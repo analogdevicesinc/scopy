@@ -27,7 +27,7 @@
 #include <QListWidget>
 #include <QLabel>
 #include <QList>
-#include "hoverwidget.h"
+#include <QStackedWidget>
 #include "pluginbase/statusmessage.h"
 #include "utils.h"
 #include "menu_anim.hpp"
@@ -53,11 +53,12 @@ private:
 
 	void addToRight(QWidget *widget);
 	void addToLeft(QWidget *widget);
+	void removeLastStatusMessage();
 
-	StatusMessage *m_message;
+	QList<StatusMessage *> m_messages;
 
 	// UI elements
-	QWidget *m_leftWidget;
+	QStackedWidget *m_stackedWidget;
 	QWidget *m_rightWidget;
 };
 } // namespace scopy
