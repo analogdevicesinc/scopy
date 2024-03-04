@@ -53,17 +53,14 @@ void ScopyStatusBar::initUi()
 	setMinimumHeight(20);
 	setMaximumHeight(20);
 
-	m_leftWidget = new QWidget(this);
-	auto leftLayout = new QHBoxLayout(m_leftWidget);
-	leftLayout->setContentsMargins(0, 0, 0, 0);
-	m_leftWidget->setLayout(leftLayout);
+	m_stackedWidget = new QStackedWidget(this);
 
 	m_rightWidget = new QWidget(this);
 	auto rightLayout = new QHBoxLayout(m_rightWidget);
 	rightLayout->setContentsMargins(0, 3, 0, 3);
 	m_rightWidget->setLayout(rightLayout);
 
-	layout()->addWidget(m_leftWidget);
+	layout()->addWidget(m_stackedWidget);
 	layout()->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
 	layout()->addWidget(m_rightWidget);
 
@@ -75,11 +72,15 @@ void ScopyStatusBar::initUi()
 
 void ScopyStatusBar::addToRight(QWidget *widget) { m_rightWidget->layout()->addWidget(widget); }
 
-void ScopyStatusBar::addToLeft(QWidget *widget) { m_leftWidget->layout()->addWidget(widget); }
+void ScopyStatusBar::addToLeft(QWidget *widget)
+{
+	m_stackedWidget->addWidget(widget);
+	m_stackedWidget->setCurrentWidget(widget);
+}
 
 void ScopyStatusBar::displayStatusMessage(StatusMessage *statusMessage)
 {
-	m_message = statusMessage;
+	m_messages.append(statusMessage);
 	addToLeft(statusMessage->getWidget());
 	this->toggleMenu(true);
 	this->show();
@@ -88,8 +89,22 @@ void ScopyStatusBar::displayStatusMessage(StatusMessage *statusMessage)
 void ScopyStatusBar::clearStatusMessage()
 {
 	this->toggleMenu(false);
-	delete m_message;
-	m_message = nullptr;
+	m_stackedWidget->removeWidget(m_stackedWidget->currentWidget());
+	removeLastStatusMessage();
+	if(m_stackedWidget->count() > 0) {
+		this->toggleMenu(true);
+		this->show();
+	}
+}
+
+void ScopyStatusBar::removeLastStatusMessage()
+{
+	StatusMessage *statusMessage = nullptr;
+	if(!m_messages.isEmpty()) {
+		statusMessage = m_messages.takeLast();
+		delete statusMessage;
+		statusMessage = nullptr;
+	}
 }
 
 #include "moc_scopystatusbar.cpp"
