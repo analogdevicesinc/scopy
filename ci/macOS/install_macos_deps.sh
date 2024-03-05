@@ -43,7 +43,7 @@ install_packages() {
 		brew link --overwrite --force $pkg
 	done
 
-	pip3 install mako
+	pip3 install --break-system-packages mako
 }
 
 export_paths(){
