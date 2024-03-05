@@ -50,6 +50,8 @@ void StyleHelper::initColorMap()
 	sh->colorMap.insert("ProgressBarSuccess", "#27B34F");
 	sh->colorMap.insert("ProgressBarError", "#F44336");
 	sh->colorMap.insert("ProgressBarBusy", "#F8E71C");
+
+	sh->colorMap.insert("WarningText", "#FFC904");
 }
 
 QString StyleHelper::getColor(QString id)
@@ -1233,6 +1235,32 @@ void StyleHelper::HoverToolTip(QWidget *w, QString info, QString objectName)
 
 	QHBoxLayout *layout = new QHBoxLayout(w);
 	layout->addWidget(label);
+}
+void StyleHelper::WarningLabel(QLabel *w, QString objectName)
+{
+	QString style = QString(R"css(
+					color: &&WarningText&&;
+					font-size: 11pt;
+							)css");
+	style.replace("&&WarningText&&", StyleHelper::getColor("WarningText"));
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::NoBackgroundIconButton(QPushButton *w, QIcon icon, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+	int size = 30;
+	w->setIcon(icon);
+	w->setIconSize(QSize(size, size));
+	w->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	QString style = QString(R"css(
+			QPushButton{
+				background-color: none;
+				border: 1px;
+			}
+			)css");
+	w->setStyleSheet(style);
 }
 
 #include "moc_stylehelper.cpp"
