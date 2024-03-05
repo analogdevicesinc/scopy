@@ -27,12 +27,13 @@
 #include "src/swiot_logging_categories.h"
 #include "swiotinfopage.h"
 #include "utils.h"
-
+#include <pluginbase/statusbarmanager.h>
 #include <iio.h>
 
 #include <QDebug>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <stylehelper.h>
 
 #include <iioutil/connectionprovider.h>
 
@@ -42,6 +43,7 @@ void SWIOTPlugin::preload()
 {
 	m_displayName = "SWIOT1L";
 	m_swiotController = new SwiotController(m_param, this);
+	m_statusContainer = nullptr;
 	connect(m_swiotController, &SwiotController::contextSwitched, this, &SWIOTPlugin::onCtxSwitched,
 		Qt::QueuedConnection);
 	connect(m_swiotController, &SwiotController::isRuntimeCtxChanged, this, &SWIOTPlugin::onIsRuntimeCtxChanged);
@@ -243,6 +245,7 @@ bool SWIOTPlugin::onConnect()
 	connect(m_runtime, &SwiotRuntime::backBtnPressed, this, &SWIOTPlugin::startCtxSwitch);
 	connect(m_swiotController, &SwiotController::isRuntimeCtxChanged, m_runtime,
 		&SwiotRuntime::onIsRuntimeCtxChanged);
+	connect(m_swiotController, &SwiotController::hasConnectedPowerSupply, this, &SWIOTPlugin::powerSupplyStatus);
 
 	m_swiotController->connectSwiot();
 	m_swiotController->startPingTask();
@@ -289,6 +292,7 @@ bool SWIOTPlugin::onDisconnect()
 		   dynamic_cast<Ad74413r *>(ad74413rTme->tool()), &Ad74413r::externalPowerSupply);
 	disconnect(m_swiotController, &SwiotController::hasConnectedPowerSupply,
 		   dynamic_cast<SwiotConfig *>(configTme->tool()), &SwiotConfig::externalPowerSupply);
+	disconnect(m_swiotController, &SwiotController::hasConnectedPowerSupply, this, &SWIOTPlugin::powerSupplyStatus);
 
 	disconnect(m_swiotController, &SwiotController::pingFailed, this, &SWIOTPlugin::disconnectDevice);
 
@@ -310,6 +314,11 @@ bool SWIOTPlugin::onDisconnect()
 	if(m_runtime) {
 		delete m_runtime;
 		m_runtime = nullptr;
+	}
+
+	if(m_statusContainer) {
+		delete m_statusContainer;
+		m_statusContainer = nullptr;
 	}
 
 	ConnectionProvider::close(m_param);
@@ -402,6 +411,40 @@ void SWIOTPlugin::startFaultsTutorial()
 	this->requestTool(faultsTme->id());
 	m_faultsTutorial->setTitle("FAULTS");
 	m_faultsTutorial->start();
+}
+
+void SWIOTPlugin::powerSupplyStatus(bool ps)
+{
+	if(!ps) {
+		if(!m_statusContainer) {
+			createStatusContainer();
+			StatusBarManager::pushWidget(m_statusContainer, "ExtPsuStatus");
+		}
+	} else {
+		if(m_statusContainer) {
+			delete m_statusContainer;
+			m_statusContainer = nullptr;
+		}
+	}
+}
+
+void SWIOTPlugin::createStatusContainer()
+{
+	m_statusContainer = new QWidget();
+	m_statusContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	m_statusContainer->setLayout(new QHBoxLayout(m_statusContainer));
+	m_statusContainer->layout()->setSpacing(0);
+	m_statusContainer->layout()->setContentsMargins(0, 0, 0, 0);
+
+	auto exclamationIcon = new QPushButton(m_statusContainer);
+	StyleHelper::NoBackgroundIconButton(exclamationIcon, QIcon::fromTheme(":/swiot/warning.svg"));
+
+	auto statusLabel = new QLabel("AD-SWIOT1L-SL:The system is powered at limited capacity.");
+	statusLabel->setWordWrap(true);
+	StyleHelper::WarningLabel(statusLabel, "extPsuStatusLabel");
+
+	m_statusContainer->layout()->addWidget(exclamationIcon);
+	m_statusContainer->layout()->addWidget(statusLabel);
 }
 
 void SWIOTPlugin::abortTutorial()
