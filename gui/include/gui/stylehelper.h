@@ -100,6 +100,8 @@ public:
 	static void IIOLineEdit(QLineEdit *w, QString objectName = "");
 	static void TableViewWidget(QWidget *w, QString objectName = "");
 	static void HoverToolTip(QWidget *w, QString info, QString objectName = "");
+	static void WarningLabel(QLabel *w, QString objectName = "");
+	static void NoBackgroundIconButton(QPushButton *w, QIcon icon, QString objectName = "");
 
 private:
 	QMap<QString, QString> colorMap;
