@@ -28,7 +28,6 @@
 
 #include "QLabel"
 #include "scopy-swiot_export.h"
-#include "src/externalpsreaderthread.h"
 #include "src/runtime/swiotruntime.h"
 #include "src/swiotcontroller.h"
 #include "src/swiotinfopage.h"
@@ -72,11 +71,15 @@ public Q_SLOTS:
 	void startMax14906Tutorial();
 	void startFaultsTutorial();
 
+	void powerSupplyStatus(bool ps);
+
 private:
+	void createStatusContainer();
 	void setupToolList();
 	SwiotInfoPage *m_infoPage;
 	QPushButton *m_btnIdentify;
 	QPushButton *m_btnTutorial;
+	QWidget *m_statusContainer;
 
 	QWidget *config;
 	QWidget *adtool;
