@@ -17,6 +17,7 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, QObject *parent)
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(dev) {
 		// might need to set a trigger for the pqm device
+		readPqmAttributes();
 		enableBufferChnls(dev);
 		m_buffer = iio_device_create_buffer(dev, BUFFER_SIZE, false);
 		if(!m_buffer) {
