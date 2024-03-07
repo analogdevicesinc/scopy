@@ -175,6 +175,19 @@ void PlotWidget::setupAxisScales()
 	}
 }
 
+PlotAxis *PlotWidget::plotAxisFromId(QwtAxisId axisId)
+{
+	for(QList<PlotAxis *> axes : m_plotAxis) {
+		for(PlotAxis *axis : axes) {
+			if(axis->axisId() == axisId) {
+				return axis;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 void PlotWidget::setupOpenGLCanvas()
 {
 	bool useOpenGLCanvas = Preferences::GetInstance()->get("general_use_opengl").toBool();

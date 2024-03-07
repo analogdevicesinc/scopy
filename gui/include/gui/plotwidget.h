@@ -72,6 +72,8 @@ public:
 	void setShowYAxisLabels(bool newShowYAxisLabels);
 
 	void addPlotInfoSlot(QWidget *w);
+	PlotAxis *plotAxisFromId(QwtAxisId axisId);
+
 public Q_SLOTS:
 	void replot();
 	void selectChannel(PlotChannel *);
