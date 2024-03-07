@@ -1607,15 +1607,15 @@ void SpectrumAnalyzer::connectZoomers()
 	fft_plot->getZoomer()->zoom(fft_plot->getZoomer()->zoomBase());
 
 	// plot magnifiers
-	connect(fft_plot->getMagnifier(), &scopy::MousePlotMagnifier::zoomed, waterfall_plot->getMagnifier(),
-		&scopy::MousePlotMagnifier::silentZoom);
-	connect(fft_plot->getMagnifier(), &scopy::MousePlotMagnifier::panned, waterfall_plot->getMagnifier(),
-		&scopy::MousePlotMagnifier::silentPan);
+	connect(fft_plot->getMagnifier(), &scopy::PlotMagnifier::zoomed, waterfall_plot->getMagnifier(),
+		&scopy::PlotMagnifier::silentZoom);
+	connect(fft_plot->getMagnifier(), &scopy::PlotMagnifier::panned, waterfall_plot->getMagnifier(),
+		&scopy::PlotMagnifier::silentPan);
 
-	connect(waterfall_plot->getMagnifier(), &scopy::MousePlotMagnifier::zoomed, fft_plot->getMagnifier(),
-		&scopy::MousePlotMagnifier::silentZoom);
-	connect(waterfall_plot->getMagnifier(), &scopy::MousePlotMagnifier::panned, fft_plot->getMagnifier(),
-		&scopy::MousePlotMagnifier::silentPan);
+	connect(waterfall_plot->getMagnifier(), &scopy::PlotMagnifier::zoomed, fft_plot->getMagnifier(),
+		&scopy::PlotMagnifier::silentZoom);
+	connect(waterfall_plot->getMagnifier(), &scopy::PlotMagnifier::panned, fft_plot->getMagnifier(),
+		&scopy::PlotMagnifier::silentPan);
 
 	// plot zoomers
 	connect(fft_plot->getZoomer(), &QwtPlotZoomer::zoomed, this, [=](const QRectF &rect) {
