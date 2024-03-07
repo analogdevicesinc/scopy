@@ -1673,9 +1673,9 @@ void LogicAnalyzer::connectSignalsAndSlots()
 
 	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished,
 		[=](bool isZoomOut) { updateBufferPreviewer(0, m_lastCapturedSample); });
-	connect(m_plot.getMagnifier(), &scopy::MousePlotMagnifier::zoomed,
+	connect(m_plot.getMagnifier(), &scopy::PlotMagnifier::zoomed,
 		[=](double factor, QPointF cursorPos) { updateBufferPreviewer(0, m_lastCapturedSample); });
-	connect(m_plot.getMagnifier(), &scopy::MousePlotMagnifier::panned,
+	connect(m_plot.getMagnifier(), &scopy::PlotMagnifier::panned,
 		[=](double factor) { updateBufferPreviewer(0, m_lastCapturedSample); });
 
 	connect(m_sampleRateButton, &ScaleSpinButton::valueChanged, this, &LogicAnalyzer::onSampleRateValueChanged);
@@ -1935,9 +1935,9 @@ void LogicAnalyzer::initBufferScrolling()
 {
 	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished,
 		[=](bool isZoomOut) { m_horizOffset = m_plot.HorizOffset(); });
-	connect(m_plot.getMagnifier(), &scopy::MousePlotMagnifier::zoomed,
+	connect(m_plot.getMagnifier(), &scopy::PlotMagnifier::zoomed,
 		[=](double factor, QPointF cursorPos) { m_horizOffset = m_plot.HorizOffset(); });
-	connect(m_plot.getMagnifier(), &scopy::MousePlotMagnifier::panned,
+	connect(m_plot.getMagnifier(), &scopy::PlotMagnifier::panned,
 		[=](double factor) { m_horizOffset = m_plot.HorizOffset(); });
 
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, [=](int value) {
