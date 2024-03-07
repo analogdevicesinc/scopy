@@ -594,14 +594,14 @@ DisplayPlot::DisplayPlot(int nplots, QWidget *parent, bool isdBgraph, unsigned i
 	setupReadouts();
 }
 
-scopy::MousePlotMagnifier *DisplayPlot::getMagnifier()
+scopy::PlotMagnifier *DisplayPlot::getMagnifier()
 {
 	if(d_magnifier.size())
 		return d_magnifier[0];
 	return nullptr;
 }
 
-QVector<scopy::MousePlotMagnifier *> DisplayPlot::getMagnifierList() { return d_magnifier; }
+QVector<scopy::PlotMagnifier *> DisplayPlot::getMagnifierList() { return d_magnifier; }
 
 void DisplayPlot::setupDisplayPlotDiv(bool isdBgraph)
 {
@@ -1024,6 +1024,29 @@ void DisplayPlot::setCursorReadoutsTransparency(int value) { d_cursorReadouts->s
 void DisplayPlot::moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position)
 {
 	d_cursorReadouts->moveToPosition(position);
+}
+
+// workaround for updating DisplayPlot specific controls when using magnifier
+// only required for plots which use offsets
+void DisplayPlot::onPlotMagnified()
+{
+	PlotMagnifier *magnifier = dynamic_cast<PlotMagnifier *>(sender());
+
+	if(magnifier) {
+		QRectF rect = magnifier->getCurrentRect();
+
+		if(magnifier->isXAxisEn()) {
+			double width = rect.width();
+			setHorizUnitsPerDiv(width / xAxisNumDiv());
+			setHorizOffset(rect.left() + (width / 2));
+		}
+
+		if(magnifier->isYAxisEn()) {
+			double height = rect.height();
+			setVertUnitsPerDiv(height / yAxisNumDiv(), magnifier->getYAxis().id);
+			setVertOffset(rect.top() + (height / 2), magnifier->getYAxis().id);
+		}
+	}
 }
 
 void DisplayPlot::trackModeEnabled(bool enabled)

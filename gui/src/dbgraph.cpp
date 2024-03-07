@@ -179,9 +179,9 @@ dBgraph::dBgraph(QWidget *parent, bool isdBgraph)
 	zoomer->setMousePattern(QwtEventPattern::MouseSelect3, Qt::RightButton);
 	zoomer->setMousePattern(QwtEventPattern::MouseSelect2, Qt::RightButton, Qt::ControlModifier);
 
-	d_magnifier.push_back(new scopy::MousePlotMagnifier(canvas()));
+	d_magnifier.push_back(new PlotMagnifier(this));
 	d_magnifier[0]->setXAxis(QwtAxis::XTop);
-	d_magnifier[0]->setYAxisEnabled(false);
+	d_magnifier[0]->setYAxisEn(false);
 	d_magnifier[0]->setEnabled(true);
 
 	installEventFilter(this);

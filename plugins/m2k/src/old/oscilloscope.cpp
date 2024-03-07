@@ -484,9 +484,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt, ToolMenuEntry 
 		plot.Curve(i)->setAxes(QwtAxisId(QwtAxis::XBottom, 0), QwtAxisId(QwtAxis::YLeft, i));
 		plot.addZoomer(i);
 		plot.addMagnifier(i);
-		connect(plot.getMagnifierList()[i], &::scopy::MousePlotMagnifier::zoomed, this,
+		connect(plot.getMagnifierList()[i], &::scopy::PlotMagnifier::zoomed, this,
 			&Oscilloscope::updateBufferPreviewer);
-		connect(plot.getMagnifierList()[i], &::scopy::MousePlotMagnifier::panned, this,
+		connect(plot.getMagnifierList()[i], &::scopy::PlotMagnifier::panned, this,
 			&Oscilloscope::updateBufferPreviewer);
 
 		probe_attenuation.push_back(1);
@@ -1048,9 +1048,9 @@ void Oscilloscope::add_ref_waveform(QString name, QVector<double> xData, QVector
 	plot.Curve(curve_id)->setTitle("REF " + QString::number(nb_ref_channels + 1));
 	plot.addZoomer(curve_id);
 	plot.addMagnifier(curve_id);
-	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::zoomed, this,
+	connect(plot.getMagnifierList()[curve_id], &::scopy::PlotMagnifier::zoomed, this,
 		&Oscilloscope::updateBufferPreviewer);
-	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::panned, this,
+	connect(plot.getMagnifierList()[curve_id], &::scopy::PlotMagnifier::panned, this,
 		&Oscilloscope::updateBufferPreviewer);
 
 	plot.replot();
@@ -1161,9 +1161,9 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 	plot.Curve(curve_id)->setTitle("REF " + QString::number(nb_ref_channels + 1));
 	plot.addZoomer(curve_id);
 	plot.addMagnifier(curve_id);
-	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::zoomed, this,
+	connect(plot.getMagnifierList()[curve_id], &::scopy::PlotMagnifier::zoomed, this,
 		&Oscilloscope::updateBufferPreviewer);
-	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::panned, this,
+	connect(plot.getMagnifierList()[curve_id], &::scopy::PlotMagnifier::panned, this,
 		&Oscilloscope::updateBufferPreviewer);
 
 	plot.replot();
@@ -2399,9 +2399,9 @@ void Oscilloscope::add_math_channel(const std::string &function)
 	plot.Curve(curve_id)->setTitle("M " + QString::number(curve_number + 1));
 	plot.addZoomer(curve_id);
 	plot.addMagnifier(curve_id);
-	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::zoomed, this,
+	connect(plot.getMagnifierList()[curve_id], &::scopy::PlotMagnifier::zoomed, this,
 		&Oscilloscope::updateBufferPreviewer);
-	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::panned, this,
+	connect(plot.getMagnifierList()[curve_id], &::scopy::PlotMagnifier::panned, this,
 		&Oscilloscope::updateBufferPreviewer);
 
 	plot.replot();
