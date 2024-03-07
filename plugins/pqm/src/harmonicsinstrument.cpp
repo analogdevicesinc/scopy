@@ -93,7 +93,9 @@ void HarmonicsInstrument::initTable()
 	StyleHelper::TableViewWidget(m_table->parentWidget(), "HarmonicsTable");
 	for(int i = 0; i < MAX_CHNLS; i++) {
 		for(int j = 0; j < HARMONICS_MAX_DEGREE; j++) {
-			m_table->setItem(i, j, new QTableWidgetItem());
+			QTableWidgetItem *tableItem = new QTableWidgetItem();
+			tableItem->setFlags(tableItem->flags() ^ Qt::ItemIsEditable);
+			m_table->setItem(i, j, tableItem);
 		}
 	}
 }
