@@ -323,6 +323,8 @@ void PlotWidget::selectChannel(PlotChannel *ch)
 	if(m_selectedChannel->curve()) {
 		m_selectedChannel->raise();
 	}
+
+	Q_EMIT channelSelected(ch);
 }
 
 PlotChannel *PlotWidget::selectedChannel() const { return m_selectedChannel; }
