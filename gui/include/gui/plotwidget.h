@@ -8,12 +8,16 @@
 #include <QWidget>
 #include <QwtPlot>
 #include <QwtPlotZoomer>
+#include <boundedplotzoomer.hpp>
 
 #include <buffer_previewer.hpp>
 #include <graticule.h>
+#include <plottracker.hpp>
 #include <symbol_controller.h>
 
 namespace scopy {
+
+class PlotNavigator;
 class PlotAxis;
 class PlotAxisHandle;
 
@@ -89,6 +93,8 @@ Q_SIGNALS:
 	void channelSelected(PlotChannel *ch);
 
 private:
+	PlotNavigator *nav;
+	PlotTracker *tracker;
 	QwtPlot *m_plot;
 	QwtPlotZoomer *m_zoomer;
 	QGridLayout *m_layout;
