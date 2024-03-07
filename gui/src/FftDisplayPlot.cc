@@ -421,7 +421,7 @@ void FftDisplayPlot::setZoomerEnabled()
 
 void FftDisplayPlot::setMagnifierEnabled(bool enabled)
 {
-	d_magnifier.push_back(new scopy::MousePlotMagnifier(canvas()));
+	d_magnifier.push_back(new scopy::MousePlotMagnifier(this));
 	d_magnifier[0]->setEnabled(enabled);
 	d_magnifier[0]->setYAxis(false);
 	connect(d_magnifier[0], &scopy::MousePlotMagnifier::reset, this, [=]() { d_zoomer[0]->zoom(0); });

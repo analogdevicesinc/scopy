@@ -240,11 +240,14 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget *parent, bool isdBgraph, un
 		d_zoomer.push_back(new TimeDomainDisplayZoomer(this->canvas()));
 		d_zoomer[i]->setEnabled(false);
 
-		d_magnifier.push_back(new scopy::MousePlotMagnifier(canvas()));
+		d_magnifier.push_back(new MousePlotMagnifier(this));
 		d_magnifier[i]->setBounded(true);
 		d_magnifier[i]->setFactor(0.99);
-		d_magnifier[i]->setYAxisEnabled(false);
-		connect(d_magnifier[i], &scopy::MousePlotMagnifier::reset, this, [=]() { d_zoomer[i]->zoom(0); });
+		d_magnifier[i]->setYAxisEn(false);
+		connect(d_magnifier[i], &MousePlotMagnifier::reset, this, [=]() {
+			d_zoomer[i]->zoom(0);
+			onPlotMagnified();
+		});
 	}
 }
 

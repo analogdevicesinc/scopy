@@ -104,7 +104,7 @@ ConstellationDisplayPlot::ConstellationDisplayPlot(int nplots, QWidget *parent)
 	d_zoomer[0]->setRubberBandPen(c);
 	d_zoomer[0]->setTrackerPen(c);
 
-	d_magnifier.push_back(new MousePlotMagnifier(canvas()));
+	d_magnifier.push_back(new MousePlotMagnifier(this));
 	connect(d_magnifier[0], &MousePlotMagnifier::reset, this, [=]() { d_zoomer[0]->zoom(0); });
 	d_magnifier[0]->setEnabled(true);
 

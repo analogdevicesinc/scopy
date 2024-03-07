@@ -1,14 +1,18 @@
 #include "mouseplotmagnifier.hpp"
-#include <DisplayPlot.h>
+#include "qevent.h"
+#include <qwt_interval.h>
+#include <qwt_scale_div.h>
+#include <cmath>
 
 using namespace scopy;
 
-MousePlotMagnifier::MousePlotMagnifier(QWidget *canvas)
-	: QObject(canvas)
-	, m_canvas(canvas)
+MousePlotMagnifier::MousePlotMagnifier(QwtPlot *plot)
+	: QObject(plot)
+	, m_plot(plot)
+	, m_canvas(plot->canvas())
 	, m_factor(0.95)
 	, m_cursorPos(QPoint())
-	, m_zoomBase(QRectF())
+	, m_baseRect(QRectF())
 	, m_xAxis(QwtAxis::XBottom)
 	, m_yAxis(QwtAxis::YLeft)
 	, m_xAxisEn(true)
@@ -18,8 +22,9 @@ MousePlotMagnifier::MousePlotMagnifier(QWidget *canvas)
 	, m_bounded(true)
 	, m_zoomModifier(Qt::NoModifier)
 	, m_panModifier(Qt::ShiftModifier)
+	, m_blockReset(false)
 {
-	canvas->setFocusPolicy(Qt::WheelFocus);
+	m_canvas->setFocusPolicy(Qt::WheelFocus);
 	setEnabled(true);
 
 	connect(this, &MousePlotMagnifier::reset, this, &MousePlotMagnifier::zoomToBase);
@@ -31,15 +36,15 @@ void MousePlotMagnifier::setXAxis(QwtAxisId axisId) { m_xAxis = axisId; }
 
 void MousePlotMagnifier::setYAxis(QwtAxisId axisId) { m_yAxis = axisId; }
 
-void MousePlotMagnifier::setXAxisEnabled(bool en) { m_xAxisEn = en; }
+void MousePlotMagnifier::setXAxisEn(bool en) { m_xAxisEn = en; }
 
-void MousePlotMagnifier::setYAxisEnabled(bool en) { m_yAxisEn = en; }
+void MousePlotMagnifier::setYAxisEn(bool en) { m_yAxisEn = en; }
 
-bool MousePlotMagnifier::isXAxisEnabled() const { return m_xAxisEn; }
+bool MousePlotMagnifier::isXAxisEn() const { return m_xAxisEn; }
 
-bool MousePlotMagnifier::isYAxisEnabled() const { return m_yAxisEn; }
+bool MousePlotMagnifier::isYAxisEn() const { return m_yAxisEn; }
 
-QRectF MousePlotMagnifier::zoomBase() const { return QRectF(m_zoomBase); }
+QRectF MousePlotMagnifier::zoomBase() const { return QRectF(m_baseRect); }
 
 bool MousePlotMagnifier::isZoomed() const { return m_isZoomed; }
 
@@ -55,17 +60,31 @@ double MousePlotMagnifier::getFactor() const { return m_factor; }
 
 void MousePlotMagnifier::setFactor(double factor) { m_factor = factor; }
 
-QwtPlot *MousePlotMagnifier::getPlot()
+QwtAxisId MousePlotMagnifier::getXAxis() { return m_xAxis; }
+
+QwtAxisId MousePlotMagnifier::getYAxis() { return m_yAxis; }
+
+QwtPlot *MousePlotMagnifier::plot() { return m_plot; }
+
+void MousePlotMagnifier::setBaseRect(const QRectF &rect) { m_baseRect = rect; }
+
+void MousePlotMagnifier::setBaseRect() { m_baseRect = getCurrentRect(); }
+
+QRectF MousePlotMagnifier::getCurrentRect()
 {
-	QWidget *plot = m_canvas;
-	if(plot) {
-		plot = plot->parentWidget();
+	double x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+
+	if(m_xAxisEn) {
+		x1 = plot()->axisScaleDiv(m_xAxis).lowerBound();
+		x2 = plot()->axisScaleDiv(m_xAxis).upperBound();
+	}
+	if(m_yAxisEn) {
+		y1 = plot()->axisScaleDiv(m_yAxis).lowerBound();
+		y2 = plot()->axisScaleDiv(m_yAxis).upperBound();
 	}
 
-	return qobject_cast<QwtPlot *>(plot);
+	return QRectF(x1, y1, x2 - x1, y2 - y1);
 }
-
-void MousePlotMagnifier::setBaseRect(const QRectF &rect) { m_zoomBase = rect; }
 
 void MousePlotMagnifier::setEnabled(bool en)
 {
@@ -115,12 +134,18 @@ void MousePlotMagnifier::pan(double factor)
 
 void MousePlotMagnifier::setBounded(bool en) { m_bounded = en; }
 
+bool MousePlotMagnifier::isBounded() { return m_bounded; }
+
+void MousePlotMagnifier::setBlockZoomResetEn(bool en) { m_blockReset = en; }
+
+bool MousePlotMagnifier::isBlockZoomResetEn() { return m_blockReset; }
+
 bool MousePlotMagnifier::eventFilter(QObject *object, QEvent *event)
 {
 	if(event->type() == QEvent::MouseButtonRelease) { // reset to base rect
 		QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(event);
 
-		if(mouseEvent->button() == Qt::MouseButton::RightButton && m_isZoomed && m_en) {
+		if(!m_blockReset && m_isZoomed && mouseEvent->button() == Qt::MouseButton::RightButton) {
 			Q_EMIT reset();
 		}
 	} else if(event->type() == QEvent::Wheel) { // zoom or pan
@@ -159,52 +184,52 @@ bool MousePlotMagnifier::eventFilter(QObject *object, QEvent *event)
 
 void MousePlotMagnifier::panRescale(double factor)
 {
-	if(isXAxisEnabled()) {
+	if(isXAxisEn()) {
 		m_isZoomed = true;
 		const QwtAxisId axisId = m_xAxis;
 
-		double v1 = getPlot()->axisInterval(axisId).minValue();
-		double v2 = getPlot()->axisInterval(axisId).maxValue();
+		double v1 = plot()->axisInterval(axisId).minValue();
+		double v2 = plot()->axisInterval(axisId).maxValue();
 		double pan_amount = ((v2 - v1) - (v2 - v1) * factor) * 0.5;
 		v1 += pan_amount;
 		v2 += pan_amount;
 
 		// limit zoom to zoomBase
-		if(m_bounded) {
-			if(v1 < m_zoomBase.left()) {
-				v2 = m_zoomBase.left() + (v2 - v1);
-				v1 = m_zoomBase.left();
-			} else if(v2 > m_zoomBase.right()) {
-				v1 = m_zoomBase.right() - (v2 - v1);
-				v2 = m_zoomBase.right();
+		if(m_bounded && !m_baseRect.isNull()) {
+			if(v1 < m_baseRect.left()) {
+				v2 = m_baseRect.left() + (v2 - v1);
+				v1 = m_baseRect.left();
+			} else if(v2 > m_baseRect.right()) {
+				v1 = m_baseRect.right() - (v2 - v1);
+				v2 = m_baseRect.right();
 			}
 		}
 
-		setPlotAxisScale(axisId, v1, v2);
+		plot()->setAxisScale(axisId, v1, v2);
 
-		getPlot()->replot();
+		plot()->replot();
 		Q_EMIT panned(factor);
 	}
+	Q_EMIT pannedRect(getCurrentRect());
 }
 
 void MousePlotMagnifier::zoomRescale(double factor)
 {
-	QwtPlot *plot = getPlot();
 	bool zoom = false;
 
 	for(QwtAxisId axisId : {m_xAxis, m_yAxis}) {
-		if((QwtAxis::isXAxis(axisId) && isXAxisEnabled()) || (QwtAxis::isYAxis(axisId) && isYAxisEnabled())) {
-			const QwtScaleMap scaleMap = plot->canvasMap(axisId);
+		if((QwtAxis::isXAxis(axisId) && isXAxisEn()) || (QwtAxis::isYAxis(axisId) && isYAxisEn())) {
+			const QwtScaleMap scaleMap = plot()->canvasMap(axisId);
 			double cursor = 0, v1 = 0, v2 = 0; // position of the cursor in the axis coordinates
 
 			// we use the painted plot as reference
 			if(QwtAxis::isXAxis(axisId)) {
 				cursor = m_cursorPos.x();
-				v2 = plot->canvas()->width();
+				v2 = m_canvas->width();
 			}
 			if(QwtAxis::isYAxis(axisId)) {
 				cursor = m_cursorPos.y();
-				v1 = plot->canvas()->height();
+				v1 = m_canvas->height();
 			}
 
 			// calculate new axis scale
@@ -215,56 +240,43 @@ void MousePlotMagnifier::zoomRescale(double factor)
 			v2 = scaleMap.invTransform(newCenter + width);
 
 			// limit zoom to zoomBase
-			if(QwtAxis::isXAxis(axisId) && m_bounded) {
-				v1 = std::max(v1, m_zoomBase.left());
-				v2 = std::min(v2, m_zoomBase.right());
-			}
-			if(QwtAxis::isYAxis(axisId) && m_bounded) {
-				v1 = std::max(v1, m_zoomBase.top());
-				v2 = std::min(v2, m_zoomBase.bottom());
+			if(m_bounded && !m_baseRect.isNull()) {
+				if(QwtAxis::isXAxis(axisId)) {
+					v1 = std::max(v1, m_baseRect.left());
+					v2 = std::min(v2, m_baseRect.right());
+				}
+				if(QwtAxis::isYAxis(axisId)) {
+					v1 = std::max(v1, m_baseRect.top());
+					v2 = std::min(v2, m_baseRect.bottom());
+				}
 			}
 
-			setPlotAxisScale(axisId, v1, v2);
+			plot()->setAxisScale(axisId, v1, v2);
 			zoom = true;
 		}
 	}
 
 	if(zoom) {
-		plot->replot();
+		plot()->replot();
 		m_isZoomed = true;
 		Q_EMIT zoomed(factor, m_cursorPos);
 	}
-}
-
-void MousePlotMagnifier::setPlotAxisScale(QwtAxisId axisId, double min, double max)
-{
-	getPlot()->setAxisScale(axisId, min, max);
-
-	scopy::DisplayPlot *plt = dynamic_cast<scopy::DisplayPlot *>(getPlot());
-	if(plt) {
-		if(QwtAxis::isXAxis(axisId)) {
-			double width = qAbs(max - min);
-			plt->setHorizUnitsPerDiv(width / plt->xAxisNumDiv());
-			plt->setHorizOffset(min + (width / 2));
-		}
-		if(QwtAxis::isYAxis(axisId)) {
-			double height = qAbs(max - min);
-			plt->setVertUnitsPerDiv(height / plt->yAxisNumDiv(), axisId.id);
-			plt->setVertOffset(min + (height / 2), axisId.id);
-		}
-	}
+	Q_EMIT zoomedRect(getCurrentRect());
 }
 
 void MousePlotMagnifier::zoomToBase()
 {
-	if(isXAxisEnabled()) {
-		setPlotAxisScale(m_xAxis, m_zoomBase.left(), m_zoomBase.right());
-	}
-	if(isYAxisEnabled()) {
-		setPlotAxisScale(m_yAxis, m_zoomBase.top(), m_zoomBase.bottom());
+	if(m_baseRect.isNull()) {
+		return;
 	}
 
-	getPlot()->replot();
+	if(isXAxisEn()) {
+		plot()->setAxisScale(m_xAxis, m_baseRect.left(), m_baseRect.right());
+	}
+	if(isYAxisEn()) {
+		plot()->setAxisScale(m_yAxis, m_baseRect.top(), m_baseRect.bottom());
+	}
+
+	plot()->replot();
 	m_isZoomed = false;
-	Q_EMIT zoomed(-1);
 }

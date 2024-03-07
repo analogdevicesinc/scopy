@@ -539,6 +539,8 @@ public Q_SLOTS:
 	void setCursorReadoutsTransparency(int value);
 	void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
 
+	void onPlotMagnified();
+
 Q_SIGNALS:
 	void horizScaleDivisionChanged(double);
 	void vertScaleDivisionChanged(double);

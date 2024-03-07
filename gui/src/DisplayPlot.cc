@@ -1026,6 +1026,29 @@ void DisplayPlot::moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition 
 	d_cursorReadouts->moveToPosition(position);
 }
 
+// workaround for updating DisplayPlot specific controls when using magnifier
+// only required for plots which use offsets
+void DisplayPlot::onPlotMagnified()
+{
+	MousePlotMagnifier *magnifier = dynamic_cast<MousePlotMagnifier *>(sender());
+
+	if(magnifier) {
+		QRectF rect = magnifier->getCurrentRect();
+
+		if(magnifier->isXAxisEn()) {
+			double width = rect.width();
+			setHorizUnitsPerDiv(width / xAxisNumDiv());
+			setHorizOffset(rect.left() + (width / 2));
+		}
+
+		if(magnifier->isYAxisEn()) {
+			double height = rect.height();
+			setVertUnitsPerDiv(height / yAxisNumDiv(), magnifier->getYAxis().id);
+			setVertOffset(rect.top() + (height / 2), magnifier->getYAxis().id);
+		}
+	}
+}
+
 void DisplayPlot::trackModeEnabled(bool enabled)
 {
 	d_trackMode = !enabled;
