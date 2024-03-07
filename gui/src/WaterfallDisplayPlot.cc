@@ -167,10 +167,10 @@ WaterfallDisplayPlot::WaterfallDisplayPlot(int nplots, QWidget *parent)
 	font.setWeight(75);
 	d_zoomer[0]->setTrackerFont(font);
 
-	d_magnifier.push_back(new scopy::MousePlotMagnifier(canvas()));
+	d_magnifier.push_back(new PlotMagnifier(this));
 	d_magnifier[0]->setEnabled(true);
 	d_magnifier[0]->setYAxis(false);
-	connect(d_magnifier[0], &scopy::MousePlotMagnifier::reset, this, [=]() { d_zoomer[0]->zoom(0); });
+	connect(d_magnifier[0], &scopy::PlotMagnifier::reset, this, [=]() { d_zoomer[0]->zoom(0); });
 
 	_updateIntensityRangeDisplay();
 

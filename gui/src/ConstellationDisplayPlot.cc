@@ -52,7 +52,7 @@
 #include <qwt_scale_draw.h>
 
 #include <iostream>
-#include <mouseplotmagnifier.hpp>
+#include <plotmagnifier.hpp>
 
 using namespace scopy;
 
@@ -104,8 +104,8 @@ ConstellationDisplayPlot::ConstellationDisplayPlot(int nplots, QWidget *parent)
 	d_zoomer[0]->setRubberBandPen(c);
 	d_zoomer[0]->setTrackerPen(c);
 
-	d_magnifier.push_back(new MousePlotMagnifier(canvas()));
-	connect(d_magnifier[0], &MousePlotMagnifier::reset, this, [=]() { d_zoomer[0]->zoom(0); });
+	d_magnifier.push_back(new PlotMagnifier(this));
+	connect(d_magnifier[0], &PlotMagnifier::reset, this, [=]() { d_zoomer[0]->zoom(0); });
 	d_magnifier[0]->setEnabled(true);
 
 	//  setAxisScaleEngine(QwtAxis::XBottom, new QwtLinearScaleEngine);
