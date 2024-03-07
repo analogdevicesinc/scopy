@@ -54,7 +54,7 @@ WaveformInstrument::~WaveformInstrument()
 void WaveformInstrument::initData()
 {
 	for(int i = 0; i < SAMPLE_RATE; i++) {
-		m_xTime.push_back((i / (double)SAMPLE_RATE));
+		m_xTime.push_back((i / (double)SAMPLE_RATE * XMAX));
 	}
 	for(const QMap<QString, QString> &chMap : m_chnls) {
 		for(const QString &ch : chMap) {
