@@ -84,6 +84,7 @@ Q_SIGNALS:
 	void mouseButtonPress(const QMouseEvent *event);
 	void mouseButtonRelease(const QMouseEvent *event);
 	void mouseMove(const QMouseEvent *event);
+	void channelSelected(PlotChannel *ch);
 
 private:
 	QwtPlot *m_plot;
