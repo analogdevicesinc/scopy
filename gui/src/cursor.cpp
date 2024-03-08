@@ -1,6 +1,7 @@
 #include "cursor.h"
 
 #include "plot_line_handle.h"
+#include "plotaxis.h"
 
 using namespace scopy;
 
@@ -19,7 +20,12 @@ void Cursor::setCanLeavePlot(bool leave) { m_canLeavePlot = leave; }
 
 PlotLineHandle *Cursor::cursorHandle() const { return m_cursorHandle; }
 
-void Cursor::setAxis(PlotAxis *ax) { m_axis = ax; }
+void Cursor::setAxis(PlotAxis *ax)
+{
+	m_axis = ax;
+	m_cursorBar->setMobileAxis(ax->axisId());
+	m_cursorBar->updatePlotCoordFromSurfacePos();
+}
 
 void Cursor::setVisible(bool visible)
 {
