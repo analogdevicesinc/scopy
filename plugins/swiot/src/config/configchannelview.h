@@ -21,18 +21,18 @@
 #ifndef CONFIGCHANNELVIEW_H
 #define CONFIGCHANNELVIEW_H
 
-#include "qwidget.h"
-
-#include "ui_configchannelview.h"
-
+#include <QWidget>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QLabel>
 #include <QObject>
 #include <QString>
 
+#define DEVICE_COMBO_WIDTH 105
+#define FUNCTION_COMBO_WIDTH 175
+
 namespace scopy::swiot {
-class ConfigChannelView : public QFrame
+class ConfigChannelView : public QWidget
 {
 	Q_OBJECT
 public:
@@ -77,10 +77,12 @@ private:
 	QString m_selectedFunction;
 	QStringList m_functionAvailable;
 
-	// UI elements
-	Ui::ConfigChannelView *ui;
+	QLabel *m_chnlLabel;
+	QCheckBox *m_chnlCheck;
+	QComboBox *m_deviceOptions;
+	QComboBox *m_functionOptions;
 
-	void applyUiElementsStyle();
+	void setHighlightPalette();
 	void initTutorialProperties();
 };
 } // namespace scopy::swiot

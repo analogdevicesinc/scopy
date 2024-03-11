@@ -20,11 +20,6 @@
 
 #include "configcontroller.h"
 
-#include "src/swiot_logging_categories.h"
-
-#include <QDebug>
-#include <QObject>
-
 using namespace scopy::swiot;
 
 ConfigController::ConfigController(ConfigChannelView *channelView, ConfigModel *model, int channelId)
