@@ -1,12 +1,7 @@
 #!/bin/bash
 set -ex
-STAGING_AREA=$PWD/staging
-STAGINGDIR=$STAGING_AREA/dependencies
-REPO_SRC=$BUILD_REPOSITORY_LOCALPATH
-BUILDDIR=$REPO_SRC/build
-QT_PATH="$(brew --prefix ${QT_FORMULAE})/bin"
-
-export PATH="${QT_PATH}:$PATH"
+REPO_SRC=$(git rev-parse --show-toplevel)
+source $REPO_SRC/ci/macOS/macos_config.sh
 
 cd $BUILDDIR
 
@@ -20,7 +15,7 @@ cp -R $BUILDDIR/plugins/regmap/xmls $BUILDDIR/Scopy.app/Contents/MacOS/plugins/p
 cp -R $STAGING_AREA/libiio/build/iio.framework Scopy.app/Contents/Frameworks/
 cp -R $STAGING_AREA/libad9361/build/ad9361.framework Scopy.app/Contents/Frameworks/
 
-libqwtpath=${STAGINGDIR}/lib/libqwt.6.4.0.dylib
+libqwtpath=${STAGING_AREA_DEPS}/lib/libqwt.6.4.0.dylib
 libqwtid="$(otool -D ${libqwtpath} | tail -1)"
 
 iiorpath="$(otool -D ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep @rpath)"
@@ -33,10 +28,10 @@ libusbpath="$(otool -L ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep 
 libusbid="$(echo ${libusbpath} | rev | cut -d "/" -f 1 | rev)"
 cp ${libusbpath} ./Scopy.app/Contents/Frameworks/
 
-m2kpath=${STAGINGDIR}/lib/libm2k.dylib
+m2kpath=${STAGING_AREA_DEPS}/lib/libm2k.dylib
 m2krpath="$(otool -D ${m2kpath} | grep @rpath)"
 m2kid=${m2krpath#"@rpath/"}
-cp ${STAGINGDIR}/lib/libm2k.* ./Scopy.app/Contents/Frameworks
+cp ${STAGING_AREA_DEPS}/lib/libm2k.* ./Scopy.app/Contents/Frameworks
 sudo install_name_tool -id @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/Frameworks/${m2kid}
 
 
@@ -75,7 +70,7 @@ echo "### Fixing scopy plugins"
 ls $BUILDDIR/Scopy.app/Contents/MacOs/plugins/plugins | grep libscopy | while read plugin
 do
 	echo "--- FIXING PLUGIN: $plugin"
-	echo $STAGINGDIR/lib | dylibbundler --no-codesign --overwrite-files --bundle-deps -cd \
+	echo $STAGING_AREA_DEPS/lib | dylibbundler --no-codesign --overwrite-files --bundle-deps -cd \
 	--fix-file $BUILDDIR/Scopy.app/Contents/MacOS/plugins/plugins/$plugin \
 	--dest-dir $BUILDDIR/Scopy.app/Contents/Frameworks/ \
 	--install-path @executable_path/../Frameworks/ \
@@ -84,7 +79,7 @@ done
 
 
 echo "### Fixing Scopy binary"
-echo $STAGINGDIR/lib | dylibbundler -ns -of -b \
+echo $STAGING_AREA_DEPS/lib | dylibbundler -ns -of -b \
 -x $BUILDDIR/Scopy.app/Contents/MacOS/Scopy \
 -d $BUILDDIR/Scopy.app/Contents/Frameworks  \
 -p @executable_path/../Frameworks \
@@ -137,7 +132,7 @@ sudo install_name_tool -change ${m2krpath} @executable_path/../Frameworks/${m2ki
 
 echo "=== Fixing iio-emu + libtinyiiod"
 cp $REPO_SRC/iio-emu/build/iio-emu ./Scopy.app/Contents/MacOS/
-echo $STAGINGDIR/lib | dylibbundler -ns -of -b \
+echo $STAGING_AREA_DEPS/lib | dylibbundler -ns -of -b \
 	--fix-file $BUILDDIR/Scopy.app/Contents/MacOS/iio-emu \
 	--dest-dir $BUILDDIR/Scopy.app/Contents/Frameworks/ \
 	--install-path @executable_path/../Frameworks/ \
