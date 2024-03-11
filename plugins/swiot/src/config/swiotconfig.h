@@ -24,14 +24,13 @@
 #include "configcontroller.h"
 #include "src/config/drawarea.h"
 
-#include "ui_swiotconfig.h"
-
 #include <QMap>
 #include <QPushButton>
 #include <QScrollArea>
+#include <gui/tooltemplate.h>
+
 #include <iio.h>
 #include <iioutil/commandqueue.h>
-#include <gui/tooltemplate.h>
 
 #define NUMBER_OF_CHANNELS 4
 
@@ -66,13 +65,14 @@ private:
 	ToolTemplate *m_tool;
 	DrawArea *m_drawArea;
 	QScrollArea *m_scrollArea;
-	Ui::ConfigMenu *m_ui;
+	QWidget *m_chnlsGrid;
 
 	void provideDeviceConnection();
 	void setupUiElements();
 	void buildGridLayout();
 	void createPageLayout();
 	void initTutorialProperties();
+	QWidget *createGridHeader(QWidget *parent);
 	QPushButton *createApplyBtn();
 };
 } // namespace scopy::swiot

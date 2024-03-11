@@ -20,11 +20,7 @@
 
 #include "drawarea.h"
 
-#include "src/swiot_logging_categories.h"
-
-#include <QDebug>
 #include <QFile>
-#include <QLabel>
 #include <QPainter>
 #include <QPixmap>
 #include <QVBoxLayout>

@@ -21,7 +21,7 @@
 #ifndef CONFIGCONTROLLER_H
 #define CONFIGCONTROLLER_H
 
-#include "QObject"
+#include <QObject>
 #include "configmodel.h"
 #include "src/config/configchannelview.h"
 
