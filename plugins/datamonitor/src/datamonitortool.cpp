@@ -19,7 +19,7 @@
 #include <dmmreadstrategy.hpp>
 #include <datamonitorcontroller.hpp>
 #include <datamonitorutils.hpp>
-#include <timetracker.hpp>
+#include <timemanager.hpp>
 #include "dynamicWidget.h"
 
 using namespace scopy;
@@ -80,8 +80,11 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 		tool->requestMenu(DataMonitorUtils::getToolSettingsId());
 	});
 
-	connect(toolSettings, &DataMonitorToolSettings::readIntervalChanged, this,
-		[=](double newInterval) { m_readTimer->setInterval(newInterval * 1000); });
+	auto &&timeTracker = TimeManager::GetInstance();
+	timeTracker->setTimerInterval(DataMonitorUtils::getReadIntervalDefaul());
+
+	connect(toolSettings, &DataMonitorToolSettings::readIntervalChanged, timeTracker,
+		&TimeManager::setTimerInterval);
 
 	// generate channel monitors
 
@@ -98,23 +101,22 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 
 	Q_EMIT m_flexGridLayout->reqestLayoutUpdate();
 
-	// TODO connect to UI
-	m_readTimer = new QTimer(this);
-	m_readTimer->setInterval(DataMonitorUtils::getReadIntervalDefaul() * 1000);
-	connect(m_readTimer, &QTimer::timeout, dataAcquisitionManager, &DataAcquisitionManager::readData);
-
 	startTime = new QLabel();
+
+	connect(timeTracker, &TimeManager::timeout, dataAcquisitionManager, &DataAcquisitionManager::readData);
 
 	connect(runBtn, &QPushButton::toggled, this, [=](bool toggled) {
 		if(toggled) {
-			m_readTimer->start();
+			timeTracker->startTimer();
 			if(first) {
 				resetStartTime();
 				first = false;
 			}
 		} else {
-			m_readTimer->stop();
+			timeTracker->stopTimer();
 		}
+
+		timeTracker->setIsRunning(toggled);
 	});
 
 	connect(clearBtn, &QPushButton::clicked, this, [=]() {
@@ -178,7 +180,7 @@ void DataMonitorTool::generateMonitor(DataMonitorModel *model, CollapsableMenuCo
 
 void DataMonitorTool::resetStartTime()
 {
-	auto &&timeTracker = TimeTracker::GetInstance();
+	auto &&timeTracker = TimeManager::GetInstance();
 	timeTracker->setStartTime();
 
 	QDateTime date = QDateTime::currentDateTime();

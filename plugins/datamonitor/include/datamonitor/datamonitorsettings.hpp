@@ -1,6 +1,7 @@
 #ifndef DATAMONITORSETTINGS_HPP
 #define DATAMONITORSETTINGS_HPP
 
+#include <QTimer>
 #include <QWidget>
 #include <menucombo.h>
 #include <menuheader.h>
@@ -62,10 +63,7 @@ private:
 
 	PositionSpinButton *m_ymin;
 	PositionSpinButton *m_ymax;
-	PositionSpinButton *m_xmin;
-	PositionSpinButton *m_xmax;
 	QWidget *generateYAxisSettings(QWidget *parent);
-	QWidget *generateXAxisSettings(QWidget *parent);
 	QWidget *createCurveMenu(QWidget *parent);
 
 	// MenuComboWidget *mainMonitorCombo;
