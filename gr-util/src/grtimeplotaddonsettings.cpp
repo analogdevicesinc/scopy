@@ -282,10 +282,10 @@ QWidget *GRTimePlotAddonSettings::createXYMenu(QWidget *parent)
 {
 	MenuSectionWidget *xycontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *xy = new MenuCollapseSection("X-Y", MenuCollapseSection::MHCW_NONE, xycontainer);
-	QVBoxLayout *xyMenuLayout = new QVBoxLayout(xy);
+	QVBoxLayout *xyMenuLayout = new QVBoxLayout();
 	xyMenuLayout->setMargin(0);
 	xyMenuLayout->setSpacing(10);
-	QVBoxLayout *xyLayout = new QVBoxLayout(xy);
+	QVBoxLayout *xyLayout = new QVBoxLayout();
 	xyLayout->setSpacing(10);
 	xyLayout->setMargin(0);
 
@@ -388,11 +388,11 @@ QWidget *GRTimePlotAddonSettings::createFFTMenu(QWidget *parent)
 	MenuSectionWidget *fftcontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *fft = new MenuCollapseSection("FFT", MenuCollapseSection::MHCW_NONE, fftcontainer);
 
-	QVBoxLayout *fftLayout = new QVBoxLayout(fft);
+	QVBoxLayout *fftLayout = new QVBoxLayout();
 	fftLayout->setMargin(0);
 	fftLayout->setSpacing(10);
 
-	QVBoxLayout *iqLayout = new QVBoxLayout(fft);
+	QVBoxLayout *iqLayout = new QVBoxLayout();
 	iqLayout->setMargin(0);
 	iqLayout->setSpacing(10);
 
