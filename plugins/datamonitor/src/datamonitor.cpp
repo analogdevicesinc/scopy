@@ -103,17 +103,10 @@ bool DataMonitorPlugin::onDisconnect()
 {
 	delete tool;
 
-	cs->stop();
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setTool(nullptr);
 		m_toolList[0]->setRunBtnVisible(false);
-	}
-
-	try {
-		contextClose(libm2k_context, true);
-	} catch(std::exception &ex) {
-		qDebug(CAT_DATAMONITOR) << ex.what();
 	}
 
 	auto &&cp = ContextProvider::GetInstance();
