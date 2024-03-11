@@ -45,7 +45,6 @@ public:
 	void read();
 
 	double minValue() const;
-
 	double maxValue() const;
 
 Q_SIGNALS:
@@ -57,16 +56,16 @@ Q_SIGNALS:
 private:
 	QString name;
 	QColor color;
-	UnitOfMeasurement *unitOfMeasure;
 	double m_minValue;
 	double m_maxValue;
+	double m_dataSize;
 	QVector<double> ydata;
 	QVector<double> xdata;
 	void checkMinMaxUpdate(double value);
-	IReadStrategy *readStrategy;
-
 	void setDataStorageSize();
-	double m_dataSize;
+
+	IReadStrategy *readStrategy;
+	UnitOfMeasurement *unitOfMeasure;
 };
 } // namespace datamonitor
 } // namespace scopy
