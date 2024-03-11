@@ -137,11 +137,11 @@ QPushButton *GRTimeChannelAddon::createSnapshotButton(QWidget *parent)
 QWidget *GRTimeChannelAddon::createMenu(QWidget *parent)
 {
 	QWidget *w = new QWidget(parent);
-	QVBoxLayout *lay = new QVBoxLayout(w);
+	QVBoxLayout *lay = new QVBoxLayout();
 
 	QScrollArea *scroll = new QScrollArea(parent);
 	QWidget *wScroll = new QWidget(scroll);
-	QVBoxLayout *layScroll = new QVBoxLayout(wScroll);
+	QVBoxLayout *layScroll = new QVBoxLayout();
 	layScroll->setMargin(0);
 	layScroll->setSpacing(10);
 
@@ -183,7 +183,7 @@ QWidget *GRTimeChannelAddon::createAttrMenu(QWidget *parent)
 		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrcontainer);
 	QList<IIOWidget *> attrWidgets = IIOWidgetFactory::buildAllAttrsForChannel(grch()->channel());
 
-	auto layout = new QVBoxLayout(attrcontainer);
+	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
 	layout->setMargin(0);
 	layout->setContentsMargins(0, 0, 0, 10); // bottom margin
