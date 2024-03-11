@@ -1,5 +1,7 @@
 #include "datamonitorsettings.hpp"
+#include "plottimeaxiscontroller.hpp"
 
+#include <QDateTimeEdit>
 #include <QDebug>
 #include <QScrollArea>
 #include <QTimer>
@@ -63,7 +65,9 @@ void DataMonitorSettings::init(QString title, QColor color)
 	connect(plotSwitch->onOffswitch(), &QAbstractButton::toggled, this, &DataMonitorSettings::togglePlot);
 
 	// XAxis settings
-	layout->addWidget(generateXAxisSettings(this));
+	PlotTimeAxisController *plotTimeAxisController = new PlotTimeAxisController(m_plot, this);
+	layout->addWidget(plotTimeAxisController);
+
 	// YAxis settings
 	layout->addWidget(generateYAxisSettings(this));
 
@@ -120,6 +124,13 @@ void DataMonitorSettings::addMonitor(QString monitor, QColor monitorColor)
 
 	connect(monitorChannel->checkBox(), &QCheckBox::toggled, this,
 		[=](bool toggled) { Q_EMIT monitorToggled(toggled, monitor); });
+
+	// when removing the monitor disable all active monitors
+	connect(this, &DataMonitorSettings::removeMonitor, monitorChannel, [=]() {
+		if(monitorChannel->checkBox()->isChecked()) {
+			Q_EMIT monitorToggled(false, monitor);
+		}
+	});
 }
 
 void DataMonitorSettings::generateDeviceSection(QString device)
@@ -236,63 +247,6 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 	});
 
 	return yaxisContainer;
-}
-
-QWidget *DataMonitorSettings::generateXAxisSettings(QWidget *parent)
-{
-	MenuSectionWidget *xAxisContainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *xAxisSection =
-		new MenuCollapseSection("X-AXIS", MenuCollapseSection::MHCW_NONE, xAxisContainer);
-
-	xAxisContainer->contentLayout()->addWidget(xAxisSection);
-
-	MenuOnOffSwitch *realTimeToggle = new MenuOnOffSwitch(tr("Real Time"), xAxisSection, false);
-	xAxisSection->contentLayout()->addWidget(realTimeToggle);
-
-	connect(realTimeToggle->onOffswitch(), &QAbstractButton::toggled, m_plot, &MonitorPlot::setIsRealTime);
-
-	// X-MIN-MAX
-	QWidget *xMinMax = new QWidget(xAxisSection);
-	QHBoxLayout *xMinMaxLayout = new QHBoxLayout(xMinMax);
-	xMinMaxLayout->setMargin(0);
-	xMinMaxLayout->setSpacing(10);
-	xMinMax->setLayout(xMinMaxLayout);
-
-	// TODO replace UM with the unit of measure of main monitor
-
-	m_xmin = new PositionSpinButton(
-		{
-			{"s", 1},
-			{"min", 60},
-		},
-		"XMin", (double)((long)(-1 << 31)), (double)((long)1 << 31), false, false, xMinMax);
-
-	m_xmin->setValue(DataMonitorUtils::getAxisDefaultMinValue());
-
-	m_xmax = new PositionSpinButton(
-		{
-			{"s", 1},
-			{"min", 60},
-		},
-		"XMax", (double)((long)(-1 << 31)), (double)((long)1 << 31), false, false, xMinMax);
-
-	m_xmax->setValue(DataMonitorUtils::getAxisDefaultMaxValue());
-
-	xMinMaxLayout->addWidget(m_xmin);
-	xMinMaxLayout->addWidget(m_xmax);
-
-	xAxisSection->contentLayout()->addWidget(xMinMax);
-
-	connect(m_xmin, &PositionSpinButton::valueChanged, this, [=](double value) {
-		m_plot->updateXAxisIntervalMin(value);
-		m_xmax->setMinValue(value);
-	});
-	connect(m_xmax, &PositionSpinButton::valueChanged, this, [=](double value) {
-		m_plot->updateXAxisIntervalMax(value);
-		m_xmin->setMaxValue(value);
-	});
-
-	return xAxisContainer;
 }
 
 QWidget *DataMonitorSettings::createCurveMenu(QWidget *parent)

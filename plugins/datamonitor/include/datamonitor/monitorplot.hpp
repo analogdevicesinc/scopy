@@ -8,6 +8,7 @@
 #include <datamonitormodel.hpp>
 #include <QwtDateScaleDraw>
 #include <QwtDateScaleEngine>
+#include <QTimer>
 #include "scopy-datamonitor_export.h"
 
 namespace scopy {
@@ -40,10 +41,12 @@ public:
 	double getYAxisIntervalMin();
 	double getYAxisIntervalMax();
 
-
 	void setIsRealTime(bool newIsRealTime);
 
 	void setStartTime();
+
+	void setStartingPoint(QDateTime newStartingPoint);
+	void updatePlotStartingPoint(double time, double delta);
 
 private:
 	PlotWidget *m_plot;
@@ -56,7 +59,7 @@ private:
 	bool m_isRealTime = false;
 
 	void setupXAxis();
-	QwtDateScaleDraw *genereateScaleDraw(QString format, double offset, QwtDate::IntervalType intervalType);
+	void genereateScaleDraw(QString format, double offset);
 	QwtDateScaleEngine *scaleEngine;
 
 	double m_startTime = 0;
@@ -64,6 +67,8 @@ private:
 	void updateAxisScaleDraw();
 	double m_xAxisIntervalMin;
 	double m_xAxisIntervalMax;
+
+	QDateTime m_startingPoint;
 };
 } // namespace datamonitor
 } // namespace scopy
