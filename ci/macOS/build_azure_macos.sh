@@ -1,14 +1,7 @@
 #!/bin/bash
 set -ex
-
-STAGING_AREA=$PWD/staging
-STAGING_AREA_DEPS=$STAGING_AREA/dependencies
-JOBS=-j8
-REPO_SRC=$BUILD_REPOSITORY_LOCALPATH
-
-QT_PATH="$(brew --prefix ${QT_FORMULAE})/bin"
-export PATH="${QT_PATH}:$PATH"
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH;$STAGING_AREA_DEPS;$STAGING_AREA_DEPS/lib"
+REPO_SRC=$(git rev-parse --show-toplevel)
+source $REPO_SRC/ci/macOS/macos_config.sh
 
 build_iio-emu(){
 	echo "### Clone and Build IIO-Emulator"
