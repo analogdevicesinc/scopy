@@ -21,12 +21,10 @@
 #ifndef CONFIGMODEL_H
 #define CONFIGMODEL_H
 
-#include "qobject.h"
+#include <QObject>
 
 #include <QMap>
-
 #include <iioutil/commandqueue.h>
-#include <string>
 
 extern "C"
 {
@@ -68,11 +66,11 @@ private:
 	struct iio_device *m_device;
 	int m_channelId;
 
-	std::string m_enableAttribute;
-	std::string m_functionAttribute;
-	std::string m_functionAvailableAttribute;
-	std::string m_deviceAttribute;
-	std::string m_deviceAvailableAttribute;
+	QString m_enableAttribute;
+	QString m_functionAttribute;
+	QString m_functionAvailableAttribute;
+	QString m_deviceAttribute;
+	QString m_deviceAvailableAttribute;
 
 	QString m_enabled;
 	QStringList m_availableDevices;
