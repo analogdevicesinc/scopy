@@ -19,13 +19,9 @@
  */
 
 #include "configmodel.h"
-
 #include "src/swiot_logging_categories.h"
 
 #include <iio.h>
-
-#include <QMap>
-
 #include <iioutil/iiocommand/iiodeviceattributeread.h>
 #include <iioutil/iiocommand/iiodeviceattributewrite.h>
 
@@ -36,7 +32,7 @@ ConfigModel::ConfigModel(struct iio_device *device, int channelId, CommandQueue 
 	, m_channelId(channelId)
 	, m_commandQueue(commandQueue)
 {
-	std::string attributePrefix = "ch" + std::to_string(m_channelId);
+	QString attributePrefix = "ch" + QString::number(m_channelId);
 
 	m_enableAttribute = attributePrefix + "_enable";
 	m_functionAttribute = attributePrefix + "_function";
@@ -49,7 +45,7 @@ ConfigModel::~ConfigModel() {}
 
 void ConfigModel::readEnabled()
 {
-	Command *enabledChnCmd = new IioDeviceAttributeRead(m_device, m_enableAttribute.c_str(), nullptr);
+	Command *enabledChnCmd = new IioDeviceAttributeRead(m_device, m_enableAttribute.toStdString().c_str(), nullptr);
 	connect(
 		enabledChnCmd, &scopy::Command::finished, this,
 		[=, this](scopy::Command *cmd) {
@@ -77,7 +73,7 @@ void ConfigModel::readEnabled()
 
 void ConfigModel::writeEnabled(const QString &enabled)
 {
-	Command *enabledChnCmd = new IioDeviceAttributeWrite(m_device, m_enableAttribute.c_str(),
+	Command *enabledChnCmd = new IioDeviceAttributeWrite(m_device, m_enableAttribute.toStdString().c_str(),
 							     enabled.toStdString().c_str(), nullptr);
 	connect(
 		enabledChnCmd, &scopy::Command::finished, this,
@@ -100,7 +96,7 @@ void ConfigModel::writeEnabled(const QString &enabled)
 
 void ConfigModel::readDevice()
 {
-	Command *deviceChnCmd = new IioDeviceAttributeRead(m_device, m_deviceAttribute.c_str(), nullptr);
+	Command *deviceChnCmd = new IioDeviceAttributeRead(m_device, m_deviceAttribute.toStdString().c_str(), nullptr);
 	connect(
 		deviceChnCmd, &scopy::Command::finished, this,
 		[=, this](scopy::Command *cmd) {
@@ -123,8 +119,8 @@ void ConfigModel::readDevice()
 
 void ConfigModel::writeDevice(const QString &device)
 {
-	Command *deviceChnCmd =
-		new IioDeviceAttributeWrite(m_device, m_deviceAttribute.c_str(), device.toStdString().c_str(), nullptr);
+	Command *deviceChnCmd = new IioDeviceAttributeWrite(m_device, m_deviceAttribute.toStdString().c_str(),
+							    device.toStdString().c_str(), nullptr);
 	connect(
 		deviceChnCmd, &scopy::Command::finished, this,
 		[=, this](scopy::Command *cmd) {
@@ -146,7 +142,8 @@ void ConfigModel::writeDevice(const QString &device)
 
 void ConfigModel::readFunction()
 {
-	Command *functionChnCmd = new IioDeviceAttributeRead(m_device, m_functionAttribute.c_str(), nullptr);
+	Command *functionChnCmd =
+		new IioDeviceAttributeRead(m_device, m_functionAttribute.toStdString().c_str(), nullptr);
 	connect(
 		functionChnCmd, &scopy::Command::finished, this,
 		[=, this](scopy::Command *cmd) {
@@ -169,7 +166,7 @@ void ConfigModel::readFunction()
 
 void ConfigModel::writeFunction(const QString &function)
 {
-	Command *functionChnCmd = new IioDeviceAttributeWrite(m_device, m_functionAttribute.c_str(),
+	Command *functionChnCmd = new IioDeviceAttributeWrite(m_device, m_functionAttribute.toStdString().c_str(),
 							      function.toStdString().c_str(), nullptr);
 	connect(
 		functionChnCmd, &scopy::Command::finished, this,
@@ -193,7 +190,7 @@ void ConfigModel::writeFunction(const QString &function)
 void ConfigModel::readDeviceAvailable()
 {
 	Command *deviceAvailableChnCmd =
-		new IioDeviceAttributeRead(m_device, m_deviceAvailableAttribute.c_str(), nullptr);
+		new IioDeviceAttributeRead(m_device, m_deviceAvailableAttribute.toStdString().c_str(), nullptr);
 	connect(
 		deviceAvailableChnCmd, &scopy::Command::finished, this,
 		[=, this](scopy::Command *cmd) {
@@ -219,7 +216,7 @@ void ConfigModel::readDeviceAvailable()
 void ConfigModel::readFunctionAvailable()
 {
 	Command *functionAvailableChnCmd =
-		new IioDeviceAttributeRead(m_device, m_functionAvailableAttribute.c_str(), nullptr);
+		new IioDeviceAttributeRead(m_device, m_functionAvailableAttribute.toStdString().c_str(), nullptr);
 	connect(
 		functionAvailableChnCmd, &scopy::Command::finished, this,
 		[=, this](scopy::Command *cmd) {
