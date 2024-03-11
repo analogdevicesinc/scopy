@@ -89,7 +89,6 @@ build_with_cmake() {
 	cd $BUILD_FOLDER
 	$CMAKE $CURRENT_BUILD_CMAKE_OPTS ../
 	make $JOBS
-	sudo make $JOBS install
 
 	#clear variable
 	CURRENT_BUILD_CMAKE_OPTS=""
@@ -115,6 +114,10 @@ build_libiio() {
 		-DOSX_PACKAGE:BOOL=OFF
 		"
 	build_with_cmake
+	sudo make install
+	sudo chmod -R 775 $STAGING_AREA_DEPS
+	sudo chmod 664 $STAGING_AREA_DEPS/lib/pkgconfig/libiio.pc
+	cp -R $STAGING_AREA/libiio/build/iio.framework $STAGING_AREA_DEPS/lib
 	popd
 }
 
@@ -133,6 +136,7 @@ build_libm2k() {
 		-DENABLE_LOG=OFF\
 		"
 	build_with_cmake
+	make install
 	popd
 }
 
@@ -143,6 +147,7 @@ build_libad9361() {
 
 	pushd $STAGING_AREA/libad9361
 	build_with_cmake
+	make install
 	popd
 }
 
@@ -164,6 +169,7 @@ build_gnuradio() {
 		-DENABLE_POSTINSTALL=OFF
 		"
 	build_with_cmake
+	make install
 	popd
 }
 
@@ -178,6 +184,7 @@ build_grm2k() {
 		-DDIGITAL=OFF
 		"
 	build_with_cmake
+	make install
 	popd
 }
 
@@ -189,6 +196,7 @@ build_grscopy() {
 	pushd $STAGING_AREA/gr-scopy
 	CURRENT_BUILD_CMAKE_OPTS="-DWITH_PYTHON=OFF "
 	build_with_cmake
+	make install
 	popd
 }
 
@@ -201,7 +209,7 @@ build_libsigrokdecode() {
 	git reset --hard
 	./autogen.sh
 	./configure --prefix $STAGING_AREA_DEPS
-	sudo make $JOBS install
+	make $JOBS install
 	popd
 }
 
@@ -209,7 +217,6 @@ build_qwt() {
 	echo "### Building qwt - branch qwt-multiaxes"
 	CURRENT_BUILD=qwt
 	save_version_info
-
 	qmake_build_local "qwt" "qwt.pro" "patch_qwt"
 }
 
@@ -221,6 +228,7 @@ build_libtinyiiod() {
 	pushd $STAGING_AREA/libtinyiiod
 	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_EXAMPLES=OFF"
 	build_with_cmake
+	make install
 	popd
 }
 
