@@ -19,22 +19,21 @@
  */
 
 #include "swiotconfig.h"
+#include "src/swiot_logging_categories.h"
 
 #include "configcontroller.h"
 #include "configmodel.h"
-#include "src/swiot_logging_categories.h"
-#include <QMessageBox>
+
 #include <QVBoxLayout>
+#include <gui/stylehelper.h>
 
 #include <iioutil/connectionprovider.h>
-#include <gui/stylehelper.h>
 
 using namespace scopy::swiot;
 
 SwiotConfig::SwiotConfig(QString uri, QWidget *parent)
 	: QWidget(parent)
 	, m_uri(uri)
-	, m_ui(new Ui::ConfigMenu)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *layout = new QHBoxLayout(this);
@@ -71,23 +70,49 @@ void SwiotConfig::provideDeviceConnection()
 
 void SwiotConfig::setupUiElements()
 {
-	m_ui->setupUi(this);
-	StyleHelper::MenuSmallLabel(m_ui->deviceLabel);
-	StyleHelper::MenuSmallLabel(m_ui->functionLabel);
-
 	m_applyBtn = createApplyBtn();
 	m_drawArea = new DrawArea(this);
 	m_scrollArea = new QScrollArea(this);
+	m_chnlsGrid = new QWidget(this);
+	m_chnlsGrid->setLayout(new QVBoxLayout());
+	m_chnlsGrid->layout()->setContentsMargins(0, 0, 0, 0);
+}
+
+QWidget *SwiotConfig::createGridHeader(QWidget *parent)
+{
+	QWidget *labels = new QWidget(parent);
+	labels->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	QHBoxLayout *layout = new QHBoxLayout(labels);
+	layout->setContentsMargins(0, 0, 0, 0);
+
+	QLabel *deviceLabel = new QLabel(labels);
+	deviceLabel->setText("Device");
+	StyleHelper::MenuSmallLabel(deviceLabel);
+	deviceLabel->setFixedWidth(DEVICE_COMBO_WIDTH);
+
+	QLabel *functionLabel = new QLabel(labels);
+	functionLabel->setText("Function");
+	StyleHelper::MenuSmallLabel(functionLabel);
+	functionLabel->setFixedWidth(FUNCTION_COMBO_WIDTH);
+
+	layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
+	layout->addWidget(deviceLabel);
+	layout->addWidget(functionLabel);
+
+	return labels;
 }
 
 void SwiotConfig::buildGridLayout()
 {
+	QWidget *header = createGridHeader(m_chnlsGrid);
+	m_chnlsGrid->layout()->addWidget(header);
+
 	for(int i = 0; i < NUMBER_OF_CHANNELS; i++) { // there can only be 4 channels
 		auto *channelView = new ConfigChannelView(i);
 		auto *configModel = new ConfigModel(m_swiotDevice, i, m_commandQueue);
 		auto *configController = new ConfigController(channelView, configModel, i);
 		m_controllers.push_back(configController);
-		m_ui->gridLayout->addWidget(channelView, i + 1, 0, 1, 4);
+		m_chnlsGrid->layout()->addWidget(channelView);
 		QObject::connect(channelView, &ConfigChannelView::showPath, this,
 				 [this, i](int channelIndex, const QString &deviceName) {
 					 if(channelIndex == i) {
@@ -105,14 +130,15 @@ void SwiotConfig::buildGridLayout()
 				 [this]() { m_drawArea->deactivateConnections(); });
 	}
 	// The apply button will always be at the end of the channel widgets
-	m_ui->gridLayout->addWidget(m_applyBtn, NUMBER_OF_CHANNELS + 1, 0, 1, 4);
+	m_chnlsGrid->layout()->addWidget(m_applyBtn);
+	m_chnlsGrid->layout()->addItem(new QSpacerItem(20, 40, QSizePolicy::Fixed, QSizePolicy::Expanding));
 }
 
 void SwiotConfig::createPageLayout()
 {
 	auto scrollWidget = new QWidget(this);
 	scrollWidget->setLayout(new QHBoxLayout(this));
-	scrollWidget->layout()->addWidget(this->m_ui->mainGridContainer);
+	scrollWidget->layout()->addWidget(m_chnlsGrid);
 	scrollWidget->layout()->addWidget(m_drawArea);
 	scrollWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	scrollWidget->layout()->setSpacing(40);
@@ -129,7 +155,7 @@ void SwiotConfig::initTutorialProperties()
 
 QPushButton *SwiotConfig::createApplyBtn()
 {
-	auto *applyBtn = new QPushButton();
+	auto *applyBtn = new QPushButton(this);
 	StyleHelper::BlueGrayButton(applyBtn, "applyBtn");
 	applyBtn->setCheckable(false);
 	applyBtn->setText("Apply");
