@@ -2,7 +2,6 @@
 #include <QDate>
 #include <QDebug>
 #include <QwtDate>
-#include <timetracker.hpp>
 
 using namespace scopy;
 using namespace datamonitor;
