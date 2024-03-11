@@ -33,7 +33,7 @@ QWidget *GRDeviceAddon::createAttrMenu(QWidget *parent)
 		IIOWidgetFactory::ComboUi | IIOWidgetFactory::TriggerData,
 		{.context = const_cast<iio_context *>(ctx), .device = m_src->iioDev(), .data = "Triggers"}));
 
-	auto layout = new QVBoxLayout(attrContainer);
+	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
 	layout->setContentsMargins(0, 0, 0, 10); // bottom margin
 	layout->setMargin(0);
@@ -51,7 +51,7 @@ QWidget *GRDeviceAddon::createAttrMenu(QWidget *parent)
 QWidget *GRDeviceAddon::createMenu(QWidget *parent)
 {
 	QWidget *w = new QWidget(parent);
-	QVBoxLayout *lay = new QVBoxLayout(w);
+	QVBoxLayout *lay = new QVBoxLayout();
 
 	QScrollArea *scroll = new QScrollArea(parent);
 	QWidget *wScroll = new QWidget(scroll);

@@ -16,7 +16,7 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	MenuSectionWidget *measureSection = new MenuSectionWidget(this);
 	MenuOnOffSwitch *measurePanelSwitch = new MenuOnOffSwitch("Measure Panel", this);
 	measurePanelSwitch->onOffswitch()->setChecked(true);
-	QHBoxLayout *hlay1 = new QHBoxLayout(measureSection);
+	QHBoxLayout *hlay1 = new QHBoxLayout();
 	hlay1->setContentsMargins(0, 6, 0, 6);
 	hlay1->setSpacing(9);
 	measureSection->contentLayout()->addWidget(measurePanelSwitch);
@@ -46,7 +46,7 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	hlay1->addWidget(showAllMeasure);
 	hlay1->addWidget(hideAllMeasure);
 
-	QHBoxLayout *hlay2 = new QHBoxLayout(measureSection);
+	QHBoxLayout *hlay2 = new QHBoxLayout();
 	hlay2->setContentsMargins(0, 6, 0, 6);
 	hlay2->setSpacing(9);
 	measureSection->contentLayout()->addLayout(hlay2);
@@ -81,7 +81,7 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 
 	statsPanelSwitch->onOffswitch()->setChecked(false);
 
-	QHBoxLayout *hlay3 = new QHBoxLayout(statsSection);
+	QHBoxLayout *hlay3 = new QHBoxLayout();
 	hlay3->setContentsMargins(0, 6, 0, 6);
 	hlay3->setSpacing(9);
 	statsSection->contentLayout()->addWidget(statsPanelSwitch);
@@ -111,7 +111,7 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	hlay3->addWidget(showAllStats);
 	hlay3->addWidget(hideAllStats);
 
-	QHBoxLayout *hlay4 = new QHBoxLayout(statsSection);
+	QHBoxLayout *hlay4 = new QHBoxLayout();
 	hlay4->setContentsMargins(0, 6, 0, 6);
 	hlay4->setSpacing(9);
 	statsSection->contentLayout()->addLayout(hlay4);
