@@ -55,7 +55,6 @@ private:
 	int activeMonitor = -1;
 
 	bool first = true;
-	QTimer *m_readTimer;
 
 	QLabel *startTime;
 	void resetStartTime();

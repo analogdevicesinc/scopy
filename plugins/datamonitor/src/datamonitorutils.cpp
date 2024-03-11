@@ -16,3 +16,5 @@ double DataMonitorUtils::getXAxisDefaultViewPortSize() { return 10; }
 QString DataMonitorUtils::getToolSettingsId() { return "DataMonitorSettings"; }
 
 double DataMonitorUtils::getReadIntervalDefaul() { return 1; }
+
+QString DataMonitorUtils::getPlotDateTimeFormat() { return "hh:mm:ss"; }
