@@ -55,10 +55,12 @@ cp -R /usr/local/opt/python@$pyversion/Frameworks/Python.framework Scopy.app/Con
 
 
 echo "### Change the id libqwt inside every dll"
+sudo install_name_tool -change $libqwtid $libqwtpath $BUILDDIR/Scopy.app/Contents/Frameworks/libscopy-gr-util.dylib
 sudo install_name_tool -change $libqwtid $libqwtpath $BUILDDIR/Scopy.app/Contents/Frameworks/libscopy-gr-gui.dylib
 sudo install_name_tool -change $libqwtid $libqwtpath $BUILDDIR/Scopy.app/Contents/Frameworks/libscopy-gui.dylib
 sudo install_name_tool -change $libqwtid $libqwtpath $BUILDDIR/Scopy.app/Contents/Frameworks/libscopy-sigrok-gui.dylib
 sudo install_name_tool -change $libqwtid $libqwtpath $BUILDDIR/Scopy.app/Contents/Frameworks/libscopy-core.dylib
+sudo install_name_tool -change $libqwtid $libqwtpath $BUILDDIR/Scopy.app/Contents/Frameworks/libscopy-iio-widgets.dylib
 sudo install_name_tool -change $libqwtid $libqwtpath $BUILDDIR/Scopy.app/Contents/MacOS/Scopy
 ls $BUILDDIR/Scopy.app/Contents/MacOs/plugins/plugins | grep libscopy | while read plugin
 do
@@ -90,14 +92,18 @@ echo "=== Fixing iio.framework"
 sudo install_name_tool -id @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/iio.framework/iio
 sudo install_name_tool -id @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/${iioid}
 sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/MacOS/Scopy
-sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libgnuradio-iio*
 sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libscopy-iioutil.dylib
+sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libscopy-iio-widgets.dylib
 sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libscopy-core.dylib
 sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libscopy-pluginbase.dylib
-sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/MacOS/plugins/plugins/libscopy-debuggerplugin.dylib
-sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/MacOS/plugins/plugins/libscopy-m2kplugin.dylib
-sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/MacOS/plugins/plugins/libscopy-regmapplugin.dylib
-sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/MacOS/plugins/plugins/libscopy-swiot.dylib
+sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libscopy-gr-util.dylib
+sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libscopy-gr-gui.dylib
+sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libscopy-sigrok-gui.dylib
+sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libscopy-gui.dylib
+ls $BUILDDIR/Scopy.app/Contents/MacOs/plugins/plugins | grep libscopy | while read plugin
+do
+	sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/MacOS/plugins/plugins/$plugin
+done
 
 echo "=== Fixing ad9361.framework"
 sudo install_name_tool -id @executable_path/../Frameworks/${ad9361id} ./Scopy.app/Contents/Frameworks/ad9361.framework/ad9361
