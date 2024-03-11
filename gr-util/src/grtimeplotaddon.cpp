@@ -7,7 +7,6 @@
 #include <QTimer>
 #include <QwtWeedingCurveFitter>
 
-#include <gr-gui/scope_sink_f.h>
 #include <grdeviceaddon.h>
 #include <grlog.h>
 #include <grtimechanneladdon.h>
@@ -19,7 +18,7 @@
 #include <stylehelper.h>
 #include <grtimechanneladdon.h>
 
-Q_LOGGING_CATEGORY(CAT_GRTIMEPLOT, "GRTimePlotAddon");
+Q_LOGGING_CATEGORY(CAT_GRTIMEPLOTADDON, "GRTimePlotAddon");
 
 //#define GUI_THREAD_SAMPLING
 
@@ -146,7 +145,7 @@ void GRTimePlotAddon::disable() {}
 
 void GRTimePlotAddon::stopPlotRefresh()
 {
-	qInfo(CAT_GRTIMEPLOT) << "Stopped plotting";
+	qInfo(CAT_GRTIMEPLOTADDON) << "Stopped plotting";
 	m_refreshTimerRunning = false;
 #ifdef GUI_THREAD_SAMPLING
 #else
@@ -158,7 +157,7 @@ void GRTimePlotAddon::stopPlotRefresh()
 
 void GRTimePlotAddon::startPlotRefresh()
 {
-	qInfo(CAT_GRTIMEPLOT) << "Start plotting";
+	qInfo(CAT_GRTIMEPLOTADDON) << "Start plotting";
 	updateFrameRate();
 	m_refreshTimerRunning = true;
 
@@ -315,7 +314,7 @@ void GRTimePlotAddon::updateBufferPreviewer() { m_info->updateBufferPreviewer();
 
 void GRTimePlotAddon::onInit()
 {
-	qDebug(CAT_GRTIMEPLOT) << "Init";
+	qDebug(CAT_GRTIMEPLOTADDON) << "Init";
 	m_currentSamplingInfo.sampleRate = 1;
 	m_currentSamplingInfo.bufferSize = 32;
 	m_currentSamplingInfo.plotSize = 32;
@@ -325,7 +324,7 @@ void GRTimePlotAddon::onInit()
 
 void GRTimePlotAddon::onDeinit()
 {
-	qDebug(CAT_GRTIMEPLOT) << "Deinit";
+	qDebug(CAT_GRTIMEPLOTADDON) << "Deinit";
 	onStop();
 }
 
@@ -361,13 +360,13 @@ void GRTimePlotAddon::connectSignalPaths()
 	// for through grdevices - get sampleRate;
 	std::unique_lock lock(refillMutex);
 	for(auto &sigpath : m_top->signalPaths()) {
-		qDebug(CAT_GRTIMEPLOT) << "Trying " << sigpath->name();
+		qDebug(CAT_GRTIMEPLOTADDON) << "Trying " << sigpath->name();
 		if(!sigpath->enabled())
 			continue;
 		if(!sigpath->name().startsWith(name))
 			continue;
 		sigpaths.append(sigpath);
-		qDebug(CAT_GRTIMEPLOT) << "Appended " << sigpath->name();
+		qDebug(CAT_GRTIMEPLOTADDON) << "Appended " << sigpath->name();
 	}
 
 	time_sink = time_sink_f::make(m_currentSamplingInfo.plotSize, m_currentSamplingInfo.sampleRate,
