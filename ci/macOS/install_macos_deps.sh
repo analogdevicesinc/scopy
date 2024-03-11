@@ -1,25 +1,11 @@
 #!/bin/bash
 
 set -ex
-
-REPO_SRC=$BUILD_REPOSITORY_LOCALPATH
-
-LIBIIO_VERSION=v0.25
-LIBAD9361_BRANCH=main
-LIBM2K_BRANCH=main
-GNURADIO_BRANCH=maint-3.10
-GRSCOPY_BRANCH=3.10
-GRM2K_BRANCH=main
-QWT_BRANCH=qwt-multiaxes
-LIBSIGROKDECODE_BRANCH=master
-LIBTINYIIOD_BRANCH=master
+REPO_SRC=$(git rev-parse --show-toplevel)
+source $REPO_SRC/ci/macOS/macos_config.sh
 
 PACKAGES=" ${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog "
 PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libserialport libsndfile"
-
-STAGING_AREA=$PWD/staging
-JOBS=-j8
-STAGINGDIR=$STAGING_AREA/dependencies
 
 OS_VERSION=${1:-$(sw_vers -productVersion)}
 echo "MacOS version $OS_VERSION"
@@ -53,11 +39,11 @@ export_paths(){
 	export PATH="${QT_PATH}:$PATH"
 	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libzip/lib/pkgconfig"
 	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libffi/lib/pkgconfig"
-	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$STAGINGDIR/lib/pkgconfig"
+	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$STAGING_AREA_DEPS/lib/pkgconfig"
 
 	QMAKE="$(command -v qmake)"
 	CMAKE_BIN="$(command -v cmake)"
-	CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$STAGINGDIR -DCMAKE_INSTALL_PREFIX=$STAGINGDIR"
+	CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$STAGING_AREA_DEPS -DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS"
 	CMAKE="$CMAKE_BIN ${CMAKE_OPTS[*]}"
 
 	echo -- USING CMAKE COMMAND:
@@ -214,7 +200,7 @@ build_libsigrokdecode() {
 	pushd $STAGING_AREA/libsigrokdecode
 	git reset --hard
 	./autogen.sh
-	./configure --prefix $STAGINGDIR
+	./configure --prefix $STAGING_AREA_DEPS
 	sudo make $JOBS install
 	popd
 }
