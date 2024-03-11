@@ -148,3 +148,29 @@ SingleShotBtn::SingleShotBtn(QWidget *parent)
 }
 
 #include "moc_toolbuttons.cpp"
+
+AddBtn::AddBtn(QWidget *parent)
+{
+	QIcon icon1;
+	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/launcher_add.svg", "white", 1));
+	StyleHelper::SquareToggleButtonWithIcon(this, "add_btn", false);
+	setIcon(icon1);
+}
+
+RemoveBtn::RemoveBtn(QWidget *parent)
+{
+	QIcon icon1;
+	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/red_x.svg", "white", 1));
+	StyleHelper::SquareToggleButtonWithIcon(this, "remove_btn", false);
+	setIcon(icon1);
+}
+
+SyncBtn::SyncBtn(QWidget *parent)
+{
+	QIcon icon1;
+	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/gear_wheel_hover.svg", "white", 1));
+	StyleHelper::BlueGrayButton(this,"sync_btn");
+	setText("Sync");
+	setCheckable(true);
+	setIcon(icon1);
+}

@@ -59,6 +59,28 @@ public:
 	SingleShotBtn(QWidget *parent = nullptr);
 };
 
+class SCOPY_GUI_EXPORT AddBtn : public QPushButton
+{
+	Q_OBJECT
+public:
+	AddBtn(QWidget *parent = nullptr);
+};
+
+class SCOPY_GUI_EXPORT RemoveBtn : public QPushButton
+{
+	Q_OBJECT
+public:
+	RemoveBtn(QWidget *parent = nullptr);
+};
+
+class SCOPY_GUI_EXPORT SyncBtn : public QPushButton
+{
+	Q_OBJECT
+public:
+	SyncBtn(QWidget *parent = nullptr);
+};
+
+
 } // namespace scopy
 
 #endif
