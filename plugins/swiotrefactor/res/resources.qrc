@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/swiotrefactor">
+        <file>swiot_faults.json</file>
+        <file>tutorial_chapters.json</file>
+        <file>ic_hi_gray.svg</file>
+        <file>ic_hi_snow.svg</file>
+        <file>ic_lo_gray.svg</file>
+        <file>ic_lo_snow.svg</file>
+        <file>swiot_board.svg</file>
+        <file>swiot_top_transparent.png</file>
+        <file>warning.svg</file>
+        <file>swiot_icon.svg</file>
+        <file>tool_faults.svg</file>
+        <file>ad74413r_channel1.png</file>
+        <file>ad74413r_channel2.png</file>
+        <file>ad74413r_channel3.png</file>
+        <file>ad74413r_channel4.png</file>
+        <file>max14906_channel1.png</file>
+        <file>max14906_channel2.png</file>
+        <file>max14906_channel3.png</file>
+        <file>max14906_channel4.png</file>
+    </qresource>
+</RCC>

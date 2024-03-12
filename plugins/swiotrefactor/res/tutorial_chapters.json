@@ -1,0 +1,195 @@
+{
+	"config": [
+		{
+			"index": 1,
+			"names": ["CHANNEL_WIDGET_1"],
+			"description": "This is a set of configuration controls for one channel. Each row corresponds to one channel.",
+			"y_offset": 15,
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM"
+		},
+		{
+			"index": 2,
+			"names": ["CHANNEL_ENABLE_1"],
+			"description": "This checkbox represents whether the channel is enabled or not. Disabled channels cannot be used.",
+			"y_offset": 15,
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM"
+		},
+		{
+			"index": 3,
+			"names": ["CHANNEL_DEVICE_1"],
+			"description": "This represents the device that is configured on the selected channel, either AD74413R or MAX14906.",
+			"y_offset": 15,
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM"
+		},
+		{
+			"index": 4,
+			"names": ["CHANNEL_FUNCTION_1"],
+			"description": "This shows the available function for each device. Both devices have their own specific functions.",
+			"y_offset": 15,
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM"
+		},
+		{
+			"index": 5,
+			"names": ["DRAW_AREA"],
+			"description": "A 1:1 mapping of the SWIOT board. It will display a route from the selected device to the I/O channel.",
+			"x_offset": -15,
+			"anchor": "HP_LEFT",
+			"content": "HP_LEFT"
+		},
+		{
+			"index": 6,
+			"names": ["APPLY_BUTTON"],
+			"main_widget": "APPLY_BUTTON",
+			"description": "After being done with the configuration, this button will switch the board to runtime mode and display the available tools.",
+			"y_offset": 25,
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM"
+		}
+	],
+	"max14906": [
+		{
+			"index": 1,
+			"names": ["DIO_DIGITAL_CHANNEL_SPACE"],
+			"description": "The channels configured as MAX14906 will be displayed here, or nothing if there are none. Each channel shows its own controls.",
+			"anchor": "HP_RIGHT",
+			"content": "HP_CENTER"
+		},
+		{
+			"index": 2,
+			"names": ["GENERAL_SETTINGS"],
+			"description": "The general settings tab displays settings that influence all channels. (e.g. The Timespan)",
+			"anchor": "HP_LEFT",
+			"content": "HP_LEFT",
+			"x_offset": -10
+		},
+		{
+			"index": 3,
+			"names": ["RUN_BUTTON"],
+			"description": "When pressed, the run button starts polling from all channels every second. The values will be plotted in the plot section of each channel.",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 4,
+			"names": ["CONFIG_BUTTON"],
+			"description": "The config button switches the board to config mode, this will allow setting a different configuration.",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		}
+	],
+	"ad74413r": [
+		{
+			"index": 1,
+			"names": ["AD74413R_PLOT"],
+			"description": "The plot displays the values read from all channels of AD74413R.",
+			"anchor": "HP_LEFT",
+			"content": "HP_CENTER",
+			"x_offset": 20
+		},
+		{
+			"index": 2,
+			"names": ["AD74413R_SETTINGS"],
+			"description": "Display the general settings of AD74413R or the advanced settings for each of its channels.",
+			"anchor": "HP_BOTTOMLEFT",
+			"content": "HP_BOTTOMLEFT",
+			"x_offset": -10,
+			"y_offset": 10
+		},
+		{
+			"index": 3,
+			"names": ["SINGLE_BUTTON"],
+			"description": "Reads one data buffer from all enabled channels.",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 4,
+			"names": ["RUN_BUTTON"],
+			"description": "Starts the data buffer acquisition continuously.",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 5,
+			"names": ["CONFIG_BUTTON"],
+			"description": "The config button switches the board to config mode, this will allow setting a different configuration.",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		}
+	],
+	"faults": [
+		{
+			"index": 1,
+			"names": ["AD74413R_NUMERIC"],
+			"description": "The hexadecimal raw value read from the device.",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 2,
+			"names": ["AD74413R_RESET_STORED"],
+			"description": "Pressing RESET STORED clears the stored part from all fault bits.",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 3,
+			"names": ["AD74413R_CLEAR_SELECTION"],
+			"description": "All faults can be selected and highlighted. By pressing this button all the highlighted faults will be deselected.",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 4,
+			"names": ["AD74413R_FAULTS_GROUP"],
+			"description": "Shows all faults available for this device.",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 5,
+			"names": ["AD74413R_EXPLANATIONS"],
+			"description": "Displays the explanation for all faults available to this device, the explanations get highlighted when the fault bit is active.",
+			"anchor": "HP_TOP",
+			"content": "HP_TOP",
+			"y_offset": -10
+		},
+		{
+			"index": 6,
+			"names": ["SINGLE_BUTTON"],
+			"description": "Reads the value of the faults once for both devices.",
+			"anchor": "HP_BOTTOMLEFT",
+			"content": "HP_BOTTOMLEFT",
+			"y_offset": 10
+		},
+		{
+			"index": 7,
+			"names": ["RUN_BUTTON"],
+			"description": "Starts polling the fault values from both devices every second.",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 8,
+			"names": ["CONFIG_BUTTON"],
+			"description": "The config button switches the board to config mode, this will allow setting a different configuration.",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		}
+	]
+}

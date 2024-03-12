@@ -14,6 +14,8 @@ option(ENABLE_PLUGIN_DATAMONITOR "Enable datamonitor plugin" OFF)
 option(ENABLE_PLUGIN_ADC "Enable ADC plugin" ON)
 option(ENABLE_PLUGIN_PQM "Enable PQM plugin" ON)
 
+option(ENABLE_PLUGIN_SWIOTREFACTOR "Enable SWIOTREFACTOR plugin" ON)
+
 if(ENABLE_PLUGIN_TEST)
 	add_subdirectory(guitestplugin)
 	list(APPEND PLUGINS ${PLUGIN_NAME})
@@ -32,6 +34,11 @@ endif()
 
 if(ENABLE_PLUGIN_SWIOT)
 	add_subdirectory(swiot)
+	list(APPEND PLUGINS ${PLUGIN_NAME})
+endif()
+
+if(ENABLE_PLUGIN_SWIOTREFACTOR)
+	add_subdirectory(swiotrefactor)
 	list(APPEND PLUGINS ${PLUGIN_NAME})
 endif()
 
