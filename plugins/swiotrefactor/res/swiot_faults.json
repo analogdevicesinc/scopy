@@ -1,0 +1,228 @@
+{
+	"ad74413r": {
+		"max_faults": 16,
+		"faults": [
+			{
+				"name": " VI_ERR_A ",
+				"description": " Voltage output: short-circuit error. The error condition is debounced for 2 ms before the status bit is set.\nCurrent output: open circuit error. The error condition is debounced for 2 ms before the status bit is set.\nCurrent input, loop powered: short-circuit error. A short to ground is detected if the digital input comparator is enabled as described in Current Input Loop Powered section with a trip point of AVDD/2 and the digital output is inverted via the INV_DIN_COMP_OUT bit in the DIN_CONFIGx registers. The debounce time of this error detect is user-programmable via the DEBOUNCE_TIME bits in the DIN_CONFIGx registers.\nCurrent input, externally powered: short-circuit error. A current source >25 mA is detected if the digital input comparator is enabled as described in Current Input Loop Powered section with a trip point of AVDD/2. The debounce time of this error detect is user-programmable via the DEBOUNCE_TIME bits in the DIN_CONFIGx registers. ",
+				"condition": {
+					"voltage_out": "Voltage output: short-circuit error. The error condition is debounced for 2 ms before the status bit is set.",
+					"current_out": "Current output: open circuit error. The error condition is debounced for 2 ms before the status bit is set.",
+					"current_in_loop": "Current input, loop powered: short-circuit error. A short to ground is detected if the digital input comparator is enabled as described in Current Input Loop Powered section with a trip point of AVDD/2 and the digital output is inverted via the INV_DIN_COMP_OUT bit in the DIN_CONFIGx registers. The debounce time of this error detect is user-programmable via the DEBOUNCE_TIME bits in the DIN_CONFIGx registers.",
+					"current_in_ext": "Current input, externally powered: short-circuit error. A current source >25 mA is detected if the digital input comparator is enabled as described in Current Input Loop Powered section with a trip point of AVDD/2. The debounce time of this error detect is user-programmable via the DEBOUNCE_TIME bits in the DIN_CONFIGx registers."
+				}
+			},
+			{
+				"name": " VI_ERR_B ",
+				"description": " Voltage output: short-circuit error. The error condition is debounced for 2 ms before the status bit is set.\nCurrent output: open circuit error. The error condition is debounced for 2 ms before the status bit is set.\nCurrent input, loop powered: short-circuit error. A short to ground is detected if the digital input comparator is enabled as described in Current Input Loop Powered section with a trip point of AVDD/2 and the digital output is inverted via the INV_DIN_COMP_OUT bit in the DIN_CONFIGx registers. The debounce time of this error detect is user-programmable via the DEBOUNCE_TIME bits in the DIN_CONFIGx registers.\nCurrent input, externally powered: short-circuit error. A current source >25 mA is detected if the digital input comparator is enabled as described in Current Input Loop Powered section with a trip point of AVDD/2. The debounce time of this error detect is user-programmable via the DEBOUNCE_TIME bits in the DIN_CONFIGx registers.",
+				"condition": {
+					"voltage_out": "Voltage output: short-circuit error. The error condition is debounced for 2 ms before the status bit is set.",
+					"current_out": "Current output: open circuit error. The error condition is debounced for 2 ms before the status bit is set.",
+					"current_in_loop": "Current input, loop powered: short-circuit error. A short to ground is detected if the digital input comparator is enabled as described in Current Input Loop Powered section with a trip point of AVDD/2 and the digital output is inverted via the INV_DIN_COMP_OUT bit in the DIN_CONFIGx registers. The debounce time of this error detect is user-programmable via the DEBOUNCE_TIME bits in the DIN_CONFIGx registers.",
+					"current_in_ext": "Current input, externally powered: short-circuit error. A current source >25 mA is detected if the digital input comparator is enabled as described in Current Input Loop Powered section with a trip point of AVDD/2. The debounce time of this error detect is user-programmable via the DEBOUNCE_TIME bits in the DIN_CONFIGx registers."
+				}
+			},
+			{
+				"name": " VI_ERR_C ",
+				"description": " Voltage output: short-circuit error. The error condition is debounced for 2 ms before the status bit is set.\nCurrent output: open circuit error. The error condition is debounced for 2 ms before the status bit is set.\nCurrent input, loop powered: short-circuit error. A short to ground is detected if the digital input comparator is enabled as described in Current Input Loop Powered section with a trip point of AVDD/2 and the digital output is inverted via the INV_DIN_COMP_OUT bit in the DIN_CONFIGx registers. The debounce time of this error detect is user-programmable via the DEBOUNCE_TIME bits in the DIN_CONFIGx registers.\nCurrent input, externally powered: short-circuit error. A current source >25 mA is detected if the digital input comparator is enabled as described in Current Input Loop Powered section with a trip point of AVDD/2. The debounce time of this error detect is user-programmable via the DEBOUNCE_TIME bits in the DIN_CONFIGx registers.",
+				"condition": {
+					"voltage_out": "Voltage output: short-circuit error. The error condition is debounced for 2 ms before the status bit is set.",
+					"current_out": "Current output: open circuit error. The error condition is debounced for 2 ms before the status bit is set.",
+					"current_in_loop": "Current input, loop powered: short-circuit error. A short to ground is detected if the digital input comparator is enabled as described in Current Input Loop Powered section with a trip point of AVDD/2 and the digital output is inverted via the INV_DIN_COMP_OUT bit in the DIN_CONFIGx registers. The debounce time of this error detect is user-programmable via the DEBOUNCE_TIME bits in the DIN_CONFIGx registers.",
+					"current_in_ext": "Current input, externally powered: short-circuit error. A current source >25 mA is detected if the digital input comparator is enabled as described in Current Input Loop Powered section with a trip point of AVDD/2. The debounce time of this error detect is user-programmable via the DEBOUNCE_TIME bits in the DIN_CONFIGx registers."
+				}
+			},
+			{
+				"name": " VI_ERR_D ",
+				"description": " Voltage output: short-circuit error. The error condition is debounced for 2 ms before the status bit is set.\nCurrent output: open circuit error. The error condition is debounced for 2 ms before the status bit is set.\nCurrent input, loop powered: short-circuit error. A short to ground is detected if the digital input comparator is enabled as described in Current Input Loop Powered section with a trip point of AVDD/2 and the digital output is inverted via the INV_DIN_COMP_OUT bit in the DIN_CONFIGx registers. The debounce time of this error detect is user-programmable via the DEBOUNCE_TIME bits in the DIN_CONFIGx registers.\nCurrent input, externally powered: short-circuit error. A current source >25 mA is detected if the digital input comparator is enabled as described in Current Input Loop Powered section with a trip point of AVDD/2. The debounce time of this error detect is user-programmable via the DEBOUNCE_TIME bits in the DIN_CONFIGx registers.",
+				"condition": {
+					"voltage_out": "Voltage output: short-circuit error. The error condition is debounced for 2 ms before the status bit is set.",
+					"current_out": "Current output: open circuit error. The error condition is debounced for 2 ms before the status bit is set.",
+					"current_in_loop": "Current input, loop powered: short-circuit error. A short to ground is detected if the digital input comparator is enabled as described in Current Input Loop Powered section with a trip point of AVDD/2 and the digital output is inverted via the INV_DIN_COMP_OUT bit in the DIN_CONFIGx registers. The debounce time of this error detect is user-programmable via the DEBOUNCE_TIME bits in the DIN_CONFIGx registers.",
+					"current_in_ext": "Current input, externally powered: short-circuit error. A current source >25 mA is detected if the digital input comparator is enabled as described in Current Input Loop Powered section with a trip point of AVDD/2. The debounce time of this error detect is user-programmable via the DEBOUNCE_TIME bits in the DIN_CONFIGx registers."
+				}
+			},
+			{
+				"name": " HI_TEMP_ERR ",
+				"description": " High temperature detected. After the die temperature typically reaches 115°C, this bit is asserted. "
+			},
+			{
+				"name": " CHARGE_PUMP_ERR ",
+				"description": " Charge pump error detected. This bit is asserted when the AVSS pin rises above −1.65 V. "
+			},
+			{
+				"name": " ALDO5V_ERR ",
+				"description": " ALDO5V Power Supply Monitor Error. This bit is asserted when the ALDO5V pin falls below 4.05 V. "
+			},
+			{
+				"name": " AVDD_ERR ",
+				"description": " AVDD Power Supply Monitor Error. This bit is asserted when the AVDD pin falls below 9.26 V. "
+			},
+			{
+				"name": " DVCC_ERR ",
+				"description": " DVCC Power Supply Monitor Error. This bit is asserted when the DVCC pin falls below 1.93 V. "
+			},
+			{
+				"name": " ALDO1V8_ERR ",
+				"description": " ALDO1V8 Power Supply Monitor Error. This bit is asserted when the ALDO1V8 pin falls below 1.35 V. "
+			},
+			{
+				"name": " ADC_CONV_ERR ",
+				"description": " ADC Conversion Error. ADC results may be outside the selected measurement range. "
+			},
+			{
+				"name": " ADC_SAT_ERR ",
+				"description": " ADC Saturation Error. ADC may be outside the user selected measurement range. "
+			},
+			{
+				"name": " SPI_SCLK_CNT_ERR ",
+				"description": " SPI SCLK count error detected. This bit is asserted if an SPI command is applied but 32 SCLKs are not provided. "
+			},
+			{
+				"name": " SPI_CRC_ERR ",
+				"description": " SPI CRC error detected. This bit is asserted if an invalid CRC is received. "
+			},
+			{
+				"name": " CAL_MEM_ERR ",
+				"description": " Calibration Memory Error. This flag asserts under the following two conditions: When a calibration memory CRC error or an uncorrectable error correcting code (ECC) error is detected on the calibration memory upload. It is not possible to clear this bit if there is a CRC error or uncorrectable ECC error. It is recommended to reset the device and check the supplies in this situation.When there is an attempted SPI access to a register before the calibration memory refresh is complete. Do not address the device until the calibration memory is refreshed. Writing 1 to this bit clears the flag, if the flag is asserted due to this condition. "
+			},
+			{
+				"name": " RESET_OCCURRED ",
+				"description": " Reset occurred. This bit is asserted after a reset event, which asserts the ALERT pin after the reset. Write a 1 to this bit to clear the flag. Note that a mask bit is not provided for this bit. "
+			}
+		]
+	},
+	"max14906": {
+		"max_faults": 32,
+		"faults": [
+			{
+				"name": " OVL1 ",
+				"description": " Thermal overload is detected on DOI1 "
+			},
+			{
+				"name": " OVL2 ",
+				"description": " Thermal overload is detected on DOI2 "
+			},
+			{
+				"name": " OVL3 ",
+				"description": " Thermal overload is detected on DOI3 "
+			},
+			{
+				"name": " OVL4 ",
+				"description": " Thermal overload is detected on DOI4 "
+			},
+			{
+				"name": " CL1 ",
+				"description": " Current limit detected on DOI1 "
+			},
+			{
+				"name": " CL2 ",
+				"description": " Current limit detected on DOI2 "
+			},
+			{
+				"name": " CL3 ",
+				"description": " Current limit detected on DOI3 "
+			},
+			{
+				"name": " CL4 ",
+				"description": " Current limit detected on DOI4 "
+			},
+			{
+				"name": " OWOff1 ",
+				"description": " Open-wire fault is detected on DOI1 when the high-side switch is in the off state "
+			},
+			{
+				"name": " OWOff2 ",
+				"description": " Open-wire fault is detected on DOI2 when the high-side switch is in the off state "
+			},
+			{
+				"name": " OWOff3 ",
+				"description": " Open-wire fault is detected on DOI3 when the high-side switch is in the off state "
+			},
+			{
+				"name": " OWOff4 ",
+				"description": " Open-wire fault is detected on DOI4 when the high-side switch is in the off state "
+			},
+			{
+				"name": " AboveVDD1 ",
+				"description": " Above-VDD fault is detected on DOI1 "
+			},
+			{
+				"name": " AboveVDD2 ",
+				"description": " Above-VDD fault is detected on DOI2 "
+			},
+			{
+				"name": " AboveVDD3 ",
+				"description": " Above-VDD fault is detected on DOI3 "
+			},
+			{
+				"name": " AboveVDD4 ",
+				"description": " Above-VDD fault is detected on DOI4 "
+			},
+			{
+				"name": " SHVDD1 ",
+				"description": " Short-to-VDD fault is detected on DOI1 when the high-side switch is in the off state "
+			},
+			{
+				"name": " SHVDD2 ",
+				"description": " Short-to-VDD fault is detected on DOI2 when the high-side switch is in the off state "
+			},
+			{
+				"name": " SHVDD3 ",
+				"description": " Short-to-VDD fault is detected on DOI3 when the high-side switch is in the off state "
+			},
+			{
+				"name": " SHVDD4 ",
+				"description": " Short-to-VDD fault is detected on DOI4 when the high-side switch is in the off state "
+			},
+			{
+				"name": " VDDOV1 ",
+				"description": " VDD1 supply is higher than the VDD_OVTH threshold voltage (43.5V, typ) "
+			},
+			{
+				"name": " VDDOV2 ",
+				"description": " VDD2 supply is higher than the VDD_OVTH threshold voltage (43.5V, typ) "
+			},
+			{
+				"name": " VDDOV3 ",
+				"description": " VDD3 supply is higher than the VDD_OVTH threshold voltage (43.5V, typ) "
+			},
+			{
+				"name": " VDDOV4 ",
+				"description": " VDD4 supply is higher than the VDD_OVTH threshold voltage (43.5V, typ) "
+			},
+			{
+				"name": " VINT_UV ",
+				"description": " Undervoltage on the internal supply for the SPI registers "
+			},
+			{
+				"name": " V5_UVLO ",
+				"description": " V5 undervoltage "
+			},
+			{
+				"name": " VDD_Low ",
+				"description": " Below VDD_GOOD threshold "
+			},
+			{
+				"name": " VDD_Warn ",
+				"description": " Below VDD_WARN threshold "
+			},
+			{
+				"name": " VDD_UVLO ",
+				"description": " VDD supply in UVLO; all DOI_ switches turned off "
+			},
+			{
+				"name": " ThrmShutd ",
+				"description": " The MAX14906 enters thermal shutdown "
+			},
+			{
+				"name": " LossGND ",
+				"description": " The MAX14906 detects loss of GND fault "
+			},
+			{
+				"name": " WDogErr ",
+				"description": " SPI or SYNCH watchdog timeout is detected "
+			}
+		]
+	}
+}
