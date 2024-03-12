@@ -49,8 +49,8 @@
                          </base-DElement>
                          <object>{bc934261-21c8-4583-b375-30be4633d3f0}</object>
                          <name>DataMonitorModel</name>
-                         <pos>x:-1010;y:-640</pos>
-                         <rect>x:-180;y:-130;w:360;h:260</rect>
+                         <pos>x:-1295;y:-990</pos>
+                         <rect>x:-180;y:-255;w:360;h:510</rect>
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
@@ -70,7 +70,7 @@
                          </base-DElement>
                          <object>{0526095c-34c8-4d3b-b34b-874e6de22828}</object>
                          <name>UnitOfMeasurement</name>
-                         <pos>x:-1335;y:-655</pos>
+                         <pos>x:-1660;y:-1125</pos>
                          <rect>x:-85;y:-65;w:170;h:130</rect>
                          <visual-role>0</visual-role>
                         </DObject>
@@ -109,7 +109,7 @@
                          </base-DElement>
                          <object>{ab661e7c-536e-45ca-8a29-33ea48b0eed3}</object>
                          <name>DataMonitorView</name>
-                         <pos>x:-1320;y:-385</pos>
+                         <pos>x:310;y:-835</pos>
                          <rect>x:-140;y:-80;w:280;h:160</rect>
                          <auto-sized>false</auto-sized>
                          <visual-role>0</visual-role>
@@ -126,75 +126,17 @@
                         <DObject>
                          <base-DElement>
                           <DElement>
-                           <uid>{fbf8f08c-4831-48c1-aaac-e9f8baf09977}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{f58236a6-5438-48e4-9fe4-075333074714}</object>
-                         <name>DataLoggerTool</name>
-                         <pos>x:-20;y:-480</pos>
-                         <rect>x:-95;y:-40;w:190;h:80</rect>
-                         <visual-role>0</visual-role>
-                        </DObject>
-                       </base-DObject>
-                       <show-all-members>true</show-all-members>
-                      </DClass>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DClass">
-                      <DClass>
-                       <base-DObject>
-                        <DObject>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{495bf1b8-0058-4b66-891c-038603f70138}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{079e7524-db87-4435-aae9-36118cf621ac}</object>
-                         <name>DataLoggerPlugin</name>
-                         <pos>x:-15;y:-620</pos>
-                         <rect>x:-55;y:-30;w:110;h:60</rect>
-                         <visual-role>0</visual-role>
-                        </DObject>
-                       </base-DObject>
-                      </DClass>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DDependency">
-                      <DDependency>
-                       <base-DRelation>
-                        <DRelation>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{6d13e95c-3105-4e53-9577-705d0a512a15}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{86707055-160a-434c-9a58-5e8b5163308d}</object>
-                         <a>{fbf8f08c-4831-48c1-aaac-e9f8baf09977}</a>
-                         <b>{495bf1b8-0058-4b66-891c-038603f70138}</b>
-                        </DRelation>
-                       </base-DRelation>
-                      </DDependency>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DClass">
-                      <DClass>
-                       <base-DObject>
-                        <DObject>
-                         <base-DElement>
-                          <DElement>
                            <uid>{e2e4f291-1689-4703-bb7c-706166af1b26}</uid>
                           </DElement>
                          </base-DElement>
                          <object>{68646814-9b54-4b6e-add7-63ffd9dff6cb}</object>
-                         <name>DataMonitorSettings</name>
-                         <pos>x:-620;y:-260</pos>
-                         <rect>x:-65;y:-30;w:130;h:60</rect>
+                         <name>DataMonitorToolSettings</name>
+                         <pos>x:-335;y:-615</pos>
+                         <rect>x:-120;y:-35;w:240;h:70</rect>
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
+                       <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
                     </item>
@@ -210,7 +152,7 @@
                          </base-DElement>
                          <object>{423adeb7-da61-41ff-b379-bb027dff1a44}</object>
                          <name>DataLoggerStyleHelper</name>
-                         <pos>x:-370;y:-750</pos>
+                         <pos>x:785;y:-1000</pos>
                          <rect>x:-225;y:-35;w:450;h:70</rect>
                          <visual-role>0</visual-role>
                         </DObject>
@@ -226,16 +168,116 @@
                         <DObject>
                          <base-DElement>
                           <DElement>
-                           <uid>{6ebc0163-15b9-4d9e-a3e0-195a30c8113e}</uid>
+                           <uid>{99345cc3-43f9-44ae-bffb-9373c1ceede2}</uid>
                           </DElement>
                          </base-DElement>
-                         <object>{c94d1e2d-454e-4194-b32f-6c576994eb17}</object>
-                         <name>ReaderThread</name>
-                         <pos>x:-20;y:-335</pos>
-                         <rect>x:-45;y:-30;w:90;h:60</rect>
+                         <object>{df8b9060-8ebb-471b-8f4a-cbfdc8e3c1d6}</object>
+                         <name>DataMonitorController</name>
+                         <pos>x:670;y:-885</pos>
+                         <rect>x:-120;y:-60;w:240;h:120</rect>
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
+                       <show-all-members>true</show-all-members>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DDependency">
+                      <DDependency>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{5f327e34-fa88-4134-8cab-d2afcc1dca97}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{708a1195-cbb0-4068-bff6-2826516f8f3f}</object>
+                         <a>{99345cc3-43f9-44ae-bffb-9373c1ceede2}</a>
+                         <b>{532f1c2e-61b8-4247-8b34-e1f46232f689}</b>
+                        </DRelation>
+                       </base-DRelation>
+                      </DDependency>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{e84242df-3a9c-4110-bd71-7b156c3649d7}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{d4c1f425-fcc1-4a53-9796-b2c03dade995}</object>
+                         <name>DataMonitorsHandler</name>
+                         <pos>x:980;y:-865</pos>
+                         <rect>x:-110;y:-50;w:220;h:100</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <show-all-members>true</show-all-members>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{26369935-b3da-4dac-bad5-cde221ceb09f}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{f8a3db9f-2ab7-477b-8f52-27616ab638fc}</object>
+                         <name>DataMonitorTool</name>
+                         <pos>x:-730;y:-520</pos>
+                         <rect>x:-140;y:-40;w:280;h:80</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <show-all-members>true</show-all-members>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DDependency">
+                      <DDependency>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{e966d357-46d6-43be-8107-bba1a60c7ab2}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{6bb4d5b0-584a-4cdc-a264-66a8d49343f9}</object>
+                         <a>{e2e4f291-1689-4703-bb7c-706166af1b26}</a>
+                         <b>{26369935-b3da-4dac-bad5-cde221ceb09f}</b>
+                        </DRelation>
+                       </base-DRelation>
+                      </DDependency>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{651acc9a-abd5-4fac-9e03-0a0850b4a350}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{e5402a33-7043-4186-a25d-f224c3aff0cd}</object>
+                         <name>DMMReadStrategy</name>
+                         <pos>x:-660;y:-1045</pos>
+                         <rect>x:-100;y:-75;w:200;h:150</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
                     </item>
@@ -251,31 +293,12 @@
                          </base-DElement>
                          <object>{7f44a1ed-b69d-4ff0-a6a4-b446163dec9e}</object>
                          <name>IReadStrategy</name>
-                         <pos>x:-20;y:-235</pos>
-                         <rect>x:-45;y:-30;w:90;h:60</rect>
+                         <pos>x:-920;y:-1140</pos>
+                         <rect>x:-120;y:-50;w:240;h:100</rect>
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                      </DClass>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DClass">
-                      <DClass>
-                       <base-DObject>
-                        <DObject>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{651acc9a-abd5-4fac-9e03-0a0850b4a350}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{e5402a33-7043-4186-a25d-f224c3aff0cd}</object>
-                         <name>IIOReadStrategy</name>
-                         <pos>x:140;y:-245</pos>
-                         <rect>x:-50;y:-30;w:100;h:60</rect>
-                         <visual-role>0</visual-role>
-                        </DObject>
-                       </base-DObject>
+                       <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
                     </item>
@@ -309,12 +332,12 @@
                         <DRelation>
                          <base-DElement>
                           <DElement>
-                           <uid>{114e1f37-5670-435a-abc8-01b24ca44e40}</uid>
+                           <uid>{dad61cc5-c096-4bf8-b489-458bf955bd5b}</uid>
                           </DElement>
                          </base-DElement>
-                         <object>{7e4dad75-7780-4578-8628-59476f54df49}</object>
+                         <object>{1833bfae-dc0f-46de-8b2e-da5e8031c773}</object>
                          <a>{08d587c3-c6a8-4107-b973-124dc87202fc}</a>
-                         <b>{6ebc0163-15b9-4d9e-a3e0-195a30c8113e}</b>
+                         <b>{8f5ffd30-46ee-4ba4-9dad-c362cf1e70ac}</b>
                         </DRelation>
                        </base-DRelation>
                       </DDependency>
@@ -327,17 +350,41 @@
                         <DObject>
                          <base-DElement>
                           <DElement>
-                           <uid>{45b6e6c6-9592-437b-a4e3-b07fa54eb605}</uid>
+                           <uid>{5ad4a4b0-ceaa-4461-9352-8ace5cf2d3b0}</uid>
                           </DElement>
                          </base-DElement>
-                         <object>{d3e3554d-09ba-46c7-b363-dfaa36c1b61b}</object>
-                         <name>DataLoggingController</name>
-                         <pos>x:-650;y:-110</pos>
-                         <rect>x:-70;y:-30;w:140;h:60</rect>
+                         <object>{3599f7ca-47de-4514-93d5-cf99da53ae4b}</object>
+                         <name>TestReadStrategy</name>
+                         <pos>x:-695;y:-1205</pos>
+                         <rect>x:-65;y:-40;w:130;h:80</rect>
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
+                       <show-all-members>true</show-all-members>
                       </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DAssociation">
+                      <DAssociation>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{dc8c74f9-cf07-4514-97d3-16f92c00a30c}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{7020463d-624b-41a4-b0ca-14ef3c81e393}</object>
+                         <a>{5ad4a4b0-ceaa-4461-9352-8ace5cf2d3b0}</a>
+                         <b>{08d587c3-c6a8-4107-b973-124dc87202fc}</b>
+                        </DRelation>
+                       </base-DRelation>
+                       <a>
+                        <DAssociationEnd>
+                         <navigable>true</navigable>
+                        </DAssociationEnd>
+                       </a>
+                      </DAssociation>
                      </instance>
                     </item>
                     <item>
@@ -347,12 +394,204 @@
                         <DObject>
                          <base-DElement>
                           <DElement>
-                           <uid>{b1ded7ca-ce5e-407d-b892-4632802d4cb2}</uid>
+                           <uid>{77e5f0f0-49b3-47df-81fe-1590d90e7fa1}</uid>
                           </DElement>
                          </base-DElement>
-                         <object>{84637649-3c1b-485f-a644-f835863d7885}</object>
-                         <name>DataLoggingView</name>
-                         <pos>x:-845;y:-110</pos>
+                         <object>{5d6afa1d-b42f-4d1a-bed1-140d17c80a2d}</object>
+                         <name>DMM</name>
+                         <pos>x:-1300;y:-530</pos>
+                         <rect>x:-190;y:-90;w:380;h:180</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <show-all-members>true</show-all-members>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DDependency">
+                      <DDependency>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{1648fc84-3583-4dad-bb37-3b517272659b}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{80117928-b79e-4f4e-adaa-6f9e4c6ecb0b}</object>
+                         <a>{77e5f0f0-49b3-47df-81fe-1590d90e7fa1}</a>
+                         <b>{26369935-b3da-4dac-bad5-cde221ceb09f}</b>
+                        </DRelation>
+                       </base-DRelation>
+                      </DDependency>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{73321870-6cab-425b-aa77-8026adebc46c}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{f16dc88b-ed91-48c8-96fc-0be6d07afaa1}</object>
+                         <name>DataAcquisitionManager</name>
+                         <pos>x:-750;y:-755</pos>
+                         <rect>x:-185;y:-105;w:370;h:210</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <show-all-members>true</show-all-members>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DDependency">
+                      <DDependency>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{1cb9f798-cdbd-4a1d-affa-fc7927a5e260}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{8b6dbe11-b469-47f0-8673-0b5d29187374}</object>
+                         <a>{73321870-6cab-425b-aa77-8026adebc46c}</a>
+                         <b>{8f5ffd30-46ee-4ba4-9dad-c362cf1e70ac}</b>
+                        </DRelation>
+                       </base-DRelation>
+                      </DDependency>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DDependency">
+                      <DDependency>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{940122a0-87e9-4ebe-b368-96638bfc2a63}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{7a912de0-2d5f-43e9-90f3-453f1ad40b3c}</object>
+                         <a>{73321870-6cab-425b-aa77-8026adebc46c}</a>
+                         <b>{26369935-b3da-4dac-bad5-cde221ceb09f}</b>
+                        </DRelation>
+                       </base-DRelation>
+                      </DDependency>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{ef5d4abf-973e-4f98-a094-060917aeae26}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{66536afd-14d2-4a0d-8a5c-5817dcc2ba4c}</object>
+                         <name>TimeManager</name>
+                         <pos>x:65;y:-460</pos>
+                         <rect>x:-105;y:-125;w:210;h:250</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <show-all-members>true</show-all-members>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DDependency">
+                      <DDependency>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{a633ef04-3b30-48ce-9903-86c75acd9222}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{cf2524ad-dba6-4ada-89ed-64218f3da2e2}</object>
+                         <a>{ef5d4abf-973e-4f98-a094-060917aeae26}</a>
+                         <b>{26369935-b3da-4dac-bad5-cde221ceb09f}</b>
+                        </DRelation>
+                       </base-DRelation>
+                      </DDependency>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DDependency">
+                      <DDependency>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{ded8662b-daa1-4f38-85c1-f1f094d81a7a}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{38949e3c-03df-4ebf-909d-39d8701204aa}</object>
+                         <a>{ef5d4abf-973e-4f98-a094-060917aeae26}</a>
+                         <b>{e2e4f291-1689-4703-bb7c-706166af1b26}</b>
+                        </DRelation>
+                       </base-DRelation>
+                      </DDependency>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{c92da209-5894-4cf7-99b6-d614f580470a}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{e952e3d6-070c-4b01-b6dc-93dc65aea973}</object>
+                         <name>DataMonitorController</name>
+                         <pos>x:-730;y:-345</pos>
+                         <rect>x:-150;y:-65;w:300;h:130</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <show-all-members>true</show-all-members>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DDependency">
+                      <DDependency>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{991e770f-5c6d-4c99-9a31-3d4f9ee323a2}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{77746297-4120-4048-babf-0e245ec5d311}</object>
+                         <a>{c92da209-5894-4cf7-99b6-d614f580470a}</a>
+                         <b>{26369935-b3da-4dac-bad5-cde221ceb09f}</b>
+                        </DRelation>
+                       </base-DRelation>
+                      </DDependency>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{df62e396-b4c9-472e-b135-18d3a21ae257}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{27e07d45-9906-40d9-bbde-2147ee9ff276}</object>
+                         <name>DataMonitorView</name>
+                         <pos>x:-945;y:-205</pos>
                          <rect>x:-55;y:-30;w:110;h:60</rect>
                          <visual-role>0</visual-role>
                         </DObject>
@@ -360,353 +599,9 @@
                       </DClass>
                      </instance>
                     </item>
-                    <item>
-                     <instance type="DClass">
-                      <DClass>
-                       <base-DObject>
-                        <DObject>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{9284271c-26db-4d96-b3f7-4c3202c23650}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{a6fdb9bc-3d9c-4bac-ad07-2f962a24e05e}</object>
-                         <name>DataLoggingModel</name>
-                         <pos>x:-660;y:-10</pos>
-                         <rect>x:-60;y:-30;w:120;h:60</rect>
-                         <visual-role>0</visual-role>
-                        </DObject>
-                       </base-DObject>
-                      </DClass>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DClass">
-                      <DClass>
-                       <base-DObject>
-                        <DObject>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{99345cc3-43f9-44ae-bffb-9373c1ceede2}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{df8b9060-8ebb-471b-8f4a-cbfdc8e3c1d6}</object>
-                         <name>DataMonitorController</name>
-                         <pos>x:-990;y:-390</pos>
-                         <rect>x:-120;y:-60;w:240;h:120</rect>
-                         <visual-role>0</visual-role>
-                        </DObject>
-                       </base-DObject>
-                       <show-all-members>true</show-all-members>
-                      </DClass>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DDependency">
-                      <DDependency>
-                       <base-DRelation>
-                        <DRelation>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{e3c1c37f-bd34-4de4-9af9-e9567ba0f676}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{a72d8d07-3169-4e72-b173-e52c9df73a1e}</object>
-                         <a>{8f5ffd30-46ee-4ba4-9dad-c362cf1e70ac}</a>
-                         <b>{99345cc3-43f9-44ae-bffb-9373c1ceede2}</b>
-                        </DRelation>
-                       </base-DRelation>
-                      </DDependency>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DDependency">
-                      <DDependency>
-                       <base-DRelation>
-                        <DRelation>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{5f327e34-fa88-4134-8cab-d2afcc1dca97}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{708a1195-cbb0-4068-bff6-2826516f8f3f}</object>
-                         <a>{99345cc3-43f9-44ae-bffb-9373c1ceede2}</a>
-                         <b>{532f1c2e-61b8-4247-8b34-e1f46232f689}</b>
-                        </DRelation>
-                       </base-DRelation>
-                      </DDependency>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DDependency">
-                      <DDependency>
-                       <base-DRelation>
-                        <DRelation>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{df0b86ea-906e-4f86-9c53-00484aea4ae3}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{853745bf-1e34-41f6-9cad-2e9ead13fffa}</object>
-                         <a>{6ebc0163-15b9-4d9e-a3e0-195a30c8113e}</a>
-                         <b>{fbf8f08c-4831-48c1-aaac-e9f8baf09977}</b>
-                        </DRelation>
-                       </base-DRelation>
-                      </DDependency>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DDependency">
-                      <DDependency>
-                       <base-DRelation>
-                        <DRelation>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{5b59f560-5b0a-46ca-9c18-f4719a19e65a}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{15894286-9d76-43b5-9d0b-ad85df6bc36d}</object>
-                         <a>{9284271c-26db-4d96-b3f7-4c3202c23650}</a>
-                         <b>{45b6e6c6-9592-437b-a4e3-b07fa54eb605}</b>
-                        </DRelation>
-                       </base-DRelation>
-                       <direction>2</direction>
-                      </DDependency>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DDependency">
-                      <DDependency>
-                       <base-DRelation>
-                        <DRelation>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{62105140-7d6d-44c5-be25-0664df15efdf}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{4ec81658-d4ee-4cb6-b197-cfb14ed35c15}</object>
-                         <a>{45b6e6c6-9592-437b-a4e3-b07fa54eb605}</a>
-                         <b>{b1ded7ca-ce5e-407d-b892-4632802d4cb2}</b>
-                        </DRelation>
-                       </base-DRelation>
-                       <direction>2</direction>
-                      </DDependency>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DClass">
-                      <DClass>
-                       <base-DObject>
-                        <DObject>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{e67289f8-afd2-484b-8c92-4f105200aefc}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{23796b0c-bdbe-4f09-8401-668c22fe0ea2}</object>
-                         <name>DataLoggerAPI</name>
-                         <pos>x:170;y:-690</pos>
-                         <rect>x:-50;y:-30;w:100;h:60</rect>
-                         <visual-role>0</visual-role>
-                        </DObject>
-                       </base-DObject>
-                      </DClass>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DClass">
-                      <DClass>
-                       <base-DObject>
-                        <DObject>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{16f76c34-ce73-4cdd-a5c3-6d6c4485b6c0}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{8dcc3591-0db6-4418-ad8a-95dabded45fc}</object>
-                         <name>DmmScanner</name>
-                         <pos>x:430;y:-495</pos>
-                         <rect>x:-205;y:-55;w:410;h:110</rect>
-                         <visual-role>0</visual-role>
-                        </DObject>
-                       </base-DObject>
-                       <show-all-members>true</show-all-members>
-                      </DClass>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DDependency">
-                      <DDependency>
-                       <base-DRelation>
-                        <DRelation>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{c73523c1-1981-4f4e-b74e-12b56b40e69d}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{a2dbf08b-9905-4f52-b93f-e11eeb871cac}</object>
-                         <a>{16f76c34-ce73-4cdd-a5c3-6d6c4485b6c0}</a>
-                         <b>{fbf8f08c-4831-48c1-aaac-e9f8baf09977}</b>
-                        </DRelation>
-                       </base-DRelation>
-                      </DDependency>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DClass">
-                      <DClass>
-                       <base-DObject>
-                        <DObject>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{7d7de7c3-cdf1-4ec0-aff9-cd371314d179}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{2382f525-86b7-4d2c-81f2-88f00f44ad78}</object>
-                         <name>DMM</name>
-                         <pos>x:370;y:-335</pos>
-                         <rect>x:-40;y:-30;w:80;h:60</rect>
-                         <visual-role>0</visual-role>
-                        </DObject>
-                       </base-DObject>
-                      </DClass>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DDependency">
-                      <DDependency>
-                       <base-DRelation>
-                        <DRelation>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{217d2b3a-f8de-4b04-8c64-5a7ab4f2f4e5}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{29128d46-c70b-4005-9a79-bf593018a671}</object>
-                         <a>{7d7de7c3-cdf1-4ec0-aff9-cd371314d179}</a>
-                         <b>{16f76c34-ce73-4cdd-a5c3-6d6c4485b6c0}</b>
-                        </DRelation>
-                       </base-DRelation>
-                      </DDependency>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DClass">
-                      <DClass>
-                       <base-DObject>
-                        <DObject>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{e84242df-3a9c-4110-bd71-7b156c3649d7}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{d4c1f425-fcc1-4a53-9796-b2c03dade995}</object>
-                         <name>DataMonitorsHandler</name>
-                         <pos>x:-625;y:-590</pos>
-                         <rect>x:-110;y:-50;w:220;h:100</rect>
-                         <visual-role>0</visual-role>
-                        </DObject>
-                       </base-DObject>
-                       <show-all-members>true</show-all-members>
-                      </DClass>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DClass">
-                      <DClass>
-                       <base-DObject>
-                        <DObject>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{26369935-b3da-4dac-bad5-cde221ceb09f}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{f8a3db9f-2ab7-477b-8f52-27616ab638fc}</object>
-                         <name>DataMonitorTool</name>
-                         <pos>x:-530;y:-410</pos>
-                         <rect>x:-270;y:-60;w:540;h:120</rect>
-                         <visual-role>0</visual-role>
-                        </DObject>
-                       </base-DObject>
-                       <show-all-members>true</show-all-members>
-                      </DClass>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DDependency">
-                      <DDependency>
-                       <base-DRelation>
-                        <DRelation>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{6a34c63b-5dcd-4cc7-ba82-e074cee4e44d}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{568016c9-2e41-4623-94f4-d78e0a67e506}</object>
-                         <a>{e84242df-3a9c-4110-bd71-7b156c3649d7}</a>
-                         <b>{26369935-b3da-4dac-bad5-cde221ceb09f}</b>
-                        </DRelation>
-                       </base-DRelation>
-                      </DDependency>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DDependency">
-                      <DDependency>
-                       <base-DRelation>
-                        <DRelation>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{e966d357-46d6-43be-8107-bba1a60c7ab2}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{6bb4d5b0-584a-4cdc-a264-66a8d49343f9}</object>
-                         <a>{e2e4f291-1689-4703-bb7c-706166af1b26}</a>
-                         <b>{26369935-b3da-4dac-bad5-cde221ceb09f}</b>
-                        </DRelation>
-                       </base-DRelation>
-                      </DDependency>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DDependency">
-                      <DDependency>
-                       <base-DRelation>
-                        <DRelation>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{601045a7-1cf6-405a-bb63-4a4e4f4627d9}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{05c64428-3d03-4aee-b58d-675f26f2e846}</object>
-                         <a>{99345cc3-43f9-44ae-bffb-9373c1ceede2}</a>
-                         <b>{26369935-b3da-4dac-bad5-cde221ceb09f}</b>
-                        </DRelation>
-                       </base-DRelation>
-                      </DDependency>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DDependency">
-                      <DDependency>
-                       <base-DRelation>
-                        <DRelation>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{07f7e02a-a33d-406a-ba01-fd25e02a9b33}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{256eb463-7604-477d-9f4a-72b3ee82cf02}</object>
-                         <a>{45b6e6c6-9592-437b-a4e3-b07fa54eb605}</a>
-                         <b>{e2e4f291-1689-4703-bb7c-706166af1b26}</b>
-                        </DRelation>
-                       </base-DRelation>
-                      </DDependency>
-                     </instance>
-                    </item>
                    </qlist>
                   </elements>
-                  <last-modified>1700218055378</last-modified>
+                  <last-modified>1710228974673</last-modified>
                   <toolbarid>General</toolbarid>
                  </MDiagram>
                 </base-MDiagram>
@@ -787,24 +682,24 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{63afac5c-4824-4020-b43b-b6410719f879}</uid>
+                    <uid>{611002d6-f1fc-400e-93f4-fb4c6f0348c7}</uid>
                     <visibility>5</visibility>
                     <type>2</type>
                     <properties>4</properties>
-                    <declaration>QString getTitle()</declaration>
+                    <declaration>QString getName()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{c0b941b1-94ba-4d5a-ac61-86ff366f9a4b}</uid>
+                    <uid>{49f55116-698a-4e4e-ac2a-218bcf5f8457}</uid>
                     <visibility>5</visibility>
                     <type>2</type>
-                    <declaration>void setTitle(QString newTitle)</declaration>
+                    <declaration>void setName(QString newName)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{1cc60dc9-c196-47b2-95d2-f322df5e5c2c}</uid>
+                    <uid>{af88d6c0-1e6e-4e0a-94e1-123c448dc969}</uid>
                     <visibility>5</visibility>
                     <type>2</type>
                     <properties>4</properties>
@@ -813,7 +708,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{af6ac160-e4ff-43d7-a42a-71c1a14823b9}</uid>
+                    <uid>{3d310c62-a188-4e79-b5ee-ccfabaffbec2}</uid>
                     <visibility>5</visibility>
                     <type>2</type>
                     <declaration>void setColor(QColor newColor)</declaration>
@@ -821,7 +716,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{e413f396-2cf9-4351-902f-8aef0e1d2cf6}</uid>
+                    <uid>{e735476c-8ab0-485b-b0de-c22f125a2a93}</uid>
                     <visibility>5</visibility>
                     <type>2</type>
                     <properties>4</properties>
@@ -830,7 +725,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{1a4288a1-d158-4381-98eb-d18fb38bcb0a}</uid>
+                    <uid>{2f469c5c-83db-4bbc-8504-354e053d6bc2}</uid>
                     <visibility>5</visibility>
                     <type>2</type>
                     <declaration>void setUnitOfMeasure(UnitOfMeasurement *newUnitOfMeasure)</declaration>
@@ -838,49 +733,156 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{f347a49d-97d5-47eb-a570-9e7e46525854}</uid>
+                    <uid>{99873eba-8731-4e65-a9b9-335ed824621d}</uid>
                     <visibility>5</visibility>
                     <type>2</type>
                     <properties>4</properties>
-                    <declaration>double getLastReadValue()</declaration>
+                    <declaration>QPair&lt;double, double&gt; getLastReadValue()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{3320a45a-2501-4b93-8187-a095543fd87a}</uid>
+                    <uid>{b71f0a61-09da-47bc-b322-f4d8944af7e9}</uid>
                     <visibility>5</visibility>
                     <type>2</type>
-                    <declaration>double getValueAtTime(uint32_t time)</declaration>
+                    <declaration>double getValueAtTime(double time)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{72595436-243c-4392-9a84-e9887367f1e6}</uid>
+                    <uid>{ac502bf8-7fae-43bd-83f9-227d7fab4ad2}</uid>
                     <visibility>5</visibility>
                     <type>2</type>
-                    <declaration>void updateValue(uint32_t time, double value)</declaration>
+                    <declaration>void updateValue(double time, double value)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{f879bee5-4991-4ab0-8ea3-9c9509c9eda0}</uid>
+                    <uid>{81a9abe1-900d-4f83-8c86-6cde424fe82a}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>void resetMinMax()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{f04f7163-1e36-4dc4-9da6-3187b2c64b3a}</uid>
                     <visibility>5</visibility>
                     <type>2</type>
                     <properties>4</properties>
-                    <declaration>QList&lt;QPair&lt;uint32_t, double&gt; &gt; *getValues()</declaration>
+                    <declaration>QList&lt;QPair&lt;double, double&gt;&gt; *getValues()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{65b6e9f0-7d47-4abc-ba96-22a53d589b81}</uid>
+                    <uid>{a4234949-bd5a-4dc3-8d5a-8638cc38adaf}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>void clearMonitorData()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{99b9de46-6608-4305-84dc-84265868f66d}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>QVector&lt;double&gt; *getXdata()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{b2a4acf0-c5af-4f97-bcd9-f9526f3a33eb}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>QVector&lt;double&gt; *getYdata()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{e98c29f3-1636-4256-88ef-10312527d1c4}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <properties>4</properties>
+                    <declaration>IReadStrategy *getReadStrategy()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{736bdbd4-bb61-49dd-867b-01ddcaff1bb5}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>void setReadStrategy(IReadStrategy *newReadStrategy)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{c0201582-7f13-4881-b045-d32994c9774d}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>void read()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{2d7ec948-9684-4f3c-a71a-6299a31a24b1}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <properties>4</properties>
+                    <declaration>double minValue()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{4ca8b852-510d-423f-900c-6b416d446c34}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <properties>4</properties>
+                    <declaration>double maxValue()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{90b38c7a-5804-4e44-b90a-fc0822ea63ff}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void valueUpdated(double time, double value)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{db4e62c8-d816-4ca7-b289-cc27e57015c1}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void minValueUpdated(double value)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{5615ca02-779e-4d32-bfa7-a3236baf2697}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void maxValueUpdated(double value)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{06761061-d259-459e-9b5b-75b1409e92a7}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void dataCleared()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{8ab18571-4aa0-4791-958e-f2c1c5d965ad}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>QString title</declaration>
+                    <declaration>QString name</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{c496d68f-c8a7-4e8b-8643-8853c039e876}</uid>
+                    <uid>{6fc534e6-e481-4274-b11d-7dfd34bcaaf9}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
                     <declaration>QColor color</declaration>
@@ -888,7 +890,55 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{d0cc71af-9319-4043-a68d-e92a66e0e99a}</uid>
+                    <uid>{3d743b7a-0be4-4943-95cb-bdf22874d41d}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>double m_minValue</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{8729c63b-d069-48c8-be46-8788dbf85ef9}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>double m_maxValue</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{8861993a-53ba-4e49-b41e-d26205c06e1f}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>double m_dataSize</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{ba993d25-2d3b-4932-b487-5642e244325e}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>QVector&lt;double&gt; ydata</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{c3f096f1-e8d5-4156-97ec-fa457f0b3ca7}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>QVector&lt;double&gt; xdata</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{f1f754bd-61a0-4678-afe9-85be873f5c44}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>IReadStrategy *readStrategy</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{e24ddea4-f569-4724-ad83-6dcf981a49eb}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
                     <declaration>UnitOfMeasurement *unitOfMeasure</declaration>
@@ -896,18 +946,18 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{dc3c792d-fd56-4a7c-8a43-1a48d8869a23}</uid>
+                    <uid>{7c9d58d4-f4e0-4f8c-9694-09704a482084}</uid>
                     <visibility>3</visibility>
-                    <type>1</type>
-                    <declaration>double lastReadValue</declaration>
+                    <type>2</type>
+                    <declaration>void checkMinMaxUpdate(double value)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{c504753e-ff69-49d9-8976-530761158c29}</uid>
+                    <uid>{f40c1427-cddc-438b-867f-3ce04a2a4b4a}</uid>
                     <visibility>3</visibility>
-                    <type>1</type>
-                    <declaration>QList&lt;QPair&lt;uint32_t , double&gt;&gt; *values</declaration>
+                    <type>2</type>
+                    <declaration>void setDataStorageSize()</declaration>
                    </MClassMember>
                   </item>
                  </qlist>
@@ -967,7 +1017,7 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{827088f3-7f54-4c50-9d42-395a0eccd767}</uid>
+                    <uid>{82152a30-bc10-4696-8a4a-eb188a5fa9e7}</uid>
                     <type>2</type>
                     <properties>4</properties>
                     <declaration>QString getName()</declaration>
@@ -975,7 +1025,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{06e77b35-ad96-45f0-ae3b-4d8848169365}</uid>
+                    <uid>{f4aafe37-f515-4fb5-9b89-fec2c7e38dfc}</uid>
                     <type>2</type>
                     <properties>4</properties>
                     <declaration>QString getSymbol()</declaration>
@@ -983,21 +1033,21 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{be751b4e-f9ad-4ead-88af-8f5ff5ae811b}</uid>
+                    <uid>{361a14b5-9237-469c-894f-8dde617450b3}</uid>
                     <type>2</type>
                     <declaration>QString getNameAndSymbol()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{df29994f-d031-4dfd-bdce-9c481262fd22}</uid>
+                    <uid>{c6980502-768a-4845-9315-1e13e87e79c9}</uid>
                     <type>1</type>
                     <declaration>QString name</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{8bf3d6ca-7bc9-410a-855c-3f8c41b8015e}</uid>
+                    <uid>{d70b0869-0691-4ef3-845f-7d4efaf5e1d5}</uid>
                     <type>1</type>
                     <declaration>QString symbol</declaration>
                    </MClassMember>
@@ -1128,7 +1178,7 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{fe5dbbbb-f37a-487d-8d28-32e3ecc34c1e}</uid>
+                    <uid>{2f53f1cc-d9cf-4c85-b4c2-d769dcccc9f3}</uid>
                     <type>2</type>
                     <properties>4</properties>
                     <declaration>double getSampleRate()</declaration>
@@ -1136,14 +1186,14 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{a5588ac1-a380-487a-8590-f1803c3e249e}</uid>
+                    <uid>{bc8805ca-bbc7-40d6-846e-0347f8ca7212}</uid>
                     <type>2</type>
                     <declaration>void setSampleRate(double newSampleRate)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{ff01dccf-b1d9-43c7-a582-0cb7563e974d}</uid>
+                    <uid>{32d73dbb-9ba3-4884-8c6f-9444b948b4a6}</uid>
                     <type>2</type>
                     <properties>4</properties>
                     <declaration>double getInterval()</declaration>
@@ -1151,21 +1201,21 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{0658aef1-70da-4e39-a276-d0d3ee7b30b8}</uid>
+                    <uid>{d98b1ffa-eaad-4858-a135-c4745606e8bd}</uid>
                     <type>2</type>
                     <declaration>void setInterval(double newInterval)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{a20c58da-8bba-46c9-a6c4-3c14c39ca186}</uid>
+                    <uid>{7ea6a808-78d0-4374-9478-462b50bccba2}</uid>
                     <type>2</type>
                     <declaration>void plotData(double xValue, double yValue)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{7412c2de-bacf-41ef-ad94-8c44f34b2a28}</uid>
+                    <uid>{f16a857f-a490-4ab0-9ef9-8652b00bef0b}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
                     <declaration>PlotWidget *plot</declaration>
@@ -1173,7 +1223,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{c29d2a78-ee0b-4abf-a2b1-389e7172b72d}</uid>
+                    <uid>{e9eac878-c882-4ae6-bd57-02700bf95525}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
                     <declaration>PlotChannel *plotch</declaration>
@@ -1289,7 +1339,7 @@
                     <uid>{68646814-9b54-4b6e-add7-63ffd9dff6cb}</uid>
                    </MElement>
                   </base-MElement>
-                  <name>DataMonitorSettings</name>
+                  <name>DataMonitorToolSettings</name>
                   <relations>
                    <handles>
                     <handles>
@@ -1344,6 +1394,18 @@
                   </relations>
                  </MObject>
                 </base-MObject>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{5395a7a8-9a5e-455e-b92d-1fe594fdfa78}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void readIntervalChanged(double interval)</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
                </MClass>
               </instance>
              </target>
@@ -1369,7 +1431,7 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{15b9e0a7-cd88-4180-af60-dcdf51c211a6}</uid>
+                    <uid>{cc55b3ca-facd-4802-a54e-aa42cee2b8a0}</uid>
                     <type>2</type>
                     <properties>64</properties>
                     <declaration>void DataMonitorViewStyle(DataMonitorView *dataMonitorView, QColor color)</declaration>
@@ -1495,12 +1557,63 @@
                         </target>
                        </handle>
                       </item>
+                      <item>
+                       <handle>
+                        <uid>{1833bfae-dc0f-46de-8b2e-da5e8031c773}</uid>
+                        <target>
+                         <instance type="MDependency">
+                          <MDependency>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{1833bfae-dc0f-46de-8b2e-da5e8031c773}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{7f44a1ed-b69d-4ff0-a6a4-b446163dec9e}</a>
+                             <b>{bc934261-21c8-4583-b375-30be4633d3f0}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MDependency>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
                      </qlist>
                     </handles>
                    </handles>
                   </relations>
                  </MObject>
                 </base-MObject>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{eb232074-7613-4239-9270-aa78a632c177}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>3</properties>
+                    <declaration>void read()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{c0144f42-acce-4708-89ed-01e51260fbdf}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void readDone(double time, double value)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{96111961-dfbc-4227-98bc-e3f291ffa345}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void readError(const char *err)</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
                </MClass>
               </instance>
              </target>
@@ -1519,7 +1632,7 @@
                     <uid>{e5402a33-7043-4186-a25d-f224c3aff0cd}</uid>
                    </MElement>
                   </base-MElement>
-                  <name>IIOReadStrategy</name>
+                  <name>DMMReadStrategy</name>
                   <relations>
                    <handles>
                     <handles>
@@ -1606,6 +1719,59 @@
                   </relations>
                  </MObject>
                 </base-MObject>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{732ec289-41f8-475f-9a3d-4f68eb2a5141}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <properties>4</properties>
+                    <declaration>double offset()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{5bd0cc1b-e09d-41f6-b03d-01fef785ecc1}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>void setOffset(double newOffset)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{ebe5f689-2ef2-49ff-b36f-967717d336c4}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>iio_device *dev</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{48a39726-0841-4049-b086-0b27fe4ef66b}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>iio_channel *chn</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{0ad507c1-2cc7-4b72-af07-de4f167c8390}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>double m_umScale</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{10d039fc-fef5-4f5a-a9da-99eaa6077e58}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>double m_offset</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
                </MClass>
               </instance>
              </target>
@@ -1928,7 +2094,7 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{d280fe8e-52eb-4d20-b59b-0c5df35ed96d}</uid>
+                    <uid>{93120566-4026-42e5-bd3b-7ee4114e450e}</uid>
                     <visibility>5</visibility>
                     <type>2</type>
                     <declaration>DataMonitorView* getDataMonitorView()</declaration>
@@ -1936,7 +2102,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{a8a7a4e0-5c6b-47fc-a462-37605da9f0f1}</uid>
+                    <uid>{954cb606-74c7-4251-b50e-2ff5865fbb18}</uid>
                     <visibility>5</visibility>
                     <type>2</type>
                     <properties>4</properties>
@@ -1945,7 +2111,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{b0414f12-f582-446b-80e5-044c84a2d6b2}</uid>
+                    <uid>{41997167-4a2e-40a5-b165-44fc9cb50e81}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
                     <declaration>DataMonitorView *dataMonView</declaration>
@@ -1953,7 +2119,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{6662b835-8bae-4cd9-b26b-63062682702c}</uid>
+                    <uid>{d7981edd-bd93-470b-9108-2caa6ad6b628}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
                     <declaration>DataMonitorModel *model</declaration>
@@ -2171,7 +2337,7 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{55f771a2-2752-44c1-bdde-df16ce741fb0}</uid>
+                    <uid>{e2875de2-f6a9-49bb-9937-11768256cf47}</uid>
                     <visibility>5</visibility>
                     <type>2</type>
                     <declaration>bool getMonitorEnabled()</declaration>
@@ -2179,7 +2345,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{d587b655-0da4-402d-be2b-a7cbd9c8cc64}</uid>
+                    <uid>{5dd5f07f-d192-4c5b-9fd6-9df88f7522ce}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
                     <declaration>void toggleMenu(bool toggle)</declaration>
@@ -2187,7 +2353,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{42716488-1999-4a25-b400-06aefc4d70be}</uid>
+                    <uid>{46ce2edb-7013-4674-93a7-4c85e08b3d33}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
                     <declaration>void setMonitorEnabled (bool enabled)</declaration>
@@ -2220,34 +2386,18 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{2aeed6ae-8bae-4de0-a91d-8b6c1a077633}</uid>
-                    <visibility>5</visibility>
-                    <type>2</type>
-                    <declaration>void generateMonitor(DataMonitorModel * model, CollapsableMenuControlButton *channelManager )</declaration>
+                    <uid>{956b9fe8-f6d9-4146-840b-d4ef74447016}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>ToolTemplate *tool</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{b04bbbff-3ff3-4119-9ffd-8eb861b931c4}</uid>
+                    <uid>{faf0ab1d-3e4c-41e8-bbc1-e6e68f61dab9}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>QMap&lt;int, DataMonitorController*&gt; *m_monitors</declaration>
-                   </MClassMember>
-                  </item>
-                  <item>
-                   <MClassMember>
-                    <uid>{16a0d816-b456-4128-86f9-1d959535523e}</uid>
-                    <visibility>3</visibility>
-                    <type>1</type>
-                    <declaration>FlexGridLayout *m_flexGridLayout</declaration>
-                   </MClassMember>
-                  </item>
-                  <item>
-                   <MClassMember>
-                    <uid>{a8279e76-0014-47c4-abb8-76f4857a7a89}</uid>
-                    <visibility>3</visibility>
-                    <type>1</type>
-                    <declaration>DataLoggerSettings *generalSettings</declaration>
+                    <declaration>DataAcquisitionManager *dataAcquisitionManager</declaration>
                    </MClassMember>
                   </item>
                  </qlist>
@@ -2295,6 +2445,717 @@
                  </MObject>
                 </base-MObject>
                </MItem>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{a102a75c-5d0a-4799-9b1e-07c753f903fc}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{a102a75c-5d0a-4799-9b1e-07c753f903fc}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>New Class</name>
+                 </MObject>
+                </base-MObject>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{0f88ecf9-e53b-4086-999f-aab4a322fce4}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{0f88ecf9-e53b-4086-999f-aab4a322fce4}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>New Class</name>
+                 </MObject>
+                </base-MObject>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{3599f7ca-47de-4514-93d5-cf99da53ae4b}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{3599f7ca-47de-4514-93d5-cf99da53ae4b}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>TestReadStrategy</name>
+                  <relations>
+                   <handles>
+                    <handles>
+                     <qlist>
+                      <item>
+                       <handle>
+                        <uid>{7020463d-624b-41a4-b0ca-14ef3c81e393}</uid>
+                        <target>
+                         <instance type="MAssociation">
+                          <MAssociation>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{7020463d-624b-41a4-b0ca-14ef3c81e393}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{3599f7ca-47de-4514-93d5-cf99da53ae4b}</a>
+                             <b>{7f44a1ed-b69d-4ff0-a6a4-b446163dec9e}</b>
+                            </MRelation>
+                           </base-MRelation>
+                           <a>
+                            <MAssociationEnd>
+                             <navigable>true</navigable>
+                            </MAssociationEnd>
+                           </a>
+                          </MAssociation>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                     </qlist>
+                    </handles>
+                   </handles>
+                  </relations>
+                 </MObject>
+                </base-MObject>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{c477b561-4cd2-461a-913a-cdae46b22469}</uid>
+                    <type>1</type>
+                    <declaration>double testDataValue</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{782ff9b4-9d56-4b9f-921e-51b62e0a89a3}</uid>
+                    <type>1</type>
+                    <declaration>double testDataTime</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{5d6afa1d-b42f-4d1a-bed1-140d17c80a2d}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{5d6afa1d-b42f-4d1a-bed1-140d17c80a2d}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>DMM</name>
+                  <relations>
+                   <handles>
+                    <handles>
+                     <qlist>
+                      <item>
+                       <handle>
+                        <uid>{80117928-b79e-4f4e-adaa-6f9e4c6ecb0b}</uid>
+                        <target>
+                         <instance type="MDependency">
+                          <MDependency>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{80117928-b79e-4f4e-adaa-6f9e4c6ecb0b}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{5d6afa1d-b42f-4d1a-bed1-140d17c80a2d}</a>
+                             <b>{f8a3db9f-2ab7-477b-8f52-27616ab638fc}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MDependency>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                     </qlist>
+                    </handles>
+                   </handles>
+                  </relations>
+                 </MObject>
+                </base-MObject>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{f59e0591-3ba0-4e43-9c4b-38941da2dc31}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>QList&lt;DataMonitorModel *&gt; getDmmMonitors(iio_context *ctx)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{2ec1ed90-2372-416f-8914-3fc215c5e9e8}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>bool isDMMCompatible(iio_channel *chn)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{555d8fa1-fb71-4642-a7e2-5ce3e4ee45d4}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>bool isHwmon(iio_device *dev, iio_channel *chn)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{142bf982-e15a-4a84-8397-2752ce58123e}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>bool iioChannelHasAttribute(iio_channel *chn, std::string const &amp;attr)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{b488a069-9796-46a2-8313-6157462614c4}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>void generateDictionaries()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{d38b0050-5351-44a2-ad87-ce069ab4df54}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <properties>4</properties>
+                    <declaration>QMap&lt;int, DMMInfo&gt; iioDevices()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{69074aae-c11a-4c26-aa29-3e5c3a2aa958}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <properties>4</properties>
+                    <declaration>QMap&lt;int, DMMInfo&gt; hwmonDevices()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{5b8c2602-cb52-4949-b1f3-4f21a3ecf2a7}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>QMap&lt;int, DMMInfo&gt; m_iioDevices</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{1bc5feaf-dfe8-4bf8-b8d9-ce59052a3285}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>QMap&lt;int, DMMInfo&gt; m_hwmonDevices</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{f16dc88b-ed91-48c8-96fc-0be6d07afaa1}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{f16dc88b-ed91-48c8-96fc-0be6d07afaa1}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>DataAcquisitionManager</name>
+                  <relations>
+                   <handles>
+                    <handles>
+                     <qlist>
+                      <item>
+                       <handle>
+                        <uid>{8b6dbe11-b469-47f0-8673-0b5d29187374}</uid>
+                        <target>
+                         <instance type="MDependency">
+                          <MDependency>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{8b6dbe11-b469-47f0-8673-0b5d29187374}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{f16dc88b-ed91-48c8-96fc-0be6d07afaa1}</a>
+                             <b>{bc934261-21c8-4583-b375-30be4633d3f0}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MDependency>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                      <item>
+                       <handle>
+                        <uid>{7a912de0-2d5f-43e9-90f3-453f1ad40b3c}</uid>
+                        <target>
+                         <instance type="MDependency">
+                          <MDependency>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{7a912de0-2d5f-43e9-90f3-453f1ad40b3c}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{f16dc88b-ed91-48c8-96fc-0be6d07afaa1}</a>
+                             <b>{f8a3db9f-2ab7-477b-8f52-27616ab638fc}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MDependency>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                     </qlist>
+                    </handles>
+                   </handles>
+                  </relations>
+                 </MObject>
+                </base-MObject>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{df708bf1-5b4a-4452-aca6-6d7b6df44370}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>void clearMonitorsData()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{fdeb6994-d697-46fe-b5a9-eb7a3ed2ced1}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>QList&lt;QString&gt; getMonitors()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{6f431190-3398-4b30-88e7-2648e9e65cba}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>void readData()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{f170f2e1-fffa-4460-aed1-3c7643b036ec}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>QList&lt;QString&gt; getActiveMonitors()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{8a148139-0a89-4cd3-b283-0f0e21f8576f}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>void updateActiveMonitors(bool toggled, QString monitorName)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{7b112932-d10a-4c39-a44b-a1c3c610b3df}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <properties>4</properties>
+                    <declaration>QMap&lt;QString, DataMonitorModel *&gt; *getDataMonitorMap()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{c8414926-4ec9-40f0-967c-7d4a77a19f8e}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void requestUpdateActiveMonitors()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{c9900cec-35b1-4c85-95aa-cb830a4ce68c}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void requestRead()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{79ae5ffa-4350-4b94-8614-e62fbaf0a25a}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void activeMonitorsUpdated()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{8bf40ebb-20d3-4769-8712-a8d3e5bef612}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>QMap&lt;QString, int&gt; *m_activeMonitorsMap</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{fcecd0e6-3728-44e7-9fcb-3146b97b2f74}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>QMap&lt;QString, DataMonitorModel *&gt; *m_dataMonitorMap</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{66536afd-14d2-4a0d-8a5c-5817dcc2ba4c}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{66536afd-14d2-4a0d-8a5c-5817dcc2ba4c}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>TimeManager</name>
+                  <relations>
+                   <handles>
+                    <handles>
+                     <qlist>
+                      <item>
+                       <handle>
+                        <uid>{cf2524ad-dba6-4ada-89ed-64218f3da2e2}</uid>
+                        <target>
+                         <instance type="MDependency">
+                          <MDependency>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{cf2524ad-dba6-4ada-89ed-64218f3da2e2}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{66536afd-14d2-4a0d-8a5c-5817dcc2ba4c}</a>
+                             <b>{f8a3db9f-2ab7-477b-8f52-27616ab638fc}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MDependency>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                      <item>
+                       <handle>
+                        <uid>{38949e3c-03df-4ebf-909d-39d8701204aa}</uid>
+                        <target>
+                         <instance type="MDependency">
+                          <MDependency>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{38949e3c-03df-4ebf-909d-39d8701204aa}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{66536afd-14d2-4a0d-8a5c-5817dcc2ba4c}</a>
+                             <b>{68646814-9b54-4b6e-add7-63ffd9dff6cb}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MDependency>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                     </qlist>
+                    </handles>
+                   </handles>
+                  </relations>
+                 </MObject>
+                </base-MObject>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{7c6ab9e7-5ebf-43f3-a107-17af38c1dc4d}</uid>
+                    <type>2</type>
+                    <declaration>void setStartTime()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{f0b2d79d-6b31-4311-808f-dc5150f46e53}</uid>
+                    <type>2</type>
+                    <properties>4</properties>
+                    <declaration>double startTime()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{5b933367-4db6-450e-bcff-96bdb5e37eaf}</uid>
+                    <type>2</type>
+                    <declaration>QDateTime startTime()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{e7aa4b3d-52ab-4315-96e2-9c75e1d947c6}</uid>
+                    <type>2</type>
+                    <declaration>void startTimer()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{b1b6835d-0d1f-49ab-8bd9-7ef9693ae5aa}</uid>
+                    <type>2</type>
+                    <declaration>void stopTimer()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{4a69d8d9-d09e-47d4-a879-eb404564b321}</uid>
+                    <type>2</type>
+                    <declaration>void setTimerInterval(double interval)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{e9394806-e509-4032-a6eb-b05c4ae104f2}</uid>
+                    <type>2</type>
+                    <properties>4</properties>
+                    <declaration>bool isRunning()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{96a14235-1516-4593-b07c-fa4f47ff5aca}</uid>
+                    <type>2</type>
+                    <declaration>void setIsRunning(bool newIsRunning)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{40024128-8d5c-40d2-b748-7f334ef74eac}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void timeout()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{edd10ed7-a777-42a0-a027-b1a2750b5c2b}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <properties>64</properties>
+                    <declaration>TimeManager *pinstance_</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{41683c66-4a39-47e3-831b-4fe3ae5812ce}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>QDateTime m_startTime</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{6c9fde85-7bc0-4bc2-97fd-94db8abb3e4e}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>bool m_realTime</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{f8c554e5-54cf-4245-aed0-37b0a677c77f}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>QTimer *m_timer</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{63898b03-e6e1-4e57-805d-f677bacf0210}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>bool m_isRunning</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{e952e3d6-070c-4b01-b6dc-93dc65aea973}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{e952e3d6-070c-4b01-b6dc-93dc65aea973}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>DataMonitorController</name>
+                  <relations>
+                   <handles>
+                    <handles>
+                     <qlist>
+                      <item>
+                       <handle>
+                        <uid>{77746297-4120-4048-babf-0e245ec5d311}</uid>
+                        <target>
+                         <instance type="MDependency">
+                          <MDependency>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{77746297-4120-4048-babf-0e245ec5d311}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{e952e3d6-070c-4b01-b6dc-93dc65aea973}</a>
+                             <b>{f8a3db9f-2ab7-477b-8f52-27616ab638fc}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MDependency>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                     </qlist>
+                    </handles>
+                   </handles>
+                  </relations>
+                 </MObject>
+                </base-MObject>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{72cc4125-15a8-4a0b-9003-5247669dfe50}</uid>
+                    <type>2</type>
+                    <properties>4</properties>
+                    <declaration>DataMonitorView *dataMonitorView()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{58e2ee56-a222-41b5-b865-33d6ed0ae054}</uid>
+                    <type>2</type>
+                    <properties>4</properties>
+                    <declaration>DataMonitorSettings *dataMonitorSettings()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{d6130564-57e5-45fe-8c3a-bb1203c5261c}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>DataMonitorView *m_dataMonitorView</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{0e33a00e-6adf-4b06-ac10-63aaf0263aa7}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>DataMonitorSettings *m_dataMonitorSettings</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{3848b55f-3b06-4fc8-9c5c-4fdbf79cfd04}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>DataAcquisitionManager *m_dataAcquisitionManager</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{27e07d45-9906-40d9-bbde-2147ee9ff276}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{27e07d45-9906-40d9-bbde-2147ee9ff276}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>DataMonitorView</name>
+                 </MObject>
+                </base-MObject>
+               </MClass>
               </instance>
              </target>
             </handle>
