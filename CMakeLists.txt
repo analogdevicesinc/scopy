@@ -4,6 +4,12 @@ enable_testing()
 project(scopy VERSION 2.0.0 LANGUAGES CXX)
 set(SCOPY_VERSION ${PROJECT_VERSION})
 
+# set CMAKE_BUILD_TYPE if not set externally
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
+	    "Default build type: RelWithDebInfo" FORCE)
+endif()
+
 # Make sure our local CMake Modules path comes first
 list(INSERT CMAKE_MODULE_PATH 0 ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
