@@ -49,7 +49,7 @@ export_paths(){
 	echo -- USING CMAKE COMMAND:
 	echo $CMAKE
 	echo -- USING QT: $QT_PATH
-	echo -- USING QMAKE: $QMAKE_BIN
+	echo -- USING QMAKE: $QMAKE
 	echo -- PATH: $PATH
 	echo -- PKG_CONFIG_PATH: $PKG_CONFIG_PATH
 }
@@ -207,17 +207,68 @@ build_libsigrokdecode() {
 
 	pushd $STAGING_AREA/libsigrokdecode
 	git reset --hard
+	git clean -xdf
 	./autogen.sh
 	./configure --prefix $STAGING_AREA_DEPS
 	make $JOBS install
 	popd
 }
 
+patch_qwt() {
+	patch -p1 <<-EOF
+--- a/qwtconfig.pri
++++ b/qwtconfig.pri
+@@ -19,7 +19,7 @@
+ QWT_INSTALL_PREFIX = \$\$[QT_INSTALL_PREFIX]
+
+ unix {
+-    QWT_INSTALL_PREFIX    = /usr/local
++    QWT_INSTALL_PREFIX    = $STAGING_AREA_DEPS
+     # QWT_INSTALL_PREFIX = /usr/local/qwt-\$\$QWT_VERSION-ma-qt-\$\$QT_VERSION
+ }
+
+@@ -42,7 +42,7 @@ QWT_INSTALL_LIBS      = \$\${QWT_INSTALL_PREFIX}/lib
+ # runtime environment of designer/creator.
+ ######################################################################
+
+-QWT_INSTALL_PLUGINS   = \$\${QWT_INSTALL_PREFIX}/plugins/designer
++#QWT_INSTALL_PLUGINS   = \$\${QWT_INSTALL_PREFIX}/plugins/designer
+
+ # linux distributors often organize the Qt installation
+ # their way and QT_INSTALL_PREFIX doesn't offer a good
+@@ -163,7 +163,7 @@ QWT_CONFIG     += QwtOpenGL
+
+ macx:!static:CONFIG(qt_framework, qt_framework|qt_no_framework) {
+
+-    QWT_CONFIG += QwtFramework
++#    QWT_CONFIG += QwtFramework
+ }
+
+ ######################################################################
+--- a/src/src.pro
++++ b/src/src.pro
+@@ -36,6 +36,7 @@ contains(QWT_CONFIG, QwtDll) {
+             QMAKE_LFLAGS_SONAME=
+         }
+     }
++    macx: QWT_SONAME=\$\${QWT_INSTALL_LIBS}/libqwt.dylib
+ }
+EOF
+}
+
+
 build_qwt() {
 	echo "### Building qwt - branch qwt-multiaxes"
 	CURRENT_BUILD=qwt
 	save_version_info
-	qmake_build_local "qwt" "qwt.pro" "patch_qwt"
+	pushd $STAGING_AREA/qwt
+	git clean -xdf
+	git reset --hard
+	patch_qwt
+	$QMAKE INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib qwt.pro
+	make $JOBS
+	make install
+	popd
 }
 
 build_libtinyiiod() {
