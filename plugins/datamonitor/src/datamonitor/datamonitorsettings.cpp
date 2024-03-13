@@ -71,7 +71,12 @@ void DataMonitorSettings::init(QString title, QColor color)
 	// YAxis settings
 	layout->addWidget(generateYAxisSettings(this));
 
-	layout->addWidget(createCurveMenu(this));
+	CurveStyleMenu *curveMenu = new CurveStyleMenu(this);
+
+	connect(curveMenu, &CurveStyleMenu::curveThicknessChanged, m_plot, &MonitorPlot::changeCurveThickness);
+	connect(curveMenu, &CurveStyleMenu::curveStyleIndexChanged, m_plot, &MonitorPlot::changeCurveStyle);
+
+	layout->addWidget(curveMenu);
 
 	DataMonitorStyleHelper::DataMonitorSettingsStyle(this);
 }
@@ -153,23 +158,6 @@ void DataMonitorSettings::plotYAxisMinValueUpdate(double value) { m_ymin->setVal
 
 void DataMonitorSettings::plotYAxisMaxValueUpdate(double value) { m_ymax->setValue(value); }
 
-Qt::PenStyle DataMonitorSettings::lineStyleFromIdx(int idx)
-{
-	switch(idx) {
-	case 0:
-		return Qt::PenStyle::SolidLine;
-	case 1:
-		return Qt::PenStyle::DotLine;
-	case 2:
-		return Qt::PenStyle::DashLine;
-	case 3:
-		return Qt::PenStyle::DashDotLine;
-	case 4:
-		return Qt::PenStyle::DashDotDotLine;
-	}
-	return Qt::PenStyle::SolidLine;
-}
-
 QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 {
 	MenuSectionWidget *yaxisContainer = new MenuSectionWidget(parent);
@@ -249,43 +237,5 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 	return yaxisContainer;
 }
 
-QWidget *DataMonitorSettings::createCurveMenu(QWidget *parent)
 {
-	MenuSectionWidget *curvecontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *curve = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, curvecontainer);
-
-	QWidget *curveSettings = new QWidget(curve);
-	QHBoxLayout *curveSettingsLay = new QHBoxLayout(curveSettings);
-	curveSettingsLay->setMargin(0);
-	curveSettingsLay->setSpacing(10);
-	curveSettings->setLayout(curveSettingsLay);
-
-	MenuCombo *cbThicknessW = new MenuCombo("Thickness", curve);
-	auto cbThickness = cbThicknessW->combo();
-	cbThickness->addItem("1");
-	cbThickness->addItem("2");
-	cbThickness->addItem("3");
-	cbThickness->addItem("4");
-	cbThickness->addItem("5");
-
-	connect(cbThickness, qOverload<int>(&QComboBox::currentIndexChanged), m_plot,
-		[=](int idx) { m_plot->changeCurveThickness(cbThickness->itemText(idx).toFloat()); });
-
-	MenuCombo *cbStyleW = new MenuCombo("Style", curve);
-	auto cbStyle = cbStyleW->combo();
-	cbStyle->addItem("Lines", PlotChannel::PCS_LINES);
-	cbStyle->addItem("Dots", PlotChannel::PCS_DOTS);
-	cbStyle->addItem("Steps", PlotChannel::PCS_STEPS);
-	cbStyle->addItem("Sticks", PlotChannel::PCS_STICKS);
-	cbStyle->addItem("Smooth", PlotChannel::PCS_SMOOTH);
-	StyleHelper::MenuComboBox(cbStyle, "cbStyle");
-
-	connect(cbStyle, qOverload<int>(&QComboBox::currentIndexChanged), m_plot, &MonitorPlot::changeCurveStyle);
-
-	curveSettingsLay->addWidget(cbThicknessW);
-	curveSettingsLay->addWidget(cbStyleW);
-	curve->contentLayout()->addWidget(curveSettings);
-	curvecontainer->contentLayout()->addWidget(curve);
-
-	return curvecontainer;
 }
