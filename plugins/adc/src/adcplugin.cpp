@@ -1,8 +1,5 @@
 #include "adcplugin.h"
 
-#include "adcinstrument.h"
-#include "gui/stylehelper.h"
-
 #include <QBoxLayout>
 #include <QJsonDocument>
 #include <QLabel>
@@ -15,6 +12,12 @@
 #include <pluginbase/preferenceshelper.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
+
+#include "adcinstrument.h"
+#include "adcinstrument_old.h"
+#include "gui/stylehelper.h"
+#include "timegrplot.h"
+
 
 Q_LOGGING_CATEGORY(CAT_ADCPLUGIN, "ADCPlugin");
 using namespace scopy;
@@ -121,7 +124,7 @@ bool ADCPlugin::loadPage()
 void ADCPlugin::loadToolList()
 {
 	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+		SCOPY_NEW_TOOLMENUENTRY("time_old", "Time_old", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
 }
 
 PlotProxy *ADCPlugin::createRecipe(iio_context *ctx)
@@ -192,6 +195,49 @@ PlotProxy *ADCPlugin::createRecipe(iio_context *ctx)
 	return recipe;
 }
 
+
+int ADCPlugin::plotCount() {
+	return m_toolList.size();
+}
+
+void ADCPlugin::addPlot(int j){
+	static int i = 0;
+
+
+	QString tool_name = (QString("time") + QString::number(i));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(tool_name, tool_name, ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+	m_toolList.last()->setEnabled(true);
+	m_toolList.last()->setRunBtnVisible(true);
+
+	TimeGRPlotRecipe *tgrpr = new TimeGRPlotRecipe(top,this,false);
+	QWidget *w = new AdcInstrument(tgrpr);
+
+	connect(dynamic_cast<AdcInstrument*>(w), &AdcInstrument::newPlot,this,&ADCPlugin::addPlot);
+	connect(dynamic_cast<AdcInstrument*>(w), &AdcInstrument::removePlot,this,&ADCPlugin::removePlot);
+
+	Q_EMIT toolListChanged();
+	m_toolList.last()->setTool(w);
+	requestTool(tool_name);
+	i++;
+}
+
+
+
+void ADCPlugin::removePlot(QWidget *w){
+	int i = 0;
+	for(i = 0;i < plotCount();i++) {
+		if(m_toolList[i]->tool() == w){
+			break;
+		}
+	}
+	if(i != plotCount()) {
+		m_toolList.removeAt(i);
+		Q_EMIT toolListChanged();
+		requestTool("time_old");
+	}
+}
+
+
 bool ADCPlugin::onConnect()
 {
 	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
@@ -204,10 +250,19 @@ bool ADCPlugin::onConnect()
 	// create gnuradio flow out of channels
 	// pass channels to ADC instrument - figure out channel model (sample rate/ size/ etc)
 
-	auto recipe = createRecipe(m_ctx);
+	/*auto recipe = createRecipe(m_ctx);
+	time = new AdcInstrument_Old(recipe);
 
-	time = new AdcInstrument(recipe);
+	connect(dynamic_cast<AdcInstrument_Old*>(time), &AdcInstrument_Old::newPlot,this,&ADCPlugin::addPlot);
+	connect(dynamic_cast<AdcInstrument_Old*>(time), &AdcInstrument_Old::removePlot,this,&ADCPlugin::removePlot);
+
 	m_toolList[0]->setTool(time);
+
+	*/
+
+	top = new grutil::GRTopBlock("Time", this);
+	auto plotRecipe = new TimeGRPlotRecipe(top);
+	addPlot(0);
 
 	return true;
 }

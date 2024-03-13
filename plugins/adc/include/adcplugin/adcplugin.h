@@ -158,6 +158,7 @@ private:
 	QString prefix;
 };
 
+
 class SCOPY_ADCPLUGIN_EXPORT ADCPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
@@ -179,10 +180,17 @@ public:
 	void saveSettings(QSettings &) override;
 	void loadSettings(QSettings &) override;
 
+	int plotCount();
+public Q_SLOTS:
+	void addPlot(int);
+	void removePlot(QWidget *w);
+
+
 private:
 	iio_context *m_ctx;
-	QWidget *time;
-	QLineEdit *edit;
+	GRTopBlock *top;
+
+
 	PlotProxy *createRecipe(iio_context *ctx);
 	GRTimePlotProxy *recipe;
 };

@@ -40,7 +40,9 @@ if(NOT "${SCOPY_PLUGIN_BUILD_PATH}" STREQUAL "")
 endif()
 
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
-add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
+add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES}
+    src/plotrecipe.h src/plotrecipe.cpp
+    src/timegrplot.h src/timegrplot.cpp)
 
 generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h

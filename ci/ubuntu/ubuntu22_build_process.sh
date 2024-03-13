@@ -8,12 +8,12 @@ if [ "$CI_SCRIPT" == "ON" ]
 	else
 		set -x
 		SRC_DIR=$(git rev-parse --show-toplevel)
-		QT=/opt/Qt/5.15.2/gcc_64
+		QT=/home/adi/Qt/5.15.2/gcc_64
 fi
 
 USE_STAGING=$1
 
-LIBIIO_VERSION=master
+LIBIIO_VERSION=libiio-v0
 LIBAD9361_BRANCH=master
 GLOG_BRANCH=v0.4.0
 
@@ -77,7 +77,7 @@ clone() {
 	git clone --recursive https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH gr-scopy
 	git clone --recursive https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH gr-m2k
 	git clone --recursive https://github.com/gnuradio/volk.git -b $VOLK_BRANCH volk
-	git clone --recursive https://github.com/gnuradio/gnuradio.git -b $GNURADIO_BRANCH gnuradio
+	git clone --recursive https://github.com/adisuciu/gnuradio.git -b $GNURADIO_BRANCH gnuradio
 	git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 	git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
@@ -301,9 +301,9 @@ build_deps(){
 	build_libtinyiiod
 }
 
-#clone
-#update
-#install_apt
-#install_qt
-#build_deps
+clone
+update
+install_apt
+install_qt
+build_deps
 #build_scopy

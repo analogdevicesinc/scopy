@@ -1,10 +1,6 @@
 #ifndef ADCINSTRUMENT_H
 #define ADCINSTRUMENT_H
 
-#include "gui/tooltemplate.h"
-#include "measurementsettings.h"
-#include "verticalchannelmanager.h"
-
 #include <QPushButton>
 #include <QWidget>
 
@@ -12,20 +8,111 @@
 #include <cursorcontroller.h>
 #include <gui/widgets/toolbuttons.h>
 
+#include "gui/tooltemplate.h"
+#include "measurementsettings.h"
+#include "verticalchannelmanager.h"
+#include "plotrecipe.h"
+
 namespace scopy {
 class MenuControlButton;
 class CollapsableMenuControlButton;
+
+/*
+class AcqTreeNode;
+
+class AcqTree : public QObject {
+	Q_OBJECT
+public:
+	AcqTree(QObject *parent = nullptr) : QObject(parent) {};
+	~AcqTree();
+	QList<AcqTreeNode*> m_nodes;
+
+	void reset();
+
+};
+
+class AcqTreeNode : public QObject {
+	Q_OBJECT
+public:
+	AcqTreeNode(QString name, QObject *parent = nullptr) : QObject(parent) { m_name = name; }
+	~AcqTreeNode() { }
+
+	void addDep(AcqTreeNode* t) { m_deps.append(t); }
+	bool removeDep(AcqTreeNode* t) { return m_deps.removeAll(t); }
+	AcqTree* tree() { return m_tree;}
+
+	virtual void enable() {
+		for(AcqTreeNode *n : m_deps) {
+			n->enable();
+		}
+	};
+
+	virtual void disable() {
+
+	};
+
+private:
+	AcqTree *m_tree;
+	QString m_name;
+	QList<AcqTreeNode*> m_deps;
+
+};
+
+class IIODeviceNode : AcqTreeNode {
+public:
+	IIODeviceNode(struct iio_device *dev, QString name, QObject *parent = nullptr) : AcqTreeNode(name,parent), m_dev(dev) {
+		m_devId = iio_device_get_id(m_dev);
+	}
+	~IIODeviceNode() {}
+
+	virtual void enable() override {};
+	virtual void disable() override {};
+
+private:
+	size_t m_buffersize;
+	QString m_devId;
+	struct iio_device *m_dev;
+	struct iio_buffer *m_buf;
+};
+
+class IIOChannelNode: AcqTreeNode {
+public:
+	IIOChannelNode(struct iio_channel *ch, QString name, QObject *parent = nullptr) : AcqTreeNode(name,parent), m_ch(ch) {
+		m_chId= iio_channel_get_id(m_ch);
+	}
+	~IIOChannelNode() {}
+
+	virtual void enable() override { iio_channel_enable(m_ch);};
+	virtual void disable() override { iio_channel_disable(m_ch);};
+
+private:
+	size_t m_buffersize;
+	QString m_chId;
+	struct iio_channel *m_ch;
+};
+
+
+
+
+class AdcInstrumentRecipe {
+
+public:
+	AdcInstrumentRecipe();
+	~AdcInstrumentRecipe();
+private:
+	AcqTree *man;
+
+
+};*/
 
 class AdcInstrument : public QWidget
 {
 	Q_OBJECT
 public:
-	AdcInstrument(PlotProxy *proxy, QWidget *parent = nullptr);
+	AdcInstrument(PlotRecipe *r, QWidget *parent = nullptr);
 	~AdcInstrument();
 	void init();
 	void deinit();
-	void startAddons();
-	void stopAddons();
 
 	bool running() const;
 	void setRunning(bool newRunning);
@@ -35,19 +122,19 @@ public Q_SLOTS:
 	void start();
 	void restart();
 	void showMeasurements(bool b);
-	void createSnapshotChannel(SnapshotProvider::SnapshotRecipe rec);
-	MenuControlButton *addChannel(ChannelAddon *ch, QWidget *parent);
-	void deleteChannel(ChannelAddon *);
-	CollapsableMenuControlButton *addDevice(GRDeviceAddon *dev, QWidget *parent);
+
 Q_SIGNALS:
 	void runningChanged(bool);
+	void newPlot(int);
+	void removePlot(QWidget*);
 
 private:
 	bool m_running;
+	PlotRecipe *m_recipe;
+
 	RunBtn *runBtn;
 	SingleShotBtn *singleBtn;
 	ToolTemplate *tool;
-	PlotProxy *proxy;
 	QPushButton *openLastMenuBtn;
 
 	MenuControlButton *channelsBtn;
@@ -56,8 +143,6 @@ private:
 	MeasurementSettings *measureSettings;
 	StatsPanel *stats_panel;
 
-	GRTimePlotAddon *plotAddon;
-	GRTimePlotAddonSettings *plotAddonSettings;
 	VerticalChannelManager *vcm;
 
 	MapStackedWidget *channelStack;
@@ -65,17 +150,15 @@ private:
 	QButtonGroup *channelGroup;
 
 	CursorController *cursorController;
-	CursorController *fftcursorController;
 
 	void setupTimeButtonHelper(MenuControlButton *time);
-	void setupXyButtonHelper(MenuControlButton *xy);
-	void setupFFTButtonHelper(MenuControlButton *fft);
 	void setupCursorButtonHelper(MenuControlButton *cursor);
 	void setupMeasureButtonHelper(MenuControlButton *measure);
 	void setupChannelsButtonHelper(MenuControlButton *channelsBtn);
 	void setupDeviceMenuControlButtonHelper(MenuControlButton *devBtn, GRDeviceAddon *dev);
 	void setupChannelMenuControlButtonHelper(MenuControlButton *btn, ChannelAddon *ch);
 	void initCursors();
+
 	void setupChannelDelete(ChannelAddon *ch);
 
 	Q_PROPERTY(bool running READ running WRITE setRunning NOTIFY runningChanged)
