@@ -56,7 +56,6 @@ Q_SIGNALS:
 	void toggleRealTime(bool toggled);
 
 private:
-	Qt::PenStyle lineStyleFromIdx(int idx);
 	MenuOnOffSwitch *peakHolderSwitch;
 	MenuOnOffSwitch *plotSwitch;
 	QPushButton *peakHolderReset;
@@ -64,7 +63,6 @@ private:
 	PositionSpinButton *m_ymin;
 	PositionSpinButton *m_ymax;
 	QWidget *generateYAxisSettings(QWidget *parent);
-	QWidget *createCurveMenu(QWidget *parent);
 
 	// MenuComboWidget *mainMonitorCombo;
 	QPushButton *deleteMonitor;
