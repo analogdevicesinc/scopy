@@ -1445,7 +1445,19 @@ void StyleHelper::TreeViewDebugger(QTreeView *w, QString objectName)
 		QTreeView::item:selected { background-color: &&ScopyBlue&& }
 	)css";
 	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
+	w->setStyleSheet(style);
+}
 
+void StyleHelper::OrangeWidget(QWidget *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+	QString style = QString(R"css(
+					QWidget{
+				color:&&orange&&
+			}
+			)css");
+	style.replace("&&orange&&", StyleHelper::getColor("CH0"));
 	w->setStyleSheet(style);
 }
 

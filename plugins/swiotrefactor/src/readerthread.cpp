@@ -268,8 +268,8 @@ void ReaderThread::createIioBuffer()
 	//		Command *createBufferCommand;
 	//		if(m_samplingFreq >= MAX_BUFFER_SIZE) {
 	//			createBufferCommand = new IioDeviceCreateBuffer(m_iioDev, MAX_BUFFER_SIZE, false,
-	// nullptr); 		} else { 			createBufferCommand = new IioDeviceCreateBuffer(m_iioDev,
-	// MIN_BUFFER_SIZE, false, nullptr);
+	// nullptr); 		} else { 			createBufferCommand = new
+	// IioDeviceCreateBuffer(m_iioDev, MIN_BUFFER_SIZE, false, nullptr);
 	//		}
 	//		connect(createBufferCommand, &scopy::Command::finished, this,
 	//			&ReaderThread::bufferCreateCommandFinished, Qt::QueuedConnection);

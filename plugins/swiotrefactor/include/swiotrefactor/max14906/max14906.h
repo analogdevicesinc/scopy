@@ -1,18 +1,19 @@
 #ifndef MAX14906_H
 #define MAX14906_H
 
+#include "scopy-swiotrefactor_export.h"
+
 #include "diocontroller.h"
 #include "diodigitalchannelcontroller.h"
 #include "diosettingstab.h"
-#include "scopy-swiotrefactor_export.h"
-#include <QPushButton>
-#include <QWidget>
 #include <readerthread.h>
+#include <QWidget>
+#include <QPushButton>
 #include <gui/tooltemplate.h>
 #include <gui/widgets/toolbuttons.h>
+#include <pluginbase/toolmenuentry.h>
 #include <iioutil/commandqueue.h>
 #include <iioutil/connection.h>
-#include <pluginbase/toolmenuentry.h>
 
 #define MAX_NAME "max14906"
 #define MAX14906_POLLING_TIME 1000
@@ -44,8 +45,8 @@ private:
 	GearBtn *m_gearBtn;
 
 	int m_nbDioChannels;
-	DioController *max14906ToolController;
-	DioSettingsTab *m_max14906SettingsTab;
+	DioController *m_max14906ToolController;
+	DioSettingsTab *m_max14906SettingsTab = nullptr;
 
 	QTimer *m_qTimer;
 

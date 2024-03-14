@@ -21,11 +21,15 @@
 #ifndef SCOPY_DIODIGITALCHANNEL_H
 #define SCOPY_DIODIGITALCHANNEL_H
 
-#include "ui_diodigitalchannel.h"
 #include "scopy-swiotrefactor_export.h"
-#include <QDockWidget>
+#include <mutex>
 #include <QWidget>
+#include <gui/lcdNumber.hpp>
+#include <gui/smallOnOffSwitch.h>
+#include <gui/plotwidget.h>
 #include <gui/generic_menu.hpp>
+#include <gui/customSwitch.h>
+#include <gui/widgets/menucombo.h>
 
 namespace scopy::swiotrefactor {
 class SCOPY_SWIOTREFACTOR_EXPORT DioDigitalChannel : public QWidget
@@ -37,24 +41,44 @@ public:
 
 	void updateTimeScale(double newMax);
 	void addDataSample(double value);
-	const std::vector<std::string> getConfigModes() const;
-	void setConfigModes(std::vector<std::string> &configModes);
+	const QStringList getConfigModes() const;
+	void setConfigModes(QStringList &configModes);
 	const QString &getSelectedConfigMode() const;
 	void setSelectedConfigMode(const QString &selectedConfigMode);
-	void resetSismograph();
+	void resetPlot();
 
 private:
 	void connectSignalsAndSlots();
 
-	Ui::DioDigitalChannel *ui;
 	QString m_deviceName;
 	QString m_deviceType;
 
-	std::vector<std::string> m_configModes;
+	QStringList m_configModes;
 	QString m_selectedConfigMode;
 
 	friend class DioDigitalChannelController;
+	std::mutex m_mutex;
 
+	// plot
+	PlotWidget *m_plot;
+	QVector<double> m_yValues;
+	QVector<double> m_xTime;
+	PlotChannel *m_plotCh;
+	int m_timeSpan = 10;
+
+	// bottom container
+	MenuCombo *m_configModesCombo;
+	MenuCombo *m_currentLimitsCombo;
+	LcdNumber *m_lcdNumber;
+	SmallOnOffSwitch *m_valueSwitch;
+	// top container
+	QLabel *m_channelName;
+	QLabel *m_channelType;
+
+	void initData();
+	void initPlot();
+	QWidget *createBottomContainer(QWidget *parent);
+	QWidget *createTopContainer(QWidget *parent);
 Q_SIGNALS:
 	void outputValueChanged(bool value);
 };

@@ -21,14 +21,11 @@
 #ifndef SCOPY_DIODIGITALCHANNELCONTROLLER_H
 #define SCOPY_DIODIGITALCHANNELCONTROLLER_H
 
-#include "diodigitalchannel.h"
 #include "scopy-swiotrefactor_export.h"
+#include "diodigitalchannel.h"
 #include <iio.h>
 
 #include <iioutil/commandqueue.h>
-#include <string>
-
-#define ATTR_BUFFER_LEN 200
 
 namespace scopy::swiotrefactor {
 class SCOPY_SWIOTREFACTOR_EXPORT DioDigitalChannelController : public QWidget
@@ -45,17 +42,25 @@ private Q_SLOTS:
 	void createWriteRawCommand(bool value);
 	void createWriteTypeCommand(int index);
 
+	void readAvailableTypeCmdFinished(scopy::Command *cmd);
+	void readTypeCmdFinished(scopy::Command *cmd);
+	void readRawCmdFinished(scopy::Command *cmd);
+	void readCurrentLimitCmdFinished(scopy::Command *cmd);
+	void readCurrentLimitAvailableCmdFinished(scopy::Command *cmd);
+	void writeCurrentLimitCmdFinished(scopy::Command *cmd);
+	void writeTypeCmdFinished(scopy::Command *cmd);
+
 private:
 	DioDigitalChannel *m_digitalChannel;
 
 	QString m_channelName;
 	QString m_channelType; // output or input
 
-	std::string m_iioAttrAvailableTypes; // iio attribute
-	std::vector<std::string> m_availableTypes;
+	QString m_iioAttrAvailableTypes; // iio attribute
+	QStringList m_availableTypes;
 
-	std::string m_iioAttrType; // iio attribute
-	std::string m_type;
+	QString m_iioAttrType; // iio attribute
+	QString m_type;
 
 	CommandQueue *m_cmdQueue;
 

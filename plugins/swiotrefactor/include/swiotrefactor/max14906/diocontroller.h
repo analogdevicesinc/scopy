@@ -21,8 +21,8 @@
 #ifndef SCOPY_DIOCONTROLLER_H
 #define SCOPY_DIOCONTROLLER_H
 
-#include <iio.h>
 #include "scopy-swiotrefactor_export.h"
+#include <iio.h>
 #include <QString>
 #include <QThread>
 #include <QTimer>
