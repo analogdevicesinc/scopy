@@ -23,7 +23,6 @@
 
 #include "scopy-swiotrefactor_export.h"
 #include <QWidget>
-
 #include <gui/spinbox_a.hpp>
 
 namespace scopy::swiotrefactor {
@@ -32,13 +31,11 @@ class SCOPY_SWIOTREFACTOR_EXPORT DioSettingsTab : public QWidget
 	Q_OBJECT
 public:
 	explicit DioSettingsTab(QWidget *parent = nullptr);
-
 	~DioSettingsTab();
 
 	double getTimeValue() const;
 
 Q_SIGNALS:
-
 	void timeValueChanged(double value);
 
 private:

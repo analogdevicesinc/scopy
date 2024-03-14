@@ -25,24 +25,24 @@
 using namespace scopy::swiotrefactor;
 
 DioController::DioController(struct iio_context *context_, QString deviceName)
-	: m_deviceName(std::move(deviceName))
+	: m_deviceName(deviceName)
 	, m_context(context_)
 {
-	struct iio_device *dev = iio_context_find_device(this->m_context, MAX_NAME);
-	this->m_device = dev;
+	struct iio_device *dev = iio_context_find_device(m_context, MAX_NAME);
+	m_device = dev;
 }
 
 DioController::~DioController() {}
 
 int DioController::getChannelCount()
 {
-	unsigned int dev_count = iio_device_get_channels_count(this->m_device);
+	unsigned int dev_count = iio_device_get_channels_count(m_device);
 	return (int)(dev_count);
 }
 
 QString DioController::getChannelName(unsigned int index)
 {
-	iio_channel *channel = iio_device_get_channel(this->m_device, index);
+	iio_channel *channel = iio_device_get_channel(m_device, index);
 	if(channel == nullptr) {
 		qCritical(CAT_SWIOT_MAX14906)
 			<< "Error when selecting channel with index" << index << ", returning empty string.";
@@ -55,7 +55,7 @@ QString DioController::getChannelName(unsigned int index)
 
 QString DioController::getChannelType(unsigned int index)
 {
-	iio_channel *channel = iio_device_get_channel(this->m_device, index);
+	iio_channel *channel = iio_device_get_channel(m_device, index);
 	if(channel == nullptr) {
 		qCritical(CAT_SWIOT_MAX14906)
 			<< "Error when selecting channel with index" << index << ", returning empty string.";
