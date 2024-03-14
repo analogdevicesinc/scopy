@@ -19,9 +19,9 @@
  */
 
 #include "max14906/diosettingstab.h"
-#include <menucollapsesection.h>
-#include <menuheader.h>
-#include <menusectionwidget.h>
+#include <gui/widgets/menucollapsesection.h>
+#include <gui/widgets/menuheader.h>
+#include <gui/widgets/menusectionwidget.h>
 
 using namespace scopy::swiotrefactor;
 
@@ -49,8 +49,8 @@ DioSettingsTab::DioSettingsTab(QWidget *parent)
 	// timespan
 	m_maxSpinButton = new PositionSpinButton({{tr("s"), 1}}, tr("Timespan"), 1, 300, true, false, this);
 	m_maxSpinButton->setValue(10);
-	QObject::connect(m_maxSpinButton, &PositionSpinButton::valueChanged, this,
-			 [this]() { Q_EMIT timeValueChanged(this->m_maxSpinButton->value()); });
+	connect(m_maxSpinButton, &PositionSpinButton::valueChanged, this,
+		[this]() { Q_EMIT timeValueChanged(m_maxSpinButton->value()); });
 
 	plotTimespanSection->contentLayout()->addWidget(label);
 	plotTimespanSection->contentLayout()->addWidget(m_maxSpinButton);
