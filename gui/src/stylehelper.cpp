@@ -1263,4 +1263,17 @@ void StyleHelper::NoBackgroundIconButton(QPushButton *w, QIcon icon, QString obj
 	w->setStyleSheet(style);
 }
 
+void StyleHelper::OrangeWidget(QWidget *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+	QString style = QString(R"css(
+			QWidget{
+				color:&&orange&&
+			}
+			)css");
+	style.replace("&&orange&&", StyleHelper::getColor("CH0"));
+	w->setStyleSheet(style);
+}
+
 #include "moc_stylehelper.cpp"

@@ -19,99 +19,125 @@
  */
 
 #include "max14906/diodigitalchannel.h"
-
-#include <QDebug>
-#include <qwt_axis.h>
-#include <gui/sismograph.hpp>
-#include <gui/customSwitch.h>
+#include "swiot_logging_categories.h"
+#include <QColor>
+#include <QLineEdit>
+#include <gui/plotaxis.h>
+#include <gui/stylehelper.h>
 
 using namespace scopy::swiotrefactor;
 
-#define SISMOGRAPH_INITIAL_SIZE 10
-
 DioDigitalChannel::DioDigitalChannel(const QString &deviceName, const QString &deviceType, QWidget *parent)
 	: QWidget(parent)
-	, ui(new Ui::DioDigitalChannel())
 	, m_deviceName(deviceName)
 	, m_deviceType(deviceType)
 {
-	this->ui->setupUi(this);
-	this->connectSignalsAndSlots();
+	setMinimumWidth(300);
+	QVBoxLayout *layout = new QVBoxLayout(this);
+	layout->setContentsMargins(0, 0, 0, 0);
+	setLayout(layout);
 
-	this->ui->m_channelName->setText(deviceName);
-	this->ui->m_channelType->setText(deviceType);
+	initData();
+	initPlot();
+	QWidget *topContainer = createTopContainer(this);
+	QWidget *bottomContainer = createBottomContainer(this);
 
-	this->ui->customSwitch->setOnText("1");
-	this->ui->customSwitch->setOffText("0");
+	m_channelName->setText(deviceName);
+	m_channelType->setText(deviceType);
 
-	this->ui->channelTitleLineEdit->setPlaceholderText("Enter title here...");
+	layout->addWidget(topContainer);
+	layout->addWidget(m_plot);
+	layout->addWidget(bottomContainer);
 
-	if(deviceType == "INPUT") {
-		this->ui->customSwitch->setVisible(false);
-		this->ui->currentLimitValues->hide();
-		this->ui->currentLimitLabel->hide();
-		this->ui->setValueLabel->hide();
-	} else {
-		this->ui->customSwitch->setChecked(false);
+	if(m_deviceType == "INPUT") {
+		m_valueSwitch->setVisible(false);
+		m_currentLimitsCombo->hide();
 	}
-
-	this->ui->sismograph->setAxisTitle(QwtAxis::YLeft, "");		   // clear title
-	this->ui->sismograph->setAxisTitle(QwtAxis::XBottom, "");	   // clear title
-	this->ui->sismograph->setAxisScale(0, 0, 1, 1);			   // y axis
-	this->ui->sismograph->setPlotDirection(Sismograph::RIGHT_TO_LEFT); // plot from right to left
-	this->ui->sismograph->setColor(QColor(0xff, 0x72, 0x00));	   // #ff7200
-	this->ui->sismograph->setContentsMargins(9, 9, 9, 9);
-	this->ui->sismograph->setUpdatesEnabled(true);
-	this->ui->sismograph->setAutoscale(false);
-	this->ui->sismograph->setAxisScale(QwtAxis::YRight, 0.0, 1.0);
-	this->ui->sismograph->setNumSamples(10);
-	this->ui->sismograph->setSampleRate(1);
-	this->ui->sismograph->updateYScale(SISMOGRAPH_INITIAL_SIZE,
-					   0); // FIXME: sismograph typo, actually updates XBottom axis
-	this->ui->sismograph->replot();
-
-	this->ui->lcdNumber->setPrecision(0);
-
-	QString modeLabel = deviceType.toLower();
-	modeLabel[0] = modeLabel[0].toUpper();
-	this->ui->modeLabel->setText(modeLabel + " mode");
+	connectSignalsAndSlots();
 }
 
-DioDigitalChannel::~DioDigitalChannel() { delete ui; }
+DioDigitalChannel::~DioDigitalChannel() {}
 
 void DioDigitalChannel::connectSignalsAndSlots()
 {
-	connect(this->ui->customSwitch, &CustomSwitch::toggled, this, [this]() {
-		bool isChecked = this->ui->customSwitch->isChecked();
-
-		Q_EMIT this->outputValueChanged(isChecked);
+	connect(m_valueSwitch, &CustomSwitch::toggled, this, [this]() {
+		bool isChecked = m_valueSwitch->isChecked();
+		Q_EMIT outputValueChanged(isChecked);
 	});
+}
+
+void DioDigitalChannel::initData()
+{
+	for(int i = 0; i <= m_timeSpan; i++) {
+		m_xTime.push_back(i);
+	}
+}
+
+void DioDigitalChannel::initPlot()
+{
+	m_plot = new PlotWidget(this);
+	m_plot->xAxis()->scaleDraw()->setFloatPrecision(0);
+	m_plot->xAxis()->setInterval(0, m_timeSpan);
+	m_plot->xAxis()->setVisible(true);
+
+	m_plot->yAxis()->scaleEngine()->setAttribute(QwtScaleEngine::Floating, true);
+	m_plot->yAxis()->scaleEngine()->setMajorTicksCount(2);
+	m_plot->yAxis()->scaleDraw()->setFloatPrecision(0);
+	m_plot->yAxis()->setInterval(0, 1);
+	m_plot->replot();
+	m_plot->yAxis()->setVisible(true);
+
+	QPen chPen = QPen(QColor(StyleHelper::getColor("CH0")), 1);
+
+	m_plotCh = new PlotChannel("CH0", chPen, m_plot, m_plot->xAxis(), m_plot->yAxis(), this);
+	m_plotCh->setEnabled(true);
+
+	m_plot->replot();
+}
+
+void DioDigitalChannel::resetPlot()
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+	m_yValues.clear();
+	m_xTime.clear();
+	for(int i = 0; i <= m_timeSpan; i++) {
+		m_xTime.push_back(i);
+	}
+	m_plotCh->curve()->setRawSamples(m_xTime.data(), m_yValues.data(), m_yValues.size());
+	m_plot->replot();
 }
 
 void DioDigitalChannel::updateTimeScale(double newMax)
 {
-	this->ui->sismograph->updateYScale(newMax, 0); // in this case, data always comes towards index 0
-	this->ui->sismograph->setNumSamples((int)(newMax));
-
-	this->ui->sismograph->reset(); // apply changes by plotting again
+	m_timeSpan = newMax;
+	m_plot->xAxis()->setMax(newMax);
+	resetPlot();
 }
 
 void DioDigitalChannel::addDataSample(double value)
 {
-	this->ui->sismograph->plot(value);
-
-	this->ui->lcdNumber->display(value);
+	std::lock_guard<std::mutex> lock(m_mutex);
+	m_yValues.push_back(value);
+	if(m_yValues.size() > m_timeSpan + 1) {
+		m_yValues.pop_front();
+	}
+	if(m_yValues.size() <= m_timeSpan + 1) {
+		m_plotCh->curve()->setRawSamples(m_xTime.data() + (m_xTime.size() - m_yValues.size()), m_yValues.data(),
+						 m_yValues.size());
+	}
+	m_plot->replot();
+	m_lcdNumber->display(value);
 }
 
-const std::vector<std::string> DioDigitalChannel::getConfigModes() const { return m_configModes; }
+const QStringList DioDigitalChannel::getConfigModes() const { return m_configModes; }
 
-void DioDigitalChannel::setConfigModes(std::vector<std::string> &configModes)
+void DioDigitalChannel::setConfigModes(QStringList &configModes)
 {
 	m_configModes = configModes;
 
-	this->ui->configModes->clear();
-	for(const std::string &item : m_configModes) {
-		this->ui->configModes->addItem(QString::fromStdString(item));
+	m_configModesCombo->combo()->clear();
+	for(const QString &item : qAsConst(m_configModes)) {
+		m_configModesCombo->combo()->addItem(item);
 	}
 }
 
@@ -121,9 +147,69 @@ void DioDigitalChannel::setSelectedConfigMode(const QString &selectedConfigMode)
 {
 	m_selectedConfigMode = selectedConfigMode;
 
-	int index = this->ui->configModes->findText(selectedConfigMode);
-	this->ui->configModes->setCurrentIndex(index);
-	qDebug() << "The channel " << this->m_deviceName << " read selected config mode " << selectedConfigMode;
+	int index = m_configModesCombo->combo()->findText(selectedConfigMode);
+	m_configModesCombo->combo()->setCurrentIndex(index);
+	qDebug(CAT_SWIOT_MAX14906) << "The channel " << m_deviceName << " read selected config mode "
+				   << selectedConfigMode;
 }
 
-void DioDigitalChannel::resetSismograph() { this->ui->sismograph->reset(); }
+QWidget *DioDigitalChannel::createBottomContainer(QWidget *parent)
+{
+	QWidget *bottomWidget = new QWidget(parent);
+	QHBoxLayout *layout = new QHBoxLayout(bottomWidget);
+
+	m_configModesCombo = new MenuCombo("Mode", bottomWidget);
+	m_configModesCombo->setMinimumWidth(140);
+	layout->addWidget(m_configModesCombo);
+
+	m_currentLimitsCombo = new MenuCombo("Current limit", bottomWidget);
+	layout->addWidget(m_currentLimitsCombo);
+
+	layout->addSpacerItem(new QSpacerItem(40, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
+
+	QWidget *readBackWidget = new QWidget(bottomWidget);
+	readBackWidget->setLayout(new QVBoxLayout());
+	readBackWidget->layout()->setContentsMargins(0, 0, 0, 0);
+
+	QLabel *readValueLabel = new QLabel(readBackWidget);
+	readValueLabel->setText("Readback");
+	StyleHelper::MenuSmallLabel(readValueLabel);
+	readBackWidget->layout()->addWidget(readValueLabel);
+
+	m_lcdNumber = new LcdNumber(readBackWidget);
+	m_lcdNumber->setDigitCount(1);
+	m_lcdNumber->setPrecision(0);
+	m_lcdNumber->setSegmentStyle(QLCDNumber::Flat);
+	m_lcdNumber->setFrameShape(QFrame::NoFrame);
+	StyleHelper::OrangeWidget(m_lcdNumber);
+	readBackWidget->layout()->addWidget(m_lcdNumber);
+
+	layout->addWidget(readBackWidget);
+
+	return bottomWidget;
+}
+
+QWidget *DioDigitalChannel::createTopContainer(QWidget *parent)
+{
+	QWidget *topWidget = new QWidget(parent);
+	QHBoxLayout *layout = new QHBoxLayout(topWidget);
+
+	m_channelName = new QLabel(topWidget);
+	StyleHelper::MenuSmallLabel(m_channelName);
+	layout->addWidget(m_channelName, 0, Qt::AlignLeft);
+
+	QLineEdit *channelTitleLineEdit = new QLineEdit(topWidget);
+	channelTitleLineEdit->setPlaceholderText("Enter title here...");
+	layout->addWidget(channelTitleLineEdit, 0, Qt::AlignLeft);
+
+	layout->addSpacerItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
+
+	m_channelType = new QLabel(topWidget);
+	StyleHelper::MenuSmallLabel(m_channelType);
+	layout->addWidget(m_channelType, 0, Qt::AlignRight);
+
+	m_valueSwitch = new SmallOnOffSwitch(topWidget);
+	layout->addWidget(m_valueSwitch, 0, Qt::AlignRight);
+
+	return topWidget;
+}

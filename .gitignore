@@ -66,3 +66,4 @@ plugins/adc/include/adcplugin/scopy-adcplugin_export.h
 plugins/pqm/include/pqmplugin/scopy-pqmplugin_export.h
 plugins/testplugin/include/testplugin/scopy-testplugin_export.h
 plugins/testplugin2/include/testplugin2/scopy-testplugin2_export.h
+plugins/swiotrefactor/include/swiotrefactor/scopy-swiotrefactor_export.h

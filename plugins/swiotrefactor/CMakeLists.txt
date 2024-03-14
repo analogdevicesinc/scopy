@@ -66,12 +66,6 @@ else()
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 endif()
 
-if(ANDROID)
-	find_library(QWT_LIBRARIES REQUIRED NAMES qwt_${ANDROID_ABI})
-else()
-	find_library(QWT_LIBRARIES REQUIRED NAMES qwt)
-endif()
-
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc ../../resources/resources.qrc)
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
@@ -97,7 +91,6 @@ target_link_libraries(
 	       scopy-gui
 	       scopy-core
 	       scopy-iio-widgets
-	       ${QWT_LIBRARIES}
 )
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
