@@ -115,6 +115,7 @@ public:
 	static void TableWidgetDebugger(QTableWidget *w, QString objectName = "");
 	static void SplitterStyle(QSplitter *w, QString objectName = "");
 	static void TreeViewDebugger(QTreeView *w, QString objectName = "");
+	static void OrangeWidget(QWidget *w, QString objectName = "");
 
 private:
 	QMap<QString, QString> colorMap;
