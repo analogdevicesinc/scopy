@@ -3,11 +3,15 @@ set -ex
 REPO_SRC=$(git rev-parse --show-toplevel)
 source $REPO_SRC/ci/macOS/macos_config.sh
 
-cd $BUILDDIR
+pushd $BUILDDIR
+
+SCOPYLIBS=$(find $BUILDDIR -name "*.dylib" -d 2 -type f)
+SCOPYPLUGINS=$(find $BUILDDIR/Scopy.app/Contents/MacOs/plugins/plugins -name "*.dylib" -type f)
 
 echo "### Copy DLLs to Frameworks folder"
 mkdir -p $BUILDDIR/Scopy.app/Contents/Frameworks
-find . -name "*.dylib" -d 2 -exec cp "{}" $BUILDDIR/Scopy.app/Contents/Frameworks \;
+cp $SCOPYLIBS $BUILDDIR/Scopy.app/Contents/Frameworks
+SCOPYLIBS=$(find $BUILDDIR/Scopy.app/Contents/Frameworks -name "*.dylib" -type f)
 mkdir -p $BUILDDIR/Scopy.app/Contents/MacOS/plugins/plugins
 mkdir -p $BUILDDIR/Scopy.app/Contents/MacOS/translations
 cp $BUILDDIR/translations/* $BUILDDIR/Scopy.app/Contents/MacOS/translations
@@ -15,8 +19,18 @@ cp -R $BUILDDIR/plugins/regmap/xmls $BUILDDIR/Scopy.app/Contents/MacOS/plugins/p
 cp -R $STAGING_AREA/libiio/build/iio.framework Scopy.app/Contents/Frameworks/
 cp -R $STAGING_AREA/libad9361/build/ad9361.framework Scopy.app/Contents/Frameworks/
 
-libqwtpath=${STAGING_AREA_DEPS}/lib/libqwt.6.4.0.dylib
+libqwtpath=${STAGING_AREA_DEPS}/lib/libqwt.6.4.0.dylib #hardcoded
 libqwtid="$(otool -D ${libqwtpath} | tail -1)"
+echo "=== Fixing libqwt"
+[ -z "$(otool -L ${libqwtpath} | grep libqwt...dylib)" ] || install_name_tool -id ${libqwtid} ${libqwtpath}
+otool -L ${libqwtpath}
+install_name_tool -change ${libqwtid} ${libqwtpath} ./Scopy.app/Contents/MacOS/Scopy
+for dylib in ${SCOPYLIBS} ${SCOPYPLUGINS}
+do
+	[ -z "$(otool -L ${dylib} | grep libqwt...dylib)" ] || install_name_tool -change ${libqwtid} ${libqwtpath} ${dylib}
+	otool -L $dylib
+done
+
 
 iiorpath="$(otool -D ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep @rpath)"
 iioid=${iiorpath#"@rpath/"}
@@ -54,56 +68,36 @@ pythonid=${pythonidrpath#"/usr/local/opt/python@${pyversion}/Frameworks/"}
 cp -R /usr/local/opt/python@$pyversion/Frameworks/Python.framework Scopy.app/Contents/Frameworks/
 
 
-echo "### Change the id libqwt inside every dll"
-install_name_tool -change $libqwtid $libqwtpath $BUILDDIR/Scopy.app/Contents/Frameworks/libscopy-gr-util.dylib
-install_name_tool -change $libqwtid $libqwtpath $BUILDDIR/Scopy.app/Contents/Frameworks/libscopy-gr-gui.dylib
-install_name_tool -change $libqwtid $libqwtpath $BUILDDIR/Scopy.app/Contents/Frameworks/libscopy-gui.dylib
-install_name_tool -change $libqwtid $libqwtpath $BUILDDIR/Scopy.app/Contents/Frameworks/libscopy-sigrok-gui.dylib
-install_name_tool -change $libqwtid $libqwtpath $BUILDDIR/Scopy.app/Contents/Frameworks/libscopy-core.dylib
-install_name_tool -change $libqwtid $libqwtpath $BUILDDIR/Scopy.app/Contents/Frameworks/libscopy-iio-widgets.dylib
-install_name_tool -change $libqwtid $libqwtpath $BUILDDIR/Scopy.app/Contents/MacOS/Scopy
-ls $BUILDDIR/Scopy.app/Contents/MacOs/plugins/plugins | grep libscopy | while read plugin
+echo "### Fixing scopy libraries and plugins "
+for dylib in ${SCOPYLIBS} ${SCOPYPLUGINS}
 do
-	install_name_tool -change $libqwtid $libqwtpath $BUILDDIR/Scopy.app/Contents/MacOS/plugins/plugins/$plugin
-done
-
-
-echo "### Fixing scopy plugins"
-ls $BUILDDIR/Scopy.app/Contents/MacOs/plugins/plugins | grep libscopy | while read plugin
-do
-	echo "--- FIXING PLUGIN: $plugin"
-	echo $STAGING_AREA_DEPS/lib | dylibbundler --no-codesign --overwrite-files --bundle-deps -cd \
-	--fix-file $BUILDDIR/Scopy.app/Contents/MacOS/plugins/plugins/$plugin \
-	--dest-dir $BUILDDIR/Scopy.app/Contents/Frameworks/ \
-	--install-path @executable_path/../Frameworks/ \
-	--search-path $BUILDDIR/Scopy.app/Contents/Frameworks/
+	echo "--- FIXING LIB: ${dylib##*/}"
+	echo $STAGING_AREA_DEPS/lib | dylibbundler --no-codesign --overwrite-files --bundle-deps --create-dir \
+		--fix-file $dylib \
+		--dest-dir $BUILDDIR/Scopy.app/Contents/Frameworks/ \
+		--install-path @executable_path/../Frameworks/ \
+		--search-path $BUILDDIR/Scopy.app/Contents/Frameworks/
 done
 
 
 echo "### Fixing Scopy binary"
 echo $STAGING_AREA_DEPS/lib | dylibbundler -ns -of -b \
--x $BUILDDIR/Scopy.app/Contents/MacOS/Scopy \
--d $BUILDDIR/Scopy.app/Contents/Frameworks  \
--p @executable_path/../Frameworks \
--s $BUILDDIR/Scopy.app/Contents/Frameworks
+	-x $BUILDDIR/Scopy.app/Contents/MacOS/Scopy \
+	-d $BUILDDIR/Scopy.app/Contents/Frameworks  \
+	-p @executable_path/../Frameworks \
+	-s $BUILDDIR/Scopy.app/Contents/Frameworks
 
 echo "### Fixing the frameworks dylibbundler failed to copy"
 echo "=== Fixing iio.framework"
 install_name_tool -id @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/iio.framework/iio
 install_name_tool -id @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/${iioid}
 install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/MacOS/Scopy
-install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libscopy-iioutil.dylib
-install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libscopy-iio-widgets.dylib
-install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libscopy-core.dylib
-install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libscopy-pluginbase.dylib
-install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libscopy-gr-util.dylib
-install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libscopy-gr-gui.dylib
-install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libscopy-sigrok-gui.dylib
-install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libscopy-gui.dylib
-ls $BUILDDIR/Scopy.app/Contents/MacOs/plugins/plugins | grep libscopy | while read plugin
+for dylib in ${SCOPYLIBS} ${SCOPYPLUGINS}
 do
-	install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/MacOS/plugins/plugins/$plugin
+	otool -L $dylib
+	[ -z "$(otool -L ${dylib}| grep iio.framework)" ] && echo "SKIP ${dylib##*/}" || install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ${dylib}
 done
+
 
 echo "=== Fixing ad9361.framework"
 install_name_tool -id @executable_path/../Frameworks/${ad9361id} ./Scopy.app/Contents/Frameworks/ad9361.framework/ad9361
@@ -121,8 +115,13 @@ python_sigrokdecode=$(otool -L ./Scopy.app/Contents/Frameworks/libsigrokdecode* 
 install_name_tool -change ${python_sigrokdecode} @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/Frameworks/libsigrokdecode*
 python_scopy=$(otool -L ./Scopy.app/Contents/MacOS/Scopy | grep -i python | cut -d " " -f 1 | awk '{$1=$1};1')
 install_name_tool -change ${python_scopy} @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/MacOS/Scopy
-python_libscopycore=$(otool -L ./Scopy.app/Contents/Frameworks/libscopy-core.dylib | grep -i python | cut -d " " -f 1 | awk '{$1=$1};1')
-install_name_tool -change ${python_libscopycore} @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/MacOS/Scopy
+for dylib in ${SCOPYLIBS} ${SCOPYPLUGINS}
+do
+	otool -L $dylib
+	python=$(otool -L ${dylib} | grep -i python | cut -d " " -f 1 | awk '{$1=$1};1');
+	[ -z "${python}" ] && echo "SKIP ${dylib##*/}" || install_name_tool -change ${python} @executable_path/../Frameworks/${pythonid} ${dylib}
+done
+
 
 echo "=== Fixing libserialport"
 libserialportpath="$(otool -L ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep libserialport | cut -d " " -f 1 | awk '{$1=$1};1')"
@@ -136,6 +135,7 @@ install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./
 install_name_tool -change ${m2krpath} @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/Frameworks/libgnuradio-m2k*
 install_name_tool -change ${m2krpath} @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/Frameworks/libgnuradio-scopy*
 
+
 echo "=== Fixing iio-emu + libtinyiiod"
 cp $REPO_SRC/iio-emu/build/iio-emu ./Scopy.app/Contents/MacOS/
 echo $STAGING_AREA_DEPS/lib | dylibbundler -ns -of -b \
@@ -148,3 +148,4 @@ echo "=== Bundle the Qt libraries & Create Scopy.dmg"
 macdeployqt Scopy.app -verbose=3
 zip -Xvr ScopyApp.zip Scopy.app
 macdeployqt Scopy.app -dmg -verbose=3
+popd
