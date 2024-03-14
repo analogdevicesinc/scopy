@@ -799,7 +799,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 	m_oscChannelSelectedConnection = connect(m_oscPlot, &CapturePlot::channelSelected, [=](int chIdx, bool selected){
 		chIdx -= m_oscAnalogChannels;
-		if (m_oscChannelSelected != chIdx && selected) {
+		if (chIdx >= m_oscAnalogChannels && selected) {
 			m_oscChannelSelected = chIdx;
 			nameLineEdit->setEnabled(true);
 			nameLineEdit->setText(m_oscPlotCurves[chIdx]->getName());
