@@ -4,6 +4,7 @@
 #include <QLoggingCategory>
 #include <QwtPainter>
 #include <QwtPlotOpenGLCanvas>
+#include <pluginbase/preferences.h>
 Q_LOGGING_CATEGORY(CAT_GUI_PLOT, "Plot")
 
 namespace scopy {
@@ -15,7 +16,7 @@ BasicPlot::BasicPlot(QWidget *parent)
 	, debug(false)
 	, replotFrameRate(60)
 {
-	useOpenGlCanvas = true; //= getToolLauncherInstance()->isOpenGlLoaded();
+	useOpenGlCanvas = Preferences::GetInstance()->get("general_use_opengl").toBool();
 	connect(&replotTimer, SIGNAL(timeout()), this, SLOT(replotNow()));
 
 	if(useOpenGlCanvas) {
