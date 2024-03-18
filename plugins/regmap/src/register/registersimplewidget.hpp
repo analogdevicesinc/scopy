@@ -27,6 +27,8 @@ public:
 	void valueUpdated(uint32_t value);
 	void setRegisterSelected(bool selected);
 
+	RegisterModel *getRegisterModel() const;
+
 public Q_SLOTS:
 	void applyStyle();
 

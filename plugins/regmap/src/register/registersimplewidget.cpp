@@ -147,6 +147,8 @@ void RegisterSimpleWidget::setRegisterSelected(bool selected)
 
 void RegisterSimpleWidget::applyStyle() { RegmapStyleHelper::RegisterSimpleWidgetStyle(this); }
 
+RegisterModel *RegisterSimpleWidget::getRegisterModel() const { return registerModel; }
+
 bool RegisterSimpleWidget::eventFilter(QObject *object, QEvent *event)
 {
 	if(event->type() == QEvent::MouseButtonPress) {
