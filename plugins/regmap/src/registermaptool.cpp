@@ -81,9 +81,9 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 RegisterMapTool::~RegisterMapTool() { delete deviceList; }
 
 void RegisterMapTool::addDevice(QString devName, RegisterMapTemplate *registerMapTemplate,
-				RegisterMapValues *registerMapValues)
+				RegisterMapValues *registerMapValues, int bitsPerRow)
 {
-	DeviceRegisterMap *regMap = new DeviceRegisterMap(registerMapTemplate, registerMapValues, this);
+	DeviceRegisterMap *regMap = new DeviceRegisterMap(registerMapTemplate, registerMapValues, bitsPerRow, this);
 	deviceList->insert(devName, regMap);
 	tool->addWidgetToCentralContainerHelper(regMap);
 	deviceList->value(devName)->hide();

@@ -26,6 +26,9 @@ public:
 	// IRecyclerViewAdapter interface
 	void generateWidget(int index);
 
+	int bitsPerRow() const;
+	void setBitsPerRow(int newBitsPerRow);
+
 Q_SIGNALS:
 	void requestWidget(int index);
 	void registerSelected(uint32_t address);
@@ -35,6 +38,7 @@ private:
 	QMap<uint32_t, RegisterModel *> *registerModels;
 	QMap<uint32_t, RegisterSimpleWidget *> *registersMap;
 	uint32_t selectedAddress;
+	int m_bitsPerRow = 8;
 };
 } // namespace scopy::regmap
 #endif // REGISTERMAPTABLE_H
