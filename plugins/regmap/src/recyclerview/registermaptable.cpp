@@ -29,7 +29,9 @@ RegisterMapTable::RegisterMapTable(QMap<uint32_t, RegisterModel *> *registerMode
 	QObject::connect(
 		recyclerView, &RecyclerView::initDone, this,
 		[=]() {
-			selectedAddress = 0;
+			RegisterSimpleWidget *registerWidget = registersMap->value(registersMap->firstKey());
+			RegisterModel *registerModel = registerWidget->getRegisterModel();
+			selectedAddress = registerModel->getAddress();
 			registersMap->value(selectedAddress)->setRegisterSelected(true);
 		},
 		Qt::QueuedConnection);
