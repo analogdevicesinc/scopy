@@ -110,25 +110,13 @@ deploy_app(){
 }
 
 extract_debug_symbols(){
-	echo "### Extracting debug symbols"
-	mkdir -p $DEST_FOLDER/.debug
-	$STAGING_DIR/bin/dump_syms -r $DEST_FOLDER/Scopy.exe > $DEST_FOLDER/Scopy.exe.sym
-	#/$MINGW_VERSION/bin/objcopy -v --only-keep-debug /c/$DEST_FOLDER/Scopy.exe /c/$DEST_FOLDER/.debug/Scopy.exe.debug
-	#/c/msys64/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded /c/$DEST_FOLDER/Scopy.exe
-	#/c/msys64/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded /c/$DEST_FOLDER/*.dll
-	#/c/msys64/$MINGW_VERSION/bin/objcopy.exe -v --add-gnu-debuglink=/c/$DEST_FOLDER/.debug/Scopy.exe.debug /c/$DEST_FOLDER/Scopy.exe
-	mkdir $DEBUG_FOLDER
-	mv $DEST_FOLDER/Scopy.exe.sym $DEBUG_FOLDER
-	mv $DEST_FOLDER/.debug $DEBUG_FOLDER
-	$TOOLS_FOLDER/cv2pdb/cv2pdb $DEST_FOLDER/Scopy.exe
-	$TOOLS_FOLDER/cv2pdb/cv2pdb $DEST_FOLDER/libm2k.dll
-	$TOOLS_FOLDER/cv2pdb/cv2pdb $DEST_FOLDER/libiio.dll
-	$TOOLS_FOLDER/cv2pdb/cv2pdb $DEST_FOLDER/libgnuradio-m2k.dll
-	$TOOLS_FOLDER/cv2pdb/cv2pdb $DEST_FOLDER/libgnuradio-scopy.dll
-	$TOOLS_FOLDER/cv2pdb/cv2pdb $PLUGINS_DLL
-	cp -R $DEST_FOLDER/scopy $DEBUG_FOLDER/scopy
-	mv $DEST_FOLDER/*.pdb $DEBUG_FOLDER
-
+	echo "### Duplicating unstripped bundle"
+	mkdir -p $DEBUG_FOLDER
+	cp -r $DEST_FOLDER/* $DEBUG_FOLDER/
+	echo "### Stripping bundle for installer"
+	/c/msys64/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded $DEST_FOLDER/*.exe
+	/c/msys64/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded $DEST_FOLDER/*.dll
+	/c/msys64/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded $DEST_FOLDER/plugins/plugins/*.dll
 }
 
 bundle_drivers(){
@@ -148,7 +136,7 @@ create_installer() {
 	mkdir -p $ARTIFACT_FOLDER
 	cd $WORKDIR
 	cp -R $WORKDIR/scopy_${ARCH} $ARTIFACT_FOLDER/scopy-${ARCH}
-#	cp -R $WORKDIR/debug_${ARCH} $ARTIFACT_FOLDER/debug-${ARCH}
+	cp -R $WORKDIR/debug_${ARCH} $ARTIFACT_FOLDER/debug-${ARCH}
 	PATH="/c/innosetup:/c/Program Files (x86)/Inno Setup 6:$PATH"
 	iscc //p $BUILD_FOLDER/windows/scopy-$ARCH_BIT.iss
 	mv $WORKDIR/scopy-$ARCH_BIT-setup.exe $ARTIFACT_FOLDER
@@ -163,4 +151,5 @@ build_scopy
 build_iio-emu
 deploy_app
 bundle_drivers
+extract_debug_symbols
 create_installer
