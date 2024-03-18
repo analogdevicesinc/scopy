@@ -67,7 +67,7 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 		col++;
 		currentBitFieldCount += bitFieldDetailedWidget->getWidth();
 
-		if(col > Utils::getBitsPerRowDetailed()) {
+		if(col > (Utils::getBitsPerRowDetailed() - 1)) {
 			row++;
 			col = 0;
 		}
@@ -76,7 +76,7 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 	}
 	// add spacers to keep the shape of the detailed bitfileds when the number of bitfields didn't fill a row
 	if(row == 1) {
-		while(col <= Utils::getBitsPerRowDetailed()) {
+		while(col <= (Utils::getBitsPerRowDetailed() - 1)) {
 			BitFieldDetailedWidget *aux = new BitFieldDetailedWidget("", "", 0, "", 1, "", 0, nullptr);
 			aux->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 			aux->sizePolicy().setRetainSizeWhenHidden(true);
