@@ -55,10 +55,10 @@ jobs:
         name: scopy-windows-x86_64-${{ env.commit_sha }}
         path: ${{ github.workspace }}\artifacts\scopy-x86_64
 
-#    - uses: actions/upload-artifact@v3
-#      with:
-#        name: debug-x86_64-${{ env.commit_sha }}
-#        path: ${{ github.workspace }}\artifacts\debug-x86_64
+    - uses: actions/upload-artifact@v3
+      with:
+        name: debug-windows-x86_64-${{ env.commit_sha }}
+        path: ${{ github.workspace }}\artifacts\debug-x86_64
 
     - uses: actions/upload-artifact@v3
       with:
