@@ -45,7 +45,7 @@ public:
 	QWidget *getTool();
 
 	void generateDevice(QString xmlPath, struct iio_device *dev, QString devName,
-			    IRegisterReadStrategy *readStrategy, IRegisterWriteStrategy *writeStrategy);
+			    IRegisterReadStrategy *readStrategy, IRegisterWriteStrategy *writeStrategy, int bitsPerRow);
 
 public Q_SLOTS:
 	bool onConnect() override;

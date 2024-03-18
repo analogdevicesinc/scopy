@@ -3,12 +3,14 @@
 using namespace scopy::regmap;
 
 JsonFormatedElement::JsonFormatedElement(QString fileName, QList<QString> *compatibleDevices, bool isAxiCompatible,
-					 bool useRegisterDescriptionAsName, bool useBifieldDescriptionAsName)
+					 bool useRegisterDescriptionAsName, bool useBifieldDescriptionAsName,
+					 int bitsPerRow)
 	: fileName(fileName)
 	, compatibleDevices(compatibleDevices)
 	, isAxiCompatible(isAxiCompatible)
 	, useRegisterDescriptionAsName(useRegisterDescriptionAsName)
 	, useBifieldDescriptionAsName(useBifieldDescriptionAsName)
+	, bitsPerRow(bitsPerRow)
 {}
 
 QString JsonFormatedElement::getFileName() const { return fileName; }
@@ -27,5 +29,7 @@ QString JsonFormatedElement::toString()
 		       " isAxiCompatible :" + isAxiCompatible + " useRegisterDescriptionAsName: " +
 		       useRegisterDescriptionAsName + " useBifieldDescriptionAsName: " + useBifieldDescriptionAsName);
 }
+
+int JsonFormatedElement::getBitsPerRow() const { return bitsPerRow; }
 
 bool JsonFormatedElement::getUseRegisterNameAsDescription() const { return useRegisterDescriptionAsName; }
