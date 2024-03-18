@@ -18,14 +18,21 @@ using namespace scopy;
 using namespace regmap;
 
 RegisterSimpleWidget::RegisterSimpleWidget(RegisterModel *registerModel, QVector<BitFieldSimpleWidget *> *bitFields,
-					   QWidget *parent)
+					   int bitsPerRow, QWidget *parent)
 	: registerModel(registerModel)
 	, bitFields(bitFields)
 {
 	installEventFilter(this);
 
 	setMinimumWidth(10);
-	setFixedHeight(60 * (registerModel->getWidth() / 8));
+	int height = 0;
+	if(bitsPerRow >= registerModel->getWidth()) {
+		height = registerModel->getWidth() / bitsPerRow;
+	} else {
+		height = registerModel->getWidth() / 8;
+	}
+
+	setFixedHeight(60 * height);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
 
 	QHBoxLayout *layout = new QHBoxLayout();
@@ -73,7 +80,7 @@ RegisterSimpleWidget::RegisterSimpleWidget(RegisterModel *registerModel, QVector
 		int streach = bitFields->at(bits)->getStreach();
 		bitFieldsWidgetLayout->addWidget(bitFields->at(bits), row, col, 1, streach);
 		col += streach;
-		if(col > Utils::getBitsPerRow()) {
+		if(col > (bitsPerRow - 1)) {
 			row++;
 			col = 0;
 		}

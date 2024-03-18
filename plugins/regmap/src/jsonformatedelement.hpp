@@ -9,7 +9,7 @@ class JsonFormatedElement
 public:
 	JsonFormatedElement(QString fileName, QList<QString> *compatibleDevices = new QList<QString>(),
 			    bool isAxiCompatible = false, bool useRegisterDescriptionAsName = false,
-			    bool useBifieldDescriptionAsName = false);
+			    bool useBifieldDescriptionAsName = false, int bitsPerRow = 8);
 	QString getFileName() const;
 
 	QList<QString> *getCompatibleDevices() const;
@@ -19,12 +19,15 @@ public:
 	bool getUseBifieldNameAsDescription() const;
 	QString toString();
 
+	int getBitsPerRow() const;
+
 private:
 	QString fileName;
 	QList<QString> *compatibleDevices;
 	bool isAxiCompatible = false;
 	bool useRegisterDescriptionAsName;
 	bool useBifieldDescriptionAsName;
+	int bitsPerRow;
 };
 } // namespace scopy::regmap
 #endif // JSONFORMATEDELEMENT_HPP

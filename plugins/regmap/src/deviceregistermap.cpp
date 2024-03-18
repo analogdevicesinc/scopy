@@ -15,7 +15,6 @@
 #include "readwrite/iioregisterwritestrategy.hpp"
 #include "register/registerdetailedwidget.hpp"
 #include "register/registermodel.hpp"
-#include "register/registersimplewidgetfactory.hpp"
 #include "registercontroller.hpp"
 #include "registermaptemplate.hpp"
 #include "registermapvalues.hpp"
@@ -39,7 +38,7 @@ using namespace scopy;
 using namespace regmap;
 
 DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, RegisterMapValues *registerMapValues,
-				     QWidget *parent)
+				     int bitsPerRow, QWidget *parent)
 	: QWidget(parent)
 	, registerMapValues(registerMapValues)
 	, registerMapTemplate(registerMapTemplate)
@@ -99,7 +98,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 		QHBoxLayout *tableHead = new QHBoxLayout(colBitCount);
 		colBitCount->setLayout(tableHead);
 
-		for(int i = Utils::getBitsPerRow(); i >= 0; i--) {
+		for(int i = bitsPerRow - 1; i >= 0; i--) {
 			tableHead->addWidget(new QLabel("Bit" + QString::number(i)), 1);
 		}
 
@@ -107,6 +106,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 		tableHeadWidgetLayout->addWidget(colBitCount, 8);
 		registerMapTableLayout->addWidget(tableHeadWidget);
 		registerMapTableWidget = new RegisterMapTable(registerMapTemplate->getRegisterList(), this);
+		registerMapTableWidget->setBitsPerRow(bitsPerRow);
 
 		QWidget *aux = registerMapTableWidget->getWidget();
 		if(aux) {

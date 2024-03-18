@@ -29,7 +29,7 @@ public:
 	~RegisterMapTool();
 
 	void addDevice(QString devName, RegisterMapTemplate *registerMapTemplate = nullptr,
-		       RegisterMapValues *registerMapValues = nullptr);
+		       RegisterMapValues *registerMapValues = nullptr, int bitsPerRow = 8);
 
 signals:
 

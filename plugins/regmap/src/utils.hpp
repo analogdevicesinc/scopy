@@ -22,7 +22,6 @@ public:
 	static void removeLayoutMargins(QLayout *layout);
 	static QDir setXmlPath();
 
-	static int getBitsPerRow();
 	static int getBitsPerRowDetailed();
 
 	static JsonFormatedElement *getJsonTemplate(QString xml);
@@ -31,7 +30,6 @@ public:
 	static JsonFormatedElement *getTemplate(QString devName);
 
 private:
-	static const int bitsPerRow = 7;
 	static const int bitsPerRowDetailed = 3;
 	static QMap<QString, JsonFormatedElement *> *spiJson;
 	static QMap<QString, JsonFormatedElement *> *axiJson;
