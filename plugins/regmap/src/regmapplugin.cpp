@@ -3,7 +3,6 @@
 #include "utils.hpp"
 #include "xmlfilemanager.hpp"
 
-#include "deviceregistermap.hpp"
 #include "registermaptemplate.hpp"
 #include "registermapvalues.hpp"
 #include "regmapplugin.h"
@@ -178,7 +177,8 @@ bool RegmapPlugin::onConnect()
 					iioWriteStrategy->setAddressSpace(axiAddressSpace);
 				}
 			}
-			generateDevice(templatePath, dev, devName, iioReadStrategy, iioWriteStrategy);
+			generateDevice(templatePath, dev, devName, iioReadStrategy, iioWriteStrategy,
+				       templatePaths->getBitsPerRow());
 		}
 
 		m_toolList[0]->setEnabled(true);
@@ -222,7 +222,8 @@ QString RegmapPlugin::description() { return "Register map tool"; }
 QWidget *RegmapPlugin::getTool() { return m_registerMapWidget; }
 
 void RegmapPlugin::generateDevice(QString xmlPath, struct iio_device *dev, QString devName,
-				  IRegisterReadStrategy *readStrategy, IRegisterWriteStrategy *writeStrategy)
+				  IRegisterReadStrategy *readStrategy, IRegisterWriteStrategy *writeStrategy,
+				  int bitsPerRow)
 {
 
 	RegisterMapTemplate *registerMapTemplate = nullptr;
@@ -239,7 +240,7 @@ void RegmapPlugin::generateDevice(QString xmlPath, struct iio_device *dev, QStri
 	registerMapValues->setReadStrategy(readStrategy);
 	registerMapValues->setWriteStrategy(writeStrategy);
 
-	registerMapTool->addDevice(devName, registerMapTemplate, registerMapValues);
+	registerMapTool->addDevice(devName, registerMapTemplate, registerMapValues, bitsPerRow);
 }
 
 struct iio_device *RegmapPlugin::getIioDevice(iio_context *ctx, const char *dev_name)

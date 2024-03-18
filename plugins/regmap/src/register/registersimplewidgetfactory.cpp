@@ -7,6 +7,7 @@
 #include "registersimplewidget.hpp"
 
 #include <regmapstylehelper.hpp>
+#include <utils.hpp>
 
 using namespace scopy;
 using namespace regmap;
@@ -15,12 +16,12 @@ RegisterSimpleWidgetFactory::RegisterSimpleWidgetFactory(QObject *parent)
 	: QObject{parent}
 {}
 
-RegisterSimpleWidget *RegisterSimpleWidgetFactory::buildWidget(RegisterModel *model)
+RegisterSimpleWidget *RegisterSimpleWidgetFactory::buildWidget(RegisterModel *model, int bitsPerRow)
 {
 	QVector<BitFieldSimpleWidget *> *bitFields = new QVector<BitFieldSimpleWidget *>;
 
 	BitFieldSimpleWidgetFactory bitFieldSimpleWidgetFactory;
-	int remaingSpaceOnRow = 8;
+	int remaingSpaceOnRow = bitsPerRow;
 	for(int i = 0; i < model->getBitFields()->size(); ++i) {
 		BitFieldModel *modelBitField = model->getBitFields()->at(i);
 		int width = modelBitField->getWidth();
@@ -28,17 +29,17 @@ RegisterSimpleWidget *RegisterSimpleWidgetFactory::buildWidget(RegisterModel *mo
 			bitFields->push_back(bitFieldSimpleWidgetFactory.buildWidget(model->getBitFields()->at(i),
 										     remaingSpaceOnRow));
 			width = width - remaingSpaceOnRow;
-			remaingSpaceOnRow = 8;
+			remaingSpaceOnRow = bitsPerRow;
 		}
 
 		bitFields->push_back(bitFieldSimpleWidgetFactory.buildWidget(model->getBitFields()->at(i), width));
 		remaingSpaceOnRow -= width;
 		if(remaingSpaceOnRow == 0) {
-			remaingSpaceOnRow = 8;
+			remaingSpaceOnRow = bitsPerRow;
 		}
 	}
 
-	RegisterSimpleWidget *rsw = new RegisterSimpleWidget(model, bitFields);
+	RegisterSimpleWidget *rsw = new RegisterSimpleWidget(model, bitFields, bitsPerRow);
 
 	RegmapStyleHelper::RegisterSimpleWidgetStyle(rsw);
 	return rsw;

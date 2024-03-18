@@ -68,8 +68,6 @@ QDir Utils::setXmlPath()
 	return QDir("");
 }
 
-int Utils::getBitsPerRow() { return bitsPerRow; }
-
 int Utils::getBitsPerRowDetailed() { return bitsPerRowDetailed; }
 
 JsonFormatedElement *Utils::getJsonTemplate(QString xml)
@@ -142,6 +140,11 @@ void Utils::populateJsonTemplateMap(QJsonArray jsonArray, bool isAxi)
 			object.toObject().value(QString("use_register_description_as_name")).toBool();
 		bool useBifieldDescriptionAsName =
 			object.toObject().value(QString("use_bitfield_description_as_name")).toBool();
+		int bitsPerRow = object.toObject().value(QString("bites_per_row")).toInt();
+
+		if(bitsPerRow == 0) {
+			bitsPerRow = 8;
+		}
 
 		QList<QString> *compatibleDevicesList = new QList<QString>();
 		QJsonArray compatibleDevices = object.toObject().value(QString("compatible_drivers")).toArray();
@@ -149,6 +152,7 @@ void Utils::populateJsonTemplateMap(QJsonArray jsonArray, bool isAxi)
 		qDebug(CAT_REGMAP) << "fileName : " << fileName;
 		qDebug(CAT_REGMAP) << "useRegisterDescriptionAsName : " << useRegisterDescriptionAsName;
 		qDebug(CAT_REGMAP) << "useBifieldDescriptionAsName : " << useBifieldDescriptionAsName;
+		qDebug(CAT_REGMAP) << "bitsPerRow : " << bitsPerRow;
 
 		if(!compatibleDevices.isEmpty()) {
 			for(auto device : compatibleDevices) {
@@ -158,7 +162,8 @@ void Utils::populateJsonTemplateMap(QJsonArray jsonArray, bool isAxi)
 		}
 		spiJson->insert(fileName,
 				new JsonFormatedElement(fileName, compatibleDevicesList, isAxi,
-							useRegisterDescriptionAsName, useBifieldDescriptionAsName));
+							useRegisterDescriptionAsName, useBifieldDescriptionAsName,
+							bitsPerRow));
 	}
 }
 
