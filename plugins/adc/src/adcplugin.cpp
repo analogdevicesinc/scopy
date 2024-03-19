@@ -56,6 +56,7 @@ void ADCPlugin::initPreferences()
 	p->init("adc_plot_xcursor_position", QwtAxis::XBottom);
 	p->init("adc_plot_ycursor_position", QwtAxis::YLeft);
 	p->init("adc_plot_show_buffer_previewer", true);
+	p->init("adc_default_y_mode", 0);
 }
 
 bool ADCPlugin::loadPreferencesPage()
@@ -93,13 +94,16 @@ bool ADCPlugin::loadPreferencesPage()
 	auto adc_plot_show_buffer_previewer = PreferencesHelper::addPreferenceCheckBox(
 		p, "adc_plot_show_buffer_previewer", "Show buffer previewer", m_preferencesPage);
 
+	auto adc_default_y_mode = PreferencesHelper::addPreferenceComboList(
+		p, "adc_default_y_mode", "ADC Default Y-Mode", {{"ADC Count", 0}, {"% Full Scale", 1}}, generalSection);
+
 	generalSection->contentLayout()->addWidget(adc_plot_xaxis_label_position);
 	generalSection->contentLayout()->addWidget(adc_plot_yaxis_label_position);
 	generalSection->contentLayout()->addWidget(adc_plot_yaxis_handle_position);
 	generalSection->contentLayout()->addWidget(adc_plot_xcursor_position);
 	generalSection->contentLayout()->addWidget(adc_plot_ycursor_position);
 	generalSection->contentLayout()->addWidget(adc_plot_show_buffer_previewer);
-
+	generalSection->contentLayout()->addWidget(adc_default_y_mode);
 	//	connect(p, &Preferences::preferenceChanged, )
 
 	return true;
