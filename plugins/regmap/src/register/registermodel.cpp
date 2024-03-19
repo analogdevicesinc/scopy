@@ -5,7 +5,7 @@
 using namespace scopy::regmap;
 
 RegisterModel::RegisterModel(QString name, uint32_t address, QString description, bool exists, int width, QString notes,
-			     QVector<BitFieldModel *> *bitFields)
+			     QVector<BitFieldModel *> *bitFields, RegisterMapTemplate *registerMapTemplate)
 	: name(name)
 	, address(address)
 	, description(description)
@@ -13,6 +13,7 @@ RegisterModel::RegisterModel(QString name, uint32_t address, QString description
 	, width(width)
 	, notes(notes)
 	, bitFields(bitFields)
+	, m_registerMapTemaplate(registerMapTemplate)
 {}
 
 QString RegisterModel::getName() const { return name; }
@@ -28,3 +29,10 @@ int RegisterModel::getWidth() const { return width; }
 QString RegisterModel::getNotes() const { return notes; }
 
 QVector<BitFieldModel *> *RegisterModel::getBitFields() const { return bitFields; }
+
+RegisterMapTemplate *RegisterModel::registerMapTemaplate() const { return m_registerMapTemaplate; }
+
+void RegisterModel::setRegisterMapTemaplate(RegisterMapTemplate *newRegisterMapTemaplate)
+{
+	m_registerMapTemaplate = newRegisterMapTemaplate;
+}

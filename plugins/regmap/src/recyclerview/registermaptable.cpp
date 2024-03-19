@@ -98,7 +98,7 @@ void RegisterMapTable::generateWidget(int index)
 	qDebug(CAT_REGISTER_MAP_TABLE) << "Generate new widget";
 	RegisterSimpleWidgetFactory registerSimpleWidgetFactory;
 	RegisterSimpleWidget *registerSimpleWidget =
-		registerSimpleWidgetFactory.buildWidget(registerModels->value(index), m_bitsPerRow);
+		registerSimpleWidgetFactory.buildWidget(registerModels->value(index));
 
 	QObject::connect(registerSimpleWidget, &RegisterSimpleWidget::registerSelected, this,
 			 &RegisterMapTable::registerSelected);
@@ -106,7 +106,3 @@ void RegisterMapTable::generateWidget(int index)
 	registersMap->insert(index, registerSimpleWidget);
 	Q_EMIT widgetGenerated(index, registerSimpleWidget);
 }
-
-int RegisterMapTable::bitsPerRow() const { return m_bitsPerRow; }
-
-void RegisterMapTable::setBitsPerRow(int newBitsPerRow) { m_bitsPerRow = newBitsPerRow; }

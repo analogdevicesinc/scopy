@@ -13,7 +13,7 @@ class RegisterSimpleWidgetFactory : public QObject
 public:
 	explicit RegisterSimpleWidgetFactory(QObject *parent = nullptr);
 
-	RegisterSimpleWidget *buildWidget(RegisterModel *model, int bitsPerRow);
+	RegisterSimpleWidget *buildWidget(RegisterModel *model);
 Q_SIGNALS:
 };
 } // namespace scopy::regmap

@@ -18,7 +18,7 @@ using namespace scopy;
 using namespace regmap;
 
 RegisterSimpleWidget::RegisterSimpleWidget(RegisterModel *registerModel, QVector<BitFieldSimpleWidget *> *bitFields,
-					   int bitsPerRow, QWidget *parent)
+					   QWidget *parent)
 	: registerModel(registerModel)
 	, bitFields(bitFields)
 {
@@ -26,8 +26,8 @@ RegisterSimpleWidget::RegisterSimpleWidget(RegisterModel *registerModel, QVector
 
 	setMinimumWidth(10);
 	int height = 0;
-	if(bitsPerRow >= registerModel->getWidth()) {
-		height = registerModel->getWidth() / bitsPerRow;
+	if(registerModel->registerMapTemaplate()->bitsPerRow() >= registerModel->getWidth()) {
+		height = registerModel->getWidth() / registerModel->registerMapTemaplate()->bitsPerRow();
 	} else {
 		height = registerModel->getWidth() / 8;
 	}
@@ -80,7 +80,7 @@ RegisterSimpleWidget::RegisterSimpleWidget(RegisterModel *registerModel, QVector
 		int streach = bitFields->at(bits)->getStreach();
 		bitFieldsWidgetLayout->addWidget(bitFields->at(bits), row, col, 1, streach);
 		col += streach;
-		if(col > (bitsPerRow - 1)) {
+		if(col > (registerModel->registerMapTemaplate()->bitsPerRow() - 1)) {
 			row++;
 			col = 0;
 		}
