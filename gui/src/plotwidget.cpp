@@ -12,6 +12,8 @@
 #include <QwtPlotLayout>
 #include <QwtPlotOpenGLCanvas>
 #include <QwtPlotSeriesItem>
+#include <plotnavigator.hpp>
+#include <plottracker.hpp>
 
 #include <DisplayPlot.h>
 #include <customqwtscaledraw.hpp>
@@ -71,8 +73,10 @@ PlotWidget::PlotWidget(QWidget *parent)
 	m_plot->plotLayout()->setAlignCanvasToScales(true);
 	m_plot->plotLayout()->setCanvasMargin(0);
 	m_plot->plotLayout()->setSpacing(0);
-	setupZoomer();
+
+	setupNavigator();
 }
+
 void PlotWidget::setupHandlesArea()
 {
 	m_symbolCtrl = new SymbolController(m_plot);
@@ -111,45 +115,13 @@ void PlotWidget::setupHandlesArea()
 	m_layout->addWidget(m_plot, 2, 1);
 }
 
-void PlotWidget::addPlotInfoSlot(QWidget *w) { m_layout->addWidget(w, 0, 1); }
-
-void PlotWidget::setupZoomer()
+void PlotWidget::setupNavigator()
 {
-	// zoomer
-	// OscPlotZoomer - need constructor -
-	m_zoomer = new ExtendingPlotZoomer(xAxis()->axisId(), yAxis()->axisId(), m_plot->canvas(), false);
-
-	m_zoomer->setMousePattern(QwtEventPattern::MouseSelect2, Qt::RightButton, Qt::ControlModifier);
-	m_zoomer->setMousePattern(QwtEventPattern::MouseSelect3, Qt::RightButton);
-	m_zoomer->setTrackerMode(QwtPicker::ActiveOnly);
-	const QColor c("#999999");
-	m_zoomer->setRubberBandPen(c);
-	m_zoomer->setTrackerPen(c);
-
-	m_zoomer->setEnabled(true);
-	m_zoomer->setZoomBase(false);
-	m_plot->setMouseTracking(true);
-
-	connect(m_xAxis, &PlotAxis::axisScaleUpdated, dynamic_cast<LimitedPlotZoomer *>(m_zoomer),
-		&LimitedPlotZoomer::updateZoomBase);
-	connect(m_yAxis, &PlotAxis::axisScaleUpdated, dynamic_cast<LimitedPlotZoomer *>(m_zoomer),
-		&LimitedPlotZoomer::updateZoomBase);
-	/*connect(m_zoomer,&ExtendingPlotZoomer::zoomed,this, [=](const QRectF &rect ) {
-		for(int i = 0; i < 4;i++) {
-			for(int j = 0 ;j < m_plotAxis[i].count();j++) {
-				QwtPlotZoomer *zoomer = m_plotAxis[i][j]->zoomer();
-				if(zoomer != nullptr) {
-					if(zoomer->zoomRectIndex() < m_zoomer->zoomRectIndex()) {
-						qInfo()<<zoomer->zoomRectIndex() << m_zoomer->zoomRectIndex() << i <<
-	j<< "ZoomIn"; zoomer->zoom(rect); } else { qInfo()<<zoomer->zoomRectIndex() << m_zoomer->zoomRectIndex() <<
-	i<<j<<"ZoomOut"; zoomer->zoom(0); zoomer->setZoomBase();
-					}
-				}
-			}
-		}
-		m_plot->replot();
-	});*/
+	m_navigator = new PlotNavigator(this);
+	m_tracker = new PlotTracker(this);
 }
+
+void PlotWidget::addPlotInfoSlot(QWidget *w) { m_layout->addWidget(w, 0, 1); }
 
 PlotWidget::~PlotWidget() {}
 
@@ -174,6 +146,23 @@ void PlotWidget::setupAxisScales()
 		scaleItem->setZ(200);
 	}
 }
+
+PlotAxis *PlotWidget::plotAxisFromId(QwtAxisId axisId)
+{
+	for(QList<PlotAxis *> axes : m_plotAxis) {
+		for(PlotAxis *axis : axes) {
+			if(axis->axisId() == axisId) {
+				return axis;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+PlotNavigator *PlotWidget::navigator() const { return m_navigator; }
+
+PlotTracker *PlotWidget::tracker() const { return m_tracker; }
 
 void PlotWidget::setupOpenGLCanvas()
 {
@@ -210,9 +199,18 @@ void PlotWidget::addPlotChannel(PlotChannel *ch)
 	if(m_selectedChannel == nullptr) {
 		selectChannel(ch);
 	}
+
+	m_navigator->addChannel(ch);
+	m_tracker->addChannel(ch);
 }
 
-void PlotWidget::removePlotChannel(PlotChannel *ch) { m_plotChannels.removeAll(ch); }
+void PlotWidget::removePlotChannel(PlotChannel *ch)
+{
+	m_plotChannels.removeAll(ch);
+
+	m_navigator->removeChannel(ch);
+	m_tracker->removeChannel(ch);
+}
 
 void PlotWidget::addPlotAxisHandle(PlotAxisHandle *ax) { m_plotAxisHandles[ax->axis()->position()].append(ax); }
 
