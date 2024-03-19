@@ -43,7 +43,7 @@ QList<QString> *XmlFileManager::getAllAddresses()
 	return addressList;
 }
 
-QMap<uint32_t, RegisterModel *> *XmlFileManager::getAllRegisters()
+QMap<uint32_t, RegisterModel *> *XmlFileManager::getAllRegisters(RegisterMapTemplate *parent)
 {
 	QMap<uint32_t, RegisterModel *> *regList = new QMap<uint32_t, RegisterModel *>();
 	QDomDocument xmlBOM;
@@ -60,7 +60,7 @@ QMap<uint32_t, RegisterModel *> *XmlFileManager::getAllRegisters()
 	while(!reg.isNull()) {
 		uint32_t address =
 			Utils::convertQStringToUint32(reg.firstChildElement("Address").firstChild().toText().data());
-		regList->insert(address, getRegister(reg));
+		regList->insert(address, getRegister(reg, parent));
 		reg = reg.nextSibling().toElement();
 	}
 	f.close();
@@ -92,7 +92,7 @@ QVector<BitFieldModel *> *XmlFileManager::getBitFields(QString regAddr)
 	return nullptr;
 }
 
-RegisterModel *XmlFileManager::getRegister(QDomElement reg)
+RegisterModel *XmlFileManager::getRegister(QDomElement reg, RegisterMapTemplate *parent)
 {
 	if(!reg.isNull()) {
 		QString name = "";
@@ -116,7 +116,7 @@ RegisterModel *XmlFileManager::getRegister(QDomElement reg)
 			description, reg.firstChildElement("Exists").toText().data().toUpper() == "TRUE",
 			reg.firstChildElement("Width").firstChild().toText().data().toInt(),
 			reg.firstChildElement("Notes").firstChild().toText().data(),
-			getBitFieldsOfRegister(reg, isAxiCompatible));
+			getBitFieldsOfRegister(reg, isAxiCompatible), parent);
 	}
 	return nullptr;
 }

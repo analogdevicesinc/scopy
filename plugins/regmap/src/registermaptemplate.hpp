@@ -19,8 +19,12 @@ public:
 	void setRegisterList(QMap<uint32_t, RegisterModel *> *newRegisterList);
 	RegisterModel *getDefaultTemplate(uint32_t address);
 
+	int bitsPerRow() const;
+	void setBitsPerRow(int newBitsPerRow);
+
 private:
 	QMap<uint32_t, RegisterModel *> *registerList;
+	int m_bitsPerRow = 8;
 Q_SIGNALS:
 };
 } // namespace scopy::regmap
