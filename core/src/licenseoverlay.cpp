@@ -1,7 +1,7 @@
 #include <QAbstractButton>
 #include <QCoreApplication>
 
-#include <license_overlay.h>
+#include <licenseoverlay.h>
 #include <pluginbase/preferences.h>
 using namespace scopy;
 
@@ -45,4 +45,4 @@ QString LicenseOverlay::getLicense()
 	return text;
 }
 
-#include "moc_license_overlay.cpp"
+#include "moc_licenseoverlay.cpp"
