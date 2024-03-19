@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QOpenGLWidget>
 
-#include "license_overlay.h"
+#include "licenseoverlay.h"
 #include "scopyhomepage.h"
 #include "devicemanager.h"
 #include "scannediiocontextcollector.h"
