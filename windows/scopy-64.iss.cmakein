@@ -261,8 +261,6 @@ Name: "custom"; Description: "Custom installation"; Flags: iscustom
 [Components]
 Name: "main"; Description: "Scopy"; Types: full compact custom; Flags: fixed
 Name: "plugins"; Description: "Plugins"; Types: full plugins; Flags: disablenouninstallwarning
-Name: "plugins\m2kplugin"; Description: "KIT ADALM2000"; Types: full plugins; Flags: disablenouninstallwarning
-Name: "plugins\swiotplugin"; Description: "KIT SWIOT1L"; Types: full plugins; Flags: disablenouninstallwarning
 Name: "emu"; Description: "IIO Emulator"; Types: full; Flags: disablenouninstallwarning
 
 [Files]
@@ -271,7 +269,7 @@ Source: "{#DestFolder}\Scopy.exe"; DestDir: "{app}"; Components: main; Flags: ig
 Source: "{#DestFolder}\Scopy-console.exe"; DestDir: "{app}"; Components: main; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#Workdir}\iio-emu\build\iio-emu.exe"; DestDir: "{app}"; Components: emu; Flags: ignoreversion skipifsourcedoesntexist
 //Folders
-Source: "{#DestFolder}\decoders\*"; DestDir: "{app}\decoders"; Components: plugins\m2kplugin; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\decoders\*"; DestDir: "{app}\decoders"; Components: plugins; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\drivers\*"; DestDir: "{app}\drivers"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\iconengines\*"; DestDir: "{app}\iconengines"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\imageformats\*"; DestDir: "{app}\imageformats"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
@@ -286,10 +284,7 @@ Source: "{#DestFolder}\*.dll"; DestDir: "{app}"; Components: main; Flags: ignore
 Source: "{#DestFolder}\qt.conf"; DestDir: "{app}"; Components: main; Flags: ignoreversion onlyifdoesntexist
 //Plugins
 Source: "{#DestFolder}\plugins\plugins\xmls\*"; DestDir: "{app}\plugins\plugins\xmls"; Components: main; Flags: ignoreversion skipifsourcedoesntexist recursesubdirs createallsubdirs onlyifdoesntexist
-Source: "{#DestFolder}\plugins\plugins\libscopy-regmapplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: main; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
-Source: "{#DestFolder}\plugins\plugins\libscopy-debuggerplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: main; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
-Source: "{#DestFolder}\plugins\plugins\libscopy-m2kplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: plugins\m2kplugin; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
-Source: "{#DestFolder}\plugins\plugins\libscopy-swiot.dll"; DestDir: "{app}\plugins\plugins"; Components: plugins\swiotplugin; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
+Source: "{#DestFolder}\plugins\plugins\*.dll"; DestDir: "{app}\plugins\plugins"; Components: main; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
@@ -306,9 +301,8 @@ Name: "{userdesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: deskto
 [InstallDelete]
 Type: files; Name: "{userappdata}\ADI\Scopy.ini"; Tasks: deleteini
 Type: files; Name: "{userappdata}\ADI\Preferences.ini"; Tasks: deletepreferences
-Type: filesandordirs; Name: "{app}\decoders"; Check: not WizardIsComponentSelected('plugins\m2kplugin')
-Type: files; Name: "{app}\plugins\plugins\libscopy-m2kplugin.dll"; Check: not WizardIsComponentSelected('plugins\m2kplugin')
-Type: files; Name: "{app}\plugins\plugins\libscopy-swiot.dll"; Check: not WizardIsComponentSelected('plugins\swiotplugin')
+Type: filesandordirs; Name: "{app}\decoders"; Check: not WizardIsComponentSelected('plugins')
+Type: filesandordirs; Name: "{app}\plugins"; Check: not WizardIsComponentSelected('plugins')
 Type: files; Name: "{app}\iio-emu.exe"; Check: not WizardIsComponentSelected('emu')
 
 [UninstallDelete]
