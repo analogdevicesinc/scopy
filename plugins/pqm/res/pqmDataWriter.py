@@ -13,7 +13,7 @@ while True:
         angle = random.uniform(0.0, 360.0)
         harmonics_list = (
             [100]
-            + random.sample(range(10, 80), 4)
+            + random.sample(range(10, 80), 5)
             + random.sample(range(5, 40), 5)
             + random.sample(range(0, 5), 36, counts=[8, 8, 8, 8, 4])
             + [0, 0, 0, 0]
@@ -21,7 +21,7 @@ while True:
         harmonics = map(str, harmonics_list)
         interharmonics_list = (
             [100]
-            + random.sample(range(10, 80), 4)
+            + random.sample(range(10, 80), 5)
             + random.sample(range(5, 40), 5)
             + random.sample(range(0, 5), 36, counts=[8, 8, 8, 8, 4])
             + [0, 0, 0, 0]
