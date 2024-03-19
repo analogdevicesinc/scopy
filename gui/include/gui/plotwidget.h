@@ -16,6 +16,8 @@
 namespace scopy {
 class PlotAxis;
 class PlotAxisHandle;
+class PlotNavigator;
+class PlotTracker;
 
 typedef struct _PlotSamplingInfo
 {
@@ -72,6 +74,12 @@ public:
 	void setShowYAxisLabels(bool newShowYAxisLabels);
 
 	void addPlotInfoSlot(QWidget *w);
+
+	PlotAxis *plotAxisFromId(QwtAxisId axisId);
+
+	PlotNavigator *navigator() const;
+	PlotTracker *tracker() const;
+
 public Q_SLOTS:
 	void replot();
 	void selectChannel(PlotChannel *);
@@ -96,6 +104,9 @@ private:
 
 	QList<PlotAxis *> m_plotAxis[QwtAxis::AxisPositions];
 	QList<PlotAxisHandle *> m_plotAxisHandles[QwtAxis::AxisPositions];
+
+	PlotNavigator *m_navigator;
+	PlotTracker *m_tracker;
 
 	PlotAxis *m_xAxis;
 	PlotAxis *m_yAxis;
@@ -124,7 +135,7 @@ private:
 	void setupAxisScales();
 	void setupOpenGLCanvas();
 	void setupHandlesArea();
-	void setupZoomer();
+	void setupNavigator();
 	void hideDefaultAxis();
 };
 
