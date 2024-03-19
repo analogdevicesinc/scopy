@@ -13,6 +13,7 @@
 #include <gui/widgets/toolbuttons.h>
 #include <pluginbase/resourcemanager.h>
 
+#define NUMBER_OF_HARMONICS 51
 #define HARMONICS_MAX_DEGREE 50
 #define MAX_CHNLS 6
 
