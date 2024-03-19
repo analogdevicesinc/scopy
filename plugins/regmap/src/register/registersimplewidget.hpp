@@ -21,7 +21,7 @@ class RegisterSimpleWidget : public QFrame
 	Q_OBJECT
 public:
 	explicit RegisterSimpleWidget(RegisterModel *registerModel, QVector<BitFieldSimpleWidget *> *bitFields,
-				      int bitsPerRow, QWidget *parent = nullptr);
+				      QWidget *parent = nullptr);
 	~RegisterSimpleWidget();
 
 	void valueUpdated(uint32_t value);

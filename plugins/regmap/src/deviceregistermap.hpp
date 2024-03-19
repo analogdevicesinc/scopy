@@ -27,8 +27,7 @@ class SCOPY_REGMAPPLUGIN_EXPORT DeviceRegisterMap : public QWidget
 	Q_OBJECT
 public:
 	explicit DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate = nullptr,
-				   RegisterMapValues *registerMapValues = nullptr, int bitsPerRow = 8,
-				   QWidget *parent = nullptr);
+				   RegisterMapValues *registerMapValues = nullptr, QWidget *parent = nullptr);
 	~DeviceRegisterMap();
 
 	void registerChanged(RegisterModel *regModel);
@@ -50,6 +49,7 @@ private:
 	RegisterDetailedWidget *registerDetailedWidget = nullptr;
 	void initSettings();
 	int selectedRegister;
+
 Q_SIGNALS:
 	void requestRead(uint32_t address);
 	void requestWrite(uint32_t address, uint32_t value);

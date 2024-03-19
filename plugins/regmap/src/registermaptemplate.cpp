@@ -42,5 +42,9 @@ RegisterModel *RegisterMapTemplate::getDefaultTemplate(uint32_t address)
 	}
 
 	return new RegisterModel("Register Name", address, "Register Description", true, 8, "Reigster Notes",
-				 bitFieldsList);
+				 bitFieldsList, this);
 }
+
+int RegisterMapTemplate::bitsPerRow() const { return m_bitsPerRow; }
+
+void RegisterMapTemplate::setBitsPerRow(int newBitsPerRow) { m_bitsPerRow = newBitsPerRow; }

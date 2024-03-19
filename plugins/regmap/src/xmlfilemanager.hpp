@@ -1,6 +1,7 @@
 #ifndef XMLFILEMANAGER_HPP
 #define XMLFILEMANAGER_HPP
 
+#include "registermaptemplate.hpp"
 #include "scopy-regmapplugin_export.h"
 
 #include <iio.h>
@@ -22,9 +23,9 @@ public:
 	XmlFileManager(struct iio_device *dev, QString filePath);
 
 	QList<QString> *getAllAddresses();
-	QMap<uint32_t, RegisterModel *> *getAllRegisters();
+	QMap<uint32_t, RegisterModel *> *getAllRegisters(RegisterMapTemplate *parent);
 	RegisterModel *getRegAtAddress(QString addr);
-	RegisterModel *getRegister(QDomElement reg);
+	RegisterModel *getRegister(QDomElement reg, RegisterMapTemplate *parent);
 	void getRegMapData(QString addr);
 	QVector<BitFieldModel *> *getBitFields(QString regAddr);
 	QVector<BitFieldModel *> *getBitFieldsOfRegister(QDomElement reg, bool reverseBitOrder);
