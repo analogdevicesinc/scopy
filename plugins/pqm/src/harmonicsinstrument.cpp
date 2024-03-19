@@ -32,7 +32,8 @@ HarmonicsInstrument::HarmonicsInstrument(QWidget *parent)
 	QWidget *thdWidget = createThdWidget();
 	tool->addWidgetToCentralContainerHelper(thdWidget);
 
-	m_table = new QTableWidget(MAX_CHNLS, HARMONICS_MAX_DEGREE, this);
+	//
+	m_table = new QTableWidget(MAX_CHNLS, NUMBER_OF_HARMONICS, this);
 	initTable();
 	tool->addWidgetToCentralContainerHelper(m_table);
 
@@ -76,11 +77,11 @@ HarmonicsInstrument::~HarmonicsInstrument()
 
 void HarmonicsInstrument::initData()
 {
-	for(int i = 1; i <= HARMONICS_MAX_DEGREE; i++) {
+	for(int i = 0; i < NUMBER_OF_HARMONICS; i++) {
 		m_xTime.push_back(i);
 	}
 	for(const QString &ch : m_chnls) {
-		m_yValues[ch] = std::vector<double>(50, 0);
+		m_yValues[ch] = std::vector<double>(NUMBER_OF_HARMONICS, 0);
 	}
 }
 
@@ -90,9 +91,15 @@ void HarmonicsInstrument::initTable()
 	m_table->verticalHeader()->setDefaultAlignment(Qt::AlignCenter);
 	m_table->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_table->setFixedHeight(220);
+	// Init horizontal header
+	QStringList horHeaderValues;
+	for(int i = 0; i < NUMBER_OF_HARMONICS; i++) {
+		horHeaderValues.push_back(QString::number(i));
+	}
+	m_table->setHorizontalHeaderLabels(horHeaderValues);
 	StyleHelper::TableViewWidget(m_table->parentWidget(), "HarmonicsTable");
 	for(int i = 0; i < MAX_CHNLS; i++) {
-		for(int j = 0; j < HARMONICS_MAX_DEGREE; j++) {
+		for(int j = 0; j < NUMBER_OF_HARMONICS; j++) {
 			QTableWidgetItem *tableItem = new QTableWidgetItem();
 			tableItem->setFlags(tableItem->flags() ^ Qt::ItemIsEditable);
 			m_table->setItem(i, j, tableItem);
@@ -102,17 +109,17 @@ void HarmonicsInstrument::initTable()
 
 void HarmonicsInstrument::initPlot()
 {
-	m_plot->yAxis()->setInterval(0, 100);
 	m_plot->yAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
 	m_plot->yAxis()->scaleDraw()->setFloatPrecision(2);
 	m_plot->yAxis()->scaleDraw()->setUnitType("%");
+	m_plot->yAxis()->setInterval(0, 100);
 	m_plot->setShowYAxisLabels(true);
 	m_plot->yAxis()->setVisible(true);
 
-	m_plot->xAxis()->setInterval(1, HARMONICS_MAX_DEGREE);
 	m_plot->xAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
 	m_plot->xAxis()->scaleDraw()->setFloatPrecision(0);
 	m_plot->xAxis()->scaleDraw()->setUnitType("");
+	m_plot->xAxis()->setInterval(0, HARMONICS_MAX_DEGREE);
 	m_plot->setShowXAxisLabels(true);
 	m_plot->xAxis()->setVisible(true);
 	m_plot->replot();
@@ -200,7 +207,7 @@ void HarmonicsInstrument::updateTable()
 {
 	int i = 0;
 	for(const QString &ch : m_chnls) {
-		for(int j = 0; j < HARMONICS_MAX_DEGREE; j++) {
+		for(int j = 0; j < NUMBER_OF_HARMONICS; j++) {
 			QTableWidgetItem *item = m_table->item(i, j);
 			item->setText(QString::number(m_yValues[ch][j]));
 		}
@@ -251,7 +258,7 @@ void HarmonicsInstrument::onSelectionChanged()
 {
 	QModelIndexList selectedIndexList = m_table->selectionModel()->selectedIndexes();
 	if(selectedIndexList.size() <= 1 || selectedFromSameCol(selectedIndexList)) {
-		m_plot->xAxis()->setInterval(1, HARMONICS_MAX_DEGREE);
+		m_plot->xAxis()->setInterval(0, HARMONICS_MAX_DEGREE);
 		return;
 	}
 	int firstColumnSelected = selectedIndexList.front().column() + 1;
