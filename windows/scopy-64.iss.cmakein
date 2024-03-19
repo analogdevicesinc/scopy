@@ -286,10 +286,7 @@ Source: "{#DestFolder}\*.dll"; DestDir: "{app}"; Components: main; Flags: ignore
 Source: "{#DestFolder}\qt.conf"; DestDir: "{app}"; Components: main; Flags: ignoreversion onlyifdoesntexist
 //Plugins
 Source: "{#DestFolder}\plugins\plugins\xmls\*"; DestDir: "{app}\plugins\plugins\xmls"; Components: main; Flags: ignoreversion skipifsourcedoesntexist recursesubdirs createallsubdirs onlyifdoesntexist
-Source: "{#DestFolder}\plugins\plugins\libscopy-regmapplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: main; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
-Source: "{#DestFolder}\plugins\plugins\libscopy-debuggerplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: main; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
-Source: "{#DestFolder}\plugins\plugins\libscopy-m2kplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: plugins\m2kplugin; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
-Source: "{#DestFolder}\plugins\plugins\libscopy-swiot.dll"; DestDir: "{app}\plugins\plugins"; Components: plugins\swiotplugin; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
+Source: "{#DestFolder}\plugins\plugins\*.dll"; DestDir: "{app}\plugins\plugins"; Components: main; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
