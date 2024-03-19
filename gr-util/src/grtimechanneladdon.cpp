@@ -255,15 +255,15 @@ void GRTimeChannelAddon::setYMode(YMode mode)
 	case YMODE_COUNT:
 		scale = 1;
 		if(fmt->is_signed) {
-			ymin = -1 << (fmt->bits - 1);
-			ymax = 1 << (fmt->bits - 1);
+			ymin = -(float)((int64_t)1 << (fmt->bits - 1));
+			ymax = (float)((int64_t)1 << (fmt->bits - 1));
 		} else {
 			ymin = 0;
 			ymax = 1 << (fmt->bits);
 		}
 		break;
 	case YMODE_FS:
-		scale = 1.0 / ((1 << fmt->bits));
+		scale = 1.0 / ((float)((uint64_t)1 << fmt->bits));
 		if(fmt->is_signed) {
 			ymin = -0.5;
 			ymax = 0.5;
@@ -307,9 +307,11 @@ GRIIOFloatChannelSrc *GRTimeChannelAddon::grch() const { return m_grch; }
 void GRTimeChannelAddon::onInit()
 {
 	// Defaults
-	m_yCtrl->setMin(-1.0);
-	m_yCtrl->setMax(1.0);
-	m_ymodeCb->combo()->setCurrentIndex(1);
+	/*m_yCtrl->setMin(-1.0);
+	m_yCtrl->setMax(1.0);*/
+	auto v = Preferences::get("adc_default_y_mode").toInt();
+	m_ymodeCb->combo()->setCurrentIndex(v);
+	setYMode(static_cast<YMode>(v));
 }
 
 void GRTimeChannelAddon::onDeinit() {}
