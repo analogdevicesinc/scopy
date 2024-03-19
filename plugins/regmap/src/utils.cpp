@@ -140,7 +140,7 @@ void Utils::populateJsonTemplateMap(QJsonArray jsonArray, bool isAxi)
 			object.toObject().value(QString("use_register_description_as_name")).toBool();
 		bool useBifieldDescriptionAsName =
 			object.toObject().value(QString("use_bitfield_description_as_name")).toBool();
-		int bitsPerRow = object.toObject().value(QString("bites_per_row")).toInt();
+		int bitsPerRow = object.toObject().value(QString("bits_per_row")).toInt();
 
 		if(bitsPerRow == 0) {
 			bitsPerRow = 8;
