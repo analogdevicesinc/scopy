@@ -4,6 +4,7 @@
 #include <iio-widgets/iiowidgetfactory.h>
 #include "grdeviceaddon.h"
 #include "errorbox.h"
+#include "plottracker.hpp"
 
 #include <QComboBox>
 #include <QDebug>
@@ -261,6 +262,8 @@ void GRTimeChannelAddon::setYMode(YMode mode)
 			ymin = 0;
 			ymax = 1 << (fmt->bits);
 		}
+
+		m_plotAddon->plot()->tracker()->setYAxisUnit("Counts");
 		break;
 	case YMODE_FS:
 		scale = 1.0 / ((float)((uint64_t)1 << fmt->bits));
@@ -271,12 +274,16 @@ void GRTimeChannelAddon::setYMode(YMode mode)
 			ymin = 0;
 			ymax = 1;
 		}
+
+		m_plotAddon->plot()->tracker()->setYAxisUnit("");
 		break;
 	case YMODE_SCALE:
+		m_plotAddon->plot()->tracker()->setYAxisUnit(m_unit);
 		break;
 	default:
 		break;
 	}
+
 	m_yCtrl->setMin(ymin);
 	m_yCtrl->setMax(ymax);
 	m_scOff->setScale(scale);
