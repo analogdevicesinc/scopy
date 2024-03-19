@@ -107,6 +107,7 @@ void BitFieldDetailedWidget::firstRead()
 		layout->addWidget(valueLineEdit);
 	} else if(access == "R") {
 		value = new QLabel(this);
+		layout->addWidget(value);
 	} else if(options && !options->isEmpty()) {
 		valueComboBox = new QComboBox(this);
 
