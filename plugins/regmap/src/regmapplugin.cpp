@@ -177,6 +177,7 @@ bool RegmapPlugin::onConnect()
 					iioWriteStrategy->setAddressSpace(axiAddressSpace);
 				}
 			}
+
 			generateDevice(templatePath, dev, devName, iioReadStrategy, iioWriteStrategy,
 				       templatePaths->getBitsPerRow());
 		}
@@ -229,8 +230,9 @@ void RegmapPlugin::generateDevice(QString xmlPath, struct iio_device *dev, QStri
 	RegisterMapTemplate *registerMapTemplate = nullptr;
 	if(!xmlPath.isEmpty()) {
 		registerMapTemplate = new RegisterMapTemplate(this);
+		registerMapTemplate->setBitsPerRow(bitsPerRow);
 		XmlFileManager xmlFileManager(dev, xmlPath);
-		auto aux = xmlFileManager.getAllRegisters();
+		auto aux = xmlFileManager.getAllRegisters(registerMapTemplate);
 		if(!aux->isEmpty()) {
 			registerMapTemplate->setRegisterList(aux);
 		}
@@ -240,7 +242,7 @@ void RegmapPlugin::generateDevice(QString xmlPath, struct iio_device *dev, QStri
 	registerMapValues->setReadStrategy(readStrategy);
 	registerMapValues->setWriteStrategy(writeStrategy);
 
-	registerMapTool->addDevice(devName, registerMapTemplate, registerMapValues, bitsPerRow);
+	registerMapTool->addDevice(devName, registerMapTemplate, registerMapValues);
 }
 
 struct iio_device *RegmapPlugin::getIioDevice(iio_context *ctx, const char *dev_name)
