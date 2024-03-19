@@ -1,51 +1,39 @@
-#include "qabstractbutton.h"
-
+#include <QAbstractButton>
 #include <QCoreApplication>
-#include <QDesktopWidget>
-#include <QFile>
-#include <QMessageBox>
-#include <QPushButton>
-#include <QStyle>
-#include <QTextBrowser>
 
 #include <license_overlay.h>
 #include <pluginbase/preferences.h>
-#include <stylehelper.h>
-#include <ui_licensedialogoverlay.h>
-
 using namespace scopy;
 
 LicenseOverlay::LicenseOverlay(QWidget *parent)
 	: QWidget(parent)
 	, parent(parent)
 {
-	overlay = new gui::TintedOverlay(parent);
-	ui = new Ui::LicenseDialogOverlay();
+	m_popupWidget = new PopupWidget(parent);
+	m_popupWidget->setFocusOnContinueButton();
+	m_popupWidget->setEnableExternalLinks(true);
+	m_popupWidget->enableTitleBar(false);
+	m_popupWidget->enableTintedOverlay(true);
+	m_popupWidget->setDescription(getLicense());
 
-	ui->setupUi(this);
-	ui->description->setText(getLicense());
-	StyleHelper::BlueButton(ui->btnContinue, "btnContinue");
-	StyleHelper::BlueButton(ui->btnExit, "btnExit");
-	StyleHelper::OverlayMenu(this, "licenseOverlay");
-
-	Preferences::connect(ui->btnContinue, &QAbstractButton::clicked, [&]() {
+	connect(m_popupWidget->getContinueBtn(), &QAbstractButton::clicked, [&]() {
 		Preferences::GetInstance()->set("general_first_run", false);
-		overlay->deleteLater();
 		deleteLater();
 	});
-	Preferences::connect(ui->btnExit, &QAbstractButton::clicked, [&]() { QCoreApplication::quit(); });
+	Preferences::connect(m_popupWidget->getExitBtn(), &QAbstractButton::clicked,
+			     [&]() { QCoreApplication::quit(); });
 }
+
+LicenseOverlay::~LicenseOverlay() { delete m_popupWidget; }
 
 void LicenseOverlay::showOverlay()
 {
-	overlay->show();
 	raise();
 	show();
-
-	this->move(parent->rect().center() - this->rect().center());
+	m_popupWidget->move(parent->rect().center() - m_popupWidget->rect().center());
 }
 
-QPushButton *LicenseOverlay::getContinueBtn() { return ui->btnContinue; }
+QPushButton *LicenseOverlay::getContinueBtn() { return m_popupWidget->getContinueBtn(); }
 
 QString LicenseOverlay::getLicense()
 {
