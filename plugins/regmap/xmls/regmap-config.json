@@ -10,6 +10,10 @@
             "compatible_drivers": [
                 "ad74413r"
             ]
+        },
+        {
+            "file_name": "adis16505-2.xml",
+            "bits_per_row": 16
         }
     ],
     "axi": [
