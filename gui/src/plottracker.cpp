@@ -49,6 +49,15 @@ void PlotTracker::removeChannel(PlotChannel *ch)
 	}
 }
 
+void PlotTracker::setYAxisUnit(QString unit)
+{
+	m_yAxisUnit = unit;
+
+	for(ChannelTracker *chTracker : *m_trackers) {
+		chTracker->tracker->setYAxisUnit(m_yAxisUnit);
+	}
+}
+
 ChannelTracker *PlotTracker::createTracker(PlotChannel *ch)
 {
 	ChannelTracker *chTracker = new ChannelTracker();
@@ -69,6 +78,7 @@ ChannelTracker *PlotTracker::createTracker(PlotChannel *ch)
 	formatter->setTwoDecimalMode(true);
 	tracker->setXFormatter(formatter);
 	tracker->setXAxisUnit("s");
+	tracker->setYAxisUnit(m_yAxisUnit);
 
 	return chTracker;
 }
