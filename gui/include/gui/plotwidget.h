@@ -42,6 +42,7 @@ public:
 
 	void addPlotChannel(PlotChannel *ch);
 	void removePlotChannel(PlotChannel *ch);
+	QList<PlotChannel *> getChannels();
 
 	QList<PlotAxis *> &plotAxis(int position);
 	PlotAxis *xAxis();
@@ -80,6 +81,8 @@ public:
 	PlotNavigator *navigator() const;
 	PlotTracker *tracker() const;
 
+	void setUnitsVisible(bool visible);
+
 public Q_SLOTS:
 	void replot();
 	void selectChannel(PlotChannel *);
@@ -93,6 +96,8 @@ Q_SIGNALS:
 	void mouseButtonRelease(const QMouseEvent *event);
 	void mouseMove(const QMouseEvent *event);
 	void channelSelected(PlotChannel *ch);
+	void addedChannel(PlotChannel *ch);
+	void removedChannel(PlotChannel *ch);
 
 private:
 	QwtPlot *m_plot;

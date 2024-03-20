@@ -724,6 +724,7 @@ public:
 	void setFormatter(PrefixFormatter *formatter);
 
 	void enableDeltaLabel(bool enable);
+	void setUnitsEnabled(bool enable);
 
 protected:
 	virtual void draw(QPainter *, const QPalette &) const;
@@ -737,6 +738,7 @@ private:
 	mutable unsigned int m_nrTicks;
 	mutable bool m_shouldDrawMiddleDelta;
 	bool m_delta;
+	bool m_unitsEn;
 };
 
 class SCOPY_GUI_EXPORT OscPlotZoomer : public ExtendingPlotZoomer
