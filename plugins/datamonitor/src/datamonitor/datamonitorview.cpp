@@ -26,6 +26,17 @@ DataMonitorView::DataMonitorView(QFrame *parent)
 	headerLayout->addWidget(m_measuringUnit, 1, Qt::AlignLeft);
 	headerLayout->addWidget(m_title, 1, Qt::AlignRight);
 
+	removeBtn = new QPushButton();
+
+	HoverWidget *removeHover = new HoverWidget(removeBtn, m_header, this);
+	removeHover->setStyleSheet("background-color: transparent; border: 0px;");
+	removeHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+	removeHover->setContentPos(HoverPosition::HP_TOPLEFT);
+	removeHover->setVisible(true);
+	removeHover->raise();
+
+	connect(removeBtn, &QPushButton::clicked, this, &DataMonitorView::removeMonitor);
+
 	/////////////////////////plot///////////////////
 	m_monitorPlot = new MonitorPlot(this);
 	layout->addWidget(m_monitorPlot);

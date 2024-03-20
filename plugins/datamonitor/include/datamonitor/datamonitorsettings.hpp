@@ -65,7 +65,7 @@ private:
 	QWidget *generateYAxisSettings(QWidget *parent);
 
 	// MenuComboWidget *mainMonitorCombo;
-	QPushButton *deleteMonitor;
+	//	QPushButton *deleteMonitor;
 
 	MenuHeaderWidget *header;
 	QVBoxLayout *layout;
@@ -81,6 +81,8 @@ private:
 	void generateDeviceSection(QString device);
 
 	MonitorPlot *m_plot;
+
+	bool eventFilter(QObject *watched, QEvent *event) override;
 };
 } // namespace datamonitor
 } // namespace scopy
