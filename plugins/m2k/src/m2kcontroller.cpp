@@ -77,7 +77,7 @@ void M2kController::disconnectM2k()
 		if(identifyTask && identifyTask->isRunning()) {
 			identifyTask->requestInterruption();
 		}
-		contextClose(m_m2k, true);
+		contextCloseAll();
 	} catch(std::exception &ex) {
 		qDebug(CAT_M2KPLUGIN) << ex.what();
 	}
