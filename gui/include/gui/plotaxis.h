@@ -38,6 +38,14 @@ public:
 
 	double divs() const;
 
+	void setFromatter(PrefixFormatter *formatter);
+	PrefixFormatter *getFromatter();
+
+	void setUnits(QString units);
+	QString getUnits();
+
+	void setUnitsVisible(bool visible);
+
 public Q_SLOTS:
 	void setMax(double newMax);
 	void setMin(double newMin);
@@ -49,15 +57,18 @@ Q_SIGNALS:
 	void axisScaleUpdated();
 	void maxChanged(double);
 	void minChanged(double);
+	void formatterChanged(PrefixFormatter *formatter);
+	void unitsChanged(QString units);
 
 private:
 	QwtAxisId m_axisId;
 	PlotWidget *m_plotWidget;
-	QwtPlotZoomer *m_zoomer;
 	QwtPlot *m_plot;
 	int m_position;
 	OscScaleDraw *m_scaleDraw;
 	OscScaleEngine *m_scaleEngine;
+	QString m_units;
+	PrefixFormatter *m_formatter;
 
 	int m_id;
 	double m_divs;
@@ -65,7 +76,6 @@ private:
 	double m_max;
 
 	void setupAxisScale();
-	void setupZoomer();
 	Q_PROPERTY(double max READ max WRITE setMax NOTIFY maxChanged)
 	Q_PROPERTY(double min READ min WRITE setMin NOTIFY minChanged)
 };
