@@ -60,6 +60,7 @@ GRTimeChannelAddon::GRTimeChannelAddon(QString ch, GRDeviceAddon *dev, GRTimePlo
 	m_plotCh->setHandle(m_plotAxisHandle);
 	plot->addPlotAxisHandle(m_plotAxisHandle);
 	plot->addPlotChannel(m_plotCh);
+	m_plotCh->xAxis()->setUnits("s");
 
 	m_measureMgr = new TimeMeasureManager(this);
 	m_measureMgr->initMeasure(m_pen);
@@ -262,8 +263,7 @@ void GRTimeChannelAddon::setYMode(YMode mode)
 			ymin = 0;
 			ymax = 1 << (fmt->bits);
 		}
-
-		m_plotAddon->plot()->tracker()->setYAxisUnit("Counts");
+		m_plotCh->yAxis()->setUnits("Counts");
 		break;
 	case YMODE_FS:
 		scale = 1.0 / ((float)((uint64_t)1 << fmt->bits));
@@ -274,11 +274,10 @@ void GRTimeChannelAddon::setYMode(YMode mode)
 			ymin = 0;
 			ymax = 1;
 		}
-
-		m_plotAddon->plot()->tracker()->setYAxisUnit("");
+		m_plotCh->yAxis()->setUnits("");
 		break;
 	case YMODE_SCALE:
-		m_plotAddon->plot()->tracker()->setYAxisUnit(m_unit);
+		m_plotCh->yAxis()->setUnits(m_unit);
 		break;
 	default:
 		break;
@@ -349,6 +348,7 @@ ImportChannelAddon::ImportChannelAddon(QString name, PlotAddon *plotAddon, QPen 
 	m_plotCh->setHandle(m_plotAxisHandle);
 	plot->addPlotAxisHandle(m_plotAxisHandle);
 	plot->addPlotChannel(m_plotCh);
+	m_plotCh->xAxis()->setUnits("s");
 
 	m_measureMgr = new TimeMeasureManager(this);
 	m_measureMgr->initMeasure(m_pen);
