@@ -29,6 +29,12 @@ public Q_SLOTS:
 	void vertSetVisible(bool visible);
 	void update();
 
+	void setVertUnits(QString unit);
+	void setHorizUnits(QString unit);
+
+	void setHorizFromatter(PrefixFormatter *formatter);
+	void setVertFromatter(PrefixFormatter *formatter);
+
 private:
 	QWidget *vert_contents;
 	QWidget *horiz_contents;
@@ -36,7 +42,8 @@ private:
 	QLabel *V1_val, *V2_val, *H1_val, *H2_val;
 	QLabel *deltaV_val, *deltaH_val;
 	QLabel *invDeltaH_val;
-	PrefixFormatter *formatter;
+	PrefixFormatter *hFormatter, *vFormatter;
+	QString hUnit, vUnit;
 
 	void initContent();
 };
