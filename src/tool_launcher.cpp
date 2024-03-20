@@ -1430,7 +1430,7 @@ void adiscope::ToolLauncher::destroyContext()
 			dev->setConnected(false, false);
 		if (m_m2k) {
 			try {
-				libm2k::context::contextClose(m_m2k);
+				libm2k::context::contextCloseAll();
 			} catch (libm2k::m2k_exception &e) {
 				HANDLE_EXCEPTION(e);
 				qDebug() << e.what();
