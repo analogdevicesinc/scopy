@@ -41,7 +41,7 @@ private:
 	InfoBtn *infoBtn;
 	RunBtn *runBtn;
 	QPushButton *clearBtn;
-	QPushButton *addMonitorButton;
+	AddBtn *addMonitorButton;
 
 	FlexGridLayout *m_flexGridLayout;
 	QScrollArea *m_scrollArea;
