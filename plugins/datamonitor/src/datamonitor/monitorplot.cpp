@@ -10,6 +10,7 @@
 #include <timemanager.hpp>
 
 #include <pluginbase/preferences.h>
+#include <datamonitorstylehelper.hpp>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -17,8 +18,6 @@ using namespace datamonitor;
 MonitorPlot::MonitorPlot(QWidget *parent)
 	: QWidget{parent}
 {
-	installEventFilter(this);
-
 	QVBoxLayout *layout = new QVBoxLayout(this);
 	setLayout(layout);
 
@@ -39,9 +38,6 @@ MonitorPlot::MonitorPlot(QWidget *parent)
 
 	layout->addWidget(m_plotInfo);
 	layout->addWidget(m_plot);
-
-	TimePlotStatusInfo *status = new TimePlotStatusInfo(this);
-	layout->addWidget(status);
 
 	m_monitorCurves = new QMap<QString, MonitorPlotCurve *>();
 }
@@ -68,9 +64,11 @@ void MonitorPlot::removeMonitor(QString monitorName)
 {
 	if(m_monitorCurves->contains(monitorName)) {
 		m_plot->removePlotChannel(m_monitorCurves->value(monitorName)->plotch());
+		m_monitorCurves->value(monitorName)->plotch()->curve()->detach();
 		m_monitorCurves->remove(monitorName);
 		delete m_monitorCurves->value(monitorName);
 	}
+	m_plot->replot();
 }
 
 void MonitorPlot::toggleMonitor(bool toggled, QString monitorName)
@@ -104,7 +102,7 @@ void MonitorPlot::changeCurveThickness(double thickness)
 void MonitorPlot::updateXAxisIntervalMin(double min)
 {
 	m_xAxisIntervalMax = min;
-	m_plot->xAxis()->setMax(m_startTime + (min * 1000));
+	refreshXAxisInterval();
 	m_plotInfo->updateBufferPreviewer();
 	m_plot->replot();
 }
@@ -112,7 +110,7 @@ void MonitorPlot::updateXAxisIntervalMin(double min)
 void MonitorPlot::updateXAxisIntervalMax(double max)
 {
 	m_xAxisIntervalMin = max;
-	m_plot->xAxis()->setMin(m_startTime + (max * 1000));
+	refreshXAxisInterval();
 	m_plotInfo->updateBufferPreviewer();
 	m_plot->replot();
 }
@@ -169,9 +167,7 @@ void MonitorPlot::setupXAxis()
 	m_plot->plot()->setAxisScaleEngine(m_plot->xAxis()->axisId(), scaleEngine);
 
 	updateAxisScaleDraw();
-
-	m_plot->xAxis()->setInterval(m_startTime + (m_xAxisIntervalMin * 1000),
-				     m_startTime + (m_xAxisIntervalMax * 1000));
+	refreshXAxisInterval();
 
 	m_plot->replot();
 }
@@ -179,6 +175,8 @@ void MonitorPlot::setupXAxis()
 void MonitorPlot::genereateScaleDraw(QString format, double offset)
 {
 	QwtDateScaleDraw *scaleDraw = new QwtDateScaleDraw(Qt::OffsetFromUTC);
+	scaleDraw->enableComponent(QwtAbstractScaleDraw::Ticks, false);
+	scaleDraw->enableComponent(QwtAbstractScaleDraw::Backbone, false);
 
 	// set time format for time interval types
 	scaleDraw->setDateFormat(QwtDate::IntervalType::Second, format);
@@ -217,12 +215,11 @@ void MonitorPlot::updateAxisScaleDraw()
 	m_plot->replot();
 }
 
-void MonitorPlot::setStartingPoint(QDateTime newStartingPoint)
+void MonitorPlot::refreshXAxisInterval()
 {
-	m_startingPoint = newStartingPoint;
-	m_plot->xAxis()->setMax(QwtDate::toDouble(m_startingPoint));
-	updateAxisScaleDraw();
-	m_plot->replot();
+	double time = QwtDate::toDouble(QDateTime::currentDateTime());
+	double delta = m_xAxisIntervalMin - m_xAxisIntervalMax;
+	m_plot->xAxis()->setInterval(time - (delta * 1000), time);
 }
 
 void MonitorPlot::updatePlotStartingPoint(double time, double delta)
@@ -233,7 +230,7 @@ void MonitorPlot::updatePlotStartingPoint(double time, double delta)
 		double offset = (-1) * m_startTime / 1000;
 		genereateScaleDraw(DataMonitorUtils::getPlotDateTimeFormat(), offset);
 
-		m_plot->xAxis()->setInterval(time - (m_xAxisIntervalMin * 1000), time);
+		m_plot->xAxis()->setInterval(time - (delta * 1000), time);
 	}
 
 	m_plot->replot();

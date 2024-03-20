@@ -21,6 +21,7 @@
 #include <datamonitorutils.hpp>
 #include <timemanager.hpp>
 #include "dynamicWidget.h"
+#include "logdatatofile.hpp"
 
 using namespace scopy;
 using namespace datamonitor;
@@ -130,7 +131,7 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 	});
 
 	//// add monitors
-	addMonitorButton = new QPushButton(this);
+	addMonitorButton = new AddBtn(this);
 
 	tool->addWidgetToTopContainerHelper(addMonitorButton, TTA_LEFT);
 
@@ -152,7 +153,7 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 		});
 
 		// remove the monitor
-		connect(dataMonitorController->dataMonitorSettings(), &DataMonitorSettings::removeMonitor, [=]() {
+		connect(dataMonitorController->dataMonitorView(), &DataMonitorView::removeMonitor, [=]() {
 			m_flexGridLayout->removeWidget(controllerId);
 			tool->rightStack()->remove(QString::number(controllerId));
 			tool->openRightContainerHelper(false);
@@ -167,6 +168,14 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 	///////// end add monitor
 
 	tool->addWidgetToTopContainerHelper(startTime, TTA_LEFT);
+
+	Q_EMIT addMonitorButton->clicked();
+
+	/// log data
+	LogDataToFile *logDataToFile = new LogDataToFile(dataAcquisitionManager, this);
+
+	connect(toolSettings, &DataMonitorToolSettings::requestDataLogging, logDataToFile, &LogDataToFile::logData);
+	///
 
 	DataMonitorStyleHelper::DataMonitorToolStyle(this);
 }
