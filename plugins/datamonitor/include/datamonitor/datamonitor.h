@@ -11,7 +11,7 @@
 #include <QPushButton>
 #include <QScrollArea>
 
-#include <iioutil/contextprovider.h>
+#include <iioutil/connectionprovider.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
