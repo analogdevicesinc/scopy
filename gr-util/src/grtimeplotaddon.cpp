@@ -6,6 +6,7 @@
 #include <QLoggingCategory>
 #include <QTimer>
 #include <QwtWeedingCurveFitter>
+#include <plotnavigator.hpp>
 
 #include <grdeviceaddon.h>
 #include <grlog.h>
@@ -106,6 +107,8 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 
 	m_info = new TimePlotInfo(m_plotWidget, widget);
 	m_plotWidget->addPlotInfoSlot(m_info);
+	connect(m_plotWidget->navigator(), &PlotNavigator::rectChanged, this,
+		[=]() { m_info->update(m_currentSamplingInfo); });
 
 	//	m_lay->addWidget(m_plotWidget);
 	m_plotTimer = new QTimer(this);

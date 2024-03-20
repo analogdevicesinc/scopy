@@ -142,12 +142,23 @@ void PlotNavigator::addNavigators(QwtAxisId axisId)
 	nav->zoomer = zoomer;
 	m_navigators->insert(nav);
 
-	connect(magnifier, &PlotMagnifier::zoomedRect, this,
-		[=](const QRectF &rect) { addRectToHistory(nav, rect, navigationType::Magnify); });
-	connect(magnifier, &PlotMagnifier::pannedRect, this,
-		[=](const QRectF &rect) { addRectToHistory(nav, rect, navigationType::Pan); });
-	connect(zoomer, &PlotZoomer::zoomed, this,
-		[=](const QRectF &rect) { addRectToHistory(nav, rect, navigationType::Zoom); });
+	connect(magnifier, &PlotMagnifier::zoomedRect, this, [=](const QRectF &rect) {
+		addRectToHistory(nav, rect, navigationType::Magnify);
+		Q_EMIT rectChanged(rect, navigationType::Magnify);
+	});
+	connect(magnifier, &PlotMagnifier::pannedRect, this, [=](const QRectF &rect) {
+		addRectToHistory(nav, rect, navigationType::Pan);
+		Q_EMIT rectChanged(rect, navigationType::Pan);
+	});
+	connect(zoomer, &PlotZoomer::zoomed, this, [=](const QRectF &rect) {
+		addRectToHistory(nav, rect, navigationType::Zoom);
+		Q_EMIT rectChanged(rect, navigationType::Zoom);
+	});
+
+	connect(magnifier, &PlotMagnifier::reset, this,
+		[=]() { Q_EMIT rectChanged(zoomer->zoomBase(), navigationType::None); });
+	connect(zoomer, &PlotZoomer::reset, this,
+		[=]() { Q_EMIT rectChanged(zoomer->zoomBase(), navigationType::None); });
 
 	connect(m_plotWidget->plotAxisFromId(axisId), &PlotAxis::axisScaleUpdated, this, [=]() {
 		if(m_autoBase) {
@@ -183,6 +194,7 @@ void PlotNavigator::onUndo()
 			nav->history->pop();
 			nav->zoomer->silentZoom(nav->history->top());
 			doReset = false;
+			Q_EMIT rectChanged(nav->history->top(), navigationType::None);
 		}
 	}
 
@@ -291,6 +303,21 @@ void PlotNavigator::removeChannel(PlotChannel *channel)
 	if(m_channels->empty()) {
 		m_visibleZoomer->setEnabled(false);
 	}
+}
+
+bool PlotNavigator::isZoomed()
+{
+	bool zoomed = false;
+	for(Navigator *nav : *m_navigators) {
+		if((nav->zoomer->isEnabled() && nav->zoomer->isZoomed()) ||
+		   (nav->magnifier->isEnabled() && nav->magnifier->isZoomed()) &&
+			   nav->zoomer->getCurrentRect() != nav->zoomer->zoomBase()) {
+			zoomed = true;
+			break;
+		}
+	}
+
+	return zoomed;
 }
 
 void PlotNavigator::setZoomerXAxesEn(bool en)

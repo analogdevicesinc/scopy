@@ -21,7 +21,7 @@ public:
 	virtual ~TimePlotHDivInfo();
 
 public Q_SLOTS:
-	void update(double val);
+	void update(double val, bool zoomed = false);
 
 private:
 	MetricPrefixFormatter *m_mpf;
