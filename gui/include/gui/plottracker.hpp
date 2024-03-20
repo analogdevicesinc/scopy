@@ -32,8 +32,6 @@ public:
 	void addChannel(PlotChannel *ch);
 	void removeChannel(PlotChannel *ch);
 
-	void setYAxisUnit(QString unit);
-
 protected:
 	void init(QList<PlotChannel *> *channels);
 	ChannelTracker *createTracker(PlotChannel *ch);
@@ -45,7 +43,6 @@ private:
 	bool m_en;
 	PlotWidget *m_plot;
 	QSet<ChannelTracker *> *m_trackers;
-	QString m_yAxisUnit;
 };
 } // namespace scopy
 
