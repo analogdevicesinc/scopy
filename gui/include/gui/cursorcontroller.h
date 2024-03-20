@@ -31,6 +31,8 @@ public Q_SLOTS:
 	void vertEnToggled(bool toggled);
 	void vertLockToggled(bool toggled);
 	void readoutsDragToggled(bool toggled);
+	void onAddedChannel(PlotChannel *ch);
+	void onRemovedChannel(PlotChannel *ch);
 
 private:
 	PlotWidget *m_plot;

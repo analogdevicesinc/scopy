@@ -30,6 +30,12 @@ void CursorController::initUI()
 	plotCursors->setVisible(false);
 
 	plotCursorReadouts = new PlotCursorReadouts(m_plot);
+	PlotChannel *ch = m_plot->selectedChannel();
+	plotCursorReadouts->setHorizFromatter(ch->xAxis()->getFromatter());
+	plotCursorReadouts->setVertFromatter(ch->yAxis()->getFromatter());
+	plotCursorReadouts->setHorizUnits(ch->xAxis()->getUnits());
+	plotCursorReadouts->setVertUnits(ch->yAxis()->getUnits());
+
 	hoverReadouts = new HoverWidget(plotCursorReadouts, m_plot->plot()->canvas(), m_plot);
 	hoverReadouts->setAnchorPos(HoverPosition::HP_TOPLEFT);
 	hoverReadouts->setContentPos(HoverPosition::HP_BOTTOMRIGHT);
@@ -85,6 +91,18 @@ void CursorController::connectSignals()
 		}
 		plotCursorReadouts->setH2(pos);
 	});
+
+	for(PlotChannel *ch : m_plot->getChannels()) {
+		onAddedChannel(ch);
+	}
+	connect(m_plot, &PlotWidget::addedChannel, this, &CursorController::onAddedChannel);
+	connect(m_plot, &PlotWidget::removedChannel, this, &CursorController::onRemovedChannel);
+	connect(m_plot, &PlotWidget::channelSelected, this, [=](PlotChannel *ch) {
+		plotCursorReadouts->setHorizFromatter(ch->xAxis()->getFromatter());
+		plotCursorReadouts->setVertFromatter(ch->yAxis()->getFromatter());
+		plotCursorReadouts->setHorizUnits(ch->xAxis()->getUnits());
+		plotCursorReadouts->setVertUnits(ch->yAxis()->getUnits());
+	});
 }
 
 void CursorController::initSession()
@@ -139,6 +157,20 @@ void CursorController::readoutsDragToggled(bool toggled)
 	hoverReadouts->setDraggable(readoutDragsEn);
 }
 
+void CursorController::onAddedChannel(PlotChannel *ch)
+{
+	connect(ch->xAxis(), &PlotAxis::formatterChanged, plotCursorReadouts, &PlotCursorReadouts::setHorizFromatter);
+	connect(ch->yAxis(), &PlotAxis::formatterChanged, plotCursorReadouts, &PlotCursorReadouts::setVertFromatter);
+	connect(ch->xAxis(), &PlotAxis::unitsChanged, plotCursorReadouts, &PlotCursorReadouts::setHorizUnits);
+	connect(ch->yAxis(), &PlotAxis::unitsChanged, plotCursorReadouts, &PlotCursorReadouts::setVertUnits);
+}
+
+void CursorController::onRemovedChannel(PlotChannel *ch)
+{
+	disconnect(ch->xAxis(), &PlotAxis::formatterChanged, plotCursorReadouts, nullptr);
+	disconnect(ch->yAxis(), &PlotAxis::formatterChanged, plotCursorReadouts, nullptr);
+}
+
 void CursorController::setVisible(bool visible)
 {
 	readoutsSetVisible(visible);
@@ -156,5 +188,3 @@ void CursorController::cursorsSetVisible(bool visible)
 CursorSettings *CursorController::getCursorSettings() { return cursorSettings; }
 
 PlotCursors *CursorController::getPlotCursors() { return plotCursors; }
-
-#include "moc_cursorcontroller.cpp"
