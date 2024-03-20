@@ -5,6 +5,7 @@
 #include <QStandardPaths>
 #include <QLoggingCategory>
 #include <QTranslator>
+#include <QOpenGLFunctions>
 
 #include "logging_categories.h"
 #include "qmessagebox.h"
@@ -18,6 +19,8 @@
 #include "scopypreferencespage.h"
 #include "device.h"
 
+#include <gui/restartdialog.h>
+#include "application_restarter.h"
 #include "pluginbase/preferences.h"
 #include "pluginbase/scopyjs.h"
 #include "iioutil/connectionprovider.h"
@@ -36,12 +39,14 @@
 #include <QVersionNumber>
 
 using namespace scopy;
+using namespace scopy::gui;
 
 Q_LOGGING_CATEGORY(CAT_SCOPY, "Scopy")
 
 ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	: QMainWindow(parent)
 	, ui(new Ui::ScopyMainWindow)
+	, m_glLoader(nullptr)
 {
 	QElapsedTimer timer;
 	timer.start();
@@ -274,7 +279,7 @@ void ScopyMainWindow::initPreferences()
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 
 	if(p->get("general_use_opengl").toBool()) {
-		loadOpenGL();
+		m_glLoader = new QOpenGLWidget(this);
 	}
 	if(p->get("general_load_decoders").toBool()) {
 		loadDecoders();
@@ -299,21 +304,50 @@ void ScopyMainWindow::initPreferences()
 
 void ScopyMainWindow::loadOpenGL()
 {
+	bool disablePref = false;
+	QOpenGLContext *ct = QOpenGLContext::currentContext();
+	if(ct) {
+		QOpenGLFunctions *glFuncs = ct->functions();
+		bool glCtxValid = ct->isValid();
+		QString glVersion = QString((const char *)(glFuncs->glGetString(GL_VERSION)));
+		qInfo(CAT_BENCHMARK) << "GL_VENDOR " << reinterpret_cast<const char *>(glFuncs->glGetString(GL_VENDOR));
+		qInfo(CAT_BENCHMARK) << "GL_RENDERER "
+				     << reinterpret_cast<const char *>(glFuncs->glGetString(GL_RENDERER));
+		qInfo(CAT_BENCHMARK) << "GL_VERSION " << glVersion;
+		qInfo(CAT_BENCHMARK) << "GL_EXTENSIONS "
+				     << reinterpret_cast<const char *>(glFuncs->glGetString(GL_EXTENSIONS));
+		qInfo(CAT_BENCHMARK) << "QOpenGlContext valid: " << glCtxValid;
+		if(!glCtxValid || glVersion.compare("2.0.0", Qt::CaseInsensitive) < 0) {
+			disablePref = true;
+		}
+	} else {
+		qInfo(CAT_BENCHMARK) << "QOpenGlContext is invalid";
+		disablePref = true;
+	}
 
-	// this should be part of scopygui
-	// set surfaceFormat as in Qt example: HelloGL2 -
-	// https://code.qt.io/cgit/qt/qtbase.git/tree/examples/opengl/hellogl2/main.cpp?h=5.15#n81
-	QSurfaceFormat fmt;
-	//	fmt.setDepthBufferSize(24);
-	//	QSurfaceFormat::setDefaultFormat(fmt);
+	qInfo(CAT_BENCHMARK) << "OpenGL load status: " << !disablePref;
+	if(disablePref) {
+		Preferences::GetInstance()->set("general_use_opengl", false);
+		Preferences::GetInstance()->save();
+		RestartDialog *restarter = new RestartDialog(this);
+		restarter->setDescription(
+			"Scopy uses OpenGL for high performance plot rendering. Valid OpenGL context (>v2.0.0) not "
+			"detected.\n"
+			"Restarting will set Scopy rendering mode to software. This option can be changed from the "
+			"Preferences "
+			"menu.\n"
+			"Please visit the <a "
+			"href=https://wiki.analog.com/university/tools/m2k/scopy-troubleshooting> Wiki "
+			"Analog page</a> for troubleshooting.");
+		connect(restarter, &RestartDialog::restartButtonClicked, [=] {
+			ApplicationRestarter::triggerRestart();
+			restarter->deleteLater();
+		});
+		QMetaObject::invokeMethod(restarter, &RestartDialog::showDialog, Qt::QueuedConnection);
+	}
 
-	// This acts as a loader for the OpenGL context, our plots load and draw in the OpenGL context
-	// at the same time which causes some race condition and causes the app to hang
-	// with this workaround, the app loads the OpenGL context before any plots are created
-	// Probably there's a better way to do this
-	auto a = new QOpenGLWidget(this);
-	qInfo(CAT_SCOPY, "OpenGL loaded");
-	a->deleteLater();
+	delete m_glLoader;
+	m_glLoader = nullptr;
 }
 
 void ScopyMainWindow::loadPluginsFromRepository(PluginRepository *pr)
@@ -335,6 +369,15 @@ void ScopyMainWindow::loadPluginsFromRepository(PluginRepository *pr)
 	}
 #endif
 	qInfo(CAT_BENCHMARK) << "Loading the plugins from the repository took: " << timer.elapsed() << "ms";
+}
+
+void ScopyMainWindow::showEvent(QShowEvent *event)
+{
+	QWidget::showEvent(event);
+	Preferences *p = Preferences::GetInstance();
+	if(p->get("general_use_opengl").toBool() && m_glLoader) {
+		loadOpenGL();
+	}
 }
 
 void ScopyMainWindow::handlePreferences(QString str, QVariant val)
