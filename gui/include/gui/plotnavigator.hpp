@@ -45,6 +45,8 @@ public:
 	void addChannel(PlotChannel *channel);
 	void removeChannel(PlotChannel *channel);
 
+	bool isZoomed();
+
 	void setZoomerXAxesEn(bool en);
 	void setZoomerYAxesEn(bool en);
 
@@ -92,6 +94,7 @@ public:
 Q_SIGNALS:
 	void reset();
 	void undo();
+	void rectChanged(const QRectF &rect, navigationType type);
 
 protected:
 	virtual bool eventFilter(QObject *object, QEvent *event) QWT_OVERRIDE;

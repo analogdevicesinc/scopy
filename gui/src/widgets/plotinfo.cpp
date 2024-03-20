@@ -12,10 +12,12 @@ TimePlotHDivInfo::TimePlotHDivInfo(QWidget *parent)
 	m_mpf = new MetricPrefixFormatter(this);
 	m_mpf->setTrimZeroes(true);
 }
-
 TimePlotHDivInfo::~TimePlotHDivInfo() {}
 
-void TimePlotHDivInfo::update(double val) { setText(m_mpf->format(val, "s", 2) + "/div"); }
+void TimePlotHDivInfo::update(double val, bool zoomed)
+{
+	setText(m_mpf->format(val, "s", 2) + "/div" + (zoomed ? " (zoomed)" : ""));
+}
 
 TimePlotSamplingInfo::TimePlotSamplingInfo(QWidget *parent)
 {
@@ -172,14 +174,20 @@ TimePlotInfo::~TimePlotInfo() {}
 
 void TimePlotInfo::update(PlotSamplingInfo info)
 {
-	auto x = m_plot->xAxis();
-	auto max = x->max();
-	auto min = x->min();
-	auto divs = x->divs();
-	double hdiv = abs(max - min) / divs;
-	m_hdiv->update(hdiv);
+	PlotAxis *xAxis = m_plot->xAxis();
+	double currMin, currMax, axisMax, axisMin, divs;
+	bool zoomed;
+
+	axisMax = xAxis->max();
+	axisMin = xAxis->min();
+	currMax = m_plot->plot()->axisScaleDiv(xAxis->axisId()).upperBound();
+	currMin = m_plot->plot()->axisScaleDiv(xAxis->axisId()).lowerBound();
+	zoomed = axisMax != currMax || axisMin != currMin;
+	divs = xAxis->divs();
+
+	m_hdiv->update(abs(currMax - currMin) / divs, zoomed);
 	m_sampling->update(info.plotSize, info.bufferSize, info.sampleRate);
-	m_bufferController->updateDataLimits(min, max);
+	m_bufferController->updateDataLimits(axisMin, axisMax);
 }
 
 void TimePlotInfo::updateBufferPreviewer() { m_bufferController->updateBufferPreviewer(); }
