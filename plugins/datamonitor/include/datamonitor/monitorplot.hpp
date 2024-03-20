@@ -20,6 +20,7 @@ class MonitorPlotCurve;
 
 class SCOPY_DATAMONITOR_EXPORT MonitorPlot : public QWidget
 {
+	friend class DataMonitorStyleHelper;
 	Q_OBJECT
 public:
 	explicit MonitorPlot(QWidget *parent = nullptr);
@@ -45,7 +46,6 @@ public:
 
 	void setStartTime();
 
-	void setStartingPoint(QDateTime newStartingPoint);
 	void updatePlotStartingPoint(double time, double delta);
 
 private:
@@ -65,10 +65,9 @@ private:
 	double m_startTime = 0;
 
 	void updateAxisScaleDraw();
+	void refreshXAxisInterval();
 	double m_xAxisIntervalMin;
 	double m_xAxisIntervalMax;
-
-	QDateTime m_startingPoint;
 };
 } // namespace datamonitor
 } // namespace scopy

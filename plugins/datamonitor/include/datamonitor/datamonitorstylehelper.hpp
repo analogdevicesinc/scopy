@@ -3,9 +3,9 @@
 
 #include <QObject>
 #include <datamonitorview.hpp>
-
 #include "datamonitorsettings.hpp"
 #include "datamonitortool.hpp"
+#include "datamonitortoolsettings.hpp"
 #include "monitorplot.hpp"
 
 namespace scopy {
@@ -19,6 +19,7 @@ public:
 
 	static void DataMonitorViewStyle(DataMonitorView *dataMonitorView, QColor color);
 	static void DataMonitorSettingsStyle(DataMonitorSettings *dataMonitorSettings);
+	static void DataMonitorToolSettingsStyle(DataMonitorToolSettings *dataMonitorSettings);
 	static void DataMonitorToolStyle(DataMonitorTool *tool);
 	static QString RemoveButtonStyle();
 
