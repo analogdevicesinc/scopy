@@ -4,7 +4,10 @@ using namespace scopy;
 
 PlotCursorReadouts::PlotCursorReadouts(QWidget *parent)
 	: QWidget(parent)
-	, formatter(static_cast<PrefixFormatter *>(new MetricPrefixFormatter))
+	, vFormatter(nullptr)
+	, hFormatter(nullptr)
+	, hUnit("")
+	, vUnit("")
 {
 	initContent();
 }
@@ -37,13 +40,29 @@ void PlotCursorReadouts::setH2(double val)
 
 void PlotCursorReadouts::update()
 {
-	V1_val->setText(formatter->format(v1, "Hz", 3));
-	V2_val->setText(formatter->format(v2, "Hz", 3));
-	H1_val->setText(formatter->format(h1, "s", 3));
-	H2_val->setText(formatter->format(h2, "s", 3));
-	deltaV_val->setText(formatter->format(v2 - v1, "Hz", 3));
-	deltaH_val->setText(formatter->format(h2 - h1, "s", 3));
-	invDeltaH_val->setText(formatter->format(1 / (h2 - h1), "s", 3));
+	const uint precision = 3;
+
+	if(hFormatter && !hUnit.isEmpty()) {
+		H1_val->setText(hFormatter->format(h1, hUnit, precision));
+		H2_val->setText(hFormatter->format(h2, hUnit, precision));
+		deltaH_val->setText(hFormatter->format(h2 - h1, hUnit, precision));
+		invDeltaH_val->setText(hFormatter->format(1 / (h2 - h1), hUnit, precision));
+	} else {
+		H1_val->setText(QString::number(h1, 'g', precision) + " " + hUnit);
+		H2_val->setText(QString::number(h2, 'g', precision) + " " + hUnit);
+		deltaH_val->setText(QString::number(h2 - h1, 'g', precision) + " " + hUnit);
+		invDeltaH_val->setText(QString::number(1 / (h2 - h1), 'g', precision) + " " + hUnit);
+	}
+
+	if(vFormatter && !vUnit.isEmpty()) {
+		V1_val->setText(vFormatter->format(v1, vUnit, precision));
+		V2_val->setText(vFormatter->format(v2, vUnit, precision));
+		deltaV_val->setText(vFormatter->format(v2 - v1, vUnit, precision));
+	} else {
+		V1_val->setText(QString::number(v1, 'g', precision) + " " + vUnit);
+		V2_val->setText(QString::number(v2, 'g', precision) + " " + vUnit);
+		deltaV_val->setText(QString::number(v2 - v1, 'g', precision) + " " + vUnit);
+	}
 }
 
 void PlotCursorReadouts::initContent()
@@ -114,5 +133,29 @@ void PlotCursorReadouts::vertSetVisible(bool visible) { vert_contents->setVisibl
 bool PlotCursorReadouts::horizIsVisible() { return horiz_contents->isVisible(); }
 
 bool PlotCursorReadouts::vertIsVisible() { return vert_contents->isVisible(); }
+
+void PlotCursorReadouts::setVertUnits(QString unit)
+{
+	vUnit = unit;
+	update();
+}
+
+void PlotCursorReadouts::setHorizUnits(QString unit)
+{
+	hUnit = unit;
+	update();
+}
+
+void PlotCursorReadouts::setHorizFromatter(PrefixFormatter *formatter)
+{
+	hFormatter = formatter;
+	update();
+}
+
+void PlotCursorReadouts::setVertFromatter(PrefixFormatter *formatter)
+{
+	vFormatter = formatter;
+	update();
+}
 
 #include "moc_plotcursorreadouts.cpp"
