@@ -47,12 +47,11 @@ void DataMonitorPlugin::unload() {}
 bool DataMonitorPlugin::compatible(QString param, QString cateogory)
 {
 	m_name = "DataMonitor";
-	ContextProvider *cp = ContextProvider::GetInstance();
+	ConnectionProvider *cp = ConnectionProvider::GetInstance();
+	Connection *conn = cp->open(param);
 
-	iio_context *ctx = cp->open(param);
-
-	if(!ctx) {
-		qWarning(CAT_DATAMONITOR) << "No context available for datamonitor";
+	if(!conn) {
+		qWarning(CAT_DATAMONITOR) << "No context available for datalogger";
 		return false;
 	}
 
@@ -63,8 +62,12 @@ bool DataMonitorPlugin::compatible(QString param, QString cateogory)
 
 bool DataMonitorPlugin::onConnect()
 {
-	ContextProvider *cp = ContextProvider::GetInstance();
-	iio_context *ctx = cp->open(m_param);
+	ConnectionProvider *cp = ConnectionProvider::GetInstance();
+	Connection *conn = cp->open(m_param);
+	if(conn == nullptr)
+		return false;
+
+	iio_context *ctx = conn->context();
 
 	// TODO get all DMM devices
 
@@ -109,7 +112,7 @@ bool DataMonitorPlugin::onDisconnect()
 		m_toolList[0]->setRunBtnVisible(false);
 	}
 
-	auto &&cp = ContextProvider::GetInstance();
+	auto &&cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
 
 	return true;
