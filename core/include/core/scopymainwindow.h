@@ -2,6 +2,7 @@
 #define SCOPYMAINWINDOW_H
 
 #include <QMainWindow>
+#include <QOpenGLWidget>
 
 #include "license_overlay.h"
 #include "scopyhomepage.h"
@@ -41,6 +42,8 @@ public:
 	void initTranslations();
 	void loadPluginsFromRepository(PluginRepository *pr = nullptr);
 
+	void showEvent(QShowEvent *event) override;
+
 public Q_SLOTS:
 	void requestTools(QString id);
 	void receiveVersionDocument(QJsonDocument document);
@@ -71,6 +74,7 @@ private:
 	ScopyStatusBar *statusBar;
 	ScopyMainWindow_API *api;
 	Ui::ScopyMainWindow *ui;
+	QOpenGLWidget *m_glLoader;
 
 	void loadOpenGL();
 	void initPythonWIN32();
