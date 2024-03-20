@@ -43,10 +43,14 @@ void DataMonitorStyleHelper::DataMonitorViewStyle(DataMonitorView *dataMonitorVi
 	style.replace("&&borderColor&&", StyleHelper::getColor("UIElementHighlight"));
 	style.replace("&&backgroundColor&&", StyleHelper::getColor("UIElementBackground"));
 
+	dataMonitorView->removeBtn->setMaximumSize(25, 25);
+	dataMonitorView->removeBtn->setIcon(QIcon(":/gui/icons/orange_close.svg"));
+
 	StyleHelper::MenuLargeLabel(dataMonitorView->m_measuringUnit);
 
 	dataMonitorView->m_monitorPlot->setMinimumHeight(300);
 	dataMonitorView->m_monitorPlot->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	dataMonitorView->m_monitorPlot->m_plot->setStyleSheet("color: rgba(192,192,192,255)");
 
 	dataMonitorView->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
 	dataMonitorView->setMinimumWidth(500);
@@ -64,22 +68,31 @@ void DataMonitorStyleHelper::DataMonitorSettingsStyle(DataMonitorSettings *dataM
 						)css");
 
 	style.replace("&&backgroundColor&&", "transparent");
-	style.replace("&&hoverColor&&", StyleHelper::getColor("ScopyBlueHover"));
 
-	dataMonitorSettings->deleteMonitor->setStyleSheet(RemoveButtonStyle());
+	dataMonitorSettings->setStyleSheet(style);
+}
+
+void DataMonitorStyleHelper::DataMonitorToolSettingsStyle(DataMonitorToolSettings *dataMonitorSettings)
+{
+	QString style = QString(R"css(
+						QWidget {
+							background-color : &&backgroundColor&& ;
+						}
+
+						)css");
+
+	style.replace("&&backgroundColor&&", "transparent");
+
+	StyleHelper::BlueButton(dataMonitorSettings->dataLoggingBrowseBtn);
+	StyleHelper::BlueButton(dataMonitorSettings->dataLoggingBtn);
 
 	dataMonitorSettings->setStyleSheet(style);
 }
 
 void DataMonitorStyleHelper::DataMonitorToolStyle(DataMonitorTool *tool)
 {
-
 	tool->clearBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	tool->clearBtn->setStyleSheet(RemoveButtonStyle());
-
-	QIcon icon1;
-	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/add.svg", "white", 1));
-	tool->addMonitorButton->setIcon(icon1);
 
 	StyleHelper::SquareToggleButtonWithIcon(tool->addMonitorButton, "add_monitor_btn", false);
 }

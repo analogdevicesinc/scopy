@@ -5,6 +5,7 @@
 
 #include <QLabel>
 #include <QLineEdit>
+#include <QPushButton>
 #include <QWidget>
 #include <lcdNumber.hpp>
 
@@ -37,13 +38,14 @@ public:
 Q_SIGNALS:
 	void widgetClicked();
 	void titleChanged(QString newTitle);
+	void removeMonitor();
 
 private:
 	QWidget *m_header;
 	QLabel *m_measuringUnit;
 	QLineEdit *m_title;
 	MonitorPlot *m_monitorPlot;
-
+	QPushButton *removeBtn;
 	UnitOfMeasurement *m_measureUnit;
 
 	bool eventFilter(QObject *watched, QEvent *event) override;

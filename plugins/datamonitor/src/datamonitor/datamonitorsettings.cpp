@@ -1,3 +1,4 @@
+#include "curvestylemenu.hpp"
 #include "datamonitorsettings.hpp"
 #include "plottimeaxiscontroller.hpp"
 
@@ -10,6 +11,7 @@
 #include <menucollapsesection.h>
 #include <menucontrolbutton.h>
 #include <menusectionwidget.h>
+#include <mousewheelwidgetguard.h>
 #include <plotchannel.h>
 
 using namespace scopy;
@@ -47,13 +49,6 @@ void DataMonitorSettings::init(QString title, QColor color)
 	scrollArea->setWidget(settingsBody);
 	mainLayout->addWidget(scrollArea);
 
-	MenuSectionWidget *removeMonitorSection = new MenuSectionWidget(this);
-	layout->addWidget(removeMonitorSection);
-
-	deleteMonitor = new QPushButton("Delete monitor view");
-	removeMonitorSection->contentLayout()->addWidget(deleteMonitor);
-	connect(deleteMonitor, &QPushButton::clicked, this, &DataMonitorSettings::removeMonitor);
-
 	MenuSectionWidget *togglePlotContainer = new MenuSectionWidget(this);
 
 	plotSwitch = new MenuOnOffSwitch("Toggle Plot ", togglePlotContainer, false);
@@ -77,6 +72,9 @@ void DataMonitorSettings::init(QString title, QColor color)
 	connect(curveMenu, &CurveStyleMenu::curveStyleIndexChanged, m_plot, &MonitorPlot::changeCurveStyle);
 
 	layout->addWidget(curveMenu);
+
+	MouseWheelWidgetGuard *mouseWheelWidgetGuard = new MouseWheelWidgetGuard(this);
+	mouseWheelWidgetGuard->installEventRecursively(this);
 
 	DataMonitorStyleHelper::DataMonitorSettingsStyle(this);
 }
@@ -111,6 +109,7 @@ void DataMonitorSettings::addMonitor(QString monitor, QColor monitorColor)
 	}
 
 	MenuControlButton *monitorChannel = new MenuControlButton(deviceMap.value(dev));
+	monitorChannel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
 	deviceMap.value(dev)->contentLayout()->addWidget(monitorChannel);
 	monitorChannel->setName(monitor);
 	monitorChannel->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
@@ -122,7 +121,6 @@ void DataMonitorSettings::addMonitor(QString monitor, QColor monitorColor)
 	monitorsGroup->addButton(monitorChannel);
 
 	// apply hover to the buttons based on the color they have
-	// ?? hover as option for MenuControlButton
 	monitorChannel->setStyleSheet(QString(":hover{ background-color: %1 ; }").arg(monitorColor.name()));
 
 	connect(monitorChannel, &MenuControlButton::clicked, monitorChannel->checkBox(), &QCheckBox::toggle);
@@ -237,5 +235,11 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 	return yaxisContainer;
 }
 
+bool DataMonitorSettings::eventFilter(QObject *watched, QEvent *event)
 {
+	if(event->type() == QEvent::Wheel) {
+		return true;
+	}
+
+	return QWidget::eventFilter(watched, event);
 }
