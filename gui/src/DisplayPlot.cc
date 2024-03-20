@@ -122,6 +122,8 @@ void OscScaleDraw::enableDeltaLabel(bool enable)
 	}
 }
 
+void OscScaleDraw::setUnitsEnabled(bool enable) { m_unitsEn = enable; }
+
 void OscScaleDraw::draw(QPainter *painter, const QPalette &palette) const
 {
 	int nrMajorTicks = scaleDiv().ticks(QwtScaleDiv::MajorTick).size();
@@ -237,29 +239,34 @@ QwtText OscScaleDraw::label(double value) const
 
 	value *= m_displayScale;
 
-	if(m_formatter) {
-		m_formatter->getFormatAttributes(value, prefix, scale);
-	}
-
-	if(orientation() == Qt::Vertical) {
-		double absVal = value > 0 ? value : -value;
-		if(absVal > 1e-2 && prefix == "m") {
-			scale = 1.0;
-			prefix = "";
-		} else if(absVal > 1e-5 && prefix == "μ") {
-			scale = 1e-3;
-			prefix = "m";
-		} else if(absVal > 1e-8 && prefix == "n") {
-			scale = 1e-6;
-			prefix = "μ";
-		} else if(absVal > 1e-11 && prefix == "p") {
-			scale = 1e-9;
-			prefix = "n";
+	QwtText text;
+	if(m_unitsEn) {
+		if(m_formatter) {
+			m_formatter->getFormatAttributes(value, prefix, scale);
 		}
-	}
 
-	QwtText text(sign + QLocale().toString(value / scale, 'f', m_floatPrecision + bonusPrecision) + ' ' + prefix +
-		     m_unit);
+		if(orientation() == Qt::Vertical) {
+			double absVal = value > 0 ? value : -value;
+			if(absVal > 1e-2 && prefix == "m") {
+				scale = 1.0;
+				prefix = "";
+			} else if(absVal > 1e-5 && prefix == "μ") {
+				scale = 1e-3;
+				prefix = "m";
+			} else if(absVal > 1e-8 && prefix == "n") {
+				scale = 1e-6;
+				prefix = "μ";
+			} else if(absVal > 1e-11 && prefix == "p") {
+				scale = 1e-9;
+				prefix = "n";
+			}
+		}
+
+		text = QwtText(sign + QLocale().toString(value / scale, 'f', m_floatPrecision + bonusPrecision) + ' ' +
+			       prefix + m_unit);
+	} else {
+		text = QwtText(sign + QLocale().toString(value / scale, 'f', m_floatPrecision + bonusPrecision));
+	}
 
 	if(m_color != Qt::gray)
 		text.setColor(m_color);

@@ -202,6 +202,7 @@ void PlotWidget::addPlotChannel(PlotChannel *ch)
 
 	m_navigator->addChannel(ch);
 	m_tracker->addChannel(ch);
+	Q_EMIT addedChannel(ch);
 }
 
 void PlotWidget::removePlotChannel(PlotChannel *ch)
@@ -210,7 +211,10 @@ void PlotWidget::removePlotChannel(PlotChannel *ch)
 
 	m_navigator->removeChannel(ch);
 	m_tracker->removeChannel(ch);
+	Q_EMIT removedChannel(ch);
 }
+
+QList<PlotChannel *> PlotWidget::getChannels() { return m_plotChannels; }
 
 void PlotWidget::addPlotAxisHandle(PlotAxisHandle *ax) { m_plotAxisHandles[ax->axis()->position()].append(ax); }
 
@@ -322,7 +326,15 @@ void PlotWidget::selectChannel(PlotChannel *ch)
 		m_selectedChannel->raise();
 	}
 
-	Q_EMIT channelSelected(ch);
+	Q_EMIT channelSelected(m_selectedChannel);
+}
+
+void PlotWidget::setUnitsVisible(bool visible)
+{
+	for(PlotChannel *ch : getChannels()) {
+		ch->xAxis()->setUnitsVisible(visible);
+		ch->yAxis()->setUnitsVisible(visible);
+	}
 }
 
 PlotChannel *PlotWidget::selectedChannel() const { return m_selectedChannel; }

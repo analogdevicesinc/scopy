@@ -10,30 +10,22 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
 	, m_plot(p->plot())
 	, m_position(position)
 	, m_axisId(QwtAxisId(position))
+	, m_units("")
 {
 	m_min = -1;
 	m_max = 1;
 	m_divs = (isHorizontal()) ? 11.0 : 11.0;
 
-	m_zoomer = nullptr;
 	m_id = m_plotWidget->plotAxis(m_position).count();
 	m_axisId = QwtAxisId(m_position, m_id);
 	m_plot->setAxesCount(position, m_id + 1);
 
 	updateAxisScale();
 
-	// move this outside (?)
-	if(isHorizontal()) {
-		auto prefixFormatter = new MetricPrefixFormatter();
-		prefixFormatter->setTrimZeroes(true);
-		prefixFormatter->setTwoDecimalMode(true);
-		m_scaleDraw = new OscScaleDraw(prefixFormatter, "");
-	} else {
-		auto prefixFormatter = new MetricPrefixFormatter();
-		prefixFormatter->setTrimZeroes(true);
-		prefixFormatter->setTwoDecimalMode(true);
-		m_scaleDraw = new OscScaleDraw(prefixFormatter, "");
-	}
+	m_formatter = new MetricPrefixFormatter();
+	m_formatter->setTrimZeroes(true);
+	m_formatter->setTwoDecimalMode(true);
+	m_scaleDraw = new OscScaleDraw(m_formatter, m_units);
 
 	m_scaleDraw->setColor(pen.color());
 	m_plot->setAxisScaleDraw(m_axisId, m_scaleDraw);
@@ -45,35 +37,14 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
 	m_plotWidget->addPlotAxis(this);
 
 	setupAxisScale();
-	if(isVertical()) {
-		setupZoomer();
-	}
 	setVisible(false);
 
 	connect(this, &PlotAxis::minChanged, this, &PlotAxis::updateAxisScale);
 	connect(this, &PlotAxis::maxChanged, this, &PlotAxis::updateAxisScale);
+	setUnitsVisible(false);
 }
 
-void PlotAxis::setupZoomer()
-{
-	// zoomer
-	// OscPlotZoomer - need constructor -
-
-	//	m_zoomer = new QwtPlotZoomer(m_plotWidget->xAxis()->axisId(), m_axisId, m_plot->canvas(), false);
-
-	//	m_zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
-	//							  Qt::RightButton, Qt::ControlModifier);
-	//	m_zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
-	//							  Qt::RightButton);
-
-	//	m_zoomer->setZoomBase(false);
-	//	m_zoomer->setEnabled(true);
-
-	//	connect(m_zoomer,&QwtPlotZoomer::zoomed,this, [=](const QRectF &rect ) {
-	//		qInfo()<< rect<< m_zoomer->zoomRectIndex() << "ZoomOut";
-	//		m_scaleDraw->invalidateCache();
-	//	});  - zoom out doesn't work correctly
-}
+void PlotAxis::setUnitsVisible(bool visible) { m_scaleDraw->setUnitsEnabled(visible); }
 
 void PlotAxis::setupAxisScale()
 {
@@ -101,6 +72,26 @@ bool PlotAxis::isHorizontal() { return (m_position == QwtAxis::XBottom || m_posi
 bool PlotAxis::isVertical() { return (m_position == QwtAxis::YLeft || m_position == QwtAxis::YRight); }
 
 double PlotAxis::divs() const { return (m_divs - 1); }
+
+void PlotAxis::setFromatter(PrefixFormatter *formatter)
+{
+	m_formatter = formatter;
+	m_scaleDraw->setFormatter(m_formatter);
+
+	Q_EMIT formatterChanged(formatter);
+}
+
+PrefixFormatter *PlotAxis::getFromatter() { return m_formatter; }
+
+void PlotAxis::setUnits(QString units)
+{
+	m_units = units;
+	m_scaleDraw->setUnitType(m_units);
+
+	Q_EMIT unitsChanged(units);
+}
+
+QString PlotAxis::getUnits() { return m_units; }
 
 void PlotAxis::setDivs(double divs)
 {
@@ -143,8 +134,6 @@ void PlotAxis::setMax(double newMax)
 OscScaleDraw *PlotAxis::scaleDraw() const { return m_scaleDraw; }
 
 OscScaleEngine *PlotAxis::scaleEngine() const { return m_scaleEngine; }
-
-QwtPlotZoomer *PlotAxis::zoomer() const { return m_zoomer; }
 
 double PlotAxis::max() const { return m_max; }
 
