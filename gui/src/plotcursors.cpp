@@ -14,10 +14,10 @@ PlotCursors::~PlotCursors() {}
 
 void PlotCursors::initUI()
 {
-	m_vCursors.first = new VCursor(m_plot, m_plot->plotAxis(QwtAxis::YLeft)[0]); // default y-axis
-	m_vCursors.second = new VCursor(m_plot, m_plot->plotAxis(QwtAxis::YLeft)[0]);
-	m_hCursors.first = new HCursor(m_plot, m_plot->xAxis());
-	m_hCursors.second = new HCursor(m_plot, m_plot->xAxis());
+	m_vCursors.first = new VCursor(m_plot, m_plot->selectedChannel()->yAxis());
+	m_vCursors.second = new VCursor(m_plot, m_plot->selectedChannel()->yAxis());
+	m_hCursors.first = new HCursor(m_plot, m_plot->selectedChannel()->xAxis());
+	m_hCursors.second = new HCursor(m_plot, m_plot->selectedChannel()->xAxis());
 
 	plotMarker1 = new QwtPlotMarker();
 	plotMarker2 = new QwtPlotMarker();
@@ -45,6 +45,12 @@ void PlotCursors::connectSignals()
 		if(m_tracking) {
 			displayIntersection();
 		}
+	});
+	connect(m_plot, &PlotWidget::channelSelected, this, [=](PlotChannel *ch) {
+		m_vCursors.first->setAxis(ch->yAxis());
+		m_vCursors.second->setAxis(ch->yAxis());
+		m_hCursors.first->setAxis(ch->xAxis());
+		m_hCursors.second->setAxis(ch->xAxis());
 	});
 }
 

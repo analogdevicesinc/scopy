@@ -49,15 +49,6 @@ void PlotTracker::removeChannel(PlotChannel *ch)
 	}
 }
 
-void PlotTracker::setYAxisUnit(QString unit)
-{
-	m_yAxisUnit = unit;
-
-	for(ChannelTracker *chTracker : *m_trackers) {
-		chTracker->tracker->setYAxisUnit(m_yAxisUnit);
-	}
-}
-
 ChannelTracker *PlotTracker::createTracker(PlotChannel *ch)
 {
 	ChannelTracker *chTracker = new ChannelTracker();
@@ -70,15 +61,15 @@ ChannelTracker *PlotTracker::createTracker(PlotChannel *ch)
 	tracker->setYAxis(ch->yAxis()->axisId());
 	tracker->setColor(ch->curve()->pen().color());
 	tracker->setEnabled(m_plot->selectedChannel() == ch);
+	tracker->setXAxisUnit(ch->xAxis()->getUnits());
+	tracker->setYAxisUnit(ch->yAxis()->getUnits());
+	tracker->setXFormatter(ch->xAxis()->getFromatter());
+	tracker->setYFormatter(ch->yAxis()->getFromatter());
 
-	// PLOT AXIS SHOULD CONTAIN FORMATTER AND UNITS
-	// PLOTAXIS USE OSCSCALEDRAW WHICH IS IN DISPLAYPLOT
-	MetricPrefixFormatter *formatter = new MetricPrefixFormatter();
-	formatter->setTrimZeroes(true);
-	formatter->setTwoDecimalMode(true);
-	tracker->setXFormatter(formatter);
-	tracker->setXAxisUnit("s");
-	tracker->setYAxisUnit(m_yAxisUnit);
+	connect(ch->xAxis(), &PlotAxis::formatterChanged, tracker, &BasicTracker::setXFormatter);
+	connect(ch->yAxis(), &PlotAxis::formatterChanged, tracker, &BasicTracker::setYFormatter);
+	connect(ch->xAxis(), &PlotAxis::unitsChanged, tracker, &BasicTracker::setXAxisUnit);
+	connect(ch->yAxis(), &PlotAxis::unitsChanged, tracker, &BasicTracker::setYAxisUnit);
 
 	return chTracker;
 }
