@@ -20,7 +20,6 @@
 
 #include "scopystatusbar.h"
 #include "stylehelper.h"
-#include <pluginbase/statusbarmanager.h>
 #include <QLoggingCategory>
 #include <QApplication>
 #include <QTimer>
@@ -34,10 +33,16 @@ ScopyStatusBar::ScopyStatusBar(QWidget *parent)
 	: MenuVAnim(parent)
 {
 	initUi();
+	m_statusManager = StatusBarManager::GetInstance();
+	connect(m_statusManager, &StatusBarManager::sendStatus, this, &ScopyStatusBar::displayStatusMessage);
+	connect(m_statusManager, &StatusBarManager::clearDisplay, this, &ScopyStatusBar::clearStatusMessage);
+}
 
-	auto statusManager = StatusBarManager::GetInstance();
-	connect(statusManager, &StatusBarManager::sendStatus, this, &ScopyStatusBar::displayStatusMessage);
-	connect(statusManager, &StatusBarManager::clearDisplay, this, &ScopyStatusBar::clearStatusMessage);
+ScopyStatusBar::~ScopyStatusBar()
+{
+	clearStatusMessage();
+	disconnect(m_statusManager, &StatusBarManager::sendStatus, this, &ScopyStatusBar::displayStatusMessage);
+	disconnect(m_statusManager, &StatusBarManager::clearDisplay, this, &ScopyStatusBar::clearStatusMessage);
 }
 
 void ScopyStatusBar::initUi()
