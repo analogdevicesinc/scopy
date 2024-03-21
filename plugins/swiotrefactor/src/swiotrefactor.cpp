@@ -4,7 +4,7 @@
 #include <QLabel>
 
 #include "max14906/max14906.h"
-#include "faults.h"
+#include "faults/faults.h"
 
 Q_LOGGING_CATEGORY(CAT_SWIOTREFACTOR, "SWIOTREFACTORPlugin")
 using namespace scopy::swiotrefactor;
@@ -79,7 +79,7 @@ bool SWIOTREFACTORPlugin::onConnect()
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
 
-	Faults *faults = new Faults();
+	Faults *faults = new Faults(m_param, m_toolList[1]);
 	m_toolList[1]->setTool(faults);
 	m_toolList[1]->setEnabled(true);
 	m_toolList[1]->setRunBtnVisible(true);
