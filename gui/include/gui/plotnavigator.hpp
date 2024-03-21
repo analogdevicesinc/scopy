@@ -57,6 +57,7 @@ public:
 	void setEnabled(bool en);
 
 	void setBaseRect(const QRectF &rect);
+	void setBaseRect(QwtAxisId axisId);
 	void setBaseRect();
 
 	void setBounded(bool bounded);
