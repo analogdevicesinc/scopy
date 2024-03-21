@@ -3,8 +3,7 @@
 #include <QLoggingCategory>
 #include <QLabel>
 
-#include "iiodebuginstrument.h"
-#include "iioutil/contextprovider.h"
+#include <iioutil/connectionprovider.h>
 
 Q_LOGGING_CATEGORY(CAT_IIODEBUGPLUGIN, "IIODebugPlugin")
 using namespace scopy::iiodebugplugin;
@@ -64,7 +63,21 @@ void IIODebugPlugin::unload()
 { /*delete m_infoPage;*/
 }
 
-QString IIODebugPlugin::description() { return "Write the plugin description here"; }
+QString IIODebugPlugin::description() { return "Tool for interacting with IIO attributes."; }
+
+QString IIODebugPlugin::version() { return "0.1"; }
+
+void IIODebugPlugin::saveSettings(QSettings &s)
+{
+	m_pluginApi->save(s);
+	m_iioDebugger->saveSettings(s);
+}
+
+void IIODebugPlugin::loadSettings(QSettings &s)
+{
+	m_pluginApi->load(s);
+	m_iioDebugger->loadSettings(s);
+}
 
 bool IIODebugPlugin::onConnect()
 {
@@ -72,12 +85,15 @@ bool IIODebugPlugin::onConnect()
 	// compatible to that device
 	// In case of success the function must return true and false otherwise
 
-	auto *cp = ContextProvider::GetInstance();
-	struct iio_context *context = cp->open(m_param);
-	auto *iio_debugger = new IIODebugInstrument(context);
-	m_toolList[0]->setTool(iio_debugger);
+	auto *cp = ConnectionProvider::GetInstance();
+	Connection *conn = cp->open(m_param);
+	m_iioDebugger = new IIODebugInstrument(conn->context(), m_param);
+	m_toolList[0]->setTool(m_iioDebugger);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
+
+	m_pluginApi = new IIODebugPlugin_API(this);
+	m_pluginApi->setObjectName(m_name);
 
 	return true;
 }
@@ -112,3 +128,9 @@ void IIODebugPlugin::initMetadata()
 	}
 )plugin");
 }
+
+// ----------------------------
+
+QString IIODebugPlugin_API::debugTest() const { return m_debugTest; }
+
+void IIODebugPlugin_API::setDebugTest(const QString &newDebugTest) { m_debugTest = "ajndjsadjba"; }
