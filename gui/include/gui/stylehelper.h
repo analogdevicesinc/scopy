@@ -103,6 +103,9 @@ public:
 	static void WarningLabel(QLabel *w, QString objectName = "");
 	static void NoBackgroundIconButton(QPushButton *w, QIcon icon, QString objectName = "");
 	static void OrangeWidget(QWidget *w, QString objectName = "");
+	static void ActiveStoredLabel(QLabel *w, QString objectName = "");
+	static void FaultsFrame(QFrame *w, QString objectName = "");
+	static void FaultsExplanation(QWidget *w, QString objectName = "");
 
 private:
 	QMap<QString, QString> colorMap;

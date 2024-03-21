@@ -33,6 +33,8 @@ file(
 	# some of these will eventually be moved to the core/gui directories
 	src/max14906/*.cpp
 	src/max14906/*.cc
+	src/faults/*.cpp
+	src/faults/*.cc
 	src/*.cpp
 	src/*.cc
 	model/*
@@ -45,6 +47,8 @@ file(
 	include/${SCOPY_MODULE}/*.hpp
 	include/${SCOPY_MODULE}/max14906/*.h
 	include/${SCOPY_MODULE}/max14906/*.hpp
+	include/${SCOPY_MODULE}/faults/*.h
+	include/${SCOPY_MODULE}/faults/*.hpp
 )
 file(GLOB UI_LIST ui/*.ui)
 

@@ -52,6 +52,7 @@ void StyleHelper::initColorMap()
 	sh->colorMap.insert("ProgressBarBusy", "#F8E71C");
 
 	sh->colorMap.insert("WarningText", "#FFC904");
+	sh->colorMap.insert("GrayText", "#5c5c5c");
 }
 
 QString StyleHelper::getColor(QString id)
@@ -1273,6 +1274,45 @@ void StyleHelper::OrangeWidget(QWidget *w, QString objectName)
 			}
 			)css");
 	style.replace("&&orange&&", StyleHelper::getColor("CH0"));
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::ActiveStoredLabel(QLabel *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+	QString style = QString(R"css(
+			QLabel{
+				background-color:  transparent; width: 40px; height: 14px; border: 2px solid ; border-radius: 8px; border-color: white;
+			}
+			QLabel[high=false] { border-color: white; background-color:  transparent; }
+			QLabel[high=true] { border-color: white; background-color: white; }
+			)css");
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::FaultsFrame(QFrame *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+	QString style = QString(R"css(
+			QFrame[pressed=true] { background-color: &&elementHighlight&&; border: 1px solid &&elementBackground&&; border-radius:5px; }
+			)css");
+	style.replace("&&elementHighlight&&", StyleHelper::getColor("UIElementHighlight"));
+	style.replace("&&elementBackground&&", StyleHelper::getColor("UIElementBackground"));
+
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::FaultsExplanation(QWidget *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+	QString style = QString(R"css(
+			QWidget[highlighted=true]{color:white;}
+			QWidget{color:&&defaultColor&&;}
+			)css");
+	style.replace("&&defaultColor&&", StyleHelper::getColor("GrayText"));
 	w->setStyleSheet(style);
 }
 
