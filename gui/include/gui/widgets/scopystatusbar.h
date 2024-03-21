@@ -28,6 +28,7 @@
 #include <QLabel>
 #include <QList>
 #include <QStackedWidget>
+#include <pluginbase/statusbarmanager.h>
 #include "pluginbase/statusmessage.h"
 #include "utils.h"
 #include "menu_anim.hpp"
@@ -40,6 +41,7 @@ class SCOPY_GUI_EXPORT ScopyStatusBar : public MenuVAnim
 	QWIDGET_PAINT_EVENT_HELPER
 public:
 	explicit ScopyStatusBar(QWidget *parent = nullptr);
+	~ScopyStatusBar();
 
 Q_SIGNALS:
 	void requestHistory();
@@ -60,6 +62,7 @@ private:
 	// UI elements
 	QStackedWidget *m_stackedWidget;
 	QWidget *m_rightWidget;
+	StatusBarManager *m_statusManager;
 };
 } // namespace scopy
 
