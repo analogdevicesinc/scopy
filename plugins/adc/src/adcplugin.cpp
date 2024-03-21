@@ -128,6 +128,49 @@ void ADCPlugin::loadToolList()
 		SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
 }
 
+
+GRTopBlockNode *ADCPlugin::createGRIIOTreeNode(iio_context *ctx)
+{
+	GRTopBlock *top = new GRTopBlock("ctx", this);
+	GRTopBlockNode *ctxNode = new GRTopBlockNode(top, nullptr);
+
+	int devCount = iio_context_get_devices_count(ctx);
+	qDebug(CAT_ADCPLUGIN) << " Found " << devCount << "devices";
+	for(int i = 0; i < devCount; i++) {
+		iio_device *dev = iio_context_get_device(ctx, i);
+		QString dev_name = QString::fromLocal8Bit(iio_device_get_name(dev));
+
+		qDebug(CAT_ADCPLUGIN) << "Looking for scanelements in " << dev_name;
+		/*if(dev_name == "m2k-logic-analyzer-rx")
+			continue;*/
+
+		QStringList channelList;
+
+		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(ctx,dev_name,dev_name,0x400,ctxNode);
+		GRIIODeviceSourceNode *d = new GRIIODeviceSourceNode(gr_dev, ctxNode);
+		ctxNode->addChild(d);
+		int j;
+		for(j = 0; j < iio_device_get_channels_count(dev); j++) {
+			struct iio_channel *chn = iio_device_get_channel(dev, j);
+			QString chn_name = QString::fromLocal8Bit(iio_channel_get_id(chn));
+			qDebug(CAT_ADCPLUGIN) << "Verify if " << chn_name << "is scan element";
+			if(chn_name == "timestamp" /*|| chn_name == "accel_z" || chn_name =="accel_y"*/)
+				continue;
+			if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
+				GRIIOFloatChannelSrc *ch = new GRIIOFloatChannelSrc(gr_dev,chn_name,d);
+				GRIIOFloatChannelNode *c = new GRIIOFloatChannelNode(ch,d);
+				top->registerSignalPath(c->signalPath());
+				d->addChild(c);
+			}
+		}
+		if(j > 0) { // at least one scan element
+			top->registerIIODeviceSource(gr_dev);
+		}
+
+	}
+	return ctxNode;
+}
+
 PlotProxy *ADCPlugin::createRecipe(iio_context *ctx)
 {
 	QStringList deviceList;
@@ -207,10 +250,13 @@ bool ADCPlugin::onConnect()
 
 	// create gnuradio flow out of channels
 	// pass channels to ADC instrument - figure out channel model (sample rate/ size/ etc)
+	AcqTree *tree = new AcqTree(this);
 
-	auto recipe = createRecipe(m_ctx);
+	auto recipe = createGRIIOTreeNode(m_ctx);
+	tree->m_nodes.append(recipe);
+	recipe->setParent(tree);
 
-	time = new AdcInstrument(recipe);
+	// time = new AdcInstrument(recipe);
 	m_toolList[0]->setTool(time);
 
 	return true;

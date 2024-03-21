@@ -1,6 +1,7 @@
 #ifndef TESTPLUGIN_H
 #define TESTPLUGIN_H
 
+#include "src/adcacquisitionmanager.h"
 #define SCOPY_PLUGIN_NAME ADCPlugin
 
 #include "scopy-adcplugin_export.h"
@@ -40,6 +41,7 @@ using namespace grutil;
 // spectrumchanneladdon
 // fft sweep addon
 // waterfall plot addon
+
 
 class SCOPY_ADCPLUGIN_EXPORT ChannelIdProvider : public QObject
 {
@@ -183,6 +185,9 @@ private:
 	iio_context *m_ctx;
 	QWidget *time;
 	QLineEdit *edit;
+
+	GRTopBlockNode *createGRIIOTreeNode(iio_context *ctx);
+
 	PlotProxy *createRecipe(iio_context *ctx);
 	GRTimePlotProxy *recipe;
 };

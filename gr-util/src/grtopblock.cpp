@@ -118,6 +118,11 @@ void GRTopBlock::run()
 	top->wait();
 }
 
+QString GRTopBlock::name() const
+{
+	return m_name;
+}
+
 void GRTopBlock::rebuild()
 {
 	qInfo(SCOPY_GR_UTIL) << "Rebuilding top block";
