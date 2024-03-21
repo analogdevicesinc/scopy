@@ -7,13 +7,13 @@
 #include <gr-util/griiofloatchannelsrc.h>
 #include <gr-util/grsignalpath.h>
 #include <gr-util/grscaleoffsetproc.h>
-
+#include <scopy-adcplugin_export.h>
 
 namespace scopy {
 using namespace grutil;
 class AcqTreeNode;
 
-class AcqTree : public QObject {
+class SCOPY_ADCPLUGIN_EXPORT AcqTree : public QObject {
 	Q_OBJECT
 public:
 	AcqTree(QObject *parent = nullptr);;
@@ -24,7 +24,7 @@ public:
 
 };
 
-class AcqTreeNode : public QObject {
+class SCOPY_ADCPLUGIN_EXPORT AcqTreeNode : public QObject {
 	Q_OBJECT
 public:
 	AcqTreeNode(QString name, QObject *parent = nullptr);
@@ -44,17 +44,17 @@ protected:
 
 };
 
-class IIOContextNode : public AcqTreeNode {
+class SCOPY_ADCPLUGIN_EXPORT IIOContextNode : public AcqTreeNode {
 
 };
 
-class GRTopBlockNode : public AcqTreeNode {
+class SCOPY_ADCPLUGIN_EXPORT GRTopBlockNode : public AcqTreeNode {
 public:
 	GRTopBlockNode(GRTopBlock *g, QObject *parent = nullptr);
 	~GRTopBlockNode();
 };
 
-class GRIIODeviceSourceNode : public AcqTreeNode {
+class SCOPY_ADCPLUGIN_EXPORT GRIIODeviceSourceNode : public AcqTreeNode {
 public:
 	GRIIODeviceSourceNode(GRIIODeviceSource *d, QObject *parent = nullptr);
 	~GRIIODeviceSourceNode();
@@ -62,7 +62,7 @@ public:
 
 };
 
-class GRIIOFloatChannelNode: public AcqTreeNode {
+class SCOPY_ADCPLUGIN_EXPORT GRIIOFloatChannelNode: public AcqTreeNode {
 public:
 	GRIIOFloatChannelNode(GRIIOChannel *c, QObject *parent = nullptr);
 	~GRIIOFloatChannelNode();

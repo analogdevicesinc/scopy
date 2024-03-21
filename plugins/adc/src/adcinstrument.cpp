@@ -11,7 +11,7 @@
 using namespace scopy;
 using namespace scopy::grutil;
 
-AdcInstrument::AdcInstrument(PlotProxy *proxy, QWidget *parent)
+AdcInstrument::AdcInstrument(PlotProxy2 *proxy, QWidget *parent)
 	: QWidget(parent)
 	, proxy(proxy)
 {

@@ -13,6 +13,7 @@
 #include <gui/widgets/toolbuttons.h>
 
 namespace scopy {
+using namespace adc;
 class MenuControlButton;
 class CollapsableMenuControlButton;
 
@@ -20,7 +21,7 @@ class AdcInstrument : public QWidget
 {
 	Q_OBJECT
 public:
-	AdcInstrument(PlotProxy *proxy, QWidget *parent = nullptr);
+	AdcInstrument(PlotProxy2 *proxy, QWidget *parent = nullptr);
 	~AdcInstrument();
 	void init();
 	void deinit();
@@ -47,7 +48,7 @@ private:
 	RunBtn *runBtn;
 	SingleShotBtn *singleBtn;
 	ToolTemplate *tool;
-	PlotProxy *proxy;
+	PlotProxy2 *proxy;
 	QPushButton *openLastMenuBtn;
 
 	MenuControlButton *channelsBtn;

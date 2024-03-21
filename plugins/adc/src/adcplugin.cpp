@@ -2,6 +2,7 @@
 
 #include "adcinstrument.h"
 #include "gui/stylehelper.h"
+#include "src/adctimeinstrument.h"
 
 #include <QBoxLayout>
 #include <QJsonDocument>
@@ -16,9 +17,12 @@
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
 
+#include "timeplotproxy.h"
+
 Q_LOGGING_CATEGORY(CAT_ADCPLUGIN, "ADCPlugin");
 using namespace scopy;
 using namespace scopy::grutil;
+using namespace scopy::adc;
 
 bool ADCPlugin::compatible(QString m_param, QString category)
 {
@@ -171,7 +175,7 @@ GRTopBlockNode *ADCPlugin::createGRIIOTreeNode(iio_context *ctx)
 	return ctxNode;
 }
 
-PlotProxy *ADCPlugin::createRecipe(iio_context *ctx)
+PlotProxy2 *ADCPlugin::createRecipe(iio_context *ctx)
 {
 	QStringList deviceList;
 	QMap<QString, QStringList> devChannelMap;
@@ -256,7 +260,8 @@ bool ADCPlugin::onConnect()
 	tree->m_nodes.append(recipe);
 	recipe->setParent(tree);
 
-	// time = new AdcInstrument(recipe);
+	auto timeProxy = new TimePlotProxy(this);
+	time = new ADCTimeInstrument(timeProxy);
 	m_toolList[0]->setTool(time);
 
 	return true;

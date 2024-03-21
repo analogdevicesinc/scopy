@@ -26,6 +26,7 @@
 #include <pluginbase/pluginbase.h>
 
 namespace scopy {
+namespace adc {
 using namespace grutil;
 // timedomainplot addon
 // x-y plot addon
@@ -60,7 +61,7 @@ public:
 	int idx;
 };
 
-class SCOPY_ADCPLUGIN_EXPORT PlotProxy
+class SCOPY_ADCPLUGIN_EXPORT PlotProxy2
 {
 public:
 	virtual ToolAddon *getPlotAddon() = 0;
@@ -78,7 +79,7 @@ public:
 	virtual ChannelIdProvider *getChannelIdProvider() = 0;
 };
 
-class SCOPY_ADCPLUGIN_EXPORT GRTimePlotProxy : public QObject, public PlotProxy
+class SCOPY_ADCPLUGIN_EXPORT GRTimePlotProxy : public QObject, public PlotProxy2
 {
 	Q_OBJECT
 public:
@@ -188,10 +189,10 @@ private:
 
 	GRTopBlockNode *createGRIIOTreeNode(iio_context *ctx);
 
-	PlotProxy *createRecipe(iio_context *ctx);
+	PlotProxy2 *createRecipe(iio_context *ctx);
 	GRTimePlotProxy *recipe;
 };
-
+}
 } // namespace scopy
 
 #endif // TESTPLUGIN_H

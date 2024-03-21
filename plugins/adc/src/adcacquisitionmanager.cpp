@@ -51,3 +51,7 @@ void *AcqTreeNode::data() {
 }
 
 AcqTree::AcqTree(QObject *parent) : QObject(parent) {}
+
+AcqTree::~AcqTree() {
+
+}
