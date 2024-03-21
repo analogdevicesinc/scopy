@@ -7,13 +7,14 @@
 #include <QStandardItemModel>
 #include <QPushButton>
 #include <QLabel>
+#include <QSet>
 
 namespace scopy::iiodebugplugin {
 class SearchBar : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit SearchBar(const QStringList &options, QWidget *parent = nullptr);
+	explicit SearchBar(QSet<QString> options, QWidget *parent = nullptr);
 
 	QLineEdit *getLineEdit();
 
