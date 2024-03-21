@@ -149,14 +149,12 @@ void PlotNavigator::addNavigators(QwtAxisId axisId)
 	connect(zoomer, &PlotZoomer::zoomed, this,
 		[=](const QRectF &rect) { addRectToHistory(nav, rect, navigationType::Zoom); });
 
-	if(m_plotWidget) {
-		connect(m_plotWidget->plotAxisFromId(axisId), &PlotAxis::axisScaleUpdated, this, [=]() {
-			if(m_autoBase) {
-				setBaseRect();
-				onReset();
-			}
-		});
-	}
+	connect(m_plotWidget->plotAxisFromId(axisId), &PlotAxis::axisScaleUpdated, this, [=]() {
+		if(m_autoBase) {
+			setBaseRect(axisId);
+			Q_EMIT reset();
+		}
+	});
 }
 
 void PlotNavigator::removeNavigators(QwtAxisId axisId)
@@ -359,6 +357,16 @@ void PlotNavigator::setBaseRect(const QRectF &rect)
 	for(Navigator *nav : *m_navigators) {
 		nav->magnifier->setBaseRect(rect);
 		nav->zoomer->setBaseRect(rect);
+	}
+}
+
+void PlotNavigator::setBaseRect(QwtAxisId axisId)
+{
+	for(Navigator *nav : *m_navigators) {
+		if(nav->zoomer->getXAxis() == axisId || nav->zoomer->getYAxis() == axisId) {
+			nav->magnifier->setBaseRect();
+			nav->zoomer->setBaseRect();
+		}
 	}
 }
 
