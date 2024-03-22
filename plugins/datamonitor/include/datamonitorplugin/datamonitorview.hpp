@@ -10,12 +10,12 @@
 #include <lcdNumber.hpp>
 
 #include "monitorplot.hpp"
-#include "scopy-datamonitor_export.h"
+#include "scopy-datamonitorplugin_export.h"
 
 namespace scopy {
 namespace datamonitor {
 
-class SCOPY_DATAMONITOR_EXPORT DataMonitorView : public QFrame
+class SCOPY_DATAMONITORPLUGIN_EXPORT DataMonitorView : public QFrame
 {
 	friend class DataMonitorStyleHelper;
 	Q_OBJECT

@@ -9,7 +9,7 @@
 #include <monitorplot.hpp>
 #include <monitorplotcurve.hpp>
 #include <spinbox_a.hpp>
-#include "scopy-datamonitor_export.h"
+#include "scopy-datamonitorplugin_export.h"
 #include "qloggingcategory.h"
 
 Q_DECLARE_LOGGING_CATEGORY(CAT_DATAMONITOR_SETTINGS)
@@ -22,7 +22,7 @@ class MenuSectionWidget;
 
 class CollapsableMenuControlButton;
 namespace datamonitor {
-class SCOPY_DATAMONITOR_EXPORT DataMonitorSettings : public QWidget
+class SCOPY_DATAMONITORPLUGIN_EXPORT DataMonitorSettings : public QWidget
 {
 	friend class DataMonitorStyleHelper;
 	Q_OBJECT

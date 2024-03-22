@@ -1,4 +1,4 @@
-#include "datamonitor.h"
+#include "datamonitorplugin.h"
 #include "pluginbase/scopyjs.h"
 #include "qloggingcategory.h"
 
