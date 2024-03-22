@@ -20,7 +20,7 @@ DataMonitorController::DataMonitorController(DataAcquisitionManager *dataAcquisi
 	// plot settings
 
 	connect(m_dataMonitorSettings, &DataMonitorSettings::monitorToggled, m_dataMonitorView->monitorPlot(),
-		[=](bool toggled, QString monitorName) {
+		[=, this](bool toggled, QString monitorName) {
 			// toggle monitor active inside data acquisiton manager
 			m_dataAcquisitionManager->updateActiveMonitors(toggled, monitorName);
 
