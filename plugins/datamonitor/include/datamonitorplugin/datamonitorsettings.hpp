@@ -56,16 +56,11 @@ Q_SIGNALS:
 	void toggleRealTime(bool toggled);
 
 private:
-	MenuOnOffSwitch *peakHolderSwitch;
 	MenuOnOffSwitch *plotSwitch;
-	QPushButton *peakHolderReset;
 
 	PositionSpinButton *m_ymin;
 	PositionSpinButton *m_ymax;
 	QWidget *generateYAxisSettings(QWidget *parent);
-
-	// MenuComboWidget *mainMonitorCombo;
-	//	QPushButton *deleteMonitor;
 
 	MenuHeaderWidget *header;
 	QVBoxLayout *layout;

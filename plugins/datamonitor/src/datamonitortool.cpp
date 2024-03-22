@@ -102,7 +102,7 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 
 	Q_EMIT m_flexGridLayout->reqestLayoutUpdate();
 
-	startTime = new QLabel();
+	startTime = new QLabel(this);
 
 	connect(timeTracker, &TimeManager::timeout, dataAcquisitionManager, &DataAcquisitionManager::readData);
 

@@ -28,7 +28,6 @@ public:
 
 private:
 	PlotChannel *m_plotch;
-	PlotAxis *chPlotAxis;
 	int m_curveStyleIndex;
 	DataMonitorModel *m_dataMonitorModel;
 };

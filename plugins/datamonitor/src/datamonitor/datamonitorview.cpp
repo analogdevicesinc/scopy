@@ -26,7 +26,7 @@ DataMonitorView::DataMonitorView(QFrame *parent)
 	headerLayout->addWidget(m_measuringUnit, 1, Qt::AlignLeft);
 	headerLayout->addWidget(m_title, 1, Qt::AlignRight);
 
-	removeBtn = new QPushButton();
+	removeBtn = new QPushButton(this);
 
 	HoverWidget *removeHover = new HoverWidget(removeBtn, m_header, this);
 	removeHover->setStyleSheet("background-color: transparent; border: 0px;");
