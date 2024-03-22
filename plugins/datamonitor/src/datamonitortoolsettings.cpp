@@ -48,6 +48,7 @@ DataMonitorToolSettings::DataMonitorToolSettings(QWidget *parent)
 	MenuSectionWidget *logDataContainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *logDataSection =
 		new MenuCollapseSection("Log data", MenuCollapseSection::MHCW_NONE, logDataContainer);
+	logDataSection->contentLayout()->setSpacing(10);
 
 	dataLoggingFilePath = new QLineEdit(logDataSection);
 	dataLoggingFilePath->setReadOnly(true);
@@ -69,10 +70,10 @@ DataMonitorToolSettings::DataMonitorToolSettings(QWidget *parent)
 	connect(dataLoggingBtn, &QPushButton::clicked, this,
 		[=, this]() { Q_EMIT requestDataLogging(dataLoggingFilePath->text()); });
 
-	readIntervalSection->contentLayout()->addWidget(new QLabel("Choose file"));
-	readIntervalSection->contentLayout()->addWidget(dataLoggingFilePath);
-	readIntervalSection->contentLayout()->addWidget(dataLoggingBrowseBtn);
-	readIntervalSection->contentLayout()->addWidget(dataLoggingBtn);
+	logDataSection->contentLayout()->addWidget(new QLabel("Choose file"));
+	logDataSection->contentLayout()->addWidget(dataLoggingFilePath);
+	logDataSection->contentLayout()->addWidget(dataLoggingBrowseBtn);
+	logDataSection->contentLayout()->addWidget(dataLoggingBtn);
 
 	logDataContainer->contentLayout()->addWidget(logDataSection);
 	mainLayout->addWidget(logDataContainer);
