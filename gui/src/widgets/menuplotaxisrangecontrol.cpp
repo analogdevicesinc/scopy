@@ -10,22 +10,22 @@ MenuPlotAxisRangeControl::MenuPlotAxisRangeControl(PlotAxis *m_plotAxis, QWidget
 	setLayout(minMaxLayout);
 	minMaxLayout->setMargin(0);
 	minMaxLayout->setSpacing(10);
-
+	QString unit = m_plotAxis->getUnits();
 	m_min = new PositionSpinButton(
 		{
-			{"V", 1e0},
-			{"k", 1e3},
-			{"M", 1e6},
-			{"G", 1e9},
+			{"" + unit, 1e0},
+			{"k" + unit, 1e3},
+			{"M" + unit, 1e6},
+			{"G" + unit, 1e9},
 		},
 		"Min", -DBL_MAX, DBL_MAX, false, false, this);
 
 	m_max = new PositionSpinButton(
 		{
-			{"V", 1e0},
-			{"k", 1e3},
-			{"M", 1e6},
-			{"G", 1e9},
+			{"" + unit, 1e0},
+			{"k" + unit, 1e3},
+			{"M" + unit, 1e6},
+			{"G" + unit, 1e9},
 		},
 		"Max", -DBL_MAX, DBL_MAX, false, false, this);
 

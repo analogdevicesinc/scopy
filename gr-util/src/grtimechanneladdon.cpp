@@ -86,7 +86,7 @@ QWidget *GRTimeChannelAddon::createYAxisMenu(QWidget *parent)
 	if(m_scaleAvailable) {
 		cb->addItem(m_unit, YMODE_SCALE);
 	}
-
+	m_plotAxis->setUnits("V");
 	m_yCtrl = new MenuPlotAxisRangeControl(m_plotAxis, yaxis);
 
 	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), yaxis, false);
