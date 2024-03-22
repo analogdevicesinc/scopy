@@ -36,7 +36,7 @@ Q_SIGNALS:
 
 private:
 	ToolTemplate *tool;
-	QPushButton *openLatMenuBtn;
+	QPushButton *openLastMenuBtn;
 	GearBtn *settingsButton;
 	InfoBtn *infoBtn;
 	RunBtn *runBtn;

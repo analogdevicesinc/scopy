@@ -47,7 +47,7 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 
 	lay->addWidget(tool);
 
-	openLatMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), false, this);
+	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), false, this);
 
 	settingsButton = new GearBtn(this);
 	infoBtn = new InfoBtn(this);
@@ -56,13 +56,13 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
 
-	tool->addWidgetToTopContainerMenuControlHelper(openLatMenuBtn, TTA_RIGHT);
+	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsButton, TTA_LEFT);
 
 	tool->addWidgetToTopContainerHelper(runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(clearBtn, TTA_RIGHT);
 
-	grp = static_cast<OpenLastMenuBtn *>(openLatMenuBtn)->getButtonGroup();
+	grp = static_cast<OpenLastMenuBtn *>(openLastMenuBtn)->getButtonGroup();
 	grp->addButton(settingsButton);
 
 	// channel monitors layout
