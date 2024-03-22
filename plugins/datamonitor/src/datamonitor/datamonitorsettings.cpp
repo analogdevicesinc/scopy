@@ -126,10 +126,10 @@ void DataMonitorSettings::addMonitor(QString monitor, QColor monitorColor)
 	connect(monitorChannel, &MenuControlButton::clicked, monitorChannel->checkBox(), &QCheckBox::toggle);
 
 	connect(monitorChannel->checkBox(), &QCheckBox::toggled, this,
-		[=](bool toggled) { Q_EMIT monitorToggled(toggled, monitor); });
+		[=, this](bool toggled) { Q_EMIT monitorToggled(toggled, monitor); });
 
 	// when removing the monitor disable all active monitors
-	connect(this, &DataMonitorSettings::removeMonitor, monitorChannel, [=]() {
+	connect(this, &DataMonitorSettings::removeMonitor, monitorChannel, [=, this]() {
 		if(monitorChannel->checkBox()->isChecked()) {
 			Q_EMIT monitorToggled(false, monitor);
 		}
@@ -207,13 +207,13 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 
 	yAxisSection->contentLayout()->addWidget(yMinMax);
 
-	connect(m_autoScaleTimer, &QTimer::timeout, this, [=]() {
+	connect(m_autoScaleTimer, &QTimer::timeout, this, [=, this]() {
 		m_plot->plotYAxisAutoscale();
 		plotYAxisMinValueUpdate(m_plot->getYAxisIntervalMin());
 		plotYAxisMaxValueUpdate(m_plot->getYAxisIntervalMax());
 	});
 
-	connect(autoscale->onOffswitch(), &QAbstractButton::toggled, yMinMax, [=](bool toggled) {
+	connect(autoscale->onOffswitch(), &QAbstractButton::toggled, yMinMax, [=, this](bool toggled) {
 		plotYAxisAutoscale(toggled);
 		yMinMax->setEnabled(!toggled);
 		if(toggled) {
@@ -223,11 +223,11 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 		}
 	});
 
-	connect(m_ymin, &PositionSpinButton::valueChanged, this, [=](double value) {
+	connect(m_ymin, &PositionSpinButton::valueChanged, this, [=, this](double value) {
 		m_plot->updateYAxisIntervalMin(value);
 		m_ymax->setMinValue(value);
 	});
-	connect(m_ymax, &PositionSpinButton::valueChanged, this, [=](double value) {
+	connect(m_ymax, &PositionSpinButton::valueChanged, this, [=, this](double value) {
 		m_plot->updateYAxisIntervalMax(value);
 		m_ymin->setMaxValue(value);
 	});

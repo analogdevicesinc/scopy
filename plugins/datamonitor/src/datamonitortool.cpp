@@ -76,7 +76,7 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 	DataMonitorToolSettings *toolSettings = new DataMonitorToolSettings(this);
 	tool->rightStack()->add(DataMonitorUtils::getToolSettingsId(), toolSettings);
 
-	connect(settingsButton, &GearBtn::clicked, this, [=]() {
+	connect(settingsButton, &GearBtn::clicked, this, [=, this]() {
 		tool->openRightContainerHelper(true);
 		tool->requestMenu(DataMonitorUtils::getToolSettingsId());
 	});
@@ -106,7 +106,7 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 
 	connect(timeTracker, &TimeManager::timeout, dataAcquisitionManager, &DataAcquisitionManager::readData);
 
-	connect(runBtn, &QPushButton::toggled, this, [=](bool toggled) {
+	connect(runBtn, &QPushButton::toggled, this, [=, this](bool toggled) {
 		if(toggled) {
 			timeTracker->startTimer();
 			if(first) {
@@ -120,7 +120,7 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 		timeTracker->setIsRunning(toggled);
 	});
 
-	connect(clearBtn, &QPushButton::clicked, this, [=]() {
+	connect(clearBtn, &QPushButton::clicked, this, [=, this]() {
 		if(runBtn->isChecked()) {
 			Q_EMIT runBtn->toggled(false);
 		}
@@ -135,7 +135,7 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 
 	tool->addWidgetToTopContainerHelper(addMonitorButton, TTA_LEFT);
 
-	connect(addMonitorButton, &QPushButton::clicked, this, [=]() {
+	connect(addMonitorButton, &QPushButton::clicked, this, [=, this]() {
 		DataMonitorController *dataMonitorController = new DataMonitorController(dataAcquisitionManager, this);
 
 		int controllerId = m_flexGridLayout->addQWidgetToList(dataMonitorController->dataMonitorView());
@@ -144,7 +144,7 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 		tool->rightStack()->add(QString::number(controllerId), dataMonitorController->dataMonitorSettings());
 
 		// toggle active monitors
-		connect(dataMonitorController->dataMonitorView(), &DataMonitorView::widgetClicked, this, [=]() {
+		connect(dataMonitorController->dataMonitorView(), &DataMonitorView::widgetClicked, this, [=, this]() {
 			tool->openRightContainerHelper(true);
 			tool->requestMenu(QString::number(controllerId));
 			// TODO toggle menu for the montiro
@@ -153,7 +153,7 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 		});
 
 		// remove the monitor
-		connect(dataMonitorController->dataMonitorView(), &DataMonitorView::removeMonitor, [=]() {
+		connect(dataMonitorController->dataMonitorView(), &DataMonitorView::removeMonitor, [=, this]() {
 			m_flexGridLayout->removeWidget(controllerId);
 			tool->rightStack()->remove(QString::number(controllerId));
 			tool->openRightContainerHelper(false);
