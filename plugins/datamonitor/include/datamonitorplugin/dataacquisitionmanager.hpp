@@ -6,12 +6,12 @@
 #include <QObject>
 
 #include "datamonitormodel.hpp"
-#include "scopy-datamonitor_export.h"
+#include "scopy-datamonitorplugin_export.h"
 
 namespace scopy {
 namespace datamonitor {
 
-class SCOPY_DATAMONITOR_EXPORT DataAcquisitionManager : public QObject
+class SCOPY_DATAMONITORPLUGIN_EXPORT DataAcquisitionManager : public QObject
 {
 	Q_OBJECT
 public:

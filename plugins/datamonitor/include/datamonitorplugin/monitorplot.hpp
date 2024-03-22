@@ -9,7 +9,7 @@
 #include <QwtDateScaleDraw>
 #include <QwtDateScaleEngine>
 #include <QTimer>
-#include "scopy-datamonitor_export.h"
+#include "scopy-datamonitorplugin_export.h"
 
 namespace scopy {
 
@@ -18,7 +18,7 @@ namespace datamonitor {
 
 class MonitorPlotCurve;
 
-class SCOPY_DATAMONITOR_EXPORT MonitorPlot : public QWidget
+class SCOPY_DATAMONITORPLUGIN_EXPORT MonitorPlot : public QWidget
 {
 	friend class DataMonitorStyleHelper;
 	Q_OBJECT

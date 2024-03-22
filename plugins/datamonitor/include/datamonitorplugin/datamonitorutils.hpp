@@ -2,11 +2,11 @@
 #define DATAMONITORUTILS_HPP
 
 #include <QObject>
-#include "scopy-datamonitor_export.h"
+#include "scopy-datamonitorplugin_export.h"
 
 namespace scopy {
 namespace datamonitor {
-class SCOPY_DATAMONITOR_EXPORT DataMonitorUtils : public QObject
+class SCOPY_DATAMONITORPLUGIN_EXPORT DataMonitorUtils : public QObject
 {
 	Q_OBJECT
 public:
