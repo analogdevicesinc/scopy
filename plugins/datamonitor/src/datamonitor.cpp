@@ -88,12 +88,12 @@ bool DataMonitorPlugin::onConnect()
 
 	connect(ping, &IIOPingTask::pingFailed, this, [this]() { Q_EMIT disconnectDevice(); });
 	connect(ping, &IIOPingTask::pingSuccess, this, []() { qDebug(CAT_DATAMONITOR) << "Ping Success"; });
-	connect(tool->getRunButton(), &QPushButton::toggled, this, [=](bool en) {
+	connect(tool->getRunButton(), &QPushButton::toggled, this, [=, this](bool en) {
 		if(m_toolList[0]->running() != en) {
 			m_toolList[0]->setRunning(en);
 		}
 	});
-	connect(m_toolList[0], &ToolMenuEntry::runToggled, this, [=](bool en) {
+	connect(m_toolList[0], &ToolMenuEntry::runToggled, this, [=, this](bool en) {
 		if(tool->getRunButton()->isChecked() != en) {
 			tool->getRunButton()->setChecked(en);
 		}

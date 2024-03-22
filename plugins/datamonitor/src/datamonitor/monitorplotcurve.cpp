@@ -18,7 +18,7 @@ MonitorPlotCurve::MonitorPlotCurve(DataMonitorModel *dataMonitorModel, PlotWidge
 	m_plotch->curve()->setRawSamples(m_dataMonitorModel->getXdata()->data(), m_dataMonitorModel->getYdata()->data(),
 					 m_dataMonitorModel->getYdata()->size());
 
-	connect(dataMonitorModel, &DataMonitorModel::valueUpdated, plot, [=]() {
+	connect(dataMonitorModel, &DataMonitorModel::valueUpdated, plot, [=, this]() {
 		m_plotch->curve()->setRawSamples(m_dataMonitorModel->getXdata()->data(),
 						 m_dataMonitorModel->getYdata()->data(),
 						 m_dataMonitorModel->getYdata()->size());
