@@ -8,10 +8,12 @@
 #include <menucollapsesection.h>
 #include <menucombo.h>
 #include <menusectionwidget.h>
+#include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 
 Q_LOGGING_CATEGORY(CAT_TIME_CHANNEL, "TimeChannelAddon");
 
 using namespace scopy;
+using namespace scopy::gui;
 using namespace scopy::grutil;
 
 ChannelAddon::ChannelAddon(QString ch, PlotAddon *plotAddon, QPen pen, QObject *parent)
@@ -77,36 +79,9 @@ QWidget *ChannelAddon::createCurveMenu(QWidget *parent)
 	MenuSectionWidget *curvecontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *curve = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, curvecontainer);
 
-	QWidget *curveSettings = new QWidget(curve);
-	QHBoxLayout *curveSettingsLay = new QHBoxLayout(curveSettings);
-	curveSettingsLay->setMargin(0);
-	curveSettingsLay->setSpacing(10);
-	curveSettings->setLayout(curveSettingsLay);
+	MenuPlotChannelCurveStyleControl *curveSettings = new MenuPlotChannelCurveStyleControl(curve);
+	curveSettings->addChannels(m_plotCh);
 
-	MenuCombo *cbThicknessW = new MenuCombo("Thickness", curve);
-	auto cbThickness = cbThicknessW->combo();
-	cbThickness->addItem("1");
-	cbThickness->addItem("2");
-	cbThickness->addItem("3");
-	cbThickness->addItem("4");
-	cbThickness->addItem("5");
-
-	connect(cbThickness, qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[=](int idx) { m_plotCh->setThickness(cbThickness->itemText(idx).toFloat()); });
-	MenuCombo *cbStyleW = new MenuCombo("Style", curve);
-	auto cbStyle = cbStyleW->combo();
-	cbStyle->addItem("Lines", PlotChannel::PCS_LINES);
-	cbStyle->addItem("Dots", PlotChannel::PCS_DOTS);
-	cbStyle->addItem("Steps", PlotChannel::PCS_STEPS);
-	cbStyle->addItem("Sticks", PlotChannel::PCS_STICKS);
-	cbStyle->addItem("Smooth", PlotChannel::PCS_SMOOTH);
-	StyleHelper::MenuComboBox(cbStyle, "cbStyle");
-
-	connect(cbStyle, qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[=](int idx) { m_plotCh->setStyle(cbStyle->itemData(idx).toInt()); });
-
-	curveSettingsLay->addWidget(cbThicknessW);
-	curveSettingsLay->addWidget(cbStyleW);
 	curve->contentLayout()->addWidget(curveSettings);
 	curvecontainer->contentLayout()->addWidget(curve);
 
