@@ -3,8 +3,8 @@
 #include "qpluginloader.h"
 #include <pluginbase/plugin.h>
 
-#include <datamonitor/dataacquisitionmanager.hpp>
-#include <datamonitor/testreadstrategy.hpp>
+#include <datamonitorplugin/dataacquisitionmanager.hpp>
+#include <datamonitorplugin/testreadstrategy.hpp>
 
 using namespace scopy;
 using namespace datamonitor;
