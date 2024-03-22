@@ -69,13 +69,14 @@ void TimePlotProxy::init()
 	ToolTemplate* toolLayout = m_tool->getToolTemplate();
 	m_plotComponent = new PlotComponent(m_tool);
 	m_components.append(m_plotComponent);
+	toolLayout->addWidgetToCentralContainerHelper(m_plotComponent);
 
 	auto components = getComponents();
 	for(auto c : components) {
 		c->onInit();
 	}
 
-	toolLayout->addWidgetToCentralContainerHelper(m_plotComponent);
+
 }
 
 void TimePlotProxy::deinit()

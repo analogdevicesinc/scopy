@@ -16,17 +16,58 @@ namespace adc {
 class PlotProxy;
 class ADCTimeInstrument;
 
-class SCOPY_ADCPLUGIN_EXPORT ToolComponent
-{
+class SCOPY_ADCPLUGIN_EXPORT ToolComponent {
 public:
-	virtual QString getName() = 0;
+	virtual QString getName() const { return "ToolComponent"; };
+	virtual int priority() const { return 0;};
+	virtual void onStart() {};
+	virtual void onStop()  {};
+	virtual void onInit()  {};
+	virtual void onDeinit() {};
+};
 
-	virtual void onStart() {}
-	virtual void onStop() {}
-	virtual void onInit() {}
-	virtual void onDeinit() {}
+class SCOPY_ADCPLUGIN_EXPORT MetaComponent : public ToolComponent {
+public:
+	virtual void addComponent(ToolComponent *c) {
+		m_components.append(c);
+		std::sort(m_components.first(), m_components.last(), [](const ToolComponent &a, const ToolComponent &b){ return a.priority() > b.priority(); });
+		c->onInit();
+	};
+
+	virtual void removeComponent(ToolComponent *c) {
+		c->onDeinit();
+		m_components.removeAll(c);
+	}
+
+	virtual QList<ToolComponent*> components() const { return m_components; }
+	virtual void onStart() {
+		auto cm = components();
+		for(auto c : cm) {
+			c->onStart();
+		}
+	}
+
+	virtual void onStop() {
+		auto cm = components();
+		for(auto c : cm) {
+			c->onStop();
+		}
+
+	}
+	virtual void onInit() {
+		/*auto cm = components();
+		for(auto c : cm) {
+			c->onInit();
+		}*/
+	}
+	virtual void onDeinit() {
+		/*auto cm = components();
+		for(auto c : cm) {
+			c->onDeinit();
+		}*/
+	}
 private:
-	PlotProxy* m_proxy;
+	QList<ToolComponent*> m_components;
 };
 
 class SCOPY_ADCPLUGIN_EXPORT AcqNodeChannelAware {
