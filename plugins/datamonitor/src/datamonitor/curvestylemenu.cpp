@@ -38,7 +38,7 @@ CurveStyleMenu::CurveStyleMenu(QWidget *parent)
 	cbThicknessW->combo()->installEventFilter(this);
 
 	connect(cbThickness, qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[=](int idx) { Q_EMIT curveThicknessChanged(cbThickness->itemText(idx).toFloat()); });
+		[=, this](int idx) { Q_EMIT curveThicknessChanged(cbThickness->itemText(idx).toFloat()); });
 
 	MenuCombo *cbStyleW = new MenuCombo("Style", curve);
 	auto cbStyle = cbStyleW->combo();

@@ -50,7 +50,7 @@ void MonitorPlot::addMonitor(DataMonitorModel *dataMonitorModel)
 	plotCurve->changeCurveStyle(m_currentCurveStyle);
 	plotCurve->changeCurveThickness(m_currentCurveThickness);
 
-	connect(dataMonitorModel, &DataMonitorModel::dataCleared, this, [=]() {
+	connect(dataMonitorModel, &DataMonitorModel::dataCleared, this, [=, this]() {
 		plotCurve->clearCurveData();
 		m_plot->replot();
 	});

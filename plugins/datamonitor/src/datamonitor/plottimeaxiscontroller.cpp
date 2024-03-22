@@ -48,7 +48,7 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 
 	auto &&timeTracker = TimeManager::GetInstance();
 
-	connect(timeTracker, &TimeManager::timeout, this, [=]() {
+	connect(timeTracker, &TimeManager::timeout, this, [=, this]() {
 		if(plotNowToggle->onOffswitch()->isChecked()) {
 			// plot using current date time as starting point
 			timeEdit->setTime(QTime::currentTime());

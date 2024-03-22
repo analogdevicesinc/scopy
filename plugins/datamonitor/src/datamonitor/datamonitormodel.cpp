@@ -22,7 +22,7 @@ DataMonitorModel::DataMonitorModel(QString name, QColor color, UnitOfMeasurement
 	}
 	// TODO RESERVE SPACE FOR X AND Y DATA
 	Preferences *p = Preferences::GetInstance();
-	QObject::connect(p, &Preferences::preferenceChanged, this, [=](QString id, QVariant var) {
+	QObject::connect(p, &Preferences::preferenceChanged, this, [=, this](QString id, QVariant var) {
 		if(id.contains("datamonitor")) {
 			setDataStorageSize();
 		}

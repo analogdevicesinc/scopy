@@ -52,7 +52,7 @@ DataMonitorToolSettings::DataMonitorToolSettings(QWidget *parent)
 	dataLoggingFilePath = new QLineEdit(logDataSection);
 	dataLoggingFilePath->setReadOnly(true);
 
-	connect(dataLoggingFilePath, &QLineEdit::textChanged, this, [=](QString path) {
+	connect(dataLoggingFilePath, &QLineEdit::textChanged, this, [=, this](QString path) {
 		if(filename.isEmpty() && dataLoggingFilePath->isEnabled()) {
 			dataLoggingFilePath->setText(tr("No file selected"));
 			dataLoggingFilePath->setStyleSheet("color:red");
@@ -67,7 +67,7 @@ DataMonitorToolSettings::DataMonitorToolSettings(QWidget *parent)
 
 	dataLoggingBtn = new QPushButton("Log data", logDataSection);
 	connect(dataLoggingBtn, &QPushButton::clicked, this,
-		[=]() { Q_EMIT requestDataLogging(dataLoggingFilePath->text()); });
+		[=, this]() { Q_EMIT requestDataLogging(dataLoggingFilePath->text()); });
 
 	readIntervalSection->contentLayout()->addWidget(new QLabel("Choose file"));
 	readIntervalSection->contentLayout()->addWidget(dataLoggingFilePath);
