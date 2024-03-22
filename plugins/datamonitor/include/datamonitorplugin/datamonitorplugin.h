@@ -5,7 +5,7 @@
 
 #include "iioutil/cyclicaltask.h"
 #include "iioutil/iiopingtask.h"
-#include "scopy-datamonitor_export.h"
+#include "scopy-datamonitorplugin_export.h"
 
 #include <QMap>
 #include <QPushButton>
@@ -27,7 +27,7 @@ namespace datamonitor {
 
 class DataMonitorTool;
 
-class SCOPY_DATAMONITOR_EXPORT DataMonitorPlugin : public QObject, public PluginBase
+class SCOPY_DATAMONITORPLUGIN_EXPORT DataMonitorPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
@@ -52,7 +52,6 @@ private:
 	DataMonitorTool *tool;
 	IIOPingTask *ping;
 	CyclicalTask *cs;
-
 };
 } // namespace datamonitor
 } // namespace scopy

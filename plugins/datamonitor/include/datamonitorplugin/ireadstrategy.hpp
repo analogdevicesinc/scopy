@@ -2,11 +2,11 @@
 #define IREGISTERREADSTRATEGY_HPP
 
 #include <QObject>
-#include "scopy-datamonitor_export.h"
+#include "scopy-datamonitorplugin_export.h"
 
 namespace scopy {
 namespace datamonitor {
-class SCOPY_DATAMONITOR_EXPORT IReadStrategy : public QObject
+class SCOPY_DATAMONITORPLUGIN_EXPORT IReadStrategy : public QObject
 {
 	Q_OBJECT
 public:

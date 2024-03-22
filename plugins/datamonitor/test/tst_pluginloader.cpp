@@ -24,7 +24,7 @@ private Q_SLOTS:
 };
 
 #define PLUGIN_LOCATION "../../plugins"
-#define FILENAME PLUGIN_LOCATION "/libscopy-bareminimumplugin.so"
+#define FILENAME PLUGIN_LOCATION "/libscopy-datamonitorplugin.so"
 
 void TST_BareMinimum::fileExists()
 {

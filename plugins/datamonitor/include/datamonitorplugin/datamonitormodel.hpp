@@ -4,7 +4,7 @@
 #include "ireadstrategy.hpp"
 #include "unitofmeasurement.hpp"
 
-#include "scopy-datamonitor_export.h"
+#include "scopy-datamonitorplugin_export.h"
 
 #include <QColor>
 #include <QObject>
@@ -12,7 +12,7 @@
 namespace scopy {
 namespace datamonitor {
 
-class SCOPY_DATAMONITOR_EXPORT DataMonitorModel : public QObject
+class SCOPY_DATAMONITORPLUGIN_EXPORT DataMonitorModel : public QObject
 {
 
 	Q_OBJECT

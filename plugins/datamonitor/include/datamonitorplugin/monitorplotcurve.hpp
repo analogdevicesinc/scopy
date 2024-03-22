@@ -4,12 +4,12 @@
 #include <QObject>
 #include <plotchannel.h>
 #include "datamonitormodel.hpp"
-#include "scopy-datamonitor_export.h"
+#include "scopy-datamonitorplugin_export.h"
 
 namespace scopy {
 namespace datamonitor {
 
-class SCOPY_DATAMONITOR_EXPORT MonitorPlotCurve : public QObject
+class SCOPY_DATAMONITORPLUGIN_EXPORT MonitorPlotCurve : public QObject
 {
 	Q_OBJECT
 public:
