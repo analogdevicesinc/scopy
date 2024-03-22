@@ -31,6 +31,14 @@ DataMonitorModel::DataMonitorModel(QString name, QColor color, UnitOfMeasurement
 	setDataStorageSize();
 }
 
+DataMonitorModel::~DataMonitorModel()
+{
+	if(readStrategy)
+		delete readStrategy;
+	if(unitOfMeasure)
+		delete unitOfMeasure;
+}
+
 QString DataMonitorModel::getName() const { return name; }
 
 void DataMonitorModel::setName(QString newName) { name = newName; }

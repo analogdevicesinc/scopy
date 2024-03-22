@@ -19,6 +19,7 @@ class SCOPY_DATAMONITORPLUGIN_EXPORT DataMonitorModel : public QObject
 public:
 	explicit DataMonitorModel(QString name, QColor color, UnitOfMeasurement *unitOfMeasure = nullptr,
 				  QObject *parent = nullptr);
+	~DataMonitorModel();
 
 	QString getName() const;
 	void setName(QString newName);
@@ -64,8 +65,8 @@ private:
 	void checkMinMaxUpdate(double value);
 	void setDataStorageSize();
 
-	IReadStrategy *readStrategy;
-	UnitOfMeasurement *unitOfMeasure;
+	IReadStrategy *readStrategy = nullptr;
+	UnitOfMeasurement *unitOfMeasure = nullptr;
 };
 } // namespace datamonitor
 } // namespace scopy

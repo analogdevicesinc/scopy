@@ -24,6 +24,7 @@ class SCOPY_DATAMONITORPLUGIN_EXPORT MonitorPlot : public QWidget
 	Q_OBJECT
 public:
 	explicit MonitorPlot(QWidget *parent = nullptr);
+	~MonitorPlot();
 
 	PlotWidget *plot() const;
 	void addMonitor(DataMonitorModel *dataMonitorModel);
@@ -51,7 +52,7 @@ public:
 private:
 	PlotWidget *m_plot;
 	TimePlotInfo *m_plotInfo;
-	QMap<QString, MonitorPlotCurve *> *m_monitorCurves;
+	QMap<QString, MonitorPlotCurve *> *m_monitorCurves = nullptr;
 	bool m_firstMonitor = true;
 
 	int m_currentCurveStyle = 0;
@@ -60,7 +61,7 @@ private:
 
 	void setupXAxis();
 	void genereateScaleDraw(QString format, double offset);
-	QwtDateScaleEngine *scaleEngine;
+	QwtDateScaleEngine *scaleEngine = nullptr;
 
 	double m_startTime = 0;
 
