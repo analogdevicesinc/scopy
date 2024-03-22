@@ -132,7 +132,6 @@ void ADCPlugin::loadToolList()
 		SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
 }
 
-
 GRTopBlockNode *ADCPlugin::createGRIIOTreeNode(iio_context *ctx)
 {
 	GRTopBlock *top = new GRTopBlock("ctx", this);
@@ -150,7 +149,7 @@ GRTopBlockNode *ADCPlugin::createGRIIOTreeNode(iio_context *ctx)
 
 		QStringList channelList;
 
-		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(ctx,dev_name,dev_name,0x400,ctxNode);
+		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(ctx, dev_name, dev_name, 0x400, ctxNode);
 		GRIIODeviceSourceNode *d = new GRIIODeviceSourceNode(gr_dev, ctxNode);
 		ctxNode->addChild(d);
 		int j;
@@ -161,8 +160,8 @@ GRTopBlockNode *ADCPlugin::createGRIIOTreeNode(iio_context *ctx)
 			if(chn_name == "timestamp" /*|| chn_name == "accel_z" || chn_name =="accel_y"*/)
 				continue;
 			if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
-				GRIIOFloatChannelSrc *ch = new GRIIOFloatChannelSrc(gr_dev,chn_name,d);
-				GRIIOFloatChannelNode *c = new GRIIOFloatChannelNode(ch,d);
+				GRIIOFloatChannelSrc *ch = new GRIIOFloatChannelSrc(gr_dev, chn_name, d);
+				GRIIOFloatChannelNode *c = new GRIIOFloatChannelNode(ch, d);
 				top->registerSignalPath(c->signalPath());
 				d->addChild(c);
 			}
@@ -170,7 +169,6 @@ GRTopBlockNode *ADCPlugin::createGRIIOTreeNode(iio_context *ctx)
 		if(j > 0) { // at least one scan element
 			top->registerIIODeviceSource(gr_dev);
 		}
-
 	}
 	return ctxNode;
 }

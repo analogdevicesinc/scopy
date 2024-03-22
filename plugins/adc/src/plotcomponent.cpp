@@ -3,7 +3,8 @@
 using namespace scopy;
 using namespace adc;
 
-PlotComponent::PlotComponent(QWidget *parent) : QWidget(parent)
+PlotComponent::PlotComponent(QWidget *parent)
+	: QWidget(parent)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_lay = new QVBoxLayout(this);
@@ -14,42 +15,18 @@ PlotComponent::PlotComponent(QWidget *parent) : QWidget(parent)
 	setLayout(m_lay);
 }
 
-PlotComponent::~PlotComponent()
-{
+PlotComponent::~PlotComponent() {}
 
-}
+PlotWidget *PlotComponent::plot() { return m_plot; }
 
-PlotWidget *PlotComponent::plot()
-{
-	return m_plot;
-}
+void PlotComponent::replot() { m_plot->replot(); }
 
-void PlotComponent::replot()
-{
-	m_plot->replot();
-}
+QString PlotComponent::getName() { return "PlotComponent"; }
 
-QString PlotComponent::getName()
-{
-	return "PlotComponent";
-}
+void PlotComponent::onStart() {}
 
-void PlotComponent::onStart()
-{
+void PlotComponent::onStop() {}
 
-}
+void PlotComponent::onInit() {}
 
-void PlotComponent::onStop()
-{
-
-}
-
-void PlotComponent::onInit()
-{
-
-}
-
-void PlotComponent::onDeinit()
-{
-
-}
+void PlotComponent::onDeinit() {}

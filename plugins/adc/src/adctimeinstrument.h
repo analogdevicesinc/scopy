@@ -16,20 +16,24 @@
 
 namespace scopy {
 namespace adc {
-class  ADCTimeInstrument : public QWidget
+class ADCTimeInstrument : public QWidget
 {
 	Q_OBJECT
 public:
 	ADCTimeInstrument(PlotProxy *proxy, QWidget *parent = nullptr);
 	~ADCTimeInstrument();
 
-
-
 	bool running() const;
 	void setRunning(bool newRunning);
 
-	ToolTemplate* getToolTemplate();
-	MapStackedWidget* getRightStack();
+	ToolTemplate *getToolTemplate();
+	MapStackedWidget *getRightStack();
+
+	const QString channelsMenuId = "channels";
+	const QString measureMenuId = "measure";
+	const QString statsMenuId = "stats";
+	const QString verticalChannelManagerId = "vcm";
+	const QString settingsMenuId = "settings";
 
 public Q_SLOTS:
 	void run(bool);
@@ -43,7 +47,6 @@ Q_SIGNALS:
 private:
 	void init();
 	void deinit();
-
 
 	ToolTemplate *tool;
 	PlotProxy *proxy;
@@ -67,14 +70,8 @@ private:
 
 	bool m_running;
 	Q_PROPERTY(bool running READ running WRITE setRunning NOTIFY runningChanged)
-
-	const QString channelsMenuId = "channels";
-	const QString measureMenuId = "measure";
-	const QString statsMenuId = "stats";
-	const QString verticalChannelManagerId = "vcm";
-
 };
-}
-}
+} // namespace adc
+} // namespace scopy
 
 #endif // ADCTIMEINSTRUMENT_H

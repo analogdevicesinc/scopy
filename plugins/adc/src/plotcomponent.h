@@ -24,8 +24,7 @@ public:
 	virtual PlotWidget *plot();
 public Q_SLOTS:
 	virtual void replot();
-	//virtual double sampleRate()
-
+	// virtual double sampleRate()
 
 public:
 	QString getName();
@@ -33,13 +32,13 @@ public:
 	void onStop();
 	void onInit();
 	void onDeinit();
-private:
 
+private:
 	QVBoxLayout *m_lay;
-	PlotWidget* m_plot;
+	PlotWidget *m_plot;
 };
 
-} // namespace grutil
+} // namespace adc
 } // namespace scopy
 
 #endif // PLOTCOMPONENT_H

@@ -6,35 +6,21 @@
 using namespace scopy;
 using namespace scopy::adc;
 
-TimePlotProxy::TimePlotProxy(QObject *parent) : QObject(parent)
+TimePlotProxy::TimePlotProxy(QObject *parent)
+	: QObject(parent)
 {
 	chIdP = new ChannelIdProvider(this);
-
-
 }
 
-TimePlotProxy::~TimePlotProxy() {
+TimePlotProxy::~TimePlotProxy() {}
 
-}
+ChannelIdProvider *TimePlotProxy::getChannelIdProvider() { return chIdP; }
 
-ChannelIdProvider *TimePlotProxy::getChannelIdProvider() {
-	return chIdP;
-}
+void TimePlotProxy::setInstrument(ADCTimeInstrument *t) { m_tool = t; }
 
-void TimePlotProxy::setInstrument(ADCTimeInstrument *t)
-{
-	m_tool = t;
-}
+ToolComponent *TimePlotProxy::getPlotAddon() { return (ToolComponent *)m_plotComponent; }
 
-ToolComponent *TimePlotProxy::getPlotAddon()
-{
-	return (ToolComponent*)m_plotComponent;
-}
-
-ToolComponent *TimePlotProxy::getPlotSettings()
-{
-	return (ToolComponent*)m_plotSettingsAddon;
-}
+ToolComponent *TimePlotProxy::getPlotSettings() { return (ToolComponent *)m_plotSettingsComponent; }
 
 QList<ToolComponent *> TimePlotProxy::getChannelAddons()
 {
@@ -47,36 +33,33 @@ QList<ToolComponent *> TimePlotProxy::getChannelAddons()
 	return m_components;
 }
 
-QList<ToolComponent *> TimePlotProxy::getComponents()
-{
-	return m_components;
-}
+QList<ToolComponent *> TimePlotProxy::getComponents() { return m_components; }
 
-QWidget* TimePlotProxy::getInstrument()
-{
-	return (QWidget*)(m_tool);
-}
+QWidget *TimePlotProxy::getInstrument() { return (QWidget *)(m_tool); }
 
-void TimePlotProxy::setInstrument(QWidget* t)
+void TimePlotProxy::setInstrument(QWidget *t)
 {
-	ADCTimeInstrument* ai = dynamic_cast<ADCTimeInstrument*>(t);
+	ADCTimeInstrument *ai = dynamic_cast<ADCTimeInstrument *>(t);
 	Q_ASSERT(ai);
 	m_tool = ai;
 }
 
 void TimePlotProxy::init()
 {
-	ToolTemplate* toolLayout = m_tool->getToolTemplate();
+	ToolTemplate *toolLayout = m_tool->getToolTemplate();
 	m_plotComponent = new PlotComponent(m_tool);
-	m_components.append(m_plotComponent);
+	addComponent(m_plotComponent);
+
+	m_plotSettingsComponent = new TimePlotSettingsComponent(m_plotComponent);
+	addComponent(m_plotSettingsComponent);
+
 	toolLayout->addWidgetToCentralContainerHelper(m_plotComponent);
+	toolLayout->rightStack()->add(m_tool->settingsMenuId, m_plotSettingsComponent);
 
 	auto components = getComponents();
 	for(auto c : components) {
 		c->onInit();
 	}
-
-
 }
 
 void TimePlotProxy::deinit()
@@ -105,11 +88,6 @@ void TimePlotProxy::onStop()
 	}
 }
 
-void TimePlotProxy::addChannel(AcqTreeNode *c)
-{
-}
+void TimePlotProxy::addChannel(AcqTreeNode *c) {}
 
-void TimePlotProxy::removeChannel(AcqTreeNode *c)
-{
-
-}
+void TimePlotProxy::removeChannel(AcqTreeNode *c) {}

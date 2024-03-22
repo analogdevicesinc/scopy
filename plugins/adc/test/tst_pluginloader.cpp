@@ -49,7 +49,7 @@ void TST_ADCPlugin::loaded()
 {
 	QPluginLoader qp(FILENAME, this);
 	qp.load();
-	qDebug()<<qp.errorString();
+	qDebug() << qp.errorString();
 	QVERIFY(qp.isLoaded());
 }
 

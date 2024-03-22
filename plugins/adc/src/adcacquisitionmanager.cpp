@@ -3,7 +3,9 @@
 using namespace scopy;
 using namespace scopy::grutil;
 
-GRIIOFloatChannelNode::GRIIOFloatChannelNode(GRIIOChannel *c, QObject *parent) : AcqTreeNode(c->getChannelName(), parent) {
+GRIIOFloatChannelNode::GRIIOFloatChannelNode(GRIIOChannel *c, QObject *parent)
+	: AcqTreeNode(c->getChannelName(), parent)
+{
 	m_data = c;
 	m_signalPath = new GRSignalPath("time_" + c->getDeviceSrc()->deviceName() + c->getChannelName(), this);
 	m_signalPath->append(c);
@@ -14,44 +16,46 @@ GRIIOFloatChannelNode::GRIIOFloatChannelNode(GRIIOChannel *c, QObject *parent) :
 	m_signalPath->setEnabled(false);
 }
 
-GRIIOFloatChannelNode::~GRIIOFloatChannelNode(){}
+GRIIOFloatChannelNode::~GRIIOFloatChannelNode() {}
 
-GRSignalPath *scopy::GRIIOFloatChannelNode::signalPath() const {
-	return m_signalPath;
-}
+GRSignalPath *scopy::GRIIOFloatChannelNode::signalPath() const { return m_signalPath; }
 
-GRScaleOffsetProc *scopy::GRIIOFloatChannelNode::scOff() const {
-	return m_scOff;
-}
+GRScaleOffsetProc *scopy::GRIIOFloatChannelNode::scOff() const { return m_scOff; }
 
-GRIIODeviceSourceNode::GRIIODeviceSourceNode(GRIIODeviceSource *d, QObject *parent) : AcqTreeNode(d->deviceName(), parent) {
+GRIIODeviceSourceNode::GRIIODeviceSourceNode(GRIIODeviceSource *d, QObject *parent)
+	: AcqTreeNode(d->deviceName(), parent)
+{
 	m_data = d;
 }
 
-GRIIODeviceSourceNode::~GRIIODeviceSourceNode(){}
+GRIIODeviceSourceNode::~GRIIODeviceSourceNode() {}
 
-GRTopBlockNode::GRTopBlockNode(GRTopBlock *g, QObject *parent) : AcqTreeNode(g->name(),parent) {
+GRTopBlockNode::GRTopBlockNode(GRTopBlock *g, QObject *parent)
+	: AcqTreeNode(g->name(), parent)
+{
 	m_data = g;
 }
 
 GRTopBlockNode::~GRTopBlockNode() {}
 
-AcqTreeNode::AcqTreeNode(QString name, QObject *parent) : QObject(parent) { m_name = name; }
+AcqTreeNode::AcqTreeNode(QString name, QObject *parent)
+	: QObject(parent)
+{
+	m_name = name;
+}
 
-AcqTreeNode::~AcqTreeNode() { }
+AcqTreeNode::~AcqTreeNode() {}
 
 void AcqTreeNode::addChild(AcqTreeNode *t) { m_children.append(t); }
 
 bool AcqTreeNode::removeChild(AcqTreeNode *t) { return m_children.removeAll(t); }
 
-AcqTree *AcqTreeNode::tree() { return m_tree;}
+AcqTree *AcqTreeNode::tree() { return m_tree; }
 
-void *AcqTreeNode::data() {
-	return m_data;
-}
+void *AcqTreeNode::data() { return m_data; }
 
-AcqTree::AcqTree(QObject *parent) : QObject(parent) {}
+AcqTree::AcqTree(QObject *parent)
+	: QObject(parent)
+{}
 
-AcqTree::~AcqTree() {
-
-}
+AcqTree::~AcqTree() {}

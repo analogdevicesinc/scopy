@@ -4,17 +4,15 @@ using namespace scopy;
 using namespace scopy::adc;
 ADCTimeInstrument::ADCTimeInstrument(PlotProxy *proxy, QWidget *parent)
 	: QWidget(parent)
-	, proxy(proxy) {
+	, proxy(proxy)
+{
 
 	setupToolLayout();
 	proxy->setInstrument(this);
 	init();
 }
 
-ADCTimeInstrument::~ADCTimeInstrument()
-{
-	deinit();
-}
+ADCTimeInstrument::~ADCTimeInstrument() { deinit(); }
 
 void ADCTimeInstrument::setupToolLayout()
 {
@@ -61,15 +59,21 @@ void ADCTimeInstrument::setupToolLayout()
 
 	tool->addWidgetToBottomContainerHelper(channelsBtn, TTA_LEFT);
 
+	rightMenuBtnGrp->addButton(settingsBtn);
 
 	setupChannelsButtonHelper(channelsBtn);
 	setupRunSingleButtonHelper();
 
 	vcm->add(new QLabel("test"));
 
+	connect(settingsBtn, &QPushButton::toggled, this, [=](bool b) {
+		if(b)
+			tool->requestMenu(settingsMenuId);
+	});
 }
 
-void ADCTimeInstrument::setupRunSingleButtonHelper() {
+void ADCTimeInstrument::setupRunSingleButtonHelper()
+{
 	/*connect(runBtn, &QPushButton::toggled, this, &ADCTimeInstrument::setRunning);
 	connect(singleBtn, &QPushButton::toggled, plotAddon, &GRTimePlotAddon::setSingleShot);
 	connect(singleBtn, &QPushButton::toggled, this, &ADCTimeInstrument::setRunning);
@@ -99,15 +103,9 @@ void ADCTimeInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn
 	tool->leftStack()->add(verticalChannelManagerId, vcm);
 }
 
-void ADCTimeInstrument::init()
-{
-	proxy->init();
-}
+void ADCTimeInstrument::init() { proxy->init(); }
 
-void ADCTimeInstrument::deinit()
-{
-	proxy->deinit();
-}
+void ADCTimeInstrument::deinit() { proxy->deinit(); }
 
 void ADCTimeInstrument::restart()
 {
@@ -127,14 +125,9 @@ void ADCTimeInstrument::setRunning(bool newRunning)
 	Q_EMIT runningChanged(newRunning);
 }
 
-ToolTemplate *ADCTimeInstrument::getToolTemplate()
-{
-	return tool;
-}
+ToolTemplate *ADCTimeInstrument::getToolTemplate() { return tool; }
 
-MapStackedWidget *ADCTimeInstrument::getRightStack(){
-	return rightStack;
-}
+MapStackedWidget *ADCTimeInstrument::getRightStack() { return rightStack; }
 
 void ADCTimeInstrument::start() { run(true); }
 

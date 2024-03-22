@@ -13,18 +13,20 @@ namespace scopy {
 using namespace grutil;
 class AcqTreeNode;
 
-class SCOPY_ADCPLUGIN_EXPORT AcqTree : public QObject {
+class SCOPY_ADCPLUGIN_EXPORT AcqTree : public QObject
+{
 	Q_OBJECT
 public:
-	AcqTree(QObject *parent = nullptr);;
+	AcqTree(QObject *parent = nullptr);
+	;
 	~AcqTree();
 
-	QList<AcqTreeNode*> m_nodes;
+	QList<AcqTreeNode *> m_nodes;
 	void reset();
-
 };
 
-class SCOPY_ADCPLUGIN_EXPORT AcqTreeNode : public QObject {
+class SCOPY_ADCPLUGIN_EXPORT AcqTreeNode : public QObject
+{
 	Q_OBJECT
 public:
 	AcqTreeNode(QString name, QObject *parent = nullptr);
@@ -40,29 +42,28 @@ protected:
 	AcqTree *m_tree;
 	void *m_data;
 	QString m_name;
-	QList<AcqTreeNode*> m_children;
-
+	QList<AcqTreeNode *> m_children;
 };
 
-class SCOPY_ADCPLUGIN_EXPORT IIOContextNode : public AcqTreeNode {
+class SCOPY_ADCPLUGIN_EXPORT IIOContextNode : public AcqTreeNode
+{};
 
-};
-
-class SCOPY_ADCPLUGIN_EXPORT GRTopBlockNode : public AcqTreeNode {
+class SCOPY_ADCPLUGIN_EXPORT GRTopBlockNode : public AcqTreeNode
+{
 public:
 	GRTopBlockNode(GRTopBlock *g, QObject *parent = nullptr);
 	~GRTopBlockNode();
 };
 
-class SCOPY_ADCPLUGIN_EXPORT GRIIODeviceSourceNode : public AcqTreeNode {
+class SCOPY_ADCPLUGIN_EXPORT GRIIODeviceSourceNode : public AcqTreeNode
+{
 public:
 	GRIIODeviceSourceNode(GRIIODeviceSource *d, QObject *parent = nullptr);
 	~GRIIODeviceSourceNode();
-
-
 };
 
-class SCOPY_ADCPLUGIN_EXPORT GRIIOFloatChannelNode: public AcqTreeNode {
+class SCOPY_ADCPLUGIN_EXPORT GRIIOFloatChannelNode : public AcqTreeNode
+{
 public:
 	GRIIOFloatChannelNode(GRIIOChannel *c, QObject *parent = nullptr);
 	~GRIIOFloatChannelNode();
@@ -71,7 +72,6 @@ public:
 
 	GRScaleOffsetProc *scOff() const;
 
-
 private:
 	GRSignalPath *m_signalPath;
 	GRScaleOffsetProc *m_scOff;
@@ -79,8 +79,8 @@ private:
 /*
 class IIODeviceNode : public AcqTreeNode {
 public:
-	IIODeviceNode(struct iio_device *dev, QString name, QObject *parent = nullptr) : AcqTreeNode(name,parent), m_dev(dev) {
-		m_devId = iio_device_get_id(m_dev);
+	IIODeviceNode(struct iio_device *dev, QString name, QObject *parent = nullptr) : AcqTreeNode(name,parent),
+m_dev(dev) { m_devId = iio_device_get_id(m_dev);
 	}
 	~IIODeviceNode() {}
 
@@ -96,8 +96,8 @@ private:
 
 class IIOChannelNode: public AcqTreeNode {
 public:
-     IIOChannelNode(struct iio_channel *ch, QString name, QObject *parent = nullptr) : AcqTreeNode(name,parent), m_ch(ch) {
-	     m_chId= iio_channel_get_id(m_ch);
+     IIOChannelNode(struct iio_channel *ch, QString name, QObject *parent = nullptr) : AcqTreeNode(name,parent),
+m_ch(ch) { m_chId= iio_channel_get_id(m_ch);
      }
      ~IIOChannelNode() {}
 
@@ -111,6 +111,6 @@ private:
 };
 
  */
-}
+} // namespace scopy
 
 #endif // ADCACQUISITIONMANAGER_H

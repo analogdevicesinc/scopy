@@ -43,7 +43,6 @@ using namespace grutil;
 // fft sweep addon
 // waterfall plot addon
 
-
 class SCOPY_ADCPLUGIN_EXPORT ChannelIdProvider : public QObject
 {
 	Q_OBJECT
@@ -192,7 +191,7 @@ private:
 	PlotProxy2 *createRecipe(iio_context *ctx);
 	GRTimePlotProxy *recipe;
 };
-}
+} // namespace adc
 } // namespace scopy
 
 #endif // TESTPLUGIN_H
