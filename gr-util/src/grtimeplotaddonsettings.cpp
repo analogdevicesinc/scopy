@@ -14,8 +14,10 @@
 #include <gui/widgets/menulineedit.h>
 #include <gui/widgets/menuonoffswitch.h>
 #include <gui/widgets/menusectionwidget.h>
+#include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 
 using namespace scopy::grutil;
+using namespace scopy::gui;
 
 GRTimePlotAddonSettings::GRTimePlotAddonSettings(GRTimePlotAddon *p, QObject *parent)
 	: QObject(parent)
@@ -65,13 +67,13 @@ QWidget *GRTimePlotAddonSettings::createYAxisMenu(QWidget *parent)
 	MenuSectionWidget *yaxiscontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *yaxis = new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE, yaxiscontainer);
 
-	m_yctrl = new TimeYControl(m_plot->plot()->yAxis(), yaxis);
+	m_yctrl = new MenuPlotAxisRangeControl(m_plot->plot()->yAxis(), yaxis);
 	m_singleYModeSw = new MenuOnOffSwitch("Single Y Mode", yaxis);
 	m_autoscaleBtn = new QPushButton("Autoscale", yaxis);
 
-	autoscaler = new TimeYAutoscale(this);
-	connect(autoscaler, &TimeYAutoscale::newMin, m_yctrl, &TimeYControl::setMin);
-	connect(autoscaler, &TimeYAutoscale::newMax, m_yctrl, &TimeYControl::setMax);
+	autoscaler = new PlotAutoscaler(false, this);
+	connect(autoscaler, &PlotAutoscaler::newMin, m_yctrl, &MenuPlotAxisRangeControl::setMin);
+	connect(autoscaler, &PlotAutoscaler::newMax, m_yctrl, &MenuPlotAxisRangeControl::setMax);
 	StyleHelper::BlueButton(m_autoscaleBtn, "autoscale");
 
 	connect(m_autoscaleBtn, &QPushButton::clicked, this, [=]() { autoscaler->autoscale(); });
@@ -349,36 +351,9 @@ QWidget *GRTimePlotAddonSettings::createCurveMenu(PlotChannel *ch, QWidget *pare
 {
 	MenuCollapseSection *curve = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, parent);
 
-	QWidget *curveSettings = new QWidget(curve);
-	QHBoxLayout *curveSettingsLay = new QHBoxLayout(curveSettings);
-	curveSettingsLay->setMargin(0);
-	curveSettingsLay->setSpacing(10);
-	curveSettings->setLayout(curveSettingsLay);
+	MenuPlotChannelCurveStyleControl *curveSettings = new MenuPlotChannelCurveStyleControl(curve);
+	curveSettings->addChannels(ch);
 
-	MenuCombo *cbThicknessW = new MenuCombo("Thickness", curve);
-	auto cbThickness = cbThicknessW->combo();
-	cbThickness->addItem("1");
-	cbThickness->addItem("2");
-	cbThickness->addItem("3");
-	cbThickness->addItem("4");
-	cbThickness->addItem("5");
-
-	connect(cbThickness, qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[=](int idx) { ch->setThickness(cbThickness->itemText(idx).toFloat()); });
-	MenuCombo *cbStyleW = new MenuCombo("Style", curve);
-	auto cbStyle = cbStyleW->combo();
-	cbStyle->addItem("Lines", PlotChannel::PCS_LINES);
-	cbStyle->addItem("Dots", PlotChannel::PCS_DOTS);
-	cbStyle->addItem("Steps", PlotChannel::PCS_STEPS);
-	cbStyle->addItem("Sticks", PlotChannel::PCS_STICKS);
-	cbStyle->addItem("Smooth", PlotChannel::PCS_SMOOTH);
-	StyleHelper::MenuComboBox(cbStyle, "cbStyle");
-
-	connect(cbStyle, qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[=](int idx) { ch->setStyle(cbStyle->itemData(idx).toInt()); });
-
-	curveSettingsLay->addWidget(cbThicknessW);
-	curveSettingsLay->addWidget(cbStyleW);
 	curve->contentLayout()->addWidget(curveSettings);
 	return curve;
 }
@@ -482,7 +457,7 @@ QWidget *GRTimePlotAddonSettings::createFFTMenu(QWidget *parent)
 	fftLayout->addWidget(m_fftwindow);
 	fftLayout->addWidget(m_freqOffsetSpin);
 
-	m_fftyctrl = new TimeYControl(m_plot->fftplotch()->yAxis(), fft);
+	m_fftyctrl = new MenuPlotAxisRangeControl(m_plot->fftplotch()->yAxis(), fft);
 	fftLayout->addWidget(m_fftyctrl);
 
 	auto curve = createCurveMenu(m_plot->fftplotch(), fft);

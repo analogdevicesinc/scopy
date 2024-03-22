@@ -87,14 +87,14 @@ QWidget *GRTimeChannelAddon::createYAxisMenu(QWidget *parent)
 		cb->addItem(m_unit, YMODE_SCALE);
 	}
 
-	m_yCtrl = new TimeYControl(m_plotAxis, yaxis);
+	m_yCtrl = new MenuPlotAxisRangeControl(m_plotAxis, yaxis);
 
 	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), yaxis, false);
-	m_autoscale = new TimeYAutoscale(this);
+	m_autoscale = new PlotAutoscaler(false, this);
 	m_autoscale->addChannels(m_plotCh);
 
-	connect(m_autoscale, &TimeYAutoscale::newMin, m_yCtrl, &TimeYControl::setMin);
-	connect(m_autoscale, &TimeYAutoscale::newMax, m_yCtrl, &TimeYControl::setMax);
+	connect(m_autoscale, &PlotAutoscaler::newMin, m_yCtrl, &MenuPlotAxisRangeControl::setMin);
+	connect(m_autoscale, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
 
 	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
 		m_yCtrl->setEnabled(!b);
@@ -426,7 +426,7 @@ QWidget *ImportChannelAddon::createYAxisMenu(QWidget *parent)
 	MenuSectionWidget *yaxiscontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *yaxis = new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE, yaxiscontainer);
 
-	m_yCtrl = new TimeYControl(m_plotAxis, yaxis);
+	m_yCtrl = new MenuPlotAxisRangeControl(m_plotAxis, yaxis);
 
 	yaxis->contentLayout()->addWidget(m_yCtrl);
 	yaxiscontainer->contentLayout()->addWidget(yaxis);

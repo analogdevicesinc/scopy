@@ -7,8 +7,7 @@
 #include "grtimeplotaddon.h"
 #include "measurementcontroller.h"
 #include "scopy-gr-util_export.h"
-#include "time_yautoscale.h"
-#include "time_ycontrol.h"
+
 #include "timechanneladdon.h"
 #include "tooladdon.h"
 
@@ -19,11 +18,15 @@
 #include <gui/plotchannel.h>
 #include <gui/spinbox_a.hpp>
 #include <gui/widgets/menucombo.h>
+#include <gui/plotautoscaler.h>
+#include <gui/widgets/menuplotaxisrangecontrol.h>
 
 namespace scopy {
 class MenuOnOffSwitch;
-
 namespace grutil {
+
+using namespace scopy::gui;
+
 class GRDeviceAddon;
 class SCOPY_GR_UTIL_EXPORT GRTimeChannelAddon : public TimeChannelAddon, public GRTopAddon
 {
@@ -72,8 +75,8 @@ private:
 	GRSignalPath *m_signalPath;
 	GRIIOFloatChannelSrc *m_grch;
 	TimeMeasureManager *m_measureMgr;
-	TimeYControl *m_yCtrl;
-	TimeYAutoscale *m_autoscale;
+	MenuPlotAxisRangeControl *m_yCtrl;
+	PlotAutoscaler *m_autoscale;
 	MenuCombo *m_ymodeCb;
 	MenuOnOffSwitch *m_autoscaleBtn;
 	QPushButton *m_snapBtn;
@@ -109,8 +112,8 @@ Q_SIGNALS:
 
 private:
 	TimeMeasureManager *m_measureMgr;
-	TimeYControl *m_yCtrl;
-	TimeYAutoscale *m_autoscale;
+	MenuPlotAxisRangeControl *m_yCtrl;
+	PlotAutoscaler *m_autoscale;
 
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createYAxisMenu(QWidget *parent);
