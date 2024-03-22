@@ -10,6 +10,12 @@ DataAcquisitionManager::DataAcquisitionManager(QObject *parent)
 	m_dataMonitorMap = new QMap<QString, DataMonitorModel *>();
 }
 
+DataAcquisitionManager::~DataAcquisitionManager()
+{
+	delete m_activeMonitorsMap;
+	delete m_dataMonitorMap;
+}
+
 void DataAcquisitionManager::clearMonitorsData()
 {
 	foreach(QString monKey, m_activeMonitorsMap->keys()) {
