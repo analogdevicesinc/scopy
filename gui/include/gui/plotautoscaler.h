@@ -1,7 +1,7 @@
-#ifndef TIMEYAUTOSCALE_H
-#define TIMEYAUTOSCALE_H
+#ifndef PLOTAUTOSCALER_H
+#define PLOTAUTOSCALER_H
 
-#include "scopy-gr-util_export.h"
+#include "scopy-gui_export.h"
 
 #include <QObject>
 #include <QWidget>
@@ -9,14 +9,14 @@
 #include <plotchannel.h>
 #include <spinbox_a.hpp>
 
-namespace scopy::grutil {
+namespace scopy::gui {
 
-class SCOPY_GR_UTIL_EXPORT TimeYAutoscale : public QObject
+class SCOPY_GUI_EXPORT PlotAutoscaler : public QObject
 {
 	Q_OBJECT
 public:
-	TimeYAutoscale(QObject *parent);
-	~TimeYAutoscale();
+	PlotAutoscaler(bool xAxis = false, QObject *parent = nullptr);
+	~PlotAutoscaler();
 Q_SIGNALS:
 	void newMin(double);
 	void newMax(double);
@@ -31,6 +31,7 @@ public Q_SLOTS:
 private:
 	QTimer *m_autoScaleTimer;
 	QList<PlotChannel *> m_channels;
+	bool m_xAxis;
 };
-} // namespace scopy::grutil
-#endif // TIMEYAUTOSCALE_H
+} // namespace scopy::gui
+#endif // PLOTAUTOSCALER_H

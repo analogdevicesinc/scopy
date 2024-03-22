@@ -3,7 +3,7 @@
 
 #include "grtimeplotaddon.h"
 #include "scopy-gr-util_export.h"
-#include "time_yautoscale.h"
+
 #include "timechanneladdon.h"
 #include "tooladdon.h"
 
@@ -12,10 +12,14 @@
 #include <gui/spinbox_a.hpp>
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/menuonoffswitch.h>
+#include <gui/widgets/menuplotaxisrangecontrol.h>
+#include <gui/plotautoscaler.h>
 
 namespace scopy {
 namespace grutil {
-class TimeYControl;
+
+using namespace scopy::gui;
+
 class GRTimePlotAddon;
 class GRTimeChannelAddon;
 class SCOPY_GR_UTIL_EXPORT GRTimePlotAddonSettings : public QObject,
@@ -98,11 +102,11 @@ private:
 	QWidget *widget;
 	QPen m_pen;
 
-	TimeYControl *m_yctrl;
-	TimeYControl *m_fftyctrl;
+	MenuPlotAxisRangeControl *m_yctrl;
+	MenuPlotAxisRangeControl *m_fftyctrl;
 	MenuOnOffSwitch *m_singleYModeSw;
 	QPushButton *m_autoscaleBtn;
-	TimeYAutoscale *autoscaler;
+	PlotAutoscaler *autoscaler;
 
 	ScaleSpinButton *m_bufferSizeSpin;
 	ScaleSpinButton *m_plotSizeSpin;
