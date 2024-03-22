@@ -22,10 +22,6 @@ namespace Ui {
 class DataMonitorInfoPage;
 }
 
-namespace libm2k::context {
-class Context;
-}
-
 namespace scopy {
 namespace datamonitor {
 
@@ -57,7 +53,6 @@ private:
 	IIOPingTask *ping;
 	CyclicalTask *cs;
 
-	libm2k::context::Context *libm2k_context;
 };
 } // namespace datamonitor
 } // namespace scopy
