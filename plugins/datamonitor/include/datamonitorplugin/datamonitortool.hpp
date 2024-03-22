@@ -53,7 +53,6 @@ private:
 
 	iio_context *ctx;
 	int activeMonitor = -1;
-
 	bool first = true;
 
 	QLabel *startTime;

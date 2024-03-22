@@ -16,6 +16,7 @@ class SCOPY_DATAMONITORPLUGIN_EXPORT DataAcquisitionManager : public QObject
 	Q_OBJECT
 public:
 	explicit DataAcquisitionManager(QObject *parent = nullptr);
+	~DataAcquisitionManager();
 
 	void clearMonitorsData();
 	QList<QString> getMonitors();

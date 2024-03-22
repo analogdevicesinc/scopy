@@ -42,6 +42,14 @@ MonitorPlot::MonitorPlot(QWidget *parent)
 	m_monitorCurves = new QMap<QString, MonitorPlotCurve *>();
 }
 
+MonitorPlot::~MonitorPlot()
+{
+	if(scaleEngine)
+		delete scaleEngine;
+	if(m_monitorCurves)
+		delete m_monitorCurves;
+}
+
 PlotWidget *MonitorPlot::plot() const { return m_plot; }
 
 void MonitorPlot::addMonitor(DataMonitorModel *dataMonitorModel)
