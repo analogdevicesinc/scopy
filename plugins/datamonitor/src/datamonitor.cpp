@@ -11,7 +11,6 @@
 #include <menucollapsesection.h>
 #include <menusectionwidget.h>
 
-#include <libm2k/contextbuilder.hpp>
 #include "datamonitortool.hpp"
 
 #include <pluginbase/preferences.h>
