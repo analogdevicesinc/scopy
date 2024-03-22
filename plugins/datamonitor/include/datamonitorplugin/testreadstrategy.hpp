@@ -2,12 +2,12 @@
 #define TESTREADSTRATEGY_HPP
 
 #include "ireadstrategy.hpp"
-#include "scopy-datamonitor_export.h"
+#include "scopy-datamonitorplugin_export.h"
 
 namespace scopy {
 namespace datamonitor {
 
-class SCOPY_DATAMONITOR_EXPORT TestReadStrategy : public IReadStrategy
+class SCOPY_DATAMONITORPLUGIN_EXPORT TestReadStrategy : public IReadStrategy
 {
 public:
 	TestReadStrategy();

@@ -3,12 +3,12 @@
 
 #include "iio.h"
 #include "ireadstrategy.hpp"
-#include "scopy-datamonitor_export.h"
+#include "scopy-datamonitorplugin_export.h"
 
 namespace scopy {
 namespace datamonitor {
 
-class SCOPY_DATAMONITOR_EXPORT DMMReadStrategy : public IReadStrategy
+class SCOPY_DATAMONITORPLUGIN_EXPORT DMMReadStrategy : public IReadStrategy
 {
 public:
 	DMMReadStrategy(iio_device *dev, iio_channel *chn);
