@@ -6,7 +6,7 @@
 #include <QObject>
 #include "datamonitormodel.hpp"
 #include "iio.h"
-#include "scopy-datamonitor_export.h"
+#include "scopy-datamonitorplugin_export.h"
 
 namespace scopy {
 namespace datamonitor {
@@ -18,7 +18,7 @@ struct DMMInfo
 	double umScale = 1;
 };
 
-class SCOPY_DATAMONITOR_EXPORT DMM : public QObject
+class SCOPY_DATAMONITORPLUGIN_EXPORT DMM : public QObject
 {
 	Q_OBJECT
 public:
