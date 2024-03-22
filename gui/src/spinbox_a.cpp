@@ -473,7 +473,7 @@ void SpinBoxA::setUnits(const QStringList &list)
 
 	ui->SBA_Combobox->clear();
 
-	if(list.at(0).section("=", 0, 0).trimmed().isEmpty() || list.count() == 1) {
+	if(list.at(0).section("=", 0, 0).trimmed().isEmpty() && list.count() == 1) {
 		ui->SBA_Combobox->setEnabled(false);
 	}
 
@@ -481,7 +481,10 @@ void SpinBoxA::setUnits(const QStringList &list)
 		QStringList curr = it->split('=');
 		QString s = curr.at(0);
 		double val = curr.at(1).toDouble();
-		sufixes += (s.at(0) + '|');
+		if(s.length() > 0) {
+			sufixes += (s.at(0));
+		}
+		sufixes += '|';
 
 		m_units.push_back(std::pair<QString, double>(s, val));
 		ui->SBA_Combobox->addItem(s);
