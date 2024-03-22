@@ -18,6 +18,12 @@ public:
 	void setIIOStandardItem(IIOStandardItem *item);
 	void refreshIIOView();
 
+	QPushButton *readBtn();
+	QPushButton *addToWatchlistBtn();
+
+	// add:true = +, add:false = X
+	void setAddToWatchlistState(bool add);
+
 private:
 	void setupUi();
 
@@ -27,7 +33,10 @@ private:
 	QTabWidget *m_tabWidget;
 	QWidget *m_guiView;
 	QWidget *m_iioView;
+	QWidget *m_titleContainer;
 	QLabel *m_titleLabel;
+	QPushButton *m_readBtn;
+	QPushButton *m_addToWatchlistBtn;
 };
 } // namespace scopy::iiodebugplugin
 

@@ -1,5 +1,5 @@
 #include "clidetailsview.h"
-#include <QLoggingCategory>
+#include "debuggerloggingcategories.h"
 
 using namespace scopy::iiodebugplugin;
 
@@ -164,8 +164,8 @@ void CliDetailsView::setupDevice()
 
 			setupDeviceAttr();
 		} else {
-			// TODO: improve this message
-			qWarning() << "Logic error";
+			qWarning(CAT_DETAILSVIEW)
+				<< "Error when setting up the device, the type is not Channel nor DeviceAttribute";
 		}
 	}
 	m_currentText.append(m_deviceAttrsString);
@@ -193,8 +193,8 @@ void CliDetailsView::setupContext()
 		QStandardItem *child = m_currentItem->child(i);
 		m_contextIIOItem = dynamic_cast<IIOStandardItem *>(child);
 
-		// FIXME: if the list is device,attr,device the print will not be correct
-		// but can this happen?
+		// we consider that the list of children is divided in 2 sections: the
+		// attributes and the devices/triggers and they cannot be interleaved
 		if(m_contextIIOItem->type() == IIOStandardItem::ContextAttribute) {
 			setupContextAttr();
 		} else if(m_contextIIOItem->type() == IIOStandardItem::Device ||
