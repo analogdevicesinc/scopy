@@ -71,6 +71,9 @@ void PlotBufferPreviewerController::setupBufferPreviewer()
 
 		int width = m_bufferPreviewer->width();
 		double xAxisWidth = m_bufferPrevData;
+		if(m_plot->xAxis()->min() > m_plot->xAxis()->max()) {
+			value *= -1;
+		}
 
 		moveTo = value * xAxisWidth / width;
 		m_plot->xAxis()->setInterval(m_bufferPrevInitMin + moveTo, m_bufferPrevInitMax + moveTo);
@@ -80,23 +83,27 @@ void PlotBufferPreviewerController::setupBufferPreviewer()
 	});
 
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, this, [=]() {
-		m_plot->xAxis()->setInterval(m_bufferPrevInitMin, m_bufferPrevInitMax);
-		m_plot->replot();
-
-		updateBufferPreviewer();
+		if(m_plot->xAxis()->min() > m_plot->xAxis()->max()) {
+			m_plot->xAxis()->setInterval(m_bufferPrevData, 0.);
+		} else {
+			m_plot->xAxis()->setInterval(0., m_bufferPrevData);
+		}
+		m_plot->xAxis()->updateAxisScale();
 	});
 }
 
 void PlotBufferPreviewerController::updateDataLimits(double min, double max)
 {
-	m_bufferPrevData = max - min;
+	m_bufferPrevData = abs(max - min);
 	updateBufferPreviewer();
 }
 
 void PlotBufferPreviewerController::updateBufferPreviewer()
 {
 	// Time interval within the plot canvas
-	QwtInterval plotInterval(m_plot->xAxis()->min(), m_plot->xAxis()->max());
+	double left = m_plot->plot()->axisScaleDiv(m_plot->xAxis()->axisId()).lowerBound();
+	double right = m_plot->plot()->axisScaleDiv(m_plot->xAxis()->axisId()).upperBound();
+	QwtInterval plotInterval(std::min(left, right), std::max(left, right));
 
 	// Time interval that represents the captured data
 	QwtInterval dataInterval(0.0, m_bufferPrevData);
@@ -109,6 +116,9 @@ void PlotBufferPreviewerController::updateBufferPreviewer()
 
 	double hPos = 1 - (fullInterval.maxValue() - plotInterval.minValue()) / fullInterval.width();
 	double hWidth = plotInterval.width() / fullInterval.width();
+	if(left > right) {
+		hPos = wWidth - hPos - hWidth;
+	}
 
 	m_bufferPreviewer->setWaveformWidth(wWidth);
 	m_bufferPreviewer->setWaveformPos(wPos);
