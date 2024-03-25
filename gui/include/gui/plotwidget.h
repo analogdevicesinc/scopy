@@ -26,11 +26,11 @@ typedef struct _PlotSamplingInfo
 		startingPoint = 0;
 		freqOffset = 0;
 	}
-	uint32_t bufferSize;
-	uint32_t plotSize;
-	double sampleRate;
-	double startingPoint;
-	double freqOffset;
+	uint32_t bufferSize = 0;
+	uint32_t plotSize = 0;
+	double sampleRate = 0;
+	double startingPoint = 0;
+	double freqOffset = 0;
 } PlotSamplingInfo;
 
 class SCOPY_GUI_EXPORT PlotWidget : public QWidget

@@ -468,11 +468,6 @@ void GRTimePlotAddon::updateXAxis()
 
 	qInfo() << fft_xPlotAxis->min() << fft_xPlotAxis->max();
 
-	auto max = x->max();
-	auto min = x->min();
-	auto divs = x->divs();
-	double hdiv = abs(max - min) / divs;
-
 	m_info->update(m_currentSamplingInfo);
 	Q_EMIT xAxisUpdated();
 }
