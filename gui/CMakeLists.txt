@@ -40,9 +40,6 @@ file(
 )
 file(GLOB UI_LIST ui/*.ui)
 
-message(${SRC_LIST})
-message(${HEADER_LIST})
-
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
 
 if(ANDROID)
