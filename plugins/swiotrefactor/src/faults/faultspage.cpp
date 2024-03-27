@@ -78,16 +78,16 @@ void FaultsPage::setupDevices()
 	if(swiot) {
 		if(ad74413r) {
 			QVector<uint32_t> faultRegistersAddr = {0x02e};
-			m_ad74413rFaultsDevice = new FaultsDevice("ad74413r", ":/swiot/swiot_faults.json", m_uri,
-								  faultRegistersAddr, this);
+			m_ad74413rFaultsDevice = new FaultsDevice("ad74413r", ":/swiotrefactor/swiot_faults.json",
+								  m_uri, faultRegistersAddr, this);
 		} else {
 			qCritical(CAT_SWIOT_FAULTS) << "Error: did not find ad74413r device.";
 		}
 
 		if(max14906) {
 			QVector<uint32_t> faultRegistersAddr = {0x04, 0x05, 0x06, 0x07};
-			m_max14906FaultsDevice = new FaultsDevice("max14906", ":/swiot/swiot_faults.json", m_uri,
-								  faultRegistersAddr, this);
+			m_max14906FaultsDevice = new FaultsDevice("max14906", ":/swiotrefactor/swiot_faults.json",
+								  m_uri, faultRegistersAddr, this);
 		} else {
 			qCritical(CAT_SWIOT_FAULTS) << "Error: did not find max14906 device.";
 		}
