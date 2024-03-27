@@ -29,17 +29,23 @@ public:
 	ToolTemplate *getToolTemplate();
 	MapStackedWidget *getRightStack();
 
+	int uuid = 0;
 	const QString channelsMenuId = "channels";
 	const QString measureMenuId = "measure";
 	const QString statsMenuId = "stats";
 	const QString verticalChannelManagerId = "vcm";
 	const QString settingsMenuId = "settings";
 
+	VerticalChannelManager *vcm() const;
+
 public Q_SLOTS:
 	void run(bool);
 	void stop();
 	void start();
 	void restart();
+	void addDevice(CollapsableMenuControlButton *b, ToolComponent *dev);
+	void addChannel(MenuControlButton *btn, ToolComponent *ch, CompositeWidget *c);
+
 
 Q_SIGNALS:
 	void runningChanged(bool);
@@ -59,7 +65,7 @@ private:
 	RunBtn *runBtn;
 	SingleShotBtn *singleBtn;
 	MenuControlButton *channelsBtn;
-	VerticalChannelManager *vcm;
+	VerticalChannelManager *m_vcm;
 
 	void setupToolLayout();
 	void setupRunSingleButtonHelper();

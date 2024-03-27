@@ -23,7 +23,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
-file(GLOB SRC_LIST src/*.cpp src/*.cc)
+file(GLOB SRC_LIST src/*.cpp src/*.cc src/*.h)
 file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 file(GLOB UI_LIST ui/*.ui)
 

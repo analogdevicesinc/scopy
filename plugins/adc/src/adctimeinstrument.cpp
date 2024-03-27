@@ -63,8 +63,9 @@ void ADCTimeInstrument::setupToolLayout()
 
 	setupChannelsButtonHelper(channelsBtn);
 	setupRunSingleButtonHelper();
+	channelGroup = new QButtonGroup(this);
 
-	vcm->add(new QLabel("test"));
+	m_vcm->add(new QLabel("test"));
 
 	connect(settingsBtn, &QPushButton::toggled, this, [=](bool b) {
 		if(b)
@@ -99,13 +100,71 @@ void ADCTimeInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn
 
 	connect(channelsBtn, &QPushButton::toggled, dynamic_cast<MenuHAnim *>(tool->leftContainer()),
 		&MenuHAnim::toggleMenu);
-	vcm = new VerticalChannelManager(this);
-	tool->leftStack()->add(verticalChannelManagerId, vcm);
+	m_vcm = new VerticalChannelManager(this);
+	tool->leftStack()->add(verticalChannelManagerId, m_vcm);
 }
 
+void ADCTimeInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *dev)
+{
+	auto devBtn = b;
+	m_vcm->add(b);
+	QWidget *dev_widget = dynamic_cast<QWidget*>(dev);
+	Q_ASSERT(dev_widget);
+
+	channelGroup->addButton(b->getControlBtn());
+	QString id = dev->getName() + QString::number(uuid++);
+	rightStack->add(id, dev_widget);
+
+
+	connect(b->getControlBtn(), &QPushButton::clicked/* Or ::toggled*/ , this, [=](bool b) {
+		if(b) {
+			tool->requestMenu(channelsMenuId);
+			rightStack->show(id);
+		}
+	});
+}
+
+/// ADD CHANNEL HERE
+
+void ADCTimeInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, CompositeWidget *c)
+{
+	c->add(btn);
+	channelGroup->addButton(btn);
+
+	QString id = ch->getName() + QString::number(uuid++);
+	QWidget *ch_widget = dynamic_cast<QWidget*>(ch);
+	Q_ASSERT(ch_widget);
+
+	/*setupChannelMenuControlButtonHelper(btn, ch);
+	plotComponent->plot()->selectChannel(ch->plotCh());*/
+
+	rightStack->add(id, ch_widget);
+
+	connect(btn, &QAbstractButton::clicked, this, [=](bool b) {
+		if(b) {
+			if(!channelsBtn->button()->isChecked()) {
+				// Workaround because QButtonGroup and setChecked do not interact programatically
+				channelsBtn->button()->animateClick(1);
+			}
+			rightStack->show(id);
+		}
+	});
+
+	/*setupChannelSnapshot(ch);
+	setupChannelMeasurement(ch);
+	setupChannelDelete(ch);
+	plotAddon->onChannelAdded(ch);
+	plotAddonSettings->onChannelAdded(ch);*/
+}
+// #endif
 void ADCTimeInstrument::init() { proxy->init(); }
 
 void ADCTimeInstrument::deinit() { proxy->deinit(); }
+
+VerticalChannelManager *ADCTimeInstrument::vcm() const
+{
+	return m_vcm;
+}
 
 void ADCTimeInstrument::restart()
 {

@@ -14,7 +14,7 @@ class SCOPY_ADCPLUGIN_EXPORT TimePlotProxy : public QObject, public PlotProxy, p
 {
 	Q_OBJECT
 public:
-	TimePlotProxy(QObject *parent = nullptr);
+	TimePlotProxy(AcqTreeNode *tree, QObject *parent = nullptr);
 	~TimePlotProxy();
 
 	ChannelIdProvider *getChannelIdProvider();
@@ -46,7 +46,10 @@ private:
 	PlotComponent *m_plotComponent;
 	TimePlotSettingsComponent *m_plotSettingsComponent;
 	ChannelIdProvider *chIdP;
+
 	QList<ToolComponent *> m_components;
+	AcqTreeNode *m_tree;
+	QMap<AcqTreeNode*, ToolComponent*> m_acqNodeComponentMap;
 };
 } // namespace adc
 } // namespace scopy

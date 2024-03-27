@@ -132,6 +132,16 @@ void ADCPlugin::loadToolList()
 		SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
 }
 
+bool iio_is_buffer_capable(struct iio_device *dev) {
+	for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
+		struct iio_channel *chn = iio_device_get_channel(dev, j);
+		if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
+			return true;
+		}
+	}
+	return false;
+}
+
 GRTopBlockNode *ADCPlugin::createGRIIOTreeNode(iio_context *ctx)
 {
 	GRTopBlock *top = new GRTopBlock("ctx", this);
@@ -150,8 +160,7 @@ GRTopBlockNode *ADCPlugin::createGRIIOTreeNode(iio_context *ctx)
 		QStringList channelList;
 
 		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(ctx, dev_name, dev_name, 0x400, ctxNode);
-		GRIIODeviceSourceNode *d = new GRIIODeviceSourceNode(gr_dev, ctxNode);
-		ctxNode->addChild(d);
+		GRIIODeviceSourceNode *d = new GRIIODeviceSourceNode(gr_dev, gr_dev);
 		int j;
 		for(j = 0; j < iio_device_get_channels_count(dev); j++) {
 			struct iio_channel *chn = iio_device_get_channel(dev, j);
@@ -160,14 +169,18 @@ GRTopBlockNode *ADCPlugin::createGRIIOTreeNode(iio_context *ctx)
 			if(chn_name == "timestamp" /*|| chn_name == "accel_z" || chn_name =="accel_y"*/)
 				continue;
 			if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
+
 				GRIIOFloatChannelSrc *ch = new GRIIOFloatChannelSrc(gr_dev, chn_name, d);
 				GRIIOFloatChannelNode *c = new GRIIOFloatChannelNode(ch, d);
 				top->registerSignalPath(c->signalPath());
-				d->addChild(c);
+				d->addTreeChild(c);
 			}
 		}
-		if(j > 0) { // at least one scan element
+		if(iio_is_buffer_capable(dev)) { // at least one scan element
+			ctxNode->addTreeChild(d);
 			top->registerIIODeviceSource(gr_dev);
+		} else {
+			gr_dev->deleteLater();
 		}
 	}
 	return ctxNode;
@@ -252,14 +265,19 @@ bool ADCPlugin::onConnect()
 
 	// create gnuradio flow out of channels
 	// pass channels to ADC instrument - figure out channel model (sample rate/ size/ etc)
-	AcqTree *tree = new AcqTree(this);
+	AcqTreeNode *root = new AcqTreeNode("root",this);
 
-	auto recipe = createGRIIOTreeNode(m_ctx);
-	tree->m_nodes.append(recipe);
-	recipe->setParent(tree);
+	auto timeProxy = new TimePlotProxy(root,this);
 
-	auto timeProxy = new TimePlotProxy(this);
 	time = new ADCTimeInstrument(timeProxy);
+
+	connect(root,&AcqTreeNode::newChild,timeProxy,&TimePlotProxy::addChannel);
+	auto recipe = createGRIIOTreeNode(m_ctx);
+	root->addTreeChild(recipe);
+	// root->treeChildren()[0]->addTreeChild(new AcqTreeNode("other"));
+
+
+
 	m_toolList[0]->setTool(time);
 
 	return true;

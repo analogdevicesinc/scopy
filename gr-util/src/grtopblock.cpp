@@ -12,6 +12,7 @@ GRTopBlock::GRTopBlock(QString name, QObject *parent)
 	, running(false)
 	, built(false)
 {
+	m_name = name;
 	static int topblockid = 0;
 	QString topblockname = m_name + QString::number(topblockid);
 	topblockid++;
@@ -118,10 +119,7 @@ void GRTopBlock::run()
 	top->wait();
 }
 
-QString GRTopBlock::name() const
-{
-	return m_name;
-}
+QString GRTopBlock::name() const { return m_name; }
 
 void GRTopBlock::rebuild()
 {

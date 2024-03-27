@@ -8,22 +8,11 @@
 #include <gr-util/grsignalpath.h>
 #include <gr-util/grscaleoffsetproc.h>
 #include <scopy-adcplugin_export.h>
+#include <QMap>
 
 namespace scopy {
 using namespace grutil;
 class AcqTreeNode;
-
-class SCOPY_ADCPLUGIN_EXPORT AcqTree : public QObject
-{
-	Q_OBJECT
-public:
-	AcqTree(QObject *parent = nullptr);
-	;
-	~AcqTree();
-
-	QList<AcqTreeNode *> m_nodes;
-	void reset();
-};
 
 class SCOPY_ADCPLUGIN_EXPORT AcqTreeNode : public QObject
 {
@@ -32,17 +21,28 @@ public:
 	AcqTreeNode(QString name, QObject *parent = nullptr);
 	~AcqTreeNode();
 
-	void addChild(AcqTreeNode *t);
-	bool removeChild(AcqTreeNode *t);
-	AcqTree *tree();
+	void addTreeChild(AcqTreeNode *t);
+	bool removeTreeChild(AcqTreeNode *t);
+	// AcqTree *tree();
 
 	virtual void *data();
+	QList<AcqTreeNode *> bfs();
 
+	QString name() const;
+
+	AcqTreeNode *treeParent() const;
+	void setTreeParent(AcqTreeNode *newTreeParent);
+	QList<AcqTreeNode *> treeChildren() const;
+
+Q_SIGNALS:
+	void newChild(AcqTreeNode*);
+	void deletedChild(AcqTreeNode*);
 protected:
-	AcqTree *m_tree;
+	// AcqTree *m_tree;
 	void *m_data;
 	QString m_name;
-	QList<AcqTreeNode *> m_children;
+	QList<AcqTreeNode *> m_treeChildren;
+	AcqTreeNode* m_treeParent;
 };
 
 class SCOPY_ADCPLUGIN_EXPORT IIOContextNode : public AcqTreeNode
@@ -60,19 +60,24 @@ class SCOPY_ADCPLUGIN_EXPORT GRIIODeviceSourceNode : public AcqTreeNode
 public:
 	GRIIODeviceSourceNode(GRIIODeviceSource *d, QObject *parent = nullptr);
 	~GRIIODeviceSourceNode();
+	GRIIODeviceSource* src();
+private:
+	GRIIODeviceSource* m_src;
 };
 
 class SCOPY_ADCPLUGIN_EXPORT GRIIOFloatChannelNode : public AcqTreeNode
 {
 public:
-	GRIIOFloatChannelNode(GRIIOChannel *c, QObject *parent = nullptr);
+	GRIIOFloatChannelNode(GRIIOFloatChannelSrc *c, QObject *parent = nullptr);
 	~GRIIOFloatChannelNode();
 
 	GRSignalPath *signalPath() const;
-
 	GRScaleOffsetProc *scOff() const;
 
+	GRIIOFloatChannelSrc *src() const;
+
 private:
+	GRIIOFloatChannelSrc *m_src;
 	GRSignalPath *m_signalPath;
 	GRScaleOffsetProc *m_scOff;
 };

@@ -11,6 +11,7 @@
 #include <QWidget>
 
 #include <utils.h>
+#include <compositewidget.h>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT MenuControlButton : public QAbstractButton
@@ -60,7 +61,7 @@ protected:
 	void mousePressEvent(QMouseEvent *event) override;
 };
 
-class SCOPY_GUI_EXPORT CollapsableMenuControlButton : public QWidget
+class SCOPY_GUI_EXPORT CollapsableMenuControlButton : public QWidget, public CompositeWidget
 {
 	Q_OBJECT
 public:
@@ -68,6 +69,7 @@ public:
 	~CollapsableMenuControlButton();
 
 	void add(QWidget *ch);
+	void remove(QWidget *ch);
 	MenuControlButton *getControlBtn();
 
 private:
