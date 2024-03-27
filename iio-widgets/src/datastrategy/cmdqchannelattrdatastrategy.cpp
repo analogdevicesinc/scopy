@@ -129,3 +129,5 @@ void CmdQChannelAttrDataStrategy::optionalAttrReadFinished(Command *cmd)
 	m_optionalDataRead = QString(currentOptValue);
 	Q_EMIT sendData(m_dataRead, m_optionalDataRead);
 }
+
+#include "moc_cmdqchannelattrdatastrategy.cpp"

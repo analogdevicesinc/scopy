@@ -82,3 +82,5 @@ void PlotTracker::onChannelSelected(PlotChannel *ch)
 		}
 	}
 }
+
+#include "moc_plottracker.cpp"
