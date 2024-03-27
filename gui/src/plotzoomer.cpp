@@ -237,3 +237,5 @@ void PlotZoomer::zoomToBase()
 	plot()->replot();
 	m_isZoomed = false;
 }
+
+#include "moc_plotzoomer.cpp"
