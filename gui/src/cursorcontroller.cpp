@@ -188,3 +188,5 @@ void CursorController::cursorsSetVisible(bool visible)
 CursorSettings *CursorController::getCursorSettings() { return cursorSettings; }
 
 PlotCursors *CursorController::getPlotCursors() { return plotCursors; }
+
+#include "moc_cursorcontroller.cpp"

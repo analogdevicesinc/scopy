@@ -651,3 +651,5 @@ void GRTimePlotAddonSettings::showPlotLabels(bool b)
 QString GRTimePlotAddonSettings::getName() { return name; }
 
 QWidget *GRTimePlotAddonSettings::getWidget() { return widget; }
+
+#include "moc_grtimeplotaddonsettings.cpp"
