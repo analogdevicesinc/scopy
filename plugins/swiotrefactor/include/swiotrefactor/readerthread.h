@@ -21,7 +21,7 @@
 #ifndef READERTHREAD_H
 #define READERTHREAD_H
 
-//#include "src/runtime/ad74413r/chnlinfo.h"
+#include "ad74413r/chnlinfo.h"
 
 #include <iio.h>
 
@@ -62,7 +62,7 @@ public:
 
 	int getEnabledChnls();
 
-	//	QVector<ChnlInfo *> getEnabledBufferedChnls();
+	QVector<ChnlInfo *> getEnabledBufferedChnls();
 
 	void startCapture(int requiredBuffersNumber = 0);
 
@@ -70,12 +70,12 @@ public:
 	void forcedStop();
 public Q_SLOTS:
 	void handleConnectionDestroyed();
-	//	void onChnlsChange(QMap<int, ChnlInfo *> chnlsInfo);
+	void onChnlsChange(QMap<int, ChnlInfo *> chnlsInfo);
 	void onSamplingFrequencyComputed(double samplingFreq);
 
 Q_SIGNALS:
 	void readerThreadFinished();
-	void bufferRefilled(QVector<QVector<double>> bufferData, int bufferCounter);
+	void bufferRefilled(QMap<int, QVector<double>> bufferData, int bufferCounter);
 	void channelDataChanged(int channelId, double value);
 
 private Q_SLOTS:
@@ -100,9 +100,9 @@ private:
 
 	struct iio_device *m_iioDev;
 	struct iio_buffer *m_iioBuff;
-	//	QMap<int, ChnlInfo *> m_chnlsInfo;
-	//	QVector<ChnlInfo *> m_bufferedChnls;
-	QVector<QVector<double>> m_bufferData;
+	QMap<int, ChnlInfo *> m_chnlsInfo;
+	QVector<ChnlInfo *> m_bufferedChnls;
+	QMap<int, QVector<double>> m_bufferData;
 	std::atomic<bool> m_running, m_bufferInvalid;
 	std::mutex m_mutex;
 };
