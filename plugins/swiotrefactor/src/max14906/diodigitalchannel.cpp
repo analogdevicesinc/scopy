@@ -19,6 +19,7 @@
  */
 
 #include "max14906/diodigitalchannel.h"
+#include "plotnavigator.hpp"
 #include "swiot_logging_categories.h"
 #include <QColor>
 #include <QLineEdit>
@@ -76,6 +77,7 @@ void DioDigitalChannel::initData()
 void DioDigitalChannel::initPlot()
 {
 	m_plot = new PlotWidget(this);
+	m_plot->navigator()->setEnabled(false);
 	m_plot->xAxis()->scaleDraw()->setFloatPrecision(0);
 	m_plot->xAxis()->setInterval(0, m_timeSpan);
 	m_plot->yAxis()->scaleEngine()->setAttribute(QwtScaleEngine::Floating, true);
