@@ -20,7 +20,7 @@
 
 #include "readerthread.h"
 
-//#include "src/runtime/ad74413r/bufferlogic.h"
+#include "ad74413r/bufferlogic.h"
 #include "swiot_logging_categories.h"
 
 #include <iio.h>
@@ -111,60 +111,60 @@ void ReaderThread::addBufferedDevice(iio_device *device) { m_iioDev = device; }
 
 void ReaderThread::initIioChannels()
 {
-	//	auto vals = m_chnlsInfo.values();
-	//	for(const auto &val : vals) {
-	//		val->addReadScaleCommand();
-	//		val->addReadOffsetCommand();
-	//	}
+	auto vals = m_chnlsInfo.values();
+	for(const auto &val : vals) {
+		val->addReadScaleCommand();
+		val->addReadOffsetCommand();
+	}
 }
 
 void ReaderThread::enableIioChnls()
 {
-	//	if(m_iioDev) {
-	//		auto keys = m_chnlsInfo.keys();
-	//		for(const auto &key : keys) {
-	//			struct iio_channel *iioChnl = m_chnlsInfo[key]->iioChnl();
-	//			bool isEnabled = iio_channel_is_enabled(iioChnl);
-	//			if(m_chnlsInfo[key]->isEnabled()) {
-	//				if(!isEnabled) {
-	//					iio_channel_enable(iioChnl);
-	//				}
-	//				qDebug(CAT_SWIOT_AD74413R) << "Chanel en " << key;
-	//			} else {
-	//				if(isEnabled) {
-	//					iio_channel_disable(iioChnl);
-	//				}
-	//				qDebug(CAT_SWIOT_AD74413R) << "Chanel dis " << key;
-	//			}
-	//		}
-	//	}
+	if(m_iioDev) {
+		auto keys = m_chnlsInfo.keys();
+		for(const auto &key : keys) {
+			struct iio_channel *iioChnl = m_chnlsInfo[key]->iioChnl();
+			bool isEnabled = iio_channel_is_enabled(iioChnl);
+			if(m_chnlsInfo[key]->isEnabled()) {
+				if(!isEnabled) {
+					iio_channel_enable(iioChnl);
+				}
+				qDebug(CAT_SWIOT_AD74413R) << "Chanel en " << key;
+			} else {
+				if(isEnabled) {
+					iio_channel_disable(iioChnl);
+				}
+				qDebug(CAT_SWIOT_AD74413R) << "Chanel dis " << key;
+			}
+		}
+	}
 }
 
 int ReaderThread::getEnabledChnls()
 {
 	int enChnls = 0;
-	//	auto keys = m_chnlsInfo.keys();
-	//	for(const auto &key : keys) {
-	//		if(iio_channel_is_enabled(m_chnlsInfo[key]->iioChnl())) {
-	//			enChnls++;
-	//		}
-	//	}
+	auto keys = m_chnlsInfo.keys();
+	for(const auto &key : keys) {
+		if(iio_channel_is_enabled(m_chnlsInfo[key]->iioChnl())) {
+			enChnls++;
+		}
+	}
 	return enChnls;
 }
 
-// QVector<ChnlInfo *> ReaderThread::getEnabledBufferedChnls()
-//{
-//	QVector<ChnlInfo *> enabledBufferedChnls = {};
+QVector<ChnlInfo *> ReaderThread::getEnabledBufferedChnls()
+{
+	QVector<ChnlInfo *> enabledBufferedChnls = {};
 
-//	auto keys = m_chnlsInfo.keys();
-//	for(const auto &key : keys) {
-//		if(m_chnlsInfo[key]->isScanElement() && m_chnlsInfo[key]->isEnabled() &&
-//		   !m_chnlsInfo[key]->isOutput()) {
-//			enabledBufferedChnls.push_back(m_chnlsInfo[key]);
-//		}
-//	}
-//	return enabledBufferedChnls;
-//}
+	auto keys = m_chnlsInfo.keys();
+	for(const auto &key : keys) {
+		if(m_chnlsInfo[key]->isScanElement() && m_chnlsInfo[key]->isEnabled() &&
+		   !m_chnlsInfo[key]->isOutput()) {
+			enabledBufferedChnls.push_back(m_chnlsInfo[key]);
+		}
+	}
+	return enabledBufferedChnls;
+}
 
 void ReaderThread::bufferRefillCommandFinished(scopy::Command *cmd)
 {
@@ -185,13 +185,13 @@ void ReaderThread::bufferRefillCommandFinished(scopy::Command *cmd)
 		uint32_t *endAdr = (uint32_t *)iio_buffer_end(m_iioBuff);
 		m_bufferData.clear();
 		for(int i = 0; i < m_enabledChnlsNo; i++) {
-			m_bufferData.push_back({});
+			m_bufferData.insert(i, {});
 		}
 
 		for(uint32_t *ptr = startAdr; ptr != endAdr; ptr++) {
 			idx = i % m_enabledChnlsNo;
 			uint32_t d_ptr = (uint32_t)*ptr;
-			//			data = m_bufferedChnls[idx]->convertData(d_ptr);
+			data = m_bufferedChnls[idx]->convertData(d_ptr);
 			m_bufferData[idx].push_back(data);
 			i++;
 		}
@@ -253,28 +253,28 @@ void ReaderThread::bufferDestroyCommandFinished(scopy::Command *cmd)
 		qDebug(CAT_SWIOT_AD74413R) << "Buffer wasn't destroyed: " + QString(strerror(-tcmd->getReturnCode()));
 	} else {
 		m_iioBuff = nullptr;
-		//		m_bufferedChnls.clear();
+		m_bufferedChnls.clear();
 	}
 	Q_EMIT readerThreadFinished();
 }
 
 void ReaderThread::createIioBuffer()
 {
-	//	std::unique_lock<std::mutex> lock(m_mutex);
-	//	m_enabledChnlsNo = getEnabledChnls();
-	//	m_bufferedChnls = getEnabledBufferedChnls();
-	//	qInfo(CAT_SWIOT_AD74413R) << "Enabled channels number: " + QString::number(m_enabledChnlsNo);
-	//	if(m_iioDev) {
-	//		Command *createBufferCommand;
-	//		if(m_samplingFreq >= MAX_BUFFER_SIZE) {
-	//			createBufferCommand = new IioDeviceCreateBuffer(m_iioDev, MAX_BUFFER_SIZE, false,
-	// nullptr); 		} else { 			createBufferCommand = new
-	// IioDeviceCreateBuffer(m_iioDev, MIN_BUFFER_SIZE, false, nullptr);
-	//		}
-	//		connect(createBufferCommand, &scopy::Command::finished, this,
-	//			&ReaderThread::bufferCreateCommandFinished, Qt::QueuedConnection);
-	//		m_cmdQueue->enqueue(createBufferCommand);
-	//	}
+	std::unique_lock<std::mutex> lock(m_mutex);
+	m_enabledChnlsNo = getEnabledChnls();
+	m_bufferedChnls = getEnabledBufferedChnls();
+	qInfo(CAT_SWIOT_AD74413R) << "Enabled channels number: " + QString::number(m_enabledChnlsNo);
+	if(m_iioDev) {
+		Command *createBufferCommand;
+		if(m_samplingFreq >= MAX_BUFFER_SIZE) {
+			createBufferCommand = new IioDeviceCreateBuffer(m_iioDev, MAX_BUFFER_SIZE, false, nullptr);
+		} else {
+			createBufferCommand = new IioDeviceCreateBuffer(m_iioDev, MIN_BUFFER_SIZE, false, nullptr);
+		}
+		connect(createBufferCommand, &scopy::Command::finished, this,
+			&ReaderThread::bufferCreateCommandFinished, Qt::QueuedConnection);
+		m_cmdQueue->enqueue(createBufferCommand);
+	}
 }
 
 void ReaderThread::cancelIioBuffer()
@@ -300,7 +300,7 @@ void ReaderThread::destroyIioBuffer()
 	}
 }
 
-// void ReaderThread::onChnlsChange(QMap<int, ChnlInfo *> chnlsInfo) { m_chnlsInfo = chnlsInfo; }
+void ReaderThread::onChnlsChange(QMap<int, ChnlInfo *> chnlsInfo) { m_chnlsInfo = chnlsInfo; }
 
 void ReaderThread::onSamplingFrequencyComputed(double samplingFrequency) { m_samplingFreq = samplingFrequency; }
 
@@ -328,7 +328,6 @@ void ReaderThread::runBuffered(int requiredBuffersNumber)
 
 void ReaderThread::requestStop()
 {
-	requestInterruption();
 	if(isBuffered && m_running) {
 		m_running = false;
 		destroyIioBuffer();
@@ -363,7 +362,6 @@ void ReaderThread::singleDio() { this->runDio(); }
 
 void ReaderThread::forcedStop()
 {
-	requestInterruption();
 	if(isBuffered && m_running) {
 		m_running = false;
 		cancelIioBuffer();
@@ -371,8 +369,4 @@ void ReaderThread::forcedStop()
 	wait();
 }
 
-void ReaderThread::handleConnectionDestroyed()
-{
-	m_deinit = false;
-	requestInterruption();
-}
+void ReaderThread::handleConnectionDestroyed() { m_deinit = false; }
