@@ -145,3 +145,5 @@ void GRTopBlock::connect(gr::basic_block_sptr src, int srcPort, gr::basic_block_
 }
 
 gr::top_block_sptr GRTopBlock::getGrBlock() { return top; }
+
+#include "moc_grtopblock.cpp"

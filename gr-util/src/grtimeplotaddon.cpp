@@ -591,3 +591,5 @@ void GRTimePlotAddon::setFftWindow(int idx)
 }
 
 int GRTimePlotAddon::xMode() { return m_xmode; }
+
+#include "moc_grtimeplotaddon.cpp"

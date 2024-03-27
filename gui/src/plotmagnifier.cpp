@@ -280,3 +280,5 @@ void PlotMagnifier::zoomToBase()
 	plot()->replot();
 	m_isZoomed = false;
 }
+
+#include "moc_plotmagnifier.cpp"

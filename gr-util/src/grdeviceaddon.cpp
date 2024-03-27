@@ -192,3 +192,5 @@ void GRDeviceAddon::setBufferSize(uint32_t bufferSize) { m_src->setBuffersize(bu
 void GRDeviceAddon::registerChannel(GRTimeChannelAddon *ch) { m_channels.append(ch); }
 
 QList<GRTimeChannelAddon *> GRDeviceAddon::getRegisteredChannels() { return m_channels; }
+
+#include "moc_grdeviceaddon.cpp"

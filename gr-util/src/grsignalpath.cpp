@@ -72,3 +72,5 @@ void GRSignalPath::disconnect_blk(GRTopBlock *top)
 QString GRSignalPath::name() const { return m_name; }
 
 QList<GRProxyBlock *> GRSignalPath::path() { return list; }
+
+#include "moc_grsignalpath.cpp"
