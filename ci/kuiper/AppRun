@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+SELF=$(readlink -f "$0")
+HERE=${SELF%/*}
+
+export QT_PLUGIN_PATH=$HERE/usr/plugins
+export QT_QPA_PLATFORM_PLUGIN_PATH=$HERE/usr/plugins/platforms
+export LD_LIBRARY_PATH=$HERE/usr/lib
+
+echo LD_LIBRARY_PATH: $LD_LIBRARY_PATH
+echo PATH: $PATH
+ldd $HERE/usr/bin/scopy
+exec $HERE/usr/bin/scopy

@@ -26,8 +26,9 @@ QString scopy::config::localPluginFolderPath()
 #if defined __APPLE__
 	return QCoreApplication::applicationDirPath() + "/plugins/plugins";
 #endif
-
-	return SCOPY_PLUGIN_BUILD_PATH;
+	// TODO: a check for ARM
+	// Quickfix for testing purposes
+	return QCoreApplication::applicationDirPath() + "/../share/plugins";
 }
 
 QString scopy::config::defaultTranslationFolderPath() { return SCOPY_TRANSLATION_INSTALL_PATH; }
@@ -38,7 +39,9 @@ QString scopy::config::localTranslationFolderPath()
 	return QCoreApplication::applicationDirPath() + "/translations";
 #endif
 
-	return SCOPY_TRANSLATION_BUILD_PATH;
+	// TODO: a check for ARM
+	// Quickfix for testing purposes
+	return QCoreApplication::applicationDirPath() + "/../share/translations";
 }
 
 QString scopy::config::preferencesFolderPath()

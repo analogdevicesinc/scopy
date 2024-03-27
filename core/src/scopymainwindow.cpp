@@ -386,7 +386,9 @@ void ScopyMainWindow::loadDecoders()
 #if defined __APPLE__
 	QString path = QCoreApplication::applicationDirPath() + "/decoders";
 #else
-	QString path = "decoders";
+	// TODO: a check for ARM
+	// Quickfix for testing purposes
+	QString path = QCoreApplication::applicationDirPath() + "/../lib/decoders";
 #endif
 
 	bool success = true;
