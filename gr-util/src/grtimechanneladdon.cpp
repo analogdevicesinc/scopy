@@ -445,3 +445,5 @@ QPushButton *ImportChannelAddon::createForgetButton(QWidget *parent)
 }
 
 void ImportChannelAddon::onDeinit() {}
+
+#include "moc_grtimechanneladdon.cpp"

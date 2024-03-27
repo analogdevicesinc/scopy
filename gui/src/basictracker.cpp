@@ -149,3 +149,5 @@ bool BasicTracker::eventFilter(QObject *object, QEvent *event)
 
 	return QwtWidgetOverlay::eventFilter(object, event);
 }
+
+#include "moc_basictracker.cpp"

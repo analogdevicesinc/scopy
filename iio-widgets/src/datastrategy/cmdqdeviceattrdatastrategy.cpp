@@ -132,3 +132,5 @@ void CmdQDeviceAttrDataStrategy::optionalAttrReadFinished(Command *cmd)
 
 	Q_EMIT sendData(m_dataRead, m_optionalDataRead);
 }
+
+#include "moc_cmdqdeviceattrdatastrategy.cpp"
