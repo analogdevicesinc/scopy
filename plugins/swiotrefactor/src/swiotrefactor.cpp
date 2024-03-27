@@ -6,6 +6,8 @@
 #include "max14906/max14906.h"
 #include "faults.h"
 
+#include <ad74413r/ad74413r.h>
+
 Q_LOGGING_CATEGORY(CAT_SWIOTREFACTOR, "SWIOTREFACTORPlugin")
 using namespace scopy::swiotrefactor;
 
@@ -60,6 +62,8 @@ void SWIOTREFACTORPlugin::loadToolList()
 		SCOPY_NEW_TOOLMENUENTRY("max14906", "Max14906", ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
 	m_toolList.append(
 		SCOPY_NEW_TOOLMENUENTRY("faults", "Faults", ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+	m_toolList.append(
+		SCOPY_NEW_TOOLMENUENTRY("ad74413r", "Ad74413r", ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
 }
 
 void SWIOTREFACTORPlugin::unload()
@@ -83,6 +87,12 @@ bool SWIOTREFACTORPlugin::onConnect()
 	m_toolList[1]->setTool(faults);
 	m_toolList[1]->setEnabled(true);
 	m_toolList[1]->setRunBtnVisible(true);
+
+	Ad74413r *ad74413r = new Ad74413r(m_param, m_toolList[2]);
+	m_toolList[2]->setTool(ad74413r);
+	m_toolList[2]->setEnabled(true);
+	m_toolList[2]->setRunBtnVisible(true);
+
 	return true;
 }
 
@@ -108,7 +118,7 @@ void SWIOTREFACTORPlugin::initMetadata()
 	loadMetadata(
 		R"plugin(
 	{
-	   "priority":100,
+	   "priority":110,
 	   "category":[
 	      "iio"
 	   ],
