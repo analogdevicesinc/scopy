@@ -93,3 +93,5 @@ TimeChannelAddon::TimeChannelAddon(QString ch, PlotAddon *plotAddon, QPen pen, Q
 {}
 
 TimeChannelAddon::~TimeChannelAddon() {}
+
+#include "moc_timechanneladdon.cpp"

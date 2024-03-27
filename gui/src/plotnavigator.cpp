@@ -507,3 +507,5 @@ void PlotNavigator::syncPlotNavigators(PlotNavigator *pNav1, PlotNavigator *pNav
 		}
 	}
 }
+
+#include "moc_plotnavigator.cpp"

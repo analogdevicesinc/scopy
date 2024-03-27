@@ -58,3 +58,5 @@ bool GRProxyBlock::built() { return (!start_blk.isEmpty()) || (end_blk != nullpt
 
 QList<gr::basic_block_sptr> GRProxyBlock::getGrStartPoint() { return start_blk; }
 gr::basic_block_sptr GRProxyBlock::getGrEndPoint() { return end_blk; }
+
+#include "moc_grproxyblock.cpp"
