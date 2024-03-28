@@ -8,10 +8,11 @@ Q_LOGGING_CATEGORY(CAT_TIMEYAUTOSCALE, "Time Y-Autoscale");
 
 using namespace scopy::gui;
 
-PlotAutoscaler::PlotAutoscaler(bool xAxis, QObject *parent)
+PlotAutoscaler::PlotAutoscaler(QObject *parent)
 	: QObject(parent)
-	, m_xAxis(xAxis)
 {
+	m_xAxisMode = false;
+	m_tolerance = 0;
 	// AUTOSCALE
 	m_autoScaleTimer = new QTimer(this);
 	m_autoScaleTimer->setInterval(1000);
@@ -34,7 +35,7 @@ void PlotAutoscaler::autoscale()
 		for(int i = 0; i < data->size(); i++) {
 
 			qreal sample;
-			if(m_xAxis) {
+			if(m_xAxisMode) {
 				sample = data->sample(i).x();
 			} else {
 				sample = data->sample(i).y();
@@ -47,12 +48,28 @@ void PlotAutoscaler::autoscale()
 		qInfo(CAT_TIMEYAUTOSCALE)
 			<< "Autoscaling channel " << plotCh->name() << "to (" << min << ", " << max << ")";
 	}
-	Q_EMIT newMin(min);
-	Q_EMIT newMax(max);
+
+	double minTolerance = m_tolerance * min;
+	double maxTolerance = m_tolerance * max;
+
+	Q_EMIT newMin(min - minTolerance);
+	Q_EMIT newMax(max + maxTolerance);
 }
 
 void PlotAutoscaler::addChannels(PlotChannel *c) { m_channels.append(c); }
 
 void PlotAutoscaler::removeChannels(PlotChannel *c) { m_channels.removeAll(c); }
+
+double PlotAutoscaler::tolerance() const { return m_tolerance; }
+
+void PlotAutoscaler::setTolerance(double newTolerance)
+{
+	// tolerance represents a percentage
+	m_tolerance = newTolerance / 100;
+}
+
+bool PlotAutoscaler::xAxisMode() const { return m_xAxisMode; }
+
+void PlotAutoscaler::setXAxisMode(bool newXAxis) { m_xAxisMode = newXAxis; }
 
 #include "moc_plotautoscaler.cpp"
