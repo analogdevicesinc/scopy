@@ -54,7 +54,12 @@ void MenuPlotChannelCurveStyleControl::createCurveMenu(QWidget *parent)
 	curveSettingsLay->addWidget(cbStyleW);
 }
 
-void MenuPlotChannelCurveStyleControl::addChannels(PlotChannel *c) { m_channels.append(c); }
+void MenuPlotChannelCurveStyleControl::addChannels(PlotChannel *c)
+{
+	c->setThickness(cbThicknessW->combo()->currentText().toInt());
+	c->setStyle(cbStyleW->combo()->currentIndex());
+	m_channels.append(c);
+}
 
 void MenuPlotChannelCurveStyleControl::removeChannels(PlotChannel *c) { m_channels.removeAll(c); }
 
