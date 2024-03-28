@@ -72,7 +72,7 @@ QWidget *GRTimePlotAddonSettings::createYAxisMenu(QWidget *parent)
 	m_singleYModeSw = new MenuOnOffSwitch("Single Y Mode", yaxis);
 	m_autoscaleBtn = new QPushButton("Autoscale", yaxis);
 
-	autoscaler = new PlotAutoscaler(false, this);
+	autoscaler = new PlotAutoscaler(this);
 	connect(autoscaler, &PlotAutoscaler::newMin, m_yctrl, &MenuPlotAxisRangeControl::setMin);
 	connect(autoscaler, &PlotAutoscaler::newMax, m_yctrl, &MenuPlotAxisRangeControl::setMax);
 	StyleHelper::BlueButton(m_autoscaleBtn, "autoscale");
