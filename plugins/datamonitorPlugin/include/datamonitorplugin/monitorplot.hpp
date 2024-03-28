@@ -32,9 +32,6 @@ public:
 	void toggleMonitor(bool toggled, QString monitorName);
 	bool hasMonitor(QString title);
 
-	void changeCurveStyle(int style);
-	void changeCurveThickness(double thickness);
-
 	void updateXAxisIntervalMin(double min);
 	void updateXAxisIntervalMax(double max);
 	void updateYAxisIntervalMin(double min);
@@ -48,6 +45,10 @@ public:
 	void setStartTime();
 
 	void updatePlotStartingPoint(double time, double delta);
+
+Q_SIGNALS:
+	void monitorCurveAdded(PlotChannel *c);
+	void monitorCurveRemoved(PlotChannel *c);
 
 private:
 	PlotWidget *m_plot;

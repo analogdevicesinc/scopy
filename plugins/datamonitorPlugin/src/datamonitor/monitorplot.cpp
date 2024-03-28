@@ -56,8 +56,6 @@ PlotWidget *MonitorPlot::plot() const { return m_plot; }
 void MonitorPlot::addMonitor(DataMonitorModel *dataMonitorModel)
 {
 	MonitorPlotCurve *plotCurve = new MonitorPlotCurve(dataMonitorModel, m_plot);
-	plotCurve->changeCurveStyle(m_currentCurveStyle);
-	plotCurve->changeCurveThickness(m_currentCurveThickness);
 
 	connect(dataMonitorModel, &DataMonitorModel::dataCleared, this, [=, this]() {
 		plotCurve->clearCurveData();
@@ -66,12 +64,15 @@ void MonitorPlot::addMonitor(DataMonitorModel *dataMonitorModel)
 
 	m_monitorCurves->insert(dataMonitorModel->getName(), plotCurve);
 
+	Q_EMIT monitorCurveAdded(plotCurve->plotch());
+
 	m_plot->replot();
 }
 
 void MonitorPlot::removeMonitor(QString monitorName)
 {
 	if(m_monitorCurves->contains(monitorName)) {
+		Q_EMIT monitorCurveRemoved(m_monitorCurves->value(monitorName)->plotch());
 		m_plot->removePlotChannel(m_monitorCurves->value(monitorName)->plotch());
 		m_monitorCurves->value(monitorName)->plotch()->curve()->detach();
 		m_monitorCurves->remove(monitorName);
@@ -89,24 +90,6 @@ void MonitorPlot::toggleMonitor(bool toggled, QString monitorName)
 }
 
 bool MonitorPlot::hasMonitor(QString title) { return m_monitorCurves->contains(title); }
-
-void MonitorPlot::changeCurveStyle(int style)
-{
-	m_currentCurveStyle = style;
-	foreach(QString curve, m_monitorCurves->keys()) {
-		m_monitorCurves->value(curve)->changeCurveStyle(style);
-	}
-	m_plot->replot();
-}
-
-void MonitorPlot::changeCurveThickness(double thickness)
-{
-	m_currentCurveThickness = thickness;
-	foreach(QString curve, m_monitorCurves->keys()) {
-		m_monitorCurves->value(curve)->changeCurveThickness(thickness);
-	}
-	m_plot->replot();
-}
 
 void MonitorPlot::updateXAxisIntervalMin(double min)
 {
