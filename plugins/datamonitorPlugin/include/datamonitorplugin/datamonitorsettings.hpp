@@ -58,6 +58,7 @@ private:
 	PositionSpinButton *m_ymin;
 	PositionSpinButton *m_ymax;
 	QWidget *generateYAxisSettings(QWidget *parent);
+	QWidget *generateCurveStyleSettings(QWidget *parent);
 
 	MenuHeaderWidget *header;
 	QVBoxLayout *layout;
