@@ -19,75 +19,41 @@
  */
 
 #include "ad74413r/buffermenu.h"
+#include "swiot_logging_categories.h"
 
-#include "qdebug.h"
-#include "qlineedit.h"
-
-#include <iiowidgetfactory.h>
+#include <QLabel>
+#include <iio-widgets/iiowidgetfactory.h>
+#include <iio-widgets/datastrategy/cmdqchannelattrdatastrategy.h>
+#include <iio-widgets/guistrategy/editableguistrategy.h>
 
 using namespace scopy::swiotrefactor;
-BufferMenu::BufferMenu(QWidget *parent, QString chnlFunction, Connection *conn, iio_channel *chnl)
+BufferMenu::BufferMenu(QWidget *parent, QString chnlFunction, Connection *conn, QMap<QString, iio_channel *> chnls)
 	: QWidget(parent)
-	, m_widget(parent)
 	, m_chnlFunction(chnlFunction)
 	, m_connection(conn)
-	, m_chnl(chnl)
+	, m_chnls(chnls)
 {
-	// channels sampling freq
-	QHBoxLayout *samplingFreqLayout = new QHBoxLayout();
-	m_samplingFreqOptions = new QComboBox(m_widget);
-	samplingFreqLayout->addWidget(new QLabel("Sampling frequency", m_widget));
-	samplingFreqLayout->addWidget(m_samplingFreqOptions);
-	addMenuLayout(samplingFreqLayout);
 
-	connectSignalsToSlots();
+	if(m_chnls.contains(INPUT_CHNL)) {
+		// channels sampling freq - input channel
+		IIOWidget *samplingFreq =
+			IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
+						      {.connection = const_cast<Connection *>(m_connection),
+						       .channel = const_cast<iio_channel *>(m_chnls[INPUT_CHNL]),
+						       .data = "sampling_frequency",
+						       .iioDataOptions = "sampling_frequency_available"},
+						      this);
+		samplingFreq->getDataStrategy()->requestData();
+		addMenuWidget(samplingFreq);
+
+		connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(samplingFreq->getDataStrategy()),
+			&CmdQChannelAttrDataStrategy::sendData, this, [=, this](QString data, QString dataOptions) {
+				Q_EMIT samplingFrequencyUpdated(data.toInt());
+			});
+	}
 }
 
 BufferMenu::~BufferMenu() {}
-
-void BufferMenu::connectSignalsToSlots()
-{
-	connect(m_samplingFreqOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-		&BufferMenu::onSamplingFreqChanged);
-}
-
-void BufferMenu::init()
-{
-	setAvailableOptions(m_samplingFreqOptions, "sampling_frequency_available");
-	(m_attrValues[INPUT_CHNL].contains("sampling_frequency") &&
-	 !m_attrValues[INPUT_CHNL]["sampling_frequency"].isEmpty())
-		? m_samplingFreqOptions->setCurrentText(m_attrValues[INPUT_CHNL]["sampling_frequency"].first())
-		: m_samplingFreqOptions->setCurrentText("ERROR");
-	//	m_unitPerDivision->setValue(1);
-	//	Q_EMIT m_unitPerDivision->valueChanged(m_unitPerDivision->value());
-}
-
-void BufferMenu::setAvailableOptions(QComboBox *list, QString attrName)
-{
-	if(!m_attrValues.contains(INPUT_CHNL)) {
-		return;
-	}
-	QStringList availableValues = m_attrValues[INPUT_CHNL][attrName];
-	for(const auto &srValue : qAsConst(availableValues)) {
-		list->addItem(srValue);
-	}
-}
-
-void BufferMenu::onSamplingFreqChanged(int idx)
-{
-	QString attrName = "sampling_frequency";
-	if(!m_attrValues.contains(INPUT_CHNL)) {
-		qWarning() << "There is no input channel available!";
-		return;
-	}
-	const auto &srAvail = m_attrValues[INPUT_CHNL]["sampling_frequency_available"][idx];
-	m_attrValues[INPUT_CHNL][attrName].clear();
-	m_attrValues[INPUT_CHNL][attrName].push_back(srAvail);
-
-	Q_EMIT attrValuesChanged(attrName, INPUT_CHNL);
-	// TBD should be emitted on readback
-	Q_EMIT samplingFrequencyUpdated(srAvail.toInt());
-}
 
 QString BufferMenu::getInfoMessage()
 {
@@ -97,91 +63,38 @@ QString BufferMenu::getInfoMessage()
 	return defaultMessage;
 }
 
-void BufferMenu::addMenuLayout(QBoxLayout *layout) { m_menuLayers.push_back(layout); }
+void BufferMenu::addMenuWidget(QWidget *widget) { m_widgetsList.push_back(widget); }
 
-void BufferMenu::setupVerticalSettingsMenu(QWidget *settingsWidget, QString unit, double yMin, double yMax)
+void BufferMenu::onBroadcastThreshold() {}
+
+QList<QWidget *> BufferMenu::getWidgetsList() { return m_widgetsList; }
+
+CurrentInLoopMenu::CurrentInLoopMenu(QWidget *parent, QString chnlFunction, Connection *conn,
+				     QMap<QString, iio_channel *> chnls)
+	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
-	// Y-UNIT-PER-DIV
-	QHBoxLayout *yMinMaxLayout = new QHBoxLayout(settingsWidget);
-	yMinMaxLayout->setMargin(0);
-	yMinMaxLayout->setSpacing(10);
-
-	m_unitPerDivision = new PositionSpinButton(
-		{
-			{unit, 1e0},
-		},
-		"Unit/Div", 10e-6, yMax, false, false, settingsWidget);
-
-	yMinMaxLayout->addWidget(m_unitPerDivision);
-	settingsWidget->layout()->addItem(yMinMaxLayout);
-
-	// Connects
-	connect(m_unitPerDivision, &PositionSpinButton::valueChanged, this, &BufferMenu::setUnitPerDivision);
-	connect(this, &BufferMenu::unitPerDivisionChanged, this, [=, this](double unitPerDiv) {
-		QSignalBlocker block(m_unitPerDivision);
-		m_unitPerDivision->setValue(unitPerDiv);
-	});
-}
-
-void BufferMenu::setAttrValues(QMap<QString, QMap<QString, QStringList>> values) { m_attrValues = values; }
-
-QMap<QString, QMap<QString, QStringList>> BufferMenu::getAttrValues() { return m_attrValues; }
-
-QVector<QBoxLayout *> BufferMenu::getMenuLayers() { return m_menuLayers; }
-
-double BufferMenu::convertFromRaw(int rawValue, QString chnlType)
-{
-	double value = 0.0;
-	if(m_attrValues.contains(chnlType) && m_attrValues[chnlType].contains("offset") &&
-	   m_attrValues[chnlType].contains("scale")) {
-		double offset = m_attrValues[chnlType]["offset"].first().toDouble();
-		double scale = m_attrValues[chnlType]["scale"].first().toDouble();
-		value = (rawValue + offset) * scale;
+	// dac code - output channel
+	IIOWidget *dacCode = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::RangeUi,
+							   {.connection = const_cast<Connection *>(m_connection),
+							    .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
+							    .data = "raw",
+							    .constDataOptions = "[0 1 8191]"},
+							   this);
+	QLayoutItem *item = dacCode->getUiStrategy()->ui()->layout()->itemAt(0);
+	PositionSpinButton *dacSpin = nullptr;
+	if(item) {
+		dacSpin = dynamic_cast<PositionSpinButton *>(item->widget());
 	}
-	return value;
-}
-
-void BufferMenu::onAttrWritten(QMap<QString, QMap<QString, QStringList>> values)
-{
-	m_attrValues = values;
-	Q_EMIT mapUpdated();
-}
-
-CurrentInLoopMenu::CurrentInLoopMenu(QWidget *parent, QString chnlFunction, Connection *conn, iio_channel *chnl)
-	: BufferMenu(parent, chnlFunction, conn, chnl)
-{
-	// dac code
-	QHBoxLayout *dacCodeLayout = new QHBoxLayout();
-	m_dacCodeSpinButton = new PositionSpinButton({{"value", 1E0}}, "DAC Code", 0, 8191, true, false, m_widget);
-	dacCodeLayout->addWidget(m_dacCodeSpinButton);
-	addMenuLayout(dacCodeLayout);
-	// dac label
-	QHBoxLayout *m_dacLabelLayout = new QHBoxLayout();
-	m_dacLabel = new QLabel("mA", m_widget);
-	m_dacLabelLayout->addWidget(m_dacLabel);
-	m_dacLabelLayout->setAlignment(Qt::AlignRight);
-	addMenuLayout(m_dacLabelLayout);
-
-	connectSignalsToSlots();
+	if(dacSpin) {
+		dacSpin->nameLabel()->setText("DAC Code");
+		dacSpin->comboBox()->clear();
+		dacSpin->comboBox()->addItem("raw value");
+		dacSpin->comboBox()->setEnabled(false);
+	}
+	addMenuWidget(dacCode);
 }
 
 CurrentInLoopMenu::~CurrentInLoopMenu() {}
-
-void CurrentInLoopMenu::init()
-{
-	BufferMenu::init();
-	m_unitPerDivision->setValue(0.001);
-	Q_EMIT m_unitPerDivision->valueChanged(m_unitPerDivision->value());
-	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
-		? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
-		: m_dacCodeSpinButton->setValue(0);
-}
-
-void CurrentInLoopMenu::connectSignalsToSlots()
-{
-	connect(m_dacCodeSpinButton, &PositionSpinButton::valueChanged, this, &CurrentInLoopMenu::dacCodeChanged);
-	connect(this, SIGNAL(mapUpdated()), this, SLOT(onMapUpdated()));
-}
 
 QString CurrentInLoopMenu::getInfoMessage()
 {
@@ -192,94 +105,45 @@ QString CurrentInLoopMenu::getInfoMessage()
 	return infoMessage;
 }
 
-void CurrentInLoopMenu::dacCodeChanged(double value)
+DigitalInLoopMenu::DigitalInLoopMenu(QWidget *parent, QString chnlFunction, Connection *conn,
+				     QMap<QString, iio_channel *> chnls)
+	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
-	QString attrName("raw");
-	if(!m_attrValues.contains(OUTPUT_CHNL)) {
-		qWarning() << "There is no output channel available for this function!";
-		return;
+	// threshold - input channel
+	m_threshold = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::EditableUi,
+						    {.connection = const_cast<Connection *>(m_connection),
+						     .channel = const_cast<iio_channel *>(m_chnls[INPUT_CHNL]),
+						     .data = "threshold",
+						     .constDataOptions = "[0 1 16000]"},
+						    this);
+	addMenuWidget(m_threshold);
+
+	CmdQChannelAttrDataStrategy *dataStrategy =
+		dynamic_cast<CmdQChannelAttrDataStrategy *>(m_threshold->getDataStrategy());
+	connect(dataStrategy, &CmdQChannelAttrDataStrategy::emitStatus, this,
+		[=, this](int retCode) { Q_EMIT broadcastThreshold(); });
+	// dac code - output channel
+	IIOWidget *dacCode = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::RangeUi,
+							   {.connection = const_cast<Connection *>(m_connection),
+							    .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
+							    .data = "raw",
+							    .constDataOptions = "[0 1 8191]"},
+							   this);
+	QLayoutItem *item = dacCode->getUiStrategy()->ui()->layout()->itemAt(0);
+	PositionSpinButton *dacSpin = nullptr;
+	if(item) {
+		dacSpin = dynamic_cast<PositionSpinButton *>(item->widget());
 	}
-	m_attrValues[OUTPUT_CHNL][attrName].clear();
-	m_attrValues[OUTPUT_CHNL][attrName].push_back(QString::number(value));
-	double val = convertFromRaw(value);
-	m_dacLabel->clear();
-	m_dacLabel->setText(QString::number(val) + " mA");
-
-	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
-}
-
-void CurrentInLoopMenu::onMapUpdated()
-{
-	m_dacCodeSpinButton->blockSignals(true);
-	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
-		? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
-		: m_dacCodeSpinButton->setValue(0);
-	m_dacCodeSpinButton->blockSignals(false);
-}
-
-DigitalInLoopMenu::DigitalInLoopMenu(QWidget *parent, QString chnlFunction, Connection *conn, iio_channel *chnl)
-	: BufferMenu(parent, chnlFunction, conn, chnl)
-{
-	// threshold
-	QVBoxLayout *thresholdLayout = new QVBoxLayout();
-	QRegExp regExp("([0-9]|[1-9][0-9]{1,3}|1[0-5][0-9]{3}|16000)");
-	QRegExpValidator *validator = new QRegExpValidator(regExp, this);
-	m_titleLabel = new QLabel("Threshold (0 - 16000 mV)", m_widget);
-	m_titleLabel->setStyleSheet("font-size: 14px;");
-	m_thresholdLineEdit = new QLineEdit(m_widget);
-	m_thresholdLineEdit->setStyleSheet(
-		"background: transparent; height: 20px; width: 75px; font-size: 18px; border: 0px; bottom: 10px;");
-	m_thresholdLineEdit->setValidator(validator);
-
-	QFrame *frame = new QFrame(m_widget);
-	frame->setFrameShape(QFrame::HLine);
-	frame->setStyleSheet("color: #4a64ff;");
-	thresholdLayout->addWidget(m_titleLabel);
-	thresholdLayout->addWidget(m_thresholdLineEdit);
-	thresholdLayout->addWidget(frame);
-	addMenuLayout(thresholdLayout);
-	// dac code
-	QHBoxLayout *dacCodeLayout = new QHBoxLayout();
-	m_dacCodeSpinButton = new PositionSpinButton({{"value", 1E0}}, "DAC Code", 0, 8191, true, false, m_widget);
-
-	dacCodeLayout->addWidget(m_dacCodeSpinButton);
-	addMenuLayout(dacCodeLayout);
-	// dac label
-	QHBoxLayout *m_dacLabelLayout = new QHBoxLayout();
-	m_dacLabel = new QLabel("mA", m_widget);
-	m_dacLabelLayout->addWidget(m_dacLabel);
-	m_dacLabelLayout->setAlignment(Qt::AlignRight);
-	addMenuLayout(m_dacLabelLayout);
-
-	connectSignalsToSlots();
+	if(dacSpin) {
+		dacSpin->nameLabel()->setText("DAC Code");
+		dacSpin->comboBox()->clear();
+		dacSpin->comboBox()->addItem("raw value");
+		dacSpin->comboBox()->setEnabled(false);
+	}
+	addMenuWidget(dacCode);
 }
 
 DigitalInLoopMenu::~DigitalInLoopMenu() {}
-
-void DigitalInLoopMenu::init()
-{
-	BufferMenu::init();
-	m_unitPerDivision->setValue(0.001);
-	Q_EMIT m_unitPerDivision->valueChanged(m_unitPerDivision->value());
-	(m_attrValues[INPUT_CHNL].contains("threshold") && !m_attrValues[INPUT_CHNL]["threshold"].isEmpty())
-		? m_thresholdLineEdit->setText(m_attrValues[INPUT_CHNL]["threshold"].first()),
-		m_thresholdLineEdit->setPlaceholderText(m_attrValues[INPUT_CHNL]["threshold"].first())
-		: m_thresholdLineEdit->setText("0"),
-		m_thresholdLineEdit->setPlaceholderText("0");
-
-	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
-		? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
-		: m_dacCodeSpinButton->setValue(0);
-}
-
-void DigitalInLoopMenu::connectSignalsToSlots()
-{
-	connect(m_dacCodeSpinButton, &PositionSpinButton::valueChanged, this, &DigitalInLoopMenu::dacCodeChanged);
-	connect(m_thresholdLineEdit, &QLineEdit::returnPressed, this, &DigitalInLoopMenu::thresholdChanged);
-	connect(this, SIGNAL(mapUpdated()), this, SLOT(onMapUpdated()));
-	connect(this, SIGNAL(broadcastThresholdReadBackward(QString)), this, SLOT(onBroadcastThresholdRead(QString)));
-	connect(this, &BufferMenu::thresholdControlEnable, this, &DigitalInLoopMenu::onThresholdControlEnable);
-}
 
 QString DigitalInLoopMenu::getInfoMessage()
 {
@@ -291,179 +155,75 @@ QString DigitalInLoopMenu::getInfoMessage()
 	return infoMessage;
 }
 
-void DigitalInLoopMenu::dacCodeChanged(double value)
+void DigitalInLoopMenu::onBroadcastThreshold()
 {
-	QString attrName("raw");
-	if(!m_attrValues.contains(OUTPUT_CHNL)) {
-		qWarning() << "There is no output channel available for this function!";
+	CmdQChannelAttrDataStrategy *dataStrategy =
+		dynamic_cast<CmdQChannelAttrDataStrategy *>(m_threshold->getDataStrategy());
+	dataStrategy->requestData();
+}
+
+void DigitalInLoopMenu::onEmitStatus(int retCode)
+{
+	if(retCode != 0) {
+		qWarning(CAT_SWIOT_AD74413R) << "[" << m_chnlFunction << "] Treshold value cannot be written!";
 		return;
 	}
-	m_attrValues[OUTPUT_CHNL][attrName].clear();
-	m_attrValues[OUTPUT_CHNL][attrName].push_back(QString::number(value));
-	double val = convertFromRaw(value);
-	m_dacLabel->clear();
-	m_dacLabel->setText(QString::number(val) + " mA");
-
-	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
+	Q_EMIT broadcastThreshold();
 }
 
-void DigitalInLoopMenu::thresholdChanged()
+VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection *conn,
+			       QMap<QString, iio_channel *> chnls)
+	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
-	QString attrName("threshold");
-	if(!m_attrValues.contains(INPUT_CHNL)) {
-		qWarning() << "There is no input channel available for this function!";
-		return;
+	// dac code - output channel
+	IIOWidget *dacCode = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::RangeUi,
+							   {.connection = const_cast<Connection *>(m_connection),
+							    .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
+							    .data = "raw",
+							    .constDataOptions = "[0 1 8191]"},
+							   this);
+	QLayoutItem *item = dacCode->getUiStrategy()->ui()->layout()->itemAt(0);
+	PositionSpinButton *dacSpin = nullptr;
+	if(item) {
+		dacSpin = dynamic_cast<PositionSpinButton *>(item->widget());
 	}
-	if(m_attrValues[INPUT_CHNL].contains(attrName)) {
-		m_attrValues[INPUT_CHNL][attrName].clear();
-		m_attrValues[INPUT_CHNL][attrName].push_back(m_thresholdLineEdit->text());
-		Q_EMIT attrValuesChanged(attrName, INPUT_CHNL);
-	} else {
-		qWarning() << attrName.toUpper() + " attribute does not exist!";
+	if(dacSpin) {
+		dacSpin->nameLabel()->setText("DAC Code");
+		dacSpin->comboBox()->clear();
+		dacSpin->comboBox()->addItem("raw value");
+		dacSpin->comboBox()->setEnabled(false);
 	}
-}
+	addMenuWidget(dacCode);
 
-void DigitalInLoopMenu::onMapUpdated()
-{
-	m_thresholdLineEdit->blockSignals(true);
-	if(m_attrValues[INPUT_CHNL].contains("threshold") && !m_attrValues[INPUT_CHNL]["threshold"].isEmpty()) {
-		if(m_attrValues[INPUT_CHNL]["threshold"].first().compare(m_thresholdLineEdit->text()) != 0) {
-			Q_EMIT broadcastThresholdReadForward(m_attrValues[INPUT_CHNL]["threshold"].first());
-		}
-		m_thresholdLineEdit->setText(m_attrValues[INPUT_CHNL]["threshold"].first());
-		m_thresholdLineEdit->setPlaceholderText(m_attrValues[INPUT_CHNL]["threshold"].first());
-	} else {
-		m_thresholdLineEdit->setText(0);
-	}
-	m_thresholdLineEdit->blockSignals(false);
-	m_dacCodeSpinButton->blockSignals(true);
-	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
-		? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
-		: m_dacCodeSpinButton->setValue(0);
-	m_dacCodeSpinButton->blockSignals(false);
-}
+	// slew - output channel
+	IIOWidget *slewOptions =
+		IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
+					      {.connection = const_cast<Connection *>(m_connection),
+					       .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
+					       .data = "slew_en",
+					       .constDataOptions = "0 1"},
+					      this);
 
-void DigitalInLoopMenu::onBroadcastThresholdRead(QString value)
-{
-	m_thresholdLineEdit->blockSignals(true);
-	if(value.compare(m_thresholdLineEdit->text()) != 0) {
-		m_thresholdLineEdit->setText(value);
-		m_thresholdLineEdit->setPlaceholderText(value);
-		m_attrValues[INPUT_CHNL]["threshold"].first() = value;
-	}
-	m_thresholdLineEdit->blockSignals(false);
-}
-
-void DigitalInLoopMenu::onThresholdControlEnable(bool enabled) { m_thresholdLineEdit->setEnabled(enabled); }
-
-VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection *conn, iio_channel *chnl)
-	: BufferMenu(parent, chnlFunction, conn, chnl)
-{
-	// dac code
-	//	IIOWidget *dacCode = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData |
-	// IIOWidgetFactory::RangeUi,
-	//							   {.connection = const_cast<Connection
-	//*>(m_connection), 							    .channel = const_cast<iio_channel
-	//*>(m_chnl), .data = "raw", 							    .constDataOptions = "[0 1
-	// 8191]"},
-	// m_widget); 	dacCodeLayout->addWidget(dacCode);
-	QHBoxLayout *dacCodeLayout = new QHBoxLayout();
-	m_dacCodeSpinButton = new PositionSpinButton({{"value", 1E0}}, "DAC Code", 0, 8191, true, false, m_widget);
-	dacCodeLayout->addWidget(m_dacCodeSpinButton);
-	addMenuLayout(dacCodeLayout);
-	// dac label
-	QHBoxLayout *m_dacLabelLayout = new QHBoxLayout();
-	m_dacLabel = new QLabel("V", m_widget);
-	m_dacLabelLayout->addWidget(m_dacLabel);
-	m_dacLabelLayout->setAlignment(Qt::AlignRight);
-	addMenuLayout(m_dacLabelLayout);
-	// slew
-	QHBoxLayout *slewLayout = new QHBoxLayout();
-	//	IIOWidget *slewOptions =
-	//		IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
-	//					      {.connection = const_cast<Connection *>(m_connection),
-	//					       .channel = const_cast<iio_channel *>(m_chnl),
-	//					       .data = "slew_en",
-	//					       .constDataOptions = "0 1"},
-	//					      m_widget);
-	m_slewOptions = new QComboBox(m_widget);
-	m_slewOptions->addItem(QString("Disable"));
-	m_slewOptions->addItem(QString("Enable"));
-
-	slewLayout->addWidget(new QLabel("Slew", m_widget), 1);
-	slewLayout->addWidget(m_slewOptions, 1);
-	//	slewLayout->addWidget(slewOptions);
-	addMenuLayout(slewLayout);
-	// slew step
-	QHBoxLayout *slewStepLayout = new QHBoxLayout();
-	//	IIOWidget *slewStep = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData |
-	// IIOWidgetFactory::ComboUi,
-	//							    {.connection = const_cast<Connection
-	//*>(m_connection), 							     .channel = const_cast<iio_channel
-	//*>(m_chnl), .data = "slew_step", 							     .iioDataOptions =
-	//"slew_step_available"}, 							    m_widget);
-	// slewStepLayout->addWidget(slewStep);
-	m_slewStepOptions = new QComboBox(m_widget);
-
-	slewStepLayout->addWidget(new QLabel("Slew Step Size", m_widget), 1);
-	slewStepLayout->addWidget(m_slewStepOptions, 1);
-	addMenuLayout(slewStepLayout);
-	// slew rate
-	QHBoxLayout *slewRateLayout = new QHBoxLayout();
-	//	IIOWidget *slewRate = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData |
-	// IIOWidgetFactory::ComboUi,
-	//							    {.connection = const_cast<Connection
-	//*>(m_connection), 							     .channel = const_cast<iio_channel
-	//*>(m_chnl), .data = "slew_rate", 							     .iioDataOptions =
-	//"slew_rate_available"}, 							    m_widget);
-	// slewRateLayout->addWidget(slewRate);
-	m_slewRateOptions = new QComboBox(m_widget);
-
-	slewRateLayout->addWidget(new QLabel("Slew Rate (kHz)", m_widget), 1);
-	slewRateLayout->addWidget(m_slewRateOptions, 1);
-	addMenuLayout(slewRateLayout);
-
-	connectSignalsToSlots();
+	addMenuWidget(slewOptions);
+	// slew step - output channel
+	IIOWidget *slewStep = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
+							    {.connection = const_cast<Connection *>(m_connection),
+							     .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
+							     .data = "slew_step",
+							     .iioDataOptions = "slew_step_available"},
+							    this);
+	addMenuWidget(slewStep);
+	// slew rate - output channel
+	IIOWidget *slewRate = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
+							    {.connection = const_cast<Connection *>(m_connection),
+							     .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
+							     .data = "slew_rate",
+							     .iioDataOptions = "slew_rate_available"},
+							    this);
+	addMenuWidget(slewRate);
 }
 
 VoltageOutMenu::~VoltageOutMenu() {}
-
-void VoltageOutMenu::init()
-{
-	BufferMenu::init();
-	setAvailableOptions(m_slewStepOptions, "slew_step_available");
-	setAvailableOptions(m_slewRateOptions, "slew_rate_available");
-
-	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
-		? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
-		: m_dacCodeSpinButton->setValue(0);
-
-	if(m_attrValues[OUTPUT_CHNL].contains("slew_en") && !m_attrValues[OUTPUT_CHNL]["slew_en"].isEmpty()) {
-		(m_attrValues[OUTPUT_CHNL]["slew_en"].first().compare("0") == 0)
-			? m_slewOptions->setCurrentText("Disable")
-			: m_slewOptions->setCurrentText("Enable");
-	}
-
-	(m_attrValues[OUTPUT_CHNL].contains("slew_step") && !m_attrValues[OUTPUT_CHNL]["slew_step"].isEmpty())
-		? m_slewStepOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_step"].first())
-		: m_slewStepOptions->setCurrentText("ERROR");
-
-	(m_attrValues[OUTPUT_CHNL].contains("slew_rate") && !m_attrValues[OUTPUT_CHNL]["slew_rate"].isEmpty())
-		? m_slewRateOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_rate"].first())
-		: m_slewRateOptions->setCurrentText("ERROR");
-}
-
-void VoltageOutMenu::connectSignalsToSlots()
-{
-	connect(m_dacCodeSpinButton, &PositionSpinButton::valueChanged, this, &VoltageOutMenu::dacCodeChanged);
-	connect(m_slewStepOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-		&VoltageOutMenu::slewStepIndexChanged);
-	connect(m_slewRateOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-		&VoltageOutMenu::slewRateIndexChanged);
-	connect(m_slewOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-		&VoltageOutMenu::slewIndexChanged);
-	connect(this, SIGNAL(mapUpdated()), this, SLOT(onMapUpdated()));
-}
 
 QString VoltageOutMenu::getInfoMessage()
 {
@@ -474,185 +234,58 @@ QString VoltageOutMenu::getInfoMessage()
 	return infoMessage;
 }
 
-void VoltageOutMenu::setAvailableOptions(QComboBox *list, QString attrName)
+CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection *conn,
+			       QMap<QString, iio_channel *> chnls)
+	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
-	if(!m_attrValues.contains(OUTPUT_CHNL)) {
-		qWarning() << "There is no output channel available for this function!";
-		return;
+	// dac code - output channel
+	IIOWidget *dacCode = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::RangeUi,
+							   {.connection = const_cast<Connection *>(m_connection),
+							    .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
+							    .data = "raw",
+							    .constDataOptions = "[0 1 8191]"},
+							   this);
+	QLayoutItem *item = dacCode->getUiStrategy()->ui()->layout()->itemAt(0);
+	PositionSpinButton *dacSpin = nullptr;
+	if(item) {
+		dacSpin = dynamic_cast<PositionSpinButton *>(item->widget());
 	}
-	QStringList availableValues = m_attrValues[OUTPUT_CHNL][attrName];
-	for(const auto &slewValue : qAsConst(availableValues)) {
-		list->addItem(slewValue);
+	if(dacSpin) {
+		dacSpin->nameLabel()->setText("DAC Code");
+		dacSpin->comboBox()->clear();
+		dacSpin->comboBox()->addItem("raw value");
+		dacSpin->comboBox()->setEnabled(false);
 	}
-}
+	addMenuWidget(dacCode);
+	// slew - output channel
+	IIOWidget *slewOptions =
+		IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
+					      {.connection = const_cast<Connection *>(m_connection),
+					       .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
+					       .data = "slew_en",
+					       .constDataOptions = "0 1"},
+					      this);
 
-void VoltageOutMenu::dacCodeChanged(double value)
-{
-	QString attrName("raw");
-	if(!m_attrValues.contains(OUTPUT_CHNL)) {
-		qWarning() << "There is no output channel available for this function!";
-		return;
-	}
-	m_attrValues[OUTPUT_CHNL][attrName].clear();
-	m_attrValues[OUTPUT_CHNL][attrName].push_back(QString::number((int)value));
-	// the convertFromRaw return value is in mV that's why we multiply by 10^(-3)
-	double val = convertFromRaw(value) * 0.001;
-	m_dacLabel->clear();
-	m_dacLabel->setText(QString::number(val) + " V");
-
-	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
-}
-
-void VoltageOutMenu::slewStepIndexChanged(int idx)
-{
-	QString attrName = "slew_step";
-	if(!m_attrValues.contains(OUTPUT_CHNL)) {
-		qWarning() << "There is no output channel available for this function!";
-		return;
-	}
-	const auto &slewStep = m_attrValues[OUTPUT_CHNL]["slew_step_available"][idx];
-	m_attrValues[OUTPUT_CHNL][attrName].clear();
-	m_attrValues[OUTPUT_CHNL][attrName].push_back(slewStep);
-
-	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
-}
-
-void VoltageOutMenu::slewRateIndexChanged(int idx)
-{
-	QString attrName = "slew_rate";
-	if(!m_attrValues.contains(OUTPUT_CHNL)) {
-		qWarning() << "There is no output channel available for this function!";
-		return;
-	}
-	const auto &slewStep = m_attrValues[OUTPUT_CHNL]["slew_rate_available"][idx];
-	m_attrValues[OUTPUT_CHNL][attrName].clear();
-	m_attrValues[OUTPUT_CHNL][attrName].push_back(slewStep);
-
-	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
-}
-
-void VoltageOutMenu::slewIndexChanged(int idx)
-{
-	QString attrName = "slew_en";
-	if(!m_attrValues.contains(OUTPUT_CHNL)) {
-		qWarning() << "There is no output channel available for this function!";
-		return;
-	}
-	m_attrValues[OUTPUT_CHNL][attrName].clear();
-	if(idx == SLEW_DISABLE_IDX) {
-		m_attrValues[OUTPUT_CHNL][attrName].push_back(QString("0"));
-	} else {
-		m_attrValues[OUTPUT_CHNL][attrName].push_back(QString("1"));
-	}
-
-	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
-}
-
-void VoltageOutMenu::onMapUpdated()
-{
-	m_dacCodeSpinButton->blockSignals(true);
-	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
-		? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
-		: m_dacCodeSpinButton->setValue(0);
-	m_dacCodeSpinButton->blockSignals(false);
-
-	m_slewOptions->blockSignals(true);
-	(m_attrValues[OUTPUT_CHNL]["slew_en"].first().compare("0") == 0) ? m_slewOptions->setCurrentText("Disable")
-									 : m_slewOptions->setCurrentText("Enable");
-	m_slewOptions->blockSignals(false);
-
-	m_slewStepOptions->blockSignals(true);
-	(m_attrValues[OUTPUT_CHNL].contains("slew_step") && !m_attrValues[OUTPUT_CHNL]["slew_step"].isEmpty())
-		? m_slewStepOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_step"].first())
-		: m_slewStepOptions->setCurrentText("ERROR");
-	m_slewStepOptions->blockSignals(false);
-
-	m_slewRateOptions->blockSignals(true);
-	(m_attrValues[OUTPUT_CHNL].contains("slew_rate") && !m_attrValues[OUTPUT_CHNL]["slew_rate"].isEmpty())
-		? m_slewRateOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_rate"].first())
-		: m_slewRateOptions->setCurrentText("ERROR");
-	m_slewRateOptions->blockSignals(false);
-}
-
-CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection *conn, iio_channel *chnl)
-	: BufferMenu(parent, chnlFunction, conn, chnl)
-{
-	// dac code
-	QHBoxLayout *dacCodeLayout = new QHBoxLayout();
-	m_dacCodeSpinButton = new PositionSpinButton({{"value", 1E0}}, "DAC Code", 0, 8196, true, false, m_widget);
-	dacCodeLayout->addWidget(m_dacCodeSpinButton);
-	addMenuLayout(dacCodeLayout);
-	// dac label
-	QHBoxLayout *m_dacLabelLayout = new QHBoxLayout();
-	m_dacLabel = new QLabel("mA", m_widget);
-	m_dacLabelLayout->addWidget(m_dacLabel);
-	m_dacLabelLayout->setAlignment(Qt::AlignRight);
-	addMenuLayout(m_dacLabelLayout);
-	// slew
-	QHBoxLayout *slewLayout = new QHBoxLayout();
-	m_slewOptions = new QComboBox(m_widget);
-	m_slewOptions->addItem(QString("Disable"));
-	m_slewOptions->addItem(QString("Enable"));
-
-	slewLayout->addWidget(new QLabel("Slew", m_widget), 1);
-	slewLayout->addWidget(m_slewOptions, 1);
-	addMenuLayout(slewLayout);
-	// slew step
-	QHBoxLayout *slewStepLayout = new QHBoxLayout();
-	m_slewStepOptions = new QComboBox(m_widget);
-
-	slewStepLayout->addWidget(new QLabel("Slew Step Size", m_widget), 1);
-	slewStepLayout->addWidget(m_slewStepOptions, 1);
-	addMenuLayout(slewStepLayout);
-	// slew rate
-	QHBoxLayout *slewRateLayout = new QHBoxLayout();
-	m_slewRateOptions = new QComboBox(m_widget);
-
-	slewRateLayout->addWidget(new QLabel("Slew Rate (kHz)", m_widget), 1);
-	slewRateLayout->addWidget(m_slewRateOptions, 1);
-	addMenuLayout(slewRateLayout);
-
-	connectSignalsToSlots();
+	addMenuWidget(slewOptions);
+	// slew step - output channel
+	IIOWidget *slewStep = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
+							    {.connection = const_cast<Connection *>(m_connection),
+							     .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
+							     .data = "slew_step",
+							     .iioDataOptions = "slew_step_available"},
+							    this);
+	addMenuWidget(slewStep);
+	// slew rate - output channel
+	IIOWidget *slewRate = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
+							    {.connection = const_cast<Connection *>(m_connection),
+							     .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
+							     .data = "slew_rate",
+							     .iioDataOptions = "slew_rate_available"},
+							    this);
+	addMenuWidget(slewRate);
 }
 
 CurrentOutMenu::~CurrentOutMenu() {}
-
-void CurrentOutMenu::init()
-{
-	BufferMenu::init();
-	setAvailableOptions(m_slewStepOptions, "slew_step_available");
-	setAvailableOptions(m_slewRateOptions, "slew_rate_available");
-
-	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
-		? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
-		: m_dacCodeSpinButton->setValue(0);
-
-	if(m_attrValues[OUTPUT_CHNL].contains("slew_en") && !m_attrValues[OUTPUT_CHNL]["slew_en"].isEmpty()) {
-		(m_attrValues[OUTPUT_CHNL]["slew_en"].first().compare("0") == 0)
-			? m_slewOptions->setCurrentText("Disable")
-			: m_slewOptions->setCurrentText("Enable");
-	}
-
-	(m_attrValues[OUTPUT_CHNL].contains("slew_step") && !m_attrValues[OUTPUT_CHNL]["slew_step"].isEmpty())
-		? m_slewStepOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_step"].first())
-		: m_slewStepOptions->setCurrentText("ERROR");
-
-	(m_attrValues[OUTPUT_CHNL].contains("slew_rate") && !m_attrValues[OUTPUT_CHNL]["slew_rate"].isEmpty())
-		? m_slewRateOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_rate"].first())
-		: m_slewRateOptions->setCurrentText("ERROR");
-}
-
-void CurrentOutMenu::connectSignalsToSlots()
-{
-	connect(m_dacCodeSpinButton, &PositionSpinButton::valueChanged, this, &CurrentOutMenu::dacCodeChanged);
-	connect(m_slewStepOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-		&CurrentOutMenu::slewStepIndexChanged);
-	connect(m_slewRateOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-		&CurrentOutMenu::slewRateIndexChanged);
-	connect(m_slewOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-		&CurrentOutMenu::slewIndexChanged);
-	connect(this, SIGNAL(mapUpdated()), this, SLOT(onMapUpdated()));
-}
 
 QString CurrentOutMenu::getInfoMessage()
 {
@@ -663,272 +296,69 @@ QString CurrentOutMenu::getInfoMessage()
 	return infoMessage;
 }
 
-void CurrentOutMenu::setAvailableOptions(QComboBox *list, QString attrName)
+DiagnosticMenu::DiagnosticMenu(QWidget *parent, QString chnlFunction, Connection *conn,
+			       QMap<QString, iio_channel *> chnls)
+	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
-	if(!m_attrValues.contains(OUTPUT_CHNL)) {
-		qWarning() << "There is no output channel available for this function!";
-		return;
-	}
-	QStringList availableValues = m_attrValues[OUTPUT_CHNL][attrName];
-	for(const auto &slewValue : availableValues) {
-		list->addItem(slewValue);
-	}
-}
+	// diag options - input channel
+	IIOWidget *diagOptions =
+		IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
+					      {.connection = const_cast<Connection *>(m_connection),
+					       .channel = const_cast<iio_channel *>(m_chnls[INPUT_CHNL]),
+					       .data = "diag_function",
+					       .iioDataOptions = "diag_function_available"},
+					      this);
+	addMenuWidget(diagOptions);
 
-void CurrentOutMenu::dacCodeChanged(double value)
-{
-	QString attrName("raw");
-	if(!m_attrValues.contains(OUTPUT_CHNL)) {
-		qWarning() << "There is no output channel available for this function!";
-		return;
-	}
-	if(m_attrValues.contains(OUTPUT_CHNL)) {
-		m_attrValues[OUTPUT_CHNL][attrName].clear();
-		m_attrValues[OUTPUT_CHNL][attrName].push_back(QString::number((int)value));
-		double val = convertFromRaw(value);
-		m_dacLabel->clear();
-		m_dacLabel->setText(QString::number(val) + " mA");
-
-		Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
-	}
-}
-
-void CurrentOutMenu::slewStepIndexChanged(int idx)
-{
-	QString attrName = "slew_step";
-	if(!m_attrValues.contains(OUTPUT_CHNL)) {
-		qWarning() << "There is no output channel available for this function!";
-		return;
-	}
-	const auto &slewStep = m_attrValues[OUTPUT_CHNL]["slew_step_available"][idx];
-	m_attrValues[OUTPUT_CHNL][attrName].clear();
-	m_attrValues[OUTPUT_CHNL][attrName].push_back(slewStep);
-
-	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
-}
-
-void CurrentOutMenu::slewRateIndexChanged(int idx)
-{
-	QString attrName = "slew_rate";
-	if(!m_attrValues.contains(OUTPUT_CHNL)) {
-		qWarning() << "There is no output channel available for this function!";
-		return;
-	}
-	const auto &slewStep = m_attrValues[OUTPUT_CHNL]["slew_rate_available"][idx];
-	m_attrValues[OUTPUT_CHNL][attrName].clear();
-	m_attrValues[OUTPUT_CHNL][attrName].push_back(slewStep);
-
-	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
-}
-
-void CurrentOutMenu::slewIndexChanged(int idx)
-{
-	QString attrName = "slew_en";
-	if(!m_attrValues.contains(OUTPUT_CHNL)) {
-		qWarning() << "There is no output channel available for this function!";
-		return;
-	}
-	m_attrValues[OUTPUT_CHNL][attrName].clear();
-	if(idx == SLEW_DISABLE_IDX) {
-		m_attrValues[OUTPUT_CHNL][attrName].push_back(QString("0"));
-	} else {
-		m_attrValues[OUTPUT_CHNL][attrName].push_back(QString("1"));
-	}
-
-	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
-}
-
-void CurrentOutMenu::onMapUpdated()
-{
-	m_dacCodeSpinButton->blockSignals(true);
-	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
-		? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
-		: m_dacCodeSpinButton->setValue(0);
-	m_dacCodeSpinButton->blockSignals(false);
-
-	m_slewOptions->blockSignals(true);
-	(m_attrValues[OUTPUT_CHNL]["slew_en"].first().compare("0") == 0) ? m_slewOptions->setCurrentText("Disable")
-									 : m_slewOptions->setCurrentText("Enable");
-	m_slewOptions->blockSignals(false);
-
-	m_slewStepOptions->blockSignals(true);
-	(m_attrValues[OUTPUT_CHNL].contains("slew_step") && !m_attrValues[OUTPUT_CHNL]["slew_step"].isEmpty())
-		? m_slewStepOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_step"].first())
-		: m_slewStepOptions->setCurrentText("ERROR");
-	m_slewStepOptions->blockSignals(false);
-
-	m_slewRateOptions->blockSignals(true);
-	(m_attrValues[OUTPUT_CHNL].contains("slew_rate") && !m_attrValues[OUTPUT_CHNL]["slew_rate"].isEmpty())
-		? m_slewRateOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_rate"].first())
-		: m_slewRateOptions->setCurrentText("ERROR");
-	m_slewRateOptions->blockSignals(false);
-}
-
-DiagnosticMenu::DiagnosticMenu(QWidget *parent, QString chnlFunction, Connection *conn, iio_channel *chnl)
-	: BufferMenu(parent, chnlFunction, conn, chnl)
-{
-	QHBoxLayout *diagLayout = new QHBoxLayout();
-	m_diagOptions = new QComboBox(m_widget);
-	diagLayout->addWidget(new QLabel("Function", m_widget));
-	diagLayout->addWidget(m_diagOptions);
-	addMenuLayout(diagLayout);
-
-	connectSignalsToSlots();
+	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(diagOptions->getDataStrategy()),
+		&CmdQChannelAttrDataStrategy::sendData, this,
+		[=, this](QString data, QString dataOptions) { Q_EMIT diagnosticFunctionUpdated(); });
 }
 
 DiagnosticMenu::~DiagnosticMenu() {}
 
-void DiagnosticMenu::init()
+WithoutAdvSettings::WithoutAdvSettings(QWidget *parent, QString chnlFunction, Connection *conn,
+				       QMap<QString, iio_channel *> chnls)
+	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
-	BufferMenu::init();
-	setAvailableOptions(m_diagOptions, "diag_function_available");
-	(m_attrValues[INPUT_CHNL].contains("diag_function") && !m_attrValues[INPUT_CHNL]["diag_function"].isEmpty())
-		? m_diagOptions->setCurrentText(m_attrValues[INPUT_CHNL]["diag_function"].first())
-		: m_diagOptions->setCurrentText("ERROR");
-}
-
-void DiagnosticMenu::connectSignalsToSlots()
-{
-	connect(m_diagOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-		&DiagnosticMenu::diagIndexChanged);
-	connect(this, SIGNAL(mapUpdated()), this, SLOT(onMapUpdated()));
-}
-
-void DiagnosticMenu::setAvailableOptions(QComboBox *list, QString attrName)
-{
-	if(!m_attrValues.contains(INPUT_CHNL)) {
-		qWarning() << "There is no input channel available for this function!";
-		return;
-	}
-	QStringList availableValues = m_attrValues[INPUT_CHNL][attrName];
-	for(const auto &slewValue : qAsConst(availableValues)) {
-		list->addItem(slewValue);
-	}
-}
-
-void DiagnosticMenu::diagIndexChanged(int idx)
-{
-	QString attrName = "diag_function";
-	if(!m_attrValues.contains(INPUT_CHNL)) {
-		qWarning() << "There is no input channel available for this function!";
-		return;
-	}
-	const auto &diagFunc = m_attrValues[INPUT_CHNL]["diag_function_available"][idx];
-	m_attrValues[INPUT_CHNL][attrName].clear();
-	m_attrValues[INPUT_CHNL][attrName].push_back(diagFunc);
-
-	Q_EMIT attrValuesChanged(attrName, INPUT_CHNL);
-}
-
-void DiagnosticMenu::onMapUpdated()
-{
-	m_diagOptions->blockSignals(true);
-	(m_attrValues[INPUT_CHNL].contains("diag_function") && !m_attrValues[INPUT_CHNL]["diag_function"].isEmpty())
-		? m_diagOptions->setCurrentText(m_attrValues[INPUT_CHNL]["diag_function"].first())
-		: m_diagOptions->setCurrentText("ERROR");
-	m_diagOptions->blockSignals(false);
-	Q_EMIT diagnosticFunctionUpdated();
-}
-
-WithoutAdvSettings::WithoutAdvSettings(QWidget *parent, QString chnlFunction, Connection *conn, iio_channel *chnl)
-	: BufferMenu(parent, chnlFunction, conn, chnl)
-{
-	QHBoxLayout *msgLayout = new QHBoxLayout();
-	msgLayout->addWidget(new QLabel("No advanced settings available", m_widget));
-	addMenuLayout(msgLayout);
+	QLabel *msgLabel = new QLabel("No advanced settings available", this);
+	StyleHelper::MenuSmallLabel(msgLabel);
+	addMenuWidget(msgLabel);
 }
 
 WithoutAdvSettings::~WithoutAdvSettings() {}
 
-void WithoutAdvSettings::init() { BufferMenu::init(); }
-
-void WithoutAdvSettings::connectSignalsToSlots() {}
-
-DigitalInMenu::DigitalInMenu(QWidget *parent, QString chnlFunction, Connection *conn, iio_channel *chnl)
-	: BufferMenu(parent, chnlFunction, conn, chnl)
+DigitalInMenu::DigitalInMenu(QWidget *parent, QString chnlFunction, Connection *conn,
+			     QMap<QString, iio_channel *> chnls)
+	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
-	QVBoxLayout *thresholdLayout = new QVBoxLayout();
-	QRegExp regExp("([0-9]|[1-9][0-9]{1,3}|1[0-5][0-9]{3}|16000)");
-	QRegExpValidator *validator = new QRegExpValidator(regExp, this);
-
-	m_titleLabel = new QLabel("Threshold (0 - 16000 mV)", m_widget);
-	m_titleLabel->setStyleSheet("font-size: 14px;");
-	m_thresholdLineEdit = new QLineEdit(m_widget);
-	m_thresholdLineEdit->setStyleSheet(
-		"background: transparent; height: 20px; width: 75px; font-size: 18px; border: 0px; bottom: 10px;");
-	m_thresholdLineEdit->setValidator(validator);
-	QFrame *frame = new QFrame(m_widget);
-	frame->setFrameShape(QFrame::HLine);
-	frame->setStyleSheet("color: #4a64ff;");
-	thresholdLayout->addWidget(m_titleLabel);
-	thresholdLayout->addWidget(m_thresholdLineEdit);
-	thresholdLayout->addWidget(frame);
-	addMenuLayout(thresholdLayout);
-
-	connectSignalsToSlots();
+	// threshold - input channel
+	m_threshold = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::EditableUi,
+						    {.connection = const_cast<Connection *>(m_connection),
+						     .channel = const_cast<iio_channel *>(m_chnls[INPUT_CHNL]),
+						     .data = "threshold",
+						     .constDataOptions = "[0 1 16000]"},
+						    this);
+	addMenuWidget(m_threshold);
+	CmdQChannelAttrDataStrategy *dataStrategy =
+		dynamic_cast<CmdQChannelAttrDataStrategy *>(m_threshold->getDataStrategy());
+	connect(dataStrategy, &CmdQChannelAttrDataStrategy::emitStatus, this, &DigitalInMenu::onEmitStatus);
 }
 
 DigitalInMenu::~DigitalInMenu() {}
 
-void DigitalInMenu::init()
+void DigitalInMenu::onBroadcastThreshold()
 {
-	BufferMenu::init();
-	// threshold
-	(m_attrValues[INPUT_CHNL].contains("threshold") && !m_attrValues[INPUT_CHNL]["threshold"].isEmpty())
-		? m_thresholdLineEdit->setText(m_attrValues[INPUT_CHNL]["threshold"].first()),
-		m_thresholdLineEdit->setPlaceholderText(m_attrValues[INPUT_CHNL]["threshold"].first())
-		: m_thresholdLineEdit->setText("0"),
-		m_thresholdLineEdit->setPlaceholderText("0");
+	CmdQChannelAttrDataStrategy *dataStrategy =
+		dynamic_cast<CmdQChannelAttrDataStrategy *>(m_threshold->getDataStrategy());
+	dataStrategy->requestData();
 }
 
-void DigitalInMenu::connectSignalsToSlots()
+void DigitalInMenu::onEmitStatus(int retCode)
 {
-	connect(m_thresholdLineEdit, &QLineEdit::returnPressed, this, &DigitalInMenu::thresholdChanged);
-	connect(this, SIGNAL(mapUpdated()), this, SLOT(onMapUpdated()));
-	connect(this, SIGNAL(broadcastThresholdReadBackward(QString)), this, SLOT(onBroadcastThresholdRead(QString)));
-	connect(this, &BufferMenu::thresholdControlEnable, this, &DigitalInMenu::onThresholdControlEnable);
-}
-
-void DigitalInMenu::thresholdChanged()
-{
-	QString attrName("threshold");
-	if(!m_attrValues.contains(INPUT_CHNL)) {
-		qWarning() << "There is no input channel available for this function!";
+	if(retCode != 0) {
+		qWarning(CAT_SWIOT_AD74413R) << "[" << m_chnlFunction << "] Treshold value cannot be written!";
 		return;
 	}
-	if(m_attrValues[INPUT_CHNL].contains(attrName)) {
-		m_attrValues[INPUT_CHNL][attrName].clear();
-		m_attrValues[INPUT_CHNL][attrName].push_back(m_thresholdLineEdit->text());
-		Q_EMIT attrValuesChanged(attrName, INPUT_CHNL);
-	} else {
-		qWarning() << attrName.toUpper() + " attribute does not exist!";
-	}
+	Q_EMIT broadcastThreshold();
 }
-
-void DigitalInMenu::onMapUpdated()
-{
-	m_thresholdLineEdit->blockSignals(true);
-	if(m_attrValues[INPUT_CHNL].contains("threshold") && !m_attrValues[INPUT_CHNL]["threshold"].isEmpty()) {
-		if(m_attrValues[INPUT_CHNL]["threshold"].first().compare(m_thresholdLineEdit->text()) != 0) {
-			Q_EMIT broadcastThresholdReadForward(m_attrValues[INPUT_CHNL]["threshold"].first());
-		}
-		m_thresholdLineEdit->setText(m_attrValues[INPUT_CHNL]["threshold"].first());
-		m_thresholdLineEdit->setPlaceholderText(m_attrValues[INPUT_CHNL]["threshold"].first());
-	} else {
-		m_thresholdLineEdit->setText(0);
-	}
-	m_thresholdLineEdit->blockSignals(false);
-}
-
-void DigitalInMenu::onBroadcastThresholdRead(QString value)
-{
-	m_thresholdLineEdit->blockSignals(true);
-	if(value.compare(m_thresholdLineEdit->text()) != 0) {
-		m_thresholdLineEdit->setText(value);
-		m_thresholdLineEdit->setPlaceholderText(value);
-		m_attrValues[INPUT_CHNL]["threshold"].first() = value;
-	}
-	m_thresholdLineEdit->blockSignals(false);
-}
-
-void DigitalInMenu::onThresholdControlEnable(bool enabled) { m_thresholdLineEdit->setEnabled(enabled); }

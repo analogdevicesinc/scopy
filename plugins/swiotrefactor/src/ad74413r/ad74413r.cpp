@@ -20,7 +20,6 @@
 
 #include "ad74413r/ad74413r.h"
 
-#include "ad74413r/buffermenumodel.h"
 #include "ad74413r/buffermenuview.h"
 #include "swiot_logging_categories.h"
 
@@ -79,9 +78,6 @@ Ad74413r::~Ad74413r()
 	if(m_readerThread) {
 		m_readerThread->forcedStop();
 		delete m_readerThread;
-	}
-	if(m_controllers.size() > 0) {
-		m_controllers.clear();
 	}
 	ConnectionProvider::close(m_uri);
 }
@@ -170,7 +166,6 @@ void Ad74413r::onActivateRunBtns(bool enable)
 
 void Ad74413r::onRunBtnPressed(bool toggled)
 {
-	Q_EMIT thresholdControlEnable(!toggled);
 	if(toggled) {
 		m_singleBtn->setChecked(false);
 		m_singleBtn->setEnabled(false);
@@ -197,7 +192,6 @@ void Ad74413r::onSingleBtnPressed(bool toggled)
 	bool runBtnChecked = m_runBtn->isChecked();
 	if(toggled) {
 		Q_EMIT activateExportButton();
-		Q_EMIT thresholdControlEnable(toggled);
 		verifyChnlsChanges();
 		if(runBtnChecked) {
 			m_runBtn->setChecked(false);
@@ -219,7 +213,6 @@ void Ad74413r::onSingleCaptureFinished()
 		if(m_tme->running()) {
 			m_tme->setRunning(false);
 		}
-		Q_EMIT thresholdControlEnable(true);
 		m_runBtn->setEnabled(true);
 	}
 	m_readerThread->requestStop();
@@ -383,20 +376,10 @@ void Ad74413r::setupChannel(int chnlIdx, QString function)
 		m_plot->addPlotChannel(plotCh);
 
 		QMap<QString, iio_channel *> chnlsMap = m_swiotAdLogic->getIioChnl(chnlIdx);
-		iio_channel *menuChnl = nullptr;
-		if(chnlsMap.size() > 1) {
-			menuChnl = chnlsMap["output"];
-		} else {
-			menuChnl = chnlsMap.values()[0];
-		}
-		BufferMenuView *menu = new BufferMenuView(menuChnl, m_conn, this);
+		BufferMenuView *menu = new BufferMenuView(chnlsMap, m_conn, this);
 		menu->init(chnlId, function, chPen, unit, yRange.first, yRange.second);
 		m_channelStack->add(chnlId, menu);
 
-		BufferMenuModel *swiotModel = new BufferMenuModel(chnlsMap, m_cmdQueue);
-		BufferMenuController *controller = new BufferMenuController(menu, swiotModel, chnlIdx);
-
-		controller->createConnections();
 		MenuControlButton *btn = new MenuControlButton(m_devBtn);
 		m_devBtn->add(btn);
 		m_chnlsBtnGroup->addButton(btn);
@@ -404,7 +387,6 @@ void Ad74413r::setupChannel(int chnlIdx, QString function)
 		plotCh->setEnabled(false);
 		plotCh->curve()->setRawSamples(m_xTime.data(), m_yValues[chnlIdx].data(), m_xTime.size());
 
-		chnlIdx++;
 		connect(btn, &MenuControlButton::toggled, this, [=, this](bool en) {
 			if(en) {
 				m_plot->selectChannel(plotCh);
@@ -422,17 +404,11 @@ void Ad74413r::setupChannel(int chnlIdx, QString function)
 		connect(menu, &BufferMenuView::setYMax, chYAxis, &PlotAxis::setMax);
 		connect(chYAxis, &PlotAxis::maxChanged, this, [=, this]() { Q_EMIT menu->maxChanged(chYAxis->max()); });
 
-		// old connections
-		connect(controller, &BufferMenuController::samplingFrequencyUpdated, this,
-			&Ad74413r::onSamplingFrequencyUpdated);
-		connect(controller, &BufferMenuController::diagnosticFunctionUpdated, this,
-			&Ad74413r::onDiagnosticFunctionUpdated);
-		connect(controller, SIGNAL(broadcastThresholdReadForward(QString)), this,
-			SIGNAL(broadcastReadThreshold(QString)));
-		connect(this, SIGNAL(broadcastReadThreshold(QString)), controller,
-			SIGNAL(broadcastThresholdReadBackward(QString)));
-		connect(this, &Ad74413r::thresholdControlEnable, controller,
-			&BufferMenuController::thresholdControlEnable);
+		connect(menu, &BufferMenuView::samplingFrequencyUpdated, this,
+			[=, this](int sr) { onSamplingFrequencyUpdated(chnlIdx, sr); });
+		connect(menu, &BufferMenuView::diagnosticFunctionUpdated, this, &Ad74413r::onDiagnosticFunctionUpdated);
+		connect(menu, &BufferMenuView::broadcastThresholdForward, this, &Ad74413r::broadcastReadThreshold);
+		connect(this, &Ad74413r::broadcastReadThreshold, menu, &BufferMenuView::broadcastThresholdBackward);
 	}
 	m_currentChannelSelected++;
 	if(m_currentChannelSelected == 4) {
@@ -487,7 +463,7 @@ void Ad74413r::setupToolTemplate()
 
 	MenuControlButton *chnlsMenuBtn = new MenuControlButton(this);
 	setupChannelsMenuBtn(chnlsMenuBtn, "Channels");
-	connect(chnlsMenuBtn->button(), &QAbstractButton::toggled, this, [=](bool b) {
+	connect(chnlsMenuBtn->button(), &QAbstractButton::toggled, this, [=, this](bool b) {
 		if(b)
 			m_tool->requestMenu(channelsMenuId);
 	});
@@ -504,7 +480,7 @@ void Ad74413r::setupToolTemplate()
 
 	QString settingsMenuId = "PlotSettings";
 	m_tool->rightStack()->add(settingsMenuId, createSettingsMenu(this));
-	connect(m_settingsBtn, &QPushButton::toggled, this, [=](bool b) {
+	connect(m_settingsBtn, &QPushButton::toggled, this, [=, this](bool b) {
 		if(b)
 			m_tool->requestMenu(settingsMenuId);
 	});

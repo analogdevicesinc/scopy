@@ -34,12 +34,10 @@ class BufferMenuView : public QWidget
 {
 	Q_OBJECT
 public:
-	BufferMenuView(iio_channel *chnl, Connection *conn, QWidget *parent = nullptr);
+	BufferMenuView(QMap<QString, iio_channel *> chnls, Connection *conn, QWidget *parent = nullptr);
 	~BufferMenuView();
 
 	void init(QString title, QString function, QPen color, QString unit, double yMin, double yMax);
-	void initAdvMenu(QMap<QString, QMap<QString, QStringList>> values);
-	void createHeaderWidget(const QString title);
 
 	BufferMenu *getAdvMenu();
 
@@ -49,11 +47,18 @@ Q_SIGNALS:
 	void setYMax(double yMax);
 	void maxChanged(double yMax);
 
+	void diagnosticFunctionUpdated();
+	void samplingFrequencyUpdated(int chnlId);
+	void broadcastThresholdForward();
+	void broadcastThresholdBackward();
+
 private:
+	void createConnections();
 	QWidget *createVerticalSettingsMenu(QString unit, double yMin, double yMax, QWidget *parent);
+
 	BufferMenu *m_swiotAdvMenu;
-	iio_channel *m_chnl;
 	Connection *m_connection;
+	QMap<QString, iio_channel *> m_chnls;
 };
 } // namespace scopy::swiotrefactor
 

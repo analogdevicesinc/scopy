@@ -20,18 +20,18 @@
 
 #include "ad74413r/buffermenuview.h"
 
+#include <QList>
+
 #include <gui/widgets/menuheader.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menucollapsesection.h>
-#include <QList>
-#include <iiowidget.h>
-#include <iiowidgetfactory.h>
+
 using namespace scopy::swiotrefactor;
 
-BufferMenuView::BufferMenuView(iio_channel *chnl, Connection *conn, QWidget *parent)
+BufferMenuView::BufferMenuView(QMap<QString, iio_channel *> chnls, Connection *conn, QWidget *parent)
 	: QWidget(parent)
 	, m_swiotAdvMenu(nullptr)
-	, m_chnl(chnl)
+	, m_chnls(chnls)
 	, m_connection(conn)
 {
 	setLayout(new QVBoxLayout());
@@ -43,7 +43,7 @@ BufferMenuView::~BufferMenuView() {}
 
 void BufferMenuView::init(QString title, QString function, QPen color, QString unit, double yMin, double yMax)
 {
-	m_swiotAdvMenu = BufferMenuBuilder::newAdvMenu(nullptr, function, m_connection, m_chnl);
+	m_swiotAdvMenu = BufferMenuBuilder::newAdvMenu(this, function, m_connection, m_chnls);
 
 	MenuHeaderWidget *header = new MenuHeaderWidget(title, color, this);
 
@@ -55,9 +55,9 @@ void BufferMenuView::init(QString title, QString function, QPen color, QString u
 	MenuCollapseSection *attrSection =
 		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrContainer);
 
-	QVector<QBoxLayout *> layers = m_swiotAdvMenu->getMenuLayers();
-	for(int i = 0; i < layers.size(); i++) {
-		layout->addItem(layers[i]);
+	QList<QWidget *> widgets = m_swiotAdvMenu->getWidgetsList();
+	for(QWidget *w : qAsConst(widgets)) {
+		layout->addWidget(w);
 	}
 
 	attrSection->contentLayout()->addLayout(layout);
@@ -69,17 +69,17 @@ void BufferMenuView::init(QString title, QString function, QPen color, QString u
 	this->layout()->addWidget(yAxisMenu);
 	this->layout()->addWidget(attrContainer);
 	this->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	createConnections();
 }
 
-void BufferMenuView::initAdvMenu(QMap<QString, QMap<QString, QStringList>> values)
+void BufferMenuView::createConnections()
 {
-	m_swiotAdvMenu->setAttrValues(values);
-	m_swiotAdvMenu->init();
+	connect(m_swiotAdvMenu, &BufferMenu::diagnosticFunctionUpdated, this,
+		&BufferMenuView::diagnosticFunctionUpdated);
+	connect(m_swiotAdvMenu, &BufferMenu::samplingFrequencyUpdated, this, &BufferMenuView::samplingFrequencyUpdated);
+	connect(m_swiotAdvMenu, &BufferMenu::broadcastThreshold, this, &BufferMenuView::broadcastThresholdForward);
+	connect(this, &BufferMenuView::broadcastThresholdBackward, m_swiotAdvMenu, &BufferMenu::onBroadcastThreshold);
 }
-
-void BufferMenuView::createHeaderWidget(const QString title) {}
-
-BufferMenu *BufferMenuView::getAdvMenu() { return m_swiotAdvMenu; }
 
 QWidget *BufferMenuView::createVerticalSettingsMenu(QString unit, double yMin, double yMax, QWidget *parent)
 {
@@ -125,3 +125,5 @@ QWidget *BufferMenuView::createVerticalSettingsMenu(QString unit, double yMin, d
 	});
 	return verticalContainer;
 }
+
+BufferMenu *BufferMenuView::getAdvMenu() { return m_swiotAdvMenu; }

@@ -24,7 +24,6 @@
 #include "bufferlogic.h"
 #include "bufferplothandler.h"
 #include "pluginbase/toolmenuentry.h"
-#include "buffermenucontroller.h"
 #include "readerthread.h"
 
 #include <iio.h>
@@ -37,6 +36,7 @@
 
 #include <QVector>
 #include <QWidget>
+#include <spinbox_a.hpp>
 
 #include <iioutil/connection.h>
 #define MAX_CURVES_NUMBER 8
@@ -75,8 +75,8 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void timespanChanged(double val);
-	void broadcastReadThreshold(QString value);
-	void thresholdControlEnable(bool enable);
+	void broadcastReadThreshold();
+
 	void channelWidgetEnabled(int curveId, bool en);
 	void channelWidgetSelected(int curveId);
 
@@ -124,8 +124,6 @@ private:
 	QLabel *m_statusLabel;
 	QWidget *m_statusContainer;
 	ToolMenuEntry *m_tme;
-
-	QVector<BufferMenuController *> m_controllers;
 
 	std::vector<bool> m_enabledChannels;
 
