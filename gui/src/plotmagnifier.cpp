@@ -190,16 +190,22 @@ void PlotMagnifier::panRescale(double factor)
 
 		double v1 = plot()->axisInterval(axisId).minValue();
 		double v2 = plot()->axisInterval(axisId).maxValue();
-		double pan_amount = ((v2 - v1) - (v2 - v1) * factor) * 0.5;
+		double pan_amount = (((v2 - v1) - (v2 - v1) * factor) * 0.5);
+		bool isInverted = v1 > v2;
+
+		if(isInverted) {
+			pan_amount *= -1;
+		}
+
 		v1 += pan_amount;
 		v2 += pan_amount;
 
 		// limit zoom to zoomBase
 		if(m_bounded && !m_baseRect.isNull()) {
-			if(v1 < m_baseRect.left()) {
+			if((isInverted && v1 > m_baseRect.left()) || (!isInverted && v1 < m_baseRect.left())) {
 				v2 = m_baseRect.left() + (v2 - v1);
 				v1 = m_baseRect.left();
-			} else if(v2 > m_baseRect.right()) {
+			} else if((isInverted && v2 < m_baseRect.right()) || (!isInverted && v2 > m_baseRect.right())) {
 				v1 = m_baseRect.right() - (v2 - v1);
 				v2 = m_baseRect.right();
 			}
@@ -241,13 +247,18 @@ void PlotMagnifier::zoomRescale(double factor)
 
 			// limit zoom to zoomBase
 			if(m_bounded && !m_baseRect.isNull()) {
+				bool isInverted = v1 > v2;
 				if(QwtAxis::isXAxis(axisId)) {
-					v1 = std::max(v1, m_baseRect.left());
-					v2 = std::min(v2, m_baseRect.right());
+					v1 = isInverted ? std::min(v1, m_baseRect.left())
+							: std::max(v1, m_baseRect.left());
+					v2 = isInverted ? std::max(v2, m_baseRect.right())
+							: std::min(v2, m_baseRect.right());
 				}
 				if(QwtAxis::isYAxis(axisId)) {
-					v1 = std::max(v1, m_baseRect.top());
-					v2 = std::min(v2, m_baseRect.bottom());
+					v1 = isInverted ? std::min(v1, m_baseRect.top())
+							: std::max(v1, m_baseRect.top());
+					v2 = isInverted ? std::max(v2, m_baseRect.bottom())
+							: std::min(v2, m_baseRect.bottom());
 				}
 			}
 

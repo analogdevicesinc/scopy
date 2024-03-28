@@ -208,13 +208,30 @@ void PlotZoomer::onZoomEnd()
 		QwtScaleMap xScaleMap = plot()->canvasMap(m_xAxis);
 		QwtScaleMap yScaleMap = plot()->canvasMap(m_yAxis);
 		QRectF zoomRect = QwtScaleMap::invTransform(xScaleMap, yScaleMap, rect);
+		bool xInverted = xScaleMap.s1() > xScaleMap.s2();
+		bool yInverted = yScaleMap.s1() > yScaleMap.s2();
 
 		if(m_bounded && !m_baseRect.isNull()) {
-			zoomRect.setX(std::min(zoomRect.x(), double(m_baseRect.right())));
-			zoomRect.setX(std::max(zoomRect.x(), double(m_baseRect.left())));
+			zoomRect.setX(
+				std::min(zoomRect.x(), double(xInverted ? m_baseRect.left() : m_baseRect.right())));
+			zoomRect.setX(
+				std::max(zoomRect.x(), double(xInverted ? m_baseRect.right() : m_baseRect.left())));
 
-			zoomRect.setY(std::min(zoomRect.y(), double(m_baseRect.bottom())));
-			zoomRect.setY(std::max(zoomRect.y(), double(m_baseRect.top())));
+			zoomRect.setY(
+				std::min(zoomRect.y(), double(yInverted ? m_baseRect.top() : m_baseRect.bottom())));
+			zoomRect.setY(
+				std::max(zoomRect.y(), double(yInverted ? m_baseRect.bottom() : m_baseRect.top())));
+		}
+
+		if(xInverted) {
+			double aux = zoomRect.left();
+			zoomRect.setLeft(zoomRect.right());
+			zoomRect.setRight(aux);
+		}
+		if(yInverted) {
+			double aux = zoomRect.top();
+			zoomRect.setTop(zoomRect.bottom());
+			zoomRect.setBottom(aux);
 		}
 
 		zoom(zoomRect);
