@@ -1,4 +1,3 @@
-#include "curvestylemenu.hpp"
 #include "datamonitorsettings.hpp"
 #include "plottimeaxiscontroller.hpp"
 
@@ -12,6 +11,7 @@
 #include <datamonitorutils.hpp>
 #include <menucollapsesection.h>
 #include <menucontrolbutton.h>
+#include <menuplotchannelcurvestylecontrol.h>
 #include <menusectionwidget.h>
 #include <mousewheelwidgetguard.h>
 #include <plotchannel.h>
@@ -58,12 +58,8 @@ void DataMonitorSettings::init(QString title, QColor color)
 	// YAxis settings
 	layout->addWidget(generateYAxisSettings(this));
 
-	CurveStyleMenu *curveMenu = new CurveStyleMenu(this);
-
-	connect(curveMenu, &CurveStyleMenu::curveThicknessChanged, m_plot, &MonitorPlot::changeCurveThickness);
-	connect(curveMenu, &CurveStyleMenu::curveStyleIndexChanged, m_plot, &MonitorPlot::changeCurveStyle);
-
-	layout->addWidget(curveMenu);
+	/// Curve style
+	layout->addWidget(generateCurveStyleSettings(this));
 
 	////// 7 segment settings ///////////////////
 	sevenSegmentMonitorSettings = new SevenSegmentMonitorSettings(this);
@@ -195,6 +191,25 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 	});
 
 	return yaxisContainer;
+}
+
+QWidget *DataMonitorSettings::generateCurveStyleSettings(QWidget *parent)
+{
+	MenuSectionWidget *curveStylecontainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *curveStyleSection =
+		new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, curveStylecontainer);
+
+	gui::MenuPlotChannelCurveStyleControl *curveMneu = new gui::MenuPlotChannelCurveStyleControl(curveStyleSection);
+
+	connect(m_plot, &MonitorPlot::monitorCurveAdded, curveMneu,
+		&gui::MenuPlotChannelCurveStyleControl::addChannels);
+	connect(m_plot, &MonitorPlot::monitorCurveRemoved, curveMneu,
+		&gui::MenuPlotChannelCurveStyleControl::removeChannels);
+
+	curveStyleSection->contentLayout()->addWidget(curveMneu);
+	curveStylecontainer->contentLayout()->addWidget(curveStyleSection);
+
+	return curveStylecontainer;
 }
 
 void DataMonitorSettings::chooseFile()
