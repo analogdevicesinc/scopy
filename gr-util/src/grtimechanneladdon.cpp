@@ -90,7 +90,7 @@ QWidget *GRTimeChannelAddon::createYAxisMenu(QWidget *parent)
 	m_yCtrl = new MenuPlotAxisRangeControl(m_plotAxis, yaxis);
 
 	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), yaxis, false);
-	m_autoscale = new PlotAutoscaler(false, this);
+	m_autoscale = new PlotAutoscaler(this);
 	m_autoscale->addChannels(m_plotCh);
 
 	connect(m_autoscale, &PlotAutoscaler::newMin, m_yCtrl, &MenuPlotAxisRangeControl::setMin);
