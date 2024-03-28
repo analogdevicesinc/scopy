@@ -36,7 +36,6 @@ public:
 	void updateXAxisIntervalMax(double max);
 	void updateYAxisIntervalMin(double min);
 	void updateYAxisIntervalMax(double max);
-	void plotYAxisAutoscale();
 	double getYAxisIntervalMin();
 	double getYAxisIntervalMax();
 
