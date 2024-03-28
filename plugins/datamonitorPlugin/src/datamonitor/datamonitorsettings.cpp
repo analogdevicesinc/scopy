@@ -11,9 +11,11 @@
 #include <datamonitorutils.hpp>
 #include <menucollapsesection.h>
 #include <menucontrolbutton.h>
+#include <menuplotaxisrangecontrol.h>
 #include <menuplotchannelcurvestylecontrol.h>
 #include <menusectionwidget.h>
 #include <mousewheelwidgetguard.h>
+#include <plotautoscaler.h>
 #include <plotchannel.h>
 
 using namespace scopy;
@@ -116,79 +118,40 @@ void DataMonitorSettings::plotYAxisMaxValueUpdate(double value) { m_ymax->setVal
 
 QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 {
-	MenuSectionWidget *yaxisContainer = new MenuSectionWidget(parent);
+	MenuSectionWidget *yaxisContainer = new MenuSectionWidget(this);
 	MenuCollapseSection *yAxisSection =
 		new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE, yaxisContainer);
 
 	yaxisContainer->contentLayout()->addWidget(yAxisSection);
 
+	gui::MenuPlotAxisRangeControl *plotYAxisController =
+		new gui::MenuPlotAxisRangeControl(m_plot->plot()->yAxis(), this);
+
+	plotYAxisController->setMin(DataMonitorUtils::getAxisDefaultMinValue());
+	plotYAxisController->setMax(DataMonitorUtils::getAxisDefaultMaxValue());
+
+	gui::PlotAutoscaler *plotAutoscaler = new gui::PlotAutoscaler(yAxisSection);
+	connect(m_plot, &MonitorPlot::monitorCurveAdded, plotAutoscaler, &gui::PlotAutoscaler::addChannels);
+	connect(m_plot, &MonitorPlot::monitorCurveRemoved, plotAutoscaler, &gui::PlotAutoscaler::removeChannels);
+
+	plotAutoscaler->setTolerance(10);
+
 	MenuOnOffSwitch *autoscale = new MenuOnOffSwitch(tr("AUTOSCALE"), yAxisSection, false);
 
-	QTimer *m_autoScaleTimer = new QTimer(this);
-	m_autoScaleTimer->setInterval(1000);
-
-	yAxisSection->contentLayout()->addWidget(autoscale);
-
-	// Y-MIN-MAX
-	QWidget *yMinMax = new QWidget(yAxisSection);
-	QHBoxLayout *yMinMaxLayout = new QHBoxLayout(yMinMax);
-	yMinMaxLayout->setMargin(0);
-	yMinMaxLayout->setSpacing(10);
-	yMinMax->setLayout(yMinMaxLayout);
-
-	// TODO replace UM with the unit of measure of main monitor
-
-	m_ymin = new PositionSpinButton(
-		{
-			{"UM", 1e0},
-			{"k", 1e3},
-			{"M", 1e6},
-			{"G", 1e9},
-		},
-		"YMin", (double)((long)(-1 << 31)), (double)((long)1 << 31), false, false, yMinMax);
-
-	m_ymin->setValue(DataMonitorUtils::getAxisDefaultMinValue());
-
-	m_ymax = new PositionSpinButton(
-		{
-			{"UM", 1e0},
-			{"k", 1e3},
-			{"M", 1e6},
-			{"G", 1e9},
-		},
-		"YMax", (double)((long)(-1 << 31)), (double)((long)1 << 31), false, false, yMinMax);
-
-	m_ymax->setValue(DataMonitorUtils::getAxisDefaultMaxValue());
-
-	yMinMaxLayout->addWidget(m_ymin);
-	yMinMaxLayout->addWidget(m_ymax);
-
-	yAxisSection->contentLayout()->addWidget(yMinMax);
-
-	connect(m_autoScaleTimer, &QTimer::timeout, this, [=, this]() {
-		m_plot->plotYAxisAutoscale();
-		plotYAxisMinValueUpdate(m_plot->getYAxisIntervalMin());
-		plotYAxisMaxValueUpdate(m_plot->getYAxisIntervalMax());
-	});
-
-	connect(autoscale->onOffswitch(), &QAbstractButton::toggled, yMinMax, [=, this](bool toggled) {
-		plotYAxisAutoscale(toggled);
-		yMinMax->setEnabled(!toggled);
+	connect(autoscale->onOffswitch(), &QAbstractButton::toggled, this, [=, this](bool toggled) {
+		plotYAxisController->setEnabled(!toggled);
 		if(toggled) {
-			m_autoScaleTimer->start();
+			plotAutoscaler->start();
 		} else {
-			m_autoScaleTimer->stop();
+			plotAutoscaler->stop();
 		}
 	});
 
-	connect(m_ymin, &PositionSpinButton::valueChanged, this, [=, this](double value) {
-		m_plot->updateYAxisIntervalMin(value);
-		m_ymax->setMinValue(value);
-	});
-	connect(m_ymax, &PositionSpinButton::valueChanged, this, [=, this](double value) {
-		m_plot->updateYAxisIntervalMax(value);
-		m_ymin->setMaxValue(value);
-	});
+	connect(plotAutoscaler, &gui::PlotAutoscaler::newMin, m_plot, &MonitorPlot::updateYAxisIntervalMin);
+	connect(plotAutoscaler, &gui::PlotAutoscaler::newMax, m_plot, &MonitorPlot::updateYAxisIntervalMax);
+
+	yAxisSection->contentLayout()->addWidget(autoscale);
+	yAxisSection->contentLayout()->addWidget(plotYAxisController);
 
 	return yaxisContainer;
 }

@@ -119,28 +119,6 @@ void MonitorPlot::updateYAxisIntervalMax(double max)
 	m_plot->replot();
 }
 
-void MonitorPlot::plotYAxisAutoscale()
-{
-	double max = getYAxisIntervalMin();
-	double min = getYAxisIntervalMax();
-
-	foreach(QString curve, m_monitorCurves->keys()) {
-		double curveMin = m_monitorCurves->value(curve)->curveMinVal();
-		double curveMax = m_monitorCurves->value(curve)->curveMaxVal();
-
-		if(max < curveMax)
-			max = curveMax;
-		if(min > curveMin)
-			min = curveMin;
-	}
-
-	// make the min/max value to be 10% extra so the curve is not on the edge of the axis
-	min = min - min * 0.1;
-	max = max + max * 0.1;
-	updateYAxisIntervalMin(min);
-	updateYAxisIntervalMax(max);
-}
-
 double MonitorPlot::getYAxisIntervalMin() { return m_plot->yAxis()->min(); }
 
 double MonitorPlot::getYAxisIntervalMax() { return m_plot->yAxis()->max(); }
