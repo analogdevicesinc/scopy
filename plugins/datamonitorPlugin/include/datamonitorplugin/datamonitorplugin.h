@@ -3,29 +3,14 @@
 
 #define SCOPY_PLUGIN_NAME DataMonitorPlugin
 
-#include "iioutil/cyclicaltask.h"
-#include "iioutil/iiopingtask.h"
+#include "dataacquisitionmanager.hpp"
+#include "datamonitormodel.hpp"
 #include "scopy-datamonitorplugin_export.h"
-
-#include <QMap>
-#include <QPushButton>
-#include <QScrollArea>
-
-#include <iioutil/connectionprovider.h>
+#include <QObject>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
-Q_DECLARE_LOGGING_CATEGORY(CAT_DATAMONITOR)
-Q_DECLARE_LOGGING_CATEGORY(CAT_DATAMONITOR_TOOL)
-
-namespace Ui {
-class DataMonitorInfoPage;
-}
-
-namespace scopy {
-namespace datamonitor {
-
-class DataMonitorTool;
+namespace scopy::datamonitor {
 
 class SCOPY_DATAMONITORPLUGIN_EXPORT DataMonitorPlugin : public QObject, public PluginBase
 {
@@ -33,14 +18,12 @@ class SCOPY_DATAMONITORPLUGIN_EXPORT DataMonitorPlugin : public QObject, public 
 	SCOPY_PLUGIN;
 
 public:
+	bool compatible(QString m_param, QString category) override;
 	bool loadPage() override;
 	bool loadIcon() override;
 	void loadToolList() override;
 	void unload() override;
-	bool compatible(QString param, QString cateogory) override;
 	void initMetadata() override;
-	void saveSettings(QSettings &) override;
-	void loadSettings(QSettings &) override;
 	void initPreferences() override;
 	bool loadPreferencesPage() override;
 	QString description() override;
@@ -49,12 +32,11 @@ public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
 
-private:
-	DataMonitorTool *tool;
-	IIOPingTask *ping;
-	CyclicalTask *cs;
-};
-} // namespace datamonitor
-} // namespace scopy
+	void addNewTool();
 
+private:
+	QList<DataMonitorModel *> dmmList;
+	DataAcquisitionManager *m_dataAcquisitionManager;
+};
+} // namespace scopy::datamonitor
 #endif // DATAMONITORPLUGIN_H
