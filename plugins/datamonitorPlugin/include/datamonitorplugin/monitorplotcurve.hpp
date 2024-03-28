@@ -18,18 +18,14 @@ public:
 	void clearCurveData();
 	void refreshCurve();
 	void toggleActive(bool toggled);
-	void changeCurveStyle(int style);
-	void changeCurveThickness(double thickness);
 
 	PlotChannel *plotch() const;
-	int curveStyleIndex() const;
 	double curveMinVal();
 	double curveMaxVal();
 
 private:
 	PlotChannel *m_plotch;
 	PlotAxis *chPlotAxis;
-	int m_curveStyleIndex;
 	DataMonitorModel *m_dataMonitorModel;
 };
 } // namespace datamonitor
