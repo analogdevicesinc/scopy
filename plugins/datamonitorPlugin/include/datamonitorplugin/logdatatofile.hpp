@@ -13,11 +13,17 @@ public:
 	explicit LogDataToFile(DataAcquisitionManager *dataAcquisitionManager, QObject *parent = nullptr);
 
 	void logData(QString path);
+	void loadData(QString path);
 
-signals:
+Q_SIGNALS:
+	void startLogData();
+	void logDataCompleted();
+	void startLoadData();
+	void loadDataCompleted();
 
 private:
 	DataAcquisitionManager *m_dataAcquisitionManager;
+	QString dateTimeFormat = "dd/MM/yyyy hh:mm:ss";
 };
 } // namespace datamonitor
 } // namespace scopy
