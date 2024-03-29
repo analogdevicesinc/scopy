@@ -8,6 +8,7 @@
 #include <menuonoffswitch.h>
 #include <monitorplot.hpp>
 #include <monitorplotcurve.hpp>
+#include <progresslineedit.h>
 #include <spinbox_a.hpp>
 #include "scopy-datamonitorplugin_export.h"
 #include "qloggingcategory.h"
@@ -23,6 +24,14 @@ class MenuSectionWidget;
 
 class CollapsableMenuControlButton;
 namespace datamonitor {
+
+enum ProgressBarState
+{
+	SUCCESS,
+	ERROR,
+	BUSSY
+};
+
 class SCOPY_DATAMONITORPLUGIN_EXPORT DataMonitorSettings : public QWidget
 {
 	friend class DataMonitorStyleHelper;
@@ -39,6 +48,7 @@ public Q_SLOTS:
 	void updateTitle(QString title);
 	void plotYAxisMinValueUpdate(double value);
 	void plotYAxisMaxValueUpdate(double value);
+	void updateDataLoggingStatus(ProgressBarState status);
 
 Q_SIGNALS:
 	void curveStyleIndexChanged(int index);
@@ -53,6 +63,7 @@ Q_SIGNALS:
 
 	void pathChanged(QString path);
 	void requestDataLogging(QString path);
+	void requestDataLoading(QString path);
 
 private:
 	PositionSpinButton *m_ymin;
@@ -69,9 +80,10 @@ private:
 	MonitorPlot *m_plot;
 
 	QString filename;
-	QLineEdit *dataLoggingFilePath;
+	ProgressLineEdit *dataLoggingFilePath;
 	QPushButton *dataLoggingBrowseBtn;
 	QPushButton *dataLoggingBtn;
+	QPushButton *dataLoadingBtn;
 	void chooseFile();
 
 	SevenSegmentMonitorSettings *sevenSegmentMonitorSettings;

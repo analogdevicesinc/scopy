@@ -182,6 +182,15 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	connect(m_dataMonitorSettings, &DataMonitorSettings::requestDataLogging, logDataToFile,
 		&LogDataToFile::logData);
 
+	connect(logDataToFile, &LogDataToFile::loadDataCompleted, m_dataMonitorSettings,
+		[=, this]() { m_dataMonitorSettings->updateDataLoggingStatus(ProgressBarState::SUCCESS); });
+
+	connect(logDataToFile, &LogDataToFile::logDataCompleted, m_dataMonitorSettings,
+		[=, this]() { m_dataMonitorSettings->updateDataLoggingStatus(ProgressBarState::SUCCESS); });
+
+	connect(m_dataMonitorSettings, &DataMonitorSettings::requestDataLoading, logDataToFile,
+		&LogDataToFile::loadData);
+
 	/////////////////monitor selection menu ///////////////
 
 	m_monitorSelectionMenu = new MonitorSelectionMenu(dataAcquisitionManager->getDataMonitorMap());
