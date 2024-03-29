@@ -5,6 +5,7 @@
 #include <QTextStream>
 #include <QDebug>
 #include <QDateTime>
+#include <QwtDate>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -17,11 +18,12 @@ LogDataToFile::LogDataToFile(DataAcquisitionManager *dataAcquisitionManager, QOb
 
 void LogDataToFile::logData(QString path)
 {
-	// TODO HOW SHOULD WE TREAT WRITE ?
+	Q_EMIT startLogData();
+
 	QFile file(path);
 	QTextStream exportStream(&file);
 	if(!file.isOpen()) {
-		file.open(QIODevice::Append);
+		file.open(QIODevice::WriteOnly);
 
 		QString tableHead = "Time";
 		QMap<QString, QString> values;
@@ -35,7 +37,7 @@ void LogDataToFile::logData(QString path)
 					m_dataAcquisitionManager->getDataMonitorMap()->value(monitor)->getValueAtTime(
 						xData->at(i));
 				QDateTime auxTime = QDateTime::fromMSecsSinceEpoch(xData->at(i));
-				QString time = QString(auxTime.toString("hh:mm:ss"));
+				QString time = QString(auxTime.toString(dateTimeFormat));
 
 				if(values.contains(time)) {
 					values[time] += QString(", " + QString::number(val));
@@ -61,4 +63,42 @@ void LogDataToFile::logData(QString path)
 
 	if(file.isOpen())
 		file.close();
+
+	Q_EMIT logDataCompleted();
+}
+
+void LogDataToFile::loadData(QString path)
+{
+	Q_EMIT startLoadData();
+
+	QFile file(path);
+
+	if(!file.isOpen()) {
+		file.open(QIODevice::ReadOnly);
+
+		QTextStream in(&file);
+		auto channels = in.readLine().split(",");
+		while(!in.atEnd()) {
+			QString line = in.readLine();
+			auto values = line.split(",");
+			QString time = values[0];
+			QDateTime dateTime = QDateTime::fromString(time, dateTimeFormat);
+			for(int i = 1; i < channels.length(); i++) {
+				// there is an extra space in each name we need to remove it
+				QString ch = channels[i].simplified();
+				ch.replace(" ", "");
+				if(m_dataAcquisitionManager->getDataMonitorMap()->contains(ch)) {
+					m_dataAcquisitionManager->getDataMonitorMap()->value(ch)->updateValue(
+						QwtDate::toDouble(dateTime), values[i].toDouble());
+				}
+			}
+		}
+	} else {
+		qDebug() << "File already opened! ";
+	}
+
+	if(file.isOpen())
+		file.close();
+
+	Q_EMIT loadDataCompleted();
 }

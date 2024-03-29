@@ -73,15 +73,15 @@ void DataMonitorSettings::init(QString title, QColor color)
 		new MenuCollapseSection("Log data", MenuCollapseSection::MHCW_NONE, logDataContainer);
 	logDataSection->contentLayout()->setSpacing(10);
 
-	dataLoggingFilePath = new QLineEdit(logDataSection);
-	dataLoggingFilePath->setReadOnly(true);
+	dataLoggingFilePath = new ProgressLineEdit(logDataSection);
+	dataLoggingFilePath->getLineEdit()->setReadOnly(true);
 
-	connect(dataLoggingFilePath, &QLineEdit::textChanged, this, [=, this](QString path) {
-		if(filename.isEmpty() && dataLoggingFilePath->isEnabled()) {
-			dataLoggingFilePath->setText(tr("No file selected"));
-			dataLoggingFilePath->setStyleSheet("color:red");
+	connect(dataLoggingFilePath->getLineEdit(), &QLineEdit::textChanged, this, [=, this](QString path) {
+		if(filename.isEmpty() && dataLoggingFilePath->getLineEdit()->isEnabled()) {
+			dataLoggingFilePath->getLineEdit()->setText(tr("No file selected"));
+			dataLoggingFilePath->getLineEdit()->setStyleSheet("color:red");
 		} else {
-			dataLoggingFilePath->setStyleSheet("color:white");
+			dataLoggingFilePath->getLineEdit()->setStyleSheet("color:white");
 			Q_EMIT pathChanged(path);
 		}
 	});
@@ -90,13 +90,22 @@ void DataMonitorSettings::init(QString title, QColor color)
 	connect(dataLoggingBrowseBtn, &QPushButton::clicked, this, &DataMonitorSettings::chooseFile);
 
 	dataLoggingBtn = new QPushButton("Log data", logDataSection);
-	connect(dataLoggingBtn, &QPushButton::clicked, this,
-		[=, this]() { Q_EMIT requestDataLogging(dataLoggingFilePath->text()); });
+	connect(dataLoggingBtn, &QPushButton::clicked, this, [=, this]() {
+		updateDataLoggingStatus(ProgressBarState::BUSSY);
+		Q_EMIT requestDataLogging(dataLoggingFilePath->getLineEdit()->text());
+	});
+
+	dataLoadingBtn = new QPushButton("Load data", logDataSection);
+	connect(dataLoadingBtn, &QPushButton::clicked, this, [=, this]() {
+		updateDataLoggingStatus(ProgressBarState::BUSSY);
+		Q_EMIT requestDataLoading(dataLoggingFilePath->getLineEdit()->text());
+	});
 
 	logDataSection->contentLayout()->addWidget(new QLabel("Choose file"));
 	logDataSection->contentLayout()->addWidget(dataLoggingFilePath);
 	logDataSection->contentLayout()->addWidget(dataLoggingBrowseBtn);
 	logDataSection->contentLayout()->addWidget(dataLoggingBtn);
+	logDataSection->contentLayout()->addWidget(dataLoadingBtn);
 
 	logDataContainer->contentLayout()->addWidget(logDataSection);
 	layout->addWidget(logDataContainer);
@@ -115,6 +124,20 @@ void DataMonitorSettings::updateTitle(QString title) { header->label()->setText(
 void DataMonitorSettings::plotYAxisMinValueUpdate(double value) { m_ymin->setValue(value); }
 
 void DataMonitorSettings::plotYAxisMaxValueUpdate(double value) { m_ymax->setValue(value); }
+
+void DataMonitorSettings::updateDataLoggingStatus(ProgressBarState status)
+{
+	if(status == ProgressBarState::SUCCESS) {
+		dataLoggingFilePath->getProgressBar()->setBarColor(StyleHelper::getColor("ProgressBarSuccess"));
+	}
+	if(status == ProgressBarState::ERROR) {
+		dataLoggingFilePath->getProgressBar()->setBarColor(StyleHelper::getColor("ProgressBarError"));
+	}
+	if(status == ProgressBarState::BUSSY) {
+		dataLoggingFilePath->getProgressBar()->startProgress();
+		dataLoggingFilePath->getProgressBar()->setBarColor(StyleHelper::getColor("ProgressBarBusy"));
+	}
+}
 
 QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 {
@@ -181,7 +204,7 @@ void DataMonitorSettings::chooseFile()
 	filename = QFileDialog::getSaveFileName(
 		this, tr("Export"), "", tr("Comma-separated values files (*.csv);;All Files(*)"), &selectedFilter,
 		QFileDialog::Options(QFileDialog::DontUseNativeDialog));
-	dataLoggingFilePath->setText(filename);
+	dataLoggingFilePath->getLineEdit()->setText(filename);
 }
 
 SevenSegmentMonitorSettings *DataMonitorSettings::getSevenSegmentMonitorSettings() const

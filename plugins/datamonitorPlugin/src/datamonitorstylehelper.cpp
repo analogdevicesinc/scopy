@@ -21,6 +21,7 @@ void DataMonitorStyleHelper::DataMonitorSettingsStyle(DataMonitorSettings *dataM
 
 	StyleHelper::BlueButton(dataMonitorSettings->dataLoggingBrowseBtn);
 	StyleHelper::BlueButton(dataMonitorSettings->dataLoggingBtn);
+	StyleHelper::BlueButton(dataMonitorSettings->dataLoadingBtn);
 
 	dataMonitorSettings->setStyleSheet(style);
 }
