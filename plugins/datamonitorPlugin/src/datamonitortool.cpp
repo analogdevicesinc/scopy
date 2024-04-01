@@ -36,18 +36,19 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 
 	settingsButton = new GearBtn(this);
 	infoBtn = new InfoBtn(this);
+	printBtn = new PrintBtn(this);
 	runBtn = new RunBtn(this);
 	clearBtn = new QPushButton("Clear", this);
 
-	//// add monitors TODO
+	//// add monitors
 	addMonitorButton = new AddBtn(this);
 
 	connect(addMonitorButton, &AddBtn::clicked, this, &DatamonitorTool::requestNewTool);
 
-	MenuControlButton *monitorsButton = new MenuControlButton(this);
+	monitorsButton = new MenuControlButton(this);
 	monitorsButton->setName("Monitors");
 	monitorsButton->setOpenMenuChecksThis(true);
-	monitorsButton->setDoubleClickToOpenMenu(true);
+	monitorsButton->setDoubleClickToOpenMenu(false);
 	monitorsButton->checkBox()->setVisible(false);
 	monitorsButton->button()->setVisible(false);
 
@@ -61,6 +62,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	//////////////////////////////
 
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
+	tool->addWidgetToTopContainerHelper(printBtn, TTA_LEFT);
 
 	tool->addWidgetToTopContainerHelper(runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(clearBtn, TTA_RIGHT);

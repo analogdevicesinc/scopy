@@ -70,7 +70,7 @@ void DataMonitorSettings::init(QString title, QColor color)
 	/////// data logging /////////////////
 	MenuSectionWidget *logDataContainer = new MenuSectionWidget(this);
 	MenuCollapseSection *logDataSection =
-		new MenuCollapseSection("Log data", MenuCollapseSection::MHCW_NONE, logDataContainer);
+		new MenuCollapseSection("Save data", MenuCollapseSection::MHCW_NONE, logDataContainer);
 	logDataSection->contentLayout()->setSpacing(10);
 
 	dataLoggingFilePath = new ProgressLineEdit(logDataSection);

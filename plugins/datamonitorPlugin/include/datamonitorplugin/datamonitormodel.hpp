@@ -47,6 +47,12 @@ public:
 	double minValue() const;
 	double maxValue() const;
 
+	QString getShortName() const;
+	void setShortName(const QString &newShortName);
+
+	QString getDeviceName() const;
+	void setDeviceName(const QString &newDeviceName);
+
 Q_SIGNALS:
 	void valueUpdated(double time, double value);
 	void minValueUpdated(double value);
@@ -55,6 +61,8 @@ Q_SIGNALS:
 
 private:
 	QString name;
+	QString shortName;
+	QString deviceName;
 	QColor color;
 	double m_minValue;
 	double m_maxValue;

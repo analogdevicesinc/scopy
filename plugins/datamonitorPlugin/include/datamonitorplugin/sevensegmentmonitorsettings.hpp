@@ -23,7 +23,6 @@ signals:
 
 private:
 	MenuOnOffSwitch *peakHolderToggle;
-	QPushButton *setPrecisionButton;
 	QLineEdit *precision;
 	void changePrecision();
 };
