@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -ex
+git config --global --add safe.directory $HOME/scopy
 SRC_DIR=$(git rev-parse --show-toplevel)
 source $SRC_DIR/ci/kuiper/kuiper_build_config.sh
 
@@ -17,6 +18,7 @@ build_with_cmake() {
 	$CMAKE $CURRENT_BUILD_CMAKE_OPTS ../
 	make $JOBS
 	CURRENT_BUILD_CMAKE_OPTS=""
+	# TODO: Create build-status file
 }
 
 set_config_opts() {
@@ -67,7 +69,8 @@ download_cmake() {
 	pushd ${STAGING_AREA}
 	if [ ! -d cmake ];then
 		wget ${CMAKE_DOWNLOAD_LINK}
-		tar -xvf cmake*.tar.gz && rm cmake*.tar.gz && mv cmake* cmake # unzip and rename
+		# unzip and rename
+		tar -xvf cmake*.tar.gz && rm cmake*.tar.gz && mv cmake* cmake
 	else
 		echo "Cmake already downloaded"
 	fi
@@ -79,7 +82,8 @@ download_crosscompiler(){
 	pushd ${STAGING_AREA}
 	if [ ! -d cross-pi-gcc ];then
 		wget --progress=dot:giga ${CROSSCOMPILER_DOWNLOAD_LINK}
-		tar -xf cross-gcc-*.tar.gz && rm cross-gcc-*.tar.gz && mv cross-pi-* cross-pi-gcc # unzip and rename
+		# unzip and rename
+		tar -xf cross-gcc-*.tar.gz && rm cross-gcc-*.tar.gz && mv cross-pi-* cross-pi-gcc
 	else
 		echo "Crosscompiler already downloaded"
 	fi
@@ -101,7 +105,6 @@ clone() {
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
-	[ -d 'iio-emu' ]	|| git clone --recursive https://github.com/analogdevicesinc/iio-emu -b $IIOEMU_BRANCH iio-emu
 	popd
 }
 
@@ -152,7 +155,6 @@ build_libm2k() {
 		-DINSTALL_UDEV_RULES=OFF \
 		-DENABLE_LOG=OFF
 		"
-		#temporary build without logging
 	build_with_cmake
 	sudo make install
 	popd
@@ -240,9 +242,12 @@ build_libtinyiiod() {
 
 build_iio-emu(){
 	echo "### Building iio-emu - branch $IIOEMU_BRANCH"
+	pushd $STAGING_AREA
+	[ -d 'iio-emu' ] || git clone --recursive https://github.com/analogdevicesinc/iio-emu -b $IIOEMU_BRANCH iio-emu
 	pushd $STAGING_AREA/iio-emu
 	build_with_cmake
 	sudo make install
+	popd
 	popd
 }
 
@@ -269,26 +274,17 @@ build_deps(){
 	build_qwt
 	build_libsigrokdecode
 	build_libtinyiiod
-	build_iio-emu
 }
 
 create_appdir(){
 
 	BUILD_FOLDER=$SRC_DIR/build
-
 	EMU_BUILD_FOLDER=$STAGING_AREA/iio-emu/build
-
-	PLUGINBASE_DLL=$BUILD_FOLDER/pluginbase
-	CORE_DLL=$BUILD_FOLDER/core
-	GUI_DLL=$BUILD_FOLDER/gui
-	GR_UTIL_DLL=$BUILD_FOLDER/gr-util
-	IIOUTIL_DLL=$BUILD_FOLDER/iioutil
-	IIOWIDGETS_DLL=$BUILD_FOLDER/iio-widgets
-	COMMON_DLL=$BUILD_FOLDER/common
+	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 2 -type f -name "libscopy*")
 	PLUGINS=$BUILD_FOLDER/plugins/plugins
-
 	REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
+	COPY_DEPS=$SRC_DIR/ci/kuiper/copy-deps.sh
 
 	rm -rf $APP_DIR
 	mkdir $APP_DIR
@@ -306,15 +302,7 @@ create_appdir(){
 	cp $EMU_BUILD_FOLDER/iio-emu $APP_DIR/usr/bin
 	cp $BUILD_FOLDER/scopy $APP_DIR/usr/bin
 
-	cp $PLUGINBASE_DLL/libscopy-pluginbase.so $APP_DIR/usr/lib
-	cp $CORE_DLL/libscopy-core.so $APP_DIR/usr/lib
-	cp $IIOUTIL_DLL/libscopy-iioutil.so $APP_DIR/usr/lib
-	cp $IIOWIDGETS_DLL/libscopy-iio-widgets.so $APP_DIR/usr/lib
-	cp $GUI_DLL/libscopy-gui.so $APP_DIR/usr/lib
-	cp $GUI_DLL/libscopy-gr-gui.so $APP_DIR/usr/lib
-	cp $GUI_DLL/libscopy-sigrok-gui.so $APP_DIR/usr/lib
-	cp $GR_UTIL_DLL/libscopy-gr-util.so $APP_DIR/usr/lib
-	cp $COMMON_DLL/libscopy-common.so $APP_DIR/usr/lib
+	cp $SCOPY_DLL $APP_DIR/usr/lib
 	cp -r $PLUGINS $APP_DIR/usr/share
 
 	mkdir $APP_DIR/usr/share/translations
@@ -324,89 +312,24 @@ create_appdir(){
 		cp -r $REGMAP_XMLS $APP_DIR/usr/share/plugins
 	fi
 
-
-	./copy-deps.sh $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
-	./copy-deps.sh $APP_DIR/usr/bin/iio-emu $APP_DIR/usr/lib
-	./copy-deps.sh $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
-	./copy-deps.sh "$APP_DIR/usr/share/plugins/*.so" $APP_DIR/usr/lib
+	$COPY_DEPS $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
+	$COPY_DEPS $APP_DIR/usr/bin/iio-emu $APP_DIR/usr/lib
+	$COPY_DEPS $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
+	$COPY_DEPS "$APP_DIR/usr/share/plugins/*.so" $APP_DIR/usr/lib
 
 	cp -r $QT_LOCATION/plugins $APP_DIR/usr
 	cp -r $SYSROOT/lib/python3.9 $APP_DIR/usr/lib
 	cp -r $SYSROOT/share/libsigrokdecode/decoders  $APP_DIR/usr/lib
 
-
-	# cp $SYSROOT/usr/local/lib/libqwt.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/libiio.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/libm2k.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/tinyiiod.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/libvolk.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/libad9361.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/libspdlog.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/libsigrokdecode.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/libgnuradio* $APP_DIR/usr/lib
-
-	# cp $QT_LOCATION/lib/libQt5Concurrent.so* $APP_DIR/usr/lib
-	# cp $QT_LOCATION/lib/libQt5Core.so* $APP_DIR/usr/lib
-	# cp $QT_LOCATION/lib/libQt5Gui.so* $APP_DIR/usr/lib
-	# cp $QT_LOCATION/lib/libQt5Network.so* $APP_DIR/usr/lib
-	# cp $QT_LOCATION/lib/libQt5OpenGL.so* $APP_DIR/usr/lib
-	# cp $QT_LOCATION/lib/libQt5PrintSupport.so* $APP_DIR/usr/lib
-	# cp $QT_LOCATION/lib/libQt5Qml.so* $APP_DIR/usr/lib
-	# cp $QT_LOCATION/lib/libQt5Svg.so* $APP_DIR/usr/lib
-	# cp $QT_LOCATION/lib/libQt5Widgets.so* $APP_DIR/usr/lib
-	# cp $QT_LOCATION/lib/libQt5Xml.so* $APP_DIR/usr/lib
-
 	cp $QT_LOCATION/lib/libQt5XcbQpa.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5EglFSDeviceIntegration.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5DBus.so* $APP_DIR/usr/lib
-
 
 	cp $SYSROOT/lib/arm-linux-gnueabihf/libstdc++.so* $APP_DIR/usr/lib
 	cp $SYSROOT/lib/arm-linux-gnueabihf/libc.so* $APP_DIR/usr/lib
 	cp $SYSROOT/lib/arm-linux-gnueabihf/libdl.so* $APP_DIR/usr/lib
 	cp $SYSROOT/lib/arm-linux-gnueabihf/libpthread.so* $APP_DIR/usr/lib
 	cp $SYSROOT/lib/arm-linux-gnueabihf/libGLESv2.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libpng16.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libz.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libharfbuzz.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libmd4c.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libdouble-conversion.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libicui18n.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libicuuc.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libicudata.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libpcre2-16.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libzstd.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libgthread-2.0.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libglib-2.0.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libpython3.9.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/librt.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libusb-1.0.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libserialport.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libxml2.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libgssapi_krb5.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libkrb5.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libk5crypto.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libcom_err.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libkrb5support.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libkeyutils.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libresolv.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libavahi-client.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libavahi-common.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libGLdispatch.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libfreetype.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libgraphite2.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libpcre.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libexpat.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libutil.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libudev.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libdbus-1.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/liblzma.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libbrotlidec.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libsystemd.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libbrotlicommon.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/liblz4.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libgcrypt.so* $APP_DIR/usr/lib
-	# cp $SYSROOT/lib/arm-linux-gnueabihf/libgpg-error.so* $APP_DIR/usr/lib
 
 	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/ld-linux-armhf.so* $APP_DIR/usr/lib
 	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libarmmem-v7l.so* $APP_DIR/usr/lib
@@ -428,6 +351,22 @@ create_appimage(){
 	chmod a+x $APP_IMAGE
 }
 
+# move the sysroot from the home of the docker container to the known location
+move_sysroot(){
+	mkdir -p $STAGING_AREA
+	[ -d /home/runner/sysroot ] && sudo mv /home/runner/sysroot $SYSROOT
+}
+
+
+# move and rename the AppImage artifact
+move_appimage(){
+	mv $APP_IMAGE $SRC_DIR/Scopy-armhf.AppImage
+}
+
+generate_ci_envs()
+{
+	$SRC_DIR/ci/general/gen_ci_envs.sh > $SRC_DIR/ci/general/gh-actions.envs
+}
 
 for arg in $@; do
 	$arg
