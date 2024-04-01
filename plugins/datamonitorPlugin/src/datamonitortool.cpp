@@ -86,6 +86,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 		}
 
 		timeTracker->setIsRunning(toggled);
+		Q_EMIT runToggled(toggled);
 	});
 
 	connect(clearBtn, &QPushButton::clicked, dataAcquisitionManager, &DataAcquisitionManager::clearMonitorsData);

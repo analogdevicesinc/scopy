@@ -3,7 +3,6 @@
 #include <QLoggingCategory>
 #include <QLabel>
 #include <dmm.hpp>
-#include <datamonitortool.h>
 #include <menusectionwidget.h>
 #include <menucollapsesection.h>
 #include <timemanager.hpp>
@@ -150,11 +149,12 @@ void DataMonitorPlugin::addNewTool()
 	DatamonitorTool *datamonitorTool = new DatamonitorTool(m_dataAcquisitionManager);
 
 	connect(datamonitorTool, &DatamonitorTool::requestNewTool, this, &DataMonitorPlugin::addNewTool);
+	connect(datamonitorTool, &DatamonitorTool::runToggled, this, &DataMonitorPlugin::toggleRunState);
 
 	// one for each
 	connect(m_toolList[i], &ToolMenuEntry::runToggled, this, [=, this](bool en) {
 		if(datamonitorTool->getRunButton()->isChecked() != en) {
-			datamonitorTool->getRunButton()->setChecked(en);
+			datamonitorTool->getRunButton()->toggle();
 		}
 	});
 
@@ -165,6 +165,13 @@ void DataMonitorPlugin::addNewTool()
 	i++;
 }
 
+void DataMonitorPlugin::toggleRunState(bool toggled)
+{
+	for(int i = 0; i < m_toolList.length(); i++) {
+		m_toolList[i]->setRunning(toggled);
+	}
+}
+
 void DataMonitorPlugin::initMetadata()
 {
 	loadMetadata(
@@ -172,7 +179,7 @@ void DataMonitorPlugin::initMetadata()
 	{
 	   "priority":100,
 	   "category":[
-	      "iio"
+		  "iio"
 	   ],
 	   "exclude":[""]
 	}
