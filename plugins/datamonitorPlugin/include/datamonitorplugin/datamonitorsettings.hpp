@@ -3,8 +3,8 @@
 
 #include <QTimer>
 #include <QWidget>
+#include <edittextmenuheader.h>
 #include <menucombo.h>
-#include <menuheader.h>
 #include <menuonoffswitch.h>
 #include <monitorplot.hpp>
 #include <monitorplotcurve.hpp>
@@ -45,12 +45,12 @@ public:
 	SevenSegmentMonitorSettings *getSevenSegmentMonitorSettings() const;
 
 public Q_SLOTS:
-	void updateTitle(QString title);
 	void plotYAxisMinValueUpdate(double value);
 	void plotYAxisMaxValueUpdate(double value);
 	void updateDataLoggingStatus(ProgressBarState status);
 
 Q_SIGNALS:
+	void titleUpdated(QString title);
 	void curveStyleIndexChanged(int index);
 	void changeCurveThickness(double thickness);
 
@@ -71,7 +71,7 @@ private:
 	QWidget *generateYAxisSettings(QWidget *parent);
 	QWidget *generateCurveStyleSettings(QWidget *parent);
 
-	MenuHeaderWidget *header;
+	EditTextMenuHeader *header;
 	QVBoxLayout *layout;
 
 	QWidget *settingsBody;
