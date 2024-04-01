@@ -16,7 +16,8 @@ IIOEMU_BRANCH=main
 
 STAGING_AREA=$SRC_DIR/ci/kuiper/staging
 SYSROOT=$STAGING_AREA/sysroot
-SYSROOT_DOCKER=$SRC_DIR/ci/kuiper/docker/sysroot
+SYSROOT_TAR=$STAGING_AREA/sysroot.tar.gz
+SYSROOT_DOCKER=$SRC_DIR/ci/kuiper/docker/sysroot.tar.gz
 TOOLCHAIN=$STAGING_AREA/cross-pi-gcc
 TOOLCHAIN_BIN=$TOOLCHAIN/bin
 TOOLCHAIN_HOST="arm-linux-gnueabihf"
@@ -36,6 +37,7 @@ RUNTIME_ARMHF=$SRC_DIR/ci/kuiper/runtime-armhf
 
 CMAKE_OPTS=(\
 	-DCMAKE_SYSROOT="$SYSROOT" \
+	-DQT_LOCATION="$QT_LOCATION" \
 	-DSTAGING_AREA="$STAGING_AREA" \
 	-DCMAKE_INSTALL_PREFIX="$SYSROOT" \
 	-DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN_FILE" \
@@ -45,9 +47,8 @@ CMAKE_OPTS=(\
 
 CMAKE="$CMAKE_BIN ${CMAKE_OPTS[*]}"
 
-QT_BUILD_LOCATION=$SYSROOT/usr/local/qt5.15
-QT_SYSTEM_LOCATION=/usr/local/qt5.15
-
+QT_BUILD_LOCATION=$QT_LOCATION # the location where Qt will be installed in the system
+QT_SYSTEM_LOCATION=/usr/local/qt5.15 # the Qt location relative to the sysroot folder
 CROSS_COMPILER=$STAGING_AREA/cross-pi-gcc
 
 CROSSCOMPILER_DOWNLOAD_LINK=https://sourceforge.net/projects/raspberry-pi-cross-compilers/files/Raspberry%20Pi%20GCC%20Cross-Compiler%20Toolchains/Bullseye/GCC%2010.2.0/Raspberry%20Pi%203A%2B%2C%203B%2B%2C%204/cross-gcc-10.2.0-pi_3%2B.tar.gz
