@@ -33,6 +33,7 @@ public:
 Q_SIGNALS:
 	void requestNewTool();
 	void runToggled(bool toggled);
+	void settingsTitleChanged(QString newTitle);
 
 private:
 	MenuControlButton *monitorsButton;
