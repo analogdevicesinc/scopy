@@ -37,8 +37,11 @@ DataMonitorSettings::~DataMonitorSettings() {}
 
 void DataMonitorSettings::init(QString title, QColor color)
 {
-	header = new MenuHeaderWidget(title, QPen(color), this);
+	header = new EditTextMenuHeader(title, color, this);
 	mainLayout->addWidget(header);
+
+	connect(header->lineEdit(), &QLineEdit::textChanged, this,
+		[=, this]() { Q_EMIT titleUpdated(header->lineEdit()->text()); });
 
 	settingsBody = new QWidget(this);
 	layout = new QVBoxLayout(this);
@@ -118,8 +121,6 @@ void DataMonitorSettings::init(QString title, QColor color)
 
 	DataMonitorStyleHelper::DataMonitorSettingsStyle(this);
 }
-
-void DataMonitorSettings::updateTitle(QString title) { header->label()->setText(title); }
 
 void DataMonitorSettings::plotYAxisMinValueUpdate(double value) { m_ymin->setValue(value); }
 

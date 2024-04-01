@@ -57,6 +57,7 @@ public:
 	static void MenuLargeLabel(QLabel *lbl, QString objectName = "");
 	static void MenuHeaderLine(QFrame *line, QPen pen, QString objectName = "");
 	static void MenuHeaderWidget(QWidget *w, QString objectName = "");
+	static void MenuEditTextHeaderWidget(QWidget *w, QString objectName = "");
 	static void MenuComboBox(QComboBox *cb, QString objectName = "");
 	static void MenuSmallLabel(QLabel *lbl, QString objectName = "");
 	static void MenuComboWidget(QWidget *w, QString objectName = "");

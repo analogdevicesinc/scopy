@@ -606,6 +606,28 @@ void StyleHelper::MenuHeaderWidget(QWidget *w, QString objectName)
 	w->setStyleSheet(style);
 }
 
+void StyleHelper::MenuEditTextHeaderWidget(QWidget *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+	w->setFixedHeight(48);
+	w->layout()->setContentsMargins(10, 2, 10, 2);
+	QString style = QString(R"css(
+			scopy--EditTextMenuHeader {background-color: &&UIElementBackground&&;
+						border-radius: 4px;
+						}
+			QLineEdit {
+			 background-color: transparent;
+			 color: white;
+			 font-size: 16px;
+			 border: none;
+			 padding: 2px;
+			}
+			)css");
+	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
+	w->setStyleSheet(style);
+}
+
 void StyleHelper::MenuSpinComboBox(QComboBox *w, QString objectName)
 {
 	MenuComboBox(w, objectName);
