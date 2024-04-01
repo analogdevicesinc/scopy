@@ -36,6 +36,9 @@ build/*
 .vscode/*
 ci/ubuntu/staging
 ci/macOS/staging
+ci/kuiper/staging
+ci/kuiper/docker/sysroot*
+ci/kuiper/scopy.AppDir
 windows/*
 core/include/scopy-core_config.h
 core/include/scopy-core_export.h
