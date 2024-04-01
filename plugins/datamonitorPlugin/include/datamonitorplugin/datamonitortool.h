@@ -32,6 +32,7 @@ public:
 
 Q_SIGNALS:
 	void requestNewTool();
+	void runToggled(bool toggled);
 
 private:
 	MenuControlButton *monitorsButton;
