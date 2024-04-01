@@ -5,6 +5,7 @@
 
 #include "dataacquisitionmanager.hpp"
 #include "datamonitormodel.hpp"
+#include "datamonitortool.h"
 #include "scopy-datamonitorplugin_export.h"
 #include <QObject>
 #include <pluginbase/plugin.h>
@@ -33,6 +34,7 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 	void addNewTool();
+	void toggleRunState(bool toggled);
 
 private:
 	QList<DataMonitorModel *> dmmList;
