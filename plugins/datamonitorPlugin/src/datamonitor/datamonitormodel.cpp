@@ -9,12 +9,13 @@ using namespace scopy;
 using namespace datamonitor;
 
 DataMonitorModel::DataMonitorModel(QString name, QColor color, UnitOfMeasurement *unitOfMeasure, QObject *parent)
-	: name(name)
-	, color(color)
+	: color(color)
 	, m_minValue(Q_INFINITY)
 	, m_maxValue(-Q_INFINITY)
 	, QObject{parent}
 {
+	setName(name);
+
 	if(unitOfMeasure) {
 		this->unitOfMeasure = unitOfMeasure;
 	} else {
@@ -33,7 +34,13 @@ DataMonitorModel::DataMonitorModel(QString name, QColor color, UnitOfMeasurement
 
 QString DataMonitorModel::getName() const { return name; }
 
-void DataMonitorModel::setName(QString newName) { name = newName; }
+void DataMonitorModel::setName(QString newName)
+{
+	name = newName;
+	auto nameList = name.split(":");
+	setDeviceName(nameList[0]);
+	setShortName(nameList[1]);
+}
 
 QColor DataMonitorModel::getColor() const { return color; }
 
@@ -43,7 +50,15 @@ UnitOfMeasurement *DataMonitorModel::getUnitOfMeasure() const { return unitOfMea
 
 void DataMonitorModel::setUnitOfMeasure(UnitOfMeasurement *newUnitOfMeasure) { unitOfMeasure = newUnitOfMeasure; }
 
-QPair<double, double> DataMonitorModel::getLastReadValue() const { return qMakePair(xdata.last(), ydata.last()); }
+QPair<double, double> DataMonitorModel::getLastReadValue() const
+{
+
+	if(xdata.isEmpty()) {
+		return qMakePair(0, 0);
+	}
+
+	return qMakePair(xdata.last(), ydata.last());
+}
 
 double DataMonitorModel::getValueAtTime(double time)
 {
@@ -51,7 +66,8 @@ double DataMonitorModel::getValueAtTime(double time)
 		return ydata.at(xdata.indexOf(time));
 	}
 
-	return 0.0;
+	return -Q_INFINITY;
+}
 }
 
 QList<QPair<double, double>> *DataMonitorModel::getValues() const
@@ -120,6 +136,14 @@ void DataMonitorModel::read() { readStrategy->read(); }
 double DataMonitorModel::minValue() const { return m_minValue; }
 
 double DataMonitorModel::maxValue() const { return m_maxValue; }
+
+QString DataMonitorModel::getShortName() const { return shortName; }
+
+void DataMonitorModel::setShortName(const QString &newShortName) { shortName = newShortName; }
+
+QString DataMonitorModel::getDeviceName() const { return deviceName; }
+
+void DataMonitorModel::setDeviceName(const QString &newDeviceName) { deviceName = newDeviceName; }
 
 void DataMonitorModel::updateValue(double time, double value)
 {
