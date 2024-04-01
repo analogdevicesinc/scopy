@@ -10,7 +10,7 @@ install_packages(){
 		pigz libncurses-dev autoconf automake tar figlet libclang-dev
 }
 
-#Download and extract QT Source (QT 5.15.2)
+# Download and extract QT Source (QT 5.15.2)
 download_qt(){
 	mkdir -p ${STAGING_AREA}
 	pushd ${STAGING_AREA}
@@ -67,7 +67,7 @@ build_qt5.15.2(){
 	-L$SYSROOT/usr/lib/arm-linux-gnueabihf -I$SYSROOT/usr/include/arm-linux-gnueabihf
 
 	make -j14
-	sudo make install #installs to $QT_BUILD_LOCATION
+	sudo make install # installs to $QT_BUILD_LOCATION
 }
 
 for arg in $@; do
