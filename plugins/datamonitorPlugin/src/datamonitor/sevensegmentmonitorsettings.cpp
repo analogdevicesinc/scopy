@@ -29,15 +29,13 @@ SevenSegmentMonitorSettings::SevenSegmentMonitorSettings(QWidget *parent)
 	precision = new QLineEdit(sevenSegmentSettingsSection);
 	precision->setText(QString::number(DataMonitorUtils::getDefaultPrecision()));
 
-	setPrecisionButton = new QPushButton("Set", sevenSegmentSettingsSection);
+	precisionLayout->addWidget(new QLabel("Precision: ", this));
+	precisionLayout->addWidget(precision);
 
-	precisionLayout->addWidget(precision, 2);
-	precisionLayout->addWidget(setPrecisionButton, 1);
-
-	connect(setPrecisionButton, &QPushButton::clicked, this, &SevenSegmentMonitorSettings::changePrecision);
 	connect(precision, &QLineEdit::returnPressed, this, &SevenSegmentMonitorSettings::changePrecision);
+	connect(precision, &QLineEdit::textChanged, this, &SevenSegmentMonitorSettings::changePrecision);
 
-	peakHolderToggle = new MenuOnOffSwitch(tr("Peak holder"), sevenSegmentSettingsSection, false);
+	peakHolderToggle = new MenuOnOffSwitch(tr("Min/Max"), sevenSegmentSettingsSection, false);
 	peakHolderToggle->onOffswitch()->setChecked(true);
 
 	connect(peakHolderToggle->onOffswitch(), &QAbstractButton::toggled, this,

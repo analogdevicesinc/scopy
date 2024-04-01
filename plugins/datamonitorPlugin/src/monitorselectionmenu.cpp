@@ -31,7 +31,7 @@ MonitorSelectionMenu::MonitorSelectionMenu(QMap<QString, DataMonitorModel *> *mo
 	monitorsGroup = new QButtonGroup(this);
 
 	foreach(QString monitor, monitorList->keys()) {
-		addMonitor(monitor, monitorList->value(monitor)->getColor());
+		addMonitor(monitorList->value(monitor));
 	}
 
 	QSpacerItem *spacer = new QSpacerItem(10, 10, QSizePolicy::Preferred, QSizePolicy::Expanding);
@@ -52,40 +52,39 @@ void MonitorSelectionMenu::generateDeviceSection(QString device)
 	deviceMap.insert(device, devMonitorsSection);
 }
 
-void MonitorSelectionMenu::addMonitor(QString monitor, QColor monitorColor)
+void MonitorSelectionMenu::addMonitor(DataMonitorModel *monitor)
 {
-	auto dev = monitor.split(":")[0];
 
-	if(!deviceMap.contains(dev)) {
-		generateDeviceSection(dev);
+	if(!deviceMap.contains(monitor->getDeviceName())) {
+		generateDeviceSection(monitor->getDeviceName());
 	}
 
-	MenuControlButton *monitorChannel = new MenuControlButton(deviceMap.value(dev));
+	MenuControlButton *monitorChannel = new MenuControlButton(deviceMap.value(monitor->getDeviceName()));
 	monitorChannel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
-	deviceMap.value(dev)->contentLayout()->addWidget(monitorChannel);
-	monitorChannel->setName(monitor);
+	deviceMap.value(monitor->getDeviceName())->contentLayout()->addWidget(monitorChannel);
+	monitorChannel->setName(monitor->getShortName());
 	monitorChannel->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
 	monitorChannel->setOpenMenuChecksThis(true);
-	monitorChannel->setColor(monitorColor);
+	monitorChannel->setColor(monitor->getColor());
 	monitorChannel->button()->setVisible(false);
 	monitorChannel->setCheckable(false);
 
-	monitorChannel->setToolTip(monitor);
+	monitorChannel->setToolTip(monitor->getName());
 
 	monitorsGroup->addButton(monitorChannel);
 
 	// apply hover to the buttons based on the color they have
-	monitorChannel->setStyleSheet(QString(":hover{ background-color: %1 ; }").arg(monitorColor.name()));
+	monitorChannel->setStyleSheet(QString(":hover{ background-color: %1 ; }").arg(monitor->getColor().name()));
 
 	connect(monitorChannel, &MenuControlButton::clicked, monitorChannel->checkBox(), &QCheckBox::toggle);
 
 	connect(monitorChannel->checkBox(), &QCheckBox::toggled, this,
-		[=, this](bool toggled) { Q_EMIT monitorToggled(toggled, monitor); });
+		[=, this](bool toggled) { Q_EMIT monitorToggled(toggled, monitor->getName()); });
 
 	// when removing the monitor disable all active monitors
 	connect(this, &MonitorSelectionMenu::removeMonitor, monitorChannel, [=, this]() {
 		if(monitorChannel->checkBox()->isChecked()) {
-			Q_EMIT monitorToggled(false, monitor);
+			Q_EMIT monitorToggled(false, monitor->getName());
 		}
 	});
 }
