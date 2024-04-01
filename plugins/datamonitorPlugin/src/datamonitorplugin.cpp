@@ -141,8 +141,9 @@ void DataMonitorPlugin::addNewTool()
 
 	QString tool_name = (QString("DataMonitor ") + QString::number(i));
 
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY(tool_name, tool_name, ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+	ToolMenuEntry *toolMenuEntry =
+		SCOPY_NEW_TOOLMENUENTRY(tool_name, tool_name, ":/gui/icons/scopy-default/icons/gear_wheel.svg");
+	m_toolList.append(toolMenuEntry);
 	m_toolList.last()->setEnabled(true);
 	m_toolList.last()->setRunBtnVisible(true);
 
@@ -150,6 +151,9 @@ void DataMonitorPlugin::addNewTool()
 
 	connect(datamonitorTool, &DatamonitorTool::requestNewTool, this, &DataMonitorPlugin::addNewTool);
 	connect(datamonitorTool, &DatamonitorTool::runToggled, this, &DataMonitorPlugin::toggleRunState);
+
+	connect(datamonitorTool, &DatamonitorTool::settingsTitleChanged, this,
+		[=, this](QString newTitle) { toolMenuEntry->setName(newTitle); });
 
 	// one for each
 	connect(m_toolList[i], &ToolMenuEntry::runToggled, this, [=, this](bool en) {
