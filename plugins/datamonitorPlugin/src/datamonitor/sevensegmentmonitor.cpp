@@ -21,7 +21,7 @@ SevenSegmentMonitor::SevenSegmentMonitor(DataMonitorModel *model, QWidget *paren
 
 	header->addWidget(name, Qt::AlignLeft);
 	header->addWidget(unitOfMeasurement);
-	header->setAlignment(unitOfMeasurement, Qt::AlignRight);
+	header->setAlignment(unitOfMeasurement, Qt::AlignLeft);
 
 	lcdNumber = new LcdNumber(this);
 
@@ -77,6 +77,7 @@ void SevenSegmentMonitor::updatePrecision(int precision)
 {
 	lcdNumber->setPrecision(precision);
 	lcdNumber->setDigitCount(precision + 4);
+	lcdNumber->display(m_model->getLastReadValue().second);
 
 	lcdNumberMin->setPrecision(precision);
 	lcdNumberMin->setDigitCount(precision + 4);
