@@ -31,8 +31,8 @@ void DataMonitorStyleHelper::DataMonitorToolStyle(DatamonitorTool *tool)
 	tool->clearBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	tool->clearBtn->setStyleSheet(RemoveButtonStyle());
 	tool->textMonitors->setStyleSheet("color: white; font-size: 16px;");
-	tool->tool->setRightContainerWidth(300);
-	tool->tool->setLeftContainerWidth(200);
+	tool->tool->setRightContainerWidth(285);
+	tool->tool->setLeftContainerWidth(185);
 	tool->tool->centralContainer()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
 	StyleHelper::SquareToggleButtonWithIcon(tool->addMonitorButton, "add_monitor_btn", false);
@@ -81,9 +81,7 @@ void DataMonitorStyleHelper::SevenSegmentMonitorsStyle(SevenSegmentMonitor *seve
 
 void DataMonitorStyleHelper::SevenSegmentMonitorMenuStyle(SevenSegmentMonitorSettings *sevenSegmentMonitorSettings)
 {
-
 	sevenSegmentMonitorSettings->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	StyleHelper::SmallBlueButton(sevenSegmentMonitorSettings->setPrecisionButton);
 }
 
 QString DataMonitorStyleHelper::RemoveButtonStyle()

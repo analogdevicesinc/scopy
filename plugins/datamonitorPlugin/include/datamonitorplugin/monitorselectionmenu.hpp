@@ -26,7 +26,7 @@ private:
 	QMap<QString, MenuCollapseSection *> deviceMap;
 
 	void generateDeviceSection(QString device);
-	void addMonitor(QString monitor, QColor monitorColor);
+	void addMonitor(DataMonitorModel *monitor);
 };
 } // namespace datamonitor
 } // namespace scopy

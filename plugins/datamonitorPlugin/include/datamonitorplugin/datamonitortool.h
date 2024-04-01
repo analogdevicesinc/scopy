@@ -7,6 +7,7 @@
 #include <QPushButton>
 #include <QTextEdit>
 #include <QWidget>
+#include <menucontrolbutton.h>
 #include <toolbuttons.h>
 #include <tooltemplate.h>
 #include "monitorplot.hpp"
@@ -33,11 +34,13 @@ Q_SIGNALS:
 	void requestNewTool();
 
 private:
+	MenuControlButton *monitorsButton;
 	DataAcquisitionManager *m_dataAcquisitionManager;
 
 	ToolTemplate *tool;
 	GearBtn *settingsButton;
 	InfoBtn *infoBtn;
+	PrintBtn *printBtn;
 	RunBtn *runBtn;
 	QPushButton *clearBtn;
 	AddBtn *addMonitorButton;
