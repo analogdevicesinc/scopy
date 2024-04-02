@@ -17,6 +17,9 @@ class SCOPY_DATAMONITORPLUGIN_EXPORT DataAcquisitionManager : public QObject
 public:
 	explicit DataAcquisitionManager(QObject *parent = nullptr);
 
+	void addMonitor(DataMonitorModel *monitor);
+	void removeMonitor(QString monitorName);
+	void removeDevice(QString device);
 	void clearMonitorsData();
 	QList<QString> getMonitors();
 
@@ -26,10 +29,13 @@ public:
 	void updateActiveMonitors(bool toggled, QString monitorName);
 	QMap<QString, DataMonitorModel *> *getDataMonitorMap() const;
 
-signals:
+Q_SIGNALS:
 	void requestUpdateActiveMonitors();
 	void requestRead();
 	void activeMonitorsUpdated();
+	void monitorAdded(DataMonitorModel *monitor);
+	void monitorRemoved(QString monitorName);
+	void deviceRemoved(QString deviceName);
 
 private:
 	QMap<QString, int> *m_activeMonitorsMap;

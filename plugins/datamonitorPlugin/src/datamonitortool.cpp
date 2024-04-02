@@ -8,6 +8,7 @@
 #include <sevensegmentdisplay.hpp>
 #include <timemanager.hpp>
 #include "datamonitorstylehelper.hpp"
+#include <iioutil/connection.h>
 
 using namespace scopy::datamonitor;
 
@@ -184,6 +185,10 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 
 	/// log data
 	LogDataToFile *logDataToFile = new LogDataToFile(dataAcquisitionManager, this);
+
+	connect(m_dataMonitorSettings->getDataLoggingMenu(), &DataLoggingMenu::requestLiveDataLogging, logDataToFile,
+		&LogDataToFile::continuousLogData);
+
 	connect(m_dataMonitorSettings->getDataLoggingMenu(), &DataLoggingMenu::requestDataLogging, logDataToFile,
 		&LogDataToFile::logData);
 
@@ -205,6 +210,18 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	m_monitorSelectionMenu = new MonitorSelectionMenu(dataAcquisitionManager->getDataMonitorMap());
 	tool->leftStack()->add("Monitors", m_monitorSelectionMenu);
 
+	connect(m_dataAcquisitionManager, &DataAcquisitionManager::monitorAdded, m_monitorSelectionMenu,
+		&MonitorSelectionMenu::addMonitor);
+
+	connect(m_dataAcquisitionManager, &DataAcquisitionManager::monitorRemoved, this,
+		[=, this](QString monitorName) {
+			m_monitorPlot->removeMonitor(monitorName);
+			sevenSegmetMonitors->removeSegment(monitorName);
+		});
+
+	connect(m_dataAcquisitionManager, &DataAcquisitionManager::deviceRemoved, m_monitorSelectionMenu,
+		&MonitorSelectionMenu::removeDevice);
+
 	connect(m_monitorSelectionMenu, &MonitorSelectionMenu::monitorToggled, m_monitorPlot,
 		[=, this](bool toggled, QString monitorName) {
 			// toggle monitor active inside data acquisiton manager
@@ -223,6 +240,9 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 				sevenSegmetMonitors->removeSegment(monitorName);
 			}
 		});
+
+	connect(m_monitorSelectionMenu, &MonitorSelectionMenu::requestRemoveImportedDevice, m_dataAcquisitionManager,
+		&DataAcquisitionManager::removeDevice);
 
 	DataMonitorStyleHelper::DataMonitorToolStyle(this);
 }

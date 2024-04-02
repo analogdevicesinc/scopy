@@ -31,6 +31,7 @@ public:
 
 	QPair<double, double> getLastReadValue() const;
 	double getValueAtTime(double time);
+	void setValueAtTime(double time, double value);
 	void updateValue(double time, double value);
 	void resetMinMax();
 
@@ -53,6 +54,13 @@ public:
 	QString getDeviceName() const;
 	void setDeviceName(const QString &newDeviceName);
 
+	bool isDummyMonitor() const;
+	void setIsDummyMonitor(bool newIsDummyMonitor);
+
+	void setYdata(const QVector<double> &newYdata);
+
+	void setXdata(const QVector<double> &newXdata);
+
 Q_SIGNALS:
 	void valueUpdated(double time, double value);
 	void minValueUpdated(double value);
@@ -74,6 +82,8 @@ private:
 
 	IReadStrategy *readStrategy;
 	UnitOfMeasurement *unitOfMeasure;
+
+	bool m_isDummyMonitor = false;
 };
 } // namespace datamonitor
 } // namespace scopy

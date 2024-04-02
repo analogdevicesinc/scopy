@@ -18,8 +18,7 @@ public:
 	static QString getToolSettingsId();
 	static double getReadIntervalDefaul();
 	static int getDefaultPrecision();
-	static QString getDateTimeFormat();
-	static QString getShortDateTimeFormat();
+	static QString getLoggingDateTimeFormat();
 };
 } // namespace datamonitor
 } // namespace scopy

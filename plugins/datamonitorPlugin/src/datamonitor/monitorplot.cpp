@@ -20,6 +20,16 @@ MonitorPlot::MonitorPlot(QWidget *parent)
 	QVBoxLayout *layout = new QVBoxLayout(this);
 	setLayout(layout);
 
+	Preferences *p = Preferences::GetInstance();
+	dateTimeFormat = p->get("datamonitorplugin_date_time_format").toString();
+
+	QObject::connect(p, &Preferences::preferenceChanged, this, [=, this](QString id, QVariant var) {
+		if(id.contains("datamonitorplugin_date_time_format")) {
+			dateTimeFormat = p->get("datamonitorplugin_date_time_format").toString();
+			setStartTime();
+		}
+	});
+
 	m_plot = new PlotWidget(this);
 
 	m_plot->yAxis()->setInterval(DataMonitorUtils::getAxisDefaultMinValue(),
@@ -170,7 +180,7 @@ void MonitorPlot::setStartTime()
 	auto &&timeTracker = TimeManager::GetInstance();
 	m_startTime = QwtDate::toDouble(timeTracker->startTime());
 
-	QString formattedTime = timeTracker->startTime().toString(DataMonitorUtils::getDateTimeFormat());
+	QString formattedTime = timeTracker->startTime().toString(dateTimeFormat);
 	QByteArray formattedTimeMsg = formattedTime.toLocal8Bit();
 	startTimeLabel->setText(QString(formattedTimeMsg));
 
@@ -180,11 +190,10 @@ void MonitorPlot::setStartTime()
 void MonitorPlot::updateAxisScaleDraw()
 {
 	if(m_isRealTime) {
-		genereateScaleDraw(DataMonitorUtils::getShortDateTimeFormat(),
-				   QDateTime::currentDateTime().offsetFromUtc());
+		genereateScaleDraw(dateTimeFormat, QDateTime::currentDateTime().offsetFromUtc());
 	} else {
 		double offset = (-1) * m_startTime / 1000;
-		genereateScaleDraw(DataMonitorUtils::getShortDateTimeFormat(), offset);
+		genereateScaleDraw(dateTimeFormat, offset);
 	}
 
 	m_plot->replot();
@@ -204,7 +213,7 @@ void MonitorPlot::updatePlotStartingPoint(double time, double delta)
 		m_plot->xAxis()->setInterval(time - (delta * 1000), time);
 	} else {
 		double offset = (-1) * m_startTime / 1000;
-		genereateScaleDraw(DataMonitorUtils::getShortDateTimeFormat(), offset);
+		genereateScaleDraw(dateTimeFormat, offset);
 
 		m_plot->xAxis()->setInterval(time - (delta * 1000), time);
 	}

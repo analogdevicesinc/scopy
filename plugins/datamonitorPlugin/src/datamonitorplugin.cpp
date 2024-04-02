@@ -155,6 +155,8 @@ void DataMonitorPlugin::addNewTool()
 	connect(datamonitorTool, &DatamonitorTool::settingsTitleChanged, this,
 		[=, this](QString newTitle) { toolMenuEntry->setName(newTitle); });
 
+	datamonitorTool->getRunButton()->setChecked(isRunning);
+
 	// one for each
 	connect(m_toolList[i], &ToolMenuEntry::runToggled, this, [=, this](bool en) {
 		if(datamonitorTool->getRunButton()->isChecked() != en) {
@@ -174,6 +176,7 @@ void DataMonitorPlugin::toggleRunState(bool toggled)
 	for(int i = 0; i < m_toolList.length(); i++) {
 		m_toolList[i]->setRunning(toggled);
 	}
+	isRunning = toggled;
 }
 
 void DataMonitorPlugin::initMetadata()
@@ -195,6 +198,7 @@ void DataMonitorPlugin::initPreferences()
 	Preferences *p = Preferences::GetInstance();
 	p->init("datamonitorplugin_data_storage_size", "10 Kb");
 	p->init("datamonitorplugin_read_interval", "1");
+	p->init("datamonitorplugin_date_time_format", "hh:mm:ss");
 }
 
 bool DataMonitorPlugin::loadPreferencesPage()
@@ -220,6 +224,9 @@ bool DataMonitorPlugin::loadPreferencesPage()
 
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceEdit(
 		p, "datamonitorplugin_read_interval", "Read interval (seconds) ", generalSection));
+
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceEdit(
+		p, "datamonitorplugin_date_time_format", "DateTime format :", generalSection));
 	return true;
 }
 
