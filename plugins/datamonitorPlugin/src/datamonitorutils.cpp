@@ -17,6 +17,8 @@ QString DataMonitorUtils::getToolSettingsId() { return "DataMonitorSettings"; }
 
 double DataMonitorUtils::getReadIntervalDefaul() { return 1; }
 
-QString DataMonitorUtils::getPlotDateTimeFormat() { return "hh:mm:ss"; }
-
 int DataMonitorUtils::getDefaultPrecision() { return 3; }
+
+QString DataMonitorUtils::getDateTimeFormat() { return "dd/MM/yyyy hh:mm:ss"; }
+
+QString DataMonitorUtils::getShortDateTimeFormat() { return "hh:mm:ss"; }

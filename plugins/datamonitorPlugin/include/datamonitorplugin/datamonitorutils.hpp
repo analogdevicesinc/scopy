@@ -17,8 +17,9 @@ public:
 	static double getXAxisDefaultViewPortSize();
 	static QString getToolSettingsId();
 	static double getReadIntervalDefaul();
-	static QString getPlotDateTimeFormat();
 	static int getDefaultPrecision();
+	static QString getDateTimeFormat();
+	static QString getShortDateTimeFormat();
 };
 } // namespace datamonitor
 } // namespace scopy
