@@ -19,10 +19,6 @@ void DataMonitorStyleHelper::DataMonitorSettingsStyle(DataMonitorSettings *dataM
 
 	style.replace("&&backgroundColor&&", "transparent");
 
-	StyleHelper::BlueButton(dataMonitorSettings->dataLoggingBrowseBtn);
-	StyleHelper::BlueButton(dataMonitorSettings->dataLoggingBtn);
-	StyleHelper::BlueButton(dataMonitorSettings->dataLoadingBtn);
-
 	dataMonitorSettings->setStyleSheet(style);
 }
 
@@ -82,6 +78,13 @@ void DataMonitorStyleHelper::SevenSegmentMonitorsStyle(SevenSegmentMonitor *seve
 void DataMonitorStyleHelper::SevenSegmentMonitorMenuStyle(SevenSegmentMonitorSettings *sevenSegmentMonitorSettings)
 {
 	sevenSegmentMonitorSettings->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+}
+
+void DataMonitorStyleHelper::DataLoggingMenuStyle(DataLoggingMenu *menu)
+{
+	StyleHelper::BlueButton(menu->dataLoggingBrowseBtn);
+	StyleHelper::BlueButton(menu->dataLoggingBtn);
+	StyleHelper::BlueButton(menu->dataLoadingBtn);
 }
 
 QString DataMonitorStyleHelper::RemoveButtonStyle()
