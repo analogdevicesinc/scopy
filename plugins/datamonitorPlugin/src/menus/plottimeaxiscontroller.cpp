@@ -34,7 +34,7 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 	dateEdit->setCalendarPopup(true);
 	dateEdit->setVisible(false);
 	timeEdit = new QTimeEdit(QTime::currentTime(), xAxisContainer);
-	timeEdit->setDisplayFormat(DataMonitorUtils::getShortDateTimeFormat());
+	timeEdit->setDisplayFormat("hh:mm:ss");
 	timeEdit->setVisible(false);
 
 	m_xdelta = new PositionSpinButton(

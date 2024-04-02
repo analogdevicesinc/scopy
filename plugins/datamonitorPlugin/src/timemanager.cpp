@@ -18,7 +18,10 @@ TimeManager::TimeManager(QObject *parent)
 	m_startTime = QDateTime::currentDateTime();
 
 	m_timer = new QTimer(this);
-	connect(m_timer, &QTimer::timeout, this, &TimeManager::timeout);
+	connect(m_timer, &QTimer::timeout, this, [=, this]() {
+		m_lastReadValue = QDateTime::currentDateTime();
+		Q_EMIT timeout();
+	});
 
 	qDebug(CAT_TIME_TRACKER) << "ctor";
 }
@@ -50,3 +53,5 @@ void TimeManager::setTimerInterval(double interval) { m_timer->setInterval(inter
 bool TimeManager::isRunning() const { return m_isRunning; }
 
 void TimeManager::setIsRunning(bool newIsRunning) { m_isRunning = newIsRunning; }
+
+QDateTime TimeManager::lastReadValue() const { return m_lastReadValue; }

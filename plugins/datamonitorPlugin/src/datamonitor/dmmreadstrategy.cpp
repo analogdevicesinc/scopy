@@ -2,6 +2,7 @@
 #include <QDate>
 #include <QDebug>
 #include <QwtDate>
+#include <timemanager.hpp>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -34,7 +35,8 @@ void DMMReadStrategy::read()
 		double result = (raw + m_offset) * scale * m_umScale;
 		qDebug() << "dmm read success  ";
 
-		double currentTime = QwtDate::toDouble(QDateTime::currentDateTime());
+		auto &&timeTracker = TimeManager::GetInstance();
+		double currentTime = QwtDate::toDouble(timeTracker->lastReadValue());
 
 		Q_EMIT readDone(currentTime, result);
 	}
