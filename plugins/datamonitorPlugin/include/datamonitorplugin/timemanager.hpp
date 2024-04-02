@@ -31,6 +31,8 @@ public:
 	bool isRunning() const;
 	void setIsRunning(bool newIsRunning);
 
+	QDateTime lastReadValue() const;
+
 Q_SIGNALS:
 	void timeout();
 
@@ -41,6 +43,8 @@ private:
 	bool m_realTime = false;
 	QTimer *m_timer;
 	bool m_isRunning = false;
+
+	QDateTime m_lastReadValue;
 };
 } // namespace datamonitor
 } // namespace scopy

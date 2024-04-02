@@ -10,6 +10,35 @@ DataAcquisitionManager::DataAcquisitionManager(QObject *parent)
 	m_dataMonitorMap = new QMap<QString, DataMonitorModel *>();
 }
 
+void DataAcquisitionManager::addMonitor(DataMonitorModel *monitor)
+{
+	getDataMonitorMap()->insert(monitor->getName(), monitor);
+	Q_EMIT monitorAdded(monitor);
+}
+
+void DataAcquisitionManager::removeMonitor(QString monitorName)
+{
+	if(m_activeMonitorsMap->contains(monitorName)) {
+		m_activeMonitorsMap->remove(monitorName);
+	}
+	if(getDataMonitorMap()->contains(monitorName)) {
+		delete getDataMonitorMap()->value(monitorName);
+		getDataMonitorMap()->remove(monitorName);
+		Q_EMIT monitorRemoved(monitorName);
+	}
+}
+
+void DataAcquisitionManager::removeDevice(QString device)
+{
+	foreach(QString monKey, getDataMonitorMap()->keys()) {
+		if(m_dataMonitorMap->value(monKey)->getDeviceName() == device) {
+			removeMonitor(monKey);
+		}
+	}
+
+	Q_EMIT deviceRemoved(device);
+}
+
 void DataAcquisitionManager::clearMonitorsData()
 {
 	foreach(QString monKey, m_activeMonitorsMap->keys()) {

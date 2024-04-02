@@ -50,6 +50,7 @@ Q_SIGNALS:
 	void monitorCurveRemoved(PlotChannel *c);
 
 private:
+	QString dateTimeFormat;
 	PlotWidget *m_plot;
 	TimePlotInfo *m_plotInfo;
 	QMap<QString, MonitorPlotCurve *> *m_monitorCurves;
