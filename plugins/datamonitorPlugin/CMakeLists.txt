@@ -29,6 +29,7 @@ file(
 	src/*.cpp
 	src/*.hpp
 	src/datamonitor/*.cpp
+	src/menus/*.cpp
 	src/datamonitor/*.hpp
 )
 file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)

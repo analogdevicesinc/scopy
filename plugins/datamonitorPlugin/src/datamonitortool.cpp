@@ -184,16 +184,20 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 
 	/// log data
 	LogDataToFile *logDataToFile = new LogDataToFile(dataAcquisitionManager, this);
-	connect(m_dataMonitorSettings, &DataMonitorSettings::requestDataLogging, logDataToFile,
+	connect(m_dataMonitorSettings->getDataLoggingMenu(), &DataLoggingMenu::requestDataLogging, logDataToFile,
 		&LogDataToFile::logData);
 
-	connect(logDataToFile, &LogDataToFile::loadDataCompleted, m_dataMonitorSettings,
-		[=, this]() { m_dataMonitorSettings->updateDataLoggingStatus(ProgressBarState::SUCCESS); });
+	connect(logDataToFile, &LogDataToFile::loadDataCompleted, m_dataMonitorSettings->getDataLoggingMenu(),
+		[=, this]() {
+			m_dataMonitorSettings->getDataLoggingMenu()->updateDataLoggingStatus(ProgressBarState::SUCCESS);
+		});
 
-	connect(logDataToFile, &LogDataToFile::logDataCompleted, m_dataMonitorSettings,
-		[=, this]() { m_dataMonitorSettings->updateDataLoggingStatus(ProgressBarState::SUCCESS); });
+	connect(logDataToFile, &LogDataToFile::logDataCompleted, m_dataMonitorSettings->getDataLoggingMenu(),
+		[=, this]() {
+			m_dataMonitorSettings->getDataLoggingMenu()->updateDataLoggingStatus(ProgressBarState::SUCCESS);
+		});
 
-	connect(m_dataMonitorSettings, &DataMonitorSettings::requestDataLoading, logDataToFile,
+	connect(m_dataMonitorSettings->getDataLoggingMenu(), &DataLoggingMenu::requestDataLoading, logDataToFile,
 		&LogDataToFile::loadData);
 
 	/////////////////monitor selection menu ///////////////
