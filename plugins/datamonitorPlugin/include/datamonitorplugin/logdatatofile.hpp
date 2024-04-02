@@ -12,6 +12,7 @@ class LogDataToFile : public QObject
 public:
 	explicit LogDataToFile(DataAcquisitionManager *dataAcquisitionManager, QObject *parent = nullptr);
 
+	void continuousLogData(QString path);
 	void logData(QString path);
 	void loadData(QString path);
 
@@ -23,6 +24,7 @@ Q_SIGNALS:
 
 private:
 	DataAcquisitionManager *m_dataAcquisitionManager;
+	QString *currentFileHeader;
 };
 } // namespace datamonitor
 } // namespace scopy
