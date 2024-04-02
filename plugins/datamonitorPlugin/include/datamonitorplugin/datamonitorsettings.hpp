@@ -13,6 +13,7 @@
 #include "scopy-datamonitorplugin_export.h"
 #include "qloggingcategory.h"
 #include "sevensegmentmonitorsettings.hpp"
+#include "dataloggingmenu.hpp"
 
 Q_DECLARE_LOGGING_CATEGORY(CAT_DATAMONITOR_SETTINGS)
 
@@ -24,13 +25,6 @@ class MenuSectionWidget;
 
 class CollapsableMenuControlButton;
 namespace datamonitor {
-
-enum ProgressBarState
-{
-	SUCCESS,
-	ERROR,
-	BUSSY
-};
 
 class SCOPY_DATAMONITORPLUGIN_EXPORT DataMonitorSettings : public QWidget
 {
@@ -44,10 +38,11 @@ public:
 
 	SevenSegmentMonitorSettings *getSevenSegmentMonitorSettings() const;
 
+	DataLoggingMenu *getDataLoggingMenu() const;
+
 public Q_SLOTS:
 	void plotYAxisMinValueUpdate(double value);
 	void plotYAxisMaxValueUpdate(double value);
-	void updateDataLoggingStatus(ProgressBarState status);
 
 Q_SIGNALS:
 	void titleUpdated(QString title);
@@ -60,10 +55,6 @@ Q_SIGNALS:
 	void plotXAxisMinValueChange(double value);
 	void plotXAxisMaxValueChange(double value);
 	void requestYMinMaxValues();
-
-	void pathChanged(QString path);
-	void requestDataLogging(QString path);
-	void requestDataLoading(QString path);
 
 private:
 	PositionSpinButton *m_ymin;
@@ -79,14 +70,8 @@ private:
 
 	MonitorPlot *m_plot;
 
-	QString filename;
-	ProgressLineEdit *dataLoggingFilePath;
-	QPushButton *dataLoggingBrowseBtn;
-	QPushButton *dataLoggingBtn;
-	QPushButton *dataLoadingBtn;
-	void chooseFile();
-
 	SevenSegmentMonitorSettings *sevenSegmentMonitorSettings;
+	DataLoggingMenu *dataLoggingMenu;
 
 	bool eventFilter(QObject *watched, QEvent *event) override;
 };

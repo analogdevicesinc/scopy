@@ -20,6 +20,7 @@ public:
 	static void DataMonitorToolStyle(DatamonitorTool *tool);
 	static void SevenSegmentMonitorsStyle(SevenSegmentMonitor *sevenSegmentMonitor, QString lcdColor);
 	static void SevenSegmentMonitorMenuStyle(SevenSegmentMonitorSettings *sevenSegmentMonitorSettings);
+	static void DataLoggingMenuStyle(DataLoggingMenu *menu);
 	static QString RemoveButtonStyle();
 
 signals:
