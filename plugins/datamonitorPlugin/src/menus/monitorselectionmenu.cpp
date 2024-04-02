@@ -1,6 +1,7 @@
 #include "monitorselectionmenu.hpp"
 
 #include <QLabel>
+#include <datamonitorstylehelper.hpp>
 #include <menucontrolbutton.h>
 #include <menusectionwidget.h>
 
@@ -28,6 +29,18 @@ MonitorSelectionMenu::MonitorSelectionMenu(QMap<QString, DataMonitorModel *> *mo
 	scrollArea->setWidget(settingsBody);
 	mainLayout->addWidget(scrollArea);
 
+	deviceChannelsWidget = new QWidget(this);
+	QVBoxLayout *deviceChannelsWidgetLayout = new QVBoxLayout(deviceChannelsWidget);
+	deviceChannelsWidgetLayout->setMargin(0);
+	deviceChannelsWidgetLayout->setSpacing(10);
+	deviceChannelsWidget->setLayout(deviceChannelsWidgetLayout);
+
+	importedChannelsWidget = new QWidget(this);
+	QVBoxLayout *importedChannelsWidgetLayout = new QVBoxLayout(importedChannelsWidget);
+	importedChannelsWidgetLayout->setMargin(0);
+	importedChannelsWidgetLayout->setSpacing(10);
+	importedChannelsWidget->setLayout(importedChannelsWidgetLayout);
+
 	monitorsGroup = new QButtonGroup(this);
 
 	foreach(QString monitor, monitorList->keys()) {
@@ -35,17 +48,39 @@ MonitorSelectionMenu::MonitorSelectionMenu(QMap<QString, DataMonitorModel *> *mo
 	}
 
 	QSpacerItem *spacer = new QSpacerItem(10, 10, QSizePolicy::Preferred, QSizePolicy::Expanding);
+
+	layout->addWidget(deviceChannelsWidget);
 	layout->addItem(spacer);
+	layout->addWidget(importedChannelsWidget);
 }
 
-void MonitorSelectionMenu::generateDeviceSection(QString device)
+void MonitorSelectionMenu::generateDeviceSection(QString device, bool import)
 {
-	MenuSectionWidget *devMontirosContainer = new MenuSectionWidget(this);
+	MenuCollapseSection *devMonitorsSection = new MenuCollapseSection(device, MenuCollapseSection::MHCW_NONE, this);
 
-	MenuCollapseSection *devMonitorsSection =
-		new MenuCollapseSection(device, MenuCollapseSection::MHCW_NONE, devMontirosContainer);
-	devMontirosContainer->contentLayout()->addWidget(devMonitorsSection);
-	layout->addWidget(devMontirosContainer);
+	if(import) {
+
+		QPushButton *removeBtn = new QPushButton(devMonitorsSection);
+		removeBtn->setMaximumSize(25, 25);
+		removeBtn->setIcon(QIcon(":/gui/icons/orange_close.svg"));
+
+		HoverWidget *removeHover = new HoverWidget(removeBtn, devMonitorsSection, devMonitorsSection);
+		removeHover->setStyleSheet("background-color: transparent; border: 0px;");
+		removeHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+		removeHover->setContentPos(HoverPosition::HP_CENTER);
+		removeHover->setAnchorOffset(QPoint(-20, 20));
+		removeHover->setVisible(true);
+		removeHover->raise();
+
+		connect(removeBtn, &QPushButton::clicked, this,
+			[=, this]() { Q_EMIT requestRemoveImportedDevice(device); });
+
+		importedChannelsWidget->layout()->addWidget(devMonitorsSection);
+	} else {
+		deviceChannelsWidget->layout()->addWidget(devMonitorsSection);
+	}
+
+	DataMonitorStyleHelper::MonitorSelectionMenuMenuCollapseSectionStyle(devMonitorsSection);
 
 	devMonitorsSection->header()->setChecked(false);
 
@@ -56,7 +91,7 @@ void MonitorSelectionMenu::addMonitor(DataMonitorModel *monitor)
 {
 
 	if(!deviceMap.contains(monitor->getDeviceName())) {
-		generateDeviceSection(monitor->getDeviceName());
+		generateDeviceSection(monitor->getDeviceName(), monitor->isDummyMonitor());
 	}
 
 	MenuControlButton *monitorChannel = new MenuControlButton(deviceMap.value(monitor->getDeviceName()));
@@ -87,4 +122,12 @@ void MonitorSelectionMenu::addMonitor(DataMonitorModel *monitor)
 			Q_EMIT monitorToggled(false, monitor->getName());
 		}
 	});
+}
+
+void MonitorSelectionMenu::removeDevice(QString device)
+{
+	if(deviceMap.contains(device)) {
+		delete deviceMap.value(device);
+		deviceMap.remove(device);
+	}
 }

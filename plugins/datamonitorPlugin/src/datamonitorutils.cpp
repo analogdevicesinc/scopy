@@ -19,6 +19,4 @@ double DataMonitorUtils::getReadIntervalDefaul() { return 1; }
 
 int DataMonitorUtils::getDefaultPrecision() { return 3; }
 
-QString DataMonitorUtils::getDateTimeFormat() { return "dd/MM/yyyy hh:mm:ss"; }
-
-QString DataMonitorUtils::getShortDateTimeFormat() { return "hh:mm:ss"; }
+QString DataMonitorUtils::getLoggingDateTimeFormat() { return "dd/MM/yyyy hh:mm:ss"; }
