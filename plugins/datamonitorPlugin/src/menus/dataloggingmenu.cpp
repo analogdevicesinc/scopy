@@ -4,6 +4,7 @@
 #include <datamonitorstylehelper.hpp>
 #include <menucollapsesection.h>
 #include <menusectionwidget.h>
+#include <timemanager.hpp>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -24,34 +25,57 @@ DataLoggingMenu::DataLoggingMenu(QWidget *parent)
 	dataLoggingFilePath = new ProgressLineEdit(logDataSection);
 	dataLoggingFilePath->getLineEdit()->setReadOnly(true);
 
-	connect(dataLoggingFilePath->getLineEdit(), &QLineEdit::textChanged, this, [=, this](QString path) {
-		if(filename.isEmpty() && dataLoggingFilePath->getLineEdit()->isEnabled()) {
-			dataLoggingFilePath->getLineEdit()->setText(tr("No file selected"));
-			dataLoggingFilePath->getLineEdit()->setStyleSheet("color:red");
-		} else {
-			dataLoggingFilePath->getLineEdit()->setStyleSheet("color:white");
-			Q_EMIT pathChanged(path);
-		}
-	});
-
 	dataLoggingBrowseBtn = new QPushButton("Browse", logDataSection);
 	connect(dataLoggingBrowseBtn, &QPushButton::clicked, this, &DataLoggingMenu::chooseFile);
 
+	liveDataLoggingButton = new MenuOnOffSwitch("Live data logging", logDataSection);
+
 	dataLoggingBtn = new QPushButton("Save data", logDataSection);
+
+	dataLoadingBtn = new QPushButton("Import data", logDataSection);
+
+	toggleButtonsEnabled(false);
+
+	///// time manager timeout used for requesting continuous data logging
+	auto &&timeTracker = TimeManager::GetInstance();
+	connect(timeTracker, &TimeManager::timeout, this, [=, this]() {
+		if(liveDataLoggingButton->onOffswitch()->isChecked()) {
+			Q_EMIT requestLiveDataLogging(dataLoggingFilePath->getLineEdit()->text());
+		}
+	});
+
 	connect(dataLoggingBtn, &QPushButton::clicked, this, [=, this]() {
 		updateDataLoggingStatus(ProgressBarState::BUSSY);
 		Q_EMIT requestDataLogging(dataLoggingFilePath->getLineEdit()->text());
 	});
 
-	dataLoadingBtn = new QPushButton("Load data", logDataSection);
+	connect(liveDataLoggingButton->onOffswitch(), &QAbstractButton::toggled, this, [=, this](bool toggled) {
+		m_liveDataLogging = toggled;
+		dataLoggingBtn->setEnabled(!toggled);
+		dataLoadingBtn->setEnabled(!toggled);
+	});
+
 	connect(dataLoadingBtn, &QPushButton::clicked, this, [=, this]() {
 		updateDataLoggingStatus(ProgressBarState::BUSSY);
 		Q_EMIT requestDataLoading(dataLoggingFilePath->getLineEdit()->text());
 	});
 
+	connect(dataLoggingFilePath->getLineEdit(), &QLineEdit::textChanged, this, [=, this](QString path) {
+		if(filename.isEmpty() && dataLoggingFilePath->getLineEdit()->isEnabled()) {
+			dataLoggingFilePath->getLineEdit()->setText(tr("No file selected"));
+			dataLoggingFilePath->getLineEdit()->setStyleSheet("color:red");
+
+		} else {
+			dataLoggingFilePath->getLineEdit()->setStyleSheet("color:white");
+			toggleButtonsEnabled(true);
+			Q_EMIT pathChanged(path);
+		}
+	});
+
 	logDataSection->contentLayout()->addWidget(new QLabel("Choose file"));
 	logDataSection->contentLayout()->addWidget(dataLoggingFilePath);
 	logDataSection->contentLayout()->addWidget(dataLoggingBrowseBtn);
+	logDataSection->contentLayout()->addWidget(liveDataLoggingButton);
 	logDataSection->contentLayout()->addWidget(dataLoggingBtn);
 	logDataSection->contentLayout()->addWidget(dataLoadingBtn);
 
@@ -76,6 +100,8 @@ void DataLoggingMenu::updateDataLoggingStatus(ProgressBarState status)
 	}
 }
 
+bool DataLoggingMenu::liveDataLogging() const { return m_liveDataLogging; }
+
 void DataLoggingMenu::chooseFile()
 {
 	QString selectedFilter;
@@ -83,4 +109,11 @@ void DataLoggingMenu::chooseFile()
 		this, tr("Export"), "", tr("Comma-separated values files (*.csv);;All Files(*)"), &selectedFilter,
 		QFileDialog::Options(QFileDialog::DontUseNativeDialog));
 	dataLoggingFilePath->getLineEdit()->setText(filename);
+}
+
+void DataLoggingMenu::toggleButtonsEnabled(bool en)
+{
+	dataLoggingBtn->setEnabled(en);
+	dataLoadingBtn->setEnabled(en);
+	liveDataLoggingButton->setEnabled(en);
 }

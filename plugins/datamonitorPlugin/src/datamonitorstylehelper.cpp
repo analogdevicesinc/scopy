@@ -87,6 +87,22 @@ void DataMonitorStyleHelper::DataLoggingMenuStyle(DataLoggingMenu *menu)
 	StyleHelper::BlueButton(menu->dataLoadingBtn);
 }
 
+void DataMonitorStyleHelper::MonitorSelectionMenuMenuCollapseSectionStyle(MenuCollapseSection *menu)
+{
+	QString style = QString(R"css(
+			.scopy--MenuCollapseSection { background-color: #272730;
+										border-radius: 4px;
+										margin-bottom: 3px;
+				}
+			QWidget {
+				background-color: transparent;
+			}
+			)css");
+
+	menu->layout()->setContentsMargins(10, 10, 10, 10);
+	menu->setStyleSheet(style);
+}
+
 QString DataMonitorStyleHelper::RemoveButtonStyle()
 {
 	QString style = QString(R"css(

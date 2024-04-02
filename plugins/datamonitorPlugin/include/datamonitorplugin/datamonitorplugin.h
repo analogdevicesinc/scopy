@@ -39,6 +39,7 @@ public Q_SLOTS:
 private:
 	QList<DataMonitorModel *> dmmList;
 	DataAcquisitionManager *m_dataAcquisitionManager;
+	bool isRunning = false;
 };
 } // namespace scopy::datamonitor
 #endif // DATAMONITORPLUGIN_H

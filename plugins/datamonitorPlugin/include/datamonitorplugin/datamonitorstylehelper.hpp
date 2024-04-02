@@ -21,6 +21,7 @@ public:
 	static void SevenSegmentMonitorsStyle(SevenSegmentMonitor *sevenSegmentMonitor, QString lcdColor);
 	static void SevenSegmentMonitorMenuStyle(SevenSegmentMonitorSettings *sevenSegmentMonitorSettings);
 	static void DataLoggingMenuStyle(DataLoggingMenu *menu);
+	static void MonitorSelectionMenuMenuCollapseSectionStyle(MenuCollapseSection *menu);
 	static QString RemoveButtonStyle();
 
 signals:

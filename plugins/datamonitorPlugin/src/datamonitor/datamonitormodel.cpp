@@ -68,6 +68,14 @@ double DataMonitorModel::getValueAtTime(double time)
 
 	return -Q_INFINITY;
 }
+
+void DataMonitorModel::setValueAtTime(double time, double value)
+{
+	if(xdata.contains(time)) {
+		ydata.replace(xdata.indexOf(time), value);
+	} else {
+		updateValue(time, value);
+	}
 }
 
 QList<QPair<double, double>> *DataMonitorModel::getValues() const
@@ -113,6 +121,24 @@ void DataMonitorModel::setDataStorageSize()
 	}
 }
 
+bool DataMonitorModel::isDummyMonitor() const { return m_isDummyMonitor; }
+
+void DataMonitorModel::setIsDummyMonitor(bool newIsDummyMonitor) { m_isDummyMonitor = newIsDummyMonitor; }
+
+void DataMonitorModel::setYdata(const QVector<double> &newYdata)
+{
+	ydata.erase(ydata.begin(), ydata.end());
+	ydata.append(newYdata);
+	Q_EMIT dataCleared();
+}
+
+void DataMonitorModel::setXdata(const QVector<double> &newXdata)
+{
+	xdata.erase(xdata.begin(), xdata.end());
+	xdata.append(newXdata);
+	Q_EMIT dataCleared();
+}
+
 void DataMonitorModel::setReadStrategy(IReadStrategy *newReadStrategy)
 {
 	readStrategy = newReadStrategy;
@@ -131,7 +157,12 @@ void DataMonitorModel::clearMonitorData()
 	Q_EMIT dataCleared();
 }
 
-void DataMonitorModel::read() { readStrategy->read(); }
+void DataMonitorModel::read()
+{
+	if(!m_isDummyMonitor) {
+		readStrategy->read();
+	}
+}
 
 double DataMonitorModel::minValue() const { return m_minValue; }
 
