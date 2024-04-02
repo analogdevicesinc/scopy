@@ -23,7 +23,6 @@ Q_SIGNALS:
 
 private:
 	DataAcquisitionManager *m_dataAcquisitionManager;
-	QString dateTimeFormat = "dd/MM/yyyy hh:mm:ss";
 };
 } // namespace datamonitor
 } // namespace scopy

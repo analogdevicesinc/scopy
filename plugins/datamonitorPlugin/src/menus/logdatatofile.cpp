@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QDateTime>
 #include <QwtDate>
+#include <datamonitorutils.hpp>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -37,7 +38,7 @@ void LogDataToFile::logData(QString path)
 					m_dataAcquisitionManager->getDataMonitorMap()->value(monitor)->getValueAtTime(
 						xData->at(i));
 				QDateTime auxTime = QDateTime::fromMSecsSinceEpoch(xData->at(i));
-				QString time = QString(auxTime.toString(dateTimeFormat));
+				QString time = QString(auxTime.toString(DataMonitorUtils::getDateTimeFormat()));
 
 				if(values.contains(time)) {
 					values[time] += QString(", " + QString::number(val));
@@ -82,7 +83,7 @@ void LogDataToFile::loadData(QString path)
 			QString line = in.readLine();
 			auto values = line.split(",");
 			QString time = values[0];
-			QDateTime dateTime = QDateTime::fromString(time, dateTimeFormat);
+			QDateTime dateTime = QDateTime::fromString(time, DataMonitorUtils::getDateTimeFormat());
 			for(int i = 1; i < channels.length(); i++) {
 				// there is an extra space in each name we need to remove it
 				QString ch = channels[i].simplified();
