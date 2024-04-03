@@ -18,20 +18,23 @@ QWidget *PreferencesHelper::addPreferenceEdit(Preferences *p, QString id, QStrin
 	QWidget *widget = new QWidget();
 	QHBoxLayout *layout = new QHBoxLayout();
 	layout->setMargin(0);
+	layout->setSpacing(0);
+	layout->setMargin(0);
 	widget->setLayout(layout);
 
 	QString pref1Val = p->get(id).toString();
 	QLineEdit *pref = new QLineEdit();
-	pref->setMaximumWidth(200);
 	pref->setText(pref1Val);
 	parent->connect(pref, &QLineEdit::textChanged, parent, [p, id](QString b) { p->set(id, b); });
 
 	QLabel *label = new QLabel(description);
 	label->setStyleSheet("font-weight: bold");
 
-	layout->addWidget(label);
-	layout->addWidget(pref);
-	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+	QSpacerItem *space = new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+	layout->addWidget(label, 1);
+	layout->addSpacerItem(space);
+	layout->addWidget(pref, 1);
 	return widget;
 }
 
