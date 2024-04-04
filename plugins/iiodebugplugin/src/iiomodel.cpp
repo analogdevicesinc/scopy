@@ -12,7 +12,6 @@ IIOModel::IIOModel(struct iio_context *context, QString uri, QObject *parent)
 	, m_uri(uri)
 {
 	m_model = new QStandardItemModel(this);
-	m_model->setHorizontalHeaderItem(0, new QStandardItem("IIO Tree"));
 	iioTreeSetup();
 }
 
@@ -52,7 +51,8 @@ void IIOModel::iioTreeSetup()
 void IIOModel::setupCtx()
 {
 	m_ctxList = IIOWidgetFactory::buildAllAttrsForContext(m_ctx);
-	m_rootItem = new IIOStandardItem(m_ctxList, m_rootString, m_rootString, IIOStandardItem::Context);
+	m_rootItem = createIIOStandardItem(m_ctxList, m_rootString, "", m_rootString, IIOStandardItem::Context);
+	// m_rootItem = new IIOStandardItem(m_ctxList, m_rootString, m_rootString, IIOStandardItem::Context);
 	m_rootItem->setEditable(false);
 }
 
@@ -61,9 +61,9 @@ void IIOModel::generateCtxAttributes()
 	// add attrs from context
 	for(IIOWidget *ctxWidget : m_ctxList) {
 		m_entries.insert(ctxWidget->getRecipe().data);
-		auto *attrItem = new IIOStandardItem({ctxWidget}, ctxWidget->getRecipe().data,
-						     m_rootString + SEPARATOR + ctxWidget->getRecipe().data,
-						     IIOStandardItem::ContextAttribute);
+		auto *attrItem = createIIOStandardItem({ctxWidget}, ctxWidget->getRecipe().data, "",
+						       m_rootString + SEPARATOR + ctxWidget->getRecipe().data,
+						       IIOStandardItem::ContextAttribute);
 		attrItem->setEditable(false);
 		m_rootItem->appendRow(attrItem);
 	}
@@ -78,12 +78,12 @@ void IIOModel::setupCurrentDevice()
 	bool is_trigger = iio_device_is_trigger(m_currentDevice);
 	if(is_trigger) {
 		m_currentDeviceItem =
-			new IIOStandardItem({}, m_currentDeviceName, currentDeviceId,
-					    m_rootString + SEPARATOR + m_currentDeviceName, IIOStandardItem::Trigger);
+			createIIOStandardItem({}, m_currentDeviceName, currentDeviceId,
+					      m_rootString + SEPARATOR + m_currentDeviceName, IIOStandardItem::Trigger);
 	} else {
 		m_currentDeviceItem =
-			new IIOStandardItem(m_devList, m_currentDeviceName, currentDeviceId,
-					    m_rootString + SEPARATOR + m_currentDeviceName, IIOStandardItem::Device);
+			createIIOStandardItem(m_devList, m_currentDeviceName, currentDeviceId,
+					      m_rootString + SEPARATOR + m_currentDeviceName, IIOStandardItem::Device);
 	}
 	m_currentDeviceItem->setDevice(m_currentDevice);
 	m_currentDeviceItem->setEditable(false);
@@ -98,9 +98,9 @@ void IIOModel::generateDeviceAttributes()
 
 		m_entries.insert(device_attr);
 		auto *attrItem =
-			new IIOStandardItem({m_devList[j]}, m_devList[j]->getRecipe().data,
-					    m_rootString + SEPARATOR + m_currentDeviceName + SEPARATOR + device_attr,
-					    IIOStandardItem::DeviceAttribute);
+			createIIOStandardItem({m_devList[j]}, m_devList[j]->getRecipe().data, "",
+					      m_rootString + SEPARATOR + m_currentDeviceName + SEPARATOR + device_attr,
+					      IIOStandardItem::DeviceAttribute);
 		attrItem->setDevice(m_currentDevice);
 		attrItem->setEditable(false);
 		m_currentDeviceItem->appendRow(attrItem);
@@ -115,9 +115,9 @@ void IIOModel::setupCurrentChannel()
 	QString currentChannelId = iio_channel_get_name(m_currentChannel);
 
 	m_currentChannelItem =
-		new IIOStandardItem(m_chnlList, currentChannelId, m_currentChannelName,
-				    m_rootString + SEPARATOR + m_currentDeviceName + SEPARATOR + m_currentChannelName,
-				    IIOStandardItem::Channel);
+		createIIOStandardItem(m_chnlList, currentChannelId, m_currentChannelName,
+				      m_rootString + SEPARATOR + m_currentDeviceName + SEPARATOR + m_currentChannelName,
+				      IIOStandardItem::Channel);
 	m_currentChannelItem->setChannel(m_currentChannel);
 
 	if(m_currentChannelItem->isScanElement()) {
@@ -136,12 +136,27 @@ void IIOModel::generateChannelAttributes()
 
 		m_entries.insert(attr_name);
 		QString attrName = m_chnlList[i]->getRecipe().data;
-		auto *attr_item = new IIOStandardItem({m_chnlList[i]}, attrName,
-						      m_rootString + SEPARATOR + m_currentDeviceName + SEPARATOR +
-							      m_currentChannelName + SEPARATOR + attrName,
-						      IIOStandardItem::ChannelAttribute);
+		auto *attr_item = createIIOStandardItem({m_chnlList[i]}, attrName, "",
+							m_rootString + SEPARATOR + m_currentDeviceName + SEPARATOR +
+								m_currentChannelName + SEPARATOR + attrName,
+							IIOStandardItem::ChannelAttribute);
 		attr_item->setChannel(m_currentChannel);
 		attr_item->setEditable(false);
 		m_currentChannelItem->appendRow(attr_item);
 	}
+}
+
+IIOStandardItem *IIOModel::createIIOStandardItem(QList<IIOWidget *> widgets, QString name, QString id, QString path,
+						 IIOStandardItem::Type type)
+{
+	IIOStandardItem *item;
+	if(id.isEmpty()) {
+		item = new IIOStandardItem(widgets, name, path, type);
+	} else {
+		item = new IIOStandardItem(widgets, name, id, path, type);
+	}
+
+	connect(item, &IIOStandardItem::emitLog, this, &IIOModel::emitLog);
+
+	return item;
 }

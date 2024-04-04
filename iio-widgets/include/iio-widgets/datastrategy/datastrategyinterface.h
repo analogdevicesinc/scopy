@@ -68,7 +68,7 @@ Q_SIGNALS:
 	 * @brief This signal is emitted before a write operation
 	 * @param oldData String containing the data what is present before the write
 	 * @param newData String containing the data that will be written
-	 */
+	 * */
 	virtual void aboutToWrite(QString oldData, QString newData) = 0;
 
 	/**
