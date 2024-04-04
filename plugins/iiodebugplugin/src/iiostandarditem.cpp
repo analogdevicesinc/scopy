@@ -20,6 +20,7 @@ IIOStandardItem::IIOStandardItem(QList<IIOWidget *> widgets, QString name, QStri
 	, m_index(-1)
 {
 	generateToolTip();
+	connectLog();
 }
 
 IIOStandardItem::IIOStandardItem(QList<IIOWidget *> widgets, QString name, QString id, QString path, Type type)
@@ -39,6 +40,7 @@ IIOStandardItem::IIOStandardItem(QList<IIOWidget *> widgets, QString name, QStri
 	, m_index(-1)
 {
 	generateToolTip();
+	connectLog();
 }
 
 void IIOStandardItem::setDevice(struct iio_device *device)
@@ -126,6 +128,62 @@ QString IIOStandardItem::typeString()
 	}
 }
 
+void IIOStandardItem::emitWriteLog(QString oldValue, QString newValue)
+{
+	qDebug(CAT_DEBUGGERIIOMODEL) << "Emitting write signal for" << m_path << "=>" << oldValue << newValue;
+
+	if(m_iioWidgets.size() != 1) {
+		qWarning(CAT_DEBUGGERIIOMODEL)
+			<< "Invalid call to emitWriteLog, this item contains multiple iio-widgets (or none).";
+		return;
+	}
+	IIOWidget *widget = m_iioWidgets.at(0);
+
+	QDateTime *timestamp = widget->lastOperationTimestamp();
+	bool isRead = false;
+	QString path = this->path();
+
+	Q_EMIT emitLog(timestamp, isRead, path, oldValue, newValue);
+}
+
+void IIOStandardItem::emitReadLog(QString data, QString dataOptions)
+{
+	Q_UNUSED(dataOptions)
+	qDebug(CAT_DEBUGGERIIOMODEL) << "Emitting read signal for" << m_path << "=>" << data << dataOptions;
+
+	if(m_iioWidgets.size() != 1) {
+		qWarning(CAT_DEBUGGERIIOMODEL)
+			<< "Invalid call to emitReadLog, this item contains multiple iio-widgets (or none).";
+		return;
+	}
+	IIOWidget *widget = m_iioWidgets.at(0);
+
+	QDateTime *timestamp = widget->lastOperationTimestamp();
+	bool isRead = true;
+	QString path = this->path();
+
+	Q_EMIT emitLog(timestamp, isRead, path, "", data);
+}
+
+void IIOStandardItem::connectLog()
+{
+	IIOStandardItem::Type type = this->type();
+	if(type != ChannelAttribute && type != DeviceAttribute && type != ContextAttribute) {
+		return;
+	}
+
+	// this is leaf iio widget, it can probably read/write
+	IIOWidget *widget = m_iioWidgets.at(0);
+
+	// read signal
+	connect(dynamic_cast<QWidget *>(widget->getDataStrategy()), SIGNAL(sendData(QString, QString)), this,
+		SLOT(emitReadLog(QString, QString)));
+
+	// write signal
+	connect(dynamic_cast<QWidget *>(widget->getDataStrategy()), SIGNAL(aboutToWrite(QString, QString)), this,
+		SLOT(emitWriteLog(QString, QString)));
+}
+
 void IIOStandardItem::buildDetails()
 {
 	if(!m_iioWidgets.empty()) {
@@ -206,5 +264,6 @@ void IIOStandardItem::extractDataFromChannel()
 				   .arg(repeat)
 				   .arg(format->shift);
 		m_index = iio_channel_get_index(m_channel);
+		m_details.append("Format: " + m_format);
 	}
 }

@@ -59,12 +59,14 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 		SLOT(requestData()));
 
 	// forward data from data strategy to ui strategy
-	connect(dataStrategyWidget, SIGNAL(sendData(QString, QString)),
-		uiStrategyWidget, SLOT(receiveData(QString, QString)));
+	connect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), uiStrategyWidget,
+		SLOT(receiveData(QString, QString)));
 
 	// intercept the sendData from dataStrategy to collect information
-	connect(dataStrategyWidget, SIGNAL(sendData(QString,QString)),
-		this, SLOT(storeReadInfo(QString,QString)));
+	connect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), this, SLOT(storeReadInfo(QString, QString)));
+
+	connect(dynamic_cast<QWidget *>(m_dataStrategy), SIGNAL(sendData(QString, QString)), this,
+		SLOT(storeReadTimestamp(QString, QString)));
 
 	m_dataStrategy->requestData();
 }
