@@ -2,14 +2,14 @@
 #define MEASUREMENTCONTROLLER_H
 
 #include "measure.h"
-#include "scopy-gr-util_export.h"
+#include "scopy-adcplugin_export.h"
 
 #include <QObject>
 
 #include <widgets/measurementlabel.h>
 #include <widgets/measurementpanel.h>
 
-namespace scopy::grutil {
+namespace scopy::adc {
 class GRTimeChannelAddon;
 
 typedef struct
@@ -21,7 +21,7 @@ typedef struct
 	QString type;
 } MeasurementInfo;
 
-class SCOPY_GR_UTIL_EXPORT MeasurementController : public QObject
+class SCOPY_ADCPLUGIN_EXPORT MeasurementController : public QObject
 {
 	Q_OBJECT
 public:
@@ -55,13 +55,13 @@ private:
 	QList<MeasurementLabel *> m_measureLabels;
 };
 
-class SCOPY_GR_UTIL_EXPORT TimeChannelMeasurementController : public MeasurementController
+class SCOPY_ADCPLUGIN_EXPORT TimeChannelMeasurementController : public MeasurementController
 {
 public:
 	TimeChannelMeasurementController(TimeMeasureModel *msr, QPen m_pen, QObject *parent = nullptr);
 };
 
-class SCOPY_GR_UTIL_EXPORT MeasureManagerInterface : public QObject
+class SCOPY_ADCPLUGIN_EXPORT MeasureManagerInterface : public QObject
 {
 	Q_OBJECT
 Q_SIGNALS:
@@ -79,7 +79,7 @@ public:
 	virtual MeasureModel *getModel() = 0;
 };
 
-class SCOPY_GR_UTIL_EXPORT TimeMeasureManager : public MeasureManagerInterface
+class SCOPY_ADCPLUGIN_EXPORT TimeMeasureManager : public MeasureManagerInterface
 {
 public:
 	TimeMeasureManager(QObject *parent = nullptr);

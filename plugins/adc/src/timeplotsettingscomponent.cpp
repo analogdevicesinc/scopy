@@ -9,6 +9,8 @@ namespace adc {
 
 TimePlotSettingsComponent::TimePlotSettingsComponent(PlotComponent *plot, QWidget *parent)
 	: QWidget(parent)
+	, m_syncMode(false)
+	, m_sampleRateAvailable(false)
 {
 	m_plot = plot->plot();
 	auto *w = createMenu(this);
@@ -17,6 +19,7 @@ TimePlotSettingsComponent::TimePlotSettingsComponent(PlotComponent *plot, QWidge
 	lay->setSpacing(0);
 	lay->setMargin(0);
 	setLayout(lay);
+
 }
 
 TimePlotSettingsComponent::~TimePlotSettingsComponent() {}
@@ -74,13 +77,7 @@ QWidget *TimePlotSettingsComponent::createYAxisMenu(QWidget *parent)
 	connect(m_singleYModeSw->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
 		m_yctrl->setEnabled(b);
 		m_autoscaleBtn->setEnabled(b);
-		/*for(auto ch : channels) {
-			SingleYModeAware *singleyaware = dynamic_cast<SingleYModeAware *>(ch);
-			if(singleyaware) {
-				singleyaware->setSingleYMode(b);
-			}
-		}*/
-		//	m_plot->replot();
+		setSingleYMode(b);
 	});
 
 	return yaxiscontainer;
@@ -198,9 +195,6 @@ QWidget *TimePlotSettingsComponent::createXAxisMenu(QWidget *parent)
 	auto cb = m_xModeCb->combo();
 
 	cb->addItem("Samples", XMODE_SAMPLES);
-	if(m_sampleRateAvailable) {
-		cb->addItem("Time", XMODE_TIME);
-	}
 	cb->addItem("Time - override samplerate", XMODE_OVERRIDE);
 
 	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
@@ -212,7 +206,7 @@ QWidget *TimePlotSettingsComponent::createXAxisMenu(QWidget *parent)
 		}
 		if(cb->itemData(idx) == XMODE_TIME) {
 			m_sampleRateSpin->setEnabled(false);
-			// m_sampleRateSpin->setValue(readSampleRate());
+			m_sampleRateSpin->setValue(readSampleRate());
 			// setTimeFormatter - xAxis
 			// setUnits xmin,xmax - time units
 		}
@@ -232,11 +226,14 @@ QWidget *TimePlotSettingsComponent::createXAxisMenu(QWidget *parent)
 		},
 		"SampleRate", 1, DBL_MAX, false, false, xaxis);
 
+	m_sampleRateSpin->setValue(10);
 	m_sampleRateSpin->setEnabled(false);
-	connect(m_sampleRateSpin, &PositionSpinButton::valueChanged, this, [=](double val) { setSampleRate(val); });
+	connect(m_sampleRateSpin, &PositionSpinButton::valueChanged,
+		this, [=](double val) {
+			setSampleRate(val);
+		});
 
 	connect(this, &TimePlotSettingsComponent::sampleRateChanged, m_sampleRateSpin, &PositionSpinButton::setValue);
-	// connect(this, &TimePlotSettingsComponent::sampleRateChanged, m_plot, &GRTimePlotAddon::setSampleRate);
 
 	m_showLabels = new MenuOnOffSwitch("PLOT LABELS", xaxis);
 	showPlotLabels(false);
@@ -258,6 +255,23 @@ QWidget *TimePlotSettingsComponent::createXAxisMenu(QWidget *parent)
 	return xaxiscontainer;
 }
 
+void TimePlotSettingsComponent::onInit() {
+	m_bufferSizeSpin->setValue(32);
+	m_plotSizeSpin->setValue(32);
+	m_sampleRateSpin->setValue(1);
+	m_xmin->setValue(0);
+	m_xmax->setValue(31);
+	m_syncBufferPlot->onOffswitch()->setChecked(true);
+	m_showLabels->onOffswitch()->setChecked(false);
+	m_xModeCb->combo()->setCurrentIndex(0);
+	m_yctrl->setEnabled(false);
+	m_singleYModeSw->setEnabled(true);
+	m_singleYModeSw->onOffswitch()->setChecked(false);
+	m_autoscaleBtn->setEnabled(false);
+
+	//	m_rollingModeSw->onOffswitch()->setChecked(false);
+}
+
 void TimePlotSettingsComponent::showPlotLabels(bool b)
 {
 	m_plot->setShowXAxisLabels(b);
@@ -273,6 +287,7 @@ void TimePlotSettingsComponent::setSampleRate(double newSampleRate)
 		return;
 	m_sampleRate = newSampleRate;
 	Q_EMIT sampleRateChanged(m_sampleRate);
+	updateXAxis();
 }
 
 bool TimePlotSettingsComponent::rollingMode() const { return m_rollingMode; }
@@ -283,6 +298,18 @@ void TimePlotSettingsComponent::setRollingMode(bool newRollingMode)
 		return;
 	m_rollingMode = newRollingMode;
 	Q_EMIT rollingModeChanged(newRollingMode);
+	updateXAxis();
+}
+
+
+bool TimePlotSettingsComponent::singleYMode() const { return m_singleYMode; }
+
+void TimePlotSettingsComponent::setSingleYMode(bool newSingleYMode)
+{
+	if(m_singleYMode == newSingleYMode)
+		return;
+	m_singleYMode = newSingleYMode;
+	Q_EMIT singleYModeChanged(newSingleYMode);
 }
 
 uint32_t TimePlotSettingsComponent::plotSize() const { return m_plotSize; }
@@ -293,6 +320,7 @@ void TimePlotSettingsComponent::setPlotSize(uint32_t newPlotSize)
 		return;
 	m_plotSize = newPlotSize;
 	Q_EMIT plotSizeChanged(newPlotSize);
+	updateXAxis();
 }
 
 uint32_t TimePlotSettingsComponent::bufferSize() const { return m_bufferSize; }
@@ -303,6 +331,44 @@ void TimePlotSettingsComponent::setBufferSize(uint32_t newBufferSize)
 		return;
 	m_bufferSize = newBufferSize;
 	Q_EMIT bufferSizeChanged(newBufferSize);
+	updateXAxis();
+}
+
+void TimePlotSettingsComponent::updateXAxis() {
+
+	double min = 0;
+	double max = m_plotSize;
+
+	min = min / m_sampleRate;
+	max = max / m_sampleRate;
+
+	if(m_rollingMode) {
+		m_xmin->setValue(max);
+		m_xmax->setValue(min);
+	} else {
+		m_xmin->setValue(min);
+		m_xmax->setValue(max);
+	}
+}
+
+void TimePlotSettingsComponent::onStart()
+{
+	QComboBox *cb = m_xModeCb->combo();
+
+	if(cb->itemData(cb->currentIndex()) == XMODE_TIME) {
+		double sr = readSampleRate();
+		setSampleRate(sr);
+	} else {
+		Q_EMIT sampleRateChanged(m_sampleRate);
+	}
+
+	Q_EMIT plotSizeChanged(m_plotSize);
+	Q_EMIT rollingModeChanged(m_rollingMode);
+	Q_EMIT singleYModeChanged(m_singleYMode);
+	if(!m_syncMode) {
+		Q_EMIT bufferSizeChanged(m_bufferSize);
+	}
+	updateXAxis();
 }
 
 bool TimePlotSettingsComponent::syncBufferPlotSize() const { return m_syncBufferPlotSize; }
@@ -314,6 +380,47 @@ void TimePlotSettingsComponent::setSyncBufferPlotSize(bool newSyncBufferPlotSize
 	m_syncBufferPlotSize = newSyncBufferPlotSize;
 	Q_EMIT syncBufferPlotSizeChanged(newSyncBufferPlotSize);
 }
+
+void TimePlotSettingsComponent::addChannel(ChannelComponent *c) {
+	m_channels.append(c);
+	autoscaler->addChannels(c->plotCh());
+}
+
+void TimePlotSettingsComponent::removeChannel(ChannelComponent *c) {
+	m_channels.removeAll(c);
+	autoscaler->removeChannels(c->plotCh());
+}
+
+void TimePlotSettingsComponent::addSampleRateProvider(SampleRateProvider *s) {
+	enableXModeTime();
+	m_sampleRateProviders.append(s);
+}
+
+void TimePlotSettingsComponent::removeSampleRateProvider(SampleRateProvider *s) {
+	m_sampleRateProviders.removeAll(s);
+}
+
+void TimePlotSettingsComponent::enableXModeTime() {
+	if(m_sampleRateAvailable) // already set
+		return;
+	m_sampleRateAvailable = true;
+	if(m_sampleRateAvailable) {
+		auto cb = m_xModeCb->combo();
+		cb->insertItem(1,"Time", XMODE_TIME);
+	}
+}
+double TimePlotSettingsComponent::readSampleRate()
+{
+	double sr = 1;
+	for(SampleRateProvider *ch : qAsConst(m_sampleRateProviders)) {
+		if(ch->sampleRateAvailable()) {
+			sr = ch->sampleRate();
+			break;
+		}
+	}
+	return sr;
+}
+
 
 } // namespace adc
 } // namespace scopy

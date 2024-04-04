@@ -10,6 +10,7 @@
 #include <QtConcurrent>
 
 #include <plotwidget.h>
+#include "plotinfo.h"
 
 namespace scopy {
 namespace adc {
@@ -18,7 +19,7 @@ class SCOPY_ADCPLUGIN_EXPORT PlotComponent : public QWidget, public ToolComponen
 {
 	Q_OBJECT
 public:
-	PlotComponent(QWidget *parent = nullptr);
+	PlotComponent(QString name = "PlotComponent", QWidget *parent = nullptr);
 	~PlotComponent();
 
 	virtual PlotWidget *plot();
@@ -27,7 +28,6 @@ public Q_SLOTS:
 	// virtual double sampleRate()
 
 public:
-	QString getName();
 	void onStart();
 	void onStop();
 	void onInit();
@@ -36,6 +36,7 @@ public:
 private:
 	QVBoxLayout *m_lay;
 	PlotWidget *m_plot;
+	TimePlotInfo *m_info;
 };
 
 } // namespace adc

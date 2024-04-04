@@ -30,7 +30,7 @@
 
 using namespace scopy;
 
-namespace scopy::grutil {
+namespace scopy::adc {
 class CrossPoint
 {
 public:

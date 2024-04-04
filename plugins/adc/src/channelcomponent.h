@@ -25,9 +25,6 @@ public:
 
 	virtual QWidget *createCurveMenu(QWidget *parent);
 
-Q_SIGNALS:
-	void requestDeleteChannel(ChannelAddon *);
-
 protected:
 	QString m_channelName;
 	PlotChannel *m_plotCh;

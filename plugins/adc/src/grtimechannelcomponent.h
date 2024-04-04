@@ -3,6 +3,7 @@
 
 #include "scopy-adcplugin_export.h"
 #include "channelcomponent.h"
+#include "src/grdevicecomponent.h"
 #include <gui/plotautoscaler.h>
 #include <gui/widgets/menuonoffswitch.h>
 #include <gui/widgets/menucombo.h>
@@ -15,7 +16,11 @@ namespace adc {
 using namespace scopy::gui;
 
 class GRDeviceAddon;
-class SCOPY_ADCPLUGIN_EXPORT GRTimeChannelComponent : public ChannelComponent, public GRTopAddon
+class SCOPY_ADCPLUGIN_EXPORT GRTimeChannelComponent : public ChannelComponent,
+						      public SampleRateProvider,
+						      public SingleYModeUser,
+						      public MeasurementProvider,
+						      public SampleRateUser
 {
 	Q_OBJECT
 public:
@@ -25,7 +30,7 @@ public:
 		YMODE_FS,
 		YMODE_SCALE
 	} YMode;
-	GRTimeChannelComponent(GRIIOFloatChannelNode *node, PlotComponent *plotAddon, QPen pen,
+	GRTimeChannelComponent(GRIIOFloatChannelNode *node, PlotComponent *plotComponent, QPen pen,
 			   QWidget *parent = nullptr);
 	~GRTimeChannelComponent();
 
@@ -33,9 +38,10 @@ public:
 	GRIIOFloatChannelSrc *grch() const;
 	MenuControlButton *ctrl();
 
-	// bool sampleRateAvailable() override;
-	// double sampleRate() override;
-	// MeasureManagerInterface *getMeasureManager() override;
+	bool sampleRateAvailable() override;
+	double sampleRate() override;
+	MeasureManagerInterface *getMeasureManager() override;
+	void setSampleRate(double) override;
 
 public Q_SLOTS:
 	void enable() override;
@@ -44,23 +50,24 @@ public Q_SLOTS:
 	void onStop() override;
 	void onInit() override;
 	void onDeinit() override;
-	void preFlowBuild() override;
 
 	void onNewData(const float *xData, const float *yData, int size);
 
 	void toggleAutoScale();
 	void setYMode(YMode mode);
-	/*void setSingleYMode(bool) override;
-
+	void setSingleYMode(bool) override;
+/*
 Q_SIGNALS:
 	void addNewSnapshot(SnapshotProvider::SnapshotRecipe) override;*/
 
 private:
 	GRIIOFloatChannelNode *m_node;
-	GRScaleOffsetProc *m_scOff;
+
 	GRSignalPath *m_signalPath;
+	GRScaleOffsetProc *m_scOff;
+
 	GRIIOFloatChannelSrc *m_grch;
-	//TimeMeasureManager *m_measureMgr;
+	TimeMeasureManager *m_measureMgr;
 	MenuControlButton *m_ctrl;
 	MenuPlotAxisRangeControl *m_yCtrl;
 	PlotAutoscaler *m_autoscale;
@@ -72,6 +79,7 @@ private:
 	bool m_sampleRateAvailable;
 	bool m_autoscaleEnabled;
 	bool m_running;
+	double m_plotSampleRate;
 
 	QString m_unit;
 	QWidget *createMenu(QWidget *parent = nullptr);
@@ -79,6 +87,7 @@ private:
 	QWidget *createYAxisMenu(QWidget *parent);
 	//QPushButton *createSnapshotButton(QWidget *parent);
 
+	void setupSignalPath();
 	void createMenuControlButton(QWidget *parent = nullptr);
 	void setupChannelMenuControlButtonHelper(MenuControlButton *btn);
 };

@@ -14,10 +14,10 @@ PlotCursors::~PlotCursors() {}
 
 void PlotCursors::initUI()
 {
-	m_vCursors.first = new VCursor(m_plot, m_plot->selectedChannel()->yAxis());
-	m_vCursors.second = new VCursor(m_plot, m_plot->selectedChannel()->yAxis());
-	m_hCursors.first = new HCursor(m_plot, m_plot->selectedChannel()->xAxis());
-	m_hCursors.second = new HCursor(m_plot, m_plot->selectedChannel()->xAxis());
+	m_vCursors.first = new VCursor(m_plot, m_plot->yAxis());
+	m_vCursors.second = new VCursor(m_plot, m_plot->yAxis());
+	m_hCursors.first = new HCursor(m_plot, m_plot->xAxis());
+	m_hCursors.second = new HCursor(m_plot, m_plot->xAxis());
 
 	plotMarker1 = new QwtPlotMarker();
 	plotMarker2 = new QwtPlotMarker();

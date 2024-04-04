@@ -5,6 +5,8 @@
 #include "scopy-adcplugin_export.h"
 #include "plotcomponent.h"
 #include "timeplotsettingscomponent.h"
+#include "cursorcomponent.h"
+#include "measurecomponent.h"
 
 namespace scopy {
 namespace adc {
@@ -14,7 +16,7 @@ class SCOPY_ADCPLUGIN_EXPORT TimePlotProxy : public QObject, public PlotProxy, p
 {
 	Q_OBJECT
 public:
-	TimePlotProxy(AcqTreeNode *tree, QObject *parent = nullptr);
+	TimePlotProxy(QString name, AcqTreeNode *tree, QObject *parent = nullptr);
 	~TimePlotProxy();
 
 	ChannelIdProvider *getChannelIdProvider();
@@ -41,15 +43,43 @@ public Q_SLOTS:
 	void addChannel(AcqTreeNode *c) override;
 	void removeChannel(AcqTreeNode *c) override;
 
+private Q_SLOTS:
+	void stopUpdates();
+	void startUpdates();
+
+	void setSingleShot(bool b);
+	void setFrameRate(double val);
+	void updateFrameRate();
+	void handlePreferences(QString key, QVariant v);
+
+	void updateData();
+	void update();
+
+Q_SIGNALS:
+	void requestStop();
 private:
+
+
+	void setupChannelMeasurement(ChannelComponent *ch);
+
 	ADCTimeInstrument *m_tool;
 	PlotComponent *m_plotComponent;
 	TimePlotSettingsComponent *m_plotSettingsComponent;
+	CursorComponent *m_cursorComponent;
+	MeasureComponent *m_measureComponent;
+
 	ChannelIdProvider *chIdP;
 
-	QList<ToolComponent *> m_components;
+	QFuture<void> m_refillFuture;
+	QFutureWatcher<void> *m_fw;
+	QTimer *m_plotTimer;
+
 	AcqTreeNode *m_tree;
 	QMap<AcqTreeNode*, ToolComponent*> m_acqNodeComponentMap;
+
+	bool m_refreshTimerRunning;
+
+
 };
 } // namespace adc
 } // namespace scopy

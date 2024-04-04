@@ -16,7 +16,10 @@ ChannelComponent::ChannelComponent(QString ch, PlotComponent *plotComponent, QPe
 	, m_channelName(ch)
 	, m_plotComponent(plotComponent)
 	, m_pen(pen)
-{}
+{
+
+	m_name = m_plotComponent->name()+m_channelName;
+}
 
 ChannelComponent::~ChannelComponent() {}
 

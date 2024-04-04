@@ -12,13 +12,16 @@
 #include <gui/widgets/menuonoffswitch.h>
 #include <gui/widgets/menuplotaxisrangecontrol.h>
 #include <gui/plotautoscaler.h>
+#include "grdevicecomponent.h"
+#include "channelcomponent.h"
 
 namespace scopy {
 namespace adc {
 
 using namespace scopy::gui;
 
-class SCOPY_ADCPLUGIN_EXPORT TimePlotSettingsComponent : public QWidget, public ToolComponent
+class SCOPY_ADCPLUGIN_EXPORT TimePlotSettingsComponent : public QWidget,
+							 public ToolComponent
 {
 	Q_OBJECT
 public:
@@ -38,6 +41,9 @@ public:
 	bool rollingMode() const;
 	void setRollingMode(bool newRollingMode);
 
+	bool singleYMode() const;
+	void setSingleYMode(bool newSingleYMode);
+
 	bool showPlotTags() const;
 	void setShowPlotTags(bool newShowPlotTags);
 
@@ -53,12 +59,20 @@ public:
 	uint32_t bufferSize() const;
 	void setBufferSize(uint32_t newBufferSize);
 
+	void updateXAxis();
+
 public Q_SLOTS:
-	void onStart() override {}
+	void onStart() override;
 	void onStop() override {}
-	void onInit() override {}
+	void onInit() override;
 	void onDeinit() override {}
 	void showPlotLabels(bool);
+
+	void addChannel(ChannelComponent *c);
+	void removeChannel(ChannelComponent *c);
+
+	void addSampleRateProvider(SampleRateProvider *s);
+	void removeSampleRateProvider(SampleRateProvider *s);
 
 Q_SIGNALS:
 	void plotSizeChanged(uint32_t);
@@ -66,7 +80,7 @@ Q_SIGNALS:
 
 	void rollingModeChanged(bool);
 	void sampleRateChanged(double);
-	void singleYMode(bool);
+	void singleYModeChanged(bool);
 	void syncBufferPlotSizeChanged(bool);
 
 private:
@@ -74,6 +88,8 @@ private:
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createXAxisMenu(QWidget *parent = nullptr);
 	QWidget *createYAxisMenu(QWidget *parent = nullptr);
+	double readSampleRate();
+	void enableXModeTime();
 
 	QPen m_pen;
 	MenuPlotAxisRangeControl *m_yctrl;
@@ -100,16 +116,22 @@ private:
 	double m_sampleRate;
 	bool m_rollingMode;
 	bool m_syncBufferPlotSize;
+	bool m_syncMode;
+	bool m_singleYMode;
+
+	QList<ChannelComponent*> m_channels;
+	QList<SampleRateProvider*> m_sampleRateProviders;
 	// bool m_showPlotTags;
 
 	Q_PROPERTY(uint32_t plotSize READ plotSize WRITE setPlotSize NOTIFY plotSizeChanged)
-
+	Q_PROPERTY(bool singleYMode READ singleYMode WRITE setSingleYMode NOTIFY singleYModeChanged)
 	Q_PROPERTY(bool rollingMode READ rollingMode WRITE setRollingMode NOTIFY rollingModeChanged)
 	Q_PROPERTY(double sampleRate READ sampleRate WRITE setSampleRate NOTIFY sampleRateChanged)
 	Q_PROPERTY(bool syncBufferPlotSize READ syncBufferPlotSize WRITE setSyncBufferPlotSize NOTIFY
 			   syncBufferPlotSizeChanged FINAL)
 	Q_PROPERTY(uint32_t bufferSize READ bufferSize WRITE setBufferSize NOTIFY bufferSizeChanged FINAL)
 };
+
 } // namespace adc
 } // namespace scopy
 

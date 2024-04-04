@@ -1,7 +1,6 @@
 #ifndef TOOLCOMPONENT_H
 #define TOOLCOMPONENT_H
 
-#include "gr-util/grtimeplotaddon.h"
 #include "scopy-adcplugin_export.h"
 #include <QPen>
 #include <gui/tooltemplate.h>
@@ -15,15 +14,28 @@ namespace adc {
 class PlotProxy;
 class ADCTimeInstrument;
 
+
+class SCOPY_ADCPLUGIN_EXPORT DataProvider
+{
+public:
+	virtual void setSingleShot(bool) = 0;
+	virtual size_t updateData() = 0;
+	virtual bool finished() = 0;
+	virtual void setCurveData(bool raw = false) = 0;
+};
+
 class SCOPY_ADCPLUGIN_EXPORT ToolComponent
 {
 public:
-	virtual QString getName() const { return "ToolComponent"; };
-	virtual int priority() const { return 0; };
+	virtual QString name() const { return m_name; };
+	virtual int priority() const { return m_priority; };
 	virtual void onStart(){};
 	virtual void onStop(){};
 	virtual void onInit(){};
 	virtual void onDeinit(){};
+protected:
+	QString m_name;
+	int m_priority = 0;
 };
 
 class SCOPY_ADCPLUGIN_EXPORT MetaComponent : public ToolComponent
@@ -74,7 +86,7 @@ public:
 		}*/
 	}
 
-private:
+protected:
 	QList<ToolComponent *> m_components;
 };
 

@@ -48,6 +48,7 @@ void ADCTimeInstrument::setupToolLayout()
 
 	channelsBtn = new MenuControlButton(this);
 
+
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsBtn, TTA_LEFT);
 
@@ -73,14 +74,16 @@ void ADCTimeInstrument::setupToolLayout()
 	});
 }
 
+
 void ADCTimeInstrument::setupRunSingleButtonHelper()
 {
-	/*connect(runBtn, &QPushButton::toggled, this, &ADCTimeInstrument::setRunning);
-	connect(singleBtn, &QPushButton::toggled, plotAddon, &GRTimePlotAddon::setSingleShot);
+	connect(runBtn, &QPushButton::toggled, this, &ADCTimeInstrument::setRunning);
+	connect(singleBtn, &QPushButton::toggled, this, &ADCTimeInstrument::setSingleShot);
 	connect(singleBtn, &QPushButton::toggled, this, &ADCTimeInstrument::setRunning);
 	connect(this, &ADCTimeInstrument::runningChanged, this, &ADCTimeInstrument::run);
 	connect(this, &ADCTimeInstrument::runningChanged, runBtn, &QAbstractButton::setChecked);
-	connect(plotAddon, &GRTimePlotAddon::requestStop, this, &AdcInstrument::stop, Qt::QueuedConnection);*/
+
+	// connect(this, &ADCTimeInstrument::requestStop, this, &ADCTimeInstrument::stop, Qt::QueuedConnection);
 }
 
 void ADCTimeInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn)
@@ -112,9 +115,8 @@ void ADCTimeInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent
 	Q_ASSERT(dev_widget);
 
 	channelGroup->addButton(b->getControlBtn());
-	QString id = dev->getName() + QString::number(uuid++);
+	QString id = dev->name() + QString::number(uuid++);
 	rightStack->add(id, dev_widget);
-
 
 	connect(b->getControlBtn(), &QPushButton::clicked/* Or ::toggled*/ , this, [=](bool b) {
 		if(b) {
@@ -131,12 +133,9 @@ void ADCTimeInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, Co
 	c->add(btn);
 	channelGroup->addButton(btn);
 
-	QString id = ch->getName() + QString::number(uuid++);
+	QString id = ch->name() + QString::number(uuid++);
 	QWidget *ch_widget = dynamic_cast<QWidget*>(ch);
 	Q_ASSERT(ch_widget);
-
-	/*setupChannelMenuControlButtonHelper(btn, ch);
-	plotComponent->plot()->selectChannel(ch->plotCh());*/
 
 	rightStack->add(id, ch_widget);
 
@@ -152,9 +151,7 @@ void ADCTimeInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, Co
 
 	/*setupChannelSnapshot(ch);
 	setupChannelMeasurement(ch);
-	setupChannelDelete(ch);
-	plotAddon->onChannelAdded(ch);
-	plotAddonSettings->onChannelAdded(ch);*/
+	setupChannelDelete(ch);*/
 }
 // #endif
 void ADCTimeInstrument::init() { proxy->init(); }
@@ -201,9 +198,6 @@ void ADCTimeInstrument::run(bool b)
 	}
 
 	qInfo() << b;
-	QElapsedTimer tim;
-	tim.start();
-
 	if(b) {
 		proxy->onStart();
 	} else {

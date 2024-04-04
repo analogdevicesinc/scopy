@@ -1,4 +1,5 @@
 #include "grdevicecomponent.h"
+#include "src/channelcomponent.h"
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
 #include <widgets/menuheader.h>
@@ -107,6 +108,25 @@ CollapsableMenuControlButton *GRDeviceComponent::ctrl()
 	return m_ctrl;
 }
 
+bool GRDeviceComponent::sampleRateAvailable()
+{
+	for(auto c : qAsConst(m_channels)) {
+		if(c->enabled())
+			return m_src->sampleRateAvailable();
+	}
+	return false;
+
+}
+
+double GRDeviceComponent::sampleRate()
+{
+	return m_src->readSampleRate();
+}
+
+void GRDeviceComponent::setBufferSize(uint32_t bufferSize) {
+	m_src->setBuffersize(bufferSize);
+}
+
 GRDeviceComponent::~GRDeviceComponent() {}
 
 void GRDeviceComponent::onStart()
@@ -127,4 +147,12 @@ void GRDeviceComponent::onInit()
 void GRDeviceComponent::onDeinit()
 {
 
+}
+
+void GRDeviceComponent::addChannel(ChannelComponent *c) {
+	m_channels.append(c);
+}
+
+void GRDeviceComponent::removeChannel(ChannelComponent *c) {
+	m_channels.removeAll(c);
 }

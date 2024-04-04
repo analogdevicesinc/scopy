@@ -103,20 +103,29 @@ int GRIIODeviceSource::getOutputIndex(QString ch)
 	return iio_channel_get_data_format(iio_ch);
 }*/
 
+bool GRIIODeviceSource::sampleRateAvailable()
+{
+	if(m_sampleRateAttribute.isEmpty())
+		return false;
+	return true;
+}
+
 double GRIIODeviceSource::readSampleRate()
 {
 	char buffer[20];
 	bool ok = false;
 	double sr;
-	if(!m_sampleRateAttribute.isEmpty()) {
-		iio_device_attr_read(m_iioDev, m_sampleRateAttribute.toStdString().c_str(), buffer, 20);
-		QString str(buffer);
-		sr = str.toDouble(&ok);
-		if(ok) {
-			return sr;
-		}
+	if(!sampleRateAvailable())
+		return -1;
+
+	iio_device_attr_read(m_iioDev, m_sampleRateAttribute.toStdString().c_str(), buffer, 20);
+	QString str(buffer);
+	sr = str.toDouble(&ok);
+	if(ok) {
+		return sr;
+	} else {
+		return -1;
 	}
-	return -1;
 }
 
 void GRIIODeviceSource::matchChannelToBlockOutputs(GRTopBlock *top)

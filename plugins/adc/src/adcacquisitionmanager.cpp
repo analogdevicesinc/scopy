@@ -8,50 +8,54 @@ Q_LOGGING_CATEGORY(CAT_ACQTREENODE,"AcqTreeNode")
 using namespace scopy;
 using namespace scopy::grutil;
 
-GRIIOFloatChannelNode::GRIIOFloatChannelNode(GRIIOFloatChannelSrc *c, QObject *parent)
-	: AcqTreeNode(c->getChannelName(), parent)
+GRIIOFloatChannelNode::GRIIOFloatChannelNode(GRTopBlockNode* top,GRIIOFloatChannelSrc *c, QObject *parent)
+	: AcqTreeNode(c->getChannelName(), parent), m_top(top)
 {
 	m_src = c;
-	m_signalPath = new GRSignalPath("time_" + c->getDeviceSrc()->deviceName() + c->getChannelName(), this);
-	m_signalPath->append(c);
-	m_scOff = new GRScaleOffsetProc(m_signalPath);
-	m_signalPath->append(m_scOff);
-	m_scOff->setOffset(0);
-	m_scOff->setScale(1);
-	m_signalPath->setEnabled(false);
 }
 
 GRIIOFloatChannelNode::~GRIIOFloatChannelNode() {}
-
-GRSignalPath *scopy::GRIIOFloatChannelNode::signalPath() const { return m_signalPath; }
-
-GRScaleOffsetProc *scopy::GRIIOFloatChannelNode::scOff() const { return m_scOff; }
 
 GRIIOFloatChannelSrc *GRIIOFloatChannelNode::src() const
 {
 	return m_src;
 }
 
-GRIIODeviceSourceNode::GRIIODeviceSourceNode(GRIIODeviceSource *d, QObject *parent)
-	: AcqTreeNode(d->deviceName(), parent)
+GRTopBlockNode *GRIIOFloatChannelNode::top() const
+{
+	return m_top;
+}
+
+GRIIODeviceSourceNode::GRIIODeviceSourceNode(GRTopBlockNode* top, GRIIODeviceSource *d, QObject *parent)
+	: AcqTreeNode(d->deviceName(), parent), m_top(top)
 {
 	m_src = d;
 }
 
 GRIIODeviceSourceNode::~GRIIODeviceSourceNode() {}
 
-GRIIODeviceSource *GRIIODeviceSourceNode::src()
+GRIIODeviceSource *GRIIODeviceSourceNode::src() const
 {
 	return m_src;
 }
 
+GRTopBlockNode *GRIIODeviceSourceNode::top() const
+{
+	return m_top;
+}
+
 GRTopBlockNode::GRTopBlockNode(GRTopBlock *g, QObject *parent)
-	: AcqTreeNode(g->name(), parent)
+	: AcqTreeNode(g->name(), parent), m_src(g)
 {
 	m_data = g;
 }
 
 GRTopBlockNode::~GRTopBlockNode() {}
+
+GRTopBlock *GRTopBlockNode::src() const
+{
+	return m_src;
+}
 
 AcqTreeNode::AcqTreeNode(QString name, QObject *parent)
 	: QObject(parent)
@@ -94,7 +98,7 @@ QList<AcqTreeNode *> AcqTreeNode::bfs()
 	while (!list.empty()) {
 		AcqTreeNode* current = list.front();
 		list.pop_front();
-		for (AcqTreeNode* child : current->m_treeChildren) {
+		for (AcqTreeNode* child : qAsConst(current->m_treeChildren)) {
 			if (!visited.contains(child)) {
 				visited.push_back(child);
 				list.push_back(child);

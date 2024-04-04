@@ -11,6 +11,9 @@
 #include <gui/widgets/toolbuttons.h>
 #include <gui/widgets/menucontrolbutton.h>
 #include <gui/widgets/verticalchannelmanager.h>
+#include <gui/cursorcontroller.h>
+#include <gui/widgets/measurementpanel.h>
+#include <gui/widgets/measurementsettings.h>
 
 #include "toolcomponent.h"
 
@@ -48,6 +51,8 @@ public Q_SLOTS:
 
 
 Q_SIGNALS:
+	void setSingleShot(bool);
+	void requestStop();
 	void runningChanged(bool);
 
 private:
@@ -71,8 +76,6 @@ private:
 	void setupRunSingleButtonHelper();
 
 	void setupChannelsButtonHelper(MenuControlButton *channelsBtn);
-	/*void setupCursorButtonHelper(MenuControlButton *cursor);
-	void setupMeasureButtonHelper(MenuControlButton *measure);*/
 
 	bool m_running;
 	Q_PROPERTY(bool running READ running WRITE setRunning NOTIFY runningChanged)

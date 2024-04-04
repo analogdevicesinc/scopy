@@ -53,33 +53,36 @@ class SCOPY_ADCPLUGIN_EXPORT GRTopBlockNode : public AcqTreeNode
 public:
 	GRTopBlockNode(GRTopBlock *g, QObject *parent = nullptr);
 	~GRTopBlockNode();
+	GRTopBlock *src() const;
+private:
+	GRTopBlock *m_src;
 };
 
 class SCOPY_ADCPLUGIN_EXPORT GRIIODeviceSourceNode : public AcqTreeNode
 {
 public:
-	GRIIODeviceSourceNode(GRIIODeviceSource *d, QObject *parent = nullptr);
+	GRIIODeviceSourceNode(GRTopBlockNode* top, GRIIODeviceSource *d, QObject *parent = nullptr);
 	~GRIIODeviceSourceNode();
-	GRIIODeviceSource* src();
+	GRIIODeviceSource* src() const;
+	GRTopBlockNode *top() const;
+
 private:
+	GRTopBlockNode* m_top;
 	GRIIODeviceSource* m_src;
 };
 
 class SCOPY_ADCPLUGIN_EXPORT GRIIOFloatChannelNode : public AcqTreeNode
 {
 public:
-	GRIIOFloatChannelNode(GRIIOFloatChannelSrc *c, QObject *parent = nullptr);
+	GRIIOFloatChannelNode(GRTopBlockNode* top, GRIIOFloatChannelSrc *c, QObject *parent = nullptr);
 	~GRIIOFloatChannelNode();
-
-	GRSignalPath *signalPath() const;
-	GRScaleOffsetProc *scOff() const;
-
 	GRIIOFloatChannelSrc *src() const;
 
+	GRTopBlockNode *top() const;
+
 private:
+	GRTopBlockNode* m_top;
 	GRIIOFloatChannelSrc *m_src;
-	GRSignalPath *m_signalPath;
-	GRScaleOffsetProc *m_scOff;
 };
 /*
 class IIODeviceNode : public AcqTreeNode {

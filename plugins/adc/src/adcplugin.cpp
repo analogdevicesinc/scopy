@@ -1,6 +1,5 @@
 #include "adcplugin.h"
 
-#include "adcinstrument.h"
 #include "gui/stylehelper.h"
 #include "src/adctimeinstrument.h"
 
@@ -142,11 +141,8 @@ bool iio_is_buffer_capable(struct iio_device *dev) {
 	return false;
 }
 
-GRTopBlockNode *ADCPlugin::createGRIIOTreeNode(iio_context *ctx)
+void ADCPlugin::createGRIIOTreeNode(GRTopBlockNode* ctxNode, iio_context *ctx)
 {
-	GRTopBlock *top = new GRTopBlock("ctx", this);
-	GRTopBlockNode *ctxNode = new GRTopBlockNode(top, nullptr);
-
 	int devCount = iio_context_get_devices_count(ctx);
 	qDebug(CAT_ADCPLUGIN) << " Found " << devCount << "devices";
 	for(int i = 0; i < devCount; i++) {
@@ -160,9 +156,16 @@ GRTopBlockNode *ADCPlugin::createGRIIOTreeNode(iio_context *ctx)
 		QStringList channelList;
 
 		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(ctx, dev_name, dev_name, 0x400, ctxNode);
-		GRIIODeviceSourceNode *d = new GRIIODeviceSourceNode(gr_dev, gr_dev);
-		int j;
-		for(j = 0; j < iio_device_get_channels_count(dev); j++) {
+		GRIIODeviceSourceNode *d = new GRIIODeviceSourceNode(ctxNode, gr_dev, gr_dev);
+
+		if(iio_is_buffer_capable(dev)) { // at least one scan element
+			ctxNode->addTreeChild(d);
+			ctxNode->src()->registerIIODeviceSource(gr_dev);
+		} else {
+			continue;
+		}
+
+		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
 			struct iio_channel *chn = iio_device_get_channel(dev, j);
 			QString chn_name = QString::fromLocal8Bit(iio_channel_get_id(chn));
 			qDebug(CAT_ADCPLUGIN) << "Verify if " << chn_name << "is scan element";
@@ -171,87 +174,11 @@ GRTopBlockNode *ADCPlugin::createGRIIOTreeNode(iio_context *ctx)
 			if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
 
 				GRIIOFloatChannelSrc *ch = new GRIIOFloatChannelSrc(gr_dev, chn_name, d);
-				GRIIOFloatChannelNode *c = new GRIIOFloatChannelNode(ch, d);
-				top->registerSignalPath(c->signalPath());
+				GRIIOFloatChannelNode *c = new GRIIOFloatChannelNode(ctxNode, ch, d);
 				d->addTreeChild(c);
 			}
 		}
-		if(iio_is_buffer_capable(dev)) { // at least one scan element
-			ctxNode->addTreeChild(d);
-			top->registerIIODeviceSource(gr_dev);
-		} else {
-			gr_dev->deleteLater();
-		}
 	}
-	return ctxNode;
-}
-
-PlotProxy2 *ADCPlugin::createRecipe(iio_context *ctx)
-{
-	QStringList deviceList;
-	QMap<QString, QStringList> devChannelMap;
-	int devCount = iio_context_get_devices_count(ctx);
-	qDebug(CAT_ADCPLUGIN) << " Found " << devCount << "devices";
-	for(int i = 0; i < devCount; i++) {
-		iio_device *dev = iio_context_get_device(ctx, i);
-		QString dev_name = QString::fromLocal8Bit(iio_device_get_name(dev));
-
-		qDebug(CAT_ADCPLUGIN) << "Looking for scanelements in " << dev_name;
-		if(dev_name == "m2k-logic-analyzer-rx")
-			continue;
-		QStringList channelList;
-		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
-
-			struct iio_channel *chn = iio_device_get_channel(dev, j);
-			QString chn_name = QString::fromLocal8Bit(iio_channel_get_id(chn));
-			qDebug(CAT_ADCPLUGIN) << "Verify if " << chn_name << "is scan element";
-			if(chn_name == "timestamp" /*|| chn_name == "accel_z" || chn_name =="accel_y"*/)
-				continue;
-			if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
-				channelList.append(chn_name);
-			}
-		}
-		if(channelList.isEmpty())
-			continue;
-		deviceList.append(dev_name);
-		devChannelMap.insert(dev_name, channelList);
-	}
-
-	// should this be wrapped to a register function (?)
-	GRTopBlock *top = new grutil::GRTopBlock("Time", this);
-
-	recipe = new GRTimePlotProxy(this);
-	QString plotRecipePrefix = "time_";
-	recipe->setPrefix(plotRecipePrefix);
-
-	GRTimePlotAddon *p = new GRTimePlotAddon(plotRecipePrefix, top, this);
-	GRTimePlotAddonSettings *s = new GRTimePlotAddonSettings(p, this);
-
-	recipe->setPlotAddon(p, s);
-
-	ChannelIdProvider *chIdProvider = recipe->getChannelIdProvider();
-	for(const QString &iio_dev : deviceList) {
-		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(m_ctx, iio_dev, iio_dev, 0x400, this);
-
-		top->registerIIODeviceSource(gr_dev);
-
-		GRDeviceAddon *d = new GRDeviceAddon(gr_dev, this);
-		connect(s, &GRTimePlotAddonSettings::bufferSizeChanged, d, &GRDeviceAddon::updateBufferSize);
-		recipe->addDeviceAddon(d);
-
-		for(const QString &ch : devChannelMap.value(iio_dev, {})) {
-			int idx = chIdProvider->next();
-			GRTimeChannelAddon *t = new GRTimeChannelAddon(ch, d, p, chIdProvider->pen(idx), this);
-			top->registerSignalPath(t->signalPath());
-			recipe->addChannelAddon(t);
-		}
-	}
-	recipe->setTopBlock(top);
-
-	qDebug(CAT_ADCPLUGIN) << deviceList;
-	qDebug(CAT_ADCPLUGIN) << devChannelMap;
-
-	return recipe;
 }
 
 bool ADCPlugin::onConnect()
@@ -266,14 +193,13 @@ bool ADCPlugin::onConnect()
 	// create gnuradio flow out of channels
 	// pass channels to ADC instrument - figure out channel model (sample rate/ size/ etc)
 	AcqTreeNode *root = new AcqTreeNode("root",this);
-
-	auto timeProxy = new TimePlotProxy(root,this);
-
+	GRTopBlock *top = new GRTopBlock("ctx", this);
+	GRTopBlockNode *ctxNode = new GRTopBlockNode(top, nullptr);
+	root->addTreeChild(ctxNode);
+	auto timeProxy = new TimePlotProxy("time0",root,this);
 	time = new ADCTimeInstrument(timeProxy);
-
 	connect(root,&AcqTreeNode::newChild,timeProxy,&TimePlotProxy::addChannel);
-	auto recipe = createGRIIOTreeNode(m_ctx);
-	root->addTreeChild(recipe);
+	createGRIIOTreeNode(ctxNode, m_ctx);
 	// root->treeChildren()[0]->addTreeChild(new AcqTreeNode("other"));
 
 
