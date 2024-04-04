@@ -9,6 +9,7 @@
 #include "watchlistview.h"
 #include "pluginbase/apiobject.h"
 #include "savecontextsetup.h"
+#include "iiodebuglogger.h"
 
 #include <iio.h>
 #include <QWidget>
@@ -62,6 +63,7 @@ private:
 	ApiObject *m_apiObject;
 	IIOStandardItem *m_currentlySelectedItem;
 	SaveContextSetup *m_saveContextSetup;
+	IIODebugLogger *m_debugLogger;
 
 	// GUI elements
 	QSplitter *m_VSplitter;

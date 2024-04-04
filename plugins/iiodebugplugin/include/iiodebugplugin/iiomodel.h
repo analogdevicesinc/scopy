@@ -18,6 +18,9 @@ public:
 	QStandardItemModel *getModel();
 	QSet<QString> getEntries();
 
+Q_SIGNALS:
+	void emitLog(QDateTime *timestamp, bool isRead, QString path, QString oldValue, QString newValue);
+
 private:
 	void iioTreeSetup();
 	void setupCtx();
@@ -26,6 +29,18 @@ private:
 	void generateDeviceAttributes();
 	void setupCurrentChannel();
 	void generateChannelAttributes();
+
+	/**
+	 * @brief Creates a new IIOStandardItem and connects it to the emitLog signal.
+	 * @param widgets The iio-widgets that will make up this IIOStandardItem.
+	 * @param name The name of this IIOStandardItem.
+	 * @param id The id of this IIOStandardItem, if not available pass an empty string.
+	 * @param path The path from the root of the context to the "name".
+	 * @param type The type of the IIOStandardItem.
+	 * @return The created IIOStandardItem.
+	 */
+	IIOStandardItem *createIIOStandardItem(QList<IIOWidget *> widgets, QString name, QString id, QString path,
+					       IIOStandardItem::Type type);
 
 	QStandardItemModel *m_model;
 	struct iio_context *m_ctx;
