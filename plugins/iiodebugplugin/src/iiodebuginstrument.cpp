@@ -64,6 +64,7 @@ void IIODebugInstrument::setupUi()
 
 	m_proxyModel = new IIOSortFilterProxyModel(this);
 	m_treeView = new QTreeView(bottom_container);
+	m_treeView->setHeaderHidden(true);
 	// m_saveContextSetup = new SaveContextSetup(m_treeView, bottom_container);
 	// m_iioModel = new IIOModel(m_context, m_uri, m_treeView);
 
@@ -72,6 +73,7 @@ void IIODebugInstrument::setupUi()
 	m_searchBar = new SearchBar(m_iioModel->getEntries(), this);
 	m_detailsView = new DetailsView(details_container);
 	m_watchListView = new WatchListView(watch_list);
+	m_debugLogger = new IIODebugLogger(this);
 
 	watch_list->layout()->setContentsMargins(0, 0, 0, 0);
 	watch_list->layout()->addWidget(m_watchListView);
@@ -95,6 +97,22 @@ void IIODebugInstrument::setupUi()
 	details_container->layout()->addWidget(m_detailsView);
 	tree_view_container->layout()->addWidget(m_treeView);
 	search_bar_container->layout()->addWidget(m_searchBar);
+
+	auto logBtn = new QPushButton("Show Log", this);
+	StyleHelper::BlueButton(logBtn, "ShowLogButton");
+	logBtn->setMaximumWidth(90);
+	connect(logBtn, &QPushButton::clicked, m_debugLogger, &QWidget::show);
+	connect(m_iioModel, &IIOModel::emitLog, this,
+		[this](QDateTime *timestamp, bool isRead, QString path, QString oldValue, QString newValue) {
+			QString logMessage = QString("[%1] %2: %3: %4%5")
+						     .arg(timestamp->toString("hh:mm:ss"))
+						     .arg(isRead ? "R" : "W")
+						     .arg(path)
+						     .arg(oldValue.isEmpty() ? "" : oldValue + " -> ")
+						     .arg(newValue);
+			m_debugLogger->appendLog(logMessage);
+		});
+	search_bar_container->layout()->addWidget(logBtn);
 
 	layout()->addWidget(search_bar_container);
 	layout()->addWidget(bottom_container);
@@ -132,7 +150,7 @@ void IIODebugInstrument::connectSignalsAndSlots()
 	});
 
 	QObject::connect(m_detailsView->readBtn(), &QPushButton::clicked, this, [this]() {
-		qInfo(CAT_DEBUGGERIIOMODEL) << "Read button pressed.";
+		qDebug(CAT_DEBUGGERIIOMODEL) << "Read button pressed.";
 		triggerReadOnAllChildItems(m_currentlySelectedItem);
 		m_detailsView->refreshIIOView();
 	});
@@ -248,7 +266,7 @@ void IIODebugInstrument::triggerReadOnAllChildItems(QStandardItem *item)
 	   type == IIOStandardItem::ChannelAttribute) {
 		QList<IIOWidget *> iioWidgets = IIOitem->getIIOWidgets();
 		for(int i = 0; i < iioWidgets.size(); ++i) {
-			qDebug(CAT_DEBUGGERIIOMODEL) << "Reading " << IIOitem->path();
+			qInfo(CAT_DEBUGGERIIOMODEL) << "Reading " << IIOitem->path();
 			iioWidgets.at(i)->getDataStrategy()->requestData();
 		}
 	} else {

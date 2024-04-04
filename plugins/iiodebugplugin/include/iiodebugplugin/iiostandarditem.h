@@ -3,13 +3,15 @@
 
 #include <QWidget>
 #include <QStandardItem>
+#include <QDateTime>
 #include <iio.h>
 #include <iio-widgets/iiowidgetfactory.h>
 #include <iio-widgets/iiowidget.h>
 
 namespace scopy::iiodebugplugin {
-class IIOStandardItem : public QStandardItem
+class IIOStandardItem : public QObject, public QStandardItem
 {
+	Q_OBJECT
 public:
 	enum Type
 	{
@@ -28,9 +30,24 @@ public:
 
 	~IIOStandardItem() override;
 
+	/**
+	 * @brief Sets the iio_device for this IIOStandardItem. Upon setting it, some libiio calls will be made to query
+	 * the device
+	 * @param struct iio_device *
+	 */
 	void setDevice(struct iio_device *device);
+
+	/**
+	 * @brief Sets the iio_channel for this IIOStandardItem. Upon setting it, some libiio calls will be made to
+	 * query the channel.
+	 * @param struct iio_channel *
+	 */
 	void setChannel(struct iio_channel *channel);
 
+	/**
+	 * @brief getIIOWidgets
+	 * @return The list of IIOWidgets that is makes up this item.
+	 */
 	QList<IIOWidget *> getIIOWidgets();
 
 	QStringList details();
@@ -65,7 +82,15 @@ public:
 
 	QString typeString();
 
+Q_SIGNALS:
+	void emitLog(QDateTime *timestamp, bool isRead, QString path, QString oldValue, QString newValue);
+
+protected Q_SLOTS:
+	void emitWriteLog(QString oldValue, QString newValue);
+	void emitReadLog(QString data, QString dataOptions);
+
 private:
+	void connectLog();
 	void buildDetails();
 	void generateToolTip();
 
