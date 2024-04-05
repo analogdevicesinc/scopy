@@ -6,6 +6,8 @@
 #include "grtimechannelcomponent.h"
 #include "grtimesinkcomponent.h"
 #include <pluginbase/preferences.h>
+#include "interfaces.h"
+
 
 Q_LOGGING_CATEGORY(CAT_TIMEPLOT_PROXY, "TimePlotProxy")
 using namespace scopy;

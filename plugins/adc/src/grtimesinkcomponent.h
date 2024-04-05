@@ -2,7 +2,6 @@
 #define GRTIMESINKCOMPONENT_H
 
 #include <QObject>
-#include "src/grdevicecomponent.h"
 #include "toolcomponent.h"
 #include <gr-util/time_sink_f.h>
 #include "grtimechannelcomponent.h"

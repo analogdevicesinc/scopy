@@ -12,8 +12,8 @@
 #include <gui/widgets/menuonoffswitch.h>
 #include <gui/widgets/menuplotaxisrangecontrol.h>
 #include <gui/plotautoscaler.h>
-#include "grdevicecomponent.h"
 #include "channelcomponent.h"
+#include "interfaces.h"
 
 namespace scopy {
 namespace adc {

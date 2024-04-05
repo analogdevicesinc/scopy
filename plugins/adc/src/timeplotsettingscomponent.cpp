@@ -11,6 +11,8 @@ TimePlotSettingsComponent::TimePlotSettingsComponent(PlotComponent *plot, QWidge
 	: QWidget(parent)
 	, m_syncMode(false)
 	, m_sampleRateAvailable(false)
+	, m_singleYMode(false)
+
 {
 	m_plot = plot->plot();
 	auto *w = createMenu(this);
@@ -198,19 +200,20 @@ QWidget *TimePlotSettingsComponent::createXAxisMenu(QWidget *parent)
 	cb->addItem("Time - override samplerate", XMODE_OVERRIDE);
 
 	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+		m_sampleRateSpin->setVisible(false);
 		if(cb->itemData(idx) == XMODE_SAMPLES) {
-			m_sampleRateSpin->setEnabled(false);
 			m_sampleRateSpin->setValue(1);
 			// setMetricFormatter - xAxis
 			// setUnits xmin,xmax - k,mega
 		}
 		if(cb->itemData(idx) == XMODE_TIME) {
-			m_sampleRateSpin->setEnabled(false);
+			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setValue(readSampleRate());
 			// setTimeFormatter - xAxis
 			// setUnits xmin,xmax - time units
 		}
 		if(cb->itemData(idx) == XMODE_OVERRIDE) {
+			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setEnabled(true);
 			// setTimeFormatter - xAxis
 			// setUnits xmin,xmax

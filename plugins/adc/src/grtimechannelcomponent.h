@@ -9,7 +9,7 @@
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/menuplotaxisrangecontrol.h>
 #include <gui/widgets/menucontrolbutton.h>
-
+#include "interfaces.h"
 namespace scopy {
 namespace adc {
 
@@ -17,6 +17,7 @@ using namespace scopy::gui;
 
 class GRDeviceAddon;
 class SCOPY_ADCPLUGIN_EXPORT GRTimeChannelComponent : public ChannelComponent,
+						      public GRSignalPathProvider,
 						      public SampleRateProvider,
 						      public SingleYModeUser,
 						      public MeasurementProvider,
@@ -34,7 +35,7 @@ public:
 			   QWidget *parent = nullptr);
 	~GRTimeChannelComponent();
 
-	GRSignalPath *signalPath() const;
+	GRSignalPath *signalPath() const override;
 	GRIIOFloatChannelSrc *grch() const;
 	MenuControlButton *ctrl();
 

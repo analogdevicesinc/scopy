@@ -4,7 +4,7 @@
 #include "scopy-adcplugin_export.h"
 #include "channelcomponent.h"
 #include "toolcomponent.h"
-#include "measurementcontroller.h"
+#include "interfaces.h"
 
 #include <gr-util/griiodevicesource.h>
 #include <gui/widgets/menucontrolbutton.h>
@@ -16,58 +16,6 @@ namespace scopy::adc {
 using namespace scopy;
 using namespace scopy::grutil;
 // class GRTimeChannelAddon;
-
-class SCOPY_ADCPLUGIN_EXPORT SampleRateUser {
-public:
-	virtual void setSampleRate(double) = 0;
-};
-
-class SCOPY_ADCPLUGIN_EXPORT RollingModeUser {
-public:
-	virtual void setRollingMode(bool) = 0;
-};
-
-class SCOPY_ADCPLUGIN_EXPORT PlotSizeUser {
-public:
-	virtual void setPlotSize(uint32_t bufferSize) = 0;
-};
-
-class SCOPY_ADCPLUGIN_EXPORT BufferSizeUser {
-public:
-	virtual void setBufferSize(uint32_t bufferSize) = 0;
-};
-class SCOPY_ADCPLUGIN_EXPORT SingleYModeUser {
-public:
-		 virtual void setSingleYMode(bool) = 0;
-};
-
-class SCOPY_ADCPLUGIN_EXPORT XMinMaxUser {
-public:
-	virtual void setXMinMax(double, double) = 0;
-};
-
-class SCOPY_ADCPLUGIN_EXPORT MeasurementProvider {
-public:
-	virtual MeasureManagerInterface *getMeasureManager() = 0;
-};
-
-class SCOPY_ADCPLUGIN_EXPORT SnapshotProvider {
-public:
-	typedef struct
-	{
-		std::vector<float> x;
-		std::vector<float> y;
-		QString name;
-	} SnapshotRecipe;
-
-	virtual void addNewSnapshot(SnapshotRecipe) = 0;
-};
-
-class SCOPY_ADCPLUGIN_EXPORT SampleRateProvider {
-public:
-	virtual bool sampleRateAvailable() = 0;
-	virtual double sampleRate() = 0;
-};
 
 
 class SCOPY_ADCPLUGIN_EXPORT GRDeviceComponent : public QWidget,
