@@ -50,8 +50,10 @@ TitleSpinBox::TitleSpinBox(QString title, QWidget *parent)
 	buttonWidgetLayout->addWidget(m_spinBoxDownButton);
 
 	// here we preffer the pressed signal rather than the clicked one to speed up the change of values
-	connect(m_spinBoxUpButton,   &QPushButton::pressed, m_spinBox, [this] { m_spinBox->setValue(m_spinBox->value() + m_spinBox->singleStep()); });
-	connect(m_spinBoxDownButton, &QPushButton::pressed, m_spinBox, [this] { m_spinBox->setValue(m_spinBox->value() - m_spinBox->singleStep()); });
+	connect(m_spinBoxUpButton, &QPushButton::pressed, m_spinBox,
+		[this] { m_spinBox->setValue(m_spinBox->value() + m_spinBox->singleStep()); });
+	connect(m_spinBoxDownButton, &QPushButton::pressed, m_spinBox,
+		[this] { m_spinBox->setValue(m_spinBox->value() - m_spinBox->singleStep()); });
 
 	spinboxWidgetLayout->addWidget(m_titleLabel);
 	spinboxWidgetLayout->addWidget(m_spinBox);
@@ -70,3 +72,5 @@ QPushButton *TitleSpinBox::getSpinBoxUpButton() { return m_spinBoxUpButton; }
 QPushButton *TitleSpinBox::getSpinBoxDownButton() { return m_spinBoxDownButton; }
 
 QSpinBox *TitleSpinBox::getSpinBox() { return m_spinBox; }
+
+#include "moc_titlespinbox.cpp"
