@@ -88,6 +88,7 @@ int main(int argc, char *argv[])
 	parser.addVersionOption();
 	parser.addOptions({
 		{{"s", "script"}, "Run given script.", "script"},
+		{{"r", "keep-running"}, "Keep the application session after running a certain script."},
 		{{"a", "accept-license"}, "Accept the license in advance."},
 		{{"l", "logfile"}, "Saves all the logging messages into a file.", "filename"},
 		{{"c", "connect"}, "Establish the connection to a given device by URI.", "URI"},

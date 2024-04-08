@@ -144,9 +144,15 @@ void ScopyMainWindow_API::switchTool(QString toolName)
 	}
 }
 
-void ScopyMainWindow_API::runScript(QString content, QString fileName)
+void ScopyMainWindow_API::runScript(QString scriptPath, bool exitApp)
 {
-	QJSValue val = ScopyJS::GetInstance()->engine()->evaluate(content, fileName);
+	QFile file(scriptPath);
+	if(!file.open(QFile::ReadOnly)) {
+		qCritical(CAT_SCOPY_API) << "Unable to open the script file: " << scriptPath;
+		return;
+	}
+	const QString scriptContent = getScriptContent(&file);
+	QJSValue val = ScopyJS::GetInstance()->engine()->evaluate(scriptContent, scriptPath);
 	int ret = EXIT_SUCCESS;
 	if(val.isError()) {
 		qWarning(CAT_SCOPY_API) << "Exception:" << val.toString();
@@ -155,8 +161,22 @@ void ScopyMainWindow_API::runScript(QString content, QString fileName)
 		qWarning(CAT_SCOPY_API) << val.toString();
 	}
 
+	qInfo(CAT_SCOPY_API) << "Script finished with status" << ret;
 	/* Exit application */
-	qApp->exit(ret);
+	if(exitApp)
+		qApp->exit(ret);
+}
+
+const QString ScopyMainWindow_API::getScriptContent(QFile *file)
+{
+	QTextStream stream(file);
+	QString firstLine = stream.readLine();
+	if(!firstLine.startsWith("#!"))
+		stream.seek(0);
+
+	QString content = stream.readAll();
+	file->close();
+	return content;
 }
 
 bool ScopyMainWindow_API::sortByUUID(const QString &k1, const QString &k2)

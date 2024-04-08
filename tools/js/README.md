@@ -28,6 +28,6 @@ Scopy Scripting Guide is available at: https://wiki.analog.com/university/tools/
 			- devID: The device ID that was returned upon adding it to the device browser
 			- toolName: The name of the desired tool
 5. Running a script from a given file
-	- Command: `scopy.runScript(QString content, QString fileName)`
-		- content: The content of the script
-		- fileName: The path to the file
+	- Command: `scopy.runScript(QString scriptPath, bool exitApp = true)`
+		- scriptPath: The path to the script
+		- exitApp: If set to true, the application will be closed after running the given script

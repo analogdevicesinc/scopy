@@ -3,6 +3,7 @@
 
 #include "scopy-core_export.h"
 #include "scopymainwindow.h"
+#include <QFile>
 
 namespace scopy {
 class SCOPY_CORE_EXPORT ScopyMainWindow_API : public ApiObject
@@ -20,10 +21,11 @@ public:
 	Q_INVOKABLE bool disconnectDevice();
 	Q_INVOKABLE void switchTool(QString devID, QString toolName);
 	Q_INVOKABLE void switchTool(QString toolName);
-	Q_INVOKABLE void runScript(QString content, QString fileName);
+	Q_INVOKABLE void runScript(QString scriptPath, bool exitApp = true);
 
 private:
 	static bool sortByUUID(const QString &k1, const QString &k2);
+	const QString getScriptContent(QFile *file);
 	ScopyMainWindow *m_w;
 };
 
