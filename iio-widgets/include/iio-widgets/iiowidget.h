@@ -40,9 +40,25 @@ class SCOPY_IIO_WIDGETS_EXPORT IIOWidget : public QWidget
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
 public:
+	typedef enum
+	{
+		Busy,
+		Correct,
+		Error
+	} State;
+
 	IIOWidget(AttrUiStrategyInterface *uiStrategy, DataStrategyInterface *dataStrategy, QWidget *parent = nullptr);
 
+	/**
+	 * @brief Returns the UI of the IIOWidget
+	 * @return AttrUiStrategyInterface
+	 * */
 	AttrUiStrategyInterface *getUiStrategy();
+
+	/**
+	 * @brief Returns the data save/load strategy
+	 * @return DataStretegyInterface
+	 * */
 	DataStrategyInterface *getDataStrategy();
 
 	/**
@@ -59,16 +75,23 @@ public:
 	 * */
 	void setRecipe(IIOWidgetFactoryRecipe recipe);
 
-	typedef enum
-	{
-		Busy,
-		Correct,
-		Error
-	} State;
+	/**
+	 * @brief Returns the timestamp for the last operation
+	 * @return QDateTime if there exists a last operation or nullptr if no operation was performed on this IIOWidget
+	 * */
+	QDateTime *lastOperationTimestamp();
+
+	/**
+	 * @brief Returns the state of the last operation
+	 * @return IIOWidget::State if there exists a last operation or nullptr if no operation was performed on this
+	 * IIOWidget
+	 * */
+	IIOWidget::State *lastOperationState();
 
 Q_SIGNALS:
 	/**
-	 * @brief 0 - busy, 1 - correct, 2 error
+	 * @brief Emits the current state of the IIOWidget system and a string containing a more
+	 * elaborate explanation of the current state
 	 * */
 	void currentStateChanged(State currentState, QString explanation = "");
 
@@ -79,12 +102,17 @@ protected Q_SLOTS:
 	void startTimer(QString data);
 
 protected:
+	void setLastOperationTimestamp(QDateTime timestamp);
+	void setLastOperationState(IIOWidget::State state);
+
 	AttrUiStrategyInterface *m_uiStrategy;
 	DataStrategyInterface *m_dataStrategy;
 	IIOWidgetFactoryRecipe m_recipe;
 
 	QString m_lastData;
 	SmallProgressBar *m_progressBar;
+	QDateTime *m_lastOpTimestamp;
+	IIOWidget::State *m_lastOpState;
 };
 } // namespace scopy
 
