@@ -23,23 +23,16 @@ int CmdLineHandler::handle(QCommandLineParser &parser, ScopyMainWindow_API &scop
 		}
 	}
 
+	bool keepRunning = parser.isSet("keep-running");
+	if(keepRunning) {
+		qInfo() << "keep-running option is only useful with a script!";
+	}
+
 	QString scriptPath = parser.value("script");
 	if(!scriptPath.isEmpty()) {
-		QFile file(scriptPath);
-		if(!file.open(QFile::ReadOnly)) {
-			qCritical() << "Unable to open script file";
-			return EXIT_FAILURE;
-		}
-
-		QTextStream stream(&file);
-		QString firstLine = stream.readLine();
-		if(!firstLine.startsWith("#!"))
-			stream.seek(0);
-
-		QString content = stream.readAll();
-		file.close();
-		QMetaObject::invokeMethod(&scopyApi, "runScript", Qt::QueuedConnection, Q_ARG(QString, content),
-					  Q_ARG(QString, scriptPath));
+		bool exitApp = !keepRunning;
+		QMetaObject::invokeMethod(&scopyApi, "runScript", Qt::QueuedConnection, Q_ARG(QString, scriptPath),
+					  Q_ARG(bool, exitApp));
 	}
 	return EXIT_SUCCESS;
 }
