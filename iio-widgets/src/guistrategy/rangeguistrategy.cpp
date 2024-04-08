@@ -61,7 +61,7 @@ bool RangeAttrUi::isValid()
 
 void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 {
-	QSignalBlocker blocker(m_spinBox);
+	QSignalBlocker blocker(m_spinBox->getSpinBox());
 	QString availableAttributeValue = QString(optionalData).mid(1, QString(optionalData).size() - 2);
 	QStringList optionsList = availableAttributeValue.split(" ", Qt::SkipEmptyParts);
 	bool ok = true, finalOk = true;
