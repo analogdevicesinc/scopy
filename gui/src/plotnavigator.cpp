@@ -136,7 +136,6 @@ void PlotNavigator::addNavigators(QwtAxisId axisId)
 	Navigator *nav = new Navigator();
 	PlotMagnifier *magnifier = createMagnifier(axisId);
 	PlotZoomer *zoomer = createZoomer(axisId);
-	zoomer->setDrawZoomRectEn(false);
 
 	nav->magnifier = magnifier;
 	nav->zoomer = zoomer;
@@ -263,12 +262,14 @@ void PlotNavigator::addChannel(PlotChannel *channel)
 	if(!m_axes->contains(axisId)) {
 		m_axes->insert(axisId);
 		addNavigators(axisId);
+		setBaseRect(axisId);
 	}
 
 	axisId = channel->yAxis()->axisId();
 	if(!m_axes->contains(axisId)) {
 		m_axes->insert(axisId);
 		addNavigators(axisId);
+		setBaseRect(axisId);
 	}
 
 	m_visibleZoomer->setEnabled(isZoomerEn());
