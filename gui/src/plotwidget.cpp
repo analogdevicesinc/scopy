@@ -284,8 +284,10 @@ void PlotWidget::replot() { m_plot->replot(); }
 void PlotWidget::hideAxisLabels()
 {
 	m_yAxis->setVisible(false);
+	m_xAxis->setVisible(false);
 	if(m_selectedChannel != nullptr) {
 		m_selectedChannel->yAxis()->setVisible(false);
+		m_selectedChannel->xAxis()->setVisible(false);
 	}
 }
 
