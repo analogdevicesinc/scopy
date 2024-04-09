@@ -60,8 +60,6 @@ private:
 	IIOSortFilterProxyModel *m_proxyModel;
 	WatchListView *m_watchListView;
 	ApiObject *m_apiObject;
-	QPushButton *m_readBtn;
-	QPushButton *m_addToWatchlistBtn;
 	IIOStandardItem *m_currentlySelectedItem;
 	SaveContextSetup *m_saveContextSetup;
 

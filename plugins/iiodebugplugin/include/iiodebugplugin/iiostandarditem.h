@@ -39,7 +39,7 @@ public:
 	QString path();
 	QString format();
 	QString trigger();
-	QString triggerStatus(); // TODO: look into making this an enum
+	QString triggerStatus();
 	IIOStandardItem::Type type();
 
 	/**
@@ -63,12 +63,12 @@ public:
 	bool isWatched();
 	void setWatched(bool isWatched);
 
+	QString typeString();
+
 private:
 	void buildDetails();
 	void generateToolTip();
 
-	// TODO: this approach would make 2 almost similar calls, rethink this
-	// maybe only extracting data if the extract funtcions are called ?
 	void extractDataFromDevice();
 	void extractDataFromChannel();
 

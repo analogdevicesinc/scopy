@@ -4,7 +4,6 @@
 #define BUFFER_SIZE 256
 #define SEPARATOR "/"
 
-Q_LOGGING_CATEGORY(CAT_IIOMODEL, "IIOModel")
 using namespace scopy::iiodebugplugin;
 
 IIOModel::IIOModel(struct iio_context *context, QString uri, QObject *parent)
@@ -24,13 +23,12 @@ QSet<QString> IIOModel::getEntries() { return m_entries; }
 void IIOModel::iioTreeSetup()
 {
 	m_rootString = m_uri;
-	generateCtxAttributes();
+	setupCtx();
 
 	// add all devices from context, dfs
 	uint ctx_devices_count = iio_context_get_devices_count(m_ctx);
 	for(m_currentDeviceIndex = 0; m_currentDeviceIndex < ctx_devices_count; ++m_currentDeviceIndex) {
 		setupCurrentDevice();
-		generateDeviceAttributes();
 
 		// add all channels to current device
 		uint device_channels_count = iio_device_get_channels_count(m_currentDevice);
@@ -41,22 +39,27 @@ void IIOModel::iioTreeSetup()
 			// add channel to device
 			m_currentDeviceItem->appendRow(m_currentChannelItem);
 		}
+		generateDeviceAttributes();
 
 		// add device to ctx
 		m_rootItem->appendRow(m_currentDeviceItem);
 	}
+	generateCtxAttributes();
 
 	m_model->appendRow(m_rootItem);
 }
 
+void IIOModel::setupCtx()
+{
+	m_ctxList = IIOWidgetFactory::buildAllAttrsForContext(m_ctx);
+	m_rootItem = new IIOStandardItem(m_ctxList, m_rootString, m_rootString, IIOStandardItem::Context);
+	m_rootItem->setEditable(false);
+}
+
 void IIOModel::generateCtxAttributes()
 {
-	QList<IIOWidget *> ctxList = IIOWidgetFactory::buildAllAttrsForContext(m_ctx);
-	m_rootItem = new IIOStandardItem(ctxList, m_rootString, m_rootString, IIOStandardItem::Context);
-	m_rootItem->setEditable(false);
-
 	// add attrs from context
-	for(IIOWidget *ctxWidget : ctxList) {
+	for(IIOWidget *ctxWidget : m_ctxList) {
 		m_entries.insert(ctxWidget->getRecipe().data);
 		auto *attrItem = new IIOStandardItem({ctxWidget}, ctxWidget->getRecipe().data,
 						     m_rootString + SEPARATOR + ctxWidget->getRecipe().data,
@@ -129,7 +132,6 @@ void IIOModel::generateChannelAttributes()
 {
 	// add all attrs from channel
 	for(int i = 0; i < m_chnlList.size(); ++i) {
-		// FIXME: why is there an attr_name and an attrName
 		QString attr_name = iio_channel_get_attr(m_currentChannel, i);
 
 		m_entries.insert(attr_name);
