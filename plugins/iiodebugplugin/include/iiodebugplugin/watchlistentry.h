@@ -19,24 +19,33 @@ public:
 	QTableWidgetItem *name();
 	void setName(QString name);
 
-	QTableWidgetItem *value();
-	void setValue(QString value);
-
 	QTableWidgetItem *path();
 	void setPath(QString path);
 
 	IIOStandardItem *item();
+
+	QTableWidgetItem *type() const;
+	void setType(QString type);
+
+	// the value entry can only be lineedit or combo box, other options do not have enough space to look good
+	QWidget *valueUi() const;
+	void setValueUi(QWidget *newValueUi);
 
 private Q_SLOTS:
 	void setNewData(QString data, QString optionalData);
 
 private:
 	void setupUi();
+	void setupWidget(IIOWidget *widget);
 
 	IIOStandardItem *m_item;
 	QTableWidgetItem *m_name;
-	QTableWidgetItem *m_value;
+	QWidget *m_valueUi;
+	QTableWidgetItem *m_type;
 	QTableWidgetItem *m_path;
+
+	QComboBox *m_combo;
+	QLineEdit *m_lineedit;
 };
 } // namespace scopy::iiodebugplugin
 
