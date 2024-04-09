@@ -1,7 +1,5 @@
 #include "iiostandarditem.h"
-#include <QLoggingCategory>
-
-Q_LOGGING_CATEGORY(CAT_IIOSTANDARDITEM, "IIOStandardItem")
+#include "debuggerloggingcategories.h"
 
 using namespace scopy::iiodebugplugin;
 
@@ -25,7 +23,7 @@ IIOStandardItem::IIOStandardItem(QList<IIOWidget *> widgets, QString name, QStri
 }
 
 IIOStandardItem::IIOStandardItem(QList<IIOWidget *> widgets, QString name, QString id, QString path, Type type)
-	: QStandardItem((!id.isEmpty()) ? id + ": " + name : name)
+	: QStandardItem((!name.isEmpty()) ? id + ": " + name : id)
 	, m_device(nullptr)
 	, m_channel(nullptr)
 	, m_iioWidgets(widgets)
@@ -90,7 +88,7 @@ void IIOStandardItem::setBufferCapable(bool isBufferCapable)
 	if(m_type == IIOStandardItem::Device) {
 		m_isBufferCapable = isBufferCapable;
 	} else {
-		qWarning(CAT_IIOSTANDARDITEM)
+		qWarning(CAT_DEBUGGERIIOMODEL)
 			<< "The current IIOStandardItem is not a Device, cannot set isBufferCapable flag.";
 	}
 }
@@ -98,6 +96,35 @@ void IIOStandardItem::setBufferCapable(bool isBufferCapable)
 bool IIOStandardItem::isWatched() { return m_isWatched; }
 
 void IIOStandardItem::setWatched(bool isWatched) { m_isWatched = isWatched; }
+
+QString IIOStandardItem::typeString()
+{
+	switch(m_type) {
+	case IIOStandardItem::Context: {
+		return "Context";
+	}
+	case IIOStandardItem::ContextAttribute: {
+		return "Context Attribute";
+	}
+	case IIOStandardItem::Trigger: {
+		return "Trigger";
+	}
+	case IIOStandardItem::Device: {
+		return "Device";
+	}
+	case IIOStandardItem::DeviceAttribute: {
+		return "Device Attribute";
+	}
+	case IIOStandardItem::Channel: {
+		return "Channel";
+	}
+	case IIOStandardItem::ChannelAttribute: {
+		return "Channel Attribute";
+	}
+	default:
+		return "";
+	}
+}
 
 void IIOStandardItem::buildDetails()
 {
@@ -119,41 +146,7 @@ void IIOStandardItem::buildDetails()
 	}
 }
 
-void IIOStandardItem::generateToolTip()
-{
-	switch(m_type) {
-	case IIOStandardItem::Context: {
-		setToolTip("Context");
-		break;
-	}
-	case IIOStandardItem::ContextAttribute: {
-		setToolTip("Context Attribute");
-		break;
-	}
-	case IIOStandardItem::Trigger: {
-		setToolTip("Trigger");
-		break;
-	}
-	case IIOStandardItem::Device: {
-		setToolTip("Device");
-		break;
-	}
-	case IIOStandardItem::DeviceAttribute: {
-		setToolTip("Device Attribute");
-		break;
-	}
-	case IIOStandardItem::Channel: {
-		setToolTip("Channel");
-		break;
-	}
-	case IIOStandardItem::ChannelAttribute: {
-		setToolTip("Channel Attribute");
-		break;
-	}
-	default:
-		break;
-	}
-}
+void IIOStandardItem::generateToolTip() { setToolTip(typeString()); }
 
 void IIOStandardItem::extractDataFromDevice()
 {

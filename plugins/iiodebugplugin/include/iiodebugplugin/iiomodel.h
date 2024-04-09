@@ -20,6 +20,7 @@ public:
 
 private:
 	void iioTreeSetup();
+	void setupCtx();
 	void generateCtxAttributes();
 	void setupCurrentDevice();
 	void generateDeviceAttributes();
@@ -46,6 +47,7 @@ private:
 	int m_currentDeviceIndex;
 	int m_currentChannelIndex;
 
+	QList<IIOWidget *> m_ctxList;
 	QList<IIOWidget *> m_devList;
 	QList<IIOWidget *> m_chnlList;
 };

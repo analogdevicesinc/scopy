@@ -35,8 +35,7 @@ protected:
 	void resizeEvent(QResizeEvent *event) override;
 
 private:
-	QList<int> m_offsets = {0, 0, 0, 0}; // TODO: prettify
-
+	QList<int> m_offsets;
 	ApiObject *m_apiObject;
 	QMap<QString, WatchListEntry *> m_entryObjects;
 };
