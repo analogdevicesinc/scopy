@@ -1,13 +1,12 @@
 #include <QVBoxLayout>
 #include <QLabel>
-#include <QLoggingCategory>
 
 #include <gui/stylehelper.h>
 
 #include "iiodebuginstrument.h"
 #include "iiostandarditem.h"
+#include "debuggerloggingcategories.h"
 
-Q_LOGGING_CATEGORY(CAT_IIODEBUGINSTRUMENT, "IIODebugInstrument")
 using namespace scopy::iiodebugplugin;
 
 IIODebugInstrument::IIODebugInstrument(struct iio_context *context, QString uri, QWidget *parent)
@@ -66,15 +65,13 @@ void IIODebugInstrument::setupUi()
 	m_proxyModel = new IIOSortFilterProxyModel(this);
 	m_treeView = new QTreeView(bottom_container);
 	// m_saveContextSetup = new SaveContextSetup(m_treeView, bottom_container);
-	m_iioModel = new IIOModel(m_context, m_uri, m_treeView);
+	// m_iioModel = new IIOModel(m_context, m_uri, m_treeView);
+
+	// TODO: see what to do with context0 when multiple simultaneous connections are available
+	m_iioModel = new IIOModel(m_context, "context0", m_treeView);
 	m_searchBar = new SearchBar(m_iioModel->getEntries(), this);
 	m_detailsView = new DetailsView(details_container);
 	m_watchListView = new WatchListView(watch_list);
-	m_readBtn = new QPushButton("Read Current", this);
-	m_addToWatchlistBtn = new QPushButton("Add to Watchlist", this);
-
-	m_readBtn->setFixedWidth(200);
-	m_addToWatchlistBtn->setFixedWidth(200);
 
 	watch_list->layout()->setContentsMargins(0, 0, 0, 0);
 	watch_list->layout()->addWidget(m_watchListView);
@@ -86,26 +83,9 @@ void IIODebugInstrument::setupUi()
 	StyleHelper::BackgroundPage(watch_list, "WatchListContainer");
 	StyleHelper::BackgroundPage(tree_view_container, "TreeViewContainer");
 	StyleHelper::BackgroundPage(search_bar_container, "SearchBarContainer");
-	StyleHelper::BlueButton(m_readBtn, "ReadCurrentSelectionButton");
-	StyleHelper::BlueButton(m_addToWatchlistBtn, "AddToWatchlistButton");
-
-	m_HSplitter->setStyleSheet(
-		// "QSplitter::handle { background-color: transparent; }"
-		"QSplitter::handle:horizontal { width: 6px; }"
-		"QSplitter::handle:vertical { height: 6px; }"
-		"QSplitter::handle:hover { background-color: rgba(0, 0, 0, 40); }"
-		"QSplitter::handle:pressed { background-color: rgba(0, 0, 0, 70); }"
-		"QSplitter::handle:disabled { background-color: transparent; }");
-
-	QString treeViewStyle = "QTreeView {"
-				"color: white;"
-				"show-decoration-selected: 0;"
-				"}"
-				"QTreeView::item:selected {"
-				"background-color: &&ScopyBlue&&"
-				"}";
-	treeViewStyle.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
-	m_treeView->setStyleSheet(treeViewStyle);
+	StyleHelper::SplitterStyle(m_HSplitter, "HorizontalSplitter");
+	StyleHelper::SplitterStyle(m_VSplitter, "VerticalSplitter");
+	StyleHelper::TreeViewDebugger(m_treeView, "TreeView");
 
 	m_treeView->setModel(m_proxyModel);
 
@@ -115,8 +95,6 @@ void IIODebugInstrument::setupUi()
 	details_container->layout()->addWidget(m_detailsView);
 	tree_view_container->layout()->addWidget(m_treeView);
 	search_bar_container->layout()->addWidget(m_searchBar);
-	search_bar_container->layout()->addWidget(m_addToWatchlistBtn);
-	search_bar_container->layout()->addWidget(m_readBtn);
 
 	layout()->addWidget(search_bar_container);
 	layout()->addWidget(bottom_container);
@@ -146,33 +124,33 @@ void IIODebugInstrument::connectSignalsAndSlots()
 			 &IIODebugInstrument::applySelection);
 
 	QObject::connect(m_watchListView, &WatchListView::selectedItem, this, [this](IIOStandardItem *item) {
-		qDebug(CAT_IIODEBUGINSTRUMENT) << "Expanding item" << item->path();
+		qDebug(CAT_DEBUGGERIIOMODEL) << "Expanding item" << item->path();
 		m_currentlySelectedItem = item;
 		auto sourceModel = qobject_cast<QStandardItemModel *>(m_proxyModel->sourceModel());
 		recursiveExpandItem(sourceModel->invisibleRootItem(), item);
 		m_detailsView->setIIOStandardItem(item);
 	});
 
-	QObject::connect(m_readBtn, &QPushButton::clicked, this, [this]() {
-		qInfo(CAT_IIODEBUGINSTRUMENT) << "Read button pressed.";
+	QObject::connect(m_detailsView->readBtn(), &QPushButton::clicked, this, [this]() {
+		qInfo(CAT_DEBUGGERIIOMODEL) << "Read button pressed.";
 		triggerReadOnAllChildItems(m_currentlySelectedItem);
 		m_detailsView->refreshIIOView();
 	});
 
-	QObject::connect(m_addToWatchlistBtn, &QPushButton::clicked, this, [this]() {
+	QObject::connect(m_detailsView->addToWatchlistBtn(), &QPushButton::clicked, this, [this]() {
 		if(m_currentlySelectedItem == nullptr) {
-			qInfo(CAT_IIODEBUGINSTRUMENT) << "No item selected, doing nothing.";
+			qInfo(CAT_DEBUGGERIIOMODEL) << "No item selected, doing nothing.";
 			return;
 		}
 
 		if(m_currentlySelectedItem->isWatched()) {
 			m_currentlySelectedItem->setWatched(false);
 			m_watchListView->removeFromWatchlist(m_currentlySelectedItem);
-			m_addToWatchlistBtn->setText("Add to Watchlist");
+			m_detailsView->setAddToWatchlistState(true);
 		} else {
 			m_currentlySelectedItem->setWatched(true);
 			m_watchListView->addToWatchlist(m_currentlySelectedItem);
-			m_addToWatchlistBtn->setText("Remove from Watchlist");
+			m_detailsView->setAddToWatchlistState(false);
 		}
 	});
 }
@@ -200,7 +178,7 @@ void IIODebugInstrument::recursiveExpandItems(QStandardItem *item, const QString
 		QStandardItem *childItem = item->child(row);
 
 		if(childItem == nullptr) {
-			qWarning(CAT_IIODEBUGINSTRUMENT) << "Error, invalid row. Skipping item.";
+			qWarning(CAT_DEBUGGERIIOMODEL) << "Error, invalid row. Skipping item.";
 			continue;
 		}
 
@@ -260,7 +238,7 @@ void IIODebugInstrument::triggerReadOnAllChildItems(QStandardItem *item)
 {
 	auto IIOitem = dynamic_cast<IIOStandardItem *>(item);
 	if(!IIOitem) {
-		qWarning(CAT_IIODEBUGINSTRUMENT) << "Dynamic cast failed and it shouldn't.";
+		qWarning(CAT_DEBUGGERIIOMODEL) << "Dynamic cast failed and it shouldn't.";
 		return;
 	}
 	IIOStandardItem::Type type = IIOitem->type();
@@ -270,8 +248,7 @@ void IIODebugInstrument::triggerReadOnAllChildItems(QStandardItem *item)
 	   type == IIOStandardItem::ChannelAttribute) {
 		QList<IIOWidget *> iioWidgets = IIOitem->getIIOWidgets();
 		for(int i = 0; i < iioWidgets.size(); ++i) {
-			// TODO: change this qInfo to qDebug
-			qInfo(CAT_IIODEBUGINSTRUMENT) << "Reading " << IIOitem->path();
+			qDebug(CAT_DEBUGGERIIOMODEL) << "Reading " << IIOitem->path();
 			iioWidgets.at(i)->getDataStrategy()->requestData();
 		}
 	} else {
@@ -288,7 +265,7 @@ void IIODebugInstrument::applySelection(const QItemSelection &selected, const QI
 	Q_UNUSED(deselected)
 
 	if(selected.indexes().isEmpty()) {
-		qWarning(CAT_IIODEBUGINSTRUMENT) << "Selected index is cannot be found.";
+		qWarning(CAT_DEBUGGERIIOMODEL) << "Selected index is cannot be found.";
 		return;
 	}
 
@@ -309,7 +286,7 @@ void IIODebugInstrument::applySelection(const QItemSelection &selected, const QI
 	m_currentlySelectedItem = iioItem;
 
 	if(iioItem) {
-		m_addToWatchlistBtn->setText(iioItem->isWatched() ? "Remove from Watchlist" : "Add to Watchlist");
+		m_detailsView->setAddToWatchlistState(!iioItem->isWatched());
 		m_detailsView->setIIOStandardItem(iioItem);
 		m_watchListView->currentTreeSelectionChanged(iioItem);
 	}
@@ -321,14 +298,14 @@ void IIODebugInstrument::filterAndExpand(const QString &text)
 	m_proxyModel->invalidate(); // Trigger re-filtering
 
 	if(text.isEmpty()) {
-		qDebug(CAT_IIODEBUGINSTRUMENT) << "Text is empty, will not recursively expand items.";
+		qDebug(CAT_DEBUGGERIIOMODEL) << "Text is empty, will not recursively expand items.";
 		return;
 	}
 
 	QStandardItemModel *sourceModel = qobject_cast<QStandardItemModel *>(m_proxyModel->sourceModel());
 
 	if(!sourceModel) {
-		qWarning(CAT_IIODEBUGINSTRUMENT) << "Failed to obtain source model.";
+		qWarning(CAT_DEBUGGERIIOMODEL) << "Failed to obtain source model.";
 		return;
 	}
 

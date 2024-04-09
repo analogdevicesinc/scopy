@@ -28,7 +28,7 @@ void GuiDetailsView::setupUi()
 	m_attrSeparator->getContentWidget()->layout()->addWidget(m_scrollArea);
 	m_attrSeparator->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
-	m_detailsSeparator->setLabel("Device info");
+	m_detailsSeparator->setLabel("General info");
 	m_detailsSeparator->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
 	layout()->addWidget(m_attrSeparator);
@@ -53,6 +53,8 @@ void GuiDetailsView::setIIOStandardItem(IIOStandardItem *item)
 		m_detailsList.append(label);
 		m_detailsSeparator->getContentWidget()->layout()->addWidget(label);
 	}
+
+	m_detailsSeparator->setLabel(m_currentItem->typeString() + " info");
 }
 
 void GuiDetailsView::clearWidgets()
