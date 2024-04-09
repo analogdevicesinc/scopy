@@ -64,6 +64,13 @@ Q_SIGNALS:
 	virtual void sendData(QString data, QString dataOptions) = 0;
 
 	/**
+	 * @brief This signal is emitted before a write operation
+	 * @param oldData String containing the data what is present before the write
+	 * @param newData String containing the data that will be written
+	 */
+	virtual void aboutToWrite(QString oldData, QString newData) = 0;
+
+	/**
 	 * @brief Emits the status of the operations (e.g. error code)
 	 * */
 	virtual void emitStatus(int status) = 0;

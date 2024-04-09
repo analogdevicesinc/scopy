@@ -24,6 +24,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void sendData(QString data, QString dataOptions) override;
+	void aboutToWrite(QString oldData, QString newData) override;
 	void emitStatus(int status) override;
 
 private Q_SLOTS:
