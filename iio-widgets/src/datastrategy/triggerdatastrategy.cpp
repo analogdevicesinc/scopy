@@ -48,6 +48,7 @@ void TriggerDataStrategy::save(QString data)
 		qWarning(CAT_TRIGGER_DATA_STRATEGY) << "Invalid arguments, no trigger with name" << data << "was found";
 	}
 
+	Q_EMIT aboutToWrite(m_data, data);
 	int res;
 	if(data == "None") {
 		res = iio_device_set_trigger(m_recipe.device, nullptr);

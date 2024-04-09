@@ -43,18 +43,24 @@ IIOWidget::IIOWidget(AttrUiStrategyInterface *uiStrategy, DataStrategyInterface 
 		layout()->addWidget(ui);
 	}
 	layout()->addWidget(m_progressBar);
+
+	QWidget *uiStrategyWidget = dynamic_cast<QWidget *>(m_uiStrategy);
+	QWidget *dataStrategyWidget = dynamic_cast<QWidget *>(m_dataStrategy);
+
 	connect(m_progressBar, &SmallProgressBar::progressFinished, this, [this]() { this->saveData(m_lastData); });
 
-	connect(dynamic_cast<QWidget *>(m_uiStrategy), SIGNAL(emitData(QString)), this, SLOT(startTimer(QString)));
-	connect(dynamic_cast<QWidget *>(m_dataStrategy), SIGNAL(emitStatus(int)), this, SLOT(emitDataStatus(int)));
+	connect(uiStrategyWidget, SIGNAL(emitData(QString)), this, SLOT(startTimer(QString)));
+	connect(dataStrategyWidget, SIGNAL(emitStatus(int)), this, SLOT(emitDataStatus(int)));
 
 	// forward data request from ui strategy to data strategy
-	connect(dynamic_cast<QWidget *>(m_uiStrategy), SIGNAL(requestData()), dynamic_cast<QWidget *>(m_dataStrategy),
-		SLOT(requestData()));
+	connect(uiStrategyWidget, SIGNAL(requestData()), dataStrategyWidget, SLOT(requestData()));
 
 	// forward data from data strategy to ui strategy
-	connect(dynamic_cast<QWidget *>(m_dataStrategy), SIGNAL(sendData(QString, QString)),
-		dynamic_cast<QWidget *>(m_uiStrategy), SLOT(receiveData(QString, QString)));
+	connect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), uiStrategyWidget,
+		SLOT(receiveData(QString, QString)));
+
+	// intercept the sendData from dataStrategy to collect information
+	connect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), this, SLOT(storeReadInfo(QString, QString)));
 
 	m_dataStrategy->requestData();
 }
@@ -62,6 +68,7 @@ IIOWidget::IIOWidget(AttrUiStrategyInterface *uiStrategy, DataStrategyInterface 
 void IIOWidget::saveData(QString data)
 {
 	setLastOperationState(IIOWidget::Busy);
+	setLastOperationTimestamp(QDateTime::currentDateTime());
 	m_progressBar->setBarColor(StyleHelper::getColor("ProgressBarBusy"));
 	setToolTip("Operation in progress.");
 
@@ -114,6 +121,14 @@ void IIOWidget::startTimer(QString data)
 	m_lastData = data;
 	m_progressBar->setBarColor(StyleHelper::getColor("ScopyBlue"));
 	m_progressBar->startProgress();
+}
+
+void IIOWidget::storeReadInfo(QString data, QString optionalData)
+{
+	// the parameters are unused for the moment
+	Q_UNUSED(data)
+	Q_UNUSED(optionalData)
+	setLastOperationTimestamp(QDateTime::currentDateTime());
 }
 
 void IIOWidget::setLastOperationTimestamp(QDateTime timestamp)

@@ -41,6 +41,7 @@ void DeviceAttrDataStrategy::save(QString data)
 		return;
 	}
 
+	Q_EMIT aboutToWrite(m_data, data);
 	ssize_t res =
 		iio_device_attr_write(m_recipe.device, m_recipe.data.toStdString().c_str(), data.toStdString().c_str());
 	if(res < 0) {

@@ -49,6 +49,7 @@ void CmdQDeviceAttrDataStrategy::save(QString data)
 		return;
 	}
 
+	Q_EMIT aboutToWrite(m_dataRead, data);
 	Command *writeCommand = new IioDeviceAttributeWrite(m_recipe.device, m_recipe.data.toStdString().c_str(),
 							    data.toStdString().c_str(), nullptr);
 	QObject::connect(
