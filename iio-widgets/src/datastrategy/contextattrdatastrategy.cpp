@@ -17,7 +17,7 @@ QString ContextAttrDataStrategy::optionalData() { return m_optionalData; }
 
 void ContextAttrDataStrategy::save(QString data)
 {
-	qDebug(CAT_CONTEXT_ATTR_DATA_STRATEGY) << "ContextAttrDataStrategy::save called, but the attr is read only";
+	qInfo(CAT_CONTEXT_ATTR_DATA_STRATEGY) << "ContextAttrDataStrategy::save called, but the attr is read only";
 	requestData();
 }
 

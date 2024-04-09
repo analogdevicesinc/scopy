@@ -48,6 +48,7 @@ void CmdQChannelAttrDataStrategy::save(QString data)
 		return;
 	}
 
+	Q_EMIT aboutToWrite(m_dataRead, data);
 	Command *writeCommand = new IioChannelAttributeWrite(m_recipe.channel, m_recipe.data.toStdString().c_str(),
 							     data.toStdString().c_str(), nullptr);
 	QObject::connect(
