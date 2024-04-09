@@ -1,22 +1,23 @@
 #include "watchlistview.h"
+#include "debuggerloggingcategories.h"
 #include <QVBoxLayout>
 #include <QPushButton>
-#include <QLoggingCategory>
 #include <QHeaderView>
 #include <QScrollBar>
 
 #define NAME_POS 0
 #define VALUE_POS 1
-#define PATH_POS 2
-#define CLOSE_BTN_POS 3
-#define DIVISION_REGION 4
+#define TYPE_POS 2
+#define PATH_POS 3
+#define CLOSE_BTN_POS 4
+#define DIVISION_REGION 5
 
-Q_LOGGING_CATEGORY(CAT_WATCHLISTVIEW, "WatchListView")
 using namespace scopy::iiodebugplugin;
 
 WatchListView::WatchListView(QWidget *parent)
 	: QTableWidget(parent)
 	, m_apiObject(new WatchListView_API(this))
+	, m_offsets({0, 0, 0, 0, 0})
 {
 	setupUi();
 	connectSignalsAndSlots();
@@ -25,7 +26,7 @@ WatchListView::WatchListView(QWidget *parent)
 
 void WatchListView::setupUi()
 {
-	QStringList headers = {"Name", "Value", "Path", ""};
+	QStringList headers = {"Name", "Value", "Type", "Path", ""};
 	setColumnCount(headers.size());
 	setHorizontalHeaderLabels(headers);
 	verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
@@ -40,34 +41,11 @@ void WatchListView::setupUi()
 	header->setCascadingSectionResizes(true);
 	header->setSectionResizeMode(NAME_POS, QHeaderView::Interactive);
 	header->setSectionResizeMode(VALUE_POS, QHeaderView::Interactive);
+	header->setSectionResizeMode(TYPE_POS, QHeaderView::Interactive);
 	header->setSectionResizeMode(PATH_POS, QHeaderView::Interactive);
 	header->setSectionResizeMode(CLOSE_BTN_POS, QHeaderView::Interactive);
 
-	// TODO: move this to stylehelper ( eventually )
-	QString style = QString(R"css(
-				QHeaderView::section {
-					font: 11pt;
-					border: none;
-					background-color:&&ScopyBackground&&;
-					font-family: Open Sans;
-				}
-				QTableWidget::item {
-					border-left: 1px solid &&UIElementHighlight&&;
-					font-family: Open Sans;
-				}
-				QTableWidget::item::selected {
-					background-color: &&ScopyBlue&&;
-					font-family: Open Sans;
-				}
-				QHeaderView::section {
-					border-left: 1px solid &&UIElementHighlight&&;
-					font-family: Open Sans;
-				}
-				)css");
-	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
-	style.replace("&&UIElementHighlight&&", StyleHelper::getColor("UIElementHighlight"));
-	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
-	setStyleSheet(style);
+	StyleHelper::TableWidgetDebugger(this, "DebuggerTableWidget");
 	verticalHeader()->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 }
 
@@ -76,11 +54,11 @@ void WatchListView::connectSignalsAndSlots()
 	QObject::connect(this, &QTableWidget::cellClicked, this, [this](int row, int column) {
 		selectRow(row);
 		QString path = item(row, PATH_POS)->text();
-		qInfo(CAT_WATCHLISTVIEW()) << "Selected" << path;
+		qInfo(CAT_WATCHLIST) << "Selected" << path;
 
 		if(!m_entryObjects.contains(path)) {
-			qWarning(CAT_WATCHLISTVIEW) << "No object with name" << path
-						    << "was found in the entry objects map, skipping cell selection.";
+			qWarning(CAT_WATCHLIST) << "No object with name" << path
+						<< "was found in the entry objects map, skipping cell selection.";
 			return;
 		}
 		WatchListEntry *watchListEntry = m_entryObjects[path];
@@ -108,13 +86,17 @@ void WatchListView::addToWatchlist(IIOStandardItem *item)
 	int row = rowCount();
 	insertRow(row);
 	setItem(row, NAME_POS, entry->name());
-	setItem(row, VALUE_POS, entry->value());
+	setCellWidget(row, VALUE_POS, entry->valueUi());
+	setItem(row, TYPE_POS, entry->type());
 	setItem(row, PATH_POS, entry->path());
+	selectRow(row);
 
 	auto deleteButton = new QPushButton("X");
+	QString style = "background-color: transparent; border: 0px;";
+	deleteButton->setStyleSheet(style);
 	setCellWidget(row, CLOSE_BTN_POS, deleteButton);
 	deleteButton->setContentsMargins(0, 0, 0, 0);
-	QObject::connect(deleteButton, &QPushButton::clicked, this, [this, entry]() {
+	QObject::connect(deleteButton, &QPushButton::clicked, this, [this, entry, item]() {
 		int row = -1;
 		for(int i = 0; i < rowCount(); ++i) {
 			if(this->item(i, PATH_POS)->text() == entry->path()->text()) {
@@ -127,6 +109,9 @@ void WatchListView::addToWatchlist(IIOStandardItem *item)
 			removeRow(row);
 			entry->deleteLater();
 		}
+
+		item->setWatched(false);
+		entry->deleteLater();
 	});
 }
 
@@ -146,7 +131,7 @@ void WatchListView::removeFromWatchlist(IIOStandardItem *item)
 		if(entry) {
 			entry->deleteLater();
 		} else {
-			qWarning(CAT_WATCHLISTVIEW)
+			qWarning(CAT_WATCHLIST)
 				<< "Entry" << item->path() << "not present in entries, cannot remove from watchlist.";
 		}
 	}
@@ -175,6 +160,7 @@ void WatchListView::resizeEvent(QResizeEvent *event)
 	int sectionWidth = w / DIVISION_REGION;
 	setColumnWidth(NAME_POS, sectionWidth + m_offsets[NAME_POS]);
 	setColumnWidth(VALUE_POS, sectionWidth + m_offsets[VALUE_POS]);
+	setColumnWidth(TYPE_POS, sectionWidth + m_offsets[TYPE_POS]);
 	setColumnWidth(PATH_POS, sectionWidth + m_offsets[PATH_POS]);
 	setColumnWidth(CLOSE_BTN_POS, sectionWidth + m_offsets[CLOSE_BTN_POS]);
 
@@ -217,9 +203,8 @@ void WatchListView_API::setOffsets(const QList<int> &newOffsets)
 	// abs(sum) < 1 is an error that can be accepted when computing offsets
 	if(sum < -1 || sum > 1) {
 		// the table is not fully visible, this is a backup measure to allow good display
-		qWarning(CAT_WATCHLISTVIEW)
-			<< "The table contents are not fully visible, the offset that is not seen is" << sum
-			<< "and it will be subtracted from the widest column from the last 2.";
+		qWarning(CAT_WATCHLIST) << "The table contents are not fully visible, the offset that is not seen is"
+					<< sum << "and it will be subtracted from the widest column from the last 2.";
 
 		if(newOffsets[size - 1] > newOffsets[size - 2]) {
 			p->m_offsets[size - 1] -= sum;

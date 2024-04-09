@@ -1264,6 +1264,7 @@ void StyleHelper::HoverToolTip(QWidget *w, QString info, QString objectName)
 	QHBoxLayout *layout = new QHBoxLayout(w);
 	layout->addWidget(label);
 }
+
 void StyleHelper::WarningLabel(QLabel *w, QString objectName)
 {
 	QString style = QString(R"css(
@@ -1363,6 +1364,81 @@ void StyleHelper::SpinBoxDownButton(QPushButton *w, QString objectName)
 	QPushButton:hover:!pressed {
 		border-image: url(:/gui/icons/sba_dn_btn_hover.svg);
 	})css");
+
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::TabWidgetBarUnderline(QTabWidget *w, QString objectName)
+{
+	if(!objectName.isEmpty()) {
+		w->setObjectName(objectName);
+	}
+
+	QString style = R"css(QTabBar::tab:selected { border-bottom-color: &&ScopyBlue&&; })css";
+	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::TableWidgetDebugger(QTableWidget *w, QString objectName)
+{
+	if(!objectName.isEmpty()) {
+		w->setObjectName(objectName);
+	}
+
+	QString style = QString(R"css(
+				QHeaderView::section {
+					font: 11pt;
+					border: none;
+					background-color:&&ScopyBackground&&;
+					font-family: Open Sans;
+				}
+				QTableWidget::item {
+					border-left: 1px solid &&UIElementHighlight&&;
+					font-family: Open Sans;
+				}
+				QTableWidget::item::selected {
+					background-color: &&ScopyBlue&&;
+					font-family: Open Sans;
+				}
+				QHeaderView::section {
+					border-left: 1px solid &&UIElementHighlight&&;
+					font-family: Open Sans;
+				}
+				)css");
+	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
+	style.replace("&&UIElementHighlight&&", StyleHelper::getColor("UIElementHighlight"));
+	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::SplitterStyle(QSplitter *w, QString objectName)
+{
+	if(!objectName.isEmpty()) {
+		w->setStyleSheet(objectName);
+	}
+
+	QString style = QString(R"css(
+		QSplitter::handle:horizontal { width: 6px; }
+		QSplitter::handle:vertical { height: 6px; }
+		QSplitter::handle:hover { background-color: rgba(0, 0, 0, 40); }
+		QSplitter::handle:pressed { background-color: rgba(0, 0, 0, 70); }
+		QSplitter::handle:disabled { background-color: transparent; }
+	)css");
+
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::TreeViewDebugger(QTreeView *w, QString objectName)
+{
+	if(!objectName.isEmpty()) {
+		w->setStyleSheet(objectName);
+	}
+
+	QString style = R"css(
+		QTreeView { color: white; show-decoration-selected: 0; }
+		QTreeView::item:selected { background-color: &&ScopyBlue&& }
+	)css";
+	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
 
 	w->setStyleSheet(style);
 }

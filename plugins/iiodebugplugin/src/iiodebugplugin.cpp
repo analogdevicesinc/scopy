@@ -1,11 +1,7 @@
 #include "iiodebugplugin.h"
-
-#include <QLoggingCategory>
 #include <QLabel>
-
 #include <iioutil/connectionprovider.h>
 
-Q_LOGGING_CATEGORY(CAT_IIODEBUGPLUGIN, "IIODebugPlugin")
 using namespace scopy::iiodebugplugin;
 
 bool IIODebugPlugin::compatible(QString m_param, QString category)
