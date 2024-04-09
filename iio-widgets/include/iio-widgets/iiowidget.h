@@ -100,6 +100,7 @@ protected Q_SLOTS:
 	void emitDataStatus(int status);
 
 	void startTimer(QString data);
+	void storeReadInfo(QString data, QString optionalData);
 
 protected:
 	void setLastOperationTimestamp(QDateTime timestamp);
