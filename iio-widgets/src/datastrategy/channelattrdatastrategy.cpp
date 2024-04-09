@@ -42,6 +42,7 @@ void ChannelAttrDataStrategy::save(QString data)
 		return;
 	}
 
+	Q_EMIT aboutToWrite(m_data, data);
 	ssize_t res = iio_channel_attr_write(m_recipe.channel, m_recipe.data.toStdString().c_str(),
 					     data.toStdString().c_str());
 	if(res < 0) {
