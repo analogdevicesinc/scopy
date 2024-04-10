@@ -1,7 +1,6 @@
 #include "grtimeplotaddon.h"
 
 #include "grtimeplotaddonsettings.h"
-#include "hoverwidget.h"
 
 #include <QLoggingCategory>
 #include <QTimer>
@@ -60,8 +59,8 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	fft_yPlotAxis = new PlotAxis(QwtAxis::YLeft, m_fftPlotWidget, fftchannel_pen);
 	fft_yPlotAxis->setInterval(-145, 5);
 
-	m_fft_channel = new PlotChannel("FFT", fftchannel_pen, m_fftPlotWidget, fft_xPlotAxis, fft_yPlotAxis);
-
+	m_fft_channel = new PlotChannel("FFT", fftchannel_pen, fft_xPlotAxis, fft_yPlotAxis);
+	m_fftPlotWidget->addPlotChannel(m_fft_channel);
 	//	m_fft_channel->setThickness(5);
 	//	m_fft_channel->setStyle(1);
 
@@ -81,7 +80,8 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	xy_xPlotAxis = new PlotAxis(QwtAxis::XBottom, m_xyPlotWidget, xychannel_pen);
 	xy_yPlotAxis = new PlotAxis(QwtAxis::YLeft, m_xyPlotWidget, xychannel_pen);
 
-	m_xy_channel = new PlotChannel("X-Y", xychannel_pen, m_xyPlotWidget, xy_xPlotAxis, xy_yPlotAxis, this);
+	m_xy_channel = new PlotChannel("X-Y", xychannel_pen, xy_xPlotAxis, xy_yPlotAxis, this);
+	m_xyPlotWidget->addPlotChannel(m_xy_channel);
 	//	m_xy_channel->setHandle(new PlotAxisHandle(xychannel_pen, xy_yPlotAxis, m_xyPlotWidget, QwtAxis::YLeft,
 	// this)); 	m_xyPlotWidget->addPlotAxisHandle(m_xy_channel->handle());
 
