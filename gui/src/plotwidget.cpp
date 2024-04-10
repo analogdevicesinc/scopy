@@ -200,6 +200,8 @@ void PlotWidget::addPlotChannel(PlotChannel *ch)
 		selectChannel(ch);
 	}
 
+	connect(ch, &PlotChannel::doReplot, this, &PlotWidget::replot);
+	connect(ch, &PlotChannel::attachCurve, this, [=](QwtPlotCurve *curve) { curve->attach(m_plot); });
 	m_navigator->addChannel(ch);
 	m_tracker->addChannel(ch);
 	Q_EMIT addedChannel(ch);

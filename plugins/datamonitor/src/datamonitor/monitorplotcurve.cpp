@@ -12,7 +12,8 @@ MonitorPlotCurve::MonitorPlotCurve(DataMonitorModel *dataMonitorModel, PlotWidge
 	m_curveStyleIndex = 0;
 	QPen chpen = QPen(dataMonitorModel->getColor(), 1);
 
-	m_plotch = new PlotChannel(dataMonitorModel->getName(), chpen, plot, plot->xAxis(), plot->yAxis(), this);
+	m_plotch = new PlotChannel(dataMonitorModel->getName(), chpen, plot->xAxis(), plot->yAxis(), this);
+	plot->addPlotChannel(m_plotch);
 	m_plotch->setEnabled(true);
 
 	m_plotch->curve()->setRawSamples(m_dataMonitorModel->getXdata()->data(), m_dataMonitorModel->getYdata()->data(),
