@@ -81,8 +81,8 @@ void WaveformInstrument::setupChannels(PlotWidget *plot, QMap<QString, QString> 
 	int chnlIdx = 0;
 	for(const QString &chnlId : chnls) {
 		QPen chPen = QPen(QColor(StyleHelper::getColor("CH" + QString::number(chnlIdx))), 1);
-		PlotChannel *plotCh =
-			new PlotChannel(chnls.key(chnlId), chPen, plot, plot->xAxis(), plot->yAxis(), this);
+		PlotChannel *plotCh = new PlotChannel(chnls.key(chnlId), chPen, plot->xAxis(), plot->yAxis(), this);
+		plot->addPlotChannel(plotCh);
 		plotCh->setEnabled(true);
 		plotCh->curve()->setRawSamples(m_xTime.data(), m_yValues[chnlId].data(), m_xTime.size());
 		chnlIdx++;

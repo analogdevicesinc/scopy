@@ -4,7 +4,6 @@
 #include <iio-widgets/iiowidgetfactory.h>
 #include "grdeviceaddon.h"
 #include "errorbox.h"
-#include "plottracker.hpp"
 
 #include <QComboBox>
 #include <QDebug>
@@ -55,7 +54,7 @@ GRTimeChannelAddon::GRTimeChannelAddon(QString ch, GRDeviceAddon *dev, GRTimePlo
 	auto plot = plotAddon->plot();
 
 	m_plotAxis = new PlotAxis(yPlotAxisPosition, plot, pen, this);
-	m_plotCh = new PlotChannel(m_channelName, pen, plot, plot->xAxis(), m_plotAxis, this);
+	m_plotCh = new PlotChannel(m_channelName, pen, plot->xAxis(), m_plotAxis, this);
 	m_plotAxisHandle = new PlotAxisHandle(pen, m_plotAxis, plot, yPlotAxisHandle, this);
 	m_plotCh->setHandle(m_plotAxisHandle);
 	plot->addPlotAxisHandle(m_plotAxisHandle);
@@ -343,7 +342,7 @@ ImportChannelAddon::ImportChannelAddon(QString name, PlotAddon *plotAddon, QPen 
 	;
 
 	m_plotAxis = new PlotAxis(yPlotAxisPosition, plot, pen, this);
-	m_plotCh = new PlotChannel(m_channelName, pen, plot, plot->xAxis(), m_plotAxis, this);
+	m_plotCh = new PlotChannel(m_channelName, pen, plot->xAxis(), m_plotAxis, this);
 	m_plotAxisHandle = new PlotAxisHandle(pen, m_plotAxis, plot, yPlotAxisHandle, this);
 	m_plotCh->setHandle(m_plotAxisHandle);
 	plot->addPlotAxisHandle(m_plotAxisHandle);
