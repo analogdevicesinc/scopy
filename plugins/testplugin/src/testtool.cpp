@@ -95,7 +95,8 @@ TestTool::TestTool(QWidget *parent)
 
 	QPen ch1pen = QPen(QColor(StyleHelper::getColor("CH1")), 1);
 	auto *ch1PlotAxis = new PlotAxis(QwtAxis::YLeft, plot, ch1pen);
-	PlotChannel *ch1_plotch = new PlotChannel("Channel1", ch1pen, plot, plot->xAxis(), ch1PlotAxis, this);
+	PlotChannel *ch1_plotch = new PlotChannel("Channel1", ch1pen, plot->xAxis(), ch1PlotAxis, this);
+	plot->addPlotChannel(ch1_plotch);
 	ch1_plotch->setHandle(new PlotAxisHandle(ch1pen, ch1PlotAxis, plot, QwtAxis::YLeft, this));
 	plot->addPlotAxisHandle(ch1_plotch->handle());
 
@@ -112,7 +113,8 @@ TestTool::TestTool(QWidget *parent)
 
 	QPen ch2pen = QPen(QColor(StyleHelper::getColor("CH2")), 1);
 	auto *ch2PlotAxis = new PlotAxis(QwtAxis::YLeft, plot, ch2pen);
-	PlotChannel *ch2_plotch = new PlotChannel("Channel2", ch2pen, plot, plot->xAxis(), ch2PlotAxis, this);
+	PlotChannel *ch2_plotch = new PlotChannel("Channel2", ch2pen, plot->xAxis(), ch2PlotAxis, this);
+	plot->addPlotChannel(ch2_plotch);
 	ch2_plotch->setHandle(new PlotAxisHandle(ch2pen, ch2PlotAxis, plot, QwtAxis::YRight, this));
 	plot->addPlotAxisHandle(ch2_plotch->handle());
 	connect(ch2->checkBox(), &QCheckBox::toggled, ch2_plotch, &PlotChannel::setEnabled);

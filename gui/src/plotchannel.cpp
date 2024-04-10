@@ -1,16 +1,11 @@
 #include "plotchannel.h"
-
 #include "plotaxis.h"
-#include "plotwidget.h"
-
 #include <QPen>
 
 using namespace scopy;
 
-PlotChannel::PlotChannel(QString name, QPen pen, PlotWidget *plot, PlotAxis *xAxis, PlotAxis *yAxis, QObject *parent)
+PlotChannel::PlotChannel(QString name, QPen pen, PlotAxis *xAxis, PlotAxis *yAxis, QObject *parent)
 	: QObject(parent)
-	, m_plotWidget(plot)
-	, m_plot(m_plotWidget->plot())
 	, m_xAxis(xAxis)
 	, m_yAxis(yAxis)
 	, m_handle(nullptr)
@@ -38,7 +33,7 @@ QwtPlotCurve *PlotChannel::curve() const { return m_curve; }
 void PlotChannel::setEnabled(bool b)
 {
 	if(b)
-		m_curve->attach(m_plot);
+		Q_EMIT attachCurve(m_curve);
 	else
 		m_curve->detach();
 }
@@ -52,7 +47,7 @@ void PlotChannel::setThickness(int thickness)
 	QPen pen = m_curve->pen();
 	pen.setWidthF(thickness);
 	m_curve->setPen(pen);
-	m_plot->replot();
+	Q_EMIT doReplot();
 }
 
 void PlotChannel::setStyle(int style)
@@ -83,7 +78,7 @@ void PlotChannel::setStyle(int style)
 		m_curve->setStyle(QwtPlotCurve::Lines);
 		break;
 	}
-	m_plot->replot();
+	Q_EMIT doReplot();
 }
 
 QString PlotChannel::name() const { return m_name; }
@@ -108,7 +103,7 @@ QwtPlotMarker *PlotChannel::buildMarker(QString str, QwtSymbol::Style shape, dou
 
 	m->setXValue(x);
 	m->setYValue(y);
-	m->attach(m_plot);
+	Q_EMIT attachCurve(m_curve);
 	return m;
 }
 
@@ -143,7 +138,7 @@ void PlotChannel::raise()
 	}
 }
 
-void PlotChannel::attach() { m_curve->attach(m_plot); }
+void PlotChannel::attach() { Q_EMIT attachCurve(m_curve); }
 
 void PlotChannel::detach() { m_curve->detach(); }
 

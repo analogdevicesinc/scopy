@@ -26,8 +26,7 @@ public:
 		PCS_SMOOTH
 	} PlotCurveStyle;
 
-	PlotChannel(QString name, QPen pen, PlotWidget *plot, PlotAxis *xAxis, PlotAxis *yAxis,
-		    QObject *parent = nullptr);
+	PlotChannel(QString name, QPen pen, PlotAxis *xAxis, PlotAxis *yAxis, QObject *parent = nullptr);
 	~PlotChannel();
 
 	QwtPlotCurve *curve() const;
@@ -56,14 +55,16 @@ public Q_SLOTS:
 	void setThickness(int);
 	void setStyle(int);
 
+Q_SIGNALS:
+	void attachCurve(QwtPlotCurve *curve);
+	void doReplot();
+
 private:
 	PlotAxis *m_xAxis, *m_yAxis;
 	PlotAxisHandle *m_handle;
 	QwtPlotCurve *m_curve;
 	QList<QwtPlotMarker *> m_markers;
 	QwtSymbol *symbol;
-	PlotWidget *m_plotWidget;
-	QwtPlot *m_plot;
 	QPen m_pen;
 	float *m_data;
 	QString m_name;
