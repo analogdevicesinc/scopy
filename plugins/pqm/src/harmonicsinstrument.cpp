@@ -122,8 +122,8 @@ void HarmonicsInstrument::setupPlotChannels()
 	bool first = true;
 	for(const QString &ch : m_chnls) {
 		QPen chPen = QPen(QColor(StyleHelper::getColor("CH" + QString::number(chNumber))), 1);
-		PlotChannel *plotCh =
-			new PlotChannel(m_chnls.key(ch), chPen, m_plot, m_plot->xAxis(), m_plot->yAxis(), this);
+		PlotChannel *plotCh = new PlotChannel(m_chnls.key(ch), chPen, m_plot->xAxis(), m_plot->yAxis(), this);
+		m_plot->addPlotChannel(plotCh);
 		plotCh->setStyle(PlotChannel::PCS_STICKS);
 		plotCh->setThickness(10);
 		plotCh->curve()->setRawSamples(m_xTime.data(), m_yValues[ch].data(), m_xTime.size());
