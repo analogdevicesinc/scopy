@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/datamonitor">
+        <file>tutorial_chapters.json</file>
+    </qresource>
+</RCC>
