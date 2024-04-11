@@ -1,0 +1,71 @@
+{
+	"datamonitor": [
+		{
+			"index": 1,
+			"names": ["ADD_BUTTON"],
+			"description": "Creates a new tool",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 2,
+			"names": ["RUN_BUTTON"],
+			"description": "Starts data collection",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 3,
+			"names": ["CLEAR_BUTTON"],
+			"description": "Deletes all recorded data of active monitors",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 4,
+			"names": ["SETTINGS_BUTTON"],
+			"description": "Settings",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10,
+			"x_offset": -60
+		},
+		{
+			"index": 5,
+			"names": ["MONITORS_MENU_BUTTON"],
+			"description": "Show available devices and channels",
+			"anchor": "HP_TOP",
+			"content": "HP_TOP",
+			"y_offset": 10
+		},
+		{
+			"index": 6,
+			"names": ["SHOW_PLOT_BUTTON"],
+			"description": "Display values on plot ",
+			"anchor": "HP_TOP",
+			"content": "HP_TOP",
+			"y_offset": 10
+		},
+		{
+			"index": 7,
+			"names": ["SHOW_TEXT_BUTTON"],
+			"description": "Display last recorded values as text",
+			"anchor": "HP_TOP",
+			"content": "HP_TOP",
+			"y_offset": 10
+		},
+		{
+			"index": 8,
+			"names": ["SHOW_7SEG_BUTTON"],
+			"description": "Display last recorded values on 7 segment displaies showing min and max values",
+			"anchor": "HP_TOP",
+			"content": "HP_TOP",
+			"y_offset": 10,
+			"x_offset": -60
+		}
+
+	]
+}

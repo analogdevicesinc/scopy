@@ -19,6 +19,8 @@ Q_DECLARE_LOGGING_CATEGORY(CAT_DATAMONITOR_TOOL);
 
 namespace scopy::datamonitor {
 
+class SevenSegmentDisplay;
+
 class DataMonitorSettings;
 class SCOPY_DATAMONITORPLUGIN_EXPORT DatamonitorTool : public QWidget
 {
@@ -50,11 +52,19 @@ private:
 	bool first = true;
 	void resetStartTime();
 
-	QTextEdit *textMonitors;
-
 	MonitorPlot *m_monitorPlot;
+	QTextEdit *textMonitors;
+	SevenSegmentDisplay *sevenSegmetMonitors;
+
+	MenuControlButton *showPlot;
+	MenuControlButton *showText;
+	MenuControlButton *showSegments;
+
 	DataMonitorSettings *m_dataMonitorSettings;
 	MonitorSelectionMenu *m_monitorSelectionMenu;
+
+	void initTutorialProperties();
+	void startTutorial();
 };
 } // namespace scopy::datamonitor
 #endif // DATAMONITORTOOL_H

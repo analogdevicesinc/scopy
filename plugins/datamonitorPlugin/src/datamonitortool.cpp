@@ -7,6 +7,7 @@
 #include <menucontrolbutton.h>
 #include <sevensegmentdisplay.hpp>
 #include <timemanager.hpp>
+#include <tutorialbuilder.h>
 #include "datamonitorstylehelper.hpp"
 #include <iioutil/connection.h>
 
@@ -40,6 +41,8 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	printBtn = new PrintBtn(this);
 	runBtn = new RunBtn(this);
 	clearBtn = new QPushButton("Clear", this);
+
+	connect(infoBtn, &QPushButton::clicked, this, &DatamonitorTool::startTutorial);
 
 	//// add monitors
 	addMonitorButton = new AddBtn(this);
@@ -119,7 +122,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 
 	//////// 7 segment widget ////
 
-	SevenSegmentDisplay *sevenSegmetMonitors = new SevenSegmentDisplay(this);
+	sevenSegmetMonitors = new SevenSegmentDisplay(this);
 	centralWidget->addWidget(sevenSegmetMonitors);
 
 	////////////////////////settings //////////////
@@ -148,7 +151,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	QButtonGroup *centralWidgetButtons = new QButtonGroup(this);
 	centralWidgetButtons->setExclusive(true);
 
-	MenuControlButton *showPlot = new MenuControlButton(this);
+	showPlot = new MenuControlButton(this);
 	showPlot->setName("Plot");
 	showPlot->setOpenMenuChecksThis(true);
 	showPlot->setDoubleClickToOpenMenu(true);
@@ -158,7 +161,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 
 	connect(showPlot, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(m_monitorPlot); });
 
-	MenuControlButton *showText = new MenuControlButton(this);
+	showText = new MenuControlButton(this);
 	showText->setName("Text");
 	showText->setOpenMenuChecksThis(true);
 	showText->setDoubleClickToOpenMenu(true);
@@ -166,7 +169,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	showText->button()->setVisible(false);
 	connect(showText, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(textMonitors); });
 
-	MenuControlButton *showSegments = new MenuControlButton(this);
+	showSegments = new MenuControlButton(this);
 	showSegments->setName("7 Segment");
 	showSegments->setOpenMenuChecksThis(true);
 	showSegments->setDoubleClickToOpenMenu(true);
@@ -244,6 +247,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	connect(m_monitorSelectionMenu, &MonitorSelectionMenu::requestRemoveImportedDevice, m_dataAcquisitionManager,
 		&DataAcquisitionManager::removeDevice);
 
+	initTutorialProperties();
 	DataMonitorStyleHelper::DataMonitorToolStyle(this);
 }
 
@@ -256,4 +260,25 @@ void DatamonitorTool::resetStartTime()
 	auto &&timeTracker = TimeManager::GetInstance();
 	timeTracker->setStartTime();
 	m_monitorPlot->setStartTime();
+}
+
+void DatamonitorTool::initTutorialProperties()
+{
+	runBtn->setProperty("tutorial_name", "RUN_BUTTON");
+	clearBtn->setProperty("tutorial_name", "CLEAR_BUTTON");
+	addMonitorButton->setProperty("tutorial_name", "ADD_BUTTON");
+	showPlot->setProperty("tutorial_name", "SHOW_PLOT_BUTTON");
+	showText->setProperty("tutorial_name", "SHOW_TEXT_BUTTON");
+	showSegments->setProperty("tutorial_name", "SHOW_7SEG_BUTTON");
+	settingsButton->setProperty("tutorial_name", "SETTINGS_BUTTON");
+	monitorsButton->setProperty("tutorial_name", "MONITORS_MENU_BUTTON");
+}
+
+void DatamonitorTool::startTutorial()
+{
+	QWidget *parent = Util::findContainingWindow(this);
+	gui::TutorialBuilder *datamonitorTutorial =
+		new gui::TutorialBuilder(this, ":/datamonitor/tutorial_chapters.json", "datamonitor", parent);
+	datamonitorTutorial->setTitle("Tutorial");
+	datamonitorTutorial->start();
 }
