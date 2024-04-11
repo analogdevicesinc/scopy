@@ -29,7 +29,9 @@ WatchListEntry::WatchListEntry(IIOStandardItem *item, QObject *parent)
 		IIOWidget *widget = widgets[0];
 		setupWidget(widget);
 	} else {
-		m_valueUi = new QLabel("N/A");
+		QLabel *label = new QLabel("N/A");
+		label->setContentsMargins(3, 0, 3, 0);
+		m_valueUi = label;
 	}
 }
 
@@ -76,6 +78,12 @@ void WatchListEntry::setupWidget(IIOWidget *widget)
 	// if you can cast the uiStrategy to combo, this value ui will be a combo, otherwise it will be a lineedit
 	AttrUiStrategyInterface *ui = dynamic_cast<ComboAttrUi *>(widget->getUiStrategy());
 	if(ui) {
+		// https://forum.qt.io/topic/139728/can-t-set-qcombobox-qslider-margins
+		// QFrame because QWidget does not have the paintEvent implemented
+		QFrame *wrapper = new QFrame();
+		wrapper->setLayout(new QVBoxLayout(wrapper));
+		wrapper->layout()->setContentsMargins(3, 0, 3, 0);
+
 		m_combo = new QComboBox();
 		// TODO: maybe move these to the stylehelper as well?
 		m_combo->setStyleSheet(R"css(
@@ -85,13 +93,15 @@ void WatchListEntry::setupWidget(IIOWidget *widget)
 			background-color: transparent;
 			font-size: 13px;
 		})css");
+		wrapper->layout()->addWidget(m_combo);
+
 		QString options = widget->getDataStrategy()->optionalData();
 		QStringList list = options.split(" ", Qt::SkipEmptyParts);
 		m_combo->addItems(widget->getDataStrategy()->optionalData().split(" ", Qt::SkipEmptyParts));
 		m_combo->setCurrentText(widget->getDataStrategy()->data());
 		QObject::connect(m_combo, &QComboBox::currentTextChanged, this,
 				 [this, widget, options](QString text) { widget->getDataStrategy()->save(text); });
-		m_valueUi = m_combo;
+		m_valueUi = wrapper;
 	} else {
 		m_lineedit = new QLineEdit();
 		m_lineedit->setStyleSheet(R"css(

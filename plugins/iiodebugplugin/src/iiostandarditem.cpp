@@ -214,16 +214,16 @@ void IIOStandardItem::extractDataFromDevice()
 	bool is_trigger = iio_device_is_trigger(m_device);
 	m_details.append((is_trigger) ? "This device is trigger." : "This device is NOT trigger.");
 
-	const struct iio_device **trig;
-	int ret = iio_device_get_trigger(m_device, trig);
+	const struct iio_device *trig;
+	int ret = iio_device_get_trigger(m_device, &trig);
 	if(ret == 0) {
-		m_triggerName = iio_device_get_name(*trig);
-		m_triggerStatus = QString("Current trigger: %1(%2)").arg(iio_device_get_id(*trig)).arg(m_triggerName);
+		m_triggerName = iio_device_get_name(trig);
+		m_triggerStatus = QString("Current trigger: %1(%2)").arg(iio_device_get_id(trig)).arg(m_triggerName);
 	} else if(ret == -ENODEV) {
 		m_triggerStatus = "No trigger assigned on this device";
 	} else if(ret == -ENOENT) {
 		m_triggerStatus = "No trigger on this device";
-	} else if(ret < 0) {
+	} else {
 		m_triggerStatus = "Unable to get trigger";
 	}
 	m_details.append(m_triggerStatus + ".");
