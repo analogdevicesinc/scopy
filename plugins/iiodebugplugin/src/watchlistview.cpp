@@ -67,6 +67,7 @@ void WatchListView::connectSignalsAndSlots()
 		Q_EMIT selectedItem(item);
 	});
 
+	// this lambda is responsible for modifying the column offsets
 	QObject::connect(horizontalHeader(), &QHeaderView::sectionResized, this,
 			 [this](int logicalIndex, int oldSize, int newSize) {
 				 int originalSize = width() / DIVISION_REGION;

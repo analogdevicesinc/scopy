@@ -47,16 +47,6 @@ public:
 	{}
 	~IIODebugPlugin_API(){};
 	IIODebugPlugin *p;
-
-	Q_PROPERTY(QString debugTest READ debugTest WRITE setDebugTest NOTIFY debugTestChanged FINAL)
-	QString debugTest() const;
-	void setDebugTest(const QString &newDebugTest);
-
-Q_SIGNALS:
-	void debugTestChanged();
-
-private:
-	QString m_debugTest;
 };
 
 } // namespace scopy::iiodebugplugin
