@@ -76,7 +76,7 @@ TimePlotInfo::TimePlotInfo(PlotWidget *plot, QWidget *parent)
 	hdivhover->setContentPos(HoverPosition::HP_BOTTOMRIGHT);
 	hdivhover->setAnchorOffset(QPoint(8, 6));
 	hdivhover->show();
-	m_hdiv->setAttribute(Qt::WA_TransparentForMouseEvents);
+	hdivhover->setAttribute(Qt::WA_TransparentForMouseEvents);
 
 	HoverWidget *samplinginfohover = new HoverWidget(nullptr, plot->plot()->canvas(), plot->plot());
 	samplinginfohover->setContent(m_sampling);
