@@ -26,7 +26,7 @@ void DetailsView::setupUi()
 	setLayout(new QVBoxLayout(this));
 	layout()->setContentsMargins(0, 6, 0, 0);
 
-	m_titleContainer->setLayout(new QHBoxLayout(this));
+	m_titleContainer->setLayout(new QHBoxLayout(m_titleContainer));
 	m_titleContainer->layout()->setContentsMargins(0, 0, 0, 0);
 
 	m_titleLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -34,7 +34,7 @@ void DetailsView::setupUi()
 	m_titleLabel->setAlignment(Qt::AlignCenter);
 	m_titleLabel->setStyleSheet("font-size: 14pt");
 
-	m_readBtn->setFixedWidth(50);
+	m_readBtn->setMaximumWidth(90);
 	m_addToWatchlistBtn->setMaximumSize(25, 25);
 	m_addToWatchlistBtn->setDisabled(true);
 

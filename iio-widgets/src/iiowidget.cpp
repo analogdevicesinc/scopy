@@ -66,7 +66,7 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 	connect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), this, SLOT(storeReadInfo(QString, QString)));
 
 	connect(dynamic_cast<QWidget *>(m_dataStrategy), SIGNAL(sendData(QString, QString)), this,
-		SLOT(storeReadTimestamp(QString, QString)));
+		SLOT(storeReadInfo(QString, QString)));
 
 	m_dataStrategy->requestData();
 }
