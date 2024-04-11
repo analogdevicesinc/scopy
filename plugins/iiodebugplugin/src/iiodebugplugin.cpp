@@ -124,9 +124,3 @@ void IIODebugPlugin::initMetadata()
 	}
 )plugin");
 }
-
-// ----------------------------
-
-QString IIODebugPlugin_API::debugTest() const { return m_debugTest; }
-
-void IIODebugPlugin_API::setDebugTest(const QString &newDebugTest) { m_debugTest = "ajndjsadjba"; }
