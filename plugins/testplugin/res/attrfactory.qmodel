@@ -117,7 +117,7 @@
                           </DElement>
                          </base-DElement>
                          <object>{1c9987ae-2179-4156-9dee-022dd667158f}</object>
-                         <name>AttrUiStrategyInterface</name>
+                         <name>GuiStrategyInterface</name>
                          <pos>x:-610;y:950</pos>
                          <rect>x:-195;y:-75;w:390;h:150</rect>
                          <visual-role>5</visual-role>
@@ -1139,7 +1139,7 @@
                     <uid>{ab980556-499c-4303-a883-4f61cd7fcb14}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>IIOWidget(QString title, attr::AttrUiStrategyInterface *uiStrategy, attr::SaveStrategyInterface *saveStrategy, 		   attr::DataStrategyInterface *dataStrategy, QWidget *parent = nullptr)</declaration>
+                    <declaration>IIOWidget(QString title, attr::GuiStrategyInterface *uiStrategy, attr::SaveStrategyInterface *saveStrategy, 		   attr::DataStrategyInterface *dataStrategy, QWidget *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -1155,7 +1155,7 @@
                     <uid>{5037be51-da11-4a3b-a44e-7a4673869e33}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>attr::AttrUiStrategyInterface *getUiStrategy()</declaration>
+                    <declaration>attr::GuiStrategyInterface *getUiStrategy()</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -1179,7 +1179,7 @@
                     <uid>{754ca53e-b5e4-49a1-9d86-06dd531369b6}</uid>
                     <visibility>2</visibility>
                     <type>1</type>
-                    <declaration>attr::AttrUiStrategyInterface *m_uiStrategy</declaration>
+                    <declaration>attr::GuiStrategyInterface *m_uiStrategy</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -1226,7 +1226,7 @@
                     <uid>{1c9987ae-2179-4156-9dee-022dd667158f}</uid>
                    </MElement>
                   </base-MElement>
-                  <name>AttrUiStrategyInterface</name>
+                  <name>GuiStrategyInterface</name>
                   <relations>
                    <handles>
                     <handles>

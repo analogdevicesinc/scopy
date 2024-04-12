@@ -172,7 +172,7 @@ QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForContext(struct iio_context 
 
 IIOWidget *IIOWidgetFactory::buildSingle(uint32_t hint, IIOWidgetFactoryRecipe recipe, QWidget *parent)
 {
-	AttrUiStrategyInterface *uiStrategy = nullptr;
+	GuiStrategyInterface *uiStrategy = nullptr;
 	DataStrategyInterface *dataStrategy = nullptr;
 	IIOWidget *attrWidget = nullptr;
 

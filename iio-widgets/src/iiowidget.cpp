@@ -25,7 +25,7 @@ using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_IIOWIDGET, "iioWidget")
 
-IIOWidget::IIOWidget(AttrUiStrategyInterface *uiStrategy, DataStrategyInterface *dataStrategy, QWidget *parent)
+IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *dataStrategy, QWidget *parent)
 	: QWidget(parent)
 	, m_uiStrategy(uiStrategy)
 	, m_dataStrategy(dataStrategy)
@@ -104,7 +104,7 @@ void IIOWidget::emitDataStatus(int status)
 	timer->start(4000);
 }
 
-AttrUiStrategyInterface *IIOWidget::getUiStrategy() { return m_uiStrategy; }
+GuiStrategyInterface *IIOWidget::getUiStrategy() { return m_uiStrategy; }
 
 DataStrategyInterface *IIOWidget::getDataStrategy() { return m_dataStrategy; }
 
