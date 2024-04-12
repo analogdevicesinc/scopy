@@ -14,6 +14,7 @@
 #include <QtConcurrent>
 
 #include <gui/oscilloscope_plot.hpp>
+#include <gui/widgets/plotbufferpreviewer.h>
 #include <plotwidget.h>
 #include <gnuradio/blocks/stream_to_vector.h>
 #include <gnuradio/fft/fft_v.h>
@@ -139,6 +140,7 @@ private:
 
 	GRTimeChannelAddon *m_fft_source[2];
 
+	PlotBufferPreviewer *m_bufferPreviewer;
 	TimePlotInfo *m_info;
 	time_sink_f::sptr time_sink;
 	//	fft_sink_f::sptr fft_sink;
@@ -177,6 +179,7 @@ private:
 	void updateXAxis();
 	void updateFrameRate();
 	void drawTags();
+	QWidget *createPlotInfoSlot(QWidget *parent);
 };
 } // namespace grutil
 } // namespace scopy
