@@ -6,7 +6,6 @@
 #include <cursorcontroller.h>
 #include <datamonitorutils.hpp>
 #include <monitorplotcurve.hpp>
-#include <plotinfo.h>
 #include <timemanager.hpp>
 
 #include <pluginbase/preferences.h>
@@ -34,9 +33,9 @@ MonitorPlot::MonitorPlot(QWidget *parent)
 
 	setupXAxis();
 
-	m_plotInfo = new TimePlotInfo(m_plot, this);
-
-	layout->addWidget(m_plotInfo);
+	AnalogBufferPreviewer *bufferPreviewer = new AnalogBufferPreviewer(this);
+	m_bufferPreviewer = new PlotBufferPreviewer(m_plot, bufferPreviewer, this);
+	layout->addWidget(m_bufferPreviewer);
 	layout->addWidget(m_plot);
 
 	m_monitorCurves = new QMap<QString, MonitorPlotCurve *>();
@@ -111,7 +110,7 @@ void MonitorPlot::updateXAxisIntervalMin(double min)
 {
 	m_xAxisIntervalMax = min;
 	refreshXAxisInterval();
-	m_plotInfo->updateBufferPreviewer();
+	m_bufferPreviewer->updateDataLimits();
 	m_plot->replot();
 }
 
@@ -119,7 +118,7 @@ void MonitorPlot::updateXAxisIntervalMax(double max)
 {
 	m_xAxisIntervalMin = max;
 	refreshXAxisInterval();
-	m_plotInfo->updateBufferPreviewer();
+	m_bufferPreviewer->updateDataLimits();
 	m_plot->replot();
 }
 
