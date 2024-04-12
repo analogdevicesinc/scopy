@@ -105,10 +105,13 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	m_plotWidget->xAxis()->setVisible(true);
 	//	m_plotWidget->topHandlesArea()->setVisible(true);
 
-	m_info = new TimePlotInfo(m_plotWidget, widget);
-	m_plotWidget->addPlotInfoSlot(m_info);
-	connect(m_plotWidget->navigator(), &PlotNavigator::rectChanged, this,
-		[=]() { m_info->update(m_currentSamplingInfo); });
+	QWidget *plotInfoSlot = createPlotInfoSlot(m_plotWidget);
+	m_plotWidget->addPlotInfoSlot(plotInfoSlot);
+
+	connect(m_plotWidget->navigator(), &PlotNavigator::rectChanged, this, [=]() {
+		m_info->update(m_currentSamplingInfo);
+		m_bufferPreviewer->updateDataLimits();
+	});
 
 	//	m_lay->addWidget(m_plotWidget);
 	m_plotTimer = new QTimer(this);
@@ -197,6 +200,22 @@ void GRTimePlotAddon::drawTags()
 			}
 		}
 	}
+}
+
+QWidget *GRTimePlotAddon::createPlotInfoSlot(QWidget *parent)
+{
+	QWidget *plotInfoSlot = new QWidget(parent);
+	QVBoxLayout *plotInfoLayout = new QVBoxLayout(plotInfoSlot);
+	plotInfoLayout->setSpacing(2);
+	plotInfoLayout->setMargin(4);
+	plotInfoSlot->setLayout(plotInfoLayout);
+
+	AnalogBufferPreviewer *bufferPreviewer = new AnalogBufferPreviewer(plotInfoSlot);
+	m_bufferPreviewer = new PlotBufferPreviewer(m_plotWidget, bufferPreviewer, plotInfoSlot);
+	m_info = new TimePlotInfo(m_plotWidget, plotInfoSlot);
+	plotInfoLayout->addWidget(m_bufferPreviewer);
+	plotInfoLayout->addWidget(m_info);
+	return plotInfoSlot;
 }
 
 void GRTimePlotAddon::drawPlot()
@@ -313,7 +332,7 @@ void GRTimePlotAddon::replot()
 #endif
 }
 
-void GRTimePlotAddon::updateBufferPreviewer() { m_info->updateBufferPreviewer(); }
+void GRTimePlotAddon::updateBufferPreviewer() { m_bufferPreviewer->updateBufferPreviewer(); }
 
 void GRTimePlotAddon::onInit()
 {
@@ -469,6 +488,7 @@ void GRTimePlotAddon::updateXAxis()
 	qInfo() << fft_xPlotAxis->min() << fft_xPlotAxis->max();
 
 	m_info->update(m_currentSamplingInfo);
+	m_bufferPreviewer->updateDataLimits();
 	Q_EMIT xAxisUpdated();
 }
 
