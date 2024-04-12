@@ -81,5 +81,8 @@ void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 	m_spinBox->getSpinBox()->setMaximum(max);
 	m_spinBox->getSpinBox()->setSingleStep(step);
 	m_spinBox->getSpinBox()->setValue(currentNum);
+
+	Q_EMIT displayedNewData(currentData, optionalData);
 }
-// #include "moc_rangeguistrategy.cpp"
+
+#include "moc_rangeguistrategy.cpp"
