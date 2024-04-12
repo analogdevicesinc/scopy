@@ -365,7 +365,7 @@
                            <item>interface</item>
                           </qlist>
                          </stereotypes>
-                         <name>AttrUiStrategyInterface</name>
+                         <name>GuiStrategyInterface</name>
                          <pos>x:1135;y:1000</pos>
                          <rect>x:-20;y:-20;w:40;h:40</rect>
                          <visual-role>8</visual-role>
@@ -934,7 +934,7 @@
                     <uid>{cb209626-cea5-4435-9eb9-b967d485e566}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>IIOWidget(AttrUiStrategyInterface *uiStrategy, DataStrategyInterface *dataStrategy, QWidget *parent = nullptr)</declaration>
+                    <declaration>IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *dataStrategy, QWidget *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -942,7 +942,7 @@
                     <uid>{cfd8f1f0-d2a0-43a8-a374-42af845bc7c5}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>AttrUiStrategyInterface *getUiStrategy()</declaration>
+                    <declaration>GuiStrategyInterface *getUiStrategy()</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -1014,7 +1014,7 @@
                     <uid>{2cdbae79-028f-4acc-8ea7-83abd9f0b735}</uid>
                     <visibility>2</visibility>
                     <type>1</type>
-                    <declaration>AttrUiStrategyInterface *m_uiStrategy</declaration>
+                    <declaration>GuiStrategyInterface *m_uiStrategy</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -1778,7 +1778,7 @@
                     </stereotypes>
                    </MElement>
                   </base-MElement>
-                  <name>AttrUiStrategyInterface</name>
+                  <name>GuiStrategyInterface</name>
                   <relations>
                    <handles>
                     <handles>
@@ -1819,7 +1819,7 @@
                     <uid>{35b3d02d-42f5-4bb0-bc78-e260ac466af9}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>~AttrUiStrategyInterface()</declaration>
+                    <declaration>~GuiStrategyInterface()</declaration>
                    </MClassMember>
                   </item>
                   <item>

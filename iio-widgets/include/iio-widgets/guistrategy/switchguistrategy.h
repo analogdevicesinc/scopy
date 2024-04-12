@@ -29,10 +29,10 @@
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy {
-class SCOPY_IIO_WIDGETS_EXPORT SwitchAttrUi : public QWidget, public AttrUiStrategyInterface
+class SCOPY_IIO_WIDGETS_EXPORT SwitchAttrUi : public QWidget, public GuiStrategyInterface
 {
 	Q_OBJECT
-	Q_INTERFACES(scopy::AttrUiStrategyInterface)
+	Q_INTERFACES(scopy::GuiStrategyInterface)
 public:
 	/**
 	 * @brief This contain a CustomSwitch capable of holding no more than 2 values, the ones specified in
@@ -42,7 +42,7 @@ public:
 	~SwitchAttrUi();
 
 	/**
-	 * @overload AttrUiStrategyInterface::ui()
+	 * @overload GuiStrategyInterface::ui()
 	 * */
 	QWidget *ui() override;
 
