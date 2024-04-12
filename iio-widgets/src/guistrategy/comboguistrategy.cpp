@@ -64,6 +64,7 @@ void ComboAttrUi::receiveData(QString currentData, QString optionalData)
 	}
 
 	m_comboWidget->combo()->setCurrentText(currentData);
+	Q_EMIT displayedNewData(currentData, optionalData);
 }
 
 #include "moc_comboguistrategy.cpp"

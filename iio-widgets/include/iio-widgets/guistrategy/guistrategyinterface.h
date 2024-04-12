@@ -58,13 +58,23 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	/**
+	 * @brief This signal is emitted when the ui strategy receives new data from external sources,
+	 * not from the user.
+	 * @param data The data that will be displayed.
+	 * @param optionalData The data options, if available. Empty string if the parameter is not
+	 * necessary in this case.
+	 * */
+	virtual void displayedNewData(QString data, QString optionalData) = 0;
+
+	/**
 	 * @brief This will be the signal that the user changed the data, it should be caught by an external function
 	 * and set accordingly.
-	 * @warning Do not override this.
 	 * */
 	virtual void emitData(QString data) = 0;
 
-	// sends a request to the data handler to be able to complete the display
+	/**
+	 * @brief Sends a request to the data handler to be able to complete the display
+	 * */
 	virtual void requestData() = 0;
 
 protected:

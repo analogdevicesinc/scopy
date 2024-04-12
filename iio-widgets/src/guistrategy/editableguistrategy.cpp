@@ -66,6 +66,7 @@ void EditableGuiStrategy::receiveData(QString currentData, QString optionalData)
 	QSignalBlocker blocker(m_lineEdit);
 	m_lastEmittedText = currentData;
 	m_lineEdit->edit()->setText(currentData);
+	Q_EMIT displayedNewData(currentData, optionalData);
 }
 
 #include "moc_editableguistrategy.cpp"

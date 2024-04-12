@@ -54,6 +54,7 @@ public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
 
 Q_SIGNALS:
+	void displayedNewData(QString data, QString optionalData) override;
 	void emitData(QString data) override;
 	void requestData() override;
 
