@@ -9,11 +9,11 @@
 #include <QwtDateScaleDraw>
 #include <QwtDateScaleEngine>
 #include <QTimer>
+#include <plotbufferpreviewer.h>
 #include "scopy-datamonitorplugin_export.h"
 
 namespace scopy {
 
-class TimePlotInfo;
 namespace datamonitor {
 
 class MonitorPlotCurve;
@@ -51,7 +51,6 @@ public:
 
 private:
 	PlotWidget *m_plot;
-	TimePlotInfo *m_plotInfo;
 	QMap<QString, MonitorPlotCurve *> *m_monitorCurves = nullptr;
 	bool m_firstMonitor = true;
 
@@ -69,6 +68,8 @@ private:
 	void refreshXAxisInterval();
 	double m_xAxisIntervalMin;
 	double m_xAxisIntervalMax;
+
+	PlotBufferPreviewer *m_bufferPreviewer;
 };
 } // namespace datamonitor
 } // namespace scopy
