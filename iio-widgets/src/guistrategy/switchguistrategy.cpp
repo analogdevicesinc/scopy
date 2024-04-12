@@ -78,6 +78,8 @@ void SwitchAttrUi::receiveData(QString currentData, QString optionalData)
 	} else {
 		m_menuBigSwitch->setChecked(false);
 	}
+
+	Q_EMIT displayedNewData(currentData, optionalData);
 }
 
 #include "moc_switchguistrategy.cpp"

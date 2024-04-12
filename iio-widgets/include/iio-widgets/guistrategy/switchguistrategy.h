@@ -52,8 +52,9 @@ public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
 
 Q_SIGNALS:
-	void emitData(QString data);
-	void requestData();
+	void displayedNewData(QString data, QString optionalData) override;
+	void emitData(QString data) override;
+	void requestData() override;
 
 private:
 	QWidget *m_ui;
