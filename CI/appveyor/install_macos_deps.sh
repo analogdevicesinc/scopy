@@ -2,12 +2,12 @@
 
 set -xe
 
-LIBIIO_VERSION=0ed18cd8f6b2fac5204a99e38922bea73f1f778c
-LIBAD9361_BRANCH=master
-LIBM2K_BRANCH=master
+LIBIIO_VERSION=v0.25
+LIBAD9361_BRANCH=main
+LIBM2K_BRANCH=main
 GNURADIO_BRANCH=maint-3.10
 GRSCOPY_BRANCH=3.10
-GRM2K_BRANCH=master
+GRM2K_BRANCH=main
 QWT_BRANCH=qwt-multiaxes
 LIBSIGROKDECODE_BRANCH=master
 LIBTINYIIOD_BRANCH=master
@@ -20,16 +20,22 @@ REPO_SRC=$BUILD_REPOSITORY_LOCALPATH
 WORKDIR=${PWD}
 JOBS=4
 
-brew update
-brew upgrade
-brew search ${QT_FORMULAE}
-brew install $PACKAGES
+# Workaround: Homebrew fails to upgrade Python's 2to3 due to conflicting symlinks  https://github.com/actions/runner-images/issues/6817
+rm /usr/local/bin/2to3 || true
+rm /usr/local/bin/idle3 || true
+rm /usr/local/bin/pydoc3 || true
+rm /usr/local/bin/python3 || true
+rm /usr/local/bin/python3-config || true
 
+brew update
+brew upgrade || true #ignore homebrew upgrade errors
+brew search ${QT_FORMULAE}
+brew install --display-times $PACKAGES
 for pkg in gcc bison gettext cmake python; do
 	brew link --overwrite --force $pkg
 done
 
-pip3 install mako
+pip3 install --break-system-packages mako
 
 # Generate build status info for the about page
 BUILD_STATUS_FILE=${REPO_SRC}/build-status
