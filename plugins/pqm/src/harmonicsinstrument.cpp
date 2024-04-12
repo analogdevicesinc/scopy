@@ -22,9 +22,6 @@ HarmonicsInstrument::HarmonicsInstrument(QWidget *parent)
 	ToolTemplate *tool = new ToolTemplate(this);
 	tool->topContainer()->setVisible(true);
 	tool->centralContainer()->setVisible(true);
-	tool->bottomContainer()->setVisible(true);
-	tool->rightContainer()->setVisible(true);
-	tool->openRightContainerHelper(false);
 	tool->topContainerMenuControl()->setVisible(false);
 	instrumentLayout->addWidget(tool);
 
@@ -113,15 +110,14 @@ void HarmonicsInstrument::initPlot()
 	m_plot->yAxis()->scaleDraw()->setFloatPrecision(2);
 	m_plot->yAxis()->scaleDraw()->setUnitType("%");
 	m_plot->yAxis()->setInterval(0, 100);
-	m_plot->setShowYAxisLabels(true);
-	m_plot->yAxis()->setVisible(true);
 
 	m_plot->xAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
 	m_plot->xAxis()->scaleDraw()->setFloatPrecision(0);
 	m_plot->xAxis()->scaleDraw()->setUnitType("");
 	m_plot->xAxis()->setInterval(0, HARMONICS_MAX_DEGREE);
+
+	m_plot->setShowYAxisLabels(true);
 	m_plot->setShowXAxisLabels(true);
-	m_plot->xAxis()->setVisible(true);
 	m_plot->replot();
 }
 
