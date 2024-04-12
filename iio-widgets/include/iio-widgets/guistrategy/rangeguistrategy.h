@@ -30,10 +30,10 @@
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy {
-class SCOPY_IIO_WIDGETS_EXPORT RangeAttrUi : public QWidget, public AttrUiStrategyInterface
+class SCOPY_IIO_WIDGETS_EXPORT RangeAttrUi : public QWidget, public GuiStrategyInterface
 {
 	Q_OBJECT
-	Q_INTERFACES(scopy::AttrUiStrategyInterface)
+	Q_INTERFACES(scopy::GuiStrategyInterface)
 public:
 	/**
 	 * @brief This contain a PositionSpinButton that takes the 3 values from recipe->linkedAttributeValue. The
@@ -44,7 +44,7 @@ public:
 	~RangeAttrUi();
 
 	/**
-	 * @overload AttrUiStrategyInterface::ui()
+	 * @overload GuiStrategyInterface::ui()
 	 * */
 	QWidget *ui() override;
 

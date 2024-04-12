@@ -33,10 +33,10 @@
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy {
-class SCOPY_IIO_WIDGETS_EXPORT AttrUiStrategyInterface
+class SCOPY_IIO_WIDGETS_EXPORT GuiStrategyInterface
 {
 public:
-	~AttrUiStrategyInterface() = default;
+	~GuiStrategyInterface() = default;
 
 	/**
 	 * @brief This should implement the main method for displaying the value of an attribute and also editing data
@@ -82,5 +82,5 @@ protected:
 };
 } // namespace scopy
 
-Q_DECLARE_INTERFACE(scopy::AttrUiStrategyInterface, "scopy::AttrUiStrategyInterface")
+Q_DECLARE_INTERFACE(scopy::GuiStrategyInterface, "scopy::GuiStrategyInterface")
 #endif // SCOPY_GUISTRATEGYINTERFACE_H
