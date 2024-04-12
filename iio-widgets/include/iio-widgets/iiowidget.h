@@ -32,7 +32,7 @@
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy {
-class AttrUiStrategyInterface;
+class GuiStrategyInterface;
 class DataStrategyInterface;
 
 class SCOPY_IIO_WIDGETS_EXPORT IIOWidget : public QWidget
@@ -47,13 +47,13 @@ public:
 		Error
 	} State;
 
-	IIOWidget(AttrUiStrategyInterface *uiStrategy, DataStrategyInterface *dataStrategy, QWidget *parent = nullptr);
+	IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *dataStrategy, QWidget *parent = nullptr);
 
 	/**
 	 * @brief Returns the UI of the IIOWidget
-	 * @return AttrUiStrategyInterface
+	 * @return GuiStrategyInterface
 	 * */
-	AttrUiStrategyInterface *getUiStrategy();
+	GuiStrategyInterface *getUiStrategy();
 
 	/**
 	 * @brief Returns the data save/load strategy
@@ -106,7 +106,7 @@ protected:
 	void setLastOperationTimestamp(QDateTime timestamp);
 	void setLastOperationState(IIOWidget::State state);
 
-	AttrUiStrategyInterface *m_uiStrategy;
+	GuiStrategyInterface *m_uiStrategy;
 	DataStrategyInterface *m_dataStrategy;
 	IIOWidgetFactoryRecipe m_recipe;
 
