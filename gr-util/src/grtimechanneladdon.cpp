@@ -55,7 +55,19 @@ GRTimeChannelAddon::GRTimeChannelAddon(QString ch, GRDeviceAddon *dev, GRTimePlo
 
 	m_plotAxis = new PlotAxis(yPlotAxisPosition, plot, pen, this);
 	m_plotCh = new PlotChannel(m_channelName, pen, plot->xAxis(), m_plotAxis, this);
-	m_plotAxisHandle = new PlotAxisHandle(pen, m_plotAxis, plot, yPlotAxisHandle, this);
+
+	m_plotAxisHandle = new PlotAxisHandle(plot, m_plotAxis);
+	m_plotAxisHandle->handle()->setBarVisibility(BarVisibility::ON_HOVER);
+	m_plotAxisHandle->handle()->setColor(pen.color());
+	m_plotAxisHandle->handle()->setHandlePos(yPlotAxisHandle == QwtAxis::YLeft ? HandlePos::NORTH_WEST
+										   : HandlePos::SOUTH_EAST);
+	connect(m_plotAxisHandle, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
+		double min = m_plotAxis->min() - pos;
+		double max = m_plotAxis->max() - pos;
+		m_plotAxis->setInterval(min, max);
+		plot->plot()->replot();
+	});
+
 	m_plotCh->setHandle(m_plotAxisHandle);
 	plot->addPlotAxisHandle(m_plotAxisHandle);
 	plot->addPlotChannel(m_plotCh);
@@ -343,7 +355,19 @@ ImportChannelAddon::ImportChannelAddon(QString name, PlotAddon *plotAddon, QPen 
 
 	m_plotAxis = new PlotAxis(yPlotAxisPosition, plot, pen, this);
 	m_plotCh = new PlotChannel(m_channelName, pen, plot->xAxis(), m_plotAxis, this);
-	m_plotAxisHandle = new PlotAxisHandle(pen, m_plotAxis, plot, yPlotAxisHandle, this);
+
+	m_plotAxisHandle = new PlotAxisHandle(plot, m_plotAxis);
+	m_plotAxisHandle->handle()->setBarVisibility(BarVisibility::ON_HOVER);
+	m_plotAxisHandle->handle()->setColor(pen.color());
+	m_plotAxisHandle->handle()->setHandlePos(yPlotAxisHandle == QwtAxis::YLeft ? HandlePos::NORTH_WEST
+										   : HandlePos::SOUTH_EAST);
+	connect(m_plotAxisHandle, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
+		double min = m_plotAxis->min() - pos;
+		double max = m_plotAxis->max() - pos;
+		m_plotAxis->setInterval(min, max);
+		plot->plot()->replot();
+	});
+
 	m_plotCh->setHandle(m_plotAxisHandle);
 	plot->addPlotAxisHandle(m_plotAxisHandle);
 	plot->addPlotChannel(m_plotCh);

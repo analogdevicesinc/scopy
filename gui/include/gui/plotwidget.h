@@ -14,6 +14,7 @@
 #include <symbol_controller.h>
 
 namespace scopy {
+
 class PlotAxis;
 class PlotAxisHandle;
 class PlotNavigator;
@@ -56,12 +57,6 @@ public:
 	bool eventFilter(QObject *object, QEvent *event) override;
 
 	QwtPlot *plot() const;
-	SymbolController *symbolCtrl() const;
-
-	HorizHandlesArea *bottomHandlesArea() const;
-	HorizHandlesArea *topHandlesArea() const;
-	VertHandlesArea *rightHandlesArea() const;
-	VertHandlesArea *leftHandlesArea() const;
 
 	void addPlotAxisHandle(PlotAxisHandle *ax);
 	void removePlotAxisHandle(PlotAxisHandle *ax);
@@ -98,6 +93,7 @@ Q_SIGNALS:
 	void channelSelected(PlotChannel *ch);
 	void addedChannel(PlotChannel *ch);
 	void removedChannel(PlotChannel *ch);
+	void plotScaleChanged();
 
 private:
 	QwtPlot *m_plot;
@@ -125,21 +121,13 @@ private:
 	bool m_showXAxisLabels;
 	bool m_showYAxisLabels;
 
-	SymbolController *m_symbolCtrl;
 	PlotChannel *m_selectedChannel;
-
-	/* Adjacent areas */
-	HorizHandlesArea *m_bottomHandlesArea;
-	VertHandlesArea *m_rightHandlesArea;
-	HorizHandlesArea *m_topHandlesArea;
-	VertHandlesArea *m_leftHandlesArea;
 
 	BufferPreviewer *m_bufferPreviewer;
 
 	void setAxisScalesVisible(bool visible);
 	void setupAxisScales();
 	void setupOpenGLCanvas();
-	void setupHandlesArea();
 	void setupNavigator();
 	void hideDefaultAxis();
 };

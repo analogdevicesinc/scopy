@@ -1,66 +1,79 @@
 #include "plotaxishandle.h"
-
 #include "plotaxis.h"
-#include "symbol.h"
-#include "symbol_controller.h"
-
-#include <QDebug>
 
 using namespace scopy;
-PlotAxisHandle::PlotAxisHandle(QPen pen, PlotAxis *ax, PlotWidget *p, int position, QObject *parent)
-	: QObject(parent)
-	, m_plotWidget(p)
+
+PlotAxisHandle::PlotAxisHandle(PlotWidget *plot, PlotAxis *ax)
+	: QObject(plot)
+	, m_plotWidget(plot)
 	, m_axis(ax)
-	, m_pen(pen)
+	, m_plot(plot->plot())
 {
-	VertHandlesArea *area;
-	bool left = false;
-	if(position == QwtAxis::YLeft) {
-		area = p->leftHandlesArea();
-		left = true;
-	} else {
-		area = p->rightHandlesArea();
-	}
-
-	// QColor chnColor = color;
-	m_symbolCtrl = p->symbolCtrl();
-	/* Channel offset widget */
-	m_chOffsetBar = new HorizBar(p->plot());
-	m_symbolCtrl->attachSymbol(m_chOffsetBar);
-
-	m_chOffsetBar->setCanLeavePlot(true);
-	m_chOffsetBar->setVisible(false);
-	m_chOffsetBar->setMobileAxis(ax->axisId());
-	m_chOffsetBar->setPen(pen);
-
-	m_handle = new RoundedHandleV(
-		(left) ? QPixmap(":/gui/icons/handle_right_arrow.svg") : QPixmap(":/gui/icons/handle_left_arrow.svg"),
-		QPixmap(":/gui/icons/handle_up_arrow.svg"), QPixmap(":/gui/icons/handle_down_arrow.svg"), area, left);
-
-	m_handle->setRoundRectColor(m_pen.color());
-	m_handle->setPen(pen);
-	m_handle->setVisible(true);
-
-	/* When bar position changes due to plot resizes update the handle */
-	connect(area, &HandlesArea::sizeChanged, m_handle, [=]() { m_handle->updatePosition(); });
-
-	connect(m_chOffsetBar, &HorizBar::pixelPositionChanged, this,
-		[=](int pos) { m_handle->setPositionSilenty(pos); });
-
-	connect(m_handle, &RoundedHandleV::positionChanged, this, [=](int pos) {
-		QwtScaleMap yMap = p->plot()->canvasMap(ax->axisId());
-		double offset = yMap.invTransform(pos);
-		double min = ax->min() - offset;
-		double max = ax->max() - offset;
-		ax->setInterval(min, max);
-		p->replot();
-	});
+	init();
 }
 
 PlotAxisHandle::~PlotAxisHandle() {}
 
-RoundedHandleV *PlotAxisHandle::handle() const { return m_handle; }
+void PlotAxisHandle::init()
+{
+	m_handle = new AxisHandle(m_axis->axisId(), HandlePos::SOUTH_EAST, m_plot);
+	m_pos = pixelToScale(m_handle->getPos());
+
+	connect(m_plotWidget, &PlotWidget::canvasSizeChanged, this, &PlotAxisHandle::updatePos);
+	connect(m_plotWidget, &PlotWidget::plotScaleChanged, this, &PlotAxisHandle::updatePos);
+	connect(m_axis, &PlotAxis::axisScaleUpdated, this, &PlotAxisHandle::updatePos);
+
+	connect(this, &PlotAxisHandle::updatePos, this, [=]() {
+		if(scaleToPixel(m_pos) != m_handle->getPos()) {
+			setPositionSilent(m_pos);
+		}
+	});
+
+	connect(m_handle, &AxisHandle::pixelPosChanged, this, [=](int pos) {
+		if(pos != scaleToPixel(m_pos)) {
+			Q_EMIT scalePosChanged(pixelToScale(pos));
+			m_pos = pixelToScale(pos);
+		}
+	});
+}
+
+void PlotAxisHandle::setAxis(PlotAxis *axis)
+{
+	disconnect(m_axis, &PlotAxis::axisScaleUpdated, this, nullptr);
+	m_axis = axis;
+	connect(m_axis, &PlotAxis::axisScaleUpdated, this, &PlotAxisHandle::updatePos);
+	m_handle->setAxis(axis->axisId());
+	Q_EMIT updatePos();
+}
 
 PlotAxis *PlotAxisHandle::axis() const { return m_axis; }
+
+AxisHandle *PlotAxisHandle::handle() const { return m_handle; }
+
+double PlotAxisHandle::getPosition() const { return m_pos; }
+
+void PlotAxisHandle::setPosition(double pos)
+{
+	setPositionSilent(pos);
+	Q_EMIT scalePosChanged(pos);
+}
+
+void PlotAxisHandle::setPositionSilent(double pos)
+{
+	m_pos = pos;
+	m_handle->setPosSilent(scaleToPixel(pos));
+}
+
+double PlotAxisHandle::pixelToScale(int pos)
+{
+	QwtScaleMap map = m_plot->canvasMap(m_axis->axisId());
+	return map.invTransform(pos);
+}
+
+int PlotAxisHandle::scaleToPixel(double pos)
+{
+	QwtScaleMap map = m_plot->canvasMap(m_axis->axisId());
+	return map.transform(pos);
+}
 
 #include "moc_plotaxishandle.cpp"
