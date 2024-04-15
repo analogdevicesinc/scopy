@@ -1,3 +1,4 @@
+#include "plotaxis.h"
 #include <cursorcontroller.h>
 
 using namespace scopy;
@@ -63,30 +64,30 @@ void CursorController::connectSignals()
 	initSession();
 
 	// cursor movement
-	connect(v1Cursor, &Cursor::positionChanged, this, [=](double pos) {
+	connect(v1Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
 		if(vertLock) {
-			v2Cursor->setPosition(pos - vertLockGap);
+			v2Cursor->setPositionSilent(pos - vertLockGap);
 			plotCursorReadouts->setV2(v2Cursor->getPosition());
 		}
 		plotCursorReadouts->setV1(pos);
 	});
-	connect(v2Cursor, &Cursor::positionChanged, this, [=](double pos) {
+	connect(v2Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
 		if(vertLock) {
-			v1Cursor->setPosition(pos + vertLockGap);
+			v1Cursor->setPositionSilent(pos + vertLockGap);
 			plotCursorReadouts->setV1(v1Cursor->getPosition());
 		}
 		plotCursorReadouts->setV2(pos);
 	});
-	connect(h1Cursor, &Cursor::positionChanged, this, [=](double pos) {
+	connect(h1Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
 		if(horizLock) {
-			h2Cursor->setPosition(pos - horizLockGap);
+			h2Cursor->setPositionSilent(pos - horizLockGap);
 			plotCursorReadouts->setH2(h2Cursor->getPosition());
 		}
 		plotCursorReadouts->setH1(pos);
 	});
-	connect(h2Cursor, &Cursor::positionChanged, this, [=](double pos) {
+	connect(h2Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
 		if(horizLock) {
-			h1Cursor->setPosition(pos + horizLockGap);
+			h1Cursor->setPositionSilent(pos + horizLockGap);
 			plotCursorReadouts->setH1(h1Cursor->getPosition());
 		}
 		plotCursorReadouts->setH2(pos);
@@ -134,7 +135,7 @@ void CursorController::horizLockToggled(bool toggled)
 void CursorController::horizTrackToggled(bool toggled)
 {
 	horizTrack = toggled;
-	Q_EMIT plotCursors->enableTracking(horizTrack);
+	plotCursors->enableTracking(horizTrack);
 }
 
 void CursorController::vertEnToggled(bool toggled)

@@ -7,6 +7,7 @@
 #include <gui/widgets/menucontrolbutton.h>
 #include <gui/widgets/toolbuttons.h>
 #include <gui/widgets/verticalchannelmanager.h>
+#include <pluginbase/preferences.h>
 
 using namespace scopy;
 using namespace scopy::grutil;
@@ -73,8 +74,18 @@ AdcInstrument::AdcInstrument(PlotProxy *proxy, QWidget *parent)
 	MenuControlButton *cursor = new MenuControlButton(this);
 	setupCursorButtonHelper(cursor);
 
+	bool xCursorPos = Preferences::get("adc_plot_xcursor_position").toInt() == QwtAxis::XBottom;
+	bool yCursorPos = Preferences::get("adc_plot_ycursor_position").toInt() == QwtAxis::YLeft;
+
 	cursorController = new CursorController(plotAddon->plot(), this);
+	cursorController->getPlotCursors()->setHHandlePos(xCursorPos ? HandlePos::SOUTH_EAST : HandlePos::NORTH_WEST);
+	cursorController->getPlotCursors()->setVHandlePos(yCursorPos ? HandlePos::NORTH_WEST : HandlePos::SOUTH_EAST);
+
 	fftcursorController = new CursorController(plotAddon->fftplot(), this);
+	fftcursorController->getPlotCursors()->setHHandlePos(xCursorPos ? HandlePos::SOUTH_EAST
+									: HandlePos::NORTH_WEST);
+	fftcursorController->getPlotCursors()->setVHandlePos(yCursorPos ? HandlePos::NORTH_WEST
+									: HandlePos::SOUTH_EAST);
 	fftcursorController->getCursorSettings()->hide();
 
 	HoverWidget *hoverSettings = new HoverWidget(cursorController->getCursorSettings(), cursor, tool);

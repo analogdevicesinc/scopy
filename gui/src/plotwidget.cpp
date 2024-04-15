@@ -29,7 +29,9 @@ PlotWidget::PlotWidget(QWidget *parent)
 	m_selectedChannel = nullptr;
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_plot = new QwtPlot(this);
+	m_plot->canvas()->setContentsMargins(0, 0, 0, 0);
 	m_layout = new QGridLayout(this);
+	m_layout->addWidget(m_plot, 1, 0);
 	m_layout->setSpacing(0);
 	m_layout->setMargin(0);
 	setLayout(m_layout);
@@ -37,7 +39,6 @@ PlotWidget::PlotWidget(QWidget *parent)
 	QPen pen(QColor("#9E9E9F"));
 
 	setupOpenGLCanvas();
-	setupHandlesArea();
 
 	m_xPosition = Preferences::get("adc_plot_xaxis_label_position").toInt();
 	m_yPosition = Preferences::get("adc_plot_yaxis_label_position").toInt();
@@ -75,53 +76,19 @@ PlotWidget::PlotWidget(QWidget *parent)
 	m_plot->plotLayout()->setSpacing(0);
 
 	setupNavigator();
-}
 
-void PlotWidget::setupHandlesArea()
-{
-	m_symbolCtrl = new SymbolController(m_plot);
-
-	/* Adjacent areas */
-	m_bottomHandlesArea = new HorizHandlesArea(m_plot->canvas());
-	m_rightHandlesArea = new VertHandlesArea(m_plot->canvas());
-	m_topHandlesArea = new HorizHandlesArea(m_plot->canvas());
-	m_leftHandlesArea = new VertHandlesArea(m_plot->canvas());
-
-	m_leftHandlesArea->setMinimumWidth(40);
-	m_leftHandlesArea->setBottomPadding(0);
-	m_leftHandlesArea->setTopPadding(0); /// Why ?
-	m_leftHandlesArea->setVisible(false);
-
-	m_rightHandlesArea->setMinimumWidth(60);
-	m_rightHandlesArea->setBottomPadding(0);
-	m_rightHandlesArea->setTopPadding(0); /// Why ?
-	m_rightHandlesArea->setVisible(false);
-
-	m_bottomHandlesArea->setMinimumHeight(55);
-	m_bottomHandlesArea->setLeftPadding(0);
-	m_bottomHandlesArea->setRightPadding(0); /// Why ?
-	m_bottomHandlesArea->setVisible(false);
-
-	m_topHandlesArea->setMinimumHeight(55);
-	m_topHandlesArea->setLeftPadding(0);
-	m_topHandlesArea->setRightPadding(0); /// Why ?
-	m_topHandlesArea->setVisible(false);
-
-	//	m_layout->addWidget(m_bufferPreviewer,0,1);
-	m_layout->addWidget(m_bottomHandlesArea, 3, 1);
-	m_layout->addWidget(m_rightHandlesArea, 2, 2);
-	m_layout->addWidget(m_leftHandlesArea, 2, 0);
-	m_layout->addWidget(m_topHandlesArea, 1, 1);
-	m_layout->addWidget(m_plot, 2, 1);
+	m_plot->canvas()->installEventFilter(this);
 }
 
 void PlotWidget::setupNavigator()
 {
 	m_navigator = new PlotNavigator(this);
+	connect(m_navigator, &PlotNavigator::rectChanged, this, &PlotWidget::plotScaleChanged);
+
 	m_tracker = new PlotTracker(this);
 }
 
-void PlotWidget::addPlotInfoSlot(QWidget *w) { m_layout->addWidget(w, 0, 1); }
+void PlotWidget::addPlotInfoSlot(QWidget *w) { m_layout->addWidget(w, 0, 0); }
 
 PlotWidget::~PlotWidget() {}
 
@@ -251,18 +218,6 @@ bool PlotWidget::eventFilter(QObject *object, QEvent *event)
 			break;
 		}
 		case QEvent::Resize: {
-			//			updateHandleAreaPadding(d_labelsEnabled);
-
-			// force cursor handles to emit position changed
-			// when the plot canvas is being resized
-			//			d_hCursorHandle1->triggerMove();
-			//			d_hCursorHandle2->triggerMove();
-			//			d_vCursorHandle1->triggerMove();
-			//			d_vCursorHandle2->triggerMove();
-
-			/* update the size of the gates when the plot canvas is resized */
-			//			updateGateMargins();
-
 			Q_EMIT canvasSizeChanged();
 			break;
 		}
@@ -270,6 +225,7 @@ bool PlotWidget::eventFilter(QObject *object, QEvent *event)
 			break;
 		}
 	}
+
 	return QObject::eventFilter(object, event);
 }
 
@@ -342,15 +298,5 @@ void PlotWidget::setUnitsVisible(bool visible)
 }
 
 PlotChannel *PlotWidget::selectedChannel() const { return m_selectedChannel; }
-
-VertHandlesArea *PlotWidget::leftHandlesArea() const { return m_leftHandlesArea; }
-
-VertHandlesArea *PlotWidget::rightHandlesArea() const { return m_rightHandlesArea; }
-
-HorizHandlesArea *PlotWidget::topHandlesArea() const { return m_topHandlesArea; }
-
-HorizHandlesArea *PlotWidget::bottomHandlesArea() const { return m_bottomHandlesArea; }
-
-SymbolController *PlotWidget::symbolCtrl() const { return m_symbolCtrl; }
 
 #include "moc_plotwidget.cpp"
