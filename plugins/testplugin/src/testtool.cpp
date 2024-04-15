@@ -97,7 +97,9 @@ TestTool::TestTool(QWidget *parent)
 	auto *ch1PlotAxis = new PlotAxis(QwtAxis::YLeft, plot, ch1pen);
 	PlotChannel *ch1_plotch = new PlotChannel("Channel1", ch1pen, plot->xAxis(), ch1PlotAxis, this);
 	plot->addPlotChannel(ch1_plotch);
-	ch1_plotch->setHandle(new PlotAxisHandle(ch1pen, ch1PlotAxis, plot, QwtAxis::YLeft, this));
+	PlotAxisHandle *handle1 = new PlotAxisHandle(plot, ch1PlotAxis);
+	handle1->handle()->setColor(ch1pen.color());
+	ch1_plotch->setHandle(handle1);
 	plot->addPlotAxisHandle(ch1_plotch->handle());
 
 	connect(ch1->checkBox(), &QCheckBox::toggled, ch1_plotch, &PlotChannel::setEnabled);
@@ -115,7 +117,9 @@ TestTool::TestTool(QWidget *parent)
 	auto *ch2PlotAxis = new PlotAxis(QwtAxis::YLeft, plot, ch2pen);
 	PlotChannel *ch2_plotch = new PlotChannel("Channel2", ch2pen, plot->xAxis(), ch2PlotAxis, this);
 	plot->addPlotChannel(ch2_plotch);
-	ch2_plotch->setHandle(new PlotAxisHandle(ch2pen, ch2PlotAxis, plot, QwtAxis::YRight, this));
+	PlotAxisHandle *handle2 = new PlotAxisHandle(plot, ch2PlotAxis);
+	handle2->handle()->setColor(ch2pen.color());
+	ch2_plotch->setHandle(handle2);
 	plot->addPlotAxisHandle(ch2_plotch->handle());
 	connect(ch2->checkBox(), &QCheckBox::toggled, ch2_plotch, &PlotChannel::setEnabled);
 	connect(ch2->checkBox(), &QCheckBox::toggled, this, [=]() { plot->replot(); });
@@ -213,11 +217,6 @@ TestTool::TestTool(QWidget *parent)
 	hv->setAnchorOffset(QPoint(0, -10));
 	hv->setAnchorPos(HoverPosition::HP_TOPLEFT);
 	hv->setContentPos(HoverPosition::HP_TOPRIGHT);
-
-	plot->leftHandlesArea()->setVisible(true);
-	plot->rightHandlesArea()->setVisible(true);
-	plot->bottomHandlesArea()->setVisible(true);
-	plot->topHandlesArea()->setVisible(true);
 
 	connect(channels, &QAbstractButton::toggled, this, [=](bool b) {
 		qInfo() << "setVisible: " << b;

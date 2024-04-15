@@ -1,29 +1,45 @@
 #ifndef PLOTAXISHANDLE_H
 #define PLOTAXISHANDLE_H
-
-#include "plot_line_handle.h"
 #include "plotwidget.h"
 #include "scopy-gui_export.h"
-
-#include <QWidget>
+#include <axishandle.h>
+#include <QObject>
 
 namespace scopy {
+class AxisHandle;
+
 class SCOPY_GUI_EXPORT PlotAxisHandle : public QObject
 {
 	Q_OBJECT
 public:
-	PlotAxisHandle(QPen pen, PlotAxis *ax, PlotWidget *p, int position, QObject *parent = nullptr);
+	PlotAxisHandle(PlotWidget *plot, PlotAxis *ax);
 	~PlotAxisHandle();
-	RoundedHandleV *handle() const;
+
+	void setAxis(PlotAxis *axis);
 	PlotAxis *axis() const;
+	AxisHandle *handle() const;
+
+	double getPosition() const;
+	void setPosition(double pos);
+	void setPositionSilent(double pos);
+
+	double pixelToScale(int pos);
+	int scaleToPixel(double pos);
+
+Q_SIGNALS:
+	void scalePosChanged(double);
+	void updatePos();
+
+protected:
+	void init();
 
 private:
+	double m_pos;
 	PlotWidget *m_plotWidget;
 	PlotAxis *m_axis;
-	QPen m_pen;
-	HorizBar *m_chOffsetBar;
-	RoundedHandleV *m_handle;
-	SymbolController *m_symbolCtrl;
+	QwtPlot *m_plot;
+	AxisHandle *m_handle;
 };
 } // namespace scopy
+
 #endif // PLOTAXISHANDLE_H

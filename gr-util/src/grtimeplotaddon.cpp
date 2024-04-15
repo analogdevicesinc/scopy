@@ -99,9 +99,6 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	//	widget->setLayout(m_lay);
 
 	m_plotWidget->xAxis()->setInterval(0, 1);
-	m_plotWidget->leftHandlesArea()->setVisible(true);
-	m_plotWidget->rightHandlesArea()->setVisible(true);
-	m_plotWidget->bottomHandlesArea()->setVisible(true);
 	m_plotWidget->xAxis()->setVisible(true);
 	//	m_plotWidget->topHandlesArea()->setVisible(true);
 
