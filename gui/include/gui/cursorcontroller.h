@@ -2,9 +2,6 @@
 #define CURSORCONTROLLER_H
 
 #include "scopy-gui_export.h"
-
-#include <QObject>
-
 #include <plotcursors.h>
 #include <widgets/cursorsettings.h>
 #include <widgets/plotcursorreadouts.h>
@@ -42,10 +39,10 @@ private:
 	HoverWidget *hoverReadouts;
 	double horizLockGap;
 	double vertLockGap;
-	VCursor *v1Cursor;
-	VCursor *v2Cursor;
-	HCursor *h1Cursor;
-	HCursor *h2Cursor;
+	PlotAxisHandle *v1Cursor;
+	PlotAxisHandle *v2Cursor;
+	PlotAxisHandle *h1Cursor;
+	PlotAxisHandle *h2Cursor;
 	bool horizEn, horizLock, horizTrack;
 	bool vertEn, vertLock;
 	bool readoutDragsEn;

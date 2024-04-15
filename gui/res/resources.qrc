@@ -158,6 +158,7 @@
         <file>icons/scopy-default/icons/unlocked.svg</file>
         <file>icons/warning.svg</file>
         <file>icons/scopy-default/icons/RegMap.svg</file>
+        <file>icons/handle_arrow.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>
