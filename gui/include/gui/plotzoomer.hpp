@@ -21,6 +21,7 @@ public:
 	void zoom(const QRectF &rect);
 	void silentZoom(const QRectF &rect);
 	bool isZoomed() const;
+	void cancelZoom();
 
 	void setBaseRect(const QRectF &rect);
 	void setBaseRect();
