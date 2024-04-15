@@ -2,12 +2,9 @@
 #define PLOTCURSORS_H
 #include "plotwidget.h"
 #include "scopy-gui_export.h"
-
+#include <plotaxishandle.h>
 #include <QObject>
 #include <QPair>
-
-#include <hcursor.h>
-#include <vcursor.h>
 
 namespace scopy {
 
@@ -19,16 +16,18 @@ public:
 	~PlotCursors();
 
 	void displayIntersection();
+	void setVHandlePos(HandlePos pos);
+	void setHHandlePos(HandlePos pos);
 
 public Q_SLOTS:
 	void setVisible(bool visible);
 	void horizSetVisible(bool visible);
 	void vertSetVisible(bool visible);
-	VCursor *getV1Cursor();
-	VCursor *getV2Cursor();
-	HCursor *getH1Cursor();
-	HCursor *getH2Cursor();
-	void setCanLeavePlot(bool leave);
+	PlotAxisHandle *getV1Cursor();
+	PlotAxisHandle *getV2Cursor();
+	PlotAxisHandle *getH1Cursor();
+	PlotAxisHandle *getH2Cursor();
+	void setBounded(bool leave);
 	void enableTracking(bool tracking);
 
 Q_SIGNALS:
@@ -36,8 +35,8 @@ Q_SIGNALS:
 
 private:
 	PlotWidget *m_plot;
-	QPair<VCursor *, VCursor *> m_vCursors;
-	QPair<HCursor *, HCursor *> m_hCursors;
+	QPair<PlotAxisHandle *, PlotAxisHandle *> m_vCursors;
+	QPair<PlotAxisHandle *, PlotAxisHandle *> m_hCursors;
 	QwtPlotMarker *plotMarker1;
 	QwtPlotMarker *plotMarker2;
 	bool m_tracking;
