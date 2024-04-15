@@ -71,6 +71,12 @@ void PlotZoomer::setBaseRect(const QRectF &rect) { m_baseRect = rect; }
 
 void PlotZoomer::setBaseRect() { m_baseRect = getCurrentRect(); }
 
+void PlotZoomer::cancelZoom()
+{
+	delete m_rubberBand;
+	m_rubberBand = nullptr;
+}
+
 void PlotZoomer::setEnabled(bool en)
 {
 	m_en = en;
@@ -158,6 +164,7 @@ void PlotZoomer::rescale(const QRectF &rect)
 	}
 
 	plot()->replot();
+	plot()->repaint();
 	m_isZoomed = true;
 	Q_EMIT zoomed(rect);
 }
@@ -202,7 +209,6 @@ void PlotZoomer::onZoomStart(QMouseEvent *event)
 
 void PlotZoomer::onZoomEnd()
 {
-	m_rubberBand->hide();
 	if(m_rubberBand->palette().color(QPalette::Highlight) == QColor(StyleHelper::getColor("ScopyBackground"))) {
 		QRectF rect = m_rubberBand->geometry();
 		QwtScaleMap xScaleMap = plot()->canvasMap(m_xAxis);
@@ -236,6 +242,7 @@ void PlotZoomer::onZoomEnd()
 
 		zoom(zoomRect);
 	}
+	cancelZoom();
 }
 
 void PlotZoomer::zoomToBase()
@@ -252,6 +259,7 @@ void PlotZoomer::zoomToBase()
 	}
 
 	plot()->replot();
+	plot()->repaint();
 	m_isZoomed = false;
 }
 
