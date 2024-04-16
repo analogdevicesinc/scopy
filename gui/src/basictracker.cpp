@@ -139,6 +139,7 @@ bool BasicTracker::eventFilter(QObject *object, QEvent *event)
 	if(event->type() == QEvent::MouseMove) {
 		QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(event);
 		m_mousePos = mouseEvent->pos();
+		updateOverlay();
 	}
 	if(event->type() == QEvent::Leave && isVisible()) {
 		hide();
