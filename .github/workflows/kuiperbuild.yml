@@ -1,0 +1,53 @@
+name: Kuiper Scopy1 Build
+
+on: [push, pull_request]
+
+env:
+  BUILD_HOST: ubuntu-20.04
+  USERNAME: github-actions
+
+jobs:
+
+  build_scopy1_for_kuiper:
+    runs-on: ubuntu-20.04
+
+    steps:
+        - uses: actions/checkout@v4
+          with:
+                set-safe-directory: 'true'
+
+        - name: Pull the Docker Image
+          run: docker pull cristianbindea/scopy1-kuiper:latest
+
+        - name: Create Scopy AppImage
+          shell: bash
+          run: |
+                cd $GITHUB_WORKSPACE
+                sudo apt update
+                ./CI/kuiper/create_sysroot.sh install_packages install_qemu
+                ./CI/kuiper/kuiper_build_process.sh generate_ci_envs
+
+                docker run \
+                        --mount type=bind,source="$GITHUB_WORKSPACE",target=/home/runner/scopy \
+                        --env-file $GITHUB_WORKSPACE/CI/kuiper/gh-actions.envs \
+                        cristianbindea/scopy1-kuiper:latest \
+                        /bin/bash -c    'cd $HOME && \
+                                        sudo chown -R runner:runner scopy && \
+                                        cd $HOME/scopy && \
+                                        ./CI/kuiper/kuiper_build_process.sh install_packages download_cmake download_crosscompiler move_sysroot build_iio-emu build_scopy create_appdir create_appimage move_appimage
+                                        '
+        - name: Set short git commit SHA
+          shell: bash
+          run: echo "commit_sha=$(git rev-parse --short ${{ github.sha }})" >> "$GITHUB_ENV"
+
+        # DEBUG WITH SSH
+        # - name: Setup upterm session
+        #   uses: lhotari/action-upterm@v1
+        #   if: ${{ failure() }}
+        #   with:
+        #      wait-timeout-minutes: 3
+
+        - uses: actions/upload-artifact@v4
+          with:
+            name: scopy-linux-armhf-${{ env.commit_sha }}
+            path: ${{ github.workspace }}/Scopy1-armhf.AppImage
