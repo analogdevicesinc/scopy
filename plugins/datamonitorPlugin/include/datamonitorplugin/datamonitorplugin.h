@@ -34,6 +34,7 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 	void addNewTool();
+	void removeTool(QString toolId);
 	void toggleRunState(bool toggled);
 
 private:
