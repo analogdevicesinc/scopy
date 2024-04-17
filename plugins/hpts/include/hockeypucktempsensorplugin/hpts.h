@@ -49,6 +49,7 @@ private Q_SLOTS:
 	void updateUnit(QString txt);
 	float readData();
 	void setCelsius();
+
 private:
 	void setupUiElements();
 

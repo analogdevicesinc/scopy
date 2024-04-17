@@ -28,6 +28,7 @@ public:
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
+
 private:
 	iio_context *m_ctx;
 };

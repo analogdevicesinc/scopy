@@ -31,7 +31,7 @@ bool HockeyPuckTempSensorPlugin::compatible(QString m_param, QString category)
 
 bool HockeyPuckTempSensorPlugin::loadPage()
 {
-	// Here you must write the code for the plugin info page 
+	// Here you must write the code for the plugin info page
 	// Below is an example for an iio device
 	/*m_page = new QWidget();
 	m_page->setLayout(new QVBoxLayout(m_page));
@@ -70,22 +70,21 @@ bool HockeyPuckTempSensorPlugin::loadIcon()
 
 void HockeyPuckTempSensorPlugin::loadToolList()
 {
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("HPTS", "Temperature Sensor", ":/gui/icons/scopy-default/icons/tool_voltmeter.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("HPTS", "Temperature Sensor",
+						  ":/gui/icons/scopy-default/icons/tool_voltmeter.svg"));
 }
 
-void HockeyPuckTempSensorPlugin::unload() { /*delete m_infoPage;*/ }
+void HockeyPuckTempSensorPlugin::unload()
+{ /*delete m_infoPage;*/
+}
 
 QString HockeyPuckTempSensorPlugin::description() { return "Hockey Puck temperature sensor"; }
 
-QString HockeyPuckTempSensorPlugin::displayName()
-{
-	return "Hockey Puck";
-}
+QString HockeyPuckTempSensorPlugin::displayName() { return "Hockey Puck"; }
 
 bool HockeyPuckTempSensorPlugin::onConnect()
 {
-	// This method is called when you try to connect to a device and the plugin is 
+	// This method is called when you try to connect to a device and the plugin is
 	// compatible to that device
 	// In case of success the function must return true and false otherwise
 
@@ -99,9 +98,7 @@ bool HockeyPuckTempSensorPlugin::onConnect()
 	m_toolList[0]->setTool(hockeyPuckTempSensor);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
-    	return true;
-
-
+	return true;
 }
 
 bool HockeyPuckTempSensorPlugin::onDisconnect()
