@@ -13,7 +13,7 @@ enum ProgressBarState
 {
 	SUCCESS,
 	ERROR,
-	BUSSY
+	BUSY
 };
 
 class SCOPY_DATAMONITORPLUGIN_EXPORT DataLoggingMenu : public QWidget
