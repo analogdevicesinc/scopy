@@ -28,7 +28,7 @@ private:
 	QDateEdit *dateEdit;
 	QTimeEdit *timeEdit;
 	MenuOnOffSwitch *realTimeToggle;
-	MenuOnOffSwitch *plotNowToggle;
+	MenuOnOffSwitch *livePlottingToggle;
 };
 } // namespace datamonitor
 } // namespace scopy

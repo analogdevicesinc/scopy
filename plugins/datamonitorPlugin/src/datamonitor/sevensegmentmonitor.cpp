@@ -25,18 +25,18 @@ SevenSegmentMonitor::SevenSegmentMonitor(DataMonitorModel *model, QWidget *paren
 
 	lcdNumber = new LcdNumber(this);
 
-	minMaxLayout = new QVBoxLayout(this);
+	minMaxLayout = new QVBoxLayout();
 	minMaxLayout->setMargin(0);
 	minMaxLayout->setSpacing(10);
 
-	QHBoxLayout *minLayout = new QHBoxLayout(this);
+	QHBoxLayout *minLayout = new QHBoxLayout();
 	lcdNumberMin = new LcdNumber(this);
 
 	minLabel = new QLabel("MIN:");
 	minLayout->addWidget(minLabel, 1);
 	minLayout->addWidget(lcdNumberMin, 3);
 
-	QHBoxLayout *maxLayout = new QHBoxLayout(this);
+	QHBoxLayout *maxLayout = new QHBoxLayout();
 	lcdNumberMax = new LcdNumber(this);
 
 	maxLabel = new QLabel("MAX:");
