@@ -78,18 +78,17 @@ void DioDigitalChannel::initPlot()
 	m_plot = new PlotWidget(this);
 	m_plot->xAxis()->scaleDraw()->setFloatPrecision(0);
 	m_plot->xAxis()->setInterval(0, m_timeSpan);
-	m_plot->xAxis()->setVisible(true);
-
 	m_plot->yAxis()->scaleEngine()->setAttribute(QwtScaleEngine::Floating, true);
 	m_plot->yAxis()->scaleEngine()->setMajorTicksCount(2);
 	m_plot->yAxis()->scaleDraw()->setFloatPrecision(0);
 	m_plot->yAxis()->setInterval(0, 1);
+	m_plot->setShowXAxisLabels(true);
+	m_plot->setShowYAxisLabels(true);
 	m_plot->replot();
-	m_plot->yAxis()->setVisible(true);
 
 	QPen chPen = QPen(QColor(StyleHelper::getColor("CH0")), 1);
-
-	m_plotCh = new PlotChannel("CH0", chPen, m_plot, m_plot->xAxis(), m_plot->yAxis(), this);
+	m_plotCh = new PlotChannel("CH0", chPen, m_plot->xAxis(), m_plot->yAxis(), this);
+	m_plot->addPlotChannel(m_plotCh);
 	m_plotCh->setEnabled(true);
 
 	m_plot->replot();
