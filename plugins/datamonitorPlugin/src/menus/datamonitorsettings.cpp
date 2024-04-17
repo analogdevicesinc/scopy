@@ -73,6 +73,12 @@ void DataMonitorSettings::init(QString title, QColor color)
 	dataLoggingMenu = new DataLoggingMenu(this);
 	layout->addWidget(dataLoggingMenu);
 
+	/////// delete monitor /////////////////
+	deleteMonitor = new QPushButton("Delete", this);
+	layout->addWidget(deleteMonitor);
+
+	connect(deleteMonitor, &QPushButton::clicked, this, &DataMonitorSettings::requestDeleteTool);
+
 	MouseWheelWidgetGuard *mouseWheelWidgetGuard = new MouseWheelWidgetGuard(this);
 	mouseWheelWidgetGuard->installEventRecursively(this);
 
