@@ -14,6 +14,7 @@ option(ENABLE_PLUGIN_DATAMONITOR "Enable datamonitor plugin" OFF)
 option(ENABLE_PLUGIN_ADC "Enable ADC plugin" ON)
 option(ENABLE_PLUGIN_PQM "Enable PQM plugin" ON)
 option(ENABLE_PLUGIN_DATAMONITORPLUGIN "Enable DATAMONITORPLUGIN plugin" ON)
+option(ENABLE_PLUGIN_HPTS "Enable HPTS plugin" ON)
 
 if(ENABLE_PLUGIN_TEST)
 	add_subdirectory(guitestplugin)
@@ -38,6 +39,11 @@ endif()
 
 if(ENABLE_PLUGIN_PQM)
 	add_subdirectory(pqm)
+	list(APPEND PLUGINS ${PLUGIN_NAME})
+endif()
+
+if(ENABLE_PLUGIN_HPTS)
+	add_subdirectory(hpts)
 	list(APPEND PLUGINS ${PLUGIN_NAME})
 endif()
 

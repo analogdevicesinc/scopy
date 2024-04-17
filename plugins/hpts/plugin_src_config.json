@@ -1,0 +1,33 @@
+{
+    "plugin": {
+        "dir_name": "hpts",
+        "plugin_name": "hockeypucktempsensorplugin",
+        "class_name": "HockeyPuckTempSensorPlugin",
+        "cmakelists": true,
+        "namespace": "scopy::HockeyPuckTempSensor",
+        "device_category": "iio",
+        "tools": [
+            {
+                "id": "HPTS",
+                "tool_name": "HockeyPuckTempSensor",
+                "file_name": "hpts",
+                "class_name": "HockeyPuckTempSensor",
+                "namespace": "scopy::HockeyPuckTempSensor"
+            }
+        ]
+    },
+    "cmakelists": {
+        "cmake_min_required": 3.9,
+        "cxx_standard": 20,
+        "enable_testing": "ON"
+    },
+    "test": {
+        "cmakelists": true,
+        "cmake_min_required": 3.5,
+        "tst_pluginloader": true
+    },
+    "resources": {
+        "resources_qrc": true
+    },
+    "doc": true
+}
