@@ -26,9 +26,9 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 	xAxisContainer->contentLayout()->addWidget(xAxisSection);
 	xAxisSection->contentLayout()->setSpacing(10);
 
-	realTimeToggle = new MenuOnOffSwitch(tr("Real Time"), xAxisSection, false);
-	plotNowToggle = new MenuOnOffSwitch(tr("Plot now"), xAxisContainer, false);
-	plotNowToggle->onOffswitch()->setChecked(true);
+	realTimeToggle = new MenuOnOffSwitch(tr("Use UTC date and time"), xAxisSection, false);
+	livePlottingToggle = new MenuOnOffSwitch(tr("Live plotting"), xAxisContainer, false);
+	livePlottingToggle->onOffswitch()->setChecked(true);
 
 	dateEdit = new QDateEdit(QDate::currentDate(), xAxisContainer);
 	dateEdit->setCalendarPopup(true);
@@ -49,7 +49,7 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 	auto &&timeTracker = TimeManager::GetInstance();
 
 	connect(timeTracker, &TimeManager::timeout, this, [=, this]() {
-		if(plotNowToggle->onOffswitch()->isChecked()) {
+		if(livePlottingToggle->onOffswitch()->isChecked()) {
 			// plot using current date time as starting point
 			timeEdit->setTime(QTime::currentTime());
 			dateEdit->setDate(QDate::currentDate());
@@ -58,7 +58,8 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 	});
 
 	connect(realTimeToggle->onOffswitch(), &QAbstractButton::toggled, m_plot, &MonitorPlot::setIsRealTime);
-	connect(plotNowToggle->onOffswitch(), &QAbstractButton::toggled, this, &PlotTimeAxisController::togglePlotNow);
+	connect(livePlottingToggle->onOffswitch(), &QAbstractButton::toggled, this,
+		&PlotTimeAxisController::togglePlotNow);
 
 	connect(dateEdit, &QDateEdit::dateChanged, this, &PlotTimeAxisController::updatePlotStartPoint);
 	connect(timeEdit, &QTimeEdit::timeChanged, this, &PlotTimeAxisController::updatePlotStartPoint);
@@ -67,7 +68,7 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 		[=, this](double value) { m_plot->updateXAxisIntervalMax(value); });
 
 	xAxisSection->contentLayout()->addWidget(realTimeToggle);
-	xAxisSection->contentLayout()->addWidget(plotNowToggle);
+	xAxisSection->contentLayout()->addWidget(livePlottingToggle);
 	xAxisSection->contentLayout()->addWidget(dateEdit);
 	xAxisSection->contentLayout()->addWidget(timeEdit);
 	xAxisSection->contentLayout()->addWidget(m_xdelta);
