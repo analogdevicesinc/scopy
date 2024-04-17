@@ -4,6 +4,7 @@
 #include "logging_categories.h"
 #include "scopy-regmapplugin_config.h"
 
+#include <QApplication>
 #include <QDir>
 #include <QLayout>
 #include <QPushButton>
@@ -55,11 +56,16 @@ QDir Utils::setXmlPath()
 	if(xmlsPath.entryList().empty()) {
 #ifdef Q_OS_WINDOWS
 		xmlsPath.setPath(REGMAP_XML_PATH_LOCAL);
+#elif defined __APPLE__
+		xmlsPath.setPath(QCoreApplication::applicationDirPath() + "/plugins/plugins/xmls");
+#elif defined(__arm__)
+		xmlsPath.setPath(QCoreApplication::applicationDirPath() + "/../share/plugins/xmls");
 #else
 		xmlsPath.setPath(REGMAP_XML_SYSTEM_PATH);
 #endif
 	}
 
+	qDebug(CAT_REGMAP) << "XML folder found: " << xmlsPath;
 	if(!xmlsPath.entryList().empty()) {
 		return xmlsPath;
 	}
