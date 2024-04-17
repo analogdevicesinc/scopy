@@ -126,19 +126,20 @@ bool DataMonitorPlugin::onDisconnect()
 		tool->setEnabled(false);
 		tool->setRunning(false);
 		tool->setRunBtnVisible(false);
-		QWidget *w = tool->tool();
-		if(w) {
-			tool->setTool(nullptr);
-			delete(w);
-		}
+		removeTool(tool->id());
 	}
+
+	// add proxy tool to represent the plugin
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "DataMonitor",
+						  ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+
+	Q_EMIT toolListChanged();
 	return true;
 }
 
 void DataMonitorPlugin::addNewTool()
 {
 	static int i = 0;
-
 	QString tool_name = (QString("DataMonitor ") + QString::number(i));
 
 	ToolMenuEntry *toolMenuEntry =
@@ -152,13 +153,20 @@ void DataMonitorPlugin::addNewTool()
 	connect(datamonitorTool, &DatamonitorTool::requestNewTool, this, &DataMonitorPlugin::addNewTool);
 	connect(datamonitorTool, &DatamonitorTool::runToggled, this, &DataMonitorPlugin::toggleRunState);
 
+	connect(datamonitorTool, &DatamonitorTool::requestDeleteTool, this, [=, this]() {
+		// make sure at least one tool exists
+		if(m_toolList.length() > 1) {
+			removeTool(tool_name);
+			requestTool(m_toolList.first()->id());
+		}
+	});
 	connect(datamonitorTool, &DatamonitorTool::settingsTitleChanged, this,
 		[=, this](QString newTitle) { toolMenuEntry->setName(newTitle); });
 
 	datamonitorTool->getRunButton()->setChecked(isRunning);
 
 	// one for each
-	connect(m_toolList[i], &ToolMenuEntry::runToggled, this, [=, this](bool en) {
+	connect(toolMenuEntry, &ToolMenuEntry::runToggled, this, [=, this](bool en) {
 		if(datamonitorTool->getRunButton()->isChecked() != en) {
 			datamonitorTool->getRunButton()->toggle();
 		}
@@ -169,6 +177,21 @@ void DataMonitorPlugin::addNewTool()
 	requestTool(tool_name);
 
 	i++;
+}
+
+void DataMonitorPlugin::removeTool(QString toolId)
+{
+
+	auto *tool = ToolMenuEntry::findToolMenuEntryById(m_toolList, toolId);
+	m_toolList.removeOne(tool);
+	QWidget *datamonitorTool = tool->tool();
+	if(datamonitorTool) {
+		delete datamonitorTool;
+	}
+
+	Q_EMIT toolListChanged();
+
+	delete tool;
 }
 
 void DataMonitorPlugin::toggleRunState(bool toggled)

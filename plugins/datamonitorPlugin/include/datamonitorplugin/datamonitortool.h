@@ -36,6 +36,7 @@ Q_SIGNALS:
 	void requestNewTool();
 	void runToggled(bool toggled);
 	void settingsTitleChanged(QString newTitle);
+	void requestDeleteTool();
 
 private:
 	MenuControlButton *monitorsButton;
