@@ -189,6 +189,6 @@ float HockeyPuckTempSensor::readData()
 	return val;
 }
 
-void HockeyPuckTempSensor::setCelsius() { iio_channel_attr_write(m_ch, HPTS_UNIT_ATTR_NAME, "celsius"); }
+void HockeyPuckTempSensor::setCelsius() { iio_channel_attr_write(m_ch, HPTS_UNIT_ATTR_NAME, HPTS_CELSIUS_VAL); }
 
-void HockeyPuckTempSensor::setKelvin() { iio_channel_attr_write(m_ch, HPTS_UNIT_ATTR_NAME, "kelvin"); }
+void HockeyPuckTempSensor::setKelvin() { iio_channel_attr_write(m_ch, HPTS_UNIT_ATTR_NAME, HPTS_KELVIN_VAL); }

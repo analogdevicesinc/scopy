@@ -34,6 +34,8 @@ using namespace scopy::gui;
 #define HPTS_CH_NAME "voltage0-voltage0"
 #define HPTS_ATTR_NAME "temperature_output"
 #define HPTS_UNIT_ATTR_NAME "convert_output_unit"
+#define HPTS_CELSIUS_VAL "3"
+#define HPTS_KELVIN_VAL "2"
 #endif
 
 class SCOPY_HOCKEYPUCKTEMPSENSORPLUGIN_EXPORT HockeyPuckTempSensor : public QWidget
