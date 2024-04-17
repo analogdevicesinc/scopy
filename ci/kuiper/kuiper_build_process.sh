@@ -357,7 +357,6 @@ move_sysroot(){
 	[ -d /home/runner/sysroot ] && sudo mv /home/runner/sysroot $SYSROOT
 }
 
-
 # move and rename the AppImage artifact
 move_appimage(){
 	mv $APP_IMAGE $SRC_DIR/Scopy-armhf.AppImage

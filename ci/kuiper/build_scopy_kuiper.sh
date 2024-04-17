@@ -80,7 +80,7 @@ clone() {
 	popd
 }
 
-instal_apt() {
+install_apt() {
 	sudo apt-get update
 	sudo apt-get -y upgrade
 	sudo apt-get -y install build-essential cmake vim bison flex swig swig4.0 python3 mlocate \
@@ -226,7 +226,6 @@ test_scopy() {
 	./scopy
 	popd
 }
-
 
 buid_deps() {
 	build_libiio
