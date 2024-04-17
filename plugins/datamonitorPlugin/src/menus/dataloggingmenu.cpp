@@ -45,7 +45,7 @@ DataLoggingMenu::DataLoggingMenu(QWidget *parent)
 	});
 
 	connect(dataLoggingBtn, &QPushButton::clicked, this, [=, this]() {
-		updateDataLoggingStatus(ProgressBarState::BUSSY);
+		updateDataLoggingStatus(ProgressBarState::BUSY);
 		Q_EMIT requestDataLogging(dataLoggingFilePath->getLineEdit()->text());
 	});
 
@@ -56,7 +56,7 @@ DataLoggingMenu::DataLoggingMenu(QWidget *parent)
 	});
 
 	connect(dataLoadingBtn, &QPushButton::clicked, this, [=, this]() {
-		updateDataLoggingStatus(ProgressBarState::BUSSY);
+		updateDataLoggingStatus(ProgressBarState::BUSY);
 		Q_EMIT requestDataLoading(dataLoggingFilePath->getLineEdit()->text());
 	});
 
@@ -94,7 +94,7 @@ void DataLoggingMenu::updateDataLoggingStatus(ProgressBarState status)
 	if(status == ProgressBarState::ERROR) {
 		dataLoggingFilePath->getProgressBar()->setBarColor(StyleHelper::getColor("ProgressBarError"));
 	}
-	if(status == ProgressBarState::BUSSY) {
+	if(status == ProgressBarState::BUSY) {
 		dataLoggingFilePath->getProgressBar()->startProgress();
 		dataLoggingFilePath->getProgressBar()->setBarColor(StyleHelper::getColor("ProgressBarBusy"));
 	}
