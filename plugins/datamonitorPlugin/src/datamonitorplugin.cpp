@@ -137,9 +137,7 @@ bool DataMonitorPlugin::onDisconnect()
 
 void DataMonitorPlugin::addNewTool()
 {
-	static int i = 0;
-
-	QString tool_name = (QString("DataMonitor ") + QString::number(i));
+	QString tool_name = (QString("DataMonitor ") + QString::number(numberOfTools));
 
 	ToolMenuEntry *toolMenuEntry =
 		SCOPY_NEW_TOOLMENUENTRY(tool_name, tool_name, ":/gui/icons/scopy-default/icons/gear_wheel.svg");
@@ -152,13 +150,22 @@ void DataMonitorPlugin::addNewTool()
 	connect(datamonitorTool, &DatamonitorTool::requestNewTool, this, &DataMonitorPlugin::addNewTool);
 	connect(datamonitorTool, &DatamonitorTool::runToggled, this, &DataMonitorPlugin::toggleRunState);
 
+	connect(datamonitorTool, &DatamonitorTool::requestDeleteTool, this, [=, this]() {
+		// make sure at least one tool exists
+		if(numberOfTools > 1) {
+			removeTool(tool_name);
+			delete datamonitorTool;
+			numberOfTools--;
+			requestTool(m_toolList.first()->id());
+		}
+	});
 	connect(datamonitorTool, &DatamonitorTool::settingsTitleChanged, this,
 		[=, this](QString newTitle) { toolMenuEntry->setName(newTitle); });
 
 	datamonitorTool->getRunButton()->setChecked(isRunning);
 
 	// one for each
-	connect(m_toolList[i], &ToolMenuEntry::runToggled, this, [=, this](bool en) {
+	connect(toolMenuEntry, &ToolMenuEntry::runToggled, this, [=, this](bool en) {
 		if(datamonitorTool->getRunButton()->isChecked() != en) {
 			datamonitorTool->getRunButton()->toggle();
 		}
@@ -168,7 +175,17 @@ void DataMonitorPlugin::addNewTool()
 	m_toolList.last()->setTool(datamonitorTool);
 	requestTool(tool_name);
 
-	i++;
+	numberOfTools++;
+}
+
+void DataMonitorPlugin::removeTool(QString toolId)
+{
+
+	auto *tool = ToolMenuEntry::findToolMenuEntryById(m_toolList, toolId);
+	m_toolList.removeOne(tool);
+	Q_EMIT toolListChanged();
+
+	delete tool;
 }
 
 void DataMonitorPlugin::toggleRunState(bool toggled)

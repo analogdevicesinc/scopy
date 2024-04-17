@@ -34,12 +34,14 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 	void addNewTool();
+	void removeTool(QString toolId);
 	void toggleRunState(bool toggled);
 
 private:
 	QList<DataMonitorModel *> dmmList;
 	DataAcquisitionManager *m_dataAcquisitionManager;
 	bool isRunning = false;
+	int numberOfTools = 0;
 };
 } // namespace scopy::datamonitor
 #endif // DATAMONITORPLUGIN_H

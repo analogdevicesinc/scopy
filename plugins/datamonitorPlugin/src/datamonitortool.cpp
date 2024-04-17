@@ -132,6 +132,9 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 
 	tool->rightStack()->add(DataMonitorUtils::getToolSettingsId(), m_dataMonitorSettings);
 
+	connect(m_dataMonitorSettings, &DataMonitorSettings::requestDeleteTool, this,
+		&DatamonitorTool::requestDeleteTool);
+
 	connect(m_dataMonitorSettings, &DataMonitorSettings::titleUpdated, this,
 		&DatamonitorTool::settingsTitleChanged);
 	connect(settingsButton, &GearBtn::toggled, this, [=, this](bool toggled) {
