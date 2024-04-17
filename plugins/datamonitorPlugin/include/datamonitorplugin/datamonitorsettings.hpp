@@ -55,10 +55,12 @@ Q_SIGNALS:
 	void plotXAxisMinValueChange(double value);
 	void plotXAxisMaxValueChange(double value);
 	void requestYMinMaxValues();
+	void requestDeleteTool();
 
 private:
 	PositionSpinButton *m_ymin;
 	PositionSpinButton *m_ymax;
+	QPushButton *deleteMonitor;
 	QWidget *generateYAxisSettings(QWidget *parent);
 	QWidget *generateCurveStyleSettings(QWidget *parent);
 
