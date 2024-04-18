@@ -6,7 +6,7 @@
 using namespace scopy::iiodebugplugin;
 
 IIODebugLogger::IIODebugLogger(QWidget *parent)
-	: QDialog(parent)
+	: QFrame(parent)
 	, m_textBrowser(new QTextBrowser(this))
 {
 	setupUi();
@@ -14,9 +14,6 @@ IIODebugLogger::IIODebugLogger(QWidget *parent)
 
 void IIODebugLogger::setupUi()
 {
-	setWindowTitle("Log Messages");
-	setMinimumSize(300, 100);
-	resize(600, 300);
 	setContentsMargins(0, 0, 0, 0);
 	setLayout(new QVBoxLayout(this));
 	layout()->addWidget(m_textBrowser);

@@ -32,6 +32,7 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 	, m_progressBar(new SmallProgressBar(this))
 	, m_lastOpTimestamp(nullptr)
 	, m_lastOpState(nullptr)
+	, m_lastReturnCode(0)
 {
 	setLayout(new QVBoxLayout(this));
 	layout()->setContentsMargins(0, 0, 0, 0);
@@ -55,8 +56,7 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 		SLOT(emitDataStatus(QDateTime, QString, QString, int, bool)));
 
 	// forward data request from ui strategy to data strategy
-	connect(uiStrategyWidget, SIGNAL(requestData()), dataStrategyWidget,
-		SLOT(requestData()));
+	connect(uiStrategyWidget, SIGNAL(requestData()), dataStrategyWidget, SLOT(requestData()));
 
 	// forward data from data strategy to ui strategy
 	connect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), uiStrategyWidget,
@@ -129,6 +129,8 @@ void IIOWidget::setRecipe(IIOWidgetFactoryRecipe recipe) { m_recipe = recipe; }
 QDateTime *IIOWidget::lastOperationTimestamp() { return m_lastOpTimestamp; }
 
 IIOWidget::State *IIOWidget::lastOperationState() { return m_lastOpState; }
+
+int IIOWidget::lastReturnCode() { return m_lastReturnCode; }
 
 void IIOWidget::startTimer(QString data)
 {
