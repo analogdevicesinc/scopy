@@ -96,7 +96,11 @@ bool DataMonitorPlugin::onConnect()
 	iio_context *ctx = conn->context();
 
 	DMM dmm;
-	dmmList = dmm.getDmmMonitors(ctx);
+	QList<DmmDataMonitorModel *> availableDmmList = dmm.getDmmMonitors(ctx);
+
+	foreach(auto dmmModel, availableDmmList) {
+		dmmList.push_back(dmmModel);
+	}
 
 	m_dataAcquisitionManager = new DataAcquisitionManager(this);
 

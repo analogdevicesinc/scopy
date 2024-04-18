@@ -4,8 +4,8 @@
 #include <QList>
 #include <QMap>
 #include <QObject>
+#include "dmmdatamonitormodel.hpp"
 #include "iio.h"
-#include "readabledatamonitormodel.hpp"
 #include "scopy-datamonitorplugin_export.h"
 
 namespace scopy {
@@ -24,7 +24,7 @@ class SCOPY_DATAMONITORPLUGIN_EXPORT DMM : public QObject
 public:
 	explicit DMM(QObject *parent = nullptr);
 
-	QList<ReadableDataMonitorModel *> getDmmMonitors(iio_context *ctx);
+	QList<DmmDataMonitorModel *> getDmmMonitors(iio_context *ctx);
 	bool isDMMCompatible(iio_channel *chn);
 	bool isHwmon(iio_device *dev, iio_channel *chn);
 	bool iioChannelHasAttribute(iio_channel *chn, std::string const &attr);
