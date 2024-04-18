@@ -15,6 +15,7 @@
 #include <QWidget>
 #include <QTreeView>
 #include <QSplitter>
+#include <QTabWidget>
 
 namespace scopy::iiodebugplugin {
 class SCOPY_IIODEBUGPLUGIN_EXPORT IIODebugInstrument : public QWidget
@@ -52,6 +53,11 @@ private:
 	// Triggers a read operation on the item specified as parameter and all children of that item recursively
 	void triggerReadOnAllChildItems(QStandardItem *item);
 
+	// Stacked widget
+	QTabWidget *m_tabWidget;
+	QWidget *m_mainWidget;
+	IIODebugLogger *m_debugLogger;
+
 	struct iio_context *m_context;
 	QString m_uri;
 	QTreeView *m_treeView;
@@ -63,7 +69,6 @@ private:
 	ApiObject *m_apiObject;
 	IIOStandardItem *m_currentlySelectedItem;
 	SaveContextSetup *m_saveContextSetup;
-	IIODebugLogger *m_debugLogger;
 
 	// GUI elements
 	QSplitter *m_VSplitter;

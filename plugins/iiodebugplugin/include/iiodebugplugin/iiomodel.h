@@ -19,7 +19,8 @@ public:
 	QSet<QString> getEntries();
 
 Q_SIGNALS:
-	void emitLog(QDateTime *timestamp, bool isRead, QString path, QString oldValue, QString newValue);
+	void emitLog(QDateTime timestamp, bool isRead, QString path, QString oldValue, QString newValue,
+		     int returnCode);
 
 private:
 	void iioTreeSetup();

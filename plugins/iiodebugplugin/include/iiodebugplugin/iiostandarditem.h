@@ -83,11 +83,11 @@ public:
 	QString typeString();
 
 Q_SIGNALS:
-	void emitLog(QDateTime *timestamp, bool isRead, QString path, QString oldValue, QString newValue);
+	void emitLog(QDateTime timestamp, bool isRead, QString path, QString oldValue, QString newValue,
+		     int returnCode);
 
 protected Q_SLOTS:
-	void emitWriteLog(QString oldValue, QString newValue);
-	void emitReadLog(QString data, QString dataOptions);
+	void forwardLog(QDateTime timestamp, QString data, QString dataOptions, int returnCode, bool isReadOp);
 
 private:
 	void connectLog();

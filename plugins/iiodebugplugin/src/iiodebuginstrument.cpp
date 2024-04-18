@@ -16,6 +16,7 @@ IIODebugInstrument::IIODebugInstrument(struct iio_context *context, QString uri,
 	, m_currentlySelectedItem(nullptr)
 {
 	setObjectName("IIODebugInstrument - " + uri);
+
 	setupUi();
 	connectSignalsAndSlots();
 
@@ -40,6 +41,19 @@ void IIODebugInstrument::loadSettings(QSettings &s)
 
 void IIODebugInstrument::setupUi()
 {
+	m_tabWidget = new QTabWidget(this);
+
+	m_mainWidget = new QWidget(m_tabWidget);
+	m_mainWidget->setObjectName("IIODebuggerMainWidget");
+
+	m_debugLogger = new IIODebugLogger(m_tabWidget);
+	m_debugLogger->setObjectName("IIODebuggerLogWidget");
+
+	m_tabWidget->addTab(m_mainWidget, "Main Window");
+	m_tabWidget->addTab(m_debugLogger, "Log Window");
+	m_tabWidget->setCurrentIndex(0);
+	m_tabWidget->setTabPosition(QTabWidget::South);
+
 	auto *search_bar_container = new QWidget(this);
 	auto *bottom_container = new QWidget(this);
 	auto *tree_view_container = new QWidget(bottom_container);
@@ -49,7 +63,9 @@ void IIODebugInstrument::setupUi()
 	m_VSplitter = new QSplitter(Qt::Vertical, this);
 	m_HSplitter = new QSplitter(Qt::Horizontal, this);
 
-	setLayout(new QVBoxLayout(this));
+	m_mainWidget->setLayout(new QVBoxLayout(m_mainWidget));
+	m_mainWidget->layout()->setContentsMargins(0, 0, 0, 0);
+
 	bottom_container->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	bottom_container->setLayout(new QHBoxLayout(bottom_container));
 	bottom_container->layout()->setContentsMargins(0, 0, 0, 0);
@@ -73,7 +89,6 @@ void IIODebugInstrument::setupUi()
 	m_searchBar = new SearchBar(m_iioModel->getEntries(), this);
 	m_detailsView = new DetailsView(details_container);
 	m_watchListView = new WatchListView(watch_list);
-	m_debugLogger = new IIODebugLogger(this);
 
 	watch_list->layout()->setContentsMargins(0, 0, 0, 0);
 	watch_list->layout()->addWidget(m_watchListView);
@@ -88,40 +103,31 @@ void IIODebugInstrument::setupUi()
 	StyleHelper::SplitterStyle(m_HSplitter, "HorizontalSplitter");
 	StyleHelper::SplitterStyle(m_VSplitter, "VerticalSplitter");
 	StyleHelper::TreeViewDebugger(m_treeView, "TreeView");
+	StyleHelper::TabWidgetBarUnderline(m_tabWidget, "IIODebugInstrumentTabWidget");
 
 	m_treeView->setModel(m_proxyModel);
 
-	// expand the root element, better visual experience
+	// expand the root element for better visual experience and select it
 	m_treeView->expand(m_proxyModel->index(0, 0));
+	m_currentlySelectedItem =
+		dynamic_cast<IIOStandardItem *>(m_iioModel->getModel()->invisibleRootItem()->child(0));
+	m_detailsView->setIIOStandardItem(m_currentlySelectedItem);
 
 	details_container->layout()->addWidget(m_detailsView);
 	tree_view_container->layout()->addWidget(m_treeView);
 	search_bar_container->layout()->addWidget(m_searchBar);
 
-	auto logBtn = new QPushButton("Show Log", this);
-	StyleHelper::BlueButton(logBtn, "ShowLogButton");
-	logBtn->setMaximumWidth(90);
-	connect(logBtn, &QPushButton::clicked, m_debugLogger, &QWidget::show);
-	connect(m_iioModel, &IIOModel::emitLog, this,
-		[this](QDateTime *timestamp, bool isRead, QString path, QString oldValue, QString newValue) {
-			QString logMessage = QString("[%1] %2: %3: %4%5")
-						     .arg(timestamp->toString("hh:mm:ss"))
-						     .arg(isRead ? "R" : "W")
-						     .arg(path)
-						     .arg(oldValue.isEmpty() ? "" : oldValue + " -> ")
-						     .arg(newValue);
-			m_debugLogger->appendLog(logMessage);
-		});
-	search_bar_container->layout()->addWidget(logBtn);
-
-	layout()->addWidget(search_bar_container);
-	layout()->addWidget(bottom_container);
+	m_mainWidget->layout()->addWidget(search_bar_container);
+	m_mainWidget->layout()->addWidget(bottom_container);
 	m_HSplitter->addWidget(tree_view_container);
 	m_HSplitter->addWidget(right_container);
 	bottom_container->layout()->addWidget(m_HSplitter);
 	m_VSplitter->addWidget(details_container);
 	m_VSplitter->addWidget(watch_list);
 	right_container->layout()->addWidget(m_VSplitter);
+
+	setLayout(new QVBoxLayout(this));
+	layout()->addWidget(m_tabWidget);
 }
 
 void IIODebugInstrument::connectSignalsAndSlots()
@@ -171,6 +177,21 @@ void IIODebugInstrument::connectSignalsAndSlots()
 			m_detailsView->setAddToWatchlistState(false);
 		}
 	});
+
+	QObject::connect(m_iioModel, &IIOModel::emitLog, this,
+			 [this](QDateTime timestamp, bool isRead, QString path, QString oldValue, QString newValue,
+				int returnCode) {
+				 QString logMessage =
+					 QString("[%1] %2 (%3): %4: %5%6")
+						 .arg(timestamp.toString("hh:mm:ss"))
+						 .arg(isRead ? "R" : "W")
+						 .arg(returnCode < 0 ? "FAILURE " + QString::number(returnCode)
+								     : "SUCCESS")
+						 .arg(path)
+						 .arg(oldValue.isEmpty() ? "" : oldValue + " -> ")
+						 .arg(newValue);
+				 m_debugLogger->appendLog(logMessage);
+			 });
 }
 
 IIOStandardItem *IIODebugInstrument::findItemRecursive(QStandardItem *currentItem, QStandardItem *targetItem)

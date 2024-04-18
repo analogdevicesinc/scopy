@@ -6,7 +6,7 @@
 #include <QTextBrowser>
 
 namespace scopy::iiodebugplugin {
-class IIODebugLogger : public QDialog
+class IIODebugLogger : public QFrame
 {
 	Q_OBJECT
 public:
