@@ -88,6 +88,8 @@ public Q_SLOTS:
 	void selectChannel(PlotChannel *);
 	void showAxisLabels();
 	void hideAxisLabels();
+	void setAlignCanvasToScale(int axisId, bool alignCanvasToScales);
+	bool getAlignCanvasToScale(int axisId);
 
 Q_SIGNALS:
 	void canvasSizeChanged();
