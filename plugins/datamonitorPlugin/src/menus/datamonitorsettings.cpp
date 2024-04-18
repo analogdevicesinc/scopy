@@ -74,7 +74,7 @@ void DataMonitorSettings::init(QString title, QColor color)
 	layout->addWidget(dataLoggingMenu);
 
 	/////// delete monitor /////////////////
-	deleteMonitor = new QPushButton("Delete", this);
+	deleteMonitor = new QPushButton("Delete Tool", this);
 	layout->addWidget(deleteMonitor);
 
 	connect(deleteMonitor, &QPushButton::clicked, this, &DataMonitorSettings::requestDeleteTool);
@@ -94,7 +94,7 @@ void DataMonitorSettings::plotYAxisMaxValueUpdate(double value) { m_ymax->setVal
 
 QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 {
-	MenuSectionWidget *yaxisContainer = new MenuSectionWidget(this);
+	MenuSectionWidget *yaxisContainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *yAxisSection =
 		new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE, yaxisContainer);
 
@@ -122,6 +122,8 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 			plotAutoscaler->stop();
 		}
 	});
+
+	autoscale->onOffswitch()->setChecked(true);
 
 	connect(plotAutoscaler, &gui::PlotAutoscaler::newMin, m_plot, &MonitorPlot::updateYAxisIntervalMin);
 	connect(plotAutoscaler, &gui::PlotAutoscaler::newMax, m_plot, &MonitorPlot::updateYAxisIntervalMax);

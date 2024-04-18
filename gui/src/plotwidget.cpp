@@ -293,12 +293,10 @@ void PlotWidget::hideAxisLabels()
 	}
 }
 
-void PlotWidget::setAlignCanvasToScale(int axisId, bool alignCanvasToScales)
+void PlotWidget::setAlignCanvasToScales(bool alignCanvasToScales)
 {
-	m_plot->plotLayout()->setAlignCanvasToScale(axisId, alignCanvasToScales);
+	m_plot->plotLayout()->setAlignCanvasToScales(alignCanvasToScales);
 }
-
-bool PlotWidget::getAlignCanvasToScale(int axisId) { m_plot->plotLayout()->alignCanvasToScale(axisId); }
 
 void PlotWidget::hideDefaultAxis()
 {
