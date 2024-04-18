@@ -19,7 +19,7 @@ SevenSegmentMonitorSettings::SevenSegmentMonitorSettings(QWidget *parent)
 
 	MenuSectionWidget *sevenSegmentSettingsContainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *sevenSegmentSettingsSection =
-		new MenuCollapseSection("7 Segment", MenuCollapseSection::MHCW_NONE, sevenSegmentSettingsContainer);
+		new MenuCollapseSection("7 SEGMENT", MenuCollapseSection::MHCW_NONE, sevenSegmentSettingsContainer);
 
 	sevenSegmentSettingsContainer->contentLayout()->addWidget(sevenSegmentSettingsSection);
 	sevenSegmentSettingsSection->contentLayout()->setSpacing(10);

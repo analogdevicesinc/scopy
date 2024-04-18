@@ -31,6 +31,9 @@ QList<DmmDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
 				DmmDataMonitorModel *channelModel =
 					new DmmDataMonitorModel(name, StyleHelper::getColor("CH" + QString::number(j)));
 
+				channelModel->setIioChannel(chn);
+				channelModel->setIioDevice(dev);
+
 				int type = iio_channel_get_type(chn);
 				if(type != iio_chan_type::IIO_CHAN_TYPE_UNKNOWN) {
 					DMMInfo dmmInfo = m_iioDevices.value(type);

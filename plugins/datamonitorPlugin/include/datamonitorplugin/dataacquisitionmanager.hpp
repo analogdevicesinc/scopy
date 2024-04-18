@@ -21,7 +21,6 @@ public:
 	void removeMonitor(QString monitorName);
 	void removeDevice(QString device);
 	void clearMonitorsData();
-	QList<QString> getMonitors();
 
 	// will read data once
 	void readData();

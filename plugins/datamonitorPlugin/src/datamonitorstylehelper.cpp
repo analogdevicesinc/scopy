@@ -72,6 +72,7 @@ void DataMonitorStyleHelper::SevenSegmentMonitorsStyle(SevenSegmentMonitor *seve
 	sevenSegmentMonitor->lcdNumber->setSegmentStyle(QLCDNumber::SegmentStyle::Flat);
 	sevenSegmentMonitor->lcdNumberMin->setSegmentStyle(QLCDNumber::SegmentStyle::Flat);
 	sevenSegmentMonitor->lcdNumberMax->setSegmentStyle(QLCDNumber::SegmentStyle::Flat);
+	sevenSegmentMonitor->layout->setAlignment(sevenSegmentMonitor->lcdNumber, Qt::AlignHCenter | Qt::AlignVCenter);
 
 	sevenSegmentMonitor->setStyleSheet(style);
 }
