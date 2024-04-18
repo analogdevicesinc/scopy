@@ -175,11 +175,12 @@ bool RegmapPlugin::onConnect()
 					uint32_t axiAddressSpace = Utils::convertQStringToUint32("80000000");
 					iioReadStrategy->setAddressSpace(axiAddressSpace);
 					iioWriteStrategy->setAddressSpace(axiAddressSpace);
+					generateDevice(templatePath, dev, devName, iioReadStrategy, iioWriteStrategy,
+						       templatePaths->getBitsPerRow());
 				}
+			} else {
+				generateDevice(templatePath, dev, devName, iioReadStrategy, iioWriteStrategy);
 			}
-
-			generateDevice(templatePath, dev, devName, iioReadStrategy, iioWriteStrategy,
-				       templatePaths->getBitsPerRow());
 		}
 
 		m_toolList[0]->setEnabled(true);
