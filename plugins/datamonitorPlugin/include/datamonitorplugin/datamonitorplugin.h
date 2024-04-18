@@ -4,8 +4,8 @@
 #define SCOPY_PLUGIN_NAME DataMonitorPlugin
 
 #include "dataacquisitionmanager.hpp"
-#include "datamonitormodel.hpp"
 #include "datamonitortool.h"
+#include "readabledatamonitormodel.hpp"
 #include "scopy-datamonitorplugin_export.h"
 #include <QObject>
 #include <pluginbase/plugin.h>
@@ -38,7 +38,7 @@ public Q_SLOTS:
 	void toggleRunState(bool toggled);
 
 private:
-	QList<DataMonitorModel *> dmmList;
+	QList<ReadableDataMonitorModel *> dmmList;
 	DataAcquisitionManager *m_dataAcquisitionManager;
 	bool isRunning = false;
 };
