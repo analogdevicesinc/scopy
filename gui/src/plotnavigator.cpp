@@ -3,7 +3,10 @@
 #include "plotzoomer.hpp"
 #include "qevent.h"
 
+#include <QPushButton>
+#include <hoverwidget.h>
 #include <plotaxis.h>
+#include <stylehelper.h>
 
 using namespace scopy;
 
@@ -40,6 +43,7 @@ PlotNavigator::PlotNavigator(PlotWidget *plotWidget, QSet<PlotChannel *> *channe
 	, m_zoomerXYModifier(Qt::NoModifier)
 	, m_magnifierPanModifier(Qt::ShiftModifier)
 	, m_magnifierZoomModifier(Qt::NoModifier)
+	, m_resetButton(nullptr)
 {
 	init();
 }
@@ -50,6 +54,9 @@ void PlotNavigator::init()
 		m_axes->insert(ch->xAxis()->axisId());
 		m_axes->insert(ch->yAxis()->axisId());
 	}
+
+	initResetButton();
+	setResetButtonEn(true);
 
 	initNavigators();
 	connect(this, &PlotNavigator::undo, this, &PlotNavigator::onUndo);
@@ -70,6 +77,24 @@ void PlotNavigator::initNavigators()
 	for(QwtAxisId axisId : *m_axes) {
 		addNavigators(axisId);
 	}
+}
+
+void PlotNavigator::initResetButton()
+{
+	m_resetButton = new QPushButton(m_plot->canvas());
+	QIcon icon(QPixmap(":/gui/icons/search_crossed.svg"));
+	m_resetButton->setFlat(true);
+	StyleHelper::TransparentWidget(m_resetButton);
+	m_resetButton->setIcon(icon);
+
+	connect(m_resetButton, &QPushButton::clicked, this, [=]() { Q_EMIT reset(); });
+	connect(this, &PlotNavigator::rectChanged, this, [=]() { m_resetButton->setVisible(isZoomed()); });
+
+	m_resetHover = new HoverWidget(m_resetButton, m_plot, m_plot);
+	m_resetHover->setAnchorPos(HoverPosition::HP_BOTTOMRIGHT);
+	m_resetHover->setContentPos(HoverPosition::HP_TOPLEFT);
+	m_resetHover->setAnchorOffset(QPoint(-6, -6));
+	m_resetHover->show();
 }
 
 QWidget *PlotNavigator::canvas() { return m_plot->canvas(); }
@@ -541,5 +566,7 @@ void PlotNavigator::syncPlotNavigators(PlotNavigator *pNav1, PlotNavigator *pNav
 		}
 	}
 }
+
+void PlotNavigator::setResetButtonEn(bool en) { m_resetHover->setVisible(en); }
 
 #include "moc_plotnavigator.cpp"
