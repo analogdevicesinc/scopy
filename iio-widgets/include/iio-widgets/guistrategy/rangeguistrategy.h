@@ -59,6 +59,16 @@ Q_SIGNALS:
 	void requestData() override;
 
 private:
+	/**
+	 * @brief tryParse will try an parse a QString to a double and if it fails it will try
+	 * and parse it io an int and the cast it back to a double.
+	 * @param number A QString that represents a double or an int.
+	 * @param success This will be set to false if the QString parse fails and true if the
+	 * number is parsed successfully.
+	 * @return The double that was extracted from the QString.
+	 */
+	double tryParse(QString number, bool *success);
+
 	QWidget *m_ui;
 	TitleSpinBox *m_spinBox;
 };
