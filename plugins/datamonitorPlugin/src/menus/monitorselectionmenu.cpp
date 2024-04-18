@@ -42,7 +42,8 @@ MonitorSelectionMenu::MonitorSelectionMenu(QMap<QString, DataMonitorModel *> *mo
 	importedChannelsWidgetLayout->setSpacing(10);
 	importedChannelsWidget->setLayout(importedChannelsWidgetLayout);
 
-	monitorsGroup = new QButtonGroup(this);
+	m_monitorsGroup = new QButtonGroup(this);
+	m_monitorsGroup->setExclusive(true);
 
 	foreach(QString monitor, monitorList->keys()) {
 		addMonitor(monitorList->value(monitor));
@@ -102,11 +103,11 @@ void MonitorSelectionMenu::addMonitor(DataMonitorModel *monitor)
 	monitorChannel->setOpenMenuChecksThis(true);
 	monitorChannel->setColor(monitor->getColor());
 	monitorChannel->button()->setVisible(false);
-	monitorChannel->setCheckable(false);
+	monitorChannel->setCheckable(true);
 
 	monitorChannel->setToolTip(monitor->getName());
 
-	monitorsGroup->addButton(monitorChannel);
+	m_monitorsGroup->addButton(monitorChannel);
 
 	// apply hover to the buttons based on the color they have
 	monitorChannel->setStyleSheet(QString(":hover{ background-color: %1 ; }").arg(monitor->getColor().name()));
@@ -136,3 +137,7 @@ void MonitorSelectionMenu::removeDevice(QString device)
 		deviceMap.remove(device);
 	}
 }
+
+QButtonGroup *MonitorSelectionMenu::monitorsGroup() const { return m_monitorsGroup; }
+
+void MonitorSelectionMenu::setMonitorsGroup(QButtonGroup *newMonitorsGroup) { m_monitorsGroup = newMonitorsGroup; }
