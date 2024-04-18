@@ -1,7 +1,6 @@
 #ifndef DATAMONITORMODEL_H
 #define DATAMONITORMODEL_H
 
-#include "ireadstrategy.hpp"
 #include "unitofmeasurement.hpp"
 
 #include "scopy-datamonitorplugin_export.h"
@@ -17,6 +16,7 @@ class SCOPY_DATAMONITORPLUGIN_EXPORT DataMonitorModel : public QObject
 
 	Q_OBJECT
 public:
+	DataMonitorModel(QObject *parent = nullptr);
 	explicit DataMonitorModel(QString name, QColor color, UnitOfMeasurement *unitOfMeasure = nullptr,
 				  QObject *parent = nullptr);
 
@@ -32,21 +32,16 @@ public:
 	QPair<double, double> getLastReadValue() const;
 	double getValueAtTime(double time);
 	void setValueAtTime(double time, double value);
-	void updateValue(double time, double value);
-	void resetMinMax();
+	void addValue(double time, double value);
 
-	QList<QPair<double, double>> *getValues() const;
 	void clearMonitorData();
 
 	QVector<double> *getXdata();
 	QVector<double> *getYdata();
 
-	IReadStrategy *getReadStrategy() const;
-	void setReadStrategy(IReadStrategy *newReadStrategy);
-	void read();
-
 	double minValue() const;
 	double maxValue() const;
+	void resetMinMax();
 
 	QString getShortName() const;
 	void setShortName(const QString &newShortName);
@@ -54,18 +49,22 @@ public:
 	QString getDeviceName() const;
 	void setDeviceName(const QString &newDeviceName);
 
-	bool isDummyMonitor() const;
-	void setIsDummyMonitor(bool newIsDummyMonitor);
-
 	void setYdata(const QVector<double> &newYdata);
 
 	void setXdata(const QVector<double> &newXdata);
+
+	void setMinValue(double newMinValue);
+
+	void setMaxValue(double newMaxValue);
 
 Q_SIGNALS:
 	void valueUpdated(double time, double value);
 	void minValueUpdated(double value);
 	void maxValueUpdated(double value);
 	void dataCleared();
+
+protected:
+	void setDataStorageSize();
 
 private:
 	QString name;
@@ -78,12 +77,7 @@ private:
 	QVector<double> ydata;
 	QVector<double> xdata;
 	void checkMinMaxUpdate(double value);
-	void setDataStorageSize();
-
-	IReadStrategy *readStrategy;
 	UnitOfMeasurement *unitOfMeasure;
-
-	bool m_isDummyMonitor = false;
 };
 } // namespace datamonitor
 } // namespace scopy

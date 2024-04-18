@@ -73,7 +73,11 @@ bool DataMonitorPlugin::loadIcon()
 	return true;
 }
 
-void DataMonitorPlugin::loadToolList() {}
+void DataMonitorPlugin::loadToolList()
+{
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "DataMonitor",
+						  ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+}
 
 void DataMonitorPlugin::unload()
 { /*delete m_infoPage;*/
@@ -96,7 +100,7 @@ bool DataMonitorPlugin::onConnect()
 
 	m_dataAcquisitionManager = new DataAcquisitionManager(this);
 
-	foreach(DataMonitorModel *monitor, dmmList) {
+	foreach(ReadableDataMonitorModel *monitor, dmmList) {
 		m_dataAcquisitionManager->getDataMonitorMap()->insert(monitor->getName(), monitor);
 	}
 
@@ -113,6 +117,7 @@ bool DataMonitorPlugin::onConnect()
 		}
 	});
 
+	removeTool("DataMonitorPreview");
 	addNewTool();
 
 	return true;

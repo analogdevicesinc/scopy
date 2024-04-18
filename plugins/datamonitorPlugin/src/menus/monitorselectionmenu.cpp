@@ -4,6 +4,7 @@
 #include <datamonitorstylehelper.hpp>
 #include <menucontrolbutton.h>
 #include <menusectionwidget.h>
+#include <readabledatamonitormodel.hpp>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -89,9 +90,8 @@ void MonitorSelectionMenu::generateDeviceSection(QString device, bool import)
 
 void MonitorSelectionMenu::addMonitor(DataMonitorModel *monitor)
 {
-
 	if(!deviceMap.contains(monitor->getDeviceName())) {
-		generateDeviceSection(monitor->getDeviceName(), monitor->isDummyMonitor());
+		generateDeviceSection(monitor->getDeviceName(), !qobject_cast<ReadableDataMonitorModel *>(monitor));
 	}
 
 	MenuControlButton *monitorChannel = new MenuControlButton(deviceMap.value(monitor->getDeviceName()));

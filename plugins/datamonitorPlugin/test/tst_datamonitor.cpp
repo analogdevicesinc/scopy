@@ -3,6 +3,7 @@
 #include "qpluginloader.h"
 #include <pluginbase/plugin.h>
 #include <datamonitorplugin/dataacquisitionmanager.hpp>
+#include <datamonitorplugin/readabledatamonitormodel.hpp>
 #include <datamonitorplugin/testreadstrategy.hpp>
 
 using namespace scopy;
@@ -29,7 +30,7 @@ void TST_DataMonitor::addMonitor()
 	QVERIFY(dataAcquisitionManager->getDataMonitorMap()->isEmpty());
 
 	UnitOfMeasurement *um = new UnitOfMeasurement("Volt", "V");
-	DataMonitorModel *channelModel = new DataMonitorModel("dev0:test ", "#FFFFFF", um);
+	ReadableDataMonitorModel *channelModel = new ReadableDataMonitorModel("dev0:test ", "#FFFFFF", um);
 
 	dataAcquisitionManager->getDataMonitorMap()->insert(channelModel->getName(), channelModel);
 
@@ -43,7 +44,7 @@ void TST_DataMonitor::removeMonitor()
 	QVERIFY(dataAcquisitionManager->getDataMonitorMap()->isEmpty());
 
 	UnitOfMeasurement *um = new UnitOfMeasurement("Volt", "V");
-	DataMonitorModel *channelModel = new DataMonitorModel("dev0:test ", "#FFFFFF", um);
+	ReadableDataMonitorModel *channelModel = new ReadableDataMonitorModel("dev0:test ", "#FFFFFF", um);
 
 	dataAcquisitionManager->getDataMonitorMap()->insert(channelModel->getName(), channelModel);
 
@@ -58,7 +59,7 @@ void TST_DataMonitor::activateMonitor()
 {
 	DataAcquisitionManager *dataAcquisitionManager = new DataAcquisitionManager();
 	UnitOfMeasurement *um = new UnitOfMeasurement("Volt", "V");
-	DataMonitorModel *channelModel = new DataMonitorModel("dev0:test ", "#FFFFFF", um);
+	ReadableDataMonitorModel *channelModel = new ReadableDataMonitorModel("dev0:test ", "#FFFFFF", um);
 	dataAcquisitionManager->getDataMonitorMap()->insert(channelModel->getName(), channelModel);
 
 	QVERIFY(dataAcquisitionManager->getActiveMonitors().isEmpty());
@@ -72,7 +73,7 @@ void TST_DataMonitor::disableMonitor()
 {
 	DataAcquisitionManager *dataAcquisitionManager = new DataAcquisitionManager();
 	UnitOfMeasurement *um = new UnitOfMeasurement("Volt", "V");
-	DataMonitorModel *channelModel = new DataMonitorModel("dev0:test ", "#FFFFFF", um);
+	ReadableDataMonitorModel *channelModel = new ReadableDataMonitorModel("dev0:test ", "#FFFFFF", um);
 	dataAcquisitionManager->getDataMonitorMap()->insert(channelModel->getName(), channelModel);
 
 	dataAcquisitionManager->updateActiveMonitors(true, channelModel->getName());
@@ -85,7 +86,7 @@ void TST_DataMonitor::disableOneOfManyUsers()
 {
 	DataAcquisitionManager *dataAcquisitionManager = new DataAcquisitionManager();
 	UnitOfMeasurement *um = new UnitOfMeasurement("Volt", "V");
-	DataMonitorModel *channelModel = new DataMonitorModel("dev0:test ", "#FFFFFF", um);
+	ReadableDataMonitorModel *channelModel = new ReadableDataMonitorModel("dev0:test ", "#FFFFFF", um);
 	dataAcquisitionManager->getDataMonitorMap()->insert(channelModel->getName(), channelModel);
 
 	// simulate 2 instances using the monitor
@@ -101,7 +102,7 @@ void TST_DataMonitor::disabledChannelRead()
 {
 	DataAcquisitionManager *dataAcquisitionManager = new DataAcquisitionManager();
 	UnitOfMeasurement *um = new UnitOfMeasurement("Volt", "V");
-	DataMonitorModel *channelModel = new DataMonitorModel("dev0:test ", "#FFFFFF", um);
+	ReadableDataMonitorModel *channelModel = new ReadableDataMonitorModel("dev0:test ", "#FFFFFF", um);
 	channelModel->setReadStrategy(new TestReadStrategy());
 	dataAcquisitionManager->getDataMonitorMap()->insert(channelModel->getName(), channelModel);
 
@@ -113,14 +114,14 @@ void TST_DataMonitor::disabledChannelRead()
 	dataAcquisitionManager->updateActiveMonitors(false, channelModel->getName());
 	dataAcquisitionManager->readData();
 
-	QVERIFY(channelModel->getValues()->isEmpty());
+	QVERIFY(channelModel->getYdata()->isEmpty());
 }
 
 void TST_DataMonitor::readData()
 {
 	DataAcquisitionManager *dataAcquisitionManager = new DataAcquisitionManager();
 	UnitOfMeasurement *um = new UnitOfMeasurement("Volt", "V");
-	DataMonitorModel *channelModel = new DataMonitorModel("dev0:test ", "#FFFFFF", um);
+	ReadableDataMonitorModel *channelModel = new ReadableDataMonitorModel("dev0:test ", "#FFFFFF", um);
 	channelModel->setReadStrategy(new TestReadStrategy());
 	dataAcquisitionManager->getDataMonitorMap()->insert(channelModel->getName(), channelModel);
 
@@ -128,14 +129,14 @@ void TST_DataMonitor::readData()
 
 	dataAcquisitionManager->readData();
 
-	QVERIFY(!channelModel->getValues()->isEmpty());
+	QVERIFY(!channelModel->getYdata()->isEmpty());
 }
 
 void TST_DataMonitor::clearData()
 {
 	DataAcquisitionManager *dataAcquisitionManager = new DataAcquisitionManager();
 	UnitOfMeasurement *um = new UnitOfMeasurement("Volt", "V");
-	DataMonitorModel *channelModel = new DataMonitorModel("dev0:test ", "#FFFFFF", um);
+	ReadableDataMonitorModel *channelModel = new ReadableDataMonitorModel("dev0:test ", "#FFFFFF", um);
 	channelModel->setReadStrategy(new TestReadStrategy());
 	dataAcquisitionManager->getDataMonitorMap()->insert(channelModel->getName(), channelModel);
 
@@ -144,7 +145,7 @@ void TST_DataMonitor::clearData()
 	dataAcquisitionManager->readData();
 	dataAcquisitionManager->clearMonitorsData();
 
-	QVERIFY(channelModel->getValues()->isEmpty());
+	QVERIFY(channelModel->getYdata()->isEmpty());
 }
 
 QTEST_MAIN(TST_DataMonitor)
