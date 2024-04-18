@@ -63,6 +63,7 @@ private:
 	QPushButton *deleteMonitor;
 	QWidget *generateYAxisSettings(QWidget *parent);
 	QWidget *generateCurveStyleSettings(QWidget *parent);
+	QWidget *generatePlotUiSettings(QWidget *parent);
 
 	EditTextMenuHeader *header;
 	QVBoxLayout *layout;
