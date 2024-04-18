@@ -42,7 +42,15 @@ HockeyPuckTempSensor::HockeyPuckTempSensor(iio_context *ctx, QWidget *parent)
 	layout->addWidget(m_tool);
 	tim = new QTimer(this);
 	connect(tim, &QTimer::timeout, this, &HockeyPuckTempSensor::refresh);
-	tim->start(1000);
+}
+
+void HockeyPuckTempSensor::run(bool b)
+{
+	if(b) {
+		tim->start(1000);
+	} else {
+		tim->stop();
+	}
 }
 
 void HockeyPuckTempSensor::initData()
@@ -69,11 +77,14 @@ HockeyPuckTempSensor::~HockeyPuckTempSensor() {}
 void HockeyPuckTempSensor::refresh()
 {
 	if(changedUnit) {
-		if(unit == "Celsius") {
-			setCelsius();
-		} else {
-			setKelvin();
-		}
+		int ret = 0;
+		QString val = unitOfMeasurement->itemData(unitOfMeasurement->currentIndex()).toString();
+		char buffer[100];
+		strcpy(buffer, val.toLocal8Bit().data());
+
+		ret = iio_channel_attr_write(m_ch, HPTS_OUT_UNIT_ATTR_NAME, buffer);
+		qInfo(CAT_HPTS_TOOL) << "wrote " << ret << " bytes to " << HPTS_OUT_UNIT_ATTR_NAME << ":"
+				     << QString(buffer);
 	}
 	changedUnit = false;
 
@@ -98,8 +109,6 @@ void HockeyPuckTempSensor::updateUnit(QString txt)
 	initData();
 	// hack
 	changedUnit = true;
-	unit = txt;
-	qInfo() << txt;
 }
 
 void HockeyPuckTempSensor::setupUiElements()
@@ -114,10 +123,15 @@ void HockeyPuckTempSensor::setupUiElements()
 	name = new QLabel("Temperature");
 	//	QLabel *unitOfMeasurement = new QLabel("Degrees");
 	unitOfMeasurement = new QComboBox(this);
-	unitOfMeasurement->addItem("Celsius");
-	unitOfMeasurement->addItem("Kelvin");
-	unit = "Celsius";
+	unitOfMeasurement->addItem("Raw", "0");
+	unitOfMeasurement->addItem("Resistance", "1");
+	unitOfMeasurement->addItem("Kelvin", "2");
+	unitOfMeasurement->addItem("Celsius", "3");
+	unitOfMeasurement->addItem("Fahrenheit", "4");
+
 	connect(unitOfMeasurement, &QComboBox::currentTextChanged, this, &HockeyPuckTempSensor::updateUnit);
+	unitOfMeasurement->setCurrentText("Celsius");
+
 	sevenseg = new LcdNumber(this);
 	applyStylesheet(HPTS_COLOR);
 
@@ -134,7 +148,7 @@ void HockeyPuckTempSensor::setupUiElements()
 	// plot setup
 	pa = new PlotAutoscaler(this);
 	ch = new PlotChannel(QString("temp"), QPen(HPTS_COLOR), plot, plot->xAxis(), plot->yAxis(), this);
-	plot->addedChannel(ch);
+	plot->addPlotChannel(ch);
 	plot->xAxis()->setInterval(HPTS_NR_SAMPLES - 1, 0);
 	plot->xAxis()->setVisible(true);
 	plot->yAxis()->setVisible(true);
@@ -176,19 +190,21 @@ void HockeyPuckTempSensor::applyStylesheet(QString lcdColor)
 	sevenseg->setFixedSize(200, 100);
 	sevenseg->setSegmentStyle(QLCDNumber::SegmentStyle::Flat);
 	sevenseg->setDigitCount(9);
-
 	sevenseg->setStyleSheet(style);
 }
 
 float HockeyPuckTempSensor::readData()
 {
-
 	char buffer[100];
-	iio_channel_attr_read(m_ch, HPTS_ATTR_NAME, buffer, 100);
+	int ret = 0;
+	ret = iio_channel_attr_read(m_ch, HPTS_RAW, buffer, 100); // read raw
+	qInfo(CAT_HPTS_TOOL) << "read " << ret << " bytes from " << HPTS_RAW << ":" << QString::fromUtf8(buffer);
+	ret = iio_channel_attr_write(m_ch, HPTS_INPUT_ATTR_NAME, buffer); // write value to temperature_input
+	qInfo(CAT_HPTS_TOOL) << "wrote " << ret << " bytes to " << HPTS_INPUT_ATTR_NAME << ":"
+			     << QString::fromUtf8(buffer);
+	ret = iio_channel_attr_read(m_ch, HPTS_OUTPUT_ATTR_NAME, buffer, 100); // readback output
+	qInfo(CAT_HPTS_TOOL) << "read " << ret << " bytes from " << HPTS_OUTPUT_ATTR_NAME << ":"
+			     << QString::fromUtf8(buffer);
 	float val = atof(buffer);
 	return val;
 }
-
-void HockeyPuckTempSensor::setCelsius() { iio_channel_attr_write(m_ch, HPTS_UNIT_ATTR_NAME, HPTS_CELSIUS_VAL); }
-
-void HockeyPuckTempSensor::setKelvin() { iio_channel_attr_write(m_ch, HPTS_UNIT_ATTR_NAME, HPTS_KELVIN_VAL); }

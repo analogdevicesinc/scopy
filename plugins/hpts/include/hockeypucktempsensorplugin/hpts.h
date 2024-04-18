@@ -25,17 +25,21 @@ using namespace scopy::gui;
 #define COMPATIBLE_DESCRIPTION "PREEMPT"
 #define HPTS_DEV_NAME "xadc"
 #define HPTS_CH_NAME "temp0"
-#define HPTS_ATTR_NAME "raw"
-#define HPTS_UNIT_ATTR_NAME ""
+#define HPTS_RAW "raw"
+#define HPTS_INPUT_ATTR_NAME "temperature_input"
+#define HPTS_OUTPUT_ATTR_NAME "temperature_output"
+#define HPTS_OUT_UNIT_ATTR_NAME "convert_output_unit"
+
 #else
 
 #define COMPATIBLE_DESCRIPTION "Hockey Puck IIO Server"
 #define HPTS_DEV_NAME "ad7124-4"
 #define HPTS_CH_NAME "voltage0-voltage0"
-#define HPTS_ATTR_NAME "temperature_output"
-#define HPTS_UNIT_ATTR_NAME "convert_output_unit"
-#define HPTS_CELSIUS_VAL "3"
-#define HPTS_KELVIN_VAL "2"
+#define HPTS_RAW "raw"
+#define HPTS_INPUT_ATTR_NAME "temperature_input"
+#define HPTS_OUTPUT_ATTR_NAME "temperature_output"
+#define HPTS_OUT_UNIT_ATTR_NAME "convert_output_unit"
+
 #endif
 
 class SCOPY_HOCKEYPUCKTEMPSENSORPLUGIN_EXPORT HockeyPuckTempSensor : public QWidget
@@ -44,13 +48,14 @@ class SCOPY_HOCKEYPUCKTEMPSENSORPLUGIN_EXPORT HockeyPuckTempSensor : public QWid
 public:
 	HockeyPuckTempSensor(iio_context *ctx, QWidget *parent = nullptr);
 	~HockeyPuckTempSensor();
+public Q_SLOTS:
+	void run(bool);
 private Q_SLOTS:
 	void refresh();
 	void setMin(double val);
 	void setMax(double val);
 	void updateUnit(QString txt);
 	float readData();
-	void setCelsius();
 
 private:
 	void setupUiElements();
@@ -73,7 +78,6 @@ private:
 
 	void applyStylesheet(QString lcdColor);
 	void initData();
-	void setKelvin();
 	iio_context *m_ctx;
 	iio_device *m_dev;
 	iio_channel *m_ch;

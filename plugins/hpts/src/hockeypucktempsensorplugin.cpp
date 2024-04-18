@@ -98,6 +98,9 @@ bool HockeyPuckTempSensorPlugin::onConnect()
 	m_toolList[0]->setTool(hockeyPuckTempSensor);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
+
+	connect(m_toolList[0], &ToolMenuEntry::runToggled, hockeyPuckTempSensor, &HockeyPuckTempSensor::run);
+	m_toolList[0]->setRunning(true);
 	return true;
 }
 
@@ -131,7 +134,7 @@ void HockeyPuckTempSensorPlugin::initMetadata()
 	   "category":[
 	      "iio"
 	   ],
-	   "exclude":["*"]
+	   "exclude":["*", "!debuggerplugin"]
 	}
 )plugin");
 }
