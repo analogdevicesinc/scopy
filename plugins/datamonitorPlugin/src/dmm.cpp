@@ -12,9 +12,9 @@ DMM::DMM(QObject *parent)
 	generateDictionaries();
 }
 
-QList<ReadableDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
+QList<DmmDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
 {
-	QList<ReadableDataMonitorModel *> result;
+	QList<DmmDataMonitorModel *> result;
 
 	auto deviceCount = iio_context_get_devices_count(ctx);
 	for(int i = 0; i < deviceCount; i++) {
@@ -28,8 +28,8 @@ QList<ReadableDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
 				QString name = QString::fromStdString(iio_device_get_name(dev)) + ":" +
 					QString::fromStdString(iio_channel_get_id(chn));
 
-				ReadableDataMonitorModel *channelModel = new ReadableDataMonitorModel(
-					name, StyleHelper::getColor("CH" + QString::number(j)));
+				DmmDataMonitorModel *channelModel =
+					new DmmDataMonitorModel(name, StyleHelper::getColor("CH" + QString::number(j)));
 
 				int type = iio_channel_get_type(chn);
 				if(type != iio_chan_type::IIO_CHAN_TYPE_UNKNOWN) {
