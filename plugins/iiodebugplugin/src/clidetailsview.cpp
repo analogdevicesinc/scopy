@@ -39,6 +39,7 @@ void CliDetailsView::setIIOStandardItem(IIOStandardItem *item)
 		setupContextAttr();
 		break;
 	case IIOStandardItem::Device:
+		/* fallthrough */
 	case IIOStandardItem::Trigger:
 		m_globalLevel = 1;
 		m_contextIIOItem = item;

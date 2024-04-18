@@ -88,6 +88,12 @@ public:
 	 * */
 	IIOWidget::State *lastOperationState();
 
+	/**
+	 * @brief lastReturnCode Returns the return code from the last operation performed.
+	 * @return Int value that represents the last return code. If no operation was performed, 0 will be returned.
+	 */
+	int lastReturnCode();
+
 Q_SIGNALS:
 	/**
 	 * @brief Emits the current state of the IIOWidget system and a string containing a more
@@ -113,6 +119,7 @@ protected:
 	QString m_lastData;
 	SmallProgressBar *m_progressBar;
 	QDateTime *m_lastOpTimestamp;
+	int m_lastReturnCode;
 	IIOWidget::State *m_lastOpState;
 };
 } // namespace scopy
