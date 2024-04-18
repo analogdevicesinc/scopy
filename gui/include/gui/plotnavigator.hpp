@@ -6,8 +6,10 @@
 #include <QwtPlot>
 #include "scopy-gui_export.h"
 
-namespace scopy {
+class QPushButton;
 
+namespace scopy {
+class HoverWidget;
 class PlotChannel;
 class PlotWidget;
 class PlotMagnifier;
@@ -93,6 +95,7 @@ public:
 	Qt::KeyboardModifier getZoomerXYModifier();
 
 	static void syncPlotNavigators(PlotNavigator *pNav1, PlotNavigator *pNav2, QSet<QwtAxisId> *axes);
+	void setResetButtonEn(bool en);
 
 Q_SIGNALS:
 	void reset();
@@ -107,6 +110,7 @@ protected:
 private:
 	void init();
 	void initNavigators();
+	void initResetButton();
 	QWidget *canvas();
 	PlotMagnifier *createMagnifier(QwtAxisId axisId);
 	PlotZoomer *createZoomer(QwtAxisId axisId);
@@ -131,6 +135,8 @@ private:
 	bool m_magnifierEn, m_zoomerEn;
 	Qt::KeyboardModifier m_zoomerXModifier, m_zoomerYModifier, m_zoomerXYModifier;
 	Qt::KeyboardModifier m_magnifierPanModifier, m_magnifierZoomModifier;
+	QPushButton *m_resetButton;
+	HoverWidget *m_resetHover;
 };
 } // namespace scopy
 
