@@ -1,5 +1,7 @@
 #include "dataacquisitionmanager.hpp"
 
+#include <readabledatamonitormodel.hpp>
+
 using namespace scopy;
 using namespace datamonitor;
 
@@ -52,7 +54,10 @@ void DataAcquisitionManager::readData()
 	//		readerThread->start();
 
 	foreach(QString monKey, m_activeMonitorsMap->keys()) {
-		m_dataMonitorMap->value(monKey)->read();
+		auto monitor = m_dataMonitorMap->value(monKey);
+		if(qobject_cast<ReadableDataMonitorModel *>(monitor)) {
+			dynamic_cast<ReadableDataMonitorModel *>(monitor)->read();
+		}
 	}
 }
 

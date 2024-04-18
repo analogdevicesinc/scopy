@@ -104,7 +104,8 @@ void LogDataToFile::logData(QString path)
 		// use a QSet to avoid having duplicate time values
 		QSet<double> timeValues;
 		foreach(QString monitor, m_dataAcquisitionManager->getActiveMonitors()) {
-			if(!m_dataAcquisitionManager->getDataMonitorMap()->value(monitor)->isDummyMonitor()) {
+			if(qobject_cast<DataMonitorModel *>(
+				   m_dataAcquisitionManager->getDataMonitorMap()->value(monitor))) {
 				tableHead += ", " + monitor;
 				auto xData = m_dataAcquisitionManager->getDataMonitorMap()->value(monitor)->getXdata();
 				for(int i = 0; i < xData->length(); i++) {
@@ -119,7 +120,8 @@ void LogDataToFile::logData(QString path)
 			QString time = QString(auxTime.toString(dateTimeFormat));
 
 			foreach(QString monitor, m_dataAcquisitionManager->getActiveMonitors()) {
-				if(!m_dataAcquisitionManager->getDataMonitorMap()->value(monitor)->isDummyMonitor()) {
+				if(qobject_cast<DataMonitorModel *>(
+					   m_dataAcquisitionManager->getDataMonitorMap()->value(monitor))) {
 					auto auxVal = m_dataAcquisitionManager->getDataMonitorMap()
 							      ->value(monitor)
 							      ->getValueAtTime(*i);
@@ -223,7 +225,6 @@ void LogDataToFile::loadData(QString path)
 				channelModel->setDeviceName(fileTitle);
 				channelModel->setXdata(timeVector);
 				channelModel->setYdata(*it.value());
-				channelModel->setIsDummyMonitor(true);
 				m_dataAcquisitionManager->addMonitor(channelModel);
 			}
 		}
