@@ -65,6 +65,9 @@ void DataMonitorSettings::init(QString title, QColor color)
 	/// Curve style
 	layout->addWidget(generateCurveStyleSettings(this));
 
+	////Plot style
+	layout->addWidget(generatePlotUiSettings(this));
+
 	////// 7 segment settings ///////////////////
 	sevenSegmentMonitorSettings = new SevenSegmentMonitorSettings(this);
 	layout->addWidget(sevenSegmentMonitorSettings);
@@ -151,6 +154,39 @@ QWidget *DataMonitorSettings::generateCurveStyleSettings(QWidget *parent)
 	curveStylecontainer->contentLayout()->addWidget(curveStyleSection);
 
 	return curveStylecontainer;
+}
+
+QWidget *DataMonitorSettings::generatePlotUiSettings(QWidget *parent)
+{
+	MenuSectionWidget *plotStylecontainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *plotStyleSection =
+		new MenuCollapseSection("PLOT STYLE", MenuCollapseSection::MHCW_NONE, plotStylecontainer);
+
+	MenuOnOffSwitch *showYAxisLabel = new MenuOnOffSwitch(tr("Y-AXIS label"), plotStyleSection, false);
+	showYAxisLabel->onOffswitch()->setChecked(true);
+
+	connect(showYAxisLabel->onOffswitch(), &QAbstractButton::toggled, this,
+		[=, this](bool toggled) { m_plot->plot()->yAxis()->setVisible(toggled); });
+
+	MenuOnOffSwitch *showXAxisLabel = new MenuOnOffSwitch(tr("X-AXIS label"), plotStyleSection, false);
+	showXAxisLabel->onOffswitch()->setChecked(true);
+
+	connect(showXAxisLabel->onOffswitch(), &QAbstractButton::toggled, this,
+		[=, this](bool toggled) { m_plot->plot()->xAxis()->setVisible(toggled); });
+
+	MenuOnOffSwitch *showBufferPreview = new MenuOnOffSwitch(tr("Buffer Preview"), plotStyleSection, false);
+	showBufferPreview->onOffswitch()->setChecked(true);
+
+	connect(showBufferPreview->onOffswitch(), &QAbstractButton::toggled, this,
+		[=, this](bool toggled) { m_plot->toggleBufferPreview(toggled); });
+
+	plotStyleSection->contentLayout()->addWidget(showBufferPreview);
+	plotStyleSection->contentLayout()->addWidget(showXAxisLabel);
+	plotStyleSection->contentLayout()->addWidget(showYAxisLabel);
+
+	plotStylecontainer->contentLayout()->addWidget(plotStyleSection);
+
+	return plotStylecontainer;
 }
 
 DataLoggingMenu *DataMonitorSettings::getDataLoggingMenu() const { return dataLoggingMenu; }
