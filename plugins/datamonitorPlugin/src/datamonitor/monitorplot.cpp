@@ -222,3 +222,5 @@ void MonitorPlot::updatePlotStartingPoint(double time, double delta)
 	m_plotInfo->updateBufferPreviewer();
 	m_plot->replot();
 }
+
+void MonitorPlot::toggleBufferPreview(bool toggled) { m_plotInfo->setVisible(toggled); }
