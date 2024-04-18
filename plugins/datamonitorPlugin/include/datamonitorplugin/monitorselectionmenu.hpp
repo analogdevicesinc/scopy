@@ -24,6 +24,7 @@ Q_SIGNALS:
 	void monitorToggled(bool toggled, QString monitorName);
 	void removeMonitor();
 	void requestRemoveImportedDevice(QString device);
+	void requestMonitorMenu(QString monitorName);
 
 private:
 	QWidget *deviceChannelsWidget;

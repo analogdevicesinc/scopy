@@ -63,6 +63,7 @@ target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
+target_include_directories(${PROJECT_NAME} PRIVATE ${IIO_INCLUDE_DIRS} scopy-gui scopy-iio-widgets)
 
 target_link_libraries(
 	${PROJECT_NAME}
@@ -71,6 +72,7 @@ target_link_libraries(
 	       scopy-pluginbase
 	       scopy-gui
 	       scopy-iioutil
+	       scopy-iio-widgets
 )
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)

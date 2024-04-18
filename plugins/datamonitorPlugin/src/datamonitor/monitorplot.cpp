@@ -148,7 +148,7 @@ void MonitorPlot::setupXAxis()
 
 	updateAxisScaleDraw();
 	refreshXAxisInterval();
-	m_plot->setAlignCanvasToScale(m_plot->xAxis()->axisId().id, true);
+	m_plot->setAlignCanvasToScales(false);
 
 	m_plot->replot();
 }
@@ -183,7 +183,7 @@ void MonitorPlot::setStartTime()
 
 	QString formattedTime = timeTracker->startTime().toString(dateTimeFormat);
 	QByteArray formattedTimeMsg = formattedTime.toLocal8Bit();
-	startTimeLabel->setText(QString(formattedTimeMsg));
+	startTimeLabel->setText(QString("Start time: " + formattedTimeMsg));
 
 	updateAxisScaleDraw();
 }
