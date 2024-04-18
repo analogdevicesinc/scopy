@@ -148,6 +148,7 @@ void MonitorPlot::setupXAxis()
 
 	updateAxisScaleDraw();
 	refreshXAxisInterval();
+	m_plot->setAlignCanvasToScale(m_plot->xAxis()->axisId().id, true);
 
 	m_plot->replot();
 }
