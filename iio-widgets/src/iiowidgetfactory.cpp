@@ -32,7 +32,7 @@
 #include <iioutil/connectionprovider.h>
 #include <QLoggingCategory>
 
-#define ATTR_BUFFER_SIZE 256
+#define ATTR_BUFFER_SIZE 16384
 using namespace scopy;
 Q_LOGGING_CATEGORY(CAT_ATTRFACTORY, "AttrFactory")
 
@@ -55,7 +55,7 @@ QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForChannel(struct iio_channel 
 		}
 	}
 
-	for(const auto &attributeName : channelAttributes) {
+	for(const QString &attributeName : channelAttributes) {
 		if(attributeName.endsWith("_available")) {
 			continue;
 		}
