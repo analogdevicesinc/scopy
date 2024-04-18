@@ -8,6 +8,8 @@
 using namespace scopy;
 using namespace datamonitor;
 
+DataMonitorModel::DataMonitorModel(QObject *parent) { setDataStorageSize(); }
+
 DataMonitorModel::DataMonitorModel(QString name, QColor color, UnitOfMeasurement *unitOfMeasure, QObject *parent)
 	: color(color)
 	, m_minValue(Q_INFINITY)
@@ -74,34 +76,19 @@ void DataMonitorModel::setValueAtTime(double time, double value)
 	if(xdata.contains(time)) {
 		ydata.replace(xdata.indexOf(time), value);
 	} else {
-		updateValue(time, value);
+		addValue(time, value);
 	}
-}
-
-QList<QPair<double, double>> *DataMonitorModel::getValues() const
-{
-	QList<QPair<double, double>> *result = new QList<QPair<double, double>>();
-
-	for(int i = 0; i < xdata.length(); i++) {
-		result->push_back(qMakePair(xdata.at(i), ydata.at(i)));
-	}
-
-	return result;
 }
 
 void DataMonitorModel::checkMinMaxUpdate(double value)
 {
 	if(value < m_minValue) {
-		m_minValue = value;
-		Q_EMIT minValueUpdated(value);
+		setMinValue(value);
 	}
 	if(value > m_maxValue) {
-		m_maxValue = value;
-		Q_EMIT maxValueUpdated(value);
+		setMaxValue(value);
 	}
 }
-
-IReadStrategy *DataMonitorModel::getReadStrategy() const { return readStrategy; }
 
 void DataMonitorModel::setDataStorageSize()
 {
@@ -121,15 +108,12 @@ void DataMonitorModel::setDataStorageSize()
 	}
 }
 
-bool DataMonitorModel::isDummyMonitor() const { return m_isDummyMonitor; }
-
-void DataMonitorModel::setIsDummyMonitor(bool newIsDummyMonitor) { m_isDummyMonitor = newIsDummyMonitor; }
-
 void DataMonitorModel::setYdata(const QVector<double> &newYdata)
 {
 	ydata.erase(ydata.begin(), ydata.end());
 	ydata.append(newYdata);
 	Q_EMIT dataCleared();
+	resetMinMax();
 }
 
 void DataMonitorModel::setXdata(const QVector<double> &newXdata)
@@ -139,10 +123,16 @@ void DataMonitorModel::setXdata(const QVector<double> &newXdata)
 	Q_EMIT dataCleared();
 }
 
-void DataMonitorModel::setReadStrategy(IReadStrategy *newReadStrategy)
+void DataMonitorModel::setMinValue(double newMinValue)
 {
-	readStrategy = newReadStrategy;
-	connect(readStrategy, &IReadStrategy::readDone, this, &DataMonitorModel::updateValue);
+	m_minValue = newMinValue;
+	Q_EMIT minValueUpdated(m_minValue);
+}
+
+void DataMonitorModel::setMaxValue(double newMaxValue)
+{
+	m_maxValue = newMaxValue;
+	Q_EMIT maxValueUpdated(m_maxValue);
 }
 
 QVector<double> *DataMonitorModel::getXdata() { return &xdata; }
@@ -157,16 +147,16 @@ void DataMonitorModel::clearMonitorData()
 	Q_EMIT dataCleared();
 }
 
-void DataMonitorModel::read()
-{
-	if(!m_isDummyMonitor) {
-		readStrategy->read();
-	}
-}
-
 double DataMonitorModel::minValue() const { return m_minValue; }
 
 double DataMonitorModel::maxValue() const { return m_maxValue; }
+
+void DataMonitorModel::resetMinMax()
+{
+	for(double val : ydata) {
+		checkMinMaxUpdate(val);
+	}
+}
 
 QString DataMonitorModel::getShortName() const { return shortName; }
 
@@ -176,7 +166,7 @@ QString DataMonitorModel::getDeviceName() const { return deviceName; }
 
 void DataMonitorModel::setDeviceName(const QString &newDeviceName) { deviceName = newDeviceName; }
 
-void DataMonitorModel::updateValue(double time, double value)
+void DataMonitorModel::addValue(double time, double value)
 {
 	// make sure the total amout of data won't be more than what is set in prefferences
 	if(xdata.length() >= m_dataSize) {
@@ -189,12 +179,4 @@ void DataMonitorModel::updateValue(double time, double value)
 	checkMinMaxUpdate(value);
 
 	Q_EMIT valueUpdated(time, value);
-}
-
-void DataMonitorModel::resetMinMax()
-{
-	m_minValue = Q_INFINITY;
-	Q_EMIT minValueUpdated(m_minValue);
-	m_maxValue = -Q_INFINITY;
-	Q_EMIT maxValueUpdated(m_maxValue);
 }
