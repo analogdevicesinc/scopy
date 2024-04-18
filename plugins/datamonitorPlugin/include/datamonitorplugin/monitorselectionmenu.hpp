@@ -20,6 +20,9 @@ public:
 	void addMonitor(DataMonitorModel *monitor);
 	void removeDevice(QString device);
 
+	QButtonGroup *monitorsGroup() const;
+	void setMonitorsGroup(QButtonGroup *newMonitorsGroup);
+
 Q_SIGNALS:
 	void monitorToggled(bool toggled, QString monitorName);
 	void removeMonitor();
@@ -30,7 +33,7 @@ private:
 	QWidget *deviceChannelsWidget;
 	QWidget *importedChannelsWidget;
 	QVBoxLayout *layout;
-	QButtonGroup *monitorsGroup;
+	QButtonGroup *m_monitorsGroup;
 	QMap<QString, MenuCollapseSection *> deviceMap;
 
 	void generateDeviceSection(QString device, bool import = false);

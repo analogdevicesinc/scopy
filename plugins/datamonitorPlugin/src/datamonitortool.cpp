@@ -220,8 +220,8 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	}
 
 	/////////////////monitor selection menu ///////////////
-
 	m_monitorSelectionMenu = new MonitorSelectionMenu(dataAcquisitionManager->getDataMonitorMap());
+	m_monitorSelectionMenu->monitorsGroup()->addButton(settingsButton);
 	tool->leftStack()->add("Monitors", m_monitorSelectionMenu);
 
 	connect(m_dataAcquisitionManager, &DataAcquisitionManager::monitorAdded, this,
