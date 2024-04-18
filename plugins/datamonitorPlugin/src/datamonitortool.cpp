@@ -1,8 +1,10 @@
+#include "channelattributesmenu.hpp"
 #include "datamonitortool.h"
 
 #include <QBoxLayout>
 #include <QDateTime>
 #include <datamonitorutils.hpp>
+#include <dmmdatamonitormodel.hpp>
 #include <logdatatofile.hpp>
 #include <menucontrolbutton.h>
 #include <sevensegmentdisplay.hpp>
@@ -211,18 +213,28 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	connect(m_dataMonitorSettings->getDataLoggingMenu(), &DataLoggingMenu::requestDataLoading, logDataToFile,
 		&LogDataToFile::loadData);
 
+	////generate channel settings for compatible monitors
+	foreach(QString monitor, m_dataAcquisitionManager->getDataMonitorMap()->keys()) {
+		auto monitorModel = m_dataAcquisitionManager->getDataMonitorMap()->value(monitor);
+		tool->rightStack()->add(monitor, new ChannelAttributesMenu(monitorModel, this));
+	}
+
 	/////////////////monitor selection menu ///////////////
 
 	m_monitorSelectionMenu = new MonitorSelectionMenu(dataAcquisitionManager->getDataMonitorMap());
 	tool->leftStack()->add("Monitors", m_monitorSelectionMenu);
 
-	connect(m_dataAcquisitionManager, &DataAcquisitionManager::monitorAdded, m_monitorSelectionMenu,
-		&MonitorSelectionMenu::addMonitor);
+	connect(m_dataAcquisitionManager, &DataAcquisitionManager::monitorAdded, this,
+		[=, this](DataMonitorModel *monitor) {
+			m_monitorSelectionMenu->addMonitor(monitor);
+			tool->rightStack()->add(monitor->getName(), new ChannelAttributesMenu(monitor, this));
+		});
 
 	connect(m_dataAcquisitionManager, &DataAcquisitionManager::monitorRemoved, this,
 		[=, this](QString monitorName) {
 			m_monitorPlot->removeMonitor(monitorName);
 			sevenSegmetMonitors->removeSegment(monitorName);
+			tool->rightStack()->remove(monitorName);
 		});
 
 	connect(m_dataAcquisitionManager, &DataAcquisitionManager::deviceRemoved, m_monitorSelectionMenu,
@@ -249,6 +261,11 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 
 	connect(m_monitorSelectionMenu, &MonitorSelectionMenu::requestRemoveImportedDevice, m_dataAcquisitionManager,
 		&DataAcquisitionManager::removeDevice);
+
+	connect(m_monitorSelectionMenu, &MonitorSelectionMenu::requestMonitorMenu, this, [=, this](QString monitor) {
+		tool->openRightContainerHelper(true);
+		tool->requestMenu(monitor);
+	});
 
 	initTutorialProperties();
 	DataMonitorStyleHelper::DataMonitorToolStyle(this);

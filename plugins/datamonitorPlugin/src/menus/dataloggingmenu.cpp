@@ -19,7 +19,7 @@ DataLoggingMenu::DataLoggingMenu(QWidget *parent)
 
 	MenuSectionWidget *logDataContainer = new MenuSectionWidget(this);
 	MenuCollapseSection *logDataSection =
-		new MenuCollapseSection("Data logging", MenuCollapseSection::MHCW_NONE, logDataContainer);
+		new MenuCollapseSection("DATA LOGGING", MenuCollapseSection::MHCW_NONE, logDataContainer);
 	logDataSection->contentLayout()->setSpacing(10);
 
 	dataLoggingFilePath = new ProgressLineEdit(logDataSection);
