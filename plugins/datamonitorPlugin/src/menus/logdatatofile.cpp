@@ -8,6 +8,7 @@
 #include <QwtDate>
 #include <datamonitorutils.hpp>
 #include <filemanager.h>
+#include <readabledatamonitormodel.hpp>
 #include <stylehelper.h>
 
 #include <pluginbase/preferences.h>
@@ -104,7 +105,7 @@ void LogDataToFile::logData(QString path)
 		// use a QSet to avoid having duplicate time values
 		QSet<double> timeValues;
 		foreach(QString monitor, m_dataAcquisitionManager->getActiveMonitors()) {
-			if(qobject_cast<DataMonitorModel *>(
+			if(qobject_cast<ReadableDataMonitorModel *>(
 				   m_dataAcquisitionManager->getDataMonitorMap()->value(monitor))) {
 				tableHead += ", " + monitor;
 				auto xData = m_dataAcquisitionManager->getDataMonitorMap()->value(monitor)->getXdata();
@@ -120,7 +121,7 @@ void LogDataToFile::logData(QString path)
 			QString time = QString(auxTime.toString(dateTimeFormat));
 
 			foreach(QString monitor, m_dataAcquisitionManager->getActiveMonitors()) {
-				if(qobject_cast<DataMonitorModel *>(
+				if(qobject_cast<ReadableDataMonitorModel *>(
 					   m_dataAcquisitionManager->getDataMonitorMap()->value(monitor))) {
 					auto auxVal = m_dataAcquisitionManager->getDataMonitorMap()
 							      ->value(monitor)
