@@ -105,6 +105,9 @@ bool DataLoggingMenu::liveDataLogging() const { return m_liveDataLogging; }
 
 void DataLoggingMenu::chooseFile()
 {
+	// turn off live data logging when switching files
+	liveDataLoggingButton->onOffswitch()->setChecked(false);
+
 	QString selectedFilter;
 	filename = QFileDialog::getSaveFileName(
 		this, tr("Export"), "", tr("Comma-separated values files (*.csv);;All Files(*)"), &selectedFilter,
