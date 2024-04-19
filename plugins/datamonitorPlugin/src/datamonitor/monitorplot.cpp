@@ -8,7 +8,7 @@
 #include <monitorplotcurve.hpp>
 #include <plotinfo.h>
 #include <timemanager.hpp>
-
+#include <plotnavigator.hpp>
 #include <pluginbase/preferences.h>
 
 using namespace scopy;
@@ -17,7 +17,7 @@ using namespace datamonitor;
 MonitorPlot::MonitorPlot(QWidget *parent)
 	: QWidget{parent}
 {
-	QVBoxLayout *layout = new QVBoxLayout(this);
+	layout = new QVBoxLayout(this);
 	setLayout(layout);
 
 	Preferences *p = Preferences::GetInstance();
@@ -35,6 +35,8 @@ MonitorPlot::MonitorPlot(QWidget *parent)
 	m_plot->yAxis()->setInterval(DataMonitorUtils::getAxisDefaultMinValue(),
 				     DataMonitorUtils::getAxisDefaultMaxValue());
 	m_plot->yAxis()->setVisible(true);
+	m_plot->setShowXAxisLabels(true);
+	m_plot->setShowYAxisLabels(true);
 
 	m_xAxisIntervalMin = DataMonitorUtils::getAxisDefaultMaxValue();
 	m_xAxisIntervalMax = DataMonitorUtils::getAxisDefaultMinValue();
@@ -50,12 +52,9 @@ MonitorPlot::MonitorPlot(QWidget *parent)
 	startTime->setAttribute(Qt::WA_TransparentForMouseEvents);
 
 	setStartTime();
-
 	setupXAxis();
+	generateBufferPreviewer();
 
-	m_plotInfo = new TimePlotInfo(m_plot, this);
-
-	layout->addWidget(m_plotInfo);
 	layout->addWidget(m_plot);
 
 	m_monitorCurves = new QMap<QString, MonitorPlotCurve *>();
@@ -83,7 +82,6 @@ void MonitorPlot::removeMonitor(QString monitorName)
 {
 	if(m_monitorCurves->contains(monitorName)) {
 		Q_EMIT monitorCurveRemoved(m_monitorCurves->value(monitorName)->plotch());
-		m_plot->removePlotChannel(m_monitorCurves->value(monitorName)->plotch());
 		m_monitorCurves->value(monitorName)->plotch()->curve()->detach();
 		m_monitorCurves->remove(monitorName);
 		delete m_monitorCurves->value(monitorName);
@@ -105,7 +103,7 @@ void MonitorPlot::updateXAxisIntervalMin(double min)
 {
 	m_xAxisIntervalMax = min;
 	refreshXAxisInterval();
-	m_plotInfo->updateBufferPreviewer();
+	m_bufferPreviewer->updateBufferPreviewer();
 	m_plot->replot();
 }
 
@@ -113,7 +111,7 @@ void MonitorPlot::updateXAxisIntervalMax(double max)
 {
 	m_xAxisIntervalMin = max;
 	refreshXAxisInterval();
-	m_plotInfo->updateBufferPreviewer();
+	m_bufferPreviewer->updateBufferPreviewer();
 	m_plot->replot();
 }
 
@@ -155,21 +153,22 @@ void MonitorPlot::setupXAxis()
 
 void MonitorPlot::genereateScaleDraw(QString format, double offset)
 {
-	QwtDateScaleDraw *scaleDraw = new QwtDateScaleDraw(Qt::OffsetFromUTC);
-	scaleDraw->enableComponent(QwtAbstractScaleDraw::Ticks, false);
-	scaleDraw->enableComponent(QwtAbstractScaleDraw::Backbone, false);
+	m_scaleDraw = new QwtDateScaleDraw(Qt::OffsetFromUTC);
+	m_scaleDraw->enableComponent(QwtAbstractScaleDraw::Ticks, false);
+	m_scaleDraw->enableComponent(QwtAbstractScaleDraw::Backbone, false);
 
 	// set time format for time interval types
-	scaleDraw->setDateFormat(QwtDate::IntervalType::Second, format);
-	scaleDraw->setDateFormat(QwtDate::IntervalType::Minute, format);
-	scaleDraw->setDateFormat(QwtDate::IntervalType::Hour, format);
-	scaleDraw->setDateFormat(QwtDate::IntervalType::Day, format);
-	scaleDraw->setDateFormat(QwtDate::IntervalType::Month, format);
-	scaleDraw->setDateFormat(QwtDate::IntervalType::Year, format);
-	scaleDraw->setUtcOffset(offset);
+	m_scaleDraw->setDateFormat(QwtDate::IntervalType::Millisecond, format);
+	m_scaleDraw->setDateFormat(QwtDate::IntervalType::Second, format);
+	m_scaleDraw->setDateFormat(QwtDate::IntervalType::Minute, format);
+	m_scaleDraw->setDateFormat(QwtDate::IntervalType::Hour, format);
+	m_scaleDraw->setDateFormat(QwtDate::IntervalType::Day, format);
+	m_scaleDraw->setDateFormat(QwtDate::IntervalType::Month, format);
+	m_scaleDraw->setDateFormat(QwtDate::IntervalType::Year, format);
+	m_scaleDraw->setUtcOffset(offset);
 
 	// apply scale draw to axis
-	m_plot->plot()->setAxisScaleDraw(m_plot->xAxis()->axisId(), scaleDraw);
+	m_plot->plot()->setAxisScaleDraw(m_plot->xAxis()->axisId(), m_scaleDraw);
 
 	// make label more readable
 	m_plot->plot()->setAxisLabelRotation(m_plot->xAxis()->axisId(), -50.0);
@@ -184,17 +183,17 @@ void MonitorPlot::setStartTime()
 	QString formattedTime = timeTracker->startTime().toString(dateTimeFormat);
 	QByteArray formattedTimeMsg = formattedTime.toLocal8Bit();
 	startTimeLabel->setText(QString("Start time: " + formattedTimeMsg));
-
+	genereateScaleDraw(dateTimeFormat, QDateTime::currentDateTime().offsetFromUtc());
 	updateAxisScaleDraw();
 }
 
 void MonitorPlot::updateAxisScaleDraw()
 {
 	if(m_isRealTime) {
-		genereateScaleDraw(dateTimeFormat, QDateTime::currentDateTime().offsetFromUtc());
+		m_scaleDraw->setUtcOffset(QDateTime::currentDateTime().offsetFromUtc());
 	} else {
 		double offset = (-1) * m_startTime / 1000;
-		genereateScaleDraw(dateTimeFormat, offset);
+		m_scaleDraw->setUtcOffset(offset);
 	}
 
 	m_plot->replot();
@@ -204,23 +203,42 @@ void MonitorPlot::refreshXAxisInterval()
 {
 	double time = QwtDate::toDouble(QDateTime::currentDateTime());
 	double delta = m_xAxisIntervalMin - m_xAxisIntervalMax;
+	if(m_plot->navigator()->isZoomed()) {
+		delta = std::abs(m_plot->xAxis()->visibleMax() - m_plot->xAxis()->visibleMin()) / 1000;
+	}
 	m_plot->xAxis()->setInterval(time - (delta * 1000), time);
 	m_plot->replot();
 }
 
 void MonitorPlot::updatePlotStartingPoint(double time, double delta)
 {
-	if(m_isRealTime) {
-		m_plot->xAxis()->setInterval(time - (delta * 1000), time);
+	if(m_plot->navigator()->isZoomed()) {
+		delta = std::abs(m_plot->xAxis()->visibleMax() - m_plot->xAxis()->visibleMin());
 	} else {
-		double offset = (-1) * m_startTime / 1000;
-		genereateScaleDraw(dateTimeFormat, offset);
-
-		m_plot->xAxis()->setInterval(time - (delta * 1000), time);
+		delta = delta * 1000;
 	}
 
-	m_plotInfo->updateBufferPreviewer();
+	if(m_isRealTime) {
+		m_plot->xAxis()->setInterval(time - delta, time);
+	} else {
+		double offset = (-1) * m_startTime / 1000;
+		m_scaleDraw->setUtcOffset(offset);
+
+		m_plot->xAxis()->setInterval(time - delta, time);
+	}
+
+	m_bufferPreviewer->updateDataLimits(m_startTime, time);
 	m_plot->replot();
 }
 
-void MonitorPlot::toggleBufferPreview(bool toggled) { m_plotInfo->setVisible(toggled); }
+void MonitorPlot::toggleBufferPreview(bool toggled) { m_bufferPreviewer->setVisible(toggled); }
+
+void MonitorPlot::generateBufferPreviewer()
+{
+
+	AnalogBufferPreviewer *bufferPreviewer = new AnalogBufferPreviewer(this);
+	m_bufferPreviewer = new PlotBufferPreviewer(m_plot, bufferPreviewer, this);
+
+	layout->addWidget(m_bufferPreviewer);
+	m_plot->navigator()->setResetOnNewBase(false);
+}
