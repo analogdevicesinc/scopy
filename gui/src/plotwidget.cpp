@@ -237,7 +237,11 @@ PlotAxis *PlotWidget::yAxis() { return m_yAxis; }
 
 QwtPlot *PlotWidget::plot() const { return m_plot; }
 
-void PlotWidget::replot() { m_plot->replot(); }
+void PlotWidget::replot()
+{
+	m_plot->replot();
+	Q_EMIT reploted();
+}
 
 void PlotWidget::hideAxisLabels()
 {
