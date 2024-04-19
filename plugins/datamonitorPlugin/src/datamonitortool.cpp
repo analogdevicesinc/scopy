@@ -18,7 +18,7 @@ using namespace scopy::datamonitor;
 Q_LOGGING_CATEGORY(CAT_DATAMONITOR, "DataMonitorPlugin");
 Q_LOGGING_CATEGORY(CAT_DATAMONITOR_TOOL, "DataMonitorTool");
 
-DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager, QWidget *parent)
+DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager, bool isDeletable, QWidget *parent)
 	: m_dataAcquisitionManager(dataAcquisitionManager)
 	, QWidget{parent}
 {
@@ -128,7 +128,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	centralWidget->addWidget(sevenSegmetMonitors);
 
 	////////////////////////settings //////////////
-	m_dataMonitorSettings = new DataMonitorSettings(m_monitorPlot);
+	m_dataMonitorSettings = new DataMonitorSettings(m_monitorPlot, isDeletable);
 	// TODO GET SETTINGS NAME FROM UTILS
 	m_dataMonitorSettings->init("DataMonitor", StyleHelper::getColor("ScopyBlue"));
 

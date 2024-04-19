@@ -64,6 +64,7 @@ DataLoggingMenu::DataLoggingMenu(QWidget *parent)
 		if(filename.isEmpty() && dataLoggingFilePath->getLineEdit()->isEnabled()) {
 			dataLoggingFilePath->getLineEdit()->setText(tr("No file selected"));
 			dataLoggingFilePath->getLineEdit()->setStyleSheet("color:red");
+			toggleButtonsEnabled(false);
 
 		} else {
 			dataLoggingFilePath->getLineEdit()->setStyleSheet("color:white");

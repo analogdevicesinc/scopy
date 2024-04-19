@@ -27,7 +27,8 @@ class SCOPY_DATAMONITORPLUGIN_EXPORT DatamonitorTool : public QWidget
 	friend class DataMonitorStyleHelper;
 	Q_OBJECT
 public:
-	DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager, QWidget *parent = nullptr);
+	DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager, bool isDeletable = false,
+			QWidget *parent = nullptr);
 	~DatamonitorTool();
 
 	RunBtn *getRunButton() const;
