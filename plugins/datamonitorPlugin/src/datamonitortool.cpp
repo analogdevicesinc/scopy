@@ -210,6 +210,10 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 			m_dataMonitorSettings->getDataLoggingMenu()->updateDataLoggingStatus(ProgressBarState::SUCCESS);
 		});
 
+	connect(logDataToFile, &LogDataToFile::logDataError, m_dataMonitorSettings->getDataLoggingMenu(), [=, this]() {
+		m_dataMonitorSettings->getDataLoggingMenu()->updateDataLoggingStatus(ProgressBarState::ERROR);
+	});
+
 	connect(m_dataMonitorSettings->getDataLoggingMenu(), &DataLoggingMenu::requestDataLoading, logDataToFile,
 		&LogDataToFile::loadData);
 

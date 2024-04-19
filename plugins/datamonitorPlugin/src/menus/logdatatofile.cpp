@@ -12,6 +12,7 @@
 #include <stylehelper.h>
 
 #include <pluginbase/preferences.h>
+#include <pluginbase/statusbarmanager.h>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -44,40 +45,43 @@ void LogDataToFile::continuousLogData(QString path)
 			QFile file(path);
 			QTextStream exportStream(&file);
 			if(!file.isOpen()) {
-				file.open(QIODevice::Append);
+				if(!file.open(QIODevice::Append)) {
+					StatusBarManager::pushMessage("Can't open file!", 3000);
+					Q_EMIT logDataError();
+				} else {
+					auto monitors = currentFileHeader->split(",");
 
-				auto monitors = currentFileHeader->split(",");
+					// get last time value
+					// the time of the last read value will be the same for all active monitors
+					auto lastReadValueTime = m_dataAcquisitionManager->getDataMonitorMap()
+									 ->value(monitors[1])
+									 ->getXdata()
+									 ->last();
 
-				// get last time value
-				// the time of the last read value will be the same for all active monitors
-				auto lastReadValueTime = m_dataAcquisitionManager->getDataMonitorMap()
-								 ->value(monitors[1])
-								 ->getXdata()
-								 ->last();
+					QDateTime auxTime = QDateTime::fromMSecsSinceEpoch(lastReadValueTime);
+					QString time = QString(auxTime.toString(dateTimeFormat));
 
-				QDateTime auxTime = QDateTime::fromMSecsSinceEpoch(lastReadValueTime);
-				QString time = QString(auxTime.toString(dateTimeFormat));
+					QString values = "";
 
-				QString values = "";
+					for(int i = 1; i < monitors.length(); i++) {
+						QString monitor = monitors[i];
 
-				for(int i = 1; i < monitors.length(); i++) {
-					QString monitor = monitors[i];
+						auto auxVal = m_dataAcquisitionManager->getDataMonitorMap()
+								      ->value(monitor)
+								      ->getValueAtTime(lastReadValueTime);
 
-					auto auxVal = m_dataAcquisitionManager->getDataMonitorMap()
-							      ->value(monitor)
-							      ->getValueAtTime(lastReadValueTime);
+						QString val = ", ";
+						if(lastReadValueTime != -Q_INFINITY) {
+							val += QString::number(auxVal);
+						}
 
-					QString val = ", ";
-					if(lastReadValueTime != -Q_INFINITY) {
-						val += QString::number(auxVal);
+						values += val;
 					}
 
-					values += val;
+					exportStream << time << values << "\n";
 				}
-
-				exportStream << time << values << "\n";
-
 			} else {
+				Q_EMIT logDataError();
 				qDebug() << "File already opened! ";
 			}
 
@@ -96,69 +100,73 @@ void LogDataToFile::logData(QString path)
 	QFile file(path);
 	QTextStream exportStream(&file);
 	if(!file.isOpen()) {
-		file.open(QIODevice::WriteOnly);
+		if(!file.open(QIODevice::WriteOnly)) {
+			StatusBarManager::pushMessage("Can't open file!", 3000);
+			Q_EMIT logDataError();
+		} else {
+			QString tableHead = "Time";
+			QMap<QString, QString> values;
 
-		QString tableHead = "Time";
-		QMap<QString, QString> values;
-
-		// cover all the time values recorded
-		// use a QSet to avoid having duplicate time values
-		QSet<double> timeValues;
-		foreach(QString monitor, m_dataAcquisitionManager->getActiveMonitors()) {
-			if(qobject_cast<ReadableDataMonitorModel *>(
-				   m_dataAcquisitionManager->getDataMonitorMap()->value(monitor))) {
-				tableHead += ", " + monitor;
-				auto xData = m_dataAcquisitionManager->getDataMonitorMap()->value(monitor)->getXdata();
-				for(int i = 0; i < xData->length(); i++) {
-					timeValues.insert(xData->at(i));
-				}
-			}
-		}
-
-		QSet<double>::const_iterator i;
-		for(i = timeValues.begin(); i != timeValues.end(); ++i) {
-			QDateTime auxTime = QDateTime::fromMSecsSinceEpoch(*i);
-			QString time = QString(auxTime.toString(dateTimeFormat));
-
+			// cover all the time values recorded
+			// use a QSet to avoid having duplicate time values
+			QSet<double> timeValues;
 			foreach(QString monitor, m_dataAcquisitionManager->getActiveMonitors()) {
 				if(qobject_cast<ReadableDataMonitorModel *>(
 					   m_dataAcquisitionManager->getDataMonitorMap()->value(monitor))) {
-					auto auxVal = m_dataAcquisitionManager->getDataMonitorMap()
-							      ->value(monitor)
-							      ->getValueAtTime(*i);
-
-					// verify if monitor has a value this time value if no value is found leave an
-					// empty space in the file
-					QString val = ", ";
-					if(auxVal != -Q_INFINITY) {
-						val += QString::number(auxVal);
-					}
-
-					if(values.contains(time)) {
-						values[time] += val;
-					} else {
-						values.insert(time, val);
+					tableHead += ", " + monitor;
+					auto xData = m_dataAcquisitionManager->getDataMonitorMap()
+							     ->value(monitor)
+							     ->getXdata();
+					for(int i = 0; i < xData->length(); i++) {
+						timeValues.insert(xData->at(i));
 					}
 				}
 			}
-		}
 
-		// write the data to file
-		exportStream << tableHead << "\n";
-		auto iterator = values.begin();
-		while(iterator != values.end()) {
-			exportStream << iterator.key() << iterator.value() << "\n";
-			iterator++;
-		}
+			QSet<double>::const_iterator i;
+			for(i = timeValues.begin(); i != timeValues.end(); ++i) {
+				QDateTime auxTime = QDateTime::fromMSecsSinceEpoch(*i);
+				QString time = QString(auxTime.toString(dateTimeFormat));
 
+				foreach(QString monitor, m_dataAcquisitionManager->getActiveMonitors()) {
+					if(qobject_cast<ReadableDataMonitorModel *>(
+						   m_dataAcquisitionManager->getDataMonitorMap()->value(monitor))) {
+						auto auxVal = m_dataAcquisitionManager->getDataMonitorMap()
+								      ->value(monitor)
+								      ->getValueAtTime(*i);
+
+						// verify if monitor has a value this time value if no value is found
+						// leave an empty space in the file
+						QString val = ", ";
+						if(auxVal != -Q_INFINITY) {
+							val += QString::number(auxVal);
+						}
+
+						if(values.contains(time)) {
+							values[time] += val;
+						} else {
+							values.insert(time, val);
+						}
+					}
+				}
+			}
+
+			// write the data to file
+			exportStream << tableHead << "\n";
+			auto iterator = values.begin();
+			while(iterator != values.end()) {
+				exportStream << iterator.key() << iterator.value() << "\n";
+				iterator++;
+			}
+			Q_EMIT logDataCompleted();
+		}
 	} else {
+		Q_EMIT logDataError();
 		qDebug() << "File already opened! ";
 	}
 
 	if(file.isOpen())
 		file.close();
-
-	Q_EMIT logDataCompleted();
 }
 
 void LogDataToFile::loadData(QString path)
