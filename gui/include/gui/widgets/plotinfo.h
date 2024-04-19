@@ -40,6 +40,21 @@ private:
 	MetricPrefixFormatter *m_mpf;
 };
 
+class SCOPY_GUI_EXPORT TimePlotFPS : public QLabel
+{
+	Q_OBJECT
+public:
+	TimePlotFPS(QWidget *parent = nullptr);
+	virtual ~TimePlotFPS();
+
+public Q_SLOTS:
+	void update(qint64 timestamp);
+
+private:
+	QList<qint64> *m_replotTimes;
+	qint64 m_lastTimeStamp;
+	int m_avgSize;
+};
 class SCOPY_GUI_EXPORT TimePlotStatusInfo : public QLabel
 {
 	Q_OBJECT
@@ -66,6 +81,7 @@ private:
 	TimePlotHDivInfo *m_hdiv;
 	TimePlotSamplingInfo *m_sampling;
 	TimePlotStatusInfo *m_status;
+	TimePlotFPS *m_fps;
 };
 
 } // namespace scopy
