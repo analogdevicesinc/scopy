@@ -7,6 +7,7 @@
 #include <QButtonGroup>
 #include <QWidget>
 #include <menucollapsesection.h>
+#include <semiexclusivebuttongroup.h>
 
 namespace scopy {
 namespace datamonitor {
@@ -20,8 +21,8 @@ public:
 	void addMonitor(DataMonitorModel *monitor);
 	void removeDevice(QString device);
 
-	QButtonGroup *monitorsGroup() const;
-	void setMonitorsGroup(QButtonGroup *newMonitorsGroup);
+	SemiExclusiveButtonGroup *monitorsGroup() const;
+	void setMonitorsGroup(SemiExclusiveButtonGroup *newMonitorsGroup);
 
 Q_SIGNALS:
 	void monitorToggled(bool toggled, QString monitorName);
@@ -33,7 +34,7 @@ private:
 	QWidget *deviceChannelsWidget;
 	QWidget *importedChannelsWidget;
 	QVBoxLayout *layout;
-	QButtonGroup *m_monitorsGroup;
+	SemiExclusiveButtonGroup *m_monitorsGroup;
 	QMap<QString, MenuCollapseSection *> deviceMap;
 
 	void generateDeviceSection(QString device, bool import = false);
