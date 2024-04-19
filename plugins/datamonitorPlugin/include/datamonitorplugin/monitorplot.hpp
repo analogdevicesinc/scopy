@@ -10,6 +10,7 @@
 #include <QwtDateScaleEngine>
 #include <QTimer>
 #include <QLabel>
+#include <plotbufferpreviewer.h>
 #include "scopy-datamonitorplugin_export.h"
 
 namespace scopy {
@@ -52,9 +53,11 @@ Q_SIGNALS:
 	void monitorCurveRemoved(PlotChannel *c);
 
 private:
+	QVBoxLayout *layout;
 	QString dateTimeFormat;
 	PlotWidget *m_plot;
-	TimePlotInfo *m_plotInfo;
+	PlotBufferPreviewer *m_bufferPreviewer;
+	QwtDateScaleDraw *m_scaleDraw;
 	QMap<QString, MonitorPlotCurve *> *m_monitorCurves;
 	bool m_firstMonitor = true;
 
@@ -62,6 +65,7 @@ private:
 	double m_currentCurveThickness = 1;
 	bool m_isRealTime = false;
 
+	void generateBufferPreviewer();
 	void setupXAxis();
 	void genereateScaleDraw(QString format, double offset);
 	QwtDateScaleEngine *scaleEngine;

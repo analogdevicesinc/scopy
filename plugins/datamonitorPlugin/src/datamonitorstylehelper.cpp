@@ -19,7 +19,9 @@ void DataMonitorStyleHelper::DataMonitorSettingsStyle(DataMonitorSettings *dataM
 
 	style.replace("&&backgroundColor&&", "transparent");
 
-	dataMonitorSettings->deleteMonitor->setStyleSheet(DataMonitorStyleHelper::RemoveButtonStyle());
+	if(dataMonitorSettings->deleteMonitor) {
+		dataMonitorSettings->deleteMonitor->setStyleSheet(DataMonitorStyleHelper::RemoveButtonStyle());
+	}
 	dataMonitorSettings->setStyleSheet(style);
 }
 
