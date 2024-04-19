@@ -31,7 +31,7 @@ class SCOPY_DATAMONITORPLUGIN_EXPORT DataMonitorSettings : public QWidget
 	friend class DataMonitorStyleHelper;
 	Q_OBJECT
 public:
-	explicit DataMonitorSettings(MonitorPlot *m_plot, QWidget *parent = nullptr);
+	explicit DataMonitorSettings(MonitorPlot *m_plot, bool isDeletable = false, QWidget *parent = nullptr);
 	~DataMonitorSettings();
 
 	void init(QString title, QColor color);
@@ -58,6 +58,7 @@ Q_SIGNALS:
 	void requestDeleteTool();
 
 private:
+	bool m_isDeletable;
 	PositionSpinButton *m_ymin;
 	PositionSpinButton *m_ymax;
 	QPushButton *deleteMonitor;
