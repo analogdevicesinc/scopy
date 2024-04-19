@@ -14,6 +14,9 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, QWidget *p
 	mainLayout->setSpacing(10);
 	setLayout(mainLayout);
 
+	MenuHeaderWidget *header = new MenuHeaderWidget(model->getName(), model->getColor(), this);
+	mainLayout->addWidget(header);
+
 	QWidget *settingsBody = new QWidget(this);
 	QVBoxLayout *layout = new QVBoxLayout();
 	layout->setMargin(0);
@@ -26,9 +29,6 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, QWidget *p
 	scrollArea->setWidgetResizable(true);
 	scrollArea->setWidget(settingsBody);
 	mainLayout->addWidget(scrollArea);
-
-	MenuHeaderWidget *header = new MenuHeaderWidget(model->getName(), model->getColor(), this);
-	mainLayout->addWidget(header);
 
 	MenuSectionWidget *attrcontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *attr =

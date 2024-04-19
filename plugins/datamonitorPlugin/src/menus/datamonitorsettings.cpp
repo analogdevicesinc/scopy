@@ -22,7 +22,7 @@ using namespace datamonitor;
 
 Q_LOGGING_CATEGORY(CAT_DATAMONITOR_SETTINGS, "DataMonitorSettings")
 
-DataMonitorSettings::DataMonitorSettings(MonitorPlot *m_plot, QWidget *parent)
+DataMonitorSettings::DataMonitorSettings(MonitorPlot *m_plot, bool isDeletable, QWidget *parent)
 	: m_plot(m_plot)
 	, QWidget{parent}
 {
@@ -30,6 +30,8 @@ DataMonitorSettings::DataMonitorSettings(MonitorPlot *m_plot, QWidget *parent)
 	mainLayout->setMargin(0);
 	mainLayout->setSpacing(10);
 	setLayout(mainLayout);
+
+	m_isDeletable = isDeletable;
 }
 
 DataMonitorSettings::~DataMonitorSettings() {}
@@ -77,10 +79,11 @@ void DataMonitorSettings::init(QString title, QColor color)
 	layout->addWidget(dataLoggingMenu);
 
 	/////// delete monitor /////////////////
-	deleteMonitor = new QPushButton("Delete Tool", this);
-	layout->addWidget(deleteMonitor);
-
-	connect(deleteMonitor, &QPushButton::clicked, this, &DataMonitorSettings::requestDeleteTool);
+	if(m_isDeletable) {
+		deleteMonitor = new QPushButton("Delete Tool", this);
+		layout->addWidget(deleteMonitor);
+		connect(deleteMonitor, &QPushButton::clicked, this, &DataMonitorSettings::requestDeleteTool);
+	}
 
 	MouseWheelWidgetGuard *mouseWheelWidgetGuard = new MouseWheelWidgetGuard(this);
 	mouseWheelWidgetGuard->installEventRecursively(this);
@@ -160,7 +163,9 @@ QWidget *DataMonitorSettings::generatePlotUiSettings(QWidget *parent)
 {
 	MenuSectionWidget *plotStylecontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *plotStyleSection =
-		new MenuCollapseSection("PLOT STYLE", MenuCollapseSection::MHCW_NONE, plotStylecontainer);
+		new MenuCollapseSection("PLOT SETTINGS", MenuCollapseSection::MHCW_NONE, plotStylecontainer);
+
+	plotStyleSection->contentLayout()->setSpacing(10);
 
 	MenuOnOffSwitch *showYAxisLabel = new MenuOnOffSwitch(tr("Y-AXIS label"), plotStyleSection, false);
 	showYAxisLabel->onOffswitch()->setChecked(true);
