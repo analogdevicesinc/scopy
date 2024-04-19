@@ -157,7 +157,8 @@ void DataMonitorPlugin::addNewTool()
 	m_toolList.last()->setEnabled(true);
 	m_toolList.last()->setRunBtnVisible(true);
 
-	DatamonitorTool *datamonitorTool = new DatamonitorTool(m_dataAcquisitionManager);
+	bool isDeletable = m_toolList.length() > 1;
+	DatamonitorTool *datamonitorTool = new DatamonitorTool(m_dataAcquisitionManager, isDeletable);
 
 	connect(datamonitorTool, &DatamonitorTool::requestNewTool, this, &DataMonitorPlugin::addNewTool);
 	connect(datamonitorTool, &DatamonitorTool::runToggled, this, &DataMonitorPlugin::toggleRunState);
