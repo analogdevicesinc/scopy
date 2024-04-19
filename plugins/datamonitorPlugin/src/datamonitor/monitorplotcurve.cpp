@@ -8,10 +8,12 @@ using namespace datamonitor;
 
 MonitorPlotCurve::MonitorPlotCurve(DataMonitorModel *dataMonitorModel, PlotWidget *plot, QObject *parent)
 	: m_dataMonitorModel(dataMonitorModel)
+	, m_plot(plot)
 {
 	QPen chpen = QPen(dataMonitorModel->getColor(), 1);
 
-	m_plotch = new PlotChannel(dataMonitorModel->getName(), chpen, plot, plot->xAxis(), plot->yAxis(), this);
+	m_plotch = new PlotChannel(dataMonitorModel->getName(), chpen, plot->xAxis(), plot->yAxis(), this);
+	plot->addPlotChannel(m_plotch);
 	m_plotch->setEnabled(true);
 
 	m_plotch->curve()->setRawSamples(m_dataMonitorModel->getXdata()->data(), m_dataMonitorModel->getYdata()->data(),
@@ -24,6 +26,8 @@ MonitorPlotCurve::MonitorPlotCurve(DataMonitorModel *dataMonitorModel, PlotWidge
 		plot->replot();
 	});
 }
+
+MonitorPlotCurve::~MonitorPlotCurve() { m_plot->removePlotChannel(m_plotch); }
 
 void MonitorPlotCurve::clearCurveData()
 {
