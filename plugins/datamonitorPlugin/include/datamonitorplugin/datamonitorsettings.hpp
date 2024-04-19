@@ -61,7 +61,7 @@ private:
 	bool m_isDeletable;
 	PositionSpinButton *m_ymin;
 	PositionSpinButton *m_ymax;
-	QPushButton *deleteMonitor;
+	QPushButton *deleteMonitor = nullptr;
 	QWidget *generateYAxisSettings(QWidget *parent);
 	QWidget *generateCurveStyleSettings(QWidget *parent);
 	QWidget *generatePlotUiSettings(QWidget *parent);

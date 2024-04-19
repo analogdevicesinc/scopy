@@ -14,6 +14,7 @@ class SCOPY_DATAMONITORPLUGIN_EXPORT MonitorPlotCurve : public QObject
 	Q_OBJECT
 public:
 	explicit MonitorPlotCurve(DataMonitorModel *dataMonitorModel, PlotWidget *plot, QObject *parent = nullptr);
+	~MonitorPlotCurve();
 
 	void clearCurveData();
 	void refreshCurve();
@@ -24,6 +25,7 @@ public:
 	double curveMaxVal();
 
 private:
+	PlotWidget *m_plot;
 	PlotChannel *m_plotch;
 	PlotAxis *chPlotAxis;
 	DataMonitorModel *m_dataMonitorModel;
