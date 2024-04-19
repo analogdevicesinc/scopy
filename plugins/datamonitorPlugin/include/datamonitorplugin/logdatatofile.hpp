@@ -18,6 +18,7 @@ public:
 
 Q_SIGNALS:
 	void startLogData();
+	void logDataError();
 	void logDataCompleted();
 	void startLoadData();
 	void loadDataCompleted();
