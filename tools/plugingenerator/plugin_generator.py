@@ -259,6 +259,7 @@ if toolList:
                 filesGenerated.append(srcFilePath)
             else:
                 print(srcFilePath + " file already exists!")
+
 ################################################### Plugin Src #################################################
 if os.path.exists(srcPath):
     pluginSourceFilePath = os.path.join(srcPath, pluginName + ".cpp")
@@ -281,6 +282,20 @@ if len(filesGenerated) > 0:
     filesGenerated.sort()
     print("\nGenerated files:")
     print(*filesGenerated, sep="\n")
+
+################################################### Add export to gitignore ##################################
+
+gitignorePath = os.path.join(newPluginPath, ".gitignore")
+if os.path.exists(gitignorePath):
+    print(gitignorePath + " file already exists!")
+else:
+    pluginExportPath = "include/"+ pluginName + "/scopy-" + pluginName + "_export.h"
+    gitignoreFile = open(gitignorePath, "w")
+    gitignoreFile.write(pluginExportPath)
+    gitignoreFile.close()
+    print("Plugin .gitignore file created!")
+
+##############################################################################################################
 
 pluginsCMakeListsOption = """option(ENABLE_PLUGIN_<<upper_plugin_name>> "Enable <<upper_plugin_name>> plugin" ON)
 if(ENABLE_PLUGIN_<<upper_plugin_name>>)
