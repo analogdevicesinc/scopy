@@ -215,16 +215,16 @@ QWidget *GRTimeChannelComponent::createAttrMenu(QWidget *parent)
 	return attrcontainer;
 }
 
-void GRTimeChannelComponent::enable()
+void GRTimeChannelComponent::enableChannel()
 {
 	m_signalPath->setEnabled(true);
-	ChannelComponent::enable();
+	ChannelComponent::enableChannel();
 }
 
-void GRTimeChannelComponent::disable()
+void GRTimeChannelComponent::disableChannel()
 {
 	m_signalPath->setEnabled(false);
-	ChannelComponent::disable();
+	ChannelComponent::disableChannel();
 }
 
 void GRTimeChannelComponent::onStart()
@@ -321,6 +321,18 @@ void GRTimeChannelComponent::setSampleRate(double v)
 	m_plotSampleRate = v;
 }
 
+void GRTimeChannelComponent::enable()
+{
+	m_ctrl->setVisible(true);
+	ChannelComponent::enable();
+}
+
+void GRTimeChannelComponent::disable()
+{
+	m_ctrl->setVisible(false);
+	ChannelComponent::disable();
+}
+
 GRIIOFloatChannelSrc *GRTimeChannelComponent::grch() const { return m_grch; }
 
 MenuControlButton *GRTimeChannelComponent::ctrl()
@@ -371,9 +383,9 @@ void GRTimeChannelComponent::setupChannelMenuControlButtonHelper(MenuControlButt
 
 	connect(btn->checkBox(), &QCheckBox::toggled, this, [=](bool b) {
 		if(b)
-			enable();
+			enableChannel();
 		else
-			disable();
+			disableChannel();
 	});
 	btn->checkBox()->setChecked(true);
 }

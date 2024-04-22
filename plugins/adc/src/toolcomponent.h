@@ -12,7 +12,7 @@ namespace scopy {
 namespace adc {
 
 class PlotProxy;
-class ADCTimeInstrument;
+class ADCInstrument;
 
 
 class SCOPY_ADCPLUGIN_EXPORT DataProvider
@@ -33,8 +33,23 @@ public:
 	virtual void onStop(){};
 	virtual void onInit(){};
 	virtual void onDeinit(){};
+
+	virtual void enable() {m_enabled = true;}
+	virtual void disable() {m_enabled = false;}
+	QStringList *category() {
+		return &m_category;
+	}
+
+
+	bool enabled() const {
+		return m_enabled;
+	}
+
+
 protected:
 	QString m_name;
+	bool m_enabled;
+	QStringList m_category;
 	int m_priority = 0;
 };
 
@@ -60,7 +75,8 @@ public:
 	{
 		auto cm = components();
 		for(auto c : cm) {
-			c->onStart();
+			if(c->enabled())
+				c->onStart();
 		}
 	}
 

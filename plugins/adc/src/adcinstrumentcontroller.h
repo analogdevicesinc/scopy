@@ -1,10 +1,11 @@
-#ifndef TIMEPLOTPROXY_H
-#define TIMEPLOTPROXY_H
+#ifndef ADCINSTRUMENTCONTROLLER_H
+#define ADCINSTRUMENTCONTROLLER_H
 
 #include "toolcomponent.h"
 #include "scopy-adcplugin_export.h"
 #include "plotcomponent.h"
 #include "timeplotsettingscomponent.h"
+#include "xyplotsettingscomponent.h"
 #include "cursorcomponent.h"
 #include "measurecomponent.h"
 
@@ -12,17 +13,15 @@ namespace scopy {
 namespace adc {
 class ChannelIdProvider;
 
-class SCOPY_ADCPLUGIN_EXPORT TimePlotProxy : public QObject, public PlotProxy, public AcqNodeChannelAware
+class SCOPY_ADCPLUGIN_EXPORT ADCInstrumentController : public QObject, public PlotProxy, public AcqNodeChannelAware
 {
 	Q_OBJECT
 public:
-	TimePlotProxy(QString name, AcqTreeNode *tree, QObject *parent = nullptr);
-	~TimePlotProxy();
+	ADCInstrumentController(QString name, AcqTreeNode *tree, QObject *parent = nullptr);
+	~ADCInstrumentController();
 
 	ChannelIdProvider *getChannelIdProvider();
-	;
 
-	void setInstrument(ADCTimeInstrument *tool);
 	// PlotProxy interface
 public:
 	ToolComponent *getPlotAddon();
@@ -43,6 +42,11 @@ public Q_SLOTS:
 	void addChannel(AcqTreeNode *c) override;
 	void removeChannel(AcqTreeNode *c) override;
 
+	void enableTime();
+	void enableFFT();
+	void enableXY();
+
+	void enableCategory(QString s);
 private Q_SLOTS:
 	void stopUpdates();
 	void startUpdates();
@@ -60,11 +64,17 @@ Q_SIGNALS:
 private:
 
 
-	void setupChannelMeasurement(ChannelComponent *ch);
+	void setupChannelMeasurement(PlotComponent *c, ChannelComponent *ch);
 
-	ADCTimeInstrument *m_tool;
-	PlotComponent *m_plotComponent;
-	TimePlotSettingsComponent *m_plotSettingsComponent;
+	ADCInstrument *m_tool;
+	PlotComponent *m_timePlotComponent;
+	PlotComponent *m_fftPlotComponent;
+	PlotComponent *m_xyPlotComponent;
+	MapStackedWidget *plotStack;
+
+	TimePlotSettingsComponent *m_timePlotSettingsComponent;
+	TimePlotSettingsComponent *m_fftPlotSettingsComponent;
+	XyPlotSettingsComponent *m_xyPlotSettingsComponent;
 	CursorComponent *m_cursorComponent;
 	MeasureComponent *m_measureComponent;
 
@@ -83,4 +93,4 @@ private:
 };
 } // namespace adc
 } // namespace scopy
-#endif // TIMEPLOTPROXY_H
+#endif // ADCINSTRUMENTCONTROLLER_H

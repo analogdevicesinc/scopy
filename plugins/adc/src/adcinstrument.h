@@ -1,5 +1,5 @@
-#ifndef ADCTIMEINSTRUMENT_H
-#define ADCTIMEINSTRUMENT_H
+#ifndef ADCINSTRUMENT_H
+#define ADCINSTRUMENT_H
 
 #include <QWidget>
 #include <QHBoxLayout>
@@ -19,12 +19,12 @@
 
 namespace scopy {
 namespace adc {
-class ADCTimeInstrument : public QWidget
+class ADCInstrument : public QWidget
 {
 	Q_OBJECT
 public:
-	ADCTimeInstrument(PlotProxy *proxy, QWidget *parent = nullptr);
-	~ADCTimeInstrument();
+	ADCInstrument(PlotProxy *proxy, QWidget *parent = nullptr);
+	~ADCInstrument();
 
 	bool running() const;
 	void setRunning(bool newRunning);
@@ -40,6 +40,10 @@ public:
 	const QString settingsMenuId = "settings";
 
 	VerticalChannelManager *vcm() const;
+
+	MenuControlButton *getTimeBtn() const;
+	MenuControlButton *getXyBtn() const;
+	MenuControlButton *getFftBtn() const;
 
 public Q_SLOTS:
 	void run(bool);
@@ -66,11 +70,16 @@ private:
 	MapStackedWidget *rightStack;
 	QButtonGroup *rightMenuBtnGrp;
 	QButtonGroup *channelGroup;
+	QButtonGroup *plotGroup;
 
 	RunBtn *runBtn;
 	SingleShotBtn *singleBtn;
 	MenuControlButton *channelsBtn;
 	VerticalChannelManager *m_vcm;
+
+	MenuControlButton *timeBtn;
+	MenuControlButton *xyBtn;
+	MenuControlButton *fftBtn;
 
 	void setupToolLayout();
 	void setupRunSingleButtonHelper();
@@ -79,8 +88,11 @@ private:
 
 	bool m_running;
 	Q_PROPERTY(bool running READ running WRITE setRunning NOTIFY runningChanged)
+	void setupTimeButtonHelper(MenuControlButton *time);
+	void setupXyButtonHelper(MenuControlButton *xy);
+	void setupFFTButtonHelper(MenuControlButton *fft);
 };
 } // namespace adc
 } // namespace scopy
 
-#endif // ADCTIMEINSTRUMENT_H
+#endif // ADCINSTRUMENT_H

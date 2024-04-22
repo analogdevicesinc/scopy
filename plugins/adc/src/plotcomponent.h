@@ -1,6 +1,7 @@
 #ifndef PLOTCOMPONENT_H
 #define PLOTCOMPONENT_H
 
+#include "measurementpanel.h"
 #include "scopy-adcplugin_export.h"
 #include "toolcomponent.h"
 
@@ -25,6 +26,9 @@ public:
 	virtual PlotWidget *plot();
 public Q_SLOTS:
 	virtual void replot();
+	void enableMeasurementPanel(bool);
+	void enableStatsPanel(bool);
+
 	// virtual double sampleRate()
 
 public:
@@ -33,10 +37,17 @@ public:
 	void onInit();
 	void onDeinit();
 
+	MeasurementsPanel *measurePanel() const;
+	StatsPanel *statsPanel() const;
+
 private:
 	QVBoxLayout *m_lay;
 	PlotWidget *m_plot;
 	TimePlotInfo *m_info;
+
+	MeasurementsPanel *m_measurePanel;
+	StatsPanel *m_statsPanel;
+
 };
 
 } // namespace adc

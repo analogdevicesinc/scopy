@@ -16,3 +16,4 @@ int ChannelIdProvider::next() { return idx++; }
 
 QPen ChannelIdProvider::pen(int idx) { return QPen(StyleHelper::getColor("CH" + QString::number(idx))); }
 */
+

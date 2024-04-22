@@ -185,11 +185,17 @@ void GRTimeSinkComponent::onDeinit()
 	onStop();
 }
 
+
 void GRTimeSinkComponent::addChannel(GRTimeChannelComponent *c) {
 	m_channels.append(c);
 }
 
 void GRTimeSinkComponent::removeChannel(GRTimeChannelComponent *c) {
 	m_channels.removeAll(c);
+}
+
+bool GRTimeSinkComponent::enabled() const
+{
+	return m_enabled;
 }
 

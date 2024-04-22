@@ -43,7 +43,7 @@ QPen ChannelComponent::pen() const { return m_pen; }
 
 bool ChannelComponent::enabled() const { return m_enabled; }
 
-void ChannelComponent::enable()
+void ChannelComponent::enableChannel()
 {
 	qInfo(CAT_TIME_CHANNELCOMPONENT) << m_channelName << " enabled";
 	m_enabled = true;
@@ -55,7 +55,7 @@ void ChannelComponent::enable()
 	//	m_plotAddon->plot()->replot();
 }
 
-void ChannelComponent::disable()
+void ChannelComponent::disableChannel()
 {
 	qInfo(CAT_TIME_CHANNELCOMPONENT) << m_channelName << " disabled";
 	m_enabled = false;

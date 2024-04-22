@@ -26,6 +26,7 @@ class SCOPY_ADCPLUGIN_EXPORT BufferSizeUser {
 public:
 	virtual void setBufferSize(uint32_t bufferSize) = 0;
 };
+
 class SCOPY_ADCPLUGIN_EXPORT SingleYModeUser {
 public:
 	virtual void setSingleYMode(bool) = 0;

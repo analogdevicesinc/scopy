@@ -23,6 +23,8 @@ public:
 	~GRTimeSinkComponent();
 
 	bool finished() override;
+	bool enabled() const;
+
 public Q_SLOTS:
 	void connectSignalPaths();
 	void tearDownSignalPaths();
@@ -59,6 +61,7 @@ private:
 	bool m_refreshTimerRunning;
 	bool m_syncMode;
 	bool fftComplexMode;
+	bool m_enabled;
 
 	QList<GRTimeChannelComponent*> m_channels;
 

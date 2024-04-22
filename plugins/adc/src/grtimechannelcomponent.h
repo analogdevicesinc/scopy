@@ -45,8 +45,11 @@ public:
 	void setSampleRate(double) override;
 
 public Q_SLOTS:
+
 	void enable() override;
 	void disable() override;
+	void enableChannel() override;
+	void disableChannel() override;
 	void onStart() override;
 	void onStop() override;
 	void onInit() override;

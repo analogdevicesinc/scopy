@@ -38,8 +38,8 @@ protected:
 	bool m_enabled;
 
 public Q_SLOTS:
-	virtual void enable();
-	virtual void disable();
+	virtual void enableChannel();
+	virtual void disableChannel();
 	virtual void onStart() override;
 	virtual void onStop() override;
 	virtual void onInit() override;

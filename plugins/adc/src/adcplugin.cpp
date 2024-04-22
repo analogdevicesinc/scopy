@@ -1,7 +1,7 @@
 #include "adcplugin.h"
 
 #include "gui/stylehelper.h"
-#include "src/adctimeinstrument.h"
+#include "src/adcinstrument.h"
 
 #include <QBoxLayout>
 #include <QJsonDocument>
@@ -16,7 +16,7 @@
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
 
-#include "timeplotproxy.h"
+#include "adcinstrumentcontroller.h"
 
 Q_LOGGING_CATEGORY(CAT_ADCPLUGIN, "ADCPlugin");
 using namespace scopy;
@@ -196,9 +196,9 @@ bool ADCPlugin::onConnect()
 	GRTopBlock *top = new GRTopBlock("ctx", this);
 	GRTopBlockNode *ctxNode = new GRTopBlockNode(top, nullptr);
 	root->addTreeChild(ctxNode);
-	auto timeProxy = new TimePlotProxy("time0",root,this);
-	time = new ADCTimeInstrument(timeProxy);
-	connect(root,&AcqTreeNode::newChild,timeProxy,&TimePlotProxy::addChannel);
+	auto timeProxy = new ADCInstrumentController("time0",root,this);
+	time = new ADCInstrument(timeProxy);
+	connect(root,&AcqTreeNode::newChild,timeProxy,&ADCInstrumentController::addChannel);
 	createGRIIOTreeNode(ctxNode, m_ctx);
 	// root->treeChildren()[0]->addTreeChild(new AcqTreeNode("other"));
 

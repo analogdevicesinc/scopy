@@ -1,8 +1,8 @@
-#include "adctimeinstrument.h"
+#include "adcinstrument.h"
 
 using namespace scopy;
 using namespace scopy::adc;
-ADCTimeInstrument::ADCTimeInstrument(PlotProxy *proxy, QWidget *parent)
+ADCInstrument::ADCInstrument(PlotProxy *proxy, QWidget *parent)
 	: QWidget(parent)
 	, proxy(proxy)
 {
@@ -12,9 +12,9 @@ ADCTimeInstrument::ADCTimeInstrument(PlotProxy *proxy, QWidget *parent)
 	init();
 }
 
-ADCTimeInstrument::~ADCTimeInstrument() { deinit(); }
+ADCInstrument::~ADCInstrument() { deinit(); }
 
-void ADCTimeInstrument::setupToolLayout()
+void ADCInstrument::setupToolLayout()
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *lay = new QHBoxLayout(this);
@@ -36,6 +36,7 @@ void ADCTimeInstrument::setupToolLayout()
 
 	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), true, this);
 	rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn *>(openLastMenuBtn)->getButtonGroup();
+	plotGroup = new QButtonGroup(this);
 
 	tool->openBottomContainerHelper(false);
 	tool->openTopContainerHelper(false);
@@ -48,6 +49,14 @@ void ADCTimeInstrument::setupToolLayout()
 
 	channelsBtn = new MenuControlButton(this);
 
+	timeBtn = new MenuControlButton(this);
+	setupTimeButtonHelper(timeBtn);
+
+	xyBtn = new MenuControlButton(this);
+	setupXyButtonHelper(xyBtn);
+
+	fftBtn = new MenuControlButton(this);
+	setupFFTButtonHelper(fftBtn);
 
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsBtn, TTA_LEFT);
@@ -59,11 +68,21 @@ void ADCTimeInstrument::setupToolLayout()
 	tool->addWidgetToTopContainerHelper(printBtn, TTA_LEFT);
 
 	tool->addWidgetToBottomContainerHelper(channelsBtn, TTA_LEFT);
+	tool->addWidgetToBottomContainerHelper(timeBtn, TTA_LEFT);
+	tool->addWidgetToBottomContainerHelper(xyBtn, TTA_LEFT);
+	tool->addWidgetToBottomContainerHelper(fftBtn, TTA_LEFT);
+	plotGroup->addButton(timeBtn);
+	plotGroup->addButton(xyBtn);
+	plotGroup->addButton(fftBtn);
+	plotGroup->setExclusive(true);
+	timeBtn->setChecked(true);
 
 	rightMenuBtnGrp->addButton(settingsBtn);
 
 	setupChannelsButtonHelper(channelsBtn);
 	setupRunSingleButtonHelper();
+
+
 	channelGroup = new QButtonGroup(this);
 
 	m_vcm->add(new QLabel("test"));
@@ -75,18 +94,18 @@ void ADCTimeInstrument::setupToolLayout()
 }
 
 
-void ADCTimeInstrument::setupRunSingleButtonHelper()
+void ADCInstrument::setupRunSingleButtonHelper()
 {
-	connect(runBtn, &QPushButton::toggled, this, &ADCTimeInstrument::setRunning);
-	connect(singleBtn, &QPushButton::toggled, this, &ADCTimeInstrument::setSingleShot);
-	connect(singleBtn, &QPushButton::toggled, this, &ADCTimeInstrument::setRunning);
-	connect(this, &ADCTimeInstrument::runningChanged, this, &ADCTimeInstrument::run);
-	connect(this, &ADCTimeInstrument::runningChanged, runBtn, &QAbstractButton::setChecked);
+	connect(runBtn, &QPushButton::toggled, this, &ADCInstrument::setRunning);
+	connect(singleBtn, &QPushButton::toggled, this, &ADCInstrument::setSingleShot);
+	connect(singleBtn, &QPushButton::toggled, this, &ADCInstrument::setRunning);
+	connect(this, &ADCInstrument::runningChanged, this, &ADCInstrument::run);
+	connect(this, &ADCInstrument::runningChanged, runBtn, &QAbstractButton::setChecked);
 
-	// connect(this, &ADCTimeInstrument::requestStop, this, &ADCTimeInstrument::stop, Qt::QueuedConnection);
+	// connect(this, &ADCInstrument::requestStop, this, &ADCInstrument::stop, Qt::QueuedConnection);
 }
 
-void ADCTimeInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn)
+void ADCInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn)
 {
 	channelsBtn->setName("Channels");
 	channelsBtn->setOpenMenuChecksThis(true);
@@ -107,7 +126,37 @@ void ADCTimeInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn
 	tool->leftStack()->add(verticalChannelManagerId, m_vcm);
 }
 
-void ADCTimeInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *dev)
+void ADCInstrument::setupTimeButtonHelper(MenuControlButton *time)
+{
+	time->setName("Time");
+	time->button()->setVisible(false);
+	time->setOpenMenuChecksThis(true);
+	time->setDoubleClickToOpenMenu(true);
+	time->checkBox()->setVisible(false);
+	time->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
+}
+
+void ADCInstrument::setupXyButtonHelper(MenuControlButton *xy)
+{
+	xy->setName("X-Y");
+	xy->button()->setVisible(false);
+	xy->setOpenMenuChecksThis(true);
+	xy->setDoubleClickToOpenMenu(true);
+	xy->checkBox()->setVisible(false);
+	xy->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
+}
+
+void ADCInstrument::setupFFTButtonHelper(MenuControlButton *fft)
+{
+	fft->setName("FFT");
+	fft->button()->setVisible(false);
+	fft->setOpenMenuChecksThis(true);
+	fft->setDoubleClickToOpenMenu(true);
+	fft->checkBox()->setVisible(false);
+	fft->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
+}
+
+void ADCInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *dev)
 {
 	auto devBtn = b;
 	m_vcm->add(b);
@@ -128,7 +177,7 @@ void ADCTimeInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent
 
 /// ADD CHANNEL HERE
 
-void ADCTimeInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, CompositeWidget *c)
+void ADCInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, CompositeWidget *c)
 {
 	c->add(btn);
 	channelGroup->addButton(btn);
@@ -154,16 +203,31 @@ void ADCTimeInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, Co
 	setupChannelDelete(ch);*/
 }
 // #endif
-void ADCTimeInstrument::init() { proxy->init(); }
+void ADCInstrument::init() { proxy->init(); }
 
-void ADCTimeInstrument::deinit() { proxy->deinit(); }
+void ADCInstrument::deinit() { proxy->deinit(); }
 
-VerticalChannelManager *ADCTimeInstrument::vcm() const
+MenuControlButton *ADCInstrument::getFftBtn() const
+{
+	return fftBtn;
+}
+
+MenuControlButton *ADCInstrument::getXyBtn() const
+{
+	return xyBtn;
+}
+
+MenuControlButton *ADCInstrument::getTimeBtn() const
+{
+	return timeBtn;
+}
+
+VerticalChannelManager *ADCInstrument::vcm() const
 {
 	return m_vcm;
 }
 
-void ADCTimeInstrument::restart()
+void ADCInstrument::restart()
 {
 	if(m_running) {
 		run(false);
@@ -171,9 +235,9 @@ void ADCTimeInstrument::restart()
 	}
 }
 
-bool ADCTimeInstrument::running() const { return m_running; }
+bool ADCInstrument::running() const { return m_running; }
 
-void ADCTimeInstrument::setRunning(bool newRunning)
+void ADCInstrument::setRunning(bool newRunning)
 {
 	if(m_running == newRunning)
 		return;
@@ -181,21 +245,21 @@ void ADCTimeInstrument::setRunning(bool newRunning)
 	Q_EMIT runningChanged(newRunning);
 }
 
-ToolTemplate *ADCTimeInstrument::getToolTemplate() { return tool; }
+ToolTemplate *ADCInstrument::getToolTemplate() { return tool; }
 
-MapStackedWidget *ADCTimeInstrument::getRightStack() { return rightStack; }
+MapStackedWidget *ADCInstrument::getRightStack() { return rightStack; }
 
-void ADCTimeInstrument::start() { run(true); }
+void ADCInstrument::start() { run(true); }
 
-void ADCTimeInstrument::stop() { run(false); }
+void ADCInstrument::stop() { run(false); }
 
-void ADCTimeInstrument::run(bool b)
+void ADCInstrument::run(bool b)
 {
+	QSignalBlocker rb(runBtn);
+	QSignalBlocker sb(singleBtn);
 
-	if(!b) {
-		runBtn->setChecked(false);
-		singleBtn->setChecked(false);
-	}
+	runBtn->setChecked(b);
+	singleBtn->setChecked(b);
 
 	qInfo() << b;
 	if(b) {

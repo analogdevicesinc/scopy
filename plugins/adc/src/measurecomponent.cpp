@@ -7,9 +7,8 @@ using namespace scopy::adc;
 
 MeasureComponent::MeasureComponent(ToolTemplate *tool, QObject *parent) {
 
-	MenuControlButton *measure = new MenuControlButton();
+	measure = new MenuControlButton();
 	setupMeasureButtonHelper(measure);
-
 
 	m_measureSettings = new MeasurementSettings(tool);
 	HoverWidget *measurePanelManagerHover = new HoverWidget(nullptr, measure, tool);
@@ -21,28 +20,46 @@ MeasureComponent::MeasureComponent(ToolTemplate *tool, QObject *parent) {
 		measurePanelManagerHover->raise();
 	});
 
-
-	m_measurePanel = new MeasurementsPanel(tool);
-	tool->topStack()->add(measureMenuId, m_measurePanel);
-
-	m_statsPanel = new StatsPanel(tool);
-	tool->bottomStack()->add(statsMenuId, m_statsPanel);
-	connect(m_measureSettings, &MeasurementSettings::enableMeasurementPanel, tool->topCentral(),
-		&QWidget::setVisible);
-	connect(m_measureSettings, &MeasurementSettings::enableStatsPanel, tool->bottomCentral(), &QWidget::setVisible);
-	connect(m_measureSettings, &MeasurementSettings::sortMeasurements, m_measurePanel, &MeasurementsPanel::sort);
-	connect(m_measureSettings, &MeasurementSettings::sortStats, m_statsPanel, &StatsPanel::sort);
 	connect(measure, &MenuControlButton::toggled, this, [=](bool b){
-	if(b) {
-		tool->requestMenu(measureMenuId);
-		tool->requestMenu(statsMenuId);
-	}
-	tool->openTopContainerHelper(b);
-	tool->openBottomContainerHelper(b);
+		if(b) {
+			tool->requestMenu(measureMenuId);
+			tool->requestMenu(statsMenuId);
+		}
+		// tool->openTopContainerHelper(b);
+		// tool->openBottomContainerHelper(b);
+		for( PlotComponent *p : m_plotComponents) {
+			p->enableMeasurementPanel(m_measureSettings->measurementEnabled() && b);
+			p->enableStatsPanel(m_measureSettings->statsEnabled() && b);
+		}
 
 	});
 	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
+}
 
+void MeasureComponent::addPlotComponent(PlotComponent *p) {
+	MeasurementsPanel *m_measurePanel = p->measurePanel();
+	StatsPanel *m_statsPanel = p->statsPanel();
+
+	connect(m_measureSettings, &MeasurementSettings::enableMeasurementPanel, p, &PlotComponent::enableMeasurementPanel);
+	connect(m_measureSettings, &MeasurementSettings::enableStatsPanel, p, &PlotComponent::enableStatsPanel);
+	connect(m_measureSettings, &MeasurementSettings::sortMeasurements, m_measurePanel, &MeasurementsPanel::sort);
+	connect(m_measureSettings, &MeasurementSettings::sortStats, m_statsPanel, &StatsPanel::sort);
+
+	m_plotComponents.append(p);
+
+
+}
+
+void MeasureComponent::removePlotComponent(PlotComponent*p) {
+	MeasurementsPanel *m_measurePanel = p->measurePanel();
+	StatsPanel *m_statsPanel = p->statsPanel();
+
+	disconnect(m_measureSettings, &MeasurementSettings::enableMeasurementPanel, p, &PlotComponent::enableMeasurementPanel);
+	disconnect(m_measureSettings, &MeasurementSettings::enableStatsPanel, p, &PlotComponent::enableStatsPanel);
+	disconnect(m_measureSettings, &MeasurementSettings::sortMeasurements, m_measurePanel, &MeasurementsPanel::sort);
+	disconnect(m_measureSettings, &MeasurementSettings::sortStats, m_statsPanel, &StatsPanel::sort);
+
+	m_plotComponents.removeAll(p);
 
 }
 
@@ -52,16 +69,6 @@ void MeasureComponent::setupMeasureButtonHelper(MenuControlButton *btn)
 	btn->setOpenMenuChecksThis(true);
 	btn->setDoubleClickToOpenMenu(true);
 	btn->checkBox()->setVisible(false);
-}
-
-MeasurementsPanel *MeasureComponent::measurePanel()
-{
-	return m_measurePanel;
-}
-
-StatsPanel *MeasureComponent::statsPanel()
-{
-	return m_statsPanel;
 }
 
 MeasurementSettings *MeasureComponent::measureSettings()

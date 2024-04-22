@@ -39,7 +39,7 @@ QWidget *TimePlotSettingsComponent::createMenu(QWidget *parent)
 
 	m_pen = QPen(StyleHelper::getColor("ScopyBlue"));
 
-	MenuHeaderWidget *header = new MenuHeaderWidget("PLOT", m_pen, w);
+	MenuHeaderWidget *header = new MenuHeaderWidget("TIME PLOT", m_pen, w);
 	QWidget *xaxismenu = createXAxisMenu(w);
 	QWidget *yaxismenu = createYAxisMenu(w);
 	//	QWidget* curvemenu = createCurveMenu(w);
