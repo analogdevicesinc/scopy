@@ -58,6 +58,7 @@ set_config_opts() {
 }
 
 install_packages() {
+	sudo apt update
 	sudo apt install -y build-essential cmake unzip gfortran gcc git bison libtool \
 		python3 pip gperf pkg-config gdb-multiarch g++ flex texinfo gawk openssl \
 		pigz libncurses-dev autoconf automake tar figlet liborc-0.4-dev* patchelf libc6-dev-armhf-cross squashfs-tools

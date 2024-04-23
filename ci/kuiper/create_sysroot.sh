@@ -7,6 +7,7 @@ source $SRC_DIR/ci/kuiper/kuiper_build_config.sh
 IMAGE_FILE=2023-12-13-ADI-Kuiper-full.img
 
 install_packages(){
+	sudo apt update
 	sudo apt -y install git wget unzip python3 python2
 }
 
@@ -20,6 +21,7 @@ download_kuiper(){
 
 # install qemu needed for the sysroot configuration
 install_qemu(){
+	sudo apt update
 	sudo apt -y install qemu qemu-system qemu-user-static qemu-user
 }
 
