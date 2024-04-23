@@ -50,9 +50,11 @@ BufferPreviewer::BufferPreviewer(int pixelsPerPeriod, double wavePhase, QWidget 
 	, m_leftGateWidth(0)
 	, m_rightGateWidth(0)
 	, m_cursorVisible(true)
-{}
+{
+	m_wavePoints = new QPointF();
+}
 
-BufferPreviewer::~BufferPreviewer() { delete[] m_wavePoints; }
+BufferPreviewer::~BufferPreviewer() { delete m_wavePoints; }
 
 double BufferPreviewer::waveformPos() const { return m_waveformPos; }
 
