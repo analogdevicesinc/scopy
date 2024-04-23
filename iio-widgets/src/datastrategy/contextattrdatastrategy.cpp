@@ -35,6 +35,8 @@ void ContextAttrDataStrategy::requestData()
 		return;
 	}
 
+	// There is no return code for the context attr read op, just return 0
+	Q_EMIT emitStatus(QDateTime::currentDateTime(), m_data, value, 0, true);
 	m_data = value;
 	Q_EMIT sendData(m_data, "");
 }

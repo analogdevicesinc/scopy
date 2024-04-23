@@ -64,7 +64,7 @@ void TriggerDataStrategy::save(QString data)
 		}
 	}
 
-	Q_EMIT emitStatus((int)(res));
+	Q_EMIT emitStatus(QDateTime::currentDateTime(), m_data, data, (int)(res), false);
 	requestData();
 }
 
@@ -105,6 +105,7 @@ void TriggerDataStrategy::requestData()
 		}
 	}
 
+	Q_EMIT emitStatus(QDateTime::currentDateTime(), m_data, currentTriggerName, res, true);
 	m_data = currentTriggerName;
 	m_optionalData = triggerOptions;
 	Q_EMIT sendData(m_data, m_optionalData);
