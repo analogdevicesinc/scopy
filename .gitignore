@@ -22,5 +22,7 @@ android*.sh
 !CI/android/*
 CI/kuiper/staging
 CI/kuiper/scopy.AppDir
+CI/appimage/staging
+CI/appimage/scopy.AppDir
 html/
 build_arm64-v8a/
