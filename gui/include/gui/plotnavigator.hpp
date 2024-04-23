@@ -77,6 +77,9 @@ public:
 	void setAutoBaseEn(bool en);
 	bool isAutoBaseEn();
 
+	void setResetOnNewBase(bool en);
+	bool getResetOnNewBase();
+
 	void setMagnifierPanModifier(Qt::KeyboardModifier modifier);
 	void setMagnifierZoomModifier(Qt::KeyboardModifier modifier);
 	Qt::KeyboardModifier getMagnifierPanModifier();
@@ -124,6 +127,7 @@ private:
 	QSet<PlotChannel *> *m_channels;
 	bool m_historyEn;
 	bool m_autoBase;
+	bool m_resetOnNewBase;
 	bool m_magnifierEn, m_zoomerEn;
 	Qt::KeyboardModifier m_zoomerXModifier, m_zoomerYModifier, m_zoomerXYModifier;
 	Qt::KeyboardModifier m_magnifierPanModifier, m_magnifierZoomModifier;
