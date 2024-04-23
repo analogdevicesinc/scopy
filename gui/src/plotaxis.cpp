@@ -137,6 +137,10 @@ OscScaleEngine *PlotAxis::scaleEngine() const { return m_scaleEngine; }
 
 double PlotAxis::max() const { return m_max; }
 
+double PlotAxis::visibleMin() const { return m_plot->axisScaleDiv(axisId()).lowerBound(); }
+
+double PlotAxis::visibleMax() const { return m_plot->axisScaleDiv(axisId()).upperBound(); }
+
 double PlotAxis::min() const { return m_min; }
 
 const QwtAxisId &PlotAxis::axisId() const { return m_axisId; }
