@@ -80,8 +80,8 @@ void PlotBufferPreviewer::updateDataLimits(double min, double max)
 void PlotBufferPreviewer::updateBufferPreviewer()
 {
 	// Time interval within the plot canvas
-	double left = m_plot->plot()->axisScaleDiv(m_plot->xAxis()->axisId()).lowerBound();
-	double right = m_plot->plot()->axisScaleDiv(m_plot->xAxis()->axisId()).upperBound();
+	double left = m_plot->xAxis()->visibleMin();
+	double right = m_plot->xAxis()->visibleMax();
 	QwtInterval plotInterval(std::min(left, right), std::max(left, right));
 
 	// Time interval that represents the captured data
