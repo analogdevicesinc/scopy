@@ -30,6 +30,8 @@ public:
 
 	double min() const;
 	double max() const;
+	double visibleMin() const;
+	double visibleMax() const;
 
 	QwtPlotZoomer *zoomer() const;
 	OscScaleEngine *scaleEngine() const;
