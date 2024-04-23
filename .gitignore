@@ -54,15 +54,3 @@ iio-widgets/include/iio-widgets/scopy-iio-widgets_export.h
 iioutil/include/iioutil/scopy-iioutil_export.h
 pluginbase/include/pluginbase/scopy-pluginbase_config.h
 pluginbase/include/pluginbase/scopy-pluginbase_export.h
-plugins/regmap/include/regmapplugin/scopy-regmapplugin_export.h
-plugins/regmap/include/regmapplugin/scopy-regmapplugin_config.h
-plugins/bareminimumplugin/include/bareminimumplugin/scopy-bareminimumplugin_export.h
-plugins/datalogger/include/datalogger/scopy-datalogger_export.h
-plugins/debugger/include/debuggerplugin/scopy-debuggerplugin_export.h
-plugins/guitestplugin/include/guitestplugin/scopy-guitestplugin_export.h
-plugins/m2k/include/m2kplugin/scopy-m2kplugin_export.h
-plugins/swiot/include/swiot/scopy-swiot_export.h
-plugins/adc/include/adcplugin/scopy-adcplugin_export.h
-plugins/pqm/include/pqmplugin/scopy-pqmplugin_export.h
-plugins/testplugin/include/testplugin/scopy-testplugin_export.h
-plugins/testplugin2/include/testplugin2/scopy-testplugin2_export.h
