@@ -4,6 +4,7 @@
 using namespace scopy;
 
 PlotBufferPreviewer::PlotBufferPreviewer(PlotWidget *p, BufferPreviewer *b, QWidget *parent)
+	: QWidget{parent}
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	QVBoxLayout *layout = new QVBoxLayout(this);
@@ -34,21 +35,26 @@ void PlotBufferPreviewer::setupBufferPreviewer()
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferStopDrag, this, [=]() {});
 
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferStartDrag, this, [=]() {
-		m_bufferPrevInitMin = m_plot->xAxis()->min();
-		m_bufferPrevInitMax = m_plot->xAxis()->max();
+		// reset the buffer preview position to current visible section
+		// using lower and upper bound to also consider zoom level
+		m_bufferPrevInitMin = m_plot->xAxis()->visibleMin();
+		m_bufferPrevInitMax = m_plot->xAxis()->visibleMax();
 	});
 
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, this, [=](int value) {
 		double moveTo = 0.0;
 
 		int width = m_bufferPreviewer->width();
-		double xAxisWidth = m_bufferPrevData;
+		double xAxisWidth = abs(m_bufferDataLimitMax - m_bufferDataLimitMin);
+
 		if(m_plot->xAxis()->min() > m_plot->xAxis()->max()) {
 			value *= -1;
 		}
 
 		moveTo = value * xAxisWidth / width;
-		m_plot->xAxis()->setInterval(m_bufferPrevInitMin + moveTo, m_bufferPrevInitMax + moveTo);
+
+		m_plot->plot()->setAxisScale(m_plot->xAxis()->axisId(), m_bufferPrevInitMin + moveTo,
+					     m_bufferPrevInitMax + moveTo);
 		m_plot->replot();
 
 		updateBufferPreviewer();
@@ -56,24 +62,27 @@ void PlotBufferPreviewer::setupBufferPreviewer()
 
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, this, [=]() {
 		if(m_plot->xAxis()->min() > m_plot->xAxis()->max()) {
-			m_plot->xAxis()->setInterval(m_bufferPrevData, 0.);
+			m_plot->xAxis()->setInterval(m_bufferDataLimitMax, m_bufferDataLimitMin);
 		} else {
-			m_plot->xAxis()->setInterval(0., m_bufferPrevData);
+			m_plot->xAxis()->setInterval(m_bufferDataLimitMin, m_bufferDataLimitMax);
 		}
 		m_plot->xAxis()->updateAxisScale();
+		updateDataLimits();
 	});
 }
 
 void PlotBufferPreviewer::updateDataLimits()
 {
 	PlotAxis *xAxis = (m_plot->selectedChannel()) ? m_plot->selectedChannel()->xAxis() : m_plot->xAxis();
-	m_bufferPrevData = abs(xAxis->max() - xAxis->min());
+	m_bufferDataLimitMin = xAxis->min();
+	m_bufferDataLimitMax = xAxis->max();
 	updateBufferPreviewer();
 }
 
 void PlotBufferPreviewer::updateDataLimits(double min, double max)
 {
-	m_bufferPrevData = abs(max - min);
+	m_bufferDataLimitMin = min;
+	m_bufferDataLimitMax = max;
 	updateBufferPreviewer();
 }
 
@@ -85,7 +94,8 @@ void PlotBufferPreviewer::updateBufferPreviewer()
 	QwtInterval plotInterval(std::min(left, right), std::max(left, right));
 
 	// Time interval that represents the captured data
-	QwtInterval dataInterval(0.0, m_bufferPrevData);
+	QwtInterval dataInterval(std::min(m_bufferDataLimitMin, m_bufferDataLimitMax),
+				 std::fmax(m_bufferDataLimitMin, m_bufferDataLimitMax));
 
 	// Use the two intervals to determine the width and position of the
 	// waveform and of the highlighted area
@@ -95,6 +105,7 @@ void PlotBufferPreviewer::updateBufferPreviewer()
 
 	double hPos = 1 - (fullInterval.maxValue() - plotInterval.minValue()) / fullInterval.width();
 	double hWidth = plotInterval.width() / fullInterval.width();
+
 	if(left > right) {
 		hPos = wWidth - hPos - hWidth;
 	}
