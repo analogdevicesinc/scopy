@@ -98,8 +98,8 @@ void TimePlotInfo::update(PlotSamplingInfo info)
 
 	axisMax = xAxis->max();
 	axisMin = xAxis->min();
-	currMax = m_plot->plot()->axisScaleDiv(xAxis->axisId()).upperBound();
-	currMin = m_plot->plot()->axisScaleDiv(xAxis->axisId()).lowerBound();
+	currMax = xAxis->visibleMax();
+	currMin = xAxis->visibleMin();
 	zoomed = axisMax != currMax || axisMin != currMin;
 	divs = xAxis->divs();
 
