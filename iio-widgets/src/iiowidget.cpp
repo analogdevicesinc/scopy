@@ -50,7 +50,9 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 	connect(m_progressBar, &SmallProgressBar::progressFinished, this, [this]() { this->saveData(m_lastData); });
 
 	connect(uiStrategyWidget, SIGNAL(emitData(QString)), this, SLOT(startTimer(QString)));
-	connect(dataStrategyWidget, SIGNAL(emitStatus(int)), this, SLOT(emitDataStatus(int)));
+
+	connect(dataStrategyWidget, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
+		SLOT(emitDataStatus(QDateTime, QString, QString, int, bool)));
 
 	// forward data request from ui strategy to data strategy
 	connect(uiStrategyWidget, SIGNAL(requestData()), dataStrategyWidget, SLOT(requestData()));
@@ -76,21 +78,29 @@ void IIOWidget::saveData(QString data)
 	m_dataStrategy->save(data);
 }
 
-void IIOWidget::emitDataStatus(int status)
+void IIOWidget::emitDataStatus(QDateTime timestamp, QString oldData, QString newData, int status, bool isReadOp)
 {
-	setLastOperationTimestamp(QDateTime::currentDateTime());
-	QString timestamp = m_lastOpTimestamp->toString("hh:mm:ss");
+	// The read operation will not be shown as a status here as it will overlap with the
+	// write operation that is more likely to fail
+	if(isReadOp) {
+		qInfo(CAT_IIOWIDGET) << timestamp.toString("[hh:mm:ss]")
+				     << "READ (return code: " << QString::number(status) << "):" << oldData << "->"
+				     << newData;
+		return;
+	}
+	setLastOperationTimestamp(timestamp);
+	QString timestampFormat = timestamp.toString("hh:mm:ss");
 	if(status < 0) {
 		m_progressBar->setBarColor(StyleHelper::getColor("ProgressBarError"));
 		QString statusString = "Tried to write \"" + m_lastData +
 			"\", but failed.\nError: " + QString(strerror(-status)) + " (" + QString::number(status) + ").";
-		setToolTip("[" + timestamp + "] " + statusString);
+		setToolTip("[" + timestampFormat + "] " + statusString);
 		setLastOperationState(IIOWidget::Error);
 		qDebug(CAT_IIOWIDGET) << statusString;
 	} else {
 		m_progressBar->setBarColor(StyleHelper::getColor("ProgressBarSuccess"));
 		QString statusString = "Operation finished successfully.";
-		setToolTip("[" + timestamp + "] " + statusString);
+		setToolTip("[" + timestampFormat + "] " + statusString);
 		setLastOperationState(IIOWidget::Correct);
 		qDebug(CAT_IIOWIDGET) << statusString << ". Wrote " + m_lastData + ".";
 	}
