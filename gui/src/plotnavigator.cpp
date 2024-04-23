@@ -34,6 +34,7 @@ PlotNavigator::PlotNavigator(PlotWidget *plotWidget, QSet<PlotChannel *> *channe
 	, m_autoBase(true)
 	, m_zoomerEn(true)
 	, m_magnifierEn(true)
+	, m_resetOnNewBase(true)
 	, m_zoomerXModifier(Qt::ShiftModifier)
 	, m_zoomerYModifier(Qt::ControlModifier)
 	, m_zoomerXYModifier(Qt::NoModifier)
@@ -162,7 +163,8 @@ void PlotNavigator::addNavigators(QwtAxisId axisId)
 	connect(m_plotWidget->plotAxisFromId(axisId), &PlotAxis::axisScaleUpdated, this, [=]() {
 		if(m_autoBase) {
 			setBaseRect(axisId);
-			Q_EMIT reset();
+			if(m_resetOnNewBase)
+				Q_EMIT reset();
 		}
 	});
 }
@@ -355,7 +357,7 @@ bool PlotNavigator::isXAxesEn() { return m_visibleZoomer->isXAxisEn(); }
 
 void PlotNavigator::setYAxesEn(bool en)
 {
-	setZoomerXAxesEn(en);
+	setZoomerYAxesEn(en);
 	for(Navigator *nav : *m_navigators) {
 		if(nav->magnifier->isYAxisEn()) {
 			nav->magnifier->setEnabled(en);
@@ -479,6 +481,10 @@ bool PlotNavigator::isZoomerEn() { return m_zoomerEn; }
 void PlotNavigator::setAutoBaseEn(bool en) { m_autoBase = en; }
 
 bool PlotNavigator::isAutoBaseEn() { return m_autoBase; }
+
+void PlotNavigator::setResetOnNewBase(bool en) { m_resetOnNewBase = en; }
+
+bool PlotNavigator::getResetOnNewBase() { return m_resetOnNewBase; }
 
 void PlotNavigator::syncNavigators(PlotNavigator *pNav1, Navigator *nav1, PlotNavigator *pNav2, Navigator *nav2)
 {
