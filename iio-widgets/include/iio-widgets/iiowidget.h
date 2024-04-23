@@ -97,7 +97,7 @@ Q_SIGNALS:
 
 protected Q_SLOTS:
 	void saveData(QString data);
-	void emitDataStatus(int status);
+	void emitDataStatus(QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp);
 
 	void startTimer(QString data);
 	void storeReadInfo(QString data, QString optionalData);
