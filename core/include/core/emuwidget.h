@@ -35,7 +35,7 @@ private:
 	void setStatusMessage(QString msg);
 	QString findEmuPath();
 	void stopEnableBtn(QString btnText);
-	bool startIioEmuProcess();
+	bool startIioEmuProcess(QString processPath);
 	void killEmuProcess();
 
 	Ui::EmuWidget *m_ui;
