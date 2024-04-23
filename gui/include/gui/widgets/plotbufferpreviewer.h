@@ -17,14 +17,15 @@ public:
 
 	void updateDataLimits();
 	void updateDataLimits(double min, double max);
+
 public Q_SLOTS:
 	void updateBufferPreviewer();
 
 private:
+	double m_bufferDataLimitMin;
+	double m_bufferDataLimitMax;
 	double m_bufferPrevInitMin;
 	double m_bufferPrevInitMax;
-
-	double m_bufferPrevData;
 
 	void setupBufferPreviewer();
 	PlotWidget *m_plot;
