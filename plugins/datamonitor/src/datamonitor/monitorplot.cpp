@@ -239,6 +239,6 @@ void MonitorPlot::updatePlotStartingPoint(double time, double delta)
 
 		m_plot->xAxis()->setInterval(time - (delta * 1000), time);
 	}
-
+	m_bufferPreviewer->updateDataLimits(m_startTime, time);
 	m_plot->replot();
 }
