@@ -44,8 +44,17 @@ void EmuWidget::init()
 	Preferences *p = Preferences::GetInstance();
 	p->init("iio_emu_path", QCoreApplication::applicationDirPath());
 
-	m_emuPath = findEmuPath();
-	m_emuPath.isEmpty() ? setStatusMessage("Can't find iio-emu in the system!") : setStatusMessage("");
+	QString systemEmuCall = "iio-emu";
+	if(startIioEmuProcess(systemEmuCall)) {
+		m_emuPath = systemEmuCall;
+	} else {
+		m_emuPath = findEmuPath();
+	}
+	if(m_emuPath.isEmpty()) {
+		setStatusMessage("Can't find iio-emu in the system!");
+	} else {
+		setStatusMessage("");
+	}
 	this->setEnabled(!m_emuPath.isEmpty());
 
 	QMovie *loadingIcon(new QMovie(this));
@@ -72,7 +81,7 @@ void EmuWidget::onEnableDemoClicked()
 {
 	m_ui->btnEnableDemo->startAnimation();
 	if(!m_enableDemo) {
-		bool started = startIioEmuProcess();
+		bool started = startIioEmuProcess(m_emuPath);
 		if(!started) {
 			stopEnableBtn("Enable Demo");
 			return;
@@ -122,10 +131,10 @@ void EmuWidget::stopEnableBtn(QString btnText)
 	m_ui->btnEnableDemo->setText(btnText);
 }
 
-bool EmuWidget::startIioEmuProcess()
+bool EmuWidget::startIioEmuProcess(QString processPath)
 {
 	QStringList arg = createArgList();
-	m_emuProcess->setProgram(m_emuPath);
+	m_emuProcess->setProgram(processPath);
 	m_emuProcess->setArguments(arg);
 	m_emuProcess->start();
 
