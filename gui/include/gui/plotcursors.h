@@ -16,17 +16,17 @@ public:
 	~PlotCursors();
 
 	void displayIntersection();
-	void setVHandlePos(HandlePos pos);
-	void setHHandlePos(HandlePos pos);
+	void setYHandlePos(HandlePos pos);
+	void setXHandlePos(HandlePos pos);
 
 public Q_SLOTS:
 	void setVisible(bool visible);
-	void horizSetVisible(bool visible);
-	void vertSetVisible(bool visible);
-	PlotAxisHandle *getV1Cursor();
-	PlotAxisHandle *getV2Cursor();
-	PlotAxisHandle *getH1Cursor();
-	PlotAxisHandle *getH2Cursor();
+	void setXVisible(bool visible);
+	void setYVisible(bool visible);
+	PlotAxisHandle *getY1Cursor();
+	PlotAxisHandle *getY2Cursor();
+	PlotAxisHandle *getX1Cursor();
+	PlotAxisHandle *getX2Cursor();
 	void setBounded(bool leave);
 	void enableTracking(bool tracking);
 
@@ -35,8 +35,8 @@ Q_SIGNALS:
 
 private:
 	PlotWidget *m_plot;
-	QPair<PlotAxisHandle *, PlotAxisHandle *> m_vCursors;
-	QPair<PlotAxisHandle *, PlotAxisHandle *> m_hCursors;
+	QPair<PlotAxisHandle *, PlotAxisHandle *> m_yCursors;
+	QPair<PlotAxisHandle *, PlotAxisHandle *> m_xCursors;
 	QwtPlotMarker *plotMarker1;
 	QwtPlotMarker *plotMarker2;
 	bool m_tracking;

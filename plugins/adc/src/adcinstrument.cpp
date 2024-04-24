@@ -78,13 +78,13 @@ AdcInstrument::AdcInstrument(PlotProxy *proxy, QWidget *parent)
 	bool yCursorPos = Preferences::get("adc_plot_ycursor_position").toInt() == QwtAxis::YLeft;
 
 	cursorController = new CursorController(plotAddon->plot(), this);
-	cursorController->getPlotCursors()->setHHandlePos(xCursorPos ? HandlePos::SOUTH_EAST : HandlePos::NORTH_WEST);
-	cursorController->getPlotCursors()->setVHandlePos(yCursorPos ? HandlePos::NORTH_WEST : HandlePos::SOUTH_EAST);
+	cursorController->getPlotCursors()->setXHandlePos(xCursorPos ? HandlePos::SOUTH_EAST : HandlePos::NORTH_WEST);
+	cursorController->getPlotCursors()->setYHandlePos(yCursorPos ? HandlePos::NORTH_WEST : HandlePos::SOUTH_EAST);
 
 	fftcursorController = new CursorController(plotAddon->fftplot(), this);
-	fftcursorController->getPlotCursors()->setHHandlePos(xCursorPos ? HandlePos::SOUTH_EAST
+	fftcursorController->getPlotCursors()->setXHandlePos(xCursorPos ? HandlePos::SOUTH_EAST
 									: HandlePos::NORTH_WEST);
-	fftcursorController->getPlotCursors()->setVHandlePos(yCursorPos ? HandlePos::NORTH_WEST
+	fftcursorController->getPlotCursors()->setYHandlePos(yCursorPos ? HandlePos::NORTH_WEST
 									: HandlePos::SOUTH_EAST);
 	fftcursorController->getCursorSettings()->hide();
 
@@ -208,10 +208,10 @@ AdcInstrument::AdcInstrument(PlotProxy *proxy, QWidget *parent)
 
 void AdcInstrument::initCursors()
 {
-	cursorController->getPlotCursors()->getH1Cursor()->setPosition(0);
-	cursorController->getPlotCursors()->getH2Cursor()->setPosition(0);
-	cursorController->getPlotCursors()->getV1Cursor()->setPosition(0);
-	cursorController->getPlotCursors()->getV2Cursor()->setPosition(0);
+	cursorController->getPlotCursors()->getX1Cursor()->setPosition(0);
+	cursorController->getPlotCursors()->getX2Cursor()->setPosition(0);
+	cursorController->getPlotCursors()->getY1Cursor()->setPosition(0);
+	cursorController->getPlotCursors()->getY2Cursor()->setPosition(0);
 }
 
 AdcInstrument::~AdcInstrument() { deinit(); }

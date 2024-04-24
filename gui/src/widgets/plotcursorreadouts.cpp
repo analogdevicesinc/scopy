@@ -4,37 +4,37 @@ using namespace scopy;
 
 PlotCursorReadouts::PlotCursorReadouts(QWidget *parent)
 	: QWidget(parent)
-	, vFormatter(nullptr)
-	, hFormatter(nullptr)
-	, hUnit("")
-	, vUnit("")
+	, xFormatter(nullptr)
+	, yFormatter(nullptr)
+	, xUnit("")
+	, yUnit("")
 {
 	initContent();
 }
 
 PlotCursorReadouts::~PlotCursorReadouts() {}
 
-void PlotCursorReadouts::setV1(double val)
+void PlotCursorReadouts::setY1(double val)
 {
-	v1 = val;
+	y1 = val;
 	update();
 }
 
-void PlotCursorReadouts::setV2(double val)
+void PlotCursorReadouts::setY2(double val)
 {
-	v2 = val;
+	y2 = val;
 	update();
 }
 
-void PlotCursorReadouts::setH1(double val)
+void PlotCursorReadouts::setX1(double val)
 {
-	h1 = val;
+	x1 = val;
 	update();
 }
 
-void PlotCursorReadouts::setH2(double val)
+void PlotCursorReadouts::setX2(double val)
 {
-	h2 = val;
+	x2 = val;
 	update();
 }
 
@@ -42,26 +42,26 @@ void PlotCursorReadouts::update()
 {
 	const uint precision = 3;
 
-	if(hFormatter && !hUnit.isEmpty()) {
-		H1_val->setText(hFormatter->format(h1, hUnit, precision));
-		H2_val->setText(hFormatter->format(h2, hUnit, precision));
-		deltaH_val->setText(hFormatter->format(h2 - h1, hUnit, precision));
-		invDeltaH_val->setText(hFormatter->format(1 / (h2 - h1), hUnit, precision));
+	if(yFormatter && !xUnit.isEmpty()) {
+		x1_val->setText(yFormatter->format(x1, xUnit, precision));
+		x2_val->setText(yFormatter->format(x2, xUnit, precision));
+		deltaX_val->setText(yFormatter->format(x2 - x1, xUnit, precision));
+		invDeltaX_val->setText(yFormatter->format(1 / (x2 - x1), xUnit, precision));
 	} else {
-		H1_val->setText(QString::number(h1, 'g', precision) + " " + hUnit);
-		H2_val->setText(QString::number(h2, 'g', precision) + " " + hUnit);
-		deltaH_val->setText(QString::number(h2 - h1, 'g', precision) + " " + hUnit);
-		invDeltaH_val->setText(QString::number(1 / (h2 - h1), 'g', precision) + " " + hUnit);
+		x1_val->setText(QString::number(x1, 'g', precision) + " " + xUnit);
+		x2_val->setText(QString::number(x2, 'g', precision) + " " + xUnit);
+		deltaX_val->setText(QString::number(x2 - x1, 'g', precision) + " " + xUnit);
+		invDeltaX_val->setText(QString::number(1 / (x2 - x1), 'g', precision) + " " + xUnit);
 	}
 
-	if(vFormatter && !vUnit.isEmpty()) {
-		V1_val->setText(vFormatter->format(v1, vUnit, precision));
-		V2_val->setText(vFormatter->format(v2, vUnit, precision));
-		deltaV_val->setText(vFormatter->format(v2 - v1, vUnit, precision));
+	if(yFormatter && !yUnit.isEmpty()) {
+		y1_val->setText(yFormatter->format(y1, yUnit, precision));
+		y2_val->setText(yFormatter->format(y2, yUnit, precision));
+		deltaY_val->setText(yFormatter->format(y2 - y1, yUnit, precision));
 	} else {
-		V1_val->setText(QString::number(v1, 'g', precision) + " " + vUnit);
-		V2_val->setText(QString::number(v2, 'g', precision) + " " + vUnit);
-		deltaV_val->setText(QString::number(v2 - v1, 'g', precision) + " " + vUnit);
+		y1_val->setText(QString::number(y1, 'g', precision) + " " + yUnit);
+		y2_val->setText(QString::number(y2, 'g', precision) + " " + yUnit);
+		deltaY_val->setText(QString::number(y2 - y1, 'g', precision) + " " + yUnit);
 	}
 }
 
@@ -73,88 +73,88 @@ void PlotCursorReadouts::initContent()
 	content_lay->setMargin(10);
 	content_lay->setSpacing(10);
 
-	// vertical readouts
-	vert_contents = new QWidget(this);
-	vert_contents->setFixedWidth(120);
-	QGridLayout *vert_contents_lay = new QGridLayout(vert_contents);
-	vert_contents_lay->setMargin(0);
-	vert_contents_lay->setSpacing(2);
-	vert_contents->setLayout(vert_contents_lay);
-	content_lay->addWidget(vert_contents);
+	// y readouts
+	y_contents = new QWidget(this);
+	y_contents->setFixedWidth(120);
+	QGridLayout *y_contents_lay = new QGridLayout(y_contents);
+	y_contents_lay->setMargin(0);
+	y_contents_lay->setSpacing(2);
+	y_contents->setLayout(y_contents_lay);
+	content_lay->addWidget(y_contents);
 
-	vert_contents_lay->addWidget(new QLabel("V1:", vert_contents), 0, 0);
-	V1_val = new QLabel("", this);
-	vert_contents_lay->addWidget(V1_val, 0, 1);
+	y_contents_lay->addWidget(new QLabel("y1:", y_contents), 0, 0);
+	y1_val = new QLabel("", this);
+	y_contents_lay->addWidget(y1_val, 0, 1);
 
-	vert_contents_lay->addWidget(new QLabel("V2:", vert_contents), 1, 0);
-	V2_val = new QLabel("", this);
-	vert_contents_lay->addWidget(V2_val, 1, 1);
+	y_contents_lay->addWidget(new QLabel("y2:", y_contents), 1, 0);
+	y2_val = new QLabel("", this);
+	y_contents_lay->addWidget(y2_val, 1, 1);
 
-	vert_contents_lay->addWidget(new QLabel("ΔV:", vert_contents), 2, 0);
-	deltaV_val = new QLabel("", this);
-	vert_contents_lay->addWidget(deltaV_val, 2, 1);
+	y_contents_lay->addWidget(new QLabel("Δy:", y_contents), 2, 0);
+	deltaY_val = new QLabel("", this);
+	y_contents_lay->addWidget(deltaY_val, 2, 1);
 
-	vert_contents_lay->addItem(new QSpacerItem(0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding), 3, 0);
+	y_contents_lay->addItem(new QSpacerItem(0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding), 3, 0);
 
-	// horizontal readouts
-	horiz_contents = new QWidget(this);
-	horiz_contents->setFixedWidth(120);
-	QGridLayout *horiz_contents_lay = new QGridLayout(horiz_contents);
-	horiz_contents_lay->setMargin(0);
-	horiz_contents_lay->setSpacing(2);
-	horiz_contents->setLayout(horiz_contents_lay);
-	content_lay->addWidget(horiz_contents);
+	// x readouts
+	x_contents = new QWidget(this);
+	x_contents->setFixedWidth(120);
+	QGridLayout *x_contents_lay = new QGridLayout(x_contents);
+	x_contents_lay->setMargin(0);
+	x_contents_lay->setSpacing(2);
+	x_contents->setLayout(x_contents_lay);
+	content_lay->addWidget(x_contents);
 
-	horiz_contents_lay->addWidget(new QLabel("H1:", horiz_contents), 0, 0);
-	H1_val = new QLabel("", this);
-	horiz_contents_lay->addWidget(H1_val, 0, 1);
+	x_contents_lay->addWidget(new QLabel("x1:", x_contents), 0, 0);
+	x1_val = new QLabel("", this);
+	x_contents_lay->addWidget(x1_val, 0, 1);
 
-	horiz_contents_lay->addWidget(new QLabel("H2:", horiz_contents), 1, 0);
-	H2_val = new QLabel("", this);
-	horiz_contents_lay->addWidget(H2_val, 1, 1);
+	x_contents_lay->addWidget(new QLabel("x2:", x_contents), 1, 0);
+	x2_val = new QLabel("", this);
+	x_contents_lay->addWidget(x2_val, 1, 1);
 
-	horiz_contents_lay->addWidget(new QLabel("ΔH:", horiz_contents), 2, 0);
-	deltaH_val = new QLabel("", this);
-	horiz_contents_lay->addWidget(deltaH_val, 2, 1);
+	x_contents_lay->addWidget(new QLabel("Δx:", x_contents), 2, 0);
+	deltaX_val = new QLabel("", this);
+	x_contents_lay->addWidget(deltaX_val, 2, 1);
 
-	horiz_contents_lay->addWidget(new QLabel("1/ΔH:", horiz_contents), 3, 0);
-	invDeltaH_val = new QLabel("", this);
-	horiz_contents_lay->addWidget(invDeltaH_val, 3, 1);
+	x_contents_lay->addWidget(new QLabel("1/Δx:", x_contents), 3, 0);
+	invDeltaX_val = new QLabel("", this);
+	x_contents_lay->addWidget(invDeltaX_val, 3, 1);
 
 	for(auto w : this->findChildren<QWidget *>()) {
 		StyleHelper::TransparentWidget(w);
 	}
 }
 
-void PlotCursorReadouts::horizSetVisible(bool visible) { horiz_contents->setVisible(visible); }
+void PlotCursorReadouts::setXVisible(bool visible) { x_contents->setVisible(visible); }
 
-void PlotCursorReadouts::vertSetVisible(bool visible) { vert_contents->setVisible(visible); }
+void PlotCursorReadouts::setYVisible(bool visible) { y_contents->setVisible(visible); }
 
-bool PlotCursorReadouts::horizIsVisible() { return horiz_contents->isVisible(); }
+bool PlotCursorReadouts::isXVisible() { return x_contents->isVisible(); }
 
-bool PlotCursorReadouts::vertIsVisible() { return vert_contents->isVisible(); }
+bool PlotCursorReadouts::isYVisible() { return y_contents->isVisible(); }
 
-void PlotCursorReadouts::setVertUnits(QString unit)
+void PlotCursorReadouts::setYUnits(QString unit)
 {
-	vUnit = unit;
+	yUnit = unit;
 	update();
 }
 
-void PlotCursorReadouts::setHorizUnits(QString unit)
+void PlotCursorReadouts::setXUnits(QString unit)
 {
-	hUnit = unit;
+	xUnit = unit;
 	update();
 }
 
-void PlotCursorReadouts::setHorizFromatter(PrefixFormatter *formatter)
+void PlotCursorReadouts::setXFromatter(PrefixFormatter *formatter)
 {
-	hFormatter = formatter;
+	yFormatter = formatter;
 	update();
 }
 
-void PlotCursorReadouts::setVertFromatter(PrefixFormatter *formatter)
+void PlotCursorReadouts::setYFromatter(PrefixFormatter *formatter)
 {
-	vFormatter = formatter;
+	yFormatter = formatter;
 	update();
 }
 
