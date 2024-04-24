@@ -15,11 +15,15 @@ Q_DECLARE_LOGGING_CATEGORY(CAT_WATCHLIST)
 
 // Used for the creation / access of the internal model or any internal configurations
 Q_DECLARE_LOGGING_CATEGORY(CAT_DEBUGGERIIOMODEL)
+
+// Used for plugin/instrument related logs
+Q_DECLARE_LOGGING_CATEGORY(CAT_IIODEBUGGER)
 #else
 #define CAT_TREEVIEW
 #define CAT_DETAILSVIEW
 #define CAT_WATCHLIST
 #define CAT_DEBUGGERIIOMODEL
+#define CAT_IIODEBUGGER
 #endif
 
 #endif // DEBUGGERLOGGINGCATEGORIES_H
