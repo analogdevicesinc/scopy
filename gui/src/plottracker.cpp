@@ -60,7 +60,7 @@ ChannelTracker *PlotTracker::createTracker(PlotChannel *ch)
 	tracker->setXAxis(ch->xAxis()->axisId());
 	tracker->setYAxis(ch->yAxis()->axisId());
 	tracker->setColor(ch->curve()->pen().color());
-	tracker->setEnabled(m_plot->selectedChannel() == ch);
+	tracker->setEnabled(m_en && m_plot->selectedChannel() == ch);
 	tracker->setXAxisUnit(ch->xAxis()->getUnits());
 	tracker->setYAxisUnit(ch->yAxis()->getUnits());
 	tracker->setXFormatter(ch->xAxis()->getFromatter());
