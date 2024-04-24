@@ -18,21 +18,21 @@ public:
 	CursorSettings(QWidget *parent = nullptr);
 	~CursorSettings();
 
-	QAbstractButton *getHorizEn();
-	QAbstractButton *getHorizLock();
-	QAbstractButton *getHorizTrack();
-	QAbstractButton *getVertEn();
-	QAbstractButton *getVertLock();
+	QAbstractButton *getXEn();
+	QAbstractButton *getXLock();
+	QAbstractButton *getXTrack();
+	QAbstractButton *getYEn();
+	QAbstractButton *getYLock();
 	QAbstractButton *getReadoutsDrag();
 
 private:
-	MenuSectionWidget *horizControls;
-	MenuOnOffSwitch *horizEn;
-	MenuOnOffSwitch *horizLock;
-	MenuSectionWidget *vertControls;
-	MenuOnOffSwitch *vertEn;
-	MenuOnOffSwitch *vertLock;
-	MenuOnOffSwitch *horizTrack;
+	MenuSectionWidget *xControls;
+	MenuOnOffSwitch *xEn;
+	MenuOnOffSwitch *xLock;
+	MenuSectionWidget *yControls;
+	MenuOnOffSwitch *yEn;
+	MenuOnOffSwitch *yLock;
+	MenuOnOffSwitch *xTrack;
 	MenuSectionWidget *readoutsControls;
 	MenuOnOffSwitch *readoutsDrag;
 	QVBoxLayout *layout;

@@ -17,33 +17,33 @@ public:
 	PlotCursorReadouts(QWidget *parent = nullptr);
 	~PlotCursorReadouts();
 
-	bool horizIsVisible();
-	bool vertIsVisible();
+	bool isXVisible();
+	bool isYVisible();
 
 public Q_SLOTS:
-	void setV1(double val);
-	void setV2(double val);
-	void setH1(double val);
-	void setH2(double val);
-	void horizSetVisible(bool visible);
-	void vertSetVisible(bool visible);
+	void setY1(double val);
+	void setY2(double val);
+	void setX1(double val);
+	void setX2(double val);
+	void setXVisible(bool visible);
+	void setYVisible(bool visible);
 	void update();
 
-	void setVertUnits(QString unit);
-	void setHorizUnits(QString unit);
+	void setYUnits(QString unit);
+	void setXUnits(QString unit);
 
-	void setHorizFromatter(PrefixFormatter *formatter);
-	void setVertFromatter(PrefixFormatter *formatter);
+	void setXFromatter(PrefixFormatter *formatter);
+	void setYFromatter(PrefixFormatter *formatter);
 
 private:
-	QWidget *vert_contents;
-	QWidget *horiz_contents;
-	double v1, v2, h1, h2;
-	QLabel *V1_val, *V2_val, *H1_val, *H2_val;
-	QLabel *deltaV_val, *deltaH_val;
-	QLabel *invDeltaH_val;
-	PrefixFormatter *hFormatter, *vFormatter;
-	QString hUnit, vUnit;
+	QWidget *y_contents;
+	QWidget *x_contents;
+	double y1, y2, x1, x2;
+	QLabel *y1_val, *y2_val, *x1_val, *x2_val;
+	QLabel *deltaY_val, *deltaX_val;
+	QLabel *invDeltaX_val;
+	PrefixFormatter *xFormatter, *yFormatter;
+	QString xUnit, yUnit;
 
 	void initContent();
 };
