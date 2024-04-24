@@ -1,4 +1,5 @@
 #include "iiodebugplugin.h"
+#include "debuggerloggingcategories.h"
 #include <QLabel>
 #include <iioutil/connectionprovider.h>
 
@@ -8,7 +9,16 @@ bool IIODebugPlugin::compatible(QString m_param, QString category)
 {
 	// This function defines the characteristics according to which the
 	// plugin is compatible with a specific device
+	qDebug(CAT_IIODEBUGGER) << "Checking if IIODebugPlugin is compatible.";
 	bool ret = true;
+	ConnectionProvider *c = ConnectionProvider::GetInstance();
+	Connection *conn = c->open(m_param);
+
+	if(!conn) {
+		return false;
+	}
+	c->close(m_param);
+	qDebug(CAT_IIODEBUGGER) << "IIODebugPlugin is compatible!";
 	return ret;
 }
 
