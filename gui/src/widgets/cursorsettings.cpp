@@ -23,29 +23,29 @@ void CursorSettings::initUI()
 	layout->setMargin(0);
 	setLayout(layout);
 
-	// horizontal controls
-	horizControls = new MenuSectionWidget(this);
-	layout->addWidget(horizControls);
-	horizControls->contentLayout()->setSpacing(10);
+	// x controls
+	xControls = new MenuSectionWidget(this);
+	layout->addWidget(xControls);
+	xControls->contentLayout()->setSpacing(10);
 
-	horizEn = new MenuOnOffSwitch(tr("Horizontal"), horizControls, false);
-	horizEn->onOffswitch()->setChecked(true);
-	horizControls->contentLayout()->addWidget(horizEn);
-	horizLock = new MenuOnOffSwitch(tr("Lock"), horizControls, false);
-	horizControls->contentLayout()->addWidget(horizLock);
-	horizTrack = new MenuOnOffSwitch(tr("Track"), horizControls, false);
-	horizControls->contentLayout()->addWidget(horizTrack);
+	xEn = new MenuOnOffSwitch(tr("Enable X"), xControls, false);
+	xEn->onOffswitch()->setChecked(true);
+	xControls->contentLayout()->addWidget(xEn);
+	xLock = new MenuOnOffSwitch(tr("Lock"), xControls, false);
+	xControls->contentLayout()->addWidget(xLock);
+	xTrack = new MenuOnOffSwitch(tr("Track"), xControls, false);
+	xControls->contentLayout()->addWidget(xTrack);
 
-	// vertical controls
-	vertControls = new MenuSectionWidget(this);
-	layout->addWidget(vertControls);
-	vertControls->contentLayout()->setSpacing(10);
+	// y controls
+	yControls = new MenuSectionWidget(this);
+	layout->addWidget(yControls);
+	yControls->contentLayout()->setSpacing(10);
 
-	vertEn = new MenuOnOffSwitch(tr("Vertical"), vertControls, false);
-	vertEn->onOffswitch()->setChecked(true);
-	vertControls->contentLayout()->addWidget(vertEn);
-	vertLock = new MenuOnOffSwitch(tr("Lock"), vertControls, false);
-	vertControls->contentLayout()->addWidget(vertLock);
+	yEn = new MenuOnOffSwitch(tr("Enable Y"), yControls, false);
+	yEn->onOffswitch()->setChecked(true);
+	yControls->contentLayout()->addWidget(yEn);
+	yLock = new MenuOnOffSwitch(tr("Lock"), yControls, false);
+	yControls->contentLayout()->addWidget(yLock);
 
 	// readouts controls
 	readoutsControls = new MenuSectionWidget(this);
@@ -57,33 +57,33 @@ void CursorSettings::initUI()
 
 void CursorSettings::connectSignals()
 {
-	connect(horizEn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool toggled) {
-		horizTrack->setEnabled(toggled);
-		horizLock->setEnabled(toggled);
+	connect(xEn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool toggled) {
+		xTrack->setEnabled(toggled);
+		xLock->setEnabled(toggled);
 	});
-	connect(vertEn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool toggled) {
-		vertLock->setEnabled(toggled);
+	connect(yEn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool toggled) {
+		yLock->setEnabled(toggled);
 		if(!toggled)
-			horizTrack->onOffswitch()->setChecked(false);
+			xTrack->onOffswitch()->setChecked(false);
 	});
-	connect(horizTrack->onOffswitch(), &QAbstractButton::toggled, this, [=](bool toggled) {
-		if(toggled && !vertEn->onOffswitch()->isChecked())
-			vertEn->onOffswitch()->setChecked(true);
+	connect(xTrack->onOffswitch(), &QAbstractButton::toggled, this, [=](bool toggled) {
+		if(toggled && !yEn->onOffswitch()->isChecked())
+			yEn->onOffswitch()->setChecked(true);
 
-		vertLock->setEnabled(vertEn->onOffswitch()->isChecked() && !toggled);
-		vertLock->onOffswitch()->setChecked(false);
+		yLock->setEnabled(yEn->onOffswitch()->isChecked() && !toggled);
+		yLock->onOffswitch()->setChecked(false);
 	});
 }
 
-QAbstractButton *CursorSettings::getHorizEn() { return horizEn->onOffswitch(); }
+QAbstractButton *CursorSettings::getXEn() { return xEn->onOffswitch(); }
 
-QAbstractButton *CursorSettings::getHorizLock() { return horizLock->onOffswitch(); }
+QAbstractButton *CursorSettings::getXLock() { return xLock->onOffswitch(); }
 
-QAbstractButton *CursorSettings::getHorizTrack() { return horizTrack->onOffswitch(); }
+QAbstractButton *CursorSettings::getXTrack() { return xTrack->onOffswitch(); }
 
-QAbstractButton *CursorSettings::getVertEn() { return vertEn->onOffswitch(); }
+QAbstractButton *CursorSettings::getYEn() { return yEn->onOffswitch(); }
 
-QAbstractButton *CursorSettings::getVertLock() { return vertLock->onOffswitch(); }
+QAbstractButton *CursorSettings::getYLock() { return yLock->onOffswitch(); }
 
 QAbstractButton *CursorSettings::getReadoutsDrag() { return readoutsDrag->onOffswitch(); }
 

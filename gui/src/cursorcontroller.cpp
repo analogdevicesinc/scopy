@@ -6,19 +6,19 @@ using namespace scopy;
 CursorController::CursorController(PlotWidget *plot, QObject *parent)
 	: QObject(parent)
 	, m_plot(plot)
-	, horizEn(true)
-	, horizLock(false)
-	, horizTrack(false)
-	, vertEn(true)
-	, vertLock(false)
+	, xEn(true)
+	, xLock(false)
+	, xTrack(false)
+	, yEn(true)
+	, yLock(false)
 	, readoutDragsEn(false)
 {
 	initUI();
 
-	v1Cursor = plotCursors->getV1Cursor();
-	v2Cursor = plotCursors->getV2Cursor();
-	h1Cursor = plotCursors->getH1Cursor();
-	h2Cursor = plotCursors->getH2Cursor();
+	y1Cursor = plotCursors->getY1Cursor();
+	y2Cursor = plotCursors->getY2Cursor();
+	x1Cursor = plotCursors->getX1Cursor();
+	x2Cursor = plotCursors->getX2Cursor();
 
 	connectSignals();
 }
@@ -32,10 +32,10 @@ void CursorController::initUI()
 
 	plotCursorReadouts = new PlotCursorReadouts(m_plot);
 	PlotChannel *ch = m_plot->selectedChannel();
-	plotCursorReadouts->setHorizFromatter(ch->xAxis()->getFromatter());
-	plotCursorReadouts->setVertFromatter(ch->yAxis()->getFromatter());
-	plotCursorReadouts->setHorizUnits(ch->xAxis()->getUnits());
-	plotCursorReadouts->setVertUnits(ch->yAxis()->getUnits());
+	plotCursorReadouts->setXFromatter(ch->xAxis()->getFromatter());
+	plotCursorReadouts->setYFromatter(ch->yAxis()->getFromatter());
+	plotCursorReadouts->setXUnits(ch->xAxis()->getUnits());
+	plotCursorReadouts->setYUnits(ch->yAxis()->getUnits());
 
 	hoverReadouts = new HoverWidget(plotCursorReadouts, m_plot->plot()->canvas(), m_plot);
 	hoverReadouts->setAnchorPos(HoverPosition::HP_TOPLEFT);
@@ -48,14 +48,14 @@ void CursorController::initUI()
 
 void CursorController::connectSignals()
 {
-	// horizontal controls
-	connect(cursorSettings->getHorizEn(), &QAbstractButton::toggled, this, &CursorController::horizEnToggled);
-	connect(cursorSettings->getHorizLock(), &QAbstractButton::toggled, this, &CursorController::horizLockToggled);
-	connect(cursorSettings->getHorizTrack(), &QAbstractButton::toggled, plotCursors, &PlotCursors::enableTracking);
+	// x controls
+	connect(cursorSettings->getXEn(), &QAbstractButton::toggled, this, &CursorController::xEnToggled);
+	connect(cursorSettings->getXLock(), &QAbstractButton::toggled, this, &CursorController::xLockToggled);
+	connect(cursorSettings->getXTrack(), &QAbstractButton::toggled, plotCursors, &PlotCursors::enableTracking);
 
-	// vertical controls
-	connect(cursorSettings->getVertEn(), &QAbstractButton::toggled, this, &CursorController::vertEnToggled);
-	connect(cursorSettings->getVertLock(), &QAbstractButton::toggled, this, &CursorController::vertLockToggled);
+	// y controls
+	connect(cursorSettings->getYEn(), &QAbstractButton::toggled, this, &CursorController::yEnToggled);
+	connect(cursorSettings->getYLock(), &QAbstractButton::toggled, this, &CursorController::yLockToggled);
 
 	// readouts controls
 	connect(cursorSettings->getReadoutsDrag(), &QAbstractButton::toggled, this,
@@ -64,33 +64,33 @@ void CursorController::connectSignals()
 	initSession();
 
 	// cursor movement
-	connect(v1Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
-		if(vertLock) {
-			v2Cursor->setPositionSilent(pos - vertLockGap);
-			plotCursorReadouts->setV2(v2Cursor->getPosition());
+	connect(y1Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
+		if(yLock) {
+			y2Cursor->setPositionSilent(pos - yLockGap);
+			plotCursorReadouts->setY2(y2Cursor->getPosition());
 		}
-		plotCursorReadouts->setV1(pos);
+		plotCursorReadouts->setY1(pos);
 	});
-	connect(v2Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
-		if(vertLock) {
-			v1Cursor->setPositionSilent(pos + vertLockGap);
-			plotCursorReadouts->setV1(v1Cursor->getPosition());
+	connect(y2Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
+		if(yLock) {
+			y1Cursor->setPositionSilent(pos + yLockGap);
+			plotCursorReadouts->setY1(y1Cursor->getPosition());
 		}
-		plotCursorReadouts->setV2(pos);
+		plotCursorReadouts->setY2(pos);
 	});
-	connect(h1Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
-		if(horizLock) {
-			h2Cursor->setPositionSilent(pos - horizLockGap);
-			plotCursorReadouts->setH2(h2Cursor->getPosition());
+	connect(x1Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
+		if(xLock) {
+			x2Cursor->setPositionSilent(pos - LockGap);
+			plotCursorReadouts->setX2(x2Cursor->getPosition());
 		}
-		plotCursorReadouts->setH1(pos);
+		plotCursorReadouts->setX1(pos);
 	});
-	connect(h2Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
-		if(horizLock) {
-			h1Cursor->setPositionSilent(pos + horizLockGap);
-			plotCursorReadouts->setH1(h1Cursor->getPosition());
+	connect(x2Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
+		if(xLock) {
+			x1Cursor->setPositionSilent(pos + LockGap);
+			plotCursorReadouts->setX1(x1Cursor->getPosition());
 		}
-		plotCursorReadouts->setH2(pos);
+		plotCursorReadouts->setX2(pos);
 	});
 
 	for(PlotChannel *ch : m_plot->getChannels()) {
@@ -99,57 +99,57 @@ void CursorController::connectSignals()
 	connect(m_plot, &PlotWidget::addedChannel, this, &CursorController::onAddedChannel);
 	connect(m_plot, &PlotWidget::removedChannel, this, &CursorController::onRemovedChannel);
 	connect(m_plot, &PlotWidget::channelSelected, this, [=](PlotChannel *ch) {
-		plotCursorReadouts->setHorizFromatter(ch->xAxis()->getFromatter());
-		plotCursorReadouts->setVertFromatter(ch->yAxis()->getFromatter());
-		plotCursorReadouts->setHorizUnits(ch->xAxis()->getUnits());
-		plotCursorReadouts->setVertUnits(ch->yAxis()->getUnits());
+		plotCursorReadouts->setXFromatter(ch->xAxis()->getFromatter());
+		plotCursorReadouts->setYFromatter(ch->yAxis()->getFromatter());
+		plotCursorReadouts->setXUnits(ch->xAxis()->getUnits());
+		plotCursorReadouts->setYUnits(ch->yAxis()->getUnits());
 	});
 }
 
 void CursorController::initSession()
 {
-	cursorSettings->getHorizEn()->toggled(horizEn);
-	cursorSettings->getHorizLock()->toggled(horizLock);
-	cursorSettings->getHorizTrack()->toggled(horizTrack);
-	cursorSettings->getVertEn()->toggled(vertEn);
-	cursorSettings->getVertLock()->toggled(vertLock);
+	cursorSettings->getXEn()->toggled(xEn);
+	cursorSettings->getXLock()->toggled(xLock);
+	cursorSettings->getXTrack()->toggled(xTrack);
+	cursorSettings->getYEn()->toggled(yEn);
+	cursorSettings->getYLock()->toggled(yLock);
 	cursorSettings->getReadoutsDrag()->toggled(readoutDragsEn);
 
 	setVisible(false);
 }
 
-void CursorController::horizEnToggled(bool toggled)
+void CursorController::xEnToggled(bool toggled)
 {
-	horizEn = toggled;
-	plotCursorReadouts->horizSetVisible(horizEn);
-	readoutsSetVisible(horizEn || plotCursorReadouts->vertIsVisible());
-	plotCursors->horizSetVisible(horizEn);
+	xEn = toggled;
+	plotCursorReadouts->setXVisible(xEn);
+	readoutsSetVisible(xEn || plotCursorReadouts->isYVisible());
+	plotCursors->setXVisible(xEn);
 }
 
-void CursorController::horizLockToggled(bool toggled)
+void CursorController::xLockToggled(bool toggled)
 {
-	horizLock = toggled;
-	horizLockGap = plotCursors->getH1Cursor()->getPosition() - plotCursors->getH2Cursor()->getPosition();
+	xLock = toggled;
+	LockGap = plotCursors->getX1Cursor()->getPosition() - plotCursors->getX2Cursor()->getPosition();
 }
 
-void CursorController::horizTrackToggled(bool toggled)
+void CursorController::xTrackToggled(bool toggled)
 {
-	horizTrack = toggled;
-	plotCursors->enableTracking(horizTrack);
+	xTrack = toggled;
+	plotCursors->enableTracking(xTrack);
 }
 
-void CursorController::vertEnToggled(bool toggled)
+void CursorController::yEnToggled(bool toggled)
 {
-	vertEn = toggled;
-	plotCursorReadouts->vertSetVisible(vertEn);
-	readoutsSetVisible(plotCursorReadouts->horizIsVisible() || vertEn);
-	plotCursors->vertSetVisible(vertEn);
+	yEn = toggled;
+	plotCursorReadouts->setYVisible(yEn);
+	readoutsSetVisible(plotCursorReadouts->isXVisible() || yEn);
+	plotCursors->setYVisible(yEn);
 }
 
-void CursorController::vertLockToggled(bool toggled)
+void CursorController::yLockToggled(bool toggled)
 {
-	vertLock = toggled;
-	vertLockGap = plotCursors->getV1Cursor()->getPosition() - plotCursors->getV2Cursor()->getPosition();
+	yLock = toggled;
+	yLockGap = plotCursors->getY1Cursor()->getPosition() - plotCursors->getY2Cursor()->getPosition();
 }
 
 void CursorController::readoutsDragToggled(bool toggled)
@@ -160,10 +160,10 @@ void CursorController::readoutsDragToggled(bool toggled)
 
 void CursorController::onAddedChannel(PlotChannel *ch)
 {
-	connect(ch->xAxis(), &PlotAxis::formatterChanged, plotCursorReadouts, &PlotCursorReadouts::setHorizFromatter);
-	connect(ch->yAxis(), &PlotAxis::formatterChanged, plotCursorReadouts, &PlotCursorReadouts::setVertFromatter);
-	connect(ch->xAxis(), &PlotAxis::unitsChanged, plotCursorReadouts, &PlotCursorReadouts::setHorizUnits);
-	connect(ch->yAxis(), &PlotAxis::unitsChanged, plotCursorReadouts, &PlotCursorReadouts::setVertUnits);
+	connect(ch->xAxis(), &PlotAxis::formatterChanged, plotCursorReadouts, &PlotCursorReadouts::setXFromatter);
+	connect(ch->yAxis(), &PlotAxis::formatterChanged, plotCursorReadouts, &PlotCursorReadouts::setYFromatter);
+	connect(ch->xAxis(), &PlotAxis::unitsChanged, plotCursorReadouts, &PlotCursorReadouts::setXUnits);
+	connect(ch->yAxis(), &PlotAxis::unitsChanged, plotCursorReadouts, &PlotCursorReadouts::setYUnits);
 }
 
 void CursorController::onRemovedChannel(PlotChannel *ch)
@@ -178,12 +178,12 @@ void CursorController::setVisible(bool visible)
 	cursorsSetVisible(visible);
 }
 
-void CursorController::readoutsSetVisible(bool visible) { hoverReadouts->setVisible(visible && (horizEn || vertEn)); }
+void CursorController::readoutsSetVisible(bool visible) { hoverReadouts->setVisible(visible && (xEn || yEn)); }
 
 void CursorController::cursorsSetVisible(bool visible)
 {
-	plotCursors->horizSetVisible(visible && horizEn);
-	plotCursors->vertSetVisible(visible && vertEn);
+	plotCursors->setXVisible(visible && xEn);
+	plotCursors->setYVisible(visible && yEn);
 }
 
 CursorSettings *CursorController::getCursorSettings() { return cursorSettings; }
