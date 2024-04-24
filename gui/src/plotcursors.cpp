@@ -15,10 +15,10 @@ PlotCursors::~PlotCursors() {}
 
 void PlotCursors::initUI()
 {
-	m_vCursors.first = new PlotAxisHandle(m_plot, m_plot->selectedChannel()->yAxis());
-	m_vCursors.second = new PlotAxisHandle(m_plot, m_plot->selectedChannel()->yAxis());
-	m_hCursors.first = new PlotAxisHandle(m_plot, m_plot->selectedChannel()->xAxis());
-	m_hCursors.second = new PlotAxisHandle(m_plot, m_plot->selectedChannel()->xAxis());
+	m_yCursors.first = new PlotAxisHandle(m_plot, m_plot->selectedChannel()->yAxis());
+	m_yCursors.second = new PlotAxisHandle(m_plot, m_plot->selectedChannel()->yAxis());
+	m_xCursors.first = new PlotAxisHandle(m_plot, m_plot->selectedChannel()->xAxis());
+	m_xCursors.second = new PlotAxisHandle(m_plot, m_plot->selectedChannel()->xAxis());
 
 	plotMarker1 = new QwtPlotMarker();
 	plotMarker2 = new QwtPlotMarker();
@@ -31,43 +31,43 @@ void PlotCursors::initUI()
 void PlotCursors::connectSignals()
 {
 	connect(this, &PlotCursors::update, this, [=]() {
-		Q_EMIT m_vCursors.first->updatePos();
-		Q_EMIT m_vCursors.second->updatePos();
-		Q_EMIT m_hCursors.first->updatePos();
-		Q_EMIT m_hCursors.second->updatePos();
+		Q_EMIT m_yCursors.first->updatePos();
+		Q_EMIT m_yCursors.second->updatePos();
+		Q_EMIT m_xCursors.first->updatePos();
+		Q_EMIT m_xCursors.second->updatePos();
 		if(m_tracking) {
 			displayIntersection();
 		}
 	});
 
-	connect(m_hCursors.first, &PlotAxisHandle::scalePosChanged, this, [=]() {
+	connect(m_xCursors.first, &PlotAxisHandle::scalePosChanged, this, [=]() {
 		if(m_tracking) {
 			displayIntersection();
 		}
 	});
-	connect(m_hCursors.second, &PlotAxisHandle::scalePosChanged, this, [=]() {
+	connect(m_xCursors.second, &PlotAxisHandle::scalePosChanged, this, [=]() {
 		if(m_tracking) {
 			displayIntersection();
 		}
 	});
 	connect(m_plot, &PlotWidget::channelSelected, this, [=](PlotChannel *ch) {
-		m_vCursors.first->setAxis(ch->yAxis());
-		m_vCursors.second->setAxis(ch->yAxis());
-		m_hCursors.first->setAxis(ch->xAxis());
-		m_hCursors.second->setAxis(ch->xAxis());
+		m_yCursors.first->setAxis(ch->yAxis());
+		m_yCursors.second->setAxis(ch->yAxis());
+		m_xCursors.first->setAxis(ch->xAxis());
+		m_xCursors.second->setAxis(ch->xAxis());
 		Q_EMIT update();
 	});
 }
 
 void PlotCursors::updateTracking()
 {
-	if(m_tracking && m_hCursors.first->handle()->isVisible()) {
+	if(m_tracking && m_xCursors.first->handle()->isVisible()) {
 		plotMarker1->attach(m_plot->plot());
 	} else {
 		plotMarker1->detach();
 	}
 
-	if(m_tracking && m_hCursors.second->handle()->isVisible()) {
+	if(m_tracking && m_xCursors.second->handle()->isVisible()) {
 		plotMarker2->attach(m_plot->plot());
 	} else {
 		plotMarker2->detach();
@@ -78,42 +78,42 @@ void PlotCursors::updateTracking()
 
 void PlotCursors::setBounded(bool leave)
 {
-	getV1Cursor()->handle()->setBounded(leave);
-	getV2Cursor()->handle()->setBounded(leave);
-	getH1Cursor()->handle()->setBounded(leave);
-	getH2Cursor()->handle()->setBounded(leave);
+	getY1Cursor()->handle()->setBounded(leave);
+	getY2Cursor()->handle()->setBounded(leave);
+	getX1Cursor()->handle()->setBounded(leave);
+	getX2Cursor()->handle()->setBounded(leave);
 }
 
-PlotAxisHandle *PlotCursors::getV1Cursor() { return m_vCursors.first; }
+PlotAxisHandle *PlotCursors::getY1Cursor() { return m_yCursors.first; }
 
-PlotAxisHandle *PlotCursors::getV2Cursor() { return m_vCursors.second; }
+PlotAxisHandle *PlotCursors::getY2Cursor() { return m_yCursors.second; }
 
-PlotAxisHandle *PlotCursors::getH1Cursor() { return m_hCursors.first; }
+PlotAxisHandle *PlotCursors::getX1Cursor() { return m_xCursors.first; }
 
-PlotAxisHandle *PlotCursors::getH2Cursor() { return m_hCursors.second; }
+PlotAxisHandle *PlotCursors::getX2Cursor() { return m_xCursors.second; }
 
 void PlotCursors::setVisible(bool visible)
 {
-	horizSetVisible(visible);
-	vertSetVisible(visible);
+	setXVisible(visible);
+	setYVisible(visible);
 }
 
-void PlotCursors::horizSetVisible(bool visible)
+void PlotCursors::setXVisible(bool visible)
 {
-	m_hCursors.first->handle()->setVisible(visible);
-	m_hCursors.second->handle()->setVisible(visible);
-	m_hCursors.first->handle()->raise();
-	m_hCursors.second->handle()->raise();
+	m_xCursors.first->handle()->setVisible(visible);
+	m_xCursors.second->handle()->setVisible(visible);
+	m_xCursors.first->handle()->raise();
+	m_xCursors.second->handle()->raise();
 	updateTracking();
 	Q_EMIT update();
 }
 
-void PlotCursors::vertSetVisible(bool visible)
+void PlotCursors::setYVisible(bool visible)
 {
-	m_vCursors.first->handle()->setVisible(visible && !m_tracking);
-	m_vCursors.second->handle()->setVisible(visible && !m_tracking);
-	m_vCursors.first->handle()->raise();
-	m_vCursors.second->handle()->raise();
+	m_yCursors.first->handle()->setVisible(visible && !m_tracking);
+	m_yCursors.second->handle()->setVisible(visible && !m_tracking);
+	m_yCursors.first->handle()->raise();
+	m_yCursors.second->handle()->raise();
 	updateTracking();
 	Q_EMIT update();
 }
@@ -122,8 +122,8 @@ void PlotCursors::enableTracking(bool tracking)
 {
 	m_tracking = tracking;
 
-	m_vCursors.first->handle()->setVisible(!tracking);
-	m_vCursors.second->handle()->setVisible(!tracking);
+	m_yCursors.first->handle()->setVisible(!tracking);
+	m_yCursors.second->handle()->setVisible(!tracking);
 	updateTracking();
 	Q_EMIT update();
 }
@@ -132,8 +132,8 @@ void PlotCursors::displayIntersection()
 {
 	QwtAxisId yaxis = m_plot->selectedChannel()->yAxis()->axisId();
 	QwtAxisId xaxis = m_plot->selectedChannel()->xAxis()->axisId();
-	double h1CursorPos = m_hCursors.first->getPosition();
-	double h2CursorPos = m_hCursors.second->getPosition();
+	double h1CursorPos = m_xCursors.first->getPosition();
+	double h2CursorPos = m_xCursors.second->getPosition();
 
 	plotMarker1->setAxes(xaxis, yaxis);
 	plotMarker2->setAxes(xaxis, yaxis);
@@ -141,22 +141,22 @@ void PlotCursors::displayIntersection()
 	plotMarker1->setValue(h1CursorPos, getHorizIntersectionAt(h1CursorPos));
 	plotMarker2->setValue(h2CursorPos, getHorizIntersectionAt(h2CursorPos));
 
-	Q_EMIT m_vCursors.first->scalePosChanged(plotMarker1->yValue());
-	Q_EMIT m_vCursors.second->scalePosChanged(plotMarker2->yValue());
+	Q_EMIT m_yCursors.first->scalePosChanged(plotMarker1->yValue());
+	Q_EMIT m_yCursors.second->scalePosChanged(plotMarker2->yValue());
 
 	m_plot->replot();
 }
 
-void PlotCursors::setVHandlePos(HandlePos pos)
+void PlotCursors::setYHandlePos(HandlePos pos)
 {
-	m_vCursors.first->handle()->setHandlePos(pos);
-	m_vCursors.second->handle()->setHandlePos(pos);
+	m_yCursors.first->handle()->setHandlePos(pos);
+	m_yCursors.second->handle()->setHandlePos(pos);
 }
 
-void PlotCursors::setHHandlePos(HandlePos pos)
+void PlotCursors::setXHandlePos(HandlePos pos)
 {
-	m_hCursors.first->handle()->setHandlePos(pos);
-	m_hCursors.second->handle()->setHandlePos(pos);
+	m_xCursors.first->handle()->setHandlePos(pos);
+	m_xCursors.second->handle()->setHandlePos(pos);
 }
 
 double PlotCursors::getHorizIntersectionAt(double pos)
