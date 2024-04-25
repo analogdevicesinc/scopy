@@ -65,7 +65,7 @@ void TimePlotFPS::update(qint64 timestamp)
 	}
 
 	qint64 avg = 0;
-	for(qint64 time: *m_replotTimes) {
+	for(qint64 time : *m_replotTimes) {
 		avg += time;
 	}
 	avg /= m_replotTimes->size();
@@ -73,6 +73,15 @@ void TimePlotFPS::update(qint64 timestamp)
 
 	setText(QString(QString::number(1000. / avg, 'g', 3) + " FPS"));
 }
+
+TimePlotTimestamp::TimePlotTimestamp(QWidget *parent)
+{
+	StyleHelper::TimePlotSamplingInfo(this);
+	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+}
+
+TimePlotTimestamp::~TimePlotTimestamp() {}
+
 TimePlotStatusInfo::TimePlotStatusInfo(QWidget *parent)
 {
 	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -99,9 +108,13 @@ TimePlotInfo::TimePlotInfo(PlotWidget *plot, QWidget *parent)
 	m_status = new TimePlotStatusInfo(this);
 
 	m_fps = new TimePlotFPS(this);
-	connect(plot, &PlotWidget::reploted, this, [=](){
+	connect(plot, &PlotWidget::newData, this, [=]() {
 		m_fps->update(QDateTime::currentMSecsSinceEpoch());
 	});
+
+	m_timestamp = new TimePlotTimestamp(this);
+	connect(plot, &PlotWidget::newData, this,
+		[=]() { m_timestamp->setText(QDateTime::currentDateTime().time().toString("hh:mm:ss.zzz")); });
 
 	vlay->addLayout(lay);
 
@@ -135,11 +148,19 @@ TimePlotInfo::TimePlotInfo(PlotWidget *plot, QWidget *parent)
 	fpsHover->setAttribute(Qt::WA_TransparentForMouseEvents);
 	bool showFps = p->get("general_show_plot_fps").toBool();
 	fpsHover->setVisible(showFps);
-	connect(p, &Preferences::preferenceChanged, this, [=](QString name, QVariant type){
+	connect(p, &Preferences::preferenceChanged, this, [=](QString name, QVariant type) {
 		if(name == "general_show_plot_fps") {
 			fpsHover->setVisible(p->get("general_show_plot_fps").toBool());
 		}
 	});
+
+	HoverWidget *timestampHover = new HoverWidget(nullptr, plot->plot()->canvas(), plot->plot());
+	timestampHover->setContent(m_timestamp);
+	timestampHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+	timestampHover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
+	timestampHover->setAnchorOffset(QPoint(-8, 26));
+	timestampHover->show();
+	timestampHover->setAttribute(Qt::WA_TransparentForMouseEvents);
 #endif
 }
 
