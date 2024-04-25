@@ -47,6 +47,7 @@ public:
 	void updatePlotStartingPoint(double time, double delta);
 
 	void toggleBufferPreview(bool toggled);
+	void updateBufferPreviewer(double time);
 
 Q_SIGNALS:
 	void monitorCurveAdded(PlotChannel *c);

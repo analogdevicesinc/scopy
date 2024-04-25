@@ -68,6 +68,7 @@ void MonitorPlot::addMonitor(DataMonitorModel *dataMonitorModel)
 
 	connect(dataMonitorModel, &DataMonitorModel::dataCleared, this, [=, this]() {
 		plotCurve->clearCurveData();
+		updateBufferPreviewer(m_startTime);
 		m_plot->replot();
 	});
 
@@ -93,6 +94,7 @@ void MonitorPlot::toggleMonitor(bool toggled, QString monitorName)
 {
 	if(m_monitorCurves->contains(monitorName)) {
 		m_monitorCurves->value(monitorName)->toggleActive(toggled);
+		m_bufferPreviewer->updateBufferPreviewer();
 		m_plot->replot();
 	}
 }
@@ -227,17 +229,24 @@ void MonitorPlot::updatePlotStartingPoint(double time, double delta)
 		m_plot->xAxis()->setInterval(time - delta, time);
 	}
 
-	m_bufferPreviewer->updateDataLimits(m_startTime, time);
+	updateBufferPreviewer(time);
 	m_plot->replot();
 }
 
 void MonitorPlot::toggleBufferPreview(bool toggled) { m_bufferPreviewer->setVisible(toggled); }
+
+void MonitorPlot::updateBufferPreviewer(double time) { m_bufferPreviewer->updateDataLimits(m_startTime, time); }
 
 void MonitorPlot::generateBufferPreviewer()
 {
 
 	AnalogBufferPreviewer *bufferPreviewer = new AnalogBufferPreviewer(this);
 	m_bufferPreviewer = new PlotBufferPreviewer(m_plot, bufferPreviewer, this);
+
+	connect(m_plot->navigator(), &PlotNavigator::rectChanged, this, [=, this]() {
+		double time = QwtDate::toDouble(QDateTime::currentDateTime());
+		updateBufferPreviewer(time);
+	});
 
 	layout->addWidget(m_bufferPreviewer);
 	m_plot->navigator()->setResetOnNewBase(false);
