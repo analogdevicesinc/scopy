@@ -35,6 +35,9 @@ stages:
         macOS_13:
           vmImage: 'macOS-13'
           artifactName: 'macOS-13'
+        macOS_14:
+          vmImage: 'macOS-14'
+          artifactName: 'macOS-14'
     pool:
       vmImage: $[ variables['vmImage'] ]
     steps:
