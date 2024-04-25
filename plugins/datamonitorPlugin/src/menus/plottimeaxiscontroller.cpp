@@ -54,6 +54,9 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 			timeEdit->setTime(QTime::currentTime());
 			dateEdit->setDate(QDate::currentDate());
 			updatePlotStartPoint();
+		} else {
+			double time = QwtDate::toDouble(QDateTime::currentDateTime());
+			m_plot->updateBufferPreviewer(time);
 		}
 	});
 
