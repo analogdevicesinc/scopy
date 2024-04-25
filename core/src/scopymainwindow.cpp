@@ -263,7 +263,11 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_save_session", true);
 	p->init("general_save_attached", true);
 	p->init("general_doubleclick_attach", true);
+#if defined(__arm__)
+	p->init("general_use_opengl", false);
+#else
 	p->init("general_use_opengl", true);
+#endif
 	p->init("general_use_animations", true);
 	p->init("general_theme", "default");
 	p->init("general_language", "en");
