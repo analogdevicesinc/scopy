@@ -125,6 +125,8 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 				m_plotTimer->start();
 		},
 		Qt::QueuedConnection);
+
+	connect(this, &GRTimePlotAddon::newData, m_plotWidget, &PlotWidget::newData);
 }
 
 GRTimePlotAddon::~GRTimePlotAddon() {}
@@ -307,6 +309,7 @@ void GRTimePlotAddon::setRawSamplesPtr()
 						   m_currentSamplingInfo.bufferSize);
 		vector_sink->reset();
 	}
+	Q_EMIT newData();
 }
 
 void GRTimePlotAddon::replot()
