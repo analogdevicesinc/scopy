@@ -184,7 +184,9 @@ void DataMonitorPlugin::addNewTool()
 
 	Q_EMIT toolListChanged();
 	m_toolList.last()->setTool(datamonitorTool);
-	requestTool(tool_name);
+	if(m_toolList.length() > 1) {
+		requestTool(tool_name);
+	}
 
 	i++;
 }
