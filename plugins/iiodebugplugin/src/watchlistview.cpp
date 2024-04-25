@@ -47,6 +47,16 @@ void WatchListView::setupUi()
 
 	StyleHelper::TableWidgetDebugger(this, "DebuggerTableWidget");
 	verticalHeader()->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+
+	m_readllBtn = new QPushButton("Read Watchlist", this);
+	StyleHelper::BlueButton(m_readllBtn, "ReadAllFromWatchlistButton");
+	m_hoverWidget = new HoverWidget(m_readllBtn, parentWidget(),
+					parentWidget()->parentWidget()->parentWidget()->parentWidget());
+	m_hoverWidget->setAnchorPos(HP_BOTTOMRIGHT);
+	m_hoverWidget->setContentPos(HP_BOTTOMLEFT);
+	m_hoverWidget->setAnchorOffset(QPoint(0, 5));
+	m_hoverWidget->setVisible(true);
+	m_hoverWidget->raise();
 }
 
 void WatchListView::connectSignalsAndSlots()
@@ -74,6 +84,18 @@ void WatchListView::connectSignalsAndSlots()
 				 int offset = newSize - originalSize;
 				 m_offsets[logicalIndex] = offset;
 			 });
+
+	QObject::connect(m_readllBtn, &QPushButton::clicked, this, [this]() {
+		for(auto object : m_entryObjects) {
+			IIOStandardItem::Type type = object->item()->type();
+			if(type == IIOStandardItem::ContextAttribute || type == IIOStandardItem::DeviceAttribute ||
+			   type == IIOStandardItem::ChannelAttribute) {
+				// leaf node
+				IIOWidget *iioWidget = object->item()->getIIOWidgets()[0];
+				iioWidget->getDataStrategy()->requestData();
+			}
+		}
+	});
 }
 
 void WatchListView::saveSettings(QSettings &s) { m_apiObject->save(s); }
