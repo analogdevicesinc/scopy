@@ -64,7 +64,6 @@ if(ENABLE_PLUGIN_DEBUGGER)
 	list(APPEND PLUGINS ${PLUGIN_NAME})
 endif()
 
-
 if(ENABLE_PLUGIN_DATALOGGER)
 	add_subdirectory(datalogger)
 	list(APPEND PLUGINS ${PLUGIN_NAME})

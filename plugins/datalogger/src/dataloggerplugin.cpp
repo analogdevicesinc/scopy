@@ -7,6 +7,7 @@
 #include <menucollapsesection.h>
 #include <timemanager.hpp>
 #include <datamonitorutils.hpp>
+#include <datalogger_api.hpp>
 
 #include <libm2k/analog/dmm.hpp>
 
@@ -14,6 +15,8 @@
 
 #include <pluginbase/preferences.h>
 #include <pluginbase/preferenceshelper.h>
+
+#include <pluginbase/scopyjs.h>
 
 Q_LOGGING_CATEGORY(CAT_DATALOGGERLUGIN, "DataLoggerPlugin")
 using namespace scopy::datamonitor;
@@ -123,6 +126,7 @@ bool DataLoggerPlugin::onConnect()
 
 	removeTool("DataMonitorPreview");
 	addNewTool();
+	initApi();
 
 	return true;
 }
@@ -210,6 +214,14 @@ void DataLoggerPlugin::toggleRunState(bool toggled)
 		m_toolList[i]->setRunning(toggled);
 	}
 	isRunning = toggled;
+}
+
+void DataLoggerPlugin::initApi()
+{
+	api = new DataLogger_API(this);
+	ScopyJS *js = ScopyJS::GetInstance();
+	api->setObjectName("datalogger");
+	js->registerApi(api);
 }
 
 void DataLoggerPlugin::initMetadata()
