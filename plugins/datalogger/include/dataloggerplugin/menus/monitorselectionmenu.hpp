@@ -25,6 +25,7 @@ public:
 	QButtonGroup *monitorsGroup() const;
 
 Q_SIGNALS:
+	void requestMonitorToggled(bool toggled, QString monitorName);
 	void monitorToggled(bool toggled, QString monitorName);
 	void removeMonitor();
 	void requestRemoveImportedDevice(QString device);

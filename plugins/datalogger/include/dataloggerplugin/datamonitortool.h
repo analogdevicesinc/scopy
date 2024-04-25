@@ -24,6 +24,7 @@ class SevenSegmentDisplay;
 class DataMonitorSettings;
 class SCOPY_DATALOGGERPLUGIN_EXPORT DatamonitorTool : public QWidget
 {
+	friend class DataLogger_API;
 	friend class DataMonitorStyleHelper;
 	Q_OBJECT
 public:
