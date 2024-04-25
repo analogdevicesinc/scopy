@@ -55,6 +55,15 @@ private:
 	qint64 m_lastTimeStamp;
 	int m_avgSize;
 };
+
+class SCOPY_GUI_EXPORT TimePlotTimestamp : public QLabel
+{
+	Q_OBJECT
+public:
+	TimePlotTimestamp(QWidget *parent = nullptr);
+	virtual ~TimePlotTimestamp();
+};
+
 class SCOPY_GUI_EXPORT TimePlotStatusInfo : public QLabel
 {
 	Q_OBJECT
@@ -82,6 +91,7 @@ private:
 	TimePlotSamplingInfo *m_sampling;
 	TimePlotStatusInfo *m_status;
 	TimePlotFPS *m_fps;
+	TimePlotTimestamp *m_timestamp;
 };
 
 } // namespace scopy
