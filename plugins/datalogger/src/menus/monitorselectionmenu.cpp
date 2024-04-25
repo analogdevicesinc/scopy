@@ -131,6 +131,12 @@ void MonitorSelectionMenu::addMonitor(DataMonitorModel *monitor)
 			Q_EMIT monitorToggled(false, monitor->getName());
 		}
 	});
+
+	connect(this, &MonitorSelectionMenu::requestMonitorToggled, this, [=, this](bool toggled, QString monitorName) {
+		if(monitorName == monitor->getName()) {
+			monitorChannel->checkBox()->setChecked(toggled);
+		}
+	});
 }
 
 void MonitorSelectionMenu::removeDevice(QString device)
