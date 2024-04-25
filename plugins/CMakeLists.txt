@@ -11,7 +11,7 @@ option(ENABLE_PLUGIN_REGMAP "Enable regmap plugin" ON)
 option(ENABLE_PLUGIN_DEBUGGER "Enable debugger plugin" ON)
 option(ENABLE_PLUGIN_ADC "Enable ADC plugin" ON)
 option(ENABLE_PLUGIN_PQM "Enable PQM plugin" ON)
-option(ENABLE_PLUGIN_DATAMONITORPLUGIN "Enable DATAMONITORPLUGIN plugin" ON)
+option(ENABLE_PLUGIN_DATALOGGER "Enable DATALOGGER plugin" ON)
 
 if(ENABLE_PLUGIN_TEST)
 	add_subdirectory(guitestplugin)
@@ -64,9 +64,8 @@ if(ENABLE_PLUGIN_DEBUGGER)
 	list(APPEND PLUGINS ${PLUGIN_NAME})
 endif()
 
-
-if(ENABLE_PLUGIN_DATAMONITORPLUGIN)
-	add_subdirectory(datamonitorPlugin)
+if(ENABLE_PLUGIN_DATALOGGER)
+	add_subdirectory(datalogger)
 	list(APPEND PLUGINS ${PLUGIN_NAME})
 endif()
 
