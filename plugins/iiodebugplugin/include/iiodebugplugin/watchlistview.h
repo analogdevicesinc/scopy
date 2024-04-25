@@ -38,6 +38,9 @@ private:
 	QList<int> m_offsets;
 	ApiObject *m_apiObject;
 	QMap<QString, WatchListEntry *> m_entryObjects;
+
+	HoverWidget *m_hoverWidget;
+	QPushButton *m_readllBtn;
 };
 
 class WatchListView_API : public ApiObject
