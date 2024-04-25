@@ -33,12 +33,10 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	tool->bottomContainer()->setVisible(true);
 	tool->topContainerMenuControl()->setVisible(false);
 
-	tool->openLeftContainerHelper(false);
-	tool->openRightContainerHelper(false);
-
 	lay->addWidget(tool);
 
 	settingsButton = new GearBtn(this);
+	settingsButton->setChecked(true);
 	infoBtn = new InfoBtn(this);
 	printBtn = new PrintBtn(this);
 	runBtn = new RunBtn(this);
@@ -57,6 +55,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	monitorsButton->setDoubleClickToOpenMenu(false);
 	monitorsButton->checkBox()->setVisible(false);
 	monitorsButton->button()->setVisible(false);
+	monitorsButton->setChecked(true);
 
 	tool->addWidgetToBottomContainerHelper(monitorsButton, TTA_LEFT);
 
