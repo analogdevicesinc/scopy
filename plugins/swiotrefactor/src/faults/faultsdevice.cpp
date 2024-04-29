@@ -167,7 +167,7 @@ void FaultsDevice::onFaultRegisterRead(int iReg, uint32_t value)
 	if(m_registerValues.size() == m_registers.size()) {
 		uint32_t faultRegisterValue = 0;
 		for(int i = 0; i < m_registerValues.size(); i++) {
-			faultRegisterValue |= (m_registerValues.at(i) << (i * 8));
+			faultRegisterValue |= (m_registerValues[i] << (i * 8));
 		}
 		m_faultNumeric = faultRegisterValue;
 		Q_EMIT faultNumericUpdated();
