@@ -60,14 +60,6 @@
 		},
 		{
 			"index": 2,
-			"names": ["GENERAL_SETTINGS"],
-			"description": "The general settings tab displays settings that influence all channels. (e.g. The Timespan)",
-			"anchor": "HP_LEFT",
-			"content": "HP_LEFT",
-			"x_offset": -10
-		},
-		{
-			"index": 3,
 			"names": ["RUN_BUTTON"],
 			"description": "When pressed, the run button starts polling from all channels every second. The values will be plotted in the plot section of each channel.",
 			"anchor": "HP_BOTTOM",
@@ -75,7 +67,7 @@
 			"y_offset": 10
 		},
 		{
-			"index": 4,
+			"index": 3,
 			"names": ["CONFIG_BUTTON"],
 			"description": "The config button switches the board to config mode, this will allow setting a different configuration.",
 			"anchor": "HP_BOTTOM",
