@@ -89,7 +89,7 @@ private:
 
 	uint32_t m_faultNumeric = 0;
 	QVector<uint32_t> m_registers;
-	QVector<uint32_t> m_registerValues;
+	QMap<int, uint32_t> m_registerValues;
 	QVector<Command *> m_deviceConfigCmds;
 	QVector<Command *> m_functionConfigCmds;
 };
