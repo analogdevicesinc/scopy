@@ -26,8 +26,10 @@ CommandQueue::~CommandQueue()
 
 void CommandQueue::enqueue(Command *command)
 {
+	m_enqueueMutex.lock();
 	m_commandQueue.push_back(command);
 	qDebug(CAT_COMMANDQUEUE) << "enqueued " << command << " " << m_commandQueue.size();
+	m_enqueueMutex.unlock();
 
 	if(!m_running) {
 		start();
