@@ -31,6 +31,7 @@ private Q_SLOTS:
 private:
 	std::deque<Command *> m_commandQueue;
 	std::mutex m_commandMutex;
+	std::mutex m_enqueueMutex;
 	std::atomic<bool> m_running;
 	QThreadPool m_commandExecThreadPool;
 };
