@@ -101,9 +101,10 @@ void CmdQDeviceAttrDataStrategy::attributeReadFinished(Command *cmd)
 
 	QString newData = QString(tcmd->getResult());
 	if(!m_recipe.constDataOptions.isEmpty()) {
+		QString oldData = m_dataRead;
 		m_optionalDataRead = m_recipe.constDataOptions;
-		Q_EMIT emitStatus(QDateTime::currentDateTime(), m_dataRead, newData, tcmd->getReturnCode(), true);
 		m_dataRead = newData;
+		Q_EMIT emitStatus(QDateTime::currentDateTime(), oldData, m_dataRead, tcmd->getReturnCode(), true);
 		Q_EMIT sendData(m_dataRead, m_optionalDataRead);
 	} else if(!m_recipe.iioDataOptions.isEmpty()) {
 		// if we have an attribute we have to read, we should read it, increase the counter and emit if
@@ -115,8 +116,9 @@ void CmdQDeviceAttrDataStrategy::attributeReadFinished(Command *cmd)
 		m_cmdQueue->enqueue(readOptionalCommand);
 	} else {
 		// no optional data available, emit empty string for it
-		Q_EMIT emitStatus(QDateTime::currentDateTime(), m_dataRead, newData, tcmd->getReturnCode(), true);
+		QString oldData = m_dataRead;
 		m_dataRead = newData;
+		Q_EMIT emitStatus(QDateTime::currentDateTime(), oldData, m_dataRead, tcmd->getReturnCode(), true);
 		Q_EMIT sendData(m_dataRead, QString());
 	}
 }
@@ -134,11 +136,9 @@ void CmdQDeviceAttrDataStrategy::optionalAttrReadFinished(Command *cmd)
 	}
 
 	char *currentOptValue = tcmd->getResult();
+	QString oldData = m_optionalDataRead;
 	m_optionalDataRead = QString(currentOptValue);
-
-	Q_EMIT emitStatus(QDateTime::currentDateTime(), m_optionalDataRead, QString(currentOptValue),
-			  tcmd->getReturnCode(), true);
-	m_optionalDataRead = QString(currentOptValue);
+	Q_EMIT emitStatus(QDateTime::currentDateTime(), oldData, m_optionalDataRead, tcmd->getReturnCode(), true);
 	Q_EMIT sendData(m_dataRead, m_optionalDataRead);
 }
 

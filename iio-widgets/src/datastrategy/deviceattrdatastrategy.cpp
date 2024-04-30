@@ -87,9 +87,10 @@ void DeviceAttrDataStrategy::requestData()
 		options[m_recipe.constDataOptions.size()] = '\0'; // safety measures
 	}
 
-	Q_EMIT emitStatus(QDateTime::currentDateTime(), m_data, currentValue, currentValueResult, true);
+	QString oldData = m_data;
 	m_data = currentValue;
 	m_optionalData = options;
+	Q_EMIT emitStatus(QDateTime::currentDateTime(), oldData, m_data, currentValueResult, true);
 	Q_EMIT sendData(m_data, m_optionalData);
 }
 
