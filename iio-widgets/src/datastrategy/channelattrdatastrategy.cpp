@@ -90,9 +90,11 @@ void ChannelAttrDataStrategy::requestData()
 		options[m_recipe.constDataOptions.size()] = '\0'; // safety measures
 	}
 
-	Q_EMIT emitStatus(QDateTime::currentDateTime(), m_data, QString(currentValue), (int)(currentValueResult), true);
+	// the members that contain data need to be refreshed before the signals are emitted
+	QString oldData = m_data;
 	m_data = currentValue;
 	m_optionalData = options;
+	Q_EMIT emitStatus(QDateTime::currentDateTime(), currentValue, m_data, (int)(currentValueResult), true);
 	Q_EMIT sendData(m_data, m_optionalData);
 }
 
