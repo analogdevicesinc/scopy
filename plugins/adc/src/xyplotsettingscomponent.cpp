@@ -11,6 +11,7 @@ XyPlotSettingsComponent::XyPlotSettingsComponent(PlotComponent *plot, QWidget *p
 	: QWidget(parent)
 	, m_syncMode(false)
 	, m_singleYMode(false)
+	, m_xChannel(nullptr)
 
 {
 	m_plot = plot->plot();
@@ -111,6 +112,18 @@ QWidget *XyPlotSettingsComponent::createXAxisMenu(QWidget *parent)
 	connect(x_autoscaler, &PlotAutoscaler::newMax, m_xctrl, &MenuPlotAxisRangeControl::setMax);
 	connect(m_autoscaleBtn, &QPushButton::clicked, this, [=]() { x_autoscaler->autoscale(); });
 
+	m_xChannelCb = new MenuCombo("X-Channel", this);
+	connect(m_xChannelCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx){
+		ChannelComponent *ch;
+		QString name = m_xChannelCb->combo()->itemData(idx).toString();
+		for(ChannelComponent *c : m_channels) {
+			if(c->name() == name) {
+				ch = c;
+			}
+		}
+		setXChannel(ch);
+	});
+
 	m_showLabels = new MenuOnOffSwitch("PLOT LABELS", xaxis);
 	showPlotLabels(false);
 	connect(m_showLabels->onOffswitch(), &QAbstractButton::toggled, this,
@@ -118,7 +131,9 @@ QWidget *XyPlotSettingsComponent::createXAxisMenu(QWidget *parent)
 
 	xaxiscontainer->contentLayout()->setSpacing(10);
 	xaxiscontainer->contentLayout()->addWidget(xaxis);
+	xaxis->contentLayout()->addWidget(m_xChannelCb);
 	xaxis->contentLayout()->addWidget(m_showLabels);
+
 	xaxis->contentLayout()->setSpacing(10);
 
 	return xaxiscontainer;
@@ -131,8 +146,6 @@ void XyPlotSettingsComponent::onInit() {
 	m_singleYModeSw->setEnabled(true);
 	m_singleYModeSw->onOffswitch()->setChecked(false);
 	m_autoscaleBtn->setEnabled(false);
-
-	       //	m_rollingModeSw->onOffswitch()->setChecked(false);
 }
 
 void XyPlotSettingsComponent::showPlotLabels(bool b)
@@ -174,12 +187,27 @@ void XyPlotSettingsComponent::onStart()
 
 void XyPlotSettingsComponent::addChannel(ChannelComponent *c) {
 	m_channels.append(c);
+	m_xChannelCb->combo()->addItem(c->name(), c->name());
 	y_autoscaler->addChannels(c->plotCh());
 }
 
 void XyPlotSettingsComponent::removeChannel(ChannelComponent *c) {
 	m_channels.removeAll(c);
+	m_xChannelCb->combo()->removeItem(m_xChannelCb->combo()->findData(c->name()));
 	y_autoscaler->removeChannels(c->plotCh());
+}
+
+ChannelComponent *XyPlotSettingsComponent::xChannel() const
+{
+	return m_xChannel;
+}
+
+void XyPlotSettingsComponent::setXChannel(ChannelComponent *newXChannel)
+{
+	if (m_xChannel == newXChannel)
+		return;
+	m_xChannel = newXChannel;
+	Q_EMIT xChannelChanged(newXChannel);
 }
 
 

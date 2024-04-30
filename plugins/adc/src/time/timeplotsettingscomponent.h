@@ -2,8 +2,8 @@
 #define TIMEPLOTSETTINGSCOMPONENT_H
 
 #include "scopy-adcplugin_export.h"
-#include "plotcomponent.h"
-#include "toolcomponent.h"
+#include <plotcomponent.h>
+#include <toolcomponent.h>
 
 #include <QLabel>
 

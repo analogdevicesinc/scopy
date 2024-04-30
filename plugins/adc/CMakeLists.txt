@@ -23,7 +23,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
-file(GLOB SRC_LIST src/*.cpp src/*.cc src/*.h)
+file(GLOB SRC_LIST src/*.cpp src/*.cc src/*.h src/time/*.c src/time/*.cpp src/time/*.h)
 file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 file(GLOB UI_LIST ui/*.ui)
 
@@ -51,7 +51,7 @@ generate_export_header(
 )
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} src/time src)
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
 target_link_libraries(

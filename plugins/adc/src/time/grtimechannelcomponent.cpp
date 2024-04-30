@@ -324,12 +324,16 @@ void GRTimeChannelComponent::setSampleRate(double v)
 void GRTimeChannelComponent::enable()
 {
 	m_ctrl->setVisible(true);
+	if(m_enabled) {
+		enableChannel();
+	}
 	ChannelComponent::enable();
 }
 
 void GRTimeChannelComponent::disable()
 {
 	m_ctrl->setVisible(false);
+	disableChannel();
 	ChannelComponent::disable();
 }
 
@@ -354,6 +358,7 @@ void GRTimeChannelComponent::onDeinit() {}
 
 void GRTimeChannelComponent::onNewData(const float *xData, const float *yData, int size)
 {
+
 	auto model = m_measureMgr->getModel();
 	model->setDataSource(yData, size);
 	model->measure();

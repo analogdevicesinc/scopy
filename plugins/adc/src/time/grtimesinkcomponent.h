@@ -15,7 +15,8 @@ class GRTimeSinkComponent : public QObject,
 			    public BufferSizeUser,
 			    public PlotSizeUser,
 			    public RollingModeUser,
-			    public SampleRateUser
+			    public SampleRateUser,
+			    public SinkComponent
 {
 	Q_OBJECT
 public:
@@ -41,8 +42,8 @@ public Q_SLOTS:
 	virtual void onInit() override;
 	virtual void onDeinit() override;
 
-	void addChannel(GRTimeChannelComponent *c);
-	void removeChannel(GRTimeChannelComponent *c);
+	void addChannel(ChannelComponent *c) override;
+	void removeChannel(ChannelComponent *c) override;
 Q_SIGNALS:
 	void requestRebuild();
 

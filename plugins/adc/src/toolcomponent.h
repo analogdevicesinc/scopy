@@ -123,6 +123,23 @@ public:
 	virtual void setInstrument(QWidget *) = 0;
 };
 
+class SCOPY_ADCPLUGIN_EXPORT ChannelIdProvider : public QObject
+{
+	Q_OBJECT
+public:
+	ChannelIdProvider(QObject *parent)
+		: QObject(parent)
+	{
+		idx = 0;
+	}
+	virtual ~ChannelIdProvider() {}
+
+	int next() { return idx++; }
+	QPen pen(int idx) { return QPen(StyleHelper::getColor("CH" + QString::number(idx))); }
+
+	int idx;
+};
+
 } // namespace adc
 } // namespace scopy
 

@@ -5,6 +5,7 @@ using namespace scopy::adc;
 ADCInstrument::ADCInstrument(PlotProxy *proxy, QWidget *parent)
 	: QWidget(parent)
 	, proxy(proxy)
+	, m_running(false)
 {
 
 	setupToolLayout();
@@ -194,6 +195,7 @@ void ADCInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, Compos
 				// Workaround because QButtonGroup and setChecked do not interact programatically
 				channelsBtn->button()->animateClick(1);
 			}
+			tool->requestMenu(channelsMenuId);
 			rightStack->show(id);
 		}
 	});

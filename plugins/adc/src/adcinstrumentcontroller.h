@@ -63,7 +63,6 @@ Q_SIGNALS:
 	void requestStop();
 private:
 
-
 	void setupChannelMeasurement(PlotComponent *c, ChannelComponent *ch);
 
 	ADCInstrument *m_tool;
@@ -85,9 +84,10 @@ private:
 	QTimer *m_plotTimer;
 
 	AcqTreeNode *m_tree;
-	QMap<AcqTreeNode*, ToolComponent*> m_acqNodeComponentMap;
+	QMap<AcqTreeNode*, QList<ToolComponent*>> m_acqNodeComponentMap;
 
 	bool m_refreshTimerRunning;
+	QString currentCategory;
 
 
 };

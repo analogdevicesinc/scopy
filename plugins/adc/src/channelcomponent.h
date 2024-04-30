@@ -9,6 +9,7 @@
 
 namespace scopy {
 namespace adc {
+
 class SCOPY_ADCPLUGIN_EXPORT ChannelComponent : public QWidget, public ToolComponent
 {
 	Q_OBJECT
@@ -47,6 +48,13 @@ public Q_SLOTS:
 
 	void onNewData(const float *xData, const float *yData, int size);
 };
+
+class SCOPY_ADCPLUGIN_EXPORT SinkComponent {
+public:
+	virtual void addChannel(ChannelComponent*) = 0;
+	virtual void removeChannel(ChannelComponent *) = 0;
+};
+
 }
 }
 #endif // CHANNELCOMPONENT_H

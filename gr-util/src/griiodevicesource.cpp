@@ -134,14 +134,17 @@ void GRIIODeviceSource::matchChannelToBlockOutputs(GRTopBlock *top)
 		GRIIOFloatChannelSrc *floatCh = dynamic_cast<GRIIOFloatChannelSrc *>(ch);
 		if(floatCh) {
 			auto start_sptr = floatCh->getGrStartPoint();
-			top->connect(src, getOutputIndex(floatCh->getChannelName()), start_sptr[0], 0);
+			int idx = getOutputIndex(floatCh->getChannelName());
+			top->connect(src, idx, start_sptr[0], 0);
 		}
 
 		GRIIOComplexChannelSrc *complexCh = dynamic_cast<GRIIOComplexChannelSrc *>(ch);
 		if(complexCh) {
 			auto start_sptr = complexCh->getGrStartPoint();
-			top->connect(src, getOutputIndex(complexCh->getChannelNameI()), start_sptr[0], 0);
-			top->connect(src, getOutputIndex(complexCh->getChannelNameQ()), start_sptr[1], 0);
+			int idxI = getOutputIndex(complexCh->getChannelNameI());
+			int idxQ = getOutputIndex(complexCh->getChannelNameQ());
+			top->connect(src, idxI, start_sptr[0], 0);
+			top->connect(src, idxQ, start_sptr[1], 0);
 		}
 	}
 }

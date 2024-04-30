@@ -101,6 +101,7 @@ void GRTimeSinkComponent::setCurveData(bool raw)
 			const size_t size = time_sink->data()[index].size();
 
 			if(raw) {
+				// maybe this should be forwarded back to GRTimeChannelComponent
 				curve->setRawSamples(xdata, ydata, size);
 			} else {
 				curve->setSamples(xdata, ydata, size);
@@ -186,12 +187,19 @@ void GRTimeSinkComponent::onDeinit()
 }
 
 
-void GRTimeSinkComponent::addChannel(GRTimeChannelComponent *c) {
-	m_channels.append(c);
+void GRTimeSinkComponent::addChannel(ChannelComponent *c) {
+	GRTimeChannelComponent *chan = dynamic_cast<GRTimeChannelComponent*>(c);
+	if(!chan)
+		return;
+
+	m_channels.append(chan);
 }
 
-void GRTimeSinkComponent::removeChannel(GRTimeChannelComponent *c) {
-	m_channels.removeAll(c);
+void GRTimeSinkComponent::removeChannel(ChannelComponent *c) {
+	GRTimeChannelComponent *chan = dynamic_cast<GRTimeChannelComponent*>(c);
+	if(!chan)
+		return;
+	m_channels.removeAll(chan);
 }
 
 bool GRTimeSinkComponent::enabled() const

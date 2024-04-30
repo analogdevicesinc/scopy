@@ -4,7 +4,10 @@
 #include "adcinstrument.h"
 #include "grdevicecomponent.h"
 #include "grtimechannelcomponent.h"
+#include "grxychannelcomponent.h"
 #include "grtimesinkcomponent.h"
+#include "grxysinkcomponent.h"
+
 #include <pluginbase/preferences.h>
 #include "interfaces.h"
 
@@ -21,6 +24,7 @@ ADCInstrumentController::ADCInstrumentController(QString name, AcqTreeNode * tre
 	,m_timePlotSettingsComponent(nullptr)
 	,m_cursorComponent(nullptr)
 	,m_measureComponent(nullptr)
+	,currentCategory("time")
 {
 	chIdP = new ChannelIdProvider(this);
 	m_tree = tree;
@@ -65,8 +69,10 @@ void ADCInstrumentController::init()
 	ToolTemplate *toolLayout = m_tool->getToolTemplate();
 
 	m_timePlotComponent = new PlotComponent(m_name+"_time", m_tool);
+	m_timePlotComponent->category()->append("time");
 	addComponent(m_timePlotComponent);
 	m_timePlotSettingsComponent = new TimePlotSettingsComponent(m_timePlotComponent);
+	m_timePlotSettingsComponent->category()->append("time");
 	addComponent(m_timePlotSettingsComponent);
 	connect(m_tool->getTimeBtn(), &QAbstractButton::pressed, this, [=](){
 		enableCategory("time");
@@ -82,7 +88,9 @@ void ADCInstrumentController::init()
 
 	m_xyPlotComponent = new PlotComponent(m_name+"_xy", m_tool);
 	addComponent(m_xyPlotComponent);
+	m_xyPlotComponent->category()->append("xy");
 	m_xyPlotSettingsComponent = new XyPlotSettingsComponent(m_xyPlotComponent);
+	m_xyPlotSettingsComponent->category()->append("xy");
 	addComponent(m_xyPlotSettingsComponent);
 	connect(m_tool->getXyBtn(), &QAbstractButton::pressed, this, [=](){
 		enableCategory("xy");
@@ -106,6 +114,7 @@ void ADCInstrumentController::init()
 	toolLayout->rightStack()->add(m_tool->settingsMenuId+"_xy", m_xyPlotSettingsComponent);
 	plotStack->add("fft", m_fftPlotComponent);
 	// toolLayout->rightStack()->add(m_tool->settingsMenuId+"_fft", m_fftPlotSettingsComponent);
+
 
 	connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::sampleRateChanged, this,
 		[=](double v) {
@@ -168,7 +177,6 @@ void ADCInstrumentController::init()
 
 	connect(this, &ADCInstrumentController::requestStop, m_tool, &ADCInstrument::stop, Qt::QueuedConnection);
 	connect(m_tool, &ADCInstrument::setSingleShot, this, &ADCInstrumentController::setSingleShot);
-
 }
 
 void ADCInstrumentController::deinit() {
@@ -179,7 +187,9 @@ void ADCInstrumentController::deinit() {
 
 void ADCInstrumentController::onStart() {
 	for(auto c : qAsConst(m_components)) {
-		c->onStart();
+		if(c->enabled()) {
+			c->onStart();
+		}
 	}
 	startUpdates();
 }
@@ -234,15 +244,18 @@ void ADCInstrumentController::updateData() {
 void ADCInstrumentController::update()
 {
 	for(ToolComponent *c : qAsConst(m_components)) {
+		if(!c->enabled())
+			continue;
 		if(dynamic_cast<DataProvider*>(c)) {
 			DataProvider *dp = dynamic_cast<DataProvider*>(c);
-			dp->setCurveData();
-			if(dp->finished()) {
+			dp->setCurveData();			
+			if(dp->finished() ) {
 				Q_EMIT requestStop();
 			}
 		}
 	}
 	m_timePlotComponent->replot();
+	m_xyPlotComponent->replot();
 }
 
 void ADCInstrumentController::handlePreferences(QString key, QVariant v)
@@ -270,11 +283,23 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node) {
 
 	if(dynamic_cast<GRTopBlockNode*>(node) != nullptr) {
 		GRTopBlockNode* grtbn = dynamic_cast<GRTopBlockNode*>(node);
-		GRTimeSinkComponent *c = new GRTimeSinkComponent(m_name, grtbn, this);
-		c->category()->append("time");
+		GRTimeSinkComponent *c = new GRTimeSinkComponent(m_name+"_time", grtbn, this);
+		GRXySinkComponent *c_xy = new GRXySinkComponent(m_name+"_xy", grtbn, this);
 
-		m_acqNodeComponentMap[grtbn] = c;		
+		connect(m_xyPlotSettingsComponent, &XyPlotSettingsComponent::xChannelChanged, this, [=](ChannelComponent *c) {
+			GRXyChannelComponent *chan = dynamic_cast<GRXyChannelComponent*>(c);
+				c_xy->setXChannel(chan);
+			});
+		connect(m_xyPlotSettingsComponent, &XyPlotSettingsComponent::bufferSizeChanged, c_xy, &GRXySinkComponent::setBufferSize);
+
+
+		c->category()->append("time");
+		c_xy->category()->append("xy");
+
+		m_acqNodeComponentMap[grtbn].append(c);
+		m_acqNodeComponentMap[grtbn].append(c_xy);
 		addComponent(c);
+		addComponent(c_xy);
 	}
 
 	if(dynamic_cast<GRIIODeviceSourceNode*>(node) != nullptr) {
@@ -284,7 +309,7 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node) {
 		d->category()->append("time");
 		m_tool->addDevice(d->ctrl(), d);
 
-		m_acqNodeComponentMap[griiodsn] = d;
+		m_acqNodeComponentMap[griiodsn].append(d);
 		addComponent(d);
 
 		SampleRateProvider *s = dynamic_cast<SampleRateProvider*>(d);
@@ -298,29 +323,37 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node) {
 		int idx = chIdP->next();
 		GRIIOFloatChannelNode* griiofcn = dynamic_cast<GRIIOFloatChannelNode*>(node);
 		GRTimeChannelComponent *c = new GRTimeChannelComponent(griiofcn, m_timePlotComponent, chIdP->pen(idx));
+		GRXyChannelComponent *c_xy = new GRXyChannelComponent(griiofcn, m_xyPlotComponent, chIdP->pen(idx));
 		c->category()->append("time");
+		c_xy->category()->append("xy");
 
 		/*** This is a bit of a mess because CollapsableMenuControlButton is not a MenuControlButton ***/
 		CompositeWidget *cw = nullptr;
 		GRIIODeviceSourceNode *w = dynamic_cast<GRIIODeviceSourceNode*>(griiofcn->treeParent());
-		GRDeviceComponent* dc = dynamic_cast<GRDeviceComponent*>(m_acqNodeComponentMap[w]);
+		GRDeviceComponent* dc = dynamic_cast<GRDeviceComponent*>(m_acqNodeComponentMap[w][0] /*[0] = HACK */);
 		if(w) {			
 			cw = dc->ctrl();
 		}
 		if(!cw) {
 			cw = m_tool->vcm();
 		}
-		m_acqNodeComponentMap[griiofcn] = c;
+		m_acqNodeComponentMap[griiofcn].append(c);
 		/*** End of mess ***/
 
 		m_tool->addChannel(c->ctrl(), c, cw);
+		m_tool->addChannel(c_xy->ctrl(), c_xy, cw);
 
-		auto *grNode = m_acqNodeComponentMap[griiofcn->top()];
-		GRTimeSinkComponent *grtsc = dynamic_cast<GRTimeSinkComponent*>(grNode);
-		Q_ASSERT(grtsc);
-		grtsc->addChannel(c); // For matching Sink To Channels
+		for (auto *grNode : m_acqNodeComponentMap[griiofcn->top()]) {
+			SinkComponent *grtsc = dynamic_cast<SinkComponent*>(grNode);
+			Q_ASSERT(grtsc);
+
+			grtsc->addChannel(c); // For matching Sink To Channels
+			grtsc->addChannel(c_xy); // For matching Sink To Channels
+		}
+
 		dc->addChannel(c);    // used for sample rate computation
 		m_timePlotSettingsComponent->addChannel(c); // SingleY/etc
+		m_xyPlotSettingsComponent->addChannel(c_xy);
 
 		SampleRateProvider *s = dynamic_cast<SampleRateProvider*>(c); // SampleRate Computation
 		if(s) {
@@ -328,9 +361,12 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node) {
 		}
 
 		addComponent(c);
+		addComponent(c_xy);
 		setupChannelMeasurement(m_timePlotComponent, c);
 
 	}
+
+	enableCategory(currentCategory);
 }
 
 void ADCInstrumentController::setupChannelMeasurement(PlotComponent *c ,ChannelComponent *ch)
@@ -364,6 +400,7 @@ void ADCInstrumentController::removeChannel(AcqTreeNode *node) {
 
 void ADCInstrumentController::enableCategory(QString s) {
 	QString categoryName = s;
+	currentCategory = s;
 	ToolTemplate *toolLayout = m_tool->getToolTemplate();
 	plotStack->show(categoryName);
 	toolLayout->requestMenu(m_tool->settingsMenuId+"_"+categoryName);

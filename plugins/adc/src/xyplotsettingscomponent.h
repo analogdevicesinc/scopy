@@ -35,6 +35,9 @@ public:
 	uint32_t bufferSize() const;
 	void setBufferSize(uint32_t newBufferSize);
 
+	ChannelComponent *xChannel() const;
+	void setXChannel(ChannelComponent *newXChannel);
+
 public Q_SLOTS:
 	void onStart() override;
 	void onStop() override {}
@@ -48,6 +51,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void bufferSizeChanged(uint32_t);
 	void singleYModeChanged(bool);
+	void xChannelChanged(ChannelComponent*);
 
 private:
 	PlotWidget *m_plot;
@@ -56,6 +60,8 @@ private:
 	QWidget *createYAxisMenu(QWidget *parent = nullptr);
 
 	QPen m_pen;
+	MenuCombo *m_xChannelCb;
+	ChannelComponent *m_xChannel;
 	MenuPlotAxisRangeControl *m_xctrl;
 	MenuPlotAxisRangeControl *m_yctrl;
 	MenuOnOffSwitch *m_singleYModeSw;
@@ -76,6 +82,8 @@ private:
 
 	Q_PROPERTY(bool singleYMode READ singleYMode WRITE setSingleYMode NOTIFY singleYModeChanged)
 	Q_PROPERTY(uint32_t bufferSize READ bufferSize WRITE setBufferSize NOTIFY bufferSizeChanged FINAL)
+	Q_PROPERTY(ChannelComponent* xChannel READ xChannel WRITE setXChannel NOTIFY xChannelChanged)
+
 };
 
 } // namespace adc

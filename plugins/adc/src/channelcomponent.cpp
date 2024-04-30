@@ -16,6 +16,7 @@ ChannelComponent::ChannelComponent(QString ch, PlotComponent *plotComponent, QPe
 	, m_channelName(ch)
 	, m_plotComponent(plotComponent)
 	, m_pen(pen)
+	, m_plotAxisHandle(nullptr)
 {
 
 	m_name = m_plotComponent->name()+m_channelName;
@@ -48,8 +49,10 @@ void ChannelComponent::enableChannel()
 	qInfo(CAT_TIME_CHANNELCOMPONENT) << m_channelName << " enabled";
 	m_enabled = true;
 	m_plotCh->enable();
-	m_plotAxisHandle->handle()->setVisible(true);
-	m_plotAxisHandle->handle()->raise();
+	if(m_plotAxisHandle) {
+		m_plotAxisHandle->handle()->setVisible(true);
+		m_plotAxisHandle->handle()->raise();
+	}
 	//	m_grch->setEnabled(true);
 	m_plotComponent->replot();
 	//	m_plotAddon->plot()->replot();
@@ -60,7 +63,9 @@ void ChannelComponent::disableChannel()
 	qInfo(CAT_TIME_CHANNELCOMPONENT) << m_channelName << " disabled";
 	m_enabled = false;
 	m_plotCh->disable();
-	m_plotAxisHandle->handle()->setVisible(false);
+	if(m_plotAxisHandle) {
+		m_plotAxisHandle->handle()->setVisible(false);
+	}
 
 	       //	m_grch->setEnabled(false);
 	m_plotComponent->replot();

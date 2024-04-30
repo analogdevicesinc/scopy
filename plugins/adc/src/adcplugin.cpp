@@ -196,7 +196,7 @@ bool ADCPlugin::onConnect()
 	GRTopBlock *top = new GRTopBlock("ctx", this);
 	GRTopBlockNode *ctxNode = new GRTopBlockNode(top, nullptr);
 	root->addTreeChild(ctxNode);
-	auto timeProxy = new ADCInstrumentController("time0",root,this);
+	auto timeProxy = new ADCInstrumentController("adc0",root,this);
 	time = new ADCInstrument(timeProxy);
 	connect(root,&AcqTreeNode::newChild,timeProxy,&ADCInstrumentController::addChannel);
 	createGRIIOTreeNode(ctxNode, m_ctx);
