@@ -48,9 +48,8 @@ void IIODebugInstrument::setupUi()
 
 	m_debugLogger = new IIODebugLogger(m_tabWidget);
 	m_debugLogger->setObjectName("IIODebuggerLogWidget");
-
-	m_tabWidget->addTab(m_mainWidget, "Main Window");
-	m_tabWidget->addTab(m_debugLogger, "Log Window");
+	m_tabWidget->addTab(m_mainWidget, "IIO Attributes");
+	m_tabWidget->addTab(m_debugLogger, "Log");
 	m_tabWidget->setCurrentIndex(0);
 	m_tabWidget->setTabPosition(QTabWidget::South);
 
@@ -159,6 +158,7 @@ void IIODebugInstrument::connectSignalsAndSlots()
 		qDebug(CAT_DEBUGGERIIOMODEL) << "Read button pressed.";
 		triggerReadOnAllChildItems(m_currentlySelectedItem);
 		m_detailsView->refreshIIOView();
+		m_watchListView->refreshWatchlist();
 	});
 
 	QObject::connect(m_detailsView->addToWatchlistBtn(), &QPushButton::clicked, this, [this]() {
@@ -191,6 +191,7 @@ void IIODebugInstrument::connectSignalsAndSlots()
 						 .arg(oldValue.isEmpty() ? "" : oldValue + " -> ")
 						 .arg(newValue);
 				 m_debugLogger->appendLog(logMessage);
+				 m_detailsView->refreshIIOView();
 			 });
 }
 
