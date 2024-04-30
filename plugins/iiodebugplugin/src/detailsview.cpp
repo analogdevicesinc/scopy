@@ -14,7 +14,7 @@ DetailsView::DetailsView(QWidget *parent)
 	, m_tabWidget(new QTabWidget(this))
 	, m_guiView(new QWidget(this))
 	, m_iioView(new QWidget(this))
-	, m_readBtn(new QPushButton("Read", this))
+	, m_readBtn(new QPushButton(this))
 	, m_addToWatchlistBtn(new QPushButton(this))
 	, m_titleContainer(new QWidget(this))
 {
@@ -53,7 +53,7 @@ void DetailsView::setupUi()
 	m_tabWidget->tabBar()->setExpanding(true);
 
 	StyleHelper::TabWidgetBarUnderline(m_tabWidget, "DetailsTabWidget");
-	StyleHelper::BlueButton(m_readBtn, "ReadCurrentSelectionButton");
+	StyleHelper::RefreshButton(m_readBtn, "RefreshCurrentSelectionButton");
 	m_addToWatchlistBtn->setStyleSheet("QPushButton { background-color: transparent; border: 0px; }");
 
 	m_titleContainer->layout()->addWidget(m_titleLabel);
