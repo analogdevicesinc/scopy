@@ -5,7 +5,6 @@
 #include <QDebug>
 #include <QLineEdit>
 #include <QScrollArea>
-#include <QTimer>
 #include <datamonitorstylehelper.hpp>
 #include <datamonitorutils.hpp>
 #include <menucollapsesection.h>
@@ -16,6 +15,7 @@
 #include <mousewheelwidgetguard.h>
 #include <plotautoscaler.h>
 #include <plotchannel.h>
+#include <timemanager.hpp>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -119,6 +119,7 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 	plotAutoscaler->setTolerance(10);
 
 	MenuOnOffSwitch *autoscale = new MenuOnOffSwitch(tr("AUTOSCALE"), yAxisSection, false);
+	autoscale->onOffswitch()->setChecked(true);
 
 	connect(autoscale->onOffswitch(), &QAbstractButton::toggled, this, [=, this](bool toggled) {
 		plotYAxisController->setEnabled(!toggled);
@@ -129,7 +130,17 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 		}
 	});
 
-	autoscale->onOffswitch()->setChecked(true);
+	auto &&timeTracker = TimeManager::GetInstance();
+
+	connect(timeTracker, &TimeManager::toggleRunning, this, [=, this](bool toggled) {
+		if(toggled) {
+			if(autoscale->onOffswitch()->isChecked()) {
+				plotAutoscaler->start();
+			}
+		} else {
+			plotAutoscaler->stop();
+		}
+	});
 
 	connect(plotAutoscaler, &gui::PlotAutoscaler::newMin, m_plot, &MonitorPlot::updateYAxisIntervalMin);
 	connect(plotAutoscaler, &gui::PlotAutoscaler::newMax, m_plot, &MonitorPlot::updateYAxisIntervalMax);
