@@ -52,6 +52,10 @@ void TimeManager::setTimerInterval(double interval) { m_timer->setInterval(inter
 
 bool TimeManager::isRunning() const { return m_isRunning; }
 
-void TimeManager::setIsRunning(bool newIsRunning) { m_isRunning = newIsRunning; }
+void TimeManager::setIsRunning(bool newIsRunning)
+{
+	m_isRunning = newIsRunning;
+	Q_EMIT toggleRunning(newIsRunning);
+}
 
 QDateTime TimeManager::lastReadValue() const { return m_lastReadValue; }
