@@ -74,21 +74,13 @@ void TimePlotFPS::update(qint64 timestamp)
 	setText(QString(QString::number(1000. / avg, 'g', 3) + " FPS"));
 }
 
-TimePlotTimestamp::TimePlotTimestamp(QWidget *parent)
+GenericInfoLabel::GenericInfoLabel(QWidget *parent)
 {
 	StyleHelper::TimePlotSamplingInfo(this);
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 }
 
-TimePlotTimestamp::~TimePlotTimestamp() {}
-
-TimePlotStatusInfo::TimePlotStatusInfo(QWidget *parent)
-{
-	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-	StyleHelper::TimePlotSamplingInfo(this);
-}
-
-TimePlotStatusInfo::~TimePlotStatusInfo() {}
+GenericInfoLabel::~GenericInfoLabel() {}
 
 TimePlotInfo::TimePlotInfo(PlotWidget *plot, QWidget *parent)
 {
@@ -105,14 +97,12 @@ TimePlotInfo::TimePlotInfo(PlotWidget *plot, QWidget *parent)
 
 	m_hdiv = new TimePlotHDivInfo(this);
 	m_sampling = new TimePlotSamplingInfo(this);
-	m_status = new TimePlotStatusInfo(this);
+	m_status = new GenericInfoLabel(this);
 
 	m_fps = new TimePlotFPS(this);
-	connect(plot, &PlotWidget::newData, this, [=]() {
-		m_fps->update(QDateTime::currentMSecsSinceEpoch());
-	});
+	connect(plot, &PlotWidget::newData, this, [=]() { m_fps->update(QDateTime::currentMSecsSinceEpoch()); });
 
-	m_timestamp = new TimePlotTimestamp(this);
+	m_timestamp = new GenericInfoLabel(this);
 	connect(plot, &PlotWidget::newData, this,
 		[=]() { m_timestamp->setText(QDateTime::currentDateTime().time().toString("hh:mm:ss.zzz")); });
 
@@ -161,6 +151,14 @@ TimePlotInfo::TimePlotInfo(PlotWidget *plot, QWidget *parent)
 	timestampHover->setAnchorOffset(QPoint(-8, 26));
 	timestampHover->show();
 	timestampHover->setAttribute(Qt::WA_TransparentForMouseEvents);
+
+	HoverWidget *statusHover = new HoverWidget(nullptr, plot->plot()->canvas(), plot->plot());
+	statusHover->setContent(m_status);
+	statusHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+	statusHover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
+	statusHover->setAnchorOffset(QPoint(-8, 46));
+	statusHover->show();
+	statusHover->setAttribute(Qt::WA_TransparentForMouseEvents);
 #endif
 }
 
@@ -182,5 +180,7 @@ void TimePlotInfo::update(PlotSamplingInfo info)
 	m_hdiv->update(abs(currMax - currMin) / divs, zoomed);
 	m_sampling->update(info.plotSize, info.bufferSize, info.sampleRate);
 }
+
+void TimePlotInfo::updateStatus(QString status) { m_status->setText(status); }
 
 #include "moc_plotinfo.cpp"
