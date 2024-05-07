@@ -245,6 +245,8 @@ void GRTimePlotAddon::onStart()
 		m_top->build();
 		m_top->start();
 		m_started = true;
+
+		m_info->updateStatus("running");
 	}
 }
 
@@ -258,6 +260,8 @@ void GRTimePlotAddon::onStop()
 		disconnect(m_top, SIGNAL(builtSignalPaths()), this, SLOT(connectSignalPaths()));
 		disconnect(m_top, SIGNAL(teardownSignalPaths()), this, SLOT(tearDownSignalPaths()));
 		m_started = false;
+
+		m_info->updateStatus("stopped");
 	}
 }
 
