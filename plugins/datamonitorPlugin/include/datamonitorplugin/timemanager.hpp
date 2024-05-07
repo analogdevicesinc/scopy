@@ -35,6 +35,7 @@ public:
 
 Q_SIGNALS:
 	void timeout();
+	void toggleRunning(bool toggled);
 
 private:
 	static TimeManager *pinstance_;
