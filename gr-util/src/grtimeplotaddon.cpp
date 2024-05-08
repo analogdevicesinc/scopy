@@ -5,6 +5,7 @@
 #include <QLoggingCategory>
 #include <QTimer>
 #include <QwtWeedingCurveFitter>
+#include <plotinfowidgets.h>
 #include <plotnavigator.hpp>
 
 #include <grdeviceaddon.h>
@@ -102,13 +103,8 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	m_plotWidget->xAxis()->setVisible(true);
 	//	m_plotWidget->topHandlesArea()->setVisible(true);
 
-	QWidget *plotInfoSlot = createPlotInfoSlot(m_plotWidget);
-	m_plotWidget->addPlotInfoSlot(plotInfoSlot);
-
-	connect(m_plotWidget->navigator(), &PlotNavigator::rectChanged, this, [=]() {
-		m_info->update(m_currentSamplingInfo);
-		m_bufferPreviewer->updateDataLimits();
-	});
+	connect(m_plotWidget->navigator(), &PlotNavigator::rectChanged, this,
+		[=]() { m_bufferPreviewer->updateDataLimits(); });
 
 	//	m_lay->addWidget(m_plotWidget);
 	m_plotTimer = new QTimer(this);
@@ -127,6 +123,11 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 		Qt::QueuedConnection);
 
 	connect(this, &GRTimePlotAddon::newData, m_plotWidget, &PlotWidget::newData);
+	connect(this, &GRTimePlotAddon::newData, m_fftPlotWidget, &PlotWidget::newData);
+	connect(this, &GRTimePlotAddon::newData, m_xyPlotWidget, &PlotWidget::newData);
+
+	setupBufferPreviewer();
+	setupPlotInfo();
 }
 
 GRTimePlotAddon::~GRTimePlotAddon() {}
@@ -201,20 +202,26 @@ void GRTimePlotAddon::drawTags()
 	}
 }
 
-QWidget *GRTimePlotAddon::createPlotInfoSlot(QWidget *parent)
+void GRTimePlotAddon::setupPlotInfo()
 {
-	QWidget *plotInfoSlot = new QWidget(parent);
-	QVBoxLayout *plotInfoLayout = new QVBoxLayout(plotInfoSlot);
-	plotInfoLayout->setSpacing(2);
-	plotInfoLayout->setMargin(4);
-	plotInfoSlot->setLayout(plotInfoLayout);
+	PlotInfo *info = m_plotWidget->getPlotInfo();
 
-	AnalogBufferPreviewer *bufferPreviewer = new AnalogBufferPreviewer(plotInfoSlot);
-	m_bufferPreviewer = new PlotBufferPreviewer(m_plotWidget, bufferPreviewer, plotInfoSlot);
-	m_info = new TimePlotInfo(m_plotWidget, plotInfoSlot);
-	plotInfoLayout->addWidget(m_bufferPreviewer);
-	plotInfoLayout->addWidget(m_info);
-	return plotInfoSlot;
+	TimeSamplingInfo *samplingInfo = new TimeSamplingInfo(m_plotWidget);
+	info->addCustomInfo(samplingInfo, InfoPosition::IP_RIGHT);
+	connect(this, &GRTimePlotAddon::xAxisUpdated, this, [=]() { samplingInfo->update(m_currentSamplingInfo); });
+
+	info->addCustomInfo(new TimestampInfo(m_plotWidget), InfoPosition::IP_RIGHT);
+
+	QLabel *statusInfo = info->addLabelInfo(InfoPosition::IP_RIGHT);
+	connect(this, &GRTimePlotAddon::statusChanged, this, [=](QString status) { statusInfo->setText(status); });
+}
+
+void GRTimePlotAddon::setupBufferPreviewer()
+{
+	AnalogBufferPreviewer *bufferPreviewer = new AnalogBufferPreviewer(m_plotWidget);
+	m_bufferPreviewer = new PlotBufferPreviewer(m_plotWidget, bufferPreviewer, m_plotWidget);
+	m_bufferPreviewer->setContentsMargins(0, 4, 0, 4);
+	m_plotWidget->layout()->addWidget(m_bufferPreviewer, 0, 0);
 }
 
 void GRTimePlotAddon::drawPlot()
@@ -246,7 +253,7 @@ void GRTimePlotAddon::onStart()
 		m_top->start();
 		m_started = true;
 
-		m_info->updateStatus("running");
+		Q_EMIT statusChanged("running");
 	}
 }
 
@@ -261,7 +268,7 @@ void GRTimePlotAddon::onStop()
 		disconnect(m_top, SIGNAL(teardownSignalPaths()), this, SLOT(tearDownSignalPaths()));
 		m_started = false;
 
-		m_info->updateStatus("stopped");
+		Q_EMIT statusChanged("stopped");
 	}
 }
 
@@ -405,7 +412,7 @@ void GRTimePlotAddon::connectSignalPaths()
 	time_sink->setFreqOffset(m_currentSamplingInfo.freqOffset);
 	updateXAxis();
 
-	auto fft_size = m_currentSamplingInfo.bufferSize;
+	auto fft_size = 1048576;
 	f2c = gr::blocks::float_to_complex::make();
 	auto window = gr::fft::window::build(m_fftwindow, fft_size);
 
@@ -491,7 +498,6 @@ void GRTimePlotAddon::updateXAxis()
 
 	qInfo() << fft_xPlotAxis->min() << fft_xPlotAxis->max();
 
-	m_info->update(m_currentSamplingInfo);
 	m_bufferPreviewer->updateDataLimits();
 	Q_EMIT xAxisUpdated();
 }

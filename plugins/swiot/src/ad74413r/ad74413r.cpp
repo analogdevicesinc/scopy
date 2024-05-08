@@ -26,6 +26,7 @@
 #include <iio.h>
 #include <measurementlabel.h>
 #include <plotinfo.h>
+#include <plotinfowidgets.h>
 
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menuheader.h>
@@ -320,7 +321,7 @@ void Ad74413r::plotData(QVector<double> chnlData, int chnlIdx)
 	updateXData(dataSize);
 	m_plotChnls[chnlIdx]->curve()->setSamples(m_xTime.data(), chnlData.data(), dataSize);
 	m_currentSamplingInfo.plotSize = dataSize;
-	m_info->update(m_currentSamplingInfo);
+	Q_EMIT updateSamplingInfo();
 	m_plot->replot();
 }
 
@@ -343,7 +344,7 @@ void Ad74413r::onBufferRefilled(QMap<int, QVector<double>> bufferData)
 void Ad74413r::onSamplingFreqComputed(double freq)
 {
 	m_currentSamplingInfo.sampleRate = freq;
-	m_info->update(m_currentSamplingInfo);
+	Q_EMIT updateSamplingInfo();
 }
 
 void Ad74413r::initPlotData()
@@ -573,8 +574,11 @@ void Ad74413r::setupToolTemplate()
 	layout->addWidget(m_tool);
 
 	m_plot = new PlotWidget(this);
-	m_info = new TimePlotInfo(m_plot, this);
-	m_plot->addPlotInfoSlot(m_info);
+	m_info = new PlotInfo(m_plot->plot()->canvas());
+	TimeSamplingInfo *samplingInfo = new TimeSamplingInfo(m_plot);
+	m_info->addCustomInfo(samplingInfo, InfoPosition::IP_RIGHT);
+	connect(this, &Ad74413r::updateSamplingInfo, this, [=]() { samplingInfo->update(m_currentSamplingInfo); });
+
 	initPlot();
 	setupDeviceBtn();
 	m_tool->addWidgetToCentralContainerHelper(m_plot);

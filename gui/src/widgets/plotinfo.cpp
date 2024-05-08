@@ -1,186 +1,111 @@
 #include "plotinfo.h"
 
-#include "hoverwidget.h"
-#include "plotaxis.h"
-#include "qdatetime.h"
-#include <pluginbase/preferences.h>
+#include <QLabel>
+#include <stylehelper.h>
 
 using namespace scopy;
 
-TimePlotHDivInfo::TimePlotHDivInfo(QWidget *parent)
+PlotInfo::PlotInfo(QWidget *parent)
+	: QWidget(parent)
+	, m_parent(parent)
+	, m_margin(6)
+	, m_spacing(6)
+	, m_leftInfo(new QWidget())
+	, m_rightInfo(new QWidget())
 {
-	StyleHelper::TimePlotHDivInfo(this);
-	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-	m_mpf = new MetricPrefixFormatter(this);
-	m_mpf->setTrimZeroes(true);
-}
-TimePlotHDivInfo::~TimePlotHDivInfo() {}
-
-void TimePlotHDivInfo::update(double val, bool zoomed)
-{
-	setText(m_mpf->format(val, "s", 2) + "/div" + (zoomed ? " (zoomed)" : ""));
+	initLayouts();
 }
 
-TimePlotSamplingInfo::TimePlotSamplingInfo(QWidget *parent)
+PlotInfo::~PlotInfo() {}
+
+void PlotInfo::addCustomInfo(QWidget *info, InfoPosition pos)
 {
-	StyleHelper::TimePlotSamplingInfo(this);
-	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-	m_mpf = new MetricPrefixFormatter(this);
-	m_mpf->setTrimZeroes(true);
-}
+	switch(pos) {
+	case InfoPosition::IP_LEFT:
+		m_leftLayout->addWidget(info);
+		info->setParent(m_leftInfo);
+		break;
 
-TimePlotSamplingInfo::~TimePlotSamplingInfo() {}
+	case InfoPosition::IP_RIGHT:
+		m_rightLayout->addWidget(info);
+		info->setParent(m_rightInfo);
 
-void TimePlotSamplingInfo::update(int ps, int bs, double sr)
-{
-	QString text;
-	text = QString("%1").arg(m_mpf->format(ps, "samples", 2)); //.arg(m_mpf->format(bs, "samples", 2));
-								   //	if(sr != 1.0)
-	text += QString(" at %2").arg(m_mpf->format(sr, "sps", 2));
-
-	setText(text);
-}
-
-TimePlotFPS::TimePlotFPS(QWidget *parent)
-{
-	StyleHelper::TimePlotSamplingInfo(this);
-	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-	m_replotTimes = new QList<qint64>();
-	m_lastTimeStamp = 0;
-	m_avgSize = 10;
-}
-
-TimePlotFPS::~TimePlotFPS() {}
-
-void TimePlotFPS::update(qint64 timestamp)
-{
-	if(m_lastTimeStamp == 0) {
-		m_lastTimeStamp = timestamp;
-		return;
-	}
-
-	m_replotTimes->append(timestamp - m_lastTimeStamp);
-	if(m_replotTimes->size() > m_avgSize) {
-		m_replotTimes->removeAt(0);
-	}
-
-	qint64 avg = 0;
-	for(qint64 time : *m_replotTimes) {
-		avg += time;
-	}
-	avg /= m_replotTimes->size();
-	m_lastTimeStamp = timestamp;
-
-	setText(QString(QString::number(1000. / avg, 'g', 3) + " FPS"));
-}
-
-GenericInfoLabel::GenericInfoLabel(QWidget *parent)
-{
-	StyleHelper::TimePlotSamplingInfo(this);
-	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-}
-
-GenericInfoLabel::~GenericInfoLabel() {}
-
-TimePlotInfo::TimePlotInfo(PlotWidget *plot, QWidget *parent)
-{
-	Preferences *p = Preferences::GetInstance();
-
-	m_plot = plot;
-	QVBoxLayout *vlay = new QVBoxLayout(this);
-	vlay->setMargin(0);
-	vlay->setSpacing(2);
-	setLayout(vlay);
-	QHBoxLayout *lay = new QHBoxLayout();
-	lay->setMargin(0);
-	lay->setSpacing(0);
-
-	m_hdiv = new TimePlotHDivInfo(this);
-	m_sampling = new TimePlotSamplingInfo(this);
-	m_status = new GenericInfoLabel(this);
-
-	m_fps = new TimePlotFPS(this);
-	connect(plot, &PlotWidget::newData, this, [=]() { m_fps->update(QDateTime::currentMSecsSinceEpoch()); });
-
-	m_timestamp = new GenericInfoLabel(this);
-	connect(plot, &PlotWidget::newData, this,
-		[=]() { m_timestamp->setText(QDateTime::currentDateTime().time().toString("hh:mm:ss.zzz")); });
-
-	vlay->addLayout(lay);
-
-#ifdef HOVER_INFO
-	lay->addWidget(m_hdiv);
-	lay->addWidget(m_sampling);
-	lay->setAlignment(m_sampling, Qt::AlignRight);
-#else
-
-	HoverWidget *hdivhover = new HoverWidget(nullptr, plot->plot()->canvas(), plot->plot());
-	hdivhover->setContent(m_hdiv);
-	hdivhover->setAnchorPos(HoverPosition::HP_TOPLEFT);
-	hdivhover->setContentPos(HoverPosition::HP_BOTTOMRIGHT);
-	hdivhover->setAnchorOffset(QPoint(8, 6));
-	hdivhover->show();
-	hdivhover->setAttribute(Qt::WA_TransparentForMouseEvents);
-
-	HoverWidget *samplinginfohover = new HoverWidget(nullptr, plot->plot()->canvas(), plot->plot());
-	samplinginfohover->setContent(m_sampling);
-	samplinginfohover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
-	samplinginfohover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
-	samplinginfohover->setAnchorOffset(QPoint(-8, 6));
-	samplinginfohover->show();
-	samplinginfohover->setAttribute(Qt::WA_TransparentForMouseEvents);
-
-	HoverWidget *fpsHover = new HoverWidget(nullptr, plot->plot()->canvas(), plot->plot());
-	fpsHover->setContent(m_fps);
-	fpsHover->setAnchorPos(HoverPosition::HP_TOPLEFT);
-	fpsHover->setContentPos(HoverPosition::HP_BOTTOMRIGHT);
-	fpsHover->setAnchorOffset(QPoint(8, 26));
-	fpsHover->setAttribute(Qt::WA_TransparentForMouseEvents);
-	bool showFps = p->get("general_show_plot_fps").toBool();
-	fpsHover->setVisible(showFps);
-	connect(p, &Preferences::preferenceChanged, this, [=](QString name, QVariant type) {
-		if(name == "general_show_plot_fps") {
-			fpsHover->setVisible(p->get("general_show_plot_fps").toBool());
+		// align to right if it's a label
+		QLabel *labelInfo = dynamic_cast<QLabel *>(info);
+		if(labelInfo) {
+			labelInfo->setAlignment(Qt::AlignRight);
 		}
-	});
-
-	HoverWidget *timestampHover = new HoverWidget(nullptr, plot->plot()->canvas(), plot->plot());
-	timestampHover->setContent(m_timestamp);
-	timestampHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
-	timestampHover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
-	timestampHover->setAnchorOffset(QPoint(-8, 26));
-	timestampHover->show();
-	timestampHover->setAttribute(Qt::WA_TransparentForMouseEvents);
-
-	HoverWidget *statusHover = new HoverWidget(nullptr, plot->plot()->canvas(), plot->plot());
-	statusHover->setContent(m_status);
-	statusHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
-	statusHover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
-	statusHover->setAnchorOffset(QPoint(-8, 46));
-	statusHover->show();
-	statusHover->setAttribute(Qt::WA_TransparentForMouseEvents);
-#endif
+		break;
+	}
+	info->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 }
 
-TimePlotInfo::~TimePlotInfo() {}
-
-void TimePlotInfo::update(PlotSamplingInfo info)
+QLabel *PlotInfo::addLabelInfo(InfoPosition pos)
 {
-	PlotAxis *xAxis = m_plot->xAxis();
-	double currMin, currMax, axisMax, axisMin, divs;
-	bool zoomed;
+	QLabel *label = new QLabel();
+	StyleHelper::PlotInfoLabel(label);
+	addCustomInfo(label, pos);
 
-	axisMax = xAxis->max();
-	axisMin = xAxis->min();
-	currMax = xAxis->visibleMax();
-	currMin = xAxis->visibleMin();
-	zoomed = axisMax != currMax || axisMin != currMin;
-	divs = xAxis->divs();
-
-	m_hdiv->update(abs(currMax - currMin) / divs, zoomed);
-	m_sampling->update(info.plotSize, info.bufferSize, info.sampleRate);
+	return label;
 }
 
-void TimePlotInfo::updateStatus(QString status) { m_status->setText(status); }
+void PlotInfo::removeInfo(uint index, InfoPosition pos)
+{
+	QWidget *widget = getInfo(index, pos);
+	if(widget) {
+		switch(pos) {
+		case InfoPosition::IP_LEFT:
+			m_leftLayout->removeWidget(widget);
+			break;
 
-#include "moc_plotinfo.cpp"
+		case InfoPosition::IP_RIGHT:
+			m_rightLayout->removeWidget(widget);
+			break;
+		}
+		widget->setParent(nullptr);
+	}
+}
+
+QWidget *PlotInfo::getInfo(uint index, InfoPosition pos)
+{
+	switch(pos) {
+	case InfoPosition::IP_LEFT:
+		if(index >= m_leftLayout->count())
+			return nullptr;
+		return m_leftLayout->itemAt(index)->widget();
+
+	case InfoPosition::IP_RIGHT:
+		if(index >= m_rightLayout->count())
+			return nullptr;
+		return m_rightLayout->itemAt(index)->widget();
+	}
+
+	return nullptr;
+}
+
+void PlotInfo::initLayouts()
+{
+	// left info
+	m_leftInfo->setAttribute(Qt::WA_TransparentForMouseEvents);
+	m_leftLayout = new QVBoxLayout(m_leftInfo);
+	m_leftLayout->setSpacing(m_spacing);
+	m_leftLayout->setMargin(m_margin);
+
+	m_leftHover = new HoverWidget(m_leftInfo, m_parent, m_parent);
+	m_leftHover->setAnchorPos(HoverPosition::HP_TOPLEFT);
+	m_leftHover->setContentPos(HoverPosition::HP_BOTTOMRIGHT);
+	m_leftHover->setAttribute(Qt::WA_TransparentForMouseEvents);
+	m_leftHover->show();
+
+	// right info
+	m_rightInfo->setAttribute(Qt::WA_TransparentForMouseEvents);
+	m_rightLayout = new QVBoxLayout(m_rightInfo);
+	m_rightLayout->setSpacing(m_spacing);
+	m_rightLayout->setMargin(m_margin);
+
+	m_rightHover = new HoverWidget(m_rightInfo, m_parent, m_parent);
+	m_rightHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+	m_rightHover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
+	m_rightHover->setAttribute(Qt::WA_TransparentForMouseEvents);
+	m_rightHover->show();
+}
