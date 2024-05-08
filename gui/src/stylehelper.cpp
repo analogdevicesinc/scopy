@@ -198,7 +198,7 @@ void StyleHelper::TimePlotHDivInfo(QLabel *w, QString objectName)
 	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
 	w->setStyleSheet(style);
 }
-void StyleHelper::TimePlotSamplingInfo(QLabel *w, QString objectName)
+void StyleHelper::PlotInfoLabel(QLabel *w, QString objectName)
 {
 	QString style = QString(R"css(
 							color: rgba(192,192,192,255);

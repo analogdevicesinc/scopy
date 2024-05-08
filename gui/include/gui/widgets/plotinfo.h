@@ -1,90 +1,47 @@
 #ifndef PLOTINFO_H
 #define PLOTINFO_H
 
-#include "plotwidget.h"
-
-#include <QLabel>
+#include "hoverwidget.h"
 #include <QWidget>
-
-#include <plot_utils.hpp>
 #include <scopy-gui_export.h>
-#include <stylehelper.h>
 
+class QLabel;
 namespace scopy {
 
-class SCOPY_GUI_EXPORT TimePlotHDivInfo : public QLabel
+enum InfoPosition
 {
-	Q_OBJECT
-public:
-	TimePlotHDivInfo(QWidget *parent = nullptr);
-	virtual ~TimePlotHDivInfo();
-
-public Q_SLOTS:
-	void update(double val, bool zoomed = false);
-
-private:
-	MetricPrefixFormatter *m_mpf;
+	IP_LEFT,
+	IP_RIGHT
 };
 
-class SCOPY_GUI_EXPORT TimePlotSamplingInfo : public QLabel
+class SCOPY_GUI_EXPORT PlotInfo : public QWidget
 {
 	Q_OBJECT
 public:
-	TimePlotSamplingInfo(QWidget *parent = nullptr);
-	virtual ~TimePlotSamplingInfo();
+	PlotInfo(QWidget *parent = nullptr);
+	virtual ~PlotInfo();
 
-public Q_SLOTS:
-	void update(int ps, int bs, double sr);
+	void addCustomInfo(QWidget *info, InfoPosition pos);
+	QLabel *addLabelInfo(InfoPosition pos);
+
+	void removeInfo(uint index, InfoPosition pos);
+	QWidget *getInfo(uint index, InfoPosition pos);
+
+protected:
+	void initLayouts();
 
 private:
-	MetricPrefixFormatter *m_mpf;
-};
+	QWidget *m_parent;
+	int m_margin;
+	int m_spacing;
 
-class SCOPY_GUI_EXPORT TimePlotFPS : public QLabel
-{
-	Q_OBJECT
-public:
-	TimePlotFPS(QWidget *parent = nullptr);
-	virtual ~TimePlotFPS();
+	QWidget *m_leftInfo;
+	HoverWidget *m_leftHover;
+	QVBoxLayout *m_leftLayout;
 
-public Q_SLOTS:
-	void update(qint64 timestamp);
-
-private:
-	QList<qint64> *m_replotTimes;
-	qint64 m_lastTimeStamp;
-	int m_avgSize;
-};
-
-class SCOPY_GUI_EXPORT GenericInfoLabel : public QLabel
-{
-	Q_OBJECT
-public:
-	GenericInfoLabel(QWidget *parent = nullptr);
-	virtual ~GenericInfoLabel();
-};
-
-class SCOPY_GUI_EXPORT TimePlotVDivInfo : public QWidget
-{};
-
-class SCOPY_GUI_EXPORT TimePlotInfo : public QWidget
-{
-	Q_OBJECT
-public:
-	TimePlotInfo(PlotWidget *plot, QWidget *parent = nullptr);
-	virtual ~TimePlotInfo();
-
-public Q_SLOTS:
-	void update(PlotSamplingInfo info);
-	void updateStatus(QString status);
-
-private:
-	PlotWidget *m_plot;
-	TimePlotHDivInfo *m_hdiv;
-	TimePlotSamplingInfo *m_sampling;
-	GenericInfoLabel *m_status;
-	TimePlotFPS *m_fps;
-	GenericInfoLabel *m_timestamp;
+	QWidget *m_rightInfo;
+	HoverWidget *m_rightHover;
+	QVBoxLayout *m_rightLayout;
 };
 
 } // namespace scopy

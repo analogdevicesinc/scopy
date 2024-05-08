@@ -12,6 +12,7 @@
 #include <QwtPlotLayout>
 #include <QwtPlotOpenGLCanvas>
 #include <QwtPlotSeriesItem>
+#include <plotinfowidgets.h>
 #include <plotnavigator.hpp>
 #include <plottracker.hpp>
 
@@ -76,6 +77,7 @@ PlotWidget::PlotWidget(QWidget *parent)
 	m_plot->plotLayout()->setSpacing(0);
 
 	setupNavigator();
+	setupPlotInfo();
 
 	m_plot->canvas()->installEventFilter(this);
 }
@@ -88,7 +90,7 @@ void PlotWidget::setupNavigator()
 	m_tracker = new PlotTracker(this);
 }
 
-void PlotWidget::addPlotInfoSlot(QWidget *w) { m_layout->addWidget(w, 0, 0); }
+PlotInfo *PlotWidget::getPlotInfo() { return m_plotInfo; }
 
 PlotWidget::~PlotWidget() {}
 
@@ -237,6 +239,8 @@ PlotAxis *PlotWidget::yAxis() { return m_yAxis; }
 
 QwtPlot *PlotWidget::plot() const { return m_plot; }
 
+QGridLayout *PlotWidget::layout() { return m_layout; }
+
 void PlotWidget::replot() { m_plot->replot(); }
 
 void PlotWidget::hideAxisLabels()
@@ -260,6 +264,13 @@ void PlotWidget::hideDefaultAxis()
 	m_plot->setAxisVisible(QwtAxisId(QwtAxis::XTop, 0), false);
 	m_plot->setAxisVisible(QwtAxisId(QwtAxis::YLeft, 0), false);
 	m_plot->setAxisVisible(QwtAxisId(QwtAxis::YRight, 0), false);
+}
+
+void PlotWidget::setupPlotInfo()
+{
+	m_plotInfo = new PlotInfo(m_plot->canvas());
+	m_plotInfo->addCustomInfo(new HDivInfo(this), InfoPosition::IP_LEFT);
+	m_plotInfo->addCustomInfo(new FPSInfo(this), InfoPosition::IP_LEFT);
 }
 
 bool PlotWidget::showYAxisLabels() const { return m_showYAxisLabels; }
