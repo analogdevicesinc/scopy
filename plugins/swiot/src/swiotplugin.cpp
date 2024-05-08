@@ -2,6 +2,7 @@
 
 #include <QLoggingCategory>
 #include <QLabel>
+#include <stylehelper.h>
 
 #include "swiot_logging_categories.h"
 #include "max14906/max14906.h"
