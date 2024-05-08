@@ -1,6 +1,5 @@
 #ifndef PLOT_H
 #define PLOT_H
-#include "handles_area.hpp"
 #include "plotchannel.h"
 #include "scopy-gui_export.h"
 
@@ -8,6 +7,7 @@
 #include <QWidget>
 #include <QwtPlot>
 #include <QwtPlotZoomer>
+#include <plotinfo.h>
 
 #include <buffer_previewer.hpp>
 #include <graticule.h>
@@ -57,6 +57,7 @@ public:
 	bool eventFilter(QObject *object, QEvent *event) override;
 
 	QwtPlot *plot() const;
+	QGridLayout *layout();
 
 	void addPlotAxisHandle(PlotAxisHandle *ax);
 	void removePlotAxisHandle(PlotAxisHandle *ax);
@@ -69,7 +70,7 @@ public:
 	bool showYAxisLabels() const;
 	void setShowYAxisLabels(bool newShowYAxisLabels);
 
-	void addPlotInfoSlot(QWidget *w);
+	PlotInfo *getPlotInfo();
 
 	PlotAxis *plotAxisFromId(QwtAxisId axisId);
 
@@ -126,12 +127,14 @@ private:
 	PlotChannel *m_selectedChannel;
 
 	BufferPreviewer *m_bufferPreviewer;
+	PlotInfo *m_plotInfo;
 
 	void setAxisScalesVisible(bool visible);
 	void setupAxisScales();
 	void setupOpenGLCanvas();
 	void setupNavigator();
 	void hideDefaultAxis();
+	void setupPlotInfo();
 };
 
 } // namespace scopy

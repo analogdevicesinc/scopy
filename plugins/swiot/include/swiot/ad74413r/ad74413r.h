@@ -77,6 +77,7 @@ Q_SIGNALS:
 	void updateDiagSamplingFreq();
 	void activateRunBtns(bool activate);
 	void configBtnPressed();
+	void updateSamplingInfo();
 
 private Q_SLOTS:
 	void onConfigBtnPressed();
@@ -135,7 +136,7 @@ private:
 	InfoBtn *m_infoBtn;
 
 	PlotWidget *m_plot;
-	TimePlotInfo *m_info;
+	PlotInfo *m_info;
 	PlotSamplingInfo m_currentSamplingInfo;
 	QMap<int, PlotChannel *> m_plotChnls;
 
