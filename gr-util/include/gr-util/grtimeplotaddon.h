@@ -72,6 +72,7 @@ Q_SIGNALS:
 	void requestStop();
 	void newData();
 	void xAxisUpdated();
+	void statusChanged(QString status);
 
 public Q_SLOTS:
 	void enable() override;
@@ -141,7 +142,6 @@ private:
 	GRTimeChannelAddon *m_fft_source[2];
 
 	PlotBufferPreviewer *m_bufferPreviewer;
-	TimePlotInfo *m_info;
 	time_sink_f::sptr time_sink;
 	//	fft_sink_f::sptr fft_sink;
 	gr::blocks::stream_to_vector::sptr s2v, s2v_complex;
@@ -157,6 +157,7 @@ private:
 	QList<GRTimeChannelAddon *> grChannels;
 	QVBoxLayout *m_lay;
 	void setupBufferPreviewer();
+	void setupPlotInfo();
 
 	QFuture<void> refillFuture;
 	QFutureWatcher<void> *fw;
@@ -179,7 +180,6 @@ private:
 	void updateXAxis();
 	void updateFrameRate();
 	void drawTags();
-	QWidget *createPlotInfoSlot(QWidget *parent);
 };
 } // namespace grutil
 } // namespace scopy
