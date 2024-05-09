@@ -1,8 +1,6 @@
 #ifndef CHNLINFO_H
 #define CHNLINFO_H
 
-#include "plot_utils.hpp"
-
 #include <iio.h>
 
 #include <QMap>
