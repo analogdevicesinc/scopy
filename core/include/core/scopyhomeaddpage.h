@@ -13,6 +13,7 @@
 
 #include <QFuture>
 #include <QWidget>
+#include <menucollapsesection.h>
 
 namespace Ui {
 class ScopyHomeAddPage;
@@ -45,10 +46,10 @@ private Q_SLOTS:
 private:
 	void addTabs();
 	void initAddPage();
-	void initSubSections();
 	void loadDeviceInfoPage();
 	void initializeDevice();
 	void removePluginsCheckBoxes();
+	void setupInfoSection();
 
 	Ui::ScopyHomeAddPage *ui;
 	EmuWidget *emuWidget;
@@ -60,6 +61,8 @@ private:
 	PluginManager *pluginManager;
 	DeviceImpl *deviceImpl;
 	QList<PluginEnableWidget *> pluginDescriptionList;
+
+	MenuCollapseSection *m_pluginBrowserSection;
 };
 } // namespace scopy
 #endif // SCOPYHOMEADDPAGE_H
