@@ -27,10 +27,6 @@
 
 #include <iio.h>
 #include <gui/widgets/toolbuttons.h>
-
-#include <gui/channel_manager.hpp>
-#include <gui/generic_menu.hpp>
-#include <gui/tool_view.hpp>
 #include <gui/tooltemplate.h>
 
 namespace scopy::swiotrefactor {

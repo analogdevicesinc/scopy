@@ -25,8 +25,6 @@
 #include <QThread>
 #include <QTimer>
 #include <gui/stylehelper.h>
-#include <gui/channel_manager.hpp>
-#include <gui/tool_view_builder.hpp>
 
 using namespace scopy::swiotrefactor;
 
