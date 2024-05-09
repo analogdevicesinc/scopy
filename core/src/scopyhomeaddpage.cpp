@@ -7,6 +7,7 @@
 #include <QFuture>
 #include <QLoggingCategory>
 #include <QtConcurrent>
+#include <menusectionwidget.h>
 
 Q_LOGGING_CATEGORY(CAT_HOME_ADD_PAGE, "ScopyHomeAddPage")
 
@@ -22,7 +23,7 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm)
 	this->setProperty("device_page", true);
 	addTabs();
 	initAddPage();
-	initSubSections();
+	setupInfoSection();
 	pendingUri = "";
 
 	connect(ui->btnAdd, &QPushButton::clicked, this, &ScopyHomeAddPage::addBtnClicked);
@@ -68,20 +69,6 @@ void ScopyHomeAddPage::initAddPage()
 	ui->btnAdd->setProperty("blue_button", QVariant(true));
 	ui->btnBack->setProperty("blue_button", QVariant(true));
 	ui->btnAdd->setAutoDefault(true);
-}
-
-void ScopyHomeAddPage::initSubSections()
-{
-	ui->devicePluginBrowser->setLabel("Compatible plugins");
-	ui->devicePluginBrowser->getContentWidget()->layout()->setSpacing(10);
-
-	ui->deviceInfo->setLabel("Device info");
-	deviceInfoPage = new InfoPage(ui->deviceInfo->getContentWidget());
-	deviceInfoPage->setAdvancedMode(false);
-	deviceInfoPage->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	ui->deviceInfo->getContentWidget()->layout()->addWidget(deviceInfoPage);
-	QSpacerItem *vSpacer = new QSpacerItem(40, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
-	ui->deviceInfo->getContentWidget()->layout()->addItem(vSpacer);
 }
 
 void ScopyHomeAddPage::futureVerify(QString uri, QString cat)
@@ -131,12 +118,11 @@ void ScopyHomeAddPage::deviceLoaderInitialized()
 {
 	QList<Plugin *> plugins = deviceImpl->plugins();
 	for(Plugin *p : qAsConst(plugins)) {
-		PluginEnableWidget *pluginDescription =
-			new PluginEnableWidget(ui->devicePluginBrowser->getContentWidget());
+		PluginEnableWidget *pluginDescription = new PluginEnableWidget(m_pluginBrowserSection);
 		pluginDescription->setDescription(p->description());
 		pluginDescription->checkBox()->setText(p->name());
 		pluginDescription->checkBox()->setChecked(p->enabled());
-		ui->devicePluginBrowser->getContentWidget()->layout()->addWidget(pluginDescription);
+		m_pluginBrowserSection->contentLayout()->addWidget(pluginDescription);
 		pluginDescriptionList.push_back(pluginDescription);
 		connect(pluginDescription->checkBox(), &QCheckBox::toggled, this, [=](bool en) { p->setEnabled(en); });
 	}
@@ -187,6 +173,26 @@ void ScopyHomeAddPage::removePluginsCheckBoxes()
 {
 	qDeleteAll(pluginDescriptionList);
 	pluginDescriptionList.clear();
+}
+
+void ScopyHomeAddPage::setupInfoSection()
+{
+	MenuCollapseSection *deviceInfoSection =
+		new MenuCollapseSection("Device info", MenuCollapseSection::MHCW_ONOFF, ui->infoSection);
+	deviceInfoSection->contentLayout()->setSpacing(10);
+
+	deviceInfoPage = new InfoPage(deviceInfoSection);
+	deviceInfoPage->setAdvancedMode(false);
+	deviceInfoPage->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	deviceInfoSection->contentLayout()->addWidget(deviceInfoPage);
+
+	m_pluginBrowserSection =
+		new MenuCollapseSection("Compatible plugins", MenuCollapseSection::MHCW_ONOFF, ui->infoSection);
+	m_pluginBrowserSection->contentLayout()->setSpacing(10);
+
+	ui->infoSection->layout()->addWidget(deviceInfoSection);
+	ui->infoSection->layout()->addWidget(m_pluginBrowserSection);
+	ui->infoSection->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 }
 
 #include "moc_scopyhomeaddpage.cpp"
