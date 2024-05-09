@@ -27,7 +27,6 @@
 #include <gui/lcdNumber.hpp>
 #include <gui/smallOnOffSwitch.h>
 #include <gui/plotwidget.h>
-#include <gui/generic_menu.hpp>
 #include <gui/customSwitch.h>
 #include <gui/widgets/menucombo.h>
 
