@@ -90,7 +90,7 @@ void PlotNavigator::initResetButton()
 	connect(m_resetButton, &QPushButton::clicked, this, [=]() { Q_EMIT reset(); });
 	connect(this, &PlotNavigator::rectChanged, this, [=]() { m_resetButton->setVisible(isZoomed()); });
 
-	m_resetHover = new HoverWidget(m_resetButton, m_plot, m_plot);
+	m_resetHover = new HoverWidget(m_resetButton, m_plot->canvas(), m_plot->canvas());
 	m_resetHover->setAnchorPos(HoverPosition::HP_BOTTOMRIGHT);
 	m_resetHover->setContentPos(HoverPosition::HP_TOPLEFT);
 	m_resetHover->setAnchorOffset(QPoint(-6, -6));
