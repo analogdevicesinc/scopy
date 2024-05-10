@@ -9,7 +9,8 @@
 using namespace scopy;
 using namespace datamonitor;
 
-MonitorSelectionMenu::MonitorSelectionMenu(QMap<QString, DataMonitorModel *> *monitorList, QWidget *parent)
+MonitorSelectionMenu::MonitorSelectionMenu(QMap<QString, DataMonitorModel *> *monitorList, QButtonGroup *monitorsGroup,
+					   QWidget *parent)
 	: QWidget{parent}
 {
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -42,8 +43,7 @@ MonitorSelectionMenu::MonitorSelectionMenu(QMap<QString, DataMonitorModel *> *mo
 	importedChannelsWidgetLayout->setSpacing(10);
 	importedChannelsWidget->setLayout(importedChannelsWidgetLayout);
 
-	m_monitorsGroup = new SemiExclusiveButtonGroup(this);
-	m_monitorsGroup->setExclusive(true);
+	m_monitorsGroup = monitorsGroup;
 
 	foreach(QString monitor, monitorList->keys()) {
 		addMonitor(monitorList->value(monitor));
@@ -113,11 +113,11 @@ void MonitorSelectionMenu::addMonitor(DataMonitorModel *monitor)
 	monitorChannel->setStyleSheet(monitorChannel->styleSheet() +
 				      QString(":hover{ background-color: %1 ; }").arg(monitor->getColor().name()));
 
-	connect(monitorChannel, &MenuControlButton::clicked, this, [=, this]() {
+	connect(monitorChannel, &MenuControlButton::toggled, this, [=, this](bool toggled) {
 		if(!monitorChannel->checkBox()->isChecked()) {
 			monitorChannel->checkBox()->setChecked(true);
 		}
-		Q_EMIT requestMonitorMenu(monitor->getName());
+		Q_EMIT requestMonitorMenu(toggled, monitor->getName());
 	});
 
 	connect(monitorChannel->checkBox(), &QCheckBox::toggled, this,
@@ -139,9 +139,4 @@ void MonitorSelectionMenu::removeDevice(QString device)
 	}
 }
 
-SemiExclusiveButtonGroup *MonitorSelectionMenu::monitorsGroup() const { return m_monitorsGroup; }
-
-void MonitorSelectionMenu::setMonitorsGroup(SemiExclusiveButtonGroup *newMonitorsGroup)
-{
-	m_monitorsGroup = newMonitorsGroup;
-}
+QButtonGroup *MonitorSelectionMenu::monitorsGroup() const { return m_monitorsGroup; }
