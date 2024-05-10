@@ -12,7 +12,7 @@ HDivInfo::HDivInfo(PlotWidget *plot, QWidget *parent)
 	: m_mpf(new MetricPrefixFormatter(this))
 	, m_plot(plot)
 {
-	StyleHelper::TimePlotHDivInfo(this);
+	StyleHelper::PlotInfoLabel(this);
 	m_mpf->setTrimZeroes(true);
 	connect(m_plot->navigator(), &PlotNavigator::rectChanged, this, &HDivInfo::onRectChanged);
 
