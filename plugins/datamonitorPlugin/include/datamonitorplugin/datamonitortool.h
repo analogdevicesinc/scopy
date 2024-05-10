@@ -45,6 +45,8 @@ private:
 
 	ToolTemplate *tool;
 	GearBtn *settingsButton;
+	QPushButton *openLastMenuBtn;
+	QButtonGroup *rightMenuBtnGrp;
 	InfoBtn *infoBtn;
 	PrintBtn *printBtn;
 	RunBtn *runBtn;
