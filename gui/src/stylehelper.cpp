@@ -188,16 +188,6 @@ void StyleHelper::MeasurementSelectorItemWidget(QString iconPath, MeasurementSel
 	//	StyleHelper::MenuSmallLabel(statsLabel);
 }
 
-void StyleHelper::TimePlotHDivInfo(QLabel *w, QString objectName)
-{
-	QString style = QString(R"css(
-							color: &&ScopyBlue&&;
-							font-weight: 500;
-							font-size: 12px;
-							)css");
-	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
-	w->setStyleSheet(style);
-}
 void StyleHelper::PlotInfoLabel(QLabel *w, QString objectName)
 {
 	QString style = QString(R"css(
