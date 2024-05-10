@@ -13,10 +13,9 @@
 Q_LOGGING_CATEGORY(CAT_EMU_ADD_PAGE, "EmuAddPage")
 using namespace scopy;
 
-EmuWidget::EmuWidget(QString path, QWidget *parent)
+EmuWidget::EmuWidget(QWidget *parent)
 	: QWidget(parent)
 	, m_ui(new Ui::EmuWidget)
-	, m_emuPath(path)
 	, m_enableDemo(false)
 	, m_emuProcess(nullptr)
 {
