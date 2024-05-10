@@ -31,12 +31,14 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	tool->leftContainer()->setVisible(true);
 	tool->rightContainer()->setVisible(true);
 	tool->bottomContainer()->setVisible(true);
-	tool->topContainerMenuControl()->setVisible(false);
 
 	lay->addWidget(tool);
 
 	settingsButton = new GearBtn(this);
 	settingsButton->setChecked(true);
+	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), true, this);
+	rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn *>(openLastMenuBtn)->getButtonGroup();
+
 	infoBtn = new InfoBtn(this);
 	printBtn = new PrintBtn(this);
 	runBtn = new RunBtn(this);
@@ -72,7 +74,8 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	tool->addWidgetToTopContainerHelper(runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(clearBtn, TTA_RIGHT);
 
-	tool->addWidgetToTopContainerHelper(settingsButton, TTA_RIGHT);
+	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
+	tool->addWidgetToTopContainerMenuControlHelper(settingsButton, TTA_LEFT);
 
 	tool->addWidgetToTopContainerHelper(addMonitorButton, TTA_LEFT);
 
@@ -139,8 +142,9 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	connect(m_dataMonitorSettings, &DataMonitorSettings::titleUpdated, this,
 		&DatamonitorTool::settingsTitleChanged);
 	connect(settingsButton, &GearBtn::toggled, this, [=, this](bool toggled) {
-		tool->openRightContainerHelper(toggled);
-		tool->requestMenu(DataMonitorUtils::getToolSettingsId());
+		if(toggled) {
+			tool->requestMenu(DataMonitorUtils::getToolSettingsId());
+		}
 	});
 
 	/// 7 segments settings ///
@@ -223,8 +227,10 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	}
 
 	/////////////////monitor selection menu ///////////////
-	m_monitorSelectionMenu = new MonitorSelectionMenu(dataAcquisitionManager->getDataMonitorMap());
-	m_monitorSelectionMenu->monitorsGroup()->addButton(settingsButton);
+	m_monitorSelectionMenu = new MonitorSelectionMenu(dataAcquisitionManager->getDataMonitorMap(), rightMenuBtnGrp);
+
+	rightMenuBtnGrp->addButton(settingsButton);
+
 	tool->leftStack()->add("Monitors", m_monitorSelectionMenu);
 
 	connect(m_dataAcquisitionManager, &DataAcquisitionManager::monitorAdded, this,
@@ -265,10 +271,12 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	connect(m_monitorSelectionMenu, &MonitorSelectionMenu::requestRemoveImportedDevice, m_dataAcquisitionManager,
 		&DataAcquisitionManager::removeDevice);
 
-	connect(m_monitorSelectionMenu, &MonitorSelectionMenu::requestMonitorMenu, this, [=, this](QString monitor) {
-		tool->openRightContainerHelper(true);
-		tool->requestMenu(monitor);
-	});
+	connect(m_monitorSelectionMenu, &MonitorSelectionMenu::requestMonitorMenu, this,
+		[=, this](bool toggled, QString monitor) {
+			if(toggled) {
+				tool->requestMenu(monitor);
+			}
+		});
 
 	initTutorialProperties();
 	DataMonitorStyleHelper::DataMonitorToolStyle(this);
