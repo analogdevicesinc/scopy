@@ -12,6 +12,7 @@
 #include <iio.h>
 
 #include <QFuture>
+#include <QStackedWidget>
 #include <QWidget>
 #include <menucollapsesection.h>
 
@@ -44,25 +45,31 @@ private Q_SLOTS:
 	void onEmuDeviceAvailable(QString uri);
 
 private:
-	void addTabs();
-	void initAddPage();
 	void loadDeviceInfoPage();
 	void initializeDevice();
 	void removePluginsCheckBoxes();
-	void setupInfoSection();
+	QTabWidget *createTabWidget(QWidget *parent);
+	QWidget *createInfoSection(QWidget *parent);
+	QWidget *createBtnsWidget(QWidget *parent);
+	QWidget *createAddPage(QWidget *parent);
 
-	Ui::ScopyHomeAddPage *ui;
-	EmuWidget *emuWidget;
-	IioTabWidget *iioTabWidget;
-	QString pendingUri;
-	QFutureWatcher<bool> *fw;
+	EmuWidget *m_emuWidget;
+	IioTabWidget *m_iioTabWidget;
+	QString m_pendingUri;
+	QFutureWatcher<bool> *m_fw;
 
-	InfoPage *deviceInfoPage;
-	PluginManager *pluginManager;
-	DeviceImpl *deviceImpl;
-	QList<PluginEnableWidget *> pluginDescriptionList;
+	InfoPage *m_deviceInfoPage;
+	PluginManager *m_pluginManager;
+	DeviceImpl *m_deviceImpl;
+	QList<PluginEnableWidget *> m_pluginDescriptionList;
 
 	MenuCollapseSection *m_pluginBrowserSection;
+	QPushButton *m_addBtn;
+	QPushButton *m_backBtn;
+	QLabel *m_connLostLabel;
+	QWidget *m_addPage;
+	QTabWidget *m_tabWidget;
+	QStackedWidget *m_stackedWidget;
 };
 } // namespace scopy
 #endif // SCOPYHOMEADDPAGE_H
