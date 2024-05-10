@@ -16,25 +16,25 @@ class MonitorSelectionMenu : public QWidget
 	friend class DataMonitorStyleHelper;
 	Q_OBJECT
 public:
-	explicit MonitorSelectionMenu(QMap<QString, DataMonitorModel *> *monitorList, QWidget *parent = nullptr);
+	explicit MonitorSelectionMenu(QMap<QString, DataMonitorModel *> *monitorList, QButtonGroup *monitorsGroup,
+				      QWidget *parent = nullptr);
 
 	void addMonitor(DataMonitorModel *monitor);
 	void removeDevice(QString device);
 
-	SemiExclusiveButtonGroup *monitorsGroup() const;
-	void setMonitorsGroup(SemiExclusiveButtonGroup *newMonitorsGroup);
+	QButtonGroup *monitorsGroup() const;
 
 Q_SIGNALS:
 	void monitorToggled(bool toggled, QString monitorName);
 	void removeMonitor();
 	void requestRemoveImportedDevice(QString device);
-	void requestMonitorMenu(QString monitorName);
+	void requestMonitorMenu(bool toggled, QString monitorName);
 
 private:
 	QWidget *deviceChannelsWidget;
 	QWidget *importedChannelsWidget;
 	QVBoxLayout *layout;
-	SemiExclusiveButtonGroup *m_monitorsGroup;
+	QButtonGroup *m_monitorsGroup;
 	QMap<QString, MenuCollapseSection *> deviceMap;
 
 	void generateDeviceSection(QString device, bool import = false);
