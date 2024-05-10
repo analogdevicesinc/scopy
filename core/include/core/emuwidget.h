@@ -16,7 +16,7 @@ class SCOPY_CORE_EXPORT EmuWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit EmuWidget(QString path = "", QWidget *parent = nullptr);
+	explicit EmuWidget(QWidget *parent = nullptr);
 	~EmuWidget();
 
 Q_SIGNALS:
