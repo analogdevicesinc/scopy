@@ -250,6 +250,7 @@ void StyleHelper::RefreshButton(QPushButton *btn, QString objectName)
 							font-size: 12px;
 							text-align: center;
 							font-weight: bold;
+							background-color: &&ScopyBlue&&;
 						}
 						)css");
 
@@ -1283,6 +1284,40 @@ void StyleHelper::NoBackgroundIconButton(QPushButton *w, QIcon icon, QString obj
 			}
 			)css");
 	w->setStyleSheet(style);
+}
+
+void StyleHelper::BackgroundAddPage(QWidget *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+	QString style = QString(R"css(
+		QWidget {
+			background-color: &&ScopyBackground&&;
+		}
+		)css");
+	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::BrowseButton(QPushButton *btn, QString objectName)
+{
+	if(!objectName.isEmpty())
+		btn->setObjectName(objectName);
+	btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	btn->setFixedSize(30, 30);
+	QString style = QString(R"css(
+						QPushButton {
+							font-size: 12px;
+							text-align: center;
+							font-weight: bold;
+							background-color: &&ScopyBlue&&;
+						}
+						)css");
+
+	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
+	btn->setStyleSheet(style);
+	btn->setProperty("blue_button", true);
+	btn->setText("...");
 }
 
 #include "moc_stylehelper.cpp"

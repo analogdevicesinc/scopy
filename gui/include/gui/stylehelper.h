@@ -103,6 +103,8 @@ public:
 	static void HoverToolTip(QWidget *w, QString info, QString objectName = "");
 	static void WarningLabel(QLabel *w, QString objectName = "");
 	static void NoBackgroundIconButton(QPushButton *w, QIcon icon, QString objectName = "");
+	static void BackgroundAddPage(QWidget *w, QString objectName = "");
+	static void BrowseButton(QPushButton *btn, QString objectName = "");
 
 private:
 	QMap<QString, QString> colorMap;
