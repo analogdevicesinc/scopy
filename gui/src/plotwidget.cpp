@@ -60,7 +60,20 @@ PlotWidget::PlotWidget(QWidget *parent)
 	EdgelessPlotGrid *d_grid = new EdgelessPlotGrid();
 	QColor majorPenColor(gridpen.color());
 	d_grid->setMajorPen(majorPenColor, 1.0, Qt::DashLine);
-	d_grid->attach(m_plot);
+	if(Preferences::GetInstance()->get("show_grid").toBool()) {
+		d_grid->attach(m_plot);
+	}
+	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this,
+		[=](QString preference, QVariant value) {
+			if(preference == "show_grid") {
+				if(value.toBool()) {
+					d_grid->attach(m_plot);
+				} else {
+					d_grid->detach();
+				}
+				m_plot->replot();
+			}
+		});
 
 	//	QwtPlotMarker *d_origin = new QwtPlotMarker();
 	//	d_origin->setLineStyle( QwtPlotMarker::Cross );
@@ -269,8 +282,20 @@ void PlotWidget::hideDefaultAxis()
 void PlotWidget::setupPlotInfo()
 {
 	m_plotInfo = new PlotInfo(m_plot->canvas());
-	m_plotInfo->addCustomInfo(new HDivInfo(this), InfoPosition::IP_LEFT);
 	m_plotInfo->addCustomInfo(new FPSInfo(this), InfoPosition::IP_LEFT);
+
+	HDivInfo *hDivInfo = new HDivInfo(this);
+	m_plotInfo->addCustomInfo(hDivInfo, InfoPosition::IP_LEFT);
+
+	if(!Preferences::GetInstance()->get("show_grid").toBool()) {
+		hDivInfo->hide();
+	}
+	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this,
+		[=](QString preference, QVariant value) {
+			if(preference == "show_grid") {
+				hDivInfo->setVisible(value.toBool());
+			}
+		});
 }
 
 bool PlotWidget::showYAxisLabels() const { return m_showYAxisLabels; }
