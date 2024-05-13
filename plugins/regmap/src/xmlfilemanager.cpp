@@ -212,10 +212,8 @@ BitFieldModel *XmlFileManager::getBitField(QDomElement bitField)
 			description, bitField.firstChildElement("Visibility").firstChild().toText().data(),
 			bitField.firstChildElement("Width").firstChild().toText().data().toInt(),
 			bitField.firstChildElement("Notes").firstChild().toText().data(),
-			Utils::convertQStringToUint32(
-				bitField.firstChildElement("BitOffset").firstChild().toText().data()),
-			Utils::convertQStringToUint32(
-				bitField.firstChildElement("RegOffset").firstChild().toText().data()),
+			bitField.firstChildElement("BitOffset").firstChild().toText().data().toInt(),
+			bitField.firstChildElement("RegOffset").firstChild().toText().data().toInt(),
 			bitField.firstChildElement("SliceWidth").firstChild().toText().data().toInt(), options);
 	}
 	return nullptr;
