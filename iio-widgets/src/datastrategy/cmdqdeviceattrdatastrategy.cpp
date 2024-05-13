@@ -109,6 +109,7 @@ void CmdQDeviceAttrDataStrategy::attributeReadFinished(Command *cmd)
 	} else if(!m_recipe.iioDataOptions.isEmpty()) {
 		// if we have an attribute we have to read, we should read it, increase the counter and emit if
 		// possible
+		m_dataRead = newData;
 		Command *readOptionalCommand = new IioDeviceAttributeRead(
 			m_recipe.device, m_recipe.iioDataOptions.toStdString().c_str(), nullptr);
 		QObject::connect(readOptionalCommand, &Command::finished, this,
