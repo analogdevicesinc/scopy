@@ -6,12 +6,6 @@
             "use_bitfield_description_as_name": true
         },
         {
-            "file_name": "AD74412.xml",
-            "compatible_drivers": [
-                "ad74413r"
-            ]
-        },
-        {
             "file_name": "adis16505-2.xml",
             "bits_per_row": 16
         }
