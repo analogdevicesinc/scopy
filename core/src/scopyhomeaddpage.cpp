@@ -16,7 +16,7 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm)
 	, m_pluginManager(pm)
 	, m_deviceImpl(nullptr)
 {
-	StyleHelper::BackgroundPage(this, "add_page");
+	StyleHelper::BackgroundAddPage(this, "add");
 	setProperty("device_page", true);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *layout = new QVBoxLayout(this);
