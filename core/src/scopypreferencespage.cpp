@@ -204,6 +204,8 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
 		p, "general_show_status_bar", "Enable the status bar for displaying important messages.",
 		generalSection));
+	generalSection->contentLayout()->addWidget(
+		PreferencesHelper::addPreferenceCheckBox(p, "show_grid", "Show Grid", generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
 		p, "general_theme", "Theme", {"default", "light"}, generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
