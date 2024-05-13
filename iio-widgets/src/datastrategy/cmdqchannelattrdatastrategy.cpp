@@ -107,6 +107,7 @@ void CmdQChannelAttrDataStrategy::attributeReadFinished(Command *cmd)
 		Q_EMIT emitStatus(QDateTime::currentDateTime(), oldData, m_dataRead, tcmd->getReturnCode(), true);
 		Q_EMIT sendData(m_dataRead, m_optionalDataRead);
 	} else if(!m_recipe.iioDataOptions.isEmpty()) {
+		m_dataRead = newData;
 		Command *readOptionalCommand = new IioChannelAttributeRead(
 			m_recipe.channel, m_recipe.iioDataOptions.toStdString().c_str(), nullptr);
 		QObject::connect(readOptionalCommand, &Command::finished, this,
