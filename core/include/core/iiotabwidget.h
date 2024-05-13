@@ -1,12 +1,12 @@
 #ifndef IIOTABWIDGET_H
 #define IIOTABWIDGET_H
 
+#include "menucombo.h"
+#include <QComboBox>
 #include <QFutureWatcher>
 #include <QWidget>
-
-namespace Ui {
-class IioTabWidget;
-}
+#include <animationpushbutton.h>
+#include <menulineedit.h>
 
 namespace scopy {
 
@@ -34,20 +34,38 @@ private Q_SLOTS:
 	void verifyBtnClicked();
 
 private:
-	Ui::IioTabWidget *m_ui;
-	QFutureWatcher<int> *fwScan;
-	QFutureWatcher<QVector<QString>> *fwSerialScan;
-	QStringList scanParamsList;
-	QStringList scanList;
-
-	void init();
-	void verifyIioBackend();
+	void setupConnections();
+	QStringList computeBackendsList();
 	void addScanFeedbackMsg(QString message);
-	void createBackEndCheckBox(QString backEnd);
+	QCheckBox *createBackendCheckBox(QString backEnd, QWidget *parent);
+	void setupFilterWidget(QStringList backednsList);
 	QString getSerialPath();
+	bool isSerialCompatible();
+	void setupBtnLdIcon(AnimationPushButton *btn);
+	QWidget *createFilterWidget(QWidget *parent);
+	QWidget *createAvlCtxWidget(QWidget *parent);
+	QWidget *createSerialSettWidget(QWidget *parent);
+	QWidget *createUriWidget(QWidget *parent);
+	QWidget *createVerifyBtnWidget(QWidget *parent);
 
-	const QVector<unsigned int> availableBaudRates = {2400,	 4800,	 9600,	 14400,	 19200, 38400,
-							  57600, 115200, 230400, 460800, 921600};
+	QWidget *m_filterWidget;
+	QComboBox *m_avlCtxCb;
+	MenuCombo *m_serialPortCb;
+	MenuCombo *m_baudRateCb;
+	MenuLineEdit *m_serialFrameEdit;
+	MenuLineEdit *m_uriEdit;
+	QLabel *m_uriMsgLabel;
+	AnimationPushButton *m_btnScan;
+	AnimationPushButton *m_btnSerialScan;
+	AnimationPushButton *m_btnVerify;
+
+	QFutureWatcher<int> *m_fwScan;
+	QFutureWatcher<QVector<QString>> *m_fwSerialScan;
+	QStringList m_scanParamsList;
+	QStringList m_scanList;
+
+	const QVector<unsigned int> m_availableBaudRates = {2400,  4800,   9600,   14400,  19200, 38400,
+							    57600, 115200, 230400, 460800, 921600};
 };
 } // namespace scopy
 
