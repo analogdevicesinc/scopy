@@ -3,8 +3,6 @@
 #include "iioutil/scopy-iioutil_config.h"
 #include "qtconcurrentrun.h"
 
-#include "ui_iiotabwidget.h"
-
 #include <iio.h>
 
 #include <QCheckBox>
@@ -19,187 +17,191 @@ using namespace scopy;
 
 IioTabWidget::IioTabWidget(QWidget *parent)
 	: QWidget(parent)
-	, m_ui(new Ui::IioTabWidget())
 {
-	m_ui->setupUi(this);
-	init();
-	verifyIioBackend();
+	QHBoxLayout *layout = new QHBoxLayout(this);
+	layout->setSpacing(10);
+	setLayout(layout);
 
-	connect(m_ui->btnVerify, &QPushButton::clicked, this, &IioTabWidget::verifyBtnClicked, Qt::QueuedConnection);
-	// scan
-	fwScan = new QFutureWatcher<int>(this);
-	connect(fwScan, &QFutureWatcher<int>::started, m_ui->btnScan, &AnimationPushButton::startAnimation,
+	QWidget *vWidget = new QWidget(this);
+	QVBoxLayout *vLay = new QVBoxLayout(this);
+	vLay->setSpacing(10);
+	vLay->setMargin(0);
+	vWidget->setLayout(vLay);
+
+	QStringList backendsList = computeBackendsList();
+
+	m_filterWidget = createFilterWidget(vWidget);
+	setupFilterWidget(backendsList);
+
+	QWidget *avlContextWidget = createAvlCtxWidget(vWidget);
+	m_btnScan->setVisible(!backendsList.isEmpty());
+
+	QWidget *serialSettWiedget = createSerialSettWidget(vWidget);
+	bool serialCompatible = isSerialCompatible();
+	serialSettWiedget->setEnabled(serialCompatible);
+
+	QWidget *uriWidget = createUriWidget(vWidget);
+	QWidget *btnVerifyWidget = createVerifyBtnWidget(vWidget);
+
+	vLay->addWidget(m_filterWidget);
+	vLay->addWidget(avlContextWidget);
+	vLay->addWidget(serialSettWiedget);
+	vLay->addWidget(uriWidget);
+	vLay->addWidget(btnVerifyWidget);
+	vLay->addItem(new QSpacerItem(0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding));
+
+	layout->addWidget(vWidget);
+	layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+	addScanFeedbackMsg("No scanned contexts... Press the refresh button!");
+
+	m_fwScan = new QFutureWatcher<int>(this);
+	m_fwSerialScan = new QFutureWatcher<QVector<QString>>(this);
+	setupConnections();
+}
+
+IioTabWidget::~IioTabWidget() {}
+
+void IioTabWidget::setupConnections()
+{
+	connect(m_btnVerify, &QPushButton::clicked, this, &IioTabWidget::verifyBtnClicked, Qt::QueuedConnection);
+	// scanfilterLayout
+	connect(m_fwScan, &QFutureWatcher<int>::started, m_btnScan, &AnimationPushButton::startAnimation,
 		Qt::QueuedConnection);
-	connect(fwScan, &QFutureWatcher<int>::finished, this, &IioTabWidget::scanFinished, Qt::QueuedConnection);
-	connect(m_ui->btnScan, SIGNAL(clicked()), this, SLOT(futureScan()), Qt::QueuedConnection);
+	connect(m_fwScan, &QFutureWatcher<int>::finished, this, &IioTabWidget::scanFinished, Qt::QueuedConnection);
+	connect(m_btnScan, SIGNAL(clicked()), this, SLOT(futureScan()), Qt::QueuedConnection);
 
-	connect(m_ui->comboBoxContexts, &QComboBox::textActivated, this,
-		[=]() { Q_EMIT uriChanged(m_ui->comboBoxContexts->currentText()); });
+	connect(m_avlCtxCb, &QComboBox::textActivated, this, [=]() { Q_EMIT uriChanged(m_avlCtxCb->currentText()); });
 	// serial scan
-	fwSerialScan = new QFutureWatcher<QVector<QString>>(this);
-	connect(fwSerialScan, &QFutureWatcher<int>::started, m_ui->btnSerialScan, &AnimationPushButton::startAnimation,
+	connect(m_fwSerialScan, &QFutureWatcher<int>::started, m_btnSerialScan, &AnimationPushButton::startAnimation,
 		Qt::QueuedConnection);
-	connect(fwSerialScan, &QFutureWatcher<int>::finished, this, &IioTabWidget::serialScanFinished,
+	connect(m_fwSerialScan, &QFutureWatcher<int>::finished, this, &IioTabWidget::serialScanFinished,
 		Qt::QueuedConnection);
-	connect(m_ui->btnSerialScan, SIGNAL(clicked()), this, SLOT(futureSerialScan()), Qt::QueuedConnection);
+	connect(m_btnSerialScan, SIGNAL(clicked()), this, SLOT(futureSerialScan()), Qt::QueuedConnection);
 	// serial widget connections
-	connect(m_ui->comboBoxSerialPort, &QComboBox::textActivated, this,
+	connect(m_serialPortCb->combo(), &QComboBox::textActivated, this,
 		[=]() { Q_EMIT uriChanged(getSerialPath()); });
-	connect(m_ui->comboBoxBaudRate, &QComboBox::textActivated, this, [=]() { Q_EMIT uriChanged(getSerialPath()); });
-	connect(m_ui->editSerialFrameConfig, &QLineEdit::returnPressed, this,
+	connect(m_baudRateCb->combo(), &QComboBox::textActivated, this, [=]() { Q_EMIT uriChanged(getSerialPath()); });
+	connect(m_serialFrameEdit->edit(), &QLineEdit::returnPressed, this,
 		[=]() { Q_EMIT uriChanged(getSerialPath()); });
 	connect(this, &IioTabWidget::uriChanged, this, &IioTabWidget::updateUri);
-	connect(m_ui->editUri, &QLineEdit::returnPressed, this, [=]() { Q_EMIT m_ui->btnVerify->clicked(); });
-	connect(m_ui->editUri, &QLineEdit::textChanged, this,
-		[=](QString uri) { m_ui->btnVerify->setEnabled(!uri.isEmpty()); });
+	connect(m_uriEdit->edit(), &QLineEdit::returnPressed, this, [=]() { Q_EMIT m_btnVerify->clicked(); });
+	connect(m_uriEdit->edit(), &QLineEdit::textChanged, this,
+		[=](QString uri) { m_btnVerify->setEnabled(!uri.isEmpty()); });
 }
 
-IioTabWidget::~IioTabWidget() { delete m_ui; }
-
-void IioTabWidget::init()
+QStringList IioTabWidget::computeBackendsList()
 {
-	bool hasLibSerialPort = false;
-#ifdef WITH_LIBSERIALPORT
-	hasLibSerialPort = true;
-#endif
-	bool hasSerialBackend = iio_has_backend("serial");
-
-	QMovie *veifyIcon(new QMovie(this));
-	veifyIcon->setFileName(":/gui/loading.gif");
-	m_ui->btnVerify->setAnimation(veifyIcon);
-
-	QMovie *scanIcon(new QMovie(this));
-	scanIcon->setFileName(":/gui/loading.gif");
-	m_ui->btnScan->setAnimation(scanIcon);
-	StyleHelper::RefreshButton(m_ui->btnScan);
-
-	QMovie *serialScanIcon(new QMovie(this));
-	serialScanIcon->setFileName(":/gui/loading.gif");
-	m_ui->btnSerialScan->setAnimation(serialScanIcon);
-	StyleHelper::RefreshButton(m_ui->btnSerialScan);
-
-	QRegExp re("[5-9]{1}(n|o|e|m|s){1}[1-2]{1}(x|r|d){0,1}$");
-	QRegExpValidator *validator = new QRegExpValidator(re, this);
-
-	m_ui->editSerialFrameConfig->setValidator(validator);
-	m_ui->serialSettingsWidget->setEnabled(hasLibSerialPort && hasSerialBackend);
-	m_ui->btnVerify->setProperty("blue_button", QVariant(true));
-	m_ui->btnVerify->setEnabled(false);
-
-	addScanFeedbackMsg("No scanned contexts... Press the refresh button!");
-	m_ui->btnScan->setAutoDefault(true);
-	m_ui->btnVerify->setAutoDefault(true);
-	m_ui->editSerialFrameConfig->setFocusPolicy(Qt::ClickFocus);
-	m_ui->editUri->setFocusPolicy(Qt::ClickFocus);
-	for(int baudRate : availableBaudRates) {
-		m_ui->comboBoxBaudRate->addItem(QString::number(baudRate));
-	}
-}
-
-void IioTabWidget::verifyIioBackend()
-{
-	bool scan = false;
+	QStringList list;
 	int backEndsCount = iio_get_backends_count();
 	for(int i = 0; i < backEndsCount; i++) {
 		QString backEnd(iio_get_backend(i));
 		if(backEnd.compare("xml") == 0 || backEnd.compare("serial") == 0) {
 			continue;
 		}
-		createBackEndCheckBox(backEnd);
-		scan = true;
+		list.append(backEnd);
 	}
-	m_ui->btnScan->setVisible(scan);
+	return list;
 }
 
-void IioTabWidget::createBackEndCheckBox(QString backEnd)
+QCheckBox *IioTabWidget::createBackendCheckBox(QString backEnd, QWidget *parent)
 {
-	QCheckBox *cb = new QCheckBox();
-	cb->setText(backEnd);
+	QCheckBox *cb = new QCheckBox(backEnd, m_filterWidget);
+	cb->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 	connect(cb, &QCheckBox::toggled, this, [=](bool en) {
 		if(en) {
-			scanParamsList.push_back(backEnd + ":");
+			m_scanParamsList.push_back(backEnd + ":");
 		} else {
-			scanParamsList.removeOne(backEnd + ":");
+			m_scanParamsList.removeOne(backEnd + ":");
 		}
-		m_ui->btnScan->setFocus();
+		m_btnScan->setFocus();
 	});
-	m_ui->filterCheckBoxes->layout()->addWidget(cb);
+	return cb;
+}
+
+void IioTabWidget::setupFilterWidget(QStringList backednsList)
+{
+	QHBoxLayout *filterLayout = dynamic_cast<QHBoxLayout *>(m_filterWidget->layout());
+	for(const QString &backend : backednsList) {
+		QCheckBox *cb = createBackendCheckBox(backend, m_filterWidget);
+		filterLayout->addWidget(cb, 0, Qt::AlignLeft);
+	}
+	filterLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
 }
 
 void IioTabWidget::verifyBtnClicked()
 {
 	QRegExp ipRegex("^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-"
 			"4][0-9]|25[0-5])$");
-	QString uri(m_ui->editUri->text());
+	QString uri(m_uriEdit->edit()->text());
 	bool isIp = uri.contains(ipRegex);
-	if(isIp && !m_ui->editUri->text().contains("ip:")) {
-		m_ui->editUri->blockSignals(true);
-		m_ui->editUri->setText("ip:" + uri);
-		m_ui->editUri->blockSignals(false);
+	if(isIp && !m_uriEdit->edit()->text().contains("ip:")) {
+		m_uriEdit->edit()->blockSignals(true);
+		m_uriEdit->edit()->setText("ip:" + uri);
+		m_uriEdit->edit()->blockSignals(false);
 	}
-	m_ui->btnScan->setDisabled(true);
-	m_ui->btnSerialScan->setDisabled(true);
-	m_ui->btnVerify->startAnimation();
-	Q_EMIT startVerify(m_ui->editUri->text(), "iio");
+	m_btnScan->setDisabled(true);
+	m_btnSerialScan->setDisabled(true);
+	m_btnVerify->startAnimation();
+	Q_EMIT startVerify(m_uriEdit->edit()->text(), "iio");
 }
 
 void IioTabWidget::onVerifyFinished(bool result)
 {
-	m_ui->uriMessageLabel->clear();
+	m_uriMsgLabel->clear();
 	if(!result) {
-		m_ui->uriMessageLabel->setText("\"" + m_ui->editUri->text() + "\" not a valid context!");
+		m_uriMsgLabel->setText("\"" + m_uriEdit->edit()->text() + "\" not a valid context!");
 	}
-	m_ui->btnVerify->stopAnimation();
-	m_ui->btnScan->setEnabled(true);
-	m_ui->btnSerialScan->setEnabled(true);
+	m_btnVerify->stopAnimation();
+	m_btnScan->setEnabled(true);
+	m_btnSerialScan->setEnabled(true);
 }
 
 void IioTabWidget::futureScan()
 {
-	scanList.clear();
-	QString scanParams = scanParamsList.join("");
-	QFuture<int> f = QtConcurrent::run(std::bind(&IIOScanTask::scan, &scanList, scanParams));
-	fwScan->setFuture(f);
+	m_scanList.clear();
+	QString scanParams = m_scanParamsList.join("");
+	QFuture<int> f = QtConcurrent::run(std::bind(&IIOScanTask::scan, &m_scanList, scanParams));
+	m_fwScan->setFuture(f);
 }
 
 void IioTabWidget::futureSerialScan()
 {
 	QFuture<QVector<QString>> f = QtConcurrent::run(std::bind(&IIOScanTask::getSerialPortsName));
-	fwSerialScan->setFuture(f);
+	m_fwSerialScan->setFuture(f);
 }
 
 void IioTabWidget::scanFinished()
 {
-	int retCode = fwScan->result();
-	m_ui->btnScan->stopAnimation();
-	m_ui->comboBoxContexts->clear();
-	m_ui->uriMessageLabel->clear();
+	int retCode = m_fwScan->result();
+	m_btnScan->stopAnimation();
+	m_avlCtxCb->clear();
+	m_uriMsgLabel->clear();
 	if(retCode < 0) {
 		addScanFeedbackMsg("Scan command failed!");
 		qWarning(CAT_IIO_ADD_PAGE) << "iio_scan_context_get_info_list error " << retCode;
 		return;
 	}
-	if(scanList.isEmpty()) {
+	if(m_scanList.isEmpty()) {
 		addScanFeedbackMsg("No scanned contexts available!");
 		return;
 	}
-	if(!m_ui->comboBoxContexts->isEnabled()) {
-		m_ui->comboBoxContexts->setEnabled(true);
+	if(!m_avlCtxCb->isEnabled()) {
+		m_avlCtxCb->setEnabled(true);
 	}
-	for(const auto &ctx : qAsConst(scanList)) {
-		m_ui->comboBoxContexts->addItem(ctx);
+	for(const auto &ctx : qAsConst(m_scanList)) {
+		m_avlCtxCb->addItem(ctx);
 	}
-	updateUri(m_ui->comboBoxContexts->currentText());
+	updateUri(m_avlCtxCb->currentText());
 }
 
 void IioTabWidget::serialScanFinished()
 {
-	QVector<QString> portsName = fwSerialScan->result();
-	m_ui->btnSerialScan->stopAnimation();
-	m_ui->comboBoxSerialPort->clear();
+	QVector<QString> portsName = m_fwSerialScan->result();
+	m_btnSerialScan->stopAnimation();
+	m_serialPortCb->combo()->clear();
 	if(!portsName.empty()) {
 		for(const QString &port : portsName) {
-			m_ui->comboBoxSerialPort->addItem(port);
+			m_serialPortCb->combo()->addItem(port);
 		}
 	}
 }
@@ -207,33 +209,187 @@ void IioTabWidget::serialScanFinished()
 QString IioTabWidget::getSerialPath()
 {
 	QString serialPath = "serial:";
-	serialPath.append(m_ui->comboBoxSerialPort->currentText());
-	serialPath.append("," + m_ui->comboBoxBaudRate->currentText());
-	serialPath.append("," + m_ui->editSerialFrameConfig->text());
+	serialPath.append(m_serialPortCb->combo()->currentText());
+	serialPath.append("," + m_baudRateCb->combo()->currentText());
+	serialPath.append("," + m_serialFrameEdit->edit()->text());
 	return serialPath;
+}
+
+bool IioTabWidget::isSerialCompatible()
+{
+	bool hasLibSerialPort = false;
+#ifdef WITH_LIBSERIALPORT
+	hasLibSerialPort = true;
+#endif
+	bool hasSerialBackend = iio_has_backend("serial");
+	return hasLibSerialPort && hasSerialBackend;
 }
 
 void IioTabWidget::updateUri(QString uri)
 {
-	m_ui->editUri->clear();
-	m_ui->editUri->setText(uri);
+	m_uriEdit->edit()->clear();
+	m_uriEdit->edit()->setText(uri);
 	if(!uri.isEmpty()) {
-		m_ui->btnVerify->setFocus();
+		m_btnVerify->setFocus();
 	}
 }
 
 void IioTabWidget::addScanFeedbackMsg(QString message)
 {
-	m_ui->comboBoxContexts->clear();
-	m_ui->comboBoxContexts->addItem(message);
-	m_ui->comboBoxContexts->setEnabled(false);
+	m_avlCtxCb->clear();
+	m_avlCtxCb->addItem(message);
+	m_avlCtxCb->setEnabled(false);
 	updateUri("");
 }
 
 void IioTabWidget::showEvent(QShowEvent *event)
 {
 	QWidget::showEvent(event);
-	m_ui->btnScan->setFocus();
+	m_btnScan->setFocus();
+}
+
+void IioTabWidget::setupBtnLdIcon(AnimationPushButton *btn)
+{
+	QMovie *icon(new QMovie(this));
+	icon->setFileName(":/gui/loading.gif");
+	btn->setAnimation(icon);
+}
+
+QWidget *IioTabWidget::createFilterWidget(QWidget *parent)
+{
+	QWidget *w = new QWidget(parent);
+	QHBoxLayout *layout = new QHBoxLayout(w);
+	layout->setMargin(0);
+	layout->setSpacing(10);
+	w->setLayout(layout);
+
+	QLabel *label = new QLabel("Filter:", w);
+	StyleHelper::MenuSmallLabel(label);
+	label->setFixedWidth(60);
+	layout->addWidget(label);
+	return w;
+}
+
+QWidget *IioTabWidget::createAvlCtxWidget(QWidget *parent)
+{
+	QWidget *w = new QWidget(parent);
+	QHBoxLayout *layout = new QHBoxLayout(w);
+	layout->setMargin(0);
+	layout->setSpacing(10);
+	w->setLayout(layout);
+
+	QLabel *label = new QLabel("Context:", w);
+	StyleHelper::MenuSmallLabel(label);
+	label->setFixedWidth(60);
+
+	m_avlCtxCb = new QComboBox(w);
+	StyleHelper::MenuComboBox(m_avlCtxCb, "ctx_combo");
+
+	m_btnScan = new AnimationPushButton(w);
+	setupBtnLdIcon(m_btnScan);
+	StyleHelper::RefreshButton(m_btnScan);
+	m_btnScan->setAutoDefault(true);
+
+	layout->addWidget(label);
+	layout->addWidget(m_avlCtxCb);
+	layout->addWidget(m_btnScan);
+	return w;
+}
+
+QWidget *IioTabWidget::createSerialSettWidget(QWidget *parent)
+{
+	QWidget *w = new QWidget(parent);
+	QHBoxLayout *layout = new QHBoxLayout(w);
+	layout->setMargin(0);
+	layout->setSpacing(10);
+	w->setLayout(layout);
+
+	QLabel *label = new QLabel("Serial:", w);
+	StyleHelper::MenuSmallLabel(label);
+	label->setFixedWidth(60);
+
+	m_serialPortCb = new MenuCombo("Port name", w);
+	m_baudRateCb = new MenuCombo("Baud rate", w);
+	for(int baudRate : m_availableBaudRates) {
+		m_baudRateCb->combo()->addItem(QString::number(baudRate));
+	}
+
+	QWidget *lineEditWidget = new QWidget(w);
+	lineEditWidget->setLayout(new QVBoxLayout(lineEditWidget));
+	lineEditWidget->layout()->setMargin(0);
+	lineEditWidget->layout()->setSpacing(3);
+	QLabel *serialFrameLabel = new QLabel("Port config", lineEditWidget);
+	StyleHelper::MenuComboLabel(serialFrameLabel);
+
+	QRegExp re("[5-9]{1}(n|o|e|m|s){1}[1-2]{1}(x|r|d){0,1}$");
+	QRegExpValidator *validator = new QRegExpValidator(re, this);
+	m_serialFrameEdit = new MenuLineEdit(lineEditWidget);
+	m_serialFrameEdit->edit()->setValidator(validator);
+	m_serialFrameEdit->edit()->setText("8n1");
+	m_serialFrameEdit->edit()->setFocusPolicy(Qt::ClickFocus);
+
+	lineEditWidget->layout()->addWidget(serialFrameLabel);
+	lineEditWidget->layout()->addWidget(m_serialFrameEdit);
+	lineEditWidget->setFixedWidth(serialFrameLabel->width());
+
+	m_btnSerialScan = new AnimationPushButton(w);
+	setupBtnLdIcon(m_btnSerialScan);
+	StyleHelper::RefreshButton(m_btnSerialScan);
+
+	layout->addWidget(label, Qt::AlignBottom);
+	layout->addWidget(m_serialPortCb);
+	layout->addWidget(m_baudRateCb);
+	layout->addWidget(lineEditWidget);
+	layout->addWidget(m_btnSerialScan);
+	return w;
+}
+
+QWidget *IioTabWidget::createUriWidget(QWidget *parent)
+{
+	QWidget *w = new QWidget(parent);
+	QHBoxLayout *layout = new QHBoxLayout(w);
+	layout->setMargin(0);
+	layout->setSpacing(10);
+	w->setLayout(layout);
+
+	QLabel *label = new QLabel("URI:", w);
+	StyleHelper::MenuSmallLabel(label);
+	label->setFixedWidth(60);
+
+	QWidget *msgUriWidget = new QWidget(w);
+	msgUriWidget->setLayout(new QVBoxLayout(msgUriWidget));
+	msgUriWidget->layout()->setMargin(0);
+	msgUriWidget->layout()->setSpacing(0);
+	m_uriEdit = new MenuLineEdit(msgUriWidget);
+	m_uriEdit->edit()->setFocusPolicy(Qt::ClickFocus);
+	m_uriMsgLabel = new QLabel(msgUriWidget);
+	msgUriWidget->layout()->addWidget(m_uriEdit);
+	msgUriWidget->layout()->addWidget(m_uriMsgLabel);
+
+	layout->addWidget(label, Qt::AlignTop);
+	layout->addWidget(msgUriWidget);
+	return w;
+}
+
+QWidget *IioTabWidget::createVerifyBtnWidget(QWidget *parent)
+{
+	QWidget *w = new QWidget(parent);
+	QHBoxLayout *layout = new QHBoxLayout(w);
+	layout->setMargin(0);
+	layout->setAlignment(Qt::AlignRight);
+	w->setLayout(layout);
+
+	m_btnVerify = new AnimationPushButton(w);
+	setupBtnLdIcon(m_btnVerify);
+	StyleHelper::BlueButton(m_btnVerify);
+	m_btnVerify->setText("Verify");
+	m_btnVerify->setIconSize(QSize(30, 30));
+	m_btnVerify->setFixedWidth(128);
+	m_btnVerify->setEnabled(false);
+	m_btnVerify->setAutoDefault(true);
+
+	layout->addWidget(m_btnVerify);
+	return w;
 }
 
 #include "moc_iiotabwidget.cpp"
