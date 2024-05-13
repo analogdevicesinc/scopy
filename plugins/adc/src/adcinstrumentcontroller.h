@@ -42,11 +42,6 @@ public Q_SLOTS:
 	void addChannel(AcqTreeNode *c) override;
 	void removeChannel(AcqTreeNode *c) override;
 
-	void enableTime();
-	void enableFFT();
-	void enableXY();
-
-	void enableCategory(QString s);
 private Q_SLOTS:
 	void stopUpdates();
 	void startUpdates();
@@ -63,17 +58,13 @@ Q_SIGNALS:
 	void requestStop();
 private:
 
-	void setupChannelMeasurement(PlotComponent *c, ChannelComponent *ch);
+	void setupChannelMeasurement(PlotComponentManager *c, ChannelComponent *ch);
 
 	ADCInstrument *m_tool;
-	PlotComponent *m_timePlotComponent;
-	PlotComponent *m_fftPlotComponent;
-	PlotComponent *m_xyPlotComponent;
+	PlotComponentManager *m_plotComponentManager;
 	MapStackedWidget *plotStack;
 
 	TimePlotSettingsComponent *m_timePlotSettingsComponent;
-	TimePlotSettingsComponent *m_fftPlotSettingsComponent;
-	XyPlotSettingsComponent *m_xyPlotSettingsComponent;
 	CursorComponent *m_cursorComponent;
 	MeasureComponent *m_measureComponent;
 
@@ -84,7 +75,7 @@ private:
 	QTimer *m_plotTimer;
 
 	AcqTreeNode *m_tree;
-	QMap<AcqTreeNode*, QList<ToolComponent*>> m_acqNodeComponentMap;
+	QMap<AcqTreeNode*, ToolComponent*> m_acqNodeComponentMap;
 
 	bool m_refreshTimerRunning;
 	QString currentCategory;

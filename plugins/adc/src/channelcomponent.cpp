@@ -4,6 +4,7 @@
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
+#include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_TIME_CHANNELCOMPONENT, "TimeChannelComponent");
 
@@ -11,15 +12,18 @@ Q_LOGGING_CATEGORY(CAT_TIME_CHANNELCOMPONENT, "TimeChannelComponent");
 using namespace scopy;
 using namespace gui;
 using namespace scopy::adc;
-ChannelComponent::ChannelComponent(QString ch, PlotComponent *plotComponent, QPen pen, QWidget *parent)
+ChannelComponent::ChannelComponent(QString ch, PlotComponent *m_plot, QPen pen, QWidget *parent)
 	: QWidget(parent)
 	, m_channelName(ch)
-	, m_plotComponent(plotComponent)
 	, m_pen(pen)
-	, m_plotAxisHandle(nullptr)
+	, m_enabled(true)
+	, m_chData(new ChannelData(this))
+	, m_plotChannelCmpt(new PlotChannelComponent(this,m_plot,this))
 {
 
-	m_name = m_plotComponent->name()+m_channelName;
+	connect(m_chData, &ChannelData::newData,m_plotChannelCmpt,&PlotChannelComponent::onNewData);
+
+	m_name = m_channelName;
 }
 
 ChannelComponent::~ChannelComponent() {}
@@ -36,25 +40,32 @@ void ChannelComponent::onInit() {}
 
 void ChannelComponent::onDeinit() {}
 
-void ChannelComponent::onNewData(const float *xData, const float *yData, int size) {}
-
-PlotChannel *ChannelComponent::plotCh() const { return m_plotCh; }
 
 QPen ChannelComponent::pen() const { return m_pen; }
 
 bool ChannelComponent::enabled() const { return m_enabled; }
 
+ChannelData *ChannelComponent::chData() const
+{
+	return m_chData;
+}
+
+PlotChannelComponent *ChannelComponent::plotChannelCmpt() const
+{
+	return m_plotChannelCmpt;
+}
+
+void ChannelComponent::setPlotChannelCmpt(PlotChannelComponent *newPlotChannelCmpt)
+{
+	m_plotChannelCmpt = newPlotChannelCmpt;
+}
+
 void ChannelComponent::enableChannel()
 {
 	qInfo(CAT_TIME_CHANNELCOMPONENT) << m_channelName << " enabled";
 	m_enabled = true;
-	m_plotCh->enable();
-	if(m_plotAxisHandle) {
-		m_plotAxisHandle->handle()->setVisible(true);
-		m_plotAxisHandle->handle()->raise();
-	}
+	/**/
 	//	m_grch->setEnabled(true);
-	m_plotComponent->replot();
 	//	m_plotAddon->plot()->replot();
 }
 
@@ -62,28 +73,8 @@ void ChannelComponent::disableChannel()
 {
 	qInfo(CAT_TIME_CHANNELCOMPONENT) << m_channelName << " disabled";
 	m_enabled = false;
-	m_plotCh->disable();
-	if(m_plotAxisHandle) {
-		m_plotAxisHandle->handle()->setVisible(false);
-	}
+	/**/
 
-	       //	m_grch->setEnabled(false);
-	m_plotComponent->replot();
+	//	m_grch->setEnabled(false);
 	//	m_plotAddon->plot()->replot();
 }
-
-QWidget *ChannelComponent::createCurveMenu(QWidget *parent)
-{
-
-	MenuSectionWidget *curvecontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *curve = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, curvecontainer);
-
-	MenuPlotChannelCurveStyleControl *curveSettings = new MenuPlotChannelCurveStyleControl(curve);
-	curveSettings->addChannels(m_plotCh);
-
-	curve->contentLayout()->addWidget(curveSettings);
-	curvecontainer->contentLayout()->addWidget(curve);
-
-	return curvecontainer;
-}
-

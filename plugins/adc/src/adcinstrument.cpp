@@ -53,12 +53,6 @@ void ADCInstrument::setupToolLayout()
 	timeBtn = new MenuControlButton(this);
 	setupTimeButtonHelper(timeBtn);
 
-	xyBtn = new MenuControlButton(this);
-	setupXyButtonHelper(xyBtn);
-
-	fftBtn = new MenuControlButton(this);
-	setupFFTButtonHelper(fftBtn);
-
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsBtn, TTA_LEFT);
 
@@ -70,11 +64,7 @@ void ADCInstrument::setupToolLayout()
 
 	tool->addWidgetToBottomContainerHelper(channelsBtn, TTA_LEFT);
 	tool->addWidgetToBottomContainerHelper(timeBtn, TTA_LEFT);
-	tool->addWidgetToBottomContainerHelper(xyBtn, TTA_LEFT);
-	tool->addWidgetToBottomContainerHelper(fftBtn, TTA_LEFT);
 	plotGroup->addButton(timeBtn);
-	plotGroup->addButton(xyBtn);
-	plotGroup->addButton(fftBtn);
 	plotGroup->setExclusive(true);
 	timeBtn->setChecked(true);
 
@@ -137,26 +127,6 @@ void ADCInstrument::setupTimeButtonHelper(MenuControlButton *time)
 	time->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
 }
 
-void ADCInstrument::setupXyButtonHelper(MenuControlButton *xy)
-{
-	xy->setName("X-Y");
-	xy->button()->setVisible(false);
-	xy->setOpenMenuChecksThis(true);
-	xy->setDoubleClickToOpenMenu(true);
-	xy->checkBox()->setVisible(false);
-	xy->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
-}
-
-void ADCInstrument::setupFFTButtonHelper(MenuControlButton *fft)
-{
-	fft->setName("FFT");
-	fft->button()->setVisible(false);
-	fft->setOpenMenuChecksThis(true);
-	fft->setDoubleClickToOpenMenu(true);
-	fft->checkBox()->setVisible(false);
-	fft->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
-}
-
 void ADCInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *dev)
 {
 	auto devBtn = b;
@@ -208,16 +178,6 @@ void ADCInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, Compos
 void ADCInstrument::init() { proxy->init(); }
 
 void ADCInstrument::deinit() { proxy->deinit(); }
-
-MenuControlButton *ADCInstrument::getFftBtn() const
-{
-	return fftBtn;
-}
-
-MenuControlButton *ADCInstrument::getXyBtn() const
-{
-	return xyBtn;
-}
 
 MenuControlButton *ADCInstrument::getTimeBtn() const
 {

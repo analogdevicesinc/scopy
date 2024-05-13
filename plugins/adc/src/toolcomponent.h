@@ -14,6 +14,56 @@ namespace adc {
 class PlotProxy;
 class ADCInstrument;
 
+class SCOPY_ADCPLUGIN_EXPORT ChannelData : public QObject{
+	Q_OBJECT
+public:
+	ChannelData(QObject *parent) : QObject(parent) {
+
+	}
+	~ChannelData() {
+		freeData();
+
+	}
+
+	void freeData() {
+		if(m_ownsData) {
+			free((void*)m_xData);
+			free((void*)m_yData);
+		}
+	}
+
+	const float *xData() { return m_xData;}
+	const float *yData() { return m_yData;}
+	const size_t size() { return m_size;}
+
+public Q_SLOTS:
+	virtual void onNewData(const float *xData_, const float *yData_, size_t size, bool copy) {
+		// this could be optimized not to reallocate the data
+		freeData();
+		if(copy) {
+			m_xData = (float*)malloc(sizeof(float) * size);
+			m_yData = (float*)malloc(sizeof(float) * size);
+			memcpy(m_xData, xData_, size);
+			memcpy(m_yData, yData_, size);
+		} else {
+			m_xData = (float*)xData_;
+			m_yData = (float*)yData_;
+		}
+		m_size = size;
+		m_ownsData = copy;
+
+		Q_EMIT newData(xData_, yData_, size, copy);
+
+	}
+Q_SIGNALS:
+	void newData(const float *xData_, const float *yData_, size_t size, bool copy);
+
+private:
+	size_t m_size = 0;
+	float *m_xData = 0;
+	float *m_yData = 0;
+	bool m_ownsData	= false;
+};
 
 class SCOPY_ADCPLUGIN_EXPORT DataProvider
 {
@@ -21,7 +71,7 @@ public:
 	virtual void setSingleShot(bool) = 0;
 	virtual size_t updateData() = 0;
 	virtual bool finished() = 0;
-	virtual void setCurveData(bool raw = false) = 0;
+	virtual void setData(bool copy = false) = 0;
 };
 
 class SCOPY_ADCPLUGIN_EXPORT ToolComponent
@@ -36,10 +86,6 @@ public:
 
 	virtual void enable() {m_enabled = true;}
 	virtual void disable() {m_enabled = false;}
-	QStringList *category() {
-		return &m_category;
-	}
-
 
 	bool enabled() const {
 		return m_enabled;
@@ -49,7 +95,6 @@ public:
 protected:
 	QString m_name;
 	bool m_enabled;
-	QStringList m_category;
 	int m_priority = 0;
 };
 

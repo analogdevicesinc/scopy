@@ -13,7 +13,7 @@ namespace scopy {
 namespace adc {
 
 using namespace scopy::gui;
-
+#if 0
 class GRDeviceAddon;
 class SCOPY_ADCPLUGIN_EXPORT GRXyChannelComponent : public ChannelComponent,
 						    public GRSignalPathProvider
@@ -76,6 +76,7 @@ private:
 	void createMenuControlButton(QWidget *parent = nullptr);
 	void setupChannelMenuControlButtonHelper(MenuControlButton *btn);
 };
+#endif
 
 } // namespace grutil
 } // namespace scopy

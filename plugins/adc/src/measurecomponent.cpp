@@ -5,8 +5,9 @@
 using namespace scopy;
 using namespace scopy::adc;
 
-MeasureComponent::MeasureComponent(ToolTemplate *tool, QObject *parent) {
+MeasureComponent::MeasureComponent(ToolTemplate *tool, PlotComponentManager *p, QObject *parent) {
 
+	m_plotComponentManager = p;
 	measure = new MenuControlButton();
 	setupMeasureButtonHelper(measure);
 
@@ -27,29 +28,22 @@ MeasureComponent::MeasureComponent(ToolTemplate *tool, QObject *parent) {
 		}
 		// tool->openTopContainerHelper(b);
 		// tool->openBottomContainerHelper(b);
-		for( PlotComponent *p : m_plotComponents) {
-			p->enableMeasurementPanel(m_measureSettings->measurementEnabled() && b);
-			p->enableStatsPanel(m_measureSettings->statsEnabled() && b);
-		}
+		m_plotComponentManager->enableMeasurementPanel(m_measureSettings->measurementEnabled() && b);
+		m_plotComponentManager->enableStatsPanel(m_measureSettings->statsEnabled() && b);
 
 	});
 	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
-}
 
-void MeasureComponent::addPlotComponent(PlotComponent *p) {
 	MeasurementsPanel *m_measurePanel = p->measurePanel();
 	StatsPanel *m_statsPanel = p->statsPanel();
 
-	connect(m_measureSettings, &MeasurementSettings::enableMeasurementPanel, p, &PlotComponent::enableMeasurementPanel);
-	connect(m_measureSettings, &MeasurementSettings::enableStatsPanel, p, &PlotComponent::enableStatsPanel);
+	connect(m_measureSettings, &MeasurementSettings::enableMeasurementPanel, p, &PlotComponentManager::enableMeasurementPanel);
+	connect(m_measureSettings, &MeasurementSettings::enableStatsPanel, p, &PlotComponentManager::enableStatsPanel);
 	connect(m_measureSettings, &MeasurementSettings::sortMeasurements, m_measurePanel, &MeasurementsPanel::sort);
 	connect(m_measureSettings, &MeasurementSettings::sortStats, m_statsPanel, &StatsPanel::sort);
 
-	m_plotComponents.append(p);
-
-
 }
-
+/*
 void MeasureComponent::removePlotComponent(PlotComponent*p) {
 	MeasurementsPanel *m_measurePanel = p->measurePanel();
 	StatsPanel *m_statsPanel = p->statsPanel();
@@ -61,7 +55,7 @@ void MeasureComponent::removePlotComponent(PlotComponent*p) {
 
 	m_plotComponents.removeAll(p);
 
-}
+}*/
 
 void MeasureComponent::setupMeasureButtonHelper(MenuControlButton *btn)
 {

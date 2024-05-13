@@ -24,6 +24,8 @@ private:
 	HorizBar *m_chOffsetBar;
 	RoundedHandleV *m_handle;
 	SymbolController *m_symbolCtrl;
+
+	QList<QMetaObject::Connection> conns;
 };
 } // namespace scopy
 #endif // PLOTAXISHANDLE_H

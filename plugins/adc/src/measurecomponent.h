@@ -12,10 +12,10 @@ namespace adc {
 class SCOPY_ADCPLUGIN_EXPORT MeasureComponent : public QObject, public ToolComponent
 {
 public:
-	MeasureComponent(ToolTemplate *tool, QObject *parent);
+	MeasureComponent(ToolTemplate *tool, PlotComponentManager* p, QObject *parent);
 	MeasurementSettings *measureSettings();
-	void addPlotComponent(PlotComponent *c);
-	void removePlotComponent(PlotComponent *c);
+	/*void addPlotComponent(PlotComponent *c);
+	void removePlotComponent(PlotComponent *c);*/
 
 private:
 	void setupMeasureButtonHelper(MenuControlButton*);
@@ -24,7 +24,7 @@ private:
 	QString measureMenuId = "measure";
 	QString statsMenuId = "stats";
 	MenuControlButton *measure;
-	QList<PlotComponent*> m_plotComponents;
+	PlotComponentManager* m_plotComponentManager;
 };
 }
 }

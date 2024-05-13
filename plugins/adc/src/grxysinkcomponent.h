@@ -7,7 +7,7 @@
 
 namespace scopy {
 namespace adc {
-
+#if 0
 class GRXySinkComponent : public QObject,
 			    public ToolComponent,
 			    public DataProvider,
@@ -62,6 +62,7 @@ private:
 	QList<GRXyChannelComponent*> m_channels;
 
 };
+#endif
 }
 }
 

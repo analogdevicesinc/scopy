@@ -7,9 +7,9 @@ using namespace scopy;
 CursorComponent::CursorComponent(PlotComponent *plot, ToolTemplate *tool, QObject *parent) : QObject(parent), m_plot(plot) {
 
 	cursor = new MenuControlButton();
-	setupCursorButtonHelper(cursor);	
+	setupCursorButtonHelper(cursor);
 
-	cursorController = new CursorController(m_plot->plot(), this);
+	cursorController = new CursorController(m_plot->timePlot(), this);
 	HoverWidget *hoverSettings = new HoverWidget(cursorController->getCursorSettings(), cursor, tool);
 	hoverSettings->setAnchorPos(HoverPosition::HP_TOPRIGHT);
 	hoverSettings->setContentPos(HoverPosition::HP_TOPLEFT);

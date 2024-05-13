@@ -9,14 +9,45 @@
 namespace scopy {
 namespace adc {
 
+class GRTimeSinkAcquisitionSignalPath : QObject {
+public:
+	GRTimeSinkAcquisitionSignalPath(QString m_name, ChannelComponent *ch, GRIIOFloatChannelNode *node, QObject *parent)  : QObject(parent) {
+		m_ch = ch;
+		m_node = node;
+		m_grch = node->src();
+		m_signalPath = new GRSignalPath(m_name	+ m_grch->getDeviceSrc()->deviceName()
+							+ m_grch->getChannelName(), this);
+		m_signalPath->append(m_grch);
+		m_scOff = new GRScaleOffsetProc(m_signalPath);
+		m_signalPath->append(m_scOff);
+		m_scOff->setOffset(0);
+		m_scOff->setScale(1);
+		m_signalPath->setEnabled(true); // or false
+		m_node->top()->src()->registerSignalPath(m_signalPath);
+	}
+	~GRTimeSinkAcquisitionSignalPath() {
+
+	}
+
+	void onNewData(const float *xData, const float *yData, size_t size, bool copy) {
+		m_ch->chData()->onNewData(xData, yData, size, copy);
+	}
+
+	ChannelComponent *m_ch;
+	GRIIOFloatChannelNode *m_node;
+	GRSignalPath *m_signalPath;
+	GRScaleOffsetProc *m_scOff;
+	GRIIOFloatChannelSrc *m_grch;
+
+};
+
 class GRTimeSinkComponent : public QObject,
 			    public ToolComponent,
 			    public DataProvider,
 			    public BufferSizeUser,
 			    public PlotSizeUser,
 			    public RollingModeUser,
-			    public SampleRateUser,
-			    public SinkComponent
+			    public SampleRateUser
 {
 	Q_OBJECT
 public:
@@ -32,7 +63,7 @@ public Q_SLOTS:
 
 	virtual size_t updateData() override;
 	virtual void setSingleShot(bool) override;
-	virtual void setCurveData(bool raw = true) override;
+	virtual void setData(bool raw = false) override;
 	virtual void setRollingMode(bool b) override;
 	virtual void setSampleRate(double) override;
 	virtual void setBufferSize(uint32_t size) override;
@@ -42,8 +73,11 @@ public Q_SLOTS:
 	virtual void onInit() override;
 	virtual void onDeinit() override;
 
-	void addChannel(ChannelComponent *c) override;
-	void removeChannel(ChannelComponent *c) override;
+	virtual void enable() override;
+	virtual void disable() override;
+
+	void addChannel(ChannelComponent* ch, GRIIOFloatChannelNode *node);
+	void removeChannel(GRIIOFloatChannelNode *c);
 Q_SIGNALS:
 	void requestRebuild();
 
@@ -58,13 +92,9 @@ private:
 
 	bool m_rollingMode;
 	bool m_singleShot;
-	bool m_showPlotTags;
-	bool m_refreshTimerRunning;
 	bool m_syncMode;
-	bool fftComplexMode;
-	bool m_enabled;
 
-	QList<GRTimeChannelComponent*> m_channels;
+	QList<GRTimeSinkAcquisitionSignalPath*> m_channels;
 
 };
 }

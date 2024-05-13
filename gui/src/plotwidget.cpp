@@ -209,8 +209,8 @@ void PlotWidget::removePlotChannel(PlotChannel *ch)
 {
 	m_plotChannels.removeAll(ch);
 
-	m_navigator->removeChannel(ch);
-	m_tracker->removeChannel(ch);
+	//m_navigator->removeChannel(ch);
+	//m_tracker->removeChannel(ch);
 	Q_EMIT removedChannel(ch);
 }
 

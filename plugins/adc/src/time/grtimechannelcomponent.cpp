@@ -16,16 +16,13 @@ using namespace scopy;
 using namespace scopy::grutil;
 using namespace scopy::adc;
 
-GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, PlotComponent *plotComponent, QPen pen,
-				       QWidget *parent)
-	: ChannelComponent(node->name(), plotComponent, pen, parent)
+GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, PlotComponent *m_plot, QPen pen, QWidget *parent)
+	: ChannelComponent(node->name(), m_plot, pen, parent)
 
 {
 
 	m_node = node;
-	m_grch = m_node->src();
-
-	setupSignalPath();
+	m_src = node->src();
 
 	int yPlotAxisPosition = Preferences::get("adc_plot_yaxis_label_position").toInt();
 	int yPlotAxisHandle = Preferences::get("adc_plot_yaxis_handle_position").toInt();
@@ -37,23 +34,14 @@ GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, Plot
 	m_scaleAvailable = true; // query from GRIIOFloatChannel;
 	m_unit = "Volts";	 // query from GRIIOFloatChannel;
 
-	m_channelName = m_grch->getChannelName();
-	auto plot = plotComponent->plot();
+	m_channelName = node->name();
 
-	m_plotAxis = new PlotAxis(yPlotAxisPosition, plot, pen, this);
-	m_plotCh = new PlotChannel(m_channelName, pen, plot, plot->xAxis(), m_plotAxis, this);
-	m_plotAxisHandle = new PlotAxisHandle(pen, m_plotAxis, plot, yPlotAxisHandle, this);
-	m_plotCh->setHandle(m_plotAxisHandle);
-	plot->addPlotAxisHandle(m_plotAxisHandle);
-	plot->addPlotChannel(m_plotCh);
-	m_plotCh->xAxis()->setUnits("s");
 
 	m_measureMgr = new TimeMeasureManager(this);
 	m_measureMgr->initMeasure(m_pen);
-	m_measureMgr->getModel()->setAdcBitCount(grch()->getFmt()->bits);
+	m_measureMgr->getModel()->setAdcBitCount(m_src->getFmt()->bits);
 
 	widget = createMenu();
-	m_sampleRateAvailable = m_grch->sampleRateAvailable();
 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	auto m_lay = new QVBoxLayout(this);
@@ -64,26 +52,10 @@ GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, Plot
 	setLayout(m_lay);
 
 	createMenuControlButton();
+
 }
 
 GRTimeChannelComponent::~GRTimeChannelComponent() {}
-
-void GRTimeChannelComponent::setupSignalPath()
-{
-	m_signalPath = new GRSignalPath(m_plotComponent->name()
-						+ m_grch->getDeviceSrc()->deviceName()
-						+ m_grch->getChannelName()
-					, this);
-	m_signalPath->append(m_grch);
-	m_scOff = new GRScaleOffsetProc(m_signalPath);
-	m_signalPath->append(m_scOff);
-	m_scOff->setOffset(0);
-	m_scOff->setScale(1);
-	m_signalPath->setEnabled(false);
-	m_node->top()->src()->registerSignalPath(m_signalPath);
-}
-
-GRSignalPath *GRTimeChannelComponent::signalPath() const { return m_signalPath; }
 
 QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 {
@@ -99,32 +71,32 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 	if(m_scaleAvailable) {
 		cb->addItem(m_unit, YMODE_SCALE);
 	}
-	m_plotAxis->setUnits("V");
-	m_yCtrl = new MenuPlotAxisRangeControl(m_plotAxis, yaxis);
+	//m_plotAxis->setUnits("V");
+	//m_yCtrl = new MenuPlotAxisRangeControl(m_plotAxis, yaxis);
 
-	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), yaxis, false);
-	m_autoscale = new PlotAutoscaler(false, this);
-	m_autoscale->addChannels(m_plotCh);
+	//m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), yaxis, false);
+	//m_autoscale = new PlotAutoscaler(false, this);
+	//m_autoscale->addChannels(m_plotCh);
 
-	connect(m_autoscale, &PlotAutoscaler::newMin, m_yCtrl, &MenuPlotAxisRangeControl::setMin);
-	connect(m_autoscale, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
+	//connect(m_autoscale, &PlotAutoscaler::newMin, m_yCtrl, &MenuPlotAxisRangeControl::setMin);
+	//connect(m_autoscale, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
 
-	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
-		m_yCtrl->setEnabled(!b);
-		m_autoscaleEnabled = b;
-		toggleAutoScale();
-	});
+	// connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
+	// 	m_yCtrl->setEnabled(!b);
+	// 	m_autoscaleEnabled = b;
+	// 	toggleAutoScale();
+	// });
 
-	yaxis->contentLayout()->addWidget(m_autoscaleBtn);
-	yaxis->contentLayout()->addWidget(m_yCtrl);
-	yaxis->contentLayout()->addWidget(m_ymodeCb);
+	// yaxis->contentLayout()->addWidget(m_autoscaleBtn);
+	// yaxis->contentLayout()->addWidget(m_yCtrl);
+	// yaxis->contentLayout()->addWidget(m_ymodeCb);
 
-	yaxiscontainer->contentLayout()->addWidget(yaxis);
+	// yaxiscontainer->contentLayout()->addWidget(yaxis);
 
-	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		auto mode = cb->itemData(idx).toInt();
-		setYMode(static_cast<YMode>(mode));
-	});
+	// connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+	// 	auto mode = cb->itemData(idx).toInt();
+	// 	setYMode(static_cast<YMode>(mode));
+	// });
 
 	return yaxiscontainer;
 }
@@ -176,7 +148,7 @@ QWidget *GRTimeChannelComponent::createMenu(QWidget *parent)
 
 	MenuHeaderWidget *header = new MenuHeaderWidget(m_channelName, m_pen, w);
 	QWidget *yaxismenu = createYAxisMenu(w);
-	QWidget *curvemenu = createCurveMenu(w);
+	// QWidget *curvemenu = createCurveMenu(w);
 	QWidget *attrmenu = createAttrMenu(w);
 	QWidget *measuremenu = m_measureMgr->createMeasurementMenu(w);
 	//m_snapBtn = createSnapshotButton(w);
@@ -184,7 +156,7 @@ QWidget *GRTimeChannelComponent::createMenu(QWidget *parent)
 	lay->addWidget(header);
 	lay->addWidget(scroll);
 	layScroll->addWidget(yaxismenu);
-	layScroll->addWidget(curvemenu);
+	// layScroll->addWidget(curvemenu);
 	layScroll->addWidget(attrmenu);
 	layScroll->addWidget(measuremenu);
 	//layScroll->addWidget(m_snapBtn);
@@ -198,7 +170,7 @@ QWidget *GRTimeChannelComponent::createAttrMenu(QWidget *parent)
 	MenuSectionWidget *attrcontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *attr =
 		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrcontainer);
-	QList<IIOWidget *> attrWidgets = IIOWidgetFactory::buildAllAttrsForChannel(grch()->channel());
+	QList<IIOWidget *> attrWidgets = IIOWidgetFactory::buildAllAttrsForChannel(m_src->channel());
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
@@ -215,32 +187,20 @@ QWidget *GRTimeChannelComponent::createAttrMenu(QWidget *parent)
 	return attrcontainer;
 }
 
-void GRTimeChannelComponent::enableChannel()
-{
-	m_signalPath->setEnabled(true);
-	ChannelComponent::enableChannel();
-}
-
-void GRTimeChannelComponent::disableChannel()
-{
-	m_signalPath->setEnabled(false);
-	ChannelComponent::disableChannel();
-}
-
 void GRTimeChannelComponent::onStart()
 {
 	m_running = true;
-	m_measureMgr->getModel()->setSampleRate(m_plotSampleRate);
-	toggleAutoScale();
+	// m_measureMgr->getModel()->setSampleRate(m_plotSampleRate);
+//	toggleAutoScale();
 }
 
 void GRTimeChannelComponent::onStop()
 {
 	m_running = false;
-	toggleAutoScale();
+/*	toggleAutoScale();
 	if(m_autoscaleEnabled) {
 		m_autoscale->autoscale();
-	}
+	}*/
 }
 
 void GRTimeChannelComponent::toggleAutoScale()
@@ -258,7 +218,7 @@ void GRTimeChannelComponent::setYMode(YMode mode)
 	double offset = 0;
 	double ymin = -1;
 	double ymax = 1;
-	const iio_data_format *fmt = m_grch->getFmt();
+	const iio_data_format *fmt = m_src->getFmt(); // get from iio-node interface
 
 	switch(mode) {
 	case YMODE_COUNT:
@@ -270,7 +230,7 @@ void GRTimeChannelComponent::setYMode(YMode mode)
 			ymin = 0;
 			ymax = 1 << (fmt->bits);
 		}
-		m_plotCh->yAxis()->setUnits("Counts");
+//		m_plotCh->yAxis()->setUnits("Counts");
 		break;
 	case YMODE_FS:
 		scale = 1.0 / ((float)((uint64_t)1 << fmt->bits));
@@ -281,25 +241,25 @@ void GRTimeChannelComponent::setYMode(YMode mode)
 			ymin = 0;
 			ymax = 1;
 		}
-		m_plotCh->yAxis()->setUnits("");
+//		m_plotCh->yAxis()->setUnits("");
 		break;
 	case YMODE_SCALE:
 
-		m_plotCh->yAxis()->setUnits(m_unit);
+//		m_plotCh->yAxis()->setUnits(m_unit);
 		break;
 	default:
 		break;
 	}
 
-	m_yCtrl->setMin(ymin);
+	/*m_yCtrl->setMin(ymin);
 	m_yCtrl->setMax(ymax);
 	m_scOff->setScale(scale);
-	m_scOff->setOffset(offset);
+	m_scOff->setOffset(offset);*/
 }
 
 void GRTimeChannelComponent::setSingleYMode(bool b)
 {
-	if(b) {
+	/*if(b) {
 		m_plotCh->curve()->setYAxis(m_plotComponent->plot()->yAxis()->axisId()); // get default axis
 	} else {
 		m_plotCh->curve()->setYAxis(m_plotAxis->axisId()); // set it's own axis
@@ -307,19 +267,10 @@ void GRTimeChannelComponent::setSingleYMode(bool b)
 	m_plotAxisHandle->handle()->setVisible(!b);
 	m_yCtrl->setEnabled(!b);
 	m_autoscaleBtn->onOffswitch()->setChecked(false);
-	m_autoscaleBtn->setEnabled(!b);
+	m_autoscaleBtn->setEnabled(!b);*/
 }
-
-bool GRTimeChannelComponent::sampleRateAvailable() { return m_signalPath->enabled() && m_sampleRateAvailable; }
-
-double GRTimeChannelComponent::sampleRate() { return m_grch->readSampleRate(); }
 
 MeasureManagerInterface *GRTimeChannelComponent::getMeasureManager() { return m_measureMgr; }
-
-void GRTimeChannelComponent::setSampleRate(double v)
-{
-	m_plotSampleRate = v;
-}
 
 void GRTimeChannelComponent::enable()
 {
@@ -336,8 +287,6 @@ void GRTimeChannelComponent::disable()
 	disableChannel();
 	ChannelComponent::disable();
 }
-
-GRIIOFloatChannelSrc *GRTimeChannelComponent::grch() const { return m_grch; }
 
 MenuControlButton *GRTimeChannelComponent::ctrl()
 {
@@ -381,10 +330,6 @@ void GRTimeChannelComponent::setupChannelMenuControlButtonHelper(MenuControlButt
 	btn->setColor(pen().color());
 	btn->button()->setVisible(false);
 	btn->setCheckable(true);
-
-	connect(btn, &QAbstractButton::clicked, this, [=](){
-		m_plotComponent->plot()->selectChannel(m_plotCh);
-	});
 
 	connect(btn->checkBox(), &QCheckBox::toggled, this, [=](bool b) {
 		if(b)

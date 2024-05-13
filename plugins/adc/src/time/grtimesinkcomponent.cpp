@@ -1,6 +1,7 @@
 #include "grtimesinkcomponent.h"
 #include "grtimechannelcomponent.h"
 #include <gr-util/grsignalpath.h>
+#include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_GRTIMESINKCOMPONENT,"GRTimeSinkComponent")
 using namespace scopy::adc;
@@ -9,7 +10,7 @@ using namespace scopy::grutil;
 
 
 GRTimeSinkComponent::GRTimeSinkComponent(QString name, GRTopBlockNode *t, QObject *parent) : QObject(parent)
-{
+{	m_enabled = true;
 	m_node = t;
 	m_top = t->src();
 	m_name = name;
@@ -48,8 +49,9 @@ void GRTimeSinkComponent::connectSignalPaths()
 	int index = 0;
 	time_channel_map.clear();
 
-	for(GRTimeChannelComponent *gr : qAsConst(m_channels)) {
-		GRSignalPath *sigPath = gr->signalPath();
+
+	for(GRTimeSinkAcquisitionSignalPath *gr : m_channels) {
+		GRSignalPath *sigPath = gr->m_signalPath;
 		if(sigPath->enabled()) {
 			// connect end of signal path to time_sink input
 			m_top->connect(sigPath->getGrEndPoint(), 0, time_sink, index);
@@ -73,7 +75,7 @@ void GRTimeSinkComponent::connectSignalPaths()
 
 void GRTimeSinkComponent::tearDownSignalPaths()
 {
-	setCurveData(false);
+	setData(true);
 	qInfo()<<"TEARING DOWN";
 }
 
@@ -90,23 +92,16 @@ bool GRTimeSinkComponent::finished() {
 	return time_sink->finishedAcquisition();
 }
 
-void GRTimeSinkComponent::setCurveData(bool raw)
+void GRTimeSinkComponent::setData(bool copy)
 {
 	int index = 0;
-	for(GRTimeChannelComponent *gr : qAsConst(m_channels)) {
-		if(gr->signalPath()->enabled()) {
-			QwtPlotCurve *curve = gr->plotCh()->curve();
+	for(GRTimeSinkAcquisitionSignalPath *gr : m_channels) {
+		if(gr->m_signalPath->enabled()) {
 			const float *xdata = time_sink->time().data();
 			const float *ydata = time_sink->data()[index].data();
 			const size_t size = time_sink->data()[index].size();
 
-			if(raw) {
-				// maybe this should be forwarded back to GRTimeChannelComponent
-				curve->setRawSamples(xdata, ydata, size);
-			} else {
-				curve->setSamples(xdata, ydata, size);
-			}
-			gr->onNewData(xdata, ydata, size);
+			gr->onNewData(xdata, ydata, size, copy);
 			index++;
 		}
 	}
@@ -186,20 +181,25 @@ void GRTimeSinkComponent::onDeinit()
 	onStop();
 }
 
-
-void GRTimeSinkComponent::addChannel(ChannelComponent *c) {
-	GRTimeChannelComponent *chan = dynamic_cast<GRTimeChannelComponent*>(c);
-	if(!chan)
-		return;
-
-	m_channels.append(chan);
+void GRTimeSinkComponent::enable() {
+	ToolComponent::enable();
 }
 
-void GRTimeSinkComponent::removeChannel(ChannelComponent *c) {
-	GRTimeChannelComponent *chan = dynamic_cast<GRTimeChannelComponent*>(c);
-	if(!chan)
-		return;
-	m_channels.removeAll(chan);
+void GRTimeSinkComponent::disable() {
+	ToolComponent::disable();
+}
+
+
+void GRTimeSinkComponent::addChannel(ChannelComponent* ch, GRIIOFloatChannelNode *node) {
+	m_channels.append(new GRTimeSinkAcquisitionSignalPath(m_name, ch, node, this));
+}
+
+void GRTimeSinkComponent::removeChannel(GRIIOFloatChannelNode *node) {
+	for(GRTimeSinkAcquisitionSignalPath *ch : m_channels) {
+		if(ch->m_node == node) {
+			m_channels.removeAll(ch);
+		}
+	}
 }
 
 bool GRTimeSinkComponent::enabled() const

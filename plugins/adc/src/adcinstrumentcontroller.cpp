@@ -20,7 +20,7 @@ ADCInstrumentController::ADCInstrumentController(QString name, AcqTreeNode * tre
 	: QObject(parent)
 	, m_refreshTimerRunning(false)
 	,m_tool(nullptr)
-	,m_timePlotComponent(nullptr)
+	,m_plotComponentManager(nullptr)
 	,m_timePlotSettingsComponent(nullptr)
 	,m_cursorComponent(nullptr)
 	,m_measureComponent(nullptr)
@@ -51,7 +51,7 @@ ADCInstrumentController::~ADCInstrumentController() {}
 
 ChannelIdProvider *ADCInstrumentController::getChannelIdProvider() { return chIdP; }
 
-ToolComponent *ADCInstrumentController::getPlotAddon() { return (ToolComponent *)m_timePlotComponent; }
+ToolComponent *ADCInstrumentController::getPlotAddon() { return (ToolComponent *)m_plotComponentManager; }
 
 ToolComponent *ADCInstrumentController::getPlotSettings() { return (ToolComponent *)m_timePlotSettingsComponent; }
 
@@ -68,53 +68,24 @@ void ADCInstrumentController::init()
 {
 	ToolTemplate *toolLayout = m_tool->getToolTemplate();
 
-	m_timePlotComponent = new PlotComponent(m_name+"_time", m_tool);
-	m_timePlotComponent->category()->append("time");
-	addComponent(m_timePlotComponent);
-	m_timePlotSettingsComponent = new TimePlotSettingsComponent(m_timePlotComponent);
-	m_timePlotSettingsComponent->category()->append("time");
+	m_plotComponentManager = new PlotComponentManager(m_name+"_time", m_tool);
+	addComponent(m_plotComponentManager);
+	m_timePlotSettingsComponent = new TimePlotSettingsComponent(m_plotComponentManager->plots()[0]);
 	addComponent(m_timePlotSettingsComponent);
-	connect(m_tool->getTimeBtn(), &QAbstractButton::pressed, this, [=](){
-		enableCategory("time");
-	});
 
-	m_fftPlotComponent = new PlotComponent(m_name+"_fft", m_tool);
-	addComponent(m_fftPlotComponent);
-	/*m_fftPlotSettingsComponent = new FftPlotSettingsComponent(m_fftPlotComponent);
-	addComponent(m_fftPlotSettingsComponent);*/
-	connect(m_tool->getFftBtn(), &QAbstractButton::pressed, this, [=](){
-		enableCategory("fft");
-	});
+	// m_cursorComponent = new CursorComponent(m_plotComponentManager, m_tool->getToolTemplate(), this);
+	// addComponent(m_cursorComponent);
 
-	m_xyPlotComponent = new PlotComponent(m_name+"_xy", m_tool);
-	addComponent(m_xyPlotComponent);
-	m_xyPlotComponent->category()->append("xy");
-	m_xyPlotSettingsComponent = new XyPlotSettingsComponent(m_xyPlotComponent);
-	m_xyPlotSettingsComponent->category()->append("xy");
-	addComponent(m_xyPlotSettingsComponent);
-	connect(m_tool->getXyBtn(), &QAbstractButton::pressed, this, [=](){
-		enableCategory("xy");
-	});
+	m_measureComponent = new MeasureComponent(m_tool->getToolTemplate(),m_plotComponentManager, this);
+	// m_measureComponent->addPlotComponent(m_plotComponentManager);
 
-	m_cursorComponent = new CursorComponent(m_timePlotComponent, m_tool->getToolTemplate(), this);
-	addComponent(m_cursorComponent);
-
-	m_measureComponent = new MeasureComponent(m_tool->getToolTemplate(), this);
-	m_measureComponent->addPlotComponent(m_timePlotComponent);
-	m_measureComponent->addPlotComponent(m_fftPlotComponent);
-	m_measureComponent->addPlotComponent(m_xyPlotComponent);
 	addComponent(m_measureComponent);
 
 	plotStack = new MapStackedWidget(m_tool);
 	toolLayout->addWidgetToCentralContainerHelper(plotStack);
 
-	plotStack->add("time",m_timePlotComponent);
-	toolLayout->rightStack()->add(m_tool->settingsMenuId+"_time", m_timePlotSettingsComponent);
-	plotStack->add("xy", m_xyPlotComponent);
-	toolLayout->rightStack()->add(m_tool->settingsMenuId+"_xy", m_xyPlotSettingsComponent);
-	plotStack->add("fft", m_fftPlotComponent);
-	// toolLayout->rightStack()->add(m_tool->settingsMenuId+"_fft", m_fftPlotSettingsComponent);
-
+	plotStack->add("time",m_plotComponentManager);
+	toolLayout->rightStack()->add(m_tool->settingsMenuId, m_timePlotSettingsComponent);
 
 	connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::sampleRateChanged, this,
 		[=](double v) {
@@ -177,6 +148,7 @@ void ADCInstrumentController::init()
 
 	connect(this, &ADCInstrumentController::requestStop, m_tool, &ADCInstrument::stop, Qt::QueuedConnection);
 	connect(m_tool, &ADCInstrument::setSingleShot, this, &ADCInstrumentController::setSingleShot);
+
 }
 
 void ADCInstrumentController::deinit() {
@@ -248,14 +220,13 @@ void ADCInstrumentController::update()
 			continue;
 		if(dynamic_cast<DataProvider*>(c)) {
 			DataProvider *dp = dynamic_cast<DataProvider*>(c);
-			dp->setCurveData();			
+			dp->setData(false);
 			if(dp->finished() ) {
 				Q_EMIT requestStop();
 			}
 		}
 	}
-	m_timePlotComponent->replot();
-	m_xyPlotComponent->replot();
+	m_plotComponentManager->replot();
 }
 
 void ADCInstrumentController::handlePreferences(QString key, QVariant v)
@@ -284,32 +255,17 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node) {
 	if(dynamic_cast<GRTopBlockNode*>(node) != nullptr) {
 		GRTopBlockNode* grtbn = dynamic_cast<GRTopBlockNode*>(node);
 		GRTimeSinkComponent *c = new GRTimeSinkComponent(m_name+"_time", grtbn, this);
-		GRXySinkComponent *c_xy = new GRXySinkComponent(m_name+"_xy", grtbn, this);
-
-		connect(m_xyPlotSettingsComponent, &XyPlotSettingsComponent::xChannelChanged, this, [=](ChannelComponent *c) {
-			GRXyChannelComponent *chan = dynamic_cast<GRXyChannelComponent*>(c);
-				c_xy->setXChannel(chan);
-			});
-		connect(m_xyPlotSettingsComponent, &XyPlotSettingsComponent::bufferSizeChanged, c_xy, &GRXySinkComponent::setBufferSize);
-
-
-		c->category()->append("time");
-		c_xy->category()->append("xy");
-
-		m_acqNodeComponentMap[grtbn].append(c);
-		m_acqNodeComponentMap[grtbn].append(c_xy);
+		m_acqNodeComponentMap[grtbn] = (c);
 		addComponent(c);
-		addComponent(c_xy);
 	}
 
 	if(dynamic_cast<GRIIODeviceSourceNode*>(node) != nullptr) {
 		GRIIODeviceSourceNode* griiodsn = dynamic_cast<GRIIODeviceSourceNode*>(node);
 		GRDeviceComponent *d = new GRDeviceComponent(griiodsn);
 		addComponent(d);
-		d->category()->append("time");
 		m_tool->addDevice(d->ctrl(), d);
 
-		m_acqNodeComponentMap[griiodsn].append(d);
+		m_acqNodeComponentMap[griiodsn] = (d);
 		addComponent(d);
 
 		SampleRateProvider *s = dynamic_cast<SampleRateProvider*>(d);
@@ -322,54 +278,48 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node) {
 	if(dynamic_cast<GRIIOFloatChannelNode*>(node) != nullptr) {
 		int idx = chIdP->next();
 		GRIIOFloatChannelNode* griiofcn = dynamic_cast<GRIIOFloatChannelNode*>(node);
-		GRTimeChannelComponent *c = new GRTimeChannelComponent(griiofcn, m_timePlotComponent, chIdP->pen(idx));
-		GRXyChannelComponent *c_xy = new GRXyChannelComponent(griiofcn, m_xyPlotComponent, chIdP->pen(idx));
-		c->category()->append("time");
-		c_xy->category()->append("xy");
+		GRTimeChannelComponent *c = new GRTimeChannelComponent(griiofcn, m_plotComponentManager->plot(0), chIdP->pen(idx));
+		m_plotComponentManager->addChannel(c);
 
 		/*** This is a bit of a mess because CollapsableMenuControlButton is not a MenuControlButton ***/
 		CompositeWidget *cw = nullptr;
 		GRIIODeviceSourceNode *w = dynamic_cast<GRIIODeviceSourceNode*>(griiofcn->treeParent());
-		GRDeviceComponent* dc = dynamic_cast<GRDeviceComponent*>(m_acqNodeComponentMap[w][0] /*[0] = HACK */);
+		GRDeviceComponent* dc = dynamic_cast<GRDeviceComponent*>(m_acqNodeComponentMap[w]);
 		if(w) {			
 			cw = dc->ctrl();
 		}
 		if(!cw) {
 			cw = m_tool->vcm();
 		}
-		m_acqNodeComponentMap[griiofcn].append(c);
+		m_acqNodeComponentMap[griiofcn] = c;
 		/*** End of mess ***/
 
 		m_tool->addChannel(c->ctrl(), c, cw);
-		m_tool->addChannel(c_xy->ctrl(), c_xy, cw);
 
-		for (auto *grNode : m_acqNodeComponentMap[griiofcn->top()]) {
-			SinkComponent *grtsc = dynamic_cast<SinkComponent*>(grNode);
-			Q_ASSERT(grtsc);
-
-			grtsc->addChannel(c); // For matching Sink To Channels
-			grtsc->addChannel(c_xy); // For matching Sink To Channels
-		}
+		GRTimeSinkComponent *grtsc = dynamic_cast<GRTimeSinkComponent*>(m_acqNodeComponentMap[griiofcn->top()]);
+		Q_ASSERT(grtsc);
+		grtsc->addChannel(c,griiofcn); // For matching Sink To Channels
 
 		dc->addChannel(c);    // used for sample rate computation
 		m_timePlotSettingsComponent->addChannel(c); // SingleY/etc
-		m_xyPlotSettingsComponent->addChannel(c_xy);
-
+		m_plotComponentManager->addChannel(c);
 		SampleRateProvider *s = dynamic_cast<SampleRateProvider*>(c); // SampleRate Computation
 		if(s) {
 			m_timePlotSettingsComponent->addSampleRateProvider(s);
 		}
 
 		addComponent(c);
-		addComponent(c_xy);
-		setupChannelMeasurement(m_timePlotComponent, c);
+		setupChannelMeasurement(m_plotComponentManager, c);
+
+		static bool b = false;
+		if(b == true)
+			m_plotComponentManager->moveChannel(c,1);
+		b = true;
 
 	}
-
-	enableCategory(currentCategory);
 }
 
-void ADCInstrumentController::setupChannelMeasurement(PlotComponent *c ,ChannelComponent *ch)
+void ADCInstrumentController::setupChannelMeasurement(PlotComponentManager *c ,ChannelComponent *ch)
 {
 	auto chMeasureableChannel = dynamic_cast<MeasurementProvider *>(ch);
 	if(!chMeasureableChannel)
@@ -397,23 +347,3 @@ void ADCInstrumentController::setupChannelMeasurement(PlotComponent *c ,ChannelC
 void ADCInstrumentController::removeChannel(AcqTreeNode *node) {
 	// removeComponent(node);
 }
-
-void ADCInstrumentController::enableCategory(QString s) {
-	QString categoryName = s;
-	currentCategory = s;
-	ToolTemplate *toolLayout = m_tool->getToolTemplate();
-	plotStack->show(categoryName);
-	toolLayout->requestMenu(m_tool->settingsMenuId+"_"+categoryName);
-	// m_tool->vcm()->filter(s);
-
-	for(auto c : qAsConst(m_components)) {
-		if(c->category()->contains(categoryName)) {
-			c->enable();
-		} else {
-			c->disable();
-		}
-	}
-	m_tool->restart();
-}
-
-

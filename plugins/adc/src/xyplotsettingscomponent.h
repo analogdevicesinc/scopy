@@ -19,7 +19,7 @@ namespace scopy {
 namespace adc {
 
 using namespace scopy::gui;
-
+#if 0
 class SCOPY_ADCPLUGIN_EXPORT XyPlotSettingsComponent : public QWidget,
 							 public ToolComponent
 {
@@ -85,7 +85,7 @@ private:
 	Q_PROPERTY(ChannelComponent* xChannel READ xChannel WRITE setXChannel NOTIFY xChannelChanged)
 
 };
-
+#endif
 } // namespace adc
 } // namespace scopy
 

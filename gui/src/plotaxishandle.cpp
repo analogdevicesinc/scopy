@@ -42,11 +42,14 @@ PlotAxisHandle::PlotAxisHandle(QPen pen, PlotAxis *ax, PlotWidget *p, int positi
 	m_handle->setVisible(true);
 
 	/* When bar position changes due to plot resizes update the handle */
-	connect(area, &HandlesArea::sizeChanged, m_handle, [=]() { m_handle->updatePosition(); });
+	conns.append(
+		connect(area, &HandlesArea::sizeChanged, m_handle, [=]() { m_handle->updatePosition(); }));
 
-	connect(m_chOffsetBar, &HorizBar::pixelPositionChanged, this,
-		[=](int pos) { m_handle->setPositionSilenty(pos); });
+	conns.append(
+		connect(m_chOffsetBar, &HorizBar::pixelPositionChanged, this,
+			[=](int pos) { m_handle->setPositionSilenty(pos); }));
 
+	conns.append(
 	connect(m_handle, &RoundedHandleV::positionChanged, this, [=](int pos) {
 		QwtScaleMap yMap = p->plot()->canvasMap(ax->axisId());
 		double offset = yMap.invTransform(pos);
@@ -54,10 +57,17 @@ PlotAxisHandle::PlotAxisHandle(QPen pen, PlotAxis *ax, PlotWidget *p, int positi
 		double max = ax->max() - offset;
 		ax->setInterval(min, max);
 		p->replot();
-	});
+		}));
 }
 
-PlotAxisHandle::~PlotAxisHandle() {}
+PlotAxisHandle::~PlotAxisHandle() {
+	for(QMetaObject::Connection c : conns) {
+		disconnect(c);
+	}
+	m_symbolCtrl->detachSymbol(m_chOffsetBar);
+	delete m_chOffsetBar;
+	delete m_handle;
+}
 
 RoundedHandleV *PlotAxisHandle::handle() const { return m_handle; }
 

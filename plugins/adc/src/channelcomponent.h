@@ -3,18 +3,20 @@
 
 #include <scopy-adcplugin_export.h>
 #include <QWidget>
-#include "plotcomponent.h"
 #include "toolcomponent.h"
-#include "plotchannel.h"
+#include "plotcomponent.h"
+
 
 namespace scopy {
 namespace adc {
 
-class SCOPY_ADCPLUGIN_EXPORT ChannelComponent : public QWidget, public ToolComponent
+class PlotChannelComponent;
+
+class SCOPY_ADCPLUGIN_EXPORT ChannelComponent : public QWidget,  public ToolComponent
 {
 	Q_OBJECT
 public:
-	ChannelComponent(QString ch, PlotComponent *plotComponent, QPen pen, QWidget *parent = nullptr);
+	ChannelComponent(QString ch, PlotComponent *m_plot, QPen pen, QWidget *parent = nullptr);
 	virtual ~ChannelComponent();
 
 	QWidget *getMenuControlWidget();
@@ -22,21 +24,24 @@ public:
 
 	QPen pen() const;
 	bool enabled() const;
-	PlotChannel *plotCh() const;
 
-	virtual QWidget *createCurveMenu(QWidget *parent);
+	// virtual QWidget *createCurveMenu(QWidget *parent);
+
+	ChannelData *chData() const;
+
+	PlotChannelComponent *plotChannelCmpt() const;
+	void setPlotChannelCmpt(PlotChannelComponent *newPlotChannelCmpt);
 
 protected:
+
 	QString m_channelName;
-	PlotChannel *m_plotCh;
-	PlotAxis *m_plotAxis;
-	PlotAxisHandle *m_plotAxisHandle;
-	PlotComponent *m_plotComponent;
 	QPen m_pen;
 	QWidget *widget;
 	QWidget *m_mcw;
-
 	bool m_enabled;
+
+	ChannelData *m_chData;
+	PlotChannelComponent *m_plotChannelCmpt;
 
 public Q_SLOTS:
 	virtual void enableChannel();
@@ -46,13 +51,7 @@ public Q_SLOTS:
 	virtual void onInit() override;
 	virtual void onDeinit() override;
 
-	void onNewData(const float *xData, const float *yData, int size);
-};
-
-class SCOPY_ADCPLUGIN_EXPORT SinkComponent {
-public:
-	virtual void addChannel(ChannelComponent*) = 0;
-	virtual void removeChannel(ChannelComponent *) = 0;
+	// void onNewData(const float *xData, const float *yData, int size, bool latch);
 };
 
 }

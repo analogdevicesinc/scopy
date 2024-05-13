@@ -42,8 +42,6 @@ public:
 	VerticalChannelManager *vcm() const;
 
 	MenuControlButton *getTimeBtn() const;
-	MenuControlButton *getXyBtn() const;
-	MenuControlButton *getFftBtn() const;
 
 public Q_SLOTS:
 	void run(bool);
@@ -78,8 +76,6 @@ private:
 	VerticalChannelManager *m_vcm;
 
 	MenuControlButton *timeBtn;
-	MenuControlButton *xyBtn;
-	MenuControlButton *fftBtn;
 
 	void setupToolLayout();
 	void setupRunSingleButtonHelper();
@@ -89,8 +85,6 @@ private:
 	bool m_running;
 	Q_PROPERTY(bool running READ running WRITE setRunning NOTIFY runningChanged)
 	void setupTimeButtonHelper(MenuControlButton *time);
-	void setupXyButtonHelper(MenuControlButton *xy);
-	void setupFFTButtonHelper(MenuControlButton *fft);
 };
 } // namespace adc
 } // namespace scopy

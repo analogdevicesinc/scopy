@@ -16,7 +16,7 @@ Q_LOGGING_CATEGORY(CAT_GRXYCHANNELCOMPONENT, "GRXyChannelComponent");
 using namespace scopy;
 using namespace scopy::grutil;
 using namespace scopy::adc;
-
+#if 0
 GRXyChannelComponent::GRXyChannelComponent(GRIIOFloatChannelNode *node, PlotComponent *plotComponent, QPen pen,
 					       QWidget *parent)
 	: ChannelComponent(node->name(), plotComponent, pen, parent)
@@ -316,3 +316,4 @@ void GRXyChannelComponent::setupChannelMenuControlButtonHelper(MenuControlButton
 	});
 	btn->checkBox()->setChecked(true);
 }
+#endif

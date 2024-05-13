@@ -6,7 +6,7 @@
 
 namespace scopy {
 namespace adc {
-
+#if 0
 XyPlotSettingsComponent::XyPlotSettingsComponent(PlotComponent *plot, QWidget *parent)
 	: QWidget(parent)
 	, m_syncMode(false)
@@ -210,6 +210,6 @@ void XyPlotSettingsComponent::setXChannel(ChannelComponent *newXChannel)
 	Q_EMIT xChannelChanged(newXChannel);
 }
 
-
+#endif
 } // namespace adc
 } // namespace scopy

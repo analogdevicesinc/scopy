@@ -3,11 +3,10 @@
 #include "grtimechannelcomponent.h"
 #include <gr-util/grsignalpath.h>
 
-Q_LOGGING_CATEGORY(CAT_GRXYSINKCOMPONENT,"GRXySinkComponent")
 using namespace scopy::adc;
 using namespace scopy::grutil;
 
-
+#if 0
 
 GRXySinkComponent::GRXySinkComponent(QString name, GRTopBlockNode *t, QObject *parent) : QObject(parent) {
 	m_node = t;
@@ -198,4 +197,4 @@ bool GRXySinkComponent::enabled() const
 {
 	return m_enabled;
 }
-
+#endif

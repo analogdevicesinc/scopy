@@ -8,6 +8,7 @@
 
 namespace scopy {
 namespace adc {
+/*
 class SCOPY_ADCPLUGIN_EXPORT TimeInstrumentComponent : public QObject, public MetaComponent, public AcqNodeChannelAware
 {
 	Q_OBJECT
@@ -57,6 +58,7 @@ public:
 
 
 };
+*/
 }
 }
 #endif // TIMEINSTRUMENTCOMPONENT_H

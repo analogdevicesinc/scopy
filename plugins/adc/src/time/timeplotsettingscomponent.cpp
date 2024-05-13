@@ -14,7 +14,7 @@ TimePlotSettingsComponent::TimePlotSettingsComponent(PlotComponent *plot, QWidge
 	, m_singleYMode(false)
 
 {
-	m_plot = plot->plot();
+	m_plot = plot->timePlot();
 	auto *w = createMenu(this);
 	QVBoxLayout *lay = new QVBoxLayout(parent);
 	lay->addWidget(w);
@@ -386,12 +386,12 @@ void TimePlotSettingsComponent::setSyncBufferPlotSize(bool newSyncBufferPlotSize
 
 void TimePlotSettingsComponent::addChannel(ChannelComponent *c) {
 	m_channels.append(c);
-	autoscaler->addChannels(c->plotCh());
+	// autoscaler->addChannels(c->plotCh());/
 }
 
 void TimePlotSettingsComponent::removeChannel(ChannelComponent *c) {
 	m_channels.removeAll(c);
-	autoscaler->removeChannels(c->plotCh());
+	// autoscaler->removeChannels(c->plotCh());
 }
 
 void TimePlotSettingsComponent::addSampleRateProvider(SampleRateProvider *s) {
