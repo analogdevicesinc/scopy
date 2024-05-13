@@ -258,7 +258,7 @@
 				<DefaultValue>0</DefaultValue>
 				<Description>Sets the Sink Current on the DIN Pins.</Description>
 				<Visibility>Public</Visibility>
-				<Width>4</Width>
+				<Width>5</Width>
 				<Notes>On AD74413R(din_upgrade=1), all 5 bits(din_config&lt;10:6&gt;) are used to set the current.
 
 On AD74412R(din_upgrade=0) then only the lower 4 bits(din_config&lt;9:6&gt;) are used to set the current.
@@ -266,7 +266,7 @@ On AD74412R(din_upgrade=0) then only the lower 4 bits(din_config&lt;9:6&gt;) are
 Hence Fullscale DIN sink current =1.8mA on AD74412R.</Notes>
 				<BitOffset>0</BitOffset>
 				<RegOffset>6</RegOffset>
-				<SliceWidth>4</SliceWidth>
+				<SliceWidth>5</SliceWidth>
 			</BitField>
 			<BitField>
 				<Name>DIN_RANGE</Name>
@@ -1860,6 +1860,28 @@ When an ADC conversion causes this bit to be set, the ADC result is automaticall
 		</BitFields>
 	</Register>
 	<Register>
+		<Name>DIN_COUNTER</Name>
+		<Address>0x3D</Address>
+		<Description>Debounced DIN Count Register per Channel.</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes>This count is allowed to roll over by design as in normal operation it's update rate should be slow.</Notes>
+		<BitFields>
+			<BitField>
+				<Name>DIN_CNT</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Contains the 16bit Count from the DIN Counter.</Description>
+				<Visibility>Public</Visibility>
+				<Width>16</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>16</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
 		<Name>READ_SELECT</Name>
 		<Address>0x41</Address>
 		<Description>Readback Select Register</Description>
@@ -2141,10 +2163,6 @@ When an ADC conversion causes this bit to be set, the ADC result is automaticall
 						<Value>65</Value>
 					</Option>
 					<Option>
-						<Description>ADC_CONV_CTRL_80SPS</Description>
-						<Value>66</Value>
-					</Option>
-					<Option>
 						<Description>THERM_RST</Description>
 						<Value>67</Value>
 					</Option>
@@ -2188,47 +2206,6 @@ When an ADC conversion causes this bit to be set, the ADC result is automaticall
 				<BitOffset>0</BitOffset>
 				<RegOffset>9</RegOffset>
 				<SliceWidth>1</SliceWidth>
-			</BitField>
-		</BitFields>
-	</Register>
-	<Register>
-		<Name>ADC_CONV_CTRL_80SPS</Name>
-		<Address>0x42</Address>
-		<Description>80SPS ADC Conversion Control Register.</Description>
-		<Exists>True</Exists>
-		<Width>16</Width>
-		<Notes></Notes>
-		<BitFields>
-			<BitField>
-				<Name>CONV_SEQ_40SPS</Name>
-				<Access>R/W</Access>
-				<DefaultValue>0</DefaultValue>
-				<Description>Selects Single or Continuous Mode.</Description>
-				<Visibility>Public</Visibility>
-				<Width>2</Width>
-				<Notes>If the fuse bit adc_40sps_dis is set then writing to this register will not start conversions.
-If the fuse bit adc_40sps_dis is 1 then this field is not available for writes.  Reads will return 0.</Notes>
-				<Options>
-					<Option>
-						<Description>Stop continuous conversions and leave the ADC powered up or power up the ADC.</Description>
-						<Value>0</Value>
-					</Option>
-					<Option>
-						<Description>Start single sequence conversion.</Description>
-						<Value>1</Value>
-					</Option>
-					<Option>
-						<Description>Start Continuous Conversions.</Description>
-						<Value>2</Value>
-					</Option>
-					<Option>
-						<Description>Stop continuous conversions and power down the ADC or power down the ADC.</Description>
-						<Value>3</Value>
-					</Option>
-				</Options>
-				<BitOffset>0</BitOffset>
-				<RegOffset>0</RegOffset>
-				<SliceWidth>2</SliceWidth>
 			</BitField>
 		</BitFields>
 	</Register>
