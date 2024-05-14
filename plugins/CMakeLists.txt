@@ -6,7 +6,7 @@ message(STATUS "Plugins folder after install: " ${SCOPY_PLUGIN_INSTALL_PATH})
 
 option(ENABLE_PLUGIN_M2K "Enable m2k plugin" ON)
 option(ENABLE_PLUGIN_TEST "Enable test plugin" OFF)
-option(ENABLE_PLUGIN_SWIOT "Enable swiot plugin" ON)
+option(ENABLE_PLUGIN_SWIOT "Enable swiot plugin" OFF)
 option(ENABLE_PLUGIN_REGMAP "Enable regmap plugin" ON)
 option(ENABLE_PLUGIN_DEBUGGER "Enable debugger plugin" ON)
 option(ENABLE_PLUGIN_ADC "Enable ADC plugin" ON)
