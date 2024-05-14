@@ -427,7 +427,7 @@ void SWIOTREFACTORPlugin::initMetadata()
 	loadMetadata(
 		R"plugin(
 	{
-	   "priority":100,
+	   "priority":101,
 	   "category":[
 	      "iio"
 	   ],
