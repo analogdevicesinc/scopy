@@ -3,9 +3,12 @@
 
 #include "scopy-core_export.h"
 
+#include <QComboBox>
 #include <QLineEdit>
 #include <QProcess>
 #include <QWidget>
+#include <animationpushbutton.h>
+#include <menulineedit.h>
 
 namespace Ui {
 class EmuWidget;
@@ -26,23 +29,35 @@ protected:
 	void showEvent(QShowEvent *event) override;
 private Q_SLOTS:
 	void onEnableDemoClicked();
-	void onOptionChanged(QString option);
 	void browseFile(QLineEdit *lineEditPath);
 
 private:
+	QWidget *createDemoOptWidget(QWidget *parent);
+	QWidget *createXmlPathWidget(QWidget *parent);
+	QWidget *createRxTxDevWidget(QWidget *parent);
+	QWidget *createUriWidget(QWidget *parent);
+	QWidget *createEnBtnWidget(QWidget *parent);
 	void init();
+	void enGenericOptWidget(QWidget *xmlPathWidget, QWidget *rxTxDevWidget, QString crtOpt);
 	QStringList createArgList();
 	void setStatusMessage(QString msg);
 	QString findEmuPath();
 	void stopEnableBtn(QString btnText);
-	bool startIioEmuProcess(QString processPath);
+	bool startIioEmuProcess(QString processPath, QStringList arg = {});
 	void killEmuProcess();
 
-	Ui::EmuWidget *m_ui;
+	QWidget *m_emuWidget;
+	QComboBox *m_demoOptCb;
+	MenuLineEdit *m_xmlPathEdit;
+	MenuLineEdit *m_rxTxDevEdit;
+	MenuLineEdit *m_uriEdit;
+	QLabel *m_uriMsgLabel;
+	AnimationPushButton *m_enDemoBtn;
+
 	QString m_emuPath;
 	bool m_enableDemo;
 	QProcess *m_emuProcess;
-	const QVector<QString> m_availableOptions{"adalm2000", "generic"};
+	const QStringList m_availableOptions{"adalm2000", "generic"};
 };
 } // namespace scopy
 
