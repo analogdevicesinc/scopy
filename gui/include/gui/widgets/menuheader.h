@@ -16,11 +16,11 @@ public:
 	MenuHeaderWidget(QString title, QPen pen, QWidget *parent = nullptr);
 	~MenuHeaderWidget();
 
-	QLabel *label();
+	QLineEdit *title();
 	void applyStylesheet();
 
 private:
-	QLabel *m_label;
+	QLineEdit *m_title;
 	QFrame *m_line;
 	QPen m_pen;
 };

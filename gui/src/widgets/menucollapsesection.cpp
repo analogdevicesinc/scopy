@@ -1,3 +1,4 @@
+#include "qlineedit.h"
 #include <smallOnOffSwitch.h>
 #include <widgets/menucollapsesection.h>
 
@@ -16,8 +17,13 @@ MenuCollapseHeader::MenuCollapseHeader(QString title, MenuCollapseSection::MenuH
 	setCheckable(true);
 	setLayout(lay);
 
-	m_label = new QLabel(title, this);
-	StyleHelper::MenuCollapseHeaderLabel(m_label, "menuCollapseLabel");
+	m_label = new QLineEdit(title, this);
+	m_label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+	m_label->setEnabled(false);
+	m_label->setReadOnly(false);
+
+	StyleHelper::MenuCollapseHeaderLineEdit(m_label, "menuCollapseLabel");
+	m_label->setTextMargins(0, 0, 0, 0);
 
 	switch(style) {
 	case MenuCollapseSection::MHCW_ARROW:
@@ -29,7 +35,7 @@ MenuCollapseHeader::MenuCollapseHeader(QString title, MenuCollapseSection::MenuH
 	case MenuCollapseSection::MHCW_ONOFF:
 		m_ctrl = new SmallOnOffSwitch(this);
 		StyleHelper::MenuOnOffSwitchButton(dynamic_cast<SmallOnOffSwitch *>(m_ctrl), "menuCollapseButton");
-		connect(this, &QAbstractButton::toggled, m_ctrl, &QAbstractButton::toggled);
+		connect(this, &QAbstractButton::toggled, [=](bool b) { m_ctrl->setChecked(b); });
 		m_ctrl->setChecked(true);
 		break;
 	default:
@@ -42,22 +48,25 @@ MenuCollapseHeader::MenuCollapseHeader(QString title, MenuCollapseSection::MenuH
 	m_ctrl->setAttribute(Qt::WA_TransparentForMouseEvents);
 
 	lay->addWidget(m_label);
-	lay->addSpacerItem(new QSpacerItem(40, 40, QSizePolicy::Expanding, QSizePolicy::Maximum));
+	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Maximum));
 	lay->addWidget(m_ctrl);
 }
 
 MenuCollapseHeader::~MenuCollapseHeader() {}
 
+QLineEdit *MenuCollapseHeader::title() { return m_label; }
+
 MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style,
 					 QWidget *parent)
 	: QWidget(parent)
+	, m_title(title)
 {
 
 	m_lay = new QVBoxLayout(this);
 	m_lay->setMargin(0);
 	m_lay->setSpacing(0);
 	setLayout(m_lay);
-	m_header = new MenuCollapseHeader(title, style, this);
+	m_header = new MenuCollapseHeader(m_title, style, this);
 	m_lay->addWidget(m_header);
 	QWidget *container = new QWidget(this);
 	m_lay->addWidget(container);
@@ -75,8 +84,12 @@ QAbstractButton *MenuCollapseSection::header() { return m_header; }
 
 QVBoxLayout *MenuCollapseSection::contentLayout() const { return m_contLayout; }
 
-// void MenuCollapseSection::add(QWidget *ch) {
-//	m_contLayout->addWidget(ch);
-//}
+QString MenuCollapseSection::title() { return m_title; }
+
+void MenuCollapseSection::setTitle(QString s)
+{
+	m_title = s;
+	m_header->title()->setText(m_title);
+}
 
 #include "moc_menucollapsesection.cpp"

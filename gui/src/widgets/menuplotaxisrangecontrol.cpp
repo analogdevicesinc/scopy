@@ -33,22 +33,40 @@ MenuPlotAxisRangeControl::MenuPlotAxisRangeControl(PlotAxis *m_plotAxis, QWidget
 	minMaxLayout->addWidget(m_max);
 	// Connects
 	connect(m_min, &PositionSpinButton::valueChanged, m_plotAxis, &PlotAxis::setMin);
+	connect(m_min, &PositionSpinButton::valueChanged, this,
+		[=](double) { Q_EMIT intervalChanged(m_min->value(), m_max->value()); });
 	connect(m_plotAxis, &PlotAxis::minChanged, this, [=]() {
 		QSignalBlocker b(m_min);
 		m_min->setValue(m_plotAxis->min());
+		Q_EMIT intervalChanged(m_min->value(), m_max->value());
 	});
 
 	connect(m_max, &PositionSpinButton::valueChanged, m_plotAxis, &PlotAxis::setMax);
+	connect(m_max, &PositionSpinButton::valueChanged, this,
+		[=](double) { Q_EMIT intervalChanged(m_min->value(), m_max->value()); });
 	connect(m_plotAxis, &PlotAxis::maxChanged, this, [=]() {
 		QSignalBlocker b(m_max);
 		m_max->setValue(m_plotAxis->max());
+		Q_EMIT intervalChanged(m_min->value(), m_max->value());
 	});
 }
 
 MenuPlotAxisRangeControl::~MenuPlotAxisRangeControl() {}
 
-void MenuPlotAxisRangeControl::setMin(double val) { m_min->setValue(val); }
+double MenuPlotAxisRangeControl::min() { return m_min->value(); }
 
-void MenuPlotAxisRangeControl::setMax(double val) { m_max->setValue(val); }
+double MenuPlotAxisRangeControl::max() { return m_max->value(); }
+
+void MenuPlotAxisRangeControl::setMin(double val)
+{
+	m_min->setValue(val);
+	Q_EMIT intervalChanged(val, m_max->value());
+}
+
+void MenuPlotAxisRangeControl::setMax(double val)
+{
+	m_max->setValue(val);
+	Q_EMIT intervalChanged(m_min->value(), val);
+}
 
 #include "moc_menuplotaxisrangecontrol.cpp"

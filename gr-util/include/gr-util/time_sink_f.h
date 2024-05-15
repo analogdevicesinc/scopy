@@ -68,7 +68,7 @@ public:
 
 	static sptr make(int size, float sampleRate, const std::string &name, int nconnections);
 	virtual std::string name() const = 0;
-	virtual void updateData() = 0;
+	virtual uint64_t updateData() = 0;
 	virtual const std::vector<float> &time() const = 0;
 	virtual const std::vector<float> &freq() const = 0;
 	virtual const std::vector<std::vector<float>> &data() const = 0;
