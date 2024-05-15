@@ -23,7 +23,8 @@
 
 #include <QWidget>
 #include <iio.h>
-#include <gui/spinbox_a.hpp>
+// #include <gui/spinbox_a.hpp>
+#include <gui/widgets/titlespinbox.h>
 #include "guistrategy/guistrategyinterface.h"
 #include "iiowidgetdata.h"
 #include "scopy-iio-widgets_export.h"
@@ -53,12 +54,12 @@ public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
 
 Q_SIGNALS:
-	void emitData(QString data);
-	void requestData();
+	void emitData(QString data) override;
+	void requestData() override;
 
 private:
 	QWidget *m_ui;
-	PositionSpinButton *m_positionSpinButton;
+	TitleSpinBox *m_spinBox;
 };
 } // namespace scopy
 
