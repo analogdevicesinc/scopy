@@ -22,35 +22,48 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 	layout->setSpacing(10);
 	setLayout(layout);
 
-	QWidget *vWidget = new QWidget(this);
-	QVBoxLayout *vLay = new QVBoxLayout(this);
-	vLay->setSpacing(10);
-	vLay->setMargin(0);
-	vWidget->setLayout(vLay);
+	QWidget *gridWidget = new QWidget(this);
+	QGridLayout *gridLay = new QGridLayout(this);
+	gridLay->setSpacing(10);
+	gridLay->setMargin(0);
+	gridWidget->setLayout(gridLay);
 
 	QStringList backendsList = computeBackendsList();
 
-	m_filterWidget = createFilterWidget(vWidget);
+	QLabel *filterLabel = new QLabel("Filter:", gridWidget);
+	StyleHelper::MenuSmallLabel(filterLabel);
+	m_filterWidget = createFilterWidget(gridWidget);
 	setupFilterWidget(backendsList);
+	gridLay->addWidget(filterLabel, 0, 0);
+	gridLay->addWidget(m_filterWidget, 0, 1);
 
-	QWidget *avlContextWidget = createAvlCtxWidget(vWidget);
+	QLabel *ctxLabel = new QLabel("Context:", gridWidget);
+	StyleHelper::MenuSmallLabel(ctxLabel);
+	QWidget *avlContextWidget = createAvlCtxWidget(gridWidget);
 	m_btnScan->setVisible(!backendsList.isEmpty());
+	gridLay->addWidget(ctxLabel, 1, 0);
+	gridLay->addWidget(avlContextWidget, 1, 1);
 
-	QWidget *serialSettWiedget = createSerialSettWidget(vWidget);
+	QLabel *serialLabel = new QLabel("Serial:", gridWidget);
+	StyleHelper::MenuSmallLabel(serialLabel);
+	QWidget *serialSettWiedget = createSerialSettWidget(gridWidget);
 	bool serialCompatible = isSerialCompatible();
 	serialSettWiedget->setEnabled(serialCompatible);
+	gridLay->addWidget(serialLabel, 2, 0);
+	gridLay->addWidget(serialSettWiedget, 2, 1);
 
-	QWidget *uriWidget = createUriWidget(vWidget);
-	QWidget *btnVerifyWidget = createVerifyBtnWidget(vWidget);
+	QLabel *uriLabel = new QLabel("URI:", gridWidget);
+	StyleHelper::MenuSmallLabel(uriLabel);
+	QWidget *uriWidget = createUriWidget(gridWidget);
+	gridLay->addWidget(uriLabel, 3, 0);
+	gridLay->addWidget(uriWidget, 3, 1);
 
-	vLay->addWidget(m_filterWidget);
-	vLay->addWidget(avlContextWidget);
-	vLay->addWidget(serialSettWiedget);
-	vLay->addWidget(uriWidget);
-	vLay->addWidget(btnVerifyWidget);
-	vLay->addItem(new QSpacerItem(0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding));
+	QWidget *btnVerifyWidget = createVerifyBtnWidget(gridWidget);
+	gridLay->addWidget(btnVerifyWidget, 4, 1, Qt::AlignRight);
 
-	layout->addWidget(vWidget);
+	gridLay->addItem(new QSpacerItem(0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding), 5, 0);
+
+	layout->addWidget(gridWidget);
 	layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
 	addScanFeedbackMsg("No scanned contexts... Press the refresh button!");
 
@@ -262,11 +275,6 @@ QWidget *IioTabWidget::createFilterWidget(QWidget *parent)
 	layout->setMargin(0);
 	layout->setSpacing(10);
 	w->setLayout(layout);
-
-	QLabel *label = new QLabel("Filter:", w);
-	StyleHelper::MenuSmallLabel(label);
-	label->setFixedWidth(60);
-	layout->addWidget(label);
 	return w;
 }
 
@@ -278,10 +286,6 @@ QWidget *IioTabWidget::createAvlCtxWidget(QWidget *parent)
 	layout->setSpacing(10);
 	w->setLayout(layout);
 
-	QLabel *label = new QLabel("Context:", w);
-	StyleHelper::MenuSmallLabel(label);
-	label->setFixedWidth(60);
-
 	m_avlCtxCb = new QComboBox(w);
 	StyleHelper::MenuComboBox(m_avlCtxCb, "ctx_combo");
 
@@ -290,7 +294,6 @@ QWidget *IioTabWidget::createAvlCtxWidget(QWidget *parent)
 	StyleHelper::RefreshButton(m_btnScan);
 	m_btnScan->setAutoDefault(true);
 
-	layout->addWidget(label);
 	layout->addWidget(m_avlCtxCb);
 	layout->addWidget(m_btnScan);
 	return w;
@@ -303,10 +306,6 @@ QWidget *IioTabWidget::createSerialSettWidget(QWidget *parent)
 	layout->setMargin(0);
 	layout->setSpacing(10);
 	w->setLayout(layout);
-
-	QLabel *label = new QLabel("Serial:", w);
-	StyleHelper::MenuSmallLabel(label);
-	label->setFixedWidth(60);
 
 	m_serialPortCb = new MenuCombo("Port name", w);
 	m_baudRateCb = new MenuCombo("Baud rate", w);
@@ -336,7 +335,6 @@ QWidget *IioTabWidget::createSerialSettWidget(QWidget *parent)
 	setupBtnLdIcon(m_btnSerialScan);
 	StyleHelper::RefreshButton(m_btnSerialScan);
 
-	layout->addWidget(label, Qt::AlignBottom);
 	layout->addWidget(m_serialPortCb);
 	layout->addWidget(m_baudRateCb);
 	layout->addWidget(lineEditWidget);
@@ -352,10 +350,6 @@ QWidget *IioTabWidget::createUriWidget(QWidget *parent)
 	layout->setSpacing(10);
 	w->setLayout(layout);
 
-	QLabel *label = new QLabel("URI:", w);
-	StyleHelper::MenuSmallLabel(label);
-	label->setFixedWidth(60);
-
 	QWidget *msgUriWidget = new QWidget(w);
 	msgUriWidget->setLayout(new QVBoxLayout(msgUriWidget));
 	msgUriWidget->layout()->setMargin(0);
@@ -366,7 +360,6 @@ QWidget *IioTabWidget::createUriWidget(QWidget *parent)
 	msgUriWidget->layout()->addWidget(m_uriEdit);
 	msgUriWidget->layout()->addWidget(m_uriMsgLabel);
 
-	layout->addWidget(label, Qt::AlignTop);
 	layout->addWidget(msgUriWidget);
 	return w;
 }
