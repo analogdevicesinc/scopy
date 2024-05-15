@@ -52,7 +52,7 @@ void GRProxyBlock::setEnabled(bool v)
 	blockSignals(!v); // to prevent rebuilding from non-enabled blocks - maybe
 }
 
-bool GRProxyBlock::enabled() { return m_enabled; }
+ bool GRProxyBlock::enabled() { return m_enabled; }
 
 bool GRProxyBlock::built() { return (!start_blk.isEmpty()) || (end_blk != nullptr); }
 

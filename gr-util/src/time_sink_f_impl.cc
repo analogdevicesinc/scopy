@@ -79,21 +79,25 @@ time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string
 	, m_workFinished(false)
 	, m_dataUpdated(false)
 	, m_freqOffset(0)
+	, m_lastUpdateReadItems(0)
 {
 	qInfo(CAT_TIME_SINK_F) << "ctor";
 	// reserve memory for n buffers
 	m_data.reserve(nconnections);
-	m_dataTags.reserve(nconnections);
-	m_tags.reserve(nconnections);
+	/*m_dataTags.reserve(nconnections);
+	m_tags.reserve(nconnections);*/
 
 	for(int i = 0; i < m_nconnections; i++) {
 		m_buffers.push_back(std::deque<float>());
 		m_data.push_back(std::vector<float>());
-		m_localtags.push_back(std::vector<tag_t>());
+		/*m_localtags.push_back(std::vector<tag_t>());
 		m_tags.push_back(std::deque<tag_t>());
-		m_dataTags.push_back(std::vector<PlotTag_t>());
+		m_dataTags.push_back(std::vector<PlotTag_t>());*/
 		// each data buffer reserves size
 		m_data[i].reserve(size);
+		for(int j = 0; j < size; j++) {
+			m_data[i].push_back(0);
+		}
 	}
 
 	m_time.reserve(size + 1);
@@ -107,18 +111,18 @@ bool time_sink_f_impl::check_topology(int ninputs, int noutputs) { return ninput
 
 std::string time_sink_f_impl::name() const { return m_name; }
 
-void time_sink_f_impl::updateData()
+uint64_t time_sink_f_impl::updateData()
 {
 	gr::thread::scoped_lock lock(d_setlock);
 
 	for(int i = 0; i < m_nconnections; i++) {
 		m_data[i].clear();
-		m_dataTags[i].clear();
+		// m_dataTags[i].clear();
 		for(int j = 0; j < m_buffers[i].size(); j++) {
 			m_data[i].push_back(m_buffers[i][j]);
 		}
 
-		if(!m_computeTags)
+	/*	if(!m_computeTags)
 			continue;
 
 		for(int j = 0; j < m_tags[i].size(); j++) {
@@ -132,13 +136,16 @@ void time_sink_f_impl::updateData()
 			tag.offset = nitems_read(i) - m_tags[i][j].offset;
 
 			m_dataTags[i].push_back(tag);
-		}
+		}*/
 	}
-
 	//	nitems_read();
 	if(m_workFinished) {
 		m_dataUpdated = true;
 	}
+
+	uint64_t delta = nitems_read(0) - m_lastUpdateReadItems;
+	m_lastUpdateReadItems = nitems_read(0);
+	return delta;
 }
 
 bool time_sink_f_impl::rollingMode() { return m_rollingMode; }
@@ -186,7 +193,7 @@ int time_sink_f_impl::work(int noutput_items, gr_vector_const_void_star &input_i
 		for(int i = 0; i < m_nconnections; i++) {
 			if(m_buffers[i].size() >= m_size) {
 				m_buffers[i].clear();
-				//				m_tags[i].clear();
+				//m_tags[i].clear();
 			}
 		}
 	}
@@ -202,14 +209,14 @@ int time_sink_f_impl::work(int noutput_items, gr_vector_const_void_star &input_i
 			m_buffers[i].push_front(in[j]);
 		}
 
-		if(m_computeTags) {
+		/*if(m_computeTags) {
 			m_localtags[i].clear();
 			get_tags_in_window(m_localtags[i], i, 0, noutput_items);
 			m_tags[i].insert(m_tags[i].end(), m_localtags[i].begin(), m_localtags[i].end());
 			while(m_size < nitems_read(i) - m_tags[i].front().offset) {
 				m_tags[i].pop_front();
 			}
-		}
+		}*/
 	}
 
 	return noutput_items;
