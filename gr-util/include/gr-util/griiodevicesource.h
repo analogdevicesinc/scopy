@@ -18,17 +18,20 @@ public:
 	GRIIOChannel(QString channelName, GRIIODeviceSource *dev, QObject *parent = nullptr)
 		: GRProxyBlock(parent)
 		, channelName(channelName)
-		, dev(dev)
+		, m_dev(dev)
 	{}
-	GRIIODeviceSource *getDeviceSrc() { return dev; }
+	GRIIODeviceSource *getDeviceSrc() { return m_dev; }
 	QString getChannelName() { return channelName; }
-	virtual bool sampleRateAvailable() { return false; }
+	virtual bool samplerateAttributeAvailable() { return false; }
 	virtual double readSampleRate() { return -1; }
 	static QString findAttribute(QStringList possibleNames, iio_channel *);
 
+	virtual bool scaleAttributeAvailable() { return false; };
+	virtual double readScale() { return 1; };
+
 protected:
 	QString channelName;
-	GRIIODeviceSource *dev;
+	GRIIODeviceSource *m_dev;
 };
 
 class SCOPY_GR_UTIL_EXPORT GRIIODeviceSource : public GRProxyBlock
@@ -51,11 +54,13 @@ public:
 	std::vector<std::string> channelNames() const;
 
 	QString deviceName() const;
+	bool sampleRateAvailable();
 	double readSampleRate();
 
 	static QString findAttribute(QStringList possibleNames, iio_device *dev);
 
 	iio_device *iioDev() const;
+	iio_context *ctx() const;
 
 protected:
 	QList<GRIIOChannel *> m_list;

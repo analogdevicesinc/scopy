@@ -12,9 +12,14 @@ PlotChannel::PlotChannel(QString name, QPen pen, PlotAxis *xAxis, PlotAxis *yAxi
 	, m_handle(nullptr)
 	, m_pen(pen)
 	, m_name(name)
+	, m_style(0)
+	, m_thickness(1)
 
+{}
+
+void PlotChannel::init()
 {
-	m_curve = new QwtPlotCurve(name);
+	m_curve = new QwtPlotCurve(m_name);
 	m_curve->setAxes(m_xAxis->axisId(), m_yAxis->axisId());
 	m_curve->setStyle(QwtPlotCurve::Lines);
 	m_curve->setPen(m_pen);
@@ -26,6 +31,8 @@ PlotChannel::PlotChannel(QString name, QPen pen, PlotAxis *xAxis, PlotAxis *yAxi
 	m_curve->setSymbol(symbol);
 	// curvefitter (?)
 }
+
+void PlotChannel::deinit() { delete m_curve; }
 
 PlotChannel::~PlotChannel() {}
 
@@ -43,7 +50,7 @@ void PlotChannel::enable() { setEnabled(true); }
 
 void PlotChannel::disable() { setEnabled(false); }
 
-void PlotChannel::setThickness(int thickness)
+void PlotChannel::setThicknessInternal(int thickness)
 {
 	QPen pen = m_curve->pen();
 	pen.setWidthF(thickness);
@@ -51,7 +58,7 @@ void PlotChannel::setThickness(int thickness)
 	Q_EMIT doReplot();
 }
 
-void PlotChannel::setStyle(int style)
+void PlotChannel::setStyleInternal(int style)
 {
 
 	m_curve->setPaintAttribute(QwtPlotCurve::ClipPolygons, true);
@@ -110,6 +117,16 @@ QwtPlotMarker *PlotChannel::buildMarker(QString str, QwtSymbol::Style shape, dou
 
 void PlotChannel::addMarker(QwtPlotMarker *m) { m_markers.append(m); }
 
+void PlotChannel::setSamples(const float *xData, const float *yData, size_t size, bool copy)
+{
+	if(copy) {
+		curve()->setSamples(xData, yData, size);
+	} else {
+		curve()->setRawSamples(xData, yData, size);
+	}
+	Q_EMIT newData(xData, yData, size, copy);
+}
+
 void PlotChannel::clearMarkers()
 {
 	for(auto *m : m_markers) {
@@ -147,4 +164,25 @@ PlotAxis *PlotChannel::yAxis() const { return m_yAxis; }
 
 PlotAxis *PlotChannel::xAxis() const { return m_xAxis; }
 
+int PlotChannel::thickness() const { return m_thickness; }
+
+void PlotChannel::setThickness(int newThickness)
+{
+	if(m_thickness == newThickness)
+		return;
+	m_thickness = newThickness;
+	setThicknessInternal(newThickness);
+	Q_EMIT thicknessChanged();
+}
+
+int PlotChannel::style() const { return m_style; }
+
+void PlotChannel::setStyle(int newStyle)
+{
+	if(m_style == newStyle)
+		return;
+	m_style = newStyle;
+	setStyleInternal(newStyle);
+	Q_EMIT styleChanged();
+}
 #include "moc_plotchannel.cpp"

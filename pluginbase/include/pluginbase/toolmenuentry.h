@@ -43,6 +43,7 @@ public:
 		m_enabled = other.m_enabled;
 		m_running = other.m_running;
 		m_runBtnVisible = other.m_runBtnVisible;
+		m_runEnabled = other.m_runEnabled;
 		m_attached = other.m_attached;
 		m_pluginName = other.m_pluginName;
 		m_tool = other.m_tool;

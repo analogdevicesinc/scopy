@@ -73,6 +73,7 @@ public:
 	static void MenuOnOffSwitchButton(SmallOnOffSwitch *w, QString objectName = "");
 	static void MenuCollapseSection(QWidget *w, QString objectName = "");
 	static void MenuCollapseHeaderLabel(QLabel *w, QString objectName = "");
+	static void MenuCollapseHeaderLineEdit(QLineEdit *w, QString objectName = "");
 	static void MenuComboLabel(QLabel *w, QString objectName = "");
 	static void MenuHeaderLabel(QLabel *w, QString objectName = "");
 	static void MenuControlLabel(QLabel *w, QString objectName = "");

@@ -11,9 +11,19 @@
 #include <QWidget>
 
 #include <utils.h>
+#include <compositewidget.h>
 
 namespace scopy {
-class SCOPY_GUI_EXPORT MenuControlButton : public QAbstractButton
+
+class MenuControlButton;
+class SCOPY_GUI_EXPORT MenuControlWidget
+{
+
+public:
+	virtual MenuControlButton *header() = 0;
+};
+
+class SCOPY_GUI_EXPORT MenuControlButton : public QAbstractButton, public MenuControlWidget
 {
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
@@ -31,13 +41,17 @@ public:
 
 	void setColor(QColor c);
 	void setCheckBoxStyle(MenuControlButton::CheckboxStyle cs);
-	void setName(QString s);
 
 	void setDoubleClickToOpenMenu(bool b);
 	void setOpenMenuChecksThis(bool b);
 
 	QCheckBox *checkBox();
 	QPushButton *button();
+
+	MenuControlButton *header() override { return this; }
+
+public Q_SLOTS:
+	void setName(QString s);
 
 Q_SIGNALS:
 	void doubleClicked();
@@ -60,15 +74,17 @@ protected:
 	void mousePressEvent(QMouseEvent *event) override;
 };
 
-class SCOPY_GUI_EXPORT CollapsableMenuControlButton : public QWidget
+class SCOPY_GUI_EXPORT CollapsableMenuControlButton : public QWidget, public CompositeWidget, public MenuControlWidget
 {
 	Q_OBJECT
 public:
 	CollapsableMenuControlButton(QWidget *parent = nullptr);
 	~CollapsableMenuControlButton();
 
-	void add(QWidget *ch);
+	void add(QWidget *ch) override;
+	void remove(QWidget *ch) override;
 	MenuControlButton *getControlBtn();
+	MenuControlButton *header() override { return m_ctrl; }
 
 private:
 	MenuControlButton *m_ctrl;

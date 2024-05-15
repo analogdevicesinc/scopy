@@ -18,7 +18,7 @@ class SCOPY_GUI_EXPORT PlotAxis : public QObject
 	Q_OBJECT
 public:
 	PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent = nullptr);
-	~PlotAxis() {}
+	~PlotAxis();
 
 	int position();
 	bool isHorizontal();

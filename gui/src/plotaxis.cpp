@@ -46,6 +46,8 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
 	setUnitsVisible(false);
 }
 
+PlotAxis::~PlotAxis() {}
+
 void PlotAxis::setUnitsVisible(bool visible) { m_scaleDraw->setUnitsEnabled(visible); }
 
 void PlotAxis::setScaleEn(bool en)

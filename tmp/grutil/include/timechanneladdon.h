@@ -1,7 +1,7 @@
 #ifndef TIMECHANNELADDON_H
 #define TIMECHANNELADDON_H
 
-#include "measurementcontroller.h"
+#include "plugins/adc/measurementcontroller.h"
 #include "scopy-gr-util_export.h"
 #include "tooladdon.h"
 

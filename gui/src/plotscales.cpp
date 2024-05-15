@@ -151,3 +151,5 @@ void PlotScales::initGraticule()
 		m_plot->replot();
 	});
 }
+
+#include "moc_plotscales.cpp"

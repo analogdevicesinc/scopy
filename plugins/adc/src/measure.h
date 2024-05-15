@@ -21,19 +21,18 @@
 #ifndef MEASURE_H
 #define MEASURE_H
 
-#include "scopy-gr-util_export.h"
+#include "scopy-adc_export.h"
 
 #include <QList>
 #include <QObject>
 #include <QString>
-
 #include <memory>
 
-namespace scopy::grutil {
+namespace scopy::adc {
 class CrossingDetection;
 class Statistic;
 
-class SCOPY_GR_UTIL_EXPORT Statistic
+class SCOPY_ADC_EXPORT Statistic
 {
 public:
 	Statistic();
@@ -54,7 +53,7 @@ private:
 	double m_average;
 };
 
-class SCOPY_GR_UTIL_EXPORT MeasurementData
+class SCOPY_ADC_EXPORT MeasurementData
 {
 public:
 	enum unitTypes
@@ -106,7 +105,7 @@ private:
 	Statistic m_stat;
 };
 
-class SCOPY_GR_UTIL_EXPORT MeasureModel : public QObject
+class SCOPY_ADC_EXPORT MeasureModel : public QObject
 {
 	Q_OBJECT
 public:
@@ -156,7 +155,7 @@ protected:
 	QList<std::shared_ptr<MeasurementData>> m_measurements;
 };
 
-class SCOPY_GR_UTIL_EXPORT TimeMeasureModel : public MeasureModel
+class SCOPY_ADC_EXPORT TimeMeasureModel : public MeasureModel
 {
 	enum defaultMeasurements
 	{
@@ -198,7 +197,7 @@ private:
 	bool highLowFromHistogram(double &low, double &high, double min, double max);
 };
 
-class SCOPY_GR_UTIL_EXPORT SpectralMeasure : public MeasureModel
+class SCOPY_ADC_EXPORT SpectralMeasure : public MeasureModel
 {
 	enum defaultSpectralMeasurements
 	{
@@ -225,6 +224,6 @@ private:
 
 	void measureSpectral();
 };
-} // namespace scopy::grutil
+} // namespace scopy::adc
 
 #endif // MEASURE_H

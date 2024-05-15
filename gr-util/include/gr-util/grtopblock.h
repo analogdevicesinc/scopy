@@ -27,6 +27,8 @@ public:
 
 	gr::top_block_sptr getGrBlock();
 
+	QString name() const;
+
 Q_SIGNALS:
 	void aboutToBuild();
 	void builtSignalPaths();
