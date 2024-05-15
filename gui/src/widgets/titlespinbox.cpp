@@ -1,8 +1,6 @@
 #include "titlespinbox.h"
 #include "stylehelper.h"
 
-#include <string>
-
 #include <QBoxLayout>
 #include <QLoggingCategory>
 #include <utils.h>
