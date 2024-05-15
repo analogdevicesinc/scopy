@@ -51,6 +51,11 @@ void StyleHelper::initColorMap()
 	sh->colorMap.insert("ProgressBarError", "#F44336");
 	sh->colorMap.insert("ProgressBarBusy", "#F8E71C");
 
+	sh->colorMap.insert("ButtonPressed", "#2a44df");
+	sh->colorMap.insert("ButtonHover", "#4a34ff");
+	sh->colorMap.insert("ButtonDisabled", "#868482");
+	sh->colorMap.insert("LabelTextTinted", "rgba(255, 255, 255, 150)");
+
 	sh->colorMap.insert("WarningText", "#FFC904");
 }
 
@@ -1318,6 +1323,48 @@ void StyleHelper::BrowseButton(QPushButton *btn, QString objectName)
 	btn->setStyleSheet(style);
 	btn->setProperty("blue_button", true);
 	btn->setText("...");
+}
+
+void StyleHelper::SpinBoxUpButton(QPushButton *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+
+	QString style = QString(R"css(
+	QPushButton {
+		background-color: transparent;
+		border-image: url(:/gui/icons/sba_up_btn.svg);
+		border: 0px;
+	}
+	QPushButton:pressed {
+		border-image: url(:/gui/icons/sba_up_btn_pressed.svg);
+	}
+	QPushButton:hover:!pressed {
+		border-image: url(:/gui/icons/sba_up_btn_hover.svg);
+	})css");
+
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::SpinBoxDownButton(QPushButton *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+
+	QString style = QString(R"css(
+	QPushButton {
+		background-color: transparent;
+		border-image: url(:/gui/icons/sba_dn_btn.svg);
+		border: 0px;
+	}
+	QPushButton:pressed {
+		border-image: url(:/gui/icons/sba_dn_btn_pressed.svg);
+	}
+	QPushButton:hover:!pressed {
+		border-image: url(:/gui/icons/sba_dn_btn_hover.svg);
+	})css");
+
+	w->setStyleSheet(style);
 }
 
 #include "moc_stylehelper.cpp"
