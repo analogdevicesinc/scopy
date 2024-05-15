@@ -12,6 +12,7 @@ option(ENABLE_PLUGIN_DEBUGGER "Enable debugger plugin" ON)
 option(ENABLE_PLUGIN_ADC "Enable ADC plugin" ON)
 option(ENABLE_PLUGIN_PQM "Enable PQM plugin" ON)
 option(ENABLE_PLUGIN_DATALOGGER "Enable DATALOGGER plugin" ON)
+option(ENABLE_PLUGIN_IIODEBUGPLUGIN "Enable IIODEBUGPLUGIN plugin" ON)
 
 if(ENABLE_PLUGIN_TEST)
 	add_subdirectory(guitestplugin)
@@ -66,6 +67,16 @@ endif()
 
 if(ENABLE_PLUGIN_DATALOGGER)
 	add_subdirectory(datalogger)
+	list(APPEND PLUGINS ${PLUGIN_NAME})
+endif()
+
+if(ENABLE_PLUGIN_DATAMONITOR)
+	add_subdirectory(datamonitor)
+	list(APPEND PLUGINS ${PLUGIN_NAME})
+endif()
+
+if(ENABLE_PLUGIN_IIODEBUGPLUGIN)
+	add_subdirectory(iiodebugplugin)
 	list(APPEND PLUGINS ${PLUGIN_NAME})
 endif()
 
