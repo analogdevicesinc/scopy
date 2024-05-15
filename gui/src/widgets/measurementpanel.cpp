@@ -79,7 +79,7 @@ void MeasurementsPanel::addMeasurement(MeasurementLabel *meas)
 void MeasurementsPanel::removeMeasurement(MeasurementLabel *meas)
 {
 	m_labels.removeAll(meas);
-	//	updateOrder();
+	// updateOrder();
 }
 
 void MeasurementsPanel::sort(int sortType)
@@ -122,7 +122,7 @@ void MeasurementsPanel::updateOrder()
 	m_stacks.append(new VerticalWidgetStack(this));
 	panelLayout->insertWidget(idx, m_stacks.last());
 
-	for(QWidget *label : m_labels) {
+	for(QWidget *label : qAsConst(m_labels)) {
 		addWidget(label);
 	}
 }

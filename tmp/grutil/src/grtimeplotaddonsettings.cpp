@@ -458,6 +458,7 @@ QWidget *GRTimePlotAddonSettings::createFFTMenu(QWidget *parent)
 	fftLayout->addWidget(m_fftwindow);
 	fftLayout->addWidget(m_freqOffsetSpin);
 
+	// m_plot->fftplotch()->yAxis()->setUnits("db");
 	m_fftyctrl = new MenuPlotAxisRangeControl(m_plot->fftplotch()->yAxis(), fft);
 	fftLayout->addWidget(m_fftyctrl);
 

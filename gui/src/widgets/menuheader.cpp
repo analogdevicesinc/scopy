@@ -1,3 +1,4 @@
+#include "qlineedit.h"
 #include <stylehelper.h>
 #include <widgets/menuheader.h>
 
@@ -14,22 +15,25 @@ MenuHeaderWidget::MenuHeaderWidget(QString title, QPen pen, QWidget *parent)
 	lay->setMargin(3);
 	//		lay->setContentsMargins(3,3,3,3);
 
-	m_label = new QLabel(title, this);
+	m_title = new QLineEdit(title, this);
+	m_title->setEnabled(false);
+	m_title->setReadOnly(false);
+
 	m_line = new QFrame(this);
 	m_pen = pen;
 
-	lay->addWidget(m_label);
+	lay->addWidget(m_title);
 	lay->addWidget(m_line);
 	applyStylesheet();
 }
 
 MenuHeaderWidget::~MenuHeaderWidget() {}
 
-QLabel *MenuHeaderWidget::label() { return m_label; }
+QLineEdit *MenuHeaderWidget::title() { return m_title; }
 
 void MenuHeaderWidget::applyStylesheet()
 {
-	StyleHelper::MenuHeaderLabel(m_label, "menuLabel");
+	StyleHelper::MenuCollapseHeaderLineEdit(m_title, "menuLabel");
 	StyleHelper::MenuHeaderLine(m_line, m_pen, "menuSeparator");
 	StyleHelper::MenuHeaderWidget(this, "menuHeader");
 }
