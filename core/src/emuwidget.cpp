@@ -27,17 +27,33 @@ EmuWidget::EmuWidget(QWidget *parent)
 	vWidget->setLayout(vLay);
 
 	m_emuWidget = new QWidget(vWidget);
-	QVBoxLayout *emuWidgetLay = new QVBoxLayout(m_emuWidget);
+	QGridLayout *emuWidgetLay = new QGridLayout(m_emuWidget);
 	emuWidgetLay->setSpacing(10);
 	emuWidgetLay->setMargin(0);
+
+	QLabel *demoLabel = new QLabel("Demo option:", m_emuWidget);
+	StyleHelper::MenuSmallLabel(demoLabel);
 	QWidget *demoOptWidget = createDemoOptWidget(m_emuWidget);
+	emuWidgetLay->addWidget(demoLabel, 0, 0);
+	emuWidgetLay->addWidget(demoOptWidget, 0, 1);
+
+	QLabel *xmlLabel = new QLabel("XML path:", m_emuWidget);
+	StyleHelper::MenuSmallLabel(xmlLabel);
 	QWidget *xmlPathWidget = createXmlPathWidget(m_emuWidget);
+	emuWidgetLay->addWidget(xmlLabel, 1, 0);
+	emuWidgetLay->addWidget(xmlPathWidget, 1, 1);
+
+	QLabel *rxTxLabel = new QLabel("RX/TX Devices:", m_emuWidget);
+	StyleHelper::MenuSmallLabel(rxTxLabel);
 	QWidget *rxTxDevWidget = createRxTxDevWidget(m_emuWidget);
+	emuWidgetLay->addWidget(rxTxLabel, 2, 0);
+	emuWidgetLay->addWidget(rxTxDevWidget, 2, 1);
+
+	QLabel *uriLabel = new QLabel("Uri:", m_emuWidget);
+	StyleHelper::MenuSmallLabel(uriLabel);
 	QWidget *uriWidget = createUriWidget(m_emuWidget);
-	emuWidgetLay->addWidget(demoOptWidget);
-	emuWidgetLay->addWidget(xmlPathWidget);
-	emuWidgetLay->addWidget(rxTxDevWidget);
-	emuWidgetLay->addWidget(uriWidget);
+	emuWidgetLay->addWidget(uriLabel, 3, 0);
+	emuWidgetLay->addWidget(uriWidget, 3, 1);
 
 	QWidget *btnWidget = createEnBtnWidget(vWidget);
 
@@ -195,18 +211,11 @@ QWidget *EmuWidget::createDemoOptWidget(QWidget *parent)
 	layout->setSpacing(10);
 	w->setLayout(layout);
 
-	QLabel *label = new QLabel("Demo option:", w);
-	StyleHelper::MenuSmallLabel(label);
-	label->setFixedWidth(100);
-
 	m_demoOptCb = new QComboBox(w);
 	for(const QString &opt : m_availableOptions) {
 		m_demoOptCb->addItem(opt);
 	}
-
 	StyleHelper::MenuComboBox(m_demoOptCb, "demo_combo");
-
-	layout->addWidget(label);
 	layout->addWidget(m_demoOptCb);
 	return w;
 }
@@ -219,18 +228,12 @@ QWidget *EmuWidget::createXmlPathWidget(QWidget *parent)
 	layout->setSpacing(10);
 	w->setLayout(layout);
 
-	QLabel *label = new QLabel("XML path:", w);
-	StyleHelper::MenuSmallLabel(label);
-	label->setFixedWidth(100);
-
 	m_xmlPathEdit = new MenuLineEdit(w);
 
 	QPushButton *xmlPathBtn = new QPushButton("...", w);
 	StyleHelper::BrowseButton(xmlPathBtn);
-
 	connect(xmlPathBtn, &QPushButton::clicked, this, [=]() { browseFile(m_xmlPathEdit->edit()); });
 
-	layout->addWidget(label);
 	layout->addWidget(m_xmlPathEdit);
 	layout->addWidget(xmlPathBtn);
 	return w;
@@ -244,10 +247,6 @@ QWidget *EmuWidget::createRxTxDevWidget(QWidget *parent)
 	layout->setSpacing(10);
 	w->setLayout(layout);
 
-	QLabel *label = new QLabel("RX/TX Devices:", w);
-	StyleHelper::MenuSmallLabel(label);
-	label->setFixedWidth(100);
-
 	m_rxTxDevEdit = new MenuLineEdit(w);
 	m_rxTxDevEdit->edit()->setPlaceholderText("iio:device0@/absolutePathTo/data.bin");
 
@@ -256,7 +255,6 @@ QWidget *EmuWidget::createRxTxDevWidget(QWidget *parent)
 
 	connect(rxTxDevBtn, &QPushButton::clicked, this, [=]() { browseFile(m_rxTxDevEdit->edit()); });
 
-	layout->addWidget(label);
 	layout->addWidget(m_rxTxDevEdit);
 	layout->addWidget(rxTxDevBtn);
 	return w;
@@ -270,10 +268,6 @@ QWidget *EmuWidget::createUriWidget(QWidget *parent)
 	layout->setSpacing(10);
 	w->setLayout(layout);
 
-	QLabel *label = new QLabel("Uri:", w);
-	StyleHelper::MenuSmallLabel(label);
-	label->setFixedWidth(100);
-
 	QWidget *msgUriWidget = new QWidget(w);
 	msgUriWidget->setLayout(new QVBoxLayout(msgUriWidget));
 	msgUriWidget->layout()->setMargin(0);
@@ -284,7 +278,6 @@ QWidget *EmuWidget::createUriWidget(QWidget *parent)
 	msgUriWidget->layout()->addWidget(m_uriEdit);
 	msgUriWidget->layout()->addWidget(m_uriMsgLabel);
 
-	layout->addWidget(label);
 	layout->addWidget(msgUriWidget);
 	return w;
 }
