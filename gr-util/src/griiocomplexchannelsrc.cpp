@@ -17,7 +17,7 @@ GRIIOComplexChannelSrc::GRIIOComplexChannelSrc(QString channelName, GRIIODeviceS
 void GRIIOComplexChannelSrc::build_blks(GRTopBlock *top)
 {
 	qDebug(SCOPY_GR_UTIL) << "Building GRIIOComplexChannelSrc";
-	dev->addChannel(this);
+	m_dev->addChannel(this);
 	s2f[0] = gr::blocks::short_to_float::make();
 	s2f[1] = gr::blocks::short_to_float::make();
 	f2c = gr::blocks::float_to_complex::make();
@@ -31,7 +31,7 @@ void GRIIOComplexChannelSrc::build_blks(GRTopBlock *top)
 
 void GRIIOComplexChannelSrc::destroy_blks(GRTopBlock *top)
 {
-	dev->removeChannel(this);
+	m_dev->removeChannel(this);
 	end_blk = nullptr;
 	s2f[0] = s2f[1] = nullptr;
 	f2c = nullptr;
