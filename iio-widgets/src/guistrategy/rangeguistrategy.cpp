@@ -19,6 +19,7 @@
  */
 
 #include "guistrategy/rangeguistrategy.h"
+#include <QSpinBox>
 
 using namespace scopy;
 
@@ -34,15 +35,15 @@ RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, QWidget *parent)
 			<< "The data you sent to this range gui strategy is not complete. Cannot create object";
 	}
 	m_ui->setLayout(new QVBoxLayout(m_ui));
+	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
 	// FIXME: this does not look right when uninitialized, also crashes...
-	m_positionSpinButton = new PositionSpinButton({{"-", 1}}, m_recipe.data);
-	StyleHelper::MenuSpinBox(m_positionSpinButton, "RangeSpinButton");
-	m_ui->layout()->addWidget(m_positionSpinButton);
+	m_spinBox = new TitleSpinBox(m_recipe.data.toUpper(), this);
+	m_ui->layout()->addWidget(m_spinBox);
 	Q_EMIT requestData();
 
-	connect(m_positionSpinButton, &PositionSpinButton::valueChanged, this,
-		[this](double value) { Q_EMIT emitData(QString::number(value)); });
+	connect(m_spinBox->getSpinBox(), QOverload<int>::of(&QSpinBox::valueChanged), this,
+		[this](int value) { Q_EMIT emitData(QString::number(value)); });
 }
 
 RangeAttrUi::~RangeAttrUi() { m_ui->deleteLater(); }
@@ -60,7 +61,7 @@ bool RangeAttrUi::isValid()
 
 void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 {
-	QSignalBlocker blocker(m_positionSpinButton);
+	QSignalBlocker blocker(m_spinBox);
 	QString availableAttributeValue = QString(optionalData).mid(1, QString(optionalData).size() - 2);
 	QStringList optionsList = availableAttributeValue.split(" ", Qt::SkipEmptyParts);
 	bool ok = true, finalOk = true;
@@ -76,9 +77,9 @@ void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 		qWarning(CAT_ATTR_GUI_STRATEGY)
 			<< "Could not parse the values from" << availableAttributeValue << "as double ";
 	}
-	m_positionSpinButton->setMinValue(min);
-	m_positionSpinButton->setMaxValue(max);
-	m_positionSpinButton->setStep(step);
-	m_positionSpinButton->setValue(currentNum);
+	m_spinBox->getSpinBox()->setMinimum(min);
+	m_spinBox->getSpinBox()->setMaximum(max);
+	m_spinBox->getSpinBox()->setSingleStep(step);
+	m_spinBox->getSpinBox()->setValue(currentNum);
 }
-#include "moc_rangeguistrategy.cpp"
+// #include "moc_rangeguistrategy.cpp"
