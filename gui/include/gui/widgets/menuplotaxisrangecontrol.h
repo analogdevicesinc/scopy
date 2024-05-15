@@ -15,6 +15,10 @@ class SCOPY_GUI_EXPORT MenuPlotAxisRangeControl : public QWidget
 public:
 	MenuPlotAxisRangeControl(PlotAxis *, QWidget *parent = nullptr);
 	~MenuPlotAxisRangeControl();
+	double min();
+	double max();
+Q_SIGNALS:
+	void intervalChanged(double, double);
 public Q_SLOTS:
 	void setMin(double);
 	void setMax(double);

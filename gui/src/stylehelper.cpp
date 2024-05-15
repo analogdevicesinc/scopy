@@ -868,7 +868,8 @@ void StyleHelper::MenuSectionWidget(QWidget *w, QString objectName)
 		w->setObjectName(objectName);
 	w->layout()->setContentsMargins(10, 10, 10, 10);
 	QString style = QString(R"css(
-			scopy--MenuSectionWidget {background-color: &&UIElementBackground&&;
+			QWidget{ background-color: &&UIElementBackground&&;}
+			scopy--MenuSectionWidget {
 			border-radius: 4px;
 			margin-bottom: 3px;
 			}
@@ -989,6 +990,35 @@ void StyleHelper::MenuOnOffSwitchLabel(QLabel *w, QString objectName) { StyleHel
 void StyleHelper::MenuCollapseHeaderLabel(QLabel *w, QString objectName)
 {
 	StyleHelper::MenuMediumLabel(w, objectName);
+}
+
+void StyleHelper::MenuCollapseHeaderLineEdit(QLineEdit *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+	w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	w->setMinimumWidth(50);
+	//	lbl->setMaximumWidth(80);
+	QString style = QString(R"css(
+				QLineEdit {
+					color: white;
+					background-color: rgba(255,255,255,0);
+					font-weight: 500;
+					font-family: Open Sans;
+					font-size: 14px;
+					font-style: normal;
+					border: 0px solid gray;
+					border-bottom: 1px solid rgba(255, 255, 255, 102);
+padding-left: -2px;
+					}
+				QLineEdit:disabled {
+				 border: 0px solid gray;
+				 border-bottom: 0px solid rgba(255, 255, 255, 102);
+padding-left: -2px;
+				}
+
+				)css");
+	w->setStyleSheet(style);
 }
 
 void StyleHelper::MenuOnOffSwitchButton(SmallOnOffSwitch *w, QString objectName)

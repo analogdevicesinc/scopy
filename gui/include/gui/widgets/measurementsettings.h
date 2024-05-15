@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <menuonoffswitch.h>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT MeasurementSettings : public QWidget
@@ -20,6 +21,9 @@ public:
 	MeasurementSettings(QWidget *parent = nullptr);
 	~MeasurementSettings();
 
+	bool measurementEnabled();
+	bool statsEnabled();
+
 Q_SIGNALS:
 	void toggleAllMeasurements(bool);
 	void toggleAllStats(bool);
@@ -27,6 +31,10 @@ Q_SIGNALS:
 	void sortStats(MeasurementSortingType type);
 	void enableMeasurementPanel(bool b);
 	void enableStatsPanel(bool b);
+
+private:
+	MenuOnOffSwitch *measurePanelSwitch;
+	MenuOnOffSwitch *statsPanelSwitch;
 };
 } // namespace scopy
 
