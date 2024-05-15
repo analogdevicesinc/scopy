@@ -6,7 +6,6 @@
 
 #include <QLoggingCategory>
 
-#include <grtimechanneladdon.h>
 #include <gui/stylehelper.h>
 #include <gui/widgets/menubigswitch.h>
 #include <gui/widgets/menucollapsesection.h>
@@ -17,7 +16,7 @@
 
 Q_LOGGING_CATEGORY(CAT_MEASUREMENT_CONTROLLER, "MeasurementController");
 
-namespace scopy::grutil {
+namespace scopy::adc {
 
 MeasurementController::MeasurementController(QPen pen, MeasureModel *msr, QObject *parent)
 	: QObject(parent)

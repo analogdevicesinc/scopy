@@ -32,10 +32,10 @@ public:
 	time_sink_f_impl(int size, float sampleRate, const std::string &name, int nconnections);
 	~time_sink_f_impl();
 
-	bool check_topology(int ninputs, int noutputs);
-	std::string name() const;
+	bool check_topology(int ninputs, int noutputs) override;
+	std::string name() const override;
 
-	void updateData() override;
+	uint64_t updateData() override;
 
 	bool rollingMode() override;
 	void setRollingMode(bool b) override;
@@ -85,6 +85,8 @@ private:
 	bool m_computeTags;
 	float m_freqOffset;
 	bool m_complexFft;
+	uint64_t m_lastUpdateReadItems;
+
 
 	void generate_time_axis();
 };

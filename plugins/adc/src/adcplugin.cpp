@@ -1,7 +1,7 @@
 #include "adcplugin.h"
 
-#include "adcinstrument.h"
 #include "gui/stylehelper.h"
+#include "src/adcinstrument.h"
 
 #include <QBoxLayout>
 #include <QJsonDocument>
@@ -16,9 +16,12 @@
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
 
+#include "adcinstrumentcontroller.h"
+
 Q_LOGGING_CATEGORY(CAT_ADCPLUGIN, "ADCPlugin");
 using namespace scopy;
 using namespace scopy::grutil;
+using namespace scopy::adc;
 
 bool ADCPlugin::compatible(QString m_param, QString category)
 {
@@ -50,11 +53,11 @@ finish:
 void ADCPlugin::initPreferences()
 {
 	Preferences *p = Preferences::GetInstance();
-	p->init("adc_plot_xaxis_label_position", QwtAxis::XBottom);
-	p->init("adc_plot_yaxis_label_position", QwtAxis::YLeft);
-	p->init("adc_plot_yaxis_handle_position", QwtAxis::YLeft);
-	p->init("adc_plot_xcursor_position", QwtAxis::XBottom);
-	p->init("adc_plot_ycursor_position", QwtAxis::YLeft);
+	p->init("adc_plot_xaxis_label_position", HandlePos::SOUTH);
+	p->init("adc_plot_yaxis_label_position", HandlePos::WEST);
+	p->init("adc_plot_yaxis_handle_position", HandlePos::WEST);
+	p->init("adc_plot_xcursor_position", HandlePos::SOUTH);
+	p->init("adc_plot_ycursor_position", HandlePos::WEST);
 	p->init("adc_plot_show_buffer_previewer", true);
 	p->init("adc_default_y_mode", 0);
 }
@@ -78,19 +81,19 @@ bool ADCPlugin::loadPreferencesPage()
 
 	auto adc_plot_xaxis_label_position = PreferencesHelper::addPreferenceComboList(
 		p, "adc_plot_xaxis_label_position", "Plot X-Axis scale position",
-		{{"Top", QwtAxis::XTop}, {"Bottom", QwtAxis::XBottom}}, generalSection);
+		{{"Top", HandlePos::NORTH}, {"Bottom", HandlePos::SOUTH}}, generalSection);
 	auto adc_plot_yaxis_label_position = PreferencesHelper::addPreferenceComboList(
 		p, "adc_plot_yaxis_label_position", "Plot Y-Axis scale position",
-		{{"Left", QwtAxis::YLeft}, {"Right", QwtAxis::YRight}}, generalSection);
+		{{"Left", HandlePos::WEST}, {"Right", HandlePos::EAST}}, generalSection);
 	auto adc_plot_yaxis_handle_position = PreferencesHelper::addPreferenceComboList(
 		p, "adc_plot_yaxis_handle_position", "Plot channel Y-handle position",
-		{{"Left", QwtAxis::YLeft}, {"Right", QwtAxis::YRight}}, generalSection);
+		{{"Left", HandlePos::WEST}, {"Right", HandlePos::EAST}}, generalSection);
 	auto adc_plot_xcursor_position = PreferencesHelper::addPreferenceComboList(
 		p, "adc_plot_xcursor_position", "Plot X-Cursor position",
-		{{"Top", QwtAxis::XTop}, {"Bottom", QwtAxis::XBottom}}, generalSection);
+		{{"Top", HandlePos::NORTH}, {"Bottom", HandlePos::SOUTH}}, generalSection);
 	auto adc_plot_ycursor_position = PreferencesHelper::addPreferenceComboList(
 		p, "adc_plot_ycursor_position", "Plot Y-Curosr position",
-		{{"Left", QwtAxis::YLeft}, {"Right", QwtAxis::YRight}}, generalSection);
+		{{"Left", HandlePos::WEST}, {"Right", HandlePos::EAST}}, generalSection);
 	auto adc_plot_show_buffer_previewer = PreferencesHelper::addPreferenceCheckBox(
 		p, "adc_plot_show_buffer_previewer", "Show buffer previewer", m_preferencesPage);
 
@@ -128,10 +131,18 @@ void ADCPlugin::loadToolList()
 		SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
 }
 
-PlotProxy *ADCPlugin::createRecipe(iio_context *ctx)
+bool iio_is_buffer_capable(struct iio_device *dev) {
+	for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
+		struct iio_channel *chn = iio_device_get_channel(dev, j);
+		if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void ADCPlugin::createGRIIOTreeNode(GRTopBlockNode* ctxNode, iio_context *ctx)
 {
-	QStringList deviceList;
-	QMap<QString, QStringList> devChannelMap;
 	int devCount = iio_context_get_devices_count(ctx);
 	qDebug(CAT_ADCPLUGIN) << " Found " << devCount << "devices";
 	for(int i = 0; i < devCount; i++) {
@@ -139,61 +150,35 @@ PlotProxy *ADCPlugin::createRecipe(iio_context *ctx)
 		QString dev_name = QString::fromLocal8Bit(iio_device_get_name(dev));
 
 		qDebug(CAT_ADCPLUGIN) << "Looking for scanelements in " << dev_name;
-		if(dev_name == "m2k-logic-analyzer-rx")
-			continue;
-		QStringList channelList;
-		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
+		/*if(dev_name == "m2k-logic-analyzer-rx")
+			continue;*/
 
+		QStringList channelList;
+
+		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(ctx, dev_name, dev_name, 0x400, ctxNode);
+		GRIIODeviceSourceNode *d = new GRIIODeviceSourceNode(ctxNode, gr_dev, gr_dev);
+
+		if(iio_is_buffer_capable(dev)) { // at least one scan element
+			ctxNode->addTreeChild(d);
+			ctxNode->src()->registerIIODeviceSource(gr_dev);
+		} else {
+			continue;
+		}
+
+		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
 			struct iio_channel *chn = iio_device_get_channel(dev, j);
 			QString chn_name = QString::fromLocal8Bit(iio_channel_get_id(chn));
 			qDebug(CAT_ADCPLUGIN) << "Verify if " << chn_name << "is scan element";
 			if(chn_name == "timestamp" /*|| chn_name == "accel_z" || chn_name =="accel_y"*/)
 				continue;
 			if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
-				channelList.append(chn_name);
+
+				GRIIOFloatChannelSrc *ch = new GRIIOFloatChannelSrc(gr_dev, chn_name, d);
+				GRIIOFloatChannelNode *c = new GRIIOFloatChannelNode(ctxNode, ch, d);
+				d->addTreeChild(c);
 			}
 		}
-		if(channelList.isEmpty())
-			continue;
-		deviceList.append(dev_name);
-		devChannelMap.insert(dev_name, channelList);
 	}
-
-	// should this be wrapped to a register function (?)
-	GRTopBlock *top = new grutil::GRTopBlock("Time", this);
-
-	recipe = new GRTimePlotProxy(this);
-	QString plotRecipePrefix = "time_";
-	recipe->setPrefix(plotRecipePrefix);
-
-	GRTimePlotAddon *p = new GRTimePlotAddon(plotRecipePrefix, top, this);
-	GRTimePlotAddonSettings *s = new GRTimePlotAddonSettings(p, this);
-
-	recipe->setPlotAddon(p, s);
-
-	ChannelIdProvider *chIdProvider = recipe->getChannelIdProvider();
-	for(const QString &iio_dev : deviceList) {
-		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(m_ctx, iio_dev, iio_dev, 0x400, this);
-
-		top->registerIIODeviceSource(gr_dev);
-
-		GRDeviceAddon *d = new GRDeviceAddon(gr_dev, this);
-		connect(s, &GRTimePlotAddonSettings::bufferSizeChanged, d, &GRDeviceAddon::updateBufferSize);
-		recipe->addDeviceAddon(d);
-
-		for(const QString &ch : devChannelMap.value(iio_dev, {})) {
-			int idx = chIdProvider->next();
-			GRTimeChannelAddon *t = new GRTimeChannelAddon(ch, d, p, chIdProvider->pen(idx), this);
-			top->registerSignalPath(t->signalPath());
-			recipe->addChannelAddon(t);
-		}
-	}
-	recipe->setTopBlock(top);
-
-	qDebug(CAT_ADCPLUGIN) << deviceList;
-	qDebug(CAT_ADCPLUGIN) << devChannelMap;
-
-	return recipe;
 }
 
 bool ADCPlugin::onConnect()
@@ -207,10 +192,18 @@ bool ADCPlugin::onConnect()
 
 	// create gnuradio flow out of channels
 	// pass channels to ADC instrument - figure out channel model (sample rate/ size/ etc)
+	AcqTreeNode *root = new AcqTreeNode("root",this);
+	GRTopBlock *top = new GRTopBlock("ctx", this);
+	GRTopBlockNode *ctxNode = new GRTopBlockNode(top, nullptr);
+	root->addTreeChild(ctxNode);
+	auto timeProxy = new ADCInstrumentController("adc0",root,this);
+	time = new ADCInstrument(timeProxy);
+	connect(root,&AcqTreeNode::newChild,timeProxy,&ADCInstrumentController::addChannel);
+	createGRIIOTreeNode(ctxNode, m_ctx);
+	// root->treeChildren()[0]->addTreeChild(new AcqTreeNode("other"));
 
-	auto recipe = createRecipe(m_ctx);
 
-	time = new AdcInstrument(recipe);
+
 	m_toolList[0]->setTool(time);
 
 	return true;
