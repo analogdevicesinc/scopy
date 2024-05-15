@@ -51,6 +51,7 @@ public:
 	std::vector<std::string> channelNames() const;
 
 	QString deviceName() const;
+	bool sampleRateAvailable();
 	double readSampleRate();
 
 	static QString findAttribute(QStringList possibleNames, iio_device *dev);

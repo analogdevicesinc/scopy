@@ -4,6 +4,7 @@
 #define SCOPY_PLUGIN_NAME ADCPlugin
 
 #include "scopy-adc_export.h"
+#include "src/adcacquisitionmanager.h"
 
 #include <iio.h>
 
@@ -11,35 +12,18 @@
 #include <QLineEdit>
 #include <QObject>
 
-#include <gr-util/grdeviceaddon.h>
 #include <gr-util/griiodevicesource.h>
 #include <gr-util/griiofloatchannelsrc.h>
 #include <gr-util/grproxyblock.h>
 #include <gr-util/grscaleoffsetproc.h>
-#include <gr-util/grtimechanneladdon.h>
-#include <gr-util/grtimeplotaddon.h>
-#include <gr-util/grtimeplotaddonsettings.h>
 #include <gr-util/grtopblock.h>
-#include <gr-util/tooladdon.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
+#include <gui/stylehelper.h>
 
 namespace scopy {
+namespace adc {
 using namespace grutil;
-// timedomainplot addon
-// x-y plot addon
-// histogram plot addon
-
-// timedomainchannel addon
-// timedomainmathchannel addon
-// referencechannel addon
-// softtrigger menu addon
-// cursor addon
-// measurements addon
-
-// spectrumchanneladdon
-// fft sweep addon
-// waterfall plot addon
 
 class SCOPY_ADC_EXPORT ChannelIdProvider : public QObject
 {
@@ -183,10 +167,11 @@ private:
 	iio_context *m_ctx;
 	QWidget *time;
 	QLineEdit *edit;
-	PlotProxy *createRecipe(iio_context *ctx);
-	GRTimePlotProxy *recipe;
-};
 
+	void createGRIIOTreeNode(GRTopBlockNode *node, iio_context *ctx);
+
+};
+} // namespace adc
 } // namespace scopy
 
 #endif // TESTPLUGIN_H
