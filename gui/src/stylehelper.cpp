@@ -257,6 +257,9 @@ void StyleHelper::RefreshButton(QPushButton *btn, QString objectName)
 							font-weight: bold;
 							background-color: &&ScopyBlue&&;
 						}
+						QPushButton:disabled {
+							background-color:#727273; /* design token - uiElement*/
+						}
 						)css");
 
 	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
@@ -1317,6 +1320,9 @@ void StyleHelper::BrowseButton(QPushButton *btn, QString objectName)
 							text-align: center;
 							font-weight: bold;
 							background-color: &&ScopyBlue&&;
+						}
+						QPushButton:disabled {
+							background-color:#727273; /* design token - uiElement*/
 						}
 						)css");
 
