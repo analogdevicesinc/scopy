@@ -231,7 +231,7 @@ void DataLoggerPlugin::initMetadata()
 	loadMetadata(
 		R"plugin(
 	{
-	   "priority":100,
+	   "priority":3,
 	   "category":[
 		  "iio"
 	   ],
