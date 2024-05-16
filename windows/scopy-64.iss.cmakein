@@ -259,9 +259,16 @@ Name: "plugins"; Description: "Scopy with plugins"
 Name: "custom"; Description: "Custom installation"; Flags: iscustom
 
 [Components]
-Name: "main"; Description: "Scopy"; Types: full compact custom; Flags: fixed
-Name: "plugins"; Description: "Plugins"; Types: full plugins; Flags: disablenouninstallwarning
+Name: "main"; Description: "Scopy"; Types: full plugins compact custom; Flags: fixed
 Name: "emu"; Description: "IIO Emulator"; Types: full; Flags: disablenouninstallwarning
+Name: "plugins"; Description: "Plugins"; Types: full plugins compact custom; Flags: disablenouninstallwarning
+Name: "plugins/adc"; Description: "ADC plugin"; Types: full plugins; Flags: disablenouninstallwarning
+Name: "plugins/datalogger"; Description: "Data Logger plugin"; Types: full plugins; Flags: disablenouninstallwarning
+Name: "plugins/debugger"; Description: "Debugger plugin"; Types: full plugins; Flags: disablenouninstallwarning
+Name: "plugins/m2k"; Description: "ADALM2000 plugin"; Types: full plugins; Flags: disablenouninstallwarning
+Name: "plugins/pqm"; Description: "Power Quality Monitor plugin"; Types: full plugins; Flags: disablenouninstallwarning
+Name: "plugins/regmap"; Description: "Register map plugin"; Types: full plugins; Flags: disablenouninstallwarning
+Name: "plugins/swiot"; Description: "SWIOT plugin"; Types: full plugins; Flags: disablenouninstallwarning       
 
 [Files]
 //Executables
@@ -283,8 +290,14 @@ Source: "{#DestFolder}\translations\*"; DestDir: "{app}\translations"; Component
 Source: "{#DestFolder}\*.dll"; DestDir: "{app}"; Components: main; Flags: ignoreversion onlyifdoesntexist
 Source: "{#DestFolder}\qt.conf"; DestDir: "{app}"; Components: main; Flags: ignoreversion onlyifdoesntexist
 //Plugins
-Source: "{#DestFolder}\plugins\plugins\xmls\*"; DestDir: "{app}\plugins\plugins\xmls"; Components: main; Flags: ignoreversion skipifsourcedoesntexist recursesubdirs createallsubdirs onlyifdoesntexist
-Source: "{#DestFolder}\plugins\plugins\*.dll"; DestDir: "{app}\plugins\plugins"; Components: main; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
+Source: "{#DestFolder}\plugins\plugins\xmls\*"; DestDir: "{app}\plugins\plugins\xmls"; Components: plugins/regmap; Flags: ignoreversion skipifsourcedoesntexist recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\plugins\plugins\libscopy-adcplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: plugins/adc; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
+Source: "{#DestFolder}\plugins\plugins\libscopy-dataloggerplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: plugins/datalogger; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
+Source: "{#DestFolder}\plugins\plugins\libscopy-debuggerplugin.dll";DestDir: "{app}\plugins\plugins"; Components: plugins/debugger; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
+Source: "{#DestFolder}\plugins\plugins\libscopy-m2kplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: plugins/m2k; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
+Source: "{#DestFolder}\plugins\plugins\libscopy-pqmplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: plugins/pqm; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
+Source: "{#DestFolder}\plugins\plugins\libscopy-regmapplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: plugins/regmap; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
+Source: "{#DestFolder}\plugins\plugins\libscopy-swiot.dll";DestDir: "{app}\plugins\plugins"; Components: plugins/swiot; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
