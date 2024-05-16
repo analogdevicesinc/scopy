@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE context [
+<!ELEMENT context (device | context-attribute)*>
+<!ELEMENT context-attribute EMPTY>
+<!ELEMENT device (channel | attribute | debug-attribute | buffer-attribute)*>
+<!ELEMENT channel (scan-element?, attribute*)>
+<!ELEMENT attribute EMPTY>
+<!ELEMENT scan-element EMPTY>
+<!ELEMENT debug-attribute EMPTY>
+<!ELEMENT buffer-attribute EMPTY>
+<!ATTLIST context name CDATA #REQUIRED description CDATA #IMPLIED>
+<!ATTLIST context-attribute name CDATA #REQUIRED value CDATA #REQUIRED>
+<!ATTLIST device id CDATA #REQUIRED name CDATA #IMPLIED>
+<!ATTLIST channel id CDATA #REQUIRED type (input|output) #REQUIRED name CDATA #IMPLIED>
+<!ATTLIST scan-element index CDATA #REQUIRED format CDATA #REQUIRED scale CDATA #IMPLIED>
+<!ATTLIST attribute name CDATA #REQUIRED filename CDATA #IMPLIED value CDATA #IMPLIED>
+<!ATTLIST debug-attribute name CDATA #REQUIRED value CDATA #IMPLIED>
+<!ATTLIST buffer-attribute name CDATA #REQUIRED value CDATA #IMPLIED>]>
+<context name="network" description="10.48.65.107 no-OS swiot-rebase-new-2e299b27e-modified" >
+	<context-attribute name="ip,ip-addr" value="10.48.65.107" />
+	<context-attribute name="uri" value="ip:10.48.65.107" />
+	<device id="iio:device0" name="swiot" >
+		<attribute name="mode" value="config" />
+		<attribute name="mode_available" value="config runtime" />
+		<attribute name="ext_psu" value="1" />
+		<attribute name="ch0_enable" value="0" />
+		<attribute name="ch1_enable" value="0" />
+		<attribute name="ch2_enable" value="0" />
+		<attribute name="ch3_enable" value="0" />
+		<attribute name="ch0_function" value="high_z" />
+		<attribute name="ch1_function" value="high_z" />
+		<attribute name="ch2_function" value="high_z" />
+		<attribute name="ch3_function" value="high_z" />
+		<attribute name="ch0_device" value="ad74413r" />
+		<attribute name="ch1_device" value="ad74413r" />
+		<attribute name="ch2_device" value="ad74413r" />
+		<attribute name="ch3_device" value="ad74413r" />
+		<attribute name="ch0_function_available" value="high_z voltage_out current_out voltage_in current_in_ext current_in_loop resistance digital_input digital_input_loop current_in_ext_hart current_in_loop_hart" />
+		<attribute name="ch1_function_available" value="high_z voltage_out current_out voltage_in current_in_ext current_in_loop resistance digital_input digital_input_loop current_in_ext_hart current_in_loop_hart" />
+		<attribute name="ch2_function_available" value="high_z voltage_out current_out voltage_in current_in_ext current_in_loop resistance digital_input digital_input_loop current_in_ext_hart current_in_loop_hart" />
+		<attribute name="ch3_function_available" value="high_z voltage_out current_out voltage_in current_in_ext current_in_loop resistance digital_input digital_input_loop current_in_ext_hart current_in_loop_hart" />
+		<attribute name="ch0_device_available" value="ad74413r max14906" />
+		<attribute name="ch1_device_available" value="ad74413r max14906" />
+		<attribute name="ch2_device_available" value="ad74413r max14906" />
+		<attribute name="ch3_device_available" value="ad74413r max14906" />
+	</device>
+	<device id="trigger0" name="ad74413r-dev0" ></device>
+</context>
