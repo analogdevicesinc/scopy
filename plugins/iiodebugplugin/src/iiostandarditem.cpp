@@ -181,8 +181,14 @@ void IIOStandardItem::extractDataFromDevice()
 	const struct iio_device *trig;
 	int ret = iio_device_get_trigger(m_device, &trig);
 	if(ret == 0) {
-		m_triggerName = iio_device_get_name(trig);
-		m_triggerStatus = QString("Current trigger: %1(%2)").arg(iio_device_get_id(trig)).arg(m_triggerName);
+		// there might be cases when the ret code is 0 (success) but the trig is NULL (we funny like that)
+		if(trig) {
+			m_triggerName = iio_device_get_name(trig);
+			QString triggerId = iio_device_get_id(trig);
+			m_triggerStatus = QString("Current trigger: %1(%2)").arg(triggerId).arg(m_triggerName);
+		} else {
+			m_triggerStatus = "No trigger on this device";
+		}
 	} else if(ret == -ENODEV) {
 		m_triggerStatus = "No trigger assigned on this device";
 	} else if(ret == -ENOENT) {
