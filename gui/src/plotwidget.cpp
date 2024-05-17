@@ -14,6 +14,7 @@
 #include <QwtPlotSeriesItem>
 #include <plotinfowidgets.h>
 #include <plotnavigator.hpp>
+#include <plotscales.h>
 #include <plottracker.hpp>
 #include <QwtPlotCanvas>
 #include <qwt_scale_widget.h>
@@ -37,60 +38,20 @@ PlotWidget::PlotWidget(QWidget *parent)
 	m_layout->setMargin(0);
 	setLayout(m_layout);
 
-	QPen pen(QColor("#9E9E9F"));
-
-	setupOpenGLCanvas();
-
-	m_xPosition = Preferences::get("adc_plot_xaxis_label_position").toInt();
-	m_yPosition = Preferences::get("adc_plot_yaxis_label_position").toInt();
-
-	// default Axis
-	new PlotAxis(QwtAxis::XBottom, this, pen, this);
-	new PlotAxis(QwtAxis::YLeft, this, pen, this);
-	hideDefaultAxis();
-
-	m_xAxis = new PlotAxis(m_xPosition, this, pen, this);
-	m_yAxis = new PlotAxis(m_yPosition, this, pen, this);
-
-	setupAxisScales();
-	setAxisScalesVisible(true);
-
-	// Plot needs a grid
-	QPen gridpen(QColor("#353537"));
-	EdgelessPlotGrid *d_grid = new EdgelessPlotGrid();
-	QColor majorPenColor(gridpen.color());
-	d_grid->setMajorPen(majorPenColor, 1.0, Qt::DashLine);
-	if(Preferences::GetInstance()->get("show_grid").toBool()) {
-		d_grid->attach(m_plot);
-	}
-	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this,
-		[=](QString preference, QVariant value) {
-			if(preference == "show_grid") {
-				if(value.toBool()) {
-					d_grid->attach(m_plot);
-				} else {
-					d_grid->detach();
-				}
-				m_plot->replot();
-			}
-		});
-
-	//	QwtPlotMarker *d_origin = new QwtPlotMarker();
-	//	d_origin->setLineStyle( QwtPlotMarker::Cross );
-	//	d_origin->setValue( 0, 0.0 );
-	//	d_origin->setLinePen( Qt::gray, 0.0, Qt::DashLine );
-	//	d_origin->attach( m_plot );
-
-	graticule = new Graticule(m_plot);
-	connect(this, SIGNAL(canvasSizeChanged()), graticule, SLOT(onCanvasSizeChanged()));
-	setDisplayGraticule(false);
-
 	m_plot->plotLayout()->setAlignCanvasToScales(true);
 	m_plot->plotLayout()->setCanvasMargin(0);
 	m_plot->plotLayout()->setSpacing(0);
 
+	m_xPosition = Preferences::get("adc_plot_xaxis_label_position").toInt();
+	m_yPosition = Preferences::get("adc_plot_yaxis_label_position").toInt();
+	QPen pen(QColor("#9E9E9F"));
+	m_xAxis = new PlotAxis(m_xPosition, this, pen, this);
+	m_yAxis = new PlotAxis(m_yPosition, this, pen, this);
+
+	setupOpenGLCanvas();
 	setupNavigator();
 	setupPlotInfo();
+	setupPlotScales();
 
 	m_plot->canvas()->installEventFilter(this);
 }
@@ -106,28 +67,6 @@ void PlotWidget::setupNavigator()
 PlotInfo *PlotWidget::getPlotInfo() { return m_plotInfo; }
 
 PlotWidget::~PlotWidget() {}
-
-void PlotWidget::setupAxisScales()
-{
-	for(unsigned int i = 0; i < 4; i++) {
-		QwtScaleDraw::Alignment scale = static_cast<QwtScaleDraw::Alignment>(i);
-		auto scaleItem = new EdgelessPlotScaleItem(scale);
-
-		scaleItem->scaleDraw()->setAlignment(scale);
-		scaleItem->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone, false);
-		scaleItem->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels, false);
-		scaleItem->setFont(m_plot->axisWidget(0)->font());
-
-		QPalette palette = scaleItem->palette();
-		palette.setBrush(QPalette::WindowText, QColor(0x6E6E6F));
-		palette.setBrush(QPalette::Text, QColor(0x6E6E6F));
-		scaleItem->setPalette(palette);
-		scaleItem->setBorderDistance(0);
-		scaleItem->attach(m_plot);
-		m_scaleItems.push_back(scaleItem);
-		scaleItem->setZ(200);
-	}
-}
 
 PlotAxis *PlotWidget::plotAxisFromId(QwtAxisId axisId)
 {
@@ -146,6 +85,8 @@ PlotNavigator *PlotWidget::navigator() const { return m_navigator; }
 
 PlotTracker *PlotWidget::tracker() const { return m_tracker; }
 
+PlotScales *PlotWidget::scales() const { return m_plotScales; }
+
 void PlotWidget::setupOpenGLCanvas()
 {
 	bool useOpenGLCanvas = Preferences::GetInstance()->get("general_use_opengl").toBool();
@@ -161,17 +102,6 @@ void PlotWidget::setupOpenGLCanvas()
 	} else {
 		QwtPlotCanvas *plotCanvas = qobject_cast<QwtPlotCanvas *>(m_plot->canvas());
 		plotCanvas->setPaintAttribute(QwtPlotCanvas::BackingStore, true);
-	}
-}
-
-void PlotWidget::setAxisScalesVisible(bool visible)
-{
-	for(QwtPlotScaleItem *scale : qAsConst(m_scaleItems)) {
-		if(visible) {
-			scale->attach(m_plot);
-		} else {
-			scale->detach();
-		}
 	}
 }
 
@@ -205,16 +135,6 @@ void PlotWidget::addPlotAxisHandle(PlotAxisHandle *ax) { m_plotAxisHandles[ax->a
 void PlotWidget::removePlotAxisHandle(PlotAxisHandle *ax) { m_plotAxisHandles[ax->axis()->position()].removeAll(ax); }
 
 void PlotWidget::addPlotAxis(PlotAxis *ax) { m_plotAxis[ax->position()].append(ax); }
-
-bool PlotWidget::getDisplayGraticule() const { return displayGraticule; }
-
-void PlotWidget::setDisplayGraticule(bool newDisplayGraticule)
-{
-	displayGraticule = newDisplayGraticule;
-	setAxisScalesVisible(!displayGraticule);
-	graticule->enableGraticule(displayGraticule);
-	m_plot->replot();
-}
 
 bool PlotWidget::eventFilter(QObject *object, QEvent *event)
 {
@@ -271,14 +191,6 @@ void PlotWidget::setAlignCanvasToScales(bool alignCanvasToScales)
 	m_plot->plotLayout()->setAlignCanvasToScales(alignCanvasToScales);
 }
 
-void PlotWidget::hideDefaultAxis()
-{
-	m_plot->setAxisVisible(QwtAxisId(QwtAxis::XBottom, 0), false);
-	m_plot->setAxisVisible(QwtAxisId(QwtAxis::XTop, 0), false);
-	m_plot->setAxisVisible(QwtAxisId(QwtAxis::YLeft, 0), false);
-	m_plot->setAxisVisible(QwtAxisId(QwtAxis::YRight, 0), false);
-}
-
 void PlotWidget::setupPlotInfo()
 {
 	m_plotInfo = new PlotInfo(m_plot->canvas());
@@ -297,6 +209,8 @@ void PlotWidget::setupPlotInfo()
 			}
 		});
 }
+
+void PlotWidget::setupPlotScales() { m_plotScales = new PlotScales(this); }
 
 bool PlotWidget::showYAxisLabels() const { return m_showYAxisLabels; }
 
