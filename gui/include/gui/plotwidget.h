@@ -10,10 +10,10 @@
 #include <plotinfo.h>
 
 #include <buffer_previewer.hpp>
-#include <graticule.h>
-#include <symbol_controller.h>
 
 namespace scopy {
+
+class PlotScales;
 
 class PlotAxis;
 class PlotAxisHandle;
@@ -52,8 +52,6 @@ public:
 	void addPlotAxis(PlotAxis *ax);
 	// void removePlotAxis(PlotAxis *ax);  - not supported by Qwt
 
-	bool getDisplayGraticule() const;
-	void setDisplayGraticule(bool newDisplayGraticule);
 	bool eventFilter(QObject *object, QEvent *event) override;
 
 	QwtPlot *plot() const;
@@ -76,6 +74,7 @@ public:
 
 	PlotNavigator *navigator() const;
 	PlotTracker *tracker() const;
+	PlotScales *scales() const;
 
 	void setUnitsVisible(bool visible);
 
@@ -104,7 +103,6 @@ private:
 	QGridLayout *m_layout;
 
 	QList<PlotChannel *> m_plotChannels;
-	QList<QwtPlotScaleItem *> m_scaleItems;
 
 	QList<PlotAxis *> m_plotAxis[QwtAxis::AxisPositions];
 	QList<PlotAxisHandle *> m_plotAxisHandles[QwtAxis::AxisPositions];
@@ -118,9 +116,6 @@ private:
 	int m_xPosition;
 	int m_yPosition;
 
-	bool displayGraticule;
-	Graticule *graticule;
-
 	bool m_showXAxisLabels;
 	bool m_showYAxisLabels;
 
@@ -128,13 +123,12 @@ private:
 
 	BufferPreviewer *m_bufferPreviewer;
 	PlotInfo *m_plotInfo;
+	PlotScales *m_plotScales;
 
-	void setAxisScalesVisible(bool visible);
-	void setupAxisScales();
 	void setupOpenGLCanvas();
 	void setupNavigator();
-	void hideDefaultAxis();
 	void setupPlotInfo();
+	void setupPlotScales();
 };
 
 } // namespace scopy
