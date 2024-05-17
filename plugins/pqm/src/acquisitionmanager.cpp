@@ -23,15 +23,11 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QOb
 		if(!m_buffer) {
 			qWarning(CAT_PQM_ACQ) << "Cannot create the buffer!";
 		}
-		m_dataRefreshTimer = new QTimer(this);
-		m_dataRefreshTimer->setInterval(500);
-		connect(m_dataRefreshTimer, &QTimer::timeout, this, &AcquisitionManager::futureReadData);
 		m_pingTimer = new QTimer(this);
 		m_pingTimer->setInterval(2000);
 		connect(m_pingTimer, &QTimer::timeout, this, &AcquisitionManager::pingTimerTimeout);
-		connect(m_readFw, &QFutureWatcher<void>::finished, this, &AcquisitionManager::onReadFinished);
-
-		m_dataRefreshTimer->start();
+		connect(m_readFw, &QFutureWatcher<void>::finished, this, &AcquisitionManager::onReadFinished,
+			Qt::QueuedConnection);
 	} else {
 		qWarning(CAT_PQM_ACQ) << "The PQM device is not available!";
 	}
@@ -39,11 +35,6 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QOb
 
 AcquisitionManager::~AcquisitionManager()
 {
-	if(m_dataRefreshTimer) {
-		m_dataRefreshTimer->stop();
-		m_dataRefreshTimer->deleteLater();
-		m_dataRefreshTimer = nullptr;
-	}
 	if(m_pingTimer) {
 		m_pingTimer->stop();
 		m_pingTimer->deleteLater();
@@ -80,7 +71,19 @@ void AcquisitionManager::enableBufferChnls(iio_device *dev)
 	}
 }
 
-void AcquisitionManager::toolEnabled(bool en, QString toolName) { m_tools[toolName] = en; }
+void AcquisitionManager::toolEnabled(bool en, QString toolName)
+{
+	m_tools[toolName] = en;
+	QMap<QString, bool>::const_iterator it = std::find(m_tools.cbegin(), m_tools.cend(), true);
+	if(it != m_tools.cend()) {
+		if(!m_readFw->isRunning()) {
+			futureReadData();
+		}
+	} else {
+		m_readFw->waitForFinished();
+		m_readFw->cancel();
+	}
+}
 
 void AcquisitionManager::futureReadData()
 {
@@ -174,8 +177,12 @@ void AcquisitionManager::onReadFinished()
 		Q_EMIT pqmAttrsAvailable(m_pqmAttr);
 	}
 	if(m_buffHaveBeenRead) {
-		m_buffHaveBeenRead = false;
+		m_attrHaveBeenRead = false;
 		Q_EMIT bufferDataAvailable(m_bufferData);
+	}
+	QMap<QString, bool>::const_iterator it = std::find(m_tools.cbegin(), m_tools.cend(), true);
+	if(it != m_tools.cend()) {
+		futureReadData();
 	}
 }
 

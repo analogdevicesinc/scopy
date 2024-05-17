@@ -123,7 +123,7 @@ bool PQMPlugin::onConnect()
 	m_toolList[2]->setEnabled(true);
 	m_toolList[2]->setRunBtnVisible(true);
 	connect(m_acqManager, &AcquisitionManager::bufferDataAvailable, waveform,
-		&WaveformInstrument::onBufferDataAvailable);
+		&WaveformInstrument::onBufferDataAvailable, Qt::QueuedConnection);
 
 	SettingsInstrument *settings = new SettingsInstrument();
 	m_toolList[3]->setTool(settings);
