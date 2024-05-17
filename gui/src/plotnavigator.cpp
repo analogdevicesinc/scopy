@@ -73,6 +73,7 @@ void PlotNavigator::initNavigators()
 	m_visibleZoomer->setBlockZoomEn(true);
 	m_visibleZoomer->setBlockZoomResetEn(true);
 	m_visibleZoomer->setEnabled(false);
+	m_visibleZoomer->setMinimumZoom(0);
 
 	for(QwtAxisId axisId : *m_axes) {
 		addNavigators(axisId);
@@ -270,6 +271,7 @@ PlotZoomer *PlotNavigator::createZoomer(QwtAxisId axisId)
 	zoomer->setBlockZoomResetEn(true);
 	zoomer->setDrawZoomRectEn(false);
 	zoomer->setBounded(isBounded());
+	zoomer->setMinimumZoom(0);
 
 	return zoomer;
 }
