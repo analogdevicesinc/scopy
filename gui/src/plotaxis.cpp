@@ -48,23 +48,31 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
 
 void PlotAxis::setUnitsVisible(bool visible) { m_scaleDraw->setUnitsEnabled(visible); }
 
+void PlotAxis::setScaleEn(bool en)
+{
+	if(en) {
+		m_scaleItem->attach(m_plot);
+	} else {
+		m_scaleItem->detach();
+	}
+}
+
 void PlotAxis::setupAxisScale()
 {
 	QwtScaleDraw::Alignment scale = static_cast<QwtScaleDraw::Alignment>(m_position);
-	auto scaleItem = new EdgelessPlotScaleItem(scale);
+	m_scaleItem = new EdgelessPlotScaleItem(scale);
 
-	scaleItem->scaleDraw()->setAlignment(scale);
-	scaleItem->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone, false);
-	scaleItem->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels, false);
-	scaleItem->setFont(m_plot->axisWidget(0)->font());
+	m_scaleItem->scaleDraw()->setAlignment(scale);
+	m_scaleItem->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone, false);
+	m_scaleItem->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels, false);
+	m_scaleItem->setFont(m_plot->axisWidget(0)->font());
 
-	QPalette palette = scaleItem->palette();
+	QPalette palette = m_scaleItem->palette();
 	palette.setBrush(QPalette::WindowText, QColor(0x6E6E6F));
 	palette.setBrush(QPalette::Text, QColor(0x6E6E6F));
-	scaleItem->setPalette(palette);
-	scaleItem->setBorderDistance(0);
-	scaleItem->attach(m_plot);
-	scaleItem->setZ(200);
+	m_scaleItem->setPalette(palette);
+	m_scaleItem->setBorderDistance(0);
+	m_scaleItem->setZ(200);
 }
 
 int PlotAxis::position() { return m_position; }
