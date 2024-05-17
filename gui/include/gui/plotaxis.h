@@ -47,6 +47,7 @@ public:
 	QString getUnits();
 
 	void setUnitsVisible(bool visible);
+	void setScaleEn(bool en);
 
 public Q_SLOTS:
 	void setMax(double newMax);
@@ -71,6 +72,7 @@ private:
 	OscScaleEngine *m_scaleEngine;
 	QString m_units;
 	PrefixFormatter *m_formatter;
+	EdgelessPlotScaleItem *m_scaleItem;
 
 	int m_id;
 	double m_divs;
