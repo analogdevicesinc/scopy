@@ -13,6 +13,7 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, QObject *parent)
 	, m_buffer(nullptr)
 {
 	m_readFw = new QFutureWatcher<void>(this);
+	m_readBufferFw = new QFutureWatcher<bool>(this);
 	m_setFw = new QFutureWatcher<void>(this);
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(dev) {
@@ -26,7 +27,10 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, QObject *parent)
 		m_dataRefreshTimer = new QTimer(this);
 		m_dataRefreshTimer->setInterval(500);
 		connect(m_dataRefreshTimer, &QTimer::timeout, this, &AcquisitionManager::futureReadData);
+		connect(m_setFw, &QFutureWatcher<void>::finished, this, &AcquisitionManager::onSetFinished);
 		connect(m_readFw, &QFutureWatcher<void>::finished, this, &AcquisitionManager::onReadFinished);
+		connect(m_readBufferFw, &QFutureWatcher<bool>::finished, this,
+			&AcquisitionManager::onReadBufferFinished, Qt::QueuedConnection);
 	} else {
 		qWarning(CAT_PQM_ACQ) << "The PQM device is not available!";
 	}
@@ -38,6 +42,12 @@ AcquisitionManager::~AcquisitionManager()
 		m_dataRefreshTimer->stop();
 		m_dataRefreshTimer->deleteLater();
 		m_dataRefreshTimer = nullptr;
+	}
+	if(m_readBufferFw) {
+		m_readBufferFw->waitForFinished();
+		m_readBufferFw->cancel();
+		m_readBufferFw->deleteLater();
+		m_readBufferFw = nullptr;
 	}
 	if(m_readFw) {
 		m_readFw->waitForFinished();
@@ -78,10 +88,15 @@ void AcquisitionManager::toolEnabled(bool en, QString toolName)
 		return;
 	}
 	if(it != m_tools.cend()) {
+		if(m_tools["waveform"]) {
+			futureBufferRead();
+		}
 		if(!m_dataRefreshTimer->isActive()) {
 			m_dataRefreshTimer->start();
 		}
 	} else {
+		m_readBufferFw->waitForFinished();
+		m_readBufferFw->cancel();
 		m_dataRefreshTimer->stop();
 	}
 }
@@ -97,10 +112,10 @@ void AcquisitionManager::futureReadData()
 void AcquisitionManager::readData()
 {
 	if(m_tools["rms"] || m_tools["harmonics"] || m_tools["settings"]) {
+		m_readBufferFw->waitForFinished();
+		m_readBufferFw->pause();
 		m_attrHaveBeenRead = readPqmAttributes();
-	}
-	if(m_tools["waveform"]) {
-		m_buffHaveBeenRead = readBufferedData();
+		m_readBufferFw->resume();
 	}
 }
 
@@ -134,6 +149,22 @@ bool AcquisitionManager::readPqmAttributes()
 	return true;
 }
 
+void AcquisitionManager::onReadFinished()
+{
+	if(m_attrHaveBeenRead) {
+		m_attrHaveBeenRead = false;
+		Q_EMIT pqmAttrsAvailable(m_pqmAttr);
+	}
+}
+
+void AcquisitionManager::futureBufferRead()
+{
+	if(!m_readBufferFw->isRunning()) {
+		QFuture<bool> f = QtConcurrent::run(this, &AcquisitionManager::readBufferedData);
+		m_readBufferFw->setFuture(f);
+	}
+}
+
 bool AcquisitionManager::readBufferedData()
 {
 	if(!m_buffer) {
@@ -164,15 +195,13 @@ bool AcquisitionManager::readBufferedData()
 	return true;
 }
 
-void AcquisitionManager::onReadFinished()
+void AcquisitionManager::onReadBufferFinished()
 {
-	if(m_attrHaveBeenRead) {
-		m_attrHaveBeenRead = false;
-		Q_EMIT pqmAttrsAvailable(m_pqmAttr);
-	}
-	if(m_buffHaveBeenRead) {
-		m_buffHaveBeenRead = false;
-		Q_EMIT bufferDataAvailable(m_bufferData);
+	bool readResult = m_readBufferFw->result();
+	if(m_tools["waveform"]) {
+		if(readResult)
+			Q_EMIT bufferDataAvailable(m_bufferData);
+		futureBufferRead();
 	}
 }
 
@@ -188,9 +217,18 @@ double AcquisitionManager::convertFromHwToHost(int value, QString chnlId)
 	return result;
 }
 
+void AcquisitionManager::prepareForSet()
+{
+	m_readFw->waitForFinished();
+	m_readFw->pause();
+	m_readBufferFw->waitForFinished();
+	m_readBufferFw->pause();
+}
+
 void AcquisitionManager::setConfigAttr(QMap<QString, QMap<QString, QString>> attr)
 {
 	if(!m_setFw->isRunning()) {
+		prepareForSet();
 		QFuture<void> f = QtConcurrent::run(this, &AcquisitionManager::setData, attr);
 		m_setFw->setFuture(f);
 	}
@@ -198,8 +236,6 @@ void AcquisitionManager::setConfigAttr(QMap<QString, QMap<QString, QString>> att
 
 void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 {
-	m_readFw->waitForFinished();
-	m_readFw->pause();
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(!dev)
 		return;
@@ -212,7 +248,12 @@ void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 			iio_device_attr_write(dev, key.toStdString().c_str(), newVal.toStdString().c_str());
 		}
 	}
+}
+
+void AcquisitionManager::onSetFinished()
+{
 	m_readFw->resume();
+	m_readBufferFw->resume();
 }
 
 #include "moc_acquisitionmanager.cpp"
