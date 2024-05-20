@@ -12,6 +12,7 @@ if [ "$CI_SCRIPT" == "ON" ];
 fi
 
 BUILD_TARGET=x86_64
+ARCH_BIT=64
 TOOLS_FOLDER=$WORKDIR/scopy-mingw-build-deps
 pushd $TOOLS_FOLDER
 source ./mingw_toolchain.sh $BUILD_TARGET OFF  # USING_STAGING = OFF
@@ -81,6 +82,7 @@ deploy_app(){
 
 	pushd $STAGING_DIR/bin
 	cp -n $DLL_DEPS $DEST_FOLDER/
+	cp -n iio_*.exe $DEST_FOLDER/
 	popd
 
 	cp $EMU_BUILD_FOLDER/iio-emu.exe $DEST_FOLDER

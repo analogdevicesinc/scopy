@@ -270,6 +270,7 @@ Source: "{#DestFolder}\Scopy.exe"; DestDir: "{app}"; Components: main; Flags: ig
 Source: "{#DestFolder}\Scopy-console.exe"; DestDir: "{app}"; Components: main; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#Workdir}\iio-emu\build\iio-emu.exe"; DestDir: "{app}"; Components: emu; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#Workdir}\iio-emu\build\tools\xml_gen.exe"; DestDir: "{app}"; Components: emu; Flags: ignoreversion skipifsourcedoesntexist
+Source: "{#DestFolder}\iio_*.exe"; DestDir: "{app}"; Components: main; Flags: ignoreversion skipifsourcedoesntexist
 //Folders
 Source: "{#DestFolder}\decoders\*"; DestDir: "{app}\decoders"; Components: plugins; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\drivers\*"; DestDir: "{app}\drivers"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
@@ -307,6 +308,7 @@ Type: filesandordirs; Name: "{app}\decoders"; Check: not WizardIsComponentSelect
 Type: filesandordirs; Name: "{app}\plugins"; Check: not WizardIsComponentSelected('plugins')
 Type: files; Name: "{app}\iio-emu.exe"; Check: not WizardIsComponentSelected('emu')
 Type: files; Name: "{app}\xml_gen.exe"; Check: not WizardIsComponentSelected('emu')
+Type: files; Name: "{app}\iio_*.exe"; Check: not WizardIsComponentSelected('main')
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\decoders"
