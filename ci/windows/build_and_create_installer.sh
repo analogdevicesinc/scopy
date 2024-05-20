@@ -60,7 +60,7 @@ build_iio-emu(){
 
 	mkdir -p $EMU_BUILD_FOLDER
 	cd $EMU_BUILD_FOLDER
-	$CMAKE ../
+	$CMAKE -DBUILD_TOOLS=ON ../
 	$MAKE_BIN -j4
 }
 
