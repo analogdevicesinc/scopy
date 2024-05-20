@@ -110,3 +110,4 @@ target_link_libraries(
 )
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
+set(PLUGIN_DESCRIPTION "Register map plugin" PARENT_SCOPE)
