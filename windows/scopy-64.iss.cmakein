@@ -17,7 +17,7 @@ AppUpdatesURL="http://www.analog.com"
 AppCopyright="Copyright 2018 Analog Devices, Inc."
 CreateAppDir=yes
 OutputBaseFilename=scopy-64-setup
-LicenseFile="@CMAKE_SOURCE_DIR@\LICENSE"
+LicenseFile="@CMAKE_SOURCE_DIR@/LICENSE"
 OutputDir="{#Workdir}"
 AllowNoIcons=yes
 Compression=lzma2
@@ -269,6 +269,7 @@ Name: "plugins"; Description: "plugins"; Types: full plugins compact custom; Fla
 Source: "{#DestFolder}\Scopy.exe"; DestDir: "{app}"; Components: main; Flags: ignoreversion
 Source: "{#DestFolder}\Scopy-console.exe"; DestDir: "{app}"; Components: main; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#Workdir}\iio-emu\build\iio-emu.exe"; DestDir: "{app}"; Components: emu; Flags: ignoreversion skipifsourcedoesntexist
+Source: "{#Workdir}\iio-emu\build\tools\xml_gen.exe"; DestDir: "{app}"; Components: emu; Flags: ignoreversion skipifsourcedoesntexist
 //Folders
 Source: "{#DestFolder}\decoders\*"; DestDir: "{app}\decoders"; Components: plugins; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\drivers\*"; DestDir: "{app}\drivers"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
@@ -305,6 +306,7 @@ Type: files; Name: "{userappdata}\ADI\Preferences.ini"; Tasks: deletepreferences
 Type: filesandordirs; Name: "{app}\decoders"; Check: not WizardIsComponentSelected('plugins')
 Type: filesandordirs; Name: "{app}\plugins"; Check: not WizardIsComponentSelected('plugins')
 Type: files; Name: "{app}\iio-emu.exe"; Check: not WizardIsComponentSelected('emu')
+Type: files; Name: "{app}\xml_gen.exe"; Check: not WizardIsComponentSelected('emu')
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\decoders"
