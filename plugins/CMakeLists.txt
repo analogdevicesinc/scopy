@@ -6,15 +6,13 @@ message(STATUS "Plugins folder after install: " ${SCOPY_PLUGIN_INSTALL_PATH})
 
 option(ENABLE_PLUGIN_M2K "Enable m2k plugin" ON)
 option(ENABLE_PLUGIN_TEST "Enable test plugin" OFF)
-option(ENABLE_PLUGIN_SWIOT "Enable swiot plugin" OFF)
 option(ENABLE_PLUGIN_REGMAP "Enable regmap plugin" ON)
 option(ENABLE_PLUGIN_DEBUGGER "Enable debugger plugin" ON)
 option(ENABLE_PLUGIN_ADC "Enable ADC plugin" ON)
+option(ENABLE_PLUGIN_SWIOTREFACTOR "Enable SWIOTREFACTOR plugin" ON)
 option(ENABLE_PLUGIN_PQM "Enable PQM plugin" ON)
 option(ENABLE_PLUGIN_DATALOGGER "Enable DATALOGGER plugin" ON)
 option(ENABLE_PLUGIN_IIODEBUGPLUGIN "Enable IIODEBUGPLUGIN plugin" ON)
-
-option(ENABLE_PLUGIN_SWIOTREFACTOR "Enable SWIOTREFACTOR plugin" ON)
 
 if(ENABLE_PLUGIN_TEST)
 	add_subdirectory(guitestplugin)
@@ -29,11 +27,6 @@ endif()
 
 if(ENABLE_PLUGIN_ADC)
 	add_subdirectory(adc)
-	list(APPEND PLUGINS ${PLUGIN_NAME})
-endif()
-
-if(ENABLE_PLUGIN_SWIOT)
-	add_subdirectory(swiot)
 	list(APPEND PLUGINS ${PLUGIN_NAME})
 endif()
 
