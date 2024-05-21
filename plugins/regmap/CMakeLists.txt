@@ -6,6 +6,9 @@ message(STATUS "building plugin: " ${SCOPY_MODULE})
 
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
+set(PLUGIN_NAME "Register map")
+set(PLUGIN_DESCRIPTION "Register map of connected device with detailed register table for available XML templates")
+
 include(GenerateExportHeader)
 
 # TODO: split stylesheet/resources and add here TODO: export header files correctly
@@ -101,5 +104,8 @@ target_link_libraries(
 	       Qt5::Test
 )
 
-set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
+set(PROJECT_NAME ${PROJECT_NAME} PARENT_SCOPE)
+set(PLUGIN_NAME ${PLUGIN_NAME} PARENT_SCOPE)
+set(PLUGIN_SHORT_NAME ${SCOPY_MODULE} PARENT_SCOPE)
 set(PLUGIN_DESCRIPTION "Register map plugin" PARENT_SCOPE)
+

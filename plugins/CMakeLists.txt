@@ -30,12 +30,12 @@ function(ConfigureInstallerSettings PLUGIN_NAME PLUGIN_DESCRIPTION FIXED)
 
 	set(PLUGIN_COMPONENTS
 	    ${PLUGIN_COMPONENTS}
-	    "\n Name: \"plugins/${AUX_PLUGIN}\"; Description: ${PLUGIN_DESCRIPTION} ; Types: full plugins; Flags: ${FIXED} "
+	    "\n Name: \"plugins/${PROJECT_NAME}\"; Description: ${ARGN} ; Types: full plugins; Flags: ${FIXED} "
 	    PARENT_SCOPE
 	)
 	set(PLUGIN_COMPONENTS_FILES
 	    ${PLUGIN_COMPONENTS_FILES}
-	    "\n Source:\"{#DestFolder}\\plugins\\plugins\\libscopy-${AUX_PLUGIN}.dll\"; DestDir: \"{app}\\plugins\\plugins\"; Components: plugins\\${AUX_PLUGIN}; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist"
+	    "\n Source:\"{#DestFolder}\\plugins\\plugins\\libscopy-${PROJECT_NAME}.dll\"; DestDir: \"{app}\\plugins\\plugins\"; Components: plugins\\${PROJECT_NAME}; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist"
 	    PARENT_SCOPE
 	)
 endfunction()
@@ -77,8 +77,8 @@ endif()
 
 if(ENABLE_PLUGIN_REGMAP)
 	add_subdirectory(regmap)
-	list(APPEND PLUGINS ${PLUGIN_NAME})
-	configureinstallersettings(${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "fixed")
+	list(APPEND PLUGINS ${PROJECT_NAME})
+	configureinstallersettings(${PLUGIN_SHORT_NAME} "fixed" ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} )
 endif()
 
 if(ENABLE_PLUGIN_DEBUGGER)
@@ -127,8 +127,31 @@ if(ENABLE_PLUGIN_M2K)
 	endif()
 endif()
 
-message(STATUS "Building plugins:" ${PLUGINS})
-message("PLUGIN_COMPONENTS" ${PLUGIN_COMPONENTS})
+if(ENABLE_PLUGIN_REGMAP)
+	add_subdirectory(regmap)
+	list(APPEND PLUGINS ${LIBRARY_NAME})
+endif()
+
+if(ENABLE_PLUGIN_DEBUGGER)
+	add_subdirectory(debugger)
+	list(APPEND PLUGINS ${PLUGIN_NAME})
+endif()
+
+if(ENABLE_PLUGIN_DATALOGGER)
+	add_subdirectory(datalogger)
+	list(APPEND PLUGINS ${PLUGIN_NAME})
+endif()
+
+if(ENABLE_PLUGIN_DATAMONITOR)
+	add_subdirectory(datamonitor)
+	list(APPEND PLUGINS ${PLUGIN_NAME})
+endif()
+
+if(ENABLE_PLUGIN_IIODEBUGPLUGIN)
+	add_subdirectory(iiodebugplugin)
+	list(APPEND PLUGINS ${PLUGIN_NAME})
+endif()
+
 set(PLUGINS ${PLUGINS} PARENT_SCOPE)
 set(PLUGIN_COMPONENTS ${PLUGIN_COMPONENTS} PARENT_SCOPE)
 set(PLUGIN_COMPONENTS_FILES ${PLUGIN_COMPONENTS_FILES} PARENT_SCOPE)
