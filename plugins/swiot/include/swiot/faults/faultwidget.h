@@ -21,15 +21,13 @@
 #ifndef SCOPY_FAULTWIDGET_H
 #define SCOPY_FAULTWIDGET_H
 
-#include "scopy-swiot_export.h"
-
 #include <QJsonObject>
 #include <QLabel>
 #include <QFrame>
 #include <qcoreevent.h>
 
 namespace scopy::swiot {
-class SCOPY_SWIOT_EXPORT FaultWidget : public QFrame
+class FaultWidget : public QFrame
 {
 	Q_OBJECT
 

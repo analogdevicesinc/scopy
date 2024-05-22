@@ -21,7 +21,6 @@
 #ifndef FAULTSPAGE_H
 #define FAULTSPAGE_H
 
-#include "scopy-swiot_export.h"
 #include "faultsdevice.h"
 
 #include <iio.h>
@@ -32,7 +31,7 @@
 namespace scopy::swiot {
 class FaultsDevice;
 
-class SCOPY_SWIOT_EXPORT FaultsPage : public QWidget
+class FaultsPage : public QWidget
 {
 	Q_OBJECT
 public:

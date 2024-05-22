@@ -21,7 +21,6 @@
 #ifndef SCOPY_DIODIGITALCHANNEL_H
 #define SCOPY_DIODIGITALCHANNEL_H
 
-#include "scopy-swiot_export.h"
 #include <mutex>
 #include <QWidget>
 #include <gui/lcdNumber.hpp>
@@ -31,7 +30,7 @@
 #include <gui/widgets/menucombo.h>
 
 namespace scopy::swiot {
-class SCOPY_SWIOT_EXPORT DioDigitalChannel : public QWidget
+class DioDigitalChannel : public QWidget
 {
 	Q_OBJECT
 public:
