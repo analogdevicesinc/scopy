@@ -21,7 +21,6 @@
 #ifndef FAULTSDEVICE_H
 #define FAULTSDEVICE_H
 
-#include "scopy-swiot_export.h"
 #include "faultsgroup.h"
 #include <QLineEdit>
 #include <QPushButton>
@@ -34,7 +33,7 @@
 namespace scopy::swiot {
 class FaultsGroup;
 
-class SCOPY_SWIOT_EXPORT FaultsDevice : public QWidget
+class FaultsDevice : public QWidget
 {
 	Q_OBJECT
 public:

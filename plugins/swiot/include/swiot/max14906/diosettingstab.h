@@ -21,12 +21,11 @@
 #ifndef DIOSETTINGSTAB_H
 #define DIOSETTINGSTAB_H
 
-#include "scopy-swiot_export.h"
 #include <QWidget>
 #include <gui/spinbox_a.hpp>
 
 namespace scopy::swiot {
-class SCOPY_SWIOT_EXPORT DioSettingsTab : public QWidget
+class DioSettingsTab : public QWidget
 {
 	Q_OBJECT
 public:

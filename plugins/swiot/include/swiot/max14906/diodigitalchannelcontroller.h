@@ -21,14 +21,13 @@
 #ifndef SCOPY_DIODIGITALCHANNELCONTROLLER_H
 #define SCOPY_DIODIGITALCHANNELCONTROLLER_H
 
-#include "scopy-swiot_export.h"
 #include "diodigitalchannel.h"
 #include <iio.h>
 
 #include <iioutil/commandqueue.h>
 
 namespace scopy::swiot {
-class SCOPY_SWIOT_EXPORT DioDigitalChannelController : public QWidget
+class DioDigitalChannelController : public QWidget
 {
 	Q_OBJECT
 public:
