@@ -1825,7 +1825,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 			} else {
 #if defined __APPLE__
 				bool success = loadDecoders(QCoreApplication::applicationDirPath() + "/decoders");
-#elif defined(__arm__) && !defined(__android__)
+#elif defined(__appimage__)
 				bool success = loadDecoders(QCoreApplication::applicationDirPath() + "/../lib/decoders");
 #else
 				bool success = loadDecoders("decoders");
