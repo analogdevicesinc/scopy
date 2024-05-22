@@ -9,6 +9,8 @@ if [ "$CI_SCRIPT" == "ON" ]
 		SRC_DIR=$(git rev-parse --show-toplevel)
 fi
 
+export APPIMAGE=1
+
 ## Set STAGING
 USE_STAGING=$1
 [ -z $USE_STAGING ] && USE_STAGING=ON

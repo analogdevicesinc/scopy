@@ -482,6 +482,10 @@ endif()
 # Compiler options
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall)
 
+if(DEFINED ENV{APPIMAGE})
+	add_compile_definitions(__appimage__)
+endif()
+
 #List of warnings to be treated as errors
 target_compile_options(${PROJECT_NAME} PUBLIC
 	-Werror=return-type
