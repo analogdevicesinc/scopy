@@ -86,8 +86,14 @@ generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
 )
 
+set(INCLUDE_DIRECTORIES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/ad74413r
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/faults
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/max14906
+)
+
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
+target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRECTORIES})
 
 include_directories(${Qt${QT_VERSION_MAJOR}Concurrent_INCLUDE_DIRS})
 
