@@ -240,3 +240,5 @@ void DioDigitalChannelController::writeTypeCmdFinished(Command *cmd)
 					      << tcmd->getReturnCode();
 	}
 }
+
+#include "moc_diodigitalchannelcontroller.cpp"

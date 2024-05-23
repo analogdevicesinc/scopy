@@ -318,3 +318,5 @@ QMap<QString, iio_channel *> BufferLogic::getIioChnl(int chnlIdx)
 
 	return chnlsMap;
 }
+
+#include "moc_bufferlogic.cpp"

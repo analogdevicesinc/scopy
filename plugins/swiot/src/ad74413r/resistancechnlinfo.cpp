@@ -20,3 +20,5 @@ double ResistanceChnlInfo::convertData(unsigned int data)
 		((ADC_MAX_VALUE - data) != 0) ? ((data * RPULL_UP) / (ADC_MAX_VALUE - data)) : MAX_RESISTANCE_VALUE;
 	return convertedData;
 }
+
+#include "moc_resistancechnlinfo.cpp"

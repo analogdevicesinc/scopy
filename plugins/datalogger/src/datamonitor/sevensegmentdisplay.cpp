@@ -70,3 +70,5 @@ void SevenSegmentDisplay::togglePeakHolder(bool toggle)
 		monitorList->value(monitor)->togglePeakHolder(toggle);
 	}
 }
+
+#include "moc_sevensegmentdisplay.cpp"

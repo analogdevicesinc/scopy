@@ -86,3 +86,5 @@ void ExternalPsReaderThread::run()
 		m_conn->commandQueue()->enqueue(iioAttrRead);
 	}
 }
+
+#include "moc_externalpsreaderthread.cpp"

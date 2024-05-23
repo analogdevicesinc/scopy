@@ -121,3 +121,5 @@ void DataLoggingMenu::toggleButtonsEnabled(bool en)
 	dataLoadingBtn->setEnabled(en);
 	liveDataLoggingButton->setEnabled(en);
 }
+
+#include "moc_dataloggingmenu.cpp"

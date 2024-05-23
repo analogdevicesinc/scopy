@@ -362,3 +362,5 @@ void IIODebugInstrument_API::setVSplitter(const QList<int> &newSplitter) { p->m_
 QList<int> IIODebugInstrument_API::hSplitter() const { return p->m_HSplitter->sizes(); }
 
 void IIODebugInstrument_API::setHSplitter(const QList<int> &newSplitter) { p->m_HSplitter->setSizes(newSplitter); }
+
+#include "moc_iiodebuginstrument.cpp"

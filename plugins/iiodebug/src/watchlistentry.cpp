@@ -130,3 +130,5 @@ void WatchListEntry::setValueUi(QWidget *newValueUi) { m_valueUi = newValueUi; }
 QTableWidgetItem *WatchListEntry::type() const { return m_type; }
 
 void WatchListEntry::setType(QString type) { m_type->setText(type); }
+
+#include "moc_watchlistentry.cpp"

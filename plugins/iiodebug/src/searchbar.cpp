@@ -22,3 +22,5 @@ SearchBar::SearchBar(QSet<QString> options, QWidget *parent)
 }
 
 QLineEdit *SearchBar::getLineEdit() { return m_lineEdit; }
+
+#include "moc_searchbar.cpp"

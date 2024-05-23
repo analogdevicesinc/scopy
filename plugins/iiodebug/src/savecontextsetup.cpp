@@ -22,3 +22,5 @@ void SaveContextSetup::setupUi()
 	layout()->addWidget(m_saveBtn);
 	layout()->addWidget(m_loadBtn);
 }
+
+#include "moc_savecontextsetup.cpp"

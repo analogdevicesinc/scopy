@@ -22,3 +22,5 @@ double VoltageChnlInfo::convertData(unsigned int data)
 	convertedData = (data + m_offsetScalePair.first) * m_offsetScalePair.second * factor;
 	return convertedData;
 }
+
+#include "moc_voltagechnlinfo.cpp"
