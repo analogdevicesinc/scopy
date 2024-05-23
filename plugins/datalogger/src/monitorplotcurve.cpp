@@ -48,3 +48,5 @@ PlotChannel *MonitorPlotCurve::plotch() const { return m_plotch; }
 double MonitorPlotCurve::curveMinVal() { return m_dataMonitorModel->minValue(); }
 
 double MonitorPlotCurve::curveMaxVal() { return m_dataMonitorModel->maxValue(); }
+
+#include "moc_monitorplotcurve.cpp"

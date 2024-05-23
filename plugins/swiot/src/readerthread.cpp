@@ -370,3 +370,5 @@ void ReaderThread::forcedStop()
 }
 
 void ReaderThread::handleConnectionDestroyed() { m_deinit = false; }
+
+#include "moc_readerthread.cpp"

@@ -243,3 +243,5 @@ void FaultsGroup::createFaultWidgets(const QString &path)
 	}
 	delete faultsObj;
 }
+
+#include "moc_faultsgroup.cpp"

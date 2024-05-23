@@ -237,3 +237,5 @@ void IIOStandardItem::extractDataFromChannel()
 		m_details.append("Format: " + m_format);
 	}
 }
+
+#include "moc_iiostandarditem.cpp"

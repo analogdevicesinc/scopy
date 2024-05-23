@@ -111,3 +111,5 @@ void BufferAcquisitionHandler::resetDataPoints()
 }
 
 bool BufferAcquisitionHandler::singleCapture() const { return m_singleCapture; }
+
+#include "moc_bufferacquisitionhandler.cpp"

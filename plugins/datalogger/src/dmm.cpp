@@ -149,3 +149,5 @@ void DMM::generateDictionaries()
 QMap<int, DMMInfo> DMM::iioDevices() const { return m_iioDevices; }
 
 QMap<int, DMMInfo> DMM::hwmonDevices() const { return m_hwmonDevices; }
+
+#include "moc_dmm.cpp"

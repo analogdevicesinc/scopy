@@ -723,3 +723,5 @@ void Ad74413r::initTutorialProperties()
 	m_settingsBtn->setProperty("tutorial_name", "AD74413R_SETTINGS");
 	m_configBtn->setProperty("tutorial_name", "CONFIG_BUTTON");
 }
+
+#include "moc_ad74413r.cpp"

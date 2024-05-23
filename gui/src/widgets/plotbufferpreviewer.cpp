@@ -115,3 +115,5 @@ void PlotBufferPreviewer::updateBufferPreviewer()
 	m_bufferPreviewer->setHighlightWidth(hWidth);
 	m_bufferPreviewer->setHighlightPos(hPos);
 }
+
+#include "moc_plotbufferpreviewer.cpp"

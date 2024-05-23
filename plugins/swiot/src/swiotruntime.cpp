@@ -88,3 +88,5 @@ void SwiotRuntime::createDevicesMap()
 }
 
 void SwiotRuntime::onBackBtnPressed() { Q_EMIT writeModeAttribute("config"); }
+
+#include "moc_swiotruntime.cpp"

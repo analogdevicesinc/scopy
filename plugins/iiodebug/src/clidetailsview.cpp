@@ -227,3 +227,5 @@ QString CliDetailsView::tabs(int level)
 		return "";
 	}
 }
+
+#include "moc_clidetailsview.cpp"

@@ -36,3 +36,5 @@ void PqmController::stopPingTask()
 		m_pingTask = nullptr;
 	}
 }
+
+#include "moc_pqmcontroller.cpp"

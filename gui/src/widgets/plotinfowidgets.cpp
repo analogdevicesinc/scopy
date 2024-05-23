@@ -120,3 +120,5 @@ TimestampInfo::TimestampInfo(PlotWidget *plot, QWidget *parent)
 }
 
 TimestampInfo::~TimestampInfo() {}
+
+#include "moc_plotinfowidgets.cpp"

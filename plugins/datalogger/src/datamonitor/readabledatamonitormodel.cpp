@@ -51,3 +51,5 @@ void ReadableDataMonitorModel::resetMinMax()
 	setMinValue(Q_INFINITY);
 	setMaxValue(-Q_INFINITY);
 }
+
+#include "moc_readabledatamonitormodel.cpp"

@@ -227,3 +227,5 @@ void WatchListView_API::setOffsets(const QList<int> &newOffsets)
 		}
 	}
 }
+
+#include "moc_watchlistview.cpp"

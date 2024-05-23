@@ -214,3 +214,5 @@ QWidget *DioDigitalChannel::createTopContainer(QWidget *parent)
 
 	return topWidget;
 }
+
+#include "moc_diodigitalchannel.cpp"

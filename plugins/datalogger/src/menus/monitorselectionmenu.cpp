@@ -148,3 +148,5 @@ void MonitorSelectionMenu::removeDevice(QString device)
 }
 
 QButtonGroup *MonitorSelectionMenu::monitorsGroup() const { return m_monitorsGroup; }
+
+#include "moc_monitorselectionmenu.cpp"

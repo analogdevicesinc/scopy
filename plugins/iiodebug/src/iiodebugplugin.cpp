@@ -134,3 +134,5 @@ void IIODebugPlugin::initMetadata()
 	}
 )plugin");
 }
+
+#include "moc_iiodebugplugin.cpp"

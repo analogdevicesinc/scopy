@@ -220,3 +220,5 @@ bool DataMonitorSettings::eventFilter(QObject *watched, QEvent *event)
 
 	return QWidget::eventFilter(watched, event);
 }
+
+#include "moc_datamonitorsettings.cpp"
