@@ -44,7 +44,7 @@ private Q_SLOTS:
 };
 
 #define PLUGIN_LOCATION "../../plugins"
-#define FILENAME PLUGIN_LOCATION "/libscopy-pqmplugin.so"
+#define FILENAME PLUGIN_LOCATION "/libscopy-pqm.so"
 
 void TST_PQMPlugin::fileExists()
 {

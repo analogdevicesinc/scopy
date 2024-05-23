@@ -2,9 +2,9 @@
 #include <QTest>
 #include "qpluginloader.h"
 #include <pluginbase/plugin.h>
-#include <dataloggerplugin/dataacquisitionmanager.hpp>
-#include <dataloggerplugin/datamonitor/readabledatamonitormodel.hpp>
-#include <dataloggerplugin/datamonitor/readstrategy/testreadstrategy.hpp>
+#include <datalogger/dataacquisitionmanager.hpp>
+#include <datalogger/datamonitor/readabledatamonitormodel.hpp>
+#include <datalogger/datamonitor/readstrategy/testreadstrategy.hpp>
 
 using namespace scopy;
 using namespace datamonitor;

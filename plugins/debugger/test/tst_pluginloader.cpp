@@ -25,7 +25,7 @@ private Q_SLOTS:
 };
 
 #define PLUGIN_LOCATION "../../plugins"
-#define FILENAME PLUGIN_LOCATION "/libscopy-debuggerplugin.so"
+#define FILENAME PLUGIN_LOCATION "/libscopy-debugger.so"
 
 void TST_Debugger::fileExists()
 {

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 
-set(SCOPY_MODULE m2kplugin)
+set(SCOPY_MODULE m2k)
 
 message(STATUS "building plugin: " ${SCOPY_MODULE})
 
