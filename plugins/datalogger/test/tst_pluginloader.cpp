@@ -44,7 +44,7 @@ private Q_SLOTS:
 };
 
 #define PLUGIN_LOCATION "../../plugins"
-#define FILENAME PLUGIN_LOCATION "/libscopy-dataloggerplugin.so"
+#define FILENAME PLUGIN_LOCATION "/libscopy-datalogger.so"
 
 void TST_DataLoggerPlugin::fileExists()
 {

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 
-set(SCOPY_MODULE debuggerplugin)
+set(SCOPY_MODULE debugger)
 
 message(STATUS "building plugin: " ${SCOPY_MODULE})
 
