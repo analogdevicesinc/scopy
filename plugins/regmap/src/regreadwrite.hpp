@@ -1,7 +1,7 @@
 #ifndef REGREADWRITE_HPP
 #define REGREADWRITE_HPP
 
-#include "scopy-regmapplugin_export.h"
+#include "scopy-regmap_export.h"
 
 #include <iio.h>
 
@@ -11,7 +11,7 @@
 #define BUF_SIZE 16384
 
 namespace scopy::regmap {
-class SCOPY_REGMAPPLUGIN_EXPORT RegReadWrite : public QObject
+class SCOPY_REGMAP_EXPORT RegReadWrite : public QObject
 {
 	Q_OBJECT
 

@@ -1,11 +1,11 @@
 #ifndef VERTICALSCROLLAREA_HPP
 #define VERTICALSCROLLAREA_HPP
 
-#include "scopy-regmapplugin_export.h"
+#include "scopy-regmap_export.h"
 
 #include <qscrollarea.h>
 
-class SCOPY_REGMAPPLUGIN_EXPORT VerticalScrollArea : public QScrollArea
+class SCOPY_REGMAP_EXPORT VerticalScrollArea : public QScrollArea
 {
 	Q_OBJECT
 public:
