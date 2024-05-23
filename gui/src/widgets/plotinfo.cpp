@@ -109,3 +109,5 @@ void PlotInfo::initLayouts()
 	m_rightHover->setAttribute(Qt::WA_TransparentForMouseEvents);
 	m_rightHover->show();
 }
+
+#include "moc_plotinfo.cpp"

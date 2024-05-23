@@ -247,3 +247,5 @@ void LogDataToFile::loadData(QString path)
 
 	Q_EMIT loadDataCompleted();
 }
+
+#include "moc_logdatatofile.cpp"

@@ -89,3 +89,5 @@ void DetailsView::setAddToWatchlistState(bool add)
 		m_addToWatchlistBtn->setToolTip("Remove from Watchlist");
 	}
 }
+
+#include "moc_detailsview.cpp"

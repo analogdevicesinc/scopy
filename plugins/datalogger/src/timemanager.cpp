@@ -59,3 +59,5 @@ void TimeManager::setIsRunning(bool newIsRunning)
 }
 
 QDateTime TimeManager::lastReadValue() const { return m_lastReadValue; }
+
+#include "moc_timemanager.cpp"

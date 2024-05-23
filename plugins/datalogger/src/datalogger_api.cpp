@@ -202,3 +202,5 @@ void DataLogger_API::importDataFromPathForTool(QString toolName, QString path)
 		Q_EMIT monitorTool->m_dataMonitorSettings->dataLoggingMenu->requestDataLoading(path);
 	}
 }
+
+#include "moc_datalogger_api.cpp"

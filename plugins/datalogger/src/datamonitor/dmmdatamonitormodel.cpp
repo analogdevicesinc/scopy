@@ -40,3 +40,5 @@ QString DmmDataMonitorModel::getDeviceName() { return QString::fromStdString(iio
 iio_device *DmmDataMonitorModel::iioDevice() const { return m_iioDevice; }
 
 void DmmDataMonitorModel::setIioDevice(iio_device *newIioDevice) { m_iioDevice = newIioDevice; }
+
+#include "moc_dmmdatamonitormodel.cpp"

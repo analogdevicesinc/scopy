@@ -313,3 +313,5 @@ void DatamonitorTool::startTutorial()
 	datamonitorTutorial->setTitle("Tutorial");
 	datamonitorTutorial->start();
 }
+
+#include "moc_datamonitortool.cpp"

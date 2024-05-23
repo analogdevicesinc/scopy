@@ -67,3 +67,5 @@ QString DioController::getChannelType(unsigned int index)
 }
 
 iio_device *DioController::getDevice() const { return DioController::m_device; }
+
+#include "moc_diocontroller.cpp"
