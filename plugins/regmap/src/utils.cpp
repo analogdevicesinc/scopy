@@ -2,7 +2,7 @@
 
 #include "jsonformatedelement.hpp"
 #include "logging_categories.h"
-#include "scopy-regmapplugin_config.h"
+#include "scopy-regmap_config.h"
 
 #include <QApplication>
 #include <QDir>

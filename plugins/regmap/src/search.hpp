@@ -1,13 +1,13 @@
 #ifndef SEARCH_HPP
 #define SEARCH_HPP
 
-#include "scopy-regmapplugin_export.h"
+#include "scopy-regmap_export.h"
 
 #include <QObject>
 
 namespace scopy::regmap {
 class RegisterModel;
-class SCOPY_REGMAPPLUGIN_EXPORT Search : public QObject
+class SCOPY_REGMAP_EXPORT Search : public QObject
 {
 	Q_OBJECT
 public:

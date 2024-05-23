@@ -1,7 +1,7 @@
 #ifndef REGISTERMAPVALUES_HPP
 #define REGISTERMAPVALUES_HPP
 
-#include "scopy-regmapplugin_export.h"
+#include "scopy-regmap_export.h"
 
 #include <QMap>
 #include <QObject>
@@ -11,7 +11,7 @@ class IRegisterWriteStrategy;
 class IRegisterReadStrategy;
 class RegReadWrite;
 
-class SCOPY_REGMAPPLUGIN_EXPORT RegisterMapValues : public QObject
+class SCOPY_REGMAP_EXPORT RegisterMapValues : public QObject
 {
 	Q_OBJECT
 public:

@@ -30,7 +30,7 @@
 
 #include "iioutil/connectionprovider.h"
 #include "jsonformatedelement.hpp"
-#include "scopy-regmapplugin_config.h"
+#include "scopy-regmap_config.h"
 #include "utils.hpp"
 #include "utils.hpp"
 #if defined __APPLE__
