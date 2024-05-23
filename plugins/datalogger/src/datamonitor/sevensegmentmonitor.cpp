@@ -87,3 +87,5 @@ void SevenSegmentMonitor::updatePrecision(int precision)
 	lcdNumberMax->setDigitCount(precision + 4);
 	lcdNumberMax->display(m_model->maxValue());
 }
+
+#include "moc_sevensegmentmonitor.cpp"

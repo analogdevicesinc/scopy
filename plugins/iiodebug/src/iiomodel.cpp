@@ -160,3 +160,5 @@ IIOStandardItem *IIOModel::createIIOStandardItem(QList<IIOWidget *> widgets, QSt
 
 	return item;
 }
+
+#include "moc_iiomodel.cpp"

@@ -129,3 +129,5 @@ bool FaultWidget::eventFilter(QObject *object, QEvent *event)
 
 	return QWidget::eventFilter(object, event);
 }
+
+#include "moc_faultwidget.cpp"

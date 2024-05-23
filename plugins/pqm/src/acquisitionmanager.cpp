@@ -247,3 +247,5 @@ void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 	}
 	m_readFw->resume();
 }
+
+#include "moc_acquisitionmanager.cpp"

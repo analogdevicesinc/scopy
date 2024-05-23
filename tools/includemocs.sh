@@ -2,7 +2,7 @@
 set -x
 
 scopymodules=("core" "pluginbase" "gui" "iioutil" "iio-widgets" "gr-util")
-scopyplugins=("testplugin" "testplugin2" "swiot" "adc" "pqm" "debugger" "datalogger" "regmap")
+scopyplugins=("test" "test2" "swiot" "adc" "pqm" "debugger" "datalogger" "regmap" "iiodebug")
 
 for mod in ${scopymodules[@]};do
 	echo ${mod}

@@ -190,3 +190,5 @@ void PQMPlugin::initMetadata()
 	}
 )plugin");
 }
+
+#include "moc_pqmplugin.cpp"

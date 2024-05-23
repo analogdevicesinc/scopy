@@ -178,3 +178,5 @@ QWidget *BufferMenuView::createVerticalSettingsMenu(QString unit, double yMin, d
 }
 
 BufferMenu *BufferMenuView::getAdvMenu() { return m_swiotAdvMenu; }
+
+#include "moc_buffermenuview.cpp"

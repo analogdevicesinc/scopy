@@ -273,3 +273,5 @@ bool RegmapPlugin::isBufferCapable(iio_device *dev)
 
 	return false;
 }
+
+#include "moc_regmapplugin.cpp"

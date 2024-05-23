@@ -135,3 +135,5 @@ QString DataMonitorStyleHelper::RemoveButtonStyle()
 
 	return style;
 }
+
+#include "moc_datamonitorstylehelper.cpp"
