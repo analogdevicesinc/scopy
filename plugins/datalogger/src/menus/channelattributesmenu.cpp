@@ -59,3 +59,5 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, QWidget *p
 	QSpacerItem *spacer = new QSpacerItem(10, 10, QSizePolicy::Preferred, QSizePolicy::Expanding);
 	layout->addItem(spacer);
 }
+
+#include "moc_channelattributesmenu.cpp"

@@ -426,3 +426,5 @@ void SWIOTPlugin::initMetadata()
 	}
 )plugin");
 }
+
+#include "moc_swiotplugin.cpp"

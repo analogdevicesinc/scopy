@@ -209,3 +209,5 @@ void SwiotController::setIsRuntimeCtx(bool runtimeCtx)
 	m_isRuntimeCtx = runtimeCtx;
 	Q_EMIT isRuntimeCtxChanged(m_isRuntimeCtx);
 }
+
+#include "moc_swiotcontroller.cpp"

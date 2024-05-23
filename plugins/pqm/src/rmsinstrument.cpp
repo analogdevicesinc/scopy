@@ -215,3 +215,5 @@ void RmsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> data)
 		}
 	}
 }
+
+#include "moc_rmsinstrument.cpp"

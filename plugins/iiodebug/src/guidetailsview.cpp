@@ -72,3 +72,5 @@ void GuiDetailsView::clearWidgets()
 	}
 	m_detailsList.clear();
 }
+
+#include "moc_guidetailsview.cpp"

@@ -353,3 +353,5 @@ void FaultsDevice::initTutorialProperties()
 	m_faultsGroup->setProperty("tutorial_name", "AD74413R_FAULTS_GROUP");
 	m_faultsExplanation->setProperty("tutorial_name", "AD74413R_EXPLANATIONS");
 }
+
+#include "moc_faultsdevice.cpp"

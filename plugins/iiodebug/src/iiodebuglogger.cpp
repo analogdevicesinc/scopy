@@ -30,3 +30,5 @@ void IIODebugLogger::appendLog(QString log)
 	qDebug(CAT_DEBUGGERIIOMODEL) << "Adding to log: " << log;
 	m_textBrowser->append(log);
 }
+
+#include "moc_iiodebuglogger.cpp"
