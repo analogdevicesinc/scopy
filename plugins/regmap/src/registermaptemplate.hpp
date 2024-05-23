@@ -1,13 +1,13 @@
 #ifndef REGISTERMAPTEMPLATE_HPP
 #define REGISTERMAPTEMPLATE_HPP
 
-#include "scopy-regmapplugin_export.h"
+#include "scopy-regmap_export.h"
 
 #include <QObject>
 
 namespace scopy::regmap {
 class RegisterModel;
-class SCOPY_REGMAPPLUGIN_EXPORT RegisterMapTemplate : public QObject
+class SCOPY_REGMAP_EXPORT RegisterMapTemplate : public QObject
 {
 	Q_OBJECT
 public:

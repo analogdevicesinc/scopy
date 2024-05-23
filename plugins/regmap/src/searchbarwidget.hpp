@@ -1,7 +1,7 @@
 #ifndef SEARCHBARWIDGET_HPP
 #define SEARCHBARWIDGET_HPP
 
-#include "scopy-regmapplugin_export.h"
+#include "scopy-regmap_export.h"
 
 #include <QWidget>
 
@@ -9,7 +9,7 @@ class QHBoxLayout;
 class QPushButton;
 class QLineEdit;
 namespace scopy::regmap {
-class SCOPY_REGMAPPLUGIN_EXPORT SearchBarWidget : public QWidget
+class SCOPY_REGMAP_EXPORT SearchBarWidget : public QWidget
 {
 	Q_OBJECT
 public:

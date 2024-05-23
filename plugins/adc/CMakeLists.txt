@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 
-set(SCOPY_MODULE adcplugin)
+set(SCOPY_MODULE adc)
 
 message(STATUS "building plugin: " ${SCOPY_MODULE})
 

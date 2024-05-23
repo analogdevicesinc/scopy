@@ -25,7 +25,7 @@ private Q_SLOTS:
 };
 
 #define PLUGIN_LOCATION "../../plugins"
-#define FILENAME PLUGIN_LOCATION "/libscopy-m2kplugin.so"
+#define FILENAME PLUGIN_LOCATION "/libscopy-m2k.so"
 
 void TST_M2k::fileExists()
 {
