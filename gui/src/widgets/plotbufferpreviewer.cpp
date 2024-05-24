@@ -1,5 +1,6 @@
 #include "plotbufferpreviewer.h"
 #include "plotaxis.h"
+#include <cmath>
 
 using namespace scopy;
 

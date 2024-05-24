@@ -1996,18 +1996,18 @@ line-height: 14px;
   <customwidget>
    <class>scopy::InstrumentNotes</class>
    <extends>QWidget</extends>
-   <header>gui/instrumentnotes.h</header>
+   <header>m2k-gui/instrumentnotes.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>scopy::LinkedButton</class>
+   <extends>QPushButton</extends>
+   <header>m2k-gui/linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>scopy::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>gui/customSwitch.h</header>
-  </customwidget>
-  <customwidget>
-   <class>scopy::LinkedButton</class>
-   <extends>QPushButton</extends>
-   <header>gui/linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>QwtThermo</class>
@@ -2022,16 +2022,17 @@ line-height: 14px;
   <customwidget>
    <class>scopy::Sismograph</class>
    <extends>QFrame</extends>
-   <header>sismograph.hpp</header>
+   <header>m2k-gui/sismograph.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>scopy::CustomScale</class>
    <extends>QwtThermo</extends>
-   <header>gui/customScale.hpp</header>
+   <header>m2k-gui/customScale.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../../gui/res/resources.qrc"/>
   <include location="../../../gui/res/resources.qrc"/>
  </resources>
  <connections>
@@ -2069,7 +2070,7 @@ line-height: 14px;
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

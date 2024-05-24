@@ -1,5 +1,6 @@
 #include "plottracker.hpp"
 #include "plotaxis.h"
+#include <QSet>
 
 using namespace scopy;
 

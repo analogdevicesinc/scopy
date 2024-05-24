@@ -2,7 +2,6 @@
 #define SUBSECTIONSEPARATOR_H
 
 #include "scopy-gui_export.h"
-
 #include <QLabel>
 #include <QPushButton>
 #include <QWidget>

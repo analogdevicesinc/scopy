@@ -21,7 +21,7 @@
 #ifndef PG_PATTERNS_HPP
 #define PG_PATTERNS_HPP
 
-#include "gui/osc_import_settings.h"
+#include "m2k-gui/osc_import_settings.h"
 #include "gui/spinbox_a.hpp"
 
 #include <QIntValidator>
@@ -39,7 +39,7 @@
 
 // Generated UI
 #include "filemanager.h"
-#include "gui/genericlogicplotcurve.h"
+#include "m2k-gui/genericlogicplotcurve.h"
 #include "sigrok-gui/decoder.h"
 
 #include "ui_binarycounterpatternui.h"
