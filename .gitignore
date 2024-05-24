@@ -47,12 +47,8 @@ core/include/core/scopy-core_export.h
 common/include/common/scopy-common_config.h
 common/include/common/scopy-common_export.h
 gr-util/include/gr-util/scopy-gr-util_export.h
-gui/gr-gui/include/gr-gui/scopy-gr-gui_export.h
-gui/gr-gui/include/gr-gui/scopy-gr-gui_config.h
 gui/include/gui/scopy-gui_export.h
 gui/include/gui/scopy-gui_config.h
-gui/sigrok-gui/include/sigrok-gui/scopy-sigrok-gui_export.h
-gui/sigrok-gui/include/sigrok-gui/scopy-sigrok-gui_config.h
 iio-widgets/include/iio-widgets/scopy-iio-widgets_export.h
 iioutil/include/iioutil/scopy-iioutil_export.h
 pluginbase/include/pluginbase/scopy-pluginbase_config.h

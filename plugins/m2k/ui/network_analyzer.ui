@@ -97,7 +97,7 @@
            <string>Print</string>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="../../../gui/res/resources.qrc">
             <normaloff>:/gui/icons/printer.svg</normaloff>:/gui/icons/printer.svg</iconset>
           </property>
           <property name="iconSize">
@@ -1940,7 +1940,7 @@ QPushButton[invalid=true]:enabled:!pressed { background-color: #4a64ff; }
                             <string>Previous</string>
                            </property>
                            <property name="icon">
-                            <iconset>
+                            <iconset resource="../../../gui/res/resources.qrc">
                              <normaloff>:/gui/icons/arrow_left.svg</normaloff>:/gui/icons/arrow_left.svg</iconset>
                            </property>
                            <property name="iconSize">
@@ -1996,7 +1996,7 @@ padding-left: 20px;
                             <string>     Next</string>
                            </property>
                            <property name="icon">
-                            <iconset>
+                            <iconset resource="../../../gui/res/resources.qrc">
                              <normaloff>:/gui/icons/arrow_right.svg</normaloff>:/gui/icons/arrow_right.svg</iconset>
                            </property>
                            <property name="iconSize">
@@ -3135,15 +3135,31 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>scopy::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>gui/customPushButton.h</header>
-  </customwidget>
-  <customwidget>
    <class>scopy::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>scopy::InstrumentNotes</class>
+   <extends>QWidget</extends>
+   <header>m2k-gui/instrumentnotes.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>scopy::LinkedButton</class>
+   <extends>QPushButton</extends>
+   <header>m2k-gui/linked_button.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>scopy::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>gui/customSwitch.h</header>
+  </customwidget>
+  <customwidget>
+   <class>scopy::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>gui/customPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>scopy::MenuHAnim</class>
@@ -3152,26 +3168,10 @@ QLabel {
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>scopy::InstrumentNotes</class>
-   <extends>QWidget</extends>
-   <header>gui/instrumentnotes.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>scopy::RunSingleWidget</class>
    <extends>QWidget</extends>
-   <header>gui/runsinglewidget.h</header>
+   <header>m2k-gui/runsinglewidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>scopy::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>gui/customSwitch.h</header>
-  </customwidget>
-  <customwidget>
-   <class>scopy::LinkedButton</class>
-   <extends>QPushButton</extends>
-   <header>gui/linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>scopy::dBgraph</class>
@@ -3188,7 +3188,7 @@ QLabel {
   <customwidget>
    <class>scopy::CustomPlotPositionButton</class>
    <extends>QWidget</extends>
-   <header>gui/customplotpositionbutton.h</header>
+   <header>m2k-gui/customplotpositionbutton.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -3198,8 +3198,8 @@ QLabel {
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../gui/res/resources.qrc"/>
-  <include location="../gui/res/resources.qrc"/>
+  <include location="../../../gui/res/resources.qrc"/>
+  <include location="../../../gui/res/resources.qrc"/>
  </resources>
  <connections/>
  <buttongroups>

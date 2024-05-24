@@ -19,7 +19,7 @@
  */
 #include "signal_generator_api.hpp"
 
-#include "gui/channel_widget.hpp"
+#include "m2k-gui/channel_widget.hpp"
 #include "gui/spinbox_a.hpp"
 
 #include "ui_signal_generator.h"

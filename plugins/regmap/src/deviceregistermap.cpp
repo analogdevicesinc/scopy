@@ -31,7 +31,6 @@
 
 #include <src/readwrite/fileregisterwritestrategy.hpp>
 #include <src/recyclerview/registermaptable.hpp>
-#include <tool_view_builder.hpp>
 #include <utils.h>
 
 using namespace scopy;
