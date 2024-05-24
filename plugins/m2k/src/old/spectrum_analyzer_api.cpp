@@ -19,8 +19,8 @@
  */
 #include "spectrum_analyzer_api.hpp"
 
-#include "gui/channel_widget.hpp"
-#include "gui/db_click_buttons.hpp"
+#include "m2k-gui/channel_widget.hpp"
+#include "m2k-gui/db_click_buttons.hpp"
 
 #include "ui_cursors_settings.h"
 #include "ui_spectrum_analyzer.h"

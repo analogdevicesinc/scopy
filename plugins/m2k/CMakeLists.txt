@@ -43,6 +43,7 @@ file(
 	src/old/*.c
 	src/old/*.h
 )
+
 file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 file(GLOB UI_LIST ui/*.ui ui/patterns/*.ui)
 
@@ -50,6 +51,7 @@ set(ENABLE_TESTING ON)
 if(ENABLE_TESTING)
 	add_subdirectory(test)
 endif()
+add_subdirectory(m2k-gui)
 
 set(PROJECT_SOURCES ${SRC_LIST} ${OLD_SCOPY_FILES} ${HEADER_LIST} ${UI_LIST})
 
@@ -88,11 +90,12 @@ configure_file(
 )
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 target_include_directories(
 	${PROJECT_NAME}
 	PRIVATE Qt::Widgets
 		Qt::Core
-		scopy-gui
+		scopy-m2k-gui
 		scopy-pluginbase
 		scopy-common
 		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
@@ -112,6 +115,7 @@ target_link_libraries(
 	       scopy-pluginbase
 	       scopy-iioutil
 	       scopy-gui
+	       scopy-m2k-gui
 	       scopy-gr-gui
 	       scopy-sigrok-gui
 	       libm2k::libm2k

@@ -20,7 +20,7 @@
 
 #include "statistic_widget.h"
 
-#include "gui/m2kmeasure.h"
+#include "m2k-gui/m2kmeasure.h"
 #include "plot_utils.hpp"
 
 #include "ui_statistic.h"

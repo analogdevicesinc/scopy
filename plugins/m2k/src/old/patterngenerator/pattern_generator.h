@@ -22,7 +22,7 @@
 #define PATTERNGENERATOR_H
 
 #include "buffer_previewer.hpp"
-#include "gui/genericlogicplotcurve.h"
+#include "m2k-gui/genericlogicplotcurve.h"
 #include "gui/spinbox_a.hpp"
 #include "m2ktool.hpp"
 #include "mousewheelwidgetguard.h"

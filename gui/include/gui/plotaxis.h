@@ -4,12 +4,12 @@
 #include "osc_scale_engine.h"
 #include "plotaxishandle.h"
 #include "plotwidget.h"
+#include "plot_utils.hpp"
+#include "basicscaledraw.h"
 #include "scopy-gui_export.h"
 
 #include <QwtPlotZoomer>
 #include <QwtScaleEngine>
-
-#include <DisplayPlot.h>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT PlotAxis : public QObject
@@ -36,7 +36,7 @@ public:
 	QwtPlotZoomer *zoomer() const;
 	OscScaleEngine *scaleEngine() const;
 
-	OscScaleDraw *scaleDraw() const;
+	BasicScaleDraw *scaleDraw() const;
 
 	double divs() const;
 
@@ -67,7 +67,7 @@ private:
 	PlotWidget *m_plotWidget;
 	QwtPlot *m_plot;
 	int m_position;
-	OscScaleDraw *m_scaleDraw;
+	BasicScaleDraw *m_scaleDraw;
 	OscScaleEngine *m_scaleEngine;
 	QString m_units;
 	PrefixFormatter *m_formatter;

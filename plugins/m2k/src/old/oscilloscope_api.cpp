@@ -19,7 +19,7 @@
  */
 #include "oscilloscope_api.hpp"
 
-#include "gui/channel_widget.hpp"
+#include "m2k-gui/channel_widget.hpp"
 #include "measure_settings.h"
 
 #include "ui_channel_settings.h"
