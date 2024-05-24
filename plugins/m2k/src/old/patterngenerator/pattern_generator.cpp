@@ -24,7 +24,7 @@
 #include "digitalchannel_manager.hpp"
 #include "gui/basemenu.h"
 #include "gui/dynamicWidget.h"
-#include "gui/logicdatacurve.h"
+#include "m2k-gui/logicdatacurve.h"
 #include "m2kpluginExceptionHandler.h"
 #include "pattern_generator_api.h"
 #include "patterns/patterns.hpp"

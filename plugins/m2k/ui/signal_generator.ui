@@ -261,7 +261,7 @@
                   <string notr="true"/>
                  </property>
                  <property name="currentIndex">
-                  <number>3</number>
+                  <number>2</number>
                  </property>
                  <property name="usesScrollButtons">
                   <bool>false</bool>
@@ -1460,30 +1460,30 @@ background-repeat: no-repeat;
   <customwidget>
    <class>scopy::InstrumentNotes</class>
    <extends>QWidget</extends>
-   <header>gui/instrumentnotes.h</header>
+   <header>m2k-gui/instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>scopy::LinkedButton</class>
    <extends>QPushButton</extends>
-   <header>gui/linked_button.hpp</header>
+   <header>m2k-gui/linked_button.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>scopy::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>gui/customSwitch.h</header>
   </customwidget>
   <customwidget>
    <class>scopy::MenuHAnim</class>
    <extends>QWidget</extends>
-   <header location="global">gui/menu_anim.hpp</header>
+   <header>gui/menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>scopy::RunSingleWidget</class>
    <extends>QWidget</extends>
-   <header location="global">gui/runsinglewidget.h</header>
+   <header>m2k-gui/runsinglewidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>scopy::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.h</header>
   </customwidget>
   <customwidget>
    <class>scopy::Math</class>

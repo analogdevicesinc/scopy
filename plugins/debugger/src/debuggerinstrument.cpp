@@ -26,7 +26,6 @@
 #include <QFileDialog>
 #include <QJSEngine>
 
-#include <gui/tool_view_builder.hpp>
 #include <gui/utils.h>
 
 using namespace scopy;
@@ -37,7 +36,6 @@ DebuggerInstrument::DebuggerInstrument(struct iio_context *ctx, QJSEngine *engin
 	: QWidget(parent)
 	, ui(new Ui::DebuggerInstrument)
 	, eng(engine)
-	, m_toolView(nullptr)
 {
 	ui->setupUi(this);
 	m_debugController.setIioContext(ctx);

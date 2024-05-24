@@ -1,5 +1,6 @@
 #include "waveforminstrument.h"
 #include "plotaxis.h"
+#include <qwt_legend.h>
 #include <gui/stylehelper.h>
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/plotaxis.h>
