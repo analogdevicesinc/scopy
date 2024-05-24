@@ -38,7 +38,7 @@
 #include <hoverwidget.h>
 
 #include <condition_variable>
-#include <gui/dropdown_switch_list.h>
+#include "m2k-gui/dropdown_switch_list.h"
 #include <libm2k/contextbuilder.hpp>
 #include <libm2k/digital/m2kdigital.hpp>
 #include <libm2k/enums.hpp>

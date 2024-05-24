@@ -1094,20 +1094,20 @@ QPushButton:disabled {
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>scopy::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>gui/customSwitch.h</header>
-  </customwidget>
-  <customwidget>
    <class>scopy::InstrumentNotes</class>
    <extends>QWidget</extends>
-   <header>gui/instrumentnotes.h</header>
+   <header>m2k-gui/instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>scopy::LinkedButton</class>
    <extends>QPushButton</extends>
-   <header>gui/linked_button.hpp</header>
+   <header>m2k-gui/linked_button.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>scopy::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>gui/customSwitch.h</header>
   </customwidget>
   <customwidget>
    <class>QwtThermo</class>
@@ -1117,10 +1117,11 @@ QPushButton:disabled {
   <customwidget>
    <class>scopy::LcdNumber</class>
    <extends>QLCDNumber</extends>
-   <header>gui/lcdNumber.hpp</header>
+   <header>lcdNumber.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../../gui/res/resources.qrc"/>
   <include location="../../../gui/res/resources.qrc"/>
  </resources>
  <connections>

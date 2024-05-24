@@ -22,7 +22,6 @@
 #define FILEMANAGER_H
 
 #include "scopy-gui_export.h"
-
 #include <QString>
 #include <QStringList>
 #include <QVector>
@@ -100,14 +99,14 @@ private:
 	QStringList additionalInformation;
 };
 
-class ScopyFileHeader
+class SCOPY_GUI_EXPORT ScopyFileHeader
 {
 public:
 	static bool hasValidHeader(QVector<QVector<QString>> data);
 	static QStringList getHeader();
 };
 
-class FileManagerException : public std::runtime_error
+class SCOPY_GUI_EXPORT FileManagerException : public std::runtime_error
 {
 public:
 	FileManagerException(const char *msg)
