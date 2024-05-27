@@ -40,8 +40,8 @@ public:
 
 	double divs() const;
 
-	void setFromatter(PrefixFormatter *formatter);
-	PrefixFormatter *getFromatter();
+	void setFormatter(PrefixFormatter *formatter);
+	PrefixFormatter *getFormatter();
 
 	void setUnits(QString units);
 	QString getUnits();

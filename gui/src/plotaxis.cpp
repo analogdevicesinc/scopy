@@ -83,7 +83,7 @@ bool PlotAxis::isVertical() { return (m_position == QwtAxis::YLeft || m_position
 
 double PlotAxis::divs() const { return (m_divs - 1); }
 
-void PlotAxis::setFromatter(PrefixFormatter *formatter)
+void PlotAxis::setFormatter(PrefixFormatter *formatter)
 {
 	m_formatter = formatter;
 	m_scaleDraw->setFormatter(m_formatter);
@@ -91,7 +91,7 @@ void PlotAxis::setFromatter(PrefixFormatter *formatter)
 	Q_EMIT formatterChanged(formatter);
 }
 
-PrefixFormatter *PlotAxis::getFromatter() { return m_formatter; }
+PrefixFormatter *PlotAxis::getFormatter() { return m_formatter; }
 
 void PlotAxis::setUnits(QString units)
 {
