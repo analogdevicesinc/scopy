@@ -64,8 +64,8 @@ ChannelTracker *PlotTracker::createTracker(PlotChannel *ch)
 	tracker->setEnabled(m_en && m_plot->selectedChannel() == ch);
 	tracker->setXAxisUnit(ch->xAxis()->getUnits());
 	tracker->setYAxisUnit(ch->yAxis()->getUnits());
-	tracker->setXFormatter(ch->xAxis()->getFromatter());
-	tracker->setYFormatter(ch->yAxis()->getFromatter());
+	tracker->setXFormatter(ch->xAxis()->getFormatter());
+	tracker->setYFormatter(ch->yAxis()->getFormatter());
 
 	connect(ch->xAxis(), &PlotAxis::formatterChanged, tracker, &BasicTracker::setXFormatter);
 	connect(ch->yAxis(), &PlotAxis::formatterChanged, tracker, &BasicTracker::setYFormatter);
