@@ -1,19 +1,21 @@
 #!/bin/bash
 set -ex
 
+## Set STAGING
+USE_STAGING=ON
+##
+
 if [ "$CI_SCRIPT" == "ON" ]
 	then
-		SRC_DIR=$GITHUB_WORKSPACE
+		SRC_DIR=/home/runner/scopy
 		git config --global --add safe.directory '*'
+		USE_STAGING=OFF
 	else
 		SRC_DIR=$(git rev-parse --show-toplevel)
 fi
 
 export APPIMAGE=1
 
-## Set STAGING
-USE_STAGING=$1
-[ -z $USE_STAGING ] && USE_STAGING=ON
 
 LIBIIO_VERSION=v0.25
 LIBAD9361_BRANCH=main
@@ -27,6 +29,9 @@ LIBSIGROKDECODE_BRANCH=master
 QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 IIOEMU_BRANCH=master
+
+# default python version used in CI scripts, can be changed to match locally installed python
+PYTHON_VERSION=python3.8
 
 QT_LOCATION=/opt/Qt/5.15.2/gcc_64
 
@@ -138,7 +143,7 @@ install_packages() {
 	sudo apt-get update
 	sudo apt-get -y upgrade
 	sudo apt-get -y install \
-		python3 python-dev python3-pip libpython3-all-dev python3-numpy \
+		$PYTHON_VERSION-full python3-pip lib$PYTHON_VERSION-dev python3-numpy \
 		keyboard-configuration vim git wget unzip\
 		g++ build-essential cmake curl autogen autoconf autoconf-archive pkg-config flex bison swig \
 		subversion mesa-common-dev graphviz xserver-xorg gettext texinfo mm-common doxygen \
@@ -271,10 +276,11 @@ build_libsigrokdecode() {
 	if [ "$USE_STAGING" == "ON" ]
 	then
 		./configure --prefix $STAGING_AREA_DEPS
+		LD_RUN_PATH=$STAGING_AREA_DEPS/lib make $JOBS
 	else
 		./configure
+		make $JOBS
 	fi
-	make $JOBS
 	if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
 	popd
 }
@@ -302,7 +308,8 @@ build_scopy() {
 	echo "### Building scopy"
 	pushd $SRC_DIR
 	CURRENT_BUILD_CMAKE_OPTS="\
-		-DCLONE_IIO_EMU=OFF
+		-DCLONE_IIO_EMU=OFF \
+		-DPYTOHN_EXECUTABLE=/usr/bin/$PYTHON_VERSION
 		"
 	build_with_cmake OFF
 	popd
@@ -326,6 +333,7 @@ create_appdir(){
 	pushd ${STAGING_AREA}
 	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib:$QT_LOCATION/lib
 	export PATH=$QT_LOCATION:$PATH
+	sudo ldconfig
 
 	rm -rf $APP_DIR
 	export QMAKE=$QMAKE_BIN # this is needed for deploy-plugin-qt.AppImage
@@ -333,7 +341,7 @@ create_appdir(){
 	# so the solution is to extract the appimage first and only then to run it
 	export APPIMAGE_EXTRACT_AND_RUN=1
 	${STAGING_AREA}/linuxdeploy-x86_64.AppImage \
-		--appdir  $APP_DIR\
+		--appdir  $APP_DIR \
 		--executable $SRC_DIR/build/scopy \
 		--custom-apprun $SRC_DIR/CI/appimage/AppRun \
 		--desktop-file $SRC_DIR/CI/appimage/scopy.desktop \
@@ -341,8 +349,9 @@ create_appdir(){
 		--plugin qt
 
 	cp $STAGING_AREA/iio-emu/build/iio-emu $APP_DIR/usr/bin
-	python_path=$(python3 -c "import os as _; print(_.__file__)")
-	python_path=${python_path%/*}
+	# search for the python version linked by cmake and copy inside the appimage the same version
+	FOUND_PYTHON_VERSION=$(grep 'PYTHON_VERSION' $SRC_DIR/build/CMakeCache.txt | awk -F= '{print $2}' | grep -o 'python[0-9]\+\.[0-9]\+')
+	python_path=/usr/lib/$FOUND_PYTHON_VERSION
 	cp -r $python_path $APP_DIR/usr/lib
 	cp -r $QT_LOCATION/plugins $APP_DIR/usr
 
@@ -355,7 +364,7 @@ create_appdir(){
 		exit 1
 	fi
 
-	cp ${STAGING_AREA}/libtinyiiod/build/tinyiiod.so* $APP_DIR/usr/lib
+	cp ${STAGING_AREA_DEPS}/lib/tinyiiod.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5XcbQpa.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5EglFSDeviceIntegration.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5DBus.so* $APP_DIR/usr/lib
@@ -377,7 +386,7 @@ create_appimage(){
 }
 
 generate_ci_envs(){
-	$SRC_DIR/CI/appveyor/gen_ci_envs.sh > $SRC_DIR/CI/appimage/gh-actions.envs
+	$GITHUB_WORKSPACE/CI/appveyor/gen_ci_envs.sh > $GITHUB_WORKSPACE/CI/appimage/gh-actions.envs
 }
 
 move_appimage(){
