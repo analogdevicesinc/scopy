@@ -6,6 +6,10 @@ message(STATUS "building plugin: " ${SCOPY_MODULE})
 
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
+set(PLUGIN_NAME "Data logger")
+set(PLUGIN_DESCRIPTION "Used to monitor and log data")
+
+
 include(GenerateExportHeader)
 
 # TODO: split stylesheet/resources and add here TODO: export header files correctly
@@ -84,7 +88,9 @@ target_link_libraries(
 	       scopy-iio-widgets
 )
 
-set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
-set(PLUGIN_DESCRIPTION "Data Logger plugin" PARENT_SCOPE)
+set(PROJECT_NAME ${PROJECT_NAME} PARENT_SCOPE)
+set(PLUGIN_NAME ${PLUGIN_NAME} PARENT_SCOPE)
+set(PLUGIN_SHORT_NAME ${SCOPY_MODULE} PARENT_SCOPE)
+set(PLUGIN_DESCRIPTION ${PLUGIN_DESCRIPTION} PARENT_SCOPE)
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${SCOPY_PLUGIN_INSTALL_DIR})
