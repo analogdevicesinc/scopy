@@ -6,6 +6,9 @@ message(STATUS "building plugin: " ${SCOPY_MODULE})
 
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
+set(PLUGIN_NAME "Debuger")
+set(PLUGIN_DESCRIPTION "Used to debug connected devices")
+
 include(GenerateExportHeader)
 
 # TODO: split stylesheet/resources and add here TODO: export header files correctly
@@ -64,5 +67,7 @@ target_link_libraries(
 	       scopy-core
 )
 
-set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
-set(PLUGIN_DESCRIPTION "Debugger plugin" PARENT_SCOPE)
+set(PROJECT_NAME ${PROJECT_NAME} PARENT_SCOPE)
+set(PLUGIN_NAME ${PLUGIN_NAME} PARENT_SCOPE)
+set(PLUGIN_SHORT_NAME ${SCOPY_MODULE} PARENT_SCOPE)
+set(PLUGIN_DESCRIPTION ${PLUGIN_DESCRIPTION} PARENT_SCOPE)

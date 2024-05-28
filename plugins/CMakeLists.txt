@@ -17,6 +17,7 @@ option(ENABLE_PLUGIN_IIODEBUGPLUGIN "Enable IIODEBUGPLUGIN plugin" ON)
 set(PLUGIN_COMPONENTS "")
 set(PLUGIN_COMPONENTS_FILES "")
 
+<<<<<<< HEAD
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -27,10 +28,13 @@ endif()
 
 function(ConfigureInstallerSettings PLUGIN_NAME PLUGIN_DESCRIPTION FIXED)
 	string(REPLACE "scopy-" "" AUX_PLUGIN ${PLUGIN_NAME})
+=======
+function(ConfigureInstallerSettings PROJECT_NAME PLUGIN_NAME PLUGIN_DESCRIPTION FIXED)
+>>>>>>> generic: plugins CMAKE variables
 
 	set(PLUGIN_COMPONENTS
 	    ${PLUGIN_COMPONENTS}
-	    "\n Name: \"plugins/${PROJECT_NAME}\"; Description: ${ARGN} ; Types: full plugins; Flags: ${FIXED} "
+	    "\n Name: \"plugins/${PROJECT_NAME}\"; Description: ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} ; Types: full plugins; Flags: ${FIXED} "
 	    PARENT_SCOPE
 	)
 	set(PLUGIN_COMPONENTS_FILES
@@ -71,20 +75,20 @@ endif()
 
 if(ENABLE_PLUGIN_ADC)
 	add_subdirectory(adc)
-	list(APPEND PLUGINS ${PLUGIN_NAME})
-	configureinstallersettings(${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "fixed")
+	list(APPEND PLUGINS ${PROJECT_NAME})
+	configureinstallersettings(${PLUGIN_SHORT_NAME} ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "fixed")
 endif()
 
 if(ENABLE_PLUGIN_REGMAP)
 	add_subdirectory(regmap)
 	list(APPEND PLUGINS ${PROJECT_NAME})
-	configureinstallersettings(${PLUGIN_SHORT_NAME} "fixed" ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} )
+	configureinstallersettings(${PLUGIN_SHORT_NAME}  ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "fixed")
 endif()
 
 if(ENABLE_PLUGIN_DEBUGGER)
 	add_subdirectory(debugger)
-	list(APPEND PLUGINS ${PLUGIN_NAME})
-	configureinstallersettings(${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "fixed")
+	list(APPEND PLUGINS ${PROJECT_NAME})
+	configureinstallersettings(${PLUGIN_SHORT_NAME} ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "fixed")
 endif()
 
 if(ENABLE_PLUGIN_IIODEBUGPLUGIN)
@@ -95,20 +99,20 @@ endif()
 
 if(ENABLE_PLUGIN_DATALOGGER)
 	add_subdirectory(datalogger)
-	list(APPEND PLUGINS ${PLUGIN_NAME})
-	configureinstallersettings(${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "fixed")
+	list(APPEND PLUGINS ${PROJECT_NAME})
+	configureinstallersettings(${PLUGIN_SHORT_NAME} ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "fixed")
 endif()
 
 if(ENABLE_PLUGIN_SWIOT)
 	add_subdirectory(swiot)
-	list(APPEND PLUGINS ${PLUGIN_NAME})
-	configureinstallersettings(${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "disablenouninstallwarning")
+	list(APPEND PLUGINS ${PROJECT_NAME})
+	configureinstallersettings(${PLUGIN_SHORT_NAME} ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "disablenouninstallwarning" )
 endif()
 
 if(ENABLE_PLUGIN_PQM)
 	add_subdirectory(pqm)
-	list(APPEND PLUGINS ${PLUGIN_NAME})
-	configureinstallersettings(${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "disablenouninstallwarning")
+	list(APPEND PLUGINS ${PROJECT_NAME})
+	configureinstallersettings(${PLUGIN_SHORT_NAME} ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "disablenouninstallwarning" )
 endif()
 
 if(ENABLE_PLUGIN_M2K)
@@ -122,24 +126,9 @@ if(ENABLE_PLUGIN_M2K)
 
 	if(WITH_SIGROK AND WITH_PYTHON)
 		add_subdirectory(m2k)
-		list(APPEND PLUGINS ${PLUGIN_NAME})
-		configureinstallersettings(${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "disablenouninstallwarning")
+		list(APPEND PLUGINS ${PROJECT_NAME})
+		configureinstallersettings(${PLUGIN_SHORT_NAME} ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION}  "disablenouninstallwarning")
 	endif()
-endif()
-
-if(ENABLE_PLUGIN_REGMAP)
-	add_subdirectory(regmap)
-	list(APPEND PLUGINS ${LIBRARY_NAME})
-endif()
-
-if(ENABLE_PLUGIN_DEBUGGER)
-	add_subdirectory(debugger)
-	list(APPEND PLUGINS ${PLUGIN_NAME})
-endif()
-
-if(ENABLE_PLUGIN_DATALOGGER)
-	add_subdirectory(datalogger)
-	list(APPEND PLUGINS ${PLUGIN_NAME})
 endif()
 
 if(ENABLE_PLUGIN_DATAMONITOR)
