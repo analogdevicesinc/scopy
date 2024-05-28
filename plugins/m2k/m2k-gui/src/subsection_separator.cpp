@@ -4,7 +4,7 @@
 
 #include <QHBoxLayout>
 
-using namespace scopy::gui;
+using namespace scopy::m2kgui;
 
 SubsectionSeparator::SubsectionSeparator(QWidget *parent)
 	: QWidget(parent)

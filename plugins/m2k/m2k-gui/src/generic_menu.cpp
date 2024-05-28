@@ -38,7 +38,7 @@ void GenericMenu::setMenuHeader(const QString &title, const QColor *lineColor, b
 	m_menuHeader->setEnabledBtnState(hasEnableBtn);
 }
 
-void GenericMenu::insertSection(scopy::gui::SubsectionSeparator *section)
+void GenericMenu::insertSection(scopy::m2kgui::SubsectionSeparator *section)
 {
 	BaseMenuItem *item = new BaseMenuItem(m_menu);
 	item->setWidget(section);
