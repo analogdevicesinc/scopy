@@ -29,8 +29,9 @@ EMU_BUILD_FOLDER=$WORKDIR/iio-emu/build
 PLUGINBASE_DLL=$BUILD_FOLDER/pluginbase
 CORE_DLL=$BUILD_FOLDER/core
 GUI_DLL=$BUILD_FOLDER/gui
-SIGROK_GUI_DLL=$BUILD_FOLDER/gui/sigrok-gui
-GR_GUI_DLL=$BUILD_FOLDER/gui/gr-gui
+M2K_GUI_DLL=$BUILD_FOLDER/plugins/m2k/m2k-gui
+SIGROK_GUI_DLL=$BUILD_FOLDER/plugins/m2k/m2k-gui
+GR_GUI_DLL=$BUILD_FOLDER/plugins/m2k/m2k-gui
 IIOUTIL_DLL=$BUILD_FOLDER/iioutil
 COMMON_DLL=$BUILD_FOLDER/common
 IIO_WIDGETS_DLL=$BUILD_FOLDER/iio-widgets
@@ -92,6 +93,7 @@ deploy_app(){
 	cp $CORE_DLL/libscopy-core.dll $DEST_FOLDER
 	cp $GUI_DLL/libscopy-gui.dll $DEST_FOLDER
 	cp $IIOUTIL_DLL/libscopy-iioutil.dll $DEST_FOLDER
+	cp $M2K_GUI_DLL/libscopy-m2k-gui.dll $DEST_FOLDER
 	cp $SIGROK_GUI_DLL/libscopy-sigrok-gui.dll $DEST_FOLDER
 	cp $GR_GUI_DLL/libscopy-gr-gui.dll $DEST_FOLDER
 	cp $COMMON_DLL/libscopy-common.dll $DEST_FOLDER
