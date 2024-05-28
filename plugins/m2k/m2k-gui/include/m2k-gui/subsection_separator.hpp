@@ -1,7 +1,7 @@
 #ifndef SUBSECTIONSEPARATOR_H
 #define SUBSECTIONSEPARATOR_H
 
-#include "scopy-gui_export.h"
+#include "scopy-m2k-gui_export.h"
 #include <QLabel>
 #include <QPushButton>
 #include <QWidget>
@@ -11,8 +11,8 @@ class SubsectionSeparator;
 }
 
 namespace scopy {
-namespace gui {
-class SCOPY_GUI_EXPORT SubsectionSeparator : public QWidget
+namespace m2kgui {
+class SCOPY_M2K_GUI_EXPORT SubsectionSeparator : public QWidget
 {
 	Q_OBJECT
 
@@ -40,7 +40,7 @@ public:
 	void setContent(QWidget *content);
 	QWidget *getContentWidget();
 };
-} // namespace gui
+} // namespace m2kgui
 } // namespace scopy
 
 #endif // SUBSECTIONSEPARATOR_H

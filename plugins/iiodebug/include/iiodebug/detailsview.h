@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <QTabWidget>
 #include <QTextBrowser>
-#include <gui/subsection_separator.hpp>
 #include "iiostandarditem.h"
 #include "guidetailsview.h"
 #include "clidetailsview.h"
