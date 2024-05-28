@@ -21,9 +21,15 @@ cmake_minimum_required(VERSION 3.5)
 project(scopy LANGUAGES C CXX VERSION 1.4.1)
 
 set(Python_ADDITIONAL_VERSIONS 3)
-FIND_PACKAGE(PythonInterp REQUIRED)
-set(PYTHON_VERSION python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
-
+if(PYTHON_EXECUTABLE)
+	message(STATUS "Using custom Python EXECUTABLE: ${PYTHON_EXECUTABLE}")
+	set(Python3_EXECUTABLE ${PYTHON_EXECUTABLE})
+else()
+	message(STATUS "Using default Python EXECUTABLE")
+endif()
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+message (STATUS "Found Python " ${Python3_VERSION} " at " ${Python3_EXECUTABLE} " and " ${Python3_LIBRARY})
+set(PYTHON_VERSION python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR} CACHE STRING "PYTHON_USED")
 
 function(dump_cmake_variables)
     get_cmake_property(_variableNames VARIABLES)
