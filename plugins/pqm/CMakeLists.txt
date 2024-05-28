@@ -6,6 +6,9 @@ message(STATUS "building plugin: " ${SCOPY_MODULE})
 
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
+set(PLUGIN_NAME "PQM")
+set(PLUGIN_DESCRIPTION "Power Quality Monitor")
+
 include(GenerateExportHeader)
 
 # TODO: split stylesheet/resources and add here TODO: export header files correctly
@@ -58,7 +61,9 @@ target_link_libraries(
 	       scopy-gr-util
 )
 
-set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
-set(PLUGIN_DESCRIPTION "Power Quality Monitor plugin (PQM)" PARENT_SCOPE)
+set(PROJECT_NAME ${PROJECT_NAME} PARENT_SCOPE)
+set(PLUGIN_NAME ${PLUGIN_NAME} PARENT_SCOPE)
+set(PLUGIN_SHORT_NAME ${SCOPY_MODULE} PARENT_SCOPE)
+set(PLUGIN_DESCRIPTION ${PLUGIN_DESCRIPTION} PARENT_SCOPE)
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${SCOPY_PLUGIN_INSTALL_DIR})
