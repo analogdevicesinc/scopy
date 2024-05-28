@@ -5,7 +5,7 @@
 #include "basemenu.h"
 #include "menu_header.hpp"
 
-#include <gui/subsection_separator.hpp>
+#include <subsection_separator.hpp>
 
 #include <QWidget>
 
@@ -24,7 +24,7 @@ public:
 
 	void initInteractiveMenu();
 	void setMenuHeader(const QString &title, const QColor *lineColor, bool hasEnableBtn);
-	void insertSection(scopy::gui::SubsectionSeparator *section);
+	void insertSection(scopy::m2kgui::SubsectionSeparator *section);
 	void addNewHeaderWidget(QWidget *widget);
 
 	void setMenuWidget(QWidget *widget);
