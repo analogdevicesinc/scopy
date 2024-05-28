@@ -4,8 +4,6 @@ using namespace scopy::iiodebugplugin;
 
 GuiDetailsView::GuiDetailsView(QWidget *parent)
 	: QWidget(parent)
-	, m_attrSeparator(new gui::SubsectionSeparator(this))
-	, m_detailsSeparator(new gui::SubsectionSeparator(this))
 	, m_scrollArea(new QScrollArea(this))
 	, m_scrollAreaContents(new QWidget(this))
 {
@@ -21,17 +19,19 @@ void GuiDetailsView::setupUi()
 	m_scrollAreaContents->setObjectName("DetailsViewScrollAreaContents");
 	m_scrollAreaContents->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-	m_scrollArea->setWidget(m_scrollAreaContents);
 	m_scrollArea->setWidgetResizable(true);
+	m_scrollArea->setWidget(m_scrollAreaContents);
 
-	m_attrSeparator->setLabel("Attributes");
-	m_attrSeparator->getContentWidget()->layout()->addWidget(m_scrollArea);
-	m_attrSeparator->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+	MenuCollapseSection *attrSection = new MenuCollapseSection("Attributes", MenuCollapseSection::MHCW_ONOFF, this);
+	attrSection->contentLayout()->setSpacing(10);
+	attrSection->contentLayout()->setMargin(0);
+	attrSection->contentLayout()->addWidget(m_scrollArea);
+	attrSection->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
-	m_detailsSeparator->setLabel("General info");
+	m_detailsSeparator = new MenuCollapseSection("General info", MenuCollapseSection::MHCW_ONOFF, this);
 	m_detailsSeparator->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-	layout()->addWidget(m_attrSeparator);
+	layout()->addWidget(attrSection);
 	layout()->addWidget(m_detailsSeparator);
 }
 
@@ -43,6 +43,7 @@ void GuiDetailsView::setIIOStandardItem(IIOStandardItem *item)
 	for(auto widget : iioWidgets) {
 		widget->show();
 		m_currentWidgets.append(widget);
+		widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 		m_scrollAreaContents->layout()->addWidget(widget);
 	}
 
@@ -51,10 +52,13 @@ void GuiDetailsView::setIIOStandardItem(IIOStandardItem *item)
 		auto label = new QLabel(detail);
 		label->show();
 		m_detailsList.append(label);
-		m_detailsSeparator->getContentWidget()->layout()->addWidget(label);
+		m_detailsSeparator->contentLayout()->addWidget(label);
 	}
 
-	m_detailsSeparator->setLabel(m_currentItem->typeString() + " info");
+	QLabel *detailsLabel = dynamic_cast<QLabel *>(m_detailsSeparator->header()->layout()->itemAt(0)->widget());
+	if(detailsLabel) {
+		detailsLabel->setText(m_currentItem->typeString() + " info");
+	}
 }
 
 void GuiDetailsView::clearWidgets()
@@ -66,9 +70,9 @@ void GuiDetailsView::clearWidgets()
 	}
 	m_currentWidgets.clear();
 
-	while((child = m_detailsSeparator->getContentWidget()->layout()->takeAt(0)) != nullptr) {
+	while((child = m_detailsSeparator->contentLayout()->takeAt(0)) != nullptr) {
 		child->widget()->hide();
-		m_detailsSeparator->getContentWidget()->layout()->removeWidget(child->widget());
+		m_detailsSeparator->contentLayout()->removeWidget(child->widget());
 	}
 	m_detailsList.clear();
 }
