@@ -29,6 +29,14 @@ public:
 	virtual double sampleRate() = 0;
 };
 
+class SCOPY_ADCPLUGIN_EXPORT MeasurementPanelInterface {
+public:
+	virtual MeasurementsPanel *measurePanel() const = 0;
+	virtual StatsPanel *statsPanel() const = 0;
+	virtual void enableMeasurementPanel(bool) = 0;
+	virtual void enableStatsPanel(bool) = 0;
+};
+
 
 }
 

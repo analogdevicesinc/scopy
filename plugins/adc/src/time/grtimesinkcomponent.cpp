@@ -9,8 +9,11 @@ using namespace scopy::grutil;
 
 
 
-GRTimeSinkComponent::GRTimeSinkComponent(QString name, GRTopBlockNode *t, QObject *parent) : QObject(parent)
-{	m_enabled = true;
+GRTimeSinkComponent::GRTimeSinkComponent(QString name, GRTopBlockNode *t, QObject *parent)
+	: QObject(parent)
+	, ToolComponent()
+{
+	m_enabled = true;
 	m_node = t;
 	m_top = t->src();
 	m_name = name;
@@ -181,15 +184,6 @@ void GRTimeSinkComponent::onDeinit()
 	onStop();
 }
 
-void GRTimeSinkComponent::enable() {
-	ToolComponent::enable();
-}
-
-void GRTimeSinkComponent::disable() {
-	ToolComponent::disable();
-}
-
-
 void GRTimeSinkComponent::addChannel(ChannelComponent* ch, GRIIOFloatChannelNode *node) {
 	m_channels.append(new GRTimeSinkAcquisitionSignalPath(m_name, ch, node, this));
 }
@@ -201,9 +195,3 @@ void GRTimeSinkComponent::removeChannel(GRIIOFloatChannelNode *node) {
 		}
 	}
 }
-
-bool GRTimeSinkComponent::enabled() const
-{
-	return m_enabled;
-}
-

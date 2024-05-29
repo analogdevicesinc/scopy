@@ -10,27 +10,57 @@ using namespace scopy::gui;
 
 PlotAutoscaler::PlotAutoscaler(QObject *parent)
 	: QObject(parent)
+	, m_timeout(1000)
 {
 	m_xAxisMode = false;
 	m_tolerance = 0;
 	// AUTOSCALE
 	m_autoScaleTimer = new QTimer(this);
-	m_autoScaleTimer->setInterval(1000);
+	m_autoScaleTimer->setInterval(m_timeout);
 	connect(m_autoScaleTimer, &QTimer::timeout, this, &PlotAutoscaler::autoscale);
+
+	m_max = -1000000.0;
+	m_min = 1000000.0;
 }
 
 PlotAutoscaler::~PlotAutoscaler() {}
 
-void PlotAutoscaler::start() { m_autoScaleTimer->start(); }
+void PlotAutoscaler::start() {
+	m_autoScaleTimer->start();
+}
 
-void PlotAutoscaler::stop() { m_autoScaleTimer->stop(); }
+void PlotAutoscaler::stop() {
+	m_autoScaleTimer->stop();
+}
+
+void PlotAutoscaler::onNewData(const float *xData, const float *yData, size_t size, bool copy) {
+	// this is a little wonky but should work
+	if(!m_autoScaleTimer->isActive())
+		return;
+
+	for(int i = 0; i < size ; i++) {
+		qreal sample;
+		if(m_xAxisMode) {
+			sample = xData[i];
+		} else {
+			sample = yData[i];
+		}
+		if(m_max < sample)
+			m_max = sample;
+		if(m_min > sample)
+			m_min = sample;
+	}
+}
+
+void PlotAutoscaler::setTimeout(int t)
+{
+	m_timeout = t;
+	m_autoScaleTimer->setInterval(t);
+}
 
 void PlotAutoscaler::autoscale()
 {
-	double max = -1000000.0;
-	double min = 1000000.0;
-
-	for(PlotChannel *plotCh : m_channels) {
+	for(PlotChannel *plotCh : qAsConst(m_channels)) {
 		auto data = plotCh->curve()->data();
 		for(int i = 0; i < data->size(); i++) {
 
@@ -40,27 +70,41 @@ void PlotAutoscaler::autoscale()
 			} else {
 				sample = data->sample(i).y();
 			}
-			if(max < sample)
-				max = sample;
-			if(min > sample)
-				min = sample;
+			if(m_max < sample)
+				m_max = sample;
+			if(m_min > sample)
+				m_min = sample;
 		}
 		qInfo(CAT_TIMEYAUTOSCALE)
-			<< "Autoscaling channel " << plotCh->name() << "to (" << min << ", " << max << ")";
+			<< "Autoscaling channel " << plotCh->name() << "to (" << m_min << ", " << m_max << ")";
 	}
 
-	double minTolerance = m_tolerance * min;
-	double maxTolerance = m_tolerance * max;
+	double minTolerance = m_tolerance * m_min;
+	double maxTolerance = m_tolerance * m_max;
 
-	Q_EMIT newMin(min - minTolerance);
-	Q_EMIT newMax(max + maxTolerance);
+	Q_EMIT newMin(m_min - minTolerance);
+	Q_EMIT newMax(m_max + maxTolerance);
+
+	m_max = -1000000.0;
+	m_min = 1000000.0;
 }
 
-void PlotAutoscaler::addChannels(PlotChannel *c) { m_channels.append(c); }
+void PlotAutoscaler::addChannels(PlotChannel *c) {
+	m_channels.append(c);
+	connect(c, &PlotChannel::newData, this, &PlotAutoscaler::onNewData);
+}
 
-void PlotAutoscaler::removeChannels(PlotChannel *c) { m_channels.removeAll(c); }
+void PlotAutoscaler::removeChannels(PlotChannel *c) {
+	m_channels.removeAll(c);
+	disconnect(c, &PlotChannel::newData, this, &PlotAutoscaler::onNewData);
+}
 
 double PlotAutoscaler::tolerance() const { return m_tolerance; }
+
+int PlotAutoscaler::timeout() const
+{
+	return m_timeout;
+}
 
 void PlotAutoscaler::setTolerance(double newTolerance)
 {

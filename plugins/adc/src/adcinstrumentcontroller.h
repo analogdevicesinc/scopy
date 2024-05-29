@@ -4,7 +4,7 @@
 #include "toolcomponent.h"
 #include "scopy-adcplugin_export.h"
 #include "timeplotcomponent.h"
-#include "timeplotsettingscomponent.h"
+#include "timeplotmanagersettings.h"
 #include "cursorcomponent.h"
 #include "measurecomponent.h"
 
@@ -57,13 +57,13 @@ Q_SIGNALS:
 	void requestStop();
 private:
 
-	void setupChannelMeasurement(PlotComponentManager *c, ChannelComponent *ch);
+	void setupChannelMeasurement(TimePlotManager *c, ChannelComponent *ch);
 
 	ADCInstrument *m_tool;
-	PlotComponentManager *m_plotComponentManager;
+	TimePlotManager *m_plotComponentManager;
 	MapStackedWidget *plotStack;
 
-	TimePlotSettingsComponent *m_timePlotSettingsComponent;
+	TimePlotManagerSettings *m_timePlotSettingsComponent;
 	CursorComponent *m_cursorComponent;
 	MeasureComponent *m_measureComponent;
 

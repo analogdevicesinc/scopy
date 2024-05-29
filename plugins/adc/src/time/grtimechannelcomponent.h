@@ -9,6 +9,7 @@
 #include <gui/widgets/menuplotaxisrangecontrol.h>
 #include <gui/widgets/menucontrolbutton.h>
 #include "interfaces.h"
+
 namespace scopy {
 namespace adc {
 
@@ -26,7 +27,7 @@ public:
 		YMODE_FS,
 		YMODE_SCALE
 	} YMode;
-	GRTimeChannelComponent(GRIIOFloatChannelNode *node, PlotComponent *m_plot,QPen pen,
+	GRTimeChannelComponent(GRIIOFloatChannelNode *node, TimePlotComponent *m_plot,QPen pen,
 			   QWidget *parent = nullptr);
 	~GRTimeChannelComponent();
 
@@ -60,7 +61,7 @@ private:
 	TimeMeasureManager *m_measureMgr;
 	MenuControlButton *m_ctrl;
 	MenuPlotAxisRangeControl *m_yCtrl;
-	PlotAutoscaler *m_autoscale;
+	PlotAutoscaler *m_autoscaler;
 	MenuCombo *m_ymodeCb;
 	MenuOnOffSwitch *m_autoscaleBtn;
 
@@ -74,6 +75,7 @@ private:
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createAttrMenu(QWidget *parent);
 	QWidget *createYAxisMenu(QWidget *parent);
+	QWidget *createCurveMenu(QWidget *parent);
 	//QPushButton *createSnapshotButton(QWidget *parent);
 
 	void createMenuControlButton(QWidget *parent = nullptr);

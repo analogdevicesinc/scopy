@@ -9,6 +9,8 @@
 
 #include <iio-widgets/iiowidget.h>
 #include <iio-widgets/iiowidgetfactory.h>
+#include <timeplotcomponentchannel.h>
+#include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 
 Q_LOGGING_CATEGORY(CAT_GRTIMECHANNELCOMPONENT, "GRTimeChannelComponent");
 
@@ -16,7 +18,7 @@ using namespace scopy;
 using namespace scopy::grutil;
 using namespace scopy::adc;
 
-GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, PlotComponent *m_plot, QPen pen, QWidget *parent)
+GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, TimePlotComponent *m_plot, QPen pen, QWidget *parent)
 	: ChannelComponent(node->name(), m_plot, pen, parent)
 
 {
@@ -27,7 +29,6 @@ GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, Plot
 	int yPlotAxisHandle = Preferences::get("adc_plot_yaxis_handle_position").toInt();
 
 	m_running = false;
-	m_enabled = false;
 	m_autoscaleEnabled = false;
 
 	m_scaleAvailable = true; // query from GRIIOFloatChannel;
@@ -61,7 +62,7 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 	MenuSectionWidget *yaxiscontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *yaxis = new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE, yaxiscontainer);
 
-	       // Y-MODE
+	// Y-MODE
 	m_ymodeCb = new MenuCombo("YMODE", yaxis);
 	auto cb = m_ymodeCb->combo();
 	cb->addItem("ADC Counts", YMODE_COUNT);
@@ -70,34 +71,47 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 	if(m_scaleAvailable) {
 		cb->addItem(m_unit, YMODE_SCALE);
 	}
-	//m_plotAxis->setUnits("V");
-	//m_yCtrl = new MenuPlotAxisRangeControl(m_plotAxis, yaxis);
+	m_yCtrl = new MenuPlotAxisRangeControl(m_plotChannelCmpt->m_timePlotYAxis, yaxis);
 
-	//m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), yaxis, false);
-	//m_autoscale = new PlotAutoscaler(false, this);
-	//m_autoscale->addChannels(m_plotCh);
+	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), yaxis, false);
+	m_autoscaler = new PlotAutoscaler(this);
+	m_autoscaler->addChannels(m_plotChannelCmpt->m_timePlotCh);
 
-	//connect(m_autoscale, &PlotAutoscaler::newMin, m_yCtrl, &MenuPlotAxisRangeControl::setMin);
-	//connect(m_autoscale, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
+	connect(m_autoscaler, &PlotAutoscaler::newMin, m_yCtrl, &MenuPlotAxisRangeControl::setMin);
+	connect(m_autoscaler, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
 
-	// connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
-	// 	m_yCtrl->setEnabled(!b);
-	// 	m_autoscaleEnabled = b;
-	// 	toggleAutoScale();
-	// });
+	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
+		m_yCtrl->setEnabled(!b);
+		m_autoscaleEnabled = b;
+		toggleAutoScale();
+	});
 
-	// yaxis->contentLayout()->addWidget(m_autoscaleBtn);
-	// yaxis->contentLayout()->addWidget(m_yCtrl);
-	// yaxis->contentLayout()->addWidget(m_ymodeCb);
+	yaxis->contentLayout()->addWidget(m_autoscaleBtn);
+	yaxis->contentLayout()->addWidget(m_yCtrl);
+	yaxis->contentLayout()->addWidget(m_ymodeCb);
 
-	// yaxiscontainer->contentLayout()->addWidget(yaxis);
+	yaxiscontainer->contentLayout()->addWidget(yaxis);
 
-	// connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-	// 	auto mode = cb->itemData(idx).toInt();
-	// 	setYMode(static_cast<YMode>(mode));
-	// });
+	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+		auto mode = cb->itemData(idx).toInt();
+		setYMode(static_cast<YMode>(mode));
+	});
 
 	return yaxiscontainer;
+}
+
+QWidget *GRTimeChannelComponent::createCurveMenu(QWidget *parent)
+{
+	MenuSectionWidget *curvecontainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *curve = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, curvecontainer);
+
+	MenuPlotChannelCurveStyleControl *curvemenu = new MenuPlotChannelCurveStyleControl(curve);
+	curvemenu->addChannels(m_plotChannelCmpt->m_timePlotCh);
+	curvemenu->addChannels(m_plotChannelCmpt->m_xyPlotCh);
+
+	curvecontainer->contentLayout()->addWidget(curve);
+	curve->contentLayout()->addWidget(curvemenu);
+	return curvecontainer;
 }
 
 /*
@@ -147,7 +161,8 @@ QWidget *GRTimeChannelComponent::createMenu(QWidget *parent)
 
 	MenuHeaderWidget *header = new MenuHeaderWidget(m_channelName, m_pen, w);
 	QWidget *yaxismenu = createYAxisMenu(w);
-	// QWidget *curvemenu = createCurveMenu(w);
+
+	QWidget *curvemenu = createCurveMenu(w);
 	QWidget *attrmenu = createAttrMenu(w);
 	QWidget *measuremenu = m_measureMgr->createMeasurementMenu(w);
 	//m_snapBtn = createSnapshotButton(w);
@@ -155,7 +170,7 @@ QWidget *GRTimeChannelComponent::createMenu(QWidget *parent)
 	lay->addWidget(header);
 	lay->addWidget(scroll);
 	layScroll->addWidget(yaxismenu);
-	// layScroll->addWidget(curvemenu);
+	layScroll->addWidget(curvemenu);
 	layScroll->addWidget(attrmenu);
 	layScroll->addWidget(measuremenu);
 	//layScroll->addWidget(m_snapBtn);
@@ -189,25 +204,25 @@ QWidget *GRTimeChannelComponent::createAttrMenu(QWidget *parent)
 void GRTimeChannelComponent::onStart()
 {
 	m_running = true;
-	// m_measureMgr->getModel()->setSampleRate(m_plotSampleRate);
-//	toggleAutoScale();
+	//m_measureMgr->getModel()->setSampleRate(m_plotSampleRate);
+	toggleAutoScale();
 }
 
 void GRTimeChannelComponent::onStop()
 {
 	m_running = false;
-/*	toggleAutoScale();
+	toggleAutoScale();
 	if(m_autoscaleEnabled) {
-		m_autoscale->autoscale();
-	}*/
+		m_autoscaler->autoscale();
+	}
 }
 
 void GRTimeChannelComponent::toggleAutoScale()
 {
 	if(m_running && m_autoscaleEnabled) {
-		m_autoscale->start();
+		m_autoscaler->start();
 	} else {
-		m_autoscale->stop();
+		m_autoscaler->stop();
 	}
 }
 
@@ -250,9 +265,9 @@ void GRTimeChannelComponent::setYMode(YMode mode)
 		break;
 	}
 
-	/*m_yCtrl->setMin(ymin);
+	m_yCtrl->setMin(ymin);
 	m_yCtrl->setMax(ymax);
-	m_scOff->setScale(scale);
+	/*m_scOff->setScale(scale);
 	m_scOff->setOffset(offset);*/
 }
 
@@ -306,7 +321,6 @@ void GRTimeChannelComponent::onDeinit() {}
 
 void GRTimeChannelComponent::onNewData(const float *xData, const float *yData, int size)
 {
-
 	auto model = m_measureMgr->getModel();
 	model->setDataSource(yData, size);
 	model->measure();

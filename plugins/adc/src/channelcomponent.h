@@ -10,27 +10,23 @@
 namespace scopy {
 namespace adc {
 
-class PlotChannelComponent;
+class TimePlotComponentChannel;
 
 class SCOPY_ADCPLUGIN_EXPORT ChannelComponent : public QWidget,  public ToolComponent
 {
 	Q_OBJECT
 public:
-	ChannelComponent(QString ch, PlotComponent *m_plot, QPen pen, QWidget *parent = nullptr);
+	ChannelComponent(QString ch, TimePlotComponent *m_plot, QPen pen, QWidget *parent = nullptr);
 	virtual ~ChannelComponent();
 
 	QWidget *getMenuControlWidget();
 	void setMenuControlWidget(QWidget *);
 
 	QPen pen() const;
-	bool enabled() const;
-
-	// virtual QWidget *createCurveMenu(QWidget *parent);
 
 	ChannelData *chData() const;
-
-	PlotChannelComponent *plotChannelCmpt() const;
-	void setPlotChannelCmpt(PlotChannelComponent *newPlotChannelCmpt);
+	TimePlotComponentChannel *plotChannelCmpt() const;
+	void setPlotChannelCmpt(TimePlotComponentChannel *newPlotChannelCmpt);
 
 protected:
 
@@ -38,10 +34,9 @@ protected:
 	QPen m_pen;
 	QWidget *widget;
 	QWidget *m_mcw;
-	bool m_enabled;
 
 	ChannelData *m_chData;
-	PlotChannelComponent *m_plotChannelCmpt;
+	TimePlotComponentChannel *m_plotChannelCmpt;
 
 public Q_SLOTS:
 	virtual void enableChannel();

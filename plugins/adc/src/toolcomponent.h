@@ -77,6 +77,8 @@ public:
 class SCOPY_ADCPLUGIN_EXPORT ToolComponent
 {
 public:
+	ToolComponent() : m_enabled(true), m_priority(0) {}
+	virtual ~ToolComponent() {};
 	virtual QString name() const { return m_name; };
 	virtual int priority() const { return m_priority; };
 	virtual void onStart(){};
@@ -94,13 +96,15 @@ public:
 
 protected:
 	QString m_name;
-	bool m_enabled;
+	bool m_enabled = true;
 	int m_priority = 0;
 };
 
 class SCOPY_ADCPLUGIN_EXPORT MetaComponent : public ToolComponent
 {
 public:
+	MetaComponent() : ToolComponent() {}
+	virtual ~MetaComponent() {}
 	virtual void addComponent(ToolComponent *c)
 	{
 		m_components.append(c);
@@ -134,10 +138,10 @@ public:
 	}
 	virtual void onInit()
 	{
-		/*auto cm = components();
+		auto cm = components();
 		for(auto c : cm) {
 			c->onInit();
-		}*/
+		}
 	}
 	virtual void onDeinit()
 	{

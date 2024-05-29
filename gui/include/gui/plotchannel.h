@@ -41,6 +41,7 @@ public:
 	void clearMarkers();
 	void removeMarker(QwtPlotMarker *m);
 	void addMarker(QwtPlotMarker *m);
+	void setSamples(const float* xData, const float* yData, size_t size, bool copy = true);
 
 	QString name() const;
 
@@ -58,6 +59,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void attachCurve(QwtPlotCurve *curve);
 	void doReplot();
+	void newData(const float *xData, const float *yData, size_t size, bool);
 
 private:
 	PlotAxis *m_xAxis, *m_yAxis;

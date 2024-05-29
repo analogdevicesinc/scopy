@@ -4,7 +4,11 @@
 using namespace scopy::adc;
 using namespace scopy;
 
-CursorComponent::CursorComponent(PlotComponent *plot, ToolTemplate *tool, QObject *parent) : QObject(parent), m_plot(plot) {
+CursorComponent::CursorComponent(TimePlotComponent *plot, ToolTemplate *tool, QObject *parent)
+	: QObject(parent)
+	, ToolComponent()
+	, m_plot(plot)
+	{
 
 	cursor = new MenuControlButton();
 	setupCursorButtonHelper(cursor);
