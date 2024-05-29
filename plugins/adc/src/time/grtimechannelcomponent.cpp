@@ -20,7 +20,6 @@ GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, Plot
 	: ChannelComponent(node->name(), m_plot, pen, parent)
 
 {
-
 	m_node = node;
 	m_src = node->src();
 

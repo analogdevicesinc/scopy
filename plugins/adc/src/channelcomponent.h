@@ -4,7 +4,7 @@
 #include <scopy-adcplugin_export.h>
 #include <QWidget>
 #include "toolcomponent.h"
-#include "plotcomponent.h"
+#include "timeplotcomponent.h"
 
 
 namespace scopy {

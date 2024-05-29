@@ -8,7 +8,7 @@
 namespace scopy {
 class AxisHandle;
 
-class SCOPY_GUI_EXPORT PlotAxisHandle : public QObject
+class SCOPY_GUI_EXPORT PlotAxisHandle : public QWidget
 {
 	Q_OBJECT
 public:

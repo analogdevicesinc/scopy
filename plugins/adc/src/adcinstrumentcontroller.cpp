@@ -1,12 +1,9 @@
 #include "adcinstrumentcontroller.h"
-#include "adcplugin.h"
-#include "plotcomponent.h"
+#include "timeplotcomponent.h"
 #include "adcinstrument.h"
 #include "grdevicecomponent.h"
 #include "grtimechannelcomponent.h"
-#include "grxychannelcomponent.h"
 #include "grtimesinkcomponent.h"
-#include "grxysinkcomponent.h"
 
 #include <pluginbase/preferences.h>
 #include "interfaces.h"
@@ -47,7 +44,9 @@ ADCInstrumentController::ADCInstrumentController(QString name, AcqTreeNode * tre
 		Qt::QueuedConnection);
 }
 
-ADCInstrumentController::~ADCInstrumentController() {}
+ADCInstrumentController::~ADCInstrumentController() {
+
+}
 
 ChannelIdProvider *ADCInstrumentController::getChannelIdProvider() { return chIdP; }
 
@@ -70,8 +69,17 @@ void ADCInstrumentController::init()
 
 	m_plotComponentManager = new PlotComponentManager(m_name+"_time", m_tool);
 	addComponent(m_plotComponentManager);
-	m_timePlotSettingsComponent = new TimePlotSettingsComponent(m_plotComponentManager->plots()[0]);
+	m_timePlotSettingsComponent = new TimePlotSettingsComponent(m_plotComponentManager);
 	addComponent(m_timePlotSettingsComponent);
+
+
+
+	uint32_t tmp;
+	tmp = m_plotComponentManager->addPlot("1");
+	m_timePlotSettingsComponent->addPlot(m_plotComponentManager->plot(tmp));
+	tmp = m_plotComponentManager->addPlot("2");
+	m_timePlotSettingsComponent->addPlot(m_plotComponentManager->plot(tmp));
+
 
 	// m_cursorComponent = new CursorComponent(m_plotComponentManager, m_tool->getToolTemplate(), this);
 	// addComponent(m_cursorComponent);
@@ -86,57 +94,6 @@ void ADCInstrumentController::init()
 
 	plotStack->add("time",m_plotComponentManager);
 	toolLayout->rightStack()->add(m_tool->settingsMenuId, m_timePlotSettingsComponent);
-
-	connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::sampleRateChanged, this,
-		[=](double v) {
-			for(auto c : qAsConst(m_components)) {
-				SampleRateUser *comp =  dynamic_cast<SampleRateUser *>(c);
-				if(comp) {
-					comp->setSampleRate(v);
-				}
-			}
-		});
-
-	connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::rollingModeChanged, this,
-		[=](bool v) {
-			for(auto c : qAsConst(m_components)) {
-				RollingModeUser *comp =  dynamic_cast<RollingModeUser *>(c);
-				if(comp) {
-					comp->setRollingMode(v);
-				}
-			}
-		});
-
-	connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::plotSizeChanged, this,
-		[=](uint32_t v) {
-			for(auto c : qAsConst(m_components)) {
-				PlotSizeUser *comp =  dynamic_cast<PlotSizeUser *>(c);
-				if(comp) {
-					comp->setPlotSize(v);
-				}
-			}
-		});
-
-	connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::singleYModeChanged, this,
-		[=](bool v) {
-			for(auto c : qAsConst(m_components)) {
-				SingleYModeUser *comp =  dynamic_cast<SingleYModeUser *>(c);
-				if(comp) {
-					comp->setSingleYMode(v);
-				}
-			}
-		});
-
-	connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::bufferSizeChanged, this,
-		[=](uint32_t v) {
-			for(auto c : qAsConst(m_components)) {
-				BufferSizeUser *comp =  dynamic_cast<BufferSizeUser *>(c);
-				if(comp) {
-					comp->setBufferSize(v);
-				}
-			}
-		});
-
 
 	for(auto c : qAsConst(m_components)) {
 		c->onInit();
@@ -257,6 +214,12 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node) {
 		GRTimeSinkComponent *c = new GRTimeSinkComponent(m_name+"_time", grtbn, this);
 		m_acqNodeComponentMap[grtbn] = (c);
 		addComponent(c);
+
+		connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::bufferSizeChanged, c, &GRTimeSinkComponent::setBufferSize);
+		connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::plotSizeChanged, c, &GRTimeSinkComponent::setPlotSize);
+		connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::sampleRateChanged, c, &GRTimeSinkComponent::setSampleRate);
+		connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::rollingModeChanged, c, &GRTimeSinkComponent::setRollingMode);
+
 	}
 
 	if(dynamic_cast<GRIIODeviceSourceNode*>(node) != nullptr) {
@@ -268,10 +231,7 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node) {
 		m_acqNodeComponentMap[griiodsn] = (d);
 		addComponent(d);
 
-		SampleRateProvider *s = dynamic_cast<SampleRateProvider*>(d);
-		if(s) {
-			m_timePlotSettingsComponent->addSampleRateProvider(s);
-		}
+		connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::bufferSizeChanged, d, &GRDeviceComponent::setBufferSize);
 
 	}
 
@@ -282,6 +242,7 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node) {
 		m_plotComponentManager->addChannel(c);
 
 		/*** This is a bit of a mess because CollapsableMenuControlButton is not a MenuControlButton ***/
+
 		CompositeWidget *cw = nullptr;
 		GRIIODeviceSourceNode *w = dynamic_cast<GRIIODeviceSourceNode*>(griiofcn->treeParent());
 		GRDeviceComponent* dc = dynamic_cast<GRDeviceComponent*>(m_acqNodeComponentMap[w]);
@@ -292,9 +253,14 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node) {
 			cw = m_tool->vcm();
 		}
 		m_acqNodeComponentMap[griiofcn] = c;
+
 		/*** End of mess ***/
 
 		m_tool->addChannel(c->ctrl(), c, cw);
+
+		connect(c->ctrl(), &QAbstractButton::clicked, this, [=](){
+			m_plotComponentManager->selectChannel(c);
+		});
 
 		GRTimeSinkComponent *grtsc = dynamic_cast<GRTimeSinkComponent*>(m_acqNodeComponentMap[griiofcn->top()]);
 		Q_ASSERT(grtsc);
@@ -302,18 +268,21 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node) {
 
 		dc->addChannel(c);    // used for sample rate computation
 		m_timePlotSettingsComponent->addChannel(c); // SingleY/etc
-		m_plotComponentManager->addChannel(c);
-		SampleRateProvider *s = dynamic_cast<SampleRateProvider*>(c); // SampleRate Computation
-		if(s) {
-			m_timePlotSettingsComponent->addSampleRateProvider(s);
-		}
 
 		addComponent(c);
 		setupChannelMeasurement(m_plotComponentManager, c);
 
+
+		/*SampleRateProvider *s = dynamic_cast<SampleRateProvider*>(c); // SampleRate Computation
+		if(s) {
+			m_timePlotSettingsComponent->addSampleRateProvider(s);
+		}*/
+
 		static bool b = false;
-		if(b == true)
+		if(b == true) {
 			m_plotComponentManager->moveChannel(c,1);
+			m_plotComponentManager->moveChannel(c,0);
+		}
 		b = true;
 
 	}
