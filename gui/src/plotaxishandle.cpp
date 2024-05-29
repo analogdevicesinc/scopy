@@ -5,7 +5,7 @@
 using namespace scopy;
 
 PlotAxisHandle::PlotAxisHandle(PlotWidget *plot, PlotAxis *ax)
-	: QObject(plot)
+	: QWidget(plot)
 	, m_plotWidget(plot)
 	, m_axis(ax)
 	, m_plot(plot->plot())
@@ -13,7 +13,9 @@ PlotAxisHandle::PlotAxisHandle(PlotWidget *plot, PlotAxis *ax)
 	init();
 }
 
-PlotAxisHandle::~PlotAxisHandle() {}
+PlotAxisHandle::~PlotAxisHandle() {
+	// delete m_handle;
+}
 
 void PlotAxisHandle::init()
 {

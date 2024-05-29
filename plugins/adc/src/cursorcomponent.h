@@ -3,7 +3,7 @@
 
 #include <menucontrolbutton.h>
 #include <gui/cursorcontroller.h>
-#include "plotcomponent.h"
+#include "timeplotcomponent.h"
 
 namespace scopy {
 namespace adc {

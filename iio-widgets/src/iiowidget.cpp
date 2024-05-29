@@ -66,8 +66,8 @@ void IIOWidget::emitDataStatus(QDateTime timestamp, QString oldData, QString new
 	// write operation that is more likely to fail
 	if(isReadOp) {
 		qDebug(CAT_IIOWIDGET) << timestamp.toString("[hh:mm:ss]")
-				      << "READ (return code: " << QString::number(status) << "):" << oldData << "->"
-				      << newData;
+				     << "READ (return code: " << QString::number(status) << "):" << oldData << "->"
+				     << newData;
 		return;
 	}
 	setLastOperationTimestamp(timestamp);

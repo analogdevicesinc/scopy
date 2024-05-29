@@ -13,7 +13,10 @@ ADCInstrument::ADCInstrument(PlotProxy *proxy, QWidget *parent)
 	init();
 }
 
-ADCInstrument::~ADCInstrument() { deinit(); }
+ADCInstrument::~ADCInstrument() {
+	stop();
+	deinit();
+}
 
 void ADCInstrument::setupToolLayout()
 {

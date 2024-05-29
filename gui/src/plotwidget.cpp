@@ -120,10 +120,25 @@ void PlotWidget::addPlotChannel(PlotChannel *ch)
 
 void PlotWidget::removePlotChannel(PlotChannel *ch)
 {
-	m_plotChannels.removeAll(ch);
 
-	//m_navigator->removeChannel(ch);
-	//m_tracker->removeChannel(ch);
+	m_plotChannels.removeAll(ch);
+	m_navigator->removeChannel(ch);
+	m_tracker->removeChannel(ch);
+
+	// QwtAxisId cannot be removed from QwtPlot
+	ch->yAxis()->setVisible(false);
+
+	if(m_selectedChannel == ch) {
+		if(m_plotChannels.size() > 0) {
+			m_selectedChannel = m_plotChannels[0];
+		} else {
+			m_selectedChannel = nullptr;
+		}
+	}
+
+	// QwtAxis cannot be removed :(
+
+
 	Q_EMIT removedChannel(ch);
 }
 
@@ -267,6 +282,9 @@ void PlotWidget::showAxisLabels()
 	if(m_selectedChannel != nullptr) {
 		m_selectedChannel->xAxis()->setVisible(m_showXAxisLabels);
 		m_selectedChannel->yAxis()->setVisible(m_showYAxisLabels);
+	} else {
+		xAxis()->setVisible(m_showXAxisLabels);
+		yAxis()->setVisible(m_showXAxisLabels);
 	}
 }
 

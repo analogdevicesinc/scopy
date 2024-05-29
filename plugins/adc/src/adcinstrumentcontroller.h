@@ -3,9 +3,8 @@
 
 #include "toolcomponent.h"
 #include "scopy-adcplugin_export.h"
-#include "plotcomponent.h"
+#include "timeplotcomponent.h"
 #include "timeplotsettingscomponent.h"
-#include "xyplotsettingscomponent.h"
 #include "cursorcomponent.h"
 #include "measurecomponent.h"
 

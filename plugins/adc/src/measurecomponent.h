@@ -3,7 +3,7 @@
 #include "toolcomponent.h"
 #include "gui/widgets/measurementsettings.h"
 #include "gui/widgets/menucontrolbutton.h"
-#include "plotcomponent.h"
+#include "timeplotcomponent.h"
 #include "scopy-adcplugin_export.h"
 
 namespace scopy {
