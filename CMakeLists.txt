@@ -209,3 +209,33 @@ install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION .)
 if(QT_VERSION_MAJOR EQUAL 6)
 	qt_finalize_executable(${PROJECT_NAME})
 endif()
+
+# Helper function to copy DLLs from a given directory
+function(copy_dlls_from_dir dir)
+file(GLOB DLLS "${dir}/*.dll")
+foreach(DLL ${DLLS})
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy
+		${DLL}
+		$<TARGET_FILE_DIR:${PROJECT_NAME}>
+	)
+endforeach()
+endfunction()
+
+# List of directories containing DLLs
+set(DLL_DIRS
+	"${CMAKE_BINARY_DIR}/common"
+	"${CMAKE_BINARY_DIR}/core"
+	"${CMAKE_BINARY_DIR}/gr-util"
+	"${CMAKE_BINARY_DIR}/gui"
+	"${CMAKE_BINARY_DIR}/iioutil"
+	"${CMAKE_BINARY_DIR}/iio-widgets"
+	"${CMAKE_BINARY_DIR}/pluginbase"
+	"${CMAKE_BINARY_DIR}/gui/sigrok-gui"
+	"${CMAKE_BINARY_DIR}/gui/gr-gui"
+)
+
+# Copy DLLs from each directory
+foreach(DIR ${DLL_DIRS})
+	copy_dlls_from_dir(${DIR})
+endforeach()
