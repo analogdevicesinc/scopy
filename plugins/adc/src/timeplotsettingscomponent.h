@@ -2,7 +2,7 @@
 #define TIMEPLOTSETTINGSCOMPONENT_H
 
 #include "scopy-adcplugin_export.h"
-#include <plotcomponent.h>
+#include <timeplotcomponent.h>
 #include <toolcomponent.h>
 
 #include <QLabel>
@@ -32,7 +32,7 @@ public:
 		XMODE_OVERRIDE
 	} XMode;
 
-	TimePlotSettingsComponent(PlotComponent *plot, QWidget *parent = nullptr);
+	TimePlotSettingsComponent(PlotComponentManager *plot, QWidget *parent = nullptr);
 	~TimePlotSettingsComponent();
 
 	uint32_t plotSize() const;
@@ -74,6 +74,8 @@ public Q_SLOTS:
 	void addSampleRateProvider(SampleRateProvider *s);
 	void removeSampleRateProvider(SampleRateProvider *s);
 
+	void addPlot(PlotComponent *plt);
+	void removePlot(PlotComponent *p);
 Q_SIGNALS:
 	void plotSizeChanged(uint32_t);
 	void bufferSizeChanged(uint32_t);
@@ -84,7 +86,8 @@ Q_SIGNALS:
 	void syncBufferPlotSizeChanged(bool);
 
 private:
-	PlotWidget *m_plot;
+	PlotComponentManager *m_plotManager;
+
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createXAxisMenu(QWidget *parent = nullptr);
 	QWidget *createYAxisMenu(QWidget *parent = nullptr);
@@ -92,10 +95,6 @@ private:
 	void enableXModeTime();
 
 	QPen m_pen;
-	MenuPlotAxisRangeControl *m_yctrl;
-	MenuOnOffSwitch *m_singleYModeSw;
-	QPushButton *m_autoscaleBtn;
-	PlotAutoscaler *autoscaler;
 
 	ScaleSpinButton *m_bufferSizeSpin;
 	ScaleSpinButton *m_plotSizeSpin;
@@ -106,25 +105,25 @@ private:
 	PositionSpinButton *m_freqOffsetSpin;
 	MenuOnOffSwitch *m_rollingModeSw;
 	MenuOnOffSwitch *m_syncBufferPlot;
-	MenuOnOffSwitch *m_showLabels;
 	MenuCombo *m_xModeCb;
 
-	bool m_sampleRateAvailable;
+	QPushButton *m_addPlotBtn;
+	QVBoxLayout *m_plotContainerLayout;
+	QMap<uint32_t, QWidget*> m_plotWidgetMap;
 
+	bool m_sampleRateAvailable;
 	uint32_t m_bufferSize;
 	uint32_t m_plotSize;
 	double m_sampleRate;
 	bool m_rollingMode;
 	bool m_syncBufferPlotSize;
 	bool m_syncMode;
-	bool m_singleYMode;
 
 	QList<ChannelComponent*> m_channels;
 	QList<SampleRateProvider*> m_sampleRateProviders;
 	// bool m_showPlotTags;
 
 	Q_PROPERTY(uint32_t plotSize READ plotSize WRITE setPlotSize NOTIFY plotSizeChanged)
-	Q_PROPERTY(bool singleYMode READ singleYMode WRITE setSingleYMode NOTIFY singleYModeChanged)
 	Q_PROPERTY(bool rollingMode READ rollingMode WRITE setRollingMode NOTIFY rollingModeChanged)
 	Q_PROPERTY(double sampleRate READ sampleRate WRITE setSampleRate NOTIFY sampleRateChanged)
 	Q_PROPERTY(bool syncBufferPlotSize READ syncBufferPlotSize WRITE setSyncBufferPlotSize NOTIFY

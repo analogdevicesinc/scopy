@@ -3,7 +3,6 @@
 
 #include "scopy-adcplugin_export.h"
 #include "channelcomponent.h"
-#include "src/grdevicecomponent.h"
 #include <gui/plotautoscaler.h>
 #include <gui/widgets/menuonoffswitch.h>
 #include <gui/widgets/menucombo.h>
@@ -17,7 +16,6 @@ using namespace scopy::gui;
 
 class GRDeviceAddon;
 class SCOPY_ADCPLUGIN_EXPORT GRTimeChannelComponent : public ChannelComponent,
-						      public SingleYModeUser,
 						      public MeasurementProvider
 {
 	Q_OBJECT
@@ -47,8 +45,9 @@ public Q_SLOTS:
 	void onNewData(const float *xData, const float *yData, int size);
 
 	void toggleAutoScale();
+
 	void setYMode(YMode mode);
-	void setSingleYMode(bool) override;
+	void setSingleYMode(bool);
 	// void setSampleRate(double v) override;
 /*
 Q_SIGNALS:
@@ -79,8 +78,6 @@ private:
 
 	void createMenuControlButton(QWidget *parent = nullptr);
 	void setupChannelMenuControlButtonHelper(MenuControlButton *btn);
-
-	// GRSignalPathProvider interface
 };
 
 } // namespace grutil

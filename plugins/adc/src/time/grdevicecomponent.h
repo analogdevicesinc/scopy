@@ -20,7 +20,6 @@ using namespace scopy::grutil;
 
 class SCOPY_ADCPLUGIN_EXPORT GRDeviceComponent : public QWidget,
 						 public ToolComponent,
-						 public BufferSizeUser,
 						 public SampleRateProvider
 {
 	Q_OBJECT
@@ -39,7 +38,7 @@ public Q_SLOTS:
 	void onStop() override;
 	void onInit() override;
 	void onDeinit() override;
-	void setBufferSize(uint32_t bufferSize) override;
+	void setBufferSize(uint32_t bufferSize);
 
 
 	void removeChannel(ChannelComponent *c);

@@ -4,7 +4,7 @@
 #include <QObject>
 #include "toolcomponent.h"
 #include <gr-util/time_sink_f.h>
-#include "grtimechannelcomponent.h"
+#include "channelcomponent.h"
 
 namespace scopy {
 namespace adc {
@@ -43,11 +43,7 @@ public:
 
 class GRTimeSinkComponent : public QObject,
 			    public ToolComponent,
-			    public DataProvider,
-			    public BufferSizeUser,
-			    public PlotSizeUser,
-			    public RollingModeUser,
-			    public SampleRateUser
+			    public DataProvider
 {
 	Q_OBJECT
 public:
@@ -64,10 +60,10 @@ public Q_SLOTS:
 	virtual size_t updateData() override;
 	virtual void setSingleShot(bool) override;
 	virtual void setData(bool raw = false) override;
-	virtual void setRollingMode(bool b) override;
-	virtual void setSampleRate(double) override;
-	virtual void setBufferSize(uint32_t size) override;
-	virtual void setPlotSize(uint32_t size) override;
+	virtual void setRollingMode(bool b);
+	virtual void setSampleRate(double);
+	virtual void setBufferSize(uint32_t size);
+	virtual void setPlotSize(uint32_t size);
 	virtual void onStart() override;
 	virtual void onStop() override;
 	virtual void onInit() override;
