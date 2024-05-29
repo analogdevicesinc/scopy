@@ -67,9 +67,9 @@ void ADCInstrumentController::init()
 {
 	ToolTemplate *toolLayout = m_tool->getToolTemplate();
 
-	m_plotComponentManager = new PlotComponentManager(m_name+"_time", m_tool);
+	m_plotComponentManager = new TimePlotManager(m_name+"_time", m_tool);
 	addComponent(m_plotComponentManager);
-	m_timePlotSettingsComponent = new TimePlotSettingsComponent(m_plotComponentManager);
+	m_timePlotSettingsComponent = new TimePlotManagerSettings(m_plotComponentManager);
 	addComponent(m_timePlotSettingsComponent);
 
 
@@ -215,10 +215,10 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node) {
 		m_acqNodeComponentMap[grtbn] = (c);
 		addComponent(c);
 
-		connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::bufferSizeChanged, c, &GRTimeSinkComponent::setBufferSize);
-		connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::plotSizeChanged, c, &GRTimeSinkComponent::setPlotSize);
-		connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::sampleRateChanged, c, &GRTimeSinkComponent::setSampleRate);
-		connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::rollingModeChanged, c, &GRTimeSinkComponent::setRollingMode);
+		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::bufferSizeChanged, c, &GRTimeSinkComponent::setBufferSize);
+		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::plotSizeChanged, c, &GRTimeSinkComponent::setPlotSize);
+		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::sampleRateChanged, c, &GRTimeSinkComponent::setSampleRate);
+		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::rollingModeChanged, c, &GRTimeSinkComponent::setRollingMode);
 
 	}
 
@@ -231,7 +231,7 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node) {
 		m_acqNodeComponentMap[griiodsn] = (d);
 		addComponent(d);
 
-		connect(m_timePlotSettingsComponent, &TimePlotSettingsComponent::bufferSizeChanged, d, &GRDeviceComponent::setBufferSize);
+		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::bufferSizeChanged, d, &GRDeviceComponent::setBufferSize);
 
 	}
 
@@ -288,7 +288,7 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node) {
 	}
 }
 
-void ADCInstrumentController::setupChannelMeasurement(PlotComponentManager *c ,ChannelComponent *ch)
+void ADCInstrumentController::setupChannelMeasurement(TimePlotManager *c ,ChannelComponent *ch)
 {
 	auto chMeasureableChannel = dynamic_cast<MeasurementProvider *>(ch);
 	if(!chMeasureableChannel)

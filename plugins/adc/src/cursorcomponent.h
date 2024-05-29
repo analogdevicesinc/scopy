@@ -11,7 +11,7 @@ class CursorComponent : public QObject, public ToolComponent
 {
 	Q_OBJECT
 public:
-	CursorComponent(PlotComponent *plot, ToolTemplate *tool, QObject *parent = nullptr);
+	CursorComponent(TimePlotComponent *plot, ToolTemplate *tool, QObject *parent = nullptr);
 	~CursorComponent();
 
 	void onInit() override;
@@ -23,7 +23,7 @@ public:
 
 private:
 
-	PlotComponent *m_plot;
+	TimePlotComponent *m_plot;
 	CursorController *cursorController;
 	MenuControlButton *cursor;
 

@@ -3,8 +3,8 @@
 #include "toolcomponent.h"
 #include "gui/widgets/measurementsettings.h"
 #include "gui/widgets/menucontrolbutton.h"
-#include "timeplotcomponent.h"
 #include "scopy-adcplugin_export.h"
+#include "interfaces.h"
 
 namespace scopy {
 namespace adc {
@@ -12,10 +12,8 @@ namespace adc {
 class SCOPY_ADCPLUGIN_EXPORT MeasureComponent : public QObject, public ToolComponent
 {
 public:
-	MeasureComponent(ToolTemplate *tool, PlotComponentManager* p, QObject *parent);
+	MeasureComponent(ToolTemplate *tool, MeasurementPanelInterface* p, QObject *parent);
 	MeasurementSettings *measureSettings();
-	/*void addPlotComponent(PlotComponent *c);
-	void removePlotComponent(PlotComponent *c);*/
 
 private:
 	void setupMeasureButtonHelper(MenuControlButton*);
@@ -24,7 +22,7 @@ private:
 	QString measureMenuId = "measure";
 	QString statsMenuId = "stats";
 	MenuControlButton *measure;
-	PlotComponentManager* m_plotComponentManager;
+	MeasurementPanelInterface* m_measurementPanelInterface;
 };
 }
 }

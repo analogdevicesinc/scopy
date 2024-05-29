@@ -11,7 +11,9 @@ using namespace scopy::adc;
 // using namespace scopy::gui;
 using namespace scopy::grutil;
 
-GRDeviceComponent::GRDeviceComponent(GRIIODeviceSourceNode *node, QWidget *parent) : QWidget(parent)
+GRDeviceComponent::GRDeviceComponent(GRIIODeviceSourceNode *node, QWidget *parent)
+	: QWidget(parent)
+	, ToolComponent()
 {
 	m_node = node;
 	name = node->name();

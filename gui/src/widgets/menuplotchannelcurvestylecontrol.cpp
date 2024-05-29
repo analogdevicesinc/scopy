@@ -8,7 +8,6 @@ using namespace scopy::gui;
 MenuPlotChannelCurveStyleControl::MenuPlotChannelCurveStyleControl(QWidget *parent)
 	: QWidget(parent)
 {
-
 	createCurveMenu(this);
 }
 
