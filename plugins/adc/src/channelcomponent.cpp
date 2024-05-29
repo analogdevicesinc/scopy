@@ -5,6 +5,7 @@
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 #include <QLoggingCategory>
+#include <timeplotcomponentchannel.h>
 
 Q_LOGGING_CATEGORY(CAT_TIME_CHANNELCOMPONENT, "TimeChannelComponent");
 
@@ -12,18 +13,18 @@ Q_LOGGING_CATEGORY(CAT_TIME_CHANNELCOMPONENT, "TimeChannelComponent");
 using namespace scopy;
 using namespace gui;
 using namespace scopy::adc;
-ChannelComponent::ChannelComponent(QString ch, PlotComponent *m_plot, QPen pen, QWidget *parent)
+ChannelComponent::ChannelComponent(QString ch, TimePlotComponent *m_plot, QPen pen, QWidget *parent)
 	: QWidget(parent)
+	, ToolComponent()
 	, m_channelName(ch)
 	, m_pen(pen)
-	, m_enabled(true)
 	, m_chData(new ChannelData(this))
-	, m_plotChannelCmpt(new PlotChannelComponent(this,m_plot,this))
+	, m_plotChannelCmpt(new TimePlotComponentChannel(this,m_plot,this))
 {
 
-	connect(m_chData, &ChannelData::newData,m_plotChannelCmpt,&PlotChannelComponent::onNewData);
-
+	connect(m_chData, &ChannelData::newData,m_plotChannelCmpt,&TimePlotComponentChannel::onNewData);
 	m_name = m_channelName;
+	m_enabled = true;
 }
 
 ChannelComponent::~ChannelComponent() {}
@@ -43,19 +44,17 @@ void ChannelComponent::onDeinit() {}
 
 QPen ChannelComponent::pen() const { return m_pen; }
 
-bool ChannelComponent::enabled() const { return m_enabled; }
-
 ChannelData *ChannelComponent::chData() const
 {
 	return m_chData;
 }
 
-PlotChannelComponent *ChannelComponent::plotChannelCmpt() const
+TimePlotComponentChannel *ChannelComponent::plotChannelCmpt() const
 {
 	return m_plotChannelCmpt;
 }
 
-void ChannelComponent::setPlotChannelCmpt(PlotChannelComponent *newPlotChannelCmpt)
+void ChannelComponent::setPlotChannelCmpt(TimePlotComponentChannel *newPlotChannelCmpt)
 {
 	m_plotChannelCmpt = newPlotChannelCmpt;
 }

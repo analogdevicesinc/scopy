@@ -18,6 +18,10 @@ public:
 	PlotAutoscaler(QObject *parent = nullptr);
 	~PlotAutoscaler();
 
+	bool xAxisMode() const;
+	double tolerance() const;
+	int timeout() const;
+
 Q_SIGNALS:
 	void newMin(double);
 	void newMax(double);
@@ -25,19 +29,23 @@ Q_SIGNALS:
 public Q_SLOTS:
 	void start();
 	void stop();
-	void autoscale();
-	bool xAxisMode() const;
+	void autoscale();	
 	void setXAxisMode(bool newXAxis);
-	double tolerance() const;
 	void setTolerance(double newTolerance);
 	void addChannels(PlotChannel *);
 	void removeChannels(PlotChannel *);
+	void onNewData(const float *xData, const float *yData, size_t size, bool copy);
+	void setTimeout(int);
 
 private:
 	QTimer *m_autoScaleTimer;
 	QList<PlotChannel *> m_channels;
 	bool m_xAxisMode;
+
 	double m_tolerance;
+	double m_max;
+	double m_min;
+	int m_timeout;
 };
 } // namespace scopy::gui
 #endif // PLOTAUTOSCALER_H

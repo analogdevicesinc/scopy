@@ -1,14 +1,16 @@
-#include "timeplotsettingscomponent.h"
+#include "timeplotmanagersettings.h"
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menuheader.h>
 #include <gui/stylehelper.h>
+#include <timeplotcomponentsettings.h>
 
 namespace scopy {
 namespace adc {
 
-TimePlotSettingsComponent::TimePlotSettingsComponent(PlotComponentManager *mgr, QWidget *parent)
+TimePlotManagerSettings::TimePlotManagerSettings(TimePlotManager *mgr, QWidget *parent)
 	: QWidget(parent)
+	, ToolComponent()
 	, m_syncMode(false)
 	, m_sampleRateAvailable(false)
 {
@@ -21,9 +23,9 @@ TimePlotSettingsComponent::TimePlotSettingsComponent(PlotComponentManager *mgr, 
 	setLayout(lay);
 }
 
-TimePlotSettingsComponent::~TimePlotSettingsComponent() {}
+TimePlotManagerSettings::~TimePlotManagerSettings() {}
 
-QWidget *TimePlotSettingsComponent::createMenu(QWidget *parent)
+QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 {
 	QScrollArea *scroll = new QScrollArea(parent);
 	scroll->setWidgetResizable(true);
@@ -48,7 +50,7 @@ QWidget *TimePlotSettingsComponent::createMenu(QWidget *parent)
 
 	connect(m_addPlotBtn, &QPushButton::clicked, this, [=](){
 		uint32_t idx = m_plotManager->addPlot("Plot ");
-		PlotComponent *plt = m_plotManager->plot(idx);
+		TimePlotComponent *plt = m_plotManager->plot(idx);
 		addPlot(plt);
 	});
 
@@ -62,7 +64,7 @@ QWidget *TimePlotSettingsComponent::createMenu(QWidget *parent)
 	return scroll;
 }
 
-QWidget *TimePlotSettingsComponent::createXAxisMenu(QWidget *parent)
+QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 {
 	MenuSectionWidget *xaxiscontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *xaxis = new MenuCollapseSection("X-AXIS", MenuCollapseSection::MHCW_NONE, xaxiscontainer);
@@ -75,10 +77,10 @@ QWidget *TimePlotSettingsComponent::createXAxisMenu(QWidget *parent)
 
 	m_bufferSizeSpin = new ScaleSpinButton(
 		{
-			{"samples", 1e0},
-			{"ksamples", 1e3},
-			{"Msamples", 1e6},
-		},
+		 {"samples", 1e0},
+		 {"ksamples", 1e3},
+		 {"Msamples", 1e6},
+		 },
 		"Buffer Size", 16, DBL_MAX, false, false, bufferPlotSize);
 
 	connect(m_bufferSizeSpin, &ScaleSpinButton::valueChanged, this, [=](double val) {
@@ -91,11 +93,11 @@ QWidget *TimePlotSettingsComponent::createXAxisMenu(QWidget *parent)
 
 	m_plotSizeSpin = new ScaleSpinButton(
 		{
-			{"samples", 1e0},
-			{"ksamples", 1e3},
-			{"Msamples", 1e6},
-			{"Gsamples", 1e9},
-		},
+		 {"samples", 1e0},
+		 {"ksamples", 1e3},
+		 {"Msamples", 1e6},
+		 {"Gsamples", 1e9},
+		 },
 		"Plot Size", 16, DBL_MAX, false, false, bufferPlotSize);
 
 	connect(m_plotSizeSpin, &ScaleSpinButton::valueChanged, this, [=](double val) { setPlotSize((uint32_t)val); });
@@ -119,7 +121,7 @@ QWidget *TimePlotSettingsComponent::createXAxisMenu(QWidget *parent)
 	});
 	m_rollingModeSw = new MenuOnOffSwitch(tr("ROLLING MODE"), xaxis, false);
 	connect(m_rollingModeSw->onOffswitch(), &QAbstractButton::toggled, this,
-		&TimePlotSettingsComponent::setRollingMode);
+		&TimePlotManagerSettings::setRollingMode);
 
 	QWidget *xMinMax = new QWidget(xaxis);
 	QHBoxLayout *xMinMaxLayout = new QHBoxLayout(xMinMax);
@@ -129,26 +131,26 @@ QWidget *TimePlotSettingsComponent::createXAxisMenu(QWidget *parent)
 
 	m_xmin = new PositionSpinButton(
 		{
-			{"ns", 1E-9},
-			{"μs", 1E-6},
-			{"ms", 1E-3},
-			{"s", 1e0},
-			{"ks", 1e3},
-			{"Ms", 1e6},
-			{"Gs", 1e9},
-		},
+		 {"ns", 1E-9},
+		 {"μs", 1E-6},
+		 {"ms", 1E-3},
+		 {"s", 1e0},
+		 {"ks", 1e3},
+		 {"Ms", 1e6},
+		 {"Gs", 1e9},
+		 },
 		"XMin", -DBL_MAX, DBL_MAX, false, false, xMinMax);
 
 	m_xmax = new PositionSpinButton(
 		{
-			{"ns", 1E-9},
-			{"μs", 1E-6},
-			{"ms", 1E-3},
-			{"s", 1e0},
-			{"ks", 1e3},
-			{"Ms", 1e6},
-			{"Gs", 1e9},
-		},
+		 {"ns", 1E-9},
+		 {"μs", 1E-6},
+		 {"ms", 1E-3},
+		 {"s", 1e0},
+		 {"ks", 1e3},
+		 {"Ms", 1e6},
+		 {"Gs", 1e9},
+		 },
 		"XMax", -DBL_MAX, DBL_MAX, false, false, xMinMax);
 
 	connect(m_xmin, &PositionSpinButton::valueChanged, this, [=](double min) {
@@ -190,11 +192,11 @@ QWidget *TimePlotSettingsComponent::createXAxisMenu(QWidget *parent)
 
 	m_sampleRateSpin = new PositionSpinButton(
 		{
-			{"Hz", 1e0},
-			{"kHz", 1e3},
-			{"MHz", 1e6},
-			{"GHz", 1e9},
-		},
+		 {"Hz", 1e0},
+		 {"kHz", 1e3},
+		 {"MHz", 1e6},
+		 {"GHz", 1e9},
+		 },
 		"SampleRate", 1, DBL_MAX, false, false, xaxis);
 
 	m_sampleRateSpin->setValue(10);
@@ -204,7 +206,7 @@ QWidget *TimePlotSettingsComponent::createXAxisMenu(QWidget *parent)
 			setSampleRate(val);
 		});
 
-	connect(this, &TimePlotSettingsComponent::sampleRateChanged, m_sampleRateSpin, &PositionSpinButton::setValue);
+	connect(this, &TimePlotManagerSettings::sampleRateChanged, m_sampleRateSpin, &PositionSpinButton::setValue);
 
 
 	xaxiscontainer->contentLayout()->setSpacing(10);
@@ -221,7 +223,7 @@ QWidget *TimePlotSettingsComponent::createXAxisMenu(QWidget *parent)
 	return xaxiscontainer;
 }
 
-void TimePlotSettingsComponent::onInit() {
+void TimePlotManagerSettings::onInit() {
 	m_bufferSizeSpin->setValue(32);
 	m_plotSizeSpin->setValue(32);
 	m_sampleRateSpin->setValue(1);
@@ -230,13 +232,13 @@ void TimePlotSettingsComponent::onInit() {
 	m_syncBufferPlot->onOffswitch()->setChecked(true);
 	m_xModeCb->combo()->setCurrentIndex(0);
 
-	//	m_rollingModeSw->onOffswitch()->setChecked(false);
+	       //	m_rollingModeSw->onOffswitch()->setChecked(false);
 }
 
 
-double TimePlotSettingsComponent::sampleRate() const { return m_sampleRate; }
+double TimePlotManagerSettings::sampleRate() const { return m_sampleRate; }
 
-void TimePlotSettingsComponent::setSampleRate(double newSampleRate)
+void TimePlotManagerSettings::setSampleRate(double newSampleRate)
 {
 	if(qFuzzyCompare(m_sampleRate, newSampleRate))
 		return;
@@ -245,9 +247,9 @@ void TimePlotSettingsComponent::setSampleRate(double newSampleRate)
 	updateXAxis();
 }
 
-bool TimePlotSettingsComponent::rollingMode() const { return m_rollingMode; }
+bool TimePlotManagerSettings::rollingMode() const { return m_rollingMode; }
 
-void TimePlotSettingsComponent::setRollingMode(bool newRollingMode)
+void TimePlotManagerSettings::setRollingMode(bool newRollingMode)
 {
 	if(m_rollingMode == newRollingMode)
 		return;
@@ -256,9 +258,9 @@ void TimePlotSettingsComponent::setRollingMode(bool newRollingMode)
 	updateXAxis();
 }
 
-uint32_t TimePlotSettingsComponent::plotSize() const { return m_plotSize; }
+uint32_t TimePlotManagerSettings::plotSize() const { return m_plotSize; }
 
-void TimePlotSettingsComponent::setPlotSize(uint32_t newPlotSize)
+void TimePlotManagerSettings::setPlotSize(uint32_t newPlotSize)
 {
 	if(m_plotSize == newPlotSize)
 		return;
@@ -267,9 +269,9 @@ void TimePlotSettingsComponent::setPlotSize(uint32_t newPlotSize)
 	updateXAxis();
 }
 
-uint32_t TimePlotSettingsComponent::bufferSize() const { return m_bufferSize; }
+uint32_t TimePlotManagerSettings::bufferSize() const { return m_bufferSize; }
 
-void TimePlotSettingsComponent::setBufferSize(uint32_t newBufferSize)
+void TimePlotManagerSettings::setBufferSize(uint32_t newBufferSize)
 {
 	if(m_bufferSize == newBufferSize)
 		return;
@@ -278,7 +280,7 @@ void TimePlotSettingsComponent::setBufferSize(uint32_t newBufferSize)
 	updateXAxis();
 }
 
-void TimePlotSettingsComponent::updateXAxis() {
+void TimePlotManagerSettings::updateXAxis() {
 
 	double min = 0;
 	double max = m_plotSize;
@@ -295,7 +297,7 @@ void TimePlotSettingsComponent::updateXAxis() {
 	}
 }
 
-void TimePlotSettingsComponent::onStart()
+void TimePlotManagerSettings::onStart()
 {
 	QComboBox *cb = m_xModeCb->combo();
 
@@ -314,9 +316,9 @@ void TimePlotSettingsComponent::onStart()
 	updateXAxis();
 }
 
-bool TimePlotSettingsComponent::syncBufferPlotSize() const { return m_syncBufferPlotSize; }
+bool TimePlotManagerSettings::syncBufferPlotSize() const { return m_syncBufferPlotSize; }
 
-void TimePlotSettingsComponent::setSyncBufferPlotSize(bool newSyncBufferPlotSize)
+void TimePlotManagerSettings::setSyncBufferPlotSize(bool newSyncBufferPlotSize)
 {
 	if(m_syncBufferPlotSize == newSyncBufferPlotSize)
 		return;
@@ -324,36 +326,36 @@ void TimePlotSettingsComponent::setSyncBufferPlotSize(bool newSyncBufferPlotSize
 	Q_EMIT syncBufferPlotSizeChanged(newSyncBufferPlotSize);
 }
 
-void TimePlotSettingsComponent::addPlot(PlotComponent *plt) {
-	QWidget *plotMenu = plt->createPlotMenu();
+void TimePlotManagerSettings::addPlot(TimePlotComponent *plt) {
+	QWidget *plotMenu = plt->plotMenu();
 	m_plotContainerLayout->addWidget(plotMenu);
 }
 
-void TimePlotSettingsComponent::removePlot(PlotComponent *p) {
-	m_plotContainerLayout->removeWidget(p->plotMenu());
-	p->deletePlotMenu();
+void TimePlotManagerSettings::removePlot(TimePlotComponent *p) {
+	/*m_plotContainerLayout->removeWidget(p->plotMenu());
+	p->deletePlotMenu();*/
 }
 
-void TimePlotSettingsComponent::addChannel(ChannelComponent *c) {
+void TimePlotManagerSettings::addChannel(ChannelComponent *c) {
 	m_channels.append(c);
 	// autoscaler->addChannels(c->plotCh());/
 }
 
-void TimePlotSettingsComponent::removeChannel(ChannelComponent *c) {
+void TimePlotManagerSettings::removeChannel(ChannelComponent *c) {
 	m_channels.removeAll(c);
 	// autoscaler->removeChannels(c->plotCh());
 }
 
-void TimePlotSettingsComponent::addSampleRateProvider(SampleRateProvider *s) {
+void TimePlotManagerSettings::addSampleRateProvider(SampleRateProvider *s) {
 	enableXModeTime();
 	m_sampleRateProviders.append(s);
 }
 
-void TimePlotSettingsComponent::removeSampleRateProvider(SampleRateProvider *s) {
+void TimePlotManagerSettings::removeSampleRateProvider(SampleRateProvider *s) {
 	m_sampleRateProviders.removeAll(s);
 }
 
-void TimePlotSettingsComponent::enableXModeTime() {
+void TimePlotManagerSettings::enableXModeTime() {
 	if(m_sampleRateAvailable) // already set
 		return;
 	m_sampleRateAvailable = true;
@@ -362,7 +364,7 @@ void TimePlotSettingsComponent::enableXModeTime() {
 		cb->insertItem(1,"Time", XMODE_TIME);
 	}
 }
-double TimePlotSettingsComponent::readSampleRate()
+double TimePlotManagerSettings::readSampleRate()
 {
 	double sr = 1;
 	for(SampleRateProvider *ch : qAsConst(m_sampleRateProviders)) {

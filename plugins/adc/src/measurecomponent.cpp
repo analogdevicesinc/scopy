@@ -5,9 +5,11 @@
 using namespace scopy;
 using namespace scopy::adc;
 
-MeasureComponent::MeasureComponent(ToolTemplate *tool, PlotComponentManager *p, QObject *parent) {
+MeasureComponent::MeasureComponent(ToolTemplate *tool, MeasurementPanelInterface *p, QObject *parent)
+	: QObject(parent)
+	, ToolComponent() {
 
-	m_plotComponentManager = p;
+	m_measurementPanelInterface = p;
 	measure = new MenuControlButton();
 	setupMeasureButtonHelper(measure);
 
@@ -28,8 +30,8 @@ MeasureComponent::MeasureComponent(ToolTemplate *tool, PlotComponentManager *p, 
 		}
 		// tool->openTopContainerHelper(b);
 		// tool->openBottomContainerHelper(b);
-		m_plotComponentManager->enableMeasurementPanel(m_measureSettings->measurementEnabled() && b);
-		m_plotComponentManager->enableStatsPanel(m_measureSettings->statsEnabled() && b);
+		m_measurementPanelInterface->enableMeasurementPanel(m_measureSettings->measurementEnabled() && b);
+		m_measurementPanelInterface->enableStatsPanel(m_measureSettings->statsEnabled() && b);
 
 	});
 	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
@@ -37,8 +39,8 @@ MeasureComponent::MeasureComponent(ToolTemplate *tool, PlotComponentManager *p, 
 	MeasurementsPanel *m_measurePanel = p->measurePanel();
 	StatsPanel *m_statsPanel = p->statsPanel();
 
-	connect(m_measureSettings, &MeasurementSettings::enableMeasurementPanel, p, &PlotComponentManager::enableMeasurementPanel);
-	connect(m_measureSettings, &MeasurementSettings::enableStatsPanel, p, &PlotComponentManager::enableStatsPanel);
+	connect(m_measureSettings, SIGNAL(enableMeasurementPanel), dynamic_cast<QObject*>(p), SLOT(enableMeasurementPanel));
+	connect(m_measureSettings, SIGNAL(enableStatsPanel), dynamic_cast<QObject*>(p), SLOT(enableStatsPanel));
 	connect(m_measureSettings, &MeasurementSettings::sortMeasurements, m_measurePanel, &MeasurementsPanel::sort);
 	connect(m_measureSettings, &MeasurementSettings::sortStats, m_statsPanel, &StatsPanel::sort);
 

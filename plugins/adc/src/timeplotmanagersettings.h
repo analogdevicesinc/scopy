@@ -1,5 +1,5 @@
-#ifndef TIMEPLOTSETTINGSCOMPONENT_H
-#define TIMEPLOTSETTINGSCOMPONENT_H
+#ifndef TIMEPLOTMANAGERSETTINGS_H
+#define TIMEPLOTMANAGERSETTINGS_H
 
 #include "scopy-adcplugin_export.h"
 #include <timeplotcomponent.h>
@@ -15,13 +15,15 @@
 #include "channelcomponent.h"
 #include "interfaces.h"
 
+#include "timeplotmanager.h"
+
 namespace scopy {
 namespace adc {
 
 using namespace scopy::gui;
 
-class SCOPY_ADCPLUGIN_EXPORT TimePlotSettingsComponent : public QWidget,
-							 public ToolComponent
+class SCOPY_ADCPLUGIN_EXPORT TimePlotManagerSettings : public QWidget,
+						       public ToolComponent
 {
 	Q_OBJECT
 public:
@@ -32,8 +34,8 @@ public:
 		XMODE_OVERRIDE
 	} XMode;
 
-	TimePlotSettingsComponent(PlotComponentManager *plot, QWidget *parent = nullptr);
-	~TimePlotSettingsComponent();
+	TimePlotManagerSettings(TimePlotManager *plot, QWidget *parent = nullptr);
+	~TimePlotManagerSettings();
 
 	uint32_t plotSize() const;
 	void setPlotSize(uint32_t newPlotSize);
@@ -74,8 +76,8 @@ public Q_SLOTS:
 	void addSampleRateProvider(SampleRateProvider *s);
 	void removeSampleRateProvider(SampleRateProvider *s);
 
-	void addPlot(PlotComponent *plt);
-	void removePlot(PlotComponent *p);
+	void addPlot(TimePlotComponent *plt);
+	void removePlot(TimePlotComponent *p);
 Q_SIGNALS:
 	void plotSizeChanged(uint32_t);
 	void bufferSizeChanged(uint32_t);
@@ -86,7 +88,7 @@ Q_SIGNALS:
 	void syncBufferPlotSizeChanged(bool);
 
 private:
-	PlotComponentManager *m_plotManager;
+	TimePlotManager *m_plotManager;
 
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createXAxisMenu(QWidget *parent = nullptr);
@@ -134,4 +136,4 @@ private:
 } // namespace adc
 } // namespace scopy
 
-#endif // TIMEPLOTSETTINGSCOMPONENT_H
+#endif // TIMEPLOTMANAGERSETTINGS_H

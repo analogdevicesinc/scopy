@@ -69,9 +69,6 @@ public Q_SLOTS:
 	virtual void onInit() override;
 	virtual void onDeinit() override;
 
-	virtual void enable() override;
-	virtual void disable() override;
-
 	void addChannel(ChannelComponent* ch, GRIIOFloatChannelNode *node);
 	void removeChannel(GRIIOFloatChannelNode *c);
 Q_SIGNALS:
