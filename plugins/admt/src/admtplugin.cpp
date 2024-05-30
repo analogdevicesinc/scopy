@@ -1,18 +1,32 @@
 #include "admtplugin.h"
+#include "harmoniccalibration.h"
 
 #include <QLoggingCategory>
 #include <QLabel>
 
-#include "harmoniccalibration.h"
+#include <iioutil/connectionprovider.h>
 
 Q_LOGGING_CATEGORY(CAT_ADMTPLUGIN, "ADMTPlugin")
 using namespace scopy::admt;
 
 bool ADMTPlugin::compatible(QString m_param, QString category)
 {
-	// This function defines the characteristics according to which the
-	// plugin is compatible with a specific device
-	bool ret = true;
+	m_name = "ADMT4000";
+	bool ret = false;
+	Connection *conn = ConnectionProvider::open(m_param);
+
+	if(!conn) {
+		qWarning(CAT_ADMTPLUGIN) << "No context available for admt";
+		return false;
+	}
+
+	iio_device *admtDevice = iio_context_find_device(conn->context(), "admt4000");
+	if(admtDevice) {
+		ret = true;
+	}
+
+	ConnectionProvider::close(m_param);
+
 	return ret;
 }
 
@@ -56,12 +70,12 @@ bool ADMTPlugin::loadIcon()
 void ADMTPlugin::loadToolList()
 {
 	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("harmoniccalibration", "Harmonic Calibration", ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+		SCOPY_NEW_TOOLMENUENTRY("harmoniccalibration", "Harmonic Calibration", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
 }
 
 void ADMTPlugin::unload() { /*delete m_infoPage;*/ }
 
-QString ADMTPlugin::description() { return "Write the plugin description here"; }
+QString ADMTPlugin::description() { return "Plugin for ADMT Harmonic Calibration"; }
 
 bool ADMTPlugin::onConnect()
 {
