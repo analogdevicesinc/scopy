@@ -26,12 +26,13 @@ public:
 	double pixelToScale(int pos);
 	int scaleToPixel(double pos);
 
+	void init();
+	void deinit();
+
 Q_SIGNALS:
 	void scalePosChanged(double);
 	void updatePos();
 
-protected:
-	void init();
 
 private:
 	double m_pos;

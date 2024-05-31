@@ -94,7 +94,10 @@ void TimePlotComponent::showXSourceOnXy(bool b)
 	m_XYXChannel->plotChannelCmpt()->m_xyPlotCh->setEnabled(b);
 }
 
-void TimePlotComponent::setName(QString s) { m_name = s; }
+void TimePlotComponent::setName(QString s) {
+	m_name = s;
+	Q_EMIT nameChanged(s);
+}
 
 ChannelComponent *TimePlotComponent::XYXChannel() { return m_XYXChannel; }
 

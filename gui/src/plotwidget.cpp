@@ -101,6 +101,7 @@ void PlotWidget::setupOpenGLCanvas()
 
 void PlotWidget::addPlotChannel(PlotChannel *ch)
 {
+	ch->init();
 	m_plotChannels.append(ch);
 	if(m_selectedChannel == nullptr) {
 		selectChannel(ch);
@@ -122,7 +123,6 @@ void PlotWidget::removePlotChannel(PlotChannel *ch)
 
 	// QwtAxisId cannot be removed from QwtPlot
 	ch->yAxis()->setVisible(false);
-
 	if(m_selectedChannel == ch) {
 		if(m_plotChannels.size() > 0) {
 			m_selectedChannel = m_plotChannels[0];
@@ -131,16 +131,19 @@ void PlotWidget::removePlotChannel(PlotChannel *ch)
 		}
 	}
 
-	// QwtAxis cannot be removed :(
-
+	ch->deinit();
 	Q_EMIT removedChannel(ch);
 }
 
 QList<PlotChannel *> PlotWidget::getChannels() { return m_plotChannels; }
 
-void PlotWidget::addPlotAxisHandle(PlotAxisHandle *ax) { m_plotAxisHandles[ax->axis()->position()].append(ax); }
+void PlotWidget::addPlotAxisHandle(PlotAxisHandle *ax) {
+	m_plotAxisHandles[ax->axis()->position()].append(ax);
+}
 
-void PlotWidget::removePlotAxisHandle(PlotAxisHandle *ax) { m_plotAxisHandles[ax->axis()->position()].removeAll(ax); }
+void PlotWidget::removePlotAxisHandle(PlotAxisHandle *ax) {
+	m_plotAxisHandles[ax->axis()->position()].removeAll(ax);
+}
 
 void PlotWidget::addPlotAxis(PlotAxis *ax) { m_plotAxis[ax->position()].append(ax); }
 
