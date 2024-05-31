@@ -1,7 +1,7 @@
 #ifndef GRTIMECHANNELCOMPONENT_H
 #define GRTIMECHANNELCOMPONENT_H
 
-#include "scopy-adcplugin_export.h"
+#include "scopy-adc_export.h"
 #include "channelcomponent.h"
 #include <gui/plotautoscaler.h>
 #include <gui/widgets/menuonoffswitch.h>
@@ -16,7 +16,7 @@ namespace adc {
 using namespace scopy::gui;
 
 class GRDeviceAddon;
-class SCOPY_ADCPLUGIN_EXPORT GRTimeChannelComponent : public ChannelComponent,
+class SCOPY_ADC_EXPORT GRTimeChannelComponent : public ChannelComponent,
 						      public MeasurementProvider
 {
 	Q_OBJECT

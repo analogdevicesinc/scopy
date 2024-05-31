@@ -9,6 +9,7 @@
 namespace scopy {
 namespace adc {
 
+
 class GRTimeSinkAcquisitionSignalPath : QObject {
 public:
 	GRTimeSinkAcquisitionSignalPath(QString m_name, ChannelComponent *ch, GRIIOFloatChannelNode *node, QObject *parent)  : QObject(parent) {

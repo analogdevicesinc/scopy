@@ -1,7 +1,7 @@
 #ifndef TIMEPLOTMANAGERSETTINGS_H
 #define TIMEPLOTMANAGERSETTINGS_H
 
-#include "scopy-adcplugin_export.h"
+#include "scopy-adc_export.h"
 #include <timeplotcomponent.h>
 #include <toolcomponent.h>
 
@@ -22,7 +22,7 @@ namespace adc {
 
 using namespace scopy::gui;
 
-class SCOPY_ADCPLUGIN_EXPORT TimePlotManagerSettings : public QWidget,
+class SCOPY_ADC_EXPORT TimePlotManagerSettings : public QWidget,
 						       public ToolComponent
 {
 	Q_OBJECT

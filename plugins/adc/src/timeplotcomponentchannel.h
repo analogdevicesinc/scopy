@@ -1,7 +1,7 @@
 #ifndef TIMEPLOTCOMPONENTCHANNEL_H
 #define TIMEPLOTCOMPONENTCHANNEL_H
 
-#include "scopy-adcplugin_export.h"
+#include "scopy-adc_export.h"
 #include <QObject>
 #include <toolcomponent.h>
 #include <channelcomponent.h>
@@ -9,7 +9,7 @@
 
 namespace scopy {
 namespace adc {
-class SCOPY_ADCPLUGIN_EXPORT TimePlotComponentChannel : public QObject, public ToolComponent {
+class SCOPY_ADC_EXPORT TimePlotComponentChannel : public QObject, public ToolComponent {
 	Q_OBJECT
 public:
 

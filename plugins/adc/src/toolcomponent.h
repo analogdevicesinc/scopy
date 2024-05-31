@@ -1,7 +1,7 @@
 #ifndef TOOLCOMPONENT_H
 #define TOOLCOMPONENT_H
 
-#include "scopy-adcplugin_export.h"
+#include "scopy-adc_export.h"
 #include <QPen>
 #include <gui/tooltemplate.h>
 #include <gui/stylehelper.h>
@@ -14,7 +14,7 @@ namespace adc {
 class PlotProxy;
 class ADCInstrument;
 
-class SCOPY_ADCPLUGIN_EXPORT ChannelData : public QObject{
+class SCOPY_ADC_EXPORT ChannelData : public QObject{
 	Q_OBJECT
 public:
 	ChannelData(QObject *parent) : QObject(parent) {
@@ -65,7 +65,7 @@ private:
 	bool m_ownsData	= false;
 };
 
-class SCOPY_ADCPLUGIN_EXPORT DataProvider
+class SCOPY_ADC_EXPORT DataProvider
 {
 public:
 	virtual void setSingleShot(bool) = 0;
@@ -74,7 +74,7 @@ public:
 	virtual void setData(bool copy = false) = 0;
 };
 
-class SCOPY_ADCPLUGIN_EXPORT ToolComponent
+class SCOPY_ADC_EXPORT ToolComponent
 {
 public:
 	ToolComponent() : m_enabled(true), m_priority(0) {}
@@ -100,7 +100,7 @@ protected:
 	int m_priority = 0;
 };
 
-class SCOPY_ADCPLUGIN_EXPORT MetaComponent : public ToolComponent
+class SCOPY_ADC_EXPORT MetaComponent : public ToolComponent
 {
 public:
 	MetaComponent() : ToolComponent() {}
@@ -155,14 +155,14 @@ protected:
 	QList<ToolComponent *> m_components;
 };
 
-class SCOPY_ADCPLUGIN_EXPORT AcqNodeChannelAware
+class SCOPY_ADC_EXPORT AcqNodeChannelAware
 {
 public:
 	virtual void addChannel(AcqTreeNode *c) = 0;
 	virtual void removeChannel(AcqTreeNode *c) = 0;
 };
 
-class SCOPY_ADCPLUGIN_EXPORT PlotProxy : public MetaComponent
+class SCOPY_ADC_EXPORT PlotProxy : public MetaComponent
 {
 public:
 	virtual void init() = 0;
@@ -172,7 +172,7 @@ public:
 	virtual void setInstrument(QWidget *) = 0;
 };
 
-class SCOPY_ADCPLUGIN_EXPORT ChannelIdProvider : public QObject
+class SCOPY_ADC_EXPORT ChannelIdProvider : public QObject
 {
 	Q_OBJECT
 public:

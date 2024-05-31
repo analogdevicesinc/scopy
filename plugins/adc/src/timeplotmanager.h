@@ -1,6 +1,6 @@
 #ifndef TIMEPLOTMANAGER_H
 #define TIMEPLOTMANAGER_H
-#include "scopy-adcplugin_export.h"
+#include "scopy-adc_export.h"
 #include <QWidget>
 #include <interfaces.h>
 #include <channelcomponent.h>
@@ -8,7 +8,7 @@
 
 namespace scopy {
 namespace adc {
-class SCOPY_ADCPLUGIN_EXPORT TimePlotManager : public QWidget, public MeasurementPanelInterface, public MetaComponent {
+class SCOPY_ADC_EXPORT TimePlotManager : public QWidget, public MeasurementPanelInterface, public MetaComponent {
 	Q_OBJECT
 public:
 	TimePlotManager(QString name = "TimePlotManager", QWidget *parent = nullptr);
