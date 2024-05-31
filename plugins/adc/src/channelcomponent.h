@@ -1,7 +1,7 @@
 #ifndef CHANNELCOMPONENT_H
 #define CHANNELCOMPONENT_H
 
-#include <scopy-adcplugin_export.h>
+#include <scopy-adc_export.h>
 #include <QWidget>
 #include "toolcomponent.h"
 #include "timeplotcomponent.h"
@@ -12,7 +12,7 @@ namespace adc {
 
 class TimePlotComponentChannel;
 
-class SCOPY_ADCPLUGIN_EXPORT ChannelComponent : public QWidget,  public ToolComponent
+class SCOPY_ADC_EXPORT ChannelComponent : public QWidget,  public ToolComponent
 {
 	Q_OBJECT
 public:

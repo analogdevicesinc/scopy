@@ -1,7 +1,7 @@
 #ifndef GRDEVICECOMPONENT_H
 #define GRDEVICECOMPONENT_H
 
-#include "scopy-adcplugin_export.h"
+#include "scopy-adc_export.h"
 #include "channelcomponent.h"
 #include "toolcomponent.h"
 #include "interfaces.h"
@@ -18,7 +18,7 @@ using namespace scopy::grutil;
 // class GRTimeChannelAddon;
 
 
-class SCOPY_ADCPLUGIN_EXPORT GRDeviceComponent : public QWidget,
+class SCOPY_ADC_EXPORT GRDeviceComponent : public QWidget,
 						 public ToolComponent,
 						 public SampleRateProvider
 {

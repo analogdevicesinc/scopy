@@ -3,13 +3,13 @@
 #include <QWidget>
 #include <timeplotcomponent.h>
 #include <toolcomponent.h>
-#include "scopy-adcplugin_export.h"
+#include "scopy-adc_export.h"
 
 
 namespace scopy {
 namespace adc {
 
-class SCOPY_ADCPLUGIN_EXPORT TimePlotComponentSettings : public QWidget, public ToolComponent
+class SCOPY_ADC_EXPORT TimePlotComponentSettings : public QWidget, public ToolComponent
 {
 	Q_OBJECT
 public:

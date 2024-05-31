@@ -2,7 +2,7 @@
 #define ADCINSTRUMENTCONTROLLER_H
 
 #include "toolcomponent.h"
-#include "scopy-adcplugin_export.h"
+#include "scopy-adc_export.h"
 #include "timeplotcomponent.h"
 #include "timeplotmanagersettings.h"
 #include "cursorcomponent.h"
@@ -12,7 +12,7 @@ namespace scopy {
 namespace adc {
 class ChannelIdProvider;
 
-class SCOPY_ADCPLUGIN_EXPORT ADCInstrumentController : public QObject, public PlotProxy, public AcqNodeChannelAware
+class SCOPY_ADC_EXPORT ADCInstrumentController : public QObject, public PlotProxy, public AcqNodeChannelAware
 {
 	Q_OBJECT
 public:

@@ -21,7 +21,7 @@
 #ifndef MEASURE_H
 #define MEASURE_H
 
-#include "scopy-adcplugin_export.h"
+#include "scopy-adc_export.h"
 
 #include <QList>
 #include <QObject>
@@ -32,7 +32,7 @@ namespace scopy::adc {
 class CrossingDetection;
 class Statistic;
 
-class SCOPY_ADCPLUGIN_EXPORT Statistic
+class SCOPY_ADC_EXPORT Statistic
 {
 public:
 	Statistic();
@@ -53,7 +53,7 @@ private:
 	double m_average;
 };
 
-class SCOPY_ADCPLUGIN_EXPORT MeasurementData
+class SCOPY_ADC_EXPORT MeasurementData
 {
 public:
 	enum unitTypes
@@ -105,7 +105,7 @@ private:
 	Statistic m_stat;
 };
 
-class SCOPY_ADCPLUGIN_EXPORT MeasureModel : public QObject
+class SCOPY_ADC_EXPORT MeasureModel : public QObject
 {
 	Q_OBJECT
 public:
@@ -155,7 +155,7 @@ protected:
 	QList<std::shared_ptr<MeasurementData>> m_measurements;
 };
 
-class SCOPY_ADCPLUGIN_EXPORT TimeMeasureModel : public MeasureModel
+class SCOPY_ADC_EXPORT TimeMeasureModel : public MeasureModel
 {
 	enum defaultMeasurements
 	{
@@ -197,7 +197,7 @@ private:
 	bool highLowFromHistogram(double &low, double &high, double min, double max);
 };
 
-class SCOPY_ADCPLUGIN_EXPORT SpectralMeasure : public MeasureModel
+class SCOPY_ADC_EXPORT SpectralMeasure : public MeasureModel
 {
 	enum defaultSpectralMeasurements
 	{

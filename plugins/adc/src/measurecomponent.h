@@ -3,13 +3,13 @@
 #include "toolcomponent.h"
 #include "gui/widgets/measurementsettings.h"
 #include "gui/widgets/menucontrolbutton.h"
-#include "scopy-adcplugin_export.h"
+#include "scopy-adc_export.h"
 #include "interfaces.h"
 
 namespace scopy {
 namespace adc {
 
-class SCOPY_ADCPLUGIN_EXPORT MeasureComponent : public QObject, public ToolComponent
+class SCOPY_ADC_EXPORT MeasureComponent : public QObject, public ToolComponent
 {
 public:
 	MeasureComponent(ToolTemplate *tool, MeasurementPanelInterface* p, QObject *parent);
