@@ -1,13 +1,10 @@
 #include "grtimesinkcomponent.h"
-#include "grtimechannelcomponent.h"
 #include <gr-util/grsignalpath.h>
 #include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_GRTIMESINKCOMPONENT,"GRTimeSinkComponent")
 using namespace scopy::adc;
 using namespace scopy::grutil;
-
-
 
 GRTimeSinkComponent::GRTimeSinkComponent(QString name, GRTopBlockNode *t, QObject *parent)
 	: QObject(parent)
@@ -26,7 +23,6 @@ GRTimeSinkComponent::~GRTimeSinkComponent()
 {
 
 }
-
 
 void GRTimeSinkComponent::connectSignalPaths()
 {
@@ -53,24 +49,14 @@ void GRTimeSinkComponent::connectSignalPaths()
 	time_channel_map.clear();
 
 
-	for(GRTimeSinkAcquisitionSignalPath *gr : m_channels) {
-		GRSignalPath *sigPath = gr->m_signalPath;
+	for(GRChannel *gr : m_channels) {
+		GRSignalPath *sigPath = gr->sigpath();
 		if(sigPath->enabled()) {
 			// connect end of signal path to time_sink input
 			m_top->connect(sigPath->getGrEndPoint(), 0, time_sink, index);
 			// map signal path to time_sink input
 			time_channel_map.insert(sigPath->name(), index);
-#if 0
-			if(m_currentSamplingInfo.plotSize >= 1000000) {
-				gr->plotCh()->curve()->setPaintAttribute(QwtPlotCurve::ClipPolygons);
-				gr->plotCh()->curve()->setPaintAttribute(QwtPlotCurve::ImageBuffer);
-				gr->plotCh()->curve()->setPaintAttribute(QwtPlotCurve::FilterPoints);
-				gr->plotCh()->curve()->setPaintAttribute(QwtPlotCurve::FilterPointsAggressive);
-				/*auto curveFitter = new QwtWeedingCurveFitter(100000000);
-				curveFitter->setChunkSize(100000000);
-				gr->plotCh()->curve()->setCurveFitter(curveFitter);*/
-			}
-#endif
+
 			index++;
 		}
 	}	
@@ -98,15 +84,17 @@ bool GRTimeSinkComponent::finished() {
 void GRTimeSinkComponent::setData(bool copy)
 {
 	int index = 0;
-	for(GRTimeSinkAcquisitionSignalPath *gr : m_channels) {
-		if(gr->m_signalPath->enabled()) {
-			const float *xdata = time_sink->time().data();
-			const float *ydata = time_sink->data()[index].data();
-			const size_t size = time_sink->data()[index].size();
 
-			gr->onNewData(xdata, ydata, size, copy);
-			index++;
-		}
+	for(GRChannel *gr : qAsConst(m_channels)) {
+		int index = time_channel_map.value(gr->sigpath()->name(), -1);
+		if(index == -1)
+			continue;
+
+		const float *xdata = time_sink->time().data();
+		const float *ydata = time_sink->data()[index].data();
+		const size_t size = time_sink->data()[index].size();
+
+		gr->onNewData(xdata, ydata, size, copy);
 	}
 }
 
@@ -184,14 +172,10 @@ void GRTimeSinkComponent::onDeinit()
 	onStop();
 }
 
-void GRTimeSinkComponent::addChannel(ChannelComponent* ch, GRIIOFloatChannelNode *node) {
-	m_channels.append(new GRTimeSinkAcquisitionSignalPath(m_name, ch, node, this));
+void GRTimeSinkComponent::addChannel(GRChannel *ch) {
+	m_channels.append(ch);
 }
 
-void GRTimeSinkComponent::removeChannel(GRIIOFloatChannelNode *node) {
-	for(GRTimeSinkAcquisitionSignalPath *ch : m_channels) {
-		if(ch->m_node == node) {
-			m_channels.removeAll(ch);
-		}
-	}
+void GRTimeSinkComponent::removeChannel(GRChannel *ch) {
+	m_channels.removeAll(ch);
 }

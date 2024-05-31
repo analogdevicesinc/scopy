@@ -44,7 +44,6 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 	m_xyPlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_xyPlot->xAxis()->setInterval(-2048, 2048);
 	m_xyPlot->xAxis()->setVisible(true);
-	//	m_plotWidget->topHandlesArea()->setVisible(true);
 
 	/*	connect(m_plot->navigator(), &PlotNavigator::rectChanged, this,
 		[=]() { m_info->update(m_currentSamplingInfo); });
@@ -131,10 +130,8 @@ void TimePlotComponent::setXYXChannel(ChannelComponent *c) {
 				     this,
 				     [=](const float* xData_, const float* yData_, size_t size, bool copy){
 					     xyXData = yData_;
-					     // just set xyxdata to plotchannel and let replot handle it ?
 					     for(TimePlotComponentChannel *ch : qAsConst(m_channels)) {
 						     ch->setXyXData(xyXData);
-						     //ch->refreshData(copy);
 					     }
 				     });
 		m_XYXChannel->plotChannelCmpt()->m_xyPlotCh->setEnabled(m_showXSourceOnXy);
@@ -170,9 +167,6 @@ void TimePlotComponent::removeChannel(ChannelComponent *c)
 		}
 	}
 	m_plotMenu->removeChannel(c);
-
-
-
 }
 
 bool TimePlotComponent::singleYMode() const

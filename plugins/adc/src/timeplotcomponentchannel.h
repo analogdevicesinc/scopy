@@ -9,7 +9,7 @@
 
 namespace scopy {
 namespace adc {
-class SCOPY_ADC_EXPORT TimePlotComponentChannel : public QObject, public ToolComponent {
+class SCOPY_ADC_EXPORT TimePlotComponentChannel : public QObject {
 	Q_OBJECT
 public:
 
@@ -19,8 +19,8 @@ public:
 	QWidget *createCurveMenu(QWidget *parent);
 
 public Q_SLOTS:
-	void enable() override;
-	void disable() override;
+	void enable();
+	void disable();
 	void onNewData(const float *xData_, const float *yData_, size_t size, bool copy);
 	void setXyXData(const float *);
 	void setSingleYMode(bool);
@@ -41,6 +41,7 @@ public:
 	ChannelComponent *m_ch;
 	const float *m_xyXData = 0;
 	bool m_singleYMode = false;
+	bool m_enabled;
 };
 }
 }

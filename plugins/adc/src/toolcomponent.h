@@ -52,7 +52,7 @@ public Q_SLOTS:
 		m_size = size;
 		m_ownsData = copy;
 
-		Q_EMIT newData(xData_, yData_, size, copy);
+		Q_EMIT newData(m_xData, m_yData, m_size, m_ownsData);
 
 	}
 Q_SIGNALS:
