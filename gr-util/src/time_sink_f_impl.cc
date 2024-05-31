@@ -124,21 +124,21 @@ uint64_t time_sink_f_impl::updateData()
 			m_data[i].push_back(m_buffers[i][j]);
 		}
 
-	/*	if(!m_computeTags)
-			continue;
+		/*	if(!m_computeTags)
+				continue;
 
-		for(int j = 0; j < m_tags[i].size(); j++) {
-			PlotTag_t tag;
+			for(int j = 0; j < m_tags[i].size(); j++) {
+				PlotTag_t tag;
 
-			std::stringstream s;
-			s << m_tags[i][j].key << ": " << m_tags[i][j].value;
-			tag.str = QString::fromStdString(s.str());
-			qInfo() << "nitems_read(i)" << nitems_read(i) << "tag.offset" << m_tags[i][j].offset;
-			;
-			tag.offset = nitems_read(i) - m_tags[i][j].offset;
+				std::stringstream s;
+				s << m_tags[i][j].key << ": " << m_tags[i][j].value;
+				tag.str = QString::fromStdString(s.str());
+				qInfo() << "nitems_read(i)" << nitems_read(i) << "tag.offset" << m_tags[i][j].offset;
+				;
+				tag.offset = nitems_read(i) - m_tags[i][j].offset;
 
-			m_dataTags[i].push_back(tag);
-		}*/
+				m_dataTags[i].push_back(tag);
+			}*/
 	}
 	//	nitems_read();
 	if(m_workFinished) {
@@ -195,7 +195,7 @@ int time_sink_f_impl::work(int noutput_items, gr_vector_const_void_star &input_i
 		for(int i = 0; i < m_nconnections; i++) {
 			if(m_buffers[i].size() >= m_size) {
 				m_buffers[i].clear();
-				//m_tags[i].clear();
+				// m_tags[i].clear();
 			}
 		}
 	}

@@ -8,7 +8,7 @@ CursorComponent::CursorComponent(TimePlotComponent *plot, ToolTemplate *tool, QO
 	: QObject(parent)
 	, ToolComponent()
 	, m_plot(plot)
-	{
+{
 
 	cursor = new MenuControlButton();
 	setupCursorButtonHelper(cursor);
@@ -19,31 +19,22 @@ CursorComponent::CursorComponent(TimePlotComponent *plot, ToolTemplate *tool, QO
 	hoverSettings->setContentPos(HoverPosition::HP_TOPLEFT);
 	hoverSettings->setAnchorOffset(QPoint(0, -10));
 
-
 	connect(cursor->button(), &QAbstractButton::toggled, hoverSettings, &HoverWidget::setVisible);
 	connect(cursor, &QAbstractButton::toggled, cursorController, &CursorController::setVisible);
 	tool->addWidgetToBottomContainerHelper(cursor, TTA_RIGHT);
 }
 
-CursorComponent::~CursorComponent()
+CursorComponent::~CursorComponent() {}
+
+void CursorComponent::onInit()
 {
-
-}
-
-void CursorComponent::onInit() {
 	cursorController->getPlotCursors()->getX1Cursor()->setPosition(0);
 	cursorController->getPlotCursors()->getX2Cursor()->setPosition(0);
 	cursorController->getPlotCursors()->getY1Cursor()->setPosition(0);
 	cursorController->getPlotCursors()->getY2Cursor()->setPosition(0);
 }
 
-
-
-MenuControlButton *CursorComponent::ctrl()
-{
-	return cursor;
-}
-
+MenuControlButton *CursorComponent::ctrl() { return cursor; }
 
 void CursorComponent::setupCursorButtonHelper(MenuControlButton *cursor)
 {

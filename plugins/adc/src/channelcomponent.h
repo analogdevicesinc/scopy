@@ -6,20 +6,19 @@
 #include "toolcomponent.h"
 #include "timeplotcomponent.h"
 
-
 namespace scopy {
 namespace adc {
 
 class TimePlotComponentChannel;
 
-
-class GRChannel {
+class GRChannel
+{
 public:
-	virtual GRSignalPath* sigpath() = 0;
+	virtual GRSignalPath *sigpath() = 0;
 	virtual void onNewData(const float *xData, const float *yData, size_t size, bool copy) = 0;
 };
 
-class SCOPY_ADC_EXPORT ChannelComponent : public QWidget,  public ToolComponent
+class SCOPY_ADC_EXPORT ChannelComponent : public QWidget, public ToolComponent
 {
 	Q_OBJECT
 public:
@@ -36,7 +35,6 @@ public:
 	void setPlotChannelCmpt(TimePlotComponentChannel *newPlotChannelCmpt);
 
 protected:
-
 	QString m_channelName;
 	QPen m_pen;
 	QWidget *widget;
@@ -54,6 +52,6 @@ public Q_SLOTS:
 	// void onNewData(const float *xData, const float *yData, int size, bool latch);
 };
 
-}
-}
+} // namespace adc
+} // namespace scopy
 #endif // CHANNELCOMPONENT_H

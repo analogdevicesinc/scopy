@@ -9,7 +9,6 @@
 
 Q_LOGGING_CATEGORY(CAT_TIME_CHANNELCOMPONENT, "TimeChannelComponent");
 
-
 using namespace scopy;
 using namespace gui;
 using namespace scopy::adc;
@@ -19,10 +18,10 @@ ChannelComponent::ChannelComponent(QString ch, TimePlotComponent *m_plot, QPen p
 	, m_channelName(ch)
 	, m_pen(pen)
 	, m_chData(new ChannelData(this))
-	, m_plotChannelCmpt(new TimePlotComponentChannel(this,m_plot,this))
+	, m_plotChannelCmpt(new TimePlotComponentChannel(this, m_plot, this))
 {
 
-	connect(m_chData, &ChannelData::newData,m_plotChannelCmpt,&TimePlotComponentChannel::onNewData);
+	connect(m_chData, &ChannelData::newData, m_plotChannelCmpt, &TimePlotComponentChannel::onNewData);
 	m_name = m_channelName;
 	m_enabled = true;
 }
@@ -41,21 +40,13 @@ void ChannelComponent::onInit() {}
 
 void ChannelComponent::onDeinit() {}
 
-
 QPen ChannelComponent::pen() const { return m_pen; }
 
-ChannelData *ChannelComponent::chData() const
-{
-	return m_chData;
-}
+ChannelData *ChannelComponent::chData() const { return m_chData; }
 
-TimePlotComponentChannel *ChannelComponent::plotChannelCmpt() const
-{
-	return m_plotChannelCmpt;
-}
+TimePlotComponentChannel *ChannelComponent::plotChannelCmpt() const { return m_plotChannelCmpt; }
 
 void ChannelComponent::setPlotChannelCmpt(TimePlotComponentChannel *newPlotChannelCmpt)
 {
 	m_plotChannelCmpt = newPlotChannelCmpt;
 }
-

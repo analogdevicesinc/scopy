@@ -113,11 +113,11 @@ void PlotChannel::addMarker(QwtPlotMarker *m) { m_markers.append(m); }
 void PlotChannel::setSamples(const float *xData, const float *yData, size_t size, bool copy)
 {
 	if(copy) {
-		curve()->setSamples(xData,yData,size);
+		curve()->setSamples(xData, yData, size);
 	} else {
-		curve()->setRawSamples(xData,yData,size);
+		curve()->setRawSamples(xData, yData, size);
 	}
-	Q_EMIT newData(xData,yData,size,copy);
+	Q_EMIT newData(xData, yData, size, copy);
 }
 
 void PlotChannel::clearMarkers()

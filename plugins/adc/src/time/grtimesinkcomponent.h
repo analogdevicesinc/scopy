@@ -9,9 +9,7 @@
 namespace scopy {
 namespace adc {
 
-class GRTimeSinkComponent : public QObject,
-			    public ToolComponent,
-			    public DataProvider
+class GRTimeSinkComponent : public QObject, public ToolComponent, public DataProvider
 {
 	Q_OBJECT
 public:
@@ -37,7 +35,7 @@ public Q_SLOTS:
 	virtual void onInit() override;
 	virtual void onDeinit() override;
 
-	void addChannel(GRChannel* ch);
+	void addChannel(GRChannel *ch);
 	void removeChannel(GRChannel *c);
 Q_SIGNALS:
 	void requestRebuild();
@@ -55,10 +53,9 @@ private:
 	bool m_singleShot;
 	bool m_syncMode;
 
-	QList<GRChannel*> m_channels;
-
+	QList<GRChannel *> m_channels;
 };
-}
-}
+} // namespace adc
+} // namespace scopy
 
 #endif // GRTIMESINKCOMPONENT_H

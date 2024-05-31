@@ -6,12 +6,14 @@
 
 namespace scopy::adc {
 
-class SCOPY_ADC_EXPORT MeasurementProvider {
+class SCOPY_ADC_EXPORT MeasurementProvider
+{
 public:
 	virtual MeasureManagerInterface *getMeasureManager() = 0;
 };
 
-class SCOPY_ADC_EXPORT SnapshotProvider {
+class SCOPY_ADC_EXPORT SnapshotProvider
+{
 public:
 	typedef struct
 	{
@@ -23,13 +25,15 @@ public:
 	virtual void addNewSnapshot(SnapshotRecipe) = 0;
 };
 
-class SCOPY_ADC_EXPORT SampleRateProvider {
+class SCOPY_ADC_EXPORT SampleRateProvider
+{
 public:
 	virtual bool sampleRateAvailable() = 0;
 	virtual double sampleRate() = 0;
 };
 
-class SCOPY_ADC_EXPORT MeasurementPanelInterface {
+class SCOPY_ADC_EXPORT MeasurementPanelInterface
+{
 public:
 	virtual MeasurementsPanel *measurePanel() const = 0;
 	virtual StatsPanel *statsPanel() const = 0;
@@ -37,7 +41,6 @@ public:
 	virtual void enableStatsPanel(bool) = 0;
 };
 
-
-}
+} // namespace scopy::adc
 
 #endif // INTERFACES_H

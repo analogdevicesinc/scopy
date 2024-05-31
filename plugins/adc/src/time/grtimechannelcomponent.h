@@ -18,14 +18,17 @@ using namespace scopy::gui;
 
 class GRDeviceAddon;
 
-class GRTimeChannelSigpath : QObject {
+class GRTimeChannelSigpath : QObject
+{
 public:
-	GRTimeChannelSigpath(QString m_name, ChannelComponent *ch, GRIIOFloatChannelNode *node, QObject *parent)  : QObject(parent) {
+	GRTimeChannelSigpath(QString m_name, ChannelComponent *ch, GRIIOFloatChannelNode *node, QObject *parent)
+		: QObject(parent)
+	{
 		m_ch = ch;
 		m_node = node;
 		m_grch = node->src();
-		m_signalPath = new GRSignalPath(m_name	+ m_grch->getDeviceSrc()->deviceName()
-							+ m_grch->getChannelName(), this);
+		m_signalPath = new GRSignalPath(
+			m_name + m_grch->getDeviceSrc()->deviceName() + m_grch->getChannelName(), this);
 		m_signalPath->append(m_grch);
 		m_scOff = new GRScaleOffsetProc(m_signalPath);
 		m_signalPath->append(m_scOff);
@@ -34,11 +37,10 @@ public:
 		m_signalPath->setEnabled(true); // or false
 		m_node->top()->src()->registerSignalPath(m_signalPath);
 	}
-	~GRTimeChannelSigpath() {
+	~GRTimeChannelSigpath() {}
 
-	}
-
-	void onNewData(const float *xData, const float *yData, size_t size, bool copy) {
+	void onNewData(const float *xData, const float *yData, size_t size, bool copy)
+	{
 		m_ch->chData()->onNewData(xData, yData, size, copy);
 	}
 
@@ -47,12 +49,9 @@ public:
 	GRSignalPath *m_signalPath;
 	GRScaleOffsetProc *m_scOff;
 	GRIIOFloatChannelSrc *m_grch;
-
 };
 
-class SCOPY_ADC_EXPORT GRTimeChannelComponent : public ChannelComponent,
-						public GRChannel,
-						public MeasurementProvider
+class SCOPY_ADC_EXPORT GRTimeChannelComponent : public ChannelComponent, public GRChannel, public MeasurementProvider
 {
 	Q_OBJECT
 public:
@@ -62,15 +61,14 @@ public:
 		YMODE_FS,
 		YMODE_SCALE
 	} YMode;
-	GRTimeChannelComponent(GRIIOFloatChannelNode *node, TimePlotComponent *m_plot, GRTimeSinkComponent *grtsc, QPen pen,
-			   QWidget *parent = nullptr);
+	GRTimeChannelComponent(GRIIOFloatChannelNode *node, TimePlotComponent *m_plot, GRTimeSinkComponent *grtsc,
+			       QPen pen, QWidget *parent = nullptr);
 	~GRTimeChannelComponent();
 
 	MenuControlButton *ctrl();
 	MeasureManagerInterface *getMeasureManager() override;
 
 	GRSignalPath *sigpath() override;
-
 
 public Q_SLOTS:
 
@@ -88,14 +86,14 @@ public Q_SLOTS:
 	void setYMode(YMode mode);
 	void setSingleYMode(bool);
 	// void setSampleRate(double v) override;
-/*
-Q_SIGNALS:
-	void addNewSnapshot(SnapshotProvider::SnapshotRecipe) override;*/
+	/*
+	Q_SIGNALS:
+		void addNewSnapshot(SnapshotProvider::SnapshotRecipe) override;*/
 
 private:
 	GRIIOFloatChannelNode *m_node;
 	GRIIOFloatChannelSrc *m_src;
-	GRTimeChannelSigpath* m_grtch;
+	GRTimeChannelSigpath *m_grtch;
 
 	TimeMeasureManager *m_measureMgr;
 	MenuControlButton *m_ctrl;
@@ -104,7 +102,7 @@ private:
 	MenuCombo *m_ymodeCb;
 	MenuOnOffSwitch *m_autoscaleBtn;
 
-	//QPushButton *m_snapBtn;
+	// QPushButton *m_snapBtn;
 
 	bool m_scaleAvailable;
 	bool m_autoscaleEnabled;
@@ -115,12 +113,12 @@ private:
 	QWidget *createAttrMenu(QWidget *parent);
 	QWidget *createYAxisMenu(QWidget *parent);
 	QWidget *createCurveMenu(QWidget *parent);
-	//QPushButton *createSnapshotButton(QWidget *parent);
+	// QPushButton *createSnapshotButton(QWidget *parent);
 
 	void createMenuControlButton(QWidget *parent = nullptr);
 	void setupChannelMenuControlButtonHelper(MenuControlButton *btn);
 };
 
-} // namespace grutil
+} // namespace adc
 } // namespace scopy
 #endif // GRTIMECHANNELCOMPONENT_H

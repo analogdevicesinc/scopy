@@ -22,8 +22,7 @@ namespace adc {
 
 using namespace scopy::gui;
 
-class SCOPY_ADC_EXPORT TimePlotManagerSettings : public QWidget,
-						       public ToolComponent
+class SCOPY_ADC_EXPORT TimePlotManagerSettings : public QWidget, public ToolComponent
 {
 	Q_OBJECT
 public:
@@ -111,7 +110,7 @@ private:
 
 	QPushButton *m_addPlotBtn;
 	QVBoxLayout *m_plotContainerLayout;
-	QMap<uint32_t, QWidget*> m_plotWidgetMap;
+	QMap<uint32_t, QWidget *> m_plotWidgetMap;
 
 	bool m_sampleRateAvailable;
 	uint32_t m_bufferSize;
@@ -121,8 +120,8 @@ private:
 	bool m_syncBufferPlotSize;
 	bool m_syncMode;
 
-	QList<ChannelComponent*> m_channels;
-	QList<SampleRateProvider*> m_sampleRateProviders;
+	QList<ChannelComponent *> m_channels;
+	QList<SampleRateProvider *> m_sampleRateProviders;
 	// bool m_showPlotTags;
 
 	Q_PROPERTY(uint32_t plotSize READ plotSize WRITE setPlotSize NOTIFY plotSizeChanged)

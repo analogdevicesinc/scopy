@@ -16,31 +16,22 @@ TimePlotManager::TimePlotManager(QString name, QWidget *parent)
 
 	m_measurePanel = new MeasurementsPanel(this);
 	m_measurePanel->setFixedHeight(100);
-	//tool->topStack()->add(measureMenuId, m_measurePanel);
+	// tool->topStack()->add(measureMenuId, m_measurePanel);
 
 	m_statsPanel = new StatsPanel(this);
 	m_statsPanel->setFixedHeight(80);
-	//tool->bottomStack()->add(statsMenuId, m_statsPanel);
+	// tool->bottomStack()->add(statsMenuId, m_statsPanel);
 	m_lay->addWidget(m_measurePanel);
 	m_measurePanel->setVisible(false);
 	m_statsPanel->setVisible(false);
 	m_lay->addWidget(m_statsPanel);
 }
 
-TimePlotManager::~TimePlotManager()
-{
+TimePlotManager::~TimePlotManager() {}
 
-}
+void TimePlotManager::enableMeasurementPanel(bool b) { m_measurePanel->setVisible(b); }
 
-void TimePlotManager::enableMeasurementPanel(bool b)
-{
-	m_measurePanel->setVisible(b);
-}
-
-void TimePlotManager::enableStatsPanel(bool b)
-{
-	m_statsPanel->setVisible(b);
-}
+void TimePlotManager::enableStatsPanel(bool b) { m_statsPanel->setVisible(b); }
 
 void TimePlotManager::setXInterval(double xMin, double xMax)
 {
@@ -54,21 +45,15 @@ void TimePlotManager::selectChannel(ChannelComponent *c)
 	for(TimePlotComponentChannel *pcc : m_channels) {
 		if(pcc->m_ch == c) {
 			PlotChannel *ch = pcc->m_timePlotCh;
-			PlotWidget* w = pcc->m_plotComponent->timePlot();
+			PlotWidget *w = pcc->m_plotComponent->timePlot();
 			w->selectChannel(ch);
 		}
 	}
 }
 
-MeasurementsPanel *TimePlotManager::measurePanel() const
-{
-	return m_measurePanel;
-}
+MeasurementsPanel *TimePlotManager::measurePanel() const { return m_measurePanel; }
 
-StatsPanel *TimePlotManager::statsPanel() const
-{
-	return m_statsPanel;
-}
+StatsPanel *TimePlotManager::statsPanel() const { return m_statsPanel; }
 
 uint32_t TimePlotManager::addPlot(QString name)
 {
@@ -81,7 +66,8 @@ uint32_t TimePlotManager::addPlot(QString name)
 }
 
 void TimePlotManager::removePlot(uint32_t uuid)
-{	TimePlotComponent *plt = plot(uuid);
+{
+	TimePlotComponent *plt = plot(uuid);
 	m_plots.removeAll(plt);
 	removeComponent(plt);
 	m_lay->removeWidget(plt);
@@ -94,14 +80,14 @@ void TimePlotManager::addChannel(ChannelComponent *c, uint32_t uuid)
 	plt->addChannel(c);
 }
 
-
 void TimePlotManager::removeChannel(ChannelComponent *c)
 {
 	c->plotChannelCmpt()->m_plotComponent->removeChannel(c);
 	m_channels.removeAll(c->plotChannelCmpt());
 }
 
-void TimePlotManager::moveChannel(ChannelComponent *c, uint32_t uuid) {
+void TimePlotManager::moveChannel(ChannelComponent *c, uint32_t uuid)
+{
 	c->plotChannelCmpt()->m_plotComponent->removeChannel(c);
 	TimePlotComponent *plt = plot(uuid);
 	c->plotChannelCmpt()->initPlotComponent(plt);
@@ -119,10 +105,7 @@ TimePlotComponent *TimePlotManager::plot(uint32_t uuid)
 	return plt;
 }
 
-QList<TimePlotComponent *> TimePlotManager::plots() const
-{
-	return m_plots;
-}
+QList<TimePlotComponent *> TimePlotManager::plots() const { return m_plots; }
 
 void TimePlotManager::replot()
 {

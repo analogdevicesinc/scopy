@@ -13,7 +13,8 @@ PlotAxisHandle::PlotAxisHandle(PlotWidget *plot, PlotAxis *ax)
 	init();
 }
 
-PlotAxisHandle::~PlotAxisHandle() {
+PlotAxisHandle::~PlotAxisHandle()
+{
 	// delete m_handle;
 }
 

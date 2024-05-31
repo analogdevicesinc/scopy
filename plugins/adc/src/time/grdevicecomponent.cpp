@@ -30,7 +30,6 @@ GRDeviceComponent::GRDeviceComponent(GRIIODeviceSourceNode *node, QWidget *paren
 	createMenuControlButton();
 }
 
-
 QWidget *GRDeviceComponent::createAttrMenu(QWidget *parent)
 {
 	MenuSectionWidget *attrContainer = new MenuSectionWidget(parent);
@@ -105,10 +104,7 @@ void GRDeviceComponent::setupDeviceMenuControlButtonHelper(MenuControlButton *de
 	devBtn->setDoubleClickToOpenMenu(true);
 }
 
-CollapsableMenuControlButton *GRDeviceComponent::ctrl()
-{
-	return m_ctrl;
-}
+CollapsableMenuControlButton *GRDeviceComponent::ctrl() { return m_ctrl; }
 
 bool GRDeviceComponent::sampleRateAvailable()
 {
@@ -117,44 +113,22 @@ bool GRDeviceComponent::sampleRateAvailable()
 			return m_src->sampleRateAvailable();
 	}
 	return false;
-
 }
 
-double GRDeviceComponent::sampleRate()
-{
-	return m_src->readSampleRate();
-}
+double GRDeviceComponent::sampleRate() { return m_src->readSampleRate(); }
 
-void GRDeviceComponent::setBufferSize(uint32_t bufferSize) {
-	m_src->setBuffersize(bufferSize);
-}
+void GRDeviceComponent::setBufferSize(uint32_t bufferSize) { m_src->setBuffersize(bufferSize); }
 
 GRDeviceComponent::~GRDeviceComponent() {}
 
-void GRDeviceComponent::onStart()
-{
+void GRDeviceComponent::onStart() {}
 
-}
+void GRDeviceComponent::onStop() {}
 
-void GRDeviceComponent::onStop()
-{
+void GRDeviceComponent::onInit() {}
 
-}
+void GRDeviceComponent::onDeinit() {}
 
-void GRDeviceComponent::onInit()
-{
+void GRDeviceComponent::addChannel(ChannelComponent *c) { m_channels.append(c); }
 
-}
-
-void GRDeviceComponent::onDeinit()
-{
-
-}
-
-void GRDeviceComponent::addChannel(ChannelComponent *c) {
-	m_channels.append(c);
-}
-
-void GRDeviceComponent::removeChannel(ChannelComponent *c) {
-	m_channels.removeAll(c);
-}
+void GRDeviceComponent::removeChannel(ChannelComponent *c) { m_channels.removeAll(c); }

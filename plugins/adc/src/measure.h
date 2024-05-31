@@ -224,6 +224,6 @@ private:
 
 	void measureSpectral();
 };
-} // namespace scopy::grutil
+} // namespace scopy::adc
 
 #endif // MEASURE_H
