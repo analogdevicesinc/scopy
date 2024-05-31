@@ -2,6 +2,7 @@
 #define GRTIMECHANNELCOMPONENT_H
 
 #include "grtimesinkcomponent.h"
+#include "menucollapsesection.h"
 #include "scopy-adc_export.h"
 #include "channelcomponent.h"
 #include <gui/plotautoscaler.h>
@@ -69,6 +70,8 @@ public:
 	MeasureManagerInterface *getMeasureManager() override;
 
 	GRSignalPath *sigpath() override;
+	void insertPlotComboWidget(QWidget *w);
+	QVBoxLayout* menuLayout();
 
 public Q_SLOTS:
 
@@ -94,6 +97,7 @@ private:
 	GRIIOFloatChannelNode *m_node;
 	GRIIOFloatChannelSrc *m_src;
 	GRTimeChannelSigpath *m_grtch;
+	QVBoxLayout *m_layScroll;
 
 	TimeMeasureManager *m_measureMgr;
 	MenuControlButton *m_ctrl;
@@ -101,6 +105,8 @@ private:
 	PlotAutoscaler *m_autoscaler;
 	MenuCombo *m_ymodeCb;
 	MenuOnOffSwitch *m_autoscaleBtn;
+
+	MenuCollapseSection *m_curveSection;
 
 	// QPushButton *m_snapBtn;
 

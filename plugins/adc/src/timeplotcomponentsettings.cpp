@@ -117,7 +117,11 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 
 	// init
 	xySwitch->onOffswitch()->setChecked(true);
-	singleYMode->onOffswitch()->setChecked(false);
+	singleYMode->onOffswitch()->setChecked(true);
+	m_yCtrl->setMin(-2048);
+	m_yCtrl->setMax(2048);
+	labelsSwitch->onOffswitch()->setChecked(true);
+	labelsSwitch->onOffswitch()->setChecked(false);
 }
 
 TimePlotComponentSettings::~TimePlotComponentSettings() {}

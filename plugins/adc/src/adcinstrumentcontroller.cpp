@@ -71,9 +71,9 @@ void ADCInstrumentController::init()
 	addComponent(m_timePlotSettingsComponent);
 
 	uint32_t tmp;
-	tmp = m_plotComponentManager->addPlot("1");
+	tmp = m_plotComponentManager->addPlot("Acceleration 1");
 	m_timePlotSettingsComponent->addPlot(m_plotComponentManager->plot(tmp));
-	tmp = m_plotComponentManager->addPlot("2");
+	tmp = m_plotComponentManager->addPlot("Inertial movement 2");
 	m_timePlotSettingsComponent->addPlot(m_plotComponentManager->plot(tmp));
 
 	// m_cursorComponent = new CursorComponent(m_plotComponentManager, m_tool->getToolTemplate(), this);
@@ -248,6 +248,7 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 		Q_ASSERT(grtsc);
 
 		m_plotComponentManager->addChannel(c);
+		c->insertPlotComboWidget(m_plotComponentManager->plotCombo(c));
 
 		/*** This is a bit of a mess because CollapsableMenuControlButton is not a MenuControlButton ***/
 
@@ -275,18 +276,6 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 
 		addComponent(c);
 		setupChannelMeasurement(m_plotComponentManager, c);
-
-		/*SampleRateProvider *s = dynamic_cast<SampleRateProvider*>(c); // SampleRate Computation
-		if(s) {
-			m_timePlotSettingsComponent->addSampleRateProvider(s);
-		}*/
-
-		static bool b = false;
-		if(b == true) {
-			m_plotComponentManager->moveChannel(c, 1);
-			m_plotComponentManager->moveChannel(c, 0);
-		}
-		b = true;
 	}
 }
 
