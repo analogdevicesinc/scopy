@@ -80,6 +80,8 @@ time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string
 	, m_dataUpdated(false)
 	, m_freqOffset(0)
 	, m_lastUpdateReadItems(0)
+	, m_complexFft(false)
+	, m_singleShot(false)
 {
 	qInfo(CAT_TIME_SINK_F) << "ctor";
 	// reserve memory for n buffers

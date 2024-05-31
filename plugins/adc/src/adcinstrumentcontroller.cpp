@@ -238,7 +238,10 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node) {
 	if(dynamic_cast<GRIIOFloatChannelNode*>(node) != nullptr) {
 		int idx = chIdP->next();
 		GRIIOFloatChannelNode* griiofcn = dynamic_cast<GRIIOFloatChannelNode*>(node);
-		GRTimeChannelComponent *c = new GRTimeChannelComponent(griiofcn, m_plotComponentManager->plot(0), chIdP->pen(idx));
+		GRTimeSinkComponent *grtsc = dynamic_cast<GRTimeSinkComponent*>(m_acqNodeComponentMap[griiofcn->top()]);
+		GRTimeChannelComponent *c = new GRTimeChannelComponent(griiofcn, m_plotComponentManager->plot(0), grtsc, chIdP->pen(idx));
+		Q_ASSERT(grtsc);
+
 		m_plotComponentManager->addChannel(c);
 
 		/*** This is a bit of a mess because CollapsableMenuControlButton is not a MenuControlButton ***/
@@ -262,10 +265,8 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node) {
 			m_plotComponentManager->selectChannel(c);
 		});
 
-		GRTimeSinkComponent *grtsc = dynamic_cast<GRTimeSinkComponent*>(m_acqNodeComponentMap[griiofcn->top()]);
-		Q_ASSERT(grtsc);
-		grtsc->addChannel(c,griiofcn); // For matching Sink To Channels
 
+		grtsc->addChannel(c); // For matching Sink To Channels
 		dc->addChannel(c);    // used for sample rate computation
 		m_timePlotSettingsComponent->addChannel(c); // SingleY/etc
 

@@ -10,8 +10,8 @@ using namespace scopy::adc;
 
 TimePlotComponentChannel::TimePlotComponentChannel(ChannelComponent *ch, TimePlotComponent *plotComponent, QObject *parent)
 	: QObject(parent)
-	, ToolComponent()
-{ // is this part of the timePlot or the channel (?) , maybe part of the channel and just move across plots (?)
+	, m_enabled(true)
+{
 	auto timeplot = plotComponent->timePlot();
 	auto xyplot = plotComponent->xyPlot();
 
@@ -91,16 +91,8 @@ TimePlotComponentChannel::~TimePlotComponentChannel() {
 
 }
 
-void TimePlotComponentChannel::disable() {
-	ToolComponent::disable();
-	m_timePlotCh->disable();
-	if(m_timePlotAxisHandle) {
-		m_timePlotAxisHandle->handle()->setVisible(false);
-	}
-}
 
 void TimePlotComponentChannel::refreshData(bool copy) {
-
 	auto data = m_ch->chData();
 	m_timePlotCh->setSamples(data->xData(), data->yData(),data->size(), copy);
 	if(m_xyXData) {
@@ -145,10 +137,21 @@ QWidget *TimePlotComponentChannel::createCurveMenu(QWidget *parent) {
 }
 
 void TimePlotComponentChannel::enable() {
-	ToolComponent::enable();
 	m_timePlotCh->enable();
+	m_xyPlotCh->enable();
 	if(m_timePlotAxisHandle) {
 		m_timePlotAxisHandle->handle()->setVisible(true);
 		m_timePlotAxisHandle->handle()->raise();
 	}
+	m_enabled = true;
 }
+
+void TimePlotComponentChannel::disable() {
+	m_timePlotCh->disable();
+	m_xyPlotCh->disable();
+	if(m_timePlotAxisHandle) {
+		m_timePlotAxisHandle->handle()->setVisible(false);
+	}
+	m_enabled = false;
+}
+
