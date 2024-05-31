@@ -190,8 +190,8 @@ bool ADCPlugin::onConnect()
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
 
-	// create gnuradio flow out of channels
-	// pass channels to ADC instrument - figure out channel model (sample rate/ size/ etc)
+	       // create gnuradio flow out of channels
+	       // pass channels to ADC instrument - figure out channel model (sample rate/ size/ etc)
 	AcqTreeNode *root = new AcqTreeNode("root",this);
 	GRTopBlock *top = new GRTopBlock("ctx", this);
 	GRTopBlockNode *ctxNode = new GRTopBlockNode(top, nullptr);
@@ -251,5 +251,3 @@ void ADCPlugin::initMetadata()
 }
 
 QString ADCPlugin::version() { return "0.1"; }
-
-#include "moc_adcplugin.cpp"

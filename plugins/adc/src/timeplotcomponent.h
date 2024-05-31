@@ -1,7 +1,7 @@
 #ifndef TIMEPLOTCOMPONENT_H
 #define TIMEPLOTCOMPONENT_H
 
-#include "scopy-adcplugin_export.h"
+#include "scopy-adc_export.h"
 #include "toolcomponent.h"
 
 #include <QFuture>
@@ -27,7 +27,7 @@ class TimePlotComponentSettings;
 class TimePlotComponentChannel;
 class ChannelComponent;
 
-class SCOPY_ADCPLUGIN_EXPORT TimePlotComponent : public QWidget, public MetaComponent
+class SCOPY_ADC_EXPORT TimePlotComponent : public QWidget, public MetaComponent
 {
 	Q_OBJECT
 public:
