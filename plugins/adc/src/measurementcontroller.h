@@ -98,5 +98,5 @@ protected:
 	TimeMeasureModel *m_measureModel;
 };
 
-} // namespace scopy::grutil
+} // namespace scopy::adc
 #endif // MEASUREMENTCONTROLLER_H

@@ -17,10 +17,9 @@
 #include <plotwidget.h>
 #include "plotinfo.h"
 
-using namespace	scopy::gui;
+using namespace scopy::gui;
 namespace scopy {
 namespace adc {
-
 
 class TimePlotComponent;
 class TimePlotComponentSettings;
@@ -45,16 +44,17 @@ public Q_SLOTS:
 	void setName(QString s);
 	// virtual double sampleRate()
 
-	ChannelComponent* XYXChannel();
+	ChannelComponent *XYXChannel();
 	void setXYXChannel(ChannelComponent *c);
+
 public:
 	void onStart();
 	void onStop();
 	void onInit();
 	void onDeinit();
 
-	void addChannel(ChannelComponent*);
-	void removeChannel(ChannelComponent*);
+	void addChannel(ChannelComponent *);
+	void removeChannel(ChannelComponent *);
 
 	uint32_t uuid();
 	TimePlotComponentSettings *createPlotMenu(QWidget *parent);
@@ -78,15 +78,13 @@ private:
 	ChannelComponent *m_XYXChannel;
 	const float *xyXData;
 
-	QList<TimePlotComponentChannel*> m_channels;
+	QList<TimePlotComponentChannel *> m_channels;
 
 private:
 	QMetaObject::Connection xyDataConn;
 };
 
-
 } // namespace adc
 } // namespace scopy
-
 
 #endif // TIMEPLOTCOMPONENT_H

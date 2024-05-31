@@ -138,7 +138,6 @@ void PlotWidget::removePlotChannel(PlotChannel *ch)
 
 	// QwtAxis cannot be removed :(
 
-
 	Q_EMIT removedChannel(ch);
 }
 

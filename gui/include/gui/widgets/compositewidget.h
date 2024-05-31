@@ -3,7 +3,8 @@
 
 #include <QWidget>
 
-class CompositeWidget {
+class CompositeWidget
+{
 public:
 	virtual void add(QWidget *w) = 0;
 	virtual void remove(QWidget *w) = 0;

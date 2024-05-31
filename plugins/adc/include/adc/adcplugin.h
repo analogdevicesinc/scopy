@@ -30,7 +30,7 @@ class SCOPY_ADC_EXPORT ADCPlugin : public QObject, public PluginBase
 	Q_OBJECT
 	SCOPY_PLUGIN;
 
-	       // Plugin interface
+	// Plugin interface
 public:
 	void initPreferences() override;
 	void initMetadata() override;
@@ -52,7 +52,6 @@ private:
 	QLineEdit *edit;
 
 	void createGRIIOTreeNode(GRTopBlockNode *node, iio_context *ctx);
-
 };
 } // namespace adc
 } // namespace scopy

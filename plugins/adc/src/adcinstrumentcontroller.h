@@ -55,8 +55,8 @@ private Q_SLOTS:
 
 Q_SIGNALS:
 	void requestStop();
-private:
 
+private:
 	void setupChannelMeasurement(TimePlotManager *c, ChannelComponent *ch);
 
 	ADCInstrument *m_tool;
@@ -74,12 +74,10 @@ private:
 	QTimer *m_plotTimer;
 
 	AcqTreeNode *m_tree;
-	QMap<AcqTreeNode*, ToolComponent*> m_acqNodeComponentMap;
+	QMap<AcqTreeNode *, ToolComponent *> m_acqNodeComponentMap;
 
 	bool m_refreshTimerRunning;
 	QString currentCategory;
-
-
 };
 } // namespace adc
 } // namespace scopy

@@ -9,10 +9,10 @@
 
 namespace scopy {
 namespace adc {
-class SCOPY_ADC_EXPORT TimePlotComponentChannel : public QObject {
+class SCOPY_ADC_EXPORT TimePlotComponentChannel : public QObject
+{
 	Q_OBJECT
 public:
-
 	TimePlotComponentChannel(ChannelComponent *ch, TimePlotComponent *plotComponent, QObject *parent);
 	~TimePlotComponentChannel();
 
@@ -43,6 +43,6 @@ public:
 	bool m_singleYMode = false;
 	bool m_enabled;
 };
-}
-}
+} // namespace adc
+} // namespace scopy
 #endif // TIMEPLOTCOMPONENTCHANNEL_H

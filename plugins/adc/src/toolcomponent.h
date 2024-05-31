@@ -14,46 +14,45 @@ namespace adc {
 class PlotProxy;
 class ADCInstrument;
 
-class SCOPY_ADC_EXPORT ChannelData : public QObject{
+class SCOPY_ADC_EXPORT ChannelData : public QObject
+{
 	Q_OBJECT
 public:
-	ChannelData(QObject *parent) : QObject(parent) {
+	ChannelData(QObject *parent)
+		: QObject(parent)
+	{}
+	~ChannelData() { freeData(); }
 
-	}
-	~ChannelData() {
-		freeData();
-
-	}
-
-	void freeData() {
+	void freeData()
+	{
 		if(m_ownsData) {
-			free((void*)m_xData);
-			free((void*)m_yData);
+			free((void *)m_xData);
+			free((void *)m_yData);
 		}
 	}
 
-	const float *xData() { return m_xData;}
-	const float *yData() { return m_yData;}
-	const size_t size() { return m_size;}
+	const float *xData() { return m_xData; }
+	const float *yData() { return m_yData; }
+	const size_t size() { return m_size; }
 
 public Q_SLOTS:
-	virtual void onNewData(const float *xData_, const float *yData_, size_t size, bool copy) {
+	virtual void onNewData(const float *xData_, const float *yData_, size_t size, bool copy)
+	{
 		// this could be optimized not to reallocate the data
 		freeData();
 		if(copy) {
-			m_xData = (float*)malloc(sizeof(float) * size);
-			m_yData = (float*)malloc(sizeof(float) * size);
+			m_xData = (float *)malloc(sizeof(float) * size);
+			m_yData = (float *)malloc(sizeof(float) * size);
 			memcpy(m_xData, xData_, sizeof(float) * size);
 			memcpy(m_yData, yData_, sizeof(float) * size);
 		} else {
-			m_xData = (float*)xData_;
-			m_yData = (float*)yData_;
+			m_xData = (float *)xData_;
+			m_yData = (float *)yData_;
 		}
 		m_size = size;
 		m_ownsData = copy;
 
 		Q_EMIT newData(m_xData, m_yData, m_size, m_ownsData);
-
 	}
 Q_SIGNALS:
 	void newData(const float *xData_, const float *yData_, size_t size, bool copy);
@@ -62,7 +61,7 @@ private:
 	size_t m_size = 0;
 	float *m_xData = 0;
 	float *m_yData = 0;
-	bool m_ownsData	= false;
+	bool m_ownsData = false;
 };
 
 class SCOPY_ADC_EXPORT DataProvider
@@ -77,8 +76,11 @@ public:
 class SCOPY_ADC_EXPORT ToolComponent
 {
 public:
-	ToolComponent() : m_enabled(true), m_priority(0) {}
-	virtual ~ToolComponent() {};
+	ToolComponent()
+		: m_enabled(true)
+		, m_priority(0)
+	{}
+	virtual ~ToolComponent(){};
 	virtual QString name() const { return m_name; };
 	virtual int priority() const { return m_priority; };
 	virtual void onStart(){};
@@ -86,13 +88,10 @@ public:
 	virtual void onInit(){};
 	virtual void onDeinit(){};
 
-	virtual void enable() {m_enabled = true;}
-	virtual void disable() {m_enabled = false;}
+	virtual void enable() { m_enabled = true; }
+	virtual void disable() { m_enabled = false; }
 
-	bool enabled() const {
-		return m_enabled;
-	}
-
+	bool enabled() const { return m_enabled; }
 
 protected:
 	QString m_name;
@@ -103,7 +102,9 @@ protected:
 class SCOPY_ADC_EXPORT MetaComponent : public ToolComponent
 {
 public:
-	MetaComponent() : ToolComponent() {}
+	MetaComponent()
+		: ToolComponent()
+	{}
 	virtual ~MetaComponent() {}
 	virtual void addComponent(ToolComponent *c)
 	{

@@ -46,8 +46,7 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
 	setUnitsVisible(false);
 }
 
-PlotAxis::~PlotAxis() {
-}
+PlotAxis::~PlotAxis() {}
 
 void PlotAxis::setUnitsVisible(bool visible) { m_scaleDraw->setUnitsEnabled(visible); }
 
@@ -119,9 +118,7 @@ void PlotAxis::setInterval(double min, double max)
 	//	updateAxisScale();
 }
 
-void PlotAxis::setVisible(bool val) {
-	m_plot->setAxisVisible(m_axisId, val);
-}
+void PlotAxis::setVisible(bool val) { m_plot->setAxisVisible(m_axisId, val); }
 
 void PlotAxis::updateAxisScale()
 {

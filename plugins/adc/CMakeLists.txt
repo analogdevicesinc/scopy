@@ -26,7 +26,16 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
-file(GLOB SRC_LIST src/*.cpp src/*.cc src/*.h src/time/*.c src/time/*.cpp src/time/*.h)
+file(
+	GLOB
+	SRC_LIST
+	src/*.cpp
+	src/*.cc
+	src/*.h
+	src/time/*.c
+	src/time/*.cpp
+	src/time/*.h
+)
 file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 file(GLOB UI_LIST ui/*.ui)
 
@@ -39,10 +48,17 @@ set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
-add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES}
-    src/timeplotmanager.h src/timeplotmanager.cpp
-    src/timeplotcomponentchannel.h src/timeplotcomponentchannel.cpp
-    src/timeplotmanagersettings.h src/timeplotmanagersettings.cpp)
+add_library(
+	${PROJECT_NAME} SHARED
+	${PROJECT_SOURCES}
+	${PROJECT_RESOURCES}
+	src/timeplotmanager.h
+	src/timeplotmanager.cpp
+	src/timeplotcomponentchannel.h
+	src/timeplotcomponentchannel.cpp
+	src/timeplotmanagersettings.h
+	src/timeplotmanagersettings.cpp
+)
 
 generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h

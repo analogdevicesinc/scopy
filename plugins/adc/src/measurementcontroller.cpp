@@ -278,6 +278,6 @@ static const std::map<int, QString> icons_spect = {
 	};
 */
 
-} // namespace scopy::grutil
+} // namespace scopy::adc
 
 #include "moc_measurementcontroller.cpp"

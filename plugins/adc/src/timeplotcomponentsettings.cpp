@@ -6,7 +6,6 @@
 #include <QLineEdit>
 #include <timeplotcomponentchannel.h>
 
-
 using namespace scopy;
 using namespace scopy::adc;
 
@@ -27,23 +26,25 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 
 	MenuSectionWidget *w = new MenuSectionWidget(this);
 	v->addWidget(w);
-	MenuCollapseSection *plotMenu = new MenuCollapseSection("PLOT - " + plt->name(), MenuCollapseSection::MHCW_NONE, w);
+	MenuCollapseSection *plotMenu =
+		new MenuCollapseSection("PLOT - " + plt->name(), MenuCollapseSection::MHCW_NONE, w);
 
 	QLabel *plotTitleLabel = new QLabel("Plot title");
 	StyleHelper::MenuSmallLabel(plotTitleLabel);
 
 	QLineEdit *plotTitle = new QLineEdit(m_plotComponent->name());
 	StyleHelper::MenuLineEdit(plotTitle);
-	connect(plotTitle, &QLineEdit::textChanged, this, [=](QString s){
+	connect(plotTitle, &QLineEdit::textChanged, this, [=](QString s) {
 		m_plotComponent->setName(s);
 		plotMenu->setTitle("PLOT - " + s);
 	});
 
 	MenuOnOffSwitch *labelsSwitch = new MenuOnOffSwitch("Show plot labels", plotMenu, false);
-	connect(labelsSwitch->onOffswitch(), &QAbstractButton::toggled, m_plotComponent, &TimePlotComponent::showPlotLabels);
+	connect(labelsSwitch->onOffswitch(), &QAbstractButton::toggled, m_plotComponent,
+		&TimePlotComponent::showPlotLabels);
 
 	MenuOnOffSwitch *singleYMode = new MenuOnOffSwitch("SINGLE Y MODE", plotMenu, true);
-	MenuPlotAxisRangeControl *m_yCtrl = new MenuPlotAxisRangeControl(m_plotComponent->timePlot()->yAxis(),this);
+	MenuPlotAxisRangeControl *m_yCtrl = new MenuPlotAxisRangeControl(m_plotComponent->timePlot()->yAxis(), this);
 
 	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), plotMenu, false);
 
@@ -51,24 +52,23 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	connect(m_autoscaler, &PlotAutoscaler::newMin, m_yCtrl, &MenuPlotAxisRangeControl::setMin);
 	connect(m_autoscaler, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
 
-	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [=](double min, double max){
+	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [=](double min, double max) {
 		if(m_plotComponent->singleYMode()) {
-			m_plotComponent->xyPlot()->xAxis()->setInterval(m_yCtrl->min(),m_yCtrl->max());
-			m_plotComponent->xyPlot()->yAxis()->setInterval(m_yCtrl->min(),m_yCtrl->max());
+			m_plotComponent->xyPlot()->xAxis()->setInterval(m_yCtrl->min(), m_yCtrl->max());
+			m_plotComponent->xyPlot()->yAxis()->setInterval(m_yCtrl->min(), m_yCtrl->max());
 		}
 	});
 
-	connect(singleYMode->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b){
+	connect(singleYMode->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
 		m_plotComponent->setSingleYMode(b);
 		m_yCtrl->setVisible(b);
 		m_autoscaleBtn->setVisible(b);
 
 		if(m_plotComponent->singleYMode()) {
-			m_plotComponent->xyPlot()->xAxis()->setInterval(m_yCtrl->min(),m_yCtrl->max());
-			m_plotComponent->xyPlot()->yAxis()->setInterval(m_yCtrl->min(),m_yCtrl->max());
+			m_plotComponent->xyPlot()->xAxis()->setInterval(m_yCtrl->min(), m_yCtrl->max());
+			m_plotComponent->xyPlot()->yAxis()->setInterval(m_yCtrl->min(), m_yCtrl->max());
 		}
 	});
-
 
 	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
 		m_yCtrl->setEnabled(!b);
@@ -76,15 +76,13 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 		toggleAutoScale();
 	});
 
-
 	MenuOnOffSwitch *xySwitch = new MenuOnOffSwitch("XY PLOT", plotMenu, true);
 
 	m_xAxisSrc = new MenuCombo("XY - X Axis source");
-	connect(m_xAxisSrc->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx){
+	connect(m_xAxisSrc->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		QComboBox *cb = m_xAxisSrc->combo();
-		ChannelComponent *c = static_cast<ChannelComponent*>(cb->itemData(idx).value<void*>());
+		ChannelComponent *c = static_cast<ChannelComponent *>(cb->itemData(idx).value<void *>());
 		m_plotComponent->setXYXChannel(c);
-
 	});
 
 	m_xAxisShow = new MenuOnOffSwitch("XY - Plot X source", plotMenu, false);
@@ -95,9 +93,8 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 		m_xAxisShow->setVisible(b);
 	});
 
-	connect(m_xAxisShow->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
-		m_plotComponent->showXSourceOnXy(b);
-	});
+	connect(m_xAxisShow->onOffswitch(), &QAbstractButton::toggled, this,
+		[=](bool b) { m_plotComponent->showXSourceOnXy(b); });
 
 	w->contentLayout()->addWidget(plotMenu);
 
@@ -118,20 +115,17 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	m_xAxisSrc->setVisible(false);
 	m_xAxisShow->setVisible(false);
 
-
 	// init
 	xySwitch->onOffswitch()->setChecked(true);
 	singleYMode->onOffswitch()->setChecked(false);
 }
 
-TimePlotComponentSettings::~TimePlotComponentSettings() {
-
-}
+TimePlotComponentSettings::~TimePlotComponentSettings() {}
 
 void TimePlotComponentSettings::addChannel(ChannelComponent *c)
 {
 	// https://stackoverflow.com/questions/44501171/qvariant-with-custom-class-pointer-does-not-return-same-address
-	m_xAxisSrc->combo()->addItem(c->name(),QVariant::fromValue(static_cast<void*>(c)));
+	m_xAxisSrc->combo()->addItem(c->name(), QVariant::fromValue(static_cast<void *>(c)));
 	m_autoscaler->addChannels(c->plotChannelCmpt()->m_timePlotCh);
 	m_channels.append(c);
 }
@@ -139,20 +133,14 @@ void TimePlotComponentSettings::addChannel(ChannelComponent *c)
 void TimePlotComponentSettings::removeChannel(ChannelComponent *c)
 {
 	m_channels.removeAll(c);
-	int comboId = m_xAxisSrc->combo()->findData(QVariant::fromValue(static_cast<void*>(c)));
+	int comboId = m_xAxisSrc->combo()->findData(QVariant::fromValue(static_cast<void *>(c)));
 	m_xAxisSrc->combo()->removeItem(comboId);
 	m_autoscaler->removeChannels(c->plotChannelCmpt()->m_timePlotCh);
 }
 
-void TimePlotComponentSettings::onInit()
-{
+void TimePlotComponentSettings::onInit() {}
 
-}
-
-void TimePlotComponentSettings::onDeinit()
-{
-
-}
+void TimePlotComponentSettings::onDeinit() {}
 
 void TimePlotComponentSettings::onStart()
 {
@@ -174,6 +162,3 @@ void TimePlotComponentSettings::toggleAutoScale()
 		m_autoscaler->stop();
 	}
 }
-
-
-

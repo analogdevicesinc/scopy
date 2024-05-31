@@ -35,14 +35,15 @@ public:
 	QList<AcqTreeNode *> treeChildren() const;
 
 Q_SIGNALS:
-	void newChild(AcqTreeNode*);
-	void deletedChild(AcqTreeNode*);
+	void newChild(AcqTreeNode *);
+	void deletedChild(AcqTreeNode *);
+
 protected:
 	// AcqTree *m_tree;
 	void *m_data;
 	QString m_name;
 	QList<AcqTreeNode *> m_treeChildren;
-	AcqTreeNode* m_treeParent;
+	AcqTreeNode *m_treeParent;
 };
 
 class SCOPY_ADC_EXPORT IIOContextNode : public AcqTreeNode
@@ -54,6 +55,7 @@ public:
 	GRTopBlockNode(GRTopBlock *g, QObject *parent = nullptr);
 	~GRTopBlockNode();
 	GRTopBlock *src() const;
+
 private:
 	GRTopBlock *m_src;
 };
@@ -61,27 +63,27 @@ private:
 class SCOPY_ADC_EXPORT GRIIODeviceSourceNode : public AcqTreeNode
 {
 public:
-	GRIIODeviceSourceNode(GRTopBlockNode* top, GRIIODeviceSource *d, QObject *parent = nullptr);
+	GRIIODeviceSourceNode(GRTopBlockNode *top, GRIIODeviceSource *d, QObject *parent = nullptr);
 	~GRIIODeviceSourceNode();
-	GRIIODeviceSource* src() const;
+	GRIIODeviceSource *src() const;
 	GRTopBlockNode *top() const;
 
 private:
-	GRTopBlockNode* m_top;
-	GRIIODeviceSource* m_src;
+	GRTopBlockNode *m_top;
+	GRIIODeviceSource *m_src;
 };
 
 class SCOPY_ADC_EXPORT GRIIOFloatChannelNode : public AcqTreeNode
 {
 public:
-	GRIIOFloatChannelNode(GRTopBlockNode* top, GRIIOFloatChannelSrc *c, QObject *parent = nullptr);
+	GRIIOFloatChannelNode(GRTopBlockNode *top, GRIIOFloatChannelSrc *c, QObject *parent = nullptr);
 	~GRIIOFloatChannelNode();
 	GRIIOFloatChannelSrc *src() const;
 
 	GRTopBlockNode *top() const;
 
 private:
-	GRTopBlockNode* m_top;
+	GRTopBlockNode *m_top;
 	GRIIOFloatChannelSrc *m_src;
 };
 /*

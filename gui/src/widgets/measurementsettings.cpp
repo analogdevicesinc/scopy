@@ -144,14 +144,8 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 
 MeasurementSettings::~MeasurementSettings() {}
 
-bool MeasurementSettings::measurementEnabled()
-{
-	return measurePanelSwitch->onOffswitch()->isChecked();
-}
+bool MeasurementSettings::measurementEnabled() { return measurePanelSwitch->onOffswitch()->isChecked(); }
 
-bool MeasurementSettings::statsEnabled()
-{
-	return statsPanelSwitch->onOffswitch()->isChecked();
-}
+bool MeasurementSettings::statsEnabled() { return statsPanelSwitch->onOffswitch()->isChecked(); }
 
 #include "moc_measurementsettings.cpp"

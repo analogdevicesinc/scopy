@@ -29,7 +29,7 @@ Q_SIGNALS:
 public Q_SLOTS:
 	void start();
 	void stop();
-	void autoscale();	
+	void autoscale();
 	void setXAxisMode(bool newXAxis);
 	void setTolerance(double newTolerance);
 	void addChannels(PlotChannel *);

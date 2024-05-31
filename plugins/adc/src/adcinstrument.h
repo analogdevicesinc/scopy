@@ -51,7 +51,6 @@ public Q_SLOTS:
 	void addDevice(CollapsableMenuControlButton *b, ToolComponent *dev);
 	void addChannel(MenuControlButton *btn, ToolComponent *ch, CompositeWidget *c);
 
-
 Q_SIGNALS:
 	void setSingleShot(bool);
 	void requestStop();

@@ -22,14 +22,12 @@ public:
 	MenuControlButton *ctrl();
 
 private:
-
 	TimePlotComponent *m_plot;
 	CursorController *cursorController;
 	MenuControlButton *cursor;
 
 	void setupCursorButtonHelper(MenuControlButton *cursor);
-
 };
-}
-}
+} // namespace adc
+} // namespace scopy
 #endif // CURSORCOMPONENT_H
