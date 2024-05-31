@@ -48,10 +48,7 @@ MenuCollapseHeader::MenuCollapseHeader(QString title, MenuCollapseSection::MenuH
 
 MenuCollapseHeader::~MenuCollapseHeader() {}
 
-QLabel *MenuCollapseHeader::label()
-{
-	return m_label;
-}
+QLabel *MenuCollapseHeader::label() { return m_label; }
 
 MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style,
 					 QWidget *parent)
@@ -81,10 +78,7 @@ QAbstractButton *MenuCollapseSection::header() { return m_header; }
 
 QVBoxLayout *MenuCollapseSection::contentLayout() const { return m_contLayout; }
 
-QString MenuCollapseSection::title()
-{
-	return m_title;
-}
+QString MenuCollapseSection::title() { return m_title; }
 
 void MenuCollapseSection::setTitle(QString s)
 {

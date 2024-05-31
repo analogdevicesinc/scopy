@@ -11,7 +11,6 @@
 #include <QLineEdit>
 #include <timeplotcomponentsettings.h>
 
-
 using namespace scopy;
 using namespace scopy::adc;
 using namespace scopy::gui;
@@ -39,7 +38,6 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 	/*m_timeInfo = new PlotInfo(m_timePlot, this);
 	m_timePlot->addPlotInfoSlot(m_timeInfo);*/
 
-
 	m_xyPlot = new PlotWidget(this);
 	m_xyPlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_xyPlot->xAxis()->setInterval(-2048, 2048);
@@ -64,7 +62,11 @@ TimePlotComponent::~TimePlotComponent() {}
 PlotWidget *TimePlotComponent::timePlot() { return m_timePlot; }
 PlotWidget *TimePlotComponent::xyPlot() { return m_xyPlot; }
 
-void TimePlotComponent::replot() { m_timePlot->replot();  m_xyPlot->replot(); }
+void TimePlotComponent::replot()
+{
+	m_timePlot->replot();
+	m_xyPlot->replot();
+}
 
 void TimePlotComponent::showPlotLabels(bool b)
 {
@@ -92,43 +94,28 @@ void TimePlotComponent::showXSourceOnXy(bool b)
 	m_XYXChannel->plotChannelCmpt()->m_xyPlotCh->setEnabled(b);
 }
 
-void TimePlotComponent::setName(QString s)
-{
-	m_name = s;
-}
+void TimePlotComponent::setName(QString s) { m_name = s; }
 
+ChannelComponent *TimePlotComponent::XYXChannel() { return m_XYXChannel; }
 
-ChannelComponent *TimePlotComponent::XYXChannel()
-{
-	return m_XYXChannel;
-}
+void TimePlotComponent::onStart() { MetaComponent::onStart(); }
 
-void TimePlotComponent::onStart() {
-	MetaComponent::onStart();
-}
+void TimePlotComponent::onStop() { MetaComponent::onStop(); }
 
-void TimePlotComponent::onStop() {
-	MetaComponent::onStop();
-}
-
-
-void TimePlotComponent::onInit() {
-
-}
+void TimePlotComponent::onInit() {}
 
 void TimePlotComponent::onDeinit() {}
 
-void TimePlotComponent::setXYXChannel(ChannelComponent *c) {
+void TimePlotComponent::setXYXChannel(ChannelComponent *c)
+{
 	disconnect(xyDataConn);
 	if(m_XYXChannel) {
 		m_XYXChannel->plotChannelCmpt()->m_xyPlotCh->setEnabled(true);
 	}
 	m_XYXChannel = c;
 	if(c) {
-		xyDataConn =  connect(c->chData(),
-				     &ChannelData::newData,
-				     this,
-				     [=](const float* xData_, const float* yData_, size_t size, bool copy){
+		xyDataConn = connect(c->chData(), &ChannelData::newData, this,
+				     [=](const float *xData_, const float *yData_, size_t size, bool copy) {
 					     xyXData = yData_;
 					     for(TimePlotComponentChannel *ch : qAsConst(m_channels)) {
 						     ch->setXyXData(xyXData);
@@ -149,8 +136,8 @@ void TimePlotComponent::addChannel(ChannelComponent *c)
 
 void TimePlotComponent::removeChannel(ChannelComponent *c)
 {
-	TimePlotComponentChannel* toRemove;
-	for(TimePlotComponentChannel* ch : qAsConst(m_channels)) {
+	TimePlotComponentChannel *toRemove;
+	for(TimePlotComponentChannel *ch : qAsConst(m_channels)) {
 		if(ch->m_ch == c) {
 			toRemove = ch;
 			break;
@@ -161,32 +148,17 @@ void TimePlotComponent::removeChannel(ChannelComponent *c)
 	if(m_XYXChannel == c) {
 		if(m_channels.size() > 0) {
 			setXYXChannel(m_channels[0]->m_ch);
-		}
-		else {
+		} else {
 			setXYXChannel(nullptr);
 		}
 	}
 	m_plotMenu->removeChannel(c);
 }
 
-bool TimePlotComponent::singleYMode() const
-{
-	return m_singleYMode;
-}
+bool TimePlotComponent::singleYMode() const { return m_singleYMode; }
 
+TimePlotComponentSettings *TimePlotComponent::createPlotMenu(QWidget *parent) { return m_plotMenu; }
 
-TimePlotComponentSettings *TimePlotComponent::createPlotMenu(QWidget *parent) {
+TimePlotComponentSettings *TimePlotComponent::plotMenu() { return m_plotMenu; }
 
-	return m_plotMenu;
-}
-
-TimePlotComponentSettings *TimePlotComponent::plotMenu() {
-	return m_plotMenu;
-}
-
-uint32_t TimePlotComponent::uuid()
-{
-	return m_uuid;
-}
-
-
+uint32_t TimePlotComponent::uuid() { return m_uuid; }

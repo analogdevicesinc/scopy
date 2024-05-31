@@ -41,7 +41,7 @@ public:
 	void clearMarkers();
 	void removeMarker(QwtPlotMarker *m);
 	void addMarker(QwtPlotMarker *m);
-	void setSamples(const float* xData, const float* yData, size_t size, bool copy = true);
+	void setSamples(const float *xData, const float *yData, size_t size, bool copy = true);
 
 	QString name() const;
 

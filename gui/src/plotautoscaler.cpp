@@ -25,20 +25,17 @@ PlotAutoscaler::PlotAutoscaler(QObject *parent)
 
 PlotAutoscaler::~PlotAutoscaler() {}
 
-void PlotAutoscaler::start() {
-	m_autoScaleTimer->start();
-}
+void PlotAutoscaler::start() { m_autoScaleTimer->start(); }
 
-void PlotAutoscaler::stop() {
-	m_autoScaleTimer->stop();
-}
+void PlotAutoscaler::stop() { m_autoScaleTimer->stop(); }
 
-void PlotAutoscaler::onNewData(const float *xData, const float *yData, size_t size, bool copy) {
+void PlotAutoscaler::onNewData(const float *xData, const float *yData, size_t size, bool copy)
+{
 	// this is a little wonky but should work
 	if(!m_autoScaleTimer->isActive())
 		return;
 
-	for(int i = 0; i < size ; i++) {
+	for(int i = 0; i < size; i++) {
 		qreal sample;
 		if(m_xAxisMode) {
 			sample = xData[i];
@@ -89,22 +86,21 @@ void PlotAutoscaler::autoscale()
 	m_min = 1000000.0;
 }
 
-void PlotAutoscaler::addChannels(PlotChannel *c) {
+void PlotAutoscaler::addChannels(PlotChannel *c)
+{
 	m_channels.append(c);
 	connect(c, &PlotChannel::newData, this, &PlotAutoscaler::onNewData);
 }
 
-void PlotAutoscaler::removeChannels(PlotChannel *c) {
+void PlotAutoscaler::removeChannels(PlotChannel *c)
+{
 	m_channels.removeAll(c);
 	disconnect(c, &PlotChannel::newData, this, &PlotAutoscaler::onNewData);
 }
 
 double PlotAutoscaler::tolerance() const { return m_tolerance; }
 
-int PlotAutoscaler::timeout() const
-{
-	return m_timeout;
-}
+int PlotAutoscaler::timeout() const { return m_timeout; }
 
 void PlotAutoscaler::setTolerance(double newTolerance)
 {

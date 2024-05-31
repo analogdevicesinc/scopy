@@ -87,7 +87,6 @@ private:
 	bool m_complexFft;
 	uint64_t m_lastUpdateReadItems;
 
-
 	void generate_time_axis();
 };
 

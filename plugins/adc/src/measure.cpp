@@ -1311,6 +1311,6 @@ double Statistic::min() const { return m_min; }
 double Statistic::max() const { return m_max; }
 
 double Statistic::numPushedData() const { return m_dataCount; }
-} // namespace scopy::grutil
+} // namespace scopy::adc
 
 #include "moc_measure.cpp"

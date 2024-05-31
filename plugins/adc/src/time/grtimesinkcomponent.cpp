@@ -2,7 +2,7 @@
 #include <gr-util/grsignalpath.h>
 #include <QLoggingCategory>
 
-Q_LOGGING_CATEGORY(CAT_GRTIMESINKCOMPONENT,"GRTimeSinkComponent")
+Q_LOGGING_CATEGORY(CAT_GRTIMESINKCOMPONENT, "GRTimeSinkComponent")
 using namespace scopy::adc;
 using namespace scopy::grutil;
 
@@ -19,16 +19,13 @@ GRTimeSinkComponent::GRTimeSinkComponent(QString name, GRTopBlockNode *t, QObjec
 	m_syncMode = false;
 }
 
-GRTimeSinkComponent::~GRTimeSinkComponent()
-{
-
-}
+GRTimeSinkComponent::~GRTimeSinkComponent() {}
 
 void GRTimeSinkComponent::connectSignalPaths()
 {
 	QList<GRSignalPath *> sigpaths;
 
-       // for through grdevices - get sampleRate;
+	// for through grdevices - get sampleRate;
 	std::unique_lock lock(refillMutex);
 	for(auto &sigpath : m_top->signalPaths()) {
 		qDebug(CAT_GRTIMESINKCOMPONENT) << "Trying " << sigpath->name();
@@ -48,7 +45,6 @@ void GRTimeSinkComponent::connectSignalPaths()
 	int index = 0;
 	time_channel_map.clear();
 
-
 	for(GRChannel *gr : m_channels) {
 		GRSignalPath *sigPath = gr->sigpath();
 		if(sigPath->enabled()) {
@@ -59,13 +55,13 @@ void GRTimeSinkComponent::connectSignalPaths()
 
 			index++;
 		}
-	}	
+	}
 }
 
 void GRTimeSinkComponent::tearDownSignalPaths()
 {
 	setData(true);
-	qInfo()<<"TEARING DOWN";
+	qInfo() << "TEARING DOWN";
 }
 
 size_t GRTimeSinkComponent::updateData()
@@ -77,9 +73,7 @@ size_t GRTimeSinkComponent::updateData()
 	return new_samples;
 }
 
-bool GRTimeSinkComponent::finished() {
-	return time_sink->finishedAcquisition();
-}
+bool GRTimeSinkComponent::finished() { return time_sink->finishedAcquisition(); }
 
 void GRTimeSinkComponent::setData(bool copy)
 {
@@ -105,7 +99,7 @@ void GRTimeSinkComponent::setRollingMode(bool b)
 		time_sink->setRollingMode(b);
 		Q_EMIT requestRebuild();
 		// updateXAxis();
-	}	
+	}
 }
 
 void GRTimeSinkComponent::setSampleRate(double val)
@@ -134,7 +128,8 @@ void GRTimeSinkComponent::setSingleShot(bool b)
 	}
 }
 
-void GRTimeSinkComponent::onStart() {
+void GRTimeSinkComponent::onStart()
+{
 
 	connect(this, &GRTimeSinkComponent::requestRebuild, m_top, &GRTopBlock::rebuild, Qt::QueuedConnection);
 	connect(m_top, SIGNAL(builtSignalPaths()), this, SLOT(connectSignalPaths()));
@@ -146,7 +141,8 @@ void GRTimeSinkComponent::onStart() {
 	}
 }
 
-void GRTimeSinkComponent::onStop() {
+void GRTimeSinkComponent::onStop()
+{
 	if(!m_syncMode) {
 		m_top->stop();
 		m_top->teardown();
@@ -155,7 +151,6 @@ void GRTimeSinkComponent::onStop() {
 	disconnect(this, &GRTimeSinkComponent::requestRebuild, m_top, &GRTopBlock::rebuild);
 	disconnect(m_top, SIGNAL(builtSignalPaths()), this, SLOT(connectSignalPaths()));
 	disconnect(m_top, SIGNAL(teardownSignalPaths()), this, SLOT(tearDownSignalPaths()));
-
 }
 
 void GRTimeSinkComponent::onInit()
@@ -172,10 +167,6 @@ void GRTimeSinkComponent::onDeinit()
 	onStop();
 }
 
-void GRTimeSinkComponent::addChannel(GRChannel *ch) {
-	m_channels.append(ch);
-}
+void GRTimeSinkComponent::addChannel(GRChannel *ch) { m_channels.append(ch); }
 
-void GRTimeSinkComponent::removeChannel(GRChannel *ch) {
-	m_channels.removeAll(ch);
-}
+void GRTimeSinkComponent::removeChannel(GRChannel *ch) { m_channels.removeAll(ch); }

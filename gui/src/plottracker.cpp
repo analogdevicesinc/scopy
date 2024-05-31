@@ -48,7 +48,6 @@ void PlotTracker::removeChannel(PlotChannel *ch)
 			toRemove = chTracker;
 			break;
 		}
-
 	}
 	m_trackers->remove(toRemove);
 	delete toRemove;

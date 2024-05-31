@@ -13,7 +13,8 @@ ADCInstrument::ADCInstrument(PlotProxy *proxy, QWidget *parent)
 	init();
 }
 
-ADCInstrument::~ADCInstrument() {
+ADCInstrument::~ADCInstrument()
+{
 	stop();
 	deinit();
 }
@@ -76,7 +77,6 @@ void ADCInstrument::setupToolLayout()
 	setupChannelsButtonHelper(channelsBtn);
 	setupRunSingleButtonHelper();
 
-
 	channelGroup = new QButtonGroup(this);
 
 	m_vcm->add(new QLabel("test"));
@@ -86,7 +86,6 @@ void ADCInstrument::setupToolLayout()
 			tool->requestMenu(settingsMenuId);
 	});
 }
-
 
 void ADCInstrument::setupRunSingleButtonHelper()
 {
@@ -134,14 +133,14 @@ void ADCInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *de
 {
 	auto devBtn = b;
 	m_vcm->add(b);
-	QWidget *dev_widget = dynamic_cast<QWidget*>(dev);
+	QWidget *dev_widget = dynamic_cast<QWidget *>(dev);
 	Q_ASSERT(dev_widget);
 
 	channelGroup->addButton(b->getControlBtn());
 	QString id = dev->name() + QString::number(uuid++);
 	rightStack->add(id, dev_widget);
 
-	connect(b->getControlBtn(), &QPushButton::clicked/* Or ::toggled*/ , this, [=](bool b) {
+	connect(b->getControlBtn(), &QPushButton::clicked /* Or ::toggled*/, this, [=](bool b) {
 		if(b) {
 			tool->requestMenu(channelsMenuId);
 			rightStack->show(id);
@@ -157,7 +156,7 @@ void ADCInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, Compos
 	channelGroup->addButton(btn);
 
 	QString id = ch->name() + QString::number(uuid++);
-	QWidget *ch_widget = dynamic_cast<QWidget*>(ch);
+	QWidget *ch_widget = dynamic_cast<QWidget *>(ch);
 	Q_ASSERT(ch_widget);
 
 	rightStack->add(id, ch_widget);
@@ -182,15 +181,9 @@ void ADCInstrument::init() { proxy->init(); }
 
 void ADCInstrument::deinit() { proxy->deinit(); }
 
-MenuControlButton *ADCInstrument::getTimeBtn() const
-{
-	return timeBtn;
-}
+MenuControlButton *ADCInstrument::getTimeBtn() const { return timeBtn; }
 
-VerticalChannelManager *ADCInstrument::vcm() const
-{
-	return m_vcm;
-}
+VerticalChannelManager *ADCInstrument::vcm() const { return m_vcm; }
 
 void ADCInstrument::restart()
 {

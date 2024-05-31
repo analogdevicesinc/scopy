@@ -8,7 +8,8 @@
 using namespace scopy;
 using namespace scopy::adc;
 
-TimePlotComponentChannel::TimePlotComponentChannel(ChannelComponent *ch, TimePlotComponent *plotComponent, QObject *parent)
+TimePlotComponentChannel::TimePlotComponentChannel(ChannelComponent *ch, TimePlotComponent *plotComponent,
+						   QObject *parent)
 	: QObject(parent)
 	, m_enabled(true)
 {
@@ -20,12 +21,12 @@ TimePlotComponentChannel::TimePlotComponentChannel(ChannelComponent *ch, TimePlo
 
 	m_timePlotYAxis->setUnits("V");
 	m_timePlotCh->xAxis()->setUnits("s");
-	m_timePlotYAxis->setInterval(-2048,2048);
-	m_xyPlotYAxis->setInterval(-2048,2048);
-
+	m_timePlotYAxis->setInterval(-2048, 2048);
+	m_xyPlotYAxis->setInterval(-2048, 2048);
 }
 
-void TimePlotComponentChannel::deinitPlotComponent() {
+void TimePlotComponentChannel::deinitPlotComponent()
+{
 	if(m_plotComponent == nullptr)
 		return;
 
@@ -41,10 +42,10 @@ void TimePlotComponentChannel::deinitPlotComponent() {
 	delete m_timePlotAxisHandle;
 	delete m_xyPlotYAxis;
 	delete m_xyPlotCh;
-
 }
 
-void TimePlotComponentChannel::initPlotComponent(TimePlotComponent *plotComponent) {
+void TimePlotComponentChannel::initPlotComponent(TimePlotComponent *plotComponent)
+{
 
 	auto timeplot = plotComponent->timePlot();
 	auto xyplot = plotComponent->xyPlot();
@@ -83,32 +84,30 @@ void TimePlotComponentChannel::initPlotComponent(TimePlotComponent *plotComponen
 	m_xyPlotCh->setEnabled(true);
 
 	setSingleYMode(m_plotComponent->singleYMode());
-	m_timePlotYAxis->setInterval(-2048,2048);
-	m_xyPlotYAxis->setInterval(-2048,2048);
+	m_timePlotYAxis->setInterval(-2048, 2048);
+	m_xyPlotYAxis->setInterval(-2048, 2048);
 }
 
-TimePlotComponentChannel::~TimePlotComponentChannel() {
+TimePlotComponentChannel::~TimePlotComponentChannel() {}
 
-}
-
-
-void TimePlotComponentChannel::refreshData(bool copy) {
+void TimePlotComponentChannel::refreshData(bool copy)
+{
 	auto data = m_ch->chData();
-	m_timePlotCh->setSamples(data->xData(), data->yData(),data->size(), copy);
+	m_timePlotCh->setSamples(data->xData(), data->yData(), data->size(), copy);
 	if(m_xyXData) {
-		m_xyPlotCh->setSamples(m_xyXData,data->yData(),data->size(), copy);
+		m_xyPlotCh->setSamples(m_xyXData, data->yData(), data->size(), copy);
 	}
 }
 
-void TimePlotComponentChannel::onNewData(const float *xData_, const float *yData_, size_t size, bool copy) {
+void TimePlotComponentChannel::onNewData(const float *xData_, const float *yData_, size_t size, bool copy)
+{
 	refreshData(copy);
 }
 
-void TimePlotComponentChannel::setXyXData(const float *xyxdata) {
-	m_xyXData = xyxdata;
-}
+void TimePlotComponentChannel::setXyXData(const float *xyxdata) { m_xyXData = xyxdata; }
 
-void TimePlotComponentChannel::setSingleYMode(bool b) {
+void TimePlotComponentChannel::setSingleYMode(bool b)
+{
 	m_singleYMode = b;
 	if(m_singleYMode) {
 		QwtAxisId id = m_plotComponent->timePlot()->yAxis()->axisId();
@@ -122,7 +121,8 @@ void TimePlotComponentChannel::setSingleYMode(bool b) {
 	m_timePlotAxisHandle->setVisible(!b);
 }
 
-QWidget *TimePlotComponentChannel::createCurveMenu(QWidget *parent) {
+QWidget *TimePlotComponentChannel::createCurveMenu(QWidget *parent)
+{
 
 	MenuSectionWidget *curvecontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *curve = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, curvecontainer);
@@ -136,7 +136,8 @@ QWidget *TimePlotComponentChannel::createCurveMenu(QWidget *parent) {
 	return curvecontainer;
 }
 
-void TimePlotComponentChannel::enable() {
+void TimePlotComponentChannel::enable()
+{
 	m_timePlotCh->enable();
 	m_xyPlotCh->enable();
 	if(m_timePlotAxisHandle) {
@@ -146,7 +147,8 @@ void TimePlotComponentChannel::enable() {
 	m_enabled = true;
 }
 
-void TimePlotComponentChannel::disable() {
+void TimePlotComponentChannel::disable()
+{
 	m_timePlotCh->disable();
 	m_xyPlotCh->disable();
 	if(m_timePlotAxisHandle) {
@@ -154,4 +156,3 @@ void TimePlotComponentChannel::disable() {
 	}
 	m_enabled = false;
 }
-

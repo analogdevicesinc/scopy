@@ -5,7 +5,6 @@
 #include <toolcomponent.h>
 #include "scopy-adc_export.h"
 
-
 namespace scopy {
 namespace adc {
 
@@ -23,22 +22,23 @@ public Q_SLOTS:
 	void onDeinit() override;
 	void onStart() override;
 	void onStop() override;
-private:
 
+private:
 	PlotAutoscaler *m_autoscaler;
 	TimePlotComponent *m_plotComponent;
 	MenuCombo *m_xAxisSrc;
 	MenuOnOffSwitch *m_xAxisShow;
 	MenuOnOffSwitch *m_autoscaleBtn;
-	QList<ChannelComponent*> m_channels;
+	QList<ChannelComponent *> m_channels;
 
 	bool m_autoscaleEnabled;
 	bool m_running;
+
 private:
 	void toggleAutoScale();
 };
 
-}
-}
+} // namespace adc
+} // namespace scopy
 
 #endif // TIMEPLOTCOMPONENTSETTINGS_H
