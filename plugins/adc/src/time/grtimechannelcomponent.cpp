@@ -104,14 +104,15 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 QWidget *GRTimeChannelComponent::createCurveMenu(QWidget *parent)
 {
 	MenuSectionWidget *curvecontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *curve = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, curvecontainer);
+	m_curveSection = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, curvecontainer);
+	m_curveSection->contentLayout()->setSpacing(10);
 
-	MenuPlotChannelCurveStyleControl *curvemenu = new MenuPlotChannelCurveStyleControl(curve);
+	MenuPlotChannelCurveStyleControl *curvemenu = new MenuPlotChannelCurveStyleControl(m_curveSection);
 	curvemenu->addChannels(m_plotChannelCmpt->m_timePlotCh);
 	curvemenu->addChannels(m_plotChannelCmpt->m_xyPlotCh);
 
-	curvecontainer->contentLayout()->addWidget(curve);
-	curve->contentLayout()->addWidget(curvemenu);
+	curvecontainer->contentLayout()->addWidget(m_curveSection);
+	m_curveSection->contentLayout()->addWidget(curvemenu);
 	return curvecontainer;
 }
 
@@ -144,11 +145,12 @@ QWidget *GRTimeChannelComponent::createMenu(QWidget *parent)
 
 	QScrollArea *scroll = new QScrollArea(parent);
 	QWidget *wScroll = new QWidget(scroll);
-	QVBoxLayout *layScroll = new QVBoxLayout();
-	layScroll->setMargin(0);
-	layScroll->setSpacing(10);
 
-	wScroll->setLayout(layScroll);
+	m_layScroll = new QVBoxLayout();
+	m_layScroll->setMargin(0);
+	m_layScroll->setSpacing(10);
+
+	wScroll->setLayout(m_layScroll);
 	scroll->setWidgetResizable(true);
 	scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -170,13 +172,13 @@ QWidget *GRTimeChannelComponent::createMenu(QWidget *parent)
 
 	lay->addWidget(header);
 	lay->addWidget(scroll);
-	layScroll->addWidget(yaxismenu);
-	layScroll->addWidget(curvemenu);
-	layScroll->addWidget(attrmenu);
-	layScroll->addWidget(measuremenu);
+	m_layScroll->addWidget(yaxismenu);
+	m_layScroll->addWidget(curvemenu);
+	m_layScroll->addWidget(attrmenu);
+	m_layScroll->addWidget(measuremenu);
 	// layScroll->addWidget(m_snapBtn);
 
-	layScroll->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	m_layScroll->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 	return w;
 }
 
@@ -288,6 +290,16 @@ void GRTimeChannelComponent::setSingleYMode(bool b)
 MeasureManagerInterface *GRTimeChannelComponent::getMeasureManager() { return m_measureMgr; }
 
 GRSignalPath *GRTimeChannelComponent::sigpath() { return m_grtch->m_signalPath; }
+
+void GRTimeChannelComponent::insertPlotComboWidget(QWidget *w)
+{
+	m_curveSection->contentLayout()->addWidget(w);
+}
+
+QVBoxLayout *GRTimeChannelComponent::menuLayout()
+{
+	return m_layScroll;
+}
 
 void GRTimeChannelComponent::enable()
 {

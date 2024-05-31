@@ -14,7 +14,11 @@ PlotChannel::PlotChannel(QString name, QPen pen, PlotAxis *xAxis, PlotAxis *yAxi
 	, m_name(name)
 
 {
-	m_curve = new QwtPlotCurve(name);
+
+}
+
+void PlotChannel::init() {
+	m_curve = new QwtPlotCurve(m_name);
 	m_curve->setAxes(m_xAxis->axisId(), m_yAxis->axisId());
 	m_curve->setStyle(QwtPlotCurve::Lines);
 	m_curve->setPen(m_pen);
@@ -27,7 +31,12 @@ PlotChannel::PlotChannel(QString name, QPen pen, PlotAxis *xAxis, PlotAxis *yAxi
 	// curvefitter (?)
 }
 
-PlotChannel::~PlotChannel() {}
+void PlotChannel::deinit() {
+	delete m_curve;
+}
+
+PlotChannel::~PlotChannel() {
+}
 
 QwtPlotCurve *PlotChannel::curve() const { return m_curve; }
 

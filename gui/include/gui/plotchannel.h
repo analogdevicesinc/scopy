@@ -45,6 +45,8 @@ public:
 
 	QString name() const;
 
+	void init();
+	void deinit();
 public Q_SLOTS:
 	void raise();
 	void attach();

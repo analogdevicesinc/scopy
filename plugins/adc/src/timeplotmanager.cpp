@@ -1,6 +1,7 @@
 #include <timeplotmanager.h>
 #include <timeplotcomponentchannel.h>
 #include <plotaxis.h>
+#include <timeplotmanagercombobox.h>
 
 using namespace scopy;
 using namespace scopy::adc;
@@ -55,13 +56,21 @@ MeasurementsPanel *TimePlotManager::measurePanel() const { return m_measurePanel
 
 StatsPanel *TimePlotManager::statsPanel() const { return m_statsPanel; }
 
+QWidget *TimePlotManager::plotCombo(ChannelComponent *c)
+{
+	return m_channelPlotcomboMap[c];
+}
+
 uint32_t TimePlotManager::addPlot(QString name)
 {
 	TimePlotComponent *plt = new TimePlotComponent(name, m_plotIdx, this);
 	m_plotIdx++;
 	m_plots.append(plt);
 	addComponent(plt);
-	m_lay->insertWidget(1, plt);
+	m_lay->insertWidget(-1, plt);
+	for(TimePlotManagerCombobox *p : m_channelPlotcomboMap.values()) {
+		p->addPlot(plt);
+	}
 	return plt->uuid();
 }
 
@@ -71,6 +80,10 @@ void TimePlotManager::removePlot(uint32_t uuid)
 	m_plots.removeAll(plt);
 	removeComponent(plt);
 	m_lay->removeWidget(plt);
+
+	for(TimePlotManagerCombobox *p : m_channelPlotcomboMap.values()) {
+		p->removePlot(plt);
+	}
 }
 
 void TimePlotManager::addChannel(ChannelComponent *c, uint32_t uuid)
@@ -78,12 +91,15 @@ void TimePlotManager::addChannel(ChannelComponent *c, uint32_t uuid)
 	m_channels.append(c->plotChannelCmpt());
 	TimePlotComponent *plt = plot(uuid);
 	plt->addChannel(c);
+	m_channelPlotcomboMap.insert(c, new TimePlotManagerCombobox(this, c));
+
 }
 
 void TimePlotManager::removeChannel(ChannelComponent *c)
 {
 	c->plotChannelCmpt()->m_plotComponent->removeChannel(c);
 	m_channels.removeAll(c->plotChannelCmpt());
+	m_channelPlotcomboMap.remove(c);
 }
 
 void TimePlotManager::moveChannel(ChannelComponent *c, uint32_t uuid)
@@ -92,6 +108,7 @@ void TimePlotManager::moveChannel(ChannelComponent *c, uint32_t uuid)
 	TimePlotComponent *plt = plot(uuid);
 	c->plotChannelCmpt()->initPlotComponent(plt);
 	plt->addChannel(c);
+	plt->replot();
 }
 
 TimePlotComponent *TimePlotManager::plot(uint32_t uuid)

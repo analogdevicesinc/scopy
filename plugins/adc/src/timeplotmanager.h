@@ -8,6 +8,8 @@
 
 namespace scopy {
 namespace adc {
+
+class TimePlotManagerCombobox;
 class SCOPY_ADC_EXPORT TimePlotManager : public QWidget, public MeasurementPanelInterface, public MetaComponent
 {
 	Q_OBJECT
@@ -30,6 +32,7 @@ public:
 	StatsPanel *statsPanel() const override;
 
 	QWidget *createMenu(QWidget *parent);
+	QWidget* plotCombo(ChannelComponent *c);
 
 public Q_SLOTS:
 	void replot();
@@ -46,6 +49,7 @@ private:
 	QList<TimePlotComponentChannel *> m_channels;
 	MeasurementsPanel *m_measurePanel;
 	StatsPanel *m_statsPanel;
+	QMap<ChannelComponent*, TimePlotManagerCombobox*> m_channelPlotcomboMap;
 	// PlotSettings *m_plotSettings;
 };
 } // namespace adc

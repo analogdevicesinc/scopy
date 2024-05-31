@@ -46,6 +46,8 @@ public Q_SLOTS:
 
 	ChannelComponent *XYXChannel();
 	void setXYXChannel(ChannelComponent *c);
+Q_SIGNALS:
+	void nameChanged(QString);
 
 public:
 	void onStart();

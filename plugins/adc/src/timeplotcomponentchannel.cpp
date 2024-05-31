@@ -86,6 +86,7 @@ void TimePlotComponentChannel::initPlotComponent(TimePlotComponent *plotComponen
 	setSingleYMode(m_plotComponent->singleYMode());
 	m_timePlotYAxis->setInterval(-2048, 2048);
 	m_xyPlotYAxis->setInterval(-2048, 2048);
+	refreshData(true);
 }
 
 TimePlotComponentChannel::~TimePlotComponentChannel() {}
