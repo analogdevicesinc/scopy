@@ -18,12 +18,14 @@ using namespace scopy;
 using namespace scopy::grutil;
 using namespace scopy::adc;
 
-GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, TimePlotComponent *m_plot, QPen pen, QWidget *parent)
+GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, TimePlotComponent *m_plot, GRTimeSinkComponent *grtsc, QPen pen, QWidget *parent)
 	: ChannelComponent(node->name(), m_plot, pen, parent)
 
 {
 	m_node = node;
 	m_src = node->src();
+
+	m_grtch = new GRTimeChannelSigpath(grtsc->name(),this,node,this);
 
 	int yPlotAxisPosition = Preferences::get("adc_plot_yaxis_label_position").toInt();
 	int yPlotAxisHandle = Preferences::get("adc_plot_yaxis_handle_position").toInt();
@@ -35,7 +37,6 @@ GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, Time
 	m_unit = "Volts";	 // query from GRIIOFloatChannel;
 
 	m_channelName = node->name();
-
 
 	m_measureMgr = new TimeMeasureManager(this);
 	m_measureMgr->initMeasure(m_pen);
@@ -267,8 +268,8 @@ void GRTimeChannelComponent::setYMode(YMode mode)
 
 	m_yCtrl->setMin(ymin);
 	m_yCtrl->setMax(ymax);
-	/*m_scOff->setScale(scale);
-	m_scOff->setOffset(offset);*/
+	m_grtch->m_scOff->setScale(scale);
+	m_grtch->m_scOff->setOffset(offset);
 }
 
 void GRTimeChannelComponent::setSingleYMode(bool b)
@@ -286,19 +287,22 @@ void GRTimeChannelComponent::setSingleYMode(bool b)
 
 MeasureManagerInterface *GRTimeChannelComponent::getMeasureManager() { return m_measureMgr; }
 
+GRSignalPath *GRTimeChannelComponent::sigpath()
+{
+	return m_grtch->m_signalPath;
+}
+
 void GRTimeChannelComponent::enable()
 {
-	m_ctrl->setVisible(true);
-	if(m_enabled) {
-		enableChannel();
-	}
+	m_grtch->m_signalPath->setEnabled(true);
+	m_plotChannelCmpt->enable();
 	ChannelComponent::enable();
 }
 
 void GRTimeChannelComponent::disable()
 {
-	m_ctrl->setVisible(false);
-	disableChannel();
+	m_grtch->m_signalPath->setEnabled(false);
+	m_plotChannelCmpt->disable();
 	ChannelComponent::disable();
 }
 
@@ -310,8 +314,8 @@ MenuControlButton *GRTimeChannelComponent::ctrl()
 void GRTimeChannelComponent::onInit()
 {
 	// Defaults
-	/*m_yCtrl->setMin(-1.0);
-	m_yCtrl->setMax(1.0);*/
+	m_yCtrl->setMin(-1.0);
+	m_yCtrl->setMax(1.0);
 	auto v = Preferences::get("adc_default_y_mode").toInt();
 	m_ymodeCb->combo()->setCurrentIndex(v);
 	setYMode(static_cast<YMode>(v));
@@ -319,8 +323,9 @@ void GRTimeChannelComponent::onInit()
 
 void GRTimeChannelComponent::onDeinit() {}
 
-void GRTimeChannelComponent::onNewData(const float *xData, const float *yData, int size)
+void GRTimeChannelComponent::onNewData(const float *xData, const float *yData, size_t size, bool copy)
 {
+	m_grtch->onNewData(xData,yData,size,copy);
 	auto model = m_measureMgr->getModel();
 	model->setDataSource(yData, size);
 	model->measure();
@@ -346,9 +351,9 @@ void GRTimeChannelComponent::setupChannelMenuControlButtonHelper(MenuControlButt
 
 	connect(btn->checkBox(), &QCheckBox::toggled, this, [=](bool b) {
 		if(b)
-			enableChannel();
+			enable();
 		else
-			disableChannel();
+			disable();
 	});
 	btn->checkBox()->setChecked(true);
 }

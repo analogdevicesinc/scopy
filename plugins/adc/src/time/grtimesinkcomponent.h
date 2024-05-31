@@ -9,39 +9,6 @@
 namespace scopy {
 namespace adc {
 
-
-class GRTimeSinkAcquisitionSignalPath : QObject {
-public:
-	GRTimeSinkAcquisitionSignalPath(QString m_name, ChannelComponent *ch, GRIIOFloatChannelNode *node, QObject *parent)  : QObject(parent) {
-		m_ch = ch;
-		m_node = node;
-		m_grch = node->src();
-		m_signalPath = new GRSignalPath(m_name	+ m_grch->getDeviceSrc()->deviceName()
-							+ m_grch->getChannelName(), this);
-		m_signalPath->append(m_grch);
-		m_scOff = new GRScaleOffsetProc(m_signalPath);
-		m_signalPath->append(m_scOff);
-		m_scOff->setOffset(0);
-		m_scOff->setScale(1);
-		m_signalPath->setEnabled(true); // or false
-		m_node->top()->src()->registerSignalPath(m_signalPath);
-	}
-	~GRTimeSinkAcquisitionSignalPath() {
-
-	}
-
-	void onNewData(const float *xData, const float *yData, size_t size, bool copy) {
-		m_ch->chData()->onNewData(xData, yData, size, copy);
-	}
-
-	ChannelComponent *m_ch;
-	GRIIOFloatChannelNode *m_node;
-	GRSignalPath *m_signalPath;
-	GRScaleOffsetProc *m_scOff;
-	GRIIOFloatChannelSrc *m_grch;
-
-};
-
 class GRTimeSinkComponent : public QObject,
 			    public ToolComponent,
 			    public DataProvider
@@ -60,7 +27,7 @@ public Q_SLOTS:
 
 	virtual size_t updateData() override;
 	virtual void setSingleShot(bool) override;
-	virtual void setData(bool raw = false) override;
+	virtual void setData(bool copy = false) override;
 	virtual void setRollingMode(bool b);
 	virtual void setSampleRate(double);
 	virtual void setBufferSize(uint32_t size);
@@ -70,8 +37,8 @@ public Q_SLOTS:
 	virtual void onInit() override;
 	virtual void onDeinit() override;
 
-	void addChannel(ChannelComponent* ch, GRIIOFloatChannelNode *node);
-	void removeChannel(GRIIOFloatChannelNode *c);
+	void addChannel(GRChannel* ch);
+	void removeChannel(GRChannel *c);
 Q_SIGNALS:
 	void requestRebuild();
 
@@ -88,7 +55,7 @@ private:
 	bool m_singleShot;
 	bool m_syncMode;
 
-	QList<GRTimeSinkAcquisitionSignalPath*> m_channels;
+	QList<GRChannel*> m_channels;
 
 };
 }

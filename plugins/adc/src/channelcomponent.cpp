@@ -59,21 +59,3 @@ void ChannelComponent::setPlotChannelCmpt(TimePlotComponentChannel *newPlotChann
 	m_plotChannelCmpt = newPlotChannelCmpt;
 }
 
-void ChannelComponent::enableChannel()
-{
-	qInfo(CAT_TIME_CHANNELCOMPONENT) << m_channelName << " enabled";
-	m_enabled = true;
-	/**/
-	//	m_grch->setEnabled(true);
-	//	m_plotAddon->plot()->replot();
-}
-
-void ChannelComponent::disableChannel()
-{
-	qInfo(CAT_TIME_CHANNELCOMPONENT) << m_channelName << " disabled";
-	m_enabled = false;
-	/**/
-
-	//	m_grch->setEnabled(false);
-	//	m_plotAddon->plot()->replot();
-}

@@ -12,6 +12,13 @@ namespace adc {
 
 class TimePlotComponentChannel;
 
+
+class GRChannel {
+public:
+	virtual GRSignalPath* sigpath() = 0;
+	virtual void onNewData(const float *xData, const float *yData, size_t size, bool copy) = 0;
+};
+
 class SCOPY_ADC_EXPORT ChannelComponent : public QWidget,  public ToolComponent
 {
 	Q_OBJECT
@@ -23,8 +30,8 @@ public:
 	void setMenuControlWidget(QWidget *);
 
 	QPen pen() const;
-
 	ChannelData *chData() const;
+
 	TimePlotComponentChannel *plotChannelCmpt() const;
 	void setPlotChannelCmpt(TimePlotComponentChannel *newPlotChannelCmpt);
 
@@ -39,8 +46,6 @@ protected:
 	TimePlotComponentChannel *m_plotChannelCmpt;
 
 public Q_SLOTS:
-	virtual void enableChannel();
-	virtual void disableChannel();
 	virtual void onStart() override;
 	virtual void onStop() override;
 	virtual void onInit() override;

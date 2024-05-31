@@ -338,12 +338,10 @@ void TimePlotManagerSettings::removePlot(TimePlotComponent *p) {
 
 void TimePlotManagerSettings::addChannel(ChannelComponent *c) {
 	m_channels.append(c);
-	// autoscaler->addChannels(c->plotCh());/
 }
 
 void TimePlotManagerSettings::removeChannel(ChannelComponent *c) {
 	m_channels.removeAll(c);
-	// autoscaler->removeChannels(c->plotCh());
 }
 
 void TimePlotManagerSettings::addSampleRateProvider(SampleRateProvider *s) {
