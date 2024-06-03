@@ -59,7 +59,7 @@ set_config_opts() {
 install_packages() {
 	sudo apt update
 	sudo apt install -y build-essential cmake unzip gfortran gcc git bison libtool \
-		python3 pip gperf pkg-config gdb-multiarch g++ flex texinfo gawk openssl \
+		${PYTHON_VERSION}-full pip gperf pkg-config gdb-multiarch g++ flex texinfo gawk openssl \
 		pigz libncurses-dev autoconf automake tar figlet liborc-0.4-dev* patchelf libc6-dev-armhf-cross squashfs-tools
 	pip install mako
 }
@@ -255,7 +255,8 @@ build_scopy() {
 	echo "### Building scopy"
 	pushd $SRC_DIR
 	CURRENT_BUILD_CMAKE_OPTS="\
-		-DCLONE_IIO_EMU=OFF
+		-DCLONE_IIO_EMU=OFF \
+		-DPYTHON_EXECUTABLE=/usr/bin/python3.9
 		"
 	build_with_cmake
 	popd
@@ -302,7 +303,10 @@ create_appdir(){
 
 
 	cp -r $QT_LOCATION/plugins $APP_DIR/usr
-	cp -r $SYSROOT/lib/python3.9 $APP_DIR/usr/lib
+	# search for the python version linked by cmake and copy inside the appimage the same version
+	FOUND_PYTHON_VERSION=$(grep 'PYTHON_VERSION' $SRC_DIR/build/CMakeCache.txt | awk -F= '{print $2}' | grep -o 'python[0-9]\+\.[0-9]\+')
+	python_path=/usr/lib/$FOUND_PYTHON_VERSION
+	cp -r $python_path $APP_DIR/usr/lib
 	cp -r $SYSROOT/share/libsigrokdecode/decoders  $APP_DIR/usr/lib
 
 	cp $QT_LOCATION/lib/libQt5XcbQpa.so* $APP_DIR/usr/lib
@@ -326,6 +330,7 @@ create_appdir(){
 	cp $SYSROOT/lib/arm-linux-gnueabihf/libXdmcp.so* $APP_DIR/usr/lib
 	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libXau.so* $APP_DIR/usr/lib
 	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libxcb.so* $APP_DIR/usr/lib
+	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libffi.so* $APP_DIR/usr/lib
 }
 
 
