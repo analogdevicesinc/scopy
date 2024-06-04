@@ -1,1 +1,2 @@
 include/adc/scopy-adc_export.h
+include/adc/scopy-adc_config.h

@@ -6,7 +6,7 @@ message(STATUS "building plugin: " ${SCOPY_MODULE})
 
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
-set(PLUGIN_NAME "Register map")
+set(PLUGIN_DISPLAY_NAME "Register map")
 set(PLUGIN_DESCRIPTION "Register map of connected device with detailed register table for available XML templates")
 
 include(GenerateExportHeader)
@@ -104,8 +104,8 @@ target_link_libraries(
 	       Qt5::Test
 )
 
-set(PROJECT_NAME ${PROJECT_NAME} PARENT_SCOPE)
-set(PLUGIN_NAME ${PLUGIN_NAME} PARENT_SCOPE)
-set(PLUGIN_SHORT_NAME ${SCOPY_MODULE} PARENT_SCOPE)
-set(PLUGIN_DESCRIPTION ${PLUGIN_DESCRIPTION} PARENT_SCOPE)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	configureinstallersettings(${SCOPY_MODULE} ${PLUGIN_DESCRIPTION} FALSE)
+endif()
 
+set(REGNMAP_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
