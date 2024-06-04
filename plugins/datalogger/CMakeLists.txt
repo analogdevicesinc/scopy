@@ -6,9 +6,8 @@ message(STATUS "building plugin: " ${SCOPY_MODULE})
 
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
-set(PLUGIN_NAME "Data logger")
+set(PLUGIN_DISPLAY_NAME "Data logger")
 set(PLUGIN_DESCRIPTION "Used to monitor and log data")
-
 
 include(GenerateExportHeader)
 
@@ -66,6 +65,11 @@ generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
 )
 
+configure_file(
+	include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h.cmakein
+	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h @ONLY
+)
+
 set(INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/menus
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/datamonitor
@@ -88,9 +92,11 @@ target_link_libraries(
 	       scopy-iio-widgets
 )
 
-set(PROJECT_NAME ${PROJECT_NAME} PARENT_SCOPE)
-set(PLUGIN_NAME ${PLUGIN_NAME} PARENT_SCOPE)
-set(PLUGIN_SHORT_NAME ${SCOPY_MODULE} PARENT_SCOPE)
-set(PLUGIN_DESCRIPTION ${PLUGIN_DESCRIPTION} PARENT_SCOPE)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	set(INSTALLER_DESCRIPTION "${PLUGIN_DISPLAY_NAME} ${PLUGIN_DESCRIPTION}")
+	configureinstallersettings(${SCOPY_MODULE} ${INSTALLER_DESCRIPTION} FALSE)
+endif()
+
+set(DATALOGGER_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${SCOPY_PLUGIN_INSTALL_DIR})
