@@ -41,6 +41,7 @@ public:
 
 	void initMetadata() override;
 	QString description() override;
+	QString displayName() override;
 
 	QWidget *getTool();
 

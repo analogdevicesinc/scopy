@@ -7,8 +7,6 @@ set(__INCLUDED_SCOPY_WINDOWS_CMAKE TRUE)
 set(ENV_WORKDIR $ENV{WORKDIR})
 set(ENV_DEST_FOLDER $ENV{DEST_FOLDER})
 
-configure_file(windows/scopy.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/windows/scopy.iss @ONLY)
-configure_file(windows/scopy-32.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/windows/scopy-32.iss @ONLY)
 configure_file(windows/scopy-64.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/windows/scopy-64.iss @ONLY)
 
 macro(duplicate_target ORIGINAL NEW)

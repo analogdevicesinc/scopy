@@ -14,10 +14,6 @@ option(ENABLE_PLUGIN_PQM "Enable PQM plugin" ON)
 option(ENABLE_PLUGIN_DATALOGGER "Enable DATALOGGER plugin" ON)
 option(ENABLE_PLUGIN_IIODEBUGPLUGIN "Enable IIODEBUGPLUGIN plugin" ON)
 
-set(PLUGIN_COMPONENTS "")
-set(PLUGIN_COMPONENTS_FILES "")
-
-<<<<<<< HEAD
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -26,26 +22,12 @@ else()
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 endif()
 
-function(ConfigureInstallerSettings PLUGIN_NAME PLUGIN_DESCRIPTION FIXED)
-	string(REPLACE "scopy-" "" AUX_PLUGIN ${PLUGIN_NAME})
-=======
-function(ConfigureInstallerSettings PROJECT_NAME PLUGIN_NAME PLUGIN_DESCRIPTION FIXED)
->>>>>>> generic: plugins CMAKE variables
-
-	set(PLUGIN_COMPONENTS
-	    ${PLUGIN_COMPONENTS}
-	    "\n Name: \"plugins/${PROJECT_NAME}\"; Description: ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} ; Types: full plugins; Flags: ${FIXED} "
-	    PARENT_SCOPE
-	)
-	set(PLUGIN_COMPONENTS_FILES
-	    ${PLUGIN_COMPONENTS_FILES}
-	    "\n Source:\"{#DestFolder}\\plugins\\plugins\\libscopy-${PROJECT_NAME}.dll\"; DestDir: \"{app}\\plugins\\plugins\"; Components: plugins\\${PROJECT_NAME}; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist"
-	    PARENT_SCOPE
-	)
-endfunction()
-
 # The order the plugins are added here will also affect the installer order. Make sure fixed plugin are before optional
 # ones.
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	include(ScopyWindowsInstaller)
+endif()
 
 if(ENABLE_PLUGIN_TEST)
 	add_subdirectory(guitest)
@@ -75,44 +57,37 @@ endif()
 
 if(ENABLE_PLUGIN_ADC)
 	add_subdirectory(adc)
-	list(APPEND PLUGINS ${PROJECT_NAME})
-	configureinstallersettings(${PLUGIN_SHORT_NAME} ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "fixed")
+	list(APPEND PLUGINS ${ADC_TARGET_NAME})
 endif()
 
 if(ENABLE_PLUGIN_REGMAP)
 	add_subdirectory(regmap)
-	list(APPEND PLUGINS ${PROJECT_NAME})
-	configureinstallersettings(${PLUGIN_SHORT_NAME}  ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "fixed")
+	list(APPEND PLUGINS ${REGNMAP_TARGET_NAME})
 endif()
 
 if(ENABLE_PLUGIN_DEBUGGER)
 	add_subdirectory(debugger)
-	list(APPEND PLUGINS ${PROJECT_NAME})
-	configureinstallersettings(${PLUGIN_SHORT_NAME} ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "fixed")
+	list(APPEND PLUGINS ${DEBUGGER_TARGET_NAME})
 endif()
 
 if(ENABLE_PLUGIN_IIODEBUGPLUGIN)
 	add_subdirectory(iiodebug)
-	list(APPEND PLUGINS ${PLUGIN_NAME})
-	configureinstallersettings(${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "fixed")
+	list(APPEND PLUGINS ${IIODEBUG_TARGET_NAME})
 endif()
 
 if(ENABLE_PLUGIN_DATALOGGER)
 	add_subdirectory(datalogger)
-	list(APPEND PLUGINS ${PROJECT_NAME})
-	configureinstallersettings(${PLUGIN_SHORT_NAME} ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "fixed")
+	list(APPEND PLUGINS ${DATALOGGER_TARGET_NAME})
 endif()
 
 if(ENABLE_PLUGIN_SWIOT)
 	add_subdirectory(swiot)
-	list(APPEND PLUGINS ${PROJECT_NAME})
-	configureinstallersettings(${PLUGIN_SHORT_NAME} ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "disablenouninstallwarning" )
+	list(APPEND PLUGINS ${SWIOT_TARGET_NAME})
 endif()
 
 if(ENABLE_PLUGIN_PQM)
 	add_subdirectory(pqm)
-	list(APPEND PLUGINS ${PROJECT_NAME})
-	configureinstallersettings(${PLUGIN_SHORT_NAME} ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "disablenouninstallwarning" )
+	list(APPEND PLUGINS ${PQM_TARGET_NAME})
 endif()
 
 if(ENABLE_PLUGIN_M2K)
@@ -126,19 +101,8 @@ if(ENABLE_PLUGIN_M2K)
 
 	if(WITH_SIGROK AND WITH_PYTHON)
 		add_subdirectory(m2k)
-		list(APPEND PLUGINS ${PROJECT_NAME})
-		configureinstallersettings(${PLUGIN_SHORT_NAME} ${PLUGIN_NAME} ${PLUGIN_DESCRIPTION}  "disablenouninstallwarning")
+		list(APPEND PLUGINS ${M2K_TARGET_NAME})
 	endif()
-endif()
-
-if(ENABLE_PLUGIN_DATAMONITOR)
-	add_subdirectory(datamonitor)
-	list(APPEND PLUGINS ${PLUGIN_NAME})
-endif()
-
-if(ENABLE_PLUGIN_IIODEBUGPLUGIN)
-	add_subdirectory(iiodebugplugin)
-	list(APPEND PLUGINS ${PLUGIN_NAME})
 endif()
 
 set(PLUGINS ${PLUGINS} PARENT_SCOPE)
