@@ -6,6 +6,9 @@ message(STATUS "building plugin: " ${SCOPY_MODULE})
 
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
+set(PLUGIN_DISPLAY_NAME "IIO Debug")
+set(PLUGIN_DESCRIPTION "Debugger for IIO")
+
 include(GenerateExportHeader)
 
 # TODO: split stylesheet/resources and add here TODO: export header files correctly
@@ -64,6 +67,10 @@ target_link_libraries(
 	       scopy-iio-widgets
 )
 
-set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	configureinstallersettings(${SCOPY_MODULE} ${PLUGIN_DESCRIPTION} FALSE)
+endif()
+
+set(IIODEBUG_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${SCOPY_PLUGIN_INSTALL_DIR})

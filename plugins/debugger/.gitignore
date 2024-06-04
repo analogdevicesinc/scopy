@@ -1,1 +1,2 @@
 include/debugger/scopy-debugger_export.h
+include/debugger/scopy-debugger_config.h
