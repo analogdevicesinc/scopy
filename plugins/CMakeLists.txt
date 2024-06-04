@@ -14,6 +14,10 @@ option(ENABLE_PLUGIN_PQM "Enable PQM plugin" ON)
 option(ENABLE_PLUGIN_DATALOGGER "Enable DATALOGGER plugin" ON)
 option(ENABLE_PLUGIN_IIODEBUGPLUGIN "Enable IIODEBUGPLUGIN plugin" ON)
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	include(ScopyWindows)
+endif()
+
 if(ENABLE_PLUGIN_TEST)
 	add_subdirectory(guitestplugin)
 	list(APPEND PLUGINS ${PLUGIN_NAME})
