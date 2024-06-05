@@ -251,3 +251,5 @@ void MonitorPlot::generateBufferPreviewer()
 	layout->addWidget(m_bufferPreviewer);
 	m_plot->navigator()->setResetOnNewBase(false);
 }
+
+#include "moc_monitorplot.cpp"

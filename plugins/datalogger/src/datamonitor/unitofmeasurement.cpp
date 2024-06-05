@@ -13,3 +13,5 @@ QString UnitOfMeasurement::getName() const { return name; }
 QString UnitOfMeasurement::getSymbol() const { return symbol; }
 
 QString UnitOfMeasurement::getNameAndSymbol() { return QString(name + " ( " + symbol + " )"); }
+
+#include "moc_unitofmeasurement.cpp"

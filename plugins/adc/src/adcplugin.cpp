@@ -258,3 +258,5 @@ void ADCPlugin::initMetadata()
 }
 
 QString ADCPlugin::version() { return "0.1"; }
+
+#include "moc_adcplugin.cpp"

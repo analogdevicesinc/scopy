@@ -148,3 +148,5 @@ void Faults::initTutorialProperties()
 	m_runBtn->setProperty("tutorial_name", "RUN_BUTTON");
 	m_configBtn->setProperty("tutorial_name", "CONFIG_BUTTON");
 }
+
+#include "moc_faults.cpp"

@@ -118,3 +118,5 @@ void WaveformInstrument::onBufferDataAvailable(QMap<QString, std::vector<double>
 		}
 	}
 }
+
+#include "moc_waveforminstrument.cpp"

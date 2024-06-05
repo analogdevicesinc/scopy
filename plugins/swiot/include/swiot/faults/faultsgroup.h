@@ -21,14 +21,13 @@
 #ifndef FAULTSGROUP_H
 #define FAULTSGROUP_H
 
-#include "scopy-swiot_export.h"
 #include "faultwidget.h"
 #include <set>
 #include <QVector>
 #include <gui/flexgridlayout.hpp>
 
 namespace scopy::swiot {
-class SCOPY_SWIOT_EXPORT FaultsGroup : public QWidget
+class FaultsGroup : public QWidget
 {
 	Q_OBJECT
 public:

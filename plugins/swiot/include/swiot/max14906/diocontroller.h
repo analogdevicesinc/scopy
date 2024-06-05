@@ -21,7 +21,6 @@
 #ifndef SCOPY_DIOCONTROLLER_H
 #define SCOPY_DIOCONTROLLER_H
 
-#include "scopy-swiot_export.h"
 #include <iio.h>
 #include <QString>
 #include <QThread>
@@ -30,7 +29,7 @@
 #include <utility>
 
 namespace scopy::swiot {
-class SCOPY_SWIOT_EXPORT DioController : public QObject
+class DioController : public QObject
 {
 	Q_OBJECT
 public:

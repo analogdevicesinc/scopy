@@ -118,3 +118,5 @@ void ChnlInfo::initUnitOfMeasureFactor()
 	m_unitOfMeasureFactor["n"] = pow(10, -9);
 	m_unitOfMeasureFactor["p"] = pow(10, -12);
 }
+
+#include "moc_chnlinfo.cpp"

@@ -272,3 +272,5 @@ QPushButton *Max14906::createConfigBtn(QWidget *parent)
 	configBtn->setText("Config");
 	return configBtn;
 }
+
+#include "moc_max14906.cpp"

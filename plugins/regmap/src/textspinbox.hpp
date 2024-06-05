@@ -1,13 +1,13 @@
 #ifndef TEXTSPINBOX_H
 #define TEXTSPINBOX_H
 
-#include "scopy-regmapplugin_export.h"
+#include "scopy-regmap_export.h"
 
 #include <QObject>
 #include <QSpinBox>
 #include <QWidget>
 
-class SCOPY_REGMAPPLUGIN_EXPORT TextSpinBox : public QSpinBox
+class SCOPY_REGMAP_EXPORT TextSpinBox : public QSpinBox
 {
 public:
 	explicit TextSpinBox(QWidget *parent = 0);

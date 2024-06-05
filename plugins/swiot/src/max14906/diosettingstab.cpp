@@ -64,3 +64,5 @@ DioSettingsTab::DioSettingsTab(QWidget *parent)
 DioSettingsTab::~DioSettingsTab() {}
 
 double DioSettingsTab::getTimeValue() const { return m_maxSpinButton->value(); }
+
+#include "moc_diosettingstab.cpp"

@@ -486,3 +486,5 @@ void DigitalInMenu::onEmitStatus(QDateTime timestamp, QString oldData, QString n
 	}
 	Q_EMIT thresholdChangeEnd();
 }
+
+#include "moc_buffermenu.cpp"

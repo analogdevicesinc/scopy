@@ -283,3 +283,5 @@ void HarmonicsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> 
 		}
 	}
 }
+
+#include "moc_harmonicsinstrument.cpp"
