@@ -11,6 +11,7 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, QObject *parent)
 	, m_ctx(ctx)
 	, m_dataRefreshTimer(nullptr)
 	, m_buffer(nullptr)
+	, m_pingStatus(true)
 {
 	m_readFw = new QFutureWatcher<void>(this);
 	m_setFw = new QFutureWatcher<void>(this);
@@ -59,6 +60,24 @@ AcquisitionManager::~AcquisitionManager()
 	m_pqmAttr.clear();
 }
 
+bool AcquisitionManager::pingInternal()
+{
+	auto dev = iio_context_get_device(m_ctx, 0);
+	const iio_device *test_device = nullptr;
+
+	int ret = iio_device_get_trigger(dev, &test_device);
+
+	if(ret < 0 && ret != -ENOENT) {
+		return false;
+	}
+	return true;
+}
+
+bool AcquisitionManager::ping()
+{
+	return m_pingStatus;
+}
+
 void AcquisitionManager::enableBufferChnls(iio_device *dev)
 {
 	int chnlsNo = iio_device_get_channels_count(dev);
@@ -97,6 +116,10 @@ void AcquisitionManager::futureReadData()
 
 void AcquisitionManager::readData()
 {
+	m_pingStatus = pingInternal();
+	if (!m_pingStatus) {
+		return;
+	}
 	if(m_tools["rms"] || m_tools["harmonics"] || m_tools["settings"]) {
 		m_attrHaveBeenRead = readPqmAttributes();
 	}

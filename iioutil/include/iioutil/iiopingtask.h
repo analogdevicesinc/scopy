@@ -19,7 +19,7 @@ public:
 	IIOPingTask(iio_context *c, QObject *parent = nullptr);
 	~IIOPingTask();
 	virtual void run() override;
-
+	void setCallback(const std::function<bool(void)> callback);
 	static bool ping(iio_context *ctx);
 
 Q_SIGNALS:
@@ -29,6 +29,7 @@ Q_SIGNALS:
 protected:
 	iio_context *c;
 	bool enabled;
+	std::function<bool(void)> m_callback;
 };
 } // namespace scopy
 #endif // IIOPINGTASK_H

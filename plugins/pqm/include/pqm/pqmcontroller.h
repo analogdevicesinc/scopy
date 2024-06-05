@@ -13,7 +13,7 @@ public:
 	PqmController(QString uri, QObject *parent = nullptr);
 	~PqmController();
 
-	void startPingTask(iio_context *ctx);
+	void startPingTask(iio_context *ctx, const std::function<bool(void)> callback);
 	void stopPingTask();
 
 Q_SIGNALS:

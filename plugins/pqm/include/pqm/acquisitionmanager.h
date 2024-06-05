@@ -22,6 +22,7 @@ public:
 	~AcquisitionManager();
 
 public Q_SLOTS:
+	bool ping();
 	void toolEnabled(bool en, QString toolName);
 	void setConfigAttr(QMap<QString, QMap<QString, QString>>);
 Q_SIGNALS:
@@ -41,6 +42,7 @@ private:
 	bool readPqmAttributes();
 	bool readBufferedData();
 	void setData(QMap<QString, QMap<QString, QString>>);
+	bool pingInternal();
 
 	iio_context *m_ctx;
 	iio_buffer *m_buffer;
@@ -55,6 +57,8 @@ private:
 
 	bool m_attrHaveBeenRead = false;
 	bool m_buffHaveBeenRead = false;
+
+	std::atomic<bool> m_pingStatus;
 };
 } // namespace scopy::pqm
 
