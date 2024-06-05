@@ -109,9 +109,10 @@ bool PQMPlugin::onConnect()
 	}
 	struct iio_context *ctx = conn->context();
 	connect(m_pqmController, &PqmController::pingFailed, this, &PQMPlugin::disconnectDevice);
-	m_pqmController->startPingTask(ctx);
-
 	m_acqManager = new AcquisitionManager(ctx, this);
+	auto fp = std::bind(&AcquisitionManager::ping, m_acqManager);
+	m_pqmController->startPingTask(ctx, fp);
+
 
 	RmsInstrument *rms = new RmsInstrument();
 	m_toolList[0]->setTool(rms);

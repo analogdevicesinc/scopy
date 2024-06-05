@@ -6,15 +6,20 @@ using namespace scopy;
 IIOPingTask::IIOPingTask(iio_context *c, QObject *parent)
 	: QThread(parent)
 	, c(c)
+	, m_callback(nullptr)
 {}
 
 IIOPingTask::~IIOPingTask() {}
 
 void IIOPingTask::run()
 {
-
+	bool ret;
 	enabled = true;
-	bool ret = ping(c);
+	if (m_callback) {
+		ret = m_callback();
+	} else {
+		ret = ping(c);
+	}
 
 	if(isInterruptionRequested())
 		return;
@@ -22,6 +27,11 @@ void IIOPingTask::run()
 		Q_EMIT pingSuccess();
 	else
 		Q_EMIT pingFailed();
+}
+
+void IIOPingTask::setCallback(const std::function<bool()> callback)
+{
+	m_callback = callback;
 }
 
 bool IIOPingTask::ping(iio_context *ctx)

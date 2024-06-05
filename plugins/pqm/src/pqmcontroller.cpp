@@ -13,13 +13,14 @@ PqmController::PqmController(QString uri, QObject *parent)
 
 PqmController::~PqmController() { stopPingTask(); }
 
-void PqmController::startPingTask(iio_context *ctx)
+void PqmController::startPingTask(iio_context *ctx, const std::function<bool(void)> callback)
 {
 	if(!ctx) {
 		qWarning(CAT_PQM_CONTROLLER) << "The context is unavailable!";
 		return;
 	}
 	m_pingTask = new IIOPingTask(ctx);
+	m_pingTask->setCallback(callback);
 	m_pingTimer = new CyclicalTask(m_pingTask);
 	connect(m_pingTask, &IIOPingTask::pingFailed, this, &PqmController::pingFailed);
 	connect(m_pingTask, &IIOPingTask::pingSuccess, this, &PqmController::pingSuccess);
