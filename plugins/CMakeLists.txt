@@ -15,11 +15,6 @@ option(ENABLE_PLUGIN_PQM "Enable PQM plugin" ON)
 option(ENABLE_PLUGIN_DATALOGGER "Enable DATALOGGER plugin" ON)
 option(ENABLE_PLUGIN_IIODEBUGPLUGIN "Enable IIODEBUGPLUGIN plugin" ON)
 
-if(ENABLE_PLUGIN_ADMT)
-	add_subdirectory(admt)
-	list(APPEND PLUGINS ${PLUGIN_NAME})
-endif()
-
 set(PLUGIN_COMPONENTS "")
 set(PLUGIN_COMPONENTS_FILES "")
 
@@ -123,6 +118,12 @@ if(ENABLE_PLUGIN_M2K)
 		list(APPEND PLUGINS ${PLUGIN_NAME})
 		configureinstallersettings(${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "disablenouninstallwarning")
 	endif()
+endif()
+
+if(ENABLE_PLUGIN_ADMT)
+	add_subdirectory(admt)
+	list(APPEND PLUGINS ${PLUGIN_NAME})
+	configureinstallersettings(${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "disablenouninstallwarning")
 endif()
 
 message(STATUS "Building plugins:" ${PLUGINS})

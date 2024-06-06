@@ -3,13 +3,13 @@
 
 #define SCOPY_PLUGIN_NAME ADMTPlugin
 
-#include "scopy-admtplugin_export.h"
+#include "scopy-admt_export.h"
 #include <QObject>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
 namespace scopy::admt {
-class SCOPY_ADMTPLUGIN_EXPORT ADMTPlugin : public QObject, public PluginBase
+class SCOPY_ADMT_EXPORT ADMTPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;

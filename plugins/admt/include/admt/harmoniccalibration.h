@@ -1,7 +1,7 @@
 #ifndef HARMONICCALIBRATION_H
 #define HARMONICCALIBRATION_H
 
-#include "scopy-admtplugin_export.h"
+#include "scopy-admt_export.h"
 
 #include <QBoxLayout>
 #include <QWidget>
@@ -19,7 +19,7 @@
 #include <menucollapsesection.h>
 
 namespace scopy::admt {
-class SCOPY_ADMTPLUGIN_EXPORT HarmonicCalibration : public QWidget
+class SCOPY_ADMT_EXPORT HarmonicCalibration : public QWidget
 {
 	Q_OBJECT
 public:

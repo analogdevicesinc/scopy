@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 
-set(SCOPY_MODULE admtplugin)
+set(SCOPY_MODULE admt)
 
 message(STATUS "building plugin: " ${SCOPY_MODULE})
 
@@ -64,6 +64,7 @@ target_link_libraries(
         scopy-iioutil 
 )
 
-set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE) 
+set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
+set(PLUGIN_DESCRIPTION "ADMT plugin" PARENT_SCOPE) 
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${SCOPY_PLUGIN_INSTALL_DIR})
