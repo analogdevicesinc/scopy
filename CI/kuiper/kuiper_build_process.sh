@@ -301,7 +301,6 @@ create_appdir(){
 	$COPY_DEPS $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
 	$COPY_DEPS $APP_DIR/usr/bin/iio-emu $APP_DIR/usr/lib
 
-
 	cp -r $QT_LOCATION/plugins $APP_DIR/usr
 	# search for the python version linked by cmake and copy inside the appimage the same version
 	FOUND_PYTHON_VERSION=$(grep 'PYTHON_VERSION' $SRC_DIR/build/CMakeCache.txt | awk -F= '{print $2}' | grep -o 'python[0-9]\+\.[0-9]\+')
@@ -312,27 +311,13 @@ create_appdir(){
 	cp $QT_LOCATION/lib/libQt5XcbQpa.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5EglFSDeviceIntegration.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5DBus.so* $APP_DIR/usr/lib
-
-
-	cp $SYSROOT/lib/arm-linux-gnueabihf/libstdc++.so* $APP_DIR/usr/lib
-	cp $SYSROOT/lib/arm-linux-gnueabihf/libc.so* $APP_DIR/usr/lib
-	cp $SYSROOT/lib/arm-linux-gnueabihf/libdl.so* $APP_DIR/usr/lib
-	cp $SYSROOT/lib/arm-linux-gnueabihf/libpthread.so* $APP_DIR/usr/lib
 	cp $SYSROOT/lib/arm-linux-gnueabihf/libGLESv2.so* $APP_DIR/usr/lib
-
-	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/ld-linux-armhf.so* $APP_DIR/usr/lib
-	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libarmmem-v7l.so* $APP_DIR/usr/lib
-	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libm.so* $APP_DIR/usr/lib
-	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libgcc_s.so* $APP_DIR/usr/lib
-	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libdl.so* $APP_DIR/usr/lib
 	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libmd.so* $APP_DIR/usr/lib
 	cp $SYSROOT/lib/arm-linux-gnueabihf/libbsd.so* $APP_DIR/usr/lib
 	cp $SYSROOT/lib/arm-linux-gnueabihf/libXdmcp.so* $APP_DIR/usr/lib
 	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libXau.so* $APP_DIR/usr/lib
-	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libxcb.so* $APP_DIR/usr/lib
 	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libffi.so* $APP_DIR/usr/lib
 }
-
 
 create_appimage(){
 	rm -rf $APP_IMAGE
