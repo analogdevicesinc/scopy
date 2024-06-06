@@ -48,7 +48,7 @@ build_qt5.15.2(){
 	-prefix $QT_SYSTEM_LOCATION \
 	-extprefix $QT_BUILD_LOCATION \
 	-eglfs \
-	-opengl es2 \
+	-opengl desktop \
 	-device linux-rasp-pi4-v3d-g++ \
 	-device-option CROSS_COMPILE=$CROSS_COMPILER/bin/arm-linux-gnueabihf- \
 	-skip qtscript \
