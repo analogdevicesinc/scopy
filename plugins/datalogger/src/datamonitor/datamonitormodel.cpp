@@ -185,3 +185,5 @@ void DataMonitorModel::addValue(double time, double value)
 
 	Q_EMIT valueUpdated(time, value);
 }
+
+#include "moc_datamonitormodel.cpp"

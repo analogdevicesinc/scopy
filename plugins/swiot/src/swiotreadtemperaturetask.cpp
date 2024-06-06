@@ -155,3 +155,5 @@ void SwiotReadTemperatureTask::readOffsetCommandFinished(Command *cmd)
 				  << ". Temperature not available.";
 	}
 }
+
+#include "moc_swiotreadtemperaturetask.cpp"

@@ -248,3 +248,5 @@ void SettingsInstrument::initCalibSection(QWidget *parent)
 
 	parent->layout()->addWidget(calibrateSection);
 }
+
+#include "moc_settingsinstrument.cpp"

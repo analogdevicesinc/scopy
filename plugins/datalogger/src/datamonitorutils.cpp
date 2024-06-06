@@ -20,3 +20,5 @@ double DataMonitorUtils::getReadIntervalDefaul() { return 1; }
 int DataMonitorUtils::getDefaultPrecision() { return 3; }
 
 QString DataMonitorUtils::getLoggingDateTimeFormat() { return "dd/MM/yyyy hh:mm:ss"; }
+
+#include "moc_datamonitorutils.cpp"

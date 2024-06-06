@@ -30,7 +30,7 @@
 
 #include "iioutil/connectionprovider.h"
 #include "jsonformatedelement.hpp"
-#include "scopy-regmapplugin_config.h"
+#include "scopy-regmap_config.h"
 #include "utils.hpp"
 #include "utils.hpp"
 #if defined __APPLE__
@@ -273,3 +273,5 @@ bool RegmapPlugin::isBufferCapable(iio_device *dev)
 
 	return false;
 }
+
+#include "moc_regmapplugin.cpp"

@@ -91,3 +91,5 @@ void DataAcquisitionManager::updateActiveMonitors(bool toggled, QString monitorN
 QList<QString> DataAcquisitionManager::getActiveMonitors() { return m_activeMonitorsMap->keys(); }
 
 QMap<QString, DataMonitorModel *> *DataAcquisitionManager::getDataMonitorMap() const { return m_dataMonitorMap; }
+
+#include "moc_dataacquisitionmanager.cpp"

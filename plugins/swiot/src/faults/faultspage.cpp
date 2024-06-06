@@ -95,3 +95,5 @@ void FaultsPage::setupDevices()
 		qCritical(CAT_SWIOT_FAULTS) << "Error: did not find swiot device.";
 	}
 }
+
+#include "moc_faultspage.cpp"

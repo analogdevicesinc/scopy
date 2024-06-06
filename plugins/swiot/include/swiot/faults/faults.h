@@ -21,7 +21,6 @@
 #ifndef FAULTS_H
 #define FAULTS_H
 
-#include "scopy-swiot_export.h"
 #include "faultspage.h"
 #include <pluginbase/toolmenuentry.h>
 
@@ -30,7 +29,7 @@
 #include <gui/tooltemplate.h>
 
 namespace scopy::swiot {
-class SCOPY_SWIOT_EXPORT Faults : public QWidget
+class Faults : public QWidget
 {
 	Q_OBJECT
 public:

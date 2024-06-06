@@ -19,3 +19,5 @@ double DigitalChnlInfo::convertData(unsigned int data)
 	convertedData = (data + m_offsetScalePair.first) * m_offsetScalePair.second;
 	return convertedData;
 }
+
+#include "moc_digitalchnlinfo.cpp"

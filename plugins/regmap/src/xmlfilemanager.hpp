@@ -2,7 +2,7 @@
 #define XMLFILEMANAGER_HPP
 
 #include "registermaptemplate.hpp"
-#include "scopy-regmapplugin_export.h"
+#include "scopy-regmap_export.h"
 
 #include <iio.h>
 
@@ -15,7 +15,7 @@ namespace scopy::regmap {
 class RegisterModel;
 class BitFieldModel;
 
-class SCOPY_REGMAPPLUGIN_EXPORT XmlFileManager : public QObject
+class SCOPY_REGMAP_EXPORT XmlFileManager : public QObject
 {
 	Q_OBJECT
 

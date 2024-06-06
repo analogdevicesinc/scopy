@@ -278,3 +278,5 @@ bool DataLoggerPlugin::loadPreferencesPage()
 }
 
 QString DataLoggerPlugin::description() { return "Use IIO raw and scale attributes to plot and save data"; }
+
+#include "moc_dataloggerplugin.cpp"

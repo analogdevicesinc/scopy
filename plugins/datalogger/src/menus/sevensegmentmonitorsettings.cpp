@@ -62,3 +62,5 @@ void SevenSegmentMonitorSettings::changePrecision()
 
 	Q_EMIT precisionChanged(precision->text().toInt());
 }
+
+#include "moc_sevensegmentmonitorsettings.cpp"

@@ -1,13 +1,13 @@
 #ifndef DEVICEREGISTERMAP_HPP
 #define DEVICEREGISTERMAP_HPP
 
-#include "scopy-regmapplugin_export.h"
+#include "scopy-regmap_export.h"
 
 #include <QMap>
 #include <QObject>
 #include <QWidget>
 #include <tooltemplate.h>
-#include "scopy-regmapplugin_export.h"
+#include "scopy-regmap_export.h"
 
 class QVBoxLayout;
 
@@ -22,7 +22,7 @@ class RegisterController;
 class SearchBarWidget;
 class RegisterMapTable;
 
-class SCOPY_REGMAPPLUGIN_EXPORT DeviceRegisterMap : public QWidget
+class SCOPY_REGMAP_EXPORT DeviceRegisterMap : public QWidget
 {
 	Q_OBJECT
 public:

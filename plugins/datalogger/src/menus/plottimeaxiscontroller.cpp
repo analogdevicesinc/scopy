@@ -93,3 +93,5 @@ void PlotTimeAxisController::updatePlotStartPoint()
 
 	m_plot->updatePlotStartingPoint(time, delta);
 }
+
+#include "moc_plottimeaxiscontroller.cpp"

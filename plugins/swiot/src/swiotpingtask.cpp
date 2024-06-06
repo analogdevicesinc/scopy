@@ -46,3 +46,5 @@ void SwiotPingTask::getTriggerCommandFinished(scopy::Command *cmd)
 		Q_EMIT pingFailed();
 	}
 }
+
+#include "moc_swiotpingtask.cpp"

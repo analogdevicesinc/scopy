@@ -577,7 +577,8 @@ void Ad74413r::setupToolTemplate()
 	m_info = new PlotInfo(m_plot->plot()->canvas());
 	TimeSamplingInfo *samplingInfo = new TimeSamplingInfo(m_plot);
 	m_info->addCustomInfo(samplingInfo, InfoPosition::IP_RIGHT);
-	connect(this, &Ad74413r::updateSamplingInfo, this, [=]() { samplingInfo->update(m_currentSamplingInfo); });
+	connect(this, &Ad74413r::updateSamplingInfo, this,
+		[this, samplingInfo]() { samplingInfo->update(m_currentSamplingInfo); });
 
 	initPlot();
 	setupDeviceBtn();
@@ -723,3 +724,5 @@ void Ad74413r::initTutorialProperties()
 	m_settingsBtn->setProperty("tutorial_name", "AD74413R_SETTINGS");
 	m_configBtn->setProperty("tutorial_name", "CONFIG_BUTTON");
 }
+
+#include "moc_ad74413r.cpp"
