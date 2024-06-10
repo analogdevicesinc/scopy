@@ -20,8 +20,9 @@ android*.sh
 *.apk
 *.aab
 !CI/android/*
-CI/kuiper/staging
-CI/kuiper/scopy.AppDir
+CI/armhf/staging
+CI/armhf/scopy.AppDir
+CI/armhf/scopy.squashfs
 CI/appimage/staging
 CI/appimage/scopy.AppDir
 html/
