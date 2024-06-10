@@ -44,6 +44,7 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 	m_plotContainerLayout = new QVBoxLayout(w);
 	m_plotContainerLayout->setMargin(0);
 	m_plotContainerLayout->setSpacing(10);
+	m_plotContainerLayout->setAlignment(Qt::AlignTop);
 
 	m_addPlotBtn = new QPushButton("Add Plot", this);
 	StyleHelper::BlueButton(m_addPlotBtn, "AddPlotButton");
@@ -52,6 +53,12 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 		uint32_t idx = m_plotManager->addPlot("Plot ");
 		TimePlotComponent *plt = m_plotManager->plot(idx);
 		addPlot(plt);
+
+	});
+
+	connect(m_plotManager, &TimePlotManager::plotRemoved, this, [=](uint32_t uuid){
+		TimePlotComponent *plt = m_plotManager->plot(uuid);
+		removePlot(plt);
 	});
 
 	lay->addWidget(header);
@@ -175,6 +182,7 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 		}
 		if(cb->itemData(idx) == XMODE_TIME) {
 			m_sampleRateSpin->setVisible(true);
+			m_sampleRateSpin->setEnabled(false);
 			m_sampleRateSpin->setValue(readSampleRate());
 			// setTimeFormatter - xAxis
 			// setUnits xmin,xmax - time units
@@ -328,13 +336,25 @@ void TimePlotManagerSettings::addPlot(TimePlotComponent *plt)
 
 void TimePlotManagerSettings::removePlot(TimePlotComponent *p)
 {
-	/*m_plotContainerLayout->removeWidget(p->plotMenu());
-	p->deletePlotMenu();*/
+	m_plotContainerLayout->removeWidget(p->plotMenu());	
 }
 
-void TimePlotManagerSettings::addChannel(ChannelComponent *c) { m_channels.append(c); }
+void TimePlotManagerSettings::addChannel(ChannelComponent *c) {
+	m_channels.append(c);
+	SampleRateProvider *srp = dynamic_cast<SampleRateProvider*>(c);
+	if(srp) {
+		addSampleRateProvider(srp);
+	}
 
-void TimePlotManagerSettings::removeChannel(ChannelComponent *c) { m_channels.removeAll(c); }
+}
+
+void TimePlotManagerSettings::removeChannel(ChannelComponent *c) {
+	m_channels.removeAll(c);
+	SampleRateProvider *srp = dynamic_cast<SampleRateProvider*>(c);
+	if(srp) {
+		removeSampleRateProvider(srp);
+	}
+}
 
 void TimePlotManagerSettings::addSampleRateProvider(SampleRateProvider *s)
 {
