@@ -4,8 +4,10 @@
 
 using namespace scopy::admt;
 
-HarmonicCalibration::HarmonicCalibration(QWidget *parent) 
+HarmonicCalibration::HarmonicCalibration(struct iio_context *context, QWidget *parent)
 {
+    this->context = context;
+
     QHBoxLayout *lay = new QHBoxLayout(this);
     lay->setMargin(0);
 	setLayout(lay);
@@ -41,9 +43,6 @@ HarmonicCalibration::HarmonicCalibration(QWidget *parent)
     leftBodyLayout->setSpacing(10);
     leftBody->setLayout(leftBodyLayout);
 
-    //leftLayout->addLayout(leftBodyLayout);
-
-
     rotationSection = new MenuSectionWidget(leftWidget);
     countSection = new MenuSectionWidget(leftWidget);
     angleSection = new MenuSectionWidget(leftWidget);
@@ -68,6 +67,9 @@ HarmonicCalibration::HarmonicCalibration(QWidget *parent)
     StyleHelper::BlueButton(getRotationButton, "rotationButton");
     StyleHelper::BlueButton(getCountButton, "countButton");
     StyleHelper::BlueButton(getAngleButton, "angleButton");
+    QObject::connect(getRotationButton, &QPushButton::clicked, this, &HarmonicCalibration::getRotationData);
+    QObject::connect(getCountButton, &QPushButton::clicked, this, &HarmonicCalibration::getCountData);
+    QObject::connect(getAngleButton, &QPushButton::clicked, this, &HarmonicCalibration::getAngleData);
 
     rotationCollapse->contentLayout()->addWidget(rotationLineEdit);
     rotationCollapse->contentLayout()->addWidget(getRotationButton);
@@ -88,3 +90,28 @@ HarmonicCalibration::HarmonicCalibration(QWidget *parent)
 }
 
 HarmonicCalibration::~HarmonicCalibration() {}
+
+void HarmonicCalibration::getRotationData()
+{
+    int devCount = iio_context_get_devices_count(context);
+    auto s = std::to_string(devCount);
+    QString qstr = QString::fromStdString(s);
+    rotationLineEdit->setText(qstr);
+}
+
+void HarmonicCalibration::getCountData()
+{
+    countLineEdit->setText("test");
+}
+
+void HarmonicCalibration::getAngleData()
+{
+    angleLineEdit->setText("test");
+}
+
+QStringList HarmonicCalibration::getDeviceList(iio_context *context)
+{
+    QStringList deviceList;
+    int devCount = iio_context_get_devices_count(context);
+    return deviceList;
+}

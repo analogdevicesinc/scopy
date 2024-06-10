@@ -26,7 +26,7 @@ bool ADMTPlugin::compatible(QString m_param, QString category)
 	}
 
 	ConnectionProvider::close(m_param);
-
+	
 	return ret;
 }
 
@@ -83,7 +83,9 @@ bool ADMTPlugin::onConnect()
 	// compatible to that device 
 	// In case of success the function must return true and false otherwise 
     	
-	HarmonicCalibration *harmonicCalibration = new HarmonicCalibration();
+	auto *cp = ConnectionProvider::GetInstance();
+	Connection *conn = cp->open(m_param);
+	HarmonicCalibration *harmonicCalibration = new HarmonicCalibration(conn->context());
 	m_toolList[0]->setTool(harmonicCalibration);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
