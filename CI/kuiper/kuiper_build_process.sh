@@ -2,7 +2,8 @@
 
 set -ex
 git config --global --add safe.directory $HOME/scopy
-SRC_DIR=$(git rev-parse --show-toplevel)
+SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
+SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
 source $SRC_DIR/CI/kuiper/kuiper_build_config.sh
 
 echo -- USING CMAKE COMMAND:
@@ -245,8 +246,12 @@ build_iio-emu(){
 	pushd $STAGING_AREA
 	[ -d 'iio-emu' ] || git clone --recursive https://github.com/analogdevicesinc/iio-emu -b $IIOEMU_BRANCH iio-emu
 	pushd $STAGING_AREA/iio-emu
-	build_with_cmake
-	sudo make install
+	if [ -d 'build' ];then
+		echo "### IIO-EMU already built --- skipping"
+	else
+		build_with_cmake
+		sudo make install
+	fi
 	popd
 	popd
 }
@@ -260,20 +265,6 @@ build_scopy() {
 		"
 	build_with_cmake
 	popd
-}
-
-build_deps(){
-	build_libiio
-	build_libad9361
-	build_spdlog
-	build_libm2k
-	build_volk
-	build_gnuradio
-	build_grscopy
-	build_grm2k
-	build_qwt
-	build_libsigrokdecode
-	build_libtinyiiod
 }
 
 create_appdir(){
@@ -330,17 +321,86 @@ create_appimage(){
 # move the sysroot from the home of the docker container to the known location
 move_sysroot(){
 	mkdir -p $STAGING_AREA
-	[ -d /home/runner/sysroot ] && sudo mv /home/runner/sysroot $SYSROOT
+	[ -d /home/runner/sysroot ] && sudo mv /home/runner/sysroot $SYSROOT || echo "Sysroot not found or already moved"
+	if [ ! -d $SYSROOT ];then
+		echo "Missing SYSROOT"
+		exit 1
+	fi
 }
 
 # move and rename the AppImage artifact
 move_appimage(){
-	mv $APP_IMAGE $SRC_DIR/Scopy1-armhf.AppImage
+	[ -d $APP_IMAGE ] && mv $APP_IMAGE $SRC_DIR/Scopy1-armhf.AppImage || echo "Appimage not found"
 }
 
 generate_ci_envs(){
 	$SRC_DIR/CI/appveyor/gen_ci_envs.sh > $SRC_DIR/CI/kuiper/gh-actions.envs
 }
+
+#
+# Helper functions
+#
+build_deps(){
+	build_libiio
+	build_libad9361
+	build_spdlog
+	build_libm2k
+	build_volk
+	build_gnuradio
+	build_grscopy
+	build_grm2k
+	build_qwt
+	build_libsigrokdecode
+	build_libtinyiiod
+}
+
+run_workflow(){
+	install_packages
+	download_cmake
+	download_crosscompiler
+	move_sysroot
+	build_iio-emu
+	build_scopy
+	create_appdir
+	create_appimage
+	move_appimage
+}
+
+get_tools(){
+	install_packages
+	download_cmake
+	download_crosscompiler
+	move_sysroot
+}
+
+generate_appimage(){
+	build_iio-emu
+	build_scopy
+	create_appdir
+	create_appimage
+}
+
+dev_setup(){
+	# for the local development of Scopy armhf the easyest method is to download the docker image
+	# a temporary docker volume is created to bridge the local environment and the docker container
+	# the compiling is done inside the container unsing the already prepared filesystem
+	docker pull cristianbindea/scopy1-kuiper:latest
+	docker run -it \
+		--mount type=bind,source="$SRC_DIR",target=/home/runner/scopy \
+		cristianbindea/scopy1-kuiper:latest
+	# now this repository folder it shared with the docker container
+
+	# to compile the application use "scopy/CI/kuiper/kuiper_build_process.sh get_tools generate_appimage"
+	# after the first compilation just use "scopy/CI/kuiper/kuiper_build_process.sh generate_appimage"
+	# to continue using the same docker container use docker start (container id) and "docker attach (container id)"
+
+	# finally after the development is done use this to clean the system
+	# "docker container rm -v (container id)"
+	# "docker image rm cristianbindea/scopy1-kuiper:latest"
+
+	# to get the container id use "docker container ls -a"
+}
+
 
 for arg in $@; do
 	$arg
