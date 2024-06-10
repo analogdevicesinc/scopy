@@ -12,6 +12,7 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 
+#include <iio.h>
 #include <toolbuttons.h>
 #include <tooltemplate.h>
 #include <menuheader.h>
@@ -23,9 +24,16 @@ class SCOPY_ADMT_EXPORT HarmonicCalibration : public QWidget
 {
 	Q_OBJECT
 public:
-	HarmonicCalibration(QWidget *parent = nullptr);
+	HarmonicCalibration(struct iio_context *context, QWidget *parent = nullptr);
 	~HarmonicCalibration();
 private:
+	void getRotationData();
+	void getCountData();
+	void getAngleData();
+	QStringList getDeviceList(iio_context *context);
+
+	iio_context *context;
+
 	ToolTemplate *tool;
 	GearBtn *settingsButton;
 	InfoBtn *infoButton;
