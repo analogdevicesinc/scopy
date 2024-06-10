@@ -21,6 +21,11 @@ QString GRIIODeviceSource::findAttribute(QStringList possibleNames, iio_device *
 
 iio_device *GRIIODeviceSource::iioDev() const { return m_iioDev; }
 
+iio_context *GRIIODeviceSource::ctx() const
+{
+	return m_ctx;
+}
+
 QString GRIIOChannel::findAttribute(QStringList possibleNames, iio_channel *ch)
 {
 	const char *attr = nullptr;

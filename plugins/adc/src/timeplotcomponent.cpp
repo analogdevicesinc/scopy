@@ -55,6 +55,8 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 
 	m_plotMenu = new TimePlotComponentSettings(this, parent);
 	addComponent(m_plotMenu);
+
+	connect(m_plotMenu, &TimePlotComponentSettings::requestDeletePlot, this, [=](){Q_EMIT requestDeletePlot();});
 }
 
 TimePlotComponent::~TimePlotComponent() {}

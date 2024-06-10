@@ -22,7 +22,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	v->setSpacing(0);
 	v->setMargin(0);
 	setLayout(v);
-	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
 	MenuSectionWidget *w = new MenuSectionWidget(this);
 	v->addWidget(w);
@@ -98,6 +98,11 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 
 	w->contentLayout()->addWidget(plotMenu);
 
+	m_deletePlot = new QPushButton("DELETE PLOT");
+	StyleHelper::BlueButton(m_deletePlot);
+	connect(m_deletePlot, &QAbstractButton::clicked, this, [=](){Q_EMIT requestDeletePlot();});
+
+
 	plotMenu->contentLayout()->addWidget(singleYMode);
 	plotMenu->contentLayout()->addWidget(m_autoscaleBtn);
 	plotMenu->contentLayout()->addWidget(m_yCtrl);
@@ -108,7 +113,9 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	plotMenu->contentLayout()->addWidget(plotTitleLabel);
 	plotMenu->contentLayout()->addWidget(plotTitle);
 	plotMenu->contentLayout()->addWidget(labelsSwitch);
+	plotMenu->contentLayout()->addWidget(m_deletePlot);
 	plotMenu->contentLayout()->setSpacing(10);
+
 
 	m_autoscaleBtn->setVisible(false);
 	m_yCtrl->setVisible(false);

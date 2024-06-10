@@ -48,6 +48,7 @@ public Q_SLOTS:
 	void setXYXChannel(ChannelComponent *c);
 Q_SIGNALS:
 	void nameChanged(QString);
+	void requestDeletePlot();
 
 public:
 	void onStart();
