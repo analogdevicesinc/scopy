@@ -1,4 +1,4 @@
-#docker build -t cristianbindea/scopy1-ubuntu-appimage .
+#docker build -t cristianbindea/scopy1-x86_64-appimage .
 #DOCKER_BUILDKIT=0
 FROM ubuntu:20.04
 SHELL ["/bin/bash", "-c"]
@@ -23,13 +23,13 @@ RUN echo "${USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-$USER && \
 
 USER $USER
 WORKDIR /home/${USER}
-RUN git clone https://github.com/analogdevicesinc/scopy --branch appimage-scopy1
+RUN git clone https://github.com/analogdevicesinc/scopy --branch dev
 WORKDIR /home/${USER}/scopy
 
-RUN ./CI/appimage/ubuntu_appimage_process.sh install_packages
+ENV CI_SCRIPT=ON
+RUN ./CI/x86_64/x86-64_appimage_process.sh install_packages
 RUN sudo pip3 install aqtinstall && sudo python3 -m aqt install-qt --outputdir /opt/Qt linux desktop 5.15.2
-RUN ./CI/appimage/ubuntu_appimage_process.sh clone download_tools build_deps
+RUN ./CI/x86_64/x86-64_appimage_process.sh clone download_tools build_deps
 
-# to be set at runtime CI_SCRIPT=ON
 WORKDIR /home/${USER}
 # RUN rm -rf scopy

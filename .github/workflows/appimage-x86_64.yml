@@ -1,4 +1,4 @@
-name: Ubuntu Scopy Appimage Build
+name: Scopy1 x86_64 AppImage Build
 
 on: [push, pull_request]
 
@@ -8,7 +8,7 @@ env:
 
 jobs:
 
-  build_scopy1_ubuntu_appimage:
+  build_scopy1_x86-64_appimage:
     runs-on: ubuntu-20.04
 
     steps:
@@ -17,23 +17,23 @@ jobs:
                 set-safe-directory: 'true'
 
         - name: Pull the Docker Image
-          run: docker pull cristianbindea/scopy1-ubuntu-appimage:latest
+          run: docker pull cristianbindea/scopy1-x86_64-appimage:latest
 
         - name: Create Scopy AppImage
           shell: bash
           run: |
                 export CI_SCRIPT=ON
                 cd $GITHUB_WORKSPACE
-                ./CI/appimage/ubuntu_appimage_process.sh generate_ci_envs
+                ./CI/x86_64/x86-64_appimage_process.sh generate_ci_envs
 
                 docker run \
                         --mount type=bind,source="$GITHUB_WORKSPACE",target=/home/runner/scopy \
-                        --env-file $GITHUB_WORKSPACE/CI/appimage/gh-actions.envs \
-                        cristianbindea/scopy1-ubuntu-appimage:latest \
+                        --env-file $GITHUB_WORKSPACE/CI/x86_64/gh-actions.envs \
+                        cristianbindea/scopy1-x86_64-appimage:latest \
                         /bin/bash -c    'cd $HOME && \
                                         sudo chown -R runner:runner scopy && \
                                         cd $HOME/scopy && \
-                                        ./CI/appimage/ubuntu_appimage_process.sh download_tools build_iio-emu build_scopy create_appdir create_appimage move_appimage
+                                        ./CI/x86_64/x86-64_appimage_process.sh download_tools build_iio-emu build_scopy create_appdir create_appimage move_appimage
                                         '
         - name: Set short git commit SHA
           shell: bash
@@ -41,5 +41,5 @@ jobs:
 
         - uses: actions/upload-artifact@v4
           with:
-            name: scopy-ubuntu-x86_64-${{ env.commit_sha }}
+            name: scopy-linux-x86_64-${{ env.commit_sha }}
             path: ${{ github.workspace }}/Scopy1-x86_64.AppImage
