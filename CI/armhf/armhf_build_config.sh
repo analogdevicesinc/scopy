@@ -18,26 +18,26 @@ export APPIMAGE=1
 
 PYTHON_VERSION=python3.9 # default python version used in CI scripts, can be changed to match locally installed python
 
-STAGING_AREA=$SRC_DIR/CI/kuiper/staging
+STAGING_AREA=$SRC_DIR/CI/armhf/staging
 SYSROOT=$STAGING_AREA/sysroot
 SYSROOT_TAR=$STAGING_AREA/sysroot.tar.gz
-SYSROOT_DOCKER=$SRC_DIR/CI/kuiper/docker/sysroot.tar.gz
+SYSROOT_DOCKER=$SRC_DIR/CI/armhf/docker/sysroot.tar.gz
 TOOLCHAIN=$STAGING_AREA/cross-pi-gcc
 TOOLCHAIN_BIN=$TOOLCHAIN/bin
 TOOLCHAIN_HOST="arm-linux-gnueabihf"
-TOOLCHAIN_FILE=$SRC_DIR/CI/kuiper/cmake_toolchain.cmake
+TOOLCHAIN_FILE=$SRC_DIR/CI/armhf/cmake_toolchain.cmake
 QT_LOCATION=$SYSROOT/usr/local/qt5.15
 
 CMAKE_BIN=$STAGING_AREA/cmake/bin/cmake
 QMAKE_BIN=$QT_LOCATION/bin/qmake
 JOBS=-j14
 
-APP_DIR=$SRC_DIR/CI/kuiper/scopy.AppDir
-APP_IMAGE=$SRC_DIR/CI/kuiper/Scopy1-armhf.AppImage
-APP_RUN=$SRC_DIR/CI/kuiper/AppRun
-APP_DESKTOP=$SRC_DIR/CI/kuiper/scopy.desktop
-APP_SQUASHFS=$SRC_DIR/CI/kuiper/scopy.squashfs
-RUNTIME_ARMHF=$SRC_DIR/CI/kuiper/runtime-armhf
+APP_DIR=$SRC_DIR/CI/armhf/scopy.AppDir
+APP_IMAGE=$SRC_DIR/CI/armhf/Scopy1-armhf.AppImage
+APP_RUN=$SRC_DIR/CI/armhf/AppRun
+APP_DESKTOP=$SRC_DIR/CI/armhf/scopy.desktop
+APP_SQUASHFS=$SRC_DIR/CI/armhf/scopy.squashfs
+RUNTIME_ARMHF=$SRC_DIR/CI/armhf/runtime-armhf
 
 CMAKE_OPTS=(\
 	-DCMAKE_SYSROOT="$SYSROOT" \

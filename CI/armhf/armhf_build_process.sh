@@ -4,7 +4,7 @@ set -ex
 git config --global --add safe.directory $HOME/scopy
 SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
 SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
-source $SRC_DIR/CI/kuiper/kuiper_build_config.sh
+source $SRC_DIR/CI/armhf/armhf_build_config.sh
 
 echo -- USING CMAKE COMMAND:
 echo $CMAKE
@@ -271,7 +271,7 @@ create_appdir(){
 
 	BUILD_FOLDER=$SRC_DIR/build
 	EMU_BUILD_FOLDER=$STAGING_AREA/iio-emu/build
-	COPY_DEPS=$SRC_DIR/CI/kuiper/copy-deps.sh
+	COPY_DEPS=$SRC_DIR/CI/armhf/copy-deps.sh
 
 	rm -rf $APP_DIR
 	mkdir $APP_DIR
@@ -295,7 +295,7 @@ create_appdir(){
 	cp -r $QT_LOCATION/plugins $APP_DIR/usr
 	# search for the python version linked by cmake and copy inside the appimage the same version
 	FOUND_PYTHON_VERSION=$(grep 'PYTHON_VERSION' $SRC_DIR/build/CMakeCache.txt | awk -F= '{print $2}' | grep -o 'python[0-9]\+\.[0-9]\+')
-	python_path=/usr/lib/$FOUND_PYTHON_VERSION
+	python_path=${SYSROOT}/usr/lib/$FOUND_PYTHON_VERSION
 	cp -r $python_path $APP_DIR/usr/lib
 	cp -r $SYSROOT/share/libsigrokdecode/decoders  $APP_DIR/usr/lib
 
@@ -334,7 +334,7 @@ move_appimage(){
 }
 
 generate_ci_envs(){
-	$SRC_DIR/CI/appveyor/gen_ci_envs.sh > $SRC_DIR/CI/kuiper/gh-actions.envs
+	$SRC_DIR/CI/appveyor/gen_ci_envs.sh > $SRC_DIR/CI/armhf/gh-actions.envs
 }
 
 #
@@ -384,19 +384,19 @@ dev_setup(){
 	# for the local development of Scopy armhf the easyest method is to download the docker image
 	# a temporary docker volume is created to bridge the local environment and the docker container
 	# the compiling is done inside the container unsing the already prepared filesystem
-	docker pull cristianbindea/scopy1-kuiper:latest
+	docker pull cristianbindea/scopy1-armhf-appimage:latest
 	docker run -it \
 		--mount type=bind,source="$SRC_DIR",target=/home/runner/scopy \
-		cristianbindea/scopy1-kuiper:latest
+		cristianbindea/scopy1-armhf-appimage:latest
 	# now this repository folder it shared with the docker container
 
-	# to compile the application use "scopy/CI/kuiper/kuiper_build_process.sh get_tools generate_appimage"
-	# after the first compilation just use "scopy/CI/kuiper/kuiper_build_process.sh generate_appimage"
+	# to compile the application use "scopy/CI/armhf/armhf_build_process.sh get_tools generate_appimage"
+	# after the first compilation just use "scopy/CI/armhf/armhf_build_process.sh generate_appimage"
 	# to continue using the same docker container use docker start (container id) and "docker attach (container id)"
 
 	# finally after the development is done use this to clean the system
 	# "docker container rm -v (container id)"
-	# "docker image rm cristianbindea/scopy1-kuiper:latest"
+	# "docker image rm cristianbindea/scopy1-armhf-appimage:latest"
 
 	# to get the container id use "docker container ls -a"
 }

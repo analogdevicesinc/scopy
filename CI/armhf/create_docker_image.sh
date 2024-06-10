@@ -3,7 +3,7 @@
 set -ex
 SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
 SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
-source $SRC_DIR/CI/kuiper/kuiper_build_config.sh
+source $SRC_DIR/CI/armhf/armhf_build_config.sh
 
 # install docker
 install_packages(){
@@ -16,7 +16,7 @@ install_packages(){
 }
 
 create_sysroot(){
-	$SRC_DIR/CI/kuiper/create_sysroot.sh \
+	$SRC_DIR/CI/armhf/create_sysroot.sh \
 		install_packages \
 		download_kuiper \
 		install_qemu \
@@ -34,9 +34,9 @@ tar_and_move_sysroot(){
 }
 
 create_image(){
-	pushd ${SRC_DIR}/CI/kuiper/docker
-	sudo docker build --load --tag cristianbindea/scopy1-kuiper .
-	# sudo DOCKER_BUILDKIT=0 docker build --tag cristianbindea/scopy1-kuiper . # build the image using old backend
+	pushd ${SRC_DIR}/CI/armhf/docker
+	sudo docker build --load --tag cristianbindea/scopy1-armhf-appimage .
+	# sudo DOCKER_BUILDKIT=0 docker build --tag cristianbindea/scopy1-armhf-appimage . # build the image using old backend
 	popd
 }
 
