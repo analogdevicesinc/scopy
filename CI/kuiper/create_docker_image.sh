@@ -1,7 +1,8 @@
 #!/bin/bash
 
 set -ex
-SRC_DIR=$(git rev-parse --show-toplevel)
+SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
+SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
 source $SRC_DIR/CI/kuiper/kuiper_build_config.sh
 
 # install docker
