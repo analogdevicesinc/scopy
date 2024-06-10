@@ -5,6 +5,7 @@ HERE=${SELF%/*}
 
 export QT_PLUGIN_PATH=$HERE/usr/plugins
 export QT_QPA_PLATFORM_PLUGIN_PATH=$HERE/usr/plugins/platforms
+export QT_QPA_PLATFORM=xcb
 export LD_LIBRARY_PATH=$HERE/usr/lib
 
 python_dir=$(find "$HERE/usr/lib/" -maxdepth 1 -type d -name "python3.*")
