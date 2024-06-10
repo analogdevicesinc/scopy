@@ -2,6 +2,7 @@
 #define GRTIMESINKCOMPONENT_H
 
 #include <QObject>
+#include "interfaces.h"
 #include "toolcomponent.h"
 #include <gr-util/time_sink_f.h>
 #include "channelcomponent.h"
@@ -19,6 +20,7 @@ public:
 	bool finished() override;
 	bool enabled() const;
 
+	QWidget* createMenu(QWidget *parent = nullptr);
 public Q_SLOTS:
 	void connectSignalPaths();
 	void tearDownSignalPaths();
@@ -34,6 +36,7 @@ public Q_SLOTS:
 	virtual void onStop() override;
 	virtual void onInit() override;
 	virtual void onDeinit() override;
+
 
 	void addChannel(GRChannel *ch);
 	void removeChannel(GRChannel *c);
@@ -54,6 +57,9 @@ private:
 	bool m_syncMode;
 
 	QList<GRChannel *> m_channels;
+
+	// SampleRateProvider interface
+
 };
 } // namespace adc
 } // namespace scopy

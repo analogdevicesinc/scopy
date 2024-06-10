@@ -223,6 +223,7 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 			&GRTimeSinkComponent::setSampleRate);
 		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::rollingModeChanged, c,
 			&GRTimeSinkComponent::setRollingMode);
+
 	}
 
 	if(dynamic_cast<GRIIODeviceSourceNode *>(node) != nullptr) {
@@ -232,6 +233,7 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 		m_tool->addDevice(d->ctrl(), d);
 
 		m_acqNodeComponentMap[griiodsn] = (d);
+		m_timePlotSettingsComponent->addSampleRateProvider(d);
 		addComponent(d);
 
 		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::bufferSizeChanged, d,
@@ -270,7 +272,7 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 		connect(c->ctrl(), &QAbstractButton::clicked, this,
 			[=]() { m_plotComponentManager->selectChannel(c); });
 
-		grtsc->addChannel(c);			    // For matching Sink To Channels
+		grtsc->addChannel(c);			    // For matching Sink To Channels		
 		dc->addChannel(c);			    // used for sample rate computation
 		m_timePlotSettingsComponent->addChannel(c); // SingleY/etc
 

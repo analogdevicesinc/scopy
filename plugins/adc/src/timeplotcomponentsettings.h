@@ -22,6 +22,8 @@ public Q_SLOTS:
 	void onDeinit() override;
 	void onStart() override;
 	void onStop() override;
+Q_SIGNALS:
+	void requestDeletePlot();
 
 private:
 	PlotAutoscaler *m_autoscaler;
@@ -30,6 +32,7 @@ private:
 	MenuOnOffSwitch *m_xAxisShow;
 	MenuOnOffSwitch *m_autoscaleBtn;
 	QList<ChannelComponent *> m_channels;
+	QPushButton *m_deletePlot;
 
 	bool m_autoscaleEnabled;
 	bool m_running;

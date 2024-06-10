@@ -34,7 +34,7 @@ GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, Time
 	m_running = false;
 	m_autoscaleEnabled = false;
 
-	m_scaleAvailable = true; // query from GRIIOFloatChannel;
+	m_scaleAvailable = m_src->scaleAttributeAvailable(); // query from GRIIOFloatChannel;
 	m_unit = "Volts";	 // query from GRIIOFloatChannel;
 
 	m_channelName = node->name();
@@ -69,9 +69,19 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 	cb->addItem("ADC Counts", YMODE_COUNT);
 	cb->addItem("% Full Scale", YMODE_FS);
 
+	m_scaleWidget = nullptr;
 	if(m_scaleAvailable) {
 		cb->addItem(m_unit, YMODE_SCALE);
+		IIOWidgetFactoryRecipe rec;
+		rec.context = m_src->ctx();
+		rec.channel = m_src->channel();
+		rec.device = m_src->dev();
+		rec.data = "scale";
+
+		m_scaleWidget = IIOWidgetFactory::buildSingle(0x00, rec, this);
 	}
+
+
 	m_yCtrl = new MenuPlotAxisRangeControl(m_plotChannelCmpt->m_timePlotYAxis, yaxis);
 
 	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), yaxis, false);
@@ -90,6 +100,8 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 	yaxis->contentLayout()->addWidget(m_autoscaleBtn);
 	yaxis->contentLayout()->addWidget(m_yCtrl);
 	yaxis->contentLayout()->addWidget(m_ymodeCb);
+	if(m_scaleWidget)
+		yaxis->contentLayout()->addWidget(m_scaleWidget);
 
 	yaxiscontainer->contentLayout()->addWidget(yaxis);
 
@@ -239,6 +251,7 @@ void GRTimeChannelComponent::setYMode(YMode mode)
 
 	switch(mode) {
 	case YMODE_COUNT:
+		m_scaleWidget->setVisible(false);
 		scale = 1;
 		if(fmt->is_signed) {
 			ymin = -(float)((int64_t)1 << (fmt->bits - 1));
@@ -250,6 +263,7 @@ void GRTimeChannelComponent::setYMode(YMode mode)
 		//		m_plotCh->yAxis()->setUnits("Counts");
 		break;
 	case YMODE_FS:
+		m_scaleWidget->setVisible(false);
 		scale = 1.0 / ((float)((uint64_t)1 << fmt->bits));
 		if(fmt->is_signed) {
 			ymin = -0.5;
@@ -261,8 +275,22 @@ void GRTimeChannelComponent::setYMode(YMode mode)
 		//		m_plotCh->yAxis()->setUnits("");
 		break;
 	case YMODE_SCALE:
+		scale = m_scaleWidget->getDataStrategy()->data().toDouble();
+		m_scaleWidget->setVisible(true);
+
+		if(fmt->is_signed) {
+			ymin = -(float)((int64_t)1 << (fmt->bits - 1));
+			ymax = (float)((int64_t)1 << (fmt->bits - 1));
+		} else {
+			ymin = 0;
+			ymax = (1 << (fmt->bits));
+		}
+
+		ymin = ymin * scale;
+		ymax = ymax * scale;
 
 		//		m_plotCh->yAxis()->setUnits(m_unit);
+
 		break;
 	default:
 		break;
@@ -362,3 +390,15 @@ void GRTimeChannelComponent::setupChannelMenuControlButtonHelper(MenuControlButt
 	});
 	btn->checkBox()->setChecked(true);
 }
+
+bool GRTimeChannelComponent::sampleRateAvailable()
+{
+	return m_src->samplerateAttributeAvailable();
+}
+
+double GRTimeChannelComponent::sampleRate()
+{
+	return m_src->readSampleRate();
+}
+
+

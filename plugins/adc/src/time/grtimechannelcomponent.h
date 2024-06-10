@@ -11,6 +11,7 @@
 #include <gui/widgets/menuplotaxisrangecontrol.h>
 #include <gui/widgets/menucontrolbutton.h>
 #include "interfaces.h"
+#include <iio-widgets/iiowidget.h>
 
 namespace scopy {
 namespace adc {
@@ -52,7 +53,12 @@ public:
 	GRIIOFloatChannelSrc *m_grch;
 };
 
-class SCOPY_ADC_EXPORT GRTimeChannelComponent : public ChannelComponent, public GRChannel, public MeasurementProvider
+class SCOPY_ADC_EXPORT GRTimeChannelComponent
+	: public ChannelComponent
+	, public GRChannel
+	, public MeasurementProvider
+	, public SampleRateProvider
+
 {
 	Q_OBJECT
 public:
@@ -73,6 +79,8 @@ public:
 	void insertPlotComboWidget(QWidget *w);
 	QVBoxLayout* menuLayout();
 
+
+
 public Q_SLOTS:
 
 	void enable() override;
@@ -84,11 +92,13 @@ public Q_SLOTS:
 
 	void onNewData(const float *xData, const float *yData, size_t size, bool copy) override;
 
-	void toggleAutoScale();
+	bool sampleRateAvailable() override;
+	double sampleRate() override;
 
+	void toggleAutoScale();
 	void setYMode(YMode mode);
 	void setSingleYMode(bool);
-	// void setSampleRate(double v) override;
+
 	/*
 	Q_SIGNALS:
 		void addNewSnapshot(SnapshotProvider::SnapshotRecipe) override;*/
@@ -105,6 +115,7 @@ private:
 	PlotAutoscaler *m_autoscaler;
 	MenuCombo *m_ymodeCb;
 	MenuOnOffSwitch *m_autoscaleBtn;
+	IIOWidget* m_scaleWidget;
 
 	MenuCollapseSection *m_curveSection;
 
@@ -123,6 +134,8 @@ private:
 
 	void createMenuControlButton(QWidget *parent = nullptr);
 	void setupChannelMenuControlButtonHelper(MenuControlButton *btn);
+
+
 };
 
 } // namespace adc

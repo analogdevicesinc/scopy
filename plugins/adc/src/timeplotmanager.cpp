@@ -2,6 +2,7 @@
 #include <timeplotcomponentchannel.h>
 #include <plotaxis.h>
 #include <timeplotmanagercombobox.h>
+#include <timeplotcomponentsettings.h>
 
 using namespace scopy;
 using namespace scopy::adc;
@@ -66,6 +67,15 @@ uint32_t TimePlotManager::addPlot(QString name)
 	TimePlotComponent *plt = new TimePlotComponent(name, m_plotIdx, this);
 	m_plotIdx++;
 	m_plots.append(plt);
+
+	connect(plt, &TimePlotComponent::requestDeletePlot, this, [=](){
+		Q_EMIT plotRemoved(plt->uuid());
+		removePlot(plt->uuid());
+
+		delete plt->plotMenu();
+		delete plt;
+	});
+
 	addComponent(plt);
 	m_lay->insertWidget(-1, plt);
 	for(TimePlotManagerCombobox *p : m_channelPlotcomboMap.values()) {
