@@ -35,14 +35,14 @@ PYTHON_VERSION=python3.8
 
 QT_LOCATION=/opt/Qt/5.15.2/gcc_64
 
-STAGING_AREA=$SRC_DIR/CI/appimage/staging
+STAGING_AREA=$SRC_DIR/CI/x86_64/staging
 QMAKE_BIN=$QT_LOCATION/bin/qmake
 CMAKE_BIN=${STAGING_AREA}/cmake/bin/cmake
 JOBS=-j14
 
 APP_DIR_NAME=scopy.AppDir
-APP_DIR=$SRC_DIR/CI/appimage/$APP_DIR_NAME
-APP_IMAGE=$SRC_DIR/CI/appimage/Scopy1-x86_64.AppImage
+APP_DIR=$SRC_DIR/CI/x86_64/$APP_DIR_NAME
+APP_IMAGE=$SRC_DIR/CI/x86_64/Scopy1-x86_64.AppImage
 
 if [ "$USE_STAGING" == "ON" ]
 	then
@@ -253,16 +253,24 @@ build_qwt() {
 	pushd $STAGING_AREA/qwt
 	git clean -xdf
 	sed -i 's|/usr/local/qwt-$$QWT_VERSION-ma|/usr/local|g' qwtconfig.pri
+
+	INSTALL=$1
+	[ -z $INSTALL ] && INSTALL=ON
+
 	if [ "$USE_STAGING" == "ON" ]
 	then
 		$QMAKE_BIN INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib qwt.pro
 		make $JOBS
-		make INSTALL_ROOT=$STAGING_AREA_DEPS install
+		if [ "$INSTALL" == "ON" ];then
+			make INSTALL_ROOT=$STAGING_AREA_DEPS install
+		fi
 		cp -r $STAGING_AREA_DEPS/usr/local/* $STAGING_AREA_DEPS/
 	else
 		$QMAKE_BIN qwt.pro
 		make $JOBS
-		sudo make install
+		if [ "$INSTALL" == "ON" ];then
+			sudo make install
+		fi
 	fi
 
 	popd
@@ -273,6 +281,10 @@ build_libsigrokdecode() {
 	pushd $STAGING_AREA/libsigrokdecode
 	git clean -xdf
 	./autogen.sh
+
+	INSTALL=$1
+	[ -z $INSTALL ] && INSTALL=ON
+
 	if [ "$USE_STAGING" == "ON" ]
 	then
 		./configure --prefix $STAGING_AREA_DEPS
@@ -281,7 +293,10 @@ build_libsigrokdecode() {
 		./configure
 		make $JOBS
 	fi
-	if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
+
+	if [ "$INSTALL" == "ON" ];then
+		if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
+	fi
 	popd
 }
 
@@ -324,8 +339,8 @@ build_deps(){
 	build_gnuradio ON
 	build_grscopy ON
 	build_grm2k ON
-	build_qwt
-	build_libsigrokdecode
+	build_qwt ON
+	build_libsigrokdecode ON
 	build_libtinyiiod ON
 }
 
@@ -343,8 +358,8 @@ create_appdir(){
 	${STAGING_AREA}/linuxdeploy-x86_64.AppImage \
 		--appdir  $APP_DIR \
 		--executable $SRC_DIR/build/scopy \
-		--custom-apprun $SRC_DIR/CI/appimage/AppRun \
-		--desktop-file $SRC_DIR/CI/appimage/scopy.desktop \
+		--custom-apprun $SRC_DIR/CI/x86_64/AppRun \
+		--desktop-file $SRC_DIR/CI/x86_64/scopy.desktop \
 		--icon-file $SRC_DIR/resources/Scopy.png \
 		--plugin qt
 
@@ -371,6 +386,7 @@ create_appdir(){
 	cp /usr/lib/x86_64-linux-gnu/libXdmcp.so* $APP_DIR/usr/lib
 	cp /usr/lib/x86_64-linux-gnu/libbsd.so* $APP_DIR/usr/lib
 	cp /usr/lib/x86_64-linux-gnu/libXau.so* $APP_DIR/usr/lib
+	cp /usr/lib/x86_64-linux-gnu/libffi.so* $APP_DIR/usr/lib
 	popd
 }
 
@@ -386,7 +402,7 @@ create_appimage(){
 }
 
 generate_ci_envs(){
-	$GITHUB_WORKSPACE/CI/appveyor/gen_ci_envs.sh > $GITHUB_WORKSPACE/CI/appimage/gh-actions.envs
+	$GITHUB_WORKSPACE/CI/appveyor/gen_ci_envs.sh > $GITHUB_WORKSPACE/CI/x86_64/gh-actions.envs
 }
 
 move_appimage(){

@@ -23,7 +23,7 @@ android*.sh
 CI/armhf/staging
 CI/armhf/scopy.AppDir
 CI/armhf/scopy.squashfs
-CI/appimage/staging
-CI/appimage/scopy.AppDir
+CI/x86_64/staging
+CI/x86_64/scopy.AppDir
 html/
 build_arm64-v8a/
