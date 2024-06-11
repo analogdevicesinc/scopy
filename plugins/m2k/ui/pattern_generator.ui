@@ -25,9 +25,6 @@
   <property name="windowTitle">
    <string>Scopy Pattern Generator</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true"/>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
     <number>0</number>

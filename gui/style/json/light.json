@@ -1,0 +1,27 @@
+{
+"interactive_subtle_idle": "#848B95",
+"interactive_subtle_hover": "#5E6773",
+"interactive_subtle_pressed": "#5E6773",
+"interactive_subtle_disabled": "#D5D8DC",
+"interactive_focus": "#B16EE0",
+"interactive_primary_idle": "#0067B9",
+"interactive_primary_hover": "#00427A",
+"interactive_primary_pressed": "#00427A",
+"interactive_primary_disabled": "#92BEFC",
+"content_default": "#101820",
+"content_subtle": "#5E6773",
+"content_silent": "#9FA4AD",
+"content_inverse": "#FFFFFF",
+"danger_default": "#C81A28",
+"interactive_secondary_idle": "#F45000",
+"background_subtle": "#F0F1F3",
+"background_primary": "#FFFFFF",
+"background_secondary": "#e4e7eb",
+"background_plot": "#101820",
+"interactive_secondary_pressed": "#EDF3FC",
+"color_default_hexcode": "000000",
+"color_inverse_hexcode": "FFFFFF",
+"svg_checkmark": ":/gui/icons/checkmark_light.svg",
+"svg_arrow_down": ":/gui/icons/handle_down_arrow_light.svg"
+}
+

@@ -6,7 +6,7 @@ SKIP_BUILD="-not -path */build/* -not -path */ci/flatpak*"
 
 IN_PLACE="-i"
 VERBOSE="--verbose"
-CLANG_FORMAT="clang-format-12"
+CLANG_FORMAT="clang-format"
 CMAKE_FORMAT="cmake-format"
 
 find $SCOPY_REPO $SKIP_BUILD -type f -name "*.cpp" | xargs $CLANG_FORMAT $VERBOSE $IN_PLACE

@@ -1,0 +1,9 @@
+QWidget[&&property&&=true] {
+    border-top-right-radius: &radius_1&;
+    border-bottom-right-radius: &radius_1&;
+    border: &border_width& solid &interactive_subtle_idle&;
+    max-height: &unit_2&;
+    min-height: &unit_2&;
+    padding: 0 &padding_1& 0 &padding_1&;
+    background-color: transparent;
+}

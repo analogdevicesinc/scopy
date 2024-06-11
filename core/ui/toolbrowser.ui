@@ -27,35 +27,10 @@
   </property>
   <property name="styleSheet">
    <string notr="true">#btnSave,#btnLoad,#btnPreferences,#btnAbout {
- text-align:center;
+ text-align: center;
  height: 25px;
- background-color: none;
- border:none;
 }
 
-#btnSave:hover,
-#btnLoad:hover,
-#btnPreferences:hover,
-#btnAbout:hover,
-#btnCollapse_2:hover{
- background-color: rgba(0, 0, 0, 60);
- border: 1px solid rgba(0, 0, 0, 30);
- border-radius:5px;
-}
-
-
-#btnSave {
- qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/save.svg&quot;);
-}
-#btnLoad {
- qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/load.svg&quot;);
-}
-#btnPreferences {
- qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/preferences.svg&quot;);
-}
-#btnAbout {
- qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/info.svg&quot;);
-}
 #logo {
 background-image: url(:/gui/icons/scopy-default/icons/logo_analog.svg);
 background-repeat: no-repeat;
@@ -67,7 +42,6 @@ min-height:36px;
 #btnCollapseMini {
  height:40px;
  width:40px;
- background-image: url(:/gui/icons/scopy-default/icons/menu.svg);
  background-repeat: no-repeat;
  background-position: center center;
 }
