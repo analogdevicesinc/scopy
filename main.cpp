@@ -9,6 +9,7 @@
 #include <core/scopymainwindow_api.h>
 #include <gui/utils.h>
 #include <core/crashreport.h>
+#include <core/style.h>
 
 using namespace scopy;
 
@@ -104,8 +105,8 @@ int main(int argc, char *argv[])
 	printRuntimeEnvironmentInfo();
 	ApplicationRestarter restarter(QString::fromLocal8Bit(argv[0]));
 	a.setWindowIcon(QIcon(":/gui/icon.ico"));
-	a.setStyle("Fusion");
-	a.setStyleSheet(Util::loadStylesheetFromFile(":/gui/stylesheets/default.qss"));
+	Style().init();
+
 	ScopyMainWindow w;
 	w.show();
 

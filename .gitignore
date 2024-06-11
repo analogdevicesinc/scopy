@@ -64,3 +64,5 @@ bin/*
 lib/*
 docs/_build/*
 share/*
+gui/include/gui/style_properties.h
+gui/include/gui/style_attributes.h
