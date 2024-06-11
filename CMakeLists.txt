@@ -52,6 +52,17 @@ message(STATUS "SCOPY_RESOURCE_FILES: " ${SCOPY_RESOURCE_FILES})
 option(ENABLE_TRANSLATION "Enable translation" ON)
 include(ScopyTranslation)
 
+find_package(Python3 COMPONENTS Interpreter)
+execute_process(
+	COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tools/style_generator.py ${CMAKE_CURRENT_SOURCE_DIR}
+		${CMAKE_CURRENT_BINARY_DIR} RESULT_VARIABLE ret
+)
+if(NOT ret EQUAL "0")
+	message(FATAL_ERROR "Failed to generate style files! error: ${ret}")
+else()
+	message("-- Generated style files")
+endif()
+
 if(ENABLE_TRANSLATION)
 	generate_translations()
 	qt_add_resources(SCOPY_RESOURCES ${CMAKE_BINARY_DIR}/translations.qrc)

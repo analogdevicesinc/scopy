@@ -58,3 +58,5 @@ iio-widgets/include/iio-widgets/scopy-iio-widgets_export.h
 iioutil/include/iioutil/scopy-iioutil_export.h
 pluginbase/include/pluginbase/scopy-pluginbase_config.h
 pluginbase/include/pluginbase/scopy-pluginbase_export.h
+gui/include/gui/style_properties.h
+gui/include/gui/style_attributes.h
