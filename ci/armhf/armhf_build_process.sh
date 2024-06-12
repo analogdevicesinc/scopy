@@ -3,7 +3,7 @@
 set -ex
 git config --global --add safe.directory $HOME/scopy
 SRC_DIR=$(git rev-parse --show-toplevel)
-source $SRC_DIR/ci/kuiper/kuiper_build_config.sh
+source $SRC_DIR/ci/armhf/armhf_build_config.sh
 
 echo -- USING CMAKE COMMAND:
 echo $CMAKE
@@ -285,7 +285,7 @@ create_appdir(){
 	PLUGINS=$BUILD_FOLDER/plugins/plugins
 	REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
-	COPY_DEPS=$SRC_DIR/ci/kuiper/copy-deps.sh
+	COPY_DEPS=$SRC_DIR/ci/armhf/copy-deps.sh
 
 	rm -rf $APP_DIR
 	mkdir $APP_DIR

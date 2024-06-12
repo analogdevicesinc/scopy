@@ -2,21 +2,21 @@
 
 set -e
 SRC_DIR=$(git rev-parse --show-toplevel)
-source $SRC_DIR/ci/kuiper/kuiper_build_config.sh
+source $SRC_DIR/ci/armhf/armhf_build_config.sh
 
 BINARY=$1
 LOCATION=$2
 
 
-if [ ! -f "${SRC_DIR}"/ci/kuiper/ldd-mod ]; then
-	sed 's|.*RTLDLIST=.*|RTLDLIST="/usr/arm-linux-gnueabihf/lib/ld-2.31.so /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3"|' /usr/bin/ldd | tee "${SRC_DIR}"/ci/kuiper/ldd-mod
-	chmod +x "${SRC_DIR}"/ci/kuiper/ldd-mod
+if [ ! -f "${SRC_DIR}"/ci/armhf/ldd-mod ]; then
+	sed 's|.*RTLDLIST=.*|RTLDLIST="/usr/arm-linux-gnueabihf/lib/ld-2.31.so /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3"|' /usr/bin/ldd | tee "${SRC_DIR}"/ci/armhf/ldd-mod
+	chmod +x "${SRC_DIR}"/ci/armhf/ldd-mod
 fi
 
 export LD_LIBRARY_PATH="${APP_DIR}/usr/lib:${SYSROOT}/lib:${SYSROOT}/lib/arm-linux-gnueabihf:${SYSROOT}/usr/arm-linux-gnueabihf/lib:${SYSROOT}/usr/local/qt5.15/lib:${SYSROOT}/usr/local/lib:${SRC_DIR}/build"
 LIBS_ARRAY=()
 run_ldd(){
-	for library in $("${SRC_DIR}"/ci/kuiper/ldd-mod "$1" | cut -d '>' -f 2 | awk '{print $1}')
+	for library in $("${SRC_DIR}"/ci/armhf/ldd-mod "$1" | cut -d '>' -f 2 | awk '{print $1}')
 	do
 		# check if the library exists at that path and if it was processed already
 		if [ -f "${library}" ] && ! [[ "${LIBS_ARRAY[*]}" =~ "${library}" ]]; then
