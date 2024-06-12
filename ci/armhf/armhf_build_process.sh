@@ -2,7 +2,8 @@
 
 set -ex
 git config --global --add safe.directory $HOME/scopy
-SRC_DIR=$(git rev-parse --show-toplevel)
+SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
+SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
 source $SRC_DIR/ci/armhf/armhf_build_config.sh
 
 echo -- USING CMAKE COMMAND:
@@ -60,7 +61,7 @@ set_config_opts() {
 install_packages() {
 	sudo apt update
 	sudo apt install -y build-essential cmake unzip gfortran gcc git bison libtool \
-		python3 pip gperf pkg-config gdb-multiarch g++ flex texinfo gawk openssl \
+		${PYTHON_VERSION}-full pip gperf pkg-config gdb-multiarch g++ flex texinfo gawk openssl \
 		pigz libncurses-dev autoconf automake tar figlet liborc-0.4-dev* patchelf libc6-dev-armhf-cross squashfs-tools
 	pip install mako
 }
@@ -71,7 +72,7 @@ download_cmake() {
 	if [ ! -d cmake ];then
 		wget ${CMAKE_DOWNLOAD_LINK}
 		# unzip and rename
-		tar -xvf cmake*.tar.gz && rm cmake*.tar.gz && mv cmake* cmake
+		tar -xf cmake*.tar.gz && rm cmake*.tar.gz && mv cmake* cmake
 	else
 		echo "Cmake already downloaded"
 	fi
@@ -123,8 +124,12 @@ build_libiio() {
 		-DENABLE_IPV6:BOOL=OFF \
 		-DINSTALL_UDEV_RULE:BOOL=OFF
 		"
-	build_with_cmake
-	sudo make install
+	if [ -d 'build' ];then
+		echo "### IIO-EMU already built --- skipping"
+	else
+		build_with_cmake
+		sudo make install
+	fi
 	popd
 }
 
@@ -257,24 +262,11 @@ build_scopy() {
 	pushd $SRC_DIR
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PLUGIN_TEST=ON \
-		-DENABLE_TESTING=ON
+		-DENABLE_TESTING=ON \
+		-DPYTHON_EXECUTABLE=/usr/bin/python3.9
 		"
 	build_with_cmake
 	popd
-}
-
-build_deps(){
-	build_libiio
-	build_libad9361
-	build_spdlog
-	build_libm2k
-	build_volk
-	build_gnuradio
-	build_grscopy
-	build_grm2k
-	build_qwt
-	build_libsigrokdecode
-	build_libtinyiiod
 }
 
 create_appdir(){
@@ -317,31 +309,23 @@ create_appdir(){
 	$COPY_DEPS $APP_DIR/usr/bin/iio-emu $APP_DIR/usr/lib
 	$COPY_DEPS $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
 	$COPY_DEPS "$APP_DIR/usr/share/plugins/*.so" $APP_DIR/usr/lib
-
 	cp -r $QT_LOCATION/plugins $APP_DIR/usr
-	cp -r $SYSROOT/lib/python3.9 $APP_DIR/usr/lib
+
+	# search for the python version linked by cmake and copy inside the appimage the same version
+	FOUND_PYTHON_VERSION=$(grep 'PYTHON_VERSION' $SRC_DIR/build/CMakeCache.txt | awk -F= '{print $2}' | grep -o 'python[0-9]\+\.[0-9]\+')
+	python_path=${SYSROOT}/usr/lib/$FOUND_PYTHON_VERSION
+	cp -r $python_path $APP_DIR/usr/lib
+
 	cp -r $SYSROOT/share/libsigrokdecode/decoders  $APP_DIR/usr/lib
 
 	cp $QT_LOCATION/lib/libQt5XcbQpa.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5EglFSDeviceIntegration.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5DBus.so* $APP_DIR/usr/lib
-
-	cp $SYSROOT/lib/arm-linux-gnueabihf/libstdc++.so* $APP_DIR/usr/lib
-	cp $SYSROOT/lib/arm-linux-gnueabihf/libc.so* $APP_DIR/usr/lib
-	cp $SYSROOT/lib/arm-linux-gnueabihf/libdl.so* $APP_DIR/usr/lib
-	cp $SYSROOT/lib/arm-linux-gnueabihf/libpthread.so* $APP_DIR/usr/lib
 	cp $SYSROOT/lib/arm-linux-gnueabihf/libGLESv2.so* $APP_DIR/usr/lib
-
-	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/ld-linux-armhf.so* $APP_DIR/usr/lib
-	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libarmmem-v7l.so* $APP_DIR/usr/lib
-	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libm.so* $APP_DIR/usr/lib
-	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libgcc_s.so* $APP_DIR/usr/lib
-	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libdl.so* $APP_DIR/usr/lib
-	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libmd.so* $APP_DIR/usr/lib
 	cp $SYSROOT/lib/arm-linux-gnueabihf/libbsd.so* $APP_DIR/usr/lib
 	cp $SYSROOT/lib/arm-linux-gnueabihf/libXdmcp.so* $APP_DIR/usr/lib
 	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libXau.so* $APP_DIR/usr/lib
-	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libxcb.so* $APP_DIR/usr/lib
+	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libffi.so* $APP_DIR/usr/lib
 }
 
 create_appimage(){
@@ -355,7 +339,11 @@ create_appimage(){
 # move the sysroot from the home of the docker container to the known location
 move_sysroot(){
 	mkdir -p $STAGING_AREA
-	[ -d /home/runner/sysroot ] && sudo mv /home/runner/sysroot $SYSROOT
+	[ -d /home/runner/sysroot ] && sudo mv /home/runner/sysroot $SYSROOT || echo "Sysroot not found or already moved"
+	if [ ! -d $SYSROOT ];then
+		echo "Missing SYSROOT"
+		exit 1
+	fi
 }
 
 # move and rename the AppImage artifact
@@ -366,6 +354,71 @@ move_appimage(){
 generate_ci_envs()
 {
 	$SRC_DIR/ci/general/gen_ci_envs.sh > $SRC_DIR/ci/general/gh-actions.envs
+}
+
+
+#
+# Helper functions
+#
+build_deps(){
+	build_libiio
+	build_libad9361
+	build_spdlog
+	build_libm2k
+	build_volk
+	build_gnuradio
+	build_grscopy
+	build_grm2k
+	build_qwt
+	build_libsigrokdecode
+	build_libtinyiiod
+}
+
+run_workflow(){
+	install_packages
+	download_cmake
+	download_crosscompiler
+	move_sysroot
+	build_iio-emu
+	build_scopy
+	create_appdir
+	create_appimage
+	move_appimage
+}
+
+get_tools(){
+	install_packages
+	download_cmake
+	download_crosscompiler
+	move_sysroot
+}
+
+generate_appimage(){
+	build_iio-emu
+	build_scopy
+	create_appdir
+	create_appimage
+}
+
+dev_setup(){
+	# for the local development of Scopy armhf the easyest method is to download the docker image
+	# a temporary docker volume is created to bridge the local environment and the docker container
+	# the compiling is done inside the container unsing the already prepared filesystem
+	docker pull cristianbindea/scopy2-armhf-appimage:latest
+	docker run -it \
+		--mount type=bind,source="$SRC_DIR",target=/home/runner/scopy \
+		cristianbindea/scopy2-armhf-appimage:latest
+	# now this repository folder it shared with the docker container
+
+	# to compile the application use "scopy/ci/armhf/armhf_build_process.sh get_tools generate_appimage"
+	# after the first compilation just use "scopy/ci/armhf/armhf_build_process.sh generate_appimage"
+	# to continue using the same docker container use docker start (container id) and "docker attach (container id)"
+
+	# finally after the development is done use this to clean the system
+	# "docker container rm -v (container id)"
+	# "docker image rm cristianbindea/scopy2-armhf-appimage:latest"
+
+	# to get the container id use "docker container ls -a"
 }
 
 for arg in $@; do

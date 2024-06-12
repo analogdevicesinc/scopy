@@ -1,14 +1,15 @@
 #!/bin/bash
 
 set -ex
-SRC_DIR=$(git rev-parse --show-toplevel)
+SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
+SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
 source $SRC_DIR/ci/armhf/armhf_build_config.sh
 
 IMAGE_FILE=2023-12-13-ADI-Kuiper-full.img
 
 install_packages(){
 	sudo apt update
-	sudo apt -y install git wget unzip python3 python2
+	sudo apt -y install git wget unzip python3 python2 python
 }
 
 download_kuiper(){

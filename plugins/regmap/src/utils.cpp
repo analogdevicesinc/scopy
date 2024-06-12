@@ -58,7 +58,7 @@ QDir Utils::setXmlPath()
 		xmlsPath.setPath(REGMAP_XML_PATH_LOCAL);
 #elif defined __APPLE__
 		xmlsPath.setPath(QCoreApplication::applicationDirPath() + "/plugins/plugins/xmls");
-#elif defined(__arm__)
+#elif defined(__appimage__)
 		xmlsPath.setPath(QCoreApplication::applicationDirPath() + "/../share/plugins/xmls");
 #else
 		xmlsPath.setPath(REGMAP_XML_SYSTEM_PATH);
