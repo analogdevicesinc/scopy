@@ -1,4 +1,4 @@
-name: Kuiper Scopy Build
+name: Scopy armhf Build
 
 on: [push, pull_request]
 
@@ -8,7 +8,7 @@ env:
 
 jobs:
 
-  build_scopy_for_kuiper:
+  build_scopy_for_armhf:
     runs-on: ubuntu-20.04
 
     steps:
@@ -17,24 +17,24 @@ jobs:
                 set-safe-directory: 'true'
 
         - name: Pull the Docker Image
-          run: docker pull cristianbindea/scopy2-kuiper:latest
+          run: docker pull cristianbindea/scopy2-armhf-appimage:latest
 
         - name: Create Scopy AppImage
           shell: bash
           run: |
                 cd $GITHUB_WORKSPACE
                 sudo apt update
-                ./ci/kuiper/create_sysroot.sh install_packages install_qemu
-                ./ci/kuiper/kuiper_build_process.sh generate_ci_envs
+                ./ci/armhf/create_sysroot.sh install_packages install_qemu
+                ./ci/armhf/armhf_build_process.sh generate_ci_envs
 
                 docker run \
                         --mount type=bind,source="$GITHUB_WORKSPACE",target=/home/runner/scopy \
                         --env-file $GITHUB_WORKSPACE/ci/general/gh-actions.envs \
-                        cristianbindea/scopy2-kuiper:latest \
+                        cristianbindea/scopy2-armhf-appimage:latest \
                         /bin/bash -c    'cd $HOME && \
                                         sudo chown -R runner:runner scopy && \
                                         cd $HOME/scopy && \
-                                        ./ci/kuiper/kuiper_build_process.sh install_packages download_cmake download_crosscompiler move_sysroot build_scopy build_iio-emu create_appdir create_appimage move_appimage
+                                        ./ci/armhf/armhf_build_process.sh install_packages download_cmake download_crosscompiler move_sysroot build_scopy build_iio-emu create_appdir create_appimage move_appimage
                                         '
         - name: Set short git commit SHA
           shell: bash

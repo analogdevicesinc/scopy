@@ -14,26 +14,26 @@ QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 IIOEMU_BRANCH=main
 
-STAGING_AREA=$SRC_DIR/ci/kuiper/staging
+STAGING_AREA=$SRC_DIR/ci/armhf/staging
 SYSROOT=$STAGING_AREA/sysroot
 SYSROOT_TAR=$STAGING_AREA/sysroot.tar.gz
-SYSROOT_DOCKER=$SRC_DIR/ci/kuiper/docker/sysroot.tar.gz
+SYSROOT_DOCKER=$SRC_DIR/ci/armhf/docker/sysroot.tar.gz
 TOOLCHAIN=$STAGING_AREA/cross-pi-gcc
 TOOLCHAIN_BIN=$TOOLCHAIN/bin
 TOOLCHAIN_HOST="arm-linux-gnueabihf"
-TOOLCHAIN_FILE=$SRC_DIR/ci/kuiper/cmake_toolchain.cmake
+TOOLCHAIN_FILE=$SRC_DIR/ci/armhf/cmake_toolchain.cmake
 QT_LOCATION=$SYSROOT/usr/local/qt5.15
 
 CMAKE_BIN=$STAGING_AREA/cmake/bin/cmake
 QMAKE_BIN=$QT_LOCATION/bin/qmake
 JOBS=-j14
 
-APP_DIR=$SRC_DIR/ci/kuiper/scopy.AppDir
-APP_IMAGE=$SRC_DIR/ci/kuiper/Scopy.AppImage
-APP_RUN=$SRC_DIR/ci/kuiper/AppRun
-APP_DESKTOP=$SRC_DIR/ci/kuiper/scopy.desktop
-APP_SQUASHFS=$SRC_DIR/ci/kuiper/scopy.squashfs
-RUNTIME_ARMHF=$SRC_DIR/ci/kuiper/runtime-armhf
+APP_DIR=$SRC_DIR/ci/armhf/scopy.AppDir
+APP_IMAGE=$SRC_DIR/ci/armhf/Scopy.AppImage
+APP_RUN=$SRC_DIR/ci/armhf/AppRun
+APP_DESKTOP=$SRC_DIR/ci/armhf/scopy.desktop
+APP_SQUASHFS=$SRC_DIR/ci/armhf/scopy.squashfs
+RUNTIME_ARMHF=$SRC_DIR/ci/armhf/runtime-armhf
 
 CMAKE_OPTS=(\
 	-DCMAKE_SYSROOT="$SYSROOT" \
