@@ -25,7 +25,7 @@ QString scopy::config::localPluginFolderPath()
 
 #if defined __APPLE__
 	return QCoreApplication::applicationDirPath() + "/plugins/plugins";
-#elif defined(__arm__)
+#elif defined(__appimage__)
 	return QCoreApplication::applicationDirPath() + "/../share/plugins";
 #endif
 
@@ -38,7 +38,7 @@ QString scopy::config::localTranslationFolderPath()
 {
 #if defined __APPLE__
 	return QCoreApplication::applicationDirPath() + "/translations";
-#elif defined(__arm__)
+#elif defined(__appimage__)
 	return QCoreApplication::applicationDirPath() + "/../share/translations";
 #endif
 
