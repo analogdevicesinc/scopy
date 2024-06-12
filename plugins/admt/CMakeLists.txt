@@ -62,6 +62,8 @@ target_link_libraries(
         scopy-pluginbase 
         scopy-gui 
         scopy-iioutil 
+        scopy-gr-util
+        scopy-iio-widgets
 )
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)

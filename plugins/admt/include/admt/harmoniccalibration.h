@@ -12,6 +12,7 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 
+#include <admtplugin.h>
 #include <iio.h>
 #include <toolbuttons.h>
 #include <tooltemplate.h>
@@ -19,20 +20,18 @@
 #include <menusectionwidget.h>
 #include <menucollapsesection.h>
 
-namespace scopy::admt {
+namespace scopy {
 class SCOPY_ADMT_EXPORT HarmonicCalibration : public QWidget
 {
 	Q_OBJECT
 public:
-	HarmonicCalibration(struct iio_context *context, QWidget *parent = nullptr);
+	HarmonicCalibration(PlotProxy *proxy, QWidget *parent = nullptr);
 	~HarmonicCalibration();
 private:
 	void getRotationData();
 	void getCountData();
 	void getAngleData();
 	QStringList getDeviceList(iio_context *context);
-
-	iio_context *context;
 
 	ToolTemplate *tool;
 	GearBtn *settingsButton;
@@ -46,6 +45,13 @@ private:
 	MenuSectionWidget *rotationSection, *countSection, *angleSection;
 	MenuCollapseSection *rotationCollapse, *countCollapse, *angleCollapse;
 	QScrollArea *scrollArea;
+
+	QPushButton *openLastMenuBtn;
+	PlotProxy *proxy;
+	GRTimePlotAddon *plotAddon;
+	GRTimePlotAddonSettings *plotAddonSettings;
+	QButtonGroup *rightMenuBtnGrp;
+	int uuid = 0;
 };
 } // namespace scopy::admt
 #endif // HARMONICCALIBRATION_H

@@ -2,12 +2,12 @@
 
 #include <stylehelper.h>
 
-using namespace scopy::admt;
+using namespace scopy;
+using namespace scopy::grutil;
 
-HarmonicCalibration::HarmonicCalibration(struct iio_context *context, QWidget *parent)
+HarmonicCalibration::HarmonicCalibration(PlotProxy *proxy, QWidget *parent)
 {
-    this->context = context;
-
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QHBoxLayout *lay = new QHBoxLayout(this);
     lay->setMargin(0);
 	setLayout(lay);
@@ -18,10 +18,39 @@ HarmonicCalibration::HarmonicCalibration(struct iio_context *context, QWidget *p
 	tool->rightContainer()->setVisible(true);
 	tool->bottomContainer()->setVisible(true);
 	lay->addWidget(tool);
+    tool->setLeftContainerWidth(210);
+	tool->setRightContainerWidth(300);
+	tool->setTopContainerHeight(100);
+	tool->setBottomContainerHeight(90);
+
+    openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), true, this);
+    rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn *>(openLastMenuBtn)->getButtonGroup();
+    
+    tool->openBottomContainerHelper(false);
+	tool->openTopContainerHelper(false);
+
+    settingsButton = new GearBtn(this);
     infoButton = new InfoBtn(this);
     runButton = new RunBtn(this);
+
+    tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
+	tool->addWidgetToTopContainerMenuControlHelper(settingsButton, TTA_LEFT);
+
     tool->addWidgetToTopContainerHelper(infoButton, TTA_LEFT);
     tool->addWidgetToTopContainerHelper(runButton, TTA_RIGHT);
+
+    plotAddon = dynamic_cast<GRTimePlotAddon *>(proxy->getPlotAddon());
+	tool->addWidgetToCentralContainerHelper(plotAddon->getWidget());
+
+    plotAddonSettings = dynamic_cast<GRTimePlotAddonSettings *>(proxy->getPlotSettings());
+	rightMenuBtnGrp->addButton(settingsButton);
+
+    QString settingsMenuId = plotAddonSettings->getName() + QString(uuid++);
+	tool->rightStack()->add(settingsMenuId, plotAddonSettings->getWidget());
+	connect(settingsButton, &QPushButton::toggled, this, [=, this](bool b) {
+		if(b)
+			tool->requestMenu(settingsMenuId);
+	});
 
     leftWidget = new QWidget(this);
     leftLayout = new QVBoxLayout(this);
@@ -85,18 +114,15 @@ HarmonicCalibration::HarmonicCalibration(struct iio_context *context, QWidget *p
     leftBodyLayout->addWidget(countSection);
     leftBodyLayout->addWidget(angleSection);
 
-    QStackedWidget *centralWidget = new QStackedWidget(this);
-	tool->addWidgetToCentralContainerHelper(centralWidget);
+    // QStackedWidget *centralWidget = new QStackedWidget(this);
+	// tool->addWidgetToCentralContainerHelper(centralWidget);
 }
 
 HarmonicCalibration::~HarmonicCalibration() {}
 
 void HarmonicCalibration::getRotationData()
 {
-    int devCount = iio_context_get_devices_count(context);
-    auto s = std::to_string(devCount);
-    QString qstr = QString::fromStdString(s);
-    rotationLineEdit->setText(qstr);
+    rotationLineEdit->setText("test");
 }
 
 void HarmonicCalibration::getCountData()
