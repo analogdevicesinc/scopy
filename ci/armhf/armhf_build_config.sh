@@ -14,6 +14,12 @@ QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 IIOEMU_BRANCH=main
 
+export APPIMAGE=1
+
+PYTHON_VERSION=python3.9 # default python version used in CI scripts, can be changed to match locally installed python
+
+STAGING_AREA=$SRC_DIR/CI/armhf/staging
+
 STAGING_AREA=$SRC_DIR/ci/armhf/staging
 SYSROOT=$STAGING_AREA/sysroot
 SYSROOT_TAR=$STAGING_AREA/sysroot.tar.gz
