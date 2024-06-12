@@ -443,7 +443,7 @@ void ScopyMainWindow::loadDecoders()
 #if defined(WITH_SIGROK) && defined(WITH_PYTHON)
 #if defined __APPLE__
 	QString path = QCoreApplication::applicationDirPath() + "/decoders";
-#elif defined(__arm__)
+#elif defined(__appimage__)
 	QString path = QCoreApplication::applicationDirPath() + "/../lib/decoders";
 #else
 	QString path = "decoders";
