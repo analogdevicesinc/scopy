@@ -170,6 +170,107 @@ QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForContext(struct iio_context 
 	return result;
 }
 
+IIOWidget *IIOWidgetFactory::buildAttrForChannel(iio_channel *channel, QString attributeName, QWidget *parent)
+{
+	QString optionalName = attributeName + "_available";
+	IIOWidgetFactoryRecipe recipe = {
+		.channel = channel,
+		.data = attributeName,
+	};
+
+	const char *nameFound = iio_channel_find_attr(channel, attributeName.toStdString().c_str());
+	if(!nameFound) {
+		qWarning(CAT_ATTRFACTORY) << "No attribute with the name" << attributeName << "was found.";
+		return nullptr;
+	}
+
+	const char *optionalFound = iio_channel_find_attr(channel, optionalName.toStdString().c_str());
+	if(!optionalFound) {
+		qDebug(CAT_ATTRFACTORY) << "Constructing simple iiowidget from" << attributeName << "as" << optionalName
+					<< "was not found.";
+		return IIOWidgetFactory::buildSingle(EditableUi | AttrData, recipe, parent);
+	}
+
+	recipe.iioDataOptions = optionalName;
+	char buffer[ATTR_BUFFER_SIZE] = {0};
+	int res = iio_channel_attr_read(channel, optionalName.toStdString().c_str(), buffer, ATTR_BUFFER_SIZE);
+	if(res < 0) {
+		qWarning(CAT_ATTRFACTORY) << "Error reading" << optionalName << ":" << res;
+		return IIOWidgetFactory::buildSingle(EditableUi | AttrData, recipe, parent);
+	}
+
+	if(QString(buffer).startsWith("[")) {
+		return IIOWidgetFactory::buildSingle(RangeUi | AttrData, recipe, parent);
+	}
+
+	return IIOWidgetFactory::buildSingle(ComboUi | AttrData, recipe, parent);
+}
+
+IIOWidget *IIOWidgetFactory::buildAttrForDevice(iio_device *device, QString attributeName, QWidget *parent)
+{
+	QString optionalName = attributeName + "_available";
+	IIOWidgetFactoryRecipe recipe = {
+		.device = device,
+		.data = attributeName,
+	};
+
+	const char *nameFound = iio_device_find_attr(device, attributeName.toStdString().c_str());
+	if(!nameFound) {
+		qWarning(CAT_ATTRFACTORY) << "No attribute with the name" << attributeName << "was found.";
+		return nullptr;
+	}
+
+	const char *optionalFound = iio_device_find_attr(device, optionalName.toStdString().c_str());
+	if(!optionalFound) {
+		qDebug(CAT_ATTRFACTORY) << "Constructing simple iiowidget from" << attributeName << "as" << optionalName
+					<< "was not found.";
+		return IIOWidgetFactory::buildSingle(EditableUi | DeviceAttrData, recipe, parent);
+	}
+
+	recipe.iioDataOptions = optionalName;
+	char buffer[ATTR_BUFFER_SIZE] = {0};
+	int res = iio_device_attr_read(device, optionalName.toStdString().c_str(), buffer, ATTR_BUFFER_SIZE);
+	if(res < 0) {
+		qWarning(CAT_ATTRFACTORY) << "Error reading" << optionalName << ":" << res;
+		return IIOWidgetFactory::buildSingle(EditableUi | DeviceAttrData, recipe, parent);
+	}
+
+	if(QString(buffer).startsWith("[")) {
+		return IIOWidgetFactory::buildSingle(RangeUi | DeviceAttrData, recipe, parent);
+	}
+
+	return IIOWidgetFactory::buildSingle(ComboUi | DeviceAttrData, recipe, parent);
+}
+
+IIOWidget *IIOWidgetFactory::buildAttrForContext(iio_context *context, QString attributeName, QWidget *parent)
+{
+	IIOWidget *result;
+	ssize_t attrCount = iio_context_get_attrs_count(context);
+	const char *name;
+	const char *value;
+	int retCode;
+
+	for(int i = 0; i < attrCount; ++i) {
+		retCode = iio_context_get_attr(context, i, &name, &value);
+
+		if(retCode < 0) {
+			qWarning(CAT_ATTRFACTORY) << "Could not read any data from context attr with index" << i;
+			continue;
+		}
+
+		if(strcmp("", "") == 0) {
+			IIOWidgetFactoryRecipe recipe = {
+				.context = context,
+				.data = QString(name),
+			};
+
+			return IIOWidgetFactory::buildSingle(EditableUi | ContextAttrData, recipe, parent);
+		}
+	}
+
+	return nullptr;
+}
+
 IIOWidget *IIOWidgetFactory::buildSingle(uint32_t hint, IIOWidgetFactoryRecipe recipe, QWidget *parent)
 {
 	GuiStrategyInterface *uiStrategy = nullptr;
