@@ -61,6 +61,13 @@ public:
 	static QList<IIOWidget *> buildAllAttrsForChannel(struct iio_channel *channel, QWidget *parent = nullptr);
 	static QList<IIOWidget *> buildAllAttrsForDevice(struct iio_device *dev, QWidget *parent = nullptr);
 	static QList<IIOWidget *> buildAllAttrsForContext(struct iio_context *context, QWidget *parent = nullptr);
+
+	static IIOWidget *buildAttrForChannel(struct iio_channel *channel, QString attributeName,
+					      QWidget *parent = nullptr);
+	static IIOWidget *buildAttrForDevice(struct iio_device *device, QString attributeName,
+					     QWidget *parent = nullptr);
+	static IIOWidget *buildAttrForContext(struct iio_context *context, QString attributeName,
+					      QWidget *parent = nullptr);
 };
 } // namespace scopy
 
