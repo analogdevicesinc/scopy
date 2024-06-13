@@ -10,6 +10,9 @@ message(STATUS "building plugin: " ${"${SCOPY_MODULE}"})
 
 project(scopy-${"${SCOPY_MODULE}"} VERSION 0.1 LANGUAGES CXX) 
 
+set(PLUGIN_DISPLAY_NAME ${plugin_display_name.upper()})
+set(PLUGIN_DESCRIPTION ${plugin_description.upper()})
+
 include(GenerateExportHeader) 
 
 # TODO: split stylesheet/resources and add here TODO: export header files correctly
@@ -58,6 +61,11 @@ generate_export_header(
     ${"${PROJECT_NAME}"} EXPORT_FILE_NAME ${"${CMAKE_CURRENT_SOURCE_DIR}"}/include/${"${SCOPY_MODULE}"}/${"${PROJECT_NAME}"}_export.h 
 )
 
+configure_file(
+	include/${"${SCOPY_MODULE}"}/scopy-${"${SCOPY_MODULE}"}_config.h.cmakein
+	${"${CMAKE_CURRENT_SOURCE_DIR}"}/include/${"${SCOPY_MODULE}"}/scopy-${"${SCOPY_MODULE}"}_config.h @ONLY
+)
+
 target_include_directories(${"${PROJECT_NAME}"} INTERFACE ${"${CMAKE_CURRENT_SOURCE_DIR}"}/include) 
 target_include_directories(${"${PROJECT_NAME}"} PRIVATE ${"${CMAKE_CURRENT_SOURCE_DIR}"}/include/${"${SCOPY_MODULE}"}) 
 
@@ -72,6 +80,11 @@ target_link_libraries(
         scopy-iioutil 
 )
 
-set(PLUGIN_NAME ${"${PROJECT_NAME}"} PARENT_SCOPE) 
+if(${"${CMAKE_SYSTEM_NAME}"} MATCHES "Windows")
+	configureinstallersettings(${"${SCOPY_MODULE}"} ${"${PLUGIN_DESCRIPTION}"} FALSE)
+endif()
+
+set(${scopy_module}_TARGET_NAME ${"${PROJECT_NAME}"} PARENT_SCOPE)
+
 
 install(TARGETS ${"${PROJECT_NAME}"} RUNTIME DESTINATION ${"${SCOPY_PLUGIN_INSTALL_DIR}"})

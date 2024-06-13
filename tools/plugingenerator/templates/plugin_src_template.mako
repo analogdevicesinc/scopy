@@ -74,7 +74,7 @@ void ${config['class_name']}::loadToolList()
 
 void ${config['class_name']}::unload() { /*delete m_infoPage;*/ }
 
-QString ${config['class_name']}::description() { return "Write the plugin description here"; }
+QString ${config['class_name']}::description() { return "${config['plugin_description']}"; }
 
 bool ${config['class_name']}::onConnect()
 {

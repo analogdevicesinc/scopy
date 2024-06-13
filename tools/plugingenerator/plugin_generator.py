@@ -51,6 +51,8 @@ filesGenerated = []
 directoriesGenerated = []
 pluginDirName = generatorOptions["plugin"]["dir_name"]
 pluginName = generatorOptions["plugin"]["plugin_name"]
+pluginDisplayName = generatorOptions["plugin"]["plugin_display_name"]
+pluginDecription = generatorOptions["plugin"]["plugin_description"]
 pluginClassName = generatorOptions["plugin"]["class_name"]
 pluginExportMacro = "SCOPY_" + pluginName.upper() + "_EXPORT"
 
@@ -216,7 +218,9 @@ if generatorOptions["plugin"]["cmakelists"]:
     cmakeListsPath = os.path.join(newPluginPath, "CMakeLists.txt")
     cmakeTemplate = Template(filename="templates/cmakelists_template.mako")
     cmakeContent = cmakeTemplate.render(
-        scopy_module=pluginName, config=generatorOptions["cmakelists"]
+        scopy_module=pluginName, 
+	    plugin_display_name=pluginDisplayName, 
+	    plugin_description=pluginDecription, config=generatorOptions["cmakelists"]
     )
 
 if not os.path.exists(cmakeListsPath):
@@ -226,6 +230,25 @@ if not os.path.exists(cmakeListsPath):
     filesGenerated.append(cmakeListsPath)
 else:
     print(cmakeListsPath + " file already exists!")
+########################################### Plugin CMAKE variable configuration file ##########################
+if os.path.exists(pluginIncludePath):
+    cmakeinFilePath = os.path.join(pluginIncludePath, "scopy-" + pluginName + "_config.h.cmakein")
+    if not os.path.exists(cmakeinFilePath):
+        cmakeinFileTemplate =  Template(
+                filename="templates/plugin_cmake_config_vars.mako"
+            )
+        cmakeinFileContent = cmakeinFileTemplate.render(
+                plugin_name=pluginName
+            )
+        
+        cmakeinFile = open(cmakeinFilePath, "w")
+        cmakeinFile.write(cmakeinFileContent)
+        cmakeinFile.close()
+        filesGenerated.append(cmakeinFilePath)
+        
+    else:
+         print(cmakeinFilePath + " file already exists!")
+    
 
 ##################################################### Plugin ToolList #########################################
 toolList = generatorOptions["plugin"]["tools"]
@@ -290,8 +313,10 @@ if os.path.exists(gitignorePath):
     print(gitignorePath + " file already exists!")
 else:
     pluginExportPath = "include/"+ pluginName + "/scopy-" + pluginName + "_export.h"
+    pluginConfigPath = "\ninclude/"+ pluginName + "/scopy-" + pluginName + "_config.h"
     gitignoreFile = open(gitignorePath, "w")
     gitignoreFile.write(pluginExportPath)
+    gitignoreFile.write(pluginConfigPath)
     gitignoreFile.close()
     print("Plugin .gitignore file created!")
 
