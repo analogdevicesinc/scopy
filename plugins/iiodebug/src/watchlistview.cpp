@@ -163,7 +163,7 @@ void WatchListView::refreshWatchlist()
 		   type == IIOStandardItem::ChannelAttribute) {
 			// leaf node
 			IIOWidget *iioWidget = object->item()->getIIOWidgets()[0];
-			iioWidget->getDataStrategy()->requestData();
+			iioWidget->getDataStrategy()->readAsync();
 		}
 	}
 }

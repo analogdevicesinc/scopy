@@ -56,7 +56,7 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 		SLOT(emitDataStatus(QDateTime, QString, QString, int, bool)));
 
 	// forward data request from ui strategy to data strategy
-	connect(uiStrategyWidget, SIGNAL(requestData()), dataStrategyWidget, SLOT(requestData()));
+	connect(uiStrategyWidget, SIGNAL(requestData()), dataStrategyWidget, SLOT(readAsync()));
 
 	// forward data from data strategy to ui strategy
 	connect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), uiStrategyWidget,
@@ -68,8 +68,16 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 	connect(dynamic_cast<QWidget *>(m_dataStrategy), SIGNAL(sendData(QString, QString)), this,
 		SLOT(storeReadInfo(QString, QString)));
 
-	m_dataStrategy->requestData();
+	m_dataStrategy->readAsync();
 }
+
+QPair<QString, QString> IIOWidget::read() { return m_dataStrategy->read(); }
+
+int IIOWidget::write(QString data) { return m_dataStrategy->write(data); }
+
+void IIOWidget::readAsync() { m_dataStrategy->readAsync(); }
+
+void IIOWidget::writeAsync(QString data) { m_dataStrategy->writeAsync(data); }
 
 void IIOWidget::saveData(QString data)
 {
@@ -79,7 +87,7 @@ void IIOWidget::saveData(QString data)
 	setToolTip("Operation in progress.");
 
 	qDebug(CAT_IIOWIDGET) << "Sending data" << data << "to data strategy.";
-	m_dataStrategy->save(data);
+	m_dataStrategy->writeAsync(data);
 }
 
 void IIOWidget::emitDataStatus(QDateTime timestamp, QString oldData, QString newData, int status, bool isReadOp)
@@ -87,9 +95,9 @@ void IIOWidget::emitDataStatus(QDateTime timestamp, QString oldData, QString new
 	// The read operation will not be shown as a status here as it will overlap with the
 	// write operation that is more likely to fail
 	if(isReadOp) {
-		qInfo(CAT_IIOWIDGET) << timestamp.toString("[hh:mm:ss]")
-				     << "READ (return code: " << QString::number(status) << "):" << oldData << "->"
-				     << newData;
+		qDebug(CAT_IIOWIDGET) << timestamp.toString("[hh:mm:ss]")
+				      << "READ (return code: " << QString::number(status) << "):" << oldData << "->"
+				      << newData;
 		return;
 	}
 	setLastOperationTimestamp(timestamp);

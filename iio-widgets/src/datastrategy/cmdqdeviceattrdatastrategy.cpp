@@ -42,7 +42,7 @@ QString CmdQDeviceAttrDataStrategy::data() { return m_dataRead; }
 
 QString CmdQDeviceAttrDataStrategy::optionalData() { return m_optionalDataRead; }
 
-void CmdQDeviceAttrDataStrategy::save(QString data)
+void CmdQDeviceAttrDataStrategy::writeAsync(QString data)
 {
 	if(m_recipe.device == nullptr || m_recipe.data == "") {
 		qWarning(CAT_CMDQ_DEVICE_DATA_STRATEGY) << "Invalid arguments, cannot write any data.";
@@ -66,14 +66,14 @@ void CmdQDeviceAttrDataStrategy::save(QString data)
 
 			Q_EMIT emitStatus(QDateTime::currentDateTime(), m_dataRead, data, (int)(tcmd->getReturnCode()),
 					  false);
-			requestData(); // readback
+			read(); // readback
 		},
 		Qt::QueuedConnection);
 
 	m_cmdQueue->enqueue(writeCommand);
 }
 
-void CmdQDeviceAttrDataStrategy::requestData()
+void CmdQDeviceAttrDataStrategy::readAsync()
 {
 	if(m_recipe.device == nullptr || m_recipe.data.isEmpty()) {
 		qWarning(CAT_CMDQ_DEVICE_DATA_STRATEGY) << "Invalid arguments, cannot read any data.";
@@ -85,6 +85,25 @@ void CmdQDeviceAttrDataStrategy::requestData()
 
 	QObject::connect(readDataCommand, &Command::finished, this, &CmdQDeviceAttrDataStrategy::attributeReadFinished);
 	m_cmdQueue->enqueue(readDataCommand);
+}
+
+int CmdQDeviceAttrDataStrategy::write(QString data)
+{
+	qWarning(CAT_CMDQ_DEVICE_DATA_STRATEGY)
+		<< "The method write(QString) was called. It signals a synchronous write, "
+		   "but the command queue can only work in an async way. Consider using only "
+		   "the writeAsync() method for this strategy. The return code should be "
+		   "ignored.";
+	return 0;
+}
+
+QPair<QString, QString> CmdQDeviceAttrDataStrategy::read()
+{
+	qWarning(CAT_CMDQ_DEVICE_DATA_STRATEGY)
+		<< "The method read() was called. It signals a synchronous read, "
+		   "but the command queue can only work in an async way. Consider using only "
+		   "the readAsync() method for this strategy. The result should be ignored.";
+	return {};
 }
 
 void CmdQDeviceAttrDataStrategy::attributeReadFinished(Command *cmd)
