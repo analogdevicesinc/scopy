@@ -99,8 +99,9 @@ void WatchListEntry::setupWidget(IIOWidget *widget)
 		QStringList list = options.split(" ", Qt::SkipEmptyParts);
 		m_combo->addItems(widget->getDataStrategy()->optionalData().split(" ", Qt::SkipEmptyParts));
 		m_combo->setCurrentText(widget->getDataStrategy()->data());
-		QObject::connect(m_combo, &QComboBox::currentTextChanged, this,
-				 [this, widget, options](QString text) { widget->getDataStrategy()->save(text); });
+		QObject::connect(m_combo, &QComboBox::currentTextChanged, this, [this, widget, options](QString text) {
+			widget->getDataStrategy()->writeAsync(text);
+		});
 		m_valueUi = wrapper;
 	} else {
 		m_lineedit = new QLineEdit();
@@ -114,7 +115,7 @@ void WatchListEntry::setupWidget(IIOWidget *widget)
 		m_lineedit->setText(widget->getDataStrategy()->data());
 		QObject::connect(m_lineedit, &QLineEdit::editingFinished, this, [this, widget]() {
 			QString text = m_lineedit->text();
-			widget->getDataStrategy()->save(text);
+			widget->getDataStrategy()->writeAsync(text);
 		});
 		m_valueUi = m_lineedit;
 	}
