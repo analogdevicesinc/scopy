@@ -57,6 +57,10 @@ if(ENABLE_TRANSLATION)
 	qt_add_resources(SCOPY_RESOURCES ${CMAKE_BINARY_DIR}/translations.qrc)
 endif()
 
+if(DEFINED ENV{APPIMAGE})
+	add_compile_definitions(__appimage__)
+endif()
+
 qt_add_resources(SCOPY_RESOURCES ${SCOPY_RESOURCE_FILES})
 
 if(WIN32)
