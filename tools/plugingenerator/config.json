@@ -2,6 +2,8 @@
     "plugin": {
         "dir_name": "new",
         "plugin_name": "newplugin",
+        "plugin_display_name": "newpluginDisplayName",
+        "plugin_description": "newpluginDescription",
         "class_name": "NEWPlugin",
         "cmakelists": true,
         "namespace": "scopy::newplugin",
