@@ -18,8 +18,11 @@ public:
 	QString optionalData() override;
 
 public Q_SLOTS:
-	void save(QString data) override;
-	void requestData() override;
+	int write(QString data) override;
+	QPair<QString, QString> read() override;
+
+	void writeAsync(QString data) override;
+	void readAsync() override;
 
 Q_SIGNALS:
 	void sendData(QString data, QString dataOptions) override;
@@ -29,6 +32,7 @@ Q_SIGNALS:
 private:
 	QString m_data;
 	QString m_optionalData;
+	QString m_previousData;
 };
 } // namespace scopy
 

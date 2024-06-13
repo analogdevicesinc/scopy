@@ -215,7 +215,7 @@ void DigitalInLoopMenu::onBroadcastThreshold()
 {
 	CmdQChannelAttrDataStrategy *dataStrategy =
 		dynamic_cast<CmdQChannelAttrDataStrategy *>(m_threshold->getDataStrategy());
-	dataStrategy->requestData();
+	dataStrategy->readAsync();
 }
 
 void DigitalInLoopMenu::onRunBtnsPressed(bool en)
@@ -420,7 +420,7 @@ DiagnosticMenu::DiagnosticMenu(QWidget *parent, QString chnlFunction, Connection
 
 DiagnosticMenu::~DiagnosticMenu() {}
 
-void DiagnosticMenu::onDiagSamplingChange() { m_samplingFreq->getDataStrategy()->requestData(); }
+void DiagnosticMenu::onDiagSamplingChange() { m_samplingFreq->getDataStrategy()->readAsync(); }
 
 void DiagnosticMenu::onSamplingFreqWrite(QDateTime timestamp, QString oldData, QString newData, int retCode,
 					 bool readOp)
@@ -467,7 +467,7 @@ void DigitalInMenu::onBroadcastThreshold()
 {
 	CmdQChannelAttrDataStrategy *dataStrategy =
 		dynamic_cast<CmdQChannelAttrDataStrategy *>(m_threshold->getDataStrategy());
-	dataStrategy->requestData();
+	dataStrategy->readAsync();
 }
 
 void DigitalInMenu::onRunBtnsPressed(bool en)

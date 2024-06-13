@@ -41,7 +41,7 @@ QString CmdQChannelAttrDataStrategy::data() { return m_dataRead; }
 
 QString CmdQChannelAttrDataStrategy::optionalData() { return m_optionalDataRead; }
 
-void CmdQChannelAttrDataStrategy::save(QString data)
+void CmdQChannelAttrDataStrategy::writeAsync(QString data)
 {
 	if(m_recipe.channel == nullptr || m_recipe.data == "") {
 		qWarning(CAT_CMDQ_CHANNEL_DATA_STATEGY) << "Invalid arguments, cannot write any data.";
@@ -65,14 +65,14 @@ void CmdQChannelAttrDataStrategy::save(QString data)
 
 			Q_EMIT emitStatus(QDateTime::currentDateTime(), m_dataRead, data, (int)(tcmd->getReturnCode()),
 					  false);
-			requestData(); // readback
+			readAsync(); // readback
 		},
 		Qt::QueuedConnection);
 
 	m_cmdQueue->enqueue(writeCommand);
 }
 
-void CmdQChannelAttrDataStrategy::requestData()
+void CmdQChannelAttrDataStrategy::readAsync()
 {
 	if(m_recipe.channel == nullptr || m_recipe.data.isEmpty()) {
 		qWarning(CAT_CMDQ_CHANNEL_DATA_STATEGY) << "Invalid arguments, cannot read any data.";
@@ -85,6 +85,25 @@ void CmdQChannelAttrDataStrategy::requestData()
 	QObject::connect(readDataCommand, &Command::finished, this,
 			 &CmdQChannelAttrDataStrategy::attributeReadFinished);
 	m_cmdQueue->enqueue(readDataCommand);
+}
+
+int CmdQChannelAttrDataStrategy::write(QString data)
+{
+	qWarning(CAT_CMDQ_CHANNEL_DATA_STATEGY)
+		<< "The method write(QString) was called. It signals a synchronous write, "
+		   "but the command queue can only work in an async way. Consider using only "
+		   "the writeAsync() method for this strategy. The return code should be "
+		   "ignored.";
+	return 0;
+}
+
+QPair<QString, QString> CmdQChannelAttrDataStrategy::read()
+{
+	qWarning(CAT_CMDQ_CHANNEL_DATA_STATEGY)
+		<< "The method read() was called. It signals a synchronous read, "
+		   "but the command queue can only work in an async way. Consider using only "
+		   "the readAsync() method for this strategy. The result should be ignored.";
+	return {};
 }
 
 void CmdQChannelAttrDataStrategy::attributeReadFinished(Command *cmd)
