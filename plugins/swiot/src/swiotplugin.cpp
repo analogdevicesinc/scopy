@@ -3,6 +3,7 @@
 #include <QLoggingCategory>
 #include <QLabel>
 #include <stylehelper.h>
+#include <iioutil/cmdqpingtask.h>
 
 #include "swiot_logging_categories.h"
 #include "max14906/max14906.h"
@@ -145,6 +146,9 @@ bool SWIOTPlugin::onConnect()
 		return false;
 	}
 
+	m_pingTask = new CmdQPingTask(conn, "sw_trig", this);
+	m_cyclicalTask = new CyclicalTask(m_pingTask);
+
 	m_runtime = new SwiotRuntime(m_param, this);
 	connect(m_runtime, &SwiotRuntime::writeModeAttribute, this, &SWIOTPlugin::setCtxMode);
 	connect(m_swiotController, &SwiotController::isRuntimeCtxChanged, m_runtime,
@@ -153,7 +157,6 @@ bool SWIOTPlugin::onConnect()
 
 	m_swiotController->connectSwiot();
 	m_swiotController->readModeAttribute();
-	m_swiotController->startPingTask();
 	m_swiotController->startPowerSupplyTask("ext_psu");
 	m_btnTutorial->setEnabled(true);
 	m_btnTutorial->setToolTip("");
@@ -187,12 +190,9 @@ bool SWIOTPlugin::onDisconnect()
 
 	disconnect(m_swiotController, &SwiotController::hasConnectedPowerSupply, this, &SWIOTPlugin::powerSupplyStatus);
 
-	disconnect(m_swiotController, &SwiotController::pingFailed, this, &SWIOTPlugin::disconnectDevice);
-
 	disconnect(m_swiotController, &SwiotController::isRuntimeCtxChanged, m_runtime,
 		   &SwiotRuntime::onIsRuntimeCtxChanged);
 
-	m_swiotController->stopPingTask();
 	m_swiotController->stopPowerSupplyTask();
 	m_swiotController->stopTemperatureTask();
 	m_swiotController->disconnectSwiot();
@@ -209,7 +209,7 @@ bool SWIOTPlugin::onDisconnect()
 		delete m_statusContainer;
 		m_statusContainer = nullptr;
 	}
-
+	clearPingTask();
 	ConnectionProvider::close(m_param);
 
 	if(m_switchCmd) {
@@ -219,6 +219,10 @@ bool SWIOTPlugin::onDisconnect()
 
 	return true;
 }
+
+void SWIOTPlugin::startPingTask() { m_cyclicalTask->start(2000); }
+
+void SWIOTPlugin::stopPingTask() { m_cyclicalTask->stop(); }
 
 void SWIOTPlugin::onIsRuntimeCtxChanged(bool isRuntimeCtx)
 {
@@ -395,12 +399,22 @@ void SWIOTPlugin::setupToolList()
 	connect(dynamic_cast<Faults *>(faultsTme->tool()), &Faults::backBtnPressed, m_runtime,
 		&SwiotRuntime::onBackBtnPressed);
 
-	connect(m_swiotController, &SwiotController::pingFailed, this, &SWIOTPlugin::disconnectDevice);
-
 	if(!m_isRuntime) {
 		requestTool(configTme->id());
 	} else {
 		requestTool(ad74413rTme->id());
+	}
+}
+
+void SWIOTPlugin::clearPingTask()
+{
+	if(m_pingTask) {
+		m_pingTask->deleteLater();
+		m_pingTask = nullptr;
+	}
+	if(m_cyclicalTask) {
+		m_cyclicalTask->deleteLater();
+		m_cyclicalTask = nullptr;
 	}
 }
 
