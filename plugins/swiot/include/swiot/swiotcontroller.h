@@ -24,7 +24,6 @@
 #include "iioutil/cyclicaltask.h"
 #include "externalpsreaderthread.h"
 #include "swiotidentifytask.h"
-#include "swiotpingtask.h"
 #include "swiotreadtemperaturetask.h"
 
 #include <iio.h>
@@ -38,9 +37,6 @@ class SwiotController : public QObject
 public:
 	SwiotController(QString uri, QObject *parent = nullptr);
 	~SwiotController();
-
-	void startPingTask();
-	void stopPingTask();
 
 	void startPowerSupplyTask(QString attribute);
 	void stopPowerSupplyTask();
@@ -72,7 +68,6 @@ private:
 	void setIsRuntimeCtx(bool runtimeCtx);
 
 	SwiotIdentifyTask *identifyTask;
-	SwiotPingTask *pingTask;
 	ExternalPsReaderThread *extPsTask;
 	SwiotReadTemperatureTask *temperatureTask;
 	CommandQueue *m_cmdQueue;
@@ -82,7 +77,6 @@ private:
 	bool m_isRuntimeCtx;
 	bool m_temperatureReadEn;
 
-	CyclicalTask *pingTimer;
 	CyclicalTask *powerSupplyTimer;
 	CyclicalTask *temperatureTimer;
 };

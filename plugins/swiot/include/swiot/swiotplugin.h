@@ -38,6 +38,9 @@ public:
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
+	void startPingTask() override;
+	void stopPingTask() override;
+
 	void onIsRuntimeCtxChanged(bool isRuntimeCtx);
 
 	void startTutorial();
@@ -56,6 +59,7 @@ private Q_SLOTS:
 private:
 	void switchCtx();
 	void setupToolList();
+	void clearPingTask();
 	void createStatusContainer();
 	QPushButton *m_btnIdentify;
 	QPushButton *m_btnTutorial;
