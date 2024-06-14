@@ -18,9 +18,9 @@ public:
 	virtual QString param() = 0;
 	virtual QString displayParam() = 0;
 	virtual QWidget *icon() = 0;
-	;
+
 	virtual QWidget *page() = 0;
-	;
+
 	virtual QList<ToolMenuEntry *> toolList() = 0;
 	virtual void init() = 0;
 	virtual void preload() = 0;

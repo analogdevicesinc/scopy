@@ -4,7 +4,6 @@
 #include "devicefactory.h"
 #include "deviceimpl.h"
 #include "deviceloader.h"
-#include "iiodeviceimpl.h"
 #include "pluginbase/statusbarmanager.h"
 
 #include <QDebug>

@@ -223,6 +223,16 @@ void DeviceImpl::loadBadges()
 	connect(this, &DeviceImpl::connected, warningHover, &HoverWidget::hide);
 }
 
+void DeviceImpl::setHighPriorPlugin(Plugin *plugin)
+{
+	int priority = plugin->metadata().value("priority").toInt();
+	int highestPriority = (m_highPriorPlugin) ? m_highPriorPlugin->metadata().value("priority").toInt() : -1;
+
+	if(plugin->pingTask() && priority > highestPriority) {
+		m_highPriorPlugin = plugin;
+	}
+}
+
 void DeviceImpl::onConnectionFailed() { disconnectDev(); }
 
 QList<Plugin *> DeviceImpl::plugins() const { return m_plugins; }
@@ -280,6 +290,7 @@ void DeviceImpl::connectDev()
 				p->loadSettings(s);
 			}
 			m_connectedPlugins.push_back(p);
+			setHighPriorPlugin(p);
 		} else {
 			disconnectDevice = p->metadata().value("disconnectDevOnConnectFailure").toBool();
 			if(disconnectDevice) {
@@ -293,6 +304,10 @@ void DeviceImpl::connectDev()
 		connbtn->hide();
 		discbtn->show();
 		discbtn->setFocus();
+		if(m_highPriorPlugin) {
+			connect(m_highPriorPlugin->pingTask(), &PingTask::pingFailed, this, &DeviceImpl::disconnectDev);
+			m_highPriorPlugin->startPingTask();
+		}
 		Q_EMIT connected();
 	}
 	qInfo(CAT_BENCHMARK) << this->displayName() << " device connection took: " << timer.elapsed() << "ms";
@@ -303,6 +318,10 @@ void DeviceImpl::disconnectDev()
 	QElapsedTimer pluginTimer;
 	QElapsedTimer timer;
 	timer.start();
+	if(m_highPriorPlugin) {
+		m_highPriorPlugin->stopPingTask();
+		disconnect(m_highPriorPlugin->pingTask(), &PingTask::pingFailed, this, &DeviceImpl::disconnectDev);
+	}
 	connbtn->show();
 	discbtn->hide();
 	Preferences *pref = Preferences::GetInstance();
