@@ -102,11 +102,13 @@ void TimePlotManager::addChannel(ChannelComponent *c, uint32_t uuid)
 	TimePlotComponent *plt = plot(uuid);
 	plt->addChannel(c);
 	m_channelPlotcomboMap.insert(c, new TimePlotManagerCombobox(this, c));
+	c->addChannelToPlot();
 
 }
 
 void TimePlotManager::removeChannel(ChannelComponent *c)
 {
+	c->removeChannelFromPlot();
 	c->plotChannelCmpt()->m_plotComponent->removeChannel(c);
 	m_channels.removeAll(c->plotChannelCmpt());
 	m_channelPlotcomboMap.remove(c);
@@ -114,9 +116,11 @@ void TimePlotManager::removeChannel(ChannelComponent *c)
 
 void TimePlotManager::moveChannel(ChannelComponent *c, uint32_t uuid)
 {
+	c->removeChannelFromPlot();
 	c->plotChannelCmpt()->m_plotComponent->removeChannel(c);
 	TimePlotComponent *plt = plot(uuid);
 	c->plotChannelCmpt()->initPlotComponent(plt);
+	c->addChannelToPlot();
 	plt->addChannel(c);
 	plt->replot();
 }

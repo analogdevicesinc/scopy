@@ -8,6 +8,7 @@
 #include <gui/plotautoscaler.h>
 #include <gui/widgets/menuonoffswitch.h>
 #include <gui/widgets/menucombo.h>
+#include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 #include <gui/widgets/menuplotaxisrangecontrol.h>
 #include <gui/widgets/menucontrolbutton.h>
 #include "interfaces.h"
@@ -70,6 +71,7 @@ public:
 	MenuControlButton *ctrl();
 	MeasureManagerInterface *getMeasureManager() override;
 
+
 	GRSignalPath *sigpath() override;
 	void insertPlotComboWidget(QWidget *w);
 	QVBoxLayout* menuLayout();
@@ -77,6 +79,9 @@ public:
 	YMode ymode() const override;
 	void setYMode(YMode newYmode) override;
 	bool scaleAvailable() const override;
+	double yMin() const override;
+	double yMax() const override;
+	bool yLock() const override;
 
 public Q_SLOTS:
 
@@ -95,9 +100,12 @@ public Q_SLOTS:
 	void toggleAutoScale();
 	void setYModeHelper(YMode mode);
 
-	/*
-	Q_SIGNALS:
-		void addNewSnapshot(SnapshotProvider::SnapshotRecipe) override;*/
+	void addChannelToPlot() override;
+	void removeChannelFromPlot() override;
+
+/*
+Q_SIGNALS:
+	void addNewSnapshot(SnapshotProvider::SnapshotRecipe) override;*/
 
 signals:
 	void yModeChanged();
@@ -111,6 +119,7 @@ private:
 	TimeMeasureManager *m_measureMgr;
 	MenuControlButton *m_ctrl;
 	MenuOnOffSwitch *m_yAxisCtrl;
+	MenuPlotChannelCurveStyleControl *m_curvemenu;
 	MenuPlotAxisRangeControl *m_yCtrl;
 	PlotAutoscaler *m_autoscaler;
 	MenuCombo *m_ymodeCb;
@@ -121,6 +130,7 @@ private:
 
 	// QPushButton *m_snapBtn;
 
+	bool m_yLock;
 	bool m_scaleAvailable;
 	bool m_autoscaleEnabled;
 	bool m_running;

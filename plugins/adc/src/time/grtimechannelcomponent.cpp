@@ -54,6 +54,8 @@ GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, Time
 	setLayout(m_lay);
 
 	createMenuControlButton();
+
+	addChannelToPlot();
 }
 
 GRTimeChannelComponent::~GRTimeChannelComponent() {}
@@ -95,6 +97,7 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 	});
 
 	connect(m_yAxisCtrl->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b){
+		m_yLock = b;
 		m_yCtrl->setVisible(!b);
 		m_autoscaleBtn->setVisible(!b);
 		m_plotChannelCmpt->setSingleYMode(b);
@@ -143,12 +146,9 @@ QWidget *GRTimeChannelComponent::createCurveMenu(QWidget *parent)
 	m_curveSection = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, curvecontainer);
 	m_curveSection->contentLayout()->setSpacing(10);
 
-	MenuPlotChannelCurveStyleControl *curvemenu = new MenuPlotChannelCurveStyleControl(m_curveSection);
-	curvemenu->addChannels(m_plotChannelCmpt->m_timePlotCh);
-	curvemenu->addChannels(m_plotChannelCmpt->m_xyPlotCh);
-
+	m_curvemenu = new MenuPlotChannelCurveStyleControl(m_curveSection);
 	curvecontainer->contentLayout()->addWidget(m_curveSection);
-	m_curveSection->contentLayout()->addWidget(curvemenu);
+	m_curveSection->contentLayout()->addWidget(m_curvemenu);
 	return curvecontainer;
 }
 
@@ -331,10 +331,35 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 	m_grtch->m_scOff->setOffset(offset);
 }
 
+void GRTimeChannelComponent::addChannelToPlot()
+{
+	m_curvemenu->addChannels(m_plotChannelCmpt->m_timePlotCh);
+	m_curvemenu->addChannels(m_plotChannelCmpt->m_xyPlotCh);
+}
+
+void GRTimeChannelComponent::removeChannelFromPlot()
+{
+	m_curvemenu->removeChannels(m_plotChannelCmpt->m_timePlotCh);
+	m_curvemenu->removeChannels(m_plotChannelCmpt->m_xyPlotCh);
+}
+
 bool GRTimeChannelComponent::scaleAvailable() const
 {
 	return m_scaleAvailable;
 }
+
+bool GRTimeChannelComponent::yLock() const {
+	return m_yLock;
+}
+
+double GRTimeChannelComponent::yMin() const {
+	return m_yCtrl->min();
+}
+
+double GRTimeChannelComponent::yMax() const {
+	return m_yCtrl->max();
+}
+
 
 MeasureManagerInterface *GRTimeChannelComponent::getMeasureManager() { return m_measureMgr; }
 

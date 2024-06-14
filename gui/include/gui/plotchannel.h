@@ -47,6 +47,12 @@ public:
 
 	void init();
 	void deinit();
+	int thickness() const;
+	void setThickness(int newThickness);
+
+	int style() const;
+	void setStyle(int newStyle);
+
 public Q_SLOTS:
 	void raise();
 	void attach();
@@ -55,13 +61,19 @@ public Q_SLOTS:
 	void enable();
 	void disable();
 
-	void setThickness(int);
-	void setStyle(int);
+
+private:
+	void setThicknessInternal(int);
+	void setStyleInternal(int);
 
 Q_SIGNALS:
 	void attachCurve(QwtPlotCurve *curve);
 	void doReplot();
 	void newData(const float *xData, const float *yData, size_t size, bool);
+
+	void thicknessChanged();
+
+	void styleChanged();
 
 private:
 	PlotAxis *m_xAxis, *m_yAxis;
@@ -72,6 +84,12 @@ private:
 	QPen m_pen;
 	float *m_data;
 	QString m_name;
+
+	int m_thickness;
+	int m_style;
+
+	Q_PROPERTY(int thickness READ thickness WRITE setThickness NOTIFY thicknessChanged);
+	Q_PROPERTY(int style READ style WRITE setStyle NOTIFY styleChanged);
 };
 } // namespace scopy
 

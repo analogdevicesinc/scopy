@@ -4,6 +4,9 @@
 #include <timeplotcomponent.h>
 #include <toolcomponent.h>
 #include "scopy-adc_export.h"
+#include "interfaces.h"
+#include <gui/widgets/menuplotaxisrangecontrol.h>
+#include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 
 namespace scopy {
 namespace adc {
@@ -22,23 +25,32 @@ public Q_SLOTS:
 	void onDeinit() override;
 	void onStart() override;
 	void onStop() override;
+	void updateYAxis();
 Q_SIGNALS:
 	void requestDeletePlot();
 
 private:
 	PlotAutoscaler *m_autoscaler;
 	TimePlotComponent *m_plotComponent;
+	MenuCombo *m_yModeCb;
 	MenuCombo *m_xAxisSrc;
+	MenuPlotAxisRangeControl *m_yCtrl;
+	MenuPlotChannelCurveStyleControl *m_curve;
 	MenuOnOffSwitch *m_xAxisShow;
 	MenuOnOffSwitch *m_autoscaleBtn;
 	QList<ChannelComponent *> m_channels;
+	QList<ScaleProvider *> m_scaleProviders;
 	QPushButton *m_deletePlot;
 
 	bool m_autoscaleEnabled;
 	bool m_running;
 
+
+
 private:
 	void toggleAutoScale();
+	void updateYModeCombo();
+
 };
 
 } // namespace adc
