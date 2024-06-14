@@ -20,9 +20,6 @@ public:
 	M2kController(QString uri, QObject *parent = nullptr);
 	~M2kController();
 
-	void startPingTask();
-	void stopPingTask();
-
 	void startTemperatureTask();
 	void stopTemperatureTask();
 
@@ -47,13 +44,11 @@ Q_SIGNALS:
 private:
 	M2kReadTemperatureTask *tempTask;
 	M2kIdentifyTask *identifyTask;
-	IIOPingTask *pingTask;
 	iio_context *m_iioctx;
 	QString uri;
 	libm2k::context::M2k *m_m2k;
 
 	CyclicalTask *tempTimer;
-	CyclicalTask *pingTimer;
 };
 
 } // namespace scopy::m2k
