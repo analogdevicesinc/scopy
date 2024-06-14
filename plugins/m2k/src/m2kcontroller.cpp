@@ -19,32 +19,10 @@ M2kController::M2kController(QString uri, QObject *parent)
 	, uri(uri)
 {
 	identifyTask = nullptr;
-	pingTask = nullptr;
 	m_m2k = nullptr;
 }
 
 M2kController::~M2kController() {}
-
-void M2kController::startPingTask()
-{
-	pingTask = new IIOPingTask(m_iioctx);
-	pingTimer = new CyclicalTask(pingTask, this);
-	connect(pingTask, SIGNAL(pingSuccess()), this, SIGNAL(pingSuccess()));
-	connect(pingTask, SIGNAL(pingFailed()), this, SIGNAL(pingFailed()));
-	pingTimer->start();
-}
-
-void M2kController::stopPingTask()
-{
-	if(!pingTask) {
-		return;
-	}
-	pingTask->requestInterruption();
-	pingTimer->deleteLater();
-	pingTimer = nullptr;
-	pingTask->deleteLater();
-	pingTask = nullptr;
-}
 
 void M2kController::startTemperatureTask()
 {

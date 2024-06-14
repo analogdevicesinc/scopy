@@ -49,6 +49,8 @@ public:
 public Q_SLOTS:
 	void showPageCallback() override;
 	void hidePageCallback() override;
+	void startPingTask() override;
+	void stopPingTask() override;
 
 	void calibrationStarted();
 	void calibrationSuccess();
@@ -79,6 +81,7 @@ private:
 	void storeToolState(QStringList tools);
 	void restoreToolState(QStringList tools);
 	void cleanup();
+	void clearPingTask();
 };
 } // namespace m2k
 } // namespace scopy
