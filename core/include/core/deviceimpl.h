@@ -63,6 +63,7 @@ protected:
 	void loadPages();
 	void loadToolList();
 	void loadBadges();
+	void setHighPriorPlugin(Plugin *plugin);
 
 protected:
 	PluginManager *p;
@@ -76,6 +77,7 @@ protected:
 	QWidget *m_icon;
 	QWidget *m_page;
 	QPushButton *connbtn, *discbtn;
+	Plugin *m_highPriorPlugin = nullptr;
 };
 } // namespace scopy
 
