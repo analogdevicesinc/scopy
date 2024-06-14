@@ -168,6 +168,10 @@ void M2kPlugin::showPageCallback() { m_m2kController->startTemperatureTask(); }
 
 void M2kPlugin::hidePageCallback() { m_m2kController->stopTemperatureTask(); }
 
+void M2kPlugin::startPingTask() { m_cyclicalTask->start(5000); }
+
+void M2kPlugin::stopPingTask() { m_cyclicalTask->stop(); }
+
 void M2kPlugin::calibrationStarted()
 {
 	storeToolState(calibrationToolNames);
@@ -339,17 +343,28 @@ void M2kPlugin::cleanup()
 		tme->setTool(nullptr);
 	}
 
-	disconnect(m_m2kController, &M2kController::pingFailed, this, &M2kPlugin::disconnectDevice);
 	disconnect(m_m2kController, SIGNAL(calibrationStarted()), this, SLOT(calibrationStarted()));
 	disconnect(m_m2kController, SIGNAL(calibrationSuccess()), this, SLOT(calibrationSuccess()));
 	disconnect(m_m2kController, SIGNAL(calibrationFailed()), this, SLOT(calibrationFinished()));
 
-	m_m2kController->stopPingTask();
 	m_m2kController->disconnectM2k();
 	m_btnCalibrate->setDisabled(true);
+	clearPingTask();
 
 	ConnectionProvider *c = ConnectionProvider::GetInstance();
 	c->close(m_param);
+}
+
+void M2kPlugin::clearPingTask()
+{
+	if(m_pingTask) {
+		m_pingTask->deleteLater();
+		m_pingTask = nullptr;
+	}
+	if(m_cyclicalTask) {
+		m_cyclicalTask->deleteLater();
+		m_cyclicalTask = nullptr;
+	}
 }
 
 bool M2kPlugin::onConnect()
@@ -366,8 +381,8 @@ bool M2kPlugin::onConnect()
 		m_btnCalibrate->setDisabled(false);
 
 		m_m2kController->connectM2k(ctx);
-		m_m2kController->startPingTask();
-		connect(m_m2kController, &M2kController::pingFailed, this, &M2kPlugin::disconnectDevice);
+		m_pingTask = new IIOPingTask(ctx, this);
+		m_cyclicalTask = new CyclicalTask(m_pingTask);
 
 		Filter *f = new Filter(ctx);
 		QJSEngine *js = ScopyJS::GetInstance()->engine();
