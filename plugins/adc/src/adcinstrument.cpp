@@ -41,7 +41,6 @@ void ADCInstrument::setupToolLayout()
 
 	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), true, this);
 	rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn *>(openLastMenuBtn)->getButtonGroup();
-	plotGroup = new QButtonGroup(this);
 
 	tool->openBottomContainerHelper(false);
 	tool->openTopContainerHelper(false);
@@ -54,9 +53,6 @@ void ADCInstrument::setupToolLayout()
 
 	channelsBtn = new MenuControlButton(this);
 
-	timeBtn = new MenuControlButton(this);
-	setupTimeButtonHelper(timeBtn);
-
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsBtn, TTA_LEFT);
 
@@ -67,10 +63,6 @@ void ADCInstrument::setupToolLayout()
 	tool->addWidgetToTopContainerHelper(printBtn, TTA_LEFT);
 
 	tool->addWidgetToBottomContainerHelper(channelsBtn, TTA_LEFT);
-	tool->addWidgetToBottomContainerHelper(timeBtn, TTA_LEFT);
-	plotGroup->addButton(timeBtn);
-	plotGroup->setExclusive(true);
-	timeBtn->setChecked(true);
 
 	rightMenuBtnGrp->addButton(settingsBtn);
 
@@ -78,8 +70,6 @@ void ADCInstrument::setupToolLayout()
 	setupRunSingleButtonHelper();
 
 	channelGroup = new QButtonGroup(this);
-
-	m_vcm->add(new QLabel("test"));
 
 	connect(settingsBtn, &QPushButton::toggled, this, [=](bool b) {
 		if(b)
@@ -117,16 +107,6 @@ void ADCInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn)
 		&MenuHAnim::toggleMenu);
 	m_vcm = new VerticalChannelManager(this);
 	tool->leftStack()->add(verticalChannelManagerId, m_vcm);
-}
-
-void ADCInstrument::setupTimeButtonHelper(MenuControlButton *time)
-{
-	time->setName("Time");
-	time->button()->setVisible(false);
-	time->setOpenMenuChecksThis(true);
-	time->setDoubleClickToOpenMenu(true);
-	time->checkBox()->setVisible(false);
-	time->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
 }
 
 void ADCInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *dev)
@@ -180,8 +160,6 @@ void ADCInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, Compos
 void ADCInstrument::init() { proxy->init(); }
 
 void ADCInstrument::deinit() { proxy->deinit(); }
-
-MenuControlButton *ADCInstrument::getTimeBtn() const { return timeBtn; }
 
 VerticalChannelManager *ADCInstrument::vcm() const { return m_vcm; }
 

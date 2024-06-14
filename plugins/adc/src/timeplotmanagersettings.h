@@ -71,10 +71,8 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void plotSizeChanged(uint32_t);
 	void bufferSizeChanged(uint32_t);
-
 	void rollingModeChanged(bool);
 	void sampleRateChanged(double);
-	void singleYModeChanged(bool);
 	void syncBufferPlotSizeChanged(bool);
 
 private:
@@ -85,7 +83,6 @@ private:
 	QWidget *createYAxisMenu(QWidget *parent = nullptr);
 	double readSampleRate();
 	void updateXModeCombo();
-	void updateYModeCombo();
 
 	QPen m_pen;
 
@@ -99,7 +96,6 @@ private:
 	MenuOnOffSwitch *m_rollingModeSw;
 	MenuOnOffSwitch *m_syncBufferPlot;
 	MenuCombo *m_xModeCb;
-	MenuCombo *m_yModeCb;
 
 	QPushButton *m_addPlotBtn;
 	QVBoxLayout *m_plotContainerLayout;
@@ -115,7 +111,7 @@ private:
 
 	QList<ChannelComponent *> m_channels;
 	QList<SampleRateProvider *> m_sampleRateProviders;
-	QList<ScaleProvider *> m_scaleProviders;
+
 	// bool m_showPlotTags;
 
 	Q_PROPERTY(uint32_t plotSize READ plotSize WRITE setPlotSize NOTIFY plotSizeChanged)

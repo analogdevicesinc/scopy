@@ -50,3 +50,13 @@ void ChannelComponent::setPlotChannelCmpt(TimePlotComponentChannel *newPlotChann
 {
 	m_plotChannelCmpt = newPlotChannelCmpt;
 }
+
+void ChannelComponent::addChannelToPlot()
+{
+
+}
+
+void ChannelComponent::removeChannelFromPlot()
+{
+
+}

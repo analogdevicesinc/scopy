@@ -41,8 +41,6 @@ public:
 
 	VerticalChannelManager *vcm() const;
 
-	MenuControlButton *getTimeBtn() const;
-
 public Q_SLOTS:
 	void run(bool);
 	void stop();
@@ -67,14 +65,11 @@ private:
 	MapStackedWidget *rightStack;
 	QButtonGroup *rightMenuBtnGrp;
 	QButtonGroup *channelGroup;
-	QButtonGroup *plotGroup;
 
 	RunBtn *runBtn;
 	SingleShotBtn *singleBtn;
 	MenuControlButton *channelsBtn;
 	VerticalChannelManager *m_vcm;
-
-	MenuControlButton *timeBtn;
 
 	void setupToolLayout();
 	void setupRunSingleButtonHelper();
@@ -83,7 +78,6 @@ private:
 
 	bool m_running;
 	Q_PROPERTY(bool running READ running WRITE setRunning NOTIFY runningChanged)
-	void setupTimeButtonHelper(MenuControlButton *time);
 };
 } // namespace adc
 } // namespace scopy
