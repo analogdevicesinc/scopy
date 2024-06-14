@@ -45,6 +45,9 @@ public:
 	virtual YMode ymode() const = 0;
 	virtual void setYMode(YMode newYmode) = 0;
 	virtual bool scaleAvailable() const = 0;
+	virtual bool yLock() const = 0;
+	virtual double yMin() const = 0;
+	virtual double yMax() const = 0;
 };
 
 

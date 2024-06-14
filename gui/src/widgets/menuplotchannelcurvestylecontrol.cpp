@@ -57,9 +57,53 @@ void MenuPlotChannelCurveStyleControl::addChannels(PlotChannel *c)
 {
 	c->setThickness(cbThicknessW->combo()->currentText().toInt());
 	c->setStyle(cbStyleW->combo()->currentIndex());
+
+	connect(c, &PlotChannel::styleChanged, this, &MenuPlotChannelCurveStyleControl::setStyleSlot);
+	connect(c, &PlotChannel::thicknessChanged, this, &MenuPlotChannelCurveStyleControl::setThicknessSlot);
+
 	m_channels.append(c);
 }
 
-void MenuPlotChannelCurveStyleControl::removeChannels(PlotChannel *c) { m_channels.removeAll(c); }
+void MenuPlotChannelCurveStyleControl::removeChannels(PlotChannel *c) {
+	disconnect(c, &PlotChannel::styleChanged, this, &MenuPlotChannelCurveStyleControl::setStyleSlot);
+	disconnect(c, &PlotChannel::thicknessChanged, this, &MenuPlotChannelCurveStyleControl::setThicknessSlot);
+	m_channels.removeAll(c);
+}
+
+void MenuPlotChannelCurveStyleControl::setStyleSlot()
+{
+	if(m_channels.count() <= 0)
+		return;
+
+	int style = m_channels[0]->style();
+	for(PlotChannel *c : qAsConst(m_channels)) {
+		if(style != c->style())	{
+			// "Mixed style should be written here"
+			return;
+		}
+	}
+
+	cbStyleW->combo()->setCurrentIndex(cbStyleW->combo()->findData(style));
+
+}
+
+void MenuPlotChannelCurveStyleControl::setThicknessSlot()
+{
+	if(m_channels.count() <= 0)
+		return;
+
+	int thickness = m_channels[0]->thickness();
+	for(PlotChannel *c : qAsConst(m_channels)) {
+		if(thickness != c->thickness())	{
+			// "Mixed thickness should be written here"
+			return;
+		}
+	}
+
+	qInfo()<<m_channels.count() << thickness;
+	cbThicknessW->combo()->setCurrentText(QString::number(thickness));
+}
+
+
 
 #include "moc_menuplotchannelcurvestylecontrol.cpp"

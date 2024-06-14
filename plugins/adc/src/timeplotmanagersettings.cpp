@@ -206,21 +206,6 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 		},
 		"SampleRate", 1, DBL_MAX, false, false, xaxis);
 
-	m_yModeCb = new MenuCombo("YMODE", xaxis);
-	auto ycb = m_yModeCb->combo();
-	ycb->addItem("ADC Counts", YMODE_COUNT);
-	ycb->addItem("% Full Scale", YMODE_FS);
-
-	connect(ycb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		auto mode = ycb->itemData(idx).toInt();
-		for(auto c : qAsConst(m_scaleProviders)) {
-			c->setYMode(static_cast<YMode>(mode));
-		}
-		// add to scaleinterface
-		// get min-max
-		// apply ymin-ymax
-	});
-
 	m_sampleRateSpin->setValue(10);
 	m_sampleRateSpin->setEnabled(false);
 	connect(m_sampleRateSpin, &PositionSpinButton::valueChanged, this, [=](double val) { setSampleRate(val); });
@@ -235,8 +220,6 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	xaxis->contentLayout()->addWidget(xMinMax);
 	xaxis->contentLayout()->addWidget(m_xModeCb);
 	xaxis->contentLayout()->addWidget(m_sampleRateSpin);
-	xaxis->contentLayout()->addWidget(m_yModeCb);
-
 	xaxis->contentLayout()->setSpacing(10);
 
 	return xaxiscontainer;
@@ -364,12 +347,6 @@ void TimePlotManagerSettings::addChannel(ChannelComponent *c) {
 	if(srp) {
 		addSampleRateProvider(srp);
 	}
-	ScaleProvider *sp = dynamic_cast<ScaleProvider*>(c);
-	if(sp) {
-		m_scaleProviders.append(sp);
-		updateYModeCombo();
-	}
-
 }
 
 void TimePlotManagerSettings::removeChannel(ChannelComponent *c) {
@@ -377,12 +354,6 @@ void TimePlotManagerSettings::removeChannel(ChannelComponent *c) {
 	SampleRateProvider *srp = dynamic_cast<SampleRateProvider*>(c);
 	if(srp) {
 		removeSampleRateProvider(srp);
-	}
-
-	ScaleProvider *sp = dynamic_cast<ScaleProvider*>(c);
-	if(sp) {
-		m_scaleProviders.append(sp);
-		updateYModeCombo();
 	}
 }
 
@@ -419,31 +390,6 @@ void TimePlotManagerSettings::updateXModeCombo()
 	}
 }
 
-void TimePlotManagerSettings::updateYModeCombo()
-{
-	bool scaleItemCbtmp = true;
-	for(ScaleProvider *s : qAsConst(m_scaleProviders)) {
-		if(s->scaleAvailable() == false) {
-			scaleItemCbtmp = false;
-			break;
-		}
-	}
-
-	if(scaleItemCbtmp) {
-		// need scale item
-		int idx = m_yModeCb->combo()->findData(YMODE_SCALE);
-		if(idx == -1) {
-			m_yModeCb->combo()->addItem("Scale", YMODE_SCALE);
-		}
-
-	} else {
-		// no need
-		int idx = m_yModeCb->combo()->findData(YMODE_SCALE);
-		if(idx) {
-			m_yModeCb->combo()->removeItem(idx);
-		}
-	}
-}
 
 } // namespace adc
 } // namespace scopy

@@ -1,7 +1,6 @@
 #include <timeplotcomponentsettings.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menucollapsesection.h>
-#include <gui/widgets/menuplotaxisrangecontrol.h>
 #include <QWidget>
 #include <QLineEdit>
 #include <timeplotcomponentchannel.h>
@@ -43,7 +42,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	connect(labelsSwitch->onOffswitch(), &QAbstractButton::toggled, m_plotComponent,
 		&TimePlotComponent::showPlotLabels);
 
-	MenuPlotAxisRangeControl *m_yCtrl = new MenuPlotAxisRangeControl(m_plotComponent->timePlot()->yAxis(), this);
+	m_yCtrl = new MenuPlotAxisRangeControl(m_plotComponent->timePlot()->yAxis(), this);
 
 	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), plotMenu, false);
 
@@ -84,10 +83,24 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 
 	w->contentLayout()->addWidget(plotMenu);
 
+	m_yModeCb = new MenuCombo("YMODE", plotMenu);
+	auto ycb = m_yModeCb->combo();
+	ycb->addItem("ADC Counts", YMODE_COUNT);
+	ycb->addItem("% Full Scale", YMODE_FS);
+
+	connect(ycb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+		auto mode = ycb->itemData(idx).toInt();
+		for(auto c : qAsConst(m_scaleProviders)) {
+			c->setYMode(static_cast<YMode>(mode));
+		}
+		updateYAxis();
+	});
+
+	m_curve = new MenuPlotChannelCurveStyleControl(plotMenu);
+
 	m_deletePlot = new QPushButton("DELETE PLOT");
 	StyleHelper::BlueButton(m_deletePlot);
 	connect(m_deletePlot, &QAbstractButton::clicked, this, [=](){Q_EMIT requestDeletePlot();});
-
 
 	plotMenu->contentLayout()->addWidget(m_autoscaleBtn);
 	plotMenu->contentLayout()->addWidget(m_yCtrl);
@@ -98,6 +111,9 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	plotMenu->contentLayout()->addWidget(plotTitleLabel);
 	plotMenu->contentLayout()->addWidget(plotTitle);
 	plotMenu->contentLayout()->addWidget(labelsSwitch);
+
+	plotMenu->contentLayout()->addWidget(m_yModeCb);
+	plotMenu->contentLayout()->addWidget(m_curve);
 	plotMenu->contentLayout()->addWidget(m_deletePlot);
 	plotMenu->contentLayout()->setSpacing(10);
 
@@ -122,6 +138,15 @@ void TimePlotComponentSettings::addChannel(ChannelComponent *c)
 	// https://stackoverflow.com/questions/44501171/qvariant-with-custom-class-pointer-does-not-return-same-address
 	m_xAxisSrc->combo()->addItem(c->name(), QVariant::fromValue(static_cast<void *>(c)));
 	m_autoscaler->addChannels(c->plotChannelCmpt()->m_timePlotCh);
+	ScaleProvider *sp = dynamic_cast<ScaleProvider*>(c);
+	if(sp) {
+		m_scaleProviders.append(sp);
+		updateYModeCombo();
+	}
+
+	m_curve->addChannels(c->plotChannelCmpt()->m_timePlotCh);
+	m_curve->addChannels(c->plotChannelCmpt()->m_xyPlotCh);
+
 	m_channels.append(c);
 }
 
@@ -131,6 +156,13 @@ void TimePlotComponentSettings::removeChannel(ChannelComponent *c)
 	int comboId = m_xAxisSrc->combo()->findData(QVariant::fromValue(static_cast<void *>(c)));
 	m_xAxisSrc->combo()->removeItem(comboId);
 	m_autoscaler->removeChannels(c->plotChannelCmpt()->m_timePlotCh);
+	ScaleProvider *sp = dynamic_cast<ScaleProvider*>(c);
+	if(sp) {
+		m_scaleProviders.removeAll(sp);
+		updateYModeCombo();
+	}
+	m_curve->removeChannels(c->plotChannelCmpt()->m_timePlotCh);
+	m_curve->removeChannels(c->plotChannelCmpt()->m_xyPlotCh);
 }
 
 void TimePlotComponentSettings::onInit() {}
@@ -156,4 +188,46 @@ void TimePlotComponentSettings::toggleAutoScale()
 	} else {
 		m_autoscaler->stop();
 	}
+}
+
+
+void TimePlotComponentSettings::updateYModeCombo()
+{
+	bool scaleItemCbtmp = true;
+	for(ScaleProvider *s : qAsConst(m_scaleProviders)) {
+		if(s->scaleAvailable() == false) {
+			scaleItemCbtmp = false;
+			break;
+		}
+	}
+
+	if(scaleItemCbtmp) {
+		// need scale item
+		int idx = m_yModeCb->combo()->findData(YMODE_SCALE);
+		if(idx == -1) {
+			m_yModeCb->combo()->addItem("Scale", YMODE_SCALE);
+		}
+
+	} else {
+		// no need
+		int idx = m_yModeCb->combo()->findData(YMODE_SCALE);
+		if(idx) {
+			m_yModeCb->combo()->removeItem(idx);
+		}
+	}
+}
+
+void TimePlotComponentSettings::updateYAxis() {
+	double max = -1000000.0;
+	double min = 1000000.0;
+	for(ScaleProvider* s : qAsConst(m_scaleProviders)) {
+		if(s->yMax() > max) {
+			max = s->yMax();
+		}
+		if(s->yMin() < min) {
+			min = s->yMin();
+		}
+	}
+	m_yCtrl->setMin(min);
+	m_yCtrl->setMax(max);
 }

@@ -34,6 +34,9 @@ public:
 	TimePlotComponentChannel *plotChannelCmpt() const;
 	void setPlotChannelCmpt(TimePlotComponentChannel *newPlotChannelCmpt);
 
+	virtual void addChannelToPlot();
+	virtual void removeChannelFromPlot();
+
 protected:
 	QString m_channelName;
 	QPen m_pen;
@@ -42,6 +45,7 @@ protected:
 
 	ChannelData *m_chData;
 	TimePlotComponentChannel *m_plotChannelCmpt;
+
 
 public Q_SLOTS:
 	virtual void onStart() override;

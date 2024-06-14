@@ -20,6 +20,10 @@ public Q_SLOTS:
 	void addChannels(PlotChannel *c);
 	void removeChannels(PlotChannel *c);
 
+private Q_SLOTS:
+	void setStyleSlot();
+	void setThicknessSlot();
+
 private:
 	void createCurveMenu(QWidget *parent);
 	QList<PlotChannel *> m_channels;
