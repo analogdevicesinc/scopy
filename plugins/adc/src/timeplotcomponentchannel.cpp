@@ -111,15 +111,19 @@ void TimePlotComponentChannel::setSingleYMode(bool b)
 {
 	m_singleYMode = b;
 	if(m_singleYMode) {
-		QwtAxisId id = m_plotComponent->timePlot()->yAxis()->axisId();
-		m_timePlotCh->curve()->setYAxis(id);
-		m_xyPlotCh->curve()->setYAxis(m_plotComponent->xyPlot()->yAxis()->axisId());
+		QwtAxisId id_time = m_plotComponent->timePlot()->yAxis()->axisId();
+		m_timePlotCh->curve()->setYAxis(id_time);
+		QwtAxisId id_xy = m_plotComponent->xyPlot()->yAxis()->axisId();
+		m_xyPlotCh->curve()->setYAxis(id_xy);
 	} else {
-		QwtAxisId id = m_timePlotYAxis->axisId();
-		m_timePlotCh->curve()->setYAxis(id);
-		m_xyPlotCh->curve()->setYAxis(id);
+		QwtAxisId id_time = m_timePlotYAxis->axisId();
+		m_timePlotCh->curve()->setYAxis(id_time);
+		QwtAxisId id_xy = m_xyPlotYAxis->axisId();
+		m_xyPlotCh->curve()->setYAxis(id_xy);
 	}
-	m_timePlotAxisHandle->setVisible(!b);
+
+	m_timePlotAxisHandle->handle()->setVisible(!b);
+	m_plotComponent->replot();
 }
 
 QWidget *TimePlotComponentChannel::createCurveMenu(QWidget *parent)

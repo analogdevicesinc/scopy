@@ -42,17 +42,8 @@ public:
 	bool rollingMode() const;
 	void setRollingMode(bool newRollingMode);
 
-	bool singleYMode() const;
-	void setSingleYMode(bool newSingleYMode);
-
-	bool showPlotTags() const;
-	void setShowPlotTags(bool newShowPlotTags);
-
 	double sampleRate() const;
 	void setSampleRate(double newSampleRate);
-
-	double freqOffset() const;
-	void setFreqOffset(double newFreqOffset);
 
 	bool syncBufferPlotSize() const;
 	void setSyncBufferPlotSize(bool newSyncBufferPlotSize);
@@ -93,7 +84,8 @@ private:
 	QWidget *createXAxisMenu(QWidget *parent = nullptr);
 	QWidget *createYAxisMenu(QWidget *parent = nullptr);
 	double readSampleRate();
-	void enableXModeTime();
+	void updateXModeCombo();
+	void updateYModeCombo();
 
 	QPen m_pen;
 
@@ -107,6 +99,7 @@ private:
 	MenuOnOffSwitch *m_rollingModeSw;
 	MenuOnOffSwitch *m_syncBufferPlot;
 	MenuCombo *m_xModeCb;
+	MenuCombo *m_yModeCb;
 
 	QPushButton *m_addPlotBtn;
 	QVBoxLayout *m_plotContainerLayout;
@@ -122,6 +115,7 @@ private:
 
 	QList<ChannelComponent *> m_channels;
 	QList<SampleRateProvider *> m_sampleRateProviders;
+	QList<ScaleProvider *> m_scaleProviders;
 	// bool m_showPlotTags;
 
 	Q_PROPERTY(uint32_t plotSize READ plotSize WRITE setPlotSize NOTIFY plotSizeChanged)

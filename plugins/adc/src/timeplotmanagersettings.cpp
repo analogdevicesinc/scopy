@@ -5,6 +5,8 @@
 #include <gui/stylehelper.h>
 #include <timeplotcomponentsettings.h>
 
+#include <grtimechannelcomponent.h>
+
 namespace scopy {
 namespace adc {
 
@@ -168,26 +170,26 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	xMinMaxLayout->addWidget(m_xmax);
 
 	m_xModeCb = new MenuCombo("XMode", xaxis);
-	auto cb = m_xModeCb->combo();
+	auto xcb = m_xModeCb->combo();
 
-	cb->addItem("Samples", XMODE_SAMPLES);
-	cb->addItem("Time - override samplerate", XMODE_OVERRIDE);
+	xcb->addItem("Samples", XMODE_SAMPLES);
+	xcb->addItem("Time - override samplerate", XMODE_OVERRIDE);
 
-	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+	connect(xcb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		m_sampleRateSpin->setVisible(false);
-		if(cb->itemData(idx) == XMODE_SAMPLES) {
+		if(xcb->itemData(idx) == XMODE_SAMPLES) {
 			m_sampleRateSpin->setValue(1);
 			// setMetricFormatter - xAxis
 			// setUnits xmin,xmax - k,mega
 		}
-		if(cb->itemData(idx) == XMODE_TIME) {
+		if(xcb->itemData(idx) == XMODE_TIME) {
 			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setEnabled(false);
 			m_sampleRateSpin->setValue(readSampleRate());
 			// setTimeFormatter - xAxis
 			// setUnits xmin,xmax - time units
 		}
-		if(cb->itemData(idx) == XMODE_OVERRIDE) {
+		if(xcb->itemData(idx) == XMODE_OVERRIDE) {
 			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setEnabled(true);
 			// setTimeFormatter - xAxis
@@ -204,6 +206,21 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 		},
 		"SampleRate", 1, DBL_MAX, false, false, xaxis);
 
+	m_yModeCb = new MenuCombo("YMODE", xaxis);
+	auto ycb = m_yModeCb->combo();
+	ycb->addItem("ADC Counts", YMODE_COUNT);
+	ycb->addItem("% Full Scale", YMODE_FS);
+
+	connect(ycb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+		auto mode = ycb->itemData(idx).toInt();
+		for(auto c : qAsConst(m_scaleProviders)) {
+			c->setYMode(static_cast<YMode>(mode));
+		}
+		// add to scaleinterface
+		// get min-max
+		// apply ymin-ymax
+	});
+
 	m_sampleRateSpin->setValue(10);
 	m_sampleRateSpin->setEnabled(false);
 	connect(m_sampleRateSpin, &PositionSpinButton::valueChanged, this, [=](double val) { setSampleRate(val); });
@@ -218,6 +235,7 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	xaxis->contentLayout()->addWidget(xMinMax);
 	xaxis->contentLayout()->addWidget(m_xModeCb);
 	xaxis->contentLayout()->addWidget(m_sampleRateSpin);
+	xaxis->contentLayout()->addWidget(m_yModeCb);
 
 	xaxis->contentLayout()->setSpacing(10);
 
@@ -339,11 +357,17 @@ void TimePlotManagerSettings::removePlot(TimePlotComponent *p)
 	m_plotContainerLayout->removeWidget(p->plotMenu());	
 }
 
+
 void TimePlotManagerSettings::addChannel(ChannelComponent *c) {
 	m_channels.append(c);
 	SampleRateProvider *srp = dynamic_cast<SampleRateProvider*>(c);
 	if(srp) {
 		addSampleRateProvider(srp);
+	}
+	ScaleProvider *sp = dynamic_cast<ScaleProvider*>(c);
+	if(sp) {
+		m_scaleProviders.append(sp);
+		updateYModeCombo();
 	}
 
 }
@@ -354,26 +378,24 @@ void TimePlotManagerSettings::removeChannel(ChannelComponent *c) {
 	if(srp) {
 		removeSampleRateProvider(srp);
 	}
+
+	ScaleProvider *sp = dynamic_cast<ScaleProvider*>(c);
+	if(sp) {
+		m_scaleProviders.append(sp);
+		updateYModeCombo();
+	}
 }
 
 void TimePlotManagerSettings::addSampleRateProvider(SampleRateProvider *s)
 {
-	enableXModeTime();
+	updateXModeCombo();
 	m_sampleRateProviders.append(s);
 }
 
-void TimePlotManagerSettings::removeSampleRateProvider(SampleRateProvider *s) { m_sampleRateProviders.removeAll(s); }
+void TimePlotManagerSettings::removeSampleRateProvider(SampleRateProvider *s) {
+	m_sampleRateProviders.removeAll(s); }
 
-void TimePlotManagerSettings::enableXModeTime()
-{
-	if(m_sampleRateAvailable) // already set
-		return;
-	m_sampleRateAvailable = true;
-	if(m_sampleRateAvailable) {
-		auto cb = m_xModeCb->combo();
-		cb->insertItem(1, "Time", XMODE_TIME);
-	}
-}
+
 double TimePlotManagerSettings::readSampleRate()
 {
 	double sr = 1;
@@ -384,6 +406,43 @@ double TimePlotManagerSettings::readSampleRate()
 		}
 	}
 	return sr;
+}
+
+void TimePlotManagerSettings::updateXModeCombo()
+{
+	if(m_sampleRateAvailable) // already set
+		return;
+	m_sampleRateAvailable = true;
+	if(m_sampleRateAvailable) {
+		auto cb = m_xModeCb->combo();
+		cb->insertItem(1, "Time", XMODE_TIME);
+	}
+}
+
+void TimePlotManagerSettings::updateYModeCombo()
+{
+	bool scaleItemCbtmp = true;
+	for(ScaleProvider *s : qAsConst(m_scaleProviders)) {
+		if(s->scaleAvailable() == false) {
+			scaleItemCbtmp = false;
+			break;
+		}
+	}
+
+	if(scaleItemCbtmp) {
+		// need scale item
+		int idx = m_yModeCb->combo()->findData(YMODE_SCALE);
+		if(idx == -1) {
+			m_yModeCb->combo()->addItem("Scale", YMODE_SCALE);
+		}
+
+	} else {
+		// no need
+		int idx = m_yModeCb->combo()->findData(YMODE_SCALE);
+		if(idx) {
+			m_yModeCb->combo()->removeItem(idx);
+		}
+	}
 }
 
 } // namespace adc

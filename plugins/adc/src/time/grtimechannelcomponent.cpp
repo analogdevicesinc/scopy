@@ -81,9 +81,8 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 		m_scaleWidget = IIOWidgetFactory::buildSingle(0x00, rec, this);
 	}
 
-
+	m_yAxisCtrl = new MenuOnOffSwitch("LOCK Y-Axis");
 	m_yCtrl = new MenuPlotAxisRangeControl(m_plotChannelCmpt->m_timePlotYAxis, yaxis);
-
 	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), yaxis, false);
 	m_autoscaler = new PlotAutoscaler(this);
 	m_autoscaler->addChannels(m_plotChannelCmpt->m_timePlotCh);
@@ -91,12 +90,25 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 	connect(m_autoscaler, &PlotAutoscaler::newMin, m_yCtrl, &MenuPlotAxisRangeControl::setMin);
 	connect(m_autoscaler, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
 
+	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [=](double min, double max) {
+		m_plotChannelCmpt->m_xyPlotYAxis->setInterval(m_yCtrl->min(), m_yCtrl->max());
+	});
+
+	connect(m_yAxisCtrl->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b){
+		m_yCtrl->setVisible(!b);
+		m_autoscaleBtn->setVisible(!b);
+		m_plotChannelCmpt->setSingleYMode(b);
+	});
+
+	m_yAxisCtrl->onOffswitch()->setChecked(true);
+
 	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
 		m_yCtrl->setEnabled(!b);
 		m_autoscaleEnabled = b;
 		toggleAutoScale();
 	});
 
+	yaxis->contentLayout()->addWidget(m_yAxisCtrl);
 	yaxis->contentLayout()->addWidget(m_autoscaleBtn);
 	yaxis->contentLayout()->addWidget(m_yCtrl);
 	yaxis->contentLayout()->addWidget(m_ymodeCb);
@@ -108,6 +120,18 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		auto mode = cb->itemData(idx).toInt();
 		setYMode(static_cast<YMode>(mode));
+	});
+
+	connect(this, &GRTimeChannelComponent::yModeChanged, this, [=]() {
+		int idx = cb->currentIndex();
+		int itemcount = cb->count();
+		for(int i = 0; i < itemcount; i++) {
+			if(cb->itemData(i) == m_ymode) {
+				idx = i;
+				break;
+			}
+		}
+		cb->setCurrentIndex(idx);
 	});
 
 	return yaxiscontainer;
@@ -241,7 +265,7 @@ void GRTimeChannelComponent::toggleAutoScale()
 	}
 }
 
-void GRTimeChannelComponent::setYMode(YMode mode)
+void GRTimeChannelComponent::setYModeHelper(YMode mode)
 {
 	double scale = 1;
 	double offset = 0;
@@ -251,7 +275,9 @@ void GRTimeChannelComponent::setYMode(YMode mode)
 
 	switch(mode) {
 	case YMODE_COUNT:
-		m_scaleWidget->setVisible(false);
+		if(m_scaleAvailable) {
+			m_scaleWidget->setVisible(false);
+		}
 		scale = 1;
 		if(fmt->is_signed) {
 			ymin = -(float)((int64_t)1 << (fmt->bits - 1));
@@ -263,7 +289,9 @@ void GRTimeChannelComponent::setYMode(YMode mode)
 		//		m_plotCh->yAxis()->setUnits("Counts");
 		break;
 	case YMODE_FS:
-		m_scaleWidget->setVisible(false);
+		if(m_scaleAvailable) {
+			m_scaleWidget->setVisible(false);
+		}
 		scale = 1.0 / ((float)((uint64_t)1 << fmt->bits));
 		if(fmt->is_signed) {
 			ymin = -0.5;
@@ -272,12 +300,13 @@ void GRTimeChannelComponent::setYMode(YMode mode)
 			ymin = 0;
 			ymax = 1;
 		}
-		//		m_plotCh->yAxis()->setUnits("");
+		//m_plotCh->yAxis()->setUnits("");
 		break;
 	case YMODE_SCALE:
-		scale = m_scaleWidget->getDataStrategy()->data().toDouble();
-		m_scaleWidget->setVisible(true);
-
+		if(m_scaleAvailable) {
+			scale = m_scaleWidget->getDataStrategy()->data().toDouble();
+			m_scaleWidget->setVisible(true);
+		}
 		if(fmt->is_signed) {
 			ymin = -(float)((int64_t)1 << (fmt->bits - 1));
 			ymax = (float)((int64_t)1 << (fmt->bits - 1));
@@ -289,7 +318,7 @@ void GRTimeChannelComponent::setYMode(YMode mode)
 		ymin = ymin * scale;
 		ymax = ymax * scale;
 
-		//		m_plotCh->yAxis()->setUnits(m_unit);
+		//m_plotCh->yAxis()->setUnits(m_unit);
 
 		break;
 	default:
@@ -302,17 +331,9 @@ void GRTimeChannelComponent::setYMode(YMode mode)
 	m_grtch->m_scOff->setOffset(offset);
 }
 
-void GRTimeChannelComponent::setSingleYMode(bool b)
+bool GRTimeChannelComponent::scaleAvailable() const
 {
-	/*if(b) {
-		m_plotCh->curve()->setYAxis(m_plotComponent->plot()->yAxis()->axisId()); // get default axis
-	} else {
-		m_plotCh->curve()->setYAxis(m_plotAxis->axisId()); // set it's own axis
-	}
-	m_plotAxisHandle->handle()->setVisible(!b);
-	m_yCtrl->setEnabled(!b);
-	m_autoscaleBtn->onOffswitch()->setChecked(false);
-	m_autoscaleBtn->setEnabled(!b);*/
+	return m_scaleAvailable;
 }
 
 MeasureManagerInterface *GRTimeChannelComponent::getMeasureManager() { return m_measureMgr; }
@@ -401,4 +422,16 @@ double GRTimeChannelComponent::sampleRate()
 	return m_src->readSampleRate();
 }
 
+YMode GRTimeChannelComponent::ymode() const
+{
+	return m_ymode;
+}
 
+void GRTimeChannelComponent::setYMode(YMode newYmode)
+{
+	if (m_ymode == newYmode)
+		return;
+	m_ymode = newYmode;
+	setYModeHelper(newYmode);
+	Q_EMIT yModeChanged();
+}
