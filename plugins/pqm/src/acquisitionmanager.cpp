@@ -6,10 +6,10 @@
 Q_LOGGING_CATEGORY(CAT_PQM_ACQ, "PqmAqcManager");
 using namespace scopy::pqm;
 
-AcquisitionManager::AcquisitionManager(iio_context *ctx, QObject *parent)
+AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QObject *parent)
 	: QObject(parent)
 	, m_ctx(ctx)
-	, m_dataRefreshTimer(nullptr)
+	, m_pingTask(pingTask)
 	, m_buffer(nullptr)
 {
 	m_readFw = new QFutureWatcher<void>(this);
@@ -27,7 +27,12 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, QObject *parent)
 		m_dataRefreshTimer = new QTimer(this);
 		m_dataRefreshTimer->setInterval(500);
 		connect(m_dataRefreshTimer, &QTimer::timeout, this, &AcquisitionManager::futureReadData);
+		m_pingTimer = new QTimer(this);
+		m_pingTimer->setInterval(2000);
+		connect(m_pingTimer, &QTimer::timeout, this, &AcquisitionManager::pingTimerTimeout);
 		connect(m_readFw, &QFutureWatcher<void>::finished, this, &AcquisitionManager::onReadFinished);
+
+		m_dataRefreshTimer->start();
 	} else {
 		qWarning(CAT_PQM_ACQ) << "The PQM device is not available!";
 	}
@@ -39,6 +44,11 @@ AcquisitionManager::~AcquisitionManager()
 		m_dataRefreshTimer->stop();
 		m_dataRefreshTimer->deleteLater();
 		m_dataRefreshTimer = nullptr;
+	}
+	if(m_pingTimer) {
+		m_pingTimer->stop();
+		m_pingTimer->deleteLater();
+		m_pingTimer = nullptr;
 	}
 	if(m_readFw) {
 		m_readFw->waitForFinished();
@@ -53,6 +63,7 @@ AcquisitionManager::~AcquisitionManager()
 	if(m_ctx) {
 		m_ctx = nullptr;
 	}
+	m_pingTask = nullptr;
 	// buffer destroy?
 	m_chnlsName.clear();
 	m_bufferData.clear();
@@ -70,22 +81,7 @@ void AcquisitionManager::enableBufferChnls(iio_device *dev)
 	}
 }
 
-void AcquisitionManager::toolEnabled(bool en, QString toolName)
-{
-	m_tools[toolName] = en;
-	QMap<QString, bool>::const_iterator it = std::find(m_tools.cbegin(), m_tools.cend(), true);
-	if(!m_dataRefreshTimer) {
-		qWarning(CAT_PQM_ACQ) << "Unable to start data acquisition!";
-		return;
-	}
-	if(it != m_tools.cend()) {
-		if(!m_dataRefreshTimer->isActive()) {
-			m_dataRefreshTimer->start();
-		}
-	} else {
-		m_dataRefreshTimer->stop();
-	}
-}
+void AcquisitionManager::toolEnabled(bool en, QString toolName) { m_tools[toolName] = en; }
 
 void AcquisitionManager::futureReadData()
 {
@@ -97,12 +93,19 @@ void AcquisitionManager::futureReadData()
 
 void AcquisitionManager::readData()
 {
+	mutex.lock();
+	if(m_enPing) {
+		m_pingTask->start();
+		m_pingTask->wait(THREAD_FINISH_TIMEOUT);
+		m_enPing = false;
+	}
 	if(m_tools["rms"] || m_tools["harmonics"] || m_tools["settings"]) {
 		m_attrHaveBeenRead = readPqmAttributes();
 	}
 	if(m_tools["waveform"]) {
 		m_buffHaveBeenRead = readBufferedData();
 	}
+	mutex.unlock();
 }
 
 bool AcquisitionManager::readPqmAttributes()
@@ -179,6 +182,8 @@ void AcquisitionManager::onReadFinished()
 	}
 }
 
+void AcquisitionManager::pingTimerTimeout() { m_enPing = true; }
+
 int AcquisitionManager::readGetNewMeasurement(iio_device *dev)
 {
 	char dest[MAX_ATTR_SIZE];
@@ -229,10 +234,13 @@ void AcquisitionManager::setConfigAttr(QMap<QString, QMap<QString, QString>> att
 	}
 }
 
+void AcquisitionManager::startPing() { m_pingTimer->start(); }
+
+void AcquisitionManager::stopPing() { m_pingTimer->stop(); }
+
 void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 {
-	m_readFw->waitForFinished();
-	m_readFw->pause();
+	mutex.lock();
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(!dev)
 		return;
@@ -245,7 +253,7 @@ void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 			iio_device_attr_write(dev, key.toStdString().c_str(), newVal.toStdString().c_str());
 		}
 	}
-	m_readFw->resume();
+	mutex.unlock();
 }
 
 #include "moc_acquisitionmanager.cpp"

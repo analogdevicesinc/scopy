@@ -12,11 +12,12 @@
 
 #include <pluginbase/preferences.h>
 #include <iioutil/connectionprovider.h>
+#include <iioutil/iiopingtask.h>
 
 Q_LOGGING_CATEGORY(CAT_PQMPLUGIN, "PQMPlugin");
 using namespace scopy::pqm;
 
-void PQMPlugin::preload() { m_pqmController = new PqmController(m_param); }
+void PQMPlugin::preload() {}
 
 bool PQMPlugin::compatible(QString m_param, QString category)
 {
@@ -89,14 +90,7 @@ void PQMPlugin::loadToolList()
 						  ":/gui/icons/scopy-default/icons/tool_debugger.svg"));
 }
 
-void PQMPlugin::unload()
-{
-	delete m_infoPage;
-	if(m_pqmController) {
-		delete m_pqmController;
-		m_pqmController = nullptr;
-	}
-}
+void PQMPlugin::unload() { delete m_infoPage; }
 
 QString PQMPlugin::description() { return "Adds functionality specific to PQM board"; }
 
@@ -108,10 +102,9 @@ bool PQMPlugin::onConnect()
 		return false;
 	}
 	struct iio_context *ctx = conn->context();
-	connect(m_pqmController, &PqmController::pingFailed, this, &PQMPlugin::disconnectDevice);
-	m_pqmController->startPingTask(ctx);
+	m_pingTask = new IIOPingTask(ctx, this);
 
-	m_acqManager = new AcquisitionManager(ctx, this);
+	m_acqManager = new AcquisitionManager(ctx, m_pingTask, this);
 
 	RmsInstrument *rms = new RmsInstrument();
 	m_toolList[0]->setTool(rms);
@@ -153,8 +146,6 @@ bool PQMPlugin::onConnect()
 
 bool PQMPlugin::onDisconnect()
 {
-	m_pqmController->stopPingTask();
-	disconnect(m_pqmController);
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);
@@ -171,10 +162,22 @@ bool PQMPlugin::onDisconnect()
 	disconnect(m_acqManager);
 	delete m_acqManager;
 	m_acqManager = nullptr;
-
+	clearPingTask();
 	ConnectionProvider *cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
 	return true;
+}
+
+void PQMPlugin::startPingTask() { m_acqManager->startPing(); }
+
+void PQMPlugin::stopPingTask() { m_acqManager->stopPing(); }
+
+void PQMPlugin::clearPingTask()
+{
+	if(m_pingTask) {
+		m_pingTask->deleteLater();
+		m_pingTask = nullptr;
+	}
 }
 
 void PQMPlugin::initMetadata()
