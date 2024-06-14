@@ -58,16 +58,11 @@ class SCOPY_ADC_EXPORT GRTimeChannelComponent
 	, public GRChannel
 	, public MeasurementProvider
 	, public SampleRateProvider
+	, public ScaleProvider
 
 {
 	Q_OBJECT
 public:
-	typedef enum
-	{
-		YMODE_COUNT,
-		YMODE_FS,
-		YMODE_SCALE
-	} YMode;
 	GRTimeChannelComponent(GRIIOFloatChannelNode *node, TimePlotComponent *m_plot, GRTimeSinkComponent *grtsc,
 			       QPen pen, QWidget *parent = nullptr);
 	~GRTimeChannelComponent();
@@ -79,7 +74,9 @@ public:
 	void insertPlotComboWidget(QWidget *w);
 	QVBoxLayout* menuLayout();
 
-
+	YMode ymode() const override;
+	void setYMode(YMode newYmode) override;
+	bool scaleAvailable() const override;
 
 public Q_SLOTS:
 
@@ -96,12 +93,14 @@ public Q_SLOTS:
 	double sampleRate() override;
 
 	void toggleAutoScale();
-	void setYMode(YMode mode);
-	void setSingleYMode(bool);
+	void setYModeHelper(YMode mode);
 
 	/*
 	Q_SIGNALS:
 		void addNewSnapshot(SnapshotProvider::SnapshotRecipe) override;*/
+
+signals:
+	void yModeChanged();
 
 private:
 	GRIIOFloatChannelNode *m_node;
@@ -111,6 +110,7 @@ private:
 
 	TimeMeasureManager *m_measureMgr;
 	MenuControlButton *m_ctrl;
+	MenuOnOffSwitch *m_yAxisCtrl;
 	MenuPlotAxisRangeControl *m_yCtrl;
 	PlotAutoscaler *m_autoscaler;
 	MenuCombo *m_ymodeCb;
@@ -135,7 +135,9 @@ private:
 	void createMenuControlButton(QWidget *parent = nullptr);
 	void setupChannelMenuControlButtonHelper(MenuControlButton *btn);
 
+	Q_PROPERTY(YMode ymode READ ymode WRITE setYMode NOTIFY yModeChanged);
 
+	YMode m_ymode;
 };
 
 } // namespace adc

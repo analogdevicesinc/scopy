@@ -6,6 +6,13 @@
 
 namespace scopy::adc {
 
+typedef enum
+{
+	YMODE_COUNT,
+	YMODE_FS,
+	YMODE_SCALE
+} YMode;
+
 class SCOPY_ADC_EXPORT MeasurementProvider
 {
 public:
@@ -31,6 +38,15 @@ public:
 	virtual bool sampleRateAvailable() = 0;
 	virtual double sampleRate() = 0;
 };
+
+class SCOPY_ADC_EXPORT ScaleProvider
+{
+public:
+	virtual YMode ymode() const = 0;
+	virtual void setYMode(YMode newYmode) = 0;
+	virtual bool scaleAvailable() const = 0;
+};
+
 
 class SCOPY_ADC_EXPORT MeasurementPanelInterface
 {

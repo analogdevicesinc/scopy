@@ -43,7 +43,6 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	connect(labelsSwitch->onOffswitch(), &QAbstractButton::toggled, m_plotComponent,
 		&TimePlotComponent::showPlotLabels);
 
-	MenuOnOffSwitch *singleYMode = new MenuOnOffSwitch("SINGLE Y MODE", plotMenu, true);
 	MenuPlotAxisRangeControl *m_yCtrl = new MenuPlotAxisRangeControl(m_plotComponent->timePlot()->yAxis(), this);
 
 	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), plotMenu, false);
@@ -53,21 +52,8 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	connect(m_autoscaler, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
 
 	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [=](double min, double max) {
-		if(m_plotComponent->singleYMode()) {
-			m_plotComponent->xyPlot()->xAxis()->setInterval(m_yCtrl->min(), m_yCtrl->max());
-			m_plotComponent->xyPlot()->yAxis()->setInterval(m_yCtrl->min(), m_yCtrl->max());
-		}
-	});
-
-	connect(singleYMode->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
-		m_plotComponent->setSingleYMode(b);
-		m_yCtrl->setVisible(b);
-		m_autoscaleBtn->setVisible(b);
-
-		if(m_plotComponent->singleYMode()) {
-			m_plotComponent->xyPlot()->xAxis()->setInterval(m_yCtrl->min(), m_yCtrl->max());
-			m_plotComponent->xyPlot()->yAxis()->setInterval(m_yCtrl->min(), m_yCtrl->max());
-		}
+		m_plotComponent->xyPlot()->xAxis()->setInterval(m_yCtrl->min(), m_yCtrl->max());
+		m_plotComponent->xyPlot()->yAxis()->setInterval(m_yCtrl->min(), m_yCtrl->max());
 	});
 
 	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
@@ -103,7 +89,6 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	connect(m_deletePlot, &QAbstractButton::clicked, this, [=](){Q_EMIT requestDeletePlot();});
 
 
-	plotMenu->contentLayout()->addWidget(singleYMode);
 	plotMenu->contentLayout()->addWidget(m_autoscaleBtn);
 	plotMenu->contentLayout()->addWidget(m_yCtrl);
 
@@ -117,14 +102,13 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	plotMenu->contentLayout()->setSpacing(10);
 
 
-	m_autoscaleBtn->setVisible(false);
-	m_yCtrl->setVisible(false);
+	m_autoscaleBtn->setVisible(true);
+	m_yCtrl->setVisible(true);
 	m_xAxisSrc->setVisible(false);
 	m_xAxisShow->setVisible(false);
 
 	// init
 	xySwitch->onOffswitch()->setChecked(true);
-	singleYMode->onOffswitch()->setChecked(true);
 	m_yCtrl->setMin(-2048);
 	m_yCtrl->setMax(2048);
 	labelsSwitch->onOffswitch()->setChecked(true);
