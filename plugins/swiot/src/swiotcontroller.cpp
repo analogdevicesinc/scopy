@@ -35,8 +35,6 @@ SwiotController::SwiotController(QString uri, QObject *parent)
 	, m_isRuntimeCtx(false)
 	, m_temperatureReadEn(false)
 {
-	pingTask = nullptr;
-	pingTimer = nullptr;
 	temperatureTask = nullptr;
 	temperatureTimer = nullptr;
 	extPsTask = nullptr;
@@ -46,22 +44,6 @@ SwiotController::SwiotController(QString uri, QObject *parent)
 }
 
 SwiotController::~SwiotController() {}
-
-void SwiotController::startPingTask()
-{
-	pingTask = new SwiotPingTask(m_conn);
-	pingTimer = new CyclicalTask(pingTask);
-	connect(pingTask, SIGNAL(pingSuccess()), this, SIGNAL(pingSuccess()));
-	connect(pingTask, SIGNAL(pingFailed()), this, SIGNAL(pingFailed()));
-	pingTimer->start(2000);
-}
-
-void SwiotController::stopPingTask()
-{
-	pingTask->requestInterruption();
-	pingTimer->deleteLater();
-	pingTask->deleteLater();
-}
 
 void SwiotController::connectSwiot()
 {
