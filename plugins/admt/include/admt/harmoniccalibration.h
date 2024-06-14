@@ -11,6 +11,7 @@
 #include <QString>
 #include <QVBoxLayout>
 #include <QScrollArea>
+#include <QButtonGroup>
 
 #include <admtplugin.h>
 #include <iio.h>
@@ -19,39 +20,72 @@
 #include <menuheader.h>
 #include <menusectionwidget.h>
 #include <menucollapsesection.h>
+#include <menucontrolbutton.h>
+#include <verticalchannelmanager.h>
+#include <measurementsettings.h>
 
 namespace scopy {
-class SCOPY_ADMT_EXPORT HarmonicCalibration : public QWidget
+class MenuControlButton;
+class CollapsableMenuControlButton;
+
+class HarmonicCalibration : public QWidget
 {
 	Q_OBJECT
 public:
 	HarmonicCalibration(PlotProxy *proxy, QWidget *parent = nullptr);
 	~HarmonicCalibration();
+	void init();
+	void deinit();
+	void startAddons();
+	void stopAddons();
+	bool running() const;
+	void setRunning(bool newRunning);
+public Q_SLOTS:
+	void run(bool);
+	void stop();
+	void start();
+	void restart();
+	void showMeasurements(bool b);
+	void createSnapshotChannel(SnapshotProvider::SnapshotRecipe rec);
+	void deleteChannel(ChannelAddon *);
+	MenuControlButton *addChannel(ChannelAddon *channelAddon, QWidget *parent);
+	CollapsableMenuControlButton *addDevice(GRDeviceAddon *dev, QWidget *parent);
+Q_SIGNALS:
+	void runningChanged(bool);
 private:
-	void getRotationData();
-	void getCountData();
-	void getAngleData();
-	QStringList getDeviceList(iio_context *context);
-
+	bool m_running;
 	ToolTemplate *tool;
 	GearBtn *settingsButton;
 	InfoBtn *infoButton;
 	RunBtn *runButton;
-	QPushButton *getRotationButton, *getCountButton, *getAngleButton;
-	QLineEdit *rotationLineEdit, *countLineEdit, *angleLineEdit;
-	MenuHeaderWidget *header;
-	QWidget *leftWidget, *leftBody;
-	QVBoxLayout *leftLayout, *leftBodyLayout;
-	MenuSectionWidget *rotationSection, *countSection, *angleSection;
-	MenuCollapseSection *rotationCollapse, *countCollapse, *angleCollapse;
-	QScrollArea *scrollArea;
 
-	QPushButton *openLastMenuBtn;
+	QPushButton *openLastMenuButton;
 	PlotProxy *proxy;
 	GRTimePlotAddon *plotAddon;
 	GRTimePlotAddonSettings *plotAddonSettings;
-	QButtonGroup *rightMenuBtnGrp;
+	QButtonGroup *rightMenuButtonGroup;
+
+	MenuControlButton *channelsButton;
+	VerticalChannelManager *verticalChannelManager;
+	QButtonGroup *channelGroup;
+	MapStackedWidget *channelStack;
+	MeasurementsPanel *measurePanel;
+	MeasurementSettings *measureSettings;
+	StatsPanel *statsPanel;
+
+	void setupChannelsButtonHelper(MenuControlButton *channelsButton);
+	void setupMeasureButtonHelper(MenuControlButton *measureButton);
+	void setupChannelSnapshot(ChannelAddon *channelAddon);
+	void setupChannelMeasurement(ChannelAddon *channelAddon);
+	void setupChannelDelete(ChannelAddon *channelAddon);
+	void setupChannelMenuControlButtonHelper(MenuControlButton *menuControlButton, ChannelAddon *channelAddon);
+	void setupDeviceMenuControlButtonHelper(MenuControlButton *menuControlButton, GRDeviceAddon *channelAddon);
+
 	int uuid = 0;
+	const QString channelsMenuId = "channels";
+	const QString measureMenuId = "measure";
+	const QString statsMenuId = "stats";
+	const QString verticalChannelManagerId = "vcm";
 };
 } // namespace scopy::admt
 #endif // HARMONICCALIBRATION_H
