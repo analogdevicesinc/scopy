@@ -1,6 +1,5 @@
 #include "plotwidget.h"
 
-#include "edgelessplot.h"
 #include "plotaxis.h"
 
 #include <QDebug>
@@ -42,12 +41,7 @@ PlotWidget::PlotWidget(QWidget *parent)
 	m_plot->plotLayout()->setCanvasMargin(0);
 	m_plot->plotLayout()->setSpacing(0);
 
-	m_xPosition = Preferences::get("adc_plot_xaxis_label_position").toInt();
-	m_yPosition = Preferences::get("adc_plot_yaxis_label_position").toInt();
-	QPen pen(QColor("#9E9E9F"));
-	m_xAxis = new PlotAxis(m_xPosition, this, pen, this);
-	m_yAxis = new PlotAxis(m_yPosition, this, pen, this);
-
+	setupAxes();
 	setupOpenGLCanvas();
 	setupNavigator();
 	setupPlotInfo();
@@ -211,6 +205,19 @@ void PlotWidget::setupPlotInfo()
 }
 
 void PlotWidget::setupPlotScales() { m_plotScales = new PlotScales(this); }
+
+void PlotWidget::setupAxes()
+{
+	// this is needed to hide default QwtPlot axes
+	m_plot->setAxisVisible(QwtAxis::YLeft, false);
+	m_plot->setAxisVisible(QwtAxis::XBottom, false);
+
+	m_xPosition = Preferences::get("adc_plot_xaxis_label_position").toInt();
+	m_yPosition = Preferences::get("adc_plot_yaxis_label_position").toInt();
+	QPen pen(QColor("#9E9E9F"));
+	m_xAxis = new PlotAxis(m_xPosition, this, pen, this);
+	m_yAxis = new PlotAxis(m_yPosition, this, pen, this);
+}
 
 bool PlotWidget::showYAxisLabels() const { return m_showYAxisLabels; }
 
