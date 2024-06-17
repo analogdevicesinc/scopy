@@ -129,6 +129,7 @@ private:
 	void setupNavigator();
 	void setupPlotInfo();
 	void setupPlotScales();
+	void setupAxes();
 };
 
 } // namespace scopy
