@@ -16,7 +16,6 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QOb
 	m_setFw = new QFutureWatcher<void>(this);
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(dev) {
-		readPqmAttributes();
 		// might need to set a trigger for the pqm device
 		readPqmAttributes();
 		enableBufferChnls(dev);
@@ -111,8 +110,8 @@ void AcquisitionManager::readData()
 bool AcquisitionManager::readPqmAttributes()
 {
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
-	if(!isMeasurementAvailable(dev)) {
-		qDebug(CAT_PQM_ACQ) << "Measurement is unavailable!";
+	if(!dev) {
+		qDebug(CAT_PQM_ACQ) << "Device is unavailable!";
 		return false;
 	}
 	int attrNo = iio_device_get_attrs_count(dev);
@@ -122,10 +121,8 @@ bool AcquisitionManager::readPqmAttributes()
 	char dest[MAX_ATTR_SIZE];
 	for(int i = 0; i < attrNo; i++) {
 		attrName = iio_device_get_attr(dev, i);
-		if(strcmp(attrName, NEW_MEASUREMENT_ATTR) != 0) {
-			iio_device_attr_read(dev, attrName, dest, MAX_ATTR_SIZE);
-			m_pqmAttr[DEVICE_PQM][attrName] = QString(dest);
-		}
+		iio_device_attr_read(dev, attrName, dest, MAX_ATTR_SIZE);
+		m_pqmAttr[DEVICE_PQM][attrName] = QString(dest);
 	}
 	for(int i = 0; i < chnlsNo; i++) {
 		iio_channel *chnl = iio_device_get_channel(dev, i);
@@ -183,36 +180,6 @@ void AcquisitionManager::onReadFinished()
 }
 
 void AcquisitionManager::pingTimerTimeout() { m_enPing = true; }
-
-int AcquisitionManager::readGetNewMeasurement(iio_device *dev)
-{
-	char dest[MAX_ATTR_SIZE];
-	int measurementNumber = 0;
-	bool ok = false;
-	iio_device_attr_read(dev, NEW_MEASUREMENT_ATTR, dest, MAX_ATTR_SIZE);
-	QString value(dest);
-	measurementNumber = value.toInt(&ok);
-	if(!ok) {
-		qWarning(CAT_PQM_ACQ) << "get_new_measurment attribute cannot be read!";
-		return -1;
-	}
-	return measurementNumber;
-}
-
-bool AcquisitionManager::isMeasurementAvailable(iio_device *dev)
-{
-	int measurementNumber = readGetNewMeasurement(dev);
-	if(measurementNumber < 0) {
-		return false;
-	}
-	if(m_pqmAttr.empty()) {
-		m_pqmAttr[DEVICE_PQM][NEW_MEASUREMENT_ATTR] = QString::number(measurementNumber);
-		return true;
-	}
-	int oldMeasurementNumber = m_pqmAttr[DEVICE_PQM][NEW_MEASUREMENT_ATTR].toInt();
-	m_pqmAttr[DEVICE_PQM][NEW_MEASUREMENT_ATTR] = QString::number(measurementNumber);
-	return (measurementNumber != oldMeasurementNumber);
-}
 
 double AcquisitionManager::convertFromHwToHost(int value, QString chnlId)
 {
