@@ -7,6 +7,7 @@
 #include "plot_utils.hpp"
 #include "basicscaledraw.h"
 #include "scopy-gui_export.h"
+#include "edgelessplot.h"
 
 #include <QwtPlotZoomer>
 #include <QwtScaleEngine>
