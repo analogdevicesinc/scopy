@@ -89,7 +89,8 @@ void TimePlotComponentChannel::initPlotComponent(TimePlotComponent *plotComponen
 	refreshData(true);
 }
 
-TimePlotComponentChannel::~TimePlotComponentChannel() {}
+TimePlotComponentChannel::~TimePlotComponentChannel() {
+}
 
 void TimePlotComponentChannel::refreshData(bool copy)
 {

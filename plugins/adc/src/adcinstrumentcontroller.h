@@ -68,6 +68,7 @@ private:
 	MeasureComponent *m_measureComponent;
 
 	ChannelIdProvider *chIdP;
+	CollapsableMenuControlButton *m_otherCMCB;
 
 	QFuture<void> m_refillFuture;
 	QFutureWatcher<void> *m_fw;

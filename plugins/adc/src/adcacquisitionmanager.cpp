@@ -6,7 +6,7 @@
 Q_LOGGING_CATEGORY(CAT_ACQTREENODE, "AcqTreeNode")
 
 using namespace scopy;
-using namespace scopy::grutil;
+using namespace scopy::adc;
 
 GRIIOFloatChannelNode::GRIIOFloatChannelNode(GRTopBlockNode *top, GRIIOFloatChannelSrc *c, QObject *parent)
 	: AcqTreeNode(c->getChannelName(), parent)
@@ -49,6 +49,7 @@ AcqTreeNode::AcqTreeNode(QString name, QObject *parent)
 	: QObject(parent)
 {
 	m_name = name;
+	m_treeParent = nullptr;
 }
 
 AcqTreeNode::~AcqTreeNode() {}
@@ -103,3 +104,28 @@ AcqTreeNode *AcqTreeNode::treeParent() const { return m_treeParent; }
 void AcqTreeNode::setTreeParent(AcqTreeNode *newTreeParent) { m_treeParent = newTreeParent; }
 
 QList<AcqTreeNode *> AcqTreeNode::treeChildren() const { return m_treeChildren; }
+
+AcqTreeNode *AcqTreeNode::treeRoot()
+{
+	AcqTreeNode *root = this;
+	while(root->m_treeParent) {
+		qInfo()<<root->m_name;
+		root = root->m_treeParent;
+	}
+	return root;
+}
+
+ImportFloatChannelNode::ImportFloatChannelNode(SnapshotRecipe rec, QObject *parent) : AcqTreeNode(rec.name, parent), m_recipe(rec)
+{
+
+}
+
+ImportFloatChannelNode::~ImportFloatChannelNode()
+{
+
+}
+
+SnapshotRecipe ImportFloatChannelNode::recipe() const
+{
+	return m_recipe;
+}
