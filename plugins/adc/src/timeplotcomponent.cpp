@@ -119,16 +119,19 @@ void TimePlotComponent::setXYXChannel(ChannelComponent *c)
 	}
 	m_XYXChannel = c;
 	if(c) {
-		xyDataConn = connect(c->chData(), &ChannelData::newData, this,
-				     [=](const float *xData_, const float *yData_, size_t size, bool copy) {
-					     xyXData = yData_;
-					     for(TimePlotComponentChannel *ch : qAsConst(m_channels)) {
-						     ch->setXyXData(xyXData);
-					     }
-				     });
+		onXyXNewData(c->chData()->xData(), c->chData()->yData(), c->chData()->size(), true);
+		xyDataConn = connect(c->chData(), &ChannelData::newData, this, &TimePlotComponent::onXyXNewData);
 		m_XYXChannel->plotChannelCmpt()->m_xyPlotCh->setEnabled(m_showXSourceOnXy);
 	}
 }
+
+void TimePlotComponent::onXyXNewData(const float *xData_, const float *yData_, size_t size, bool copy) {
+	xyXData = yData_;
+	for(TimePlotComponentChannel *ch : qAsConst(m_channels)) {
+		ch->setXyXData(xyXData);
+	}
+}
+
 
 void TimePlotComponent::addChannel(ChannelComponent *c)
 {

@@ -44,7 +44,7 @@ void TimePlotManager::setXInterval(double xMin, double xMax)
 
 void TimePlotManager::selectChannel(ChannelComponent *c)
 {
-	for(TimePlotComponentChannel *pcc : m_channels) {
+	for(TimePlotComponentChannel *pcc : qAsConst(m_channels)) {
 		if(pcc->m_ch == c) {
 			PlotChannel *ch = pcc->m_timePlotCh;
 			PlotWidget *w = pcc->m_plotComponent->timePlot();
@@ -96,10 +96,10 @@ void TimePlotManager::removePlot(uint32_t uuid)
 	}
 }
 
-void TimePlotManager::addChannel(ChannelComponent *c, uint32_t uuid)
+void TimePlotManager::addChannel(ChannelComponent *c)
 {
 	m_channels.append(c->plotChannelCmpt());
-	TimePlotComponent *plt = plot(uuid);
+	TimePlotComponent *plt = c->plotChannelCmpt()->m_plotComponent;
 	plt->addChannel(c);
 	m_channelPlotcomboMap.insert(c, new TimePlotManagerCombobox(this, c));
 	c->addChannelToPlot();

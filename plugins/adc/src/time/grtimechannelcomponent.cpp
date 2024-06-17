@@ -28,9 +28,6 @@ GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, Time
 
 	m_grtch = new GRTimeChannelSigpath(grtsc->name(), this, node, this);
 
-	int yPlotAxisPosition = Preferences::get("adc_plot_yaxis_label_position").toInt();
-	int yPlotAxisHandle = Preferences::get("adc_plot_yaxis_handle_position").toInt();
-
 	m_running = false;
 	m_autoscaleEnabled = false;
 
@@ -53,9 +50,7 @@ GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, Time
 	m_lay->addWidget(widget);
 	setLayout(m_lay);
 
-	createMenuControlButton();
-
-	addChannelToPlot();
+	createMenuControlButton(this);
 }
 
 GRTimeChannelComponent::~GRTimeChannelComponent() {}
@@ -152,7 +147,7 @@ QWidget *GRTimeChannelComponent::createCurveMenu(QWidget *parent)
 	return curvecontainer;
 }
 
-/*
+
 QPushButton *GRTimeChannelComponent::createSnapshotButton(QWidget *parent)
 {
 	QPushButton *snapBtn = new QPushButton("Snapshot", parent);
@@ -160,19 +155,22 @@ QPushButton *GRTimeChannelComponent::createSnapshotButton(QWidget *parent)
 
 	connect(snapBtn, &QPushButton::clicked, this, [=]() {
 		std::vector<float> x, y;
-		auto data = m_plotCh->curve()->data();
+		auto data = m_plotChannelCmpt->m_timePlotCh->curve()->data();
 		for(int i = 0; i < data->size(); i++) {
 			x.push_back(data->sample(i).x());
 			y.push_back(data->sample(i).y());
 		}
-		SnapshotProvider::SnapshotRecipe rec{x, y, m_channelName};
-		Q_EMIT addNewSnapshot(rec);
+		SnapshotRecipe rec{x, y, m_plotChannelCmpt->m_plotComponent, "REF - " + m_channelName};
+		AcqTreeNode* treeRoot= m_node->treeRoot();
+		ImportFloatChannelNode *snap = new ImportFloatChannelNode(rec,treeRoot);
+		treeRoot->addTreeChild(snap);
+
 	});
 
 	snapBtn->setEnabled(false);
 	return snapBtn;
 }
-*/
+
 
 QWidget *GRTimeChannelComponent::createMenu(QWidget *parent)
 {
@@ -204,7 +202,7 @@ QWidget *GRTimeChannelComponent::createMenu(QWidget *parent)
 	QWidget *curvemenu = createCurveMenu(w);
 	QWidget *attrmenu = createAttrMenu(w);
 	QWidget *measuremenu = m_measureMgr->createMeasurementMenu(w);
-	// m_snapBtn = createSnapshotButton(w);
+	m_snapBtn = createSnapshotButton(w);
 
 	lay->addWidget(header);
 	lay->addWidget(scroll);
@@ -212,7 +210,7 @@ QWidget *GRTimeChannelComponent::createMenu(QWidget *parent)
 	m_layScroll->addWidget(curvemenu);
 	m_layScroll->addWidget(attrmenu);
 	m_layScroll->addWidget(measuremenu);
-	// layScroll->addWidget(m_snapBtn);
+	m_layScroll->addWidget(m_snapBtn);
 
 	m_layScroll->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 	return w;
@@ -365,7 +363,7 @@ MeasureManagerInterface *GRTimeChannelComponent::getMeasureManager() { return m_
 
 GRSignalPath *GRTimeChannelComponent::sigpath() { return m_grtch->m_signalPath; }
 
-void GRTimeChannelComponent::insertPlotComboWidget(QWidget *w)
+void GRTimeChannelComponent::insertMenuWidget(QWidget *w)
 {
 	m_curveSection->contentLayout()->addWidget(w);
 }
@@ -389,11 +387,11 @@ void GRTimeChannelComponent::disable()
 	ChannelComponent::disable();
 }
 
-MenuControlButton *GRTimeChannelComponent::ctrl() { return m_ctrl; }
-
 void GRTimeChannelComponent::onInit()
 {
 	// Defaults
+	addChannelToPlot();
+
 	m_yCtrl->setMin(-1.0);
 	m_yCtrl->setMax(1.0);
 	auto v = Preferences::get("adc_default_y_mode").toInt();
@@ -409,33 +407,9 @@ void GRTimeChannelComponent::onNewData(const float *xData, const float *yData, s
 	auto model = m_measureMgr->getModel();
 	model->setDataSource(yData, size);
 	model->measure();
-	// m_snapBtn->setEnabled(true);
+	m_snapBtn->setEnabled(true);
 }
 
-void GRTimeChannelComponent::createMenuControlButton(QWidget *parent)
-{
-	m_ctrl = new MenuControlButton(parent);
-	setupChannelMenuControlButtonHelper(m_ctrl);
-}
-
-void GRTimeChannelComponent::setupChannelMenuControlButtonHelper(MenuControlButton *btn)
-{
-	btn->setName(m_channelName);
-	btn->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
-	btn->setOpenMenuChecksThis(true);
-	btn->setDoubleClickToOpenMenu(true);
-	btn->setColor(pen().color());
-	btn->button()->setVisible(false);
-	btn->setCheckable(true);
-
-	connect(btn->checkBox(), &QCheckBox::toggled, this, [=](bool b) {
-		if(b)
-			enable();
-		else
-			disable();
-	});
-	btn->checkBox()->setChecked(true);
-}
 
 bool GRTimeChannelComponent::sampleRateAvailable()
 {

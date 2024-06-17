@@ -9,8 +9,10 @@
 #include <gr-util/grscaleoffsetproc.h>
 #include <scopy-adc_export.h>
 #include <QMap>
+#include <interfaces.h>
 
 namespace scopy {
+namespace adc {
 using namespace grutil;
 class AcqTreeNode;
 
@@ -33,6 +35,7 @@ public:
 	AcqTreeNode *treeParent() const;
 	void setTreeParent(AcqTreeNode *newTreeParent);
 	QList<AcqTreeNode *> treeChildren() const;
+	AcqTreeNode* treeRoot();
 
 Q_SIGNALS:
 	void newChild(AcqTreeNode *);
@@ -86,6 +89,20 @@ private:
 	GRTopBlockNode *m_top;
 	GRIIOFloatChannelSrc *m_src;
 };
+
+class SCOPY_ADC_EXPORT ImportFloatChannelNode : public AcqTreeNode
+{
+public:
+	// ImportFloatChannelNode()
+	ImportFloatChannelNode(SnapshotRecipe, QObject *parent = nullptr);
+	~ImportFloatChannelNode();
+	SnapshotRecipe recipe() const;
+
+private:
+	SnapshotRecipe m_recipe;
+};
+
+
 /*
 class IIODeviceNode : public AcqTreeNode {
 public:
@@ -121,6 +138,7 @@ private:
 };
 
  */
+}
 } // namespace scopy
 
 #endif // ADCACQUISITIONMANAGER_H

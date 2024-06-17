@@ -26,6 +26,7 @@ TimePlotManagerCombobox::TimePlotManagerCombobox(TimePlotManager *man, ChannelCo
 	connect(m_combo, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx){
 		uint32_t uuid = m_combo->itemData(idx).toULongLong();
 		man->moveChannel(m_ch, uuid);
+		man->replot();
 	});
 
 	lay->addWidget(m_mcombo);

@@ -20,7 +20,7 @@ public:
 	uint32_t addPlot(QString name);
 	void removePlot(uint32_t uuid);
 
-	void addChannel(ChannelComponent *, uint32_t uuid = 0);
+	void addChannel(ChannelComponent *);
 	void moveChannel(ChannelComponent *, uint32_t uuid = 0);
 	void removeChannel(ChannelComponent *);
 

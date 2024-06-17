@@ -68,12 +68,10 @@ public:
 			       QPen pen, QWidget *parent = nullptr);
 	~GRTimeChannelComponent();
 
-	MenuControlButton *ctrl();
 	MeasureManagerInterface *getMeasureManager() override;
 
-
 	GRSignalPath *sigpath() override;
-	void insertPlotComboWidget(QWidget *w);
+	void insertMenuWidget(QWidget *w) override;
 	QVBoxLayout* menuLayout();
 
 	YMode ymode() const override;
@@ -103,11 +101,8 @@ public Q_SLOTS:
 	void addChannelToPlot() override;
 	void removeChannelFromPlot() override;
 
-/*
-Q_SIGNALS:
-	void addNewSnapshot(SnapshotProvider::SnapshotRecipe) override;*/
 
-signals:
+Q_SIGNALS:
 	void yModeChanged();
 
 private:
@@ -117,18 +112,17 @@ private:
 	QVBoxLayout *m_layScroll;
 
 	TimeMeasureManager *m_measureMgr;
-	MenuControlButton *m_ctrl;
 	MenuOnOffSwitch *m_yAxisCtrl;
-	MenuPlotChannelCurveStyleControl *m_curvemenu;
 	MenuPlotAxisRangeControl *m_yCtrl;
 	PlotAutoscaler *m_autoscaler;
-	MenuCombo *m_ymodeCb;
 	MenuOnOffSwitch *m_autoscaleBtn;
+	MenuCombo *m_ymodeCb;
 	IIOWidget* m_scaleWidget;
 
+	MenuPlotChannelCurveStyleControl *m_curvemenu;
 	MenuCollapseSection *m_curveSection;
 
-	// QPushButton *m_snapBtn;
+	QPushButton *m_snapBtn;
 
 	bool m_yLock;
 	bool m_scaleAvailable;
@@ -140,10 +134,7 @@ private:
 	QWidget *createAttrMenu(QWidget *parent);
 	QWidget *createYAxisMenu(QWidget *parent);
 	QWidget *createCurveMenu(QWidget *parent);
-	// QPushButton *createSnapshotButton(QWidget *parent);
-
-	void createMenuControlButton(QWidget *parent = nullptr);
-	void setupChannelMenuControlButtonHelper(MenuControlButton *btn);
+	QPushButton *createSnapshotButton(QWidget *parent);
 
 	Q_PROPERTY(YMode ymode READ ymode WRITE setYMode NOTIFY yModeChanged);
 
