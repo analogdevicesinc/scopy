@@ -12,7 +12,6 @@
 #define MAX_ATTR_SIZE 1024
 #define BUFFER_SIZE 256
 #define DEVICE_PQM "pqm"
-#define NEW_MEASUREMENT_ATTR "get_new_measurement"
 namespace scopy::pqm {
 class AcquisitionManager : public QObject
 {
@@ -33,8 +32,6 @@ private Q_SLOTS:
 	void onReadFinished();
 
 private:
-	int readGetNewMeasurement(iio_device *dev);
-	bool isMeasurementAvailable(iio_device *dev);
 	double convertFromHwToHost(int value, QString chnlId);
 	void enableBufferChnls(iio_device *dev);
 	void readData();
