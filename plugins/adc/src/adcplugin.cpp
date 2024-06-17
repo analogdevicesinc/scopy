@@ -199,7 +199,8 @@ bool ADCPlugin::onConnect()
 	root->addTreeChild(ctxNode);
 	auto timeProxy = new ADCInstrumentController("adc0", root, this);
 	time = new ADCInstrument(timeProxy);
-	connect(root, &AcqTreeNode::newChild, timeProxy, &ADCInstrumentController::addChannel);
+	connect(root, &AcqTreeNode::newChild, timeProxy, &ADCInstrumentController::addChannel, Qt::QueuedConnection);
+	connect(root, &AcqTreeNode::deletedChild, timeProxy, &ADCInstrumentController::removeChannel, Qt::QueuedConnection);
 	createGRIIOTreeNode(ctxNode, m_ctx);
 	// root->treeChildren()[0]->addTreeChild(new AcqTreeNode("other"));
 

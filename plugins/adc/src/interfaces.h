@@ -19,18 +19,15 @@ public:
 	virtual MeasureManagerInterface *getMeasureManager() = 0;
 };
 
-class SCOPY_ADC_EXPORT SnapshotProvider
+class TimePlotComponent;
+typedef struct
 {
-public:
-	typedef struct
-	{
-		std::vector<float> x;
-		std::vector<float> y;
-		QString name;
-	} SnapshotRecipe;
+	std::vector<float> x;
+	std::vector<float> y;
+	TimePlotComponent *targetPlot;
+	QString name;
+} SnapshotRecipe;
 
-	virtual void addNewSnapshot(SnapshotRecipe) = 0;
-};
 
 class SCOPY_ADC_EXPORT SampleRateProvider
 {

@@ -100,6 +100,12 @@ void ADCInstrumentController::init()
 
 	connect(this, &ADCInstrumentController::requestStop, m_tool, &ADCInstrument::stop, Qt::QueuedConnection);
 	connect(m_tool, &ADCInstrument::setSingleShot, this, &ADCInstrumentController::setSingleShot);
+
+	m_otherCMCB = new CollapsableMenuControlButton(m_tool->vcm());
+	m_otherCMCB->getControlBtn()->button()->setVisible(false);
+	m_otherCMCB->getControlBtn()->setName("Other");
+	m_tool->vcm()->addEnd(m_otherCMCB);
+
 }
 
 void ADCInstrumentController::deinit()
@@ -250,7 +256,7 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 		Q_ASSERT(grtsc);
 
 		m_plotComponentManager->addChannel(c);
-		c->insertPlotComboWidget(m_plotComponentManager->plotCombo(c));
+		c->insertMenuWidget(m_plotComponentManager->plotCombo(c));
 
 		/*** This is a bit of a mess because CollapsableMenuControlButton is not a MenuControlButton ***/
 
@@ -279,7 +285,64 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 		addComponent(c);
 		setupChannelMeasurement(m_plotComponentManager, c);
 	}
+
+	if(dynamic_cast<ImportFloatChannelNode *>(node) != nullptr) {
+		int idx = chIdP->next();
+		ImportFloatChannelNode *ifcn = dynamic_cast<ImportFloatChannelNode *>(node);
+		ImportChannelComponent *c =
+			new ImportChannelComponent(ifcn, chIdP->pen(idx));
+
+		m_plotComponentManager->addChannel(c);
+		c->insertMenuWidget(m_plotComponentManager->plotCombo(c));
+
+		CompositeWidget *cw = m_otherCMCB;
+		m_acqNodeComponentMap[ifcn] = c;
+		m_tool->addChannel(c->ctrl(), c, cw);
+
+		connect(c->ctrl(), &QAbstractButton::clicked, this,
+			[=]() { m_plotComponentManager->selectChannel(c); });
+
+		m_timePlotSettingsComponent->addChannel(c); // SingleY/etc
+
+		addComponent(c);
+		setupChannelMeasurement(m_plotComponentManager, c);
+	}
+	m_plotComponentManager->replot();
+
 }
+
+void ADCInstrumentController::removeChannel(AcqTreeNode *node)
+{
+  if(dynamic_cast<ImportFloatChannelNode *>(node) != nullptr) {
+	ImportFloatChannelNode *ifcn = dynamic_cast<ImportFloatChannelNode *>(node);
+	ImportChannelComponent *c = dynamic_cast<ImportChannelComponent*>(m_acqNodeComponentMap[ifcn]);
+
+	m_otherCMCB->remove(c->ctrl());
+	m_plotComponentManager->removeChannel(c);
+	m_timePlotSettingsComponent->removeChannel(c);
+	removeComponent(c);
+	delete c;
+
+  }
+  m_plotComponentManager->replot();
+}
+
+
+/*void ADCInstrumentController::createSnapshotChannel(SnapshotProvider::SnapshotRecipe rec)
+{
+	//	proxy->getChannelAddons().append(new ch)
+	qInfo() << "Creating snapshot from recipe" << rec.name;
+
+	int idx = chIdP->next();
+	ImportChannelAddon *ch = new ImportChannelAddon("REF-" + rec.name + "-" + QString::number(idx), plotAddon,
+							chidp->pen(idx), this);
+	proxy->addChannelAddon(ch);
+	ch->setData(rec.x, rec.y);
+	auto btn = addChannel(ch, vcm);
+	vcm->add(btn);
+	ch->onInit();
+	btn->animateClick(1);
+}*/
 
 void ADCInstrumentController::setupChannelMeasurement(TimePlotManager *c, ChannelComponent *ch)
 {
@@ -306,7 +369,3 @@ void ADCInstrumentController::setupChannelMeasurement(TimePlotManager *c, Channe
 	}
 }
 
-void ADCInstrumentController::removeChannel(AcqTreeNode *node)
-{
-	// removeComponent(node);
-}
