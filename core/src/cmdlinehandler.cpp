@@ -34,6 +34,13 @@ int CmdLineHandler::handle(QCommandLineParser &parser, ScopyMainWindow_API &scop
 		QMetaObject::invokeMethod(&scopyApi, "runScript", Qt::QueuedConnection, Q_ARG(QString, scriptPath),
 					  Q_ARG(bool, exitApp));
 	}
+
+	QStringList scriptListPath = parser.values("script-list");
+	if(!scriptListPath.isEmpty()) {
+		bool exitApp = !keepRunning;
+		QMetaObject::invokeMethod(&scopyApi, "runScriptList", Qt::QueuedConnection,
+					  Q_ARG(QStringList, scriptListPath), Q_ARG(bool, exitApp));
+	}
 	return EXIT_SUCCESS;
 }
 
