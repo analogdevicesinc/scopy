@@ -26,6 +26,9 @@ protected:
 
 private Q_SLOTS:
 	void getTriggerCommandFinished(scopy::Command *cmd);
+
+private:
+	const int MS_TO_WAIT = 2000;
 };
 } // namespace scopy
 #endif // SWIOTPINGTASK_H
