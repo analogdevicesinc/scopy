@@ -5,6 +5,7 @@
 
 #include <QThread>
 #include <QThreadPool>
+#include <QTime>
 
 #include <deque>
 
@@ -25,6 +26,8 @@ public:
 	void wait();
 	void requestStop();
 	void runCmd();
+	QTime lastCmdTime() const;
+
 private Q_SLOTS:
 	void resolveNext(scopy::Command *cmd);
 
@@ -34,6 +37,7 @@ private:
 	std::mutex m_enqueueMutex;
 	std::atomic<bool> m_running;
 	QThreadPool m_commandExecThreadPool;
+	QTime m_lastCmdTime;
 };
 } // namespace scopy
 #endif // IIOCOMMANDQUEUE_H
