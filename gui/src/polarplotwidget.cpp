@@ -1,7 +1,6 @@
 #include "polarplotwidget.h"
 
 #include <QGridLayout>
-#include <extendingplotzoomer.h>
 
 using namespace scopy;
 

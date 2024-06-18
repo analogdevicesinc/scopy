@@ -87,16 +87,6 @@ endif()
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Xml Svg REQUIRED)
-option(SCOPY_ENABLE_GR_GUI "Build gnuradio addons for scopy-gui" ON)
-option(SCOPY_ENABLE_SIGROK_GUI "Build sigrok addons for scopy-gui" ON)
-if(SCOPY_ENABLE_GR_GUI)
-	add_subdirectory(gr-gui)
-	set(SCOPY_HAVE_GR_GUI ON)
-endif()
-if(SCOPY_ENABLE_SIGROK_GUI)
-	add_subdirectory(sigrok-gui)
-	set(SCOPY_HAVE_SIGROK_GUI ON)
-endif()
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
 find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
@@ -119,10 +109,7 @@ target_include_directories(
 target_include_directories(
 	${PROJECT_NAME}
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/
-		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/widgets
-		scopy-common
-		scopy-pluginbase
-		scopy-sigrok-gui
+		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/widgets scopy-common scopy-pluginbase
 )
 
 target_include_directories(

@@ -1,0 +1,6 @@
+include/m2k-gui/scopy-m2k-gui_export.h
+include/m2k-gui/scopy-m2k-gui_config.h
+gr-gui/include/gr-gui/scopy-gr-gui_export.h
+gr-gui/include/gr-gui/scopy-gr-gui_config.h
+sigrok-gui/include/sigrok-gui/scopy-sigrok-gui_export.h
+sigrok-gui/include/sigrok-gui/scopy-sigrok-gui_config.h

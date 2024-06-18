@@ -21,7 +21,7 @@
 #include "signal_generator.hpp"
 
 #include "gnuradio/blocks/multiply_const.h"
-#include "gui/channel_widget.hpp"
+#include "m2k-gui/channel_widget.hpp"
 #include "gui/dynamicWidget.h"
 #include "gui/spinbox_a.hpp"
 #include "m2kpluginExceptionHandler.h"

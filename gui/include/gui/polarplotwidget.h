@@ -5,7 +5,6 @@
 
 #include <QGridLayout>
 #include <QWidget>
-#include <nyquistplotzoomer.h>
 #include <polarplotchannel.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_polar_grid.h>

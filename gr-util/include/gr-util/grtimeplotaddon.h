@@ -13,7 +13,6 @@
 #include <QVBoxLayout>
 #include <QtConcurrent>
 
-#include <gui/oscilloscope_plot.hpp>
 #include <gui/widgets/plotbufferpreviewer.h>
 #include <plotwidget.h>
 #include <gnuradio/blocks/stream_to_vector.h>

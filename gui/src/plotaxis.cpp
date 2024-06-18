@@ -2,6 +2,8 @@
 
 #include <QDebug>
 #include <QwtPlotLayout>
+#include <qwt_scale_widget.h>
+#include <edgelessplot.h>
 
 using namespace scopy;
 PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
@@ -25,7 +27,7 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
 	m_formatter = new MetricPrefixFormatter();
 	m_formatter->setTrimZeroes(true);
 	m_formatter->setTwoDecimalMode(true);
-	m_scaleDraw = new OscScaleDraw(m_formatter, m_units);
+	m_scaleDraw = new BasicScaleDraw(m_formatter, m_units);
 
 	m_scaleDraw->setColor(pen.color());
 	m_plot->setAxisScaleDraw(m_axisId, m_scaleDraw);
@@ -131,7 +133,7 @@ void PlotAxis::setMax(double newMax)
 	emit maxChanged(newMax);
 }
 
-OscScaleDraw *PlotAxis::scaleDraw() const { return m_scaleDraw; }
+BasicScaleDraw *PlotAxis::scaleDraw() const { return m_scaleDraw; }
 
 OscScaleEngine *PlotAxis::scaleEngine() const { return m_scaleEngine; }
 

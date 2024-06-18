@@ -5,7 +5,9 @@ source $REPO_SRC/ci/macOS/macos_config.sh
 
 pushd $BUILDDIR
 
-SCOPYLIBS=$(find $BUILDDIR -name "*.dylib" -d 2 -type f)
+SCOPYLIBS="$(find $BUILDDIR -name "*.dylib" -d 2 -type f)
+$(find $BUILDDIR/plugins/m2k/m2k-gui -name "*.dylib" -type f)"
+
 SCOPYPLUGINS=$(find $BUILDDIR/Scopy.app/Contents/MacOs/plugins/plugins -name "*.dylib" -type f)
 
 echo "### Copy DLLs to Frameworks folder"

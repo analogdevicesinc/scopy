@@ -19,7 +19,7 @@
  */
 #include "measure_settings.h"
 
-#include "gui/dropdown_switch_list.h"
+#include "m2k-gui/dropdown_switch_list.h"
 #include "oscilloscope_plot.hpp"
 
 #include "ui_measure_settings.h"

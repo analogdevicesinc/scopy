@@ -23,8 +23,6 @@
 
 #include <iio.h>
 
-#include <gui/tool_view.hpp>
-
 /* Qt includes */
 #include <QFile>
 #include <QMainWindow>
@@ -75,7 +73,6 @@ private Q_SLOTS:
 private:
 	Ui::DebuggerInstrument *ui;
 	QPushButton *menuRunButton;
-	scopy::gui::ToolView *m_toolView;
 	QWidget *m_widget;
 
 	QJSEngine *eng;

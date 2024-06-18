@@ -26,7 +26,7 @@
 #include "fft_block.hpp"
 #include "gui/customPushButton.h"
 #include "gui/spinbox_a.hpp"
-#include "gui/startstoprangewidget.h"
+#include "m2k-gui/startstoprangewidget.h"
 #include "iio_manager.hpp"
 #include "m2ktool.hpp"
 #include "plot_utils.hpp"
