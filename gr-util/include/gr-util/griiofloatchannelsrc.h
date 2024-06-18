@@ -24,6 +24,8 @@ public:
 	struct iio_device *dev() const;
 	struct iio_context *ctx() const;
 
+	const QString &scaleAttribute() const;
+
 protected:
 	gr::basic_block_sptr x2f;
 
