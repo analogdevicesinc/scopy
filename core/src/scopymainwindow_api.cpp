@@ -167,6 +167,18 @@ void ScopyMainWindow_API::runScript(QString scriptPath, bool exitApp)
 		qApp->exit(ret);
 }
 
+void ScopyMainWindow_API::runScriptList(QStringList scriptPathList, bool exitApp)
+{
+	foreach(QString scriptPath, scriptPathList) {
+		runScript(scriptPath, false);
+	}
+
+	if(exitApp) {
+		int ret = EXIT_SUCCESS;
+		qApp->exit(ret);
+	}
+}
+
 const QString ScopyMainWindow_API::getScriptContent(QFile *file)
 {
 	QTextStream stream(file);
