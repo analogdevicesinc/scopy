@@ -22,6 +22,7 @@ public:
 	Q_INVOKABLE void switchTool(QString devID, QString toolName);
 	Q_INVOKABLE void switchTool(QString toolName);
 	Q_INVOKABLE void runScript(QString scriptPath, bool exitApp = true);
+	Q_INVOKABLE void runScriptList(QStringList scriptPathList, bool exitApp = true);
 
 private:
 	static bool sortByUUID(const QString &k1, const QString &k2);
