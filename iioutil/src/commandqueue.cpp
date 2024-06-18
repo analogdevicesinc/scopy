@@ -13,7 +13,9 @@ Q_LOGGING_CATEGORY(CAT_COMMANDQUEUE, "CommandQueue");
 CommandQueue::CommandQueue(QObject *parent)
 	: QObject(parent)
 	, m_running(false)
-{}
+{
+	m_lastCmdTime = QTime::currentTime();
+}
 
 CommandQueue::~CommandQueue()
 {
@@ -44,6 +46,7 @@ void CommandQueue::start()
 
 void CommandQueue::resolveNext(scopy::Command *cmd)
 {
+	m_lastCmdTime = QTime::currentTime();
 	m_commandQueue.pop_front(); // also delete/disconnect
 	qDebug(CAT_COMMANDQUEUE) << "delete " << cmd;
 	disconnect(cmd, &Command::finished, this, &CommandQueue::resolveNext);
@@ -55,6 +58,8 @@ void CommandQueue::resolveNext(scopy::Command *cmd)
 		runCmd();
 	}
 }
+
+QTime CommandQueue::lastCmdTime() const { return m_lastCmdTime; }
 
 void CommandQueue::runCmd()
 {

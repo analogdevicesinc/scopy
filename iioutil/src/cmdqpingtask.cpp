@@ -27,6 +27,10 @@ void CmdQPingTask::run()
 		Q_EMIT pingFailed();
 		return;
 	}
+	int lastCmdInterval = c->commandQueue()->lastCmdTime().msecsTo(QTime::currentTime());
+	if(lastCmdInterval < MS_TO_WAIT) {
+		return;
+	}
 	bool pingStatus = ping();
 	if(!pingStatus) {
 		Q_EMIT pingFailed();
