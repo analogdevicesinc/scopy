@@ -69,13 +69,7 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 	m_scaleWidget = nullptr;
 	if(m_scaleAvailable) {
 		cb->addItem(m_unit, YMODE_SCALE);
-		IIOWidgetFactoryRecipe rec;
-		rec.context = m_src->ctx();
-		rec.channel = m_src->channel();
-		rec.device = m_src->dev();
-		rec.data = "scale";
-
-		m_scaleWidget = IIOWidgetFactory::buildSingle(0x00, rec, this);
+		m_scaleWidget = IIOWidgetFactory::buildAttrForChannel(m_src->channel(), m_src->scaleAttribute(),this);
 	}
 
 	m_yAxisCtrl = new MenuOnOffSwitch("LOCK Y-Axis");

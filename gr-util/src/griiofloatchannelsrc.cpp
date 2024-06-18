@@ -20,6 +20,12 @@ GRIIOFloatChannelSrc::GRIIOFloatChannelSrc(GRIIODeviceSource *dev, QString chann
 			"sampling_frequency",
 		},
 		m_iioCh);
+
+	m_scaleAttribute = findAttribute(
+			{
+			 "scale",
+			 },
+			m_iioCh);
 }
 
 void GRIIOFloatChannelSrc::build_blks(GRTopBlock *top)
@@ -112,4 +118,9 @@ struct iio_device *GRIIOFloatChannelSrc::dev() const {
 
 struct iio_context *GRIIOFloatChannelSrc::ctx() const {
 	return  m_dev->ctx();
+}
+
+const QString &GRIIOFloatChannelSrc::scaleAttribute() const
+{
+	return m_scaleAttribute;
 }
