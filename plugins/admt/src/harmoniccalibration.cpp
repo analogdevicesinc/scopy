@@ -46,7 +46,7 @@ HarmonicCalibration::HarmonicCalibration(PlotProxy *proxy, QWidget *parent)
 
     QString settingsMenuId = plotAddonSettings->getName() + QString(uuid++);
 	tool->rightStack()->add(settingsMenuId, plotAddonSettings->getWidget());
-	connect(settingsButton, &QPushButton::toggled, this, [=, this](bool b) {
+	connect(settingsButton, &QPushButton::toggled, this, [=](bool b) {
 		if(b)
 			tool->requestMenu(settingsMenuId);
 	});
@@ -65,7 +65,7 @@ HarmonicCalibration::HarmonicCalibration(PlotProxy *proxy, QWidget *parent)
 	measurePanelManagerHover->setContent(measureSettings);
 	measurePanelManagerHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
 	measurePanelManagerHover->setContentPos(HoverPosition::HP_TOPLEFT);
-	connect(measure->button(), &QPushButton::toggled, this, [=, this](bool b) {
+	connect(measure->button(), &QPushButton::toggled, this, [=](bool b) {
 		measurePanelManagerHover->setVisible(b);
 		measurePanelManagerHover->raise();
 	});
@@ -129,7 +129,7 @@ void HarmonicCalibration::setupChannelsButtonHelper(MenuControlButton *channelsB
 	channelsButton->setChecked(true);
 	channelStack = new MapStackedWidget(this);
 	tool->rightStack()->add(channelsMenuId, channelStack);
-	connect(channelsButton->button(), &QAbstractButton::toggled, this, [=, this](bool b) {
+	connect(channelsButton->button(), &QAbstractButton::toggled, this, [=](bool b) {
 		if(b)
 			tool->requestMenu(channelsMenuId);
 	});
@@ -154,7 +154,7 @@ void HarmonicCalibration::setupChannelMenuControlButtonHelper(MenuControlButton 
 	menuControlButton->button()->setVisible(false);
 	menuControlButton->setCheckable(true);
 
-	connect(menuControlButton->checkBox(), &QCheckBox::toggled, this, [=, this](bool b) {
+	connect(menuControlButton->checkBox(), &QCheckBox::toggled, this, [=](bool b) {
 		if(b)
 			channelAddon->enable();
 		else
@@ -233,7 +233,7 @@ MenuControlButton *HarmonicCalibration::addChannel(ChannelAddon *channelAddon, Q
 
 	channelStack->add(id, channelAddon->getWidget());
 
-	connect(menuControlButton, &QAbstractButton::clicked, this, [=, this](bool b) {
+	connect(menuControlButton, &QAbstractButton::clicked, this, [=](bool b) {
 		if(b) {
 			if(!channelsButton->button()->isChecked()) {
 				// Workaround because QButtonGroup and setChecked do not interact programatically
@@ -269,7 +269,7 @@ CollapsableMenuControlButton *HarmonicCalibration::addDevice(GRDeviceAddon *dev,
 	channelGroup->addButton(devButton->getControlBtn());
 	QString id = dev->getName() + QString::number(uuid++);
 	channelStack->add(id, dev->getWidget());
-	connect(devButton->getControlBtn(), &QPushButton::toggled, this, [=, this](bool b) {
+	connect(devButton->getControlBtn(), &QPushButton::toggled, this, [=](bool b) {
 		if(b) {
 			tool->requestMenu(channelsMenuId);
 			channelStack->show(id);
