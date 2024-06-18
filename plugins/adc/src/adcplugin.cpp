@@ -150,10 +150,12 @@ void ADCPlugin::createGRIIOTreeNode(GRTopBlockNode *ctxNode, iio_context *ctx)
 		iio_device *dev = iio_context_get_device(ctx, i);
 		QString dev_name = QString::fromLocal8Bit(iio_device_get_name(dev));
 
-		qDebug(CAT_ADCPLUGIN) << "Looking for scanelements in " << dev_name;
+		if(dev_name.isEmpty())
+			continue;
 		/*if(dev_name == "m2k-logic-analyzer-rx")
 			continue;*/
 
+		qDebug(CAT_ADCPLUGIN) << "Looking for scanelements in " << dev_name;
 		QStringList channelList;
 
 		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(ctx, dev_name, dev_name, 0x400, ctxNode);
