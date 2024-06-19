@@ -10,7 +10,8 @@ set(SCOPY_SOURCE_PATH ${CMAKE_SOURCE_DIR} CACHE STRING "SCOPY_SOURCE_PATH" FORCE
 
 
 #SCOPY BASE TESTS
-add_test(NAME "DeviceConnectionJSTest" COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/automatedJSTests/scopyDeviceConnectionTest.sh)
+#add_test(NAME "DeviceConnectionJSTest" COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/automatedJSTests/scopyDeviceConnectionTest.sh)
+add_test(NAME "SwitchToolJSTest" COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/automatedJSTests/scopySwitchToolTest.sh)
 
 
 # PLUGIN SPECIFIC TESTS
