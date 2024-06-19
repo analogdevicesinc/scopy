@@ -6,7 +6,6 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include "iiostandarditem.h"
-#include <gui/subsection_separator.hpp>
 
 namespace scopy::iiodebugplugin {
 class GuiDetailsView : public QWidget
@@ -20,8 +19,7 @@ public:
 
 private:
 	IIOStandardItem *m_currentItem;
-	gui::SubsectionSeparator *m_attrSeparator;
-	gui::SubsectionSeparator *m_detailsSeparator;
+	MenuCollapseSection *m_detailsSeparator;
 	QScrollArea *m_scrollArea;
 	QWidget *m_scrollAreaContents;
 	QList<IIOWidget *> m_currentWidgets;

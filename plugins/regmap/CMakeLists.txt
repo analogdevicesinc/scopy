@@ -6,6 +6,9 @@ message(STATUS "building plugin: " ${SCOPY_MODULE})
 
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
+set(PLUGIN_DISPLAY_NAME "Register map")
+set(PLUGIN_DESCRIPTION "Register map of connected device with detailed register table for available XML templates")
+
 include(GenerateExportHeader)
 
 # TODO: split stylesheet/resources and add here TODO: export header files correctly
@@ -55,14 +58,6 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
 
 find_package(libm2k REQUIRED)
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
-elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS/plugins/plugins")
-else()
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
-endif()
-
 set(REGMAP_XML_PATH ${CMAKE_INSTALL_FULL_DATADIR}/regmap)
 set(REGMAP_XML_SYSTEM_PATH ${REGMAP_XML_PATH}/xmls)
 set(REGMAP_XML_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/xmls)
@@ -109,5 +104,8 @@ target_link_libraries(
 	       Qt5::Test
 )
 
-set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
-set(PLUGIN_DESCRIPTION "Register map plugin" PARENT_SCOPE)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	configureinstallersettings(${SCOPY_MODULE} ${PLUGIN_DESCRIPTION} FALSE)
+endif()
+
+set(REGNMAP_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)

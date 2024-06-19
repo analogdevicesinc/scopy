@@ -32,8 +32,8 @@ public Q_SLOTS:
 	void setYUnits(QString unit);
 	void setXUnits(QString unit);
 
-	void setXFromatter(PrefixFormatter *formatter);
-	void setYFromatter(PrefixFormatter *formatter);
+	void setXFormatter(PrefixFormatter *formatter);
+	void setYFormatter(PrefixFormatter *formatter);
 
 private:
 	QWidget *y_contents;

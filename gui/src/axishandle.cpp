@@ -230,6 +230,9 @@ void AxisHandle::paintEvent(QPaintEvent *event)
 	QLine line = getLine();
 	if(m_barVisibility == BarVisibility::ALWAYS || (m_barVisibility == BarVisibility::ON_HOVER && m_isHovering)) {
 		p.drawLine(line);
+		setMask(QRegion(getRectFromLine(line)) + QRegion(getBigRect()));
+	} else {
+		setMask(QRegion(getBigRect()));
 	}
 
 	QRect rect = getRect();
@@ -239,8 +242,6 @@ void AxisHandle::paintEvent(QPaintEvent *event)
 	updateHandleOrientation();
 	p.drawPixmap(QPoint(rect.center().x() - m_handle.width() / 2, rect.center().y() - m_handle.height() / 2),
 		     m_handle);
-
-	setMask(QRegion(getRectFromLine(line)) + QRegion(getBigRect()));
 }
 
 void AxisHandle::onMouseMove(QPointF pos)
@@ -273,7 +274,9 @@ bool AxisHandle::onMouseButtonPress(QPointF pos)
 
 void AxisHandle::onMouseButtonRelease()
 {
-	m_pressed = false;
+	if(m_isHovering) {
+		m_pressed = false;
+	}
 	setCursor(Qt::OpenHandCursor);
 }
 

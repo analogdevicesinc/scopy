@@ -1,6 +1,7 @@
 #include "plotchannel.h"
 #include "plotaxis.h"
 #include <QPen>
+#include <QwtText>
 
 using namespace scopy;
 

@@ -50,6 +50,35 @@ public:
 	IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *dataStrategy, QWidget *parent = nullptr);
 
 	/**
+	 * @brief Performs a synchronous data read.
+	 * @return Returns a QPair where the first value is a QString with the data read (e.g. the sample rate)
+	 * and the second value is a QString with the options (e.g. the available sample rates). If no options
+	 * are available, an empty string is returned.
+	 * */
+	QPair<QString, QString> read();
+
+	/**
+	 * @brief Performs a synchronous data write.
+	 * @param data The data to write.
+	 * @return The return code from this operation. It can also be accessed from the IIOWidget::lastReturnCode()
+	 * function.
+	 */
+	int write(QString data);
+
+	/**
+	 * @brief Starts an asynchronous read operation. The result can be accessed by connecting a slot to the
+	 * DataStrategyInterface::sendData() function from the Data Strategy of this IIOWidget.
+	 */
+	void readAsync();
+
+	/**
+	 * @brief Starts an asynchronous write operation. The result can be accessed by connecting a slot to the
+	 * DataStrategyInterface::emitStatus() function from the Data Steategy of this IIOWidget.
+	 * @param data
+	 */
+	void writeAsync(QString data);
+
+	/**
 	 * @brief Returns the UI of the IIOWidget
 	 * @return GuiStrategyInterface
 	 * */

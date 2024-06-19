@@ -36,11 +36,26 @@ QString TriggerDataStrategy::data() { return m_data; }
 
 QString TriggerDataStrategy::optionalData() { return m_optionalData; }
 
-void TriggerDataStrategy::save(QString data)
+void TriggerDataStrategy::writeAsync(QString data)
+{
+	int res = write(data);
+	Q_EMIT emitStatus(QDateTime::currentDateTime(), m_data, data, (int)(res), false);
+	readAsync();
+}
+
+void TriggerDataStrategy::readAsync()
+{
+	read();
+
+	Q_EMIT emitStatus(QDateTime::currentDateTime(), m_previousData, m_data, m_returnCode, true);
+	Q_EMIT sendData(m_data, m_optionalData);
+}
+
+int TriggerDataStrategy::write(QString data)
 {
 	if(m_recipe.context == nullptr || m_recipe.device == nullptr) {
 		qWarning(CAT_TRIGGER_DATA_STRATEGY) << "Invalid arguments, cannot write any data";
-		return;
+		return -EINVAL;
 	}
 
 	struct iio_device *trigger = iio_context_find_device(m_recipe.context, data.toStdString().c_str());
@@ -64,17 +79,16 @@ void TriggerDataStrategy::save(QString data)
 		}
 	}
 
-	Q_EMIT emitStatus(QDateTime::currentDateTime(), m_data, data, (int)(res), false);
-	requestData();
+	return res;
 }
 
-void TriggerDataStrategy::requestData()
+QPair<QString, QString> TriggerDataStrategy::read()
 {
 	QString currentTriggerName, triggerOptions = "None ";
 
 	if(m_recipe.context == nullptr || m_recipe.device == nullptr) {
 		qWarning(CAT_TRIGGER_DATA_STRATEGY) << "Invalid arguments, cannot read any data";
-		return;
+		return {};
 	}
 
 	const struct iio_device *currentTrigger;
@@ -105,11 +119,11 @@ void TriggerDataStrategy::requestData()
 		}
 	}
 
-	QString oldData = m_data;
+	m_previousData = m_data;
 	m_data = currentTriggerName;
 	m_optionalData = triggerOptions;
-	Q_EMIT emitStatus(QDateTime::currentDateTime(), oldData, m_data, res, true);
-	Q_EMIT sendData(m_data, m_optionalData);
+
+	return {m_data, m_previousData};
 }
 
 #include "moc_triggerdatastrategy.cpp"

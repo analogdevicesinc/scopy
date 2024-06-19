@@ -1783,15 +1783,31 @@ QPushButton:checked { border-image: url(:/gui/icons/setup_btn_checked.svg); }</s
  </widget>
  <customwidgets>
   <customwidget>
-   <class>scopy::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>gui/customPushButton.h</header>
-  </customwidget>
-  <customwidget>
    <class>scopy::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>scopy::InstrumentNotes</class>
+   <extends>QWidget</extends>
+   <header>m2k-gui/instrumentnotes.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>scopy::LinkedButton</class>
+   <extends>QPushButton</extends>
+   <header>m2k-gui/linked_button.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>scopy::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>gui/customSwitch.h</header>
+  </customwidget>
+  <customwidget>
+   <class>scopy::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>gui/customPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>scopy::MenuHAnim</class>
@@ -1800,29 +1816,14 @@ QPushButton:checked { border-image: url(:/gui/icons/setup_btn_checked.svg); }</s
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>scopy::InstrumentNotes</class>
-   <extends>QWidget</extends>
-   <header>gui/instrumentnotes.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>scopy::RunSingleWidget</class>
    <extends>QWidget</extends>
-   <header>gui/runsinglewidget.h</header>
+   <header>m2k-gui/runsinglewidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>scopy::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>gui/customSwitch.h</header>
-  </customwidget>
-  <customwidget>
-   <class>scopy::LinkedButton</class>
-   <extends>QPushButton</extends>
-   <header>gui/linked_button.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../../gui/res/resources.qrc"/>
   <include location="../../../gui/res/resources.qrc"/>
  </resources>
  <connections>

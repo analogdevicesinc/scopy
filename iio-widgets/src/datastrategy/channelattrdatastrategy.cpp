@@ -29,17 +29,34 @@ ChannelAttrDataStrategy::ChannelAttrDataStrategy(IIOWidgetFactoryRecipe recipe, 
 	: QWidget(parent)
 {
 	m_recipe = recipe;
+	m_returnCode = 0;
 }
 
 QString ChannelAttrDataStrategy::data() { return m_data; }
 
 QString ChannelAttrDataStrategy::optionalData() { return m_optionalData; }
 
-void ChannelAttrDataStrategy::save(QString data)
+void ChannelAttrDataStrategy::writeAsync(QString data)
+{
+	int retCode = write(data);
+
+	Q_EMIT emitStatus(QDateTime::currentDateTime(), m_data, data, (int)(retCode), false);
+	readAsync(); // readback
+}
+
+void ChannelAttrDataStrategy::readAsync()
+{
+	QPair<QString, QString> values = read();
+
+	Q_EMIT emitStatus(QDateTime::currentDateTime(), values.first, m_data, (int)(m_returnCode), true);
+	Q_EMIT sendData(m_data, m_optionalData);
+}
+
+int ChannelAttrDataStrategy::write(QString data)
 {
 	if(m_recipe.channel == nullptr || m_recipe.data == "") {
 		qWarning(CAT_IIO_DATA_STRATEGY) << "Invalid arguments, cannot write any data";
-		return;
+		return -EINVAL;
 	}
 
 	Q_EMIT aboutToWrite(m_data, data);
@@ -49,24 +66,22 @@ void ChannelAttrDataStrategy::save(QString data)
 		qWarning(CAT_IIO_DATA_STRATEGY) << "Cannot write" << data << "to" << m_recipe.data;
 	}
 
-	Q_EMIT emitStatus(QDateTime::currentDateTime(), m_data, data, (int)(res), false);
-	requestData(); // readback
+	return res;
 }
 
-void ChannelAttrDataStrategy::requestData()
+QPair<QString, QString> ChannelAttrDataStrategy::read()
 {
 	if(m_recipe.channel == nullptr || m_recipe.data.isEmpty()) {
 		qWarning(CAT_IIO_DATA_STRATEGY) << "Invalid arguments, cannot read any data";
-		return;
+		return {};
 	}
 
 	char options[BUFFER_SIZE] = {0}, currentValue[BUFFER_SIZE] = {0};
 
-	ssize_t currentValueResult =
+	m_returnCode =
 		iio_channel_attr_read(m_recipe.channel, m_recipe.data.toStdString().c_str(), currentValue, BUFFER_SIZE);
-	if(currentValueResult < 0) {
-		qWarning(CAT_IIO_DATA_STRATEGY)
-			<< "Could not read" << m_recipe.data << "error code:" << currentValueResult;
+	if(m_returnCode < 0) {
+		qWarning(CAT_IIO_DATA_STRATEGY) << "Could not read" << m_recipe.data << "error code:" << m_returnCode;
 	}
 
 	if(m_recipe.iioDataOptions != "") {
@@ -76,8 +91,6 @@ void ChannelAttrDataStrategy::requestData()
 			qWarning(CAT_IIO_DATA_STRATEGY)
 				<< "Could not read" << m_recipe.data << "error code:" << optionsResult;
 		}
-		Q_EMIT emitStatus(QDateTime::currentDateTime(), m_optionalData, options, (int)(currentValueResult),
-				  true);
 	}
 
 	if(m_recipe.constDataOptions != "") {
@@ -94,8 +107,8 @@ void ChannelAttrDataStrategy::requestData()
 	QString oldData = m_data;
 	m_data = currentValue;
 	m_optionalData = options;
-	Q_EMIT emitStatus(QDateTime::currentDateTime(), currentValue, m_data, (int)(currentValueResult), true);
-	Q_EMIT sendData(m_data, m_optionalData);
+
+	return {currentValue, options};
 }
 
 #include "moc_channelattrdatastrategy.cpp"

@@ -57,8 +57,8 @@ bool RegmapPlugin::loadIcon()
 
 void RegmapPlugin::loadToolList()
 {
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("regmap", "Register Map", ":/gui/icons/scopy-default/icons/RegMap.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(REGMAP_PLUGIN_SCOPY_MODULE, REGMAP_PLUGIN_DISPLAY_NAME,
+						  ":/gui/icons/scopy-default/icons/RegMap.svg"));
 }
 
 void RegmapPlugin::unload()
@@ -68,7 +68,7 @@ void RegmapPlugin::unload()
 
 bool RegmapPlugin::compatible(QString m_param, QString category)
 {
-	m_name = "REGMAP";
+	m_name = REGMAP_PLUGIN_DISPLAY_NAME;
 	auto &&cp = ConnectionProvider::GetInstance();
 	Connection *conn = cp->open(m_param);
 
@@ -219,7 +219,8 @@ void RegmapPlugin::initMetadata()
 )plugin");
 }
 
-QString RegmapPlugin::description() { return "Register map tool"; }
+QString RegmapPlugin::description() { return REGMAP_PLUGIN_DESCRIPTION; }
+QString RegmapPlugin::displayName() { return REGMAP_PLUGIN_DISPLAY_NAME; }
 
 QWidget *RegmapPlugin::getTool() { return m_registerMapWidget; }
 

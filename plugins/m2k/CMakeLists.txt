@@ -6,6 +6,9 @@ message(STATUS "building plugin: " ${SCOPY_MODULE})
 
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
+set(PLUGIN_DISPLAY_NAME "ADALM2000")
+set(PLUGIN_DESCRIPTION "Plugin for ADALM2000 (M2K)")
+
 include(GenerateExportHeader)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -40,6 +43,7 @@ file(
 	src/old/*.c
 	src/old/*.h
 )
+
 file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 file(GLOB UI_LIST ui/*.ui ui/patterns/*.ui)
 
@@ -47,6 +51,7 @@ set(ENABLE_TESTING ON)
 if(ENABLE_TESTING)
 	add_subdirectory(test)
 endif()
+add_subdirectory(m2k-gui)
 
 set(PROJECT_SOURCES ${SRC_LIST} ${OLD_SCOPY_FILES} ${HEADER_LIST} ${UI_LIST})
 
@@ -71,14 +76,6 @@ find_package(
 find_package(gnuradio-scopy REQUIRED PATH_SUFFIXES scopy)
 find_package(gnuradio-m2k REQUIRED PATH_SUFFIXES m2k)
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
-elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS/plugins/plugins")
-else()
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
-endif()
-
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
@@ -87,12 +84,18 @@ generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
 )
 
+configure_file(
+	include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h.cmakein
+	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h @ONLY
+)
+
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 target_include_directories(
 	${PROJECT_NAME}
 	PRIVATE Qt::Widgets
 		Qt::Core
-		scopy-gui
+		scopy-m2k-gui
 		scopy-pluginbase
 		scopy-common
 		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
@@ -112,6 +115,7 @@ target_link_libraries(
 	       scopy-pluginbase
 	       scopy-iioutil
 	       scopy-gui
+	       scopy-m2k-gui
 	       scopy-gr-gui
 	       scopy-sigrok-gui
 	       libm2k::libm2k
@@ -126,5 +130,9 @@ target_link_libraries(
 	       gnuradio::gnuradio-m2k
 )
 
-set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
-set(PLUGIN_DESCRIPTION "ADALM2000 plugin" PARENT_SCOPE)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	set(INSTALLER_DESCRIPTION "${PLUGIN_DISPLAY_NAME} ${PLUGIN_DESCRIPTION}")
+	configureinstallersettings(${SCOPY_MODULE} ${INSTALLER_DESCRIPTION} "disablenouninstallwarning")
+endif()
+
+set(M2K_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)

@@ -118,6 +118,8 @@ bool IIODebugPlugin::onDisconnect()
 			delete(w);
 		}
 	}
+
+	ConnectionProvider::GetInstance()->close(m_param);
 	return true;
 }
 

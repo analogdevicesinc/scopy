@@ -26,6 +26,7 @@
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/widgets/errorbox.h>
 #include <gui/widgets/hoverwidget.h>
+#include <math.h>
 
 using namespace scopy;
 

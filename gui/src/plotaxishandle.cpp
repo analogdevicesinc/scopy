@@ -1,5 +1,6 @@
 #include "plotaxishandle.h"
 #include "plotaxis.h"
+#include <qwt_scale_map.h>
 
 using namespace scopy;
 

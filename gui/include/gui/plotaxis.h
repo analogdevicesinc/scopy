@@ -4,12 +4,13 @@
 #include "osc_scale_engine.h"
 #include "plotaxishandle.h"
 #include "plotwidget.h"
+#include "plot_utils.hpp"
+#include "basicscaledraw.h"
 #include "scopy-gui_export.h"
+#include "edgelessplot.h"
 
 #include <QwtPlotZoomer>
 #include <QwtScaleEngine>
-
-#include <DisplayPlot.h>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT PlotAxis : public QObject
@@ -36,17 +37,18 @@ public:
 	QwtPlotZoomer *zoomer() const;
 	OscScaleEngine *scaleEngine() const;
 
-	OscScaleDraw *scaleDraw() const;
+	BasicScaleDraw *scaleDraw() const;
 
 	double divs() const;
 
-	void setFromatter(PrefixFormatter *formatter);
-	PrefixFormatter *getFromatter();
+	void setFormatter(PrefixFormatter *formatter);
+	PrefixFormatter *getFormatter();
 
 	void setUnits(QString units);
 	QString getUnits();
 
 	void setUnitsVisible(bool visible);
+	void setScaleEn(bool en);
 
 public Q_SLOTS:
 	void setMax(double newMax);
@@ -67,10 +69,11 @@ private:
 	PlotWidget *m_plotWidget;
 	QwtPlot *m_plot;
 	int m_position;
-	OscScaleDraw *m_scaleDraw;
+	BasicScaleDraw *m_scaleDraw;
 	OscScaleEngine *m_scaleEngine;
 	QString m_units;
 	PrefixFormatter *m_formatter;
+	EdgelessPlotScaleItem *m_scaleItem;
 
 	int m_id;
 	double m_divs;

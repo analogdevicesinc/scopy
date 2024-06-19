@@ -2,6 +2,8 @@
 
 #include <QDebug>
 #include <QwtPlotLayout>
+#include <qwt_scale_widget.h>
+#include <edgelessplot.h>
 
 using namespace scopy;
 PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
@@ -25,7 +27,7 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
 	m_formatter = new MetricPrefixFormatter();
 	m_formatter->setTrimZeroes(true);
 	m_formatter->setTwoDecimalMode(true);
-	m_scaleDraw = new OscScaleDraw(m_formatter, m_units);
+	m_scaleDraw = new BasicScaleDraw(m_formatter, m_units);
 
 	m_scaleDraw->setColor(pen.color());
 	m_plot->setAxisScaleDraw(m_axisId, m_scaleDraw);
@@ -46,23 +48,31 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
 
 void PlotAxis::setUnitsVisible(bool visible) { m_scaleDraw->setUnitsEnabled(visible); }
 
+void PlotAxis::setScaleEn(bool en)
+{
+	if(en) {
+		m_scaleItem->attach(m_plot);
+	} else {
+		m_scaleItem->detach();
+	}
+}
+
 void PlotAxis::setupAxisScale()
 {
 	QwtScaleDraw::Alignment scale = static_cast<QwtScaleDraw::Alignment>(m_position);
-	auto scaleItem = new EdgelessPlotScaleItem(scale);
+	m_scaleItem = new EdgelessPlotScaleItem(scale);
 
-	scaleItem->scaleDraw()->setAlignment(scale);
-	scaleItem->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone, false);
-	scaleItem->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels, false);
-	scaleItem->setFont(m_plot->axisWidget(0)->font());
+	m_scaleItem->scaleDraw()->setAlignment(scale);
+	m_scaleItem->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Backbone, false);
+	m_scaleItem->scaleDraw()->enableComponent(QwtAbstractScaleDraw::Labels, false);
+	m_scaleItem->setFont(m_plot->axisWidget(0)->font());
 
-	QPalette palette = scaleItem->palette();
+	QPalette palette = m_scaleItem->palette();
 	palette.setBrush(QPalette::WindowText, QColor(0x6E6E6F));
 	palette.setBrush(QPalette::Text, QColor(0x6E6E6F));
-	scaleItem->setPalette(palette);
-	scaleItem->setBorderDistance(0);
-	scaleItem->attach(m_plot);
-	scaleItem->setZ(200);
+	m_scaleItem->setPalette(palette);
+	m_scaleItem->setBorderDistance(0);
+	m_scaleItem->setZ(200);
 }
 
 int PlotAxis::position() { return m_position; }
@@ -73,7 +83,7 @@ bool PlotAxis::isVertical() { return (m_position == QwtAxis::YLeft || m_position
 
 double PlotAxis::divs() const { return (m_divs - 1); }
 
-void PlotAxis::setFromatter(PrefixFormatter *formatter)
+void PlotAxis::setFormatter(PrefixFormatter *formatter)
 {
 	m_formatter = formatter;
 	m_scaleDraw->setFormatter(m_formatter);
@@ -81,7 +91,7 @@ void PlotAxis::setFromatter(PrefixFormatter *formatter)
 	Q_EMIT formatterChanged(formatter);
 }
 
-PrefixFormatter *PlotAxis::getFromatter() { return m_formatter; }
+PrefixFormatter *PlotAxis::getFormatter() { return m_formatter; }
 
 void PlotAxis::setUnits(QString units)
 {
@@ -131,7 +141,7 @@ void PlotAxis::setMax(double newMax)
 	emit maxChanged(newMax);
 }
 
-OscScaleDraw *PlotAxis::scaleDraw() const { return m_scaleDraw; }
+BasicScaleDraw *PlotAxis::scaleDraw() const { return m_scaleDraw; }
 
 OscScaleEngine *PlotAxis::scaleEngine() const { return m_scaleEngine; }
 
