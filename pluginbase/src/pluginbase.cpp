@@ -60,6 +60,8 @@ void PluginBase::startPingTask() {}
 
 void PluginBase::stopPingTask() {}
 
+void PluginBase::onPausePingTask(bool) {}
+
 bool PluginBase::enabled() { return m_enabled; }
 
 QString PluginBase::param() { return m_param; }

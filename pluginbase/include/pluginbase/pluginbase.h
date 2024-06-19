@@ -67,6 +67,7 @@ public Q_SLOTS:
 	virtual void requestTool(QString);
 	virtual void startPingTask() override;
 	virtual void stopPingTask() override;
+	virtual void onPausePingTask(bool) override;
 
 protected:
 	QString m_param;
@@ -112,6 +113,7 @@ Q_SIGNALS:                                                                      
 	void restartDevice() override;                                                                                 \
 	void toolListChanged() override;                                                                               \
 	void requestToolByUuid(QString) override;                                                                      \
+	void pausePingTask(bool) override;                                                                             \
                                                                                                                        \
 private:
 
