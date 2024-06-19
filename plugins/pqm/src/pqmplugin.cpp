@@ -172,6 +172,15 @@ void PQMPlugin::startPingTask() { m_acqManager->startPing(); }
 
 void PQMPlugin::stopPingTask() { m_acqManager->stopPing(); }
 
+void PQMPlugin::onPausePingTask(bool pause)
+{
+	if(pause) {
+		m_acqManager->stopPing();
+	} else {
+		m_acqManager->startPing();
+	}
+}
+
 void PQMPlugin::clearPingTask()
 {
 	if(m_pingTask) {
