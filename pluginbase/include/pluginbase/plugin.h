@@ -363,6 +363,13 @@ public Q_SLOTS:
 	 */
 	virtual void stopPingTask() = 0;
 
+	/**
+	 * @brief onPausePingTask
+	 * Plugin can have a ping task which checks if the device is alive.
+	 * This method pauses/resumes the ping task.
+	 */
+	virtual void onPausePingTask(bool) = 0;
+
 	// Q_SIGNALS:
 
 	/**
@@ -393,6 +400,14 @@ public Q_SLOTS:
 	 * (adding/removing tools after postload)
 	 */
 	virtual void toolListChanged() = 0;
+
+	/**
+	 * @brief pausePingTask
+	 * Plugin can emit this signal if it requests to pause/resume the ping task
+	 * If the argument is False, the resume will be attempted
+	 * It works only if a ping task exists at device level
+	 */
+	virtual void pausePingTask(bool) = 0;
 
 	virtual void restartDevice() = 0;
 };
