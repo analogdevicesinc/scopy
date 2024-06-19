@@ -49,14 +49,34 @@ public:
 
 public Q_SLOTS:
 	/**
-	 * @brief Performs a write operation
+	 * @brief Performs a synchronous write operation. The synchronous write operation
+	 * will not trigger a read operation afterwards (as opposed to the asynchronous
+	 * operation). This functionn has to be called manually if needed.
+	 * @param data The data to write
+	 * @return The return code for this write operation.
 	 * */
-	virtual void save(QString data) = 0;
+	virtual int write(QString data) = 0;
 
 	/**
-	 * @brief Performs a read operation and emits the data
+	 * @brief Performs a synchronous read operation.
+	 * @return A QPair where the first value is a QString with the data read and the
+	 * second value is a QString with the optional values. If no optional values are
+	 * present, an empty string is returned.
 	 * */
-	virtual void requestData() = 0;
+	virtual QPair<QString, QString> read() = 0;
+
+	/**
+	 * @brief Performs an asynchronous write operation. The result can be accessed
+	 * by connecting a slot to the DataStrategyInteface::emitStatus() signal.
+	 * @param data The data to write.
+	 */
+	virtual void writeAsync(QString data) = 0;
+
+	/**
+	 * @brief Performs an asynchronous read operation. The result can be accessed
+	 * by connecting a slot to the DataStrategyInterface::sendData() signal.
+	 */
+	virtual void readAsync() = 0;
 
 Q_SIGNALS:
 	/**

@@ -146,13 +146,13 @@ void PlotCursorReadouts::setXUnits(QString unit)
 	update();
 }
 
-void PlotCursorReadouts::setXFromatter(PrefixFormatter *formatter)
+void PlotCursorReadouts::setXFormatter(PrefixFormatter *formatter)
 {
 	yFormatter = formatter;
 	update();
 }
 
-void PlotCursorReadouts::setYFromatter(PrefixFormatter *formatter)
+void PlotCursorReadouts::setYFormatter(PrefixFormatter *formatter)
 {
 	yFormatter = formatter;
 	update();

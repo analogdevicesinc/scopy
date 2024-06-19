@@ -32,8 +32,8 @@ void CursorController::initUI()
 
 	plotCursorReadouts = new PlotCursorReadouts(m_plot);
 	PlotChannel *ch = m_plot->selectedChannel();
-	plotCursorReadouts->setXFromatter(ch->xAxis()->getFromatter());
-	plotCursorReadouts->setYFromatter(ch->yAxis()->getFromatter());
+	plotCursorReadouts->setXFormatter(ch->xAxis()->getFormatter());
+	plotCursorReadouts->setYFormatter(ch->yAxis()->getFormatter());
 	plotCursorReadouts->setXUnits(ch->xAxis()->getUnits());
 	plotCursorReadouts->setYUnits(ch->yAxis()->getUnits());
 
@@ -99,8 +99,8 @@ void CursorController::connectSignals()
 	connect(m_plot, &PlotWidget::addedChannel, this, &CursorController::onAddedChannel);
 	connect(m_plot, &PlotWidget::removedChannel, this, &CursorController::onRemovedChannel);
 	connect(m_plot, &PlotWidget::channelSelected, this, [=](PlotChannel *ch) {
-		plotCursorReadouts->setXFromatter(ch->xAxis()->getFromatter());
-		plotCursorReadouts->setYFromatter(ch->yAxis()->getFromatter());
+		plotCursorReadouts->setXFormatter(ch->xAxis()->getFormatter());
+		plotCursorReadouts->setYFormatter(ch->yAxis()->getFormatter());
 		plotCursorReadouts->setXUnits(ch->xAxis()->getUnits());
 		plotCursorReadouts->setYUnits(ch->yAxis()->getUnits());
 	});
@@ -160,8 +160,8 @@ void CursorController::readoutsDragToggled(bool toggled)
 
 void CursorController::onAddedChannel(PlotChannel *ch)
 {
-	connect(ch->xAxis(), &PlotAxis::formatterChanged, plotCursorReadouts, &PlotCursorReadouts::setXFromatter);
-	connect(ch->yAxis(), &PlotAxis::formatterChanged, plotCursorReadouts, &PlotCursorReadouts::setYFromatter);
+	connect(ch->xAxis(), &PlotAxis::formatterChanged, plotCursorReadouts, &PlotCursorReadouts::setXFormatter);
+	connect(ch->yAxis(), &PlotAxis::formatterChanged, plotCursorReadouts, &PlotCursorReadouts::setYFormatter);
 	connect(ch->xAxis(), &PlotAxis::unitsChanged, plotCursorReadouts, &PlotCursorReadouts::setXUnits);
 	connect(ch->yAxis(), &PlotAxis::unitsChanged, plotCursorReadouts, &PlotCursorReadouts::setYUnits);
 }

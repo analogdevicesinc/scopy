@@ -188,7 +188,7 @@ void IIODebugInstrument::connectSignalsAndSlots()
 						 .arg(returnCode < 0 ? "FAILURE " + QString::number(returnCode)
 								     : "SUCCESS")
 						 .arg(path)
-						 .arg(oldValue.isEmpty() ? "" : oldValue + " -> ")
+						 .arg(oldValue.isEmpty() || isRead ? "" : oldValue + " -> ")
 						 .arg(newValue);
 				 m_debugLogger->appendLog(logMessage);
 				 m_detailsView->refreshIIOView();
@@ -289,7 +289,7 @@ void IIODebugInstrument::triggerReadOnAllChildItems(QStandardItem *item)
 		QList<IIOWidget *> iioWidgets = IIOitem->getIIOWidgets();
 		for(int i = 0; i < iioWidgets.size(); ++i) {
 			qInfo(CAT_DEBUGGERIIOMODEL) << "Reading " << IIOitem->path();
-			iioWidgets.at(i)->getDataStrategy()->requestData();
+			iioWidgets.at(i)->getDataStrategy()->readAsync();
 		}
 	} else {
 		// not a leaf node, continue recursion
