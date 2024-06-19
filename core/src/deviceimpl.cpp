@@ -223,13 +223,32 @@ void DeviceImpl::loadBadges()
 	connect(this, &DeviceImpl::connected, warningHover, &HoverWidget::hide);
 }
 
-void DeviceImpl::setHighPriorPlugin(Plugin *plugin)
+void DeviceImpl::setPingPlugin(Plugin *plugin)
 {
-	int priority = plugin->metadata().value("priority").toInt();
-	int highestPriority = (m_highPriorPlugin) ? m_highPriorPlugin->metadata().value("priority").toInt() : -1;
+	if(!m_pingPlugin && plugin->pingTask()) {
+		m_pingPlugin = plugin;
+	}
+}
 
-	if(plugin->pingTask() && priority > highestPriority) {
-		m_highPriorPlugin = plugin;
+void DeviceImpl::connPluginPingPause()
+{
+	if(!m_pingPlugin) {
+		return;
+	}
+	for(auto &&p : m_connectedPlugins) {
+		connect(dynamic_cast<QObject *>(p), SIGNAL(pausePingTask(bool)), dynamic_cast<QObject *>(m_pingPlugin),
+			SLOT(onPausePingTask(bool)));
+	}
+}
+
+void DeviceImpl::disconnPluginPingPause()
+{
+	if(!m_pingPlugin) {
+		return;
+	}
+	for(auto &&p : m_connectedPlugins) {
+		disconnect(dynamic_cast<QObject *>(p), SIGNAL(pausePingTask(bool)),
+			   dynamic_cast<QObject *>(m_pingPlugin), SLOT(onPausePingTask(bool)));
 	}
 }
 
@@ -290,7 +309,7 @@ void DeviceImpl::connectDev()
 				p->loadSettings(s);
 			}
 			m_connectedPlugins.push_back(p);
-			setHighPriorPlugin(p);
+			setPingPlugin(p);
 		} else {
 			disconnectDevice = p->metadata().value("disconnectDevOnConnectFailure").toBool();
 			if(disconnectDevice) {
@@ -304,9 +323,10 @@ void DeviceImpl::connectDev()
 		connbtn->hide();
 		discbtn->show();
 		discbtn->setFocus();
-		if(m_highPriorPlugin) {
-			connect(m_highPriorPlugin->pingTask(), &PingTask::pingFailed, this, &DeviceImpl::disconnectDev);
-			m_highPriorPlugin->startPingTask();
+		connPluginPingPause();
+		if(m_pingPlugin) {
+			connect(m_pingPlugin->pingTask(), &PingTask::pingFailed, this, &DeviceImpl::disconnectDev);
+			m_pingPlugin->startPingTask();
 		}
 		Q_EMIT connected();
 	}
@@ -318,9 +338,10 @@ void DeviceImpl::disconnectDev()
 	QElapsedTimer pluginTimer;
 	QElapsedTimer timer;
 	timer.start();
-	if(m_highPriorPlugin) {
-		m_highPriorPlugin->stopPingTask();
-		disconnect(m_highPriorPlugin->pingTask(), &PingTask::pingFailed, this, &DeviceImpl::disconnectDev);
+	disconnPluginPingPause();
+	if(m_pingPlugin) {
+		m_pingPlugin->stopPingTask();
+		disconnect(m_pingPlugin->pingTask(), &PingTask::pingFailed, this, &DeviceImpl::disconnectDev);
 	}
 	connbtn->show();
 	discbtn->hide();
