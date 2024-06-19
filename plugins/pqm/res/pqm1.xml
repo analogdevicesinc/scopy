@@ -52,6 +52,10 @@
 		<attribute name="sampling_frequency" value="1000" />
 		<attribute name="nominal_frequency" value="50" />
 		<attribute name="nominal_frequency_available" value="50 60" />
+		<attribute name="system_time" value="0000000000000000" />
+		<attribute name="log_start_time" value="0000000000000000" />
+		<attribute name="log_stop_time" value="0000000000000000" />
+		<attribute name="start_logging" value="0" />
 		<channel id="voltage0" name="ua" type="input" >
 			<scan-element index="0" format="be:u24/32&gt;&gt;0" />
 			<attribute name="rms" filename="in_voltage0_rms" value="200.6921" />
