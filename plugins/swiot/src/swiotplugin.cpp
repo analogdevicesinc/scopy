@@ -220,9 +220,18 @@ bool SWIOTPlugin::onDisconnect()
 	return true;
 }
 
-void SWIOTPlugin::startPingTask() { m_cyclicalTask->start(2000); }
+void SWIOTPlugin::startPingTask() { m_cyclicalTask->start(PING_PERIOD); }
 
 void SWIOTPlugin::stopPingTask() { m_cyclicalTask->stop(); }
+
+void SWIOTPlugin::onPausePingTask(bool pause)
+{
+	if(pause) {
+		stopPingTask();
+	} else {
+		startPingTask();
+	}
+}
 
 void SWIOTPlugin::onIsRuntimeCtxChanged(bool isRuntimeCtx)
 {
