@@ -63,7 +63,9 @@ protected:
 	void loadPages();
 	void loadToolList();
 	void loadBadges();
-	void setHighPriorPlugin(Plugin *plugin);
+	void setPingPlugin(Plugin *plugin);
+	void connPluginPingPause();
+	void disconnPluginPingPause();
 
 protected:
 	PluginManager *p;
@@ -77,7 +79,7 @@ protected:
 	QWidget *m_icon;
 	QWidget *m_page;
 	QPushButton *connbtn, *discbtn;
-	Plugin *m_highPriorPlugin = nullptr;
+	Plugin *m_pingPlugin = nullptr;
 };
 } // namespace scopy
 

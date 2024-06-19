@@ -8,3 +8,5 @@ PingTask::PingTask(QObject *parent)
 PingTask::~PingTask() {}
 
 void PingTask::run() {}
+
+#include "moc_pingtask.cpp"
