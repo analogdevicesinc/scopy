@@ -24,6 +24,7 @@ Q_SIGNALS:
 private Q_SLOTS:
 	void onSetBtnPressed();
 	void onReadBtnPressed(bool en);
+	void setDateTimeAttr(QDateTime dateTime, QString attrName);
 
 private:
 	void initConfigSection(QWidget *parent);
@@ -36,6 +37,9 @@ private:
 
 	bool m_readEnabled;
 	QMap<QString, QMap<QString, QString>> m_pqmAttr;
+	const QString SYSTEM_TIME_ATTR = "system_time";
+	const QString LOG_START_ATTR = "log_start_time";
+	const QString LOG_STOP_ATTR = "log_stop_time";
 };
 } // namespace scopy::pqm
 
