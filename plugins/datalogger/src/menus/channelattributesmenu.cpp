@@ -1,6 +1,6 @@
 #include "menus/channelattributesmenu.hpp"
 
-#include <iiowidgetfactory.h>
+#include <iiowidgetbuilder.h>
 #include <menuheader.h>
 
 using namespace scopy;
@@ -40,8 +40,8 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, QWidget *p
 	attrLayout->setContentsMargins(0, 0, 0, 10); // bottom margin
 
 	if(qobject_cast<DmmDataMonitorModel *>(model)) {
-		QList<IIOWidget *> attrWidgets = IIOWidgetFactory::buildAllAttrsForChannel(
-			dynamic_cast<DmmDataMonitorModel *>(model)->iioChannel());
+		QList<IIOWidget *> attrWidgets =
+			IIOWidgetBuilder().channel(dynamic_cast<DmmDataMonitorModel *>(model)->iioChannel()).buildAll();
 
 		for(auto w : attrWidgets) {
 			attrLayout->addWidget(w);

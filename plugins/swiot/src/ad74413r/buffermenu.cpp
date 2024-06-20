@@ -23,7 +23,7 @@
 
 #include <QLabel>
 #include <titlespinbox.h>
-#include <iio-widgets/iiowidgetfactory.h>
+#include <iio-widgets/iiowidgetbuilder.h>
 #include <iio-widgets/datastrategy/cmdqchannelattrdatastrategy.h>
 #include <iio-widgets/guistrategy/editableguistrategy.h>
 #include <guistrategy/comboguistrategy.h>
@@ -36,15 +36,15 @@ BufferMenu::BufferMenu(QWidget *parent, QString chnlFunction, Connection *conn, 
 	, m_connection(conn)
 	, m_chnls(chnls)
 {
-
 	if(m_chnls.contains(INPUT_CHNL)) {
-		m_samplingFreq =
-			IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
-						      {.connection = const_cast<Connection *>(m_connection),
-						       .channel = const_cast<iio_channel *>(m_chnls[INPUT_CHNL]),
-						       .data = "sampling_frequency",
-						       .iioDataOptions = "sampling_frequency_available"},
-						      this);
+		m_samplingFreq = IIOWidgetBuilder()
+					 .connection(const_cast<Connection *>(m_connection))
+					 .channel(const_cast<iio_channel *>(m_chnls[INPUT_CHNL]))
+					 .attribute("sampling_frequency")
+					 .optionsAttribute("sampling_frequency_available")
+					 .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
+					 .parent(this)
+					 .buildSingle();
 		addMenuWidget(m_samplingFreq);
 		connect(dynamic_cast<ComboAttrUi *>(m_samplingFreq->getUiStrategy()), &ComboAttrUi::displayedNewData,
 			this,
@@ -94,12 +94,13 @@ CurrentInLoopMenu::CurrentInLoopMenu(QWidget *parent, QString chnlFunction, Conn
 	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
 	// dac code - output channel
-	IIOWidget *dacCode = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::RangeUi,
-							   {.connection = const_cast<Connection *>(m_connection),
-							    .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
-							    .data = "raw",
-							    .constDataOptions = "[0 1 8191]"},
-							   this);
+	IIOWidget *dacCode = IIOWidgetBuilder()
+				     .connection(const_cast<Connection *>(m_connection))
+				     .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
+				     .attribute("raw")
+				     .optionsValues("[0 1 8191]")
+				     .parent(this)
+				     .buildSingle();
 	QLayoutItem *item = dacCode->getUiStrategy()->ui()->layout()->itemAt(0);
 	TitleSpinBox *dacSpin = nullptr;
 	if(item) {
@@ -148,12 +149,13 @@ DigitalInLoopMenu::DigitalInLoopMenu(QWidget *parent, QString chnlFunction, Conn
 	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
 	// threshold - input channel
-	m_threshold = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::EditableUi,
-						    {.connection = const_cast<Connection *>(m_connection),
-						     .channel = const_cast<iio_channel *>(m_chnls[INPUT_CHNL]),
-						     .data = "threshold",
-						     .constDataOptions = "[0 1 16000]"},
-						    this);
+	m_threshold = IIOWidgetBuilder()
+			      .connection(const_cast<Connection *>(m_connection))
+			      .channel(const_cast<iio_channel *>(m_chnls[INPUT_CHNL]))
+			      .attribute("threshold")
+			      .optionsValues("[0 1 16000]")
+			      .parent(this)
+			      .buildSingle();
 	addMenuWidget(m_threshold);
 
 	CmdQChannelAttrDataStrategy *dataStrategy =
@@ -162,12 +164,13 @@ DigitalInLoopMenu::DigitalInLoopMenu(QWidget *parent, QString chnlFunction, Conn
 		&BufferMenu::thresholdChangeStart);
 	connect(dataStrategy, &CmdQChannelAttrDataStrategy::emitStatus, this, &DigitalInLoopMenu::onEmitStatus);
 	// dac code - output channel
-	IIOWidget *dacCode = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::RangeUi,
-							   {.connection = const_cast<Connection *>(m_connection),
-							    .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
-							    .data = "raw",
-							    .constDataOptions = "[0 1 8191]"},
-							   this);
+	IIOWidget *dacCode = IIOWidgetBuilder()
+				     .connection(const_cast<Connection *>(m_connection))
+				     .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
+				     .attribute("raw")
+				     .optionsValues("[0 1 8191]")
+				     .parent(this)
+				     .buildSingle();
 	QLayoutItem *item = dacCode->getUiStrategy()->ui()->layout()->itemAt(0);
 	TitleSpinBox *dacSpin = nullptr;
 	if(item) {
@@ -241,12 +244,13 @@ VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection
 	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
 	// dac code - output channel
-	IIOWidget *dacCode = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::RangeUi,
-							   {.connection = const_cast<Connection *>(m_connection),
-							    .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
-							    .data = "raw",
-							    .constDataOptions = "[0 1 8191]"},
-							   this);
+	IIOWidget *dacCode = IIOWidgetBuilder()
+				     .connection(const_cast<Connection *>(m_connection))
+				     .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
+				     .attribute("raw")
+				     .optionsValues("[0 1 8191]")
+				     .parent(this)
+				     .buildSingle();
 	QLayoutItem *item = dacCode->getUiStrategy()->ui()->layout()->itemAt(0);
 	TitleSpinBox *dacSpin = nullptr;
 	if(item) {
@@ -273,30 +277,35 @@ VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection
 		&CmdQChannelAttrDataStrategy::sendData, this, &VoltageOutMenu::updateCnvtLabel);
 
 	// slew - output channel
-	IIOWidget *slewOptions =
-		IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
-					      {.connection = const_cast<Connection *>(m_connection),
-					       .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
-					       .data = "slew_en",
-					       .constDataOptions = "0 1"},
-					      this);
-
+	IIOWidget *slewOptions = IIOWidgetBuilder()
+					 .connection(const_cast<Connection *>(m_connection))
+					 .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
+					 .attribute("slew_en")
+					 .optionsValues("0 1")
+					 .parent(this)
+					 .buildSingle();
 	addMenuWidget(slewOptions);
+
 	// slew step - output channel
-	IIOWidget *slewStep = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
-							    {.connection = const_cast<Connection *>(m_connection),
-							     .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
-							     .data = "slew_step",
-							     .iioDataOptions = "slew_step_available"},
-							    this);
+	IIOWidget *slewStep = IIOWidgetBuilder()
+				      .connection(const_cast<Connection *>(m_connection))
+				      .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
+				      .attribute("slew_step")
+				      .optionsAttribute("slew_step_available")
+				      .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
+				      .parent(this)
+				      .buildSingle();
 	addMenuWidget(slewStep);
+
 	// slew rate - output channel
-	IIOWidget *slewRate = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
-							    {.connection = const_cast<Connection *>(m_connection),
-							     .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
-							     .data = "slew_rate",
-							     .iioDataOptions = "slew_rate_available"},
-							    this);
+	IIOWidget *slewRate = IIOWidgetBuilder()
+				      .connection(const_cast<Connection *>(m_connection))
+				      .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
+				      .attribute("slew_rate")
+				      .optionsAttribute("slew_rate_available")
+				      .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
+				      .parent(this)
+				      .buildSingle();
 	addMenuWidget(slewRate);
 }
 
@@ -322,12 +331,13 @@ CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection
 	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
 	// dac code - output channel
-	IIOWidget *dacCode = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::RangeUi,
-							   {.connection = const_cast<Connection *>(m_connection),
-							    .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
-							    .data = "raw",
-							    .constDataOptions = "[0 1 8191]"},
-							   this);
+	IIOWidget *dacCode = IIOWidgetBuilder()
+				     .connection(const_cast<Connection *>(m_connection))
+				     .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
+				     .attribute("raw")
+				     .optionsValues("[0 1 8191]")
+				     .parent(this)
+				     .buildSingle();
 	QLayoutItem *item = dacCode->getUiStrategy()->ui()->layout()->itemAt(0);
 	TitleSpinBox *dacSpin = nullptr;
 	if(item) {
@@ -354,30 +364,35 @@ CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection
 		&CmdQChannelAttrDataStrategy::sendData, this, &CurrentOutMenu::updateCnvtLabel);
 
 	// slew - output channel
-	IIOWidget *slewOptions =
-		IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
-					      {.connection = const_cast<Connection *>(m_connection),
-					       .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
-					       .data = "slew_en",
-					       .constDataOptions = "0 1"},
-					      this);
-
+	IIOWidget *slewOptions = IIOWidgetBuilder()
+					 .connection(const_cast<Connection *>(m_connection))
+					 .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
+					 .attribute("slew_en")
+					 .optionsValues("0 1")
+					 .parent(this)
+					 .buildSingle();
 	addMenuWidget(slewOptions);
+
 	// slew step - output channel
-	IIOWidget *slewStep = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
-							    {.connection = const_cast<Connection *>(m_connection),
-							     .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
-							     .data = "slew_step",
-							     .iioDataOptions = "slew_step_available"},
-							    this);
+	IIOWidget *slewStep = IIOWidgetBuilder()
+				      .connection(const_cast<Connection *>(m_connection))
+				      .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
+				      .attribute("slew_step")
+				      .optionsAttribute("slew_step_available")
+				      .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
+				      .parent(this)
+				      .buildSingle();
 	addMenuWidget(slewStep);
+
 	// slew rate - output channel
-	IIOWidget *slewRate = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
-							    {.connection = const_cast<Connection *>(m_connection),
-							     .channel = const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]),
-							     .data = "slew_rate",
-							     .iioDataOptions = "slew_rate_available"},
-							    this);
+	IIOWidget *slewRate = IIOWidgetBuilder()
+				      .connection(const_cast<Connection *>(m_connection))
+				      .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
+				      .attribute("slew_rate")
+				      .optionsAttribute("slew_rate_available")
+				      .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
+				      .parent(this)
+				      .buildSingle();
 	addMenuWidget(slewRate);
 }
 
@@ -403,13 +418,14 @@ DiagnosticMenu::DiagnosticMenu(QWidget *parent, QString chnlFunction, Connection
 	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
 	// diag options - input channel
-	IIOWidget *diagOptions =
-		IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::ComboUi,
-					      {.connection = const_cast<Connection *>(m_connection),
-					       .channel = const_cast<iio_channel *>(m_chnls[INPUT_CHNL]),
-					       .data = "diag_function",
-					       .iioDataOptions = "diag_function_available"},
-					      this);
+	IIOWidget *diagOptions = IIOWidgetBuilder()
+					 .connection(const_cast<Connection *>(m_connection))
+					 .channel(const_cast<iio_channel *>(m_chnls[INPUT_CHNL]))
+					 .attribute("diag_function")
+					 .optionsAttribute("diag_function_available")
+					 .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
+					 .parent(this)
+					 .buildSingle();
 	addMenuWidget(diagOptions);
 
 	connect(dynamic_cast<ComboAttrUi *>(diagOptions->getUiStrategy()), &ComboAttrUi::displayedNewData, this,
@@ -447,12 +463,13 @@ DigitalInMenu::DigitalInMenu(QWidget *parent, QString chnlFunction, Connection *
 	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
 	// threshold - input channel
-	m_threshold = IIOWidgetFactory::buildSingle(IIOWidgetFactory::CMDQAttrData | IIOWidgetFactory::EditableUi,
-						    {.connection = const_cast<Connection *>(m_connection),
-						     .channel = const_cast<iio_channel *>(m_chnls[INPUT_CHNL]),
-						     .data = "threshold",
-						     .constDataOptions = "[0 1 16000]"},
-						    this);
+	m_threshold = IIOWidgetBuilder()
+			      .connection(const_cast<Connection *>(m_connection))
+			      .channel(const_cast<iio_channel *>(m_chnls[INPUT_CHNL]))
+			      .attribute("threshold")
+			      .optionsValues("[0 1 16000]")
+			      .parent(this)
+			      .buildSingle();
 	addMenuWidget(m_threshold);
 	CmdQChannelAttrDataStrategy *dataStrategy =
 		dynamic_cast<CmdQChannelAttrDataStrategy *>(m_threshold->getDataStrategy());
