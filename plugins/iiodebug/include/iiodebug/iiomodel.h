@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QStandardItemModel>
 #include <QSet>
-#include <iio-widgets/iiowidgetfactory.h>
+#include <iio-widgets/iiowidgetbuilder.h>
 #include <iio.h>
 #include "iiostandarditem.h"
 

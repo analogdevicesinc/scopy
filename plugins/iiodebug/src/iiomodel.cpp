@@ -50,7 +50,7 @@ void IIOModel::iioTreeSetup()
 
 void IIOModel::setupCtx()
 {
-	m_ctxList = IIOWidgetFactory::buildAllAttrsForContext(m_ctx);
+	m_ctxList = IIOWidgetBuilder().context(m_ctx).buildAll();
 	m_rootItem = createIIOStandardItem(m_ctxList, m_rootString, "", m_rootString, IIOStandardItem::Context);
 	// m_rootItem = new IIOStandardItem(m_ctxList, m_rootString, m_rootString, IIOStandardItem::Context);
 	m_rootItem->setEditable(false);
@@ -72,7 +72,7 @@ void IIOModel::generateCtxAttributes()
 void IIOModel::setupCurrentDevice()
 {
 	m_currentDevice = iio_context_get_device(m_ctx, m_currentDeviceIndex);
-	m_devList = IIOWidgetFactory::buildAllAttrsForDevice(m_currentDevice);
+	m_devList = IIOWidgetBuilder().device(m_currentDevice).buildAll();
 	m_currentDeviceName = iio_device_get_name(m_currentDevice);
 	QString currentDeviceId = iio_device_get_id(m_currentDevice);
 	bool is_trigger = iio_device_is_trigger(m_currentDevice);
@@ -110,7 +110,7 @@ void IIOModel::generateDeviceAttributes()
 void IIOModel::setupCurrentChannel()
 {
 	m_currentChannel = iio_device_get_channel(m_currentDevice, m_currentChannelIndex);
-	m_chnlList = IIOWidgetFactory::buildAllAttrsForChannel(m_currentChannel);
+	m_chnlList = IIOWidgetBuilder().channel(m_currentChannel).buildAll();
 	m_currentChannelName = iio_channel_get_id(m_currentChannel);
 	QString currentChannelId = iio_channel_get_name(m_currentChannel);
 
