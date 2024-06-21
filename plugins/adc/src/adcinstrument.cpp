@@ -198,11 +198,13 @@ void ADCInstrument::stop() { run(false); }
 
 void ADCInstrument::run(bool b)
 {
-	QSignalBlocker rb(runBtn);
-	QSignalBlocker sb(singleBtn);
+	// QSignalBlocker rb(runBtn);
+	// QSignalBlocker sb(singleBtn);
 
-	runBtn->setChecked(b);
-	singleBtn->setChecked(b);
+	if(!b) {
+		runBtn->setChecked(false);
+		singleBtn->setChecked(false);
+	}
 
 	qInfo() << b;
 	if(b) {

@@ -55,10 +55,10 @@ GRTimeChannelComponent::~GRTimeChannelComponent() {}
 
 QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_ONOFF, parent);
+	m_yaxisMenu = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_ONOFF, parent);
 
 	// Y-MODE
-	m_ymodeCb = new MenuCombo("YMODE", section);
+	m_ymodeCb = new MenuCombo("YMODE", m_yaxisMenu);
 	auto cb = m_ymodeCb->combo();
 	cb->addItem("ADC Counts", YMODE_COUNT);
 	cb->addItem("% Full Scale", YMODE_FS);
@@ -69,8 +69,8 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 		m_scaleWidget = IIOWidgetFactory::buildAttrForChannel(m_src->channel(), m_src->scaleAttribute(),this);
 	}
 
-	m_yCtrl = new MenuPlotAxisRangeControl(m_plotChannelCmpt->m_timePlotYAxis, section);
-	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), section, false);
+	m_yCtrl = new MenuPlotAxisRangeControl(m_plotChannelCmpt->m_timePlotYAxis, m_yaxisMenu);
+	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), m_yaxisMenu, false);
 	m_autoscaler = new PlotAutoscaler(this);
 	m_autoscaler->addChannels(m_plotChannelCmpt->m_timePlotCh);
 
@@ -81,7 +81,7 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 		m_plotChannelCmpt->m_xyPlotYAxis->setInterval(m_yCtrl->min(), m_yCtrl->max());
 	});
 
-	connect(section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b){
+	connect(m_yaxisMenu->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b){
 		m_yLock = b;		
 		m_plotChannelCmpt->lockYAxis(!b);
 	});
@@ -93,11 +93,11 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 		toggleAutoScale();
 	});
 
-	section->contentLayout()->addWidget(m_autoscaleBtn);
-	section->contentLayout()->addWidget(m_yCtrl);
-	section->contentLayout()->addWidget(m_ymodeCb);
+	m_yaxisMenu->contentLayout()->addWidget(m_autoscaleBtn);
+	m_yaxisMenu->contentLayout()->addWidget(m_yCtrl);
+	m_yaxisMenu->contentLayout()->addWidget(m_ymodeCb);
 	if(m_scaleWidget)
-		section->contentLayout()->addWidget(m_scaleWidget);
+		m_yaxisMenu->contentLayout()->addWidget(m_scaleWidget);
 
 
 	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
@@ -117,7 +117,7 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 		cb->setCurrentIndex(idx);
 	});
 
-	return section;
+	return m_yaxisMenu;
 }
 
 QWidget *GRTimeChannelComponent::createCurveMenu(QWidget *parent)
@@ -340,8 +340,10 @@ void GRTimeChannelComponent::onInit()
 	// Defaults
 	addChannelToPlot();
 
+	m_yaxisMenu->setCollapsed(true);
 	m_yCtrl->setMin(-1.0);
 	m_yCtrl->setMax(1.0);
+
 	auto v = Preferences::get("adc_default_y_mode").toInt();
 	m_ymodeCb->combo()->setCurrentIndex(v);
 	setYMode(static_cast<YMode>(v));
