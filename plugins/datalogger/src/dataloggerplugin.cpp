@@ -39,36 +39,7 @@ bool DataLoggerPlugin::compatible(QString m_param, QString category)
 	return true;
 }
 
-bool DataLoggerPlugin::loadPage()
-{
-	// Here you must write the code for the plugin info page
-	// Below is an example for an iio device
-	/*m_page = new QWidget();
-	m_page->setLayout(new QVBoxLayout(m_page));
-	m_page->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	m_infoPage = new InfoPage(m_page);
-	m_infoPage->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-	m_page->layout()->addWidget(m_infoPage);
-	m_page->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
-
-	auto cp = ContextProvider::GetInstance();
-	struct iio_context *context = cp->open(m_param);
-	ssize_t attributeCount = iio_context_get_attrs_count(context);
-	for(int i = 0; i < attributeCount; ++i) {
-		const char *name;
-		const char *value;
-		int ret = iio_context_get_attr(context, i, &name, &value);
-		if(ret < 0) {
-			qWarning(CAT_DATALOGGERLUGIN) << "Could not read attribute with index:" << i;
-			continue;
-		}
-
-		m_infoPage->update(name, value);
-	}
-	cp->close(m_param);
-	m_page->ensurePolished();*/
-	return true;
-}
+bool DataLoggerPlugin::loadPage() { return false; }
 
 bool DataLoggerPlugin::loadIcon()
 {
