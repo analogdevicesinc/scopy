@@ -32,7 +32,8 @@ GRDeviceComponent::GRDeviceComponent(GRIIODeviceSourceNode *node, QWidget *paren
 
 QWidget *GRDeviceComponent::createAttrMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *attr = new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *attr =
+		new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
 	QList<IIOWidget *> attrWidgets = IIOWidgetFactory::buildAllAttrsForDevice(m_src->iioDev());
 	const struct iio_context *ctx = iio_device_get_context(m_src->iioDev());
 	attrWidgets.append(IIOWidgetFactory::buildSingle(

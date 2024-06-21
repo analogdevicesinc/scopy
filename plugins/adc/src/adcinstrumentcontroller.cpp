@@ -106,7 +106,6 @@ void ADCInstrumentController::init()
 	m_otherCMCB->getControlBtn()->button()->setVisible(false);
 	m_otherCMCB->getControlBtn()->setName("Other");
 	m_tool->vcm()->addEnd(m_otherCMCB);
-
 }
 
 void ADCInstrumentController::deinit()
@@ -230,7 +229,6 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 			&GRTimeSinkComponent::setSampleRate);
 		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::rollingModeChanged, c,
 			&GRTimeSinkComponent::setRollingMode);
-
 	}
 
 	if(dynamic_cast<GRIIODeviceSourceNode *>(node) != nullptr) {
@@ -258,7 +256,7 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 
 		m_plotComponentManager->addChannel(c);
 		QWidget *ww = m_plotComponentManager->plotCombo(c);
-		c->menu()->add(ww,"plot",gui::MenuWidget::MA_BOTTOMFIRST);
+		c->menu()->add(ww, "plot", gui::MenuWidget::MA_BOTTOMFIRST);
 
 		/*** This is a bit of a mess because CollapsableMenuControlButton is not a MenuControlButton ***/
 
@@ -280,7 +278,7 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 		connect(c->ctrl(), &QAbstractButton::clicked, this,
 			[=]() { m_plotComponentManager->selectChannel(c); });
 
-		grtsc->addChannel(c);			    // For matching Sink To Channels		
+		grtsc->addChannel(c);			    // For matching Sink To Channels
 		dc->addChannel(c);			    // used for sample rate computation
 		m_timePlotSettingsComponent->addChannel(c); // SingleY/etc
 
@@ -291,11 +289,10 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 	if(dynamic_cast<ImportFloatChannelNode *>(node) != nullptr) {
 		int idx = chIdP->next();
 		ImportFloatChannelNode *ifcn = dynamic_cast<ImportFloatChannelNode *>(node);
-		ImportChannelComponent *c =
-			new ImportChannelComponent(ifcn, chIdP->pen(idx));
+		ImportChannelComponent *c = new ImportChannelComponent(ifcn, chIdP->pen(idx));
 
 		m_plotComponentManager->addChannel(c);
-		c->menu()->add(m_plotComponentManager->plotCombo(c),"plot",gui::MenuWidget::MA_BOTTOMFIRST);
+		c->menu()->add(m_plotComponentManager->plotCombo(c), "plot", gui::MenuWidget::MA_BOTTOMFIRST);
 
 		CompositeWidget *cw = m_otherCMCB;
 		m_acqNodeComponentMap[ifcn] = c;
@@ -312,25 +309,22 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 		setupChannelMeasurement(m_plotComponentManager, c);
 	}
 	m_plotComponentManager->replot();
-
 }
 
 void ADCInstrumentController::removeChannel(AcqTreeNode *node)
 {
-  if(dynamic_cast<ImportFloatChannelNode *>(node) != nullptr) {
-	ImportFloatChannelNode *ifcn = dynamic_cast<ImportFloatChannelNode *>(node);
-	ImportChannelComponent *c = dynamic_cast<ImportChannelComponent*>(m_acqNodeComponentMap[ifcn]);
+	if(dynamic_cast<ImportFloatChannelNode *>(node) != nullptr) {
+		ImportFloatChannelNode *ifcn = dynamic_cast<ImportFloatChannelNode *>(node);
+		ImportChannelComponent *c = dynamic_cast<ImportChannelComponent *>(m_acqNodeComponentMap[ifcn]);
 
-	m_otherCMCB->remove(c->ctrl());
-	m_plotComponentManager->removeChannel(c);
-	m_timePlotSettingsComponent->removeChannel(c);
-	removeComponent(c);
-	delete c;
-
-  }
-  m_plotComponentManager->replot();
+		m_otherCMCB->remove(c->ctrl());
+		m_plotComponentManager->removeChannel(c);
+		m_timePlotSettingsComponent->removeChannel(c);
+		removeComponent(c);
+		delete c;
+	}
+	m_plotComponentManager->replot();
 }
-
 
 /*void ADCInstrumentController::createSnapshotChannel(SnapshotProvider::SnapshotRecipe rec)
 {
@@ -372,4 +366,3 @@ void ADCInstrumentController::setupChannelMeasurement(TimePlotManager *c, Channe
 		connect(chMeasureManager, &MeasureManagerInterface::disableStat, statsPanel, &StatsPanel::removeStat);
 	}
 }
-

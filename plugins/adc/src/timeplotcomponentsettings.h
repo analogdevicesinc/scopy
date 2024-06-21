@@ -49,13 +49,9 @@ private:
 	bool m_autoscaleEnabled;
 	bool m_running;
 
-
-
-
 private:
 	void toggleAutoScale();
 	void updateYModeCombo();
-
 };
 
 } // namespace adc

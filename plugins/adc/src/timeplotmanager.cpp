@@ -57,10 +57,7 @@ MeasurementsPanel *TimePlotManager::measurePanel() const { return m_measurePanel
 
 StatsPanel *TimePlotManager::statsPanel() const { return m_statsPanel; }
 
-QWidget *TimePlotManager::plotCombo(ChannelComponent *c)
-{
-	return m_channelPlotcomboMap[c];
-}
+QWidget *TimePlotManager::plotCombo(ChannelComponent *c) { return m_channelPlotcomboMap[c]; }
 
 uint32_t TimePlotManager::addPlot(QString name)
 {
@@ -68,7 +65,7 @@ uint32_t TimePlotManager::addPlot(QString name)
 	m_plotIdx++;
 	m_plots.append(plt);
 
-	connect(plt, &TimePlotComponent::requestDeletePlot, this, [=](){
+	connect(plt, &TimePlotComponent::requestDeletePlot, this, [=]() {
 		Q_EMIT plotRemoved(plt->uuid());
 		removePlot(plt->uuid());
 
@@ -88,7 +85,6 @@ uint32_t TimePlotManager::addPlot(QString name)
 	for(TimePlotComponent *plt : qAsConst(m_plots)) {
 		plt->plotMenu()->showDeleteButtons(b);
 	}
-
 
 	return plt->uuid();
 }

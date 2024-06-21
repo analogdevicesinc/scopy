@@ -61,7 +61,6 @@ public Q_SLOTS:
 	void enable();
 	void disable();
 
-
 private:
 	void setThicknessInternal(int);
 	void setStyleInternal(int);

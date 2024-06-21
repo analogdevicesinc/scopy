@@ -109,23 +109,17 @@ AcqTreeNode *AcqTreeNode::treeRoot()
 {
 	AcqTreeNode *root = this;
 	while(root->m_treeParent) {
-		qInfo()<<root->m_name;
+		qInfo() << root->m_name;
 		root = root->m_treeParent;
 	}
 	return root;
 }
 
-ImportFloatChannelNode::ImportFloatChannelNode(SnapshotRecipe rec, QObject *parent) : AcqTreeNode(rec.name, parent), m_recipe(rec)
-{
+ImportFloatChannelNode::ImportFloatChannelNode(SnapshotRecipe rec, QObject *parent)
+	: AcqTreeNode(rec.name, parent)
+	, m_recipe(rec)
+{}
 
-}
+ImportFloatChannelNode::~ImportFloatChannelNode() {}
 
-ImportFloatChannelNode::~ImportFloatChannelNode()
-{
-
-}
-
-SnapshotRecipe ImportFloatChannelNode::recipe() const
-{
-	return m_recipe;
-}
+SnapshotRecipe ImportFloatChannelNode::recipe() const { return m_recipe; }

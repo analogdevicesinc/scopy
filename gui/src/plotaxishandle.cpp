@@ -41,10 +41,7 @@ void PlotAxisHandle::init()
 	});
 }
 
-void PlotAxisHandle::deinit() {
-	delete m_handle;
-
-}
+void PlotAxisHandle::deinit() { delete m_handle; }
 
 void PlotAxisHandle::setAxis(PlotAxis *axis)
 {

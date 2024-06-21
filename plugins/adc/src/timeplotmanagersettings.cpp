@@ -27,8 +27,6 @@ TimePlotManagerSettings::TimePlotManagerSettings(TimePlotManager *mgr, QWidget *
 
 TimePlotManagerSettings::~TimePlotManagerSettings() {}
 
-
-
 QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 {
 	m_pen = QPen(StyleHelper::getColor("ScopyBlue"));
@@ -43,10 +41,9 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 		uint32_t idx = m_plotManager->addPlot("Plot ");
 		TimePlotComponent *plt = m_plotManager->plot(idx);
 		addPlot(plt);
-
 	});
 
-	connect(m_plotManager, &TimePlotManager::plotRemoved, this, [=](uint32_t uuid){
+	connect(m_plotManager, &TimePlotManager::plotRemoved, this, [=](uint32_t uuid) {
 		TimePlotComponent *plt = m_plotManager->plot(uuid);
 		removePlot(plt);
 	});
@@ -58,7 +55,8 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 
 QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("X-AXIS", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *section =
+		new MenuSectionCollapseWidget("X-AXIS", MenuCollapseSection::MHCW_NONE, parent);
 
 	QWidget *bufferPlotSize = new QWidget(section);
 	QHBoxLayout *bufferPlotSizeLayout = new QHBoxLayout(bufferPlotSize);
@@ -283,10 +281,7 @@ void TimePlotManagerSettings::updateXAxis()
 	}
 }
 
-MenuWidget *TimePlotManagerSettings::menu()
-{
-	return m_menu;
-}
+MenuWidget *TimePlotManagerSettings::menu() { return m_menu; }
 
 void TimePlotManagerSettings::onStart()
 {
@@ -320,7 +315,7 @@ void TimePlotManagerSettings::setSyncBufferPlotSize(bool newSyncBufferPlotSize)
 void TimePlotManagerSettings::addPlot(TimePlotComponent *p)
 {
 	QWidget *plotMenu = p->plotMenu();
-	m_menu->add(plotMenu,p->name()+QString(p->uuid()),gui::MenuWidget::MA_TOPLAST);
+	m_menu->add(plotMenu, p->name() + QString(p->uuid()), gui::MenuWidget::MA_TOPLAST);
 }
 
 void TimePlotManagerSettings::removePlot(TimePlotComponent *p)
@@ -329,18 +324,19 @@ void TimePlotManagerSettings::removePlot(TimePlotComponent *p)
 	m_menu->remove(plotMenu);
 }
 
-
-void TimePlotManagerSettings::addChannel(ChannelComponent *c) {
+void TimePlotManagerSettings::addChannel(ChannelComponent *c)
+{
 	m_channels.append(c);
-	SampleRateProvider *srp = dynamic_cast<SampleRateProvider*>(c);
+	SampleRateProvider *srp = dynamic_cast<SampleRateProvider *>(c);
 	if(srp) {
 		addSampleRateProvider(srp);
 	}
 }
 
-void TimePlotManagerSettings::removeChannel(ChannelComponent *c) {
+void TimePlotManagerSettings::removeChannel(ChannelComponent *c)
+{
 	m_channels.removeAll(c);
-	SampleRateProvider *srp = dynamic_cast<SampleRateProvider*>(c);
+	SampleRateProvider *srp = dynamic_cast<SampleRateProvider *>(c);
 	if(srp) {
 		removeSampleRateProvider(srp);
 	}
@@ -352,9 +348,7 @@ void TimePlotManagerSettings::addSampleRateProvider(SampleRateProvider *s)
 	m_sampleRateProviders.append(s);
 }
 
-void TimePlotManagerSettings::removeSampleRateProvider(SampleRateProvider *s) {
-	m_sampleRateProviders.removeAll(s); }
-
+void TimePlotManagerSettings::removeSampleRateProvider(SampleRateProvider *s) { m_sampleRateProviders.removeAll(s); }
 
 double TimePlotManagerSettings::readSampleRate()
 {
@@ -383,7 +377,6 @@ void TimePlotManagerSettings::updateXModeCombo()
 	m_menu->collapseAll();
 	m_menu->setCollapsed(s, true);
 }*/
-
 
 } // namespace adc
 } // namespace scopy

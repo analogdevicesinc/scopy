@@ -3,11 +3,11 @@
 
 #include <QWidget>
 
-class Collapsable {
+class Collapsable
+{
 public:
 	virtual bool collapsed() = 0;
 	virtual void setCollapsed(bool b) = 0;
-
 };
 
 class CompositeWidget

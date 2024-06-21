@@ -31,8 +31,7 @@ ChannelComponent::ChannelComponent(QString ch, TimePlotComponent *m_plot, QPen p
 	m_enabled = true;
 }
 
-ChannelComponent::~ChannelComponent() {
-}
+ChannelComponent::~ChannelComponent() {}
 
 void ChannelComponent::onStart() {}
 
@@ -40,9 +39,7 @@ void ChannelComponent::onStop() {}
 
 void ChannelComponent::onInit() {}
 
-void ChannelComponent::onDeinit() {
-	m_plotChannelCmpt->deinitPlotComponent();
-}
+void ChannelComponent::onDeinit() { m_plotChannelCmpt->deinitPlotComponent(); }
 
 QPen ChannelComponent::pen() const { return m_pen; }
 
@@ -55,25 +52,13 @@ void ChannelComponent::setPlotChannelCmpt(TimePlotComponentChannel *newPlotChann
 	m_plotChannelCmpt = newPlotChannelCmpt;
 }
 
-MenuControlButton *ChannelComponent::ctrl()
-{
-	return m_ctrl;
-}
+MenuControlButton *ChannelComponent::ctrl() { return m_ctrl; }
 
-void ChannelComponent::addChannelToPlot()
-{
+void ChannelComponent::addChannelToPlot() {}
 
-}
+void ChannelComponent::removeChannelFromPlot() {}
 
-void ChannelComponent::removeChannelFromPlot()
-{
-
-}
-
-MenuWidget *ChannelComponent::menu()
-{
-	return m_menu;
-}
+MenuWidget *ChannelComponent::menu() { return m_menu; }
 
 void ChannelComponent::enable()
 {
@@ -87,9 +72,7 @@ void ChannelComponent::disable()
 	ToolComponent::disable();
 }
 
-void ChannelComponent::initMenu(QWidget *parent){
-	m_menu = new MenuWidget(m_channelName, m_pen, parent);
-}
+void ChannelComponent::initMenu(QWidget *parent) { m_menu = new MenuWidget(m_channelName, m_pen, parent); }
 
 void ChannelComponent::createMenuControlButton(ChannelComponent *c, QWidget *parent)
 {
@@ -108,9 +91,7 @@ void ChannelComponent::createMenuControlButton(ChannelComponent *c, QWidget *par
 		} else {
 			c->disable();
 		}
-	c->plotChannelCmpt()->m_plotComponent->replot();
+		c->plotChannelCmpt()->m_plotComponent->replot();
 	});
 	c->m_ctrl->checkBox()->setChecked(true);
-
 }
-

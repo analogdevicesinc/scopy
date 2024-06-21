@@ -55,12 +55,11 @@ public:
 	GRIIOFloatChannelSrc *m_grch;
 };
 
-class SCOPY_ADC_EXPORT GRTimeChannelComponent
-	: public ChannelComponent
-	, public GRChannel
-	, public MeasurementProvider
-	, public SampleRateProvider
-	, public ScaleProvider
+class SCOPY_ADC_EXPORT GRTimeChannelComponent : public ChannelComponent,
+						public GRChannel,
+						public MeasurementProvider,
+						public SampleRateProvider,
+						public ScaleProvider
 
 {
 	Q_OBJECT
@@ -72,7 +71,7 @@ public:
 	MeasureManagerInterface *getMeasureManager() override;
 
 	GRSignalPath *sigpath() override;
-	QVBoxLayout* menuLayout();
+	QVBoxLayout *menuLayout();
 
 	YMode ymode() const override;
 	void setYMode(YMode newYmode) override;
@@ -101,7 +100,6 @@ public Q_SLOTS:
 	void addChannelToPlot() override;
 	void removeChannelFromPlot() override;
 
-
 Q_SIGNALS:
 	void yModeChanged();
 
@@ -116,7 +114,7 @@ private:
 	PlotAutoscaler *m_autoscaler;
 	MenuOnOffSwitch *m_autoscaleBtn;
 	MenuCombo *m_ymodeCb;
-	IIOWidget* m_scaleWidget;
+	IIOWidget *m_scaleWidget;
 
 	MenuPlotChannelCurveStyleControl *m_curvemenu;
 	MenuSectionCollapseWidget *m_yaxisMenu;

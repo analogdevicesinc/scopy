@@ -8,7 +8,8 @@
 namespace scopy {
 namespace adc {
 
-class TimePlotManagerCombobox : public QWidget {
+class TimePlotManagerCombobox : public QWidget
+{
 	Q_OBJECT
 public:
 	TimePlotManagerCombobox(TimePlotManager *man, ChannelComponent *c, QWidget *parent = nullptr);
@@ -21,6 +22,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
 	void renamePlotSlot();
+
 private:
 	TimePlotManager *m_man;
 	ChannelComponent *m_ch;
@@ -28,9 +30,7 @@ private:
 	QComboBox *m_combo;
 
 	int findIndexFromUuid(uint32_t uuid);
-
-
 };
-}
-}
+} // namespace adc
+} // namespace scopy
 #endif // TIMEPLOTMANAGERCOMBOBOX_H
