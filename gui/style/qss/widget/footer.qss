@@ -1,0 +1,9 @@
+QWidget[&&property&&=true] {
+    background-color: &background&;
+    border: 1px solid &color_highlight&;
+    padding: 10px;
+    font-size: &unit_pixel_1&;
+    color: &color_highlight&;
+    text-align: center;
+}
+

@@ -1,0 +1,103 @@
+QPushButton[qss_button_basic=true] {
+    background-color: #3265B0; /* Blue background color */
+    color: #FFFFFF; /* White text color */
+    border: none; /* No border */
+    padding: 10px 20px; /* Padding for size */
+    border-radius: 10px; /* Rounded corners */
+    font-size: 16px; /* Font size */
+    font-weight: bold; /* Bold text */
+}
+
+QPushButton[qss_button_basic=true]:hover {
+    background-color: #3265B0; /* Darker blue on hover */
+}
+
+QPushButton[qss_button_basic=true]:pressed {
+    background-color: #29519B; /* Even darker blue on press */
+}
+QPushButton[qss_button_activateButton=true] {
+    background-color: #0078D7;
+    color: #FFFFFF;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+QPushButton[qss_button_activateButton=true]:hover {
+    background-color: #005BB5;
+}
+
+QPushButton[qss_button_activateButton=true]:pressed {
+    background-color: #005BB5;
+}
+QPushButton[qss_button_toolButton=true] {
+    background-color: #F7F8FA;
+    border: none;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+QPushButton[qss_button_toolButton=true]:hover {
+    background-color: #3265B0;
+}
+
+QPushButton[qss_button_toolButton=true]:pressed {
+    background-color: #29519B;
+}
+
+/* General Application Background */
+QWidget {
+    background-color: #F7F8FA;
+    font-family: Arial, sans-serif;
+}
+
+QWidget[qss_widget_deviceList=true] {
+    background-color: #FFFFFF;
+    border: 1px solid #3265B0;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: left;
+}
+QWidget[qss_widget_deviceItem=true] {
+    background-color: #FFFFFF;
+    border: 1px solid #F7F8FA;
+    border-radius: 8px;
+    padding: 10px;
+    color: #3265B0;
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+QWidget[qss_widget_deviceItem=true]:hover {
+    border-color: #F7F8FA;
+}
+
+QWidget[qss_widget_deviceItem=true]:checked {
+    background-color: #3265B0;
+    border-color: #29519B;
+}
+
+QWidget[qss_widget_footer=true] {
+    background-color: #F7F8FA;
+    border: 1px solid #29519B;
+    padding: 10px;
+    font-size: 12px;
+    color: #3265B0;
+    text-align: center;
+}
+
+QLabel[qss_label_sidebarLabel=true] {
+    font-size: 18px;
+}
+QLabel[qss_label_sidebarLabel=true] {
+    color: #F7F8FA;
+}
+QLabel[qss_label_headerLabel] {
+    color: #F7F8FA;
+}
+
+QLabel[qss_label_headerLabel=true] {
+    font-size: 24px;
+}

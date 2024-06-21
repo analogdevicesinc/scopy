@@ -1,0 +1,6 @@
+QLabel[&&property&&=true] {
+    font-size: 18px;
+}
+QLabel[&&property&&=true] {
+    color: &background&;
+}

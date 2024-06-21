@@ -209,7 +209,7 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 	generalSection->contentLayout()->addWidget(
 		PreferencesHelper::addPreferenceCheckBox(p, "show_graticule", "Show Graticule", generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
-		p, "general_theme", "Theme", {"default", "light"}, generalSection));
+		p, "general_theme", "Theme", {"dark", "light", "funky"}, generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
 		p, "general_language", "Language", t->getLanguages(), generalSection));
 

@@ -51,7 +51,7 @@
  qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/load.svg&quot;);
 }
 #btnPreferences {
- qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/preferences.svg&quot;);
+ qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/gear_wheel.svg&quot;);
 }
 #btnAbout {
  qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/info.svg&quot;);

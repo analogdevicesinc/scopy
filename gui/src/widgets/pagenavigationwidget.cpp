@@ -3,6 +3,7 @@
 #include <QBoxLayout>
 #include <QDebug>
 #include <QLoggingCategory>
+#include <style.h>
 
 #include <stylehelper.h>
 
@@ -28,20 +29,20 @@ void PageNavigationWidget::initUI(QWidget *parent)
 	buttonsLayout->setSpacing(10);
 
 	homeButton = new QPushButton(this);
-	StyleHelper::BlueIconButton(homeButton, QIcon(":/gui/icons/launcher_home.svg"), "homeButton");
+	StyleHelper::BlueIconButton(homeButton, Style::getPixmap(":/gui/icons/home.svg"), "homeButton");
 	buttonsLayout->addWidget(homeButton);
 	homeButton->hide();
 
 	backwardButton = new QPushButton(this);
-	StyleHelper::BlueIconButton(backwardButton, QIcon(":/gui/icons/handle_left_arrow.svg"), "backwardButton");
+	StyleHelper::BlueIconButton(backwardButton, Style::getPixmap(":/gui/icons/handle_left_arrow.svg"), "backwardButton");
 	buttonsLayout->addWidget(backwardButton);
 
 	forwardButton = new QPushButton(this);
-	StyleHelper::BlueIconButton(forwardButton, QIcon(":/gui/icons/handle_right_arrow.svg"), "forwardButton");
+	StyleHelper::BlueIconButton(forwardButton, Style::getPixmap(":/gui/icons/handle_right_arrow.svg"), "forwardButton");
 	buttonsLayout->addWidget(forwardButton);
 
 	openButton = new QPushButton(this);
-	StyleHelper::BlueIconButton(openButton, QIcon(":/gui/icons/sba_up_btn_pressed.svg"), "openButton");
+	StyleHelper::BlueIconButton(openButton, Style::getPixmap(":/gui/icons/sba_up_btn_pressed.svg"), "openButton");
 	buttonsLayout->addWidget(openButton);
 	openButton->hide();
 
