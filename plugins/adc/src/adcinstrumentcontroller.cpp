@@ -3,6 +3,7 @@
 #include "adcinstrument.h"
 #include "grdevicecomponent.h"
 #include "grtimechannelcomponent.h"
+#include "importchannelcomponent.h"
 #include "grtimesinkcomponent.h"
 
 #include <pluginbase/preferences.h>

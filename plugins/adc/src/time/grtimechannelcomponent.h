@@ -119,6 +119,7 @@ private:
 	IIOWidget* m_scaleWidget;
 
 	MenuPlotChannelCurveStyleControl *m_curvemenu;
+	MenuSectionCollapseWidget *m_yaxisMenu;
 
 	QPushButton *m_snapBtn;
 
