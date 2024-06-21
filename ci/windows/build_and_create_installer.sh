@@ -13,10 +13,12 @@ fi
 
 BUILD_TARGET=x86_64
 ARCH_BIT=64
-TOOLS_FOLDER=$WORKDIR/scopy-mingw-build-deps
-pushd $TOOLS_FOLDER
-source ./mingw_toolchain.sh $BUILD_TARGET OFF  # USING_STAGING = OFF
-popd
+
+## Set STAGING
+USE_STAGING=OFF
+##
+
+source $SRC_FOLDER/ci/windows/mingw_toolchain.sh $USE_STAGING
 
 export DEST_FOLDER=$WORKDIR/scopy_$ARCH
 BUILD_FOLDER=$WORKDIR/build_$ARCH
@@ -151,9 +153,16 @@ create_installer() {
 	ls -la $SRC_FOLDER
 }
 
-build_scopy
-build_iio-emu
-deploy_app
-bundle_drivers
-extract_debug_symbols
-create_installer
+
+run_workflow(){
+	build_scopy
+	build_iio-emu
+	deploy_app
+	bundle_drivers
+	extract_debug_symbols
+	create_installer
+}
+
+for arg in $@; do
+	$arg
+done
