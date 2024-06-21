@@ -39,9 +39,10 @@ MeasureComponent::MeasureComponent(ToolTemplate *tool, MeasurementPanelInterface
 	MeasurementsPanel *m_measurePanel = p->measurePanel();
 	StatsPanel *m_statsPanel = p->statsPanel();
 
-	connect(m_measureSettings, SIGNAL(enableMeasurementPanel), dynamic_cast<QObject *>(p),
-		SLOT(enableMeasurementPanel));
-	connect(m_measureSettings, SIGNAL(enableStatsPanel), dynamic_cast<QObject *>(p), SLOT(enableStatsPanel));
+	connect(m_measureSettings, SIGNAL(enableMeasurementPanel(bool)), dynamic_cast<QObject *>(p),
+		SLOT(enableMeasurementPanel(bool)));
+	connect(m_measureSettings, SIGNAL(enableStatsPanel(bool)), dynamic_cast<QObject *>(p),
+		SLOT(enableStatsPanel(bool)));
 	connect(m_measureSettings, &MeasurementSettings::sortMeasurements, m_measurePanel, &MeasurementsPanel::sort);
 	connect(m_measureSettings, &MeasurementSettings::sortStats, m_statsPanel, &StatsPanel::sort);
 }
