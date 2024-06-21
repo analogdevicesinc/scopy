@@ -40,8 +40,6 @@ GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, Time
 	m_measureMgr->initMeasure(m_pen);
 	m_measureMgr->getModel()->setAdcBitCount(m_src->getFmt()->bits);
 
-	widget = createMenu();
-
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	auto m_lay = new QVBoxLayout(this);
 	m_lay->setMargin(0);
@@ -57,11 +55,10 @@ GRTimeChannelComponent::~GRTimeChannelComponent() {}
 
 QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 {
-	MenuSectionWidget *yaxiscontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *yaxis = new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE, yaxiscontainer);
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_ONOFF, parent);
 
 	// Y-MODE
-	m_ymodeCb = new MenuCombo("YMODE", yaxis);
+	m_ymodeCb = new MenuCombo("YMODE", section);
 	auto cb = m_ymodeCb->combo();
 	cb->addItem("ADC Counts", YMODE_COUNT);
 	cb->addItem("% Full Scale", YMODE_FS);
@@ -72,9 +69,8 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 		m_scaleWidget = IIOWidgetFactory::buildAttrForChannel(m_src->channel(), m_src->scaleAttribute(),this);
 	}
 
-	m_yAxisCtrl = new MenuOnOffSwitch("LOCK Y-Axis");
-	m_yCtrl = new MenuPlotAxisRangeControl(m_plotChannelCmpt->m_timePlotYAxis, yaxis);
-	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), yaxis, false);
+	m_yCtrl = new MenuPlotAxisRangeControl(m_plotChannelCmpt->m_timePlotYAxis, section);
+	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), section, false);
 	m_autoscaler = new PlotAutoscaler(this);
 	m_autoscaler->addChannels(m_plotChannelCmpt->m_timePlotCh);
 
@@ -85,14 +81,11 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 		m_plotChannelCmpt->m_xyPlotYAxis->setInterval(m_yCtrl->min(), m_yCtrl->max());
 	});
 
-	connect(m_yAxisCtrl->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b){
-		m_yLock = b;
-		m_yCtrl->setVisible(!b);
-		m_autoscaleBtn->setVisible(!b);
-		m_plotChannelCmpt->setSingleYMode(b);
+	connect(section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b){
+		m_yLock = b;		
+		m_plotChannelCmpt->lockYAxis(!b);
 	});
 
-	m_yAxisCtrl->onOffswitch()->setChecked(true);
 
 	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
 		m_yCtrl->setEnabled(!b);
@@ -100,14 +93,12 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 		toggleAutoScale();
 	});
 
-	yaxis->contentLayout()->addWidget(m_yAxisCtrl);
-	yaxis->contentLayout()->addWidget(m_autoscaleBtn);
-	yaxis->contentLayout()->addWidget(m_yCtrl);
-	yaxis->contentLayout()->addWidget(m_ymodeCb);
+	section->contentLayout()->addWidget(m_autoscaleBtn);
+	section->contentLayout()->addWidget(m_yCtrl);
+	section->contentLayout()->addWidget(m_ymodeCb);
 	if(m_scaleWidget)
-		yaxis->contentLayout()->addWidget(m_scaleWidget);
+		section->contentLayout()->addWidget(m_scaleWidget);
 
-	yaxiscontainer->contentLayout()->addWidget(yaxis);
 
 	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		auto mode = cb->itemData(idx).toInt();
@@ -126,19 +117,17 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 		cb->setCurrentIndex(idx);
 	});
 
-	return yaxiscontainer;
+	return section;
 }
 
 QWidget *GRTimeChannelComponent::createCurveMenu(QWidget *parent)
 {
-	MenuSectionWidget *curvecontainer = new MenuSectionWidget(parent);
-	m_curveSection = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, curvecontainer);
-	m_curveSection->contentLayout()->setSpacing(10);
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("CURVE", MenuCollapseSection::MHCW_NONE, parent);
+	section->contentLayout()->setSpacing(10);
 
-	m_curvemenu = new MenuPlotChannelCurveStyleControl(m_curveSection);
-	curvecontainer->contentLayout()->addWidget(m_curveSection);
-	m_curveSection->contentLayout()->addWidget(m_curvemenu);
-	return curvecontainer;
+	m_curvemenu = new MenuPlotChannelCurveStyleControl(section);
+	section->contentLayout()->addWidget(m_curvemenu);
+	return section;
 }
 
 
@@ -168,53 +157,26 @@ QPushButton *GRTimeChannelComponent::createSnapshotButton(QWidget *parent)
 
 QWidget *GRTimeChannelComponent::createMenu(QWidget *parent)
 {
-	QWidget *w = new QWidget(parent);
-	QVBoxLayout *lay = new QVBoxLayout();
+	ChannelComponent::initMenu(parent);
+	QWidget *yaxismenu = createYAxisMenu(m_menu);
+	QWidget *curvemenu = createCurveMenu(m_menu);
+	QWidget *attrmenu = createAttrMenu(m_menu);
+	QWidget *measuremenu = m_measureMgr->createMeasurementMenu(m_menu);
+	m_snapBtn = createSnapshotButton(m_menu);
 
-	QScrollArea *scroll = new QScrollArea(parent);
-	QWidget *wScroll = new QWidget(scroll);
+	m_menu->add(yaxismenu, "yaxis");
+	m_menu->add(curvemenu, "curve");
+	m_menu->add(attrmenu, "attr");
+	m_menu->add(measuremenu, "measure");
+	m_menu->add(m_snapBtn, "snap",MenuWidget::MA_BOTTOMLAST);
 
-	m_layScroll = new QVBoxLayout();
-	m_layScroll->setMargin(0);
-	m_layScroll->setSpacing(10);
+	return m_menu;
 
-	wScroll->setLayout(m_layScroll);
-	scroll->setWidgetResizable(true);
-	scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	// if ScrollBarAlwaysOn - layScroll->setContentsMargins(0,0,6,0);
-
-	scroll->setWidget(wScroll);
-
-	lay->setMargin(0);
-	lay->setSpacing(10);
-	w->setLayout(lay);
-
-	MenuHeaderWidget *header = new MenuHeaderWidget(m_channelName, m_pen, w);
-	QWidget *yaxismenu = createYAxisMenu(w);
-
-	QWidget *curvemenu = createCurveMenu(w);
-	QWidget *attrmenu = createAttrMenu(w);
-	QWidget *measuremenu = m_measureMgr->createMeasurementMenu(w);
-	m_snapBtn = createSnapshotButton(w);
-
-	lay->addWidget(header);
-	lay->addWidget(scroll);
-	m_layScroll->addWidget(yaxismenu);
-	m_layScroll->addWidget(curvemenu);
-	m_layScroll->addWidget(attrmenu);
-	m_layScroll->addWidget(measuremenu);
-	m_layScroll->addWidget(m_snapBtn);
-
-	m_layScroll->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
-	return w;
 }
 
 QWidget *GRTimeChannelComponent::createAttrMenu(QWidget *parent)
 {
-	MenuSectionWidget *attrcontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *attr =
-		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrcontainer);
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
 	QList<IIOWidget *> attrWidgets = IIOWidgetFactory::buildAllAttrsForChannel(m_src->channel());
 
 	auto layout = new QVBoxLayout();
@@ -226,10 +188,9 @@ QWidget *GRTimeChannelComponent::createAttrMenu(QWidget *parent)
 		layout->addWidget(w);
 	}
 
-	attr->contentLayout()->addLayout(layout);
-	attrcontainer->contentLayout()->addWidget(attr);
-	attr->header()->setChecked(false);
-	return attrcontainer;
+	section->contentLayout()->addLayout(layout);
+	section->setCollapsed(true);
+	return section;
 }
 
 void GRTimeChannelComponent::onStart()
@@ -357,11 +318,6 @@ MeasureManagerInterface *GRTimeChannelComponent::getMeasureManager() { return m_
 
 GRSignalPath *GRTimeChannelComponent::sigpath() { return m_grtch->m_signalPath; }
 
-void GRTimeChannelComponent::insertMenuWidget(QWidget *w)
-{
-	m_curveSection->contentLayout()->addWidget(w);
-}
-
 QVBoxLayout *GRTimeChannelComponent::menuLayout()
 {
 	return m_layScroll;
@@ -370,14 +326,12 @@ QVBoxLayout *GRTimeChannelComponent::menuLayout()
 void GRTimeChannelComponent::enable()
 {
 	m_grtch->m_signalPath->setEnabled(true);
-	m_plotChannelCmpt->enable();
 	ChannelComponent::enable();
 }
 
 void GRTimeChannelComponent::disable()
 {
 	m_grtch->m_signalPath->setEnabled(false);
-	m_plotChannelCmpt->disable();
 	ChannelComponent::disable();
 }
 

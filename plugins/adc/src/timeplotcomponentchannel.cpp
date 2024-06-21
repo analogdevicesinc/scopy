@@ -83,7 +83,7 @@ void TimePlotComponentChannel::initPlotComponent(TimePlotComponent *plotComponen
 	xyplot->addPlotChannel(m_xyPlotCh);
 	m_xyPlotCh->setEnabled(true);
 
-	setSingleYMode(m_plotComponent->singleYMode());
+	lockYAxis(m_plotComponent->singleYMode());
 	m_timePlotYAxis->setInterval(-2048, 2048);
 	m_xyPlotYAxis->setInterval(-2048, 2048);
 	refreshData(true);
@@ -108,7 +108,7 @@ void TimePlotComponentChannel::onNewData(const float *xData_, const float *yData
 
 void TimePlotComponentChannel::setXyXData(const float *xyxdata) { m_xyXData = xyxdata; }
 
-void TimePlotComponentChannel::setSingleYMode(bool b)
+void TimePlotComponentChannel::lockYAxis(bool b)
 {
 	m_singleYMode = b;
 	if(m_singleYMode) {
@@ -130,16 +130,14 @@ void TimePlotComponentChannel::setSingleYMode(bool b)
 QWidget *TimePlotComponentChannel::createCurveMenu(QWidget *parent)
 {
 
-	MenuSectionWidget *curvecontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *curve = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, curvecontainer);
+	MenuSectionCollapseWidget *curve = new MenuSectionCollapseWidget("CURVE", MenuCollapseSection::MHCW_NONE, parent);
 
 	MenuPlotChannelCurveStyleControl *curveSettings = new MenuPlotChannelCurveStyleControl(curve);
 	curveSettings->addChannels(m_timePlotCh);
 
 	curve->contentLayout()->addWidget(curveSettings);
-	curvecontainer->contentLayout()->addWidget(curve);
 
-	return curvecontainer;
+	return curve;
 }
 
 void TimePlotComponentChannel::enable()

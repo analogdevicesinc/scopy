@@ -9,11 +9,14 @@
 #include "menucollapsesection.h"
 #include "menuplotchannelcurvestylecontrol.h"
 #include "menuplotaxisrangecontrol.h"
+#include "menuwidget.h"
+
 
 namespace scopy {
 namespace adc {
 
 class TimePlotComponentChannel;
+
 
 class GRChannel
 {
@@ -22,7 +25,7 @@ public:
 	virtual void onNewData(const float *xData, const float *yData, size_t size, bool copy) = 0;
 };
 
-class SCOPY_ADC_EXPORT ChannelComponent : public QWidget, public ToolComponent
+class SCOPY_ADC_EXPORT ChannelComponent : public QWidget, public ToolComponent, public Menu
 {
 	Q_OBJECT
 public:
@@ -38,8 +41,8 @@ public:
 	virtual MenuControlButton* ctrl();
 	virtual void addChannelToPlot();
 	virtual void removeChannelFromPlot();
-	virtual void insertMenuWidget(QWidget *);
 
+	MenuWidget *menu() override;
 	static void createMenuControlButton(ChannelComponent *c, QWidget *parent = nullptr);
 
 protected:
@@ -47,12 +50,16 @@ protected:
 	QPen m_pen;
 	QWidget *widget;
 	MenuControlButton *m_ctrl;
+	MenuWidget *m_menu;
 
 	ChannelData *m_chData;
 	TimePlotComponentChannel *m_plotChannelCmpt;
 
+	void initMenu(QWidget *parent = nullptr);
 
 public Q_SLOTS:
+	virtual void enable() override;
+	virtual void disable() override;
 	virtual void onStart() override;
 	virtual void onStop() override;
 	virtual void onInit() override;
@@ -70,7 +77,6 @@ public:
 	~ImportChannelComponent();
 
 	virtual void onInit() override;
-	virtual void insertMenuWidget(QWidget*) override;
 public Q_SLOTS:
 	void forgetChannel();
 private:
@@ -78,9 +84,7 @@ private:
 
 	QVBoxLayout *m_layScroll;
 	MenuPlotChannelCurveStyleControl *m_curvemenu;
-	MenuCollapseSection *m_curveSection;
 
-	MenuOnOffSwitch *m_yAxisCtrl;
 	MenuPlotAxisRangeControl *m_yCtrl;
 	PlotAutoscaler *m_autoscaler;
 	QPushButton *m_autoscaleBtn;

@@ -69,13 +69,9 @@ bool ADCPlugin::loadPreferencesPage()
 	m_preferencesPage = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
 
-	MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
-	MenuCollapseSection *generalSection =
-		new MenuCollapseSection("General", MenuCollapseSection::MHCW_NONE, generalWidget);
-	generalWidget->contentLayout()->setSpacing(10);
-	generalWidget->contentLayout()->addWidget(generalSection);
+	MenuSectionCollapseWidget *generalSection = new MenuSectionCollapseWidget("General", MenuCollapseSection::MHCW_NONE);
 	generalSection->contentLayout()->setSpacing(10);
-	lay->addWidget(generalWidget);
+	lay->addWidget(generalSection);
 	lay->setMargin(0);
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 

@@ -225,12 +225,9 @@ QWidget *TimeMeasureManager::createMeasurementMenuSection(QString category, QWid
 {
 
 	auto m_measureController = getController();
-	MenuSectionWidget *measureContainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *measureSection =
-		new MenuCollapseSection("MEASUREMENT " + category, MenuCollapseSection::MHCW_ARROW, measureContainer);
+	MenuSectionCollapseWidget *measureSection = new MenuSectionCollapseWidget("MEASUREMENT " + category, MenuCollapseSection::MHCW_ARROW, parent);
 	QScrollArea *measureScroll = new QScrollArea(measureSection);
 	MeasurementSelector *measureSelector = new MeasurementSelector();
-	measureContainer->contentLayout()->addWidget(measureSection);
 	measureSection->contentLayout()->addWidget(measureScroll);
 	measureScroll->setWidget(measureSelector);
 	measureScroll->setWidgetResizable(true);
@@ -257,13 +254,13 @@ QWidget *TimeMeasureManager::createMeasurementMenuSection(QString category, QWid
 				});
 		}
 	}
-	measureSection->header()->setChecked(false);
+	measureSection->setCollapsed(true);
 
 	connect(this, &MeasureManagerInterface::toggleAllMeasurement, measureSelector,
 		&MeasurementSelector::toggleAllMeasurement);
 	connect(this, &MeasureManagerInterface::toggleAllStats, measureSelector, &MeasurementSelector::toggleAllStats);
 
-	return measureContainer;
+	return measureSection;
 }
 
 /*
