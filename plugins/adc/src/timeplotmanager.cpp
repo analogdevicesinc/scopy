@@ -77,7 +77,9 @@ uint32_t TimePlotManager::addPlot(QString name)
 	});
 
 	addComponent(plt);
-	m_lay->insertWidget(-1, plt);
+
+	int idx = m_lay->indexOf(m_statsPanel);
+	m_lay->insertWidget(idx, plt);
 	for(TimePlotManagerCombobox *p : m_channelPlotcomboMap.values()) {
 		p->addPlot(plt);
 	}
