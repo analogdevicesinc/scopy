@@ -26,8 +26,8 @@ public:
 	virtual double readSampleRate() { return -1; }
 	static QString findAttribute(QStringList possibleNames, iio_channel *);
 
-	virtual bool scaleAttributeAvailable() { return false;};
-	virtual double readScale() { return 1;};
+	virtual bool scaleAttributeAvailable() { return false; };
+	virtual double readScale() { return 1; };
 
 protected:
 	QString channelName;

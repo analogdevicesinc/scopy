@@ -69,7 +69,8 @@ bool ADCPlugin::loadPreferencesPage()
 	m_preferencesPage = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
 
-	MenuSectionCollapseWidget *generalSection = new MenuSectionCollapseWidget("General", MenuCollapseSection::MHCW_NONE);
+	MenuSectionCollapseWidget *generalSection =
+		new MenuSectionCollapseWidget("General", MenuCollapseSection::MHCW_NONE);
 	generalSection->contentLayout()->setSpacing(10);
 	lay->addWidget(generalSection);
 	lay->setMargin(0);
@@ -198,7 +199,8 @@ bool ADCPlugin::onConnect()
 	auto timeProxy = new ADCInstrumentController("adc0", root, this);
 	time = new ADCInstrument(timeProxy);
 	connect(root, &AcqTreeNode::newChild, timeProxy, &ADCInstrumentController::addChannel, Qt::QueuedConnection);
-	connect(root, &AcqTreeNode::deletedChild, timeProxy, &ADCInstrumentController::removeChannel, Qt::QueuedConnection);
+	connect(root, &AcqTreeNode::deletedChild, timeProxy, &ADCInstrumentController::removeChannel,
+		Qt::QueuedConnection);
 	createGRIIOTreeNode(ctxNode, m_ctx);
 	// root->treeChildren()[0]->addTreeChild(new AcqTreeNode("other"));
 

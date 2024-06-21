@@ -56,7 +56,7 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 	m_plotMenu = new TimePlotComponentSettings(this, parent);
 	addComponent(m_plotMenu);
 
-	connect(m_plotMenu, &TimePlotComponentSettings::requestDeletePlot, this, [=](){Q_EMIT requestDeletePlot();});
+	connect(m_plotMenu, &TimePlotComponentSettings::requestDeletePlot, this, [=]() { Q_EMIT requestDeletePlot(); });
 }
 
 TimePlotComponent::~TimePlotComponent() {}
@@ -96,7 +96,8 @@ void TimePlotComponent::showXSourceOnXy(bool b)
 	m_XYXChannel->plotChannelCmpt()->m_xyPlotCh->setEnabled(b);
 }
 
-void TimePlotComponent::setName(QString s) {
+void TimePlotComponent::setName(QString s)
+{
 	m_name = s;
 	Q_EMIT nameChanged(s);
 }
@@ -125,7 +126,8 @@ void TimePlotComponent::setXYXChannel(ChannelComponent *c)
 	}
 }
 
-void TimePlotComponent::onXyXNewData(const float *xData_, const float *yData_, size_t size, bool copy) {
+void TimePlotComponent::onXyXNewData(const float *xData_, const float *yData_, size_t size, bool copy)
+{
 	xyXData = yData_;
 	for(TimePlotComponentChannel *ch : qAsConst(m_channels)) {
 		ch->setXyXData(xyXData);
@@ -133,13 +135,13 @@ void TimePlotComponent::onXyXNewData(const float *xData_, const float *yData_, s
 	}
 }
 
-void TimePlotComponent::refreshXYXData() {
+void TimePlotComponent::refreshXYXData()
+{
 	for(TimePlotComponentChannel *ch : qAsConst(m_channels)) {
 		ch->setXyXData(xyXData);
 		ch->refreshData(true);
 	}
 }
-
 
 void TimePlotComponent::addChannel(ChannelComponent *c)
 {

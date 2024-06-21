@@ -23,7 +23,7 @@ MenuCollapseHeader::MenuCollapseHeader(QString title, MenuCollapseSection::MenuH
 	m_label->setReadOnly(false);
 
 	StyleHelper::MenuCollapseHeaderLineEdit(m_label, "menuCollapseLabel");
-	m_label->setTextMargins(0,0,0,0);
+	m_label->setTextMargins(0, 0, 0, 0);
 
 	switch(style) {
 	case MenuCollapseSection::MHCW_ARROW:
@@ -35,9 +35,7 @@ MenuCollapseHeader::MenuCollapseHeader(QString title, MenuCollapseSection::MenuH
 	case MenuCollapseSection::MHCW_ONOFF:
 		m_ctrl = new SmallOnOffSwitch(this);
 		StyleHelper::MenuOnOffSwitchButton(dynamic_cast<SmallOnOffSwitch *>(m_ctrl), "menuCollapseButton");
-		connect(this, &QAbstractButton::toggled, [=](bool b) {
-			m_ctrl->setChecked(b);
-		});
+		connect(this, &QAbstractButton::toggled, [=](bool b) { m_ctrl->setChecked(b); });
 		m_ctrl->setChecked(true);
 		break;
 	default:

@@ -37,12 +37,13 @@ private:
 	QVBoxLayout *m_layout;
 };
 
-class SCOPY_GUI_EXPORT MenuSectionCollapseWidget : public QWidget, public Collapsable, public CompositeWidget {
+class SCOPY_GUI_EXPORT MenuSectionCollapseWidget : public QWidget, public Collapsable, public CompositeWidget
+{
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
 public:
-
-	MenuSectionCollapseWidget(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style, QWidget *parent = nullptr);
+	MenuSectionCollapseWidget(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style,
+				  QWidget *parent = nullptr);
 	~MenuSectionCollapseWidget();
 	QVBoxLayout *contentLayout() const;
 
@@ -51,13 +52,12 @@ public:
 
 	bool collapsed() override;
 	void setCollapsed(bool b) override;
-	MenuCollapseSection* collapseSection();
+	MenuCollapseSection *collapseSection();
 
 private:
 	QVBoxLayout *m_layout;
-	MenuSectionWidget* m_section;
+	MenuSectionWidget *m_section;
 	MenuCollapseSection *m_collapse;
-
 };
 
 } // namespace scopy

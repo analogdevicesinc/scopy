@@ -68,6 +68,7 @@ public:
 
 private Q_SLOTS:
 	void onXyXNewData(const float *xData_, const float *yData_, size_t size, bool copy);
+
 private:
 	uint32_t m_uuid;
 	QHBoxLayout *m_plotLayout;

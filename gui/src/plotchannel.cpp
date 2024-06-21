@@ -15,11 +15,10 @@ PlotChannel::PlotChannel(QString name, QPen pen, PlotAxis *xAxis, PlotAxis *yAxi
 	, m_style(0)
 	, m_thickness(1)
 
+{}
+
+void PlotChannel::init()
 {
-
-}
-
-void PlotChannel::init() {
 	m_curve = new QwtPlotCurve(m_name);
 	m_curve->setAxes(m_xAxis->axisId(), m_yAxis->axisId());
 	m_curve->setStyle(QwtPlotCurve::Lines);
@@ -33,12 +32,9 @@ void PlotChannel::init() {
 	// curvefitter (?)
 }
 
-void PlotChannel::deinit() {
-	delete m_curve;
-}
+void PlotChannel::deinit() { delete m_curve; }
 
-PlotChannel::~PlotChannel() {
-}
+PlotChannel::~PlotChannel() {}
 
 QwtPlotCurve *PlotChannel::curve() const { return m_curve; }
 
@@ -168,30 +164,22 @@ PlotAxis *PlotChannel::yAxis() const { return m_yAxis; }
 
 PlotAxis *PlotChannel::xAxis() const { return m_xAxis; }
 
-
-int PlotChannel::thickness() const
-{
-	return m_thickness;
-}
+int PlotChannel::thickness() const { return m_thickness; }
 
 void PlotChannel::setThickness(int newThickness)
 {
-	if (m_thickness == newThickness)
+	if(m_thickness == newThickness)
 		return;
 	m_thickness = newThickness;
 	setThicknessInternal(newThickness);
 	Q_EMIT thicknessChanged();
 }
 
-
-int PlotChannel::style() const
-{
-	return m_style;
-}
+int PlotChannel::style() const { return m_style; }
 
 void PlotChannel::setStyle(int newStyle)
 {
-	if (m_style == newStyle)
+	if(m_style == newStyle)
 		return;
 	m_style = newStyle;
 	setStyleInternal(newStyle);

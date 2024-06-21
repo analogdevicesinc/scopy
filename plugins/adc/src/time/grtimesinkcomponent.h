@@ -34,7 +34,6 @@ public Q_SLOTS:
 	virtual void onInit() override;
 	virtual void onDeinit() override;
 
-
 	void addChannel(GRChannel *ch);
 	void removeChannel(GRChannel *c);
 Q_SIGNALS:
@@ -56,7 +55,6 @@ private:
 	QList<GRChannel *> m_channels;
 
 	// SampleRateProvider interface
-
 };
 } // namespace adc
 } // namespace scopy

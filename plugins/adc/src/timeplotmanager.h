@@ -32,7 +32,7 @@ public:
 	StatsPanel *statsPanel() const override;
 
 	QWidget *createMenu(QWidget *parent);
-	QWidget* plotCombo(ChannelComponent *c);
+	QWidget *plotCombo(ChannelComponent *c);
 
 public Q_SLOTS:
 	void replot();
@@ -51,7 +51,7 @@ private:
 	QList<TimePlotComponentChannel *> m_channels;
 	MeasurementsPanel *m_measurePanel;
 	StatsPanel *m_statsPanel;
-	QMap<ChannelComponent*, TimePlotManagerCombobox*> m_channelPlotcomboMap;
+	QMap<ChannelComponent *, TimePlotManagerCombobox *> m_channelPlotcomboMap;
 	// PlotSettings *m_plotSettings;
 };
 } // namespace adc

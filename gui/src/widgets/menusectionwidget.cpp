@@ -34,8 +34,9 @@ MenuVScrollArea::~MenuVScrollArea() {}
 
 QVBoxLayout *MenuVScrollArea::contentLayout() const { return m_layout; }
 
-
-MenuSectionCollapseWidget::MenuSectionCollapseWidget(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style, QWidget *parent) : QWidget(parent)
+MenuSectionCollapseWidget::MenuSectionCollapseWidget(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style,
+						     QWidget *parent)
+	: QWidget(parent)
 {
 	m_layout = new QVBoxLayout(this);
 	m_layout->setSpacing(0);
@@ -47,38 +48,17 @@ MenuSectionCollapseWidget::MenuSectionCollapseWidget(QString title, MenuCollapse
 	m_section->contentLayout()->addWidget(m_collapse);
 }
 
-MenuSectionCollapseWidget::~MenuSectionCollapseWidget()
-{
+MenuSectionCollapseWidget::~MenuSectionCollapseWidget() {}
 
-}
+QVBoxLayout *MenuSectionCollapseWidget::contentLayout() const { return m_collapse->contentLayout(); }
 
-QVBoxLayout *MenuSectionCollapseWidget::contentLayout() const
-{
-	return m_collapse->contentLayout();
-}
+void MenuSectionCollapseWidget::add(QWidget *w) { m_collapse->contentLayout()->addWidget(w); }
 
-void MenuSectionCollapseWidget::add(QWidget *w)
-{
-	m_collapse->contentLayout()->addWidget(w);
-}
+void MenuSectionCollapseWidget::remove(QWidget *w) { m_collapse->contentLayout()->removeWidget(w); }
 
-void MenuSectionCollapseWidget::remove(QWidget *w)
-{
-	m_collapse->contentLayout()->removeWidget(w);
-}
+bool MenuSectionCollapseWidget::collapsed() { return m_collapse->header()->isChecked(); }
 
-bool MenuSectionCollapseWidget::collapsed()
-{
-	return m_collapse->header()->isChecked();
-}
+void MenuSectionCollapseWidget::setCollapsed(bool b) { m_collapse->header()->setChecked(!b); }
 
-void MenuSectionCollapseWidget::setCollapsed(bool b)
-{
-	m_collapse->header()->setChecked(!b);
-}
-
-MenuCollapseSection *MenuSectionCollapseWidget::collapseSection()
-{
-	return m_collapse;
-}
+MenuCollapseSection *MenuSectionCollapseWidget::collapseSection() { return m_collapse; }
 #include "moc_menusectionwidget.cpp"
