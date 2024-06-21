@@ -33,7 +33,6 @@ Q_SIGNALS:
 	void scalePosChanged(double);
 	void updatePos();
 
-
 private:
 	double m_pos;
 	PlotWidget *m_plotWidget;

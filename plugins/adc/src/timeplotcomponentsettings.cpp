@@ -23,7 +23,8 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	setLayout(v);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("APLOT - " + plt->name(), MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *section =
+		new MenuSectionCollapseWidget("APLOT - " + plt->name(), MenuCollapseSection::MHCW_NONE, parent);
 
 	MenuCollapseSection *plotMenu = section->collapseSection();
 	v->addWidget(section);
@@ -97,7 +98,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 
 	m_deletePlot = new QPushButton("DELETE PLOT");
 	StyleHelper::BlueButton(m_deletePlot);
-	connect(m_deletePlot, &QAbstractButton::clicked, this, [=](){Q_EMIT requestDeletePlot();});
+	connect(m_deletePlot, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
 
 	plotMenu->contentLayout()->addWidget(m_autoscaleBtn);
 	plotMenu->contentLayout()->addWidget(m_yCtrl);
@@ -114,7 +115,6 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	plotMenu->contentLayout()->addWidget(m_deletePlot);
 	plotMenu->contentLayout()->setSpacing(10);
 
-
 	m_autoscaleBtn->setVisible(true);
 	m_yCtrl->setVisible(true);
 	m_xAxisSrc->setVisible(false);
@@ -127,21 +127,22 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	labelsSwitch->onOffswitch()->setChecked(true);
 	labelsSwitch->onOffswitch()->setChecked(false);
 
-	m_deletePlotHover = new QPushButton("",nullptr);
+	m_deletePlotHover = new QPushButton("", nullptr);
 	m_deletePlotHover->setMaximumSize(16, 16);
 	m_deletePlotHover->setIcon(QIcon(":/gui/icons/orange_close.svg"));
 
-	HoverWidget *hv = new HoverWidget(m_deletePlotHover,m_plotComponent,m_plotComponent);
+	HoverWidget *hv = new HoverWidget(m_deletePlotHover, m_plotComponent, m_plotComponent);
 	hv->setStyleSheet("background-color: transparent; border: 0px;");
 	hv->setContentPos(HP_TOPLEFT);
 	hv->setAnchorPos(HP_BOTTOMRIGHT);
 	hv->setVisible(true);
 	hv->raise();
 
-	connect(m_deletePlotHover, &QAbstractButton::clicked, this, [=](){Q_EMIT requestDeletePlot();});
+	connect(m_deletePlotHover, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
 }
 
-void TimePlotComponentSettings::showDeleteButtons(bool b) {
+void TimePlotComponentSettings::showDeleteButtons(bool b)
+{
 	m_deletePlot->setVisible(b);
 	m_deletePlotHover->setVisible(b);
 }
@@ -153,7 +154,7 @@ void TimePlotComponentSettings::addChannel(ChannelComponent *c)
 	// https://stackoverflow.com/questions/44501171/qvariant-with-custom-class-pointer-does-not-return-same-address
 	m_xAxisSrc->combo()->addItem(c->name(), QVariant::fromValue(static_cast<void *>(c)));
 	m_autoscaler->addChannels(c->plotChannelCmpt()->m_timePlotCh);
-	ScaleProvider *sp = dynamic_cast<ScaleProvider*>(c);
+	ScaleProvider *sp = dynamic_cast<ScaleProvider *>(c);
 	if(sp) {
 		m_scaleProviders.append(sp);
 		updateYModeCombo();
@@ -171,7 +172,7 @@ void TimePlotComponentSettings::removeChannel(ChannelComponent *c)
 	int comboId = m_xAxisSrc->combo()->findData(QVariant::fromValue(static_cast<void *>(c)));
 	m_xAxisSrc->combo()->removeItem(comboId);
 	m_autoscaler->removeChannels(c->plotChannelCmpt()->m_timePlotCh);
-	ScaleProvider *sp = dynamic_cast<ScaleProvider*>(c);
+	ScaleProvider *sp = dynamic_cast<ScaleProvider *>(c);
 	if(sp) {
 		m_scaleProviders.removeAll(sp);
 		updateYModeCombo();
@@ -205,7 +206,6 @@ void TimePlotComponentSettings::toggleAutoScale()
 	}
 }
 
-
 void TimePlotComponentSettings::updateYModeCombo()
 {
 	bool scaleItemCbtmp = true;
@@ -232,10 +232,11 @@ void TimePlotComponentSettings::updateYModeCombo()
 	}
 }
 
-void TimePlotComponentSettings::updateYAxis() {
+void TimePlotComponentSettings::updateYAxis()
+{
 	double max = -1000000.0;
 	double min = 1000000.0;
-	for(ScaleProvider* s : qAsConst(m_scaleProviders)) {
+	for(ScaleProvider *s : qAsConst(m_scaleProviders)) {
 		if(s->yMax() > max) {
 			max = s->yMax();
 		}

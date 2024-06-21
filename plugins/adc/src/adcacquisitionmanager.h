@@ -35,7 +35,7 @@ public:
 	AcqTreeNode *treeParent() const;
 	void setTreeParent(AcqTreeNode *newTreeParent);
 	QList<AcqTreeNode *> treeChildren() const;
-	AcqTreeNode* treeRoot();
+	AcqTreeNode *treeRoot();
 
 Q_SIGNALS:
 	void newChild(AcqTreeNode *);
@@ -102,7 +102,6 @@ private:
 	SnapshotRecipe m_recipe;
 };
 
-
 /*
 class IIODeviceNode : public AcqTreeNode {
 public:
@@ -138,7 +137,7 @@ private:
 };
 
  */
-}
+} // namespace adc
 } // namespace scopy
 
 #endif // ADCACQUISITIONMANAGER_H

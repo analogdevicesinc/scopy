@@ -225,7 +225,8 @@ QWidget *TimeMeasureManager::createMeasurementMenuSection(QString category, QWid
 {
 
 	auto m_measureController = getController();
-	MenuSectionCollapseWidget *measureSection = new MenuSectionCollapseWidget("MEASUREMENT " + category, MenuCollapseSection::MHCW_ARROW, parent);
+	MenuSectionCollapseWidget *measureSection =
+		new MenuSectionCollapseWidget("MEASUREMENT " + category, MenuCollapseSection::MHCW_ARROW, parent);
 	QScrollArea *measureScroll = new QScrollArea(measureSection);
 	MeasurementSelector *measureSelector = new MeasurementSelector();
 	measureSection->contentLayout()->addWidget(measureScroll);

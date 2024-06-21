@@ -17,6 +17,7 @@ public:
 	void add(QWidget *ch) override;
 	void remove(QWidget *ch) override;
 	void addEnd(QWidget *ch);
+
 private:
 	QSpacerItem *spacer;
 	QVBoxLayout *lay;

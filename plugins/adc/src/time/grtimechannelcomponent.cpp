@@ -32,7 +32,7 @@ GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, Time
 	m_autoscaleEnabled = false;
 
 	m_scaleAvailable = m_src->scaleAttributeAvailable(); // query from GRIIOFloatChannel;
-	m_unit = "Volts";	 // query from GRIIOFloatChannel;
+	m_unit = "Volts";				     // query from GRIIOFloatChannel;
 
 	m_channelName = node->name();
 
@@ -66,7 +66,7 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 	m_scaleWidget = nullptr;
 	if(m_scaleAvailable) {
 		cb->addItem(m_unit, YMODE_SCALE);
-		m_scaleWidget = IIOWidgetFactory::buildAttrForChannel(m_src->channel(), m_src->scaleAttribute(),this);
+		m_scaleWidget = IIOWidgetFactory::buildAttrForChannel(m_src->channel(), m_src->scaleAttribute(), this);
 	}
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_plotChannelCmpt->m_timePlotYAxis, m_yaxisMenu);
@@ -81,11 +81,10 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 		m_plotChannelCmpt->m_xyPlotYAxis->setInterval(m_yCtrl->min(), m_yCtrl->max());
 	});
 
-	connect(m_yaxisMenu->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b){
-		m_yLock = b;		
+	connect(m_yaxisMenu->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
+		m_yLock = b;
 		m_plotChannelCmpt->lockYAxis(!b);
 	});
-
 
 	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
 		m_yCtrl->setEnabled(!b);
@@ -98,7 +97,6 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 	m_yaxisMenu->contentLayout()->addWidget(m_ymodeCb);
 	if(m_scaleWidget)
 		m_yaxisMenu->contentLayout()->addWidget(m_scaleWidget);
-
 
 	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		auto mode = cb->itemData(idx).toInt();
@@ -122,14 +120,14 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 
 QWidget *GRTimeChannelComponent::createCurveMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("CURVE", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *section =
+		new MenuSectionCollapseWidget("CURVE", MenuCollapseSection::MHCW_NONE, parent);
 	section->contentLayout()->setSpacing(10);
 
 	m_curvemenu = new MenuPlotChannelCurveStyleControl(section);
 	section->contentLayout()->addWidget(m_curvemenu);
 	return section;
 }
-
 
 QPushButton *GRTimeChannelComponent::createSnapshotButton(QWidget *parent)
 {
@@ -144,16 +142,14 @@ QPushButton *GRTimeChannelComponent::createSnapshotButton(QWidget *parent)
 			y.push_back(data->sample(i).y());
 		}
 		SnapshotRecipe rec{x, y, m_plotChannelCmpt->m_plotComponent, "REF - " + m_channelName};
-		AcqTreeNode* treeRoot= m_node->treeRoot();
-		ImportFloatChannelNode *snap = new ImportFloatChannelNode(rec,treeRoot);
+		AcqTreeNode *treeRoot = m_node->treeRoot();
+		ImportFloatChannelNode *snap = new ImportFloatChannelNode(rec, treeRoot);
 		treeRoot->addTreeChild(snap);
-
 	});
 
 	snapBtn->setEnabled(false);
 	return snapBtn;
 }
-
 
 QWidget *GRTimeChannelComponent::createMenu(QWidget *parent)
 {
@@ -168,15 +164,15 @@ QWidget *GRTimeChannelComponent::createMenu(QWidget *parent)
 	m_menu->add(curvemenu, "curve");
 	m_menu->add(attrmenu, "attr");
 	m_menu->add(measuremenu, "measure");
-	m_menu->add(m_snapBtn, "snap",MenuWidget::MA_BOTTOMLAST);
+	m_menu->add(m_snapBtn, "snap", MenuWidget::MA_BOTTOMLAST);
 
 	return m_menu;
-
 }
 
 QWidget *GRTimeChannelComponent::createAttrMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *section =
+		new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
 	QList<IIOWidget *> attrWidgets = IIOWidgetFactory::buildAllAttrsForChannel(m_src->channel());
 
 	auto layout = new QVBoxLayout();
@@ -253,7 +249,7 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 			ymin = 0;
 			ymax = 1;
 		}
-		//m_plotCh->yAxis()->setUnits("");
+		// m_plotCh->yAxis()->setUnits("");
 		break;
 	case YMODE_SCALE:
 		if(m_scaleAvailable) {
@@ -271,7 +267,7 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 		ymin = ymin * scale;
 		ymax = ymax * scale;
 
-		//m_plotCh->yAxis()->setUnits(m_unit);
+		// m_plotCh->yAxis()->setUnits(m_unit);
 
 		break;
 	default:
@@ -296,32 +292,19 @@ void GRTimeChannelComponent::removeChannelFromPlot()
 	m_curvemenu->removeChannels(m_plotChannelCmpt->m_xyPlotCh);
 }
 
-bool GRTimeChannelComponent::scaleAvailable() const
-{
-	return m_scaleAvailable;
-}
+bool GRTimeChannelComponent::scaleAvailable() const { return m_scaleAvailable; }
 
-bool GRTimeChannelComponent::yLock() const {
-	return m_yLock;
-}
+bool GRTimeChannelComponent::yLock() const { return m_yLock; }
 
-double GRTimeChannelComponent::yMin() const {
-	return m_yCtrl->min();
-}
+double GRTimeChannelComponent::yMin() const { return m_yCtrl->min(); }
 
-double GRTimeChannelComponent::yMax() const {
-	return m_yCtrl->max();
-}
-
+double GRTimeChannelComponent::yMax() const { return m_yCtrl->max(); }
 
 MeasureManagerInterface *GRTimeChannelComponent::getMeasureManager() { return m_measureMgr; }
 
 GRSignalPath *GRTimeChannelComponent::sigpath() { return m_grtch->m_signalPath; }
 
-QVBoxLayout *GRTimeChannelComponent::menuLayout()
-{
-	return m_layScroll;
-}
+QVBoxLayout *GRTimeChannelComponent::menuLayout() { return m_layScroll; }
 
 void GRTimeChannelComponent::enable()
 {
@@ -360,25 +343,15 @@ void GRTimeChannelComponent::onNewData(const float *xData, const float *yData, s
 	m_snapBtn->setEnabled(true);
 }
 
+bool GRTimeChannelComponent::sampleRateAvailable() { return m_src->samplerateAttributeAvailable(); }
 
-bool GRTimeChannelComponent::sampleRateAvailable()
-{
-	return m_src->samplerateAttributeAvailable();
-}
+double GRTimeChannelComponent::sampleRate() { return m_src->readSampleRate(); }
 
-double GRTimeChannelComponent::sampleRate()
-{
-	return m_src->readSampleRate();
-}
-
-YMode GRTimeChannelComponent::ymode() const
-{
-	return m_ymode;
-}
+YMode GRTimeChannelComponent::ymode() const { return m_ymode; }
 
 void GRTimeChannelComponent::setYMode(YMode newYmode)
 {
-	if (m_ymode == newYmode)
+	if(m_ymode == newYmode)
 		return;
 	m_ymode = newYmode;
 	setYModeHelper(newYmode);

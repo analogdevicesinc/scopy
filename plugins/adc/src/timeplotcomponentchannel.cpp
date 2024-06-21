@@ -91,8 +91,7 @@ void TimePlotComponentChannel::initPlotComponent(TimePlotComponent *plotComponen
 	refreshData(true);
 }
 
-TimePlotComponentChannel::~TimePlotComponentChannel() {
-}
+TimePlotComponentChannel::~TimePlotComponentChannel() {}
 
 void TimePlotComponentChannel::refreshData(bool copy)
 {
@@ -132,7 +131,8 @@ void TimePlotComponentChannel::lockYAxis(bool b)
 QWidget *TimePlotComponentChannel::createCurveMenu(QWidget *parent)
 {
 
-	MenuSectionCollapseWidget *curve = new MenuSectionCollapseWidget("CURVE", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *curve =
+		new MenuSectionCollapseWidget("CURVE", MenuCollapseSection::MHCW_NONE, parent);
 
 	MenuPlotChannelCurveStyleControl *curveSettings = new MenuPlotChannelCurveStyleControl(curve);
 	curveSettings->addChannels(m_timePlotCh);

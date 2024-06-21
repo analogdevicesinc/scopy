@@ -11,12 +11,10 @@
 #include "menuplotaxisrangecontrol.h"
 #include "menuwidget.h"
 
-
 namespace scopy {
 namespace adc {
 
 class TimePlotComponentChannel;
-
 
 class GRChannel
 {
@@ -38,7 +36,7 @@ public:
 	TimePlotComponentChannel *plotChannelCmpt() const;
 	void setPlotChannelCmpt(TimePlotComponentChannel *newPlotChannelCmpt);
 
-	virtual MenuControlButton* ctrl();
+	virtual MenuControlButton *ctrl();
 	virtual void addChannelToPlot();
 	virtual void removeChannelFromPlot();
 
@@ -67,7 +65,6 @@ public Q_SLOTS:
 
 	// void onNewData(const float *xData, const float *yData, int size, bool latch);
 };
-
 
 } // namespace adc
 } // namespace scopy

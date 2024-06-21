@@ -5,7 +5,8 @@
 using namespace scopy;
 using namespace scopy::gui;
 
-MenuWidget::MenuWidget(QString name, QPen p, QWidget *parent) : QWidget(parent)
+MenuWidget::MenuWidget(QString name, QPen p, QWidget *parent)
+	: QWidget(parent)
 {
 	uuid = 0;
 	QVBoxLayout *lay = new QVBoxLayout();
@@ -35,22 +36,18 @@ MenuWidget::MenuWidget(QString name, QPen p, QWidget *parent) : QWidget(parent)
 	m_header = new MenuHeaderWidget(name, p, this);
 	lay->addWidget(m_header);
 	lay->addWidget(scroll);
-
 }
 
-MenuWidget::~MenuWidget()
-{
-
-}
+MenuWidget::~MenuWidget() {}
 
 void MenuWidget::add(QWidget *w, QString name, MenuAlignment position)
 {
 	m_widgetMap.insert(name, w);
 	int spacerIndex = m_layScroll->indexOf(m_spacer);
-	switch(position){
+	switch(position) {
 
 	case MA_TOPFIRST:
-		m_layScroll->insertWidget(0,w);
+		m_layScroll->insertWidget(0, w);
 		break;
 	case MA_TOPLAST:
 		m_layScroll->insertWidget(spacerIndex, w);
@@ -59,28 +56,24 @@ void MenuWidget::add(QWidget *w, QString name, MenuAlignment position)
 		m_layScroll->insertWidget(spacerIndex + 1, w);
 		break;
 	case MA_BOTTOMLAST:
-		m_layScroll->insertWidget(-1,w);
+		m_layScroll->insertWidget(-1, w);
 		break;
 	}
 }
 
 void MenuWidget::add(QWidget *w)
 {
-	add(w,"widget" + QString(uuid), MA_TOPLAST);
+	add(w, "widget" + QString(uuid), MA_TOPLAST);
 	uuid++;
 }
 
-void MenuWidget::add(QWidget *w, QString name)
-{
-	add(w, name, MA_TOPLAST);
-}
+void MenuWidget::add(QWidget *w, QString name) { add(w, name, MA_TOPLAST); }
 
 void MenuWidget::remove(QWidget *w)
 {
 	m_widgetMap.remove(widgetName(w));
 	m_layScroll->removeWidget(w);
 }
-
 
 void MenuWidget::remove(QString s)
 {
@@ -89,34 +82,29 @@ void MenuWidget::remove(QString s)
 	m_layScroll->removeWidget(w);
 }
 
-MenuHeaderWidget *MenuWidget::header()
-{
-	return m_header;
-}
+MenuHeaderWidget *MenuWidget::header() { return m_header; }
 
-QWidget *MenuWidget::findWidget(QString name)
-{
-	return m_widgetMap.value(name, nullptr);
-}
+QWidget *MenuWidget::findWidget(QString name) { return m_widgetMap.value(name, nullptr); }
 
-QString MenuWidget::widgetName(QWidget *w)
-{
-	return m_widgetMap.key(w, "");
-}
+QString MenuWidget::widgetName(QWidget *w) { return m_widgetMap.key(w, ""); }
 
-void MenuWidget::collapseAll() {
+void MenuWidget::collapseAll()
+{
 	for(QWidget *w : m_widgetMap.values()) {
-		Collapsable *c = dynamic_cast<Collapsable*>(w);
+		Collapsable *c = dynamic_cast<Collapsable *>(w);
 		if(c != nullptr) {
 			c->setCollapsed(true);
 		}
 	}
 }
 
-void MenuWidget::setCollapsed(QString name, bool b) {
+void MenuWidget::setCollapsed(QString name, bool b)
+{
 	QWidget *w = findWidget(name);
-	Collapsable *c = dynamic_cast<Collapsable*>(w);
+	Collapsable *c = dynamic_cast<Collapsable *>(w);
 	if(c != nullptr) {
 		c->setCollapsed(b);
 	}
 }
+
+#include "moc_menuwidget.cpp"

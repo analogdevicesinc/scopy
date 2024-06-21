@@ -137,13 +137,9 @@ void PlotWidget::removePlotChannel(PlotChannel *ch)
 
 QList<PlotChannel *> PlotWidget::getChannels() { return m_plotChannels; }
 
-void PlotWidget::addPlotAxisHandle(PlotAxisHandle *ax) {
-	m_plotAxisHandles[ax->axis()->position()].append(ax);
-}
+void PlotWidget::addPlotAxisHandle(PlotAxisHandle *ax) { m_plotAxisHandles[ax->axis()->position()].append(ax); }
 
-void PlotWidget::removePlotAxisHandle(PlotAxisHandle *ax) {
-	m_plotAxisHandles[ax->axis()->position()].removeAll(ax);
-}
+void PlotWidget::removePlotAxisHandle(PlotAxisHandle *ax) { m_plotAxisHandles[ax->axis()->position()].removeAll(ax); }
 
 void PlotWidget::addPlotAxis(PlotAxis *ax) { m_plotAxis[ax->position()].append(ax); }
 

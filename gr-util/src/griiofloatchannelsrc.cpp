@@ -22,10 +22,10 @@ GRIIOFloatChannelSrc::GRIIOFloatChannelSrc(GRIIODeviceSource *dev, QString chann
 		m_iioCh);
 
 	m_scaleAttribute = findAttribute(
-			{
-			 "scale",
-			 },
-			m_iioCh);
+		{
+			"scale",
+		},
+		m_iioCh);
 }
 
 void GRIIOFloatChannelSrc::build_blks(GRTopBlock *top)
@@ -106,21 +106,12 @@ double GRIIOFloatChannelSrc::readScale()
 	}
 }
 
-
-
 const iio_data_format *GRIIOFloatChannelSrc::getFmt() const { return fmt; }
 
 struct iio_channel *GRIIOFloatChannelSrc::channel() const { return m_iioCh; }
 
-struct iio_device *GRIIOFloatChannelSrc::dev() const {
-	return m_dev->iioDev();
-}
+struct iio_device *GRIIOFloatChannelSrc::dev() const { return m_dev->iioDev(); }
 
-struct iio_context *GRIIOFloatChannelSrc::ctx() const {
-	return  m_dev->ctx();
-}
+struct iio_context *GRIIOFloatChannelSrc::ctx() const { return m_dev->ctx(); }
 
-const QString &GRIIOFloatChannelSrc::scaleAttribute() const
-{
-	return m_scaleAttribute;
-}
+const QString &GRIIOFloatChannelSrc::scaleAttribute() const { return m_scaleAttribute; }

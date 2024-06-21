@@ -11,10 +11,10 @@
 
 namespace scopy {
 namespace gui {
-class SCOPY_GUI_EXPORT MenuWidget : public QWidget, public CompositeWidget {
+class SCOPY_GUI_EXPORT MenuWidget : public QWidget, public CompositeWidget
+{
 	Q_OBJECT
 public:
-
 	enum MenuAlignment
 	{
 		MA_TOPFIRST,
@@ -31,24 +31,23 @@ public:
 	void remove(QWidget *) override;
 	void add(QWidget *, QString name);
 	void remove(QString);
-	MenuHeaderWidget* header();
+	MenuHeaderWidget *header();
 
-	QWidget* findWidget(QString name);
-	QString widgetName(QWidget*);
+	QWidget *findWidget(QString name);
+	QString widgetName(QWidget *);
 
 	void collapseAll();
 	void setCollapsed(QString name, bool b);
 
 private:
-	QMap<QString, QWidget*> m_widgetMap;
+	QMap<QString, QWidget *> m_widgetMap;
 	QSpacerItem *m_spacer;
 	QVBoxLayout *m_layScroll;
 	MenuHeaderWidget *m_header;
 	int uuid;
-
 };
-}
+} // namespace gui
 
-}
+} // namespace scopy
 
 #endif // MENUWIDGET_H

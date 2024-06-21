@@ -3,7 +3,6 @@
 
 #include "channelcomponent.h"
 
-
 namespace scopy {
 namespace adc {
 class SCOPY_ADC_EXPORT ImportChannelComponent : public ChannelComponent
@@ -16,6 +15,7 @@ public:
 	virtual void onInit() override;
 public Q_SLOTS:
 	void forgetChannel();
+
 private:
 	ImportFloatChannelNode *m_node;
 
@@ -26,15 +26,13 @@ private:
 	PlotAutoscaler *m_autoscaler;
 	QPushButton *m_autoscaleBtn;
 
-
 	bool m_yLock;
 
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createYAxisMenu(QWidget *parent);
 	QWidget *createCurveMenu(QWidget *parent);
-
 };
-}
-}
+} // namespace adc
+} // namespace scopy
 
 #endif // IMPORTCHANNELCOMPONENT_H

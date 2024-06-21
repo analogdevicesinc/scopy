@@ -31,9 +31,10 @@ typedef struct
 	QString name;
 } SnapshotRecipe;
 
-class SCOPY_ADC_EXPORT Menu {
+class SCOPY_ADC_EXPORT Menu
+{
 public:
-	virtual MenuWidget* menu() = 0;
+	virtual MenuWidget *menu() = 0;
 };
 
 class SCOPY_ADC_EXPORT SampleRateProvider
@@ -53,7 +54,6 @@ public:
 	virtual double yMin() const = 0;
 	virtual double yMax() const = 0;
 };
-
 
 class SCOPY_ADC_EXPORT MeasurementPanelInterface
 {

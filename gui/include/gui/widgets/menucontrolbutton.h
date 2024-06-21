@@ -16,10 +16,11 @@
 namespace scopy {
 
 class MenuControlButton;
-class SCOPY_GUI_EXPORT MenuControlWidget {
+class SCOPY_GUI_EXPORT MenuControlWidget
+{
 
 public:
-	virtual MenuControlButton* header() = 0;
+	virtual MenuControlButton *header() = 0;
 };
 
 class SCOPY_GUI_EXPORT MenuControlButton : public QAbstractButton, public MenuControlWidget
@@ -47,7 +48,7 @@ public:
 	QCheckBox *checkBox();
 	QPushButton *button();
 
-	MenuControlButton *header() override {return this;}
+	MenuControlButton *header() override { return this; }
 
 public Q_SLOTS:
 	void setName(QString s);
@@ -83,7 +84,7 @@ public:
 	void add(QWidget *ch) override;
 	void remove(QWidget *ch) override;
 	MenuControlButton *getControlBtn();
-	MenuControlButton *header() override {return m_ctrl;}
+	MenuControlButton *header() override { return m_ctrl; }
 
 private:
 	MenuControlButton *m_ctrl;

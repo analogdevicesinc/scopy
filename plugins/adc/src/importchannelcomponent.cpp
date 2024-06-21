@@ -7,7 +7,8 @@
 using namespace scopy;
 using namespace scopy::adc;
 
-ImportChannelComponent::ImportChannelComponent(ImportFloatChannelNode *node, QPen pen, QWidget *parent) : ChannelComponent(node->recipe().name, node->recipe().targetPlot, pen, parent)
+ImportChannelComponent::ImportChannelComponent(ImportFloatChannelNode *node, QPen pen, QWidget *parent)
+	: ChannelComponent(node->recipe().name, node->recipe().targetPlot, pen, parent)
 {
 
 	m_node = node;
@@ -20,14 +21,9 @@ ImportChannelComponent::ImportChannelComponent(ImportFloatChannelNode *node, QPe
 	m_lay->addWidget(widget);
 	setLayout(m_lay);
 	createMenuControlButton(this);
-
 }
 
-ImportChannelComponent::~ImportChannelComponent()
-{
-
-
-}
+ImportChannelComponent::~ImportChannelComponent() {}
 
 void ImportChannelComponent::onInit()
 {
@@ -48,24 +44,23 @@ QWidget *ImportChannelComponent::createMenu(QWidget *parent)
 	QWidget *curvemenu = createCurveMenu(m_menu);
 	// QWidget *measuremenu = m_measureMgr->createMeasurementMenu(w);
 	m_menu->header()->title()->setEnabled(true);
-	connect(m_menu->header()->title(), &QLineEdit::textChanged, this, [=](QString s) {
-		m_ctrl->setName(s);
-	});
+	connect(m_menu->header()->title(), &QLineEdit::textChanged, this, [=](QString s) { m_ctrl->setName(s); });
 
 	QPushButton *m_forget = new QPushButton("Remove reference channel");
 	StyleHelper::BlueButton(m_forget);
 	connect(m_forget, &QAbstractButton::clicked, this, &ImportChannelComponent::forgetChannel);
 
-	m_menu->add(yaxismenu,"yaxis");
-	m_menu->add(curvemenu,"curve");
-	m_menu->add(m_forget,"forget",gui::MenuWidget::MA_BOTTOMLAST);
+	m_menu->add(yaxismenu, "yaxis");
+	m_menu->add(curvemenu, "curve");
+	m_menu->add(m_forget, "forget", gui::MenuWidget::MA_BOTTOMLAST);
 
 	return m_menu;
 }
 
 QWidget *ImportChannelComponent::createYAxisMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *section =
+		new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_NONE, parent);
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_plotChannelCmpt->m_timePlotYAxis, section);
 	m_autoscaleBtn = new QPushButton(tr("AUTOSCALE"), section);
@@ -80,11 +75,10 @@ QWidget *ImportChannelComponent::createYAxisMenu(QWidget *parent)
 		m_plotChannelCmpt->m_xyPlotYAxis->setInterval(m_yCtrl->min(), m_yCtrl->max());
 	});
 
-	connect(section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b){
+	connect(section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
 		m_yLock = b;
 		m_plotChannelCmpt->lockYAxis(!b);
 	});
-
 
 	connect(m_autoscaleBtn, &QAbstractButton::pressed, m_autoscaler, &PlotAutoscaler::autoscale);
 
@@ -96,7 +90,8 @@ QWidget *ImportChannelComponent::createYAxisMenu(QWidget *parent)
 
 QWidget *ImportChannelComponent::createCurveMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("CURVE", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *section =
+		new MenuSectionCollapseWidget("CURVE", MenuCollapseSection::MHCW_NONE, parent);
 	section->contentLayout()->setSpacing(10);
 
 	m_curvemenu = new MenuPlotChannelCurveStyleControl(section);
@@ -104,8 +99,8 @@ QWidget *ImportChannelComponent::createCurveMenu(QWidget *parent)
 	return section;
 }
 
-void ImportChannelComponent::forgetChannel() {
-	AcqTreeNode* treeRoot= m_node->treeRoot();
+void ImportChannelComponent::forgetChannel()
+{
+	AcqTreeNode *treeRoot = m_node->treeRoot();
 	treeRoot->removeTreeChild(m_node);
 }
-
