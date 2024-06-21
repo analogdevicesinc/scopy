@@ -4,6 +4,7 @@
 #include <datamonitorstylehelper.hpp>
 #include <menucontrolbutton.h>
 #include <menusectionwidget.h>
+#include <style.h>
 #include <datamonitor/readabledatamonitormodel.hpp>
 
 using namespace scopy;
@@ -66,7 +67,7 @@ void MonitorSelectionMenu::generateDeviceSection(QString device, bool import)
 
 		QPushButton *removeBtn = new QPushButton(devMonitorsSection);
 		removeBtn->setMaximumSize(25, 25);
-		removeBtn->setIcon(QIcon(":/gui/icons/orange_close.svg"));
+		removeBtn->setIcon(Style::getPixmap(":/gui/icons/orange_close.svg"));
 
 		HoverWidget *removeHover = new HoverWidget(removeBtn, devMonitorsSection, devMonitorsSection);
 		removeHover->setStyleSheet("background-color: transparent; border: 0px;");

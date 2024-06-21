@@ -87,7 +87,7 @@ void PQMPlugin::loadToolList()
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("pqmwaveform", "Waveform",
 						  ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("pqmsettings", "Settings",
-						  ":/gui/icons/scopy-default/icons/tool_debugger.svg"));
+						  ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
 }
 
 void PQMPlugin::unload() { delete m_infoPage; }

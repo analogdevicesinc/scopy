@@ -25,7 +25,7 @@ bool TestPlugin::loadPage()
 void TestPlugin::loadToolList()
 {
 	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("Buttons", "Buttons", ":/gui/icons/scopy-default/icons/tool_home.svg"));
+		SCOPY_NEW_TOOLMENUENTRY("Buttons", "Buttons", ":/gui/icons/home.svg"));
 }
 
 bool TestPlugin::onConnect()

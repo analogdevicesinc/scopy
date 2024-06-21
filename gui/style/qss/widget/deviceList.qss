@@ -1,0 +1,7 @@
+QWidget[&&property&&=true] {
+    background-color: &background&;
+    border: 1px solid &background_deep&;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: left;
+}

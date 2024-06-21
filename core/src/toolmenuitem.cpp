@@ -23,10 +23,12 @@
 #include "gui/dynamicWidget.h"
 #include "gui/utils.h"
 #include "qdebug.h"
+#include "style_properties.h"
 
 #include <QHBoxLayout>
 #include <QLoggingCategory>
 #include <QSpacerItem>
+#include <style.h>
 
 using namespace scopy;
 Q_LOGGING_CATEGORY(CAT_TOOLMENUITEM, "ToolMenuItem")
@@ -42,12 +44,16 @@ ToolMenuItem::ToolMenuItem(QString id, QString name, QString iconPath, QWidget *
 	_buildUI();
 
 	// Load stylesheets
-	this->setStyleSheet(Util::loadStylesheetFromFile(":/gui/stylesheets/toolMenuItem.qss"));
+//	this->setStyleSheet(Util::loadStylesheetFromFile(":/gui/stylesheets/toolMenuItem.qss"));
 	setAttribute(Qt::WA_StyledBackground, true);
 #ifdef __ANDROID__
 	setDynamicProperty(this, "allowHover", false);
 #else
 	setDynamicProperty(this, "allowHover", true);
+	Style::setStyle(this, style::widget::deviceItem);
+	Style::setStyle(toolBtn, style::button::toolButton);
+	Style::setStyle(toolRunBtn, style::button::toolButton);
+
 	enableDoubleClick(true);
 #endif
 }
@@ -176,7 +182,7 @@ void ToolMenuItem::_buildUI()
 	toolRunBtn->setMaximumSize(32, 32);
 	toolBtn->setMinimumHeight(42);
 
-	toolBtn->setIcon(QIcon::fromTheme(iconPath));
+	toolBtn->setIcon(Style::getPixmap(iconPath));
 	toolBtn->setCheckable(true);
 	toolBtn->setIconSize(QSize(32, 32));
 

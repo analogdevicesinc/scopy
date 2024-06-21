@@ -9,6 +9,7 @@
 
 #include <QDebug>
 #include <QLoggingCategory>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_DEVBROWSER, "DeviceBrowser")
 
@@ -47,7 +48,11 @@ void DeviceBrowser::initBtns()
 	bg->addButton(ui->btnAdd);
 	bg->addButton(ui->btnHome);
 	ui->btnHome->setProperty(devBrowserId, "home");
+	ui->btnHome->setIcon(Style::getPixmap(":/gui/icons/home.svg", Style::getColor(json::theme::highlight)));
+	Style::setStyle(ui->btnHome, style::button::basic);
 	ui->btnAdd->setProperty(devBrowserId, "add");
+	ui->btnAdd->setIcon(Style::getPixmap(":/gui/icons/add.svg", Style::getColor(json::theme::highlight)));
+	Style::setStyle(ui->btnAdd, style::button::basic);
 	list.append(ui->btnHome);
 	list.append(ui->btnAdd);
 	ui->btnHome->setChecked(true);

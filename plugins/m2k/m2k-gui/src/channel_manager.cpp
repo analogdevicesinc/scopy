@@ -3,6 +3,7 @@
 #include "gui/dynamicWidget.h"
 
 #include <QHBoxLayout>
+#include <style.h>
 
 using namespace scopy;
 using namespace scopy::m2kgui;
@@ -289,7 +290,7 @@ void ChannelManager::insertAddBtn(QWidget *menu, bool dockable)
 
 	m_addChannelBtn->setCheckable(true);
 	m_addChannelBtn->setFlat(true);
-	m_addChannelBtn->setIcon(QIcon(":/gui/icons/add.svg"));
+	m_addChannelBtn->setIcon(Style::getPixmap(":/gui/icons/add.svg"));
 	m_addChannelBtn->setIconSize(QSize(25, 25));
 	m_addChannelBtn->setMaximumSize(25, 25);
 

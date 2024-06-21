@@ -1,0 +1,153 @@
+/* General Application Style */
+* {
+    background-color: &background_deep&;
+    color: &highlight&;
+    font-family: Arial, sans-serif;
+}
+
+/* Buttons */
+QPushButton {
+    background-color: &color_background&;
+    color: &highlight&;
+    border-radius: 5px;
+    padding: 5px 10px;
+}
+
+QPushButton:hover {
+    background-color: &background_deep&;
+    color: &highlight&;
+}
+
+QPushButton:disabled {
+    background-color: &background&;
+    color: &background_deep&;
+}
+
+/* Tabs */
+QTabBar::tab {
+    background: &background&;
+    color: &highlight&;
+    padding: 10px;
+}
+
+QTabBar::tab:selected {
+    background: &color_background&;
+    color: &highlight&;
+}
+
+QTabWidget::pane {
+    border: 1px solid &highlight&;
+}
+
+/* Group Boxes */
+QGroupBox {
+    border: 1px solid &highlight&;
+    border-radius: 5px;
+    margin-top: 10px;
+    color: &highlight&;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 3px;
+    background-color: &color_background&;
+    color: &highlight&;
+    border-radius: 3px;
+}
+
+/* Sliders */
+QSlider::groove:horizontal {
+    border: 1px solid &highlight&;
+    height: 8px;
+    background: &background_deep&;
+    margin: 2px 0;
+}
+
+QSlider::handle:horizontal {
+    background: &color_background&;
+    border: 1px solid &highlight&;
+    width: 18px;
+    margin: -2px 0;
+    border-radius: 3px;
+}
+
+/* Scrollbars */
+QScrollBar:horizontal, QScrollBar:vertical {
+    background: &background&;
+    border: 1px solid &color_background&;
+    border-radius: 3px;
+    width: 10px;
+    margin: 0px;
+}
+
+QScrollBar::handle:horizontal, QScrollBar::handle:vertical {
+    background: &color_background&;
+    min-width: 20px;
+    border-radius: 5px;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal,
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    border: none;
+    background: none;
+}
+
+/* Tool Buttons */
+QToolButton {
+    background-color: &color_background&;
+    color: &highlight&;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+QToolButton:hover {
+    background-color: &background_deep&;
+    color: &highlight&;
+}
+
+/* Checkboxes */
+QCheckBox {
+    spacing: 5px;
+    color: &highlight&;
+}
+
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+}
+
+QCheckBox::indicator:unchecked {
+    background-color: &background_deep&;
+    border: 1px solid &color_highlight&;
+    border-radius: 3px;
+}
+
+QCheckBox::indicator:checked {
+    background-color: &highlight&;
+    border: 1px solid &color_highlight&;
+    border-radius: 3px;
+}
+
+/* Comboboxes */
+QComboBox {
+    background-color: &background&;
+    color: &color_background&;
+    border: 1px solid &color_highlight&;
+    border-radius: 5px;
+    padding: 3px;
+}
+
+QComboBox::drop-down {
+    background-color: &color_background&;
+    color: &background_deep&;
+    border-left: 1px solid &color_highlight&;
+}
+
+QComboBox QAbstractItemView {
+    background-color: &background&;
+    color: &background_deep&;
+    selection-background-color: &background_deep&;
+    selection-color: &background_deep&;
+}
+

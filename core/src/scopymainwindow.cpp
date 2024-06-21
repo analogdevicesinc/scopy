@@ -6,6 +6,7 @@
 #include <QLoggingCategory>
 #include <QTranslator>
 #include <QOpenGLFunctions>
+#include <style.h>
 
 #include "logging_categories.h"
 #include "qmessagebox.h"
@@ -49,6 +50,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	QElapsedTimer timer;
 	timer.start();
 	ui->setupUi(this);
+	Style::setStyle(ui->centralwidget, style::widget::footer);
+	Style::setStyle(ui->animHolder, style::widget::deviceList);
 
 	ScopyTitleManager::setMainWindow(this);
 	ScopyTitleManager::setApplicationName("Scopy");
@@ -267,7 +270,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_use_opengl", true);
 #endif
 	p->init("general_use_animations", true);
-	p->init("general_theme", "default");
+	p->init("general_theme", "dark");
 	p->init("general_language", "en");
 	p->init("show_grid", true);
 	p->init("show_graticule", false);
@@ -305,6 +308,8 @@ void ScopyMainWindow::initPreferences()
 	QIcon::setThemeName(themeName);
 	QIcon::setThemeSearchPaths({":/gui/icons/" + themeName});
 	qInfo(CAT_BENCHMARK) << "Init preferences took: " << timer.elapsed() << "ms";
+
+	Style::GetInstance()->setTheme(Preferences::GetInstance()->get("general_theme").toString());
 }
 
 void ScopyMainWindow::loadOpenGL()

@@ -9,6 +9,7 @@
 #include <spinbox_a.hpp>
 #include <smallOnOffSwitch.h>
 #include <customSwitch.h>
+#include <style.h>
 #include <widgets/measurementlabel.h>
 
 using namespace scopy;
@@ -38,26 +39,26 @@ void StyleHelper::initColorMap()
 	sh->colorMap.insert("CH5", "#02BCD4");
 	sh->colorMap.insert("CH6", "#F44336");
 	sh->colorMap.insert("CH7", "#F5A623");
-	sh->colorMap.insert("ScopyBlue", "#4A64FF");
-	sh->colorMap.insert("UIElementBackground", "#272730");
-	sh->colorMap.insert("UIElementHighlight", "#373740");
+	sh->colorMap.insert("ScopyBlue", Style::getAttribute(json::theme::color_highlight));
+	sh->colorMap.insert("UIElementBackground", Style::getAttribute(json::theme::background));
+	sh->colorMap.insert("UIElementHighlight", Style::getAttribute(json::theme::highlight));
 	sh->colorMap.insert("LabelText", "#FFFFFF");
-	sh->colorMap.insert("ScopyBackground", "#141416");
-	sh->colorMap.insert("ScopyBlueHover", "#4A34FF");
-	sh->colorMap.insert("ScopyBlueSelected", "#3324B1");
+	sh->colorMap.insert("ScopyBackground", Style::getAttribute(json::theme::background_deep));
+	sh->colorMap.insert("ScopyBlueHover", Style::getAttribute(json::theme::color_highlight));
+	sh->colorMap.insert("ScopyBlueSelected", Style::getAttribute(json::theme::color_highlight));
 
 	sh->colorMap.insert("ProgressBarIdle", "#7D7D83");
 	sh->colorMap.insert("ProgressBarSuccess", "#27B34F");
 	sh->colorMap.insert("ProgressBarError", "#F44336");
 	sh->colorMap.insert("ProgressBarBusy", "#F8E71C");
 
-	sh->colorMap.insert("ButtonPressed", "#2a44df");
-	sh->colorMap.insert("ButtonHover", "#4a34ff");
+	sh->colorMap.insert("ButtonPressed", Style::getAttribute(json::theme::color_background));
+	sh->colorMap.insert("ButtonHover", Style::getAttribute(json::theme::color_highlight));
 	sh->colorMap.insert("ButtonDisabled", "#868482");
 	sh->colorMap.insert("LabelTextTinted", "rgba(255, 255, 255, 150)");
 
 	sh->colorMap.insert("WarningText", "#FFC904");
-	sh->colorMap.insert("GrayText", "#5c5c5c");
+	sh->colorMap.insert("GrayText", Style::getAttribute(json::theme::background_deep));
 }
 
 QString StyleHelper::getColor(QString id)
@@ -256,7 +257,7 @@ void StyleHelper::RefreshButton(QPushButton *btn, QString objectName)
 	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
 	btn->setStyleSheet(style);
 	btn->setProperty("blue_button", true);
-	btn->setIcon(QIcon(":/gui/icons/refresh.svg"));
+	btn->setIcon(Style::getPixmap(":/gui/icons/refresh.svg"));
 	btn->setIconSize(QSize(25, 25));
 }
 

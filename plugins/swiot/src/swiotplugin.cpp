@@ -119,7 +119,7 @@ bool SWIOTPlugin::loadIcon()
 void SWIOTPlugin::loadToolList()
 {
 	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY(CONFIG_TME_ID, "Config", ":/gui/icons/scopy-default/icons/tool_debugger.svg"));
+		SCOPY_NEW_TOOLMENUENTRY(CONFIG_TME_ID, "Config", ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(AD74413R_TME_ID, "AD74413R",
 						  ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
 	m_toolList.append(

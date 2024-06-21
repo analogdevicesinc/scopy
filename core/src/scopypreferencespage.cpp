@@ -213,7 +213,7 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
 		p, "general_use_native_dialogs", "Use native dialogs", generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
-		p, "general_theme", "Theme", {"default", "light"}, generalSection));
+		p, "general_theme", "Theme", {"dark", "light", "funky"}, generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
 		p, "general_language", "Language", t->getLanguages(), generalSection));
 
