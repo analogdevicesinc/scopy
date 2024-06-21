@@ -58,6 +58,7 @@ add_library(
 	src/timeplotcomponentchannel.cpp
 	src/timeplotmanagersettings.h
 	src/timeplotmanagersettings.cpp
+	src/importchannelcomponent.h src/importchannelcomponent.cpp
 )
 
 generate_export_header(
