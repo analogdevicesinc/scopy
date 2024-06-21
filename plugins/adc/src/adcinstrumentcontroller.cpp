@@ -256,7 +256,8 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 		Q_ASSERT(grtsc);
 
 		m_plotComponentManager->addChannel(c);
-		c->insertMenuWidget(m_plotComponentManager->plotCombo(c));
+		QWidget *ww = m_plotComponentManager->plotCombo(c);
+		c->menu()->add(ww,"plot",gui::MenuWidget::MA_BOTTOMFIRST);
 
 		/*** This is a bit of a mess because CollapsableMenuControlButton is not a MenuControlButton ***/
 
@@ -293,7 +294,7 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 			new ImportChannelComponent(ifcn, chIdP->pen(idx));
 
 		m_plotComponentManager->addChannel(c);
-		c->insertMenuWidget(m_plotComponentManager->plotCombo(c));
+		c->menu()->add(m_plotComponentManager->plotCombo(c),"plot",gui::MenuWidget::MA_BOTTOMFIRST);
 
 		CompositeWidget *cw = m_otherCMCB;
 		m_acqNodeComponentMap[ifcn] = c;
@@ -301,6 +302,8 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 
 		connect(c->ctrl(), &QAbstractButton::clicked, this,
 			[=]() { m_plotComponentManager->selectChannel(c); });
+
+		c->ctrl()->animateClick();
 
 		m_timePlotSettingsComponent->addChannel(c); // SingleY/etc
 

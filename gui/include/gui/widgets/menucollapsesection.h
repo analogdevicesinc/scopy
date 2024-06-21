@@ -50,11 +50,11 @@ class SCOPY_GUI_EXPORT MenuCollapseHeader : public QAbstractButton
 public:
 	MenuCollapseHeader(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style, QWidget *parent);
 	~MenuCollapseHeader();
-	QLabel *label();
+	QLineEdit *title();
 
 private:
 	QAbstractButton *m_ctrl;
-	QLabel *m_label;
+	QLineEdit *m_label;
 	QHBoxLayout *lay;
 };
 

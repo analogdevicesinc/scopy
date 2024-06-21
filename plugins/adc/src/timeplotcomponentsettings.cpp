@@ -23,11 +23,10 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	setLayout(v);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-	MenuSectionWidget *w = new MenuSectionWidget(this);
-	v->addWidget(w);
-	MenuCollapseSection *plotMenu =
-		new MenuCollapseSection("PLOT - " + plt->name(), MenuCollapseSection::MHCW_NONE, w);
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("APLOT - " + plt->name(), MenuCollapseSection::MHCW_NONE, parent);
 
+	MenuCollapseSection *plotMenu = section->collapseSection();
+	v->addWidget(section);
 	QLabel *plotTitleLabel = new QLabel("Plot title");
 	StyleHelper::MenuSmallLabel(plotTitleLabel);
 
@@ -81,8 +80,6 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	connect(m_xAxisShow->onOffswitch(), &QAbstractButton::toggled, this,
 		[=](bool b) { m_plotComponent->showXSourceOnXy(b); });
 
-	w->contentLayout()->addWidget(plotMenu);
-
 	m_yModeCb = new MenuCombo("YMODE", plotMenu);
 	auto ycb = m_yModeCb->combo();
 	ycb->addItem("ADC Counts", YMODE_COUNT);
@@ -129,6 +126,24 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	m_yCtrl->setMax(2048);
 	labelsSwitch->onOffswitch()->setChecked(true);
 	labelsSwitch->onOffswitch()->setChecked(false);
+
+	m_deletePlotHover = new QPushButton("",nullptr);
+	m_deletePlotHover->setMaximumSize(16, 16);
+	m_deletePlotHover->setIcon(QIcon(":/gui/icons/orange_close.svg"));
+
+	HoverWidget *hv = new HoverWidget(m_deletePlotHover,m_plotComponent,m_plotComponent);
+	hv->setStyleSheet("background-color: transparent; border: 0px;");
+	hv->setContentPos(HP_TOPLEFT);
+	hv->setAnchorPos(HP_BOTTOMRIGHT);
+	hv->setVisible(true);
+	hv->raise();
+
+	connect(m_deletePlotHover, &QAbstractButton::clicked, this, [=](){Q_EMIT requestDeletePlot();});
+}
+
+void TimePlotComponentSettings::showDeleteButtons(bool b) {
+	m_deletePlot->setVisible(b);
+	m_deletePlotHover->setVisible(b);
 }
 
 TimePlotComponentSettings::~TimePlotComponentSettings() {}

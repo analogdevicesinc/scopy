@@ -22,7 +22,7 @@ namespace adc {
 
 using namespace scopy::gui;
 
-class SCOPY_ADC_EXPORT TimePlotManagerSettings : public QWidget, public ToolComponent
+class SCOPY_ADC_EXPORT TimePlotManagerSettings : public QWidget, public ToolComponent, public Menu
 {
 	Q_OBJECT
 public:
@@ -52,6 +52,7 @@ public:
 	void setBufferSize(uint32_t newBufferSize);
 
 	void updateXAxis();
+	MenuWidget *menu() override;
 
 public Q_SLOTS:
 	void onStart() override;
@@ -68,6 +69,8 @@ public Q_SLOTS:
 
 	void addPlot(TimePlotComponent *plt);
 	void removePlot(TimePlotComponent *p);
+	void collapseAllAndOpenMenu(QString s);
+
 Q_SIGNALS:
 	void plotSizeChanged(uint32_t);
 	void bufferSizeChanged(uint32_t);
@@ -85,6 +88,7 @@ private:
 	void updateXModeCombo();
 
 	QPen m_pen;
+	MenuWidget *m_menu;
 
 	ScaleSpinButton *m_bufferSizeSpin;
 	ScaleSpinButton *m_plotSizeSpin;
@@ -98,7 +102,6 @@ private:
 	MenuCombo *m_xModeCb;
 
 	QPushButton *m_addPlotBtn;
-	QVBoxLayout *m_plotContainerLayout;
 	QMap<uint32_t, QWidget *> m_plotWidgetMap;
 
 	bool m_sampleRateAvailable;

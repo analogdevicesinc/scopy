@@ -13,6 +13,7 @@
 #include <gui/widgets/menucontrolbutton.h>
 #include "interfaces.h"
 #include <iio-widgets/iiowidget.h>
+#include <gui/widgets/menuwidget.h>
 
 namespace scopy {
 namespace adc {
@@ -71,7 +72,6 @@ public:
 	MeasureManagerInterface *getMeasureManager() override;
 
 	GRSignalPath *sigpath() override;
-	void insertMenuWidget(QWidget *w) override;
 	QVBoxLayout* menuLayout();
 
 	YMode ymode() const override;
@@ -112,7 +112,6 @@ private:
 	QVBoxLayout *m_layScroll;
 
 	TimeMeasureManager *m_measureMgr;
-	MenuOnOffSwitch *m_yAxisCtrl;
 	MenuPlotAxisRangeControl *m_yCtrl;
 	PlotAutoscaler *m_autoscaler;
 	MenuOnOffSwitch *m_autoscaleBtn;
@@ -120,7 +119,6 @@ private:
 	IIOWidget* m_scaleWidget;
 
 	MenuPlotChannelCurveStyleControl *m_curvemenu;
-	MenuCollapseSection *m_curveSection;
 
 	QPushButton *m_snapBtn;
 
@@ -130,6 +128,7 @@ private:
 	bool m_running;
 
 	QString m_unit;
+
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createAttrMenu(QWidget *parent);
 	QWidget *createYAxisMenu(QWidget *parent);
