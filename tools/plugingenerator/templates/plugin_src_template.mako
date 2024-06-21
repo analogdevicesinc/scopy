@@ -52,8 +52,10 @@ bool ${config['class_name']}::loadPage()
 		m_infoPage->update(name, value);
 	}
 	cp->close(m_param);
-	m_page->ensurePolished();*/
+	m_page->ensurePolished();
 	return true;
+	*/
+	return false;
 }
 
 bool ${config['class_name']}::loadIcon()
