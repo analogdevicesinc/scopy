@@ -3,8 +3,11 @@
 #include "scopy-adc_export.h"
 #include <QString>
 #include "measurementcontroller.h"
+#include "menuwidget.h"
 
 namespace scopy::adc {
+using namespace scopy;
+using namespace scopy::gui;
 
 typedef enum
 {
@@ -28,6 +31,10 @@ typedef struct
 	QString name;
 } SnapshotRecipe;
 
+class SCOPY_ADC_EXPORT Menu {
+public:
+	virtual MenuWidget* menu() = 0;
+};
 
 class SCOPY_ADC_EXPORT SampleRateProvider
 {

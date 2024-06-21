@@ -27,26 +27,14 @@ TimePlotManagerSettings::TimePlotManagerSettings(TimePlotManager *mgr, QWidget *
 
 TimePlotManagerSettings::~TimePlotManagerSettings() {}
 
+
+
 QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 {
-	QScrollArea *scroll = new QScrollArea(parent);
-	scroll->setWidgetResizable(true);
-	QWidget *w = new QWidget(scroll);
-	scroll->setWidget(w);
-	QVBoxLayout *lay = new QVBoxLayout(w);
-	lay->setMargin(0);
-	lay->setSpacing(10);
-	w->setLayout(lay);
-
 	m_pen = QPen(StyleHelper::getColor("ScopyBlue"));
+	m_menu = new MenuWidget("TIME PLOT", m_pen, parent);
 
-	MenuHeaderWidget *header = new MenuHeaderWidget("TIME PLOT", m_pen, w);
-	QWidget *xaxismenu = createXAxisMenu(w);
-
-	m_plotContainerLayout = new QVBoxLayout(w);
-	m_plotContainerLayout->setMargin(0);
-	m_plotContainerLayout->setSpacing(10);
-	m_plotContainerLayout->setAlignment(Qt::AlignTop);
+	QWidget *xaxismenu = createXAxisMenu(m_menu);
 
 	m_addPlotBtn = new QPushButton("Add Plot", this);
 	StyleHelper::BlueButton(m_addPlotBtn, "AddPlotButton");
@@ -63,21 +51,16 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 		removePlot(plt);
 	});
 
-	lay->addWidget(header);
-	lay->addWidget(xaxismenu);
-	lay->addLayout(m_plotContainerLayout);
-	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
-	lay->addWidget(m_addPlotBtn);
-
-	return scroll;
+	m_menu->add(xaxismenu, "xaxis");
+	m_menu->add(m_addPlotBtn, "add", gui::MenuWidget::MA_BOTTOMLAST);
+	return m_menu;
 }
 
 QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 {
-	MenuSectionWidget *xaxiscontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *xaxis = new MenuCollapseSection("X-AXIS", MenuCollapseSection::MHCW_NONE, xaxiscontainer);
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("X-AXIS", MenuCollapseSection::MHCW_NONE, parent);
 
-	QWidget *bufferPlotSize = new QWidget(xaxis);
+	QWidget *bufferPlotSize = new QWidget(section);
 	QHBoxLayout *bufferPlotSizeLayout = new QHBoxLayout(bufferPlotSize);
 	bufferPlotSizeLayout->setMargin(0);
 	bufferPlotSizeLayout->setSpacing(10);
@@ -113,7 +96,7 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	bufferPlotSizeLayout->addWidget(m_bufferSizeSpin);
 	bufferPlotSizeLayout->addWidget(m_plotSizeSpin);
 
-	m_syncBufferPlot = new MenuOnOffSwitch(tr("SYNC BUFFER-PLOT SIZES"), xaxis, false);
+	m_syncBufferPlot = new MenuOnOffSwitch(tr("SYNC BUFFER-PLOT SIZES"), section, false);
 	connect(m_syncBufferPlot->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
 		m_plotSizeSpin->setEnabled(!b);
 		m_rollingModeSw->setEnabled(!b);
@@ -127,11 +110,11 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 				   &ScaleSpinButton::setValue);
 		}
 	});
-	m_rollingModeSw = new MenuOnOffSwitch(tr("ROLLING MODE"), xaxis, false);
+	m_rollingModeSw = new MenuOnOffSwitch(tr("ROLLING MODE"), section, false);
 	connect(m_rollingModeSw->onOffswitch(), &QAbstractButton::toggled, this,
 		&TimePlotManagerSettings::setRollingMode);
 
-	QWidget *xMinMax = new QWidget(xaxis);
+	QWidget *xMinMax = new QWidget(section);
 	QHBoxLayout *xMinMaxLayout = new QHBoxLayout(xMinMax);
 	xMinMaxLayout->setMargin(0);
 	xMinMaxLayout->setSpacing(10);
@@ -169,7 +152,7 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	xMinMaxLayout->addWidget(m_xmin);
 	xMinMaxLayout->addWidget(m_xmax);
 
-	m_xModeCb = new MenuCombo("XMode", xaxis);
+	m_xModeCb = new MenuCombo("XMode", section);
 	auto xcb = m_xModeCb->combo();
 
 	xcb->addItem("Samples", XMODE_SAMPLES);
@@ -204,7 +187,7 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 			{"MHz", 1e6},
 			{"GHz", 1e9},
 		},
-		"SampleRate", 1, DBL_MAX, false, false, xaxis);
+		"SampleRate", 1, DBL_MAX, false, false, section);
 
 	m_sampleRateSpin->setValue(10);
 	m_sampleRateSpin->setEnabled(false);
@@ -212,17 +195,17 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 	connect(this, &TimePlotManagerSettings::sampleRateChanged, m_sampleRateSpin, &PositionSpinButton::setValue);
 
-	xaxiscontainer->contentLayout()->setSpacing(10);
-	xaxiscontainer->contentLayout()->addWidget(xaxis);
-	xaxis->contentLayout()->addWidget(bufferPlotSize);
-	xaxis->contentLayout()->addWidget(m_syncBufferPlot);
-	xaxis->contentLayout()->addWidget(m_rollingModeSw);
-	xaxis->contentLayout()->addWidget(xMinMax);
-	xaxis->contentLayout()->addWidget(m_xModeCb);
-	xaxis->contentLayout()->addWidget(m_sampleRateSpin);
-	xaxis->contentLayout()->setSpacing(10);
+	section->contentLayout()->setSpacing(10);
 
-	return xaxiscontainer;
+	section->contentLayout()->addWidget(bufferPlotSize);
+	section->contentLayout()->addWidget(m_syncBufferPlot);
+	section->contentLayout()->addWidget(m_rollingModeSw);
+	section->contentLayout()->addWidget(xMinMax);
+	section->contentLayout()->addWidget(m_xModeCb);
+	section->contentLayout()->addWidget(m_sampleRateSpin);
+	section->contentLayout()->setSpacing(10);
+
+	return section;
 }
 
 void TimePlotManagerSettings::onInit()
@@ -300,6 +283,11 @@ void TimePlotManagerSettings::updateXAxis()
 	}
 }
 
+MenuWidget *TimePlotManagerSettings::menu()
+{
+	return m_menu;
+}
+
 void TimePlotManagerSettings::onStart()
 {
 	QComboBox *cb = m_xModeCb->combo();
@@ -329,15 +317,16 @@ void TimePlotManagerSettings::setSyncBufferPlotSize(bool newSyncBufferPlotSize)
 	Q_EMIT syncBufferPlotSizeChanged(newSyncBufferPlotSize);
 }
 
-void TimePlotManagerSettings::addPlot(TimePlotComponent *plt)
+void TimePlotManagerSettings::addPlot(TimePlotComponent *p)
 {
-	QWidget *plotMenu = plt->plotMenu();
-	m_plotContainerLayout->addWidget(plotMenu);
+	QWidget *plotMenu = p->plotMenu();
+	m_menu->add(plotMenu,p->name()+QString(p->uuid()),gui::MenuWidget::MA_TOPLAST);
 }
 
 void TimePlotManagerSettings::removePlot(TimePlotComponent *p)
 {
-	m_plotContainerLayout->removeWidget(p->plotMenu());	
+	QWidget *plotMenu = p->plotMenu();
+	m_menu->remove(plotMenu);
 }
 
 
@@ -389,6 +378,11 @@ void TimePlotManagerSettings::updateXModeCombo()
 		cb->insertItem(1, "Time", XMODE_TIME);
 	}
 }
+
+/*void TimePlotManagerSettings::collapseAllAndOpenMenu(QString s) {
+	m_menu->collapseAll();
+	m_menu->setCollapsed(s, true);
+}*/
 
 
 } // namespace adc

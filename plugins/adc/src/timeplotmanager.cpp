@@ -81,6 +81,13 @@ uint32_t TimePlotManager::addPlot(QString name)
 	for(TimePlotManagerCombobox *p : m_channelPlotcomboMap.values()) {
 		p->addPlot(plt);
 	}
+
+	bool b = m_plots.count() > 1;
+	for(TimePlotComponent *plt : qAsConst(m_plots)) {
+		plt->plotMenu()->showDeleteButtons(b);
+	}
+
+
 	return plt->uuid();
 }
 
@@ -94,6 +101,11 @@ void TimePlotManager::removePlot(uint32_t uuid)
 	for(TimePlotManagerCombobox *p : m_channelPlotcomboMap.values()) {
 		p->removePlot(plt);
 	}
+
+	bool b = m_plots.count() > 1;
+	for(TimePlotComponent *plt : qAsConst(m_plots)) {
+		plt->plotMenu()->showDeleteButtons(b);
+	}
 }
 
 void TimePlotManager::addChannel(ChannelComponent *c)
@@ -103,7 +115,6 @@ void TimePlotManager::addChannel(ChannelComponent *c)
 	plt->addChannel(c);
 	m_channelPlotcomboMap.insert(c, new TimePlotManagerCombobox(this, c));
 	c->addChannelToPlot();
-
 }
 
 void TimePlotManager::removeChannel(ChannelComponent *c)

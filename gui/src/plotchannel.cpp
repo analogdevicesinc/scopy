@@ -12,6 +12,8 @@ PlotChannel::PlotChannel(QString name, QPen pen, PlotAxis *xAxis, PlotAxis *yAxi
 	, m_handle(nullptr)
 	, m_pen(pen)
 	, m_name(name)
+	, m_style(0)
+	, m_thickness(1)
 
 {
 

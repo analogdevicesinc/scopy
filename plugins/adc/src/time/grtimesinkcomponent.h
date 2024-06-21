@@ -18,9 +18,6 @@ public:
 	~GRTimeSinkComponent();
 
 	bool finished() override;
-	bool enabled() const;
-
-	QWidget* createMenu(QWidget *parent = nullptr);
 public Q_SLOTS:
 	void connectSignalPaths();
 	void tearDownSignalPaths();

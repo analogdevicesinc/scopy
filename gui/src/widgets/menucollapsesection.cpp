@@ -1,3 +1,4 @@
+#include "qlineedit.h"
 #include <smallOnOffSwitch.h>
 #include <widgets/menucollapsesection.h>
 
@@ -16,8 +17,13 @@ MenuCollapseHeader::MenuCollapseHeader(QString title, MenuCollapseSection::MenuH
 	setCheckable(true);
 	setLayout(lay);
 
-	m_label = new QLabel(title, this);
-	StyleHelper::MenuCollapseHeaderLabel(m_label, "menuCollapseLabel");
+	m_label = new QLineEdit(title, this);
+	m_label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+	m_label->setEnabled(false);
+	m_label->setReadOnly(false);
+
+	StyleHelper::MenuCollapseHeaderLineEdit(m_label, "menuCollapseLabel");
+	m_label->setTextMargins(0,0,0,0);
 
 	switch(style) {
 	case MenuCollapseSection::MHCW_ARROW:
@@ -42,13 +48,13 @@ MenuCollapseHeader::MenuCollapseHeader(QString title, MenuCollapseSection::MenuH
 	m_ctrl->setAttribute(Qt::WA_TransparentForMouseEvents);
 
 	lay->addWidget(m_label);
-	lay->addSpacerItem(new QSpacerItem(40, 40, QSizePolicy::Expanding, QSizePolicy::Maximum));
+	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Maximum));
 	lay->addWidget(m_ctrl);
 }
 
 MenuCollapseHeader::~MenuCollapseHeader() {}
 
-QLabel *MenuCollapseHeader::label() { return m_label; }
+QLineEdit *MenuCollapseHeader::title() { return m_label; }
 
 MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style,
 					 QWidget *parent)
@@ -83,11 +89,7 @@ QString MenuCollapseSection::title() { return m_title; }
 void MenuCollapseSection::setTitle(QString s)
 {
 	m_title = s;
-	m_header->label()->setText(m_title);
+	m_header->title()->setText(m_title);
 }
-
-// void MenuCollapseSection::add(QWidget *ch) {
-//	m_contLayout->addWidget(ch);
-//}
 
 #include "moc_menucollapsesection.cpp"

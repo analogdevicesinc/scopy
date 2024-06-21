@@ -18,6 +18,8 @@ public:
 	TimePlotComponentSettings(TimePlotComponent *plt, QWidget *parent = nullptr);
 	~TimePlotComponentSettings();
 
+	void showDeleteButtons(bool b);
+
 public Q_SLOTS:
 	void addChannel(ChannelComponent *c);
 	void removeChannel(ChannelComponent *c);
@@ -26,6 +28,7 @@ public Q_SLOTS:
 	void onStart() override;
 	void onStop() override;
 	void updateYAxis();
+
 Q_SIGNALS:
 	void requestDeletePlot();
 
@@ -41,9 +44,11 @@ private:
 	QList<ChannelComponent *> m_channels;
 	QList<ScaleProvider *> m_scaleProviders;
 	QPushButton *m_deletePlot;
+	QPushButton *m_deletePlotHover;
 
 	bool m_autoscaleEnabled;
 	bool m_running;
+
 
 
 

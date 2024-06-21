@@ -1,5 +1,6 @@
 #include "timeplotmanagercombobox.h"
 #include "timeplotcomponentchannel.h"
+#include <menusectionwidget.h>
 using namespace scopy;
 using namespace scopy::adc;
 
@@ -9,7 +10,8 @@ TimePlotManagerCombobox::TimePlotManagerCombobox(TimePlotManager *man, ChannelCo
 	lay->setSpacing(0);
 	lay->setMargin(0);
 
-	m_mcombo = new MenuCombo("PLOT", parent);
+	MenuSectionWidget *sec = new MenuSectionWidget(this);
+	m_mcombo = new MenuCombo("PLOT", sec);
 	m_combo = m_mcombo->combo();
 	m_man = man;
 	m_ch = c;
@@ -28,8 +30,8 @@ TimePlotManagerCombobox::TimePlotManagerCombobox(TimePlotManager *man, ChannelCo
 		man->moveChannel(m_ch, uuid);
 		man->replot();
 	});
-
-	lay->addWidget(m_mcombo);
+	lay->addWidget(sec);
+	sec->contentLayout()->addWidget(m_mcombo);
 
 }
 

@@ -23,7 +23,7 @@ public Q_SLOTS:
 	void disable();
 	void onNewData(const float *xData_, const float *yData_, size_t size, bool copy);
 	void setXyXData(const float *);
-	void setSingleYMode(bool);
+	void lockYAxis(bool);
 	void refreshData(bool copy);
 
 	void initPlotComponent(TimePlotComponent *plotComponent);

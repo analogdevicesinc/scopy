@@ -86,7 +86,7 @@ void TimePlotComponent::setSingleYMode(bool b)
 {
 	m_singleYMode = b;
 	for(TimePlotComponentChannel *pcc : qAsConst(m_channels)) {
-		pcc->setSingleYMode(b);
+		pcc->lockYAxis(b);
 	}
 }
 
@@ -129,6 +129,14 @@ void TimePlotComponent::onXyXNewData(const float *xData_, const float *yData_, s
 	xyXData = yData_;
 	for(TimePlotComponentChannel *ch : qAsConst(m_channels)) {
 		ch->setXyXData(xyXData);
+		ch->refreshData(copy);
+	}
+}
+
+void TimePlotComponent::refreshXYXData() {
+	for(TimePlotComponentChannel *ch : qAsConst(m_channels)) {
+		ch->setXyXData(xyXData);
+		ch->refreshData(true);
 	}
 }
 
@@ -137,8 +145,10 @@ void TimePlotComponent::addChannel(ChannelComponent *c)
 {
 	m_channels.append(c->plotChannelCmpt());
 	if(m_XYXChannel == nullptr) {
+		// if we don't have an XY channel, set this one
 		setXYXChannel(c);
 	}
+	refreshXYXData();
 	m_plotMenu->addChannel(c);
 }
 
