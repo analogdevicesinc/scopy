@@ -97,6 +97,21 @@ find_library(
 )
 message("IIO LIBRARIES: " ${IIO_LIBRARIES})
 
+set(SCOPY_DLL_BUILD_PATH ${CMAKE_BINARY_DIR})
+set(SCOPY_DLL_INSTALL_PATH ${CMAKE_INSTALL_LIBDIR}/scopy)
+set(SCOPY_PLUGIN_BUILD_PATH ${CMAKE_BINARY_DIR}/plugins/plugins)
+set(SCOPY_PLUGIN_INSTALL_PATH ${CMAKE_INSTALL_LIBDIR}/scopy/plugins)
+set(SCOPY_TRANSLATION_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/translations)
+set(SCOPY_TRANSLATION_INSTALL_PATH ${CMAKE_INSTALL_LIBDIR}/scopy/translations)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_DLL_BUILD_PATH})
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/Frameworks")
+else()
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_DLL_BUILD_PATH})
+endif()
+
 option(ENABLE_TESTING "Enable unit tests" ON)
 if(ENABLE_TESTING)
 	message(STATUS "Unit tests enabled")
@@ -109,12 +124,6 @@ if(APPLE)
 	include(ScopyMacOS)
 endif(APPLE)
 
-set(SCOPY_DLL_PATH ${CMAKE_INSTALL_LIBDIR})
-set(SCOPY_PLUGIN_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/plugins/plugins)
-set(SCOPY_PLUGIN_INSTALL_PATH ${CMAKE_INSTALL_FULL_DATADIR}/scopy-plugins)
-set(SCOPY_TRANSLATION_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/translations)
-set(SCOPY_TRANSLATION_INSTALL_PATH ${CMAKE_INSTALL_FULL_DATADIR}/translations)
-
 add_subdirectory(common)
 add_subdirectory(iioutil)
 add_subdirectory(gui)
@@ -123,6 +132,10 @@ add_subdirectory(pluginbase)
 add_subdirectory(core)
 add_subdirectory(plugins)
 add_subdirectory(iio-widgets)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS")
+endif()
 
 set(SCOPY_DEPENDENCIES ${IIO_LIBRARIES})
 
@@ -195,7 +208,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gui/res/icon_small.svg
 		DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/icons/hicolor/scalable/apps RENAME scopy.svg
 	)
-	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/translations DESTINATION ${CMAKE_INSTALL_FULL_DATADIR})
 endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	include(ScopyWindows)
@@ -208,7 +220,8 @@ if(NOT ENABLE_APPLICATION_BUNDLE)
 	)
 endif()
 
-install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION .)
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/translations DESTINATION ${SCOPY_TRANSLATION_INSTALL_PATH})
+install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 
 if(QT_VERSION_MAJOR EQUAL 6)
 	qt_finalize_executable(${PROJECT_NAME})

@@ -11,7 +11,7 @@ function(ConfigureInstallerSettings PLUGIN_TARGET_NAME PLUGIN_INSTALLER_DESCRIPT
 	    CACHE STRING "PLUGIN COMPONENTS FOR WINDOWS INSTALLER" FORCE
 	)
 	set(PLUGIN_COMPONENTS_FILES
-	    "${PLUGIN_COMPONENTS_FILES} \n Source:\"{#DestFolder}\\plugins\\plugins\\libscopy-${PLUGIN_TARGET_NAME}.dll\"; DestDir: \"{app}\\plugins\\plugins\"; Components: plugins\\${PLUGIN_TARGET_NAME}; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist ;"
+	    "${PLUGIN_COMPONENTS_FILES} \n Source:\"{#DestFolder}\\plugins\\libscopy-${PLUGIN_TARGET_NAME}.dll\"; DestDir: \"{app}\\plugins\"; Components: plugins\\${PLUGIN_TARGET_NAME}; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist ;"
 	    CACHE STRING "PLUGIN COMPONENTS FILES FOR WINDOWS INSTALLER" FORCE
 	)
 endfunction()
