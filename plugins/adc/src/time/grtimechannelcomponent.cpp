@@ -65,11 +65,9 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 
 	m_scaleWidget = nullptr;
 	if(m_scaleAvailable) {
-		cb->addItem(m_unit, YMODE_SCALE);
-		m_scaleWidget = IIOWidgetBuilder()
-					.channel(m_src->channel())
-					.attribute(m_src->scaleAttribute())
-					.buildSingle();
+		cb->addItem(m_unit.name, YMODE_SCALE);
+		m_scaleWidget =
+			IIOWidgetBuilder().channel(m_src->channel()).attribute(m_src->scaleAttribute()).buildSingle();
 	}
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_plotChannelCmpt->m_timePlotYAxis, m_yaxisMenu);
