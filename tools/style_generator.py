@@ -1,6 +1,6 @@
 import os
-import shutil
 import sys
+from distutils.dir_util import copy_tree
 from typing import Dict, Optional, Set, List
 
 
@@ -29,13 +29,14 @@ def create_namespace_structure(extension: str, path: str, root_namespace: str = 
 
 
 # Replaces a placeholder property in a file with a given value
-def replace_property(in_file: str, out_file: str, value: str) -> bool:
+def replace_property(in_file: str, value: str, out_file: str) -> bool:
     search_text = "&&property&&"
 
     with open(in_file, 'r') as file:
         data = file.read().replace(search_text, value)
 
     with open(out_file, 'a') as file:
+        print(out_file)
         file.write(data)
 
     return True
@@ -166,26 +167,6 @@ def close_json_file(json_path: str, end_char: str = "}") -> None:
         file.write("\n" + end_char + "\n")
 
 
-# Combines multiple JSON files into one
-def combine_json_files(input_folder: str, output_file: str) -> None:
-    combined_data = '['
-    first_file = True
-
-    for root, _, files in os.walk(input_folder):
-        for file in files:
-            if file.endswith('.json'):
-                with open(os.path.join(root, file), 'r') as f:
-                    if not first_file:
-                        combined_data += ','
-                    combined_data += f.read().strip()
-                    first_file = False
-
-    combined_data += ']'
-
-    with open(output_file, 'w') as f:
-        f.write(combined_data)
-
-
 def generate_qss():
     qss_header_name = "style_properties.h"
     qss_header_path = os.path.join(source_folder, "gui", "include", "gui", qss_header_name)
@@ -236,6 +217,5 @@ if __name__ == "__main__":
 
     generate_qss()
     generate_json()
-    combine_json_files(os.path.join(style_folder, "json"), theme_attributes_path)
-
+    copy_tree(os.path.join(style_folder, "json"), os.path.join(build_folder, "json"))
     sys.exit(0)
