@@ -13,9 +13,14 @@ fi
 
 BUILD_TARGET=x86_64
 ARCH_BIT=64
+
+## Set STAGING
+USE_STAGING=OFF
+##
+
 TOOLS_FOLDER=$WORKDIR/scopy-mingw-build-deps
 pushd $TOOLS_FOLDER
-source ./mingw_toolchain.sh $BUILD_TARGET OFF  # USING_STAGING = OFF
+source ./mingw_toolchain.sh $BUILD_TARGET $USE_STAGING
 popd
 
 export DEST_FOLDER=$WORKDIR/scopy_$ARCH
@@ -25,19 +30,8 @@ ARTIFACT_FOLDER=$WORKDIR/artifact_$ARCH
 PYTHON_FILES=$STAGING_DIR/lib/python3.*
 DLL_DEPS=$(cat $SRC_FOLDER/ci/windows/mingw_dll_deps)
 EMU_BUILD_FOLDER=$WORKDIR/iio-emu/build
-
-PLUGINBASE_DLL=$BUILD_FOLDER/pluginbase
-CORE_DLL=$BUILD_FOLDER/core
-GUI_DLL=$BUILD_FOLDER/gui
-M2K_GUI_DLL=$BUILD_FOLDER/plugins/m2k/m2k-gui
-SIGROK_GUI_DLL=$BUILD_FOLDER/plugins/m2k/m2k-gui
-GR_GUI_DLL=$BUILD_FOLDER/plugins/m2k/m2k-gui
-IIOUTIL_DLL=$BUILD_FOLDER/iioutil
-COMMON_DLL=$BUILD_FOLDER/common
-IIO_WIDGETS_DLL=$BUILD_FOLDER/iio-widgets
-GRUTIL_DLL=$BUILD_FOLDER/gr-util
-
-REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
+STAGING_AREA=$SRC_FOLDER/ci/windows/staging
+REGMAP_XMLS=$BUILD_FOLDER/plugins/plugins/regmap/xmls
 
 # Generate build status info for the about page
 cp $BUILD_STATUS_FILE $SRC_FOLDER/build-status
@@ -66,12 +60,42 @@ build_iio-emu(){
 	$MAKE_BIN -j4
 }
 
+download_tools() {
+	mkdir -p $STAGING_AREA
+	pushd $STAGING_AREA
+	if [ ! -f windres.exe ]; then
+		wget http://swdownloads.analog.com/cse/build/windres.exe.gz
+		gunzip windres.exe.gz
+	fi
+
+	if [ ! -f dpinst.zip ]; then
+		wget http://swdownloads.analog.com/cse/m1k/drivers/dpinst.zip
+		unzip "dpinst.zip"
+	fi
+
+	if [ ! -f dfu-util.zip ]; then
+		wget http://swdownloads.analog.com/cse/m1k/drivers/dfu-util.zip
+		unzip "dfu-util.zip"
+	fi
+
+	if [ ! -f cv2pdb-dlls.zip ]; then
+		wget https://swdownloads.analog.com/cse/scopydeps/cv2pdb-dlls.zip
+		unzip "cv2pdb-dlls.zip"
+	fi
+
+	if [ ! -f is.exe ]; then
+		wget https://jrsoftware.org/download.php/is.exe
+	fi
+	popd
+}
+
 deploy_app(){
 	echo "### Deploying application and dependencies"
 	if [ -d $DEST_FOLDER ]; then
 		rm -rf $DEST_FOLDER
 	fi
-	mkdir $DEST_FOLDER
+	rm -rf $DEST_FOLDER
+	mkdir -p $DEST_FOLDER
 	cp $BUILD_FOLDER/Scopy.exe $DEST_FOLDER/
 	cp $BUILD_FOLDER/qt.conf $DEST_FOLDER/
 	cp $BUILD_FOLDER/Scopy-console.exe $DEST_FOLDER/
@@ -89,71 +113,77 @@ deploy_app(){
 	cp $EMU_BUILD_FOLDER/iio-emu.exe $DEST_FOLDER
 	cp -r $PYTHON_FILES $DEST_FOLDER
 	cp $BUILD_FOLDER/windows/scopy-$ARCH_BIT.iss $DEST_FOLDER
-	cp $PLUGINBASE_DLL/libscopy-pluginbase.dll $DEST_FOLDER
-	cp $CORE_DLL/libscopy-core.dll $DEST_FOLDER
-	cp $GUI_DLL/libscopy-gui.dll $DEST_FOLDER
-	cp $IIOUTIL_DLL/libscopy-iioutil.dll $DEST_FOLDER
-	cp $M2K_GUI_DLL/libscopy-m2k-gui.dll $DEST_FOLDER
-	cp $SIGROK_GUI_DLL/libscopy-sigrok-gui.dll $DEST_FOLDER
-	cp $GR_GUI_DLL/libscopy-gr-gui.dll $DEST_FOLDER
-	cp $COMMON_DLL/libscopy-common.dll $DEST_FOLDER
-	cp $GRUTIL_DLL/libscopy-gr-util.dll $DEST_FOLDER
-	cp $IIO_WIDGETS_DLL/libscopy-iio-widgets.dll $DEST_FOLDER
+	cp -v $BUILD_FOLDER/libscopy-*.dll $DEST_FOLDER
 
-	PLUGINS_DLL=$(find $BUILD_FOLDER/plugins -type f -name "*.dll")
-	mkdir -p $DEST_FOLDER/plugins/plugins
-	cp $PLUGINS_DLL $DEST_FOLDER/plugins/plugins
+	PLUGINS_DLL=$(find $BUILD_FOLDER/plugins/plugins -type f -name "*.dll")
+	mkdir -p $DEST_FOLDER/plugins
+	cp -v $PLUGINS_DLL $DEST_FOLDER/plugins
 
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
 	mkdir -p $DEST_FOLDER/translations
 	cp $TRANSLATIONS_QM $DEST_FOLDER/translations
 
 	if [ -d $REGMAP_XMLS ]; then
-		cp -r $REGMAP_XMLS $DEST_FOLDER/plugins/plugins
+		cp -r $REGMAP_XMLS $DEST_FOLDER/plugins
 	fi
 }
 
 extract_debug_symbols(){
 	echo "### Duplicating unstripped bundle"
+	rm -rf $DEBUG_FOLDER
 	mkdir -p $DEBUG_FOLDER
 	cp -r $DEST_FOLDER/* $DEBUG_FOLDER/
 	echo "### Stripping bundle for installer"
-	/c/msys64/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded $DEST_FOLDER/*.exe
-	/c/msys64/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded $DEST_FOLDER/*.dll
-	/c/msys64/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded $DEST_FOLDER/plugins/plugins/*.dll
+	/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded $DEST_FOLDER/*.exe
+	/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded $DEST_FOLDER/*.dll
+	/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded $DEST_FOLDER/plugins/*.dll
 }
 
 bundle_drivers(){
 	echo "### Bundling drivers"
 	cp -R $SRC_FOLDER/windows/drivers $DEST_FOLDER
 	if [[ $ARCH_BIT == "64" ]]; then
-		cp -R $TOOLS_FOLDER/dfu-util-static-amd64.exe $DEST_FOLDER/drivers/dfu-util.exe
-		cp -R $TOOLS_FOLDER/dpinst_amd64.exe $DEST_FOLDER/drivers/dpinst.exe
+		cp -R $STAGING_AREA/dfu-util-static-amd64.exe $DEST_FOLDER/drivers/dfu-util.exe
+		cp -R $STAGING_AREA/dpinst_amd64.exe $DEST_FOLDER/drivers/dpinst.exe
 	else
-		cp -R $TOOLS_FOLDER/dfu-util-static.exe $DEST_FOLDER/drivers/dfu-util.exe
-		cp -R $TOOLS_FOLDER/dpinst.exe $DEST_FOLDER/drivers/dpinst.exe
+		cp -R $STAGING_AREA/dfu-util-static.exe $DEST_FOLDER/drivers/dfu-util.exe
+		cp -R $STAGING_AREA/dpinst.exe $DEST_FOLDER/drivers/dpinst.exe
 	fi
 }
 
 create_installer() {
 	echo "### Creating installer"
+	pushd $WORKDIR
 	mkdir -p $ARTIFACT_FOLDER
-	cd $WORKDIR
 	cp -R $WORKDIR/scopy_${ARCH} $ARTIFACT_FOLDER/scopy-${ARCH}
-	cp -R $WORKDIR/debug_${ARCH} $ARTIFACT_FOLDER/debug-${ARCH}
+	[ -d $WORKDIR/debug_${ARCH} ] && cp -R $WORKDIR/debug_${ARCH} $ARTIFACT_FOLDER/debug-${ARCH} || echo "No debug folder"
 	PATH="/c/innosetup:/c/Program Files (x86)/Inno Setup 6:$PATH"
 	iscc //p $BUILD_FOLDER/windows/scopy-$ARCH_BIT.iss
 	mv $WORKDIR/scopy-$ARCH_BIT-setup.exe $ARTIFACT_FOLDER
 
 	echo "Done. Artifacts generated in $ARTIFACT_FOLDER"
 	ls -la $ARTIFACT_FOLDER
-	cp -R $ARTIFACT_FOLDER $SRC_FOLDER
-	ls -la $SRC_FOLDER
+
+	if [ "$CI_SCRIPT" == "ON" ]; then
+		cp -R $ARTIFACT_FOLDER $SRC_FOLDER
+		ls -la $SRC_FOLDER
+	fi
+	popd
 }
 
-build_scopy
-build_iio-emu
-deploy_app
-bundle_drivers
-extract_debug_symbols
-create_installer
+
+run_workflow(){
+	download_tools
+	build_scopy
+	build_iio-emu
+	deploy_app
+	bundle_drivers
+	extract_debug_symbols
+	create_installer
+}
+
+run_workflow
+
+for arg in $@; do
+	$arg
+done
