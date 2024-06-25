@@ -29,7 +29,6 @@ android*.sh
 !CI/android/*
 html/
 build_arm64-v8a/
-doc/*
 !doc/Doxyfile
 .cache/*
 build/*
@@ -58,3 +57,7 @@ iio-widgets/include/iio-widgets/scopy-iio-widgets_export.h
 iioutil/include/iioutil/scopy-iioutil_export.h
 pluginbase/include/pluginbase/scopy-pluginbase_config.h
 pluginbase/include/pluginbase/scopy-pluginbase_export.h
+bin/*
+lib/*
+doc/_build/*
+share/*
