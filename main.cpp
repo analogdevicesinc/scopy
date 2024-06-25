@@ -103,12 +103,6 @@ int main(int argc, char *argv[])
 	ApplicationRestarter restarter(QString::fromLocal8Bit(argv[0]));
 	a.setWindowIcon(QIcon(":/gui/icon.ico"));
 
-
-
-
-
-
-
 	ScopyMainWindow w;
 	w.show();
 

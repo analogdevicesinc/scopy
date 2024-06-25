@@ -98,8 +98,7 @@ RunBtn::RunBtn(QWidget *parent)
 	setStyleSheet(style);
 	QIcon icon1;
 	icon1.addPixmap(Style::getPixmap(":/gui/icons/play.svg"), QIcon::Normal, QIcon::Off);
-	icon1.addPixmap(Style::getPixmap(":/gui/icons/scopy-default/icons/play_stop.svg"),
-			QIcon::Normal, QIcon::On);
+	icon1.addPixmap(Style::getPixmap(":/gui/icons/scopy-default/icons/play_stop.svg"), QIcon::Normal, QIcon::On);
 	setIcon(icon1);
 	setLayoutDirection(Qt::RightToLeft);
 }
@@ -142,8 +141,7 @@ SingleShotBtn::SingleShotBtn(QWidget *parent)
 	setStyleSheet(style);
 	QIcon icon1;
 	icon1.addPixmap(Style::getPixmap(":/gui/icons/play_oneshot.svg"), QIcon::Normal, QIcon::Off);
-	icon1.addPixmap(Style::getPixmap(":/gui/icons/scopy-default/icons/play_stop.svg"),
-			QIcon::Normal, QIcon::On);
+	icon1.addPixmap(Style::getPixmap(":/gui/icons/scopy-default/icons/play_stop.svg"), QIcon::Normal, QIcon::On);
 	setIcon(icon1);
 	setLayoutDirection(Qt::RightToLeft);
 }

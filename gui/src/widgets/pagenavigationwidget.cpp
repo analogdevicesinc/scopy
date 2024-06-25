@@ -34,11 +34,13 @@ void PageNavigationWidget::initUI(QWidget *parent)
 	homeButton->hide();
 
 	backwardButton = new QPushButton(this);
-	StyleHelper::BlueIconButton(backwardButton, Style::getPixmap(":/gui/icons/handle_left_arrow.svg"), "backwardButton");
+	StyleHelper::BlueIconButton(backwardButton, Style::getPixmap(":/gui/icons/handle_left_arrow.svg"),
+				    "backwardButton");
 	buttonsLayout->addWidget(backwardButton);
 
 	forwardButton = new QPushButton(this);
-	StyleHelper::BlueIconButton(forwardButton, Style::getPixmap(":/gui/icons/handle_right_arrow.svg"), "forwardButton");
+	StyleHelper::BlueIconButton(forwardButton, Style::getPixmap(":/gui/icons/handle_right_arrow.svg"),
+				    "forwardButton");
 	buttonsLayout->addWidget(forwardButton);
 
 	openButton = new QPushButton(this);
