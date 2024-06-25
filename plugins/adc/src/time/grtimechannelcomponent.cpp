@@ -8,7 +8,7 @@
 #include <gr-util/grsignalpath.h>
 
 #include <iio-widgets/iiowidget.h>
-#include <iio-widgets/iiowidgetfactory.h>
+#include <iio-widgets/iiowidgetbuilder.h>
 #include <timeplotcomponentchannel.h>
 #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 
@@ -66,7 +66,10 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 	m_scaleWidget = nullptr;
 	if(m_scaleAvailable) {
 		cb->addItem(m_unit, YMODE_SCALE);
-		m_scaleWidget = IIOWidgetFactory::buildAttrForChannel(m_src->channel(), m_src->scaleAttribute(), this);
+		m_scaleWidget = IIOWidgetBuilder()
+					.channel(m_src->channel())
+					.attribute(m_src->scaleAttribute())
+					.buildSingle();
 	}
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_plotChannelCmpt->m_timePlotYAxis, m_yaxisMenu);
@@ -173,7 +176,7 @@ QWidget *GRTimeChannelComponent::createAttrMenu(QWidget *parent)
 {
 	MenuSectionCollapseWidget *section =
 		new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
-	QList<IIOWidget *> attrWidgets = IIOWidgetFactory::buildAllAttrsForChannel(m_src->channel());
+	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder().channel(m_src->channel()).buildAll();
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
@@ -263,6 +266,8 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 			ymin = 0;
 			ymax = (1 << (fmt->bits));
 		}
+
+		scale = scale / 1000.0; // target value is in mV
 
 		ymin = ymin * scale;
 		ymax = ymax * scale;

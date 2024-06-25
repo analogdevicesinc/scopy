@@ -4,7 +4,7 @@
 #include <widgets/menusectionwidget.h>
 #include <widgets/menuheader.h>
 #include <iio-widgets/iiowidget.h>
-#include <iio-widgets/iiowidgetfactory.h>
+#include <iio-widgets/iiowidgetbuilder.h>
 
 using namespace scopy;
 using namespace scopy::adc;
@@ -34,11 +34,16 @@ QWidget *GRDeviceComponent::createAttrMenu(QWidget *parent)
 {
 	MenuSectionCollapseWidget *attr =
 		new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
-	QList<IIOWidget *> attrWidgets = IIOWidgetFactory::buildAllAttrsForDevice(m_src->iioDev());
+
+	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder().device(m_src->iioDev()).buildAll();
 	const struct iio_context *ctx = iio_device_get_context(m_src->iioDev());
-	attrWidgets.append(IIOWidgetFactory::buildSingle(
-		IIOWidgetFactory::ComboUi | IIOWidgetFactory::TriggerData,
-		{.context = const_cast<iio_context *>(ctx), .device = m_src->iioDev(), .data = "Triggers"}));
+	attrWidgets.append(IIOWidgetBuilder()
+				   .context(const_cast<iio_context *>(ctx))
+				   .device(m_src->iioDev())
+				   .attribute("Triggers")
+				   .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
+				   .dataStrategy(IIOWidgetBuilder::DS::TriggerData)
+				   .buildSingle());
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
