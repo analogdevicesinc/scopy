@@ -316,12 +316,12 @@ void MeasureSettings::onChannelAdded(int chnIdx)
 			enum M2kMeasurementData::axisType axis = measurements[i]->axis();
 
 			if(axis == M2kMeasurementData::HORIZONTAL) {
-				m_horizMeasurements->addDropdownElement(Style::getPixmap(icons_lut.at(i)), measurements[i]->name(),
-									QVariant(i));
+				m_horizMeasurements->addDropdownElement(Style::getPixmap(icons_lut.at(i)),
+									measurements[i]->name(), QVariant(i));
 				m_measurePosInDropdowns.append(h++);
 			} else if(axis == M2kMeasurementData::VERTICAL) {
-				m_vertMeasurements->addDropdownElement(Style::getPixmap(icons_lut.at(i)), measurements[i]->name(),
-								       QVariant(i));
+				m_vertMeasurements->addDropdownElement(Style::getPixmap(icons_lut.at(i)),
+								       measurements[i]->name(), QVariant(i));
 				m_measurePosInDropdowns.append(v++);
 			}
 		}

@@ -44,7 +44,7 @@ ToolMenuItem::ToolMenuItem(QString id, QString name, QString iconPath, QWidget *
 	_buildUI();
 
 	// Load stylesheets
-//	this->setStyleSheet(Util::loadStylesheetFromFile(":/gui/stylesheets/toolMenuItem.qss"));
+	//	this->setStyleSheet(Util::loadStylesheetFromFile(":/gui/stylesheets/toolMenuItem.qss"));
 	setAttribute(Qt::WA_StyledBackground, true);
 #ifdef __ANDROID__
 	setDynamicProperty(this, "allowHover", false);

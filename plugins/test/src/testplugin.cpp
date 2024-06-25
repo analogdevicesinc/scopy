@@ -92,8 +92,7 @@ bool TestPlugin::loadPage()
 void TestPlugin::loadToolList()
 {
 	renameCnt = 0;
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("test1first", "FirstPlugin", ":/gui/icons/home.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1first", "FirstPlugin", ":/gui/icons/home.svg"));
 	m_toolList.append(
 		SCOPY_NEW_TOOLMENUENTRY("test1second", "Second Plugin", ":/gui/icons/scopy-default/icons/tool_io.svg"));
 }
