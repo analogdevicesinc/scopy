@@ -212,6 +212,20 @@ void SettingsInstrument::initTimestampSection(QWidget *parent)
 		new MenuCollapseSection("Logging", MenuCollapseSection::MHCW_ARROW, parent);
 	timestampSection->contentLayout()->setSpacing(6);
 
+	QPushButton *startLogBtn = new QPushButton("Start", timestampSection);
+	startLogBtn->setFixedWidth(88);
+	StyleHelper::BlueButton(startLogBtn, "startLogBtn");
+	startLogBtn->setCheckable(true);
+	connect(startLogBtn, &QPushButton::clicked, this, [this, startLogBtn](bool checked) {
+		m_pqmAttr[DEVICE_NAME]["start_logging"] = QString::number(checked);
+		if(checked) {
+			startLogBtn->setText("Stop");
+		} else {
+			startLogBtn->setText("Start");
+		}
+		onSetBtnPressed();
+	});
+
 	QWidget *timestampWidget = new QWidget(timestampSection);
 	timestampWidget->setLayout(new QHBoxLayout());
 	timestampWidget->layout()->setContentsMargins(0, 0, 0, 0);
@@ -233,20 +247,21 @@ void SettingsInstrument::initTimestampSection(QWidget *parent)
 		}
 	});
 
-	timestampWidget->layout()->addWidget(timestampEdit1);
-	timestampWidget->layout()->addWidget(timestampEdit2);
-
 	QPushButton *timestampBtn = new QPushButton("Set interval", timestampSection);
 	timestampBtn->setFixedWidth(88);
 	StyleHelper::BlueButton(timestampBtn, "timestampBtn");
-	timestampSection->contentLayout()->addWidget(timestampWidget);
-	timestampSection->contentLayout()->addWidget(timestampBtn);
-
 	connect(timestampBtn, &QPushButton::clicked, this, [this, timestampEdit1, timestampEdit2]() {
 		setDateTimeAttr(timestampEdit1->dateTime(), LOG_START_ATTR);
 		setDateTimeAttr(timestampEdit2->dateTime(), LOG_STOP_ATTR);
 		onSetBtnPressed();
 	});
+
+	timestampWidget->layout()->addWidget(timestampEdit1);
+	timestampWidget->layout()->addWidget(timestampEdit2);
+	timestampWidget->layout()->addWidget(timestampBtn);
+
+	timestampSection->contentLayout()->addWidget(startLogBtn);
+	timestampSection->contentLayout()->addWidget(timestampWidget);
 
 	parent->layout()->addWidget(timestampSection);
 }
