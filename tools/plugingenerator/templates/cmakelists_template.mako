@@ -50,10 +50,6 @@ endif()
 set(PROJECT_SOURCES ${"${SRC_LIST}"} ${"${HEADER_LIST}"} ${"${UI_LIST}"}) 
 find_package(Qt${"${QT_VERSION_MAJOR}"} COMPONENTS REQUIRED Widgets Core) 
 
-if(NOT "${"${SCOPY_PLUGIN_BUILD_PATH}"}" STREQUAL "") 
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${"${SCOPY_PLUGIN_BUILD_PATH}"}) 
-endif() 
-
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc) 
 add_library(${"${PROJECT_NAME}"} SHARED ${"${PROJECT_SOURCES}"} ${"${PROJECT_RESOURCES}"}) 
 
