@@ -69,6 +69,16 @@ set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Xml Svg REQUIRED)
 option(SCOPY_ENABLE_GR_GUI "Build gnuradio addons for scopy-gui" ON)
 option(SCOPY_ENABLE_SIGROK_GUI "Build sigrok addons for scopy-gui" ON)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_DLL_BUILD_PATH})
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/Frameworks")
+else()
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_DLL_BUILD_PATH})
+endif()
+
+
 if(SCOPY_ENABLE_GR_GUI)
 	add_subdirectory(gr-gui)
 	set(SCOPY_HAVE_GR_GUI ON)
