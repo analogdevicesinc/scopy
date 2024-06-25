@@ -11,6 +11,7 @@ LIBAD9361_BRANCH=main
 GLOG_BRANCH=v0.4.0
 LIBM2K_BRANCH=main
 SPDLOG_BRANCH=v1.x
+LIBSNDFILE_BRANCH=1.2.2
 VOLK_BRANCH=main
 GNURADIO_BRANCH=maint-3.10
 GRSCOPY_BRANCH=3.10
@@ -23,16 +24,6 @@ IIOEMU_BRANCH=master
 MINGW_VERSION=mingw64
 ARCH=x86_64
 STAGING_AREA=$WORKFOLDER/staging
-
-RC_COMPILER_OPT="-DCMAKE_RC_COMPILER=/mingw64/bin/windres.exe"
-PATH="/bin:$STAGING_DIR/bin:$WORKFOLDER/cv2pdb:/c/Program Files (x86)/Inno Setup 6:/c/innosetup/:/bin:/usr/bin:${STAGING_DIR}/bin:/c/Program\ Files/Git/cmd:/c/Windows/System32:/c/Program\ Files/Appveyor/BuildAgent:$PATH"
-QMAKE=${STAGING_DIR}/bin/qmake
-PKG_CONFIG_PATH=$STAGING_DIR/lib/pkgconfig
-CC=${STAGING_DIR}/bin/${ARCH}-w64-mingw32-gcc.exe
-CXX=${STAGING_DIR}/bin/${ARCH}-w64-mingw32-g++.exe
-JOBS="-j9"
-MAKE_BIN=$STAGING_DIR/usr/bin/make.exe
-MAKE_CMD="$MAKE_BIN $JOBS"
 
 USE_STAGING=$1
 if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
@@ -49,7 +40,18 @@ if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
 		export PACMAN="pacman --noconfirm --needed"
 fi
 
-CMAKE_OPTS=( \
+RC_COMPILER_OPT="-DCMAKE_RC_COMPILER=/mingw64/bin/windres.exe"
+PATH="/bin:$STAGING_DIR/bin:$WORKFOLDER/cv2pdb:/c/Program Files (x86)/Inno Setup 6:/c/innosetup/:/bin:/usr/bin:${STAGING_DIR}/bin:/c/Program\ Files/Git/cmd:/c/Windows/System32:/c/Program\ Files/Appveyor/BuildAgent:$PATH"
+QMAKE=${STAGING_DIR}/bin/qmake
+PKG_CONFIG_PATH=$STAGING_DIR/lib/pkgconfig
+CC=${STAGING_DIR}/bin/${ARCH}-w64-mingw32-gcc.exe
+CXX=${STAGING_DIR}/bin/${ARCH}-w64-mingw32-g++.exe
+JOBS="-j9"
+MAKE_BIN=/usr/bin/make.exe
+MAKE_CMD="$MAKE_BIN $JOBS"
+export CMAKE_GENERATOR="Unix Makefiles"
+
+export CMAKE_OPTS=( \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 	-DCMAKE_VERBOSE_MAKEFILE=ON \
 	-DCMAKE_C_COMPILER:FILEPATH=${CC} \
@@ -60,10 +62,9 @@ CMAKE_OPTS=( \
 	-DCMAKE_PREFIX_PATH=$STAGING_DIR/lib/cmake \
 	-DCMAKE_STAGING_PREFIX=$STAGING_DIR \
 	-DCMAKE_INSTALL_PREFIX=$STAGING_DIR \
-	)
+)
 
-CMAKE_GENERATOR="Unix Makefiles"
-CMAKE="${STAGING_DIR}/bin/cmake ${CMAKE_OPTS[@]} "
+export CMAKE="${STAGING_DIR}/bin/cmake ${CMAKE_OPTS[@]} "
 
 AUTOCONF_OPTS="--prefix=$STAGING_DIR \
 	--host=${ARCH}-w64-mingw32 \

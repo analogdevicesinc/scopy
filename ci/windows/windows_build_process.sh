@@ -92,12 +92,14 @@ clone() {
 	mkdir -p $STAGING_AREA
 	pushd $STAGING_AREA
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
+	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
 	[ -d 'spdlog' ]		|| git clone --recursive https://github.com/gabime/spdlog.git -b $SPDLOG_BRANCH spdlog
-	[ -d 'volk' ]		|| git clone --recursive https://github.com/gnuradio/volk.git -b $VOLK_BRANCH volk
-	[ -d 'gnuradio' ]	|| git clone --recursive https://github.com/gnuradio/gnuradio.git -b $GNURADIO_BRANCH gnuradio
+	[ -d 'libsndfile' ]	|| git clone --recursive https://github.com/libsndfile/libsndfile -b $LIBSNDFILE_BRANCH libsndfile
 	[ -d 'gr-scopy' ]	|| git clone --recursive https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH gr-scopy
 	[ -d 'gr-m2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH gr-m2k
+	[ -d 'volk' ]		|| git clone --recursive https://github.com/gnuradio/volk.git -b $VOLK_BRANCH volk
+	[ -d 'gnuradio' ]	|| git clone --recursive https://github.com/gnuradio/gnuradio.git -b $GNURADIO_BRANCH gnuradio
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
@@ -138,7 +140,7 @@ build_with_cmake() {
 	eval $CURRENT_BUILD_POST_CMAKE
 	make $JOBS
 	if [ "$INSTALL" == "ON" ];then
-		if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
+		make install
 	fi
 	eval $CURRENT_BUILD_POST_MAKE
 	echo "$CURRENT_BUILD - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
@@ -284,9 +286,7 @@ build_qwt() {
 	else
 		$QMAKE qwt.pro
 		make $JOBS
-		if [ "$INSTALL" == "ON" ];then
-			sudo make install
-		fi
+		make install
 	fi
 
 	cp $STAGING_DIR/lib/qwt.dll $STAGING_DIR/bin/qwt.dll
@@ -320,7 +320,7 @@ build_libsigrokdecode() {
 	fi
 
 	if [ "$INSTALL" == "ON" ];then
-		if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
+		make install
 	fi
 
 	#clean deps folder
