@@ -1,4 +1,4 @@
-name: Scopy armhf Build
+name: Scopy armhf AppImage Build
 
 on: [push, pull_request]
 
@@ -8,7 +8,7 @@ env:
 
 jobs:
 
-  build_scopy_for_armhf:
+  build_scopy_armhf_appimage:
     runs-on: ubuntu-20.04
 
     steps:
