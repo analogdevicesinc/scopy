@@ -2,6 +2,7 @@
 #define GRIIOFLOATCHANNELSRC_H
 
 #include "griiodevicesource.h"
+#include "iioutil/iiounits.h"
 #include "scopy-gr-util_export.h"
 
 namespace scopy::grutil {
@@ -10,14 +11,16 @@ class SCOPY_GR_UTIL_EXPORT GRIIOFloatChannelSrc : public GRIIOChannel
 public:
 	GRIIOFloatChannelSrc(GRIIODeviceSource *dev, QString channelName, QObject *parent = nullptr);
 
-	void build_blks(GRTopBlock *top);
-	void destroy_blks(GRTopBlock *top);
+	void build_blks(GRTopBlock *top) override;
+	void destroy_blks(GRTopBlock *top) override;
 
 	virtual bool samplerateAttributeAvailable() override;
 	virtual double readSampleRate() override;
 
 	virtual bool scaleAttributeAvailable() override;
 	virtual double readScale() override;
+
+	IIOUnit unit();
 
 	const iio_data_format *getFmt() const;
 	struct iio_channel *channel() const;
@@ -30,6 +33,7 @@ protected:
 	gr::basic_block_sptr x2f;
 
 private:
+	IIOUnit m_unit;
 	const iio_data_format *fmt;
 	iio_channel *m_iioCh;
 	QString m_sampleRateAttribute;
