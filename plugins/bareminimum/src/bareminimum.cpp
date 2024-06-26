@@ -9,7 +9,6 @@
 
 #include <pluginbase/messagebroker.h>
 #include <pluginbase/preferences.h>
-#include <pluginbase/preferenceshelper.h>
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN, "BareMinimum");
 using namespace scopy;
