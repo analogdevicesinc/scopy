@@ -24,7 +24,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
 	MenuSectionCollapseWidget *section =
-		new MenuSectionCollapseWidget("APLOT - " + plt->name(), MenuCollapseSection::MHCW_NONE, parent);
+		new MenuSectionCollapseWidget("PLOT - " + plt->name(), MenuCollapseSection::MHCW_NONE, parent);
 
 	MenuCollapseSection *plotMenu = section->collapseSection();
 	v->addWidget(section);
