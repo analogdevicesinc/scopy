@@ -32,7 +32,7 @@ GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, Time
 	m_autoscaleEnabled = false;
 
 	m_scaleAvailable = m_src->scaleAttributeAvailable(); // query from GRIIOFloatChannel;
-	m_unit = "Volts";				     // query from GRIIOFloatChannel;
+	m_unit = m_src->unit();				     // query from GRIIOFloatChannel;
 
 	m_channelName = node->name();
 
