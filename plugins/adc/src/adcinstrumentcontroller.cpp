@@ -358,10 +358,13 @@ void ADCInstrumentController::setupChannelMeasurement(TimePlotManager *c, Channe
 			&MeasurementsPanel::addMeasurement);
 		connect(chMeasureManager, &MeasureManagerInterface::disableMeasurement, measurePanel,
 			&MeasurementsPanel::removeMeasurement);
-		connect(measureSettings, &MeasurementSettings::toggleAllMeasurements, chMeasureManager,
-			&MeasureManagerInterface::toggleAllMeasurement);
-		connect(measureSettings, &MeasurementSettings::toggleAllStats, chMeasureManager,
-			&MeasureManagerInterface::toggleAllStats);
+		connect(measureSettings, &MeasurementSettings::toggleAllMeasurements, [=](bool b) {
+			measurePanel->setInhibitUpdates(true);
+			chMeasureManager->toggleAllMeasurement(b);
+			measurePanel->setInhibitUpdates(false);
+		});
+		connect(measureSettings, &MeasurementSettings::toggleAllStats,
+			[=](bool b) { chMeasureManager->toggleAllStats(b); });
 		connect(chMeasureManager, &MeasureManagerInterface::enableStat, statsPanel, &StatsPanel::addStat);
 		connect(chMeasureManager, &MeasureManagerInterface::disableStat, statsPanel, &StatsPanel::removeStat);
 	}
