@@ -13,7 +13,7 @@ class SCOPY_GUI_EXPORT TitleSpinBox : public QWidget
 	Q_OBJECT
 
 public:
-	explicit TitleSpinBox(QString title, QWidget *parent = nullptr);
+	explicit TitleSpinBox(QString title, bool isCompact = false, QWidget *parent = nullptr);
 	~TitleSpinBox();
 
 	void setTitle(QString title);
@@ -45,6 +45,7 @@ private:
 	 * @return
 	 */
 	static QString truncValue(double value);
+	void connectSignalsAndSlots();
 
 	QPushButton *m_spinBoxUpButton;
 	QPushButton *m_spinBoxDownButton;

@@ -23,23 +23,44 @@
 
 using namespace scopy;
 
-ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, QWidget *parent)
+ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget *parent)
 	: m_ui(new QWidget(nullptr))
+	, m_isCompact(isCompact)
 {
 	m_recipe = recipe;
-	m_ui->setLayout(new QVBoxLayout(m_ui));
-	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
-	m_comboWidget = new MenuCombo(recipe.data, m_ui);
-	StyleHelper::IIOComboBox(m_comboWidget->combo(), "IIOComboBox");
+	if(m_isCompact) {
+		m_ui->setLayout(new QHBoxLayout(m_ui));
+		m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
-	m_ui->layout()->addWidget(m_comboWidget);
-	Q_EMIT requestData();
+		auto label = new QLabel(recipe.data, m_ui);
+		StyleHelper::IIOCompactLabel(label, "IIOTitleLabel");
+		m_comboWidget = new QComboBox(m_ui);
+		m_comboWidget->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
 
-	connect(m_comboWidget->combo(), QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
-		QString currentData = m_comboWidget->combo()->currentText();
+		StyleHelper::IIOComboBox(m_comboWidget, "IIOComboBox");
+		m_comboWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+
+		m_ui->layout()->addWidget(label);
+		m_ui->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
+		m_ui->layout()->addWidget(m_comboWidget);
+	} else {
+		m_ui->setLayout(new QVBoxLayout(m_ui));
+		m_ui->layout()->setContentsMargins(0, 0, 0, 0);
+
+		auto comboMenuWidget = new MenuCombo(recipe.data, m_ui);
+		m_comboWidget = comboMenuWidget->combo();
+		StyleHelper::IIOComboBox(m_comboWidget, "IIOComboBox");
+
+		m_ui->layout()->addWidget(comboMenuWidget);
+	}
+
+	connect(m_comboWidget, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
+		QString currentData = m_comboWidget->currentText();
 		Q_EMIT emitData(currentData);
 	});
+
+	Q_EMIT requestData();
 }
 
 ComboAttrUi::~ComboAttrUi() { m_ui->deleteLater(); }
@@ -56,14 +77,22 @@ bool ComboAttrUi::isValid()
 
 void ComboAttrUi::receiveData(QString currentData, QString optionalData)
 {
-	QSignalBlocker blocker(m_comboWidget->combo());
-	m_comboWidget->combo()->clear();
+	QSignalBlocker blocker(m_comboWidget);
+	m_comboWidget->clear();
 	QStringList optionsList = QString(optionalData).split(" ", Qt::SkipEmptyParts);
 	for(const QString &item : optionsList) {
-		m_comboWidget->combo()->addItem(item);
+		m_comboWidget->addItem(item);
 	}
 
-	m_comboWidget->combo()->setCurrentText(currentData);
+	if(m_isCompact) {
+		// hackish: in compact mode, the value is pushed to the right and the width is
+		// at the minimum. Because of this, the viewport is smaller than the size and some
+		// values might not be seen. The temporary solution is to add this line (until the
+		// new gui system and the new designs).
+		m_comboWidget->view()->setMinimumWidth(m_comboWidget->view()->sizeHintForColumn(0));
+	}
+
+	m_comboWidget->setCurrentText(currentData);
 	Q_EMIT displayedNewData(currentData, optionalData);
 }
 

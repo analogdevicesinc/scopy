@@ -118,6 +118,7 @@ public:
 	static void ActiveStoredLabel(QLabel *w, QString objectName = "");
 	static void FaultsFrame(QFrame *w, QString objectName = "");
 	static void FaultsExplanation(QWidget *w, QString objectName = "");
+	static void IIOCompactLabel(QLabel *label, QString objectName = "");
 
 private:
 	QMap<QString, QString> colorMap;

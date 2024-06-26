@@ -25,7 +25,7 @@ using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_ATTR_GUI_STRATEGY, "AttrGuiStrategy")
 
-RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, QWidget *parent)
+RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget *parent)
 	: QWidget(parent)
 	, m_ui(new QWidget(nullptr))
 {
@@ -34,16 +34,17 @@ RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, QWidget *parent)
 		qCritical(CAT_ATTR_GUI_STRATEGY)
 			<< "The data you sent to this range gui strategy is not complete. Cannot create object";
 	}
+
 	m_ui->setLayout(new QVBoxLayout(m_ui));
 	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
 	// FIXME: this does not look right when uninitialized, also crashes...
-	m_spinBox = new TitleSpinBox(m_recipe.data.toUpper(), this);
+	m_spinBox = new TitleSpinBox(m_recipe.data.toUpper(), isCompact, this);
 	m_ui->layout()->addWidget(m_spinBox);
-	Q_EMIT requestData();
 
 	connect(m_spinBox->getLineEdit(), &QLineEdit::textChanged, this,
 		[this](QString text) { Q_EMIT emitData(text); });
+	Q_EMIT requestData();
 }
 
 RangeAttrUi::~RangeAttrUi() { m_ui->deleteLater(); }

@@ -39,6 +39,7 @@ Q_LOGGING_CATEGORY(CAT_ATTRFACTORY, "AttrFactory")
 IIOWidgetBuilder::IIOWidgetBuilder(QObject *parent)
 	: QObject(parent)
 	, m_connection(nullptr)
+	, m_isCompact(false)
 	, m_context(nullptr)
 	, m_device(nullptr)
 	, m_channel(nullptr)
@@ -167,6 +168,7 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 void IIOWidgetBuilder::clear()
 {
 	m_connection = nullptr;
+	m_isCompact = false;
 	m_context = nullptr;
 	m_device = nullptr;
 	m_channel = nullptr;
@@ -181,6 +183,12 @@ void IIOWidgetBuilder::clear()
 IIOWidgetBuilder &IIOWidgetBuilder::connection(Connection *connection)
 {
 	m_connection = connection;
+	return *this;
+}
+
+IIOWidgetBuilder &IIOWidgetBuilder::compactMode(bool isCompact)
+{
+	m_isCompact = isCompact;
 	return *this;
 }
 
@@ -335,14 +343,14 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 
 	switch(strategy) {
 	case UIS::EditableUi:
-		ui = new EditableGuiStrategy(m_generatedRecipe, m_widgetParent);
+		ui = new EditableGuiStrategy(m_generatedRecipe, m_isCompact, m_widgetParent);
 		break;
 	case UIS::SwitchUi:
 	case UIS::ComboUi:
-		ui = new ComboAttrUi(m_generatedRecipe, m_widgetParent);
+		ui = new ComboAttrUi(m_generatedRecipe, m_isCompact, m_widgetParent);
 		break;
 	case UIS::RangeUi:
-		ui = new RangeAttrUi(m_generatedRecipe, m_widgetParent);
+		ui = new RangeAttrUi(m_generatedRecipe, m_isCompact, m_widgetParent);
 		break;
 	default:
 		break;
