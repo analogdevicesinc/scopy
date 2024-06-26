@@ -82,6 +82,15 @@ public:
 	IIOWidgetBuilder &connection(scopy::Connection *connection);
 
 	/**
+	 * @brief Sets the UI of the widgets to compact mode, this way, the widget
+	 * sizes will be more compact.
+	 * @param isCompact If this is set to true, the widget will be in compact
+	 * mode. If false, the widget will be in normal mode.
+	 * @return
+	 */
+	IIOWidgetBuilder &compactMode(bool isCompact);
+
+	/**
 	 * @brief Sets the context that will be used, if no iio_device or iio_channel
 	 * is set, the build functions will work with the context.
 	 * @param context
@@ -151,6 +160,7 @@ private:
 	GuiStrategyInterface *createUIS();
 
 	Connection *m_connection;
+	bool m_isCompact;
 	struct iio_context *m_context;
 	struct iio_device *m_device;
 	struct iio_channel *m_channel;
