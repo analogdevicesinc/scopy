@@ -17,11 +17,11 @@ TimePlotManager::TimePlotManager(QString name, QWidget *parent)
 	m_lay->setSpacing(0);
 
 	m_measurePanel = new MeasurementsPanel(this);
-	m_measurePanel->setFixedHeight(100);
+	m_measurePanel->setFixedHeight(110);
 	// tool->topStack()->add(measureMenuId, m_measurePanel);
 
 	m_statsPanel = new StatsPanel(this);
-	m_statsPanel->setFixedHeight(80);
+	m_statsPanel->setFixedHeight(100);
 	// tool->bottomStack()->add(statsMenuId, m_statsPanel);
 	m_lay->addWidget(m_measurePanel);
 	m_measurePanel->setVisible(false);
