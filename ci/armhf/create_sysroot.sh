@@ -1,14 +1,15 @@
 #!/bin/bash
 
 set -ex
-SRC_DIR=$(git rev-parse --show-toplevel)
-source $SRC_DIR/ci/kuiper/kuiper_build_config.sh
+SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
+SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
+source $SRC_DIR/ci/armhf/armhf_build_config.sh
 
 IMAGE_FILE=2023-12-13-ADI-Kuiper-full.img
 
 install_packages(){
 	sudo apt update
-	sudo apt -y install git wget unzip python3 python2
+	sudo apt -y install git wget unzip python3 python2 python
 }
 
 download_kuiper(){
@@ -44,7 +45,7 @@ extract_sysroot(){
 
 # execute chroot inside the sysroot folder and install/remove packages using apt
 configure_sysroot(){
-	cat $SRC_DIR/ci/kuiper/inside_chroot.sh | sudo chroot ${SYSROOT}
+	cat $SRC_DIR/ci/armhf/inside_chroot.sh | sudo chroot ${SYSROOT}
 }
 
 move_and_extract_sysroot(){

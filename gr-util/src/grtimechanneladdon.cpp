@@ -1,7 +1,7 @@
 #include "grtimechanneladdon.h"
 
 #include <iio-widgets/iiowidget.h>
-#include <iio-widgets/iiowidgetfactory.h>
+#include <iio-widgets/iiowidgetbuilder.h>
 #include "grdeviceaddon.h"
 #include "errorbox.h"
 
@@ -19,7 +19,6 @@
 #include <gui/widgets/menuonoffswitch.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <pluginbase/preferences.h>
-#include <iio-widgets/iiowidgetfactory.h>
 
 Q_LOGGING_CATEGORY(CAT_GR_TIME_CHANNEL, "GRTimeChannel");
 using namespace scopy::grutil;
@@ -194,7 +193,7 @@ QWidget *GRTimeChannelAddon::createAttrMenu(QWidget *parent)
 	MenuSectionWidget *attrcontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *attr =
 		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrcontainer);
-	QList<IIOWidget *> attrWidgets = IIOWidgetFactory::buildAllAttrsForChannel(grch()->channel());
+	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder().channel(grch()->channel()).buildAll();
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);

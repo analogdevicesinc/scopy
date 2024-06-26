@@ -27,18 +27,18 @@ FROM start AS sysroot_builder
 ARG USER=runner
 ENV DEBIAN_FRONTEND=noninteractive
 COPY sysroot.tar.gz /home/${USER}
-RUN git clone https://github.com/analogdevicesinc/scopy -b kuiper-worflow
+RUN git clone https://github.com/analogdevicesinc/scopy -b dev
 WORKDIR /home/${USER}/scopy
-RUN ./ci/kuiper/create_sysroot.sh \
+RUN ./ci/armhf/create_sysroot.sh \
 		install_packages \
 		move_and_extract_sysroot \
 		fix_relativelinks
-RUN ./ci/kuiper/build_qt.sh \
+RUN ./ci/armhf/build_qt.sh \
 		install_packages \
 		download_qt \
 		download_crosscompiler \
 		build_qt5.15.2
-RUN ./ci/kuiper/kuiper_build_process.sh \
+RUN ./ci/armhf/armhf_build_process.sh \
 		install_packages \
 		download_cmake \
 		download_crosscompiler \
@@ -51,9 +51,9 @@ FROM start
 ARG USER=runner
 ENV DEBIAN_FRONTEND=noninteractive
 RUN mkdir -p /home/${USER}/sysroot
-COPY --from=sysroot_builder /home/${USER}/scopy/ci/kuiper/staging/sysroot/usr /home/${USER}/sysroot/usr
-COPY --from=sysroot_builder /home/${USER}/scopy/ci/kuiper/staging/sysroot/share /home/${USER}/sysroot/share
-COPY --from=sysroot_builder /home/${USER}/scopy/ci/kuiper/staging/sysroot/include /home/${USER}/sysroot/include
+COPY --from=sysroot_builder /home/${USER}/scopy/ci/armhf/staging/sysroot/usr /home/${USER}/sysroot/usr
+COPY --from=sysroot_builder /home/${USER}/scopy/ci/armhf/staging/sysroot/share /home/${USER}/sysroot/share
+COPY --from=sysroot_builder /home/${USER}/scopy/ci/armhf/staging/sysroot/include /home/${USER}/sysroot/include
 WORKDIR /home/${USER}/sysroot
 RUN ln -s usr/bin bin && ln -s usr/lib lib && ln -s usr/sbin sbin
 WORKDIR /home/${USER}

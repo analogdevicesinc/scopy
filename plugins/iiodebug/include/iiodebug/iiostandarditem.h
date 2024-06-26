@@ -5,7 +5,7 @@
 #include <QStandardItem>
 #include <QDateTime>
 #include <iio.h>
-#include <iio-widgets/iiowidgetfactory.h>
+#include <iio-widgets/iiowidgetbuilder.h>
 #include <iio-widgets/iiowidget.h>
 
 namespace scopy::iiodebugplugin {

@@ -3,7 +3,7 @@
 #include "plotaxis.h"
 #include "plotwidget.h"
 #include "spinbox_a.hpp"
-#include <iio-widgets/iiowidgetfactory.h>
+#include <iio-widgets/iiowidgetbuilder.h>
 
 #include <QButtonGroup>
 #include <QDebug>

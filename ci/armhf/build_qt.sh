@@ -1,8 +1,9 @@
 #!/bin/bash
 
 set -ex
-SRC_DIR=$(git rev-parse --show-toplevel)
-source $SRC_DIR/ci/kuiper/kuiper_build_config.sh
+SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
+SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
+source $SRC_DIR/ci/armhf/armhf_build_config.sh
 
 install_packages(){
 	sudo apt install -y build-essential cmake unzip gfortran gcc git bison \
@@ -18,7 +19,7 @@ download_qt(){
 		wget --progress=dot:giga ${QT_DOWNLOAD_LINK}
 		tar -xf qt-everywhere-src-*.tar.xz && rm qt-everywhere-src-*.tar.xz && mv qt-everywhere-src-* qt-everywhere-src # unzip and rename
 		cd qt-everywhere-src
-		patch -p1 < $SRC_DIR/ci/kuiper/qt_patch.patch # Patch QT Source
+		patch -p1 < $SRC_DIR/ci/armhf/qt_patch.patch # Patch QT Source
 	else
 		echo "QT already downloaded"
 	fi
@@ -48,7 +49,7 @@ build_qt5.15.2(){
 	-prefix $QT_SYSTEM_LOCATION \
 	-extprefix $QT_BUILD_LOCATION \
 	-eglfs \
-	-opengl es2 \
+	-opengl desktop \
 	-device linux-rasp-pi4-v3d-g++ \
 	-device-option CROSS_COMPILE=$CROSS_COMPILER/bin/arm-linux-gnueabihf- \
 	-skip qtscript \
