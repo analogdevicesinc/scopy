@@ -39,7 +39,7 @@ HarmonicCalibration::HarmonicCalibration(PlotProxy *proxy, QWidget *parent)
 	setupChannelsButtonHelper(channelsButton);
 
     plotAddon = dynamic_cast<GRTimePlotAddon *>(proxy->getPlotAddon());
-	tool->addWidgetToCentralContainerHelper(plotAddon->getWidget());
+	// tool->addWidgetToCentralContainerHelper(plotAddon->getWidget());
 
     plotAddonSettings = dynamic_cast<GRTimePlotAddonSettings *>(proxy->getPlotSettings());
 	rightMenuButtonGroup->addButton(settingsButton);
@@ -54,8 +54,8 @@ HarmonicCalibration::HarmonicCalibration(PlotProxy *proxy, QWidget *parent)
     MenuControlButton *measure = new MenuControlButton(this);
 	setupMeasureButtonHelper(measure);
 	measurePanel = new MeasurementsPanel(this);
-	tool->topStack()->add(measureMenuId, measurePanel);
-    tool->openTopContainerHelper(false);
+	//tool->topStack()->add(measureMenuId, measurePanel);
+    //tool->openTopContainerHelper(false);
 
     statsPanel = new StatsPanel(this);
 	tool->bottomStack()->add(statsMenuId, statsPanel);
@@ -91,6 +91,32 @@ HarmonicCalibration::HarmonicCalibration(PlotProxy *proxy, QWidget *parent)
     // Left Channel Manager
     verticalChannelManager = new VerticalChannelManager(this);
 	tool->leftStack()->add(verticalChannelManagerId, verticalChannelManager);
+
+	QWidget *historicalGraphWidget = new QWidget();
+	QVBoxLayout *historicalGraphLayout = new QVBoxLayout(this);
+
+	dataGraph = new Sismograph(this);
+	dataGraph->setColor(QColor("#ff7200"));
+	dataGraph->setAutoscale(false);
+	dataGraph->addScale(-1.0, 1.0, 5, 5);
+	dataGraph->addScale(-5.0, 5.0, 10, 2);
+	dataGraph->addScale(-25.0, 25.0, 10, 5);
+	dataGraph->setUnitOfMeasure("Voltage", "V");
+
+	tempGraph = new Sismograph(this);
+	tempGraph->setColor(QColor("#9013fe"));
+	tempGraph->setAutoscale(false);
+	tempGraph->addScale(-1.0, 1.0, 5, 5);
+	tempGraph->addScale(-5.0, 5.0, 10, 2);
+	tempGraph->addScale(-25.0, 25.0, 10, 5);
+	tempGraph->setUnitOfMeasure("Voltage", "V");
+
+	historicalGraphLayout->addWidget(dataGraph);
+	historicalGraphLayout->addWidget(tempGraph);
+
+	historicalGraphWidget->setLayout(historicalGraphLayout);
+
+	tool->addWidgetToCentralContainerHelper(historicalGraphWidget);
 
     channelGroup = new QButtonGroup(this);
 	for(auto d : proxy->getDeviceAddons()) {
