@@ -38,7 +38,7 @@ public:
 	 * @brief This contain a CustomSwitch capable of holding no more than 2 values, the ones specified in
 	 * recipe->linkedAttributeValue.
 	 * */
-	explicit SwitchAttrUi(IIOWidgetFactoryRecipe recipe, QWidget *parent = nullptr);
+	explicit SwitchAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QWidget *parent = nullptr);
 	~SwitchAttrUi();
 
 	/**

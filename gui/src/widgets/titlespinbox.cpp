@@ -8,7 +8,7 @@
 using namespace scopy;
 Q_LOGGING_CATEGORY(CAT_TITLESPINBOX, "TitleSpinBox")
 
-TitleSpinBox::TitleSpinBox(QString title, QWidget *parent)
+TitleSpinBox::TitleSpinBox(QString title, bool isCompact, QWidget *parent)
 	: QWidget(parent)
 	, m_titleLabel(new QLabel(title, this))
 	, m_lineedit(new QLineEdit(this))
@@ -27,18 +27,8 @@ TitleSpinBox::TitleSpinBox(QString title, QWidget *parent)
 	m_lineedit->setMaximumHeight(25);
 
 	QWidget *spinboxWidget = new QWidget(this);
-	QVBoxLayout *spinboxWidgetLayout = new QVBoxLayout(spinboxWidget);
-	spinboxWidgetLayout->setSpacing(0);
-	spinboxWidgetLayout->setMargin(0);
-
-	spinboxWidgetLayout->addWidget(m_titleLabel);
-	spinboxWidgetLayout->addWidget(m_lineedit);
-
 	QWidget *buttonWidget = new QWidget(this);
 	buttonWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-	QVBoxLayout *buttonWidgetLayout = new QVBoxLayout(buttonWidget);
-	buttonWidgetLayout->setSpacing(1);
-	buttonWidgetLayout->setContentsMargins(0, 0, 0, 1);
 
 	m_spinBoxUpButton->setAutoRepeat(true); // so the user can hold down the button and it will react
 	StyleHelper::SpinBoxUpButton(m_spinBoxUpButton, "SpinBoxUpButton");
@@ -50,56 +40,47 @@ TitleSpinBox::TitleSpinBox(QString title, QWidget *parent)
 	m_spinBoxDownButton->setIconSize(QSize(20, 20));
 	m_spinBoxDownButton->setFixedSize(20, 20);
 
-	buttonWidgetLayout->addWidget(m_spinBoxUpButton);
-	buttonWidgetLayout->addWidget(m_spinBoxDownButton);
+	QLayout *buttonWidgetLayout;
+	QLayout *spinboxWidgetLayout;
 
-	// here we preffer the pressed signal rather than the clicked one to speed up the change of values
-	connect(m_spinBoxUpButton, &QPushButton::pressed, m_lineedit, [this] {
-		bool ok = true;
-		QString text = m_lineedit->text();
-		double value = text.toDouble(&ok);
-		if(!ok) {
-			// If the cast fails that means that there is an issue with the text and the
-			// min/max/step values are useless here. The signal will just be skipped and
-			// a debug message will de displayed.
-			qDebug(CAT_TITLESPINBOX) << "Cannot increase the value:" << text;
-			return;
-		}
+	if(isCompact) {
+		m_titleLabel->setText(m_titleLabel->text().toUpper());
+		m_titleLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+		StyleHelper::IIOCompactLabel(m_titleLabel, "IIOTitleLabel");
+		m_lineedit->setAlignment(Qt::AlignRight);
 
-		double newValue = value + m_step;
-		if(newValue > m_max) {
-			newValue = value;
-		}
+		buttonWidgetLayout = new QHBoxLayout(buttonWidget);
+		spinboxWidgetLayout = new QHBoxLayout(spinboxWidget);
 
-		m_lineedit->setText(truncValue(newValue));
-	});
+		buttonWidgetLayout->addWidget(m_spinBoxDownButton);
+		buttonWidgetLayout->addWidget(m_spinBoxUpButton);
+		spinboxWidgetLayout->addWidget(m_titleLabel);
+		spinboxWidgetLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
+		spinboxWidgetLayout->addWidget(m_lineedit);
 
-	connect(m_spinBoxDownButton, &QPushButton::pressed, m_lineedit, [this] {
-		bool ok = true;
-		QString text = m_lineedit->text();
-		double value = text.toDouble(&ok);
-		if(!ok) {
-			// If the cast fails that means that there is an issue with the text and the
-			// min/max/step values are useless here. The signal will just be skipped and
-			// a debug message will de displayed.
-			qDebug(CAT_TITLESPINBOX) << "Cannot decrease the value:" << text;
-			return;
-		}
+		mainLayout->addWidget(spinboxWidget);
+		mainLayout->addWidget(buttonWidget);
+	} else {
+		buttonWidgetLayout = new QVBoxLayout(buttonWidget);
+		spinboxWidgetLayout = new QVBoxLayout(spinboxWidget);
 
-		double newValue = value - m_step;
-		if(newValue < m_min) {
-			newValue = value;
-		}
+		buttonWidgetLayout->addWidget(m_spinBoxUpButton);
+		buttonWidgetLayout->addWidget(m_spinBoxDownButton);
+		spinboxWidgetLayout->addWidget(m_titleLabel);
+		spinboxWidgetLayout->addWidget(m_lineedit);
 
-		m_lineedit->setText(truncValue(newValue));
-	});
+		mainLayout->addWidget(spinboxWidget);
+		mainLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
+		mainLayout->addWidget(buttonWidget);
+	}
 
-	spinboxWidgetLayout->addWidget(m_titleLabel);
-	spinboxWidgetLayout->addWidget(m_lineedit);
+	buttonWidgetLayout->setSpacing(1);
+	buttonWidgetLayout->setContentsMargins(0, 0, 0, 1);
 
-	mainLayout->addWidget(spinboxWidget);
-	mainLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
-	mainLayout->addWidget(buttonWidget);
+	spinboxWidgetLayout->setSpacing(0);
+	spinboxWidgetLayout->setMargin(0);
+
+	connectSignalsAndSlots();
 }
 
 TitleSpinBox::~TitleSpinBox() {}
@@ -148,6 +129,50 @@ QString TitleSpinBox::truncValue(double value)
 
 	sReturn.chop(toChop);
 	return sReturn;
+}
+
+void TitleSpinBox::connectSignalsAndSlots()
+{
+	// here we preffer the pressed signal rather than the clicked one to speed up the change of values
+	connect(m_spinBoxUpButton, &QPushButton::pressed, m_lineedit, [this] {
+		bool ok = true;
+		QString text = m_lineedit->text();
+		double value = text.toDouble(&ok);
+		if(!ok) {
+			// If the cast fails that means that there is an issue with the text and the
+			// min/max/step values are useless here. The signal will just be skipped and
+			// a debug message will de displayed.
+			qDebug(CAT_TITLESPINBOX) << "Cannot increase the value:" << text;
+			return;
+		}
+
+		double newValue = value + m_step;
+		if(newValue > m_max) {
+			newValue = value;
+		}
+
+		m_lineedit->setText(truncValue(newValue));
+	});
+
+	connect(m_spinBoxDownButton, &QPushButton::pressed, m_lineedit, [this] {
+		bool ok = true;
+		QString text = m_lineedit->text();
+		double value = text.toDouble(&ok);
+		if(!ok) {
+			// If the cast fails that means that there is an issue with the text and the
+			// min/max/step values are useless here. The signal will just be skipped and
+			// a debug message will de displayed.
+			qDebug(CAT_TITLESPINBOX) << "Cannot decrease the value:" << text;
+			return;
+		}
+
+		double newValue = value - m_step;
+		if(newValue < m_min) {
+			newValue = value;
+		}
+
+		m_lineedit->setText(truncValue(newValue));
+	});
 }
 
 #include "moc_titlespinbox.cpp"

@@ -25,7 +25,7 @@ using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_SWITCHGUISTRATEGY, "SwitchGuiStrategy")
 
-SwitchAttrUi::SwitchAttrUi(IIOWidgetFactoryRecipe recipe, QWidget *parent)
+SwitchAttrUi::SwitchAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget *parent)
 	: QWidget(parent)
 	, m_ui(new QWidget(nullptr))
 	, m_optionsList(new QStringList)
