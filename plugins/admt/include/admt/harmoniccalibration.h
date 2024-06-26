@@ -2,6 +2,7 @@
 #define HARMONICCALIBRATION_H
 
 #include "scopy-admt_export.h"
+#include "sismograph.hpp"
 
 #include <QBoxLayout>
 #include <QWidget>
@@ -12,6 +13,7 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include <QButtonGroup>
+#include <QVBoxLayout>
 
 #include <admtplugin.h>
 #include <iio.h>
@@ -72,6 +74,8 @@ private:
 	MeasurementsPanel *measurePanel;
 	MeasurementSettings *measureSettings;
 	StatsPanel *statsPanel;
+
+	Sismograph *dataGraph, *tempGraph;
 
 	void setupChannelsButtonHelper(MenuControlButton *channelsButton);
 	void setupMeasureButtonHelper(MenuControlButton *measureButton);
