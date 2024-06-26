@@ -12,7 +12,7 @@
 
 #include <iioutil/connectionprovider.h>
 #include <pluginbase/preferences.h>
-#include <pluginbase/preferenceshelper.h>
+#include <gui/preferenceshelper.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
 
