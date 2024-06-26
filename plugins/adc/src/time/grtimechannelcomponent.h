@@ -2,6 +2,7 @@
 #define GRTIMECHANNELCOMPONENT_H
 
 #include "grtimesinkcomponent.h"
+#include "iioutil/iiounits.h"
 #include "menucollapsesection.h"
 #include "scopy-adc_export.h"
 #include "channelcomponent.h"
@@ -126,7 +127,7 @@ private:
 	bool m_autoscaleEnabled;
 	bool m_running;
 
-	QString m_unit;
+	IIOUnit m_unit;
 
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createAttrMenu(QWidget *parent);
