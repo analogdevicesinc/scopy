@@ -9,7 +9,7 @@
 #include <QCoreApplication>
 #include <QScrollArea>
 #include <stylehelper.h>
-#include "pluginbase/preferenceshelper.h"
+#include "gui/preferenceshelper.h"
 #include "application_restarter.h"
 #include <QDir>
 #include <QDebug>
