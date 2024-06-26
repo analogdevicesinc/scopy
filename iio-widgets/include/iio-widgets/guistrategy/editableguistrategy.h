@@ -37,7 +37,7 @@ public:
 	/**
 	 * @brief This contain a MenuLineEdit with no validation on what the text can or cannot be set.
 	 * */
-	explicit EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent = nullptr);
+	explicit EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QWidget *parent = nullptr);
 	~EditableGuiStrategy();
 
 	/**

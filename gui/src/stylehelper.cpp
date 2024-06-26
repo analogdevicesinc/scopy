@@ -1491,4 +1491,25 @@ void StyleHelper::FaultsExplanation(QWidget *w, QString objectName)
 	w->setStyleSheet(style);
 }
 
+void StyleHelper::IIOCompactLabel(QLabel *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+	w->setText(w->text().toUpper());
+	w->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	QString style = R"css(
+			QLabel {
+				color: white;
+				background-color: rgba(255,255,255,0);
+				font-weight: 500;
+				font-family: Open Sans;
+				font-size: 12px;
+				font-style: normal;
+			}
+				QLabel:disabled {
+					color: grey;
+			})css";
+	w->setStyleSheet(style);
+}
+
 #include "moc_stylehelper.cpp"
