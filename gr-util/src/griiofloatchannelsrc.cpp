@@ -26,6 +26,9 @@ GRIIOFloatChannelSrc::GRIIOFloatChannelSrc(GRIIODeviceSource *dev, QString chann
 			"scale",
 		},
 		m_iioCh);
+
+	iio_chan_type type = iio_channel_get_type(m_iioCh);
+	m_unit = IIOUnitsManager::iioChannelTypes().value(type, {"Adimensional", ".", 1});
 }
 
 void GRIIOFloatChannelSrc::build_blks(GRTopBlock *top)
@@ -105,6 +108,8 @@ double GRIIOFloatChannelSrc::readScale()
 		return -1;
 	}
 }
+
+scopy::IIOUnit GRIIOFloatChannelSrc::unit() { return m_unit; }
 
 const iio_data_format *GRIIOFloatChannelSrc::getFmt() const { return fmt; }
 
