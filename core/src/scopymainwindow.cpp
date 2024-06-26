@@ -26,17 +26,15 @@
 #include "iioutil/connectionprovider.h"
 #include "pluginbase/messagebroker.h"
 #include "scopy-core_config.h"
-#include "popupwidget.h"
 #include "pluginbase/statusbarmanager.h"
 #include "scopytitlemanager.h"
 #include <common/scopyconfig.h>
 #include <translationsrepository.h>
 #include <libsigrokdecode/libsigrokdecode.h>
-#include <functional>
-#include <utility>
 #include <stylehelper.h>
 #include <scopymainwindow_api.h>
 #include <QVersionNumber>
+#include <iioutil/iiounits.h>
 
 using namespace scopy;
 using namespace scopy::gui;
@@ -58,6 +56,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ScopyTitleManager::setGitHash(QString(SCOPY_VERSION_GIT));
 
 	StyleHelper::GetInstance()->initColorMap();
+	IIOUnitsManager::GetInstance();
 	setAttribute(Qt::WA_QuitOnClose, true);
 	initPythonWIN32();
 	initStatusBar();
