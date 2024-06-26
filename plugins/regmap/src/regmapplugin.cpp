@@ -21,7 +21,7 @@
 #include <src/readwrite/iioregisterreadstrategy.hpp>
 #include <src/readwrite/iioregisterwritestrategy.hpp>
 #include <pluginbase/preferences.h>
-#include <pluginbase/preferenceshelper.h>
+#include <gui/preferenceshelper.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
 #include <readwrite/fileregisterreadstrategy.hpp>

@@ -1,18 +1,19 @@
 #ifndef PREFERENCESHELPER_H
 #define PREFERENCESHELPER_H
-#include "preferences.h"
-#include "scopy-pluginbase_export.h"
+#include "scopy-gui_export.h"
 
 #include <QCheckBox>
 #include <QComboBox>
 #include <QLineEdit>
+
+#include <pluginbase/preferences.h>
 
 namespace scopy {
 /**
  * @brief The PreferencesHelper class
  * PreferencesHelper class used to create widgets and connect the widgets to the Preferences singleton
  */
-class SCOPY_PLUGINBASE_EXPORT PreferencesHelper
+class SCOPY_GUI_EXPORT PreferencesHelper
 {
 
 public:
