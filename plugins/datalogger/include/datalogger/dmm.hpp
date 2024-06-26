@@ -7,16 +7,10 @@
 #include "datamonitor/dmmdatamonitormodel.hpp"
 #include "iio.h"
 #include "scopy-datalogger_export.h"
+#include "iioutil/iiounits.h"
 
 namespace scopy {
 namespace datamonitor {
-
-struct DMMInfo
-{
-	QString key;
-	QString key_symbol;
-	double umScale = 1;
-};
 
 class SCOPY_DATALOGGER_EXPORT DMM : public QObject
 {
@@ -30,12 +24,12 @@ public:
 	bool iioChannelHasAttribute(iio_channel *chn, std::string const &attr);
 	void generateDictionaries();
 
-	QMap<int, DMMInfo> iioDevices() const;
-	QMap<int, DMMInfo> hwmonDevices() const;
+	QMap<iio_chan_type, IIOUnit> iioDevices() const;
+	QMap<hwmon_chan_type, IIOUnit> hwmonDevices() const;
 
 private:
-	QMap<int, DMMInfo> m_iioDevices;
-	QMap<int, DMMInfo> m_hwmonDevices;
+	QMap<iio_chan_type, IIOUnit> m_iioDevices;
+	QMap<hwmon_chan_type, IIOUnit> m_hwmonDevices;
 };
 } // namespace datamonitor
 } // namespace scopy
