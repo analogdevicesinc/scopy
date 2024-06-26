@@ -40,7 +40,7 @@ public:
 	 * string from recipe->linkedAttributeValue should look like "[begin step end]" where "begin", "step" and "end"
 	 * will be converted to double.
 	 * */
-	explicit RangeAttrUi(IIOWidgetFactoryRecipe recipe, QWidget *parent = nullptr);
+	explicit RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QWidget *parent = nullptr);
 	~RangeAttrUi();
 
 	/**
