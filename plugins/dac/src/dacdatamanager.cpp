@@ -15,19 +15,23 @@ DacDataManager::DacDataManager(DacDataModel *model, QWidget *parent)
 	, m_model(model)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	m_layout = new QHBoxLayout(this);
+	m_layout = new QVBoxLayout(this);
 	m_layout->setMargin(0);
 	m_layout->setSpacing(10);
 	setLayout(m_layout);
 
-	QVBoxLayout *leftHeader = new QVBoxLayout(this);
-//	leftHeader->setMargin(0);
-//	leftHeader->setSpacing(10);
+	QWidget *header = new QWidget(this);
+	QVBoxLayout *headerLay = new QVBoxLayout(this);
+	header->setLayout(headerLay);
+	StyleHelper::BackgroundWidget(header);
+	headerLay->setMargin(10);
+	headerLay->setSpacing(0);
 
 	dacAddonStack = new MapStackedWidget(this);
 
-	QLabel *name = new QLabel(model->getName(), this);
+//	QLabel *name = new QLabel(model->getName().toUpper(), this);
 	m_mode = new MenuCombo("MODE", this);
+	StyleHelper::IIOComboBox(m_mode->combo());
 	auto cb = m_mode->combo();
 	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		auto mode = cb->itemData(idx).toInt();
@@ -38,29 +42,20 @@ DacDataManager::DacDataManager(DacDataModel *model, QWidget *parent)
 	setupDacMode("Buffer", DAC_BUFFER);
 	setupDacMode("DDS", DAC_DDS);
 
-	leftHeader->addWidget(name, Qt::AlignLeft);
-	leftHeader->addWidget(m_mode, Qt::AlignLeft);
+	headerLay->addWidget(m_mode);
+//	leftHeaderLay->addWidget(name);
+//	leftHeaderLay->addWidget(m_mode);
+//	leftHeaderLay->addItem(new QSpacerItem(40, 40, QSizePolicy::Expanding));
 
 	m_color = StyleHelper::getColor(
 		"CH" + QString::number(QRandomGenerator::global()->bounded(0, 7)));
-//	setStyleSheet("background-color:" + m_color.name());
 
-	m_layout->addLayout(leftHeader, 1);
+	m_layout->addWidget(header);
 	m_layout->addWidget(dacAddonStack);
+	m_layout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding));
 
 	cb->setCurrentIndex(DAC_BUFFER);
-
-//	m_layout->addWidget(mapstackedwidget-containing-configs-for-buffer-and-dds);
 }
-
-// tbd should we have a DacAddon on which
-// DacBuffer and DacDds Addon are based of?
-// and for the disabled part we have a simple
-// DacAddon, just empty.
-// m_dacBuffer = new DacDataBuffer();
-// move this into a setupDacFunction
-// and save the modeCombo to a member
-// such that you can add items later on
 
 DacDataManager::~DacDataManager()
 {

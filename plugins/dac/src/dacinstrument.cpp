@@ -26,6 +26,10 @@ DacInstrument::DacInstrument(const Connection *conn, QWidget *parent)
 	tool->leftContainer()->setVisible(true);
 	tool->rightContainer()->setVisible(true);
 	tool->topContainer()->setVisible(true);
+	tool->setLeftContainerWidth(210);
+	tool->setRightContainerWidth(300);
+	tool->setTopContainerHeight(100);
+	tool->setBottomContainerHeight(90);
 	lay->addWidget(tool);
 
 	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), true, this);

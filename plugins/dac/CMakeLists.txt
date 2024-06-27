@@ -57,7 +57,8 @@ target_link_libraries(
         Qt::Core 
         scopy-pluginbase 
         scopy-gui 
-        scopy-iioutil 
+	scopy-iioutil
+	scopy-iio-widgets
 )
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE) 

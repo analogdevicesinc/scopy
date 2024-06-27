@@ -36,7 +36,7 @@ public:
 	void setColor(QColor newColor);
 private:
 	struct iio_device *m_dev;
-	QHBoxLayout *m_layout;
+	QVBoxLayout *m_layout;
 	DacDataModel *m_model;
 	QWidget *m_widget;
 	QColor m_color;

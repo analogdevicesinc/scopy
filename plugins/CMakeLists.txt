@@ -84,7 +84,6 @@ endif()
 if(ENABLE_PLUGIN_DAC)
 	add_subdirectory(dac)
 	list(APPEND PLUGINS ${PLUGIN_NAME})
-	configureinstallersettings(${PLUGIN_NAME} ${PLUGIN_DESCRIPTION} "fixed")
 endif()
 
 if(ENABLE_PLUGIN_SWIOT)
