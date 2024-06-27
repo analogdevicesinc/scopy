@@ -1,0 +1,104 @@
+{
+	"dacbuffer": [
+		{
+			"index": 1,
+			"names": ["MODE_SELECTOR"],
+			"description": "Change DAC mode (Disabled, DDS, Buffer)",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 2,
+			"names": ["FILE_MANAGER"],
+			"description": "Select data file for the DAC buffer",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 3,
+			"names": ["CHANNEL_SELECTOR"],
+			"description": "Enable channels to be used in the DAC buffer",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 4,
+			"names": ["CYCLIC_BUTTON"],
+			"description": "Select whether to use cyclic or non-cyclic buffer",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 5,
+			"names": ["FILESIZE"],
+			"description": "Displays the number of samples in file, can be used to truncate the file",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 6,
+			"names": ["RUN_BUTTON"],
+			"description": "Start the DAC buffer output.",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 7,
+			"names": ["CONSOLE_LOG"],
+			"description": "Displays information on file load status, buffer output status or other errors.",
+			"anchor": "HP_TOP",
+			"content": "HP_TOP",
+			"y_offset": 10
+		}
+	],
+	"dacbuffernoncyclic": [
+		{
+			"index": 1,
+			"names": ["BUFFERSIZE"],
+			"description": "Select the buffersize or use the amount automatically provided based on file size.",
+			"anchor": "HP_TOP",
+			"content": "HP_TOP",
+			"y_offset": 10
+		},
+		{
+			"index": 2,
+			"names": ["KERNEL_BUFFERS"],
+			"description": "Select the number of kernel buffers or use the amount automatically provided based on file size.",
+			"anchor": "HP_TOP",
+			"content": "HP_TOP",
+			"y_offset": 10
+		}
+	],
+	"dacdds": [
+		{
+			"index": 1,
+			"names": ["TX_INDICATOR"],
+			"description": "Label header for each available TX",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 2,
+			"names": ["TX_READ"],
+			"description": "Refresh all the IIO Attributes of the corresponding TX.",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 3,
+			"names": ["TX_MODE_SELECTOR"],
+			"description": "Select the TX DDS configuration mode (one tone, two tones, independent I/Q control if compatible).",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		}
+	]
+}
