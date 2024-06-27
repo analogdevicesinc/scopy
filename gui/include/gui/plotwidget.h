@@ -79,6 +79,8 @@ public:
 	void setUnitsVisible(bool visible);
 
 	void printPlot(QPainter *painter, bool useSymbols = false);
+	void plotChannelChangeYAxis(PlotChannel *c, PlotAxis *y);
+	void plotChannelChangeXAxis(PlotChannel *c, PlotAxis *x);
 
 public Q_SLOTS:
 	void replot();

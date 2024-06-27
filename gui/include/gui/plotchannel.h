@@ -53,6 +53,10 @@ public:
 	int style() const;
 	void setStyle(int newStyle);
 
+	void setYAxis(PlotAxis *newYAxis);
+
+	void setXAxis(PlotAxis *newXAxis);
+
 public Q_SLOTS:
 	void raise();
 	void attach();
@@ -75,7 +79,8 @@ Q_SIGNALS:
 	void styleChanged();
 
 private:
-	PlotAxis *m_xAxis, *m_yAxis;
+	PlotAxis *m_xAxis;
+	PlotAxis *m_yAxis;
 	PlotAxisHandle *m_handle;
 	QwtPlotCurve *m_curve;
 	QList<QwtPlotMarker *> m_markers;

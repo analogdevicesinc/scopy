@@ -39,14 +39,18 @@ public:
 public Q_SLOTS:
 	virtual void replot();
 	void showPlotLabels(bool b);
-	void setSingleYMode(bool b);
+	void setSingleYModeAll(bool b);
 	void showXSourceOnXy(bool b);
 	void setName(QString s);
 	// virtual double sampleRate()
 
 	ChannelComponent *XYXChannel();
 	void setXYXChannel(ChannelComponent *c);
+	void refreshXYXAxis();
 	void refreshXYXData();
+	void refreshAxisLabels();
+	void selectChannel(ChannelComponent *c);
+
 Q_SIGNALS:
 	void nameChanged(QString);
 	void requestDeletePlot();
@@ -89,6 +93,8 @@ private:
 
 private:
 	QMetaObject::Connection xyDataConn;
+	QMetaObject::Connection xyAxisMinConn;
+	QMetaObject::Connection xyAxisMaxConn;
 };
 
 } // namespace adc

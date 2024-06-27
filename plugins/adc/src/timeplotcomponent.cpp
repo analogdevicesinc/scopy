@@ -70,6 +70,22 @@ void TimePlotComponent::replot()
 	m_xyPlot->replot();
 }
 
+void TimePlotComponent::refreshAxisLabels() {
+	m_timePlot->showAxisLabels();
+	m_xyPlot->showAxisLabels();
+}
+
+/*void TimePlotComponent::setSingleYMode(TimePlotComponentChannel *c, bool b) {
+
+	if(m_XYXChannel == c->m_ch) {
+		for(auto c : m_channels) {
+			c->
+		}
+	}
+	c->lockYAxis(b);
+	refreshAxisLabels();
+}*/
+
 void TimePlotComponent::showPlotLabels(bool b)
 {
 	m_timePlot->setShowXAxisLabels(b);
@@ -82,10 +98,10 @@ void TimePlotComponent::showPlotLabels(bool b)
 	m_xyPlot->showAxisLabels();
 }
 
-void TimePlotComponent::setSingleYMode(bool b)
+void TimePlotComponent::setSingleYModeAll(bool b)
 {
 	m_singleYMode = b;
-	for(TimePlotComponentChannel *pcc : qAsConst(m_channels)) {
+	for(auto pcc: qAsConst(m_channels)) {
 		pcc->lockYAxis(b);
 	}
 }
@@ -115,15 +131,45 @@ void TimePlotComponent::onDeinit() {}
 void TimePlotComponent::setXYXChannel(ChannelComponent *c)
 {
 	disconnect(xyDataConn);
+	disconnect(xyAxisMinConn);
+	disconnect(xyAxisMaxConn);
+
 	if(m_XYXChannel) {
 		m_XYXChannel->plotChannelCmpt()->m_xyPlotCh->setEnabled(true);
 	}
 	m_XYXChannel = c;
-	if(c) {
+	if(c) {		
 		onXyXNewData(c->chData()->xData(), c->chData()->yData(), c->chData()->size(), true);
 		xyDataConn = connect(c->chData(), &ChannelData::newData, this, &TimePlotComponent::onXyXNewData);
 		m_XYXChannel->plotChannelCmpt()->m_xyPlotCh->setEnabled(m_showXSourceOnXy);
+		xyAxisMinConn = connect(c->plotChannelCmpt()->m_timePlotYAxis, &PlotAxis::minChanged, this, [=](double val){
+			if(!c->plotChannelCmpt()->m_singleYMode) {
+				m_xyPlot->xAxis()->setMin(val);
+			}
+		} );
+		xyAxisMaxConn = connect(c->plotChannelCmpt()->m_timePlotYAxis, &PlotAxis::maxChanged, this, [=](double val){
+			if(!c->plotChannelCmpt()->m_singleYMode) {
+				m_xyPlot->xAxis()->setMax(val);
+			}
+		} );
+
 	}
+}
+
+void TimePlotComponent::refreshXYXAxis()
+{
+	double min = m_xyPlot->yAxis()->min();
+	double max = m_xyPlot->yAxis()->max();
+
+	if(m_XYXChannel) {
+		if(!m_XYXChannel->plotChannelCmpt()->m_singleYMode) {
+			min = m_XYXChannel->plotChannelCmpt()->m_timePlotYAxis->min();
+			max = m_XYXChannel->plotChannelCmpt()->m_timePlotYAxis->max();
+		}
+	}
+
+	m_xyPlot->xAxis()->setInterval(min,max);
+
 }
 
 void TimePlotComponent::onXyXNewData(const float *xData_, const float *yData_, size_t size, bool copy)
@@ -152,6 +198,13 @@ void TimePlotComponent::addChannel(ChannelComponent *c)
 	}
 	refreshXYXData();
 	m_plotMenu->addChannel(c);
+}
+
+void TimePlotComponent::selectChannel(ChannelComponent *c) {
+	m_timePlot->selectChannel(c->plotChannelCmpt()->m_timePlotCh);
+	if(m_XYXChannel != c || m_showXSourceOnXy) {
+		m_xyPlot->selectChannel(c->plotChannelCmpt()->m_xyPlotCh);
+	}
 }
 
 void TimePlotComponent::removeChannel(ChannelComponent *c)

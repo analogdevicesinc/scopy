@@ -42,13 +42,10 @@ void TimePlotManager::setXInterval(double xMin, double xMax)
 	}
 }
 
-void TimePlotManager::selectChannel(ChannelComponent *c)
-{
+void TimePlotManager::selectChannel(ChannelComponent *c) {
 	for(TimePlotComponentChannel *pcc : qAsConst(m_channels)) {
 		if(pcc->m_ch == c) {
-			PlotChannel *ch = pcc->m_timePlotCh;
-			PlotWidget *w = pcc->m_plotComponent->timePlot();
-			w->selectChannel(ch);
+			pcc->m_plotComponent->selectChannel(c);
 		}
 	}
 }
