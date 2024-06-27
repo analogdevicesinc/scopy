@@ -89,6 +89,19 @@ void PlotChannel::setStyleInternal(int style)
 	Q_EMIT doReplot();
 }
 
+void PlotChannel::setXAxis(PlotAxis *newXAxis)
+{
+	m_xAxis = newXAxis;
+	curve()->setXAxis(m_xAxis->axisId());
+}
+
+void PlotChannel::setYAxis(PlotAxis *newYAxis)
+{
+	m_yAxis = newYAxis;
+	curve()->setYAxis(m_yAxis->axisId());
+
+}
+
 QString PlotChannel::name() const { return m_name; }
 
 QList<QwtPlotMarker *> PlotChannel::markers() { return m_markers; }
