@@ -99,6 +99,23 @@ void PlotWidget::setupOpenGLCanvas()
 	}
 }
 
+void PlotWidget::plotChannelChangeXAxis(PlotChannel *c, PlotAxis *x) {
+	m_tracker->removeChannel(c);
+	c->xAxis()->setVisible(false);
+	c->setXAxis(x);
+	m_tracker->addChannel(c);
+	showAxisLabels();
+}
+
+void PlotWidget::plotChannelChangeYAxis(PlotChannel *c, PlotAxis *y) {
+
+	m_tracker->removeChannel(c);
+	c->yAxis()->setVisible(false);
+	c->setYAxis(y);
+	m_tracker->addChannel(c);
+	showAxisLabels();
+}
+
 void PlotWidget::addPlotChannel(PlotChannel *ch)
 {
 	ch->init();
