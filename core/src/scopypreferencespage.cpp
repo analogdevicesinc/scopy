@@ -10,6 +10,7 @@
 #include <QScrollArea>
 #include <stylehelper.h>
 #include "gui/preferenceshelper.h"
+#include <style.h>
 #include "application_restarter.h"
 #include <QDir>
 #include <QDebug>
@@ -209,7 +210,7 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 	generalSection->contentLayout()->addWidget(
 		PreferencesHelper::addPreferenceCheckBox(p, "show_graticule", "Show Graticule", generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
-		p, "general_theme", "Theme", {"dark", "light", "funky"}, generalSection));
+		p, "general_theme", "Theme", Style::GetInstance()->getThemeList(), generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
 		p, "general_language", "Language", t->getLanguages(), generalSection));
 

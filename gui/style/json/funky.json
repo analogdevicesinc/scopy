@@ -1,8 +1,10 @@
 {
-  "background_deep": "#FFD700",
-  "background": "#FFFAE5",
-  "highlight": "#FF4500",
-  "color_highlight": "#1E90FF",
-  "color_background": "#32CD32"
+    "background_deep": "#FF69B4",        
+    "background": "#FFD700",              
+    "highlight": "#00FF00",             
+    "color_highlight": "#00FFFF",         
+    "color_background": "#FF4500",        
+    "highlight_disabled": "#D3D3D3",      
+    "focus_item": "#800080"         
 }
 

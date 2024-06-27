@@ -3,5 +3,7 @@
 "background": "#3A424B",
 "highlight": "#FFFFFF",
 "color_highlight": "#92BEFC",
-"color_background": "#00427A"
+"color_background": "#00427A",
+"highlight_disabled": "#9FA4AD",
+"focus_item": "#101820"
 }

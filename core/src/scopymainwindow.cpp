@@ -49,21 +49,23 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 {
 	QElapsedTimer timer;
 	timer.start();
-	ui->setupUi(this);
-	Style::setStyle(ui->centralwidget, style::widget::footer);
-	Style::setStyle(ui->animHolder, style::widget::deviceList);
 
 	ScopyTitleManager::setMainWindow(this);
 	ScopyTitleManager::setApplicationName("Scopy");
 	ScopyTitleManager::setScopyVersion("v" + QString(scopy::config::version()));
 	ScopyTitleManager::setGitHash(QString(SCOPY_VERSION_GIT));
-
-	StyleHelper::GetInstance()->initColorMap();
 	IIOUnitsManager::GetInstance();
+	StyleHelper::GetInstance()->initColorMap();
+
 	setAttribute(Qt::WA_QuitOnClose, true);
-	initPythonWIN32();
-	initStatusBar();
 	initPreferences();
+	StyleHelper::GetInstance()->initColorMap();
+	initPythonWIN32();
+
+	ui->setupUi(this);
+	initStatusBar();
+	Style::setStyle(ui->centralwidget, style::widget::footer);
+	Style::setStyle(ui->animHolder, style::widget::deviceList);
 
 	ConnectionProvider::GetInstance();
 	MessageBroker::GetInstance();
