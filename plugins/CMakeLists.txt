@@ -12,6 +12,7 @@ option(ENABLE_PLUGIN_ADC "Enable ADC plugin" ON)
 option(ENABLE_PLUGIN_SWIOT "Enable SWIOT plugin" ON)
 option(ENABLE_PLUGIN_PQM "Enable PQM plugin" ON)
 option(ENABLE_PLUGIN_DATALOGGER "Enable DATALOGGER plugin" ON)
+option(ENABLE_PLUGIN_DAC "Enable DAC plugin" ON)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
@@ -74,6 +75,11 @@ if(ENABLE_PLUGIN_DATALOGGER)
 	list(APPEND PLUGINS ${DATALOGGER_TARGET_NAME})
 endif()
 
+if(ENABLE_PLUGIN_DAC)
+	add_subdirectory(dac)
+	list(APPEND PLUGINS ${PLUGIN_NAME})
+endif()
+
 if(ENABLE_PLUGIN_SWIOT)
 	add_subdirectory(swiot)
 	list(APPEND PLUGINS ${SWIOT_TARGET_NAME})
@@ -83,6 +89,7 @@ if(ENABLE_PLUGIN_PQM)
 	add_subdirectory(pqm)
 	list(APPEND PLUGINS ${PQM_TARGET_NAME})
 endif()
+
 
 if(ENABLE_PLUGIN_M2K)
 	if(NOT WITH_PYTHON)
