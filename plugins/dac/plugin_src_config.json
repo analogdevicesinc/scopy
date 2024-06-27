@@ -1,0 +1,33 @@
+{
+    "plugin": {
+        "dir_name": "dac",
+        "plugin_name": "dac",
+        "class_name": "DACPlugin",
+        "cmakelists": true,
+        "namespace": "scopy::dacplugin",
+        "device_category": "iio",
+        "tools": [
+            {
+                "id": "Dac",
+                "tool_name": "Dac",
+                "file_name": "Dac",
+                "class_name": "Dac",
+                "namespace": "scopy::dacplugin"
+            }
+        ]
+    },
+    "cmakelists": {
+        "cmake_min_required": 3.9,
+        "cxx_standard": 20,
+        "enable_testing": "ON"
+    },
+    "test": {
+        "cmakelists": true,
+        "cmake_min_required": 3.5,
+        "tst_pluginloader": true
+    },
+    "resources": {
+        "resources_qrc": true
+    },
+    "doc": true
+}
