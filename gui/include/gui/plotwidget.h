@@ -78,6 +78,8 @@ public:
 
 	void setUnitsVisible(bool visible);
 
+	void plotChannelChangeYAxis(PlotChannel *c, PlotAxis *y);
+	void plotChannelChangeXAxis(PlotChannel *c, PlotAxis *x);
 public Q_SLOTS:
 	void replot();
 	void selectChannel(PlotChannel *);
