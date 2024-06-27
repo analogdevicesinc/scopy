@@ -15,8 +15,8 @@
 using namespace scopy;
 
 Style *Style::pinstance_{nullptr};
-QJsonDocument *Style::m_global_json{new QJsonDocument()};
-QJsonDocument *Style::m_theme_json{new QJsonDocument()};
+QJsonDocument *Style::m_global_json{nullptr};
+QJsonDocument *Style::m_theme_json{nullptr};
 
 Style::Style(QObject *parent)
 	: QObject(parent)
@@ -39,9 +39,7 @@ Style *Style::GetInstance()
 
 void Style::init(QString theme)
 {
-	std::cout << "THEME:::" << theme.toStdString() << std::endl;
-
-	QFile global_file(m_globalJsonPath);
+	QFile global_file = QFile(m_globalJsonPath);
 	global_file.open(QIODevice::ReadOnly);
 	QByteArray global_data = global_file.readAll();
 	global_file.close();
@@ -71,7 +69,7 @@ bool Style::setTheme(QString theme)
 	if(getTheme() == theme || (QFileInfo(tmp_theme_path).isFile() && tmp_theme_path != m_themeJsonPath)) {
 		m_themeJsonPath = tmp_theme_path;
 
-		QFile theme_file(m_themeJsonPath);
+		QFile theme_file = QFile(m_themeJsonPath);
 		theme_file.open(QIODevice::ReadOnly);
 		QByteArray theme_data = theme_file.readAll();
 		theme_file.close();
@@ -85,23 +83,26 @@ bool Style::setTheme(QString theme)
 	return false;
 }
 
-QList<QString> *Style::getThemeList()
+QStringList Style::getThemeList()
 {
-	QList<QString> *themes = new QList<QString>();
-	QStringList fileList = QDir(m_themeJsonPath).entryList(QDir::Files);
+	QStringList themes = QStringList();
+	QStringList fileList = QDir(QFileInfo(m_themeJsonPath).path()).entryList(QDir::Files);
+	QString globalJsonName = QFileInfo(m_globalJsonPath).fileName();
 
 	foreach(QString filename, fileList) {
-		themes->append(filename);
+		if(filename.contains(".json") && filename != globalJsonName) {
+			themes.append(filename.replace(".json", ""));
+		}
 	}
+
 	return themes;
 }
 
 QString Style::getAttribute(const char *key)
 {
-
 	QString attr = m_theme_json->object().value(key).toString();
 	if(attr.isEmpty()) {
-		QString attr = m_global_json->object().value(key).toString();
+		attr = m_global_json->object().value(key).toString();
 	}
 
 	return attr;

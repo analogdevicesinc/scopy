@@ -27,7 +27,7 @@ public:
 	static QPixmap getPixmap(QString pixmap, QColor color = QColor());
 	QString getTheme();
 	bool setTheme(QString theme);
-	QList<QString> *getThemeList();
+	QStringList getThemeList();
 
 private:
 	static Style *pinstance_;
