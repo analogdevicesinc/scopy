@@ -113,18 +113,21 @@ void TimePlotComponentChannel::lockYAxis(bool b)
 {
 	m_singleYMode = b;
 	if(m_singleYMode) {
-		QwtAxisId id_time = m_plotComponent->timePlot()->yAxis()->axisId();
-		m_timePlotCh->curve()->setYAxis(id_time);
-		QwtAxisId id_xy = m_plotComponent->xyPlot()->yAxis()->axisId();
-		m_xyPlotCh->curve()->setYAxis(id_xy);
+		PlotAxis *time = m_plotComponent->timePlot()->yAxis();
+		PlotAxis *xy = m_plotComponent->xyPlot()->yAxis();
+		m_plotComponent->timePlot()->plotChannelChangeYAxis(m_timePlotCh, time);
+		m_plotComponent->xyPlot()->plotChannelChangeYAxis(m_xyPlotCh, xy);
 	} else {
-		QwtAxisId id_time = m_timePlotYAxis->axisId();
-		m_timePlotCh->curve()->setYAxis(id_time);
-		QwtAxisId id_xy = m_xyPlotYAxis->axisId();
-		m_xyPlotCh->curve()->setYAxis(id_xy);
+		PlotAxis *time = m_timePlotYAxis;
+		PlotAxis *xy = m_xyPlotYAxis;
+		m_plotComponent->timePlot()->plotChannelChangeYAxis(m_timePlotCh, time);
+		m_plotComponent->xyPlot()->plotChannelChangeYAxis(m_xyPlotCh, xy);
 	}
 
+
 	m_timePlotAxisHandle->handle()->setVisible(!b);
+	m_plotComponent->refreshXYXAxis();
+	m_plotComponent->refreshAxisLabels();
 	m_plotComponent->replot();
 }
 
