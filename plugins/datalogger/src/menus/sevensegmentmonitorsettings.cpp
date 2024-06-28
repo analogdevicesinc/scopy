@@ -24,7 +24,7 @@ SevenSegmentMonitorSettings::SevenSegmentMonitorSettings(QWidget *parent)
 	sevenSegmentSettingsContainer->contentLayout()->addWidget(sevenSegmentSettingsSection);
 	sevenSegmentSettingsSection->contentLayout()->setSpacing(10);
 
-	QHBoxLayout *precisionLayout = new QHBoxLayout(this);
+	QHBoxLayout *precisionLayout = new QHBoxLayout();
 
 	precision = new QLineEdit(sevenSegmentSettingsSection);
 	precision->setText(QString::number(DataMonitorUtils::getDefaultPrecision()));
