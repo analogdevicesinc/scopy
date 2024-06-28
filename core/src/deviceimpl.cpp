@@ -230,7 +230,7 @@ void DeviceImpl::setPingPlugin(Plugin *plugin)
 	}
 }
 
-void DeviceImpl::connPluginPingPause()
+void DeviceImpl::bindPing()
 {
 	if(!m_pingPlugin) {
 		return;
@@ -239,9 +239,11 @@ void DeviceImpl::connPluginPingPause()
 		connect(dynamic_cast<QObject *>(p), SIGNAL(pausePingTask(bool)), dynamic_cast<QObject *>(m_pingPlugin),
 			SLOT(onPausePingTask(bool)));
 	}
+	connect(m_pingPlugin->pingTask(), &PingTask::pingFailed, this, &DeviceImpl::disconnectDev);
+	m_pingPlugin->startPingTask();
 }
 
-void DeviceImpl::disconnPluginPingPause()
+void DeviceImpl::unbindPing()
 {
 	if(!m_pingPlugin) {
 		return;
@@ -250,6 +252,9 @@ void DeviceImpl::disconnPluginPingPause()
 		disconnect(dynamic_cast<QObject *>(p), SIGNAL(pausePingTask(bool)),
 			   dynamic_cast<QObject *>(m_pingPlugin), SLOT(onPausePingTask(bool)));
 	}
+	m_pingPlugin->stopPingTask();
+	disconnect(m_pingPlugin->pingTask(), &PingTask::pingFailed, this, &DeviceImpl::disconnectDev);
+	m_pingPlugin = nullptr;
 }
 
 void DeviceImpl::onConnectionFailed() { disconnectDev(); }
@@ -323,11 +328,7 @@ void DeviceImpl::connectDev()
 		connbtn->hide();
 		discbtn->show();
 		discbtn->setFocus();
-		connPluginPingPause();
-		if(m_pingPlugin) {
-			connect(m_pingPlugin->pingTask(), &PingTask::pingFailed, this, &DeviceImpl::disconnectDev);
-			m_pingPlugin->startPingTask();
-		}
+		bindPing();
 		Q_EMIT connected();
 	}
 	qInfo(CAT_BENCHMARK) << this->displayName() << " device connection took: " << timer.elapsed() << "ms";
@@ -338,11 +339,7 @@ void DeviceImpl::disconnectDev()
 	QElapsedTimer pluginTimer;
 	QElapsedTimer timer;
 	timer.start();
-	disconnPluginPingPause();
-	if(m_pingPlugin) {
-		m_pingPlugin->stopPingTask();
-		disconnect(m_pingPlugin->pingTask(), &PingTask::pingFailed, this, &DeviceImpl::disconnectDev);
-	}
+	unbindPing();
 	connbtn->show();
 	discbtn->hide();
 	Preferences *pref = Preferences::GetInstance();
