@@ -48,8 +48,23 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 		removePlot(plt);
 	});
 
+	m_plotSection = new MenuSectionWidget(this);
+	m_plotCb = new MenuCombo("Plot Settings", m_plotSection);
+	m_plotSection->contentLayout()->addWidget(m_plotCb);
+
+	m_plotStack = new MapStackedWidget(this);
+	m_plotStack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
 	m_menu->add(xaxismenu, "xaxis");
+	m_menu->add(m_plotSection);
+	m_menu->add(m_plotStack);
+
+	connect(m_plotCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+		m_plotStack->show(QString(m_plotCb->combo()->currentData().toInt()));
+	});
+
 	m_menu->add(m_addPlotBtn, "add", gui::MenuWidget::MA_BOTTOMLAST);
+
 	return m_menu;
 }
 
@@ -315,13 +330,31 @@ void TimePlotManagerSettings::setSyncBufferPlotSize(bool newSyncBufferPlotSize)
 void TimePlotManagerSettings::addPlot(TimePlotComponent *p)
 {
 	QWidget *plotMenu = p->plotMenu();
-	m_menu->add(plotMenu, p->name() + QString(p->uuid()), gui::MenuWidget::MA_TOPLAST);
+
+	connect(p, &TimePlotComponent::nameChanged, this, [=](QString newName){
+		int idx = m_plotCb->combo()->findData(p->uuid());
+		m_plotCb->combo()->setItemText(idx,newName);
+	});
+	m_plotCb->combo()->addItem(p->name(), p->uuid());
+	m_plotStack->add(QString(p->uuid()), plotMenu);
+	// m_menu->add(plotMenu, p->name() + QString(p->uuid()), gui::MenuWidget::MA_TOPLAST);
+	setPlotComboVisible();
+}
+
+void TimePlotManagerSettings::setPlotComboVisible() {
+	bool visible = m_plotCb->combo()->count() > 1;
+	m_plotSection->setVisible(visible);
 }
 
 void TimePlotManagerSettings::removePlot(TimePlotComponent *p)
 {
 	QWidget *plotMenu = p->plotMenu();
-	m_menu->remove(plotMenu);
+	// m_menu->remove(plotMenu);
+	int idx = m_plotCb->combo()->findData(p->uuid());
+	m_plotCb->combo()->removeItem(idx);
+	m_plotStack->remove(QString(p->uuid()));
+
+	setPlotComboVisible();
 }
 
 void TimePlotManagerSettings::addChannel(ChannelComponent *c)

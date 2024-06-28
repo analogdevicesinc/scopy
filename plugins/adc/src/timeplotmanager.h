@@ -53,6 +53,7 @@ private:
 	StatsPanel *m_statsPanel;
 	QMap<ChannelComponent *, TimePlotManagerCombobox *> m_channelPlotcomboMap;
 	// PlotSettings *m_plotSettings;
+	void multiPlotUpdate();
 };
 } // namespace adc
 } // namespace scopy
