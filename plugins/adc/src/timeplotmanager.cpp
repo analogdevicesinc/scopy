@@ -78,11 +78,8 @@ uint32_t TimePlotManager::addPlot(QString name)
 		p->addPlot(plt);
 	}
 
-	bool b = m_plots.count() > 1;
-	for(TimePlotComponent *plt : qAsConst(m_plots)) {
-		plt->plotMenu()->showDeleteButtons(b);
-	}
 
+	multiPlotUpdate();
 	return plt->uuid();
 }
 
@@ -97,9 +94,18 @@ void TimePlotManager::removePlot(uint32_t uuid)
 		p->removePlot(plt);
 	}
 
+	multiPlotUpdate();
+}
+
+
+void TimePlotManager::multiPlotUpdate() {
 	bool b = m_plots.count() > 1;
 	for(TimePlotComponent *plt : qAsConst(m_plots)) {
 		plt->plotMenu()->showDeleteButtons(b);
+	}
+
+	for(TimePlotManagerCombobox *cb : m_channelPlotcomboMap) {
+		cb->setVisible(b);
 	}
 }
 
