@@ -23,19 +23,19 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	setLayout(v);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-	MenuSectionCollapseWidget *section =
-		new MenuSectionCollapseWidget("PLOT - " + plt->name(), MenuCollapseSection::MHCW_NONE, parent);
 
-	MenuCollapseSection *plotMenu = section->collapseSection();
-	v->addWidget(section);
-	QLabel *plotTitleLabel = new QLabel("Plot title");
+
+	MenuSectionCollapseWidget *plotMenu =
+		new MenuSectionCollapseWidget("SETTINGS", MenuCollapseSection::MHCW_NONE, parent);
+
+	QLabel *plotTitleLabel = new QLabel("Plot title");	
 	StyleHelper::MenuSmallLabel(plotTitleLabel);
 
 	QLineEdit *plotTitle = new QLineEdit(m_plotComponent->name());
 	StyleHelper::MenuLineEdit(plotTitle);
 	connect(plotTitle, &QLineEdit::textChanged, this, [=](QString s) {
 		m_plotComponent->setName(s);
-		plotMenu->setTitle("PLOT - " + s);
+	//	plotMenu->setTitle("PLOT - " + s);
 	});
 
 	MenuOnOffSwitch *labelsSwitch = new MenuOnOffSwitch("Show plot labels", plotMenu, false);
@@ -63,7 +63,12 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 		toggleAutoScale();
 	});
 
-	MenuOnOffSwitch *xySwitch = new MenuOnOffSwitch("XY PLOT", plotMenu, true);
+	MenuSectionCollapseWidget *yaxis =
+		new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_NONE, parent);
+
+	MenuSectionCollapseWidget *xySection =
+		new MenuSectionCollapseWidget("XY PLOT", MenuCollapseSection::MHCW_ONOFF, parent);
+	QAbstractButton *xySwitch = xySection->collapseSection()->header();
 
 	m_xAxisSrc = new MenuCombo("XY - X Axis source");
 	connect(m_xAxisSrc->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
@@ -74,7 +79,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 
 	m_xAxisShow = new MenuOnOffSwitch("XY - Plot X source", plotMenu, false);
 
-	connect(xySwitch->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
+	connect(xySwitch, &QAbstractButton::toggled, this, [=](bool b) {
 		m_plotComponent->xyPlot()->setVisible(b);
 		m_xAxisSrc->setVisible(b);
 		m_xAxisShow->setVisible(b);
@@ -102,20 +107,25 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	StyleHelper::BlueButton(m_deletePlot);
 	connect(m_deletePlot, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
 
-	plotMenu->contentLayout()->addWidget(m_autoscaleBtn);
-	plotMenu->contentLayout()->addWidget(m_yCtrl);
+	yaxis->contentLayout()->addWidget(m_autoscaleBtn);
+	yaxis->contentLayout()->addWidget(m_yCtrl);
+	yaxis->contentLayout()->addWidget(m_yModeCb);
 
-	plotMenu->contentLayout()->addWidget(xySwitch);
-	plotMenu->contentLayout()->addWidget(m_xAxisSrc);
-	plotMenu->contentLayout()->addWidget(m_xAxisShow);
 	plotMenu->contentLayout()->addWidget(plotTitleLabel);
 	plotMenu->contentLayout()->addWidget(plotTitle);
 	plotMenu->contentLayout()->addWidget(labelsSwitch);
-
-	plotMenu->contentLayout()->addWidget(m_yModeCb);
 	plotMenu->contentLayout()->addWidget(m_curve);
-	plotMenu->contentLayout()->addWidget(m_deletePlot);
 	plotMenu->contentLayout()->setSpacing(10);
+
+	xySection->add(m_xAxisSrc);
+	xySection->add(m_xAxisShow);
+
+	v->setSpacing(10);
+	v->addWidget(yaxis);
+	v->addWidget(xySection);
+	v->addWidget(plotMenu);
+	v->addWidget(m_deletePlot);
+	v->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Expanding, QSizePolicy::Expanding));
 
 	m_autoscaleBtn->setVisible(true);
 	m_yCtrl->setVisible(true);
@@ -123,7 +133,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	m_xAxisShow->setVisible(false);
 
 	// init
-	xySwitch->onOffswitch()->setChecked(true);
+	xySwitch->setChecked(true);
 	m_yCtrl->setMin(-2048);
 	m_yCtrl->setMax(2048);
 	labelsSwitch->onOffswitch()->setChecked(true);
@@ -141,6 +151,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	hv->raise();
 
 	connect(m_deletePlotHover, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
+
 }
 
 void TimePlotComponentSettings::showDeleteButtons(bool b)
