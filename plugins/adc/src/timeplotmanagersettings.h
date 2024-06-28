@@ -14,6 +14,7 @@
 #include <gui/plotautoscaler.h>
 #include "channelcomponent.h"
 #include "interfaces.h"
+#include <gui/widgets/menusectionwidget.h>
 
 #include "timeplotmanager.h"
 
@@ -100,6 +101,9 @@ private:
 	MenuOnOffSwitch *m_rollingModeSw;
 	MenuOnOffSwitch *m_syncBufferPlot;
 	MenuCombo *m_xModeCb;
+	MenuSectionWidget *m_plotSection;
+	MenuCombo *m_plotCb;
+	MapStackedWidget *m_plotStack;
 
 	QPushButton *m_addPlotBtn;
 	QMap<uint32_t, QWidget *> m_plotWidgetMap;
@@ -123,6 +127,7 @@ private:
 	Q_PROPERTY(bool syncBufferPlotSize READ syncBufferPlotSize WRITE setSyncBufferPlotSize NOTIFY
 			   syncBufferPlotSizeChanged FINAL)
 	Q_PROPERTY(uint32_t bufferSize READ bufferSize WRITE setBufferSize NOTIFY bufferSizeChanged FINAL)
+	void setPlotComboVisible();
 };
 
 } // namespace adc
