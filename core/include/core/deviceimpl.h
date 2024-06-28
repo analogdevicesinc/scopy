@@ -64,8 +64,8 @@ protected:
 	void loadToolList();
 	void loadBadges();
 	void setPingPlugin(Plugin *plugin);
-	void connPluginPingPause();
-	void disconnPluginPingPause();
+	void bindPing();
+	void unbindPing();
 
 protected:
 	PluginManager *p;
