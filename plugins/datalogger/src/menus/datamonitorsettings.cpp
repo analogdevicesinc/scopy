@@ -45,7 +45,7 @@ void DataMonitorSettings::init(QString title, QColor color)
 		[=, this]() { Q_EMIT titleUpdated(header->lineEdit()->text()); });
 
 	settingsBody = new QWidget(this);
-	layout = new QVBoxLayout(this);
+	layout = new QVBoxLayout();
 	layout->setMargin(0);
 	layout->setSpacing(10);
 	settingsBody->setLayout(layout);
