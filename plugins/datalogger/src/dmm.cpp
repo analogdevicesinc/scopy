@@ -28,11 +28,14 @@ QList<DmmDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
 				QString name = QString::fromStdString(iio_device_get_name(dev)) + ":" +
 					QString::fromStdString(iio_channel_get_id(chn));
 
-				DmmDataMonitorModel *channelModel =
-					new DmmDataMonitorModel(name, StyleHelper::getColor("CH" + QString::number(j)));
+				UnitOfMeasurement *unitOfMeasurement = new UnitOfMeasurement("", "");
+				DMMReadStrategy *dmmReadStrategy = new DMMReadStrategy(dev, chn);
 
-				channelModel->setIioChannel(chn);
-				channelModel->setIioDevice(dev);
+				if(iioChannelHasAttribute(chn, "offset")) {
+					double offset = 0;
+					iio_channel_attr_read_double(chn, "offset", &offset);
+					dmmReadStrategy->setOffset(offset);
+				}
 
 				int type = iio_channel_get_type(chn);
 				if(type != iio_chan_type::IIO_CHAN_TYPE_UNKNOWN) {
@@ -41,21 +44,16 @@ QList<DmmDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
 					if(isHwmon(dev, chn)) {
 						dmmInfo = m_hwmonDevices.value(static_cast<hwmon_chan_type>(type));
 					}
-
-					channelModel->setUnitOfMeasure(
-						new UnitOfMeasurement(dmmInfo.name, dmmInfo.symbol));
-
-					DMMReadStrategy *dmmReadStrategy = new DMMReadStrategy(dev, chn);
+					unitOfMeasurement = new UnitOfMeasurement(dmmInfo.name, dmmInfo.symbol);
 					dmmReadStrategy->setUmScale(dmmInfo.scale);
-					channelModel->setReadStrategy(dmmReadStrategy);
-
-					if(iioChannelHasAttribute(chn, "offset")) {
-						double offset = 0;
-						iio_channel_attr_read_double(chn, "offset", &offset);
-
-						dmmReadStrategy->setOffset(offset);
-					}
 				}
+
+				DmmDataMonitorModel *channelModel =
+					new DmmDataMonitorModel(name, StyleHelper::getColor("CH" + QString::number(j)),
+								unitOfMeasurement, dmmReadStrategy);
+
+				channelModel->setIioChannel(chn);
+				channelModel->setIioDevice(dev);
 
 				result.push_back(channelModel);
 			}
