@@ -14,14 +14,14 @@ SevenSegmentDisplay::SevenSegmentDisplay(QWidget *parent)
 	mainLayout->setSpacing(10);
 	setLayout(mainLayout);
 
-	QWidget *mainContainer = new QWidget(this);
-	QVBoxLayout *mainContainerLayout = new QVBoxLayout(this);
+	QWidget *mainContainer = new QWidget();
+	QVBoxLayout *mainContainerLayout = new QVBoxLayout();
 	mainContainerLayout->setMargin(0);
 	mainContainerLayout->setSpacing(10);
 	mainContainer->setLayout(mainContainerLayout);
 
 	QWidget *widgetBody = new QWidget(this);
-	layout = new QVBoxLayout(this);
+	layout = new QVBoxLayout();
 	layout->setMargin(0);
 	layout->setSpacing(10);
 	widgetBody->setLayout(layout);

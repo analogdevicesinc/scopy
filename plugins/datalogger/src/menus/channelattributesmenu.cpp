@@ -23,8 +23,6 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, QWidget *p
 	layout->setSpacing(10);
 	settingsBody->setLayout(layout);
 
-	mainLayout->addLayout(layout);
-
 	QScrollArea *scrollArea = new QScrollArea(this);
 	scrollArea->setWidgetResizable(true);
 	scrollArea->setWidget(settingsBody);

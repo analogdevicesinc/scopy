@@ -6,6 +6,7 @@
 #include <menuonoffswitch.h>
 #include <menusectionwidget.h>
 #include <timemanager.hpp>
+#include <cfloat>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -43,7 +44,7 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 			{"min", 60},
 			{"hour", 3600},
 		},
-		"Delta", (double)((long)(-1 << 31)), (double)((long)1 << 31), false, false, xAxisContainer);
+		"Delta", -DBL_MAX, DBL_MAX, false, false, xAxisContainer);
 	m_xdelta->setValue(DataMonitorUtils::getAxisDefaultMaxValue());
 
 	auto &&timeTracker = TimeManager::GetInstance();
