@@ -19,123 +19,187 @@
  */
 
 #include "customSwitch.h"
+#include "qevent.h"
+#include "qpainterpath.h"
+#include "qstyleoption.h"
 
 #include <QDebug>
 #include <QFile>
-#include <QResizeEvent>
+#include <QPropertyAnimation>
+#include <style.h>
+#include <QPen>
+#include <QPainter>
 
 using namespace scopy;
 
 CustomSwitch::CustomSwitch(QWidget *parent)
 	: QPushButton(parent)
-	, on(this)
-	, off(this)
-	, handle(this)
-	, anim(&handle, "geometry")
-	, polarity(false)
+	, onLabel(new QLabel("On", this))
+	, offLabel(new QLabel("Off", this))
+	, layout(new QHBoxLayout(this))
 {
-	on.setObjectName("on");
-	off.setObjectName("off");
-	handle.setObjectName("handle");
-
-	setFlat(true);
 	setCheckable(true);
-	setDuration(100);
+	setObjectName("toggleButton");
 
-	QFile file(":/gui/stylesheets/customSwitch.qss");
-	file.open(QFile::ReadOnly);
-	QString styleSheet = QString::fromLatin1(file.readAll());
-	this->setStyleSheet(styleSheet);
+	onLabel->setAlignment(Qt::AlignCenter);
+	offLabel->setAlignment(Qt::AlignCenter);
 
-	connect(this, SIGNAL(toggled(bool)), SLOT(toggleAnim(bool)));
-	on.raise();
-	off.raise();
-	on.setText(tr("on"));
-	off.setText(tr("off"));
-	updateOnOffLabels();
+	layout->addWidget(offLabel);
+	layout->addWidget(onLabel);
+	layout->setContentsMargins(0, 0, 0, 0);
+	layout->setSpacing(0);
+
+	setLayout(layout);
+
+	connect(this, &QPushButton::toggled, this, [this](bool checked) { update(); });
+
+	// Initialize the state to unchecked
+	setChecked(false);
+	setMinimumWidth(80);
+	setMinimumHeight(40);
 }
 
-void CustomSwitch::updateOnOffLabels()
+void CustomSwitch::paintEvent(QPaintEvent *event)
 {
-	on.setEnabled(isChecked() ^ polarity);
-	off.setEnabled(!isChecked() ^ polarity);
+	QPainter p(this);
+	p.setRenderHint(QPainter::Antialiasing);
+	QPen pen = QPen();
+	pen.setBrush(QColor(Qt::transparent));
+	pen.setColor(Style::getColor(json::theme::color_highlight));
+	pen.setWidth(2);
+	p.setPen(pen);
+
+	// Position of shape
+	qreal x = 0;
+	qreal y = 0;
+	// Size of shape
+	qreal width = this->width() / 2;
+	qreal height = this->height();
+	// Radius of corners
+	qreal corner_radius = 8;
+
+	QPainterPath path = QPainterPath();
+	path.moveTo(x + corner_radius, y);
+	path.arcTo(x, y, 2 * corner_radius, 2 * corner_radius, 90.0, 90.0);
+	path.lineTo(x, y + (height - 2 * corner_radius));
+	path.arcTo(x, y + (height - 2 * corner_radius), 2 * corner_radius, 2 * corner_radius, 180.0, 90.0);
+	path.lineTo(x + (width - 2 * corner_radius), y + height);
+	path.lineTo(x + (width - 2 * corner_radius), y);
+	path.lineTo(x + corner_radius, y);
+	p.drawPath(path);
+
+	p.translate(0,this->height());
+	p.scale(1.0, -1.0);
+	pen.setColor(Style::getColor(json::theme::highlight));
+	p.drawPath(path);
 }
 
-bool CustomSwitch::event(QEvent *e)
-{
-	if(e->type() == QEvent::DynamicPropertyChange) {
-		QDynamicPropertyChangeEvent *const propEvent = static_cast<QDynamicPropertyChangeEvent *>(e);
-		QString propName = propEvent->propertyName();
-		if(propName == "leftText" && property("leftText").isValid())
-			on.setText(property("leftText").toString());
-		if(propName == "rightText" && property("rightText").isValid())
-			off.setText(property("rightText").toString());
-		if(propName == "polarity" && property("polarity").isValid())
-			polarity = property("polarity").toBool();
-		if(propName == "duration" && property("duration").isValid())
-			setDuration(property("duration").toInt());
-		if(propName == "bigBtn" && property("bigBtn").isValid()) {
-			if(property("bigBtn").toBool()) {
-				QFile file(":/gui/stylesheets/bigCustomSwitch.qss");
-				file.open(QFile::ReadOnly);
-				QString styleSheet = QString::fromLatin1(file.readAll());
-				this->setStyleSheet(styleSheet);
-			}
-		}
-	}
-	return QPushButton::event(e);
-}
+// int CustomSwitch::offset() const { return m_offset; }
 
-CustomSwitch::~CustomSwitch() {}
+// void CustomSwitch::setOffset(int value)
+//{
+//	m_offset = value;
+//	update();
+//}
 
-void CustomSwitch::setDuration(int ms)
-{
-	duration_ms = ms;
-	anim.setDuration(ms);
-}
+// QSize CustomSwitch::sizeHint() const
+//{
+//	return QSize(m_btn_width * 4, 2 * m_track_radius);
+//}
 
-void CustomSwitch::toggleAnim(bool enabled)
-{
-	if(!isVisible())
-		return;
+// void CustomSwitch::setChecked(bool checked)
+//{
+//	QPushButton::setChecked(checked);
+//	setOffset(m_end_offset[checked]());
+//}
 
-	QRect on_rect(0, handle.y(), handle.width(), handle.height());
-	QRect off_rect(width() - handle.width(), handle.y(), handle.width(), handle.height());
+void CustomSwitch::setOnText(QString text) { m_text[true] = text; }
 
-	anim.stop();
+void CustomSwitch::setOffText(QString text) { m_text[false] = text; }
 
-	if(enabled ^ polarity) {
-		anim.setStartValue(off_rect);
-		anim.setEndValue(on_rect);
-	} else {
-		anim.setStartValue(on_rect);
-		anim.setEndValue(off_rect);
-	}
+void CustomSwitch::setOn(const QPixmap &pixmap) {}
 
-	updateOnOffLabels();
-	anim.start();
-}
+void CustomSwitch::setOff(const QPixmap &pixmap) {}
 
-void CustomSwitch::showEvent(QShowEvent *event)
-{
-	updateOnOffLabels();
-	if(isChecked() ^ polarity) {
-		handle.setGeometry(QRect(0, handle.y(), handle.width(), handle.height()));
-	} else {
-		handle.setGeometry(QRect(width() - handle.width(), handle.y(), handle.width(), handle.height()));
-	}
-}
+// void CustomSwitch::resizeEvent(QResizeEvent *event)
+//{
+//	QPushButton::resizeEvent(event);
+//	setOffset(m_end_offset[isChecked()]());
+//}
 
-const QLabel &CustomSwitch::getOn() const { return on; }
+// void CustomSwitch::paintEvent(QPaintEvent *event)
+//{
+//	Qp p(this);
+//	p.setRenderHint(Qp::Antialiasing);
+//	p.setPen(Qt::NoPen);
 
-void CustomSwitch::setOnText(const QString &on_) { this->on.setText(on_); }
+//	qreal track_opacity = m_track_opacity;
+//	qreal thumb_opacity = 1.0;
+//	qreal text_opacity = 1.0;
 
-const QLabel &CustomSwitch::getOff() const { return off; }
+//	QColor track_brush, thumb_brush, text_color;
+//	if(isEnabled()) {
+//		track_brush = m_track_color[isChecked()];
+//		thumb_brush = m_thumb_color[isChecked()];
+//		text_color = m_text_color[isChecked()];
+//	} else {
+//		track_opacity *= 0.8;
+//		track_brush = palette().shadow().color();
+//		thumb_brush = palette().mid().color();
+//		text_color = palette().shadow().color();
+//	}
 
-void CustomSwitch::setOffText(const QString &off_) { this->off.setText(off_); }
+//	p.setBrush(track_brush);
+//	p.setOpacity(track_opacity);
+////	QpPath path;
+////	path.addRoundedRect(m_margin, m_margin, m_btn_width - 2 * m_margin, m_track_radius * 2 - 2 * m_margin,
+/// m_track_radius, m_track_radius); /	p.drawPath(path); /	p.fillPath(path, Qt::transparent); /
+/// p.drawRoundedRect(m_margin, m_margin, m_btn_width - 2 * m_margin, m_track_radius * 2 - 2 * m_margin, m_track_radius,
+////			  m_track_radius);
 
-void CustomSwitch::setOn(const QPixmap &pixmap) { this->on.setPixmap(pixmap); }
+//	// Define colors
+//	QColor offColor = thumb_brush; // Light gray color
+//	QColor onColor = track_brush;  // Light blue color
 
-void CustomSwitch::setOff(const QPixmap &pixmap) { this->off.setPixmap(pixmap); }
+//	// Get widget size
+//	int width = size().width();
+//	int height = size().height();
+
+//	// Draw "Off" rectangle (left side)
+//	p.setPen(QColor(160, 160, 160)); // Gray border color
+//	p.setBrush(offColor);
+//	p.drawRect(0, 0, width / 2, height);
+
+//	// Draw "On" rectangle (right side)
+//	p.setPen(QColor(100, 100, 255)); // Blue border color
+//	p.setBrush(onColor);
+//	p.drawRect(width / 2, 0, width / 2, height);
+
+//	p.setBrush(thumb_brush);
+//	p.setOpacity(thumb_opacity);
+//	p.drawEllipse(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 * m_thumb_radius,
+//		      2 * m_thumb_radius);
+
+//	p.drawText(QRectF(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 * m_thumb_radius, 2 *
+// m_thumb_radius), Qt::AlignCenter, m_text[isChecked()]);
+//}
+
+// void CustomSwitch::mouseReleaseEvent(QMouseEvent *event)
+//{
+//	if(event->button() == Qt::LeftButton && rect().contains(event->pos())) {
+//		QPushButton::toggle();
+//		auto *anim = new QPropertyAnimation(this, "offset");
+//		anim->setDuration(120);
+//		anim->setStartValue(m_offset);
+//		anim->setEndValue(m_end_offset[isChecked()]());
+//		anim->start(QAbstractAnimation::DeleteWhenStopped);
+//	}
+//}
+
+// void CustomSwitch::enterEvent(QEvent *event)
+//{
+//	setCursor(Qt::PointingHandCursor);
+//	QPushButton::enterEvent(event);
+//}
 
 #include "moc_customSwitch.cpp"

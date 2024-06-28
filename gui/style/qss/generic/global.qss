@@ -3,24 +3,7 @@
     background-color: &background&;
     color: &highlight&;
     font-family: Arial, sans-serif;
-}
-
-/* Buttons */
-QPushButton {
-    background-color: &color_background&;
-    color: &highlight&;
-    border-radius: 5px;
-    padding: 5px 10px;
-}
-
-QPushButton:hover {
-    background-color: &background_deep&;
-    color: &highlight&;
-}
-
-QPushButton:disabled {
-    background-color: &background&;
-    color: &background_deep&;
+    font-size: 16px;
 }
 
 /* Tabs */
@@ -106,29 +89,6 @@ QToolButton:hover {
     color: &highlight&;
 }
 
-/* Checkboxes */
-QCheckBox {
-    spacing: 5px;
-    color: &highlight&;
-}
-
-QCheckBox::indicator {
-    width: 18px;
-    height: 18px;
-}
-
-QCheckBox::indicator:unchecked {
-    background-color: &background_deep&;
-    border: 1px solid &color_highlight&;
-    border-radius: 3px;
-}
-
-QCheckBox::indicator:checked {
-    background-color: &highlight&;
-    border: 1px solid &color_highlight&;
-    border-radius: 3px;
-}
-
 /* Comboboxes */
 QComboBox {
     background-color: &background&;
@@ -168,43 +128,22 @@ QComboBox QAbstractItemView {
 
 
 
-/*
-scopy--SpinBoxA QPushButton#SBA_UpButton {
- width: 30px;
- height: 30px;
- border-image: url(:/gui/icons/sba_up_btn.svg);
- border: 0px;
-}
-scopy--SpinBoxA QPushButton#SBA_UpButton:pressed {
- border-image: url(:/gui/icons/sba_up_btn_pressed.svg);
-}
-scopy--SpinBoxA QPushButton#SBA_UpButton:hover:!pressed {
- border-image: url(:/gui/icons/sba_up_btn_hover.svg);
-}
-scopy--SpinBoxA QPushButton#SBA_DownButton {
- width: 30px;
- height: 30px;
- border-image: url(:/gui/icons/sba_dn_btn.svg);
- border: 0px;
+*:focus {
+    border: none;
+    outline: none;
 }
 
-scopy--SpinBoxA QPushButton#SBA_DownButton:pressed {
- border-image: url(:/gui/icons/sba_dn_btn_pressed.svg);
-}
-scopy--SpinBoxA QPushButton#SBA_DownButton:hover:!pressed {
- border-image: url(:/gui/icons/sba_dn_btn_hover.svg);
-}
-scopy--SpinBoxA QLabel#SBA_Label {
- color: rgba(255, 255, 255, 102);
- font-size: 14px;
+QCheckBox::indicator {
+    width: &unit_pixel_1&;
+    height: &unit_pixel_1&;
+    border: 1px solid &highlight_disabled&;
+    border-radius: &radius_pixel_1&;
+    background-color: transparent;
 }
 
-scopy--SpinBoxA QLineEdit#SBA_LineEdit {
- height: 20px;
- width: 75px;
- font-size: 18px;
- border: 0px;
- bottom: 10px;
+QCheckBox::indicator:checked {
+    border: none;
+    border-radius: &radius_pixel_1&;
+    background-color: &color_highlight&;
+    image: url(&svg_checkmark&);
 }
-*/
-
