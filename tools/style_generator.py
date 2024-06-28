@@ -124,7 +124,7 @@ def parse_json_file(filepath: str, root_folder: str, out_file: str) -> Dict[str,
     items = content.split(',')
 
     for item in items:
-        key, value = item.split(':')
+        key, value = item.split(':', 1)
         key = key.strip().strip('"')
         formatted_key = os.path.relpath(filepath, root_folder).replace("/", "_").replace(".json", "") + "_" + key
         json_content[key] = formatted_key

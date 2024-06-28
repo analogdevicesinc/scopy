@@ -23,21 +23,24 @@
 #include <QDebug>
 #include <QFile>
 #include <QResizeEvent>
+#include <QStyleOptionButton>
 #include <QStylePainter>
 
 using namespace scopy;
 
 SmallOnOffSwitch::SmallOnOffSwitch(QWidget *parent)
-	: QPushButton(parent)
+	: QCheckBox(parent)
 {
 	setCheckable(true);
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-	m_track_radius = Style::getAttribute(json::global::unit_int_1).toInt();
-	m_thumb_radius = Style::getAttribute(json::global::unit_int_1).toInt() - 2;
+	m_track_radius = Style::getAttribute(json::global::unit_int_1).toInt() / 2;
+	m_thumb_radius = Style::getAttribute(json::global::unit_int_1).toInt() / 2 - 1;
+	m_btn_width = Style::getAttribute(json::global::unit_int_1).toInt() * 2.2;
+	m_spacing = Style::getAttribute(json::global::unit_int_1).toInt() / 2;
 	m_margin = std::max(0, m_thumb_radius - m_track_radius);
 	m_base_offset = std::max(m_thumb_radius, m_track_radius);
-	m_end_offset[true] = [this]() { return width() - m_base_offset; };
+	m_end_offset[true] = [this]() { return m_btn_width - m_base_offset; };
 	m_end_offset[false] = [this]() { return m_base_offset; };
 	m_offset = m_base_offset;
 
@@ -45,9 +48,13 @@ SmallOnOffSwitch::SmallOnOffSwitch(QWidget *parent)
 	m_track_color[false] = Style::getColor(json::theme::highlight_disabled);
 	m_thumb_color[true] = Style::getColor(json::theme::focus_item);
 	m_thumb_color[false] = Style::getColor(json::theme::focus_item);
-	m_text_color[true] = Style::getColor(json::theme::highlight);
-	m_text_color[false] = Style::getColor(json::theme::highlight);
 	m_track_opacity = 1.0;
+}
+
+SmallOnOffSwitch::SmallOnOffSwitch(const QString &text, QWidget *parent)
+	: SmallOnOffSwitch(parent)
+{
+	QCheckBox::setText(text);
 }
 
 int SmallOnOffSwitch::offset() const { return m_offset; }
@@ -60,18 +67,26 @@ void SmallOnOffSwitch::setOffset(int value)
 
 QSize SmallOnOffSwitch::sizeHint() const
 {
-	return QSize(4 * m_track_radius + 2 * m_margin, 2 * m_track_radius + 2 * m_margin);
+	QSize size;
+	if(QCheckBox::text().isEmpty()) {
+		size = QSize(m_btn_width, 2 * m_track_radius);
+	} else {
+		size = QCheckBox::sizeHint();
+		size.rwidth() += m_btn_width + m_spacing;
+	}
+
+	return size;
 }
 
 void SmallOnOffSwitch::setChecked(bool checked)
 {
-	QAbstractButton::setChecked(checked);
+	QCheckBox::setChecked(checked);
 	setOffset(m_end_offset[checked]());
 }
 
 void SmallOnOffSwitch::resizeEvent(QResizeEvent *event)
 {
-	QAbstractButton::resizeEvent(event);
+	QCheckBox::resizeEvent(event);
 	setOffset(m_end_offset[isChecked()]());
 }
 
@@ -83,23 +98,20 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
 
 	qreal track_opacity = m_track_opacity;
 	qreal thumb_opacity = 1.0;
-	qreal text_opacity = 1.0;
 
-	QColor track_brush, thumb_brush, text_color;
+	QColor track_brush, thumb_brush;
 	if(isEnabled()) {
 		track_brush = m_track_color[isChecked()];
 		thumb_brush = m_thumb_color[isChecked()];
-		text_color = m_text_color[isChecked()];
 	} else {
 		track_opacity *= 0.8;
 		track_brush = palette().shadow().color();
 		thumb_brush = palette().mid().color();
-		text_color = palette().shadow().color();
 	}
 
 	p.setBrush(track_brush);
 	p.setOpacity(track_opacity);
-	p.drawRoundedRect(m_margin, m_margin, width() - 2 * m_margin, height() - 2 * m_margin, m_track_radius,
+	p.drawRoundedRect(m_margin, m_margin, m_btn_width - 2 * m_margin, m_track_radius * 2 - 2 * m_margin, m_track_radius,
 			  m_track_radius);
 
 	p.setBrush(thumb_brush);
@@ -107,20 +119,20 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
 	p.drawEllipse(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 * m_thumb_radius,
 		      2 * m_thumb_radius);
 
-	p.setPen(text_color);
-	p.setOpacity(text_opacity);
-	QFont font = p.font();
-	font.setPixelSize(static_cast<int>(1.5 * m_thumb_radius));
-	p.setFont(font);
-	//	p.drawText(QRectF(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 * m_thumb_radius,
-	//			  2 * m_thumb_radius),
-	//		   Qt::AlignCenter);
+	if(!QCheckBox::text().isEmpty()) {
+		QStylePainter sp(this);
+		QStyleOptionButton opt;
+		initStyleOption(&opt);
+		opt.rect.setLeft(opt.rect.left() + m_btn_width + m_spacing);
+		opt.rect.setTop(opt.rect.top() - (opt.rect.height() - m_track_radius * 2));
+		sp.drawControl(QStyle::CE_CheckBoxLabel, opt);
+	}
 }
 
 void SmallOnOffSwitch::mouseReleaseEvent(QMouseEvent *event)
 {
-	QAbstractButton::mouseReleaseEvent(event);
-	if(event->button() == Qt::LeftButton) {
+	if(event->button() == Qt::LeftButton && rect().contains(event->pos())) {
+		QCheckBox::toggle();
 		auto *anim = new QPropertyAnimation(this, "offset");
 		anim->setDuration(120);
 		anim->setStartValue(m_offset);
@@ -132,7 +144,7 @@ void SmallOnOffSwitch::mouseReleaseEvent(QMouseEvent *event)
 void SmallOnOffSwitch::enterEvent(QEvent *event)
 {
 	setCursor(Qt::PointingHandCursor);
-	QAbstractButton::enterEvent(event);
+	QCheckBox::enterEvent(event);
 }
 
 #include "moc_smallOnOffSwitch.cpp"

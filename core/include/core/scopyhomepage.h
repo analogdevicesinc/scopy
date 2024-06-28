@@ -21,7 +21,7 @@ class SCOPY_CORE_EXPORT ScopyHomePage : public QWidget
 public:
 	explicit ScopyHomePage(QWidget *parent = nullptr, PluginManager *pm = nullptr);
 	~ScopyHomePage();
-	QPushButton *scanControlBtn();
+	QCheckBox *scanControlBtn();
 Q_SIGNALS:
 	void requestDevice(QString id);
 	void deviceAddedToUi(QString id);

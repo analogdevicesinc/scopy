@@ -5,6 +5,7 @@
 "color_highlight": "#0067B9",
 "color_background": "#92BEFC",
 "highlight_disabled": "#848B95",
-"focus_item": "#FFFFFF"
+"focus_item": "#FFFFFF",
+"svg_checkmark": ":/gui/icons/checkmark_light.svg"
 }
 

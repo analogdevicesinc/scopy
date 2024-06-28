@@ -12,6 +12,7 @@
 #include "gui/preferenceshelper.h"
 #include <style.h>
 #include "application_restarter.h"
+#include "smallOnOffSwitch.h"
 #include <QDir>
 #include <QDebug>
 #include <QLoggingCategory>

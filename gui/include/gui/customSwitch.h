@@ -21,49 +21,62 @@
 #ifndef CUSTOM_SWITCH_HPP
 #define CUSTOM_SWITCH_HPP
 
-#include "customanimation.h"
 #include "scopy-gui_export.h"
 
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QMap>
 #include <QPushButton>
 #include <QWidget>
-
-class QShowEvent;
 
 namespace scopy {
 class SCOPY_GUI_EXPORT CustomSwitch : public QPushButton
 {
 	Q_OBJECT
 
-	Q_PROPERTY(int duration_ms MEMBER duration_ms WRITE setDuration);
-
 public:
 	explicit CustomSwitch(QWidget *parent = nullptr);
-	~CustomSwitch();
+//	explicit CustomSwitch(const QString &text, QWidget *parent = nullptr);
 
-	const QLabel &getOn() const;
-	void setOnText(const QString &on_);
+//	QSize sizeHint() const override;
+//	void setChecked(bool checked);
+
+	void setOnText(const QString text);
+	void setOffText(const QString text);
+
 	void setOn(const QPixmap &pixmap);
-
-	const QLabel &getOff() const;
-	void setOffText(const QString &off_);
 	void setOff(const QPixmap &pixmap);
 
+protected:
+//	void resizeEvent(QResizeEvent *event) override;
+	void paintEvent(QPaintEvent *event) override;
+//	void mouseReleaseEvent(QMouseEvent *event) override;
+//	void enterEvent(QEvent *event) override;
+//	int offset() const;
+//	void setOffset(int value);
+
 private:
-	QLabel on, off;
-	QWidget handle;
-	CustomAnimation anim;
-	int duration_ms;
-	bool polarity;
+	QLabel *onLabel;
+	QLabel *offLabel;
+	QHBoxLayout *layout;
 
-	void setDuration(int ms);
-	void updateOnOffLabels();
 
-	void showEvent(QShowEvent *event);
-	bool event(QEvent *);
 
-private Q_SLOTS:
-	void toggleAnim(bool enabled);
+
+	int m_spacing;
+	int m_btn_width;
+	int m_track_radius;
+	int m_thumb_radius;
+	int m_margin;
+	int m_base_offset;
+	int m_offset;
+	qreal m_track_opacity;
+
+	QMap<bool, QColor> m_track_color;
+	QMap<bool, QColor> m_thumb_color;
+	QMap<bool, QColor> m_text_color;
+	QMap<bool, QString> m_text;
+	QMap<bool, std::function<int()>> m_end_offset;
 };
 } // namespace scopy
 

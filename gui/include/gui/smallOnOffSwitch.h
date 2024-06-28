@@ -23,26 +23,24 @@
 
 #include "scopy-gui_export.h"
 
+#include <QCheckBox>
 #include <QColor>
 #include <QMap>
 #include <QPainter>
 #include <QPropertyAnimation>
-#include <QPushButton>
 #include <QWidget>
 
 class QShowEvent;
 
 namespace scopy {
-class SCOPY_GUI_EXPORT SmallOnOffSwitch : public QPushButton
+class SCOPY_GUI_EXPORT SmallOnOffSwitch : public QCheckBox
 {
 	Q_OBJECT
 	Q_PROPERTY(int offset READ offset WRITE setOffset)
 
 public:
 	explicit SmallOnOffSwitch(QWidget *parent = nullptr);
-
-	int offset() const;
-	void setOffset(int value);
+	explicit SmallOnOffSwitch(const QString &text, QWidget *parent = nullptr);
 
 	QSize sizeHint() const override;
 	void setChecked(bool checked);
@@ -52,8 +50,12 @@ protected:
 	void paintEvent(QPaintEvent *event) override;
 	void mouseReleaseEvent(QMouseEvent *event) override;
 	void enterEvent(QEvent *event) override;
+	int offset() const;
+	void setOffset(int value);
 
 private:
+	int m_spacing;
+	int m_btn_width;
 	int m_track_radius;
 	int m_thumb_radius;
 	int m_margin;
@@ -63,7 +65,6 @@ private:
 
 	QMap<bool, QColor> m_track_color;
 	QMap<bool, QColor> m_thumb_color;
-	QMap<bool, QColor> m_text_color;
 	QMap<bool, std::function<int()>> m_end_offset;
 };
 } // namespace scopy

@@ -1,4 +1,7 @@
 {
-"unit_pixel_1": "10px",
-"unit_int_1": "10"
+"unit_pixel_1": "16px",
+"unit_int_1": "16",
+"unit_pixel_2": "20px",
+"unit_int_2": "20",
+"radius_pixel_1": "4px"
 }
