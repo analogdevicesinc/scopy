@@ -81,6 +81,3 @@ if(${"${CMAKE_SYSTEM_NAME}"} MATCHES "Windows")
 endif()
 
 set(${scopy_module}_TARGET_NAME ${"${PROJECT_NAME}"} PARENT_SCOPE)
-
-
-install(TARGETS ${"${PROJECT_NAME}"} RUNTIME DESTINATION ${"${SCOPY_PLUGIN_INSTALL_DIR}"})
