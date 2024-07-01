@@ -32,6 +32,9 @@ TranslationsRepository *TranslationsRepository::GetInstance()
 QString TranslationsRepository::getTranslationsPath()
 {
 	// Check the local plugins folder first
+
+	//adauga preferinte path
+
 	QDir pathDir(config::localTranslationFolderPath());
 	if(pathDir.exists()) {
 		return config::localTranslationFolderPath();

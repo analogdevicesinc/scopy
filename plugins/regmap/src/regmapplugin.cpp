@@ -96,7 +96,7 @@ void RegmapPlugin::initPreferences()
 	Preferences *p = Preferences::GetInstance();
 	p->init("regmap_color_by_value", "Default");
 #if defined __APPLE__
-	p->init("additional_regmap_xml_path", QCoreApplication::applicationDirPath() + "/plugins/plugins/xmls");
+	p->init("additional_regmap_xml_path", QCoreApplication::applicationDirPath() + "/plugins/xmls");
 #else
 	p->init("additional_regmap_xml_path", REGMAP_XML_PATH_LOCAL);
 #endif

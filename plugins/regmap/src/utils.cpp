@@ -55,11 +55,11 @@ QDir Utils::setXmlPath()
 	QDir xmlsPath(REGMAP_XML_BUILD_PATH);
 	if(xmlsPath.entryList().empty()) {
 #ifdef Q_OS_WINDOWS
-		xmlsPath.setPath(REGMAP_XML_PATH_LOCAL);
+		xmlsPath.setPath(QCoreApplication::applicationDirPath() + "/plugins/xmls");
 #elif defined __APPLE__
-		xmlsPath.setPath(QCoreApplication::applicationDirPath() + "/plugins/plugins/xmls");
+		xmlsPath.setPath(QCoreApplication::applicationDirPath() + "/plugins/xmls");
 #elif defined(__appimage__)
-		xmlsPath.setPath(QCoreApplication::applicationDirPath() + "/../share/plugins/xmls");
+		xmlsPath.setPath(QCoreApplication::applicationDirPath() + "/../lib/plugins/xmls");
 #else
 		xmlsPath.setPath(REGMAP_XML_SYSTEM_PATH);
 #endif

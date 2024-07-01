@@ -333,8 +333,8 @@ create_appdir(){
 	pushd ${STAGING_AREA}
 	BUILD_FOLDER=$SRC_DIR/build
 	EMU_BUILD_FOLDER=$STAGING_AREA/iio-emu/build
-	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 2 -type f -name "libscopy*")
-	PLUGINS=$BUILD_FOLDER/plugins/plugins
+	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 1 -type f -name "libscopy*")
+	PLUGINS=$BUILD_FOLDER/plugins
 	REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
 	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib:$QT_LOCATION/lib

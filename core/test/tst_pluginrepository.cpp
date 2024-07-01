@@ -17,7 +17,7 @@ private:
 };
 
 #define NONPLUGIN_LIBRARY_LOCATION "../libscopycore.so"
-#define PLUGIN_LOCATION "../../plugins/plugins"
+#define PLUGIN_LOCATION "../../plugins"
 
 void TST_PluginRepository::loadLibs()
 {

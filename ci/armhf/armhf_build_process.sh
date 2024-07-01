@@ -273,8 +273,8 @@ create_appdir(){
 
 	BUILD_FOLDER=$SRC_DIR/build
 	EMU_BUILD_FOLDER=$STAGING_AREA/iio-emu/build
-	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 2 -type f -name "libscopy*")
-	PLUGINS=$BUILD_FOLDER/plugins/plugins
+	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 1 -type f -name "libscopy*")
+	PLUGINS=$BUILD_FOLDER/plugins
 	REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
 	COPY_DEPS=$SRC_DIR/ci/armhf/copy-deps.sh
