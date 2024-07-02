@@ -65,9 +65,6 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 	// intercept the sendData from dataStrategy to collect information
 	connect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), this, SLOT(storeReadInfo(QString, QString)));
 
-	connect(dynamic_cast<QWidget *>(m_dataStrategy), SIGNAL(sendData(QString, QString)), this,
-		SLOT(storeReadInfo(QString, QString)));
-
 	m_dataStrategy->readAsync();
 }
 
