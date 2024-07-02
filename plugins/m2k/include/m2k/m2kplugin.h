@@ -49,6 +49,9 @@ public:
 public Q_SLOTS:
 	void showPageCallback() override;
 	void hidePageCallback() override;
+	void startPingTask() override;
+	void stopPingTask() override;
+	void onPausePingTask(bool pause) override;
 
 	void calibrationStarted();
 	void calibrationSuccess();
@@ -70,6 +73,7 @@ private:
 	m2k_iio_manager *m2k_man;
 	InfoPage *m_m2kInfoPage;
 
+	const int PING_PERIOD = 5000;
 	const int infoPageTimerTimeout = 1000;
 	const QStringList calibrationToolNames = {"Oscilloscope",     "Spectrum Analyzer", "Network Analyzer",
 						  "Signal Generator", "Voltmeter",	   "Calibration"};
@@ -79,6 +83,7 @@ private:
 	void storeToolState(QStringList tools);
 	void restoreToolState(QStringList tools);
 	void cleanup();
+	void clearPingTask();
 };
 } // namespace m2k
 } // namespace scopy

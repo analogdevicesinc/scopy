@@ -11,6 +11,9 @@
 #include <QWidget>
 #include <QtPlugin>
 
+#include <iioutil/cyclicaltask.h>
+#include <iioutil/pingtask.h>
+
 namespace scopy {
 
 /**
@@ -293,6 +296,13 @@ public:
 	 */
 	virtual QJsonObject metadata() = 0;
 
+	/**
+	 * @brief pingTask
+	 * @return plugin m_pingTask getter
+	 * Default implementation in PluginBase - override not recommended
+	 */
+	virtual PingTask *pingTask() = 0;
+
 public Q_SLOTS:
 	/**
 	 * @brief onConnect
@@ -304,6 +314,7 @@ public Q_SLOTS:
 	 * No default implementation in PluginBase - must be overriden
 	 */
 	virtual bool onConnect() = 0;
+
 	/**
 	 * @brief onDisconnect
 	 * is called when scopy disconnects from the device
@@ -337,6 +348,28 @@ public Q_SLOTS:
 	 * Default implementation in PluginBase - can be overriden
 	 */
 	virtual void messageCallback(QString topic, QString message) = 0;
+
+	/**
+	 * @brief startPingTask
+	 * Plugin can have a ping task which checks if the device is alive.
+	 * This method stars the ping task.
+	 */
+	virtual void startPingTask() = 0;
+
+	/**
+	 * @brief stopPingTask
+	 * Plugin can have a ping task which checks if the device is alive.
+	 * This method stops the ping task.
+	 */
+	virtual void stopPingTask() = 0;
+
+	/**
+	 * @brief onPausePingTask
+	 * Plugin can have a ping task which checks if the device is alive.
+	 * This method pauses/resumes the ping task.
+	 */
+	virtual void onPausePingTask(bool) = 0;
+
 	// Q_SIGNALS:
 
 	/**
@@ -367,6 +400,15 @@ public Q_SLOTS:
 	 * (adding/removing tools after postload)
 	 */
 	virtual void toolListChanged() = 0;
+
+	/**
+	 * @brief pausePingTask
+	 * Plugin can emit this signal if it requests to pause/resume the ping task
+	 * If the argument is False, the resume will be attempted
+	 * It works only if a ping task exists at device level
+	 */
+	virtual void pausePingTask(bool) = 0;
+
 	virtual void restartDevice() = 0;
 };
 } // namespace scopy

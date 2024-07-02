@@ -48,8 +48,10 @@ void CyclicalTask::stop()
 {
 	if(enabled) {
 		qDebug(CAT_CYCLICALTASK) << "Stopping scanner thread";
-		task->requestInterruption();
 		t->stop();
+		if(!task->isFinished()) {
+			task->wait(THREAD_FINISH_TIMEOUT);
+		}
 		enabled = false;
 	}
 }

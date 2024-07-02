@@ -56,6 +56,12 @@ void PluginBase::requestTool(QString id)
 	Q_EMIT requestToolByUuid(ToolMenuEntry::findToolMenuEntryById(m_toolList, id)->uuid());
 }
 
+void PluginBase::startPingTask() {}
+
+void PluginBase::stopPingTask() {}
+
+void PluginBase::onPausePingTask(bool) {}
+
 bool PluginBase::enabled() { return m_enabled; }
 
 QString PluginBase::param() { return m_param; }
@@ -94,6 +100,8 @@ void PluginBase::init() {}
 void PluginBase::deinit() {}
 
 void PluginBase::cloneExtra(Plugin *) {}
+
+PingTask *PluginBase::pingTask() { return m_pingTask; }
 
 void PluginBase::initMetadata()
 {

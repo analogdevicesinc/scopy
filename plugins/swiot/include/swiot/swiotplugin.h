@@ -38,6 +38,10 @@ public:
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
+	void startPingTask() override;
+	void stopPingTask() override;
+	void onPausePingTask(bool pause) override;
+
 	void onIsRuntimeCtxChanged(bool isRuntimeCtx);
 
 	void startTutorial();
@@ -56,6 +60,7 @@ private Q_SLOTS:
 private:
 	void switchCtx();
 	void setupToolList();
+	void clearPingTask();
 	void createStatusContainer();
 	QPushButton *m_btnIdentify;
 	QPushButton *m_btnTutorial;
@@ -77,6 +82,8 @@ private:
 	bool m_isRuntime;
 	bool m_switchCmd = false;
 	QString m_ctxMode;
+
+	const int PING_PERIOD = 2000;
 };
 } // namespace scopy::swiot
 #endif // SWIOTPLUGIN_H

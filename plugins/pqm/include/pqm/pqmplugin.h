@@ -7,7 +7,6 @@
 
 #include <QObject>
 #include <acquisitionmanager.h>
-#include <pqmcontroller.h>
 #include <gui/infopage.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
@@ -31,11 +30,15 @@ public:
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
+	void startPingTask() override;
+	void stopPingTask() override;
+	void onPausePingTask(bool pause) override;
 
 private:
+	void clearPingTask();
+
 	InfoPage *m_infoPage;
 	AcquisitionManager *m_acqManager;
-	PqmController *m_pqmController = nullptr;
 };
 } // namespace scopy::pqm
 

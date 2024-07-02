@@ -8,6 +8,7 @@
 #include <QFutureWatcher>
 
 #include <iioutil/commandqueue.h>
+#include <iioutil/pingtask.h>
 
 #define MAX_ATTR_SIZE 1024
 #define BUFFER_SIZE 256
@@ -18,12 +19,14 @@ class AcquisitionManager : public QObject
 {
 	Q_OBJECT
 public:
-	AcquisitionManager(iio_context *ctx, QObject *parent = nullptr);
+	AcquisitionManager(iio_context *ctx, PingTask *pingTask, QObject *parent = nullptr);
 	~AcquisitionManager();
 
 public Q_SLOTS:
 	void toolEnabled(bool en, QString toolName);
 	void setConfigAttr(QMap<QString, QMap<QString, QString>>);
+	void startPing();
+	void stopPing();
 Q_SIGNALS:
 	void pqmAttrsAvailable(QMap<QString, QMap<QString, QString>>);
 	void bufferDataAvailable(QMap<QString, std::vector<double>>);
@@ -31,6 +34,7 @@ Q_SIGNALS:
 private Q_SLOTS:
 	void futureReadData();
 	void onReadFinished();
+	void pingTimerTimeout();
 
 private:
 	int readGetNewMeasurement(iio_device *dev);
@@ -44,10 +48,13 @@ private:
 
 	iio_context *m_ctx;
 	iio_buffer *m_buffer;
-	QTimer *m_dataRefreshTimer;
+	QTimer *m_dataRefreshTimer = nullptr;
+	QTimer *m_pingTimer = nullptr;
+	PingTask *m_pingTask = nullptr;
 	QFutureWatcher<void> *m_readFw;
 	QFutureWatcher<void> *m_setFw;
 
+	QMutex mutex;
 	QVector<QString> m_chnlsName;
 	QMap<QString, QMap<QString, QString>> m_pqmAttr;
 	QMap<QString, std::vector<double>> m_bufferData;
@@ -55,6 +62,8 @@ private:
 
 	bool m_attrHaveBeenRead = false;
 	bool m_buffHaveBeenRead = false;
+	bool m_enPing = false;
+	const int THREAD_FINISH_TIMEOUT = 10000;
 };
 } // namespace scopy::pqm
 
