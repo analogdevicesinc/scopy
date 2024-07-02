@@ -29,15 +29,11 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void futureReadData();
-	void futureBufferRead();
 	void onReadFinished();
-	void onReadBufferFinished();
-	void onSetFinished();
 
 private:
 	double convertFromHwToHost(int value, QString chnlId);
 	void enableBufferChnls(iio_device *dev);
-	void prepareForSet();
 	void readData();
 	bool readPqmAttributes();
 	bool readBufferedData();
@@ -45,17 +41,17 @@ private:
 
 	iio_context *m_ctx;
 	iio_buffer *m_buffer;
-	QTimer *m_dataRefreshTimer;
 	QFutureWatcher<void> *m_readFw;
-	QFutureWatcher<bool> *m_readBufferFw;
 	QFutureWatcher<void> *m_setFw;
 
+	QMutex mutex;
 	QVector<QString> m_chnlsName;
 	QMap<QString, QMap<QString, QString>> m_pqmAttr;
 	QMap<QString, QVector<double>> m_bufferData;
 	QMap<QString, bool> m_tools = {{"rms", false}, {"harmonics", false}, {"waveform", false}, {"settings", false}};
 
 	bool m_attrHaveBeenRead = false;
+	bool m_buffHaveBeenRead = false;
 };
 } // namespace scopy::pqm
 
