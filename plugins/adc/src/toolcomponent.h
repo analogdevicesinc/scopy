@@ -109,8 +109,7 @@ public:
 	virtual void addComponent(ToolComponent *c)
 	{
 		m_components.append(c);
-		// std::sort(m_components.first(), m_components.last(), [](const ToolComponent &a, const ToolComponent
-		// &b){ return a.priority() > b.priority(); });
+		std::sort(m_components.begin(), m_components.end(), [](const ToolComponent *a, const ToolComponent *b){ return a->priority() < b->priority(); });
 		c->onInit();
 	};
 
@@ -146,10 +145,10 @@ public:
 	}
 	virtual void onDeinit()
 	{
-		/*auto cm = components();
+		auto cm = components();
 		for(auto c : cm) {
 			c->onDeinit();
-		}*/
+		}
 	}
 
 protected:
