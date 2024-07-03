@@ -27,7 +27,6 @@ GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, Time
 	m_src = node->src();
 
 	m_grtch = new GRTimeChannelSigpath(grtsc->name(), this, node, this);
-
 	m_running = false;
 	m_autoscaleEnabled = false;
 
@@ -193,13 +192,17 @@ QWidget *GRTimeChannelComponent::createAttrMenu(QWidget *parent)
 void GRTimeChannelComponent::onStart()
 {
 	m_running = true;
+	m_grtch->m_signalPath->setEnabled(true);
 	// m_measureMgr->getModel()->setSampleRate(m_plotSampleRate);
 	toggleAutoScale();
+
+
 }
 
 void GRTimeChannelComponent::onStop()
 {
 	m_running = false;
+	m_grtch->m_signalPath->setEnabled(false);
 	toggleAutoScale();
 	if(m_autoscaleEnabled) {
 		m_autoscaler->autoscale();
@@ -305,6 +308,19 @@ void GRTimeChannelComponent::removeChannelFromPlot()
 IIOUnit GRTimeChannelComponent::unit() const
 {
 	return m_unit;
+}
+
+void GRTimeChannelComponent::enable()
+{
+	ChannelComponent::enable();
+	Q_EMIT sigpath()->requestRebuild();
+
+}
+
+void GRTimeChannelComponent::disable()
+{
+	ChannelComponent::disable();
+	Q_EMIT sigpath()->requestRebuild();
 }
 
 bool GRTimeChannelComponent::scaleAvailable() const { return m_scaleAvailable; }

@@ -132,12 +132,17 @@ double GRIIODeviceSource::readSampleRate()
 
 void GRIIODeviceSource::matchChannelToBlockOutputs(GRTopBlock *top)
 {
+	QMap<GRIIOChannel*, int> map;
 	for(GRIIOChannel *ch : qAsConst(m_list)) {
 		GRIIOFloatChannelSrc *floatCh = dynamic_cast<GRIIOFloatChannelSrc *>(ch);
 		if(floatCh) {
 			auto start_sptr = floatCh->getGrStartPoint();
+
 			int idx = getOutputIndex(floatCh->getChannelName());
-			top->connect(src, idx, start_sptr[0], 0);
+			int mapIdx = map.value(ch,0);
+			top->connect(src, idx, start_sptr[mapIdx], 0);
+			mapIdx++;
+			map.insert(ch, mapIdx);
 		}
 
 		GRIIOComplexChannelSrc *complexCh = dynamic_cast<GRIIOComplexChannelSrc *>(ch);
@@ -145,8 +150,11 @@ void GRIIODeviceSource::matchChannelToBlockOutputs(GRTopBlock *top)
 			auto start_sptr = complexCh->getGrStartPoint();
 			int idxI = getOutputIndex(complexCh->getChannelNameI());
 			int idxQ = getOutputIndex(complexCh->getChannelNameQ());
-			top->connect(src, idxI, start_sptr[0], 0);
-			top->connect(src, idxQ, start_sptr[1], 0);
+			int mapIdx = map.value(ch,0);
+			top->connect(src, idxI, start_sptr[mapIdx], 0);
+			top->connect(src, idxQ, start_sptr[mapIdx+1], 0);
+			mapIdx+=2;
+			map.insert(ch, mapIdx);
 		}
 	}
 }
