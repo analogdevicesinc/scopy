@@ -1,16 +1,27 @@
 #include "adcinstrument.h"
+#include <pluginbase/resourcemanager.h>
+#include <gui/smallOnOffSwitch.h>
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(CAT_ADCINSTRUMENT, "ADCInstrument")
 
 using namespace scopy;
 using namespace scopy::adc;
-ADCInstrument::ADCInstrument(PlotProxy *proxy, QWidget *parent)
+
+
+
+ADCInstrument::ADCInstrument(PlotProxy *proxy, ToolMenuEntry *tme, QWidget *parent)
 	: QWidget(parent)
 	, proxy(proxy)
 	, m_running(false)
+	, m_tme(tme)
 {
-
 	setupToolLayout();
 	proxy->setInstrument(this);
 	init();
+
+	connect(this, &ADCInstrument::runningChanged, m_tme, &ToolMenuEntry::setRunning);
+	connect(m_tme, &ToolMenuEntry::runToggled, this, &ADCInstrument::setRunning);
 }
 
 ADCInstrument::~ADCInstrument()
@@ -47,6 +58,8 @@ void ADCInstrument::setupToolLayout()
 
 	GearBtn *settingsBtn = new GearBtn(this);
 	InfoBtn *infoBtn = new InfoBtn(this);
+	addBtn = new AddBtn(this);
+	removeBtn = new RemoveBtn(this);
 	PrintBtn *printBtn = new PrintBtn(this);
 	runBtn = new RunBtn(this);
 	singleBtn = new SingleShotBtn(this);
@@ -62,6 +75,8 @@ void ADCInstrument::setupToolLayout()
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
 	tool->addWidgetToTopContainerHelper(printBtn, TTA_LEFT);
 
+	tool->addWidgetToTopContainerHelper(addBtn, TTA_LEFT);
+	tool->addWidgetToTopContainerHelper(removeBtn, TTA_LEFT);
 	tool->addWidgetToBottomContainerHelper(channelsBtn, TTA_LEFT);
 
 	rightMenuBtnGrp->addButton(settingsBtn);
@@ -75,6 +90,11 @@ void ADCInstrument::setupToolLayout()
 		if(b)
 			tool->requestMenu(settingsMenuId);
 	});
+	connect(addBtn, &QAbstractButton::clicked, this, [=](){
+		Q_EMIT requestNewInstrument(TIME);
+	});
+
+	connect(removeBtn, &QAbstractButton::clicked, this, &ADCInstrument::requestDeleteInstrument);
 }
 
 void ADCInstrument::setupRunSingleButtonHelper()
@@ -85,7 +105,6 @@ void ADCInstrument::setupRunSingleButtonHelper()
 	connect(this, &ADCInstrument::runningChanged, this, &ADCInstrument::run);
 	connect(this, &ADCInstrument::runningChanged, runBtn, &QAbstractButton::setChecked);
 
-	// connect(this, &ADCInstrument::requestStop, this, &ADCInstrument::stop, Qt::QueuedConnection);
 }
 
 void ADCInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn)
@@ -126,6 +145,7 @@ void ADCInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *de
 			rightStack->show(id);
 		}
 	});
+
 }
 
 /// ADD CHANNEL HERE
@@ -191,15 +211,12 @@ void ADCInstrument::stop() { run(false); }
 
 void ADCInstrument::run(bool b)
 {
-	// QSignalBlocker rb(runBtn);
-	// QSignalBlocker sb(singleBtn);
-
+	runBtn->setChecked(b);
 	if(!b) {
-		runBtn->setChecked(false);
 		singleBtn->setChecked(false);
 	}
 
-	qInfo() << b;
+	qInfo(CAT_ADCINSTRUMENT) << proxy->name() <<": run " << b;
 	if(b) {
 		proxy->onStart();
 	} else {

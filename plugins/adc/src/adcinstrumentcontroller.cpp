@@ -62,6 +62,11 @@ void ADCInstrumentController::setInstrument(QWidget *t)
 	m_tool = ai;
 }
 
+void ADCInstrumentController::stop() {
+	qInfo()<<"Stopping "<<m_name;
+	Q_EMIT requestStop();
+	qInfo()<<"Stopped "<<m_name;
+}
 void ADCInstrumentController::init()
 {
 	ToolTemplate *toolLayout = m_tool->getToolTemplate();
@@ -99,7 +104,6 @@ void ADCInstrumentController::init()
 		addChannel(node);
 	}
 
-	connect(this, &ADCInstrumentController::requestStop, m_tool, &ADCInstrument::stop, Qt::QueuedConnection);
 	connect(m_tool, &ADCInstrument::setSingleShot, this, &ADCInstrumentController::setSingleShot);
 
 	m_otherCMCB = new CollapsableMenuControlButton(m_tool->vcm());
@@ -117,6 +121,7 @@ void ADCInstrumentController::deinit()
 
 void ADCInstrumentController::onStart()
 {
+		ResourceManager::open("adc",this);
 	for(auto c : qAsConst(m_components)) {
 		if(c->enabled()) {
 			c->onStart();
@@ -131,6 +136,7 @@ void ADCInstrumentController::onStop()
 		c->onStop();
 	}
 	stopUpdates();
+	ResourceManager::close("adc");
 }
 
 void ADCInstrumentController::stopUpdates()
