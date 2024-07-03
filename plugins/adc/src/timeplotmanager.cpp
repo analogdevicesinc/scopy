@@ -78,7 +78,6 @@ uint32_t TimePlotManager::addPlot(QString name)
 		p->addPlot(plt);
 	}
 
-
 	multiPlotUpdate();
 	return plt->uuid();
 }

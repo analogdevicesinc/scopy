@@ -94,9 +94,9 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	ycb->addItem("% Full Scale", YMODE_FS);
 
 	connect(ycb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		auto mode = ycb->itemData(idx).toInt();
+		m_ymode = static_cast<YMode>(ycb->itemData(idx).toInt());
 		for(auto c : qAsConst(m_scaleProviders)) {
-			c->setYMode(static_cast<YMode>(mode));
+			c->setYMode(m_ymode);
 		}
 		updateYAxis();
 	});
@@ -259,4 +259,23 @@ void TimePlotComponentSettings::updateYAxis()
 	}
 	m_yCtrl->setMin(min);
 	m_yCtrl->setMax(max);
+
+	auto timePlotYAxis = m_plotComponent->timePlot()->yAxis();
+	switch(m_ymode) {
+	case YMODE_COUNT:
+
+		timePlotYAxis->setUnits("");
+		timePlotYAxis->scaleDraw()->setFloatPrecision(0);
+		break;
+	case YMODE_FS:
+		timePlotYAxis->setUnits("");
+		timePlotYAxis->scaleDraw()->setFloatPrecision(2);
+		break;
+	case YMODE_SCALE:
+		timePlotYAxis->setUnits(m_scaleProviders[0]->unit().symbol);
+		timePlotYAxis->scaleDraw()->setFloatPrecision(3);
+		break;
+	default:
+		break;
+	}
 }
