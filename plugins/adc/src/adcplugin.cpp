@@ -183,12 +183,11 @@ void ADCPlugin::createGRIIOTreeNode(GRTopBlockNode *ctxNode, iio_context *ctx)
 
 bool ADCPlugin::onConnect()
 {
+	deleteInstrument(m_toolList[0]);
 	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
 	if(conn == nullptr)
 		return false;
 	m_ctx = conn->context();
-	m_toolList[0]->setEnabled(true);
-	m_toolList[0]->setRunBtnVisible(true);
 
 	// create gnuradio flow out of channels
 	// pass channels to ADC instrument - figure out channel model (sample rate/ size/ etc)
@@ -196,17 +195,65 @@ bool ADCPlugin::onConnect()
 	GRTopBlock *top = new GRTopBlock("ctx", this);
 	GRTopBlockNode *ctxNode = new GRTopBlockNode(top, nullptr);
 	root->addTreeChild(ctxNode);
-	auto timeProxy = new ADCInstrumentController("adc0", root, this);
-	time = new ADCInstrument(timeProxy);
+	createGRIIOTreeNode(ctxNode, m_ctx);
+
+	newInstrument(TIME,root);
+
+	return true;
+}
+
+void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode* root) {
+
+	static int idx = 0;
+	m_toolList.append(
+		SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+	m_toolList.last()->setEnabled(true);
+	m_toolList.last()->setRunBtnVisible(true);
+
+	auto timeProxy = new ADCInstrumentController("adc" + QString::number(idx), root, this);
+	ADCInstrument *w = new ADCInstrument(timeProxy, m_toolList.last());
+	idx++;
+
+
+	connect(timeProxy, &ADCInstrumentController::requestStartLater, w, &ADCInstrument::start, Qt::QueuedConnection);
+	connect(timeProxy, &ADCInstrumentController::requestStopLater, w, &ADCInstrument::stop, Qt::QueuedConnection);
+	connect(timeProxy, &ADCInstrumentController::requestStop, w, &ADCInstrument::stop);
+	connect(timeProxy, &ADCInstrumentController::requestStart, w, &ADCInstrument::start);
+
 	connect(root, &AcqTreeNode::newChild, timeProxy, &ADCInstrumentController::addChannel, Qt::QueuedConnection);
 	connect(root, &AcqTreeNode::deletedChild, timeProxy, &ADCInstrumentController::removeChannel,
 		Qt::QueuedConnection);
-	createGRIIOTreeNode(ctxNode, m_ctx);
-	// root->treeChildren()[0]->addTreeChild(new AcqTreeNode("other"));
 
-	m_toolList[0]->setTool(time);
+	connect(w, &ADCInstrument::requestNewInstrument, this, [=](ADCInstrumentType t){
+		newInstrument(t, root);
+	});
 
-	return true;
+	connect(w, &ADCInstrument::requestDeleteInstrument, this, [=](){
+		ToolMenuEntry *t = nullptr;
+		for(auto tool : qAsConst(m_toolList)) {
+			if(tool->tool() == w) {
+				t = tool;
+			}
+		}
+		deleteInstrument(t);
+	});
+
+
+	Q_EMIT toolListChanged();
+	m_toolList.last()->setTool(w);
+}
+
+void ADCPlugin::deleteInstrument(ToolMenuEntry *tool) {
+
+	tool->setEnabled(false);
+	tool->setRunBtnVisible(false);
+	QWidget *w = tool->tool();
+	if(w) {
+		tool->setTool(nullptr);
+		delete(w);
+	}
+	m_toolList.removeAll(tool);
+	Q_EMIT toolListChanged();
 }
 
 bool ADCPlugin::onDisconnect()
@@ -215,14 +262,12 @@ bool ADCPlugin::onDisconnect()
 	if(m_ctx)
 		ConnectionProvider::GetInstance()->close(m_param);
 	for(auto &tool : m_toolList) {
-		tool->setEnabled(false);
-		tool->setRunBtnVisible(false);
-		QWidget *w = tool->tool();
-		if(w) {
-			tool->setTool(nullptr);
-			delete(w);
-		}
+		deleteInstrument(tool);
 	}
+
+	m_toolList.append(
+		SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+
 	return true;
 }
 
