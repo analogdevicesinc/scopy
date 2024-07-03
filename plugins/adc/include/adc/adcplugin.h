@@ -21,9 +21,15 @@
 #include <pluginbase/pluginbase.h>
 #include <gui/stylehelper.h>
 
+#include <adcinstrumentcontroller.h>
 namespace scopy {
 namespace adc {
 using namespace grutil;
+
+typedef enum {
+	TIME,
+	FREQUENCY
+} ADCInstrumentType;
 
 class SCOPY_ADC_EXPORT ADCPlugin : public QObject, public PluginBase
 {
@@ -46,9 +52,10 @@ public:
 	void saveSettings(QSettings &) override;
 	void loadSettings(QSettings &) override;
 
+	void newInstrument(ADCInstrumentType t, AcqTreeNode *root);
+	void deleteInstrument(ToolMenuEntry *w);
 private:
 	iio_context *m_ctx;
-	QWidget *time;
 	QLineEdit *edit;
 
 	void createGRIIOTreeNode(GRTopBlockNode *node, iio_context *ctx);
