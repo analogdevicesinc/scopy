@@ -47,9 +47,6 @@ void GRProxyBlock::setEnabled(bool v)
 		return;
 
 	m_enabled = v;
-	blockSignals(false); // make sure request rebuild is sent
-	Q_EMIT requestRebuild();
-	blockSignals(!v); // to prevent rebuilding from non-enabled blocks - maybe
 }
 
 bool GRProxyBlock::enabled() { return m_enabled; }

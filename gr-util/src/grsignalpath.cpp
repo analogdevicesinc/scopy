@@ -44,7 +44,7 @@ gr::basic_block_sptr GRSignalPath::getGrEndPoint()
 
 void GRSignalPath::connect_blk(GRTopBlock *top, GRProxyBlock *src)
 {
-	qDebug(SCOPY_GR_UTIL) << "Start connecting GRSignalPath";
+	qDebug(SCOPY_GR_UTIL) << "Start connecting GRSignalPath" << name();
 	GRProxyBlock *prevBlk = src;
 	for(GRProxyBlock *blk : qAsConst(list)) {
 		if(blk->enabled() && !blk->built() ||
