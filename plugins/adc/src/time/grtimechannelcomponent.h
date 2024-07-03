@@ -39,10 +39,12 @@ public:
 		m_signalPath->append(m_scOff);
 		m_scOff->setOffset(0);
 		m_scOff->setScale(1);
-		m_signalPath->setEnabled(true); // or false
+		m_signalPath->setEnabled(false);
 		m_node->top()->src()->registerSignalPath(m_signalPath);
 	}
-	~GRTimeChannelSigpath() {}
+	~GRTimeChannelSigpath() {
+		m_node->top()->src()->unregisterSignalPath(m_signalPath);
+	}
 
 	void onNewData(const float *xData, const float *yData, size_t size, bool copy)
 	{
@@ -83,7 +85,6 @@ public:
 	IIOUnit unit() const override;
 
 public Q_SLOTS:
-
 	void enable() override;
 	void disable() override;
 	void onStart() override;
