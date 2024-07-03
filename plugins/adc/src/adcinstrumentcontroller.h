@@ -8,11 +8,18 @@
 #include "cursorcomponent.h"
 #include "measurecomponent.h"
 
+#include <pluginbase/resourcemanager.h>
 namespace scopy {
 namespace adc {
 class ChannelIdProvider;
 
-class SCOPY_ADC_EXPORT ADCInstrumentController : public QObject, public PlotProxy, public AcqNodeChannelAware
+
+class SCOPY_ADC_EXPORT ADCInstrumentController :
+	  public QObject
+	, public PlotProxy
+	, public AcqNodeChannelAware
+	, public SyncInstrument
+	, public ResourceUser
 {
 	Q_OBJECT
 public:
@@ -20,8 +27,6 @@ public:
 	~ADCInstrumentController();
 
 	ChannelIdProvider *getChannelIdProvider();
-
-	// PlotProxy interface
 public:
 	ToolComponent *getPlotAddon();
 	ToolComponent *getPlotSettings();
@@ -32,6 +37,7 @@ public:
 	QWidget *getInstrument() override;
 	void setInstrument(QWidget *) override;
 
+	void stop() override;
 public Q_SLOTS:
 	void init() override;
 	void deinit() override;
@@ -54,7 +60,10 @@ private Q_SLOTS:
 	void update();
 
 Q_SIGNALS:
+	void requestStart();
 	void requestStop();
+	void requestStartLater();
+	void requestStopLater();
 
 private:
 	void setupChannelMeasurement(TimePlotManager *c, ChannelComponent *ch);
