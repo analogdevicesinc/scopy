@@ -16,14 +16,17 @@
 #include <gui/widgets/measurementsettings.h>
 
 #include "toolcomponent.h"
+#include <adcplugin.h>
+
 
 namespace scopy {
 namespace adc {
+
 class ADCInstrument : public QWidget
 {
 	Q_OBJECT
 public:
-	ADCInstrument(PlotProxy *proxy, QWidget *parent = nullptr);
+	ADCInstrument(PlotProxy *proxy, ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~ADCInstrument();
 
 	bool running() const;
@@ -41,6 +44,8 @@ public:
 
 	VerticalChannelManager *vcm() const;
 
+	QPushButton *sync() const;
+
 public Q_SLOTS:
 	void run(bool);
 	void stop();
@@ -51,14 +56,16 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void setSingleShot(bool);
-	void requestStop();
 	void runningChanged(bool);
+	void requestNewInstrument(ADCInstrumentType t);
+	void requestDeleteInstrument();
 
 private:
 	void init();
 	void deinit();
 
 	ToolTemplate *tool;
+	ToolMenuEntry *m_tme;
 	PlotProxy *proxy;
 
 	QPushButton *openLastMenuBtn;
@@ -66,8 +73,11 @@ private:
 	QButtonGroup *rightMenuBtnGrp;
 	QButtonGroup *channelGroup;
 
+	AddBtn *addBtn;
+	RemoveBtn *removeBtn;
 	RunBtn *runBtn;
 	SingleShotBtn *singleBtn;
+	QPushButton *m_sync;
 	MenuControlButton *channelsBtn;
 	VerticalChannelManager *m_vcm;
 
@@ -77,9 +87,13 @@ private:
 	void setupChannelsButtonHelper(MenuControlButton *channelsBtn);
 
 	bool m_running;
+
 	Q_PROPERTY(bool running READ running WRITE setRunning NOTIFY runningChanged)
+
+
 };
 } // namespace adc
 } // namespace scopy
+static int instrumentIdx = 0;
 
 #endif // ADCINSTRUMENT_H
