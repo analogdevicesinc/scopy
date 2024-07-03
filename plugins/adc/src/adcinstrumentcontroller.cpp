@@ -67,6 +67,7 @@ void ADCInstrumentController::stop() {
 	Q_EMIT requestStop();
 	qInfo()<<"Stopped "<<m_name;
 }
+
 void ADCInstrumentController::init()
 {
 	ToolTemplate *toolLayout = m_tool->getToolTemplate();
@@ -121,18 +122,21 @@ void ADCInstrumentController::deinit()
 
 void ADCInstrumentController::onStart()
 {
-		ResourceManager::open("adc",this);
+	ResourceManager::open("adc",this);
 	for(auto c : qAsConst(m_components)) {
 		if(c->enabled()) {
+
 			c->onStart();
 		}
 	}
 	startUpdates();
+
 }
 
 void ADCInstrumentController::onStop()
 {
-	for(auto c : qAsConst(m_components)) {
+	for(int idx = m_components.size() - 1 ; idx >= 0;idx--) {
+		auto c = m_components[idx];
 		c->onStop();
 	}
 	stopUpdates();
@@ -190,7 +194,7 @@ void ADCInstrumentController::update()
 			DataProvider *dp = dynamic_cast<DataProvider *>(c);
 			dp->setData(false);
 			if(dp->finished()) {
-				Q_EMIT requestStop();
+					Q_EMIT requestStopLater();
 			}
 		}
 	}
@@ -374,4 +378,31 @@ void ADCInstrumentController::setupChannelMeasurement(TimePlotManager *c, Channe
 		connect(chMeasureManager, &MeasureManagerInterface::enableStat, statsPanel, &StatsPanel::addStat);
 		connect(chMeasureManager, &MeasureManagerInterface::disableStat, statsPanel, &StatsPanel::removeStat);
 	}
+}
+
+
+uint32_t SyncController::bufferSize() const
+{
+	return m_bufferSize;
+}
+
+void SyncController::setBufferSize(uint32_t newBufferSize)
+{
+	if (m_bufferSize == newBufferSize)
+		return;
+	m_bufferSize = newBufferSize;
+	emit bufferSizeChanged();
+}
+
+bool SyncController::singleShot() const
+{
+	return m_singleShot;
+}
+
+void SyncController::setSingleShot(bool newSingleShot)
+{
+	if (m_singleShot == newSingleShot)
+		return;
+	m_singleShot = newSingleShot;
+	emit singleShotChanged();
 }
