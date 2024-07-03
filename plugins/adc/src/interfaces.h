@@ -4,6 +4,7 @@
 #include <QString>
 #include "measurementcontroller.h"
 #include "menuwidget.h"
+#include <iioutil/iiounits.h>
 
 namespace scopy::adc {
 using namespace scopy;
@@ -53,6 +54,7 @@ public:
 	virtual bool yLock() const = 0;
 	virtual double yMin() const = 0;
 	virtual double yMax() const = 0;
+	virtual IIOUnit unit() const = 0;
 };
 
 class SCOPY_ADC_EXPORT MeasurementPanelInterface

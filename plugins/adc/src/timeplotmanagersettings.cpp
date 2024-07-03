@@ -95,6 +95,8 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 		setBufferSize((uint32_t)val);
 	});
 
+	connect(this, &TimePlotManagerSettings::bufferSizeChanged, m_bufferSizeSpin, &ScaleSpinButton::setValue);
+
 	m_plotSizeSpin = new ScaleSpinButton(
 		{
 			{"samples", 1e0},
@@ -175,21 +177,27 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 		m_sampleRateSpin->setVisible(false);
 		if(xcb->itemData(idx) == XMODE_SAMPLES) {
 			m_sampleRateSpin->setValue(1);
-			// setMetricFormatter - xAxis
-			// setUnits xmin,xmax - k,mega
+			for(TimePlotComponent *p : m_plotManager->plots()) {
+				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(0);
+			}
+
 		}
 		if(xcb->itemData(idx) == XMODE_TIME) {
 			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setEnabled(false);
 			m_sampleRateSpin->setValue(readSampleRate());
-			// setTimeFormatter - xAxis
-			// setUnits xmin,xmax - time units
+
+			for(TimePlotComponent *p : m_plotManager->plots()) {
+				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
+			}
+
 		}
 		if(xcb->itemData(idx) == XMODE_OVERRIDE) {
 			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setEnabled(true);
-			// setTimeFormatter - xAxis
-			// setUnits xmin,xmax
+			for(TimePlotComponent *p : m_plotManager->plots()) {
+				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
+			}
 		}
 	});
 
@@ -311,9 +319,7 @@ void TimePlotManagerSettings::onStart()
 
 	Q_EMIT plotSizeChanged(m_plotSize);
 	Q_EMIT rollingModeChanged(m_rollingMode);
-	if(!m_syncMode) {
-		Q_EMIT bufferSizeChanged(m_bufferSize);
-	}
+	Q_EMIT bufferSizeChanged(m_bufferSize);
 	updateXAxis();
 }
 
