@@ -80,6 +80,7 @@ public:
 	double yMin() const override;
 	double yMax() const override;
 	bool yLock() const override;
+	IIOUnit unit() const override;
 
 public Q_SLOTS:
 
