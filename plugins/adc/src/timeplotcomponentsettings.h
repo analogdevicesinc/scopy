@@ -45,6 +45,7 @@ private:
 	QList<ScaleProvider *> m_scaleProviders;
 	QPushButton *m_deletePlot;
 	QPushButton *m_deletePlotHover;
+	YMode m_ymode;
 
 	bool m_autoscaleEnabled;
 	bool m_running;
