@@ -44,6 +44,8 @@ public:
 
 	VerticalChannelManager *vcm() const;
 
+	QPushButton *sync() const;
+
 public Q_SLOTS:
 	void run(bool);
 	void stop();
@@ -75,6 +77,7 @@ private:
 	RemoveBtn *removeBtn;
 	RunBtn *runBtn;
 	SingleShotBtn *singleBtn;
+	QPushButton *m_sync;
 	MenuControlButton *channelsBtn;
 	VerticalChannelManager *m_vcm;
 
@@ -84,7 +87,10 @@ private:
 	void setupChannelsButtonHelper(MenuControlButton *channelsBtn);
 
 	bool m_running;
+
 	Q_PROPERTY(bool running READ running WRITE setRunning NOTIFY runningChanged)
+
+
 };
 } // namespace adc
 } // namespace scopy

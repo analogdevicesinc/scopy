@@ -60,6 +60,11 @@ void ADCInstrument::setupToolLayout()
 	InfoBtn *infoBtn = new InfoBtn(this);
 	addBtn = new AddBtn(this);
 	removeBtn = new RemoveBtn(this);
+
+	m_sync = new QPushButton("Sync");
+	m_sync->setCheckable(true);
+	StyleHelper::BlueGrayButton(m_sync);
+
 	PrintBtn *printBtn = new PrintBtn(this);
 	runBtn = new RunBtn(this);
 	singleBtn = new SingleShotBtn(this);
@@ -77,6 +82,8 @@ void ADCInstrument::setupToolLayout()
 
 	tool->addWidgetToTopContainerHelper(addBtn, TTA_LEFT);
 	tool->addWidgetToTopContainerHelper(removeBtn, TTA_LEFT);
+	tool->addWidgetToTopContainerHelper(m_sync, TTA_LEFT);
+
 	tool->addWidgetToBottomContainerHelper(channelsBtn, TTA_LEFT);
 
 	rightMenuBtnGrp->addButton(settingsBtn);
@@ -90,6 +97,7 @@ void ADCInstrument::setupToolLayout()
 		if(b)
 			tool->requestMenu(settingsMenuId);
 	});
+
 	connect(addBtn, &QAbstractButton::clicked, this, [=](){
 		Q_EMIT requestNewInstrument(TIME);
 	});
@@ -104,7 +112,6 @@ void ADCInstrument::setupRunSingleButtonHelper()
 	connect(singleBtn, &QPushButton::toggled, this, &ADCInstrument::setRunning);
 	connect(this, &ADCInstrument::runningChanged, this, &ADCInstrument::run);
 	connect(this, &ADCInstrument::runningChanged, runBtn, &QAbstractButton::setChecked);
-
 }
 
 void ADCInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn)
@@ -180,6 +187,11 @@ void ADCInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, Compos
 void ADCInstrument::init() { proxy->init(); }
 
 void ADCInstrument::deinit() { proxy->deinit(); }
+
+QPushButton *ADCInstrument::sync() const
+{
+	return m_sync;
+}
 
 VerticalChannelManager *ADCInstrument::vcm() const { return m_vcm; }
 
