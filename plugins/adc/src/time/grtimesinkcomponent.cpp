@@ -17,6 +17,7 @@ GRTimeSinkComponent::GRTimeSinkComponent(QString name, GRTopBlockNode *t, QObjec
 	m_rollingMode = false;
 	m_singleShot = false;
 	m_syncMode = false;
+	m_priority = 10;
 }
 
 GRTimeSinkComponent::~GRTimeSinkComponent() {}
@@ -45,7 +46,7 @@ void GRTimeSinkComponent::connectSignalPaths()
 	int index = 0;
 	time_channel_map.clear();
 
-	for(GRChannel *gr : m_channels) {
+	for(GRChannel *gr : qAsConst(m_channels)) {
 		GRSignalPath *sigPath = gr->sigpath();
 		if(sigPath->enabled()) {
 			// connect end of signal path to time_sink input
@@ -73,7 +74,7 @@ size_t GRTimeSinkComponent::updateData()
 	return new_samples;
 }
 
-bool GRTimeSinkComponent::finished() { return time_sink->finishedAcquisition(); }
+bool GRTimeSinkComponent::finished() { return (time_sink) ? time_sink->finishedAcquisition() : false; }
 
 void GRTimeSinkComponent::setData(bool copy)
 {

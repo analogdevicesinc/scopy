@@ -236,7 +236,10 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 			ymin = 0;
 			ymax = 1 << (fmt->bits);
 		}
-		//		m_plotCh->yAxis()->setUnits("Counts");
+		m_plotChannelCmpt->m_timePlotYAxis->setUnits("");
+		m_plotChannelCmpt->m_timePlotYAxis->scaleDraw()->setFloatPrecision(0);
+//		m_plotCh->yAxis()->setUnits("Counts");
+//		m_plotCh->yAxis()->
 		break;
 	case YMODE_FS:
 		if(m_scaleAvailable) {
@@ -250,6 +253,8 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 			ymin = 0;
 			ymax = 1;
 		}
+		m_plotChannelCmpt->m_timePlotYAxis->setUnits("");
+		m_plotChannelCmpt->m_timePlotYAxis->scaleDraw()->setFloatPrecision(2);
 		// m_plotCh->yAxis()->setUnits("");
 		break;
 	case YMODE_SCALE:
@@ -270,7 +275,9 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 		ymin = ymin * scale;
 		ymax = ymax * scale;
 
-		// m_plotCh->yAxis()->setUnits(m_unit);
+		m_plotChannelCmpt->m_timePlotYAxis->setUnits(m_unit.symbol);
+		m_plotChannelCmpt->m_timePlotYAxis->scaleDraw()->setFloatPrecision(3);
+
 
 		break;
 	default:
@@ -295,6 +302,11 @@ void GRTimeChannelComponent::removeChannelFromPlot()
 	m_curvemenu->removeChannels(m_plotChannelCmpt->m_xyPlotCh);
 }
 
+IIOUnit GRTimeChannelComponent::unit() const
+{
+	return m_unit;
+}
+
 bool GRTimeChannelComponent::scaleAvailable() const { return m_scaleAvailable; }
 
 bool GRTimeChannelComponent::yLock() const { return m_yLock; }
@@ -309,18 +321,6 @@ GRSignalPath *GRTimeChannelComponent::sigpath() { return m_grtch->m_signalPath; 
 
 QVBoxLayout *GRTimeChannelComponent::menuLayout() { return m_layScroll; }
 
-void GRTimeChannelComponent::enable()
-{
-	m_grtch->m_signalPath->setEnabled(true);
-	ChannelComponent::enable();
-}
-
-void GRTimeChannelComponent::disable()
-{
-	m_grtch->m_signalPath->setEnabled(false);
-	ChannelComponent::disable();
-}
-
 void GRTimeChannelComponent::onInit()
 {
 	// Defaults
@@ -330,6 +330,7 @@ void GRTimeChannelComponent::onInit()
 	m_yCtrl->setMin(-1.0);
 	m_yCtrl->setMax(1.0);
 
+	m_ymode = static_cast<adc::YMode>(-1);
 	auto v = Preferences::get("adc_default_y_mode").toInt();
 	m_ymodeCb->combo()->setCurrentIndex(v);
 	setYMode(static_cast<YMode>(v));
