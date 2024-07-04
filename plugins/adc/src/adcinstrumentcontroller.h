@@ -155,6 +155,7 @@ private:
 	QTimer *m_plotTimer;
 
 	AcqTreeNode *m_tree;
+	DataProvider *m_dataProvider;
 	QMap<AcqTreeNode *, ToolComponent *> m_acqNodeComponentMap;
 
 	bool m_refreshTimerRunning;
