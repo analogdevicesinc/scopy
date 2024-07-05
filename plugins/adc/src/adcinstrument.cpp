@@ -10,24 +10,15 @@ using namespace scopy::adc;
 
 
 
-ADCInstrument::ADCInstrument(PlotProxy *proxy, ToolMenuEntry *tme, QWidget *parent)
+ADCInstrument::ADCInstrument(ToolMenuEntry *tme, QWidget *parent)
 	: QWidget(parent)
-	, proxy(proxy)
-	, m_running(false)
 	, m_tme(tme)
 {
 	setupToolLayout();
-	proxy->setInstrument(this);
-	init();
-
-	connect(this, &ADCInstrument::runningChanged, m_tme, &ToolMenuEntry::setRunning);
-	connect(m_tme, &ToolMenuEntry::runToggled, this, &ADCInstrument::setRunning);
 }
 
 ADCInstrument::~ADCInstrument()
 {
-	stop();
-	deinit();
 }
 
 void ADCInstrument::setupToolLayout()
@@ -66,16 +57,16 @@ void ADCInstrument::setupToolLayout()
 	StyleHelper::BlueGrayButton(m_sync);
 
 	PrintBtn *printBtn = new PrintBtn(this);
-	runBtn = new RunBtn(this);
-	singleBtn = new SingleShotBtn(this);
+	m_runBtn = new RunBtn(this);
+	m_singleBtn = new SingleShotBtn(this);
 
 	channelsBtn = new MenuControlButton(this);
 
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsBtn, TTA_LEFT);
 
-	tool->addWidgetToTopContainerHelper(runBtn, TTA_RIGHT);
-	tool->addWidgetToTopContainerHelper(singleBtn, TTA_RIGHT);
+	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
+	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
 
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
 	tool->addWidgetToTopContainerHelper(printBtn, TTA_LEFT);
@@ -98,6 +89,15 @@ void ADCInstrument::setupToolLayout()
 			tool->requestMenu(settingsMenuId);
 	});
 
+	connect(m_runBtn, &QAbstractButton::toggled, this, [=](bool b) {
+		m_runBtn->setEnabled(false);
+		if(b) {
+			Q_EMIT requestStart();
+		} else {
+			Q_EMIT requestStop();
+		}
+	});
+
 	connect(addBtn, &QAbstractButton::clicked, this, [=](){
 		Q_EMIT requestNewInstrument(TIME);
 	});
@@ -107,11 +107,6 @@ void ADCInstrument::setupToolLayout()
 
 void ADCInstrument::setupRunSingleButtonHelper()
 {
-	connect(runBtn, &QPushButton::toggled, this, &ADCInstrument::setRunning);
-	connect(singleBtn, &QPushButton::toggled, this, &ADCInstrument::setSingleShot);
-	connect(singleBtn, &QPushButton::toggled, this, &ADCInstrument::setRunning);
-	connect(this, &ADCInstrument::runningChanged, this, &ADCInstrument::run);
-	connect(this, &ADCInstrument::runningChanged, runBtn, &QAbstractButton::setChecked);
 }
 
 void ADCInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn)
@@ -155,8 +150,6 @@ void ADCInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *de
 
 }
 
-/// ADD CHANNEL HERE
-
 void ADCInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, CompositeWidget *c)
 {
 	c->add(btn);
@@ -184,54 +177,33 @@ void ADCInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, Compos
 	setupChannelDelete(ch);*/
 }
 // #endif
-void ADCInstrument::init() { proxy->init(); }
-
-void ADCInstrument::deinit() { proxy->deinit(); }
 
 QPushButton *ADCInstrument::sync() const
 {
 	return m_sync;
 }
 
+void ADCInstrument::stopped()
+{
+	m_tme->setRunning(false);
+	QSignalBlocker sb(m_runBtn);
+	m_singleBtn->setChecked(false);
+	m_runBtn->setEnabled(true);
+	m_runBtn->setChecked(false);
+	m_runBtn->setText("Start");
+}
+
+void ADCInstrument::started()
+{
+	m_tme->setRunning(true);
+	QSignalBlocker sb(m_runBtn);
+	m_runBtn->setChecked(true);
+	m_runBtn->setEnabled(true);
+	m_runBtn->setText("Stop");
+}
+
 VerticalChannelManager *ADCInstrument::vcm() const { return m_vcm; }
-
-void ADCInstrument::restart()
-{
-	if(m_running) {
-		run(false);
-		run(true);
-	}
-}
-
-bool ADCInstrument::running() const { return m_running; }
-
-void ADCInstrument::setRunning(bool newRunning)
-{
-	if(m_running == newRunning)
-		return;
-	m_running = newRunning;
-	Q_EMIT runningChanged(newRunning);
-}
 
 ToolTemplate *ADCInstrument::getToolTemplate() { return tool; }
 
 MapStackedWidget *ADCInstrument::getRightStack() { return rightStack; }
-
-void ADCInstrument::start() { run(true); }
-
-void ADCInstrument::stop() { run(false); }
-
-void ADCInstrument::run(bool b)
-{
-	runBtn->setChecked(b);
-	if(!b) {
-		singleBtn->setChecked(false);
-	}
-
-	qInfo(CAT_ADCINSTRUMENT) << proxy->name() <<": run " << b;
-	if(b) {
-		proxy->onStart();
-	} else {
-		proxy->onStop();
-	}
-}
