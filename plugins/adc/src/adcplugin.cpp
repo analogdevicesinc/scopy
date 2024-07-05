@@ -207,31 +207,26 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode* root) {
 	static int idx = 0;
 	m_toolList.append(
 		SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
-	m_toolList.last()->setEnabled(true);
-	m_toolList.last()->setRunBtnVisible(true);
+	auto tme = m_toolList.last();
+	tme->setEnabled(true);
+	tme->setRunBtnVisible(true);
 
-	auto timeProxy = new ADCInstrumentController("adc" + QString::number(idx), root, this);
-	ADCInstrument *w = new ADCInstrument(timeProxy, m_toolList.last());
+	auto adc = new ADCInstrumentController(tme, "adc" + QString::number(idx), root, this);
+	auto ui = adc->ui();
 	idx++;
 
-
-	connect(timeProxy, &ADCInstrumentController::requestStartLater, w, &ADCInstrument::start, Qt::QueuedConnection);
-	connect(timeProxy, &ADCInstrumentController::requestStopLater, w, &ADCInstrument::stop, Qt::QueuedConnection);
-	connect(timeProxy, &ADCInstrumentController::requestStop, w, &ADCInstrument::stop);
-	connect(timeProxy, &ADCInstrumentController::requestStart, w, &ADCInstrument::start);
-
-	connect(root, &AcqTreeNode::newChild, timeProxy, &ADCInstrumentController::addChannel, Qt::QueuedConnection);
-	connect(root, &AcqTreeNode::deletedChild, timeProxy, &ADCInstrumentController::removeChannel,
+	connect(root, &AcqTreeNode::newChild, adc, &ADCInstrumentController::addChannel, Qt::QueuedConnection);
+	connect(root, &AcqTreeNode::deletedChild, adc, &ADCInstrumentController::removeChannel,
 		Qt::QueuedConnection);
 
-	connect(w, &ADCInstrument::requestNewInstrument, this, [=](ADCInstrumentType t){
+	connect(ui, &ADCInstrument::requestNewInstrument, this, [=](ADCInstrumentType t){
 		newInstrument(t, root);
 	});
 
-	connect(w, &ADCInstrument::requestDeleteInstrument, this, [=](){
+	connect(ui, &ADCInstrument::requestDeleteInstrument, this, [=](){
 		ToolMenuEntry *t = nullptr;
 		for(auto tool : qAsConst(m_toolList)) {
-			if(tool->tool() == w) {
+			if(tool->tool() == ui) {
 				t = tool;
 			}
 		}
@@ -240,7 +235,7 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode* root) {
 
 
 	Q_EMIT toolListChanged();
-	m_toolList.last()->setTool(w);
+	tme->setTool(ui);
 }
 
 void ADCPlugin::deleteInstrument(ToolMenuEntry *tool) {
