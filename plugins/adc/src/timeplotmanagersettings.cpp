@@ -15,6 +15,7 @@ TimePlotManagerSettings::TimePlotManagerSettings(TimePlotManager *mgr, QWidget *
 	, ToolComponent()
 	, m_syncMode(false)
 	, m_sampleRateAvailable(false)
+	, m_rollingMode(false)
 {
 	m_plotManager = mgr;
 	auto *w = createMenu(this);
