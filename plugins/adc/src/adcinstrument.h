@@ -24,13 +24,11 @@ namespace adc {
 
 class ADCInstrument : public QWidget
 {
+	friend class ADCInstrumentController;
 	Q_OBJECT
 public:
-	ADCInstrument(PlotProxy *proxy, ToolMenuEntry *tme, QWidget *parent = nullptr);
+	ADCInstrument(ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~ADCInstrument();
-
-	bool running() const;
-	void setRunning(bool newRunning);
 
 	ToolTemplate *getToolTemplate();
 	MapStackedWidget *getRightStack();
@@ -47,26 +45,21 @@ public:
 	QPushButton *sync() const;
 
 public Q_SLOTS:
-	void run(bool);
-	void stop();
-	void start();
-	void restart();
+	void stopped();
+	void started();
 	void addDevice(CollapsableMenuControlButton *b, ToolComponent *dev);
 	void addChannel(MenuControlButton *btn, ToolComponent *ch, CompositeWidget *c);
 
 Q_SIGNALS:
-	void setSingleShot(bool);
-	void runningChanged(bool);
+	void requestStart();
+	void requestStop();
+
 	void requestNewInstrument(ADCInstrumentType t);
 	void requestDeleteInstrument();
 
 private:
-	void init();
-	void deinit();
-
 	ToolTemplate *tool;
 	ToolMenuEntry *m_tme;
-	PlotProxy *proxy;
 
 	QPushButton *openLastMenuBtn;
 	MapStackedWidget *rightStack;
@@ -75,8 +68,8 @@ private:
 
 	AddBtn *addBtn;
 	RemoveBtn *removeBtn;
-	RunBtn *runBtn;
-	SingleShotBtn *singleBtn;
+	RunBtn *m_runBtn;
+	SingleShotBtn *m_singleBtn;
 	QPushButton *m_sync;
 	MenuControlButton *channelsBtn;
 	VerticalChannelManager *m_vcm;
@@ -85,12 +78,6 @@ private:
 	void setupRunSingleButtonHelper();
 
 	void setupChannelsButtonHelper(MenuControlButton *channelsBtn);
-
-	bool m_running;
-
-	Q_PROPERTY(bool running READ running WRITE setRunning NOTIFY runningChanged)
-
-
 };
 } // namespace adc
 } // namespace scopy

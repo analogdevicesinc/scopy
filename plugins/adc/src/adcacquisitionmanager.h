@@ -10,6 +10,7 @@
 #include <scopy-adc_export.h>
 #include <QMap>
 #include <interfaces.h>
+#include <synccontroller.h>
 
 namespace scopy {
 namespace adc {
@@ -58,9 +59,11 @@ public:
 	GRTopBlockNode(GRTopBlock *g, QObject *parent = nullptr);
 	~GRTopBlockNode();
 	GRTopBlock *src() const;
+	SyncController *sync() const;
 
 private:
 	GRTopBlock *m_src;
+	SyncController *m_sync;
 };
 
 class SCOPY_ADC_EXPORT GRIIODeviceSourceNode : public AcqTreeNode

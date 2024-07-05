@@ -10,7 +10,7 @@
 namespace scopy {
 namespace adc {
 
-class GRTimeSinkComponent : public QObject, public ToolComponent, public DataProvider
+class GRTimeSinkComponent : public QObject, public DataProvider, public SyncInstrument
 {
 	Q_OBJECT
 public:
@@ -18,26 +18,49 @@ public:
 	~GRTimeSinkComponent();
 
 	bool finished() override;
+	const QString &name() const;
+
 public Q_SLOTS:
 	void connectSignalPaths();
 	void tearDownSignalPaths();
 
-	virtual size_t updateData() override;
-	virtual void setSingleShot(bool) override;
-	virtual void setData(bool copy = false) override;
 	virtual void setRollingMode(bool b);
 	virtual void setSampleRate(double);
 	virtual void setBufferSize(uint32_t size);
 	virtual void setPlotSize(uint32_t size);
-	virtual void onStart() override;
-	virtual void onStop() override;
-	virtual void onInit() override;
-	virtual void onDeinit() override;
+
+	virtual void onArm() override;
+	virtual void onDisarm() override;
+	virtual void setSyncMode(bool b) override;
+	virtual void setSyncController(SyncController *s) override;
+	virtual bool syncMode() override;
+
+	void init();
+	void deinit();
+
+	virtual void start() override;
+	virtual void stop() override;
+
+	virtual size_t updateData() override;
+	virtual void setSingleShot(bool) override;
+	virtual void setData(bool copy = false) override;
 
 	void addChannel(GRChannel *ch);
 	void removeChannel(GRChannel *c);
+
+	void setSyncSingleShot(bool) override;
+	void setSyncBufferSize(uint32_t) override;
+
 Q_SIGNALS:
+	void arm();
+	void disarm();
+
+	void ready();
+	void finish();
+
 	void requestRebuild();
+	void requestSingleShot(bool);
+	void requestBufferSize(uint32_t);
 
 private:
 	std::mutex refillMutex;
@@ -51,8 +74,12 @@ private:
 	bool m_rollingMode;
 	bool m_singleShot;
 	bool m_syncMode;
+	bool m_armed;
+
+	SyncController *m_sync;
 
 	QList<GRChannel *> m_channels;
+	QString m_name;
 
 	// SampleRateProvider interface
 };

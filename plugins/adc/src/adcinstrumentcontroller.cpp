@@ -13,16 +13,15 @@ Q_LOGGING_CATEGORY(CAT_TIMEPLOT_PROXY, "TimePlotProxy")
 using namespace scopy;
 using namespace scopy::adc;
 
-ADCInstrumentController::ADCInstrumentController(QString name, AcqTreeNode *tree, QObject *parent)
+ADCInstrumentController::ADCInstrumentController(ToolMenuEntry *tme, QString name, AcqTreeNode *tree, QObject *parent)
 	: QObject(parent)
 	, m_refreshTimerRunning(false)
-	, m_tool(nullptr)
 	, m_plotComponentManager(nullptr)
 	, m_timePlotSettingsComponent(nullptr)
 	, m_cursorComponent(nullptr)
 	, m_measureComponent(nullptr)
-	, currentCategory("time")
-{
+	, m_started(false)
+{	
 	chIdP = new ChannelIdProvider(this);
 	m_tree = tree;
 	m_name = name;
@@ -43,6 +42,9 @@ ADCInstrumentController::ADCInstrumentController(QString name, AcqTreeNode *tree
 				m_plotTimer->start();
 		},
 		Qt::QueuedConnection);
+
+	m_ui = new ADCInstrument(tme, nullptr);
+	init();
 }
 
 ADCInstrumentController::~ADCInstrumentController() {}
@@ -53,26 +55,11 @@ ToolComponent *ADCInstrumentController::getPlotAddon() { return (ToolComponent *
 
 ToolComponent *ADCInstrumentController::getPlotSettings() { return (ToolComponent *)m_timePlotSettingsComponent; }
 
-QWidget *ADCInstrumentController::getInstrument() { return (QWidget *)(m_tool); }
-
-void ADCInstrumentController::setInstrument(QWidget *t)
-{
-	ADCInstrument *ai = dynamic_cast<ADCInstrument *>(t);
-	Q_ASSERT(ai);
-	m_tool = ai;
-}
-
-void ADCInstrumentController::stop() {
-	qInfo()<<"Stopping "<<m_name;
-	Q_EMIT requestStop();
-	qInfo()<<"Stopped "<<m_name;
-}
-
 void ADCInstrumentController::init()
 {
-	ToolTemplate *toolLayout = m_tool->getToolTemplate();
+	ToolTemplate *toolLayout = m_ui->getToolTemplate();
 
-	m_plotComponentManager = new TimePlotManager(m_name + "_time", m_tool);
+	m_plotComponentManager = new TimePlotManager(m_name + "_time", m_ui);
 	addComponent(m_plotComponentManager);
 	m_timePlotSettingsComponent = new TimePlotManagerSettings(m_plotComponentManager);
 	addComponent(m_timePlotSettingsComponent);
@@ -86,16 +73,16 @@ void ADCInstrumentController::init()
 	// m_cursorComponent = new CursorComponent(m_plotComponentManager, m_tool->getToolTemplate(), this);
 	// addComponent(m_cursorComponent);
 
-	m_measureComponent = new MeasureComponent(m_tool->getToolTemplate(), m_plotComponentManager, this);
+	m_measureComponent = new MeasureComponent(m_ui->getToolTemplate(), m_plotComponentManager, this);
 	// m_measureComponent->addPlotComponent(m_plotComponentManager);
 
 	addComponent(m_measureComponent);
 
-	plotStack = new MapStackedWidget(m_tool);
+	plotStack = new MapStackedWidget(m_ui);
 	toolLayout->addWidgetToCentralContainerHelper(plotStack);
 
 	plotStack->add("time", m_plotComponentManager);
-	toolLayout->rightStack()->add(m_tool->settingsMenuId, m_timePlotSettingsComponent);
+	toolLayout->rightStack()->add(m_ui->settingsMenuId, m_timePlotSettingsComponent);
 
 	for(auto c : qAsConst(m_components)) {
 		c->onInit();
@@ -105,12 +92,10 @@ void ADCInstrumentController::init()
 		addChannel(node);
 	}
 
-	connect(m_tool, &ADCInstrument::setSingleShot, this, &ADCInstrumentController::setSingleShot);
-
-	m_otherCMCB = new CollapsableMenuControlButton(m_tool->vcm());
+	m_otherCMCB = new CollapsableMenuControlButton(m_ui->vcm());
 	m_otherCMCB->getControlBtn()->button()->setVisible(false);
 	m_otherCMCB->getControlBtn()->setName("Other");
-	m_tool->vcm()->addEnd(m_otherCMCB);
+	m_ui->vcm()->addEnd(m_otherCMCB);
 }
 
 void ADCInstrumentController::deinit()
@@ -122,25 +107,35 @@ void ADCInstrumentController::deinit()
 
 void ADCInstrumentController::onStart()
 {
-	ResourceManager::open("adc",this);
 	for(auto c : qAsConst(m_components)) {
 		if(c->enabled()) {
 			c->onStart();
 		}
 	}
-	dynamic_cast<GRTimeSinkComponent*>(m_dataProvider)->onStart();
-	startUpdates();
-
+	m_started = true;
 }
+
+
 
 void ADCInstrumentController::onStop()
 {
-	dynamic_cast<GRTimeSinkComponent*>(m_dataProvider)->onStop();
+	m_started = false;
+	//dynamic_cast<GRTimeSinkComponent*>(m_dataProvider)->onStop();
 	for(int idx = m_components.size() - 1 ; idx >= 0;idx--) {
 		auto c = m_components[idx];
 		c->onStop();
 	}
-	stopUpdates();
+}
+
+void ADCInstrumentController::start()
+{
+	ResourceManager::open("adc",this);
+	m_dataProvider->start();
+}
+
+void ADCInstrumentController::stop()
+{
+	m_dataProvider->stop();
 	ResourceManager::close("adc");
 }
 
@@ -148,9 +143,9 @@ void ADCInstrumentController::stopUpdates()
 {
 	qInfo(CAT_TIMEPLOT_PROXY) << "Stopped plotting";
 	m_refreshTimerRunning = false;
-
 	m_refillFuture.cancel();
 	m_plotTimer->stop();
+	m_ui->stopped();
 }
 
 void ADCInstrumentController::startUpdates()
@@ -160,6 +155,7 @@ void ADCInstrumentController::startUpdates()
 	m_refreshTimerRunning = true;
 	update();
 	m_plotTimer->start();
+	m_ui->started();
 }
 
 void ADCInstrumentController::setSingleShot(bool b)
@@ -179,7 +175,7 @@ void ADCInstrumentController::update()
 {
 	m_dataProvider->setData(false);
 	if(m_dataProvider->finished()) {
-		Q_EMIT requestStopLater();
+		Q_EMIT requestStop();
 	}
 	m_plotComponentManager->replot();
 }
@@ -211,27 +207,52 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 	if(dynamic_cast<GRTopBlockNode *>(node) != nullptr) {
 		GRTopBlockNode *grtbn = dynamic_cast<GRTopBlockNode *>(node);
 		GRTimeSinkComponent *c = new GRTimeSinkComponent(m_name + "_time", grtbn, this);
-		m_acqNodeComponentMap[grtbn] = (c);
+//		m_acqNodeComponentMap[grtbn] = (c);
 		//addComponent(c);
 
 		m_dataProvider = c;
-		c->onInit();
+		c->init();
 
 		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::bufferSizeChanged, c,
 			&GRTimeSinkComponent::setBufferSize);
+
+		connect(c, &GRTimeSinkComponent::requestSingleShot, this, &ADCInstrumentController::setSingleShot);
+		connect(c, &GRTimeSinkComponent::requestBufferSize, m_timePlotSettingsComponent, &TimePlotManagerSettings::setBufferSize);
+
 		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::plotSizeChanged, c,
 			&GRTimeSinkComponent::setPlotSize);
 		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::sampleRateChanged, c,
 			&GRTimeSinkComponent::setSampleRate);
 		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::rollingModeChanged, c,
 			&GRTimeSinkComponent::setRollingMode);
+
+		connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b){
+			setSingleShot(b);
+			if(b && !m_started){
+				Q_EMIT requestStart();
+			}
+		});
+		connect(m_ui, &ADCInstrument::requestStart, this, &ADCInstrumentController::requestStart);
+		connect(this, &ADCInstrumentController::requestStart, this, &ADCInstrumentController::start);
+		connect(m_ui, &ADCInstrument::requestStop, this, &ADCInstrumentController::requestStop);
+		connect(this, &ADCInstrumentController::requestStop, this, &ADCInstrumentController::stop);
+
+		connect(m_ui->m_sync, &QAbstractButton::toggled, this, [=](bool b){
+			c->setSyncMode(b);
+		});
+
+		connect(c, SIGNAL(arm()), this, SLOT(onStart()));
+		connect(c, SIGNAL(disarm()), this, SLOT(onStop()));
+
+		connect(c, SIGNAL(ready()), this, SLOT(startUpdates()));
+		connect(c, SIGNAL(finish()), this, SLOT(stopUpdates()));
 	}
 
 	if(dynamic_cast<GRIIODeviceSourceNode *>(node) != nullptr) {
 		GRIIODeviceSourceNode *griiodsn = dynamic_cast<GRIIODeviceSourceNode *>(node);
 		GRDeviceComponent *d = new GRDeviceComponent(griiodsn);
 		addComponent(d);
-		m_tool->addDevice(d->ctrl(), d);
+		m_ui->addDevice(d->ctrl(), d);
 
 		m_acqNodeComponentMap[griiodsn] = (d);
 		m_timePlotSettingsComponent->addSampleRateProvider(d);
@@ -245,7 +266,7 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 		int idx = chIdP->next();
 		GRIIOFloatChannelNode *griiofcn = dynamic_cast<GRIIOFloatChannelNode *>(node);
 		GRTimeSinkComponent *grtsc =
-			dynamic_cast<GRTimeSinkComponent *>(m_acqNodeComponentMap[griiofcn->top()]);
+			dynamic_cast<GRTimeSinkComponent *>(m_dataProvider);
 		GRTimeChannelComponent *c =
 			new GRTimeChannelComponent(griiofcn, m_plotComponentManager->plot(0), grtsc, chIdP->pen(idx));
 		Q_ASSERT(grtsc);
@@ -263,13 +284,13 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 			cw = dc->ctrl();
 		}
 		if(!cw) {
-			cw = m_tool->vcm();
+			cw = m_ui->vcm();
 		}
 		m_acqNodeComponentMap[griiofcn] = c;
 
 		/*** End of mess ***/
 
-		m_tool->addChannel(c->ctrl(), c, cw);
+		m_ui->addChannel(c->ctrl(), c, cw);
 
 		connect(c->ctrl(), &QAbstractButton::clicked, this,
 			[=]() { m_plotComponentManager->selectChannel(c); });
@@ -292,7 +313,7 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 
 		CompositeWidget *cw = m_otherCMCB;
 		m_acqNodeComponentMap[ifcn] = c;
-		m_tool->addChannel(c->ctrl(), c, cw);
+		m_ui->addChannel(c->ctrl(), c, cw);
 
 		connect(c->ctrl(), &QAbstractButton::clicked, this,
 			[=]() { m_plotComponentManager->selectChannel(c); });
@@ -366,29 +387,9 @@ void ADCInstrumentController::setupChannelMeasurement(TimePlotManager *c, Channe
 	}
 }
 
-
-uint32_t SyncController::bufferSize() const
+ADCInstrument *ADCInstrumentController::ui() const
 {
-	return m_bufferSize;
+	return m_ui;
 }
 
-void SyncController::setBufferSize(uint32_t newBufferSize)
-{
-	if (m_bufferSize == newBufferSize)
-		return;
-	m_bufferSize = newBufferSize;
-	emit bufferSizeChanged();
-}
 
-bool SyncController::singleShot() const
-{
-	return m_singleShot;
-}
-
-void SyncController::setSingleShot(bool newSingleShot)
-{
-	if (m_singleShot == newSingleShot)
-		return;
-	m_singleShot = newSingleShot;
-	emit singleShotChanged();
-}
