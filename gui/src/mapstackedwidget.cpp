@@ -22,6 +22,7 @@ QString MapStackedWidget::getKey(QWidget *w)
 void MapStackedWidget::add(QString key, QWidget *w)
 {
 	map[key] = w;
+	w->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 	addWidget(w);
 	qDebug(CAT_MAPSTACKWIDGET) << key << "added to stack";
 }
@@ -55,7 +56,9 @@ bool MapStackedWidget::show(QString key)
 	QWidget *w = map[key];
 	if(w) {
 		if(indexOf(map[key]) != -1) {
+			this->currentWidget()->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 			setCurrentWidget(w);
+			w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 			qDebug(CAT_MAPSTACKWIDGET) << key << " found - showing";
 			return true;
 		} else {
