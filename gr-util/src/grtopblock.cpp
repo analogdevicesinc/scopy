@@ -123,19 +123,23 @@ QString GRTopBlock::name() const { return m_name; }
 
 void GRTopBlock::rebuild()
 {
-	qInfo(SCOPY_GR_UTIL) << "Rebuilding top block";
+	qInfo(SCOPY_GR_UTIL) << QObject::sender();
+	qInfo(SCOPY_GR_UTIL) << "Request rebuild";
 	bool wasRunning = false;
 	if(running) {
+		qInfo(SCOPY_GR_UTIL) << "Stopping";
 		wasRunning = true;
 		stop();
 	}
 
 	if(built) {
+		qInfo(SCOPY_GR_UTIL) << "building";
 		teardown();
 		build();
 	}
 
 	if(wasRunning) {
+		qInfo(SCOPY_GR_UTIL) << "starting";
 		start();
 	}
 }
