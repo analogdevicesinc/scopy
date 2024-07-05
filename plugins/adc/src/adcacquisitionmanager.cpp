@@ -38,12 +38,18 @@ GRTopBlockNode::GRTopBlockNode(GRTopBlock *g, QObject *parent)
 	: AcqTreeNode(g->name(), parent)
 	, m_src(g)
 {
+	m_sync = new SyncController(this);
 	m_data = g;
 }
 
 GRTopBlockNode::~GRTopBlockNode() {}
 
 GRTopBlock *GRTopBlockNode::src() const { return m_src; }
+
+SyncController *GRTopBlockNode::sync() const
+{
+	return m_sync;
+}
 
 AcqTreeNode::AcqTreeNode(QString name, QObject *parent)
 	: QObject(parent)

@@ -71,6 +71,8 @@ public:
 	virtual size_t updateData() = 0;
 	virtual bool finished() = 0;
 	virtual void setData(bool copy = false) = 0;
+	virtual void start() = 0;
+	virtual void stop() = 0;
 };
 
 class SCOPY_ADC_EXPORT ToolComponent
@@ -80,13 +82,13 @@ public:
 		: m_enabled(true)
 		, m_priority(0)
 	{}
-	virtual ~ToolComponent(){};
-	virtual QString name() const { return m_name; };
-	virtual int priority() const { return m_priority; };
-	virtual void onStart(){};
-	virtual void onStop(){};
-	virtual void onInit(){};
-	virtual void onDeinit(){};
+	virtual ~ToolComponent(){}
+	virtual QString name() const { return m_name; }
+	virtual int priority() const { return m_priority; }
+	virtual void onStart(){}
+	virtual void onStop(){}
+	virtual void onInit(){}
+	virtual void onDeinit(){}
 
 	virtual void enable() { m_enabled = true; }
 	virtual void disable() { m_enabled = false; }
@@ -160,16 +162,6 @@ class SCOPY_ADC_EXPORT AcqNodeChannelAware
 public:
 	virtual void addChannel(AcqTreeNode *c) = 0;
 	virtual void removeChannel(AcqTreeNode *c) = 0;
-};
-
-class SCOPY_ADC_EXPORT PlotProxy : public MetaComponent
-{
-public:
-	virtual void init() = 0;
-	virtual void deinit() = 0;
-
-	virtual QWidget *getInstrument() = 0;
-	virtual void setInstrument(QWidget *) = 0;
 };
 
 class SCOPY_ADC_EXPORT ChannelIdProvider : public QObject
