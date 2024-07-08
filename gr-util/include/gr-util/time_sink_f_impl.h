@@ -24,12 +24,16 @@
 #include "time_sink_f.h"
 
 #include <QString>
+#include <QObject>
+#include "scopy-gr-util_export.h"
+
 namespace scopy {
 
-class time_sink_f_impl : public time_sink_f
+class SCOPY_GR_UTIL_EXPORT time_sink_f_impl : public QObject, public time_sink_f
 {
+	Q_OBJECT
 public:
-	time_sink_f_impl(int size, float sampleRate, const std::string &name, int nconnections);
+	time_sink_f_impl(int size, float sampleRate, const std::string &name, int nconnections, QObject *parent);
 	~time_sink_f_impl();
 
 	bool check_topology(int ninputs, int noutputs) override;
@@ -54,6 +58,8 @@ public:
 
 	bool finishedAcquisition() override;
 
+	void sync() override;
+
 	const std::vector<float> &time() const override;
 	const std::vector<float> &freq() const override;
 	const std::vector<std::vector<float>> &data() const override;
@@ -62,6 +68,9 @@ public:
 	bool start() override;
 	bool stop() override;
 	int work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) override;
+
+Q_SIGNALS:
+	void done();
 
 private:
 	std::vector<std::deque<float>> m_buffers;
@@ -86,6 +95,7 @@ private:
 	float m_freqOffset;
 	bool m_complexFft;
 	uint64_t m_lastUpdateReadItems;
+	bool m_sync;
 
 	void generate_time_axis();
 };

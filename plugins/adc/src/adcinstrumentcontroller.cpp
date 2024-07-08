@@ -28,12 +28,12 @@ ADCInstrumentController::ADCInstrumentController(ToolMenuEntry *tme, QString nam
 
 	Preferences *p = Preferences::GetInstance();
 
-	m_plotTimer = new QTimer(this);
-	m_plotTimer->setSingleShot(true);
-	connect(m_plotTimer, &QTimer::timeout, this, &ADCInstrumentController::updateData);
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 
-	m_fw = new QFutureWatcher<void>(this);
+	m_plotTimer = new QTimer(this);
+	m_plotTimer->setSingleShot(true);
+	connect(m_plotTimer, &QTimer::timeout, this, &ADCInstrumentController::update);
+	/*m_fw = new QFutureWatcher<void>(this);
 	connect(
 		m_fw, &QFutureWatcher<void>::finished, this,
 		[=]() {
@@ -42,7 +42,7 @@ ADCInstrumentController::ADCInstrumentController(ToolMenuEntry *tme, QString nam
 				m_plotTimer->start();
 		},
 		Qt::QueuedConnection);
-
+	*/
 	m_ui = new ADCInstrument(tme, nullptr);
 	init();
 }
@@ -173,7 +173,7 @@ void ADCInstrumentController::updateData()
 
 void ADCInstrumentController::update()
 {
-	m_dataProvider->setData(false);
+//	m_dataProvider->setData(false);
 	if(m_dataProvider->finished()) {
 		Q_EMIT requestStop();
 	}
@@ -246,6 +246,7 @@ void ADCInstrumentController::addChannel(AcqTreeNode *node)
 
 		connect(c, SIGNAL(ready()), this, SLOT(startUpdates()));
 		connect(c, SIGNAL(finish()), this, SLOT(stopUpdates()));
+		connect(c, SIGNAL(refresh()), this, SLOT(update()));
 	}
 
 	if(dynamic_cast<GRIIODeviceSourceNode *>(node) != nullptr) {

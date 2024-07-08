@@ -51,6 +51,7 @@
 #include <gnuradio/sync_block.h>
 
 #include <QString>
+#include <QObject>
 
 namespace scopy {
 
@@ -60,13 +61,14 @@ typedef struct
 	int offset;
 } PlotTag_t;
 
-class SCOPY_GR_UTIL_EXPORT time_sink_f : virtual public gr::sync_block
+class SCOPY_GR_UTIL_EXPORT time_sink_f :virtual public gr::sync_block
 {
+//	Q_OBJECT
 public:
 	// scopy::time_sink_f::sptr
 	typedef std::shared_ptr<time_sink_f> sptr;
 
-	static sptr make(int size, float sampleRate, const std::string &name, int nconnections);
+	static sptr make(int size, float sampleRate, const std::string &name, int nconnections, QObject *parent = nullptr);
 	virtual std::string name() const = 0;
 	virtual uint64_t updateData() = 0;
 	virtual const std::vector<float> &time() const = 0;
@@ -84,6 +86,10 @@ public:
 	virtual void setComputeTags(bool newComputeTags) = 0;
 	virtual bool fftComplex() = 0;
 	virtual void setFftComplex(bool) = 0;
+	virtual void sync() = 0;
+
+Q_SIGNALS:
+	virtual void done() = 0;
 };
 
 } /* namespace scopy */

@@ -2,6 +2,8 @@
 #include <gr-util/grsignalpath.h>
 #include <QLoggingCategory>
 
+#include <gr-util/time_sink_f_impl.h>
+
 Q_LOGGING_CATEGORY(CAT_GRTIMESINKCOMPONENT, "GRTimeSinkComponent")
 using namespace scopy::adc;
 using namespace scopy::grutil;
@@ -47,6 +49,14 @@ void GRTimeSinkComponent::connectSignalPaths()
 				      m_name.toStdString(), sigpaths.count());
 	time_sink->setRollingMode(m_rollingMode);
 	time_sink->setSingleShot(m_singleShot);
+
+
+	auto t = dynamic_cast<time_sink_f_impl*>(time_sink.get());
+	connect(t, &time_sink_f_impl::done, this, [=](){
+		setData(true);
+		Q_EMIT refresh();
+		t->sync();
+		}, Qt::QueuedConnection);
 
 	int index = 0;
 	time_channel_map.clear();

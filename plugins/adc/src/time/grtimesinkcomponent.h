@@ -58,6 +58,8 @@ Q_SIGNALS:
 	void ready();
 	void finish();
 
+	void refresh();
+
 	void requestRebuild();
 	void requestSingleShot(bool);
 	void requestBufferSize(uint32_t);

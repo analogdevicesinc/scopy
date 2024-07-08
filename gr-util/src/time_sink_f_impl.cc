@@ -40,9 +40,9 @@ using namespace gr;
 
 namespace scopy {
 
-time_sink_f::sptr time_sink_f::make(int size, float sampleRate, const std::string &name, int nconnections)
+time_sink_f::sptr time_sink_f::make(int size, float sampleRate, const std::string &name, int nconnections, QObject *parent)
 {
-	return gnuradio::get_initial_sptr(new time_sink_f_impl(size, sampleRate, name, nconnections));
+	return gnuradio::get_initial_sptr(new time_sink_f_impl(size, sampleRate, name, nconnections, parent));
 }
 
 void time_sink_f_impl::generate_time_axis()
@@ -68,8 +68,9 @@ void time_sink_f_impl::generate_time_axis()
 	}
 }
 
-time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string &name, int nconnections)
-	: sync_block("time_sink_f", io_signature::make(nconnections, nconnections, sizeof(float)),
+time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string &name, int nconnections, QObject *parent)
+	: QObject(parent)
+	, sync_block("time_sink_f", io_signature::make(nconnections, nconnections, sizeof(float)),
 		     io_signature::make(0, 0, 0))
 	, m_size(size)
 	, m_sampleRate(sampleRate)
@@ -82,6 +83,7 @@ time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string
 	, m_lastUpdateReadItems(0)
 	, m_complexFft(false)
 	, m_singleShot(false)
+	, m_sync(true)
 {
 	qInfo(CAT_TIME_SINK_F) << "ctor";
 	// reserve memory for n buffers
@@ -115,32 +117,17 @@ std::string time_sink_f_impl::name() const { return m_name; }
 
 uint64_t time_sink_f_impl::updateData()
 {
-	gr::thread::scoped_lock lock(d_setlock);
+//	gr::thread::scoped_lock lock(d_setlock);
 
 	for(int i = 0; i < m_nconnections; i++) {
 		m_data[i].clear();
-		// m_dataTags[i].clear();
 		for(int j = 0; j < m_buffers[i].size(); j++) {
 			m_data[i].push_back(m_buffers[i][j]);
 		}
 
-		/*	if(!m_computeTags)
-				continue;
 
-			for(int j = 0; j < m_tags[i].size(); j++) {
-				PlotTag_t tag;
-
-				std::stringstream s;
-				s << m_tags[i][j].key << ": " << m_tags[i][j].value;
-				tag.str = QString::fromStdString(s.str());
-				qInfo() << "nitems_read(i)" << nitems_read(i) << "tag.offset" << m_tags[i][j].offset;
-				;
-				tag.offset = nitems_read(i) - m_tags[i][j].offset;
-
-				m_dataTags[i].push_back(tag);
-			}*/
 	}
-	//	nitems_read();
+
 	if(m_workFinished) {
 		m_dataUpdated = true;
 	}
@@ -160,6 +147,13 @@ void time_sink_f_impl::setSingleShot(bool b) { m_singleShot = b; }
 
 bool time_sink_f_impl::finishedAcquisition() { return m_workFinished && m_dataUpdated; }
 
+void time_sink_f_impl::sync()
+{
+	gr::thread::scoped_lock lock(d_setlock);
+	m_sync = true;
+	qInfo()<<"m_sync";
+}
+
 const std::vector<float> &time_sink_f_impl::time() const { return m_time; }
 
 const std::vector<float> &time_sink_f_impl::freq() const { return m_freq; }
@@ -172,10 +166,13 @@ bool time_sink_f_impl::start()
 {
 	m_workFinished = false;
 	m_dataUpdated = false;
+	m_sync = true;
 	return true;
 }
 
 bool time_sink_f_impl::stop() { return true; }
+
+
 
 int time_sink_f_impl::work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items)
 {
@@ -183,6 +180,10 @@ int time_sink_f_impl::work(int noutput_items, gr_vector_const_void_star &input_i
 	//	qInfo(CAT_TIME_SINK_F)<<"Work";
 	gr::thread::scoped_lock lock(d_setlock);
 
+	if(!m_sync) {
+		qInfo()<<"!m_sync";
+		return 0;
+	}
 	// Trigger on BUFFER_START (?)
 	if(m_singleShot) {
 		if(m_buffers[0].size() == m_size) {
@@ -194,6 +195,10 @@ int time_sink_f_impl::work(int noutput_items, gr_vector_const_void_star &input_i
 	if(!m_rollingMode) {
 		for(int i = 0; i < m_nconnections; i++) {
 			if(m_buffers[i].size() >= m_size) {
+				updateData();
+				m_sync = false;
+				qInfo()<<"done";
+				Q_EMIT done();
 				m_buffers[i].clear();
 				// m_tags[i].clear();
 			}
