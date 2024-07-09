@@ -4,7 +4,6 @@
 #include "scopy-admt_export.h"
 #include "sismograph.hpp"
 
-#include <QBoxLayout>
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
@@ -13,33 +12,31 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include <QButtonGroup>
-#include <QVBoxLayout>
+#include <QTimer>
+#include <QSpacerItem>
+#include <QVariant>
 
-#include <admtplugin.h>
 #include <iio.h>
+#include <iioutil/connectionprovider.h>
+#include <admtcontroller.h>
+#include <admtplugin.h>
 #include <toolbuttons.h>
 #include <tooltemplate.h>
 #include <menuheader.h>
 #include <menusectionwidget.h>
 #include <menucollapsesection.h>
 #include <menucontrolbutton.h>
-#include <verticalchannelmanager.h>
-#include <measurementsettings.h>
+#include <menucombo.h>
+#include <stylehelper.h>
 
-namespace scopy {
-class MenuControlButton;
-class CollapsableMenuControlButton;
+namespace scopy::admt {
 
 class HarmonicCalibration : public QWidget
 {
 	Q_OBJECT
 public:
-	HarmonicCalibration(PlotProxy *proxy, QWidget *parent = nullptr);
+	HarmonicCalibration(ADMTController *m_admtController, QWidget *parent = nullptr);
 	~HarmonicCalibration();
-	void init();
-	void deinit();
-	void startAddons();
-	void stopAddons();
 	bool running() const;
 	void setRunning(bool newRunning);
 public Q_SLOTS:
@@ -47,49 +44,47 @@ public Q_SLOTS:
 	void stop();
 	void start();
 	void restart();
-	void showMeasurements(bool b);
-	void createSnapshotChannel(SnapshotProvider::SnapshotRecipe rec);
-	void deleteChannel(ChannelAddon *);
-	MenuControlButton *addChannel(ChannelAddon *channelAddon, QWidget *parent);
-	CollapsableMenuControlButton *addDevice(GRDeviceAddon *dev, QWidget *parent);
+	void timerTask();
 Q_SIGNALS:
 	void runningChanged(bool);
 private:
+	ADMTController *m_admtController;
+	iio_context *m_ctx;
 	bool m_running;
 	ToolTemplate *tool;
 	GearBtn *settingsButton;
 	InfoBtn *infoButton;
 	RunBtn *runButton;
 
+	double rotation, angle, count, temp;
+
 	QPushButton *openLastMenuButton;
-	PlotProxy *proxy;
-	GRTimePlotAddon *plotAddon;
-	GRTimePlotAddonSettings *plotAddonSettings;
 	QButtonGroup *rightMenuButtonGroup;
 
-	MenuControlButton *channelsButton;
-	VerticalChannelManager *verticalChannelManager;
-	QButtonGroup *channelGroup;
-	MapStackedWidget *channelStack;
-	MeasurementsPanel *measurePanel;
-	MeasurementSettings *measureSettings;
-	StatsPanel *statsPanel;
+	QLineEdit *sampleRateLineEdit, *bufferSizeLineEdit, *dataGraphSamplesLineEdit, *tempGraphSamplesLineEdit;
+	QLabel *rotationValueLabel, *angleValueLabel, *countValueLabel, *tempValueLabel;
 
 	Sismograph *dataGraph, *tempGraph;
 
-	void setupChannelsButtonHelper(MenuControlButton *channelsButton);
-	void setupMeasureButtonHelper(MenuControlButton *measureButton);
-	void setupChannelSnapshot(ChannelAddon *channelAddon);
-	void setupChannelMeasurement(ChannelAddon *channelAddon);
-	void setupChannelDelete(ChannelAddon *channelAddon);
-	void setupChannelMenuControlButtonHelper(MenuControlButton *menuControlButton, ChannelAddon *channelAddon);
-	void setupDeviceMenuControlButtonHelper(MenuControlButton *menuControlButton, GRDeviceAddon *channelAddon);
+	MenuHeaderWidget *header;
+
+	MenuSectionWidget *rightMenuSectionWidget;
+	MenuCollapseSection *rotationCollapse, *angleCollapse, *countCollapse, *tempCollapse;
+	MenuCombo *m_dataGraphChannelMenuCombo, *m_dataGraphDirectionMenuCombo, *m_tempGraphDirectionMenuCombo;
+
+	void updateChannelValues();
+	void updateLineEditValues();
+	void updateGeneralSettingEnabled(bool value);
+	void connectLineEditToNumber(QLineEdit* lineEdit, int& variable);
+	void connectLineEditToGraphSamples(QLineEdit* lineEdit, int& variable, Sismograph* graph);
+	void connectMenuComboToGraphDirection(MenuCombo* menuCombo, Sismograph* graph);
+	void changeGraphColorByChannelName(Sismograph* graph, const char* channelName);
+	void connectMenuComboToGraphChannel(MenuCombo* menuCombo, Sismograph* graph);
+
+	QTimer *timer;
 
 	int uuid = 0;
-	const QString channelsMenuId = "channels";
-	const QString measureMenuId = "measure";
-	const QString statsMenuId = "stats";
-	const QString verticalChannelManagerId = "vcm";
+	const char *rotationChannelName, *angleChannelName, *countChannelName, *temperatureChannelName;
 };
 } // namespace scopy::admt
 #endif // HARMONICCALIBRATION_H

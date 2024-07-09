@@ -4,6 +4,7 @@
 #define SCOPY_PLUGIN_NAME ADMTPlugin
 
 #include "scopy-admt_export.h"
+#include "admtcontroller.h"
 
 #include <iio.h>
 
@@ -24,8 +25,8 @@
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
-namespace scopy {
-using namespace grutil;
+namespace scopy::admt {
+using namespace scopy::grutil;
 
 class SCOPY_ADMT_EXPORT ChannelIdProvider : public QObject
 {
@@ -168,6 +169,8 @@ private:
 	QLineEdit *edit;
 	PlotProxy *createRecipe(iio_context *ctx);
 	GRTimePlotProxy *recipe;
+
+	ADMTController *m_admtController;
 };
 } // namespace scopy::admt
 #endif // ADMTPLUGIN_H
