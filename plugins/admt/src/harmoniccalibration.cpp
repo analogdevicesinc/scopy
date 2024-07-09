@@ -101,12 +101,11 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	StyleHelper::MenuSmallLabel(dataGraphLabel, "dataGraphLabel");
 
 	dataGraph = new Sismograph(this);
-	dataGraph->setColor(QColor("#ff7200"));
+	changeGraphColorByChannelName(dataGraph, rotationChannelName);
 	dataGraph->setPlotAxisXTitle("Degree (°)");
-	dataGraph->setPlotDirection(Sismograph::LEFT_TO_RIGHT);
 	dataGraph->setUnitOfMeasure("Degree", "°");
 	dataGraph->setAutoscale(false);
-	dataGraph->addScale(-30.0, 390.0, 15, 5);
+	dataGraph->setAxisScale(QwtAxis::YLeft, -30.0, 390.0);
 	dataGraph->setNumSamples(dataGraphSamples);
 	dataGraphValue = &rotation;
 	dataGraph->plot(*dataGraphValue);
@@ -118,7 +117,6 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	tempGraph = new Sismograph(this);
 	changeGraphColorByChannelName(tempGraph, temperatureChannelName);
 	tempGraph->setPlotAxisXTitle("Celsius (°C)");
-	tempGraph->setPlotDirection(Sismograph::LEFT_TO_RIGHT);
 	tempGraph->setUnitOfMeasure("Celsius", "°C");
 	tempGraph->setAutoscale(false);
 	tempGraph->addScale(0.0, 100.0, 25, 5);
@@ -181,7 +179,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	dataGraphSection->contentLayout()->setSpacing(10);
 
 	// Graph Channel
-	m_dataGraphChannelMenuCombo = new MenuCombo("Graph Channel", dataGraphSection);
+	m_dataGraphChannelMenuCombo = new MenuCombo("Channel", dataGraphSection);
 	auto dataGraphChannelCombo = m_dataGraphChannelMenuCombo->combo();
 	dataGraphChannelCombo->addItem("Rotation", QVariant::fromValue(reinterpret_cast<void*>(const_cast<char*>(rotationChannelName))));
 	dataGraphChannelCombo->addItem("Angle", QVariant::fromValue(reinterpret_cast<void*>(const_cast<char*>(angleChannelName))));
@@ -193,7 +191,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 
 	// Graph Samples
 	QLabel *dataGraphSamplesLabel = new QLabel(generalSection);
-	dataGraphSamplesLabel->setText("Graph Samples");
+	dataGraphSamplesLabel->setText("Samples");
 	StyleHelper::MenuSmallLabel(dataGraphSamplesLabel, "dataGraphSamplesLabel");
 	dataGraphSamplesLineEdit = new QLineEdit(generalSection);
 	dataGraphSamplesLineEdit->setText(QString::number(dataGraphSamples));
@@ -204,7 +202,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	dataGraphSection->contentLayout()->addWidget(dataGraphSamplesLineEdit);
 
 	// Graph Direction
-	m_dataGraphDirectionMenuCombo = new MenuCombo("Graph Direction", dataGraphSection);
+	m_dataGraphDirectionMenuCombo = new MenuCombo("Direction", dataGraphSection);
 	auto dataGraphDirectionCombo = m_dataGraphDirectionMenuCombo->combo();
 	dataGraphDirectionCombo->addItem("Left to right", Sismograph::LEFT_TO_RIGHT);
 	dataGraphDirectionCombo->addItem("Right to left", Sismograph::RIGHT_TO_LEFT);
@@ -222,7 +220,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 
 	// Graph Samples
 	QLabel *tempGraphSamplesLabel = new QLabel(generalSection);
-	tempGraphSamplesLabel->setText("Graph Samples");
+	tempGraphSamplesLabel->setText("Samples");
 	StyleHelper::MenuSmallLabel(tempGraphSamplesLabel, "tempGraphSamplesLabel");
 	tempGraphSamplesLineEdit = new QLineEdit(generalSection);
 	tempGraphSamplesLineEdit->setText(QString::number(tempGraphSamples));
@@ -232,7 +230,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	connectLineEditToGraphSamples(tempGraphSamplesLineEdit, tempGraphSamples, tempGraph);
 
 	// Graph Direction
-	m_tempGraphDirectionMenuCombo = new MenuCombo("Graph Direction", tempGraphSection);
+	m_tempGraphDirectionMenuCombo = new MenuCombo("Direction", tempGraphSection);
 	auto tempGraphDirectionCombo = m_tempGraphDirectionMenuCombo->combo();
 	tempGraphDirectionCombo->addItem("Left to right", Sismograph::LEFT_TO_RIGHT);
 	tempGraphDirectionCombo->addItem("Right to left", Sismograph::RIGHT_TO_LEFT);
@@ -414,21 +412,24 @@ void HarmonicCalibration::connectMenuComboToGraphChannel(MenuCombo* menuCombo, S
 		{
 			case ADMTController::Channel::ROTATION:
 				dataGraphValue = &rotation;
-				graph->setAxisTitle(QwtAxis::YLeft, tr("Degree (°)"));
-				graph->addScale(-30.0, 390.0, 15, 5);
 				graph->setUnitOfMeasure("Degree", "°");
+				graph->setAxisScale(QwtAxis::YLeft, -30.0, 390.0);
+				graph->setNumSamples(dataGraphSamples);
+				graph->setAxisTitle(QwtAxis::YLeft, tr("Degree (°)"));
 				break;
 			case ADMTController::Channel::ANGLE:
 				dataGraphValue = &angle;
-				graph->setAxisTitle(QwtAxis::YLeft, tr("Degree (°)"));
-				graph->addScale(-30.0, 390.0, 15, 5);
 				graph->setUnitOfMeasure("Degree", "°");
+				graph->setAxisScale(QwtAxis::YLeft, -30.0, 390.0);
+				graph->setNumSamples(dataGraphSamples);
+				graph->setAxisTitle(QwtAxis::YLeft, tr("Degree (°)"));
 				break;
 			case ADMTController::Channel::COUNT:
 				dataGraphValue = &count;
-				graph->setAxisTitle(QwtAxis::YLeft, tr("Count"));
-				graph->addScale(-1.0, 20.0, 5, 1);
 				graph->setUnitOfMeasure("Count", "");
+				graph->setAxisScale(QwtAxis::YLeft, -1.0, 20.0);
+				graph->setNumSamples(dataGraphSamples);
+				graph->setAxisTitle(QwtAxis::YLeft, tr("Count"));
 				break;
 		}
 		changeGraphColorByChannelName(graph, value);
