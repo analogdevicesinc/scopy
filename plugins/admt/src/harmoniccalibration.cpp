@@ -2,326 +2,281 @@
 
 #include <stylehelper.h>
 
+static int sampleRate = 50;
+static int bufferSize = 1;
+static int dataGraphSamples = 100;
+static int tempGraphSamples = 100;
+static bool running = false;
+static double *dataGraphValue;
+
 using namespace scopy;
+using namespace scopy::admt;
 using namespace scopy::grutil;
 
-HarmonicCalibration::HarmonicCalibration(PlotProxy *proxy, QWidget *parent)
+HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidget *parent)
 	: QWidget(parent)
-	, proxy(proxy)
+	, m_admtController(m_admtController)
 {
+	rotationChannelName = m_admtController->getChannelId(ADMTController::Channel::ROTATION);
+	angleChannelName = m_admtController->getChannelId(ADMTController::Channel::ANGLE);
+	countChannelName = m_admtController->getChannelId(ADMTController::Channel::COUNT);
+	temperatureChannelName = m_admtController->getChannelId(ADMTController::Channel::TEMPERATURE);
+
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QHBoxLayout *lay = new QHBoxLayout(this);
-    lay->setMargin(0);
-	setLayout(lay);
     tool = new ToolTemplate(this);
-	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	tool->topContainer()->setVisible(true);
-	tool->leftContainer()->setVisible(true);
-	tool->rightContainer()->setVisible(true);
-	tool->bottomContainer()->setVisible(true);
+	setLayout(lay);
+    lay->setMargin(0);
 	lay->addWidget(tool);
-    tool->setLeftContainerWidth(210);
-	tool->setRightContainerWidth(300);
-	tool->setTopContainerHeight(100);
-	tool->setBottomContainerHeight(90);
-
+	
     openLastMenuButton = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), true, this);
 	rightMenuButtonGroup = dynamic_cast<OpenLastMenuBtn *>(openLastMenuButton)->getButtonGroup();
-    
-    tool->openBottomContainerHelper(false);
-	tool->openTopContainerHelper(false);
 
     settingsButton = new GearBtn(this);
     infoButton = new InfoBtn(this);
     runButton = new RunBtn(this);
 
-    channelsButton = new MenuControlButton(this);
-	setupChannelsButtonHelper(channelsButton);
-
-    plotAddon = dynamic_cast<GRTimePlotAddon *>(proxy->getPlotAddon());
-	// tool->addWidgetToCentralContainerHelper(plotAddon->getWidget());
-
-    plotAddonSettings = dynamic_cast<GRTimePlotAddonSettings *>(proxy->getPlotSettings());
 	rightMenuButtonGroup->addButton(settingsButton);
 
-    QString settingsMenuId = plotAddonSettings->getName() + QString(uuid++);
-	tool->rightStack()->add(settingsMenuId, plotAddonSettings->getWidget());
-	connect(settingsButton, &QPushButton::toggled, this, [=](bool b) {
-		if(b)
-			tool->requestMenu(settingsMenuId);
-	});
+	// Raw Data Widget
+	QScrollArea *rawDataScroll = new QScrollArea(this);
+	rawDataScroll->setWidgetResizable(true);
+	QWidget *rawDataWidget = new QWidget(rawDataScroll);
+	rawDataScroll->setWidget(rawDataWidget);
+	QVBoxLayout *rawDataLayout = new QVBoxLayout(rawDataWidget);
+	rawDataLayout->setMargin(0);
+	// rawDataLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
+	rawDataWidget->setLayout(rawDataLayout);
 
-    MenuControlButton *measure = new MenuControlButton(this);
-	setupMeasureButtonHelper(measure);
-	measurePanel = new MeasurementsPanel(this);
-	//tool->topStack()->add(measureMenuId, measurePanel);
-    //tool->openTopContainerHelper(false);
+	MenuSectionWidget *rotationWidget = new MenuSectionWidget(rawDataWidget);
+	MenuSectionWidget *angleWidget = new MenuSectionWidget(rawDataWidget);
+	MenuSectionWidget *countWidget = new MenuSectionWidget(rawDataWidget);
+	MenuSectionWidget *tempWidget = new MenuSectionWidget(rawDataWidget);
+	rotationWidget->contentLayout()->setSpacing(10);
+	angleWidget->contentLayout()->setSpacing(10);
+	countWidget->contentLayout()->setSpacing(10);
+	tempWidget->contentLayout()->setSpacing(10);
+	MenuCollapseSection *rotationSection = new MenuCollapseSection("Rotation", MenuCollapseSection::MHCW_NONE, rotationWidget);
+	MenuCollapseSection *angleSection = new MenuCollapseSection("Angle", MenuCollapseSection::MHCW_NONE, angleWidget);
+	MenuCollapseSection *countSection = new MenuCollapseSection("Count", MenuCollapseSection::MHCW_NONE, countWidget);
+	MenuCollapseSection *tempSection = new MenuCollapseSection("Temperature", MenuCollapseSection::MHCW_NONE, tempWidget);
+	rotationSection->contentLayout()->setSpacing(10);
+	angleSection->contentLayout()->setSpacing(10);
+	countSection->contentLayout()->setSpacing(10);
+	tempSection->contentLayout()->setSpacing(10);
 
-    statsPanel = new StatsPanel(this);
-	tool->bottomStack()->add(statsMenuId, statsPanel);
+	rotationWidget->contentLayout()->addWidget(rotationSection);
+	angleWidget->contentLayout()->addWidget(angleSection);
+	countWidget->contentLayout()->addWidget(countSection);
+	tempWidget->contentLayout()->addWidget(tempSection);
 
-    measureSettings = new MeasurementSettings(this);
-	HoverWidget *measurePanelManagerHover = new HoverWidget(nullptr, measure, tool);
-	measurePanelManagerHover->setContent(measureSettings);
-	measurePanelManagerHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
-	measurePanelManagerHover->setContentPos(HoverPosition::HP_TOPLEFT);
-	connect(measure->button(), &QPushButton::toggled, this, [=](bool b) {
-		measurePanelManagerHover->setVisible(b);
-		measurePanelManagerHover->raise();
-	});
-    connect(measureSettings, &MeasurementSettings::enableMeasurementPanel, tool->topCentral(),
-		&QWidget::setVisible);
-	connect(measureSettings, &MeasurementSettings::enableStatsPanel, tool->bottomCentral(), &QWidget::setVisible);
+	rawDataLayout->addWidget(rotationWidget);
+	rawDataLayout->addWidget(angleWidget);
+	rawDataLayout->addWidget(countWidget);
+	rawDataLayout->addWidget(tempWidget);
+	rawDataLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
-	connect(measureSettings, &MeasurementSettings::sortMeasurements, measurePanel, &MeasurementsPanel::sort);
-	connect(measureSettings, &MeasurementSettings::sortStats, statsPanel, &StatsPanel::sort);
+	rotationValueLabel = new QLabel(rotationSection);
+	StyleHelper::MenuControlLabel(rotationValueLabel, "rotationValueLabel");
+	angleValueLabel = new QLabel(angleSection);
+	StyleHelper::MenuControlLabel(angleValueLabel, "angleValueLabel");
+	countValueLabel = new QLabel(countSection);
+	StyleHelper::MenuControlLabel(countValueLabel, "countValueLabel");
+	tempValueLabel = new QLabel(tempSection);
+	StyleHelper::MenuControlLabel(tempValueLabel, "tempValueLabel");
+	
+	updateChannelValues();
+	updateLineEditValues();
 
-    tool->addWidgetToTopContainerMenuControlHelper(openLastMenuButton, TTA_RIGHT);
-	tool->addWidgetToTopContainerMenuControlHelper(settingsButton, TTA_LEFT);
-
-    tool->addWidgetToTopContainerHelper(infoButton, TTA_LEFT);
-    tool->addWidgetToTopContainerHelper(runButton, TTA_RIGHT);
-
-    tool->addWidgetToBottomContainerHelper(channelsButton, TTA_LEFT);
-	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
-
-    connect(channelsButton, &QPushButton::toggled, dynamic_cast<MenuHAnim *>(tool->leftContainer()),
-		&MenuHAnim::toggleMenu);
-
-    // Left Channel Manager
-    verticalChannelManager = new VerticalChannelManager(this);
-	tool->leftStack()->add(verticalChannelManagerId, verticalChannelManager);
+	rotationSection->contentLayout()->addWidget(rotationValueLabel);
+	angleSection->contentLayout()->addWidget(angleValueLabel);
+	countSection->contentLayout()->addWidget(countValueLabel);
+	tempSection->contentLayout()->addWidget(tempValueLabel);
 
 	QWidget *historicalGraphWidget = new QWidget();
 	QVBoxLayout *historicalGraphLayout = new QVBoxLayout(this);
 
+	QLabel *dataGraphLabel = new QLabel(historicalGraphWidget);
+	dataGraphLabel->setText("Phase");
+	StyleHelper::MenuSmallLabel(dataGraphLabel, "dataGraphLabel");
+
 	dataGraph = new Sismograph(this);
 	dataGraph->setColor(QColor("#ff7200"));
+	dataGraph->setPlotAxisXTitle("Degree (°)");
+	dataGraph->setPlotDirection(Sismograph::LEFT_TO_RIGHT);
+	dataGraph->setUnitOfMeasure("Degree", "°");
 	dataGraph->setAutoscale(false);
-	dataGraph->addScale(-1.0, 1.0, 5, 5);
-	dataGraph->addScale(-5.0, 5.0, 10, 2);
-	dataGraph->addScale(-25.0, 25.0, 10, 5);
-	dataGraph->setUnitOfMeasure("Voltage", "V");
+	dataGraph->addScale(-30.0, 390.0, 15, 5);
+	dataGraph->setNumSamples(dataGraphSamples);
+	dataGraphValue = &rotation;
+	dataGraph->plot(*dataGraphValue);
+
+	QLabel *tempGraphLabel = new QLabel(historicalGraphWidget);
+	tempGraphLabel->setText("Temperature");
+	StyleHelper::MenuSmallLabel(tempGraphLabel, "tempGraphLabel");
 
 	tempGraph = new Sismograph(this);
-	tempGraph->setColor(QColor("#9013fe"));
+	changeGraphColorByChannelName(tempGraph, temperatureChannelName);
+	tempGraph->setPlotAxisXTitle("Celsius (°C)");
+	tempGraph->setPlotDirection(Sismograph::LEFT_TO_RIGHT);
+	tempGraph->setUnitOfMeasure("Celsius", "°C");
 	tempGraph->setAutoscale(false);
-	tempGraph->addScale(-1.0, 1.0, 5, 5);
-	tempGraph->addScale(-5.0, 5.0, 10, 2);
-	tempGraph->addScale(-25.0, 25.0, 10, 5);
-	tempGraph->setUnitOfMeasure("Voltage", "V");
+	tempGraph->addScale(0.0, 100.0, 25, 5);
+	tempGraph->setNumSamples(tempGraphSamples);
+	tempGraph->plot(temp);
 
+	historicalGraphLayout->addWidget(dataGraphLabel);
 	historicalGraphLayout->addWidget(dataGraph);
+	historicalGraphLayout->addWidget(tempGraphLabel);
 	historicalGraphLayout->addWidget(tempGraph);
 
 	historicalGraphWidget->setLayout(historicalGraphLayout);
 
+	// General Setting
+	QScrollArea *generalSettingScroll = new QScrollArea(this);
+	generalSettingScroll->setWidgetResizable(true);
+	QWidget *generalSettingWidget = new QWidget(generalSettingScroll);
+	generalSettingScroll->setWidget(generalSettingWidget);
+	QVBoxLayout *generalSettingLayout = new QVBoxLayout(generalSettingWidget);
+	generalSettingLayout->setMargin(0);
+	generalSettingWidget->setLayout(generalSettingLayout);
+
+	header = new MenuHeaderWidget("ADMT4000", QPen(StyleHelper::getColor("ScopyBlue")), this);
+
+	// General Setting Widget
+	MenuSectionWidget *generalWidget = new MenuSectionWidget(generalSettingWidget);
+	generalWidget->contentLayout()->setSpacing(10);
+	MenuCollapseSection *generalSection = new MenuCollapseSection("Data Acquisition", MenuCollapseSection::MHCW_NONE, generalWidget);
+	generalSection->contentLayout()->setSpacing(10);
+	generalWidget->contentLayout()->addWidget(generalSection);
+
+	// Sample Rate
+	QLabel *sampleRateLabel = new QLabel(generalSection);
+	sampleRateLabel->setText("Sample Rate (Update Freq.)");
+	StyleHelper::MenuSmallLabel(sampleRateLabel, "sampleRateLabel");
+	sampleRateLineEdit = new QLineEdit(generalSection);
+	sampleRateLineEdit->setText(QString::number(sampleRate));
+
+	connectLineEditToNumber(sampleRateLineEdit, sampleRate);
+
+	generalSection->contentLayout()->addWidget(sampleRateLabel);
+	generalSection->contentLayout()->addWidget(sampleRateLineEdit);
+
+	// Buffer Size
+	QLabel *bufferSizeLabel = new QLabel(generalSection);
+	bufferSizeLabel->setText("Buffer Sample Size");
+	StyleHelper::MenuSmallLabel(bufferSizeLabel, "bufferSizeLabel");
+	bufferSizeLineEdit = new QLineEdit(generalSection);
+	bufferSizeLineEdit->setText(QString::number(bufferSize));
+
+	connectLineEditToNumber(bufferSizeLineEdit, bufferSize);
+
+	generalSection->contentLayout()->addWidget(bufferSizeLabel);
+	generalSection->contentLayout()->addWidget(bufferSizeLineEdit);
+
+	// Data Graph Setting Widget
+	MenuSectionWidget *dataGraphWidget = new MenuSectionWidget(generalSettingWidget);
+	dataGraphWidget->contentLayout()->setSpacing(10);
+	MenuCollapseSection *dataGraphSection = new MenuCollapseSection("Data Graph", MenuCollapseSection::MHCW_NONE, dataGraphWidget);
+	dataGraphSection->contentLayout()->setSpacing(10);
+
+	// Graph Channel
+	m_dataGraphChannelMenuCombo = new MenuCombo("Graph Channel", dataGraphSection);
+	auto dataGraphChannelCombo = m_dataGraphChannelMenuCombo->combo();
+	dataGraphChannelCombo->addItem("Rotation", QVariant::fromValue(reinterpret_cast<void*>(const_cast<char*>(rotationChannelName))));
+	dataGraphChannelCombo->addItem("Angle", QVariant::fromValue(reinterpret_cast<void*>(const_cast<char*>(angleChannelName))));
+	dataGraphChannelCombo->addItem("Count", QVariant::fromValue(reinterpret_cast<void*>(const_cast<char*>(countChannelName))));
+
+	connectMenuComboToGraphChannel(m_dataGraphChannelMenuCombo, dataGraph);
+
+	dataGraphSection->contentLayout()->addWidget(m_dataGraphChannelMenuCombo);
+
+	// Graph Samples
+	QLabel *dataGraphSamplesLabel = new QLabel(generalSection);
+	dataGraphSamplesLabel->setText("Graph Samples");
+	StyleHelper::MenuSmallLabel(dataGraphSamplesLabel, "dataGraphSamplesLabel");
+	dataGraphSamplesLineEdit = new QLineEdit(generalSection);
+	dataGraphSamplesLineEdit->setText(QString::number(dataGraphSamples));
+
+	connectLineEditToGraphSamples(dataGraphSamplesLineEdit, dataGraphSamples, dataGraph);
+	
+	dataGraphSection->contentLayout()->addWidget(dataGraphSamplesLabel);
+	dataGraphSection->contentLayout()->addWidget(dataGraphSamplesLineEdit);
+
+	// Graph Direction
+	m_dataGraphDirectionMenuCombo = new MenuCombo("Graph Direction", dataGraphSection);
+	auto dataGraphDirectionCombo = m_dataGraphDirectionMenuCombo->combo();
+	dataGraphDirectionCombo->addItem("Left to right", Sismograph::LEFT_TO_RIGHT);
+	dataGraphDirectionCombo->addItem("Right to left", Sismograph::RIGHT_TO_LEFT);
+	dataGraphSection->contentLayout()->addWidget(m_dataGraphDirectionMenuCombo);
+
+	dataGraphWidget->contentLayout()->addWidget(dataGraphSection);
+
+	connectMenuComboToGraphDirection(m_dataGraphDirectionMenuCombo, dataGraph);
+
+	// Temperature Graph
+	MenuSectionWidget *tempGraphWidget = new MenuSectionWidget(generalSettingWidget);
+	tempGraphWidget->contentLayout()->setSpacing(10);
+	MenuCollapseSection *tempGraphSection = new MenuCollapseSection("Temperature Graph", MenuCollapseSection::MHCW_NONE, tempGraphWidget);
+	tempGraphSection->contentLayout()->setSpacing(10);
+
+	// Graph Samples
+	QLabel *tempGraphSamplesLabel = new QLabel(generalSection);
+	tempGraphSamplesLabel->setText("Graph Samples");
+	StyleHelper::MenuSmallLabel(tempGraphSamplesLabel, "tempGraphSamplesLabel");
+	tempGraphSamplesLineEdit = new QLineEdit(generalSection);
+	tempGraphSamplesLineEdit->setText(QString::number(tempGraphSamples));
+	tempGraphSection->contentLayout()->addWidget(tempGraphSamplesLabel);
+	tempGraphSection->contentLayout()->addWidget(tempGraphSamplesLineEdit);
+
+	connectLineEditToGraphSamples(tempGraphSamplesLineEdit, tempGraphSamples, tempGraph);
+
+	// Graph Direction
+	m_tempGraphDirectionMenuCombo = new MenuCombo("Graph Direction", tempGraphSection);
+	auto tempGraphDirectionCombo = m_tempGraphDirectionMenuCombo->combo();
+	tempGraphDirectionCombo->addItem("Left to right", Sismograph::LEFT_TO_RIGHT);
+	tempGraphDirectionCombo->addItem("Right to left", Sismograph::RIGHT_TO_LEFT);
+	tempGraphSection->contentLayout()->addWidget(m_tempGraphDirectionMenuCombo);
+	tempGraphWidget->contentLayout()->addWidget(tempGraphSection);
+
+	connectMenuComboToGraphDirection(m_tempGraphDirectionMenuCombo, tempGraph);
+
+	generalSettingLayout->addWidget(header);
+	generalSettingLayout->addSpacerItem(new QSpacerItem(0, 3, QSizePolicy::Fixed, QSizePolicy::Fixed));
+	generalSettingLayout->addWidget(generalWidget);
+	generalSettingLayout->addWidget(dataGraphWidget);
+	generalSettingLayout->addWidget(tempGraphWidget);
+	generalSettingLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	tool->topContainer()->setVisible(true);
+	tool->leftContainer()->setVisible(true);
+	tool->rightContainer()->setVisible(true);
+	tool->bottomContainer()->setVisible(true);
+    tool->setLeftContainerWidth(210);
+	tool->setRightContainerWidth(300);
+	tool->setTopContainerHeight(100);
+	tool->setBottomContainerHeight(90);
+	tool->openBottomContainerHelper(false);
+	tool->openTopContainerHelper(false);
+    tool->addWidgetToTopContainerMenuControlHelper(openLastMenuButton, TTA_RIGHT);
+	tool->addWidgetToTopContainerMenuControlHelper(settingsButton, TTA_LEFT);
+    tool->addWidgetToTopContainerHelper(infoButton, TTA_LEFT);
+    tool->addWidgetToTopContainerHelper(runButton, TTA_RIGHT);
+	// tool->leftStack()->add("rawDataWidget", rawDataWidget);
+	tool->leftStack()->add("rawDataScroll", rawDataScroll);
+	tool->rightStack()->add("generalSettingScroll", generalSettingScroll);
 	tool->addWidgetToCentralContainerHelper(historicalGraphWidget);
-
-    channelGroup = new QButtonGroup(this);
-	for(auto d : proxy->getDeviceAddons()) {
-		GRDeviceAddon *dev = dynamic_cast<GRDeviceAddon *>(d);
-		if(!dev)
-			continue;
-		CollapsableMenuControlButton *devButton = addDevice(dev, verticalChannelManager);
-		verticalChannelManager->add(devButton);
-
-		for(TimeChannelAddon *channelAddon : dev->getRegisteredChannels()) {
-			auto menuControlButton = addChannel(channelAddon, devButton);
-			devButton->add(menuControlButton);
-		}
-	}
 
 	connect(runButton, &QPushButton::toggled, this, &HarmonicCalibration::setRunning);
 	connect(this, &HarmonicCalibration::runningChanged, this, &HarmonicCalibration::run);
 	connect(this, &HarmonicCalibration::runningChanged, runButton, &QAbstractButton::setChecked);
-	connect(plotAddon, &GRTimePlotAddon::requestStop, this, &HarmonicCalibration::stop, Qt::QueuedConnection);
-	connect(measure, &MenuControlButton::toggled, this, &HarmonicCalibration::showMeasurements);
 
-	channelsButton->button()->setChecked(true);
-	channelGroup->buttons()[1]->setChecked(true);
-
-	init();
+	timer = new QTimer(this);
+	connect(timer, &QTimer::timeout, this, &HarmonicCalibration::timerTask);
 }
 
 HarmonicCalibration::~HarmonicCalibration() {}
-
-void HarmonicCalibration::setupChannelsButtonHelper(MenuControlButton *channelsButton)
-{
-	channelsButton->setName("Channels");
-	channelsButton->setOpenMenuChecksThis(true);
-	channelsButton->setDoubleClickToOpenMenu(true);
-	channelsButton->checkBox()->setVisible(false);
-	channelsButton->setChecked(true);
-	channelStack = new MapStackedWidget(this);
-	tool->rightStack()->add(channelsMenuId, channelStack);
-	connect(channelsButton->button(), &QAbstractButton::toggled, this, [=](bool b) {
-		if(b)
-			tool->requestMenu(channelsMenuId);
-	});
-	rightMenuButtonGroup->addButton(channelsButton->button());
-}
-
-void HarmonicCalibration::setupMeasureButtonHelper(MenuControlButton *measureButton)
-{
-	measureButton->setName("Measure");
-	measureButton->setOpenMenuChecksThis(true);
-	measureButton->setDoubleClickToOpenMenu(true);
-	measureButton->checkBox()->setVisible(false);
-}
-
-void HarmonicCalibration::setupChannelMenuControlButtonHelper(MenuControlButton *menuControlButton, ChannelAddon *channelAddon)
-{
-	menuControlButton->setName(channelAddon->getName());
-	menuControlButton->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
-	menuControlButton->setOpenMenuChecksThis(true);
-	menuControlButton->setDoubleClickToOpenMenu(true);
-	menuControlButton->setColor(channelAddon->pen().color());
-	menuControlButton->button()->setVisible(false);
-	menuControlButton->setCheckable(true);
-
-	connect(menuControlButton->checkBox(), &QCheckBox::toggled, this, [=](bool b) {
-		if(b)
-			channelAddon->enable();
-		else
-			channelAddon->disable();
-	});
-	menuControlButton->checkBox()->setChecked(true);
-}
-
-void HarmonicCalibration::setupChannelSnapshot(ChannelAddon *channelAddon)
-{
-	auto snapshotChannel = dynamic_cast<SnapshotProvider *>(channelAddon);
-	if(!snapshotChannel)
-		return;
-	connect(channelAddon, SIGNAL(addNewSnapshot(SnapshotProvider::SnapshotRecipe)), this,
-		SLOT(createSnapshotChannel(SnapshotProvider::SnapshotRecipe)));
-}
-
-void HarmonicCalibration::setupChannelMeasurement(ChannelAddon *channelAddon)
-{
-	auto chMeasureableChannel = dynamic_cast<MeasurementProvider *>(channelAddon);
-	if(!chMeasureableChannel)
-		return;
-	auto chMeasureManager = chMeasureableChannel->getMeasureManager();
-	if(!chMeasureManager)
-		return;
-	if(measureSettings) {
-		connect(chMeasureManager, &MeasureManagerInterface::enableMeasurement, measurePanel,
-			&MeasurementsPanel::addMeasurement);
-		connect(chMeasureManager, &MeasureManagerInterface::disableMeasurement, measurePanel,
-			&MeasurementsPanel::removeMeasurement);
-		connect(measureSettings, &MeasurementSettings::toggleAllMeasurements, chMeasureManager,
-			&MeasureManagerInterface::toggleAllMeasurement);
-		connect(measureSettings, &MeasurementSettings::toggleAllStats, chMeasureManager,
-			&MeasureManagerInterface::toggleAllStats);
-		connect(chMeasureManager, &MeasureManagerInterface::enableStat, statsPanel, &StatsPanel::addStat);
-		connect(chMeasureManager, &MeasureManagerInterface::disableStat, statsPanel, &StatsPanel::removeStat);
-	}
-}
-
-void HarmonicCalibration::setupChannelDelete(ChannelAddon *channelAddon)
-{
-	connect(channelAddon, SIGNAL(requestDeleteChannel(ChannelAddon *)), this, SLOT(deleteChannel(ChannelAddon *)));
-}
-
-void HarmonicCalibration::deleteChannel(ChannelAddon *ch)
-{
-
-	MenuControlButton *last = nullptr;
-	for(auto c : proxy->getChannelAddons()) {
-		auto ca = dynamic_cast<ChannelAddon *>(c);
-		if(ca == ch && last) {
-			last->animateClick(1);
-		}
-
-		last = dynamic_cast<MenuControlButton *>(ca->getMenuControlWidget());
-	}
-	proxy->removeChannelAddon(ch);
-
-	ch->onStop();
-	ch->disable();
-	plotAddon->onChannelRemoved(ch);
-	plotAddonSettings->onChannelRemoved(ch);
-	ch->onDeinit();
-	delete ch->getMenuControlWidget();
-	delete ch;
-}
-
-MenuControlButton *HarmonicCalibration::addChannel(ChannelAddon *channelAddon, QWidget *parent)
-{
-	MenuControlButton *menuControlButton = new MenuControlButton(parent);
-	channelAddon->setMenuControlWidget(menuControlButton);
-	channelGroup->addButton(menuControlButton);
-
-	QString id = channelAddon->getName() + QString::number(uuid++);
-	setupChannelMenuControlButtonHelper(menuControlButton, channelAddon);
-
-	channelStack->add(id, channelAddon->getWidget());
-
-	connect(menuControlButton, &QAbstractButton::clicked, this, [=](bool b) {
-		if(b) {
-			if(!channelsButton->button()->isChecked()) {
-				// Workaround because QButtonGroup and setChecked do not interact programatically
-				channelsButton->button()->animateClick(1);
-			}
-
-			plotAddon->plot()->selectChannel(channelAddon->plotCh());
-			channelStack->show(id);
-		}
-	});
-
-	setupChannelSnapshot(channelAddon);
-	setupChannelMeasurement(channelAddon);
-	setupChannelDelete(channelAddon);
-	plotAddon->onChannelAdded(channelAddon);
-	plotAddonSettings->onChannelAdded(channelAddon);
-	return menuControlButton;
-}
-
-void HarmonicCalibration::setupDeviceMenuControlButtonHelper(MenuControlButton *deviceMenuControlButton, GRDeviceAddon *deviceAddon)
-{
-	deviceMenuControlButton->setName(deviceAddon->getName());
-	deviceMenuControlButton->setCheckable(true);
-	deviceMenuControlButton->button()->setVisible(false);
-	deviceMenuControlButton->setOpenMenuChecksThis(true);
-	deviceMenuControlButton->setDoubleClickToOpenMenu(true);
-}
-
-CollapsableMenuControlButton *HarmonicCalibration::addDevice(GRDeviceAddon *dev, QWidget *parent)
-{
-	auto devButton = new CollapsableMenuControlButton(parent);
-	setupDeviceMenuControlButtonHelper(devButton->getControlBtn(), dev);
-	channelGroup->addButton(devButton->getControlBtn());
-	QString id = dev->getName() + QString::number(uuid++);
-	channelStack->add(id, dev->getWidget());
-	connect(devButton->getControlBtn(), &QPushButton::toggled, this, [=](bool b) {
-		if(b) {
-			tool->requestMenu(channelsMenuId);
-			channelStack->show(id);
-		}
-	});
-	return devButton;
-}
-
-void HarmonicCalibration::init()
-{
-	auto addons = proxy->getAddons();
-	proxy->init();
-	//initCursors();
-	for(auto addon : addons) {
-		addon->onInit();
-	}
-}
-
-void HarmonicCalibration::deinit()
-{
-	auto addons = proxy->getAddons();
-
-	for(auto addon : addons) {
-		addon->onDeinit();
-	}
-}
 
 void HarmonicCalibration::restart()
 {
@@ -329,33 +284,6 @@ void HarmonicCalibration::restart()
 		run(false);
 		run(true);
 	}
-}
-
-void HarmonicCalibration::showMeasurements(bool b)
-{
-	if(b) {
-		tool->requestMenu(measureMenuId);
-		tool->requestMenu(statsMenuId);
-	}
-	tool->openTopContainerHelper(b);
-	tool->openBottomContainerHelper(b);
-}
-
-void HarmonicCalibration::createSnapshotChannel(SnapshotProvider::SnapshotRecipe rec)
-{
-	//	proxy->getChannelAddons().append(new ch)
-	qInfo() << "Creating snapshot from recipe" << rec.name;
-
-	ChannelIdProvider *chidp = proxy->getChannelIdProvider();
-	int idx = chidp->next();
-	ImportChannelAddon *ch = new ImportChannelAddon("REF-" + rec.name + "-" + QString::number(idx), plotAddon,
-							chidp->pen(idx), this);
-	proxy->addChannelAddon(ch);
-	ch->setData(rec.x, rec.y);
-	auto btn = addChannel(ch, verticalChannelManager);
-	verticalChannelManager->add(btn);
-	ch->onInit();
-	btn->animateClick(1);
 }
 
 bool HarmonicCalibration::running() const { return m_running; }
@@ -372,23 +300,6 @@ void HarmonicCalibration::start() { run(true); }
 
 void HarmonicCalibration::stop() { run(false); }
 
-void HarmonicCalibration::startAddons()
-{
-	auto addons = proxy->getAddons();
-
-	for(auto addon : addons) {
-		addon->onStart();
-	}
-}
-void HarmonicCalibration::stopAddons()
-{
-	auto addons = proxy->getAddons();
-
-	for(auto addon : addons) {
-		addon->onStop();
-	}
-}
-
 void HarmonicCalibration::run(bool b)
 {
 	qInfo() << b;
@@ -397,11 +308,130 @@ void HarmonicCalibration::run(bool b)
 
 	if(!b) {
 		runButton->setChecked(false);
+		timer->stop();
+	}
+	else{
+		timer->start(sampleRate);
 	}
 
-	if(b) {
-		startAddons();
-	} else {
-		stopAddons();
+	updateGeneralSettingEnabled(!b);
+}
+
+void HarmonicCalibration::timerTask(){
+	updateChannelValues();
+	updateLineEditValues();
+
+	dataGraph->plot(*dataGraphValue);
+	tempGraph->plot(temp);
+}
+
+void HarmonicCalibration::updateChannelValues(){
+	rotation = m_admtController->getChannelValue(rotationChannelName, bufferSize);
+	angle = m_admtController->getChannelValue(angleChannelName, bufferSize);
+	count = m_admtController->getChannelValue(countChannelName, bufferSize);
+	temp = m_admtController->getChannelValue(temperatureChannelName, bufferSize);
+}
+
+void HarmonicCalibration::updateLineEditValues(){
+	rotationValueLabel->setText(QString::number(rotation) + "°");
+	angleValueLabel->setText(QString::number(angle) + "°");
+	countValueLabel->setText(QString::number(count));
+	tempValueLabel->setText(QString::number(temp) + " °C");
+}
+
+void HarmonicCalibration::updateGeneralSettingEnabled(bool value)
+{
+	sampleRateLineEdit->setEnabled(value);
+	bufferSizeLineEdit->setEnabled(value);
+	dataGraphSamplesLineEdit->setEnabled(value);
+	tempGraphSamplesLineEdit->setEnabled(value);
+	m_dataGraphDirectionMenuCombo->setEnabled(value);
+	m_tempGraphDirectionMenuCombo->setEnabled(value);
+}
+
+void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, int& variable)
+{
+    connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit]() {
+        bool ok;
+        int value = lineEdit->text().toInt(&ok);
+        if (ok) {
+            variable = value;
+        } else {
+            lineEdit->setText(QString::number(variable));
+        }
+    });
+}
+
+void HarmonicCalibration::connectLineEditToGraphSamples(QLineEdit* lineEdit, int& variable, Sismograph* graph)
+{
+    connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit, graph]() {
+        bool ok;
+        int value = lineEdit->text().toInt(&ok);
+        if (ok) {
+            variable = value;
+			graph->setNumSamples(variable);
+        } else {
+            lineEdit->setText(QString::number(variable));
+        }
+    });
+}
+
+void HarmonicCalibration::connectMenuComboToGraphDirection(MenuCombo* menuCombo, Sismograph* graph)
+{
+	QComboBox *combo = menuCombo->combo();
+	connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [combo, graph]() {
+		int value = qvariant_cast<int>(combo->currentData());
+		switch(value)
+		{
+			case Sismograph::LEFT_TO_RIGHT:
+				graph->setPlotDirection(Sismograph::LEFT_TO_RIGHT);
+				graph->reset();
+				break;
+			case Sismograph::RIGHT_TO_LEFT:
+				graph->setPlotDirection(Sismograph::RIGHT_TO_LEFT);
+				graph->reset();
+				break;
+		}
+	});
+}
+
+void HarmonicCalibration::changeGraphColorByChannelName(Sismograph* graph, const char* channelName)
+{
+	int index = m_admtController->getChannelIndex(channelName);
+	if(index > -1){
+		graph->setColor(StyleHelper::getColor( QString::fromStdString("CH" + std::to_string(index) )));
 	}
+}
+
+void HarmonicCalibration::connectMenuComboToGraphChannel(MenuCombo* menuCombo, Sismograph* graph)
+{
+	QComboBox *combo = menuCombo->combo();
+	connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, combo, graph]() {
+		int currentIndex = combo->currentIndex();
+		QVariant currentData = combo->currentData();
+		char *value = reinterpret_cast<char*>(currentData.value<void*>());
+		switch(currentIndex)
+		{
+			case ADMTController::Channel::ROTATION:
+				dataGraphValue = &rotation;
+				graph->setAxisTitle(QwtAxis::YLeft, tr("Degree (°)"));
+				graph->addScale(-30.0, 390.0, 15, 5);
+				graph->setUnitOfMeasure("Degree", "°");
+				break;
+			case ADMTController::Channel::ANGLE:
+				dataGraphValue = &angle;
+				graph->setAxisTitle(QwtAxis::YLeft, tr("Degree (°)"));
+				graph->addScale(-30.0, 390.0, 15, 5);
+				graph->setUnitOfMeasure("Degree", "°");
+				break;
+			case ADMTController::Channel::COUNT:
+				dataGraphValue = &count;
+				graph->setAxisTitle(QwtAxis::YLeft, tr("Count"));
+				graph->addScale(-1.0, 20.0, 5, 1);
+				graph->setUnitOfMeasure("Count", "");
+				break;
+		}
+		changeGraphColorByChannelName(graph, value);
+		graph->reset();
+	});
 }

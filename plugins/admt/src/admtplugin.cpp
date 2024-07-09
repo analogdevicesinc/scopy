@@ -1,4 +1,5 @@
 #include "admtplugin.h"
+#include "admtcontroller.h"
 #include "harmoniccalibration.h"
 
 #include <QLoggingCategory>
@@ -7,7 +8,7 @@
 #include <iioutil/connectionprovider.h>
 
 Q_LOGGING_CATEGORY(CAT_ADMTPLUGIN, "ADMTPlugin")
-using namespace scopy;
+using namespace scopy::admt;
 using namespace scopy::grutil;
 
 bool ADMTPlugin::compatible(QString m_param, QString category)
@@ -27,7 +28,7 @@ bool ADMTPlugin::compatible(QString m_param, QString category)
 	}
 
 	ConnectionProvider::close(m_param);
-	
+	ret = true;
 	return ret;
 }
 
@@ -159,9 +160,11 @@ bool ADMTPlugin::onConnect()
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
 
-	auto recipe = createRecipe(m_ctx);
+	//auto recipe = createRecipe(m_ctx);
 
-	harmonicCalibration = new HarmonicCalibration(recipe);
+	m_admtController = new ADMTController(m_param, this);
+	m_admtController->connectADMT();
+	harmonicCalibration = new HarmonicCalibration(m_admtController);
 	m_toolList[0]->setTool(harmonicCalibration);
 	
 	return true;
@@ -181,6 +184,8 @@ bool ADMTPlugin::onDisconnect()
 			delete(w);
 		}
 	}
+
+	m_admtController->disconnectADMT();
 	return true;
 }
 
