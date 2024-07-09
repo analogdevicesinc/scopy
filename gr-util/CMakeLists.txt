@@ -62,7 +62,6 @@ target_link_libraries(
 	PUBLIC Qt${QT_VERSION_MAJOR}::Core
 	       scopy-iioutil
 	       scopy-gui
-	       scopy-gr-gui
 	       scopy-iio-widgets
 	       gnuradio::gnuradio-runtime
 	       gnuradio::gnuradio-analog
