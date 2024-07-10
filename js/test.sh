@@ -18,7 +18,7 @@ fi
 # run scopy functions of provided script
 if [ ! -z $2 ]; then
     cd $scopyBuildDir
-    ./scopy  --script=$2
+    QT_QPA_PLATFORM=offscreen ./scopy  --script=$2
 fi
 
 #if emu was started by this script stop emu
