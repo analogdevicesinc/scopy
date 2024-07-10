@@ -233,4 +233,37 @@ void ScopyJS::jsCategoryFilter(QLoggingCategory *category)
 	}
 }
 
+QJSValue ScopyJS::evaluateFile(const QString &path)
+{
+	QTextStream out(stdout);
+	QFile file(path);
+	if(!file.open(QFile::ReadOnly)) {
+		out << "Unable to open the script file: " << path << Qt::endl;
+		return "";
+	}
+	const QString scriptContent = getScriptContent(&file);
+	QJSValue val = ScopyJS::GetInstance()->engine()->evaluate(scriptContent, path);
+	if(val.isError()) {
+		out << "Exception:" << val.toString() << Qt::endl;
+	} else if(!val.isUndefined()) {
+		out << val.toString() << Qt::endl;
+	}
+
+	out.flush();
+
+	return val;
+}
+
+const QString ScopyJS::getScriptContent(QFile *file)
+{
+	QTextStream stream(file);
+	QString firstLine = stream.readLine();
+	if(!firstLine.startsWith("#!"))
+		stream.seek(0);
+
+	QString content = stream.readAll();
+	file->close();
+	return content;
+}
+
 #include "moc_scopyjs.cpp"

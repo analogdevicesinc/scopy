@@ -31,6 +31,7 @@
 #include <QJSEngine>
 #include <QObject>
 #include <QSocketNotifier>
+#include <QFile>
 
 class QJSEngine;
 
@@ -58,6 +59,7 @@ public:
 	Q_INVOKABLE QString readFromConsole(const QString &text);
 	Q_INVOKABLE void returnToApplication();
 	Q_INVOKABLE void suppressScopyMessages(bool b);
+	Q_INVOKABLE QJSValue evaluateFile(const QString &path);
 
 	QJSEngine *engine();
 
@@ -83,6 +85,9 @@ private:
 	static ScopyJS *pinstance_;
 	static QLoggingCategory::CategoryFilter oldCategoryFilter;
 	static void jsCategoryFilter(QLoggingCategory *category);
+
+private:
+	const QString getScriptContent(QFile *file);
 };
 
 } // namespace scopy
