@@ -8,8 +8,12 @@ using namespace scopy;
 using namespace scopy::adc;
 
 ImportChannelComponent::ImportChannelComponent(ImportFloatChannelNode *node, QPen pen, QWidget *parent)
-	: ChannelComponent(node->recipe().name, node->recipe().targetPlot, pen, parent)
+	: ChannelComponent(node->recipe().name, pen, parent)
 {
+
+	m_plotChannelCmpt = new TimePlotComponentChannel(this, node->recipe().targetPlot, this);
+	m_timePlotChannelComponent = dynamic_cast<TimePlotComponentChannel*>(m_plotChannelCmpt);
+	connect(m_chData, &ChannelData::newData, m_timePlotChannelComponent, &TimePlotComponentChannel::onNewData);
 
 	m_node = node;
 	m_channelName = node->name();
@@ -34,7 +38,7 @@ void ImportChannelComponent::onInit()
 	addChannelToPlot();
 
 	chData()->onNewData(rec.x.data(), rec.y.data(), rec.x.size(), true);
-	m_plotChannelCmpt->refreshData(true);
+	m_timePlotChannelComponent->refreshData(true);
 }
 
 QWidget *ImportChannelComponent::createMenu(QWidget *parent)
@@ -62,22 +66,22 @@ QWidget *ImportChannelComponent::createYAxisMenu(QWidget *parent)
 	MenuSectionCollapseWidget *section =
 		new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_NONE, parent);
 
-	m_yCtrl = new MenuPlotAxisRangeControl(m_plotChannelCmpt->m_timePlotYAxis, section);
+	m_yCtrl = new MenuPlotAxisRangeControl(m_timePlotChannelComponent->m_timePlotYAxis, section);
 	m_autoscaleBtn = new QPushButton(tr("AUTOSCALE"), section);
 	StyleHelper::BlueButton(m_autoscaleBtn);
 	m_autoscaler = new PlotAutoscaler(this);
-	m_autoscaler->addChannels(m_plotChannelCmpt->m_timePlotCh);
+	m_autoscaler->addChannels(m_timePlotChannelComponent->m_timePlotCh);
 
 	connect(m_autoscaler, &PlotAutoscaler::newMin, m_yCtrl, &MenuPlotAxisRangeControl::setMin);
 	connect(m_autoscaler, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
 
 	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [=](double min, double max) {
-		m_plotChannelCmpt->m_xyPlotYAxis->setInterval(m_yCtrl->min(), m_yCtrl->max());
+		m_timePlotChannelComponent->m_xyPlotYAxis->setInterval(m_yCtrl->min(), m_yCtrl->max());
 	});
 
 	connect(section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
 		m_yLock = b;
-		m_plotChannelCmpt->lockYAxis(!b);
+		m_timePlotChannelComponent->lockYAxis(!b);
 	});
 
 	connect(m_autoscaleBtn, &QAbstractButton::pressed, m_autoscaler, &PlotAutoscaler::autoscale);

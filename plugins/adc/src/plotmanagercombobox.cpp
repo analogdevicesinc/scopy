@@ -1,10 +1,10 @@
-#include "timeplotmanagercombobox.h"
+#include "plotmanagercombobox.h"
 #include "timeplotcomponentchannel.h"
 #include <menusectionwidget.h>
 using namespace scopy;
 using namespace scopy::adc;
 
-TimePlotManagerCombobox::TimePlotManagerCombobox(TimePlotManager *man, ChannelComponent *c, QWidget *parent)
+PlotManagerCombobox::PlotManagerCombobox(PlotManager *man, ChannelComponent *c, QWidget *parent)
 	: QWidget(parent)
 {
 	QVBoxLayout *lay = new QVBoxLayout(this);
@@ -19,12 +19,12 @@ TimePlotManagerCombobox::TimePlotManagerCombobox(TimePlotManager *man, ChannelCo
 	m_ch = c;
 
 	// add all plots from manager
-	for(TimePlotComponent *plt : man->plots()) {
+	for(PlotComponent *plt : man->plots()) {
 		addPlot(plt);
 	}
 
 	// select current plot in combo
-	uint32_t uuid = c->plotChannelCmpt()->m_plotComponent->uuid();
+	uint32_t uuid = c->plotChannelCmpt()->plotComponent()->uuid();
 	m_combo->setCurrentIndex(findIndexFromUuid(uuid));
 
 	connect(m_combo, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
@@ -36,34 +36,34 @@ TimePlotManagerCombobox::TimePlotManagerCombobox(TimePlotManager *man, ChannelCo
 	sec->contentLayout()->addWidget(m_mcombo);
 }
 
-TimePlotManagerCombobox::~TimePlotManagerCombobox() {}
+PlotManagerCombobox::~PlotManagerCombobox() {}
 
-void TimePlotManagerCombobox::renamePlotSlot()
+void PlotManagerCombobox::renamePlotSlot()
 {
 	TimePlotComponent *plt = dynamic_cast<TimePlotComponent *>(QObject::sender());
 	renamePlot(plt);
 }
 
-void TimePlotManagerCombobox::addPlot(TimePlotComponent *p)
+void PlotManagerCombobox::addPlot(PlotComponent *p)
 {
 	m_combo->addItem(p->name(), p->uuid());
-	connect(p, &TimePlotComponent::nameChanged, this, &TimePlotManagerCombobox::renamePlotSlot);
+	connect(p, &TimePlotComponent::nameChanged, this, &PlotManagerCombobox::renamePlotSlot);
 }
 
-void TimePlotManagerCombobox::removePlot(TimePlotComponent *p)
+void PlotManagerCombobox::removePlot(PlotComponent *p)
 {
 	int idx = findIndexFromUuid(p->uuid());
 	m_combo->removeItem(idx);
-	disconnect(p, &TimePlotComponent::nameChanged, this, &TimePlotManagerCombobox::renamePlotSlot);
+	disconnect(p, &TimePlotComponent::nameChanged, this, &PlotManagerCombobox::renamePlotSlot);
 }
 
-void TimePlotManagerCombobox::renamePlot(TimePlotComponent *p)
+void PlotManagerCombobox::renamePlot(PlotComponent *p)
 {
 	int idx = findIndexFromUuid(p->uuid());
 	m_combo->setItemText(idx, p->name());
 }
 
-int TimePlotManagerCombobox::findIndexFromUuid(uint32_t uuid)
+int PlotManagerCombobox::findIndexFromUuid(uint32_t uuid)
 {
 	for(int i = 0; i < m_combo->count(); i++) {
 		if(uuid == m_combo->itemData(i)) {

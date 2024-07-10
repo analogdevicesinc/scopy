@@ -11,6 +11,8 @@
 namespace scopy {
 namespace adc {
 
+
+
 class SCOPY_ADC_EXPORT TimePlotComponentSettings : public QWidget, public ToolComponent
 {
 	Q_OBJECT
