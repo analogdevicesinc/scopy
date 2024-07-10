@@ -17,6 +17,7 @@ TimePlotComponentChannel::TimePlotComponentChannel(ChannelComponent *ch, TimePlo
 	auto xyplot = plotComponent->xyPlot();
 
 	m_ch = ch;
+	m_plotComponent = nullptr;
 	initPlotComponent(plotComponent);
 
 	m_timePlotYAxis->setUnits("V");
@@ -46,9 +47,10 @@ void TimePlotComponentChannel::deinitPlotComponent()
 	delete m_xyPlotCh;
 }
 
-void TimePlotComponentChannel::initPlotComponent(TimePlotComponent *plotComponent)
+void TimePlotComponentChannel::initPlotComponent(PlotComponent *pc)
 {
 
+	TimePlotComponent* plotComponent = dynamic_cast<TimePlotComponent*>(pc);
 	auto timeplot = plotComponent->timePlot();
 	auto xyplot = plotComponent->xyPlot();
 
@@ -143,6 +145,16 @@ QWidget *TimePlotComponentChannel::createCurveMenu(QWidget *parent)
 	curve->contentLayout()->addWidget(curveSettings);
 
 	return curve;
+}
+
+ChannelComponent *TimePlotComponentChannel::channelComponent()
+{
+	return m_ch;
+}
+
+PlotComponent *TimePlotComponentChannel::plotComponent()
+{
+	return m_plotComponent;
 }
 
 void TimePlotComponentChannel::enable()
