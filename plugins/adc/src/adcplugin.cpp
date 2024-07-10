@@ -241,6 +241,7 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode* root) {
 void ADCPlugin::deleteInstrument(ToolMenuEntry *tool) {
 
 	tool->setEnabled(false);
+	tool->setRunning(false);
 	tool->setRunBtnVisible(false);
 	QWidget *w = tool->tool();
 	if(w) {

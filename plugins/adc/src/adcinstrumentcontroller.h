@@ -67,7 +67,7 @@ Q_SIGNALS:
 	void requestStopLater();
 
 private:
-	void setupChannelMeasurement(TimePlotManager *c, ChannelComponent *ch);
+	void setupChannelMeasurement(PlotManager *c, ChannelComponent *ch);
 
 	ADCInstrument *m_ui;
 	TimePlotManager *m_plotComponentManager;
