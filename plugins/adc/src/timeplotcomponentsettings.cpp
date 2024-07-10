@@ -51,7 +51,13 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	connect(m_autoscaler, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
 
 	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [=](double min, double max) {
-		if(m_plotComponent->XYXChannel() && m_plotComponent->XYXChannel()->plotChannelCmpt()->m_singleYMode) {
+
+		bool singleYMode = false;
+		if(m_plotComponent->XYXChannel()) {
+			singleYMode = dynamic_cast<TimePlotComponentChannel*>(m_plotComponent->XYXChannel()->plotChannelCmpt())->m_singleYMode;
+		}
+
+		if(singleYMode) {
 			m_plotComponent->xyPlot()->xAxis()->setInterval(m_yCtrl->min(), m_yCtrl->max());
 		}
 		m_plotComponent->xyPlot()->yAxis()->setInterval(m_yCtrl->min(), m_yCtrl->max());
@@ -165,16 +171,18 @@ TimePlotComponentSettings::~TimePlotComponentSettings() {}
 void TimePlotComponentSettings::addChannel(ChannelComponent *c)
 {
 	// https://stackoverflow.com/questions/44501171/qvariant-with-custom-class-pointer-does-not-return-same-address
+
+	auto timePlotComponentChannel = dynamic_cast<TimePlotComponentChannel*>(c->plotChannelCmpt());
 	m_xAxisSrc->combo()->addItem(c->name(), QVariant::fromValue(static_cast<void *>(c)));
-	m_autoscaler->addChannels(c->plotChannelCmpt()->m_timePlotCh);
+	m_autoscaler->addChannels(timePlotComponentChannel->m_timePlotCh);
 	ScaleProvider *sp = dynamic_cast<ScaleProvider *>(c);
 	if(sp) {
 		m_scaleProviders.append(sp);
 		updateYModeCombo();
 	}
 
-	m_curve->addChannels(c->plotChannelCmpt()->m_timePlotCh);
-	m_curve->addChannels(c->plotChannelCmpt()->m_xyPlotCh);
+	m_curve->addChannels(timePlotComponentChannel->m_timePlotCh);
+	m_curve->addChannels(timePlotComponentChannel->m_xyPlotCh);
 
 	m_channels.append(c);
 }
@@ -184,14 +192,17 @@ void TimePlotComponentSettings::removeChannel(ChannelComponent *c)
 	m_channels.removeAll(c);
 	int comboId = m_xAxisSrc->combo()->findData(QVariant::fromValue(static_cast<void *>(c)));
 	m_xAxisSrc->combo()->removeItem(comboId);
-	m_autoscaler->removeChannels(c->plotChannelCmpt()->m_timePlotCh);
+
+	TimePlotComponentChannel *chcmpt = dynamic_cast<TimePlotComponentChannel *>(c->plotChannelCmpt());
+
+	m_autoscaler->removeChannels(chcmpt->m_timePlotCh);
 	ScaleProvider *sp = dynamic_cast<ScaleProvider *>(c);
 	if(sp) {
 		m_scaleProviders.removeAll(sp);
 		updateYModeCombo();
 	}
-	m_curve->removeChannels(c->plotChannelCmpt()->m_timePlotCh);
-	m_curve->removeChannels(c->plotChannelCmpt()->m_xyPlotCh);
+	m_curve->removeChannels(chcmpt->m_timePlotCh);
+	m_curve->removeChannels(chcmpt->m_xyPlotCh);
 }
 
 void TimePlotComponentSettings::onInit() {}
