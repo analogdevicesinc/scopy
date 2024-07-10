@@ -16,17 +16,19 @@
 
 #include <plotwidget.h>
 #include "plotinfo.h"
+#include "plotcomponent.h"
 
 using namespace scopy::gui;
 namespace scopy {
 namespace adc {
 
-class TimePlotComponent;
 class TimePlotComponentSettings;
 class TimePlotComponentChannel;
+class PlotComponentChannel;
 class ChannelComponent;
 
-class SCOPY_ADC_EXPORT TimePlotComponent : public QWidget, public MetaComponent
+
+class SCOPY_ADC_EXPORT TimePlotComponent : public PlotComponent
 {
 	Q_OBJECT
 public:
@@ -37,34 +39,19 @@ public:
 	virtual PlotWidget *xyPlot();
 
 public Q_SLOTS:
-	virtual void replot();
-	void showPlotLabels(bool b);
 	void setSingleYModeAll(bool b);
 	void showXSourceOnXy(bool b);
-	void setName(QString s);
-	// virtual double sampleRate()
 
 	ChannelComponent *XYXChannel();
 	void setXYXChannel(ChannelComponent *c);
 	void refreshXYXAxis();
 	void refreshXYXData();
-	void refreshAxisLabels();
-	void selectChannel(ChannelComponent *c);
-
-Q_SIGNALS:
-	void nameChanged(QString);
-	void requestDeletePlot();
-
+	void selectChannel(ChannelComponent *c) override;
+	void setXInterval(double min, double max) override;
 public:
-	void onStart();
-	void onStop();
-	void onInit();
-	void onDeinit();
+	void addChannel(ChannelComponent *) override;
+	void removeChannel(ChannelComponent *) override;
 
-	void addChannel(ChannelComponent *);
-	void removeChannel(ChannelComponent *);
-
-	uint32_t uuid();
 	TimePlotComponentSettings *createPlotMenu(QWidget *parent);
 	TimePlotComponentSettings *plotMenu();
 
@@ -74,8 +61,6 @@ private Q_SLOTS:
 	void onXyXNewData(const float *xData_, const float *yData_, size_t size, bool copy);
 
 private:
-	uint32_t m_uuid;
-	QHBoxLayout *m_plotLayout;
 	PlotWidget *m_timePlot;
 	PlotWidget *m_xyPlot;
 	PlotInfo *m_timeInfo;
@@ -89,7 +74,6 @@ private:
 	ChannelComponent *m_XYXChannel;
 	const float *xyXData;
 
-	QList<TimePlotComponentChannel *> m_channels;
 
 private:
 	QMetaObject::Connection xyDataConn;
