@@ -11,7 +11,6 @@
 namespace scopy {
 namespace adc {
 
-class PlotProxy;
 class ADCInstrument;
 
 class SCOPY_ADC_EXPORT ChannelData : public QObject
