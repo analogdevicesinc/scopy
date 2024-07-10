@@ -121,6 +121,7 @@ private:
 
 	MenuPlotChannelCurveStyleControl *m_curvemenu;
 	MenuSectionCollapseWidget *m_yaxisMenu;
+	TimePlotComponentChannel *m_timePlotComponentChannel;
 
 	QPushButton *m_snapBtn;
 

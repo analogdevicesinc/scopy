@@ -20,9 +20,13 @@ using namespace scopy::adc;
 
 GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, TimePlotComponent *m_plot,
 					       GRTimeSinkComponent *grtsc, QPen pen, QWidget *parent)
-	: ChannelComponent(node->name(), m_plot, pen, parent)
+	: ChannelComponent(node->name(), pen, parent)
 
 {
+	m_plotChannelCmpt = new TimePlotComponentChannel(this, m_plot, this);
+	m_timePlotComponentChannel = dynamic_cast<TimePlotComponentChannel*>(m_plotChannelCmpt);
+	connect(m_chData, &ChannelData::newData, m_timePlotComponentChannel, &TimePlotComponentChannel::onNewData);
+
 	m_node = node;
 	m_src = node->src();
 
@@ -69,21 +73,21 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 			IIOWidgetBuilder().channel(m_src->channel()).attribute(m_src->scaleAttribute()).buildSingle();
 	}
 
-	m_yCtrl = new MenuPlotAxisRangeControl(m_plotChannelCmpt->m_timePlotYAxis, m_yaxisMenu);
+	m_yCtrl = new MenuPlotAxisRangeControl(m_timePlotComponentChannel->m_timePlotYAxis, m_yaxisMenu);
 	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), m_yaxisMenu, false);
 	m_autoscaler = new PlotAutoscaler(this);
-	m_autoscaler->addChannels(m_plotChannelCmpt->m_timePlotCh);
+	m_autoscaler->addChannels(m_timePlotComponentChannel->m_timePlotCh);
 
 	connect(m_autoscaler, &PlotAutoscaler::newMin, m_yCtrl, &MenuPlotAxisRangeControl::setMin);
 	connect(m_autoscaler, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
 
 	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [=](double min, double max) {
-		m_plotChannelCmpt->m_xyPlotYAxis->setInterval(m_yCtrl->min(), m_yCtrl->max());
+		m_timePlotComponentChannel->m_xyPlotYAxis->setInterval(m_yCtrl->min(), m_yCtrl->max());
 	});
 
 	connect(m_yaxisMenu->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
 		m_yLock = b;
-		m_plotChannelCmpt->lockYAxis(!b);
+		m_timePlotComponentChannel->lockYAxis(!b);
 	});
 
 	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
@@ -136,12 +140,12 @@ QPushButton *GRTimeChannelComponent::createSnapshotButton(QWidget *parent)
 
 	connect(snapBtn, &QPushButton::clicked, this, [=]() {
 		std::vector<float> x, y;
-		auto data = m_plotChannelCmpt->m_timePlotCh->curve()->data();
+		auto data = m_timePlotComponentChannel->m_timePlotCh->curve()->data();
 		for(int i = 0; i < data->size(); i++) {
 			x.push_back(data->sample(i).x());
 			y.push_back(data->sample(i).y());
 		}
-		SnapshotRecipe rec{x, y, m_plotChannelCmpt->m_plotComponent, "REF - " + m_channelName};
+		SnapshotRecipe rec{x, y, m_timePlotComponentChannel->m_plotComponent, "REF - " + m_channelName};
 		AcqTreeNode *treeRoot = m_node->treeRoot();
 		ImportFloatChannelNode *snap = new ImportFloatChannelNode(rec, treeRoot);
 		treeRoot->addTreeChild(snap);
@@ -239,8 +243,8 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 			ymin = 0;
 			ymax = 1 << (fmt->bits);
 		}
-		m_plotChannelCmpt->m_timePlotYAxis->setUnits("");
-		m_plotChannelCmpt->m_timePlotYAxis->scaleDraw()->setFloatPrecision(0);
+		m_timePlotComponentChannel->m_timePlotYAxis->setUnits("");
+		m_timePlotComponentChannel->m_timePlotYAxis->scaleDraw()->setFloatPrecision(0);
 //		m_plotCh->yAxis()->setUnits("Counts");
 //		m_plotCh->yAxis()->
 		break;
@@ -256,8 +260,8 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 			ymin = 0;
 			ymax = 1;
 		}
-		m_plotChannelCmpt->m_timePlotYAxis->setUnits("");
-		m_plotChannelCmpt->m_timePlotYAxis->scaleDraw()->setFloatPrecision(2);
+		m_timePlotComponentChannel->m_timePlotYAxis->setUnits("");
+		m_timePlotComponentChannel->m_timePlotYAxis->scaleDraw()->setFloatPrecision(2);
 		// m_plotCh->yAxis()->setUnits("");
 		break;
 	case YMODE_SCALE:
@@ -278,8 +282,8 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 		ymin = ymin * scale;
 		ymax = ymax * scale;
 
-		m_plotChannelCmpt->m_timePlotYAxis->setUnits(m_unit.symbol);
-		m_plotChannelCmpt->m_timePlotYAxis->scaleDraw()->setFloatPrecision(3);
+		m_timePlotComponentChannel->m_timePlotYAxis->setUnits(m_unit.symbol);
+		m_timePlotComponentChannel->m_timePlotYAxis->scaleDraw()->setFloatPrecision(3);
 
 
 		break;
@@ -295,14 +299,14 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 
 void GRTimeChannelComponent::addChannelToPlot()
 {
-	m_curvemenu->addChannels(m_plotChannelCmpt->m_timePlotCh);
-	m_curvemenu->addChannels(m_plotChannelCmpt->m_xyPlotCh);
+	m_curvemenu->addChannels(m_timePlotComponentChannel->m_timePlotCh);
+	m_curvemenu->addChannels(m_timePlotComponentChannel->m_xyPlotCh);
 }
 
 void GRTimeChannelComponent::removeChannelFromPlot()
 {
-	m_curvemenu->removeChannels(m_plotChannelCmpt->m_timePlotCh);
-	m_curvemenu->removeChannels(m_plotChannelCmpt->m_xyPlotCh);
+	m_curvemenu->removeChannels(m_timePlotComponentChannel->m_timePlotCh);
+	m_curvemenu->removeChannels(m_timePlotComponentChannel->m_xyPlotCh);
 }
 
 IIOUnit GRTimeChannelComponent::unit() const

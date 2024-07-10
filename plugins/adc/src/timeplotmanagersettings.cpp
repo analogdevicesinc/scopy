@@ -44,7 +44,7 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 		addPlot(plt);
 	});
 
-	connect(m_plotManager, &TimePlotManager::plotRemoved, this, [=](uint32_t uuid) {
+	connect(m_plotManager, &PlotManager::plotRemoved, this, [=](uint32_t uuid) {
 		TimePlotComponent *plt = m_plotManager->plot(uuid);
 		removePlot(plt);
 	});
@@ -178,7 +178,8 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 		m_sampleRateSpin->setVisible(false);
 		if(xcb->itemData(idx) == XMODE_SAMPLES) {
 			m_sampleRateSpin->setValue(1);
-			for(TimePlotComponent *p : m_plotManager->plots()) {
+			for(PlotComponent *plt : m_plotManager->plots()) {
+				auto p = dynamic_cast<TimePlotComponent*>(plt);
 				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(0);
 			}
 
@@ -188,7 +189,8 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_sampleRateSpin->setEnabled(false);
 			m_sampleRateSpin->setValue(readSampleRate());
 
-			for(TimePlotComponent *p : m_plotManager->plots()) {
+			for(PlotComponent *plt : m_plotManager->plots()) {
+				auto p = dynamic_cast<TimePlotComponent*>(plt);
 				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
 			}
 
@@ -196,7 +198,8 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 		if(xcb->itemData(idx) == XMODE_OVERRIDE) {
 			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setEnabled(true);
-			for(TimePlotComponent *p : m_plotManager->plots()) {
+			for(PlotComponent *plt : m_plotManager->plots()) {
+				auto p = dynamic_cast<TimePlotComponent*>(plt);
 				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
 			}
 		}

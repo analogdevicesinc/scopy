@@ -1,5 +1,4 @@
 #include "channelcomponent.h"
-#include "qlineedit.h"
 #include <gui/plotchannel.h>
 #include <gui/plotaxis.h>
 #include <gui/widgets/menusectionwidget.h>
@@ -15,18 +14,16 @@ Q_LOGGING_CATEGORY(CAT_TIME_CHANNELCOMPONENT, "TimeChannelComponent");
 using namespace scopy;
 using namespace gui;
 using namespace scopy::adc;
-ChannelComponent::ChannelComponent(QString ch, TimePlotComponent *m_plot, QPen pen, QWidget *parent)
+ChannelComponent::ChannelComponent(QString ch, QPen pen, QWidget *parent)
 	: QWidget(parent)
 	, ToolComponent()
 	, m_channelName(ch)
 	, m_pen(pen)
 	, m_chData(new ChannelData(this))
-	, m_plotChannelCmpt(new TimePlotComponentChannel(this, m_plot, this))
 	, m_menu(nullptr)
 {
 
 	m_ctrl = nullptr;
-	connect(m_chData, &ChannelData::newData, m_plotChannelCmpt, &TimePlotComponentChannel::onNewData);
 	m_name = m_channelName;
 	m_enabled = true;
 }
@@ -45,9 +42,9 @@ QPen ChannelComponent::pen() const { return m_pen; }
 
 ChannelData *ChannelComponent::chData() const { return m_chData; }
 
-TimePlotComponentChannel *ChannelComponent::plotChannelCmpt() const { return m_plotChannelCmpt; }
+PlotComponentChannel *ChannelComponent::plotChannelCmpt() const { return m_plotChannelCmpt; }
 
-void ChannelComponent::setPlotChannelCmpt(TimePlotComponentChannel *newPlotChannelCmpt)
+void ChannelComponent::setPlotChannelCmpt(PlotComponentChannel *newPlotChannelCmpt)
 {
 	m_plotChannelCmpt = newPlotChannelCmpt;
 }
@@ -91,7 +88,7 @@ void ChannelComponent::createMenuControlButton(ChannelComponent *c, QWidget *par
 		} else {
 			c->disable();
 		}
-		c->plotChannelCmpt()->m_plotComponent->replot();
+		c->plotChannelCmpt()->plotComponent()->replot();
 	});
 	c->m_ctrl->checkBox()->setChecked(true);
 }

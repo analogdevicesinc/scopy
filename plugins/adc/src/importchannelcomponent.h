@@ -2,6 +2,7 @@
 #define IMPORTCHANNELCOMPONENT_H
 
 #include "channelcomponent.h"
+#include <gui/plotautoscaler.h>
 
 namespace scopy {
 namespace adc {
@@ -25,6 +26,7 @@ private:
 	MenuPlotAxisRangeControl *m_yCtrl;
 	PlotAutoscaler *m_autoscaler;
 	QPushButton *m_autoscaleBtn;
+	TimePlotComponentChannel* m_timePlotChannelComponent;
 
 	bool m_yLock;
 

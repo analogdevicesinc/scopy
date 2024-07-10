@@ -6,10 +6,12 @@
 #include <toolcomponent.h>
 #include <channelcomponent.h>
 #include <timeplotcomponent.h>
+#include <plotcomponent.h>
 
 namespace scopy {
 namespace adc {
-class SCOPY_ADC_EXPORT TimePlotComponentChannel : public QObject
+
+class SCOPY_ADC_EXPORT TimePlotComponentChannel : public QObject, public PlotComponentChannel
 {
 	Q_OBJECT
 public:
@@ -17,17 +19,19 @@ public:
 	~TimePlotComponentChannel();
 
 	QWidget *createCurveMenu(QWidget *parent);
+	ChannelComponent *channelComponent() override;
+	PlotComponent *plotComponent() override;
 
 public Q_SLOTS:
-	void enable();
-	void disable();
-	void onNewData(const float *xData_, const float *yData_, size_t size, bool copy);
+	void enable() override;
+	void disable() override;
+	void onNewData(const float *xData_, const float *yData_, size_t size, bool copy) override;
 	void setXyXData(const float *);
 	void lockYAxis(bool);
 	void refreshData(bool copy);
 
-	void initPlotComponent(TimePlotComponent *plotComponent);
-	void deinitPlotComponent();
+	void initPlotComponent(PlotComponent *plotComponent) override;
+	void deinitPlotComponent() override;
 
 public:
 	PlotChannel *m_timePlotCh = nullptr;

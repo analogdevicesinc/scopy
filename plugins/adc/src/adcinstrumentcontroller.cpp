@@ -9,7 +9,6 @@
 #include <pluginbase/preferences.h>
 #include "interfaces.h"
 
-Q_LOGGING_CATEGORY(CAT_TIMEPLOT_PROXY, "TimePlotProxy")
 using namespace scopy;
 using namespace scopy::adc;
 
@@ -141,7 +140,6 @@ void ADCInstrumentController::stop()
 
 void ADCInstrumentController::stopUpdates()
 {
-	qInfo(CAT_TIMEPLOT_PROXY) << "Stopped plotting";
 	m_refreshTimerRunning = false;
 	m_refillFuture.cancel();
 	m_plotTimer->stop();
@@ -150,7 +148,6 @@ void ADCInstrumentController::stopUpdates()
 
 void ADCInstrumentController::startUpdates()
 {
-	qInfo(CAT_TIMEPLOT_PROXY) << "Start plotting";
 	updateFrameRate();
 	m_refreshTimerRunning = true;
 	update();
@@ -359,7 +356,7 @@ void ADCInstrumentController::removeChannel(AcqTreeNode *node)
 	btn->animateClick(1);
 }*/
 
-void ADCInstrumentController::setupChannelMeasurement(TimePlotManager *c, ChannelComponent *ch)
+void ADCInstrumentController::setupChannelMeasurement(PlotManager *c, ChannelComponent *ch)
 {
 	auto chMeasureableChannel = dynamic_cast<MeasurementProvider *>(ch);
 	if(!chMeasureableChannel)
