@@ -4,7 +4,7 @@
 #include <scopy-adc_export.h>
 #include <QWidget>
 #include "toolcomponent.h"
-#include "timeplotcomponent.h"
+#include "plotcomponent.h"
 #include "menucontrolbutton.h"
 #include "menucollapsesection.h"
 #include "menuplotchannelcurvestylecontrol.h"
@@ -27,14 +27,14 @@ class SCOPY_ADC_EXPORT ChannelComponent : public QWidget, public ToolComponent, 
 {
 	Q_OBJECT
 public:
-	ChannelComponent(QString ch, TimePlotComponent *m_plot, QPen pen, QWidget *parent = nullptr);
+	ChannelComponent(QString ch, QPen pen, QWidget *parent = nullptr);
 	virtual ~ChannelComponent();
 
 	QPen pen() const;
 	ChannelData *chData() const;
 
-	TimePlotComponentChannel *plotChannelCmpt() const;
-	void setPlotChannelCmpt(TimePlotComponentChannel *newPlotChannelCmpt);
+	PlotComponentChannel *plotChannelCmpt() const;
+	void setPlotChannelCmpt(PlotComponentChannel *newPlotChannelCmpt);
 
 	virtual MenuControlButton *ctrl();
 	virtual void addChannelToPlot();
@@ -51,7 +51,7 @@ protected:
 	MenuWidget *m_menu;
 
 	ChannelData *m_chData;
-	TimePlotComponentChannel *m_plotChannelCmpt;
+	PlotComponentChannel *m_plotChannelCmpt;
 
 	void initMenu(QWidget *parent = nullptr);
 
