@@ -114,7 +114,6 @@ private:
 	double m_sampleRate;
 	bool m_rollingMode;
 	bool m_syncBufferPlotSize;
-	bool m_syncMode;
 
 	QList<ChannelComponent *> m_channels;
 	QList<SampleRateProvider *> m_sampleRateProviders;

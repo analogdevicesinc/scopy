@@ -1,0 +1,49 @@
+#ifndef FFTPLOTCOMPONENTCHANNEL_H
+#define FFTPLOTCOMPONENTCHANNEL_H
+
+
+#include "scopy-adc_export.h"
+#include <QObject>
+#include <toolcomponent.h>
+#include <channelcomponent.h>
+#include "fftplotcomponent.h"
+#include <plotcomponent.h>
+
+namespace scopy {
+namespace adc {
+
+class SCOPY_ADC_EXPORT FFTPlotComponentChannel : public QObject, public PlotComponentChannel
+{
+	Q_OBJECT
+public:
+	FFTPlotComponentChannel(ChannelComponent *ch, FFTPlotComponent *plotComponent, QObject *parent);
+	~FFTPlotComponentChannel();
+
+	QWidget *createCurveMenu(QWidget *parent);
+	ChannelComponent *channelComponent() override;
+	PlotComponent *plotComponent() override;
+	PlotChannel* plotChannel() override;
+
+public Q_SLOTS:
+	void enable() override;
+	void disable() override;
+	void onNewData(const float *xData_, const float *yData_, size_t size, bool copy) override;
+	void lockYAxis(bool);
+	void refreshData(bool copy);
+
+	void initPlotComponent(PlotComponent *plotComponent) override;
+	void deinitPlotComponent() override;
+
+public:
+	PlotChannel *m_fftPlotCh = nullptr;
+	PlotAxis *m_fftPlotYAxis = nullptr;
+	PlotAxisHandle *m_fftPlotAxisHandle = nullptr;
+
+	FFTPlotComponent *m_plotComponent = nullptr;
+	ChannelComponent *m_ch;
+	bool m_singleYMode = false;
+	bool m_enabled;
+};
+} // namespace adc
+} // namespace scopy
+#endif // FFTPLOTCOMPONENTCHANNEL_H

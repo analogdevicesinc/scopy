@@ -21,6 +21,7 @@ public:
 	virtual void disable() = 0;
 	virtual void onNewData(const float *xData_, const float *yData_, size_t size, bool copy) = 0;
 	virtual PlotComponent* plotComponent() = 0;
+	virtual PlotChannel* plotChannel() = 0;
 	virtual void initPlotComponent(PlotComponent *plotComponent) = 0;
 	virtual void deinitPlotComponent() = 0;
 };

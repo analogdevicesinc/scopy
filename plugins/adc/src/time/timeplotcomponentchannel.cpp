@@ -157,6 +157,11 @@ PlotComponent *TimePlotComponentChannel::plotComponent()
 	return m_plotComponent;
 }
 
+PlotChannel *TimePlotComponentChannel::plotChannel()
+{
+	return m_timePlotCh;
+}
+
 void TimePlotComponentChannel::enable()
 {
 	m_timePlotCh->enable();

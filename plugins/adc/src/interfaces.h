@@ -45,6 +45,12 @@ public:
 	virtual double sampleRate() = 0;
 };
 
+class SCOPY_ADC_EXPORT FftInstrumentComponent {
+public:
+	virtual bool complexMode() = 0;
+	virtual void setComplexMode(bool b) = 0;
+};
+
 class SCOPY_ADC_EXPORT ScaleProvider
 {
 public:

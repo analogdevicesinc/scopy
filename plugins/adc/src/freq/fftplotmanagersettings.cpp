@@ -1,21 +1,17 @@
-#include "timeplotmanagersettings.h"
+#include "fftplotmanagersettings.h"
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menuheader.h>
 #include <gui/stylehelper.h>
-#include <timeplotcomponentsettings.h>
-
 #include <grtimechannelcomponent.h>
 
 namespace scopy {
 namespace adc {
 
-TimePlotManagerSettings::TimePlotManagerSettings(TimePlotManager *mgr, QWidget *parent)
+FFTPlotManagerSettings::FFTPlotManagerSettings(FFTPlotManager *mgr, QWidget *parent)
 	: QWidget(parent)
 	, ToolComponent()
-	, m_syncMode(false)
 	, m_sampleRateAvailable(false)
-	, m_rollingMode(false)
 {
 	m_plotManager = mgr;
 	auto *w = createMenu(this);
@@ -26,12 +22,12 @@ TimePlotManagerSettings::TimePlotManagerSettings(TimePlotManager *mgr, QWidget *
 	setLayout(lay);
 }
 
-TimePlotManagerSettings::~TimePlotManagerSettings() {}
+FFTPlotManagerSettings::~FFTPlotManagerSettings() {}
 
-QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
+QWidget *FFTPlotManagerSettings::createMenu(QWidget *parent)
 {
 	m_pen = QPen(StyleHelper::getColor("ScopyBlue"));
-	m_menu = new MenuWidget("TIME PLOT", m_pen, parent);
+	m_menu = new MenuWidget("FFT PLOT", m_pen, parent);
 
 	QWidget *xaxismenu = createXAxisMenu(m_menu);
 
@@ -40,12 +36,12 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 
 	connect(m_addPlotBtn, &QPushButton::clicked, this, [=]() {
 		uint32_t idx = m_plotManager->addPlot("Plot ");
-		TimePlotComponent *plt = m_plotManager->plot(idx);
+		FFTPlotComponent *plt = m_plotManager->plot(idx);
 		addPlot(plt);
 	});
 
 	connect(m_plotManager, &PlotManager::plotRemoved, this, [=](uint32_t uuid) {
-		TimePlotComponent *plt = m_plotManager->plot(uuid);
+		FFTPlotComponent *plt = m_plotManager->plot(uuid);
 		removePlot(plt);
 	});
 
@@ -69,66 +65,25 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 	return m_menu;
 }
 
-QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
+QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 {
 	MenuSectionCollapseWidget *section =
 		new MenuSectionCollapseWidget("X-AXIS", MenuCollapseSection::MHCW_NONE, parent);
 
-	QWidget *bufferPlotSize = new QWidget(section);
-	QHBoxLayout *bufferPlotSizeLayout = new QHBoxLayout(bufferPlotSize);
-	bufferPlotSizeLayout->setMargin(0);
-	bufferPlotSizeLayout->setSpacing(10);
-	bufferPlotSize->setLayout(bufferPlotSizeLayout);
-
 	m_bufferSizeSpin = new ScaleSpinButton(
 		{
-			{"samples", 1e0},
-			{"ksamples", 1e3},
-			{"Msamples", 1e6},
-		},
-		"Buffer Size", 16, DBL_MAX, false, false, bufferPlotSize);
+		 {"samples", 1e0},
+		 {"ksamples", 1e3},
+		 {"Msamples", 1e6},
+		 },
+		"Buffer Size", 16, DBL_MAX, false, false, section);
 
 	connect(m_bufferSizeSpin, &ScaleSpinButton::valueChanged, this, [=](double val) {
-		if(m_plotSizeSpin->value() < val) {
-			m_plotSizeSpin->setValue(val);
-		}
-		m_plotSizeSpin->setMinValue(val);
 		setBufferSize((uint32_t)val);
 	});
 
-	connect(this, &TimePlotManagerSettings::bufferSizeChanged, m_bufferSizeSpin, &ScaleSpinButton::setValue);
+	connect(this, &FFTPlotManagerSettings::bufferSizeChanged, m_bufferSizeSpin, &ScaleSpinButton::setValue);
 
-	m_plotSizeSpin = new ScaleSpinButton(
-		{
-			{"samples", 1e0},
-			{"ksamples", 1e3},
-			{"Msamples", 1e6},
-			{"Gsamples", 1e9},
-		},
-		"Plot Size", 16, DBL_MAX, false, false, bufferPlotSize);
-
-	connect(m_plotSizeSpin, &ScaleSpinButton::valueChanged, this, [=](double val) { setPlotSize((uint32_t)val); });
-
-	bufferPlotSizeLayout->addWidget(m_bufferSizeSpin);
-	bufferPlotSizeLayout->addWidget(m_plotSizeSpin);
-
-	m_syncBufferPlot = new MenuOnOffSwitch(tr("SYNC BUFFER-PLOT SIZES"), section, false);
-	connect(m_syncBufferPlot->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
-		m_plotSizeSpin->setEnabled(!b);
-		m_rollingModeSw->setEnabled(!b);
-		if(b) {
-			m_rollingModeSw->onOffswitch()->setChecked(false);
-			m_plotSizeSpin->setValue(m_bufferSizeSpin->value());
-			connect(m_bufferSizeSpin, &ScaleSpinButton::valueChanged, m_plotSizeSpin,
-				&ScaleSpinButton::setValue);
-		} else {
-			disconnect(m_bufferSizeSpin, &ScaleSpinButton::valueChanged, m_plotSizeSpin,
-				   &ScaleSpinButton::setValue);
-		}
-	});
-	m_rollingModeSw = new MenuOnOffSwitch(tr("ROLLING MODE"), section, false);
-	connect(m_rollingModeSw->onOffswitch(), &QAbstractButton::toggled, this,
-		&TimePlotManagerSettings::setRollingMode);
 
 	QWidget *xMinMax = new QWidget(section);
 	QHBoxLayout *xMinMaxLayout = new QHBoxLayout(xMinMax);
@@ -138,26 +93,26 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 	m_xmin = new PositionSpinButton(
 		{
-			{"ns", 1E-9},
-			{"μs", 1E-6},
-			{"ms", 1E-3},
-			{"s", 1e0},
-			{"ks", 1e3},
-			{"Ms", 1e6},
-			{"Gs", 1e9},
-		},
+		 {"ns", 1E-9},
+		 {"μs", 1E-6},
+		 {"ms", 1E-3},
+		 {"s", 1e0},
+		 {"ks", 1e3},
+		 {"Ms", 1e6},
+		 {"Gs", 1e9},
+		 },
 		"XMin", -DBL_MAX, DBL_MAX, false, false, xMinMax);
 
 	m_xmax = new PositionSpinButton(
 		{
-			{"ns", 1E-9},
-			{"μs", 1E-6},
-			{"ms", 1E-3},
-			{"s", 1e0},
-			{"ks", 1e3},
-			{"Ms", 1e6},
-			{"Gs", 1e9},
-		},
+		 {"ns", 1E-9},
+		 {"μs", 1E-6},
+		 {"ms", 1E-3},
+		 {"s", 1e0},
+		 {"ks", 1e3},
+		 {"Ms", 1e6},
+		 {"Gs", 1e9},
+		 },
 		"XMax", -DBL_MAX, DBL_MAX, false, false, xMinMax);
 
 	connect(m_xmin, &PositionSpinButton::valueChanged, this,
@@ -179,8 +134,8 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 		if(xcb->itemData(idx) == XMODE_SAMPLES) {
 			m_sampleRateSpin->setValue(1);
 			for(PlotComponent *plt : m_plotManager->plots()) {
-				auto p = dynamic_cast<TimePlotComponent*>(plt);
-				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(0);
+				auto p = dynamic_cast<FFTPlotComponent*>(plt);
+				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(0);
 			}
 
 		}
@@ -190,8 +145,8 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_sampleRateSpin->setValue(readSampleRate());
 
 			for(PlotComponent *plt : m_plotManager->plots()) {
-				auto p = dynamic_cast<TimePlotComponent*>(plt);
-				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
+				auto p = dynamic_cast<FFTPlotComponent*>(plt);
+				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
 			}
 
 		}
@@ -199,32 +154,30 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setEnabled(true);
 			for(PlotComponent *plt : m_plotManager->plots()) {
-				auto p = dynamic_cast<TimePlotComponent*>(plt);
-				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
+				auto p = dynamic_cast<FFTPlotComponent*>(plt);
+				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
 			}
 		}
 	});
 
 	m_sampleRateSpin = new PositionSpinButton(
 		{
-			{"Hz", 1e0},
-			{"kHz", 1e3},
-			{"MHz", 1e6},
-			{"GHz", 1e9},
-		},
+		 {"Hz", 1e0},
+		 {"kHz", 1e3},
+		 {"MHz", 1e6},
+		 {"GHz", 1e9},
+		 },
 		"SampleRate", 1, DBL_MAX, false, false, section);
 
 	m_sampleRateSpin->setValue(10);
 	m_sampleRateSpin->setEnabled(false);
 	connect(m_sampleRateSpin, &PositionSpinButton::valueChanged, this, [=](double val) { setSampleRate(val); });
 
-	connect(this, &TimePlotManagerSettings::sampleRateChanged, m_sampleRateSpin, &PositionSpinButton::setValue);
+	connect(this, &FFTPlotManagerSettings::sampleRateChanged, m_sampleRateSpin, &PositionSpinButton::setValue);
 
 	section->contentLayout()->setSpacing(10);
 
-	section->contentLayout()->addWidget(bufferPlotSize);
-	section->contentLayout()->addWidget(m_syncBufferPlot);
-	section->contentLayout()->addWidget(m_rollingModeSw);
+	section->contentLayout()->addWidget(m_bufferSizeSpin);
 	section->contentLayout()->addWidget(xMinMax);
 	section->contentLayout()->addWidget(m_xModeCb);
 	section->contentLayout()->addWidget(m_sampleRateSpin);
@@ -233,22 +186,20 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	return section;
 }
 
-void TimePlotManagerSettings::onInit()
+void FFTPlotManagerSettings::onInit()
 {
 	m_bufferSizeSpin->setValue(32);
-	m_plotSizeSpin->setValue(32);
 	m_sampleRateSpin->setValue(1);
 	m_xmin->setValue(0);
 	m_xmax->setValue(31);
-	m_syncBufferPlot->onOffswitch()->setChecked(true);
 	m_xModeCb->combo()->setCurrentIndex(0);
 
-	//	m_rollingModeSw->onOffswitch()->setChecked(false);
+	       //	m_rollingModeSw->onOffswitch()->setChecked(false);
 }
 
-double TimePlotManagerSettings::sampleRate() const { return m_sampleRate; }
+double FFTPlotManagerSettings::sampleRate() const { return m_sampleRate; }
 
-void TimePlotManagerSettings::setSampleRate(double newSampleRate)
+void FFTPlotManagerSettings::setSampleRate(double newSampleRate)
 {
 	if(qFuzzyCompare(m_sampleRate, newSampleRate))
 		return;
@@ -257,31 +208,9 @@ void TimePlotManagerSettings::setSampleRate(double newSampleRate)
 	updateXAxis();
 }
 
-bool TimePlotManagerSettings::rollingMode() const { return m_rollingMode; }
+uint32_t FFTPlotManagerSettings::bufferSize() const { return m_bufferSize; }
 
-void TimePlotManagerSettings::setRollingMode(bool newRollingMode)
-{
-	if(m_rollingMode == newRollingMode)
-		return;
-	m_rollingMode = newRollingMode;
-	Q_EMIT rollingModeChanged(newRollingMode);
-	updateXAxis();
-}
-
-uint32_t TimePlotManagerSettings::plotSize() const { return m_plotSize; }
-
-void TimePlotManagerSettings::setPlotSize(uint32_t newPlotSize)
-{
-	if(m_plotSize == newPlotSize)
-		return;
-	m_plotSize = newPlotSize;
-	Q_EMIT plotSizeChanged(newPlotSize);
-	updateXAxis();
-}
-
-uint32_t TimePlotManagerSettings::bufferSize() const { return m_bufferSize; }
-
-void TimePlotManagerSettings::setBufferSize(uint32_t newBufferSize)
+void FFTPlotManagerSettings::setBufferSize(uint32_t newBufferSize)
 {
 	if(m_bufferSize == newBufferSize)
 		return;
@@ -290,27 +219,23 @@ void TimePlotManagerSettings::setBufferSize(uint32_t newBufferSize)
 	updateXAxis();
 }
 
-void TimePlotManagerSettings::updateXAxis()
+void FFTPlotManagerSettings::updateXAxis()
 {
 
 	double min = 0;
-	double max = m_plotSize;
+	double max = m_bufferSize;
 
 	min = min / m_sampleRate;
 	max = max / m_sampleRate;
 
-	if(m_rollingMode) {
-		m_xmin->setValue(max);
-		m_xmax->setValue(min);
-	} else {
-		m_xmin->setValue(min);
-		m_xmax->setValue(max);
-	}
+	m_xmin->setValue(min);
+	m_xmax->setValue(max);
+
 }
 
-MenuWidget *TimePlotManagerSettings::menu() { return m_menu; }
+MenuWidget *FFTPlotManagerSettings::menu() { return m_menu; }
 
-void TimePlotManagerSettings::onStart()
+void FFTPlotManagerSettings::onStart()
 {
 	QComboBox *cb = m_xModeCb->combo();
 
@@ -321,27 +246,15 @@ void TimePlotManagerSettings::onStart()
 		Q_EMIT sampleRateChanged(m_sampleRate);
 	}
 
-	Q_EMIT plotSizeChanged(m_plotSize);
-	Q_EMIT rollingModeChanged(m_rollingMode);
 	Q_EMIT bufferSizeChanged(m_bufferSize);
 	updateXAxis();
 }
 
-bool TimePlotManagerSettings::syncBufferPlotSize() const { return m_syncBufferPlotSize; }
-
-void TimePlotManagerSettings::setSyncBufferPlotSize(bool newSyncBufferPlotSize)
-{
-	if(m_syncBufferPlotSize == newSyncBufferPlotSize)
-		return;
-	m_syncBufferPlotSize = newSyncBufferPlotSize;
-	Q_EMIT syncBufferPlotSizeChanged(newSyncBufferPlotSize);
-}
-
-void TimePlotManagerSettings::addPlot(TimePlotComponent *p)
+void FFTPlotManagerSettings::addPlot(FFTPlotComponent *p)
 {
 	QWidget *plotMenu = p->plotMenu();
 
-	connect(p, &TimePlotComponent::nameChanged, this, [=](QString newName){
+	connect(p, &FFTPlotComponent::nameChanged, this, [=](QString newName){
 		int idx = m_plotCb->combo()->findData(p->uuid());
 		m_plotCb->combo()->setItemText(idx,newName);
 	});
@@ -351,12 +264,12 @@ void TimePlotManagerSettings::addPlot(TimePlotComponent *p)
 	setPlotComboVisible();
 }
 
-void TimePlotManagerSettings::setPlotComboVisible() {
+void FFTPlotManagerSettings::setPlotComboVisible() {
 	bool visible = m_plotCb->combo()->count() > 1;
 	m_plotSection->setVisible(visible);
 }
 
-void TimePlotManagerSettings::removePlot(TimePlotComponent *p)
+void FFTPlotManagerSettings::removePlot(FFTPlotComponent *p)
 {
 	QWidget *plotMenu = p->plotMenu();
 	// m_menu->remove(plotMenu);
@@ -367,7 +280,7 @@ void TimePlotManagerSettings::removePlot(TimePlotComponent *p)
 	setPlotComboVisible();
 }
 
-void TimePlotManagerSettings::addChannel(ChannelComponent *c)
+void FFTPlotManagerSettings::addChannel(ChannelComponent *c)
 {
 	m_channels.append(c);
 	SampleRateProvider *srp = dynamic_cast<SampleRateProvider *>(c);
@@ -376,7 +289,7 @@ void TimePlotManagerSettings::addChannel(ChannelComponent *c)
 	}
 }
 
-void TimePlotManagerSettings::removeChannel(ChannelComponent *c)
+void FFTPlotManagerSettings::removeChannel(ChannelComponent *c)
 {
 	m_channels.removeAll(c);
 	SampleRateProvider *srp = dynamic_cast<SampleRateProvider *>(c);
@@ -385,15 +298,15 @@ void TimePlotManagerSettings::removeChannel(ChannelComponent *c)
 	}
 }
 
-void TimePlotManagerSettings::addSampleRateProvider(SampleRateProvider *s)
+void FFTPlotManagerSettings::addSampleRateProvider(SampleRateProvider *s)
 {
 	updateXModeCombo();
 	m_sampleRateProviders.append(s);
 }
 
-void TimePlotManagerSettings::removeSampleRateProvider(SampleRateProvider *s) { m_sampleRateProviders.removeAll(s); }
+void FFTPlotManagerSettings::removeSampleRateProvider(SampleRateProvider *s) { m_sampleRateProviders.removeAll(s); }
 
-double TimePlotManagerSettings::readSampleRate()
+double FFTPlotManagerSettings::readSampleRate()
 {
 	double sr = 1;
 	for(SampleRateProvider *ch : qAsConst(m_sampleRateProviders)) {
@@ -405,7 +318,7 @@ double TimePlotManagerSettings::readSampleRate()
 	return sr;
 }
 
-void TimePlotManagerSettings::updateXModeCombo()
+void FFTPlotManagerSettings::updateXModeCombo()
 {
 	if(m_sampleRateAvailable) // already set
 		return;
@@ -416,7 +329,7 @@ void TimePlotManagerSettings::updateXModeCombo()
 	}
 }
 
-/*void TimePlotManagerSettings::collapseAllAndOpenMenu(QString s) {
+/*void FFTPlotManagerSettings::collapseAllAndOpenMenu(QString s) {
 	m_menu->collapseAll();
 	m_menu->setCollapsed(s, true);
 }*/
