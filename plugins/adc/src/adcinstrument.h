@@ -24,6 +24,8 @@ namespace adc {
 
 class ADCInstrument : public QWidget
 {
+	friend class ADCFFTInstrumentController;
+	friend class ADCTimeInstrumentController;
 	friend class ADCInstrumentController;
 	Q_OBJECT
 public:
@@ -69,6 +71,7 @@ private:
 	AddBtn *addBtn;
 	RemoveBtn *removeBtn;
 	RunBtn *m_runBtn;
+	QPushButton *m_complex;
 	SingleShotBtn *m_singleBtn;
 	QPushButton *m_sync;
 	MenuControlButton *channelsBtn;

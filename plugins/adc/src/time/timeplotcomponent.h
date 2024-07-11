@@ -2,7 +2,6 @@
 #define TIMEPLOTCOMPONENT_H
 
 #include "scopy-adc_export.h"
-#include "toolcomponent.h"
 
 #include <QFuture>
 #include <QTimer>
@@ -26,7 +25,6 @@ class TimePlotComponentSettings;
 class TimePlotComponentChannel;
 class PlotComponentChannel;
 class ChannelComponent;
-
 
 class SCOPY_ADC_EXPORT TimePlotComponent : public PlotComponent
 {

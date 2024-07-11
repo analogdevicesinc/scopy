@@ -4,6 +4,7 @@
 #include "griiodevicesource.h"
 #include "iioutil/iiounits.h"
 #include "scopy-gr-util_export.h"
+#include <gnuradio/blocks/stream_to_vector.h>
 
 namespace scopy::grutil {
 class SCOPY_GR_UTIL_EXPORT GRIIOFloatChannelSrc : public GRIIOChannel
@@ -31,8 +32,10 @@ public:
 
 protected:
 	gr::basic_block_sptr x2f;
+	gr::blocks::stream_to_vector::sptr s2v;
 
 private:
+	GRTopBlock *m_top;
 	IIOUnit m_unit;
 	const iio_data_format *fmt;
 	iio_channel *m_iioCh;

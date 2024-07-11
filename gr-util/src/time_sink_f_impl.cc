@@ -40,9 +40,9 @@ using namespace gr;
 
 namespace scopy {
 
-time_sink_f::sptr time_sink_f::make(int size, float sampleRate, const std::string &name, int nconnections)
+time_sink_f::sptr time_sink_f::make(int size, size_t vlen,  float sampleRate, const std::string &name, int nconnections)
 {
-	return gnuradio::get_initial_sptr(new time_sink_f_impl(size, sampleRate, name, nconnections));
+	return gnuradio::get_initial_sptr(new time_sink_f_impl(size, vlen, sampleRate, name, nconnections));
 }
 
 void time_sink_f_impl::generate_time_axis()
@@ -68,9 +68,10 @@ void time_sink_f_impl::generate_time_axis()
 	}
 }
 
-time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string &name, int nconnections)
-	: sync_block("time_sink_f", io_signature::make(nconnections, nconnections, sizeof(float)),
+time_sink_f_impl::time_sink_f_impl(int size, size_t vlen, float sampleRate, const std::string &name, int nconnections)
+	: sync_block("time_sink_f", io_signature::make(nconnections, nconnections, sizeof(float) * vlen),
 		     io_signature::make(0, 0, 0))
+	, m_vlen(vlen)
 	, m_size(size)
 	, m_sampleRate(sampleRate)
 	, m_name(name)
@@ -86,16 +87,11 @@ time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string
 	qInfo(CAT_TIME_SINK_F) << "ctor";
 	// reserve memory for n buffers
 	m_data.reserve(nconnections);
-	/*m_dataTags.reserve(nconnections);
-	m_tags.reserve(nconnections);*/
+
 
 	for(int i = 0; i < m_nconnections; i++) {
 		m_buffers.push_back(std::deque<float>());
 		m_data.push_back(std::vector<float>());
-		/*m_localtags.push_back(std::vector<tag_t>());
-		m_tags.push_back(std::deque<tag_t>());
-		m_dataTags.push_back(std::vector<PlotTag_t>());*/
-		// each data buffer reserves size
 		m_data[i].reserve(size);
 		for(int j = 0; j < size; j++) {
 			m_data[i].push_back(0);
@@ -119,27 +115,11 @@ uint64_t time_sink_f_impl::updateData()
 
 	for(int i = 0; i < m_nconnections; i++) {
 		m_data[i].clear();
-		// m_dataTags[i].clear();
 		for(int j = 0; j < m_buffers[i].size(); j++) {
 			m_data[i].push_back(m_buffers[i][j]);
 		}
-
-		/*	if(!m_computeTags)
-				continue;
-
-			for(int j = 0; j < m_tags[i].size(); j++) {
-				PlotTag_t tag;
-
-				std::stringstream s;
-				s << m_tags[i][j].key << ": " << m_tags[i][j].value;
-				tag.str = QString::fromStdString(s.str());
-				qInfo() << "nitems_read(i)" << nitems_read(i) << "tag.offset" << m_tags[i][j].offset;
-				;
-				tag.offset = nitems_read(i) - m_tags[i][j].offset;
-
-				m_dataTags[i].push_back(tag);
-			}*/
 	}
+
 	//	nitems_read();
 	if(m_workFinished) {
 		m_dataUpdated = true;
@@ -165,8 +145,6 @@ const std::vector<float> &time_sink_f_impl::time() const { return m_time; }
 const std::vector<float> &time_sink_f_impl::freq() const { return m_freq; }
 
 const std::vector<std::vector<float>> &time_sink_f_impl::data() const { return m_data; }
-
-const std::vector<std::vector<PlotTag_t>> &time_sink_f_impl::tags() const { return m_dataTags; }
 
 bool time_sink_f_impl::start()
 {
@@ -195,13 +173,12 @@ int time_sink_f_impl::work(int noutput_items, gr_vector_const_void_star &input_i
 		for(int i = 0; i < m_nconnections; i++) {
 			if(m_buffers[i].size() >= m_size) {
 				m_buffers[i].clear();
-				// m_tags[i].clear();
 			}
 		}
 	}
 
 	for(int i = 0; i < m_nconnections; i++) {
-		for(int j = 0; j < noutput_items; j++) {
+		for(int j = 0; j < noutput_items * m_vlen; j++) {
 			if(m_buffers[i].size() >= m_size) {
 				m_buffers[i].pop_back();
 			}
@@ -211,29 +188,9 @@ int time_sink_f_impl::work(int noutput_items, gr_vector_const_void_star &input_i
 			m_buffers[i].push_front(in[j]);
 		}
 
-		/*if(m_computeTags) {
-			m_localtags[i].clear();
-			get_tags_in_window(m_localtags[i], i, 0, noutput_items);
-			m_tags[i].insert(m_tags[i].end(), m_localtags[i].begin(), m_localtags[i].end());
-			while(m_size < nitems_read(i) - m_tags[i].front().offset) {
-				m_tags[i].pop_front();
-			}
-		}*/
 	}
 
 	return noutput_items;
-}
-
-bool time_sink_f_impl::computeTags() { return m_computeTags; }
-
-void time_sink_f_impl::setComputeTags(bool newComputeTags)
-{
-	m_computeTags = newComputeTags;
-	//	for(int i = 0; i < m_nconnections; i++) {
-	//		m_dataTags[i].clear();
-	//		m_tags[i].clear();
-	//		m_localtags[i].clear();
-	//	}
 }
 
 float time_sink_f_impl::freqOffset() { return m_freqOffset; }

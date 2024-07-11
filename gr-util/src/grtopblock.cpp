@@ -50,6 +50,17 @@ void GRTopBlock::unregisterIIODeviceSource(GRIIODeviceSource *dev)
 	rebuild();
 }
 
+void GRTopBlock::setVLen(size_t vlen)
+{
+	m_vlen = vlen;
+}
+
+size_t GRTopBlock::vlen()
+{
+	return m_vlen;
+}
+
+
 void GRTopBlock::build()
 {
 

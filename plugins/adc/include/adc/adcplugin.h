@@ -57,6 +57,7 @@ public:
 private:
 	iio_context *m_ctx;
 	QLineEdit *edit;
+	QList<ADCInstrumentController*> m_ctrls;
 
 	void createGRIIOTreeNode(GRTopBlockNode *node, iio_context *ctx);
 };
