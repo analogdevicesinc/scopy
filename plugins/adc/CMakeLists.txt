@@ -35,6 +35,9 @@ file(
 	src/time/*.c
 	src/time/*.cpp
 	src/time/*.h
+	src/freq/*.c
+	src/freq/*.cpp
+	src/freq/*.h
 )
 file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 file(GLOB UI_LIST ui/*.ui)
@@ -52,16 +55,6 @@ add_library(
 	${PROJECT_NAME} SHARED
 	${PROJECT_SOURCES}
 	${PROJECT_RESOURCES}
-	src/timeplotmanager.h
-	src/timeplotmanager.cpp
-	src/timeplotcomponentchannel.h
-	src/timeplotcomponentchannel.cpp
-	src/timeplotmanagersettings.h
-	src/timeplotmanagersettings.cpp
-	src/importchannelcomponent.h
-	src/importchannelcomponent.cpp
-	src/plotcomponent.h src/plotcomponent.cpp
-	src/plotmanager.h src/plotmanager.cpp
 )
 
 generate_export_header(
