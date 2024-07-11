@@ -24,6 +24,8 @@ namespace adc {
 
 class ADCInstrument : public QWidget
 {
+	friend class ADCFFTInstrumentController;
+	friend class ADCTimeInstrumentController;
 	friend class ADCInstrumentController;
 	Q_OBJECT
 public:
