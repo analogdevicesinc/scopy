@@ -16,7 +16,8 @@
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
 
-#include "adcinstrumentcontroller.h"
+#include "adctimeinstrumentcontroller.h"
+#include "adcfftinstrumentcontroller.h"
 
 Q_LOGGING_CATEGORY(CAT_ADCPLUGIN, "ADCPlugin");
 using namespace scopy;
@@ -198,6 +199,7 @@ bool ADCPlugin::onConnect()
 	createGRIIOTreeNode(ctxNode, m_ctx);
 
 	newInstrument(TIME,root);
+	newInstrument(FREQUENCY,root);
 
 	return true;
 }
@@ -205,19 +207,23 @@ bool ADCPlugin::onConnect()
 void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode* root) {
 
 	static int idx = 0;
+	ADCInstrumentController *adc;
+	ADCInstrument *ui;
+
+	if(t == TIME) {
 	m_toolList.append(
 		SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
 	auto tme = m_toolList.last();
 	tme->setEnabled(true);
 	tme->setRunBtnVisible(true);
 
-	auto adc = new ADCInstrumentController(tme, "adc" + QString::number(idx), root, this);
-	auto ui = adc->ui();
+	adc = new ADCTimeInstrumentController(tme, "adc" + QString::number(idx), root, this);
+	adc->init();
+	ui = adc->ui();
 	idx++;
 
-	connect(root, &AcqTreeNode::newChild, adc, &ADCInstrumentController::addChannel, Qt::QueuedConnection);
-	connect(root, &AcqTreeNode::deletedChild, adc, &ADCInstrumentController::removeChannel,
-		Qt::QueuedConnection);
+	connect(root, &AcqTreeNode::newChild, dynamic_cast<ADCTimeInstrumentController*>(adc), &ADCTimeInstrumentController::addChannel, Qt::QueuedConnection);
+	connect(root, &AcqTreeNode::deletedChild,  dynamic_cast<ADCTimeInstrumentController*>(adc), &ADCTimeInstrumentController::removeChannel,		Qt::QueuedConnection);
 
 	connect(ui, &ADCInstrument::requestNewInstrument, this, [=](ADCInstrumentType t){
 		newInstrument(t, root);
@@ -232,8 +238,41 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode* root) {
 		}
 		deleteInstrument(t);
 	});
+	} else if(t == FREQUENCY) {
+
+		m_toolList.append(
+			SCOPY_NEW_TOOLMENUENTRY("freq", "Frequency", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+		auto tme = m_toolList.last();
+		tme->setEnabled(true);
+		tme->setRunBtnVisible(true);
+
+		adc = new ADCFFTInstrumentController(tme, "adc" + QString::number(idx), root, this);
+		adc->init();
+		ui = adc->ui();
+		idx++;
+
+		connect(root, &AcqTreeNode::newChild, dynamic_cast<ADCFFTInstrumentController*>(adc), &ADCFFTInstrumentController::addChannel, Qt::QueuedConnection);
+		connect(root, &AcqTreeNode::deletedChild,  dynamic_cast<ADCFFTInstrumentController*>(adc), &ADCFFTInstrumentController::removeChannel,		Qt::QueuedConnection);
+
+		connect(ui, &ADCInstrument::requestNewInstrument, this, [=](ADCInstrumentType t){
+			newInstrument(t, root);
+		});
+
+		connect(ui, &ADCInstrument::requestDeleteInstrument, this, [=](){
+			ToolMenuEntry *t = nullptr;
+			for(auto tool : qAsConst(m_toolList)) {
+				if(tool->tool() == ui) {
+					t = tool;
+				}
+			}
+			deleteInstrument(t);
+		});
+	} else {
+		return;
+	}
 
 
+	auto tme = m_toolList.last();
 	Q_EMIT toolListChanged();
 	tme->setTool(ui);
 }
