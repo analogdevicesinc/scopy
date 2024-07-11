@@ -4,7 +4,7 @@
 #include "grproxyblock.h"
 #include "scopy-gr-util_export.h"
 
-#include <gnuradio/blocks/add_const_ff.h>
+#include <gnuradio/blocks/add_const_v.h>
 #include <gnuradio/blocks/multiply_const.h>
 
 namespace scopy::grutil {
@@ -18,10 +18,11 @@ public:
 	void destroy_blks(GRTopBlock *top);
 
 protected:
-	gr::blocks::add_const_ff::sptr add;
+	gr::blocks::add_const_v<float>::sptr add;
 	gr::blocks::multiply_const_ff::sptr mul;
 	double m_scale;
 	double m_offset;
+	GRTopBlock *m_top;
 };
 } // namespace scopy::grutil
 #endif // GRSCALEOFFSETPROC_H

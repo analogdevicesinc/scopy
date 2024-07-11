@@ -15,6 +15,7 @@ namespace scopy {
 namespace adc {
 class ChannelIdProvider;
 
+
 class SCOPY_ADC_EXPORT ADCInstrumentController :
 	  public QObject
 	, public AcqNodeChannelAware
@@ -24,41 +25,35 @@ class SCOPY_ADC_EXPORT ADCInstrumentController :
 	Q_OBJECT
 public:
 	ADCInstrumentController(ToolMenuEntry *tme, QString name, AcqTreeNode *tree, QObject *parent = nullptr);
-	~ADCInstrumentController();
+	virtual ~ADCInstrumentController();
 
 	ChannelIdProvider *getChannelIdProvider();
 public:
-	ToolComponent *getPlotAddon();
-	ToolComponent *getPlotSettings();
-
 	QList<ToolComponent *> getChannelAddons();
 	QList<ToolComponent *> getComponents();
 
 	ADCInstrument *ui() const;
 
 public Q_SLOTS:
-	void init();
-	void deinit();
-	void onStart();
-	void onStop();
+	virtual void init();
+	virtual void deinit();
+	virtual void onStart() override;
+	virtual void onStop() override;
 
-	void start();
-	void stop() override;
+	virtual void start();
+	virtual void stop() override;
 
-	void addChannel(AcqTreeNode *c) override;
-	void removeChannel(AcqTreeNode *c) override;
+protected Q_SLOTS:
+	virtual void stopUpdates();
+	virtual void startUpdates();
 
-private Q_SLOTS:
-	void stopUpdates();
-	void startUpdates();
+	virtual void setSingleShot(bool b);
+	virtual void setFrameRate(double val);
+	virtual void updateFrameRate();
+	virtual void handlePreferences(QString key, QVariant v);
 
-	void setSingleShot(bool b);
-	void setFrameRate(double val);
-	void updateFrameRate();
-	void handlePreferences(QString key, QVariant v);
-
-	void updateData();
-	void update();
+	virtual void updateData();
+	virtual void update();
 
 Q_SIGNALS:
 	void requestStart();
@@ -66,14 +61,13 @@ Q_SIGNALS:
 	void requestStartLater();
 	void requestStopLater();
 
-private:
+protected:
 	void setupChannelMeasurement(PlotManager *c, ChannelComponent *ch);
 
 	ADCInstrument *m_ui;
-	TimePlotManager *m_plotComponentManager;
+	PlotManager *m_plotComponentManager;
 	MapStackedWidget *plotStack;
 
-	TimePlotManagerSettings *m_timePlotSettingsComponent;
 	CursorComponent *m_cursorComponent;
 	MeasureComponent *m_measureComponent;
 
@@ -92,6 +86,7 @@ private:
 
 	bool m_refreshTimerRunning;
 };
+
 } // namespace adc
 } // namespace scopy
 #endif // ADCINSTRUMENTCONTROLLER_H
