@@ -39,6 +39,7 @@ public:
 	virtual MenuControlButton *ctrl();
 	virtual void addChannelToPlot();
 	virtual void removeChannelFromPlot();
+	virtual void setMenuControlButtonVisible(bool b);
 
 	MenuWidget *menu() override;
 	static void createMenuControlButton(ChannelComponent *c, QWidget *parent = nullptr);

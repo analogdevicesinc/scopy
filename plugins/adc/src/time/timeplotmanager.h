@@ -6,6 +6,7 @@
 #include <channelcomponent.h>
 #include <measurementpanel.h>
 #include "plotmanager.h"
+#include "time/timeplotcomponent.h"
 
 namespace scopy {
 namespace adc {

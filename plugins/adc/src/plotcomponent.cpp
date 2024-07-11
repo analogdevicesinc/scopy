@@ -66,7 +66,9 @@ void PlotComponent::addChannel(ChannelComponent *c)
 }
 
 void PlotComponent::selectChannel(ChannelComponent *c) {
-
+	for(auto plot : m_plots) {
+		plot->selectChannel(c->plotChannelCmpt()->plotChannel());
+	}
 }
 
 void PlotComponent::setXInterval(double min, double max)
