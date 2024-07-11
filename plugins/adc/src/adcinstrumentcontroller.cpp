@@ -340,22 +340,6 @@ void ADCInstrumentController::removeChannel(AcqTreeNode *node)
 	m_plotComponentManager->replot();
 }
 
-/*void ADCInstrumentController::createSnapshotChannel(SnapshotProvider::SnapshotRecipe rec)
-{
-	//	proxy->getChannelAddons().append(new ch)
-	qInfo() << "Creating snapshot from recipe" << rec.name;
-
-	int idx = chIdP->next();
-	ImportChannelAddon *ch = new ImportChannelAddon("REF-" + rec.name + "-" + QString::number(idx), plotAddon,
-							chidp->pen(idx), this);
-	proxy->addChannelAddon(ch);
-	ch->setData(rec.x, rec.y);
-	auto btn = addChannel(ch, vcm);
-	vcm->add(btn);
-	ch->onInit();
-	btn->animateClick(1);
-}*/
-
 void ADCInstrumentController::setupChannelMeasurement(PlotManager *c, ChannelComponent *ch)
 {
 	auto chMeasureableChannel = dynamic_cast<MeasurementProvider *>(ch);
