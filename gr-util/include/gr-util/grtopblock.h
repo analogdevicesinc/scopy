@@ -23,6 +23,9 @@ public:
 	void registerIIODeviceSource(GRIIODeviceSource *);
 	void unregisterIIODeviceSource(GRIIODeviceSource *);
 
+	void setVLen(size_t vlen);
+	size_t vlen();
+
 	void connect(gr::basic_block_sptr src, int srcPort, gr::basic_block_sptr dst, int dstPort);
 
 	gr::top_block_sptr getGrBlock();
@@ -53,6 +56,7 @@ private:
 	QString m_name;
 	bool running;
 	bool built;
+	size_t m_vlen;
 	QList<GRSignalPath *> m_signalPaths;
 	QList<GRIIODeviceSource *> m_iioDeviceSources;
 };

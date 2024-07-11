@@ -3,7 +3,6 @@
 
 #include "grtimesinkcomponent.h"
 #include "iioutil/iiounits.h"
-#include "menucollapsesection.h"
 #include "scopy-adc_export.h"
 #include "channelcomponent.h"
 #include <gui/plotautoscaler.h>
@@ -15,6 +14,7 @@
 #include "interfaces.h"
 #include <iio-widgets/iiowidget.h>
 #include <gui/widgets/menuwidget.h>
+#include "time/timeplotcomponent.h"
 
 namespace scopy {
 namespace adc {
@@ -103,6 +103,7 @@ public Q_SLOTS:
 	void addChannelToPlot() override;
 	void removeChannelFromPlot() override;
 
+
 Q_SIGNALS:
 	void yModeChanged();
 
@@ -141,6 +142,7 @@ private:
 	Q_PROPERTY(YMode ymode READ ymode WRITE setYMode NOTIFY yModeChanged);
 
 	YMode m_ymode;
+
 };
 
 } // namespace adc
