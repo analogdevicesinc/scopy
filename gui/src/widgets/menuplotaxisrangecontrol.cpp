@@ -29,26 +29,43 @@ MenuPlotAxisRangeControl::MenuPlotAxisRangeControl(PlotAxis *m_plotAxis, QWidget
 		},
 		"Max", -DBL_MAX, DBL_MAX, false, false, this);
 
+	addAxis(m_plotAxis);
 	minMaxLayout->addWidget(m_min);
 	minMaxLayout->addWidget(m_max);
+
+}
+
+
+void MenuPlotAxisRangeControl::addAxis(PlotAxis *ax) {
 	// Connects
-	connect(m_min, &PositionSpinButton::valueChanged, m_plotAxis, &PlotAxis::setMin);
-	connect(m_min, &PositionSpinButton::valueChanged, this,
+
+	if(connections.contains(ax))
+		return;
+
+	connections[ax] << connect(m_min, &PositionSpinButton::valueChanged, ax, &PlotAxis::setMin);
+	connections[ax] << connect(m_min, &PositionSpinButton::valueChanged, this,
 		[=](double) { Q_EMIT intervalChanged(m_min->value(), m_max->value()); });
-	connect(m_plotAxis, &PlotAxis::minChanged, this, [=]() {
+	connections[ax] << connect(ax, &PlotAxis::minChanged, this, [=]() {
 		QSignalBlocker b(m_min);
-		m_min->setValue(m_plotAxis->min());
+		m_min->setValue(ax->min());
 		Q_EMIT intervalChanged(m_min->value(), m_max->value());
 	});
 
-	connect(m_max, &PositionSpinButton::valueChanged, m_plotAxis, &PlotAxis::setMax);
-	connect(m_max, &PositionSpinButton::valueChanged, this,
+	connections[ax] << connect(m_max, &PositionSpinButton::valueChanged, ax, &PlotAxis::setMax);
+	connections[ax] << connect(m_max, &PositionSpinButton::valueChanged, this,
 		[=](double) { Q_EMIT intervalChanged(m_min->value(), m_max->value()); });
-	connect(m_plotAxis, &PlotAxis::maxChanged, this, [=]() {
+	connections[ax] << connect(ax, &PlotAxis::maxChanged, this, [=]() {
 		QSignalBlocker b(m_max);
-		m_max->setValue(m_plotAxis->max());
+		m_max->setValue(ax->max());
 		Q_EMIT intervalChanged(m_min->value(), m_max->value());
 	});
+}
+
+void MenuPlotAxisRangeControl::removeAxis(PlotAxis *ax) {
+	for(const QMetaObject::Connection &c : qAsConst(connections[ax])) {
+		QObject::disconnect(c);
+	}
+	connections.remove(ax);
 }
 
 MenuPlotAxisRangeControl::~MenuPlotAxisRangeControl() {}

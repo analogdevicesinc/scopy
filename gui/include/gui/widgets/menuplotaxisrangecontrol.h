@@ -23,9 +23,13 @@ public Q_SLOTS:
 	void setMin(double);
 	void setMax(double);
 
+	void addAxis(PlotAxis *ax);
+	void removeAxis(PlotAxis *ax);
 private:
 	PositionSpinButton *m_min;
 	PositionSpinButton *m_max;
+
+	QMap<PlotAxis*, QList<QMetaObject::Connection>> connections;
 };
 } // namespace scopy::gui
 

@@ -14,6 +14,7 @@ public:
 	~ImportChannelComponent();
 
 	virtual void onInit() override;
+
 public Q_SLOTS:
 	void forgetChannel();
 
@@ -33,6 +34,11 @@ private:
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createYAxisMenu(QWidget *parent);
 	QWidget *createCurveMenu(QWidget *parent);
+
+	// ChannelComponent interface
+public:
+	void addChannelToPlot() override;
+	void removeChannelFromPlot() override;
 };
 } // namespace adc
 } // namespace scopy

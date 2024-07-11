@@ -299,14 +299,18 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 
 void GRTimeChannelComponent::addChannelToPlot()
 {
+	m_yCtrl->addAxis(m_timePlotComponentChannel->m_timePlotYAxis);
 	m_curvemenu->addChannels(m_timePlotComponentChannel->m_timePlotCh);
 	m_curvemenu->addChannels(m_timePlotComponentChannel->m_xyPlotCh);
+	m_autoscaler->addChannels(m_timePlotComponentChannel->m_timePlotCh);
 }
 
 void GRTimeChannelComponent::removeChannelFromPlot()
 {
+	m_yCtrl->removeAxis(m_timePlotComponentChannel->m_timePlotYAxis);
 	m_curvemenu->removeChannels(m_timePlotComponentChannel->m_timePlotCh);
 	m_curvemenu->removeChannels(m_timePlotComponentChannel->m_xyPlotCh);
+	m_autoscaler->removeChannels(m_timePlotComponentChannel->m_timePlotCh);
 }
 
 IIOUnit GRTimeChannelComponent::unit() const
