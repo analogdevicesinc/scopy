@@ -1,5 +1,6 @@
 #include "qlineedit.h"
 #include <smallOnOffSwitch.h>
+#include <style.h>
 #include <widgets/menucollapsesection.h>
 
 using namespace scopy;

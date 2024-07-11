@@ -29,14 +29,14 @@ RegmapStyleHelper *RegmapStyleHelper::GetInstance()
 void RegmapStyleHelper::initColorMap()
 {
 	auto sh = RegmapStyleHelper::GetInstance();
-	sh->colorMap.insert("ScopyBlue", Style::getAttribute(json::theme::color_highlight));
-	sh->colorMap.insert("UIElementBackground", Style::getAttribute(json::theme::background));
-	sh->colorMap.insert("LabelText", Style::getAttribute(json::theme::highlight));
+	sh->colorMap.insert("ScopyBlue", Style::getAttribute(json::theme::highlight_color));
+	sh->colorMap.insert("UIElementBackground", Style::getAttribute(json::theme::background_primary));
+	sh->colorMap.insert("LabelText", Style::getAttribute(json::theme::highlight_primary));
 	sh->colorMap.insert("LabelText2", "rgba(255, 255, 255, 150)");
-	sh->colorMap.insert("ScopyBackground", Style::getAttribute(json::theme::color_background));
-	sh->colorMap.insert("WidgetBackground", Style::getAttribute(json::theme::background));
-	sh->colorMap.insert("ButtonPressed", Style::getAttribute(json::theme::highlight));
-	sh->colorMap.insert("ButtonHover", Style::getAttribute(json::theme::color_highlight));
+	sh->colorMap.insert("ScopyBackground", Style::getAttribute(json::theme::background_color));
+	sh->colorMap.insert("WidgetBackground", Style::getAttribute(json::theme::background_primary));
+	sh->colorMap.insert("ButtonPressed", Style::getAttribute(json::theme::highlight_primary));
+	sh->colorMap.insert("ButtonHover", Style::getAttribute(json::theme::highlight_color));
 	sh->colorMap.insert("ButtonDisabled", "grey");
 	sh->colorMap.insert("Red", "red");
 	sh->colorMap.insert("Transparent", "transparent");
@@ -73,15 +73,15 @@ QString RegmapStyleHelper::FrameWidgetStyle()
                                  border-right: 2px solid black;
                                  border-left: 2px solid black;
                                  border-bottom: 2px solid black;
-                                 background-color: &&background&& ;
+                                 background-color: &&background_primary&& ;
                         }
 
                         QWidget  {
-                            background-color: &&background&& ;
+                            background-color: &&background_primary&& ;
                         }
 
                         )css");
-	style.replace("&&background&&", RegmapStyleHelper::getColor("WidgetBackground"));
+	style.replace("&&background_primary&&", RegmapStyleHelper::getColor("WidgetBackground"));
 
 	return style;
 }
@@ -215,7 +215,7 @@ void RegmapStyleHelper::regmapSettingsMenu(RegisterMapSettingsMenu *settings, QS
 
 	QString style = QString(R"css(
                         QWidget {
-                                 background-color: &&background&& ;
+                                 background-color: &&background_primary&& ;
                         }
                         QWidget {
                                  font: normal;
@@ -224,7 +224,7 @@ void RegmapStyleHelper::regmapSettingsMenu(RegisterMapSettingsMenu *settings, QS
                         }
                         )css");
 
-	style.replace("&&background&&", RegmapStyleHelper::getColor("Transparent"));
+	style.replace("&&background_primary&&", RegmapStyleHelper::getColor("Transparent"));
 	style.replace("&&textColor&&", RegmapStyleHelper::getColor("LabelText"));
 
 	style += RegmapStyleHelper::BlueButtonStyle();

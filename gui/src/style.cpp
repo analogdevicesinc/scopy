@@ -57,7 +57,7 @@ QPixmap Style::getPixmap(QString pixmap, QColor color)
 {
 	if(color.isValid())
 		return Util::ChangeSVGColor(pixmap, color.name(), 1);
-	return Util::ChangeSVGColor(pixmap, getAttribute(json::theme::color_highlight), 1);
+	return Util::ChangeSVGColor(pixmap, getAttribute(json::theme::highlight_color), 1);
 }
 
 QString Style::getTheme() { return QFileInfo(m_themeJsonPath).fileName().replace(".json", ""); }
@@ -105,12 +105,29 @@ QString Style::getAttribute(const char *key)
 		attr = m_global_json->object().value(key).toString();
 	}
 
-	return attr;
+	return replaceAttribute(attr);
 }
 
 QColor Style::getColor(const char *key) { return QColor(getAttribute(key)); }
 
 int Style::getDimension(const char *key) { return getAttribute(key).toInt(); }
+
+QString Style::replaceAttribute(QString style)
+{
+	if(style.contains("&")) {
+		for(const QString &key : m_theme_json->object().keys()) {
+			QJsonValue value = m_theme_json->object().value(key);
+			style.replace("&" + key + "&", value.toString());
+		}
+		for(const QString &key : m_global_json->object().keys()) {
+			QJsonValue value = m_global_json->object().value(key);
+			style.replace("&" + key + "&", value.toString());
+		}
+		replaceAttribute(style);
+	}
+
+	return style;
+}
 
 void Style::applyStyle()
 {
@@ -119,16 +136,7 @@ void Style::applyStyle()
 	QString style = QString(file.readAll());
 	file.close();
 
-	for(const QString &key : m_theme_json->object().keys()) {
-		QJsonValue value = m_theme_json->object().value(key);
-		style.replace("&" + key + "&", value.toString());
-	}
-	for(const QString &key : m_global_json->object().keys()) {
-		QJsonValue value = m_global_json->object().value(key);
-		style.replace("&" + key + "&", value.toString());
-	}
-
+	style = replaceAttribute(style);
 	qApp->setStyleSheet(style);
-
 	std::cout << style.toStdString() << std::endl;
 }

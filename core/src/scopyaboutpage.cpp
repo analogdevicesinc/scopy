@@ -7,6 +7,7 @@
 #include <QTabBar>
 #include <QTabWidget>
 #include <QVBoxLayout>
+#include <style.h>
 
 #include <stylehelper.h>
 
@@ -39,6 +40,7 @@ QWidget *ScopyAboutPage::buildPage(QString src)
 	lay->addWidget(browser);
 	lay->setMargin(0);
 	initNavigationWidget(browser);
+	browser->setStyleSheet("background-color: " + Style::getAttribute(json::theme::focus_item));
 
 	if(QFile::exists(QString(src).replace("qrc:/", ":/"))) {
 		browser->setSource(src);

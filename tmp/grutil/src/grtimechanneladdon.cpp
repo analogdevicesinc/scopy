@@ -11,7 +11,6 @@
 #include <QVBoxLayout>
 
 #include <gui/stylehelper.h>
-#include <gui/widgets/menubigswitch.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/menuheader.h>

@@ -3,6 +3,7 @@
 #include "ui_toolbrowser.h"
 
 #include <QDebug>
+#include <style.h>
 
 #include <gui/utils.h>
 
@@ -27,6 +28,12 @@ ToolBrowser::ToolBrowser(QWidget *parent)
 	ui->homePlaceholder->layout()->addWidget(homeTmi);
 	Util::retainWidgetSizeWhenHidden(ui->logo);
 	homeTmi->setDraggable(false);
+
+	ui->btnLoad->setIcon(Style::getPixmap(":/gui/icons/scopy-default/icons/load.svg"));
+	ui->btnSave->setIcon(Style::getPixmap(":/gui/icons/scopy-default/icons/save.svg"));
+	ui->btnAbout->setIcon(Style::getPixmap(":/gui/icons/scopy-default/icons/info.svg"));
+	ui->btnPreferences->setIcon(Style::getPixmap(":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+	ui->btnCollapseMini->setIcon(Style::getPixmap(":/gui/icons/scopy-default/icons/menu.svg"));
 
 	connect(ui->btnCollapse, &QPushButton::clicked, this, &ToolBrowser::toggleCollapse);
 	connect(ui->btnCollapseMini, &QPushButton::clicked, this, &ToolBrowser::toggleCollapse);

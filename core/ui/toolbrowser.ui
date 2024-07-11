@@ -43,19 +43,6 @@
  border-radius:5px;
 }
 
-
-#btnSave {
- qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/save.svg&quot;);
-}
-#btnLoad {
- qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/load.svg&quot;);
-}
-#btnPreferences {
- qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/gear_wheel.svg&quot;);
-}
-#btnAbout {
- qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/info.svg&quot;);
-}
 #logo {
 background-image: url(:/gui/icons/scopy-default/icons/logo_analog.svg);
 background-repeat: no-repeat;
@@ -67,7 +54,6 @@ min-height:36px;
 #btnCollapseMini {
  height:40px;
  width:40px;
- background-image: url(:/gui/icons/scopy-default/icons/menu.svg);
  background-repeat: no-repeat;
  background-position: center center;
 }

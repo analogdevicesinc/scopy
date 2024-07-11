@@ -1,0 +1,21 @@
+QPushButton[&&property&&=true] {
+	width: 82px;
+	height: 32px;
+	border-radius: &radius_1&;
+	text-align: center;
+	padding: &padding_1&;
+	color: &highlight_primary&;
+	background-color: #ff7200;
+}
+
+QPushButton[&&property&&=true]:!checked {
+	background-color: #ff7200;
+}
+
+  QPushButton[&&property&&=true]:checked {
+	background-color: #F45000;
+}
+
+QPushButton[&&property&&=true]:disabled {
+	background-color: &highlight_disabled&;
+}

@@ -36,6 +36,7 @@
 #include <QRegExpValidator>
 #include <QVBoxLayout>
 #include <qmath.h>
+#include <style.h>
 
 using namespace std;
 using namespace scopy;
@@ -68,6 +69,14 @@ SpinBoxA::SpinBoxA(QWidget *parent)
 	connect(ui->SBA_LineEdit, SIGNAL(editingFinished()), SLOT(onLineEditTextEdited()));
 	connect(ui->SBA_UpButton, SIGNAL(clicked()), SLOT(onUpButtonPressed()));
 	connect(ui->SBA_DownButton, SIGNAL(clicked()), SLOT(onDownButtonPressed()));
+
+	ui->SBA_UpButton->setIcon(Style::getPixmap(":/gui/icons/add.svg", Style::getColor(json::theme::focus_item)));
+	Style::setStyle(ui->SBA_UpButton, style::button::basic);
+
+	ui->SBA_DownButton->setIcon(Style::getPixmap(":/gui/icons/add.svg", Style::getColor(json::theme::focus_item)));
+//	ui->SBA_DownButton->setStyleSheet("QWidget[test=true] { background-color: red; }");
+//	ui->SBA_DownButton->setProperty("test", true);
+	Style::setStyle(ui->SBA_DownButton, style::button::basic);
 
 	connect(this, SIGNAL(valueChanged(double)), ui->SBA_CompletionCircle, SLOT(setValueDouble(double)));
 	connect(ui->SBA_CompletionCircle, SIGNAL(toggled(bool)), SLOT(setFineMode(bool)));

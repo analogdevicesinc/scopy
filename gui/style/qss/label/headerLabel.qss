@@ -1,5 +1,5 @@
 QLabel[&&property&&] {
-    color: &background&;
+    color: &background_primary&;
 }
 
 QLabel[&&property&&=true] {

@@ -1,11 +1,16 @@
 {
-"background_deep": "#A0A1A3",
-"background": "#F0F1F3",
-"highlight": "#101820",
-"color_highlight": "#0067B9",
-"color_background": "#92BEFC",
-"highlight_disabled": "#848B95",
+"background_secondary": "#A0A1A3",
+"background_primary": "#F0F1F3",
+"highlight_primary": "#101820",
+"highlight_color": "#0067B9",
+"background_color": "#92BEFC",
+"highlight_secondary": "#848B95",
 "focus_item": "#FFFFFF",
-"svg_checkmark": ":/gui/icons/checkmark_light.svg"
+"hover_color": "#C6D8F6",
+"pressed_color": "#EDF3FC",
+"highlight_disabled": "#D5D8DC",
+"highlight_color_disabled": "#92BEFC",
+"svg_checkmark": ":/gui/icons/checkmark_light.svg",
+"svg_arrow_down": ":/gui/icons/handle_down_arrow_light.svg"
 }
 

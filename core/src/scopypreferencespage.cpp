@@ -51,6 +51,7 @@ void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text)
 	w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	QWidget *pane = new QWidget();
+	pane->setStyleSheet("background-color: " + Style::getAttribute(json::theme::background_secondary) + ";");
 	QHBoxLayout *lay = new QHBoxLayout();
 	lay->setMargin(10);
 	pane->setLayout(lay);

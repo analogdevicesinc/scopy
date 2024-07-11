@@ -1,4 +1,5 @@
 #include "scopyhomeinfopage.h"
+#include "style.h"
 
 #include "ui_scopyhomeinfopage.h"
 
@@ -13,6 +14,7 @@ ScopyHomeInfoPage::ScopyHomeInfoPage(QWidget *parent)
 	, ui(new Ui::ScopyHomeInfoPage)
 {
 	ui->setupUi(this);
+	Style::setStyle(ui->textBrowser, style::widget::border);
 	//	initReportButton();
 }
 

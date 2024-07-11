@@ -1,9 +1,9 @@
 QWidget[&&property&&=true] {
-    background-color: &background&;
-    border: 1px solid &color_highlight&;
+    background-color: &background_primary&;
+    border: 1px solid &highlight_color&;
     padding: 10px;
-    font-size: &unit_pixel_1&;
-    color: &color_highlight&;
+    font-size: &unit_1&;
+    color: &highlight_color&;
     text-align: center;
 }
 

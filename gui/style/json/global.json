@@ -1,7 +1,11 @@
 {
-"unit_pixel_1": "16px",
-"unit_int_1": "16",
-"unit_pixel_2": "20px",
-"unit_int_2": "20",
-"radius_pixel_1": "4px"
+"font_size": "14px",
+"unit_05": "8",
+"unit_1": "16",
+"unit_2": "24",
+"radius_1": "4",
+"raduis_2": "8",
+"padding_1": "6",
+"padding_2": "12",
+"border_width": "1"
 }

@@ -1,0 +1,4 @@
+*[&&property&&=true] {
+border: &border_width& solid &highlight_secondary&; 
+border-radius: &radius_1&;
+}

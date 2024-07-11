@@ -40,18 +40,18 @@ DeviceBrowser::~DeviceBrowser()
 
 void DeviceBrowser::initBtns()
 {
-	StyleHelper::FrameBackgroundShadow(ui->containerHome);
-	StyleHelper::FrameBackgroundShadow(ui->containerAdd);
+	ui->containerHome->setStyleSheet("border: none");
+	ui->containerAdd->setStyleSheet("border: none");
 
 	bg = new QButtonGroup(this);
 
 	bg->addButton(ui->btnAdd);
 	bg->addButton(ui->btnHome);
 	ui->btnHome->setProperty(devBrowserId, "home");
-	ui->btnHome->setIcon(Style::getPixmap(":/gui/icons/home.svg", Style::getColor(json::theme::highlight)));
+	ui->btnHome->setIcon(Style::getPixmap(":/gui/icons/home.svg", Style::getColor(json::theme::focus_item)));
 	Style::setStyle(ui->btnHome, style::button::basic);
 	ui->btnAdd->setProperty(devBrowserId, "add");
-	ui->btnAdd->setIcon(Style::getPixmap(":/gui/icons/add.svg", Style::getColor(json::theme::highlight)));
+	ui->btnAdd->setIcon(Style::getPixmap(":/gui/icons/add.svg", Style::getColor(json::theme::focus_item)));
 	Style::setStyle(ui->btnAdd, style::button::basic);
 	list.append(ui->btnHome);
 	list.append(ui->btnAdd);

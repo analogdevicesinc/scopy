@@ -7,25 +7,10 @@
 using namespace scopy;
 QWidget *PreferencesHelper::addPreferenceCheckBox(Preferences *p, QString id, QString description, QObject *parent)
 {
-//	QWidget *widget = new QWidget();
-//	QHBoxLayout *layout = new QHBoxLayout();
-//	layout->setMargin(0);
-//	layout->setSpacing(0);
-//	layout->setMargin(0);
-//	widget->setLayout(layout);
-
 	SmallOnOffSwitch *pref = new SmallOnOffSwitch(description);
 	pref->setChecked(p->get(id).toBool());
 	parent->connect(pref, &SmallOnOffSwitch::toggled, parent, [p, id](bool b) { p->set(id, b); });
 
-//	QLabel *label = new QLabel(description);
-//	label->setStyleSheet("font-weight: bold");
-
-//	QSpacerItem *space = new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Preferred);
-
-//	layout->addWidget(pref);
-//	layout->addSpacerItem(space);
-//	layout->addWidget(label);
 	return pref;
 }
 

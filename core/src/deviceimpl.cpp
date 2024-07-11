@@ -203,7 +203,7 @@ void DeviceImpl::loadBadges()
 {
 	QPushButton *forgetBtn = new QPushButton();
 	forgetBtn->setMaximumSize(25, 25);
-	forgetBtn->setIcon(Style::getPixmap(":/gui/icons/orange_close.svg"));
+	forgetBtn->setIcon(Style::getPixmap(":/gui/icons/orange_close.svg", Style::getColor(json::theme::focus_item)));
 	connect(forgetBtn, &QPushButton::clicked, this, &DeviceImpl::forget);
 	HoverWidget *forgetHover = new HoverWidget(forgetBtn, m_icon, m_icon);
 	forgetHover->setStyleSheet("background-color: transparent; border: 0px;");

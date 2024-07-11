@@ -178,7 +178,7 @@ void ToolMenuItem::_buildUI()
 	layout->addWidget(toolBtn);
 	layout->addWidget(toolRunBtn);
 
-	setDynamicProperty(toolRunBtn, "stopButton", true);
+	Style::setStyle(toolRunBtn, style::button::stopButton);
 	toolRunBtn->setMaximumSize(32, 32);
 	toolBtn->setMinimumHeight(42);
 

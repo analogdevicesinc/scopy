@@ -49,22 +49,20 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 {
 	QElapsedTimer timer;
 	timer.start();
+	initPreferences();
 
 	ScopyTitleManager::setMainWindow(this);
 	ScopyTitleManager::setApplicationName("Scopy");
 	ScopyTitleManager::setScopyVersion("v" + QString(scopy::config::version()));
 	ScopyTitleManager::setGitHash(QString(SCOPY_VERSION_GIT));
+
+	StyleHelper::GetInstance()->initColorMap();
 	IIOUnitsManager::GetInstance();
-
 	setAttribute(Qt::WA_QuitOnClose, true);
-	initPreferences();
-	StyleHelper::GetInstance()->initColorMap();
-	StyleHelper::GetInstance()->initColorMap();
 	initPythonWIN32();
-
-	ui->setupUi(this);
 	initStatusBar();
-	Style::setStyle(ui->centralwidget, style::widget::footer);
+
+//	Style::setStyle(ui->centralwidget, style::widget::footer);
 	Style::setStyle(ui->animHolder, style::widget::deviceList);
 
 	ConnectionProvider::GetInstance();
@@ -288,6 +286,9 @@ void ScopyMainWindow::initPreferences()
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 
+	Style::GetInstance()->setTheme(Preferences::GetInstance()->get("general_theme").toString());
+	ui->setupUi(this);
+
 	if(p->get("general_use_opengl").toBool()) {
 		m_glLoader = new QOpenGLWidget(this);
 	}
@@ -305,13 +306,12 @@ void ScopyMainWindow::initPreferences()
 
 		QMetaObject::invokeMethod(license, &LicenseOverlay::showOverlay, Qt::QueuedConnection);
 	}
+
 	QString theme = p->get("general_theme").toString();
 	QString themeName = "scopy-" + theme;
 	QIcon::setThemeName(themeName);
 	QIcon::setThemeSearchPaths({":/gui/icons/" + themeName});
 	qInfo(CAT_BENCHMARK) << "Init preferences took: " << timer.elapsed() << "ms";
-
-	Style::GetInstance()->setTheme(Preferences::GetInstance()->get("general_theme").toString());
 }
 
 void ScopyMainWindow::loadOpenGL()

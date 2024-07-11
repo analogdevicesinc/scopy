@@ -23,11 +23,8 @@
 
 #include "scopy-gui_export.h"
 
-#include <QHBoxLayout>
 #include <QLabel>
-#include <QMap>
 #include <QPushButton>
-#include <QWidget>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT CustomSwitch : public QPushButton
@@ -36,47 +33,25 @@ class SCOPY_GUI_EXPORT CustomSwitch : public QPushButton
 
 public:
 	explicit CustomSwitch(QWidget *parent = nullptr);
-//	explicit CustomSwitch(const QString &text, QWidget *parent = nullptr);
-
-//	QSize sizeHint() const override;
-//	void setChecked(bool checked);
+	explicit CustomSwitch(QString on, QString off, QWidget *parent = nullptr);
+	~CustomSwitch();
 
 	void setOnText(const QString text);
 	void setOffText(const QString text);
 
-	void setOn(const QPixmap &pixmap);
-	void setOff(const QPixmap &pixmap);
+	QSize sizeHint() const override;
+
+public Q_SLOTS:
+	void update();
 
 protected:
-//	void resizeEvent(QResizeEvent *event) override;
+	void init();
 	void paintEvent(QPaintEvent *event) override;
-//	void mouseReleaseEvent(QMouseEvent *event) override;
-//	void enterEvent(QEvent *event) override;
-//	int offset() const;
-//	void setOffset(int value);
+	bool event(QEvent *) override;
 
 private:
-	QLabel *onLabel;
-	QLabel *offLabel;
-	QHBoxLayout *layout;
-
-
-
-
-	int m_spacing;
-	int m_btn_width;
-	int m_track_radius;
-	int m_thumb_radius;
-	int m_margin;
-	int m_base_offset;
-	int m_offset;
-	qreal m_track_opacity;
-
-	QMap<bool, QColor> m_track_color;
-	QMap<bool, QColor> m_thumb_color;
-	QMap<bool, QColor> m_text_color;
-	QMap<bool, QString> m_text;
-	QMap<bool, std::function<int()>> m_end_offset;
+	QLabel *m_onLabel;
+	QLabel *m_offLabel;
 };
 } // namespace scopy
 

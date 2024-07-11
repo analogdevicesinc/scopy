@@ -41,17 +41,20 @@ class SCOPY_GUI_EXPORT SmallOnOffSwitch : public QCheckBox
 public:
 	explicit SmallOnOffSwitch(QWidget *parent = nullptr);
 	explicit SmallOnOffSwitch(const QString &text, QWidget *parent = nullptr);
+	~SmallOnOffSwitch();
 
 	QSize sizeHint() const override;
-	void setChecked(bool checked);
+
+public Q_SLOTS:
+	void toggleAnim();
 
 protected:
 	void resizeEvent(QResizeEvent *event) override;
 	void paintEvent(QPaintEvent *event) override;
-	void mouseReleaseEvent(QMouseEvent *event) override;
 	void enterEvent(QEvent *event) override;
 	int offset() const;
 	void setOffset(int value);
+	void init();
 
 private:
 	int m_spacing;
@@ -64,6 +67,7 @@ private:
 	qreal m_track_opacity;
 
 	QMap<bool, QColor> m_track_color;
+	QMap<bool, QColor> m_track_color_disabled;
 	QMap<bool, QColor> m_thumb_color;
 	QMap<bool, std::function<int()>> m_end_offset;
 };

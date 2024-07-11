@@ -1,17 +1,5 @@
 QPushButton[&&property&&=true] {
-    background-color: &color_highlight&; /* Blue background color */
-    color: &highlight&; /* White text color */
-    border: none; /* No border */
-    padding: 10px 20px; /* Padding for size */
-    border-radius: 10px; /* Rounded corners */
-    font-size: 16px; /* Font size */
-    font-weight: bold; /* Bold text */
+    background-color: &highlight_color&;
+    color: &focus_item&;
 }
 
-QPushButton[&&property&&=true]:hover {
-    background-color: &color_background&; /* Darker blue on hover */
-}
-
-QPushButton[&&property&&=true]:pressed {
-    background-color: &color_background&; /* Even darker blue on press */
-}

@@ -7,7 +7,6 @@
 #include <QLoggingCategory>
 
 #include <gui/stylehelper.h>
-#include <gui/widgets/menubigswitch.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/menulineedit.h>

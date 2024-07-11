@@ -70,37 +70,16 @@ RunBtn::RunBtn(QWidget *parent)
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	setText("Run");
 	connect(this, &QPushButton::toggled, this, [=](bool b) { setText(b ? "Stop" : "Run"); });
-	QString style = QString(R"css(
-			QPushButton {
-				width: 88px;
-				height: 48px;
-					border-radius: 2px;
-					text-align: left;
-					padding-left: 20px;
-					padding-right: 20px;
-				color: white;
-					font-weight: 700;
-					font-size: 14px;
-			}
+	Style::setStyle(this, style::button::runSingle);
+	setStyleSheet("background-color: " + Style::getAttribute(json::theme::highlight_color) + ";");
 
-			QPushButton:!checked {
-				background-color: #27b34f;
-			}
-
-			  QPushButton:checked {
-				background-color: #F45000;
-			}
-
-			QPushButton:disabled {
-				background-color: grey;
-			})css");
-
-	setStyleSheet(style);
 	QIcon icon1;
-	icon1.addPixmap(Style::getPixmap(":/gui/icons/play.svg"), QIcon::Normal, QIcon::Off);
-	icon1.addPixmap(Style::getPixmap(":/gui/icons/scopy-default/icons/play_stop.svg"), QIcon::Normal, QIcon::On);
+	icon1.addPixmap(Style::getPixmap(":/gui/icons/play.svg", Style::getColor(json::theme::focus_item)),
+			QIcon::Normal, QIcon::Off);
+	icon1.addPixmap(Style::getPixmap(":/gui/icons/scopy-default/icons/play_stop.svg",
+					 Style::getColor(json::theme::focus_item)),
+			QIcon::Normal, QIcon::On);
 	setIcon(icon1);
-	setLayoutDirection(Qt::RightToLeft);
 }
 
 SingleShotBtn::SingleShotBtn(QWidget *parent)
@@ -111,39 +90,17 @@ SingleShotBtn::SingleShotBtn(QWidget *parent)
 	setChecked(false);
 	setText("Single");
 	connect(this, &QPushButton::toggled, this, [=](bool b) { setText(b ? "Stop" : "Single"); });
-	QString style = QString(R"css(
-			QPushButton {
-				width: 88px;
-				height: 48px;
-					border-radius: 2px;
-					text-align: left;
-					padding-left: 20px;
-					padding-right: 20px;
-				color: white;
-					font-weight: 700;
-					font-size: 14px;
-				opacity: 80;
-			}
+	Style::setStyle(this, style::button::runSingle);
+	setStyleSheet("background-color: #ff7200;");
 
-			QPushButton:!checked {
-				background-color: #ff7200;
-			}
-
-			  QPushButton:checked {
-				background-color: #F45000;
-			}
-
-			QPushButton:disabled {
-				background-color: grey;
-			}
-			)css");
-
-	setStyleSheet(style);
 	QIcon icon1;
-	icon1.addPixmap(Style::getPixmap(":/gui/icons/play_oneshot.svg"), QIcon::Normal, QIcon::Off);
-	icon1.addPixmap(Style::getPixmap(":/gui/icons/scopy-default/icons/play_stop.svg"), QIcon::Normal, QIcon::On);
+	icon1.addPixmap(
+		Style::getPixmap(":/gui/icons/play_oneshot.svg", Style::getColor(json::theme::focus_item)),
+		QIcon::Normal, QIcon::Off);
+	icon1.addPixmap(Style::getPixmap(":/gui/icons/scopy-default/icons/play_stop.svg",
+					 Style::getColor(json::theme::focus_item)),
+			QIcon::Normal, QIcon::On);
 	setIcon(icon1);
-	setLayoutDirection(Qt::RightToLeft);
 }
 
 #include "moc_toolbuttons.cpp"

@@ -1,73 +1,111 @@
 /* General Application Style */
 * {
-    background-color: &background&;
-    color: &highlight&;
+    background-color: &background_primary&;
+    color: &highlight_primary&;
     font-family: Arial, sans-serif;
-    font-size: 16px;
+    font-size: &font_size&;
+}
+
+*:focus {
+    outline: none;
+}
+
+QCheckBox::indicator {
+	height: &unit_1&;
+	width: &unit_1&;
+	border-radius: &radius_1&;
+}
+
+QCheckBox::indicator::unchecked {
+	border: &border_width& solid &highlight_secondary&;
+	background-color: &focus_item&;
+	image: none;
+}
+
+QCheckBox::indicator::checked {
+	border: &border_width& solid &highlight_color&;
+	background-color: &highlight_color&;
+	image: url(&svg_checkmark&);
+}
+
+QPushButton {
+    background-color: transparent;
+    border: none;
+    padding: &padding_1& &padding_2&;
+    border-radius: &radius_1&;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background-color: &hover_color&;
+}
+
+QPushButton:pressed {
+    background-color: &pressed_color&;
 }
 
 /* Tabs */
 QTabBar::tab {
-    background: &background&;
-    color: &highlight&;
+    background: &background_primary&;
+    color: &highlight_primary&;
     padding: 10px;
 }
 
 QTabBar::tab:selected {
-    background: &color_background&;
-    color: &highlight&;
+    background: &background_color&;
+    color: &highlight_primary&;
 }
 
 QTabWidget::pane {
-    border: 1px solid &highlight&;
+    border: &border_width& solid &highlight_primary&;
 }
 
 /* Group Boxes */
 QGroupBox {
-    border: 1px solid &highlight&;
+    border: &border_width& solid &highlight_primary&;
     border-radius: 5px;
     margin-top: 10px;
-    color: &highlight&;
+    color: &highlight_primary&;
 }
 
 QGroupBox::title {
     subcontrol-origin: margin;
     subcontrol-position: top left;
     padding: 0 3px;
-    background-color: &color_background&;
-    color: &highlight&;
+    background-color: &background_color&;
+    color: &highlight_primary&;
     border-radius: 3px;
 }
 
-/* Sliders */
+/* 
 QSlider::groove:horizontal {
-    border: 1px solid &highlight&;
+    border: &border_width& solid &highlight_primary&;
     height: 8px;
-    background: &background_deep&;
+    background: &background_secondary&;
     margin: 2px 0;
 }
 
 QSlider::handle:horizontal {
-    background: &color_background&;
-    border: 1px solid &highlight&;
+    background: &background_color&;
+    border: &border_width& solid &highlight_primary&;
     width: 18px;
     margin: -2px 0;
     border-radius: 3px;
 }
+Sliders */
 
-/* Scrollbars */
+/* 
 QScrollBar:horizontal, QScrollBar:vertical {
-    background: &background&;
-    border: 1px solid &color_background&;
-    border-radius: 3px;
-    width: 10px;
+    background: &background_primary&;
+    border: &border_width& solid transparent;
+    border-radius: 4px;
     margin: 0px;
 }
 
 QScrollBar::handle:horizontal, QScrollBar::handle:vertical {
-    background: &color_background&;
-    min-width: 20px;
-    border-radius: 5px;
+    background: &highlight_color&;
+    min-width: &unit_2&;
+    border-radius: 4px;
 }
 
 QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal,
@@ -75,75 +113,128 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
     border: none;
     background: none;
 }
+*/
 
 /* Tool Buttons */
 QToolButton {
-    background-color: &color_background&;
-    color: &highlight&;
-    border-radius: 5px;
+    background-color: &background_color&;
+    color: &highlight_primary&;
+    border-radius: 4px;
     padding: 5px;
 }
 
 QToolButton:hover {
-    background-color: &background_deep&;
-    color: &highlight&;
+    background-color: &background_secondary&;
+    color: &highlight_primary&;
 }
 
-/* Comboboxes */
+
+
+
+
 QComboBox {
-    background-color: &background&;
-    color: &color_background&;
-    border: 1px solid &color_highlight&;
-    border-radius: 5px;
-    padding: 3px;
+height: &unit_2&;
+border: &border_width& solid &highlight_secondary&;
+border-radius: &radius_1&;
+background-color: &background_secondary&;
+color: &highlight_primary&;
 }
 
+QComboBox::item:selected {
+ border-bottom: 0px solid none;
+ background-color: &hover_color&;
+}
+QComboBox::item {
+ background-color: &background_secondary&;
+}
 QComboBox::drop-down {
-    background-color: &color_background&;
-    color: &background_deep&;
-    border-left: 1px solid &color_highlight&;
+ subcontrol-position: center right;
+ background-color: &background_secondary&;
+ padding-right: &padding_2&;
+ width: 10px;
+ height: 6px;
+ font-size: 16px;
+ text-align: left;
+}
+QComboBox::indicator {
+ width: 1px;
+ background-color: transparent;
+ selection-background-color: transparent;
+ color: transparent;
+ selection-color: transparent;
+}
+QComboBox::down-arrow{
+    image: url(&svg_arrow_down&);
 }
 
-QComboBox QAbstractItemView {
-    background-color: &background&;
-    color: &background_deep&;
-    selection-background-color: &background_deep&;
-    selection-color: &background_deep&;
+
+
+QTabWidget::pane { 
+    border: 0; 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-*:focus {
+QTabBar::tab {
+    text-align: center;
     border: none;
-    outline: none;
 }
 
-QCheckBox::indicator {
-    width: &unit_pixel_1&;
-    height: &unit_pixel_1&;
-    border: 1px solid &highlight_disabled&;
-    border-radius: &radius_pixel_1&;
+QTabBar::tab:selected {
+    background: &pressed_color&;
+    border: 2px solid &background_primary&;
+}
+
+QTabBar::tab:hover {
+    background: &hover_color&;
+    border: 2px solid &background_primary&;
+}
+
+QTabBar QLabel {
     background-color: transparent;
 }
 
-QCheckBox::indicator:checked {
-    border: none;
-    border-radius: &radius_pixel_1&;
-    background-color: &color_highlight&;
-    image: url(&svg_checkmark&);
+
+
+
+
+
+
+/* fix this */
+QScrollArea { border: 0px;}
+QScrollBar:vertical {
+ background: &background_secondary&;
+ max-width:  &unit_05&;
+}
+QScrollBar::handle:vertical {
+ background: &highlight_color&;
+ border: 0;
+ border-radius: &radius_1&;
+}
+QScrollBar::handle:vertical:hover {
+ background: &background_color&;
+ border: 0;
+ border-radius: &radius_1&;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+ border: none;
+ background: none;
+}
+QScrollBar:horizontal {
+ background: &background_secondary&;
+ max-height: &unit_05&;
+ border-radius: &radius_1&;
+}
+QScrollBar::handle:horizontal {
+ background: &highlight_color&;
+ border: 0;
+ border-radius: &radius_1&;
+}
+QScrollBar::handle:horizontal:hover {
+ background: &background_color&;
+ border: 0;
+ border-radius: &radius_1&;
+}
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+ border: none;
+ background: none;
 }

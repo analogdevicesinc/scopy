@@ -113,10 +113,8 @@
         <file>icons/trigger_rising_disabled.svg</file>
         <file>icons/trigger_rising_enabled.svg</file>
         <file>icons/v_cursor_handle.svg</file>
-        <file>stylesheets/bigCustomSwitch.qss</file>
         <file>stylesheets/browser.qss</file>
         <file>stylesheets/channel_widget.qss</file>
-        <file>stylesheets/customSwitch.qss</file>
         <file>stylesheets/default.qss</file>
         <file>stylesheets/dropdown_switch_list.qss</file>
         <file>stylesheets/light.qss</file>
@@ -162,6 +160,8 @@
         <file>icons/search_crossed.svg</file>
         <file>icons/checkmark_light.svg</file>
         <file>icons/checkmark_dark.svg</file>
+        <file>icons/handle_down_arrow_dark.svg</file>
+        <file>icons/handle_down_arrow_light.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>

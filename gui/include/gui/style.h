@@ -29,6 +29,9 @@ public:
 	bool setTheme(QString theme);
 	QStringList getThemeList();
 
+protected:
+	static QString replaceAttribute(QString style);
+
 private:
 	static Style *pinstance_;
 	static QJsonDocument *m_global_json;

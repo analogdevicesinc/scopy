@@ -1,20 +1,20 @@
 QWidget[&&property&&=true] {
-    background-color: &highlight&;
-    border: 1px solid &background_deep&;
+    background-color: &highlight_primary&;
+    border: 1px solid &background_secondary&;
     border-radius: 8px;
     padding: 10px;
-    color: &background&;
+    color: &background_primary&;
     font-size: 14px;
     margin-bottom: 10px;
     text-align: left;
 }
 
 QWidget[&&property&&=true]:hover {
-    border-color: &background&;
+    border-color: &background_primary&;
 }
 
 QWidget[&&property&&=true]:checked {
-    background-color: &background&;
-    border-color: &background_deep&;
+    background-color: &background_primary&;
+    border-color: &background_secondary&;
 }
 

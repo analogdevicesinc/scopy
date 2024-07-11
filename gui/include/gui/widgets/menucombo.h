@@ -21,7 +21,6 @@ public:
 	virtual ~MenuCombo();
 
 	QComboBox *combo();
-	void applyStylesheet();
 
 private:
 	QLabel *m_label;
@@ -38,7 +37,6 @@ public:
 	virtual ~MenuComboWidget();
 
 	QComboBox *combo();
-	void applyStylesheet();
 
 private:
 	MenuCombo *m_combo;
