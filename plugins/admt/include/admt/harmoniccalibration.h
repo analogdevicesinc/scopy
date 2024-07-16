@@ -15,6 +15,9 @@
 #include <QTimer>
 #include <QSpacerItem>
 #include <QVariant>
+#include <QTabWidget>
+#include <QListWidget>
+#include <QPlainTextEdit>
 
 #include <iio.h>
 #include <iioutil/connectionprovider.h>
@@ -61,8 +64,10 @@ private:
 	QPushButton *openLastMenuButton;
 	QButtonGroup *rightMenuButtonGroup;
 
-	QLineEdit *sampleRateLineEdit, *bufferSizeLineEdit, *dataGraphSamplesLineEdit, *tempGraphSamplesLineEdit;
-	QLabel *rotationValueLabel, *angleValueLabel, *countValueLabel, *tempValueLabel;
+	QLineEdit *sampleRateLineEdit, *bufferSizeLineEdit, *dataGraphSamplesLineEdit, *tempGraphSamplesLineEdit, 
+			*calibrationH1MagLineEdit, *calibrationH2MagLineEdit, *calibrationH3MagLineEdit, *calibrationH8MagLineEdit,
+			*calibrationH1PhaseLineEdit, *calibrationH2PhaseLineEdit, *calibrationH3PhaseLineEdit, *calibrationH8PhaseLineEdit;
+	QLabel *rotationValueLabel, *angleValueLabel, *countValueLabel, *tempValueLabel, *calibrationAngleLabel;
 
 	Sismograph *dataGraph, *tempGraph;
 
@@ -72,6 +77,12 @@ private:
 	MenuCollapseSection *rotationCollapse, *angleCollapse, *countCollapse, *tempCollapse;
 	MenuCombo *m_dataGraphChannelMenuCombo, *m_dataGraphDirectionMenuCombo, *m_tempGraphDirectionMenuCombo;
 
+	QTabWidget *tabWidget;
+
+	QListWidget *rawDataListWidget;
+
+	QPlainTextEdit *logsPlainTextEdit;
+
 	void updateChannelValues();
 	void updateLineEditValues();
 	void updateGeneralSettingEnabled(bool value);
@@ -80,11 +91,29 @@ private:
 	void connectMenuComboToGraphDirection(MenuCombo* menuCombo, Sismograph* graph);
 	void changeGraphColorByChannelName(Sismograph* graph, const char* channelName);
 	void connectMenuComboToGraphChannel(MenuCombo* menuCombo, Sismograph* graph);
+	ToolTemplate* createCalibrationWidget();
+	void updateLabelValue(QLabel* label, int channelIndex);
+	void updateChannelValue(int channelIndex);
+	void calibrationTask();
+	void addAngleToRawDataList();
+	void removeLastItemFromRawDataList();
+	void calibrateData();
+	void registerCalibrationData();
 
-	QTimer *timer;
+	QTimer *timer, *calibrationTimer;
 
 	int uuid = 0;
 	const char *rotationChannelName, *angleChannelName, *countChannelName, *temperatureChannelName;
 };
+
+enum TABS
+{
+	ACQUISITION = 0,
+	UTILITIES = 1,
+	CALIBRATION = 2,
+};
+
+
+
 } // namespace scopy::admt
 #endif // HARMONICCALIBRATION_H
