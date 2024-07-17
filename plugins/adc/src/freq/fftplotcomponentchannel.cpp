@@ -56,6 +56,8 @@ void FFTPlotComponentChannel::initPlotComponent(PlotComponent *pc)
 	int yPlotAxisPosition = Preferences::get("adc_plot_yaxis_label_position").toInt();
 	int yPlotAxisHandle = Preferences::get("adc_plot_yaxis_handle_position").toInt();
 	m_fftPlotYAxis = new PlotAxis(yPlotAxisPosition, fftplot, m_ch->pen(), this);
+	m_fftPlotYAxis->setUnits("dB");
+
 	m_fftPlotCh = new PlotChannel(m_ch->name(), m_ch->pen(), fftplot->xAxis(), m_fftPlotYAxis, this);
 	m_fftPlotAxisHandle = new PlotAxisHandle(fftplot, m_fftPlotYAxis);
 
@@ -75,7 +77,7 @@ void FFTPlotComponentChannel::initPlotComponent(PlotComponent *pc)
 	fftplot->addPlotChannel(m_fftPlotCh);
 	m_fftPlotCh->setEnabled(true);
 
-	// lockYAxis(m_plotComponent->singleYMode());
+	lockYAxis(true);
 	m_fftPlotYAxis->setInterval(-2048, 2048);
 	refreshData(true);
 }
@@ -96,24 +98,19 @@ void FFTPlotComponentChannel::onNewData(const float *xData_, const float *yData_
 
 void FFTPlotComponentChannel::lockYAxis(bool b)
 {
-	/*m_singleYMode = b;
+	m_singleYMode = b;
 	if(m_singleYMode) {
-		PlotAxis *time = m_plotComponent->timePlot()->yAxis();
-		PlotAxis *xy = m_plotComponent->xyPlot()->yAxis();
-		m_plotComponent->timePlot()->plotChannelChangeYAxis(m_timePlotCh, time);
-		m_plotComponent->xyPlot()->plotChannelChangeYAxis(m_xyPlotCh, xy);
+		PlotAxis *time = m_plotComponent->fftPlot()->yAxis();
+		m_plotComponent->fftPlot()->plotChannelChangeYAxis(m_fftPlotCh, time);
 	} else {
-		PlotAxis *time = m_timePlotYAxis;
-		PlotAxis *xy = m_xyPlotYAxis;
-		m_plotComponent->timePlot()->plotChannelChangeYAxis(m_timePlotCh, time);
-		m_plotComponent->xyPlot()->plotChannelChangeYAxis(m_xyPlotCh, xy);
+		PlotAxis *time = m_fftPlotYAxis;
+		m_plotComponent->fftPlot()->plotChannelChangeYAxis(m_fftPlotCh, time);
 	}
 
 
-	m_timePlotAxisHandle->handle()->setVisible(!b);
-	m_plotComponent->refreshXYXAxis();
+	m_fftPlotAxisHandle->handle()->setVisible(!b);
 	m_plotComponent->refreshAxisLabels();
-	m_plotComponent->replot();*/
+	m_plotComponent->replot();
 }
 
 QWidget *FFTPlotComponentChannel::createCurveMenu(QWidget *parent)

@@ -134,8 +134,8 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 		if(xcb->itemData(idx) == XMODE_SAMPLES) {
 			m_sampleRateSpin->setValue(1);
 			for(PlotComponent *plt : m_plotManager->plots()) {
-				auto p = dynamic_cast<TimePlotComponent*>(plt);
-				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(0);
+				auto p = dynamic_cast<FFTPlotComponent*>(plt);
+				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(0);
 			}
 
 		}
@@ -145,8 +145,8 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_sampleRateSpin->setValue(readSampleRate());
 
 			for(PlotComponent *plt : m_plotManager->plots()) {
-				auto p = dynamic_cast<TimePlotComponent*>(plt);
-				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
+				auto p = dynamic_cast<FFTPlotComponent*>(plt);
+				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
 			}
 
 		}
@@ -154,8 +154,8 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setEnabled(true);
 			for(PlotComponent *plt : m_plotManager->plots()) {
-				auto p = dynamic_cast<TimePlotComponent*>(plt);
-				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
+				auto p = dynamic_cast<FFTPlotComponent*>(plt);
+				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
 			}
 		}
 	});

@@ -56,6 +56,11 @@ void ADCInstrument::setupToolLayout()
 	m_sync->setCheckable(true);
 	StyleHelper::BlueGrayButton(m_sync);
 
+
+	m_complex = new QPushButton("Complex");
+	m_complex->setCheckable(true);
+	StyleHelper::BlueGrayButton(m_complex);
+
 	PrintBtn *printBtn = new PrintBtn(this);
 	m_runBtn = new RunBtn(this);
 	m_singleBtn = new SingleShotBtn(this);
@@ -74,6 +79,7 @@ void ADCInstrument::setupToolLayout()
 	tool->addWidgetToTopContainerHelper(addBtn, TTA_LEFT);
 	tool->addWidgetToTopContainerHelper(removeBtn, TTA_LEFT);
 	tool->addWidgetToTopContainerHelper(m_sync, TTA_LEFT);
+	tool->addWidgetToTopContainerHelper(m_complex, TTA_LEFT);
 
 	tool->addWidgetToBottomContainerHelper(channelsBtn, TTA_LEFT);
 

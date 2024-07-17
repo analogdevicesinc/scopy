@@ -238,6 +238,7 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode* root) {
 		}
 		deleteInstrument(t);
 	});
+	m_ctrls.append(adc);
 	} else if(t == FREQUENCY) {
 
 		m_toolList.append(
@@ -267,6 +268,7 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode* root) {
 			}
 			deleteInstrument(t);
 		});
+		m_ctrls.append(adc);
 	} else {
 		return;
 	}
@@ -284,6 +286,15 @@ void ADCPlugin::deleteInstrument(ToolMenuEntry *tool) {
 	tool->setRunBtnVisible(false);
 	QWidget *w = tool->tool();
 	if(w) {
+		ADCInstrumentController *found = nullptr;
+		for(ADCInstrumentController *ctrl : m_ctrls) {
+			if(ctrl->ui() == tool->tool()) {
+				found = ctrl;
+				break;
+			}
+		}
+		found->stop();
+		m_ctrls.removeAll(found);
 		tool->setTool(nullptr);
 		delete(w);
 	}

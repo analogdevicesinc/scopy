@@ -33,7 +33,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	StyleHelper::MenuLineEdit(plotTitle);
 	connect(plotTitle, &QLineEdit::textChanged, this, [=](QString s) {
 		m_plotComponent->setName(s);
-		//	plotMenu->setTitle("PLOT - " + s);
+	//	plotMenu->setTitle("PLOT - " + s);
 	});
 
 	MenuOnOffSwitch *labelsSwitch = new MenuOnOffSwitch("Show plot labels", plotMenu, false);
@@ -68,8 +68,8 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 
 	m_yCtrl->setVisible(true);
 
-	m_yCtrl->setMin(-2048);
-	m_yCtrl->setMax(2048);
+	m_yCtrl->setMin(-140);
+	m_yCtrl->setMax(20);
 	labelsSwitch->onOffswitch()->setChecked(true);
 	labelsSwitch->onOffswitch()->setChecked(false);
 

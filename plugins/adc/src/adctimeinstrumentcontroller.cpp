@@ -59,6 +59,7 @@ void ADCTimeInstrumentController::init()
 	m_otherCMCB->getControlBtn()->button()->setVisible(false);
 	m_otherCMCB->getControlBtn()->setName("Other");
 	m_ui->vcm()->addEnd(m_otherCMCB);
+	m_ui->m_complex->setVisible(false);
 }
 
 void ADCTimeInstrumentController::addChannel(AcqTreeNode *node)
@@ -74,8 +75,9 @@ void ADCTimeInstrumentController::addChannel(AcqTreeNode *node)
 		m_dataProvider = c;
 		c->init();
 
-		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::bufferSizeChanged, c,
-			&GRTimeSinkComponent::setBufferSize);
+		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::bufferSizeChanged, this, [=](double val){
+			// grtbn->src()->setVLen(val);
+			c->setBufferSize(val);});
 
 		connect(c, &GRTimeSinkComponent::requestSingleShot, this, &ADCTimeInstrumentController::setSingleShot);
 		connect(c, &GRTimeSinkComponent::requestBufferSize, m_timePlotSettingsComponent, &TimePlotManagerSettings::setBufferSize);

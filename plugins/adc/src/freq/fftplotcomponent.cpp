@@ -23,6 +23,7 @@ FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	m_fftPlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_fftPlot->xAxis()->setInterval(0, 1);
 	m_fftPlot->xAxis()->setVisible(true);
+	m_fftPlot->yAxis()->setUnits("dB");
 
 	m_plots.append(m_fftPlot);
 	m_plotLayout->addWidget(m_fftPlot);

@@ -4,6 +4,7 @@
 #include "scopy-adc_export.h"
 #include "adcinstrumentcontroller.h"
 
+
 namespace scopy {
 namespace adc {
 
@@ -15,7 +16,17 @@ public:
 	virtual void init() override;
 	virtual void addChannel(AcqTreeNode *node) override;
 	virtual void removeChannel(AcqTreeNode *node) override;
+	void setComplexMode(bool b);
+	void createIIODevice(AcqTreeNode *node);
+	void createIIOFloatChannel(AcqTreeNode *node);
+	void createIIOComplexChannel(AcqTreeNode *node_I, AcqTreeNode *node_Q);
+	void createFFTSink(AcqTreeNode *node);
+	void createImportFloatChannel(AcqTreeNode *node);
+	bool getComplexChannelPair(AcqTreeNode *node, AcqTreeNode **node_i, AcqTreeNode **node_q);
+
 private:
+	bool m_complexMode;
+	QList<AcqTreeNode*> m_complexChannels;
 	FFTPlotManagerSettings* m_fftPlotSettingsComponent;
 };
 
