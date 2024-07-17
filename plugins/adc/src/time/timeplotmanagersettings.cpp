@@ -91,7 +91,7 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 		if(m_plotSizeSpin->value() < val) {
 			m_plotSizeSpin->setValue(val);
 		}
-		m_plotSizeSpin->setMinValue(val);
+		m_plotSizeSpin->setMinValue(val);		
 		setBufferSize((uint32_t)val);
 	});
 

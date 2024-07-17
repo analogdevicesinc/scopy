@@ -55,6 +55,11 @@ void ChannelComponent::addChannelToPlot() {}
 
 void ChannelComponent::removeChannelFromPlot() {}
 
+void ChannelComponent::setMenuControlButtonVisible(bool b)
+{
+	m_ctrl->setVisible(b);
+}
+
 MenuWidget *ChannelComponent::menu() { return m_menu; }
 
 void ChannelComponent::enable()

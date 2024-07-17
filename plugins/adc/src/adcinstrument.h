@@ -71,6 +71,7 @@ private:
 	AddBtn *addBtn;
 	RemoveBtn *removeBtn;
 	RunBtn *m_runBtn;
+	QPushButton *m_complex;
 	SingleShotBtn *m_singleBtn;
 	QPushButton *m_sync;
 	MenuControlButton *channelsBtn;
