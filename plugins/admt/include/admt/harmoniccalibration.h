@@ -18,6 +18,7 @@
 #include <QTabWidget>
 #include <QListWidget>
 #include <QPlainTextEdit>
+#include <QFileDialog>
 
 #include <iio.h>
 #include <iioutil/connectionprovider.h>
@@ -31,6 +32,7 @@
 #include <menucontrolbutton.h>
 #include <menucombo.h>
 #include <stylehelper.h>
+#include <filemanager.h>
 
 namespace scopy::admt {
 
@@ -99,6 +101,10 @@ private:
 	void removeLastItemFromRawDataList();
 	void calibrateData();
 	void registerCalibrationData();
+	void extractCalibrationData();
+	void importCalibrationData();
+	void calibrationLogWrite(QString message);
+	void calibrationLogWriteLn(QString message);
 
 	QTimer *timer, *calibrationTimer;
 

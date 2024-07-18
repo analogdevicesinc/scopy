@@ -470,8 +470,6 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	angleWidget->contentLayout()->addWidget(angleSection);
 	calibrationAngleLabel = new QLabel(angleSection);
 	StyleHelper::MenuControlLabel(calibrationAngleLabel, "calibrationAngleLabel");
-	updateChannelValue(ADMTController::Channel::ANGLE);
-	updateLabelValue(calibrationAngleLabel, ADMTController::Channel::ANGLE);
 	angleSection->contentLayout()->addWidget(calibrationAngleLabel);
 
 	// Calibration Widget
@@ -493,9 +491,19 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrateDataButton->setText("Calibrate");
 	StyleHelper::BlueButton(calibrateDataButton, "calibrateDataButton");
 
+	QPushButton *extractDataButton = new QPushButton(calibrationControlWidget);
+	extractDataButton->setText("Extract");
+	StyleHelper::BlueButton(extractDataButton, "extractDataButton");
+
+	QPushButton *importDataButton = new QPushButton(calibrationControlWidget);
+	importDataButton->setText("Import");
+	StyleHelper::BlueButton(importDataButton, "importDataButton");
+
 	calibrationSection->contentLayout()->addWidget(addCalibrationDataButton);
 	calibrationSection->contentLayout()->addWidget(removeLastCalibrationDataButton);
 	calibrationSection->contentLayout()->addWidget(calibrateDataButton);
+	calibrationSection->contentLayout()->addWidget(extractDataButton);
+	calibrationSection->contentLayout()->addWidget(importDataButton);
 
 	controlLayout->addWidget(angleWidget);
 	controlLayout->addWidget(calibrationControlWidget);
@@ -503,7 +511,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	// Raw Data Widget
 	QWidget *calibrationDataWidget = new QWidget(this);
-	QHBoxLayout *calibrationDataLayout = new QHBoxLayout(calibrationDataWidget);
+	QVBoxLayout *calibrationDataLayout = new QVBoxLayout(calibrationDataWidget);
 	calibrationDataLayout->setMargin(0);
 	calibrationDataWidget->setLayout(calibrationDataLayout);
 
@@ -515,22 +523,11 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	rawDataWidget->contentLayout()->addWidget(rawDataSection);
 
 	rawDataListWidget = new QListWidget(rawDataWidget);
-	calibrationDataLayout->addWidget(rawDataListWidget);
-
 	rawDataSection->contentLayout()->addWidget(rawDataListWidget);
 
-	calibrationDataLayout->addWidget(rawDataWidget);
-
-	// Result Widget
-	QWidget *calibrationResultWidget = new QWidget(this);
-	QVBoxLayout *calibrationResultLayout = new QVBoxLayout(calibrationResultWidget);
-	calibrationResultLayout->setMargin(0);
-	calibrationResultWidget->setLayout(calibrationResultLayout);
-
 	// Logs Widget
-	MenuSectionWidget *logsWidget = new MenuSectionWidget(calibrationResultWidget);
+	MenuSectionWidget *logsWidget = new MenuSectionWidget(calibrationDataWidget);
 	logsWidget->contentLayout()->setSpacing(10);
-	// logsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	MenuCollapseSection *logsSection = new MenuCollapseSection("Logs", MenuCollapseSection::MHCW_NONE, logsWidget);
 	logsSection->contentLayout()->setSpacing(10);
 	logsWidget->contentLayout()->addWidget(logsSection);
@@ -540,7 +537,14 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	logsSection->contentLayout()->addWidget(logsPlainTextEdit);
 
-	calibrationResultLayout->addWidget(logsWidget);
+	calibrationDataLayout->addWidget(rawDataWidget);
+	calibrationDataLayout->addWidget(logsWidget);
+
+	// Result Widget
+	QWidget *calibrationResultWidget = new QWidget(this);
+	QVBoxLayout *calibrationResultLayout = new QVBoxLayout(calibrationResultWidget);
+	calibrationResultLayout->setMargin(0);
+	calibrationResultWidget->setLayout(calibrationResultLayout);
 
 	// Register Widget
 	QWidget *calibrationRegisterWidget = new QWidget(calibrationResultWidget);
@@ -649,6 +653,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	connect(addCalibrationDataButton, &QPushButton::clicked, this, &HarmonicCalibration::addAngleToRawDataList);
 	connect(removeLastCalibrationDataButton, &QPushButton::clicked, this, &HarmonicCalibration::removeLastItemFromRawDataList);
 	connect(calibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::calibrateData);
+	connect(extractDataButton, &QPushButton::clicked, this, &HarmonicCalibration::extractCalibrationData);
+	connect(importDataButton, &QPushButton::clicked, this, &HarmonicCalibration::importCalibrationData);
 	connect(registerCalibrationDataButton, &QPushButton::clicked, this, &HarmonicCalibration::registerCalibrationData);
 
 	return tool;
@@ -710,10 +716,87 @@ void HarmonicCalibration::removeLastItemFromRawDataList(){
 
 void HarmonicCalibration::calibrateData()
 {
-	logsPlainTextEdit->appendPlainText("\n============ Calibration Start ============\n");
+	logsPlainTextEdit->appendPlainText("\n======= Calibration Start =======\n");
 }
 
 void HarmonicCalibration::registerCalibrationData()
 {
-	logsPlainTextEdit->appendPlainText("\n============ Register Calibration Start ============\n");
+	logsPlainTextEdit->appendPlainText("\n=== Register Calibration Start ===\n");
+}
+
+void HarmonicCalibration::calibrationLogWrite(QString message)
+{
+	logsPlainTextEdit->appendPlainText(message);
+}
+
+void HarmonicCalibration::calibrationLogWriteLn(QString message)
+{
+	logsPlainTextEdit->appendPlainText("\n" + message);
+}
+
+void HarmonicCalibration::extractCalibrationData()
+{
+	QStringList filter;
+	filter += QString(tr("Comma-separated values files (*.csv)"));
+	filter += QString(tr("Tab-delimited values files (*.txt)"));
+	filter += QString(tr("All Files(*)"));
+
+	QString selectedFilter = filter[0];
+
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Export"), "", filter.join(";;"), &selectedFilter, QFileDialog::Options());
+
+	if(fileName.split(".").size() <= 1) {
+		// file name w/o extension. Let's append it
+		QString ext = selectedFilter.split(".")[1].split(")")[0];
+		fileName += "." + ext;
+	}
+
+	if(!fileName.isEmpty()) {
+		bool withScopyHeader = false;
+		FileManager fm("HarmonicCalibration");
+		fm.open(fileName, FileManager::EXPORT);
+
+		QVector<double> rawData;
+
+		for (int i = 0; i < rawDataListWidget->count(); ++i) {
+			QListWidgetItem* item = rawDataListWidget->item(i);
+			bool ok;
+			double value = item->text().toDouble(&ok);
+			if (ok) {
+				rawData.append(value);
+			} else {
+				// Handle the case where the conversion fails if necessary
+			}
+		}
+
+		fm.save(rawData, "RawData");
+
+		fm.performWrite(withScopyHeader);
+	}
+}
+
+void HarmonicCalibration::importCalibrationData()
+{
+	QString fileName = QFileDialog::getOpenFileName(
+		this, tr("Import"), "",
+		tr("Comma-separated values files (*.csv);;"
+		   "Tab-delimited values files (*.txt)"),
+		nullptr, QFileDialog::Options());
+
+	FileManager fm("HarmonicCalibration");
+
+	try {
+		fm.open(fileName, FileManager::IMPORT);
+
+		rawDataListWidget->clear();
+
+		QVector<double> data = fm.read(0);
+		for(int i = 0; i < data.size(); ++i) {
+			QString dataStr = QString::number(data[i]);
+			rawDataListWidget->addItem(dataStr);
+		}
+
+	} catch(FileManagerException &ex) {
+		calibrationLogWriteLn(QString(ex.what()));
+	}
 }
