@@ -59,7 +59,7 @@ void SmallOnOffSwitch::init()
 	m_offset = m_base_offset;
 
 	m_track_color[true] = Style::getColor(json::theme::highlight_color);
-	m_track_color[false] = Style::getColor(json::theme::highlight_secondary);
+	m_track_color[false] = Style::getColor(json::theme::highlight_2);
 	m_track_color_disabled[true] = Style::getColor(json::theme::highlight_color_disabled);
 	m_track_color_disabled[false] = Style::getColor(json::theme::highlight_disabled);
 	m_thumb_color[true] = Style::getColor(json::theme::focus_item);

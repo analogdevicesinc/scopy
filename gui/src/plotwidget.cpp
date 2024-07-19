@@ -1,6 +1,7 @@
 #include "plotwidget.h"
 
 #include "plotaxis.h"
+#include "style.h"
 
 #include <QDebug>
 #include <QLabel>
@@ -56,6 +57,7 @@ PlotWidget::PlotWidget(QWidget *parent)
 	setupPlotButtonManager();
 
 	m_plot->canvas()->installEventFilter(this);
+	m_plot->canvas()->setStyleSheet("QWidget { background-color: " + Style::getAttribute(json::theme::focus_item) + "; }");
 }
 
 void PlotWidget::setupNavigator()

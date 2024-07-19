@@ -30,12 +30,12 @@ void RegmapStyleHelper::initColorMap()
 {
 	auto sh = RegmapStyleHelper::GetInstance();
 	sh->colorMap.insert("ScopyBlue", Style::getAttribute(json::theme::highlight_color));
-	sh->colorMap.insert("UIElementBackground", Style::getAttribute(json::theme::background_primary));
-	sh->colorMap.insert("LabelText", Style::getAttribute(json::theme::highlight_primary));
+	sh->colorMap.insert("UIElementBackground", Style::getAttribute(json::theme::background_1));
+	sh->colorMap.insert("LabelText", Style::getAttribute(json::theme::highlight_1));
 	sh->colorMap.insert("LabelText2", "rgba(255, 255, 255, 150)");
 	sh->colorMap.insert("ScopyBackground", Style::getAttribute(json::theme::background_color));
-	sh->colorMap.insert("WidgetBackground", Style::getAttribute(json::theme::background_primary));
-	sh->colorMap.insert("ButtonPressed", Style::getAttribute(json::theme::highlight_primary));
+	sh->colorMap.insert("WidgetBackground", Style::getAttribute(json::theme::background_1));
+	sh->colorMap.insert("ButtonPressed", Style::getAttribute(json::theme::highlight_1));
 	sh->colorMap.insert("ButtonHover", Style::getAttribute(json::theme::highlight_color));
 	sh->colorMap.insert("ButtonDisabled", "grey");
 	sh->colorMap.insert("Red", "red");
@@ -73,15 +73,15 @@ QString RegmapStyleHelper::FrameWidgetStyle()
                                  border-right: 2px solid black;
                                  border-left: 2px solid black;
                                  border-bottom: 2px solid black;
-                                 background-color: &&background_primary&& ;
+                                 background-color: &&background_1&& ;
                         }
 
                         QWidget  {
-                            background-color: &&background_primary&& ;
+                            background-color: &&background_1&& ;
                         }
 
                         )css");
-	style.replace("&&background_primary&&", RegmapStyleHelper::getColor("WidgetBackground"));
+	style.replace("&&background_1&&", RegmapStyleHelper::getColor("WidgetBackground"));
 
 	return style;
 }
@@ -215,7 +215,7 @@ void RegmapStyleHelper::regmapSettingsMenu(RegisterMapSettingsMenu *settings, QS
 
 	QString style = QString(R"css(
                         QWidget {
-                                 background-color: &&background_primary&& ;
+                                 background-color: &&background_1&& ;
                         }
                         QWidget {
                                  font: normal;
@@ -224,7 +224,7 @@ void RegmapStyleHelper::regmapSettingsMenu(RegisterMapSettingsMenu *settings, QS
                         }
                         )css");
 
-	style.replace("&&background_primary&&", RegmapStyleHelper::getColor("Transparent"));
+	style.replace("&&background_1&&", RegmapStyleHelper::getColor("Transparent"));
 	style.replace("&&textColor&&", RegmapStyleHelper::getColor("LabelText"));
 
 	style += RegmapStyleHelper::BlueButtonStyle();

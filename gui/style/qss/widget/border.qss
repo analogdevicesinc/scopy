@@ -1,4 +1,4 @@
 *[&&property&&=true] {
-border: &border_width& solid &highlight_secondary&; 
+border: &border_width& solid &highlight_2&; 
 border-radius: &radius_1&;
 }

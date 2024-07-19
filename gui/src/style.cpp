@@ -114,7 +114,7 @@ int Style::getDimension(const char *key) { return getAttribute(key).toInt(); }
 
 QString Style::replaceAttribute(QString style)
 {
-	if(style.contains("&")) {
+	if(style.contains('&')) {
 		for(const QString &key : m_theme_json->object().keys()) {
 			QJsonValue value = m_theme_json->object().value(key);
 			style.replace("&" + key + "&", value.toString());

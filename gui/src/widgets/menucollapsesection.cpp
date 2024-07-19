@@ -62,7 +62,7 @@ MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::Men
 	: QWidget(parent)
 	, m_title(title)
 {
-
+	StyleHelper::MenuCollapseSection(this, "menuCollapse");
 	m_lay = new QVBoxLayout(this);
 	m_lay->setMargin(0);
 	m_lay->setSpacing(0);
@@ -76,7 +76,6 @@ MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::Men
 	m_contLayout->setMargin(0);
 	m_contLayout->setSpacing(0);
 
-	StyleHelper::MenuCollapseSection(this, "menuCollapse");
 	connect(m_header, &QAbstractButton::toggled, container, &QWidget::setVisible);
 }
 

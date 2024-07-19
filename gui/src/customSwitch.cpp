@@ -70,11 +70,11 @@ void CustomSwitch::paintEvent(QPaintEvent *event)
 	if(isChecked()) {
 		m_onLabel->raise();
 		m_onLabel->setStyleSheet("border-color: " + Style::getAttribute(json::theme::highlight_color));
-		m_offLabel->setStyleSheet("border-color: " + Style::getAttribute(json::theme::highlight_secondary));
+		m_offLabel->setStyleSheet("border-color: " + Style::getAttribute(json::theme::highlight_2));
 	} else {
 		m_offLabel->raise();
 		m_offLabel->setStyleSheet("border-color: " + Style::getAttribute(json::theme::highlight_color));
-		m_onLabel->setStyleSheet("border-color: " + Style::getAttribute(json::theme::highlight_secondary));
+		m_onLabel->setStyleSheet("border-color: " + Style::getAttribute(json::theme::highlight_2));
 	}
 }
 

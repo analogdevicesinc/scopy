@@ -49,19 +49,11 @@ file(GLOB SCOPY_RESOURCE_FILES gui/res/resources.qrc resources/aboutpage.qrc)
 find_file(SCOPY_ICON_ICO icon.ico PATHS ${CMAKE_SOURCE_DIR}/gui/res)
 message(STATUS "SCOPY_RESOURCE_FILES: " ${SCOPY_RESOURCE_FILES})
 
+include(ScopyStyle)
+generate_style("--core" ${CMAKE_CURRENT_SOURCE_DIR}/gui/style ${CMAKE_CURRENT_SOURCE_DIR}/gui/include/gui)
+
 option(ENABLE_TRANSLATION "Enable translation" ON)
 include(ScopyTranslation)
-
-find_package(Python3 COMPONENTS Interpreter)
-execute_process(
-	COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tools/style_generator.py ${CMAKE_CURRENT_SOURCE_DIR}
-		${CMAKE_CURRENT_BINARY_DIR} RESULT_VARIABLE ret
-)
-if(NOT ret EQUAL "0")
-	message(FATAL_ERROR "Failed to generate style files! error: ${ret}")
-else()
-	message("-- Generated style files")
-endif()
 
 if(ENABLE_TRANSLATION)
 	generate_translations()

@@ -4,7 +4,7 @@ QPushButton[&&property&&=true] {
 	border-radius: &radius_1&;
 	text-align: center;
 	padding: &padding_1&;
-	color: &highlight_primary&;
+	color: &highlight_1&;
 	background-color: #ff7200;
 }
 

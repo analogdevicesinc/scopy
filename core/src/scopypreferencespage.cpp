@@ -51,7 +51,7 @@ void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text)
 	w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	QWidget *pane = new QWidget();
-	pane->setStyleSheet("background-color: " + Style::getAttribute(json::theme::background_secondary) + ";");
+	pane->setStyleSheet(".QWidget{background-color: " + Style::getAttribute(json::theme::background_2) + ";}");
 	QHBoxLayout *lay = new QHBoxLayout();
 	lay->setMargin(10);
 	pane->setLayout(lay);
@@ -61,6 +61,7 @@ void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text)
 	scrollArea->setWidgetResizable(true);
 	scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	lay->addWidget(scrollArea);
+	scrollArea->viewport()->setStyleSheet(".QWidget{background-color: " + Style::getAttribute(json::theme::background_2) + ";}");
 
 	// Hackish - so we don't override paint event
 	tabWidget->addTab(pane, "");

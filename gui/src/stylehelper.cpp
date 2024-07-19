@@ -41,10 +41,10 @@ void StyleHelper::initColorMap()
 	sh->colorMap.insert("CH7", "#F5A623");
 	sh->colorMap.insert("ScopyBlue", Style::getAttribute(json::theme::highlight_color));
 	sh->colorMap.insert("SH_disabled", Style::getAttribute(json::theme::highlight_disabled));
-	sh->colorMap.insert("UIElementBackground", Style::getAttribute(json::theme::background_primary));
-	sh->colorMap.insert("UIElementHighlight", Style::getAttribute(json::theme::highlight_primary));
-	sh->colorMap.insert("LabelText", Style::getAttribute(json::theme::highlight_primary));
-	sh->colorMap.insert("ScopyBackground", Style::getAttribute(json::theme::background_secondary));
+	sh->colorMap.insert("UIElementBackground", Style::getAttribute(json::theme::background_1));
+	sh->colorMap.insert("UIElementHighlight", Style::getAttribute(json::theme::highlight_1));
+	sh->colorMap.insert("LabelText", Style::getAttribute(json::theme::highlight_1));
+	sh->colorMap.insert("ScopyBackground", Style::getAttribute(json::theme::background_2));
 	sh->colorMap.insert("ScopyBlueHover", Style::getAttribute(json::theme::highlight_color));
 	sh->colorMap.insert("ScopyBlueSelected", Style::getAttribute(json::theme::highlight_color));
 
@@ -59,7 +59,7 @@ void StyleHelper::initColorMap()
 	sh->colorMap.insert("LabelTextTinted", "rgba(255, 255, 255, 150)");
 
 	sh->colorMap.insert("WarningText", "#FFC904");
-	sh->colorMap.insert("GrayText", Style::getAttribute(json::theme::background_secondary));
+	sh->colorMap.insert("GrayText", Style::getAttribute(json::theme::background_2));
 	sh->colorMap.insert("SH_focus", Style::getAttribute(json::theme::focus_item));
 }
 
@@ -785,7 +785,7 @@ void StyleHelper::MenuCollapseSection(QWidget *w, QString objectName)
 
 	/// ????
 	QString style = QString(R"css(
-QWidget {
+.QWidget {
 	background-color: transparent;
 }
 )css");
@@ -1346,8 +1346,9 @@ void StyleHelper::BackgroundAddPage(QWidget *w, QString objectName)
 	if(!objectName.isEmpty())
 		w->setObjectName(objectName);
 	QString style = QString(R"css(
-		QWidget {
+		.QWidget {
 			background-color: &&ScopyBackground&&;
+			background-color: red;
 		}
 		)css");
 	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));

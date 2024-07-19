@@ -1,5 +1,5 @@
 QPushButton[&&property&&=true] {
-    background-color: &background_primary&;
+    background-color: &background_1&;
     border: none;
     padding: 5px;
     border-radius: 4px;
@@ -10,10 +10,10 @@ QPushButton[&&property&&=true]:hover {
 }
 
 QPushButton[&&property&&=true]:pressed {
-    background-color: &background_secondary&;
+    background-color: &background_2&;
 }
 
 QPushButton[&&property&&=true]:checked {
-    background-color: &background_secondary&;
+    background-color: &background_2&;
 }
 

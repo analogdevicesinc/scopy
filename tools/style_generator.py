@@ -1,6 +1,5 @@
 import os
 import sys
-from distutils.dir_util import copy_tree
 from typing import Dict, Optional, Set, List
 
 
@@ -15,6 +14,9 @@ def create_namespace_structure(extension: str, path: str, root_namespace: str = 
         return namespace_structure
 
     for dirpath, _, filenames in os.walk(path):
+        if len(filenames) == 0:
+            continue
+
         files = [f for f in filenames if f.endswith(extension)]
         if files:
             relative_path = os.path.relpath(dirpath, path)
@@ -36,7 +38,6 @@ def replace_property(in_file: str, value: str, out_file: str) -> bool:
         data = file.read().replace(search_text, value)
 
     with open(out_file, 'a') as file:
-        print(out_file)
         file.write(data)
 
     return True
@@ -77,16 +78,19 @@ def generate_namespace_code(namespace_structure: Dict[str, Dict[str, str]], vari
     for root_path in root_parts:
         path_parts = root_path.split(os.sep)
         if path_parts[0] not in added_namespaces:
-            add_namespaces(path_parts, namespace_structure[root_path], 0)
-            added_namespaces.add(path_parts[0])
+            if len(namespace_structure[root_path]) != 0:
+                add_namespaces(path_parts, namespace_structure[root_path], 0)
+                added_namespaces.add(path_parts[0])
 
     return '\n'.join(code_lines)
 
 
 # Writes the generated namespace code to a header file
 def write_header_file(output_file: str, namespace_code: str, name: str, namespace_name: str) -> None:
-    def_name = name.upper().replace(".", "_")
+    if len(namespace_code.strip()) == 0:
+        return
 
+    def_name = name.upper().replace(".", "_")
     with open(output_file, 'w') as f:
         f.write("#ifndef " + def_name + "\n")
         f.write("#define " + def_name + "\n")
@@ -136,7 +140,7 @@ def parse_json_file(filepath: str, root_folder: str, out_file: str) -> Dict[str,
 # Generates JSON variable declarations for a given file
 def generate_json_variable(filepath: str, indent: str, root_folder: str, out_file: str) -> str:
     with open(filepath, 'r') as file:
-        if len(file.read()) == 0:
+        if len(file.read().strip()) == 0:
             return ''
 
     json = parse_json_file(filepath, root_folder, out_file)
@@ -149,13 +153,13 @@ def generate_json_variable(filepath: str, indent: str, root_folder: str, out_fil
 
 
 # Opens the JSON file for writing with a given start character
-def open_json_file(json_path: str, start_char: str = "{") -> None:
+def open_json_file(json_path: str) -> None:
     with open(json_path, 'w') as file:
-        file.write(start_char + "\n")
+        file.write("{\n")
 
 
 # Closes the JSON file, ensuring the last comma is removed
-def close_json_file(json_path: str, end_char: str = "}") -> None:
+def close_json_file(json_path: str) -> None:
     with open(json_path, 'r+') as file:
         content = file.read()
         last_comma_index = content.rfind(',')
@@ -164,16 +168,17 @@ def close_json_file(json_path: str, end_char: str = "}") -> None:
             file.seek(0)
             file.write(content)
             file.truncate()
-        file.write("\n" + end_char + "\n")
+        file.write("\n}\n")
 
 
-def generate_qss():
+def generate_qss(append: bool) -> None:
     qss_header_name = "style_properties.h"
-    qss_header_path = os.path.join(source_folder, "gui", "include", "gui", qss_header_name)
+    qss_header_path = os.path.join(generated_header_folder, qss_header_name)
     qss_name = "style.qss"
     qss_path = os.path.join(build_folder, qss_name)
 
-    open_qss_file(qss_path)
+    if not append:
+        open_qss_file(qss_path)
     qss_namespace_code = generate_namespace_code(
         create_namespace_structure("qss", os.path.join(style_folder, "qss")),
         generate_qss_variable,
@@ -183,9 +188,9 @@ def generate_qss():
     write_header_file(qss_header_path, qss_namespace_code, qss_header_name, "style")
 
 
-def generate_json():
+def generate_json(theme_attributes_path: str) -> None:
     json_header_name = "style_attributes.h"
-    json_header_path = os.path.join(source_folder, "gui", "include", "gui", json_header_name)
+    json_header_path = os.path.join(generated_header_folder, json_header_name)
     global_json_path = os.path.join(style_folder, "json", "global.json")
     theme_json_path = os.path.join(style_folder, "json", "dark.json")
 
@@ -206,16 +211,54 @@ def generate_json():
     close_json_file(theme_attributes_path)
 
 
+def copy_and_append_jsons(src_dir: str, dest_dir: str, append: bool) -> None:
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
+
+    for root, _, files in os.walk(src_dir):
+        for file in files:
+            src_file_path = os.path.join(root, file)
+            dest_file_path = os.path.join(dest_dir, file)
+
+            with open(src_file_path, 'r') as src_file:
+                src_content = src_file.read()
+
+            if os.path.exists(dest_file_path) and append:
+                with open(dest_file_path, 'r') as dest_file:
+                    dest_content = dest_file.read()
+                with open(dest_file_path, 'w') as dest_file:
+                    dest_file.write(
+                        dest_content[:dest_content.find("\n}")] + ",\n" + src_content[src_content.find("{\n") + 2:])
+            else:
+                with open(dest_file_path, 'w') as dest_file:
+                    dest_file.write(src_content)
+
+
+"""
+options:
+- copy json files, generate qss and headers (for core)
+    arguments: --core <gui style folder> <gui headers folder> <build folder>
+    
+- generate qss file and header (for plugins)
+    arguments: --plugin <plugin style folder> <plugin headers folder> <build folder>
+"""
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        raise ValueError("Incorrect number of arguments provided")
+    if len(sys.argv) != 5:
+        raise ValueError(f"Incorrect number of arguments provided. Got {len(sys.argv)} arguments")
 
-    source_folder = sys.argv[1]
-    build_folder = sys.argv[2]
-    style_folder = os.path.join(source_folder, "gui", "style")
-    theme_attributes_path = os.path.join(build_folder, "theme_attributes.json")
+    if sys.argv[1] == "--core":
+        is_plugin = False
+    elif sys.argv[1] == "--plugin":
+        is_plugin = True
+    else:
+        raise ValueError(f"Invalid option. Got {option} and was expecting --core or --plugin")
 
-    generate_qss()
-    generate_json()
-    copy_tree(os.path.join(style_folder, "json"), os.path.join(build_folder, "json"))
+    style_folder = sys.argv[2]
+    generated_header_folder = sys.argv[3]
+    build_folder = sys.argv[4]
+
+    generate_qss(is_plugin)
+    generate_json(os.path.join(build_folder, "theme_attributes.json"))
+    copy_and_append_jsons(os.path.join(style_folder, "json"), os.path.join(build_folder, "json"), is_plugin)
+
     sys.exit(0)
