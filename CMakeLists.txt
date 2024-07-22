@@ -98,7 +98,7 @@ find_library(
 message("IIO LIBRARIES: " ${IIO_LIBRARIES})
 
 set(SCOPY_DLL_BUILD_PATH ${CMAKE_BINARY_DIR})
-set(SCOPY_DLL_INSTALL_PATH ${CMAKE_INSTALL_LIBDIR}/scopy)
+set(SCOPY_DLL_INSTALL_PATH ${CMAKE_INSTALL_FULL_LIBDIR})
 set(SCOPY_PLUGIN_BUILD_PATH ${CMAKE_BINARY_DIR}/plugins/plugins)
 set(SCOPY_PLUGIN_INSTALL_PATH ${CMAKE_INSTALL_LIBDIR}/scopy/plugins)
 set(SCOPY_TRANSLATION_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/translations)
@@ -226,3 +226,12 @@ install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 if(QT_VERSION_MAJOR EQUAL 6)
 	qt_finalize_executable(${PROJECT_NAME})
 endif()
+
+# make uninstall
+add_custom_target("uninstall" COMMENT "Uninstall installed files")
+add_custom_command(
+	TARGET "uninstall"
+	POST_BUILD
+	COMMENT "Uninstall files with install_manifest.txt"
+	COMMAND xargs rm -vf < install_manifest.txt || echo Nothing in install_manifest.txt to be uninstalled!
+)
