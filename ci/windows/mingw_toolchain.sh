@@ -1,46 +1,56 @@
 #!/usr/bin/bash.exe
 
 set -ex
-export MINGW_VERSION=mingw64
-export ARCH=x86_64
 # get the full directory path of the script
 export WORKFOLDER=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-USE_STAGING=$1
-STAGING_PREFIX=$2
 
+BUILD_STATUS_FILE=$HOME/scopy-mingw-build-status
+
+LIBSERIALPORT_BRANCH=scopy-v2
+LIBIIO_VERSION=libiio-v0
+LIBAD9361_BRANCH=main
+LIBM2K_BRANCH=main
+SPDLOG_BRANCH=v1.x
+LIBSNDFILE_BRANCH=1.2.2
+VOLK_BRANCH=main
+GNURADIO_BRANCH=maint-3.10
+GRSCOPY_BRANCH=3.10
+GRM2K_BRANCH=main
+LIBSIGROKDECODE_BRANCH=master
+QWT_BRANCH=qwt-multiaxes-updated
+LIBTINYIIOD_BRANCH=master
+IIOEMU_BRANCH=master
+
+MINGW_VERSION=mingw64
+ARCH=x86_64
+STAGING_AREA=$WORKFOLDER/staging
+
+USE_STAGING=$1
 if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
 	then
-		echo -- USING STAGING
+		echo -- USING STAGING FOLDER: $STAGING_AREA_DEPS
 		export USE_STAGING="ON"
-		if [ -z "$STAGING_PREFIX" ]
-			then
-				STAGING_PREFIX="staging"
-				export STAGING_ENV=$WORKFOLDER/staging_$ARCH
-			else
-				echo -- STAGING_PREFIX:$STAGING_PREFIX
-				export STAGING_ENV=${STAGING_PREFIX}_${ARCH}
-		fi
-		export STAGING=${STAGING_PREFIX}_${ARCH}
-		export STAGING_DIR=${WORKFOLDER}/${STAGING}/${MINGW_VERSION}
-		export PACMAN="pacman -r $STAGING_ENV --noconfirm --needed"
+		export STAGING_AREA_DEPS=$STAGING_AREA/dependencies
+		export STAGING_DIR=${WORKFOLDER}/${STAGING_AREA_DEPS}/${MINGW_VERSION}
+		export PACMAN="pacman -r $STAGING_DIR --noconfirm --needed"
 	else
-		echo -- NO STAGING
-		export USE_STAGING=OFF
+		echo -- NO STAGING: INSTALLING IN SYSTEM
+		export USE_STAGING="OFF"
 		export STAGING_DIR=/${MINGW_VERSION}
-		export STAGING_ENV=""
 		export PACMAN="pacman --noconfirm --needed"
 fi
 
-export RC_COMPILER_OPT="-DCMAKE_RC_COMPILER=/mingw64/bin/windres.exe"
-export PATH="/bin:$STAGING_DIR/bin:$WORKFOLDER/cv2pdb:/c/Program Files (x86)/Inno Setup 6:/c/innosetup/:/bin:/usr/bin:${STAGING_DIR}/bin:/c/Program\ Files/Git/cmd:/c/Windows/System32:/c/Program\ Files/Appveyor/BuildAgent:$PATH"
-export QMAKE=${STAGING_DIR}/bin/qmake
-export PKG_CONFIG_PATH=$STAGING_DIR/lib/pkgconfig
-export CC=${STAGING_DIR}/bin/${ARCH}-w64-mingw32-gcc.exe
-export CXX=${STAGING_DIR}/bin/${ARCH}-w64-mingw32-g++.exe
-export JOBS="-j9"
-export MAKE_BIN=$STAGING_ENV/usr/bin/make.exe
-export MAKE_CMD="$MAKE_BIN $JOBS"
+RC_COMPILER_OPT="-DCMAKE_RC_COMPILER=/mingw64/bin/windres.exe"
+PATH="/bin:$STAGING_DIR/bin:$WORKFOLDER/cv2pdb:/c/Program Files (x86)/Inno Setup 6:/c/innosetup/:/bin:/usr/bin:${STAGING_DIR}/bin:/c/Program\ Files/Git/cmd:/c/Windows/System32:/c/Program\ Files/Appveyor/BuildAgent:$PATH"
+QMAKE=${STAGING_DIR}/bin/qmake
+PKG_CONFIG_PATH=$STAGING_DIR/lib/pkgconfig
+CC=${STAGING_DIR}/bin/${ARCH}-w64-mingw32-gcc.exe
+CXX=${STAGING_DIR}/bin/${ARCH}-w64-mingw32-g++.exe
+JOBS="-j22"
+MAKE_BIN=/usr/bin/make.exe
+MAKE_CMD="$MAKE_BIN $JOBS"
 export CMAKE_GENERATOR="Unix Makefiles"
+
 export CMAKE_OPTS=( \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 	-DCMAKE_VERBOSE_MAKEFILE=ON \
@@ -53,19 +63,18 @@ export CMAKE_OPTS=( \
 	-DCMAKE_STAGING_PREFIX=$STAGING_DIR \
 	-DCMAKE_INSTALL_PREFIX=$STAGING_DIR \
 )
+
 export CMAKE="${STAGING_DIR}/bin/cmake ${CMAKE_OPTS[@]} "
 
-export AUTOCONF_OPTS="--prefix=$STAGING_DIR \
+AUTOCONF_OPTS="--prefix=$STAGING_DIR \
 	--host=${ARCH}-w64-mingw32 \
 	--enable-shared \
 	--disable-static"
 
-BUILD_STATUS_FILE=/tmp/scopy-mingw-build-status
-touch $BUILD_STATUS_FILE
-
+echo -- BUILD_STATUS_FILE:$BUILD_STATUS_FILE
 echo -- MAKE_BIN:$MAKE_BIN
 echo -- STAGING_DIR:$STAGING_DIR
-echo -- STAGING_ENV:$STAGING_ENV
+echo -- STAGING_AREA:$STAGING_AREA
 echo -- MINGW_VERSION:$MINGW_VERSION
 echo -- TARGET ARCH:$ARCH
 echo -- PATH:$PATH

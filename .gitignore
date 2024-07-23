@@ -45,6 +45,7 @@ ci/armhf/scopy.AppDir
 ci/armhf/scopy.squashfs
 ci/x86_64/staging
 ci/x86_64/scopy.AppDir
+ci/windows/staging
 windows/*
 core/include/scopy-core_config.h
 core/include/scopy-core_export.h
