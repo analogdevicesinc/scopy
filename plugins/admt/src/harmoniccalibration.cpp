@@ -150,29 +150,29 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	generalSection->contentLayout()->setSpacing(10);
 	generalWidget->contentLayout()->addWidget(generalSection);
 
-	// Sample Rate
-	QLabel *sampleRateLabel = new QLabel(generalSection);
-	sampleRateLabel->setText("Sample Rate (Update Freq.)");
-	StyleHelper::MenuSmallLabel(sampleRateLabel, "sampleRateLabel");
-	sampleRateLineEdit = new QLineEdit(generalSection);
-	sampleRateLineEdit->setText(QString::number(sampleRate));
+	// Graph Update Interval
+	QLabel *graphUpdateIntervalLabel = new QLabel(generalSection);
+	graphUpdateIntervalLabel->setText("Graph Update Interval (ms)");
+	StyleHelper::MenuSmallLabel(graphUpdateIntervalLabel, "graphUpdateIntervalLabel");
+	graphUpdateIntervalLineEdit = new QLineEdit(generalSection);
+	graphUpdateIntervalLineEdit->setText(QString::number(sampleRate));
 
-	connectLineEditToNumber(sampleRateLineEdit, sampleRate);
+	connectLineEditToNumber(graphUpdateIntervalLineEdit, sampleRate);
 
-	generalSection->contentLayout()->addWidget(sampleRateLabel);
-	generalSection->contentLayout()->addWidget(sampleRateLineEdit);
+	generalSection->contentLayout()->addWidget(graphUpdateIntervalLabel);
+	generalSection->contentLayout()->addWidget(graphUpdateIntervalLineEdit);
 
-	// Buffer Size
-	QLabel *bufferSizeLabel = new QLabel(generalSection);
-	bufferSizeLabel->setText("Buffer Sample Size");
-	StyleHelper::MenuSmallLabel(bufferSizeLabel, "bufferSizeLabel");
-	bufferSizeLineEdit = new QLineEdit(generalSection);
-	bufferSizeLineEdit->setText(QString::number(bufferSize));
+	// Data Sample Size
+	QLabel *dataSampleSizeLabel = new QLabel(generalSection);
+	dataSampleSizeLabel->setText("Data Sample Size");
+	StyleHelper::MenuSmallLabel(dataSampleSizeLabel, "dataSampleSizeLabel");
+	dataSampleSizeLineEdit = new QLineEdit(generalSection);
+	dataSampleSizeLineEdit->setText(QString::number(bufferSize));
 
-	connectLineEditToNumber(bufferSizeLineEdit, bufferSize);
+	connectLineEditToNumber(dataSampleSizeLineEdit, bufferSize);
 
-	generalSection->contentLayout()->addWidget(bufferSizeLabel);
-	generalSection->contentLayout()->addWidget(bufferSizeLineEdit);
+	generalSection->contentLayout()->addWidget(dataSampleSizeLabel);
+	generalSection->contentLayout()->addWidget(dataSampleSizeLineEdit);
 
 	// Data Graph Setting Widget
 	MenuSectionWidget *dataGraphWidget = new MenuSectionWidget(generalSettingWidget);
@@ -352,8 +352,8 @@ void HarmonicCalibration::updateLineEditValues(){
 
 void HarmonicCalibration::updateGeneralSettingEnabled(bool value)
 {
-	sampleRateLineEdit->setEnabled(value);
-	bufferSizeLineEdit->setEnabled(value);
+	graphUpdateIntervalLineEdit->setEnabled(value);
+	dataSampleSizeLineEdit->setEnabled(value);
 	dataGraphSamplesLineEdit->setEnabled(value);
 	tempGraphSamplesLineEdit->setEnabled(value);
 	m_dataGraphDirectionMenuCombo->setEnabled(value);
@@ -623,15 +623,15 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationPhaseLayout->addWidget(calibrationH8PhaseLabel);
 	calibrationPhaseLayout->addWidget(calibrationH8PhaseLineEdit);
 
-	QPushButton *registerCalibrationDataButton = new QPushButton(calibrationRegisterWidget);
-	registerCalibrationDataButton->setText("Register");
-	StyleHelper::BlueButton(registerCalibrationDataButton, "registerCalibrationDataButton");
+	QPushButton *applyCalibrationDataButton = new QPushButton(calibrationRegisterWidget);
+	applyCalibrationDataButton->setText("Apply");
+	StyleHelper::BlueButton(applyCalibrationDataButton, "applyCalibrationDataButton");
 
 	calibrationRegisterLayout->addWidget(calibrationMagWidget);
 	calibrationRegisterLayout->addWidget(calibrationPhaseWidget);
 
 	calibrationResultLayout->addWidget(calibrationRegisterWidget);
-	calibrationResultLayout->addWidget(registerCalibrationDataButton);
+	calibrationResultLayout->addWidget(applyCalibrationDataButton);
 
 	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tool->topContainer()->setVisible(false);
@@ -655,7 +655,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	connect(calibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::calibrateData);
 	connect(extractDataButton, &QPushButton::clicked, this, &HarmonicCalibration::extractCalibrationData);
 	connect(importDataButton, &QPushButton::clicked, this, &HarmonicCalibration::importCalibrationData);
-	connect(registerCalibrationDataButton, &QPushButton::clicked, this, &HarmonicCalibration::registerCalibrationData);
+	connect(applyCalibrationDataButton, &QPushButton::clicked, this, &HarmonicCalibration::registerCalibrationData);
 
 	return tool;
 }
@@ -717,6 +717,17 @@ void HarmonicCalibration::removeLastItemFromRawDataList(){
 void HarmonicCalibration::calibrateData()
 {
 	logsPlainTextEdit->appendPlainText("\n======= Calibration Start =======\n");
+	QVector<double> rawData;
+
+	for (int i = 0; i < rawDataListWidget->count(); ++i) {
+		QListWidgetItem* item = rawDataListWidget->item(i);
+		std::string text = item->text().toStdString();
+		double value = std::stod(text);
+		rawData.append(value);
+	}
+	std::vector<double> stdData(rawData.begin(), rawData.end());
+
+	logsPlainTextEdit->appendPlainText(m_admtController->calibrate(stdData));
 }
 
 void HarmonicCalibration::registerCalibrationData()

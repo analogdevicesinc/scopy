@@ -66,7 +66,7 @@ private:
 	QPushButton *openLastMenuButton;
 	QButtonGroup *rightMenuButtonGroup;
 
-	QLineEdit *sampleRateLineEdit, *bufferSizeLineEdit, *dataGraphSamplesLineEdit, *tempGraphSamplesLineEdit, 
+	QLineEdit *graphUpdateIntervalLineEdit, *dataSampleSizeLineEdit, *dataGraphSamplesLineEdit, *tempGraphSamplesLineEdit, 
 			*calibrationH1MagLineEdit, *calibrationH2MagLineEdit, *calibrationH3MagLineEdit, *calibrationH8MagLineEdit,
 			*calibrationH1PhaseLineEdit, *calibrationH2PhaseLineEdit, *calibrationH3PhaseLineEdit, *calibrationH8PhaseLineEdit;
 	QLabel *rotationValueLabel, *angleValueLabel, *countValueLabel, *tempValueLabel, *calibrationAngleLabel;
