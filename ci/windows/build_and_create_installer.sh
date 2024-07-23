@@ -8,7 +8,6 @@ if [ "$CI_SCRIPT" == "ON" ];
 		set -x
 		SRC_FOLDER=$(git rev-parse --show-toplevel)
 		export WORKDIR=$SRC_FOLDER
-		git clone https://github.com/analogdevicesinc/scopy-mingw-build-deps.git -b ci-for-scopy2 $WORKDIR/scopy-mingw-build-deps
 fi
 
 BUILD_TARGET=x86_64
@@ -18,10 +17,7 @@ ARCH_BIT=64
 USE_STAGING=OFF
 ##
 
-TOOLS_FOLDER=$WORKDIR/scopy-mingw-build-deps
-pushd $TOOLS_FOLDER
-source ./mingw_toolchain.sh $BUILD_TARGET $USE_STAGING
-popd
+source $SRC_FOLDER/ci/windows/mingw_toolchain.sh $USE_STAGING
 
 export DEST_FOLDER=$WORKDIR/scopy_$ARCH
 BUILD_FOLDER=$WORKDIR/build_$ARCH
@@ -34,8 +30,36 @@ STAGING_AREA=$SRC_FOLDER/ci/windows/staging
 REGMAP_XMLS=$BUILD_FOLDER/plugins/plugins/regmap/xmls
 
 # Generate build status info for the about page
-cp $BUILD_STATUS_FILE $SRC_FOLDER/build-status
+
+# to be added back later
+# cp $BUILD_STATUS_FILE $SRC_FOLDER/build-status
+
 pacman -Qe >> $SRC_FOLDER/build-status
+
+download_tools() {
+	mkdir -p $STAGING_AREA
+	pushd $STAGING_AREA
+	if [ ! -f windres.exe ]; then
+		wget2 http://swdownloads.analog.com/cse/build/windres.exe.gz
+		gunzip windres.exe.gz
+	fi
+
+	if [ ! -f dpinst.zip ]; then
+		wget2 http://swdownloads.analog.com/cse/m1k/drivers/dpinst.zip
+		unzip "dpinst.zip"
+	fi
+
+	if [ ! -f dfu-util.zip ]; then
+		wget2 http://swdownloads.analog.com/cse/m1k/drivers/dfu-util.zip
+		unzip "dfu-util.zip"
+	fi
+
+	if [ ! -f cv2pdb-dlls.zip ]; then
+		wget2 https://swdownloads.analog.com/cse/scopydeps/cv2pdb-dlls.zip
+		unzip "cv2pdb-dlls.zip"
+	fi
+	popd
+}
 
 build_scopy(){
 	echo "### Building Scopy"
@@ -44,7 +68,7 @@ build_scopy(){
 	$CMAKE $RC_COMPILER_OPT -DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe \
 				-DENABLE_TESTING=OFF \
 				$SRC_FOLDER
-	$MAKE_BIN -j4
+	$MAKE_BIN $JOBS
 	ls -la $BUILD_FOLDER
 }
 
@@ -57,36 +81,7 @@ build_iio-emu(){
 	mkdir -p $EMU_BUILD_FOLDER
 	cd $EMU_BUILD_FOLDER
 	$CMAKE -DBUILD_TOOLS=ON ../
-	$MAKE_BIN -j4
-}
-
-download_tools() {
-	mkdir -p $STAGING_AREA
-	pushd $STAGING_AREA
-	if [ ! -f windres.exe ]; then
-		wget http://swdownloads.analog.com/cse/build/windres.exe.gz
-		gunzip windres.exe.gz
-	fi
-
-	if [ ! -f dpinst.zip ]; then
-		wget http://swdownloads.analog.com/cse/m1k/drivers/dpinst.zip
-		unzip "dpinst.zip"
-	fi
-
-	if [ ! -f dfu-util.zip ]; then
-		wget http://swdownloads.analog.com/cse/m1k/drivers/dfu-util.zip
-		unzip "dfu-util.zip"
-	fi
-
-	if [ ! -f cv2pdb-dlls.zip ]; then
-		wget https://swdownloads.analog.com/cse/scopydeps/cv2pdb-dlls.zip
-		unzip "cv2pdb-dlls.zip"
-	fi
-
-	if [ ! -f is.exe ]; then
-		wget https://jrsoftware.org/download.php/is.exe
-	fi
-	popd
+	$MAKE_BIN $JOBS
 }
 
 deploy_app(){
@@ -163,7 +158,6 @@ create_installer() {
 
 	echo "Done. Artifacts generated in $ARTIFACT_FOLDER"
 	ls -la $ARTIFACT_FOLDER
-
 	if [ "$CI_SCRIPT" == "ON" ]; then
 		cp -R $ARTIFACT_FOLDER $SRC_FOLDER
 		ls -la $SRC_FOLDER
@@ -175,6 +169,7 @@ run_workflow(){
 	download_tools
 	build_scopy
 	build_iio-emu
+	download_tools
 	deploy_app
 	bundle_drivers
 	extract_debug_symbols
