@@ -1,0 +1,4 @@
+*
+!mingw_toolchain.sh
+!windows_build_process.sh
+!sigrokdecode-windows-fix.patch
