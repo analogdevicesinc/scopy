@@ -20,6 +20,7 @@
 
 #include "iiowidget.h"
 #include <QDateTime>
+#include <pluginbase/preferences.h>
 
 using namespace scopy;
 
@@ -34,38 +35,10 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 	, m_lastOpState(nullptr)
 	, m_lastReturnCode(0)
 {
-	setLayout(new QVBoxLayout(this));
-	layout()->setContentsMargins(0, 0, 0, 0);
-	layout()->setSpacing(0);
-	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-
-	QWidget *ui = uiStrategy->ui();
-	if(ui) {
-		layout()->addWidget(ui);
+	bool useLazyLoading = Preferences::GetInstance()->get("iiowidgets_use_lazy_loading").toBool();
+	if(!useLazyLoading) { // force skip lazy load
+		LAZY_LOAD(initialize);
 	}
-	layout()->addWidget(m_progressBar);
-
-	QWidget *uiStrategyWidget = dynamic_cast<QWidget *>(m_uiStrategy);
-	QWidget *dataStrategyWidget = dynamic_cast<QWidget *>(m_dataStrategy);
-
-	connect(m_progressBar, &SmallProgressBar::progressFinished, this, [this]() { this->saveData(m_lastData); });
-
-	connect(uiStrategyWidget, SIGNAL(emitData(QString)), this, SLOT(startTimer(QString)));
-
-	connect(dataStrategyWidget, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
-		SLOT(emitDataStatus(QDateTime, QString, QString, int, bool)));
-
-	// forward data request from ui strategy to data strategy
-	connect(uiStrategyWidget, SIGNAL(requestData()), dataStrategyWidget, SLOT(readAsync()));
-
-	// forward data from data strategy to ui strategy
-	connect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), uiStrategyWidget,
-		SLOT(receiveData(QString, QString)));
-
-	// intercept the sendData from dataStrategy to collect information
-	connect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), this, SLOT(storeReadInfo(QString, QString)));
-
-	m_dataStrategy->readAsync();
 }
 
 QPair<QString, QString> IIOWidget::read() { return m_dataStrategy->read(); }
@@ -150,6 +123,45 @@ void IIOWidget::storeReadInfo(QString data, QString optionalData)
 	Q_UNUSED(data)
 	Q_UNUSED(optionalData)
 	setLastOperationTimestamp(QDateTime::currentDateTime());
+}
+
+void IIOWidget::initialize()
+{
+	setLayout(new QVBoxLayout(this));
+	layout()->setContentsMargins(0, 0, 0, 0);
+	layout()->setSpacing(0);
+	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+
+	QWidget *ui = m_uiStrategy->ui();
+	if(ui) {
+		layout()->addWidget(ui);
+	}
+	layout()->addWidget(m_progressBar);
+
+	QWidget *uiStrategyWidget = dynamic_cast<QWidget *>(m_uiStrategy);
+	QWidget *dataStrategyWidget = dynamic_cast<QWidget *>(m_dataStrategy);
+
+	connect(m_progressBar, &SmallProgressBar::progressFinished, this, [this]() { this->saveData(m_lastData); });
+
+	connect(uiStrategyWidget, SIGNAL(emitData(QString)), this, SLOT(startTimer(QString)));
+
+	connect(dataStrategyWidget, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
+		SLOT(emitDataStatus(QDateTime, QString, QString, int, bool)));
+
+	// forward data request from ui strategy to data strategy
+	connect(uiStrategyWidget, SIGNAL(requestData()), dataStrategyWidget, SLOT(readAsync()));
+
+	// forward data from data strategy to ui strategy
+	connect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), uiStrategyWidget,
+		SLOT(receiveData(QString, QString)));
+
+	// intercept the sendData from dataStrategy to collect information
+	connect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), this, SLOT(storeReadInfo(QString, QString)));
+
+	connect(dynamic_cast<QWidget *>(m_dataStrategy), SIGNAL(sendData(QString, QString)), this,
+		SLOT(storeReadInfo(QString, QString)));
+
+	m_dataStrategy->readAsync();
 }
 
 void IIOWidget::setLastOperationTimestamp(QDateTime timestamp)
