@@ -1,6 +1,7 @@
 #include "debuggerplugin.h"
 
-#include "debuggerinstrument.h"
+#include "debugger/debuggerinstrument.h"
+#include "iioexplorerinstrument.h"
 
 #include <iio.h>
 
@@ -23,22 +24,13 @@ Q_LOGGING_CATEGORY(CAT_BENCHMARK, "Benchmark");
 
 bool DebuggerPlugin::compatible(QString m_param, QString category)
 {
-	qDebug(CAT_DEBUGGERPLUGIN) << "Checking if Debugger (V1) is compatible.";
-
-	// Check weather this version (V1) should be used, true if V2 should be used
-	bool useThisDebugger = Preferences::GetInstance()->get("plugins_use_debugger_v2").toBool();
-	if(useThisDebugger) {
-		return false;
-	}
-
 	bool ret = true;
-	ConnectionProvider *c = ConnectionProvider::GetInstance();
-	Connection *conn = c->open(m_param);
+	Connection *conn = ConnectionProvider::open(m_param);
 
 	if(!conn) {
 		return false;
 	}
-	c->close(m_param);
+	ConnectionProvider::close(m_param);
 	return ret;
 }
 
@@ -49,17 +41,41 @@ void DebuggerPlugin::loadToolList()
 	ToolMenuEntry::findToolMenuEntryById(m_toolList, "debugger")->setVisible(true);
 }
 
+void DebuggerPlugin::unload() {}
+
 QString DebuggerPlugin::description() { return "IIO context explorer tool"; }
+
+QString DebuggerPlugin::version() { return "0.1"; }
+
+void DebuggerPlugin::saveSettings(QSettings &s)
+{
+	if(m_useDebuggerV2) {
+		m_iioDebugger->saveSettings(s);
+	}
+}
+
+void DebuggerPlugin::loadSettings(QSettings &s)
+{
+	if(m_useDebuggerV2) {
+		m_iioDebugger->loadSettings(s);
+	}
+}
 
 bool DebuggerPlugin::onConnect()
 {
-	ConnectionProvider *c = ConnectionProvider::GetInstance();
-	m_conn = c->open(m_param);
+	m_conn = ConnectionProvider::open(m_param);
 	if(!m_conn) {
 		return false;
 	}
-	auto dbgTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "debugger");
-	dbgTme->setTool(new DebuggerInstrument(m_conn->context(), nullptr, nullptr));
+
+	ToolMenuEntry *dbgTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "debugger");
+	m_useDebuggerV2 = Preferences::get("plugins_use_debugger_v2").toBool();
+	if(m_useDebuggerV2) {
+		m_iioDebugger = new IIOExplorerInstrument(m_conn->context(), nullptr, nullptr);
+		dbgTme->setTool(m_iioDebugger);
+	} else {
+		dbgTme->setTool(new DebuggerInstrument(m_conn->context(), nullptr, nullptr));
+	}
 	dbgTme->setEnabled(true);
 	dbgTme->setRunBtnVisible(true);
 
@@ -77,8 +93,7 @@ bool DebuggerPlugin::onDisconnect()
 	}
 
 	if(m_conn) {
-		ConnectionProvider *c = ConnectionProvider::GetInstance();
-		c->close(m_param);
+		ConnectionProvider::close(m_param);
 	}
 	return true;
 }
@@ -88,6 +103,12 @@ bool DebuggerPlugin::loadPage()
 	m_page = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_page);
 	lay->addWidget(new QLabel("IIO Debugger plugin", m_page));
+	return true;
+}
+
+bool DebuggerPlugin::loadIcon()
+{
+	SCOPY_PLUGIN_ICON(":/gui/icons/adalm.svg");
 	return true;
 }
 
