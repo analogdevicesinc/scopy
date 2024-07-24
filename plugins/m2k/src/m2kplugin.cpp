@@ -366,13 +366,13 @@ void M2kPlugin::cleanup()
 
 void M2kPlugin::clearPingTask()
 {
-	if(m_pingTask) {
-		m_pingTask->deleteLater();
-		m_pingTask = nullptr;
-	}
 	if(m_cyclicalTask) {
 		m_cyclicalTask->deleteLater();
 		m_cyclicalTask = nullptr;
+	}
+	if(m_pingTask) {
+		m_pingTask->deleteLater();
+		m_pingTask = nullptr;
 	}
 }
 
