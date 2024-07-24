@@ -21,6 +21,11 @@
 #include <osc_scale_engine.h>
 #include <pluginbase/preferences.h>
 
+#include <QPainter>
+#include <QwtLegend>
+#include <QwtPlotRenderer>
+#include <stylehelper.h>
+
 using namespace scopy;
 
 PlotWidget::PlotWidget(QWidget *parent)
@@ -219,6 +224,36 @@ void PlotWidget::setupAxes()
 	m_yAxis = new PlotAxis(m_yPosition, this, pen, this);
 }
 
+QwtSymbol::Style PlotWidget::getCurveStyle(int i)
+{
+	if(i == 0)
+		return QwtSymbol::Ellipse;
+	if(i == 1)
+		return QwtSymbol::Rect;
+	if(i == 2)
+		return QwtSymbol::Diamond;
+	if(i == 3)
+		return QwtSymbol::Triangle;
+	if(i == 4)
+		return QwtSymbol::Cross;
+	if(i == 5)
+		return QwtSymbol::XCross;
+	if(i == 6)
+		return QwtSymbol::Star1;
+	if(i == 7)
+		return QwtSymbol::Star2;
+	if(i == 8)
+		return QwtSymbol::Hexagon;
+	if(i == 9)
+		return QwtSymbol::DTriangle;
+	if(i == 10)
+		return QwtSymbol::UTriangle;
+	if(i == 11)
+		return QwtSymbol::LTriangle;
+
+	return QwtSymbol::RTriangle;
+}
+
 bool PlotWidget::showYAxisLabels() const { return m_showYAxisLabels; }
 
 void PlotWidget::setShowYAxisLabels(bool newShowYAxisLabels) { m_showYAxisLabels = newShowYAxisLabels; }
@@ -257,6 +292,53 @@ void PlotWidget::setUnitsVisible(bool visible)
 		ch->xAxis()->setUnitsVisible(visible);
 		ch->yAxis()->setUnitsVisible(visible);
 	}
+}
+
+void PlotWidget::printPlot(QPainter *painter, bool useSymbols)
+{
+	QwtPlotRenderer renderer;
+	renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, true);
+	renderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground, true);
+
+	// Apply printable plot changes
+	// list of current curve colors
+	QList<QPen> plotChColors;
+	for(int i = 0; i < getChannels().length(); i++) {
+		QPen printPen = getChannels().at(i)->curve()->pen();
+		// save current curve color
+		plotChColors.push_back(getChannels().at(i)->curve()->pen());
+		// get channel colors from StyleHelper
+		printPen.setColor(StyleHelper::getColor("CH" + QString::number(i)));
+		printPen.setWidth(2);
+		getChannels().at(i)->curve()->setPen(printPen);
+		if(useSymbols) {
+			QwtSymbol *symbol = new QwtSymbol(getCurveStyle(i), Qt::white, printPen, QSize(10, 10));
+			getChannels().at(i)->curve()->setSymbol(symbol);
+		}
+	}
+
+	QwtLegend *legendDisplay = new QwtLegend(m_plot);
+	legendDisplay->setDefaultItemMode(QwtLegendData::ReadOnly);
+	m_plot->insertLegend(legendDisplay, QwtPlot::TopLegend);
+	m_plot->updateLegend();
+
+	m_plot->replot();
+
+	// Print plot to Painter
+	renderer.render(m_plot, painter, QRectF(0, 0, 400, 300));
+
+	// revert changes made for printable plot
+
+	m_plot->insertLegend(nullptr);
+
+	// revert curves to original settings
+	for(int i = 0; i < getChannels().length(); i++) {
+		getChannels().at(i)->curve()->setPen(plotChColors.at(i));
+		if(useSymbols) {
+			getChannels().at(i)->curve()->setSymbol(new QwtSymbol(QwtSymbol::NoSymbol));
+		}
+	}
+	m_plot->replot();
 }
 
 PlotChannel *PlotWidget::selectedChannel() const { return m_selectedChannel; }

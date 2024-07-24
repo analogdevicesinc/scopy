@@ -78,6 +78,8 @@ public:
 
 	void setUnitsVisible(bool visible);
 
+	void printPlot(QPainter *painter, bool useSymbols = false);
+
 public Q_SLOTS:
 	void replot();
 	void selectChannel(PlotChannel *);
@@ -130,6 +132,7 @@ private:
 	void setupPlotInfo();
 	void setupPlotScales();
 	void setupAxes();
+	QwtSymbol::Style getCurveStyle(int i);
 };
 
 } // namespace scopy
