@@ -8,6 +8,8 @@
 
 #include <QObject>
 
+#include "iioexplorerinstrument.h"
+
 #include <pluginbase/pluginbase.h>
 #include <iioutil/connection.h>
 
@@ -18,18 +20,26 @@ class SCOPY_DEBUGGER_EXPORT DebuggerPlugin : public QObject, public PluginBase
 	SCOPY_PLUGIN;
 
 public:
-	void initMetadata() override;
-	bool compatible(QString param, QString category) override;
+	friend class IIODebugPlugin_API;
+	bool compatible(QString m_param, QString category) override;
 	bool loadPage() override;
+	bool loadIcon() override;
 	void loadToolList() override;
+	void unload() override;
+	void initMetadata() override;
 	QString description() override;
+	QString version() override;
+	void saveSettings(QSettings &) override;
+	void loadSettings(QSettings &) override;
 
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
 
 private:
+	debugger::IIOExplorerInstrument *m_iioDebugger;
 	Connection *m_conn;
+	bool m_useDebuggerV2;
 };
 } // namespace scopy::debugger
 

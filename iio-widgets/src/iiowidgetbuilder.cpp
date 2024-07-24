@@ -115,6 +115,9 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 			}
 
 			result.append(buildSingle());
+
+			m_attribute = "";
+			m_optionsAttribute = "";
 		}
 	} else if(m_device) {
 		attrCount = iio_device_get_attrs_count(m_device);
@@ -137,6 +140,8 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 			}
 
 			result.append(buildSingle());
+			m_attribute = "";
+			m_optionsAttribute = "";
 		}
 	} else if(m_context) {
 		attrCount = iio_context_get_attrs_count(m_context);
@@ -152,6 +157,8 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 
 			m_attribute = name;
 			result.append(buildSingle());
+			m_attribute = "";
+			m_optionsAttribute = "";
 		}
 	} else {
 		qWarning(CAT_ATTRBUILDER) << "Not enough information to build IIOWidgets";
