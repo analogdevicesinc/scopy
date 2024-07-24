@@ -13,7 +13,7 @@ include(GenerateExportHeader)
 
 # TODO: split stylesheet/resources and add here TODO: export header files correctly
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/ui)
@@ -26,55 +26,63 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
-set(SCOPY_QT_COMPONENTS Widgets Concurrent Svg Xml)
-
-file(GLOB SRC_LIST src/*.cpp model/*)
-
+file(
+	GLOB
+	SRC_LIST
+	src/*.cpp
+	src/*.cc
+	src/debugger/*.cpp
+	src/debugger/*.cc
+	src/debugger/*.h
+	src/debugger/*.hpp
+	src/iioexplorer/*.cpp
+	src/iioexplorer/*cc
+)
 file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 file(GLOB UI_LIST ui/*.ui)
 
+set(ENABLE_TESTING ON)
 if(ENABLE_TESTING)
 	add_subdirectory(test)
 endif()
 
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS/plugins/plugins")
+else()
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
+endif()
 
-qt_add_resources(PROJECT_RESOURCES resources/resources.qrc ../../resources/resources.qrc)
-
+qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
 
 generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
 )
 
-configure_file(
-	include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h.cmakein
-	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h @ONLY
-)
-
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-include_directories(${Qt${QT_VERSION_MAJOR}Concurrent_INCLUDE_DIRS})
-
-foreach(comp ${SCOPY_QT_COMPONENTS})
-	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
-endforeach()
-
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
 target_link_libraries(
 	${PROJECT_NAME}
-	PUBLIC ${SCOPY_QT_LIBRARIES}
-	       scopy-pluginbase
-	       scopy-iioutil
-	       scopy-gui
+	PUBLIC Qt::Widgets
+	       Qt::Core
 	       scopy-core
+	       scopy-pluginbase
+	       scopy-gui
+	       scopy-iioutil
+	       scopy-iio-widgets
 )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	set(INSTALLER_DESCRIPTION "${PLUGIN_DISPLAY_NAME} ${PLUGIN_DESCRIPTION}")
-	configureinstallersettings(${SCOPY_MODULE} ${INSTALLER_DESCRIPTION} FALSE)
+	configureinstallersettings(${SCOPY_MODULE} ${PLUGIN_DESCRIPTION} FALSE)
 endif()
 
-set(DEBUGGER_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
+set(IIODEBUG_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
+
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${SCOPY_PLUGIN_INSTALL_DIR})
