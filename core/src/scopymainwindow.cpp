@@ -408,6 +408,8 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 		Q_EMIT p->restartRequired();
 	} else if(str == "general_show_status_bar") {
 		StatusBarManager::GetInstance()->setEnabled(val.toBool());
+	} else if(str == "plugins_use_debugger_v2") {
+		Q_EMIT p->restartRequired();
 	}
 }
 
