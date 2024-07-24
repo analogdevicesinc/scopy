@@ -30,6 +30,7 @@
 #include "guistrategy/guistrategyinterface.h"
 #include "datastrategy/datastrategyinterface.h"
 #include "scopy-iio-widgets_export.h"
+#include <pluginbase/lazyloadwidget.h>
 
 namespace scopy {
 class GuiStrategyInterface;
@@ -39,6 +40,7 @@ class SCOPY_IIO_WIDGETS_EXPORT IIOWidget : public QWidget
 {
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
+	QWIDGET_LAZY_INIT(initialize)
 public:
 	typedef enum
 	{
@@ -138,6 +140,8 @@ protected Q_SLOTS:
 	void storeReadInfo(QString data, QString optionalData);
 
 protected:
+	void initialize();
+
 	void setLastOperationTimestamp(QDateTime timestamp);
 	void setLastOperationState(IIOWidget::State state);
 
