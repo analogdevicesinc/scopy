@@ -208,6 +208,8 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 		PreferencesHelper::addPreferenceCheckBox(p, "show_grid", "Show Grid", generalSection));
 	generalSection->contentLayout()->addWidget(
 		PreferencesHelper::addPreferenceCheckBox(p, "show_graticule", "Show Graticule", generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
+		p, "iiowidgets_use_lazy_loading", "Use Lazy Loading", generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
 		p, "general_theme", "Theme", {"default", "light"}, generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
