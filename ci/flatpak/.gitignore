@@ -1,0 +1,5 @@
+Scopy.flatpak
+.flatpak-builder
+build
+repo
+org.adi.Scopy.json
