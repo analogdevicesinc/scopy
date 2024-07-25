@@ -1,0 +1,3 @@
+[submodule "ci/flatpak/shared-modules"]
+	path = ci/flatpak/shared-modules
+	url = https://github.com/flathub/shared-modules.git
