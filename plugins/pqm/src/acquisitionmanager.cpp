@@ -75,11 +75,19 @@ void AcquisitionManager::toolEnabled(bool en, QString toolName)
 {
 	m_tools[toolName] = en;
 	QMap<QString, bool>::const_iterator it = std::find(m_tools.cbegin(), m_tools.cend(), true);
+	if(m_tools["rms"] || m_tools["harmonics"] || m_tools["settings"]) {
+		setProcessData(true);
+	}
+	if(m_tools["waveform"]) {
+		setProcessData(false);
+	}
 	if(it != m_tools.cend()) {
+		stopPing();
 		if(!m_readFw->isRunning()) {
 			futureReadData();
 		}
 	} else {
+		startPing();
 		m_readFw->waitForFinished();
 		m_readFw->cancel();
 	}
@@ -96,11 +104,6 @@ void AcquisitionManager::futureReadData()
 void AcquisitionManager::readData()
 {
 	mutex.lock();
-	if(m_enPing) {
-		m_pingTask->start();
-		m_pingTask->wait(THREAD_FINISH_TIMEOUT);
-		m_enPing = false;
-	}
 	if(m_tools["rms"] || m_tools["harmonics"] || m_tools["settings"]) {
 		m_attrHaveBeenRead = readPqmAttributes();
 	}
@@ -186,7 +189,13 @@ void AcquisitionManager::onReadFinished()
 	}
 }
 
-void AcquisitionManager::pingTimerTimeout() { m_enPing = true; }
+void AcquisitionManager::pingTimerTimeout()
+{
+	mutex.lock();
+	m_pingTask->start();
+	m_pingTask->wait(THREAD_FINISH_TIMEOUT);
+	mutex.unlock();
+}
 
 double AcquisitionManager::convertFromHwToHost(int value, QString chnlId)
 {
@@ -228,6 +237,18 @@ void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 		}
 	}
 	mutex.unlock();
+}
+
+void AcquisitionManager::setProcessData(bool en)
+{
+	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
+	if(!dev) {
+		return;
+	}
+	int ret = iio_device_attr_write_bool(dev, "process_data", en);
+	if(ret < 0) {
+		qInfo(CAT_PQM_ACQ) << "Cannot write process_data attribute!";
+	}
 }
 
 #include "moc_acquisitionmanager.cpp"
