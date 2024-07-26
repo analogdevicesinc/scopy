@@ -42,10 +42,11 @@ private:
 	bool readPqmAttributes();
 	bool readBufferedData();
 	void setData(QMap<QString, QMap<QString, QString>>);
+	void setProcessData(bool en);
 
 	iio_context *m_ctx;
 	iio_buffer *m_buffer;
-	
+
 	QTimer *m_pingTimer = nullptr;
 	PingTask *m_pingTask = nullptr;
 	QFutureWatcher<void> *m_readFw;
@@ -59,7 +60,6 @@ private:
 
 	bool m_attrHaveBeenRead = false;
 	bool m_buffHaveBeenRead = false;
-	bool m_enPing = false;
 	const int THREAD_FINISH_TIMEOUT = 10000;
 };
 } // namespace scopy::pqm
