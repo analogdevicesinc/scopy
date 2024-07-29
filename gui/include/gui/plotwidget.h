@@ -22,17 +22,13 @@ class PlotTracker;
 
 typedef struct _PlotSamplingInfo
 {
-	_PlotSamplingInfo()
-	{
-		startingPoint = 0;
-		freqOffset = 0;
-	}
 	uint32_t bufferSize = 0;
 	uint32_t plotSize = 0;
 	double sampleRate = 0;
 	double startingPoint = 0;
 	double freqOffset = 0;
-} PlotSamplingInfo;
+	bool complexMode = 0;
+} SamplingInfo;
 
 class SCOPY_GUI_EXPORT PlotWidget : public QWidget
 {
