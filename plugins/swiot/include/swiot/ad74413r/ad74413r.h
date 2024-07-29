@@ -137,7 +137,7 @@ private:
 
 	PlotWidget *m_plot;
 	PlotInfo *m_info;
-	PlotSamplingInfo m_currentSamplingInfo;
+	SamplingInfo m_currentSamplingInfo;
 	QMap<int, PlotChannel *> m_plotChnls;
 
 	QMap<QString, iio_device *> m_iioDevicesMap;
