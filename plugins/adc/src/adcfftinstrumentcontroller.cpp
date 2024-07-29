@@ -7,6 +7,8 @@
 #include "freq/fftplotmanager.h"
 #include "freq/fftplotmanagersettings.h"
 #include "interfaces.h"
+#include "importchannelcomponent.h"
+
 using namespace scopy;
 using namespace adc;
 
@@ -17,32 +19,6 @@ ADCFFTInstrumentController::ADCFFTInstrumentController(ToolMenuEntry *tme, QStri
 
 ADCFFTInstrumentController::~ADCFFTInstrumentController()
 {
-
-}
-
-void ADCFFTInstrumentController::setComplexMode(bool b) {
-	m_complexMode = b;
-	for(auto c : qAsConst(m_components)) {
-		if(dynamic_cast<FftInstrumentComponent*>(c)) {
-			dynamic_cast<FftInstrumentComponent*>(c)->setComplexMode(b);
-		}
-	}
-
-	for(auto c : qAsConst(m_components)) {
-		if(dynamic_cast<FftInstrumentComponent*>(c)) {
-			if(dynamic_cast<FftInstrumentComponent*>(c)->complexMode() == m_complexMode) {
-				c->enable();
-				// c->
-			} else {
-				c->disable();
-			}
-		}
-	}
-
-	if(m_started) {
-		stop();
-		start();
-	}
 
 }
 
@@ -86,7 +62,6 @@ void ADCFFTInstrumentController::init()
 	m_otherCMCB->getControlBtn()->setName("Other");
 	m_ui->vcm()->addEnd(m_otherCMCB);
 
-	connect(m_ui->m_complex, &QPushButton::toggled, this, &ADCFFTInstrumentController::setComplexMode);
 }
 
 void ADCFFTInstrumentController::createIIODevice(AcqTreeNode *node)
@@ -100,8 +75,9 @@ void ADCFFTInstrumentController::createIIODevice(AcqTreeNode *node)
 	m_fftPlotSettingsComponent->addSampleRateProvider(d);
 	addComponent(d);
 
-	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::bufferSizeChanged, d,
-		&GRDeviceComponent::setBufferSize);
+	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, this, [=](SamplingInfo p){
+		d->setBufferSize(p.bufferSize);
+	});
 }
 
 void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
@@ -141,6 +117,7 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 	grtsc->addChannel(c);			    // For matching Sink To Channels
 	dc->addChannel(c);			    // used for sample rate computation
 	m_fftPlotSettingsComponent->addChannel(c); // SingleY/etc
+	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, c, &ChannelComponent::setSamplingInfo);
 
 	addComponent(c);
 	setupChannelMeasurement(m_plotComponentManager, c);
@@ -181,6 +158,7 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 	grtsc->addChannel(c);			    // For matching Sink To Channels
 	dc->addChannel(c);			    // used for sample rate computation
 	m_fftPlotSettingsComponent->addChannel(c); // SingleY/etc
+	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, c, &ChannelComponent::setSamplingInfo);
 
 	addComponent(c);
 	setupChannelMeasurement(m_plotComponentManager, c);
@@ -190,21 +168,24 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 {
 	GRTopBlockNode *grtbn = dynamic_cast<GRTopBlockNode *>(node);
 	GRFFTSinkComponent *c = new GRFFTSinkComponent(m_name + "_fft", grtbn, this);
-	//m_acqNodeComponentMap[grtbn] = (c);
-	//addComponent(c);
 
 	m_dataProvider = c;
 	c->init();
 
-	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::bufferSizeChanged, c,
-		&GRFFTSinkComponent::setBufferSize);
+	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, this, [=](SamplingInfo p){
+		if(m_started) {
+			stop();
+			c->setSamplingInfo(p);
+			start();
+		} else {
+			c->setSamplingInfo(p);
+		}
+	});
 
 	connect(c, &GRFFTSinkComponent::requestSingleShot, this, &ADCFFTInstrumentController::setSingleShot);
 	connect(c, &GRFFTSinkComponent::requestBufferSize, m_fftPlotSettingsComponent, &FFTPlotManagerSettings::setBufferSize);
 
-
-	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::sampleRateChanged, c,
-		&GRFFTSinkComponent::setSampleRate);
+	connect(m_ui->m_complex, &QAbstractButton::toggled, m_fftPlotSettingsComponent, &FFTPlotManagerSettings::setComplexMode);
 
 	connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b){
 		setSingleShot(b);
@@ -305,8 +286,6 @@ void ADCFFTInstrumentController::addChannel(AcqTreeNode *node)
 	if(dynamic_cast<ImportFloatChannelNode *>(node) != nullptr) {
 		createImportFloatChannel(node);
 	}
-
-	setComplexMode(m_complexMode);
 
 	m_plotComponentManager->replot();
 }

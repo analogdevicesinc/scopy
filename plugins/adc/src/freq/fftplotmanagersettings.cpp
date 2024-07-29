@@ -20,6 +20,13 @@ FFTPlotManagerSettings::FFTPlotManagerSettings(FFTPlotManager *mgr, QWidget *par
 	lay->setSpacing(0);
 	lay->setMargin(0);
 	setLayout(lay);
+	m_samplingInfo.bufferSize = 32;
+	m_samplingInfo.plotSize = 32;
+	m_samplingInfo.complexMode = false;
+	m_samplingInfo.freqOffset = 0;
+	m_samplingInfo.sampleRate = 1;
+	m_samplingInfo.startingPoint = 0;
+
 }
 
 FFTPlotManagerSettings::~FFTPlotManagerSettings() {}
@@ -82,8 +89,6 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 		setBufferSize((uint32_t)val);
 	});
 
-	connect(this, &FFTPlotManagerSettings::bufferSizeChanged, m_bufferSizeSpin, &ScaleSpinButton::setValue);
-
 
 	QWidget *xMinMax = new QWidget(section);
 	QHBoxLayout *xMinMaxLayout = new QHBoxLayout(xMinMax);
@@ -143,6 +148,8 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setEnabled(false);
 			m_sampleRateSpin->setValue(readSampleRate());
+			m_freqOffsetSpin->setVisible(true);
+			m_freqOffsetSpin->setEnabled(true);
 
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<FFTPlotComponent*>(plt);
@@ -153,6 +160,8 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 		if(xcb->itemData(idx) == XMODE_OVERRIDE) {
 			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setEnabled(true);
+			m_freqOffsetSpin->setVisible(true);
+			m_freqOffsetSpin->setEnabled(true);
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<FFTPlotComponent*>(plt);
 				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
@@ -173,7 +182,24 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 	m_sampleRateSpin->setEnabled(false);
 	connect(m_sampleRateSpin, &PositionSpinButton::valueChanged, this, [=](double val) { setSampleRate(val); });
 
-	connect(this, &FFTPlotManagerSettings::sampleRateChanged, m_sampleRateSpin, &PositionSpinButton::setValue);
+	m_freqOffsetSpin = new PositionSpinButton(
+		{
+		 {"Hz", 1e0},
+		 {"kHz", 1e3},
+		 {"MHz", 1e6},
+		 {"GHz", 1e9},
+		 },
+		"Frequency Offset", 0, DBL_MAX, false, false, section);
+
+	m_freqOffsetSpin->setValue(0);
+	m_freqOffsetSpin->setEnabled(false);
+	connect(m_freqOffsetSpin, &PositionSpinButton::valueChanged, this, [=](double val) { setFreqOffset(val); });
+	connect(this, &FFTPlotManagerSettings::samplingInfoChanged, this, [=](SamplingInfo p){
+		m_freqOffsetSpin->setValue(m_samplingInfo.freqOffset);
+		m_sampleRateSpin->setValue(m_samplingInfo.sampleRate);
+		m_bufferSizeSpin->setValue(m_samplingInfo.bufferSize);
+
+	});
 
 	section->contentLayout()->setSpacing(10);
 
@@ -181,6 +207,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 	section->contentLayout()->addWidget(xMinMax);
 	section->contentLayout()->addWidget(m_xModeCb);
 	section->contentLayout()->addWidget(m_sampleRateSpin);
+	section->contentLayout()->addWidget(m_freqOffsetSpin);
 	section->contentLayout()->setSpacing(10);
 
 	return section;
@@ -197,36 +224,29 @@ void FFTPlotManagerSettings::onInit()
 	       //	m_rollingModeSw->onOffswitch()->setChecked(false);
 }
 
-double FFTPlotManagerSettings::sampleRate() const { return m_sampleRate; }
-
-void FFTPlotManagerSettings::setSampleRate(double newSampleRate)
-{
-	if(qFuzzyCompare(m_sampleRate, newSampleRate))
-		return;
-	m_sampleRate = newSampleRate;
-	Q_EMIT sampleRateChanged(m_sampleRate);
-	updateXAxis();
-}
-
-uint32_t FFTPlotManagerSettings::bufferSize() const { return m_bufferSize; }
-
-void FFTPlotManagerSettings::setBufferSize(uint32_t newBufferSize)
-{
-	if(m_bufferSize == newBufferSize)
-		return;
-	m_bufferSize = newBufferSize;
-	Q_EMIT bufferSizeChanged(newBufferSize);
-	updateXAxis();
-}
-
 void FFTPlotManagerSettings::updateXAxis()
 {
 
 	double min = 0;
-	double max = m_bufferSize;
+	double max = 0;
 
-	min = min / m_sampleRate;
-	max = max / m_sampleRate;
+	QComboBox *cb = m_xModeCb->combo();
+
+
+	if(cb->itemData(cb->currentIndex()) == XMODE_TIME) {
+		max = m_samplingInfo.sampleRate;
+	} else {
+		max = m_samplingInfo.bufferSize;
+	}
+
+	if(m_samplingInfo.complexMode) {
+		min = -max;
+	} else {
+		min = 0;
+	}
+
+	min = m_samplingInfo.freqOffset + min/2;
+	max = m_samplingInfo.freqOffset + max/2;
 
 	m_xmin->setValue(min);
 	m_xmax->setValue(max);
@@ -242,11 +262,9 @@ void FFTPlotManagerSettings::onStart()
 	if(cb->itemData(cb->currentIndex()) == XMODE_TIME) {
 		double sr = readSampleRate();
 		setSampleRate(sr);
-	} else {
-		Q_EMIT sampleRateChanged(m_sampleRate);
 	}
 
-	Q_EMIT bufferSizeChanged(m_bufferSize);
+	Q_EMIT samplingInfoChanged(m_samplingInfo);
 	updateXAxis();
 }
 
@@ -287,6 +305,7 @@ void FFTPlotManagerSettings::addChannel(ChannelComponent *c)
 	if(srp) {
 		addSampleRateProvider(srp);
 	}
+	c->setSamplingInfo(m_samplingInfo);
 }
 
 void FFTPlotManagerSettings::removeChannel(ChannelComponent *c)
@@ -318,6 +337,7 @@ double FFTPlotManagerSettings::readSampleRate()
 	return sr;
 }
 
+
 void FFTPlotManagerSettings::updateXModeCombo()
 {
 	if(m_sampleRateAvailable) // already set
@@ -327,6 +347,58 @@ void FFTPlotManagerSettings::updateXModeCombo()
 		auto cb = m_xModeCb->combo();
 		cb->insertItem(1, "Time", XMODE_TIME);
 	}
+}
+
+
+double FFTPlotManagerSettings::sampleRate() const { return m_samplingInfo.sampleRate; }
+
+void FFTPlotManagerSettings::setSampleRate(double newSampleRate)
+{
+	if(qFuzzyCompare(m_samplingInfo.sampleRate, newSampleRate))
+		return;
+	m_samplingInfo.sampleRate = newSampleRate;
+	Q_EMIT samplingInfoChanged(m_samplingInfo);
+	updateXAxis();
+}
+
+uint32_t FFTPlotManagerSettings::bufferSize() const { return m_samplingInfo.bufferSize; }
+
+void FFTPlotManagerSettings::setBufferSize(uint32_t newBufferSize)
+{
+	qInfo()<<"setBufferSize";
+	if(m_samplingInfo.bufferSize == newBufferSize)
+		return;
+	m_samplingInfo.bufferSize = newBufferSize;
+	Q_EMIT samplingInfoChanged(m_samplingInfo);
+	updateXAxis();
+}
+
+double FFTPlotManagerSettings::freqOffset() const
+{
+	return m_samplingInfo.freqOffset;
+}
+
+void FFTPlotManagerSettings::setFreqOffset(double newFreqOffset)
+{
+	if (qFuzzyCompare(m_samplingInfo.freqOffset, newFreqOffset))
+		return;
+	m_samplingInfo.freqOffset = newFreqOffset;
+	Q_EMIT samplingInfoChanged(m_samplingInfo);
+	updateXAxis();
+}
+
+bool FFTPlotManagerSettings::complexMode() const
+{
+	return m_samplingInfo.complexMode;
+}
+
+void FFTPlotManagerSettings::setComplexMode(bool newComplexMode)
+{
+	if (m_samplingInfo.complexMode == newComplexMode)
+		return;
+	m_samplingInfo.complexMode = newComplexMode;
+	Q_EMIT samplingInfoChanged(m_samplingInfo);
+	updateXAxis();
 }
 
 /*void FFTPlotManagerSettings::collapseAllAndOpenMenu(QString s) {

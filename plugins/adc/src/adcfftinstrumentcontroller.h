@@ -16,7 +16,7 @@ public:
 	virtual void init() override;
 	virtual void addChannel(AcqTreeNode *node) override;
 	virtual void removeChannel(AcqTreeNode *node) override;
-	void setComplexMode(bool b);
+	// void setComplexMode(bool b);
 	void createIIODevice(AcqTreeNode *node);
 	void createIIOFloatChannel(AcqTreeNode *node);
 	void createIIOComplexChannel(AcqTreeNode *node_I, AcqTreeNode *node_Q);

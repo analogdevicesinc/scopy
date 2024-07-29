@@ -3,6 +3,8 @@
 
 #include "channelcomponent.h"
 #include <gui/plotautoscaler.h>
+#include <gui/widgets/menuplotchannelcurvestylecontrol.h>
+#include <gui/widgets/menuplotaxisrangecontrol.h>
 
 namespace scopy {
 namespace adc {

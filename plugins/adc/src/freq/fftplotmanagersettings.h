@@ -42,8 +42,13 @@ public:
 	uint32_t bufferSize() const;
 	void setBufferSize(uint32_t newBufferSize);
 
-	void updateXAxis();
 	MenuWidget *menu() override;
+
+	double freqOffset() const;
+	void setFreqOffset(double newFreqOffset);
+
+	bool complexMode() const;
+	void setComplexMode(bool newComplexMode);
 
 public Q_SLOTS:
 	void onStart() override;
@@ -61,10 +66,14 @@ public Q_SLOTS:
 	void addPlot(FFTPlotComponent *plt);
 	void removePlot(FFTPlotComponent *p);
 	void collapseAllAndOpenMenu(QString s);
+	void updateXAxis();
 
 Q_SIGNALS:
-	void bufferSizeChanged(uint32_t);
-	void sampleRateChanged(double);
+	void complexModeChanged();
+	void sampleRateChanged();
+	void freqOffsetChanged();
+	void bufferSizeChanged();
+	void samplingInfoChanged(SamplingInfo);
 
 private:
 	FFTPlotManager *m_plotManager;
@@ -93,16 +102,18 @@ private:
 	QMap<uint32_t, QWidget *> m_plotWidgetMap;
 
 	bool m_sampleRateAvailable;
-	uint32_t m_bufferSize;
-	double m_sampleRate;
+
+	SamplingInfo m_samplingInfo;
 
 	QList<ChannelComponent *> m_channels;
 	QList<SampleRateProvider *> m_sampleRateProviders;
 
 
-	// Q_PROPERTY(double sampleRate READ sampleRate WRITE setSampleRate NOTIFY sampleRateChanged)
+	Q_PROPERTY(bool complexMode READ complexMode WRITE setComplexMode NOTIFY complexModeChanged)
 	Q_PROPERTY(double sampleRate READ sampleRate WRITE setSampleRate NOTIFY sampleRateChanged)
+	Q_PROPERTY(double freqOffset READ freqOffset WRITE setFreqOffset NOTIFY freqOffsetChanged)
 	Q_PROPERTY(uint32_t bufferSize READ bufferSize WRITE setBufferSize NOTIFY bufferSizeChanged FINAL)
+
 	void setPlotComboVisible();
 };
 

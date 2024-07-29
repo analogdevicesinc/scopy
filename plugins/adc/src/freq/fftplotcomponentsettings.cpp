@@ -40,11 +40,13 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	connect(labelsSwitch->onOffswitch(), &QAbstractButton::toggled, m_plotComponent,
 		&FFTPlotComponent::showPlotLabels);
 
-	m_yCtrl = new MenuPlotAxisRangeControl(m_plotComponent->fftPlot()->yAxis(), this);
-
-
 	MenuSectionCollapseWidget *yaxis =
 		new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_NONE, parent);
+
+	m_yCtrl = new MenuPlotAxisRangeControl(m_plotComponent->fftPlot()->yAxis(), this);
+	m_yPwrOffset = new PositionSpinButton(
+		{ {"db", 1e0} },
+		"Power Offset", -200, 200, false, false, yaxis);
 
 	m_curve = new MenuPlotChannelCurveStyleControl(plotMenu);
 
@@ -53,6 +55,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	connect(m_deletePlot, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
 
 	yaxis->contentLayout()->addWidget(m_yCtrl);
+	yaxis->contentLayout()->addWidget(m_yPwrOffset);
 
 	plotMenu->contentLayout()->addWidget(plotTitleLabel);
 	plotMenu->contentLayout()->addWidget(plotTitle);
@@ -104,6 +107,14 @@ void FFTPlotComponentSettings::addChannel(ChannelComponent *c)
 	auto fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel*>(c->plotChannelCmpt());
 	m_curve->addChannels(fftPlotComponentChannel->plotChannel());
 
+	if(dynamic_cast<FFTChannel*>(c)) {
+		FFTChannel* fc = dynamic_cast<FFTChannel*>(c);
+		connections[c] << connect(m_yPwrOffset, &PositionSpinButton::valueChanged, c, [=](double val){
+			fc->setPowerOffset(val);
+		});
+		fc->setPowerOffset(m_yPwrOffset->value());
+
+	}
 	m_channels.append(c);
 }
 
@@ -113,5 +124,11 @@ void FFTPlotComponentSettings::removeChannel(ChannelComponent *c)
 
 	auto fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel*>(c->plotChannelCmpt());
 	m_curve->removeChannels(fftPlotComponentChannel->plotChannel());
+
+	for(const QMetaObject::Connection &c : qAsConst(connections[c])) {
+		QObject::disconnect(c);
+	}
+	connections.remove(c);
+
 }
 

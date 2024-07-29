@@ -43,7 +43,6 @@ void FFTPlotComponentChannel::deinitPlotComponent()
 
 void FFTPlotComponentChannel::initPlotComponent(PlotComponent *pc)
 {
-
 	FFTPlotComponent* plotComponent = dynamic_cast<FFTPlotComponent*>(pc);
 	auto fftplot = plotComponent->fftPlot();
 

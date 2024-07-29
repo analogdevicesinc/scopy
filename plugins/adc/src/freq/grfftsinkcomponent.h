@@ -10,7 +10,7 @@
 namespace scopy {
 namespace adc {
 
-class GRFFTSinkComponent : public QObject, public DataProvider, public SyncInstrument, public FftInstrumentComponent
+class GRFFTSinkComponent : public QObject, public DataProvider, public SyncInstrument, public SamplingInfoComponent
 {
 	Q_OBJECT
 public:
@@ -23,9 +23,6 @@ public:
 public Q_SLOTS:
 	void connectSignalPaths();
 	void tearDownSignalPaths();
-
-	virtual void setSampleRate(double);
-	virtual void setBufferSize(uint32_t size);
 
 	virtual void onArm() override;
 	virtual void onDisarm() override;
@@ -43,8 +40,8 @@ public Q_SLOTS:
 	virtual void setSingleShot(bool) override;
 	virtual void setData(bool copy = false) override;
 
-	virtual bool complexMode() override;
-	virtual void setComplexMode(bool b) override;
+	virtual SamplingInfo samplingInfo() override;
+	virtual void setSamplingInfo(SamplingInfo p) override;
 
 	void addChannel(GRChannel *ch);
 	void removeChannel(GRChannel *c);
@@ -67,7 +64,7 @@ private:
 	std::mutex refillMutex;
 	time_sink_f::sptr time_sink;
 	QMap<QString, int> time_channel_map;
-	PlotSamplingInfo m_currentSamplingInfo;
+	SamplingInfo m_samplingInfo;
 
 	GRTopBlockNode *m_node;
 	GRTopBlock *m_top;

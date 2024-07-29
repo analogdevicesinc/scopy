@@ -6,24 +6,20 @@
 #include "toolcomponent.h"
 #include "plotcomponent.h"
 #include "menucontrolbutton.h"
-#include "menucollapsesection.h"
-#include "menuplotchannelcurvestylecontrol.h"
-#include "menuplotaxisrangecontrol.h"
 #include "menuwidget.h"
 
 namespace scopy {
 namespace adc {
 
-class TimePlotComponentChannel;
-
-class GRChannel
+class SCOPY_ADC_EXPORT GRChannel : public DataProcessor
 {
 public:
 	virtual GRSignalPath *sigpath() = 0;
-	virtual void onNewData(const float *xData, const float *yData, size_t size, bool copy) = 0;
 };
 
-class SCOPY_ADC_EXPORT ChannelComponent : public QWidget, public ToolComponent, public Menu
+class TimePlotComponentChannel;
+
+class SCOPY_ADC_EXPORT ChannelComponent : public QWidget, public ToolComponent, public Menu, public SamplingInfoComponent
 {
 	Q_OBJECT
 public:
@@ -44,6 +40,9 @@ public:
 	MenuWidget *menu() override;
 	static void createMenuControlButton(ChannelComponent *c, QWidget *parent = nullptr);
 
+	virtual SamplingInfo samplingInfo() override;
+	virtual void setSamplingInfo(SamplingInfo p) override;
+
 protected:
 	QString m_channelName;
 	QPen m_pen;
@@ -53,6 +52,8 @@ protected:
 
 	ChannelData *m_chData;
 	PlotComponentChannel *m_plotChannelCmpt;
+
+	SamplingInfo m_samplingInfo;
 
 	void initMenu(QWidget *parent = nullptr);
 
