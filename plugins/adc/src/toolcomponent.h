@@ -92,7 +92,7 @@ public:
 	virtual void enable() { m_enabled = true; }
 	virtual void disable() { m_enabled = false; }
 
-	bool enabled() const { return m_enabled; }
+	virtual bool enabled() const { return m_enabled; }
 
 protected:
 	QString m_name;

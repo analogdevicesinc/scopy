@@ -79,9 +79,9 @@ void ADCInstrument::setupToolLayout()
 	tool->addWidgetToTopContainerHelper(addBtn, TTA_LEFT);
 	tool->addWidgetToTopContainerHelper(removeBtn, TTA_LEFT);
 	tool->addWidgetToTopContainerHelper(m_sync, TTA_LEFT);
-	tool->addWidgetToTopContainerHelper(m_complex, TTA_LEFT);
 
 	tool->addWidgetToBottomContainerHelper(channelsBtn, TTA_LEFT);
+	tool->addWidgetToBottomContainerHelper(m_complex, TTA_LEFT);
 
 	rightMenuBtnGrp->addButton(settingsBtn);
 

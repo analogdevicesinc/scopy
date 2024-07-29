@@ -59,7 +59,7 @@ TimeSamplingInfo::TimeSamplingInfo(QWidget *parent)
 
 TimeSamplingInfo::~TimeSamplingInfo() {}
 
-void TimeSamplingInfo::update(PlotSamplingInfo info)
+void TimeSamplingInfo::update(SamplingInfo info)
 {
 	QString text;
 	text = QString("%1").arg(m_mpf->format(info.plotSize, "samples", 2));
