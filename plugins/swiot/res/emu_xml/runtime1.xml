@@ -145,5 +145,5 @@
 			<attribute name="offset" filename="in_temp_offset" value="0" />
 		</channel>
 	</device>
-	<device id="trigger0" name="ad74413r-dev0" ></device>
+	<device id="trigger0" name="sw_trig" ></device>
 </context>
