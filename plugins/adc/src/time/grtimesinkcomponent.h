@@ -66,7 +66,7 @@ private:
 	std::mutex refillMutex;
 	time_sink_f::sptr time_sink;
 	QMap<QString, int> time_channel_map;
-	PlotSamplingInfo m_currentSamplingInfo;
+	SamplingInfo m_currentSamplingInfo;
 
 	GRTopBlockNode *m_node;
 	GRTopBlock *m_top;

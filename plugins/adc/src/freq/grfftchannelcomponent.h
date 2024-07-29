@@ -16,6 +16,7 @@
 #include <gui/widgets/menuwidget.h>
 #include "freq/fftplotcomponentchannel.h"
 #include "freq/fftplotcomponent.h"
+#include <gr-util/grsignalpath.h>
 #include <gr-util/grfftfloatproxy.h>
 #include <gr-util/griiocomplexchannelsrc.h>
 
@@ -57,11 +58,21 @@ public:
 		return m_signalPath;
 	}
 
+	void setPowerOffset(double val) {
+		val = m_powerOffset;
+		m_fft->setPowerOffset(val);
+	}
+
+	double powerOffset() {
+		return m_powerOffset;
+	}
+
 	GRTopBlock *m_top;
 	ChannelComponent *m_ch;
 	GRSignalPath *m_signalPath;
 	GRFFTComplexProc *m_fft;
 	GRIIOComplexChannelSrc *m_grch;
+	double m_powerOffset;
 };
 
 class GRFFTChannelSigpath : public QObject, public GRChannel
@@ -70,6 +81,7 @@ public:
 	GRFFTChannelSigpath(QString m_name, ChannelComponent *ch, GRTopBlock *top,GRIIOFloatChannelSrc *src, QObject *parent)
 		: QObject(parent)
 	{
+		m_powerOffset = 0;
 		m_ch = ch;
 		m_grch = src;
 		m_signalPath = new GRSignalPath(
@@ -94,19 +106,28 @@ public:
 		return m_signalPath;
 	}
 
+	void setPowerOffset(double val) {
+		m_powerOffset = val;
+		m_fft->setPowerOffset(val);
+	}
+
+	double powerOffset() {
+		return m_powerOffset;
+	}
 
 	GRTopBlock *m_top;
 	ChannelComponent *m_ch;
 	GRSignalPath *m_signalPath;
 	GRFFTFloatProc *m_fft;
 	GRIIOFloatChannelSrc *m_grch;
+	double m_powerOffset;
 };
 
 class SCOPY_ADC_EXPORT GRFFTChannelComponent : public ChannelComponent,
 					       public GRChannel,
 					       public MeasurementProvider,
 					       public SampleRateProvider,
-					       public FftInstrumentComponent
+					       public FFTChannel
 {
 	Q_OBJECT
 public:
@@ -121,8 +142,10 @@ public:
 	GRSignalPath *sigpath() override;
 	QVBoxLayout *menuLayout();
 
-	uint32_t fftSize() const;
-	void setFftSize(uint32_t newFftSize);
+	double powerOffset();
+	void setPowerOffset(double) override;
+
+	virtual bool enabled() const override;
 
 public Q_SLOTS:
 	void enable() override;
@@ -142,20 +165,23 @@ public Q_SLOTS:
 	void addChannelToPlot() override;
 	void removeChannelFromPlot() override;
 
-	bool complexMode() override;
-	void setComplexMode(bool b) override;
+	// SamplingInfoComponent interface
+public:
+	void setSamplingInfo(SamplingInfo p) override;
 
 Q_SIGNALS:
 	void yModeChanged();
 	void fftSizeChanged();
+	void powerOffsetChanged(double);
 
 private:
+	double m_powerOffset;
+
 	GRIIOFloatChannelNode *m_node;
 	GRIIOChannel *m_src;
 
 	GRIIOFloatChannelSrc *m_src_I;
 	GRIIOFloatChannelSrc *m_src_Q;
-
 
 	GRChannel *m_grtch;
 	QVBoxLayout *m_layScroll;
@@ -181,11 +207,10 @@ private:
 	QWidget *createCurveMenu(QWidget *parent);
 	QPushButton *createSnapshotButton(QWidget *parent);
 
-	Q_PROPERTY(uint32_t fftSize READ fftSize WRITE setFftSize NOTIFY fftSizeChanged);
-
 	YMode m_ymode;
-	uint32_t m_fftSize;
 	void _init();
+
+	Q_PROPERTY(double powerOffset READ powerOffset WRITE setPowerOffset NOTIFY powerOffsetChanged)
 };
 
 

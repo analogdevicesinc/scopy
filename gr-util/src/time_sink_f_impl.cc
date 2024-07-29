@@ -54,12 +54,18 @@ void time_sink_f_impl::generate_time_axis()
 		m_time.push_back(timeoffset + i / m_sampleRate);
 	}
 
+	double __sampleRate = m_sampleRate;
+	if(m_sampleRate == 1) {
+		// if sample rate is 1 (sample mode) use resolution bandwidth of 1
+		// this is a hack - a separate mode should be created
+		__sampleRate = m_size;
+	}
 	double freqoffset = m_freqOffset;
-	double rbw = m_sampleRate / m_size;
+	double rbw = __sampleRate / m_size;;
 	m_freq.clear();
 	if(m_complexFft) {
 		for(int i = 0; i < m_size; i++) {
-			m_freq.push_back(freqoffset + (i * rbw) - m_sampleRate / 2);
+			m_freq.push_back(freqoffset + (i * rbw) - __sampleRate / 2);
 		}
 	} else {
 		for(int i = 0; i < m_size; i++) {

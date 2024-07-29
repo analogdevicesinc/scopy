@@ -1,6 +1,6 @@
 #include "plotcomponent.h"
 #include "channelcomponent.h"
-#include "timeplotcomponentchannel.h"
+#include "plotaxis.h"
 
 using namespace scopy;
 using namespace adc;

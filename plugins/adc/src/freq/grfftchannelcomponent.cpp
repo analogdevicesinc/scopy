@@ -37,6 +37,10 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRII
 	m_src = m_src_complex;
 
 	m_grtch = new GRFFTComplexChannelSigpath(grtsc->name(), this, m_node->top()->src(), m_src_complex,this); // change prototype here (?)
+	connect(this, &GRFFTChannelComponent::powerOffsetChanged, this, [=](double v){
+		dynamic_cast<GRFFTComplexChannelSigpath*>(m_grtch)->setPowerOffset(v);
+	});
+
 	m_complex = true;
 	_init();
 
@@ -58,6 +62,10 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node, FFTPlo
 	m_grtch = new GRFFTChannelSigpath(grtsc->name(), this, m_node->top()->src(),node->src(), this);
 
 	m_complex = false;
+
+	connect(this, &GRFFTChannelComponent::powerOffsetChanged, this, [=](double v){
+		dynamic_cast<GRFFTChannelSigpath*>(m_grtch)->setPowerOffset(v);
+	});
 	_init();
 
 }
@@ -151,6 +159,7 @@ QWidget *GRFFTChannelComponent::createMenu(QWidget *parent)
 	} else {
 		auto src = dynamic_cast<GRIIOFloatChannelSrc*>(m_src);
 		QWidget *attrmenui = createChAttrMenu(src->channel(), m_menu);
+		m_menu->add(attrmenui, "attr");
 	}
 	//QWidget *measuremenu = m_measureMgr->createMeasurementMenu(m_menu);
 	m_snapBtn = createSnapshotButton(m_menu);
@@ -210,27 +219,44 @@ void GRFFTChannelComponent::removeChannelFromPlot()
 	m_curvemenu->removeChannels(m_fftPlotComponentChannel->m_fftPlotCh);
 }
 
-bool GRFFTChannelComponent::complexMode()
+bool GRFFTChannelComponent::enabled() const
 {
-	return m_complex;
+	return m_enabled && !(m_complex ^ m_samplingInfo.complexMode);
 }
 
-void GRFFTChannelComponent::setComplexMode(bool b)
+void GRFFTChannelComponent::setSamplingInfo(SamplingInfo p)
 {
-	m_ctrl->setVisible(!m_complex ^ b);
+	ChannelComponent::setSamplingInfo(p);
+	bool b = !(m_complex ^ p.complexMode); // hide if they are different
+	m_ctrl->setVisible(b);
+	if(enabled()) {
+		m_plotChannelCmpt->enable();
+	} else {
+		m_plotChannelCmpt->disable();
+	}
+
+	// dont care (yet) about rest of sampling info - could be useful for measurements
 }
 
 void GRFFTChannelComponent::enable()
 {
 	ChannelComponent::enable();
-	Q_EMIT sigpath()->requestRebuild();
+	m_ctrl->checkBox()->setChecked(true);
+	if(m_running) {
+		m_grtch->sigpath()->setEnabled(true);
+	}
+	Q_EMIT m_node->top()->src()->requestRebuild();//sigpath()->requestRebuild();
 
 }
 
 void GRFFTChannelComponent::disable()
 {
 	ChannelComponent::disable();
-	Q_EMIT sigpath()->requestRebuild();
+	m_ctrl->checkBox()->setChecked(false);
+	if(m_running) {
+		m_grtch->sigpath()->setEnabled(false);
+	}
+	Q_EMIT m_node->top()->src()->requestRebuild();//sigpath()->requestRebuild();
 }
 
 // MeasureManagerInterface *GRFFTChannelComponent::getMeasureManager() { return m_measureMgr; }
@@ -238,6 +264,19 @@ void GRFFTChannelComponent::disable()
 GRSignalPath *GRFFTChannelComponent::sigpath() { return m_grtch->sigpath(); }
 
 QVBoxLayout *GRFFTChannelComponent::menuLayout() { return m_layScroll; }
+
+double GRFFTChannelComponent::powerOffset()
+{
+	return m_powerOffset;
+}
+
+void GRFFTChannelComponent::setPowerOffset(double newPowerOffset)
+{
+	if (m_powerOffset == newPowerOffset)
+		return;
+	m_powerOffset = newPowerOffset;
+	Q_EMIT powerOffsetChanged(m_powerOffset);
+}
 
 void GRFFTChannelComponent::onInit()
 {
@@ -264,16 +303,3 @@ void GRFFTChannelComponent::onNewData(const float *xData, const float *yData, si
 bool GRFFTChannelComponent::sampleRateAvailable() { return m_src->samplerateAttributeAvailable(); }
 
 double GRFFTChannelComponent::sampleRate() { return m_src->readSampleRate(); }
-
-uint32_t GRFFTChannelComponent::fftSize() const
-{
-	return m_fftSize;
-}
-
-void GRFFTChannelComponent::setFftSize(uint32_t newFftSize)
-{
-	if (m_fftSize == newFftSize)
-		return;
-	m_fftSize = newFftSize;
-	emit fftSizeChanged();
-}

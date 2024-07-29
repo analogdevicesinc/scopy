@@ -33,7 +33,7 @@ public:
 	virtual ~TimeSamplingInfo();
 
 public Q_SLOTS:
-	void update(PlotSamplingInfo info);
+	void update(SamplingInfo info);
 
 private:
 	MetricPrefixFormatter *m_mpf;

@@ -1,5 +1,6 @@
 #ifndef INTERFACES_H
 #define INTERFACES_H
+#include "plotwidget.h"
 #include "scopy-adc_export.h"
 #include <QString>
 #include "measurementcontroller.h"
@@ -38,6 +39,11 @@ public:
 	virtual MenuWidget *menu() = 0;
 };
 
+class SCOPY_ADC_EXPORT FFTChannel {
+public:
+	virtual void setPowerOffset(double) = 0;
+};
+
 class SCOPY_ADC_EXPORT SampleRateProvider
 {
 public:
@@ -45,10 +51,16 @@ public:
 	virtual double sampleRate() = 0;
 };
 
-class SCOPY_ADC_EXPORT FftInstrumentComponent {
+class SCOPY_ADC_EXPORT DataProcessor {
 public:
-	virtual bool complexMode() = 0;
-	virtual void setComplexMode(bool b) = 0;
+	virtual void onNewData(const float *xData, const float *yData, size_t size, bool copy) = 0;
+};
+
+
+class SCOPY_ADC_EXPORT SamplingInfoComponent {
+public:
+	virtual SamplingInfo samplingInfo() = 0;
+	virtual void setSamplingInfo(SamplingInfo p) = 0;
 };
 
 class SCOPY_ADC_EXPORT ScaleProvider
