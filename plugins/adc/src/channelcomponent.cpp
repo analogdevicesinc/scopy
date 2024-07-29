@@ -96,4 +96,17 @@ void ChannelComponent::createMenuControlButton(ChannelComponent *c, QWidget *par
 		c->plotChannelCmpt()->plotComponent()->replot();
 	});
 	c->m_ctrl->checkBox()->setChecked(true);
+	c->setEnabled(true);
 }
+
+SamplingInfo ChannelComponent::samplingInfo()
+{
+	return m_samplingInfo;
+}
+
+void ChannelComponent::setSamplingInfo(SamplingInfo p)
+{
+	m_samplingInfo = p;
+}
+
+
