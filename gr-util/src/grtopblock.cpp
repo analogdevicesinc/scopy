@@ -18,6 +18,7 @@ GRTopBlock::GRTopBlock(QString name, QObject *parent)
 	topblockid++;
 	qInfo() << "building" << topblockname;
 	top = gr::make_top_block(topblockname.toStdString());
+	QObject::connect(this,SIGNAL(requestRebuild()), this, SLOT(rebuild()),Qt::QueuedConnection);
 }
 
 GRTopBlock::~GRTopBlock() {}

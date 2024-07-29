@@ -42,6 +42,7 @@ Q_SIGNALS:
 	void aboutToStop();
 	void stopped();
 	void finished();
+	void requestRebuild();
 
 public Q_SLOTS:
 	void build();

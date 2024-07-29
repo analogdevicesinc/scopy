@@ -43,11 +43,13 @@ PlotWidget *FFTPlotComponent::fftPlot() { return m_plots[0]; }
 void FFTPlotComponent::addChannel(ChannelComponent *c)
 {
 	PlotComponent::addChannel(c);
+	m_plotMenu->addChannel(c);
 }
 
 void FFTPlotComponent::removeChannel(ChannelComponent *c)
 {
 	PlotComponent::removeChannel(c);
+	m_plotMenu->removeChannel(c);
 }
 
 FFTPlotComponentSettings *FFTPlotComponent::createPlotMenu(QWidget *parent)
