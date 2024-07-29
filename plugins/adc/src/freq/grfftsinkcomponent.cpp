@@ -18,8 +18,6 @@ GRFFTSinkComponent::GRFFTSinkComponent(QString name, GRTopBlockNode *t, QObject 
 	m_armed = false;
 	init();
 	m_sync->addInstrument(this);
-
-
 }
 
 GRFFTSinkComponent::~GRFFTSinkComponent() {
@@ -42,13 +40,14 @@ void GRFFTSinkComponent::connectSignalPaths()
 		qDebug(CAT_GRFFTSINKCOMPONENT) << "Appended " << sigpath->name();
 	}
 
-	time_sink = time_sink_f::make(m_currentSamplingInfo.bufferSize,
-				      m_currentSamplingInfo.bufferSize,
-				      m_currentSamplingInfo.sampleRate,
+	time_sink = time_sink_f::make(m_samplingInfo.bufferSize,
+				      m_samplingInfo.bufferSize,
+				      m_samplingInfo.sampleRate,
 				      m_name.toStdString(), sigpaths.count());
 	time_sink->setRollingMode(false);
 	time_sink->setSingleShot(m_singleShot);
-	time_sink->setFftComplex(m_complex);
+	time_sink->setFftComplex(m_samplingInfo.complexMode);
+	time_sink->setFreqOffset(m_samplingInfo.freqOffset);
 
 	int index = 0;
 	time_channel_map.clear();
@@ -92,7 +91,7 @@ void GRFFTSinkComponent::setData(bool copy)
 		if(index == -1)
 			continue;
 
-		const float *xdata = time_sink->time().data();
+		const float *xdata = time_sink->freq().data();
 		const float *ydata = time_sink->data()[index].data();
 		const size_t size = time_sink->data()[index].size();
 
@@ -100,30 +99,19 @@ void GRFFTSinkComponent::setData(bool copy)
 	}
 }
 
-bool GRFFTSinkComponent::complexMode()
+SamplingInfo GRFFTSinkComponent::samplingInfo()
 {
-	return m_complex;
+	return m_samplingInfo;
 }
 
-void GRFFTSinkComponent::setComplexMode(bool b)
+void GRFFTSinkComponent::setSamplingInfo(SamplingInfo p)
 {
-	m_complex = b;
-}
-
-void GRFFTSinkComponent::setSampleRate(double val)
-{
-	m_currentSamplingInfo.sampleRate = val;
+	m_samplingInfo = p;
+	m_top->setVLen(m_samplingInfo.bufferSize);
 	if(m_armed)
 		Q_EMIT requestRebuild();
 }
 
-void GRFFTSinkComponent::setBufferSize(uint32_t size)
-{
-	m_currentSamplingInfo.bufferSize = size;
-	m_top->setVLen(m_currentSamplingInfo.bufferSize);
-	if(m_armed)
-		Q_EMIT requestRebuild();
-}
 
 void GRFFTSinkComponent::setSingleShot(bool b)
 {
@@ -157,9 +145,9 @@ void GRFFTSinkComponent::onDisarm()
 
 void GRFFTSinkComponent::init()
 {
-	m_currentSamplingInfo.sampleRate = 1;
-	m_currentSamplingInfo.bufferSize = 32;
-	m_currentSamplingInfo.plotSize = 32;
+	m_samplingInfo.sampleRate = 1;
+	m_samplingInfo.bufferSize = 32;
+	m_samplingInfo.plotSize = 32;
 }
 
 void GRFFTSinkComponent::deinit()
@@ -169,9 +157,9 @@ void GRFFTSinkComponent::deinit()
 
 void GRFFTSinkComponent::start()
 {
-	m_sync->setBufferSize(this, m_currentSamplingInfo.bufferSize);
+	m_sync->setBufferSize(this, m_samplingInfo.bufferSize);
 	m_sync->setSingleShot(this, m_singleShot);
-	m_top->setVLen(m_currentSamplingInfo.bufferSize);
+	m_top->setVLen(m_samplingInfo.bufferSize);
 	m_sync->arm(this);
 	m_top->build();
 	m_top->start();
