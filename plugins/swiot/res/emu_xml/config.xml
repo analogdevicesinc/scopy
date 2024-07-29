@@ -44,5 +44,5 @@
 		<attribute name="ch2_device_available" value="ad74413r max14906" />
 		<attribute name="ch3_device_available" value="ad74413r max14906" />
 	</device>
-	<device id="trigger0" name="ad74413r-dev0" ></device>
+	<device id="trigger0" name="sw_trig" ></device>
 </context>
