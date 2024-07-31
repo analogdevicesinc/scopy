@@ -1379,8 +1379,14 @@ void NetworkAnalyzer::goertzel()
 			mag1_averaged_sum += mag1;
 			mag2_averaged_sum += mag2;
 			dcOffset_averaged_sum += dcOffset;
-			ui->currentAverageLabel->setText(QString(tr("Average: ") + QString::number(avg)
-								 + " / " + QString::number(m_nb_averaging)));
+
+			QString average_label_str = QString(tr("Average: ") + QString::number(avg)
+							+ " / " + QString::number(m_nb_averaging));
+			QMetaObject::invokeMethod(ui->currentAverageLabel,
+						  "setText",
+						  Qt::QueuedConnection,
+						  Q_ARG(QString, average_label_str));
+
 			if (avg == m_nb_averaging) {
 				mag1 = mag1_averaged_sum / m_nb_averaging;
 				mag2 = mag2_averaged_sum / m_nb_averaging;
