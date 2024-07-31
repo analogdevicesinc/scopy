@@ -360,19 +360,23 @@ void ScopyMainWindow::loadPluginsFromRepository(PluginRepository *pr)
 
 	QElapsedTimer timer;
 	timer.start();
-	// Check the local plugins folder first
+	// Check the local build plugins folder first
+	// Check if directory exists and it's not empty
 	QDir pathDir(scopy::config::localPluginFolderPath());
-	if(pathDir.exists()) {
+
+	if(pathDir.exists() && pathDir.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries).count() != 0) {
 		pr->init(scopy::config::localPluginFolderPath());
 	} else {
 		pr->init(scopy::config::defaultPluginFolderPath());
 	}
+
 #ifndef Q_OS_ANDROID
 	QString pluginAdditionalPath = Preferences::GetInstance()->get("general_additional_plugin_path").toString();
 	if(!pluginAdditionalPath.isEmpty()) {
 		pr->init(pluginAdditionalPath);
 	}
 #endif
+
 	qInfo(CAT_BENCHMARK) << "Loading the plugins from the repository took: " << timer.elapsed() << "ms";
 }
 
