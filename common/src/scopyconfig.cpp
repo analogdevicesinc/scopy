@@ -12,38 +12,34 @@ QString scopy::config::tempLogFilePath() { return QDir::cleanPath(settingsFolder
 
 QString scopy::config::defaultPluginFolderPath()
 {
-	// Plugin path is different per system
-	//  - Windows - In Scopy.exe location
-	//  - Linux - /usr/share/scopy/plugins
-	//  -  macOS - similar(?)
-	//  - Android - Only in app cache - On init, copy plugins from data to cache (?))
+
+#ifdef WIN32
+	// Scopy_install_folder/plugins
+	return QCoreApplication::applicationDirPath() + "/plugins";
+#elif defined __APPLE__
+	// Scopy.app/Contents/MacOS/plugins
+	return QCoreApplication::applicationDirPath() + "/plugins";
+#elif defined(__appimage__)
+	// usr/lib/plugins
+	return QCoreApplication::applicationDirPath() + "/../lib/scopy/plugins";
+#endif
+
 	return SCOPY_PLUGIN_INSTALL_PATH;
 }
 
-QString scopy::config::localPluginFolderPath()
-{
+QString scopy::config::localPluginFolderPath() { return SCOPY_PLUGIN_BUILD_PATH; }
 
-#if defined __APPLE__
-	return QCoreApplication::applicationDirPath() + "/plugins/plugins";
-#elif defined(__appimage__)
-	return QCoreApplication::applicationDirPath() + "/../share/plugins";
-#endif
-
-	return SCOPY_PLUGIN_BUILD_PATH;
-}
-
-QString scopy::config::defaultTranslationFolderPath() { return SCOPY_TRANSLATION_INSTALL_PATH; }
-
-QString scopy::config::localTranslationFolderPath()
+QString scopy::config::defaultTranslationFolderPath()
 {
 #if defined __APPLE__
 	return QCoreApplication::applicationDirPath() + "/translations";
 #elif defined(__appimage__)
-	return QCoreApplication::applicationDirPath() + "/../share/translations";
+	return QCoreApplication::applicationDirPath() + "/../lib/scopy/translations";
 #endif
-
-	return SCOPY_TRANSLATION_BUILD_PATH;
+	return SCOPY_TRANSLATION_INSTALL_PATH;
 }
+
+QString scopy::config::localTranslationFolderPath() { return SCOPY_TRANSLATION_BUILD_PATH; }
 
 QString scopy::config::preferencesFolderPath()
 {

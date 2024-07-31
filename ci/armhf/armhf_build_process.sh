@@ -273,14 +273,14 @@ create_appdir(){
 
 	BUILD_FOLDER=$SRC_DIR/build
 	EMU_BUILD_FOLDER=$STAGING_AREA/iio-emu/build
-	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 2 -type f -name "libscopy*")
 	PLUGINS=$BUILD_FOLDER/plugins/plugins
-	REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
+	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 1 -type f -name "libscopy*")
+	REGMAP_XMLS=$PLUGINS/regmap/xmls
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
 	COPY_DEPS=$SRC_DIR/ci/armhf/copy-deps.sh
 
 	rm -rf $APP_DIR
-	mkdir $APP_DIR
+	mkdir -p $APP_DIR
 	mkdir -p $APP_DIR/usr/bin
 	mkdir -p $APP_DIR/usr/lib
 	mkdir -p $APP_DIR/usr/share/applications
@@ -296,19 +296,20 @@ create_appdir(){
 	cp $BUILD_FOLDER/scopy $APP_DIR/usr/bin
 
 	cp $SCOPY_DLL $APP_DIR/usr/lib
-	cp -r $PLUGINS $APP_DIR/usr/share
+	mkdir -p $APP_DIR/usr/lib/scopy/plugins
+	cp $PLUGINS/*.so $APP_DIR/usr/lib/scopy/plugins
 
-	mkdir $APP_DIR/usr/share/translations
-	cp $TRANSLATIONS_QM $APP_DIR/usr/share/translations
+	mkdir -p $APP_DIR/usr/lib/scopy/translations
+	cp $TRANSLATIONS_QM $APP_DIR/usr/lib/scopy/translations
 
 	if [ -d $REGMAP_XMLS ]; then
-		cp -r $REGMAP_XMLS $APP_DIR/usr/share/plugins
+		cp -r $REGMAP_XMLS $APP_DIR/usr/lib/scopy/plugins
 	fi
 
 	$COPY_DEPS $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
 	$COPY_DEPS $APP_DIR/usr/bin/iio-emu $APP_DIR/usr/lib
 	$COPY_DEPS $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
-	$COPY_DEPS "$APP_DIR/usr/share/plugins/*.so" $APP_DIR/usr/lib
+	$COPY_DEPS "$APP_DIR/usr/lib/scopy/plugins/*.so" $APP_DIR/usr/lib
 	cp -r $QT_LOCATION/plugins $APP_DIR/usr
 
 	# search for the python version linked by cmake and copy inside the appimage the same version

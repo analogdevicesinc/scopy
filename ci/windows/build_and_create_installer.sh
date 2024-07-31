@@ -171,7 +171,6 @@ create_installer() {
 	popd
 }
 
-
 run_workflow(){
 	download_tools
 	build_scopy
