@@ -26,10 +26,9 @@ HarmonicsInstrument::HarmonicsInstrument(QWidget *parent)
 	instrumentLayout->addWidget(tool);
 
 	// central widget components
-	QWidget *thdWidget = createThdWidget();
-	tool->addWidgetToCentralContainerHelper(thdWidget);
+	m_thdWidget = createThdWidget();
+	tool->addWidgetToCentralContainerHelper(m_thdWidget);
 
-	//
 	m_table = new QTableWidget(MAX_CHNLS, NUMBER_OF_HARMONICS, this);
 	initTable();
 	tool->addWidgetToCentralContainerHelper(m_table);
@@ -71,6 +70,8 @@ HarmonicsInstrument::~HarmonicsInstrument()
 	m_labels.clear();
 	m_plotChnls.clear();
 }
+
+void HarmonicsInstrument::showThdWidget(bool show) { m_thdWidget->setVisible(show); }
 
 void HarmonicsInstrument::initData()
 {

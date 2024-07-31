@@ -25,6 +25,7 @@ public:
 	HarmonicsInstrument(QWidget *parent = nullptr);
 	~HarmonicsInstrument();
 
+	void showThdWidget(bool show);
 public Q_SLOTS:
 	void stop() override;
 	void toggleHarmonics(bool en);
@@ -47,6 +48,7 @@ private:
 	bool selectedFromSameCol(QModelIndexList list);
 
 	QString m_harmonicsType;
+	QWidget *m_thdWidget;
 	RunBtn *m_runBtn;
 	SingleShotBtn *m_singleBtn;
 	QTableWidget *m_table;
