@@ -5,19 +5,10 @@ source $REPO_SRC/ci/macOS/macos_config.sh
 
 pushd $BUILDDIR
 
-SCOPYLIBS="$(find $BUILDDIR -name "*.dylib" -d 2 -type f)
-$(find $BUILDDIR/plugins/m2k/m2k-gui -name "*.dylib" -type f)"
-
-SCOPYPLUGINS=$(find $BUILDDIR/Scopy.app/Contents/MacOs/plugins/plugins -name "*.dylib" -type f)
+SCOPYPLUGINS=$(find $BUILDDIR/Scopy.app/Contents/MacOs/plugins -name "*.dylib" -type f)
+SCOPYLIBS=$(find $BUILDDIR/Scopy.app/Contents/Frameworks -name "*.dylib" -type f)
 
 echo "### Copy DLLs to Frameworks folder"
-mkdir -p $BUILDDIR/Scopy.app/Contents/Frameworks
-cp $SCOPYLIBS $BUILDDIR/Scopy.app/Contents/Frameworks
-SCOPYLIBS=$(find $BUILDDIR/Scopy.app/Contents/Frameworks -name "*.dylib" -type f)
-mkdir -p $BUILDDIR/Scopy.app/Contents/MacOS/plugins/plugins
-mkdir -p $BUILDDIR/Scopy.app/Contents/MacOS/translations
-cp $BUILDDIR/translations/* $BUILDDIR/Scopy.app/Contents/MacOS/translations
-cp -R $BUILDDIR/plugins/regmap/xmls $BUILDDIR/Scopy.app/Contents/MacOS/plugins/plugins
 cp -R $STAGING_AREA/libiio/build/iio.framework Scopy.app/Contents/Frameworks/
 cp -R $STAGING_AREA/libad9361/build/ad9361.framework Scopy.app/Contents/Frameworks/
 
@@ -54,8 +45,8 @@ install_name_tool -id @executable_path/../Frameworks/${m2kid} ./Scopy.app/Conten
 echo "### Check available python version"
 for version in 3.8 3.9 3.10 3.11 3.12
 do
-	if [ -e /usr/local/opt/python@$version/Frameworks/Python.framework/Versions/$version/Python ] ; then
-		pythonpath=/usr/local/opt/python@$version/Frameworks/Python.framework/Versions/$version/Python
+	if [ -e $(brew --prefix python3)/Frameworks/Python.framework/Versions/$version/Python ] ; then
+		pythonpath=$(brew --prefix python3)/Frameworks/Python.framework/Versions/$version/Python
 		pyversion=$version
 		pythonidrpath="$(otool -D $pythonpath | head -2 |  tail -1)"
 	fi
@@ -66,9 +57,8 @@ if [ -z $pyversion ] ; then
 	exit 1
 fi
 echo " - Found python$version at $pythonpath"
-pythonid=${pythonidrpath#"/usr/local/opt/python@${pyversion}/Frameworks/"}
-cp -R /usr/local/opt/python@$pyversion/Frameworks/Python.framework Scopy.app/Contents/Frameworks/
-
+pythonid=${pythonidrpath#"$(brew --prefix python3)/Frameworks/"}
+cp -R $(brew --prefix python3)/Frameworks/Python.framework Scopy.app/Contents/Frameworks/
 
 echo "### Fixing scopy libraries and plugins "
 for dylib in ${SCOPYLIBS} ${SCOPYPLUGINS}
