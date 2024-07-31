@@ -113,6 +113,7 @@ bool PQMPlugin::onConnect()
 	connect(m_acqManager, &AcquisitionManager::pqmAttrsAvailable, rms, &RmsInstrument::onAttrAvailable);
 
 	HarmonicsInstrument *harmonics = new HarmonicsInstrument();
+	harmonics->showThdWidget(m_acqManager->hasFwVers());
 	m_toolList[1]->setTool(harmonics);
 	m_toolList[1]->setEnabled(true);
 	m_toolList[1]->setRunBtnVisible(true);
