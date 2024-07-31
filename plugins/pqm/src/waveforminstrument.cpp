@@ -121,13 +121,14 @@ QWidget *WaveformInstrument::createSettMenu(QWidget *parent)
 	plotTimespanSection->contentLayout()->setMargin(0);
 
 	// timespan
-	m_timespanSpin = new PositionSpinButton({{"ms", 1E-3}, {"s", 1E0}}, "Timespan", 0.08, 10, true, false);
-	m_timespanSpin->setStep(0.08);
-	m_timespanSpin->setValue(1);
+	m_timespanSpin = new PositionSpinButton({{"ms", 1E-3}, {"s", 1E0}}, "Timespan", 0.1, 10, true, false);
+	m_timespanSpin->setStep(0.01);
 	connect(m_timespanSpin, &PositionSpinButton::valueChanged, this, [=, this](double value) {
 		m_voltagePlot->xAxis()->setMin(-value);
 		m_currentPlot->xAxis()->setMin(-value);
 	});
+	m_timespanSpin->valueChanged(0.1);
+	m_timespanSpin->setEnabled(false);
 
 	plotTimespanSection->contentLayout()->addWidget(m_timespanSpin);
 
