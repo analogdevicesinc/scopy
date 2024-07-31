@@ -8,6 +8,7 @@
 #include <QTextEdit>
 #include <QWidget>
 #include <menucontrolbutton.h>
+#include <printplotmanager.h>
 #include <toolbuttons.h>
 #include <tooltemplate.h>
 #include "monitorplot.hpp"
@@ -49,7 +50,7 @@ private:
 	QPushButton *openLastMenuBtn;
 	QButtonGroup *rightMenuBtnGrp;
 	InfoBtn *infoBtn;
-	PrintBtn *printBtn;
+	PrintPlotManager *printplotManager;
 	RunBtn *runBtn;
 	QPushButton *clearBtn;
 	AddBtn *addMonitorButton;
