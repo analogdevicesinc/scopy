@@ -1,6 +1,8 @@
 #ifndef ADMTCONTROLLER_H
 #define ADMTCONTROLLER_H
 
+#include "scopy-admt_export.h"
+
 #include <iio.h>
 #include <bitset>
 
@@ -21,7 +23,7 @@
 using namespace std;
 
 namespace scopy::admt {    
-class ADMTController : public QObject
+class SCOPY_ADMT_EXPORT ADMTController : public QObject
 {
     Q_OBJECT
 public:
