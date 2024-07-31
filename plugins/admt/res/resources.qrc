@@ -1,2 +1,7 @@
-<!DOCTYPE RCC>
-<RCC version="1.0"/>
+<RCC>
+    <qresource prefix="/admt">
+        <file>minus.svg</file>
+        <file>plus.svg</file>
+        <file>chevron-down-s.svg</file>
+    </qresource>
+</RCC>
