@@ -95,6 +95,9 @@ void HarmonicsInstrument::initTable()
 		horHeaderValues.push_back(QString::number(i));
 	}
 	m_table->setHorizontalHeaderLabels(horHeaderValues);
+	for(int i = 0; i < HARMONICS_MIN_DEGREE; i++) {
+		m_table->horizontalHeader()->hideSection(i);
+	}
 	StyleHelper::TableViewWidget(m_table->parentWidget(), "HarmonicsTable");
 	for(int i = 0; i < MAX_CHNLS; i++) {
 		for(int j = 0; j < NUMBER_OF_HARMONICS; j++) {
@@ -115,7 +118,7 @@ void HarmonicsInstrument::initPlot()
 	m_plot->xAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
 	m_plot->xAxis()->scaleDraw()->setFloatPrecision(0);
 	m_plot->xAxis()->scaleDraw()->setUnitType("");
-	m_plot->xAxis()->setInterval(0, HARMONICS_MAX_DEGREE);
+	m_plot->xAxis()->setInterval(HARMONICS_MIN_DEGREE, HARMONICS_MAX_DEGREE);
 
 	m_plot->setShowYAxisLabels(true);
 	m_plot->setShowXAxisLabels(true);
@@ -255,13 +258,14 @@ void HarmonicsInstrument::onSelectionChanged()
 {
 	QModelIndexList selectedIndexList = m_table->selectionModel()->selectedIndexes();
 	if(selectedIndexList.size() <= 1 || selectedFromSameCol(selectedIndexList)) {
-		m_plot->xAxis()->setInterval(0, HARMONICS_MAX_DEGREE);
+		m_plot->xAxis()->setInterval(HARMONICS_MIN_DEGREE, HARMONICS_MAX_DEGREE);
 		return;
 	}
-	int firstColumnSelected = selectedIndexList.front().column() + 1;
-	int lastColumnSelected = selectedIndexList.back().column() + 1;
-	m_plot->xAxis()->setInterval(std::min(firstColumnSelected, lastColumnSelected),
-				     std::max(firstColumnSelected, lastColumnSelected));
+	int firstColumnSelected = selectedIndexList.front().column();
+	int lastColumnSelected = selectedIndexList.back().column();
+	int lowerIdx = std::min(firstColumnSelected, lastColumnSelected);
+	int minDegree = (lowerIdx < HARMONICS_MIN_DEGREE) ? HARMONICS_MIN_DEGREE : lowerIdx;
+	m_plot->xAxis()->setInterval(minDegree, std::max(firstColumnSelected, lastColumnSelected));
 }
 
 void HarmonicsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> attr)
