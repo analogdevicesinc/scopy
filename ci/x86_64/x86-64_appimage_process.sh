@@ -2,7 +2,7 @@
 set -ex
 
 ## Set STAGING
-USE_STAGING=ON
+USE_STAGING=OFF
 ##
 
 if [ "$CI_SCRIPT" == "ON" ]
@@ -322,8 +322,7 @@ build_scopy() {
 	echo "### Building scopy"
 	pushd $SRC_DIR
 	CURRENT_BUILD_CMAKE_OPTS="\
-		-DCLONE_IIO_EMU=OFF \
-		-DPYTOHN_EXECUTABLE=/usr/bin/$PYTHON_VERSION
+		-DPYTHON_EXECUTABLE=/usr/bin/$PYTHON_VERSION
 		"
 	build_with_cmake OFF
 	popd
@@ -333,8 +332,8 @@ create_appdir(){
 	pushd ${STAGING_AREA}
 	BUILD_FOLDER=$SRC_DIR/build
 	EMU_BUILD_FOLDER=$STAGING_AREA/iio-emu/build
-	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 2 -type f -name "libscopy*")
 	PLUGINS=$BUILD_FOLDER/plugins/plugins
+	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 1 -type f -name "libscopy*")
 	REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
 	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib:$QT_LOCATION/lib
@@ -347,7 +346,7 @@ create_appdir(){
 	rm -rf $DLL_FOLDER
 	mkdir $DLL_FOLDER
 	cp $SCOPY_DLL $DLL_FOLDER
-	cp $PLUGINS/* $DLL_FOLDER
+	cp $PLUGINS/*.so $DLL_FOLDER
 
 	export QMAKE=$QMAKE_BIN # this is needed for deploy-plugin-qt.AppImage
 	# inside a docker image you can't run an appimage executable without privileges
@@ -365,7 +364,8 @@ create_appdir(){
 	$COPY_DEPS "$DLL_FOLDER/*" $APP_DIR/usr/lib
 	rm -rf $DLL_FOLDER
 	cp $SCOPY_DLL $APP_DIR/usr/lib
-	cp -r $PLUGINS $APP_DIR/usr/share
+	mkdir -p $APP_DIR/usr/lib/scopy/plugins
+	cp $PLUGINS/*.so $APP_DIR/usr/lib/scopy/plugins
 
 	cp $EMU_BUILD_FOLDER/iio-emu $APP_DIR/usr/bin
 	cp ${STAGING_AREA_DEPS}/lib/tinyiiod.so* $APP_DIR/usr/lib
@@ -384,11 +384,11 @@ create_appdir(){
 		exit 1
 	fi
 	
-	mkdir $APP_DIR/usr/share/translations
-	cp $TRANSLATIONS_QM $APP_DIR/usr/share/translations
+	mkdir -p $APP_DIR/usr/lib/scopy/translations
+	cp $TRANSLATIONS_QM $APP_DIR/usr/lib/scopy/translations
 
 	if [ -d $REGMAP_XMLS ]; then
-		cp -r $REGMAP_XMLS $APP_DIR/usr/share/plugins
+		cp -r $REGMAP_XMLS $APP_DIR/usr/lib/scopy/plugins
 	fi
 
 	cp $STAGING_AREA_DEPS/lib/libspdlog.so* $APP_DIR/usr/lib
