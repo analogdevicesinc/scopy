@@ -2,6 +2,7 @@
 #include "debuggerloggingcategories.h"
 #include <QLabel>
 #include <iioutil/connectionprovider.h>
+#include <pluginbase/preferences.h>
 
 using namespace scopy::iiodebugplugin;
 
@@ -10,6 +11,13 @@ bool IIODebugPlugin::compatible(QString m_param, QString category)
 	// This function defines the characteristics according to which the
 	// plugin is compatible with a specific device
 	qDebug(CAT_IIODEBUGGER) << "Checking if IIODebugPlugin is compatible.";
+
+	// Check weather this version (V2) should be used
+	bool useThisDebugger = Preferences::GetInstance()->get("plugins_use_debugger_v2").toBool();
+	if(!useThisDebugger) {
+		return false;
+	}
+
 	bool ret = true;
 	ConnectionProvider *c = ConnectionProvider::GetInstance();
 	Connection *conn = c->open(m_param);
