@@ -8,6 +8,7 @@
 #include <gui/widgets/toolbuttons.h>
 #include <gui/widgets/verticalchannelmanager.h>
 #include <pluginbase/preferences.h>
+#include <printplotmanager.h>
 
 using namespace scopy;
 using namespace scopy::grutil;
@@ -42,7 +43,8 @@ AdcInstrument::AdcInstrument(PlotProxy *proxy, QWidget *parent)
 
 	GearBtn *settingsBtn = new GearBtn(this);
 	InfoBtn *infoBtn = new InfoBtn(this);
-	PrintBtn *printBtn = new PrintBtn(this);
+	// PrintBtn *printBtn = new PrintBtn(this);
+	PrintPlotManager *printplotManager = new PrintPlotManager(this);
 	runBtn = new RunBtn(this);
 	singleBtn = new SingleShotBtn(this);
 
@@ -124,7 +126,7 @@ AdcInstrument::AdcInstrument(PlotProxy *proxy, QWidget *parent)
 	tool->addWidgetToTopContainerHelper(singleBtn, TTA_RIGHT);
 
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
-	tool->addWidgetToTopContainerHelper(printBtn, TTA_LEFT);
+	tool->addWidgetToTopContainerHelper(printplotManager->getPrintBtn(), TTA_LEFT);
 
 	tool->addWidgetToBottomContainerHelper(channelsBtn, TTA_LEFT);
 	//	tool->addWidgetToBottomContainerHelper(timeBtn, TTA_LEFT);
@@ -133,6 +135,12 @@ AdcInstrument::AdcInstrument(PlotProxy *proxy, QWidget *parent)
 
 	tool->addWidgetToBottomContainerHelper(cursor, TTA_RIGHT);
 	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
+
+	connect(printplotManager->getPrintBtn(), &QPushButton::clicked, this, [=, this]() {
+		QList<PlotWidget *> plotList;
+		plotList.push_back(plotAddon->plot());
+		printplotManager->printPlots(plotList, "ADC");
+	});
 
 	connect(channelsBtn, &QPushButton::toggled, dynamic_cast<MenuHAnim *>(tool->leftContainer()),
 		&MenuHAnim::toggleMenu);
