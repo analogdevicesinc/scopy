@@ -19,6 +19,8 @@
 #include <QListWidget>
 #include <QPlainTextEdit>
 #include <QFileDialog>
+#include <QGridLayout>
+#include <QIcon>
 
 #include <iio.h>
 #include <iioutil/connectionprovider.h>
@@ -33,10 +35,12 @@
 #include <menucombo.h>
 #include <stylehelper.h>
 #include <filemanager.h>
+#include <customSwitch.h>
+#include <widgets/horizontalspinbox.h>
 
 namespace scopy::admt {
 
-class HarmonicCalibration : public QWidget
+class SCOPY_ADMT_EXPORT HarmonicCalibration : public QWidget
 {
 	Q_OBJECT
 public:
@@ -69,7 +73,7 @@ private:
 	QLineEdit *graphUpdateIntervalLineEdit, *dataSampleSizeLineEdit, *dataGraphSamplesLineEdit, *tempGraphSamplesLineEdit, 
 			*calibrationH1MagLineEdit, *calibrationH2MagLineEdit, *calibrationH3MagLineEdit, *calibrationH8MagLineEdit,
 			*calibrationH1PhaseLineEdit, *calibrationH2PhaseLineEdit, *calibrationH3PhaseLineEdit, *calibrationH8PhaseLineEdit;
-	QLabel *rotationValueLabel, *angleValueLabel, *countValueLabel, *tempValueLabel, *calibrationAngleLabel;
+	QLabel *rotationValueLabel, *angleValueLabel, *countValueLabel, *tempValueLabel, *calibrationMotorCurrentPositionLabel;
 
 	Sismograph *dataGraph, *tempGraph;
 
@@ -105,6 +109,12 @@ private:
 	void importCalibrationData();
 	void calibrationLogWrite(QString message);
 	void calibrationLogWriteLn(QString message);
+	void applyTextBoxStyle(QWidget *widget);
+	void applyLabelPadding(QLabel *widget);
+	void applyLineEditPadding(QLineEdit *widget);
+	void applyLineEditAlignment(QLineEdit *widget);
+	void applyComboBoxStyle(QComboBox *widget, const QString& styleHelperColor = "CH0");
+	void applyLabelStyle(QWidget *widget, const QString& styleHelperColor = "CH0", bool isBold = false);
 
 	QTimer *timer, *calibrationTimer;
 
