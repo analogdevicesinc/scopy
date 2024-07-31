@@ -17,6 +17,7 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QOb
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(dev) {
 		// might need to set a trigger for the pqm device
+		m_hasFwVers = iio_device_find_attr(dev, "fw_version");
 		readPqmAttributes();
 		enableBufferChnls(dev);
 		m_buffer = iio_device_create_buffer(dev, BUFFER_SIZE, false);
@@ -250,5 +251,7 @@ void AcquisitionManager::setProcessData(bool en)
 		qInfo(CAT_PQM_ACQ) << "Cannot write process_data attribute!";
 	}
 }
+
+bool AcquisitionManager::hasFwVers() const { return m_hasFwVers; }
 
 #include "moc_acquisitionmanager.cpp"
