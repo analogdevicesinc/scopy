@@ -40,7 +40,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn *>(openLastMenuBtn)->getButtonGroup();
 
 	infoBtn = new InfoBtn(this);
-	printBtn = new PrintBtn(this);
+	printplotManager = new PrintPlotManager(this);
 	runBtn = new RunBtn(this);
 	clearBtn = new QPushButton("Clear", this);
 
@@ -69,7 +69,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	//////////////////////////////
 
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
-	tool->addWidgetToTopContainerHelper(printBtn, TTA_LEFT);
+	tool->addWidgetToTopContainerHelper(printplotManager->getPrintBtn(), TTA_LEFT);
 
 	tool->addWidgetToTopContainerHelper(runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(clearBtn, TTA_RIGHT);
@@ -107,6 +107,12 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	/////////////////////////plot///////////////////
 	m_monitorPlot = new MonitorPlot(this);
 	centralWidget->addWidget(m_monitorPlot);
+
+	connect(printplotManager->getPrintBtn(), &QPushButton::clicked, this, [=, this]() {
+		QList<PlotWidget *> plotList;
+		plotList.push_back(m_monitorPlot->plot());
+		printplotManager->printPlots(plotList, "DataLogger");
+	});
 
 	/////////////////////text values ////////////
 	textMonitors = new QTextEdit(this);
