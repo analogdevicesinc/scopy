@@ -47,7 +47,7 @@ private:
 	QMap<QString, QVector<double>> m_yValues;
 	QVector<double> m_xTime;
 
-	const double m_plotSampleRate = 3200;
+	const double m_plotSampleRate = 5120;
 	const QMap<QString, QMap<QString, QString>> m_chnls = {
 		{"voltage", {{"Ua", "ua"}, {"Ub", "ub"}, {"Uc", "uc"}}},
 		{"current", {{"Ia", "ia"}, {"Ib", "ib"}, {"Ic", "ic"}, {"In", "in"}}}};
