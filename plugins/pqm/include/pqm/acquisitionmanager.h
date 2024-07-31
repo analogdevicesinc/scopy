@@ -21,6 +21,8 @@ public:
 	AcquisitionManager(iio_context *ctx, PingTask *pingTask, QObject *parent = nullptr);
 	~AcquisitionManager();
 
+	bool hasFwVers() const;
+
 public Q_SLOTS:
 	void toolEnabled(bool en, QString toolName);
 	void setConfigAttr(QMap<QString, QMap<QString, QString>>);
@@ -60,6 +62,7 @@ private:
 
 	bool m_attrHaveBeenRead = false;
 	bool m_buffHaveBeenRead = false;
+	bool m_hasFwVers = false;
 	const int THREAD_FINISH_TIMEOUT = 10000;
 };
 } // namespace scopy::pqm
