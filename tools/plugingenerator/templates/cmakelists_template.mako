@@ -65,6 +65,17 @@ configure_file(
 target_include_directories(${"${PROJECT_NAME}"} INTERFACE ${"${CMAKE_CURRENT_SOURCE_DIR}"}/include) 
 target_include_directories(${"${PROJECT_NAME}"} PRIVATE ${"${CMAKE_CURRENT_SOURCE_DIR}"}/include/${"${SCOPY_MODULE}"}) 
 
+% if pdk_en:
+target_include_directories(${"${PROJECT_NAME}"} PRIVATE ${"${PDK_DEPS_INCLUDE}"})
+
+include(${"${CMAKE_SOURCE_DIR}"}/PdkSupport.cmake)
+inlcude_dirs(${"${PDK_DEPS_INCLUDE}"})
+
+target_link_libraries(${"${PROJECT_NAME}"} PUBLIC Qt::Widgets Qt::Core)
+
+link_libs(${"${PDK_DEPS_LIB}"})
+
+% else:
 target_include_directories(${"${PROJECT_NAME}"} PUBLIC scopy-pluginbase scopy-gui) 
 
 target_link_libraries( 
@@ -75,6 +86,8 @@ target_link_libraries(
         scopy-gui 
         scopy-iioutil 
 )
+
+% endif
 
 if(${"${CMAKE_SYSTEM_NAME}"} MATCHES "Windows")
 	configureinstallersettings(${"${SCOPY_MODULE}"} ${"${PLUGIN_DESCRIPTION}"} FALSE)
