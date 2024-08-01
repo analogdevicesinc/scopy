@@ -1,4 +1,9 @@
 {
+    "pdk":{
+        "enable": true,
+        "deps_path": "",
+        "project_path": ""
+    },
     "plugin": {
         "dir_name": "new",
         "plugin_name": "newplugin",
