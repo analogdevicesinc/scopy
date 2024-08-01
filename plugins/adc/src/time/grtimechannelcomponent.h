@@ -23,8 +23,9 @@ using namespace scopy::gui;
 
 class GRDeviceAddon;
 
-class GRTimeChannelSigpath : QObject
+class GRTimeChannelSigpath : public QObject, public GRChannel
 {
+	Q_OBJECT
 public:
 	GRTimeChannelSigpath(QString m_name, ChannelComponent *ch, GRIIOFloatChannelNode *node, QObject *parent)
 		: QObject(parent)
@@ -46,9 +47,13 @@ public:
 		m_node->top()->src()->unregisterSignalPath(m_signalPath);
 	}
 
-	void onNewData(const float *xData, const float *yData, size_t size, bool copy)
+	void onNewData(const float *xData, const float *yData, size_t size, bool copy) override
 	{
 		m_ch->chData()->onNewData(xData, yData, size, copy);
+	}
+
+	GRSignalPath* sigpath() override {
+		return m_signalPath;
 	}
 
 	ChannelComponent *m_ch;

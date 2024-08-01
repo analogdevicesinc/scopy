@@ -74,6 +74,7 @@ private:
 	QPushButton *m_complex;
 	SingleShotBtn *m_singleBtn;
 	QPushButton *m_sync;
+	MenuControlButton *m_cursor;
 	MenuControlButton *channelsBtn;
 	VerticalChannelManager *m_vcm;
 
@@ -81,6 +82,7 @@ private:
 	void setupRunSingleButtonHelper();
 
 	void setupChannelsButtonHelper(MenuControlButton *channelsBtn);
+	void setupCursorButtonHelper(MenuControlButton *cursor);
 };
 } // namespace adc
 } // namespace scopy

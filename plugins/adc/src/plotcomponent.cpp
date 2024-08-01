@@ -21,6 +21,13 @@ PlotComponent::PlotComponent(QString name, uint32_t uuid, QWidget *parent)
 
 PlotComponent::~PlotComponent() {}
 
+QPair<double, double> PlotComponent::xInterval()
+{
+	double min = m_plots[0]->xAxis()->min();
+	double max = m_plots[0]->xAxis()->max();
+	return QPair<double,double>(min,max);
+}
+
 void PlotComponent::replot()
 {
 	for(auto plot : m_plots) {
@@ -71,6 +78,10 @@ void PlotComponent::selectChannel(ChannelComponent *c) {
 	}
 }
 
+void PlotComponent::setXInterval(QPair<double,double> p) {
+	setXInterval(p.first,p.second);
+}
+
 void PlotComponent::setXInterval(double min, double max)
 {
 	for(auto plot : m_plots) {
@@ -91,3 +102,8 @@ void PlotComponent::removeChannel(ChannelComponent *c)
 }
 
 uint32_t PlotComponent::uuid() { return m_uuid; }
+
+CursorController *PlotComponent::cursor() const
+{
+	return m_cursor;
+}
