@@ -341,7 +341,7 @@ double GRTimeChannelComponent::yMax() const { return m_yCtrl->max(); }
 
 MeasureManagerInterface *GRTimeChannelComponent::getMeasureManager() { return m_measureMgr; }
 
-GRSignalPath *GRTimeChannelComponent::sigpath() { return m_grtch->m_signalPath; }
+GRSignalPath *GRTimeChannelComponent::sigpath() { return m_grtch->sigpath(); }
 
 QVBoxLayout *GRTimeChannelComponent::menuLayout() { return m_layScroll; }
 

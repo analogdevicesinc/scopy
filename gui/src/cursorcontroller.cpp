@@ -20,7 +20,7 @@ CursorController::CursorController(PlotWidget *plot, QObject *parent)
 	x1Cursor = plotCursors->getX1Cursor();
 	x2Cursor = plotCursors->getX2Cursor();
 
-	connectSignals();
+	//connectSignals();
 }
 
 CursorController::~CursorController() {}
@@ -44,10 +44,9 @@ void CursorController::initUI()
 	hoverReadouts->setAnchorOffset(QPoint(10, 10));
 	hoverReadouts->setRelative(true);
 
-	cursorSettings = new CursorSettings(m_plot);
 }
 
-void CursorController::connectSignals()
+void CursorController::connectSignals(CursorSettings *cursorSettings)
 {
 	// x controls
 	connect(cursorSettings->getXEn(), &QAbstractButton::toggled, this, &CursorController::xEnToggled);
@@ -62,7 +61,12 @@ void CursorController::connectSignals()
 	connect(cursorSettings->getReadoutsDrag(), &QAbstractButton::toggled, this,
 		&CursorController::readoutsDragToggled);
 
-	initSession();
+	cursorSettings->initSession();
+
+	getPlotCursors()->getX1Cursor()->setPosition(0);
+	getPlotCursors()->getX2Cursor()->setPosition(0);
+	getPlotCursors()->getY1Cursor()->setPosition(0);
+	getPlotCursors()->getY2Cursor()->setPosition(0);
 
 	// cursor movement
 	connect(y1Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
@@ -105,18 +109,6 @@ void CursorController::connectSignals()
 		plotCursorReadouts->setXUnits(ch->xAxis()->getUnits());
 		plotCursorReadouts->setYUnits(ch->yAxis()->getUnits());
 	});
-}
-
-void CursorController::initSession()
-{
-	cursorSettings->getXEn()->toggled(xEn);
-	cursorSettings->getXLock()->toggled(xLock);
-	cursorSettings->getXTrack()->toggled(xTrack);
-	cursorSettings->getYEn()->toggled(yEn);
-	cursorSettings->getYLock()->toggled(yLock);
-	cursorSettings->getReadoutsDrag()->toggled(readoutDragsEn);
-
-	setVisible(false);
 }
 
 void CursorController::xEnToggled(bool toggled)
@@ -186,8 +178,6 @@ void CursorController::cursorsSetVisible(bool visible)
 	plotCursors->setXVisible(visible && xEn);
 	plotCursors->setYVisible(visible && yEn);
 }
-
-CursorSettings *CursorController::getCursorSettings() { return cursorSettings; }
 
 PlotCursors *CursorController::getPlotCursors() { return plotCursors; }
 

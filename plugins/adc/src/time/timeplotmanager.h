@@ -12,6 +12,7 @@ namespace scopy {
 namespace adc {
 
 class SCOPY_ADC_EXPORT TimePlotManager : public PlotManager {
+	Q_OBJECT
 public:
 	TimePlotManager(QString name = "TimePlotManager", QWidget *parent = nullptr);
 	~TimePlotManager();
