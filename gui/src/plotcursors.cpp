@@ -15,10 +15,10 @@ PlotCursors::~PlotCursors() {}
 
 void PlotCursors::initUI()
 {
-	m_yCursors.first = new PlotAxisHandle(m_plot, m_plot->selectedChannel()->yAxis());
-	m_yCursors.second = new PlotAxisHandle(m_plot, m_plot->selectedChannel()->yAxis());
-	m_xCursors.first = new PlotAxisHandle(m_plot, m_plot->selectedChannel()->xAxis());
-	m_xCursors.second = new PlotAxisHandle(m_plot, m_plot->selectedChannel()->xAxis());
+	m_yCursors.first = new PlotAxisHandle(m_plot, m_plot->yAxis());
+	m_yCursors.second = new PlotAxisHandle(m_plot, m_plot->yAxis());
+	m_xCursors.first = new PlotAxisHandle(m_plot, m_plot->xAxis());
+	m_xCursors.second = new PlotAxisHandle(m_plot, m_plot->xAxis());
 
 	plotMarker1 = new QwtPlotMarker();
 	plotMarker2 = new QwtPlotMarker();
@@ -130,6 +130,8 @@ void PlotCursors::enableTracking(bool tracking)
 
 void PlotCursors::displayIntersection()
 {
+	if(m_plot->selectedChannel() == nullptr)
+		return;
 	QwtAxisId yaxis = m_plot->selectedChannel()->yAxis()->axisId();
 	QwtAxisId xaxis = m_plot->selectedChannel()->xAxis()->axisId();
 	double h1CursorPos = m_xCursors.first->getPosition();
