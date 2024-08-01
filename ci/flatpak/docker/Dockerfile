@@ -1,32 +1,38 @@
 FROM ubuntu:20.04
+CMD ["/bin/bash"]
+ARG USER=runner
+ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Bucharest
+ENV CI_SCRIPT=ON
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN apt-get update -y
+# Install starting packages
+RUN apt update && apt -y upgrade && \
+	apt install -y apt-utils software-properties-common sudo
+
+# Create user
+RUN groupadd -g 1000 -r $USER && \
+	useradd -u 1000 -g 1000 --create-home -r $USER
+
+# Change password
+RUN echo "$USER:$USER" | chpasswd
+
+# Make sudo passwordless
+RUN echo "${USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-$USER && \
+	usermod -aG sudo $USER && \
+	usermod -aG plugdev $USER
+
+USER $USER
 
 # Install base dependencies
-RUN apt-get install -y software-properties-common build-essential git sudo apt-utils subversion mm-common
-
 # Install flatpak
-RUN add-apt-repository ppa:alexlarsson/flatpak -y
-RUN apt-get update -y
-RUN apt install flatpak flatpak-builder -y
+# Clean apt
+RUN sudo apt install -y git wget vim build-essential subversion mm-common && \
+	sudo apt install flatpak jq flatpak-builder -y && \
+	sudo apt clean -y && sudo apt autoclean -y
 
 # Install remote
-RUN flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-RUN flatpak install flathub org.kde.Platform//5.15-22.08 -y
-RUN flatpak install flathub org.kde.Sdk//5.15-22.08 -y
+RUN sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+RUN sudo flatpak install flathub org.kde.Platform//5.15-23.08 -y && sudo flatpak install flathub org.kde.Sdk//5.15-23.08 -y
 
-# Clean
-RUN apt-get clean -y && apt-get autoclean -y
-
-RUN echo Cloning scopy-flatpak
-ARG REPO_LINK=https://github.com/analogdevicesinc/scopy-flatpak
-ARG REPO_LOCAL=/home/docker/scopy-flatpak
-ARG REPO_BRANCH=ci-for-scopy2
-
-RUN git clone --recurse-submodules "$REPO_LINK" -b "$REPO_BRANCH" "$REPO_LOCAL" 2> /dev/null || (cd "$REPO_LOCAL"; git pull)
-
-#RUN cd /home/docker/scopy-flatpak && make -j4
-#RUN rm -rf Scopy.flatpak
-CMD ["/bin/bash"]
+WORKDIR /home/$USER

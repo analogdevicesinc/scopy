@@ -35,6 +35,7 @@ doc/*
 .cache/*
 build/*
 .vscode/*
+ci/general/gh-actions.envs
 ci/ubuntu/staging
 ci/macOS/staging
 ci/armhf/staging
