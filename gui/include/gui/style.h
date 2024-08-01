@@ -37,7 +37,8 @@ private:
 	static QJsonDocument *m_theme_json;
 	QString m_globalJsonPath;
 	QString m_themeJsonPath;
-	QString m_qssPath;
+	QString m_qssGlobalFilePath;
+	QString m_qssFolderPath;
 	QString m_m2kqssPath;
 	QString m_currentStyle;
 };

@@ -23,7 +23,8 @@ Style::Style(QObject *parent)
 	: QObject(parent)
 	, m_globalJsonPath("style/json/global.json")
 	, m_themeJsonPath("style/json/dark.json")
-	, m_qssPath("style/qss/global.qss")
+	, m_qssGlobalFilePath("style/qss/global.qss")
+	, m_qssFolderPath("style/qss")
 	, m_m2kqssPath("style/qss/m2k.qss")
 {
 	init();
@@ -136,19 +137,20 @@ QString Style::replaceAttributes(QString style, int calls_limit)
 
 void Style::applyStyle()
 {
-	QDirIterator it(m_qssPath, QStringList() << "*.qss", QDir::Files, QDirIterator::Subdirectories);
+	QDirIterator it(m_qssFolderPath, QStringList() << "*.qss", QDir::Files, QDirIterator::Subdirectories);
 	QFile *file;
 	QMap<QString, QString> *map = new QMap<QString, QString>();
 
 	while (it.hasNext())
 		file = new QFile(it.filePath());
+		std::cout << it.filePath().toStdString() << std::endl;
 		file->open(QIODevice::ReadOnly);
 		QString data = QString(file->readAll());
 		map->insert(file->fileName(), data);
 
 	// make py script generate all files into a folder with the name as the property
 
-//	QFile file(m_qssPath);
+//	QFile file(m_qssGlobalFilePath);
 //	file.open(QIODevice::ReadOnly);
 //	QString style = QString(file.readAll());
 //	file.close();
