@@ -385,8 +385,8 @@
 				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
 				"-DENABLE_PYTHON=OFF",
 				"-DENABLE_CSHARP=OFF",
-				"-DENABLE_LOG=ON",
-				"-DENABLE_TOOLS=ON",
+				"-DENABLE_TOOLS=OFF",
+				"-DBUILD_EXAMPLES=OFF",
 				"-DINSTALL_UDEV_RULES=OFF"
 			],
 			"sources": [
@@ -495,7 +495,7 @@
 				{
 					"type": "git",
 					"url": "https://github.com/analogdevicesinc/iio-emu",
-					"commit": "b8208485f50573a38263031ab05e9cd30712bf0c"
+					"branch": "master"
 				}
 			]
 		},
