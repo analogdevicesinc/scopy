@@ -144,7 +144,7 @@ PlotChannel *FFTPlotComponentChannel::plotChannel()
 void FFTPlotComponentChannel::enable()
 {
 	m_fftPlotCh->enable();
-	if(m_fftPlotAxisHandle) {
+	if(m_fftPlotAxisHandle && !m_singleYMode) {
 		m_fftPlotAxisHandle->handle()->setVisible(true);
 		m_fftPlotAxisHandle->handle()->raise();
 	}

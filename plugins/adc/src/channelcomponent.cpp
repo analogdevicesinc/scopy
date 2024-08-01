@@ -38,6 +38,9 @@ void ChannelComponent::onInit() {}
 
 void ChannelComponent::onDeinit() { m_plotChannelCmpt->deinitPlotComponent(); }
 
+void ChannelComponent::onNewData(const float *xData, const float *yData, size_t size, bool copy) {
+}
+
 QPen ChannelComponent::pen() const { return m_pen; }
 
 ChannelData *ChannelComponent::chData() const { return m_chData; }
@@ -108,5 +111,3 @@ void ChannelComponent::setSamplingInfo(SamplingInfo p)
 {
 	m_samplingInfo = p;
 }
-
-

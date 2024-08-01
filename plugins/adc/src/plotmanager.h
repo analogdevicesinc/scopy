@@ -42,6 +42,7 @@ public Q_SLOTS:
 	void setXInterval(double xMin, double xMax);
 	void selectChannel(ChannelComponent *c);
 Q_SIGNALS:
+	void plotAdded(uint32_t);
 	void plotRemoved(uint32_t);
 
 protected:

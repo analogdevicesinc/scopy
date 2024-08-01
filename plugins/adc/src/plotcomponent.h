@@ -1,6 +1,7 @@
 #ifndef PLOTCOMPONENT_H
 #define PLOTCOMPONENT_H
 
+#include "cursorcontroller.h"
 #include "scopy-adc_export.h"
 #include <gui/plotwidget.h>
 #include "toolcomponent.h"
@@ -33,6 +34,7 @@ public:
 	~PlotComponent();
 
 	PlotWidget *plot(int idx);
+	QPair<double, double> xInterval();
 
 public Q_SLOTS:
 	virtual void replot();
@@ -41,6 +43,7 @@ public Q_SLOTS:
 	virtual void refreshAxisLabels();
 	virtual void selectChannel(ChannelComponent *c);
 	virtual void setXInterval(double min, double max);
+	virtual void setXInterval(QPair<double,double> p);
 
 Q_SIGNALS:
 	void nameChanged(QString);
@@ -59,12 +62,15 @@ public:
 	// TimePlotComponentSettings *createPlotMenu(QWidget *parent);
 	// TimePlotComponentSettings *plotMenu();
 
+	CursorController *cursor() const;
+
 protected:
 	uint32_t m_uuid;
 	QHBoxLayout *m_plotLayout;
 	QList<PlotWidget*> m_plots;
 
 	QList<PlotComponentChannel *> m_channels;
+	CursorController *m_cursor;
 };
 }}
 #endif // PLOTCOMPONENT_H
