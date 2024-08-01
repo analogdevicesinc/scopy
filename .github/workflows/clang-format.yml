@@ -16,6 +16,7 @@ jobs:
     - uses: DoozyX/clang-format-lint-action@v0.16
       with:
         source: '.'
+        exclude: './ci/flatpak'
         extensions: 'h,hpp,cpp,cc,cc.in'
         clangFormatVersion: 12
 
