@@ -87,4 +87,14 @@ QAbstractButton *CursorSettings::getYLock() { return yLock->onOffswitch(); }
 
 QAbstractButton *CursorSettings::getReadoutsDrag() { return readoutsDrag->onOffswitch(); }
 
+void CursorSettings::initSession()
+{
+	getXEn()->setChecked(true);
+	getXLock()->setChecked(false);
+	getXTrack()->setChecked(false);
+	getYEn()->setChecked(false);
+	getYLock()->setChecked(false);
+	getReadoutsDrag()->setChecked(false);
+}
+
 #include "moc_cursorsettings.cpp"

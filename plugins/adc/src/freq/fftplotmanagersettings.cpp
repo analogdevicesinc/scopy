@@ -136,14 +136,15 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 	connect(xcb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		m_sampleRateSpin->setVisible(false);
+		m_freqOffsetSpin->setVisible(false);
 		if(xcb->itemData(idx) == XMODE_SAMPLES) {
 			m_sampleRateSpin->setValue(1);
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<FFTPlotComponent*>(plt);
 				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(0);
 			}
-
 		}
+
 		if(xcb->itemData(idx) == XMODE_TIME) {
 			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setEnabled(false);
@@ -155,7 +156,6 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 				auto p = dynamic_cast<FFTPlotComponent*>(plt);
 				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
 			}
-
 		}
 		if(xcb->itemData(idx) == XMODE_OVERRIDE) {
 			m_sampleRateSpin->setVisible(true);
@@ -221,7 +221,9 @@ void FFTPlotManagerSettings::onInit()
 	m_xmax->setValue(31);
 	m_xModeCb->combo()->setCurrentIndex(0);
 
-	       //	m_rollingModeSw->onOffswitch()->setChecked(false);
+	m_sampleRateSpin->setVisible(false);
+	m_freqOffsetSpin->setVisible(false);
+
 }
 
 void FFTPlotManagerSettings::updateXAxis()

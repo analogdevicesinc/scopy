@@ -12,7 +12,6 @@ ADCInstrumentController::ADCInstrumentController(ToolMenuEntry *tme, QString nam
 	: QObject(parent)
 	, m_refreshTimerRunning(false)
 	, m_plotComponentManager(nullptr)
-	, m_cursorComponent(nullptr)
 	, m_measureComponent(nullptr)
 	, m_started(false)
 {	

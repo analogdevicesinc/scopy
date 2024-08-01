@@ -166,7 +166,7 @@ void TimePlotComponentChannel::enable()
 {
 	m_timePlotCh->enable();
 	m_xyPlotCh->enable();
-	if(m_timePlotAxisHandle) {
+	if(m_timePlotAxisHandle && !m_singleYMode) {
 		m_timePlotAxisHandle->handle()->setVisible(true);
 		m_timePlotAxisHandle->handle()->raise();
 	}

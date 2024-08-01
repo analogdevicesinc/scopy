@@ -5,7 +5,6 @@
 #include "scopy-adc_export.h"
 #include "timeplotcomponent.h"
 #include "timeplotmanagersettings.h"
-#include "cursorcomponent.h"
 #include "measurecomponent.h"
 #include <QMap>
 #include <pluginbase/resourcemanager.h>
@@ -68,7 +67,6 @@ protected:
 	PlotManager *m_plotComponentManager;
 	MapStackedWidget *plotStack;
 
-	CursorComponent *m_cursorComponent;
 	MeasureComponent *m_measureComponent;
 
 	ChannelIdProvider *chIdP;

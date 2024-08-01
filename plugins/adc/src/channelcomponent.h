@@ -19,7 +19,7 @@ public:
 
 class TimePlotComponentChannel;
 
-class SCOPY_ADC_EXPORT ChannelComponent : public QWidget, public ToolComponent, public Menu, public SamplingInfoComponent
+class SCOPY_ADC_EXPORT ChannelComponent : public QWidget, public ToolComponent, public Menu, public SamplingInfoComponent, public DataProcessor
 {
 	Q_OBJECT
 public:
@@ -51,7 +51,9 @@ protected:
 	MenuWidget *m_menu;
 
 	ChannelData *m_chData;
+
 	PlotComponentChannel *m_plotChannelCmpt;
+	DataProcessor *m_dataProcessor;
 
 	SamplingInfo m_samplingInfo;
 
@@ -64,8 +66,7 @@ public Q_SLOTS:
 	virtual void onStop() override;
 	virtual void onInit() override;
 	virtual void onDeinit() override;
-
-	// void onNewData(const float *xData, const float *yData, int size, bool latch);
+	virtual void onNewData(const float *xData, const float *yData, size_t size, bool copy) override;
 };
 
 } // namespace adc

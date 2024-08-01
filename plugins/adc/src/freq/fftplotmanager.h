@@ -12,6 +12,7 @@ namespace scopy {
 namespace adc {
 
 class SCOPY_ADC_EXPORT FFTPlotManager : public PlotManager {
+	Q_OBJECT
 public:
 	FFTPlotManager(QString name = "FFTPlotManager", QWidget *parent = nullptr);
 	~FFTPlotManager();

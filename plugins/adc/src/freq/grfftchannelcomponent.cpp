@@ -71,6 +71,7 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node, FFTPlo
 }
 
 void GRFFTChannelComponent::_init() {
+	m_running = false;
 	m_scaleAvailable = m_src->scaleAttributeAvailable(); // query from GRIIOFloatChannel;
 
 	/*	m_measureMgr = new TimeMeasureManager(this);
@@ -284,8 +285,8 @@ void GRFFTChannelComponent::onInit()
 	addChannelToPlot();
 
 	m_yaxisMenu->setCollapsed(true);
-	m_yCtrl->setMin(-1.0);
-	m_yCtrl->setMax(1.0);
+	m_yCtrl->setMin(-140.0);
+	m_yCtrl->setMax(20.0);
 
 }
 

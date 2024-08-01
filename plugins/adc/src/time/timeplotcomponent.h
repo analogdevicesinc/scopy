@@ -45,6 +45,7 @@ public Q_SLOTS:
 	void refreshXYXAxis();
 	void refreshXYXData();
 	void selectChannel(ChannelComponent *c) override;
+	void setXInterval(QPair<double,double>p) override;
 	void setXInterval(double min, double max) override;
 public:
 	void addChannel(ChannelComponent *) override;

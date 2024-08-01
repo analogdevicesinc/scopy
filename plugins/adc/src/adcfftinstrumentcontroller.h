@@ -28,6 +28,7 @@ private:
 	bool m_complexMode;
 	QList<AcqTreeNode*> m_complexChannels;
 	FFTPlotManagerSettings* m_fftPlotSettingsComponent;
+
 };
 
 }

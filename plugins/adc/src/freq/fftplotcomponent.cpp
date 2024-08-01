@@ -20,6 +20,7 @@ FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	// , m_plotMenu(nullptr)
 {
 	m_fftPlot = new PlotWidget(this);
+
 	m_fftPlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_fftPlot->xAxis()->setInterval(0, 1);
 	m_fftPlot->xAxis()->setVisible(true);
@@ -32,6 +33,7 @@ FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	addComponent(m_plotMenu);
 
 	connect(m_plotMenu, &FFTPlotComponentSettings::requestDeletePlot, this, [=]() { Q_EMIT requestDeletePlot();});
+	m_cursor = new CursorController(m_fftPlot, this);
 
 }
 

@@ -20,6 +20,7 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 	: PlotComponent(name, uuid, parent)
 	, m_plotMenu(nullptr)
 	, m_XYXChannel(nullptr)
+	, m_singleYMode(true)
 {
 	m_timePlot = new PlotWidget(this);
 	m_timePlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -51,6 +52,7 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 	addComponent(m_plotMenu);
 
 	connect(m_plotMenu, &TimePlotComponentSettings::requestDeletePlot, this, [=]() { Q_EMIT requestDeletePlot(); });
+	m_cursor = new CursorController(m_timePlot, this);
 }
 
 TimePlotComponent::~TimePlotComponent() {}
@@ -173,6 +175,11 @@ void TimePlotComponent::removeChannel(ChannelComponent *c)
 		}
 	}
 	m_plotMenu->removeChannel(c);
+}
+
+
+void TimePlotComponent::setXInterval(QPair<double,double>p) {
+	setXInterval(p.first,p.second);
 }
 
 void TimePlotComponent::setXInterval(double min, double max) {

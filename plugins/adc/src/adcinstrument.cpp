@@ -67,6 +67,9 @@ void ADCInstrument::setupToolLayout()
 
 	channelsBtn = new MenuControlButton(this);
 
+	m_cursor = new MenuControlButton(this);
+	setupCursorButtonHelper(m_cursor);
+
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsBtn, TTA_LEFT);
 
@@ -82,6 +85,7 @@ void ADCInstrument::setupToolLayout()
 
 	tool->addWidgetToBottomContainerHelper(channelsBtn, TTA_LEFT);
 	tool->addWidgetToBottomContainerHelper(m_complex, TTA_LEFT);
+	tool->addWidgetToBottomContainerHelper(m_cursor, TTA_RIGHT);
 
 	rightMenuBtnGrp->addButton(settingsBtn);
 
@@ -219,3 +223,12 @@ VerticalChannelManager *ADCInstrument::vcm() const { return m_vcm; }
 ToolTemplate *ADCInstrument::getToolTemplate() { return tool; }
 
 MapStackedWidget *ADCInstrument::getRightStack() { return rightStack; }
+
+void ADCInstrument::setupCursorButtonHelper(MenuControlButton *cursor)
+{
+	cursor->setName("Cursors");
+	cursor->setOpenMenuChecksThis(true);
+	cursor->setDoubleClickToOpenMenu(true);
+	cursor->checkBox()->setVisible(false);
+	cursor->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
+}

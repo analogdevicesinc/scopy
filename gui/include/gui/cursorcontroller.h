@@ -15,8 +15,8 @@ public:
 	CursorController(PlotWidget *plot, QObject *parent = nullptr);
 	~CursorController();
 
-	CursorSettings *getCursorSettings();
 	PlotCursors *getPlotCursors();
+	void connectSignals(CursorSettings *cursorSettings);
 
 public Q_SLOTS:
 	void setVisible(bool visible);
@@ -48,8 +48,8 @@ private:
 	bool readoutDragsEn;
 
 	void initUI();
-	void connectSignals();
-	void initSession();
+
+	// void initSession();
 };
 } // namespace scopy
 #endif // CURSORCONTROLLER_H
