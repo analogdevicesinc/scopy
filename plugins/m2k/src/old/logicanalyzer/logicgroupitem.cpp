@@ -26,7 +26,6 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QVBoxLayout>
-#include <style.h>
 
 using namespace scopy;
 
@@ -83,7 +82,7 @@ void LogicGroupItem::buildUi()
 
 	QPushButton *deleteBtn = new QPushButton(this);
 	deleteBtn->setFlat(true);
-	deleteBtn->setIcon(Style::getPixmap(":/gui/icons/close_hovered.svg"));
+	deleteBtn->setIcon(QIcon(":/gui/icons/close_hovered.svg"));
 	deleteBtn->setMaximumSize(QSize(16, 16));
 	connect(deleteBtn, &QPushButton::clicked, this, &LogicGroupItem::deleteBtnClicked);
 	connect(deleteBtn, &QPushButton::clicked, [=]() {

@@ -1,7 +1,7 @@
 /* General Application Style */
 * {
-    background-color: &background_1&;
-    color: &highlight_1&;
+    background-color: &background_primary&;
+    color: &content_default&;
     font-family: Arial, sans-serif;
     font-size: &font_size&;
 }
@@ -21,22 +21,22 @@ QCheckBox::indicator {
 }
 
 QCheckBox::indicator::unchecked::disabled {
-	background-color: &highlight_disabled&;
+	background-color: &interactive_subtle_disabled&;
 }
 QCheckBox::indicator::unchecked {
-	border: &border_width& solid &highlight_2&;
-	background-color: &background_3&;
+	border: &border_width& solid &interactive_subtle_idle&;
+	background-color: &content_inverse&;
 	image: none;
 }
 
 QCheckBox::indicator::checked::disabled {
-	border: &border_width& solid &highlight_color_disabled&;
-	background-color: &highlight_color_disabled&;
+	border: &border_width& solid &interactive_primary_disabled&;
+	background-color: &interactive_primary_disabled&;
 	image: url(&svg_checkmark&);
 }
 QCheckBox::indicator::checked {
-	border: &border_width& solid &highlight_color&;
-	background-color: &highlight_color&;
+	border: &border_width& solid &content_silent&;
+	background-color: &interactive_primary_idle&;
 	image: url(&svg_checkmark&);
 }
 
@@ -44,57 +44,40 @@ QPushButton {
     background-color: transparent;
     border: none;
     padding: &padding_1& &padding_2&;
-    border-radius: &radius_1&;
     font-weight: bold;
 }
 
-QPushButton:hover {
-    background-color: &hover_color&;
+QPushButton::hover {
+    background-color: &interactive_primary_idle&;
+    color: &content_inverse&;
 }
 
-QPushButton:pressed {
-    background-color: &pressed_color&;
+QPushButton::pressed {
+    background-color: &interactive_primary_idle&;
+    color: &content_inverse&;
 }
-
-
-
-/* Tool Buttons */
-QToolButton {
-    background-color: &background_color&;
-    color: &highlight_1&;
-    border-radius: 4px;
-    padding: 5px;
-}
-
-QToolButton:hover {
-    background-color: &background_2&;
-    color: &highlight_1&;
-}
-
-
-
-
 
 QComboBox::disabled {
-background-color: &background_1&;
-border: &border_width& solid &highlight_disabled&;
+color: &interactive_subtle_disabled&;
+border: &border_width& solid &interactive_subtle_disabled&;
 }
 QComboBox {
 height: &unit_2&;
-border: &border_width& solid &highlight_2&;
+border: &border_width& solid &interactive_subtle_idle&;
 border-radius: &radius_1&;
-background-color: &background_3&;
-color: &highlight_1&;
+background-color: &background_primary&;
+color: &content_default&;
 }
 QComboBox::item::disabled {
-background-color: &background_1&;
+color: &interactive_subtle_disabled&;
 }
 QComboBox::item:selected {
  border-bottom: 0px solid none;
- background-color: &hover_color&;
+ background-color: &interactive_subtle_hover&;
+ color: &content_inverse&;
 }
 QComboBox::item {
- background-color: &background_3&;
+ background-color: &background_primary&;
 }
 QComboBox::drop-down {
  subcontrol-position: center right;
@@ -116,48 +99,49 @@ QComboBox::down-arrow{
     image: url(&svg_arrow_down&);
 }
 
-
-/* Tabs */
+QTabWidget {
+    border: none;
+    }
 QTabBar::tab {
-    background: &background_1&;
-    color: &highlight_1&;
+    background: transparent;
+    color: &content_default&;
     padding: &padding_1&;
+    /*
     border-radius: &radius_1&;
-    border: &border_width& solid &background_1&;
+    border: &border_width& solid &interactive_subtle_disabled&;
+    */
 }
 
 QTabBar::tab:selected {
-    background: &background_color&;
-    color: &highlight_1&;
+    background-color: &interactive_primary_pressed&;
+    color: &content_inverse&; 
 }
 
 QTabBar::tab:hover {
-    background: &hover_color&;
+    background-color: &interactive_primary_hover&;
+    color: &content_inverse&; 
 }
 
-QTabBar QLabel {
+QTabBar::tab QLabel {
     background-color: transparent;
+    color: &content_default&;
 }
-
-
-
-
-
 
 
 /* fix this */
 QScrollArea { border: 0px;}
 QScrollBar:vertical {
- background: &background_2&;
+ max-width: 8px;
+ background: &interactive_subtle_idle&;
  max-width:  &unit_05&;
 }
 QScrollBar::handle:vertical {
- background: &highlight_color&;
+ background: &interactive_primary_idle&;
  border: 0;
  border-radius: &radius_1&;
 }
 QScrollBar::handle:vertical:hover {
- background: &background_color&;
+ background: &interactive_primary_disabled&;
  border: 0;
  border-radius: &radius_1&;
 }
@@ -167,17 +151,17 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
  background: none;
 }
 QScrollBar:horizontal {
- background: &background_2&;
+ background: &interactive_subtle_idle&;
  max-height: &unit_05&;
  border-radius: &radius_1&;
 }
 QScrollBar::handle:horizontal {
- background: &highlight_color&;
+ background: &interactive_primary_idle&;
  border: 0;
  border-radius: &radius_1&;
 }
 QScrollBar::handle:horizontal:hover {
- background: &background_color&;
+ background: &interactive_primary_disabled&;
  border: 0;
  border-radius: &radius_1&;
 }
@@ -186,3 +170,42 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
  border: none;
  background: none;
 }
+QSlider::handle {
+ background: &interactive_subtle_idle&;
+ border: 0px solid;
+ width: 18px;
+ margin: -8px 0;
+ border-radius: 8px;
+}
+QSlider::handle:disabled { background: &interactive_subtle_disabled&; }
+QSlider::sub-page:horizontal { background: &interactive_primary_disabled&; }
+
+scopy--SpinBoxA QPushButton#SBA_DownButton {
+ width: 16px;
+ height: 16px;
+ border: 0px;
+}
+scopy--SpinBoxA QPushButton#SBA_UpButton {
+ width: 16px;
+ height: 16px;
+ border: 0px;
+}
+scopy--SpinBoxA QLineEdit#SBA_LineEdit {
+ height: 20px;
+ width: 75px;
+ font-size: 18px;
+ border: 0px;
+ bottom: 10px;
+}
+scopy--SpinBoxA QComboBox#SBA_Combobox::drop-down {
+ subcontrol-position: center right;
+ width: 10px;
+ height: 6px;
+}
+scopy--SpinBoxA QComboBox#SBA_Combobox::drop-down:disabled {
+ subcontrol-position: center right;
+ width: 0px;
+ height: 0px;
+}
+QFrame[subsection_line=true]{
+border: 1px solid &content_silent&;}

@@ -84,10 +84,10 @@ void DetailsView::setAddToWatchlistState(bool add)
 {
 	m_addToWatchlistBtn->setEnabled(true);
 	if(add) {
-		m_addToWatchlistBtn->setIcon(Style::getPixmap(ADD_ICON, Style::getColor(json::theme::focus_item)));
+		m_addToWatchlistBtn->setIcon(Style::getPixmap(ADD_ICON, Style::getColor(json::theme::content_inverse)));
 		m_addToWatchlistBtn->setToolTip("Add to Watchlist");
 	} else {
-		m_addToWatchlistBtn->setIcon(Style::getPixmap(REMOVE_ICON, Style::getColor(json::theme::focus_item)));
+		m_addToWatchlistBtn->setIcon(Style::getPixmap(REMOVE_ICON, Style::getColor(json::theme::content_inverse)));
 		m_addToWatchlistBtn->setToolTip("Remove from Watchlist");
 	}
 }

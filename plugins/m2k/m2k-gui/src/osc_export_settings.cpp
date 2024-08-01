@@ -24,7 +24,6 @@
 #include <QHeaderView>
 #include <QStandardItem>
 #include <QTreeView>
-#include <style.h>
 
 using namespace scopy;
 
@@ -57,7 +56,7 @@ ExportSettings::~ExportSettings() { delete ui; }
 
 void ExportSettings::addChannel(int id, QString name)
 {
-	exportChannels->addDropdownElement(Style::getPixmap(""), name, QVariant(id));
+	exportChannels->addDropdownElement(QIcon(""), name, QVariant(id));
 	nr_channels++;
 	QStandardItemModel *model = static_cast<QStandardItemModel *>(exportChannels->model());
 	model->item(id, 1)->setData(QVariant((int)true), Qt::EditRole);

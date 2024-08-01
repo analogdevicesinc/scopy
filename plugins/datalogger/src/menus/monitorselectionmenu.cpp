@@ -67,7 +67,7 @@ void MonitorSelectionMenu::generateDeviceSection(QString device, bool import)
 
 		QPushButton *removeBtn = new QPushButton(devMonitorsSection);
 		removeBtn->setMaximumSize(25, 25);
-		removeBtn->setIcon(Style::getPixmap(":/gui/icons/orange_close.svg", Style::getColor(json::theme::focus_item)));
+		removeBtn->setIcon(Style::getPixmap(":/gui/icons/orange_close.svg", Style::getColor(json::theme::content_inverse)));
 
 		HoverWidget *removeHover = new HoverWidget(removeBtn, devMonitorsSection, devMonitorsSection);
 		removeHover->setStyleSheet("background-color: transparent; border: 0px;");

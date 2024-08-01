@@ -27,7 +27,6 @@
 #include <QHeaderView>
 #include <QStandardItem>
 #include <QTreeView>
-#include <style.h>
 
 using namespace scopy;
 using namespace scopy::m2k;
@@ -316,12 +315,12 @@ void MeasureSettings::onChannelAdded(int chnIdx)
 			enum M2kMeasurementData::axisType axis = measurements[i]->axis();
 
 			if(axis == M2kMeasurementData::HORIZONTAL) {
-				m_horizMeasurements->addDropdownElement(Style::getPixmap(icons_lut.at(i)),
-									measurements[i]->name(), QVariant(i));
+				m_horizMeasurements->addDropdownElement(QIcon(icons_lut.at(i)), measurements[i]->name(),
+									QVariant(i));
 				m_measurePosInDropdowns.append(h++);
 			} else if(axis == M2kMeasurementData::VERTICAL) {
-				m_vertMeasurements->addDropdownElement(Style::getPixmap(icons_lut.at(i)),
-								       measurements[i]->name(), QVariant(i));
+				m_vertMeasurements->addDropdownElement(QIcon(icons_lut.at(i)), measurements[i]->name(),
+								       QVariant(i));
 				m_measurePosInDropdowns.append(v++);
 			}
 		}
@@ -330,10 +329,10 @@ void MeasureSettings::onChannelAdded(int chnIdx)
 			enum M2kMeasurementData::axisType axis = measurements[i]->axis();
 
 			if(axis == M2kMeasurementData::HORIZONTAL_F) {
-				m_horizMeasurements->addDropdownElement(Style::getPixmap(icons_spect.at(i)),
+				m_horizMeasurements->addDropdownElement(QIcon(icons_spect.at(i)),
 									measurements[i]->name(), QVariant(i));
 			} else if(axis == M2kMeasurementData::VERTICAL_F) {
-				m_vertMeasurements->addDropdownElement(Style::getPixmap(icons_spect.at(i)),
+				m_vertMeasurements->addDropdownElement(QIcon(icons_spect.at(i)),
 								       measurements[i]->name(), QVariant(i));
 			}
 		}

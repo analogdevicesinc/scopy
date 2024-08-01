@@ -441,7 +441,7 @@ QPushButton[load_logo=true]{
  text-align: left;
 }
 QPushButton[preferences_icon=true]{
- icon: url(:/gui/icons/scopy-default/icons/gear_wheel.svg);
+ icon: url(:/gui/icons/scopy-default/icons/preferences.svg);
  text-align: center;
  qproperty-text: "Preferences";
 }

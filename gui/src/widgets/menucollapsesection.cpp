@@ -69,6 +69,12 @@ MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::Men
 	setLayout(m_lay);
 	m_header = new MenuCollapseHeader(m_title, style, this);
 	m_lay->addWidget(m_header);
+
+	QFrame *line = new QFrame();
+	StyleHelper::MenuHeaderLine(line, QPen(Style::getColor(json::theme::interactive_subtle_idle)));
+	m_lay->addWidget(line);
+	m_lay->addSpacing(Style::getDimension(json::global::unit_1));
+
 	QWidget *container = new QWidget(this);
 	m_lay->addWidget(container);
 	m_contLayout = new QVBoxLayout(container);

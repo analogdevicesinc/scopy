@@ -44,6 +44,7 @@ public:
 	~SmallOnOffSwitch();
 
 	QSize sizeHint() const override;
+	void setSpacing(int spacing);
 
 public Q_SLOTS:
 	void toggleAnim();
@@ -52,11 +53,14 @@ protected:
 	void resizeEvent(QResizeEvent *event) override;
 	void paintEvent(QPaintEvent *event) override;
 	void enterEvent(QEvent *event) override;
+	void leaveEvent(QEvent *event) override;
+	void mousePressEvent(QMouseEvent *event) override;
 	int offset() const;
 	void setOffset(int value);
 	void init();
 
 private:
+	bool m_is_entered;
 	int m_spacing;
 	int m_btn_width;
 	int m_track_radius;

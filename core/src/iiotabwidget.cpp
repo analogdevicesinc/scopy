@@ -322,7 +322,6 @@ QWidget *IioTabWidget::createAvlCtxWidget(QWidget *parent)
 	w->setLayout(layout);
 
 	m_avlCtxCb = new QComboBox(w);
-	StyleHelper::MenuComboBox(m_avlCtxCb, "ctx_combo");
 
 	m_btnScan = new AnimationPushButton(w);
 	setupBtnLdIcon(m_btnScan);
@@ -353,7 +352,6 @@ QWidget *IioTabWidget::createSerialSettWidget(QWidget *parent)
 	lineEditWidget->layout()->setMargin(0);
 	lineEditWidget->layout()->setSpacing(3);
 	QLabel *serialFrameLabel = new QLabel("Port config", lineEditWidget);
-	StyleHelper::MenuComboLabel(serialFrameLabel);
 
 	QRegExp re("[5-9]{1}(n|o|e|m|s){1}[1-2]{1}(x|r|d){0,1}$");
 	QRegExpValidator *validator = new QRegExpValidator(re, this);

@@ -48,6 +48,7 @@ SmallOnOffSwitch::~SmallOnOffSwitch() {}
 
 void SmallOnOffSwitch::init()
 {
+	m_is_entered = false;
 	m_track_radius = Style::getDimension(json::global::unit_1) / 2;
 	m_thumb_radius = Style::getDimension(json::global::unit_1) / 2 - 1;
 	m_btn_width = Style::getDimension(json::global::unit_1) * 2.2;
@@ -58,16 +59,22 @@ void SmallOnOffSwitch::init()
 	m_end_offset[false] = [this]() { return m_base_offset; };
 	m_offset = m_base_offset;
 
-	m_track_color[true] = Style::getColor(json::theme::highlight_color);
-	m_track_color[false] = Style::getColor(json::theme::highlight_2);
-	m_track_color_disabled[true] = Style::getColor(json::theme::highlight_color_disabled);
-	m_track_color_disabled[false] = Style::getColor(json::theme::highlight_disabled);
-	m_thumb_color[true] = Style::getColor(json::theme::focus_item);
-	m_thumb_color[false] = Style::getColor(json::theme::focus_item);
+	m_track_color[true] = Style::getColor(json::theme::interactive_primary_idle);
+	m_track_color[false] = Style::getColor(json::theme::interactive_subtle_idle);
+	m_track_color_disabled[true] = Style::getColor(json::theme::interactive_primary_disabled);
+	m_track_color_disabled[false] = Style::getColor(json::theme::interactive_subtle_disabled);
+	m_thumb_color[true] = Style::getColor(json::theme::content_inverse);
+	m_thumb_color[false] = Style::getColor(json::theme::content_inverse);
 	m_track_opacity = 1.0;
 }
 
 int SmallOnOffSwitch::offset() const { return m_offset; }
+
+void SmallOnOffSwitch::setSpacing(int spacing)
+{
+	m_spacing = spacing;
+	update();
+}
 
 void SmallOnOffSwitch::setOffset(int value)
 {
@@ -138,7 +145,21 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
 void SmallOnOffSwitch::enterEvent(QEvent *event)
 {
 	setCursor(Qt::PointingHandCursor);
+	m_is_entered = true;
 	QCheckBox::enterEvent(event);
+}
+
+void SmallOnOffSwitch::leaveEvent(QEvent *event)
+{
+	m_is_entered = false;
+	QCheckBox::enterEvent(event);
+}
+
+void SmallOnOffSwitch::mousePressEvent(QMouseEvent *event)
+{
+	if(event->button() == Qt::LeftButton && m_is_entered) {
+		toggle();
+	}
 }
 
 #include "moc_smallOnOffSwitch.cpp"

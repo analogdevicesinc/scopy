@@ -622,7 +622,7 @@ QPushButton[load_logo=true]{
 }
 
 QPushButton[preferences_icon=true]{
-	icon: url(:/icons/scopy-default/icons/gear_wheel.svg);
+	icon: url(:/icons/scopy-default/icons/preferences.svg);
 	text-align: center;
 	qproperty-text: "Preferences";
 }

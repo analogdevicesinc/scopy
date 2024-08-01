@@ -49,10 +49,8 @@ ToolMenuItem::ToolMenuItem(QString id, QString name, QString iconPath, QWidget *
 #ifdef __ANDROID__
 	setDynamicProperty(this, "allowHover", false);
 #else
-	setDynamicProperty(this, "allowHover", true);
-	Style::setStyle(this, style::widget::deviceItem);
-	Style::setStyle(toolBtn, style::button::toolButton);
-	Style::setStyle(toolRunBtn, style::button::toolButton);
+	toolBtn->setStyleSheet("text-align:left;");
+	Style::setStyle(toolRunBtn, style::widget::notInteractive);
 
 	enableDoubleClick(true);
 #endif

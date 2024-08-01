@@ -27,20 +27,8 @@
   </property>
   <property name="styleSheet">
    <string notr="true">#btnSave,#btnLoad,#btnPreferences,#btnAbout {
- text-align:center;
+ text-align: center;
  height: 25px;
- background-color: none;
- border:none;
-}
-
-#btnSave:hover,
-#btnLoad:hover,
-#btnPreferences:hover,
-#btnAbout:hover,
-#btnCollapse_2:hover{
- background-color: rgba(0, 0, 0, 60);
- border: 1px solid rgba(0, 0, 0, 30);
- border-radius:5px;
 }
 
 #logo {

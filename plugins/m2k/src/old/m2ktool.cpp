@@ -19,8 +19,11 @@
  */
 
 #include "m2ktool.hpp"
+#include "utils.h"
 
 #include <QMimeData>
+#include <iostream>
+#include <style.h>
 
 using namespace scopy;
 using namespace scopy::m2k;
@@ -40,6 +43,7 @@ M2kTool::M2kTool(struct iio_context *ctx, ToolMenuEntry *tme, ApiObject *api, co
 	p = Preferences::GetInstance();
 	connect(p, &Preferences::preferenceChanged, this, &M2kTool::readPreferences);
 	M2kTool::readPreferences();
+	Style::GetInstance()->setM2KStylesheet(this);
 }
 
 M2kTool::~M2kTool()

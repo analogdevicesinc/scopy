@@ -62,9 +62,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	initPythonWIN32();
 	initStatusBar();
 
-//	Style::setStyle(ui->centralwidget, style::widget::footer);
-	Style::setStyle(ui->animHolder, style::widget::deviceList);
-
 	ConnectionProvider::GetInstance();
 	MessageBroker::GetInstance();
 
@@ -100,7 +97,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	toolman = new ToolManager(tm, ts, dtm, this);
 	toolman->addToolList("home", {});
 	toolman->addToolList("add", {});
-
+	ui->mainWidget->setStyleSheet("QWidget#mainWidget { background-color: " + Style::getAttribute(json::theme::background_subtle) + ";}");
+	ts->setStyleSheet("QWidget#mainWidget { background-color: " + Style::getAttribute(json::theme::background_subtle) + ";}");
 	connect(tm, &ToolMenu::toggleAttach, toolman, &ToolManager::toggleAttach);
 	connect(tb, &ToolBrowser::collapsed, [=](bool coll) {
 		ui->animHolder->setAnimMin(50);

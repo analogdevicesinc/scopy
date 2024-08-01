@@ -4,8 +4,8 @@
 #include <QColor>
 #include <QObject>
 #include "scopy-gui_export.h"
-#include <style_properties.h>
-#include <style_attributes.h>
+#include <../gui/style_properties.h>
+#include <../gui/style_attributes.h>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT Style : public QObject
@@ -15,8 +15,8 @@ private:
 	Style(QObject *parent = nullptr);
 	~Style();
 
-	void applyStyle();
 	void init(QString theme = "");
+	void applyStyle();
 
 public:
 	static Style *GetInstance();
@@ -28,9 +28,8 @@ public:
 	QString getTheme();
 	bool setTheme(QString theme);
 	QStringList getThemeList();
-
-protected:
-	static QString replaceAttribute(QString style);
+	static QString replaceAttributes(QString style, int calls_limit = 10);
+	void setM2KStylesheet(QWidget *widget);
 
 private:
 	static Style *pinstance_;
@@ -39,6 +38,8 @@ private:
 	QString m_globalJsonPath;
 	QString m_themeJsonPath;
 	QString m_qssPath;
+	QString m_m2kqssPath;
+	QString m_currentStyle;
 };
 } // namespace scopy
 

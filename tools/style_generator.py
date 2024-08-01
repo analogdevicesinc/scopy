@@ -1,5 +1,7 @@
 import os
 import sys
+import shutil
+from distutils.dir_util import copy_tree
 from typing import Dict, Optional, Set, List
 
 
@@ -31,7 +33,8 @@ def create_namespace_structure(extension: str, path: str, root_namespace: str = 
 
 
 # Replaces a placeholder property in a file with a given value
-def replace_property(in_file: str, value: str, out_file: str) -> bool:
+def replace_property(in_file: str, value: str) -> bool:
+    out_file = os.path.join(build_qss_folder, value + ".qss")
     search_text = "&&property&&"
 
     with open(in_file, 'r') as file:
@@ -44,17 +47,16 @@ def replace_property(in_file: str, value: str, out_file: str) -> bool:
 
 
 # Generates a QSS variable for a given file
-def generate_qss_variable(filepath: str, indent: str, root_folder: str, out_file: str) -> str:
+def generate_qss_variable(filepath: str, indent: str, root_folder: str) -> str:
     value = os.path.relpath(filepath, root_folder).replace("/", "_").replace(".qss", "")
-    if not replace_property(filepath, value, out_file):
+    if not replace_property(filepath, value):
         return ""
 
     return f'{indent}const char *const ' + os.path.basename(filepath).replace(".qss", '') + f' = "{value}";'
 
 
 # Generates namespace code based on the given structure
-def generate_namespace_code(namespace_structure: Dict[str, Dict[str, str]], variable_func, root_folder: str,
-                            out_file: str) -> str:
+def generate_namespace_code(namespace_structure: Dict[str, Dict[str, str]], variable_func, root_folder: str) -> str:
     code_lines: List[str] = []
 
     def add_namespaces(folder: List[str], files: Dict[str, str], level: int) -> None:
@@ -62,7 +64,7 @@ def generate_namespace_code(namespace_structure: Dict[str, Dict[str, str]], vari
         code_lines.append(f'{indent}namespace {folder[level]} {{')
         if level + 1 == len(folder):
             for filename, filepath in files.items():
-                code_lines.append(variable_func(filepath, f'{indent}\t', root_folder, out_file))
+                code_lines.append(variable_func(filepath, f'{indent}\t', root_folder))
         else:
             subnamespace = {k: v for k, v in namespace_structure.items() if
                             k.startswith('/'.join(folder[:level + 1]) + '/')}
@@ -79,6 +81,10 @@ def generate_namespace_code(namespace_structure: Dict[str, Dict[str, str]], vari
         path_parts = root_path.split(os.sep)
         if path_parts[0] not in added_namespaces:
             if len(namespace_structure[root_path]) != 0:
+                if path_parts[0] == GENERAL_FOLDER:
+                    # for filename, filepath in namespace_structure[root_path].items():
+                    #     variable_func(filepath, '', root_folder)
+                    continue
                 add_namespaces(path_parts, namespace_structure[root_path], 0)
                 added_namespaces.add(path_parts[0])
 
@@ -102,21 +108,21 @@ def write_header_file(output_file: str, namespace_code: str, name: str, namespac
 
 
 # Opens the QSS file for writing
-def open_qss_file(qss_path) -> None:
-    open(qss_path, 'w')
-
-
-# Appends a variable to a JSON file
-def append_variable(key: str, out_file: str) -> None:
-    if not out_file:
-        return
-
-    with open(out_file, 'a') as file:
-        file.write("\t\"" + key + "\",\n")
+def clear_qss_folder(qss_path: str) -> None:
+    os.makedirs(qss_path, exist_ok=True)
+    for filename in os.listdir(qss_path):
+        file_path = os.path.join(qss_path, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
 
 
 # Parses a JSON file and returns a dictionary of its contents
-def parse_json_file(filepath: str, root_folder: str, out_file: str) -> Dict[str, str]:
+def parse_json_file(filepath: str, root_folder: str) -> Dict[str, str]:
     with open(filepath, 'r') as file:
         content = file.read().strip()
 
@@ -132,18 +138,17 @@ def parse_json_file(filepath: str, root_folder: str, out_file: str) -> Dict[str,
         key = key.strip().strip('"')
         formatted_key = os.path.relpath(filepath, root_folder).replace("/", "_").replace(".json", "") + "_" + key
         json_content[key] = formatted_key
-        append_variable(formatted_key, out_file)
 
     return json_content
 
 
 # Generates JSON variable declarations for a given file
-def generate_json_variable(filepath: str, indent: str, root_folder: str, out_file: str) -> str:
+def generate_json_variable(filepath: str, indent: str, root_folder: str) -> str:
     with open(filepath, 'r') as file:
         if len(file.read().strip()) == 0:
             return ''
 
-    json = parse_json_file(filepath, root_folder, out_file)
+    json = parse_json_file(filepath, root_folder)
     variable = ""
 
     for key in json:
@@ -171,44 +176,41 @@ def close_json_file(json_path: str) -> None:
         file.write("\n}\n")
 
 
-def generate_qss(append: bool) -> None:
+def generate_qss(has_general_style: bool) -> None:
     qss_header_name = "style_properties.h"
     qss_header_path = os.path.join(generated_header_folder, qss_header_name)
-    qss_name = "style.qss"
-    qss_path = os.path.join(build_folder, qss_name)
 
-    if not append:
-        open_qss_file(qss_path)
+    # generate general qss file (only for core use)
+    if has_general_style:
+        clear_qss_folder(build_qss_folder)
+        copy_tree(os.path.join(style_folder, "qss", GENERAL_FOLDER), build_qss_folder)
+
+    # generate header and copy property files to build_qss_folder
     qss_namespace_code = generate_namespace_code(
         create_namespace_structure("qss", os.path.join(style_folder, "qss")),
         generate_qss_variable,
         style_folder,
-        qss_path
     )
     write_header_file(qss_header_path, qss_namespace_code, qss_header_name, "style")
 
 
-def generate_json(theme_attributes_path: str) -> None:
+def generate_json() -> None:
     json_header_name = "style_attributes.h"
     json_header_path = os.path.join(generated_header_folder, json_header_name)
     global_json_path = os.path.join(style_folder, "json", "global.json")
     theme_json_path = os.path.join(style_folder, "json", "dark.json")
 
-    open_json_file(theme_attributes_path)
     json_namespace_code = generate_namespace_code(
         create_namespace_structure(".json", global_json_path, "global"),
         generate_json_variable,
         style_folder,
-        theme_attributes_path
     )
     json_namespace_code += "\n" + generate_namespace_code(
         create_namespace_structure(".json", theme_json_path, "theme"),
         generate_json_variable,
         style_folder,
-        theme_attributes_path
     )
     write_header_file(json_header_path, json_namespace_code, json_header_name, "json")
-    close_json_file(theme_attributes_path)
 
 
 def copy_and_append_jsons(src_dir: str, dest_dir: str, append: bool) -> None:
@@ -253,12 +255,15 @@ if __name__ == "__main__":
     else:
         raise ValueError(f"Invalid option. Got {option} and was expecting --core or --plugin")
 
+    GENERAL_FOLDER = 'generic'
     style_folder = sys.argv[2]
     generated_header_folder = sys.argv[3]
     build_folder = sys.argv[4]
+    build_qss_folder = os.path.join(build_folder, "style", "qss")
+    build_json_folder = os.path.join(build_folder, "style", "json")
 
-    generate_qss(is_plugin)
-    generate_json(os.path.join(build_folder, "theme_attributes.json"))
-    copy_and_append_jsons(os.path.join(style_folder, "json"), os.path.join(build_folder, "json"), is_plugin)
+    generate_qss(not is_plugin)
+    generate_json()
+    copy_and_append_jsons(os.path.join(style_folder, "json"), build_json_folder, is_plugin)
 
     sys.exit(0)

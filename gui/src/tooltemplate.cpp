@@ -10,7 +10,7 @@ ToolTemplate::ToolTemplate(QWidget *parent)
 {
 	m_ui = new Ui::ToolTemplate();
 	m_ui->setupUi(this);
-	setStyleSheet(".QWidget { background-color: " + Style::getAttribute(json::theme::background_2) + "; }");
+	setStyleSheet(".QWidget { background-color: " + Style::getAttribute(json::theme::background_subtle) + "; }");
 
 	m_ui->bottomCentral->setVisible(false);
 	m_ui->topCentral->setVisible(false);

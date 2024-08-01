@@ -21,10 +21,7 @@
 #include "toolmenu.h"
 
 #include "gui/dynamicWidget.h"
-#include "style_properties.h"
-
 #include <QDebug>
-#include <style.h>
 
 using namespace scopy;
 
@@ -32,8 +29,6 @@ ToolMenu::ToolMenu(QWidget *parent)
 	: BaseMenu(parent)
 {
 	buttonGroup = new QButtonGroup(this);
-	Style::setStyle(this, style::widget::deviceList);
-
 	connect(this, &ToolMenu::itemMovedFromTo, this, &ToolMenu::_updateToolList);
 }
 

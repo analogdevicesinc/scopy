@@ -33,8 +33,6 @@ CustomSwitch::CustomSwitch(QWidget *parent)
 {
 	setCheckable(true);
 	init();
-
-	connect(this, &QPushButton::setChecked, this, [this](bool checked) { update(); });
 	update();
 }
 
@@ -67,15 +65,13 @@ void CustomSwitch::init()
 void CustomSwitch::paintEvent(QPaintEvent *event)
 {
 	m_offLabel->move(m_onLabel->width() - Style::getDimension(json::global::border_width), m_offLabel->pos().y());
-	if(isChecked()) {
-		m_onLabel->raise();
-		m_onLabel->setStyleSheet("border-color: " + Style::getAttribute(json::theme::highlight_color));
-		m_offLabel->setStyleSheet("border-color: " + Style::getAttribute(json::theme::highlight_2));
-	} else {
-		m_offLabel->raise();
-		m_offLabel->setStyleSheet("border-color: " + Style::getAttribute(json::theme::highlight_color));
-		m_onLabel->setStyleSheet("border-color: " + Style::getAttribute(json::theme::highlight_2));
-	}
+	m_onLabel->raise();
+
+	QString offColor = Style::getAttribute(json::theme::interactive_primary_idle);
+	QString onColor = Style::getAttribute(json::theme::interactive_subtle_idle);
+	if(isChecked()) std::swap(onColor, offColor);
+	m_onLabel->setStyleSheet("color: " + onColor + "; border-color: " + onColor);
+	m_offLabel->setStyleSheet("color: " + offColor + "; border-color: " + offColor);
 }
 
 bool CustomSwitch::event(QEvent *e)

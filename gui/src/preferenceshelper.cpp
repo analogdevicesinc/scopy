@@ -7,11 +7,25 @@
 using namespace scopy;
 QWidget *PreferencesHelper::addPreferenceCheckBox(Preferences *p, QString id, QString description, QObject *parent)
 {
-	SmallOnOffSwitch *pref = new SmallOnOffSwitch(description);
+	QWidget *widget = new QWidget();
+	QHBoxLayout *layout = new QHBoxLayout();
+	layout->setMargin(0);
+	layout->setSpacing(0);
+	layout->setMargin(0);
+	widget->setLayout(layout);
+
+	SmallOnOffSwitch *pref = new SmallOnOffSwitch();
 	pref->setChecked(p->get(id).toBool());
 	parent->connect(pref, &SmallOnOffSwitch::toggled, parent, [p, id](bool b) { p->set(id, b); });
 
-	return pref;
+	QSpacerItem *space = new QSpacerItem(20, 20, QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+	layout->addWidget(new QLabel(description, widget));
+	layout->addSpacerItem(space);
+	layout->addWidget(pref);
+	widget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+	return widget;
 }
 
 QWidget *PreferencesHelper::addPreferenceEdit(Preferences *p, QString id, QString description, QObject *parent)

@@ -1,7 +1,7 @@
 QWidget[&&property&&=true] {
     border-top-left-radius: &radius_1&;
     border-bottom-left-radius: &radius_1&;
-    border: &border_width& solid &highlight_2&;
+    border: &border_width& solid &interactive_subtle_idle&;
     max-height: &unit_2&;
     min-height: &unit_2&;
     padding: 0 &padding_1& 0 &padding_1&;

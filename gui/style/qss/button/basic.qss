@@ -1,5 +1,0 @@
-QPushButton[&&property&&=true] {
-    background-color: &highlight_color&;
-    color: &focus_item&;
-}
-

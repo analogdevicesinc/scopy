@@ -71,13 +71,13 @@ RunBtn::RunBtn(QWidget *parent)
 	setText("Run");
 	connect(this, &QPushButton::toggled, this, [=](bool b) { setText(b ? "Stop" : "Run"); });
 	Style::setStyle(this, style::button::runSingle);
-	setStyleSheet("background-color: " + Style::getAttribute(json::theme::highlight_color) + ";");
+	setStyleSheet("background-color: " + Style::getAttribute(json::theme::interactive_primary_idle) + ";");
 
 	QIcon icon1;
-	icon1.addPixmap(Style::getPixmap(":/gui/icons/play.svg", Style::getColor(json::theme::focus_item)),
+	icon1.addPixmap(Style::getPixmap(":/gui/icons/play.svg", Style::getColor(json::theme::content_inverse)),
 			QIcon::Normal, QIcon::Off);
 	icon1.addPixmap(Style::getPixmap(":/gui/icons/scopy-default/icons/play_stop.svg",
-					 Style::getColor(json::theme::focus_item)),
+					 Style::getColor(json::theme::content_inverse)),
 			QIcon::Normal, QIcon::On);
 	setIcon(icon1);
 }
@@ -95,10 +95,10 @@ SingleShotBtn::SingleShotBtn(QWidget *parent)
 
 	QIcon icon1;
 	icon1.addPixmap(
-		Style::getPixmap(":/gui/icons/play_oneshot.svg", Style::getColor(json::theme::focus_item)),
+		Style::getPixmap(":/gui/icons/play_oneshot.svg", Style::getColor(json::theme::content_inverse)),
 		QIcon::Normal, QIcon::Off);
 	icon1.addPixmap(Style::getPixmap(":/gui/icons/scopy-default/icons/play_stop.svg",
-					 Style::getColor(json::theme::focus_item)),
+					 Style::getColor(json::theme::content_inverse)),
 			QIcon::Normal, QIcon::On);
 	setIcon(icon1);
 }

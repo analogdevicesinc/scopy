@@ -57,7 +57,7 @@ PlotWidget::PlotWidget(QWidget *parent)
 	setupPlotButtonManager();
 
 	m_plot->canvas()->installEventFilter(this);
-	m_plot->canvas()->setStyleSheet("QWidget { background-color: " + Style::getAttribute(json::theme::focus_item) + "; }");
+	m_plot->canvas()->setStyleSheet("QWidget { background-color: " + Style::getAttribute(json::theme::background_plot) + "; }");
 }
 
 void PlotWidget::setupNavigator()
