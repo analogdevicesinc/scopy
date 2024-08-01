@@ -25,6 +25,8 @@ public:
 	QAbstractButton *getYLock();
 	QAbstractButton *getReadoutsDrag();
 
+	void initSession();
+
 private:
 	MenuSectionWidget *xControls;
 	MenuOnOffSwitch *xEn;
