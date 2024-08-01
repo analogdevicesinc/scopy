@@ -3,3 +3,4 @@ Scopy.flatpak
 build
 repo
 org.adi.Scopy.json
+tmp.json

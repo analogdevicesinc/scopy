@@ -18,7 +18,7 @@
     #define _ENABLE_VOLK OFF
 
 #elif __X86__
-    #define RUNTIME_VERSION 5.15-22.08
+    #define RUNTIME_VERSION 5.15-23.08
     #define CFLAGS --disable-assembly
     #define CMAKE_C_FLAGS -DCMAKE_C_FLAGS= -fno-asynchronous-unwind-tables -fPIC
     #define CMAKE_ASM_FLAGS -DCMAKE_ASM_FLAGS=

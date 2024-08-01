@@ -19,7 +19,7 @@ repo: build
 	flatpak build-export $@ $<
 
 build: preprocess
-	flatpak-builder --verbose --arch=$(ARCH) $@ $(SRC)
+	flatpak-builder --verbose --keep-build-dirs --ccache --user --disable-rofiles-fuse --arch=$(ARCH) $@ $(SRC)
 
 preprocess: clean
 	if [ $(EN_PREPROCESS) = true ]; then \

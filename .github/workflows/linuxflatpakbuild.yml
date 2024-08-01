@@ -14,15 +14,17 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Pull the Docker Image
-      run: docker pull cristianbindea/scopy2-flatpak
+      run: docker pull cristianbindea/scopy2-flatpak:testing
 
     - name: Run Docker Image
       run: |
             $GITHUB_WORKSPACE/ci/general/gen_ci_envs.sh > $GITHUB_WORKSPACE/ci/general/gh-actions.envs
             docker run --privileged \
-                -v `pwd`:$GITHUB_WORKSPACE:rw \
+                -e CI_SCRIPT='ON' \
+                --mount type=bind,source="$GITHUB_WORKSPACE",target=$GITHUB_WORKSPACE \
                 --env-file $GITHUB_WORKSPACE/ci/general/gh-actions.envs \
-                cristianbindea/scopy2-flatpak /bin/bash -xe $GITHUB_WORKSPACE/ci/flatpak/inside_flatpak_docker.sh
+                cristianbindea/scopy2-flatpak:testing \
+                /bin/bash -c 'sudo chown -R runner:runner $GITHUB_WORKSPACE && $GITHUB_WORKSPACE/ci/flatpak/flatpak_build_process.sh'
 
     - name: Set short git commit SHA
       shell: bash
