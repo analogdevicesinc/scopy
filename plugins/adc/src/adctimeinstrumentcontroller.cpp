@@ -26,6 +26,21 @@ void ADCTimeInstrumentController::init()
 	TimePlotManager* m_timePlotComponentManager = new TimePlotManager(m_name + "_time", m_ui);
 	m_plotComponentManager = m_timePlotComponentManager;
 	addComponent(m_plotComponentManager);
+
+	CursorSettings *m_cursorSettings = new CursorSettings();
+	HoverWidget *hoverSettings = new HoverWidget(m_cursorSettings, m_ui->m_cursor, m_ui);
+	hoverSettings->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+	hoverSettings->setContentPos(HoverPosition::HP_TOPLEFT);
+	hoverSettings->setAnchorOffset(QPoint(0, -10));
+
+	connect(m_ui->m_cursor->button(), &QAbstractButton::toggled, hoverSettings, &HoverWidget::setVisible);
+
+	connect(m_plotComponentManager, &PlotManager::plotAdded, this ,[=](uint32_t uuid) {
+		auto cursorController = m_plotComponentManager->plot(uuid)->cursor();
+		cursorController->connectSignals(m_cursorSettings);
+		connect(m_ui->m_cursor, &QAbstractButton::toggled, cursorController, &CursorController::setVisible);
+	});
+
 	m_timePlotSettingsComponent = new TimePlotManagerSettings(m_timePlotComponentManager);
 	addComponent(m_timePlotSettingsComponent);
 
