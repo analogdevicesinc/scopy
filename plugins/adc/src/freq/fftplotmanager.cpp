@@ -19,8 +19,8 @@ uint32_t FFTPlotManager::addPlot(QString name)
 	FFTPlotComponent *plt = new FFTPlotComponent(name, m_plotIdx, this);
 	m_plotIdx++;
 	m_plots.append(plt);
-	auto xInterval = m_plots[0]->xInterval();
-	plt->setXInterval(xInterval);
+
+	plt->setXInterval(m_xInterval);
 
 	connect(plt, &FFTPlotComponent::requestDeletePlot, this, [=]() {
 		Q_EMIT plotRemoved(plt->uuid());

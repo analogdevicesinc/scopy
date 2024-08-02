@@ -35,6 +35,7 @@ public:
 	QWidget *plotCombo(ChannelComponent *c);
 
 public Q_SLOTS:
+	void updateAxisScales();
 	void replot();
 	void enableMeasurementPanel(bool) override;
 	void enableStatsPanel(bool) override;
@@ -48,6 +49,7 @@ Q_SIGNALS:
 protected:
 	uint32_t m_plotIdx;
 	QVBoxLayout *m_lay;
+	QPair<double, double> m_xInterval;
 	QList<PlotComponent *> m_plots;
 	QList<PlotComponentChannel *> m_channels;
 	MeasurementsPanel *m_measurePanel;
