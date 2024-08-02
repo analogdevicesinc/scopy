@@ -244,9 +244,9 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 			ymax = 1 << (fmt->bits);
 		}
 		m_timePlotComponentChannel->m_timePlotYAxis->setUnits("");
-		m_timePlotComponentChannel->m_timePlotYAxis->scaleDraw()->setFloatPrecision(0);
-//		m_plotCh->yAxis()->setUnits("Counts");
-//		m_plotCh->yAxis()->
+		m_timePlotComponentChannel->m_timePlotYAxis->setUnits("");
+		m_timePlotComponentChannel->m_timePlotYAxis->scaleDraw()->setFloatPrecision(3);
+		m_timePlotComponentChannel->m_timePlotYAxis->getFormatter()->setTwoDecimalMode(false);
 		break;
 	case YMODE_FS:
 		if(m_scaleAvailable) {
@@ -261,8 +261,8 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 			ymax = 1;
 		}
 		m_timePlotComponentChannel->m_timePlotYAxis->setUnits("");
-		m_timePlotComponentChannel->m_timePlotYAxis->scaleDraw()->setFloatPrecision(2);
-		// m_plotCh->yAxis()->setUnits("");
+		m_timePlotComponentChannel->m_timePlotYAxis->scaleDraw()->setFloatPrecision(3);
+		m_timePlotComponentChannel->m_timePlotYAxis->getFormatter()->setTwoDecimalMode(true);
 		break;
 	case YMODE_SCALE:
 		if(m_scaleAvailable) {
@@ -282,8 +282,9 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 		ymin = ymin * scale;
 		ymax = ymax * scale;
 
-		m_timePlotComponentChannel->m_timePlotYAxis->setUnits(m_unit.symbol);
+		m_timePlotComponentChannel->m_timePlotYAxis->setUnits(unit().symbol);
 		m_timePlotComponentChannel->m_timePlotYAxis->scaleDraw()->setFloatPrecision(3);
+		m_timePlotComponentChannel->m_timePlotYAxis->getFormatter()->setTwoDecimalMode(true);
 
 
 		break;
