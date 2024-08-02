@@ -11,7 +11,7 @@
 #include <iioutil/pingtask.h>
 
 #define MAX_ATTR_SIZE 1024
-#define BUFFER_SIZE 512
+#define BUFFER_SIZE 256
 #define DEVICE_PQM "pqm"
 namespace scopy::pqm {
 class AcquisitionManager : public QObject

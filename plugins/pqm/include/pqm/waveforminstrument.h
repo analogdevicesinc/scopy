@@ -4,6 +4,7 @@
 #include "scopy-pqm_export.h"
 
 #include <QWidget>
+#include <plottingstrategy.h>
 #include <gui/spinbox_a.hpp>
 #include <gui/plotwidget.h>
 #include <gui/tooltemplate.h>
@@ -27,6 +28,9 @@ Q_SIGNALS:
 	void enableTool(bool en, QString toolName = "waveform");
 	void runTme(bool en);
 
+private Q_SLOTS:
+	void onTriggeredChnlChanged(QString triggeredChnl);
+
 private:
 	void initData();
 	void initPlot(PlotWidget *plot, QString unitType, int yMin = -650, int yMax = 650);
@@ -35,6 +39,8 @@ private:
 
 	void updateXData(int dataSize);
 	void plotData(QVector<double> chnlData, QString chnlId);
+	void deletePlottingStrategy();
+	void createTriggeredStrategy(QString triggerChnl);
 
 	PlotWidget *m_voltagePlot;
 	PlotWidget *m_currentPlot;
@@ -44,8 +50,8 @@ private:
 	PositionSpinButton *m_timespanSpin;
 
 	QMap<QString, PlotChannel *> m_plotChnls;
-	QMap<QString, QVector<double>> m_yValues;
 	QVector<double> m_xTime;
+	PlottingStrategy *m_plottingStrategy = nullptr;
 
 	const double m_plotSampleRate = 5120;
 	const QMap<QString, QMap<QString, QString>> m_chnls = {
