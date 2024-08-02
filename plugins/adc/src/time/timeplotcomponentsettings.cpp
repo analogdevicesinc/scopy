@@ -274,19 +274,25 @@ void TimePlotComponentSettings::updateYAxis()
 	auto timePlotYAxis = m_plotComponent->timePlot()->yAxis();
 	switch(m_ymode) {
 	case YMODE_COUNT:
-
+		// Move this to iio_units function
 		timePlotYAxis->setUnits("");
-		timePlotYAxis->scaleDraw()->setFloatPrecision(0);
+		timePlotYAxis->scaleDraw()->setFloatPrecision(3);
+		timePlotYAxis->getFormatter()->setTwoDecimalMode(false);
 		break;
 	case YMODE_FS:
 		timePlotYAxis->setUnits("");
-		timePlotYAxis->scaleDraw()->setFloatPrecision(2);
+		timePlotYAxis->scaleDraw()->setFloatPrecision(3);
+		timePlotYAxis->getFormatter()->setTwoDecimalMode(true);
 		break;
 	case YMODE_SCALE:
 		timePlotYAxis->setUnits(m_scaleProviders[0]->unit().symbol);
 		timePlotYAxis->scaleDraw()->setFloatPrecision(3);
+		timePlotYAxis->getFormatter()->setTwoDecimalMode(true);
 		break;
 	default:
 		break;
 	}
+
+	timePlotYAxis->scaleDraw()->invalidateCache();
+	timePlotYAxis->updateAxisScale();
 }

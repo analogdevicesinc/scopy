@@ -179,7 +179,9 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_sampleRateSpin->setValue(1);
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<TimePlotComponent*>(plt);
-				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(0);
+				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
+				p->timePlot()->xAxis()->getFormatter()->setTwoDecimalMode(false);
+
 			}
 
 		}
@@ -190,7 +192,10 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<TimePlotComponent*>(plt);
-				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
+				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
+				p->timePlot()->xAxis()->scaleDraw()->setUnitsEnabled(true);
+				p->timePlot()->xAxis()->getFormatter()->setTwoDecimalMode(true);
+
 			}
 
 		}
@@ -199,9 +204,13 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_sampleRateSpin->setEnabled(true);
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<TimePlotComponent*>(plt);
-				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
+				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
+				p->timePlot()->xAxis()->scaleDraw()->setUnitsEnabled(true);
+				p->timePlot()->xAxis()->getFormatter()->setTwoDecimalMode(true);
+
 			}
 		}
+		m_plotManager->updateAxisScales();
 	});
 
 	m_sampleRateSpin = new PositionSpinButton(
@@ -234,14 +243,16 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 void TimePlotManagerSettings::onInit()
 {
-	m_bufferSizeSpin->setValue(32);
-	m_plotSizeSpin->setValue(32);
+	m_bufferSizeSpin->setValue(400);
+	m_plotSizeSpin->setValue(400);
 	m_sampleRateSpin->setValue(1);
 	m_xmin->setValue(0);
-	m_xmax->setValue(31);
+	m_xmax->setValue(400);
 	m_syncBufferPlot->onOffswitch()->setChecked(true);
+	m_xModeCb->combo()->setCurrentIndex(1);
 	m_xModeCb->combo()->setCurrentIndex(0);
 
+	m_plotManager->updateAxisScales();
 	//	m_rollingModeSw->onOffswitch()->setChecked(false);
 }
 

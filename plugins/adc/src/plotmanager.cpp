@@ -1,5 +1,6 @@
 #include "plotmanager.h"
 #include "plotmanagercombobox.h"
+#include "plotaxis.h"
 
 using namespace scopy;
 using namespace scopy::adc;
@@ -34,6 +35,8 @@ void PlotManager::enableStatsPanel(bool b) { m_statsPanel->setVisible(b); }
 
 void PlotManager::setXInterval(double xMin, double xMax)
 {
+	m_xInterval.first = xMin;
+	m_xInterval.second = xMax;
 	for(auto plt : qAsConst(m_plots)) {
 		plt->setXInterval(xMin, xMax);
 	}
@@ -52,6 +55,21 @@ MeasurementsPanel *PlotManager::measurePanel() const { return m_measurePanel; }
 StatsPanel *PlotManager::statsPanel() const { return m_statsPanel; }
 
 QWidget *PlotManager::plotCombo(ChannelComponent *c) { return m_channelPlotcomboMap[c]; }
+
+void PlotManager::updateAxisScales()
+{
+	for(PlotComponent *plt : plots()) {
+		for(PlotWidget *pw : plt->plots()) {
+		pw->yAxis()->scaleDraw()->invalidateCache();
+		pw->xAxis()->scaleDraw()->invalidateCache();
+		if(pw->selectedChannel()) {
+			pw->selectedChannel()->yAxis()->scaleDraw()->invalidateCache();
+			pw->selectedChannel()->xAxis()->scaleDraw()->invalidateCache();
+		}
+		pw->replot();
+		}
+	}
+}
 
 void PlotManager::addChannel(ChannelComponent *c)
 {
