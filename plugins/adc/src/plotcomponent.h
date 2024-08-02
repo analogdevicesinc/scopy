@@ -64,6 +64,8 @@ public:
 
 	CursorController *cursor() const;
 
+	QList<PlotWidget *> plots() const;
+
 protected:
 	uint32_t m_uuid;
 	QHBoxLayout *m_plotLayout;

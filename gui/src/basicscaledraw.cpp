@@ -180,6 +180,7 @@ QwtText BasicScaleDraw::label(double value) const
 	value *= m_displayScale;
 
 	QwtText text;
+	QString unit = "";
 	if(m_unitsEn) {
 		if(m_formatter) {
 			m_formatter->getFormatAttributes(value, prefix, scale);
@@ -202,11 +203,13 @@ QwtText BasicScaleDraw::label(double value) const
 			}
 		}
 
-		text = QwtText(sign + QLocale().toString(value / scale, 'f', m_floatPrecision + bonusPrecision) + ' ' +
-			       prefix + m_unit);
-	} else {
-		text = QwtText(sign + QLocale().toString(value / scale, 'f', m_floatPrecision + bonusPrecision));
+		/*text = QwtText(sign + QLocale().toString(value / scale, 'f', m_floatPrecision + bonusPrecision) + ' ' +
+			       prefix + m_unit);*/
+		unit = m_unit;
 	}
+	text = QwtText(m_formatter->format(value, unit, m_floatPrecision + bonusPrecision));
+
+
 
 	if(m_color != Qt::gray)
 		text.setColor(m_color);

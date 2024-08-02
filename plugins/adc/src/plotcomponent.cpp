@@ -107,3 +107,8 @@ CursorController *PlotComponent::cursor() const
 {
 	return m_cursor;
 }
+
+QList<PlotWidget *> PlotComponent::plots() const
+{
+	return m_plots;
+}
