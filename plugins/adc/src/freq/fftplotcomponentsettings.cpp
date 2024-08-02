@@ -44,8 +44,14 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 		new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_NONE, parent);
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_plotComponent->fftPlot()->yAxis(), this);
+
+	m_plotComponent->fftPlot()->yAxis()->setUnits("dB");
+	m_plotComponent->fftPlot()->yAxis()->setUnitsVisible(true);
+	m_plotComponent->fftPlot()->yAxis()->getFormatter()->setTwoDecimalMode(false);
+
+
 	m_yPwrOffset = new PositionSpinButton(
-		{ {"db", 1e0} },
+		{ {"dB", 1e0} },
 		"Power Offset", -200, 200, false, false, yaxis);
 
 	m_curve = new MenuPlotChannelCurveStyleControl(plotMenu);
