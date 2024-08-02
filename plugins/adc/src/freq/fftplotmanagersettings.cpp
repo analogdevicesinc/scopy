@@ -141,7 +141,10 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_sampleRateSpin->setValue(1);
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<FFTPlotComponent*>(plt);
-				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(0);
+				p->fftPlot()->xAxis()->scaleDraw()->setUnitType("");
+				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
+				p->fftPlot()->xAxis()->scaleDraw()->setUnitsEnabled(false);
+				p->fftPlot()->xAxis()->getFormatter()->setTwoDecimalMode(false);
 			}
 		}
 
@@ -154,7 +157,10 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<FFTPlotComponent*>(plt);
-				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
+				p->fftPlot()->xAxis()->scaleDraw()->setUnitType("Hz");
+				p->fftPlot()->xAxis()->scaleDraw()->setUnitsEnabled(true);
+				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
+				p->fftPlot()->xAxis()->getFormatter()->setTwoDecimalMode(true);
 			}
 		}
 		if(xcb->itemData(idx) == XMODE_OVERRIDE) {
@@ -164,9 +170,13 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_freqOffsetSpin->setEnabled(true);
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<FFTPlotComponent*>(plt);
-				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(2);
+				p->fftPlot()->xAxis()->scaleDraw()->setUnitType("Hz");
+				p->fftPlot()->xAxis()->scaleDraw()->setUnitsEnabled(true);
+				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
+				p->fftPlot()->xAxis()->getFormatter()->setTwoDecimalMode(true);
 			}
 		}
+		m_plotManager->updateAxisScales();
 	});
 
 	m_sampleRateSpin = new PositionSpinButton(
@@ -215,10 +225,10 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 void FFTPlotManagerSettings::onInit()
 {
-	m_bufferSizeSpin->setValue(32);
+	m_bufferSizeSpin->setValue(400);
 	m_sampleRateSpin->setValue(1);
 	m_xmin->setValue(0);
-	m_xmax->setValue(31);
+	m_xmax->setValue(400);
 	m_xModeCb->combo()->setCurrentIndex(0);
 
 	m_sampleRateSpin->setVisible(false);
