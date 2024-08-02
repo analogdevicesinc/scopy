@@ -1,6 +1,11 @@
 #include "waveforminstrument.h"
 #include "plotaxis.h"
+#include "plottingstrategybuilder.h"
+#include <menucombo.h>
+#include <menuonoffswitch.h>
 #include <qwt_legend.h>
+#include <rollingstrategy.h>
+#include <swtriggerstrategy.h>
 #include <gui/stylehelper.h>
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/plotaxis.h>
@@ -19,6 +24,7 @@ WaveformInstrument::WaveformInstrument(QWidget *parent)
 	setLayout(layout);
 	StyleHelper::GetInstance()->initColorMap();
 
+	m_plottingStrategy = PlottingStrategyBuilder::build("trigger", m_plotSampleRate);
 	ToolTemplate *tool = new ToolTemplate(this);
 	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tool->topContainer()->setVisible(true);
@@ -57,22 +63,13 @@ WaveformInstrument::WaveformInstrument(QWidget *parent)
 	connect(m_singleBtn, SIGNAL(toggled(bool)), this, SLOT(toggleWaveform(bool)));
 }
 
-WaveformInstrument::~WaveformInstrument()
-{
-	m_xTime.clear();
-	m_yValues.clear();
-}
+WaveformInstrument::~WaveformInstrument() { m_xTime.clear(); }
 
 void WaveformInstrument::initData()
 {
 	m_xTime.clear();
 	for(int i = m_plotSampleRate - 1; i >= 0; i--) {
 		m_xTime.push_back(-(i / m_plotSampleRate));
-	}
-	for(const QMap<QString, QString> &chMap : m_chnls) {
-		for(const QString &ch : chMap) {
-			m_yValues[ch] = QVector<double>();
-		}
 	}
 }
 
@@ -114,25 +111,54 @@ QWidget *WaveformInstrument::createSettMenu(QWidget *parent)
 
 	MenuHeaderWidget *header = new MenuHeaderWidget("Settings", QPen(StyleHelper::getColor("ScopyBlue")), widget);
 	MenuSectionWidget *plotSettingsContainer = new MenuSectionWidget(widget);
-	MenuCollapseSection *plotTimespanSection =
-		new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE, widget);
-	plotTimespanSection->setLayout(new QVBoxLayout());
-	plotTimespanSection->contentLayout()->setSpacing(10);
-	plotTimespanSection->contentLayout()->setMargin(0);
+	MenuCollapseSection *plotSection = new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE, widget);
+	plotSection->setLayout(new QVBoxLayout());
+	plotSection->contentLayout()->setSpacing(10);
+	plotSection->contentLayout()->setMargin(0);
 
 	// timespan
 	m_timespanSpin = new PositionSpinButton({{"ms", 1E-3}, {"s", 1E0}}, "Timespan", 0.1, 10, true, false);
 	m_timespanSpin->setStep(0.01);
+	m_timespanSpin->setValue(1);
 	connect(m_timespanSpin, &PositionSpinButton::valueChanged, this, [=, this](double value) {
 		m_voltagePlot->xAxis()->setMin(-value);
 		m_currentPlot->xAxis()->setMin(-value);
 	});
-	m_timespanSpin->valueChanged(0.1);
-	m_timespanSpin->setEnabled(false);
 
-	plotTimespanSection->contentLayout()->addWidget(m_timespanSpin);
+	QWidget *plottingModeWidget = new QWidget(plotSection);
+	plottingModeWidget->setLayout(new QVBoxLayout(plottingModeWidget));
+	plottingModeWidget->layout()->setMargin(0);
 
-	plotSettingsContainer->contentLayout()->addWidget(plotTimespanSection);
+	connect(m_runBtn, &QPushButton::toggled, plottingModeWidget, &QWidget::setDisabled);
+	connect(m_singleBtn, &QPushButton::toggled, plottingModeWidget, &QWidget::setDisabled);
+
+	m_triggeredBy = new MenuCombo("Triggered by", plottingModeWidget);
+	m_triggeredBy->combo()->addItem("ua");
+	m_triggeredBy->combo()->addItem("ub");
+	m_triggeredBy->combo()->addItem("uc");
+	m_triggeredBy->combo()->addItem("triphasic");
+	connect(m_triggeredBy->combo(), &QComboBox::currentTextChanged, this,
+		&WaveformInstrument::onTriggeredChnlChanged);
+
+	MenuOnOffSwitch *rollingModeSwitch = new MenuOnOffSwitch("Rolling mode", plottingModeWidget);
+	rollingModeSwitch->onOffswitch()->setChecked(false);
+	connect(rollingModeSwitch->onOffswitch(), &QAbstractButton::toggled, triggeredBy, &MenuCombo::setDisabled);
+	connect(rollingModeSwitch->onOffswitch(), &QAbstractButton::toggled, this, [this, triggeredBy](bool checked) {
+		deletePlottingStrategy();
+		if(checked) {
+			m_plottingStrategy = PlottingStrategyBuilder::build("rolling", m_plotSampleRate);
+		} else {
+			QString triggerChnl = triggeredBy->combo()->currentText();
+			createTriggeredStrategy(triggerChnl);
+		}
+	});
+	plottingModeWidget->layout()->addWidget(triggeredBy);
+	plottingModeWidget->layout()->addWidget(rollingModeSwitch);
+
+	plotSection->contentLayout()->addWidget(m_timespanSpin);
+	plotSection->contentLayout()->addWidget(plottingModeWidget);
+
+	plotSettingsContainer->contentLayout()->addWidget(plotSection);
 	layout->addWidget(header);
 	layout->addWidget(plotSettingsContainer);
 	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -149,10 +175,7 @@ void WaveformInstrument::toggleWaveform(bool en)
 	} else {
 		ResourceManager::close("pqm");
 	}
-	const QStringList keys = m_yValues.keys();
-	for(const QString &chnlId : keys) {
-		m_yValues[chnlId].clear();
-	}
+	m_plottingStrategy->clearSamples();
 	Q_EMIT enableTool(en);
 }
 
@@ -178,24 +201,42 @@ void WaveformInstrument::plotData(QVector<double> chnlData, QString chnlId)
 	m_currentPlot->replot();
 }
 
+void WaveformInstrument::deletePlottingStrategy()
+{
+	if(m_plottingStrategy) {
+		delete m_plottingStrategy;
+		m_plottingStrategy = nullptr;
+	}
+}
+
+void WaveformInstrument::createTriggeredStrategy(QString triggerChnl)
+{
+	triggerChnl = (triggerChnl.compare("triphasic") == 0) ? "" : triggerChnl;
+	m_plottingStrategy = PlottingStrategyBuilder::build(TRIGGER_MODE, m_plotSampleRate, triggerChnl);
+}
+
+void WaveformInstrument::onTriggeredChnlChanged(QString triggeredChnl)
+{
+	deletePlottingStrategy();
+	createTriggeredStrategy(triggeredChnl);
+}
+
 void WaveformInstrument::onBufferDataAvailable(QMap<QString, QVector<double>> data)
 {
-	if(m_runBtn->isChecked() || m_singleBtn->isChecked()) {
-
-		int samplingFreq = m_plotSampleRate * m_timespanSpin->value();
-		const QStringList keys = data.keys();
+	if(!m_runBtn->isChecked() && !m_singleBtn->isChecked()) {
+		return;
+	}
+	int samplingFreq = m_plotSampleRate * m_timespanSpin->value();
+	m_plottingStrategy->setSamplingFreq(samplingFreq);
+	QMap<QString, QVector<double>> processedData = m_plottingStrategy->processSamples(data);
+	const QStringList keys = processedData.keys();
+	if(m_plottingStrategy->dataReady()) {
 		for(const auto &key : keys) {
-			m_yValues[key].append(data[key]);
-			if(m_yValues[key].size() > samplingFreq) {
-				int unnecessarySamples = m_yValues[key].size() - samplingFreq;
-				m_yValues[key].erase(m_yValues[key].begin(),
-						     m_yValues[key].begin() + unnecessarySamples);
-			}
-			plotData(m_yValues[key], key);
+			plotData(processedData[key], key);
 		}
-		if(m_singleBtn->isChecked() && m_yValues.first().size() == samplingFreq) {
-			m_singleBtn->setChecked(false);
-		}
+	}
+	if(m_singleBtn->isChecked() && processedData.first().size() == samplingFreq) {
+		m_singleBtn->setChecked(false);
 	}
 }
 
