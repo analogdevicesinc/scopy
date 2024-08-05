@@ -140,15 +140,20 @@ TestTool::TestTool(QWidget *parent)
 	measure->setDoubleClickToOpenMenu(true);
 	measure->checkBox()->setVisible(false);
 
+
+	CursorSettings *cursorSettings = new CursorSettings(this);
 	CursorController *cursorController = new CursorController(plot, this);
 
-	HoverWidget *hoverSettings = new HoverWidget(cursorController->getCursorSettings(), cursor, tool);
+	cursorController->connectSignals(cursorSettings);
+
+	HoverWidget *hoverSettings = new HoverWidget(cursorSettings, cursor, tool);
 	hoverSettings->setAnchorPos(HoverPosition::HP_TOPRIGHT);
 	hoverSettings->setContentPos(HoverPosition::HP_TOPLEFT);
 	hoverSettings->setAnchorOffset(QPoint(0, -10));
 
 	connect(cursor->button(), &QAbstractButton::toggled, hoverSettings, &HoverWidget::setVisible);
 	connect(cursor, &QAbstractButton::toggled, cursorController, &CursorController::setVisible);
+
 
 	tool->addWidgetToTopContainerMenuControlHelper(btn3, TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(btn5, TTA_LEFT);
