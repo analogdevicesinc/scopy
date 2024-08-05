@@ -104,12 +104,12 @@ download_tools() {
 
 	# download tools for creating the AppDir and the AppImage
 	if [ ! -f linuxdeploy-x86_64.AppImage ];then
-		wget https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20231026-1/linuxdeploy-x86_64.AppImage
+		wget https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20240109-1/linuxdeploy-x86_64.AppImage
 		chmod +x linuxdeploy-x86_64.AppImage
 	fi
 
 	if [ ! -f linuxdeploy-plugin-qt-x86_64.AppImage ];then
-		wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+		wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/1-alpha-20240109-1/linuxdeploy-plugin-qt-x86_64.AppImage
 		chmod +x linuxdeploy-plugin-qt-x86_64.AppImage
 	fi
 
