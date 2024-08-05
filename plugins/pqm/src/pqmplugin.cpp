@@ -105,6 +105,7 @@ bool PQMPlugin::onConnect()
 	m_pingTask = new IIOPingTask(ctx, this);
 
 	m_acqManager = new AcquisitionManager(ctx, m_pingTask, this);
+	bool hasFwVers = m_acqManager->hasFwVers();
 
 	RmsInstrument *rms = new RmsInstrument();
 	m_toolList[0]->setTool(rms);
@@ -113,13 +114,14 @@ bool PQMPlugin::onConnect()
 	connect(m_acqManager, &AcquisitionManager::pqmAttrsAvailable, rms, &RmsInstrument::onAttrAvailable);
 
 	HarmonicsInstrument *harmonics = new HarmonicsInstrument();
-	harmonics->showThdWidget(m_acqManager->hasFwVers());
+	harmonics->showThdWidget(hasFwVers);
 	m_toolList[1]->setTool(harmonics);
 	m_toolList[1]->setEnabled(true);
 	m_toolList[1]->setRunBtnVisible(true);
 	connect(m_acqManager, &AcquisitionManager::pqmAttrsAvailable, harmonics, &HarmonicsInstrument::onAttrAvailable);
 
 	WaveformInstrument *waveform = new WaveformInstrument();
+	waveform->showOneBuffer(hasFwVers);
 	m_toolList[2]->setTool(waveform);
 	m_toolList[2]->setEnabled(true);
 	m_toolList[2]->setRunBtnVisible(true);
