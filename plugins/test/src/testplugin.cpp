@@ -22,6 +22,7 @@
 #include <gui/preferenceshelper.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
+#include <widgets/menuspinbox.h>
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN, "TestPlugin");
 using namespace scopy;
@@ -179,6 +180,8 @@ bool TestPlugin::onConnect()
 	btn4 = new QPushButton("show hoverwidget", tool);
 	btn4->setCheckable(true);
 
+	gui::MenuSpinbox *m_spin = new gui::MenuSpinbox("Frequency", 1e6, "Hz", 400000, 6000000000,tool);;
+
 	connect(btn, &QPushButton::clicked, this, [=]() { m_toolList[0]->setAttached(!m_toolList[0]->attached()); });
 	connect(btn2, &QPushButton::clicked, this,
 		[=]() { m_toolList[0]->setName("TestPlugin" + QString::number(renameCnt++)); });
@@ -193,6 +196,7 @@ bool TestPlugin::onConnect()
 	lay->addWidget(btn2);
 	lay->addWidget(btn3);
 	lay->addWidget(btn4);
+	lay->addWidget(m_spin);
 
 	tool2 = new TestTool();
 
