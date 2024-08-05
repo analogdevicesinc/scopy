@@ -4,6 +4,7 @@
 #include "scopy-pqm_export.h"
 
 #include <QWidget>
+#include <menucombo.h>
 #include <plottingstrategy.h>
 #include <gui/spinbox_a.hpp>
 #include <gui/plotwidget.h>
@@ -11,6 +12,9 @@
 #include <gui/widgets/menucontrolbutton.h>
 #include <gui/widgets/toolbuttons.h>
 #include <pluginbase/resourcemanager.h>
+
+#define ROLLING_MODE "rolling"
+#define TRIGGER_MODE "trigger"
 
 namespace scopy::pqm {
 class SCOPY_PQM_EXPORT WaveformInstrument : public QWidget, public ResourceUser
@@ -20,6 +24,7 @@ public:
 	WaveformInstrument(QWidget *parent = nullptr);
 	~WaveformInstrument();
 
+	void showOneBuffer(bool hasFwVers);
 public Q_SLOTS:
 	void stop() override;
 	void toggleWaveform(bool en);
@@ -30,6 +35,7 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void onTriggeredChnlChanged(QString triggeredChnl);
+	void onRollingSwitch(bool checked);
 
 private:
 	void initData();
@@ -38,7 +44,7 @@ private:
 	QWidget *createSettMenu(QWidget *parent);
 
 	void updateXData(int dataSize);
-	void plotData(QVector<double> chnlData, QString chnlId);
+	void plotData(QMap<QString, QVector<double>> chnlsData);
 	void deletePlottingStrategy();
 	void createTriggeredStrategy(QString triggerChnl);
 
@@ -48,6 +54,7 @@ private:
 	SingleShotBtn *m_singleBtn;
 	GearBtn *m_settBtn;
 	PositionSpinButton *m_timespanSpin;
+	MenuCombo *m_triggeredBy;
 
 	QMap<QString, PlotChannel *> m_plotChnls;
 	QVector<double> m_xTime;

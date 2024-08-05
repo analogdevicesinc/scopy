@@ -1,7 +1,6 @@
 #include "waveforminstrument.h"
 #include "plotaxis.h"
 #include "plottingstrategybuilder.h"
-#include <menucombo.h>
 #include <menuonoffswitch.h>
 #include <qwt_legend.h>
 #include <rollingstrategy.h>
@@ -65,6 +64,14 @@ WaveformInstrument::WaveformInstrument(QWidget *parent)
 
 WaveformInstrument::~WaveformInstrument() { m_xTime.clear(); }
 
+void WaveformInstrument::showOneBuffer(bool hasFwVers)
+{
+	if(hasFwVers)
+		return;
+	m_timespanSpin->setEnabled(hasFwVers);
+	m_timespanSpin->setValue(0.03);
+}
+
 void WaveformInstrument::initData()
 {
 	m_xTime.clear();
@@ -117,14 +124,15 @@ QWidget *WaveformInstrument::createSettMenu(QWidget *parent)
 	plotSection->contentLayout()->setMargin(0);
 
 	// timespan
-	m_timespanSpin = new PositionSpinButton({{"ms", 1E-3}, {"s", 1E0}}, "Timespan", 0.1, 10, true, false);
-	m_timespanSpin->setStep(0.01);
+	m_timespanSpin = new PositionSpinButton({{"ms", 1E-3}, {"s", 1E0}}, "Timespan", 0.02, 10, true, false);
+	m_timespanSpin->setStep(0.05);
 	m_timespanSpin->setValue(1);
 	connect(m_timespanSpin, &PositionSpinButton::valueChanged, this, [=, this](double value) {
 		m_voltagePlot->xAxis()->setMin(-value);
 		m_currentPlot->xAxis()->setMin(-value);
 	});
 
+	// plotting mode: software trigger or rolling mode
 	QWidget *plottingModeWidget = new QWidget(plotSection);
 	plottingModeWidget->setLayout(new QVBoxLayout(plottingModeWidget));
 	plottingModeWidget->layout()->setMargin(0);
@@ -142,17 +150,10 @@ QWidget *WaveformInstrument::createSettMenu(QWidget *parent)
 
 	MenuOnOffSwitch *rollingModeSwitch = new MenuOnOffSwitch("Rolling mode", plottingModeWidget);
 	rollingModeSwitch->onOffswitch()->setChecked(false);
-	connect(rollingModeSwitch->onOffswitch(), &QAbstractButton::toggled, triggeredBy, &MenuCombo::setDisabled);
-	connect(rollingModeSwitch->onOffswitch(), &QAbstractButton::toggled, this, [this, triggeredBy](bool checked) {
-		deletePlottingStrategy();
-		if(checked) {
-			m_plottingStrategy = PlottingStrategyBuilder::build("rolling", m_plotSampleRate);
-		} else {
-			QString triggerChnl = triggeredBy->combo()->currentText();
-			createTriggeredStrategy(triggerChnl);
-		}
-	});
-	plottingModeWidget->layout()->addWidget(triggeredBy);
+	connect(rollingModeSwitch->onOffswitch(), &QAbstractButton::toggled, m_triggeredBy, &MenuCombo::setDisabled);
+	connect(rollingModeSwitch->onOffswitch(), &QAbstractButton::toggled, this,
+		&WaveformInstrument::onRollingSwitch);
+	plottingModeWidget->layout()->addWidget(m_triggeredBy);
 	plottingModeWidget->layout()->addWidget(rollingModeSwitch);
 
 	plotSection->contentLayout()->addWidget(m_timespanSpin);
@@ -192,11 +193,14 @@ void WaveformInstrument::updateXData(int dataSize)
 	}
 }
 
-void WaveformInstrument::plotData(QVector<double> chnlData, QString chnlId)
+void WaveformInstrument::plotData(QMap<QString, QVector<double>> chnlsData)
 {
-	int dataSize = chnlData.size();
-	updateXData(dataSize);
-	m_plotChnls[chnlId]->curve()->setSamples(m_xTime.data(), chnlData.data(), dataSize);
+	const QStringList keys = chnlsData.keys();
+	for(const QString &chnlId : keys) {
+		int dataSize = chnlsData[chnlId].size();
+		updateXData(dataSize);
+		m_plotChnls[chnlId]->curve()->setSamples(m_xTime.data(), chnlsData[chnlId].data(), dataSize);
+	}
 	m_voltagePlot->replot();
 	m_currentPlot->replot();
 }
@@ -221,6 +225,17 @@ void WaveformInstrument::onTriggeredChnlChanged(QString triggeredChnl)
 	createTriggeredStrategy(triggeredChnl);
 }
 
+void WaveformInstrument::onRollingSwitch(bool checked)
+{
+	deletePlottingStrategy();
+	if(checked) {
+		m_plottingStrategy = PlottingStrategyBuilder::build(ROLLING_MODE, m_plotSampleRate);
+	} else {
+		QString triggerChnl = m_triggeredBy->combo()->currentText();
+		createTriggeredStrategy(triggerChnl);
+	}
+}
+
 void WaveformInstrument::onBufferDataAvailable(QMap<QString, QVector<double>> data)
 {
 	if(!m_runBtn->isChecked() && !m_singleBtn->isChecked()) {
@@ -229,11 +244,8 @@ void WaveformInstrument::onBufferDataAvailable(QMap<QString, QVector<double>> da
 	int samplingFreq = m_plotSampleRate * m_timespanSpin->value();
 	m_plottingStrategy->setSamplingFreq(samplingFreq);
 	QMap<QString, QVector<double>> processedData = m_plottingStrategy->processSamples(data);
-	const QStringList keys = processedData.keys();
 	if(m_plottingStrategy->dataReady()) {
-		for(const auto &key : keys) {
-			plotData(processedData[key], key);
-		}
+		plotData(processedData);
 	}
 	if(m_singleBtn->isChecked() && processedData.first().size() == samplingFreq) {
 		m_singleBtn->setChecked(false);
