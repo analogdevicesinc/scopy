@@ -1,6 +1,6 @@
 #! /bin/bash 
 # set -xe
-# get scopy buil path from CMakeCache.txt
+# get scopy build path from CMakeCache.txt
 scopyBuildDir=$(grep 'SCOPY_BUILD_PATH' ../CMakeCache.txt  | awk -F= '{print $2}')
 
 isEmuRunning=TRUE
@@ -9,7 +9,7 @@ isEmuRunning=TRUE
 if ! pgrep -x "iio-emu" > /dev/null; then
     isEmuRunning=FALSE
     if [ ! -z $1 ]; then
-    echo "############# EMU PATH IS " $1;
+        echo "############# EMU PATH IS " $1;
         cd $1
         iio-emu generic *.xml &
     fi
@@ -23,7 +23,7 @@ fi
 
 #if emu was started by this script stop emu
 if [ "$isEmuRunning" = FALSE ]; then
-	    #stop emu
-	    killall -9 iio-emu
+    #stop emu
+    killall -9 iio-emu
 fi
 
