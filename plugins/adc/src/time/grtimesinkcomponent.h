@@ -24,11 +24,6 @@ public Q_SLOTS:
 	void connectSignalPaths();
 	void tearDownSignalPaths();
 
-	virtual void setRollingMode(bool b);
-	virtual void setSampleRate(double);
-	virtual void setBufferSize(uint32_t size);
-	virtual void setPlotSize(uint32_t size);
-
 	virtual void onArm() override;
 	virtual void onDisarm() override;
 	virtual void setSyncMode(bool b) override;
@@ -45,11 +40,15 @@ public Q_SLOTS:
 	virtual void setSingleShot(bool) override;
 	virtual void setData(bool copy = false) override;
 
+	SamplingInfo samplingInfo();
+	void setSamplingInfo(SamplingInfo p);
+
 	void addChannel(GRChannel *ch);
 	void removeChannel(GRChannel *c);
 
 	void setSyncSingleShot(bool) override;
 	void setSyncBufferSize(uint32_t) override;
+
 
 Q_SIGNALS:
 	void arm();
@@ -66,12 +65,11 @@ private:
 	std::mutex refillMutex;
 	time_sink_f::sptr time_sink;
 	QMap<QString, int> time_channel_map;
-	SamplingInfo m_currentSamplingInfo;
+	SamplingInfo m_samplingInfo;
 
 	GRTopBlockNode *m_node;
 	GRTopBlock *m_top;
 
-	bool m_rollingMode;
 	bool m_singleShot;
 	bool m_syncMode;
 	bool m_armed;
