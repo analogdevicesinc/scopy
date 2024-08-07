@@ -86,8 +86,6 @@ void FFTSamplingInfo::update(SamplingInfo info)
 {
 	QString text;
 	text = QString("%1").arg(m_mpf->format(info.plotSize, "samples", 2));
-	//.arg(m_mpf->format(binfo.bufferSizes, "samples", 2));
-	//	if(info.sampleRate != 1.0)
 	if(info.sampleRate != 1) {
 		text += QString(" at %2").arg(m_mpf->format(info.sampleRate, "sps", 2));
 	}

@@ -1,25 +1,66 @@
 #include "menuspinbox.h"
 #include <cfloat>
-
-
+#include <stylehelper.h>
 
 namespace scopy {
 namespace gui {
 
-MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, double max, QWidget *parent) : QWidget(parent) {
-	lay = new QHBoxLayout(this);
-	setLayout(lay);
+MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, double max, bool vertical, bool left, QWidget *parent) : QWidget(parent) {
+	auto lay1 = new QVBoxLayout(this);
+	lay1->setSpacing(0);
+	lay1->setMargin(0);
+
+	setLayout(lay1);
+
+	auto lay = new QHBoxLayout(this);
+
+	lay->setSpacing(0);
+	lay->setMargin(0);
+
+	QLayout *btnLay;
+	QLayout *editLay;
+
+	if(vertical) {
+		btnLay = new QVBoxLayout();
+		editLay = new QVBoxLayout();
+	} else {
+		btnLay = new QHBoxLayout();
+		editLay = new QHBoxLayout();
+	}
+
+
 	m_label = new QLabel(name);
 	m_edit = new QLineEdit("0");
 	m_scaleCb = new QComboBox();
 	m_plus = new QPushButton("+");
 	m_minus = new QPushButton("-");
 
-	lay->addWidget(m_label);
-	lay->addWidget(m_edit);
-	lay->addWidget(m_scaleCb);
-	lay->addWidget(m_plus);
-	lay->addWidget(m_minus);
+	btnLay->addWidget(m_plus);
+	btnLay->addWidget(m_minus);
+
+	editLay->addWidget(m_label);
+	editLay->addWidget(m_edit);
+	editLay->addWidget(m_scaleCb);
+
+	StyleHelper::MenuSmallLabel(m_label);
+	StyleHelper::MenuLineEditWidget(m_edit);
+	StyleHelper::MenuComboBox(m_scaleCb);
+
+	StyleHelper::SpinBoxUpButton(m_plus, "plus_btn");
+	m_plus->setFixedSize(32,32);
+	StyleHelper::SpinBoxDownButton(m_minus, "minus_btn");
+	m_minus->setFixedSize(32,32);
+
+
+	lay1->addWidget(m_label);
+	if(left) {
+		lay->addLayout(btnLay);
+		lay->addLayout(editLay);
+	} else {
+		lay->addLayout(editLay);
+		lay->addLayout(btnLay);
+	}
+	lay1->addLayout(lay);
 
 	m_incrementStrategy = new IncrementStrategyFixed();
 
@@ -47,6 +88,7 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	m_min = min;
 	m_max = max;
 	populateCombobox(unit,m_min,m_max);
+	setValue(val);
 }
 
 MenuSpinbox::~MenuSpinbox()
@@ -144,7 +186,7 @@ void MenuSpinbox::populateWidgets()
 	double scale = 1;
 	for(i = m_scaleCb->count() - 1; i >= 0; i--) { // find most suitable scale
 		scale = m_scaleCb->itemData(i).toDouble();
-		if(m_value / scale > 1)
+		if(m_value / scale >= 10)
 			break;
 	}
 	if( i < 0 ){
