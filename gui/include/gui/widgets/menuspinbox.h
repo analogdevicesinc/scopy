@@ -79,7 +79,13 @@ class SCOPY_GUI_EXPORT MenuSpinbox : public QWidget
 	QWIDGET_PAINT_EVENT_HELPER
 
 public:
-	MenuSpinbox(QString name, double val, QString unit, double min, double max, QWidget *parent = nullptr);
+	enum {
+		SS_SIMPLE,
+		SS_SCALE,
+
+	} SpinboxStyle;
+
+	MenuSpinbox(QString name, double val, QString unit, double min, double max, bool vertical = 0, bool left = 0, QWidget *parent = nullptr);
 	~MenuSpinbox();
 
 	double value() const;
@@ -109,8 +115,6 @@ private:
 	void populateCombobox(QString unit, double min, double max);
 	int findLastDigit(QString str);
 	double clamp(double val, double min, double max);
-
-	QHBoxLayout *lay;
 
 	QLabel *m_label;
 	QLineEdit *m_edit;
