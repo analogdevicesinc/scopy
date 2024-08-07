@@ -34,8 +34,6 @@ void TimePlotComponentChannel::deinitPlotComponent()
 	auto timeplot = m_plotComponent->timePlot();
 	auto xyplot = m_plotComponent->xyPlot();
 
-	m_timePlotAxisHandle->deinit();
-
 	timeplot->removePlotAxisHandle(m_timePlotAxisHandle);
 	timeplot->removePlotChannel(m_timePlotCh);
 	xyplot->removePlotChannel(m_xyPlotCh);
