@@ -172,6 +172,8 @@
         <file>icons/handle_down_arrow_light.svg</file>
         <file>icons/minus.svg</file>
         <file>icons/plus.svg</file>
+        <file>icons/unlocked.svg</file>
+        <file>icons/locked.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>

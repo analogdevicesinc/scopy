@@ -244,7 +244,7 @@ void StyleHelper::BlueButton(QPushButton *btn, QString objectName)
 	style.replace("&&SH_disabled&&", StyleHelper::getColor("SH_disabled"));
 	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
 //	btn->setStyleSheet(style);
-	Style::setStyle(btn, style::button::basicButton);
+	Style::setStyle(btn, style::properties::button::basicButton);
 	btn->setIconSize(QSize(48, 48));
 }
 

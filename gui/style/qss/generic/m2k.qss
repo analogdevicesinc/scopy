@@ -1,11 +1,15 @@
 QWidget {
  background-color: transparent;
 }
-
+QPushButton {
+    background-color: transparent;
+    border: none;
+    padding: 0 0;
+    font-weight: bold;
+}
 scopy--DetachedToolWindow, QMainWindow > .QWidget, scopy--Sismograph > QwtPlotCanvas, QMessageBox, QToolTip {
  background-color: &interactive_subtle_disabled&;
 }
-
 QDockWidget {
  titlebar-normal-icon: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg);
  background-color: &interactive_subtle_disabled&;
@@ -240,9 +244,9 @@ QPushButton[blue_button=true]{
  border-radius: 4px;
  font-size: 14px;
 }
-QPushButton[blue_button=true]:pressed{ background-color: &interactive_primary_hover&; }
-QPushButton[blue_button=true]:hover{ background-color: #4a34ff; }
-QPushButton[blue_button=true]:disabled { background-color: grey; }
+QPushButton[blue_button=true]:hover{ background-color: &interactive_primary_idle&; }
+QPushButton[blue_button=true]:pressed{ background-color: &interactive_primary_idle&; }
+QPushButton[blue_button=true]:disabled { background-color: &interactive_subtle_disabled&; }
 
 QPushButton[info_button=true]{
  min-height: 40px;
@@ -333,7 +337,7 @@ QFrame[line_separator=true]{ background-color: #13&color_default_hexcode&; }
  background-color: none;
 }
 scopy--CursorReadouts {
- background-color: &background_plot&;
+ background-color: red;
 }
 QWidget[scopy_logo=true]{
  background-image: url(:/gui/icons/scopy-default/icons/logo.svg);
@@ -405,7 +409,7 @@ scopy--ChannelWidget QWidget#widget {
  border-radius: 4px;
 }
 scopy--ChannelWidget QWidget#widget[selected=true] {
- background-color: #99&color_default_hexcode&;
+ background-color: #99&color_inverse_hexcode&;
 }
 .scopy--ChannelWidget QWidget#widget::hover {
 background-color: #3C&color_inverse_hexcode&;
@@ -520,7 +524,6 @@ scopy--DropdownSwitchList QCheckBox::indicator {
  height: 16px;
  subcontrol-position: center;
 }
-
 QPushButton[stopButton=true] {
  background-repeat: no-repeat;
  background-position: center center;

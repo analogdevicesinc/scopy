@@ -21,6 +21,7 @@
 #include "customSwitch.h"
 #include "qcoreevent.h"
 #include "qvariant.h"
+#include <iostream>
 #include <style.h>
 #include <QHBoxLayout>
 
@@ -50,9 +51,9 @@ void CustomSwitch::init()
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	m_onLabel->setAlignment(Qt::AlignCenter);
-	Style::setStyle(m_onLabel, style::widget::customSwitchLeft);
+	Style::setStyle(m_onLabel, style::properties::widget::customSwitch, "left_off");
 	m_offLabel->setAlignment(Qt::AlignCenter);
-	Style::setStyle(m_offLabel, style::widget::customSwitchRight);
+	Style::setStyle(m_offLabel, style::properties::widget::customSwitch, "right_off");
 
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	layout->addWidget(m_onLabel);
@@ -60,18 +61,30 @@ void CustomSwitch::init()
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(0);
 	setLayout(layout);
+
+	connect(this, &CustomSwitch::toggled, this, &CustomSwitch::onToggle);
+}
+
+void CustomSwitch::onToggle(bool en)
+{
+	if(en) {
+		Style::setStyle(m_onLabel, style::properties::widget::customSwitch, "left_on");
+		Style::setStyle(m_offLabel, style::properties::widget::customSwitch, "right_off");
+	} else {
+		Style::setStyle(m_onLabel, style::properties::widget::customSwitch, "left_off");
+		Style::setStyle(m_offLabel, style::properties::widget::customSwitch, "right_on");
+	}
 }
 
 void CustomSwitch::paintEvent(QPaintEvent *event)
 {
 	m_offLabel->move(m_onLabel->width() - Style::getDimension(json::global::border_width), m_offLabel->pos().y());
-	m_onLabel->raise();
 
-	QString offColor = Style::getAttribute(json::theme::interactive_primary_idle);
-	QString onColor = Style::getAttribute(json::theme::interactive_subtle_idle);
-	if(isChecked()) std::swap(onColor, offColor);
-	m_onLabel->setStyleSheet("color: " + onColor + "; border-color: " + onColor);
-	m_offLabel->setStyleSheet("color: " + offColor + "; border-color: " + offColor);
+	if(isChecked()) {
+		m_onLabel->raise();
+	} else {
+		m_offLabel->raise();
+	}
 }
 
 bool CustomSwitch::event(QEvent *e)
@@ -109,6 +122,7 @@ QSize CustomSwitch::sizeHint() const
 void CustomSwitch::update()
 {
 	QPushButton::update();
+	onToggle(isChecked());
 	setMaximumSize(sizeHint());
 }
 

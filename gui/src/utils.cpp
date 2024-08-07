@@ -218,6 +218,7 @@ void Util::SetAttrRecur(QDomElement &elem, QString strtagname, QString strattr, 
 	// recurivelly change color
 	QDomElement docElem = doc.documentElement(); //<-- make const "variable"
 	SetAttrRecur(docElem, "path", "fill", color);
+	SetAttrRecur(docElem, "rect", "fill", color);
 	SetAttrRecur(docElem, "polygon", "fill", color);
 	SetAttrRecur(docElem, "path", "opacity", QString::number(opacity, 'g', 2));
 	// create svg renderer with edited contents

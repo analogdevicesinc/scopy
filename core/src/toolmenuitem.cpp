@@ -50,7 +50,7 @@ ToolMenuItem::ToolMenuItem(QString id, QString name, QString iconPath, QWidget *
 	setDynamicProperty(this, "allowHover", false);
 #else
 	toolBtn->setStyleSheet("text-align:left;");
-	Style::setStyle(toolRunBtn, style::widget::notInteractive);
+	Style::setStyle(toolRunBtn, style::properties::widget::notInteractive);
 
 	enableDoubleClick(true);
 #endif
@@ -176,7 +176,7 @@ void ToolMenuItem::_buildUI()
 	layout->addWidget(toolBtn);
 	layout->addWidget(toolRunBtn);
 
-	Style::setStyle(toolRunBtn, style::button::stopButton);
+	Style::setStyle(toolRunBtn, style::properties::button::stopButton);
 	toolRunBtn->setMaximumSize(32, 32);
 	toolBtn->setMinimumHeight(42);
 

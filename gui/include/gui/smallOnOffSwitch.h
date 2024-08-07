@@ -57,7 +57,7 @@ protected:
 	void mousePressEvent(QMouseEvent *event) override;
 	int offset() const;
 	void setOffset(int value);
-	void init();
+	void initDimensions();
 
 private:
 	bool m_is_entered;

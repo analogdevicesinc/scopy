@@ -70,7 +70,7 @@ RunBtn::RunBtn(QWidget *parent)
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	setText("Run");
 	connect(this, &QPushButton::toggled, this, [=](bool b) { setText(b ? "Stop" : "Run"); });
-	Style::setStyle(this, style::button::runSingle);
+	Style::setStyle(this, style::properties::button::runSingle);
 	setStyleSheet("background-color: " + Style::getAttribute(json::theme::interactive_primary_idle) + ";");
 
 	QIcon icon1;
@@ -90,7 +90,7 @@ SingleShotBtn::SingleShotBtn(QWidget *parent)
 	setChecked(false);
 	setText("Single");
 	connect(this, &QPushButton::toggled, this, [=](bool b) { setText(b ? "Stop" : "Single"); });
-	Style::setStyle(this, style::button::runSingle);
+	Style::setStyle(this, style::properties::button::runSingle);
 	setStyleSheet("background-color: #ff7200;");
 
 	QIcon icon1;

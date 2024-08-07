@@ -19,6 +19,7 @@
  */
 
 #include "smallOnOffSwitch.h"
+#include "dynamicWidget.h"
 #include "style.h"
 #include <QDebug>
 #include <QFile>
@@ -33,7 +34,7 @@ SmallOnOffSwitch::SmallOnOffSwitch(QWidget *parent)
 {
 	setCheckable(true);
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	init();
+	initDimensions();
 
 	connect(this, &QCheckBox::toggled, this, &SmallOnOffSwitch::toggleAnim);
 }
@@ -46,7 +47,7 @@ SmallOnOffSwitch::SmallOnOffSwitch(const QString &text, QWidget *parent)
 
 SmallOnOffSwitch::~SmallOnOffSwitch() {}
 
-void SmallOnOffSwitch::init()
+void SmallOnOffSwitch::initDimensions()
 {
 	m_is_entered = false;
 	m_track_radius = Style::getDimension(json::global::unit_1) / 2;
@@ -112,6 +113,7 @@ void SmallOnOffSwitch::resizeEvent(QResizeEvent *event)
 
 void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
 {
+	update();
 	QPainter p(this);
 	p.setRenderHint(QPainter::Antialiasing);
 	p.setPen(Qt::NoPen);
@@ -125,12 +127,28 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
 	}
 
 	p.setBrush(track_brush);
+	int track_radius = !getDynamicProperty(this, "use_icon") ? m_track_radius :  m_track_radius / 2;
 	p.drawRoundedRect(m_margin, m_margin, m_btn_width - 2 * m_margin, m_track_radius * 2 - 2 * m_margin,
-			  m_track_radius, m_track_radius);
+			  track_radius , track_radius);
 
-	p.setBrush(thumb_brush);
-	p.drawEllipse(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 * m_thumb_radius,
-		      2 * m_thumb_radius);
+	// use icon (this is used in m2k)
+	if(getDynamicProperty(this, "use_icon")) {
+		QPixmap pixmap;
+		if(isChecked()) {
+			pixmap = Style::getPixmap(":/gui/icons/unlocked.svg",
+						  Style::getColor(json::theme::content_inverse));
+		} else {
+			pixmap = Style::getPixmap(":/gui/icons/locked.svg",
+						  Style::getColor(json::theme::content_inverse));
+		}
+
+//		p.drawPixmap(QRect(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 * m_thumb_radius, 2 * m_thumb_radius), pixmap);
+		p.drawPixmap(QRect(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, pixmap.width(), pixmap.height()), pixmap);
+	} else {
+		p.setBrush(thumb_brush);
+		p.drawEllipse(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 * m_thumb_radius,
+			      2 * m_thumb_radius);
+	}
 
 	if(!QCheckBox::text().isEmpty()) {
 		QStylePainter sp(this);
