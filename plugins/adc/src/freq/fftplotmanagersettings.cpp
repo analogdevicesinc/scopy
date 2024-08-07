@@ -52,6 +52,15 @@ QWidget *FFTPlotManagerSettings::createMenu(QWidget *parent)
 		removePlot(plt);
 	});
 
+	connect(this, &FFTPlotManagerSettings::samplingInfoChanged, this, [=](SamplingInfo s){
+		for(auto p : m_plotManager->plots()) {
+			auto tpc = dynamic_cast<FFTPlotComponent*>(p);
+			if(tpc) {
+				tpc->fftPlotInfo()->update(s);
+			}
+		}
+	});
+
 	m_plotSection = new MenuSectionWidget(this);
 	m_plotCb = new MenuCombo("Plot Settings", m_plotSection);
 	m_plotSection->contentLayout()->addWidget(m_plotCb);
@@ -377,9 +386,9 @@ uint32_t FFTPlotManagerSettings::bufferSize() const { return m_samplingInfo.buff
 
 void FFTPlotManagerSettings::setBufferSize(uint32_t newBufferSize)
 {
-	qInfo()<<"setBufferSize";
 	if(m_samplingInfo.bufferSize == newBufferSize)
 		return;
+	m_samplingInfo.plotSize = newBufferSize;
 	m_samplingInfo.bufferSize = newBufferSize;
 	Q_EMIT samplingInfoChanged(m_samplingInfo);
 	updateXAxis();

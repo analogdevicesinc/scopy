@@ -29,6 +29,10 @@ FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	m_plots.append(m_fftPlot);
 	m_plotLayout->addWidget(m_fftPlot);
 
+
+	m_fftInfo = new FFTSamplingInfo();
+	m_fftPlot->getPlotInfo()->addCustomInfo(m_fftInfo,IP_RIGHT);
+
 	m_plotMenu = new FFTPlotComponentSettings(this, parent);
 	addComponent(m_plotMenu);
 
@@ -62,4 +66,9 @@ FFTPlotComponentSettings *FFTPlotComponent::createPlotMenu(QWidget *parent)
 FFTPlotComponentSettings *FFTPlotComponent::plotMenu()
 {
 	return m_plotMenu;
+}
+
+FFTSamplingInfo *FFTPlotComponent::fftPlotInfo() const
+{
+	return m_fftInfo;
 }
