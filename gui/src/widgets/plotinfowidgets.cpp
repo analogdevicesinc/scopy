@@ -65,7 +65,36 @@ void TimeSamplingInfo::update(SamplingInfo info)
 	text = QString("%1").arg(m_mpf->format(info.plotSize, "samples", 2));
 	//.arg(m_mpf->format(binfo.bufferSizes, "samples", 2));
 	//	if(info.sampleRate != 1.0)
-	text += QString(" at %2").arg(m_mpf->format(info.sampleRate, "sps", 2));
+	if(info.sampleRate != 1) {
+		text += QString(" at %2").arg(m_mpf->format(info.sampleRate, "sps", 2));
+	}
+
+	setText(text);
+}
+
+
+FFTSamplingInfo::FFTSamplingInfo(QWidget *parent)
+	: m_mpf(new MetricPrefixFormatter(this))
+{
+	StyleHelper::PlotInfoLabel(this);
+	m_mpf->setTrimZeroes(true);
+}
+
+FFTSamplingInfo::~FFTSamplingInfo() {}
+
+void FFTSamplingInfo::update(SamplingInfo info)
+{
+	QString text;
+	text = QString("%1").arg(m_mpf->format(info.plotSize, "samples", 2));
+	//.arg(m_mpf->format(binfo.bufferSizes, "samples", 2));
+	//	if(info.sampleRate != 1.0)
+	if(info.sampleRate != 1) {
+		text += QString(" at %2").arg(m_mpf->format(info.sampleRate, "sps", 2));
+	}
+	if(info.freqOffset != 0) {
+		text += QString("\nCenter Frequency: %1").arg(m_mpf->format(info.freqOffset,"Hz",3));
+	}
+
 
 	setText(text);
 }
