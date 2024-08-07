@@ -13,7 +13,6 @@ GRTimeSinkComponent::GRTimeSinkComponent(QString name, GRTopBlockNode *t, QObjec
 	m_sync = m_node->sync();
 	m_top = t->src();
 	m_name = name;
-	m_rollingMode = false;
 	m_singleShot = false;
 	m_syncMode = false;
 	m_armed = false;
@@ -43,11 +42,11 @@ void GRTimeSinkComponent::connectSignalPaths()
 		qDebug(CAT_GRTIMESINKCOMPONENT) << "Appended " << sigpath->name();
 	}
 
-	time_sink = time_sink_f::make(m_currentSamplingInfo.plotSize,
-				      m_currentSamplingInfo.bufferSize,
-				      m_currentSamplingInfo.sampleRate,
+	time_sink = time_sink_f::make(m_samplingInfo.plotSize,
+				      m_samplingInfo.bufferSize,
+				      m_samplingInfo.sampleRate,
 				      m_name.toStdString(), sigpaths.count());
-	time_sink->setRollingMode(m_rollingMode);
+	time_sink->setRollingMode(m_samplingInfo.rollingMode);
 	time_sink->setSingleShot(m_singleShot);
 
 	int index = 0;
@@ -100,44 +99,28 @@ void GRTimeSinkComponent::setData(bool copy)
 	}
 }
 
-void GRTimeSinkComponent::setRollingMode(bool b)
-{
-	m_rollingMode = b;
-	if(time_sink) {
-		time_sink->setRollingMode(b);
-		if(m_armed)
-			Q_EMIT requestRebuild();
-		// updateXAxis();
-	}
-}
-
-void GRTimeSinkComponent::setSampleRate(double val)
-{
-	m_currentSamplingInfo.sampleRate = val;
-	if(m_armed)
-		Q_EMIT requestRebuild();
-}
-
-void GRTimeSinkComponent::setBufferSize(uint32_t size)
-{
-	m_currentSamplingInfo.bufferSize = size;
-	m_top->setVLen(m_currentSamplingInfo.bufferSize);
-	if(m_armed)
-		Q_EMIT requestRebuild();
-}
-
-void GRTimeSinkComponent::setPlotSize(uint32_t size)
-{
-	m_currentSamplingInfo.plotSize = size;
-	if(m_armed)
-		Q_EMIT requestRebuild();
-}
 
 void GRTimeSinkComponent::setSingleShot(bool b)
 {
 	m_singleShot = b;
 	if(time_sink) {
 		time_sink->setSingleShot(m_singleShot);
+	}
+}
+
+SamplingInfo GRTimeSinkComponent::samplingInfo()
+{
+	return m_samplingInfo;
+}
+
+void GRTimeSinkComponent::setSamplingInfo(SamplingInfo p)
+{
+	m_samplingInfo = p;
+	m_top->setVLen(m_samplingInfo.bufferSize);
+	if(time_sink) {
+		time_sink->setRollingMode(m_samplingInfo.rollingMode);
+		if(m_armed)
+			Q_EMIT requestRebuild();
 	}
 }
 
@@ -165,9 +148,9 @@ void GRTimeSinkComponent::onDisarm()
 
 void GRTimeSinkComponent::init()
 {
-	m_currentSamplingInfo.sampleRate = 1;
-	m_currentSamplingInfo.bufferSize = 32;
-	m_currentSamplingInfo.plotSize = 32;
+	m_samplingInfo.sampleRate = 1;
+	m_samplingInfo.bufferSize = 32;
+	m_samplingInfo.plotSize = 32;
 }
 
 void GRTimeSinkComponent::deinit()
@@ -177,9 +160,9 @@ void GRTimeSinkComponent::deinit()
 
 void GRTimeSinkComponent::start()
 {
-	m_sync->setBufferSize(this, m_currentSamplingInfo.bufferSize);
+	m_sync->setBufferSize(this, m_samplingInfo.bufferSize);
 	m_sync->setSingleShot(this, m_singleShot);
-	m_top->setVLen(m_currentSamplingInfo.bufferSize);
+	m_top->setVLen(m_samplingInfo.bufferSize);
 	m_sync->arm(this);
 	m_top->build();
 	m_top->start();

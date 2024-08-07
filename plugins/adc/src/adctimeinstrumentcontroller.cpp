@@ -90,19 +90,12 @@ void ADCTimeInstrumentController::addChannel(AcqTreeNode *node)
 		m_dataProvider = c;
 		c->init();
 
-		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::bufferSizeChanged, this, [=](double val){
-			// grtbn->src()->setVLen(val);
-			c->setBufferSize(val);});
 
 		connect(c, &GRTimeSinkComponent::requestSingleShot, this, &ADCTimeInstrumentController::setSingleShot);
 		connect(c, &GRTimeSinkComponent::requestBufferSize, m_timePlotSettingsComponent, &TimePlotManagerSettings::setBufferSize);
 
-		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::plotSizeChanged, c,
-			&GRTimeSinkComponent::setPlotSize);
-		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::sampleRateChanged, c,
-			&GRTimeSinkComponent::setSampleRate);
-		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::rollingModeChanged, c,
-			&GRTimeSinkComponent::setRollingMode);
+		connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::samplingInfoChanged, c,
+			&GRTimeSinkComponent::setSamplingInfo);
 
 		connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b){
 			setSingleShot(b);

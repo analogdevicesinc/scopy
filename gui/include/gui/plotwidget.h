@@ -28,6 +28,7 @@ typedef struct _PlotSamplingInfo
 	double startingPoint = 0;
 	double freqOffset = 0;
 	bool complexMode = 0;
+	bool rollingMode = 0;
 } SamplingInfo;
 
 class SCOPY_GUI_EXPORT PlotWidget : public QWidget

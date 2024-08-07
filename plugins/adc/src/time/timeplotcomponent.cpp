@@ -11,6 +11,8 @@
 #include <QLineEdit>
 #include <timeplotcomponentsettings.h>
 
+#include <gui/widgets/plotinfowidgets.h>
+
 using namespace scopy;
 using namespace scopy::adc;
 using namespace scopy::gui;
@@ -27,9 +29,6 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 	m_timePlot->xAxis()->setInterval(0, 1);
 	m_timePlot->xAxis()->setVisible(true);
 
-	/*m_timeInfo = new PlotInfo(m_timePlot, this);
-	m_timePlot->addPlotInfoSlot(m_timeInfo);*/
-
 	m_xyPlot = new PlotWidget(this);
 	m_xyPlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_xyPlot->xAxis()->setInterval(-2048, 2048);
@@ -37,6 +36,9 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 
 	m_plots.append(m_timePlot);
 	m_plots.append(m_xyPlot);
+
+	m_timePlotInfo = new TimeSamplingInfo();
+	m_timePlot->getPlotInfo()->addCustomInfo(m_timePlotInfo,IP_RIGHT);
 
 	/*	connect(m_plot->navigator(), &PlotNavigator::rectChanged, this,
 		[=]() { m_info->update(m_currentSamplingInfo); });
@@ -133,6 +135,11 @@ void TimePlotComponent::onXyXNewData(const float *xData_, const float *yData_, s
 		pcc->setXyXData(xyXData);
 		pcc->refreshData(copy);
 	}
+}
+
+TimeSamplingInfo *TimePlotComponent::timePlotInfo() const
+{
+	return m_timePlotInfo;
 }
 
 void TimePlotComponent::refreshXYXData()
