@@ -2,6 +2,7 @@
 #include <timeplotcomponentchannel.h>
 #include <plotaxis.h>
 #include "plotmanagercombobox.h"
+#include "plotnavigator.hpp"
 #include <timeplotcomponentsettings.h>
 
 using namespace scopy;
@@ -9,7 +10,7 @@ using namespace scopy::adc;
 
 
 TimePlotManager::TimePlotManager(QString name, QWidget *parent) : PlotManager(name, parent){
-
+	m_primary = nullptr;
 }
 
 TimePlotManager::~TimePlotManager() {}
@@ -19,6 +20,9 @@ uint32_t TimePlotManager::addPlot(QString name)
 	TimePlotComponent *plt = new TimePlotComponent(name, m_plotIdx, this);
 	m_plotIdx++;
 	m_plots.append(plt);
+	if(m_primary == nullptr) {
+		m_primary = plt;
+	}
 
 	plt->setXInterval(m_xInterval);
 
@@ -39,6 +43,7 @@ uint32_t TimePlotManager::addPlot(QString name)
 	}
 
 	multiPlotUpdate();
+	syncNavigatorAndCursors(plt);
 	Q_EMIT plotAdded(plt->uuid());
 	return plt->uuid();
 }
@@ -55,6 +60,7 @@ void TimePlotManager::removePlot(uint32_t uuid)
 	}
 
 	multiPlotUpdate();
+	syncAllPlotNavigatorsAndCursors();
 }
 
 TimePlotComponent *TimePlotManager::plot(uint32_t uuid)
@@ -64,6 +70,7 @@ TimePlotComponent *TimePlotManager::plot(uint32_t uuid)
 
 void TimePlotManager::multiPlotUpdate() {
 	bool b = m_plots.count() > 1;
+
 	for(PlotComponent *p : qAsConst(m_plots)) {
 		auto plt = dynamic_cast<TimePlotComponent*>(p);
 		plt->plotMenu()->showDeleteButtons(b);
@@ -71,5 +78,27 @@ void TimePlotManager::multiPlotUpdate() {
 
 	for(PlotManagerCombobox *cb : m_channelPlotcomboMap) {
 		cb->setVisible(b);
+	}
+}
+
+void TimePlotManager::syncNavigatorAndCursors(PlotComponent* p) {
+	if(p == m_primary)
+		return;
+	auto plt = dynamic_cast<TimePlotComponent*>(p);
+	QSet<QwtAxisId> set;
+	set.insert(m_primary->plot(0)->xAxis()->axisId());
+	// set.insert(m_primary->plot(0)->yAxis()->axisId());
+	set.insert(p->plot(0)->xAxis()->axisId());
+	// set.insert(p->plot(0)->yAxis()->axisId());
+	PlotNavigator::syncPlotNavigators(m_primary->plot(0)->navigator(), p->plot(0)->navigator(),&set);
+}
+
+void TimePlotManager::syncAllPlotNavigatorsAndCursors()
+{
+	if(m_primary != m_plots[0]) {
+		m_primary = m_plots[0];
+		for(PlotComponent *p : qAsConst(m_plots)) {
+			syncNavigatorAndCursors(p);
+		}
 	}
 }
