@@ -16,6 +16,7 @@
 #include <plotwidget.h>
 #include "plotinfo.h"
 #include "plotcomponent.h"
+#include <gui/widgets/plotinfowidgets.h>
 
 using namespace scopy::gui;
 namespace scopy {
@@ -56,6 +57,8 @@ public:
 
 	bool singleYMode() const;
 
+	TimeSamplingInfo *timePlotInfo() const;
+
 private Q_SLOTS:
 	void onXyXNewData(const float *xData_, const float *yData_, size_t size, bool copy);
 
@@ -71,6 +74,7 @@ private:
 	bool m_showXSourceOnXy;
 
 	ChannelComponent *m_XYXChannel;
+	TimeSamplingInfo* m_timePlotInfo;
 	const float *xyXData;
 
 

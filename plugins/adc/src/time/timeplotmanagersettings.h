@@ -78,6 +78,7 @@ Q_SIGNALS:
 	void rollingModeChanged(bool);
 	void sampleRateChanged(double);
 	void syncBufferPlotSizeChanged(bool);
+	void samplingInfoChanged(SamplingInfo);
 
 private:
 	TimePlotManager *m_plotManager;
@@ -109,16 +110,12 @@ private:
 	QMap<uint32_t, QWidget *> m_plotWidgetMap;
 
 	bool m_sampleRateAvailable;
-	uint32_t m_bufferSize;
-	uint32_t m_plotSize;
-	double m_sampleRate;
-	bool m_rollingMode;
 	bool m_syncBufferPlotSize;
 
 	QList<ChannelComponent *> m_channels;
 	QList<SampleRateProvider *> m_sampleRateProviders;
 
-	// bool m_showPlotTags;
+	SamplingInfo m_samplingInfo;
 
 	Q_PROPERTY(uint32_t plotSize READ plotSize WRITE setPlotSize NOTIFY plotSizeChanged)
 	Q_PROPERTY(bool rollingMode READ rollingMode WRITE setRollingMode NOTIFY rollingModeChanged)
