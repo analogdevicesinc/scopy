@@ -14,7 +14,6 @@ TimePlotManagerSettings::TimePlotManagerSettings(TimePlotManager *mgr, QWidget *
 	: QWidget(parent)
 	, ToolComponent()
 	, m_sampleRateAvailable(false)
-	, m_rollingMode(false)
 {
 	m_plotManager = mgr;
 	auto *w = createMenu(this);
@@ -47,6 +46,17 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 		TimePlotComponent *plt = m_plotManager->plot(uuid);
 		removePlot(plt);
 	});
+
+	connect(this, &TimePlotManagerSettings::samplingInfoChanged, this, [=](SamplingInfo s){
+		for(auto p : m_plotManager->plots()) {
+			auto tpc = dynamic_cast<TimePlotComponent*>(p);
+			if(tpc) {
+				tpc->timePlotInfo()->update(s);
+			}
+		}
+	});
+
+
 
 	m_plotSection = new MenuSectionWidget(this);
 	m_plotCb = new MenuCombo("Plot Settings", m_plotSection);
@@ -243,6 +253,13 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 void TimePlotManagerSettings::onInit()
 {
+	m_samplingInfo.plotSize = 400;
+	m_samplingInfo.bufferSize = 400;
+	m_samplingInfo.complexMode = 0;
+	m_samplingInfo.rollingMode = 0;
+	m_samplingInfo.freqOffset = 0;
+	m_samplingInfo.sampleRate = 1;
+
 	m_bufferSizeSpin->setValue(400);
 	m_plotSizeSpin->setValue(400);
 	m_sampleRateSpin->setValue(1);
@@ -256,47 +273,51 @@ void TimePlotManagerSettings::onInit()
 	//	m_rollingModeSw->onOffswitch()->setChecked(false);
 }
 
-double TimePlotManagerSettings::sampleRate() const { return m_sampleRate; }
+double TimePlotManagerSettings::sampleRate() const { return m_samplingInfo.sampleRate; }
 
 void TimePlotManagerSettings::setSampleRate(double newSampleRate)
 {
-	if(qFuzzyCompare(m_sampleRate, newSampleRate))
+	if(qFuzzyCompare(m_samplingInfo.sampleRate, newSampleRate))
 		return;
-	m_sampleRate = newSampleRate;
-	Q_EMIT sampleRateChanged(m_sampleRate);
+	m_samplingInfo.sampleRate = newSampleRate;
+	Q_EMIT sampleRateChanged(newSampleRate);
+	Q_EMIT samplingInfoChanged(m_samplingInfo);
 	updateXAxis();
 }
 
-bool TimePlotManagerSettings::rollingMode() const { return m_rollingMode; }
+bool TimePlotManagerSettings::rollingMode() const { return m_samplingInfo.rollingMode; }
 
 void TimePlotManagerSettings::setRollingMode(bool newRollingMode)
 {
-	if(m_rollingMode == newRollingMode)
+	if(m_samplingInfo.rollingMode == newRollingMode)
 		return;
-	m_rollingMode = newRollingMode;
+	m_samplingInfo.rollingMode = newRollingMode;
 	Q_EMIT rollingModeChanged(newRollingMode);
+	Q_EMIT samplingInfoChanged(m_samplingInfo);
 	updateXAxis();
 }
 
-uint32_t TimePlotManagerSettings::plotSize() const { return m_plotSize; }
+uint32_t TimePlotManagerSettings::plotSize() const { return m_samplingInfo.plotSize; }
 
 void TimePlotManagerSettings::setPlotSize(uint32_t newPlotSize)
 {
-	if(m_plotSize == newPlotSize)
+	if(m_samplingInfo.plotSize == newPlotSize)
 		return;
-	m_plotSize = newPlotSize;
+	m_samplingInfo.plotSize = newPlotSize;
 	Q_EMIT plotSizeChanged(newPlotSize);
+	Q_EMIT samplingInfoChanged(m_samplingInfo);
 	updateXAxis();
 }
 
-uint32_t TimePlotManagerSettings::bufferSize() const { return m_bufferSize; }
+uint32_t TimePlotManagerSettings::bufferSize() const { return m_samplingInfo.bufferSize; }
 
 void TimePlotManagerSettings::setBufferSize(uint32_t newBufferSize)
 {
-	if(m_bufferSize == newBufferSize)
+	if(m_samplingInfo.bufferSize == newBufferSize)
 		return;
-	m_bufferSize = newBufferSize;
+	m_samplingInfo.bufferSize = newBufferSize;
 	Q_EMIT bufferSizeChanged(newBufferSize);
+	Q_EMIT samplingInfoChanged(m_samplingInfo);
 	updateXAxis();
 }
 
@@ -304,12 +325,12 @@ void TimePlotManagerSettings::updateXAxis()
 {
 
 	double min = 0;
-	double max = m_plotSize;
+	double max = m_samplingInfo.plotSize;
 
-	min = min / m_sampleRate;
-	max = max / m_sampleRate;
+	min = min / m_samplingInfo.sampleRate;
+	max = max / m_samplingInfo.sampleRate;
 
-	if(m_rollingMode) {
+	if(m_samplingInfo.rollingMode) {
 		m_xmin->setValue(max);
 		m_xmax->setValue(min);
 	} else {
@@ -328,12 +349,10 @@ void TimePlotManagerSettings::onStart()
 		double sr = readSampleRate();
 		setSampleRate(sr);
 	} else {
-		Q_EMIT sampleRateChanged(m_sampleRate);
+		Q_EMIT sampleRateChanged(m_samplingInfo.sampleRate);
 	}
 
-	Q_EMIT plotSizeChanged(m_plotSize);
-	Q_EMIT rollingModeChanged(m_rollingMode);
-	Q_EMIT bufferSizeChanged(m_bufferSize);
+	Q_EMIT samplingInfoChanged(m_samplingInfo);
 	updateXAxis();
 }
 
