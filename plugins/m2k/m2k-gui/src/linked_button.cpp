@@ -5,6 +5,7 @@
 #include <QDesktopServices>
 #include <QFile>
 #include <QUrl>
+#include <style.h>
 
 using namespace scopy;
 
@@ -13,7 +14,7 @@ LinkedButton::LinkedButton(QWidget *parent)
 {
 	setDynamicProperty(this, "info_button", true);
 
-	this->setIcon(QIcon::fromTheme(":/gui/icons/scopy-default/icons/info"));
+	this->setIcon(Style::getPixmap(":/gui/icons/scopy-default/icons/info"));
 	this->setIconSize(QSize(32, 32));
 
 	this->setToolTip("See more info");

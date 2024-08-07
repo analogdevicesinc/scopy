@@ -1,13 +1,17 @@
 QWidget {
  background-color: transparent;
 }
-
+QPushButton {
+    background-color: transparent;
+    border: none;
+    padding: 0 0;
+    font-weight: bold;
+}
 scopy--DetachedToolWindow, QMainWindow > .QWidget, scopy--Sismograph > QwtPlotCanvas, QMessageBox, QToolTip {
  background-color: &interactive_subtle_disabled&;
 }
-
 QDockWidget {
- titlebar-normal-icon: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg);
+ titlebar-normal-icon: url(:/gui/icons/&icon_theme_folder&/icons/sba_cmb_box_arrow_right.svg);
  background-color: &interactive_subtle_disabled&;
 }
 QDockWidget::title {
@@ -55,6 +59,7 @@ QwtThermo {
  color: &content_subtle&;
  font-size: 26px;
 }
+/*
 scopy--BufferPreviewer {
  border: 1px solid &interactive_primary_idle&;
  alternate-background-color: &interactive_primary_disabled&;
@@ -62,6 +67,7 @@ scopy--BufferPreviewer {
  selection-color: &interactive_secondary_idle&;
  color: &content_default&;
 }
+*/
 QDial {
  background-color: &background_plot&;
  color: &interactive_primary_disabled&;
@@ -207,13 +213,13 @@ QPushButton[subsection_arrow_button=true]{
  max-height: 12px;
  max-width: 12px;
  border: none;
- image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg);
+ image: url(:/gui/icons/&icon_theme_folder&/icons/sba_cmb_box_arrow_right.svg);
 }
 QPushButton[subsection_arrow_button=true]:checked{
  max-height: 12px;
  max-width: 12px;
  border: none;
- image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
+ image: url(:/gui/icons/&icon_theme_folder&/icons/sba_cmb_box_arrow.svg);
 }
 QLabel[general_settings_label=true]{
  color: &content_default&;
@@ -221,7 +227,7 @@ QLabel[general_settings_label=true]{
  font-weight: normal;
 }
 QFrame[blue_line=true]{ border: 2px solid &interactive_primary_disabled&; }
-QFrame[drag_widget=true] { border-image:url(:/gui/icons/scopy-default/icons/menu.svg); }
+QFrame[drag_widget=true] { border-image:url(:/gui/icons/&icon_theme_folder&/icons/menu.svg); }
 
 
 QWidget[device_page="true"] {
@@ -240,9 +246,9 @@ QPushButton[blue_button=true]{
  border-radius: 4px;
  font-size: 14px;
 }
-QPushButton[blue_button=true]:pressed{ background-color: &interactive_primary_hover&; }
-QPushButton[blue_button=true]:hover{ background-color: #4a34ff; }
-QPushButton[blue_button=true]:disabled { background-color: grey; }
+QPushButton[blue_button=true]:hover{ background-color: &interactive_primary_idle&; }
+QPushButton[blue_button=true]:pressed{ background-color: &interactive_primary_idle&; }
+QPushButton[blue_button=true]:disabled { background-color: &interactive_subtle_disabled&; }
 
 QPushButton[info_button=true]{
  min-height: 40px;
@@ -333,61 +339,61 @@ QFrame[line_separator=true]{ background-color: #13&color_default_hexcode&; }
  background-color: none;
 }
 scopy--CursorReadouts {
- background-color: &background_plot&;
+ background-color: red;
 }
 QWidget[scopy_logo=true]{
- background-image: url(:/gui/icons/scopy-default/icons/logo.svg);
+ background-image: url(:/gui/icons/&icon_theme_folder&/icons/logo.svg);
  background-repeat: no-repeat;
  background-position: left center;
 }
 QPushButton[menu_icon=true]{
- background-image: url(:/gui/icons/scopy-default/icons/menu.svg);
+ background-image: url(:/gui/icons/&icon_theme_folder&/icons/menu.svg);
  background-repeat: no-repeat;
  background-position: left center;
 }
 QWidget[adi_logo=true]{
- background-image: url(:/gui/icons/scopy-default/icons/logo_analog.svg);
+ background-image: url(:/gui/icons/&icon_theme_folder&/icons/logo_analog.svg);
  background-repeat: no-repeat;
  background-position: left center;
  min-width: 104px;
  min-height: 30px;
 }
 QPushButton[save_logo=true]{
- icon: url(:/gui/icons/scopy-default/icons/save.svg);
+ icon: url(:/gui/icons/&icon_theme_folder&/icons/save.svg);
  text-align: right;
 }
 QPushButton[load_logo=true]{
- icon: url(:/gui/icons/scopy-default/icons/load.svg);
+ icon: url(:/gui/icons/&icon_theme_folder&/icons/load.svg);
  text-align: left;
 }
 QPushButton[preferences_icon=true]{
- icon: url(:/gui/icons/scopy-default/icons/preferences.svg);
+ icon: url(:/gui/icons/&icon_theme_folder&/icons/preferences.svg);
  text-align: center;
  qproperty-text: "Preferences";
 }
 QPushButton[general_settings_icon=true]:checked {
- image: url(:/gui/icons/scopy-default/icons/gear_wheel_pressed.svg);
+ image: url(:/gui/icons/&icon_theme_folder&/icons/gear_wheel_pressed.svg);
 }
 QPushButton[general_settings_icon=true]:!checked {
- image: url(:/gui/icons/scopy-default/icons/gear_wheel.svg);
+ image: url(:/gui/icons/&icon_theme_folder&/icons/gear_wheel.svg);
 }
 QPushButton[general_settings_icon=true]:!checked:hover {
- image: url(:/gui/icons/scopy-default/icons/gear_wheel_hover.svg);
+ image: url(:/gui/icons/&icon_theme_folder&/icons/gear_wheel_hover.svg);
 }
 QPushButton[general_settings_icon=true]:checked:hover {
- image: url(:/gui/icons/scopy-default/icons/gear_wheel_pressed.svg);
+ image: url(:/gui/icons/&icon_theme_folder&/icons/gear_wheel_pressed.svg);
 }
 QPushButton[settings_icon=true]:checked {
- image: url(:/gui/icons/scopy-default/icons/setup3_checked_hover.svg);
+ image: url(:/gui/icons/&icon_theme_folder&/icons/setup3_checked_hover.svg);
 }
 QPushButton[settings_icon=true]:!checked {
- image: url(:/gui/icons/scopy-default/icons/setup3_unchecked.svg);
+ image: url(:/gui/icons/&icon_theme_folder&/icons/setup3_unchecked.svg);
 }
 QPushButton[settings_icon=true]:!checked:hover {
- image: url(:/gui/icons/scopy-default/icons/setup3_unchecked_hover.svg);
+ image: url(:/gui/icons/&icon_theme_folder&/icons/setup3_unchecked_hover.svg);
 }
 QPushButton[settings_icon=true]:checked:hover {
- image: url(:/gui/icons/scopy-default/icons/setup3_checked_hover.svg);
+ image: url(:/gui/icons/&icon_theme_folder&/icons/setup3_checked_hover.svg);
 }
 QHeaderView::section {
  background-color: transparent;
@@ -405,7 +411,7 @@ scopy--ChannelWidget QWidget#widget {
  border-radius: 4px;
 }
 scopy--ChannelWidget QWidget#widget[selected=true] {
- background-color: #99&color_default_hexcode&;
+ background-color: #99&color_inverse_hexcode&;
 }
 .scopy--ChannelWidget QWidget#widget::hover {
 background-color: #3C&color_inverse_hexcode&;
@@ -520,25 +526,24 @@ scopy--DropdownSwitchList QCheckBox::indicator {
  height: 16px;
  subcontrol-position: center;
 }
-
 QPushButton[stopButton=true] {
  background-repeat: no-repeat;
  background-position: center center;
 }
 QPushButton[stopButton=true]:enabled {
- background-image: url(:/gui/icons/scopy-default/icons/play_stop.svg);
+ background-image: url(:/gui/icons/&icon_theme_folder&/icons/play_stop.svg);
 }
 QPushButton[stopButton=true][disabled=true][enabled=false] {
- background-image: url(:/gui/icons/scopy-default/icons/play_stop.svg);
+ background-image: url(:/gui/icons/&icon_theme_folder&/icons/play_stop.svg);
 }
 QPushButton[stopButton=true]:checked {
  background-image: url(:/gui/icons/play_green.svg);
 }
 QPushButton[userNote=true] {
- background-image: url(:/gui/icons/scopy-default/icons/note_unchecked.svg);
+ background-image: url(:/gui/icons/&icon_theme_folder&/icons/note_unchecked.svg);
 }
 QPushButton[userNote=true]:checked {
- background-image: url(:/gui/icons/scopy-default/icons/note_checked.svg);
+ background-image: url(:/gui/icons/&icon_theme_folder&/icons/note_checked.svg);
 }
 
 *[has_frame=true] {

@@ -43,6 +43,7 @@ public:
 
 public Q_SLOTS:
 	void update();
+	void onToggle(bool en);
 
 protected:
 	void init();

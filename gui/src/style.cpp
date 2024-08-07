@@ -18,14 +18,15 @@ using namespace scopy;
 Style *Style::pinstance_{nullptr};
 QJsonDocument *Style::m_global_json{nullptr};
 QJsonDocument *Style::m_theme_json{nullptr};
+QMap<QString, QString> *Style::m_styleMap{new QMap<QString, QString>()};
 
 Style::Style(QObject *parent)
 	: QObject(parent)
 	, m_globalJsonPath("style/json/global.json")
 	, m_themeJsonPath("style/json/dark.json")
-	, m_qssGlobalFilePath("style/qss/global.qss")
+	, m_qssGlobalFile("global")
 	, m_qssFolderPath("style/qss")
-	, m_m2kqssPath("style/qss/m2k.qss")
+	, m_m2kqssFile("m2k")
 {
 	init();
 }
@@ -54,13 +55,51 @@ void Style::init(QString theme)
 	setTheme(theme);
 }
 
-void Style::setStyle(QWidget *widget, const char *style) { widget->setProperty(style, true); }
+void Style::setStyle(QWidget *widget, const char *style, QVariant value, bool force)
+{
+	if(!m_styleMap->contains(style)) {
+		qCritical("Style: Failed to set style: %s to widget: %s", widget->objectName().toStdString().c_str(),
+			  style);
+	}
+
+	// set property stylesheet directly to the widget
+	// this may be used if the property was overwritten or was not recognized
+	if(force || !isProperty(style)) {
+		widget->setStyleSheet(widget->styleSheet() + "\n" + m_styleMap->value(style));
+	}
+
+	widget->setProperty(style, value);
+
+	// update widget
+	widget->style()->unpolish(widget);
+	widget->style()->polish(widget);
+	QEvent event(QEvent::StyleChange);
+	QApplication::sendEvent(widget, &event);
+	widget->update();
+	widget->updateGeometry();
+}
+
+bool Style::isProperty(QString style) { return style.contains("properties"); }
 
 QPixmap Style::getPixmap(QString pixmap, QColor color)
 {
 	if(color.isValid())
 		return Util::ChangeSVGColor(pixmap, color.name(), 1);
 	return Util::ChangeSVGColor(pixmap, getAttribute(json::theme::content_default), 1);
+}
+
+QString Style::getColorTransparent(const char *key, double transparency)
+{
+	int percent = (100 - transparency) / 100. * 255.;
+	QString color = Style::getAttribute(key);
+	QString alpha = QString::number(percent, 16);
+	if(alpha.length() == 1) {
+		alpha = "0" + alpha;
+	}
+
+	color = "#" + alpha + color.right(6);
+
+	return color;
 }
 
 QString Style::getTheme() { return QFileInfo(m_themeJsonPath).fileName().replace(".json", ""); }
@@ -79,7 +118,7 @@ bool Style::setTheme(QString theme)
 
 		m_theme_json = new QJsonDocument(QJsonDocument::fromJson(theme_data));
 
-		applyStyle();
+		genrateStyle();
 		return true;
 	}
 
@@ -135,33 +174,41 @@ QString Style::replaceAttributes(QString style, int calls_limit)
 	return style;
 }
 
-void Style::applyStyle()
+void Style::genrateStyle()
 {
 	QDirIterator it(m_qssFolderPath, QStringList() << "*.qss", QDir::Files, QDirIterator::Subdirectories);
 	QFile *file;
-	QMap<QString, QString> *map = new QMap<QString, QString>();
 
-	while (it.hasNext())
+	while(it.hasNext()) {
+		it.next();
 		file = new QFile(it.filePath());
-		std::cout << it.filePath().toStdString() << std::endl;
 		file->open(QIODevice::ReadOnly);
 		QString data = QString(file->readAll());
-		map->insert(file->fileName(), data);
+		m_styleMap->insert(QFileInfo(it.filePath()).baseName(), replaceAttributes(data));
+	}
 
-	// make py script generate all files into a folder with the name as the property
-
-//	QFile file(m_qssGlobalFilePath);
-//	file.open(QIODevice::ReadOnly);
-//	QString style = QString(file.readAll());
-//	file.close();
-
-//	m_currentStyle = replaceAttributes(style);
-//	qApp->setStyleSheet(m_currentStyle);
-//	std::cout << m_currentStyle.toStdString() << std::endl;
+	setGlobalStyle();
 }
 
-void Style::setM2KStylesheet(QWidget *widget)
+QString Style::getAllProperties()
 {
-	QString style = m_currentStyle + Style::replaceAttributes(Util::loadStylesheetFromFile(m_m2kqssPath));
-	widget->setStyleSheet(style);
+	QString style;
+	for(auto it = m_styleMap->keyValueBegin(); it != m_styleMap->keyValueEnd(); ++it) {
+		if(isProperty(it->first)) {
+			style += it->second + "\n";
+		}
+	}
+
+	return style;
 }
+
+void Style::setGlobalStyle(QWidget *widget)
+{
+	if(widget) {
+		widget->setStyleSheet(m_styleMap->value(m_qssGlobalFile));
+	} else {
+		qApp->setStyleSheet(getAllProperties() + m_styleMap->value(m_qssGlobalFile));
+	}
+}
+
+void Style::setM2KStylesheet(QWidget *widget) { widget->setStyleSheet(m_styleMap->value(m_m2kqssFile)); }
