@@ -30,9 +30,6 @@ void FFTPlotComponentChannel::deinitPlotComponent()
 		return;
 
 	auto fftplot = m_plotComponent->fftPlot();
-
-	m_fftPlotAxisHandle->deinit();
-
 	fftplot->removePlotAxisHandle(m_fftPlotAxisHandle);
 	fftplot->removePlotChannel(m_fftPlotCh);
 
