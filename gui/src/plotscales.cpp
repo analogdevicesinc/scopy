@@ -143,11 +143,19 @@ void PlotScales::initGraticule()
 			}
 		});
 	connect(m_plot, &PlotWidget::channelSelected, this, [=](PlotChannel *ch) {
-		m_x1Graticule->setAxes(ch->xAxis()->axisId(), ch->yAxis()->axisId());
-		m_x2Graticule->setAxes(ch->xAxis()->axisId(), ch->yAxis()->axisId());
+		QwtAxisId xAxisId = m_plot->xAxis()->axisId();
+		QwtAxisId yAxisId = m_plot->yAxis()->axisId();
 
-		m_y1Graticule->setAxes(ch->xAxis()->axisId(), ch->yAxis()->axisId());
-		m_y2Graticule->setAxes(ch->xAxis()->axisId(), ch->yAxis()->axisId());
+		if(ch!=nullptr){
+			xAxisId = ch->xAxis()->axisId();
+			yAxisId = ch->yAxis()->axisId();
+		}
+
+		m_x1Graticule->setAxes(xAxisId, yAxisId);
+		m_x2Graticule->setAxes(xAxisId, yAxisId);
+
+		m_y1Graticule->setAxes(xAxisId, yAxisId);
+		m_y2Graticule->setAxes(xAxisId, yAxisId);
 		m_plot->replot();
 	});
 }

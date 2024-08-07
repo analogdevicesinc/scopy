@@ -51,10 +51,17 @@ void PlotCursors::connectSignals()
 		}
 	});
 	connect(m_plot, &PlotWidget::channelSelected, this, [=](PlotChannel *ch) {
-		m_yCursors.first->setAxis(ch->yAxis());
-		m_yCursors.second->setAxis(ch->yAxis());
-		m_xCursors.first->setAxis(ch->xAxis());
-		m_xCursors.second->setAxis(ch->xAxis());
+		PlotAxis* xAxis = m_plot->xAxis();
+		PlotAxis* yAxis = m_plot->xAxis();
+
+		if(ch != nullptr) {
+			xAxis = ch->xAxis();
+			yAxis = ch->yAxis();
+		}
+		m_yCursors.first->setAxis(yAxis);
+		m_yCursors.second->setAxis(yAxis);
+		m_xCursors.first->setAxis(xAxis);
+		m_xCursors.second->setAxis(xAxis);
 		Q_EMIT update();
 	});
 }
