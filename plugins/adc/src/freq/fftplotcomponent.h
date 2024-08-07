@@ -18,6 +18,7 @@
 #include "plotinfo.h"
 #include "plotcomponent.h"
 #include "fftplotcomponentsettings.h"
+#include <gui/widgets/plotinfowidgets.h>
 
 using namespace scopy::gui;
 namespace scopy {
@@ -42,9 +43,11 @@ public:
 	FFTPlotComponentSettings *createPlotMenu(QWidget *parent);
 	FFTPlotComponentSettings *plotMenu();
 
+	FFTSamplingInfo *fftPlotInfo() const;
+
 private:
 	PlotWidget *m_fftPlot;
-	PlotInfo *m_fftInfo;
+	FFTSamplingInfo *m_fftInfo;
 
 	FFTPlotComponentSettings *m_plotMenu;
 };

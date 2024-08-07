@@ -107,6 +107,7 @@ void TimePlotComponentChannel::refreshData(bool copy)
 void TimePlotComponentChannel::onNewData(const float *xData_, const float *yData_, size_t size, bool copy)
 {
 	refreshData(copy);
+	// Q_EMIT m_plotComponent->timePlot()->newData();
 }
 
 void TimePlotComponentChannel::setXyXData(const float *xyxdata) { m_xyXData = xyxdata; }
