@@ -104,10 +104,17 @@ void CursorController::connectSignals(CursorSettings *cursorSettings)
 	connect(m_plot, &PlotWidget::addedChannel, this, &CursorController::onAddedChannel);
 	connect(m_plot, &PlotWidget::removedChannel, this, &CursorController::onRemovedChannel);
 	connect(m_plot, &PlotWidget::channelSelected, this, [=](PlotChannel *ch) {
-		plotCursorReadouts->setXFormatter(ch->xAxis()->getFormatter());
-		plotCursorReadouts->setYFormatter(ch->yAxis()->getFormatter());
-		plotCursorReadouts->setXUnits(ch->xAxis()->getUnits());
-		plotCursorReadouts->setYUnits(ch->yAxis()->getUnits());
+		PlotAxis *xAxis = m_plot->xAxis();
+		PlotAxis *yAxis = m_plot->yAxis();
+		if(ch!=nullptr) {
+			xAxis = ch->xAxis();
+			yAxis = ch->yAxis();
+		}
+
+		plotCursorReadouts->setXFormatter(xAxis->getFormatter());
+		plotCursorReadouts->setYFormatter(yAxis->getFormatter());
+		plotCursorReadouts->setXUnits(xAxis->getUnits());
+		plotCursorReadouts->setYUnits(yAxis->getUnits());
 	});
 }
 

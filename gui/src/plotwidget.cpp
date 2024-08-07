@@ -147,9 +147,9 @@ void PlotWidget::removePlotChannel(PlotChannel *ch)
 	ch->yAxis()->setVisible(false);
 	if(m_selectedChannel == ch) {
 		if(m_plotChannels.size() > 0) {
-			m_selectedChannel = m_plotChannels[0];
+			selectChannel(m_plotChannels[0]);
 		} else {
-			m_selectedChannel = nullptr;
+			selectChannel(nullptr);
 		}
 	}
 
@@ -309,12 +309,13 @@ void PlotWidget::selectChannel(PlotChannel *ch)
 	m_selectedChannel = ch;
 	showAxisLabels();
 
-	if(!m_selectedChannel)
-		return;
-
-	if(m_selectedChannel->curve()) {
-		m_selectedChannel->raise();
+	if(m_selectedChannel != nullptr) {
+		if(m_selectedChannel->curve()) {
+			m_selectedChannel->raise();
+		}
 	}
+		// return;
+
 
 	Q_EMIT channelSelected(m_selectedChannel);
 }
