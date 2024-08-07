@@ -21,6 +21,11 @@ PlotComponent::PlotComponent(QString name, uint32_t uuid, QWidget *parent)
 
 PlotComponent::~PlotComponent() {}
 
+PlotWidget *PlotComponent::plot(int idx)
+{
+	return m_plots[idx];
+}
+
 QPair<double, double> PlotComponent::xInterval()
 {
 	double min = m_plots[0]->xAxis()->min();
