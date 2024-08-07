@@ -1,5 +1,5 @@
 //This import path is relative to where scopy is build
-evaluateFile("../js/scpycommon.js")
+evaluateFile("../js/scopycommon.js")
 
 function connectionTest(){
     printToConsole("TEST CONNECTION")
