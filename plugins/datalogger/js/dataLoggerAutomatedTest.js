@@ -1,9 +1,8 @@
-//This import paht is relative to where scopy is build 
-evaluateFile("../js/scpyDefaultJsFunctions.js")
+//This import path is relative to where scopy is build
+evaluateFile("../js/scopycommon.js")
 evaluateFile("../plugins/datalogger/js/dataLoggerFunctions.js")
 
 function dataLogAndLoadTest(){
-    //TODO REPLACE WITH VAR
     const filePath = "../plugins/datalogger/js/test.csv"
 
     printToConsole("FILE IS " + filePath)
