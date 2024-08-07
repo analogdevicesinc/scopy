@@ -22,7 +22,12 @@ public:
 	TimePlotComponent *plot(uint32_t uuid);
 
 private:
+	PlotComponent* m_primary;
 	void multiPlotUpdate();
+
+	// void syncCursors();
+	void syncNavigatorAndCursors(PlotComponent*);
+	void syncAllPlotNavigatorsAndCursors();
 };
 } // namespace adc
 } // namespace scopy

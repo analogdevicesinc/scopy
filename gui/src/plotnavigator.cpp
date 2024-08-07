@@ -323,12 +323,16 @@ void PlotNavigator::removeChannel(PlotChannel *channel)
 		}
 	}
 
-	/*for(Navigator *nav : *m_navigators) {
+	QList<Navigator*> toDelete;
+	for(Navigator *nav : *m_navigators) {
 		if((xFound && nav->magnifier->getXAxis() == xAxis) || (yFound && nav->magnifier->getYAxis() == yAxis)) {
-			m_navigators->remove(nav);
-			delete nav;
+			toDelete.push_back(nav);
 		}
-	}*/
+	}
+	for(Navigator* n : toDelete) {
+		m_navigators->remove(n);
+		delete n;
+	}
 
 	if(m_channels->empty()) {
 		m_visibleZoomer->setEnabled(false);
