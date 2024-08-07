@@ -27,7 +27,6 @@ public:
 	int scaleToPixel(double pos);
 
 	void init();
-	void deinit();
 
 Q_SIGNALS:
 	void scalePosChanged(double);
