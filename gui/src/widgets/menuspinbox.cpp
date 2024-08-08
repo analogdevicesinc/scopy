@@ -7,14 +7,14 @@ namespace gui {
 
 MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, double max, bool vertical, bool left, QWidget *parent) : QWidget(parent) {
 	auto lay1 = new QVBoxLayout(this);
-	lay1->setSpacing(0);
+	lay1->setSpacing(5);
 	lay1->setMargin(0);
 
 	setLayout(lay1);
 
 	auto lay = new QHBoxLayout(this);
 
-	lay->setSpacing(0);
+	lay->setSpacing(5);
 	lay->setMargin(0);
 
 	QLayout *btnLay;
@@ -38,7 +38,7 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	btnLay->addWidget(m_plus);
 	btnLay->addWidget(m_minus);
 
-	editLay->addWidget(m_label);
+	// editLay->addWidget(m_label);
 	editLay->addWidget(m_edit);
 	editLay->addWidget(m_scaleCb);
 
