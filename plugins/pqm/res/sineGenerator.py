@@ -4,9 +4,9 @@ import os
 
 start_time = 0
 end_time = 100  # number of buffers
-sample_rate = 1000
+sample_rate = 5100
 acquisition_time = np.arange(start_time, end_time, 1 / sample_rate)
-frequency = 10
+frequency = 50
 offset = 0
 voltage_amplitude = 330
 current_amplitude = 2
@@ -54,7 +54,7 @@ while True:
     if file_size <= 0 and safety_guard >= 2:
         print(safety_guard)
         safety_guard = 0
-        bufferValues = bufferValues.astype("float32")
+        bufferValues = bufferValues.astype("int16")
         bufferValues.tofile(output_file, "")
         output_file.flush()
     time.sleep(3)
