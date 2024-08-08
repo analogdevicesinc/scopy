@@ -122,7 +122,6 @@ private:
 
 	PlotChannel *m_selectedChannel;
 
-	BufferPreviewer *m_bufferPreviewer;
 	PlotInfo *m_plotInfo;
 	PlotScales *m_plotScales;
 

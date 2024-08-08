@@ -11,6 +11,11 @@ using namespace scopy::adc;
 
 TimePlotManager::TimePlotManager(QString name, QWidget *parent) : PlotManager(name, parent){
 	m_primary = nullptr;
+
+	m_bufferpreviewer = new AnalogBufferPreviewer();
+
+	int idx = m_lay->indexOf(m_statsPanel);
+	m_lay->insertWidget(idx, m_bufferpreviewer);
 }
 
 TimePlotManager::~TimePlotManager() {}
@@ -22,6 +27,9 @@ uint32_t TimePlotManager::addPlot(QString name)
 	m_plots.append(plt);
 	if(m_primary == nullptr) {
 		m_primary = plt;
+		m_plotpreviewer = new PlotBufferPreviewer(m_primary->plot(0),m_bufferpreviewer,m_primary->plot(0));
+		int idx = m_lay->indexOf(m_statsPanel);
+		m_lay->insertWidget(idx, m_plotpreviewer);
 	}
 
 	plt->setXInterval(m_xInterval);
@@ -84,6 +92,9 @@ void TimePlotManager::multiPlotUpdate() {
 void TimePlotManager::syncNavigatorAndCursors(PlotComponent* p) {
 	if(p == m_primary)
 		return;
+
+	m_plotpreviewer = new PlotBufferPreviewer(m_primary->plot(0),m_bufferpreviewer,m_primary->plot(0));
+
 	auto plt = dynamic_cast<TimePlotComponent*>(p);
 	QSet<QwtAxisId> set;
 	set.insert(m_primary->plot(0)->xAxis()->axisId());
