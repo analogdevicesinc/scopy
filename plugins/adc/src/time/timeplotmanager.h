@@ -1,5 +1,6 @@
 #ifndef TIMEPLOTMANAGER_H
 #define TIMEPLOTMANAGER_H
+#include "plotbufferpreviewer.h"
 #include "scopy-adc_export.h"
 #include <QWidget>
 #include <interfaces.h>
@@ -23,6 +24,8 @@ public:
 
 private:
 	PlotComponent* m_primary;
+	PlotBufferPreviewer* m_plotpreviewer;
+	AnalogBufferPreviewer* m_bufferpreviewer;
 	void multiPlotUpdate();
 
 	// void syncCursors();
