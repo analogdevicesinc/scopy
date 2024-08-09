@@ -3,12 +3,27 @@
 
 #include <stylehelper.h>
 
-static int sampleRate = 1000;
+static int sampleRate = 50;
+static int calibrationRate = 20;
 static int bufferSize = 1;
 static int dataGraphSamples = 100;
 static int tempGraphSamples = 100;
 static bool running = false;
 static double *dataGraphValue;
+
+static int cycleCount = 1;
+static int samplesPerCycle = 256;
+static int totalSamplesCount = cycleCount * samplesPerCycle;
+static bool startMotor = false;
+
+static uint32_t h1MagDeviceRegister = 0x15;
+static uint32_t h2MagDeviceRegister = 0x17;
+static uint32_t h3MagDeviceRegister = 0x19;
+static uint32_t h8MagDeviceRegister = 0x1B;
+static uint32_t h1PhaseDeviceRegister = 0x16;
+static uint32_t h2PhaseDeviceRegister = 0x18;
+static uint32_t h3PhaseDeviceRegister = 0x1A;
+static uint32_t h8PhaseDeviceRegister = 0x1C;
 
 using namespace scopy;
 using namespace scopy::admt;
@@ -124,7 +139,8 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	dataGraph->setUnitOfMeasure("Degree", "°");
 	dataGraph->setAutoscale(false);
 	dataGraph->setAxisScale(QwtAxis::YLeft, -30.0, 390.0);
-	dataGraph->setNumSamples(dataGraphSamples);
+	//dataGraph->setNumSamples(dataGraphSamples);
+	dataGraph->setHistoryDuration(10.0);
 	dataGraphValue = &rotation;
 
 	QLabel *tempGraphLabel = new QLabel(historicalGraphWidget);
@@ -169,9 +185,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	graphUpdateIntervalLabel->setText("Graph Update Interval (ms)");
 	StyleHelper::MenuSmallLabel(graphUpdateIntervalLabel, "graphUpdateIntervalLabel");
 	graphUpdateIntervalLineEdit = new QLineEdit(generalSection);
-	applyTextBoxStyle(graphUpdateIntervalLineEdit);
-	applyLineEditPadding(graphUpdateIntervalLineEdit);
-	applyLineEditAlignment(graphUpdateIntervalLineEdit);
+	applyLineEditStyle(graphUpdateIntervalLineEdit);
 	graphUpdateIntervalLineEdit->setText(QString::number(sampleRate));
 
 	connectLineEditToNumber(graphUpdateIntervalLineEdit, sampleRate);
@@ -184,9 +198,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	dataSampleSizeLabel->setText("Data Sample Size");
 	StyleHelper::MenuSmallLabel(dataSampleSizeLabel, "dataSampleSizeLabel");
 	dataSampleSizeLineEdit = new QLineEdit(generalSection);
-	applyTextBoxStyle(dataSampleSizeLineEdit);
-	applyLineEditPadding(dataSampleSizeLineEdit);
-	applyLineEditAlignment(dataSampleSizeLineEdit);
+	applyLineEditStyle(dataSampleSizeLineEdit);
 	dataSampleSizeLineEdit->setText(QString::number(bufferSize));
 
 	connectLineEditToNumber(dataSampleSizeLineEdit, bufferSize);
@@ -217,9 +229,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	dataGraphSamplesLabel->setText("Samples");
 	StyleHelper::MenuSmallLabel(dataGraphSamplesLabel, "dataGraphSamplesLabel");
 	dataGraphSamplesLineEdit = new QLineEdit(generalSection);
-	applyTextBoxStyle(dataGraphSamplesLineEdit);
-	applyLineEditPadding(dataGraphSamplesLineEdit);
-	applyLineEditAlignment(dataGraphSamplesLineEdit);
+	applyLineEditStyle(dataGraphSamplesLineEdit);
 	dataGraphSamplesLineEdit->setText(QString::number(dataGraphSamples));
 
 	connectLineEditToGraphSamples(dataGraphSamplesLineEdit, dataGraphSamples, dataGraph);
@@ -240,9 +250,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	tempGraphSamplesLabel->setText("Samples");
 	StyleHelper::MenuSmallLabel(tempGraphSamplesLabel, "tempGraphSamplesLabel");
 	tempGraphSamplesLineEdit = new QLineEdit(generalSection);
-	applyTextBoxStyle(tempGraphSamplesLineEdit);
-	applyLineEditPadding(tempGraphSamplesLineEdit);
-	applyLineEditAlignment(tempGraphSamplesLineEdit);
+	applyLineEditStyle(tempGraphSamplesLineEdit);
 	tempGraphSamplesLineEdit->setText(QString::number(tempGraphSamples));
 	tempGraphSection->contentLayout()->addWidget(tempGraphSamplesLabel);
 	tempGraphSection->contentLayout()->addWidget(tempGraphSamplesLineEdit);
@@ -292,7 +300,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	connect(tabWidget, &QTabWidget::currentChanged, [=](int index){
 		tabWidget->setCurrentIndex(index);
 
-		if(index == 1) { calibrationTimer->start(sampleRate); }
+		if(index == 1) { calibrationTimer->start(calibrationRate); }
 		else { calibrationTimer->stop(); }
 	});
 }
@@ -347,10 +355,10 @@ void HarmonicCalibration::timerTask(){
 }
 
 void HarmonicCalibration::updateChannelValues(){
-	rotation = m_admtController->getChannelValue(rotationChannelName, bufferSize);
-	angle = m_admtController->getChannelValue(angleChannelName, bufferSize);
-	count = m_admtController->getChannelValue(countChannelName, bufferSize);
-	temp = m_admtController->getChannelValue(temperatureChannelName, bufferSize);
+	rotation = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), rotationChannelName, bufferSize);
+	angle = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), angleChannelName, bufferSize);
+	count = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), countChannelName, bufferSize);
+	temp = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), temperatureChannelName, bufferSize);
 }
 
 void HarmonicCalibration::updateLineEditValues(){
@@ -373,6 +381,19 @@ void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, int& vari
     connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit]() {
         bool ok;
         int value = lineEdit->text().toInt(&ok);
+        if (ok) {
+            variable = value;
+        } else {
+            lineEdit->setText(QString::number(variable));
+        }
+    });
+}
+
+void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, double& variable)
+{
+    connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit]() {
+        bool ok;
+        double value = lineEdit->text().toDouble(&ok);
         if (ok) {
             variable = value;
         } else {
@@ -416,7 +437,7 @@ void HarmonicCalibration::connectMenuComboToGraphDirection(MenuCombo* menuCombo,
 
 void HarmonicCalibration::changeGraphColorByChannelName(Sismograph* graph, const char* channelName)
 {
-	int index = m_admtController->getChannelIndex(channelName);
+	int index = m_admtController->getChannelIndex(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), channelName);
 	if(index > -1){
 		graph->setColor(StyleHelper::getColor( QString::fromStdString("CH" + std::to_string(index) )));
 	}
@@ -460,7 +481,254 @@ void HarmonicCalibration::connectMenuComboToGraphChannel(MenuCombo* menuCombo, S
 
 ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 {
+	initializeMotor();
 	ToolTemplate *tool = new ToolTemplate(this);
+
+	#pragma region Motor Attributes Widget
+	QScrollArea *motorAttributesScroll = new QScrollArea();
+	QWidget *motorAttributesWidget = new QWidget();
+	QVBoxLayout *motorAttributesLayout = new QVBoxLayout(motorAttributesWidget);
+	motorAttributesScroll->setWidgetResizable(true);
+	motorAttributesScroll->setWidget(motorAttributesWidget);
+	motorAttributesWidget->setLayout(motorAttributesLayout);
+	
+	// amax
+	MenuSectionWidget *amaxSectionWidget = new MenuSectionWidget(motorAttributesWidget);
+	MenuCollapseSection *amaxCollapseSection = new MenuCollapseSection("amax", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, amaxSectionWidget);
+	amaxSectionWidget->contentLayout()->addWidget(amaxCollapseSection);
+	motorAmaxValueLabel = new QLabel("-", amaxSectionWidget);
+	StyleHelper::MenuSmallLabel(motorAmaxValueLabel);
+	readMotorAttributeValue(ADMTController::MotorAttribute::AMAX, &amax);
+	updateLabelValue(motorAmaxValueLabel, ADMTController::MotorAttribute::AMAX);
+	QLineEdit *motorAmaxLineEdit = new QLineEdit(amaxSectionWidget);
+	applyLineEditStyle(motorAmaxLineEdit);
+	motorAmaxLineEdit->setText(QString::number(amax));
+	connectLineEditToNumber(motorAmaxLineEdit, amax);
+	QWidget *motorAmaxButtonGroupWidget = new QWidget(amaxSectionWidget);
+	QHBoxLayout *motorAmaxButtonGroupLayout = new QHBoxLayout(motorAmaxButtonGroupWidget);
+	motorAmaxButtonGroupWidget->setLayout(motorAmaxButtonGroupLayout);
+	motorAmaxButtonGroupLayout->setMargin(0);
+	motorAmaxButtonGroupLayout->setSpacing(10);
+	QPushButton *readMotorAmaxButton = new QPushButton("Read", motorAmaxButtonGroupWidget);
+	StyleHelper::BlueButton(readMotorAmaxButton);
+	connect(readMotorAmaxButton, &QPushButton::pressed, this, [=]{
+		readMotorAttributeValue(ADMTController::MotorAttribute::AMAX, &amax);
+		updateLabelValue(motorAmaxValueLabel, ADMTController::MotorAttribute::AMAX);
+	});
+	QPushButton *writeMotorAmaxButton = new QPushButton("Write", motorAmaxButtonGroupWidget);
+	StyleHelper::BlueButton(writeMotorAmaxButton);
+	connect(writeMotorAmaxButton, &QPushButton::pressed, this, [=]{
+		writeMotorAttributeValue(ADMTController::MotorAttribute::AMAX, amax);
+		readMotorAttributeValue(ADMTController::MotorAttribute::AMAX, &amax);
+		updateLabelValue(motorAmaxValueLabel, ADMTController::MotorAttribute::AMAX);
+	});
+	motorAmaxButtonGroupLayout->addWidget(readMotorAmaxButton);
+	motorAmaxButtonGroupLayout->addWidget(writeMotorAmaxButton);
+	amaxCollapseSection->contentLayout()->setSpacing(10);
+	amaxCollapseSection->contentLayout()->addWidget(motorAmaxValueLabel);
+	amaxCollapseSection->contentLayout()->addWidget(motorAmaxLineEdit);
+	amaxCollapseSection->contentLayout()->addWidget(motorAmaxButtonGroupWidget);
+
+	//rotate_vmax
+	MenuSectionWidget *rotateVmaxSectionWidget = new MenuSectionWidget(motorAttributesWidget);
+	MenuCollapseSection *rotateVmaxCollapseSection = new MenuCollapseSection("rotate_vmax", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, rotateVmaxSectionWidget);
+	rotateVmaxSectionWidget->contentLayout()->addWidget(rotateVmaxCollapseSection);
+	motorRotateVmaxValueLabel = new QLabel("-", rotateVmaxSectionWidget);
+	StyleHelper::MenuSmallLabel(motorRotateVmaxValueLabel);
+	readMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, &rotate_vmax);
+	updateLabelValue(motorRotateVmaxValueLabel, ADMTController::MotorAttribute::ROTATE_VMAX);
+	QLineEdit *motorRotateVmaxLineEdit = new QLineEdit(rotateVmaxSectionWidget);
+	applyLineEditStyle(motorRotateVmaxLineEdit);
+	motorRotateVmaxLineEdit->setText(QString::number(rotate_vmax));
+	connectLineEditToNumber(motorRotateVmaxLineEdit, rotate_vmax);
+	QWidget *motorRotateVmaxButtonGroupWidget = new QWidget(rotateVmaxSectionWidget);
+	QHBoxLayout *motorRotateVmaxButtonGroupLayout = new QHBoxLayout(motorRotateVmaxButtonGroupWidget);
+	motorRotateVmaxButtonGroupWidget->setLayout(motorRotateVmaxButtonGroupLayout);
+	motorRotateVmaxButtonGroupLayout->setMargin(0);
+	motorRotateVmaxButtonGroupLayout->setSpacing(10);
+	QPushButton *readMotorRotateVmaxButton = new QPushButton("Read", motorRotateVmaxButtonGroupWidget);
+	StyleHelper::BlueButton(readMotorRotateVmaxButton);
+	connect(readMotorRotateVmaxButton, &QPushButton::pressed, this, [=]{
+		readMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, &rotate_vmax);
+		updateLabelValue(motorRotateVmaxValueLabel, ADMTController::MotorAttribute::ROTATE_VMAX);
+	});
+	QPushButton *writeMotorRotateVmaxButton = new QPushButton("Write", motorRotateVmaxButtonGroupWidget);
+	StyleHelper::BlueButton(writeMotorRotateVmaxButton);
+	connect(writeMotorRotateVmaxButton, &QPushButton::pressed, this, [=]{
+		writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
+		readMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, &rotate_vmax);
+		updateLabelValue(motorRotateVmaxValueLabel, ADMTController::MotorAttribute::ROTATE_VMAX);
+	});
+	motorRotateVmaxButtonGroupLayout->addWidget(readMotorRotateVmaxButton);
+	motorRotateVmaxButtonGroupLayout->addWidget(writeMotorRotateVmaxButton);
+	rotateVmaxCollapseSection->contentLayout()->setSpacing(10);
+	rotateVmaxCollapseSection->contentLayout()->addWidget(motorRotateVmaxValueLabel);
+	rotateVmaxCollapseSection->contentLayout()->addWidget(motorRotateVmaxLineEdit);
+	rotateVmaxCollapseSection->contentLayout()->addWidget(motorRotateVmaxButtonGroupWidget);
+
+	//dmax
+	MenuSectionWidget *dmaxSectionWidget = new MenuSectionWidget(motorAttributesWidget);
+	MenuCollapseSection *dmaxCollapseSection = new MenuCollapseSection("dmax", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, dmaxSectionWidget);
+	dmaxSectionWidget->contentLayout()->addWidget(dmaxCollapseSection);
+	motorDmaxValueLabel = new QLabel("-", dmaxSectionWidget);
+	StyleHelper::MenuSmallLabel(motorDmaxValueLabel);
+	readMotorAttributeValue(ADMTController::MotorAttribute::DMAX, &dmax);
+	updateLabelValue(motorDmaxValueLabel, ADMTController::MotorAttribute::DMAX);
+	QLineEdit *motorDmaxLineEdit = new QLineEdit(dmaxSectionWidget);
+	applyLineEditStyle(motorDmaxLineEdit);
+	motorDmaxLineEdit->setText(QString::number(dmax));
+	connectLineEditToNumber(motorDmaxLineEdit, dmax);
+	QWidget *motorDmaxButtonGroupWidget = new QWidget(dmaxSectionWidget);
+	QHBoxLayout *motorDmaxButtonGroupLayout = new QHBoxLayout(motorDmaxButtonGroupWidget);
+	motorDmaxButtonGroupWidget->setLayout(motorDmaxButtonGroupLayout);
+	motorDmaxButtonGroupLayout->setMargin(0);
+	motorDmaxButtonGroupLayout->setSpacing(10);
+	QPushButton *readMotorDmaxButton = new QPushButton("Read", motorDmaxButtonGroupWidget);
+	StyleHelper::BlueButton(readMotorDmaxButton);
+	connect(readMotorDmaxButton, &QPushButton::pressed, this, [=]{
+		readMotorAttributeValue(ADMTController::MotorAttribute::DMAX, &dmax);
+		updateLabelValue(motorDmaxValueLabel, ADMTController::MotorAttribute::DMAX);
+	});
+	QPushButton *writeMotorDmaxButton = new QPushButton("Write", motorDmaxButtonGroupWidget);
+	StyleHelper::BlueButton(writeMotorDmaxButton);
+	connect(writeMotorDmaxButton, &QPushButton::pressed, this, [=]{
+		writeMotorAttributeValue(ADMTController::MotorAttribute::DMAX, dmax);
+		readMotorAttributeValue(ADMTController::MotorAttribute::DMAX, &dmax);
+		updateLabelValue(motorDmaxValueLabel, ADMTController::MotorAttribute::DMAX);
+	});
+	motorDmaxButtonGroupLayout->addWidget(readMotorDmaxButton);
+	motorDmaxButtonGroupLayout->addWidget(writeMotorDmaxButton);
+	dmaxCollapseSection->contentLayout()->setSpacing(10);
+	dmaxCollapseSection->contentLayout()->addWidget(motorDmaxValueLabel);
+	dmaxCollapseSection->contentLayout()->addWidget(motorDmaxLineEdit);
+	dmaxCollapseSection->contentLayout()->addWidget(motorDmaxButtonGroupWidget);
+
+	//disable
+	MenuSectionWidget *disableSectionWidget = new MenuSectionWidget(motorAttributesWidget);
+	MenuCollapseSection *disableCollapseSection = new MenuCollapseSection("disable", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, disableSectionWidget);
+	disableSectionWidget->contentLayout()->addWidget(disableCollapseSection);
+	// motorDisableValueLabel = new QLabel("-", disableSectionWidget);
+	// readMotorAttributeValue(ADMTController::MotorAttribute::DISABLE, &disable);
+	// updateLabelValue(motorDisableValueLabel, ADMTController::MotorAttribute::DISABLE);
+	QPushButton *writeMotorDisableButton = new QPushButton("Disable", disableSectionWidget);
+	StyleHelper::BlueButton(writeMotorDisableButton);
+	connect(writeMotorDisableButton, &QPushButton::pressed, this, [=]{
+		writeMotorAttributeValue(ADMTController::MotorAttribute::DISABLE, 1);
+	});
+	disableCollapseSection->contentLayout()->setSpacing(10);
+	// disableCollapseSection->contentLayout()->addWidget(motorDisableValueLabel);
+	// disableCollapseSection->contentLayout()->addWidget(motorDisableLineEdit);
+	disableCollapseSection->contentLayout()->addWidget(writeMotorDisableButton);
+
+	//target_pos
+	MenuSectionWidget *targetPosSectionWidget = new MenuSectionWidget(motorAttributesWidget);
+	MenuCollapseSection *targetPosCollapseSection = new MenuCollapseSection("target_pos", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, targetPosSectionWidget);
+	targetPosSectionWidget->contentLayout()->addWidget(targetPosCollapseSection);
+	motorTargetPosValueLabel = new QLabel("-", targetPosSectionWidget);
+	StyleHelper::MenuSmallLabel(motorTargetPosValueLabel);
+	readMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, &target_pos);
+	updateLabelValue(motorTargetPosValueLabel, ADMTController::MotorAttribute::TARGET_POS);
+	QLineEdit *motorTargetPosLineEdit = new QLineEdit(targetPosSectionWidget);
+	applyLineEditStyle(motorTargetPosLineEdit);
+	motorTargetPosLineEdit->setText(QString::number(target_pos));
+	connectLineEditToNumber(motorTargetPosLineEdit, target_pos);
+	QWidget *motorTargetPosButtonGroupWidget = new QWidget(targetPosSectionWidget);
+	QHBoxLayout *motorTargetPosButtonGroupLayout = new QHBoxLayout(motorTargetPosButtonGroupWidget);
+	motorTargetPosButtonGroupWidget->setLayout(motorTargetPosButtonGroupLayout);
+	motorTargetPosButtonGroupLayout->setMargin(0);
+	motorTargetPosButtonGroupLayout->setSpacing(10);
+	QPushButton *readMotorTargetPosButton = new QPushButton("Read", motorTargetPosButtonGroupWidget);
+	StyleHelper::BlueButton(readMotorTargetPosButton);
+	connect(readMotorTargetPosButton, &QPushButton::pressed, this, [=]{
+		readMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, &target_pos);
+		updateLabelValue(motorTargetPosValueLabel, ADMTController::MotorAttribute::TARGET_POS);
+	});
+	QPushButton *writeMotorTargetPosButton = new QPushButton("Write", motorTargetPosButtonGroupWidget);
+	StyleHelper::BlueButton(writeMotorTargetPosButton);
+	connect(writeMotorTargetPosButton, &QPushButton::pressed, this, [=]{
+		writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, target_pos);
+		readMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, &target_pos);
+		updateLabelValue(motorTargetPosValueLabel, ADMTController::MotorAttribute::TARGET_POS);
+	});
+	motorTargetPosButtonGroupLayout->addWidget(readMotorTargetPosButton);
+	motorTargetPosButtonGroupLayout->addWidget(writeMotorTargetPosButton);
+	targetPosCollapseSection->contentLayout()->setSpacing(10);
+	targetPosCollapseSection->contentLayout()->addWidget(motorTargetPosValueLabel);
+	targetPosCollapseSection->contentLayout()->addWidget(motorTargetPosLineEdit);
+	targetPosCollapseSection->contentLayout()->addWidget(motorTargetPosButtonGroupWidget);
+
+	//current_pos
+	MenuSectionWidget *currentPosSectionWidget = new MenuSectionWidget(motorAttributesWidget);
+	MenuCollapseSection *currentPosCollapseSection = new MenuCollapseSection("current_pos", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, currentPosSectionWidget);
+	currentPosSectionWidget->contentLayout()->addWidget(currentPosCollapseSection);
+	motorCurrentPosValueLabel = new QLabel("-", currentPosSectionWidget);
+	StyleHelper::MenuSmallLabel(motorCurrentPosValueLabel);
+	readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, &current_pos);
+	updateLabelValue(motorCurrentPosValueLabel, ADMTController::MotorAttribute::CURRENT_POS);
+	QWidget *motorCurrentPosButtonGroupWidget = new QWidget(currentPosSectionWidget);
+	QHBoxLayout *motorCurrentPosButtonGroupLayout = new QHBoxLayout(motorCurrentPosButtonGroupWidget);
+	motorCurrentPosButtonGroupWidget->setLayout(motorCurrentPosButtonGroupLayout);
+	motorCurrentPosButtonGroupLayout->setMargin(0);
+	motorCurrentPosButtonGroupLayout->setSpacing(10);
+	QPushButton *readMotorCurrentPosButton = new QPushButton("Read", motorCurrentPosButtonGroupWidget);
+	StyleHelper::BlueButton(readMotorCurrentPosButton);
+	connect(readMotorCurrentPosButton, &QPushButton::pressed, this, [=]{
+		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, &current_pos);
+		updateLabelValue(motorCurrentPosValueLabel, ADMTController::MotorAttribute::CURRENT_POS);
+	});
+	motorCurrentPosButtonGroupLayout->addWidget(readMotorCurrentPosButton);
+	currentPosCollapseSection->contentLayout()->setSpacing(10);
+	currentPosCollapseSection->contentLayout()->addWidget(motorCurrentPosValueLabel);
+	currentPosCollapseSection->contentLayout()->addWidget(motorCurrentPosButtonGroupWidget);
+
+	//ramp_mode
+	MenuSectionWidget *rampModeSectionWidget = new MenuSectionWidget(motorAttributesWidget);
+	MenuCollapseSection *rampModeCollapseSection = new MenuCollapseSection("ramp_mode", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, rampModeSectionWidget);
+	rampModeSectionWidget->contentLayout()->addWidget(rampModeCollapseSection);
+	motorRampModeValueLabel = new QLabel("-", rampModeSectionWidget);
+	StyleHelper::MenuSmallLabel(motorRampModeValueLabel);
+	readMotorAttributeValue(ADMTController::MotorAttribute::RAMP_MODE, &ramp_mode);
+	updateLabelValue(motorRampModeValueLabel, ADMTController::MotorAttribute::RAMP_MODE);
+	QLineEdit *motorRampModeLineEdit = new QLineEdit(rampModeSectionWidget);
+	applyLineEditStyle(motorRampModeLineEdit);
+	motorRampModeLineEdit->setText(QString::number(ramp_mode));
+	connectLineEditToNumber(motorRampModeLineEdit, ramp_mode);
+	QWidget *motorRampModeButtonGroupWidget = new QWidget(rampModeSectionWidget);
+	QHBoxLayout *motorRampModeButtonGroupLayout = new QHBoxLayout(motorRampModeButtonGroupWidget);
+	motorRampModeButtonGroupWidget->setLayout(motorRampModeButtonGroupLayout);
+	motorRampModeButtonGroupLayout->setMargin(0);
+	motorRampModeButtonGroupLayout->setSpacing(10);
+	QPushButton *readMotorRampModeButton = new QPushButton("Read", motorRampModeButtonGroupWidget);
+	StyleHelper::BlueButton(readMotorRampModeButton);
+	connect(readMotorRampModeButton, &QPushButton::pressed, this, [=]{
+		readMotorAttributeValue(ADMTController::MotorAttribute::RAMP_MODE, &ramp_mode);
+		updateLabelValue(motorRampModeValueLabel, ADMTController::MotorAttribute::RAMP_MODE);
+	});
+	QPushButton *writeMotorRampModeButton = new QPushButton("Write", motorRampModeButtonGroupWidget);
+	StyleHelper::BlueButton(writeMotorRampModeButton);
+	connect(writeMotorRampModeButton, &QPushButton::pressed, this, [=]{
+		writeMotorAttributeValue(ADMTController::MotorAttribute::RAMP_MODE, ramp_mode);
+		readMotorAttributeValue(ADMTController::MotorAttribute::RAMP_MODE, &ramp_mode);
+		updateLabelValue(motorRampModeValueLabel, ADMTController::MotorAttribute::RAMP_MODE);
+	});
+	motorRampModeButtonGroupLayout->addWidget(readMotorRampModeButton);
+	motorRampModeButtonGroupLayout->addWidget(writeMotorRampModeButton);
+	rampModeCollapseSection->contentLayout()->setSpacing(10);
+	rampModeCollapseSection->contentLayout()->addWidget(motorRampModeValueLabel);
+	rampModeCollapseSection->contentLayout()->addWidget(motorRampModeLineEdit);
+	rampModeCollapseSection->contentLayout()->addWidget(motorRampModeButtonGroupWidget);
+
+	motorAttributesLayout->setMargin(0);
+	motorAttributesLayout->setSpacing(10);
+	motorAttributesLayout->addWidget(amaxSectionWidget);
+	motorAttributesLayout->addWidget(rotateVmaxSectionWidget);
+	motorAttributesLayout->addWidget(dmaxSectionWidget);
+	motorAttributesLayout->addWidget(disableSectionWidget);
+	motorAttributesLayout->addWidget(targetPosSectionWidget);
+	motorAttributesLayout->addWidget(currentPosSectionWidget);
+	motorAttributesLayout->addWidget(rampModeSectionWidget);
+	motorAttributesLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	#pragma endregion
 
 	#pragma region Calibration Data Graph Widget
 	QWidget *calibrationDataGraphWidget = new QWidget();
@@ -476,25 +744,68 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationRawDataGraphLayout->setSpacing(4);
 	QLabel *calibrationRawDataGraphLabel = new QLabel("Raw Data", calibrationRawDataGraphWidget);
 	StyleHelper::MenuCollapseHeaderLabel(calibrationRawDataGraphLabel, "calibrationRawDataGraphLabel");
-	PlotWidget *calibrationRawDataPlotWidget = new PlotWidget();
+	calibrationRawDataPlotWidget = new Sismograph();
+	// PlotWidget *calibrationRawDataPlotWidget = new PlotWidget();
+	calibrationRawDataPlotWidget->setColor(StyleHelper::getColor("ScopyBlue"));
+	calibrationRawDataPlotWidget->setPlotAxisXTitle("Degree (°)");
+	calibrationRawDataPlotWidget->setUnitOfMeasure("Degree", "°");
+	calibrationRawDataPlotWidget->setAutoscale(false);
+	calibrationRawDataPlotWidget->setAxisScale(QwtAxis::YLeft, -30.0, 390.0);
+	calibrationRawDataPlotWidget->setHistoryDuration(120.0);
+
 	calibrationRawDataPlotWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 	calibrationRawDataGraphLayout->addWidget(calibrationRawDataGraphLabel);
 	calibrationRawDataGraphLayout->addWidget(calibrationRawDataPlotWidget);
 
-	QWidget *calibrationFFTDataGraphWidget = new QWidget(calibrationDataGraphWidget);
-	QVBoxLayout *calibrationFFTDataGraphLayout = new QVBoxLayout(calibrationFFTDataGraphWidget);
-	calibrationFFTDataGraphWidget->setLayout(calibrationFFTDataGraphLayout);
-	calibrationFFTDataGraphLayout->setMargin(0);
-	calibrationFFTDataGraphLayout->setSpacing(4);
-	QLabel *calibrationFFTDataGraphLabel = new QLabel("FFT Data", calibrationFFTDataGraphWidget);
-	StyleHelper::MenuCollapseHeaderLabel(calibrationFFTDataGraphLabel, "calibrationFFTDataGraphLabel");
-	PlotWidget *calibrationFFTDataPlotWidget = new PlotWidget();
-	calibrationFFTDataPlotWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-	calibrationFFTDataGraphLayout->addWidget(calibrationFFTDataGraphLabel);
-	calibrationFFTDataGraphLayout->addWidget(calibrationFFTDataPlotWidget);
+	// QWidget *calibrationFFTDataGraphWidget = new QWidget(calibrationDataGraphWidget);
+	// QVBoxLayout *calibrationFFTDataGraphLayout = new QVBoxLayout(calibrationFFTDataGraphWidget);
+	// calibrationFFTDataGraphWidget->setLayout(calibrationFFTDataGraphLayout);
+	// calibrationFFTDataGraphLayout->setMargin(0);
+	// calibrationFFTDataGraphLayout->setSpacing(4);
+	// QLabel *calibrationFFTDataGraphLabel = new QLabel("FFT Data", calibrationFFTDataGraphWidget);
+	// StyleHelper::MenuCollapseHeaderLabel(calibrationFFTDataGraphLabel, "calibrationFFTDataGraphLabel");
+	// PlotWidget *calibrationFFTDataPlotWidget = new PlotWidget();
+	// calibrationFFTDataPlotWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+	// calibrationFFTDataGraphLayout->addWidget(calibrationFFTDataGraphLabel);
+	// calibrationFFTDataGraphLayout->addWidget(calibrationFFTDataPlotWidget);
+
+	#pragma region Raw Data Section Widget
+	QWidget *rawDataContainerWidget = new QWidget(calibrationDataGraphWidget);
+	QHBoxLayout *rawDataContainerLayout = new QHBoxLayout(rawDataContainerWidget);
+	rawDataContainerWidget->setLayout(rawDataContainerLayout);
+
+	MenuSectionWidget *rawDataWidget = new MenuSectionWidget(rawDataContainerWidget);
+	MenuCollapseSection *rawDataSection = new MenuCollapseSection("Raw Data", MenuCollapseSection::MHCW_NONE, calibrationDataGraphWidget);
+	rawDataWidget->contentLayout()->setSpacing(10);
+	rawDataWidget->contentLayout()->addWidget(rawDataSection);
+	rawDataSection->contentLayout()->setSpacing(10);
+
+	rawDataListWidget = new QListWidget(rawDataWidget);
+	rawDataSection->contentLayout()->addWidget(rawDataListWidget);
+
+	#pragma region Logs Section Widget
+	MenuSectionWidget *logsSectionWidget = new MenuSectionWidget(rawDataContainerWidget);
+	MenuCollapseSection *logsCollapseSection = new MenuCollapseSection("Logs", MenuCollapseSection::MHCW_NONE, logsSectionWidget);
+	logsSectionWidget->contentLayout()->setSpacing(10);
+	logsSectionWidget->contentLayout()->addWidget(logsCollapseSection);
+
+	logsPlainTextEdit = new QPlainTextEdit(logsSectionWidget);
+	logsPlainTextEdit->setReadOnly(true);
+
+	logsCollapseSection->contentLayout()->setSpacing(10);
+	logsCollapseSection->contentLayout()->addWidget(logsPlainTextEdit);
+	#pragma endregion
+
+	rawDataContainerLayout->setMargin(0);
+	rawDataContainerLayout->setSpacing(10);
+	rawDataContainerLayout->addWidget(rawDataWidget);
+	rawDataContainerLayout->addWidget(logsSectionWidget);
+
+	#pragma endregion
 
 	calibrationDataGraphLayout->addWidget(calibrationRawDataGraphWidget);
-	calibrationDataGraphLayout->addWidget(calibrationFFTDataGraphWidget);
+	// calibrationDataGraphLayout->addWidget(calibrationFFTDataGraphWidget);
+	calibrationDataGraphLayout->addWidget(rawDataContainerWidget);
 	#pragma endregion
 	
 	#pragma region Calibration Settings Widget
@@ -551,16 +862,18 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	h1RowContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	h1RowLayout->setContentsMargins(12, 4, 12, 4);
 	QLabel *calibrationH1Label = new QLabel("H1", calibrationCalculatedCoeffWidget);
-	QLabel *calibrationH1MagLabel = new QLabel("999.99°", calibrationCalculatedCoeffWidget);
-	QLabel *calibrationH1PhaseLabel = new QLabel("Φ 999.99", calibrationCalculatedCoeffWidget);
-	calibrationH1Label->setFixedWidth(52);
-	applyLabelStyle(calibrationH1Label, "LabelText", true);
-	applyLabelStyle(calibrationH1MagLabel, "CH0");
-	applyLabelStyle(calibrationH1PhaseLabel, "CH1");
+	calibrationH1MagLabel = new QLabel("--.--°", calibrationCalculatedCoeffWidget);
+	calibrationH1PhaseLabel = new QLabel("Φ --.--", calibrationCalculatedCoeffWidget);
+	applyTextStyle(calibrationH1Label, "LabelText", true);
+	applyTextStyle(calibrationH1MagLabel, "CH0");
+	applyTextStyle(calibrationH1PhaseLabel, "CH1");
+	calibrationH1Label->setFixedWidth(24);
+	calibrationH1MagLabel->setContentsMargins(0, 0, 48, 0);
+	calibrationH1PhaseLabel->setFixedWidth(56);
 
 	h1RowLayout->addWidget(calibrationH1Label);
-	h1RowLayout->addWidget(calibrationH1MagLabel);
-	h1RowLayout->addWidget(calibrationH1PhaseLabel, 0, Qt::AlignRight);
+	h1RowLayout->addWidget(calibrationH1MagLabel, 0, Qt::AlignRight);
+	h1RowLayout->addWidget(calibrationH1PhaseLabel);
 
 	// H2
 	QWidget *h2RowContainer = new QWidget(calibrationCalculatedCoeffWidget);
@@ -571,16 +884,18 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	h2RowContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	h2RowLayout->setContentsMargins(12, 4, 12, 4);
 	QLabel *calibrationH2Label = new QLabel("H2", calibrationCalculatedCoeffWidget);
-	QLabel *calibrationH2MagLabel = new QLabel("999.99°", calibrationCalculatedCoeffWidget);
-	QLabel *calibrationH2PhaseLabel = new QLabel("Φ 999.99", calibrationCalculatedCoeffWidget);
-	calibrationH2Label->setFixedWidth(52);
-	applyLabelStyle(calibrationH2Label, "LabelText", true);
-	applyLabelStyle(calibrationH2MagLabel, "CH0");
-	applyLabelStyle(calibrationH2PhaseLabel, "CH1");
+	calibrationH2MagLabel = new QLabel("--.--°", calibrationCalculatedCoeffWidget);
+	calibrationH2PhaseLabel = new QLabel("Φ --.--", calibrationCalculatedCoeffWidget);
+	applyTextStyle(calibrationH2Label, "LabelText", true);
+	applyTextStyle(calibrationH2MagLabel, "CH0");
+	applyTextStyle(calibrationH2PhaseLabel, "CH1");
+	calibrationH2Label->setFixedWidth(24);
+	calibrationH2MagLabel->setContentsMargins(0, 0, 48, 0);
+	calibrationH2PhaseLabel->setFixedWidth(56);
 
 	h2RowLayout->addWidget(calibrationH2Label);
-	h2RowLayout->addWidget(calibrationH2MagLabel);
-	h2RowLayout->addWidget(calibrationH2PhaseLabel, 0, Qt::AlignRight);
+	h2RowLayout->addWidget(calibrationH2MagLabel, 0, Qt::AlignRight);
+	h2RowLayout->addWidget(calibrationH2PhaseLabel);
 
 	// H3
 	QWidget *h3RowContainer = new QWidget(calibrationCalculatedCoeffWidget);
@@ -591,16 +906,18 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	h3RowContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	h3RowLayout->setContentsMargins(12, 4, 12, 4);
 	QLabel *calibrationH3Label = new QLabel("H3", calibrationCalculatedCoeffWidget);
-	QLabel *calibrationH3MagLabel = new QLabel("999.99°", calibrationCalculatedCoeffWidget);
-	QLabel *calibrationH3PhaseLabel = new QLabel("Φ 999.99", calibrationCalculatedCoeffWidget);
-	calibrationH3Label->setFixedWidth(52);
-	applyLabelStyle(calibrationH3Label, "LabelText", true);
-	applyLabelStyle(calibrationH3MagLabel, "CH0");
-	applyLabelStyle(calibrationH3PhaseLabel, "CH1");
+	calibrationH3MagLabel = new QLabel("--.--°", calibrationCalculatedCoeffWidget);
+	calibrationH3PhaseLabel = new QLabel("Φ --.--", calibrationCalculatedCoeffWidget);
+	applyTextStyle(calibrationH3Label, "LabelText", true);
+	applyTextStyle(calibrationH3MagLabel, "CH0");
+	applyTextStyle(calibrationH3PhaseLabel, "CH1");
+	calibrationH3Label->setFixedWidth(24);
+	calibrationH3MagLabel->setContentsMargins(0, 0, 48, 0);
+	calibrationH3PhaseLabel->setFixedWidth(56);
 
 	h3RowLayout->addWidget(calibrationH3Label);
-	h3RowLayout->addWidget(calibrationH3MagLabel);
-	h3RowLayout->addWidget(calibrationH3PhaseLabel, 0, Qt::AlignRight);
+	h3RowLayout->addWidget(calibrationH3MagLabel, 0, Qt::AlignRight);
+	h3RowLayout->addWidget(calibrationH3PhaseLabel);
 
 	// H8
 	QWidget *h8RowContainer = new QWidget(calibrationCalculatedCoeffWidget);
@@ -611,16 +928,18 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	h8RowContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	h8RowLayout->setContentsMargins(12, 4, 12, 4);
 	QLabel *calibrationH8Label = new QLabel("H8", calibrationCalculatedCoeffWidget);
-	QLabel *calibrationH8MagLabel = new QLabel("999.99°", calibrationCalculatedCoeffWidget);
-	QLabel *calibrationH8PhaseLabel = new QLabel("Φ 999.99", calibrationCalculatedCoeffWidget);
-	calibrationH8Label->setFixedWidth(52);
-	applyLabelStyle(calibrationH8Label, "LabelText", true);
-	applyLabelStyle(calibrationH8MagLabel, "CH0");
-	applyLabelStyle(calibrationH8PhaseLabel, "CH1");
+	calibrationH8MagLabel = new QLabel("--.--°", calibrationCalculatedCoeffWidget);
+	calibrationH8PhaseLabel = new QLabel("Φ --.--", calibrationCalculatedCoeffWidget);
+	applyTextStyle(calibrationH8Label, "LabelText", true);
+	applyTextStyle(calibrationH8MagLabel, "CH0");
+	applyTextStyle(calibrationH8PhaseLabel, "CH1");
+	calibrationH8Label->setFixedWidth(24);
+	calibrationH8MagLabel->setContentsMargins(0, 0, 48, 0);
+	calibrationH8PhaseLabel->setFixedWidth(56);
 
 	h8RowLayout->addWidget(calibrationH8Label);
-	h8RowLayout->addWidget(calibrationH8MagLabel);
-	h8RowLayout->addWidget(calibrationH8PhaseLabel, 0, Qt::AlignRight);
+	h8RowLayout->addWidget(calibrationH8MagLabel, 0, Qt::AlignRight);
+	h8RowLayout->addWidget(calibrationH8PhaseLabel);
 
 	calibrationCalculatedCoeffLayout->addWidget(h1RowContainer, 0, 0);
 	calibrationCalculatedCoeffLayout->addWidget(h2RowContainer, 1, 0);
@@ -684,21 +1003,22 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	QLabel *currentPositionLabel = new QLabel("Current Position", motorControlSectionWidget);
 	StyleHelper::MenuSmallLabel(currentPositionLabel, "currentPositionLabel");
 	calibrationMotorCurrentPositionLabel = new QLabel("--.--°", motorControlSectionWidget);
-	// calibrationMotorCurrentPositionLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	calibrationMotorCurrentPositionLabel->setAlignment(Qt::AlignRight);
-	applyTextBoxStyle(calibrationMotorCurrentPositionLabel);
-	applyLabelPadding(calibrationMotorCurrentPositionLabel);
+	applyLabelStyle(calibrationMotorCurrentPositionLabel);
 
 	HorizontalSpinBox *motorTargetPositionSpinBox = new HorizontalSpinBox("Target Position", 9999.99, "°", motorControlSectionWidget);
 	HorizontalSpinBox *motorVelocitySpinBox = new HorizontalSpinBox("Velocity", 9999.99, "rpm", motorControlSectionWidget);
 
-	QPushButton *calibrationStartMotorButton = new QPushButton(motorControlSectionWidget);
+	calibrationStartMotorButton = new QPushButton(motorControlSectionWidget);
 	calibrationStartMotorButton->setCheckable(true);
 	calibrationStartMotorButton->setChecked(false);
 	calibrationStartMotorButton->setText("Start Motor");
 	calibrationStartMotorButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	calibrationStartMotorButton->setFixedHeight(36);
-	connect(calibrationStartMotorButton, &QPushButton::toggled, this, [=](bool b) { calibrationStartMotorButton->setText(b ? " Stop Motor" : " Start Motor"); });
+	connect(calibrationStartMotorButton, &QPushButton::toggled, this, [=](bool b) { 
+		calibrationStartMotorButton->setText(b ? " Stop Motor" : " Start Motor"); 
+		startMotor = b;
+	});
 	QString calibrationStartMotorButtonStyle = QString(R"css(
 			QPushButton {
 				border-radius: 2px;
@@ -740,30 +1060,6 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	motorControlCollapseSection->contentLayout()->addWidget(autoCalibrateCheckBox);
 	#pragma endregion
 
-	#pragma region Raw Data Section Widget
-	MenuSectionWidget *rawDataWidget = new MenuSectionWidget(calibrationDataGraphWidget);
-	MenuCollapseSection *rawDataSection = new MenuCollapseSection("Raw Data", MenuCollapseSection::MHCW_NONE, calibrationDataGraphWidget);
-	rawDataWidget->contentLayout()->setSpacing(10);
-	rawDataWidget->contentLayout()->addWidget(rawDataSection);
-	rawDataSection->contentLayout()->setSpacing(10);
-
-	rawDataListWidget = new QListWidget(rawDataWidget);
-	rawDataSection->contentLayout()->addWidget(rawDataListWidget);
-	#pragma endregion
-
-	#pragma region Logs Section Widget
-	MenuSectionWidget *logsSectionWidget = new MenuSectionWidget(calibrationSettingsWidget);
-	MenuCollapseSection *logsCollapseSection = new MenuCollapseSection("Logs", MenuCollapseSection::MHCW_NONE, logsSectionWidget);
-	logsSectionWidget->contentLayout()->setSpacing(10);
-	logsSectionWidget->contentLayout()->addWidget(logsCollapseSection);
-
-	logsPlainTextEdit = new QPlainTextEdit(logsSectionWidget);
-	logsPlainTextEdit->setReadOnly(true);
-
-	logsCollapseSection->contentLayout()->setSpacing(10);
-	logsCollapseSection->contentLayout()->addWidget(logsPlainTextEdit);
-	#pragma endregion
-
 	#pragma region Debug Section Widget
 	MenuSectionWidget *debugSectionWidget = new MenuSectionWidget(calibrationSettingsWidget);
 	MenuCollapseSection *debugCollapseSection = new MenuCollapseSection("Debug", MenuCollapseSection::MHCW_NONE, debugSectionWidget);
@@ -782,10 +1078,15 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrateDataButton->setText("Calibrate");
 	StyleHelper::BlueButton(calibrateDataButton, "calibrateDataButton");
 
+	QPushButton *clearCalibrateDataButton = new QPushButton(debugSectionWidget);
+	clearCalibrateDataButton->setText("Clear All Data");
+	StyleHelper::BlueButton(clearCalibrateDataButton, "clearCalibrateDataButton");
+
 	debugCollapseSection->contentLayout()->setSpacing(10);
 	debugCollapseSection->contentLayout()->addWidget(addCalibrationDataButton);
 	debugCollapseSection->contentLayout()->addWidget(removeLastCalibrationDataButton);
 	debugCollapseSection->contentLayout()->addWidget(calibrateDataButton);
+	debugCollapseSection->contentLayout()->addWidget(clearCalibrateDataButton);
 	#pragma endregion
 
 	calibrationSettingsLayout->setMargin(0);
@@ -793,8 +1094,6 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationSettingsLayout->addWidget(calibrationDataSectionWidget);
 	calibrationSettingsLayout->addWidget(motorConfigurationSectionWidget);
 	calibrationSettingsLayout->addWidget(motorControlSectionWidget);
-	calibrationSettingsLayout->addWidget(rawDataWidget);
-	calibrationSettingsLayout->addWidget(logsSectionWidget);
 	calibrationSettingsLayout->addWidget(debugSectionWidget);
 	calibrationSettingsLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 	#pragma endregion
@@ -802,13 +1101,15 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tool->topContainer()->setVisible(false);
 	tool->topContainerMenuControl()->setVisible(false);
-	tool->leftContainer()->setVisible(false);
+	tool->leftContainer()->setVisible(true);
 	tool->rightContainer()->setVisible(true);
 	tool->bottomContainer()->setVisible(false);
+	tool->setLeftContainerWidth(270);
 	tool->setRightContainerWidth(270);
 	tool->openBottomContainerHelper(false);
 	tool->openTopContainerHelper(false);
 
+	tool->leftStack()->add("motorAttributesScroll", motorAttributesScroll);
 	tool->addWidgetToCentralContainerHelper(calibrationDataGraphWidget);
 	tool->rightStack()->add("calibrationSettingsScrollArea", calibrationSettingsScrollArea);
 
@@ -818,6 +1119,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	connect(extractDataButton, &QPushButton::clicked, this, &HarmonicCalibration::extractCalibrationData);
 	connect(importDataButton, &QPushButton::clicked, this, &HarmonicCalibration::importCalibrationData);
 	connect(applyCalibrationDataButton, &QPushButton::clicked, this, &HarmonicCalibration::registerCalibrationData);
+	connect(clearCalibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::clearRawDataList);
 
 	return tool;
 }
@@ -827,16 +1129,16 @@ void HarmonicCalibration::updateLabelValue(QLabel* label, int channelIndex)
 	switch(channelIndex)
 	{
 		case ADMTController::Channel::ROTATION:
-			label->setText(QString::number(rotation) + "°");
+			label->setText(QString("%1").arg(rotation, 0, 'f', 2) + "°");
 			break;
 		case ADMTController::Channel::ANGLE:
-			label->setText(QString::number(angle) + "°");
+			label->setText(QString("%1").arg(angle, 0, 'f', 2) + "°");
 			break;
 		case ADMTController::Channel::COUNT:
 			label->setText(QString::number(count));
 			break;
 		case ADMTController::Channel::TEMPERATURE:
-			label->setText(QString::number(temp) + "°C");
+			label->setText(QString("%1").arg(temp, 0, 'f', 2) + "°C");
 			break;
 	}
 }
@@ -846,17 +1148,59 @@ void HarmonicCalibration::updateChannelValue(int channelIndex)
 	switch(channelIndex)
 	{
 		case ADMTController::Channel::ROTATION:
-			rotation = m_admtController->getChannelValue(rotationChannelName, 1);
+			rotation = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), rotationChannelName, 1);
 			break;
 		case ADMTController::Channel::ANGLE:
-			angle = m_admtController->getChannelValue(angleChannelName, 1);
+			angle = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), angleChannelName, 1);
 			break;
 		case ADMTController::Channel::COUNT:
-			count = m_admtController->getChannelValue(countChannelName, 1);
+			count = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), countChannelName, 1);
 			break;
 		case ADMTController::Channel::TEMPERATURE:
-			temp = m_admtController->getChannelValue(temperatureChannelName, 1);
+			temp = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), temperatureChannelName, 1);
 			break;
+	}
+}
+
+void HarmonicCalibration::readMotorAttributeValue(ADMTController::MotorAttribute attribute, double *value)
+{
+	int result = m_admtController->getDeviceAttributeValue(m_admtController->getDeviceId(ADMTController::Device::TMC5240), m_admtController->getMotorAttribute(attribute), value);
+}
+
+void HarmonicCalibration::writeMotorAttributeValue(ADMTController::MotorAttribute attribute, double value)
+{
+	int result = m_admtController->setDeviceAttributeValue(m_admtController->getDeviceId(ADMTController::Device::TMC5240), 
+														   m_admtController->getMotorAttribute(attribute), 
+														   value);
+	if(result != 0) { calibrationLogWriteLn(QString(m_admtController->getMotorAttribute(attribute)) + ": Write Error " + QString::number(result)); }
+}
+
+void HarmonicCalibration::updateLabelValue(QLabel *label, ADMTController::MotorAttribute attribute)
+{
+	switch(attribute)
+	{
+		case ADMTController::MotorAttribute::AMAX:
+			label->setText(QString::number(amax));
+			break;
+		case ADMTController::MotorAttribute::ROTATE_VMAX:
+			label->setText(QString::number(rotate_vmax));
+			break;
+		case ADMTController::MotorAttribute::DMAX:
+			label->setText(QString::number(dmax));
+			break;
+		case ADMTController::MotorAttribute::DISABLE:
+			label->setText(QString::number(disable));
+			break;
+		case ADMTController::MotorAttribute::TARGET_POS:
+			label->setText(QString::number(target_pos));
+			break;
+		case ADMTController::MotorAttribute::CURRENT_POS:
+			label->setText(QString::number(current_pos));
+			break;
+		case ADMTController::MotorAttribute::RAMP_MODE:
+			label->setText(QString::number(ramp_mode));
+			break;
+
 	}
 }
 
@@ -864,6 +1208,8 @@ void HarmonicCalibration::calibrationTask()
 {
 	updateChannelValue(ADMTController::Channel::ANGLE);
 	updateLabelValue(calibrationMotorCurrentPositionLabel, ADMTController::Channel::ANGLE);
+
+	startMotorAcquisition();
 }
 
 void HarmonicCalibration::addAngleToRawDataList()
@@ -878,7 +1224,7 @@ void HarmonicCalibration::removeLastItemFromRawDataList(){
 
 void HarmonicCalibration::calibrateData()
 {
-	logsPlainTextEdit->appendPlainText("\n======= Calibration Start =======\n");
+	calibrationLogWrite("==== Calibration Start ====\n");
 	QVector<double> rawData;
 
 	for (int i = 0; i < rawDataListWidget->count(); ++i) {
@@ -889,12 +1235,48 @@ void HarmonicCalibration::calibrateData()
 	}
 	std::vector<double> stdData(rawData.begin(), rawData.end());
 
-	logsPlainTextEdit->appendPlainText(m_admtController->calibrate(stdData));
+	calibrationLogWriteLn(m_admtController->calibrate(stdData, cycleCount, samplesPerCycle));
+
+	calibrationH1MagLabel->setText(QString::number(m_admtController->HAR_MAG_1) + "°");
+	calibrationH2MagLabel->setText(QString::number(m_admtController->HAR_MAG_2) + "°");
+	calibrationH3MagLabel->setText(QString::number(m_admtController->HAR_MAG_3) + "°");
+	calibrationH8MagLabel->setText(QString::number(m_admtController->HAR_MAG_8) + "°");
+	calibrationH1PhaseLabel->setText("Φ " + QString::number(m_admtController->HAR_PHASE_1));
+	calibrationH2PhaseLabel->setText("Φ " + QString::number(m_admtController->HAR_PHASE_2));
+	calibrationH3PhaseLabel->setText("Φ " + QString::number(m_admtController->HAR_PHASE_3));
+	calibrationH8PhaseLabel->setText("Φ " + QString::number(m_admtController->HAR_PHASE_8));
 }
 
 void HarmonicCalibration::registerCalibrationData()
 {
-	logsPlainTextEdit->appendPlainText("\n=== Register Calibration Start ===\n");
+	calibrationLogWrite("=== Apply Calibration ===\n");
+
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		h1MagDeviceRegister, m_admtController->HAR_MAG_1) != 0) 
+		{ calibrationLogWriteLn("Failed to write to H1 Mag Register"); }
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		h2MagDeviceRegister, m_admtController->HAR_MAG_2) != 0)
+		{ calibrationLogWriteLn("Failed to write to H2 Mag Register"); }
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		h3MagDeviceRegister, m_admtController->HAR_MAG_3) != 0)
+		{ calibrationLogWriteLn("Failed to write to H3 Mag Register"); }
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		h8MagDeviceRegister, m_admtController->HAR_MAG_8) != 0)
+		{ calibrationLogWriteLn("Failed to write to H8 Mag Register"); }
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		h1PhaseDeviceRegister, m_admtController->HAR_PHASE_1) != 0)
+		{ calibrationLogWriteLn("Failed to write to H1 Phase Register"); }
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		h2PhaseDeviceRegister, m_admtController->HAR_PHASE_2) != 0)
+		{ calibrationLogWriteLn("Failed to write to H2 Phase Register"); }
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		h3PhaseDeviceRegister, m_admtController->HAR_PHASE_3) != 0)
+		{ calibrationLogWriteLn("Failed to write to H3 Phase Register"); }
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		h8PhaseDeviceRegister, m_admtController->HAR_PHASE_8) != 0)
+		{ calibrationLogWriteLn("Failed to write to H8 Phase Register"); }
+
+	calibrationLogWrite("=== Calibration Complete ===\n");
 }
 
 void HarmonicCalibration::calibrationLogWrite(QString message)
@@ -974,9 +1356,64 @@ void HarmonicCalibration::importCalibrationData()
 	}
 }
 
-void HarmonicCalibration::applyTextBoxStyle(QWidget *widget)
+void HarmonicCalibration::initializeMotor()
 {
-	applyLabelStyle(widget);
+	amax = 1200;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::AMAX, amax);
+	readMotorAttributeValue(ADMTController::MotorAttribute::AMAX, &amax);
+
+	rotate_vmax = 600000;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
+	readMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, &rotate_vmax);
+
+	writeMotorAttributeValue(ADMTController::MotorAttribute::DISABLE, 1);
+
+	dmax = 3000;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::DMAX, dmax);
+	readMotorAttributeValue(ADMTController::MotorAttribute::DMAX, &dmax);
+
+	ramp_mode = 0;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::RAMP_MODE, ramp_mode);
+	readMotorAttributeValue(ADMTController::MotorAttribute::RAMP_MODE, &ramp_mode);
+
+	target_pos = 0;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, target_pos);
+}
+
+void HarmonicCalibration::startMotorAcquisition()
+{
+	if(startMotor && rawDataListWidget->count() < totalSamplesCount){
+		double magNum = 408;
+
+		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, &current_pos);
+		target_pos = current_pos - 408;
+		writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, target_pos);
+
+		while(target_pos != current_pos) {
+			readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, &current_pos);
+		}
+
+		double currentAngle = angle;
+		calibrationRawDataPlotWidget->plot(currentAngle);
+		QString dataStr = QString::number(currentAngle);
+		rawDataListWidget->addItem(dataStr);
+		rawDataListWidget->scrollToBottom();
+	}
+	else if(rawDataListWidget->count() == totalSamplesCount)
+	{
+		calibrationStartMotorButton->setChecked(false);
+	}
+}
+
+void HarmonicCalibration::clearRawDataList()
+{
+	rawDataListWidget->clear();
+	calibrationRawDataPlotWidget->reset();
+}
+
+void HarmonicCalibration::applyLineEditStyle(QLineEdit *widget)
+{
+	applyTextStyle(widget);
 	QString existingStyle = widget->styleSheet();
 	QString style = QString(R"css(
 								background-color: black;
@@ -985,6 +1422,9 @@ void HarmonicCalibration::applyTextBoxStyle(QWidget *widget)
 							)css");
 	widget->setStyleSheet(existingStyle + style);
 	widget->setFixedHeight(30);
+	widget->setContentsMargins(0, 0, 0, 0);
+	widget->setTextMargins(12, 4, 12, 4);
+	widget->setAlignment(Qt::AlignRight);
 }
 
 void HarmonicCalibration::applyComboBoxStyle(QComboBox *widget, const QString& styleHelperColor)
@@ -1043,23 +1483,7 @@ void HarmonicCalibration::applyComboBoxStyle(QComboBox *widget, const QString& s
 	widget->setFixedHeight(30);
 }
 
-void HarmonicCalibration::applyLabelPadding(QLabel *widget)
-{
-	widget->setContentsMargins(12, 4, 12, 4);
-}
-
-void HarmonicCalibration::applyLineEditPadding(QLineEdit *widget)
-{
-	widget->setContentsMargins(0, 0, 0, 0);
-	widget->setTextMargins(12, 4, 12, 4);
-}
-
-void HarmonicCalibration::applyLineEditAlignment(QLineEdit *widget)
-{
-	widget->setAlignment(Qt::AlignRight);
-}
-
-void HarmonicCalibration::applyLabelStyle(QWidget *widget, const QString& styleHelperColor, bool isBold)
+void HarmonicCalibration::applyTextStyle(QWidget *widget, const QString& styleHelperColor, bool isBold)
 {
 	QString existingStyle = widget->styleSheet();
 	QString style = QString(R"css(
@@ -1076,4 +1500,18 @@ void HarmonicCalibration::applyLabelStyle(QWidget *widget, const QString& styleH
 	}
 	style = style.replace(QString("&&fontweight&&"), fontWeight);
 	widget->setStyleSheet(existingStyle + style);
+}
+
+void HarmonicCalibration::applyLabelStyle(QLabel *widget)
+{
+	applyTextStyle(widget);
+	QString existingStyle = widget->styleSheet();
+	QString style = QString(R"css(
+								background-color: black;
+								border-radius: 4px;
+								border: none;
+							)css");
+	widget->setStyleSheet(existingStyle + style);
+	widget->setFixedHeight(30);
+	widget->setContentsMargins(12, 4, 12, 4);
 }

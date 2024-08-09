@@ -30,6 +30,8 @@ public:
     ADMTController(QString uri, QObject *parent = nullptr);
     ~ADMTController();
 
+    int HAR_MAG_1, HAR_MAG_2, HAR_MAG_3, HAR_MAG_8 ,HAR_PHASE_1 ,HAR_PHASE_2 ,HAR_PHASE_3 ,HAR_PHASE_8;
+
     enum Channel
     {
         ROTATION,
@@ -39,16 +41,43 @@ public:
         CHANNEL_COUNT
     };
 
+    enum Device
+    {
+        ADMT4000,
+        TMC5240,
+        DEVICE_COUNT
+    };
+
+    enum MotorAttribute
+    {
+        AMAX,
+        ROTATE_VMAX,
+        DMAX,
+        DISABLE,
+        TARGET_POS,
+        CURRENT_POS,
+        RAMP_MODE,
+        MOTOR_ATTR_COUNT
+    };
+
     const char* ChannelIds[CHANNEL_COUNT] = {"rot", "angl", "count", "temp"};
+    const char* DeviceIds[DEVICE_COUNT] = {"admt4000", "tmc5240"};
+    const char* MotorAttributes[MOTOR_ATTR_COUNT] = {"amax", "rotate_vmax", "dmax",
+                                                     "disable", "target_pos", "current_pos",
+                                                     "ramp_mode"};
 
     const char* getChannelId(Channel channel);
+    const char* getDeviceId(Device device);
+    const char* getMotorAttribute(MotorAttribute attribute);
 
     void connectADMT();
     void disconnectADMT();
-    QString getChannelValue();
-    int getChannelIndex(const char *channelName);
-    double getChannelValue(const char *channelName, int bufferSize);
-    QString calibrate(vector<double> PANG);
+    int getChannelIndex(const char *deviceName, const char *channelName);
+    double getChannelValue(const char *deviceName, const char *channelName, int bufferSize = 1);
+    int getDeviceAttributeValue(const char *deviceName, const char *attributeName, double *returnValue);
+    int setDeviceAttributeValue(const char *deviceName, const char *attributeName, double writeValue);
+    QString calibrate(vector<double> PANG, int cycles = 11, int samplesPerCycle = 256);
+    int writeDeviceRegistry(const char *deviceName, uint32_t address, double value);
 private:
     iio_context *m_iioCtx;
     iio_buffer *m_iioBuffer;

@@ -37,6 +37,7 @@
 #include <filemanager.h>
 #include <customSwitch.h>
 #include <widgets/horizontalspinbox.h>
+#include <pluginbase/statusbarmanager.h>
 
 namespace scopy::admt {
 
@@ -65,17 +66,32 @@ private:
 	InfoBtn *infoButton;
 	RunBtn *runButton;
 
-	double rotation, angle, count, temp;
+	double rotation, angle, count, temp, amax, rotate_vmax, dmax, disable, target_pos, current_pos, ramp_mode;
 
-	QPushButton *openLastMenuButton;
+	QPushButton *openLastMenuButton, *calibrationStartMotorButton;
 	QButtonGroup *rightMenuButtonGroup;
 
-	QLineEdit *graphUpdateIntervalLineEdit, *dataSampleSizeLineEdit, *dataGraphSamplesLineEdit, *tempGraphSamplesLineEdit, 
-			*calibrationH1MagLineEdit, *calibrationH2MagLineEdit, *calibrationH3MagLineEdit, *calibrationH8MagLineEdit,
-			*calibrationH1PhaseLineEdit, *calibrationH2PhaseLineEdit, *calibrationH3PhaseLineEdit, *calibrationH8PhaseLineEdit;
-	QLabel *rotationValueLabel, *angleValueLabel, *countValueLabel, *tempValueLabel, *calibrationMotorCurrentPositionLabel;
+	QLineEdit 	*graphUpdateIntervalLineEdit, *dataSampleSizeLineEdit,
+				*dataGraphSamplesLineEdit, *tempGraphSamplesLineEdit, 
+				*calibrationH1MagLineEdit, *calibrationH2MagLineEdit, 
+				*calibrationH3MagLineEdit, *calibrationH8MagLineEdit,
+				*calibrationH1PhaseLineEdit, *calibrationH2PhaseLineEdit, 
+				*calibrationH3PhaseLineEdit, *calibrationH8PhaseLineEdit;
+	QLabel 	*rotationValueLabel, *angleValueLabel, *countValueLabel, *tempValueLabel, 
+			*calibrationMotorCurrentPositionLabel,
+			*motorAmaxValueLabel, *motorRotateVmaxValueLabel, *motorDmaxValueLabel,
+			*motorDisableValueLabel, *motorTargetPosValueLabel, *motorCurrentPosValueLabel,
+			*motorRampModeValueLabel,
+			*calibrationH1MagLabel,
+			*calibrationH1PhaseLabel,
+			*calibrationH2MagLabel,
+			*calibrationH2PhaseLabel,
+			*calibrationH3MagLabel,
+			*calibrationH3PhaseLabel,
+			*calibrationH8MagLabel,
+			*calibrationH8PhaseLabel;
 
-	Sismograph *dataGraph, *tempGraph;
+	Sismograph *dataGraph, *tempGraph, *calibrationRawDataPlotWidget;
 
 	MenuHeaderWidget *header;
 
@@ -93,12 +109,14 @@ private:
 	void updateLineEditValues();
 	void updateGeneralSettingEnabled(bool value);
 	void connectLineEditToNumber(QLineEdit* lineEdit, int& variable);
+	void connectLineEditToNumber(QLineEdit* lineEdit, double& variable);
 	void connectLineEditToGraphSamples(QLineEdit* lineEdit, int& variable, Sismograph* graph);
 	void connectMenuComboToGraphDirection(MenuCombo* menuCombo, Sismograph* graph);
 	void changeGraphColorByChannelName(Sismograph* graph, const char* channelName);
 	void connectMenuComboToGraphChannel(MenuCombo* menuCombo, Sismograph* graph);
 	ToolTemplate* createCalibrationWidget();
 	void updateLabelValue(QLabel* label, int channelIndex);
+	void updateLabelValue(QLabel *label, ADMTController::MotorAttribute attribute);
 	void updateChannelValue(int channelIndex);
 	void calibrationTask();
 	void addAngleToRawDataList();
@@ -109,12 +127,15 @@ private:
 	void importCalibrationData();
 	void calibrationLogWrite(QString message);
 	void calibrationLogWriteLn(QString message);
-	void applyTextBoxStyle(QWidget *widget);
-	void applyLabelPadding(QLabel *widget);
-	void applyLineEditPadding(QLineEdit *widget);
-	void applyLineEditAlignment(QLineEdit *widget);
+	void readMotorAttributeValue(ADMTController::MotorAttribute attribute, double *value);
+	void writeMotorAttributeValue(ADMTController::MotorAttribute attribute, double value);
+	void applyLineEditStyle(QLineEdit *widget);
 	void applyComboBoxStyle(QComboBox *widget, const QString& styleHelperColor = "CH0");
-	void applyLabelStyle(QWidget *widget, const QString& styleHelperColor = "CH0", bool isBold = false);
+	void applyTextStyle(QWidget *widget, const QString& styleHelperColor = "CH0", bool isBold = false);
+	void applyLabelStyle(QLabel *widget);
+	void initializeMotor();
+	void startMotorAcquisition();
+	void clearRawDataList();
 
 	QTimer *timer, *calibrationTimer;
 
