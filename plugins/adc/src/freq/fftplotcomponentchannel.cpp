@@ -19,8 +19,8 @@ FFTPlotComponentChannel::FFTPlotComponentChannel(ChannelComponent *ch, FFTPlotCo
 	m_plotComponent = nullptr;
 	initPlotComponent(plotComponent);
 
-	m_fftPlotYAxis->setUnits("V");
-	m_fftPlotCh->xAxis()->setUnits("s");
+	m_fftPlotYAxis->setUnits("dB");
+	m_fftPlotCh->xAxis()->setUnits("samples");
 	m_fftPlotYAxis->setInterval(-2048, 2048);
 }
 

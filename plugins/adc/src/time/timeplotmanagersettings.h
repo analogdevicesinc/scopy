@@ -1,6 +1,7 @@
 #ifndef TIMEPLOTMANAGERSETTINGS_H
 #define TIMEPLOTMANAGERSETTINGS_H
 
+#include "menuspinbox.h"
 #include "scopy-adc_export.h"
 #include <timeplotcomponent.h>
 #include <toolcomponent.h>
@@ -92,13 +93,13 @@ private:
 	QPen m_pen;
 	MenuWidget *m_menu;
 
-	ScaleSpinButton *m_bufferSizeSpin;
-	ScaleSpinButton *m_plotSizeSpin;
+	MenuSpinbox *m_bufferSizeSpin;
+	MenuSpinbox *m_plotSizeSpin;
 
-	PositionSpinButton *m_xmin;
-	PositionSpinButton *m_xmax;
-	PositionSpinButton *m_sampleRateSpin;
-	PositionSpinButton *m_freqOffsetSpin;
+	MenuSpinbox *m_xmin;
+	MenuSpinbox *m_xmax;
+	MenuSpinbox *m_sampleRateSpin;
+
 	MenuOnOffSwitch *m_rollingModeSw;
 	MenuOnOffSwitch *m_syncBufferPlot;
 	MenuCombo *m_xModeCb;

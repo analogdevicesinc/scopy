@@ -87,6 +87,11 @@ void PlotComponent::setXInterval(QPair<double,double> p) {
 	setXInterval(p.first,p.second);
 }
 
+void PlotComponent::setXUnit(QString s)
+{
+	m_plots[0]->xAxis()->setUnits(s);
+}
+
 void PlotComponent::setXInterval(double min, double max)
 {
 	for(auto plot : m_plots) {

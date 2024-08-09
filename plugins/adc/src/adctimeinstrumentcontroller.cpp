@@ -75,6 +75,9 @@ void ADCTimeInstrumentController::init()
 	m_otherCMCB->getControlBtn()->setName("Other");
 	m_ui->vcm()->addEnd(m_otherCMCB);
 	m_ui->m_complex->setVisible(false);
+
+	m_ui->m_settingsBtn->animateClick();
+	m_ui->sync()->setVisible(false);
 }
 
 void ADCTimeInstrumentController::addChannel(AcqTreeNode *node)

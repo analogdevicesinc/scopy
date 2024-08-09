@@ -630,15 +630,26 @@ void StyleHelper::MenuEditTextHeaderWidget(QWidget *w, QString objectName)
 
 void StyleHelper::MenuSpinComboBox(QComboBox *w, QString objectName)
 {
-	MenuComboBox(w, objectName);
 	QString style = QString(R"css(
-	QComboBox {
-	font-size: 12px;
-	}
-	QComboBox QAbstractItemView {
-	 background-color: &&ScopyBackground&&;
-	 selection-background-color: &&UIElementBackground&&;
-	}
+QComboBox {
+ height: 20px;
+ font-size: 12px;
+ font-weight: normal;
+ border-bottom: 0px;
+ padding-bottom: 0px;
+}
+QComboBox::drop-down {
+ subcontrol-position: center right;
+ width: 10px;
+ height: 6px;
+ border-image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
+}
+QComboBox::drop-down:disabled {
+ subcontrol-position: center right;
+ width: 0px;
+ height: 0px;
+ border-image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
+}
 	)css");
 
 	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
@@ -741,6 +752,10 @@ QLineEdit {
  border: 0px solid gray;
  border-bottom: 1px solid rgba(255, 255, 255, 102);
  padding: 2px;
+ padding-bottom: 4px;
+}
+QLineEdit:disabled {
+color: gray;
 }
 	)css");
 	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
@@ -793,6 +808,22 @@ QWidget {
 	w->setStyleSheet(style);
 }
 
+void StyleHelper::MenuSpinboxLine(QFrame *w, QString objectName) {
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+
+	QString style = QString(R"css(
+QFrame {
+height: 1px;
+background-color: transparent;
+color: &&ScopyBlue&&;
+}
+	)css");
+	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
+	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
+	w->setStyleSheet(style);
+}
+/*
 void StyleHelper::MenuSpinBox(SpinBoxA *w, QString objectName)
 {
 	if(!objectName.isEmpty())
@@ -860,7 +891,7 @@ scopy--SpinBoxA QDial#SBA_CompletionCircle {
 	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
 	w->setStyleSheet(style);
 	MenuSpinComboBox(w->ui->SBA_Combobox, ""); // Should this be refactored ?
-}
+}*/
 
 void StyleHelper::MenuSectionWidget(QWidget *w, QString objectName)
 {
@@ -1351,6 +1382,36 @@ void StyleHelper::BrowseButton(QPushButton *btn, QString objectName)
 	btn->setStyleSheet(style);
 	btn->setProperty("blue_button", true);
 	btn->setText("...");
+}
+
+void StyleHelper::MenuSpinboxLabel(QLabel *w, QString objectName) {
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+
+	QString style = QString(R"css(
+QLabel {
+ color: rgba(255, 255, 255, 102);
+ font-size: 14px;
+ background-color: transparent;
+)css");
+
+	w->setStyleSheet(style);
+}
+void StyleHelper::MenuSpinboxLineEdit(QLineEdit *w, QString objectName) {
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+
+	QString style = QString(R"css(
+QLineEdit {
+ height: 20px;
+ width: 75px;
+ font-size: 18px;
+ border: 0px;
+ bottom: 10px;
+ background-color: transparent;
+})css");
+
+	w->setStyleSheet(style);
 }
 
 void StyleHelper::SpinBoxUpButton(QPushButton *w, QString objectName)
