@@ -34,6 +34,10 @@ Application Specific plugins
 
 * SWIOT1L
 * PQM
+    * :ref:`RMS <rms>`
+    * :ref:`Harmonics <harmonics>`
+    * :ref:`Waveform <waveform>`
+    * :ref:`Settings <settings>`
 
 
 Each plugin:
@@ -53,4 +57,5 @@ Contents
    datalogger/datalogger
    registermap/registermap
    m2k/index
+   pqm/index
 
