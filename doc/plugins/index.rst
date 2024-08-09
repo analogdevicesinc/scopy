@@ -15,7 +15,7 @@ General IIO plugins
 
 * Debugger
 
-* Register Map
+* :ref:`Register Map <registermap>`
 
 Application Specific plugins
 
@@ -51,5 +51,6 @@ Contents
    :maxdepth: 3
 
    datalogger/datalogger
+   registermap/registermap
    m2k/index
 
