@@ -17,6 +17,8 @@
 #include <iterator>
 
 static const size_t maxAttrSize = 512;
+static vector<double> angle_errors_fft;
+static vector<double> angle_errors_fft_phase;
 
 using namespace scopy::admt;
 using namespace std;
@@ -56,9 +58,26 @@ const char* ADMTController::getChannelId(Channel channel)
 	return "Unknown";
 }
 
-int ADMTController::getChannelIndex(const char *channelName)
+const char* ADMTController::getDeviceId(Device device)
 {
-	iio_device *admtDevice = iio_context_find_device(m_iioCtx, "admt4000");
+	if(device >= 0 && device < DEVICE_COUNT){
+		return DeviceIds[device];
+	}
+	return "Unknown";
+}
+
+const char* ADMTController::getMotorAttribute(MotorAttribute attribute)
+{
+	if(attribute >= 0 && attribute < MOTOR_ATTR_COUNT){
+		return MotorAttributes[attribute];
+	}
+	return "Unknown";
+}
+
+
+int ADMTController::getChannelIndex(const char *deviceName, const char *channelName)
+{
+	iio_device *admtDevice = iio_context_find_device(m_iioCtx, deviceName);
 	int channelCount = iio_device_get_channels_count(admtDevice);
 	iio_channel *channel;
 	std::string message = "";
@@ -80,7 +99,7 @@ int ADMTController::getChannelIndex(const char *channelName)
 	return -1;
 }
 
-double ADMTController::getChannelValue(const char *channelName, int bufferSize = 1)
+double ADMTController::getChannelValue(const char *deviceName, const char *channelName, int bufferSize)
 {
 	double value;
 	char converted[bufferSize] = "";
@@ -88,7 +107,7 @@ double ADMTController::getChannelValue(const char *channelName, int bufferSize =
 	int deviceCount = iio_context_get_devices_count(m_iioCtx);
 	//if(deviceCount < 1) return QString("No devices found");
 
-	iio_device *admtDevice = iio_context_find_device(m_iioCtx, "admt4000");
+	iio_device *admtDevice = iio_context_find_device(m_iioCtx, deviceName);
 	//if(admtDevice == NULL) return QString("No ADMT4000 device");
 
 	int channelCount = iio_device_get_channels_count(admtDevice);
@@ -183,6 +202,60 @@ double ADMTController::getChannelValue(const char *channelName, int bufferSize =
 	message = message + result.toStdString();
  	iio_buffer_destroy(iioBuffer);
 	return value; //QString::fromStdString(message);
+}
+
+/** @brief Get the attribute value of a device
+ * @param deviceName A pointer to the device name
+ * @param attributeName A NULL-terminated string corresponding to the name of the
+ * attribute
+ * @param returnValue A pointer to a double variable where the value should be stored
+ * @return On success, 0 is returned.
+ * @return On error, -1 is returned. */
+int ADMTController::getDeviceAttributeValue(const char *deviceName, const char *attributeName, double *returnValue)
+{
+    int result = -1;
+    int deviceCount = iio_context_get_devices_count(m_iioCtx);
+    if(deviceCount == 0) { return result; }
+	iio_device *iioDevice = iio_context_find_device(m_iioCtx, deviceName);
+    if(iioDevice == NULL) { return result; }
+    const char* hasAttr = iio_device_find_attr(iioDevice, attributeName);
+    if(hasAttr == NULL) { return result; }
+    result = iio_device_attr_read_double(iioDevice, attributeName, returnValue);
+
+    return result;
+}
+
+/** @brief Set the attribute value of a device
+ * @param deviceName A pointer to the device name
+ * @param attributeName A NULL-terminated string corresponding to the name of the
+ * attribute
+ * @param writeValue A double variable of the value to be set
+ * @return On success, 0 is returned.
+ * @return On error, -1 is returned. */
+int ADMTController::setDeviceAttributeValue(const char *deviceName, const char *attributeName, double writeValue)
+{
+    int result = -1;
+    int deviceCount = iio_context_get_devices_count(m_iioCtx);
+    if(deviceCount == 0) { return result; }
+	iio_device *iioDevice = iio_context_find_device(m_iioCtx, deviceName);
+    if(iioDevice == NULL) { return result; }
+    const char* hasAttr = iio_device_find_attr(iioDevice, attributeName);
+    if(hasAttr == NULL) { return result; }
+    result = iio_device_attr_write_double(iioDevice, attributeName, writeValue);
+
+    return result;
+}
+
+int ADMTController::writeDeviceRegistry(const char *deviceName, uint32_t address, double value)
+{
+    int result = -1;
+    int deviceCount = iio_context_get_devices_count(m_iioCtx);
+    if(deviceCount == 0) { return result; }
+    iio_device *iioDevice = iio_context_find_device(m_iioCtx, deviceName);
+    if(iioDevice == NULL) { return result; }
+    result = iio_device_reg_write(iioDevice, address, static_cast<uint32_t>(value));
+
+    return result;
 }
 
 /* bit reversal from online example */
@@ -324,8 +397,8 @@ int ADMTController::calculate_angle_error(vector<double> angle_meas, vector<doub
     return 0;
 }
 
-QString ADMTController::calibrate(vector<double> PANG){
-	int cycles = 11, CCW = 0, circshiftData = 0;
+QString ADMTController::calibrate(vector<double> PANG, int cycles, int samplesPerCycle){
+	int CCW = 0, circshiftData = 0;
 	QString result = "";
 
     // original script data (measured data: from data capture using GUI or other medium i.e., csv)
@@ -357,13 +430,13 @@ QString ADMTController::calibrate(vector<double> PANG){
     /* FFT based on implementation from https://www.oreilly.com/library/view/c-cookbook/0596007612/ch11s18.html */
     vector<double> angle_errors_fft_temp(PANG.size());
     vector<double> angle_errors_fft_phase_temp(PANG.size());
-    vector<double> angle_errors_fft(PANG.size() / 2);
-    vector<double> angle_errors_fft_phase(PANG.size() / 2);
+    angle_errors_fft(PANG.size() / 2);
+    angle_errors_fft_phase(PANG.size() / 2);
     typedef complex<double> cx;
 
     /* array declaration must be constant so hardcoded as of now */
-    cx fft_in[256];
-    cx fft_out[256];
+    cx fft_in[samplesPerCycle*cycles];
+    cx fft_out[samplesPerCycle*cycles];
 
     /* Format angle errros to match data type used in fft function */
     for (int i = 0; i < PANG.size(); i++)
@@ -493,17 +566,17 @@ QString ADMTController::calibrate(vector<double> PANG){
     // Derive register compatible HMAG values
     double mag_scale_factor_11bit = 11.2455 / (1 << 11);
     double mag_scale_factor_8bit = 1.40076 / (1 << 8);
-    int HAR_MAG_1 = (int)(H1Mag / mag_scale_factor_11bit) & (0x7FF); // 11 bit 
-    int HAR_MAG_2 = (int)(H2Mag / mag_scale_factor_11bit) & (0x7FF); // 11 bit
-    int HAR_MAG_3 = (int)(H3Mag / mag_scale_factor_8bit) & (0xFF); // 8 bit
-    int HAR_MAG_8 = (int)(H8Mag / mag_scale_factor_8bit) & (0xFF);  // 8 bit
+    HAR_MAG_1 = (int)(H1Mag / mag_scale_factor_11bit) & (0x7FF); // 11 bit 
+    HAR_MAG_2 = (int)(H2Mag / mag_scale_factor_11bit) & (0x7FF); // 11 bit
+    HAR_MAG_3 = (int)(H3Mag / mag_scale_factor_8bit) & (0xFF); // 8 bit
+    HAR_MAG_8 = (int)(H8Mag / mag_scale_factor_8bit) & (0xFF);  // 8 bit
 
     // Derive register compatible HPHASE values
     double pha_scale_factor_12bit = 360.0 / (1 << 12); // in Deg
-    int HAR_PHASE_1 = (int)(H1PHcor / pha_scale_factor_12bit) & (0xFFF); // 12bit number
-    int HAR_PHASE_2 = (int)(H2PHcor / pha_scale_factor_12bit) & (0xFFF); // 12bit number
-    int HAR_PHASE_3 = (int)(H3PHcor / pha_scale_factor_12bit) & (0xFFF);// 12bit number
-    int HAR_PHASE_8 = (int)(H8PHcor / pha_scale_factor_12bit) & (0xFFF); // 12bit number
+    HAR_PHASE_1 = (int)(H1PHcor / pha_scale_factor_12bit) & (0xFFF); // 12bit number
+    HAR_PHASE_2 = (int)(H2PHcor / pha_scale_factor_12bit) & (0xFFF); // 12bit number
+    HAR_PHASE_3 = (int)(H3PHcor / pha_scale_factor_12bit) & (0xFFF);// 12bit number
+    HAR_PHASE_8 = (int)(H8PHcor / pha_scale_factor_12bit) & (0xFFF); // 12bit number
 
 	result.append("HMAG1: " + QString::number(HAR_MAG_1) + "\n");
 	result.append("HMAG2: " + QString::number(HAR_MAG_2) + "\n");
