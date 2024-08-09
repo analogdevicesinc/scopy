@@ -26,7 +26,7 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
 
 	m_formatter = new MetricPrefixFormatter();
 	m_formatter->setTrimZeroes(true);
-	m_formatter->setTwoDecimalMode(true);
+	m_formatter->setTwoDecimalMode(false);
 	m_scaleDraw = new BasicScaleDraw(m_formatter, m_units);
 
 	m_scaleDraw->setColor(pen.color());
