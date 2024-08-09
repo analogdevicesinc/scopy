@@ -1,5 +1,6 @@
 #include "testtool.h"
 
+#include "menuspinbox.h"
 #include "plotaxis.h"
 #include "plotwidget.h"
 #include "spinbox_a.hpp"
@@ -259,7 +260,10 @@ QWidget *TestTool::createMenu(QWidget *parent)
 	PositionSpinButton *ssb =
 		new PositionSpinButton({{"Hz", 1e0}, {"kHz", 1e3}, {"MHz", 1e6}}, "Volts", 0, 1000, true, false, vdiv);
 	ssb->setMaxValue(1000);
-	StyleHelper::MenuSpinBox(ssb, "vdivSpin");
+	// StyleHelper::MenuSpinBox(ssb, "vdivSpin");
+
+	gui::MenuSpinbox *msb = new gui::MenuSpinbox("Frequency",2000000,"Hz",500000,6000000000,true,false,this);
+
 
 	MenuOnOffSwitch *autoscale = new MenuOnOffSwitch(tr("AUTOSCALE"), vdiv, false);
 
@@ -268,6 +272,7 @@ QWidget *TestTool::createMenu(QWidget *parent)
 	section1->contentLayout()->addWidget(cbb);
 	MenuCollapseSection *section2 = new MenuCollapseSection("SECTION2", MenuCollapseSection::MHCW_ONOFF, vdiv);
 	section2->contentLayout()->addWidget(ssb);
+	section2->contentLayout()->addWidget(msb);
 	section2->contentLayout()->addWidget(autoscale);
 
 	//	MenuBigSwitch *bigsw = new MenuBigSwitch("Yes", "No", vdiv);

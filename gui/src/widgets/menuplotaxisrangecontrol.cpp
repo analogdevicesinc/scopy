@@ -11,23 +11,12 @@ MenuPlotAxisRangeControl::MenuPlotAxisRangeControl(PlotAxis *m_plotAxis, QWidget
 	minMaxLayout->setMargin(0);
 	minMaxLayout->setSpacing(10);
 	QString unit = m_plotAxis->getUnits();
-	m_min = new PositionSpinButton(
-		{
-			{"" + unit, 1e0},
-			{"k" + unit, 1e3},
-			{"M" + unit, 1e6},
-			{"G" + unit, 1e9},
-		},
-		"Min", -DBL_MAX, DBL_MAX, false, false, this);
 
-	m_max = new PositionSpinButton(
-		{
-			{"" + unit, 1e0},
-			{"k" + unit, 1e3},
-			{"M" + unit, 1e6},
-			{"G" + unit, 1e9},
-		},
-		"Max", -DBL_MAX, DBL_MAX, false, false, this);
+	m_min = new MenuSpinbox("Min",0,"counts",-1e9,1e9,true,false,this);
+	m_max = new MenuSpinbox("Max",0,"counts",-1e9,1e9,true,false,this);
+
+	m_min->setScaleRange(1,1e9);
+	m_max->setScaleRange(1,1e9);
 
 	addAxis(m_plotAxis);
 	minMaxLayout->addWidget(m_min);
@@ -42,8 +31,8 @@ void MenuPlotAxisRangeControl::addAxis(PlotAxis *ax) {
 	if(connections.contains(ax))
 		return;
 
-	connections[ax] << connect(m_min, &PositionSpinButton::valueChanged, ax, &PlotAxis::setMin);
-	connections[ax] << connect(m_min, &PositionSpinButton::valueChanged, this,
+	connections[ax] << connect(m_min, &MenuSpinbox::valueChanged, ax, &PlotAxis::setMin);
+	connections[ax] << connect(m_min, &MenuSpinbox::valueChanged, this,
 		[=](double) { Q_EMIT intervalChanged(m_min->value(), m_max->value()); });
 	connections[ax] << connect(ax, &PlotAxis::minChanged, this, [=]() {
 		QSignalBlocker b(m_min);
@@ -51,8 +40,8 @@ void MenuPlotAxisRangeControl::addAxis(PlotAxis *ax) {
 		Q_EMIT intervalChanged(m_min->value(), m_max->value());
 	});
 
-	connections[ax] << connect(m_max, &PositionSpinButton::valueChanged, ax, &PlotAxis::setMax);
-	connections[ax] << connect(m_max, &PositionSpinButton::valueChanged, this,
+	connections[ax] << connect(m_max, &MenuSpinbox::valueChanged, ax, &PlotAxis::setMax);
+	connections[ax] << connect(m_max, &MenuSpinbox::valueChanged, this,
 		[=](double) { Q_EMIT intervalChanged(m_min->value(), m_max->value()); });
 	connections[ax] << connect(ax, &PlotAxis::maxChanged, this, [=]() {
 		QSignalBlocker b(m_max);
@@ -86,4 +75,15 @@ void MenuPlotAxisRangeControl::setMax(double val)
 	Q_EMIT intervalChanged(m_min->value(), val);
 }
 
+MenuSpinbox *MenuPlotAxisRangeControl::minSpinbox()
+{
+	return m_min;
+}
+
+MenuSpinbox *MenuPlotAxisRangeControl::maxSpinbox()
+{
+	return m_max;
+}
+
 #include "moc_menuplotaxisrangecontrol.cpp"
+
