@@ -11,7 +11,7 @@ General IIO plugins
 
 * DAC plugin
 
-* Datalogger
+* :ref:`Datalogger <datalogger>`
 
 * Debugger
 
@@ -50,5 +50,6 @@ Contents
 .. toctree::
    :maxdepth: 3
 
+   datalogger/datalogger
    m2k/index
 
