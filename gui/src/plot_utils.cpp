@@ -53,14 +53,15 @@ QString PrefixFormatter::buildString(double value, QString prefix, QString unitT
 	if(m_trimZeroes) {
 		for(auto i = 0; i < precision; i++) {
 			const double singlePrecision = value * pow(10, i);
-			if(singlePrecision == round(singlePrecision)) {
+			if(qFuzzyCompare(singlePrecision,round(singlePrecision))) {
 				precision = i;
 				break;
 			}
 		}
 	}
 
-	return QLocale().toString(value, 'f', precision) + " " + prefix + unitType;
+	QString str = QLocale().toString(value, 'f', precision) + " " + prefix + unitType;
+	return str;
 }
 
 int PrefixFormatter::findPrefixIndex(double value) const

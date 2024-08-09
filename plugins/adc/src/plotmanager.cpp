@@ -42,6 +42,15 @@ void PlotManager::setXInterval(double xMin, double xMax)
 	}
 }
 
+void PlotManager::setXUnit(QString s)
+{
+	for(PlotComponent *p : m_plots) {
+		p->setXUnit(s);
+	}
+
+
+}
+
 void PlotManager::selectChannel(ChannelComponent *c) {
 	for(PlotComponentChannel *pcc : qAsConst(m_channels)) {
 		if(pcc->channelComponent() == c) {

@@ -41,6 +41,7 @@ public Q_SLOTS:
 	void enableStatsPanel(bool) override;
 
 	void setXInterval(double xMin, double xMax);
+	void setXUnit(QString);
 	void selectChannel(ChannelComponent *c);
 Q_SIGNALS:
 	void plotAdded(uint32_t);

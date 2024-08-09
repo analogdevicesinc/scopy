@@ -86,15 +86,9 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 	MenuSectionCollapseWidget *section =
 		new MenuSectionCollapseWidget("X-AXIS", MenuCollapseSection::MHCW_NONE, parent);
 
-	m_bufferSizeSpin = new ScaleSpinButton(
-		{
-		 {"samples", 1e0},
-		 {"ksamples", 1e3},
-		 {"Msamples", 1e6},
-		 },
-		"Buffer Size", 16, DBL_MAX, false, false, section);
+	m_bufferSizeSpin = new MenuSpinbox("Buffer Size", 16, "samples", 0, 4000000,true, false, section);
 
-	connect(m_bufferSizeSpin, &ScaleSpinButton::valueChanged, this, [=](double val) {
+	connect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, this, [=](double val) {
 		setBufferSize((uint32_t)val);
 	});
 
@@ -105,33 +99,15 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 	xMinMaxLayout->setSpacing(10);
 	xMinMax->setLayout(xMinMaxLayout);
 
-	m_xmin = new PositionSpinButton(
-		{
-		 {"ns", 1E-9},
-		 {"μs", 1E-6},
-		 {"ms", 1E-3},
-		 {"s", 1e0},
-		 {"ks", 1e3},
-		 {"Ms", 1e6},
-		 {"Gs", 1e9},
-		 },
-		"XMin", -DBL_MAX, DBL_MAX, false, false, xMinMax);
+	m_xmin = new MenuSpinbox("XMin", 0,"samples",-DBL_MAX, DBL_MAX, true, false, xMinMax);
+	m_xmin->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 
-	m_xmax = new PositionSpinButton(
-		{
-		 {"ns", 1E-9},
-		 {"μs", 1E-6},
-		 {"ms", 1E-3},
-		 {"s", 1e0},
-		 {"ks", 1e3},
-		 {"Ms", 1e6},
-		 {"Gs", 1e9},
-		 },
-		"XMax", -DBL_MAX, DBL_MAX, false, false, xMinMax);
+	m_xmax = new MenuSpinbox("XMax", 0,"samples",-DBL_MAX, DBL_MAX, true, false, xMinMax);
+	m_xmax->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 
-	connect(m_xmin, &PositionSpinButton::valueChanged, this,
+	connect(m_xmin, &MenuSpinbox::valueChanged, this,
 		[=](double min) { m_plotManager->setXInterval(m_xmin->value(), m_xmax->value()); });
-	connect(m_xmax, &PositionSpinButton::valueChanged, this,
+	connect(m_xmax, &MenuSpinbox::valueChanged, this,
 		[=](double max) { m_plotManager->setXInterval(m_xmin->value(), m_xmax->value()); });
 
 	xMinMaxLayout->addWidget(m_xmin);
@@ -141,12 +117,16 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 	auto xcb = m_xModeCb->combo();
 
 	xcb->addItem("Samples", XMODE_SAMPLES);
-	xcb->addItem("Time - override samplerate", XMODE_OVERRIDE);
+	xcb->addItem("Frequency - override samplerate", XMODE_OVERRIDE);
 
 	connect(xcb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		m_sampleRateSpin->setVisible(false);
 		m_freqOffsetSpin->setVisible(false);
+
 		if(xcb->itemData(idx) == XMODE_SAMPLES) {
+			m_xmin->setUnit("samples");
+			m_xmax->setUnit("samples");
+			m_plotManager->setXUnit("samples");
 			m_sampleRateSpin->setValue(1);
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<FFTPlotComponent*>(plt);
@@ -158,6 +138,9 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 		}
 
 		if(xcb->itemData(idx) == XMODE_TIME) {
+			m_xmin->setUnit("Hz");
+			m_xmax->setUnit("Hz");
+			m_plotManager->setXUnit("Hz");
 			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setEnabled(false);
 			m_sampleRateSpin->setValue(readSampleRate());
@@ -173,6 +156,9 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 			}
 		}
 		if(xcb->itemData(idx) == XMODE_OVERRIDE) {
+			m_xmin->setUnit("Hz");
+			m_xmax->setUnit("Hz");
+			m_plotManager->setXUnit("Hz");
 			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setEnabled(true);
 			m_freqOffsetSpin->setVisible(true);
@@ -188,31 +174,19 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 		m_plotManager->updateAxisScales();
 	});
 
-	m_sampleRateSpin = new PositionSpinButton(
-		{
-		 {"Hz", 1e0},
-		 {"kHz", 1e3},
-		 {"MHz", 1e6},
-		 {"GHz", 1e9},
-		 },
-		"SampleRate", 1, DBL_MAX, false, false, section);
+	m_sampleRateSpin = new MenuSpinbox("Sample Rate", 1, "Hz", 0, DBL_MAX, true, false, section);
+	m_sampleRateSpin->setIncrementMode(MenuSpinbox::IS_125);
 
 	m_sampleRateSpin->setValue(10);
 	m_sampleRateSpin->setEnabled(false);
-	connect(m_sampleRateSpin, &PositionSpinButton::valueChanged, this, [=](double val) { setSampleRate(val); });
+	connect(m_sampleRateSpin, &MenuSpinbox::valueChanged, this, [=](double val) { setSampleRate(val); });
 
-	m_freqOffsetSpin = new PositionSpinButton(
-		{
-		 {"Hz", 1e0},
-		 {"kHz", 1e3},
-		 {"MHz", 1e6},
-		 {"GHz", 1e9},
-		 },
-		"Frequency Offset", 0, DBL_MAX, false, false, section);
+	m_freqOffsetSpin = new MenuSpinbox("Frequency Offset", 1, "Hz", 0, DBL_MAX, true, false, section);
+	m_freqOffsetSpin->setIncrementMode(MenuSpinbox::IS_125);
 
 	m_freqOffsetSpin->setValue(0);
 	m_freqOffsetSpin->setEnabled(false);
-	connect(m_freqOffsetSpin, &PositionSpinButton::valueChanged, this, [=](double val) { setFreqOffset(val); });
+	connect(m_freqOffsetSpin, &MenuSpinbox::valueChanged, this, [=](double val) { setFreqOffset(val); });
 	connect(this, &FFTPlotManagerSettings::samplingInfoChanged, this, [=](SamplingInfo p){
 		m_freqOffsetSpin->setValue(m_samplingInfo.freqOffset);
 		m_sampleRateSpin->setValue(m_samplingInfo.sampleRate);
@@ -340,8 +314,8 @@ void FFTPlotManagerSettings::removeChannel(ChannelComponent *c)
 
 void FFTPlotManagerSettings::addSampleRateProvider(SampleRateProvider *s)
 {
-	updateXModeCombo();
 	m_sampleRateProviders.append(s);
+	updateXModeCombo();
 }
 
 void FFTPlotManagerSettings::removeSampleRateProvider(SampleRateProvider *s) { m_sampleRateProviders.removeAll(s); }
@@ -366,7 +340,8 @@ void FFTPlotManagerSettings::updateXModeCombo()
 	m_sampleRateAvailable = true;
 	if(m_sampleRateAvailable) {
 		auto cb = m_xModeCb->combo();
-		cb->insertItem(1, "Time", XMODE_TIME);
+		cb->insertItem(1, "Frequency", XMODE_TIME);
+		QMetaObject::invokeMethod(cb,"setCurrentIndex",Qt::QueuedConnection,Q_ARG(int,1));
 	}
 }
 

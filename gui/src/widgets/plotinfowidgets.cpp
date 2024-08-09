@@ -62,7 +62,7 @@ TimeSamplingInfo::~TimeSamplingInfo() {}
 void TimeSamplingInfo::update(SamplingInfo info)
 {
 	QString text;
-	text = QString("%1").arg(m_mpf->format(info.plotSize, "samples", 2));
+	text = QString("%1 samples").arg(QString::number(info.plotSize));
 	//.arg(m_mpf->format(binfo.bufferSizes, "samples", 2));
 	//	if(info.sampleRate != 1.0)
 	if(info.sampleRate != 1) {

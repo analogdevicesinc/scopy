@@ -74,6 +74,8 @@ void ADCFFTInstrumentController::init()
 	m_otherCMCB->getControlBtn()->setName("Other");
 	m_ui->vcm()->addEnd(m_otherCMCB);
 
+	m_ui->m_settingsBtn->animateClick();
+	m_ui->sync()->setVisible(false);
 }
 
 void ADCFFTInstrumentController::createIIODevice(AcqTreeNode *node)

@@ -44,15 +44,19 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 		new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_NONE, parent);
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_plotComponent->fftPlot()->yAxis(), this);
+	m_yCtrl->minSpinbox()->setIncrementMode(MenuSpinbox::IS_FIXED);
+	m_yCtrl->maxSpinbox()->setIncrementMode(MenuSpinbox::IS_FIXED);
+	m_yCtrl->minSpinbox()->setUnit("dB");
+	m_yCtrl->maxSpinbox()->setUnit("dB");
 
 	m_plotComponent->fftPlot()->yAxis()->setUnits("dB");
 	m_plotComponent->fftPlot()->yAxis()->setUnitsVisible(true);
 	m_plotComponent->fftPlot()->yAxis()->getFormatter()->setTwoDecimalMode(false);
 
 
-	m_yPwrOffset = new PositionSpinButton(
-		{ {"dB", 1e0} },
-		"Power Offset", -200, 200, false, false, yaxis);
+	m_yPwrOffset = new MenuSpinbox("Power Offset",0, "dB", -200, 200, true, false, yaxis);
+	m_yPwrOffset->setScaleRange(1,1);
+	m_yPwrOffset->setIncrementMode(MenuSpinbox::IS_FIXED);
 
 	m_curve = new MenuPlotChannelCurveStyleControl(plotMenu);
 
@@ -115,7 +119,7 @@ void FFTPlotComponentSettings::addChannel(ChannelComponent *c)
 
 	if(dynamic_cast<FFTChannel*>(c)) {
 		FFTChannel* fc = dynamic_cast<FFTChannel*>(c);
-		connections[c] << connect(m_yPwrOffset, &PositionSpinButton::valueChanged, c, [=](double val){
+		connections[c] << connect(m_yPwrOffset, &MenuSpinbox::valueChanged, c, [=](double val){
 			fc->setPowerOffset(val);
 		});
 		fc->setPowerOffset(m_yPwrOffset->value());

@@ -262,7 +262,7 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 		}
 		m_timePlotComponentChannel->m_timePlotYAxis->setUnits("");
 		m_timePlotComponentChannel->m_timePlotYAxis->scaleDraw()->setFloatPrecision(3);
-		m_timePlotComponentChannel->m_timePlotYAxis->getFormatter()->setTwoDecimalMode(true);
+		m_timePlotComponentChannel->m_timePlotYAxis->getFormatter()->setTwoDecimalMode(false);
 		break;
 	case YMODE_SCALE:
 		if(m_scaleAvailable) {

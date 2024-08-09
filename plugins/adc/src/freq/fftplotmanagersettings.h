@@ -16,6 +16,7 @@
 #include <gui/widgets/menusectionwidget.h>
 
 #include "fftplotmanager.h"
+#include "menuspinbox.h"
 
 namespace scopy {
 namespace adc {
@@ -74,6 +75,8 @@ Q_SIGNALS:
 	void freqOffsetChanged();
 	void bufferSizeChanged();
 	void samplingInfoChanged(SamplingInfo);
+private Q_SLOTS:
+	double readSampleRate();
 
 private:
 	FFTPlotManager *m_plotManager;
@@ -81,18 +84,17 @@ private:
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createXAxisMenu(QWidget *parent = nullptr);
 	QWidget *createYAxisMenu(QWidget *parent = nullptr);
-	double readSampleRate();
 	void updateXModeCombo();
 
 	QPen m_pen;
 	MenuWidget *m_menu;
 
-	ScaleSpinButton *m_bufferSizeSpin;
+	MenuSpinbox *m_bufferSizeSpin;
 
-	PositionSpinButton *m_xmin;
-	PositionSpinButton *m_xmax;
-	PositionSpinButton *m_sampleRateSpin;
-	PositionSpinButton *m_freqOffsetSpin;
+	MenuSpinbox *m_xmin;
+	MenuSpinbox *m_xmax;
+	MenuSpinbox *m_sampleRateSpin;
+	MenuSpinbox *m_freqOffsetSpin;
 	MenuCombo *m_xModeCb;
 	MenuSectionWidget *m_plotSection;
 	MenuCombo *m_plotCb;

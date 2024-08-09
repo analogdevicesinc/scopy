@@ -1,6 +1,7 @@
 #ifndef MENUPLOTAXISRANGECONTROL_H
 #define MENUPLOTAXISRANGECONTROL_H
 
+#include "menuspinbox.h"
 #include "plotaxis.h"
 #include "scopy-gui_export.h"
 #include "spinbox_a.hpp"
@@ -23,11 +24,14 @@ public Q_SLOTS:
 	void setMin(double);
 	void setMax(double);
 
+	MenuSpinbox* minSpinbox();
+	MenuSpinbox* maxSpinbox();
+
 	void addAxis(PlotAxis *ax);
 	void removeAxis(PlotAxis *ax);
 private:
-	PositionSpinButton *m_min;
-	PositionSpinButton *m_max;
+	MenuSpinbox *m_min;
+	MenuSpinbox *m_max;
 
 	QMap<PlotAxis*, QList<QMetaObject::Connection>> connections;
 };

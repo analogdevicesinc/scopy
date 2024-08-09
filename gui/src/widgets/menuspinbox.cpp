@@ -1,33 +1,11 @@
 #include "menuspinbox.h"
-#include <cfloat>
 #include <stylehelper.h>
 
 namespace scopy {
 namespace gui {
 
+
 MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, double max, bool vertical, bool left, QWidget *parent) : QWidget(parent) {
-	auto lay1 = new QVBoxLayout(this);
-	lay1->setSpacing(5);
-	lay1->setMargin(0);
-
-	setLayout(lay1);
-
-	auto lay = new QHBoxLayout(this);
-
-	lay->setSpacing(5);
-	lay->setMargin(0);
-
-	QLayout *btnLay;
-	QLayout *editLay;
-
-	if(vertical) {
-		btnLay = new QVBoxLayout();
-		editLay = new QVBoxLayout();
-	} else {
-		btnLay = new QHBoxLayout();
-		editLay = new QHBoxLayout();
-	}
-
 
 	m_label = new QLabel(name);
 	m_edit = new QLineEdit("0");
@@ -35,34 +13,22 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	m_plus = new QPushButton("+");
 	m_minus = new QPushButton("-");
 
-	btnLay->addWidget(m_plus);
-	btnLay->addWidget(m_minus);
+	m_plus->setAutoRepeat(true);
+	m_plus->setAutoRepeatDelay(300);
+	m_plus->setAutoRepeatInterval(20);
 
-	// editLay->addWidget(m_label);
-	editLay->addWidget(m_edit);
-	editLay->addWidget(m_scaleCb);
-
-	StyleHelper::MenuSmallLabel(m_label);
-	StyleHelper::MenuLineEditWidget(m_edit);
-	StyleHelper::MenuComboBox(m_scaleCb);
-
-	StyleHelper::SpinBoxUpButton(m_plus, "plus_btn");
-	m_plus->setFixedSize(32,32);
-	StyleHelper::SpinBoxDownButton(m_minus, "minus_btn");
-	m_minus->setFixedSize(32,32);
+	m_minus->setAutoRepeat(true);
+	m_minus->setAutoRepeatDelay(300);
+	m_minus->setAutoRepeatInterval(20);
 
 
-	lay1->addWidget(m_label);
-	if(left) {
-		lay->addLayout(btnLay);
-		lay->addLayout(editLay);
+	if(vertical) {
+		layoutVertically(left);
 	} else {
-		lay->addLayout(editLay);
-		lay->addLayout(btnLay);
+		layoutHorizontally(left);
 	}
-	lay1->addLayout(lay);
 
-	m_incrementStrategy = new IncrementStrategyFixed();
+	m_incrementStrategy = new IncrementStrategyPower2();
 
 	connect(m_plus, &QAbstractButton::clicked, this, [=](){
 		setValue(m_incrementStrategy->increment(m_value));
@@ -72,6 +38,11 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	});
 
 	connect(m_edit, &QLineEdit::editingFinished, this, [=]() {
+		userInput(m_edit->text());
+	});
+
+	connect(m_scaleCb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+		m_incrementStrategy->setScale(m_scaleCb->itemData(idx).toDouble());
 		userInput(m_edit->text());
 	});
 
@@ -87,14 +58,112 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	m_unit = unit;
 	m_min = min;
 	m_max = max;
-	populateCombobox(unit,m_min,m_max);
+	m_scaleMin = min;
+	m_scaleMax = max;
+	setScaleRange(m_scaleMin,m_scaleMax);
 	setValue(val);
 }
 
 MenuSpinbox::~MenuSpinbox()
 {
 	delete m_incrementStrategy;
+}
 
+void MenuSpinbox::layoutVertically(bool left)
+{
+	auto lay = new QHBoxLayout(this);
+	setLayout(lay);
+
+	lay->setSpacing(5);
+	lay->setMargin(0);
+
+	QLayout *btnLay;
+	QLayout *editLay;
+
+	btnLay = new QVBoxLayout();
+	editLay = new QVBoxLayout();
+
+	btnLay->setSpacing(2);
+	btnLay->setMargin(0);
+	editLay->setSpacing(2);
+	editLay->setMargin(0);
+
+	btnLay->addWidget(m_plus);
+	btnLay->addWidget(m_minus);
+
+	editLay->addWidget(m_label);
+	editLay->addWidget(m_edit);
+
+	QFrame *line = new QFrame(this);
+	line->setFrameShape(QFrame::HLine);
+	line->setFrameShadow(QFrame::Plain);
+	editLay->addWidget(line);
+	StyleHelper::MenuSpinboxLine(line);
+	editLay->addWidget(m_scaleCb);
+
+	if(left) {
+		lay->addLayout(btnLay);
+		lay->addLayout(editLay);
+	} else {
+		lay->addLayout(editLay);
+		lay->addLayout(btnLay);
+	}
+
+	StyleHelper::MenuSpinboxLabel(m_label);
+	StyleHelper::MenuSpinboxLineEdit(m_edit);
+	StyleHelper::MenuSpinComboBox(m_scaleCb);
+
+	StyleHelper::SpinBoxUpButton(m_plus, "plus_btn");
+	m_plus->setFixedSize(30,30);
+	StyleHelper::SpinBoxDownButton(m_minus, "minus_btn");
+	m_minus->setFixedSize(30,30);
+}
+
+
+void MenuSpinbox::layoutHorizontally(bool left)
+{
+
+	auto lay = new QHBoxLayout(this);
+	setLayout(lay);
+
+	lay->setSpacing(5);
+	lay->setMargin(0);
+
+	QLayout *btnLay;
+	QLayout *editLay;
+
+	btnLay = new QHBoxLayout();
+	editLay = new QHBoxLayout();
+
+	btnLay->setSpacing(2);
+	btnLay->setMargin(0);
+	editLay->setSpacing(5);
+	editLay->setMargin(0);
+
+	btnLay->addWidget(m_plus);
+	btnLay->addWidget(m_minus);
+
+	editLay->addWidget(m_label);
+	editLay->addWidget(m_edit);
+
+	editLay->addWidget(m_scaleCb);
+
+	if(left) {
+		lay->addLayout(btnLay);
+		lay->addLayout(editLay);
+	} else {
+		lay->addLayout(editLay);
+		lay->addLayout(btnLay);
+	}
+
+	StyleHelper::MenuSmallLabel(m_label);
+	StyleHelper::MenuLineEdit(m_edit);
+	StyleHelper::MenuComboBox(m_scaleCb);
+
+	StyleHelper::SpinBoxUpButton(m_plus, "plus_btn");
+	m_plus->setFixedSize(30,30);
+	StyleHelper::SpinBoxDownButton(m_minus, "minus_btn");
+	m_minus->setFixedSize(30,30);
 }
 
 double MenuSpinbox::value() const
@@ -102,7 +171,11 @@ double MenuSpinbox::value() const
 	return m_value;
 }
 
-void MenuSpinbox::setValue(double newValue, bool force)
+void MenuSpinbox::setValue(double newValue) {
+	setValueForce(newValue, 0);
+}
+
+void MenuSpinbox::setValueForce(double newValue, bool force)
 {
 	if (qFuzzyCompare(m_value, newValue) || force)
 		return;
@@ -112,10 +185,10 @@ void MenuSpinbox::setValue(double newValue, bool force)
 	Q_EMIT valueChanged(newValue);
 }
 
-/*void MenuSpinbox::setValue(QString s)
+void MenuSpinbox::setValueString(QString s)
 {
 	userInput(s);
-}*/
+}
 
 QString MenuSpinbox::unit() const
 {
@@ -127,23 +200,47 @@ void MenuSpinbox::setUnit(const QString &newUnit)
 	if (m_unit == newUnit)
 		return;
 	m_unit = newUnit;
-	populateCombobox(m_unit,m_min, m_max);
+	setScaleRange(m_scaleMin, m_scaleMax);
 	Q_EMIT unitChanged(newUnit);
 }
 
+void MenuSpinbox::setMinValue(double min)
+{
+	m_min = min;
+}
 
+void MenuSpinbox::setMaxValue(double min)
+{
+	m_min = min;
+}
 
 IncrementStrategy *MenuSpinbox::incrementStrategy() const
 {
 	return m_incrementStrategy;
 }
 
-void MenuSpinbox::setIncrementStrategy(IncrementStrategy *newIncrementStrategy)
+void MenuSpinbox::setIncrementMode(IncrementMode im)
 {
-	if(m_incrementStrategy != newIncrementStrategy) {
-		delete m_incrementStrategy;
-		m_incrementStrategy = newIncrementStrategy;
+	if(m_im == im)
+		return;
+
+	m_im = im;
+	delete m_incrementStrategy;
+	switch(m_im) {
+
+	case IS_POW2:
+		m_incrementStrategy = new IncrementStrategyPower2();
+		break;
+	case IS_125:
+		m_incrementStrategy = new IncrementStrategy125();
+		break;
+	case IS_FIXED:
+	default:
+		m_incrementStrategy = new IncrementStrategyFixed();
+		break;
 	}
+	m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
+
 }
 
 void MenuSpinbox::userInput(QString s)
@@ -184,21 +281,29 @@ void MenuSpinbox::populateWidgets()
 
 	int i = 0;
 	double scale = 1;
+	double absvalue = abs(m_value);
+	if(qFuzzyCompare(absvalue, 0)) {
+		scale = 1;
+		for(i = m_scaleCb->count() - 1; i >= 0; i--) { // find most suitable scale
+			if(m_scaleCb->itemData(i).toDouble() == 1)
+				break;
+		}
+	} else {
 	for(i = m_scaleCb->count() - 1; i >= 0; i--) { // find most suitable scale
 		scale = m_scaleCb->itemData(i).toDouble();
-		if(m_value / scale >= 10)
+		if(absvalue / scale >= 10)
 			break;
-	}
-	if( i < 0 ){
+	} if( i < 0 ){
 		i = 0;
 		scale = m_scaleCb->itemData(i).toDouble();
-	}
+	} }
 
 	QSignalBlocker sb1(m_edit);
 	QSignalBlocker sb2(m_scaleCb);
 	m_edit->setText(QString::number(m_value/scale)); // reduce number to a meaningful value
 	m_scaleCb->setCurrentIndex(i); 	// set apropriate scale in combobox
-	setToolTip(QString::number(m_value)); // set tooltip
+	m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
+	setToolTip(QString::number(m_value,'f',6)); // set tooltip
 
 }
 
@@ -207,15 +312,15 @@ void MenuSpinbox::applyStylesheet()
 
 }
 
-void MenuSpinbox::populateCombobox(QString unit, double min = 0, double max = DBL_MAX /*, enum metric */) {
-
+void MenuSpinbox::setScaleRange(double min, double max) {
+	m_scaleCb->clear();
 	for(int i = 0;i<m_scales.count();i++) {
 		auto scale = m_scales[i].scale;
-		//if(scale / min > 1 && scale / max < 1) {
-			m_scaleCb->addItem(m_scales[i].prefix + unit, scale);
-		//}
+		if(scale >= min && scale <= max) {
+			m_scaleCb->addItem(m_scales[i].prefix + m_unit, scale);
+		}
 	}
-
+	m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
 }
 
 int MenuSpinbox::findLastDigit(QString str)

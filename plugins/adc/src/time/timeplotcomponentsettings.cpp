@@ -139,7 +139,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	m_xAxisShow->setVisible(false);
 
 	// init
-	xySwitch->setChecked(true);
+	xySwitch->setChecked(false);
 	m_yCtrl->setMin(-2048);
 	m_yCtrl->setMax(2048);
 	labelsSwitch->onOffswitch()->setChecked(true);
@@ -205,7 +205,9 @@ void TimePlotComponentSettings::removeChannel(ChannelComponent *c)
 	m_curve->removeChannels(chcmpt->m_xyPlotCh);
 }
 
-void TimePlotComponentSettings::onInit() {}
+void TimePlotComponentSettings::onInit() {
+
+}
 
 void TimePlotComponentSettings::onDeinit() {}
 
@@ -282,7 +284,7 @@ void TimePlotComponentSettings::updateYAxis()
 	case YMODE_FS:
 		timePlotYAxis->setUnits("");
 		timePlotYAxis->scaleDraw()->setFloatPrecision(3);
-		timePlotYAxis->getFormatter()->setTwoDecimalMode(true);
+		timePlotYAxis->getFormatter()->setTwoDecimalMode(false);
 		break;
 	case YMODE_SCALE:
 		timePlotYAxis->setUnits(m_scaleProviders[0]->unit().symbol);
