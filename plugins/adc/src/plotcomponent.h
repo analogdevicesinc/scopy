@@ -44,6 +44,7 @@ public Q_SLOTS:
 	virtual void selectChannel(ChannelComponent *c);
 	virtual void setXInterval(double min, double max);
 	virtual void setXInterval(QPair<double,double> p);
+	virtual void setXUnit(QString s);
 
 Q_SIGNALS:
 	void nameChanged(QString);
