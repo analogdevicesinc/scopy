@@ -47,18 +47,20 @@ void ADCInstrument::setupToolLayout()
 	tool->openBottomContainerHelper(false);
 	tool->openTopContainerHelper(false);
 
-	GearBtn *settingsBtn = new GearBtn(this);
+	m_settingsBtn = new GearBtn(this);
 	InfoBtn *infoBtn = new InfoBtn(this);
 	addBtn = new AddBtn(this);
 	removeBtn = new RemoveBtn(this);
 
 	m_sync = new QPushButton("Sync");
+	m_sync->setFixedWidth(150);
 	m_sync->setCheckable(true);
 	StyleHelper::BlueGrayButton(m_sync);
 
 
 	m_complex = new QPushButton("Complex");
 	m_complex->setCheckable(true);
+	m_complex->setFixedWidth(150);
 	StyleHelper::BlueGrayButton(m_complex);
 
 	PrintBtn *printBtn = new PrintBtn(this);
@@ -71,7 +73,7 @@ void ADCInstrument::setupToolLayout()
 	setupCursorButtonHelper(m_cursor);
 
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
-	tool->addWidgetToTopContainerMenuControlHelper(settingsBtn, TTA_LEFT);
+	tool->addWidgetToTopContainerMenuControlHelper(m_settingsBtn, TTA_LEFT);
 
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
@@ -87,14 +89,14 @@ void ADCInstrument::setupToolLayout()
 	tool->addWidgetToBottomContainerHelper(m_complex, TTA_LEFT);
 	tool->addWidgetToBottomContainerHelper(m_cursor, TTA_RIGHT);
 
-	rightMenuBtnGrp->addButton(settingsBtn);
+	rightMenuBtnGrp->addButton(m_settingsBtn);
 
 	setupChannelsButtonHelper(channelsBtn);
 	setupRunSingleButtonHelper();
 
 	channelGroup = new QButtonGroup(this);
 
-	connect(settingsBtn, &QPushButton::toggled, this, [=](bool b) {
+	connect(m_settingsBtn, &QPushButton::toggled, this, [=](bool b) {
 		if(b)
 			tool->requestMenu(settingsMenuId);
 	});
@@ -112,7 +114,7 @@ void ADCInstrument::setupToolLayout()
 		Q_EMIT requestNewInstrument(TIME);
 	});
 
-	connect(removeBtn, &QAbstractButton::clicked, this, &ADCInstrument::requestDeleteInstrument);
+	connect(removeBtn, &QAbstractButton::clicked, this, &ADCInstrument::requestDeleteInstrument);	
 }
 
 void ADCInstrument::setupRunSingleButtonHelper()
