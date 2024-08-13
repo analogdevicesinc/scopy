@@ -16,6 +16,16 @@
         "rx_tx_bin_path": "/plugins/pqm/res/data.bin"
     },
     {
+        "device": "swiot_config",
+        "xml_path": "/plugins/swiot/res/emu_xml/config.xml",
+        "uri": "ip:127.0.0.1"
+    },
+    {
+        "device": "swiot_runtime",
+        "xml_path": "/plugins/swiot/res/emu_xml/runtime1.xml",
+        "uri": "ip:127.0.0.1"
+    },
+    {
         "device": "generic",
         "uri": "ip:127.0.0.1"
     }
