@@ -300,6 +300,10 @@ void PlotWidget::printPlot(QPainter *painter, bool useSymbols)
 	renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, true);
 	renderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground, true);
 
+	// Change axis and legend color
+	auto currentStyle = m_plot->styleSheet();
+	m_plot->setStyleSheet("color: #9E9E9F");
+
 	// Apply printable plot changes
 	// list of current curve colors
 	QList<QPen> plotChColors;
@@ -328,8 +332,8 @@ void PlotWidget::printPlot(QPainter *painter, bool useSymbols)
 	renderer.render(m_plot, painter, QRectF(0, 0, 400, 300));
 
 	// revert changes made for printable plot
-
 	m_plot->insertLegend(nullptr);
+	m_plot->setStyleSheet(currentStyle);
 
 	// revert curves to original settings
 	for(int i = 0; i < getChannels().length(); i++) {
