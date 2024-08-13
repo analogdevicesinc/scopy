@@ -8,6 +8,9 @@
 #include <stylehelper.h>
 
 #include <filesystem>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 Q_LOGGING_CATEGORY(CAT_EMU_ADD_PAGE, "EmuAddPage")
 using namespace scopy;
@@ -25,6 +28,9 @@ EmuWidget::EmuWidget(QWidget *parent)
 	vLay->setSpacing(10);
 	vLay->setMargin(0);
 	vWidget->setLayout(vLay);
+
+	getJsonConfiguration();
+	getEmuOptions();
 
 	m_emuWidget = new QWidget(vWidget);
 	QGridLayout *emuWidgetLay = new QGridLayout(m_emuWidget);
@@ -103,10 +109,20 @@ void EmuWidget::init()
 
 void EmuWidget::enGenericOptWidget(QWidget *xmlPathWidget, QWidget *rxTxDevWidget, QString crtOpt)
 {
-	bool isGeneric = crtOpt.contains("generic");
-	xmlPathWidget->setEnabled(isGeneric);
-	rxTxDevWidget->setEnabled(isGeneric);
+	// when a new option is selected clear all fields
+	m_xmlPathEdit->edit()->setText("");
+	m_rxTxDevEdit->edit()->setText("");
+	m_uriEdit->edit()->setText("");
+
+	bool isNotAdalm2000 = !crtOpt.contains("adalm2000");
+
+	xmlPathWidget->setEnabled(isNotAdalm2000);
+	rxTxDevWidget->setEnabled(isNotAdalm2000);
 	m_enDemoBtn->setFocus();
+
+	if(isNotAdalm2000) {
+		configureOption(crtOpt);
+	}
 }
 
 void EmuWidget::setStatusMessage(QString msg)
@@ -141,10 +157,13 @@ QStringList EmuWidget::createArgList()
 {
 	QString option = m_demoOptCb->currentText();
 	QStringList arguments;
-	arguments.append(option);
-	if(option.compare("generic") == 0) {
+
+	if(option.compare("adalm2000") != 0) {
+		arguments.append("generic");
 		arguments.append(m_xmlPathEdit->edit()->text());
 		arguments.append(m_rxTxDevEdit->edit()->text());
+	} else {
+		arguments.append("adalm2000");
 	}
 	return arguments;
 }
@@ -192,6 +211,70 @@ void EmuWidget::killEmuProcess()
 	m_emuWidget->setEnabled(true);
 	stopEnableBtn("Enable Demo");
 	m_enableDemo = !m_enableDemo;
+}
+
+void EmuWidget::getEmuOptions()
+{
+	// Populate emu devices from json
+	QJsonDocument d = QJsonDocument::fromJson(m_jsonConfigVal.toUtf8());
+	QJsonArray valuesList = d.array();
+
+	for(auto object : valuesList) {
+		QString device = object.toObject().value(QString("device")).toString();
+		m_availableOptions.append(device);
+	}
+}
+
+void EmuWidget::configureOption(QString option)
+{
+	QJsonDocument d = QJsonDocument::fromJson(m_jsonConfigVal.toUtf8());
+	QJsonArray valuesList = d.array();
+
+	for(auto jsonArrayItem : valuesList) {
+		QJsonObject jsonObject = jsonArrayItem.toObject();
+		QString device = jsonObject.value(QString("device")).toString();
+		if(device == option) {
+			QString currentPath = QDir::currentPath();
+
+			if(jsonObject.contains("xml_path")) {
+				QString xmlPath = jsonObject.value(QString("xml_path")).toString();
+				m_xmlPathEdit->edit()->setText(currentPath + xmlPath);
+			}
+
+			if(jsonObject.contains("rx_tx_device")) {
+				QString rxTxDevice = jsonObject.value(QString("rx_tx_device")).toString();
+				rxTxDevice += "@";
+				rxTxDevice += currentPath;
+				rxTxDevice += jsonObject.value(QString("rx_tx_bin_path")).toString();
+				m_rxTxDevEdit->edit()->setText(rxTxDevice);
+			}
+
+			if(jsonObject.contains("uri")) {
+				QString uri = jsonObject.value(QString("uri")).toString();
+				m_uriEdit->edit()->setText(uri);
+			}
+
+			break;
+		}
+	}
+}
+
+void EmuWidget::getJsonConfiguration()
+{
+	QString currentPath = QDir::currentPath();
+	QString filePath = currentPath + "/resources/scopy_emu_options_config.json";
+	QFile file;
+
+	file.setFileName(filePath);
+
+	if(file.exists()) {
+		file.open(QIODevice::ReadOnly | QIODevice::Text);
+		m_jsonConfigVal = file.readAll();
+		file.close();
+	} else {
+		qWarning(CAT_EMU_ADD_PAGE) << "Emu configuration file is missing ";
+		m_availableOptions.append("generic");
+	}
 }
 
 void EmuWidget::browseFile(QLineEdit *lineEditPath)

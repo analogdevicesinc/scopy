@@ -46,6 +46,10 @@ private:
 	bool startIioEmuProcess(QString processPath, QStringList arg = {});
 	void killEmuProcess();
 
+	void getEmuOptions();
+	void configureOption(QString option);
+	void getJsonConfiguration();
+
 	QWidget *m_emuWidget;
 	QComboBox *m_demoOptCb;
 	MenuLineEdit *m_xmlPathEdit;
@@ -57,7 +61,9 @@ private:
 	QString m_emuPath;
 	bool m_enableDemo;
 	QProcess *m_emuProcess;
-	const QStringList m_availableOptions{"adalm2000", "generic"};
+	QStringList m_availableOptions;
+
+	QString m_jsonConfigVal;
 };
 } // namespace scopy
 
