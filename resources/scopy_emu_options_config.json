@@ -1,0 +1,23 @@
+[
+    {
+        "device": "adalm2000",
+        "uri": "ip:127.0.0.1"
+    },
+    {
+        "device": "pluto",
+        "xml_path": "/resources/emuXml/pluto.xml",
+        "uri": "ip:127.0.0.1"
+    },
+    {
+        "device": "pqm",
+        "xml_path": "/plugins/pqm/res/pqm1.xml",
+        "uri": "ip:127.0.0.1",
+        "rx_tx_device":"iio:device0",
+        "rx_tx_bin_path": "/plugins/pqm/res/data.bin"
+    },
+    {
+        "device": "generic",
+        "uri": "ip:127.0.0.1"
+    }
+
+]
