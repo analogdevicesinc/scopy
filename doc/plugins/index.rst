@@ -32,7 +32,13 @@ Application Specific plugins
     * :ref:`Power Supply <power_supply>`
 
 
-* SWIOT1L
+* AD-SWIOT1L-SL
+
+    * :ref:`Config <swiot_config>`
+    * :ref:`AD74413R <ad74413r>`
+    * :ref:`MAX14906 <max14906>`
+    * :ref:`Faults <faults>`
+
 * PQM
     * :ref:`RMS <rms>`
     * :ref:`Harmonics <harmonics>`
@@ -58,4 +64,5 @@ Contents
    registermap/registermap
    m2k/index
    pqm/index
+   swiot1l/index
 
