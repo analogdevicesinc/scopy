@@ -17,8 +17,6 @@
 #include <iterator>
 
 static const size_t maxAttrSize = 512;
-static vector<double> angle_errors_fft;
-static vector<double> angle_errors_fft_phase;
 
 using namespace scopy::admt;
 using namespace std;
@@ -78,6 +76,7 @@ const char* ADMTController::getMotorAttribute(MotorAttribute attribute)
 int ADMTController::getChannelIndex(const char *deviceName, const char *channelName)
 {
 	iio_device *admtDevice = iio_context_find_device(m_iioCtx, deviceName);
+    if(admtDevice == NULL) { return -1; }
 	int channelCount = iio_device_get_channels_count(admtDevice);
 	iio_channel *channel;
 	std::string message = "";
@@ -430,8 +429,8 @@ QString ADMTController::calibrate(vector<double> PANG, int cycles, int samplesPe
     /* FFT based on implementation from https://www.oreilly.com/library/view/c-cookbook/0596007612/ch11s18.html */
     vector<double> angle_errors_fft_temp(PANG.size());
     vector<double> angle_errors_fft_phase_temp(PANG.size());
-    angle_errors_fft(PANG.size() / 2);
-    angle_errors_fft_phase(PANG.size() / 2);
+    angle_errors_fft = vector<double>(PANG.size() / 2);
+    angle_errors_fft_phase = vector<double>(PANG.size() / 2);
     typedef complex<double> cx;
 
     /* array declaration must be constant so hardcoded as of now */

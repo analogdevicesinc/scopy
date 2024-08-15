@@ -21,6 +21,7 @@
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QIcon>
+#include <QPen>
 
 #include <iio.h>
 #include <iioutil/connectionprovider.h>
@@ -68,7 +69,7 @@ private:
 
 	double rotation, angle, count, temp, amax, rotate_vmax, dmax, disable, target_pos, current_pos, ramp_mode;
 
-	QPushButton *openLastMenuButton, *calibrationStartMotorButton;
+	QPushButton *openLastMenuButton, *calibrationStartMotorButton, *applyCalibrationDataButton;
 	QButtonGroup *rightMenuButtonGroup;
 
 	QLineEdit 	*graphUpdateIntervalLineEdit, *dataSampleSizeLineEdit,
@@ -105,6 +106,10 @@ private:
 
 	QPlainTextEdit *logsPlainTextEdit;
 
+	PlotWidget *calibrationFFTDataPlotWidget;
+	PlotAxis *calibrationFFTXPlotAxis, *calibrationFFTYPlotAxis;
+	PlotChannel *calibrationFFTPlotChannel, *calibrationFFTPhasePlotChannel;
+
 	void updateChannelValues();
 	void updateLineEditValues();
 	void updateGeneralSettingEnabled(bool value);
@@ -127,17 +132,27 @@ private:
 	void importCalibrationData();
 	void calibrationLogWrite(QString message);
 	void calibrationLogWriteLn(QString message);
-	void readMotorAttributeValue(ADMTController::MotorAttribute attribute, double *value);
+	void readMotorAttributeValue(ADMTController::MotorAttribute attribute, double& value);
 	void writeMotorAttributeValue(ADMTController::MotorAttribute attribute, double value);
 	void applyLineEditStyle(QLineEdit *widget);
 	void applyComboBoxStyle(QComboBox *widget, const QString& styleHelperColor = "CH0");
 	void applyTextStyle(QWidget *widget, const QString& styleHelperColor = "CH0", bool isBold = false);
 	void applyLabelStyle(QLabel *widget);
 	void initializeMotor();
-	void startMotorAcquisition();
+	void stepMotorAcquisition(double step = -408);
 	void clearRawDataList();
+	void motorCalibrationAcquisitionTask();
+	void connectLineEditToRPSConversion(QLineEdit* lineEdit, double& vmax);
+	double convertRPStoVMAX(double rps);
+	double convertVMAXtoRPS(double vmax);
+	void connectLineEditToAMAXConversion(QLineEdit* lineEdit, double& amax);
+	double convertAccelTimetoAMAX(double accelTime);
+	double convertAMAXtoAccelTime(double amax);
+	void updateCalculatedCoeff();
+	void resetCalculatedCoeff();
+	void connectMenuComboToNumber(MenuCombo* menuCombo, double& variable);
 
-	QTimer *timer, *calibrationTimer;
+	QTimer *timer, *calibrationTimer, *motorCalibrationAcquisitionTimer;
 
 	int uuid = 0;
 	const char *rotationChannelName, *angleChannelName, *countChannelName, *temperatureChannelName;
