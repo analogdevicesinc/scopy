@@ -257,6 +257,18 @@ int ADMTController::writeDeviceRegistry(const char *deviceName, uint32_t address
     return result;
 }
 
+int ADMTController::readDeviceRegistry(const char *deviceName, uint32_t address, double& readValue)
+{
+    int result = -1;
+    int deviceCount = iio_context_get_devices_count(m_iioCtx);
+    if(deviceCount == 0) { return result; }
+    iio_device *iioDevice = iio_context_find_device(m_iioCtx, deviceName);
+    if(iioDevice == NULL) { return result; }
+    result = iio_device_reg_read(iioDevice, address, reinterpret_cast<uint32_t*>(&readValue));
+
+    return result;
+}
+
 /* bit reversal from online example */
 unsigned int ADMTController::bitReverse(unsigned int x, int log2n) {
     int n = 0;
