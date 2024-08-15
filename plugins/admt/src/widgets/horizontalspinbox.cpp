@@ -25,8 +25,8 @@ HorizontalSpinBox::HorizontalSpinBox(QString header, double initialValue, QStrin
     controlLayout->setMargin(0);
     controlLayout->setSpacing(2);
 
-    lineEdit = new QLineEdit(controlWidget);
-    applyLineEditStyle(lineEdit);
+    m_lineEdit = new QLineEdit(controlWidget);
+    applyLineEditStyle(m_lineEdit);
 
     if(QString::compare(m_unit, "") != 0) {
         QWidget *lineEditContainer = new QWidget(controlWidget);
@@ -38,14 +38,14 @@ HorizontalSpinBox::HorizontalSpinBox(QString header, double initialValue, QStrin
         QLabel *unitLabel = new QLabel(m_unit, controlWidget);
         applyUnitLabelStyle(unitLabel);
 
-        lineEdit->setTextMargins(12, 4, 0, 4);
+        m_lineEdit->setTextMargins(12, 4, 0, 4);
 
-        lineEditLayout->addWidget(lineEdit);
+        lineEditLayout->addWidget(m_lineEdit);
         lineEditLayout->addWidget(unitLabel);
         controlLayout->addWidget(lineEditContainer);
     }
     else{
-        controlLayout->addWidget(lineEdit);
+        controlLayout->addWidget(m_lineEdit);
     }
     
     QPushButton *minusButton = new QPushButton(controlWidget);
@@ -62,7 +62,7 @@ HorizontalSpinBox::HorizontalSpinBox(QString header, double initialValue, QStrin
     container->addWidget(controlWidget);
 
     setValue(m_value);
-    connect(lineEdit, SIGNAL(editingFinished()), SLOT(onLineEditTextEdited()));
+    connect(m_lineEdit, SIGNAL(editingFinished()), SLOT(onLineEditTextEdited()));
     connect(minusButton, SIGNAL(clicked()), SLOT(onMinusButtonPressed()));
     connect(plusButton, SIGNAL(clicked()), SLOT(onPlusButtonPressed()));
 }
@@ -71,12 +71,14 @@ void HorizontalSpinBox::onMinusButtonPressed()
 {
     m_value--;
     setValue(m_value);
+    Q_EMIT m_lineEdit->editingFinished();
 }
 
 void HorizontalSpinBox::onPlusButtonPressed()
 {
     m_value++;
     setValue(m_value);
+    Q_EMIT m_lineEdit->editingFinished();
 }
 
 void HorizontalSpinBox::onLineEditTextEdited()
@@ -92,7 +94,7 @@ void HorizontalSpinBox::onLineEditTextEdited()
 
 void HorizontalSpinBox::setValue(double value)
 {
-    lineEdit->setText(QString::number(value));
+    m_lineEdit->setText(QString::number(value));
 }
 
 void HorizontalSpinBox::applyLineEditStyle(QLineEdit *widget)
@@ -155,3 +157,5 @@ void HorizontalSpinBox::applyUnitLabelStyle(QLabel *widget)
     widget->setAlignment(Qt::AlignRight);
     widget->setContentsMargins(0, 4, 12, 4);
 }
+
+QLineEdit *HorizontalSpinBox::lineEdit() { return m_lineEdit; }
