@@ -32,6 +32,8 @@ public:
 
     int HAR_MAG_1, HAR_MAG_2, HAR_MAG_3, HAR_MAG_8 ,HAR_PHASE_1 ,HAR_PHASE_2 ,HAR_PHASE_3 ,HAR_PHASE_8;
 
+    vector<double> angle_errors_fft, angle_errors_fft_phase;
+
     enum Channel
     {
         ROTATION,
@@ -58,6 +60,12 @@ public:
         CURRENT_POS,
         RAMP_MODE,
         MOTOR_ATTR_COUNT
+    };
+
+    enum MotorRampMode
+    {
+        POSITION,
+        RAMP_MODE_1
     };
 
     const char* ChannelIds[CHANNEL_COUNT] = {"rot", "angl", "count", "temp"};

@@ -17,6 +17,7 @@ namespace scopy::admt {
         Q_OBJECT
     public:
         HorizontalSpinBox(QString header = "", double initialValue = 0.0, QString unit = "", QWidget *parent = nullptr);
+        QLineEdit *lineEdit();
     public Q_SLOTS:
         void setValue(double);
     protected Q_SLOTS:
@@ -26,7 +27,7 @@ namespace scopy::admt {
     private:
         double m_value = 0;
         QString m_unit = "";
-        QLineEdit *lineEdit;
+        QLineEdit *m_lineEdit;
         void applyLineEditStyle(QLineEdit *widget);
         void applyPushButtonStyle(QPushButton *widget, int topLeftBorderRadius = 0, int topRightBorderRadius = 0, int bottomLeftBorderRadius = 0, int bottomRightBorderRadius = 0);
         void applyUnitLabelStyle(QLabel *widget);
