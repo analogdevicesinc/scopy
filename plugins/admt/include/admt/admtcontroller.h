@@ -86,6 +86,7 @@ public:
     int setDeviceAttributeValue(const char *deviceName, const char *attributeName, double writeValue);
     QString calibrate(vector<double> PANG, int cycles = 11, int samplesPerCycle = 256);
     int writeDeviceRegistry(const char *deviceName, uint32_t address, double value);
+    int readDeviceRegistry(const char *deviceName, uint32_t address, double& readValue);
 private:
     iio_context *m_iioCtx;
     iio_buffer *m_iioBuffer;
