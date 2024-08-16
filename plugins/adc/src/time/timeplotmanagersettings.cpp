@@ -356,6 +356,14 @@ void TimePlotManagerSettings::addPlot(TimePlotComponent *p)
 	m_plotStack->add(QString(p->uuid()), plotMenu);
 	// m_menu->add(plotMenu, p->name() + QString(p->uuid()), gui::MenuWidget::MA_TOPLAST);
 	setPlotComboVisible();
+	connect(p->plotMenu(), &TimePlotComponentSettings::requestSettings, this, [=](){
+		int idx = m_plotCb->combo()->findData(p->uuid());
+		m_plotCb->combo()->setCurrentIndex(idx);
+		m_menu->scrollTo(m_plotCb);
+		Q_EMIT requestOpenMenu();
+
+	});
+
 }
 
 void TimePlotManagerSettings::setPlotComboVisible() {
@@ -423,11 +431,6 @@ void TimePlotManagerSettings::updateXModeCombo()
 		QMetaObject::invokeMethod(cb,"setCurrentIndex",Qt::QueuedConnection,Q_ARG(int,1));
 	}
 }
-
-/*void TimePlotManagerSettings::collapseAllAndOpenMenu(QString s) {
-	m_menu->collapseAll();
-	m_menu->setCollapsed(s, true);
-}*/
 
 } // namespace adc
 } // namespace scopy
