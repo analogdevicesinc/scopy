@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "compositewidget.h"
 #include "menuheader.h"
+#include "qscrollarea.h"
 #include <QSpacerItem>
 #include <QVBoxLayout>
 #include <QMap>
@@ -36,6 +37,7 @@ public:
 	QWidget *findWidget(QString name);
 	QString widgetName(QWidget *);
 
+	void scrollTo(QWidget *);
 	void collapseAll();
 	void setCollapsed(QString name, bool b);
 
@@ -44,6 +46,7 @@ private:
 	QSpacerItem *m_spacer;
 	QVBoxLayout *m_layScroll;
 	MenuHeaderWidget *m_header;
+	QScrollArea *scroll;
 	int uuid;
 };
 } // namespace gui

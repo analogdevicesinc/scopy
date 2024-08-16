@@ -27,6 +27,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void requestDeletePlot();
+	void requestSettings();
 
 private:
 	FFTPlotComponent *m_plotComponent;
@@ -37,6 +38,7 @@ private:
 	QList<ChannelComponent *> m_channels;
 	QPushButton *m_deletePlot;
 	QPushButton *m_deletePlotHover;
+	QPushButton *m_settingsPlotHover;
 
 	bool m_autoscaleEnabled;
 	bool m_running;

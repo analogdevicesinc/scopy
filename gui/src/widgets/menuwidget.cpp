@@ -11,7 +11,7 @@ MenuWidget::MenuWidget(QString name, QPen p, QWidget *parent)
 	uuid = 0;
 	QVBoxLayout *lay = new QVBoxLayout();
 
-	QScrollArea *scroll = new QScrollArea(parent);
+	scroll = new QScrollArea(parent);
 	QWidget *wScroll = new QWidget(scroll);
 
 	m_layScroll = new QVBoxLayout();
@@ -87,6 +87,10 @@ MenuHeaderWidget *MenuWidget::header() { return m_header; }
 QWidget *MenuWidget::findWidget(QString name) { return m_widgetMap.value(name, nullptr); }
 
 QString MenuWidget::widgetName(QWidget *w) { return m_widgetMap.key(w, ""); }
+
+void MenuWidget::scrollTo(QWidget *w) {
+	scroll->ensureWidgetVisible(w);
+}
 
 void MenuWidget::collapseAll()
 {
