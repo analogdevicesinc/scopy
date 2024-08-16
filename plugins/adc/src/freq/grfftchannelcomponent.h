@@ -160,12 +160,9 @@ public Q_SLOTS:
 	bool sampleRateAvailable() override;
 	double sampleRate() override;
 
-	void setYModeHelper(YMode mode);
-
 	void addChannelToPlot() override;
 	void removeChannelFromPlot() override;
 
-	// SamplingInfoComponent interface
 public:
 	void setSamplingInfo(SamplingInfo p) override;
 

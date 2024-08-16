@@ -49,6 +49,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void nameChanged(QString);
 	void requestDeletePlot();
+	void selectComponent(PlotComponent*);
 
 public:
 	virtual void onStart();
