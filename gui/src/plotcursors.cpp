@@ -135,6 +135,11 @@ void PlotCursors::enableTracking(bool tracking)
 	Q_EMIT update();
 }
 
+bool PlotCursors::tracking() const
+{
+	return m_tracking;
+}
+
 void PlotCursors::displayIntersection()
 {
 	if(m_plot->selectedChannel() == nullptr)
