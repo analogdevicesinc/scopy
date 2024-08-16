@@ -33,6 +33,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void requestDeletePlot();
+	void requestSettings();
 
 private:
 	PlotAutoscaler *m_autoscaler;
@@ -47,6 +48,7 @@ private:
 	QList<ScaleProvider *> m_scaleProviders;
 	QPushButton *m_deletePlot;
 	QPushButton *m_deletePlotHover;
+	QPushButton *m_settingsPlotHover;
 	YMode m_ymode;
 
 	bool m_autoscaleEnabled;
