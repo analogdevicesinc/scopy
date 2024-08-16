@@ -25,9 +25,9 @@ public:
 	bool getComplexChannelPair(AcqTreeNode *node, AcqTreeNode **node_i, AcqTreeNode **node_q);
 
 private:
-	bool m_complexMode;
 	QList<AcqTreeNode*> m_complexChannels;
 	FFTPlotManagerSettings* m_fftPlotSettingsComponent;
+	ChannelComponent *m_defaultComplexCh, *m_defaultRealCh;
 
 };
 
