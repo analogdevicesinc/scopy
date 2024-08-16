@@ -172,6 +172,13 @@ void CursorController::onRemovedChannel(PlotChannel *ch)
 	disconnect(ch->yAxis(), &PlotAxis::formatterChanged, plotCursorReadouts, nullptr);
 }
 
+void CursorController::updateTracking()
+{
+	if(plotCursors->tracking()) {
+		plotCursors->displayIntersection();
+	}
+}
+
 void CursorController::setVisible(bool visible)
 {
 	readoutsSetVisible(visible);
