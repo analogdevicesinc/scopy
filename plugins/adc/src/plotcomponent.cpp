@@ -38,6 +38,7 @@ void PlotComponent::replot()
 	for(auto plot : m_plots) {
 		plot->replot();
 	}
+	m_cursor->updateTracking();
 }
 
 void PlotComponent::refreshAxisLabels() {
