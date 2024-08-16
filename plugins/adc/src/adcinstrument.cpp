@@ -110,6 +110,8 @@ void ADCInstrument::setupToolLayout()
 		}
 	});
 
+	connect(m_tme, &ToolMenuEntry::runToggled, m_runBtn, &QAbstractButton::toggle);
+
 	connect(addBtn, &QAbstractButton::clicked, this, [=](){
 		Q_EMIT requestNewInstrument(TIME);
 	});
