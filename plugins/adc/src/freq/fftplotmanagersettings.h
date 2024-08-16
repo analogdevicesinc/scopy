@@ -56,7 +56,6 @@ public Q_SLOTS:
 	void onStop() override {}
 	void onInit() override;
 	void onDeinit() override {}
-	void showPlotLabels(bool);
 
 	void addChannel(ChannelComponent *c);
 	void removeChannel(ChannelComponent *c);
@@ -66,7 +65,6 @@ public Q_SLOTS:
 
 	void addPlot(FFTPlotComponent *plt);
 	void removePlot(FFTPlotComponent *p);
-	void collapseAllAndOpenMenu(QString s);
 	void updateXAxis();
 
 Q_SIGNALS:
@@ -75,6 +73,7 @@ Q_SIGNALS:
 	void freqOffsetChanged();
 	void bufferSizeChanged();
 	void samplingInfoChanged(SamplingInfo);
+	void requestOpenMenu();
 private Q_SLOTS:
 	double readSampleRate();
 
