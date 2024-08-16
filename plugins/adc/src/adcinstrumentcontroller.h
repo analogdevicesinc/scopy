@@ -28,9 +28,6 @@ public:
 
 	ChannelIdProvider *getChannelIdProvider();
 public:
-	QList<ToolComponent *> getChannelAddons();
-	QList<ToolComponent *> getComponents();
-
 	ADCInstrument *ui() const;
 
 public Q_SLOTS:
