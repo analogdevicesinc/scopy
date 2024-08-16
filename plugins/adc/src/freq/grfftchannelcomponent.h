@@ -59,7 +59,7 @@ public:
 	}
 
 	void setPowerOffset(double val) {
-		val = m_powerOffset;
+		m_powerOffset = val;
 		m_fft->setPowerOffset(val);
 	}
 
