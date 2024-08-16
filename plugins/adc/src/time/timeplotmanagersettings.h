@@ -61,7 +61,6 @@ public Q_SLOTS:
 	void onStop() override {}
 	void onInit() override;
 	void onDeinit() override {}
-	void showPlotLabels(bool);
 
 	void addChannel(ChannelComponent *c);
 	void removeChannel(ChannelComponent *c);
@@ -71,7 +70,6 @@ public Q_SLOTS:
 
 	void addPlot(TimePlotComponent *plt);
 	void removePlot(TimePlotComponent *p);
-	void collapseAllAndOpenMenu(QString s);
 
 Q_SIGNALS:
 	void plotSizeChanged(uint32_t);
@@ -80,6 +78,7 @@ Q_SIGNALS:
 	void sampleRateChanged(double);
 	void syncBufferPlotSizeChanged(bool);
 	void samplingInfoChanged(SamplingInfo);
+	void requestOpenMenu();
 
 private:
 	TimePlotManager *m_plotManager;
