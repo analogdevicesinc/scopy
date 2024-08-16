@@ -52,6 +52,7 @@ void PlotManager::setXUnit(QString s)
 }
 
 void PlotManager::selectChannel(ChannelComponent *c) {
+	c->ctrl()->setChecked(true);
 	for(PlotComponentChannel *pcc : qAsConst(m_channels)) {
 		if(pcc->channelComponent() == c) {
 			pcc->plotComponent()->selectChannel(c);
