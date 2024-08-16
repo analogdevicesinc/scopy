@@ -14,7 +14,8 @@ using namespace adc;
 
 ADCFFTInstrumentController::ADCFFTInstrumentController(ToolMenuEntry *tme, QString name, AcqTreeNode *tree, QObject *parent) : ADCInstrumentController(tme,name, tree, parent)
 {
-	m_complexMode = false;
+	m_defaultComplexCh = nullptr;
+	m_defaultRealCh = nullptr;
 }
 
 ADCFFTInstrumentController::~ADCFFTInstrumentController()
@@ -58,8 +59,12 @@ void ADCFFTInstrumentController::init()
 	plotStack = new MapStackedWidget(m_ui);
 	toolLayout->addWidgetToCentralContainerHelper(plotStack);
 
-	plotStack->add("time", m_plotComponentManager);
+	plotStack->add("fft", m_plotComponentManager);
 	toolLayout->rightStack()->add(m_ui->settingsMenuId, m_fftPlotSettingsComponent);
+	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::requestOpenMenu, [=]() {
+		toolLayout->requestMenu(m_ui->settingsMenuId);
+		m_ui->m_settingsBtn->setChecked(true);
+	});
 
 	for(auto c : qAsConst(m_components)) {
 		c->onInit();
@@ -135,6 +140,11 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 
 	addComponent(c);
 	setupChannelMeasurement(m_plotComponentManager, c);
+
+	if(m_defaultRealCh == nullptr) {
+		m_defaultRealCh = c;
+		m_plotComponentManager->selectChannel(c);
+	}
 }
 
 void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, AcqTreeNode *node_Q) {
@@ -176,6 +186,10 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 
 	addComponent(c);
 	setupChannelMeasurement(m_plotComponentManager, c);
+
+	if(m_defaultComplexCh == nullptr) {
+		m_defaultComplexCh = c;
+	}
 }
 
 void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
@@ -200,6 +214,13 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 	connect(c, &GRFFTSinkComponent::requestBufferSize, m_fftPlotSettingsComponent, &FFTPlotManagerSettings::setBufferSize);
 
 	connect(m_ui->m_complex, &QAbstractButton::toggled, m_fftPlotSettingsComponent, &FFTPlotManagerSettings::setComplexMode);
+	connect(m_ui->m_complex, &QAbstractButton::toggled, this, [=](){
+		if(m_ui->m_complex->isChecked()) {
+			m_plotComponentManager->selectChannel(m_defaultComplexCh);
+		} else {
+			m_plotComponentManager->selectChannel(m_defaultRealCh);
+		}
+	});
 
 	connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b){
 		setSingleShot(b);

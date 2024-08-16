@@ -13,9 +13,14 @@ public:
 	virtual void init() override;
 	virtual void addChannel(AcqTreeNode *node) override;
 	virtual void removeChannel(AcqTreeNode *node) override;
+	void createTimeSink(AcqTreeNode *node);
+	void createIIODevice(AcqTreeNode *node);
+	void createIIOFloatChannel(AcqTreeNode *node);
+	void createImportFloatChannel(AcqTreeNode *node);
 
 private:
 	TimePlotManagerSettings *m_timePlotSettingsComponent;
+	ChannelComponent *m_defaultCh;
 };
 
 }

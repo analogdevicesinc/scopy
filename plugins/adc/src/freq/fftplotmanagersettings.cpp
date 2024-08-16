@@ -275,6 +275,16 @@ void FFTPlotManagerSettings::addPlot(FFTPlotComponent *p)
 	m_plotStack->add(QString(p->uuid()), plotMenu);
 	// m_menu->add(plotMenu, p->name() + QString(p->uuid()), gui::MenuWidget::MA_TOPLAST);
 	setPlotComboVisible();
+
+	connect(p->plotMenu(), &FFTPlotComponentSettings::requestSettings, this, [=](){
+		int idx = m_plotCb->combo()->findData(p->uuid());
+		m_plotCb->combo()->setCurrentIndex(idx);
+		m_menu->scrollTo(m_plotCb);
+		Q_EMIT requestOpenMenu();
+
+	});
+
+
 }
 
 void FFTPlotManagerSettings::setPlotComboVisible() {
@@ -397,10 +407,6 @@ void FFTPlotManagerSettings::setComplexMode(bool newComplexMode)
 	updateXAxis();
 }
 
-/*void FFTPlotManagerSettings::collapseAllAndOpenMenu(QString s) {
-	m_menu->collapseAll();
-	m_menu->setCollapsed(s, true);
-}*/
 
 } // namespace adc
 } // namespace scopy
