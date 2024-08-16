@@ -117,6 +117,7 @@ void ToolManager::unlockToolList(QString s)
 void ToolManager::updateToolEntry(ToolMenuEntry *tme)
 {
 	auto m = tm->getToolMenuItemFor(tme->uuid());
+	QSignalBlocker sb(m->getToolRunBtn());
 	m->setVisible(tme->visible());
 	m->setEnabled(tme->enabled());
 	m->setName(tme->name());
