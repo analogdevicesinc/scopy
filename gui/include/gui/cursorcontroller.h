@@ -30,6 +30,7 @@ public Q_SLOTS:
 	void readoutsDragToggled(bool toggled);
 	void onAddedChannel(PlotChannel *ch);
 	void onRemovedChannel(PlotChannel *ch);
+	void updateTracking();
 
 private:
 	PlotWidget *m_plot;

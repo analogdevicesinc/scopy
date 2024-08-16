@@ -19,6 +19,8 @@ public:
 	void setYHandlePos(HandlePos pos);
 	void setXHandlePos(HandlePos pos);
 
+	bool tracking() const;
+
 public Q_SLOTS:
 	void setVisible(bool visible);
 	void setXVisible(bool visible);
