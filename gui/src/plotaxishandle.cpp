@@ -23,7 +23,7 @@ PlotAxisHandle::~PlotAxisHandle()
 void PlotAxisHandle::init()
 {
 	m_handle = new AxisHandle(m_axis->axisId(), HandlePos::SOUTH_EAST, m_plot);
-	connect(m_plot,&QObject::destroyed, this, [=](){ m_handle = nullptr;});
+	connect(m_plot, &QObject::destroyed, this, [=]() { m_handle = nullptr; });
 	m_pos = pixelToScale(m_handle->getPos());
 
 	connect(m_plotWidget, &PlotWidget::canvasSizeChanged, this, &PlotAxisHandle::updatePos);

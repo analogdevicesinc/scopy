@@ -24,7 +24,7 @@ GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, Time
 
 {
 	m_plotChannelCmpt = new TimePlotComponentChannel(this, m_plot, this);
-	m_timePlotComponentChannel = dynamic_cast<TimePlotComponentChannel*>(m_plotChannelCmpt);
+	m_timePlotComponentChannel = dynamic_cast<TimePlotComponentChannel *>(m_plotChannelCmpt);
 	connect(m_chData, &ChannelData::newData, m_timePlotComponentChannel, &TimePlotComponentChannel::onNewData);
 
 	m_node = node;
@@ -199,8 +199,6 @@ void GRTimeChannelComponent::onStart()
 	m_grtch->m_signalPath->setEnabled(true);
 	// m_measureMgr->getModel()->setSampleRate(m_plotSampleRate);
 	toggleAutoScale();
-
-
 }
 
 void GRTimeChannelComponent::onStop()
@@ -286,7 +284,6 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 		m_timePlotComponentChannel->m_timePlotYAxis->scaleDraw()->setFloatPrecision(3);
 		m_timePlotComponentChannel->m_timePlotYAxis->getFormatter()->setTwoDecimalMode(true);
 
-
 		break;
 	default:
 		break;
@@ -314,16 +311,12 @@ void GRTimeChannelComponent::removeChannelFromPlot()
 	m_autoscaler->removeChannels(m_timePlotComponentChannel->m_timePlotCh);
 }
 
-IIOUnit GRTimeChannelComponent::unit() const
-{
-	return m_unit;
-}
+IIOUnit GRTimeChannelComponent::unit() const { return m_unit; }
 
 void GRTimeChannelComponent::enable()
 {
 	ChannelComponent::enable();
 	Q_EMIT sigpath()->requestRebuild();
-
 }
 
 void GRTimeChannelComponent::disable()

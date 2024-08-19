@@ -29,7 +29,7 @@ namespace scopy {
 class time_sink_f_impl : public time_sink_f
 {
 public:
-	time_sink_f_impl(int size, size_t vlen,float sampleRate, const std::string &name, int nconnections);
+	time_sink_f_impl(int size, size_t vlen, float sampleRate, const std::string &name, int nconnections);
 	~time_sink_f_impl();
 
 	bool check_topology(int ninputs, int noutputs) override;
