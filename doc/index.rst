@@ -2,14 +2,13 @@ Scopy
 ===============================================================================
 
 `Analog Devices Inc. <https://www.analog.com>`__
-HDL libraries and projects for various reference design and prototyping systems.
 This repository contains Scopy plugins information
 
 .. note::
 
-   We are in the process of moving the HDL documentation from
+   We are in the process of moving the Scopy documentation from
    `wiki <https://wiki.analog.com/university/tools/m2k/scopy#user_guides>`__
-   to :git-hdl:`/`.
+   to :git-scopy:`/dev`.
 
    We apologize for any inconvenience that may occur due to this migration.
 
