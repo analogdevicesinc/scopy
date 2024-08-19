@@ -49,8 +49,8 @@ void ADCInstrument::setupToolLayout()
 
 	m_settingsBtn = new GearBtn(this);
 	InfoBtn *infoBtn = new InfoBtn(this);
-	// PrintBtn *printBtn = new PrintBtn(this);
-	PrintPlotManager *printplotManager = new PrintPlotManager(this);
+	m_printBtn = new PrintBtn(this);
+	printPlotManager = new PrintPlotManager(this);
 	addBtn = new AddBtn(this);
 	removeBtn = new RemoveBtn(this);
 
@@ -79,7 +79,7 @@ void ADCInstrument::setupToolLayout()
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
 
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
-	tool->addWidgetToTopContainerHelper(printplotManager->getPrintBtn(), TTA_LEFT);
+	tool->addWidgetToTopContainerHelper(m_printBtn, TTA_LEFT);
 
 	tool->addWidgetToTopContainerHelper(addBtn, TTA_LEFT);
 	tool->addWidgetToTopContainerHelper(removeBtn, TTA_LEFT);
@@ -116,7 +116,7 @@ void ADCInstrument::setupToolLayout()
 		Q_EMIT requestNewInstrument(TIME);
 	});
 
-	connect(removeBtn, &QAbstractButton::clicked, this, &ADCInstrument::requestDeleteInstrument);	
+	connect(removeBtn, &QAbstractButton::clicked, this, &ADCInstrument::requestDeleteInstrument);
 }
 
 void ADCInstrument::setupRunSingleButtonHelper()
@@ -137,12 +137,6 @@ void ADCInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn)
 			tool->requestMenu(channelsMenuId);
 	});
 	rightMenuBtnGrp->addButton(channelsBtn->button());
-
-	connect(printplotManager->getPrintBtn(), &QPushButton::clicked, this, [=, this]() {
-		QList<PlotWidget *> plotList;
-		plotList.push_back(plotAddon->plot());
-		printplotManager->printPlots(plotList, "ADC");
-	});
 
 	connect(channelsBtn, &QPushButton::toggled, dynamic_cast<MenuHAnim *>(tool->leftContainer()),
 		&MenuHAnim::toggleMenu);

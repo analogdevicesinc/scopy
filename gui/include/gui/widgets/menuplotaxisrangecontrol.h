@@ -13,6 +13,7 @@ namespace scopy::gui {
 class SCOPY_GUI_EXPORT MenuPlotAxisRangeControl : public QWidget
 {
 	Q_OBJECT
+	QWIDGET_PAINT_EVENT_HELPER
 public:
 	MenuPlotAxisRangeControl(PlotAxis *, QWidget *parent = nullptr);
 	~MenuPlotAxisRangeControl();
