@@ -12,7 +12,8 @@
 namespace scopy {
 namespace adc {
 
-class SCOPY_ADC_EXPORT TimePlotManager : public PlotManager {
+class SCOPY_ADC_EXPORT TimePlotManager : public PlotManager
+{
 	Q_OBJECT
 public:
 	TimePlotManager(QString name = "TimePlotManager", QWidget *parent = nullptr);
@@ -23,13 +24,13 @@ public:
 	TimePlotComponent *plot(uint32_t uuid);
 
 private:
-	PlotComponent* m_primary;
-	PlotBufferPreviewer* m_plotpreviewer;
-	AnalogBufferPreviewer* m_bufferpreviewer;
+	PlotComponent *m_primary;
+	PlotBufferPreviewer *m_plotpreviewer;
+	AnalogBufferPreviewer *m_bufferpreviewer;
 	void multiPlotUpdate();
 
 	// void syncCursors();
-	void syncNavigatorAndCursors(PlotComponent*);
+	void syncNavigatorAndCursors(PlotComponent *);
 	void syncAllPlotNavigatorsAndCursors();
 };
 } // namespace adc

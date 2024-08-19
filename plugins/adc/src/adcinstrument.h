@@ -19,7 +19,6 @@
 #include <adcplugin.h>
 #include "printplotmanager.h"
 
-
 namespace scopy {
 namespace adc {
 

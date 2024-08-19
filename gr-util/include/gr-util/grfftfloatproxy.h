@@ -1,7 +1,6 @@
 #ifndef GRFFTPROC_H
 #define GRFFTPROC_H
 
-
 #include "grproxyblock.h"
 #include "scopy-gr-util_export.h"
 
@@ -60,6 +59,5 @@ protected:
 	GRTopBlock *m_top;
 };
 } // namespace scopy::grutil
-
 
 #endif // GRFFTFLOATPROXY_H

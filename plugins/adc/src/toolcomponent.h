@@ -81,13 +81,13 @@ public:
 		: m_enabled(true)
 		, m_priority(0)
 	{}
-	virtual ~ToolComponent(){}
+	virtual ~ToolComponent() {}
 	virtual QString name() const { return m_name; }
 	virtual int priority() const { return m_priority; }
-	virtual void onStart(){}
-	virtual void onStop(){}
-	virtual void onInit(){}
-	virtual void onDeinit(){}
+	virtual void onStart() {}
+	virtual void onStop() {}
+	virtual void onInit() {}
+	virtual void onDeinit() {}
 
 	virtual void enable() { m_enabled = true; }
 	virtual void disable() { m_enabled = false; }
@@ -110,7 +110,8 @@ public:
 	virtual void addComponent(ToolComponent *c)
 	{
 		m_components.append(c);
-		std::sort(m_components.begin(), m_components.end(), [](const ToolComponent *a, const ToolComponent *b){ return a->priority() < b->priority(); });
+		std::sort(m_components.begin(), m_components.end(),
+			  [](const ToolComponent *a, const ToolComponent *b) { return a->priority() < b->priority(); });
 		c->onInit();
 	};
 

@@ -198,51 +198,53 @@ bool ADCPlugin::onConnect()
 	root->addTreeChild(ctxNode);
 	createGRIIOTreeNode(ctxNode, m_ctx);
 
-	newInstrument(TIME,root);
-	newInstrument(FREQUENCY,root);
+	newInstrument(TIME, root);
+	newInstrument(FREQUENCY, root);
 
 	return true;
 }
 
-void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode* root) {
+void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root)
+{
 
 	static int idx = 0;
 	ADCInstrumentController *adc;
 	ADCInstrument *ui;
 
 	if(t == TIME) {
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
-	auto tme = m_toolList.last();
-	tme->setEnabled(true);
-	tme->setRunBtnVisible(true);
+		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("time", "Time",
+							  ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+		auto tme = m_toolList.last();
+		tme->setEnabled(true);
+		tme->setRunBtnVisible(true);
 
-	adc = new ADCTimeInstrumentController(tme, "adc" + QString::number(idx), root, this);
-	adc->init();
-	ui = adc->ui();
-	idx++;
+		adc = new ADCTimeInstrumentController(tme, "adc" + QString::number(idx), root, this);
+		adc->init();
+		ui = adc->ui();
+		idx++;
 
-	connect(root, &AcqTreeNode::newChild, dynamic_cast<ADCTimeInstrumentController*>(adc), &ADCTimeInstrumentController::addChannel, Qt::QueuedConnection);
-	connect(root, &AcqTreeNode::deletedChild,  dynamic_cast<ADCTimeInstrumentController*>(adc), &ADCTimeInstrumentController::removeChannel,		Qt::QueuedConnection);
+		connect(root, &AcqTreeNode::newChild, dynamic_cast<ADCTimeInstrumentController *>(adc),
+			&ADCTimeInstrumentController::addChannel, Qt::QueuedConnection);
+		connect(root, &AcqTreeNode::deletedChild, dynamic_cast<ADCTimeInstrumentController *>(adc),
+			&ADCTimeInstrumentController::removeChannel, Qt::QueuedConnection);
 
-	connect(ui, &ADCInstrument::requestNewInstrument, this, [=](ADCInstrumentType t){
-		newInstrument(t, root);
-	});
+		connect(ui, &ADCInstrument::requestNewInstrument, this,
+			[=](ADCInstrumentType t) { newInstrument(t, root); });
 
-	connect(ui, &ADCInstrument::requestDeleteInstrument, this, [=](){
-		ToolMenuEntry *t = nullptr;
-		for(auto tool : qAsConst(m_toolList)) {
-			if(tool->tool() == ui) {
-				t = tool;
+		connect(ui, &ADCInstrument::requestDeleteInstrument, this, [=]() {
+			ToolMenuEntry *t = nullptr;
+			for(auto tool : qAsConst(m_toolList)) {
+				if(tool->tool() == ui) {
+					t = tool;
+				}
 			}
-		}
-		deleteInstrument(t);
-	});
-	m_ctrls.append(adc);
+			deleteInstrument(t);
+		});
+		m_ctrls.append(adc);
 	} else if(t == FREQUENCY) {
 
-		m_toolList.append(
-			SCOPY_NEW_TOOLMENUENTRY("freq", "Frequency", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("freq", "Frequency",
+							  ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
 		auto tme = m_toolList.last();
 		tme->setEnabled(true);
 		tme->setRunBtnVisible(true);
@@ -252,14 +254,15 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode* root) {
 		ui = adc->ui();
 		idx++;
 
-		connect(root, &AcqTreeNode::newChild, dynamic_cast<ADCFFTInstrumentController*>(adc), &ADCFFTInstrumentController::addChannel, Qt::QueuedConnection);
-		connect(root, &AcqTreeNode::deletedChild,  dynamic_cast<ADCFFTInstrumentController*>(adc), &ADCFFTInstrumentController::removeChannel,		Qt::QueuedConnection);
+		connect(root, &AcqTreeNode::newChild, dynamic_cast<ADCFFTInstrumentController *>(adc),
+			&ADCFFTInstrumentController::addChannel, Qt::QueuedConnection);
+		connect(root, &AcqTreeNode::deletedChild, dynamic_cast<ADCFFTInstrumentController *>(adc),
+			&ADCFFTInstrumentController::removeChannel, Qt::QueuedConnection);
 
-		connect(ui, &ADCInstrument::requestNewInstrument, this, [=](ADCInstrumentType t){
-			newInstrument(t, root);
-		});
+		connect(ui, &ADCInstrument::requestNewInstrument, this,
+			[=](ADCInstrumentType t) { newInstrument(t, root); });
 
-		connect(ui, &ADCInstrument::requestDeleteInstrument, this, [=](){
+		connect(ui, &ADCInstrument::requestDeleteInstrument, this, [=]() {
 			ToolMenuEntry *t = nullptr;
 			for(auto tool : qAsConst(m_toolList)) {
 				if(tool->tool() == ui) {
@@ -273,13 +276,13 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode* root) {
 		return;
 	}
 
-
 	auto tme = m_toolList.last();
 	Q_EMIT toolListChanged();
 	tme->setTool(ui);
 }
 
-void ADCPlugin::deleteInstrument(ToolMenuEntry *tool) {
+void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
+{
 
 	tool->setEnabled(false);
 	tool->setRunning(false);

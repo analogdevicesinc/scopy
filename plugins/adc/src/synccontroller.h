@@ -8,7 +8,8 @@ namespace scopy {
 namespace adc {
 
 class SyncController;
-class SCOPY_ADC_EXPORT SyncInstrument {
+class SCOPY_ADC_EXPORT SyncInstrument
+{
 public:
 	virtual void setSyncController(SyncController *s) = 0;
 	virtual void setSyncMode(bool) = 0;
@@ -21,10 +22,11 @@ public:
 	virtual void setSyncBufferSize(uint32_t) = 0;
 };
 
-class SCOPY_ADC_EXPORT SyncController : public QObject {
+class SCOPY_ADC_EXPORT SyncController : public QObject
+{
 	Q_OBJECT
 public:
-SyncController(QObject *parent = nullptr);
+	SyncController(QObject *parent = nullptr);
 	~SyncController();
 
 	void addInstrument(SyncInstrument *s);
@@ -40,10 +42,10 @@ Q_SIGNALS:
 	void resetAll();
 
 private:
-	QMap<SyncInstrument*, bool> m_syncState;
-	QList<SyncInstrument*> m_syncInstruments;
+	QMap<SyncInstrument *, bool> m_syncState;
+	QList<SyncInstrument *> m_syncInstruments;
 	//	Q_PROPERTY(float sampleRate READ sampleRate WRITE sampleRate);
 };
-}
-}
+} // namespace adc
+} // namespace scopy
 #endif // SYNCCONTROLLER_H

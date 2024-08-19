@@ -23,19 +23,17 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	setLayout(v);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-
-
 	MenuSectionCollapseWidget *plotMenu =
 		new MenuSectionCollapseWidget("SETTINGS", MenuCollapseSection::MHCW_NONE, parent);
 
-	QLabel *plotTitleLabel = new QLabel("Plot title");	
+	QLabel *plotTitleLabel = new QLabel("Plot title");
 	StyleHelper::MenuSmallLabel(plotTitleLabel);
 
 	QLineEdit *plotTitle = new QLineEdit(m_plotComponent->name());
 	StyleHelper::MenuLineEdit(plotTitle);
 	connect(plotTitle, &QLineEdit::textChanged, this, [=](QString s) {
 		m_plotComponent->setName(s);
-	//	plotMenu->setTitle("PLOT - " + s);
+		//	plotMenu->setTitle("PLOT - " + s);
 	});
 
 	MenuOnOffSwitch *labelsSwitch = new MenuOnOffSwitch("Show plot labels", plotMenu, false);
@@ -51,10 +49,11 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	connect(m_autoscaler, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
 
 	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [=](double min, double max) {
-
 		bool singleYMode = false;
 		if(m_plotComponent->XYXChannel()) {
-			singleYMode = dynamic_cast<TimePlotComponentChannel*>(m_plotComponent->XYXChannel()->plotChannelCmpt())->m_singleYMode;
+			singleYMode = dynamic_cast<TimePlotComponentChannel *>(
+					      m_plotComponent->XYXChannel()->plotChannelCmpt())
+					      ->m_singleYMode;
 		}
 
 		if(singleYMode) {
@@ -131,7 +130,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	v->addWidget(xySection);
 	v->addWidget(plotMenu);
 	v->addWidget(m_deletePlot);
-	v->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Expanding, QSizePolicy::Expanding));
+	v->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 
 	m_autoscaleBtn->setVisible(true);
 	m_yCtrl->setVisible(true);
@@ -153,7 +152,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	hv->setStyleSheet("background-color: transparent; border: 0px;");
 	hv->setContentPos(HP_TOPRIGHT);
 	hv->setAnchorPos(HP_BOTTOMLEFT);
-	hv->setAnchorOffset(QPoint(0,-10));
+	hv->setAnchorOffset(QPoint(0, -10));
 	hv->setVisible(true);
 	hv->raise();
 
@@ -167,12 +166,11 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	hv1->setStyleSheet("background-color: transparent; border: 0px;");
 	hv1->setContentPos(HP_TOPRIGHT);
 	hv1->setAnchorPos(HP_BOTTOMLEFT);
-	hv1->setAnchorOffset(QPoint(20,-10));
+	hv1->setAnchorOffset(QPoint(20, -10));
 	hv1->setVisible(true);
 	hv1->raise();
 
 	connect(m_settingsPlotHover, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestSettings(); });
-
 }
 
 void TimePlotComponentSettings::showDeleteButtons(bool b)
@@ -188,7 +186,7 @@ void TimePlotComponentSettings::addChannel(ChannelComponent *c)
 {
 	// https://stackoverflow.com/questions/44501171/qvariant-with-custom-class-pointer-does-not-return-same-address
 
-	auto timePlotComponentChannel = dynamic_cast<TimePlotComponentChannel*>(c->plotChannelCmpt());
+	auto timePlotComponentChannel = dynamic_cast<TimePlotComponentChannel *>(c->plotChannelCmpt());
 	m_xAxisSrc->combo()->addItem(c->name(), QVariant::fromValue(static_cast<void *>(c)));
 	m_autoscaler->addChannels(timePlotComponentChannel->m_timePlotCh);
 	ScaleProvider *sp = dynamic_cast<ScaleProvider *>(c);
@@ -221,9 +219,7 @@ void TimePlotComponentSettings::removeChannel(ChannelComponent *c)
 	m_curve->removeChannels(chcmpt->m_xyPlotCh);
 }
 
-void TimePlotComponentSettings::onInit() {
-
-}
+void TimePlotComponentSettings::onInit() {}
 
 void TimePlotComponentSettings::onDeinit() {}
 

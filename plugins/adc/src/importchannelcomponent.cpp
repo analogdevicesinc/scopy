@@ -12,7 +12,7 @@ ImportChannelComponent::ImportChannelComponent(ImportFloatChannelNode *node, QPe
 {
 
 	m_plotChannelCmpt = new TimePlotComponentChannel(this, node->recipe().targetPlot, this);
-	m_timePlotChannelComponent = dynamic_cast<TimePlotComponentChannel*>(m_plotChannelCmpt);
+	m_timePlotChannelComponent = dynamic_cast<TimePlotComponentChannel *>(m_plotChannelCmpt);
 	connect(m_chData, &ChannelData::newData, m_timePlotChannelComponent, &TimePlotComponentChannel::onNewData);
 
 	m_node = node;

@@ -808,7 +808,8 @@ QWidget {
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::MenuSpinboxLine(QFrame *w, QString objectName) {
+void StyleHelper::MenuSpinboxLine(QFrame *w, QString objectName)
+{
 	if(!objectName.isEmpty())
 		w->setObjectName(objectName);
 
@@ -1384,7 +1385,8 @@ void StyleHelper::BrowseButton(QPushButton *btn, QString objectName)
 	btn->setText("...");
 }
 
-void StyleHelper::MenuSpinboxLabel(QLabel *w, QString objectName) {
+void StyleHelper::MenuSpinboxLabel(QLabel *w, QString objectName)
+{
 	if(!objectName.isEmpty())
 		w->setObjectName(objectName);
 
@@ -1398,7 +1400,8 @@ QLabel {
 
 	w->setStyleSheet(style);
 }
-void StyleHelper::MenuSpinboxLineEdit(QLineEdit *w, QString objectName) {
+void StyleHelper::MenuSpinboxLineEdit(QLineEdit *w, QString objectName)
+{
 	if(!objectName.isEmpty())
 		w->setObjectName(objectName);
 

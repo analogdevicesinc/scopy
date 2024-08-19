@@ -323,13 +323,13 @@ void PlotNavigator::removeChannel(PlotChannel *channel)
 		}
 	}
 
-	QList<Navigator*> toDelete;
+	QList<Navigator *> toDelete;
 	for(Navigator *nav : *m_navigators) {
 		if((xFound && nav->magnifier->getXAxis() == xAxis) || (yFound && nav->magnifier->getYAxis() == yAxis)) {
 			toDelete.push_back(nav);
 		}
 	}
-	for(Navigator* n : toDelete) {
+	for(Navigator *n : toDelete) {
 		m_navigators->remove(n);
 		delete n;
 	}

@@ -12,16 +12,15 @@
 using namespace scopy;
 using namespace adc;
 
-ADCFFTInstrumentController::ADCFFTInstrumentController(ToolMenuEntry *tme, QString name, AcqTreeNode *tree, QObject *parent) : ADCInstrumentController(tme,name, tree, parent)
+ADCFFTInstrumentController::ADCFFTInstrumentController(ToolMenuEntry *tme, QString name, AcqTreeNode *tree,
+						       QObject *parent)
+	: ADCInstrumentController(tme, name, tree, parent)
 {
 	m_defaultComplexCh = nullptr;
 	m_defaultRealCh = nullptr;
 }
 
-ADCFFTInstrumentController::~ADCFFTInstrumentController()
-{
-
-}
+ADCFFTInstrumentController::~ADCFFTInstrumentController() {}
 
 void ADCFFTInstrumentController::init()
 {
@@ -38,18 +37,18 @@ void ADCFFTInstrumentController::init()
 
 	connect(m_ui->m_cursor->button(), &QAbstractButton::toggled, hoverSettings, &HoverWidget::setVisible);
 
-	connect(m_plotComponentManager, &PlotManager::plotAdded, this ,[=](uint32_t uuid) {
+	connect(m_plotComponentManager, &PlotManager::plotAdded, this, [=](uint32_t uuid) {
 		auto cursorController = m_plotComponentManager->plot(uuid)->cursor();
 		cursorController->connectSignals(m_cursorSettings);
 		connect(m_ui->m_cursor, &QAbstractButton::toggled, cursorController, &CursorController::setVisible);
 	});
 
-	m_fftPlotSettingsComponent = new FFTPlotManagerSettings(dynamic_cast<FFTPlotManager*>(m_plotComponentManager));
+	m_fftPlotSettingsComponent = new FFTPlotManagerSettings(dynamic_cast<FFTPlotManager *>(m_plotComponentManager));
 	addComponent(m_fftPlotSettingsComponent);
 
 	uint32_t tmp;
 	tmp = m_plotComponentManager->addPlot("FFT");
-	m_fftPlotSettingsComponent->addPlot(dynamic_cast<FFTPlotComponent*>(m_plotComponentManager->plot(tmp)));
+	m_fftPlotSettingsComponent->addPlot(dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(tmp)));
 
 	m_measureComponent = new MeasureComponent(m_ui->getToolTemplate(), m_plotComponentManager, this);
 	// m_measureComponent->addPlotComponent(m_plotComponentManager);
@@ -69,7 +68,7 @@ void ADCFFTInstrumentController::init()
 	connect(m_ui->m_printBtn, &QPushButton::clicked, this, [=, this]() {
 		QList<PlotWidget *> plotList;
 
-		for(PlotComponent* pp : m_plotComponentManager->plots()) {
+		for(PlotComponent *pp : m_plotComponentManager->plots()) {
 			for(PlotWidget *plt : pp->plots()) {
 				plotList.push_back(plt);
 			}
@@ -105,19 +104,17 @@ void ADCFFTInstrumentController::createIIODevice(AcqTreeNode *node)
 	m_fftPlotSettingsComponent->addSampleRateProvider(d);
 	addComponent(d);
 
-	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, this, [=](SamplingInfo p){
-		d->setBufferSize(p.bufferSize);
-	});
+	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, this,
+		[=](SamplingInfo p) { d->setBufferSize(p.bufferSize); });
 }
 
 void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 {
 	int idx = chIdP->next();
 	GRIIOFloatChannelNode *griiofcn = dynamic_cast<GRIIOFloatChannelNode *>(node);
-	GRFFTSinkComponent *grtsc =
-		dynamic_cast<GRFFTSinkComponent *>(m_dataProvider);
-	GRFFTChannelComponent *c =
-		new GRFFTChannelComponent(griiofcn, dynamic_cast<FFTPlotComponent*>(m_plotComponentManager->plot(0)), grtsc, chIdP->pen(idx));
+	GRFFTSinkComponent *grtsc = dynamic_cast<GRFFTSinkComponent *>(m_dataProvider);
+	GRFFTChannelComponent *c = new GRFFTChannelComponent(
+		griiofcn, dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(0)), grtsc, chIdP->pen(idx));
 	Q_ASSERT(grtsc);
 
 	m_plotComponentManager->addChannel(c);
@@ -141,13 +138,13 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 
 	m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this,
-		[=]() { m_plotComponentManager->selectChannel(c); });
+	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
 
-	grtsc->addChannel(c);			    // For matching Sink To Channels
-	dc->addChannel(c);			    // used for sample rate computation
+	grtsc->addChannel(c);			   // For matching Sink To Channels
+	dc->addChannel(c);			   // used for sample rate computation
 	m_fftPlotSettingsComponent->addChannel(c); // SingleY/etc
-	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, c, &ChannelComponent::setSamplingInfo);
+	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, c,
+		&ChannelComponent::setSamplingInfo);
 
 	addComponent(c);
 	setupChannelMeasurement(m_plotComponentManager, c);
@@ -158,14 +155,15 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 	}
 }
 
-void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, AcqTreeNode *node_Q) {
+void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, AcqTreeNode *node_Q)
+{
 	int idx = chIdP->next();
 	GRIIOFloatChannelNode *griiofcn_I = dynamic_cast<GRIIOFloatChannelNode *>(node_I);
 	GRIIOFloatChannelNode *griiofcn_Q = dynamic_cast<GRIIOFloatChannelNode *>(node_Q);
-	GRFFTSinkComponent *grtsc =
-		dynamic_cast<GRFFTSinkComponent *>(m_dataProvider);
-	GRFFTChannelComponent *c =
-		new GRFFTChannelComponent(griiofcn_I, griiofcn_Q, dynamic_cast<FFTPlotComponent*>(m_plotComponentManager->plot(0)), grtsc, chIdP->pen(idx));
+	GRFFTSinkComponent *grtsc = dynamic_cast<GRFFTSinkComponent *>(m_dataProvider);
+	GRFFTChannelComponent *c = new GRFFTChannelComponent(
+		griiofcn_I, griiofcn_Q, dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(0)), grtsc,
+		chIdP->pen(idx));
 	Q_ASSERT(grtsc);
 
 	m_plotComponentManager->addChannel(c);
@@ -187,13 +185,13 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 
 	m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this,
-		[=]() { m_plotComponentManager->selectChannel(c); });
+	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
 
-	grtsc->addChannel(c);			    // For matching Sink To Channels
-	dc->addChannel(c);			    // used for sample rate computation
+	grtsc->addChannel(c);			   // For matching Sink To Channels
+	dc->addChannel(c);			   // used for sample rate computation
 	m_fftPlotSettingsComponent->addChannel(c); // SingleY/etc
-	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, c, &ChannelComponent::setSamplingInfo);
+	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, c,
+		&ChannelComponent::setSamplingInfo);
 
 	addComponent(c);
 	setupChannelMeasurement(m_plotComponentManager, c);
@@ -211,7 +209,7 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 	m_dataProvider = c;
 	c->init();
 
-	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, this, [=](SamplingInfo p){
+	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, this, [=](SamplingInfo p) {
 		if(m_started) {
 			stop();
 			c->setSamplingInfo(p);
@@ -222,10 +220,12 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 	});
 
 	connect(c, &GRFFTSinkComponent::requestSingleShot, this, &ADCFFTInstrumentController::setSingleShot);
-	connect(c, &GRFFTSinkComponent::requestBufferSize, m_fftPlotSettingsComponent, &FFTPlotManagerSettings::setBufferSize);
+	connect(c, &GRFFTSinkComponent::requestBufferSize, m_fftPlotSettingsComponent,
+		&FFTPlotManagerSettings::setBufferSize);
 
-	connect(m_ui->m_complex, &QAbstractButton::toggled, m_fftPlotSettingsComponent, &FFTPlotManagerSettings::setComplexMode);
-	connect(m_ui->m_complex, &QAbstractButton::toggled, this, [=](){
+	connect(m_ui->m_complex, &QAbstractButton::toggled, m_fftPlotSettingsComponent,
+		&FFTPlotManagerSettings::setComplexMode);
+	connect(m_ui->m_complex, &QAbstractButton::toggled, this, [=]() {
 		if(m_ui->m_complex->isChecked()) {
 			m_plotComponentManager->selectChannel(m_defaultComplexCh);
 		} else {
@@ -233,9 +233,9 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 		}
 	});
 
-	connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b){
+	connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b) {
 		setSingleShot(b);
-		if(b && !m_started){
+		if(b && !m_started) {
 			Q_EMIT requestStart();
 		}
 	});
@@ -244,9 +244,7 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 	connect(m_ui, &ADCInstrument::requestStop, this, &ADCInstrumentController::requestStop);
 	connect(this, &ADCInstrumentController::requestStop, this, &ADCInstrumentController::stop);
 
-	connect(m_ui->m_sync, &QAbstractButton::toggled, this, [=](bool b){
-		c->setSyncMode(b);
-	});
+	connect(m_ui->m_sync, &QAbstractButton::toggled, this, [=](bool b) { c->setSyncMode(b); });
 
 	connect(c, SIGNAL(arm()), this, SLOT(onStart()));
 	connect(c, SIGNAL(disarm()), this, SLOT(onStop()));
@@ -268,8 +266,7 @@ void ADCFFTInstrumentController::createImportFloatChannel(AcqTreeNode *node)
 	m_acqNodeComponentMap[ifcn] = c;
 	m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this,
-		[=]() { m_plotComponentManager->selectChannel(c); });
+	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
 
 	c->ctrl()->animateClick();
 
@@ -302,12 +299,10 @@ bool ADCFFTInstrumentController::getComplexChannelPair(AcqTreeNode *node, AcqTre
 		return false;
 	}
 
-	*node_i = m_complexChannels[cnt-2];
-	*node_q = m_complexChannels[cnt-1];
+	*node_i = m_complexChannels[cnt - 2];
+	*node_q = m_complexChannels[cnt - 1];
 	return true;
 }
-
-
 
 void ADCFFTInstrumentController::addChannel(AcqTreeNode *node)
 {
