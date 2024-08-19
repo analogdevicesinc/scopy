@@ -17,11 +17,12 @@ void GRFFTFloatProc::setWindow(gr::fft::window::win_type w)
 		mul->set_k(m_scale);*/
 }
 
-void GRFFTFloatProc::setPowerOffset(double val) {
+void GRFFTFloatProc::setPowerOffset(double val)
+{
 	m_powerOffset = val;
 	if(powerOffset) {
 		std::vector<float> k;
-		for(int i = 0;i<m_top->vlen();i++) {
+		for(int i = 0; i < m_top->vlen(); i++) {
 			k.push_back(m_powerOffset);
 		}
 		powerOffset->set_k(k);
@@ -42,7 +43,7 @@ void GRFFTFloatProc::build_blks(GRTopBlock *top)
 
 	nlog10 = gr::blocks::nlog10_ff::make(10.0, fft_size);
 	std::vector<float> k;
-	for(int i = 0;i<fft_size;i++) {
+	for(int i = 0; i < fft_size; i++) {
 		k.push_back(m_powerOffset);
 	}
 
@@ -60,7 +61,7 @@ void GRFFTFloatProc::build_blks(GRTopBlock *top)
 void GRFFTFloatProc::destroy_blks(GRTopBlock *top)
 {
 
-	qInfo()<<"destroyed grfftfloatproc";
+	qInfo() << "destroyed grfftfloatproc";
 	fft = nullptr;
 	ctm = nullptr;
 	mult_const1 = nullptr;
@@ -69,7 +70,6 @@ void GRFFTFloatProc::destroy_blks(GRTopBlock *top)
 	start_blk.clear();
 	end_blk = nullptr;
 }
-
 
 GRFFTComplexProc::GRFFTComplexProc(QObject *parent)
 	: GRProxyBlock(parent)
@@ -84,17 +84,17 @@ void GRFFTComplexProc::setWindow(gr::fft::window::win_type w)
 		mul->set_k(m_scale);*/
 }
 
-void GRFFTComplexProc::setPowerOffset(double val) {
+void GRFFTComplexProc::setPowerOffset(double val)
+{
 	m_powerOffset = val;
 	if(powerOffset) {
 		std::vector<float> k;
-		for(int i = 0;i<m_top->vlen();i++) {
+		for(int i = 0; i < m_top->vlen(); i++) {
 			k.push_back(m_powerOffset);
 		}
 		powerOffset->set_k(k);
 	}
 }
-
 
 void GRFFTComplexProc::build_blks(GRTopBlock *top)
 {
@@ -108,7 +108,7 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 	nlog10 = gr::blocks::nlog10_ff::make(10.0, fft_size);
 
 	std::vector<float> k;
-	for(int i = 0;i<fft_size;i++) {
+	for(int i = 0; i < fft_size; i++) {
 		k.push_back(m_powerOffset);
 	}
 
@@ -117,7 +117,7 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 	top->connect(fft_complex, 0, ctm, 0);
 	top->connect(ctm, 0, mult_const1, 0);
 	top->connect(mult_const1, 0, nlog10, 0);
-	top->connect(nlog10,0,powerOffset,0);
+	top->connect(nlog10, 0, powerOffset, 0);
 
 	start_blk.append(fft_complex);
 	end_blk = powerOffset;

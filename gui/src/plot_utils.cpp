@@ -53,7 +53,7 @@ QString PrefixFormatter::buildString(double value, QString prefix, QString unitT
 	if(m_trimZeroes) {
 		for(auto i = 0; i < precision; i++) {
 			const double singlePrecision = value * pow(10, i);
-			if(qFuzzyCompare(singlePrecision,round(singlePrecision))) {
+			if(qFuzzyCompare(singlePrecision, round(singlePrecision))) {
 				precision = i;
 				break;
 			}

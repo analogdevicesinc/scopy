@@ -47,16 +47,14 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 		removePlot(plt);
 	});
 
-	connect(this, &TimePlotManagerSettings::samplingInfoChanged, this, [=](SamplingInfo s){
+	connect(this, &TimePlotManagerSettings::samplingInfoChanged, this, [=](SamplingInfo s) {
 		for(auto p : m_plotManager->plots()) {
-			auto tpc = dynamic_cast<TimePlotComponent*>(p);
+			auto tpc = dynamic_cast<TimePlotComponent *>(p);
 			if(tpc) {
 				tpc->timePlotInfo()->update(s);
 			}
 		}
 	});
-
-
 
 	m_plotSection = new MenuSectionWidget(this);
 	m_plotCb = new MenuCombo("Plot Settings", m_plotSection);
@@ -69,9 +67,8 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 	m_menu->add(m_plotSection);
 	m_menu->add(m_plotStack);
 
-	connect(m_plotCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		m_plotStack->show(QString(m_plotCb->combo()->currentData().toInt()));
-	});
+	connect(m_plotCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
+		[=](int idx) { m_plotStack->show(QString(m_plotCb->combo()->currentData().toInt())); });
 
 	m_menu->add(m_addPlotBtn, "add", gui::MenuWidget::MA_BOTTOMLAST);
 
@@ -89,21 +86,21 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	bufferPlotSizeLayout->setSpacing(10);
 	bufferPlotSize->setLayout(bufferPlotSizeLayout);
 
-	m_bufferSizeSpin = new MenuSpinbox("Buffer Size", 16, "samples", 16, 4000000,true, false, bufferPlotSize);
-	m_bufferSizeSpin->setScaleRange(1,1e6);
+	m_bufferSizeSpin = new MenuSpinbox("Buffer Size", 16, "samples", 16, 4000000, true, false, bufferPlotSize);
+	m_bufferSizeSpin->setScaleRange(1, 1e6);
 
 	connect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, this, [=](double val) {
 		if(m_plotSizeSpin->value() < val) {
 			m_plotSizeSpin->setValue(val);
 		}
-		m_plotSizeSpin->setMinValue(val);		
+		m_plotSizeSpin->setMinValue(val);
 		setBufferSize((uint32_t)val);
 	});
 
 	connect(this, &TimePlotManagerSettings::bufferSizeChanged, m_bufferSizeSpin, &MenuSpinbox::setValue);
 
 	m_plotSizeSpin = new MenuSpinbox("Plot Size", 16, "samples", 0, 4000000, true, false, bufferPlotSize);
-	m_plotSizeSpin->setScaleRange(1,1e6);
+	m_plotSizeSpin->setScaleRange(1, 1e6);
 
 	connect(m_plotSizeSpin, &MenuSpinbox::valueChanged, this, [=](double val) { setPlotSize((uint32_t)val); });
 
@@ -117,11 +114,10 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 		if(b) {
 			m_rollingModeSw->onOffswitch()->setChecked(false);
 			m_plotSizeSpin->setValue(m_bufferSizeSpin->value());
-			connect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, m_plotSizeSpin,
-				&MenuSpinbox::setValue);
+			connect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, m_plotSizeSpin, &MenuSpinbox::setValue);
 		} else {
 			disconnect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, m_plotSizeSpin,
-				  &MenuSpinbox::setValue);
+				   &MenuSpinbox::setValue);
 		}
 	});
 	m_rollingModeSw = new MenuOnOffSwitch(tr("ROLLING MODE"), section, false);
@@ -134,10 +130,10 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	xMinMaxLayout->setSpacing(10);
 	xMinMax->setLayout(xMinMaxLayout);
 
-	m_xmin = new MenuSpinbox("XMin", -1, "samples", -DBL_MAX, DBL_MAX, true, false,xMinMax);
+	m_xmin = new MenuSpinbox("XMin", -1, "samples", -DBL_MAX, DBL_MAX, true, false, xMinMax);
 	m_xmin->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 
-	m_xmax = new MenuSpinbox("XMax", -1, "samples", -DBL_MAX, DBL_MAX, true, false,xMinMax);
+	m_xmax = new MenuSpinbox("XMax", -1, "samples", -DBL_MAX, DBL_MAX, true, false, xMinMax);
 	m_xmax->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 
 	connect(m_xmin, &MenuSpinbox::valueChanged, this,
@@ -162,12 +158,10 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_xmax->setUnit("samples");
 			m_plotManager->setXUnit("samples");
 			for(PlotComponent *plt : m_plotManager->plots()) {
-				auto p = dynamic_cast<TimePlotComponent*>(plt);
+				auto p = dynamic_cast<TimePlotComponent *>(plt);
 				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
 				p->timePlot()->xAxis()->getFormatter()->setTwoDecimalMode(false);
-
 			}
-
 		}
 		if(xcb->itemData(idx) == XMODE_TIME) {
 			m_sampleRateSpin->setVisible(true);
@@ -178,13 +172,11 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_plotManager->setXUnit("s");
 
 			for(PlotComponent *plt : m_plotManager->plots()) {
-				auto p = dynamic_cast<TimePlotComponent*>(plt);
+				auto p = dynamic_cast<TimePlotComponent *>(plt);
 				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
 				p->timePlot()->xAxis()->scaleDraw()->setUnitsEnabled(true);
 				p->timePlot()->xAxis()->getFormatter()->setTwoDecimalMode(true);
-
 			}
-
 		}
 		if(xcb->itemData(idx) == XMODE_OVERRIDE) {
 			m_sampleRateSpin->setVisible(true);
@@ -194,18 +186,17 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_xmax->setUnit("s");
 			m_plotManager->setXUnit("s");
 			for(PlotComponent *plt : m_plotManager->plots()) {
-				auto p = dynamic_cast<TimePlotComponent*>(plt);
+				auto p = dynamic_cast<TimePlotComponent *>(plt);
 				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
 				p->timePlot()->xAxis()->scaleDraw()->setUnitsEnabled(true);
 				p->timePlot()->xAxis()->getFormatter()->setTwoDecimalMode(true);
-
 			}
 		}
 		updateXAxis();
 		m_plotManager->updateAxisScales();
 	});
 
-	m_sampleRateSpin = new MenuSpinbox("Sample rate", 1, "Hz", 1,DBL_MAX, true, false, section);
+	m_sampleRateSpin = new MenuSpinbox("Sample rate", 1, "Hz", 1, DBL_MAX, true, false, section);
 	m_sampleRateSpin->setIncrementMode(MenuSpinbox::IS_125);
 
 	m_sampleRateSpin->setValue(10);
@@ -348,25 +339,24 @@ void TimePlotManagerSettings::addPlot(TimePlotComponent *p)
 {
 	QWidget *plotMenu = p->plotMenu();
 
-	connect(p, &TimePlotComponent::nameChanged, this, [=](QString newName){
+	connect(p, &TimePlotComponent::nameChanged, this, [=](QString newName) {
 		int idx = m_plotCb->combo()->findData(p->uuid());
-		m_plotCb->combo()->setItemText(idx,newName);
+		m_plotCb->combo()->setItemText(idx, newName);
 	});
 	m_plotCb->combo()->addItem(p->name(), p->uuid());
 	m_plotStack->add(QString(p->uuid()), plotMenu);
 	// m_menu->add(plotMenu, p->name() + QString(p->uuid()), gui::MenuWidget::MA_TOPLAST);
 	setPlotComboVisible();
-	connect(p->plotMenu(), &TimePlotComponentSettings::requestSettings, this, [=](){
+	connect(p->plotMenu(), &TimePlotComponentSettings::requestSettings, this, [=]() {
 		int idx = m_plotCb->combo()->findData(p->uuid());
 		m_plotCb->combo()->setCurrentIndex(idx);
 		m_menu->scrollTo(m_plotCb);
 		Q_EMIT requestOpenMenu();
-
 	});
-
 }
 
-void TimePlotManagerSettings::setPlotComboVisible() {
+void TimePlotManagerSettings::setPlotComboVisible()
+{
 	bool visible = m_plotCb->combo()->count() > 1;
 	m_plotSection->setVisible(visible);
 }
@@ -428,7 +418,7 @@ void TimePlotManagerSettings::updateXModeCombo()
 	if(m_sampleRateAvailable) {
 		auto cb = m_xModeCb->combo();
 		cb->insertItem(1, "Time", XMODE_TIME);
-		QMetaObject::invokeMethod(cb,"setCurrentIndex",Qt::QueuedConnection,Q_ARG(int,1));
+		QMetaObject::invokeMethod(cb, "setCurrentIndex", Qt::QueuedConnection, Q_ARG(int, 1));
 	}
 }
 

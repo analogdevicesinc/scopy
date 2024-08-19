@@ -18,59 +18,59 @@ using namespace scopy;
 using namespace scopy::grutil;
 using namespace scopy::adc;
 
-
-GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRIIOFloatChannelNode *node_Q, FFTPlotComponent *m_plot, GRFFTSinkComponent *grtsc, QPen pen, QWidget *parent)
+GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRIIOFloatChannelNode *node_Q,
+					     FFTPlotComponent *m_plot, GRFFTSinkComponent *grtsc, QPen pen,
+					     QWidget *parent)
 	: ChannelComponent(node_I->name() + node_Q->name(), pen, parent)
 
 {
 	m_plotChannelCmpt = new FFTPlotComponentChannel(this, m_plot, this);
 
-	m_fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel*>(m_plotChannelCmpt);
+	m_fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel *>(m_plotChannelCmpt);
 	connect(m_chData, &ChannelData::newData, m_fftPlotComponentChannel, &FFTPlotComponentChannel::onNewData);
 
 	m_node = node_I;
-	m_channelName = node_I->name() +"-"+ node_Q->name();
+	m_channelName = node_I->name() + "-" + node_Q->name();
 	m_src_I = node_I->src();
 	m_src_Q = node_Q->src();
 
-	GRIIOComplexChannelSrc* m_src_complex = new GRIIOComplexChannelSrc(m_channelName, m_src_I->getDeviceSrc(), m_src_I->getChannelName(), m_src_Q->getChannelName(),this);
+	GRIIOComplexChannelSrc *m_src_complex = new GRIIOComplexChannelSrc(
+		m_channelName, m_src_I->getDeviceSrc(), m_src_I->getChannelName(), m_src_Q->getChannelName(), this);
 	m_src = m_src_complex;
 
-	m_grtch = new GRFFTComplexChannelSigpath(grtsc->name(), this, m_node->top()->src(), m_src_complex,this); // change prototype here (?)
-	connect(this, &GRFFTChannelComponent::powerOffsetChanged, this, [=](double v){
-		dynamic_cast<GRFFTComplexChannelSigpath*>(m_grtch)->setPowerOffset(v);
-	});
+	m_grtch = new GRFFTComplexChannelSigpath(grtsc->name(), this, m_node->top()->src(), m_src_complex,
+						 this); // change prototype here (?)
+	connect(this, &GRFFTChannelComponent::powerOffsetChanged, this,
+		[=](double v) { dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setPowerOffset(v); });
 
 	m_complex = true;
 	_init();
-
 }
 
 GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node, FFTPlotComponent *m_plot,
-					       GRFFTSinkComponent *grtsc, QPen pen, QWidget *parent)
+					     GRFFTSinkComponent *grtsc, QPen pen, QWidget *parent)
 	: ChannelComponent(node->name(), pen, parent)
 
 {
 	m_plotChannelCmpt = new FFTPlotComponentChannel(this, m_plot, this);
 
-	m_fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel*>(m_plotChannelCmpt);
+	m_fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel *>(m_plotChannelCmpt);
 	connect(m_chData, &ChannelData::newData, m_fftPlotComponentChannel, &FFTPlotComponentChannel::onNewData);
 
 	m_node = node;
 	m_src = node->src();
 	m_channelName = node->name();
-	m_grtch = new GRFFTChannelSigpath(grtsc->name(), this, m_node->top()->src(),node->src(), this);
+	m_grtch = new GRFFTChannelSigpath(grtsc->name(), this, m_node->top()->src(), node->src(), this);
 
 	m_complex = false;
 
-	connect(this, &GRFFTChannelComponent::powerOffsetChanged, this, [=](double v){
-		dynamic_cast<GRFFTChannelSigpath*>(m_grtch)->setPowerOffset(v);
-	});
+	connect(this, &GRFFTChannelComponent::powerOffsetChanged, this,
+		[=](double v) { dynamic_cast<GRFFTChannelSigpath *>(m_grtch)->setPowerOffset(v); });
 	_init();
-
 }
 
-void GRFFTChannelComponent::_init() {
+void GRFFTChannelComponent::_init()
+{
 	m_running = false;
 	m_scaleAvailable = m_src->scaleAttributeAvailable(); // query from GRIIOFloatChannel;
 
@@ -90,22 +90,17 @@ void GRFFTChannelComponent::_init() {
 }
 GRFFTChannelComponent::~GRFFTChannelComponent() {}
 
-MeasureManagerInterface *GRFFTChannelComponent::getMeasureManager()
-{
-	return nullptr;
-}
+MeasureManagerInterface *GRFFTChannelComponent::getMeasureManager() { return nullptr; }
 
 QWidget *GRFFTChannelComponent::createYAxisMenu(QWidget *parent)
 {
 	m_yaxisMenu = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_ONOFF, parent);
 	m_yCtrl = new MenuPlotAxisRangeControl(m_fftPlotComponentChannel->m_fftPlotYAxis, m_yaxisMenu);
 
-	connect(m_yaxisMenu->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
-		m_fftPlotComponentChannel->lockYAxis(!b);
-	});
+	connect(m_yaxisMenu->collapseSection()->header(), &QAbstractButton::toggled, this,
+		[=](bool b) { m_fftPlotComponentChannel->lockYAxis(!b); });
 
 	m_yaxisMenu->contentLayout()->addWidget(m_yCtrl);
-
 
 	return m_yaxisMenu;
 }
@@ -151,21 +146,19 @@ QWidget *GRFFTChannelComponent::createMenu(QWidget *parent)
 	m_menu->add(yaxismenu, "yaxis");
 	m_menu->add(curvemenu, "curve");
 
-	if( dynamic_cast<GRIIOComplexChannelSrc*>(m_src) != nullptr) {
-		auto src = dynamic_cast<GRIIOComplexChannelSrc*>(m_src);
+	if(dynamic_cast<GRIIOComplexChannelSrc *>(m_src) != nullptr) {
+		auto src = dynamic_cast<GRIIOComplexChannelSrc *>(m_src);
 		QWidget *attrmenui = createChAttrMenu(m_src_I->channel(), m_menu);
 		m_menu->add(attrmenui, "attr");
 		QWidget *attrmenuq = createChAttrMenu(m_src_Q->channel(), m_menu);
 		m_menu->add(attrmenuq, "attr");
 	} else {
-		auto src = dynamic_cast<GRIIOFloatChannelSrc*>(m_src);
+		auto src = dynamic_cast<GRIIOFloatChannelSrc *>(m_src);
 		QWidget *attrmenui = createChAttrMenu(src->channel(), m_menu);
 		m_menu->add(attrmenui, "attr");
 	}
-	//QWidget *measuremenu = m_measureMgr->createMeasurementMenu(m_menu);
+	// QWidget *measuremenu = m_measureMgr->createMeasurementMenu(m_menu);
 	m_snapBtn = createSnapshotButton(m_menu);
-
-
 
 	// m_menu->add(measuremenu, "measure");
 	m_menu->add(m_snapBtn, "snap", MenuWidget::MA_BOTTOMLAST);
@@ -198,8 +191,6 @@ void GRFFTChannelComponent::onStart()
 	m_running = true;
 	m_grtch->sigpath()->setEnabled(true);
 	// m_measureMgr->getModel()->setSampleRate(m_plotSampleRate);
-
-
 }
 
 void GRFFTChannelComponent::onStop()
@@ -220,10 +211,7 @@ void GRFFTChannelComponent::removeChannelFromPlot()
 	m_curvemenu->removeChannels(m_fftPlotComponentChannel->m_fftPlotCh);
 }
 
-bool GRFFTChannelComponent::enabled() const
-{
-	return m_enabled && !(m_complex ^ m_samplingInfo.complexMode);
-}
+bool GRFFTChannelComponent::enabled() const { return m_enabled && !(m_complex ^ m_samplingInfo.complexMode); }
 
 void GRFFTChannelComponent::setSamplingInfo(SamplingInfo p)
 {
@@ -246,8 +234,7 @@ void GRFFTChannelComponent::enable()
 	if(m_running) {
 		m_grtch->sigpath()->setEnabled(true);
 	}
-	Q_EMIT m_node->top()->src()->requestRebuild();//sigpath()->requestRebuild();
-
+	Q_EMIT m_node->top()->src()->requestRebuild(); // sigpath()->requestRebuild();
 }
 
 void GRFFTChannelComponent::disable()
@@ -257,7 +244,7 @@ void GRFFTChannelComponent::disable()
 	if(m_running) {
 		m_grtch->sigpath()->setEnabled(false);
 	}
-	Q_EMIT m_node->top()->src()->requestRebuild();//sigpath()->requestRebuild();
+	Q_EMIT m_node->top()->src()->requestRebuild(); // sigpath()->requestRebuild();
 }
 
 // MeasureManagerInterface *GRFFTChannelComponent::getMeasureManager() { return m_measureMgr; }
@@ -266,14 +253,11 @@ GRSignalPath *GRFFTChannelComponent::sigpath() { return m_grtch->sigpath(); }
 
 QVBoxLayout *GRFFTChannelComponent::menuLayout() { return m_layScroll; }
 
-double GRFFTChannelComponent::powerOffset()
-{
-	return m_powerOffset;
-}
+double GRFFTChannelComponent::powerOffset() { return m_powerOffset; }
 
 void GRFFTChannelComponent::setPowerOffset(double newPowerOffset)
 {
-	if (m_powerOffset == newPowerOffset)
+	if(m_powerOffset == newPowerOffset)
 		return;
 	m_powerOffset = newPowerOffset;
 	Q_EMIT powerOffsetChanged(m_powerOffset);
@@ -287,7 +271,6 @@ void GRFFTChannelComponent::onInit()
 	m_yaxisMenu->setCollapsed(true);
 	m_yCtrl->setMin(-140.0);
 	m_yCtrl->setMax(20.0);
-
 }
 
 void GRFFTChannelComponent::onDeinit() {}

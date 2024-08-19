@@ -126,7 +126,6 @@ public:
 	static void FaultsExplanation(QWidget *w, QString objectName = "");
 	static void IIOCompactLabel(QLabel *label, QString objectName = "");
 
-
 private:
 	QMap<QString, QString> colorMap;
 	static StyleHelper *pinstance_;
