@@ -146,7 +146,6 @@ TestTool::TestTool(QWidget *parent)
 	measure->setDoubleClickToOpenMenu(true);
 	measure->checkBox()->setVisible(false);
 
-
 	CursorSettings *cursorSettings = new CursorSettings(this);
 	CursorController *cursorController = new CursorController(plot, this);
 
@@ -159,7 +158,6 @@ TestTool::TestTool(QWidget *parent)
 
 	connect(cursor->button(), &QAbstractButton::toggled, hoverSettings, &HoverWidget::setVisible);
 	connect(cursor, &QAbstractButton::toggled, cursorController, &CursorController::setVisible);
-
 
 	tool->addWidgetToTopContainerMenuControlHelper(btn3, TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(btn5, TTA_LEFT);
@@ -262,8 +260,7 @@ QWidget *TestTool::createMenu(QWidget *parent)
 	ssb->setMaxValue(1000);
 	// StyleHelper::MenuSpinBox(ssb, "vdivSpin");
 
-	gui::MenuSpinbox *msb = new gui::MenuSpinbox("Frequency",2000000,"Hz",500000,6000000000,true,false,this);
-
+	gui::MenuSpinbox *msb = new gui::MenuSpinbox("Frequency", 2000000, "Hz", 500000, 6000000000, true, false, this);
 
 	MenuOnOffSwitch *autoscale = new MenuOnOffSwitch(tr("AUTOSCALE"), vdiv, false);
 
