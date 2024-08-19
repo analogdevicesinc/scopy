@@ -10,10 +10,7 @@ using namespace scopy;
 PrintPlotManager::PrintPlotManager(QObject *parent)
 	: QObject{parent}
 {
-	m_printBtn = new PrintBtn();
 }
-
-PrintBtn *PrintPlotManager::getPrintBtn() { return m_printBtn; }
 
 void PrintPlotManager::printPlots(QList<PlotWidget *> plotList, QString toolName)
 {

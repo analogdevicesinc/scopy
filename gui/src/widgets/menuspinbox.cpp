@@ -7,11 +7,11 @@ namespace gui {
 
 MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, double max, bool vertical, bool left, QWidget *parent) : QWidget(parent) {
 
-	m_label = new QLabel(name);
-	m_edit = new QLineEdit("0");
-	m_scaleCb = new QComboBox();
-	m_plus = new QPushButton("+");
-	m_minus = new QPushButton("-");
+	m_label = new QLabel(name, parent);
+	m_edit = new QLineEdit("0", parent);
+	m_scaleCb = new QComboBox(parent);
+	m_plus = new QPushButton("+", parent);
+	m_minus = new QPushButton("-", parent);
 
 	m_plus->setAutoRepeat(true);
 	m_plus->setAutoRepeatDelay(300);
