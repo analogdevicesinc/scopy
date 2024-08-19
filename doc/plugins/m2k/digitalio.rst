@@ -6,11 +6,8 @@ Digital IO
 
     **Video guide:**
 
-.. raw:: html
+.. video:: https://www.youtube.com/watch?v=9cYstnAoUpk  
 
-    <div style="text-align: center;"> 
-   <iframe width="560" height="315" src="https://www.youtube.com/embed/9cYstnAoUpk" frameborder="0" align="center" allowfullscreen></iframe>
-    </div>
     
 |
 
