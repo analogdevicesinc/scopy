@@ -8,8 +8,9 @@
 using namespace scopy;
 using namespace scopy::adc;
 
-
-TimePlotManager::TimePlotManager(QString name, QWidget *parent) : PlotManager(name, parent){
+TimePlotManager::TimePlotManager(QString name, QWidget *parent)
+	: PlotManager(name, parent)
+{
 	m_primary = nullptr;
 
 	m_bufferpreviewer = new AnalogBufferPreviewer();
@@ -27,7 +28,7 @@ uint32_t TimePlotManager::addPlot(QString name)
 	m_plots.append(plt);
 	if(m_primary == nullptr) {
 		m_primary = plt;
-		m_plotpreviewer = new PlotBufferPreviewer(m_primary->plot(0),m_bufferpreviewer,m_primary->plot(0));
+		m_plotpreviewer = new PlotBufferPreviewer(m_primary->plot(0), m_bufferpreviewer, m_primary->plot(0));
 		int idx = m_lay->indexOf(m_statsPanel);
 		m_lay->insertWidget(idx, m_plotpreviewer);
 	}
@@ -73,14 +74,15 @@ void TimePlotManager::removePlot(uint32_t uuid)
 
 TimePlotComponent *TimePlotManager::plot(uint32_t uuid)
 {
-	return dynamic_cast<TimePlotComponent*>(PlotManager::plot(uuid));
+	return dynamic_cast<TimePlotComponent *>(PlotManager::plot(uuid));
 }
 
-void TimePlotManager::multiPlotUpdate() {
+void TimePlotManager::multiPlotUpdate()
+{
 	bool b = m_plots.count() > 1;
 
 	for(PlotComponent *p : qAsConst(m_plots)) {
-		auto plt = dynamic_cast<TimePlotComponent*>(p);
+		auto plt = dynamic_cast<TimePlotComponent *>(p);
 		plt->plotMenu()->showDeleteButtons(b);
 	}
 
@@ -89,19 +91,20 @@ void TimePlotManager::multiPlotUpdate() {
 	}
 }
 
-void TimePlotManager::syncNavigatorAndCursors(PlotComponent* p) {
+void TimePlotManager::syncNavigatorAndCursors(PlotComponent *p)
+{
 	if(p == m_primary)
 		return;
 
-	m_plotpreviewer = new PlotBufferPreviewer(m_primary->plot(0),m_bufferpreviewer,m_primary->plot(0));
+	m_plotpreviewer = new PlotBufferPreviewer(m_primary->plot(0), m_bufferpreviewer, m_primary->plot(0));
 
-	auto plt = dynamic_cast<TimePlotComponent*>(p);
+	auto plt = dynamic_cast<TimePlotComponent *>(p);
 	QSet<QwtAxisId> set;
 	set.insert(m_primary->plot(0)->xAxis()->axisId());
 	// set.insert(m_primary->plot(0)->yAxis()->axisId());
 	set.insert(p->plot(0)->xAxis()->axisId());
 	// set.insert(p->plot(0)->yAxis()->axisId());
-	PlotNavigator::syncPlotNavigators(m_primary->plot(0)->navigator(), p->plot(0)->navigator(),&set);
+	PlotNavigator::syncPlotNavigators(m_primary->plot(0)->navigator(), p->plot(0)->navigator(), &set);
 }
 
 void TimePlotManager::syncAllPlotNavigatorsAndCursors()

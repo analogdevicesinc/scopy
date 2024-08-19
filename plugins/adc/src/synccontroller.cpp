@@ -7,21 +7,26 @@ SyncController::SyncController(QObject *parent) {}
 
 SyncController::~SyncController() {}
 
-void SyncController::addInstrument(SyncInstrument *s) { m_syncInstruments.append(s);
+void SyncController::addInstrument(SyncInstrument *s)
+{
+	m_syncInstruments.append(s);
 	s->setSyncController(this);
-	m_syncState.insert(s,false);
+	m_syncState.insert(s, false);
 }
 
-void SyncController::removeInstrument(SyncInstrument *s) {m_syncInstruments.removeAll(s);
+void SyncController::removeInstrument(SyncInstrument *s)
+{
+	m_syncInstruments.removeAll(s);
 	s->setSyncController(nullptr);
 	m_syncState.remove(s);
 }
 
-void SyncController::arm(SyncInstrument *si) {
+void SyncController::arm(SyncInstrument *si)
+{
 	if(!si->syncMode()) {
 		si->onArm();
 	} else {
-		for (SyncInstrument *s : qAsConst(m_syncInstruments)) {
+		for(SyncInstrument *s : qAsConst(m_syncInstruments)) {
 			if(s->syncMode()) {
 				s->onArm();
 			}
@@ -29,11 +34,12 @@ void SyncController::arm(SyncInstrument *si) {
 	}
 }
 
-void SyncController::disarm(SyncInstrument *si) {
+void SyncController::disarm(SyncInstrument *si)
+{
 	if(!si->syncMode()) {
 		si->onDisarm();
 	} else {
-		for (SyncInstrument *s : qAsConst(m_syncInstruments)) {
+		for(SyncInstrument *s : qAsConst(m_syncInstruments)) {
 			if(s->syncMode()) {
 				s->onDisarm();
 			}
@@ -61,7 +67,7 @@ void SyncController::setBufferSize(SyncInstrument *si, uint32_t newBufferSize)
 {
 	if(!si->syncMode())
 		return;
-	for (SyncInstrument *s : qAsConst(m_syncInstruments)) {
+	for(SyncInstrument *s : qAsConst(m_syncInstruments)) {
 		if(s == si)
 			continue;
 		if(s->syncMode()) {
@@ -70,12 +76,11 @@ void SyncController::setBufferSize(SyncInstrument *si, uint32_t newBufferSize)
 	}
 }
 
-
 void SyncController::setSingleShot(SyncInstrument *si, bool newSingleShot)
 {
 	if(!si->syncMode())
 		return;
-	for (SyncInstrument *s : qAsConst(m_syncInstruments)) {
+	for(SyncInstrument *s : qAsConst(m_syncInstruments)) {
 		if(s == si)
 			continue;
 		if(s->syncMode()) {
@@ -83,5 +88,5 @@ void SyncController::setSingleShot(SyncInstrument *si, bool newSingleShot)
 		}
 	}
 }
-}
-}
+} // namespace adc
+} // namespace scopy

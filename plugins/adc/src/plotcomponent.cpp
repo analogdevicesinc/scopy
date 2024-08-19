@@ -21,16 +21,13 @@ PlotComponent::PlotComponent(QString name, uint32_t uuid, QWidget *parent)
 
 PlotComponent::~PlotComponent() {}
 
-PlotWidget *PlotComponent::plot(int idx)
-{
-	return m_plots[idx];
-}
+PlotWidget *PlotComponent::plot(int idx) { return m_plots[idx]; }
 
 QPair<double, double> PlotComponent::xInterval()
 {
 	double min = m_plots[0]->xAxis()->min();
 	double max = m_plots[0]->xAxis()->max();
-	return QPair<double,double>(min,max);
+	return QPair<double, double>(min, max);
 }
 
 void PlotComponent::replot()
@@ -41,12 +38,12 @@ void PlotComponent::replot()
 	m_cursor->updateTracking();
 }
 
-void PlotComponent::refreshAxisLabels() {
+void PlotComponent::refreshAxisLabels()
+{
 	for(auto plot : m_plots) {
 		plot->showAxisLabels();
 	}
 }
-
 
 void PlotComponent::showPlotLabels(bool b)
 {
@@ -57,13 +54,11 @@ void PlotComponent::showPlotLabels(bool b)
 	}
 }
 
-
 void PlotComponent::setName(QString s)
 {
 	m_name = s;
 	Q_EMIT nameChanged(s);
 }
-
 
 void PlotComponent::onStart() { MetaComponent::onStart(); }
 
@@ -73,30 +68,23 @@ void PlotComponent::onInit() {}
 
 void PlotComponent::onDeinit() {}
 
-void PlotComponent::addChannel(ChannelComponent *c)
-{
-	m_channels.append(c->plotChannelCmpt());
-}
+void PlotComponent::addChannel(ChannelComponent *c) { m_channels.append(c->plotChannelCmpt()); }
 
-void PlotComponent::selectChannel(ChannelComponent *c) {
+void PlotComponent::selectChannel(ChannelComponent *c)
+{
 	for(auto plot : m_plots) {
 		plot->selectChannel(c->plotChannelCmpt()->plotChannel());
 	}
 }
 
-void PlotComponent::setXInterval(QPair<double,double> p) {
-	setXInterval(p.first,p.second);
-}
+void PlotComponent::setXInterval(QPair<double, double> p) { setXInterval(p.first, p.second); }
 
-void PlotComponent::setXUnit(QString s)
-{
-	m_plots[0]->xAxis()->setUnits(s);
-}
+void PlotComponent::setXUnit(QString s) { m_plots[0]->xAxis()->setUnits(s); }
 
 void PlotComponent::setXInterval(double min, double max)
 {
 	for(auto plot : m_plots) {
-		plot->xAxis()->setInterval(min,max);
+		plot->xAxis()->setInterval(min, max);
 	}
 }
 
@@ -114,12 +102,6 @@ void PlotComponent::removeChannel(ChannelComponent *c)
 
 uint32_t PlotComponent::uuid() { return m_uuid; }
 
-CursorController *PlotComponent::cursor() const
-{
-	return m_cursor;
-}
+CursorController *PlotComponent::cursor() const { return m_cursor; }
 
-QList<PlotWidget *> PlotComponent::plots() const
-{
-	return m_plots;
-}
+QList<PlotWidget *> PlotComponent::plots() const { return m_plots; }

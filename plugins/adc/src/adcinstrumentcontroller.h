@@ -14,12 +14,10 @@ namespace scopy {
 namespace adc {
 class ChannelIdProvider;
 
-
-class SCOPY_ADC_EXPORT ADCInstrumentController :
-	  public QObject
-	, public AcqNodeChannelAware
-	, public MetaComponent
-	, public ResourceUser
+class SCOPY_ADC_EXPORT ADCInstrumentController : public QObject,
+						 public AcqNodeChannelAware,
+						 public MetaComponent,
+						 public ResourceUser
 {
 	Q_OBJECT
 public:
@@ -27,6 +25,7 @@ public:
 	virtual ~ADCInstrumentController();
 
 	ChannelIdProvider *getChannelIdProvider();
+
 public:
 	ADCInstrument *ui() const;
 
