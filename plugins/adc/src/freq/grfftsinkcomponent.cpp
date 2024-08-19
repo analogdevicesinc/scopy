@@ -20,9 +20,7 @@ GRFFTSinkComponent::GRFFTSinkComponent(QString name, GRTopBlockNode *t, QObject 
 	m_sync->addInstrument(this);
 }
 
-GRFFTSinkComponent::~GRFFTSinkComponent() {
-	m_sync->removeInstrument(this);
-}
+GRFFTSinkComponent::~GRFFTSinkComponent() { m_sync->removeInstrument(this); }
 
 void GRFFTSinkComponent::connectSignalPaths()
 {
@@ -40,9 +38,7 @@ void GRFFTSinkComponent::connectSignalPaths()
 		qDebug(CAT_GRFFTSINKCOMPONENT) << "Appended " << sigpath->name();
 	}
 
-	time_sink = time_sink_f::make(m_samplingInfo.bufferSize,
-				      m_samplingInfo.bufferSize,
-				      m_samplingInfo.sampleRate,
+	time_sink = time_sink_f::make(m_samplingInfo.bufferSize, m_samplingInfo.bufferSize, m_samplingInfo.sampleRate,
 				      m_name.toStdString(), sigpaths.count());
 	time_sink->setRollingMode(false);
 	time_sink->setSingleShot(m_singleShot);
@@ -99,10 +95,7 @@ void GRFFTSinkComponent::setData(bool copy)
 	}
 }
 
-SamplingInfo GRFFTSinkComponent::samplingInfo()
-{
-	return m_samplingInfo;
-}
+SamplingInfo GRFFTSinkComponent::samplingInfo() { return m_samplingInfo; }
 
 void GRFFTSinkComponent::setSamplingInfo(SamplingInfo p)
 {
@@ -111,7 +104,6 @@ void GRFFTSinkComponent::setSamplingInfo(SamplingInfo p)
 	if(m_armed)
 		Q_EMIT requestRebuild();
 }
-
 
 void GRFFTSinkComponent::setSingleShot(bool b)
 {
@@ -150,10 +142,7 @@ void GRFFTSinkComponent::init()
 	m_samplingInfo.plotSize = 32;
 }
 
-void GRFFTSinkComponent::deinit()
-{
-	qDebug(CAT_GRFFTSINKCOMPONENT) << "Deinit";
-}
+void GRFFTSinkComponent::deinit() { qDebug(CAT_GRFFTSINKCOMPONENT) << "Deinit"; }
 
 void GRFFTSinkComponent::start()
 {
@@ -163,7 +152,6 @@ void GRFFTSinkComponent::start()
 	m_sync->arm(this);
 	m_top->build();
 	m_top->start();
-
 }
 
 void GRFFTSinkComponent::stop()
@@ -171,38 +159,20 @@ void GRFFTSinkComponent::stop()
 	m_top->stop();
 	m_top->teardown();
 	m_sync->disarm(this);
-
 }
 
-bool GRFFTSinkComponent::syncMode() {
-	return m_syncMode;
-}
+bool GRFFTSinkComponent::syncMode() { return m_syncMode; }
 
-void GRFFTSinkComponent::setSyncMode(bool b)
-{
-	m_syncMode = b;
-}
+void GRFFTSinkComponent::setSyncMode(bool b) { m_syncMode = b; }
 
-void GRFFTSinkComponent::setSyncController(SyncController *s)
-{
-	m_sync = s;
-}
+void GRFFTSinkComponent::setSyncController(SyncController *s) { m_sync = s; }
 
 void GRFFTSinkComponent::addChannel(GRChannel *ch) { m_channels.append(ch); }
 
 void GRFFTSinkComponent::removeChannel(GRChannel *ch) { m_channels.removeAll(ch); }
 
-void GRFFTSinkComponent::setSyncSingleShot(bool b)
-{
-	Q_EMIT requestSingleShot(b);
-}
+void GRFFTSinkComponent::setSyncSingleShot(bool b) { Q_EMIT requestSingleShot(b); }
 
-void GRFFTSinkComponent::setSyncBufferSize(uint32_t val)
-{
-	Q_EMIT requestBufferSize(val);
-}
+void GRFFTSinkComponent::setSyncBufferSize(uint32_t val) { Q_EMIT requestBufferSize(val); }
 
-const QString &GRFFTSinkComponent::name() const
-{
-	return m_name;
-}
+const QString &GRFFTSinkComponent::name() const { return m_name; }

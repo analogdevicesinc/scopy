@@ -22,10 +22,10 @@ void GRIIOComplexChannelSrc::build_blks(GRTopBlock *top)
 	s2f[1] = gr::blocks::short_to_float::make();
 	f2c = gr::blocks::float_to_complex::make();
 
-	s2v = gr::blocks::stream_to_vector::make(sizeof(gr_complex),top->vlen());
+	s2v = gr::blocks::stream_to_vector::make(sizeof(gr_complex), top->vlen());
 	top->connect(s2f[0], 0, f2c, 0);
 	top->connect(s2f[1], 0, f2c, 1);
-	top->connect(f2c,0,s2v,0);
+	top->connect(f2c, 0, s2v, 0);
 	start_blk.append(s2f[0]);
 	start_blk.append(s2f[1]);
 	end_blk = s2v;
@@ -44,4 +44,3 @@ void GRIIOComplexChannelSrc::destroy_blks(GRTopBlock *top)
 const QString &GRIIOComplexChannelSrc::getChannelNameI() const { return channelNameI; }
 
 const QString &GRIIOComplexChannelSrc::getChannelNameQ() const { return channelNameQ; }
-

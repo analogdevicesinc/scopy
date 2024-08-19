@@ -72,7 +72,6 @@ void TimeSamplingInfo::update(SamplingInfo info)
 	setText(text);
 }
 
-
 FFTSamplingInfo::FFTSamplingInfo(QWidget *parent)
 	: m_mpf(new MetricPrefixFormatter(this))
 {
@@ -90,9 +89,8 @@ void FFTSamplingInfo::update(SamplingInfo info)
 		text += QString(" at %2").arg(m_mpf->format(info.sampleRate, "sps", 2));
 	}
 	if(info.freqOffset != 0) {
-		text += QString("\nCenter Frequency: %1").arg(m_mpf->format(info.freqOffset,"Hz",3));
+		text += QString("\nCenter Frequency: %1").arg(m_mpf->format(info.freqOffset, "Hz", 3));
 	}
-
 
 	setText(text);
 }

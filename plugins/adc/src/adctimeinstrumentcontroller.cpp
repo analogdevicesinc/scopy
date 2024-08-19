@@ -5,25 +5,23 @@
 #include "importchannelcomponent.h"
 #include "grtimesinkcomponent.h"
 
-
 using namespace scopy;
 using namespace adc;
 
-ADCTimeInstrumentController::ADCTimeInstrumentController(ToolMenuEntry *tme, QString name, AcqTreeNode *tree, QObject *parent) : ADCInstrumentController(tme,name, tree, parent)
+ADCTimeInstrumentController::ADCTimeInstrumentController(ToolMenuEntry *tme, QString name, AcqTreeNode *tree,
+							 QObject *parent)
+	: ADCInstrumentController(tme, name, tree, parent)
 {
 	m_defaultCh = nullptr;
 }
 
-ADCTimeInstrumentController::~ADCTimeInstrumentController()
-{
-
-}
+ADCTimeInstrumentController::~ADCTimeInstrumentController() {}
 
 void ADCTimeInstrumentController::init()
 {
 	ToolTemplate *toolLayout = m_ui->getToolTemplate();
 
-	TimePlotManager* m_timePlotComponentManager = new TimePlotManager(m_name + "_time", m_ui);
+	TimePlotManager *m_timePlotComponentManager = new TimePlotManager(m_name + "_time", m_ui);
 	m_plotComponentManager = m_timePlotComponentManager;
 	addComponent(m_plotComponentManager);
 
@@ -35,7 +33,7 @@ void ADCTimeInstrumentController::init()
 
 	connect(m_ui->m_cursor->button(), &QAbstractButton::toggled, hoverSettings, &HoverWidget::setVisible);
 
-	connect(m_plotComponentManager, &PlotManager::plotAdded, this ,[=](uint32_t uuid) {
+	connect(m_plotComponentManager, &PlotManager::plotAdded, this, [=](uint32_t uuid) {
 		auto cursorController = m_plotComponentManager->plot(uuid)->cursor();
 		cursorController->connectSignals(m_cursorSettings);
 		connect(m_ui->m_cursor, &QAbstractButton::toggled, cursorController, &CursorController::setVisible);
@@ -70,7 +68,7 @@ void ADCTimeInstrumentController::init()
 	connect(m_ui->m_printBtn, &QPushButton::clicked, this, [=, this]() {
 		QList<PlotWidget *> plotList;
 
-		for(PlotComponent* pp : m_plotComponentManager->plots()) {
+		for(PlotComponent *pp : m_plotComponentManager->plots()) {
 			for(PlotWidget *plt : pp->plots()) {
 				plotList.push_back(plt);
 			}
@@ -101,21 +99,21 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 	GRTopBlockNode *grtbn = dynamic_cast<GRTopBlockNode *>(node);
 	GRTimeSinkComponent *c = new GRTimeSinkComponent(m_name + "_time", grtbn, this);
 	//		m_acqNodeComponentMap[grtbn] = (c);
-	//addComponent(c);
+	// addComponent(c);
 
 	m_dataProvider = c;
 	c->init();
 
-
 	connect(c, &GRTimeSinkComponent::requestSingleShot, this, &ADCTimeInstrumentController::setSingleShot);
-	connect(c, &GRTimeSinkComponent::requestBufferSize, m_timePlotSettingsComponent, &TimePlotManagerSettings::setBufferSize);
+	connect(c, &GRTimeSinkComponent::requestBufferSize, m_timePlotSettingsComponent,
+		&TimePlotManagerSettings::setBufferSize);
 
 	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::samplingInfoChanged, c,
 		&GRTimeSinkComponent::setSamplingInfo);
 
-	connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b){
+	connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b) {
 		setSingleShot(b);
-		if(b && !m_started){
+		if(b && !m_started) {
 			Q_EMIT requestStart();
 		}
 	});
@@ -124,9 +122,7 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 	connect(m_ui, &ADCInstrument::requestStop, this, &ADCInstrumentController::requestStop);
 	connect(this, &ADCInstrumentController::requestStop, this, &ADCInstrumentController::stop);
 
-	connect(m_ui->m_sync, &QAbstractButton::toggled, this, [=](bool b){
-		c->setSyncMode(b);
-	});
+	connect(m_ui->m_sync, &QAbstractButton::toggled, this, [=](bool b) { c->setSyncMode(b); });
 
 	connect(c, SIGNAL(arm()), this, SLOT(onStart()));
 	connect(c, SIGNAL(disarm()), this, SLOT(onStop()));
@@ -154,10 +150,9 @@ void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 {
 	int idx = chIdP->next();
 	GRIIOFloatChannelNode *griiofcn = dynamic_cast<GRIIOFloatChannelNode *>(node);
-	GRTimeSinkComponent *grtsc =
-		dynamic_cast<GRTimeSinkComponent *>(m_dataProvider);
-	GRTimeChannelComponent *c =
-		new GRTimeChannelComponent(griiofcn, dynamic_cast<TimePlotComponent*>(m_plotComponentManager->plot(0)), grtsc, chIdP->pen(idx));
+	GRTimeSinkComponent *grtsc = dynamic_cast<GRTimeSinkComponent *>(m_dataProvider);
+	GRTimeChannelComponent *c = new GRTimeChannelComponent(
+		griiofcn, dynamic_cast<TimePlotComponent *>(m_plotComponentManager->plot(0)), grtsc, chIdP->pen(idx));
 	Q_ASSERT(grtsc);
 
 	m_plotComponentManager->addChannel(c);
@@ -181,8 +176,7 @@ void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 
 	m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this,
-		[=]() { m_plotComponentManager->selectChannel(c); });
+	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
 
 	grtsc->addChannel(c);			    // For matching Sink To Channels
 	dc->addChannel(c);			    // used for sample rate computation
@@ -210,8 +204,7 @@ void ADCTimeInstrumentController::createImportFloatChannel(AcqTreeNode *node)
 	m_acqNodeComponentMap[ifcn] = c;
 	m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this,
-		[=]() { m_plotComponentManager->selectChannel(c); });
+	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
 
 	c->ctrl()->animateClick();
 

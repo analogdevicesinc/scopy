@@ -27,11 +27,11 @@ using namespace scopy::gui;
 
 class GRDeviceAddon;
 
-
 class GRFFTComplexChannelSigpath : public QObject, public GRChannel
 {
 public:
-	GRFFTComplexChannelSigpath(QString m_name, ChannelComponent *ch, GRTopBlock *top,GRIIOComplexChannelSrc *src, QObject *parent)
+	GRFFTComplexChannelSigpath(QString m_name, ChannelComponent *ch, GRTopBlock *top, GRIIOComplexChannelSrc *src,
+				   QObject *parent)
 		: QObject(parent)
 	{
 		m_ch = ch;
@@ -45,27 +45,22 @@ public:
 		m_top = top;
 		m_top->registerSignalPath(m_signalPath);
 	}
-	~GRFFTComplexChannelSigpath() {
-		m_top->unregisterSignalPath(m_signalPath);
-	}
+	~GRFFTComplexChannelSigpath() { m_top->unregisterSignalPath(m_signalPath); }
 
 	void onNewData(const float *xData, const float *yData, size_t size, bool copy) override
 	{
 		m_ch->chData()->onNewData(xData, yData, size, copy);
 	}
 
-	GRSignalPath* sigpath() override {
-		return m_signalPath;
-	}
+	GRSignalPath *sigpath() override { return m_signalPath; }
 
-	void setPowerOffset(double val) {
+	void setPowerOffset(double val)
+	{
 		m_powerOffset = val;
 		m_fft->setPowerOffset(val);
 	}
 
-	double powerOffset() {
-		return m_powerOffset;
-	}
+	double powerOffset() { return m_powerOffset; }
 
 	GRTopBlock *m_top;
 	ChannelComponent *m_ch;
@@ -78,7 +73,8 @@ public:
 class GRFFTChannelSigpath : public QObject, public GRChannel
 {
 public:
-	GRFFTChannelSigpath(QString m_name, ChannelComponent *ch, GRTopBlock *top,GRIIOFloatChannelSrc *src, QObject *parent)
+	GRFFTChannelSigpath(QString m_name, ChannelComponent *ch, GRTopBlock *top, GRIIOFloatChannelSrc *src,
+			    QObject *parent)
 		: QObject(parent)
 	{
 		m_powerOffset = 0;
@@ -93,27 +89,22 @@ public:
 		m_top = top;
 		m_top->registerSignalPath(m_signalPath);
 	}
-	~GRFFTChannelSigpath() {
-		m_top->unregisterSignalPath(m_signalPath);
-	}
+	~GRFFTChannelSigpath() { m_top->unregisterSignalPath(m_signalPath); }
 
 	void onNewData(const float *xData, const float *yData, size_t size, bool copy) override
 	{
 		m_ch->chData()->onNewData(xData, yData, size, copy);
 	}
 
-	GRSignalPath* sigpath() override {
-		return m_signalPath;
-	}
+	GRSignalPath *sigpath() override { return m_signalPath; }
 
-	void setPowerOffset(double val) {
+	void setPowerOffset(double val)
+	{
 		m_powerOffset = val;
 		m_fft->setPowerOffset(val);
 	}
 
-	double powerOffset() {
-		return m_powerOffset;
-	}
+	double powerOffset() { return m_powerOffset; }
 
 	GRTopBlock *m_top;
 	ChannelComponent *m_ch;
@@ -132,9 +123,9 @@ class SCOPY_ADC_EXPORT GRFFTChannelComponent : public ChannelComponent,
 	Q_OBJECT
 public:
 	GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRIIOFloatChannelNode *node_Q, FFTPlotComponent *m_plot,
-						     GRFFTSinkComponent *grtsc, QPen pen, QWidget *parent = nullptr);
+			      GRFFTSinkComponent *grtsc, QPen pen, QWidget *parent = nullptr);
 	GRFFTChannelComponent(GRIIOFloatChannelNode *node, FFTPlotComponent *m_plot, GRFFTSinkComponent *grtsc,
-			       QPen pen, QWidget *parent = nullptr);
+			      QPen pen, QWidget *parent = nullptr);
 	~GRFFTChannelComponent();
 
 	MeasureManagerInterface *getMeasureManager() override;
@@ -183,7 +174,7 @@ private:
 	GRChannel *m_grtch;
 	QVBoxLayout *m_layScroll;
 
-	//FFTMeasureManager *m_measureMgr;
+	// FFTMeasureManager *m_measureMgr;
 	MenuPlotAxisRangeControl *m_yCtrl;
 	MenuCombo *m_ymodeCb;
 	IIOWidget *m_scaleWidget;
@@ -209,9 +200,6 @@ private:
 
 	Q_PROPERTY(double powerOffset READ powerOffset WRITE setPowerOffset NOTIFY powerOffsetChanged)
 };
-
-
-
 
 } // namespace adc
 } // namespace scopy

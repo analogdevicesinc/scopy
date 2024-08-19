@@ -14,20 +14,21 @@ namespace adc {
 class ChannelComponent;
 class PlotComponent;
 
-
-class SCOPY_ADC_EXPORT PlotComponentChannel {
+class SCOPY_ADC_EXPORT PlotComponentChannel
+{
 public:
 	virtual ChannelComponent *channelComponent() = 0;
 	virtual void enable() = 0;
 	virtual void disable() = 0;
 	virtual void onNewData(const float *xData_, const float *yData_, size_t size, bool copy) = 0;
-	virtual PlotComponent* plotComponent() = 0;
-	virtual PlotChannel* plotChannel() = 0;
+	virtual PlotComponent *plotComponent() = 0;
+	virtual PlotChannel *plotChannel() = 0;
 	virtual void initPlotComponent(PlotComponent *plotComponent) = 0;
 	virtual void deinitPlotComponent() = 0;
 };
 
-class SCOPY_ADC_EXPORT PlotComponent : public QWidget, public MetaComponent {
+class SCOPY_ADC_EXPORT PlotComponent : public QWidget, public MetaComponent
+{
 	Q_OBJECT
 public:
 	PlotComponent(QString name, uint32_t uuid, QWidget *parent = nullptr);
@@ -43,13 +44,13 @@ public Q_SLOTS:
 	virtual void refreshAxisLabels();
 	virtual void selectChannel(ChannelComponent *c);
 	virtual void setXInterval(double min, double max);
-	virtual void setXInterval(QPair<double,double> p);
+	virtual void setXInterval(QPair<double, double> p);
 	virtual void setXUnit(QString s);
 
 Q_SIGNALS:
 	void nameChanged(QString);
 	void requestDeletePlot();
-	void selectComponent(PlotComponent*);
+	void selectComponent(PlotComponent *);
 
 public:
 	virtual void onStart();
@@ -71,10 +72,11 @@ public:
 protected:
 	uint32_t m_uuid;
 	QHBoxLayout *m_plotLayout;
-	QList<PlotWidget*> m_plots;
+	QList<PlotWidget *> m_plots;
 
 	QList<PlotComponentChannel *> m_channels;
 	CursorController *m_cursor;
 };
-}}
+} // namespace adc
+} // namespace scopy
 #endif // PLOTCOMPONENT_H

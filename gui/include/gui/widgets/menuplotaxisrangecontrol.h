@@ -25,16 +25,17 @@ public Q_SLOTS:
 	void setMin(double);
 	void setMax(double);
 
-	MenuSpinbox* minSpinbox();
-	MenuSpinbox* maxSpinbox();
+	MenuSpinbox *minSpinbox();
+	MenuSpinbox *maxSpinbox();
 
 	void addAxis(PlotAxis *ax);
 	void removeAxis(PlotAxis *ax);
+
 private:
 	MenuSpinbox *m_min;
 	MenuSpinbox *m_max;
 
-	QMap<PlotAxis*, QList<QMetaObject::Connection>> connections;
+	QMap<PlotAxis *, QList<QMetaObject::Connection>> connections;
 };
 } // namespace scopy::gui
 

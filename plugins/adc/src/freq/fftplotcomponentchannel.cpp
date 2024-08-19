@@ -8,8 +8,7 @@
 using namespace scopy;
 using namespace scopy::adc;
 
-FFTPlotComponentChannel::FFTPlotComponentChannel(ChannelComponent *ch, FFTPlotComponent *plotComponent,
-						   QObject *parent)
+FFTPlotComponentChannel::FFTPlotComponentChannel(ChannelComponent *ch, FFTPlotComponent *plotComponent, QObject *parent)
 	: QObject(parent)
 	, m_enabled(true)
 {
@@ -40,7 +39,7 @@ void FFTPlotComponentChannel::deinitPlotComponent()
 
 void FFTPlotComponentChannel::initPlotComponent(PlotComponent *pc)
 {
-	FFTPlotComponent* plotComponent = dynamic_cast<FFTPlotComponent*>(pc);
+	FFTPlotComponent *plotComponent = dynamic_cast<FFTPlotComponent *>(pc);
 	auto fftplot = plotComponent->fftPlot();
 
 	if(plotComponent != m_plotComponent) {
@@ -91,7 +90,6 @@ void FFTPlotComponentChannel::onNewData(const float *xData_, const float *yData_
 	refreshData(copy);
 }
 
-
 void FFTPlotComponentChannel::lockYAxis(bool b)
 {
 	m_singleYMode = b;
@@ -102,7 +100,6 @@ void FFTPlotComponentChannel::lockYAxis(bool b)
 		PlotAxis *time = m_fftPlotYAxis;
 		m_plotComponent->fftPlot()->plotChannelChangeYAxis(m_fftPlotCh, time);
 	}
-
 
 	m_fftPlotAxisHandle->handle()->setVisible(!b);
 	m_plotComponent->refreshAxisLabels();
@@ -123,20 +120,11 @@ QWidget *FFTPlotComponentChannel::createCurveMenu(QWidget *parent)
 	return curve;
 }
 
-ChannelComponent *FFTPlotComponentChannel::channelComponent()
-{
-	return m_ch;
-}
+ChannelComponent *FFTPlotComponentChannel::channelComponent() { return m_ch; }
 
-PlotComponent *FFTPlotComponentChannel::plotComponent()
-{
-	return m_plotComponent;
-}
+PlotComponent *FFTPlotComponentChannel::plotComponent() { return m_plotComponent; }
 
-PlotChannel *FFTPlotComponentChannel::plotChannel()
-{
-	return m_fftPlotCh;
-}
+PlotChannel *FFTPlotComponentChannel::plotChannel() { return m_fftPlotCh; }
 
 void FFTPlotComponentChannel::enable()
 {

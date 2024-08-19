@@ -104,7 +104,8 @@ void PlotWidget::setupOpenGLCanvas()
 	}
 }
 
-void PlotWidget::plotChannelChangeXAxis(PlotChannel *c, PlotAxis *x) {
+void PlotWidget::plotChannelChangeXAxis(PlotChannel *c, PlotAxis *x)
+{
 	m_tracker->removeChannel(c);
 	c->xAxis()->setVisible(false);
 	c->setXAxis(x);
@@ -112,7 +113,8 @@ void PlotWidget::plotChannelChangeXAxis(PlotChannel *c, PlotAxis *x) {
 	showAxisLabels();
 }
 
-void PlotWidget::plotChannelChangeYAxis(PlotChannel *c, PlotAxis *y) {
+void PlotWidget::plotChannelChangeYAxis(PlotChannel *c, PlotAxis *y)
+{
 
 	m_tracker->removeChannel(c);
 	c->yAxis()->setVisible(false);
@@ -314,8 +316,7 @@ void PlotWidget::selectChannel(PlotChannel *ch)
 			m_selectedChannel->raise();
 		}
 	}
-		// return;
-
+	// return;
 
 	Q_EMIT channelSelected(m_selectedChannel);
 }

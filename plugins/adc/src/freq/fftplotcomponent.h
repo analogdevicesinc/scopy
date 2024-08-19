@@ -1,7 +1,6 @@
 #ifndef FFTPLOTCOMPONENT_H
 #define FFTPLOTCOMPONENT_H
 
-
 #include "scopy-adc_export.h"
 
 #include <QFuture>
@@ -51,6 +50,6 @@ private:
 
 	FFTPlotComponentSettings *m_plotMenu;
 };
-}
-}
+} // namespace adc
+} // namespace scopy
 #endif // FFTPLOTCOMPONENT_H

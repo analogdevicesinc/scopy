@@ -46,8 +46,9 @@ public Q_SLOTS:
 	void refreshXYXAxis();
 	void refreshXYXData();
 	void selectChannel(ChannelComponent *c) override;
-	void setXInterval(QPair<double,double>p) override;
+	void setXInterval(QPair<double, double> p) override;
 	void setXInterval(double min, double max) override;
+
 public:
 	void addChannel(ChannelComponent *) override;
 	void removeChannel(ChannelComponent *) override;
@@ -74,9 +75,8 @@ private:
 	bool m_showXSourceOnXy;
 
 	ChannelComponent *m_XYXChannel;
-	TimeSamplingInfo* m_timePlotInfo;
+	TimeSamplingInfo *m_timePlotInfo;
 	const float *xyXData;
-
 
 private:
 	QMetaObject::Connection xyDataConn;

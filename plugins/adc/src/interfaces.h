@@ -39,7 +39,8 @@ public:
 	virtual MenuWidget *menu() = 0;
 };
 
-class SCOPY_ADC_EXPORT FFTChannel {
+class SCOPY_ADC_EXPORT FFTChannel
+{
 public:
 	virtual void setPowerOffset(double) = 0;
 };
@@ -51,13 +52,14 @@ public:
 	virtual double sampleRate() = 0;
 };
 
-class SCOPY_ADC_EXPORT DataProcessor {
+class SCOPY_ADC_EXPORT DataProcessor
+{
 public:
 	virtual void onNewData(const float *xData, const float *yData, size_t size, bool copy) = 0;
 };
 
-
-class SCOPY_ADC_EXPORT SamplingInfoComponent {
+class SCOPY_ADC_EXPORT SamplingInfoComponent
+{
 public:
 	virtual SamplingInfo samplingInfo() = 0;
 	virtual void setSamplingInfo(SamplingInfo p) = 0;

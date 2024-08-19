@@ -40,7 +40,7 @@ using namespace gr;
 
 namespace scopy {
 
-time_sink_f::sptr time_sink_f::make(int size, size_t vlen,  float sampleRate, const std::string &name, int nconnections)
+time_sink_f::sptr time_sink_f::make(int size, size_t vlen, float sampleRate, const std::string &name, int nconnections)
 {
 	return gnuradio::get_initial_sptr(new time_sink_f_impl(size, vlen, sampleRate, name, nconnections));
 }
@@ -61,7 +61,8 @@ void time_sink_f_impl::generate_time_axis()
 		__sampleRate = m_size;
 	}
 	double freqoffset = m_freqOffset;
-	double rbw = __sampleRate / m_size;;
+	double rbw = __sampleRate / m_size;
+	;
 	m_freq.clear();
 	if(m_complexFft) {
 		for(int i = 0; i < m_size; i++) {
@@ -93,7 +94,6 @@ time_sink_f_impl::time_sink_f_impl(int size, size_t vlen, float sampleRate, cons
 	qInfo(CAT_TIME_SINK_F) << "ctor";
 	// reserve memory for n buffers
 	m_data.reserve(nconnections);
-
 
 	for(int i = 0; i < m_nconnections; i++) {
 		m_buffers.push_back(std::deque<float>());
@@ -193,7 +193,6 @@ int time_sink_f_impl::work(int noutput_items, gr_vector_const_void_star &input_i
 			in = (const float *)input_items[i];
 			m_buffers[i].push_front(in[j]);
 		}
-
 	}
 
 	return noutput_items;

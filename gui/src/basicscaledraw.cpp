@@ -203,13 +203,11 @@ QwtText BasicScaleDraw::label(double value) const
 			}
 		}
 
-		/*text = QwtText(sign + QLocale().toString(value / scale, 'f', m_floatPrecision + bonusPrecision) + ' ' +
-			       prefix + m_unit);*/
+		/*text = QwtText(sign + QLocale().toString(value / scale, 'f', m_floatPrecision + bonusPrecision) + ' '
+		   + prefix + m_unit);*/
 		unit = m_unit;
 	}
 	text = QwtText(m_formatter->format(value, unit, m_floatPrecision + bonusPrecision));
-
-
 
 	if(m_color != Qt::gray)
 		text.setColor(m_color);

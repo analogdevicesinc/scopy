@@ -88,9 +88,7 @@ QWidget *MenuWidget::findWidget(QString name) { return m_widgetMap.value(name, n
 
 QString MenuWidget::widgetName(QWidget *w) { return m_widgetMap.key(w, ""); }
 
-void MenuWidget::scrollTo(QWidget *w) {
-	scroll->ensureWidgetVisible(w);
-}
+void MenuWidget::scrollTo(QWidget *w) { scroll->ensureWidgetVisible(w); }
 
 void MenuWidget::collapseAll()
 {

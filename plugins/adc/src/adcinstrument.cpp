@@ -8,8 +8,6 @@ Q_LOGGING_CATEGORY(CAT_ADCINSTRUMENT, "ADCInstrument")
 using namespace scopy;
 using namespace scopy::adc;
 
-
-
 ADCInstrument::ADCInstrument(ToolMenuEntry *tme, QWidget *parent)
 	: QWidget(parent)
 	, m_tme(tme)
@@ -17,9 +15,7 @@ ADCInstrument::ADCInstrument(ToolMenuEntry *tme, QWidget *parent)
 	setupToolLayout();
 }
 
-ADCInstrument::~ADCInstrument()
-{
-}
+ADCInstrument::~ADCInstrument() {}
 
 void ADCInstrument::setupToolLayout()
 {
@@ -112,16 +108,12 @@ void ADCInstrument::setupToolLayout()
 
 	connect(m_tme, &ToolMenuEntry::runToggled, m_runBtn, &QAbstractButton::toggle);
 
-	connect(addBtn, &QAbstractButton::clicked, this, [=](){
-		Q_EMIT requestNewInstrument(TIME);
-	});
+	connect(addBtn, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestNewInstrument(TIME); });
 
 	connect(removeBtn, &QAbstractButton::clicked, this, &ADCInstrument::requestDeleteInstrument);
 }
 
-void ADCInstrument::setupRunSingleButtonHelper()
-{
-}
+void ADCInstrument::setupRunSingleButtonHelper() {}
 
 void ADCInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn)
 {
@@ -161,7 +153,6 @@ void ADCInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *de
 			rightStack->show(id);
 		}
 	});
-
 }
 
 void ADCInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, CompositeWidget *c)
@@ -192,10 +183,7 @@ void ADCInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, Compos
 }
 // #endif
 
-QPushButton *ADCInstrument::sync() const
-{
-	return m_sync;
-}
+QPushButton *ADCInstrument::sync() const { return m_sync; }
 
 void ADCInstrument::stopped()
 {

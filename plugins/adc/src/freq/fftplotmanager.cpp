@@ -7,10 +7,9 @@
 using namespace scopy;
 using namespace scopy::adc;
 
-
-FFTPlotManager::FFTPlotManager(QString name, QWidget *parent) : PlotManager(name, parent){
-
-}
+FFTPlotManager::FFTPlotManager(QString name, QWidget *parent)
+	: PlotManager(name, parent)
+{}
 
 FFTPlotManager::~FFTPlotManager() {}
 
@@ -59,13 +58,14 @@ void FFTPlotManager::removePlot(uint32_t uuid)
 
 FFTPlotComponent *FFTPlotManager::plot(uint32_t uuid)
 {
-	return dynamic_cast<FFTPlotComponent*>(PlotManager::plot(uuid));
+	return dynamic_cast<FFTPlotComponent *>(PlotManager::plot(uuid));
 }
 
-void FFTPlotManager::multiPlotUpdate() {
+void FFTPlotManager::multiPlotUpdate()
+{
 	bool b = m_plots.count() > 1;
 	for(PlotComponent *p : qAsConst(m_plots)) {
-		auto plt = dynamic_cast<FFTPlotComponent*>(p);
+		auto plt = dynamic_cast<FFTPlotComponent *>(p);
 		plt->plotMenu()->showDeleteButtons(b);
 	}
 

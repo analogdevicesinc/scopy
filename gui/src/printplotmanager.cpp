@@ -9,8 +9,7 @@ using namespace scopy;
 
 PrintPlotManager::PrintPlotManager(QObject *parent)
 	: QObject{parent}
-{
-}
+{}
 
 void PrintPlotManager::printPlots(QList<PlotWidget *> plotList, QString toolName)
 {

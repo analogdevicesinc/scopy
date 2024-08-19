@@ -26,7 +26,8 @@ namespace scopy {
 namespace adc {
 using namespace grutil;
 
-typedef enum {
+typedef enum
+{
 	TIME,
 	FREQUENCY
 } ADCInstrumentType;
@@ -54,10 +55,11 @@ public:
 
 	void newInstrument(ADCInstrumentType t, AcqTreeNode *root);
 	void deleteInstrument(ToolMenuEntry *w);
+
 private:
 	iio_context *m_ctx;
 	QLineEdit *edit;
-	QList<ADCInstrumentController*> m_ctrls;
+	QList<ADCInstrumentController *> m_ctrls;
 
 	void createGRIIOTreeNode(GRTopBlockNode *node, iio_context *ctx);
 };

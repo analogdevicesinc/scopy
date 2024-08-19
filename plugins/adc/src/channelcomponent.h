@@ -19,7 +19,11 @@ public:
 
 class TimePlotComponentChannel;
 
-class SCOPY_ADC_EXPORT ChannelComponent : public QWidget, public ToolComponent, public Menu, public SamplingInfoComponent, public DataProcessor
+class SCOPY_ADC_EXPORT ChannelComponent : public QWidget,
+					  public ToolComponent,
+					  public Menu,
+					  public SamplingInfoComponent,
+					  public DataProcessor
 {
 	Q_OBJECT
 public:

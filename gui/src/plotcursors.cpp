@@ -51,8 +51,8 @@ void PlotCursors::connectSignals()
 		}
 	});
 	connect(m_plot, &PlotWidget::channelSelected, this, [=](PlotChannel *ch) {
-		PlotAxis* xAxis = m_plot->xAxis();
-		PlotAxis* yAxis = m_plot->xAxis();
+		PlotAxis *xAxis = m_plot->xAxis();
+		PlotAxis *yAxis = m_plot->xAxis();
 
 		if(ch != nullptr) {
 			xAxis = ch->xAxis();
@@ -135,10 +135,7 @@ void PlotCursors::enableTracking(bool tracking)
 	Q_EMIT update();
 }
 
-bool PlotCursors::tracking() const
-{
-	return m_tracking;
-}
+bool PlotCursors::tracking() const { return m_tracking; }
 
 void PlotCursors::displayIntersection()
 {

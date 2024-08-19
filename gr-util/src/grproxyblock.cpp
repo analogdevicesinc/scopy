@@ -17,7 +17,7 @@ void GRProxyBlock::destroy_blks(GRTopBlock *top) { start_blk.clear(); }
 
 void GRProxyBlock::connect_blk(GRTopBlock *top, GRProxyBlock *src)
 {
-	qInfo()<<"created grfftfloatproc";
+	qInfo() << "created grfftfloatproc";
 	if(src == nullptr) // block is a source
 		return;
 	int nrOfOutputs = src->getGrEndPoint()->output_signature()->min_streams();

@@ -50,8 +50,8 @@ void GRIIOFloatChannelSrc::build_blks(GRTopBlock *top)
 		break;
 	}
 
-	s2v = gr::blocks::stream_to_vector::make(sizeof(float),top->vlen());
-	top->connect(x2f,0,s2v,0);
+	s2v = gr::blocks::stream_to_vector::make(sizeof(float), top->vlen());
+	top->connect(x2f, 0, s2v, 0);
 	end_blk = s2v;
 	start_blk.append(x2f);
 }
