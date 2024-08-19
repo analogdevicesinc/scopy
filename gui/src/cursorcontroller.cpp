@@ -20,7 +20,7 @@ CursorController::CursorController(PlotWidget *plot, QObject *parent)
 	x1Cursor = plotCursors->getX1Cursor();
 	x2Cursor = plotCursors->getX2Cursor();
 
-	//connectSignals();
+	// connectSignals();
 }
 
 CursorController::~CursorController() {}
@@ -43,7 +43,6 @@ void CursorController::initUI()
 	hoverReadouts->setContentPos(HoverPosition::HP_BOTTOMRIGHT);
 	hoverReadouts->setAnchorOffset(QPoint(10, 10));
 	hoverReadouts->setRelative(true);
-
 }
 
 void CursorController::connectSignals(CursorSettings *cursorSettings)
@@ -106,7 +105,7 @@ void CursorController::connectSignals(CursorSettings *cursorSettings)
 	connect(m_plot, &PlotWidget::channelSelected, this, [=](PlotChannel *ch) {
 		PlotAxis *xAxis = m_plot->xAxis();
 		PlotAxis *yAxis = m_plot->yAxis();
-		if(ch!=nullptr) {
+		if(ch != nullptr) {
 			xAxis = ch->xAxis();
 			yAxis = ch->yAxis();
 		}

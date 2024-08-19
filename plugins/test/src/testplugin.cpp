@@ -180,7 +180,8 @@ bool TestPlugin::onConnect()
 	btn4 = new QPushButton("show hoverwidget", tool);
 	btn4->setCheckable(true);
 
-	gui::MenuSpinbox *m_spin = new gui::MenuSpinbox("Frequency", 1e6, "Hz", 400000, 6000000000,tool);;
+	gui::MenuSpinbox *m_spin = new gui::MenuSpinbox("Frequency", 1e6, "Hz", 400000, 6000000000, tool);
+	;
 
 	connect(btn, &QPushButton::clicked, this, [=]() { m_toolList[0]->setAttached(!m_toolList[0]->attached()); });
 	connect(btn2, &QPushButton::clicked, this,

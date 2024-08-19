@@ -21,7 +21,7 @@ public:
 	QWidget *createCurveMenu(QWidget *parent);
 	ChannelComponent *channelComponent() override;
 	PlotComponent *plotComponent() override;
-	PlotChannel* plotChannel() override;
+	PlotChannel *plotChannel() override;
 
 public Q_SLOTS:
 	void enable() override;

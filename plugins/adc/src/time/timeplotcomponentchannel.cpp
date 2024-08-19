@@ -48,7 +48,7 @@ void TimePlotComponentChannel::deinitPlotComponent()
 void TimePlotComponentChannel::initPlotComponent(PlotComponent *pc)
 {
 
-	TimePlotComponent* plotComponent = dynamic_cast<TimePlotComponent*>(pc);
+	TimePlotComponent *plotComponent = dynamic_cast<TimePlotComponent *>(pc);
 	auto timeplot = plotComponent->timePlot();
 	auto xyplot = plotComponent->xyPlot();
 
@@ -125,7 +125,6 @@ void TimePlotComponentChannel::lockYAxis(bool b)
 		m_plotComponent->xyPlot()->plotChannelChangeYAxis(m_xyPlotCh, xy);
 	}
 
-
 	m_timePlotAxisHandle->handle()->setVisible(!b);
 	m_plotComponent->refreshXYXAxis();
 	m_plotComponent->refreshAxisLabels();
@@ -146,20 +145,11 @@ QWidget *TimePlotComponentChannel::createCurveMenu(QWidget *parent)
 	return curve;
 }
 
-ChannelComponent *TimePlotComponentChannel::channelComponent()
-{
-	return m_ch;
-}
+ChannelComponent *TimePlotComponentChannel::channelComponent() { return m_ch; }
 
-PlotComponent *TimePlotComponentChannel::plotComponent()
-{
-	return m_plotComponent;
-}
+PlotComponent *TimePlotComponentChannel::plotComponent() { return m_plotComponent; }
 
-PlotChannel *TimePlotComponentChannel::plotChannel()
-{
-	return m_timePlotCh;
-}
+PlotChannel *TimePlotComponentChannel::plotChannel() { return m_timePlotCh; }
 
 void TimePlotComponentChannel::enable()
 {
