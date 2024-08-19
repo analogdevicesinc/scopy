@@ -38,8 +38,7 @@ void ChannelComponent::onInit() {}
 
 void ChannelComponent::onDeinit() { m_plotChannelCmpt->deinitPlotComponent(); }
 
-void ChannelComponent::onNewData(const float *xData, const float *yData, size_t size, bool copy) {
-}
+void ChannelComponent::onNewData(const float *xData, const float *yData, size_t size, bool copy) {}
 
 QPen ChannelComponent::pen() const { return m_pen; }
 
@@ -58,10 +57,7 @@ void ChannelComponent::addChannelToPlot() {}
 
 void ChannelComponent::removeChannelFromPlot() {}
 
-void ChannelComponent::setMenuControlButtonVisible(bool b)
-{
-	m_ctrl->setVisible(b);
-}
+void ChannelComponent::setMenuControlButtonVisible(bool b) { m_ctrl->setVisible(b); }
 
 MenuWidget *ChannelComponent::menu() { return m_menu; }
 
@@ -102,12 +98,6 @@ void ChannelComponent::createMenuControlButton(ChannelComponent *c, QWidget *par
 	c->setEnabled(true);
 }
 
-SamplingInfo ChannelComponent::samplingInfo()
-{
-	return m_samplingInfo;
-}
+SamplingInfo ChannelComponent::samplingInfo() { return m_samplingInfo; }
 
-void ChannelComponent::setSamplingInfo(SamplingInfo p)
-{
-	m_samplingInfo = p;
-}
+void ChannelComponent::setSamplingInfo(SamplingInfo p) { m_samplingInfo = p; }

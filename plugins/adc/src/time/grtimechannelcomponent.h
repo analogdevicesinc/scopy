@@ -43,18 +43,14 @@ public:
 		m_signalPath->setEnabled(false);
 		m_node->top()->src()->registerSignalPath(m_signalPath);
 	}
-	~GRTimeChannelSigpath() {
-		m_node->top()->src()->unregisterSignalPath(m_signalPath);
-	}
+	~GRTimeChannelSigpath() { m_node->top()->src()->unregisterSignalPath(m_signalPath); }
 
 	void onNewData(const float *xData, const float *yData, size_t size, bool copy) override
 	{
 		m_ch->chData()->onNewData(xData, yData, size, copy);
 	}
 
-	GRSignalPath* sigpath() override {
-		return m_signalPath;
-	}
+	GRSignalPath *sigpath() override { return m_signalPath; }
 
 	ChannelComponent *m_ch;
 	GRIIOFloatChannelNode *m_node;
@@ -108,7 +104,6 @@ public Q_SLOTS:
 	void addChannelToPlot() override;
 	void removeChannelFromPlot() override;
 
-
 Q_SIGNALS:
 	void yModeChanged();
 
@@ -147,7 +142,6 @@ private:
 	Q_PROPERTY(YMode ymode READ ymode WRITE setYMode NOTIFY yModeChanged);
 
 	YMode m_ymode;
-
 };
 
 } // namespace adc

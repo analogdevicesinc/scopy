@@ -47,11 +47,10 @@ void PlotManager::setXUnit(QString s)
 	for(PlotComponent *p : m_plots) {
 		p->setXUnit(s);
 	}
-
-
 }
 
-void PlotManager::selectChannel(ChannelComponent *c) {
+void PlotManager::selectChannel(ChannelComponent *c)
+{
 	c->ctrl()->setChecked(true);
 	for(PlotComponentChannel *pcc : qAsConst(m_channels)) {
 		if(pcc->channelComponent() == c) {
@@ -70,13 +69,13 @@ void PlotManager::updateAxisScales()
 {
 	for(PlotComponent *plt : plots()) {
 		for(PlotWidget *pw : plt->plots()) {
-		pw->yAxis()->scaleDraw()->invalidateCache();
-		pw->xAxis()->scaleDraw()->invalidateCache();
-		if(pw->selectedChannel()) {
-			pw->selectedChannel()->yAxis()->scaleDraw()->invalidateCache();
-			pw->selectedChannel()->xAxis()->scaleDraw()->invalidateCache();
-		}
-		pw->replot();
+			pw->yAxis()->scaleDraw()->invalidateCache();
+			pw->xAxis()->scaleDraw()->invalidateCache();
+			if(pw->selectedChannel()) {
+				pw->selectedChannel()->yAxis()->scaleDraw()->invalidateCache();
+				pw->selectedChannel()->xAxis()->scaleDraw()->invalidateCache();
+			}
+			pw->replot();
 		}
 	}
 }
