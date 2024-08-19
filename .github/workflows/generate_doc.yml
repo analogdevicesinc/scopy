@@ -1,0 +1,83 @@
+name: Generate documentation
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+
+jobs:
+  build-doc:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.x"
+
+    - name: Install pip packages
+      working-directory: docs
+      run: |
+        pip install pip --upgrade
+        pip install -r requirements.txt
+
+    - name: Build doc
+      working-directory: docs
+      run: |
+        make html SPHINXOPTS='-W --keep-going'
+
+    - name: Store the generated doc
+      uses: actions/upload-artifact@v4
+      with:
+        name: html
+        path: docs/_build/html
+
+  deploy-doc:
+    runs-on: ubuntu-latest
+    needs: build-doc
+    if: github.ref == 'refs/heads/dev'
+
+    steps:
+    - run: |
+        git config --global user.name "${{ github.event.head_commit.committer.name }}"
+        git config --global user.email "${{ github.event.head_commit.committer.email }}"
+
+    - uses: actions/checkout@v4
+    - name: Create gh-pages branch
+      run: >
+        git ls-remote --exit-code --heads origin refs/heads/gh-pages ||
+        (
+          git reset --hard ;
+          git clean -fdx ;
+          git checkout --orphan gh-pages ;
+          git reset --hard;
+          git commit -m "empty" --allow-empty ;
+          git push origin gh-pages:gh-pages
+        )
+
+    - uses: actions/checkout@v4
+      with:
+        ref: 'gh-pages'
+
+    - name: Empty gh-pages
+      run: |
+        git rm -r . --quiet || true
+
+    - uses: actions/download-artifact@v4
+      with:
+        name: html
+
+    - name: Patch doc build
+      run: |
+        rm -r _sources
+        touch .nojekyll
+
+    - name: Commit gh-pages
+      run: |
+        git add . >> /dev/null
+        git commit -m "deploy: ${GITHUB_SHA}" --allow-empty
+
+    - name: Push to gh-pages
+      run: |
+        git push origin gh-pages:gh-pages
