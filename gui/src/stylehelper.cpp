@@ -1393,6 +1393,7 @@ QLabel {
  color: rgba(255, 255, 255, 102);
  font-size: 14px;
  background-color: transparent;
+}
 )css");
 
 	w->setStyleSheet(style);
