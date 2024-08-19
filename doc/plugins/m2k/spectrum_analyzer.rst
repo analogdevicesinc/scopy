@@ -5,13 +5,8 @@ Spectrum Analyzer
 
 	**Video guide:**
 
-.. raw:: html
+.. video:: https://www.youtube.com/watch?v=lsfvpkSOoPA  
 
-    <div style="text-align: center;"> 
-   <iframe width="560" height="315" src="https://www.youtube.com/embed/lsfvpkSOoPA" frameborder="0" align="center" allowfullscreen></iframe>
-    </div>
-    
-|
 
 
 General Description
@@ -77,7 +72,7 @@ The channel setting allows the user to set the desired computation or variations
 * **Blackman-Harris:** The Blackman-Harris window is a very good window to use with FFT analyzers. It has better amplitude accuracy than the Hanning, very good selectivity, and the fastest filter rolloff. The filter is steep and narrow and reaches a lower attenuation than the other windows. This allows signals close together in frequency to be distinguished, even when their amplitudes are very different.
 * **Kaiser :** The Kaiser window, combines excellent selectivity and reasonable accuracy. The Kaiser window has the lowest side-lobes and the least broadening for non-bin frequencies. Because of these properties, it is the best window to use for measurements requiring a large dynamic range.
 
-Visit `this <https://ccrma.stanford.edu/~jos/sasp/Spectrum_Analysis_Windows.html>`_ for a detailed explanation
+Visit `this <https://ccrma.stanford.edu/~jos/sasp/Spectrum_Analysis_Windows.html>`__ for a detailed explanation
 
 
     For the description of the Averaging Types see below:

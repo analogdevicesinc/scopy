@@ -31,8 +31,8 @@ Download
 
 .. warning::
 
-  In order to have Scopy working with `ADALM2000 <https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/ADALM2000.html>`_  please make sure that the Device Drivers are installed. A guide on this topic can be found in the section:
-    * `ADALM2000 for End Users <https://wiki.analog.com/university/tools/m2k/users>`_ 
+  In order to have Scopy working with `ADALM2000 <https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/ADALM2000.html>`__  please make sure that the Device Drivers are installed. A guide on this topic can be found in the section:
+    * `ADALM2000 for End Users <https://wiki.analog.com/university/tools/m2k/users>`__ 
 
 Installation
 ---------------------------------------------------------------------
@@ -43,13 +43,7 @@ Once you downloaded the installer, run it and follow all the required steps. Aft
 
 Video intalation guide:
 
-.. raw:: html
-
-    <div style="text-align: center;"> 
-   <iframe width="560" height="315" src="https://www.youtube.com/embed/894HkVXf7-U" frameborder="0" align="center" allowfullscreen></iframe>
-    </div>
-
-|
+.. video:: https://www.youtube.com/watch?v=894HkVXf7-U
 
 
   **Scopy for Linux**
@@ -81,12 +75,7 @@ After this, get the Scopy.flatpak file from the downloaded archive and run:
 
 Video intalation guide:
 
-
-.. raw:: html
-
-    <div style="text-align: center;"> 
-   <iframe width="560" height="315" src="https://www.youtube.com/embed/9qgxmmTrcSE" frameborder="0" align="center" allowfullscreen></iframe>
-    </div>
+.. video:: https://www.youtube.com/watch?v=9qgxmmTrcSE
 
 |
 
@@ -98,21 +87,15 @@ Drag the application from the .dmg window into Applications to install and wait 
 
 Video intalation guide:
 
+.. video:: https://www.youtube.com/watch?v=To0ACQ77tkg
 
-.. raw:: html
-
-    <div style="text-align: center;"> 
-   <iframe width="560" height="315" src="https://www.youtube.com/embed/To0ACQ77tkg" frameborder="0" align="center" allowfullscreen></iframe>
-    </div>
-
-|
 
 
   **Scopy for Android**
 
 Tap on the downloaded .apk file to start the installation process and proceed by hitting the “Install” button. Optionally, you may be warned that this application comes from unknown sources, hit the “Install anyway” button. Now, you can find “Scopy” together with your other apps.
 
-In order to connect `ADALM2000 <https://www.analog.com/ADALM2000>`_  to your device, you will need an OTG adapter that will mediate the connection between your device and the USB cable, as shown in the image below.
+In order to connect `ADALM2000 <https://www.analog.com/ADALM2000>`__  to your device, you will need an OTG adapter that will mediate the connection between your device and the USB cable, as shown in the image below.
 
 .. image:: ../resources/scopy-android-setup-example.png
     :align: center
@@ -293,4 +276,7 @@ Source code
 ---------------------------------------------------------------------
 
 The source code for the entire application can be found on `github <https://github.com/analogdevicesinc/scopy>`_ 
+
+
+
 

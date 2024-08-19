@@ -5,13 +5,8 @@ Signal Generator
 
 	**Video guide:**
 
-.. raw:: html
+.. video:: https://www.youtube.com/watch?v=zWX7VnKDYq4  
 
-    <div style="text-align: center;"> 
-   <iframe width="560" height="315" src="https://www.youtube.com/embed/zWX7VnKDYq4" frameborder="0" align="center" allowfullscreen></iframe>
-    </div>
-    
-|
 
 
 General Description
@@ -51,8 +46,8 @@ Buffer signal type takes a file as an input. The supported file types for buffer
 * .csv - Comma separated values
 * .mat - MATLAB Mat format
 
-CSV file format supports raw CSVs such as `this <https://gist.github.com/adisuciu/7aa30bc9e545db23a17e86d23ae4f53c>`_, as well as Scopy formatted CSVs such as  
-`this <https://gist.github.com/adisuciu/5abffa8233707c7b95585e80fbb1dde9>`_ This means it is possible to acquire a signal in the oscilloscope and play it back in the signal generator.
+CSV file format supports raw CSVs such as `this <https://gist.github.com/adisuciu/7aa30bc9e545db23a17e86d23ae4f53c>`__ , as well as Scopy formatted CSVs such as  
+`this <https://gist.github.com/adisuciu/5abffa8233707c7b95585e80fbb1dde9>`__ This means it is possible to acquire a signal in the oscilloscope and play it back in the signal generator.
 
 
 	This in not entirely true. The scope sample rate is 100 MSPS (or factors of ten less) and the signal generator sample rate is 75MSPS (or factors of 10 less) so scope samples do not inherently match up with generator samples. Scope samples would need to be re-sampled by a factor of 3 to 4 to have the signal frequency played back properly.
