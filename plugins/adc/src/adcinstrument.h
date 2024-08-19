@@ -17,6 +17,7 @@
 
 #include "toolcomponent.h"
 #include <adcplugin.h>
+#include "printplotmanager.h"
 
 
 namespace scopy {
@@ -78,6 +79,8 @@ private:
 	MenuControlButton *m_cursor;
 	MenuControlButton *channelsBtn;
 	VerticalChannelManager *m_vcm;
+	PrintBtn *m_printBtn;
+	PrintPlotManager *printPlotManager;
 
 	void setupToolLayout();
 	void setupRunSingleButtonHelper();

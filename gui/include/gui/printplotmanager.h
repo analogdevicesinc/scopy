@@ -15,13 +15,11 @@ class SCOPY_GUI_EXPORT PrintPlotManager : public QObject
 public:
 	explicit PrintPlotManager(QObject *parent = nullptr);
 
-	PrintBtn *getPrintBtn();
 	void printPlots(QList<PlotWidget *> plotList, QString toolName);
 	void setPrintWithSymbols(bool printWithSymbols);
 signals:
 
 private:
-	PrintBtn *m_printBtn;
 	bool m_printWithSymbols = false;
 };
 } // namespace scopy

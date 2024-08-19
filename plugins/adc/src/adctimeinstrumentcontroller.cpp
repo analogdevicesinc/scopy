@@ -67,6 +67,17 @@ void ADCTimeInstrumentController::init()
 		m_ui->m_settingsBtn->setChecked(true);
 	});
 
+	connect(m_ui->m_printBtn, &QPushButton::clicked, this, [=, this]() {
+		QList<PlotWidget *> plotList;
+
+		for(PlotComponent* pp : m_plotComponentManager->plots()) {
+			for(PlotWidget *plt : pp->plots()) {
+				plotList.push_back(plt);
+			}
+		}
+		m_ui->printPlotManager->printPlots(plotList, "ADC");
+	});
+
 	for(auto c : qAsConst(m_components)) {
 		c->onInit();
 	}
