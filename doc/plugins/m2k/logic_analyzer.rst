@@ -6,15 +6,9 @@ Logic Analyzer
 
     **Video guide:**
     
-.. raw:: html
-
-    <div style="text-align: center;"> 
-   <iframe width="560" height="315" src="https://www.youtube.com/embed/zWX7VnKDYq4" frameborder="0" align="center" allowfullscreen></iframe>
-    </div>
+.. video:: https://www.youtube.com/watch?v=zWX7VnKDYq4  
     
 |
-
-
 
 
 General 
