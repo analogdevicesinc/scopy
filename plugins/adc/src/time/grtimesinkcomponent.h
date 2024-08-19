@@ -49,7 +49,6 @@ public Q_SLOTS:
 	void setSyncSingleShot(bool) override;
 	void setSyncBufferSize(uint32_t) override;
 
-
 Q_SIGNALS:
 	void arm();
 	void disarm();

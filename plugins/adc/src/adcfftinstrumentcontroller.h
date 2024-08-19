@@ -4,12 +4,12 @@
 #include "scopy-adc_export.h"
 #include "adcinstrumentcontroller.h"
 
-
 namespace scopy {
 namespace adc {
 
 class FFTPlotManagerSettings;
-class SCOPY_ADC_EXPORT ADCFFTInstrumentController : public ADCInstrumentController {
+class SCOPY_ADC_EXPORT ADCFFTInstrumentController : public ADCInstrumentController
+{
 public:
 	ADCFFTInstrumentController(ToolMenuEntry *tme, QString name, AcqTreeNode *tree, QObject *parent = nullptr);
 	~ADCFFTInstrumentController();
@@ -25,13 +25,12 @@ public:
 	bool getComplexChannelPair(AcqTreeNode *node, AcqTreeNode **node_i, AcqTreeNode **node_q);
 
 private:
-	QList<AcqTreeNode*> m_complexChannels;
-	FFTPlotManagerSettings* m_fftPlotSettingsComponent;
+	QList<AcqTreeNode *> m_complexChannels;
+	FFTPlotManagerSettings *m_fftPlotSettingsComponent;
 	ChannelComponent *m_defaultComplexCh, *m_defaultRealCh;
-
 };
 
-}
-}
+} // namespace adc
+} // namespace scopy
 
 #endif // ADCFFTINSTRUMENTCONTROLLER_H

@@ -14,7 +14,7 @@ ADCInstrumentController::ADCInstrumentController(ToolMenuEntry *tme, QString nam
 	, m_plotComponentManager(nullptr)
 	, m_measureComponent(nullptr)
 	, m_started(false)
-{	
+{
 	chIdP = new ChannelIdProvider(this);
 	m_tree = tree;
 	m_name = name;
@@ -43,10 +43,7 @@ ADCInstrumentController::~ADCInstrumentController() {}
 
 ChannelIdProvider *ADCInstrumentController::getChannelIdProvider() { return chIdP; }
 
-void ADCInstrumentController::init()
-{
-
-}
+void ADCInstrumentController::init() {}
 
 void ADCInstrumentController::deinit()
 {
@@ -65,12 +62,10 @@ void ADCInstrumentController::onStart()
 	m_started = true;
 }
 
-
-
 void ADCInstrumentController::onStop()
 {
 	m_started = false;
-	for(int idx = m_components.size() - 1 ; idx >= 0;idx--) {
+	for(int idx = m_components.size() - 1; idx >= 0; idx--) {
 		auto c = m_components[idx];
 		c->onStop();
 	}
@@ -78,7 +73,7 @@ void ADCInstrumentController::onStop()
 
 void ADCInstrumentController::start()
 {
-	ResourceManager::open("adc",this);
+	ResourceManager::open("adc", this);
 	m_dataProvider->start();
 }
 
@@ -105,16 +100,11 @@ void ADCInstrumentController::startUpdates()
 	m_ui->started();
 }
 
-void ADCInstrumentController::setSingleShot(bool b)
-{
-	m_dataProvider->setSingleShot(b);
-}
+void ADCInstrumentController::setSingleShot(bool b) { m_dataProvider->setSingleShot(b); }
 
 void ADCInstrumentController::updateData()
 {
-	m_refillFuture = QtConcurrent::run([=]() {
-		m_dataProvider->updateData();
-	});
+	m_refillFuture = QtConcurrent::run([=]() { m_dataProvider->updateData(); });
 	m_fw->setFuture(m_refillFuture);
 }
 
@@ -152,8 +142,6 @@ void ADCInstrumentController::setFrameRate(double val)
 
 }*/
 
-
-
 /*void ADCInstrumentController::removeChannel(AcqTreeNode *node)
 {
 
@@ -175,7 +163,7 @@ void ADCInstrumentController::setupChannelMeasurement(PlotManager *c, ChannelCom
 			&MeasurementsPanel::addMeasurement);
 		connect(chMeasureManager, &MeasureManagerInterface::disableMeasurement, measurePanel,
 			&MeasurementsPanel::removeMeasurement);
-		connect(measureSettings, &MeasurementSettings::toggleAllMeasurements,this , [=](bool b) {
+		connect(measureSettings, &MeasurementSettings::toggleAllMeasurements, this, [=](bool b) {
 			measurePanel->setInhibitUpdates(true);
 			Q_EMIT chMeasureManager->toggleAllMeasurement(b);
 			measurePanel->setInhibitUpdates(false);
@@ -187,8 +175,4 @@ void ADCInstrumentController::setupChannelMeasurement(PlotManager *c, ChannelCom
 	}
 }
 
-ADCInstrument *ADCInstrumentController::ui() const
-{
-	return m_ui;
-}
-
+ADCInstrument *ADCInstrumentController::ui() const { return m_ui; }

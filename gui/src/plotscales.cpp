@@ -146,7 +146,7 @@ void PlotScales::initGraticule()
 		QwtAxisId xAxisId = m_plot->xAxis()->axisId();
 		QwtAxisId yAxisId = m_plot->yAxis()->axisId();
 
-		if(ch!=nullptr){
+		if(ch != nullptr) {
 			xAxisId = ch->xAxis()->axisId();
 			yAxisId = ch->yAxis()->axisId();
 		}

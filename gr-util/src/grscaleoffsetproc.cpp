@@ -20,7 +20,7 @@ void GRScaleOffsetProc::setOffset(double off)
 	m_offset = off;
 	if(add) {
 		std::vector<float> k;
-		for(int i = 0;i<m_top->vlen();i++) {
+		for(int i = 0; i < m_top->vlen(); i++) {
 			k.push_back(m_offset);
 		}
 		add->set_k(k);
@@ -36,7 +36,7 @@ void GRScaleOffsetProc::build_blks(GRTopBlock *top)
 	mul = gr::blocks::multiply_const_ff::make(m_scale, m_vlen);
 
 	std::vector<float> k;
-	for(int i = 0;i<m_vlen;i++) {
+	for(int i = 0; i < m_vlen; i++) {
 		k.push_back(m_offset);
 	}
 

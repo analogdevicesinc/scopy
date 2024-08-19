@@ -18,13 +18,9 @@ GRTimeSinkComponent::GRTimeSinkComponent(QString name, GRTopBlockNode *t, QObjec
 	m_armed = false;
 	init();
 	m_sync->addInstrument(this);
-
-
 }
 
-GRTimeSinkComponent::~GRTimeSinkComponent() {
-	m_sync->removeInstrument(this);
-}
+GRTimeSinkComponent::~GRTimeSinkComponent() { m_sync->removeInstrument(this); }
 
 void GRTimeSinkComponent::connectSignalPaths()
 {
@@ -42,9 +38,7 @@ void GRTimeSinkComponent::connectSignalPaths()
 		qDebug(CAT_GRTIMESINKCOMPONENT) << "Appended " << sigpath->name();
 	}
 
-	time_sink = time_sink_f::make(m_samplingInfo.plotSize,
-				      m_samplingInfo.bufferSize,
-				      m_samplingInfo.sampleRate,
+	time_sink = time_sink_f::make(m_samplingInfo.plotSize, m_samplingInfo.bufferSize, m_samplingInfo.sampleRate,
 				      m_name.toStdString(), sigpaths.count());
 	time_sink->setRollingMode(m_samplingInfo.rollingMode);
 	time_sink->setSingleShot(m_singleShot);
@@ -99,7 +93,6 @@ void GRTimeSinkComponent::setData(bool copy)
 	}
 }
 
-
 void GRTimeSinkComponent::setSingleShot(bool b)
 {
 	m_singleShot = b;
@@ -108,10 +101,7 @@ void GRTimeSinkComponent::setSingleShot(bool b)
 	}
 }
 
-SamplingInfo GRTimeSinkComponent::samplingInfo()
-{
-	return m_samplingInfo;
-}
+SamplingInfo GRTimeSinkComponent::samplingInfo() { return m_samplingInfo; }
 
 void GRTimeSinkComponent::setSamplingInfo(SamplingInfo p)
 {
@@ -153,10 +143,7 @@ void GRTimeSinkComponent::init()
 	m_samplingInfo.plotSize = 32;
 }
 
-void GRTimeSinkComponent::deinit()
-{
-	qDebug(CAT_GRTIMESINKCOMPONENT) << "Deinit";
-}
+void GRTimeSinkComponent::deinit() { qDebug(CAT_GRTIMESINKCOMPONENT) << "Deinit"; }
 
 void GRTimeSinkComponent::start()
 {
@@ -166,7 +153,6 @@ void GRTimeSinkComponent::start()
 	m_sync->arm(this);
 	m_top->build();
 	m_top->start();
-
 }
 
 void GRTimeSinkComponent::stop()
@@ -174,38 +160,20 @@ void GRTimeSinkComponent::stop()
 	m_top->stop();
 	m_top->teardown();
 	m_sync->disarm(this);
-
 }
 
-bool GRTimeSinkComponent::syncMode() {
-	return m_syncMode;
-}
+bool GRTimeSinkComponent::syncMode() { return m_syncMode; }
 
-void GRTimeSinkComponent::setSyncMode(bool b)
-{
-	m_syncMode = b;
-}
+void GRTimeSinkComponent::setSyncMode(bool b) { m_syncMode = b; }
 
-void GRTimeSinkComponent::setSyncController(SyncController *s)
-{
-	m_sync = s;
-}
+void GRTimeSinkComponent::setSyncController(SyncController *s) { m_sync = s; }
 
 void GRTimeSinkComponent::addChannel(GRChannel *ch) { m_channels.append(ch); }
 
 void GRTimeSinkComponent::removeChannel(GRChannel *ch) { m_channels.removeAll(ch); }
 
-void GRTimeSinkComponent::setSyncSingleShot(bool b)
-{
-	Q_EMIT requestSingleShot(b);
-}
+void GRTimeSinkComponent::setSyncSingleShot(bool b) { Q_EMIT requestSingleShot(b); }
 
-void GRTimeSinkComponent::setSyncBufferSize(uint32_t val)
-{
-	Q_EMIT requestBufferSize(val);
-}
+void GRTimeSinkComponent::setSyncBufferSize(uint32_t val) { Q_EMIT requestBufferSize(val); }
 
-const QString &GRTimeSinkComponent::name() const
-{
-	return m_name;
-}
+const QString &GRTimeSinkComponent::name() const { return m_name; }

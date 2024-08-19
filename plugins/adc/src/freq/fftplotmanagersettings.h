@@ -109,7 +109,6 @@ private:
 	QList<ChannelComponent *> m_channels;
 	QList<SampleRateProvider *> m_sampleRateProviders;
 
-
 	Q_PROPERTY(bool complexMode READ complexMode WRITE setComplexMode NOTIFY complexModeChanged)
 	Q_PROPERTY(double sampleRate READ sampleRate WRITE setSampleRate NOTIFY sampleRateChanged)
 	Q_PROPERTY(double freqOffset READ freqOffset WRITE setFreqOffset NOTIFY freqOffsetChanged)

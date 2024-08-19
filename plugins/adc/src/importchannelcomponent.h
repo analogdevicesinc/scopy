@@ -29,7 +29,7 @@ private:
 	MenuPlotAxisRangeControl *m_yCtrl;
 	PlotAutoscaler *m_autoscaler;
 	QPushButton *m_autoscaleBtn;
-	TimePlotComponentChannel* m_timePlotChannelComponent;
+	TimePlotComponentChannel *m_timePlotChannelComponent;
 
 	bool m_yLock;
 

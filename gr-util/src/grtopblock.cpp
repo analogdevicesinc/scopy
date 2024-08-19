@@ -18,7 +18,7 @@ GRTopBlock::GRTopBlock(QString name, QObject *parent)
 	topblockid++;
 	qInfo() << "building" << topblockname;
 	top = gr::make_top_block(topblockname.toStdString());
-	QObject::connect(this,SIGNAL(requestRebuild()), this, SLOT(rebuild()),Qt::QueuedConnection);
+	QObject::connect(this, SIGNAL(requestRebuild()), this, SLOT(rebuild()), Qt::QueuedConnection);
 }
 
 GRTopBlock::~GRTopBlock() {}
@@ -51,16 +51,9 @@ void GRTopBlock::unregisterIIODeviceSource(GRIIODeviceSource *dev)
 	rebuild();
 }
 
-void GRTopBlock::setVLen(size_t vlen)
-{
-	m_vlen = vlen;
-}
+void GRTopBlock::setVLen(size_t vlen) { m_vlen = vlen; }
 
-size_t GRTopBlock::vlen()
-{
-	return m_vlen;
-}
-
+size_t GRTopBlock::vlen() { return m_vlen; }
 
 void GRTopBlock::build()
 {

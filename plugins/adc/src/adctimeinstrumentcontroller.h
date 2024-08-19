@@ -6,7 +6,8 @@
 
 namespace scopy {
 namespace adc {
-class SCOPY_ADC_EXPORT ADCTimeInstrumentController : public ADCInstrumentController {
+class SCOPY_ADC_EXPORT ADCTimeInstrumentController : public ADCInstrumentController
+{
 public:
 	ADCTimeInstrumentController(ToolMenuEntry *tme, QString name, AcqTreeNode *tree, QObject *parent = nullptr);
 	~ADCTimeInstrumentController();
@@ -23,7 +24,7 @@ private:
 	ChannelComponent *m_defaultCh;
 };
 
-}
-}
+} // namespace adc
+} // namespace scopy
 
 #endif // ADCTIMEINSTRUMENTCONTROLLER_H

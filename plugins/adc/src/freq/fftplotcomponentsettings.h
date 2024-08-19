@@ -47,8 +47,9 @@ private:
 	void toggleAutoScale();
 	void updateYModeCombo();
 
-	QMap<ChannelComponent*, QList<QMetaObject::Connection>> connections;
+	QMap<ChannelComponent *, QList<QMetaObject::Connection>> connections;
 };
-}}
+} // namespace adc
+} // namespace scopy
 
 #endif // FFTPLOTCOMPONENTSETTINGS_H

@@ -24,7 +24,7 @@ public:
 	virtual void moveChannel(ChannelComponent *, uint32_t uuid = 0);
 	virtual void removeChannel(ChannelComponent *);
 
-	       // TimePlotComponent* plot(QString name);
+	// TimePlotComponent* plot(QString name);
 	PlotComponent *plot(uint32_t uuid);
 
 	QList<PlotComponent *> plots() const;
@@ -57,7 +57,7 @@ protected:
 	StatsPanel *m_statsPanel;
 	QMap<ChannelComponent *, PlotManagerCombobox *> m_channelPlotcomboMap;
 	// PlotSettings *m_plotSettings;
-
 };
-}}
+} // namespace adc
+} // namespace scopy
 #endif // PLOTMANAGER_H

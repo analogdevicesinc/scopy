@@ -33,7 +33,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	StyleHelper::MenuLineEdit(plotTitle);
 	connect(plotTitle, &QLineEdit::textChanged, this, [=](QString s) {
 		m_plotComponent->setName(s);
-	//	plotMenu->setTitle("PLOT - " + s);
+		//	plotMenu->setTitle("PLOT - " + s);
 	});
 
 	MenuOnOffSwitch *labelsSwitch = new MenuOnOffSwitch("Show plot labels", plotMenu, false);
@@ -53,9 +53,8 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_plotComponent->fftPlot()->yAxis()->setUnitsVisible(true);
 	m_plotComponent->fftPlot()->yAxis()->getFormatter()->setTwoDecimalMode(false);
 
-
-	m_yPwrOffset = new MenuSpinbox("Power Offset",0, "dB", -200, 200, true, false, yaxis);
-	m_yPwrOffset->setScaleRange(1,1);
+	m_yPwrOffset = new MenuSpinbox("Power Offset", 0, "dB", -200, 200, true, false, yaxis);
+	m_yPwrOffset->setScaleRange(1, 1);
 	m_yPwrOffset->setIncrementMode(MenuSpinbox::IS_FIXED);
 
 	m_curve = new MenuPlotChannelCurveStyleControl(plotMenu);
@@ -77,7 +76,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	v->addWidget(yaxis);
 	v->addWidget(plotMenu);
 	v->addWidget(m_deletePlot);
-	v->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Expanding, QSizePolicy::Expanding));
+	v->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 
 	m_yCtrl->setVisible(true);
 
@@ -94,7 +93,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	hv->setStyleSheet("background-color: transparent; border: 0px;");
 	hv->setContentPos(HP_TOPRIGHT);
 	hv->setAnchorPos(HP_BOTTOMLEFT);
-	hv->setAnchorOffset(QPoint(0,-10));
+	hv->setAnchorOffset(QPoint(0, -10));
 	hv->setVisible(true);
 	hv->raise();
 	connect(m_deletePlotHover, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
@@ -107,12 +106,11 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	hv1->setStyleSheet("background-color: transparent; border: 0px;");
 	hv1->setContentPos(HP_TOPRIGHT);
 	hv1->setAnchorPos(HP_BOTTOMLEFT);
-	hv1->setAnchorOffset(QPoint(20,-10));
+	hv1->setAnchorOffset(QPoint(20, -10));
 	hv1->setVisible(true);
 	hv1->raise();
 
 	connect(m_settingsPlotHover, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestSettings(); });
-
 }
 
 void FFTPlotComponentSettings::showDeleteButtons(bool b)
@@ -122,23 +120,20 @@ void FFTPlotComponentSettings::showDeleteButtons(bool b)
 	m_deletePlotHover->setVisible(b);
 }
 
-
 FFTPlotComponentSettings::~FFTPlotComponentSettings() {}
 
 void FFTPlotComponentSettings::addChannel(ChannelComponent *c)
 {
 	// https://stackoverflow.com/questions/44501171/qvariant-with-custom-class-pointer-does-not-return-same-address
 
-	auto fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel*>(c->plotChannelCmpt());
+	auto fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt());
 	m_curve->addChannels(fftPlotComponentChannel->plotChannel());
 
-	if(dynamic_cast<FFTChannel*>(c)) {
-		FFTChannel* fc = dynamic_cast<FFTChannel*>(c);
-		connections[c] << connect(m_yPwrOffset, &MenuSpinbox::valueChanged, c, [=](double val){
-			fc->setPowerOffset(val);
-		});
+	if(dynamic_cast<FFTChannel *>(c)) {
+		FFTChannel *fc = dynamic_cast<FFTChannel *>(c);
+		connections[c] << connect(m_yPwrOffset, &MenuSpinbox::valueChanged, c,
+					  [=](double val) { fc->setPowerOffset(val); });
 		fc->setPowerOffset(m_yPwrOffset->value());
-
 	}
 	m_channels.append(c);
 }
@@ -147,13 +142,11 @@ void FFTPlotComponentSettings::removeChannel(ChannelComponent *c)
 {
 	m_channels.removeAll(c);
 
-	auto fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel*>(c->plotChannelCmpt());
+	auto fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt());
 	m_curve->removeChannels(fftPlotComponentChannel->plotChannel());
 
 	for(const QMetaObject::Connection &c : qAsConst(connections[c])) {
 		QObject::disconnect(c);
 	}
 	connections.remove(c);
-
 }
-

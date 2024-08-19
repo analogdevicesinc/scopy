@@ -99,7 +99,6 @@ void PlotChannel::setYAxis(PlotAxis *newYAxis)
 {
 	m_yAxis = newYAxis;
 	curve()->setYAxis(m_yAxis->axisId());
-
 }
 
 QString PlotChannel::name() const { return m_name; }

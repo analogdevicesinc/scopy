@@ -53,7 +53,6 @@ private:
 	MetricPrefixFormatter *m_mpf;
 };
 
-
 class SCOPY_GUI_EXPORT FPSInfo : public QLabel
 {
 	Q_OBJECT
