@@ -26,6 +26,8 @@
 #include <QwtPlotRenderer>
 #include <stylehelper.h>
 
+#include <plotbuttonmanager.h>
+
 using namespace scopy;
 
 PlotWidget::PlotWidget(QWidget *parent)
@@ -51,6 +53,7 @@ PlotWidget::PlotWidget(QWidget *parent)
 	setupNavigator();
 	setupPlotInfo();
 	setupPlotScales();
+	setupPlotButtonManager();
 
 	m_plot->canvas()->installEventFilter(this);
 }
@@ -222,6 +225,11 @@ void PlotWidget::setAlignCanvasToScales(bool alignCanvasToScales)
 	m_plot->plotLayout()->setAlignCanvasToScales(alignCanvasToScales);
 }
 
+PlotButtonManager *PlotWidget::plotButtonManager() const
+{
+	return m_plotButtonManager;
+}
+
 void PlotWidget::setupPlotInfo()
 {
 	m_plotInfo = new PlotInfo(m_plot->canvas());
@@ -254,6 +262,17 @@ void PlotWidget::setupAxes()
 	QPen pen(QColor("#9E9E9F"));
 	m_xAxis = new PlotAxis(m_xPosition, this, pen, this);
 	m_yAxis = new PlotAxis(m_yPosition, this, pen, this);
+}
+
+void PlotWidget::setupPlotButtonManager()
+{
+	m_plotButtonManager = new PlotButtonManager(this);
+	HoverWidget *hoverPlotButtonManager = new HoverWidget(m_plotButtonManager,this,this);
+	hoverPlotButtonManager->setAnchorPos(HoverPosition::HP_BOTTOMLEFT);
+	hoverPlotButtonManager->setContentPos(HoverPosition::HP_TOPRIGHT);
+	hoverPlotButtonManager->setAnchorOffset(QPoint(0,-20));
+	hoverPlotButtonManager->setRelative(true);
+	hoverPlotButtonManager->show();
 }
 
 QwtSymbol::Style PlotWidget::getCurveStyle(int i)
