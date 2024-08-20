@@ -43,6 +43,7 @@ class SCOPY_ADC_EXPORT FFTChannel
 {
 public:
 	virtual void setPowerOffset(double) = 0;
+	virtual void setWindow(int) = 0;
 };
 
 class SCOPY_ADC_EXPORT SampleRateProvider
