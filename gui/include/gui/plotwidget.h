@@ -1,5 +1,6 @@
 #ifndef PLOT_H
 #define PLOT_H
+#include "plotbuttonmanager.h"
 #include "plotchannel.h"
 #include "scopy-gui_export.h"
 
@@ -79,6 +80,8 @@ public:
 	void plotChannelChangeYAxis(PlotChannel *c, PlotAxis *y);
 	void plotChannelChangeXAxis(PlotChannel *c, PlotAxis *x);
 
+	PlotButtonManager *plotButtonManager() const;
+
 public Q_SLOTS:
 	void replot();
 	void selectChannel(PlotChannel *);
@@ -124,12 +127,14 @@ private:
 
 	PlotInfo *m_plotInfo;
 	PlotScales *m_plotScales;
+	PlotButtonManager *m_plotButtonManager;
 
 	void setupOpenGLCanvas();
 	void setupNavigator();
 	void setupPlotInfo();
 	void setupPlotScales();
 	void setupAxes();
+	void setupPlotButtonManager();
 	QwtSymbol::Style getCurveStyle(int i);
 };
 
