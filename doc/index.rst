@@ -8,7 +8,7 @@ This repository contains Scopy plugins information
 
    We are in the process of moving the Scopy documentation from
    `wiki <https://wiki.analog.com/university/tools/m2k/scopy#user_guides>`__
-   to :git-scopy:`/dev`.
+   to :git-scopy:`/`.
 
    We apologize for any inconvenience that may occur due to this migration.
 
