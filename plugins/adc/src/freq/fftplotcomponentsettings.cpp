@@ -5,6 +5,8 @@
 #include <QLineEdit>
 #include "fftplotcomponentchannel.h"
 
+#include <gnuradio/fft/window.h>
+
 using namespace scopy;
 using namespace scopy::adc;
 
@@ -57,6 +59,26 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_yPwrOffset->setScaleRange(1, 1);
 	m_yPwrOffset->setIncrementMode(MenuSpinbox::IS_FIXED);
 
+	m_windowCb = new MenuCombo("Window",yaxis);
+
+	m_windowCb->combo()->addItem("Hann", gr::fft::window::WIN_HANN);
+	m_windowCb->combo()->addItem("Hanning", gr::fft::window::WIN_HANNING);
+	m_windowCb->combo()->addItem("Blackman", gr::fft::window::WIN_BLACKMAN);
+	m_windowCb->combo()->addItem("Rectangular", gr::fft::window::WIN_RECTANGULAR);
+	m_windowCb->combo()->addItem("Flattop", gr::fft::window::WIN_FLATTOP);
+	m_windowCb->combo()->addItem("Blackman-Harris", gr::fft::window::WIN_BLACKMAN_hARRIS);
+	m_windowCb->combo()->addItem("Bartlett", gr::fft::window::WIN_BARTLETT);
+	m_windowCb->combo()->setCurrentIndex(0);
+
+	connect(m_windowCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx){
+		for(auto c : m_channels) {
+			if(dynamic_cast<FFTChannel *>(c)) {
+				FFTChannel *fc = dynamic_cast<FFTChannel *>(c);
+				fc->setWindow(m_windowCb->combo()->itemData(idx).toInt());
+			}
+		}
+	});
+
 	m_curve = new MenuPlotChannelCurveStyleControl(plotMenu);
 
 	m_deletePlot = new QPushButton("DELETE PLOT");
@@ -65,6 +87,8 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 
 	yaxis->contentLayout()->addWidget(m_yCtrl);
 	yaxis->contentLayout()->addWidget(m_yPwrOffset);
+	yaxis->contentLayout()->addWidget(m_windowCb);
+
 
 	plotMenu->contentLayout()->addWidget(plotTitleLabel);
 	plotMenu->contentLayout()->addWidget(plotTitle);
@@ -122,6 +146,7 @@ void FFTPlotComponentSettings::addChannel(ChannelComponent *c)
 		connections[c] << connect(m_yPwrOffset, &MenuSpinbox::valueChanged, c,
 					  [=](double val) { fc->setPowerOffset(val); });
 		fc->setPowerOffset(m_yPwrOffset->value());
+		fc->setWindow(m_windowCb->combo()->currentData().toInt());
 	}
 	m_channels.append(c);
 }

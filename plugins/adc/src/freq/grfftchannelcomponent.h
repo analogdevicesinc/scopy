@@ -27,7 +27,7 @@ using namespace scopy::gui;
 
 class GRDeviceAddon;
 
-class GRFFTComplexChannelSigpath : public QObject, public GRChannel
+class GRFFTComplexChannelSigpath : public QObject, public GRChannel, public FFTChannel
 {
 public:
 	GRFFTComplexChannelSigpath(QString m_name, ChannelComponent *ch, GRTopBlock *top, GRIIOComplexChannelSrc *src,
@@ -40,6 +40,8 @@ public:
 			m_name + m_grch->getDeviceSrc()->deviceName() + m_grch->getChannelName(), this);
 		m_signalPath->append(m_grch);
 		m_fft = new GRFFTComplexProc(m_signalPath);
+		int nrBits = src->getFmt()->bits - src->getFmt()->is_signed;
+		m_fft->setNrBits(nrBits);
 		m_signalPath->append(m_fft);
 		m_signalPath->setEnabled(false);
 		m_top = top;
@@ -54,13 +56,17 @@ public:
 
 	GRSignalPath *sigpath() override { return m_signalPath; }
 
-	void setPowerOffset(double val)
+	void setPowerOffset(double val) override
 	{
 		m_powerOffset = val;
 		m_fft->setPowerOffset(val);
 	}
 
 	double powerOffset() { return m_powerOffset; }
+
+	void setWindow(int w) override{
+		m_fft->setWindow(static_cast<gr::fft::window::win_type>(w));
+	}
 
 	GRTopBlock *m_top;
 	ChannelComponent *m_ch;
@@ -70,7 +76,7 @@ public:
 	double m_powerOffset;
 };
 
-class GRFFTChannelSigpath : public QObject, public GRChannel
+class GRFFTChannelSigpath : public QObject, public GRChannel, public FFTChannel
 {
 public:
 	GRFFTChannelSigpath(QString m_name, ChannelComponent *ch, GRTopBlock *top, GRIIOFloatChannelSrc *src,
@@ -84,6 +90,8 @@ public:
 			m_name + m_grch->getDeviceSrc()->deviceName() + m_grch->getChannelName(), this);
 		m_signalPath->append(m_grch);
 		m_fft = new GRFFTFloatProc(m_signalPath);
+		int nrBits = src->getFmt()->bits - src->getFmt()->is_signed;
+		m_fft->setNrBits(nrBits);
 		m_signalPath->append(m_fft);
 		m_signalPath->setEnabled(false);
 		m_top = top;
@@ -98,13 +106,17 @@ public:
 
 	GRSignalPath *sigpath() override { return m_signalPath; }
 
-	void setPowerOffset(double val)
+	void setPowerOffset(double val) override
 	{
 		m_powerOffset = val;
 		m_fft->setPowerOffset(val);
 	}
 
 	double powerOffset() { return m_powerOffset; }
+
+	void setWindow(int w) override {
+		m_fft->setWindow(static_cast<gr::fft::window::win_type>(w));
+	}
 
 	GRTopBlock *m_top;
 	ChannelComponent *m_ch;
@@ -135,6 +147,9 @@ public:
 
 	double powerOffset();
 	void setPowerOffset(double) override;
+	void setWindow(int) override;
+	void setSamplingInfo(SamplingInfo p) override;
+	int window() const;
 
 	virtual bool enabled() const override;
 
@@ -154,16 +169,16 @@ public Q_SLOTS:
 	void addChannelToPlot() override;
 	void removeChannelFromPlot() override;
 
-public:
-	void setSamplingInfo(SamplingInfo p) override;
 
 Q_SIGNALS:
 	void yModeChanged();
 	void fftSizeChanged();
 	void powerOffsetChanged(double);
+	void windowChanged(int);
 
 private:
 	double m_powerOffset;
+	int m_window;
 
 	GRIIOFloatChannelNode *m_node;
 	GRIIOChannel *m_src;
@@ -199,6 +214,7 @@ private:
 	void _init();
 
 	Q_PROPERTY(double powerOffset READ powerOffset WRITE setPowerOffset NOTIFY powerOffsetChanged)
+	Q_PROPERTY(int window READ window WRITE setWindow NOTIFY windowChanged)
 };
 
 } // namespace adc

@@ -35,6 +35,8 @@ private:
 	MenuPlotChannelCurveStyleControl *m_curve;
 	MenuSpinbox *m_yPwrOffset;
 
+	MenuCombo *m_windowCb;
+
 	QList<ChannelComponent *> m_channels;
 	QPushButton *m_deletePlot;
 	QPushButton *m_deletePlotHover;

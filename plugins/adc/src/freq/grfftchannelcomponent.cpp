@@ -24,6 +24,7 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRII
 	: ChannelComponent(node_I->name() + node_Q->name(), pen, parent)
 
 {
+
 	m_plotChannelCmpt = new FFTPlotComponentChannel(this, m_plot, this);
 
 	m_fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel *>(m_plotChannelCmpt);
@@ -42,6 +43,10 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRII
 						 this); // change prototype here (?)
 	connect(this, &GRFFTChannelComponent::powerOffsetChanged, this,
 		[=](double v) { dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setPowerOffset(v); });
+
+	connect(this, &GRFFTChannelComponent::windowChanged, this,
+		[=](int w) { dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setWindow(w); });
+
 
 	m_complex = true;
 	_init();
@@ -66,6 +71,9 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node, FFTPlo
 
 	connect(this, &GRFFTChannelComponent::powerOffsetChanged, this,
 		[=](double v) { dynamic_cast<GRFFTChannelSigpath *>(m_grtch)->setPowerOffset(v); });
+
+	connect(this, &GRFFTChannelComponent::windowChanged, this,
+		[=](int w) { dynamic_cast<GRFFTChannelSigpath *>(m_grtch)->setWindow(w); });
 	_init();
 }
 
@@ -73,6 +81,9 @@ void GRFFTChannelComponent::_init()
 {
 	m_running = false;
 	m_scaleAvailable = m_src->scaleAttributeAvailable(); // query from GRIIOFloatChannel;
+	m_powerOffset = 0;
+	m_window = 1;
+
 
 	/*	m_measureMgr = new TimeMeasureManager(this);
 		m_measureMgr->initMeasure(m_pen);
@@ -253,16 +264,6 @@ GRSignalPath *GRFFTChannelComponent::sigpath() { return m_grtch->sigpath(); }
 
 QVBoxLayout *GRFFTChannelComponent::menuLayout() { return m_layScroll; }
 
-double GRFFTChannelComponent::powerOffset() { return m_powerOffset; }
-
-void GRFFTChannelComponent::setPowerOffset(double newPowerOffset)
-{
-	if(m_powerOffset == newPowerOffset)
-		return;
-	m_powerOffset = newPowerOffset;
-	Q_EMIT powerOffsetChanged(m_powerOffset);
-}
-
 void GRFFTChannelComponent::onInit()
 {
 	// Defaults
@@ -287,3 +288,26 @@ void GRFFTChannelComponent::onNewData(const float *xData, const float *yData, si
 bool GRFFTChannelComponent::sampleRateAvailable() { return m_src->samplerateAttributeAvailable(); }
 
 double GRFFTChannelComponent::sampleRate() { return m_src->readSampleRate(); }
+
+double GRFFTChannelComponent::powerOffset() { return m_powerOffset; }
+
+void GRFFTChannelComponent::setPowerOffset(double newPowerOffset)
+{
+	if(m_powerOffset == newPowerOffset)
+		return;
+	m_powerOffset = newPowerOffset;
+	Q_EMIT powerOffsetChanged(m_powerOffset);
+}
+
+int GRFFTChannelComponent::window() const
+{
+	return m_window;
+}
+
+void GRFFTChannelComponent::setWindow(int newWindow)
+{
+	if (m_window == newWindow)
+		return;
+	m_window = newWindow;
+	Q_EMIT windowChanged(newWindow);
+}
