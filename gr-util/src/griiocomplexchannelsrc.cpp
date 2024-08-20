@@ -7,12 +7,14 @@
 #include <QDebug>
 
 using namespace scopy::grutil;
-GRIIOComplexChannelSrc::GRIIOComplexChannelSrc(QString channelName, GRIIODeviceSource *dev, QString channelNameI,
-					       QString channelNameQ, QObject *parent)
+GRIIOComplexChannelSrc::GRIIOComplexChannelSrc(QString channelName, GRIIODeviceSource *dev, QString channelNameI, QString channelNameQ, QObject *parent)
 	: GRIIOChannel(channelName, dev, parent)
 	, channelNameI(channelNameI)
 	, channelNameQ(channelNameQ)
-{}
+{
+	auto m_iioCh = iio_device_find_channel(dev->iioDev(), channelNameI.toStdString().c_str(), false);
+	fmt = iio_channel_get_data_format(m_iioCh);
+}
 
 void GRIIOComplexChannelSrc::build_blks(GRTopBlock *top)
 {
@@ -23,8 +25,9 @@ void GRIIOComplexChannelSrc::build_blks(GRTopBlock *top)
 	f2c = gr::blocks::float_to_complex::make();
 
 	s2v = gr::blocks::stream_to_vector::make(sizeof(gr_complex), top->vlen());
-	top->connect(s2f[0], 0, f2c, 0);
-	top->connect(s2f[1], 0, f2c, 1);
+
+	top->connect(s2f[0], 0, f2c, 1);
+	top->connect(s2f[1], 0, f2c, 0);
 	top->connect(f2c, 0, s2v, 0);
 	start_blk.append(s2f[0]);
 	start_blk.append(s2f[1]);
@@ -44,3 +47,8 @@ void GRIIOComplexChannelSrc::destroy_blks(GRTopBlock *top)
 const QString &GRIIOComplexChannelSrc::getChannelNameI() const { return channelNameI; }
 
 const QString &GRIIOComplexChannelSrc::getChannelNameQ() const { return channelNameQ; }
+
+const iio_data_format *GRIIOComplexChannelSrc::getFmt() const
+{
+	return fmt;
+}

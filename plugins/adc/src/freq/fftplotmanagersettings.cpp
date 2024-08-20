@@ -76,6 +76,8 @@ QWidget *FFTPlotManagerSettings::createMenu(QWidget *parent)
 
 	m_menu->add(m_addPlotBtn, "add", gui::MenuWidget::MA_BOTTOMLAST);
 
+
+
 	return m_menu;
 }
 
