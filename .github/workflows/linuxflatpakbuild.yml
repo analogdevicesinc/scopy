@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Pull the Docker Image
-      run: docker pull cristianbindea/scopy2-flatpak:testing
+      run: docker pull cristianbindea/scopy2-flatpak:latest
 
     - name: Run Docker Image
       run: |
@@ -23,7 +23,7 @@ jobs:
                 -e CI_SCRIPT='ON' \
                 --mount type=bind,source="$GITHUB_WORKSPACE",target=$GITHUB_WORKSPACE \
                 --env-file $GITHUB_WORKSPACE/ci/general/gh-actions.envs \
-                cristianbindea/scopy2-flatpak:testing \
+                cristianbindea/scopy2-flatpak:latest \
                 /bin/bash -c 'sudo chown -R runner:runner $GITHUB_WORKSPACE && $GITHUB_WORKSPACE/ci/flatpak/flatpak_build_process.sh'
 
     - name: Set short git commit SHA
