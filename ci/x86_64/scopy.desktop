@@ -1,9 +1,0 @@
-[Desktop Entry]
-Icon=scopy
-Exec=scopy
-Terminal=false
-Type=Application
-Categories=Science
-Name=Scopy
-GenericName=Oscilloscope
-Comment=A software oscilloscope

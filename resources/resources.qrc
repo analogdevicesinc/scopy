@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>m2k.html</file>
-        <file>scopy.html</file>
-    </qresource>
-</RCC>
