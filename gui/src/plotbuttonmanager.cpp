@@ -7,7 +7,8 @@ PlotButtonManager::PlotButtonManager(QWidget *parent) : QWidget(parent)
 	m_collapse->setCheckable(true);
 	m_collapse->setChecked(true);
 
-	m_collapse->setFixedSize(8,16);
+	m_collapse->setFixedSize(16,16);
+	m_collapse->setStyleSheet("color:red;");
 	m_lay->addWidget(m_collapse);
 	m_lay->setSpacing(0);
 	m_lay->setMargin(0);
@@ -15,6 +16,7 @@ PlotButtonManager::PlotButtonManager(QWidget *parent) : QWidget(parent)
 	connect(m_collapse,&QAbstractButton::toggled, this, &PlotButtonManager::collapsePriv);
 
 	setMouseTracking(true);
+	raise();
 }
 
 PlotButtonManager::~PlotButtonManager()
@@ -50,8 +52,8 @@ bool PlotButtonManager::event(QEvent *event)
 {
 	if (event->type() == QEvent::Enter) {
 		collapsePriv(false);
-
-	} else if (event->type() == QEvent::Leave) {
+	}
+	if (event->type() == QEvent::Leave) {
 		collapsePriv(true);
 	}
 
