@@ -89,28 +89,16 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_deletePlotHover->setMaximumSize(16, 16);
 	m_deletePlotHover->setIcon(QIcon(":/gui/icons/orange_close.svg"));
 
-	HoverWidget *hv = new HoverWidget(m_deletePlotHover, m_plotComponent, m_plotComponent);
-	hv->setStyleSheet("background-color: transparent; border: 0px;");
-	hv->setContentPos(HP_TOPRIGHT);
-	hv->setAnchorPos(HP_BOTTOMLEFT);
-	hv->setAnchorOffset(QPoint(0, -10));
-	hv->setVisible(true);
-	hv->raise();
 	connect(m_deletePlotHover, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
 
 	m_settingsPlotHover = new QPushButton("", nullptr);
 	m_settingsPlotHover->setMaximumSize(16, 16);
 	m_settingsPlotHover->setIcon(QIcon(":/gui/icons/scopy-default/icons/preferences.svg"));
 
-	HoverWidget *hv1 = new HoverWidget(m_settingsPlotHover, m_plotComponent, m_plotComponent);
-	hv1->setStyleSheet("background-color: transparent; border: 0px;");
-	hv1->setContentPos(HP_TOPRIGHT);
-	hv1->setAnchorPos(HP_BOTTOMLEFT);
-	hv1->setAnchorOffset(QPoint(20, -10));
-	hv1->setVisible(true);
-	hv1->raise();
-
 	connect(m_settingsPlotHover, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestSettings(); });
+
+	m_plotComponent->fftPlot()->plotButtonManager()->add(m_deletePlotHover);
+	m_plotComponent->fftPlot()->plotButtonManager()->add(m_settingsPlotHover);
 }
 
 void FFTPlotComponentSettings::showDeleteButtons(bool b)
