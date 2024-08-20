@@ -264,7 +264,7 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 		break;
 	case YMODE_SCALE:
 		if(m_scaleAvailable) {
-			scale = m_scaleWidget->getDataStrategy()->data().toDouble();
+			scale = m_scaleWidget->read().first.toDouble();
 			m_scaleWidget->setVisible(true);
 		}
 		if(fmt->is_signed) {
