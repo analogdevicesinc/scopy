@@ -197,7 +197,6 @@ void GRTimeChannelComponent::onStart()
 {
 	m_running = true;
 	m_grtch->m_signalPath->setEnabled(true);
-	// m_measureMgr->getModel()->setSampleRate(m_plotSampleRate);
 	toggleAutoScale();
 }
 
@@ -368,6 +367,12 @@ void GRTimeChannelComponent::onNewData(const float *xData, const float *yData, s
 bool GRTimeChannelComponent::sampleRateAvailable() { return m_src->samplerateAttributeAvailable(); }
 
 double GRTimeChannelComponent::sampleRate() { return m_src->readSampleRate(); }
+
+void GRTimeChannelComponent::setSamplingInfo(SamplingInfo p)
+{
+	ChannelComponent::setSamplingInfo(p);
+	m_measureMgr->getModel()->setSampleRate(p.sampleRate);
+}
 
 YMode GRTimeChannelComponent::ymode() const { return m_ymode; }
 
