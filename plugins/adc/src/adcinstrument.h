@@ -50,7 +50,8 @@ public Q_SLOTS:
 	void stopped();
 	void started();
 	void addDevice(CollapsableMenuControlButton *b, ToolComponent *dev);
-	void addChannel(MenuControlButton *btn, ToolComponent *ch, CompositeWidget *c);
+	void addChannel(MenuControlButton *btn, ChannelComponent *ch, CompositeWidget *c);
+	void switchToChannelMenu(QString id, bool force = true);
 
 Q_SIGNALS:
 	void requestStart();
