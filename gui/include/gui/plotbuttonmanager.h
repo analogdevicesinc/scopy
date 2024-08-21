@@ -11,12 +11,17 @@ class PlotButtonManager : public QWidget, public CompositeWidget, public Collaps
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
 public:
+	typedef enum {
+		PBM_LEFT,
+		PBM_RIGHT
+	} CollapseButtonOrientation;
 	PlotButtonManager(QWidget *parent);
 	~PlotButtonManager();
 
 	void add(QWidget *w) override;
 	void remove(QWidget *w) override;
 	bool event(QEvent *ev) override;
+	void setCollapseOrientation(CollapseButtonOrientation);
 
 public Q_SLOTS:
 	virtual bool collapsed() override;
@@ -25,8 +30,9 @@ public Q_SLOTS:
 private:
 	void collapsePriv(bool);
 	QHBoxLayout *m_lay;
-	QPushButton *m_collapse;
-	QMap<QWidget*, QWidget*> m_map;
+	QHBoxLayout *m_collapsablelay;
+	QPushButton *m_collapseBtn;
+	QWidget *m_collapsableContainer;
 
 };
 
