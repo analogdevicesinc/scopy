@@ -2,7 +2,6 @@
 #define GRFFTCHANNELCOMPONENT_H
 
 #include "grfftsinkcomponent.h"
-#include "iioutil/iiounits.h"
 #include "scopy-adc_export.h"
 #include "channelcomponent.h"
 #include <gui/plotautoscaler.h>
@@ -19,6 +18,7 @@
 #include <gr-util/grsignalpath.h>
 #include <gr-util/grfftfloatproxy.h>
 #include <gr-util/griiocomplexchannelsrc.h>
+#include "markercontroller.h"
 
 namespace scopy {
 namespace adc {
@@ -64,8 +64,12 @@ public:
 
 	double powerOffset() { return m_powerOffset; }
 
-	void setWindow(int w) override{
+	void setWindow(int w) override {
 		m_fft->setWindow(static_cast<gr::fft::window::win_type>(w));
+	}
+
+	void setWindowCorrection(bool b) override {
+		m_fft->setWindowCorrection(b);
 	}
 
 	GRTopBlock *m_top;
@@ -118,6 +122,10 @@ public:
 		m_fft->setWindow(static_cast<gr::fft::window::win_type>(w));
 	}
 
+	void setWindowCorrection(bool b) override {
+		m_fft->setWindowCorrection(b);
+	}
+
 	GRTopBlock *m_top;
 	ChannelComponent *m_ch;
 	GRSignalPath *m_signalPath;
@@ -141,6 +149,7 @@ public:
 	~GRFFTChannelComponent();
 
 	MeasureManagerInterface *getMeasureManager() override;
+	MarkerController* markerController();
 
 	GRSignalPath *sigpath() override;
 	QVBoxLayout *menuLayout();
@@ -150,7 +159,8 @@ public:
 	void setWindow(int) override;
 	void setSamplingInfo(SamplingInfo p) override;
 	int window() const;
-
+	bool windowCorrection() const;
+	void setWindowCorrection(bool newWindowCorr) override;
 	virtual bool enabled() const override;
 
 public Q_SLOTS:
@@ -175,10 +185,12 @@ Q_SIGNALS:
 	void fftSizeChanged();
 	void powerOffsetChanged(double);
 	void windowChanged(int);
+	void windowCorrectionChanged(bool);
 
 private:
 	double m_powerOffset;
 	int m_window;
+	bool m_windowCorrection;
 
 	GRIIOFloatChannelNode *m_node;
 	GRIIOChannel *m_src;
@@ -205,7 +217,8 @@ private:
 	bool m_complex;
 
 	QWidget *createMenu(QWidget *parent = nullptr);
-	QWidget *createChAttrMenu(iio_channel *ch, QWidget *parent);
+	QWidget *createChAttrMenu(iio_channel *ch, QString title, QWidget *parent);
+	QWidget *createMarkerMenu(QWidget *parent);
 	QWidget *createYAxisMenu(QWidget *parent);
 	QWidget *createCurveMenu(QWidget *parent);
 	QPushButton *createSnapshotButton(QWidget *parent);
@@ -215,6 +228,7 @@ private:
 
 	Q_PROPERTY(double powerOffset READ powerOffset WRITE setPowerOffset NOTIFY powerOffsetChanged)
 	Q_PROPERTY(int window READ window WRITE setWindow NOTIFY windowChanged)
+	Q_PROPERTY(bool windowCorrection READ windowCorrection WRITE setWindowCorrection NOTIFY windowCorrectionChanged)
 };
 
 } // namespace adc

@@ -121,5 +121,6 @@ private:
 	QHBoxLayout *panelLayout;
 	QList<StatsLabel *> m_labels;
 };
+
 } // namespace scopy
 #endif // MEASUREMENTPANEL_H
