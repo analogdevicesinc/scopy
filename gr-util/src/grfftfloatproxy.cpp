@@ -9,6 +9,7 @@ GRFFTFloatProc::GRFFTFloatProc(QObject *parent)
 	m_fftwindow = gr::fft::window::WIN_HANN;
 	m_powerOffset = 0;
 	nrBits = 12;
+	m_windowCorr = true;
 
 	m_wincorr_factor[gr::fft::window::WIN_HANN] = 2;
 	m_wincorr_factor[gr::fft::window::WIN_HANNING] = 2;
@@ -25,8 +26,12 @@ void GRFFTFloatProc::setWindow(gr::fft::window::win_type w)
 {
 	m_fftwindow = w;
 	Q_EMIT requestRebuild();
-	/*if(mul)
-		mul->set_k(m_scale);*/
+}
+
+void GRFFTFloatProc::setWindowCorrection(bool b)
+{
+	m_windowCorr = b;
+	Q_EMIT requestRebuild();
 }
 
 void GRFFTFloatProc::setPowerOffset(double val)
@@ -52,7 +57,7 @@ void GRFFTFloatProc::build_blks(GRTopBlock *top)
 	auto fft_size = top->vlen();
 
 	auto window = gr::fft::window::build(m_fftwindow, fft_size);
-	auto corr = m_wincorr_factor[m_fftwindow];
+	auto corr = (m_windowCorr) ? m_wincorr_factor[m_fftwindow] : 1;
 
 	fft = gr::fft::fft_v<float, true>::make(fft_size, window, false);
 	ctm = gr::blocks::complex_to_mag_squared::make(fft_size);
@@ -101,6 +106,8 @@ GRFFTComplexProc::GRFFTComplexProc(QObject *parent)
 	m_fftwindow = gr::fft::window::WIN_HANNING;
 	nrBits = 12;
 	m_powerOffset = 0;
+	m_windowCorr = true;
+
 	m_wincorr_factor[gr::fft::window::WIN_HANN] = 2;
 	m_wincorr_factor[gr::fft::window::WIN_HANNING] = 2;
 	m_wincorr_factor[gr::fft::window::WIN_BLACKMAN] = 2;
@@ -118,6 +125,11 @@ void GRFFTComplexProc::setWindow(gr::fft::window::win_type w)
 
 	/*if(mul)
 		mul->set_k(m_scale);*/
+}
+
+void GRFFTComplexProc::setWindowCorrection(bool b) {
+	m_windowCorr = b;
+	Q_EMIT requestRebuild();
 }
 
 void GRFFTComplexProc::setPowerOffset(double val)
@@ -142,7 +154,7 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 	m_top = top;
 	auto fft_size = top->vlen();
 	auto window = gr::fft::window::build(m_fftwindow, fft_size);
-	auto corr = m_wincorr_factor[m_fftwindow];
+	auto corr = (m_windowCorr) ? m_wincorr_factor[m_fftwindow] : 1;
 	mult_nrbits =  gr::blocks::multiply_const_cc::make(gr_complex(1.0 / (1<<nrBits), 1.0 / (1<<nrBits)), fft_size);
 	fft_complex = gr::fft::fft_v<gr_complex, true>::make(fft_size, window, true);
 

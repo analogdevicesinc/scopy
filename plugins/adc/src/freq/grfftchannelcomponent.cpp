@@ -47,6 +47,9 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRII
 	connect(this, &GRFFTChannelComponent::windowChanged, this,
 		[=](int w) { dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setWindow(w); });
 
+	connect(this, &GRFFTChannelComponent::windowCorrectionChanged, this,
+		[=](bool b) { dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setWindowCorrection(b); });
+
 
 	m_complex = true;
 	_init();
@@ -74,6 +77,9 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node, FFTPlo
 
 	connect(this, &GRFFTChannelComponent::windowChanged, this,
 		[=](int w) { dynamic_cast<GRFFTChannelSigpath *>(m_grtch)->setWindow(w); });
+
+	connect(this, &GRFFTChannelComponent::windowCorrectionChanged, this,
+		[=](bool b) { dynamic_cast<GRFFTChannelSigpath *>(m_grtch)->setWindowCorrection(b); });
 	_init();
 }
 
@@ -83,7 +89,7 @@ void GRFFTChannelComponent::_init()
 	m_scaleAvailable = m_src->scaleAttributeAvailable(); // query from GRIIOFloatChannel;
 	m_powerOffset = 0;
 	m_window = 1;
-
+	m_windowCorrection = true;
 
 	/*	m_measureMgr = new TimeMeasureManager(this);
 		m_measureMgr->initMeasure(m_pen);
@@ -97,11 +103,17 @@ void GRFFTChannelComponent::_init()
 	m_lay->addWidget(widget);
 	setLayout(m_lay);
 
+	m_fftPlotComponentChannel->markerController()->setComplex(m_complex);
 	createMenuControlButton(this);
 }
 GRFFTChannelComponent::~GRFFTChannelComponent() {}
 
 MeasureManagerInterface *GRFFTChannelComponent::getMeasureManager() { return nullptr; }
+
+MarkerController *GRFFTChannelComponent::markerController()
+{
+	return m_fftPlotComponentChannel->markerController();
+}
 
 QWidget *GRFFTChannelComponent::createYAxisMenu(QWidget *parent)
 {
@@ -154,21 +166,25 @@ QWidget *GRFFTChannelComponent::createMenu(QWidget *parent)
 	ChannelComponent::initMenu(parent);
 	QWidget *yaxismenu = createYAxisMenu(m_menu);
 	QWidget *curvemenu = createCurveMenu(m_menu);
+	QWidget *markerMenu = createMarkerMenu(m_menu);
 	m_menu->add(yaxismenu, "yaxis");
+	m_menu->add(markerMenu, "marker");
 	m_menu->add(curvemenu, "curve");
 
 	if(dynamic_cast<GRIIOComplexChannelSrc *>(m_src) != nullptr) {
 		auto src = dynamic_cast<GRIIOComplexChannelSrc *>(m_src);
-		QWidget *attrmenui = createChAttrMenu(m_src_I->channel(), m_menu);
+		QWidget *attrmenui = createChAttrMenu(m_src_I->channel(), "ATTRIBUTES - I CHANNEL", m_menu);
 		m_menu->add(attrmenui, "attr");
-		QWidget *attrmenuq = createChAttrMenu(m_src_Q->channel(), m_menu);
+		QWidget *attrmenuq = createChAttrMenu(m_src_Q->channel(), "ATTRIBUTES - Q CHANNEL", m_menu);
 		m_menu->add(attrmenuq, "attr");
 	} else {
 		auto src = dynamic_cast<GRIIOFloatChannelSrc *>(m_src);
-		QWidget *attrmenui = createChAttrMenu(src->channel(), m_menu);
+		QWidget *attrmenui = createChAttrMenu(src->channel(), "ATTRIBUTES", m_menu);
 		m_menu->add(attrmenui, "attr");
 	}
 	// QWidget *measuremenu = m_measureMgr->createMeasurementMenu(m_menu);
+
+
 	m_snapBtn = createSnapshotButton(m_menu);
 
 	// m_menu->add(measuremenu, "measure");
@@ -177,10 +193,69 @@ QWidget *GRFFTChannelComponent::createMenu(QWidget *parent)
 	return m_menu;
 }
 
-QWidget *GRFFTChannelComponent::createChAttrMenu(iio_channel *ch, QWidget *parent)
+QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent) {
+	MenuSectionCollapseWidget *section =
+		new MenuSectionCollapseWidget("MARKER", MenuCollapseSection::MHCW_ONOFF, parent);
+
+	auto layout = new QVBoxLayout();
+	layout->setSpacing(10);
+	layout->setMargin(0);
+
+	MenuCombo *markerCb = new MenuCombo("Marker Type", section);
+	markerCb->combo()->addItem("Peak", MarkerController::MC_PEAK);
+	markerCb->combo()->addItem("Fixed", MarkerController::MC_FIXED);
+	markerCb->combo()->addItem("Single Tone", MarkerController::MC_SINGLETONE);
+	if(m_complex) {
+		markerCb->combo()->addItem("Image", MarkerController::MC_IMAGE);
+	}
+
+	markerCb->combo()->setCurrentIndex(0);
+
+	MenuOnOffSwitch *fixedMarkerEditBtn = new MenuOnOffSwitch("Marker editable", section);
+	connect(fixedMarkerEditBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
+		m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(b);
+	});
+	fixedMarkerEditBtn->onOffswitch()->setChecked(true);
+	fixedMarkerEditBtn->setVisible(false);
+
+	MenuSpinbox *markerCnt = new MenuSpinbox("Marker count", 5, "markers",0,9,true,false,section);
+	markerCnt->setIncrementMode(MenuSpinbox::IS_FIXED);
+	markerCnt->setScaleRange(1,10);
+	markerCnt->setValue(5);
+
+	connect(markerCnt, &MenuSpinbox::valueChanged,this,[=](double cnt){
+		m_fftPlotComponentChannel->markerController()->setNrOfMarkers(cnt);
+	});
+
+	connect(section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
+		if(b) {
+			auto markerType = static_cast<MarkerController::MarkerTypes>(markerCb->combo()->currentData().toInt());
+			m_fftPlotComponentChannel->markerController()->setMarkerType(markerType);
+		} else {
+			m_fftPlotComponentChannel->markerController()->setMarkerType(MarkerController::MC_NONE);
+		}
+	});
+
+	connect(markerCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+		auto markerType = static_cast<MarkerController::MarkerTypes>(markerCb->combo()->currentData().toInt());
+		m_fftPlotComponentChannel->markerController()->setMarkerType(markerType);
+		fixedMarkerEditBtn->setVisible(markerCb->combo()->currentData().toInt() == MarkerController::MC_FIXED);
+	});
+
+	layout->addWidget(markerCb);
+	layout->addWidget(markerCnt);
+	layout->addWidget(fixedMarkerEditBtn);
+
+	section->contentLayout()->addLayout(layout);
+	section->setCollapsed(true);
+	return section;
+
+}
+
+QWidget *GRFFTChannelComponent::createChAttrMenu(iio_channel *ch, QString title, QWidget *parent)
 {
 	MenuSectionCollapseWidget *section =
-		new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
+		new MenuSectionCollapseWidget(title, MenuCollapseSection::MHCW_NONE, parent);
 	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder().channel(ch).buildAll();
 
 	auto layout = new QVBoxLayout();
@@ -283,6 +358,7 @@ void GRFFTChannelComponent::onNewData(const float *xData, const float *yData, si
 	model->setDataSource(yData, size);
 	model->measure();*/
 	m_snapBtn->setEnabled(true);
+
 }
 
 bool GRFFTChannelComponent::sampleRateAvailable() { return m_src->samplerateAttributeAvailable(); }
@@ -310,4 +386,17 @@ void GRFFTChannelComponent::setWindow(int newWindow)
 		return;
 	m_window = newWindow;
 	Q_EMIT windowChanged(newWindow);
+}
+
+bool GRFFTChannelComponent::windowCorrection() const
+{
+	return m_windowCorrection;
+}
+
+void GRFFTChannelComponent::setWindowCorrection(bool newWindowCorr)
+{
+	if (m_windowCorrection == newWindowCorr)
+		return;
+	m_windowCorrection = newWindowCorr;
+	Q_EMIT windowCorrectionChanged(newWindowCorr);
 }

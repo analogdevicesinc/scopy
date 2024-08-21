@@ -155,7 +155,18 @@ void ADCInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *de
 	});
 }
 
-void ADCInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, CompositeWidget *c)
+void ADCInstrument::switchToChannelMenu(QString id, bool force) {
+	if(force) {
+		if(!channelsBtn->button()->isChecked()) {
+			// Workaround because QButtonGroup and setChecked do not interact programatically
+			channelsBtn->button()->animateClick(1);
+		}
+		tool->requestMenu(channelsMenuId);
+	}
+	rightStack->show(id);
+}
+
+void ADCInstrument::addChannel(MenuControlButton *btn, ChannelComponent *ch, CompositeWidget *c)
 {
 	c->add(btn);
 	channelGroup->addButton(btn);
@@ -168,14 +179,11 @@ void ADCInstrument::addChannel(MenuControlButton *btn, ToolComponent *ch, Compos
 
 	connect(btn, &QAbstractButton::clicked, this, [=](bool b) {
 		if(b) {
-			if(!channelsBtn->button()->isChecked()) {
-				// Workaround because QButtonGroup and setChecked do not interact programatically
-				channelsBtn->button()->animateClick(1);
-			}
-			tool->requestMenu(channelsMenuId);
-			rightStack->show(id);
+			switchToChannelMenu(id, true);
 		}
 	});
+
+	connect(ch, &ChannelComponent::requestChannelMenu, this, [=](bool f){ switchToChannelMenu(id, f);});
 
 	/*setupChannelSnapshot(ch);
 	setupChannelMeasurement(ch);
