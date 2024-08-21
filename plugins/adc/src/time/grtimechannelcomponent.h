@@ -98,6 +98,8 @@ public Q_SLOTS:
 	bool sampleRateAvailable() override;
 	double sampleRate() override;
 
+	void setSamplingInfo(SamplingInfo p) override;
+
 	void toggleAutoScale();
 	void setYModeHelper(YMode mode);
 
