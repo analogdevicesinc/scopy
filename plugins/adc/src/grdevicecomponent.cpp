@@ -58,14 +58,17 @@ QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent) {
 		}
 		if(createAttr) {
 			qInfo()<<"common "<<attrName;
-			/*IIOWidget *w = IIOWidgetBuilder().context(const_cast<iio_context *>(ctx))
-			.device(const_cast<iio_device*>(dev))
-					       .channel(const_cast<iio_channel*>(ch))
-			createMultiDataStrategy
+			IIOWidget *w = IIOWidgetBuilder().context(const_cast<iio_context *>(ctx))
+				.device(const_cast<iio_device*>(dev))
+				.channel(const_cast<iio_channel*>(ch))
+				.attribute(attrName).buildSingle();
+
+//			iiowidgetbuilder.convertToMulti(w)
+			/*createMultiDataStrategy
 			Add rest of data strategies
 
-			 attrWidgets.append(w);
 			*/
+			attrWidgets.append(w);
 
 		}
 	}

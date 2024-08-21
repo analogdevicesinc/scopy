@@ -149,8 +149,9 @@ void PlotCursors::displayIntersection()
 	plotMarker1->setAxes(xaxis, yaxis);
 	plotMarker2->setAxes(xaxis, yaxis);
 
-	plotMarker1->setValue(h1CursorPos, getHorizIntersectionAt(h1CursorPos));
-	plotMarker2->setValue(h2CursorPos, getHorizIntersectionAt(h2CursorPos));
+	auto ch = m_plot->selectedChannel();
+	plotMarker1->setValue(h1CursorPos, ch->getValueAt(h1CursorPos));
+	plotMarker2->setValue(h2CursorPos, ch->getValueAt(h2CursorPos));
 
 	Q_EMIT m_yCursors.first->scalePosChanged(plotMarker1->yValue());
 	Q_EMIT m_yCursors.second->scalePosChanged(plotMarker2->yValue());
@@ -170,60 +171,5 @@ void PlotCursors::setXHandlePos(HandlePos pos)
 	m_xCursors.second->handle()->setHandlePos(pos);
 }
 
-double PlotCursors::getHorizIntersectionAt(double pos)
-{
-	auto tmp = m_plot->selectedChannel();
-	QwtSeriesData<QPointF> *curve_data = tmp->curve()->data();
-	int n = curve_data->size();
-
-	if(n == 0) {
-		return -1;
-	} else {
-		double leftTime, rightTime, leftCustom, rightCustom;
-		int rightIndex = -1;
-		int leftIndex = -1;
-		int left = 0;
-		int right = n - 1;
-
-		if(curve_data->sample(right).x() < pos || curve_data->sample(left).x() > pos) {
-			return -1;
-		}
-
-		while(left <= right) {
-			int mid = (left + right) / 2;
-			double xData = curve_data->sample(mid).x();
-
-			if(xData == pos) {
-				if(mid > 0) {
-					leftIndex = mid - 1;
-					rightIndex = mid;
-				}
-				break;
-			} else if(xData < pos) {
-				left = mid + 1;
-			} else {
-				right = mid - 1;
-			}
-		}
-
-		if((leftIndex == -1 || rightIndex == -1) && left > 0) {
-			leftIndex = left - 1;
-			rightIndex = left;
-		}
-		if(leftIndex == -1 || rightIndex == -1) {
-			return -1;
-		}
-
-		leftTime = curve_data->sample(leftIndex).x();
-		rightTime = curve_data->sample(rightIndex).x();
-
-		leftCustom = curve_data->sample(leftIndex).y();
-		rightCustom = curve_data->sample(rightIndex).y();
-
-		double value = (rightCustom - leftCustom) / (rightTime - leftTime) * (pos - leftTime) + leftCustom;
-
-		return value;
-	}
-}
 
 #include "moc_plotcursors.cpp"
