@@ -73,9 +73,13 @@ QWidget *MeasurementController::enableMeasurement(QString name)
 			lbl->setUnit(meas.unit);
 			lbl->setColor(m_pen.color());
 			if(meas.formatter == "time") {
-				lbl->setMeasurementValueFormatter(new TimePrefixFormatter(lbl));
+				auto tfp = new TimePrefixFormatter(lbl);
+				tfp->setTwoDecimalMode(false);
+				lbl->setMeasurementValueFormatter(tfp);
 			} else if(meas.formatter == "metric") {
-				lbl->setMeasurementValueFormatter(new MetricPrefixFormatter(lbl));
+				auto mfp = new MetricPrefixFormatter(lbl);
+				mfp->setTwoDecimalMode(false);
+				lbl->setMeasurementValueFormatter(mfp);
 			}
 
 			m_measureLabels.append(lbl);
@@ -157,21 +161,22 @@ QList<MeasurementInfo> MeasurementController::availableMeasurements() const { re
 TimeChannelMeasurementController::TimeChannelMeasurementController(TimeMeasureModel *msr, QPen m_pen, QObject *parent)
 	: MeasurementController(m_pen, msr, parent)
 {
+
 	addMeasurement({"Period", ":/gui/icons/measurements/period.svg", "", "time", "Horizontal"});
 	addMeasurement({"Frequency", ":/gui/icons/measurements/frequency.svg", "Hz", "metric", "Horizontal"});
-	addMeasurement({"Min", ":/gui/icons/measurements/min.svg", "V", "metric", "Vertical"});
-	addMeasurement({"Max", ":/gui/icons/measurements/max.svg", "V", "metric", "Vertical"});
-	addMeasurement({"Peak-peak", ":/gui/icons/measurements/peak_to_peak.svg", "V", "metric", "Vertical"});
-	addMeasurement({"Cycle Mean", ":/gui/icons/measurements/cycle_mean.svg", "V", "metric", "Vertical"});
-	addMeasurement({"RMS", ":/gui/icons/measurements/rms.svg", "V", "metric", "Vertical"});
-	addMeasurement({"Cycle RMS", ":/gui/icons/measurements/cycle_rms.svg", "V", "metric", "Vertical"});
-	addMeasurement({"AC RMS", ":/gui/icons/measurements/rms.svg", "V", "metric", "Vertical"});
+	addMeasurement({"Min", ":/gui/icons/measurements/min.svg", "", "metric", "Vertical"});
+	addMeasurement({"Max", ":/gui/icons/measurements/max.svg", "", "metric", "Vertical"});
+	addMeasurement({"Peak-peak", ":/gui/icons/measurements/peak_to_peak.svg", "", "metric", "Vertical"});
+	addMeasurement({"Cycle Mean", ":/gui/icons/measurements/cycle_mean.svg", "", "metric", "Vertical"});
+	addMeasurement({"RMS", ":/gui/icons/measurements/rms.svg", "", "metric", "Vertical"});
+	addMeasurement({"Cycle RMS", ":/gui/icons/measurements/cycle_rms.svg", "", "metric", "Vertical"});
+	addMeasurement({"AC RMS", ":/gui/icons/measurements/rms.svg", "", "metric", "Vertical"});
 	addMeasurement({"Area", ":/gui/icons/measurements/area.svg", "Vs", "metric", "Vertical"});
 	addMeasurement({"Cycle Area", ":/gui/icons/measurements/cycle_area.svg", "Vs", "metric", "Vertical"});
-	addMeasurement({"Low", ":/gui/icons/measurements/low.svg", "V", "metric", "Vertical"});
-	addMeasurement({"High", ":/gui/icons/measurements/high.svg", "V", "metric", "Vertical"});
-	addMeasurement({"Amplitude", ":/gui/icons/measurements/amplitude.svg", "V", "metric", "Vertical"});
-	addMeasurement({"Middle", ":/gui/icons/measurements/middle.svg", "V", "metric", "Vertical"});
+	addMeasurement({"Low", ":/gui/icons/measurements/low.svg", "", "metric", "Vertical"});
+	addMeasurement({"High", ":/gui/icons/measurements/high.svg", "", "metric", "Vertical"});
+	addMeasurement({"Amplitude", ":/gui/icons/measurements/amplitude.svg", "", "metric", "Vertical"});
+	addMeasurement({"Middle", ":/gui/icons/measurements/middle.svg", "", "metric", "Vertical"});
 	addMeasurement({"+Over", ":/gui/icons/measurements/p_overshoot.svg", "%", "metric", "Vertical"});
 	addMeasurement({"-Over", ":/gui/icons/measurements/n_overshoot.svg", "%", "metric", "Vertical"});
 	addMeasurement({"Rise", ":/gui/icons/measurements/rise_time.svg", "s", "metric", "Horizontal"});
