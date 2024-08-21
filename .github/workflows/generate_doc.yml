@@ -17,13 +17,13 @@ jobs:
         python-version: "3.x"
 
     - name: Install pip packages
-      working-directory: doc
+      working-directory: docs
       run: |
         pip install pip --upgrade
         pip install -r requirements.txt
 
     - name: Build doc
-      working-directory: doc
+      working-directory: docs
       run: |
         make html SPHINXOPTS='-W --keep-going'
 
@@ -31,7 +31,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: html
-        path: doc/_build/html
+        path: docs/_build/html
 
   deploy-doc:
     runs-on: ubuntu-latest
