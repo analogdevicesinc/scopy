@@ -21,6 +21,7 @@ class SCOPY_GR_UTIL_EXPORT GRFFTFloatProc : public GRProxyBlock
 public:
 	GRFFTFloatProc(QObject *parent = nullptr);
 	void setWindow(gr::fft::window::win_type w);
+	void setWindowCorrection(bool b);
 	void setPowerOffset(double);
 	void setNrBits(int);
 	void build_blks(GRTopBlock *top);
@@ -31,7 +32,7 @@ protected:
 	int nrBits;
 	QMap<gr::fft::window::win_type, double> m_wincorr_factor;
 	gr::fft::fft_v<float, true>::sptr fft;
-
+	bool m_windowCorr;
 	gr::blocks::multiply_const_ff::sptr mult_nrbits;
 	gr::blocks::complex_to_mag_squared::sptr ctm;
 	gr::blocks::multiply_const_cc::sptr mult_wind_corr;
@@ -49,6 +50,7 @@ public:
 	GRFFTComplexProc(QObject *parent = nullptr);
 	void setWindow(gr::fft::window::win_type w);
 	void setPowerOffset(double);
+	void setWindowCorrection(bool b);
 	void setNrBits(int);
 	void build_blks(GRTopBlock *top);
 	void destroy_blks(GRTopBlock *top);
@@ -57,6 +59,7 @@ protected:
 	double m_powerOffset;
 	QMap<gr::fft::window::win_type, double> m_wincorr_factor;
 	int nrBits;
+	bool m_windowCorr;
 	gr::fft::fft_v<gr_complex, true>::sptr fft_complex;
 	gr::blocks::multiply_const_cc::sptr mult_nrbits;
 	gr::blocks::complex_to_mag_squared::sptr ctm;
