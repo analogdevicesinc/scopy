@@ -48,6 +48,7 @@ private:
 	CollapsableMenuControlButton *m_ctrl;
 	QPen m_pen;
 	// QList<GRTimeChannelAddon *> m_channels;
+	QWidget *createChCommonAttrMenu(QWidget *parent);
 	QWidget *createAttrMenu(QWidget *parent);
 	QWidget *createMenu(QWidget *parent = nullptr);
 	void createMenuControlButton(QWidget * = nullptr);

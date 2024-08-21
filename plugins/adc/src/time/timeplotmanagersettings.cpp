@@ -54,6 +54,7 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 				tpc->timePlotInfo()->update(s);
 			}
 		}
+
 	});
 
 	m_plotSection = new MenuSectionWidget(this);
@@ -379,6 +380,8 @@ void TimePlotManagerSettings::addChannel(ChannelComponent *c)
 	if(srp) {
 		addSampleRateProvider(srp);
 	}
+
+	connect(this, &TimePlotManagerSettings::samplingInfoChanged, c, &ChannelComponent::setSamplingInfo);
 }
 
 void TimePlotManagerSettings::removeChannel(ChannelComponent *c)
