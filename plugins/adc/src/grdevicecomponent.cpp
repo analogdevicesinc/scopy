@@ -30,6 +30,69 @@ GRDeviceComponent::GRDeviceComponent(GRIIODeviceSourceNode *node, QWidget *paren
 	createMenuControlButton();
 }
 
+QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent) {
+	const struct iio_device *dev = m_src->iioDev();
+
+	QList<IIOWidget *> attrWidgets;
+	const struct iio_context *ctx = iio_device_get_context(dev);
+
+	int chCount = iio_device_get_channels_count(dev);
+	if(chCount < 2) {
+		return nullptr;
+	}
+
+	const struct iio_channel *ch = iio_device_get_channel(dev,0);
+
+	int attrCount = iio_channel_get_attrs_count(ch);
+
+	for(int i = 0; i < attrCount;i++) {
+		bool createAttr = true;
+		const char *attrName = iio_channel_get_attr(ch,i);
+		for(int j = 1; j < chCount; j++) {
+			const struct iio_channel *ch1 = iio_device_get_channel(dev,j);
+			const char *attr1Name = iio_channel_find_attr(ch1,attrName);
+			if(strcmp(attrName,attr1Name) != 0) {
+				createAttr = false;
+				break;
+			}
+		}
+		if(createAttr) {
+			qInfo()<<"common "<<attrName;
+			/*IIOWidget *w = IIOWidgetBuilder().context(const_cast<iio_context *>(ctx))
+			.device(const_cast<iio_device*>(dev))
+					       .channel(const_cast<iio_channel*>(ch))
+			createMultiDataStrategy
+			Add rest of data strategies
+
+			 attrWidgets.append(w);
+			*/
+
+		}
+	}
+
+
+	if(attrWidgets.count() == 0) {
+		return nullptr;
+	}
+
+	MenuSectionCollapseWidget *attr =
+		new MenuSectionCollapseWidget("COMMON CHANNEL ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
+
+
+	auto layout = new QVBoxLayout();
+	layout->setSpacing(10);
+	layout->setContentsMargins(0, 0, 0, 10); // bottom margin
+	layout->setMargin(0);
+
+	for(auto w : attrWidgets) {
+		layout->addWidget(w);
+	}
+
+	attr->contentLayout()->addLayout(layout);
+	attr->setCollapsed(true);
+	return attr;
+}
+
 QWidget *GRDeviceComponent::createAttrMenu(QWidget *parent)
 {
 	MenuSectionCollapseWidget *attr =
@@ -83,10 +146,14 @@ QWidget *GRDeviceComponent::createMenu(QWidget *parent)
 
 	MenuHeaderWidget *header = new MenuHeaderWidget(name, m_pen, w);
 	QWidget *attrMenu = createAttrMenu(w);
+	QWidget *chcommonattrMenu = createChCommonAttrMenu(w);
 
 	lay->addWidget(header);
 	lay->addWidget(scroll);
 	layScroll->addWidget(attrMenu);
+	if(chcommonattrMenu) {
+		layScroll->addWidget(chcommonattrMenu);
+	}
 
 	layScroll->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 	return w;

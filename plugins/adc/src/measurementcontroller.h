@@ -93,7 +93,6 @@ public:
 
 protected:
 	virtual QWidget *createMeasurementMenuSection(QString category, QWidget *parent);
-
 	TimeChannelMeasurementController *m_measureController;
 	TimeMeasureModel *m_measureModel;
 };
