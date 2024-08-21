@@ -16,15 +16,18 @@ PlotManager::PlotManager(QString name, QWidget *parent)
 
 	m_measurePanel = new MeasurementsPanel(this);
 	m_measurePanel->setFixedHeight(110);
-	// tool->topStack()->add(measureMenuId, m_measurePanel);
+	m_measurePanel->setVisible(false);
 
 	m_statsPanel = new StatsPanel(this);
 	m_statsPanel->setFixedHeight(100);
-	// tool->bottomStack()->add(statsMenuId, m_statsPanel);
-	m_lay->addWidget(m_measurePanel);
-	m_measurePanel->setVisible(false);
 	m_statsPanel->setVisible(false);
+
+	m_markerPanel = new MarkerPanel(this);
+	m_markerPanel->setVisible(false);
+
+	m_lay->addWidget(m_measurePanel);
 	m_lay->addWidget(m_statsPanel);
+	m_lay->addWidget(m_markerPanel);
 }
 
 PlotManager::~PlotManager() {}
@@ -32,6 +35,11 @@ PlotManager::~PlotManager() {}
 void PlotManager::enableMeasurementPanel(bool b) { m_measurePanel->setVisible(b); }
 
 void PlotManager::enableStatsPanel(bool b) { m_statsPanel->setVisible(b); }
+
+void PlotManager::enableMarkerPanel(bool b)
+{
+	m_markerPanel->setVisible(b);
+}
 
 void PlotManager::setXInterval(double xMin, double xMax)
 {
@@ -62,6 +70,11 @@ void PlotManager::selectChannel(ChannelComponent *c)
 MeasurementsPanel *PlotManager::measurePanel() const { return m_measurePanel; }
 
 StatsPanel *PlotManager::statsPanel() const { return m_statsPanel; }
+
+MarkerPanel *PlotManager::markerPanel() const
+{
+	return m_markerPanel;
+}
 
 QWidget *PlotManager::plotCombo(ChannelComponent *c) { return m_channelPlotcomboMap[c]; }
 

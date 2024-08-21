@@ -46,7 +46,6 @@ private:
 	void initUI();
 	void connectSignals();
 	void updateTracking();
-	double getHorizIntersectionAt(double pos);
 };
 } // namespace scopy
 

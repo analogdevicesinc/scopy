@@ -100,7 +100,6 @@ void MenuPlotChannelCurveStyleControl::setThicknessSlot()
 		}
 	}
 
-	qInfo() << m_channels.count() << thickness;
 	cbThicknessW->combo()->setCurrentText(QString::number(thickness));
 }
 

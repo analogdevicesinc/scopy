@@ -56,6 +56,7 @@ public:
 	void setYAxis(PlotAxis *newYAxis);
 
 	void setXAxis(PlotAxis *newXAxis);
+	double getValueAt(double pos);
 
 public Q_SLOTS:
 	void raise();

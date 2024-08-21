@@ -1,6 +1,7 @@
 #ifndef MEASUREMENTSETTINGS_H
 #define MEASUREMENTSETTINGS_H
 
+#include "menusectionwidget.h"
 #include "scopy-gui_export.h"
 
 #include <QPushButton>
@@ -23,6 +24,13 @@ public:
 
 	bool measurementEnabled();
 	bool statsEnabled();
+	bool markerEnabled();
+
+	MenuSectionWidget *getMarkerSection() const;
+
+	MenuSectionWidget *getStatsSection() const;
+
+	MenuSectionWidget *getMeasureSection() const;
 
 Q_SIGNALS:
 	void toggleAllMeasurements(bool);
@@ -31,10 +39,16 @@ Q_SIGNALS:
 	void sortStats(MeasurementSortingType type);
 	void enableMeasurementPanel(bool b);
 	void enableStatsPanel(bool b);
+	void enableMarkerPanel(bool b);
 
 private:
 	MenuOnOffSwitch *measurePanelSwitch;
 	MenuOnOffSwitch *statsPanelSwitch;
+	MenuOnOffSwitch *markerPanelSwitch;
+
+	MenuSectionWidget *markerSection;
+	MenuSectionWidget *statsSection;
+	MenuSectionWidget *measureSection;
 };
 } // namespace scopy
 
