@@ -267,9 +267,10 @@ void PlotWidget::setupAxes()
 void PlotWidget::setupPlotButtonManager()
 {
 	m_plotButtonManager = new PlotButtonManager(this);
-	HoverWidget *hoverPlotButtonManager = new HoverWidget(m_plotButtonManager,this,this);
-	hoverPlotButtonManager->setAnchorPos(HoverPosition::HP_BOTTOMLEFT);
-	hoverPlotButtonManager->setContentPos(HoverPosition::HP_TOPRIGHT);
+	m_plotButtonManager->setCollapseOrientation(PlotButtonManager::PBM_RIGHT);
+	HoverWidget *hoverPlotButtonManager = new HoverWidget(m_plotButtonManager,m_plot->canvas(),m_plot->canvas());
+	hoverPlotButtonManager->setAnchorPos(HoverPosition::HP_BOTTOMRIGHT);
+	hoverPlotButtonManager->setContentPos(HoverPosition::HP_TOPLEFT);
 	hoverPlotButtonManager->setAnchorOffset(QPoint(0,-20));
 	hoverPlotButtonManager->setRelative(true);
 	hoverPlotButtonManager->show();

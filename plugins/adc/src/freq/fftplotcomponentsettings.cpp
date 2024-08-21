@@ -127,6 +127,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 
 void FFTPlotComponentSettings::showDeleteButtons(bool b)
 {
+	m_plotComponent->fftPlot()->plotButtonManager()->setVisible(b);
 	m_deletePlot->setVisible(b);
 	m_settingsPlotHover->setVisible(b);
 	m_deletePlotHover->setVisible(b);

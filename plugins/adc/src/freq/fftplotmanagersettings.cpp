@@ -149,7 +149,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 				p->fftPlot()->xAxis()->scaleDraw()->setUnitType("Hz");
 				p->fftPlot()->xAxis()->scaleDraw()->setUnitsEnabled(true);
 				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
-				p->fftPlot()->xAxis()->getFormatter()->setTwoDecimalMode(true);
+				p->fftPlot()->xAxis()->getFormatter()->setTwoDecimalMode(false);
 			}
 		}
 		if(xcb->itemData(idx) == XMODE_OVERRIDE) {
@@ -165,7 +165,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 				p->fftPlot()->xAxis()->scaleDraw()->setUnitType("Hz");
 				p->fftPlot()->xAxis()->scaleDraw()->setUnitsEnabled(true);
 				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
-				p->fftPlot()->xAxis()->getFormatter()->setTwoDecimalMode(true);
+				p->fftPlot()->xAxis()->getFormatter()->setTwoDecimalMode(false);
 			}
 		}
 		m_plotManager->updateAxisScales();
