@@ -11,6 +11,7 @@ Preferences *Preferences::pinstance_{nullptr};
 
 Preferences::Preferences(QObject *parent)
 	: QObject(parent)
+	, s(nullptr)
 {
 	connect(parent, SIGNAL(aboutToQuit()), this, SLOT(save()));
 }
