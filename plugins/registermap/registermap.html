@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Register Map &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/style.min.css?v=a3ba2641" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../../_static/app.umd.js?v=7b10be7e"></script>
+    <link rel="icon" href="../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ADALM2000" href="../m2k/index.html" />
+    <link rel="prev" title="Datalogger" href="../datalogger/datalogger.html" />
+   
+  
+    <meta name="robots" content="noindex">
+  
+  <meta name="repo" content="">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <div class="banner"></div>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../documentation/eval/index.html">Evaluation Boards</a>
+  <a href="../../../documentation/university/index.html">University Program</a>
+  <a href="../../../hdl/index.html">HDL</a>
+  <a href="../../../no-OS/index.html">no-OS</a>
+  <a href="../../../pyadi-iio/index.html">Hardware Python Interfaces</a>
+  <a href="../../../precision-converters-firmware/index.html">Precision Converters Firmware</a>
+  <a href="../../../doctools/index.html">Doctools</a>
+  <a href="../../../PrecisionToolbox/index.html">Precision Toolbox</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header">On this page</div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Register Map</a><ul>
+<li><a class="reference internal" href="#user-guide">User Guide</a></li>
+<li><a class="reference internal" href="#settings">Settings</a></li>
+<li><a class="reference internal" href="#xml-file-format">XML file format</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../index.html">
+      <img class="only-light" src="../../_static/scopy.png"/>
+      <img class="only-dark" src="../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../documentation/eval/index.html">Evaluation Boards</a>
+  <a href="../../../documentation/university/index.html">University Program</a>
+  <a href="../../../hdl/index.html">HDL</a>
+  <a href="../../../no-OS/index.html">no-OS</a>
+  <a href="../../../pyadi-iio/index.html">Hardware Python Interfaces</a>
+  <a href="../../../precision-converters-firmware/index.html">Precision Converters Firmware</a>
+  <a href="../../../doctools/index.html">Doctools</a>
+  <a href="../../../PrecisionToolbox/index.html">Precision Toolbox</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-1" id="toctree-collapse-1-1"/><div class="collapse"><a class="reference internal" href="../m2k/index.html">ADALM2000</a><label for="toctree-collapse-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-2" id="toctree-collapse-1-2"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-3" id="toctree-collapse-1-3" checked=""/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-1-3"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="register-map">
+<span id="registermap"></span><h1>Register Map<a class="headerlink" href="#register-map" title="Link to this heading">¶</a></h1>
+<p>The Register Map allow access to reading and writing registers for devices
+connected to Scopy.</p>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/registermap/registermap4.PNG" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/registermap/registermap4.PNG" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>If the user has an .xml file of the register map that follows the format
+exmplained <a class="reference internal" href="#xml-file-format"><span class="std std-ref">here</span></a>  the plugin will generate an table
+view matching the .xml file contents</p>
+<section id="user-guide">
+<h2>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading">¶</a></h2>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>User can use the address picker to select the address of the register
+they want to read/write</p></li>
+<li><p>Read button will read selected register</p></li>
+<li><p>The value of a register is shown here once read</p></li>
+<li><p>To write a value to the register user can ether</p>
+<ul class="simple">
+<li><p>change the value from 3. then press Write button</p></li>
+<li><p>change the value of the bitfields from 7. then press Write button</p></li>
+</ul>
+</li>
+<li><p>Toggle the detailed bitfields (7.) visible</p></li>
+<li><p>Register map table created based on .xml file. Each row represetns a
+register the first colum is de register information and the following columns
+represent the bitfields of the register</p></li>
+<li><p>For the selected register we display detailed informations about the
+bitfields and allow user to change values at bitfield value</p></li>
+<li><p>Use this menu to select the device you want to use</p></li>
+<li><p>Search bar can be used to filter the registers. The function will search
+based on</p>
+<ul class="simple">
+<li><p>name or description of register</p></li>
+<li><p>name or description of bitfield</p></li>
+</ul>
+</li>
+</ol>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/registermap/registermap1.PNG" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/registermap/registermap1.PNG" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</section>
+<section id="settings">
+<h2>Settings<a class="headerlink" href="#settings" title="Link to this heading">¶</a></h2>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/registermap/regmap2.PNG" class="align-right" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/registermap/regmap2.PNG" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>If Autoread is checked when a register is selected a read is
+automatically done</p></li>
+<li><p>User has option to read an interval of registers</p></li>
+<li><p>If user has a set of values previously read and wants to load them he
+needs to select the file and press “Write values”</p></li>
+<li><p>Pressing “Register dump” will save all currently read registers to the
+selected file</p></li>
+</ol>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</section>
+<section id="xml-file-format">
+<span id="id1"></span><h2>XML file format<a class="headerlink" href="#xml-file-format" title="Link to this heading">¶</a></h2>
+<p>The xml file starts and ends with the device name and contains registers.</p>
+<p>The structure of a register is:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Name: the name of the register;</p></li>
+<li><p>Address: the address of the register;</p></li>
+<li><p>Description: the description of the register;</p></li>
+<li><p>Exists: a true or false value;</p></li>
+<li><p>Width: the size of the register in bits;</p></li>
+<li><p>Notes: other observations;</p></li>
+<li><p>Bitfields: a list of Bitfield type elements;</p></li>
+</ul>
+</div></blockquote>
+<p>The structure of a bitfield is:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Name: the name of the bitfield;</p></li>
+<li><p>Access: the type of access (read and/or write);</p></li>
+<li><p>DefaultValue: the default value of the bitfield;</p></li>
+<li><p>Width: the size of the bitfield in bits;</p></li>
+<li><p>RegOffset: the relative position of the bitfield to the register;</p></li>
+<li><p>BitOffset;</p></li>
+<li><p>SliceWidth;</p></li>
+<li><p>Visibility;</p></li>
+<li><p>Notes;</p></li>
+<li><p>Options: the list of possible values for the bitfield</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>The structure of an Option type object:</dt><dd><ul class="simple">
+<li><p>Desctiption: description for the option (will be used in the application)</p></li>
+<li><p>Value: the value in hexadecimal</p></li>
+</ul>
+</dd>
+</dl>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/registermap/regmap5.PNG" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/registermap/regmap5.PNG" />
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>User can create it’s own .xml file for any device and add it to where scopy
+is build in “/plugins/regmap/xmls/” to be able to see the register map table</p>
+</div>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="../datalogger/datalogger.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Datalogger</a>
+    <a href="../m2k/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">ADALM2000</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>
