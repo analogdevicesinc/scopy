@@ -120,9 +120,7 @@ void EmuWidget::enGenericOptWidget(QWidget *xmlPathWidget, QWidget *rxTxDevWidge
 	rxTxDevWidget->setEnabled(isNotAdalm2000);
 	m_enDemoBtn->setFocus();
 
-	if(isNotAdalm2000) {
-		configureOption(crtOpt);
-	}
+	configureOption(crtOpt);
 }
 
 void EmuWidget::setStatusMessage(QString msg)
@@ -157,14 +155,13 @@ QStringList EmuWidget::createArgList()
 {
 	QString option = m_demoOptCb->currentText();
 	QStringList arguments;
+	arguments.append(m_emuType);
 
 	if(option.compare("adalm2000") != 0) {
-		arguments.append("generic");
 		arguments.append(m_xmlPathEdit->edit()->text());
 		arguments.append(m_rxTxDevEdit->edit()->text());
-	} else {
-		arguments.append("adalm2000");
 	}
+
 	return arguments;
 }
 
@@ -252,6 +249,12 @@ void EmuWidget::configureOption(QString option)
 			if(jsonObject.contains("uri")) {
 				QString uri = jsonObject.value(QString("uri")).toString();
 				m_uriEdit->edit()->setText(uri);
+			}
+
+			if(jsonObject.contains("emu-type")) {
+				m_emuType = jsonObject.value(QString("emu-type")).toString();
+			} else {
+				m_emuType = "generic";
 			}
 
 			break;

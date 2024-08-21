@@ -64,6 +64,7 @@ private:
 	QStringList m_availableOptions;
 
 	QString m_jsonConfigVal;
+	QString m_emuType = "generic";
 };
 } // namespace scopy
 
