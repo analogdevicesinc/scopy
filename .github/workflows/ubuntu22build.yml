@@ -15,13 +15,16 @@ jobs:
         options: --user root
     steps:
         - uses: actions/checkout@v3
+
         - name: Build Scopy
           run: |
-            /bin/bash -c "export CI_SCRIPT=ON && source $GITHUB_WORKSPACE/ci/ubuntu/ubuntu22_build_process.sh && build_scopy"
+            git config --global --add safe.directory $GITHUB_WORKSPACE
+            export CI_SCRIPT=ON && $GITHUB_WORKSPACE/ci/ubuntu/ubuntu_build_process.sh build_scopy
 
         - name: Run Tests
           run: |
-            cd $GITHUB_WORKSPACE/build-x86_64
+            sudo ldconfig
+            cd $GITHUB_WORKSPACE/build
             QT_QPA_PLATFORM=offscreen ctest -V --output-on-failure --output-junit $GITHUB_WORKSPACE/test-result-ubuntu22.xml
 
         - name: Report
