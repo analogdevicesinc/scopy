@@ -7,6 +7,7 @@
 #include <channelcomponent.h>
 #include "fftplotcomponent.h"
 #include <plotcomponent.h>
+#include "markercontroller.h"
 
 namespace scopy {
 namespace adc {
@@ -22,6 +23,7 @@ public:
 	ChannelComponent *channelComponent() override;
 	PlotComponent *plotComponent() override;
 	PlotChannel *plotChannel() override;
+	MarkerController *markerController() const;
 
 public Q_SLOTS:
 	void enable() override;
@@ -42,6 +44,9 @@ public:
 	ChannelComponent *m_ch;
 	bool m_singleYMode = false;
 	bool m_enabled;
+
+private:
+	MarkerController *m_markerController;
 };
 } // namespace adc
 } // namespace scopy

@@ -112,6 +112,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	StyleHelper::BlueButton(m_deletePlot);
 	connect(m_deletePlot, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
 
+	yaxis->contentLayout()->setSpacing(2);
 	yaxis->contentLayout()->addWidget(m_autoscaleBtn);
 	yaxis->contentLayout()->addWidget(m_yCtrl);
 	yaxis->contentLayout()->addWidget(m_yModeCb);

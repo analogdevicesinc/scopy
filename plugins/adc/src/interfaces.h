@@ -1,5 +1,6 @@
 #ifndef INTERFACES_H
 #define INTERFACES_H
+#include "markercontroller.h"
 #include "plotwidget.h"
 #include "scopy-adc_export.h"
 #include <QString>
@@ -44,6 +45,7 @@ class SCOPY_ADC_EXPORT FFTChannel
 public:
 	virtual void setPowerOffset(double) = 0;
 	virtual void setWindow(int) = 0;
+	virtual void setWindowCorrection(bool) = 0;
 };
 
 class SCOPY_ADC_EXPORT SampleRateProvider
@@ -83,8 +85,10 @@ class SCOPY_ADC_EXPORT MeasurementPanelInterface
 public:
 	virtual MeasurementsPanel *measurePanel() const = 0;
 	virtual StatsPanel *statsPanel() const = 0;
+	virtual MarkerPanel *markerPanel() const = 0;
 	virtual void enableMeasurementPanel(bool) = 0;
 	virtual void enableStatsPanel(bool) = 0;
+	virtual void enableMarkerPanel(bool) = 0;
 };
 
 } // namespace scopy::adc

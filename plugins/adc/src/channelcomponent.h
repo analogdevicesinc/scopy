@@ -47,6 +47,9 @@ public:
 	virtual SamplingInfo samplingInfo() override;
 	virtual void setSamplingInfo(SamplingInfo p) override;
 
+Q_SIGNALS:
+	void requestChannelMenu(bool force = true);
+
 protected:
 	QString m_channelName;
 	QPen m_pen;

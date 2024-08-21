@@ -79,6 +79,17 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 		}
 	});
 
+	m_windowChkb = new MenuOnOffSwitch("Window Correction", this);
+	connect(m_windowChkb->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
+		for(auto c : m_channels) {
+			if(dynamic_cast<FFTChannel *>(c)) {
+				FFTChannel *fc = dynamic_cast<FFTChannel *>(c);
+				fc->setWindowCorrection(b);
+			}
+		}
+	});
+	m_windowChkb->onOffswitch()->setChecked(true);
+
 	m_curve = new MenuPlotChannelCurveStyleControl(plotMenu);
 
 	m_deletePlot = new QPushButton("DELETE PLOT");
@@ -88,7 +99,8 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	yaxis->contentLayout()->addWidget(m_yCtrl);
 	yaxis->contentLayout()->addWidget(m_yPwrOffset);
 	yaxis->contentLayout()->addWidget(m_windowCb);
-
+	yaxis->contentLayout()->addWidget(m_windowChkb);
+	yaxis->contentLayout()->setSpacing(10);
 
 	plotMenu->contentLayout()->addWidget(plotTitleLabel);
 	plotMenu->contentLayout()->addWidget(plotTitle);

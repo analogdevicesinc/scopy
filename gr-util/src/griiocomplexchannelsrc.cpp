@@ -26,8 +26,8 @@ void GRIIOComplexChannelSrc::build_blks(GRTopBlock *top)
 
 	s2v = gr::blocks::stream_to_vector::make(sizeof(gr_complex), top->vlen());
 
-	top->connect(s2f[0], 0, f2c, 1);
-	top->connect(s2f[1], 0, f2c, 0);
+	top->connect(s2f[0], 0, f2c, 0);
+	top->connect(s2f[1], 0, f2c, 1);
 	top->connect(f2c, 0, s2v, 0);
 	start_blk.append(s2f[0]);
 	start_blk.append(s2f[1]);

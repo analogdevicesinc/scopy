@@ -1,5 +1,6 @@
 #ifndef PLOTMANAGER_H
 #define PLOTMANAGER_H
+#include "markercontroller.h"
 #include "scopy-adc_export.h"
 #include <QWidget>
 #include "toolcomponent.h"
@@ -30,6 +31,7 @@ public:
 	QList<PlotComponent *> plots() const;
 	MeasurementsPanel *measurePanel() const override;
 	StatsPanel *statsPanel() const override;
+	MarkerPanel *markerPanel() const override;
 
 	QWidget *createMenu(QWidget *parent);
 	QWidget *plotCombo(ChannelComponent *c);
@@ -39,6 +41,7 @@ public Q_SLOTS:
 	void replot();
 	void enableMeasurementPanel(bool) override;
 	void enableStatsPanel(bool) override;
+	void enableMarkerPanel(bool) override;
 
 	void setXInterval(double xMin, double xMax);
 	void setXUnit(QString);
@@ -54,6 +57,8 @@ protected:
 	QList<PlotComponent *> m_plots;
 	QList<PlotComponentChannel *> m_channels;
 	MeasurementsPanel *m_measurePanel;
+	MarkerPanel *m_markerPanel;
+
 	StatsPanel *m_statsPanel;
 	QMap<ChannelComponent *, PlotManagerCombobox *> m_channelPlotcomboMap;
 	// PlotSettings *m_plotSettings;

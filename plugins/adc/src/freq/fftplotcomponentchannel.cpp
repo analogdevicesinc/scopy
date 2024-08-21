@@ -16,11 +16,16 @@ FFTPlotComponentChannel::FFTPlotComponentChannel(ChannelComponent *ch, FFTPlotCo
 
 	m_ch = ch;
 	m_plotComponent = nullptr;
+	m_markerController = new MarkerController(this, this);
 	initPlotComponent(plotComponent);
 
 	m_fftPlotYAxis->setUnits("dB");
 	m_fftPlotCh->xAxis()->setUnits("samples");
 	m_fftPlotYAxis->setInterval(-2048, 2048);
+
+	m_markerController->init();
+
+
 }
 
 void FFTPlotComponentChannel::deinitPlotComponent()
@@ -35,6 +40,11 @@ void FFTPlotComponentChannel::deinitPlotComponent()
 	delete m_fftPlotYAxis;
 	delete m_fftPlotCh;
 	delete m_fftPlotAxisHandle;
+}
+
+MarkerController *FFTPlotComponentChannel::markerController() const
+{
+	return m_markerController;
 }
 
 void FFTPlotComponentChannel::initPlotComponent(PlotComponent *pc)
@@ -75,6 +85,8 @@ void FFTPlotComponentChannel::initPlotComponent(PlotComponent *pc)
 	lockYAxis(true);
 	m_fftPlotYAxis->setInterval(-2048, 2048);
 	refreshData(true);
+
+	m_markerController->setPlot(fftplot->plot());
 }
 
 FFTPlotComponentChannel::~FFTPlotComponentChannel() {}
@@ -88,18 +100,21 @@ void FFTPlotComponentChannel::refreshData(bool copy)
 void FFTPlotComponentChannel::onNewData(const float *xData_, const float *yData_, size_t size, bool copy)
 {
 	refreshData(copy);
+	m_markerController->computeMarkers();
 }
 
 void FFTPlotComponentChannel::lockYAxis(bool b)
 {
 	m_singleYMode = b;
 	if(m_singleYMode) {
-		PlotAxis *time = m_plotComponent->fftPlot()->yAxis();
-		m_plotComponent->fftPlot()->plotChannelChangeYAxis(m_fftPlotCh, time);
+		PlotAxis *y = m_plotComponent->fftPlot()->yAxis();
+		m_plotComponent->fftPlot()->plotChannelChangeYAxis(m_fftPlotCh, y);
 	} else {
-		PlotAxis *time = m_fftPlotYAxis;
-		m_plotComponent->fftPlot()->plotChannelChangeYAxis(m_fftPlotCh, time);
+		PlotAxis *y = m_fftPlotYAxis;
+		m_plotComponent->fftPlot()->plotChannelChangeYAxis(m_fftPlotCh, y);
 	}
+
+	m_markerController->setAxes(m_fftPlotCh->xAxis()->axisId(), m_fftPlotCh->yAxis()->axisId());
 
 	m_fftPlotAxisHandle->handle()->setVisible(!b);
 	m_plotComponent->refreshAxisLabels();
@@ -134,6 +149,7 @@ void FFTPlotComponentChannel::enable()
 		m_fftPlotAxisHandle->handle()->raise();
 	}
 	m_enabled = true;
+	m_markerController->setEnabled(true);
 }
 
 void FFTPlotComponentChannel::disable()
@@ -143,4 +159,5 @@ void FFTPlotComponentChannel::disable()
 		m_fftPlotAxisHandle->handle()->setVisible(false);
 	}
 	m_enabled = false;
+	m_markerController->setEnabled(false);
 }

@@ -14,6 +14,7 @@ HDivInfo::HDivInfo(PlotWidget *plot, QWidget *parent)
 {
 	StyleHelper::PlotInfoLabel(this);
 	m_mpf->setTrimZeroes(true);
+	m_mpf->setTwoDecimalMode(false);
 	connect(m_plot->navigator(), &PlotNavigator::rectChanged, this, &HDivInfo::onRectChanged);
 
 	onRectChanged();
@@ -55,6 +56,7 @@ TimeSamplingInfo::TimeSamplingInfo(QWidget *parent)
 {
 	StyleHelper::PlotInfoLabel(this);
 	m_mpf->setTrimZeroes(true);
+	m_mpf->setTwoDecimalMode(false);
 }
 
 TimeSamplingInfo::~TimeSamplingInfo() {}
@@ -77,6 +79,7 @@ FFTSamplingInfo::FFTSamplingInfo(QWidget *parent)
 {
 	StyleHelper::PlotInfoLabel(this);
 	m_mpf->setTrimZeroes(true);
+	m_mpf->setTwoDecimalMode(false);
 }
 
 FFTSamplingInfo::~FFTSamplingInfo() {}
@@ -84,9 +87,9 @@ FFTSamplingInfo::~FFTSamplingInfo() {}
 void FFTSamplingInfo::update(SamplingInfo info)
 {
 	QString text;
-	text = QString("%1").arg(m_mpf->format(info.plotSize, "samples", 2));
+	text = QString("%1").arg(m_mpf->format(info.plotSize, "samples", 3));
 	if(info.sampleRate != 1) {
-		text += QString(" at %2").arg(m_mpf->format(info.sampleRate, "sps", 2));
+		text += QString(" at %2").arg(m_mpf->format(info.sampleRate, "sps", 3));
 	}
 	if(info.freqOffset != 0) {
 		text += QString("\nCenter Frequency: %1").arg(m_mpf->format(info.freqOffset, "Hz", 3));

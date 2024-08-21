@@ -92,6 +92,8 @@ void ADCTimeInstrumentController::init()
 
 	m_ui->m_settingsBtn->animateClick();
 	m_ui->sync()->setVisible(false);
+
+	m_measureComponent->measureSettings()->getMarkerSection()->setVisible(false);
 }
 
 void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)

@@ -36,6 +36,7 @@ private:
 	MenuSpinbox *m_yPwrOffset;
 
 	MenuCombo *m_windowCb;
+	MenuOnOffSwitch *m_windowChkb;
 
 	QList<ChannelComponent *> m_channels;
 	QPushButton *m_deletePlot;

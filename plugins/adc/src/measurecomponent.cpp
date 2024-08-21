@@ -33,6 +33,7 @@ MeasureComponent::MeasureComponent(ToolTemplate *tool, MeasurementPanelInterface
 		// tool->openBottomContainerHelper(b);
 		m_measurementPanelInterface->enableMeasurementPanel(m_measureSettings->measurementEnabled() && b);
 		m_measurementPanelInterface->enableStatsPanel(m_measureSettings->statsEnabled() && b);
+		m_measurementPanelInterface->enableMarkerPanel(m_measureSettings->markerEnabled() && b);
 	});
 	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
 
@@ -43,6 +44,8 @@ MeasureComponent::MeasureComponent(ToolTemplate *tool, MeasurementPanelInterface
 		SLOT(enableMeasurementPanel(bool)));
 	connect(m_measureSettings, SIGNAL(enableStatsPanel(bool)), dynamic_cast<QObject *>(p),
 		SLOT(enableStatsPanel(bool)));
+	connect(m_measureSettings, SIGNAL(enableMarkerPanel(bool)), dynamic_cast<QObject *>(p),
+		SLOT(enableMarkerPanel(bool)));
 	connect(m_measureSettings, &MeasurementSettings::sortMeasurements, m_measurePanel, &MeasurementsPanel::sort);
 	connect(m_measureSettings, &MeasurementSettings::sortStats, m_statsPanel, &StatsPanel::sort);
 }
