@@ -13,9 +13,9 @@ Digital IO
 
 
 General description
--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
-.. image:: ../../resources/m2k/digitalio/scopy_2018-05-15_16-46-33.png
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/digitalio/scopy_2018-05-15_16-46-33.png
     :alt: alternate text
     :align: right
 
@@ -27,11 +27,11 @@ General description
 
 
 Use Cases
--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
     **IO operation**
 
-.. image:: ../../resources/m2k/digitalio/scopy_2018-05-15_16-51-11.png
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/digitalio/scopy_2018-05-15_16-51-11.png
     :alt: alternate text
     :align: right
 
@@ -43,12 +43,16 @@ Use Cases
 
 4. Monitor channel 0 using voltmeter/scope/logic analyzer
 
-5. Set channel 0 as output by clicking the direction button Channel 7 input state is the same as channel 0 output state Voltmeter shows the same state (5V/0V) as channel 0 output state
+5. Set channel 0 as output by clicking the direction button Channel 7 input 
+   state is the same as channel 0 output state Voltmeter shows the same state 
+   (5V/0V) as channel 0 output state
 
 
-6. Change channel 0 output state by clicking it (multiple times) Channel 7 input state is the same as channel 0 output state Voltmeter shows the same state (5V/0V) as channel 0 output state
+6. Change channel 0 output state by clicking it (multiple times) Channel 7 
+   input state is the same as channel 0 output state Voltmeter shows the same 
+   state (5V/0V) as channel 0 output state
 
--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
   **Grouped operation**
 
@@ -65,7 +69,8 @@ Use Cases
 
 2. Start digital IO instrument
 
-3. Also monitor these connections with a logic analyzer (use breadboard to split the connection)
+3. Also monitor these connections with a logic analyzer (use breadboard to 
+   split the connection)
 
 4. Set DIO 0-7 to Grouped interface
 
@@ -74,8 +79,8 @@ Use Cases
 
 6. Set each DIO8-15 output states at random
 
-
-DIO 0 – 7 grouped value should be the binary value of channels 8-15. Logic analyzer should show the same results
+DIO 0 – 7 grouped value should be the binary value of channels 8-15. Logic 
+analyzer should show the same results
 
 7. Set all channels 8-15 to input
 
@@ -87,10 +92,10 @@ Channels 8-15 input state should represent that value in binary
 
 Logic analyzer should show the same results
 
-.. image:: ../../resources/m2k/digitalio/scopy_2018-05-15_17-11-24.png
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/digitalio/scopy_2018-05-15_17-11-24.png
     :align: center
 
--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
    **Interaction with pattern generator**
 
@@ -98,9 +103,11 @@ Logic analyzer should show the same results
 
 2. Generate clock signals on channels 0 and 8
 
-In the digitalIO the group as well as channel 8 should have a red highlight indicating that the pattern generator has ownership of the channels.
+In the digitalIO the group as well as channel 8 should have a red highlight 
+indicating that the pattern generator has ownership of the channels.
 
-The user cannot interact with those channels. Logic analyzer shows clock signal correctly generated at channels 0 and 8
+The user cannot interact with those channels. Logic analyzer shows clock signal 
+correctly generated at channels 0 and 8
 
 3. Connect channel 10 to channel 11
 
@@ -110,13 +117,18 @@ The user cannot interact with those channels. Logic analyzer shows clock signal 
 
 Channel 11 input state follows channel 10 output state
 
-Rest of the channels work properly. The user can set direction and output state and can read input state
+Rest of the channels work properly. The user can set direction and output state 
+and can read input state
 
-6. While running, set a clock signal on channel 10 in the pattern generator Channel 10 has a red highlight, the user cannot interact with it anymore. Channel 11 input state might flicker indicating that a signal can be read from channel 11.
+6. While running, set a clock signal on channel 10 in the pattern generator 
+   Channel 10 has a red highlight, the user cannot interact with it anymore. 
+   Channel 11 input state might flicker indicating that a signal can be read from 
+   channel 11.
 
-Logic analyzer shows a new clock signal generated at channel 10 which can also be read on channel 11
+Logic analyzer shows a new clock signal generated at channel 10 which can also 
+be read on channel 11
 
-.. image:: ../../resources/m2k/digitalio/scopy_2018-05-15_17-13-47.png
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/digitalio/scopy_2018-05-15_17-13-47.png
     :align: center
 
 7. Stop the pattern generator

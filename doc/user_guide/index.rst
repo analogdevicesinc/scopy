@@ -5,7 +5,8 @@ Scopy
 
 About 
 ---------------------------------------------------------------------
-Scopy is a multi-functional software toolset with strong capabilities for signal analysis.
+Scopy is a multi-functional software toolset with strong capabilities for 
+signal analysis.
 
 
 Download
@@ -14,24 +15,33 @@ Download
 .. tip::  
 
       **Scopy for Windows**
+
         * Download: `Installer for latest release (Windows 64/32-bit) <https://github.com/analogdevicesinc/scopy/releases/latest>`_ 
 
       **Scopy for Linux**
+
         * Download: `Scopy Flatpak installer <https://github.com/analogdevicesinc/scopy/releases/latest>`_  
 
       **Scopy for OSX**
+
         * Download:`OSX installer <https://github.com/analogdevicesinc/scopy/releases/latest>`_ 
 
       **Scopy for Android**
+
         * Download: `Android installer <https://github.com/analogdevicesinc/scopy/releases/latest>`_ 
+  
         * Google Play store link: `Scopy <https://play.google.com/store/apps/details?id=org.adi.scopy>`_ 
 
       **Scopy all platforms latest(nightly) builds**
+
         * Download:`Installer for latest (nightly) build <https://github.com/analogdevicesinc/scopy/releases/tag/continous>`_ 
 
 .. warning::
 
-  In order to have Scopy working with `ADALM2000 <https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/ADALM2000.html>`__  please make sure that the Device Drivers are installed. A guide on this topic can be found in the section:
+  In order to have Scopy working with `ADALM2000 <https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/ADALM2000.html>`__  please make sure that the Device Drivers are 
+
+  installed. A guide on this topic can be found in the section:
+
     * `ADALM2000 for End Users <https://wiki.analog.com/university/tools/m2k/users>`__ 
 
 Installation
@@ -39,7 +49,8 @@ Installation
 
   **Scopy for Windows**
 
-Once you downloaded the installer, run it and follow all the required steps. After completion, system reboot is required.
+Once you downloaded the installer, run it and follow all the required steps. 
+After completion, system reboot is required.
 
 Video intalation guide:
 
@@ -48,7 +59,9 @@ Video intalation guide:
 
   **Scopy for Linux**
 
-Before downloading and extracting the scopy-v1.1.1-Linux-flatpak.zip archive, you need to setup Flatpak `using this setup guide <https://flatpak.org/setup/>`_ for your Linux distribution.
+Before downloading and extracting the scopy-v1.1.1-Linux-flatpak.zip archive, 
+you need to setup Flatpak `using this setup guide <https://flatpak.org/setup/>`_ 
+for your Linux distribution.
 
 
 
@@ -82,8 +95,11 @@ Video intalation guide:
 
   **Scopy for OSX**
 
-Double click the downloaded .dmg to make its content available. “Scopy” will show up in the Finder sidebar and a window showing the content should open up.
-Drag the application from the .dmg window into Applications to install and wait for the process to finish.
+Double click the downloaded .dmg to make its content available. “Scopy” 
+will show up in the Finder sidebar and a window showing the content should open 
+up.
+Drag the application from the .dmg window into Applications to install and wait 
+for the process to finish.
 
 Video intalation guide:
 
@@ -93,11 +109,16 @@ Video intalation guide:
 
   **Scopy for Android**
 
-Tap on the downloaded .apk file to start the installation process and proceed by hitting the “Install” button. Optionally, you may be warned that this application comes from unknown sources, hit the “Install anyway” button. Now, you can find “Scopy” together with your other apps.
+Tap on the downloaded .apk file to start the installation process and proceed 
+by hitting the “Install” button. Optionally, you may be warned that this 
+application comes from unknown sources, hit the “Install anyway” button. 
+Now, you can find “Scopy” together with your other apps.
 
-In order to connect `ADALM2000 <https://www.analog.com/ADALM2000>`__  to your device, you will need an OTG adapter that will mediate the connection between your device and the USB cable, as shown in the image below.
+In order to connect `ADALM2000 <https://www.analog.com/ADALM2000>`__  to your 
+device, you will need an OTG adapter that will mediate the connection between 
+your device and the USB cable, as shown in the image below.
 
-.. image:: ../resources/scopy-android-setup-example.png
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-android-setup-example.png
     :align: center
 ..
 
@@ -121,12 +142,20 @@ Usage
 
 The Home view is divided into four sections:
 
-* **Devices(1)**: List of devices (USB or remote) that Scopy can connect to. USB devices are detected automatically at startup. The Add button can be used to add remote devices to the list.
+* **Devices(1)**: List of devices (USB or remote) that Scopy can connect to. 
+
+USB devices are detected automatically at startup. The Add button can be used 
+to add remote devices to the list.
+
 * **Instruments Menu(2)**: List with instruments provided by the application.
-* **Information Window(3)**: Section containing the welcome, add device page and for each device a description.
+
+* **Information Window(3)**: Section containing the welcome, add device page 
+
+and for each device a description.
+
 * **General Settings Menu(4)**: Save and load session and the preferences menu.
 
-.. image:: ../resources/scopy_home_view.png
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_home_view.png
     :align: center
 ..
 
@@ -136,13 +165,17 @@ The Home view is divided into four sections:
   
 
 
-If a compatible USB device is available it will be displayed in the **Devices** section.
+If a compatible USB device is available it will be displayed in the **Devices** 
+section.
 
-To connect to that device click on the device and then click the **Connect** button in the **Information Window.**
+To connect to that device click on the device and then click the **Connect** 
+button in the **Information Window.**
 
-If the connection was established, the device will have a green status line under it and you will be able to disconnect from it in the same **Information Window.**
+If the connection was established, the device will have a green status line 
+under it and you will be able to disconnect from it in the same **Information 
+Window.**
 
-.. image:: ../resources/device_connected.png
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/device_connected.png
     :align: center
 ..
 
@@ -150,41 +183,51 @@ If the connection was established, the device will have a green status line unde
 
   **Connecting to a remote device**
 
-To connect to a remote device click on the **Plus** icon. Enter the IP of the remote device into the **Hostname** field and click the **Connect** button. If a device can be detected at the IP you provided, the **Connect** button will change to an **Add** button and you can click on it to add the remote device to the list of detected devices.
+To connect to a remote device click on the **Plus** icon. Enter the IP of the 
+remote device into the **Hostname** field and click the **Connect** button. If 
+a device can be detected at the IP you provided, the **Connect** button will 
+change to an **Add** button and you can click on it to add the remote device to 
+the list of detected devices.
 
 
-.. image:: ../resources/scopy_add_device_page1.png
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_add_device_page1.png
+    :align: center
+..
+
+|
+
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_add_device_page2.png
     :align: center
 ..
 
 
-.. image:: ../resources/scopy_add_device_page2.png
-    :align: center
-..
-
-
-Clicking the Forget Device button will remove the device from the list. Clicking the Identify button will make the device blink.
+Clicking the Forget Device button will remove the device from the list. 
+Clicking the Identify button will make the device blink.
 
 |
 
   **General Settings Menu**
 
 
-.. image:: ../resources/scopy_general_settings1.png
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_general_settings1.png
     :align: center
 ..
 
-The save/load buttons can be used to save the current session or load another session. The preferences button will open the preferences for Scopy where different options for different tools can be modified.
+The save/load buttons can be used to save the current session or load another 
+session. The preferences button will open the preferences for Scopy where 
+different options for different tools can be modified.
 
-.. image:: ../resources/preferences1.png
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/preferences1.png
     :align: center
 ..
 
-Clicking the **Reset Scopy** button will reset the application to a default configuration.
+Clicking the **Reset Scopy** button will reset the application to a default 
+configuration.
 
-Checking the **user notes preference** will enable a tool where the user can add different pages with html formatted text
+Checking the **user notes preference** will enable a tool where the user can 
+add different pages with html formatted text
 
-.. image:: ../resources/notes1.png
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/notes1.png
     :align: center
 ..
 
@@ -192,13 +235,19 @@ Checking the **user notes preference** will enable a tool where the user can add
 User Guides
 ---------------------------------------------------------------------
 
-Scopy interacts with only one hardware device at a time. Once a device is selected to be used with the application, a list of instruments that are available for that device will be enabled. Each instrument can be opened from the left menu. The icon on the right of the instrument name specifies that the instrument is enabled and provides a shortcut that allows an instrument to be turned on or off.
+Scopy interacts with only one hardware device at a time. Once a device is 
+selected to be used with the application, a list of instruments that are 
+available for that device will be enabled. Each instrument can be opened from 
+the left menu. The icon on the right of the instrument name specifies that the 
+instrument is enabled and provides a shortcut that allows an instrument to be 
+turned on or off.
 
-The instruments menu can be minimized by clicking on the **Scopy** button near the top-left window.
+The instruments menu can be minimized by clicking on the **Scopy** button near 
+the top-left window.
 
 |
 
-.. image:: ../resources/min_menu.png
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/min_menu.png
     :align: center
 ..
 
@@ -207,21 +256,27 @@ The instruments menu can be minimized by clicking on the **Scopy** button near t
 
   **Detaching Instruments**
 
-Scopy provides the detaching into multiple windows feature for each instrument available, providing a better view/manipulation.
+Scopy provides the detaching into multiple windows feature for each instrument 
+available, providing a better view/manipulation.
 
 There are 2 ways to do this:
 
-* **Drag and Drop** - select the desired instrument drag it outside Instrument Menu section and drop it inside the application window area.
+* **Drag and Drop** - select the desired instrument drag it outside Instrument 
 
-.. image:: ../resources/scopy_drag_n_drop.gif
+ Menu section and drop it inside the application window area.
+
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_drag_n_drop.gif
     :align: center
 ..
 
 |
 
-* **Double Click** - first make sure that the **Double click to detach** a tool option is enabled in the **Preferences** menu; double-click on the desired instrument to detach it.
+* **Double Click** - first make sure that the **Double click to detach** a tool 
+ 
+ option is enabled in the **Preferences** menu; double-click on the desired 
+ instrument to detach it.
 
-.. image:: ../resources/scopy_dc_detach.gif
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_dc_detach.gif
     :align: center
 ..
 
@@ -231,7 +286,7 @@ There are 2 ways to do this:
 Instruments Overview
 ---------------------------------------------------------------------
 
-.. image:: ../resources/scopy_instruments_menu.png
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_instruments_menu.png
     :align: center
 ..
 
@@ -275,7 +330,8 @@ Complete Scopy build guides on:
 Source code
 ---------------------------------------------------------------------
 
-The source code for the entire application can be found on `github <https://github.com/analogdevicesinc/scopy>`_ 
+The source code for the entire application can be found on `github 
+<https://github.com/analogdevicesinc/scopy>`_ 
 
 
 

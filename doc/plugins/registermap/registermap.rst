@@ -4,23 +4,27 @@ Register Map
 ================================================================================
 
 
-The Register Map allow access to reading and writing registers for devices connected to Scopy.
+The Register Map allow access to reading and writing registers for devices 
+connected to Scopy.
 
 
-.. image:: ../../resources/registermap/registermap4.PNG
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/registermap/registermap4.PNG
     :align: center
 
 |
 
 
-If the user has an .xml file of the register map that follows the format exmplained :ref:`here <xml_file_format>`  the plugin will generate an table view matching the .xml file contents 
+If the user has an .xml file of the register map that follows the format 
+exmplained :ref:`here <xml_file_format>`  the plugin will generate an table 
+view matching the .xml file contents 
 
 
 
 User Guide 
--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
-   1. User can use the address picker to select the address of the register they want to read/write 
+   1. User can use the address picker to select the address of the register 
+      they want to read/write 
 
    2. Read button will read selected register
 
@@ -33,39 +37,48 @@ User Guide
 
    5. Toggle the detailed bitfields (7.) visible
 
-   6. Register map table created based on .xml file. Each row represetns a register the first colum is de register information and the following columns represent the bitfields of the register
+   6. Register map table created based on .xml file. Each row represetns a 
+      register the first colum is de register information and the following columns 
+      represent the bitfields of the register
 
-   7. For the selected register we display detailed informations about the bitfields and allow user to change values at bitfield value 
+   7. For the selected register we display detailed informations about the 
+      bitfields and allow user to change values at bitfield value 
 
    8. Use this menu to select the device you want to use
 
-   9. Search bar can be used to filter the registers. The function will search based on 
+   9. Search bar can be used to filter the registers. The function will search 
+      based on 
 
       * name or description of register
       * name or description of bitfield
 
 |
 
-.. image:: ../../resources/registermap/registermap1.PNG
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/registermap/registermap1.PNG
     :align: center
 
 |
 
 
 Settings 
--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+|
 
-   1. If Autoread is checked when a register is selected a read is automatically done 
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/registermap/regmap2.PNG
+    :align: right
+
+|
+
+   1. If Autoread is checked when a register is selected a read is 
+      automatically done 
 
    2. User has option to read an interval of registers
 
-   3. If user has a set of values previously read and wants to load them he needs to select the file and press "Write values"
+   3. If user has a set of values previously read and wants to load them he 
+      needs to select the file and press "Write values"
 
-   4. Pressing "Register dump" will save all currently read registers to the selected file
-
-
-.. image:: ../../resources/registermap/regmap2.PNG
-    :align: center
+   4. Pressing "Register dump" will save all currently read registers to the 
+      selected file
 
 
 |
@@ -74,7 +87,7 @@ Settings
 
 
 XML file format
--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 The xml file starts and ends with the device name and contains registers. 
 
@@ -105,10 +118,11 @@ The structure of an Option type object:
    * Desctiption: description for the option (will be used in the application) 
    * Value: the value in hexadecimal
 
-.. image:: ../../resources/registermap/regmap5.PNG
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/registermap/regmap5.PNG
     :align: center
 
 
 .. tip::  
-   User can create it's own .xml file for any device and add it to where scopy is build in "/plugins/regmap/xmls/" to be able to see the register map table 
+   User can create it's own .xml file for any device and add it to where scopy 
+   is build in "/plugins/regmap/xmls/" to be able to see the register map table 
 
