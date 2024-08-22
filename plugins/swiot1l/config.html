@@ -1,26 +1,27 @@
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../../">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>RMS &#8212; Scopy  documentation</title>
+    <title>Configuration &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../_static/style.min.css?v=a3ba2641" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
-    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script defer="" src="../../_static/app.umd.js?v=61e1751a"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script defer="" src="../../_static/app.umd.js?v=7b10be7e"></script>
     <link rel="icon" href="../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Harmonics" href="harmonics.html" />
-    <link rel="prev" title="PQM" href="index.html" />
+    <link rel="next" title="AD74413R" href="ad74413r.html" />
+    <link rel="prev" title="AD-SWIOT1L-SL plugin" href="index.html" />
    
   
-  <meta name="global_root" content="../../../">
+    <meta name="robots" content="noindex">
+  
   <meta name="repo" content="">
   
 
@@ -81,11 +82,11 @@
   <a href="../../../documentation/eval/index.html">Evaluation Boards</a>
   <a href="../../../documentation/university/index.html">University Program</a>
   <a href="../../../hdl/index.html">HDL</a>
-  <a href="../../../pyadi-iio/index.html">Hardware Python Interfaces</a>
   <a href="../../../no-OS/index.html">no-OS</a>
+  <a href="../../../pyadi-iio/index.html">Hardware Python Interfaces</a>
   <a href="../../../precision-converters-firmware/index.html">Precision Converters Firmware</a>
-  <a href="../../../PrecisionToolbox/index.html">Precision Toolbox</a>
   <a href="../../../doctools/index.html">Doctools</a>
+  <a href="../../../PrecisionToolbox/index.html">Precision Toolbox</a>
 </root>
 
   </div>
@@ -97,8 +98,8 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">RMS</a><ul>
-<li><a class="reference internal" href="#user-guide">User Guide</a></li>
+<li><a class="reference internal" href="#">Configuration</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
 </ul>
 </li>
 </ul>
@@ -108,7 +109,7 @@
     </div>
 
   
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
     <a id="logo" href="../../index.html">
       <img class="only-light" src="../../_static/scopy.png"/>
@@ -125,11 +126,11 @@ Content on this topic
   <a href="../../../documentation/eval/index.html">Evaluation Boards</a>
   <a href="../../../documentation/university/index.html">University Program</a>
   <a href="../../../hdl/index.html">HDL</a>
-  <a href="../../../pyadi-iio/index.html">Hardware Python Interfaces</a>
   <a href="../../../no-OS/index.html">no-OS</a>
+  <a href="../../../pyadi-iio/index.html">Hardware Python Interfaces</a>
   <a href="../../../precision-converters-firmware/index.html">Precision Converters Firmware</a>
-  <a href="../../../PrecisionToolbox/index.html">Precision Toolbox</a>
   <a href="../../../doctools/index.html">Doctools</a>
+  <a href="../../../PrecisionToolbox/index.html">Precision Toolbox</a>
 </root>
 
 </div>
@@ -154,18 +155,18 @@ Content on this topic
 <li class="toctree-l3"><a class="reference internal" href="../m2k/power_supply.html">Power Supply</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-2" id="toctree-collapse-1-2" checked=""/><div class="collapse"><a class="reference internal" href="index.html">PQM</a><label for="toctree-collapse-1-2"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">RMS</a></li>
-<li class="toctree-l3"><a class="reference internal" href="harmonics.html">Harmonics</a></li>
-<li class="toctree-l3"><a class="reference internal" href="waveform.html">Waveform</a></li>
-<li class="toctree-l3"><a class="reference internal" href="settings.html">System settings</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-2" id="toctree-collapse-1-2"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/settings.html">System settings</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-3" id="toctree-collapse-1-3"/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-1-3"><div class="icon"></div></label></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../swiot1l/swiot_config.html">Configuration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../swiot1l/ad74413r.html">AD74413R</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../swiot1l/max14906.html">MAX14906</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-3" id="toctree-collapse-1-3" checked=""/><div class="collapse"><a class="reference internal" href="index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-1-3"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="faults.html">Faults</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
 </ul>
 </li>
@@ -184,28 +185,37 @@ Content on this topic
         <div class="bodywrapper" id="top-anchor">
           <div class="body" role="main">
             
-  <section id="rms">
-<span id="id1"></span><h1>RMS<a class="headerlink" href="#rms" title="Link to this heading">¶</a></h1>
-<p>The main purpose of this instrument is to display and graphically represent the
-RMS and the angle of each phase (for both voltage and current). At the same
-time, information such as voltage and current unbalance or flicker data can
-also be inferred from here. Each time new data is available, the tool updates
-accordingly.</p>
-<p>The instrument is divided into two sections:</p>
-<ol class="arabic simple">
-<li><p>Voltage: Shows the details of the voltage (left side).</p></li>
-<li><p>Current: Shows the details of the current (right side).</p></li>
+  <section id="configuration">
+<span id="config"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">#</a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">#</a></h2>
+<img alt="https://github.com/analogdevicesinc/scopy/blob/doc_resources/resources/swiot1l/config.png?raw=true" class="align-center" src="https://github.com/analogdevicesinc/scopy/blob/doc_resources/resources/swiot1l/config.png?raw=true" />
+<p>The Config Instrument is only available when the AD-SWIOT1L-SL system is
+in configuration mode. This mode allows the user to define, for each of
+the 4 physical channels, the device that will control the channel and
+the function defined for that device. The channel can also be disabled,
+in which case it will not be configured.</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>Channel index</p></li>
+<li><p>Channel state (enabled/disabled)</p></li>
+<li><p>Chip configured on that channel</p></li>
+<li><p>Function selected (chip specific)</p></li>
+<li><p>Channel to chip mapping</p>
+<p>The AD-SWIOT1L-SL board image contains a mapping of the AD74413R and
+MAX14906 chips that highlights the connection between each chip and
+the corresponding configured channel pin.</p>
+</li>
+<li><p>Mode switch</p>
+<p>After configuring the system pressing the Apply button will switch the
+SWIOT1L to runtime mode. The device will briefly disconnect while the
+IIO Context is reconfigured and it will automatically reconnect to
+the AD-SWIOT1L-SL board.</p>
+</li>
 </ol>
-<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/rms.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/rms.png" />
-<section id="user-guide">
-<h2>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading">¶</a></h2>
-<ol class="arabic simple">
-<li><p>From the menu on the left, you can select the desired instrument. To the
-right of the name, there is a button that allows you to start or stop data
-acquisition.</p></li>
-<li><p>By pressing the “Single” button, a single batch of data is acquired.</p></li>
-<li><p>By pressing the “Run” button, continuous data acquisition starts.</p></li>
-</ol>
+</div></blockquote>
+<p>Upon successful connection a different set of instruments will be available
+to operate and control the system.</p>
 </section>
 </section>
 
@@ -213,8 +223,8 @@ acquisition.</p></li>
           </div>
               <div class="related">
                 &nbsp;
-    <a href="index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">PQM</a>
-    <a href="harmonics.html" title="Next document (Alt+Shift+RightArrow)" class="next">Harmonics</a>
+    <a href="index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">AD-SWIOT1L-SL plugin</a>
+    <a href="ad74413r.html" title="Next document (Alt+Shift+RightArrow)" class="next">AD74413R</a>
               </div>
           
         </div>
