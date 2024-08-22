@@ -1,14 +1,14 @@
-#docker build -t cristianbindea/scopy2-x86_64-appimage .
-#DOCKER_BUILDKIT=0
 FROM ubuntu:20.04
 SHELL ["/bin/bash", "-c"]
 
 ARG USER=runner
-ARG DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 ENV TZ=Europe/Bucharest
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-RUN apt-get update && apt-get -y upgrade && apt-get install -y apt-utils sudo git tzdata keyboard-configuration
+RUN apt-get update && \
+	apt-get -y upgrade && \
+	apt-get install -y apt-utils sudo tzdata keyboard-configuration software-properties-common
 
 RUN groupadd -g 1000 -r $USER && \
 	useradd -u 1000 -g 1000 --create-home -r $USER
@@ -22,14 +22,17 @@ RUN echo "${USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-$USER && \
 	usermod -aG plugdev $USER
 
 USER $USER
-WORKDIR /home/${USER}
-RUN git clone https://github.com/analogdevicesinc/scopy --branch dev
-WORKDIR /home/${USER}/scopy
+WORKDIR /home/${USER}/scripts
+COPY x86-64_appimage_process.sh .
+RUN ./x86-64_appimage_process.sh configure_system
 
 ENV CI_SCRIPT=ON
-RUN ./ci/x86_64/x86-64_appimage_process.sh install_packages
-RUN sudo pip3 install aqtinstall && sudo python3 -m aqt install-qt --outputdir /opt/Qt linux desktop 5.15.2
-RUN ./ci/x86_64/x86-64_appimage_process.sh clone download_tools build_deps
-
 WORKDIR /home/${USER}
-# RUN rm -rf scopy
+
+
+# Clean image
+RUN rm -rf /home/${USER}/scripts
+RUN sudo rm -rf /var/lib/apt/lists/*
+
+FROM scratch
+COPY --from=0 / /
