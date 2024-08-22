@@ -4,7 +4,6 @@ SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
 SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
 
 build_docker(){
-	# need to test again
 	pushd $SRC_DIR/ci/flatpak/docker
 	docker build -t cristianbindea/scopy2-flatpak:testing  .
 	CONTAINER_NAME=builder-flatpak
