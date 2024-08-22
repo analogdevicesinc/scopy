@@ -15,6 +15,7 @@ namespace regmap {
 class RegisterMapSettingsMenu : public QWidget
 {
 	friend class RegmapStyleHelper;
+	friend class RegMap_API;
 
 	Q_OBJECT
 

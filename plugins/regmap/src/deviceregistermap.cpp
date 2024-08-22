@@ -220,6 +220,8 @@ bool DeviceRegisterMap::hasTemplate()
 	return false;
 }
 
+bool DeviceRegisterMap::getAutoread() { return autoread; }
+
 void DeviceRegisterMap::initSettings()
 {
 	QObject::connect(this, &DeviceRegisterMap::requestRead, registerMapValues, &RegisterMapValues::requestRead);

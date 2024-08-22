@@ -27,12 +27,14 @@
 #include <readwrite/fileregisterreadstrategy.hpp>
 #include <readwrite/fileregisterwritestrategy.hpp>
 #include "logging_categories.h"
+#include <regmap_api.h>
 
 #include "iioutil/connectionprovider.h"
 #include "jsonformatedelement.hpp"
 #include "scopy-regmap_config.h"
 #include "utils.hpp"
 #include "utils.hpp"
+#include <pluginbase/scopyjs.h>
 #if defined __APPLE__
 #include <QApplication>
 #endif
@@ -185,6 +187,7 @@ bool RegmapPlugin::onConnect()
 
 		m_toolList[0]->setEnabled(true);
 		m_toolList[0]->setTool(m_registerMapWidget);
+		InitApi();
 
 		return true;
 	}
@@ -275,4 +278,11 @@ bool RegmapPlugin::isBufferCapable(iio_device *dev)
 	return false;
 }
 
+void RegmapPlugin::InitApi()
+{
+	api = new RegMap_API(this);
+	ScopyJS *js = ScopyJS::GetInstance();
+	api->setObjectName("regmap");
+	js->registerApi(api);
+}
 #include "moc_regmapplugin.cpp"
