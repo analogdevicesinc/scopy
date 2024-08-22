@@ -8,15 +8,17 @@ USE_STAGING=OFF
 if [ "$CI_SCRIPT" == "ON" ]
 	then
 		SRC_DIR=/home/runner/scopy
+		SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 		git config --global --add safe.directory '*'
 		USE_STAGING=OFF
 	else
-		SRC_DIR=$(git rev-parse --show-toplevel)
+		SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || echo "No source directory found"
+		SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 fi
 
 export APPIMAGE=1
 
-LIBIIO_VERSION=v0.25
+LIBIIO_VERSION=libiio-v0
 LIBAD9361_BRANCH=main
 LIBM2K_BRANCH=main
 SPDLOG_BRANCH=v1.x
@@ -34,14 +36,14 @@ PYTHON_VERSION=python3.8
 
 QT_LOCATION=/opt/Qt/5.15.2/gcc_64
 
-STAGING_AREA=$SRC_DIR/ci/x86_64/staging
+STAGING_AREA=$SRC_SCRIPT/staging
 QMAKE_BIN=$QT_LOCATION/bin/qmake
 CMAKE_BIN=${STAGING_AREA}/cmake/bin/cmake
 JOBS=-j14
 
 APP_DIR_NAME=scopy.AppDir
-APP_DIR=$SRC_DIR/ci/x86_64/$APP_DIR_NAME
-APP_IMAGE=$SRC_DIR/ci/x86_64/Scopy-x86_64.AppImage
+APP_DIR=$SRC_SCRIPT/$APP_DIR_NAME
+APP_IMAGE=$SRC_SCRIPT/Scopy-x86_64.AppImage
 
 if [ "$USE_STAGING" == "ON" ]
 	then
@@ -93,6 +95,12 @@ clone() {
 	popd
 }
 
+install_qt() {
+	# installing Qt using the aqt tool https://github.com/miurahr/aqtinstall
+	sudo pip3 install --no-cache-dir aqtinstall
+	sudo python3 -m aqt install-qt --outputdir /opt/Qt linux desktop 5.15.2
+}
+
 download_tools() {
 	mkdir -p ${STAGING_AREA}
 	pushd ${STAGING_AREA}
@@ -141,7 +149,7 @@ install_packages() {
 
 	sudo apt-get update
 	sudo apt-get -y upgrade
-	sudo apt-get -y install \
+	sudo apt-get -y --no-install-recommends install \
 		$PYTHON_VERSION-full python3-pip lib$PYTHON_VERSION-dev python3-numpy \
 		keyboard-configuration vim git wget unzip\
 		g++ build-essential cmake curl autogen autoconf autoconf-archive pkg-config flex bison swig \
@@ -152,8 +160,8 @@ install_packages() {
 		libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libavahi-client-dev libsndfile1-dev \
 		libxkbcommon-x11-0 libqt5gui5 libncurses5 libtool libaio-dev libzmq3-dev libxml2-dev
 
-	pip3 install mako
-	pip3 install packaging
+	pip3 install --no-cache-dir mako
+	pip3 install --no-cache-dir packaging
 }
 
 build_libiio() {
@@ -428,7 +436,6 @@ move_appimage(){
 #
 
 build_deps(){
-	install_packages
 	clone
 	download_tools
 	build_libiio ON
@@ -445,7 +452,6 @@ build_deps(){
 }
 
 run_workflow(){
-	install_packages
 	download_tools
 	build_iio-emu
 	build_scopy
@@ -467,6 +473,12 @@ generate_appimage(){
 	create_appimage
 }
 
+configure_system(){
+	install_packages
+	install_qt
+	build_deps
+	download_tools
+}
 
 for arg in $@; do
 	$arg
