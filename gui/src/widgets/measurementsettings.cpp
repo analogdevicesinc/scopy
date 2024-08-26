@@ -149,8 +149,6 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	lay->addWidget(measureSection);
 	lay->addWidget(statsSection);
 	lay->addWidget(markerSection);
-
-
 }
 
 MeasurementSettings::~MeasurementSettings() {}
@@ -159,19 +157,10 @@ bool MeasurementSettings::measurementEnabled() { return measurePanelSwitch->onOf
 bool MeasurementSettings::statsEnabled() { return statsPanelSwitch->onOffswitch()->isChecked(); }
 bool MeasurementSettings::markerEnabled() { return markerPanelSwitch->onOffswitch()->isChecked(); }
 
-MenuSectionWidget *MeasurementSettings::getMarkerSection() const
-{
-	return markerSection;
-}
+MenuSectionWidget *MeasurementSettings::getMarkerSection() const { return markerSection; }
 
-MenuSectionWidget *MeasurementSettings::getStatsSection() const
-{
-	return statsSection;
-}
+MenuSectionWidget *MeasurementSettings::getStatsSection() const { return statsSection; }
 
-MenuSectionWidget *MeasurementSettings::getMeasureSection() const
-{
-	return measureSection;
-}
+MenuSectionWidget *MeasurementSettings::getMeasureSection() const { return measureSection; }
 
 #include "moc_measurementsettings.cpp"
