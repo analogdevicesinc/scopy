@@ -54,7 +54,6 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 				tpc->timePlotInfo()->update(s);
 			}
 		}
-
 	});
 
 	m_plotSection = new MenuSectionWidget(this);

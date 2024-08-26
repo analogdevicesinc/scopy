@@ -46,10 +46,7 @@ void GRFFTFloatProc::setPowerOffset(double val)
 	}
 }
 
-void GRFFTFloatProc::setNrBits(int v)
-{
-	nrBits = v;
-}
+void GRFFTFloatProc::setNrBits(int v) { nrBits = v; }
 
 void GRFFTFloatProc::build_blks(GRTopBlock *top)
 {
@@ -62,8 +59,8 @@ void GRFFTFloatProc::build_blks(GRTopBlock *top)
 	fft = gr::fft::fft_v<float, true>::make(fft_size, window, false);
 	ctm = gr::blocks::complex_to_mag_squared::make(fft_size);
 
-	mult_nrbits = gr::blocks::multiply_const_ff::make(1.00 / (1<<nrBits), fft_size);
-	mult_wind_corr = gr::blocks::multiply_const_cc::make(gr_complex(corr,corr), fft_size);
+	mult_nrbits = gr::blocks::multiply_const_ff::make(1.00 / (1 << nrBits), fft_size);
+	mult_wind_corr = gr::blocks::multiply_const_cc::make(gr_complex(corr, corr), fft_size);
 	mult_const1 = gr::blocks::multiply_const_ff::make(1.00 / (fft_size * fft_size), fft_size);
 
 	nlog10 = gr::blocks::nlog10_ff::make(10.0, fft_size);
@@ -74,7 +71,7 @@ void GRFFTFloatProc::build_blks(GRTopBlock *top)
 
 	powerOffset = gr::blocks::add_const_v<float>::make(k);
 
-	top->connect(mult_nrbits,0,fft,0);
+	top->connect(mult_nrbits, 0, fft, 0);
 	top->connect(fft, 0, mult_wind_corr, 0);
 	top->connect(mult_wind_corr, 0, ctm, 0);
 	top->connect(ctm, 0, mult_const1, 0);
@@ -115,7 +112,6 @@ GRFFTComplexProc::GRFFTComplexProc(QObject *parent)
 	m_wincorr_factor[gr::fft::window::WIN_FLATTOP] = 2;
 	m_wincorr_factor[gr::fft::window::WIN_BLACKMAN_hARRIS] = 2;
 	m_wincorr_factor[gr::fft::window::WIN_BARTLETT] = 2;
-
 }
 
 void GRFFTComplexProc::setWindow(gr::fft::window::win_type w)
@@ -127,7 +123,8 @@ void GRFFTComplexProc::setWindow(gr::fft::window::win_type w)
 		mul->set_k(m_scale);*/
 }
 
-void GRFFTComplexProc::setWindowCorrection(bool b) {
+void GRFFTComplexProc::setWindowCorrection(bool b)
+{
 	m_windowCorr = b;
 	Q_EMIT requestRebuild();
 }
@@ -144,10 +141,7 @@ void GRFFTComplexProc::setPowerOffset(double val)
 	}
 }
 
-void GRFFTComplexProc::setNrBits(int v)
-{
-	nrBits = v;
-}
+void GRFFTComplexProc::setNrBits(int v) { nrBits = v; }
 
 void GRFFTComplexProc::build_blks(GRTopBlock *top)
 {
@@ -155,11 +149,11 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 	auto fft_size = top->vlen();
 	auto window = gr::fft::window::build(m_fftwindow, fft_size);
 	auto corr = (m_windowCorr) ? m_wincorr_factor[m_fftwindow] : 1;
-	mult_nrbits =  gr::blocks::multiply_const_cc::make(gr_complex(1.0 / (1<<nrBits), 1.0 / (1<<nrBits)), fft_size);
+	mult_nrbits =
+		gr::blocks::multiply_const_cc::make(gr_complex(1.0 / (1 << nrBits), 1.0 / (1 << nrBits)), fft_size);
 	fft_complex = gr::fft::fft_v<gr_complex, true>::make(fft_size, window, true);
 
-
-	mult_wind_corr = gr::blocks::multiply_const_cc::make(gr_complex(corr,corr), fft_size);
+	mult_wind_corr = gr::blocks::multiply_const_cc::make(gr_complex(corr, corr), fft_size);
 	ctm = gr::blocks::complex_to_mag_squared::make(fft_size);
 	mult_const1 = gr::blocks::multiply_const_ff::make(1.0 / ((float)fft_size * (float)fft_size), fft_size);
 	nlog10 = gr::blocks::nlog10_ff::make(10.0, fft_size);
@@ -171,7 +165,7 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 
 	powerOffset = gr::blocks::add_const_v<float>::make(k);
 
-	top->connect(mult_nrbits,0,fft_complex,0);
+	top->connect(mult_nrbits, 0, fft_complex, 0);
 	top->connect(fft_complex, 0, mult_wind_corr, 0);
 	top->connect(mult_wind_corr, 0, ctm, 0);
 	top->connect(ctm, 0, mult_const1, 0);
