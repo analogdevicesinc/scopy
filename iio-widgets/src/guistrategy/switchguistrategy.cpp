@@ -25,8 +25,8 @@ using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_SWITCHGUISTRATEGY, "SwitchGuiStrategy")
 
-SwitchAttrUi::SwitchAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget *parent)
-	: QWidget(parent)
+SwitchAttrUi::SwitchAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QObject *parent)
+	: QObject(parent)
 	, m_ui(new QWidget(nullptr))
 	, m_optionsList(new QStringList)
 {
@@ -43,11 +43,7 @@ SwitchAttrUi::SwitchAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidge
 	});
 }
 
-SwitchAttrUi::~SwitchAttrUi()
-{
-	delete m_optionsList;
-	m_ui->deleteLater();
-}
+SwitchAttrUi::~SwitchAttrUi() { delete m_optionsList; }
 
 QWidget *SwitchAttrUi::ui() { return m_ui; }
 

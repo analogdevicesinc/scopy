@@ -24,11 +24,13 @@
 Q_LOGGING_CATEGORY(CAT_DEVICE_DATA_STRATEGY, "DeviceDataStrategy")
 using namespace scopy;
 
-DeviceAttrDataStrategy::DeviceAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent)
-	: QWidget(parent)
+DeviceAttrDataStrategy::DeviceAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
+	: QObject(parent)
 {
 	m_recipe = recipe;
 }
+
+DeviceAttrDataStrategy::~DeviceAttrDataStrategy() {}
 
 QString DeviceAttrDataStrategy::data() { return m_data; }
 

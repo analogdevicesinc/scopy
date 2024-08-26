@@ -29,7 +29,7 @@
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy {
-class SCOPY_IIO_WIDGETS_EXPORT MultiDataStrategy : public QWidget, public DataStrategyInterface
+class SCOPY_IIO_WIDGETS_EXPORT MultiDataStrategy : public QObject, public DataStrategyInterface
 {
 	Q_OBJECT
 	Q_INTERFACES(scopy::DataStrategyInterface)
@@ -42,7 +42,8 @@ public:
 	 * added after creation.
 	 * @param parent QWidget*
 	 */
-	explicit MultiDataStrategy(QList<DataStrategyInterface *> strategies, QWidget *parent = nullptr);
+	explicit MultiDataStrategy(QList<DataStrategyInterface *> strategies, QObject *parent = nullptr);
+	~MultiDataStrategy();
 
 	/**
 	 * @brief addDataStrategy Add and connect a new Data Strategy.

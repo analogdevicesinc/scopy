@@ -25,8 +25,8 @@ using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_ATTR_GUI_STRATEGY, "AttrGuiStrategy")
 
-RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget *parent)
-	: QWidget(parent)
+RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QObject *parent)
+	: QObject(parent)
 	, m_ui(new QWidget(nullptr))
 {
 	m_recipe = recipe;
@@ -39,7 +39,7 @@ RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
 	// FIXME: this does not look right when uninitialized, also crashes...
-	m_spinBox = new TitleSpinBox(m_recipe.data.toUpper(), isCompact, this);
+	m_spinBox = new TitleSpinBox(m_recipe.data.toUpper(), isCompact, m_ui);
 	m_ui->layout()->addWidget(m_spinBox);
 
 	connect(m_spinBox->getLineEdit(), &QLineEdit::textChanged, this,
@@ -47,7 +47,7 @@ RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 	Q_EMIT requestData();
 }
 
-RangeAttrUi::~RangeAttrUi() { m_ui->deleteLater(); }
+RangeAttrUi::~RangeAttrUi() {}
 
 QWidget *RangeAttrUi::ui() { return m_ui; }
 
