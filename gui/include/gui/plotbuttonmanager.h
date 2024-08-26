@@ -11,7 +11,8 @@ class PlotButtonManager : public QWidget, public CompositeWidget, public Collaps
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
 public:
-	typedef enum {
+	typedef enum
+	{
 		PBM_LEFT,
 		PBM_RIGHT
 	} CollapseButtonOrientation;
@@ -33,8 +34,6 @@ private:
 	QHBoxLayout *m_collapsablelay;
 	QPushButton *m_collapseBtn;
 	QWidget *m_collapsableContainer;
-
 };
 
 #endif // PLOTBUTTONMANAGER_H
-
