@@ -171,5 +171,4 @@ void PlotCursors::setXHandlePos(HandlePos pos)
 	m_xCursors.second->handle()->setHandlePos(pos);
 }
 
-
 #include "moc_plotcursors.cpp"

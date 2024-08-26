@@ -59,7 +59,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_yPwrOffset->setScaleRange(1, 1);
 	m_yPwrOffset->setIncrementMode(MenuSpinbox::IS_FIXED);
 
-	m_windowCb = new MenuCombo("Window",yaxis);
+	m_windowCb = new MenuCombo("Window", yaxis);
 
 	m_windowCb->combo()->addItem("Hann", gr::fft::window::WIN_HANN);
 	m_windowCb->combo()->addItem("Hanning", gr::fft::window::WIN_HANNING);
@@ -70,7 +70,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_windowCb->combo()->addItem("Bartlett", gr::fft::window::WIN_BARTLETT);
 	m_windowCb->combo()->setCurrentIndex(0);
 
-	connect(m_windowCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx){
+	connect(m_windowCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		for(auto c : m_channels) {
 			if(dynamic_cast<FFTChannel *>(c)) {
 				FFTChannel *fc = dynamic_cast<FFTChannel *>(c);

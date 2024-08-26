@@ -24,8 +24,6 @@ FFTPlotComponentChannel::FFTPlotComponentChannel(ChannelComponent *ch, FFTPlotCo
 	m_fftPlotYAxis->setInterval(-2048, 2048);
 
 	m_markerController->init();
-
-
 }
 
 void FFTPlotComponentChannel::deinitPlotComponent()
@@ -42,10 +40,7 @@ void FFTPlotComponentChannel::deinitPlotComponent()
 	delete m_fftPlotAxisHandle;
 }
 
-MarkerController *FFTPlotComponentChannel::markerController() const
-{
-	return m_markerController;
-}
+MarkerController *FFTPlotComponentChannel::markerController() const { return m_markerController; }
 
 void FFTPlotComponentChannel::initPlotComponent(PlotComponent *pc)
 {
