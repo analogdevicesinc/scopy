@@ -36,10 +36,7 @@ void PlotManager::enableMeasurementPanel(bool b) { m_measurePanel->setVisible(b)
 
 void PlotManager::enableStatsPanel(bool b) { m_statsPanel->setVisible(b); }
 
-void PlotManager::enableMarkerPanel(bool b)
-{
-	m_markerPanel->setVisible(b);
-}
+void PlotManager::enableMarkerPanel(bool b) { m_markerPanel->setVisible(b); }
 
 void PlotManager::setXInterval(double xMin, double xMax)
 {
@@ -71,10 +68,7 @@ MeasurementsPanel *PlotManager::measurePanel() const { return m_measurePanel; }
 
 StatsPanel *PlotManager::statsPanel() const { return m_statsPanel; }
 
-MarkerPanel *PlotManager::markerPanel() const
-{
-	return m_markerPanel;
-}
+MarkerPanel *PlotManager::markerPanel() const { return m_markerPanel; }
 
 QWidget *PlotManager::plotCombo(ChannelComponent *c) { return m_channelPlotcomboMap[c]; }
 

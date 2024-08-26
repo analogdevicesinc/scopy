@@ -14,14 +14,14 @@ namespace scopy::grutil {
 class SCOPY_GR_UTIL_EXPORT GRIIOComplexChannelSrc : public GRIIOChannel
 {
 public:
-	GRIIOComplexChannelSrc(QString channelName, GRIIODeviceSource *dev, QString channelNameI, QString channelNameQ, QObject *parent = nullptr);
+	GRIIOComplexChannelSrc(QString channelName, GRIIODeviceSource *dev, QString channelNameI, QString channelNameQ,
+			       QObject *parent = nullptr);
 
 	void build_blks(GRTopBlock *top);
 	void destroy_blks(GRTopBlock *top);
 
 	const QString &getChannelNameI() const;
 	const QString &getChannelNameQ() const;
-
 
 	const iio_data_format *getFmt() const;
 

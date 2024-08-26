@@ -154,16 +154,15 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 		m_defaultRealCh = c;
 		m_plotComponentManager->selectChannel(c);
 	}
-	connect(c->markerController(), &MarkerController::markerInfoUpdated,this, [=](){
+	connect(c->markerController(), &MarkerController::markerInfoUpdated, this, [=]() {
 		auto info = c->markerController()->markerInfo();
 		QString name = c->name();
 		m_plotComponentManager->markerPanel()->updateChannel(name, info);
 	});
 
-
-	auto markerController = dynamic_cast<FFTPlotComponentChannel*>(c->plotChannelCmpt())->markerController();
-	connect(markerController, &MarkerController::markerEnabled, this, [=](bool b){
-		if(b) {			
+	auto markerController = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt())->markerController();
+	connect(markerController, &MarkerController::markerEnabled, this, [=](bool b) {
+		if(b) {
 			m_plotComponentManager->markerPanel()->newChannel(c->name(), c->pen());
 		} else {
 			m_plotComponentManager->markerPanel()->deleteChannel(c->name());
@@ -219,13 +218,13 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 		m_defaultComplexCh = c;
 	}
 
-	connect(c->markerController(), &MarkerController::markerInfoUpdated,this, [=](){
+	connect(c->markerController(), &MarkerController::markerInfoUpdated, this, [=]() {
 		auto info = c->markerController()->markerInfo();
 		m_plotComponentManager->markerPanel()->updateChannel(c->name(), info);
 	});
 
-	auto markerController = dynamic_cast<FFTPlotComponentChannel*>(c->plotChannelCmpt())->markerController();
-	connect(markerController, &MarkerController::markerEnabled, this, [=](bool b){
+	auto markerController = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt())->markerController();
+	connect(markerController, &MarkerController::markerEnabled, this, [=](bool b) {
 		if(b) {
 			m_plotComponentManager->markerPanel()->newChannel(c->name(), c->pen());
 		} else {
@@ -262,7 +261,7 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 	connect(m_ui->m_complex, &QAbstractButton::toggled, m_fftPlotSettingsComponent,
 		&FFTPlotManagerSettings::setComplexMode);
 	connect(m_ui->m_complex, &QAbstractButton::toggled, this, [=]() {
-		if(m_ui->m_complex->isChecked()) {			
+		if(m_ui->m_complex->isChecked()) {
 			m_plotComponentManager->selectChannel(m_defaultComplexCh);
 			Q_EMIT m_defaultComplexCh->requestChannelMenu(false);
 		} else {
