@@ -155,7 +155,8 @@ void ADCInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *de
 	});
 }
 
-void ADCInstrument::switchToChannelMenu(QString id, bool force) {
+void ADCInstrument::switchToChannelMenu(QString id, bool force)
+{
 	if(force) {
 		if(!channelsBtn->button()->isChecked()) {
 			// Workaround because QButtonGroup and setChecked do not interact programatically
@@ -183,7 +184,7 @@ void ADCInstrument::addChannel(MenuControlButton *btn, ChannelComponent *ch, Com
 		}
 	});
 
-	connect(ch, &ChannelComponent::requestChannelMenu, this, [=](bool f){ switchToChannelMenu(id, f);});
+	connect(ch, &ChannelComponent::requestChannelMenu, this, [=](bool f) { switchToChannelMenu(id, f); });
 
 	/*setupChannelSnapshot(ch);
 	setupChannelMeasurement(ch);

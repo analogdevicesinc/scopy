@@ -64,13 +64,9 @@ public:
 
 	double powerOffset() { return m_powerOffset; }
 
-	void setWindow(int w) override {
-		m_fft->setWindow(static_cast<gr::fft::window::win_type>(w));
-	}
+	void setWindow(int w) override { m_fft->setWindow(static_cast<gr::fft::window::win_type>(w)); }
 
-	void setWindowCorrection(bool b) override {
-		m_fft->setWindowCorrection(b);
-	}
+	void setWindowCorrection(bool b) override { m_fft->setWindowCorrection(b); }
 
 	GRTopBlock *m_top;
 	ChannelComponent *m_ch;
@@ -118,13 +114,9 @@ public:
 
 	double powerOffset() { return m_powerOffset; }
 
-	void setWindow(int w) override {
-		m_fft->setWindow(static_cast<gr::fft::window::win_type>(w));
-	}
+	void setWindow(int w) override { m_fft->setWindow(static_cast<gr::fft::window::win_type>(w)); }
 
-	void setWindowCorrection(bool b) override {
-		m_fft->setWindowCorrection(b);
-	}
+	void setWindowCorrection(bool b) override { m_fft->setWindowCorrection(b); }
 
 	GRTopBlock *m_top;
 	ChannelComponent *m_ch;
@@ -149,7 +141,7 @@ public:
 	~GRFFTChannelComponent();
 
 	MeasureManagerInterface *getMeasureManager() override;
-	MarkerController* markerController();
+	MarkerController *markerController();
 
 	GRSignalPath *sigpath() override;
 	QVBoxLayout *menuLayout();
@@ -178,7 +170,6 @@ public Q_SLOTS:
 
 	void addChannelToPlot() override;
 	void removeChannelFromPlot() override;
-
 
 Q_SIGNALS:
 	void yModeChanged();

@@ -225,10 +225,7 @@ void PlotWidget::setAlignCanvasToScales(bool alignCanvasToScales)
 	m_plot->plotLayout()->setAlignCanvasToScales(alignCanvasToScales);
 }
 
-PlotButtonManager *PlotWidget::plotButtonManager() const
-{
-	return m_plotButtonManager;
-}
+PlotButtonManager *PlotWidget::plotButtonManager() const { return m_plotButtonManager; }
 
 void PlotWidget::setupPlotInfo()
 {
@@ -268,10 +265,10 @@ void PlotWidget::setupPlotButtonManager()
 {
 	m_plotButtonManager = new PlotButtonManager(this);
 	m_plotButtonManager->setCollapseOrientation(PlotButtonManager::PBM_RIGHT);
-	HoverWidget *hoverPlotButtonManager = new HoverWidget(m_plotButtonManager,m_plot->canvas(),m_plot->canvas());
+	HoverWidget *hoverPlotButtonManager = new HoverWidget(m_plotButtonManager, m_plot->canvas(), m_plot->canvas());
 	hoverPlotButtonManager->setAnchorPos(HoverPosition::HP_BOTTOMRIGHT);
 	hoverPlotButtonManager->setContentPos(HoverPosition::HP_TOPLEFT);
-	hoverPlotButtonManager->setAnchorOffset(QPoint(0,-20));
+	hoverPlotButtonManager->setAnchorOffset(QPoint(0, -20));
 	hoverPlotButtonManager->setRelative(true);
 	hoverPlotButtonManager->show();
 }

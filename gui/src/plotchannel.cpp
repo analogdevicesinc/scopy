@@ -198,7 +198,6 @@ void PlotChannel::setStyle(int newStyle)
 	Q_EMIT styleChanged();
 }
 
-
 double PlotChannel::getValueAt(double pos)
 {
 	auto tmp = this;

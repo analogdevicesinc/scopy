@@ -30,7 +30,8 @@ GRDeviceComponent::GRDeviceComponent(GRIIODeviceSourceNode *node, QWidget *paren
 	createMenuControlButton();
 }
 
-QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent) {
+QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent)
+{
 	const struct iio_device *dev = m_src->iioDev();
 
 	QList<IIOWidget *> attrWidgets;
@@ -41,38 +42,38 @@ QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent) {
 		return nullptr;
 	}
 
-	const struct iio_channel *ch = iio_device_get_channel(dev,0);
+	const struct iio_channel *ch = iio_device_get_channel(dev, 0);
 
 	int attrCount = iio_channel_get_attrs_count(ch);
 
-	for(int i = 0; i < attrCount;i++) {
+	for(int i = 0; i < attrCount; i++) {
 		bool createAttr = true;
-		const char *attrName = iio_channel_get_attr(ch,i);
+		const char *attrName = iio_channel_get_attr(ch, i);
 		for(int j = 1; j < chCount; j++) {
-			const struct iio_channel *ch1 = iio_device_get_channel(dev,j);
-			const char *attr1Name = iio_channel_find_attr(ch1,attrName);
-			if(strcmp(attrName,attr1Name) != 0) {
+			const struct iio_channel *ch1 = iio_device_get_channel(dev, j);
+			const char *attr1Name = iio_channel_find_attr(ch1, attrName);
+			if(strcmp(attrName, attr1Name) != 0) {
 				createAttr = false;
 				break;
 			}
 		}
 		if(createAttr) {
-			qInfo()<<"common "<<attrName;
-			IIOWidget *w = IIOWidgetBuilder().context(const_cast<iio_context *>(ctx))
-				.device(const_cast<iio_device*>(dev))
-				.channel(const_cast<iio_channel*>(ch))
-				.attribute(attrName).buildSingle();
+			qInfo() << "common " << attrName;
+			IIOWidget *w = IIOWidgetBuilder()
+					       .context(const_cast<iio_context *>(ctx))
+					       .device(const_cast<iio_device *>(dev))
+					       .channel(const_cast<iio_channel *>(ch))
+					       .attribute(attrName)
+					       .buildSingle();
 
-//			iiowidgetbuilder.convertToMulti(w)
+			//			iiowidgetbuilder.convertToMulti(w)
 			/*createMultiDataStrategy
 			Add rest of data strategies
 
 			*/
 			attrWidgets.append(w);
-
 		}
 	}
-
 
 	if(attrWidgets.count() == 0) {
 		return nullptr;
@@ -80,7 +81,6 @@ QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent) {
 
 	MenuSectionCollapseWidget *attr =
 		new MenuSectionCollapseWidget("COMMON CHANNEL ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
-
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
