@@ -28,14 +28,16 @@ Q_LOGGING_CATEGORY(CAT_CMDQ_CHANNEL_DATA_STATEGY, "CmdQChannelDataStrategy")
 
 using namespace scopy;
 
-CmdQChannelAttrDataStrategy::CmdQChannelAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent)
-	: QWidget(parent)
+CmdQChannelAttrDataStrategy::CmdQChannelAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
+	: QObject(parent)
 	, m_cmdQueue(recipe.connection->commandQueue())
 	, m_dataRead("")
 	, m_optionalDataRead("")
 {
 	m_recipe = recipe;
 }
+
+CmdQChannelAttrDataStrategy::~CmdQChannelAttrDataStrategy() {}
 
 QString CmdQChannelAttrDataStrategy::data() { return m_dataRead; }
 

@@ -29,14 +29,16 @@ Q_LOGGING_CATEGORY(CAT_CMDQ_DEVICE_DATA_STRATEGY, "CmdQDeviceDataStrategy")
 
 using namespace scopy;
 
-CmdQDeviceAttrDataStrategy::CmdQDeviceAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent)
-	: QWidget(parent)
+CmdQDeviceAttrDataStrategy::CmdQDeviceAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
+	: QObject(parent)
 	, m_cmdQueue(recipe.connection->commandQueue())
 	, m_dataRead("")
 	, m_optionalDataRead("")
 {
 	m_recipe = recipe;
 }
+
+CmdQDeviceAttrDataStrategy::CmdQDeviceAttrDataStrategy() {}
 
 QString CmdQDeviceAttrDataStrategy::data() { return m_dataRead; }
 

@@ -29,7 +29,7 @@
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy {
-class SCOPY_IIO_WIDGETS_EXPORT SwitchAttrUi : public QWidget, public GuiStrategyInterface
+class SCOPY_IIO_WIDGETS_EXPORT SwitchAttrUi : public QObject, public GuiStrategyInterface
 {
 	Q_OBJECT
 	Q_INTERFACES(scopy::GuiStrategyInterface)
@@ -38,7 +38,7 @@ public:
 	 * @brief This contain a CustomSwitch capable of holding no more than 2 values, the ones specified in
 	 * recipe->linkedAttributeValue.
 	 * */
-	explicit SwitchAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QWidget *parent = nullptr);
+	explicit SwitchAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QObject *parent = nullptr);
 	~SwitchAttrUi();
 
 	/**

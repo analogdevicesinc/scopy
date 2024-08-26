@@ -3,8 +3,8 @@
 Q_LOGGING_CATEGORY(CAT_MULTI_DATA_STRATEGY, "MultiDataStrategy")
 using namespace scopy;
 
-MultiDataStrategy::MultiDataStrategy(QList<DataStrategyInterface *> strategies, QWidget *parent)
-	: QWidget(parent)
+MultiDataStrategy::MultiDataStrategy(QList<DataStrategyInterface *> strategies, QObject *parent)
+	: QObject(parent)
 	, m_dataStrategies(strategies)
 	, m_data("")
 	, m_optionalData("")
@@ -26,6 +26,8 @@ MultiDataStrategy::MultiDataStrategy(QList<DataStrategyInterface *> strategies, 
 		connect(widgetDS, SIGNAL(aboutToWrite(QString, QString)), this, SIGNAL(aboutToWrite(QString, QString)));
 	}
 }
+
+MultiDataStrategy::~MultiDataStrategy() {}
 
 void MultiDataStrategy::addDataStrategy(DataStrategyInterface *ds)
 {

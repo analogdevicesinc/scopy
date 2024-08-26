@@ -30,7 +30,7 @@
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy {
-class SCOPY_IIO_WIDGETS_EXPORT RangeAttrUi : public QWidget, public GuiStrategyInterface
+class SCOPY_IIO_WIDGETS_EXPORT RangeAttrUi : public QObject, public GuiStrategyInterface
 {
 	Q_OBJECT
 	Q_INTERFACES(scopy::GuiStrategyInterface)
@@ -40,7 +40,7 @@ public:
 	 * string from recipe->linkedAttributeValue should look like "[begin step end]" where "begin", "step" and "end"
 	 * will be converted to double.
 	 * */
-	explicit RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QWidget *parent = nullptr);
+	explicit RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QObject *parent = nullptr);
 	~RangeAttrUi();
 
 	/**
