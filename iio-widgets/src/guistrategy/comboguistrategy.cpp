@@ -23,8 +23,9 @@
 
 using namespace scopy;
 
-ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget *parent)
-	: m_ui(new QWidget(nullptr))
+ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QObject *parent)
+	: QObject(parent)
+	, m_ui(new QWidget(nullptr))
 	, m_isCompact(isCompact)
 {
 	m_recipe = recipe;
@@ -63,7 +64,7 @@ ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 	Q_EMIT requestData();
 }
 
-ComboAttrUi::~ComboAttrUi() { m_ui->deleteLater(); }
+ComboAttrUi::~ComboAttrUi() {}
 
 QWidget *ComboAttrUi::ui() { return m_ui; }
 
