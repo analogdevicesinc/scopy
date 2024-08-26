@@ -4,12 +4,14 @@
 Q_LOGGING_CATEGORY(CAT_CONTEXT_ATTR_DATA_STRATEGY, "ContextAttrDataStrategy")
 using namespace scopy;
 
-ContextAttrDataStrategy::ContextAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent)
-	: QWidget(parent)
+ContextAttrDataStrategy::ContextAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
+	: QObject(parent)
 {
 	m_recipe = recipe;
 	m_optionalData = "";
 }
+
+ContextAttrDataStrategy::ContextAttrDataStrategy() {}
 
 QString ContextAttrDataStrategy::data() { return m_data; }
 

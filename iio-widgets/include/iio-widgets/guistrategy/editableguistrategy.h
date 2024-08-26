@@ -29,7 +29,7 @@
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy {
-class SCOPY_IIO_WIDGETS_EXPORT EditableGuiStrategy : public QWidget, public GuiStrategyInterface
+class SCOPY_IIO_WIDGETS_EXPORT EditableGuiStrategy : public QObject, public GuiStrategyInterface
 {
 	Q_OBJECT
 	Q_INTERFACES(scopy::GuiStrategyInterface)
@@ -37,7 +37,7 @@ public:
 	/**
 	 * @brief This contain a MenuLineEdit with no validation on what the text can or cannot be set.
 	 * */
-	explicit EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QWidget *parent = nullptr);
+	explicit EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QObject *parent = nullptr);
 	~EditableGuiStrategy();
 
 	/**

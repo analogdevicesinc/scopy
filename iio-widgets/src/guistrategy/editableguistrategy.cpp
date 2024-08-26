@@ -22,8 +22,8 @@
 
 using namespace scopy;
 
-EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget *parent)
-	: QWidget(parent)
+EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isCompact, QObject *parent)
+	: QObject(parent)
 	, m_ui(new QWidget(nullptr))
 	, m_lineEdit(new MenuLineEdit(m_ui))
 {
@@ -55,7 +55,7 @@ EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isC
 	Q_EMIT requestData();
 }
 
-EditableGuiStrategy::~EditableGuiStrategy() { m_ui->deleteLater(); }
+EditableGuiStrategy::~EditableGuiStrategy() {}
 
 QWidget *EditableGuiStrategy::ui() { return m_ui; }
 

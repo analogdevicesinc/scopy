@@ -28,12 +28,13 @@
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy {
-class SCOPY_IIO_WIDGETS_EXPORT TriggerDataStrategy : public QWidget, public DataStrategyInterface
+class SCOPY_IIO_WIDGETS_EXPORT TriggerDataStrategy : public QObject, public DataStrategyInterface
 {
 	Q_OBJECT
 	Q_INTERFACES(scopy::DataStrategyInterface)
 public:
-	explicit TriggerDataStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent = nullptr);
+	explicit TriggerDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr);
+	~TriggerDataStrategy();
 
 	QString data() override;
 	QString optionalData() override;
