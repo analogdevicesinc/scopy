@@ -1,6 +1,7 @@
 #include "plotbuttonmanager.h"
 
-PlotButtonManager::PlotButtonManager(QWidget *parent) : QWidget(parent)
+PlotButtonManager::PlotButtonManager(QWidget *parent)
+	: QWidget(parent)
 {
 
 	m_collapsableContainer = new QWidget(this);
@@ -10,10 +11,10 @@ PlotButtonManager::PlotButtonManager(QWidget *parent) : QWidget(parent)
 	m_collapsableContainer->setLayout(m_collapsablelay);
 
 	m_lay = new QHBoxLayout(this);
-	m_collapseBtn = new QPushButton("",this);
+	m_collapseBtn = new QPushButton("", this);
 	m_collapseBtn->setCheckable(true);
 	m_collapseBtn->setChecked(true);
-	m_collapseBtn->setFixedSize(4,16);
+	m_collapseBtn->setFixedSize(4, 16);
 	m_collapseBtn->setStyleSheet("background-color: #AAAAAAAA");
 
 	m_lay->addWidget(m_collapseBtn);
@@ -21,17 +22,14 @@ PlotButtonManager::PlotButtonManager(QWidget *parent) : QWidget(parent)
 	m_lay->setSpacing(0);
 	m_lay->setMargin(0);
 
-	connect(m_collapseBtn,&QAbstractButton::toggled, this, &PlotButtonManager::collapsePriv);
+	connect(m_collapseBtn, &QAbstractButton::toggled, this, &PlotButtonManager::collapsePriv);
 
 	setMouseTracking(true);
 	m_collapsableContainer->setVisible(false);
 	m_collapseBtn->setVisible(false);
 }
 
-PlotButtonManager::~PlotButtonManager()
-{
-
-}
+PlotButtonManager::~PlotButtonManager() {}
 
 void PlotButtonManager::add(QWidget *w)
 {
@@ -47,10 +45,10 @@ void PlotButtonManager::remove(QWidget *w)
 
 bool PlotButtonManager::event(QEvent *event)
 {
-	if (event->type() == QEvent::Enter) {
+	if(event->type() == QEvent::Enter) {
 		collapsePriv(false);
 	}
-	if (event->type() == QEvent::Leave) {
+	if(event->type() == QEvent::Leave) {
 		collapsePriv(true);
 	}
 
@@ -68,26 +66,12 @@ void PlotButtonManager::setCollapseOrientation(CollapseButtonOrientation p)
 	}
 }
 
-bool PlotButtonManager::collapsed()
-{
-	return m_collapseBtn->isChecked();
-}
+bool PlotButtonManager::collapsed() { return m_collapseBtn->isChecked(); }
 
-void PlotButtonManager::setCollapsed(bool b)
-{
-	m_collapseBtn->setChecked(true);
-}
+void PlotButtonManager::setCollapsed(bool b) { m_collapseBtn->setChecked(true); }
 
-void PlotButtonManager::collapsePriv(bool b)
-{
-	m_collapsableContainer->setVisible(!b);
-
-}
+void PlotButtonManager::collapsePriv(bool b) { m_collapsableContainer->setVisible(!b); }
 
 // eventfilter
 
-
-
-
-
-
+#include "moc_plotbuttonmanager.cpp"

@@ -20,7 +20,8 @@ class SCOPY_ADC_EXPORT MarkerController : public QObject
 {
 	Q_OBJECT
 public:
-	typedef enum {
+	typedef enum
+	{
 		MC_NONE,
 		MC_PEAK,
 		MC_FIXED,
@@ -28,13 +29,15 @@ public:
 		MC_IMAGE
 	} MarkerTypes;
 
-	typedef struct {
+	typedef struct
+	{
 		double x;
 		double y;
 		int idx;
 	} PeakInfo;
 
-	typedef struct {
+	typedef struct
+	{
 		QString name;
 		QwtPlotMarker *marker;
 		PeakInfo peak;
@@ -42,7 +45,6 @@ public:
 
 	MarkerController(FFTPlotComponentChannel *ch, QObject *parent);
 	~MarkerController();
-
 
 	void init();
 	bool enabled() const;
@@ -71,7 +73,7 @@ private:
 	void computePeakMarkers();
 	void computeSingleToneMarkers();
 	void computeFixedMarkerFrequency();
-	void computeImageMarkers();	
+	void computeImageMarkers();
 	int findPeakNearIdx(int idx, int range);
 
 	void cacheMarkerInfo();
@@ -83,11 +85,11 @@ private:
 	bool m_complex;
 	bool m_handlesVisible;
 
-	QList<QwtPlotMarker*> m_markers;
+	QList<QwtPlotMarker *> m_markers;
 	QList<PeakInfo> m_peakInfo;
 	QList<PeakInfo> m_sortedPeakInfo;
 	QList<MarkerInfo> m_markerInfo;
-	QList<PlotAxisHandle*> m_fixedHandles;
+	QList<PlotAxisHandle *> m_fixedHandles;
 	QList<double> m_markerCache;
 
 	MarkerTypes m_markerType;
@@ -97,14 +99,13 @@ private:
 	QwtPlot *m_plot;
 	QwtAxisId m_xAxis;
 	QwtAxisId m_yAxis;
-
-
 };
 
 class SCOPY_ADC_EXPORT MarkerPanel : public QWidget
 {
 	Q_OBJECT;
 	QWIDGET_PAINT_EVENT_HELPER;
+
 public:
 	MarkerPanel(QWidget *parent = nullptr);
 	~MarkerPanel();
@@ -113,15 +114,17 @@ public Q_SLOTS:
 	void deleteChannel(QString name);
 	void updateChannel(QString, QList<MarkerController::MarkerInfo>);
 	int markerCount();
+
 private:
 	QHBoxLayout *m_panelLayout;
-	QMap<QString, QWidget*> m_map;
+	QMap<QString, QWidget *> m_map;
 };
 
 class SCOPY_ADC_EXPORT MarkerLabel : public QWidget
 {
 	Q_OBJECT;
 	QWIDGET_PAINT_EVENT_HELPER;
+
 public:
 	MarkerLabel(QString name, QPen c, QWidget *parent = nullptr);
 	~MarkerLabel();
@@ -133,9 +136,8 @@ private:
 	QString m_name;
 	QTextEdit *m_txt;
 	MetricPrefixFormatter *m_mpf;
-
 };
-}
-}
+} // namespace adc
+} // namespace scopy
 
 #endif // MARKERCONTROLLER_H

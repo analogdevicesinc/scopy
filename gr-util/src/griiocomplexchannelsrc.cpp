@@ -7,7 +7,8 @@
 #include <QDebug>
 
 using namespace scopy::grutil;
-GRIIOComplexChannelSrc::GRIIOComplexChannelSrc(QString channelName, GRIIODeviceSource *dev, QString channelNameI, QString channelNameQ, QObject *parent)
+GRIIOComplexChannelSrc::GRIIOComplexChannelSrc(QString channelName, GRIIODeviceSource *dev, QString channelNameI,
+					       QString channelNameQ, QObject *parent)
 	: GRIIOChannel(channelName, dev, parent)
 	, channelNameI(channelNameI)
 	, channelNameQ(channelNameQ)
@@ -48,7 +49,4 @@ const QString &GRIIOComplexChannelSrc::getChannelNameI() const { return channelN
 
 const QString &GRIIOComplexChannelSrc::getChannelNameQ() const { return channelNameQ; }
 
-const iio_data_format *GRIIOComplexChannelSrc::getFmt() const
-{
-	return fmt;
-}
+const iio_data_format *GRIIOComplexChannelSrc::getFmt() const { return fmt; }
