@@ -31,6 +31,7 @@
 #include "datastrategy/datastrategyinterface.h"
 #include "scopy-iio-widgets_export.h"
 #include <pluginbase/lazyloadwidget.h>
+#include <functional>
 
 namespace scopy {
 class GuiStrategyInterface;
@@ -125,6 +126,9 @@ public:
 	 */
 	int lastReturnCode();
 
+	void setUItoDataConversion(std::function<QString(QString)> func);
+	void setDataToUIConversion(std::function<QString(QString)> func);
+
 Q_SIGNALS:
 	/**
 	 * @brief Emits the current state of the IIOWidget system and a string containing a more
@@ -138,6 +142,9 @@ protected Q_SLOTS:
 
 	void startTimer(QString data);
 	void storeReadInfo(QString data, QString optionalData);
+
+	void convertUItoDS(QString data);
+	void convertDStoUI(QString data, QString optionalData);
 
 protected:
 	void initialize();
@@ -154,6 +161,10 @@ protected:
 	QDateTime *m_lastOpTimestamp;
 	int m_lastReturnCode;
 	IIOWidget::State *m_lastOpState;
+
+	/* Conversion functions */
+	std::function<QString(QString)> m_UItoDS;
+	std::function<QString(QString)> m_DStoUI;
 };
 } // namespace scopy
 
