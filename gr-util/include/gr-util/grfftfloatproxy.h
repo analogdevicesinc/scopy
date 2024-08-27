@@ -30,7 +30,6 @@ public:
 protected:
 	double m_powerOffset;
 	int nrBits;
-	QMap<gr::fft::window::win_type, double> m_wincorr_factor;
 	gr::fft::fft_v<float, true>::sptr fft;
 	bool m_windowCorr;
 	gr::blocks::multiply_const_ff::sptr mult_nrbits;
@@ -57,7 +56,6 @@ public:
 
 protected:
 	double m_powerOffset;
-	QMap<gr::fft::window::win_type, double> m_wincorr_factor;
 	int nrBits;
 	bool m_windowCorr;
 	gr::fft::fft_v<gr_complex, true>::sptr fft_complex;
