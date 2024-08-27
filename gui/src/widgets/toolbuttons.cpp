@@ -94,9 +94,8 @@ SingleShotBtn::SingleShotBtn(QWidget *parent)
 	setStyleSheet("background-color: #ff7200;");
 
 	QIcon icon1;
-	icon1.addPixmap(
-		Style::getPixmap(":/gui/icons/play_oneshot.svg", Style::getColor(json::theme::content_inverse)),
-		QIcon::Normal, QIcon::Off);
+	icon1.addPixmap(Style::getPixmap(":/gui/icons/play_oneshot.svg", Style::getColor(json::theme::content_inverse)),
+			QIcon::Normal, QIcon::Off);
 	icon1.addPixmap(Style::getPixmap(":/gui/icons/scopy-default/icons/play_stop.svg",
 					 Style::getColor(json::theme::content_inverse)),
 			QIcon::Normal, QIcon::On);

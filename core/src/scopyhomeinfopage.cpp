@@ -15,7 +15,8 @@ ScopyHomeInfoPage::ScopyHomeInfoPage(QWidget *parent)
 {
 	ui->setupUi(this);
 	Style::setStyle(ui->textBrowser, style::properties::widget::border);
-	ui->textBrowser->setStyleSheet(".QWidget {background-color: " + Style::getAttribute(json::theme::background_primary) + ";}");
+	ui->textBrowser->setStyleSheet(
+		".QWidget {background-color: " + Style::getAttribute(json::theme::background_primary) + ";}");
 	//	initReportButton();
 }
 

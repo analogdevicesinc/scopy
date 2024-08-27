@@ -20,8 +20,10 @@ ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
 	auto &&db = ui->wDeviceBrowser;
 	add = new ScopyHomeAddPage(this, pm);
 
-	ui->wInfoPageStack->setStyleSheet(".QWidget {border-radius: " + Style::getAttribute(json::global::radius_1) + ";}");
-	ui->horizontalLayout_2->setStyleSheet(".QWidget {border-radius: " + Style::getAttribute(json::global::radius_1) + ";}");
+	ui->wInfoPageStack->setStyleSheet(".QWidget {border-radius: " + Style::getAttribute(json::global::radius_1) +
+					  ";}");
+	ui->horizontalLayout_2->setStyleSheet(
+		".QWidget {border-radius: " + Style::getAttribute(json::global::radius_1) + ";}");
 
 	is->add("home", new ScopyHomeInfoPage());
 	is->add("add", add);

@@ -127,9 +127,9 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
 	}
 
 	p.setBrush(track_brush);
-	int track_radius = !getDynamicProperty(this, "use_icon") ? m_track_radius :  m_track_radius / 2;
+	int track_radius = !getDynamicProperty(this, "use_icon") ? m_track_radius : m_track_radius / 2;
 	p.drawRoundedRect(m_margin, m_margin, m_btn_width - 2 * m_margin, m_track_radius * 2 - 2 * m_margin,
-			  track_radius , track_radius);
+			  track_radius, track_radius);
 
 	// use icon (this is used in m2k)
 	if(getDynamicProperty(this, "use_icon")) {
@@ -142,8 +142,11 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
 						  Style::getColor(json::theme::content_inverse));
 		}
 
-//		p.drawPixmap(QRect(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 * m_thumb_radius, 2 * m_thumb_radius), pixmap);
-		p.drawPixmap(QRect(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, pixmap.width(), pixmap.height()), pixmap);
+		//		p.drawPixmap(QRect(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 *
+		//m_thumb_radius, 2 * m_thumb_radius), pixmap);
+		p.drawPixmap(QRect(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, pixmap.width(),
+				   pixmap.height()),
+			     pixmap);
 	} else {
 		p.setBrush(thumb_brush);
 		p.drawEllipse(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 * m_thumb_radius,

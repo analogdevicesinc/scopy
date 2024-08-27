@@ -243,7 +243,7 @@ void StyleHelper::BlueButton(QPushButton *btn, QString objectName)
 	style.replace("&&SH_focus&&", StyleHelper::getColor("SH_focus"));
 	style.replace("&&SH_disabled&&", StyleHelper::getColor("SH_disabled"));
 	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
-//	btn->setStyleSheet(style);
+	//	btn->setStyleSheet(style);
 	Style::setStyle(btn, style::properties::button::basicButton);
 	btn->setIconSize(QSize(48, 48));
 }
@@ -483,58 +483,58 @@ void StyleHelper::MenuControlWidget(QWidget *w, QColor color, QString objectName
 
 void StyleHelper::MenuComboBox(QComboBox *cb, QString objectName)
 {
-//	if(!objectName.isEmpty())
-//		cb->setObjectName(objectName);
-//	cb->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-//	QString style = QString(R"css(
-//QWidget {
-//}
-//QComboBox {
-// color: white;
-// height: 24px;
-// border: none;
-// font-weight: normal;
-// font-size: 16px;
-// background-color: transparent;
-// border-bottom: 1px solid rgba(255, 255, 255, 102);
-//}
-//QComboBox:disabled, QLineEdit:disabled { color: &&SH_disabled&&; }
-//QComboBox QAbstractItemView {
-// border: none;
-// text-align: left;
-// color: transparent;
-// outline: none;
-// background-color: &&ScopyBackground&&;
-// selection-background-color: &&UIElementBackground&&;
-// border-bottom: 1px solid &&GrayText&&;
-// border-top: 1px solid &&GrayText&&;
-//}
-//QComboBox::item:selected {
-// font-weight: bold;
-// font-size: 18px;
-// border-bottom: 0px solid none;
-// background-color: transparent;
-//}
-//QComboBox::drop-down {
-// subcontrol-position: center right;
-// border-image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
-// width: 10px;
-// height: 6px;
-// font-size: 16px;
-// text-align: left;
-// color: transparent;
-//}
-//QComboBox::indicator {
-// background-color: transparent;
-// selection-background-color: transparent;
-// color: transparent;
-// selection-color: transparent;
-//}
-//)css");
+	//	if(!objectName.isEmpty())
+	//		cb->setObjectName(objectName);
+	//	cb->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	//	QString style = QString(R"css(
+	// QWidget {
+	//}
+	// QComboBox {
+	// color: white;
+	// height: 24px;
+	// border: none;
+	// font-weight: normal;
+	// font-size: 16px;
+	// background-color: transparent;
+	// border-bottom: 1px solid rgba(255, 255, 255, 102);
+	//}
+	// QComboBox:disabled, QLineEdit:disabled { color: &&SH_disabled&&; }
+	// QComboBox QAbstractItemView {
+	// border: none;
+	// text-align: left;
+	// color: transparent;
+	// outline: none;
+	// background-color: &&ScopyBackground&&;
+	// selection-background-color: &&UIElementBackground&&;
+	// border-bottom: 1px solid &&GrayText&&;
+	// border-top: 1px solid &&GrayText&&;
+	//}
+	// QComboBox::item:selected {
+	// font-weight: bold;
+	// font-size: 18px;
+	// border-bottom: 0px solid none;
+	// background-color: transparent;
+	//}
+	// QComboBox::drop-down {
+	// subcontrol-position: center right;
+	// border-image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
+	// width: 10px;
+	// height: 6px;
+	// font-size: 16px;
+	// text-align: left;
+	// color: transparent;
+	//}
+	// QComboBox::indicator {
+	// background-color: transparent;
+	// selection-background-color: transparent;
+	// color: transparent;
+	// selection-color: transparent;
+	//}
+	//)css");
 
-//	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
-//	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
-//	cb->setStyleSheet(style);
+	//	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
+	//	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
+	//	cb->setStyleSheet(style);
 }
 
 void StyleHelper::MenuSmallLabel(QLabel *m_lbl, QString objectName)
@@ -557,7 +557,7 @@ void StyleHelper::MenuSmallLabel(QLabel *m_lbl, QString objectName)
 				}
 				)css");
 	m_lbl->setText(m_lbl->text().toUpper());
-//	m_lbl->setStyleSheet(style);
+	//	m_lbl->setStyleSheet(style);
 }
 
 void StyleHelper::MenuComboWidget(QWidget *w, QString objectName)
@@ -654,7 +654,6 @@ void StyleHelper::MenuEditTextHeaderWidget(QWidget *w, QString objectName)
 
 void StyleHelper::MenuSpinComboBox(QComboBox *w, QString objectName)
 {
-
 }
 
 void StyleHelper::MenuOnOffSwitch(QWidget *w, QString objectName)
@@ -1211,59 +1210,59 @@ void StyleHelper::IIOWidgetElement(QWidget *w, QString objectName)
 
 void StyleHelper::IIOComboBox(QComboBox *w, QString objectName)
 {
-//	if(!objectName.isEmpty())
-//		w->setObjectName(objectName);
-//	w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-//	QString style = QString(R"css(
-//QWidget {
-//}
-//QComboBox {
-// color: white;
-// height: 24px;
-// border: none;
-// font-weight: normal;
-// font-size: 16px;
-// background-color: transparent;
-//}
-//QComboBox:disabled, QLineEdit:disabled { color: &&SH_disabled&&; }
-//QComboBox QAbstractItemView {
-// border: none;
-// text-align: left;
-// color: transparent;
-// outline: none;
-// background-color: &&ScopyBackground&&;
-// selection-background-color: &&UIElementBackground&&;
-// border-bottom: 1px solid &&GrayText&&;
-// border-top: 1px solid &&GrayText&&;
-//}
-//QComboBox::item:selected {
-// font-weight: bold;
-// font-size: 18px;
-// border-bottom: 0px solid none;
-// background-color: transparent;
-//}
-//QComboBox::drop-down {
-// subcontrol-position: center right;
-// border-image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
-// width: 10px;
-// height: 6px;
-// font-size: 16px;
-// text-align: left;
-// color: transparent;
-//}
-//QComboBox::indicator {
-// background-color: transparent;
-// selection-background-color: transparent;
-// color: transparent;
-// selection-color: transparent;
-//}
-//)css");
+	//	if(!objectName.isEmpty())
+	//		w->setObjectName(objectName);
+	//	w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	//	QString style = QString(R"css(
+	// QWidget {
+	//}
+	// QComboBox {
+	// color: white;
+	// height: 24px;
+	// border: none;
+	// font-weight: normal;
+	// font-size: 16px;
+	// background-color: transparent;
+	//}
+	// QComboBox:disabled, QLineEdit:disabled { color: &&SH_disabled&&; }
+	// QComboBox QAbstractItemView {
+	// border: none;
+	// text-align: left;
+	// color: transparent;
+	// outline: none;
+	// background-color: &&ScopyBackground&&;
+	// selection-background-color: &&UIElementBackground&&;
+	// border-bottom: 1px solid &&GrayText&&;
+	// border-top: 1px solid &&GrayText&&;
+	//}
+	// QComboBox::item:selected {
+	// font-weight: bold;
+	// font-size: 18px;
+	// border-bottom: 0px solid none;
+	// background-color: transparent;
+	//}
+	// QComboBox::drop-down {
+	// subcontrol-position: center right;
+	// border-image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
+	// width: 10px;
+	// height: 6px;
+	// font-size: 16px;
+	// text-align: left;
+	// color: transparent;
+	//}
+	// QComboBox::indicator {
+	// background-color: transparent;
+	// selection-background-color: transparent;
+	// color: transparent;
+	// selection-color: transparent;
+	//}
+	//)css");
 
-//	style.replace("&&SH_disabled&&", StyleHelper::getColor("SH_disabled"));
-//	style.replace("&&GrayText&&", StyleHelper::getColor("GrayText"));
-//	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
-//	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
-//	w->setStyleSheet(style);
+	//	style.replace("&&SH_disabled&&", StyleHelper::getColor("SH_disabled"));
+	//	style.replace("&&GrayText&&", StyleHelper::getColor("GrayText"));
+	//	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
+	//	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
+	//	w->setStyleSheet(style);
 }
 
 void StyleHelper::IIOLineEdit(QLineEdit *w, QString objectName)
@@ -1310,7 +1309,7 @@ void StyleHelper::HoverToolTip(QWidget *w, QString info, QString objectName)
 		w->setObjectName(objectName);
 
 	QLabel *label = new QLabel(info);
-	QString style = QString (R"css(QLabel {
+	QString style = QString(R"css(QLabel {
 				font-weight: bold;
 				color: &&LabelText&&;
 				 }
@@ -1318,7 +1317,7 @@ void StyleHelper::HoverToolTip(QWidget *w, QString info, QString objectName)
 	style.replace("&&LabelText&&", StyleHelper::getColor("LabelText"));
 	label->style();
 
-	style = QString (R"css(QWidget {
+	style = QString(R"css(QWidget {
 			 background-color: &&ScopyBackground&&;
 			 }
 				)css");
