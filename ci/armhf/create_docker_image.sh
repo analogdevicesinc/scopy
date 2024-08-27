@@ -10,7 +10,7 @@ install_packages(){
 	sudo apt-get update
 	sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+	sudo add-apt-repository --yes "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 	sudo apt-get update
 	sudo apt-get -y install containerd.io docker-ce docker-ce-cli docker-buildx-plugin
 }
@@ -24,7 +24,7 @@ create_sysroot(){
 		configure_sysroot
 }
 
-# archive the sysroot and move it next to Dockerfile in order to copy the tar in the docker image
+# archive the sysroot and move it next to the Dockerfile in order to copy the tar in the docker image
 tar_and_move_sysroot(){
 	pushd $STAGING_AREA
 	sudo tar -czvf "${SYSROOT_TAR##*/}" sysroot
@@ -34,8 +34,8 @@ tar_and_move_sysroot(){
 
 create_image(){
 	pushd ${SRC_DIR}/ci/armhf/docker
-	sudo docker build --load --tag cristianbindea/scopy2-armhf-appimage .
-	# sudo DOCKER_BUILDKIT=0 docker build --tag cristianbindea/scopy2-armhf-appimage . # build the image using old backend
+	sudo docker build --load --tag cristianbindea/scopy2-armhf-appimage:testing .
+	# sudo DOCKER_BUILDKIT=0 docker build --tag cristianbindea/scopy2-armhf-appimage:testing . # build the image using old backend
 	popd
 }
 
