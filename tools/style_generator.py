@@ -1,7 +1,7 @@
 import os
 import sys
 import shutil
-from distutils.dir_util import copy_tree
+from shutil import copytree
 from typing import Dict, Optional, Set, List
 
 
@@ -183,7 +183,7 @@ def generate_qss(has_general_style: bool) -> None:
     # generate general qss file (only for core use)
     if has_general_style:
         clear_qss_folder(build_qss_folder)
-        copy_tree(os.path.join(style_folder, "qss", GENERAL_FOLDER), build_qss_folder)
+        copytree(os.path.join(style_folder, "qss", GENERAL_FOLDER), build_qss_folder, dirs_exist_ok=True)
 
     # generate header and copy property files to build_qss_folder
     qss_namespace_code = generate_namespace_code(

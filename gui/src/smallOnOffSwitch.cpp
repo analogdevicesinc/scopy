@@ -143,7 +143,7 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
 		}
 
 		//		p.drawPixmap(QRect(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 *
-		//m_thumb_radius, 2 * m_thumb_radius), pixmap);
+		// m_thumb_radius, 2 * m_thumb_radius), pixmap);
 		p.drawPixmap(QRect(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, pixmap.width(),
 				   pixmap.height()),
 			     pixmap);
