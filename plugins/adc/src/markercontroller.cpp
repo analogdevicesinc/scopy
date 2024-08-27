@@ -55,20 +55,17 @@ void MarkerController::setNrOfMarkers(int n)
 		m_markers[i]->attach(m_plot);
 		m_markers[i]->setVisible(m_enabled);
 	}
+
+	if(m_markerType == MC_FIXED) {
+		deinitFixedMarker();
+		initFixedMarker();
+	}
 }
 
 void MarkerController::setMarkerType(MarkerTypes v)
 {
-	if(m_markerType == MC_FIXED) {
-		deinitFixedMarker();
-	}
-
 	m_markerType = v;
 	setNrOfMarkers(m_nrOfMarkers);
-
-	if(v == MC_FIXED) {
-		initFixedMarker();
-	}
 
 	Q_EMIT markerEnabled(m_enabled && m_markerType != MC_NONE);
 	computeMarkers();
