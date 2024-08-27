@@ -34,6 +34,8 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 	, m_lastOpTimestamp(nullptr)
 	, m_lastOpState(nullptr)
 	, m_lastReturnCode(0)
+	, m_UItoDS(nullptr)
+	, m_DStoUI(nullptr)
 {
 	setLayout(new QVBoxLayout(this));
 	layout()->setContentsMargins(0, 0, 0, 0);
@@ -145,6 +147,10 @@ IIOWidget::State *IIOWidget::lastOperationState() { return m_lastOpState; }
 
 int IIOWidget::lastReturnCode() { return m_lastReturnCode; }
 
+void IIOWidget::setUItoDataConversion(std::function<QString(QString)> func) { m_UItoDS = func; }
+
+void IIOWidget::setDataToUIConversion(std::function<QString(QString)> func) { m_DStoUI = func; }
+
 void IIOWidget::startTimer(QString data)
 {
 	m_lastData = data;
@@ -158,6 +164,22 @@ void IIOWidget::storeReadInfo(QString data, QString optionalData)
 	Q_UNUSED(data)
 	Q_UNUSED(optionalData)
 	setLastOperationTimestamp(QDateTime::currentDateTime());
+}
+
+void IIOWidget::convertUItoDS(QString data)
+{
+	if(m_UItoDS) {
+		data = m_UItoDS(data);
+	}
+	this->saveData(data);
+}
+
+void IIOWidget::convertDStoUI(QString data, QString optionalData)
+{
+	if(m_DStoUI) { // only the data should be converted
+		data = m_DStoUI(data);
+	}
+	m_uiStrategy->receiveData(data, optionalData);
 }
 
 void IIOWidget::initialize() { m_dataStrategy->readAsync(); }
