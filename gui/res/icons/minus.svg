@@ -11,12 +11,11 @@
    height="16"
    viewBox="0 0 16 16"
    version="1.1"
-   id="svg4"
+   id="svg8"
    sodipodi:docname="minus.svg"
-   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
-   style="fill:none">
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
   <metadata
-     id="metadata10">
+     id="metadata14">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -28,7 +27,7 @@
     </rdf:RDF>
   </metadata>
   <defs
-     id="defs8" />
+     id="defs12" />
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -38,22 +37,20 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="2048"
-     inkscape:window-height="1046"
-     id="namedview6"
+     inkscape:window-width="1420"
+     inkscape:window-height="925"
+     id="namedview10"
      showgrid="false"
-     inkscape:zoom="47.6792"
-     inkscape:cx="2.5463849"
-     inkscape:cy="8.0901366"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg4" />
-  <rect
-     style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-opacity:1;paint-order:stroke fill markers"
-     id="rect812"
-     width="14"
-     height="2"
-     x="1"
-     y="7" />
+     inkscape:zoom="15.733333"
+     inkscape:cx="8.0304955"
+     inkscape:cy="6.4146374"
+     inkscape:window-x="166"
+     inkscape:window-y="51"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg8" />
+  <path
+     style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke-width:1.18321598"
+     inkscape:connector-curvature="0"
+     id="path4"
+     d="M 1,7 H 15 V 9 H 1 Z" />
 </svg>

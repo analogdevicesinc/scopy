@@ -80,7 +80,7 @@ void ScopyPreferencesPage::initRestartWidget()
 	QSpacerItem *space1 = new QSpacerItem(6, 20, QSizePolicy::Expanding, QSizePolicy::Fixed);
 	QSpacerItem *space2 = new QSpacerItem(6, 20, QSizePolicy::Preferred, QSizePolicy::Fixed);
 	QPushButton *btn = new QPushButton("Restart");
-	Style::setStyle(btn, style::properties::button::borderButton);
+	Style::setStyle(btn, style::properties::button::basicButton, true, true);
 	StyleHelper::BackgroundWidget(restartWidget, "restartWidget");
 	btn->setFixedWidth(100);
 

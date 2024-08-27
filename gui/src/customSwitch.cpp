@@ -51,9 +51,9 @@ void CustomSwitch::init()
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	m_onLabel->setAlignment(Qt::AlignCenter);
-	Style::setStyle(m_onLabel, style::properties::widget::customSwitch, "left_off");
+	Style::setStyle(m_onLabel, style::properties::widget::customSwitch, "left_off", true);
 	m_offLabel->setAlignment(Qt::AlignCenter);
-	Style::setStyle(m_offLabel, style::properties::widget::customSwitch, "right_off");
+	Style::setStyle(m_offLabel, style::properties::widget::customSwitch, "right_off", true);
 
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	layout->addWidget(m_onLabel);
@@ -68,11 +68,11 @@ void CustomSwitch::init()
 void CustomSwitch::onToggle(bool en)
 {
 	if(en) {
-		Style::setStyle(m_onLabel, style::properties::widget::customSwitch, "left_on");
-		Style::setStyle(m_offLabel, style::properties::widget::customSwitch, "right_off");
+		Style::setStyle(m_onLabel, style::properties::widget::customSwitch, "left_on", true);
+		Style::setStyle(m_offLabel, style::properties::widget::customSwitch, "right_off", true);
 	} else {
-		Style::setStyle(m_onLabel, style::properties::widget::customSwitch, "left_off");
-		Style::setStyle(m_offLabel, style::properties::widget::customSwitch, "right_on");
+		Style::setStyle(m_onLabel, style::properties::widget::customSwitch, "left_off", true);
+		Style::setStyle(m_offLabel, style::properties::widget::customSwitch, "right_on", true);
 	}
 }
 
