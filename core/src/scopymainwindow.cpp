@@ -91,7 +91,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ScanButtonController *sbc = new ScanButtonController(scanCycle, hp->scanControlBtn(), this);
 
 	dm = new DeviceManager(pm, this);
-	dm->setExclusive(true);
+	dm->setExclusive(false);
 
 	dtm = new DetachedToolWindowManager(this);
 	toolman = new ToolManager(tm, ts, dtm, this);
