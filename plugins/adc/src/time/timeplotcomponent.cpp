@@ -40,8 +40,11 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 	nameLbl->setText(m_name);
 	connect(this, &PlotComponent::nameChanged, nameLbl, &QLabel::setText);
 
-	m_timePlotInfo = new TimeSamplingInfo();
+	m_timePlotInfo = new TimeSamplingInfo(m_timePlot);
 	m_timePlot->getPlotInfo()->addCustomInfo(m_timePlotInfo, IP_RIGHT);
+
+	auto m_timeStampInfo = new TimestampInfo(m_timePlot, m_timePlot);
+	m_timePlot->getPlotInfo()->addCustomInfo(m_timeStampInfo, IP_RIGHT);
 
 	/*	connect(m_plot->navigator(), &PlotNavigator::rectChanged, this,
 		[=]() { m_info->update(m_currentSamplingInfo); });

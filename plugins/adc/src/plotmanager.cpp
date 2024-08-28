@@ -133,4 +133,5 @@ void PlotManager::replot()
 	for(PlotComponent *p : m_plots) {
 		p->replot();
 	}
+	Q_EMIT newData();
 }
