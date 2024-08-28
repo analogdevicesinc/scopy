@@ -49,6 +49,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void plotAdded(uint32_t);
 	void plotRemoved(uint32_t);
+	void newData();
 
 protected:
 	uint32_t m_plotIdx;
