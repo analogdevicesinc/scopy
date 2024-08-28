@@ -39,6 +39,7 @@ public:
 	void initAboutPage(PluginManager *pm = nullptr);
 	void initPreferencesPage(PluginManager *pm = nullptr);
 	void initPreferences();
+	void setupPreferences();
 	void initTranslations();
 	void loadPluginsFromRepository(PluginRepository *pr = nullptr);
 
