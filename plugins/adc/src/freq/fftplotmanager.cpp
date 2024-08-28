@@ -19,6 +19,8 @@ uint32_t FFTPlotManager::addPlot(QString name)
 	m_plotIdx++;
 	m_plots.append(plt);
 
+	connect(this, &PlotManager::newData,plt->plot(0), &PlotWidget::newData);
+
 	plt->setXInterval(m_xInterval);
 
 	connect(plt, &FFTPlotComponent::requestDeletePlot, this, [=]() {
@@ -28,6 +30,7 @@ uint32_t FFTPlotManager::addPlot(QString name)
 		delete plt->plotMenu();
 		delete plt;
 	});
+
 
 	addComponent(plt);
 

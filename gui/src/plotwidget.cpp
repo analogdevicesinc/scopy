@@ -118,7 +118,6 @@ void PlotWidget::plotChannelChangeXAxis(PlotChannel *c, PlotAxis *x)
 
 void PlotWidget::plotChannelChangeYAxis(PlotChannel *c, PlotAxis *y)
 {
-
 	m_tracker->removeChannel(c);
 	c->yAxis()->setVisible(false);
 	c->setYAxis(y);

@@ -127,6 +127,8 @@ void ADCPlugin::loadToolList()
 {
 	m_toolList.append(
 		SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+	m_toolList.append(
+		SCOPY_NEW_TOOLMENUENTRY("freq", "Frequency", ":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
 }
 
 bool iio_is_buffer_capable(struct iio_device *dev)
@@ -184,7 +186,10 @@ void ADCPlugin::createGRIIOTreeNode(GRTopBlockNode *ctxNode, iio_context *ctx)
 
 bool ADCPlugin::onConnect()
 {
-	deleteInstrument(m_toolList[0]);
+	for(auto &tool : m_toolList) {
+		deleteInstrument(tool);
+	}
+
 	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
 	if(conn == nullptr)
 		return false;
@@ -239,12 +244,13 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root)
 				}
 			}
 			deleteInstrument(t);
+
 		});
 		m_ctrls.append(adc);
 	} else if(t == FREQUENCY) {
 
 		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("freq", "Frequency",
-							  ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+							  ":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
 		auto tme = m_toolList.last();
 		tme->setEnabled(true);
 		tme->setRunBtnVisible(true);
@@ -314,8 +320,8 @@ bool ADCPlugin::onDisconnect()
 		deleteInstrument(tool);
 	}
 
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+	loadToolList();
+	Q_EMIT toolListChanged();
 
 	return true;
 }
