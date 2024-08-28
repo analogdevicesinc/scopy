@@ -19,10 +19,10 @@ USE_STAGING=OFF
 
 source $SRC_FOLDER/ci/windows/mingw_toolchain.sh $USE_STAGING
 
-export DEST_FOLDER=$WORKDIR/scopy_$ARCH
 BUILD_FOLDER=$WORKDIR/build_$ARCH
-DEBUG_FOLDER=$WORKDIR/debug_$ARCH
-ARTIFACT_FOLDER=$WORKDIR/artifact_$ARCH
+ARTIFACT_FOLDER=$SRC_FOLDER/artifacts
+export DEST_FOLDER=$ARTIFACT_FOLDER/scopy-$ARCH # the export is needed for the packaging step
+DEBUG_FOLDER=$ARTIFACT_FOLDER/debug-$ARCH
 PYTHON_FILES=$STAGING_DIR/lib/python3.*
 DLL_DEPS=$(cat $SRC_FOLDER/ci/windows/mingw_dll_deps)
 EMU_BUILD_FOLDER=$WORKDIR/iio-emu/build
@@ -38,6 +38,10 @@ pacman -Qe >> $SRC_FOLDER/build-status
 
 download_tools() {
 	mkdir -p $STAGING_AREA
+
+	# check if wget2 is installed
+	pacman -Qs mingw-w64-x86_64-wget2 > /dev/null || pacman -S --noconfirm mingw-w64-x86_64-wget2
+
 	pushd $STAGING_AREA
 	if [ ! -f windres.exe ]; then
 		wget2 http://swdownloads.analog.com/cse/build/windres.exe.gz
@@ -148,20 +152,21 @@ bundle_drivers(){
 
 create_installer() {
 	echo "### Creating installer"
-	pushd $WORKDIR
-	mkdir -p $ARTIFACT_FOLDER
-	cp -R $WORKDIR/scopy_${ARCH} $ARTIFACT_FOLDER/scopy-${ARCH}
-	[ -d $WORKDIR/debug_${ARCH} ] && cp -R $WORKDIR/debug_${ARCH} $ARTIFACT_FOLDER/debug-${ARCH} || echo "No debug folder"
+	pushd $ARTIFACT_FOLDER
 	PATH="/c/innosetup:/c/Program Files (x86)/Inno Setup 6:$PATH"
 	iscc //p $BUILD_FOLDER/windows/scopy-$ARCH_BIT.iss
-	mv $WORKDIR/scopy-$ARCH_BIT-setup.exe $ARTIFACT_FOLDER
 
-	echo "Done. Artifacts generated in $ARTIFACT_FOLDER"
-	ls -la $ARTIFACT_FOLDER
 	if [ "$CI_SCRIPT" == "ON" ]; then
-		cp -R $ARTIFACT_FOLDER $SRC_FOLDER
-		ls -la $SRC_FOLDER
+		mv $WORKDIR/scopy-$ARCH_BIT-setup.exe $ARTIFACT_FOLDER
+		zip scopy-$ARCH_BIT-setup.zip scopy-$ARCH_BIT-setup.exe
+		zip -r debug-x86_64.zip $DEBUG_FOLDER
+		zip -r scopy-x86_64.zip $DEST_FOLDER
+	else
+		mv $WORKDIR/scopy-$ARCH_BIT-setup.exe $ARTIFACT_FOLDER
 	fi
+
+	ls -la $ARTIFACT_FOLDER
+	echo "Done. Artifacts generated in $ARTIFACT_FOLDER"
 	popd
 }
 
