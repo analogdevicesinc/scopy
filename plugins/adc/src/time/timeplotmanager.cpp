@@ -14,6 +14,7 @@ TimePlotManager::TimePlotManager(QString name, QWidget *parent)
 	m_primary = nullptr;
 
 	m_bufferpreviewer = new AnalogBufferPreviewer();
+	m_plotpreviewer = nullptr;
 
 	int idx = m_lay->indexOf(m_statsPanel);
 	m_lay->insertWidget(idx, m_bufferpreviewer);
@@ -32,6 +33,8 @@ uint32_t TimePlotManager::addPlot(QString name)
 		int idx = m_lay->indexOf(m_statsPanel);
 		m_lay->insertWidget(idx, m_plotpreviewer);
 	}
+
+	connect(this, &PlotManager::newData,plt->plot(0), &PlotWidget::newData);
 
 	plt->setXInterval(m_xInterval);
 
@@ -96,7 +99,9 @@ void TimePlotManager::syncNavigatorAndCursors(PlotComponent *p)
 	if(p == m_primary)
 		return;
 
-	m_plotpreviewer = new PlotBufferPreviewer(m_primary->plot(0), m_bufferpreviewer, m_primary->plot(0));
+	if(m_plotpreviewer == nullptr) {
+		m_plotpreviewer = new PlotBufferPreviewer(m_primary->plot(0), m_bufferpreviewer, m_primary->plot(0));
+	}
 
 	auto plt = dynamic_cast<TimePlotComponent *>(p);
 	QSet<QwtAxisId> set;
