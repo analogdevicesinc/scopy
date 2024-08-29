@@ -66,7 +66,7 @@ void time_sink_f_impl::generate_time_axis()
 	m_freq.clear();
 	if(m_complexFft) {
 		for(int i = 0; i < m_size; i++) {
-			m_freq.push_back(freqoffset + (i * rbw) - __sampleRate / 2);
+			m_freq.push_back(freqoffset + ((m_size - i - 1) * rbw) - __sampleRate / 2);
 		}
 	} else {
 		for(int i = 0; i < m_size; i++) {
