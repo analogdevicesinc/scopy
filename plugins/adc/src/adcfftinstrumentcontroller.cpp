@@ -315,30 +315,24 @@ void ADCFFTInstrumentController::createImportFloatChannel(AcqTreeNode *node)
 
 bool ADCFFTInstrumentController::getComplexChannelPair(AcqTreeNode *node, AcqTreeNode **node_i, AcqTreeNode **node_q)
 {
-	if(m_complexChannels.contains(node) && m_complexChannels.count() % 2 == 1) {
-		// pending
-		*node_i = node;
-		*node_q = nullptr;
-		return false;
-	}
-
-	if(m_complexChannels.contains(node) && m_complexChannels.count() % 2 == 0) {
-		*node_i = nullptr;
-		*node_q = nullptr;
-		return false;
-	}
-
 	m_complexChannels.append(node);
 	auto cnt = m_complexChannels.count();
-	if(cnt == 1) {
-		*node_i = node;
-		*node_q = nullptr;
-		return false;
+	if(cnt % 2 == 0) {
+		if(node->name().endsWith("q",Qt::CaseInsensitive)) {
+			*node_i = m_complexChannels[cnt - 2];
+			*node_q = m_complexChannels[cnt - 1];
+		} else if(node->name().endsWith("i",Qt::CaseInsensitive)){
+			*node_i = m_complexChannels[cnt - 1];
+			*node_q = m_complexChannels[cnt - 2];
+		} else {
+			*node_i = m_complexChannels[cnt - 2];
+			*node_q = m_complexChannels[cnt - 1];
+		}
+
+		return true;
 	}
 
-	*node_i = m_complexChannels[cnt - 1];
-	*node_q = m_complexChannels[cnt - 2];
-	return true;
+	return false;
 }
 
 void ADCFFTInstrumentController::addChannel(AcqTreeNode *node)
