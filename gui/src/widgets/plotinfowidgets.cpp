@@ -144,7 +144,7 @@ TimestampInfo::TimestampInfo(PlotWidget *plot, QWidget *parent)
 {
 	StyleHelper::PlotInfoLabel(this);
 	connect(plot, &PlotWidget::newData, this,
-		[=]() { setText(QDateTime::currentDateTime().time().toString("hh:mm:ss.zzz")); });
+		[=]() { setText(QDateTime::currentDateTime().time().toString("hh:mm:ss")); });
 }
 
 TimestampInfo::~TimestampInfo() {}

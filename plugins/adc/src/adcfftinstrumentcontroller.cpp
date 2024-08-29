@@ -47,7 +47,7 @@ void ADCFFTInstrumentController::init()
 	addComponent(m_fftPlotSettingsComponent);
 
 	uint32_t tmp;
-	tmp = m_plotComponentManager->addPlot("FFT");
+	tmp = m_plotComponentManager->addPlot("Frequency Plot");
 	m_fftPlotSettingsComponent->addPlot(dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(tmp)));
 
 	m_measureComponent = new MeasureComponent(m_ui->getToolTemplate(), m_plotComponentManager, this);
