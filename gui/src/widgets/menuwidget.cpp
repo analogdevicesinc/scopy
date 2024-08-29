@@ -21,7 +21,7 @@ MenuWidget::MenuWidget(QString name, QPen p, QWidget *parent)
 	wScroll->setLayout(m_layScroll);
 	scroll->setWidgetResizable(true);
 	scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	// if ScrollBarAlwaysOn - layScroll->setContentsMargins(0,0,6,0);
 
 	scroll->setWidget(wScroll);
