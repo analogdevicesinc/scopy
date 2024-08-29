@@ -25,7 +25,7 @@ void PlotInfo::addCustomInfo(QWidget *info, InfoPosition hpos, InfoPosition vpos
 		if(vpos == IP_BOTTOM) {
 			m_leftLayout->addWidget(info);
 		} else {
-			m_leftLayout->insertWidget(0,info);
+			m_leftLayout->insertWidget(0, info);
 		}
 		info->setParent(m_leftInfo);
 		break;
@@ -35,7 +35,7 @@ void PlotInfo::addCustomInfo(QWidget *info, InfoPosition hpos, InfoPosition vpos
 		if(vpos == IP_BOTTOM) {
 			m_rightLayout->addWidget(info);
 		} else {
-			m_rightLayout->insertWidget(0,info);
+			m_rightLayout->insertWidget(0, info);
 		}
 		info->setParent(m_rightInfo);
 
@@ -49,7 +49,7 @@ void PlotInfo::addCustomInfo(QWidget *info, InfoPosition hpos, InfoPosition vpos
 	info->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 }
 
-QLabel *PlotInfo::addLabelInfo(InfoPosition hpos,  InfoPosition vpos)
+QLabel *PlotInfo::addLabelInfo(InfoPosition hpos, InfoPosition vpos)
 {
 	QLabel *label = new QLabel();
 	StyleHelper::PlotInfoLabel(label);

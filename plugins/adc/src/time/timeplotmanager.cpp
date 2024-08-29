@@ -34,7 +34,7 @@ uint32_t TimePlotManager::addPlot(QString name)
 		m_lay->insertWidget(idx, m_plotpreviewer);
 	}
 
-	connect(this, &PlotManager::newData,plt->plot(0), &PlotWidget::newData);
+	connect(this, &PlotManager::newData, plt->plot(0), &PlotWidget::newData);
 
 	plt->setXInterval(m_xInterval);
 
