@@ -43,9 +43,7 @@ ADCInstrumentController::~ADCInstrumentController() {}
 
 ChannelIdProvider *ADCInstrumentController::getChannelIdProvider() { return chIdP; }
 
-void ADCInstrumentController::setEnableAddRemovePlot(bool)
-{
-}
+void ADCInstrumentController::setEnableAddRemovePlot(bool) {}
 
 void ADCInstrumentController::setEnableAddRemoveInstrument(bool b)
 {
