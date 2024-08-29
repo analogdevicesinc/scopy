@@ -46,7 +46,7 @@ void GRFFTFloatProc::build_blks(GRTopBlock *top)
 	auto window = gr::fft::window::build(m_fftwindow, fft_size);
 	float window_sum = 0;
 	for(auto v : window) {
-		window_sum+=v;
+		window_sum += v;
 	}
 	auto corr = (m_windowCorr) ? window.size() / window_sum : 1;
 
@@ -137,12 +137,11 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 
 	float window_sum = 0;
 	for(auto v : window) {
-		window_sum+=v;
+		window_sum += v;
 	}
 	auto corr = (m_windowCorr) ? window.size() / window_sum : 1;
 
-	mult_nrbits =
-		gr::blocks::multiply_const_cc::make(gr_complex(1.0 / (1 << nrBits), 0), fft_size);
+	mult_nrbits = gr::blocks::multiply_const_cc::make(gr_complex(1.0 / (1 << nrBits), 0), fft_size);
 	fft_complex = gr::fft::fft_v<gr_complex, true>::make(fft_size, window, true);
 
 	mult_wind_corr = gr::blocks::multiply_const_cc::make(gr_complex(corr, 0), fft_size);

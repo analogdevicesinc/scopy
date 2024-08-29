@@ -56,7 +56,7 @@ public:
 	void newInstrument(ADCInstrumentType t, AcqTreeNode *root);
 	void deleteInstrument(ToolMenuEntry *w);
 
-public Q_SLOT:
+public Q_SLOTS:
 	void preferenceChanged(QString, QVariant t1);
 
 private:

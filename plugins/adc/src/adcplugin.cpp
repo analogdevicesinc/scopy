@@ -104,7 +104,6 @@ bool ADCPlugin::loadPreferencesPage()
 	auto adc_add_remove_instrument = PreferencesHelper::addPreferenceCheckBox(
 		p, "adc_add_remove_instrument", "Add/Remove instrument feature (EXPERIMENTAL)", m_preferencesPage);
 
-
 	generalSection->contentLayout()->addWidget(adc_plot_xaxis_label_position);
 	generalSection->contentLayout()->addWidget(adc_plot_yaxis_label_position);
 	generalSection->contentLayout()->addWidget(adc_plot_yaxis_handle_position);
@@ -135,8 +134,8 @@ void ADCPlugin::loadToolList()
 {
 	m_toolList.append(
 		SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("freq", "Frequency", ":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("freq", "Frequency",
+						  ":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
 }
 
 bool iio_is_buffer_capable(struct iio_device *dev)
@@ -255,13 +254,12 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root)
 				}
 			}
 			deleteInstrument(t);
-
 		});
 		m_ctrls.append(adc);
 	} else if(t == FREQUENCY) {
 
-		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("freq", "Frequency",
-							  ":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
+		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(
+			"freq", "Frequency", ":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
 		auto tme = m_toolList.last();
 		tme->setEnabled(true);
 		tme->setRunBtnVisible(true);
@@ -324,7 +322,8 @@ void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
 	Q_EMIT toolListChanged();
 }
 
-void ADCPlugin::preferenceChanged(QString s, QVariant t1) {
+void ADCPlugin::preferenceChanged(QString s, QVariant t1)
+{
 	if(s == "adc_add_remove_plot") {
 		for(ADCInstrumentController *ctrl : m_ctrls) {
 			ctrl->setEnableAddRemovePlot(t1.toBool());

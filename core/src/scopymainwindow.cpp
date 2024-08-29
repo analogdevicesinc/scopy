@@ -154,11 +154,11 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	//	 auto id = api->addDevice("m2k","ip:127.0.0.1");
 	//	 auto id = api->addDevice("iio","ip:10.48.65.163");
-	auto id = api->addDevice("iio", "ip:192.168.2.1");
+	//	auto id = api->addDevice("iio", "ip:192.168.2.1");
 	//	 auto id = api->addDevice("test","");
 
-	api->connectDevice(id);
-	api->switchTool(id, "Time");
+	// api->connectDevice(id);
+	// api->switchTool(id, "Time");
 #endif
 
 	qInfo(CAT_BENCHMARK) << "ScopyMainWindow constructor took: " << timer.elapsed() << "ms";
