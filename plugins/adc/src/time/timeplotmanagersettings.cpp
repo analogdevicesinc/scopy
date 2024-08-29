@@ -37,7 +37,7 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 	StyleHelper::BlueButton(m_addPlotBtn, "AddPlotButton");
 
 	connect(m_addPlotBtn, &QPushButton::clicked, this, [=]() {
-		uint32_t idx = m_plotManager->addPlot("Plot ");
+		uint32_t idx = m_plotManager->addPlot("Time Plot " + QString::number(m_plotManager->plots().count()));
 		TimePlotComponent *plt = m_plotManager->plot(idx);
 		addPlot(plt);
 	});
@@ -425,7 +425,7 @@ void TimePlotManagerSettings::updateXModeCombo()
 }
 
 void TimePlotManagerSettings::setEnableAddRemovePlot(bool b) {
-	m_addPlotBtn->setVisible(false);
+	m_addPlotBtn->setVisible(b);
 }
 
 } // namespace adc
