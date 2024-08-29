@@ -43,6 +43,16 @@ ADCInstrumentController::~ADCInstrumentController() {}
 
 ChannelIdProvider *ADCInstrumentController::getChannelIdProvider() { return chIdP; }
 
+void ADCInstrumentController::setEnableAddRemovePlot(bool)
+{
+}
+
+void ADCInstrumentController::setEnableAddRemoveInstrument(bool b)
+{
+	m_ui->addBtn->setVisible(b);
+	m_ui->removeBtn->setVisible(b);
+}
+
 void ADCInstrumentController::init() {}
 
 void ADCInstrumentController::deinit()
