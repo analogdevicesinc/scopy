@@ -54,7 +54,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	MenuOnOffSwitch *m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), plotMenu, false);
 	m_autoscaler = new PlotAutoscaler(this);
 
-	connect(m_autoscaler, &PlotAutoscaler::newMin, this, [=](double v) {m_yCtrl->setMin(v - 10);});
+	connect(m_autoscaler, &PlotAutoscaler::newMin, this, [=](double v) { m_yCtrl->setMin(v - 10); });
 	// connect(m_autoscaler, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
 
 	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
@@ -203,7 +203,6 @@ void FFTPlotComponentSettings::removeChannel(ChannelComponent *c)
 	connections.remove(c);
 }
 
-
 void FFTPlotComponentSettings::onStart()
 {
 	m_running = true;
@@ -215,4 +214,3 @@ void FFTPlotComponentSettings::onStop()
 	m_running = false;
 	toggleAutoScale();
 }
-

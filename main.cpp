@@ -56,8 +56,7 @@ void initLogging()
 						 "AD74413R.debug=true\n"
 						 "ScopyTranslations.debug=true\n"
 						 "GRTimeSinkComponent.debug=true\n"
-						 "GRManager.debug=true\n"
-						 );
+						 "GRManager.debug=true\n");
 	}
 	if(!getenv("QT_MESSAGE_PATTERN")) {
 		SetScopyQDebugMessagePattern();
