@@ -56,6 +56,7 @@ public:
 	void updateXAxis();
 	MenuWidget *menu() override;
 
+	void setEnableAddRemovePlot(bool);
 public Q_SLOTS:
 	void onStart() override;
 	void onStop() override {}

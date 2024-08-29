@@ -252,3 +252,8 @@ void ADCTimeInstrumentController::removeChannel(AcqTreeNode *node)
 	}
 	m_plotComponentManager->replot();
 }
+
+void ADCTimeInstrumentController::setEnableAddRemovePlot(bool b)
+{
+	m_timePlotSettingsComponent->setEnableAddRemovePlot(b);
+}

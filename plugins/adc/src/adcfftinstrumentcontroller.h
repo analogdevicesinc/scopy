@@ -24,6 +24,8 @@ public:
 	void createImportFloatChannel(AcqTreeNode *node);
 	bool getComplexChannelPair(AcqTreeNode *node, AcqTreeNode **node_i, AcqTreeNode **node_q);
 
+	virtual void setEnableAddRemovePlot(bool) override;
+
 private:
 	QList<AcqTreeNode *> m_complexChannels;
 	FFTPlotManagerSettings *m_fftPlotSettingsComponent;

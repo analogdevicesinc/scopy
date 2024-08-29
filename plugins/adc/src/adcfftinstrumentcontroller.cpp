@@ -335,6 +335,11 @@ bool ADCFFTInstrumentController::getComplexChannelPair(AcqTreeNode *node, AcqTre
 	return false;
 }
 
+void ADCFFTInstrumentController::setEnableAddRemovePlot(bool b)
+{
+	m_fftPlotSettingsComponent->setEnableAddRemovePlot(b);
+}
+
 void ADCFFTInstrumentController::addChannel(AcqTreeNode *node)
 {
 	qInfo() << node->name();
