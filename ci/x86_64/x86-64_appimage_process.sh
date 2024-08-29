@@ -5,16 +5,14 @@ set -ex
 USE_STAGING=OFF
 ##
 
-if [ "$CI_SCRIPT" == "ON" ]
-	then
-		SRC_DIR=/home/runner/scopy
-		SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-		git config --global --add safe.directory '*'
-		USE_STAGING=OFF
-	else
-		SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || echo "No source directory found"
-		SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || echo "No source directory found"
+SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+if [ "$CI_SCRIPT" == "ON" ]; then
+	USE_STAGING=OFF
+	SRC_DIR=$GITHUB_WORKSPACE
 fi
+
 
 export APPIMAGE=1
 
@@ -423,7 +421,7 @@ create_appimage(){
 }
 
 generate_ci_envs(){
-	$GITHUB_WORKSPACE/ci/general/gen_ci_envs.sh > $GITHUB_WORKSPACE/ci/x86_64/gh-actions.envs
+	$SRC_DIR/ci/general/gen_ci_envs.sh > $SRC_DIR/ci/x86_64/gh-actions.envs
 }
 
 move_appimage(){
