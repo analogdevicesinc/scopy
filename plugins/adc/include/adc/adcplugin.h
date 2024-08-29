@@ -56,6 +56,9 @@ public:
 	void newInstrument(ADCInstrumentType t, AcqTreeNode *root);
 	void deleteInstrument(ToolMenuEntry *w);
 
+public Q_SLOT:
+	void preferenceChanged(QString, QVariant t1);
+
 private:
 	iio_context *m_ctx;
 	QLineEdit *edit;
