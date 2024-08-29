@@ -51,6 +51,8 @@ public:
 	bool complexMode() const;
 	void setComplexMode(bool newComplexMode);
 
+	void setEnableAddRemovePlot(bool b);
+
 public Q_SLOTS:
 	void onStart() override;
 	void onStop() override {}
