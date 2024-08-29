@@ -22,6 +22,7 @@
 #include <QGridLayout>
 #include <QIcon>
 #include <QPen>
+#include <QCheckBox>
 
 #include <iio.h>
 #include <iioutil/connectionprovider.h>
@@ -56,8 +57,10 @@ public Q_SLOTS:
 	void start();
 	void restart();
 	void timerTask();
+	void canCalibrate(bool);
 Q_SIGNALS:
 	void runningChanged(bool);
+	void canCalibrateChanged(bool);
 private:
 	ADMTController *m_admtController;
 	iio_context *m_ctx;
@@ -69,7 +72,7 @@ private:
 
 	double rotation, angle, count, temp, amax, rotate_vmax, dmax, disable, target_pos, current_pos, ramp_mode;
 
-	QPushButton *openLastMenuButton, *calibrationStartMotorButton, *applyCalibrationDataButton;
+	QPushButton *openLastMenuButton, *calibrationStartMotorButton, *applyCalibrationDataButton, *calibrateDataButton, *extractDataButton;
 	QButtonGroup *rightMenuButtonGroup;
 
 	QLineEdit 	*graphUpdateIntervalLineEdit, *dataSampleSizeLineEdit,
@@ -92,7 +95,7 @@ private:
 			*calibrationH8MagLabel,
 			*calibrationH8PhaseLabel;
 
-	Sismograph *dataGraph, *tempGraph, *calibrationRawDataPlotWidget;
+	Sismograph *dataGraph, *tempGraph, *calibrationRawDataSismograph;
 
 	MenuHeaderWidget *header;
 
@@ -106,9 +109,13 @@ private:
 
 	QPlainTextEdit *logsPlainTextEdit;
 
-	PlotWidget *calibrationFFTDataPlotWidget;
-	PlotAxis *calibrationFFTXPlotAxis, *calibrationFFTYPlotAxis;
-	PlotChannel *calibrationFFTPlotChannel, *calibrationFFTPhasePlotChannel;
+	QCheckBox *autoCalibrateCheckBox;
+
+	PlotWidget *calibrationFFTDataPlotWidget, *calibrationRawDataPlotWidget;
+	PlotAxis *calibrationFFTXPlotAxis, *calibrationFFTYPlotAxis, *calibrationRawDataXPlotAxis, *calibrationRawDataYPlotAxis;
+	PlotChannel *calibrationFFTPlotChannel, *calibrationFFTPhasePlotChannel, *calibrationRawDataPlotChannel;
+
+	HorizontalSpinBox *motorMaxVelocitySpinBox, *motorAccelTimeSpinBox, *motorMaxDisplacementSpinBox, *motorTargetPositionSpinBox;
 
 	void updateChannelValues();
 	void updateLineEditValues();
@@ -125,7 +132,6 @@ private:
 	void updateChannelValue(int channelIndex);
 	void calibrationTask();
 	void addAngleToRawDataList();
-	void removeLastItemFromRawDataList();
 	void calibrateData();
 	void registerCalibrationData();
 	void extractCalibrationData();
@@ -151,6 +157,8 @@ private:
 	void updateCalculatedCoeff();
 	void resetCalculatedCoeff();
 	void connectMenuComboToNumber(MenuCombo* menuCombo, double& variable);
+	void appendSamplesToPlotCurve(PlotWidget *plotWidget, QVector<double>& newYData);
+	void applyTabWidgetStyle(QTabWidget *widget, const QString& styleHelperColor = "ScopyBlue");
 
 	QTimer *timer, *calibrationTimer, *motorCalibrationAcquisitionTimer;
 
