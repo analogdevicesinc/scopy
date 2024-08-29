@@ -318,10 +318,10 @@ bool ADCFFTInstrumentController::getComplexChannelPair(AcqTreeNode *node, AcqTre
 	m_complexChannels.append(node);
 	auto cnt = m_complexChannels.count();
 	if(cnt % 2 == 0) {
-		if(node->name().endsWith("q",Qt::CaseInsensitive)) {
+		if(node->name().endsWith("q", Qt::CaseInsensitive)) {
 			*node_i = m_complexChannels[cnt - 2];
 			*node_q = m_complexChannels[cnt - 1];
-		} else if(node->name().endsWith("i",Qt::CaseInsensitive)){
+		} else if(node->name().endsWith("i", Qt::CaseInsensitive)) {
 			*node_i = m_complexChannels[cnt - 1];
 			*node_q = m_complexChannels[cnt - 2];
 		} else {

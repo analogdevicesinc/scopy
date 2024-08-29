@@ -41,7 +41,8 @@ QWidget *FFTPlotManagerSettings::createMenu(QWidget *parent)
 	StyleHelper::BlueButton(m_addPlotBtn, "AddPlotButton");
 
 	connect(m_addPlotBtn, &QPushButton::clicked, this, [=]() {
-		uint32_t idx = m_plotManager->addPlot("Frequency Plot " + QString::number(m_plotManager->plots().count()));
+		uint32_t idx =
+			m_plotManager->addPlot("Frequency Plot " + QString::number(m_plotManager->plots().count()));
 		FFTPlotComponent *plt = m_plotManager->plot(idx);
 		addPlot(plt);
 	});
@@ -85,7 +86,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 		new MenuSectionCollapseWidget("X-AXIS", MenuCollapseSection::MHCW_NONE, parent);
 
 	m_bufferSizeSpin = new MenuSpinbox("Buffer Size", 16, "samples", 0, 4000000, true, false, section);
-	m_bufferSizeSpin->setScaleRange(1,1e6);
+	m_bufferSizeSpin->setScaleRange(1, 1e6);
 	connect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, this, [=](double val) { setBufferSize((uint32_t)val); });
 
 	QWidget *xMinMax = new QWidget(section);
@@ -202,7 +203,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 void FFTPlotManagerSettings::onInit()
 {
-	m_bufferSizeSpin->setValue(400);
+	m_bufferSizeSpin->setValue(4096);
 	m_sampleRateSpin->setValue(1);
 	m_xmin->setValue(0);
 	m_xmax->setValue(400);
@@ -388,9 +389,7 @@ void FFTPlotManagerSettings::setComplexMode(bool newComplexMode)
 	updateXAxis();
 }
 
-void FFTPlotManagerSettings::setEnableAddRemovePlot(bool b) {
-	m_addPlotBtn->setVisible(b);
-}
+void FFTPlotManagerSettings::setEnableAddRemovePlot(bool b) { m_addPlotBtn->setVisible(b); }
 
 } // namespace adc
 } // namespace scopy
