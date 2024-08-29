@@ -17,7 +17,6 @@ using namespace scopy::gui;
 
 FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	: PlotComponent(name, uuid, parent)
-// , m_plotMenu(nullptr)
 {
 	m_fftPlot = new PlotWidget(this);
 
@@ -29,8 +28,15 @@ FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	m_plots.append(m_fftPlot);
 	m_plotLayout->addWidget(m_fftPlot);
 
-	m_fftInfo = new FFTSamplingInfo();
+	auto nameLbl = m_fftPlot->getPlotInfo()->addLabelInfo(IP_LEFT, IP_TOP);
+	nameLbl->setText(m_name);
+	connect(this, &PlotComponent::nameChanged, nameLbl, &QLabel::setText);
+
+	m_fftInfo = new FFTSamplingInfo(m_fftPlot);
 	m_fftPlot->getPlotInfo()->addCustomInfo(m_fftInfo, IP_RIGHT);
+
+	auto m_timeStampInfo = new TimestampInfo(m_fftPlot, m_fftPlot);
+	m_fftPlot->getPlotInfo()->addCustomInfo(m_timeStampInfo, IP_RIGHT);
 
 	m_plotMenu = new FFTPlotComponentSettings(this, parent);
 	addComponent(m_plotMenu);

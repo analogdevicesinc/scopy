@@ -11,7 +11,9 @@ namespace scopy {
 enum InfoPosition
 {
 	IP_LEFT,
-	IP_RIGHT
+	IP_RIGHT,
+	IP_TOP,
+	IP_BOTTOM
 };
 
 class SCOPY_GUI_EXPORT PlotInfo : public QWidget
@@ -21,8 +23,8 @@ public:
 	PlotInfo(QWidget *parent = nullptr);
 	virtual ~PlotInfo();
 
-	void addCustomInfo(QWidget *info, InfoPosition pos);
-	QLabel *addLabelInfo(InfoPosition pos);
+	void addCustomInfo(QWidget *info, InfoPosition hpos = IP_LEFT, InfoPosition vpos = IP_BOTTOM);
+	QLabel *addLabelInfo(InfoPosition hpos = IP_LEFT, InfoPosition vpos = IP_BOTTOM);
 
 	void removeInfo(uint index, InfoPosition pos);
 	QWidget *getInfo(uint index, InfoPosition pos);

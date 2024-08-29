@@ -36,7 +36,7 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 	m_plots.append(m_timePlot);
 	m_plots.append(m_xyPlot);
 
-	auto nameLbl = m_timePlot->getPlotInfo()->addLabelInfo(IP_RIGHT);
+	auto nameLbl = m_timePlot->getPlotInfo()->addLabelInfo(IP_LEFT, IP_TOP);
 	nameLbl->setText(m_name);
 	connect(this, &PlotComponent::nameChanged, nameLbl, &QLabel::setText);
 

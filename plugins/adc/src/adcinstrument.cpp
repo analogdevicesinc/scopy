@@ -167,6 +167,7 @@ void ADCInstrument::switchToChannelMenu(QString id, bool force)
 	rightStack->show(id);
 }
 
+
 void ADCInstrument::addChannel(MenuControlButton *btn, ChannelComponent *ch, CompositeWidget *c)
 {
 	c->add(btn);
