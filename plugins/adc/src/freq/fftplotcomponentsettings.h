@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <toolcomponent.h>
 #include "menuspinbox.h"
+#include "plotautoscaler.h"
 #include "scopy-adc_export.h"
 #include "channelcomponent.h"
 #include <gui/widgets/menuplotaxisrangecontrol.h>
@@ -20,6 +21,8 @@ public:
 	~FFTPlotComponentSettings();
 
 	void showDeleteButtons(bool b);
+	void onStart() override;
+	void onStop() override;
 
 public Q_SLOTS:
 	void addChannel(ChannelComponent *c);
@@ -34,6 +37,7 @@ private:
 	MenuPlotAxisRangeControl *m_yCtrl;
 	MenuPlotChannelCurveStyleControl *m_curve;
 	MenuSpinbox *m_yPwrOffset;
+	PlotAutoscaler *m_autoscaler;
 
 	MenuCombo *m_windowCb;
 	MenuOnOffSwitch *m_windowChkb;
