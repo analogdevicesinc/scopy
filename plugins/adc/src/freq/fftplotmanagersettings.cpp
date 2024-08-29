@@ -388,5 +388,9 @@ void FFTPlotManagerSettings::setComplexMode(bool newComplexMode)
 	updateXAxis();
 }
 
+void FFTPlotManagerSettings::setEnableAddRemovePlot(bool b) {
+	m_addPlotBtn->setVisible(false);
+}
+
 } // namespace adc
 } // namespace scopy

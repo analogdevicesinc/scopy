@@ -18,6 +18,7 @@ public:
 	void createIIODevice(AcqTreeNode *node);
 	void createIIOFloatChannel(AcqTreeNode *node);
 	void createImportFloatChannel(AcqTreeNode *node);
+	void setEnableAddRemovePlot(bool b) override;
 
 private:
 	TimePlotManagerSettings *m_timePlotSettingsComponent;

@@ -1,6 +1,5 @@
 #include "adcplugin.h"
 
-#include "gui/stylehelper.h"
 #include "src/adcinstrument.h"
 
 #include <QBoxLayout>
@@ -61,6 +60,8 @@ void ADCPlugin::initPreferences()
 	p->init("adc_plot_ycursor_position", HandlePos::WEST);
 	p->init("adc_plot_show_buffer_previewer", true);
 	p->init("adc_default_y_mode", 0);
+	p->init("adc_add_remove_plot", false);
+	p->init("adc_add_remove_instrument", false);
 }
 
 bool ADCPlugin::loadPreferencesPage()
@@ -98,6 +99,12 @@ bool ADCPlugin::loadPreferencesPage()
 	auto adc_default_y_mode = PreferencesHelper::addPreferenceComboList(
 		p, "adc_default_y_mode", "ADC Default Y-Mode", {{"ADC Count", 0}, {"% Full Scale", 1}}, generalSection);
 
+	auto adc_add_remove_plot = PreferencesHelper::addPreferenceCheckBox(
+		p, "adc_add_remove_plot", "Add/Remove plot feature (EXPERIMENTAL)", m_preferencesPage);
+	auto adc_add_remove_instrument = PreferencesHelper::addPreferenceCheckBox(
+		p, "adc_add_remove_instrument", "Add/Remove instrument feature (EXPERIMENTAL)", m_preferencesPage);
+
+
 	generalSection->contentLayout()->addWidget(adc_plot_xaxis_label_position);
 	generalSection->contentLayout()->addWidget(adc_plot_yaxis_label_position);
 	generalSection->contentLayout()->addWidget(adc_plot_yaxis_handle_position);
@@ -105,7 +112,8 @@ bool ADCPlugin::loadPreferencesPage()
 	generalSection->contentLayout()->addWidget(adc_plot_ycursor_position);
 	generalSection->contentLayout()->addWidget(adc_plot_show_buffer_previewer);
 	generalSection->contentLayout()->addWidget(adc_default_y_mode);
-	//	connect(p, &Preferences::preferenceChanged, )
+	generalSection->contentLayout()->addWidget(adc_add_remove_plot);
+	generalSection->contentLayout()->addWidget(adc_add_remove_instrument);
 
 	return true;
 }
@@ -186,6 +194,8 @@ void ADCPlugin::createGRIIOTreeNode(GRTopBlockNode *ctxNode, iio_context *ctx)
 
 bool ADCPlugin::onConnect()
 {
+	Preferences *p = Preferences::GetInstance();
+	connect(p, &Preferences::preferenceChanged, this, &ADCPlugin::preferenceChanged);
 	for(auto &tool : m_toolList) {
 		deleteInstrument(tool);
 	}
@@ -225,6 +235,7 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root)
 
 		adc = new ADCTimeInstrumentController(tme, "adc" + QString::number(idx), root, this);
 		adc->init();
+
 		ui = adc->ui();
 		idx++;
 
@@ -285,11 +296,13 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root)
 	auto tme = m_toolList.last();
 	Q_EMIT toolListChanged();
 	tme->setTool(ui);
+
+	adc->setEnableAddRemovePlot(Preferences::get("adc_add_remove_plot").toBool());
+	adc->setEnableAddRemoveInstrument(Preferences::get("adc_add_remove_instrument").toBool());
 }
 
 void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
 {
-
 	tool->setEnabled(false);
 	tool->setRunning(false);
 	tool->setRunBtnVisible(false);
@@ -311,8 +324,23 @@ void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
 	Q_EMIT toolListChanged();
 }
 
+void ADCPlugin::preferenceChanged(QString s, QVariant t1) {
+	if(s == "adc_add_remove_plot") {
+		for(ADCInstrumentController *ctrl : m_ctrls) {
+			ctrl->setEnableAddRemovePlot(t1.toBool());
+		}
+	}
+	if(s == "adc_add_remove_instrument") {
+		for(ADCInstrumentController *ctrl : m_ctrls) {
+			ctrl->setEnableAddRemoveInstrument(t1.toBool());
+		}
+	}
+}
+
 bool ADCPlugin::onDisconnect()
 {
+	Preferences *p = Preferences::GetInstance();
+	disconnect(p, &Preferences::preferenceChanged, this, &ADCPlugin::preferenceChanged);
 	qDebug(CAT_ADCPLUGIN) << "disconnect";
 	if(m_ctx)
 		ConnectionProvider::GetInstance()->close(m_param);
