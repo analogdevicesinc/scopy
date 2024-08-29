@@ -26,6 +26,9 @@ public:
 
 	ChannelIdProvider *getChannelIdProvider();
 
+	virtual void setEnableAddRemovePlot(bool);
+	virtual void setEnableAddRemoveInstrument(bool);
+
 public:
 	ADCInstrument *ui() const;
 
