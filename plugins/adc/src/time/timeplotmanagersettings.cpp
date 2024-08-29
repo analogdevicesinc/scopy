@@ -424,5 +424,9 @@ void TimePlotManagerSettings::updateXModeCombo()
 	}
 }
 
+void TimePlotManagerSettings::setEnableAddRemovePlot(bool b) {
+	m_addPlotBtn->setVisible(false);
+}
+
 } // namespace adc
 } // namespace scopy
