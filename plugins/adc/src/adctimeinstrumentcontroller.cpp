@@ -43,7 +43,7 @@ void ADCTimeInstrumentController::init()
 	addComponent(m_timePlotSettingsComponent);
 
 	uint32_t tmp;
-	tmp = m_plotComponentManager->addPlot("Plot");
+	tmp = m_plotComponentManager->addPlot("Time Plot");
 	m_timePlotSettingsComponent->addPlot(m_timePlotComponentManager->plot(tmp));
 
 	// m_cursorComponent = new CursorComponent(m_plotComponentManager, m_tool->getToolTemplate(), this);
