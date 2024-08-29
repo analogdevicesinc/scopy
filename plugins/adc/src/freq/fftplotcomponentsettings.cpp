@@ -51,11 +51,23 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_yCtrl->minSpinbox()->setUnit("dB");
 	m_yCtrl->maxSpinbox()->setUnit("dB");
 
+	MenuOnOffSwitch *m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), plotMenu, false);
+	m_autoscaler = new PlotAutoscaler(this);
+
+	connect(m_autoscaler, &PlotAutoscaler::newMin, this, [=](double v) {m_yCtrl->setMin(v - 10);});
+	// connect(m_autoscaler, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
+
+	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
+		m_yCtrl->setEnabled(!b);
+		m_autoscaleEnabled = b;
+		toggleAutoScale();
+	});
+
 	m_plotComponent->fftPlot()->yAxis()->setUnits("dB");
 	m_plotComponent->fftPlot()->yAxis()->setUnitsVisible(true);
 	m_plotComponent->fftPlot()->yAxis()->getFormatter()->setTwoDecimalMode(false);
 
-	m_yPwrOffset = new MenuSpinbox("Power Offset", 0, "dB", -200, 200, true, false, yaxis);
+	m_yPwrOffset = new MenuSpinbox("Power Offset", 0, "dB", -300, 300, true, false, yaxis);
 	m_yPwrOffset->setScaleRange(1, 1);
 	m_yPwrOffset->setIncrementMode(MenuSpinbox::IS_FIXED);
 
@@ -96,6 +108,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	StyleHelper::BlueButton(m_deletePlot);
 	connect(m_deletePlot, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
 
+	yaxis->contentLayout()->addWidget(m_autoscaleBtn);
 	yaxis->contentLayout()->addWidget(m_yCtrl);
 	yaxis->contentLayout()->addWidget(m_yPwrOffset);
 	yaxis->contentLayout()->addWidget(m_windowCb);
@@ -116,6 +129,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 
 	m_yCtrl->setVisible(true);
 
+	m_autoscaleBtn->onOffswitch()->setChecked(false);
 	m_yCtrl->setMin(-140);
 	m_yCtrl->setMax(20);
 	labelsSwitch->onOffswitch()->setChecked(true);
@@ -147,6 +161,15 @@ void FFTPlotComponentSettings::showDeleteButtons(bool b)
 
 FFTPlotComponentSettings::~FFTPlotComponentSettings() {}
 
+void FFTPlotComponentSettings::toggleAutoScale()
+{
+	if(m_running && m_autoscaleEnabled) {
+		m_autoscaler->start();
+	} else {
+		m_autoscaler->stop();
+	}
+}
+
 void FFTPlotComponentSettings::addChannel(ChannelComponent *c)
 {
 	// https://stackoverflow.com/questions/44501171/qvariant-with-custom-class-pointer-does-not-return-same-address
@@ -154,6 +177,7 @@ void FFTPlotComponentSettings::addChannel(ChannelComponent *c)
 	auto fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt());
 	m_curve->addChannels(fftPlotComponentChannel->plotChannel());
 
+	m_autoscaler->addChannels(fftPlotComponentChannel->m_fftPlotCh);
 	if(dynamic_cast<FFTChannel *>(c)) {
 		FFTChannel *fc = dynamic_cast<FFTChannel *>(c);
 		connections[c] << connect(m_yPwrOffset, &MenuSpinbox::valueChanged, c,
@@ -171,8 +195,24 @@ void FFTPlotComponentSettings::removeChannel(ChannelComponent *c)
 	auto fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt());
 	m_curve->removeChannels(fftPlotComponentChannel->plotChannel());
 
+	m_autoscaler->addChannels(fftPlotComponentChannel->m_fftPlotCh);
+
 	for(const QMetaObject::Connection &c : qAsConst(connections[c])) {
 		QObject::disconnect(c);
 	}
 	connections.remove(c);
 }
+
+
+void FFTPlotComponentSettings::onStart()
+{
+	m_running = true;
+	toggleAutoScale();
+}
+
+void FFTPlotComponentSettings::onStop()
+{
+	m_running = false;
+	toggleAutoScale();
+}
+
