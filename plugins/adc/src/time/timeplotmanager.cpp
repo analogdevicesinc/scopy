@@ -99,10 +99,6 @@ void TimePlotManager::syncNavigatorAndCursors(PlotComponent *p)
 	if(p == m_primary)
 		return;
 
-	if(m_plotpreviewer == nullptr) {
-		m_plotpreviewer = new PlotBufferPreviewer(m_primary->plot(0), m_bufferpreviewer, m_primary->plot(0));
-	}
-
 	auto plt = dynamic_cast<TimePlotComponent *>(p);
 	QSet<QwtAxisId> set;
 	set.insert(m_primary->plot(0)->xAxis()->axisId());
