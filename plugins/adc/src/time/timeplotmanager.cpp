@@ -110,6 +110,7 @@ void TimePlotManager::syncNavigatorAndCursors(PlotComponent *p)
 	set.insert(p->plot(0)->xAxis()->axisId());
 	// set.insert(p->plot(0)->yAxis()->axisId());
 	PlotNavigator::syncPlotNavigators(m_primary->plot(0)->navigator(), p->plot(0)->navigator(), &set);
+	CursorController::syncXCursorControllers(m_primary->cursor(), p->cursor());
 }
 
 void TimePlotManager::syncAllPlotNavigatorsAndCursors()

@@ -12,7 +12,7 @@ class SCOPY_GUI_EXPORT PlotCursors : public QObject
 {
 	Q_OBJECT
 public:
-	PlotCursors(PlotWidget *plot);
+	PlotCursors(PlotWidget *plot, QObject *parent = nullptr);
 	~PlotCursors();
 
 	void displayIntersection();
