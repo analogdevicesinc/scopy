@@ -10,6 +10,7 @@ CursorSettings::CursorSettings(QWidget *parent)
 {
 	initUI();
 	connectSignals();
+	initSession();
 }
 
 CursorSettings::~CursorSettings() {}
@@ -95,6 +96,17 @@ void CursorSettings::initSession()
 	getYEn()->setChecked(false);
 	getYLock()->setChecked(false);
 	getReadoutsDrag()->setChecked(false);
+}
+
+void CursorSettings::updateSession()
+{
+	Q_EMIT getXEn()->toggled(getXEn()->isChecked());
+	Q_EMIT getXLock()->toggled(getXLock()->isChecked());
+	Q_EMIT getXTrack()->toggled(getXTrack()->isChecked());
+	Q_EMIT getYEn()->toggled(getYEn()->isChecked());
+	Q_EMIT getYLock()->toggled(getYLock()->isChecked());
+	Q_EMIT getReadoutsDrag()->toggled(getReadoutsDrag()->isChecked());
+	Q_EMIT sessionUpdated();
 }
 
 #include "moc_cursorsettings.cpp"

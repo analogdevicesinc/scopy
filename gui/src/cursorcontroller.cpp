@@ -12,6 +12,7 @@ CursorController::CursorController(PlotWidget *plot, QObject *parent)
 	, yEn(true)
 	, yLock(false)
 	, readoutDragsEn(false)
+	, m_visible(false)
 {
 	initUI();
 
@@ -27,7 +28,7 @@ CursorController::~CursorController() {}
 
 void CursorController::initUI()
 {
-	plotCursors = new PlotCursors(m_plot);
+	plotCursors = new PlotCursors(m_plot, this);
 	plotCursors->setVisible(false);
 
 	plotCursorReadouts = new PlotCursorReadouts(m_plot);
@@ -60,12 +61,9 @@ void CursorController::connectSignals(CursorSettings *cursorSettings)
 	connect(cursorSettings->getReadoutsDrag(), &QAbstractButton::toggled, this,
 		&CursorController::readoutsDragToggled);
 
-	cursorSettings->initSession();
-
-	getPlotCursors()->getX1Cursor()->setPosition(0);
-	getPlotCursors()->getX2Cursor()->setPosition(0);
-	getPlotCursors()->getY1Cursor()->setPosition(0);
-	getPlotCursors()->getY2Cursor()->setPosition(0);
+	//  update session in case the settings are conncted to multiple controllers
+	connect(cursorSettings, &CursorSettings::sessionUpdated, this, [=]() { setVisible(isVisible()); });
+	cursorSettings->updateSession();
 
 	// cursor movement
 	connect(y1Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
@@ -178,10 +176,57 @@ void CursorController::updateTracking()
 	}
 }
 
+void CursorController::syncXCursorControllers(CursorController *ctrl1, CursorController *ctrl2)
+{
+	ctrl2->setVisible(ctrl1->isVisible());
+	ctrl2->x1Cursor->setPosition(ctrl1->x1Cursor->getPosition());
+	ctrl2->x2Cursor->setPosition(ctrl1->x2Cursor->getPosition());
+
+	// connect ctrl1 to ctrl2
+	connect(ctrl1->x1Cursor, &PlotAxisHandle::scalePosChanged, ctrl2->x1Cursor, [=](double pos) {
+		ctrl1->x1Cursor->blockSignals(true);
+		ctrl2->x1Cursor->setPosition(pos);
+		ctrl1->x1Cursor->blockSignals(false);
+		ctrl2->m_plot->repaint();
+	});
+	connect(ctrl1->x2Cursor, &PlotAxisHandle::scalePosChanged, ctrl2->x2Cursor, [=](double pos) {
+		ctrl1->x2Cursor->blockSignals(true);
+		ctrl2->x2Cursor->setPosition(pos);
+		ctrl1->x2Cursor->blockSignals(false);
+		ctrl2->m_plot->repaint();
+	});
+
+	// connect ctrl2 to ctrl1
+	connect(ctrl2->x1Cursor, &PlotAxisHandle::scalePosChanged, ctrl1->x1Cursor, [=](double pos) {
+		ctrl2->x1Cursor->blockSignals(true);
+		ctrl1->x1Cursor->setPosition(pos);
+		ctrl2->x1Cursor->blockSignals(false);
+		ctrl1->m_plot->repaint();
+	});
+	connect(ctrl2->x2Cursor, &PlotAxisHandle::scalePosChanged, ctrl1->x2Cursor, [=](double pos) {
+		ctrl2->x2Cursor->blockSignals(true);
+		ctrl1->x2Cursor->setPosition(pos);
+		ctrl2->x2Cursor->blockSignals(false);
+		ctrl1->m_plot->repaint();
+	});
+}
+
+void CursorController::unsyncXCursorControllers(CursorController *ctrl1, CursorController *ctrl2)
+{
+	disconnect(ctrl1->x1Cursor, &PlotAxisHandle::scalePosChanged, ctrl2->x1Cursor, nullptr);
+	disconnect(ctrl1->x2Cursor, &PlotAxisHandle::scalePosChanged, ctrl2->x2Cursor, nullptr);
+	disconnect(ctrl2->x1Cursor, &PlotAxisHandle::scalePosChanged, ctrl1->x1Cursor, nullptr);
+	disconnect(ctrl2->x2Cursor, &PlotAxisHandle::scalePosChanged, ctrl1->x2Cursor, nullptr);
+}
+
+bool CursorController::isVisible() { return m_visible; }
+
 void CursorController::setVisible(bool visible)
 {
+	m_visible = visible;
 	readoutsSetVisible(visible);
 	cursorsSetVisible(visible);
+	Q_EMIT visibilityChanged(visible);
 }
 
 void CursorController::readoutsSetVisible(bool visible) { hoverReadouts->setVisible(visible && (xEn || yEn)); }
