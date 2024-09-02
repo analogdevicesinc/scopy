@@ -6,6 +6,7 @@
 #include <QwtPlotScaleItem>
 #include <QwtScaleDiv>
 #include <qwt_scale_widget.h>
+#include <stylehelper.h>
 
 #include <pluginbase/preferences.h>
 
@@ -14,7 +15,7 @@ using namespace scopy;
 PlotScales::PlotScales(PlotWidget *plot)
 	: QObject(plot)
 	, m_plot(plot)
-	, m_color(QColor(0x6E6E6F))
+	, m_color(StyleHelper::GetInstance()->getColor("UIElementHighlight"))
 {
 	initGrid();
 	initGraticule();
