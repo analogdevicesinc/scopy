@@ -3,11 +3,9 @@
 #include "stylehelper.h"
 
 #include <QDebug>
-#include <QLoggingCategory>
 
 #include <stylehelper.h>
 using namespace scopy;
-Q_LOGGING_CATEGORY(CAT_HOVERWIDGET, "HoverWidget")
 
 HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
 	: QWidget(parent)
@@ -302,9 +300,9 @@ void HoverWidget::moveToAnchor()
 		break;
 	}
 
-	qDebug(CAT_HOVERWIDGET) << "moveAnchor"
-				<< "mapped" << mappedPoint << "contentPosition" << contentPosition << "anchorPosition"
-				<< anchorPosition << "offset" << m_anchorOffset;
+	qDebug() << "moveAnchor"
+		 << "mapped" << mappedPoint << "contentPosition" << contentPosition << "anchorPosition"
+		 << anchorPosition << "offset" << m_anchorOffset;
 	move(mappedPoint + contentPosition + anchorPosition + m_anchorOffset);
 }
 
