@@ -242,6 +242,7 @@ void MonitorPlot::generateBufferPreviewer()
 
 	AnalogBufferPreviewer *bufferPreviewer = new AnalogBufferPreviewer(this);
 	m_bufferPreviewer = new PlotBufferPreviewer(m_plot, bufferPreviewer, this);
+	m_bufferPreviewer->setManualDataLimits(true);
 
 	connect(m_plot->navigator(), &PlotNavigator::rectChanged, this, [=, this]() {
 		double time = QwtDate::toDouble(QDateTime::currentDateTime());

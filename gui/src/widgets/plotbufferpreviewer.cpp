@@ -1,11 +1,13 @@
 #include "plotbufferpreviewer.h"
 #include "plotaxis.h"
 #include <cmath>
+#include <plotnavigator.hpp>
 
 using namespace scopy;
 
 PlotBufferPreviewer::PlotBufferPreviewer(PlotWidget *p, BufferPreviewer *b, QWidget *parent)
 	: QWidget{parent}
+	, m_manualDataLimits(false)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	QVBoxLayout *layout = new QVBoxLayout(this);
@@ -20,6 +22,8 @@ PlotBufferPreviewer::PlotBufferPreviewer(PlotWidget *p, BufferPreviewer *b, QWid
 }
 
 PlotBufferPreviewer::~PlotBufferPreviewer() {}
+
+void PlotBufferPreviewer::setManualDataLimits(bool enabled) { m_manualDataLimits = enabled; }
 
 void PlotBufferPreviewer::setupBufferPreviewer()
 {
@@ -63,21 +67,17 @@ void PlotBufferPreviewer::setupBufferPreviewer()
 
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, this, [=]() {
 		if(m_plot->xAxis()->min() > m_plot->xAxis()->max()) {
-			m_plot->xAxis()->setInterval(m_bufferDataLimitMax, m_bufferDataLimitMin);
+			m_plot->plot()->setAxisScale(m_plot->xAxis()->axisId(), m_bufferDataLimitMax,
+						     m_bufferDataLimitMin);
 		} else {
-			m_plot->xAxis()->setInterval(m_bufferDataLimitMin, m_bufferDataLimitMax);
+			m_plot->plot()->setAxisScale(m_plot->xAxis()->axisId(), m_bufferDataLimitMin,
+						     m_bufferDataLimitMax);
 		}
 		m_plot->xAxis()->updateAxisScale();
-		updateDataLimits();
+		updateBufferPreviewer();
 	});
-}
 
-void PlotBufferPreviewer::updateDataLimits()
-{
-	PlotAxis *xAxis = (m_plot->selectedChannel()) ? m_plot->selectedChannel()->xAxis() : m_plot->xAxis();
-	m_bufferDataLimitMin = xAxis->min();
-	m_bufferDataLimitMax = xAxis->max();
-	updateBufferPreviewer();
+	connect(m_plot->navigator(), &PlotNavigator::rectChanged, this, [=]() { updateBufferPreviewer(); });
 }
 
 void PlotBufferPreviewer::updateDataLimits(double min, double max)
@@ -89,12 +89,18 @@ void PlotBufferPreviewer::updateDataLimits(double min, double max)
 
 void PlotBufferPreviewer::updateBufferPreviewer()
 {
+	PlotAxis *xAxis = (m_plot->selectedChannel()) ? m_plot->selectedChannel()->xAxis() : m_plot->xAxis();
+
 	// Time interval within the plot canvas
-	double left = m_plot->xAxis()->visibleMin();
-	double right = m_plot->xAxis()->visibleMax();
+	double left = xAxis->visibleMin();
+	double right = xAxis->visibleMax();
 	QwtInterval plotInterval(std::min(left, right), std::max(left, right));
 
 	// Time interval that represents the captured data
+	if(!m_manualDataLimits) {
+		m_bufferDataLimitMin = xAxis->min();
+		m_bufferDataLimitMax = xAxis->max();
+	}
 	QwtInterval dataInterval(std::min(m_bufferDataLimitMin, m_bufferDataLimitMax),
 				 std::fmax(m_bufferDataLimitMin, m_bufferDataLimitMax));
 
