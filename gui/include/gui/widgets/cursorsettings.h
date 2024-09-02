@@ -25,6 +25,12 @@ public:
 	QAbstractButton *getYLock();
 	QAbstractButton *getReadoutsDrag();
 
+	void updateSession();
+
+Q_SIGNALS:
+	void sessionUpdated();
+
+protected:
 	void initSession();
 
 private:
