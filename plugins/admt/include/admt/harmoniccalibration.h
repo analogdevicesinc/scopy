@@ -39,6 +39,7 @@
 #include <filemanager.h>
 #include <customSwitch.h>
 #include <widgets/horizontalspinbox.h>
+#include <widgets/registerblockwidget.h>
 #include <pluginbase/statusbarmanager.h>
 
 namespace scopy::admt {
@@ -127,6 +128,7 @@ private:
 	void changeGraphColorByChannelName(Sismograph* graph, const char* channelName);
 	void connectMenuComboToGraphChannel(MenuCombo* menuCombo, Sismograph* graph);
 	ToolTemplate* createCalibrationWidget();
+	ToolTemplate* createRegistersWidget();
 	void updateLabelValue(QLabel* label, int channelIndex);
 	void updateLabelValue(QLabel *label, ADMTController::MotorAttribute attribute);
 	void updateChannelValue(int channelIndex);
