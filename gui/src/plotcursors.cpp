@@ -3,8 +3,9 @@
 
 using namespace scopy;
 
-PlotCursors::PlotCursors(PlotWidget *plot)
-	: m_plot(plot)
+PlotCursors::PlotCursors(PlotWidget *plot, QObject *parent)
+	: QObject(parent)
+	, m_plot(plot)
 	, m_tracking(false)
 {
 	initUI();
@@ -19,6 +20,10 @@ void PlotCursors::initUI()
 	m_yCursors.second = new PlotAxisHandle(m_plot, m_plot->yAxis());
 	m_xCursors.first = new PlotAxisHandle(m_plot, m_plot->xAxis());
 	m_xCursors.second = new PlotAxisHandle(m_plot, m_plot->xAxis());
+	m_xCursors.first->setPosition(0);
+	m_xCursors.second->setPosition(0);
+	m_yCursors.first->setPosition(0);
+	m_yCursors.second->setPosition(0);
 
 	plotMarker1 = new QwtPlotMarker();
 	plotMarker2 = new QwtPlotMarker();
