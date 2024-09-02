@@ -1122,19 +1122,24 @@ void StyleHelper::HoverWidget(QWidget *w, bool draggable, QString objectName)
 	w->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	QString style;
 
-	if(draggable) {
-		style = QString(R"css(
-				.QWidget {
-					background-color: transparent;
+	style = QString(R"css(
+				QWidget {
+					background-color: &&Background&&;
 					border-radius: 4px;
 				}
 				QWidget:hover {
-					background-color: &&UIElementBackground&&;
+					background-color: &&HoverBackground&&;
 					border-radius: 4px;
 				}
 				)css");
+
+	if(draggable) {
+		style.replace("&&Background&&", StyleHelper::getColor("UIElementBackground"));
+		style.replace("&&HoverBackground&&", StyleHelper::getColor("UIElementHighlight"));
+	} else {
+		style.replace("&&Background&&", "transparent");
+		style.replace("&&HoverBackground&&", "transparent");
 	}
-	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
 	w->setStyleSheet(style);
 }
 
