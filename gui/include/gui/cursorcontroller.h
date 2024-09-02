@@ -18,6 +18,10 @@ public:
 	PlotCursors *getPlotCursors();
 	void connectSignals(CursorSettings *cursorSettings);
 
+	void static syncXCursorControllers(CursorController *ctrl1, CursorController *ctrl2);
+	void static unsyncXCursorControllers(CursorController *ctrl1, CursorController *ctrl2);
+	bool isVisible();
+
 public Q_SLOTS:
 	void setVisible(bool visible);
 	void readoutsSetVisible(bool visible);
@@ -31,6 +35,9 @@ public Q_SLOTS:
 	void onAddedChannel(PlotChannel *ch);
 	void onRemovedChannel(PlotChannel *ch);
 	void updateTracking();
+
+Q_SIGNALS:
+	void visibilityChanged(bool visible);
 
 private:
 	PlotWidget *m_plot;
@@ -47,10 +54,9 @@ private:
 	bool xEn, xLock, xTrack;
 	bool yEn, yLock;
 	bool readoutDragsEn;
+	bool m_visible;
 
 	void initUI();
-
-	// void initSession();
 };
 } // namespace scopy
 #endif // CURSORCONTROLLER_H
