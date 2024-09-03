@@ -22,6 +22,7 @@ class AddressPicker;
 
 class SCOPY_REGMAP_EXPORT RegisterController : public QWidget
 {
+	friend class RegMap_API;
 	Q_OBJECT
 public:
 	explicit RegisterController(QWidget *parent = nullptr);
