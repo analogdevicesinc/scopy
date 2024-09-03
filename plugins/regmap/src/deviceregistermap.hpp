@@ -24,6 +24,7 @@ class RegisterMapTable;
 
 class SCOPY_REGMAP_EXPORT DeviceRegisterMap : public QWidget
 {
+	friend class RegMap_API;
 	Q_OBJECT
 public:
 	explicit DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate = nullptr,
@@ -34,6 +35,7 @@ public:
 	void toggleAutoread(bool toggled);
 	void applyFilters(QString filter);
 	bool hasTemplate();
+	bool getAutoread();
 
 private:
 	ToolTemplate *tool;

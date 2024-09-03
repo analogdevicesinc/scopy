@@ -23,6 +23,7 @@ class SearchBarWidget;
 
 class SCOPY_REGMAP_EXPORT RegisterMapTool : public QWidget
 {
+	friend class RegMap_API;
 	Q_OBJECT
 public:
 	explicit RegisterMapTool(QWidget *parent = nullptr);
