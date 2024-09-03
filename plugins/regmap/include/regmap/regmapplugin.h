@@ -24,9 +24,11 @@ namespace regmap {
 
 class RegisterMapTool;
 class JsonFormatedElement;
+class RegMap_API;
 
 class SCOPY_REGMAP_EXPORT RegmapPlugin : public QObject, public PluginBase
 {
+	friend class RegMap_API;
 	Q_OBJECT
 	SCOPY_PLUGIN;
 
@@ -59,6 +61,8 @@ private:
 	struct iio_device *getIioDevice(iio_context *ctx, const char *dev_name);
 	bool isBufferCapable(iio_device *dev);
 	RegisterMapTool *registerMapTool;
+	void InitApi();
+	RegMap_API *api;
 };
 } // namespace regmap
 } // namespace scopy

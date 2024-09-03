@@ -13,6 +13,7 @@ class RecyclerView;
 
 class RegisterMapTable : public IRecyclerViewAdapter
 {
+	friend class RegMap_API;
 	Q_OBJECT
 public:
 	RegisterMapTable(QMap<uint32_t, RegisterModel *> *registerModels, QWidget *parent);
