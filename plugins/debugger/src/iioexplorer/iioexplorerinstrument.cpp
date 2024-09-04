@@ -53,12 +53,11 @@ void IIOExplorerInstrument::setupUi()
 	m_tabWidget->setCurrentIndex(0);
 	m_tabWidget->setTabPosition(QTabWidget::South);
 
-	auto *search_bar_container = new QWidget(this);
-	auto *bottom_container = new QWidget(this);
-	auto *tree_view_container = new QWidget(bottom_container);
-	auto *right_container = new QWidget(bottom_container);
-	auto *details_container = new QWidget(right_container);
-	auto *watch_list = new QWidget(right_container);
+	QWidget *bottom_container = new QWidget(this);
+	QWidget *tree_view_container = new QWidget(bottom_container);
+	QWidget *right_container = new QWidget(bottom_container);
+	QWidget *details_container = new QWidget(right_container);
+	QWidget *watch_list = new QWidget(right_container);
 	m_VSplitter = new QSplitter(Qt::Vertical, this);
 	m_HSplitter = new QSplitter(Qt::Horizontal, this);
 
@@ -74,8 +73,6 @@ void IIOExplorerInstrument::setupUi()
 	details_container->setLayout(new QVBoxLayout(details_container));
 	watch_list->setLayout(new QVBoxLayout(watch_list));
 	tree_view_container->setLayout(new QVBoxLayout(tree_view_container));
-	search_bar_container->setLayout(new QHBoxLayout(search_bar_container));
-	search_bar_container->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
 	m_proxyModel = new IIOSortFilterProxyModel(this);
 	m_treeView = new QTreeView(bottom_container);
@@ -98,7 +95,6 @@ void IIOExplorerInstrument::setupUi()
 	StyleHelper::BackgroundPage(details_container, "DetailsContainer");
 	StyleHelper::BackgroundPage(watch_list, "WatchListContainer");
 	StyleHelper::BackgroundPage(tree_view_container, "TreeViewContainer");
-	StyleHelper::BackgroundPage(search_bar_container, "SearchBarContainer");
 	StyleHelper::SplitterStyle(m_HSplitter, "HorizontalSplitter");
 	StyleHelper::SplitterStyle(m_VSplitter, "VerticalSplitter");
 	StyleHelper::TreeViewDebugger(m_treeView, "TreeView");
@@ -113,10 +109,9 @@ void IIOExplorerInstrument::setupUi()
 	m_detailsView->setIIOStandardItem(m_currentlySelectedItem);
 
 	details_container->layout()->addWidget(m_detailsView);
+	tree_view_container->layout()->addWidget(m_searchBar);
 	tree_view_container->layout()->addWidget(m_treeView);
-	search_bar_container->layout()->addWidget(m_searchBar);
 
-	m_mainWidget->layout()->addWidget(search_bar_container);
 	m_mainWidget->layout()->addWidget(bottom_container);
 	m_HSplitter->addWidget(tree_view_container);
 	m_HSplitter->addWidget(right_container);

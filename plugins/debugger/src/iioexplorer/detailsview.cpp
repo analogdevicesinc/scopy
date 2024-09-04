@@ -49,11 +49,15 @@ void DetailsView::setupUi()
 
 	m_tabWidget->addTab(m_guiView, "GUI View");
 	m_tabWidget->addTab(m_iioView, "IIO View");
-	m_tabWidget->tabBar()->setDocumentMode(true);
-	m_tabWidget->tabBar()->setExpanding(true);
+	QTabBar *tabBar = m_tabWidget->tabBar();
+	tabBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
 	StyleHelper::TabWidgetBarUnderline(m_tabWidget, "DetailsTabWidget");
-	StyleHelper::RefreshButton(m_readBtn, "RefreshCurrentSelectionButton");
+	m_readBtn->setProperty("blue_button", true);
+	m_readBtn->setIcon(QIcon(":/gui/icons/refresh.svg"));
+	m_readBtn->setIconSize(QSize(25, 25));
+	m_readBtn->setText("Refresh");
+	m_readBtn->setMinimumHeight(35);
 	m_addToWatchlistBtn->setStyleSheet("QPushButton { background-color: transparent; border: 0px; }");
 
 	m_titleContainer->layout()->addWidget(m_titleLabel);
