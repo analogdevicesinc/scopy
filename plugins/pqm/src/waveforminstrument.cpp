@@ -99,7 +99,7 @@ void WaveformInstrument::setupChannels(PlotWidget *plot, QMap<QString, QString> 
 {
 	int chnlIdx = 0;
 	for(const QString &chnlId : chnls) {
-		QPen chPen = QPen(QColor(StyleHelper::getColor("CH" + QString::number(chnlIdx))), 1);
+		QPen chPen = QPen(QColor(StyleHelper::getChannelColor(chnlIdx)), 1);
 		PlotChannel *plotCh = new PlotChannel(chnls.key(chnlId), chPen, plot->xAxis(), plot->yAxis(), this);
 		plot->addPlotChannel(plotCh);
 		plotCh->setEnabled(true);

@@ -31,14 +31,6 @@ StyleHelper::~StyleHelper() {}
 void StyleHelper::initColorMap()
 {
 	auto sh = StyleHelper::GetInstance();
-	sh->colorMap.insert("CH0", "#FF7200");
-	sh->colorMap.insert("CH1", "#9013FE");
-	sh->colorMap.insert("CH2", "#27B34F");
-	sh->colorMap.insert("CH3", "#F8E71C");
-	sh->colorMap.insert("CH4", "&&ScopyBlue&&");
-	sh->colorMap.insert("CH5", "#02BCD4");
-	sh->colorMap.insert("CH6", "#F44336");
-	sh->colorMap.insert("CH7", "#F5A623");
 	sh->colorMap.insert("ScopyBlue", Style::getAttribute(json::theme::interactive_primary_idle));
 	sh->colorMap.insert("SH_idle", Style::getAttribute(json::theme::interactive_subtle_idle));
 	sh->colorMap.insert("SH_disabled", Style::getAttribute(json::theme::interactive_subtle_disabled));
@@ -63,6 +55,21 @@ void StyleHelper::initColorMap()
 	sh->colorMap.insert("WarningText", "#FFC904");
 	sh->colorMap.insert("GrayText", Style::getAttribute(json::theme::interactive_subtle_idle));
 	sh->colorMap.insert("SH_focus", Style::getAttribute(json::theme::content_inverse));
+}
+
+QString StyleHelper::getChannelColor(int index)
+{
+	QColor color;
+	int colorCount = Style::getChannelColorList().length();
+
+	if(colorCount <= index) {
+		color = QColor(getChannelColor(index - colorCount));
+		color.setHsv(color.hue() + 30, color.saturation(), color.value());
+	} else {
+		color = QColor(Style::getChannelColor(index));
+	}
+
+	return color.name();
 }
 
 QString StyleHelper::getColor(QString id)
@@ -113,8 +120,7 @@ void StyleHelper::BlueGrayButton(QPushButton *btn, QString objectName)
 							border-style: outset;
 
 							background-color:&&ScopyBackground&&; /* design token - uiElement*/
-
-							color: white; /* design token - font */
+							color: &&LabelText&&; /* design token - font */
 							font-weight: 700;
 							font-size: 14px;
 						}
@@ -127,6 +133,7 @@ void StyleHelper::BlueGrayButton(QPushButton *btn, QString objectName)
 						}
 
 						)css");
+	style.replace("&&LabelText&&", StyleHelper::getColor("LabelText"));
 	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
 	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
 	btn->setStyleSheet(style);
@@ -200,7 +207,7 @@ void StyleHelper::MeasurementSelectorItemWidget(QString iconPath, MeasurementSel
 void StyleHelper::PlotInfoLabel(QLabel *w, QString objectName)
 {
 	QString style = QString(R"css(
-							color: rgba(192,192,192,255);
+							color: &&LabelText&&;
 							font-weight: 400;
 							font-size: 12px;
 							)css");
@@ -333,6 +340,7 @@ void StyleHelper::BlueSquareCheckbox(QCheckBox *chk, QString objectName)
 							height: 14px;
 							border: 2px solid rgb(74,100,255);
 								border-radius: 4px;
+							image: none;
 						}
 						QCheckBox::indicator:unchecked { background-color: &&SH_focus&&; }
 						QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
@@ -358,6 +366,7 @@ void StyleHelper::ColoredCircleCheckbox(QCheckBox *chk, QColor color, QString ob
 							height: 12px;
 							border: 2px solid &&LabelText&&;
 							border-radius: 7px;
+							image: none;
 						}
 						QCheckBox::indicator:unchecked { background-color: &&UIElementBackground&&; }
 						QCheckBox::indicator:checked { background-color: &&colorname&&; }
@@ -385,13 +394,14 @@ void StyleHelper::CollapseCheckbox(QCheckBox *chk, QString objectName)
 							height: 12px;
 							border: 2px transparent;
 							background-color: transparent;
+							image: none;
 						}
 						QCheckBox::indicator:unchecked {
-							image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg);
+							image: url(:/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/sba_cmb_box_arrow_right.svg);
 							background-color: transparent;
 						}
 						QCheckBox::indicator:checked {
-							image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
+							image: url(:/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/sba_cmb_box_arrow.svg);
 							background-color: transparent;
 						}
 						)css");
@@ -415,6 +425,7 @@ void StyleHelper::ColoredSquareCheckbox(QCheckBox *chk, QColor color, QString ob
 							height: 12px;
 							border: 2px solid &&LabelText&&;
 							border-radius: 4px;
+							image: none;
 						}
 						QCheckBox::indicator:unchecked { background-color: &&UIElementBackground&&; }
 						QCheckBox::indicator:checked { background-color: &&colorname&&; }
@@ -517,12 +528,9 @@ void StyleHelper::MenuComboBox(QComboBox *cb, QString objectName)
 	//}
 	// QComboBox::drop-down {
 	// subcontrol-position: center right;
-	// border-image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
-	// width: 10px;
-	// height: 6px;
-	// font-size: 16px;
-	// text-align: left;
-	// color: transparent;
+	// border-image: url(:/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+	// "/icons/sba_cmb_box_arrow.svg); width: 10px; height: 6px; font-size: 16px; text-align: left; color:
+	// transparent;
 	//}
 	// QComboBox::indicator {
 	// background-color: transparent;
@@ -545,7 +553,7 @@ void StyleHelper::MenuSmallLabel(QLabel *m_lbl, QString objectName)
 
 	QString style = QString(R"css(
 				QLabel {
-					color: white;
+					color: &&LabelText&&;
 					background-color: rgba(255,255,255,0);
 					font-weight: 500;
 					font-family: Open Sans;
@@ -556,6 +564,7 @@ void StyleHelper::MenuSmallLabel(QLabel *m_lbl, QString objectName)
 					color: grey;
 				}
 				)css");
+	style.replace("&&LabelText&&", StyleHelper::getColor("LabelText"));
 	m_lbl->setText(m_lbl->text().toUpper());
 	//	m_lbl->setStyleSheet(style);
 }
@@ -1243,12 +1252,9 @@ void StyleHelper::IIOComboBox(QComboBox *w, QString objectName)
 	//}
 	// QComboBox::drop-down {
 	// subcontrol-position: center right;
-	// border-image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
-	// width: 10px;
-	// height: 6px;
-	// font-size: 16px;
-	// text-align: left;
-	// color: transparent;
+	// border-image: url(:/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+	// "/icons/sba_cmb_box_arrow.svg); width: 10px; height: 6px; font-size: 16px; text-align: left; color:
+	// transparent;
 	//}
 	// QComboBox::indicator {
 	// background-color: transparent;
@@ -1553,7 +1559,7 @@ void StyleHelper::OrangeWidget(QWidget *w, QString objectName)
 				color:&&orange&&
 			}
 			)css");
-	style.replace("&&orange&&", StyleHelper::getColor("CH0"));
+	style.replace("&&orange&&", StyleHelper::getColor("WarningText"));
 	w->setStyleSheet(style);
 }
 
@@ -1606,7 +1612,7 @@ void StyleHelper::IIOCompactLabel(QLabel *w, QString objectName)
 	w->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	QString style = R"css(
 			QLabel {
-				color: white;
+				color: &&LabelText&&;
 				background-color: rgba(255,255,255,0);
 				font-weight: 500;
 				font-family: Open Sans;
@@ -1616,6 +1622,7 @@ void StyleHelper::IIOCompactLabel(QLabel *w, QString objectName)
 				QLabel:disabled {
 					color: grey;
 			})css";
+	style.replace("&&LabelText&&", StyleHelper::getColor("LabelText"));
 	w->setStyleSheet(style);
 }
 

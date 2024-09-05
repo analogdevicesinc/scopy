@@ -31,6 +31,7 @@ ToolTemplate::ToolTemplate(QWidget *parent)
 	m_rightStack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_topStack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_bottomStack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	m_ui->topContainerMenuControl->setStyleSheet("background-color: " + Style::getAttribute(json::theme::background_primary));
 }
 
 ToolTemplate::~ToolTemplate() { delete m_ui; }

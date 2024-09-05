@@ -30,7 +30,7 @@ void DataMonitorStyleHelper::DataMonitorToolStyle(DatamonitorTool *tool)
 	tool->clearBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	tool->clearBtn->setStyleSheet(RemoveButtonStyle());
 	tool->textMonitors->setStyleSheet("color: white; font-size: 16px;");
-	tool->tool->setRightContainerWidth(285);
+	tool->tool->setRightContainerWidth(300);
 	tool->tool->setLeftContainerWidth(185);
 	tool->tool->centralContainer()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
@@ -104,7 +104,7 @@ void DataMonitorStyleHelper::MonitorSelectionMenuMenuCollapseSectionStyle(MenuCo
 			)css");
 
 	menu->layout()->setContentsMargins(10, 10, 10, 10);
-	menu->setStyleSheet(style);
+	// menu->setStyleSheet(style);
 }
 
 QString DataMonitorStyleHelper::RemoveButtonStyle()
@@ -130,7 +130,7 @@ QString DataMonitorStyleHelper::RemoveButtonStyle()
 				background-color: &&disabledColor&& ;
 			})css");
 
-	style.replace("&&backgroundColor&&", StyleHelper::getColor("CH6"));
+	style.replace("&&backgroundColor&&", StyleHelper::getColor("ProgressBarError"));
 	style.replace("&&disabledColor&&", "gray");
 
 	return style;

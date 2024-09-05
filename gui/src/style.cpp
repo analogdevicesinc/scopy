@@ -150,6 +150,26 @@ QString Style::getAttribute(const char *key)
 	return replaceAttributes(attr);
 }
 
+QColor Style::getChannelColor(int index)
+{
+	return getChannelColorList()[index];
+}
+
+QList<QColor> Style::getChannelColorList()
+{
+	QString chString = "ch";
+	int index = 0;
+	QString color = getAttribute(QString(chString + QString::number(index)).toStdString().c_str());
+	QList<QColor> list = QList<QColor>();
+
+	while(!color.isEmpty()) {
+		list.append(color);
+		color = getAttribute(QString(chString + QString::number(++index)).toStdString().c_str());
+	}
+
+	return list;
+}
+
 QColor Style::getColor(const char *key) { return QColor(getAttribute(key)); }
 
 int Style::getDimension(const char *key) { return getAttribute(key).toInt(); }

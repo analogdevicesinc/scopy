@@ -84,7 +84,7 @@ TestTool::TestTool(QWidget *parent)
 	MenuControlButton *channels = new MenuControlButton(this);
 	channels->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
 	channels->setName("Channels");
-	//	ch0->setColor(StyleHelper::getColor("CH0"));
+	//	ch0->setColor(StyleHelper::getChannelColor(0));
 	channels->checkBox()->setVisible(false);
 	channels->setChecked(false);
 
@@ -93,13 +93,13 @@ TestTool::TestTool(QWidget *parent)
 	MenuControlButton *ch1 = new MenuControlButton(this);
 	ch1->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
 	ch1->setName("Channel 1");
-	ch1->setColor(StyleHelper::getColor("CH1"));
+	ch1->setColor(StyleHelper::getChannelColor(0));
 	ch1->button()->setVisible(false);
 	ch1->checkBox()->setChecked(true);
 	ch1->setChecked(true);
 	channelButtonGroup->addButton(ch1);
 
-	QPen ch1pen = QPen(QColor(StyleHelper::getColor("CH1")), 1);
+	QPen ch1pen = QPen(QColor(StyleHelper::getChannelColor(0)), 1);
 	auto *ch1PlotAxis = new PlotAxis(QwtAxis::YLeft, plot, ch1pen);
 	PlotChannel *ch1_plotch = new PlotChannel("Channel1", ch1pen, plot->xAxis(), ch1PlotAxis, this);
 	plot->addPlotChannel(ch1_plotch);
@@ -116,10 +116,10 @@ TestTool::TestTool(QWidget *parent)
 	MenuControlButton *ch2 = new MenuControlButton(this);
 	ch2->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
 	ch2->setName("Channel 2");
-	ch2->setColor(StyleHelper::getColor("CH2"));
+	ch2->setColor(StyleHelper::getChannelColor(2));
 	channelButtonGroup->addButton(ch2);
 
-	QPen ch2pen = QPen(QColor(StyleHelper::getColor("CH2")), 1);
+	QPen ch2pen = QPen(QColor(StyleHelper::getChannelColor(2)), 1);
 	auto *ch2PlotAxis = new PlotAxis(QwtAxis::YLeft, plot, ch2pen);
 	PlotChannel *ch2_plotch = new PlotChannel("Channel2", ch2pen, plot->xAxis(), ch2PlotAxis, this);
 	plot->addPlotChannel(ch2_plotch);
@@ -201,16 +201,16 @@ TestTool::TestTool(QWidget *parent)
 	MenuControlButton *ad9361_ch0 = new MenuControlButton(this);
 	ad9361_ch0->setName("voltage0");
 	ad9361_ch0->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
-	ad9361_ch0->setColor(StyleHelper::getColor("CH0"));
+	ad9361_ch0->setColor(StyleHelper::getChannelColor(0));
 	MenuControlButton *ad9361_ch1 = new MenuControlButton(this);
 	ad9361_ch1->setName("voltage1");
 	ad9361_ch1->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
-	ad9361_ch1->setColor(StyleHelper::getColor("CH1"));
+	ad9361_ch1->setColor(StyleHelper::getChannelColor(1));
 
 	MenuControlButton *fileChannel = new MenuControlButton(this);
 	fileChannel->setName("test.wav");
 	fileChannel->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
-	fileChannel->setColor(StyleHelper::getColor("CH0"));
+	fileChannel->setColor(StyleHelper::getChannelColor(0));
 	Util::retainWidgetSizeWhenHidden(fileChannel->checkBox());
 	fileChannel->checkBox()->setVisible(false);
 
@@ -242,7 +242,7 @@ QWidget *TestTool::createMenu(QWidget *parent)
 	lay->setSpacing(10);
 	w->setLayout(lay);
 
-	MenuHeaderWidget *header = new MenuHeaderWidget("channel 0", QPen(StyleHelper::getColor("CH0")), w);
+	MenuHeaderWidget *header = new MenuHeaderWidget("channel 0", QPen(StyleHelper::getChannelColor(0)), w);
 	MenuComboWidget *yscale = new MenuComboWidget(tr("Y-Axis"), w);
 	MenuSectionWidget *vdiv = new MenuSectionWidget(w);
 

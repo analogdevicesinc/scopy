@@ -429,7 +429,7 @@ void Ad74413r::setupChannel(int chnlIdx, QString function)
 {
 	if(function.compare("no_config") != 0) {
 		QString chnlId(function + " " + QString::number(chnlIdx + 1));
-		QPen chPen = QPen(QColor(StyleHelper::getColor("CH" + QString::number(chnlIdx))), 1);
+		QPen chPen = QPen(QColor(StyleHelper::getChannelColor(chnlIdx)), 1);
 
 		QString unit = m_swiotAdLogic->getPlotChnlUnitOfMeasure(chnlIdx);
 		auto yRange = m_swiotAdLogic->getPlotChnlRangeValues(chnlIdx);

@@ -47,6 +47,7 @@ public:
 public:
 	static void initColorMap();
 	static QString getColor(QString id);
+	static QString getChannelColor(int index);
 	static void SquareToggleButtonWithIcon(QPushButton *btn, QString objectName, bool checkable = false);
 	static void BlueButton(QPushButton *btn, QString objectName = "");
 	static void RefreshButton(QPushButton *btn, QString objectName = "");

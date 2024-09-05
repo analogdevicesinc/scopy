@@ -8,6 +8,7 @@
 #include <timemanager.hpp>
 #include <datamonitorutils.hpp>
 #include <datalogger_api.hpp>
+#include <style.h>
 
 #include <libm2k/analog/dmm.hpp>
 
@@ -50,7 +51,7 @@ bool DataLoggerPlugin::loadIcon()
 void DataLoggerPlugin::loadToolList()
 {
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "DataLogger",
-						  ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg"));
 }
 
 void DataLoggerPlugin::unload()
@@ -128,7 +129,7 @@ bool DataLoggerPlugin::onDisconnect()
 
 	// add proxy tool to represent the plugin
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "DataLogger",
-						  ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg"));
 
 	Q_EMIT toolListChanged();
 	return true;
@@ -140,7 +141,7 @@ void DataLoggerPlugin::addNewTool()
 	QString tool_name = (QString("DataLogger ") + QString::number(i));
 
 	ToolMenuEntry *toolMenuEntry =
-		SCOPY_NEW_TOOLMENUENTRY(tool_name, tool_name, ":/gui/icons/scopy-default/icons/gear_wheel.svg");
+		SCOPY_NEW_TOOLMENUENTRY(tool_name, tool_name, ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg");
 	m_toolList.append(toolMenuEntry);
 	m_toolList.last()->setEnabled(true);
 	m_toolList.last()->setRunBtnVisible(true);

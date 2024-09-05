@@ -99,7 +99,7 @@ void RmsInstrument::createLabels(MeasurementsPanel *mPanel, QStringList chnls, Q
 	QString c = color;
 	for(const QString &ch : chnls) {
 		if(chnls.size() > 1) {
-			c = StyleHelper::getColor("CH" + QString::number(chIdx));
+			c = StyleHelper::getChannelColor(chIdx);
 		}
 		for(const QString &l : labels) {
 			MeasurementLabel *ml = new MeasurementLabel(this);

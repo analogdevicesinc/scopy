@@ -49,7 +49,7 @@ QList<DmmDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
 				}
 
 				DmmDataMonitorModel *channelModel =
-					new DmmDataMonitorModel(name, StyleHelper::getColor("CH" + QString::number(j)),
+					new DmmDataMonitorModel(name, StyleHelper::getChannelColor(j),
 								unitOfMeasurement, dmmReadStrategy);
 
 				channelModel->setIioChannel(chn);

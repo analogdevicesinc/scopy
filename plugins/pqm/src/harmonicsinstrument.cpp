@@ -130,7 +130,7 @@ void HarmonicsInstrument::setupPlotChannels()
 	int chNumber = 0;
 	bool first = true;
 	for(const QString &ch : m_chnls) {
-		QPen chPen = QPen(QColor(StyleHelper::getColor("CH" + QString::number(chNumber))), 1);
+		QPen chPen = QPen(QColor(StyleHelper::getChannelColor(chNumber)), 1);
 		PlotChannel *plotCh = new PlotChannel(m_chnls.key(ch), chPen, m_plot->xAxis(), m_plot->yAxis(), this);
 		m_plot->addPlotChannel(plotCh);
 		plotCh->setStyle(PlotChannel::PCS_STICKS);
