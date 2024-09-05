@@ -32,7 +32,7 @@ public:
 
     int HAR_MAG_1, HAR_MAG_2, HAR_MAG_3, HAR_MAG_8 ,HAR_PHASE_1 ,HAR_PHASE_2 ,HAR_PHASE_3 ,HAR_PHASE_8;
 
-    vector<double> angle_errors_fft, angle_errors_fft_phase;
+    vector<double> angle_errors_fft, angle_errors_fft_phase, calibration_samples_sine, calibration_samples_cosine, calibration_samples_sine_scaled, calibration_samples_cosine_scaled;
 
     enum Channel
     {
@@ -87,6 +87,7 @@ public:
     QString calibrate(vector<double> PANG, int cycles = 11, int samplesPerCycle = 256);
     int writeDeviceRegistry(const char *deviceName, uint32_t address, double value);
     int readDeviceRegistry(const char *deviceName, uint32_t address, double& readValue);
+    void computeSineCosineOfAngles(const vector<double>& angles);
 private:
     iio_context *m_iioCtx;
     iio_buffer *m_iioBuffer;
