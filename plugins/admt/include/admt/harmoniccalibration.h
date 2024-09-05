@@ -114,7 +114,7 @@ private:
 
 	PlotWidget *calibrationFFTDataPlotWidget, *calibrationRawDataPlotWidget;
 	PlotAxis *calibrationFFTXPlotAxis, *calibrationFFTYPlotAxis, *calibrationRawDataXPlotAxis, *calibrationRawDataYPlotAxis;
-	PlotChannel *calibrationFFTPlotChannel, *calibrationFFTPhasePlotChannel, *calibrationRawDataPlotChannel;
+	PlotChannel *calibrationFFTPlotChannel, *calibrationFFTPhasePlotChannel, *calibrationRawDataPlotChannel, *calibrationSineDataPlotChannel, *calibrationCosineDataPlotChannel;
 
 	HorizontalSpinBox *motorMaxVelocitySpinBox, *motorAccelTimeSpinBox, *motorMaxDisplacementSpinBox, *motorTargetPositionSpinBox;
 
@@ -129,6 +129,7 @@ private:
 	void connectMenuComboToGraphChannel(MenuCombo* menuCombo, Sismograph* graph);
 	ToolTemplate* createCalibrationWidget();
 	ToolTemplate* createRegistersWidget();
+	ToolTemplate* createUtilityWidget();
 	void updateLabelValue(QLabel* label, int channelIndex);
 	void updateLabelValue(QLabel *label, ADMTController::MotorAttribute attribute);
 	void updateChannelValue(int channelIndex);
@@ -151,6 +152,7 @@ private:
 	void clearRawDataList();
 	void motorCalibrationAcquisitionTask();
 	void connectLineEditToRPSConversion(QLineEdit* lineEdit, double& vmax);
+	void connectLineEditToNumberWrite(QLineEdit* lineEdit, double& variable, ADMTController::MotorAttribute attribute);
 	double convertRPStoVMAX(double rps);
 	double convertVMAXtoRPS(double vmax);
 	void connectLineEditToAMAXConversion(QLineEdit* lineEdit, double& amax);

@@ -616,3 +616,26 @@ QString ADMTController::calibrate(vector<double> PANG, int cycles, int samplesPe
 
 	return result;
 }
+
+void ADMTController::computeSineCosineOfAngles(const vector<double>& angles) {
+    // Vectors to store sine and cosine values
+    calibration_samples_sine = vector<double>(angles.size());
+    calibration_samples_cosine = vector<double>(angles.size());
+    calibration_samples_sine_scaled = vector<double>(angles.size());
+    calibration_samples_cosine_scaled = vector<double>(angles.size());
+
+    const double scaleMin = 0.0;
+    const double scaleMax = 360.0;
+
+    // Convert angles to radians and compute sine, cosine, and their scaled versions
+    for (size_t i = 0; i < angles.size(); ++i) {
+        double radians = angles[i] * M_PI / 180.0; // Convert degrees to radians
+        calibration_samples_sine[i] = sin(radians);
+        calibration_samples_cosine[i] = cos(radians);
+
+        // Scale sine and cosine to the range 0 to 360
+        calibration_samples_sine_scaled[i] = ((calibration_samples_sine[i] + 1) / 2) * (scaleMax - scaleMin) + scaleMin;
+        calibration_samples_cosine_scaled[i] = ((calibration_samples_cosine[i] + 1) / 2) * (scaleMax - scaleMin) + scaleMin;
+    }
+}
+
