@@ -5,7 +5,7 @@
 
 static int sampleRate = 50;
 static int calibrationTimerRate = 100;
-static int motorCalibrationAcquisitionTimerRate = 5;
+static int motorCalibrationAcquisitionTimerRate = 20;
 static int bufferSize = 1;
 static int dataGraphSamples = 100;
 static int tempGraphSamples = 100;
@@ -210,6 +210,57 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	generalSection->contentLayout()->addWidget(dataSampleSizeLabel);
 	generalSection->contentLayout()->addWidget(dataSampleSizeLineEdit);
 
+	MenuSectionWidget *sequenceWidget = new MenuSectionWidget(generalSettingWidget);
+	MenuCollapseSection *sequenceSection = new MenuCollapseSection("Sequence", MenuCollapseSection::MHCW_NONE, sequenceWidget);
+	sequenceWidget->contentLayout()->addWidget(sequenceSection);
+	sequenceSection->contentLayout()->setSpacing(10);
+
+	MenuCombo *sequenceTypeMenuCombo = new MenuCombo("Sequence Type", sequenceSection);
+	QComboBox *sequenceTypeComboBox = sequenceTypeMenuCombo->combo();
+	sequenceTypeComboBox->addItem("Mode 1", QVariant(0));
+	sequenceTypeComboBox->addItem("Mode 2", QVariant(1));
+	sequenceTypeComboBox->setCurrentIndex(1);
+	applyComboBoxStyle(sequenceTypeComboBox);
+
+	MenuCombo *conversionTypeMenuCombo = new MenuCombo("Conversion Type", sequenceSection);
+	QComboBox *conversionTypeComboBox = conversionTypeMenuCombo->combo();
+	conversionTypeComboBox->addItem("Continuous", QVariant(0));
+	conversionTypeComboBox->addItem("One Shot", QVariant(1));
+	applyComboBoxStyle(conversionTypeComboBox);
+
+	MenuCombo *cnvSourceMenuCombo = new MenuCombo("CNV Source", sequenceSection);
+	QComboBox *cnvSourceComboBox = cnvSourceMenuCombo->combo();
+	cnvSourceComboBox->addItem("External", QVariant(0));
+	cnvSourceComboBox->addItem("Software", QVariant(1));
+	applyComboBoxStyle(cnvSourceComboBox);
+
+	MenuCombo *convertSynchronizationMenuCombo = new MenuCombo("Convert Synchronization", sequenceSection);
+	QComboBox *convertSynchronizationComboBox = convertSynchronizationMenuCombo->combo();
+	convertSynchronizationComboBox->addItem("Enabled", QVariant(0));
+	convertSynchronizationComboBox->addItem("Disabled", QVariant(1));
+	convertSynchronizationComboBox->setCurrentIndex(1);
+	applyComboBoxStyle(convertSynchronizationComboBox);
+
+	MenuCombo *angleFilterMenuCombo = new MenuCombo("Angle Filter", sequenceSection);
+	QComboBox *angleFilterComboBox = angleFilterMenuCombo->combo();
+	angleFilterComboBox->addItem("Enabled", QVariant(0));
+	angleFilterComboBox->addItem("Disabled", QVariant(1));
+	angleFilterComboBox->setCurrentIndex(1);
+	applyComboBoxStyle(angleFilterComboBox);
+
+	MenuCombo *eighthHarmonicMenuCombo = new MenuCombo("8th Harmonic", sequenceSection);
+	QComboBox *eighthHarmonicComboBox = eighthHarmonicMenuCombo->combo();
+	eighthHarmonicComboBox->addItem("Factory Set", QVariant(0));
+	eighthHarmonicComboBox->addItem("User", QVariant(1));
+	applyComboBoxStyle(eighthHarmonicComboBox);
+
+	sequenceSection->contentLayout()->addWidget(sequenceTypeMenuCombo);
+	sequenceSection->contentLayout()->addWidget(conversionTypeMenuCombo);
+	sequenceSection->contentLayout()->addWidget(cnvSourceMenuCombo);
+	sequenceSection->contentLayout()->addWidget(convertSynchronizationMenuCombo);
+	sequenceSection->contentLayout()->addWidget(angleFilterMenuCombo);
+	sequenceSection->contentLayout()->addWidget(eighthHarmonicMenuCombo);
+
 	// Data Graph Setting Widget
 	MenuSectionWidget *dataGraphWidget = new MenuSectionWidget(generalSettingWidget);
 	dataGraphWidget->contentLayout()->setSpacing(10);
@@ -266,6 +317,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	generalSettingLayout->addWidget(header);
 	generalSettingLayout->addSpacerItem(new QSpacerItem(0, 3, QSizePolicy::Fixed, QSizePolicy::Fixed));
 	generalSettingLayout->addWidget(generalWidget);
+	generalSettingLayout->addWidget(sequenceWidget);
 	generalSettingLayout->addWidget(dataGraphWidget);
 	generalSettingLayout->addWidget(tempGraphWidget);
 	generalSettingLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -302,6 +354,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	connect(motorCalibrationAcquisitionTimer, &QTimer::timeout, this, &HarmonicCalibration::motorCalibrationAcquisitionTask);
 
 	tabWidget->addTab(createCalibrationWidget(), "Calibration");
+	tabWidget->addTab(createUtilityWidget(), "Utility");
 	tabWidget->addTab(createRegistersWidget(), "Registers");
 
 	connect(tabWidget, &QTabWidget::currentChanged, [=](int index){
@@ -330,29 +383,47 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	QTabWidget *calibrationDataGraphTabWidget = new QTabWidget(calibrationDataGraphSectionWidget);
 	applyTabWidgetStyle(calibrationDataGraphTabWidget);
 	calibrationDataGraphSectionWidget->contentLayout()->setSpacing(10);
-	calibrationDataGraphSectionWidget->contentLayout()->addWidget(calibrationDataGraphTabWidget);
 
 	// Raw Data Plot Widget
 	calibrationRawDataPlotWidget = new PlotWidget();
 	calibrationRawDataPlotWidget->setContentsMargins(10, 20, 10, 10);
+	calibrationRawDataPlotWidget->xAxis()->setVisible(false);
+	calibrationRawDataPlotWidget->yAxis()->setVisible(false);
 	QPen calibrationRawDataPen = QPen(StyleHelper::getColor("ScopyBlue"));
+	QPen calibrationSineDataPen = QPen(StyleHelper::getColor("CH0"));
+	calibrationSineDataPen.color().setAlphaF(0.1);
+	QPen calibrationCosineDataPen = QPen(StyleHelper::getColor("CH1"));
+	calibrationCosineDataPen.color().setAlphaF(0.1);
+
 	calibrationRawDataXPlotAxis = new PlotAxis(QwtAxis::XBottom, calibrationRawDataPlotWidget, calibrationRawDataPen);
 	calibrationRawDataYPlotAxis = new PlotAxis(QwtAxis::YLeft, calibrationRawDataPlotWidget, calibrationRawDataPen);
-	calibrationRawDataYPlotAxis->setInterval(0, 360);
+	calibrationRawDataYPlotAxis->setInterval(0, 400);
 
-	calibrationRawDataPlotChannel = new PlotChannel("Raw Data", calibrationRawDataPen, calibrationRawDataXPlotAxis, calibrationRawDataYPlotAxis);
-	calibrationRawDataPlotChannel->setStyle(PlotChannel::PCS_DOTS);
+	calibrationRawDataPlotChannel = new PlotChannel("Samples", calibrationRawDataPen, calibrationRawDataXPlotAxis, calibrationRawDataYPlotAxis);
+	calibrationSineDataPlotChannel = new PlotChannel("Sine", calibrationSineDataPen, calibrationRawDataXPlotAxis, calibrationRawDataYPlotAxis);
+	calibrationCosineDataPlotChannel = new PlotChannel("Cosine", calibrationCosineDataPen, calibrationRawDataXPlotAxis, calibrationRawDataYPlotAxis);
+
 	calibrationRawDataPlotWidget->addPlotChannel(calibrationRawDataPlotChannel);
+	calibrationRawDataPlotWidget->addPlotChannel(calibrationSineDataPlotChannel);
+	calibrationRawDataPlotWidget->addPlotChannel(calibrationCosineDataPlotChannel);
+	calibrationRawDataPlotChannel->setStyle(PlotChannel::PCS_DOTS);
 	calibrationRawDataPlotChannel->setEnabled(true);
+	calibrationSineDataPlotChannel->setEnabled(true);
+	calibrationCosineDataPlotChannel->setEnabled(true);
 	calibrationRawDataPlotWidget->selectChannel(calibrationRawDataPlotChannel);
 	calibrationRawDataPlotWidget->replot();
 
-	// Calibrated Plot Widget
-	PlotWidget *calibrationCalibratedDataPlotWidget = new PlotWidget();
-	calibrationCalibratedDataPlotWidget->setContentsMargins(10, 20, 10, 10);
+	calibrationRawDataPlotWidget->setShowXAxisLabels(true);
+	calibrationRawDataPlotWidget->setShowYAxisLabels(true);
+	calibrationRawDataPlotWidget->showAxisLabels();
 
-	calibrationDataGraphTabWidget->addTab(calibrationRawDataPlotWidget, "Raw");
-	calibrationDataGraphTabWidget->addTab(calibrationCalibratedDataPlotWidget, "Calibrated");
+	// Calibrated Plot Widget
+	// PlotWidget *calibrationCalibratedDataPlotWidget = new PlotWidget();
+	// calibrationCalibratedDataPlotWidget->setContentsMargins(10, 20, 10, 10);
+
+	calibrationDataGraphTabWidget->addTab(calibrationRawDataPlotWidget, "Calibration Samples");
+	// calibrationDataGraphTabWidget->addTab(calibrationCalibratedDataPlotWidget, "Calibrated");
+	calibrationDataGraphSectionWidget->contentLayout()->addWidget(calibrationDataGraphTabWidget);
 
 	MenuSectionWidget *FFTDataGraphSectionWidget = new MenuSectionWidget(calibrationDataGraphWidget);
 	QTabWidget *FFTDataGraphTabWidget = new QTabWidget(FFTDataGraphSectionWidget);
@@ -386,7 +457,10 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationFFTDataPlotWidget->setShowYAxisLabels(true);
 	calibrationFFTDataPlotWidget->showAxisLabels();
 
-	FFTDataGraphTabWidget->addTab(calibrationFFTDataPlotWidget, "FFT");
+	PlotWidget *postCalibrationAngularErrorPlotWidget = new PlotWidget();
+
+	FFTDataGraphTabWidget->addTab(calibrationFFTDataPlotWidget, "Pre-Calibration Angular Error");
+	FFTDataGraphTabWidget->addTab(postCalibrationAngularErrorPlotWidget, "Post-Calibration Angular Error");
 
 	calibrationDataGraphLayout->addWidget(calibrationDataGraphSectionWidget, 0, 0);
 	calibrationDataGraphLayout->addWidget(FFTDataGraphSectionWidget, 1, 0);
@@ -734,8 +808,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	connect(clearCalibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::clearRawDataList);
 	connectLineEditToRPSConversion(motorMaxVelocitySpinBox->lineEdit(), rotate_vmax);
 	connectLineEditToAMAXConversion(motorAccelTimeSpinBox->lineEdit(), amax);
-	connectLineEditToNumber(motorMaxDisplacementSpinBox->lineEdit(), dmax);
-	connectLineEditToNumber(motorTargetPositionSpinBox->lineEdit(), target_pos);
+	connectLineEditToNumberWrite(motorMaxDisplacementSpinBox->lineEdit(), dmax, ADMTController::MotorAttribute::DMAX);
+	connectLineEditToNumberWrite(motorTargetPositionSpinBox->lineEdit(), target_pos, ADMTController::MotorAttribute::TARGET_POS);
 	connectMenuComboToNumber(m_calibrationMotorRampModeMenuCombo, ramp_mode);
 	connect(autoCalibrateCheckBox, &QCheckBox::toggled, [=](bool toggled){ 
 		autoCalibrate = toggled; 
@@ -752,20 +826,49 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	QScrollArea *registerScrollArea = new QScrollArea();
 	QWidget *registerWidget = new QWidget(registerScrollArea);
 	QVBoxLayout *registerLayout = new QVBoxLayout(registerWidget);
-	QWidget *registerGridWidget = new QWidget(registerWidget);
-	QGridLayout *registerGridLayout = new QGridLayout(registerGridWidget);
 	registerScrollArea->setWidgetResizable(true);
 	registerScrollArea->setWidget(registerWidget);
 	registerWidget->setLayout(registerLayout);
 	registerLayout->setMargin(0);
 	registerLayout->setSpacing(10);
 
-	registerLayout->addWidget(registerGridWidget);
-	registerLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	// QWidget *registerGridWidget = new QWidget(registerWidget);
+	// QGridLayout *registerGridLayout = new QGridLayout(registerGridWidget);
+	// registerGridWidget->setLayout(registerGridLayout);
+	// registerGridLayout->setMargin(0);
+	// registerGridLayout->setSpacing(10);
 
-	registerGridWidget->setLayout(registerGridLayout);
-	registerGridLayout->setMargin(0);
-	registerGridLayout->setSpacing(10);
+	QLabel *registerConfigurationLabel = new QLabel("Configuration", registerWidget);
+	StyleHelper::MenuControlLabel(registerConfigurationLabel, "registerConfigurationLabel");
+	QWidget *registerConfigurationGridWidget = new QWidget(registerWidget);
+	QGridLayout *registerConfigurationGridLayout = new QGridLayout(registerConfigurationGridWidget);
+	registerConfigurationGridWidget->setLayout(registerConfigurationGridLayout);
+	registerConfigurationGridLayout->setMargin(0);
+	registerConfigurationGridLayout->setSpacing(10);
+
+	QLabel *registerDeviceIDLabel = new QLabel("Device ID", registerWidget);
+	StyleHelper::MenuControlLabel(registerDeviceIDLabel, "registerDeviceIDLabel");
+	QWidget *registerDeviceIDGridWidget = new QWidget(registerWidget);
+	QGridLayout *registerDeviceIDGridLayout = new QGridLayout(registerDeviceIDGridWidget);
+	registerDeviceIDGridWidget->setLayout(registerDeviceIDGridLayout);
+	registerDeviceIDGridLayout->setMargin(0);
+	registerDeviceIDGridLayout->setSpacing(10);
+
+	QLabel *registerHarmonicsLabel = new QLabel("Harmonics", registerWidget);
+	StyleHelper::MenuControlLabel(registerHarmonicsLabel, "registerHarmonicsLabel");
+	QWidget *registerHarmonicsGridWidget = new QWidget(registerWidget);
+	QGridLayout *registerHarmonicsGridLayout = new QGridLayout(registerHarmonicsGridWidget);
+	registerHarmonicsGridWidget->setLayout(registerHarmonicsGridLayout);
+	registerHarmonicsGridLayout->setMargin(0);
+	registerHarmonicsGridLayout->setSpacing(10);
+
+	QLabel *registerSensorDataLabel = new QLabel("Sensor Data", registerWidget);
+	StyleHelper::MenuControlLabel(registerSensorDataLabel, "registerSensorDataLabel");
+	QWidget *registerSensorDataGridWidget = new QWidget(registerWidget);
+	QGridLayout *registerSensorDataGridLayout = new QGridLayout(registerSensorDataGridWidget);
+	registerSensorDataGridWidget->setLayout(registerSensorDataGridLayout);
+	registerSensorDataGridLayout->setMargin(0);
+	registerSensorDataGridLayout->setSpacing(10);
 
 	RegisterBlockWidget *cnvPageRegisterBlock = new RegisterBlockWidget("CNVPAGE", "Convert Start and Page Select", 0x01, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 	RegisterBlockWidget *absAngleRegisterBlock = new RegisterBlockWidget("ABSANGLE", "Absolute Angle", 0x03, 0xDB00, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
@@ -801,42 +904,62 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	RegisterBlockWidget *uniqID3RegisterBlock = new RegisterBlockWidget("UNIQID3", "Product, voltage supply. ASIL and ASIC revision identifiers", 0x21, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 	RegisterBlockWidget *eccDisRegisterBlock = new RegisterBlockWidget("ECCDIS", "Error Correction Code disable", 0x23, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 	
-	registerGridLayout->addWidget(cnvPageRegisterBlock, 0, 0);
-	registerGridLayout->addWidget(absAngleRegisterBlock, 0, 1);
-	registerGridLayout->addWidget(digIORegisterBlock, 0, 2);
-	registerGridLayout->addWidget(angleRegisterBlock, 0, 3);
-	registerGridLayout->addWidget(faultRegisterBlock, 0, 4);
-	registerGridLayout->addWidget(angleSecRegisterBlock, 1, 0);
-	registerGridLayout->addWidget(sineRegisterBlock, 1, 1);
-	registerGridLayout->addWidget(cosineRegisterBlock, 1, 2);
-	registerGridLayout->addWidget(secAnglIRegisterBlock, 1, 3);
-	registerGridLayout->addWidget(secAnglQRegisterBlock, 1, 4);
-	registerGridLayout->addWidget(radiusRegisterBlock, 2, 0);
-	registerGridLayout->addWidget(diag1RegisterBlock, 2, 1);
-	registerGridLayout->addWidget(diag2RegisterBlock, 2, 2);
-	registerGridLayout->addWidget(tmp0RegisterBlock, 2, 3);
-	registerGridLayout->addWidget(tmp1RegisterBlock, 2, 4);
-	registerGridLayout->addWidget(generalRegisterBlock, 3, 0);
-	registerGridLayout->addWidget(digIOEnRegisterBlock, 3, 1);
-	registerGridLayout->addWidget(angleCkRegisterBlock, 3, 2);
-	registerGridLayout->addWidget(cnvCntRegisterBlock, 3, 3);
-	registerGridLayout->addWidget(h1MagRegisterBlock, 3, 4);
-	registerGridLayout->addWidget(h1PhRegisterBlock, 4, 0);
-	registerGridLayout->addWidget(h2MagRegisterBlock, 4, 1);
-	registerGridLayout->addWidget(h2PhRegisterBlock, 4, 2);
-	registerGridLayout->addWidget(h3MagRegisterBlock, 4, 3);
-	registerGridLayout->addWidget(h3PhRegisterBlock, 4, 4);
-	registerGridLayout->addWidget(h8MagRegisterBlock, 5, 0);
-	registerGridLayout->addWidget(h8PhRegisterBlock, 5, 1);
-	registerGridLayout->addWidget(eccDcdeRegisterBlock, 5, 2);
-	registerGridLayout->addWidget(uniqID0RegisterBlock, 5, 3);
-	registerGridLayout->addWidget(uniqID1RegisterBlock, 5, 4);
-	registerGridLayout->addWidget(uniqID2RegisterBlock, 6, 0);
-	registerGridLayout->addWidget(uniqID3RegisterBlock, 6, 1);
-	registerGridLayout->addWidget(eccDisRegisterBlock, 6, 2);
+	registerConfigurationGridLayout->addWidget(cnvPageRegisterBlock, 0, 0);
+	registerConfigurationGridLayout->addWidget(digIORegisterBlock, 0, 1);
+	registerConfigurationGridLayout->addWidget(faultRegisterBlock, 0, 2);
+	registerConfigurationGridLayout->addWidget(generalRegisterBlock, 0, 3);
+	registerConfigurationGridLayout->addWidget(digIOEnRegisterBlock, 0, 4);
+	registerConfigurationGridLayout->addWidget(angleCkRegisterBlock, 1, 0);
+	registerConfigurationGridLayout->addWidget(eccDcdeRegisterBlock, 1, 1);
+	registerConfigurationGridLayout->addWidget(eccDisRegisterBlock, 1, 2);
 
-	for(int c=0; c < registerGridLayout->columnCount(); ++c) registerGridLayout->setColumnStretch(c,1);
-	for(int r=0; r < registerGridLayout->rowCount(); ++r)  registerGridLayout->setRowStretch(r,1);
+	registerDeviceIDGridLayout->addWidget(uniqID0RegisterBlock, 0, 0);
+	registerDeviceIDGridLayout->addWidget(uniqID1RegisterBlock, 0, 1);
+	registerDeviceIDGridLayout->addWidget(uniqID2RegisterBlock, 0, 2);
+	registerDeviceIDGridLayout->addWidget(uniqID3RegisterBlock, 0, 3);
+	QSpacerItem *registerDeviceSpacer = new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Preferred);
+	registerDeviceIDGridLayout->addItem(registerDeviceSpacer, 0, 4);
+
+	registerHarmonicsGridLayout->addWidget(h1MagRegisterBlock, 0, 0);
+	registerHarmonicsGridLayout->addWidget(h1PhRegisterBlock, 0, 1);
+	registerHarmonicsGridLayout->addWidget(h2MagRegisterBlock, 0, 2);
+	registerHarmonicsGridLayout->addWidget(h2PhRegisterBlock, 0, 3);
+	registerHarmonicsGridLayout->addWidget(h3MagRegisterBlock, 0, 4);
+	registerHarmonicsGridLayout->addWidget(h3PhRegisterBlock, 1, 0);
+	registerHarmonicsGridLayout->addWidget(h8MagRegisterBlock, 1, 1);
+	registerHarmonicsGridLayout->addWidget(h8PhRegisterBlock, 1, 2);
+	
+	registerSensorDataGridLayout->addWidget(absAngleRegisterBlock, 0, 0);
+	registerSensorDataGridLayout->addWidget(angleRegisterBlock, 0, 1);
+	registerSensorDataGridLayout->addWidget(angleSecRegisterBlock, 0, 2);
+	registerSensorDataGridLayout->addWidget(sineRegisterBlock, 0, 3);
+	registerSensorDataGridLayout->addWidget(cosineRegisterBlock, 0, 4);
+	registerSensorDataGridLayout->addWidget(secAnglIRegisterBlock, 1, 0);
+	registerSensorDataGridLayout->addWidget(secAnglQRegisterBlock, 1, 1);
+	registerSensorDataGridLayout->addWidget(radiusRegisterBlock, 1, 2);
+	registerSensorDataGridLayout->addWidget(diag1RegisterBlock, 1, 3);
+	registerSensorDataGridLayout->addWidget(diag2RegisterBlock, 1, 4);
+	registerSensorDataGridLayout->addWidget(tmp0RegisterBlock, 2, 0);
+	registerSensorDataGridLayout->addWidget(tmp1RegisterBlock, 2, 1);
+	registerSensorDataGridLayout->addWidget(cnvCntRegisterBlock, 2, 2);
+
+	// for(int c=0; c < registerGridLayout->columnCount(); ++c) registerGridLayout->setColumnStretch(c,1);
+	// for(int r=0; r < registerGridLayout->rowCount(); ++r)  registerGridLayout->setRowStretch(r,1);
+	for(int c=0; c < registerConfigurationGridLayout->columnCount(); ++c) registerConfigurationGridLayout->setColumnStretch(c,1);
+	for(int c=0; c < registerDeviceIDGridLayout->columnCount(); ++c) registerDeviceIDGridLayout->setColumnStretch(c,1);
+	for(int c=0; c < registerHarmonicsGridLayout->columnCount(); ++c) registerHarmonicsGridLayout->setColumnStretch(c,1);
+	for(int c=0; c < registerSensorDataGridLayout->columnCount(); ++c) registerSensorDataGridLayout->setColumnStretch(c,1);
+
+	// registerLayout->addWidget(registerGridWidget);
+	registerLayout->addWidget(registerConfigurationLabel);
+	registerLayout->addWidget(registerConfigurationGridWidget);
+	registerLayout->addWidget(registerDeviceIDLabel);
+	registerLayout->addWidget(registerDeviceIDGridWidget);
+	registerLayout->addWidget(registerHarmonicsLabel);
+	registerLayout->addWidget(registerHarmonicsGridWidget);
+	registerLayout->addWidget(registerSensorDataLabel);
+	registerLayout->addWidget(registerSensorDataGridWidget);
+	registerLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tool->topContainer()->setVisible(false);
@@ -850,6 +973,52 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	tool->openTopContainerHelper(false);
 
 	tool->addWidgetToCentralContainerHelper(registerScrollArea);
+
+	return tool;
+}
+
+ToolTemplate* HarmonicCalibration::createUtilityWidget()
+{
+	ToolTemplate *tool = new ToolTemplate(this);
+
+	QScrollArea *rightUtilityScrollArea = new QScrollArea(this);
+	QWidget *rightUtilityWidget = new QWidget(rightUtilityScrollArea);
+	rightUtilityScrollArea->setWidget(rightUtilityWidget);
+	rightUtilityScrollArea->setWidgetResizable(true);
+	QVBoxLayout *rightUtilityLayout = new QVBoxLayout(rightUtilityWidget);
+	rightUtilityWidget->setLayout(rightUtilityLayout);
+	rightUtilityLayout->setMargin(0);
+	rightUtilityLayout->setSpacing(10);
+
+	MenuSectionWidget *faultRegisterSectionWidget = new MenuSectionWidget(rightUtilityWidget);
+	rightUtilityLayout->addWidget(faultRegisterSectionWidget);
+	MenuCollapseSection *faultRegisterCollapseSection = new MenuCollapseSection("Fault Register", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, faultRegisterSectionWidget);
+	faultRegisterSectionWidget->contentLayout()->addWidget(faultRegisterCollapseSection);
+	
+	MenuControlButton *testFaultButton = new MenuControlButton(faultRegisterSectionWidget);
+	testFaultButton->setName("VDD Under Voltage");
+	testFaultButton->setCheckBoxStyle(MenuControlButton::CheckboxStyle::CS_CIRCLE);
+	testFaultButton->setOpenMenuChecksThis(true);
+	testFaultButton->setDoubleClickToOpenMenu(true);
+	testFaultButton->setColor(QColor("#c81a28"));
+	testFaultButton->button()->setVisible(false);
+	testFaultButton->setCheckable(true);
+	testFaultButton->checkBox()->setChecked(true);
+
+	faultRegisterCollapseSection->contentLayout()->addWidget(testFaultButton);
+
+	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	tool->topContainer()->setVisible(false);
+	tool->topContainerMenuControl()->setVisible(false);
+	tool->leftContainer()->setVisible(false);
+	tool->rightContainer()->setVisible(true);
+	tool->bottomContainer()->setVisible(false);
+	tool->setLeftContainerWidth(270);
+	tool->setRightContainerWidth(270);
+	tool->openBottomContainerHelper(false);
+	tool->openTopContainerHelper(false);
+
+	tool->rightStack()->addWidget(rightUtilityScrollArea);
 
 	return tool;
 }
@@ -949,6 +1118,21 @@ void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, double& v
         double value = lineEdit->text().toDouble(&ok);
         if (ok) {
             variable = value;
+			
+        } else {
+            lineEdit->setText(QString::number(variable));
+        }
+    });
+}
+
+void HarmonicCalibration::connectLineEditToNumberWrite(QLineEdit* lineEdit, double& variable, ADMTController::MotorAttribute attribute)
+{
+    connect(lineEdit, &QLineEdit::editingFinished, [=, &variable]() {
+        bool ok;
+        double value = lineEdit->text().toDouble(&ok);
+        if (ok) {
+            variable = value;
+			writeMotorAttributeValue(attribute, variable);
 			
         } else {
             lineEdit->setText(QString::number(variable));
@@ -1193,6 +1377,7 @@ void HarmonicCalibration::motorCalibrationAcquisitionTask()
 {
 	if(startMotor && rawDataList.size() < totalSamplesCount){
 		stepMotorAcquisition();
+		updateChannelValue(ADMTController::Channel::ANGLE);
 		double currentAngle = angle;
 		QVector<double> angles = { currentAngle };
 		appendSamplesToPlotCurve(calibrationRawDataPlotWidget, angles);
@@ -1387,12 +1572,17 @@ void HarmonicCalibration::importCalibrationData()
 		fm.open(fileName, FileManager::IMPORT);
 
 		QVector<double> data = fm.read(0);
-		calibrationRawDataPlotChannel->curve()->setSamples(data.data(), data.size());
-		calibrationRawDataXPlotAxis->setInterval(0, data.size());
-		for(int i = 0; i < data.size(); ++i) {
-			rawDataList.push_back(data[i]);
+		if(data.size() > 0)
+		{
+			calibrationRawDataPlotChannel->curve()->setSamples(data.data(), data.size());
+			calibrationRawDataXPlotAxis->setInterval(0, data.size());
+			m_admtController->computeSineCosineOfAngles(vector<double>(data.begin(), data.end()));
+			calibrationSineDataPlotChannel->curve()->setSamples(m_admtController->calibration_samples_sine_scaled.data(), m_admtController->calibration_samples_sine_scaled.size());
+			calibrationCosineDataPlotChannel->curve()->setSamples(m_admtController->calibration_samples_cosine_scaled.data(), m_admtController->calibration_samples_cosine_scaled.size());
+			for(int i = 0; i < data.size(); ++i) {
+				rawDataList.push_back(data[i]);
+			}
 		}
-
 	} catch(FileManagerException &ex) {
 		calibrationLogWriteLn(QString(ex.what()));
 	}
@@ -1565,6 +1755,8 @@ void HarmonicCalibration::applyTabWidgetStyle(QTabWidget *widget, const QString&
 		 min-width: 100px;
 		 min-height: 32px;
 		 padding-bottom: 5px;
+		 padding-left: 16px;
+		 padding-right: 16px;
 		 background-color: &&UIElementBackground&&;
 		 font: normal;
 		}
