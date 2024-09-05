@@ -54,7 +54,8 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 	uiStrategyObject->setParent(this);
 	dataStrategyObject->setParent(this);
 
-	connect(m_progressBar, &SmallProgressBar::progressFinished, this, [this]() { this->saveData(m_lastData); });
+	connect(m_progressBar, &SmallProgressBar::progressFinished, this,
+		[this]() { this->convertUItoDS(m_lastData); });
 
 	connect(uiStrategyObject, SIGNAL(emitData(QString)), this, SLOT(startTimer(QString)));
 
@@ -65,8 +66,7 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 	connect(uiStrategyObject, SIGNAL(requestData()), dataStrategyObject, SLOT(readAsync()));
 
 	// forward data from data strategy to ui strategy
-	connect(dataStrategyObject, SIGNAL(sendData(QString, QString)), uiStrategyObject,
-		SLOT(receiveData(QString, QString)));
+	connect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this, SLOT(convertDStoUI(QString, QString)));
 
 	// intercept the sendData from dataStrategy to collect information
 	connect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this, SLOT(storeReadInfo(QString, QString)));
