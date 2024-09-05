@@ -1,6 +1,7 @@
 #include "basictracker.hpp"
 #include "stylehelper.h"
 #include <QwtText>
+#include <style.h>
 
 using namespace scopy;
 
@@ -12,7 +13,7 @@ BasicTracker::BasicTracker(QwtPlot *plot)
 	, m_yAxisEn(true)
 	, m_xAxis(QwtAxis::XBottom)
 	, m_yAxis(QwtAxis::YLeft)
-	, m_color(QColor(StyleHelper::getColor("LabelText")))
+	, m_color(QColor(Style::getAttribute(json::theme::content_default)))
 	, m_xAxisUnit("")
 	, m_yAxisUnit("")
 	, m_xFormatter(nullptr)

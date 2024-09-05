@@ -41,7 +41,7 @@ QWidget *GRTimePlotAddonSettings::createMenu(QWidget *parent)
 	lay->setSpacing(10);
 	w->setLayout(lay);
 
-	m_pen = QPen(StyleHelper::getColor("ScopyBlue"));
+	m_pen = QPen(Style::getAttribute(json::theme::interactive_primary_idle));
 
 	MenuHeaderWidget *header = new MenuHeaderWidget("PLOT", m_pen, w);
 	QWidget *xaxismenu = createXAxisMenu(w);
@@ -75,7 +75,7 @@ QWidget *GRTimePlotAddonSettings::createYAxisMenu(QWidget *parent)
 	autoscaler = new PlotAutoscaler(this);
 	connect(autoscaler, &PlotAutoscaler::newMin, m_yctrl, &MenuPlotAxisRangeControl::setMin);
 	connect(autoscaler, &PlotAutoscaler::newMax, m_yctrl, &MenuPlotAxisRangeControl::setMax);
-	StyleHelper::BlueButton(m_autoscaleBtn, "autoscale");
+	StyleHelper::BasicButton(m_autoscaleBtn, "autoscale");
 
 	connect(m_autoscaleBtn, &QPushButton::clicked, this, [=]() { autoscaler->autoscale(); });
 

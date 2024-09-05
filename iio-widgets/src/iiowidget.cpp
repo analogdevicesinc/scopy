@@ -20,6 +20,7 @@
 
 #include "iiowidget.h"
 #include <QDateTime>
+#include <style.h>
 #include <pluginbase/preferences.h>
 
 using namespace scopy;
@@ -90,7 +91,7 @@ void IIOWidget::saveData(QString data)
 {
 	setLastOperationState(IIOWidget::Busy);
 	setLastOperationTimestamp(QDateTime::currentDateTime());
-	m_progressBar->setBarColor(StyleHelper::getColor("ProgressBarBusy"));
+	m_progressBar->setBarColor(Style::getAttribute(json::theme::content_busy));
 	setToolTip("Operation in progress.");
 
 	qDebug(CAT_IIOWIDGET) << "Sending data" << data << "to data strategy.";
@@ -110,14 +111,14 @@ void IIOWidget::emitDataStatus(QDateTime timestamp, QString oldData, QString new
 	setLastOperationTimestamp(timestamp);
 	QString timestampFormat = timestamp.toString("hh:mm:ss");
 	if(status < 0) {
-		m_progressBar->setBarColor(StyleHelper::getColor("ProgressBarError"));
+		m_progressBar->setBarColor(Style::getAttribute(json::theme::content_error));
 		QString statusString = "Tried to write \"" + m_lastData +
 			"\", but failed.\nError: " + QString(strerror(-status)) + " (" + QString::number(status) + ").";
 		setToolTip("[" + timestampFormat + "] " + statusString);
 		setLastOperationState(IIOWidget::Error);
 		qDebug(CAT_IIOWIDGET) << statusString;
 	} else {
-		m_progressBar->setBarColor(StyleHelper::getColor("ProgressBarSuccess"));
+		m_progressBar->setBarColor(Style::getAttribute(json::theme::content_success));
 		QString statusString = "Operation finished successfully.";
 		setToolTip("[" + timestampFormat + "] " + statusString);
 		setLastOperationState(IIOWidget::Correct);
@@ -154,7 +155,7 @@ void IIOWidget::setDataToUIConversion(std::function<QString(QString)> func) { m_
 void IIOWidget::startTimer(QString data)
 {
 	m_lastData = data;
-	m_progressBar->setBarColor(StyleHelper::getColor("ScopyBlue"));
+	m_progressBar->setBarColor(Style::getAttribute(json::theme::interactive_primary_idle));
 	m_progressBar->startProgress();
 }
 

@@ -138,7 +138,7 @@ QWidget *GRTimeChannelComponent::createCurveMenu(QWidget *parent)
 QPushButton *GRTimeChannelComponent::createSnapshotButton(QWidget *parent)
 {
 	QPushButton *snapBtn = new QPushButton("Snapshot", parent);
-	StyleHelper::BlueButton(snapBtn);
+	StyleHelper::BasicButton(snapBtn);
 
 	connect(snapBtn, &QPushButton::clicked, this, [=]() {
 		std::vector<float> x, y;

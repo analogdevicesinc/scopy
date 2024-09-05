@@ -1,0 +1,6 @@
+QPushButton[&&property&&=true] {
+	height: &unit_4&;
+	border-radius: &radius_1&;
+	text-align: center;
+	qproperty-iconSize: &unit_4&px;
+}

@@ -411,7 +411,7 @@ QWidget *IioTabWidget::createVerifyBtnWidget(QWidget *parent)
 
 	m_btnVerify = new AnimationPushButton(w);
 	setupBtnLdIcon(m_btnVerify);
-	StyleHelper::BlueButton(m_btnVerify);
+	StyleHelper::BasicButton(m_btnVerify);
 	m_btnVerify->setText("Verify");
 	m_btnVerify->setIconSize(QSize(30, 30));
 	m_btnVerify->setFixedWidth(128);

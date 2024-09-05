@@ -1,7 +1,10 @@
 QPushButton[&&property&&=true] {
     border-radius: &radius_1&;
+    border-style: outset;
     background-color: &interactive_primary_idle&;
     color: &content_inverse&;
+    font-weight: 700;
+    qproperty-iconSize: &unit_4&px;
 }
 QPushButton[&&property&&=true]:hover {
     background-color: &interactive_primary_hover&;
@@ -11,4 +14,7 @@ QPushButton[&&property&&=true]:hover {
 QPushButton[&&property&&=true]:pressed {
     background-color: &interactive_primary_pressed&;
     color: &content_inverse&;
+}
+QPushButton[&&property&&=true]:disabled {
+    background-color: &interactive_subtle_disabled&;
 }

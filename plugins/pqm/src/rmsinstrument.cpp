@@ -9,6 +9,7 @@
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/tooltemplate.h>
 #include <QLoggingCategory>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_PQM_RMS, "PqmRms")
 
@@ -38,7 +39,7 @@ RmsInstrument::RmsInstrument(QWidget *parent)
 	voltageWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *voltageLayout = new QVBoxLayout();
 	voltageWidget->setLayout(voltageLayout);
-	voltageWidget->setStyleSheet("background-color:" + StyleHelper::getColor("UIElementBackground"));
+	voltageWidget->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
 
 	MeasurementsPanel *voltagePanel = new MeasurementsPanel(this);
 	createLabels(voltagePanel, m_chnls["voltage"].values(),
@@ -55,7 +56,7 @@ RmsInstrument::RmsInstrument(QWidget *parent)
 	currentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *currentLayout = new QVBoxLayout();
 	currentWidget->setLayout(currentLayout);
-	currentWidget->setStyleSheet("background-color:" + StyleHelper::getColor("UIElementBackground"));
+	currentWidget->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
 
 	MeasurementsPanel *currentPanel = new MeasurementsPanel(this);
 	createLabels(currentPanel, m_chnls["current"].values(), {"RMS", "Angle"});
@@ -99,7 +100,7 @@ void RmsInstrument::createLabels(MeasurementsPanel *mPanel, QStringList chnls, Q
 	QString c = color;
 	for(const QString &ch : chnls) {
 		if(chnls.size() > 1) {
-			c = StyleHelper::getColor("CH" + QString::number(chIdx));
+			c = StyleHelper::getChannelColor(chIdx);
 		}
 		for(const QString &l : labels) {
 			MeasurementLabel *ml = new MeasurementLabel(this);
@@ -134,7 +135,7 @@ void RmsInstrument::updateLabels()
 
 void RmsInstrument::initPlot(PolarPlotWidget *plot)
 {
-	plot->setBgColor(QColor(StyleHelper::getColor("ScopyBackground")));
+	plot->setBgColor(QColor(Style::getAttribute(json::theme::background_primary)));
 	plot->setAzimuthInterval(0.0, 360.0, 30.0);
 	plot->plot()->insertLegend(new QwtLegend(), QwtPolarPlot::LeftLegend);
 }
@@ -143,7 +144,7 @@ void RmsInstrument::setupPlotChannels(PolarPlotWidget *plot, QMap<QString, QStri
 {
 	int chIdx = 0;
 	for(const QString &ch : channels) {
-		QPen chPen = QPen(QColor(StyleHelper::getColor("CH" + QString::number(chIdx))), 1);
+		QPen chPen = QPen(QColor(StyleHelper::getChannelColor(chIdx)), 1);
 		PolarPlotChannel *plotCh = new PolarPlotChannel(channels.key(ch), chPen, plot, this);
 		plotCh->setThickness(thickness);
 		plotCh->setEnabled(true);
