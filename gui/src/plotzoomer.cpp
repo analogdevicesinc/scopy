@@ -75,6 +75,7 @@ void PlotZoomer::cancelZoom()
 {
 	delete m_rubberBand;
 	m_rubberBand = nullptr;
+	plot()->repaint();
 }
 
 void PlotZoomer::setEnabled(bool en)
