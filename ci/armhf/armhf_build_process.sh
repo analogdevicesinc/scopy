@@ -4,7 +4,9 @@ set -ex
 git config --global --add safe.directory $HOME/scopy
 SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
 SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
-source $SRC_DIR/ci/armhf/armhf_build_config.sh
+SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+source $SRC_SCRIPT/armhf_build_config.sh
 
 echo -- USING CMAKE COMMAND:
 echo $CMAKE
@@ -344,6 +346,16 @@ move_sysroot(){
 	if [ ! -d $SYSROOT ];then
 		echo "Missing SYSROOT"
 		exit 1
+	fi
+}
+
+# move the staging folder that contains the tools needed for the build to the known location
+move_tools(){
+	[ -d /home/runner/staging ] && mv /home/runner/staging $STAGING_AREA || echo "Staging folder not found or already moved"
+	if [ ! -d $STAGING_AREA ]; then
+		echo "Missing tools folder, downloading now"
+		download_cmake
+		download_crosscompiler
 	fi
 }
 

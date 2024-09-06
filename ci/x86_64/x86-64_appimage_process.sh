@@ -424,6 +424,15 @@ generate_ci_envs(){
 	$SRC_DIR/ci/general/gen_ci_envs.sh > $SRC_DIR/ci/x86_64/gh-actions.envs
 }
 
+# move the staging folder that contains the tools needed for the build to the known location
+move_tools(){
+	[ -d /home/runner/staging ] && mv /home/runner/staging $STAGING_AREA || echo "Staging folder not found or already moved"
+	if [ ! -d $STAGING_AREA ]; then
+		echo "Missing tools folder, downloading now"
+		download_tools
+	fi
+}
+
 move_appimage(){
 	mv $APP_IMAGE $SRC_DIR
 }
@@ -450,7 +459,7 @@ build_deps(){
 }
 
 run_workflow(){
-	download_tools
+	[ "$CI_SCRIPT" == "ON" ] && move_tools || download_tools
 	build_iio-emu
 	build_scopy
 	create_appdir

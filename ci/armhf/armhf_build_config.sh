@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LIBIIO_VERSION=v0.25
+LIBIIO_VERSION=libiio-v0
 LIBAD9361_BRANCH=main
 GLOG_BRANCH=v0.4.0
 LIBM2K_BRANCH=main
@@ -18,12 +18,10 @@ export APPIMAGE=1
 
 PYTHON_VERSION=python3.9 # default python version used in CI scripts, can be changed to match locally installed python
 
-STAGING_AREA=$SRC_DIR/CI/armhf/staging
-
-STAGING_AREA=$SRC_DIR/ci/armhf/staging
+SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+STAGING_AREA=$SRC_SCRIPT/staging
 SYSROOT=$STAGING_AREA/sysroot
 SYSROOT_TAR=$STAGING_AREA/sysroot.tar.gz
-SYSROOT_DOCKER=$SRC_DIR/ci/armhf/docker/sysroot.tar.gz
 TOOLCHAIN=$STAGING_AREA/cross-pi-gcc
 TOOLCHAIN_BIN=$TOOLCHAIN/bin
 TOOLCHAIN_HOST="arm-linux-gnueabihf"
