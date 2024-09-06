@@ -55,6 +55,9 @@ public:
 	bool isXAxisEn() const;
 	bool isYAxisEn() const;
 
+	static double scaleToFactor(double scale, QwtAxisId axisId, QwtPlot *plot);
+	static double factorToScale(double factor, QwtAxisId axisId, QwtPlot *plot);
+
 Q_SIGNALS:
 	void reset();
 	void zoomed(double factor, QPointF cursorPos = QPointF());
