@@ -636,5 +636,5 @@ QString RegmapStyleHelper::sliderStyle()
 QString RegmapStyleHelper::getColorBasedOnValue(QString value)
 {
 	uint32_t colorIndex = Utils::convertQStringToUint32(value) % 16;
-	return Util::getColors().at(colorIndex);
+	return StyleHelper::getChannelColor(colorIndex);
 }
