@@ -37,6 +37,11 @@ static uint32_t h8PhaseDeviceRegister = 0x1C;
 
 static vector<double> rawDataList;
 
+static const QColor sineColor = QColor("#85e94c");
+static const QColor cosineColor = QColor("#91e6cf");
+static const QColor faultLEDColor = QColor("#c81a28");
+static const QColor statusLEDColor = QColor("#2e9e6f");
+
 using namespace scopy;
 using namespace scopy::admt;
 using namespace scopy::grutil;
@@ -390,10 +395,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationRawDataPlotWidget->xAxis()->setVisible(false);
 	calibrationRawDataPlotWidget->yAxis()->setVisible(false);
 	QPen calibrationRawDataPen = QPen(StyleHelper::getColor("ScopyBlue"));
-	QPen calibrationSineDataPen = QPen(StyleHelper::getColor("CH0"));
-	calibrationSineDataPen.color().setAlphaF(0.1);
-	QPen calibrationCosineDataPen = QPen(StyleHelper::getColor("CH1"));
-	calibrationCosineDataPen.color().setAlphaF(0.1);
+	QPen calibrationSineDataPen = QPen(sineColor);
+	QPen calibrationCosineDataPen = QPen(cosineColor);
 
 	calibrationRawDataXPlotAxis = new PlotAxis(QwtAxis::XBottom, calibrationRawDataPlotWidget, calibrationRawDataPen);
 	calibrationRawDataYPlotAxis = new PlotAxis(QwtAxis::YLeft, calibrationRawDataPlotWidget, calibrationRawDataPen);
@@ -417,13 +420,30 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationRawDataPlotWidget->setShowYAxisLabels(true);
 	calibrationRawDataPlotWidget->showAxisLabels();
 
-	// Calibrated Plot Widget
-	// PlotWidget *calibrationCalibratedDataPlotWidget = new PlotWidget();
-	// calibrationCalibratedDataPlotWidget->setContentsMargins(10, 20, 10, 10);
-
 	calibrationDataGraphTabWidget->addTab(calibrationRawDataPlotWidget, "Calibration Samples");
-	// calibrationDataGraphTabWidget->addTab(calibrationCalibratedDataPlotWidget, "Calibrated");
+
+	QWidget *calibrationDataGraphChannelsWidget = new QWidget(calibrationDataGraphSectionWidget);
+	QHBoxLayout *calibrationDataGraphChannelsLayout = new QHBoxLayout(calibrationDataGraphChannelsWidget);
+	calibrationDataGraphChannelsWidget->setLayout(calibrationDataGraphChannelsLayout);
+	QString calibrationDataGraphChannelsStyle = QString(R"css(
+														background-color: &&colorname&&;
+														)css");
+	calibrationDataGraphChannelsStyle.replace(QString("&&colorname&&"), StyleHelper::getColor("UIElementBackground"));
+	calibrationDataGraphChannelsWidget->setStyleSheet(calibrationDataGraphChannelsStyle);
+	calibrationDataGraphChannelsLayout->setMargin(0);
+	calibrationDataGraphChannelsLayout->setSpacing(10);
+	
+	MenuControlButton *toggleAngleButton = createChannelToggleWidget("Angle", QColor(StyleHelper::getColor("ScopyBlue")), calibrationDataGraphChannelsWidget);
+	MenuControlButton *toggleSineButton = createChannelToggleWidget("Sine", sineColor, calibrationDataGraphChannelsWidget);
+	MenuControlButton *toggleCosineButton = createChannelToggleWidget("Cosine", cosineColor, calibrationDataGraphChannelsWidget);
+
+	calibrationDataGraphChannelsLayout->addWidget(toggleAngleButton);
+	calibrationDataGraphChannelsLayout->addWidget(toggleSineButton);
+	calibrationDataGraphChannelsLayout->addWidget(toggleCosineButton);
+	calibrationDataGraphChannelsLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
+
 	calibrationDataGraphSectionWidget->contentLayout()->addWidget(calibrationDataGraphTabWidget);
+	calibrationDataGraphSectionWidget->contentLayout()->addWidget(calibrationDataGraphChannelsWidget);
 
 	MenuSectionWidget *FFTDataGraphSectionWidget = new MenuSectionWidget(calibrationDataGraphWidget);
 	QTabWidget *FFTDataGraphTabWidget = new QTabWidget(FFTDataGraphSectionWidget);
@@ -815,6 +835,18 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 		autoCalibrate = toggled; 
 		StatusBarManager::pushMessage(QString("Auto Calibrate: ") + QString((toggled ? "True" : "False")));
 	});
+	connect(toggleAngleButton->checkBox(), &QCheckBox::toggled, this, [=](bool b){
+		calibrationRawDataPlotWidget->selectChannel(calibrationRawDataPlotChannel);
+		calibrationRawDataPlotWidget->selectedChannel()->setEnabled(b);
+	});
+	connect(toggleSineButton->checkBox(), &QCheckBox::toggled, this, [=](bool b){
+		calibrationRawDataPlotWidget->selectChannel(calibrationSineDataPlotChannel);
+		calibrationRawDataPlotWidget->selectedChannel()->setEnabled(b);
+	});
+	connect(toggleCosineButton->checkBox(), &QCheckBox::toggled, this, [=](bool b){
+		calibrationRawDataPlotWidget->selectChannel(calibrationCosineDataPlotChannel);
+		calibrationRawDataPlotWidget->selectedChannel()->setEnabled(b);
+	});
 
 	return tool;
 }
@@ -871,10 +903,14 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	registerSensorDataGridLayout->setSpacing(10);
 
 	RegisterBlockWidget *cnvPageRegisterBlock = new RegisterBlockWidget("CNVPAGE", "Convert Start and Page Select", 0x01, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *absAngleRegisterBlock = new RegisterBlockWidget("ABSANGLE", "Absolute Angle", 0x03, 0xDB00, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 	RegisterBlockWidget *digIORegisterBlock = new RegisterBlockWidget("DIGIO", "Digital Input Output", 0x04, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *angleRegisterBlock = new RegisterBlockWidget("ANGLE", "Angle Register", 0x05, 0x8000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 	RegisterBlockWidget *faultRegisterBlock = new RegisterBlockWidget("FAULT", "Fault Register", 0x06, 0xFFFF, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	RegisterBlockWidget *generalRegisterBlock = new RegisterBlockWidget("GENERAL", "General Device Configuration", 0x10, 0x1230, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	RegisterBlockWidget *digIOEnRegisterBlock = new RegisterBlockWidget("DIGIOEN", "Enable Digital Input/Outputs", 0x12, 0x241B, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	RegisterBlockWidget *angleCkRegisterBlock = new RegisterBlockWidget("ANGLECK", "Primary vs Secondary Angle Check", 0x13, 0x000F, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+
+	RegisterBlockWidget *absAngleRegisterBlock = new RegisterBlockWidget("ABSANGLE", "Absolute Angle", 0x03, 0xDB00, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	RegisterBlockWidget *angleRegisterBlock = new RegisterBlockWidget("ANGLE", "Angle Register", 0x05, 0x8000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 	RegisterBlockWidget *angleSecRegisterBlock = new RegisterBlockWidget("ANGLESEC", "Secondary Angle", 0x08, 0x8000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 	RegisterBlockWidget *sineRegisterBlock = new RegisterBlockWidget("SINE", "Sine Measurement", 0x10, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 	RegisterBlockWidget *cosineRegisterBlock = new RegisterBlockWidget("COSINE", "Cosine Measurement", 0x11, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
@@ -885,10 +921,14 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	RegisterBlockWidget *diag2RegisterBlock = new RegisterBlockWidget("DIAG2", "Measurements of two diagnostics resistors of fixed value", 0x1E, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 	RegisterBlockWidget *tmp0RegisterBlock = new RegisterBlockWidget("TMP0", "Primary Temperature Sensor", 0x20, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 	RegisterBlockWidget *tmp1RegisterBlock = new RegisterBlockWidget("TMP1", "Secondary Temperature Sensor", 0x23, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *generalRegisterBlock = new RegisterBlockWidget("GENERAL", "General Device Configuration", 0x10, 0x1230, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *digIOEnRegisterBlock = new RegisterBlockWidget("DIGIOEN", "Enable Digital Input/Outputs", 0x12, 0x241B, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *angleCkRegisterBlock = new RegisterBlockWidget("ANGLECK", "Primary vs Secondary Angle Check", 0x13, 0x000F, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 	RegisterBlockWidget *cnvCntRegisterBlock = new RegisterBlockWidget("CNVCNT", "Conversion Count", 0x14, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	RegisterBlockWidget *eccDcdeRegisterBlock = new RegisterBlockWidget("ECCDCDE", "Error Correction Codes", 0x1D, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	RegisterBlockWidget *uniqID0RegisterBlock = new RegisterBlockWidget("UNIQID0", "Unique ID Register 0", 0x1E, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	RegisterBlockWidget *uniqID1RegisterBlock = new RegisterBlockWidget("UNIQID1", "Unique ID Register 1", 0x1F, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	RegisterBlockWidget *uniqID2RegisterBlock = new RegisterBlockWidget("UNIQID2", "Unique ID Register 2", 0x20, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	RegisterBlockWidget *uniqID3RegisterBlock = new RegisterBlockWidget("UNIQID3", "Product, voltage supply. ASIL and ASIC revision identifiers", 0x21, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	RegisterBlockWidget *eccDisRegisterBlock = new RegisterBlockWidget("ECCDIS", "Error Correction Code disable", 0x23, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+
 	RegisterBlockWidget *h1MagRegisterBlock = new RegisterBlockWidget("H1MAG", "1st Harmonic error magnitude", 0x15, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 	RegisterBlockWidget *h1PhRegisterBlock = new RegisterBlockWidget("H1PH", "1st Harmonic error phase", 0x16, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 	RegisterBlockWidget *h2MagRegisterBlock = new RegisterBlockWidget("H2MAG", "2nd Harmonic error magnitude", 0x17, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
@@ -897,12 +937,6 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	RegisterBlockWidget *h3PhRegisterBlock = new RegisterBlockWidget("H3PH", "3rd Harmonic error phase", 0x1A, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 	RegisterBlockWidget *h8MagRegisterBlock = new RegisterBlockWidget("H8MAG", "8th Harmonic error magnitude", 0x1B, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 	RegisterBlockWidget *h8PhRegisterBlock = new RegisterBlockWidget("H8PH", "8th Harmonic error phase", 0x1C, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *eccDcdeRegisterBlock = new RegisterBlockWidget("ECCDCDE", "Error Correction Codes", 0x1D, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *uniqID0RegisterBlock = new RegisterBlockWidget("UNIQID0", "Unique ID Register 0", 0x1E, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *uniqID1RegisterBlock = new RegisterBlockWidget("UNIQID1", "Unique ID Register 1", 0x1F, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *uniqID2RegisterBlock = new RegisterBlockWidget("UNIQID2", "Unique ID Register 2", 0x20, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *uniqID3RegisterBlock = new RegisterBlockWidget("UNIQID3", "Product, voltage supply. ASIL and ASIC revision identifiers", 0x21, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *eccDisRegisterBlock = new RegisterBlockWidget("ECCDIS", "Error Correction Code disable", 0x23, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 	
 	registerConfigurationGridLayout->addWidget(cnvPageRegisterBlock, 0, 0);
 	registerConfigurationGridLayout->addWidget(digIORegisterBlock, 0, 1);
@@ -912,6 +946,20 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	registerConfigurationGridLayout->addWidget(angleCkRegisterBlock, 1, 0);
 	registerConfigurationGridLayout->addWidget(eccDcdeRegisterBlock, 1, 1);
 	registerConfigurationGridLayout->addWidget(eccDisRegisterBlock, 1, 2);
+
+	registerSensorDataGridLayout->addWidget(absAngleRegisterBlock, 0, 0);
+	registerSensorDataGridLayout->addWidget(angleRegisterBlock, 0, 1);
+	registerSensorDataGridLayout->addWidget(angleSecRegisterBlock, 0, 2);
+	registerSensorDataGridLayout->addWidget(sineRegisterBlock, 0, 3);
+	registerSensorDataGridLayout->addWidget(cosineRegisterBlock, 0, 4);
+	registerSensorDataGridLayout->addWidget(secAnglIRegisterBlock, 1, 0);
+	registerSensorDataGridLayout->addWidget(secAnglQRegisterBlock, 1, 1);
+	registerSensorDataGridLayout->addWidget(radiusRegisterBlock, 1, 2);
+	registerSensorDataGridLayout->addWidget(diag1RegisterBlock, 1, 3);
+	registerSensorDataGridLayout->addWidget(diag2RegisterBlock, 1, 4);
+	registerSensorDataGridLayout->addWidget(tmp0RegisterBlock, 2, 0);
+	registerSensorDataGridLayout->addWidget(tmp1RegisterBlock, 2, 1);
+	registerSensorDataGridLayout->addWidget(cnvCntRegisterBlock, 2, 2);
 
 	registerDeviceIDGridLayout->addWidget(uniqID0RegisterBlock, 0, 0);
 	registerDeviceIDGridLayout->addWidget(uniqID1RegisterBlock, 0, 1);
@@ -929,19 +977,6 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	registerHarmonicsGridLayout->addWidget(h8MagRegisterBlock, 1, 1);
 	registerHarmonicsGridLayout->addWidget(h8PhRegisterBlock, 1, 2);
 	
-	registerSensorDataGridLayout->addWidget(absAngleRegisterBlock, 0, 0);
-	registerSensorDataGridLayout->addWidget(angleRegisterBlock, 0, 1);
-	registerSensorDataGridLayout->addWidget(angleSecRegisterBlock, 0, 2);
-	registerSensorDataGridLayout->addWidget(sineRegisterBlock, 0, 3);
-	registerSensorDataGridLayout->addWidget(cosineRegisterBlock, 0, 4);
-	registerSensorDataGridLayout->addWidget(secAnglIRegisterBlock, 1, 0);
-	registerSensorDataGridLayout->addWidget(secAnglQRegisterBlock, 1, 1);
-	registerSensorDataGridLayout->addWidget(radiusRegisterBlock, 1, 2);
-	registerSensorDataGridLayout->addWidget(diag1RegisterBlock, 1, 3);
-	registerSensorDataGridLayout->addWidget(diag2RegisterBlock, 1, 4);
-	registerSensorDataGridLayout->addWidget(tmp0RegisterBlock, 2, 0);
-	registerSensorDataGridLayout->addWidget(tmp1RegisterBlock, 2, 1);
-	registerSensorDataGridLayout->addWidget(cnvCntRegisterBlock, 2, 2);
 
 	// for(int c=0; c < registerGridLayout->columnCount(); ++c) registerGridLayout->setColumnStretch(c,1);
 	// for(int r=0; r < registerGridLayout->rowCount(); ++r)  registerGridLayout->setRowStretch(r,1);
@@ -953,12 +988,12 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	// registerLayout->addWidget(registerGridWidget);
 	registerLayout->addWidget(registerConfigurationLabel);
 	registerLayout->addWidget(registerConfigurationGridWidget);
+	registerLayout->addWidget(registerSensorDataLabel);
+	registerLayout->addWidget(registerSensorDataGridWidget);
 	registerLayout->addWidget(registerDeviceIDLabel);
 	registerLayout->addWidget(registerDeviceIDGridWidget);
 	registerLayout->addWidget(registerHarmonicsLabel);
 	registerLayout->addWidget(registerHarmonicsGridWidget);
-	registerLayout->addWidget(registerSensorDataLabel);
-	registerLayout->addWidget(registerSensorDataGridWidget);
 	registerLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -981,6 +1016,128 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 {
 	ToolTemplate *tool = new ToolTemplate(this);
 
+	#pragma region Left Utility Widget
+	QWidget *leftUtilityWidget = new QWidget(this);
+	QVBoxLayout *leftUtilityLayout = new QVBoxLayout(leftUtilityWidget);
+	leftUtilityWidget->setLayout(leftUtilityLayout);
+	leftUtilityLayout->setMargin(0);
+	leftUtilityLayout->setSpacing(10);
+	#pragma region Command Log Widget
+	MenuSectionWidget *commandLogSectionWidget = new MenuSectionWidget(leftUtilityWidget);
+	MenuCollapseSection *commandLogCollapseSection = new MenuCollapseSection("Command Log", MenuCollapseSection::MHCW_NONE, commandLogSectionWidget);
+	commandLogSectionWidget->contentLayout()->addWidget(commandLogCollapseSection);
+
+	QPlainTextEdit *commandLogPlainTextEdit = new QPlainTextEdit(commandLogSectionWidget);
+	commandLogPlainTextEdit->setReadOnly(true);
+	commandLogPlainTextEdit->setFixedHeight(320);
+
+	commandLogCollapseSection->contentLayout()->addWidget(commandLogPlainTextEdit);
+
+	leftUtilityLayout->addWidget(commandLogSectionWidget);
+	leftUtilityLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	#pragma endregion
+	#pragma endregion
+
+	#pragma region Center Utility Widget
+	QWidget *centerUtilityWidget = new QWidget(this);
+	QHBoxLayout *centerUtilityLayout = new QHBoxLayout(centerUtilityWidget);
+	centerUtilityWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+	centerUtilityWidget->setLayout(centerUtilityLayout);
+	centerUtilityLayout->setMargin(0);
+	centerUtilityLayout->setSpacing(10);
+	// centerUtilityLayout->setAlignment(Qt::AlignTop);
+
+	#pragma region DIGIO Monitor
+	MenuSectionWidget *DIGIOMonitorSectionWidget = new MenuSectionWidget(centerUtilityWidget);
+	MenuCollapseSection *DIGIOMonitorCollapseSection = new MenuCollapseSection("DIGIO Monitor", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, DIGIOMonitorSectionWidget);
+	DIGIOMonitorSectionWidget->contentLayout()->addWidget(DIGIOMonitorCollapseSection);
+
+	MenuControlButton *DIGIOBusyStatusLED = createStatusLEDWidget("BUSY", statusLEDColor, DIGIOMonitorCollapseSection);
+	MenuControlButton *DIGIOCNVStatusLED = createStatusLEDWidget("CNV", statusLEDColor, DIGIOMonitorCollapseSection);
+	MenuControlButton *DIGIOSENTStatusLED = createStatusLEDWidget("SENT", statusLEDColor, DIGIOMonitorCollapseSection);
+	MenuControlButton *DIGIOACALCStatusLED = createStatusLEDWidget("ACALC", statusLEDColor, DIGIOMonitorCollapseSection);
+	MenuControlButton *DIGIOFaultStatusLED = createStatusLEDWidget("FAULT", statusLEDColor, DIGIOMonitorCollapseSection);
+	MenuControlButton *DIGIOBootloaderStatusLED = createStatusLEDWidget("BOOTLOADER", statusLEDColor, DIGIOMonitorCollapseSection);
+
+	DIGIOMonitorCollapseSection->contentLayout()->addWidget(DIGIOBusyStatusLED);
+	DIGIOMonitorCollapseSection->contentLayout()->addWidget(DIGIOCNVStatusLED);
+	DIGIOMonitorCollapseSection->contentLayout()->addWidget(DIGIOSENTStatusLED);
+	DIGIOMonitorCollapseSection->contentLayout()->addWidget(DIGIOACALCStatusLED);
+	DIGIOMonitorCollapseSection->contentLayout()->addWidget(DIGIOFaultStatusLED);
+	DIGIOMonitorCollapseSection->contentLayout()->addWidget(DIGIOBootloaderStatusLED);
+	#pragma endregion
+
+	#pragma region MTDIAG1 Widget
+	MenuSectionWidget *MTDIAG1SectionWidget = new MenuSectionWidget(centerUtilityWidget);
+	MenuCollapseSection *MTDIAG1CollapseSection = new MenuCollapseSection("MT Diagnostic Register", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MTDIAG1SectionWidget);
+	MTDIAG1SectionWidget->contentLayout()->addWidget(MTDIAG1CollapseSection);
+
+	MenuControlButton *R0StatusLED = createStatusLEDWidget("R0", statusLEDColor, MTDIAG1SectionWidget);
+	MenuControlButton *R1StatusLED = createStatusLEDWidget("R1", statusLEDColor, MTDIAG1SectionWidget);
+	MenuControlButton *R2StatusLED = createStatusLEDWidget("R2", statusLEDColor, MTDIAG1SectionWidget);
+	MenuControlButton *R3StatusLED = createStatusLEDWidget("R3", statusLEDColor, MTDIAG1SectionWidget);
+	MenuControlButton *R4StatusLED = createStatusLEDWidget("R4", statusLEDColor, MTDIAG1SectionWidget);
+	MenuControlButton *R5StatusLED = createStatusLEDWidget("R5", statusLEDColor, MTDIAG1SectionWidget);
+	MenuControlButton *R6StatusLED = createStatusLEDWidget("R6", statusLEDColor, MTDIAG1SectionWidget);
+	MenuControlButton *R7StatusLED = createStatusLEDWidget("R7", statusLEDColor, MTDIAG1SectionWidget);
+
+	MTDIAG1CollapseSection->contentLayout()->addWidget(R0StatusLED);
+	MTDIAG1CollapseSection->contentLayout()->addWidget(R1StatusLED);
+	MTDIAG1CollapseSection->contentLayout()->addWidget(R2StatusLED);
+	MTDIAG1CollapseSection->contentLayout()->addWidget(R3StatusLED);
+	MTDIAG1CollapseSection->contentLayout()->addWidget(R4StatusLED);
+	MTDIAG1CollapseSection->contentLayout()->addWidget(R5StatusLED);
+	MTDIAG1CollapseSection->contentLayout()->addWidget(R6StatusLED);
+	MTDIAG1CollapseSection->contentLayout()->addWidget(R7StatusLED);
+	#pragma endregion
+
+	#pragma region MT Diagnostics
+	QScrollArea *MTDiagnosticsScrollArea = new QScrollArea(centerUtilityWidget);
+	QWidget *MTDiagnosticsWidget = new QWidget(MTDiagnosticsScrollArea);
+	MTDiagnosticsScrollArea->setWidget(MTDiagnosticsWidget);
+	MTDiagnosticsScrollArea->setWidgetResizable(true);
+	QVBoxLayout *MTDiagnosticsLayout = new QVBoxLayout(MTDiagnosticsWidget);
+	MTDiagnosticsLayout->setMargin(0);
+	MTDiagnosticsLayout->setSpacing(10);
+
+	MenuSectionWidget *MTDiagnosticsSectionWidget = new MenuSectionWidget(centerUtilityWidget);
+	MenuCollapseSection *MTDiagnosticsCollapseSection = new MenuCollapseSection("MT Diagnostics", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MTDiagnosticsSectionWidget);
+	MTDiagnosticsSectionWidget->contentLayout()->addWidget(MTDiagnosticsCollapseSection);
+	MTDiagnosticsCollapseSection->contentLayout()->setSpacing(10);
+
+	QLabel *AFEDIAG0Label = new QLabel("AFEDIAG0 (%)");
+	StyleHelper::MenuSmallLabel(AFEDIAG0Label, "AFEDIAG0Label");
+	QLabel *AFEDIAG1Label = new QLabel("AFEDIAG1 (%)");
+	StyleHelper::MenuSmallLabel(AFEDIAG1Label, "AFEDIAG1Label");
+	QLabel *AFEDIAG2Label = new QLabel("AFEDIAG2 (V)");
+	StyleHelper::MenuSmallLabel(AFEDIAG2Label, "AFEDIAG2Label");
+
+	QLineEdit *AFEDIAG0LineEdit = new QLineEdit("-57.0312", MTDiagnosticsSectionWidget);
+	QLineEdit *AFEDIAG1LineEdit = new QLineEdit("56.25", MTDiagnosticsSectionWidget);
+	QLineEdit *AFEDIAG2LineEdit = new QLineEdit("-312.499m", MTDiagnosticsSectionWidget);
+	applyLineEditStyle(AFEDIAG0LineEdit);
+	applyLineEditStyle(AFEDIAG1LineEdit);
+	applyLineEditStyle(AFEDIAG2LineEdit);
+
+	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG0Label);
+	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG0LineEdit);
+	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG1Label);
+	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG1LineEdit);
+	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG2Label);
+	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG2LineEdit);
+
+	MTDiagnosticsLayout->addWidget(MTDiagnosticsSectionWidget);
+	MTDiagnosticsLayout->addWidget(MTDIAG1SectionWidget);
+	#pragma endregion
+
+	centerUtilityLayout->addWidget(DIGIOMonitorSectionWidget, 0, Qt::AlignTop);
+	centerUtilityLayout->addWidget(MTDiagnosticsScrollArea, 0, Qt::AlignTop);
+	// centerUtilityLayout->addWidget(MTDIAG1SectionWidget, 0, Qt::AlignTop);
+	// centerUtilityLayout->addWidget(MTDiagnosticsSectionWidget, 0, Qt::AlignTop);
+
+	#pragma endregion
+
+	#pragma region Right Utility Widget
 	QScrollArea *rightUtilityScrollArea = new QScrollArea(this);
 	QWidget *rightUtilityWidget = new QWidget(rightUtilityScrollArea);
 	rightUtilityScrollArea->setWidget(rightUtilityWidget);
@@ -991,26 +1148,49 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	rightUtilityLayout->setSpacing(10);
 
 	MenuSectionWidget *faultRegisterSectionWidget = new MenuSectionWidget(rightUtilityWidget);
-	rightUtilityLayout->addWidget(faultRegisterSectionWidget);
 	MenuCollapseSection *faultRegisterCollapseSection = new MenuCollapseSection("Fault Register", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, faultRegisterSectionWidget);
 	faultRegisterSectionWidget->contentLayout()->addWidget(faultRegisterCollapseSection);
 	
-	MenuControlButton *testFaultButton = new MenuControlButton(faultRegisterSectionWidget);
-	testFaultButton->setName("VDD Under Voltage");
-	testFaultButton->setCheckBoxStyle(MenuControlButton::CheckboxStyle::CS_CIRCLE);
-	testFaultButton->setOpenMenuChecksThis(true);
-	testFaultButton->setDoubleClickToOpenMenu(true);
-	testFaultButton->setColor(QColor("#c81a28"));
-	testFaultButton->button()->setVisible(false);
-	testFaultButton->setCheckable(true);
-	testFaultButton->checkBox()->setChecked(true);
+	MenuControlButton *vddUnderVoltageStatusLED = createStatusLEDWidget("VDD Under Voltage", faultLEDColor, faultRegisterCollapseSection);
+	MenuControlButton *vddOverVoltageStatusLED = createStatusLEDWidget("VDD Over Voltage", faultLEDColor, faultRegisterCollapseSection);
+	MenuControlButton *vDriveUnderVoltageStatusLED = createStatusLEDWidget("VDRIVE Under Voltage", faultLEDColor, faultRegisterCollapseSection);
+	MenuControlButton *vDriveOverVoltageStatusLED = createStatusLEDWidget("VDRIVE Over Voltage", faultLEDColor, faultRegisterCollapseSection);
+	MenuControlButton *AFEDIAGStatusLED = createStatusLEDWidget("AFEDIAG", faultLEDColor, faultRegisterCollapseSection);
+	MenuControlButton *NVMCRCFaultStatusLED = createStatusLEDWidget("NVM CRC Fault", faultLEDColor, faultRegisterCollapseSection);
+	MenuControlButton *ECCDoubleBitErrorStatusLED = createStatusLEDWidget("ECC Double Bit Error", faultLEDColor, faultRegisterCollapseSection);
+	MenuControlButton *OscillatorDriftStatusLED = createStatusLEDWidget("Oscillator Drift", faultLEDColor, faultRegisterCollapseSection);
+	MenuControlButton *CountSensorFalseStateStatusLED = createStatusLEDWidget("Count Sensor False State", faultLEDColor, faultRegisterCollapseSection);
+	MenuControlButton *AngleCrossCheckStatusLED = createStatusLEDWidget("Angle Cross Check", faultLEDColor, faultRegisterCollapseSection);
+	MenuControlButton *TurnCountSensorLevelsStatusLED = createStatusLEDWidget("Turn Count Sensor Levels", faultLEDColor, faultRegisterCollapseSection);
+	MenuControlButton *MTDIAGStatusLED = createStatusLEDWidget("MTDIAG", faultLEDColor, faultRegisterCollapseSection);
+	MenuControlButton *TurnCounterCrossCheckStatusLED = createStatusLEDWidget("Turn Counter Cross Check", faultLEDColor, faultRegisterCollapseSection);
+	MenuControlButton *RadiusCheckStatusLED = createStatusLEDWidget("Radius Check", faultLEDColor, faultRegisterCollapseSection);
+	MenuControlButton *SequencerWatchdogStatusLED = createStatusLEDWidget("Sequencer Watchdog", faultLEDColor, faultRegisterCollapseSection);
 
-	faultRegisterCollapseSection->contentLayout()->addWidget(testFaultButton);
+	faultRegisterCollapseSection->contentLayout()->addWidget(vddUnderVoltageStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(vddOverVoltageStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(vDriveUnderVoltageStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(vDriveOverVoltageStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(AFEDIAGStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(NVMCRCFaultStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(ECCDoubleBitErrorStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(OscillatorDriftStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(CountSensorFalseStateStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(AngleCrossCheckStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(TurnCountSensorLevelsStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(MTDIAGStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(TurnCounterCrossCheckStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(RadiusCheckStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(SequencerWatchdogStatusLED);
 
+	rightUtilityLayout->addWidget(faultRegisterSectionWidget);
+	rightUtilityLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	#pragma endregion
+	
 	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tool->topContainer()->setVisible(false);
 	tool->topContainerMenuControl()->setVisible(false);
-	tool->leftContainer()->setVisible(false);
+	tool->leftContainer()->setVisible(true);
 	tool->rightContainer()->setVisible(true);
 	tool->bottomContainer()->setVisible(false);
 	tool->setLeftContainerWidth(270);
@@ -1018,6 +1198,8 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	tool->openBottomContainerHelper(false);
 	tool->openTopContainerHelper(false);
 
+	tool->leftStack()->addWidget(leftUtilityWidget);
+	tool->addWidgetToCentralContainerHelper(centerUtilityWidget);
 	tool->rightStack()->addWidget(rightUtilityScrollArea);
 
 	return tool;
@@ -1096,6 +1278,35 @@ void HarmonicCalibration::updateGeneralSettingEnabled(bool value)
 	dataSampleSizeLineEdit->setEnabled(value);
 	dataGraphSamplesLineEdit->setEnabled(value);
 	tempGraphSamplesLineEdit->setEnabled(value);
+}
+
+MenuControlButton *HarmonicCalibration::createStatusLEDWidget(const QString title, QColor color, QWidget *parent)
+{
+	MenuControlButton *menuControlButton = new MenuControlButton(parent);
+	menuControlButton->setName(title);
+	menuControlButton->setCheckBoxStyle(MenuControlButton::CheckboxStyle::CS_CIRCLE);
+	menuControlButton->setOpenMenuChecksThis(true);
+	menuControlButton->setDoubleClickToOpenMenu(true);
+	menuControlButton->setColor(color);
+	menuControlButton->button()->setVisible(false);
+	menuControlButton->setCheckable(true);
+	menuControlButton->checkBox()->setChecked(true);
+	menuControlButton->setEnabled(false);
+	return menuControlButton;
+}
+
+MenuControlButton *HarmonicCalibration::createChannelToggleWidget(const QString title, QColor color, QWidget *parent)
+{
+	MenuControlButton *menuControlButton = new MenuControlButton(parent);
+	menuControlButton->setName(title);
+	menuControlButton->setCheckBoxStyle(MenuControlButton::CheckboxStyle::CS_CIRCLE);
+	menuControlButton->setOpenMenuChecksThis(true);
+	menuControlButton->setDoubleClickToOpenMenu(true);
+	menuControlButton->setColor(color);
+	menuControlButton->button()->setVisible(false);
+	menuControlButton->setCheckable(false);
+	menuControlButton->checkBox()->setChecked(true);
+	return menuControlButton;
 }
 
 void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, int& variable)
@@ -1582,6 +1793,7 @@ void HarmonicCalibration::importCalibrationData()
 			for(int i = 0; i < data.size(); ++i) {
 				rawDataList.push_back(data[i]);
 			}
+			calibrationRawDataPlotWidget->replot();
 		}
 	} catch(FileManagerException &ex) {
 		calibrationLogWriteLn(QString(ex.what()));
@@ -1631,6 +1843,8 @@ void HarmonicCalibration::clearRawDataList()
 	rawDataList.clear();
 
 	calibrationRawDataPlotChannel->curve()->setData(nullptr);
+	calibrationSineDataPlotChannel->curve()->setData(nullptr);
+	calibrationCosineDataPlotChannel->curve()->setData(nullptr);
 	calibrationRawDataPlotWidget->replot();
 
 	calibrationFFTPlotChannel->curve()->setData(nullptr);

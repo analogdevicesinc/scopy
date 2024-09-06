@@ -163,6 +163,8 @@ private:
 	void connectMenuComboToNumber(MenuCombo* menuCombo, double& variable);
 	void appendSamplesToPlotCurve(PlotWidget *plotWidget, QVector<double>& newYData);
 	void applyTabWidgetStyle(QTabWidget *widget, const QString& styleHelperColor = "ScopyBlue");
+	MenuControlButton *createStatusLEDWidget(const QString title, QColor color, QWidget *parent = nullptr);
+	MenuControlButton *createChannelToggleWidget(const QString title, QColor color, QWidget *parent = nullptr);
 
 	QTimer *timer, *calibrationTimer, *motorCalibrationAcquisitionTimer;
 
