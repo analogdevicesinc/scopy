@@ -48,6 +48,9 @@ public:
 	void removeChannel(PlotChannel *channel);
 
 	bool isZoomed();
+	void forcePan(QwtAxisId axisId, double factor);
+	void forceMagnify(QwtAxisId axisId, double factor, QPointF cursorPos);
+	void forceZoom(QwtAxisId axisId, const QRectF &rect);
 
 	void setZoomerXAxesEn(bool en);
 	void setZoomerYAxesEn(bool en);
