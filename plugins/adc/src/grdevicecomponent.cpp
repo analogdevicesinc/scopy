@@ -49,9 +49,15 @@ QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent)
 	for(int i = 0; i < attrCount; i++) {
 		bool createAttr = true;
 		const char *attrName = iio_channel_get_attr(ch, i);
+		if(attrName == nullptr) {
+			continue;
+		}
 		for(int j = 1; j < chCount; j++) {
 			const struct iio_channel *ch1 = iio_device_get_channel(dev, j);
 			const char *attr1Name = iio_channel_find_attr(ch1, attrName);
+			if(attr1Name == nullptr) {
+				continue;
+			}
 			if(strcmp(attrName, attr1Name) != 0) {
 				createAttr = false;
 				break;
