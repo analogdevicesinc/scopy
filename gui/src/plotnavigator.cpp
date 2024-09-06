@@ -354,6 +354,36 @@ bool PlotNavigator::isZoomed()
 	return zoomed;
 }
 
+void PlotNavigator::forcePan(QwtAxisId axisId, double factor)
+{
+	for(Navigator *nav : *m_navigators) {
+		if((nav->magnifier->isXAxisEn() && nav->magnifier->getXAxis() == axisId) ||
+		   (nav->magnifier->isYAxisEn() && nav->magnifier->getYAxis() == axisId)) {
+			nav->magnifier->pan(factor);
+		}
+	}
+}
+
+void PlotNavigator::forceMagnify(QwtAxisId axisId, double factor, QPointF cursorPos)
+{
+	for(Navigator *nav : *m_navigators) {
+		if((nav->magnifier->isXAxisEn() && nav->magnifier->getXAxis() == axisId) ||
+		   (nav->magnifier->isYAxisEn() && nav->magnifier->getYAxis() == axisId)) {
+			nav->magnifier->zoom(factor, cursorPos);
+		}
+	}
+}
+
+void PlotNavigator::forceZoom(QwtAxisId axisId, const QRectF &rect)
+{
+	for(Navigator *nav : *m_navigators) {
+		if((nav->zoomer->isXAxisEn() && nav->zoomer->getXAxis() == axisId) ||
+		   (nav->zoomer->isYAxisEn() && nav->zoomer->getYAxis() == axisId)) {
+			nav->zoomer->zoom(rect);
+		}
+	}
+}
+
 void PlotNavigator::setZoomerXAxesEn(bool en)
 {
 	m_visibleZoomer->setXAxisEn(en);
