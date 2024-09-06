@@ -57,3 +57,7 @@ COPY --from=sysroot_builder /home/${USER}/scopy/ci/armhf/staging/sysroot/include
 WORKDIR /home/${USER}/sysroot
 RUN ln -s usr/bin bin && ln -s usr/lib lib && ln -s usr/sbin sbin
 WORKDIR /home/${USER}
+COPY armhf_build_process.sh /home/${USER}/armhf_build_process.sh
+COPY armhf_build_config.sh /home/${USER}/armhf_build_config.sh
+RUN /home/${USER}/armhf_build_process.sh install_packages download_cmake download_crosscompiler  && \
+	rm /home/${USER}/armhf_build_process.sh /home/${USER}/armhf_build_config.sh

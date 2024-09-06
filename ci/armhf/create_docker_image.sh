@@ -28,13 +28,13 @@ create_sysroot(){
 tar_and_move_sysroot(){
 	pushd $STAGING_AREA
 	sudo tar -czvf "${SYSROOT_TAR##*/}" sysroot
-	sudo mv $SYSROOT_TAR $SYSROOT_DOCKER
+	sudo mv $SYSROOT_TAR $SRC_DIR/ci/armhf
 	popd
 }
 
 create_image(){
-	pushd ${SRC_DIR}/ci/armhf/docker
-	sudo docker build --load --tag cristianbindea/scopy2-armhf-appimage:testing .
+	pushd ${SRC_DIR}/ci/armhf
+	sudo docker build --load --tag cristianbindea/scopy2-armhf-appimage:testing -f docker/Dockerfile .
 	# sudo DOCKER_BUILDKIT=0 docker build --tag cristianbindea/scopy2-armhf-appimage:testing . # build the image using old backend
 	popd
 }
