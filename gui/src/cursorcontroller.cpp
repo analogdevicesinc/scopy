@@ -40,9 +40,9 @@ void CursorController::initUI()
 		plotCursorReadouts->setYUnits(ch->yAxis()->getUnits());
 	}
 	hoverReadouts = new HoverWidget(plotCursorReadouts, m_plot->plot()->canvas(), m_plot);
-	hoverReadouts->setAnchorPos(HoverPosition::HP_TOPLEFT);
-	hoverReadouts->setContentPos(HoverPosition::HP_BOTTOMRIGHT);
-	hoverReadouts->setAnchorOffset(QPoint(10, 10));
+	hoverReadouts->setAnchorPos(HoverPosition::HP_BOTTOMRIGHT);
+	hoverReadouts->setContentPos(HoverPosition::HP_TOPLEFT);
+	hoverReadouts->setAnchorOffset(QPoint(-10, -10));
 	hoverReadouts->setRelative(true);
 }
 
