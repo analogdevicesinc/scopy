@@ -182,6 +182,20 @@ bool PlotMagnifier::eventFilter(QObject *object, QEvent *event)
 	return QObject::eventFilter(object, event);
 }
 
+double PlotMagnifier::scaleToFactor(double scale, QwtAxisId axisId, QwtPlot *plot)
+{
+	double v1 = plot->axisInterval(axisId).minValue();
+	double v2 = plot->axisInterval(axisId).maxValue();
+	return (scale / 0.5 - (v2 - v1)) / (v1 - v2);
+}
+
+double PlotMagnifier::factorToScale(double factor, QwtAxisId axisId, QwtPlot *plot)
+{
+	double v1 = plot->axisInterval(axisId).minValue();
+	double v2 = plot->axisInterval(axisId).maxValue();
+	return ((v2 - v1) - (v2 - v1) * factor) * 0.5;
+}
+
 void PlotMagnifier::panRescale(double factor)
 {
 	if(isXAxisEn()) {
@@ -190,7 +204,7 @@ void PlotMagnifier::panRescale(double factor)
 
 		double v1 = plot()->axisInterval(axisId).minValue();
 		double v2 = plot()->axisInterval(axisId).maxValue();
-		double pan_amount = (((v2 - v1) - (v2 - v1) * factor) * 0.5);
+		double pan_amount = factorToScale(factor, axisId, plot());
 		bool isInverted = v1 > v2;
 
 		if(isInverted) {
