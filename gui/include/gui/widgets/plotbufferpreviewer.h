@@ -24,13 +24,12 @@ public Q_SLOTS:
 private:
 	double m_bufferDataLimitMin;
 	double m_bufferDataLimitMax;
-	double m_bufferPrevInitMin;
-	double m_bufferPrevInitMax;
 	bool m_manualDataLimits;
 
 	void setupBufferPreviewer();
 	PlotWidget *m_plot;
 	BufferPreviewer *m_bufferPreviewer;
+	double m_lastMin;
 };
 
 } // namespace scopy

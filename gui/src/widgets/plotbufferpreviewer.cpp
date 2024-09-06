@@ -1,6 +1,7 @@
 #include "plotbufferpreviewer.h"
 #include "plotaxis.h"
 #include <cmath>
+#include <plotmagnifier.hpp>
 #include <plotnavigator.hpp>
 
 using namespace scopy;
@@ -8,6 +9,7 @@ using namespace scopy;
 PlotBufferPreviewer::PlotBufferPreviewer(PlotWidget *p, BufferPreviewer *b, QWidget *parent)
 	: QWidget{parent}
 	, m_manualDataLimits(false)
+	, m_lastMin(p->xAxis()->visibleMin())
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	QVBoxLayout *layout = new QVBoxLayout(this);
@@ -37,43 +39,31 @@ void PlotBufferPreviewer::setupBufferPreviewer()
 
 	updateDataLimits(m_plot->xAxis()->min(), m_plot->xAxis()->max());
 
-	connect(m_bufferPreviewer, &BufferPreviewer::bufferStopDrag, this, [=]() {});
-
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferStartDrag, this, [=]() {
 		// reset the buffer preview position to current visible section
-		// using lower and upper bound to also consider zoom level
-		m_bufferPrevInitMin = m_plot->xAxis()->visibleMin();
-		m_bufferPrevInitMax = m_plot->xAxis()->visibleMax();
+		m_lastMin = m_plot->xAxis()->visibleMin();
 	});
 
-	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, this, [=](int value) {
-		double moveTo = 0.0;
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, this, [=](int bufferPos) {
+		double bufferWidth = m_bufferPreviewer->width();
+		double axisWidth = m_bufferDataLimitMax - m_bufferDataLimitMin;
+		double newAxisPos = bufferPos * axisWidth / bufferWidth;
+		double axisOffset = m_lastMin - m_plot->xAxis()->visibleMin();
+		if(axisWidth < 0)
+			axisOffset *= -1;
 
-		int width = m_bufferPreviewer->width();
-		double xAxisWidth = abs(m_bufferDataLimitMax - m_bufferDataLimitMin);
+		double panAmount = PlotMagnifier::scaleToFactor(newAxisPos + axisOffset, m_plot->xAxis()->axisId(),
+								m_plot->plot());
 
-		if(m_plot->xAxis()->min() > m_plot->xAxis()->max()) {
-			value *= -1;
-		}
-
-		moveTo = value * xAxisWidth / width;
-
-		m_plot->plot()->setAxisScale(m_plot->xAxis()->axisId(), m_bufferPrevInitMin + moveTo,
-					     m_bufferPrevInitMax + moveTo);
-		m_plot->replot();
-
+		bool bounded = m_plot->navigator()->isBounded();
+		m_plot->navigator()->setBounded(false);
+		m_plot->navigator()->forcePan(m_plot->xAxis()->axisId(), panAmount);
+		m_plot->navigator()->setBounded(bounded);
 		updateBufferPreviewer();
 	});
 
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, this, [=]() {
-		if(m_plot->xAxis()->min() > m_plot->xAxis()->max()) {
-			m_plot->plot()->setAxisScale(m_plot->xAxis()->axisId(), m_bufferDataLimitMax,
-						     m_bufferDataLimitMin);
-		} else {
-			m_plot->plot()->setAxisScale(m_plot->xAxis()->axisId(), m_bufferDataLimitMin,
-						     m_bufferDataLimitMax);
-		}
-		m_plot->xAxis()->updateAxisScale();
+		Q_EMIT m_plot->navigator()->reset();
 		updateBufferPreviewer();
 	});
 
