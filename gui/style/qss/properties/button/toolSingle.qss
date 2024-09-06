@@ -5,15 +5,15 @@ QPushButton[&&property&&=true] {
 	text-align: center;
 	padding: &padding_1&;
 	color: &content_default&;
-	background-color: #ff7200;
+	background-color: &danger_default&;
 }
 
 QPushButton[&&property&&=true]:!checked {
-	background-color: #ff7200;
+	background-color: &danger_default&;
 }
 
   QPushButton[&&property&&=true]:checked {
-	background-color: #F45000;
+	background-color: &interactive_secondary_idle&;
 }
 
 QPushButton[&&property&&=true]:disabled {
