@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Pull the Docker Image
-      run: docker pull cristianbindea/scopy-mingw64 
+      run: docker pull astanea/scopy1-mingw64:1.5.0 
 
     - name: Run Docker Image
       shell: cmd
@@ -42,7 +42,7 @@ jobs:
                 -e GITHUB_RUN_ID=%GITHUB_RUN_ID% ^
                 -e GITHUB_RUN_NUMBER=%GITHUB_RUN_NUMBER% ^
                 -e RUNNER_ARCH=%RUNNER_ARCH% ^
-                cristianbindea/scopy-mingw64 C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/CI/appveyor/inside_mingw_docker.sh'
+                astanea/scopy1-mingw64:1.5.0 C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/CI/appveyor/inside_mingw_docker.sh'
 
             set "ARTIFACT_PATH=C:\msys64\home\docker\artifact_x86_64"
             docker ps -l -q > lastcontainer
