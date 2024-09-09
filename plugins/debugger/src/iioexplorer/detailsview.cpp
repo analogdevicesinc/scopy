@@ -8,7 +8,7 @@ using namespace scopy::debugger;
 
 DetailsView::DetailsView(QWidget *parent)
 	: QWidget(parent)
-	, m_titleLabel(new QLabel("Select an IIO item.", this))
+	, m_titlePath(new PathTitle("Select an IIO item.", this))
 	, m_guiDetailsView(new GuiDetailsView(this))
 	, m_cliDetailsView(new CliDetailsView(this))
 	, m_tabWidget(new QTabWidget(this))
@@ -19,6 +19,8 @@ DetailsView::DetailsView(QWidget *parent)
 	, m_titleContainer(new QWidget(this))
 {
 	setupUi();
+	// Fw the signal
+	connect(m_titlePath, &PathTitle::pathSelected, this, &DetailsView::pathSelected);
 }
 
 void DetailsView::setupUi()
@@ -28,11 +30,6 @@ void DetailsView::setupUi()
 
 	m_titleContainer->setLayout(new QHBoxLayout(m_titleContainer));
 	m_titleContainer->layout()->setContentsMargins(0, 0, 0, 0);
-
-	m_titleLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-	m_titleLabel->setStyleSheet("color: white;");
-	m_titleLabel->setAlignment(Qt::AlignCenter);
-	m_titleLabel->setStyleSheet("font-size: 14pt");
 
 	m_readBtn->setMaximumWidth(90);
 	m_addToWatchlistBtn->setMaximumSize(25, 25);
@@ -60,7 +57,7 @@ void DetailsView::setupUi()
 	m_readBtn->setMinimumHeight(35);
 	m_addToWatchlistBtn->setStyleSheet("QPushButton { background-color: transparent; border: 0px; }");
 
-	m_titleContainer->layout()->addWidget(m_titleLabel);
+	m_titleContainer->layout()->addWidget(m_titlePath);
 	m_titleContainer->layout()->addWidget(m_addToWatchlistBtn);
 	m_titleContainer->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
 	m_titleContainer->layout()->addWidget(m_readBtn);
@@ -71,7 +68,7 @@ void DetailsView::setupUi()
 
 void DetailsView::setIIOStandardItem(IIOStandardItem *item)
 {
-	m_titleLabel->setText(item->path());
+	m_titlePath->setTitle(item->path());
 	m_guiDetailsView->setIIOStandardItem(item);
 	m_cliDetailsView->setIIOStandardItem(item);
 }

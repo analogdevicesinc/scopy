@@ -107,7 +107,7 @@ void StyleHelper::BlueGrayButton(QPushButton *btn, QString objectName)
 
 							background-color:#272730; /* design token - uiElement*/
 
-						color: white; /* design token - font */
+							color: white; /* design token - font */
 							font-weight: 700;
 							font-size: 14px;
 						}
@@ -1510,6 +1510,38 @@ void StyleHelper::IIOCompactLabel(QLabel *w, QString objectName)
 					color: grey;
 			})css";
 	w->setStyleSheet(style);
+}
+
+void StyleHelper::GrayButton(QPushButton *btn, QString objectName)
+{
+	if(!objectName.isEmpty())
+		btn->setObjectName(objectName);
+
+	QString style = QString(R"css(
+		QPushButton {
+			border: 1px solid #4A4A4A;
+			border-radius: 0px;
+			background-color: #272730;
+
+			color: white;
+			font-weight: 600;
+			font-size: 14px;
+			padding: 4px 8px;
+
+			box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+		}
+
+		QPushButton:hover {
+			background-color: #35353f;
+		}
+
+		QPushButton:pressed {
+			background-color: #1d1d25;
+			border-style: inset;
+		}
+	)css");
+
+	btn->setStyleSheet(style);
 }
 
 #include "moc_stylehelper.cpp"

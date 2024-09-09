@@ -7,6 +7,7 @@
 #include "iiostandarditem.h"
 #include "guidetailsview.h"
 #include "clidetailsview.h"
+#include "pathtitle.h"
 
 namespace scopy::debugger {
 class DetailsView : public QWidget
@@ -23,6 +24,9 @@ public:
 	// add:true = +, add:false = X
 	void setAddToWatchlistState(bool add);
 
+Q_SIGNALS:
+	void pathSelected(QString path);
+
 private:
 	void setupUi();
 
@@ -33,7 +37,7 @@ private:
 	QWidget *m_guiView;
 	QWidget *m_iioView;
 	QWidget *m_titleContainer;
-	QLabel *m_titleLabel;
+	PathTitle *m_titlePath;
 	QPushButton *m_readBtn;
 	QPushButton *m_addToWatchlistBtn;
 };

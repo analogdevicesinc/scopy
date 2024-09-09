@@ -33,6 +33,7 @@ public:
 private Q_SLOTS:
 	void applySelection(const QItemSelection &selected, const QItemSelection &deselected);
 	void filterAndExpand(const QString &text);
+	void selectItem(IIOStandardItem *item);
 
 private:
 	void setupUi();
@@ -52,6 +53,9 @@ private:
 
 	// Triggers a read operation on the item specified as parameter and all children of that item recursively
 	void triggerReadOnAllChildItems(QStandardItem *item);
+
+	// Finds the item containing the path variable
+	IIOStandardItem *findItemByPath(IIOStandardItem *currentItem, const QStringList &path, int depth = 0);
 
 	// Stacked widget
 	QTabWidget *m_tabWidget;
