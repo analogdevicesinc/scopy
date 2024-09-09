@@ -17,7 +17,7 @@ jobs:
                 set-safe-directory: 'true'
 
         - name: Pull the Docker Image
-          run: docker pull cristianbindea/scopy1-x86_64-appimage:latest
+          run: docker pull astanea/scopy1-x86_64-appimage:1.5.0
 
         - name: Create Scopy AppImage
           shell: bash
@@ -29,7 +29,7 @@ jobs:
                 docker run \
                         --mount type=bind,source="$GITHUB_WORKSPACE",target=/home/runner/scopy \
                         --env-file $GITHUB_WORKSPACE/CI/x86_64/gh-actions.envs \
-                        cristianbindea/scopy1-x86_64-appimage:latest \
+                        astanea/scopy1-x86_64-appimage:1.5.0 \
                         /bin/bash -c    'cd $HOME && \
                                         sudo chown -R runner:runner scopy && \
                                         cd $HOME/scopy && \
