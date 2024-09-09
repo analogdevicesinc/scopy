@@ -141,14 +141,7 @@ void IIOExplorerInstrument::connectSignalsAndSlots()
 	QObject::connect(m_treeView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
 			 &IIOExplorerInstrument::applySelection);
 
-	QObject::connect(m_watchListView, &WatchListView::selectedItem, this, [this](IIOStandardItem *item) {
-		qDebug(CAT_DEBUGGERIIOMODEL) << "Expanding item" << item->path();
-		m_currentlySelectedItem = item;
-		auto sourceModel = qobject_cast<QStandardItemModel *>(m_proxyModel->sourceModel());
-		recursiveExpandItem(sourceModel->invisibleRootItem(), item);
-		m_detailsView->setIIOStandardItem(item);
-	});
-
+	QObject::connect(m_watchListView, &WatchListView::selectedItem, this, &IIOExplorerInstrument::selectItem);
 	QObject::connect(m_detailsView->readBtn(), &QPushButton::clicked, this, [this]() {
 		qDebug(CAT_DEBUGGERIIOMODEL) << "Read button pressed.";
 		triggerReadOnAllChildItems(m_currentlySelectedItem);
@@ -185,6 +178,22 @@ void IIOExplorerInstrument::connectSignalsAndSlots()
 			m_debugLogger->appendLog(logMessage);
 			m_detailsView->refreshIIOView();
 		});
+
+	QObject::connect(m_detailsView, &DetailsView::pathSelected, this, [&](QString path) {
+		QStringList pathList = path.split('/', Qt::SkipEmptyParts);
+		QStandardItem *root = m_iioModel->getModel()->invisibleRootItem()->child(0);
+		IIOStandardItem *iioRoot = dynamic_cast<IIOStandardItem *>(root);
+		if(!iioRoot) {
+			qWarning(CAT_IIODEBUGGER) << "Cannot find the model root.";
+			return;
+		}
+		IIOStandardItem *item = findItemByPath(iioRoot, pathList);
+		if(item) {
+			qWarning(CAT_IIODEBUGGER) << "Could not find the item with path:" << item->path();
+		}
+
+		selectItem(item);
+	});
 }
 
 IIOStandardItem *IIOExplorerInstrument::findItemRecursive(QStandardItem *currentItem, QStandardItem *targetItem)
@@ -292,6 +301,33 @@ void IIOExplorerInstrument::triggerReadOnAllChildItems(QStandardItem *item)
 	}
 }
 
+IIOStandardItem *IIOExplorerInstrument::findItemByPath(IIOStandardItem *currentItem, const QStringList &path, int depth)
+{
+	if(!currentItem || depth >= path.size()) {
+		return nullptr;
+	}
+
+	// Some devices/channels/attrs have the id/name swapped, might be an issue with the IIOModel or an
+	// inconsitency in the way some drivers are written
+	if(currentItem->name() == path[depth] || currentItem->id() == path[depth]) {
+		// If this is the last segment, return the item
+		if(depth == path.size() - 1) {
+			return currentItem;
+		}
+
+		// Check the children recursively for the next segment
+		for(int i = 0; i < currentItem->rowCount(); ++i) {
+			IIOStandardItem *child = dynamic_cast<IIOStandardItem *>(currentItem->child(i));
+			IIOStandardItem *result = findItemByPath(child, path, depth + 1);
+			if(result) {
+				return result;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 void IIOExplorerInstrument::applySelection(const QItemSelection &selected, const QItemSelection &deselected)
 {
 	Q_UNUSED(deselected)
@@ -343,6 +379,15 @@ void IIOExplorerInstrument::filterAndExpand(const QString &text)
 
 	// Iterate through the items in the source model
 	recursiveExpandItems(sourceModel->invisibleRootItem(), text);
+}
+
+void IIOExplorerInstrument::selectItem(IIOStandardItem *item)
+{
+	qDebug(CAT_DEBUGGERIIOMODEL) << "Expanding item" << item->path();
+	m_currentlySelectedItem = item;
+	auto sourceModel = qobject_cast<QStandardItemModel *>(m_proxyModel->sourceModel());
+	recursiveExpandItem(sourceModel->invisibleRootItem(), item);
+	m_detailsView->setIIOStandardItem(item);
 }
 
 // --------------------------------------------------------
