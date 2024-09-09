@@ -21,9 +21,9 @@ QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 IIOEMU_BRANCH=master
 
+STAGING_AREA=$WORKFOLDER/staging
 MINGW_VERSION=mingw64
 ARCH=x86_64
-STAGING_AREA=$WORKFOLDER/staging
 
 USE_STAGING=$1
 if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
