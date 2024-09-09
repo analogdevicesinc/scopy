@@ -140,7 +140,7 @@ private:
 	void extractCalibrationData();
 	void importCalibrationData();
 	void calibrationLogWrite(QString message);
-	void calibrationLogWriteLn(QString message);
+	void calibrationLogWriteLn(QString message = "");
 	void readMotorAttributeValue(ADMTController::MotorAttribute attribute, double& value);
 	void writeMotorAttributeValue(ADMTController::MotorAttribute attribute, double value);
 	void applyLineEditStyle(QLineEdit *widget);
@@ -156,6 +156,7 @@ private:
 	double convertRPStoVMAX(double rps);
 	double convertVMAXtoRPS(double vmax);
 	void connectLineEditToAMAXConversion(QLineEdit* lineEdit, double& amax);
+	void connectRegisterBlockToRegistry(RegisterBlockWidget* widget);
 	double convertAccelTimetoAMAX(double accelTime);
 	double convertAMAXtoAccelTime(double amax);
 	void updateCalculatedCoeff();
