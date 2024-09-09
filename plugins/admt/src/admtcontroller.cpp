@@ -72,6 +72,13 @@ const char* ADMTController::getMotorAttribute(MotorAttribute attribute)
 	return "Unknown";
 }
 
+const uint32_t ADMTController::getHarmonicRegister(HarmonicRegister registerID)
+{
+	if(registerID >= 0 && registerID < HARMONIC_REGISTER_COUNT){
+		return HarmonicRegisters[registerID];
+	}
+	return 0x0;
+}
 
 int ADMTController::getChannelIndex(const char *deviceName, const char *channelName)
 {
@@ -245,26 +252,26 @@ int ADMTController::setDeviceAttributeValue(const char *deviceName, const char *
     return result;
 }
 
-int ADMTController::writeDeviceRegistry(const char *deviceName, uint32_t address, double value)
+int ADMTController::writeDeviceRegistry(const char *deviceName, uint32_t address, uint32_t value)
 {
     int result = -1;
     int deviceCount = iio_context_get_devices_count(m_iioCtx);
     if(deviceCount == 0) { return result; }
     iio_device *iioDevice = iio_context_find_device(m_iioCtx, deviceName);
     if(iioDevice == NULL) { return result; }
-    result = iio_device_reg_write(iioDevice, address, static_cast<uint32_t>(value));
+    result = iio_device_reg_write(iioDevice, address, value);
 
     return result;
 }
 
-int ADMTController::readDeviceRegistry(const char *deviceName, uint32_t address, double& readValue)
+int ADMTController::readDeviceRegistry(const char *deviceName, uint32_t address, uint32_t *returnValue)
 {
     int result = -1;
     int deviceCount = iio_context_get_devices_count(m_iioCtx);
     if(deviceCount == 0) { return result; }
     iio_device *iioDevice = iio_context_find_device(m_iioCtx, deviceName);
     if(iioDevice == NULL) { return result; }
-    result = iio_device_reg_read(iioDevice, address, reinterpret_cast<uint32_t*>(&readValue));
+    result = iio_device_reg_read(iioDevice, address, returnValue);
 
     return result;
 }
@@ -637,5 +644,105 @@ void ADMTController::computeSineCosineOfAngles(const vector<double>& angles) {
         calibration_samples_sine_scaled[i] = ((calibration_samples_sine[i] + 1) / 2) * (scaleMax - scaleMin) + scaleMin;
         calibration_samples_cosine_scaled[i] = ((calibration_samples_cosine[i] + 1) / 2) * (scaleMax - scaleMin) + scaleMin;
     }
+}
+
+// Function to calculate the scaled harmonic coefficient magnitude and return a 16-bit unsigned integer
+uint16_t ADMTController::calculateHarmonicCoefficientMagnitude(double harmonicCoefficient, uint16_t originalValue, string key) {
+    // CORDIC scaler
+    const double cordicScaler = 0.6072;
+
+    // LSB value (0.005493 degrees)
+    const double LSB = 0.005493;
+
+    // Multiply the harmonic coefficient by the CORDIC scaler
+    double scaledValue = harmonicCoefficient * cordicScaler;
+    
+    uint16_t result = 0;
+
+    // Switch case for different bitmapping based on the key
+    if (key == "h1" || key == "h2") {
+        // For h1 and h2: [15:11 reserved], [10:0 write]
+        result = static_cast<uint16_t>(scaledValue / LSB) & 0x07FF;
+        originalValue = (originalValue & 0xF800) | result;
+    } 
+    else if (key == "h3" || key == "h8") {
+        // For h3 and h8: [15:8 reserved], [7:0 write]
+        result = static_cast<uint16_t>(scaledValue / LSB) & 0x00FF;
+        originalValue = (originalValue & 0xFF00) | result;
+    } 
+    else {
+        // Handle invalid key, here we return the original value unchanged
+        return originalValue;
+    }
+    return result;
+}
+
+// Function to calculate the scaled harmonic coefficient phase and return a 16-bit unsigned integer
+uint16_t ADMTController::calculateHarmonicCoefficientPhase(double harmonicCoefficient, uint16_t originalValue) {
+    // LSB value (0.087891 degrees)
+    const double LSB = 0.087891;
+    
+    uint16_t result = 0;
+
+    // Convert the result to an unsigned integer by dividing by LSB, fitting into 12 bits
+    // Mask to keep only bits 11:0
+    result = static_cast<uint16_t>(harmonicCoefficient / LSB) & 0x0FFF; 
+
+    // Clear bits 11:0 of the original value, keeping bits 15:12 intact
+    uint16_t preservedValue = (originalValue & 0xF000) | result;
+
+    return preservedValue;
+}
+
+uint16_t ADMTController::readRegister(uint16_t registerValue, const string key) {
+    double result = 0.0;
+    const double cordicScaler = 0.6072;
+
+    // Switch case for different bitmapping based on the key
+    if (key == "h1mag" || key == "h2mag") {
+        // For h1h2mag: value is in bits [10:0], bits [15:12] are reserved
+        const double LSB = 0.005493;
+
+        // Extract the value from bits [10:0]
+        uint16_t extractedValue = registerValue & 0x07FF;
+
+        // Convert the extracted value by applying CORDIC scaler and LSB
+        double convertedValue = extractedValue * LSB / cordicScaler;
+        
+        // Convert the scaled value back to uint16_t
+        result = static_cast<uint16_t>(convertedValue);
+    }
+    else if (key == "h3mag" || key == "h8mag") {
+        // For h3h8mag: value is in bits [7:0], bits [15:8] are reserved
+        const double LSB = 0.005493;
+
+        // Extract the value from bits [7:0]
+        uint16_t extractedValue = registerValue & 0x00FF;
+
+        // Convert the extracted value by applying CORDIC scaler and LSB
+        double convertedValue = extractedValue * LSB / cordicScaler;
+
+        // Convert the scaled value back to uint16_t
+        result = static_cast<uint16_t>(convertedValue);
+    }
+    else if (key == "h1phase" || key == "h2phase" || key == "h3phase" || key == "h8phase") {
+        // For Phase: value is in bits [11:0], bits [15:12] are reserved
+        const double LSB = 0.087891;
+
+        // Extract the value from bits [11:0]
+        uint16_t extractedValue = registerValue & 0x0FFF;
+
+        // Convert the extracted value by applying the LSB
+        double convertedValue = extractedValue * LSB;
+
+        // Convert the scaled value back to uint16_t
+        result = static_cast<uint16_t>(convertedValue);
+    } 
+    else {
+        // Indicating an error or invalid key
+        result = -1.0; 
+    }
+
+    return result;
 }
 
