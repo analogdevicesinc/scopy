@@ -26,7 +26,6 @@ DEBUG_FOLDER=$ARTIFACT_FOLDER/debug-$ARCH
 PYTHON_FILES=$STAGING_DIR/lib/python3.*
 DLL_DEPS=$(cat $SRC_FOLDER/ci/windows/mingw_dll_deps)
 EMU_BUILD_FOLDER=$WORKDIR/iio-emu/build
-STAGING_AREA=$SRC_FOLDER/ci/windows/staging
 REGMAP_XMLS=$BUILD_FOLDER/plugins/plugins/regmap/xmls
 
 # Generate build status info for the about page
@@ -170,18 +169,27 @@ create_installer() {
 	popd
 }
 
+# move the staging folder that contains the tools needed for the build to the known location
+move_tools(){
+	[ -d /home/docker/staging ] && mv /home/docker/staging $STAGING_AREA || echo "Staging folder not found or already moved"
+	if [ ! -d $STAGING_AREA ]; then
+		echo "Missing tools folder, downloading now"
+		download_tools
+	fi
+}
+
+
 run_workflow(){
-	download_tools
+	[ "$CI_SCRIPT" == "ON" ] && move_tools || download_tools
 	build_scopy
 	build_iio-emu
-	download_tools
 	deploy_app
 	bundle_drivers
 	extract_debug_symbols
 	create_installer
 }
 
-run_workflow
+# run_workflow
 
 for arg in $@; do
 	$arg

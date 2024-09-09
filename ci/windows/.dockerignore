@@ -1,4 +1,5 @@
 *
+!build_and_create_installer.sh
 !mingw_toolchain.sh
 !windows_build_process.sh
 !sigrokdecode-windows-fix.patch
