@@ -31,6 +31,7 @@ WORKDIR C:\\msys64\\home\\docker
 
 COPY mingw_toolchain.sh C:/msys64/home/docker/scripts/mingw_toolchain.sh
 COPY windows_build_process.sh C:/msys64/home/docker/scripts/windows_build_process.sh
+COPY build_and_create_installer.sh C:/msys64/home/docker/scripts/build_and_create_installer.sh
 COPY sigrokdecode-windows-fix.patch C:/msys64/home/docker/scripts/sigrokdecode-windows-fix.patch
 
 RUN C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Syyu" & \
@@ -39,5 +40,7 @@ RUN C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Syyu" & \
     C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Syuu" & \
     C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Syuu" & \
     C:\msys64\usr\bin\bash.exe -lc "C:/msys64/home/docker/scripts/windows_build_process.sh" & \
+    C:\msys64\usr\bin\bash.exe -lc "C:/msys64/home/docker/scripts/build_and_create_installer.sh download_tools" & \
+    C:\msys64\usr\bin\bash.exe -lc "mv C:/msys64/home/docker/scripts/staging C:/msys64/home/docker/staging" & \
     C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Scc " & \
     rmdir /s /q C:\msys64\home\docker\scripts
