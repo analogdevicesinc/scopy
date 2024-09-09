@@ -68,15 +68,30 @@ public:
         RAMP_MODE_1
     };
 
+    enum HarmonicRegister
+    {
+        H1MAG,
+        H1PH,
+        H2MAG,
+        H2PH,
+        H3MAG,
+        H3PH,
+        H8MAG,
+        H8PH,
+        HARMONIC_REGISTER_COUNT
+    };
+
     const char* ChannelIds[CHANNEL_COUNT] = {"rot", "angl", "count", "temp"};
     const char* DeviceIds[DEVICE_COUNT] = {"admt4000", "tmc5240"};
     const char* MotorAttributes[MOTOR_ATTR_COUNT] = {"amax", "rotate_vmax", "dmax",
                                                      "disable", "target_pos", "current_pos",
                                                      "ramp_mode"};
+    const uint32_t HarmonicRegisters[HARMONIC_REGISTER_COUNT] = {0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C};
 
     const char* getChannelId(Channel channel);
     const char* getDeviceId(Device device);
     const char* getMotorAttribute(MotorAttribute attribute);
+    const uint32_t getHarmonicRegister(HarmonicRegister registerID);
 
     void connectADMT();
     void disconnectADMT();
@@ -85,9 +100,12 @@ public:
     int getDeviceAttributeValue(const char *deviceName, const char *attributeName, double *returnValue);
     int setDeviceAttributeValue(const char *deviceName, const char *attributeName, double writeValue);
     QString calibrate(vector<double> PANG, int cycles = 11, int samplesPerCycle = 256);
-    int writeDeviceRegistry(const char *deviceName, uint32_t address, double value);
-    int readDeviceRegistry(const char *deviceName, uint32_t address, double& readValue);
+    int writeDeviceRegistry(const char *deviceName, uint32_t address, uint32_t value);
+    int readDeviceRegistry(const char *deviceName, uint32_t address, uint32_t *returnValue);
     void computeSineCosineOfAngles(const vector<double>& angles);
+    uint16_t calculateHarmonicCoefficientMagnitude(double harmonicCoefficient, uint16_t originalValue, string key);
+    uint16_t calculateHarmonicCoefficientPhase(double harmonicCoefficient, uint16_t originalValue);
+    uint16_t readRegister(uint16_t registerValue, const string key);
 private:
     iio_context *m_iioCtx;
     iio_buffer *m_iioBuffer;
