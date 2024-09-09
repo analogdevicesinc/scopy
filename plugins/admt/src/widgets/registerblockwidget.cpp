@@ -6,6 +6,8 @@ using namespace scopy::admt;
 
 RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, uint32_t address, uint32_t defaultValue, RegisterBlockWidget::ACCESS_PERMISSION accessPermission, QWidget *parent)
     : QWidget(parent)
+    , m_address(address)
+    , m_accessPermission(accessPermission)
 {
     QVBoxLayout *container = new QVBoxLayout(this);
     setLayout(container);
@@ -41,13 +43,14 @@ RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, ui
     // QLineEdit *lineEdit = new QLineEdit(menuSectionWidget);
     // applyLineEditStyle(lineEdit);
 
-    QSpinBox *spinBox = new QSpinBox(menuSectionWidget);
-    applySpinBoxStyle(spinBox);
-    spinBox->setDisplayIntegerBase(16);
-    spinBox->setMinimum(0);
-    spinBox->setMaximum(INT_MAX);
-    spinBox->setPrefix("0x");
-    spinBox->setValue(defaultValue);
+    m_spinBox = new QSpinBox(menuSectionWidget);
+    applySpinBoxStyle(m_spinBox);
+    m_spinBox->setDisplayIntegerBase(16);
+    m_spinBox->setMinimum(0);
+    m_spinBox->setMaximum(INT_MAX);
+    m_spinBox->setPrefix("0x");
+    m_value = defaultValue;
+    m_spinBox->setValue(m_value);
 
     QWidget *buttonsWidget = new QWidget(menuSectionWidget);
     QHBoxLayout *buttonsContainer = new QHBoxLayout(buttonsWidget);
@@ -55,7 +58,7 @@ RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, ui
 
     buttonsContainer->setMargin(0);
     buttonsContainer->setSpacing(10);
-    switch(accessPermission)
+    switch(m_accessPermission)
     {
         case ACCESS_PERMISSION::READWRITE:
             addReadButton(buttonsWidget);
@@ -66,34 +69,52 @@ RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, ui
             break;
         case ACCESS_PERMISSION::READ:
             addReadButton(buttonsWidget);
-            // lineEdit->setReadOnly(true);
-            spinBox->setReadOnly(true);
+            m_spinBox->setReadOnly(true);
             break;
     }
 
     menuCollapseSection->contentLayout()->setSpacing(10);
     menuCollapseSection->contentLayout()->addWidget(descriptionLabel);
-    // menuCollapseSection->contentLayout()->addWidget(lineEdit);
-    menuCollapseSection->contentLayout()->addWidget(spinBox);
+    menuCollapseSection->contentLayout()->addWidget(m_spinBox);
     menuCollapseSection->contentLayout()->addWidget(buttonsWidget);
     
     container->addWidget(menuSectionWidget);
     container->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::Preferred));
+
+    connect(m_spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &RegisterBlockWidget::onValueChanged);
 }
+
+void RegisterBlockWidget::onValueChanged(int newValue){ m_value = static_cast<uint32_t>(newValue); }
+
+uint32_t RegisterBlockWidget::getValue() { return m_value; }
+
+void RegisterBlockWidget::setValue(uint32_t value)
+{
+    m_value = value;
+    m_spinBox->setValue(m_value);
+}
+
+uint32_t RegisterBlockWidget::getAddress() { return m_address; }
+
+RegisterBlockWidget::ACCESS_PERMISSION RegisterBlockWidget::getAccessPermission() { return m_accessPermission; }
 
 void RegisterBlockWidget::addReadButton(QWidget *parent)
 {
-    QPushButton *readButton = new QPushButton("Read", parent);
-    StyleHelper::BlueButton(readButton, "readButton");
-    parent->layout()->addWidget(readButton);
+    m_readButton = new QPushButton("Read", parent);
+    StyleHelper::BlueButton(m_readButton, "readButton");
+    parent->layout()->addWidget(m_readButton);
 }
+
+QPushButton *RegisterBlockWidget::readButton() { return m_readButton; }
 
 void RegisterBlockWidget::addWriteButton(QWidget *parent)
 {
-    QPushButton *writeButton = new QPushButton("Write", parent);
-    StyleHelper::BlueButton(writeButton, "writeButton");
-    parent->layout()->addWidget(writeButton);
+    m_writeButton = new QPushButton("Write", parent);
+    StyleHelper::BlueButton(m_writeButton, "writeButton");
+    parent->layout()->addWidget(m_writeButton);
 }
+
+QPushButton *RegisterBlockWidget::writeButton() { return m_writeButton; }
 
 void RegisterBlockWidget::applyLineEditStyle(QLineEdit *widget)
 {

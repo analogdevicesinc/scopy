@@ -409,7 +409,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationRawDataPlotWidget->addPlotChannel(calibrationRawDataPlotChannel);
 	calibrationRawDataPlotWidget->addPlotChannel(calibrationSineDataPlotChannel);
 	calibrationRawDataPlotWidget->addPlotChannel(calibrationCosineDataPlotChannel);
-	calibrationRawDataPlotChannel->setStyle(PlotChannel::PCS_DOTS);
+	// calibrationRawDataPlotChannel->setStyle(PlotChannel::PCS_DOTS);
 	calibrationRawDataPlotChannel->setEnabled(true);
 	calibrationSineDataPlotChannel->setEnabled(true);
 	calibrationCosineDataPlotChannel->setEnabled(true);
@@ -864,12 +864,6 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	registerLayout->setMargin(0);
 	registerLayout->setSpacing(10);
 
-	// QWidget *registerGridWidget = new QWidget(registerWidget);
-	// QGridLayout *registerGridLayout = new QGridLayout(registerGridWidget);
-	// registerGridWidget->setLayout(registerGridLayout);
-	// registerGridLayout->setMargin(0);
-	// registerGridLayout->setSpacing(10);
-
 	QLabel *registerConfigurationLabel = new QLabel("Configuration", registerWidget);
 	StyleHelper::MenuControlLabel(registerConfigurationLabel, "registerConfigurationLabel");
 	QWidget *registerConfigurationGridWidget = new QWidget(registerWidget);
@@ -908,6 +902,8 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	RegisterBlockWidget *generalRegisterBlock = new RegisterBlockWidget("GENERAL", "General Device Configuration", 0x10, 0x1230, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 	RegisterBlockWidget *digIOEnRegisterBlock = new RegisterBlockWidget("DIGIOEN", "Enable Digital Input/Outputs", 0x12, 0x241B, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 	RegisterBlockWidget *angleCkRegisterBlock = new RegisterBlockWidget("ANGLECK", "Primary vs Secondary Angle Check", 0x13, 0x000F, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	RegisterBlockWidget *eccDcdeRegisterBlock = new RegisterBlockWidget("ECCDCDE", "Error Correction Codes", 0x1D, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	RegisterBlockWidget *eccDisRegisterBlock = new RegisterBlockWidget("ECCDIS", "Error Correction Code disable", 0x23, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 
 	RegisterBlockWidget *absAngleRegisterBlock = new RegisterBlockWidget("ABSANGLE", "Absolute Angle", 0x03, 0xDB00, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 	RegisterBlockWidget *angleRegisterBlock = new RegisterBlockWidget("ANGLE", "Angle Register", 0x05, 0x8000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
@@ -922,12 +918,11 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	RegisterBlockWidget *tmp0RegisterBlock = new RegisterBlockWidget("TMP0", "Primary Temperature Sensor", 0x20, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 	RegisterBlockWidget *tmp1RegisterBlock = new RegisterBlockWidget("TMP1", "Secondary Temperature Sensor", 0x23, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 	RegisterBlockWidget *cnvCntRegisterBlock = new RegisterBlockWidget("CNVCNT", "Conversion Count", 0x14, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *eccDcdeRegisterBlock = new RegisterBlockWidget("ECCDCDE", "Error Correction Codes", 0x1D, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+
 	RegisterBlockWidget *uniqID0RegisterBlock = new RegisterBlockWidget("UNIQID0", "Unique ID Register 0", 0x1E, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 	RegisterBlockWidget *uniqID1RegisterBlock = new RegisterBlockWidget("UNIQID1", "Unique ID Register 1", 0x1F, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 	RegisterBlockWidget *uniqID2RegisterBlock = new RegisterBlockWidget("UNIQID2", "Unique ID Register 2", 0x20, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 	RegisterBlockWidget *uniqID3RegisterBlock = new RegisterBlockWidget("UNIQID3", "Product, voltage supply. ASIL and ASIC revision identifiers", 0x21, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *eccDisRegisterBlock = new RegisterBlockWidget("ECCDIS", "Error Correction Code disable", 0x23, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 
 	RegisterBlockWidget *h1MagRegisterBlock = new RegisterBlockWidget("H1MAG", "1st Harmonic error magnitude", 0x15, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 	RegisterBlockWidget *h1PhRegisterBlock = new RegisterBlockWidget("H1PH", "1st Harmonic error phase", 0x16, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
@@ -1008,6 +1003,43 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	tool->openTopContainerHelper(false);
 
 	tool->addWidgetToCentralContainerHelper(registerScrollArea);
+
+	connectRegisterBlockToRegistry(cnvPageRegisterBlock);
+	connectRegisterBlockToRegistry(digIORegisterBlock);
+	connectRegisterBlockToRegistry(faultRegisterBlock);
+	connectRegisterBlockToRegistry(generalRegisterBlock);
+	connectRegisterBlockToRegistry(digIOEnRegisterBlock);
+	connectRegisterBlockToRegistry(angleCkRegisterBlock);
+	connectRegisterBlockToRegistry(eccDcdeRegisterBlock);
+	connectRegisterBlockToRegistry(eccDisRegisterBlock);
+
+	connectRegisterBlockToRegistry(absAngleRegisterBlock);
+	connectRegisterBlockToRegistry(angleRegisterBlock);
+	connectRegisterBlockToRegistry(angleSecRegisterBlock);
+	connectRegisterBlockToRegistry(sineRegisterBlock);
+	connectRegisterBlockToRegistry(cosineRegisterBlock);
+	connectRegisterBlockToRegistry(secAnglIRegisterBlock);
+	connectRegisterBlockToRegistry(secAnglQRegisterBlock);
+	connectRegisterBlockToRegistry(radiusRegisterBlock);
+	connectRegisterBlockToRegistry(diag1RegisterBlock);
+	connectRegisterBlockToRegistry(diag2RegisterBlock);
+	connectRegisterBlockToRegistry(tmp0RegisterBlock);
+	connectRegisterBlockToRegistry(tmp1RegisterBlock);
+	connectRegisterBlockToRegistry(cnvCntRegisterBlock);
+
+	connectRegisterBlockToRegistry(uniqID0RegisterBlock);
+	connectRegisterBlockToRegistry(uniqID1RegisterBlock);
+	connectRegisterBlockToRegistry(uniqID2RegisterBlock);
+	connectRegisterBlockToRegistry(uniqID3RegisterBlock);
+
+	connectRegisterBlockToRegistry(h1MagRegisterBlock);
+	connectRegisterBlockToRegistry(h1PhRegisterBlock);
+	connectRegisterBlockToRegistry(h2MagRegisterBlock);
+	connectRegisterBlockToRegistry(h2PhRegisterBlock);
+	connectRegisterBlockToRegistry(h3MagRegisterBlock);
+	connectRegisterBlockToRegistry(h3PhRegisterBlock);
+	connectRegisterBlockToRegistry(h8MagRegisterBlock);
+	connectRegisterBlockToRegistry(h8PhRegisterBlock);
 
 	return tool;
 }
@@ -1469,6 +1501,25 @@ void HarmonicCalibration::connectLineEditToAMAXConversion(QLineEdit* lineEdit, d
     });
 }
 
+void HarmonicCalibration::connectRegisterBlockToRegistry(RegisterBlockWidget* widget)
+{
+	uint32_t *readValue = new uint32_t;
+	connect(widget->readButton(), &QPushButton::clicked, this, [=]{
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), widget->getAddress(), readValue) == 0)
+		{ widget->setValue(*readValue); }
+	});
+	if(widget->getAccessPermission() == RegisterBlockWidget::ACCESS_PERMISSION::READWRITE || 
+	   widget->getAccessPermission() == RegisterBlockWidget::ACCESS_PERMISSION::WRITE){
+		connect(widget->writeButton(), &QPushButton::clicked, this, [=]{
+			if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), widget->getAddress(), widget->getValue()) == 0)
+			{ 
+				if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), widget->getAddress(), readValue) == 0)
+				{ widget->setValue(*readValue); }
+			}
+		});
+	}
+}
+
 double HarmonicCalibration::convertRPStoVMAX(double rps) 
 { 
 	return (rps * motorMicrostepPerRevolution * motorTimeUnit); 
@@ -1631,6 +1682,124 @@ void HarmonicCalibration::calibrateData()
 	calibrationLogWrite("==== Calibration Start ====\n");
 
 	calibrationLogWriteLn(m_admtController->calibrate(rawDataList, cycleCount, samplesPerCycle));
+
+	uint32_t *h1MagCurrent = new uint32_t, 
+			 *h1PhaseCurrent = new uint32_t, 
+			 *h2MagCurrent = new uint32_t,
+			 *h2PhaseCurrent = new uint32_t,
+			 *h3MagCurrent = new uint32_t,
+			 *h3PhaseCurrent = new uint32_t,
+			 *h8MagCurrent = new uint32_t,
+			 *h8PhaseCurrent = new uint32_t,
+			 h1MagScaled,
+			 h1PhaseScaled,
+			 h2MagScaled,
+			 h2PhaseScaled,
+			 h3MagScaled,
+			 h3PhaseScaled,
+			 h8MagScaled,
+			 h8PhaseScaled,
+			 h1MagConverted,
+			 h1PhaseConverted,
+			 h2MagConverted,
+			 h2PhaseConverted,
+			 h3MagConverted,
+			 h3PhaseConverted,
+			 h8MagConverted,
+			 h8PhaseConverted;
+
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), h1MagCurrent);
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), h1PhaseCurrent);
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG), h2MagCurrent);
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH), h2PhaseCurrent);
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG), h3MagCurrent);
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH), h3PhaseCurrent);
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), h8MagCurrent);
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), h8PhaseCurrent);
+
+	calibrationLogWriteLn();
+	calibrationLogWrite("H1 Mag Current: " + QString::number(*h1MagCurrent) + "\n");
+	calibrationLogWrite("H1 Phase Current: " + QString::number(*h1PhaseCurrent) + "\n");
+	calibrationLogWrite("H2 Mag Current: " + QString::number(*h2MagCurrent) + "\n");
+	calibrationLogWrite("H2 Phase Current: " + QString::number(*h2PhaseCurrent) + "\n");
+	calibrationLogWrite("H3 Mag Current: " + QString::number(*h3MagCurrent) + "\n");
+	calibrationLogWrite("H3 Phase Current: " + QString::number(*h3PhaseCurrent) + "\n");
+	calibrationLogWrite("H8 Mag Current: " + QString::number(*h8MagCurrent) + "\n");
+	calibrationLogWrite("H8 Phase Current: " + QString::number(*h8PhaseCurrent) + "\n");
+
+	h1MagScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(m_admtController->HAR_MAG_1, static_cast<uint16_t>(*h1MagCurrent), "h1"));
+	h1PhaseScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(m_admtController->HAR_PHASE_1, static_cast<uint16_t>(*h1PhaseCurrent)));
+	h2MagScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(m_admtController->HAR_MAG_2, static_cast<uint16_t>(*h2MagCurrent), "h2"));
+	h2PhaseScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(m_admtController->HAR_PHASE_2, static_cast<uint16_t>(*h2PhaseCurrent)));
+	h3MagScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(m_admtController->HAR_MAG_3, static_cast<uint16_t>(*h3MagCurrent), "h3"));
+	h3PhaseScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(m_admtController->HAR_PHASE_3, static_cast<uint16_t>(*h3PhaseCurrent)));
+	h8MagScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(m_admtController->HAR_MAG_8, static_cast<uint16_t>(*h8MagCurrent), "h8"));
+	h8PhaseScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(m_admtController->HAR_PHASE_8, static_cast<uint16_t>(*h8PhaseCurrent)));
+
+	calibrationLogWriteLn();
+	calibrationLogWrite("H1 Mag Scaled: " + QString::number(h1MagScaled) + "\n");
+	calibrationLogWrite("H1 Phase Scaled: " + QString::number(h1PhaseScaled) + "\n");
+	calibrationLogWrite("H2 Mag Scaled: " + QString::number(h2MagScaled) + "\n");
+	calibrationLogWrite("H2 Phase Scaled: " + QString::number(h2PhaseScaled) + "\n");
+	calibrationLogWrite("H3 Mag Scaled: " + QString::number(h3MagScaled) + "\n");
+	calibrationLogWrite("H3 Phase Scaled: " + QString::number(h3PhaseScaled) + "\n");
+	calibrationLogWrite("H8 Mag Scaled: " + QString::number(h8MagScaled) + "\n");
+	calibrationLogWrite("H8 Phase Scaled: " + QString::number(h8PhaseScaled) + "\n");
+
+	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 0x01, 0x02);
+
+	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+										  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG),
+										  h1MagScaled);
+	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+										  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH),
+										  h1PhaseScaled);
+	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+										  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG),
+										  h2MagScaled);
+	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+										  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH),
+										  h2PhaseScaled);
+	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+										  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG),
+										  h3MagScaled);
+	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+										  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH),
+										  h3PhaseScaled);
+	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+										  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG),
+										  h8MagScaled);
+	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+										  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH),
+										  h8PhaseScaled);
+
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), h1MagCurrent);
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), h1PhaseCurrent);
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG), h2MagCurrent);
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH), h2PhaseCurrent);
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG), h3MagCurrent);
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH), h3PhaseCurrent);
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), h8MagCurrent);
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), h8PhaseCurrent);
+
+	h1MagConverted = m_admtController->readRegister(static_cast<uint16_t>(*h1MagCurrent), "h1mag");
+	h1PhaseConverted = m_admtController->readRegister(static_cast<uint16_t>(*h1PhaseCurrent), "h1phase");
+	h2MagConverted = m_admtController->readRegister(static_cast<uint16_t>(*h2MagCurrent), "h2mag");
+	h2PhaseConverted = m_admtController->readRegister(static_cast<uint16_t>(*h2PhaseCurrent), "h2phase");
+	h3MagConverted = m_admtController->readRegister(static_cast<uint16_t>(*h3MagCurrent), "h3mag");
+	h3PhaseConverted = m_admtController->readRegister(static_cast<uint16_t>(*h3PhaseCurrent), "h3phase");
+	h8MagConverted = m_admtController->readRegister(static_cast<uint16_t>(*h8MagCurrent), "h8mag");
+	h8PhaseConverted = m_admtController->readRegister(static_cast<uint16_t>(*h8PhaseCurrent), "h8phase");
+
+	calibrationLogWriteLn();
+	calibrationLogWrite("H1 Mag Converted: " + QString::number(h1MagConverted) + "\n");
+	calibrationLogWrite("H1 Phase Converted: " + QString::number(h1PhaseConverted) + "\n");
+	calibrationLogWrite("H2 Mag Converted: " + QString::number(h2MagConverted) + "\n");
+	calibrationLogWrite("H2 Phase Converted: " + QString::number(h2PhaseConverted) + "\n");
+	calibrationLogWrite("H3 Mag Converted: " + QString::number(h3MagConverted) + "\n");
+	calibrationLogWrite("H3 Phase Converted: " + QString::number(h3PhaseConverted) + "\n");
+	calibrationLogWrite("H8 Mag Converted: " + QString::number(h8MagConverted) + "\n");
+	calibrationLogWrite("H8 Phase Converted: " + QString::number(h8PhaseConverted));
 
 	updateCalculatedCoeff();
 
