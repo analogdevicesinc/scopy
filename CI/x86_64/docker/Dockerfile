@@ -23,7 +23,7 @@ RUN echo "${USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-$USER && \
 
 USER $USER
 WORKDIR /home/${USER}
-RUN git clone https://github.com/analogdevicesinc/scopy --branch dev
+RUN git clone https://github.com/analogdevicesinc/scopy --branch ci/scopy-1.5.0-x86_64-appimage 
 WORKDIR /home/${USER}/scopy
 
 ENV CI_SCRIPT=ON
