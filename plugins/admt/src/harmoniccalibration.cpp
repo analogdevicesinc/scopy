@@ -92,18 +92,18 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	MenuSectionWidget *angleWidget = new MenuSectionWidget(rawDataWidget);
 	MenuSectionWidget *countWidget = new MenuSectionWidget(rawDataWidget);
 	MenuSectionWidget *tempWidget = new MenuSectionWidget(rawDataWidget);
-	rotationWidget->contentLayout()->setSpacing(10);
-	angleWidget->contentLayout()->setSpacing(10);
-	countWidget->contentLayout()->setSpacing(10);
-	tempWidget->contentLayout()->setSpacing(10);
+	rotationWidget->contentLayout()->setSpacing(8);
+	angleWidget->contentLayout()->setSpacing(8);
+	countWidget->contentLayout()->setSpacing(8);
+	tempWidget->contentLayout()->setSpacing(8);
 	MenuCollapseSection *rotationSection = new MenuCollapseSection("Rotation", MenuCollapseSection::MHCW_NONE, rotationWidget);
 	MenuCollapseSection *angleSection = new MenuCollapseSection("Angle", MenuCollapseSection::MHCW_NONE, angleWidget);
 	MenuCollapseSection *countSection = new MenuCollapseSection("Count", MenuCollapseSection::MHCW_NONE, countWidget);
 	MenuCollapseSection *tempSection = new MenuCollapseSection("Temperature", MenuCollapseSection::MHCW_NONE, tempWidget);
-	rotationSection->contentLayout()->setSpacing(10);
-	angleSection->contentLayout()->setSpacing(10);
-	countSection->contentLayout()->setSpacing(10);
-	tempSection->contentLayout()->setSpacing(10);
+	rotationSection->contentLayout()->setSpacing(8);
+	angleSection->contentLayout()->setSpacing(8);
+	countSection->contentLayout()->setSpacing(8);
+	tempSection->contentLayout()->setSpacing(8);
 
 	rotationWidget->contentLayout()->addWidget(rotationSection);
 	angleWidget->contentLayout()->addWidget(angleSection);
@@ -184,9 +184,9 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 
 	// General Setting Widget
 	MenuSectionWidget *generalWidget = new MenuSectionWidget(generalSettingWidget);
-	generalWidget->contentLayout()->setSpacing(10);
+	generalWidget->contentLayout()->setSpacing(8);
 	MenuCollapseSection *generalSection = new MenuCollapseSection("Data Acquisition", MenuCollapseSection::MHCW_NONE, generalWidget);
-	generalSection->contentLayout()->setSpacing(10);
+	generalSection->contentLayout()->setSpacing(8);
 	generalWidget->contentLayout()->addWidget(generalSection);
 
 	// Graph Update Interval
@@ -218,7 +218,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	MenuSectionWidget *sequenceWidget = new MenuSectionWidget(generalSettingWidget);
 	MenuCollapseSection *sequenceSection = new MenuCollapseSection("Sequence", MenuCollapseSection::MHCW_NONE, sequenceWidget);
 	sequenceWidget->contentLayout()->addWidget(sequenceSection);
-	sequenceSection->contentLayout()->setSpacing(10);
+	sequenceSection->contentLayout()->setSpacing(8);
 
 	MenuCombo *sequenceTypeMenuCombo = new MenuCombo("Sequence Type", sequenceSection);
 	QComboBox *sequenceTypeComboBox = sequenceTypeMenuCombo->combo();
@@ -268,9 +268,9 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 
 	// Data Graph Setting Widget
 	MenuSectionWidget *dataGraphWidget = new MenuSectionWidget(generalSettingWidget);
-	dataGraphWidget->contentLayout()->setSpacing(10);
+	dataGraphWidget->contentLayout()->setSpacing(8);
 	MenuCollapseSection *dataGraphSection = new MenuCollapseSection("Data Graph", MenuCollapseSection::MHCW_NONE, dataGraphWidget);
-	dataGraphSection->contentLayout()->setSpacing(10);
+	dataGraphSection->contentLayout()->setSpacing(8);
 
 	// Graph Channel
 	m_dataGraphChannelMenuCombo = new MenuCombo("Channel", dataGraphSection);
@@ -301,9 +301,9 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 
 	// Temperature Graph
 	MenuSectionWidget *tempGraphWidget = new MenuSectionWidget(generalSettingWidget);
-	tempGraphWidget->contentLayout()->setSpacing(10);
+	tempGraphWidget->contentLayout()->setSpacing(8);
 	MenuCollapseSection *tempGraphSection = new MenuCollapseSection("Temperature Graph", MenuCollapseSection::MHCW_NONE, tempGraphWidget);
-	tempGraphSection->contentLayout()->setSpacing(10);
+	tempGraphSection->contentLayout()->setSpacing(8);
 
 	// Graph Samples
 	QLabel *tempGraphSamplesLabel = new QLabel(generalSection);
@@ -387,7 +387,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	MenuSectionWidget *calibrationDataGraphSectionWidget = new MenuSectionWidget(calibrationDataGraphWidget);
 	QTabWidget *calibrationDataGraphTabWidget = new QTabWidget(calibrationDataGraphSectionWidget);
 	applyTabWidgetStyle(calibrationDataGraphTabWidget);
-	calibrationDataGraphSectionWidget->contentLayout()->setSpacing(10);
+	calibrationDataGraphSectionWidget->contentLayout()->setSpacing(8);
 
 	// Raw Data Plot Widget
 	calibrationRawDataPlotWidget = new PlotWidget();
@@ -430,8 +430,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 														)css");
 	calibrationDataGraphChannelsStyle.replace(QString("&&colorname&&"), StyleHelper::getColor("UIElementBackground"));
 	calibrationDataGraphChannelsWidget->setStyleSheet(calibrationDataGraphChannelsStyle);
-	calibrationDataGraphChannelsLayout->setMargin(0);
-	calibrationDataGraphChannelsLayout->setSpacing(10);
+	calibrationDataGraphChannelsLayout->setContentsMargins(20, 5, 20, 5);
+	calibrationDataGraphChannelsLayout->setSpacing(20);
 	
 	MenuControlButton *toggleAngleButton = createChannelToggleWidget("Angle", QColor(StyleHelper::getColor("ScopyBlue")), calibrationDataGraphChannelsWidget);
 	MenuControlButton *toggleSineButton = createChannelToggleWidget("Sine", sineColor, calibrationDataGraphChannelsWidget);
@@ -448,7 +448,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	MenuSectionWidget *FFTDataGraphSectionWidget = new MenuSectionWidget(calibrationDataGraphWidget);
 	QTabWidget *FFTDataGraphTabWidget = new QTabWidget(FFTDataGraphSectionWidget);
 	applyTabWidgetStyle(FFTDataGraphTabWidget);
-	FFTDataGraphSectionWidget->contentLayout()->setSpacing(10);
+	FFTDataGraphSectionWidget->contentLayout()->setSpacing(8);
 	FFTDataGraphSectionWidget->contentLayout()->addWidget(FFTDataGraphTabWidget);
 
 	// FFT Plot Widget
@@ -628,7 +628,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationCalculatedCoeffLayout->addWidget(h3RowContainer, 2, 0);
 	calibrationCalculatedCoeffLayout->addWidget(h8RowContainer, 3, 0);
 
-	calibrationCoeffSectionWidget->contentLayout()->setSpacing(10);
+	calibrationCoeffSectionWidget->contentLayout()->setSpacing(8);
 	calibrationCoeffSectionWidget->contentLayout()->addWidget(calibrationDisplayFormatLabel);
 	calibrationCoeffSectionWidget->contentLayout()->addWidget(calibrationDisplayFormatSwitch);
 	calibrationCoeffSectionWidget->contentLayout()->addWidget(calibrationCalculatedCoeffLabel);
@@ -639,7 +639,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	#pragma region Calibration Dataset Configuration
 	MenuSectionWidget *calibrationDatasetConfigSectionWidget = new MenuSectionWidget(calibrationSettingsWidget);
 	MenuCollapseSection *calibrationDatasetConfigCollapseSection = new MenuCollapseSection("Dataset Configuration", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, calibrationDatasetConfigSectionWidget);
-	calibrationDatasetConfigSectionWidget->contentLayout()->setSpacing(10);
+	calibrationDatasetConfigSectionWidget->contentLayout()->setSpacing(8);
 	calibrationDatasetConfigSectionWidget->contentLayout()->addWidget(calibrationDatasetConfigCollapseSection);
 
 	QLabel *calibrationCycleCountLabel = new QLabel("Cycle Count", calibrationDatasetConfigCollapseSection);
@@ -656,7 +656,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationSamplesPerCycleLineEdit->setText(QString::number(samplesPerCycle));
 	connectLineEditToNumber(calibrationSamplesPerCycleLineEdit, samplesPerCycle);
 
-	calibrationDatasetConfigCollapseSection->contentLayout()->setSpacing(10);
+	calibrationDatasetConfigCollapseSection->contentLayout()->setSpacing(8);
 	calibrationDatasetConfigCollapseSection->contentLayout()->addWidget(calibrationCycleCountLabel);
 	calibrationDatasetConfigCollapseSection->contentLayout()->addWidget(calibrationCycleCountLineEdit);
 	calibrationDatasetConfigCollapseSection->contentLayout()->addWidget(calibrationSamplesPerCycleLabel);
@@ -667,7 +667,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	#pragma region Calibration Data Section Widget
 	MenuSectionWidget *calibrationDataSectionWidget = new MenuSectionWidget(calibrationSettingsWidget);
 	MenuCollapseSection *calibrationDataCollapseSection = new MenuCollapseSection("Calibration Data", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, calibrationDataSectionWidget);
-	calibrationDataSectionWidget->contentLayout()->setSpacing(10);
+	calibrationDataSectionWidget->contentLayout()->setSpacing(8);
 	calibrationDataSectionWidget->contentLayout()->addWidget(calibrationDataCollapseSection);
 
 	QPushButton *importDataButton = new QPushButton(calibrationDataCollapseSection);
@@ -680,7 +680,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	clearCalibrateDataButton->setText("Clear All Data");
 	StyleHelper::BlueButton(clearCalibrateDataButton, "clearCalibrateDataButton");
 
-	calibrationDataCollapseSection->contentLayout()->setSpacing(10);
+	calibrationDataCollapseSection->contentLayout()->setSpacing(8);
 	calibrationDataCollapseSection->contentLayout()->addWidget(importDataButton);
 	calibrationDataCollapseSection->contentLayout()->addWidget(extractDataButton);
 	calibrationDataCollapseSection->contentLayout()->addWidget(clearCalibrateDataButton);
@@ -701,7 +701,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationMotorRampModeCombo->addItem("Ramp Mode 1", QVariant(ADMTController::MotorRampMode::RAMP_MODE_1));
 	applyComboBoxStyle(calibrationMotorRampModeCombo);
 
-	motorConfigurationCollapseSection->contentLayout()->setSpacing(10);
+	motorConfigurationCollapseSection->contentLayout()->setSpacing(8);
 	motorConfigurationCollapseSection->contentLayout()->addWidget(motorMaxVelocitySpinBox);
 	motorConfigurationCollapseSection->contentLayout()->addWidget(motorAccelTimeSpinBox);
 	motorConfigurationCollapseSection->contentLayout()->addWidget(motorMaxDisplacementSpinBox);
@@ -711,7 +711,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	#pragma region Motor Control Section Widget
 	MenuSectionWidget *motorControlSectionWidget = new MenuSectionWidget(calibrationSettingsWidget);
 	MenuCollapseSection *motorControlCollapseSection = new MenuCollapseSection("Motor Control", MenuCollapseSection::MHCW_NONE, motorControlSectionWidget);
-	motorControlSectionWidget->contentLayout()->setSpacing(10);
+	motorControlSectionWidget->contentLayout()->setSpacing(8);
 	motorControlSectionWidget->contentLayout()->addWidget(motorControlCollapseSection);
 	QLabel *currentPositionLabel = new QLabel("Current Position", motorControlSectionWidget);
 	StyleHelper::MenuSmallLabel(currentPositionLabel, "currentPositionLabel");
@@ -774,7 +774,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	autoCalibrateCheckBox = new QCheckBox("Auto Calibrate", motorControlSectionWidget);
 	StyleHelper::BlueSquareCheckbox(autoCalibrateCheckBox, "autoCalibrateCheckBox");
 
-	motorControlCollapseSection->contentLayout()->setSpacing(10);
+	motorControlCollapseSection->contentLayout()->setSpacing(8);
 	motorControlCollapseSection->contentLayout()->addWidget(currentPositionLabel);
 	motorControlCollapseSection->contentLayout()->addWidget(calibrationMotorCurrentPositionLabel);
 	motorControlCollapseSection->contentLayout()->addWidget(motorTargetPositionSpinBox);
@@ -786,14 +786,14 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	#pragma region Logs Section Widget
 	MenuSectionWidget *logsSectionWidget = new MenuSectionWidget(calibrationSettingsWidget);
 	MenuCollapseSection *logsCollapseSection = new MenuCollapseSection("Logs", MenuCollapseSection::MHCW_NONE, logsSectionWidget);
-	logsSectionWidget->contentLayout()->setSpacing(10);
+	logsSectionWidget->contentLayout()->setSpacing(8);
 	logsSectionWidget->contentLayout()->addWidget(logsCollapseSection);
 
 	logsPlainTextEdit = new QPlainTextEdit(logsSectionWidget);
 	logsPlainTextEdit->setReadOnly(true);
 	logsPlainTextEdit->setFixedHeight(320);
 
-	logsCollapseSection->contentLayout()->setSpacing(10);
+	logsCollapseSection->contentLayout()->setSpacing(8);
 	logsCollapseSection->contentLayout()->addWidget(logsPlainTextEdit);
 	#pragma endregion
 
@@ -862,7 +862,7 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	registerScrollArea->setWidget(registerWidget);
 	registerWidget->setLayout(registerLayout);
 	registerLayout->setMargin(0);
-	registerLayout->setSpacing(10);
+	registerLayout->setSpacing(8);
 
 	QLabel *registerConfigurationLabel = new QLabel("Configuration", registerWidget);
 	StyleHelper::MenuControlLabel(registerConfigurationLabel, "registerConfigurationLabel");
@@ -870,7 +870,7 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	QGridLayout *registerConfigurationGridLayout = new QGridLayout(registerConfigurationGridWidget);
 	registerConfigurationGridWidget->setLayout(registerConfigurationGridLayout);
 	registerConfigurationGridLayout->setMargin(0);
-	registerConfigurationGridLayout->setSpacing(10);
+	registerConfigurationGridLayout->setSpacing(8);
 
 	QLabel *registerDeviceIDLabel = new QLabel("Device ID", registerWidget);
 	StyleHelper::MenuControlLabel(registerDeviceIDLabel, "registerDeviceIDLabel");
@@ -878,7 +878,7 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	QGridLayout *registerDeviceIDGridLayout = new QGridLayout(registerDeviceIDGridWidget);
 	registerDeviceIDGridWidget->setLayout(registerDeviceIDGridLayout);
 	registerDeviceIDGridLayout->setMargin(0);
-	registerDeviceIDGridLayout->setSpacing(10);
+	registerDeviceIDGridLayout->setSpacing(8);
 
 	QLabel *registerHarmonicsLabel = new QLabel("Harmonics", registerWidget);
 	StyleHelper::MenuControlLabel(registerHarmonicsLabel, "registerHarmonicsLabel");
@@ -886,7 +886,7 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	QGridLayout *registerHarmonicsGridLayout = new QGridLayout(registerHarmonicsGridWidget);
 	registerHarmonicsGridWidget->setLayout(registerHarmonicsGridLayout);
 	registerHarmonicsGridLayout->setMargin(0);
-	registerHarmonicsGridLayout->setSpacing(10);
+	registerHarmonicsGridLayout->setSpacing(8);
 
 	QLabel *registerSensorDataLabel = new QLabel("Sensor Data", registerWidget);
 	StyleHelper::MenuControlLabel(registerSensorDataLabel, "registerSensorDataLabel");
@@ -894,7 +894,7 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	QGridLayout *registerSensorDataGridLayout = new QGridLayout(registerSensorDataGridWidget);
 	registerSensorDataGridWidget->setLayout(registerSensorDataGridLayout);
 	registerSensorDataGridLayout->setMargin(0);
-	registerSensorDataGridLayout->setSpacing(10);
+	registerSensorDataGridLayout->setSpacing(8);
 
 	RegisterBlockWidget *cnvPageRegisterBlock = new RegisterBlockWidget("CNVPAGE", "Convert Start and Page Select", 0x01, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 	RegisterBlockWidget *digIORegisterBlock = new RegisterBlockWidget("DIGIO", "Digital Input Output", 0x04, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
@@ -1053,30 +1053,32 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	QVBoxLayout *leftUtilityLayout = new QVBoxLayout(leftUtilityWidget);
 	leftUtilityWidget->setLayout(leftUtilityLayout);
 	leftUtilityLayout->setMargin(0);
-	leftUtilityLayout->setSpacing(10);
+	leftUtilityLayout->setSpacing(8);
 	#pragma region Command Log Widget
 	MenuSectionWidget *commandLogSectionWidget = new MenuSectionWidget(leftUtilityWidget);
 	MenuCollapseSection *commandLogCollapseSection = new MenuCollapseSection("Command Log", MenuCollapseSection::MHCW_NONE, commandLogSectionWidget);
+	commandLogSectionWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	commandLogSectionWidget->contentLayout()->addWidget(commandLogCollapseSection);
 
 	QPlainTextEdit *commandLogPlainTextEdit = new QPlainTextEdit(commandLogSectionWidget);
 	commandLogPlainTextEdit->setReadOnly(true);
-	commandLogPlainTextEdit->setFixedHeight(320);
+	commandLogPlainTextEdit->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
 	commandLogCollapseSection->contentLayout()->addWidget(commandLogPlainTextEdit);
 
-	leftUtilityLayout->addWidget(commandLogSectionWidget);
-	leftUtilityLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	leftUtilityLayout->addWidget(commandLogSectionWidget, 1);
+	leftUtilityLayout->addStretch();
 	#pragma endregion
 	#pragma endregion
 
 	#pragma region Center Utility Widget
 	QWidget *centerUtilityWidget = new QWidget(this);
 	QHBoxLayout *centerUtilityLayout = new QHBoxLayout(centerUtilityWidget);
-	centerUtilityWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+	centerUtilityWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+	centerUtilityWidget->setContentsMargins(2, 0, 2, 0);
 	centerUtilityWidget->setLayout(centerUtilityLayout);
 	centerUtilityLayout->setMargin(0);
-	centerUtilityLayout->setSpacing(10);
+	centerUtilityLayout->setSpacing(8);
 	// centerUtilityLayout->setAlignment(Qt::AlignTop);
 
 	#pragma region DIGIO Monitor
@@ -1130,12 +1132,12 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	MTDiagnosticsScrollArea->setWidgetResizable(true);
 	QVBoxLayout *MTDiagnosticsLayout = new QVBoxLayout(MTDiagnosticsWidget);
 	MTDiagnosticsLayout->setMargin(0);
-	MTDiagnosticsLayout->setSpacing(10);
+	MTDiagnosticsLayout->setSpacing(5);
 
 	MenuSectionWidget *MTDiagnosticsSectionWidget = new MenuSectionWidget(centerUtilityWidget);
 	MenuCollapseSection *MTDiagnosticsCollapseSection = new MenuCollapseSection("MT Diagnostics", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MTDiagnosticsSectionWidget);
 	MTDiagnosticsSectionWidget->contentLayout()->addWidget(MTDiagnosticsCollapseSection);
-	MTDiagnosticsCollapseSection->contentLayout()->setSpacing(10);
+	MTDiagnosticsCollapseSection->contentLayout()->setSpacing(8);
 
 	QLabel *AFEDIAG0Label = new QLabel("AFEDIAG0 (%)");
 	StyleHelper::MenuSmallLabel(AFEDIAG0Label, "AFEDIAG0Label");
@@ -1160,10 +1162,11 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 
 	MTDiagnosticsLayout->addWidget(MTDiagnosticsSectionWidget);
 	MTDiagnosticsLayout->addWidget(MTDIAG1SectionWidget);
+	MTDiagnosticsLayout->addStretch();
 	#pragma endregion
 
-	centerUtilityLayout->addWidget(DIGIOMonitorSectionWidget, 0, Qt::AlignTop);
-	centerUtilityLayout->addWidget(MTDiagnosticsScrollArea, 0, Qt::AlignTop);
+	centerUtilityLayout->addWidget(DIGIOMonitorSectionWidget, 1, Qt::AlignTop);
+	centerUtilityLayout->addWidget(MTDiagnosticsScrollArea);
 	// centerUtilityLayout->addWidget(MTDIAG1SectionWidget, 0, Qt::AlignTop);
 	// centerUtilityLayout->addWidget(MTDiagnosticsSectionWidget, 0, Qt::AlignTop);
 
@@ -1177,7 +1180,7 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	QVBoxLayout *rightUtilityLayout = new QVBoxLayout(rightUtilityWidget);
 	rightUtilityWidget->setLayout(rightUtilityLayout);
 	rightUtilityLayout->setMargin(0);
-	rightUtilityLayout->setSpacing(10);
+	rightUtilityLayout->setSpacing(8);
 
 	MenuSectionWidget *faultRegisterSectionWidget = new MenuSectionWidget(rightUtilityWidget);
 	MenuCollapseSection *faultRegisterCollapseSection = new MenuCollapseSection("Fault Register", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, faultRegisterSectionWidget);
@@ -1324,6 +1327,7 @@ MenuControlButton *HarmonicCalibration::createStatusLEDWidget(const QString titl
 	menuControlButton->setCheckable(true);
 	menuControlButton->checkBox()->setChecked(true);
 	menuControlButton->setEnabled(false);
+	menuControlButton->layout()->setMargin(8);
 	return menuControlButton;
 }
 
@@ -1338,6 +1342,7 @@ MenuControlButton *HarmonicCalibration::createChannelToggleWidget(const QString 
 	menuControlButton->button()->setVisible(false);
 	menuControlButton->setCheckable(false);
 	menuControlButton->checkBox()->setChecked(true);
+	menuControlButton->layout()->setMargin(0);
 	return menuControlButton;
 }
 
