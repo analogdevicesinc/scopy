@@ -35,7 +35,7 @@ tar_and_move_sysroot(){
 
 create_image(){
 	pushd ${SRC_DIR}/CI/armhf/docker
-	sudo docker build --load --tag cristianbindea/scopy1-armhf-appimage .
+	sudo docker build --load --tag astanea/scopy1-armhf-appimage .
 	# sudo DOCKER_BUILDKIT=0 docker build --tag cristianbindea/scopy1-armhf-appimage . # build the image using old backend
 	popd
 }
