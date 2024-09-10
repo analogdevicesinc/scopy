@@ -15,10 +15,10 @@ bool ADMTPlugin::compatible(QString m_param, QString category)
 {
 	m_name = "ADMT4000";
 	bool ret = false;
-	Connection *conn = ConnectionProvider::open(m_param);
+	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
 
 	if(!conn) {
-		qWarning(CAT_ADMTPLUGIN) << "No context available for admt";
+		qWarning(CAT_ADMTPLUGIN) << "No context available for ADMT";
 		return false;
 	}
 
@@ -28,7 +28,7 @@ bool ADMTPlugin::compatible(QString m_param, QString category)
 	}
 
 	ConnectionProvider::close(m_param);
-	ret = true;
+
 	return ret;
 }
 
@@ -194,11 +194,11 @@ void ADMTPlugin::initMetadata()
 	loadMetadata(
 		R"plugin(
 	{
-	   "priority":100,
+	   "priority":102,
 	   "category":[
 	      "iio"
 	   ],
-	   "exclude":[""]
+	   "exclude":["*", "!debugger"]
 	}
 )plugin");
 }
