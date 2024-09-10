@@ -27,7 +27,7 @@ FROM start AS sysroot_builder
 ARG USER=runner
 ENV DEBIAN_FRONTEND=noninteractive
 COPY sysroot.tar.gz /home/${USER}
-RUN git clone https://github.com/analogdevicesinc/scopy -b dev
+RUN git clone https://github.com/analogdevicesinc/scopy -b main
 WORKDIR /home/${USER}/scopy
 RUN ./CI/armhf/create_sysroot.sh \
 		install_packages \
