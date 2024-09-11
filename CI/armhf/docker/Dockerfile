@@ -6,7 +6,7 @@ ENV TZ=Europe/Bucharest
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update && \
 	apt-get -y upgrade && \
-	apt-get install -y apt-utils sudo git wget flex bison pkg-config make python3 pip vim
+	apt-get install -y apt-utils sudo git wget flex bison pkg-config make python3 pip vim python-is-python3
 RUN groupadd -g 1000 -r $USER && \
 	useradd -u 1000 -g 1000 --create-home -r $USER
 
@@ -57,3 +57,7 @@ COPY --from=sysroot_builder /home/${USER}/scopy/CI/armhf/staging/sysroot/include
 WORKDIR /home/${USER}/sysroot
 RUN ln -s usr/bin bin && ln -s usr/lib lib && ln -s usr/sbin sbin
 WORKDIR /home/${USER}
+COPY armhf_build_process.sh /home/${USER}/armhf_build_process.sh
+COPY armhf_build_config.sh /home/${USER}/armhf_build_config.sh
+RUN /home/${USER}/armhf_build_process.sh install_packages download_cmake download_crosscompiler  && \
+	rm /home/${USER}/armhf_build_process.sh /home/${USER}/armhf_build_config.sh
