@@ -13,7 +13,7 @@ General IIO plugins
 
 * :ref:`Datalogger <datalogger>`
 
-* Debugger
+* :ref:`Debugger <debugger>`
 
 * :ref:`Register Map <registermap>`
 
@@ -62,6 +62,7 @@ Contents
 
    adc/adc
    datalogger/datalogger
+   debugger/index
    registermap/registermap
    m2k/index
    pqm/index
