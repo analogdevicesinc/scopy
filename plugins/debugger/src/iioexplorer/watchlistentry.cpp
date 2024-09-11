@@ -120,7 +120,7 @@ void WatchListEntry::setupWidget(IIOWidget *widget)
 		m_valueUi = m_lineedit;
 	}
 
-	QObject::connect(dynamic_cast<QWidget *>(widget->getDataStrategy()), SIGNAL(sendData(QString, QString)), this,
+	QObject::connect(dynamic_cast<QObject *>(widget->getDataStrategy()), SIGNAL(sendData(QString, QString)), this,
 			 SLOT(setNewData(QString, QString)));
 }
 
