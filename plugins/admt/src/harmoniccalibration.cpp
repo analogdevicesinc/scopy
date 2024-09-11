@@ -17,7 +17,7 @@ static int samplesPerCycle = 256;
 static int totalSamplesCount = cycleCount * samplesPerCycle;
 static bool startMotor = false;
 
-static bool isDebug = true;
+static bool isDebug = false;
 static bool isCalibrated = false;
 
 static double motorTimeUnit = 1.048576; // t = 2^24/16Mhz
