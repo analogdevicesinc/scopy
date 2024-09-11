@@ -151,7 +151,7 @@ build_libm2k() {
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PYTHON=OFF \
 		-DENABLE_CSHARP=OFF \
-		-DBUILD_EXAMPLES=ON \
+		-DBUILD_EXAMPLES=OFF \
 		-DENABLE_TOOLS=OFF \
 		-DINSTALL_UDEV_RULES=OFF \
 		-DENABLE_LOG=OFF
@@ -328,9 +328,19 @@ move_sysroot(){
 	fi
 }
 
+# move the staging folder that contains the tools needed for the build to the known location
+move_tools(){
+	[ -d /home/runner/staging ] && mv /home/runner/staging $STAGING_AREA || echo "Staging folder not found or already moved"
+	if [ ! -d $STAGING_AREA ]; then
+		echo "Missing tools folder, downloading now"
+		download_cmake
+		download_crosscompiler
+	fi
+}
+
 # move and rename the AppImage artifact
 move_appimage(){
-	[ -d $APP_IMAGE ] && mv $APP_IMAGE $SRC_DIR/Scopy1-armhf.AppImage || echo "Appimage not found"
+	[ -f $APP_IMAGE ] && mv $APP_IMAGE $SRC_DIR/Scopy1-armhf.AppImage || echo "Appimage not found"
 }
 
 generate_ci_envs(){
@@ -356,8 +366,7 @@ build_deps(){
 
 run_workflow(){
 	install_packages
-	download_cmake
-	download_crosscompiler
+	move_tools
 	move_sysroot
 	build_iio-emu
 	build_scopy

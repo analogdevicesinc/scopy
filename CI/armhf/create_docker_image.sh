@@ -10,7 +10,7 @@ install_packages(){
 	sudo apt-get update
 	sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+	sudo add-apt-repository --yes "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 	sudo apt-get update
 	sudo apt-get -y install containerd.io docker-ce docker-ce-cli docker-buildx-plugin
 }
@@ -22,7 +22,6 @@ create_sysroot(){
 		install_qemu \
 		extract_sysroot \
 		configure_sysroot
-
 }
 
 # archive the sysroot and move it next to Dockerfile in order to copy the tar in the docker image

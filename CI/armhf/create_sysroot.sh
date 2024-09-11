@@ -9,14 +9,14 @@ IMAGE_FILE=2023-12-13-ADI-Kuiper-full.img
 
 install_packages(){
 	sudo apt update
-	sudo apt -y install git wget unzip python3 python
+	sudo apt -y install git wget unzip python3 python2
 }
 
 download_kuiper(){
 	mkdir -p ${STAGING_AREA}
 	pushd ${STAGING_AREA}
-	wget --progress=dot:giga ${KUIPER_DOWNLOAD_LINK}
-	unzip image*.zip
+	[ -f image_2023-12-13-ADI-Kuiper-full.zip ] || wget --progress=dot:giga ${KUIPER_DOWNLOAD_LINK}
+	[ -f 2023-12-13-ADI-Kuiper-full.img ] || unzip image*.zip
 	popd
 }
 
