@@ -63,7 +63,7 @@ void FFTPlotManager::removePlot(uint32_t uuid)
 	}
 
 	multiPlotUpdate();
-	syncAllPlotNavigatorsAndCursors();
+	// syncAllPlotNavigatorsAndCursors();
 }
 
 FFTPlotComponent *FFTPlotManager::plot(uint32_t uuid)
@@ -89,13 +89,7 @@ void FFTPlotManager::syncNavigatorAndCursors(PlotComponent *p)
 	if(p == m_primary)
 		return;
 
-	auto plt = dynamic_cast<FFTPlotComponent *>(p);
-	QSet<QwtAxisId> set;
-	set.insert(m_primary->plot(0)->xAxis()->axisId());
-	// set.insert(m_primary->plot(0)->yAxis()->axisId());
-	set.insert(p->plot(0)->xAxis()->axisId());
-	// set.insert(p->plot(0)->yAxis()->axisId());
-	PlotNavigator::syncPlotNavigators(m_primary->plot(0)->navigator(), p->plot(0)->navigator(), &set);
+	PlotNavigator::syncPlotNavigators(m_primary->plot(0)->navigator(), p->plot(0)->navigator());
 	CursorController::syncXCursorControllers(m_primary->cursor(), p->cursor());
 }
 
