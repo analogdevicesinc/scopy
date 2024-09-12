@@ -19,6 +19,10 @@ public:
 	virtual QString getKey(QWidget *w);
 	virtual bool contains(QString key);
 	virtual QWidget *get(QString key);
+
+	QSize sizeHint() const override;
+	QSize minimumSizeHint() const override;
+
 public Q_SLOTS:
 	virtual bool show(QString key);
 
