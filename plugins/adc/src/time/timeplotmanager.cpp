@@ -86,7 +86,10 @@ void TimePlotManager::multiPlotUpdate()
 
 	for(PlotComponent *p : qAsConst(m_plots)) {
 		auto plt = dynamic_cast<TimePlotComponent *>(p);
-		plt->plotMenu()->showDeleteButtons(b);
+		plt->plotMenu()->showPlotButtons(b);
+
+		// do not allow users to delete the primary plot
+		plt->plotMenu()->showDeleteButtons(b && plt != m_primary);
 	}
 
 	for(PlotManagerCombobox *cb : m_channelPlotcomboMap) {
