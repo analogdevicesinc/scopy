@@ -7,7 +7,7 @@ What is a Scopy plugin ?
 
 General IIO plugins
 
-* ADC Plugin
+* :ref: `ADC Plugin <adc>`
 
 * DAC plugin
 
@@ -60,6 +60,7 @@ Contents
 .. toctree::
    :maxdepth: 3
 
+   adc/adc
    datalogger/datalogger
    registermap/registermap
    m2k/index
