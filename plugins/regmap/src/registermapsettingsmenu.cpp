@@ -112,17 +112,12 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 	writeListOfValuesButton->setEnabled(false);
 
 	QObject::connect(writeListOfValuesButton, &QPushButton::clicked, this, [=]() {
-		int startInterval = Utils::convertQStringToUint32(startReadInterval->text());
-		int endInterval = Utils::convertQStringToUint32(endReadInterval->text());
-
 		FileRegisterReadStrategy *fileRead = new FileRegisterReadStrategy(filePath->text());
 
 		QObject::connect(fileRead, &FileRegisterReadStrategy::readDone, this,
 				 &RegisterMapSettingsMenu::requestWrite);
 
-		for(int i = startInterval; i <= endInterval; i++) {
-			fileRead->read(i);
-		}
+		fileRead->readAll();
 	});
 
 	menuSection->contentLayout()->addWidget(writeListOfValuesButton);
