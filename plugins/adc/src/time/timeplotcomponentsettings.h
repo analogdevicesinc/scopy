@@ -19,6 +19,7 @@ public:
 	~TimePlotComponentSettings();
 
 	void showDeleteButtons(bool b);
+	void showPlotButtons(bool b);
 
 public Q_SLOTS:
 	void addChannel(ChannelComponent *c);
