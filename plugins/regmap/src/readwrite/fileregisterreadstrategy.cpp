@@ -33,3 +33,21 @@ void FileRegisterReadStrategy::read(uint32_t address)
 		}
 	}
 }
+
+void FileRegisterReadStrategy::readAll()
+{
+	QFile file(path);
+	if(!file.open(QIODevice::ReadOnly)) {
+		qDebug(CAT_IIO_OPERATION) << "device read error " << file.errorString();
+		Q_EMIT readError("device read error");
+	} else {
+		while(!file.atEnd()) {
+			QString line(file.readLine());
+			uint32_t address = Utils::convertQStringToUint32(line.split(',').first());
+			uint32_t value = Utils::convertQStringToUint32(line.split(',').at(1));
+
+			Q_EMIT readDone(address, value);
+			qDebug(CAT_IIO_OPERATION) << "device read success for " << address << " with value " << value;
+		}
+	}
+}
