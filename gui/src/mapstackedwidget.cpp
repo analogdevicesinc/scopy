@@ -51,6 +51,22 @@ QWidget *MapStackedWidget::get(QString key)
 	return nullptr;
 }
 
+QSize MapStackedWidget::sizeHint() const
+{
+	if(currentWidget()) {
+		return currentWidget()->sizeHint();
+	}
+	return QStackedWidget::sizeHint();
+}
+
+QSize MapStackedWidget::minimumSizeHint() const
+{
+	if(currentWidget()) {
+		return currentWidget()->minimumSizeHint();
+	}
+	return QStackedWidget::minimumSizeHint();
+}
+
 bool MapStackedWidget::show(QString key)
 {
 	QWidget *w = map[key];
