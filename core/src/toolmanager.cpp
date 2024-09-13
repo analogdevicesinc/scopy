@@ -66,21 +66,21 @@ void ToolManager::changeToolListContents(QString s, QList<ToolMenuEntry *> sl)
 
 void ToolManager::showToolList(QString s)
 {
-	if(!map[currentKey].lock)
-		hideToolList(currentKey);
-	currentKey = s;
+	//	if(!map[currentKey].lock)
+	//		hideToolList(currentKey);
+	//	currentKey = s;
 
-	qDebug(CAT_TOOLMANAGER) << "showing" << s;
-	for(ToolMenuEntry *tme : qAsConst(map[s].tools)) {
-		ToolMenuItem *m = tm->getToolMenuItemFor(tme->uuid());
-		if(m == nullptr) {
-			m = tm->addTool(tme->uuid(), tme->name(), tme->icon());
-			connect(tme, SIGNAL(updateToolEntry()), this, SLOT(updateToolEntry()));
-			connect(m->getToolRunBtn(), SIGNAL(toggled(bool)), tme, SIGNAL(runToggled(bool)));
-			connect(m->getToolRunBtn(), SIGNAL(clicked(bool)), tme, SIGNAL(runClicked(bool)));
-		}
-		updateToolEntry(tme);
-	}
+	//	qDebug(CAT_TOOLMANAGER) << "showing" << s;
+	//	for(ToolMenuEntry *tme : qAsConst(map[s].tools)) {
+	//		ToolMenuItem *m = tm->getToolMenuItemFor(tme->uuid());
+	//		if(m == nullptr) {
+	//			m = tm->addTool(tme->uuid(), tme->name(), tme->icon());
+	//			connect(tme, SIGNAL(updateToolEntry()), this, SLOT(updateToolEntry()));
+	//			connect(m->getToolRunBtn(), SIGNAL(toggled(bool)), tme, SIGNAL(runToggled(bool)));
+	//			connect(m->getToolRunBtn(), SIGNAL(clicked(bool)), tme, SIGNAL(runClicked(bool)));
+	//		}
+	//		updateToolEntry(tme);
+	//	}
 }
 
 void ToolManager::hideToolList(QString s)
