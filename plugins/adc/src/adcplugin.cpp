@@ -319,6 +319,8 @@ void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
 		delete(w);
 	}
 	m_toolList.removeAll(tool);
+	tool->deleteLater();
+	tool = nullptr;
 	Q_EMIT toolListChanged();
 }
 
@@ -343,10 +345,10 @@ bool ADCPlugin::onDisconnect()
 	qDebug(CAT_ADCPLUGIN) << "disconnect";
 	if(m_ctx)
 		ConnectionProvider::GetInstance()->close(m_param);
-	for(auto &tool : m_toolList) {
-		deleteInstrument(tool);
-	}
 
+	while(!m_toolList.isEmpty()) {
+		deleteInstrument(m_toolList.first());
+	}
 	loadToolList();
 	Q_EMIT toolListChanged();
 
