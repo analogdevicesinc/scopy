@@ -345,6 +345,7 @@ QPair<QString, QVariant> ScopyMainWindow_API::getPreference(QString prefName)
 	if(prefName != NULL) {
 		return QPair<QString, QVariant>(prefName, prefMap[prefName]);
 	}
+	return {};
 }
 
 QMap<QString, QVariant> ScopyMainWindow_API::getPreferences()
