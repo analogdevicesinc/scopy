@@ -21,6 +21,8 @@
 #include <gui/widgets/scopystatusbar.h>
 #include "versioncheckmessage.h"
 
+#include "browsemenu/instrumentmanager.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class ScopyMainWindow;
@@ -66,7 +68,6 @@ private:
 	CyclicalTask *scanCycle;
 	IIOScanTask *scanTask;
 	ScannedIIOContextCollector *scc;
-	ToolManager *toolman;
 	DetachedToolWindowManager *dtm;
 
 	LicenseOverlay *license = nullptr;
@@ -75,6 +76,7 @@ private:
 	ScopyMainWindow_API *api;
 	Ui::ScopyMainWindow *ui;
 	QOpenGLWidget *m_glLoader;
+	InstrumentManager *m_instrManager;
 
 	void loadOpenGL();
 	void initPythonWIN32();
