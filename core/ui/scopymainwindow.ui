@@ -64,13 +64,13 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>200</width>
+        <width>230</width>
         <height>0</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>200</width>
+        <width>230</width>
         <height>16777215</height>
        </size>
       </property>
@@ -91,13 +91,20 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="scopy::ToolBrowser" name="wToolBrowser" native="true">
+        <widget class="QWidget" name="wToolBrowser" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4"/>
         </widget>
        </item>
       </layout>
@@ -138,12 +145,6 @@
   </widget>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>scopy::ToolBrowser</class>
-   <extends>QWidget</extends>
-   <header>toolbrowser.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>scopy::ToolStack</class>
    <extends>QStackedWidget</extends>
