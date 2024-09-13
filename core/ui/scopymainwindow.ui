@@ -38,7 +38,7 @@
      <height>720</height>
     </size>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
+   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0,0">
     <property name="spacing">
      <number>6</number>
     </property>
@@ -101,6 +101,17 @@
         </widget>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="browseMenu" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>200</width>
+        <height>0</height>
+       </size>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3"/>
      </widget>
     </item>
     <item>
