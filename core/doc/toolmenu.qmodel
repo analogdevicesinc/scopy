@@ -48,9 +48,9 @@
                           </DElement>
                          </base-DElement>
                          <object>{ebeabab1-6513-4e56-96d2-ba63e7038981}</object>
-                         <name>ToolManager</name>
-                         <pos>x:900;y:295</pos>
-                         <rect>x:-200;y:-35;w:400;h:70</rect>
+                         <name>InstrumentManager</name>
+                         <pos>x:895;y:255</pos>
+                         <rect>x:-240;y:-45;w:480;h:90</rect>
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
@@ -69,30 +69,9 @@
                           </DElement>
                          </base-DElement>
                          <object>{5464f43a-fbab-47fe-a8fb-917099cc3173}</object>
-                         <name>ToolMenu</name>
-                         <pos>x:890;y:90</pos>
-                         <rect>x:-210;y:-50;w:420;h:100</rect>
-                         <visual-role>0</visual-role>
-                        </DObject>
-                       </base-DObject>
-                       <show-all-members>true</show-all-members>
-                      </DClass>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DClass">
-                      <DClass>
-                       <base-DObject>
-                        <DObject>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{faa22d80-fca7-4dbc-bf70-eeff7062ce07}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{b23c93eb-35be-4cd8-8c38-042d079013c6}</object>
-                         <name>ToolMenuItem</name>
-                         <pos>x:365;y:105</pos>
-                         <rect>x:-245;y:-70;w:490;h:140</rect>
+                         <name>InstrumentMenu</name>
+                         <pos>x:895;y:105</pos>
+                         <rect>x:-185;y:-70;w:370;h:140</rect>
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
@@ -111,9 +90,9 @@
                           </DElement>
                          </base-DElement>
                          <object>{b131c26b-cc66-48a7-8f26-a6bc03fb9264}</object>
-                         <name>ToolItemWidget</name>
-                         <pos>x:-40;y:95</pos>
-                         <rect>x:-65;y:-35;w:130;h:70</rect>
+                         <name>InstrumentWidget</name>
+                         <pos>x:535;y:300</pos>
+                         <rect>x:-65;y:-60;w:130;h:120</rect>
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
@@ -133,7 +112,7 @@
                          </base-DElement>
                          <object>{b510cf1e-61ae-4ec6-af94-8ab1c850ec2a}</object>
                          <name>DefaultWidget</name>
-                         <pos>x:-135;y:235</pos>
+                         <pos>x:440;y:430</pos>
                          <rect>x:-50;y:-30;w:100;h:60</rect>
                          <visual-role>0</visual-role>
                         </DObject>
@@ -153,7 +132,7 @@
                          </base-DElement>
                          <object>{981c3d7c-6b64-4811-9cc4-99b6f8c73a1a}</object>
                          <name>MyNewWidget</name>
-                         <pos>x:20;y:235</pos>
+                         <pos>x:600;y:430</pos>
                          <rect>x:-50;y:-30;w:100;h:60</rect>
                          <visual-role>0</visual-role>
                         </DObject>
@@ -208,7 +187,7 @@
                           </DElement>
                          </base-DElement>
                          <object>{635149e7-86e7-4ee1-a3e5-a29a46344bfb}</object>
-                         <a>{faa22d80-fca7-4dbc-bf70-eeff7062ce07}</a>
+                         <a>{db5e7146-d41e-4907-9d48-4af523df145d}</a>
                          <b>{c543e186-ff61-4bbf-911f-23cc61b4434a}</b>
                         </DRelation>
                        </base-DRelation>
@@ -234,76 +213,13 @@
                          </base-DElement>
                          <object>{b0969698-ecf6-4ed3-8e68-9cef5e698ade}</object>
                          <name>ToolMenuEntry</name>
-                         <pos>x:-35;y:-115</pos>
+                         <pos>x:465;y:135</pos>
                          <rect>x:-120;y:-60;w:240;h:120</rect>
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
                        <show-all-members>true</show-all-members>
                       </DClass>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DClass">
-                      <DClass>
-                       <base-DObject>
-                        <DObject>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{a7c8680d-86ca-4859-a38c-1b7e64adaac0}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{fc685496-86a8-4cac-a080-e12fd05eff8f}</object>
-                         <name>BaseMenuItem</name>
-                         <pos>x:370;y:-45</pos>
-                         <rect>x:-50;y:-30;w:100;h:60</rect>
-                         <visual-role>0</visual-role>
-                        </DObject>
-                       </base-DObject>
-                      </DClass>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DInheritance">
-                      <DInheritance>
-                       <base-DRelation>
-                        <DRelation>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{70d9eeb9-2d4c-4cca-ad5d-dc887d53201e}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{8cff68c6-d1c8-49ea-af69-9dfb0ca715b1}</object>
-                         <a>{faa22d80-fca7-4dbc-bf70-eeff7062ce07}</a>
-                         <b>{a7c8680d-86ca-4859-a38c-1b7e64adaac0}</b>
-                        </DRelation>
-                       </base-DRelation>
-                      </DInheritance>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DAssociation">
-                      <DAssociation>
-                       <base-DRelation>
-                        <DRelation>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{15bb53a7-7760-466e-b786-3ff5090b67ad}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{a038b628-579c-4a15-9029-5d37a67fa9dd}</object>
-                         <a>{05e9bb0e-8e76-456a-ac35-205c79efd13d}</a>
-                         <b>{faa22d80-fca7-4dbc-bf70-eeff7062ce07}</b>
-                        </DRelation>
-                       </base-DRelation>
-                       <a>
-                        <DAssociationEnd>
-                         <cradinality>*</cradinality>
-                         <navigable>true</navigable>
-                         <kind>2</kind>
-                        </DAssociationEnd>
-                       </a>
-                      </DAssociation>
                      </instance>
                     </item>
                     <item>
@@ -332,18 +248,172 @@
                      </instance>
                     </item>
                     <item>
-                     <instance type="DAnnotation">
-                      <DAnnotation>
-                       <base-DElement>
-                        <DElement>
-                         <uid>{31e696c1-7109-48f8-84b6-0b580e7fa3a9}</uid>
-                        </DElement>
-                       </base-DElement>
-                       <text>Contains some things from the actual ToolMenuItem widget</text>
-                       <pos>x:-220;y:15</pos>
-                       <rect>x:0;y:0;w:187.429;h:42</rect>
-                       <auto-sized>false</auto-sized>
-                      </DAnnotation>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{abcdb03e-5bb9-4b94-a288-bcf157cd863b}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{8e9c6e36-3771-4e4f-a2da-3863d93fb7cc}</object>
+                         <name>MenuWidget</name>
+                         <pos>x:1275;y:300</pos>
+                         <rect>x:-75;y:-30;w:150;h:60</rect>
+                         <auto-sized>false</auto-sized>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{7eeb340e-b5ff-4c0d-8424-1efe53272cf4}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{b8855ac1-7d5d-406a-9e92-147672aafe85}</object>
+                         <name>BrowseMenu</name>
+                         <pos>x:1270;y:100</pos>
+                         <rect>x:-115;y:-95;w:230;h:190</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <show-all-members>true</show-all-members>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DAssociation">
+                      <DAssociation>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{4a7c89e3-117f-4612-a432-fcff2e52482b}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{2ed27405-81a1-4d97-95f1-fb75926f2ab3}</object>
+                         <a>{7eeb340e-b5ff-4c0d-8424-1efe53272cf4}</a>
+                         <b>{05e9bb0e-8e76-456a-ac35-205c79efd13d}</b>
+                        </DRelation>
+                       </base-DRelation>
+                       <a>
+                        <DAssociationEnd>
+                         <cradinality>1</cradinality>
+                         <navigable>true</navigable>
+                         <kind>2</kind>
+                        </DAssociationEnd>
+                       </a>
+                      </DAssociation>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{23a97ea0-fb44-483a-a1cb-90996610cf1c}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{82eaa98d-eaff-44b9-8275-f65cac93c419}</object>
+                         <name>CompositeWidget</name>
+                         <pos>x:895;y:-55</pos>
+                         <rect>x:-105;y:-40;w:210;h:80</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <show-all-members>true</show-all-members>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DInheritance">
+                      <DInheritance>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{28932f85-fa65-4493-abe8-20b90057214c}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{aed8badc-8d00-42f3-b462-409167519ca5}</object>
+                         <a>{05e9bb0e-8e76-456a-ac35-205c79efd13d}</a>
+                         <b>{23a97ea0-fb44-483a-a1cb-90996610cf1c}</b>
+                        </DRelation>
+                       </base-DRelation>
+                      </DInheritance>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DAssociation">
+                      <DAssociation>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{ffa689ed-dba0-4862-9b5c-ca3962623246}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{2932e7d8-e9d2-413d-8089-8ddbd4fa8860}</object>
+                         <a>{7eeb340e-b5ff-4c0d-8424-1efe53272cf4}</a>
+                         <b>{abcdb03e-5bb9-4b94-a288-bcf157cd863b}</b>
+                        </DRelation>
+                       </base-DRelation>
+                       <a>
+                        <DAssociationEnd>
+                         <cradinality>1</cradinality>
+                         <navigable>true</navigable>
+                         <kind>2</kind>
+                        </DAssociationEnd>
+                       </a>
+                      </DAssociation>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{fcad97e5-123b-4726-b2bb-67d44b56c08c}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{59ca7db8-ce98-4e9f-8767-62ccef3b6cce}</object>
+                         <name>QWidget</name>
+                         <pos>x:1270;y:-65</pos>
+                         <rect>x:-40;y:-30;w:80;h:60</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DInheritance">
+                      <DInheritance>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{8ef274a4-ea61-4f44-b046-72e50dc1d8f7}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{471280a7-2091-486d-b544-3bbb03b47d90}</object>
+                         <a>{7eeb340e-b5ff-4c0d-8424-1efe53272cf4}</a>
+                         <b>{fcad97e5-123b-4726-b2bb-67d44b56c08c}</b>
+                        </DRelation>
+                       </base-DRelation>
+                      </DInheritance>
                      </instance>
                     </item>
                     <item>
@@ -351,20 +421,19 @@
                       <DAnnotation>
                        <base-DElement>
                         <DElement>
-                         <uid>{3250a780-78cf-49c8-a586-8df1012b0e67}</uid>
+                         <uid>{fda2e20a-0c8b-4da3-9c05-d1eee3c81cdb}</uid>
                         </DElement>
                        </base-DElement>
-                       <text>Contains some things from the actual ToolMenuItem widget</text>
-                       <pos>x:-220;y:15</pos>
-                       <rect>x:0;y:0;w:187.429;h:42</rect>
-                       <auto-sized>false</auto-sized>
+                       <text>ItemWidget</text>
+                       <pos>x:495;y:215</pos>
+                       <rect>x:0;y:0;w:76.25;h:29</rect>
                       </DAnnotation>
                      </instance>
                     </item>
                    </qlist>
                   </elements>
-                  <last-modified>1724905611993</last-modified>
-                  <toolbarid>Activities</toolbarid>
+                  <last-modified>1726036115302</last-modified>
+                  <toolbarid>Classes</toolbarid>
                  </MDiagram>
                 </base-MDiagram>
                </MCanvasDiagram>
@@ -385,7 +454,7 @@
                     <uid>{ebeabab1-6513-4e56-96d2-ba63e7038981}</uid>
                    </MElement>
                   </base-MElement>
-                  <name>ToolManager</name>
+                  <name>InstrumentManager</name>
                   <relations>
                    <handles>
                     <handles>
@@ -419,6 +488,35 @@
                         </target>
                        </handle>
                       </item>
+                      <item>
+                       <handle>
+                        <uid>{635149e7-86e7-4ee1-a3e5-a29a46344bfb}</uid>
+                        <target>
+                         <instance type="MAssociation">
+                          <MAssociation>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{635149e7-86e7-4ee1-a3e5-a29a46344bfb}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{ebeabab1-6513-4e56-96d2-ba63e7038981}</a>
+                             <b>{b131c26b-cc66-48a7-8f26-a6bc03fb9264}</b>
+                            </MRelation>
+                           </base-MRelation>
+                           <a>
+                            <MAssociationEnd>
+                             <cardinality>*</cardinality>
+                             <navigable>true</navigable>
+                             <kind>2</kind>
+                            </MAssociationEnd>
+                           </a>
+                          </MAssociation>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
                      </qlist>
                     </handles>
                    </handles>
@@ -429,10 +527,18 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{32bb7d13-27a0-40f8-8f5b-e86a928e11f1}</uid>
+                    <uid>{dac27fc4-852a-49d1-ae3b-47097fa1ed33}</uid>
                     <visibility>7</visibility>
                     <type>2</type>
-                    <declaration>void addToolList(QString s, QList&lt;ToolMenuEntry *&gt; sl, QString device=&quot;&quot;)</declaration>
+                    <declaration>void addInstrumentItem(QString deviceId, QString device, QList&lt;ToolMenuEntry *&gt; tools)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{795f6647-5fc1-44d1-8faa-babc49d7a5ac}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>QMap&lt;QString, MenuSectionCollapseWidget *&gt; m_itemMap</declaration>
                    </MClassMember>
                   </item>
                  </qlist>
@@ -455,7 +561,7 @@
                     <uid>{5464f43a-fbab-47fe-a8fb-917099cc3173}</uid>
                    </MElement>
                   </base-MElement>
-                  <name>ToolMenu</name>
+                  <name>InstrumentMenu</name>
                   <relations>
                    <handles>
                     <handles>
@@ -489,6 +595,50 @@
                         </target>
                        </handle>
                       </item>
+                      <item>
+                       <handle>
+                        <uid>{ac0ee6ea-bcfc-4005-9877-455fe5994a8b}</uid>
+                        <target>
+                         <instance type="MInheritance">
+                          <MInheritance>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{ac0ee6ea-bcfc-4005-9877-455fe5994a8b}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{5464f43a-fbab-47fe-a8fb-917099cc3173}</a>
+                             <b>{8e9c6e36-3771-4e4f-a2da-3863d93fb7cc}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MInheritance>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                      <item>
+                       <handle>
+                        <uid>{aed8badc-8d00-42f3-b462-409167519ca5}</uid>
+                        <target>
+                         <instance type="MInheritance">
+                          <MInheritance>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{aed8badc-8d00-42f3-b462-409167519ca5}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{5464f43a-fbab-47fe-a8fb-917099cc3173}</a>
+                             <b>{82eaa98d-eaff-44b9-8275-f65cac93c419}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MInheritance>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
                      </qlist>
                     </handles>
                    </handles>
@@ -499,15 +649,33 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{7aad065f-4a36-489d-a62f-ff7e4b657fed}</uid>
+                    <uid>{31d7a914-b3f2-48e8-8f7d-10b9fddc11fd}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>ToolMenuItem* addMenuItem(QString device, QList&lt;ToolItemWidget *&gt; tools)</declaration>
+                    <properties>3</properties>
+                    <declaration>void add(QWidget *w)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{0f13bf24-d513-4881-990b-13ab2f9c2259}</uid>
+                    <uid>{b077e644-cd4e-4d4d-ae6b-f1a4b010e5a2}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>3</properties>
+                    <declaration>void remove(QWidget *w)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{ae041b7f-2f55-4899-bdf6-a31bdc5d0a64}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>void collapseAll()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{4bb3ef63-52fe-4b2c-a3be-cef7aef3c031}</uid>
                     <visibility>3</visibility>
                     <type>2</type>
                     <declaration>void createMenuItem(QString device, QList&lt;ToolItemWidget *&gt; tools)</declaration>
@@ -515,10 +683,10 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{82a806e2-4f2b-4616-8250-4aa7bd4199f7}</uid>
+                    <uid>{3b5c827b-2b6f-4317-b71c-761a0e6d006a}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>QMap&lt;QString device, ToolMenuItem *&gt; m_items</declaration>
+                    <declaration>QMap&lt;QString, QWidget*&gt; m_widgetMap</declaration>
                    </MClassMember>
                   </item>
                  </qlist>
@@ -541,40 +709,11 @@
                     <uid>{b23c93eb-35be-4cd8-8c38-042d079013c6}</uid>
                    </MElement>
                   </base-MElement>
-                  <name>ToolMenuItem</name>
+                  <name>InstrumentMenuItem</name>
                   <relations>
                    <handles>
                     <handles>
                      <qlist>
-                      <item>
-                       <handle>
-                        <uid>{635149e7-86e7-4ee1-a3e5-a29a46344bfb}</uid>
-                        <target>
-                         <instance type="MAssociation">
-                          <MAssociation>
-                           <base-MRelation>
-                            <MRelation>
-                             <base-MElement>
-                              <MElement>
-                               <uid>{635149e7-86e7-4ee1-a3e5-a29a46344bfb}</uid>
-                              </MElement>
-                             </base-MElement>
-                             <a>{b23c93eb-35be-4cd8-8c38-042d079013c6}</a>
-                             <b>{b131c26b-cc66-48a7-8f26-a6bc03fb9264}</b>
-                            </MRelation>
-                           </base-MRelation>
-                           <a>
-                            <MAssociationEnd>
-                             <cardinality>*</cardinality>
-                             <navigable>true</navigable>
-                             <kind>2</kind>
-                            </MAssociationEnd>
-                           </a>
-                          </MAssociation>
-                         </instance>
-                        </target>
-                       </handle>
-                      </item>
                       <item>
                        <handle>
                         <uid>{8cff68c6-d1c8-49ea-af69-9dfb0ca715b1}</uid>
@@ -597,6 +736,28 @@
                         </target>
                        </handle>
                       </item>
+                      <item>
+                       <handle>
+                        <uid>{47350cf7-faec-44b4-8686-f5342550c51b}</uid>
+                        <target>
+                         <instance type="MInheritance">
+                          <MInheritance>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{47350cf7-faec-44b4-8686-f5342550c51b}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{b23c93eb-35be-4cd8-8c38-042d079013c6}</a>
+                             <b>{f30b42b8-0b37-4670-af36-1299130b1d41}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MInheritance>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
                      </qlist>
                     </handles>
                    </handles>
@@ -607,7 +768,7 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{527cd660-8b57-4c64-938f-0f10d0c102ca}</uid>
+                    <uid>{05e96262-2635-4968-bcd4-86086e8d948a}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
                     <declaration>ToolMenuItem(QString device, QList&lt;ToolItemWidget*&gt; widgets, QWidget *parent=nullptr)</declaration>
@@ -615,7 +776,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{73931e66-d045-46a4-8c51-99885295b7d9}</uid>
+                    <uid>{4d2bd802-8d0c-41e3-8bcb-5e3a64239c77}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
                     <declaration>void changeItemWidget(QString toolId)</declaration>
@@ -623,7 +784,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{c3c169a0-f2bc-460e-8353-c27d70f7d5bb}</uid>
+                    <uid>{b3fcb9af-d0b3-4e4f-9691-8e43f505e8fd}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
                     <declaration>QMap&lt;QString, ToolItemWidget*&gt; widgets()</declaration>
@@ -631,7 +792,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{8c809ac4-8193-46bc-8d54-afb0b00b0853}</uid>
+                    <uid>{53399531-76a8-4e8e-9905-42620aadefe7}</uid>
                     <visibility>3</visibility>
                     <type>2</type>
                     <declaration>void initItemWidgets()</declaration>
@@ -639,7 +800,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{199d0629-6630-40f1-99c7-dddf39794f8e}</uid>
+                    <uid>{fcf7ceee-70b2-4805-91dc-69fae65069f3}</uid>
                     <visibility>3</visibility>
                     <type>2</type>
                     <declaration>VerticalChannelManager* createDeviceSection(QString device)</declaration>
@@ -647,7 +808,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{ff6d328b-60de-497d-89b6-55ac174ec16d}</uid>
+                    <uid>{a4247dbc-b1de-479f-811f-2d9c1d902116}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
                     <declaration>QMap&lt;QString, ToolItemWidget*&gt; m_widgets</declaration>
@@ -673,17 +834,41 @@
                     <uid>{b131c26b-cc66-48a7-8f26-a6bc03fb9264}</uid>
                    </MElement>
                   </base-MElement>
-                  <name>ToolItemWidget</name>
+                  <name>InstrumentWidget</name>
                  </MObject>
                 </base-MObject>
                 <members>
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{95e795af-4711-4b49-82fc-3263e9ded4e9}</uid>
+                    <uid>{025e5c92-5aaf-4016-8a0a-6f35af12b2c0}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>void updateItem()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{c35cb2ca-350e-49fb-9bfa-0885a9884079}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
                     <declaration>QString m_tmeUUID</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{caf78a17-9279-48bb-9610-2de6f5f1d2fb}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>QString m_name</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{c51238bd-fa04-4f15-9670-80bc31bdd9ea}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>QString m_icon</declaration>
                    </MClassMember>
                   </item>
                  </qlist>
@@ -815,7 +1000,7 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{94dce30d-e62e-491d-a868-a4d20ec072f8}</uid>
+                    <uid>{bd45c4ca-3bcd-47c0-bf07-dffb645e9f6d}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
                     <declaration>void setMenuWidget(MenuItemWidget *w)</declaration>
@@ -823,7 +1008,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{eb8c9689-b364-4b26-9877-ee54a95b7cfd}</uid>
+                    <uid>{51ae8c36-3e65-46ed-9498-41f71a92f7c0}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
                     <declaration>void removeMenuWidget()</declaration>
@@ -831,7 +1016,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{9050712e-ab2e-4247-853b-5acf8e757a93}</uid>
+                    <uid>{be2d799b-b8bb-4d04-b7c7-97d643d5e1d4}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
                     <declaration>void updateMenuWidget()</declaration>
@@ -839,7 +1024,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{9857a18a-694e-4353-9031-600cd147dc81}</uid>
+                    <uid>{9441fa5a-8e47-4ca2-9918-c178cdba7798}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
                     <declaration>ToolMenuWidget *m_menuWidget</declaration>
@@ -866,6 +1051,348 @@
                    </MElement>
                   </base-MElement>
                   <name>BaseMenuItem</name>
+                 </MObject>
+                </base-MObject>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{8e9c6e36-3771-4e4f-a2da-3863d93fb7cc}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{8e9c6e36-3771-4e4f-a2da-3863d93fb7cc}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>MenuWidget</name>
+                 </MObject>
+                </base-MObject>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{f30b42b8-0b37-4670-af36-1299130b1d41}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{f30b42b8-0b37-4670-af36-1299130b1d41}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>QWidget</name>
+                 </MObject>
+                </base-MObject>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{b8855ac1-7d5d-406a-9e92-147672aafe85}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{b8855ac1-7d5d-406a-9e92-147672aafe85}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>BrowseMenu</name>
+                  <relations>
+                   <handles>
+                    <handles>
+                     <qlist>
+                      <item>
+                       <handle>
+                        <uid>{e5d41980-3377-42d6-bbbf-7bc055914b5e}</uid>
+                        <target>
+                         <instance type="MInheritance">
+                          <MInheritance>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{e5d41980-3377-42d6-bbbf-7bc055914b5e}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{b8855ac1-7d5d-406a-9e92-147672aafe85}</a>
+                             <b>{8e9c6e36-3771-4e4f-a2da-3863d93fb7cc}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MInheritance>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                      <item>
+                       <handle>
+                        <uid>{2ed27405-81a1-4d97-95f1-fb75926f2ab3}</uid>
+                        <target>
+                         <instance type="MAssociation">
+                          <MAssociation>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{2ed27405-81a1-4d97-95f1-fb75926f2ab3}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{b8855ac1-7d5d-406a-9e92-147672aafe85}</a>
+                             <b>{5464f43a-fbab-47fe-a8fb-917099cc3173}</b>
+                            </MRelation>
+                           </base-MRelation>
+                           <a>
+                            <MAssociationEnd>
+                             <cardinality>1</cardinality>
+                             <navigable>true</navigable>
+                             <kind>2</kind>
+                            </MAssociationEnd>
+                           </a>
+                          </MAssociation>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                      <item>
+                       <handle>
+                        <uid>{c0c1b864-bc70-40a0-ad0b-fe3c82f18d42}</uid>
+                        <target>
+                         <instance type="MAssociation">
+                          <MAssociation>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{c0c1b864-bc70-40a0-ad0b-fe3c82f18d42}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{b8855ac1-7d5d-406a-9e92-147672aafe85}</a>
+                             <b>{8e9c6e36-3771-4e4f-a2da-3863d93fb7cc}</b>
+                            </MRelation>
+                           </base-MRelation>
+                           <a>
+                            <MAssociationEnd>
+                             <cardinality>1</cardinality>
+                             <navigable>true</navigable>
+                             <kind>2</kind>
+                            </MAssociationEnd>
+                           </a>
+                          </MAssociation>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                      <item>
+                       <handle>
+                        <uid>{2932e7d8-e9d2-413d-8089-8ddbd4fa8860}</uid>
+                        <target>
+                         <instance type="MAssociation">
+                          <MAssociation>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{2932e7d8-e9d2-413d-8089-8ddbd4fa8860}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{b8855ac1-7d5d-406a-9e92-147672aafe85}</a>
+                             <b>{8e9c6e36-3771-4e4f-a2da-3863d93fb7cc}</b>
+                            </MRelation>
+                           </base-MRelation>
+                           <a>
+                            <MAssociationEnd>
+                             <cardinality>1</cardinality>
+                             <navigable>true</navigable>
+                             <kind>2</kind>
+                            </MAssociationEnd>
+                           </a>
+                          </MAssociation>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                      <item>
+                       <handle>
+                        <uid>{471280a7-2091-486d-b544-3bbb03b47d90}</uid>
+                        <target>
+                         <instance type="MInheritance">
+                          <MInheritance>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{471280a7-2091-486d-b544-3bbb03b47d90}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{b8855ac1-7d5d-406a-9e92-147672aafe85}</a>
+                             <b>{59ca7db8-ce98-4e9f-8767-62ccef3b6cce}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MInheritance>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                     </qlist>
+                    </handles>
+                   </handles>
+                  </relations>
+                 </MObject>
+                </base-MObject>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{a70889de-4cd0-41b8-804f-314815bacc62}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>InstrumentMenu *getInstrumentMenu()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{cef08d81-4c4f-4850-95ff-95e1e9f24887}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void requestTool(QString)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{9322a4a4-c6ab-426d-a52b-a4d27cbdc430}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void requestSave()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{b91c91ca-906e-4be0-8580-81b9c55e9ade}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void requestLoad()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{647ab2b9-1506-45a6-9597-b2901b7f82ca}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>void createSection()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{76a08634-2a62-41db-8386-981bd7f38b83}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>void createLogo()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{8728f044-8397-4dfe-a38f-735201143386}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>void createLoadBtn()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{b939fd50-2667-4eae-8b95-c0736d6e09fb}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>void createAboutBtn()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{f8110bf5-14dc-4302-bc00-bb1e3d049292}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>InstrumentMenu *m_instrumentMenu</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{82eaa98d-eaff-44b9-8275-f65cac93c419}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{82eaa98d-eaff-44b9-8275-f65cac93c419}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>CompositeWidget</name>
+                 </MObject>
+                </base-MObject>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{d86de004-abb3-45eb-9eab-5ee07b26698f}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>3</properties>
+                    <declaration>void add(QWidget *w)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{fbe20ebd-21a8-4c22-a143-01bd49896179}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>3</properties>
+                    <declaration>void remove(QWidget *w)</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{59ca7db8-ce98-4e9f-8767-62ccef3b6cce}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{59ca7db8-ce98-4e9f-8767-62ccef3b6cce}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>QWidget</name>
                  </MObject>
                 </base-MObject>
                </MClass>
