@@ -192,7 +192,7 @@ void DataLoggerPlugin::removeTool(QString toolId)
 
 	Q_EMIT toolListChanged();
 
-	delete tool;
+	tool->deleteLater();
 }
 
 void DataLoggerPlugin::toggleRunState(bool toggled)
