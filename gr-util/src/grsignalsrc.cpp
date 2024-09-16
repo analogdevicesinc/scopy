@@ -1,11 +1,16 @@
 #include "grsignalsrc.h"
-
+#include "grtopblock.h"
 #include "grlog.h"
 
 using namespace scopy::grutil;
 
 GRSignalSrc::GRSignalSrc(QObject *parent)
 	: GRProxyBlock(parent)
+	, m_waveform(gr::analog::GR_CONST_WAVE)
+	, m_sampling_frequency(1000)
+	, m_freq(100)
+	, m_phase(0)
+	, m_offset(0)
 {}
 
 GRSignalSrc::~GRSignalSrc() {}
@@ -55,8 +60,11 @@ void GRSignalSrc::build_blks(GRTopBlock *top)
 {
 	qDebug(SCOPY_GR_UTIL) << "Building GRSignalSrc";
 	sig = gr::analog::sig_source_f::make(m_sampling_frequency, m_waveform, m_freq, m_amplitude, m_offset, m_phase);
+	s2v = gr::blocks::stream_to_vector::make(sizeof(float), top->vlen());
+	top->connect(sig, 0, s2v, 0);
 	start_blk.append(sig);
-	end_blk = sig;
+	start_blk.append(s2v);
+	end_blk = s2v;
 }
 
 void GRSignalSrc::destroy_blks(GRTopBlock *top)
