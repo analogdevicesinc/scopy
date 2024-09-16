@@ -5,6 +5,7 @@
 #include "scopy-gr-util_export.h"
 
 #include <gnuradio/analog/sig_source.h>
+#include <gnuradio/blocks/stream_to_vector.h>
 
 namespace scopy::grutil {
 class SCOPY_GR_UTIL_EXPORT GRSignalSrc : public GRProxyBlock
@@ -26,6 +27,7 @@ public:
 protected:
 	gr::analog::sig_source_f::sptr sig;
 	gr::analog::gr_waveform_t m_waveform;
+	gr::blocks::stream_to_vector::sptr s2v;
 	double m_sampling_frequency;
 	double m_freq;
 	double m_phase;
