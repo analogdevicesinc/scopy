@@ -57,6 +57,7 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	m_scaleMax = max;
 	setScaleRange(m_scaleMin, m_scaleMax);
 	setValue(val);
+	m_scalingEnabled = true;
 }
 
 MenuSpinbox::~MenuSpinbox() { delete m_incrementStrategy; }
@@ -86,11 +87,11 @@ void MenuSpinbox::layoutVertically(bool left)
 	editLay->addWidget(m_label);
 	editLay->addWidget(m_edit);
 
-	QFrame *line = new QFrame(this);
-	line->setFrameShape(QFrame::HLine);
-	line->setFrameShadow(QFrame::Plain);
-	editLay->addWidget(line);
-	StyleHelper::MenuSpinboxLine(line);
+	m_line = new QFrame(this);
+	m_line->setFrameShape(QFrame::HLine);
+	m_line->setFrameShadow(QFrame::Plain);
+	editLay->addWidget(m_line);
+	StyleHelper::MenuSpinboxLine(m_line);
 	editLay->addWidget(m_scaleCb);
 
 	if(left) {
@@ -103,6 +104,7 @@ void MenuSpinbox::layoutVertically(bool left)
 
 	StyleHelper::MenuSpinboxLabel(m_label);
 	StyleHelper::MenuSpinboxLineEdit(m_edit);
+	StyleHelper::IIOLineEdit(m_edit);
 	StyleHelper::MenuSpinComboBox(m_scaleCb);
 
 	StyleHelper::SpinBoxUpButton(m_plus, "plus_btn");
@@ -113,10 +115,14 @@ void MenuSpinbox::layoutVertically(bool left)
 
 void MenuSpinbox::layoutHorizontally(bool left)
 {
+	// Layout for the underline
+	auto lineLay = new QVBoxLayout(this);
+	lineLay->setSpacing(5);
+	lineLay->setMargin(0);
+	setLayout(lineLay);
 
+	// Elements layout
 	auto lay = new QHBoxLayout(this);
-	setLayout(lay);
-
 	lay->setSpacing(5);
 	lay->setMargin(0);
 
@@ -139,6 +145,11 @@ void MenuSpinbox::layoutHorizontally(bool left)
 
 	editLay->addWidget(m_scaleCb);
 
+	m_line = new QFrame(this);
+	m_line->setFrameShape(QFrame::HLine);
+	m_line->setFrameShadow(QFrame::Plain);
+	StyleHelper::MenuSpinboxLine(m_line);
+
 	if(left) {
 		lay->addLayout(btnLay);
 		lay->addLayout(editLay);
@@ -148,7 +159,7 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	}
 
 	StyleHelper::MenuSmallLabel(m_label);
-	StyleHelper::MenuLineEdit(m_edit);
+	StyleHelper::IIOLineEdit(m_edit);
 	StyleHelper::MenuComboBox(m_scaleCb);
 
 	StyleHelper::SpinBoxUpButton(m_plus, "plus_btn");
@@ -158,6 +169,9 @@ void MenuSpinbox::layoutHorizontally(bool left)
 
 	m_edit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	m_scaleCb->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+	lineLay->addLayout(lay);
+	lineLay->addWidget(m_line);
 }
 
 double MenuSpinbox::value() const { return m_value; }
@@ -216,6 +230,14 @@ void MenuSpinbox::setIncrementMode(IncrementMode im)
 	m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
 }
 
+void MenuSpinbox::setScalingEnabled(bool en)
+{
+	m_scalingEnabled = en;
+	m_scaleCb->setVisible(en);
+}
+
+void MenuSpinbox::setLineVisible(bool isVisible) { m_line->setVisible(isVisible); }
+
 void MenuSpinbox::userInput(QString s)
 {
 	// remove whitespace
@@ -254,6 +276,14 @@ void MenuSpinbox::userInput(QString s)
 
 void MenuSpinbox::populateWidgets()
 {
+	// TODO: Review this function
+	if(!m_scalingEnabled) {
+		QSignalBlocker sb1(m_edit);
+		QSignalBlocker sb2(m_scaleCb);
+		m_edit->setText(QString::number(m_value));
+		setToolTip(QString::number(m_value, 'f', 6)); // set tooltip
+		return;
+	}
 
 	int i = 0;
 	double scale = 1;

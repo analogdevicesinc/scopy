@@ -23,8 +23,8 @@
 
 #include <QWidget>
 #include <iio.h>
-// #include <gui/spinbox_a.hpp>
-#include <gui/widgets/titlespinbox.h>
+// #include <gui/widgets/titlespinbox.h>
+#include <gui/widgets/menuspinbox.h>
 #include "guistrategy/guistrategyinterface.h"
 #include "iiowidgetdata.h"
 #include "scopy-iio-widgets_export.h"
@@ -70,7 +70,7 @@ private:
 	double tryParse(QString number, bool *success);
 
 	QWidget *m_ui;
-	TitleSpinBox *m_spinBox;
+	gui::MenuSpinbox *m_spinBox;
 };
 } // namespace scopy
 
