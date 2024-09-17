@@ -104,6 +104,9 @@ bool DataLoggerPlugin::onConnect()
 
 bool DataLoggerPlugin::onDisconnect()
 {
+	ConnectionProvider *cp = ConnectionProvider::GetInstance();
+	cp->close(m_param);
+
 	// This method is called when the disconnect button is pressed
 	// It must remove all connections that were established on the connection
 	for(auto &tool : m_toolList) {
