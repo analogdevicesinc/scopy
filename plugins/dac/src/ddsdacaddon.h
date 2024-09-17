@@ -18,10 +18,11 @@ public:
 	DdsDacAddon(DacDataModel *model, QWidget *parent = nullptr);
 	virtual ~DdsDacAddon();
 	virtual void enable(bool enable);
+	virtual void setRunning(bool running);
 
 private:
 	DacDataModel *m_model;
-	MenuCombo *m_ddsModeCombo;
+	QMap<QWidget *, MapStackedWidget *> m_txWidgets;
 	QWidget *setupDdsTx(TxNode *txNode);
 	QWidget *setupTxMode(TxNode *txNode, unsigned int mode);
 };

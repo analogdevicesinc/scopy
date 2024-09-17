@@ -48,10 +48,12 @@ public:
 	void toggleCyclicBuffer(bool toggled);
 	void toggleBufferMode();
 	void toggleDdsMode();
-
+	void runToggled(bool toggled);
+	bool isRunning();
 private Q_SLOTS:
 	void handleChannelMenuRequest(QString uuid);
 Q_SIGNALS:
+	void running(bool toggled);
 	void requestMenu();
 
 private:

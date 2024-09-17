@@ -93,6 +93,22 @@ void DacInstrument::startTutorial()
 	startBufferTutorial();
 }
 
+void DacInstrument::runToggled(bool toggled)
+{
+	for(auto dac : m_dacDataManagers) {
+		dac->runToggled(toggled);
+	}
+}
+
+void DacInstrument::dacRunning(bool toggled)
+{
+	bool run = toggled;
+	for(auto dac : m_dacDataManagers) {
+		run = run || dac->isRunning();
+	}
+	Q_EMIT running(run);
+}
+
 void DacInstrument::startBufferTutorial()
 {
 	DacDataManager *currentDac = dynamic_cast<DacDataManager *>(dacManagerStack->currentWidget());
@@ -170,6 +186,7 @@ void DacInstrument::setupDacDataManagers()
 				// Create a DataManager for each detected dac iio_device
 				auto dm = new DacDataManager(dev, dacManagerStack);
 				m_dacDataManagers.append(dm);
+				connect(dm, &DacDataManager::running, this, &DacInstrument::dacRunning);
 
 				auto name = dm->getName();
 				if(tool->rightStack()->contains(name)) {

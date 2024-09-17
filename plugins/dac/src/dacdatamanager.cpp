@@ -46,6 +46,7 @@ DacDataManager::DacDataManager(struct iio_device *dev, QWidget *parent)
 		auto next = dynamic_cast<DacAddon *>(dacAddonStack->get(QString::number(mode)));
 		if(next) {
 			next->enable(true);
+			Q_EMIT running(next->isRunning());
 		}
 		dacAddonStack->show(QString::number(mode));
 	});
@@ -163,6 +164,7 @@ void DacDataManager::setupDacMode(QString mode_name, unsigned int mode)
 		m_menuControlBtns.push_back(btn);
 	}
 	connect(dac, &DacAddon::requestChannelMenu, this, &DacDataManager::handleChannelMenuRequest);
+	connect(dac, &DacAddon::running, this, &DacDataManager::running);
 	dacAddonStack->add(QString::number(mode), dac);
 	m_mode->combo()->addItem(mode_name, mode);
 }
@@ -207,3 +209,10 @@ void DacDataManager::toggleDdsMode()
 		//		Q_EMIT m_mode->combo()->currentIndexChanged(DAC_DDS);
 	}
 }
+
+void DacDataManager::runToggled(bool toggled)
+{
+	dynamic_cast<DacAddon *>(dacAddonStack->currentWidget())->setRunning(toggled);
+}
+
+bool DacDataManager::isRunning() { return dynamic_cast<DacAddon *>(dacAddonStack->currentWidget())->isRunning(); }
