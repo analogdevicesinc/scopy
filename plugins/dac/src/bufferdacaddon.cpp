@@ -311,6 +311,18 @@ void BufferDacAddon::updateGuiStrategyWidget()
 
 void BufferDacAddon::enable(bool enable) { m_model->enableBuffer(enable); }
 
+void BufferDacAddon::setRunning(bool toggled)
+{
+	if(!m_runBtn->isEnabled()) {
+		Q_EMIT running(false);
+	} else {
+		bool isRunning = m_runBtn->isChecked();
+		if(toggled != isRunning) {
+			m_runBtn->setChecked(toggled);
+		}
+	}
+}
+
 void BufferDacAddon::runBtnToggled(bool toggled)
 {
 	if(!m_dataBuffer) {
@@ -322,6 +334,8 @@ void BufferDacAddon::runBtnToggled(bool toggled)
 	} else {
 		m_model->stop();
 	}
+	m_isRunning = toggled;
+	Q_EMIT running(toggled);
 }
 
 void BufferDacAddon::dataReload()
