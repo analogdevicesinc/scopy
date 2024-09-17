@@ -12,6 +12,7 @@ IIOStandardItem::IIOStandardItem(QList<IIOWidget *> widgets, QString name, QStri
 	, m_name(name)
 	, m_path(path)
 	, m_format()
+	, m_formatExplanations()
 	, m_triggerName()
 	, m_triggerStatus()
 	, m_isWatched(false)
@@ -32,6 +33,7 @@ IIOStandardItem::IIOStandardItem(QList<IIOWidget *> widgets, QString name, QStri
 	, m_name(name)
 	, m_path(path)
 	, m_format()
+	, m_formatExplanations()
 	, m_triggerName()
 	, m_triggerStatus()
 	, m_isWatched(false)
@@ -68,6 +70,8 @@ QString IIOStandardItem::name() { return m_name; }
 QString IIOStandardItem::path() { return m_path; }
 
 QString IIOStandardItem::format() { return m_format; }
+
+QString IIOStandardItem::formatExplanation() { return m_formatExplanations; }
 
 QString IIOStandardItem::trigger() { return m_triggerName; }
 
@@ -233,8 +237,19 @@ void IIOStandardItem::extractDataFromChannel()
 				   .arg(format->length)
 				   .arg(repeat)
 				   .arg(format->shift);
+		m_formatExplanations =
+			QString("%1, %2%3%4, %5 bits out of %6 shifted by %7")
+				.arg(format->is_be ? "big endian" : "little endian")
+				.arg(format->is_signed ? "signed" : "unsigned")
+				.arg(format->is_fully_defined ? ", fully defined" : "")
+				.arg(format->repeat > 1 ? ", repeated " + QString::number(format->repeat) + " times"
+							: "")
+				.arg(format->bits)
+				.arg(format->length)
+				.arg(format->shift);
 		m_index = iio_channel_get_index(m_channel);
 		m_details.append("Format: " + m_format);
+		m_details.append("Format explained: " + m_formatExplanations);
 	}
 }
 

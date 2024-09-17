@@ -55,6 +55,7 @@ public:
 	QString name();
 	QString path();
 	QString format();
+	QString formatExplanation();
 	QString trigger();
 	QString triggerStatus();
 	IIOStandardItem::Type type();
@@ -105,6 +106,7 @@ private:
 	QString m_id;
 	QString m_path;
 	QString m_format;
+	QString m_formatExplanations;
 	QString m_triggerName;
 	QString m_triggerStatus;
 	IIOStandardItem::Type m_type;
