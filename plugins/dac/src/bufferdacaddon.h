@@ -24,6 +24,7 @@ public:
 	BufferDacAddon(DacDataModel *model, QWidget *parent = nullptr);
 	virtual ~BufferDacAddon();
 	virtual void enable(bool enable);
+	virtual void setRunning(bool running);
 
 Q_SIGNALS:
 	void log(QString log);

@@ -16,12 +16,16 @@ public:
 	virtual void enable(bool enable);
 	virtual QMap<QString, MenuControlButton *> getChannelBtns();
 	virtual QMap<QString, QWidget *> getChannelMenus();
+	virtual void setRunning(bool running);
+	virtual bool isRunning();
 Q_SIGNALS:
+	void running(bool enabled);
 	void requestChannelMenu(QString uuid);
 
 protected:
 	QMap<QString, MenuControlButton *> m_channelBtns;
 	QMap<QString, QWidget *> m_channelMenus;
+	bool m_isRunning;
 };
 } // namespace dac
 } // namespace scopy
