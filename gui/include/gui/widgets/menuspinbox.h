@@ -142,6 +142,8 @@ public Q_SLOTS:
 	void setValueString(QString s);
 	void setValue(double newValue);
 	void setIncrementMode(IncrementMode is);
+	void setScalingEnabled(bool en);
+	void setLineVisible(bool isVisible);
 
 Q_SIGNALS:
 	void nameChanged(QString);
@@ -164,6 +166,7 @@ private:
 	QComboBox *m_scaleCb;
 	QPushButton *m_plus;
 	QPushButton *m_minus;
+	QFrame *m_line; // underline
 
 	IncrementStrategy *m_incrementStrategy;
 	IncrementMode m_im;
@@ -180,6 +183,7 @@ private:
 	QList<UnitPrefix> m_scales;
 	// QMap<QString, double> m_scaleMap;
 	double getScaleForPrefix(QString prefix, Qt::CaseSensitivity s = Qt::CaseSensitive);
+	bool m_scalingEnabled;
 };
 } // namespace gui
 } // namespace scopy
