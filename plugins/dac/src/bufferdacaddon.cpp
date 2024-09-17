@@ -7,7 +7,6 @@
 
 #include <menusectionwidget.h>
 #include <menucollapsesection.h>
-#include <titlespinbox.h>
 #include <menulineedit.h>
 #include <menucontrolbutton.h>
 #include <menuheader.h>
@@ -22,6 +21,7 @@
 
 using namespace scopy;
 using namespace scopy::dac;
+using namespace scopy::gui;
 BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	: DacAddon(parent)
 	, m_model(model)
@@ -53,18 +53,11 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	// Buffersize section
 	MenuSectionWidget *buffersizeContainer = new MenuSectionWidget(bufferConfigContainer);
 	buffersizeContainer->setProperty("tutorial_name", "BUFFERSIZE");
-	m_bufferSizeSpin = new TitleSpinBox("Buffer size", true, buffersizeContainer);
-	m_bufferSizeSpin->setMax(16 * 1024 * 1024);
-	m_bufferSizeSpin->setMin(16);
-	m_bufferSizeSpin->setStep(4);
+	m_bufferSizeSpin =
+		new MenuSpinbox("Buffer size", 0, "samples", 16, 16 * 1024 * 1024, true, false, buffersizeContainer);
 	StyleHelper::BackgroundWidget(m_bufferSizeSpin);
-	connect(m_bufferSizeSpin->getLineEdit(), &QLineEdit::textChanged, this, [this](QString text) {
-		bool ok;
-		unsigned int buffersize = text.toUInt(&ok);
-		if(ok) {
-			m_model->setBuffersize(buffersize);
-		}
-	});
+	connect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, this,
+		[=](double value) { m_model->setBuffersize(value); });
 	buffersizeContainer->contentLayout()->setSpacing(0);
 	buffersizeContainer->contentLayout()->setMargin(0);
 	buffersizeContainer->contentLayout()->addWidget(m_bufferSizeSpin);
@@ -72,35 +65,19 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	// Kernel buffers section
 	MenuSectionWidget *kernelContainer = new MenuSectionWidget(this);
 	kernelContainer->setProperty("tutorial_name", "KERNEL_BUFFERS");
-	m_kernelCountSpin = new TitleSpinBox("Kernel buffers", true, buffersizeContainer);
-	m_kernelCountSpin->setMax(64);
-	m_kernelCountSpin->setMin(1);
-	m_kernelCountSpin->setStep(1);
+	m_kernelCountSpin = new MenuSpinbox("Kernel buffers", 0, "", 1, 64, true, false, buffersizeContainer);
+	m_kernelCountSpin->setIncrementMode(MenuSpinbox::IS_FIXED);
 	StyleHelper::BackgroundWidget(m_kernelCountSpin);
-	connect(m_kernelCountSpin->getLineEdit(), &QLineEdit::textChanged, this, [this](QString text) {
-		bool ok;
-		unsigned int kernelCount = text.toUInt(&ok);
-		if(ok) {
-			m_model->setKernelBuffersCount(kernelCount);
-		}
-	});
+	connect(m_kernelCountSpin, &MenuSpinbox::valueChanged, this,
+		[=](double value) { m_model->setKernelBuffersCount(value); });
 	kernelContainer->contentLayout()->setSpacing(0);
 	kernelContainer->contentLayout()->setMargin(0);
 	kernelContainer->contentLayout()->addWidget(m_kernelCountSpin);
 
 	// Decimation section - hidden for now
-	TitleSpinBox *decimationSpin = new TitleSpinBox("Decimation", true, bufferConfigSection);
-	decimationSpin->setMax(1000);
-	decimationSpin->setMin(1);
-	decimationSpin->setStep(1.0);
+	MenuSpinbox *decimationSpin = new MenuSpinbox("Decimation", 0, "", 1, 1000, true, false, bufferConfigSection);
 	StyleHelper::BackgroundWidget(decimationSpin);
-	connect(decimationSpin->getLineEdit(), &QLineEdit::textChanged, this, [this](QString text) {
-		bool ok;
-		double val = text.toDouble(&ok);
-		if(ok) {
-			m_model->setDecimation(val);
-		}
-	});
+	connect(decimationSpin, &MenuSpinbox::valueChanged, this, [=](double value) { m_model->setDecimation(value); });
 	decimationSpin->setValue(1);
 	decimationSpin->hide();
 
@@ -123,10 +100,10 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	connect(m_runBtn, &QPushButton::toggled, this, &BufferDacAddon::runBtnToggled);
 	connect(
 		m_model, &DacDataModel::updateBuffersize, this,
-		[this](unsigned int val) { m_bufferSizeSpin->setValue(val); }, Qt::QueuedConnection);
+		[=](unsigned int val) { m_bufferSizeSpin->setValue(val); }, Qt::QueuedConnection);
 	connect(
 		m_model, &DacDataModel::updateKernelBuffers, this,
-		[this](unsigned int val) { m_kernelCountSpin->setValue(val); }, Qt::QueuedConnection);
+		[=](unsigned int val) { m_kernelCountSpin->setValue(val); }, Qt::QueuedConnection);
 	connect(
 		m_model, &DacDataModel::invalidRunParams, this, [this]() { m_runBtn->setChecked(false); },
 		Qt::QueuedConnection);
@@ -148,18 +125,12 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	// File size and file truncate section
 	MenuSectionWidget *filesizeContainer = new MenuSectionWidget(this);
 	filesizeContainer->setProperty("tutorial_name", "FILESIZE");
-	m_fileSizeSpin = new TitleSpinBox("File size", true, filesizeContainer);
-	m_fileSizeSpin->setMax(16 * 1024 * 1024);
-	m_fileSizeSpin->setMin(16);
-	m_fileSizeSpin->setStep(4);
+	m_fileSizeSpin =
+		new MenuSpinbox("File size", 0, "samples", 16, 16 * 1024 * 1024, false, false, filesizeContainer);
+	m_fileSizeSpin->setIncrementMode(MenuSpinbox::IS_FIXED);
 	StyleHelper::BackgroundWidget(m_fileSizeSpin);
-	connect(m_fileSizeSpin->getLineEdit(), &QLineEdit::textChanged, this, [this](QString text) {
-		bool ok;
-		unsigned int filesize = text.toUInt(&ok);
-		if(ok) {
-			m_model->setFilesize(filesize);
-		}
-	});
+	connect(m_fileSizeSpin, &MenuSpinbox::valueChanged, this, [=](double value) { m_model->setFilesize(value); });
+	m_fileSizeSpin->setValue(16);
 	filesizeContainer->contentLayout()->addWidget(m_fileSizeSpin);
 	filesizeContainer->setFixedHeight(48);
 
@@ -333,7 +304,8 @@ void BufferDacAddon::updateGuiStrategyWidget()
 		auto fileSize = m_dataBuffer->getDataBufferStrategy()->data().size();
 		m_bufferSizeSpin->setValue(fileSize);
 		m_fileSizeSpin->setValue(fileSize);
-		m_fileSizeSpin->setMax(fileSize);
+		m_bufferSizeSpin->setMaxValue(fileSize);
+		m_fileSizeSpin->setMaxValue(fileSize);
 	}
 }
 
