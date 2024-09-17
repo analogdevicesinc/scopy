@@ -93,31 +93,32 @@ QWidget *DdsDacAddon::setupDdsTx(TxNode *txNode)
 
 	MenuSectionWidget *ddsModeSection = new MenuSectionWidget(this);
 	ddsModeSection->setProperty("tutorial_name", "TX_MODE_SELECTOR");
-	m_ddsModeCombo = new MenuCombo("DDS MODE", this);
-	StyleHelper::IIOComboBox(m_ddsModeCombo->combo());
-	StyleHelper::BackgroundWidget(m_ddsModeCombo);
-	auto cb = m_ddsModeCombo->combo();
-	m_ddsModeCombo->combo()->addItem("Disabled", TxMode::DISABLED);
-	m_ddsModeCombo->combo()->addItem("One CW Tone", TxMode::ONE_TONE);
-	m_ddsModeCombo->combo()->addItem("Two CW Tones", TxMode::TWO_TONES);
-	m_ddsModeCombo->combo()->addItem("Independent I/Q Control", TxMode::INDEPENDENT_IQ_CTRL);
+	MenuCombo *ddsModeCombo = new MenuCombo("DDS MODE", this);
+	StyleHelper::IIOComboBox(ddsModeCombo->combo());
+	StyleHelper::BackgroundWidget(ddsModeCombo);
+	auto cb = ddsModeCombo->combo();
+	ddsModeCombo->combo()->addItem("Disabled", TxMode::DISABLED);
+	ddsModeCombo->combo()->addItem("One CW Tone", TxMode::ONE_TONE);
+	ddsModeCombo->combo()->addItem("Two CW Tones", TxMode::TWO_TONES);
+	ddsModeCombo->combo()->addItem("Independent I/Q Control", TxMode::INDEPENDENT_IQ_CTRL);
 	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		auto mode = cb->itemData(idx).toInt();
+		ddsModeStack->show(QString::number(mode));
 		TxMode *current = dynamic_cast<TxMode *>(ddsModeStack->get(QString::number(mode)));
 		if(current) {
-			current->enable(mode != TxMode::DISABLED);
+			setRunning(mode != TxMode::DISABLED);
 			current->read();
 		}
-		ddsModeStack->show(QString::number(mode));
 	});
 
-	ddsModeSection->contentLayout()->addWidget(m_ddsModeCombo);
+	ddsModeSection->contentLayout()->addWidget(ddsModeCombo);
 	txHeaderLay->addWidget(txLabelSection, 1);
 	txHeaderLay->addWidget(txReadSection, 1);
 	txHeaderLay->addWidget(ddsModeSection, 4);
 
 	txLay->addWidget(txHeader);
 	txLay->addWidget(ddsModeStack);
+	m_txWidgets.insert(tx, ddsModeStack);
 
 	return tx;
 }
@@ -130,7 +131,19 @@ QWidget *DdsDacAddon::setupTxMode(TxNode *txNode, unsigned int mode)
 
 DdsDacAddon::~DdsDacAddon() {}
 
-void DdsDacAddon::enable(bool enable) { m_model->enableDds(enable); }
+void DdsDacAddon::enable(bool enable)
+{
+	for(auto tx : qAsConst(m_txWidgets)) {
+		dynamic_cast<TxMode *>(tx->currentWidget())->enable(enable);
+	}
+}
+
+void DdsDacAddon::setRunning(bool toggled)
+{
+	m_isRunning = toggled;
+	enable(m_isRunning);
+	Q_EMIT running(m_isRunning);
+}
 
 TxMode::TxMode(TxNode *node, unsigned int mode, QWidget *parent)
 	: QWidget(parent)
@@ -192,6 +205,9 @@ void TxMode::read()
 
 void TxMode::enable(bool enabled)
 {
+	if(m_mode == TxMode::DISABLED && enabled) {
+		return;
+	}
 	// Write all the scale attrs to IIO
 	for(int chIdx = 0; chIdx < m_txChannels.size(); chIdx++) {
 		Q_EMIT m_txChannels[chIdx]->resetChannelScales();
