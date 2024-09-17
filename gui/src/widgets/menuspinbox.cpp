@@ -131,8 +131,8 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	editLay->setSpacing(5);
 	editLay->setMargin(0);
 
-	btnLay->addWidget(m_plus);
 	btnLay->addWidget(m_minus);
+	btnLay->addWidget(m_plus);
 
 	editLay->addWidget(m_label);
 	editLay->addWidget(m_edit);
@@ -168,7 +168,7 @@ void MenuSpinbox::setValueForce(double newValue, bool force)
 
 	m_value = clamp(newValue, m_min, m_max);
 	populateWidgets();
-	Q_EMIT valueChanged(newValue);
+	Q_EMIT valueChanged(m_value);
 }
 
 void MenuSpinbox::setValueString(QString s) { userInput(s); }
@@ -186,7 +186,7 @@ void MenuSpinbox::setUnit(const QString &newUnit)
 
 void MenuSpinbox::setMinValue(double min) { m_min = min; }
 
-void MenuSpinbox::setMaxValue(double min) { m_min = min; }
+void MenuSpinbox::setMaxValue(double max) { m_max = max; }
 
 IncrementStrategy *MenuSpinbox::incrementStrategy() const { return m_incrementStrategy; }
 
