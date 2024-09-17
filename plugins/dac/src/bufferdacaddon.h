@@ -4,6 +4,7 @@
 #include <toolbuttons.h>
 #include <menuonoffswitch.h>
 #include <iio-widgets/iiowidget.h>
+#include <gui/widgets/menuspinbox.h>
 
 #include <QWidget>
 #include <QTextBrowser>
@@ -44,9 +45,9 @@ private:
 	QWidget *m_optionalGuiStrategy;
 	DataBuffer *m_dataBuffer;
 	RunBtn *m_runBtn;
-	TitleSpinBox *m_bufferSizeSpin;
-	TitleSpinBox *m_fileSizeSpin;
-	TitleSpinBox *m_kernelCountSpin;
+	gui::MenuSpinbox *m_bufferSizeSpin;
+	gui::MenuSpinbox *m_fileSizeSpin;
+	gui::MenuSpinbox *m_kernelCountSpin;
 	MenuOnOffSwitch *m_cyclicBtn;
 	QTextBrowser *m_logText;
 	FileBrowser *fm;
