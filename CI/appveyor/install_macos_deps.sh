@@ -2,14 +2,14 @@
 
 set -xe
 
-LIBIIO_VERSION=v0.25
+LIBIIO_VERSION=libiio-v0
 LIBAD9361_BRANCH=main
-LIBM2K_BRANCH=main
+LIBM2K_BRANCH=src/output_triggers
 GNURADIO_BRANCH=maint-3.10
 GRSCOPY_BRANCH=3.10
 GRM2K_BRANCH=main
 QWT_BRANCH=qwt-multiaxes
-LIBSIGROKDECODE_BRANCH=master
+LIBSIGROKDECODE_BRANCH=decoders/AD559XR
 LIBTINYIIOD_BRANCH=master
 
 PYTHON="python3"
@@ -202,7 +202,7 @@ build_grscopy() {
 build_libsigrokdecode() {
 	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
 
-	git clone --depth 1 https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH ${WORKDIR}/libsigrokdecode
+	git clone --depth 1 https://github.com/analogdevicesinc/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH ${WORKDIR}/libsigrokdecode
 	cd ${WORKDIR}/libsigrokdecode
 	CURRENT_BUILD=libsigrokdecode
 	save_version_info
