@@ -5,6 +5,7 @@ using namespace scopy;
 
 InstrumentMenu::InstrumentMenu(QWidget *parent)
 	: QWidget(parent)
+	, m_btnGroup(new QButtonGroup(this))
 {
 	m_uuid = 0;
 	QVBoxLayout *lay = new QVBoxLayout();
@@ -67,4 +68,5 @@ void InstrumentMenu::colapseAll()
 	}
 }
 
+QButtonGroup *InstrumentMenu::btnGroup() const { return m_btnGroup; }
 QString InstrumentMenu::widgetName(QWidget *w) { return m_widgetMap.key(w, ""); }

@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QScrollArea>
 #include <QVBoxLayout>
+#include <QButtonGroup>
 
 namespace scopy {
 
@@ -20,12 +21,14 @@ public:
 	void remove(QWidget *w) override;
 	void colapseAll();
 
+	QButtonGroup *btnGroup() const;
 private:
 	QMap<QString, QWidget *> m_widgetMap;
 	int m_uuid;
 	QScrollArea *m_scroll;
 	QVBoxLayout *m_layScroll;
 	QSpacerItem *m_spacer;
+	QButtonGroup *m_btnGroup;
 
 	QString widgetName(QWidget *w);
 };

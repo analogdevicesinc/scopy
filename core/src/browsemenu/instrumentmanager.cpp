@@ -18,9 +18,11 @@ void InstrumentManager::addMenuItem(QString deviceId, QString device, QList<Tool
 	MenuSectionCollapseWidget *devSection =
 		new MenuSectionCollapseWidget(device, MenuCollapseSection::MHCW_ARROW, m_instrumentMenu);
 
+	QButtonGroup *menuBtnGroup = m_instrumentMenu->btnGroup();
 	for(ToolMenuEntry *tme : tools) {
 		InstrumentWidget *instrWidget = new InstrumentWidget(tme->uuid(), tme->name(), tme->icon(), devSection);
 		devSection->add(instrWidget);
+		menuBtnGroup->addButton(instrWidget->getToolBtn());
 		connect(tme, &ToolMenuEntry::updateToolEntry, instrWidget, &InstrumentWidget::updateItem);
 		connect(instrWidget->getToolRunBtn(), SIGNAL(toggled(bool)), tme, SIGNAL(runToggled(bool)));
 		connect(instrWidget->getToolRunBtn(), SIGNAL(clicked(bool)), tme, SIGNAL(runClicked(bool)));

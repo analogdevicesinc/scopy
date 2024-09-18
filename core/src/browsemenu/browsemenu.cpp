@@ -29,6 +29,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	m_contentLay->addSpacerItem(m_spacer);
 
 	m_instrumentMenu = new InstrumentMenu(m_content);
+	QButtonGroup *btnGroup = m_instrumentMenu->btnGroup();
 	m_instrumentMenu->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
 	QPushButton *homeBtn = createBtn("Home", m_content);
@@ -55,6 +56,10 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	connect(aboutBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("about"); });
 
 	QLabel *logo = createScopyLogo(m_content);
+
+	btnGroup->addButton(homeBtn);
+	btnGroup->addButton(preferencesBtn);
+	btnGroup->addButton(aboutBtn);
 
 	add(createHLine(m_content), "headerLine", MA_TOPLAST);
 	add(homeBtn, "homeBtn", MA_TOPLAST);
