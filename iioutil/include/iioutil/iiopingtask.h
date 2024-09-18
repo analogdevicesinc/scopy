@@ -19,6 +19,7 @@ public:
 	~IIOPingTask();
 	virtual void run() override;
 	virtual bool ping() override;
+	static bool pingCtx(iio_context *ctx);
 
 protected:
 	iio_context *m_ctx;

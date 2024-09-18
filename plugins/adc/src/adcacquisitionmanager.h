@@ -60,10 +60,13 @@ public:
 	~GRTopBlockNode();
 	GRTopBlock *src() const;
 	SyncController *sync() const;
+	iio_context *ctx() const;
+	void setCtx(iio_context *ctx);
 
 private:
 	GRTopBlock *m_src;
 	SyncController *m_sync;
+	iio_context *m_ctx;
 };
 
 class SCOPY_ADC_EXPORT GRIIODeviceSourceNode : public AcqTreeNode
