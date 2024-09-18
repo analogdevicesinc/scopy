@@ -8,7 +8,8 @@ using namespace scopy;
 PrintBtn::PrintBtn(QWidget *parent)
 	: QPushButton(parent)
 {
-	StyleHelper::BlueGrayButton(this, "print_btn");
+	Style::setStyle(this, style::properties::button::subtleButton);
+	Style::setStyle(this, style::properties::button::toolButton);
 	setFixedWidth(128);
 	setCheckable(false);
 	setText("Print");
@@ -27,7 +28,9 @@ OpenLastMenuBtn::OpenLastMenuBtn(MenuHAnim *menu, bool opened, QWidget *parent)
 		setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
 	});
 
-	StyleHelper::SquareToggleButtonWithIcon(this, "open_last_menu_btn", true);
+	setCheckable(true);
+	Style::setStyle(this, style::properties::button::subtleButton);
+	Style::setStyle(this, style::properties::button::toolButton);
 	setChecked(opened);
 	grp = new SemiExclusiveButtonGroup(this);
 	connect(this, &QPushButton::toggled, m_menu, &MenuHAnim::toggleMenu);
@@ -61,7 +64,9 @@ GearBtn::GearBtn(QWidget *parent)
 		setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
 	});
 
-	StyleHelper::SquareToggleButtonWithIcon(this, "gear_btn", true);
+	setCheckable(true);
+	Style::setStyle(this, style::properties::button::subtleButton);
+	Style::setStyle(this, style::properties::button::toolButton);
 }
 
 InfoBtn::InfoBtn(QWidget *parent)
@@ -75,7 +80,9 @@ InfoBtn::InfoBtn(QWidget *parent)
 		setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
 	});
 
-	StyleHelper::SquareToggleButtonWithIcon(this, "info_btn", false);
+	setCheckable(false);
+	Style::setStyle(this, style::properties::button::subtleButton);
+	Style::setStyle(this, style::properties::button::toolButton);
 }
 
 RunBtn::RunBtn(QWidget *parent)
@@ -133,7 +140,9 @@ AddBtn::AddBtn(QWidget *parent)
 		setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
 	});
 
-	StyleHelper::SquareToggleButtonWithIcon(this, "add_btn", false);
+	setCheckable(false);
+	Style::setStyle(this, style::properties::button::subtleButton);
+	Style::setStyle(this, style::properties::button::toolButton);
 }
 
 RemoveBtn::RemoveBtn(QWidget *parent)
@@ -146,7 +155,9 @@ RemoveBtn::RemoveBtn(QWidget *parent)
 		setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
 	});
 
-	StyleHelper::SquareToggleButtonWithIcon(this, "remove_btn", false);
+	setCheckable(false);
+	Style::setStyle(this, style::properties::button::subtleButton);
+	Style::setStyle(this, style::properties::button::toolButton);
 }
 
 SyncBtn::SyncBtn(QWidget *parent)
@@ -154,7 +165,8 @@ SyncBtn::SyncBtn(QWidget *parent)
 	QIcon icon1;
 	icon1.addPixmap(Style::getPixmap(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 					 "/icons/gear_wheel.svg"));
-	StyleHelper::BlueGrayButton(this, "sync_btn");
+	Style::setStyle(this, style::properties::button::subtleButton);
+	Style::setStyle(this, style::properties::button::toolButton);
 	setText("Sync");
 	setCheckable(true);
 	setIcon(icon1);

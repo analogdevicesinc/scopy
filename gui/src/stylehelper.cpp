@@ -106,6 +106,7 @@ void StyleHelper::SquareToggleButtonWithIcon(QPushButton *btn, QString objectNam
 	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
 	btn->setStyleSheet(style);
 	btn->setIconSize(QSize(48, 48));
+	Style::setStyle(btn, style::properties::widget::solidBorder, true, true);
 }
 
 void StyleHelper::BlueGrayButton(QPushButton *btn, QString objectName)
