@@ -143,7 +143,7 @@ void RmsInstrument::setupPlotChannels(PolarPlotWidget *plot, QMap<QString, QStri
 {
 	int chIdx = 0;
 	for(const QString &ch : channels) {
-		QPen chPen = QPen(QColor(StyleHelper::getColor("CH" + QString::number(chIdx))), 1);
+		QPen chPen = QPen(QColor(StyleHelper::getChannelColor(chIdx)), 1);
 		PolarPlotChannel *plotCh = new PolarPlotChannel(channels.key(ch), chPen, plot, this);
 		plotCh->setThickness(thickness);
 		plotCh->setEnabled(true);

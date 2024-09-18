@@ -158,7 +158,7 @@ QWidget *HarmonicsInstrument::createThdWidget()
 	int chnlIdx = 0;
 	for(const QString &ch : m_chnls) {
 		MeasurementLabel *ml = new MeasurementLabel(this);
-		QString color = StyleHelper::getColor("CH" + QString::number(chnlIdx));
+		QString color = StyleHelper::getChannelColor(chnlIdx);
 		ml->setColor(QColor(color));
 		ml->setName(m_chnls.key(ch));
 		ml->setPrecision(7);

@@ -15,7 +15,7 @@ using namespace scopy;
 PlotScales::PlotScales(PlotWidget *plot)
 	: QObject(plot)
 	, m_plot(plot)
-	, m_color(StyleHelper::GetInstance()->getColor("UIElementHighlight"))
+	, m_color(StyleHelper::GetInstance()->getColor("SH_disabled"))
 {
 	initGrid();
 	initGraticule();

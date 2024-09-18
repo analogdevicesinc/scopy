@@ -176,7 +176,7 @@ public:
 	virtual ~ChannelIdProvider() {}
 
 	int next() { return idx++; }
-	QPen pen(int idx) { return QPen(StyleHelper::getColor("CH" + QString::number(idx))); }
+	QPen pen(int idx) { return QPen(StyleHelper::getChannelColor(idx)); }
 
 	int idx;
 };
