@@ -35,12 +35,16 @@ void PathTitle::setTitle(QString title)
 	QStringList segmentStrings = title.split(SPLIT_CHAR, Qt::SkipEmptyParts);
 	QString auxPath;
 
-	for(QString segment : segmentStrings) {
-		QPushButton *btn = new QPushButton(segment, this);
+	for(int i = 0; i < segmentStrings.size(); ++i) {
+		QPushButton *btn = new QPushButton(segmentStrings[i], this);
 		StyleHelper::GrayButton(btn, "SegmentButton");
-		auxPath.append(segment);
+		auxPath.append(segmentStrings[i]);
 		connect(btn, &QPushButton::clicked, this, [this, auxPath]() { Q_EMIT pathSelected(auxPath); });
 		layout()->addWidget(btn);
+
+		if(i < segmentStrings.size() - 1) {
+			auxPath.append("/");
+		}
 	}
 }
 
