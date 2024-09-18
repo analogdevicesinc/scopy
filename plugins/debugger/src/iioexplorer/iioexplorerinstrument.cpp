@@ -188,7 +188,7 @@ void IIOExplorerInstrument::connectSignalsAndSlots()
 			return;
 		}
 		IIOStandardItem *item = findItemByPath(iioRoot, pathList);
-		if(item) {
+		if(!item) {
 			qWarning(CAT_IIODEBUGGER) << "Could not find the item with path:" << item->path();
 		}
 
