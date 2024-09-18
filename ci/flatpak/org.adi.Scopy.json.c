@@ -393,7 +393,7 @@
 				{
 					"type": "git",
 					"url": "https://github.com/analogdevicesinc/libm2k",
-					"commit": "b37bbeb24e159fe975390d72cfd87629b40f352d"
+					"branch": "main"
 				}
 			]
 		},
