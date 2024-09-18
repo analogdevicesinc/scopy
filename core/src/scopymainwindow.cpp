@@ -78,7 +78,18 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ui->wToolBrowser->layout()->addWidget(browseMenu);
 	m_instrManager = new InstrumentManager(ts, browseMenu->instrumentMenu(), this);
 
-	connect(browseMenu, &BrowseMenu::requestTool, ts, &ToolStack::show);
+	connect(browseMenu, &BrowseMenu::requestTool, ts, &ToolStack::show, Qt::QueuedConnection);
+	connect(browseMenu, SIGNAL(requestLoad()), this, SLOT(load()));
+	connect(browseMenu, SIGNAL(requestSave()), this, SLOT(save()));
+	connect(browseMenu, &BrowseMenu::collapsed, this, [this](bool coll) {
+		if(coll) {
+			ui->animHolder->setAnimMin(40);
+		} else {
+			ui->animHolder->setAnimMax(230);
+		}
+		ui->animHolder->toggleMenu(!coll);
+	});
+
 	////////
 
 	scanTask = new IIOScanTask(this);

@@ -3,17 +3,23 @@
 
 #include "instrumentmenu.h"
 
+#include <QLabel>
+#include <QPushButton>
 #include <QWidget>
-#include <gui/widgets/menuwidget.h>
 #include <scopy-core_export.h>
 
 namespace scopy {
-using namespace gui;
 
 class SCOPY_CORE_EXPORT BrowseMenu : public QWidget
 {
 	Q_OBJECT
 public:
+	enum MenuAlignment
+	{
+		MA_TOPLAST,
+		MA_BOTTOMLAST
+	};
+
 	BrowseMenu(QWidget *parent = nullptr);
 	~BrowseMenu();
 
@@ -23,10 +29,22 @@ Q_SIGNALS:
 	void requestTool(QString tool);
 	void requestSave();
 	void requestLoad();
+	void collapsed(bool collapsed);
 
 private:
-	MenuWidget *m_menu;
+	void add(QWidget *w, QString name, MenuAlignment position);
+	void toggleCollapsed();
+	QPushButton *createBtn(QString name, QWidget *parent = nullptr, QIcon icon = {});
+	QFrame *createHLine(QWidget *parent = nullptr);
+	QWidget *createHeader(QWidget *parent = nullptr);
+	QLabel *createScopyLogo(QWidget *parent = nullptr);
+
+	QWidget *m_content;
+	QVBoxLayout *m_contentLay;
+	QSpacerItem *m_spacer;
 	InstrumentMenu *m_instrumentMenu;
+	QPushButton *m_btnCollapse;
+	bool m_collapsed;
 };
 } // namespace scopy
 

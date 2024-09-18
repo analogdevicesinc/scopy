@@ -7,79 +7,154 @@ using namespace scopy;
 
 BrowseMenu::BrowseMenu(QWidget *parent)
 	: QWidget(parent)
-	, m_menu(nullptr)
+	, m_collapsed(false)
 {
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	QVBoxLayout *lay = new QVBoxLayout(this);
 	lay->setMargin(0);
+	lay->setSpacing(10);
+	lay->setAlignment(Qt::AlignTop);
 	setLayout(lay);
 
-	m_menu = new MenuWidget("SCOPY", QPen(), this);
-	// TBD
-	QScrollArea *menuScroll = dynamic_cast<QScrollArea *>(m_menu->layout()->itemAt(1)->widget());
-	QVBoxLayout *scrollLay = dynamic_cast<QVBoxLayout *>(menuScroll->widget()->layout());
-	for(int i = 0; i < scrollLay->count(); ++i) {
-		QLayoutItem *layoutItem = scrollLay->itemAt(i);
-		if(layoutItem->spacerItem()) {
-			layoutItem->spacerItem()->changeSize(0, 0, QSizePolicy::Minimum, QSizePolicy::Preferred);
-			break;
-		}
-	}
+	QWidget *menuHeader = createHeader(this);
 
-	QPushButton *homeBtn = new QPushButton(m_menu);
-	homeBtn->setText("Home");
-	homeBtn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-	StyleHelper::BlueButton(homeBtn);
-	m_menu->add(homeBtn, "homeBtn", MenuWidget::MA_TOPFIRST);
+	m_content = new QWidget(this);
+	m_content->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+	m_contentLay = new QVBoxLayout(m_content);
+	m_contentLay->setMargin(0);
+	m_contentLay->setSpacing(10);
+	m_content->setLayout(m_contentLay);
+
+	m_spacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Preferred);
+	m_contentLay->addSpacerItem(m_spacer);
+
+	m_instrumentMenu = new InstrumentMenu(m_content);
+	m_instrumentMenu->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+
+	QPushButton *homeBtn = createBtn("Home", m_content);
 	connect(homeBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("home"); });
 
-	QFrame *firstLine = new QFrame(m_menu);
-	firstLine->setFrameShape(QFrame::HLine);
-	firstLine->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-	m_menu->add(firstLine, "firstLine", MenuWidget::MA_TOPLAST);
-
-	m_instrumentMenu = new InstrumentMenu(m_menu);
-	m_instrumentMenu->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-	m_menu->add(m_instrumentMenu, "instrumentMenu", MenuWidget::MA_TOPLAST);
-
-	QFrame *lastLine = new QFrame(m_menu);
-	lastLine->setFrameShape(QFrame::HLine);
-	lastLine->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-	m_menu->add(lastLine, "lastLine", MenuWidget::MA_BOTTOMFIRST);
-
-	QWidget *saveLoadWidget = new QWidget(m_menu);
+	QWidget *saveLoadWidget = new QWidget(m_content);
 	saveLoadWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 	saveLoadWidget->setLayout(new QHBoxLayout(saveLoadWidget));
 	saveLoadWidget->layout()->setMargin(0);
 
-	QPushButton *saveBtn = new QPushButton(m_menu);
-	saveBtn->setText("Save");
-	saveBtn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	QPushButton *saveBtn = createBtn("Save", saveLoadWidget);
+	connect(saveBtn, &QPushButton::clicked, this, &BrowseMenu::requestSave);
 
-	QPushButton *loadBtn = new QPushButton(m_menu);
-	loadBtn->setText("Load");
-	loadBtn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	QPushButton *loadBtn = createBtn("Load", saveLoadWidget);
+	connect(loadBtn, &QPushButton::clicked, this, &BrowseMenu::requestLoad);
 
 	saveLoadWidget->layout()->addWidget(saveBtn);
 	saveLoadWidget->layout()->addWidget(loadBtn);
 
-	m_menu->add(saveLoadWidget, "saveLoad", MenuWidget::MA_BOTTOMLAST);
-
-	QPushButton *preferencesBtn = new QPushButton(m_menu);
-	preferencesBtn->setText("Preferences");
-	preferencesBtn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-	m_menu->add(preferencesBtn, "preferencesBtn", MenuWidget::MA_BOTTOMLAST);
+	QPushButton *preferencesBtn = createBtn("Preferences", m_content);
 	connect(preferencesBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("preferences"); });
 
-	QPushButton *aboutBtn = new QPushButton(m_menu);
-	aboutBtn->setText("About");
-	aboutBtn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-	m_menu->add(aboutBtn, "aboutBtn", MenuWidget::MA_BOTTOMLAST);
+	QPushButton *aboutBtn = createBtn("About", m_content);
 	connect(aboutBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("about"); });
 
-	lay->addWidget(m_menu);
+	QLabel *logo = createScopyLogo(m_content);
+
+	add(createHLine(m_content), "headerLine", MA_TOPLAST);
+	add(homeBtn, "homeBtn", MA_TOPLAST);
+	add(createHLine(m_content), "instrMenuLine1", MA_TOPLAST);
+	add(m_instrumentMenu, "instrumentMenu", MA_TOPLAST);
+
+	add(createHLine(m_content), "instrMenuLine2", MA_BOTTOMLAST);
+	add(saveLoadWidget, "saveLoad", MA_BOTTOMLAST);
+	add(preferencesBtn, "preferencesBtn", MA_BOTTOMLAST);
+	add(aboutBtn, "aboutBtn", MA_BOTTOMLAST);
+	add(logo, "logo", MA_BOTTOMLAST);
+
+	lay->addWidget(menuHeader);
+	lay->addWidget(m_content);
 }
 
 BrowseMenu::~BrowseMenu() {}
 
 InstrumentMenu *BrowseMenu::instrumentMenu() const { return m_instrumentMenu; }
+
+void BrowseMenu::add(QWidget *w, QString name, MenuAlignment position)
+{
+	int spacerIndex = m_contentLay->indexOf(m_spacer);
+	switch(position) {
+
+	case MA_TOPLAST:
+		m_contentLay->insertWidget(spacerIndex, w);
+		break;
+	case MA_BOTTOMLAST:
+		m_contentLay->insertWidget(-1, w);
+		break;
+	}
+}
+
+void BrowseMenu::toggleCollapsed()
+{
+	m_collapsed = !m_collapsed;
+	m_btnCollapse->setHidden(m_collapsed);
+	m_content->setHidden(m_collapsed);
+	Q_EMIT collapsed(m_collapsed);
+}
+
+QPushButton *BrowseMenu::createBtn(QString name, QWidget *parent, QIcon icon)
+{
+	QPushButton *btn = new QPushButton(parent);
+	btn->setCheckable(true);
+	btn->setText(name);
+	btn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	return btn;
+}
+
+QFrame *BrowseMenu::createHLine(QWidget *parent)
+{
+	QFrame *line = new QFrame(parent);
+	line->setFrameShape(QFrame::HLine);
+	line->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	return line;
+}
+
+QWidget *BrowseMenu::createHeader(QWidget *parent)
+{
+	QWidget *menuHeader = new QWidget(parent);
+	menuHeader->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	QHBoxLayout *headerLay = new QHBoxLayout(menuHeader);
+	headerLay->setSpacing(0);
+	headerLay->setMargin(0);
+	QPushButton *btnCollapseMini = new QPushButton(menuHeader);
+	btnCollapseMini->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	btnCollapseMini->setCheckable(true);
+	btnCollapseMini->setStyleSheet(" height:40px;\n"
+				       " width:40px;\n"
+				       " background-image: url(:/gui/icons/scopy-default/icons/menu.svg);\n"
+				       " background-repeat: no-repeat;\n"
+				       " background-position: center center;\n");
+
+	headerLay->addWidget(btnCollapseMini);
+
+	m_btnCollapse = new QPushButton(menuHeader);
+	m_btnCollapse->setStyleSheet(" height:40px;\n"
+				     " background-image: url(:/gui/icons/scopy-default/icons/logo.svg);\n"
+				     " background-repeat: no-repeat;\n"
+				     " background-position: center center;\n");
+	headerLay->addWidget(m_btnCollapse);
+	connect(m_btnCollapse, &QPushButton::clicked, this, &BrowseMenu::toggleCollapsed);
+	connect(btnCollapseMini, &QPushButton::clicked, this, &BrowseMenu::toggleCollapsed);
+
+	return menuHeader;
+}
+
+QLabel *BrowseMenu::createScopyLogo(QWidget *parent)
+{
+	QLabel *logo = new QLabel(m_content);
+	logo->setStyleSheet("background-image: url(:/gui/icons/scopy-default/icons/logo_analog.svg);\n"
+			    "background-repeat: no-repeat;\n"
+			    "background-position: center center;\n"
+			    "background-repeat: no-repeat;\n"
+			    "min-height:36px;\n");
+
+	logo->setObjectName(QString::fromUtf8("logo"));
+	logo->setEnabled(true);
+	logo->setMinimumSize(QSize(0, 36));
+	return logo;
+}
