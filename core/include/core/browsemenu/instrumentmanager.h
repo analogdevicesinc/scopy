@@ -21,7 +21,7 @@ public:
 			  QObject *parent = nullptr);
 	~InstrumentManager();
 
-	void addMenuItem(QString deviceId, QString deviceName, QList<ToolMenuEntry *> tools);
+	void addMenuItem(QString deviceId, QString deviceName, QList<ToolMenuEntry *> tools, int itemIndex = -1);
 	void removeMenuItem(QString deviceId);
 	void changeToolListContents(QString deviceId, QList<ToolMenuEntry *> tools);
 

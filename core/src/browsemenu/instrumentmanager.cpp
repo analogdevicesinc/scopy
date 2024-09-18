@@ -17,7 +17,7 @@ InstrumentManager::InstrumentManager(ToolStack *ts, DetachedToolWindowManager *d
 
 InstrumentManager::~InstrumentManager() {}
 
-void InstrumentManager::addMenuItem(QString deviceId, QString device, QList<ToolMenuEntry *> tools)
+void InstrumentManager::addMenuItem(QString deviceId, QString device, QList<ToolMenuEntry *> tools, int itemIndex)
 {
 	MenuSectionCollapseWidget *devSection =
 		new MenuSectionCollapseWidget(device, MenuCollapseSection::MHCW_ARROW, m_instrumentMenu);
@@ -33,7 +33,7 @@ void InstrumentManager::addMenuItem(QString deviceId, QString device, QList<Tool
 			[this, instrWidget](bool oldAttach) { updateToolAttached(oldAttach, instrWidget); });
 		Q_EMIT tme->updateToolEntry();
 	}
-	m_instrumentMenu->add(deviceId, devSection);
+	m_instrumentMenu->add(itemIndex, deviceId, devSection);
 	m_itemMap[deviceId] = devSection;
 	devSection->hide();
 }
@@ -60,9 +60,10 @@ void InstrumentManager::changeToolListContents(QString deviceId, QList<ToolMenuE
 	for(ToolMenuEntry *tme : tools) {
 		tme->disconnect(this);
 	}
+	int itemIndex = m_instrumentMenu->indexOf(m_itemMap[deviceId]);
 	QString deviceName = m_itemMap[deviceId]->collapseSection()->title();
 	removeMenuItem(deviceId);
-	addMenuItem(deviceId, deviceName, tools);
+	addMenuItem(deviceId, deviceName, tools, itemIndex);
 	showMenuItem(deviceId);
 }
 

@@ -23,7 +23,6 @@ InstrumentMenu::InstrumentMenu(QWidget *parent)
 	m_scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	m_scroll->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);
-	// if ScrollBarAlwaysOn - layScroll->setContentsMargins(0,0,6,0);
 
 	m_scroll->setWidget(wScroll);
 
@@ -46,17 +45,28 @@ void InstrumentMenu::add(QWidget *w)
 	m_uuid++;
 }
 
-void InstrumentMenu::add(QString itemId, QWidget *w)
+void InstrumentMenu::add(int index, QString itemId, QWidget *w)
 {
 	m_widgetMap.insert(itemId, w);
-	add(w);
+	if(index < 0) {
+		add(w);
+	} else {
+		add(index, w);
+	}
 }
 
+void InstrumentMenu::add(int index, QWidget *w)
+{
+	m_layScroll->insertWidget(index, w);
+	m_uuid++;
+}
 void InstrumentMenu::remove(QWidget *w)
 {
 	m_widgetMap.remove(widgetName(w));
 	m_layScroll->removeWidget(w);
 }
+
+int InstrumentMenu::indexOf(QWidget *w) { return m_layScroll->indexOf(w); }
 
 void InstrumentMenu::colapseAll()
 {
@@ -69,4 +79,5 @@ void InstrumentMenu::colapseAll()
 }
 
 QButtonGroup *InstrumentMenu::btnGroup() const { return m_btnGroup; }
+
 QString InstrumentMenu::widgetName(QWidget *w) { return m_widgetMap.key(w, ""); }
