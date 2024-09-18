@@ -104,6 +104,16 @@ bool DataLoggerPlugin::onConnect()
 
 bool DataLoggerPlugin::onDisconnect()
 {
+	auto count = dmmList.count();
+	for(int i = 0; i < count; i++) {
+		delete dmmList.takeLast();
+	}
+
+	if(m_dataAcquisitionManager) {
+		delete m_dataAcquisitionManager;
+		m_dataAcquisitionManager = nullptr;
+	}
+
 	ConnectionProvider *cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
 
