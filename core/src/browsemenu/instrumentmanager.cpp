@@ -1,6 +1,7 @@
 #include "browsemenu/instrumentmanager.h"
 #include <browsemenu/instrumentwidget.h>
 #include <QLoggingCategory>
+#include <QButtonGroup>
 
 Q_LOGGING_CATEGORY(CAT_INSTR_MANAGER, "InstrumentManager")
 using namespace scopy;
@@ -20,14 +21,9 @@ void InstrumentManager::addMenuItem(QString deviceId, QString device, QList<Tool
 
 	QButtonGroup *menuBtnGroup = m_instrumentMenu->btnGroup();
 	for(ToolMenuEntry *tme : tools) {
-		InstrumentWidget *instrWidget = new InstrumentWidget(tme->uuid(), tme->name(), tme->icon(), devSection);
+		InstrumentWidget *instrWidget = createInstrWidget(tme, devSection);
 		devSection->add(instrWidget);
 		menuBtnGroup->addButton(instrWidget->getToolBtn());
-		connect(tme, &ToolMenuEntry::updateToolEntry, instrWidget, &InstrumentWidget::updateItem);
-		connect(instrWidget->getToolRunBtn(), SIGNAL(toggled(bool)), tme, SIGNAL(runToggled(bool)));
-		connect(instrWidget->getToolRunBtn(), SIGNAL(clicked(bool)), tme, SIGNAL(runClicked(bool)));
-		connect(instrWidget->getToolBtn(), &QPushButton::clicked, this,
-			[=]() { Q_EMIT requestToolSelect(instrWidget->getId()); });
 		connect(tme, &ToolMenuEntry::updateTool, this, &InstrumentManager::updateTool);
 		Q_EMIT tme->updateToolEntry();
 	}
@@ -54,6 +50,9 @@ void InstrumentManager::changeToolListContents(QString deviceId, QList<ToolMenuE
 	if(!m_itemMap.contains(deviceId)) {
 		qInfo(CAT_INSTR_MANAGER) << "No entry with id:" << deviceId;
 		return;
+	}
+	for(ToolMenuEntry *tme : tools) {
+		tme->disconnect(this);
 	}
 	QString deviceName = m_itemMap[deviceId]->collapseSection()->title();
 	removeMenuItem(deviceId);
@@ -97,6 +96,28 @@ void InstrumentManager::updateTool(QWidget *old)
 		}
 	}
 	qDebug(CAT_INSTR_MANAGER) << "updating tool for " << tme->name() << " - " << id;
+}
+
+void InstrumentManager::selectInstrument(InstrumentWidget *instrWidget, bool on)
+{
+	QButtonGroup *menuBtnGroup = m_instrumentMenu->btnGroup();
+	if(menuBtnGroup->id(instrWidget->getToolBtn()) != -1) {
+		instrWidget->setSelected(on);
+	}
+}
+
+InstrumentWidget *InstrumentManager::createInstrWidget(ToolMenuEntry *tme, QWidget *parent)
+{
+	InstrumentWidget *instrWidget = new InstrumentWidget(tme->uuid(), tme->name(), tme->icon(), parent);
+	connect(instrWidget->getToolRunBtn(), &QPushButton::toggled, tme, &ToolMenuEntry::runToggled);
+	connect(instrWidget->getToolRunBtn(), &QPushButton::clicked, tme, &ToolMenuEntry::runClicked);
+	connect(instrWidget->getToolBtn(), &QPushButton::clicked, this,
+		[=]() { Q_EMIT requestToolSelect(instrWidget->getId()); });
+	connect(instrWidget->getToolBtn(), &QPushButton::toggled, this,
+		[this, instrWidget](bool on) { selectInstrument(instrWidget, on); });
+	connect(tme, &ToolMenuEntry::updateToolEntry, instrWidget, &InstrumentWidget::updateItem);
+
+	return instrWidget;
 }
 
 void InstrumentManager::deviceConnected(QString id)

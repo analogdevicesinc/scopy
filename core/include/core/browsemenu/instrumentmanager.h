@@ -2,6 +2,7 @@
 #define INSTRUMENTMANAGER_H
 
 #include "instrumentmenu.h"
+#include "instrumentwidget.h"
 
 #include <QMap>
 #include <QObject>
@@ -30,12 +31,14 @@ public Q_SLOTS:
 	void deviceDisconnected(QString id);
 
 Q_SIGNALS:
-	void requestToolSelect(QString);
+	void requestToolSelect(QString id);
 
 private Q_SLOTS:
 	void updateTool(QWidget *old);
 
 private:
+	void selectInstrument(InstrumentWidget *instrWidget, bool on);
+	InstrumentWidget *createInstrWidget(ToolMenuEntry *tme, QWidget *parent = nullptr);
 	QString m_prevItem;
 	QStringList m_connectedDev;
 	ToolStack *m_ts;

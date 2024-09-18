@@ -28,25 +28,25 @@ InstrumentWidget::InstrumentWidget(QString uuid, QString name, QString icon, QWi
 	QHBoxLayout *toolLay = new QHBoxLayout(toolOption);
 	toolLay->setSpacing(0);
 	toolLay->setContentsMargins(0, 0, 0, 0);
-	toolBtn = new QPushButton(name);
-	toolBtn->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-	toolRunBtn = new CustomPushButton(toolOption);
-	toolLay->addWidget(toolBtn, Qt::AlignLeft);
-	toolLay->addWidget(toolRunBtn);
+	m_toolBtn = new QPushButton(m_name);
+	m_toolBtn->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	m_toolRunBtn = new CustomPushButton(toolOption);
+	toolLay->addWidget(m_toolBtn, Qt::AlignLeft);
+	toolLay->addWidget(m_toolRunBtn);
 
-	setDynamicProperty(toolRunBtn, "stopButton", true);
-	toolRunBtn->setMaximumSize(32, 32);
-	toolBtn->setMinimumHeight(42);
+	setDynamicProperty(m_toolRunBtn, "stopButton", true);
+	m_toolRunBtn->setMaximumSize(32, 32);
+	m_toolBtn->setMinimumHeight(42);
 
-	toolBtn->setIcon(QIcon::fromTheme(m_icon));
-	toolBtn->setCheckable(true);
-	toolBtn->setIconSize(QSize(32, 32));
+	m_toolBtn->setIcon(QIcon::fromTheme(m_icon));
+	m_toolBtn->setCheckable(true);
+	m_toolBtn->setIconSize(QSize(32, 32));
 
-	toolRunBtn->setCheckable(true);
-	toolRunBtn->setText("");
+	m_toolRunBtn->setCheckable(true);
+	m_toolRunBtn->setText("");
 
-	toolBtn->setFlat(true);
-	toolRunBtn->setFlat(true);
+	m_toolBtn->setFlat(true);
+	m_toolRunBtn->setFlat(true);
 
 	lay->addWidget(toolOption);
 
@@ -61,18 +61,18 @@ InstrumentWidget::InstrumentWidget(QString uuid, QString name, QString icon, QWi
 #endif
 }
 
-InstrumentWidget::~InstrumentWidget() { qInfo() << "Delete!"; }
+InstrumentWidget::~InstrumentWidget() {}
 
-QPushButton *InstrumentWidget::getToolBtn() const { return toolBtn; }
+QPushButton *InstrumentWidget::getToolBtn() const { return m_toolBtn; }
 
-QPushButton *InstrumentWidget::getToolRunBtn() const { return toolRunBtn; }
+QPushButton *InstrumentWidget::getToolRunBtn() const { return m_toolRunBtn; }
 
 void InstrumentWidget::enableDoubleClick(bool enable)
 {
 	if(enable) {
-		toolBtn->installEventFilter(this);
+		m_toolBtn->installEventFilter(this);
 	} else {
-		toolBtn->removeEventFilter(this);
+		m_toolBtn->removeEventFilter(this);
 		removeEventFilter(this);
 	}
 }
@@ -95,15 +95,15 @@ bool InstrumentWidget::eventFilter(QObject *watched, QEvent *event)
 void InstrumentWidget::setName(QString str)
 {
 	m_name = str;
-	toolBtn->setText(m_name);
+	m_toolBtn->setText(m_name);
 }
 
 void InstrumentWidget::hideText(bool hidden)
 {
 	if(hidden) {
-		toolBtn->setText("");
+		m_toolBtn->setText("");
 	} else {
-		toolBtn->setText(m_name);
+		m_toolBtn->setText(m_name);
 	}
 }
 
@@ -113,24 +113,14 @@ void InstrumentWidget::updateItem()
 {
 	ToolMenuEntry *tme = dynamic_cast<ToolMenuEntry *>(QObject::sender());
 	Q_ASSERT(tme);
-	QSignalBlocker sb(toolRunBtn);
+	QSignalBlocker sb(m_toolRunBtn);
 	setVisible(tme->visible());
 	setEnabled(tme->enabled());
 	setName(tme->name());
-	toolRunBtn->setEnabled(tme->runEnabled());
-	toolRunBtn->setEnabled(tme->runBtnVisible());
-	toolRunBtn->setChecked(tme->running());
-	//	Util::retainWidgetSizeWhenHidden(m, tme->visible());
-	//	qDebug(CAT_TOOLMANAGER) << "updating toolmenuentry for " << tme->name() << " - " << tme->uuid();
+	m_toolRunBtn->setEnabled(tme->runEnabled());
+	m_toolRunBtn->setEnabled(tme->runBtnVisible());
+	m_toolRunBtn->setChecked(tme->running());
 }
-
-// void InstrumentWidget::mouseMoveEvent(QMouseEvent *event)
-//{
-//#ifndef __ANDROID__
-//	BaseMenuItem::mouseMoveEvent(event);
-//	setDynamicProperty(this, "allowHover", false);
-//#endif
-// }
 
 void InstrumentWidget::enterEvent(QEvent *event)
 {
@@ -149,3 +139,11 @@ void InstrumentWidget::leaveEvent(QEvent *event)
 }
 
 QString InstrumentWidget::getId() const { return m_uuid; }
+
+void InstrumentWidget::setSelected(bool en)
+{
+	if(!en) {
+		m_toolBtn->setChecked(false);
+	}
+	setDynamicProperty(this, "selected", en);
+}

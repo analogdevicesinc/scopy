@@ -27,6 +27,8 @@ public:
 
 	QString getId() const;
 
+	void setSelected(bool en);
+
 Q_SIGNALS:
 	void doubleclick();
 
@@ -38,14 +40,9 @@ protected:
 	void enterEvent(QEvent *event);
 	void leaveEvent(QEvent *event);
 
-	//	void dragMoveEvent(QDragMoveEvent *event);
-	//	void dragLeaveEvent(QDragLeaveEvent *event);
-
-	//	void mouseMoveEvent(QMouseEvent *event);
-
 private:
-	QPushButton *toolBtn;
-	CustomPushButton *toolRunBtn;
+	QPushButton *m_toolBtn;
+	CustomPushButton *m_toolRunBtn;
 
 	QString m_uuid;
 	QString m_name;
