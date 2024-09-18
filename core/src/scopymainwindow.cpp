@@ -76,7 +76,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	////////
 	BrowseMenu *browseMenu = new BrowseMenu(ui->wToolBrowser);
 	ui->wToolBrowser->layout()->addWidget(browseMenu);
-	m_instrManager = new InstrumentManager(ts, browseMenu->instrumentMenu(), this);
 
 	connect(browseMenu, &BrowseMenu::requestTool, ts, &ToolStack::show, Qt::QueuedConnection);
 	connect(browseMenu, SIGNAL(requestLoad()), this, SLOT(load()));
@@ -89,7 +88,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 		}
 		ui->animHolder->toggleMenu(!coll);
 	});
-
 	////////
 
 	scanTask = new IIOScanTask(this);
@@ -112,6 +110,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	dm->setExclusive(false);
 
 	dtm = new DetachedToolWindowManager(this);
+	m_instrManager = new InstrumentManager(ts, dtm, browseMenu->instrumentMenu(), this);
 
 	ts->add("home", hp);
 	ts->add("about", about);
@@ -145,15 +144,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	sbc->startScan();
 
 	//////// Instrument menu changes
+	connect(dm, &DeviceManager::deviceChangedToolList, m_instrManager, &InstrumentManager::changeToolListContents);
+	connect(dm, SIGNAL(deviceConnected(QString, Device *)), m_instrManager, SLOT(deviceConnected(QString)));
+	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), m_instrManager, SLOT(deviceDisconnected(QString)));
+	connect(dm, &DeviceManager::requestTool, m_instrManager, &InstrumentManager::showMenuItem);
 	connect(m_instrManager, &InstrumentManager::requestToolSelect, ts, &ToolStack::show);
-	connect(dm, &DeviceManager::deviceChangedToolList, m_instrManager, &InstrumentManager::changeToolListContents,
-		Qt::QueuedConnection);
-	connect(dm, SIGNAL(deviceConnected(QString, Device *)), m_instrManager, SLOT(deviceConnected(QString)),
-		Qt::QueuedConnection);
-	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), m_instrManager, SLOT(deviceDisconnected(QString)),
-		Qt::QueuedConnection);
-	connect(dm, &DeviceManager::requestTool, m_instrManager, &InstrumentManager::showMenuItem,
-		Qt::QueuedConnection);
+	connect(m_instrManager, &InstrumentManager::requestToolSelect, dtm, &DetachedToolWindowManager::show);
 	///
 
 	connect(hp, &ScopyHomePage::newDeviceAvailable, dm, &DeviceManager::addDevice);

@@ -1,6 +1,7 @@
 #ifndef INSTRUMENTMANAGER_H
 #define INSTRUMENTMANAGER_H
 
+#include "../detachedtoolwindowmanager.h"
 #include "instrumentmenu.h"
 #include "instrumentwidget.h"
 
@@ -16,7 +17,8 @@ class SCOPY_CORE_EXPORT InstrumentManager : public QObject
 {
 	Q_OBJECT
 public:
-	InstrumentManager(ToolStack *ts, InstrumentMenu *instrumentMenu, QObject *parent = nullptr);
+	InstrumentManager(ToolStack *ts, DetachedToolWindowManager *dtm, InstrumentMenu *instrumentMenu,
+			  QObject *parent = nullptr);
 	~InstrumentManager();
 
 	void addMenuItem(QString deviceId, QString deviceName, QList<ToolMenuEntry *> tools);
@@ -35,13 +37,22 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void updateTool(QWidget *old);
+	void updateToolAttached(bool oldAttach, InstrumentWidget *instrWidget);
 
 private:
+	void loadToolAttachedState(ToolMenuEntry *tme);
+	void saveToolAttachedState(ToolMenuEntry *tme);
+	void detachSuccesful(InstrumentWidget *instrWidget);
+	void attachSuccesful(InstrumentWidget *instrWidget);
+	void showTool(InstrumentWidget *instrWidget);
 	void selectInstrument(InstrumentWidget *instrWidget, bool on);
+	void setTmeAttached(ToolMenuEntry *tme);
 	InstrumentWidget *createInstrWidget(ToolMenuEntry *tme, QWidget *parent = nullptr);
+
 	QString m_prevItem;
 	QStringList m_connectedDev;
 	ToolStack *m_ts;
+	DetachedToolWindowManager *m_dtm;
 	InstrumentMenu *m_instrumentMenu;
 	QMap<QString, MenuSectionCollapseWidget *> m_itemMap;
 };

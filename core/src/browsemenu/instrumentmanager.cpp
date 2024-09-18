@@ -1,14 +1,17 @@
 #include "browsemenu/instrumentmanager.h"
 #include <browsemenu/instrumentwidget.h>
 #include <QLoggingCategory>
+#include <pluginbase/preferences.h>
 #include <QButtonGroup>
 
 Q_LOGGING_CATEGORY(CAT_INSTR_MANAGER, "InstrumentManager")
 using namespace scopy;
 
-InstrumentManager::InstrumentManager(ToolStack *ts, InstrumentMenu *instrumentMenu, QObject *parent)
+InstrumentManager::InstrumentManager(ToolStack *ts, DetachedToolWindowManager *dtm, InstrumentMenu *instrumentMenu,
+				     QObject *parent)
 	: QObject(parent)
 	, m_ts(ts)
+	, m_dtm(dtm)
 	, m_instrumentMenu(instrumentMenu)
 {}
 
@@ -18,6 +21,7 @@ void InstrumentManager::addMenuItem(QString deviceId, QString device, QList<Tool
 {
 	MenuSectionCollapseWidget *devSection =
 		new MenuSectionCollapseWidget(device, MenuCollapseSection::MHCW_ARROW, m_instrumentMenu);
+	devSection->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
 	QButtonGroup *menuBtnGroup = m_instrumentMenu->btnGroup();
 	for(ToolMenuEntry *tme : tools) {
@@ -25,6 +29,8 @@ void InstrumentManager::addMenuItem(QString deviceId, QString device, QList<Tool
 		devSection->add(instrWidget);
 		menuBtnGroup->addButton(instrWidget->getToolBtn());
 		connect(tme, &ToolMenuEntry::updateTool, this, &InstrumentManager::updateTool);
+		connect(tme, &ToolMenuEntry::updateToolAttached, this,
+			[this, instrWidget](bool oldAttach) { updateToolAttached(oldAttach, instrWidget); });
 		Q_EMIT tme->updateToolEntry();
 	}
 	m_instrumentMenu->add(deviceId, devSection);
@@ -89,13 +95,97 @@ void InstrumentManager::updateTool(QWidget *old)
 		if(m_ts->contains(id)) {
 			m_ts->remove(id);
 		}
+		if(m_dtm->contains(id)) {
+			m_dtm->remove(id);
+		}
 	}
 	if(tool != nullptr) { // we have a new widget
 		if(tme->attached()) {
 			m_ts->add(id, tool);
+		} else {
+			m_dtm->add(id, tme);
 		}
+		loadToolAttachedState(tme);
 	}
 	qDebug(CAT_INSTR_MANAGER) << "updating tool for " << tme->name() << " - " << id;
+}
+
+void InstrumentManager::updateToolAttached(bool oldAttach, InstrumentWidget *instrWidget)
+{
+	ToolMenuEntry *tme = dynamic_cast<ToolMenuEntry *>(QObject::sender());
+	Q_ASSERT(tme);
+	QWidget *tool = tme->tool();
+	QString id = tme->uuid();
+
+	if(tme->attached()) {
+		// tool is detached, it will attach to the main window
+		if(m_dtm->contains(id)) {
+			m_dtm->remove(id);
+		}
+		m_ts->add(id, tool);
+		attachSuccesful(instrWidget);
+	} else {
+		// tool is attached, it will detach
+		if(m_ts->contains(id)) {
+			m_ts->remove(id);
+		}
+		m_dtm->add(id, tme);
+		detachSuccesful(instrWidget);
+	}
+	// by this time, the tool has changed it's state, either from attached to detached, or from detached to attached
+	saveToolAttachedState(tme);
+	showTool(instrWidget);
+
+	// highlight the current tool from the main window
+	if(tme->attached()) {
+		// the selected tool just attached, so it will be at the top of the stack, therefore highlighted
+		if(instrWidget) {
+			instrWidget->getToolBtn()->setChecked(true);
+			instrWidget->setSelected(true);
+		}
+	} else {
+		// the top tool just detached, so we need to find the tool that is positioned at the new top of the
+		// stack.
+		if(instrWidget) {
+			instrWidget->getToolBtn()->toggle();
+		}
+	}
+}
+
+void InstrumentManager::saveToolAttachedState(ToolMenuEntry *tme)
+{
+	Preferences *p = Preferences::GetInstance();
+	if(!p->get("general_save_attached").toBool())
+		return;
+	QString prefId;
+	prefId = tme->id() + "_attached";
+	bool attach = tme->attached();
+	p->set(prefId, attach);
+}
+
+void InstrumentManager::detachSuccesful(InstrumentWidget *instrWidget)
+{
+	QButtonGroup *menuBtnGroup = m_instrumentMenu->btnGroup();
+	if(instrWidget) {
+		instrWidget->setSelected(false);
+		menuBtnGroup->removeButton(instrWidget->getToolBtn());
+	}
+}
+
+void InstrumentManager::attachSuccesful(InstrumentWidget *instrWidget)
+{
+	QButtonGroup *menuBtnGroup = m_instrumentMenu->btnGroup();
+	if(instrWidget) {
+		menuBtnGroup->addButton(instrWidget->getToolBtn());
+	}
+}
+
+void InstrumentManager::showTool(InstrumentWidget *instrWidget)
+{
+	if(instrWidget) {
+		instrWidget->getToolBtn()->setChecked(true);
+	}
+	Q_EMIT requestToolSelect(instrWidget->getId());
 }
 
 void InstrumentManager::selectInstrument(InstrumentWidget *instrWidget, bool on)
@@ -104,6 +194,14 @@ void InstrumentManager::selectInstrument(InstrumentWidget *instrWidget, bool on)
 	if(menuBtnGroup->id(instrWidget->getToolBtn()) != -1) {
 		instrWidget->setSelected(on);
 	}
+}
+
+void InstrumentManager::setTmeAttached(ToolMenuEntry *tme)
+{
+	Preferences *p = Preferences::GetInstance();
+	if(!p->get("general_doubleclick_attach").toBool())
+		return;
+	tme->setAttached(!tme->attached());
 }
 
 InstrumentWidget *InstrumentManager::createInstrWidget(ToolMenuEntry *tme, QWidget *parent)
@@ -115,11 +213,24 @@ InstrumentWidget *InstrumentManager::createInstrWidget(ToolMenuEntry *tme, QWidg
 		[=]() { Q_EMIT requestToolSelect(instrWidget->getId()); });
 	connect(instrWidget->getToolBtn(), &QPushButton::toggled, this,
 		[this, instrWidget](bool on) { selectInstrument(instrWidget, on); });
+	connect(instrWidget, &InstrumentWidget::doubleclick, this, [this, tme]() { setTmeAttached(tme); });
 	connect(tme, &ToolMenuEntry::updateToolEntry, instrWidget, &InstrumentWidget::updateItem);
 
 	return instrWidget;
 }
 
+void InstrumentManager::loadToolAttachedState(ToolMenuEntry *tme)
+{
+	Preferences *p = Preferences::GetInstance();
+	QString prefId;
+	if(!p->get("general_save_attached").toBool())
+		return;
+
+	prefId = tme->id() + "_attached";
+	p->init(prefId, tme->attached());
+	bool attach = p->get(prefId).toBool();
+	tme->setAttached(attach);
+}
 void InstrumentManager::deviceConnected(QString id)
 {
 	m_connectedDev.append(id);
