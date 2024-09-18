@@ -356,8 +356,8 @@
 			"sources": [
 				{
 					"type": "git",
-					"url": "https://github.com/gnuradio/gnuradio",
-					"branch" : "maint-3.10"
+					"url": "https://github.com/analogdevicesinc/gnuradio",
+					"branch" : "scopy2-maint-3.10"
 				}
 			]
 		},
