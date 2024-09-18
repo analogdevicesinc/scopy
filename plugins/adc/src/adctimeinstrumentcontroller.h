@@ -3,6 +3,7 @@
 
 #include "scopy-adc_export.h"
 #include "adcinstrumentcontroller.h"
+#include "timeplotmanagersettings.h"
 
 namespace scopy {
 namespace adc {

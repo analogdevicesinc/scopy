@@ -4,11 +4,11 @@
 #include "toolcomponent.h"
 #include "scopy-adc_export.h"
 #include "timeplotcomponent.h"
-#include "timeplotmanagersettings.h"
 #include "measurecomponent.h"
 #include <QMap>
 #include <pluginbase/resourcemanager.h>
 #include <pluginbase/toolmenuentry.h>
+#include "plotmanager.h"
 
 namespace scopy {
 namespace adc {
@@ -58,6 +58,7 @@ Q_SIGNALS:
 	void requestStop();
 	void requestStartLater();
 	void requestStopLater();
+	void requestDisconnect();
 
 protected:
 	void setupChannelMeasurement(PlotManager *c, ChannelComponent *ch);
