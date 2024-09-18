@@ -68,7 +68,6 @@ private:
 	CyclicalTask *scanCycle;
 	IIOScanTask *scanTask;
 	ScannedIIOContextCollector *scc;
-	ToolManager *toolman;
 	DetachedToolWindowManager *dtm;
 
 	LicenseOverlay *license = nullptr;

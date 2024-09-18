@@ -71,13 +71,11 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	vc->subscribe(this,
 		      &ScopyMainWindow::receiveVersionDocument); // 'subscribe' to receive the version QJsonDocument
 
-	auto tb = ui->wToolBrowser;
 	auto ts = ui->wsToolStack;
-	auto tm = tb->getToolMenu();
 
 	////////
-	BrowseMenu *browseMenu = new BrowseMenu(ui->browseMenu);
-	ui->browseMenu->layout()->addWidget(browseMenu);
+	BrowseMenu *browseMenu = new BrowseMenu(ui->wToolBrowser);
+	ui->wToolBrowser->layout()->addWidget(browseMenu);
 	m_instrManager = new InstrumentManager(ts, browseMenu->instrumentMenu(), this);
 
 	connect(browseMenu, &BrowseMenu::requestTool, ts, &ToolStack::show);
@@ -103,18 +101,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	dm->setExclusive(false);
 
 	dtm = new DetachedToolWindowManager(this);
-	toolman = new ToolManager(tm, ts, dtm, this);
-	toolman->addToolList("home", {});
-	toolman->addToolList("add", {});
-
-	connect(tm, &ToolMenu::toggleAttach, toolman, &ToolManager::toggleAttach);
-	connect(tb, &ToolBrowser::collapsed, [=](bool coll) {
-		ui->animHolder->setAnimMin(50);
-		ui->animHolder->toggleMenu(!coll);
-	});
-
-	connect(tb, &ToolBrowser::requestTool, ts, &ToolStack::show);
-	connect(tb, &ToolBrowser::requestTool, dtm, &DetachedToolWindowManager::show);
 
 	ts->add("home", hp);
 	ts->add("about", about);
@@ -140,17 +126,11 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	}
 
 	connect(dm, SIGNAL(deviceConnected(QString, Device *)), scc, SLOT(lock(QString, Device *)));
-	connect(dm, SIGNAL(deviceConnected(QString, Device *)), toolman, SLOT(lockToolList(QString)));
 	connect(dm, SIGNAL(deviceConnected(QString, Device *)), hp, SLOT(connectDevice(QString)));
 	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), scc, SLOT(unlock(QString, Device *)));
-	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), toolman, SLOT(unlockToolList(QString)));
 	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), hp, SLOT(disconnectDevice(QString)));
 
 	connect(dm, SIGNAL(requestDevice(QString)), hp, SLOT(viewDevice(QString)));
-	connect(dm, SIGNAL(requestTool(QString)), toolman, SLOT(showTool(QString)));
-
-	connect(dm, SIGNAL(deviceChangedToolList(QString, QList<ToolMenuEntry *>)), toolman,
-		SLOT(changeToolListContents(QString, QList<ToolMenuEntry *>)));
 	sbc->startScan();
 
 	//////// Instrument menu changes
@@ -164,9 +144,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(dm, &DeviceManager::requestTool, m_instrManager, &InstrumentManager::showMenuItem,
 		Qt::QueuedConnection);
 	///
-
-	//	connect(tb, SIGNAL(requestSave()), this, SLOT(save()));
-	//	connect(tb, SIGNAL(requestLoad()), this, SLOT(load()));
 
 	connect(hp, &ScopyHomePage::newDeviceAvailable, dm, &DeviceManager::addDevice);
 
@@ -225,11 +202,7 @@ void ScopyMainWindow::load(QString file)
 
 void ScopyMainWindow::closeEvent(QCloseEvent *event) { dm->disconnectAll(); }
 
-void ScopyMainWindow::requestTools(QString id)
-{
-	toolman->showToolList(id);
-	m_instrManager->showMenuItem(id);
-}
+void ScopyMainWindow::requestTools(QString id) { m_instrManager->showMenuItem(id); }
 
 ScopyMainWindow::~ScopyMainWindow()
 {
@@ -525,14 +498,12 @@ void ScopyMainWindow::initApi()
 
 void ScopyMainWindow::addDeviceToUi(QString id, Device *d)
 {
-	//	toolman->addToolList(id, d->toolList());
 	m_instrManager->addMenuItem(id, d->displayName(), d->toolList());
 	hp->addDevice(id, d);
 }
 
 void ScopyMainWindow::removeDeviceFromUi(QString id)
 {
-	//	toolman->removeToolList(id);
 	m_instrManager->removeMenuItem(id);
 	hp->removeDevice(id);
 }
