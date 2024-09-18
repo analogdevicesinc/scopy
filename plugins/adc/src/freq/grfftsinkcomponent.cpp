@@ -1,6 +1,7 @@
 #include "grfftsinkcomponent.h"
 #include <gr-util/grsignalpath.h>
 #include <QLoggingCategory>
+#include "iioutil/iiopingtask.h"
 
 Q_LOGGING_CATEGORY(CAT_GRFFTSINKCOMPONENT, "GRFFTSinkComponent")
 using namespace scopy::adc;
@@ -144,14 +145,18 @@ void GRFFTSinkComponent::init()
 
 void GRFFTSinkComponent::deinit() { qDebug(CAT_GRFFTSINKCOMPONENT) << "Deinit"; }
 
-void GRFFTSinkComponent::start()
+bool GRFFTSinkComponent::start()
 {
+	iio_context_set_timeout(m_node->ctx(), 1000);
+	if(!IIOPingTask::pingCtx(m_node->ctx()))
+		return false;
 	m_sync->setBufferSize(this, m_samplingInfo.bufferSize);
 	m_sync->setSingleShot(this, m_singleShot);
 	m_top->setVLen(m_samplingInfo.bufferSize);
 	m_sync->arm(this);
 	m_top->build();
 	m_top->start();
+	return true;
 }
 
 void GRFFTSinkComponent::stop()

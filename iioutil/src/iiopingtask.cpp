@@ -22,9 +22,11 @@ void IIOPingTask::run()
 		Q_EMIT pingFailed();
 }
 
-bool IIOPingTask::ping()
+bool IIOPingTask::ping() { return pingCtx(m_ctx); }
+
+bool IIOPingTask::pingCtx(iio_context *ctx)
 {
-	auto dev = iio_context_get_device(m_ctx, 0);
+	auto dev = iio_context_get_device(ctx, 0);
 	const iio_device *test_device = nullptr;
 
 	int ret = iio_device_get_trigger(dev, &test_device);
