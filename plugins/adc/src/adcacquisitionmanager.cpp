@@ -48,6 +48,10 @@ GRTopBlock *GRTopBlockNode::src() const { return m_src; }
 
 SyncController *GRTopBlockNode::sync() const { return m_sync; }
 
+iio_context *GRTopBlockNode::ctx() const { return m_ctx; }
+
+void GRTopBlockNode::setCtx(iio_context *ctx) { m_ctx = ctx; }
+
 AcqTreeNode::AcqTreeNode(QString name, QObject *parent)
 	: QObject(parent)
 {

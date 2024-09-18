@@ -33,7 +33,7 @@ public Q_SLOTS:
 	void init();
 	void deinit();
 
-	virtual void start() override;
+	virtual bool start() override;
 	virtual void stop() override;
 
 	virtual size_t updateData() override;

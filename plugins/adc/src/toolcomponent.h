@@ -70,7 +70,7 @@ public:
 	virtual size_t updateData() = 0;
 	virtual bool finished() = 0;
 	virtual void setData(bool copy = false) = 0;
-	virtual void start() = 0;
+	virtual bool start() = 0;
 	virtual void stop() = 0;
 };
 
