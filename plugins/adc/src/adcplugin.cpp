@@ -153,6 +153,7 @@ void ADCPlugin::createGRIIOTreeNode(GRTopBlockNode *ctxNode, iio_context *ctx)
 {
 	int devCount = iio_context_get_devices_count(ctx);
 	qDebug(CAT_ADCPLUGIN) << " Found " << devCount << "devices";
+	ctxNode->setCtx(ctx);
 	for(int i = 0; i < devCount; i++) {
 		iio_device *dev = iio_context_get_device(ctx, i);
 		QString dev_name = QString::fromLocal8Bit(iio_device_get_name(dev));
@@ -255,6 +256,9 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root)
 			}
 			deleteInstrument(t);
 		});
+
+		connect(adc, &ADCInstrumentController::requestDisconnect, this, &ADCPlugin::disconnectDevice,
+			Qt::QueuedConnection);
 		m_ctrls.append(adc);
 	} else if(t == FREQUENCY) {
 
@@ -286,6 +290,9 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root)
 			}
 			deleteInstrument(t);
 		});
+
+		connect(adc, &ADCInstrumentController::requestDisconnect, this, &ADCPlugin::disconnectDevice,
+			Qt::QueuedConnection);
 		m_ctrls.append(adc);
 	} else {
 		return;

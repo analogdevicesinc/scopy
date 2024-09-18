@@ -1,6 +1,7 @@
 #include "grtimesinkcomponent.h"
 #include <gr-util/grsignalpath.h>
 #include <QLoggingCategory>
+#include "iioutil/iiopingtask.h"
 
 Q_LOGGING_CATEGORY(CAT_GRTIMESINKCOMPONENT, "GRTimeSinkComponent")
 using namespace scopy::adc;
@@ -145,14 +146,18 @@ void GRTimeSinkComponent::init()
 
 void GRTimeSinkComponent::deinit() { qDebug(CAT_GRTIMESINKCOMPONENT) << "Deinit"; }
 
-void GRTimeSinkComponent::start()
+bool GRTimeSinkComponent::start()
 {
+	iio_context_set_timeout(m_node->ctx(), 1000);
+	if(!IIOPingTask::pingCtx(m_node->ctx()))
+		return false;
 	m_sync->setBufferSize(this, m_samplingInfo.bufferSize);
 	m_sync->setSingleShot(this, m_singleShot);
 	m_top->setVLen(m_samplingInfo.bufferSize);
 	m_sync->arm(this);
 	m_top->build();
 	m_top->start();
+	return true;
 }
 
 void GRTimeSinkComponent::stop()
