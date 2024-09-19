@@ -5,7 +5,6 @@
 #include <QString>
 #include <QMap>
 #include <QFuture>
-#include <QtConcurrent>
 
 #include <iio.h>
 
