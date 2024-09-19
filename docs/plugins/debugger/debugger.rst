@@ -3,7 +3,7 @@
 Debugger
 ================================================================================
 
-This instrument represents the fist version of the debugger tool, also available in the
+This instrument represents the first version of the debugger tool, also available in the
 first version of Scopy. It is composed of 2 parts, the `DEVICE SELECTION` and the
 `REGISTER MAP SETTINGS`.
 
