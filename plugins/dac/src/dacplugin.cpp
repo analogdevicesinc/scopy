@@ -47,7 +47,7 @@ bool DACPlugin::loadIcon()
 void DACPlugin::loadToolList()
 {
 	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("dac", "Dac", ":/gui/icons/scopy-default/icons/tool_signal_generator.svg"));
+		SCOPY_NEW_TOOLMENUENTRY("dac", "DAC", ":/gui/icons/scopy-default/icons/tool_signal_generator.svg"));
 }
 
 void DACPlugin::unload()

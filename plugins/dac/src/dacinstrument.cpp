@@ -194,7 +194,7 @@ void DacInstrument::setupDacDataManagers()
 				}
 
 				// Connect the DacManager menu request for its stack
-				connect(dm, &DacDataManager::requestMenu, [=]() { tool->requestMenu(name); });
+				connect(dm, &DacDataManager::requestMenu, [&, name]() { tool->requestMenu(name); });
 
 				// Map the DacManager menu stack to its name
 				tool->rightStack()->add(name, dm->getRightMenuStack());
