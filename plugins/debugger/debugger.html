@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>MAX14906 &#8212; Scopy  documentation</title>
+    <title>Debugger &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../_static/style.min.css?v=434060ed" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
@@ -16,8 +16,8 @@
     <link rel="icon" href="../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Faults" href="faults.html" />
-    <link rel="prev" title="AD74413R" href="ad74413r.html" />
+    <link rel="next" title="IIO Explorer" href="iioexplorer.html" />
+    <link rel="prev" title="Debugger" href="index.html" />
    
   
   <meta name="global_root" content="../../../">
@@ -98,13 +98,7 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">MAX14906</a><ul>
-<li><a class="reference internal" href="#overview">Overview</a></li>
-<li><a class="reference internal" href="#instrument-layout">Instrument layout</a></li>
-<li><a class="reference internal" href="#channel-layout">Channel Layout</a></li>
-<li><a class="reference internal" href="#settings-tab">Settings tab</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">Debugger</a></li>
 </ul>
 
         </nav>
@@ -147,9 +141,9 @@ Content on this topic
 <li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../adc/adc.html">ADC plugin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../datalogger/datalogger.html">Datalogger</a></li>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-1" id="toctree-collapse-1-1"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-1-1"><div class="icon"></div></label></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../debugger/debugger.html">Debugger</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../debugger/iioexplorer.html">IIO Explorer</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-1" id="toctree-collapse-1-1" checked=""/><div class="collapse"><a class="reference internal" href="index.html">Debugger</a><label for="toctree-collapse-1-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iioexplorer.html">IIO Explorer</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
@@ -172,11 +166,11 @@ Content on this topic
 <li class="toctree-l3"><a class="reference internal" href="../pqm/settings.html">System settings</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-4" id="toctree-collapse-1-4" checked=""/><div class="collapse"><a class="reference internal" href="index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-1-4"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="swiot_config.html">Configuration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ad74413r.html">AD74413R</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">MAX14906</a></li>
-<li class="toctree-l3"><a class="reference internal" href="faults.html">Faults</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-4" id="toctree-collapse-1-4"/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/faults.html">Faults</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
 </ul>
 </li>
@@ -195,133 +189,50 @@ Content on this topic
         <div class="bodywrapper" id="top-anchor">
           <div class="body" role="main">
             
-  <section id="max14906">
-<span id="id1"></span><h1>MAX14906<a class="headerlink" href="#max14906" title="Link to this heading">¶</a></h1>
-<section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
-<p>The MAX14906 instrument is only available in the runtime mode of
-AD-SWIOT1L-SL, alongside AD74413R and Faults instruments. It represents
-the main interface for the MAX14906 chip and it dynamically shows all
-the channels configured for this specific device.</p>
-</section>
-<section id="instrument-layout">
-<h2>Instrument layout<a class="headerlink" href="#instrument-layout" title="Link to this heading">¶</a></h2>
-<img alt="https://github.com/analogdevicesinc/scopy/blob/doc_resources/resources/swiot1l/max14906.png?raw=true" class="align-center" src="https://github.com/analogdevicesinc/scopy/blob/doc_resources/resources/swiot1l/max14906.png?raw=true" />
+  <section id="debugger">
+<span id="id1"></span><h1>Debugger<a class="headerlink" href="#debugger" title="Link to this heading">¶</a></h1>
+<p>This instrument represents the first version of the debugger tool, also available in the
+first version of Scopy. It is composed of 2 parts, the <cite>DEVICE SELECTION</cite> and the
+<cite>REGISTER MAP SETTINGS</cite>.</p>
+<img alt="Debugger Tool V1" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/debugger/debugger-tool-v1.png" />
+<aside class="topic">
+<p class="topic-title">Device Selection</p>
+<p>This part contains information such as the:</p>
+<img alt="Debugger version selection" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/debugger/debugger-v1-device-selection.png" />
 <ol class="arabic simple">
-<li><p>Run button</p></li>
+<li><p>Selected Device</p></li>
+<li><p>Selected Channel (or <cite>Global</cite> for device specific attributes)</p></li>
+<li><p>Selected Channel Attribute (or Device Attribute if the channel selection is set to <cite>Global</cite>)</p></li>
+<li><p>The value of the selected attribute (this can contain constraints such as a specific list of choices)</p></li>
+<li><p>The Filename of the selected attribute</p></li>
+<li><p>Attribute <cite>read</cite> button</p></li>
+<li><p>Attribute <cite>write</cite> button</p></li>
 </ol>
-<blockquote>
-<div><p>The run button will start a polling task at a set time (1 second) for
-all channels configured as MAX14906.
-The plot will be cleared in all channels every time the run button is pressed.</p>
-</div></blockquote>
-<ol class="arabic simple" start="2">
-<li><p>Settings page</p></li>
-</ol>
-<blockquote>
-<div><p>In the settings page the timespan can be changed, this will
-change it for all channels.</p>
-</div></blockquote>
-<ol class="arabic simple" start="3">
-<li><p>Channels</p></li>
-</ol>
-<blockquote>
-<div><p>Each channel will appear in this area. The layout might change
-depending on how many channels are configured as MAX14906.
-Channels can be detached and reattached by pressing the
-arrow in the top-right corner of each channel.</p>
-</div></blockquote>
-<ol class="arabic simple" start="4">
-<li><p>Config button</p></li>
-</ol>
-<blockquote>
-<div><p>When pressing the config button, Scopy will switch the SWIOT1L
-mode to config. The device will temporarily close while
-the switch is being made. After that it will automatically
-reconnect to the SWIOT1L board, in config mode,
-so that the device can be configured again.</p>
-</div></blockquote>
-</section>
-<section id="channel-layout">
-<h2>Channel Layout<a class="headerlink" href="#channel-layout" title="Link to this heading">¶</a></h2>
-<p>The channel layout can be detached and reattached to Scopy by
-clicking the arrow on the upper right side.</p>
+</aside>
+<aside class="topic">
+<p class="topic-title">Register map settings</p>
+<p>This part contains information such as the:</p>
+<a class="reference internal image-reference" href="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/debugger/debugger-v1-register-map-settings.png"><img alt="Debugger version selection" class="align-right" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/debugger/debugger-v1-register-map-settings.png" style="width: 700px;" />
+</a>
 <ol class="arabic simple">
-<li><p>Name and placeholder</p></li>
+<li><p>Source</p></li>
+<li><p>Display mode</p></li>
+<li><p>Address</p></li>
+<li><p>Value</p></li>
+<li><p>Read Button</p></li>
+<li><p>Write Button</p></li>
+<li><p>Description</p></li>
+<li><p>Default Value</p></li>
 </ol>
-<blockquote>
-<div><p>Channel name, as displayed in the IIO Context.
-Input for custom channel name, it has no functional use, except
-for differentiating the channels based on the purpose given by the user.</p>
-</div></blockquote>
-<ol class="arabic simple" start="2">
-<li><p>Channel Type</p></li>
-</ol>
-<blockquote>
-<div><p>INPUT/OUTPUT based on the channel configuration.</p>
-</div></blockquote>
-<ol class="arabic simple" start="3">
-<li><p>Plot</p></li>
-</ol>
-<blockquote>
-<div><p>Displays the polled channel values. The plot history size is
-given by the Timespan control.</p>
-</div></blockquote>
-<ol class="arabic simple" start="4">
-<li><p>Output Mode</p></li>
-</ol>
-<blockquote>
-<div><p>Shows the function configured on the respective channel, the
-available functions change based on whether the
-channel is configured as INPUT or OUTPUT. The functions can
-be changed without switching to config mode.</p>
-</div></blockquote>
-<ol class="arabic simple" start="5">
-<li><p>Read Value</p></li>
-</ol>
-<blockquote>
-<div><p>Represents the read value on the specific channel.</p>
-</div></blockquote>
-<ol class="arabic simple" start="6">
-<li><p>Current Limit</p></li>
-</ol>
-<blockquote>
-<div><p>Only available for the channels configured as OUTPUT.</p>
-</div></blockquote>
-<ol class="arabic simple" start="7">
-<li><p>Set Value</p></li>
-</ol>
-<blockquote>
-<div><p>Only available for the channels configured as OUTPUT. Shows
-the value that will be written to the channel (the
-value is written on the hardware only once, when the switch is toggled).</p>
-</div></blockquote>
-</section>
-<section id="settings-tab">
-<h2>Settings tab<a class="headerlink" href="#settings-tab" title="Link to this heading">¶</a></h2>
-<ol class="arabic simple">
-<li><p>Timespan for polling</p></li>
-</ol>
-<blockquote>
-<div><p>This control changes the plot timespan for all the enabled channels.</p>
-</div></blockquote>
-<ol class="arabic simple" start="2">
-<li><p>Config Button</p></li>
-</ol>
-<blockquote>
-<div><p>Pressing the config button sets the device mode to configuration.
-After that, the device will disconnect briefly, reconnect and the
-Config Instrument will be automatically opened.</p>
-</div></blockquote>
-</section>
+</aside>
 </section>
 
 
           </div>
               <div class="related">
                 &nbsp;
-    <a href="ad74413r.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">AD74413R</a>
-    <a href="faults.html" title="Next document (Alt+Shift+RightArrow)" class="next">Faults</a>
+    <a href="index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Debugger</a>
+    <a href="iioexplorer.html" title="Next document (Alt+Shift+RightArrow)" class="next">IIO Explorer</a>
               </div>
           
         </div>

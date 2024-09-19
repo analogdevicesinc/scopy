@@ -1,28 +1,27 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Configuration &#8212; Scopy  documentation</title>
+    <title>Debugger &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/style.min.css?v=a3ba2641" />
+    <link rel="stylesheet" type="text/css" href="../../_static/style.min.css?v=434060ed" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=b3ba4146"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
-    <script defer="" src="../../_static/app.umd.js?v=7b10be7e"></script>
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../../_static/app.umd.js?v=c93eadd1"></script>
     <link rel="icon" href="../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="AD74413R" href="ad74413r.html" />
-    <link rel="prev" title="AD-SWIOT1L-SL plugin" href="index.html" />
+    <link rel="next" title="Debugger" href="debugger.html" />
+    <link rel="prev" title="Datalogger" href="../datalogger/datalogger.html" />
    
   
-    <meta name="robots" content="noindex">
-  
-  <meta name="repo" content="">
+  <meta name="global_root" content="../../../">
+  <meta name="repo" content="scopy">
   
 
 
@@ -79,14 +78,15 @@
 
   <div class="repotoc-tree overlay">
     <root>
-  <a href="../../../documentation/eval/index.html">Evaluation Boards</a>
-  <a href="../../../documentation/university/index.html">University Program</a>
+  <a href="../../../documentation/index.html">System Level</a>
   <a href="../../../hdl/index.html">HDL</a>
-  <a href="../../../no-OS/index.html">no-OS</a>
   <a href="../../../pyadi-iio/index.html">Hardware Python Interfaces</a>
+  <a href="../../../libiio/index.html">libiio</a>
+  <a href="../../../no-OS/index.html">no-OS</a>
   <a href="../../../precision-converters-firmware/index.html">Precision Converters Firmware</a>
-  <a href="../../../doctools/index.html">Doctools</a>
   <a href="../../../PrecisionToolbox/index.html">Precision Toolbox</a>
+  <a href="../../index.html" class="current">Scopy</a>
+  <a href="../../../doctools/index.html">Doctools</a>
 </root>
 
   </div>
@@ -98,8 +98,9 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">Configuration</a><ul>
+<li><a class="reference internal" href="#">Debugger</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#contents">Contents</a></li>
 </ul>
 </li>
 </ul>
@@ -109,7 +110,7 @@
     </div>
 
   
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
     <a id="logo" href="../../index.html">
       <img class="only-light" src="../../_static/scopy.png"/>
@@ -123,14 +124,15 @@ Content on this topic
 </label>
 <div class="repotoc-tree">
   <root>
-  <a href="../../../documentation/eval/index.html">Evaluation Boards</a>
-  <a href="../../../documentation/university/index.html">University Program</a>
+  <a href="../../../documentation/index.html">System Level</a>
   <a href="../../../hdl/index.html">HDL</a>
-  <a href="../../../no-OS/index.html">no-OS</a>
   <a href="../../../pyadi-iio/index.html">Hardware Python Interfaces</a>
+  <a href="../../../libiio/index.html">libiio</a>
+  <a href="../../../no-OS/index.html">no-OS</a>
   <a href="../../../precision-converters-firmware/index.html">Precision Converters Firmware</a>
-  <a href="../../../doctools/index.html">Doctools</a>
   <a href="../../../PrecisionToolbox/index.html">Precision Toolbox</a>
+  <a href="../../index.html" class="current">Scopy</a>
+  <a href="../../../doctools/index.html">Doctools</a>
 </root>
 
 </div>
@@ -141,9 +143,15 @@ Content on this topic
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../adc/adc.html">ADC plugin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-1" id="toctree-collapse-1-1" checked=""/><div class="collapse"><a class="current reference internal" href="#">Debugger</a><label for="toctree-collapse-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-1" id="toctree-collapse-1-1"/><div class="collapse"><a class="reference internal" href="../m2k/index.html">ADALM2000</a><label for="toctree-collapse-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-2" id="toctree-collapse-1-2"/><div class="collapse"><a class="reference internal" href="../m2k/index.html">ADALM2000</a><label for="toctree-collapse-1-2"><div class="icon"></div></label></div><ul>
 <li class="toctree-l3"><a class="reference internal" href="../m2k/oscilloscope.html">Oscilloscope</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../m2k/network_analyzer.html">Network Analyzer</a></li>
@@ -155,18 +163,18 @@ Content on this topic
 <li class="toctree-l3"><a class="reference internal" href="../m2k/power_supply.html">Power Supply</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-2" id="toctree-collapse-1-2"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-3" id="toctree-collapse-1-3"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-1-3"><div class="icon"></div></label></div><ul>
 <li class="toctree-l3"><a class="reference internal" href="../pqm/rms.html">RMS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../pqm/harmonics.html">Harmonics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../pqm/waveform.html">Waveform</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../pqm/settings.html">System settings</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-3" id="toctree-collapse-1-3" checked=""/><div class="collapse"><a class="reference internal" href="index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-1-3"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Configuration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ad74413r.html">AD74413R</a></li>
-<li class="toctree-l3"><a class="reference internal" href="max14906.html">MAX14906</a></li>
-<li class="toctree-l3"><a class="reference internal" href="faults.html">Faults</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-4" id="toctree-collapse-1-4"/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/faults.html">Faults</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
 </ul>
 </li>
@@ -185,37 +193,30 @@ Content on this topic
         <div class="bodywrapper" id="top-anchor">
           <div class="body" role="main">
             
-  <section id="configuration">
-<span id="config"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">#</a></h1>
+  <section id="debugger">
+<span id="debugger-index"></span><h1>Debugger<a class="headerlink" href="#debugger" title="Link to this heading">¶</a></h1>
+<p>The debugger plugin is used to examine IIO contexts and modify individual IIO attributes,
+as well as examining the structure of an IIO context. The more important attributes are
+also available in the other plugins, but this tool provides a full overview of the whole
+context, giving the user the ability to read/modify every  individual attribute. This
+makes it easier to configure any board in specific ways.</p>
 <section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">#</a></h2>
-<img alt="https://github.com/analogdevicesinc/scopy/blob/doc_resources/resources/swiot1l/config.png?raw=true" class="align-center" src="https://github.com/analogdevicesinc/scopy/blob/doc_resources/resources/swiot1l/config.png?raw=true" />
-<p>The Config Instrument is only available when the AD-SWIOT1L-SL system is
-in configuration mode. This mode allows the user to define, for each of
-the 4 physical channels, the device that will control the channel and
-the function defined for that device. The channel can also be disabled,
-in which case it will not be configured.</p>
-<blockquote>
-<div><ol class="arabic">
-<li><p>Channel index</p></li>
-<li><p>Channel state (enabled/disabled)</p></li>
-<li><p>Chip configured on that channel</p></li>
-<li><p>Function selected (chip specific)</p></li>
-<li><p>Channel to chip mapping</p>
-<p>The AD-SWIOT1L-SL board image contains a mapping of the AD74413R and
-MAX14906 chips that highlights the connection between each chip and
-the corresponding configured channel pin.</p>
-</li>
-<li><p>Mode switch</p>
-<p>After configuring the system pressing the Apply button will switch the
-SWIOT1L to runtime mode. The device will briefly disconnect while the
-IIO Context is reconfigured and it will automatically reconnect to
-the AD-SWIOT1L-SL board.</p>
-</li>
-</ol>
-</div></blockquote>
-<p>Upon successful connection a different set of instruments will be available
-to operate and control the system.</p>
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>This plugin is generic and can work with any valid context. It is composed of one
+instrument that has 2 versions. The default version (version 2) is the IIO Explorer.
+Users also have the ability to load version one of the debugger plugin by accessing the
+<cite>Preferences</cite> panel on the left side and unchecking the <cite>Use debugger V2 plugin</cite> box.</p>
+<img alt="Debugger version selection" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/debugger/debugger-pref-version.png" />
+</section>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Link to this heading">¶</a></h2>
+<p>The plugin contains 1 instrument that can be the Debugger (v1) or the IIO Explorer (v2):</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="debugger.html">Debugger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</div>
 </section>
 </section>
 
@@ -223,8 +224,8 @@ to operate and control the system.</p>
           </div>
               <div class="related">
                 &nbsp;
-    <a href="index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">AD-SWIOT1L-SL plugin</a>
-    <a href="ad74413r.html" title="Next document (Alt+Shift+RightArrow)" class="next">AD74413R</a>
+    <a href="../datalogger/datalogger.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Datalogger</a>
+    <a href="debugger.html" title="Next document (Alt+Shift+RightArrow)" class="next">Debugger</a>
               </div>
           
         </div>
