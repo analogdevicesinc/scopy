@@ -13,6 +13,7 @@
 #include <QPainter>
 #include <QPushButton>
 #include <QSpacerItem>
+#include <style.h>
 
 #include <cursorsettings.h>
 #include <gui/utils.h>

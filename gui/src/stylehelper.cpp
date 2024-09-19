@@ -55,6 +55,7 @@ void StyleHelper::initColorMap()
 	sh->colorMap.insert("WarningText", "#FFC904");
 	sh->colorMap.insert("GrayText", Style::getAttribute(json::theme::interactive_subtle_idle));
 	sh->colorMap.insert("SH_focus", Style::getAttribute(json::theme::content_inverse));
+	sh->colorMap.insert("stuff", Style::getAttribute(json::theme::background_subtle));
 }
 
 QString StyleHelper::getChannelColor(int index)
@@ -1038,7 +1039,7 @@ void StyleHelper::MenuCollapseHeaderLineEdit(QLineEdit *w, QString objectName)
 				QLineEdit {
 					color: white;
 					background-color: rgba(255,255,255,0);
-					font-weight: 500;
+					font-weight: 800;
 					font-family: Open Sans;
 					font-size: 14px;
 					font-style: normal;
@@ -1139,7 +1140,7 @@ void StyleHelper::HoverWidget(QWidget *w, bool draggable, QString objectName)
 
 	if(draggable) {
 		style.replace("&&Background&&", StyleHelper::getColor("UIElementBackground"));
-		style.replace("&&HoverBackground&&", StyleHelper::getColor("UIElementHighlight"));
+		style.replace("&&HoverBackground&&", StyleHelper::getColor("stuff"));
 	} else {
 		style.replace("&&Background&&", "transparent");
 		style.replace("&&HoverBackground&&", "transparent");

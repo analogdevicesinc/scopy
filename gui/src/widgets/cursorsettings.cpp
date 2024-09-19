@@ -1,4 +1,5 @@
 #include <QVBoxLayout>
+#include <style.h>
 
 #include <stylehelper.h>
 #include <widgets/cursorsettings.h>
@@ -26,6 +27,7 @@ void CursorSettings::initUI()
 
 	// x controls
 	xControls = new MenuSectionWidget(this);
+	Style::setStyle(xControls, style::properties::widget::border);
 	layout->addWidget(xControls);
 	xControls->contentLayout()->setSpacing(10);
 
@@ -39,6 +41,7 @@ void CursorSettings::initUI()
 
 	// y controls
 	yControls = new MenuSectionWidget(this);
+	Style::setStyle(yControls, style::properties::widget::border);
 	layout->addWidget(yControls);
 	yControls->contentLayout()->setSpacing(10);
 
@@ -50,6 +53,7 @@ void CursorSettings::initUI()
 
 	// readouts controls
 	readoutsControls = new MenuSectionWidget(this);
+	Style::setStyle(readoutsControls, style::properties::widget::border);
 	layout->addWidget(readoutsControls);
 
 	readoutsDrag = new MenuOnOffSwitch(tr("Move readouts"), readoutsControls, false);

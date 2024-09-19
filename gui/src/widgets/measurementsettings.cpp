@@ -2,6 +2,7 @@
 
 #include <widgets/menuonoffswitch.h>
 #include <widgets/menusectionwidget.h>
+#include <style.h>
 
 using namespace scopy;
 
@@ -14,6 +15,7 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	lay->setMargin(0);
 
 	measureSection = new MenuSectionWidget(this);
+	Style::setStyle(measureSection, style::properties::widget::border);
 	measurePanelSwitch = new MenuOnOffSwitch("Measure Panel", this);
 	measurePanelSwitch->onOffswitch()->setChecked(true);
 	QHBoxLayout *hlay1 = new QHBoxLayout();
@@ -74,6 +76,7 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	hlay2->addWidget(measureSortByType);
 
 	statsSection = new MenuSectionWidget(this);
+	Style::setStyle(statsSection, style::properties::widget::border);
 	statsPanelSwitch = new MenuOnOffSwitch("Stats Panel", this);
 	connect(statsPanelSwitch->onOffswitch(), &QAbstractButton::toggled, this,
 		[=](bool b) { Q_EMIT enableStatsPanel(b); });
@@ -139,6 +142,7 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	hlay4->addWidget(statsSortByType);
 
 	markerSection = new MenuSectionWidget(this);
+	Style::setStyle(markerSection, style::properties::widget::border);
 	markerPanelSwitch = new MenuOnOffSwitch("Marker Panel", this);
 	connect(markerPanelSwitch->onOffswitch(), &QAbstractButton::toggled, this,
 		[=](bool b) { Q_EMIT enableMarkerPanel(b); });
