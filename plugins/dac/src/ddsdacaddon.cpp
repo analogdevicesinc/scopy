@@ -113,8 +113,8 @@ QWidget *DdsDacAddon::setupDdsTx(TxNode *txNode)
 
 	ddsModeSection->contentLayout()->addWidget(ddsModeCombo);
 	txHeaderLay->addWidget(txLabelSection, 1);
-	txHeaderLay->addWidget(txReadSection, 1);
 	txHeaderLay->addWidget(ddsModeSection, 4);
+	txHeaderLay->addWidget(txReadSection, 1);
 
 	txLay->addWidget(txHeader);
 	txLay->addWidget(ddsModeStack);
