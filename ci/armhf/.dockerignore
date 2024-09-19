@@ -2,3 +2,9 @@
 !sysroot.tar.gz
 !armhf_build_process.sh
 !armhf_build_config.sh
+!cmake_toolchain.cmake
+!create_sysroot.sh
+!copy-deps.sh
+!inside_chroot.sh
+!build_qt.sh
+!qt_patch.patch

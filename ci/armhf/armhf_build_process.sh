@@ -1,10 +1,11 @@
 #!/bin/bash
 
 set -ex
-git config --global --add safe.directory $HOME/scopy
 SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
 SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
 SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+BUILD_STATUS_FILE=$SRC_SCRIPT/build-status
 
 source $SRC_SCRIPT/armhf_build_config.sh
 
@@ -21,7 +22,11 @@ build_with_cmake() {
 	$CMAKE $CURRENT_BUILD_CMAKE_OPTS ../
 	make $JOBS
 	CURRENT_BUILD_CMAKE_OPTS=""
-	# TODO: Create build-status file
+
+	echo "$(basename -a "$(git config --get remote.origin.url)") - \
+	$(git rev-parse --abbrev-ref HEAD) - \
+	$(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
 }
 
 set_config_opts() {
@@ -223,6 +228,11 @@ build_qwt() {
 	make $JOBS
 	patchelf --force-rpath --set-rpath \$ORIGIN $STAGING_AREA/qwt/lib/libqwt.so
 	sudo make INSTALL_ROOT=$SYSROOT install
+
+	echo "$(basename -a "$(git config --get remote.origin.url)") - \
+	$(git rev-parse --abbrev-ref HEAD) - \
+	$(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
 	popd
 }
 
@@ -236,6 +246,11 @@ build_libsigrokdecode() {
 	make $JOBS
 	patchelf --force-rpath --set-rpath \$ORIGIN $STAGING_AREA/libsigrokdecode/.libs/libsigrokdecode.so
 	sudo make install
+
+	echo "$(basename -a "$(git config --get remote.origin.url)") - \
+	$(git rev-parse --abbrev-ref HEAD) - \
+	$(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
 	popd
 }
 
@@ -261,6 +276,7 @@ build_iio-emu(){
 
 build_scopy() {
 	echo "### Building scopy"
+	[ -f /home/runner/build-status ] && cp /home/runner/build-status $SRC_DIR/build-status
 	pushd $SRC_DIR
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PLUGIN_TEST=ON \
@@ -272,7 +288,6 @@ build_scopy() {
 }
 
 create_appdir(){
-
 	BUILD_FOLDER=$SRC_DIR/build
 	EMU_BUILD_FOLDER=$STAGING_AREA/iio-emu/build
 	PLUGINS=$BUILD_FOLDER/plugins/plugins

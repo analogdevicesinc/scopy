@@ -1,9 +1,9 @@
 #!/bin/bash
 
 set -ex
-SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
-SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
-source $SRC_DIR/ci/armhf/armhf_build_config.sh
+SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+source $SRC_SCRIPT/armhf_build_config.sh
 
 IMAGE_FILE=2023-12-13-ADI-Kuiper-full.img
 
@@ -46,7 +46,7 @@ extract_sysroot(){
 
 # execute chroot inside the sysroot folder and install/remove packages using apt
 configure_sysroot(){
-	cat $SRC_DIR/ci/armhf/inside_chroot.sh | sudo chroot ${SYSROOT}
+	cat $SRC_SCRIPT/inside_chroot.sh | sudo chroot ${SYSROOT}
 }
 
 move_and_extract_sysroot(){
