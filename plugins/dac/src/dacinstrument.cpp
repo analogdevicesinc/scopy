@@ -1,5 +1,6 @@
 #include "dacinstrument.h"
 #include "dacdatamanager.h"
+#include "dacutils.h"
 #include "dac_logging_categories.h"
 
 #include <QHBoxLayout>
@@ -179,7 +180,10 @@ void DacInstrument::setupDacDataManagers()
 			qDebug(CAT_DAC_INSTRUMENT) << "Verify if " << chn_name << "is scan element";
 			if(chn_name == "timestamp" /*|| chn_name == "accel_z" || chn_name =="accel_y"*/)
 				continue;
-			if(iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
+			if(!iio_channel_is_output(chn)) {
+				continue;
+			}
+			if(iio_channel_is_scan_element(chn) || DacUtils::checkDdsChannel(chn)) {
 				channelList.append(chn_name);
 				deviceList.append(dev_name);
 
