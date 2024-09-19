@@ -7,7 +7,7 @@ What is a Scopy plugin ?
 
 General IIO plugins
 
-* :ref: `ADC Plugin <adc>`
+* :ref:`ADC Plugin <adc>`
 
 * DAC plugin
 
