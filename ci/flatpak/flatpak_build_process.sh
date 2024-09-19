@@ -43,7 +43,7 @@ cp tmp.json $SCOPY_JSON
 rm tmp.json
 
 # Generate build status info for the about page
-echo "Details about the versions of dependencies can be found <a href="https://github.com/analogdevicesinc/scopy-flatpak/blob/master/org.adi.Scopy.json.c">here</a>" > build-status
+jq '.modules[] | select(type == "object" and .sources[]?.type == "git") | "\(.name): \(.sources[] | select(.type == "git") | .branch // .tag // .commit // "no branch, tag, or commit")"' ./org.adi.Scopy.json >> build-status
 cp build-status $SOURCE_DIR/build-status
 
 # Insert env vars in the sandboxed flatpak build
