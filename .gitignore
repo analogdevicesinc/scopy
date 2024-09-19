@@ -62,5 +62,5 @@ pluginbase/include/pluginbase/scopy-pluginbase_config.h
 pluginbase/include/pluginbase/scopy-pluginbase_export.h
 bin/*
 lib/*
-doc/_build/*
+docs/_build/*
 share/*
