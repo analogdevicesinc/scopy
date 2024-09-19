@@ -57,7 +57,7 @@ DacDataManager::DacDataManager(struct iio_device *dev, QWidget *parent)
 	Q_EMIT m_mode->combo()->currentIndexChanged(0);
 	modeSection->contentLayout()->addWidget(m_mode);
 
-	m_color = StyleHelper::getColor("CH" + QString::number(QRandomGenerator::global()->bounded(0, 7)));
+	m_color = StyleHelper::getColor("ScopyBlue");
 	m_layout->addWidget(modeSection);
 	m_layout->addWidget(dacAddonStack);
 	m_layout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding));
@@ -198,7 +198,6 @@ void DacDataManager::toggleBufferMode()
 {
 	if(isBufferCapable()) {
 		m_mode->combo()->setCurrentIndex(DAC_BUFFER);
-		//		Q_EMIT m_mode->combo()->currentIndexChanged(DAC_DDS);
 	}
 }
 
@@ -206,7 +205,6 @@ void DacDataManager::toggleDdsMode()
 {
 	if(isDds()) {
 		m_mode->combo()->setCurrentIndex(DAC_DDS);
-		//		Q_EMIT m_mode->combo()->currentIndexChanged(DAC_DDS);
 	}
 }
 

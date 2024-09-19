@@ -57,7 +57,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 		new MenuSpinbox("Buffer size", 0, "samples", 16, 16 * 1024 * 1024, true, false, buffersizeContainer);
 	StyleHelper::BackgroundWidget(m_bufferSizeSpin);
 	connect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, this,
-		[=](double value) { m_model->setBuffersize(value); });
+		[&](double value) { m_model->setBuffersize(value); });
 	buffersizeContainer->contentLayout()->setSpacing(0);
 	buffersizeContainer->contentLayout()->setMargin(0);
 	buffersizeContainer->contentLayout()->addWidget(m_bufferSizeSpin);
@@ -69,7 +69,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	m_kernelCountSpin->setIncrementMode(MenuSpinbox::IS_FIXED);
 	StyleHelper::BackgroundWidget(m_kernelCountSpin);
 	connect(m_kernelCountSpin, &MenuSpinbox::valueChanged, this,
-		[=](double value) { m_model->setKernelBuffersCount(value); });
+		[&](double value) { m_model->setKernelBuffersCount(value); });
 	kernelContainer->contentLayout()->setSpacing(0);
 	kernelContainer->contentLayout()->setMargin(0);
 	kernelContainer->contentLayout()->addWidget(m_kernelCountSpin);
@@ -77,7 +77,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	// Decimation section - hidden for now
 	MenuSpinbox *decimationSpin = new MenuSpinbox("Decimation", 0, "", 1, 1000, true, false, bufferConfigSection);
 	StyleHelper::BackgroundWidget(decimationSpin);
-	connect(decimationSpin, &MenuSpinbox::valueChanged, this, [=](double value) { m_model->setDecimation(value); });
+	connect(decimationSpin, &MenuSpinbox::valueChanged, this, [&](double value) { m_model->setDecimation(value); });
 	decimationSpin->setValue(1);
 	decimationSpin->hide();
 
@@ -100,10 +100,10 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	connect(m_runBtn, &QPushButton::toggled, this, &BufferDacAddon::runBtnToggled);
 	connect(
 		m_model, &DacDataModel::updateBuffersize, this,
-		[=](unsigned int val) { m_bufferSizeSpin->setValue(val); }, Qt::QueuedConnection);
+		[&](unsigned int val) { m_bufferSizeSpin->setValue(val); }, Qt::QueuedConnection);
 	connect(
 		m_model, &DacDataModel::updateKernelBuffers, this,
-		[=](unsigned int val) { m_kernelCountSpin->setValue(val); }, Qt::QueuedConnection);
+		[&](unsigned int val) { m_kernelCountSpin->setValue(val); }, Qt::QueuedConnection);
 	connect(
 		m_model, &DacDataModel::invalidRunParams, this, [this]() { m_runBtn->setChecked(false); },
 		Qt::QueuedConnection);
@@ -129,7 +129,9 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 		new MenuSpinbox("File size", 0, "samples", 16, 16 * 1024 * 1024, false, false, filesizeContainer);
 	m_fileSizeSpin->setIncrementMode(MenuSpinbox::IS_FIXED);
 	StyleHelper::BackgroundWidget(m_fileSizeSpin);
-	connect(m_fileSizeSpin, &MenuSpinbox::valueChanged, this, [=](double value) { m_model->setFilesize(value); });
+	connect(
+		m_fileSizeSpin, &MenuSpinbox::valueChanged, this, [&](double value) { m_model->setFilesize(value); },
+		Qt::QueuedConnection);
 	m_fileSizeSpin->setValue(16);
 	filesizeContainer->contentLayout()->addWidget(m_fileSizeSpin);
 	filesizeContainer->setFixedHeight(48);
@@ -174,8 +176,11 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 
 	// Console log section
 	MenuSectionWidget *logSection = new MenuSectionWidget(this);
+	logSection->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 	logSection->setProperty("tutorial_name", "CONSOLE_LOG");
 	m_logText = new QTextBrowser(logSection);
+	m_logText->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	m_logText->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 	m_logText->setTabStopDistance(30);
 	QFont mono("Monospace");
 	mono.setStyleHint(QFont::Monospace);
@@ -237,8 +242,8 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	scrollLayout->addWidget(runConfigContainer);
 	scrollLayout->addWidget(bufferConfigContainer);
 	scrollLayout->addWidget(m_optionalGuiStrategy);
-	scrollLayout->addWidget(logSection);
-	scrollLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding));
+	scrollLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	scrollLayout->addWidget(logSection, 3, Qt::AlignBottom);
 	m_layout->addWidget(scroll);
 }
 

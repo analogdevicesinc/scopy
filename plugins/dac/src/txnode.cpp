@@ -48,7 +48,7 @@ unsigned int TxNode::getFormatBits() const { return m_fmtBits; }
 
 bool TxNode::enableDds(bool enable)
 {
-	qDebug(CAT_DAC_DATA) << QString("Try enable DDS TXNode %1").arg(m_txUuid);
+	qDebug(CAT_DAC_DATA) << QString("Try enable:%1 DDS TXNode %2").arg(enable).arg(m_txUuid);
 	if(m_channel) {
 		if(iio_channel_get_type(m_channel) == IIO_ALTVOLTAGE) {
 			int ret = iio_channel_attr_write_bool(m_channel, "raw", enable);
