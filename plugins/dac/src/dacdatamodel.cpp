@@ -4,6 +4,7 @@
 
 #include <algorithm>
 
+#include <QtConcurrentRun>
 #include <QDebug>
 #include <QThread>
 
@@ -137,10 +138,12 @@ void DacDataModel::setBuffersize(unsigned int buffersize)
 
 void DacDataModel::setFilesize(unsigned int filesize)
 {
-	requestInterruption();
-	m_filesize = filesize;
-	autoBuffersizeAndKernelBuffers();
-	Q_EMIT reqInitBuffer();
+	if(m_filesize != filesize) {
+		requestInterruption();
+		m_filesize = filesize;
+		autoBuffersizeAndKernelBuffers();
+		Q_EMIT reqInitBuffer();
+	}
 }
 
 void DacDataModel::enableBufferChannel(QString uuid, bool enable)
