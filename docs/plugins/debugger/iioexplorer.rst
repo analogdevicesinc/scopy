@@ -4,7 +4,7 @@ IIO Explorer
 ================================================================================
 
 This instrument represents the improved version of the original Debugger. The main
-improvements are the ease of use and visualization of the data form the IIO context.
+improvements are the ease of use and visualization of the data from the IIO context.
 
 It is composed of 4 parts or views:
 
@@ -65,7 +65,7 @@ displays a button that deletes the entire row from the watchlist.
   :align: center
 
 `The Log Window` can be accessed by clicking the `Log` button next to the `IIO Attributes`
-button and will display a log with the all operations with their timestamp, whether
+button and will display a log with all the operations with their timestamp, whether
 they were a read (R) or write (W) operation, the return code (`SUCCESS` means the return code
 is 0), the path of the modified item and the value read (in case of a write operation, the
 previous value is also displayed).
