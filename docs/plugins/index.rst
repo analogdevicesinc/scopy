@@ -9,7 +9,7 @@ General IIO plugins
 
 * :ref:`ADC Plugin <adc>`
 
-* DAC plugin
+* :ref:`DAC plugin <dac>`
 
 * :ref:`Datalogger <datalogger>`
 
@@ -61,6 +61,7 @@ Contents
    :maxdepth: 3
 
    adc/adc
+   dac/dac
    datalogger/datalogger
    debugger/index
    registermap/registermap
