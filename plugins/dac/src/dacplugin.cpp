@@ -1,6 +1,7 @@
 #include "dacplugin.h"
 #include "dac_logging_categories.h"
 #include "dacinstrument.h"
+#include "dacutils.h"
 
 #include <QLabel>
 
@@ -19,9 +20,15 @@ bool DACPlugin::compatible(QString m_param, QString category)
 
 	for(int i = 0; i < iio_context_get_devices_count(conn->context()); i++) {
 		iio_device *dev = iio_context_get_device(conn->context(), i);
-		if(dev) {
-			ret = true;
-			goto finish;
+		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
+			struct iio_channel *chn = iio_device_get_channel(dev, j);
+			if(!iio_channel_is_output(chn)) {
+				continue;
+			}
+			if(iio_channel_is_scan_element(chn) || DacUtils::checkDdsChannel(chn)) {
+				ret = true;
+				goto finish;
+			}
 		}
 	}
 finish:
