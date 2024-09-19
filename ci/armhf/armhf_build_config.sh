@@ -25,19 +25,19 @@ SYSROOT_TAR=$STAGING_AREA/sysroot.tar.gz
 TOOLCHAIN=$STAGING_AREA/cross-pi-gcc
 TOOLCHAIN_BIN=$TOOLCHAIN/bin
 TOOLCHAIN_HOST="arm-linux-gnueabihf"
-TOOLCHAIN_FILE=$SRC_DIR/ci/armhf/cmake_toolchain.cmake
+TOOLCHAIN_FILE=$SRC_SCRIPT/cmake_toolchain.cmake
 QT_LOCATION=$SYSROOT/usr/local/qt5.15
 
 CMAKE_BIN=$STAGING_AREA/cmake/bin/cmake
 QMAKE_BIN=$QT_LOCATION/bin/qmake
 JOBS=-j14
 
-APP_DIR=$SRC_DIR/ci/armhf/scopy.AppDir
-APP_IMAGE=$SRC_DIR/ci/armhf/Scopy.AppImage
-APP_RUN=$SRC_DIR/ci/armhf/AppRun
-APP_DESKTOP=$SRC_DIR/ci/armhf/scopy.desktop
-APP_SQUASHFS=$SRC_DIR/ci/armhf/scopy.squashfs
-RUNTIME_ARMHF=$SRC_DIR/ci/armhf/runtime-armhf
+APP_DIR=$SRC_SCRIPT/scopy.AppDir
+APP_IMAGE=$SRC_SCRIPT/Scopy.AppImage
+APP_RUN=$SRC_SCRIPT/AppRun
+APP_DESKTOP=$SRC_SCRIPT/scopy.desktop
+APP_SQUASHFS=$SRC_SCRIPT/scopy.squashfs
+RUNTIME_ARMHF=$SRC_SCRIPT/runtime-armhf
 
 CMAKE_OPTS=(\
 	-DCMAKE_SYSROOT="$SYSROOT" \

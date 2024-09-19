@@ -27,19 +27,19 @@ create_sysroot(){
 # archive the sysroot and move it next to the Dockerfile in order to copy the tar in the docker image
 tar_and_move_sysroot(){
 	pushd $STAGING_AREA
-	sudo tar -czvf "${SYSROOT_TAR##*/}" sysroot
+	sudo tar -czf "${SYSROOT_TAR##*/}" sysroot
 	sudo mv $SYSROOT_TAR $SRC_DIR/ci/armhf
 	popd
 }
 
 create_image(){
 	pushd ${SRC_DIR}/ci/armhf
-	sudo docker build --load --tag cristianbindea/scopy2-armhf-appimage:testing -f docker/Dockerfile .
-	# sudo DOCKER_BUILDKIT=0 docker build --tag cristianbindea/scopy2-armhf-appimage:testing . # build the image using old backend
+	docker build --load --progress plain --tag cristianbindea/scopy2-armhf-appimage:testing -f docker/Dockerfile .
+	# DOCKER_BUILDKIT=0 docker build --tag cristianbindea/scopy2-armhf-appimage:testing . # build the image using old backend
 	popd
 }
 
-install_packages
+#install_packages
 create_sysroot
 tar_and_move_sysroot
 create_image
