@@ -20,3 +20,24 @@ double DacUtils::dbFullScaleConvert(double scale, bool inverse)
 		return pow(10, scale / 20.0);
 	}
 }
+
+bool DacUtils::checkDdsChannel(iio_channel *chn)
+{
+	iio_chan_type chnType = iio_channel_get_type(chn);
+	if(chnType != IIO_ALTVOLTAGE) {
+		return false;
+	}
+	auto freq = iio_channel_find_attr(chn, "frequency");
+	if(!freq) {
+		return false;
+	}
+	auto scale = iio_channel_find_attr(chn, "scale");
+	if(!scale) {
+		return false;
+	}
+	auto phase = iio_channel_find_attr(chn, "phase");
+	if(!phase) {
+		return false;
+	}
+	return true;
+}
