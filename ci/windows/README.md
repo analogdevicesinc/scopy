@@ -8,7 +8,7 @@ Scopy is a software oscilloscope and signal analysis toolset. [The official repo
 ## Building the Docker image
 To build the Docker image just execute the command
 
-``` docker build --progress=plain --tag <image_name> --isolation=hyperv --memory=16GB --file docker/Dockerfile .```
+``` docker build --tag <image_name> --isolation=hyperv --memory=16GB --file docker/Dockerfile .```
 
 The Dockerfile is available in the docker folder.
 

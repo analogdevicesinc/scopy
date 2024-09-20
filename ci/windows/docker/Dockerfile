@@ -27,6 +27,12 @@ RUN setx PATH C:\msys64\bin;C:\msys64\mingw64\bin;C:\msys64\usr\bin;%PATH% & \
 
 ENV CI_SCRIPT=ON
 
+RUN C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Syyu"
+RUN C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Sy msys2-keyring"
+RUN C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Su"
+RUN C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Syuu"
+RUN C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Syuu"
+
 WORKDIR C:\\msys64\\home\\docker
 
 COPY mingw_toolchain.sh C:/msys64/home/docker/scripts/mingw_toolchain.sh
@@ -34,13 +40,10 @@ COPY windows_build_process.sh C:/msys64/home/docker/scripts/windows_build_proces
 COPY build_and_create_installer.sh C:/msys64/home/docker/scripts/build_and_create_installer.sh
 COPY sigrokdecode-windows-fix.patch C:/msys64/home/docker/scripts/sigrokdecode-windows-fix.patch
 
-RUN C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Syyu" & \
-    C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Sy msys2-keyring" & \
-    C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Su" & \
-    C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Syuu" & \
-    C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Syuu" & \
-    C:\msys64\usr\bin\bash.exe -lc "C:/msys64/home/docker/scripts/windows_build_process.sh" & \
-    C:\msys64\usr\bin\bash.exe -lc "C:/msys64/home/docker/scripts/build_and_create_installer.sh download_tools" & \
-    C:\msys64\usr\bin\bash.exe -lc "mv C:/msys64/home/docker/scripts/staging C:/msys64/home/docker/staging" & \
-    C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Scc " & \
-    rmdir /s /q C:\msys64\home\docker\scripts
+RUN C:\msys64\usr\bin\bash.exe -lc "C:/msys64/home/docker/scripts/windows_build_process.sh"
+RUN C:\msys64\usr\bin\bash.exe -lc "C:/msys64/home/docker/scripts/build_and_create_installer.sh download_tools"
+RUN C:\msys64\usr\bin\bash.exe -lc "mv C:/msys64/home/docker/scripts/staging C:/msys64/home/docker/staging"
+RUN C:\msys64\usr\bin\bash.exe -lc "mv C:/msys64/home/docker/scripts/build-status C:/msys64/home/docker/build-status"
+RUN C:\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Scc "
+RUN rmdir /s /q C:\msys64\home\docker\scripts
+RUN rmdir /s /q C:\msys64\home\docker\staging
