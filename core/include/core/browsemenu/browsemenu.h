@@ -34,7 +34,7 @@ Q_SIGNALS:
 private:
 	void add(QWidget *w, QString name, MenuAlignment position);
 	void toggleCollapsed();
-	QPushButton *createBtn(QString name, QWidget *parent = nullptr, QIcon icon = {});
+	QPushButton *createBtn(QString name, QString iconPath, QWidget *parent = nullptr);
 	QFrame *createHLine(QWidget *parent = nullptr);
 	QWidget *createHeader(QWidget *parent = nullptr);
 	QLabel *createScopyLogo(QWidget *parent = nullptr);

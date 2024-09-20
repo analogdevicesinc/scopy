@@ -32,7 +32,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	QButtonGroup *btnGroup = m_instrumentMenu->btnGroup();
 	m_instrumentMenu->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
-	QPushButton *homeBtn = createBtn("Home", m_content);
+	QPushButton *homeBtn = createBtn(tr("Home"), ":/gui/icons/scopy-default/icons/tool_home.svg", m_content);
 	connect(homeBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("home"); });
 
 	QWidget *saveLoadWidget = new QWidget(m_content);
@@ -40,19 +40,20 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	saveLoadWidget->setLayout(new QHBoxLayout(saveLoadWidget));
 	saveLoadWidget->layout()->setMargin(0);
 
-	QPushButton *saveBtn = createBtn("Save", saveLoadWidget);
+	QPushButton *saveBtn = createBtn(tr("Save"), ":/gui/icons/scopy-default/icons/save.svg", saveLoadWidget);
 	connect(saveBtn, &QPushButton::clicked, this, &BrowseMenu::requestSave);
 
-	QPushButton *loadBtn = createBtn("Load", saveLoadWidget);
+	QPushButton *loadBtn = createBtn(tr("Load"), ":/gui/icons/scopy-default/icons/load.svg", saveLoadWidget);
 	connect(loadBtn, &QPushButton::clicked, this, &BrowseMenu::requestLoad);
 
 	saveLoadWidget->layout()->addWidget(saveBtn);
 	saveLoadWidget->layout()->addWidget(loadBtn);
 
-	QPushButton *preferencesBtn = createBtn("Preferences", m_content);
+	QPushButton *preferencesBtn =
+		createBtn(tr("Preferences"), ":/gui/icons/scopy-default/icons/preferences.svg", m_content);
 	connect(preferencesBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("preferences"); });
 
-	QPushButton *aboutBtn = createBtn("About", m_content);
+	QPushButton *aboutBtn = createBtn(tr("About"), ":/gui/icons/scopy-default/icons/info.svg", m_content);
 	connect(aboutBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("about"); });
 
 	QLabel *logo = createScopyLogo(m_content);
@@ -102,9 +103,10 @@ void BrowseMenu::toggleCollapsed()
 	Q_EMIT collapsed(m_collapsed);
 }
 
-QPushButton *BrowseMenu::createBtn(QString name, QWidget *parent, QIcon icon)
+QPushButton *BrowseMenu::createBtn(QString name, QString iconPath, QWidget *parent)
 {
 	QPushButton *btn = new QPushButton(parent);
+	btn->setIcon(QIcon(iconPath));
 	btn->setCheckable(true);
 	btn->setText(name);
 	btn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
