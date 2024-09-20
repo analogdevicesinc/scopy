@@ -3,6 +3,8 @@
 #include <QLoggingCategory>
 #include <pluginbase/preferences.h>
 #include <QButtonGroup>
+#include <baseheaderwidget.h>
+#include <menuheader.h>
 
 Q_LOGGING_CATEGORY(CAT_INSTR_MANAGER, "InstrumentManager")
 using namespace scopy;
@@ -17,12 +19,12 @@ InstrumentManager::InstrumentManager(ToolStack *ts, DetachedToolWindowManager *d
 
 InstrumentManager::~InstrumentManager() {}
 
-void InstrumentManager::addMenuItem(QString deviceId, QString device, QList<ToolMenuEntry *> tools, int itemIndex)
+void InstrumentManager::addMenuItem(QString deviceId, DeviceInfo devInfo, QList<ToolMenuEntry *> tools, int itemIndex)
 {
 	MenuSectionCollapseWidget *devSection =
-		new MenuSectionCollapseWidget(device, MenuCollapseSection::MHCW_ARROW, m_instrumentMenu);
+		new MenuSectionCollapseWidget(devInfo.name, MenuCollapseSection::MHCW_ARROW, m_instrumentMenu);
 	devSection->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-
+	createMenuSectionLabel(devSection, devInfo.uri);
 	QButtonGroup *menuBtnGroup = m_instrumentMenu->btnGroup();
 	for(ToolMenuEntry *tme : tools) {
 		InstrumentWidget *instrWidget = createInstrWidget(tme, devSection);
@@ -35,6 +37,7 @@ void InstrumentManager::addMenuItem(QString deviceId, QString device, QList<Tool
 	}
 	m_instrumentMenu->add(itemIndex, deviceId, devSection);
 	m_itemMap[deviceId] = devSection;
+	m_devInfoMap[deviceId] = devInfo;
 	devSection->hide();
 }
 
@@ -47,6 +50,7 @@ void InstrumentManager::removeMenuItem(QString deviceId)
 	MenuSectionCollapseWidget *devSection = m_itemMap[deviceId];
 	m_itemMap.remove(deviceId);
 	m_instrumentMenu->remove(devSection);
+	m_devInfoMap.remove(deviceId);
 	delete devSection;
 	devSection = nullptr;
 }
@@ -61,9 +65,9 @@ void InstrumentManager::changeToolListContents(QString deviceId, QList<ToolMenuE
 		tme->disconnect(this);
 	}
 	int itemIndex = m_instrumentMenu->indexOf(m_itemMap[deviceId]);
-	QString deviceName = m_itemMap[deviceId]->collapseSection()->title();
+	DeviceInfo devInfo = m_devInfoMap[deviceId];
 	removeMenuItem(deviceId);
-	addMenuItem(deviceId, deviceName, tools, itemIndex);
+	addMenuItem(deviceId, devInfo, tools, itemIndex);
 	showMenuItem(deviceId);
 }
 
@@ -203,6 +207,19 @@ void InstrumentManager::setTmeAttached(ToolMenuEntry *tme)
 	if(!p->get("general_doubleclick_attach").toBool())
 		return;
 	tme->setAttached(!tme->attached());
+}
+
+void InstrumentManager::createMenuSectionLabel(MenuSectionCollapseWidget *section, QString uri)
+{
+	MenuCollapseHeader *collapseHeader = dynamic_cast<MenuCollapseHeader *>(section->collapseSection()->header());
+	if(!collapseHeader) {
+		return;
+	}
+	BaseHeaderWidget *headerWidget = dynamic_cast<BaseHeaderWidget *>(collapseHeader->headerWidget());
+	if(headerWidget) {
+		QLabel *uriLabel = new QLabel(uri, headerWidget);
+		headerWidget->layout()->addWidget(uriLabel);
+	}
 }
 
 InstrumentWidget *InstrumentManager::createInstrWidget(ToolMenuEntry *tme, QWidget *parent)
