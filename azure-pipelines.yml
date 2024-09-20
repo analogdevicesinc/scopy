@@ -80,7 +80,7 @@ stages:
             ls -la
       displayName: 'Rename and copy artifact'
       workingDirectory: $(Build.Repository.LocalPath)
-    - task: GithubRelease@0
+    - task: GithubRelease@1
       displayName: 'Push to continuous release'
       condition: and(succeeded(), and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master')))
       inputs:
