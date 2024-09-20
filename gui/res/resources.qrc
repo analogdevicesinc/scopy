@@ -162,6 +162,7 @@
         <file>icons/handle_arrow.svg</file>
         <file>icons/search_crossed.svg</file>
         <file>icons/scopy-default/icons/tool_datalogger.svg</file>
+        <file>icons/edit_pen.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>
