@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <baseheader.h>
 
 #include <scopy-gui_export.h>
 #include <stylehelper.h>
@@ -50,11 +51,13 @@ class SCOPY_GUI_EXPORT MenuCollapseHeader : public QAbstractButton
 public:
 	MenuCollapseHeader(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style, QWidget *parent);
 	~MenuCollapseHeader();
-	QLineEdit *title();
+	QString title();
+
+	BaseHeader *headerWidget() const;
 
 private:
 	QAbstractButton *m_ctrl;
-	QLineEdit *m_label;
+	BaseHeader *m_headerWidget;
 	QHBoxLayout *lay;
 };
 
