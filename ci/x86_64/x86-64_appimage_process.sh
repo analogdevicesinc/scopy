@@ -43,6 +43,8 @@ APP_DIR_NAME=scopy.AppDir
 APP_DIR=$SRC_SCRIPT/$APP_DIR_NAME
 APP_IMAGE=$SRC_SCRIPT/Scopy-x86_64.AppImage
 
+BUILD_STATUS_FILE=$SRC_SCRIPT/build-status
+
 if [ "$USE_STAGING" == "ON" ]
 	then
 		echo -- USING STAGING FOLDER: $STAGING_AREA_DEPS
@@ -140,6 +142,10 @@ build_with_cmake() {
 		if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
 	fi
 	CURRENT_BUILD_CMAKE_OPTS=""
+	echo "$(basename -a "$(git config --get remote.origin.url)") - \
+	$(git rev-parse --abbrev-ref HEAD) - \
+	$(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
 }
 
 install_packages() {
@@ -278,6 +284,11 @@ build_qwt() {
 		fi
 	fi
 
+	echo "$(basename -a "$(git config --get remote.origin.url)") - \
+	$(git rev-parse --abbrev-ref HEAD) - \
+	$(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
+
 	popd
 }
 
@@ -302,6 +313,12 @@ build_libsigrokdecode() {
 	if [ "$INSTALL" == "ON" ];then
 		if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
 	fi
+
+	echo "$(basename -a "$(git config --get remote.origin.url)") - \
+	$(git rev-parse --abbrev-ref HEAD) - \
+	$(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
+
 	popd
 }
 
@@ -327,6 +344,8 @@ build_iio-emu() {
 build_scopy() {
 	echo "### Building scopy"
 	pushd $SRC_DIR
+	[ -f /home/runner/build-status ] && cp /home/runner/build-status $SRC_DIR/build-status
+	[ $CI_SCRIPT ] && git config --global --add safe.directory $SRC_DIR
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DPYTHON_EXECUTABLE=/usr/bin/$PYTHON_VERSION
 		"
