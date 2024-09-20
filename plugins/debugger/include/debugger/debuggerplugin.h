@@ -21,7 +21,9 @@ class SCOPY_DEBUGGER_EXPORT DebuggerPlugin : public QObject, public PluginBase
 
 public:
 	friend class IIODebugPlugin_API;
+	void initPreferences() override;
 	bool compatible(QString m_param, QString category) override;
+	bool loadPreferencesPage() override;
 	bool loadPage() override;
 	bool loadIcon() override;
 	void loadToolList() override;
