@@ -22,9 +22,16 @@ install_packages() {
 	rm /usr/local/bin/python3-config || true
 
 	brew update
-	brew upgrade || true #ignore homebrew upgrade errors
+	# Workaround for brew taking a long time to upgrade existing packages
+	# Check if macOS version and upgrade packages only if the version is greater than 12
+	if (( $(echo "$(sw_vers -productVersion) > 12.0" | bc -1) )); then
+		brew upgrade --display-times || true #ignore homebrew upgrade errors
+		brew install --display-times $PACKAGES
+	else
+		HOMEBREW_NO_AUTO_UPDATE=1 brew install --display-times $PACKAGES
+	fi
+
 	brew search ${QT_FORMULAE}
-	brew install --display-times $PACKAGES
 	for pkg in gcc bison gettext cmake python; do
 		brew link --overwrite --force $pkg
 	done
