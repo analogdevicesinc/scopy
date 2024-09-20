@@ -37,6 +37,7 @@ public:
 public Q_SLOTS:
 	void deviceConnected(QString id);
 	void deviceDisconnected(QString id);
+	void onDisplayNameChanged(QString id, QString devName);
 
 Q_SIGNALS:
 	void requestToolSelect(QString id);
