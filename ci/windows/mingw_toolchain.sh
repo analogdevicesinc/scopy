@@ -4,7 +4,7 @@ set -ex
 # get the full directory path of the script
 export WORKFOLDER=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-BUILD_STATUS_FILE=$HOME/scopy-mingw-build-status
+BUILD_STATUS_FILE=$WORKFOLDER/build-status
 
 LIBSERIALPORT_BRANCH=scopy-v2
 LIBIIO_VERSION=libiio-v0

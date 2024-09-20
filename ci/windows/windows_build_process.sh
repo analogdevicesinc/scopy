@@ -85,13 +85,14 @@ create_build_status_file() {
 	touch $BUILD_STATUS_FILE
 	echo "Scopy2-MinGW" >> $BUILD_STATUS_FILE
 	echo "Docker image built on $(date)" >> $BUILD_STATUS_FILE
-	echo "Deps installed using pacman"
+	echo "Deps installed using pacman" >> $BUILD_STATUS_FILE
 	echo "" >> $BUILD_STATUS_FILE
-# 	echo "pacman -r $STAGING_AREA --noconfirm -Qe output - all explicitly installed packages on build machine" >> $BUILD_STATUS_FILE
-# 	pacman -r $STAGING_DIR --noconfirm -Qe >> $BUILD_STATUS_FILE
-# 	echo "pacman -Qm output - all packages from nonsync sources" >> $BUILD_STATUS_FILE
-# 	pacman -r $STAGING_DIR --noconfirm -Qm >> $BUILD_STATUS_FILE
-# 	echo "" >> $BUILD_STATUS_FILE
+	echo "All explicitly installed packages on build machine" >> $BUILD_STATUS_FILE
+	echo "" >> $BUILD_STATUS_FILE
+	pacman --noconfirm -Qe >> $BUILD_STATUS_FILE
+	echo "" >> $BUILD_STATUS_FILE
+	echo "Deps built from sources" >> $BUILD_STATUS_FILE
+	echo "" >> $BUILD_STATUS_FILE
 }
 
 clean_build_dir() {
@@ -117,13 +118,14 @@ build_with_cmake() {
 		make install
 	fi
 	eval $CURRENT_BUILD_POST_MAKE
-	echo "$CURRENT_BUILD - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
-	popd
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
 
 	#clean deps folder
 	if [ "$INSTALL" == "ON" ] && [ "$CI_SCRIPT" == "ON" ];then
 		git clean -xdf
 	fi
+
+	popd
 
 	# clear vars
 	CURRENT_BUILD_CMAKE_OPTS=""
@@ -152,7 +154,7 @@ build_libserialport(){
 		git clean -xdf
 	fi
 
-	echo "$CURRENT_BUILD - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
 	popd
 }
 
@@ -307,7 +309,7 @@ EOF
 		git clean -xdf
 	fi
 
-	echo "$CURRENT_BUILD - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
 	popd
 }
 
@@ -341,7 +343,7 @@ build_libsigrokdecode() {
 		git clean -xdf
 	fi
 
-	echo "$CURRENT_BUILD - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
 	popd
 }
 

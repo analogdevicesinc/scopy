@@ -17,23 +17,17 @@ ARCH_BIT=64
 USE_STAGING=OFF
 ##
 
-source $SRC_FOLDER/ci/windows/mingw_toolchain.sh $USE_STAGING
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source $SCRIPT_DIR/mingw_toolchain.sh $USE_STAGING
 
 BUILD_FOLDER=$WORKDIR/build_$ARCH
 ARTIFACT_FOLDER=$SRC_FOLDER/artifacts
 export DEST_FOLDER=$ARTIFACT_FOLDER/scopy-$ARCH # the export is needed for the packaging step
 DEBUG_FOLDER=$ARTIFACT_FOLDER/debug-$ARCH
 PYTHON_FILES=$STAGING_DIR/lib/python3.*
-DLL_DEPS=$(cat $SRC_FOLDER/ci/windows/mingw_dll_deps)
 EMU_BUILD_FOLDER=$WORKDIR/iio-emu/build
 REGMAP_XMLS=$BUILD_FOLDER/plugins/plugins/regmap/xmls
 
-# Generate build status info for the about page
-
-# to be added back later
-# cp $BUILD_STATUS_FILE $SRC_FOLDER/build-status
-
-pacman -Qe >> $SRC_FOLDER/build-status
 
 download_tools() {
 	mkdir -p $STAGING_AREA
@@ -66,6 +60,7 @@ download_tools() {
 
 build_scopy(){
 	echo "### Building Scopy"
+	[ -f $HOME/build-status ] && cp $HOME/build-status $SRC_FOLDER/build-status
 	mkdir -p $BUILD_FOLDER
 	cd $BUILD_FOLDER
 	$CMAKE $RC_COMPILER_OPT -DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe \
@@ -85,6 +80,10 @@ build_iio-emu(){
 	cd $EMU_BUILD_FOLDER
 	$CMAKE -DBUILD_TOOLS=ON ../
 	$MAKE_BIN $JOBS
+
+	pushd $WORKDIR/iio-emu
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
+	popd
 }
 
 deploy_app(){
@@ -104,6 +103,7 @@ deploy_app(){
 	cp -r $STAGING_DIR/share/libsigrokdecode/decoders  $DEST_FOLDER/
 
 	pushd $STAGING_DIR/bin
+	DLL_DEPS=$(cat $SRC_FOLDER/ci/windows/mingw_dll_deps)
 	cp -n $DLL_DEPS $DEST_FOLDER/
 	cp -n iio_*.exe $DEST_FOLDER/
 	popd
@@ -158,8 +158,12 @@ create_installer() {
 	if [ "$CI_SCRIPT" == "ON" ]; then
 		mv $WORKDIR/scopy-$ARCH_BIT-setup.exe $ARTIFACT_FOLDER
 		zip scopy-$ARCH_BIT-setup.zip scopy-$ARCH_BIT-setup.exe
-		zip -r debug-x86_64.zip $DEBUG_FOLDER
-		zip -r scopy-x86_64.zip $DEST_FOLDER
+		pushd $DEBUG_FOLDER
+		zip -r $ARTIFACT_FOLDER/debug-x86_64.zip .
+		popd
+		pushd $DEST_FOLDER
+		zip -r $ARTIFACT_FOLDER/scopy-x86_64.zip .
+		popd
 	else
 		mv $WORKDIR/scopy-$ARCH_BIT-setup.exe $ARTIFACT_FOLDER
 	fi
