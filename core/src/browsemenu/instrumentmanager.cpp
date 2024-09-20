@@ -262,3 +262,9 @@ void InstrumentManager::deviceDisconnected(QString id)
 		hideMenuItem(id);
 	}
 }
+
+void InstrumentManager::onDisplayNameChanged(QString id, QString devName)
+{
+	m_devInfoMap[id].name = devName;
+	m_itemMap[id]->collapseSection()->setTitle(devName);
+}

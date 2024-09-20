@@ -111,18 +111,18 @@ qproperty-alignment: AlignCenter;
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="name">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <widget class="QLineEdit" name="name">
+        <property name="autoFillBackground">
+         <bool>false</bool>
         </property>
-        <property name="styleSheet">
-         <string notr="true"/>
+        <property name="frame">
+         <bool>false</bool>
         </property>
-        <property name="text">
-         <string/>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
