@@ -31,6 +31,7 @@ public:
 Q_SIGNALS:
 	void requestDevice(QString id, int direction);
 	void requestRemoveDevice(QString id);
+	void displayNameChanged(QString id, QString newName);
 
 public Q_SLOTS:
 
