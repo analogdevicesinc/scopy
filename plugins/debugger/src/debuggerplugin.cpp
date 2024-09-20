@@ -16,6 +16,8 @@
 #include <core/detachedtoolwindowmanager.h>
 #include <iioutil/connectionprovider.h>
 #include <pluginbase/preferences.h>
+#include <gui/infopage.h>
+#include <gui/deviceinfopage.h>
 
 using namespace scopy;
 using namespace scopy::debugger;
@@ -135,7 +137,14 @@ bool DebuggerPlugin::loadPage()
 {
 	m_page = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_page);
-	lay->addWidget(new QLabel("IIO Debugger plugin", m_page));
+
+	ConnectionProvider *c = ConnectionProvider::GetInstance();
+	Connection *conn = c->open(m_param);
+	auto deviceInfoPage = new DeviceInfoPage(conn);
+	lay->addWidget(deviceInfoPage);
+	lay->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
+	c->close(m_param);
+
 	return true;
 }
 
