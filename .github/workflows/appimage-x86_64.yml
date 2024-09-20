@@ -11,7 +11,7 @@ jobs:
   build_scopy_x86-64_appimage:
     runs-on: ubuntu-20.04
     container:
-        image: cristianbindea/scopy2-x86_64-appimage:latest
+        image: cristianbindea/scopy2-x86_64-appimage:testing
         options: --user root
 
     steps:

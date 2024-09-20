@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Pull the Docker Image
-      run: docker pull cristianbindea/scopy2-mingw64:latest
+      run: docker pull cristianbindea/scopy2-mingw64:testing
       
     - name: Run Docker Image
       shell: cmd
@@ -44,7 +44,7 @@ jobs:
                 -e GITHUB_RUN_NUMBER=%GITHUB_RUN_NUMBER% ^
                 -e RUNNER_ARCH=%RUNNER_ARCH% ^
                 -e CI_SCRIPT=ON ^
-                cristianbindea/scopy2-mingw64:latest C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/ci/windows/build_and_create_installer.sh run_workflow'
+                cristianbindea/scopy2-mingw64:testing C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/ci/windows/build_and_create_installer.sh run_workflow'
 
     - name: Set short git commit SHA
       shell: bash
