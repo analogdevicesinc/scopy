@@ -24,8 +24,13 @@ RUN echo "${USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-$USER && \
 USER $USER
 WORKDIR /home/${USER}/scripts
 COPY x86-64_appimage_process.sh .
-RUN ./x86-64_appimage_process.sh download_tools configure_system
-RUN mv /home/${USER}/scripts/staging /home/${USER}/staging
+
+RUN ./x86-64_appimage_process.sh configure_system
+RUN rm -rf /home/${USER}/scripts/staging
+RUN ./x86-64_appimage_process.sh download_tools
+RUN mv /home/${USER}/scripts/staging /home/${USER}/staging && \
+	mv /home/${USER}/scripts/build-status /home/${USER}
+
 
 ENV CI_SCRIPT=ON
 WORKDIR /home/${USER}
