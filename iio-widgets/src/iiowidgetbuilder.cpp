@@ -29,6 +29,7 @@
 #include "datastrategy/cmdqdeviceattrdatastrategy.h"
 #include "guistrategy/comboguistrategy.h"
 #include "guistrategy/rangeguistrategy.h"
+#include <pluginbase/preferences.h>
 #include <iioutil/connectionprovider.h>
 #include <QLoggingCategory>
 
@@ -40,6 +41,7 @@ IIOWidgetBuilder::IIOWidgetBuilder(QObject *parent)
 	: QObject(parent)
 	, m_connection(nullptr)
 	, m_isCompact(false)
+	, m_includeDebugAttrs(Preferences::get("debugger_v2_include_debugfs").toBool())
 	, m_context(nullptr)
 	, m_device(nullptr)
 	, m_channel(nullptr)
@@ -143,6 +145,34 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 			m_attribute = "";
 			m_optionsAttribute = "";
 		}
+
+		if(m_includeDebugAttrs) {
+			attrCount = iio_device_get_debug_attrs_count(m_device);
+			for(ssize_t i = 0; i < attrCount; ++i) {
+				attrName = iio_device_get_debug_attr(m_device, i);
+
+				if(!attrName) {
+					qWarning(CAT_ATTRBUILDER)
+						<< "Could not read the device DEBUG attribute name with index" << i;
+					continue;
+				}
+
+				m_attribute = attrName;
+				if(QString(attrName).endsWith("_available")) {
+					continue;
+				}
+
+				availableAttr = iio_device_find_debug_attr(
+					m_device, (QString(attrName) + "_available").toStdString().c_str());
+				if(availableAttr) {
+					m_optionsAttribute = availableAttr;
+				}
+
+				result.append(buildSingle());
+				m_attribute = "";
+				m_optionsAttribute = "";
+			}
+		}
 	} else if(m_context) {
 		attrCount = iio_context_get_attrs_count(m_context);
 		for(ssize_t i = 0; i < attrCount; ++i) {
@@ -196,6 +226,12 @@ IIOWidgetBuilder &IIOWidgetBuilder::connection(Connection *connection)
 IIOWidgetBuilder &IIOWidgetBuilder::compactMode(bool isCompact)
 {
 	m_isCompact = isCompact;
+	return *this;
+}
+
+IIOWidgetBuilder &IIOWidgetBuilder::includeDebugAttributes(bool isIncluded)
+{
+	m_includeDebugAttrs = isIncluded;
 	return *this;
 }
 
