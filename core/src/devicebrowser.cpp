@@ -189,7 +189,13 @@ void DeviceBrowser::disconnectDevice(QString id)
 	w->setConnected(false);
 }
 
-DeviceIcon *DeviceBrowser::buildDeviceIcon(Device *d, QWidget *parent) { return new DeviceIconImpl(d, parent); }
+DeviceIcon *DeviceBrowser::buildDeviceIcon(Device *d, QWidget *parent)
+{
+	DeviceIconImpl *devIcon = new DeviceIconImpl(d, parent);
+	connect(devIcon, &DeviceIconImpl::displayNameChanged, this,
+		[this, d](QString newName) { Q_EMIT displayNameChanged(d->id(), newName); });
+	return devIcon;
+}
 
 /*
    auto &&is = ui->wInfoPageStack;

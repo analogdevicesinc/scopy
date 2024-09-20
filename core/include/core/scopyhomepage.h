@@ -30,6 +30,8 @@ Q_SIGNALS:
 	void deviceAddedToUi(QString id);
 	void newDeviceAvailable(DeviceImpl *d);
 
+	void displayNameChanged(QString id, QString newName);
+
 public Q_SLOTS:
 	void addDevice(QString id, Device *);
 	void removeDevice(QString id);

@@ -256,3 +256,9 @@ void InstrumentManager::deviceConnected(QString id)
 }
 
 void InstrumentManager::deviceDisconnected(QString id) { m_connectedDev.removeAll(id); }
+
+void InstrumentManager::onDisplayNameChanged(QString id, QString devName)
+{
+	m_devInfoMap[id].name = devName;
+	m_itemMap[id]->collapseSection()->setTitle(devName);
+}

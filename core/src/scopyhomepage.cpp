@@ -32,6 +32,8 @@ ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
 	connect(add, SIGNAL(requestAddDevice(QString, QString)), this, SIGNAL(requestAddDevice(QString, QString)));
 	connect(add, &ScopyHomeAddPage::requestDevice, this, [=](QString id) { Q_EMIT db->requestDevice(id, -1); });
 	connect(add, &ScopyHomeAddPage::newDeviceAvailable, this, [=](DeviceImpl *d) { Q_EMIT newDeviceAvailable(d); });
+
+	connect(db, &DeviceBrowser::displayNameChanged, this, &ScopyHomePage::displayNameChanged);
 }
 
 ScopyHomePage::~ScopyHomePage() { delete ui; }

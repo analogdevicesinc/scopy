@@ -25,8 +25,16 @@ public:
 	~DeviceIconImpl();
 public Q_SLOTS:
 	void setConnected(bool) override;
+Q_SIGNALS:
+	void displayNameChanged(QString newName);
+
+private Q_SLOTS:
+	void onPenBtnPressed();
+	void onEditFinished();
 
 private:
+	void createPenBtn();
+
 	Ui::DeviceButton *ui;
 };
 } // namespace scopy
