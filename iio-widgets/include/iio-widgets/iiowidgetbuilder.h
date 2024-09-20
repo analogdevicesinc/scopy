@@ -91,6 +91,14 @@ public:
 	IIOWidgetBuilder &compactMode(bool isCompact);
 
 	/**
+	 * @brief includeDebugAttributes If set to true, the buildAll function will
+	 * also include the debugfs attributes when creating the IIOWidgets.
+	 * @param isIncluded Default value is false.
+	 * @return
+	 */
+	IIOWidgetBuilder &includeDebugAttributes(bool isIncluded);
+
+	/**
 	 * @brief Sets the context that will be used, if no iio_device or iio_channel
 	 * is set, the build functions will work with the context.
 	 * @param context
@@ -161,6 +169,7 @@ private:
 
 	Connection *m_connection;
 	bool m_isCompact;
+	bool m_includeDebugAttrs;
 	struct iio_context *m_context;
 	struct iio_device *m_device;
 	struct iio_channel *m_channel;

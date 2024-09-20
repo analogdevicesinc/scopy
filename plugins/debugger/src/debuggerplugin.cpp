@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QLoggingCategory>
 #include <QVBoxLayout>
+#include <preferenceshelper.h>
 
 #include <core/detachedtoolwindow.h>
 #include <core/detachedtoolwindowmanager.h>
@@ -22,6 +23,13 @@ using namespace scopy::debugger;
 Q_LOGGING_CATEGORY(CAT_DEBUGGERPLUGIN, "DEBUGGERPLUGIN");
 Q_LOGGING_CATEGORY(CAT_BENCHMARK, "Benchmark");
 
+void DebuggerPlugin::initPreferences()
+{
+	Preferences *p = Preferences::GetInstance();
+	p->init("debugger_v2_include_debugfs", true);
+	p->init("plugins_use_debugger_v2", true);
+}
+
 bool DebuggerPlugin::compatible(QString m_param, QString category)
 {
 	bool ret = true;
@@ -32,6 +40,31 @@ bool DebuggerPlugin::compatible(QString m_param, QString category)
 	}
 	ConnectionProvider::close(m_param);
 	return ret;
+}
+
+bool DebuggerPlugin::loadPreferencesPage()
+{
+	Preferences *p = Preferences::GetInstance();
+
+	m_preferencesPage = new QWidget();
+	QVBoxLayout *layout = new QVBoxLayout(m_preferencesPage);
+
+	MenuSectionCollapseWidget *generalSection =
+		new MenuSectionCollapseWidget("General", MenuCollapseSection::MHCW_NONE);
+	generalSection->contentLayout()->setSpacing(10);
+	layout->addWidget(generalSection);
+	layout->setSpacing(0);
+	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	auto use_debugger_v2 = PreferencesHelper::addPreferenceCheckBox(p, "plugins_use_debugger_v2",
+									"Use Debugger V2 plugin", generalSection);
+	auto debugger_include_debugfs = PreferencesHelper::addPreferenceCheckBox(
+		p, "debugger_v2_include_debugfs", "Include debug attributes in IIO Explorer", generalSection);
+
+	generalSection->contentLayout()->addWidget(use_debugger_v2);
+	generalSection->contentLayout()->addWidget(debugger_include_debugfs);
+
+	return true;
 }
 
 void DebuggerPlugin::loadToolList()
