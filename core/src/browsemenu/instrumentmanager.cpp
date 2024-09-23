@@ -255,7 +255,13 @@ void InstrumentManager::deviceConnected(QString id)
 	showMenuItem(id);
 }
 
-void InstrumentManager::deviceDisconnected(QString id) { m_connectedDev.removeAll(id); }
+void InstrumentManager::deviceDisconnected(QString id)
+{
+	m_connectedDev.removeAll(id);
+	if(m_prevItem.compare(id) != 0) {
+		hideMenuItem(id);
+	}
+}
 
 void InstrumentManager::onDisplayNameChanged(QString id, QString devName)
 {
