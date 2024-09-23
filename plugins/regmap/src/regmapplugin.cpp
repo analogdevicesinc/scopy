@@ -218,10 +218,12 @@ bool RegmapPlugin::onDisconnect()
 	auto &&cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
 
-	for(auto &tool : m_toolList) {
-		tool->setEnabled(false);
-		tool->setRunning(false);
-		tool->setRunBtnVisible(false);
+	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+		tme->setEnabled(false);
+		tme->setRunBtnVisible(false);
+		tme->setRunning(false);
+		tme->tool()->deleteLater();
+		tme->setTool(nullptr);
 	}
 
 	Q_EMIT toolListChanged();
