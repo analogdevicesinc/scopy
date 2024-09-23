@@ -128,8 +128,8 @@ void MenuSpinbox::layoutHorizontally(bool left)
 
 	btnLay->setSpacing(2);
 	btnLay->setMargin(0);
-	editLay->setSpacing(5);
-	editLay->setMargin(0);
+	editLay->setSpacing(8);
+	editLay->setContentsMargins(0, 0, 5, 0);
 
 	btnLay->addWidget(m_minus);
 	btnLay->addWidget(m_plus);
@@ -155,6 +155,9 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	m_plus->setFixedSize(30, 30);
 	StyleHelper::SpinBoxDownButton(m_minus, "minus_btn");
 	m_minus->setFixedSize(30, 30);
+
+	m_edit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	m_scaleCb->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 }
 
 double MenuSpinbox::value() const { return m_value; }
