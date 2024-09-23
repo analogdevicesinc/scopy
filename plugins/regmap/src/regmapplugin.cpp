@@ -198,6 +198,14 @@ bool RegmapPlugin::onDisconnect()
 	auto &&cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
 
+	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+		tme->setEnabled(false);
+		tme->setRunBtnVisible(false);
+		tme->setRunning(false);
+		tme->tool()->deleteLater();
+		tme->setTool(nullptr);
+	}
+
 	if(m_registerMapWidget)
 		delete m_registerMapWidget;
 	if(m_deviceList)
