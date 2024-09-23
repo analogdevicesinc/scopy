@@ -345,11 +345,14 @@ void M2kPlugin::cleanup()
 		calib = nullptr;
 	}
 	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+		QWidget *tool = tme->tool();
 		tme->setEnabled(false);
 		tme->setRunBtnVisible(false);
 		tme->setRunning(false);
-		delete tme->tool();
 		tme->setTool(nullptr);
+		if(tool) {
+			delete tool;
+		}
 	}
 
 	disconnect(m_m2kController, SIGNAL(calibrationStarted()), this, SLOT(calibrationStarted()));
