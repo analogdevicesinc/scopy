@@ -14,7 +14,7 @@ jobs:
         image: cristianbindea/scopy2-ubuntu20:latest
         options: --user root
     steps:
-        - uses: actions/checkout@v3
+        - uses: actions/checkout@v4
         - name: Build Scopy
           run: |
             /bin/bash -c "git config --global --add safe.directory $GITHUB_WORKSPACE"
