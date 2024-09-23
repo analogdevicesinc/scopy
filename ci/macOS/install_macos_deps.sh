@@ -23,8 +23,8 @@ install_packages() {
 
 	brew update
 	# Workaround for brew taking a long time to upgrade existing packages
-	# Check if macOS version and upgrade packages only if the version is greater than 12
-	if (( $(echo "$(sw_vers -productVersion) > 12.0" | bc -1) )); then
+	# Check if macOS version and upgrade packages only if the version is greater than macOS 12
+	if (( $(echo "$(sw_vers -productVersion) > 13.0" | bc -l) )); then
 		brew upgrade --display-times || true #ignore homebrew upgrade errors
 		brew install --display-times $PACKAGES
 	else
