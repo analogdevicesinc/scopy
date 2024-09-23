@@ -7,7 +7,7 @@
 
     <title>Oscilloscope &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/style.min.css?v=434060ed" />
+    <link rel="stylesheet" type="text/css" href="../../_static/style.min.css?v=990931db" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
     <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
@@ -80,6 +80,7 @@
     <root>
   <a href="../../../documentation/index.html">System Level</a>
   <a href="../../../hdl/index.html">HDL</a>
+  <a href="../../../testbenches/index.html">HDL Testbenches</a>
   <a href="../../../pyadi-iio/index.html">Hardware Python Interfaces</a>
   <a href="../../../libiio/index.html">libiio</a>
   <a href="../../../no-OS/index.html">no-OS</a>
@@ -133,6 +134,7 @@ Content on this topic
   <root>
   <a href="../../../documentation/index.html">System Level</a>
   <a href="../../../hdl/index.html">HDL</a>
+  <a href="../../../testbenches/index.html">HDL Testbenches</a>
   <a href="../../../pyadi-iio/index.html">Hardware Python Interfaces</a>
   <a href="../../../libiio/index.html">libiio</a>
   <a href="../../../no-OS/index.html">no-OS</a>
@@ -201,7 +203,7 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="oscilloscope">
-<span id="id1"></span><h1>Oscilloscope<a class="headerlink" href="#oscilloscope" title="Link to this heading">¶</a></h1>
+<span id="id1"></span><h1>Oscilloscope<a class="headerlink" href="#oscilloscope" title="Link to this heading">#</a></h1>
 <p>The oscilloscope instrument consists of a central signal plot and a control
 panel with the settings for the different instrument options. The plot displays
 the waveforms that are captured on the available scope channels.</p>
@@ -222,7 +224,7 @@ when Scopy connects to an M2k device.</strong></p>
 <div class="line"><br /></div>
 </div>
 <section id="general">
-<h2>General<a class="headerlink" href="#general" title="Link to this heading">¶</a></h2>
+<h2>General<a class="headerlink" href="#general" title="Link to this heading">#</a></h2>
 <img alt="alternate text" class="align-right" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/oscilloscope/scopy_right_panel_settings.png" />
 <p>The control panel slides in and out from the right side of the screen and can
 be opened by pressing the button of any element from the right side of the
@@ -307,7 +309,7 @@ indicated by a filled-in circle and a channel that is off is indicated by an
 empty circle. Scope waveform colors correspond to the circle colors.</p>
 </section>
 <section id="setting-up-a-test-signal">
-<h2>Setting Up a Test Signal<a class="headerlink" href="#setting-up-a-test-signal" title="Link to this heading">¶</a></h2>
+<h2>Setting Up a Test Signal<a class="headerlink" href="#setting-up-a-test-signal" title="Link to this heading">#</a></h2>
 <p>A signal source is required in order to introduce basic oscilloscope operation,
 so we will use the Scopy two channel signal generator to generate sine waves to
 apply to the two oscilloscope channels. The oscilloscope has two balanced
@@ -337,7 +339,7 @@ selected under the numbers.</p>
 <img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/oscilloscope/sig-gen.png" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/oscilloscope/sig-gen.png" />
 </section>
 <section id="setting-the-horizontal-and-vertical-scales">
-<h2>Setting the Horizontal and Vertical Scales<a class="headerlink" href="#setting-the-horizontal-and-vertical-scales" title="Link to this heading">¶</a></h2>
+<h2>Setting the Horizontal and Vertical Scales<a class="headerlink" href="#setting-the-horizontal-and-vertical-scales" title="Link to this heading">#</a></h2>
 <p>Open the dual channel oscilloscope by clicking on the “Oscilloscope” name
 in the instrument menu. The oscilloscope initializes with both channels active
 so Channel 2 should be turned off in order to view Channel 1 only. Open the
@@ -361,7 +363,7 @@ the trigger is limited to 8k.</p>
 <img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/oscilloscope/osc-sig-2.png" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/oscilloscope/osc-sig-2.png" />
 </section>
 <section id="oscilloscope-triggering">
-<h2>Oscilloscope Triggering<a class="headerlink" href="#oscilloscope-triggering" title="Link to this heading">¶</a></h2>
+<h2>Oscilloscope Triggering<a class="headerlink" href="#oscilloscope-triggering" title="Link to this heading">#</a></h2>
 <p>Basic oscilloscope trigger settings are made by clicking on the “Trigger”
 menu, which appears as shown in the illustration below. For this example, we
 have configured the oscilloscope to trigger on the rising edge of the Channel 1
@@ -374,7 +376,7 @@ set for the channel used as a trigger source.</p>
 <img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/oscilloscope/osc-trigger.png" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/oscilloscope/osc-trigger.png" />
 </section>
 <section id="making-signal-measurements-using-cursors">
-<h2>Making Signal Measurements Using Cursors<a class="headerlink" href="#making-signal-measurements-using-cursors" title="Link to this heading">¶</a></h2>
+<h2>Making Signal Measurements Using Cursors<a class="headerlink" href="#making-signal-measurements-using-cursors" title="Link to this heading">#</a></h2>
 <p>Measurement cursors are available for the timebase and vertical scale, and are
 accessed by clicking on the “Cursors” control located in the lower right
 section of the Scopy display. The cursor menu is accessed by clicking on the
@@ -395,7 +397,7 @@ and horizontal cursors on.</p>
 <img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/oscilloscope/osc-cursors-sig.png" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/oscilloscope/osc-cursors-sig.png" />
 </section>
 <section id="using-built-in-signal-measurement-features">
-<h2>Using Built-In Signal Measurement Features<a class="headerlink" href="#using-built-in-signal-measurement-features" title="Link to this heading">¶</a></h2>
+<h2>Using Built-In Signal Measurement Features<a class="headerlink" href="#using-built-in-signal-measurement-features" title="Link to this heading">#</a></h2>
 <p>Mathematical calculations can be made by Scopy directly on the sampled data,
 and are accessed by clicking on the “Measure” control located in the lower
 right section of the Scopy display. The measurement menu is accessed by
@@ -412,7 +414,7 @@ following illustration.</p>
 <img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/oscilloscope/osc-measure.png" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/oscilloscope/osc-measure.png" />
 </section>
 <section id="working-with-math-channels">
-<h2>Working with Math Channels<a class="headerlink" href="#working-with-math-channels" title="Link to this heading">¶</a></h2>
+<h2>Working with Math Channels<a class="headerlink" href="#working-with-math-channels" title="Link to this heading">#</a></h2>
 <p>Math channels can be added to the instrument by clicking the plus(+) button
 located in the bottom menu bar, next to “Channel 2”. The opened menu will
 provide controls for adding Math channels and Reference Channels. If the Math
@@ -446,7 +448,7 @@ settings will be updated.</p>
 <img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/oscilloscope/osc-math-edit.png" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/oscilloscope/osc-math-edit.png" />
 </section>
 <section id="working-with-reference-channels">
-<h2>Working with Reference Channels<a class="headerlink" href="#working-with-reference-channels" title="Link to this heading">¶</a></h2>
+<h2>Working with Reference Channels<a class="headerlink" href="#working-with-reference-channels" title="Link to this heading">#</a></h2>
 <p>Using the same (+) button, described in the previous section, the Reference tab
 can be selected. This loads a configuration panel, which allows you to load a
 previously captured signal from a .csv file. After choosing the file, select
@@ -460,7 +462,7 @@ any time by clicking the X button next to the channel name.</p>
 <img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/oscilloscope/osc-ref.png" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/oscilloscope/osc-ref.png" />
 </section>
 <section id="working-with-mixed-signal-view">
-<h2>Working with Mixed Signal View<a class="headerlink" href="#working-with-mixed-signal-view" title="Link to this heading">¶</a></h2>
+<h2>Working with Mixed Signal View<a class="headerlink" href="#working-with-mixed-signal-view" title="Link to this heading">#</a></h2>
 <p>Using the same (+) button, described in the previous section, the Logic tab can
 be selected. Here there will be some information regarding how the Mixed Signal
 View will work and the option to enable it.</p>

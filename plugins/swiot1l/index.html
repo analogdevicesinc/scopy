@@ -7,7 +7,7 @@
 
     <title>AD-SWIOT1L-SL plugin &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/style.min.css?v=434060ed" />
+    <link rel="stylesheet" type="text/css" href="../../_static/style.min.css?v=990931db" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
     <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
@@ -80,6 +80,7 @@
     <root>
   <a href="../../../documentation/index.html">System Level</a>
   <a href="../../../hdl/index.html">HDL</a>
+  <a href="../../../testbenches/index.html">HDL Testbenches</a>
   <a href="../../../pyadi-iio/index.html">Hardware Python Interfaces</a>
   <a href="../../../libiio/index.html">libiio</a>
   <a href="../../../no-OS/index.html">no-OS</a>
@@ -130,6 +131,7 @@ Content on this topic
   <root>
   <a href="../../../documentation/index.html">System Level</a>
   <a href="../../../hdl/index.html">HDL</a>
+  <a href="../../../testbenches/index.html">HDL Testbenches</a>
   <a href="../../../pyadi-iio/index.html">Hardware Python Interfaces</a>
   <a href="../../../libiio/index.html">libiio</a>
   <a href="../../../no-OS/index.html">no-OS</a>
@@ -198,9 +200,9 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="ad-swiot1l-sl-plugin">
-<span id="swiot1l-index"></span><h1>AD-SWIOT1L-SL plugin<a class="headerlink" href="#ad-swiot1l-sl-plugin" title="Link to this heading">¶</a></h1>
+<span id="swiot1l-index"></span><h1>AD-SWIOT1L-SL plugin<a class="headerlink" href="#ad-swiot1l-sl-plugin" title="Link to this heading">#</a></h1>
 <section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
 <p>The Scopy <a class="reference external" href="https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/ad-swiot1l-sl.html">AD-SWIOT1L-SL</a> plugin is responsible with the operation and
 control of the AD-SWIOT1L-SL platform. The Scopy AD-SWIOT1L-SL
 plugin, while based on the Scopy application infrastructure, is tailored
@@ -219,7 +221,7 @@ links provided below.</p>
 </div>
 </section>
 <section id="software-setup">
-<h2>Software setup<a class="headerlink" href="#software-setup" title="Link to this heading">¶</a></h2>
+<h2>Software setup<a class="headerlink" href="#software-setup" title="Link to this heading">#</a></h2>
 <p><strong>Scopy for Windows</strong>
 <a class="reference external" href="https://swdownloads.analog.com/cse/ad-swiot1l-sl/scopy-alpha-swiot1l/scopy-alpha-windows-setup.zip">Download: Installer for latest release (Windows 64/32-bit); Updated: November
 2023</a></p>
@@ -232,7 +234,7 @@ links provided below.</p>
 <a class="reference external" href="https://swdownloads.analog.com/cse/ad-swiot1l-sl/scopy-prealpha-swiot1l/scopy-prealpha-macos.zip">Download: Scopy MacOS installer</a></p>
 </section>
 <section id="software-installation">
-<h2>Software installation<a class="headerlink" href="#software-installation" title="Link to this heading">¶</a></h2>
+<h2>Software installation<a class="headerlink" href="#software-installation" title="Link to this heading">#</a></h2>
 <p><strong>Windows</strong></p>
 <blockquote>
 <div><p>Once you downloaded the installer, run it and follow all the required steps.
@@ -257,7 +259,7 @@ for the process to finish.</p>
 </div>
 </section>
 <section id="launching-the-application">
-<h2>Launching the application<a class="headerlink" href="#launching-the-application" title="Link to this heading">¶</a></h2>
+<h2>Launching the application<a class="headerlink" href="#launching-the-application" title="Link to this heading">#</a></h2>
 <div class="embed-video"><video class="only-screen" controls="controls"><source src="https://github.com/analogdevicesinc/scopy/raw/doc_resources/resources/swiot1l/connect.mov" type="video/mp4"></source></video><span class="only-screen"></span><div class="admonition video only-print"><p class="admonition-title">Video</p>
 <p><a href="https://github.com/analogdevicesinc/scopy/raw/doc_resources/resources/swiot1l/connect.mov"><span>https://github.com/analogdevicesinc/scopy/raw/doc_resources/resources/swiot1l/connect.mov</span></a></p>
 </div></div><p>Scopy is able to control and operate multiple devices. In order to use
@@ -289,7 +291,7 @@ the SWIOT1L available instruments.</p>
 <p><a href="https://github.com/analogdevicesinc/scopy/raw/doc_resources/resources/swiot1l/tutorial-config.mov"><span>https://github.com/analogdevicesinc/scopy/raw/doc_resources/resources/swiot1l/tutorial-config.mov</span></a></p>
 </div></div></section>
 <section id="power-supply-options">
-<h2>Power Supply Options<a class="headerlink" href="#power-supply-options" title="Link to this heading">¶</a></h2>
+<h2>Power Supply Options<a class="headerlink" href="#power-supply-options" title="Link to this heading">#</a></h2>
 <img alt="https://github.com/analogdevicesinc/scopy/blob/doc_resources/resources/swiot1l/ps-warning.png?raw=true" class="align-center" src="https://github.com/analogdevicesinc/scopy/blob/doc_resources/resources/swiot1l/ps-warning.png?raw=true" />
 <p>This warning may appear in any of the instruments that interact with
 AD-SWIOT1L-SL. The user should check the external power supply switch
@@ -300,7 +302,7 @@ position and verify which option is used to power the system.</p>
 </div>
 </section>
 <section id="system-operation-modes">
-<h2>System operation modes<a class="headerlink" href="#system-operation-modes" title="Link to this heading">¶</a></h2>
+<h2>System operation modes<a class="headerlink" href="#system-operation-modes" title="Link to this heading">#</a></h2>
 <dl class="simple">
 <dt><strong>Configuration mode:</strong></dt><dd><p>When the system is powered up it will enter the Configuration
 mode. This mode allows the user to choose device and function

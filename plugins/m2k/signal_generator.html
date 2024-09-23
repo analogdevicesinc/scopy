@@ -7,7 +7,7 @@
 
     <title>Signal Generator &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/style.min.css?v=434060ed" />
+    <link rel="stylesheet" type="text/css" href="../../_static/style.min.css?v=990931db" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
     <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
@@ -80,6 +80,7 @@
     <root>
   <a href="../../../documentation/index.html">System Level</a>
   <a href="../../../hdl/index.html">HDL</a>
+  <a href="../../../testbenches/index.html">HDL Testbenches</a>
   <a href="../../../pyadi-iio/index.html">Hardware Python Interfaces</a>
   <a href="../../../libiio/index.html">libiio</a>
   <a href="../../../no-OS/index.html">no-OS</a>
@@ -133,6 +134,7 @@ Content on this topic
   <root>
   <a href="../../../documentation/index.html">System Level</a>
   <a href="../../../hdl/index.html">HDL</a>
+  <a href="../../../testbenches/index.html">HDL Testbenches</a>
   <a href="../../../pyadi-iio/index.html">Hardware Python Interfaces</a>
   <a href="../../../libiio/index.html">libiio</a>
   <a href="../../../no-OS/index.html">no-OS</a>
@@ -201,14 +203,14 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="signal-generator">
-<span id="id1"></span><h1>Signal Generator<a class="headerlink" href="#signal-generator" title="Link to this heading">¶</a></h1>
+<span id="id1"></span><h1>Signal Generator<a class="headerlink" href="#signal-generator" title="Link to this heading">#</a></h1>
 <blockquote>
 <div><p><strong>Video guide:</strong></p>
 </div></blockquote>
 <div class="iframe-video"><iframe class="only-screen" src="https://www.youtube-nocookie.com/embed/zWX7VnKDYq4"></iframe><span class="only-screen"></span><div class="admonition video only-print"><p class="admonition-title">Video</p>
 <p><a href="https://www.youtube.com/watch?v=zWX7VnKDYq4"><span>https://www.youtube.com/watch?v=zWX7VnKDYq4</span></a></p>
 </div></div><section id="general-description">
-<h2>General Description<a class="headerlink" href="#general-description" title="Link to this heading">¶</a></h2>
+<h2>General Description<a class="headerlink" href="#general-description" title="Link to this heading">#</a></h2>
 <img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/signalGenerator/scopy_2018-05-16_14-57-31.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/signalGenerator/scopy_2018-05-16_14-57-31.png" />
 <p>The signal generator instrument can be used to generate analog output from the
 M2K with user configurable parameters. It consists of 3 parts:</p>
@@ -273,10 +275,10 @@ buffer. This means that for cyclic waveforms the noise will be the same on each
 period.</p>
 </section>
 <section id="use-cases">
-<h2><strong>Use cases</strong><a class="headerlink" href="#use-cases" title="Link to this heading">¶</a></h2>
+<h2><strong>Use cases</strong><a class="headerlink" href="#use-cases" title="Link to this heading">#</a></h2>
 </section>
 <section id="create-loopback-between-ch1-and-ch2-of-the-oscilloscope-and-the-signal-generator">
-<h2><strong>Create loopback between CH1 and CH2 of the oscilloscope and the signal generator</strong><a class="headerlink" href="#create-loopback-between-ch1-and-ch2-of-the-oscilloscope-and-the-signal-generator" title="Link to this heading">¶</a></h2>
+<h2><strong>Create loopback between CH1 and CH2 of the oscilloscope and the signal generator</strong><a class="headerlink" href="#create-loopback-between-ch1-and-ch2-of-the-oscilloscope-and-the-signal-generator" title="Link to this heading">#</a></h2>
 <blockquote>
 <div><p>1.Disable channel 2</p>
 <p>2.Select sine wave with 5V amplitude and 10kHz</p>
@@ -289,7 +291,7 @@ period.</p>
 </div>
 </section>
 <section id="run-both-channels">
-<h2><strong>Run both channels</strong><a class="headerlink" href="#run-both-channels" title="Link to this heading">¶</a></h2>
+<h2><strong>Run both channels</strong><a class="headerlink" href="#run-both-channels" title="Link to this heading">#</a></h2>
 <blockquote>
 <div><p>1.Continue from previous testcase</p>
 <p>2.Enable channel 2 and select triangle wave with 5V amplitude and 20kHz</p>
@@ -302,7 +304,7 @@ period.</p>
 </div>
 </section>
 <section id="generate-square-waveform">
-<h2><strong>Generate square waveform</strong><a class="headerlink" href="#generate-square-waveform" title="Link to this heading">¶</a></h2>
+<h2><strong>Generate square waveform</strong><a class="headerlink" href="#generate-square-waveform" title="Link to this heading">#</a></h2>
 <blockquote>
 <div><p>1.Select square wave with 25% dutycycle</p>
 <p>2.Decrease noise amplitude to 200mV</p>
@@ -314,7 +316,7 @@ period.</p>
 </div>
 </section>
 <section id="generate-trapezoidal-waveform">
-<h2><strong>Generate trapezoidal waveform</strong><a class="headerlink" href="#generate-trapezoidal-waveform" title="Link to this heading">¶</a></h2>
+<h2><strong>Generate trapezoidal waveform</strong><a class="headerlink" href="#generate-trapezoidal-waveform" title="Link to this heading">#</a></h2>
 <blockquote>
 <div><p>1.Select trapezoidal waveform with 1ms rise/up/fall/low times</p>
 <p>2.Monitor oscilloscope</p>
@@ -325,7 +327,7 @@ period.</p>
 </div>
 </section>
 <section id="generate-waveform-from-wav-file">
-<h2><strong>Generate waveform from wav file</strong><a class="headerlink" href="#generate-waveform-from-wav-file" title="Link to this heading">¶</a></h2>
+<h2><strong>Generate waveform from wav file</strong><a class="headerlink" href="#generate-waveform-from-wav-file" title="Link to this heading">#</a></h2>
 <blockquote>
 <div><dl class="simple">
 <dt>1.Select buffer mode and select a wavefile. One can usually find a</dt><dd><p>suitable wavefile in C:WindowsMedia</p>
@@ -343,7 +345,7 @@ period.</p>
 </div>
 </section>
 <section id="generate-stairstep-waveform">
-<h2><strong>Generate stairstep waveform</strong><a class="headerlink" href="#generate-stairstep-waveform" title="Link to this heading">¶</a></h2>
+<h2><strong>Generate stairstep waveform</strong><a class="headerlink" href="#generate-stairstep-waveform" title="Link to this heading">#</a></h2>
 <blockquote>
 <div><dl class="simple">
 <dt>1.Select the stairstep csv file provided above</dt><dd><p><a class="reference external" href="https://gist.github.com/adisuciu/7aa30bc9e545db23a17e86d23ae4f53c">https://gist.github.com/adisuciu/7aa30bc9e545db23a17e86d23ae4f53c</a></p>
@@ -358,7 +360,7 @@ period.</p>
 </div>
 </section>
 <section id="generate-waveform-from-math-function">
-<h2><strong>Generate waveform from math function</strong><a class="headerlink" href="#generate-waveform-from-math-function" title="Link to this heading">¶</a></h2>
+<h2><strong>Generate waveform from math function</strong><a class="headerlink" href="#generate-waveform-from-math-function" title="Link to this heading">#</a></h2>
 <blockquote>
 <div><ol class="arabic simple">
 <li><p>Select Math mode and input a function such as

@@ -7,7 +7,7 @@
 
     <title>Datalogger &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/style.min.css?v=434060ed" />
+    <link rel="stylesheet" type="text/css" href="../../_static/style.min.css?v=990931db" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
     <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
@@ -80,6 +80,7 @@
     <root>
   <a href="../../../documentation/index.html">System Level</a>
   <a href="../../../hdl/index.html">HDL</a>
+  <a href="../../../testbenches/index.html">HDL Testbenches</a>
   <a href="../../../pyadi-iio/index.html">Hardware Python Interfaces</a>
   <a href="../../../libiio/index.html">libiio</a>
   <a href="../../../no-OS/index.html">no-OS</a>
@@ -131,6 +132,7 @@ Content on this topic
   <root>
   <a href="../../../documentation/index.html">System Level</a>
   <a href="../../../hdl/index.html">HDL</a>
+  <a href="../../../testbenches/index.html">HDL Testbenches</a>
   <a href="../../../pyadi-iio/index.html">Hardware Python Interfaces</a>
   <a href="../../../libiio/index.html">libiio</a>
   <a href="../../../no-OS/index.html">no-OS</a>
@@ -199,9 +201,9 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="datalogger">
-<span id="id1"></span><h1>Datalogger<a class="headerlink" href="#datalogger" title="Link to this heading">¶</a></h1>
+<span id="id1"></span><h1>Datalogger<a class="headerlink" href="#datalogger" title="Link to this heading">#</a></h1>
 <section id="general-description">
-<h2>General Description<a class="headerlink" href="#general-description" title="Link to this heading">¶</a></h2>
+<h2>General Description<a class="headerlink" href="#general-description" title="Link to this heading">#</a></h2>
 <p>The data logger tool is used to :</p>
 <blockquote>
 <div><ol class="arabic simple">
@@ -232,7 +234,7 @@ Content on this topic
 <img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/datalogger/datalogger5.PNG" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/datalogger/datalogger5.PNG" />
 </section>
 <section id="display-signals">
-<h2>Display Signals<a class="headerlink" href="#display-signals" title="Link to this heading">¶</a></h2>
+<h2>Display Signals<a class="headerlink" href="#display-signals" title="Link to this heading">#</a></h2>
 <p>Using the left side menu (1) user can select from the available device channels
 that will be displayed on the plot. The data is plotted in time based on the
 starting time (2), the starting time reflects when the tool started collecting
@@ -244,7 +246,7 @@ right</p>
 <img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/datalogger/datalogger1.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/datalogger/datalogger1.png" />
 </section>
 <section id="display-text">
-<h2>Display Text<a class="headerlink" href="#display-text" title="Link to this heading">¶</a></h2>
+<h2>Display Text<a class="headerlink" href="#display-text" title="Link to this heading">#</a></h2>
 <p>Using the left side menu user can select from the available devices, for the
 selected device channels last read value and the unit of measurement will be
 displayed in text format</p>
@@ -252,7 +254,7 @@ displayed in text format</p>
 <img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/datalogger/datalogger2.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/datalogger/datalogger2.png" />
 </section>
 <section id="display-seven-segment">
-<h2>Display Seven Segment<a class="headerlink" href="#display-seven-segment" title="Link to this heading">¶</a></h2>
+<h2>Display Seven Segment<a class="headerlink" href="#display-seven-segment" title="Link to this heading">#</a></h2>
 <p>Using the left side menu user can select from the available devices, for the
 selected device channels last read value, minimum and maximum recorded values
 and the unit of measurement will be displayed in seven segment display format</p>
@@ -261,7 +263,7 @@ and the unit of measurement will be displayed in seven segment display format</p
 </section>
 <hr class="docutils" />
 <section id="settings">
-<h2>Settings<a class="headerlink" href="#settings" title="Link to this heading">¶</a></h2>
+<h2>Settings<a class="headerlink" href="#settings" title="Link to this heading">#</a></h2>
 <p>The gear button in the top right corner of the plugin will open the settings
 allowing user to alter configurations as follow</p>
 <blockquote>
@@ -330,7 +332,7 @@ to a specified CSV file like the one bellow</p></li>
 <img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/datalogger/datalogger_settings_5.PNG" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/datalogger/datalogger_settings_5.PNG" />
 </section>
 <section id="save-data">
-<h2>Save data<a class="headerlink" href="#save-data" title="Link to this heading">¶</a></h2>
+<h2>Save data<a class="headerlink" href="#save-data" title="Link to this heading">#</a></h2>
 <p>To save data to file there are two options</p>
 <blockquote>
 <div><ol class="arabic simple">
@@ -342,7 +344,7 @@ all the recorded values of the enabled channels</p></li>
 </div></blockquote>
 </section>
 <section id="import-data">
-<h2>Import data<a class="headerlink" href="#import-data" title="Link to this heading">¶</a></h2>
+<h2>Import data<a class="headerlink" href="#import-data" title="Link to this heading">#</a></h2>
 <p>On importing data a special menu is added containing the channels from file.
 Each channel contains the data from the CSV file from it’s column, no extra
 data will be added to those channels when tool is recording. By pressing the
