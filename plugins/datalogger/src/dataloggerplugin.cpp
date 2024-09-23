@@ -118,7 +118,8 @@ bool DataLoggerPlugin::onDisconnect()
 
 	// This method is called when the disconnect button is pressed
 	// It must remove all connections that were established on the connection
-	for(auto &tool : m_toolList) {
+	while(!m_toolList.isEmpty()) {
+		ToolMenuEntry *tool = m_toolList.first();
 		tool->setEnabled(false);
 		tool->setRunning(false);
 		tool->setRunBtnVisible(false);
@@ -186,12 +187,12 @@ void DataLoggerPlugin::removeTool(QString toolId)
 	auto *tool = ToolMenuEntry::findToolMenuEntryById(m_toolList, toolId);
 	m_toolList.removeOne(tool);
 	QWidget *datamonitorTool = tool->tool();
+	tool->setTool(nullptr);
 	if(datamonitorTool) {
 		delete datamonitorTool;
 	}
 
 	Q_EMIT toolListChanged();
-
 	tool->deleteLater();
 }
 
