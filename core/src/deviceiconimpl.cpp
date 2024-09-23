@@ -43,7 +43,13 @@ void DeviceIconImpl::createPenBtn()
 {
 	QPushButton *penBtn = new QPushButton();
 	penBtn->setMaximumSize(20, 20);
-	penBtn->setIcon(QIcon(":/gui/icons/edit_pen.svg"));
+	penBtn->setStyleSheet("QPushButton {"
+			      "background-color: transparent;"
+			      "border: 0px;"
+			      "}"
+			      "QPushButton:hover {"
+			      "border-image: url(:/gui/icons/edit_pen.svg);"
+			      "}");
 	connect(penBtn, &QPushButton::clicked, this, &DeviceIconImpl::onPenBtnPressed);
 	HoverWidget *penHover = new HoverWidget(penBtn, ui->name, this);
 	penHover->setStyleSheet("background-color: transparent; border: 0px;");
