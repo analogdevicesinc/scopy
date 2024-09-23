@@ -97,6 +97,7 @@ void InstrumentManager::updateTool(QWidget *old)
 	QWidget *tool = tme->tool();
 
 	if(old != nullptr) { // we had a widget
+		saveToolAttachedState(tme);
 		if(m_ts->contains(id)) {
 			m_ts->remove(id);
 		}
