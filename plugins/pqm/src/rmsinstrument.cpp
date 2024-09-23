@@ -9,6 +9,7 @@
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/tooltemplate.h>
 #include <QLoggingCategory>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_PQM_RMS, "PqmRms")
 
@@ -38,7 +39,7 @@ RmsInstrument::RmsInstrument(QWidget *parent)
 	voltageWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *voltageLayout = new QVBoxLayout();
 	voltageWidget->setLayout(voltageLayout);
-	voltageWidget->setStyleSheet("background-color:" + StyleHelper::getColor("UIElementBackground"));
+	voltageWidget->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
 
 	MeasurementsPanel *voltagePanel = new MeasurementsPanel(this);
 	createLabels(voltagePanel, m_chnls["voltage"].values(),
@@ -55,7 +56,7 @@ RmsInstrument::RmsInstrument(QWidget *parent)
 	currentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *currentLayout = new QVBoxLayout();
 	currentWidget->setLayout(currentLayout);
-	currentWidget->setStyleSheet("background-color:" + StyleHelper::getColor("UIElementBackground"));
+	currentWidget->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
 
 	MeasurementsPanel *currentPanel = new MeasurementsPanel(this);
 	createLabels(currentPanel, m_chnls["current"].values(), {"RMS", "Angle"});
@@ -134,7 +135,7 @@ void RmsInstrument::updateLabels()
 
 void RmsInstrument::initPlot(PolarPlotWidget *plot)
 {
-	plot->setBgColor(QColor(StyleHelper::getColor("ScopyBackground")));
+	plot->setBgColor(QColor(Style::getAttribute(json::theme::background_primary)));
 	plot->setAzimuthInterval(0.0, 360.0, 30.0);
 	plot->plot()->insertLegend(new QwtLegend(), QwtPolarPlot::LeftLegend);
 }

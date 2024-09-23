@@ -8,6 +8,7 @@
 #include <menus/logdatatofile.hpp>
 #include <menucontrolbutton.h>
 #include <datamonitor/sevensegmentdisplay.hpp>
+#include <style.h>
 #include <timemanager.hpp>
 #include <tutorialbuilder.h>
 #include "datamonitorstylehelper.hpp"
@@ -139,7 +140,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	////////////////////////settings //////////////
 	m_dataMonitorSettings = new DataMonitorSettings(m_monitorPlot, isDeletable);
 	// TODO GET SETTINGS NAME FROM UTILS
-	m_dataMonitorSettings->init("DataMonitor", StyleHelper::getColor("ScopyBlue"));
+	m_dataMonitorSettings->init("DataMonitor", Style::getAttribute(json::theme::interactive_primary_idle));
 
 	tool->rightStack()->add(DataMonitorUtils::getToolSettingsId(), m_dataMonitorSettings);
 

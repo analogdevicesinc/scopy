@@ -162,10 +162,10 @@ void SettingsInstrument::initConfigSection(QWidget *parent)
 	readLoadingIcon->setFileName(":/gui/loading.gif");
 	readLoadingIcon->setScaledSize(QSize(20, 20));
 	configReadBtn->setAnimation(readLoadingIcon);
-	StyleHelper::BlueButton(configReadBtn, "configRead");
+	StyleHelper::BasicButton(configReadBtn, "configRead");
 	QPushButton *configSetBtn = new QPushButton("Set");
 	configSetBtn->setFixedWidth(88);
-	StyleHelper::BlueButton(configSetBtn, "configSet");
+	StyleHelper::BasicButton(configSetBtn, "configSet");
 	configBtns->layout()->addWidget(configReadBtn);
 	configBtns->layout()->addWidget(configSetBtn);
 	configBtns->layout()->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
@@ -193,7 +193,7 @@ void SettingsInstrument::initSystemTimeSection(QWidget *parent)
 	systemTimeEdit->setDisplayFormat("dd:MM:yyyy hh:mm:ss.zzz");
 	QPushButton *systemTimeBtn = new QPushButton("Set", systemTimeSection);
 	systemTimeBtn->setFixedWidth(88);
-	StyleHelper::BlueButton(systemTimeBtn, "systemTimeBtn");
+	StyleHelper::BasicButton(systemTimeBtn, "systemTimeBtn");
 
 	systemTimeSection->contentLayout()->addWidget(systemTimeEdit);
 	systemTimeSection->contentLayout()->addWidget(systemTimeBtn);
@@ -214,7 +214,7 @@ void SettingsInstrument::initTimestampSection(QWidget *parent)
 
 	QPushButton *startLogBtn = new QPushButton("Start", timestampSection);
 	startLogBtn->setFixedWidth(88);
-	StyleHelper::BlueButton(startLogBtn, "startLogBtn");
+	StyleHelper::BasicButton(startLogBtn, "startLogBtn");
 	startLogBtn->setCheckable(true);
 	connect(startLogBtn, &QPushButton::clicked, this, [this, startLogBtn](bool checked) {
 		m_pqmAttr[DEVICE_NAME]["start_logging"] = QString::number(checked);
@@ -249,7 +249,7 @@ void SettingsInstrument::initTimestampSection(QWidget *parent)
 
 	QPushButton *timestampBtn = new QPushButton("Set interval", timestampSection);
 	timestampBtn->setFixedWidth(88);
-	StyleHelper::BlueButton(timestampBtn, "timestampBtn");
+	StyleHelper::BasicButton(timestampBtn, "timestampBtn");
 	connect(timestampBtn, &QPushButton::clicked, this, [this, timestampEdit1, timestampEdit2]() {
 		setDateTimeAttr(timestampEdit1->dateTime(), LOG_START_ATTR);
 		setDateTimeAttr(timestampEdit2->dateTime(), LOG_STOP_ATTR);
@@ -278,7 +278,7 @@ void SettingsInstrument::initCalibSection(QWidget *parent)
 
 	QPushButton *calibrateBtn = new QPushButton("Calibrate", calibrateSection);
 	calibrateBtn->setFixedWidth(88);
-	StyleHelper::BlueButton(calibrateBtn, "calibrateBtn");
+	StyleHelper::BasicButton(calibrateBtn, "calibrateBtn");
 	calibrateSection->contentLayout()->addWidget(calibrateBtn);
 
 	parent->layout()->addWidget(calibrateSection);

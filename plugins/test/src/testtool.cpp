@@ -291,7 +291,7 @@ QWidget *TestTool::createMenu(QWidget *parent)
 	lay->addSpacerItem(new QSpacerItem(40, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	QPushButton *btn = new QPushButton("TESTBtn");
-	StyleHelper::BlueButton(btn, "TestBtn");
+	StyleHelper::BasicButton(btn, "TestBtn");
 	vdiv->contentLayout()->addWidget(btn);
 	vdiv->contentLayout()->setSpacing(4);
 

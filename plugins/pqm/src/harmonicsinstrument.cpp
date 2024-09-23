@@ -7,6 +7,7 @@
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/widgets/menucontrolbutton.h>
+#include <style.h>
 
 using namespace scopy::pqm;
 
@@ -174,7 +175,7 @@ QWidget *HarmonicsInstrument::createSettingsMenu()
 	QWidget *menu = new QWidget(this);
 	menu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	menu->setFixedWidth(185);
-	menu->setStyleSheet("background-color:" + StyleHelper::getColor("UIElementBackground"));
+	menu->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
 
 	QVBoxLayout *lay = new QVBoxLayout(menu);
 	MenuCombo *harmonicType = new MenuCombo(tr("Harmonics Type"), this);

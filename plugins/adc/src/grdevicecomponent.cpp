@@ -5,6 +5,7 @@
 #include <widgets/menuheader.h>
 #include <iio-widgets/iiowidget.h>
 #include <iio-widgets/iiowidgetbuilder.h>
+#include <style.h>
 
 using namespace scopy;
 using namespace scopy::adc;
@@ -17,7 +18,7 @@ GRDeviceComponent::GRDeviceComponent(GRIIODeviceSourceNode *node, QWidget *paren
 {
 	m_node = node;
 	name = node->name();
-	m_pen = QPen(StyleHelper::getColor("ScopyBlue"));
+	m_pen = QPen(Style::getAttribute(json::theme::interactive_primary_idle));
 	m_src = node->src();
 	// connect(this, &GRDeviceAddon::updateBufferSize, this, &GRDeviceAddon::setBufferSize);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

@@ -6,7 +6,7 @@
 #include <QwtPlotScaleItem>
 #include <QwtScaleDiv>
 #include <qwt_scale_widget.h>
-#include <stylehelper.h>
+#include <style.h>
 
 #include <pluginbase/preferences.h>
 
@@ -15,7 +15,7 @@ using namespace scopy;
 PlotScales::PlotScales(PlotWidget *plot)
 	: QObject(plot)
 	, m_plot(plot)
-	, m_color(StyleHelper::GetInstance()->getColor("SH_disabled"))
+	, m_color(Style::getAttribute(json::theme::interactive_subtle_disabled))
 {
 	initGrid();
 	initGraticule();

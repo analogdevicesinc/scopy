@@ -128,7 +128,7 @@ QWidget *GRTimeChannelAddon::createYAxisMenu(QWidget *parent)
 QPushButton *GRTimeChannelAddon::createSnapshotButton(QWidget *parent)
 {
 	QPushButton *snapBtn = new QPushButton("Snapshot", parent);
-	StyleHelper::BlueButton(snapBtn);
+	StyleHelper::BasicButton(snapBtn);
 
 	connect(snapBtn, &QPushButton::clicked, this, [=]() {
 		std::vector<float> x, y;
@@ -458,7 +458,7 @@ QWidget *ImportChannelAddon::createYAxisMenu(QWidget *parent)
 QPushButton *ImportChannelAddon::createForgetButton(QWidget *parent)
 {
 	QPushButton *btn = new QPushButton("Delete", parent);
-	StyleHelper::BlueButton(btn);
+	StyleHelper::BasicButton(btn);
 
 	connect(btn, &QPushButton::clicked, this, [=]() { Q_EMIT requestDeleteChannel(this); });
 
