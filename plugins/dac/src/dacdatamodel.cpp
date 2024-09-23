@@ -306,7 +306,9 @@ void DacDataModel::push()
 
 	m_buffer = iio_device_create_buffer(m_dev, m_buffersize, m_cyclicBuffer);
 	if(!m_buffer) {
-		qDebug(CAT_DAC_DATA) << "Unable to create buffer: %s\n" << strerror(errno);
+		QString logMsg = QString("Unable to create buffer: %1").arg(strerror(errno));
+		qDebug(CAT_DAC_DATA) << logMsg;
+		Q_EMIT log(logMsg);
 		return;
 	}
 
