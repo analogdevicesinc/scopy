@@ -14,8 +14,7 @@ jobs:
         image: cristianbindea/scopy2-ubuntu22:latest
         options: --user root
     steps:
-        - uses: actions/checkout@v3
-
+        - uses: actions/checkout@v4
         - name: Build Scopy
           run: |
             git config --global --add safe.directory $GITHUB_WORKSPACE
@@ -28,7 +27,7 @@ jobs:
             QT_QPA_PLATFORM=offscreen ctest -V --output-on-failure --output-junit $GITHUB_WORKSPACE/test-result-ubuntu22.xml
 
         - name: Report
-          uses: mikepenz/action-junit-report@v3.7.8
+          uses: mikepenz/action-junit-report@v4
           if: always()
           with:
              job_name: Verify Results
