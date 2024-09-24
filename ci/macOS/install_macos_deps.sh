@@ -107,9 +107,8 @@ build_with_cmake() {
 build_libiio() {
 	echo "### Building libiio - version $LIBIIO_VERSION"
 	CURRENT_BUILD=libiio
-	save_version_info
-
 	pushd $STAGING_AREA/libiio
+	save_version_info
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DWITH_TESTS:BOOL=OFF \
 		-DWITH_DOC:BOOL=OFF \
@@ -153,9 +152,8 @@ build_libm2k() {
 build_libad9361() {
 	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
 	CURRENT_BUILD=libad9361-iio
-	save_version_info
-
 	pushd $STAGING_AREA/libad9361
+	save_version_info
 	build_with_cmake
 	make install
 	popd
@@ -164,9 +162,8 @@ build_libad9361() {
 build_gnuradio() {
 	echo "### Building gnuradio - branch $GNURADIO_BRANCH"
 	CURRENT_BUILD=gnuradio
-	save_version_info
-
 	pushd $STAGING_AREA/gnuradio
+	save_version_info
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DPYTHON_EXECUTABLE=/usr/bin/python3 \
 		-DENABLE_DEFAULT=OFF \
@@ -186,9 +183,8 @@ build_gnuradio() {
 build_grm2k() {
 	echo "### Building gr-m2k - branch $GRM2K_BRANCH"
 	CURRENT_BUILD=gr-m2k
-	save_version_info
-
 	pushd $STAGING_AREA/gr-m2k
+	save_version_info
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PYTHON=OFF \
 		-DDIGITAL=OFF
@@ -201,9 +197,8 @@ build_grm2k() {
 build_grscopy() {
 	echo "### Building gr-scopy - branch $GRSCOPY_BRANCH"
 	CURRENT_BUILD=gr-scopy
-	save_version_info
-
 	pushd $STAGING_AREA/gr-scopy
+	save_version_info
 	CURRENT_BUILD_CMAKE_OPTS="-DWITH_PYTHON=OFF "
 	build_with_cmake
 	make install
@@ -213,9 +208,8 @@ build_grscopy() {
 build_libsigrokdecode() {
 	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
 	CURRENT_BUILD=libsigrokdecode
-	save_version_info
-
 	pushd $STAGING_AREA/libsigrokdecode
+	save_version_info
 	git reset --hard
 	git clean -xdf
 	./autogen.sh
@@ -270,8 +264,8 @@ EOF
 build_qwt() {
 	echo "### Building qwt - branch qwt-multiaxes"
 	CURRENT_BUILD=qwt
-	save_version_info
 	pushd $STAGING_AREA/qwt
+	save_version_info
 	git clean -xdf
 	git reset --hard
 	patch_qwt
@@ -284,9 +278,8 @@ build_qwt() {
 build_libtinyiiod() {
 	echo "### Building libtinyiiod - branch $LIBTINYIIOD_BRANCH"
 	CURRENT_BUILD=libtinyiiod
-	save_version_info
-
 	pushd $STAGING_AREA/libtinyiiod
+	save_version_info
 	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_EXAMPLES=OFF"
 	build_with_cmake
 	make install
