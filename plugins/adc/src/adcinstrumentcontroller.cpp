@@ -3,7 +3,7 @@
 #include "adcinstrument.h"
 
 #include <pluginbase/preferences.h>
-#include "interfaces.h"
+#include "adcinterfaces.h"
 
 using namespace scopy;
 using namespace scopy::adc;
