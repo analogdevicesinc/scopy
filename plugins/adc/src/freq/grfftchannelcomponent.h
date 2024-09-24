@@ -3,22 +3,22 @@
 
 #include "grfftsinkcomponent.h"
 #include "scopy-adc_export.h"
-#include "channelcomponent.h"
+#include <gui/channelcomponent.h>
 #include <gui/plotautoscaler.h>
 #include <gui/widgets/menuonoffswitch.h>
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 #include <gui/widgets/menuplotaxisrangecontrol.h>
 #include <gui/widgets/menucontrolbutton.h>
-#include "interfaces.h"
+#include "adcinterfaces.h"
 #include <iio-widgets/iiowidget.h>
 #include <gui/widgets/menuwidget.h>
-#include "freq/fftplotcomponentchannel.h"
-#include "freq/fftplotcomponent.h"
+#include <freq/fftplotcomponentchannel.h>
+#include <freq/fftplotcomponent.h>
 #include <gr-util/grsignalpath.h>
 #include <gr-util/grfftfloatproxy.h>
 #include <gr-util/griiocomplexchannelsrc.h>
-#include "markercontroller.h"
+#include <gui/markercontroller.h>
 
 namespace scopy {
 namespace adc {

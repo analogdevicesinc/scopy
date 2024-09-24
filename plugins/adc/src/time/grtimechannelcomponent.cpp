@@ -349,7 +349,7 @@ void GRTimeChannelComponent::onInit()
 	m_yCtrl->setMin(-1.0);
 	m_yCtrl->setMax(1.0);
 
-	m_ymode = static_cast<adc::YMode>(-1);
+	m_ymode = static_cast<YMode>(-1);
 	auto v = Preferences::get("adc_default_y_mode").toInt();
 	m_ymodeCb->combo()->setCurrentIndex(v);
 	setYMode(static_cast<YMode>(v));

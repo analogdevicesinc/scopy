@@ -15,7 +15,7 @@
 #include <gui/widgets/measurementpanel.h>
 #include <gui/widgets/measurementsettings.h>
 
-#include "toolcomponent.h"
+#include "gui/toolcomponent.h"
 #include <adcplugin.h>
 #include "printplotmanager.h"
 

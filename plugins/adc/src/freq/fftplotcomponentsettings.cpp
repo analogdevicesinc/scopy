@@ -1,6 +1,6 @@
 #include "fftplotcomponentsettings.h"
-#include <gui/widgets/menusectionwidget.h>
-#include <gui/widgets/menucollapsesection.h>
+#include <widgets/menusectionwidget.h>
+#include <widgets/menucollapsesection.h>
 #include <QWidget>
 #include <QLineEdit>
 #include "fftplotcomponentchannel.h"
@@ -8,7 +8,7 @@
 #include <gnuradio/fft/window.h>
 
 using namespace scopy;
-using namespace scopy::adc;
+using namespace adc;
 
 FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidget *parent)
 	: QWidget(parent)
@@ -220,3 +220,5 @@ void FFTPlotComponentSettings::onStop()
 	m_running = false;
 	toggleAutoScale();
 }
+
+#include "moc_fftplotcomponentsettings.cpp"

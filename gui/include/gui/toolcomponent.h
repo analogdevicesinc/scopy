@@ -1,19 +1,15 @@
 #ifndef TOOLCOMPONENT_H
 #define TOOLCOMPONENT_H
 
-#include "scopy-adc_export.h"
+#include "scopy-gui_export.h"
 #include <QPen>
-#include <gui/tooltemplate.h>
-#include <gui/stylehelper.h>
+#include <tooltemplate.h>
+#include <stylehelper.h>
 #include <QObject>
-#include "adcacquisitionmanager.h"
 
 namespace scopy {
-namespace adc {
 
-class ADCInstrument;
-
-class SCOPY_ADC_EXPORT ChannelData : public QObject
+class SCOPY_GUI_EXPORT ChannelData : public QObject
 {
 	Q_OBJECT
 public:
@@ -63,7 +59,7 @@ private:
 	bool m_ownsData = false;
 };
 
-class SCOPY_ADC_EXPORT DataProvider
+class SCOPY_GUI_EXPORT DataProvider
 {
 public:
 	virtual void setSingleShot(bool) = 0;
@@ -74,7 +70,7 @@ public:
 	virtual void stop() = 0;
 };
 
-class SCOPY_ADC_EXPORT ToolComponent
+class SCOPY_GUI_EXPORT ToolComponent
 {
 public:
 	ToolComponent()
@@ -100,7 +96,7 @@ protected:
 	int m_priority = 0;
 };
 
-class SCOPY_ADC_EXPORT MetaComponent : public ToolComponent
+class SCOPY_GUI_EXPORT MetaComponent : public ToolComponent
 {
 public:
 	MetaComponent()
@@ -157,14 +153,7 @@ protected:
 	QList<ToolComponent *> m_components;
 };
 
-class SCOPY_ADC_EXPORT AcqNodeChannelAware
-{
-public:
-	virtual void addChannel(AcqTreeNode *c) = 0;
-	virtual void removeChannel(AcqTreeNode *c) = 0;
-};
-
-class SCOPY_ADC_EXPORT ChannelIdProvider : public QObject
+class SCOPY_GUI_EXPORT ChannelIdProvider : public QObject
 {
 	Q_OBJECT
 public:
@@ -181,7 +170,6 @@ public:
 	int idx;
 };
 
-} // namespace adc
 } // namespace scopy
 
 #endif // TOOLCOMPONENT_H

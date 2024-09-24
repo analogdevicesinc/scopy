@@ -1,12 +1,12 @@
 #include "fftplotcomponentchannel.h"
 #include <pluginbase/preferences.h>
-#include <gui/widgets/menucollapsesection.h>
-#include <gui/widgets/menuplotaxisrangecontrol.h>
-#include <gui/widgets/menuplotchannelcurvestylecontrol.h>
-#include <gui/widgets/menusectionwidget.h>
+#include <widgets/menucollapsesection.h>
+#include <widgets/menuplotaxisrangecontrol.h>
+#include <widgets/menuplotchannelcurvestylecontrol.h>
+#include <widgets/menusectionwidget.h>
 
 using namespace scopy;
-using namespace scopy::adc;
+using namespace adc;
 
 FFTPlotComponentChannel::FFTPlotComponentChannel(ChannelComponent *ch, FFTPlotComponent *plotComponent, QObject *parent)
 	: QObject(parent)
@@ -16,7 +16,7 @@ FFTPlotComponentChannel::FFTPlotComponentChannel(ChannelComponent *ch, FFTPlotCo
 
 	m_ch = ch;
 	m_plotComponent = nullptr;
-	m_markerController = new MarkerController(this, this);
+	m_markerController = new FFTMarkerController(this, this);
 	initPlotComponent(plotComponent);
 
 	m_fftPlotYAxis->setUnits("dB");
@@ -40,7 +40,7 @@ void FFTPlotComponentChannel::deinitPlotComponent()
 	delete m_fftPlotAxisHandle;
 }
 
-MarkerController *FFTPlotComponentChannel::markerController() const { return m_markerController; }
+FFTMarkerController *FFTPlotComponentChannel::markerController() const { return m_markerController; }
 
 void FFTPlotComponentChannel::initPlotComponent(PlotComponent *pc)
 {
@@ -156,3 +156,5 @@ void FFTPlotComponentChannel::disable()
 	m_enabled = false;
 	m_markerController->setEnabled(false);
 }
+
+#include "moc_fftplotcomponentchannel.cpp"
