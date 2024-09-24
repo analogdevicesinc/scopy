@@ -1,15 +1,11 @@
 #ifndef BASEHEADER_H
 #define BASEHEADER_H
 
-#include <QWidget>
+#include <QString>
 
-class BaseHeader : public QWidget
+class BaseHeader
 {
 public:
-	BaseHeader(QWidget *parent)
-		: QWidget(parent)
-	{}
-	~BaseHeader() {}
 	virtual void setTitle(QString title) = 0;
 	virtual QString title() = 0;
 };

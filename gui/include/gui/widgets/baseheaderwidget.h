@@ -4,9 +4,10 @@
 #include <QLineEdit>
 #include <baseheader.h>
 #include <scopy-gui_export.h>
+#include <QVBoxLayout>
 
 namespace scopy {
-class SCOPY_GUI_EXPORT BaseHeaderWidget : public BaseHeader
+class SCOPY_GUI_EXPORT BaseHeaderWidget : public QWidget, public BaseHeader
 {
 	Q_OBJECT
 public:
@@ -16,8 +17,9 @@ public:
 	void setTitle(QString title) override;
 	QString title() override;
 
-private:
+protected:
 	QLineEdit *m_label;
+	QVBoxLayout *m_lay;
 };
 } // namespace scopy
 
