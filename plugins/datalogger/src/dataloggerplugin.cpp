@@ -175,6 +175,8 @@ void DataLoggerPlugin::addNewTool()
 		}
 	});
 
+	toolMenuEntry->setDetachable(false);
+
 	Q_EMIT toolListChanged();
 	m_toolList.last()->setTool(datamonitorTool);
 	if(m_toolList.length() > 1) {
