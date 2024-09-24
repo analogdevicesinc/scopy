@@ -150,12 +150,12 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	channelsSection->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
 	QLabel *channelsLbl = new QLabel("Channels");
 	StyleHelper::MenuSmallLabel(channelsLbl);
-	StyleHelper::BackgroundWidget(channelsSection);
 
 	QScrollArea *scrollArea = new QScrollArea(channelsSection);
 	scrollArea->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 	scrollArea->setProperty("tutorial_name", "CHANNEL_SELECTOR");
 	scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	StyleHelper::BackgroundWidget(scrollArea);
 	QWidget *channelsContainer = new QWidget(scrollArea);
 	channelsContainer->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 	QVBoxLayout *channelsContainerLayout = new QVBoxLayout();
@@ -234,7 +234,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	topSection->setLayout(topLayout);
 	topSection->setFixedHeight(190);
 	topLayout->setMargin(0);
-	topLayout->setSpacing(10);
+	topLayout->setSpacing(5);
 	topLayout->addWidget(fm);
 	topLayout->addWidget(channelsSection);
 
