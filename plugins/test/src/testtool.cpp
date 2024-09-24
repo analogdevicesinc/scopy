@@ -264,10 +264,12 @@ QWidget *TestTool::createMenu(QWidget *parent)
 
 	MenuOnOffSwitch *autoscale = new MenuOnOffSwitch(tr("AUTOSCALE"), vdiv, false);
 
-	MenuCollapseSection *section1 = new MenuCollapseSection("SECTION1", MenuCollapseSection::MHCW_ARROW, vdiv);
+	MenuCollapseSection *section1 = new MenuCollapseSection("SECTION1", MenuCollapseSection::MHCW_ARROW,
+								MenuCollapseSection::MHW_BASEWIDGET, vdiv);
 	section1->contentLayout()->addWidget(txt);
 	section1->contentLayout()->addWidget(cbb);
-	MenuCollapseSection *section2 = new MenuCollapseSection("SECTION2", MenuCollapseSection::MHCW_ONOFF, vdiv);
+	MenuCollapseSection *section2 = new MenuCollapseSection("SECTION2", MenuCollapseSection::MHCW_ONOFF,
+								MenuCollapseSection::MHW_BASEWIDGET, vdiv);
 	section2->contentLayout()->addWidget(ssb);
 	section2->contentLayout()->addWidget(msb);
 	section2->contentLayout()->addWidget(autoscale);

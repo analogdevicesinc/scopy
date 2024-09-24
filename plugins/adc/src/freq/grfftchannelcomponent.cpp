@@ -113,7 +113,8 @@ MarkerController *GRFFTChannelComponent::markerController() { return m_fftPlotCo
 
 QWidget *GRFFTChannelComponent::createYAxisMenu(QWidget *parent)
 {
-	m_yaxisMenu = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_ONOFF, parent);
+	m_yaxisMenu = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_ONOFF,
+						    MenuCollapseSection::MHW_BASEWIDGET, parent);
 	m_yCtrl = new MenuPlotAxisRangeControl(m_fftPlotComponentChannel->m_fftPlotYAxis, m_yaxisMenu);
 
 	connect(m_yaxisMenu->collapseSection()->header(), &QAbstractButton::toggled, this,
@@ -126,8 +127,8 @@ QWidget *GRFFTChannelComponent::createYAxisMenu(QWidget *parent)
 
 QWidget *GRFFTChannelComponent::createCurveMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section =
-		new MenuSectionCollapseWidget("CURVE", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("CURVE", MenuCollapseSection::MHCW_NONE,
+									   MenuCollapseSection::MHW_BASEWIDGET, parent);
 	section->contentLayout()->setSpacing(10);
 
 	m_curvemenu = new MenuPlotChannelCurveStyleControl(section);
@@ -190,8 +191,8 @@ QWidget *GRFFTChannelComponent::createMenu(QWidget *parent)
 
 QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section =
-		new MenuSectionCollapseWidget("MARKER", MenuCollapseSection::MHCW_ONOFF, parent);
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("MARKER", MenuCollapseSection::MHCW_ONOFF,
+									   MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
@@ -248,8 +249,8 @@ QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent)
 
 QWidget *GRFFTChannelComponent::createChAttrMenu(iio_channel *ch, QString title, QWidget *parent)
 {
-	MenuSectionCollapseWidget *section =
-		new MenuSectionCollapseWidget(title, MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget(title, MenuCollapseSection::MHCW_NONE,
+									   MenuCollapseSection::MHW_BASEWIDGET, parent);
 	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(section).channel(ch).buildAll();
 
 	auto layout = new QVBoxLayout();

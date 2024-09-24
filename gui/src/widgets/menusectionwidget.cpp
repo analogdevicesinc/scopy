@@ -35,6 +35,7 @@ MenuVScrollArea::~MenuVScrollArea() {}
 QVBoxLayout *MenuVScrollArea::contentLayout() const { return m_layout; }
 
 MenuSectionCollapseWidget::MenuSectionCollapseWidget(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style,
+						     MenuCollapseSection::MenuHeaderWidgetType headerType,
 						     QWidget *parent)
 	: QWidget(parent)
 {
@@ -43,7 +44,7 @@ MenuSectionCollapseWidget::MenuSectionCollapseWidget(QString title, MenuCollapse
 	m_layout->setMargin(0);
 	setLayout(m_layout);
 	m_section = new MenuSectionWidget(parent);
-	m_collapse = new MenuCollapseSection(title, style, m_section);
+	m_collapse = new MenuCollapseSection(title, style, headerType, m_section);
 	m_layout->addWidget(m_section);
 	m_section->contentLayout()->addWidget(m_collapse);
 }

@@ -22,8 +22,8 @@ FileDataGuiStrategy::FileDataGuiStrategy(QWidget *parent)
 	m_ui->setLayout(lay);
 
 	MenuSectionWidget *guiContainer = new MenuSectionWidget(m_ui);
-	MenuCollapseSection *guiSection =
-		new MenuCollapseSection("DATA CONFIGURATION", MenuCollapseSection::MHCW_ARROW, guiContainer);
+	MenuCollapseSection *guiSection = new MenuCollapseSection("DATA CONFIGURATION", MenuCollapseSection::MHCW_ARROW,
+								  MenuCollapseSection::MHW_BASEWIDGET, guiContainer);
 	guiSection->contentLayout()->setSpacing(10);
 
 	m_scaled = new MenuOnOffSwitch("Scaled", guiSection);

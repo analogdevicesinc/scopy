@@ -4,6 +4,7 @@
 #include <pluginbase/preferences.h>
 #include <QButtonGroup>
 #include <baseheaderwidget.h>
+#include <compositeheaderwidget.h>
 #include <menuheader.h>
 
 Q_LOGGING_CATEGORY(CAT_INSTR_MANAGER, "InstrumentManager")
@@ -22,7 +23,8 @@ InstrumentManager::~InstrumentManager() {}
 void InstrumentManager::addMenuItem(QString deviceId, DeviceInfo devInfo, QList<ToolMenuEntry *> tools, int itemIndex)
 {
 	MenuSectionCollapseWidget *devSection =
-		new MenuSectionCollapseWidget(devInfo.name, MenuCollapseSection::MHCW_ARROW, m_instrumentMenu);
+		new MenuSectionCollapseWidget(devInfo.name, MenuCollapseSection::MHCW_ARROW,
+					      MenuCollapseSection::MHW_COMPOSITEWIDGET, m_instrumentMenu);
 	devSection->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	createMenuSectionLabel(devSection, devInfo.uri);
 	QButtonGroup *menuBtnGroup = m_instrumentMenu->btnGroup();
@@ -216,10 +218,10 @@ void InstrumentManager::createMenuSectionLabel(MenuSectionCollapseWidget *sectio
 	if(!collapseHeader) {
 		return;
 	}
-	BaseHeaderWidget *headerWidget = dynamic_cast<BaseHeaderWidget *>(collapseHeader->headerWidget());
+	CompositeHeaderWidget *headerWidget = dynamic_cast<CompositeHeaderWidget *>(collapseHeader->headerWidget());
 	if(headerWidget) {
 		QLabel *uriLabel = new QLabel(uri, headerWidget);
-		headerWidget->layout()->addWidget(uriLabel);
+		headerWidget->add(uriLabel);
 	}
 }
 
