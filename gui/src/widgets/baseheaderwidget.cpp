@@ -4,11 +4,11 @@
 using namespace scopy;
 
 BaseHeaderWidget::BaseHeaderWidget(QString title, QWidget *parent)
-	: BaseHeader(parent)
+	: QWidget(parent)
 {
-	QVBoxLayout *lay = new QVBoxLayout(this);
-	lay->setMargin(0);
-	lay->setSpacing(0);
+	m_lay = new QVBoxLayout(this);
+	m_lay->setMargin(0);
+	m_lay->setSpacing(0);
 
 	m_label = new QLineEdit(title, this);
 	m_label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
@@ -17,7 +17,7 @@ BaseHeaderWidget::BaseHeaderWidget(QString title, QWidget *parent)
 	StyleHelper::MenuCollapseHeaderLineEdit(m_label, "menuCollapseLabel");
 	m_label->setTextMargins(0, 0, 0, 0);
 
-	lay->addWidget(m_label);
+	m_lay->addWidget(m_label);
 }
 
 BaseHeaderWidget::~BaseHeaderWidget() {}
