@@ -77,8 +77,8 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 
 QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section =
-		new MenuSectionCollapseWidget("X-AXIS", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("X-AXIS", MenuCollapseSection::MHCW_NONE,
+									   MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	QWidget *bufferPlotSize = new QWidget(section);
 	QHBoxLayout *bufferPlotSizeLayout = new QHBoxLayout(bufferPlotSize);

@@ -51,8 +51,8 @@ bool DebuggerPlugin::loadPreferencesPage()
 	m_preferencesPage = new QWidget();
 	QVBoxLayout *layout = new QVBoxLayout(m_preferencesPage);
 
-	MenuSectionCollapseWidget *generalSection =
-		new MenuSectionCollapseWidget("General", MenuCollapseSection::MHCW_NONE);
+	MenuSectionCollapseWidget *generalSection = new MenuSectionCollapseWidget(
+		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET);
 	generalSection->contentLayout()->setSpacing(10);
 	layout->addWidget(generalSection);
 	layout->setSpacing(0);

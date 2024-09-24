@@ -187,8 +187,8 @@ QWidget *ScopyHomeAddPage::createInfoSection(QWidget *parent)
 	infoScrollArea->setWidgetResizable(true);
 	infoScrollArea->setWidget(infoSection);
 
-	MenuCollapseSection *deviceInfoSection =
-		new MenuCollapseSection("Device info", MenuCollapseSection::MHCW_ONOFF, infoSection);
+	MenuCollapseSection *deviceInfoSection = new MenuCollapseSection(
+		"Device info", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, infoSection);
 	deviceInfoSection->contentLayout()->setSpacing(10);
 	deviceInfoSection->contentLayout()->setMargin(0);
 
@@ -197,8 +197,8 @@ QWidget *ScopyHomeAddPage::createInfoSection(QWidget *parent)
 	m_deviceInfoPage->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	deviceInfoSection->contentLayout()->addWidget(m_deviceInfoPage);
 
-	m_pluginBrowserSection =
-		new MenuCollapseSection("Compatible plugins", MenuCollapseSection::MHCW_ONOFF, infoSection);
+	m_pluginBrowserSection = new MenuCollapseSection("Compatible plugins", MenuCollapseSection::MHCW_ONOFF,
+							 MenuCollapseSection::MHW_BASEWIDGET, infoSection);
 	m_pluginBrowserSection->contentLayout()->setSpacing(10);
 	m_pluginBrowserSection->contentLayout()->setMargin(0);
 

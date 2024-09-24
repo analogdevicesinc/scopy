@@ -92,8 +92,8 @@ void DataMonitorSettings::plotYAxisMaxValueUpdate(double value) { m_ymax->setVal
 QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 {
 	MenuSectionWidget *yaxisContainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *yAxisSection =
-		new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE, yaxisContainer);
+	MenuCollapseSection *yAxisSection = new MenuCollapseSection(
+		"Y-AXIS", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, yaxisContainer);
 
 	yaxisContainer->contentLayout()->addWidget(yAxisSection);
 
@@ -145,8 +145,8 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 QWidget *DataMonitorSettings::generateCurveStyleSettings(QWidget *parent)
 {
 	MenuSectionWidget *curveStylecontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *curveStyleSection =
-		new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, curveStylecontainer);
+	MenuCollapseSection *curveStyleSection = new MenuCollapseSection(
+		"CURVE", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, curveStylecontainer);
 
 	gui::MenuPlotChannelCurveStyleControl *curveMneu = new gui::MenuPlotChannelCurveStyleControl(curveStyleSection);
 
@@ -165,7 +165,8 @@ QWidget *DataMonitorSettings::generatePlotUiSettings(QWidget *parent)
 {
 	MenuSectionWidget *plotStylecontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *plotStyleSection =
-		new MenuCollapseSection("PLOT SETTINGS", MenuCollapseSection::MHCW_NONE, plotStylecontainer);
+		new MenuCollapseSection("PLOT SETTINGS", MenuCollapseSection::MHCW_NONE,
+					MenuCollapseSection::MHW_BASEWIDGET, plotStylecontainer);
 
 	plotStyleSection->contentLayout()->setSpacing(10);
 
