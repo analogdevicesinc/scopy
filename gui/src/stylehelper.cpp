@@ -1639,6 +1639,74 @@ void StyleHelper::GrayButton(QPushButton *btn, QString objectName)
 			border-style: inset;
 		}
 	)css");
+	btn->setStyleSheet(style);
+}
+
+void StyleHelper::ToolMenuBtn(QPushButton *btn, QString objectName)
+{
+	if(!objectName.isEmpty())
+		btn->setObjectName(objectName);
+	btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	QString style = QString(R"css(
+			QPushButton {
+				text-align:center;
+				height: 25px;
+				background-color: none;
+				border:none;
+			}
+			QPushButton:hover {
+				background-color: rgba(0,0,0,60);
+				border: 1px solid rgba(0, 0, 0, 30);
+				border-radius:4px;
+			}
+			QPushButton:checked {
+				background-color: rgba(0,0,0,60);
+			}
+			)css");
+	btn->setStyleSheet(style);
+	btn->setCheckable(true);
+	btn->setIconSize(QSize(16, 16));
+}
+
+void StyleHelper::ToolMenuHome(QPushButton *btn, QString objectName)
+{
+	if(!objectName.isEmpty())
+		btn->setObjectName(objectName);
+	btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	QString style = QString(R"css(
+			QPushButton {
+				text-align:left;
+				height: 42px;
+				background-color: none;
+				border:none;
+			}
+			QPushButton:hover {
+				background-color: rgba(0,0,0,60);
+				border: 1px solid rgba(0, 0, 0, 30);
+				border-radius:4px;
+			}
+			QPushButton:checked {
+				background-color: rgba(0,0,0,60);
+			}
+			)css");
+	btn->setStyleSheet(style);
+	btn->setCheckable(true);
+	btn->setIconSize(QSize(32, 32));
+}
+
+void StyleHelper::ToolMenuCollapseMini(QPushButton *btn, QString objectName)
+{
+	if(!objectName.isEmpty())
+		btn->setObjectName(objectName);
+	btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	btn->setCheckable(true);
+	QString style = QString(R"css(
+			height:40px;
+			width:40px;
+			background-image: url(:/gui/icons/scopy-default/icons/menu.svg);
+			background-repeat: no-repeat;
+			background-position: center center;
+			)css");
 
 	btn->setStyleSheet(style);
 }
@@ -1659,6 +1727,36 @@ void StyleHelper::RoundedCornersWidget(QWidget *w, QString objectName)
 			)css");
 	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
 	w->setStyleSheet(style);
+}
+
+void StyleHelper::ToolMenuCollapse(QPushButton *btn, QString objectName)
+{
+	if(!objectName.isEmpty())
+		btn->setObjectName(objectName);
+	btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	QString style = QString(R"css(
+			height:40px;
+			background-image: url(:/gui/icons/scopy-default/icons/logo.svg);
+			background-repeat: no-repeat;
+			background-position: center center;
+			)css");
+
+	btn->setStyleSheet(style);
+}
+
+void StyleHelper::ScopyLogo(QLabel *label, QString objectName)
+{
+	if(!objectName.isEmpty())
+		label->setObjectName(objectName);
+	label->setEnabled(true);
+	label->setMinimumSize(QSize(0, 40));
+	QString style = QString(R"css(
+			background-image: url(:/gui/icons/scopy-default/icons/logo_analog.svg);
+			background-repeat: no-repeat;
+			background-position: center center;
+			min-height:36px;
+			)css");
+	label->setStyleSheet(style);
 }
 
 #include "moc_stylehelper.cpp"
