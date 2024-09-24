@@ -24,7 +24,7 @@ DacDataManager::DacDataManager(struct iio_device *dev, QWidget *parent)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_layout = new QVBoxLayout();
 	m_layout->setMargin(0);
-	m_layout->setSpacing(10);
+	m_layout->setSpacing(5);
 	setLayout(m_layout);
 
 	rightMenuStack = new MapStackedWidget(this);
@@ -60,7 +60,7 @@ DacDataManager::DacDataManager(struct iio_device *dev, QWidget *parent)
 	m_color = StyleHelper::getColor("ScopyBlue");
 	m_layout->addWidget(modeSection);
 	m_layout->addWidget(dacAddonStack);
-	m_layout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding));
+	m_layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
 
 	cb->setCurrentIndex(DAC_BUFFER);
 
