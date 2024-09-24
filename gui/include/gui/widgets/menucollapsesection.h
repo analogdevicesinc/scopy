@@ -53,11 +53,11 @@ public:
 	~MenuCollapseHeader();
 	QString title();
 
-	BaseHeader *headerWidget() const;
+	QWidget *headerWidget() const;
 
 private:
 	QAbstractButton *m_ctrl;
-	BaseHeader *m_headerWidget;
+	QWidget *m_headerWidget;
 	QHBoxLayout *lay;
 };
 
