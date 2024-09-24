@@ -1607,4 +1607,80 @@ void StyleHelper::IIOCompactLabel(QLabel *w, QString objectName)
 	w->setStyleSheet(style);
 }
 
+void StyleHelper::ToolMenuBtn(QPushButton *btn, QString objectName)
+{
+	if(!objectName.isEmpty())
+		btn->setObjectName(objectName);
+	btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	btn->setFixedHeight(44);
+	QString style = QString(R"css(
+			QPushButton {
+				font-family: Inter;
+				font-size: 12px;
+				font-style: normal;
+				font-weight: 600;
+				border-radius: 0px 2px 2px 0px; /* design token - buttonBorder*/
+				border-style: outset;
+				background-color: &&UIElementBackground&&;
+			}
+			QPushButton:hover {
+				background-color: rgba(0,0,0,60);
+			}
+			QPushButton:checked {
+				background-color: rgba(0,0,0,60);
+			}
+			)css");
+	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
+	btn->setStyleSheet(style);
+	btn->setIconSize(QSize(16, 16));
+}
+
+void StyleHelper::ToolMenuCollapseMini(QPushButton *btn, QString objectName)
+{
+	if(!objectName.isEmpty())
+		btn->setObjectName(objectName);
+	btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	btn->setCheckable(true);
+	QString style = QString(R"css(
+			height:40px;
+			width:40px;
+			background-image: url(:/gui/icons/scopy-default/icons/menu.svg);
+			background-repeat: no-repeat;
+			background-position: center center;
+			)css");
+
+	btn->setStyleSheet(style);
+}
+
+void StyleHelper::ToolMenuCollapse(QPushButton *btn, QString objectName)
+{
+	if(!objectName.isEmpty())
+		btn->setObjectName(objectName);
+	btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	QString style = QString(R"css(
+			height:40px;
+			background-image: url(:/gui/icons/scopy-default/icons/logo.svg);
+			background-repeat: no-repeat;
+			background-position: center center;
+			)css");
+
+	btn->setStyleSheet(style);
+}
+
+void StyleHelper::ScopyLogo(QLabel *label, QString objectName)
+{
+	if(!objectName.isEmpty())
+		label->setObjectName(objectName);
+	label->setEnabled(true);
+	label->setMinimumSize(QSize(0, 40));
+	QString style = QString(R"css(
+			background-image: url(:/gui/icons/scopy-default/icons/logo_analog.svg);
+			background-repeat: no-repeat;
+			background-position: center center;
+			background-repeat: no-repeat;
+			min-height:40px;
+			)css");
+	label->setStyleSheet(style);
+}
+
 #include "moc_stylehelper.cpp"

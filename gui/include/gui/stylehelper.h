@@ -126,6 +126,11 @@ public:
 	static void FaultsExplanation(QWidget *w, QString objectName = "");
 	static void IIOCompactLabel(QLabel *label, QString objectName = "");
 
+	static void ToolMenuBtn(QPushButton *btn, QString objectName = "");
+	static void ToolMenuCollapseMini(QPushButton *btn, QString objectName = "");
+	static void ToolMenuCollapse(QPushButton *btn, QString objectName = "");
+	static void ScopyLogo(QLabel *label, QString objectName = "");
+
 private:
 	QMap<QString, QString> colorMap;
 	static StyleHelper *pinstance_;
