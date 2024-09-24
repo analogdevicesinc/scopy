@@ -75,12 +75,12 @@ QWidget *DdsDacAddon::setupDdsTx(TxNode *txNode)
 	QLabel *txLabel = new QLabel(txNode->getUuid(), txLabelSection);
 	StyleHelper::MenuMediumLabel(txLabel);
 	txLabelSection->contentLayout()->addWidget(txLabel);
-	txLabelSection->setFixedHeight(60);
+	txLabelSection->setFixedHeight(63);
 
 	MenuSectionWidget *txReadSection = new MenuSectionWidget(this);
 	txReadSection->setProperty("tutorial_name", "TX_READ");
-	txReadSection->setFixedHeight(60);
-	txReadSection->setFixedWidth(60);
+	txReadSection->setFixedHeight(63);
+	txReadSection->setFixedWidth(63);
 	QPushButton *m_readBtn = new QPushButton(txReadSection);
 	StyleHelper::RefreshButton(m_readBtn, "ReadAttributesButton");
 	connect(m_readBtn, &QPushButton::clicked, this, [=, this]() {
@@ -152,7 +152,7 @@ TxMode::TxMode(TxNode *node, unsigned int mode, QWidget *parent)
 {
 	QVBoxLayout *txChnsLay = new QVBoxLayout();
 	this->setLayout(txChnsLay);
-	txChnsLay->setSpacing(10);
+	txChnsLay->setSpacing(5);
 	txChnsLay->setMargin(0);
 
 	auto txNodeChildren = m_node->getTones();
