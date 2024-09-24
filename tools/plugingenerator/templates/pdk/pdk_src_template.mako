@@ -205,6 +205,8 @@ QWidget *PDKWindow::generalPreferences()
 		p, "iiowidgets_use_lazy_loading", "Use Lazy Loading", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
 		p, "plugins_use_debugger_v2", "Use Debugger V2 plugin", generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
+		p, "general_use_native_dialogs", "Use native dialogs", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCombo(
 		p, "general_theme", "Theme", {"default", "light"}, generalSection));
 
@@ -249,7 +251,7 @@ void PDKWindow::initGeneralPreferences()
 	p->init("plugins_use_debugger_v2", true);
 	p->init("general_plot_target_fps", "60");
 	p->init("general_show_plot_fps", true);
-	p->init("general_use_native_dialogs", true);
+	p->init("general_use_native_dialogs", false);
 	p->init("general_additional_plugin_path", "");
 	p->init("general_load_decoders", true);
 	p->init("general_doubleclick_ctrl_opens_menu", true);
