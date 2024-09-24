@@ -46,7 +46,7 @@ RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QObject 
 	m_ui->layout()->addWidget(m_spinBox);
 
 	connect(m_spinBox, &gui::MenuSpinbox::valueChanged, this,
-		[&](double value) { Q_EMIT emitData(QString::number(value)); });
+		[&](double value) { Q_EMIT emitData(Util::doubleToQString(value)); });
 	Q_EMIT requestData();
 }
 

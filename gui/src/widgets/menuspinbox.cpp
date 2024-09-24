@@ -280,7 +280,7 @@ void MenuSpinbox::populateWidgets()
 	if(!m_scalingEnabled) {
 		QSignalBlocker sb1(m_edit);
 		QSignalBlocker sb2(m_scaleCb);
-		m_edit->setText(QString::number(m_value));
+		m_edit->setText(Util::doubleToQString(m_value));
 		setToolTip(QString::number(m_value, 'f', 6)); // set tooltip
 		return;
 	}
