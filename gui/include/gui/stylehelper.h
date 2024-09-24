@@ -128,6 +128,11 @@ public:
 	static void GrayButton(QPushButton *btn, QString objectName = "");
 
 	static void RoundedCornersWidget(QWidget *w, QString objectName = "");
+	static void ToolMenuBtn(QPushButton *btn, QString objectName = "");
+	static void ToolMenuHome(QPushButton *btn, QString objectName = "");
+	static void ToolMenuCollapseMini(QPushButton *btn, QString objectName = "");
+	static void ToolMenuCollapse(QPushButton *btn, QString objectName = "");
+	static void ScopyLogo(QLabel *label, QString objectName = "");
 
 private:
 	QMap<QString, QString> colorMap;
