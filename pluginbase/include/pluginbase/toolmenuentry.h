@@ -30,6 +30,7 @@ public:
 		, m_running(false)
 		, m_runBtnVisible(false)
 		, m_attached(true)
+		, m_detachable(true)
 		, m_tool(nullptr)
 	{}
 
@@ -59,6 +60,7 @@ public:
 	inline bool enabled() const { return m_enabled; }
 	inline bool running() const { return m_running; }
 	inline bool attached() const { return m_attached; }
+	inline bool detachable() const { return m_detachable; }
 	inline bool runEnabled() const { return m_runEnabled; }
 	inline bool runBtnVisible() const { return m_runBtnVisible; }
 	inline QWidget *tool() const { return m_tool; }
@@ -105,6 +107,14 @@ public Q_SLOTS:
 	 * Attaches the tool to the main window
 	 */
 	void setAttached(bool attach);
+
+	/**
+	 * @brief setDetachable
+	 * @param detachable
+	 * Sets the detachment property.
+	 * If false, the tool cannot be detached.
+	 */
+	void setDetachable(bool detachable);
 
 	/**
 	 * @brief setRunEnabled
@@ -164,6 +174,7 @@ private:
 	bool m_runEnabled;
 	bool m_runBtnVisible;
 	bool m_attached;
+	bool m_detachable;
 	QWidget *m_tool;
 };
 
@@ -244,8 +255,12 @@ inline QWidget *ToolMenuEntry::setTool(QWidget *newTool)
 	return oldTool;
 }
 
+inline void ToolMenuEntry::setDetachable(bool detachable) { m_detachable = detachable; }
+
 inline void ToolMenuEntry::setAttached(bool attach)
 {
+	if(!m_detachable)
+		return;
 	bool oldAttach = m_attached;
 	m_attached = attach;
 	if(oldAttach != m_attached && m_tool) {

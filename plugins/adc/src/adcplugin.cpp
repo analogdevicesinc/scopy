@@ -292,6 +292,9 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root)
 	}
 
 	auto tme = m_toolList.last();
+	if(m_toolList.size() > 2) {
+		tme->setDetachable(false);
+	}
 	Q_EMIT toolListChanged();
 	tme->setTool(ui);
 
