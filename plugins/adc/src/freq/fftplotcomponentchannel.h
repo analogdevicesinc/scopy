@@ -3,11 +3,11 @@
 
 #include "scopy-adc_export.h"
 #include <QObject>
+#include "fftplotcomponent.h"
 #include <toolcomponent.h>
 #include <channelcomponent.h>
-#include "fftplotcomponent.h"
 #include <plotcomponent.h>
-#include "markercontroller.h"
+#include <fftmarkercontroller.hpp>
 
 namespace scopy {
 namespace adc {
@@ -23,7 +23,7 @@ public:
 	ChannelComponent *channelComponent() override;
 	PlotComponent *plotComponent() override;
 	PlotChannel *plotChannel() override;
-	MarkerController *markerController() const;
+	FFTMarkerController *markerController() const;
 
 public Q_SLOTS:
 	void enable() override;
@@ -46,7 +46,7 @@ public:
 	bool m_enabled;
 
 private:
-	MarkerController *m_markerController;
+	FFTMarkerController *m_markerController;
 };
 } // namespace adc
 } // namespace scopy

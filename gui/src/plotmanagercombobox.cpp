@@ -1,8 +1,8 @@
 #include "plotmanagercombobox.h"
-#include "timeplotcomponentchannel.h"
+#include "plotmanager.h"
 #include <menusectionwidget.h>
+
 using namespace scopy;
-using namespace scopy::adc;
 
 PlotManagerCombobox::PlotManagerCombobox(PlotManager *man, ChannelComponent *c, QWidget *parent)
 	: QWidget(parent)
@@ -40,21 +40,21 @@ PlotManagerCombobox::~PlotManagerCombobox() {}
 
 void PlotManagerCombobox::renamePlotSlot()
 {
-	TimePlotComponent *plt = dynamic_cast<TimePlotComponent *>(QObject::sender());
+	PlotComponent *plt = dynamic_cast<PlotComponent *>(QObject::sender());
 	renamePlot(plt);
 }
 
 void PlotManagerCombobox::addPlot(PlotComponent *p)
 {
 	m_combo->addItem(p->name(), p->uuid());
-	connect(p, &TimePlotComponent::nameChanged, this, &PlotManagerCombobox::renamePlotSlot);
+	connect(p, &PlotComponent ::nameChanged, this, &PlotManagerCombobox::renamePlotSlot);
 }
 
 void PlotManagerCombobox::removePlot(PlotComponent *p)
 {
 	int idx = findIndexFromUuid(p->uuid());
 	m_combo->removeItem(idx);
-	disconnect(p, &TimePlotComponent::nameChanged, this, &PlotManagerCombobox::renamePlotSlot);
+	disconnect(p, &PlotComponent ::nameChanged, this, &PlotManagerCombobox::renamePlotSlot);
 }
 
 void PlotManagerCombobox::renamePlot(PlotComponent *p)
@@ -72,3 +72,5 @@ int PlotManagerCombobox::findIndexFromUuid(uint32_t uuid)
 	}
 	return -1;
 }
+
+#include "moc_plotmanagercombobox.cpp"

@@ -4,14 +4,14 @@
 #include "grtimesinkcomponent.h"
 #include "iioutil/iiounits.h"
 #include "scopy-adc_export.h"
-#include "channelcomponent.h"
+#include <gui/channelcomponent.h>
 #include <gui/plotautoscaler.h>
 #include <gui/widgets/menuonoffswitch.h>
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 #include <gui/widgets/menuplotaxisrangecontrol.h>
 #include <gui/widgets/menucontrolbutton.h>
-#include "interfaces.h"
+#include "adcinterfaces.h"
 #include <iio-widgets/iiowidget.h>
 #include <gui/widgets/menuwidget.h>
 #include "time/timeplotcomponent.h"

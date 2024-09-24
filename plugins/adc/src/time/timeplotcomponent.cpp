@@ -4,7 +4,7 @@
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menuplotaxisrangecontrol.h>
-#include "channelcomponent.h"
+#include <gui/channelcomponent.h>
 #include <pluginbase/preferences.h>
 #include <timeplotcomponentchannel.h>
 #include <qwt_point_data.h>
@@ -15,7 +15,7 @@
 
 using namespace scopy;
 using namespace scopy::adc;
-using namespace scopy::gui;
+using namespace gui;
 
 TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	: PlotComponent(name, uuid, parent)

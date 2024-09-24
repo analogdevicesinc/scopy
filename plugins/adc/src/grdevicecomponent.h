@@ -2,9 +2,9 @@
 #define GRDEVICECOMPONENT_H
 
 #include "scopy-adc_export.h"
-#include "channelcomponent.h"
-#include "toolcomponent.h"
-#include "interfaces.h"
+#include <gui/channelcomponent.h>
+#include <gui/toolcomponent.h>
+#include <gui/interfaces.h>
 
 #include <gr-util/griiodevicesource.h>
 #include <gui/widgets/menucontrolbutton.h>
@@ -12,9 +12,9 @@
 #include <QLabel>
 #include <QPen>
 
+#include "adcacquisitionmanager.h"
+
 namespace scopy::adc {
-using namespace scopy;
-using namespace scopy::grutil;
 // class GRTimeChannelAddon;
 
 class SCOPY_ADC_EXPORT GRDeviceComponent : public QWidget, public ToolComponent, public SampleRateProvider
