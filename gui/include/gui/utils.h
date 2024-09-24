@@ -46,6 +46,7 @@ public:
 	static void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars = 0);
 	static QString loadStylesheetFromFile(const QString &path);
 	static bool compareNatural(const std::string &a, const std::string &b);
+	static QString doubleToQString(double value);
 	static QWidget *findContainingWindow(QWidget *w);
 	static const QList<QString> getColors()
 	{
