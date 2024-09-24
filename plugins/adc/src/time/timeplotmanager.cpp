@@ -1,7 +1,7 @@
 #include <timeplotmanager.h>
 #include <timeplotcomponentchannel.h>
 #include <plotaxis.h>
-#include "plotmanagercombobox.h"
+#include <gui/plotmanagercombobox.h>
 #include "plotnavigator.hpp"
 #include <timeplotcomponentsettings.h>
 

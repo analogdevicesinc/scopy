@@ -2,16 +2,17 @@
 #define FFTPLOTCOMPONENTSETTINGS_H
 
 #include <QWidget>
-#include <toolcomponent.h>
+#include "scopy-adc_export.h"
 #include "menuspinbox.h"
 #include "plotautoscaler.h"
-#include "scopy-adc_export.h"
+#include <toolcomponent.h>
 #include "channelcomponent.h"
-#include <gui/widgets/menuplotaxisrangecontrol.h>
-#include <gui/widgets/menuplotchannelcurvestylecontrol.h>
+#include <widgets/menuplotaxisrangecontrol.h>
+#include <widgets/menuplotchannelcurvestylecontrol.h>
 
 namespace scopy {
 namespace adc {
+
 class FFTPlotComponent;
 class SCOPY_ADC_EXPORT FFTPlotComponentSettings : public QWidget, public ToolComponent
 {

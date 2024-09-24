@@ -1,9 +1,9 @@
 #include "fftplotmanager.h"
-#include "fftplotcomponentchannel.h"
-#include "fftplotcomponentsettings.h"
 #include <plotaxis.h>
-#include "plotmanagercombobox.h"
 #include "plotnavigator.hpp"
+#include <gui/plotmanagercombobox.h>
+#include <freq/fftplotcomponentchannel.h>
+#include <freq/fftplotcomponentsettings.h>
 
 using namespace scopy;
 using namespace scopy::adc;

@@ -1,9 +1,9 @@
 #include "plotcomponent.h"
-#include "channelcomponent.h"
+#include <channelcomponent.h>
 #include "plotaxis.h"
 
 using namespace scopy;
-using namespace adc;
+using namespace gui;
 
 PlotComponent::PlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	: QWidget(parent)
@@ -105,3 +105,5 @@ uint32_t PlotComponent::uuid() { return m_uuid; }
 CursorController *PlotComponent::cursor() const { return m_cursor; }
 
 QList<PlotWidget *> PlotComponent::plots() const { return m_plots; }
+
+#include "moc_plotcomponent.cpp"
