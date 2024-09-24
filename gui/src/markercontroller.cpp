@@ -1,26 +1,33 @@
 #include "markercontroller.h"
+#include <plotcomponent.h>
 #include <qwt_text.h>
-#include <freq/fftplotcomponentchannel.h>
 
-using namespace scopy::adc;
+using namespace scopy;
 
-MarkerController::MarkerController(FFTPlotComponentChannel *ch, QObject *parent)
+MarkerController::MarkerController(PlotComponentChannel *ch, QObject *parent)
 	: QObject(parent)
 	, m_ch(ch)
 	, m_plot(nullptr)
 	, m_xAxis(QwtAxis::XBottom)
 	, m_yAxis(QwtAxis::YLeft)
 {
-	m_enabled = false;
-	m_complex = false;
-	m_handlesVisible = true;
+	init();
+}
+
+MarkerController::MarkerController(QObject *parent)
+	: QObject(parent)
+	, m_plot(nullptr)
+	, m_xAxis(QwtAxis::XBottom)
+	, m_yAxis(QwtAxis::YLeft)
+{
+	init();
 }
 
 void MarkerController::init()
 {
-	m_plot = m_ch->m_plotComponent->fftPlot()->plot();
-	m_xAxis = m_ch->m_plotComponent->fftPlot()->xAxis()->axisId();
-	m_yAxis = m_ch->m_plotComponent->fftPlot()->yAxis()->axisId();
+	m_enabled = false;
+	m_complex = false;
+	m_handlesVisible = true;
 	setNrOfMarkers(5);
 	setMarkerType(MC_NONE);
 }
@@ -81,23 +88,23 @@ void MarkerController::setFixedMarkerFrequency(int idx, double freq)
 
 void MarkerController::initFixedMarker()
 {
-	cacheMarkerInfo();
-	for(int i = 0; i < m_nrOfMarkers; i++) {
-		double initX = popCacheMarkerInfo();
-		MarkerInfo mi = {.name = QString("F") + QString::number(i), .marker = m_markers[i], .peak = {initX, 0}};
-		m_markerInfo.append(mi);
-		PlotAxisHandle *handle =
-			new PlotAxisHandle(m_ch->plotComponent()->plot(0), m_ch->m_plotComponent->plot(0)->xAxis());
-		connect(handle, &PlotAxisHandle::scalePosChanged, this, [=](double v) {
-			m_markerInfo[i].peak.x = v;
-			computeMarkers();
-		});
-		m_fixedHandles.append(handle);
+	// cacheMarkerInfo();
+	// for(int i = 0; i < m_nrOfMarkers; i++) {
+	// 	double initX = popCacheMarkerInfo();
+	// 	MarkerInfo mi = {.name = QString("F") + QString::number(i), .marker = m_markers[i], .peak = {initX, 0}};
+	// 	m_markerInfo.append(mi);
+	// 	PlotAxisHandle *handle =
+	// 		new PlotAxisHandle(m_ch->plotComponent()->plot(0), m_ch->m_plotComponent->plot(0)->xAxis());
+	// 	connect(handle, &PlotAxisHandle::scalePosChanged, this, [=](double v) {
+	// 		m_markerInfo[i].peak.x = v;
+	// 		computeMarkers();
+	// 	});
+	// 	m_fixedHandles.append(handle);
 
-		handle->setPositionSilent(initX);
-	}
+	// 	handle->setPositionSilent(initX);
+	// }
 
-	setFixedHandleVisible(m_handlesVisible);
+	// setFixedHandleVisible(m_handlesVisible);
 }
 
 void MarkerController::setFixedHandleVisible(bool b)
@@ -198,27 +205,27 @@ void MarkerController::setComplex(bool b) { m_complex = b; }
 void MarkerController::computePeaks()
 {
 
-	auto data = m_ch->m_ch->chData();
-	m_peakInfo.clear();
+	// auto data = m_ch->m_ch->chData();
+	// m_peakInfo.clear();
 
-	int m_start = 0;
-	int m_stop = (m_complex) ? data->size() : data->size() / 2;
+	// int m_start = 0;
+	// int m_stop = (m_complex) ? data->size() : data->size() / 2;
 
-	for(int i = m_start + 2; i < m_stop - 1; i++) {
-		if(data->yData()[i - 2] < data->yData()[i - 1] &&
-		   data->yData()[i - 1] > data->yData()[i]) { // is there a better way to compute a peak ?
-			PeakInfo mi = {.x = data->xData()[i - 1], .y = data->yData()[i - 1], .idx = i - 1};
-			m_peakInfo.append(mi);
-		}
-	}
+	// for(int i = m_start + 2; i < m_stop - 1; i++) {
+	// 	if(data->yData()[i - 2] < data->yData()[i - 1] &&
+	// 	   data->yData()[i - 1] > data->yData()[i]) { // is there a better way to compute a peak ?
+	// 		PeakInfo mi = {.x = data->xData()[i - 1], .y = data->yData()[i - 1], .idx = i - 1};
+	// 		m_peakInfo.append(mi);
+	// 	}
+	// }
 
-	m_sortedPeakInfo.clear();
-	for(auto v : m_peakInfo) {
-		m_sortedPeakInfo.append(v);
-	}
+	// m_sortedPeakInfo.clear();
+	// for(auto v : m_peakInfo) {
+	// 	m_sortedPeakInfo.append(v);
+	// }
 
-	std::sort(m_sortedPeakInfo.begin(), m_sortedPeakInfo.end(),
-		  [](const PeakInfo a, const PeakInfo b) { return a.y > b.y; });
+	// std::sort(m_sortedPeakInfo.begin(), m_sortedPeakInfo.end(),
+	// 	  [](const PeakInfo a, const PeakInfo b) { return a.y > b.y; });
 }
 
 void MarkerController::computePeakMarkers()
@@ -233,67 +240,67 @@ void MarkerController::computePeakMarkers()
 
 void MarkerController::computeSingleToneMarkers()
 {
-	auto data = m_ch->m_ch->chData();
-	m_markerInfo.clear();
-	int dc_idx = (m_complex) ? data->size() / 2 : 0;
+	// auto data = m_ch->m_ch->chData();
+	// m_markerInfo.clear();
+	// int dc_idx = (m_complex) ? data->size() / 2 : 0;
 
-	if(m_sortedPeakInfo.count() == 0)
-		return;
+	// if(m_sortedPeakInfo.count() == 0)
+	// 	return;
 
-	MarkerInfo dc = {
-		.name = QString("DC"), .marker = m_markers[0], .peak = {data->xData()[dc_idx], data->yData()[dc_idx]}};
-	MarkerInfo fund = {.name = QString("Fund"), .marker = m_markers[1], .peak = m_sortedPeakInfo[0]};
-	int fund_offset = m_sortedPeakInfo[0].idx - dc_idx;
-	m_markerInfo.append(dc);
-	m_markerInfo.append(fund);
-	// Compute harmonics - need double PlotCursors::getHorizIntersectionAt(double pos)
+	// MarkerInfo dc = {
+	// 	.name = QString("DC"), .marker = m_markers[0], .peak = {data->xData()[dc_idx], data->yData()[dc_idx]}};
+	// MarkerInfo fund = {.name = QString("Fund"), .marker = m_markers[1], .peak = m_sortedPeakInfo[0]};
+	// int fund_offset = m_sortedPeakInfo[0].idx - dc_idx;
+	// m_markerInfo.append(dc);
+	// m_markerInfo.append(fund);
+	// // Compute harmonics - need double PlotCursors::getHorizIntersectionAt(double pos)
 
-	int histeresis = log2(data->size()); // easy hack - if data size is higher, so is the histeresis
+	// int histeresis = log2(data->size()); // easy hack - if data size is higher, so is the histeresis
 
-	for(int i = 2; i < m_nrOfMarkers - 1; i++) {
-		int idx = findPeakNearIdx((fund_offset * i + dc_idx), histeresis);
-		MarkerInfo mi = {.name = QString::number(i) + "H",
-				 .marker = m_markers[i],
-				 .peak = {data->xData()[idx], data->yData()[idx]}};
-		m_markerInfo.append(mi);
-	}
+	// for(int i = 2; i < m_nrOfMarkers - 1; i++) {
+	// 	int idx = findPeakNearIdx((fund_offset * i + dc_idx), histeresis);
+	// 	MarkerInfo mi = {.name = QString::number(i) + "H",
+	// 			 .marker = m_markers[i],
+	// 			 .peak = {data->xData()[idx], data->yData()[idx]}};
+	// 	m_markerInfo.append(mi);
+	// }
 }
 
 void MarkerController::computeImageMarkers()
 {
-	auto data = m_ch->m_ch->chData();
-	m_markerInfo.clear();
-	int dc_idx = (m_complex) ? data->size() / 2 : 0;
+	// auto data = m_ch->m_ch->chData();
+	// m_markerInfo.clear();
+	// int dc_idx = (m_complex) ? data->size() / 2 : 0;
 
-	if(m_sortedPeakInfo.count() == 0)
-		return;
+	// if(m_sortedPeakInfo.count() == 0)
+	// 	return;
 
-	MarkerInfo dc = {
-		.name = QString("DC"), .marker = m_markers[0], .peak = {data->xData()[dc_idx], data->yData()[dc_idx]}};
-	MarkerInfo fund = {.name = QString("Fund"), .marker = m_markers[1], .peak = m_sortedPeakInfo[0]};
-	int fund_offset = m_sortedPeakInfo[0].idx - dc_idx;
-	int idx = dc_idx - fund_offset;
-	MarkerInfo imag = {
-		.name = QString("Imag"), .marker = m_markers[2], .peak = {data->xData()[idx], data->yData()[idx]}};
+	// MarkerInfo dc = {
+	// 	.name = QString("DC"), .marker = m_markers[0], .peak = {data->xData()[dc_idx], data->yData()[dc_idx]}};
+	// MarkerInfo fund = {.name = QString("Fund"), .marker = m_markers[1], .peak = m_sortedPeakInfo[0]};
+	// int fund_offset = m_sortedPeakInfo[0].idx - dc_idx;
+	// int idx = dc_idx - fund_offset;
+	// MarkerInfo imag = {
+	// 	.name = QString("Imag"), .marker = m_markers[2], .peak = {data->xData()[idx], data->yData()[idx]}};
 
-	m_markerInfo.append(dc);
-	m_markerInfo.append(fund);
-	m_markerInfo.append(imag);
+	// m_markerInfo.append(dc);
+	// m_markerInfo.append(fund);
+	// m_markerInfo.append(imag);
 }
 
 int MarkerController::findPeakNearIdx(int idx, int range)
 {
-	auto data = m_ch->m_ch->chData();
-	int start = (idx - range) > 0 ? idx - range : 0;
-	int maxIdx = start;
-	double maxVal = data->yData()[start];
-	for(int i = start; i <= idx + range && i < data->size(); i++) {
-		if(maxVal < data->yData()[i]) {
-			maxVal = data->yData()[i];
-			maxIdx = i;
-		}
-	}
-	return maxIdx;
+	// auto data = m_ch->m_ch->chData();
+	// int start = (idx - range) > 0 ? idx - range : 0;
+	// int maxIdx = start;
+	// double maxVal = data->yData()[start];
+	// for(int i = start; i <= idx + range && i < data->size(); i++) {
+	// 	if(maxVal < data->yData()[i]) {
+	// 		maxVal = data->yData()[i];
+	// 		maxIdx = i;
+	// 	}
+	// }
+	// return maxIdx;
 }
 
 void MarkerController::cacheMarkerInfo()
@@ -317,18 +324,22 @@ double MarkerController::popCacheMarkerInfo()
 	return ret;
 }
 
+PlotComponentChannel *MarkerController::ch() const { return m_ch; }
+
+void MarkerController::setCh(PlotComponentChannel *newCh) { m_ch = newCh; }
+
 void MarkerController::attachMarkersToPlot()
 {
-	for(auto m : m_markerInfo) {
-		m.marker->setValue(m.peak.x, m.peak.y);
+	// for(auto m : m_markerInfo) {
+	// 	m.marker->setValue(m.peak.x, m.peak.y);
 
-		QwtText lbl;
-		lbl.setText(m.name);
-		lbl.setColor(m_ch->m_fftPlotCh->curve()->pen().color());
-		m.marker->setLabel(lbl);
-		m.marker->setLabelAlignment(Qt::AlignTop);
-		m.marker->setSpacing(10);
-	}
+	// 	QwtText lbl;
+	// 	lbl.setText(m.name);
+	// 	lbl.setColor(m_ch->m_fftPlotCh->curve()->pen().color());
+	// 	m.marker->setLabel(lbl);
+	// 	m.marker->setLabelAlignment(Qt::AlignTop);
+	// 	m.marker->setSpacing(10);
+	// }
 }
 
 bool MarkerController::enabled() const { return m_enabled; }
@@ -412,3 +423,5 @@ void MarkerLabel::updateInfo(QList<MarkerController::MarkerInfo> markers)
 			      m_mpf->format(m.peak.x, "Hz", 3));
 	}
 }
+
+#include "moc_markercontroller.cpp"

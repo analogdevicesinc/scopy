@@ -1,20 +1,19 @@
 #ifndef PLOTCOMPONENT_H
 #define PLOTCOMPONENT_H
 
+#include "scopy-gui_export.h"
 #include "cursorcontroller.h"
-#include "scopy-adc_export.h"
-#include <gui/plotwidget.h>
-#include "toolcomponent.h"
+#include <plotwidget.h>
+#include <toolcomponent.h>
 #include <QWidget>
 #include <QList>
 
 namespace scopy {
-namespace adc {
 
 class ChannelComponent;
 class PlotComponent;
 
-class SCOPY_ADC_EXPORT PlotComponentChannel
+class SCOPY_GUI_EXPORT PlotComponentChannel
 {
 public:
 	virtual ChannelComponent *channelComponent() = 0;
@@ -27,7 +26,7 @@ public:
 	virtual void deinitPlotComponent() = 0;
 };
 
-class SCOPY_ADC_EXPORT PlotComponent : public QWidget, public MetaComponent
+class SCOPY_GUI_EXPORT PlotComponent : public QWidget, public MetaComponent
 {
 	Q_OBJECT
 public:
@@ -77,6 +76,5 @@ protected:
 	QList<PlotComponentChannel *> m_channels;
 	CursorController *m_cursor;
 };
-} // namespace adc
 } // namespace scopy
 #endif // PLOTCOMPONENT_H

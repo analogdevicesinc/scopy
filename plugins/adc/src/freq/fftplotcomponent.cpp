@@ -1,19 +1,16 @@
 #include "fftplotcomponent.h"
 #include "plotaxis.h"
 
-#include <gui/widgets/menucollapsesection.h>
-#include <gui/widgets/menusectionwidget.h>
-#include <gui/widgets/menuplotaxisrangecontrol.h>
-#include "channelcomponent.h"
+#include <widgets/menucollapsesection.h>
+#include <widgets/menusectionwidget.h>
+#include <widgets/menuplotaxisrangecontrol.h>
 #include <pluginbase/preferences.h>
-#include <timeplotcomponentchannel.h>
 #include <qwt_point_data.h>
 #include <QLineEdit>
-#include <timeplotcomponentsettings.h>
+#include "channelcomponent.h"
 
 using namespace scopy;
-using namespace scopy::adc;
-using namespace scopy::gui;
+using namespace adc;
 
 FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	: PlotComponent(name, uuid, parent)
@@ -66,3 +63,5 @@ FFTPlotComponentSettings *FFTPlotComponent::createPlotMenu(QWidget *parent) { re
 FFTPlotComponentSettings *FFTPlotComponent::plotMenu() { return m_plotMenu; }
 
 FFTSamplingInfo *FFTPlotComponent::fftPlotInfo() const { return m_fftInfo; }
+
+#include "moc_fftplotcomponent.cpp"
