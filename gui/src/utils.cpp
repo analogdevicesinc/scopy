@@ -116,6 +116,24 @@ bool Util::compareNatural(const std::string &a, const std::string &b)
 	return (compareNatural(a_new, b_new));
 }
 
+QString Util::doubleToQString(double value)
+{
+	QString ret = QString::number(value, 'f', 7); // magic number
+	int i = ret.size() - 1;
+	int toChop = 0;
+	while(ret[i] == '0') {
+		++toChop;
+		--i;
+	}
+
+	if(ret[i] == '.') {
+		++toChop;
+	}
+
+	ret.chop(toChop);
+	return ret;
+}
+
 QWidget *Util::findContainingWindow(QWidget *w)
 {
 	while(dynamic_cast<QWidget *>(w->parent()) != nullptr)
