@@ -1,6 +1,7 @@
 #include "filebrowser.h"
 #include "dac_logging_categories.h"
 
+#include <pluginbase/preferences.h>
 #include <menusectionwidget.h>
 #include <menucollapsesection.h>
 #include <stylehelper.h>
@@ -51,8 +52,10 @@ void FileBrowser::loadFile() { Q_EMIT load(m_filename); }
 void FileBrowser::chooseFile()
 {
 	QString selectedFilter;
-	QString tmpFilename = QFileDialog::getOpenFileName(this, tr("Export"), "", tr("All Files(*)"), &selectedFilter,
-							   QFileDialog::Options(QFileDialog::DontUseNativeDialog));
+
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
+	QString tmpFilename = QFileDialog::getOpenFileName(this, tr("Import"), "", tr("All Files(*)"), &selectedFilter,
+							   (useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 	if(!tmpFilename.isEmpty()) {
 		m_filename = tmpFilename;
 		m_fileBufferPath->getLineEdit()->setText(m_filename);
