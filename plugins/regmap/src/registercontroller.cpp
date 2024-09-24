@@ -129,7 +129,8 @@ void RegisterController::setHasMap(bool hasMap)
 		detailedRegisterToggle->setCheckable(true);
 		QIcon detailedRegisterToggleIcon;
 		detailedRegisterToggleIcon.addPixmap(
-			Style::getPixmap(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_calibration.svg"));
+			Style::getPixmap(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+					 "/icons/tool_calibration.svg"));
 		detailedRegisterToggle->setIcon(detailedRegisterToggleIcon);
 		detailedRegisterToggle->setChecked(true);
 		QObject::connect(detailedRegisterToggle, &QPushButton::toggled, this,

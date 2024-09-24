@@ -52,14 +52,16 @@ bool RegmapPlugin::loadPage()
 bool RegmapPlugin::loadIcon()
 {
 	m_icon = new QLabel("");
-	m_icon->setStyleSheet("border-image: url(:/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/RegMap.svg);");
+	m_icon->setStyleSheet("border-image: url(:/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+			      "/icons/RegMap.svg);");
 	return true;
 }
 
 void RegmapPlugin::loadToolList()
 {
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(REGMAP_PLUGIN_SCOPY_MODULE, REGMAP_PLUGIN_DISPLAY_NAME,
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/RegMap.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/RegMap.svg"));
 }
 
 void RegmapPlugin::unload()

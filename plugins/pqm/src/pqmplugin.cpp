@@ -81,14 +81,18 @@ bool PQMPlugin::loadIcon()
 
 void PQMPlugin::loadToolList()
 {
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("pqmrms", "Rms", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_network_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("pqmrms", "Rms",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_network_analyzer.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("pqmharmonics", "Harmonics",
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_spectrum_analyzer.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_spectrum_analyzer.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("pqmwaveform", "Waveform",
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_oscilloscope.svg"));
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("pqmsettings", "Settings", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_oscilloscope.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("pqmsettings", "Settings",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 }
 
 void PQMPlugin::unload() { delete m_infoPage; }

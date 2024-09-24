@@ -252,7 +252,6 @@ QWidget *TestTool::createMenu(QWidget *parent)
 	cbb->addItem("Lorem");
 	cbb->addItem("Ipsum");
 	cbb->addItem("Corectipsum");
-	StyleHelper::MenuComboBox(cbb, "vdivCombo");
 
 	PositionSpinButton *ssb =
 		new PositionSpinButton({{"Hz", 1e0}, {"kHz", 1e3}, {"MHz", 1e6}}, "Volts", 0, 1000, true, false, vdiv);

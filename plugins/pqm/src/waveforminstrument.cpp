@@ -117,7 +117,8 @@ QWidget *WaveformInstrument::createSettMenu(QWidget *parent)
 	layout->setMargin(0);
 	layout->setSpacing(10);
 
-	MenuHeaderWidget *header = new MenuHeaderWidget("Settings", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), widget);
+	MenuHeaderWidget *header = new MenuHeaderWidget(
+		"Settings", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), widget);
 	MenuSectionWidget *plotSettingsContainer = new MenuSectionWidget(widget);
 	MenuCollapseSection *plotSection = new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE, widget);
 	plotSection->setLayout(new QVBoxLayout());

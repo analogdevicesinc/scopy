@@ -72,8 +72,9 @@ bool DebuggerPlugin::loadPreferencesPage()
 
 void DebuggerPlugin::loadToolList()
 {
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("debugger", "Debugger", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("debugger", "Debugger",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 	ToolMenuEntry::findToolMenuEntryById(m_toolList, "debugger")->setVisible(true);
 }
 

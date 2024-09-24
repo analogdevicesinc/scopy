@@ -119,12 +119,15 @@ bool SWIOTPlugin::loadIcon()
 
 void SWIOTPlugin::loadToolList()
 {
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY(CONFIG_TME_ID, "Config", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(CONFIG_TME_ID, "Config",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(AD74413R_TME_ID, "AD74413R",
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_oscilloscope.svg"));
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY(MAX14906_TME_ID, "MAX14906", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_io.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_oscilloscope.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(MAX14906_TME_ID, "MAX14906",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_io.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(FAULTS_TME_ID, "Faults", ":/swiot/tool_faults.svg"));
 }
 
