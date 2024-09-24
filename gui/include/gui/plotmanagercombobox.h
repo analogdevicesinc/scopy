@@ -1,14 +1,16 @@
 #ifndef PLOTMANAGERCOMBOBOX_H
 #define PLOTMANAGERCOMBOBOX_H
 
+#include <scopy-gui_export.h>
 #include <channelcomponent.h>
 #include <QWidget>
-#include <timeplotmanager.h>
+#include <menucombo.h>
 
 namespace scopy {
-namespace adc {
 
-class PlotManagerCombobox : public QWidget
+class PlotManager;
+
+class SCOPY_GUI_EXPORT PlotManagerCombobox : public QWidget
 {
 	Q_OBJECT
 public:
@@ -31,6 +33,5 @@ private:
 
 	int findIndexFromUuid(uint32_t uuid);
 };
-} // namespace adc
 } // namespace scopy
 #endif // PLOTMANAGERCOMBOBOX_H

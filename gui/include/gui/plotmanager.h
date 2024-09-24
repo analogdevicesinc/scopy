@@ -1,17 +1,17 @@
 #ifndef PLOTMANAGER_H
 #define PLOTMANAGER_H
-#include "markercontroller.h"
-#include "scopy-adc_export.h"
+
+#include "scopy-gui_export.h"
 #include <QWidget>
-#include "toolcomponent.h"
 #include "measurementpanel.h"
 #include "channelcomponent.h"
+#include "toolcomponent.h"
+#include "markercontroller.h"
 
 namespace scopy {
-namespace adc {
 
 class PlotManagerCombobox;
-class SCOPY_ADC_EXPORT PlotManager : public QWidget, public MeasurementPanelInterface, public MetaComponent
+class SCOPY_GUI_EXPORT PlotManager : public QWidget, public MeasurementPanelInterface, public MetaComponent
 {
 	Q_OBJECT
 public:
@@ -64,6 +64,5 @@ protected:
 	QMap<ChannelComponent *, PlotManagerCombobox *> m_channelPlotcomboMap;
 	// PlotSettings *m_plotSettings;
 };
-} // namespace adc
 } // namespace scopy
 #endif // PLOTMANAGER_H

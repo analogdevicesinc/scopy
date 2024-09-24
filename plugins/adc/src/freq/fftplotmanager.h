@@ -2,11 +2,11 @@
 #define FFTPLOTMANAGER_H
 #include "scopy-adc_export.h"
 #include <QWidget>
-#include <interfaces.h>
-#include <channelcomponent.h>
+#include <gui/interfaces.h>
+#include <gui/channelcomponent.h>
 #include <measurementpanel.h>
-#include "plotmanager.h"
-#include "fftplotcomponent.h"
+#include <gui/plotmanager.h>
+#include <freq/fftplotcomponent.h>
 
 namespace scopy {
 namespace adc {

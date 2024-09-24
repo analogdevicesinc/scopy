@@ -5,6 +5,7 @@
 #include "pluginbase/preferences.h"
 
 Q_LOGGING_CATEGORY(CAT_GRFFTSINKCOMPONENT, "GRFFTSinkComponent")
+using namespace scopy;
 using namespace scopy::adc;
 using namespace scopy::grutil;
 

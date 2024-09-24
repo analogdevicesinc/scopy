@@ -1,19 +1,17 @@
 #include "channelcomponent.h"
-#include <gui/plotchannel.h>
-#include <gui/plotaxis.h>
-#include <gui/widgets/menusectionwidget.h>
-#include <gui/widgets/menucollapsesection.h>
-#include <gui/widgets/menuplotchannelcurvestylecontrol.h>
+#include <plotchannel.h>
+#include <plotaxis.h>
+#include <widgets/menusectionwidget.h>
+#include <widgets/menucollapsesection.h>
+#include <widgets/menuplotchannelcurvestylecontrol.h>
 #include <QLoggingCategory>
-#include <timeplotcomponentchannel.h>
-#include <gui/widgets/menuheader.h>
-#include <gui/widgets/menuwidget.h>
+#include <widgets/menuheader.h>
+#include <widgets/menuwidget.h>
 
 Q_LOGGING_CATEGORY(CAT_TIME_CHANNELCOMPONENT, "TimeChannelComponent");
 
 using namespace scopy;
-using namespace gui;
-using namespace scopy::adc;
+
 ChannelComponent::ChannelComponent(QString ch, QPen pen, QWidget *parent)
 	: QWidget(parent)
 	, ToolComponent()
@@ -101,3 +99,5 @@ void ChannelComponent::createMenuControlButton(ChannelComponent *c, QWidget *par
 SamplingInfo ChannelComponent::samplingInfo() { return m_samplingInfo; }
 
 void ChannelComponent::setSamplingInfo(SamplingInfo p) { m_samplingInfo = p; }
+
+#include "moc_channelcomponent.cpp"

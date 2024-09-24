@@ -3,10 +3,10 @@
 
 #include "scopy-adc_export.h"
 #include <QObject>
-#include <toolcomponent.h>
-#include <channelcomponent.h>
+#include <gui/toolcomponent.h>
+#include <gui/channelcomponent.h>
 #include <timeplotcomponent.h>
-#include <plotcomponent.h>
+#include <gui/plotcomponent.h>
 
 namespace scopy {
 namespace adc {

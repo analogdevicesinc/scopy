@@ -15,17 +15,14 @@
 
 #include <plotwidget.h>
 #include "plotinfo.h"
-#include "plotcomponent.h"
+#include <gui/plotcomponent.h>
 #include <gui/widgets/plotinfowidgets.h>
 
-using namespace scopy::gui;
 namespace scopy {
 namespace adc {
 
 class TimePlotComponentSettings;
 class TimePlotComponentChannel;
-class PlotComponentChannel;
-class ChannelComponent;
 
 class SCOPY_ADC_EXPORT TimePlotComponent : public PlotComponent
 {
