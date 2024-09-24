@@ -58,7 +58,8 @@ GRTimeChannelComponent::~GRTimeChannelComponent() {}
 
 QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 {
-	m_yaxisMenu = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_ONOFF, parent);
+	m_yaxisMenu = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_ONOFF,
+						    MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	// Y-MODE
 	m_ymodeCb = new MenuCombo("YMODE", m_yaxisMenu);
@@ -126,8 +127,8 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 
 QWidget *GRTimeChannelComponent::createCurveMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section =
-		new MenuSectionCollapseWidget("CURVE", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("CURVE", MenuCollapseSection::MHCW_NONE,
+									   MenuCollapseSection::MHW_BASEWIDGET, parent);
 	section->contentLayout()->setSpacing(10);
 
 	m_curvemenu = new MenuPlotChannelCurveStyleControl(section);
@@ -177,8 +178,8 @@ QWidget *GRTimeChannelComponent::createMenu(QWidget *parent)
 
 QWidget *GRTimeChannelComponent::createAttrMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section =
-		new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE,
+									   MenuCollapseSection::MHW_BASEWIDGET, parent);
 	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(section).channel(m_src->channel()).buildAll();
 
 	auto layout = new QVBoxLayout();

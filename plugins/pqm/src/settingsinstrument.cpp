@@ -115,8 +115,8 @@ QWidget *SettingsInstrument::createConfigEdit(QString name, QString attr)
 
 void SettingsInstrument::initConfigSection(QWidget *parent)
 {
-	MenuCollapseSection *configSection =
-		new MenuCollapseSection("Config values", MenuCollapseSection::MHCW_ARROW, parent);
+	MenuCollapseSection *configSection = new MenuCollapseSection("Config values", MenuCollapseSection::MHCW_ARROW,
+								     MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	QWidget *configWidget = new QWidget(configSection);
 	configWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -185,8 +185,8 @@ void SettingsInstrument::initConfigSection(QWidget *parent)
 
 void SettingsInstrument::initSystemTimeSection(QWidget *parent)
 {
-	MenuCollapseSection *systemTimeSection =
-		new MenuCollapseSection("System time", MenuCollapseSection::MHCW_ARROW, parent);
+	MenuCollapseSection *systemTimeSection = new MenuCollapseSection("System time", MenuCollapseSection::MHCW_ARROW,
+									 MenuCollapseSection::MHW_BASEWIDGET, parent);
 	systemTimeSection->contentLayout()->setSpacing(6);
 	QDateTimeEdit *systemTimeEdit = new QDateTimeEdit(systemTimeSection);
 	systemTimeEdit->setDateTime(QDateTime::currentDateTime());
@@ -208,8 +208,8 @@ void SettingsInstrument::initSystemTimeSection(QWidget *parent)
 
 void SettingsInstrument::initTimestampSection(QWidget *parent)
 {
-	MenuCollapseSection *timestampSection =
-		new MenuCollapseSection("Logging", MenuCollapseSection::MHCW_ARROW, parent);
+	MenuCollapseSection *timestampSection = new MenuCollapseSection("Logging", MenuCollapseSection::MHCW_ARROW,
+									MenuCollapseSection::MHW_BASEWIDGET, parent);
 	timestampSection->contentLayout()->setSpacing(6);
 
 	QPushButton *startLogBtn = new QPushButton("Start", timestampSection);
@@ -268,8 +268,8 @@ void SettingsInstrument::initTimestampSection(QWidget *parent)
 
 void SettingsInstrument::initCalibSection(QWidget *parent)
 {
-	MenuCollapseSection *calibrateSection =
-		new MenuCollapseSection("Calibrate", MenuCollapseSection::MHCW_ARROW, parent);
+	MenuCollapseSection *calibrateSection = new MenuCollapseSection("Calibrate", MenuCollapseSection::MHCW_ARROW,
+									MenuCollapseSection::MHW_BASEWIDGET, parent);
 	calibrateSection->contentLayout()->setSpacing(6);
 
 	MenuCombo *calibrateCombo = new MenuCombo("Channel Type", calibrateSection);

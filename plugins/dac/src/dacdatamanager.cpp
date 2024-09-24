@@ -83,8 +83,8 @@ void DacDataManager::setupDdsDac() {}
 QWidget *DacDataManager::createAttrMenu(QWidget *parent)
 {
 	MenuSectionWidget *attrContainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *attr =
-		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrContainer);
+	MenuCollapseSection *attr = new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE,
+							    MenuCollapseSection::MHW_BASEWIDGET, attrContainer);
 	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(attr).device(m_model->getDev()).buildAll();
 
 	auto layout = new QVBoxLayout();
