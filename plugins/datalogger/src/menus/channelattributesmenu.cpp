@@ -29,8 +29,8 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, QWidget *p
 	mainLayout->addWidget(scrollArea);
 
 	MenuSectionWidget *attrcontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *attr =
-		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrcontainer);
+	MenuCollapseSection *attr = new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE,
+							    MenuCollapseSection::MHW_BASEWIDGET, attrcontainer);
 
 	QVBoxLayout *attrLayout = new QVBoxLayout();
 	attrLayout->setSpacing(10);

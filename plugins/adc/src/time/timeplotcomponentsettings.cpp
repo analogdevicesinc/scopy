@@ -23,8 +23,8 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	setLayout(v);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-	MenuSectionCollapseWidget *plotMenu =
-		new MenuSectionCollapseWidget("SETTINGS", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *plotMenu = new MenuSectionCollapseWidget(
+		"SETTINGS", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	QLabel *plotTitleLabel = new QLabel("Plot title");
 	StyleHelper::MenuSmallLabel(plotTitleLabel);
@@ -68,11 +68,11 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 		toggleAutoScale();
 	});
 
-	MenuSectionCollapseWidget *yaxis =
-		new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *yaxis = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_NONE,
+									 MenuCollapseSection::MHW_BASEWIDGET, parent);
 
-	MenuSectionCollapseWidget *xySection =
-		new MenuSectionCollapseWidget("XY PLOT", MenuCollapseSection::MHCW_ONOFF, parent);
+	MenuSectionCollapseWidget *xySection = new MenuSectionCollapseWidget(
+		"XY PLOT", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, parent);
 	QAbstractButton *xySwitch = xySection->collapseSection()->header();
 
 	m_xAxisSrc = new MenuCombo("XY - X Axis source");
