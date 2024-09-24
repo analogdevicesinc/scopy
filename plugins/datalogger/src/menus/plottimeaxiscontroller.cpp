@@ -21,8 +21,8 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 	this->setLayout(layout);
 
 	MenuSectionWidget *xAxisContainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *xAxisSection =
-		new MenuCollapseSection("X-AXIS", MenuCollapseSection::MHCW_NONE, xAxisContainer);
+	MenuCollapseSection *xAxisSection = new MenuCollapseSection(
+		"X-AXIS", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, xAxisContainer);
 
 	xAxisContainer->contentLayout()->addWidget(xAxisSection);
 	xAxisSection->contentLayout()->setSpacing(10);

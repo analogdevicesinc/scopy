@@ -77,7 +77,8 @@ QWidget *ChannelAddon::createCurveMenu(QWidget *parent)
 {
 
 	MenuSectionWidget *curvecontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *curve = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, curvecontainer);
+	MenuCollapseSection *curve = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE,
+							     MenuCollapseSection::MHW_BASEWIDGET, curvecontainer);
 
 	MenuPlotChannelCurveStyleControl *curveSettings = new MenuPlotChannelCurveStyleControl(curve);
 	curveSettings->addChannels(m_plotCh);

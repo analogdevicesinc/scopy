@@ -2,12 +2,14 @@
 #include <smallOnOffSwitch.h>
 #include <widgets/menucollapsesection.h>
 #include <QLoggingCategory>
+#include <compositeheaderwidget.h>
+
 Q_LOGGING_CATEGORY(CAT_MENU_COLLAPSE_SECTION, "MenuCollapseSection")
 
 using namespace scopy;
 
 MenuCollapseHeader::MenuCollapseHeader(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style,
-				       QWidget *parent)
+				       MenuCollapseSection::MenuHeaderWidgetType headerType, QWidget *parent)
 	: QAbstractButton(parent)
 {
 	lay = new QHBoxLayout(this);
@@ -19,7 +21,14 @@ MenuCollapseHeader::MenuCollapseHeader(QString title, MenuCollapseSection::MenuH
 	setCheckable(true);
 	setLayout(lay);
 
-	m_headerWidget = new BaseHeaderWidget(title, this);
+	switch(headerType) {
+	case MenuCollapseSection::MHW_BASEWIDGET:
+		m_headerWidget = new BaseHeaderWidget(title, this);
+		break;
+	case MenuCollapseSection::MHW_COMPOSITEWIDGET:
+		m_headerWidget = new CompositeHeaderWidget(title, this);
+		break;
+	}
 
 	switch(style) {
 	case MenuCollapseSection::MHCW_ARROW:
@@ -63,7 +72,7 @@ QString MenuCollapseHeader::title()
 QWidget *MenuCollapseHeader::headerWidget() const { return m_headerWidget; }
 
 MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style,
-					 QWidget *parent)
+					 MenuCollapseSection::MenuHeaderWidgetType headerType, QWidget *parent)
 	: QWidget(parent)
 	, m_title(title)
 {
@@ -72,7 +81,7 @@ MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::Men
 	m_lay->setMargin(0);
 	m_lay->setSpacing(0);
 	setLayout(m_lay);
-	m_header = new MenuCollapseHeader(m_title, style, this);
+	m_header = new MenuCollapseHeader(m_title, style, headerType, this);
 	m_lay->addWidget(m_header);
 	QWidget *container = new QWidget(this);
 	m_lay->addWidget(container);

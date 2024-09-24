@@ -22,13 +22,15 @@ void GuiDetailsView::setupUi()
 	m_scrollArea->setWidgetResizable(true);
 	m_scrollArea->setWidget(m_scrollAreaContents);
 
-	MenuCollapseSection *attrSection = new MenuCollapseSection("Attributes", MenuCollapseSection::MHCW_ONOFF, this);
+	MenuCollapseSection *attrSection = new MenuCollapseSection("Attributes", MenuCollapseSection::MHCW_ONOFF,
+								   MenuCollapseSection::MHW_BASEWIDGET, this);
 	attrSection->contentLayout()->setSpacing(10);
 	attrSection->contentLayout()->setMargin(0);
 	attrSection->contentLayout()->addWidget(m_scrollArea);
 	attrSection->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
-	m_detailsSeparator = new MenuCollapseSection("General info", MenuCollapseSection::MHCW_ONOFF, this);
+	m_detailsSeparator = new MenuCollapseSection("General info", MenuCollapseSection::MHCW_ONOFF,
+						     MenuCollapseSection::MHW_BASEWIDGET, this);
 	m_detailsSeparator->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
 	layout()->addWidget(attrSection);

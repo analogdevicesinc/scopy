@@ -63,8 +63,8 @@ QWidget *ImportChannelComponent::createMenu(QWidget *parent)
 
 QWidget *ImportChannelComponent::createYAxisMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section =
-		new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_ONOFF, parent);
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_ONOFF,
+									   MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_timePlotChannelComponent->m_timePlotYAxis, section);
 	m_autoscaleBtn = new QPushButton(tr("AUTOSCALE"), section);
@@ -94,8 +94,8 @@ QWidget *ImportChannelComponent::createYAxisMenu(QWidget *parent)
 
 QWidget *ImportChannelComponent::createCurveMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section =
-		new MenuSectionCollapseWidget("CURVE", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("CURVE", MenuCollapseSection::MHCW_NONE,
+									   MenuCollapseSection::MHW_BASEWIDGET, parent);
 	section->contentLayout()->setSpacing(10);
 
 	m_curvemenu = new MenuPlotChannelCurveStyleControl(section);

@@ -82,8 +82,8 @@ QWidget *FFTPlotManagerSettings::createMenu(QWidget *parent)
 
 QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section =
-		new MenuSectionCollapseWidget("X-AXIS", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("X-AXIS", MenuCollapseSection::MHCW_NONE,
+									   MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	m_bufferSizeSpin = new MenuSpinbox("Buffer Size", 16, "samples", 0, 4000000, true, false, section);
 	m_bufferSizeSpin->setScaleRange(1, 1e6);

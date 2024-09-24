@@ -666,8 +666,8 @@ QWidget *Ad74413r::createSettingsMenu(QWidget *parent)
 
 	MenuHeaderWidget *header = new MenuHeaderWidget("AD74413R", QPen(StyleHelper::getColor("ScopyBlue")), widget);
 	MenuSectionWidget *plotSettingsContainer = new MenuSectionWidget(widget);
-	MenuCollapseSection *plotTimespanSection =
-		new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE, widget);
+	MenuCollapseSection *plotTimespanSection = new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE,
+									   MenuCollapseSection::MHW_BASEWIDGET, widget);
 	plotTimespanSection->setLayout(new QVBoxLayout());
 	plotTimespanSection->contentLayout()->setSpacing(10);
 	plotTimespanSection->contentLayout()->setMargin(0);

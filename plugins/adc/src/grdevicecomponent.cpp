@@ -80,7 +80,8 @@ QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent)
 	}
 
 	MenuSectionCollapseWidget *attr =
-		new MenuSectionCollapseWidget("COMMON CHANNEL ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
+		new MenuSectionCollapseWidget("COMMON CHANNEL ATTRIBUTES", MenuCollapseSection::MHCW_NONE,
+					      MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
@@ -98,8 +99,8 @@ QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent)
 
 QWidget *GRDeviceComponent::createAttrMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *attr =
-		new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *attr = new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE,
+									MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder().device(m_src->iioDev()).buildAll();
 	const struct iio_context *ctx = iio_device_get_context(m_src->iioDev());

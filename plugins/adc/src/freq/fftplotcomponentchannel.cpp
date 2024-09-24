@@ -119,8 +119,8 @@ void FFTPlotComponentChannel::lockYAxis(bool b)
 QWidget *FFTPlotComponentChannel::createCurveMenu(QWidget *parent)
 {
 
-	MenuSectionCollapseWidget *curve =
-		new MenuSectionCollapseWidget("CURVE", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *curve = new MenuSectionCollapseWidget("CURVE", MenuCollapseSection::MHCW_NONE,
+									 MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	MenuPlotChannelCurveStyleControl *curveSettings = new MenuPlotChannelCurveStyleControl(curve);
 	curveSettings->addChannels(m_fftPlotCh);

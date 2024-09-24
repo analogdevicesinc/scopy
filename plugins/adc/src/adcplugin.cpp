@@ -71,8 +71,8 @@ bool ADCPlugin::loadPreferencesPage()
 	m_preferencesPage = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
 
-	MenuSectionCollapseWidget *generalSection =
-		new MenuSectionCollapseWidget("General", MenuCollapseSection::MHCW_NONE);
+	MenuSectionCollapseWidget *generalSection = new MenuSectionCollapseWidget(
+		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET);
 	generalSection->contentLayout()->setSpacing(10);
 	lay->addWidget(generalSection);
 	lay->setMargin(0);

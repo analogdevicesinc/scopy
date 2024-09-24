@@ -25,8 +25,8 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	setLayout(v);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-	MenuSectionCollapseWidget *plotMenu =
-		new MenuSectionCollapseWidget("SETTINGS", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *plotMenu = new MenuSectionCollapseWidget(
+		"SETTINGS", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	QLabel *plotTitleLabel = new QLabel("Plot title");
 	StyleHelper::MenuSmallLabel(plotTitleLabel);
@@ -42,8 +42,8 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	connect(labelsSwitch->onOffswitch(), &QAbstractButton::toggled, m_plotComponent,
 		&PlotComponent::showPlotLabels);
 
-	MenuSectionCollapseWidget *yaxis =
-		new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *yaxis = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_NONE,
+									 MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_plotComponent->fftPlot()->yAxis(), this);
 	m_yCtrl->minSpinbox()->setIncrementMode(MenuSpinbox::IS_FIXED);

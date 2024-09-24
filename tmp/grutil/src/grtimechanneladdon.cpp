@@ -85,7 +85,8 @@ GRTimeChannelAddon::~GRTimeChannelAddon() {}
 QWidget *GRTimeChannelAddon::createYAxisMenu(QWidget *parent)
 {
 	MenuSectionWidget *yaxiscontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *yaxis = new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE, yaxiscontainer);
+	MenuCollapseSection *yaxis = new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE,
+							     MenuCollapseSection::MHW_BASEWIDGET, yaxiscontainer);
 
 	// Y-MODE
 	m_ymodeCb = new MenuCombo("YMODE", yaxis);
@@ -191,8 +192,8 @@ QWidget *GRTimeChannelAddon::createMenu(QWidget *parent)
 QWidget *GRTimeChannelAddon::createAttrMenu(QWidget *parent)
 {
 	MenuSectionWidget *attrcontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *attr =
-		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrcontainer);
+	MenuCollapseSection *attr = new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE,
+							    MenuCollapseSection::MHW_BASEWIDGET, attrcontainer);
 	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder().channel(grch()->channel()).buildAll();
 
 	auto layout = new QVBoxLayout();
@@ -446,7 +447,8 @@ QWidget *ImportChannelAddon::createMenu(QWidget *parent)
 QWidget *ImportChannelAddon::createYAxisMenu(QWidget *parent)
 {
 	MenuSectionWidget *yaxiscontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *yaxis = new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE, yaxiscontainer);
+	MenuCollapseSection *yaxis = new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE,
+							     MenuCollapseSection::MHW_BASEWIDGET, yaxiscontainer);
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_plotAxis, yaxis);
 

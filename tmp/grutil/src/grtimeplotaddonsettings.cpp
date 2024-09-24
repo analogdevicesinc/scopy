@@ -65,7 +65,8 @@ QWidget *GRTimePlotAddonSettings::createMenu(QWidget *parent)
 QWidget *GRTimePlotAddonSettings::createYAxisMenu(QWidget *parent)
 {
 	MenuSectionWidget *yaxiscontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *yaxis = new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE, yaxiscontainer);
+	MenuCollapseSection *yaxis = new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE,
+							     MenuCollapseSection::MHW_BASEWIDGET, yaxiscontainer);
 
 	m_plot->plot()->yAxis()->setUnits("V");
 	m_yctrl = new MenuPlotAxisRangeControl(m_plot->plot()->yAxis(), yaxis);
@@ -103,7 +104,8 @@ QWidget *GRTimePlotAddonSettings::createYAxisMenu(QWidget *parent)
 QWidget *GRTimePlotAddonSettings::createXAxisMenu(QWidget *parent)
 {
 	MenuSectionWidget *xaxiscontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *xaxis = new MenuCollapseSection("X-AXIS", MenuCollapseSection::MHCW_NONE, xaxiscontainer);
+	MenuCollapseSection *xaxis = new MenuCollapseSection("X-AXIS", MenuCollapseSection::MHCW_NONE,
+							     MenuCollapseSection::MHW_BASEWIDGET, xaxiscontainer);
 
 	QWidget *bufferPlotSize = new QWidget(xaxis);
 	QHBoxLayout *bufferPlotSizeLayout = new QHBoxLayout(bufferPlotSize);
@@ -284,7 +286,8 @@ QWidget *GRTimePlotAddonSettings::createXAxisMenu(QWidget *parent)
 QWidget *GRTimePlotAddonSettings::createXYMenu(QWidget *parent)
 {
 	MenuSectionWidget *xycontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *xy = new MenuCollapseSection("X-Y", MenuCollapseSection::MHCW_NONE, xycontainer);
+	MenuCollapseSection *xy = new MenuCollapseSection("X-Y", MenuCollapseSection::MHCW_NONE,
+							  MenuCollapseSection::MHW_BASEWIDGET, xycontainer);
 	QVBoxLayout *xyMenuLayout = new QVBoxLayout();
 	xyMenuLayout->setMargin(0);
 	xyMenuLayout->setSpacing(10);
@@ -350,7 +353,8 @@ QWidget *GRTimePlotAddonSettings::createXYMenu(QWidget *parent)
 
 QWidget *GRTimePlotAddonSettings::createCurveMenu(PlotChannel *ch, QWidget *parent)
 {
-	MenuCollapseSection *curve = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, parent);
+	MenuCollapseSection *curve = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE,
+							     MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	MenuPlotChannelCurveStyleControl *curveSettings = new MenuPlotChannelCurveStyleControl(curve);
 	curveSettings->addChannels(ch);
@@ -362,7 +366,8 @@ QWidget *GRTimePlotAddonSettings::createCurveMenu(PlotChannel *ch, QWidget *pare
 QWidget *GRTimePlotAddonSettings::createFFTMenu(QWidget *parent)
 {
 	MenuSectionWidget *fftcontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *fft = new MenuCollapseSection("FFT", MenuCollapseSection::MHCW_NONE, fftcontainer);
+	MenuCollapseSection *fft = new MenuCollapseSection("FFT", MenuCollapseSection::MHCW_NONE,
+							   MenuCollapseSection::MHW_BASEWIDGET, fftcontainer);
 
 	QVBoxLayout *fftLayout = new QVBoxLayout();
 	fftLayout->setMargin(0);

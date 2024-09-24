@@ -180,8 +180,8 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 
 	// General preferences
 	MenuSectionWidget *generalWidget = new MenuSectionWidget(page);
-	MenuCollapseSection *generalSection =
-		new MenuCollapseSection("General", MenuCollapseSection::MHCW_NONE, generalWidget);
+	MenuCollapseSection *generalSection = new MenuCollapseSection(
+		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, generalWidget);
 	generalWidget->contentLayout()->setSpacing(10);
 	generalWidget->contentLayout()->addWidget(generalSection);
 	generalSection->contentLayout()->setSpacing(10);
@@ -219,8 +219,8 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 
 	// Debug preferences
 	MenuSectionWidget *debugWidget = new MenuSectionWidget(page);
-	MenuCollapseSection *debugSection =
-		new MenuCollapseSection("Debug", MenuCollapseSection::MHCW_NONE, debugWidget);
+	MenuCollapseSection *debugSection = new MenuCollapseSection("Debug", MenuCollapseSection::MHCW_NONE,
+								    MenuCollapseSection::MHW_BASEWIDGET, debugWidget);
 	debugWidget->contentLayout()->setSpacing(10);
 	debugWidget->contentLayout()->addWidget(debugSection);
 	debugSection->contentLayout()->setSpacing(10);
