@@ -29,12 +29,13 @@ TxChannel::TxChannel(TxNode *node, unsigned int nbTonesMode, QWidget *parent)
 		QHBoxLayout *toneListLay = new QHBoxLayout();
 		toneList->setLayout(toneListLay);
 		toneListLay->setMargin(0);
-		toneListLay->setSpacing(10);
+		toneListLay->setSpacing(5);
 
 		chnIqLay->addWidget(toneList);
 
 		for(TxNode *nodeTone : children) {
 			MenuSectionWidget *toneSection = new MenuSectionWidget(this);
+			toneSection->contentLayout()->setSpacing(5);
 
 			TxTone *tone = setupTxTone(nodeTone, i);
 			connect(tone, &TxTone::scaleUpdated, this, &TxChannel::scaleUpdated);

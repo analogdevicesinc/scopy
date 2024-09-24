@@ -65,6 +65,7 @@ DacInstrument::DacInstrument(const Connection *conn, QWidget *parent)
 
 	dacManagerStack = new MapStackedWidget(this);
 	tool->addWidgetToCentralContainerHelper(dacManagerStack);
+	tool->centralContainer()->layout()->setMargin(0);
 
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsBtn, TTA_LEFT);
