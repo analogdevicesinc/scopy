@@ -254,8 +254,8 @@ bool M2kPlugin::loadPreferencesPage()
 
 	// General preferences
 	MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
-	MenuCollapseSection *generalSection =
-		new MenuCollapseSection("General", MenuCollapseSection::MHCW_NONE, generalWidget);
+	MenuCollapseSection *generalSection = new MenuCollapseSection(
+		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, generalWidget);
 	generalWidget->contentLayout()->setSpacing(10);
 	generalWidget->contentLayout()->addWidget(generalSection);
 	generalSection->contentLayout()->setSpacing(10);
@@ -267,8 +267,8 @@ bool M2kPlugin::loadPreferencesPage()
 
 	// Analog tools preferences
 	MenuSectionWidget *analogWidget = new MenuSectionWidget(m_preferencesPage);
-	MenuCollapseSection *analogSection =
-		new MenuCollapseSection("Analog tools", MenuCollapseSection::MHCW_NONE, analogWidget);
+	MenuCollapseSection *analogSection = new MenuCollapseSection("Analog tools", MenuCollapseSection::MHCW_NONE,
+								     MenuCollapseSection::MHW_BASEWIDGET, analogWidget);
 	analogWidget->contentLayout()->setSpacing(10);
 	analogWidget->contentLayout()->addWidget(analogSection);
 	analogSection->contentLayout()->setSpacing(10);
@@ -294,8 +294,8 @@ bool M2kPlugin::loadPreferencesPage()
 
 	// Logic tools preferences
 	MenuSectionWidget *logicWidget = new MenuSectionWidget(m_preferencesPage);
-	MenuCollapseSection *logicSection =
-		new MenuCollapseSection("Logic tools", MenuCollapseSection::MHCW_NONE, logicWidget);
+	MenuCollapseSection *logicSection = new MenuCollapseSection("Logic tools", MenuCollapseSection::MHCW_NONE,
+								    MenuCollapseSection::MHW_BASEWIDGET, logicWidget);
 	logicWidget->contentLayout()->setSpacing(10);
 	logicWidget->contentLayout()->addWidget(logicSection);
 	logicSection->contentLayout()->setSpacing(10);

@@ -36,8 +36,8 @@ DioSettingsTab::DioSettingsTab(QWidget *parent)
 
 	MenuHeaderWidget *header = new MenuHeaderWidget("MAX14906", QPen(StyleHelper::getColor("ScopyBlue")), this);
 	MenuSectionWidget *plotSettingsContainer = new MenuSectionWidget(this);
-	MenuCollapseSection *plotTimespanSection =
-		new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE, this);
+	MenuCollapseSection *plotTimespanSection = new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE,
+									   MenuCollapseSection::MHW_BASEWIDGET, this);
 	plotTimespanSection->setLayout(new QVBoxLayout());
 	plotTimespanSection->contentLayout()->setSpacing(10);
 	plotTimespanSection->contentLayout()->setMargin(0);

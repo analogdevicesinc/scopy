@@ -27,7 +27,14 @@ public:
 		MHCW_NONE
 	} MenuHeaderCollapseStyle;
 
+	typedef enum
+	{
+		MHW_BASEWIDGET,
+		MHW_COMPOSITEWIDGET
+	} MenuHeaderWidgetType;
+
 	MenuCollapseSection(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style = MHCW_ARROW,
+			    MenuCollapseSection::MenuHeaderWidgetType headerType = MHW_BASEWIDGET,
 			    QWidget *parent = nullptr);
 	~MenuCollapseSection();
 
@@ -49,7 +56,8 @@ class SCOPY_GUI_EXPORT MenuCollapseHeader : public QAbstractButton
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
 public:
-	MenuCollapseHeader(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style, QWidget *parent);
+	MenuCollapseHeader(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style,
+			   MenuCollapseSection::MenuHeaderWidgetType headerType, QWidget *parent);
 	~MenuCollapseHeader();
 	QString title();
 

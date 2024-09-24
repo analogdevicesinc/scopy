@@ -31,8 +31,8 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 
 	QStringList backendsList = computeBackendsList();
 
-	MenuSectionCollapseWidget *scanSection =
-		new MenuSectionCollapseWidget("SCAN", MenuCollapseSection::MHCW_ARROW, contentWidget);
+	MenuSectionCollapseWidget *scanSection = new MenuSectionCollapseWidget(
+		"SCAN", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
 
 	QWidget *scanWidget = new QWidget(scanSection);
 	QGridLayout *scanGrid = new QGridLayout(scanWidget);
@@ -59,8 +59,8 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 	scanSection->add(scanWidget);
 	contentLay->addWidget(scanSection);
 
-	MenuSectionCollapseWidget *serialSection =
-		new MenuSectionCollapseWidget("SERIAL", MenuCollapseSection::MHCW_ARROW, contentWidget);
+	MenuSectionCollapseWidget *serialSection = new MenuSectionCollapseWidget(
+		"SERIAL", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
 
 	QWidget *serialSettWidget = createSerialSettWidget(serialSection);
 	bool serialCompatible = isSerialCompatible();

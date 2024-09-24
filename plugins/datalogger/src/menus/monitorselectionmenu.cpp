@@ -60,7 +60,8 @@ MonitorSelectionMenu::MonitorSelectionMenu(QMap<QString, DataMonitorModel *> *mo
 
 void MonitorSelectionMenu::generateDeviceSection(QString device, bool import)
 {
-	MenuCollapseSection *devMonitorsSection = new MenuCollapseSection(device, MenuCollapseSection::MHCW_NONE, this);
+	MenuCollapseSection *devMonitorsSection = new MenuCollapseSection(
+		device, MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_COMPOSITEWIDGET, this);
 
 	if(import) {
 
