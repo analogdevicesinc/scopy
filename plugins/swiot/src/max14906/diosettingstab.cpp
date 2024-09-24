@@ -35,7 +35,8 @@ DioSettingsTab::DioSettingsTab(QWidget *parent)
 	layout->setSpacing(10);
 	layout->setContentsMargins(0, 0, 0, 0);
 
-	MenuHeaderWidget *header = new MenuHeaderWidget("MAX14906", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), this);
+	MenuHeaderWidget *header = new MenuHeaderWidget(
+		"MAX14906", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), this);
 	MenuSectionWidget *plotSettingsContainer = new MenuSectionWidget(this);
 	MenuCollapseSection *plotTimespanSection =
 		new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE, this);

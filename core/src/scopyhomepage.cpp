@@ -20,7 +20,8 @@ ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
 	auto &&db = ui->wDeviceBrowser;
 	add = new ScopyHomeAddPage(this, pm);
 
-	ui->container->setStyleSheet(".QWidget#container { background-color: " + Style::getAttribute(json::theme::background_subtle) + "; }");
+	ui->container->setStyleSheet(".QWidget#container { background-color: " +
+				     Style::getAttribute(json::theme::background_subtle) + "; }");
 	Style::setStyle(ui->horizontalLayout_2, style::properties::widget::border);
 	Style::setStyle(ui->wInfoPageStack, style::properties::widget::border);
 

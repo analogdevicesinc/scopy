@@ -34,10 +34,11 @@ void StyleHelper::initColorMap()
 	auto sh = StyleHelper::GetInstance();
 	sh->colorMap.insert("interactive_primary_idle", Style::getAttribute(json::theme::interactive_primary_idle));
 	sh->colorMap.insert("interactive_subtle_idle", Style::getAttribute(json::theme::interactive_subtle_idle));
-	sh->colorMap.insert("interactive_subtle_disabled", Style::getAttribute(json::theme::interactive_subtle_disabled));
+	sh->colorMap.insert("interactive_subtle_disabled",
+			    Style::getAttribute(json::theme::interactive_subtle_disabled));
 	sh->colorMap.insert("background_primary", Style::getAttribute(json::theme::background_primary));
 	sh->colorMap.insert("content_default", Style::getAttribute(json::theme::content_default));
-	sh->colorMap.insert("content_busy",  Style::getAttribute(json::theme::content_busy));
+	sh->colorMap.insert("content_busy", Style::getAttribute(json::theme::content_busy));
 	sh->colorMap.insert("content_inverse", Style::getAttribute(json::theme::content_inverse));
 	sh->colorMap.insert("background_subtle", Style::getAttribute(json::theme::background_subtle));
 	sh->colorMap.insert("danger_default", Style::getAttribute(json::theme::danger_default));
@@ -450,9 +451,7 @@ void StyleHelper::MenuEditTextHeaderWidget(QWidget *w, QString objectName)
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::MenuSpinComboBox(QComboBox *w, QString objectName)
-{
-}
+void StyleHelper::MenuSpinComboBox(QComboBox *w, QString objectName) {}
 
 void StyleHelper::MenuOnOffSwitch(QWidget *w, QString objectName)
 {
@@ -592,7 +591,7 @@ void StyleHelper::MenuCollapseSection(QWidget *w, QString objectName)
 	if(!objectName.isEmpty())
 		w->setObjectName(objectName);
 
-	       /// ????
+	/// ????
 	QString style = QString(R"css(
 .QWidget {
 	background-color: transparent;
