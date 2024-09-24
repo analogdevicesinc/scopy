@@ -86,7 +86,7 @@ void ConfigChannelView::connectSignalsAndSlots()
 
 void ConfigChannelView::setHighlightPalette()
 {
-	QString highlightColor = Style::getAttribute(json::theme::content_default);
+	QString highlightColor = Style::getAttribute(json::theme::content_silent);
 	QPalette newPalette = QPalette(palette());
 	newPalette.setColor(QPalette::Highlight, QColor(highlightColor));
 	setPalette(newPalette);

@@ -11,6 +11,10 @@
     outline: none;
 }
 
+QLabel {
+	background-color: transparent;
+}
+
 QCheckBox {
 	background-color: transparent;
 }

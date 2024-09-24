@@ -8,7 +8,6 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonArray>
-#include <iostream>
 #include <utils.h>
 #include <QFileInfo>
 #include <QDirIterator>
