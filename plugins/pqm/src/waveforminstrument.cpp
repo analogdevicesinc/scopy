@@ -118,7 +118,8 @@ QWidget *WaveformInstrument::createSettMenu(QWidget *parent)
 
 	MenuHeaderWidget *header = new MenuHeaderWidget("Settings", QPen(StyleHelper::getColor("ScopyBlue")), widget);
 	MenuSectionWidget *plotSettingsContainer = new MenuSectionWidget(widget);
-	MenuCollapseSection *plotSection = new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE, widget);
+	MenuCollapseSection *plotSection = new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE,
+								   MenuCollapseSection::MHW_BASEWIDGET, widget);
 	plotSection->setLayout(new QVBoxLayout());
 	plotSection->contentLayout()->setSpacing(10);
 	plotSection->contentLayout()->setMargin(0);

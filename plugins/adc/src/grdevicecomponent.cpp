@@ -36,7 +36,8 @@ QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent)
 
 	QList<IIOWidget *> attrWidgets;
 	MenuSectionCollapseWidget *attr =
-		new MenuSectionCollapseWidget("COMMON CHANNEL ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
+		new MenuSectionCollapseWidget("COMMON CHANNEL ATTRIBUTES", MenuCollapseSection::MHCW_NONE,
+					      MenuCollapseSection::MHW_BASEWIDGET, parent);
 	const struct iio_context *ctx = iio_device_get_context(dev);
 
 	int chCount = iio_device_get_channels_count(dev);
@@ -103,8 +104,8 @@ QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent)
 
 QWidget *GRDeviceComponent::createAttrMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *attr =
-		new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
+	MenuSectionCollapseWidget *attr = new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE,
+									MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(attr).device(m_src->iioDev()).buildAll();
 	const struct iio_context *ctx = iio_device_get_context(m_src->iioDev());

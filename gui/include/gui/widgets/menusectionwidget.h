@@ -43,7 +43,7 @@ class SCOPY_GUI_EXPORT MenuSectionCollapseWidget : public QWidget, public Collap
 	QWIDGET_PAINT_EVENT_HELPER
 public:
 	MenuSectionCollapseWidget(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style,
-				  QWidget *parent = nullptr);
+				  MenuCollapseSection::MenuHeaderWidgetType headerType, QWidget *parent = nullptr);
 	~MenuSectionCollapseWidget();
 	QVBoxLayout *contentLayout() const;
 

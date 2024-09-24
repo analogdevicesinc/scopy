@@ -334,8 +334,8 @@ QWidget *FaultsDevice::createExplanationSection(QWidget *parent)
 	}
 	m_faultsExplanation->ensurePolished();
 
-	MenuCollapseSection *explanationSection =
-		new MenuCollapseSection("Faults explanation", MenuCollapseSection::MHCW_ONOFF, this);
+	MenuCollapseSection *explanationSection = new MenuCollapseSection(
+		"Faults explanation", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, this);
 	explanationSection->setLayout(new QVBoxLayout());
 	explanationSection->contentLayout()->setSpacing(10);
 	explanationSection->contentLayout()->setMargin(0);
