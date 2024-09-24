@@ -1,6 +1,8 @@
 #include "baseheaderwidget.h"
 #include <smallOnOffSwitch.h>
 #include <widgets/menucollapsesection.h>
+#include <QLoggingCategory>
+Q_LOGGING_CATEGORY(CAT_MENU_COLLAPSE_SECTION, "MenuCollapseSection")
 
 using namespace scopy;
 
@@ -48,9 +50,17 @@ MenuCollapseHeader::MenuCollapseHeader(QString title, MenuCollapseSection::MenuH
 
 MenuCollapseHeader::~MenuCollapseHeader() {}
 
-QString MenuCollapseHeader::title() { return m_headerWidget->title(); }
+QString MenuCollapseHeader::title()
+{
+	BaseHeader *baseHeader = dynamic_cast<BaseHeader *>(m_headerWidget);
+	if(!baseHeader) {
+		qDebug(CAT_MENU_COLLAPSE_SECTION) << "Header widget doesn't implement the BaseHeader interface!";
+		return "";
+	}
+	return baseHeader->title();
+}
 
-BaseHeader *MenuCollapseHeader::headerWidget() const { return m_headerWidget; }
+QWidget *MenuCollapseHeader::headerWidget() const { return m_headerWidget; }
 
 MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style,
 					 QWidget *parent)
@@ -85,7 +95,10 @@ QString MenuCollapseSection::title() { return m_title; }
 void MenuCollapseSection::setTitle(QString s)
 {
 	m_title = s;
-	m_header->headerWidget()->setTitle(s);
+	BaseHeader *baseHeader = dynamic_cast<BaseHeader *>(m_header->headerWidget());
+	if(baseHeader) {
+		baseHeader->setTitle(s);
+	}
 }
 
 #include "moc_menucollapsesection.cpp"
