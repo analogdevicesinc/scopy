@@ -12,6 +12,8 @@
 #include <QFileInfo>
 #include <QDirIterator>
 
+#include <common/scopyconfig.h>
+
 using namespace scopy;
 
 Style *Style::pinstance_{nullptr};
@@ -21,12 +23,13 @@ QMap<QString, QString> *Style::m_styleMap{new QMap<QString, QString>()};
 
 Style::Style(QObject *parent)
 	: QObject(parent)
-	, m_globalJsonPath("style/json/global.json")
-	, m_themeJsonPath("style/json/dark.json")
+	, m_globalJsonPath("/json/global.json")
+	, m_themeJsonPath("/json/dark.json")
+	, m_qssFolderPath("/qss")
 	, m_qssGlobalFile("global")
-	, m_qssFolderPath("style/qss")
 	, m_m2kqssFile("m2k")
 {
+	initPaths();
 	init();
 }
 
@@ -38,6 +41,26 @@ Style *Style::GetInstance()
 		pinstance_ = new Style(QApplication::instance()); // singleton has the app as parent
 	}
 	return pinstance_;
+}
+
+QString Style::getStylePath(QString relativePath)
+{
+	// Check the local plugins folder first
+	QDir pathDir(config::localStyleFolderPath() + relativePath);
+	QFile pathFile(config::localStyleFolderPath() + relativePath);
+
+	if(pathDir.exists() || pathFile.exists()) {
+		return config::localStyleFolderPath() + relativePath;
+	}
+
+	return config::defaultStyleFolderPath() + relativePath;
+}
+
+void Style::initPaths()
+{
+	m_globalJsonPath = getStylePath(m_globalJsonPath);
+	m_themeJsonPath = getStylePath(m_themeJsonPath);
+	m_qssFolderPath = getStylePath(m_qssFolderPath);
 }
 
 void Style::init(QString theme)

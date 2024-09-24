@@ -41,6 +41,18 @@ QString scopy::config::defaultTranslationFolderPath()
 
 QString scopy::config::localTranslationFolderPath() { return SCOPY_TRANSLATION_BUILD_PATH; }
 
+QString scopy::config::defaultStyleFolderPath()
+{
+#if defined __APPLE__
+	return QCoreApplication::applicationDirPath() + "/style";
+#elif defined(__appimage__)
+	return QCoreApplication::applicationDirPath() + "/../lib/scopy/style";
+#endif
+	return SCOPY_STYLE_INSTALL_PATH;
+}
+
+QString scopy::config::localStyleFolderPath() { return SCOPY_STYLE_BUILD_PATH; }
+
 QString scopy::config::preferencesFolderPath()
 {
 	return QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);

@@ -364,6 +364,7 @@ create_appdir(){
 	EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
 	EMU_CONFIG=$SRC_DIR/resources/scopy_emu_options_config.json
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
+	STYLE_FOLDER=$BUILD_FOLDER/style
 	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib:$QT_LOCATION/lib
 	DLL_FOLDER=${STAGING_AREA}/dll_folder
 	COPY_DEPS=${SRC_DIR}/ci/x86_64/copy-deps.sh
@@ -414,6 +415,8 @@ create_appdir(){
 	
 	mkdir -p $APP_DIR/usr/lib/scopy/translations
 	cp $TRANSLATIONS_QM $APP_DIR/usr/lib/scopy/translations
+	
+	cp -a $STYLE_FOLDER $APP_DIR/usr/lib/scopy/style
 
 	if [ -d $REGMAP_XMLS ]; then
 		cp -r $REGMAP_XMLS $APP_DIR/usr/lib/scopy/plugins
