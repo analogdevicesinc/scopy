@@ -8,7 +8,6 @@
 #include "scopyhomepage.h"
 #include "devicemanager.h"
 #include "scannediiocontextcollector.h"
-#include "toolmanager.h"
 #include "detachedtoolwindowmanager.h"
 #include "pluginrepository.h"
 #include "scopy-core_export.h"
