@@ -21,22 +21,18 @@ FileBrowser::FileBrowser(QWidget *parent)
 	setLayout(m_layout);
 
 	MenuSectionWidget *fileBufferContainer = new MenuSectionWidget(this);
-	MenuCollapseSection *fileBufferSection =
-		new MenuCollapseSection("DAC Buffer Settings", MenuCollapseSection::MHCW_NONE, fileBufferContainer);
-	fileBufferSection->contentLayout()->setSpacing(10);
+	fileBufferContainer->contentLayout()->setSpacing(10);
 
 	m_fileBufferPath = new ProgressLineEdit(this);
 	m_fileBufferPath->getLineEdit()->setReadOnly(true);
 
-	m_fileBufferBrowseBtn = new QPushButton("Browse", fileBufferSection);
-	m_fileBufferLoadBtn = new QPushButton("Load", fileBufferSection);
+	m_fileBufferBrowseBtn = new QPushButton("Browse", fileBufferContainer);
+	m_fileBufferLoadBtn = new QPushButton("Load", fileBufferContainer);
 	connect(m_fileBufferBrowseBtn, &QPushButton::clicked, this, &FileBrowser::chooseFile);
 	connect(m_fileBufferLoadBtn, &QPushButton::clicked, this, &FileBrowser::loadFile);
-	fileBufferSection->contentLayout()->addWidget(new QLabel("Choose file"));
-	fileBufferSection->contentLayout()->addWidget(m_fileBufferPath);
-	fileBufferSection->contentLayout()->addWidget(m_fileBufferBrowseBtn);
-	fileBufferSection->contentLayout()->addWidget(m_fileBufferLoadBtn);
-	fileBufferContainer->contentLayout()->addWidget(fileBufferSection);
+	fileBufferContainer->contentLayout()->addWidget(m_fileBufferPath);
+	fileBufferContainer->contentLayout()->addWidget(m_fileBufferBrowseBtn);
+	fileBufferContainer->contentLayout()->addWidget(m_fileBufferLoadBtn);
 	StyleHelper::BlueButton(m_fileBufferBrowseBtn);
 	StyleHelper::BlueButton(m_fileBufferLoadBtn);
 
