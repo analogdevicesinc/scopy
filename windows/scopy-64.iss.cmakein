@@ -287,6 +287,7 @@ Source: "{#DestFolder}\*.dll"; DestDir: "{app}"; Components: main; Flags: ignore
 Source: "{#DestFolder}\qt.conf"; DestDir: "{app}"; Components: main; Flags: ignoreversion onlyifdoesntexist
 //Plugins
 Source: "{#DestFolder}\plugins\plugins\xmls\*"; DestDir: "{app}\plugins\plugins\xmls"; Components: main; Flags: ignoreversion skipifsourcedoesntexist recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\plugins\plugins\csv\*"; DestDir: "{app}\plugins\plugins\csv"; Components: main; Flags: ignoreversion skipifsourcedoesntexist recursesubdirs createallsubdirs onlyifdoesntexist
 @PLUGIN_COMPONENTS_FILES@
 
 [Tasks]
