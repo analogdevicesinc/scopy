@@ -51,8 +51,11 @@ public Q_SLOTS:
 	void start();
 	void stop();
 	void run();
+	void suspendBuild();
+	void unsuspendBuild();
 
 private:
+	bool m_suspended;
 	gr::top_block_sptr top;
 	QString m_name;
 	bool running;
