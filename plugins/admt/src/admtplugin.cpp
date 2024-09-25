@@ -11,6 +11,8 @@ Q_LOGGING_CATEGORY(CAT_ADMTPLUGIN, "ADMTPlugin")
 using namespace scopy::admt;
 using namespace scopy::grutil;
 
+const bool isDebug = false;
+
 bool ADMTPlugin::compatible(QString m_param, QString category)
 {
 	m_name = "ADMT4000";
@@ -28,7 +30,7 @@ bool ADMTPlugin::compatible(QString m_param, QString category)
 	}
 
 	ConnectionProvider::close(m_param);
-
+	if(isDebug) return true;
 	return ret;
 }
 
@@ -164,7 +166,7 @@ bool ADMTPlugin::onConnect()
 
 	m_admtController = new ADMTController(m_param, this);
 	m_admtController->connectADMT();
-	harmonicCalibration = new HarmonicCalibration(m_admtController);
+	harmonicCalibration = new HarmonicCalibration(m_admtController, isDebug);
 	m_toolList[0]->setTool(harmonicCalibration);
 	
 	return true;

@@ -15,6 +15,7 @@
 #include <numeric>
 #include <complex>
 #include <iterator>
+#include <iomanip>
 
 static const size_t maxAttrSize = 512;
 
@@ -78,6 +79,30 @@ const uint32_t ADMTController::getHarmonicRegister(HarmonicRegister registerID)
 		return HarmonicRegisters[registerID];
 	}
 	return 0x0;
+}
+
+const uint32_t ADMTController::getConfigurationRegister(ConfigurationRegister registerID)
+{
+	if(registerID >= 0 && registerID < CONFIGURATION_REGISTER_COUNT){
+		return ConfigurationRegisters[registerID];
+	}
+	return UINT32_MAX;
+}
+
+const uint32_t ADMTController::getSensorRegister(SensorRegister registerID)
+{
+	if(registerID >= 0 && registerID < SENSOR_REGISTER_COUNT){
+		return SensorRegisters[registerID];
+	}
+	return UINT32_MAX;
+}
+
+const uint32_t ADMTController::getSensorPage(SensorRegister registerID)
+{
+	if(registerID >= 0 && registerID < SENSOR_REGISTER_COUNT){
+		return SensorPages[registerID];
+	}
+	return UINT32_MAX;
 }
 
 int ADMTController::getChannelIndex(const char *deviceName, const char *channelName)
@@ -694,7 +719,7 @@ uint16_t ADMTController::calculateHarmonicCoefficientPhase(double harmonicCoeffi
     return preservedValue;
 }
 
-uint16_t ADMTController::readRegister(uint16_t registerValue, const string key) {
+double ADMTController::getActualHarmonicRegisterValue(uint16_t registerValue, const string key) {
     double result = 0.0;
     const double cordicScaler = 0.6072;
 
@@ -707,10 +732,7 @@ uint16_t ADMTController::readRegister(uint16_t registerValue, const string key) 
         uint16_t extractedValue = registerValue & 0x07FF;
 
         // Convert the extracted value by applying CORDIC scaler and LSB
-        double convertedValue = extractedValue * LSB / cordicScaler;
-        
-        // Convert the scaled value back to uint16_t
-        result = static_cast<uint16_t>(convertedValue);
+        result = extractedValue * LSB / cordicScaler;
     }
     else if (key == "h3mag" || key == "h8mag") {
         // For h3h8mag: value is in bits [7:0], bits [15:8] are reserved
@@ -720,10 +742,7 @@ uint16_t ADMTController::readRegister(uint16_t registerValue, const string key) 
         uint16_t extractedValue = registerValue & 0x00FF;
 
         // Convert the extracted value by applying CORDIC scaler and LSB
-        double convertedValue = extractedValue * LSB / cordicScaler;
-
-        // Convert the scaled value back to uint16_t
-        result = static_cast<uint16_t>(convertedValue);
+        result = extractedValue * LSB / cordicScaler;
     }
     else if (key == "h1phase" || key == "h2phase" || key == "h3phase" || key == "h8phase") {
         // For Phase: value is in bits [11:0], bits [15:12] are reserved
@@ -733,16 +752,211 @@ uint16_t ADMTController::readRegister(uint16_t registerValue, const string key) 
         uint16_t extractedValue = registerValue & 0x0FFF;
 
         // Convert the extracted value by applying the LSB
-        double convertedValue = extractedValue * LSB;
-
-        // Convert the scaled value back to uint16_t
-        result = static_cast<uint16_t>(convertedValue);
+        result = extractedValue * LSB;
     } 
     else {
         // Indicating an error or invalid key
-        result = -1.0; 
+        result = -404.0;
     }
 
     return result;
 }
 
+map<string, bool> ADMTController::getFaultRegisterBitMapping(uint16_t registerValue) {
+    map<string, bool> result;
+
+    // Extract each bit and store the result in the map
+    // Rain: Current returns it as <key,bool> value. 
+    result["Sequencer Watchdog"]      = (registerValue >> 15) & 0x01;
+    result["AMR Radius Check"]  = (registerValue >> 14) & 0x01;
+    result["Turn Counter Cross Check"]     = (registerValue >> 13) & 0x01;
+    result["MT Diagnostic"]      = (registerValue >> 12) & 0x01;
+    result["Turn Count Sensor Levels"]    = (registerValue >> 11) & 0x01;
+    result["Angle Cross Check"]          = (registerValue >> 10) & 0x01;
+    result["Count Sensor False State"]        = (registerValue >> 9)  & 0x01;
+    result["Oscillator Drift"]        = (registerValue >> 8)  & 0x01;
+    result["ECC Double Bit Error"]        = (registerValue >> 7)  & 0x01;
+    result["Reserved"]          = (registerValue >> 6)  & 0x01;
+    result["NVM CRC Fault"]           = (registerValue >> 5)  & 0x01;
+    result["AFE Diagnostic"]           = (registerValue >> 4)  & 0x01;
+    result["VDRIVE Over Voltage"]       = (registerValue >> 3)  & 0x01;
+    result["VDRIVE Under Voltage"]      = (registerValue >> 2)  & 0x01;
+    result["VDD Over Voltage"]          = (registerValue >> 1)  & 0x01;
+    result["VDD Under Voltage"]         = (registerValue >> 0)  & 0x01;
+
+    return result;
+}
+// // How to read each value sample
+// for (const auto& pair : result) {
+//     std::cout << pair.first << ": " << (pair.second ? "Set" : "Not Set") << std::endl;
+// }
+
+map<string, string> ADMTController::getGeneralRegisterBitMapping(uint16_t registerValue) {
+    map<string, string> result;
+
+    // Bit 15: STORAGE[7]
+    result["STORAGE[7]"] = ((registerValue >> 15) & 0x01) ? "Set" : "Not Set";
+
+    // Bits 14:13: Convert Synchronization
+    uint16_t convertSync = (registerValue >> 13) & 0x03;
+    switch (convertSync) {
+        case 0x00:
+            result["Convert Synchronization"] = "Disabled";
+            break;
+        case 0x03:
+            result["Convert Synchronization"] = "Enabled";
+            break;
+        default:
+            result["Convert Synchronization"] = "Reserved";
+            break;
+    }
+
+    // Bit 12: Angle Filter
+    result["Angle Filter"] = ((registerValue >> 12) & 0x01) ? "Enabled" : "Disabled";
+
+    // Bit 11: STORAGE[6]
+    result["STORAGE[6]"] = ((registerValue >> 11) & 0x01) ? "Set" : "Not Set";
+
+    // Bit 10: 8th Harmonic
+    result["8th Harmonic"] = ((registerValue >> 10) & 0x01) ? "User-Supplied Values" : "ADI Factory Values";
+
+    // // Bit 9: Reserved (skipped)
+    // result["Reserved"] = "Reserved";
+
+    // Bits 8:6: STORAGE[5:3]
+    uint16_t storage_5_3 = (registerValue >> 6) & 0x07;
+    result["STORAGE[5:3]"] = std::to_string(storage_5_3);
+
+    // Bits 5:4: Sequence Type
+    uint16_t sequenceType = (registerValue >> 4) & 0x03;
+    switch (sequenceType) {
+        case 0x00:
+            result["Sequence Type"] = "Mode 2";
+            break;
+        case 0x03:
+            result["Sequence Type"] = "Mode 1";
+            break;
+        default:
+            result["Sequence Type"] = "Reserved";
+            break;
+    }
+
+    // Bits 3:1: STORAGE[2:0]
+    uint16_t storage_2_0 = (registerValue >> 1) & 0x07;
+    result["STORAGE[2:0]"] = std::to_string(storage_2_0);
+
+    // Bit 0: Conversion Type
+    result["Conversion Type"] = (registerValue & 0x01) ? "One-shot conversion" : "Continuous conversions";
+
+    return result;
+}
+// // How to read each value sample
+// for (const auto& pair : result) {
+//     std::cout << pair.first << ": " << pair.second << std::endl;
+// }
+
+map<string, bool> ADMTController::getDigioenRegisterBitMapping(uint16_t registerValue) {
+    map<string, bool> result;
+
+    // // Bits 15:14: Reserved (skipped)
+    // result["Reserved (15:14)"] = "Reserved";
+
+    // Bit 13: DIGIO5EN
+    result["DIGIO5EN"] = ((registerValue >> 13) & 0x01) ? true : false; // ? "GPIO5 output enable" : "GPIO5 output disable";
+
+    // Bit 12: DIGIO4EN
+    result["DIGIO4EN"] = ((registerValue >> 12) & 0x01) ? true : false; // ? "GPIO4 output enable" : "GPIO4 output disable";
+
+    // Bit 11: DIGIO3EN
+    result["DIGIO3EN"] = ((registerValue >> 11) & 0x01) ? true : false; // ? "GPIO3 output enable" : "GPIO3 output disable";
+
+    // Bit 10: DIGIO2EN
+    result["DIGIO2EN"] = ((registerValue >> 10) & 0x01) ? true : false; // ? "GPIO2 output enable" : "GPIO2 output disable";
+
+    // Bit 9: DIGIO1EN
+    result["DIGIO1EN"] = ((registerValue >> 9) & 0x01) ? true : false; // ? "GPIO1 output enable" : "GPIO1 output disable";
+
+    // Bit 8: DIGIO0EN
+    result["DIGIO0EN"] = ((registerValue >> 8) & 0x01) ? true : false; // ? "GPIO0 output enable" : "GPIO0 output disable";
+
+    // // Bits 7:6: Reserved (skipped)
+    // result["Reserved (7:6)"] = "Reserved";
+
+    // Bit 5: Bootload
+    result["BOOTLOAD"] = ((registerValue >> 5) & 0x01) ? false : true; // ? "GPIO5" : "Bootload (Output only)";
+
+    // Bit 4: Fault
+    result["FAULT"] = ((registerValue >> 4) & 0x01) ? false : true; // ? "GPIO4" : "Fault (Output only)";
+
+    // Bit 3: Acalc
+    result["ACALC"] = ((registerValue >> 3) & 0x01) ? false : true; // ? "GPIO3" : "Acalc (Output only)";
+
+    // Bit 2: Sent
+    result["SENT"] = ((registerValue >> 2) & 0x01) ? false : true; // ? "GPIO2" : "Sent (Output only)";
+
+    // Bit 1: Cnv
+    result["CNV"] = ((registerValue >> 1) & 0x01) ? false : true; // ? "GPIO1" : "Cnv (Output only)";
+
+    // Bit 0: Busy
+    result["BUSY"] = (registerValue & 0x01) ? false : true; // ? "GPIO0" : "Busy (Output only)";
+
+    return result;
+}
+
+map<string, bool> ADMTController::getDiag1RegisterBitMapping_Register(uint16_t registerValue) {
+    map<string, bool> result;
+
+    // Bits 15 to 8: R7 to R0 (Enabled or Disabled)
+    result["R7"] = ((registerValue >> 15) & 0x01) ? true : false;
+    result["R6"] = ((registerValue >> 14) & 0x01) ? true : false;
+    result["R5"] = ((registerValue >> 13) & 0x01) ? true : false;
+    result["R4"] = ((registerValue >> 12) & 0x01) ? true : false;
+    result["R3"] = ((registerValue >> 11) & 0x01) ? true : false;
+    result["R2"] = ((registerValue >> 10) & 0x01) ? true : false;
+    result["R1"] = ((registerValue >> 9) & 0x01) ? true : false;
+    result["R0"] = ((registerValue >> 8) & 0x01) ? true : false;
+
+    return result;
+}
+
+map<string, double> ADMTController::getDiag1RegisterBitMapping_Afe(uint16_t registerValue) {
+    map<string, double> result;
+
+    // Bits 7:0: AFE Diagnostic 2 - Measurement of Fixed voltage (stored in 2's complement)
+    int8_t afeDiagnostic = static_cast<int8_t>(registerValue & 0x00FF); // Interpret as signed 8-bit
+
+    // Choose the correct resolution based on the voltage level (5V or 3.3V part)
+    double resolution = 0.003222; // 0.0048828 if 5V
+
+    // Convert the AFE Diagnostic value to a voltage
+    double diagnosticVoltage = static_cast<double>(afeDiagnostic) * resolution;
+    result["AFE Diagnostic 2"] = diagnosticVoltage;
+
+    return result;
+}
+
+map<string, double> ADMTController::getDiag2RegisterBitMapping(uint16_t registerValue) {
+    map<string, double> result;
+
+    // Bits 15:8: AFE Diagnostic 1 - Measurement of AFE +57% diagnostic resistor
+    uint16_t afeDiagnostic1 = (registerValue >> 8) & 0x00FF;
+    
+    // Convert AFE Diagnostic 1 value to double
+    // Rain: adjust scaling factor as needed with actual method.
+    double diagnostic1Voltage = static_cast<double>(afeDiagnostic1) * 0.01;  // what I found (to be confirmed)
+    
+    // Store the result with fixed precision
+    result["AFE Diagnostic 1 (+57%)"] = diagnostic1Voltage;
+
+    // Bits 7:0: AFE Diagnostic 0 - Measurement of AFE -57% diagnostic resistor
+    uint16_t afeDiagnostic0 = registerValue & 0x00FF;
+    
+    // Convert AFE Diagnostic 0 value to double
+    // Rain: adjust scaling factor as needed with actual method.
+    double diagnostic0Voltage = static_cast<double>(afeDiagnostic0) * 0.01;  // what I found (to be confirmed)
+    
+    // Store the result with fixed precision
+    result["AFE Diagnostic 0 (-57%)"] = diagnostic0Voltage;
+
+    return result;
+}
