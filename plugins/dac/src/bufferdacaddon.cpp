@@ -294,6 +294,19 @@ void BufferDacAddon::onLoadFinished()
 	Q_EMIT log("Successfully loaded " + fm->getFilePath());
 	m_runBtn->setEnabled(true);
 	updateGuiStrategyWidget();
+	auto data = m_dataBuffer->getDataBufferStrategy()->data();
+	if (data.size()) {
+		enableFirstChannels(data[0].size());
+	}
+}
+
+void BufferDacAddon::enableFirstChannels(int channelCount)
+{
+	int i = 0;
+	for (auto btn : qAsConst(m_channelBtns)) {
+		btn->checkBox()->setChecked(i < channelCount);
+		i++;
+	}
 }
 
 void BufferDacAddon::updateGuiStrategyWidget()
