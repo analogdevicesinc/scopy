@@ -6,6 +6,8 @@ GuiDetailsView::GuiDetailsView(QWidget *parent)
 	: QWidget(parent)
 	, m_scrollArea(new QScrollArea(this))
 	, m_scrollAreaContents(new QWidget(this))
+	, m_spacer(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Maximum))
+	, m_wheelGuard(new MouseWheelWidgetGuard(this))
 {
 	setupUi();
 }
@@ -27,12 +29,18 @@ void GuiDetailsView::setupUi()
 	attrSection->contentLayout()->setMargin(0);
 	attrSection->contentLayout()->addWidget(m_scrollArea);
 	attrSection->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+	connect(attrSection->header(), &QAbstractButton::clicked, this, [this, attrSection](bool checked) {
+		attrSection->setSizePolicy(QSizePolicy::Preferred, checked ? QSizePolicy::Minimum : QSizePolicy::Fixed);
+		m_spacer->changeSize(0, 0, QSizePolicy::Preferred,
+				     checked ? QSizePolicy::Minimum : QSizePolicy::Expanding);
+	});
 
 	m_detailsSeparator = new MenuCollapseSection("General info", MenuCollapseSection::MHCW_ONOFF, this);
 	m_detailsSeparator->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
 	layout()->addWidget(attrSection);
 	layout()->addWidget(m_detailsSeparator);
+	layout()->addItem(m_spacer);
 }
 
 void GuiDetailsView::setIIOStandardItem(IIOStandardItem *item)
@@ -59,6 +67,8 @@ void GuiDetailsView::setIIOStandardItem(IIOStandardItem *item)
 	if(detailsLabel) {
 		detailsLabel->setText(m_currentItem->typeString() + " info");
 	}
+
+	m_wheelGuard->installEventRecursively(this);
 }
 
 void GuiDetailsView::clearWidgets()

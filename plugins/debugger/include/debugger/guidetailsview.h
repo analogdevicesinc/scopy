@@ -1,11 +1,12 @@
 #ifndef GUIDETAILSVIEW_H
 #define GUIDETAILSVIEW_H
 
+#include "iiostandarditem.h"
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
 #include <QScrollArea>
-#include "iiostandarditem.h"
+#include <gui/mousewheelwidgetguard.h>
 
 namespace scopy::debugger {
 class GuiDetailsView : public QWidget
@@ -24,6 +25,8 @@ private:
 	QWidget *m_scrollAreaContents;
 	QList<IIOWidget *> m_currentWidgets;
 	QList<QLabel *> m_detailsList;
+	QSpacerItem *m_spacer;
+	MouseWheelWidgetGuard *m_wheelGuard;
 
 	void clearWidgets();
 };
