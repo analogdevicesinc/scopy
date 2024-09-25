@@ -224,7 +224,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 		QWidget *chnMenu = createMenu(node);
 		m_channelBtns.insert(node->getUuid(), chnBtn);
 		m_channelMenus.insert(node->getUuid(), chnMenu);
-		connect(chnBtn, &QPushButton::toggled, this, [=, this](bool b) {
+		connect(chnBtn, &QPushButton::clicked, this, [=, this](bool b) {
 			if(b) {
 				Q_EMIT requestChannelMenu(node->getUuid());
 			}
