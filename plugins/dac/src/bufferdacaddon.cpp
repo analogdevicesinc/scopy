@@ -4,6 +4,7 @@
 #include "databufferbuilder.h"
 #include "databuffer.h"
 #include "dac_logging_categories.h"
+#include "scopy-dac_config.h"
 
 #include <menusectionwidget.h>
 #include <menucollapsesection.h>
@@ -145,7 +146,21 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	fileBrowserSection->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 	QLabel *fileLbl = new QLabel("Choose file");
 	StyleHelper::MenuSmallLabel(fileLbl);
+
+	// Determine default search dir
+	QString defaultDir = "";
+#ifdef Q_OS_WINDOWS
+	defaultDir = DAC_CSV_PATH_LOCAL;
+#elif defined __APPLE__
+	defaultDir = QCoreApplication::applicationDirPath() + "/plugins/csv";
+#elif defined(__appimage__)
+	defaultDir = QCoreApplication::applicationDirPath() + "/../lib/scopy/plugins/csv";
+#else
+	defaultDir = DAC_CSV_BUILD_PATH;
+#endif
+
 	fm = new FileBrowser(fileBrowserSection);
+	fm->setDefaultDir(defaultDir);
 	fm->setProperty("tutorial_name", "FILE_MANAGER");
 	connect(fm, &FileBrowser::load, this, &BufferDacAddon::load);
 	fileBrowserSection->contentLayout()->addWidget(fileLbl);
@@ -295,7 +310,7 @@ void BufferDacAddon::onLoadFinished()
 	m_runBtn->setEnabled(true);
 	updateGuiStrategyWidget();
 	auto data = m_dataBuffer->getDataBufferStrategy()->data();
-	if (data.size()) {
+	if(data.size()) {
 		enableFirstChannels(data[0].size());
 	}
 }
@@ -303,7 +318,7 @@ void BufferDacAddon::onLoadFinished()
 void BufferDacAddon::enableFirstChannels(int channelCount)
 {
 	int i = 0;
-	for (auto btn : qAsConst(m_channelBtns)) {
+	for(auto btn : qAsConst(m_channelBtns)) {
 		btn->checkBox()->setChecked(i < channelCount);
 		i++;
 	}
