@@ -11,6 +11,7 @@ GRTopBlock::GRTopBlock(QString name, QObject *parent)
 	: QObject(parent)
 	, running(false)
 	, built(false)
+	, m_suspended(false)
 {
 	m_name = name;
 	static int topblockid = 0;
@@ -57,7 +58,6 @@ size_t GRTopBlock::vlen() { return m_vlen; }
 
 void GRTopBlock::build()
 {
-
 	top->disconnect_all();
 	Q_EMIT aboutToBuild();
 
@@ -71,6 +71,7 @@ void GRTopBlock::build()
 		dev->connect_blk(this, nullptr);
 	}
 	Q_EMIT builtSignalPaths();
+
 	built = true;
 }
 
@@ -126,8 +127,18 @@ void GRTopBlock::run()
 
 QString GRTopBlock::name() const { return m_name; }
 
+void GRTopBlock::suspendBuild() { m_suspended = true; }
+
+void GRTopBlock::unsuspendBuild()
+{
+	m_suspended = false;
+	rebuild();
+}
+
 void GRTopBlock::rebuild()
 {
+	if(m_suspended)
+		return;
 	qInfo(SCOPY_GR_UTIL) << QObject::sender();
 	qInfo(SCOPY_GR_UTIL) << "Request rebuild";
 	bool wasRunning = false;

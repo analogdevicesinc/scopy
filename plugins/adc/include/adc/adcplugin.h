@@ -53,7 +53,7 @@ public:
 	void saveSettings(QSettings &) override;
 	void loadSettings(QSettings &) override;
 
-	void newInstrument(ADCInstrumentType t, AcqTreeNode *root);
+	void newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock *grtp);
 	void deleteInstrument(ToolMenuEntry *w);
 
 public Q_SLOTS:
