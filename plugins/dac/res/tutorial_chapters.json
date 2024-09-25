@@ -88,9 +88,10 @@
 			"index": 2,
 			"names": ["TX_READ"],
 			"description": "Refresh all the IIO Attributes of the corresponding TX.",
-			"anchor": "HP_BOTTOM",
-			"content": "HP_BOTTOM",
-			"y_offset": 10
+			"anchor": "HP_LEFT",
+			"content": "HP_LEFT",
+			"y_offset": 10,
+			"x_offset": 10
 		},
 		{
 			"index": 3,
