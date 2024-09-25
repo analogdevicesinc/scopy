@@ -1,5 +1,5 @@
-#ifndef INSTRUMENTMENU_H
-#define INSTRUMENTMENU_H
+#ifndef TOOLMENU_H
+#define TOOLMENU_H
 
 #include <compositewidget.h>
 #include <QMap>
@@ -9,12 +9,12 @@
 
 namespace scopy {
 
-class InstrumentMenu : public QWidget, public CompositeWidget
+class ToolMenu : public QWidget, public CompositeWidget
 {
 	Q_OBJECT
 public:
-	InstrumentMenu(QWidget *parent);
-	~InstrumentMenu();
+	ToolMenu(QWidget *parent);
+	~ToolMenu();
 
 	void add(QWidget *w) override;
 	void add(int index, QString itemId, QWidget *w);
@@ -38,4 +38,4 @@ private:
 
 } // namespace scopy
 
-#endif // INSTRUMENTMENU_H
+#endif // TOOLMENU_H

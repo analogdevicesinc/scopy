@@ -1,4 +1,4 @@
-#include "browsemenu/instrumentwidget.h"
+#include "toolmenuitem.h"
 #include "dynamicWidget.h"
 
 #include <QEvent>
@@ -10,7 +10,7 @@
 
 using namespace scopy;
 
-InstrumentWidget::InstrumentWidget(QString uuid, QString name, QString icon, QWidget *parent)
+ToolMenuItem::ToolMenuItem(QString uuid, QString name, QString icon, QWidget *parent)
 	: QWidget(parent)
 	, m_uuid(uuid)
 	, m_name(name)
@@ -61,13 +61,13 @@ InstrumentWidget::InstrumentWidget(QString uuid, QString name, QString icon, QWi
 #endif
 }
 
-InstrumentWidget::~InstrumentWidget() {}
+ToolMenuItem::~ToolMenuItem() {}
 
-QPushButton *InstrumentWidget::getToolBtn() const { return m_toolBtn; }
+QPushButton *ToolMenuItem::getToolBtn() const { return m_toolBtn; }
 
-QPushButton *InstrumentWidget::getToolRunBtn() const { return m_toolRunBtn; }
+QPushButton *ToolMenuItem::getToolRunBtn() const { return m_toolRunBtn; }
 
-void InstrumentWidget::enableDoubleClick(bool enable)
+void ToolMenuItem::enableDoubleClick(bool enable)
 {
 	if(enable) {
 		m_toolBtn->installEventFilter(this);
@@ -77,7 +77,7 @@ void InstrumentWidget::enableDoubleClick(bool enable)
 	}
 }
 
-bool InstrumentWidget::eventFilter(QObject *watched, QEvent *event)
+bool ToolMenuItem::eventFilter(QObject *watched, QEvent *event)
 {
 	if(event->type() == QEvent::MouseButtonDblClick) {
 		QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
@@ -92,13 +92,13 @@ bool InstrumentWidget::eventFilter(QObject *watched, QEvent *event)
 	return QObject::event(event);
 }
 
-void InstrumentWidget::setName(QString str)
+void ToolMenuItem::setName(QString str)
 {
 	m_name = str;
 	m_toolBtn->setText(m_name);
 }
 
-void InstrumentWidget::hideText(bool hidden)
+void ToolMenuItem::hideText(bool hidden)
 {
 	if(hidden) {
 		m_toolBtn->setText("");
@@ -107,9 +107,9 @@ void InstrumentWidget::hideText(bool hidden)
 	}
 }
 
-void InstrumentWidget::setDisabled(bool disabled) { setDisabled(disabled); }
+void ToolMenuItem::setDisabled(bool disabled) { setDisabled(disabled); }
 
-void InstrumentWidget::updateItem()
+void ToolMenuItem::updateItem()
 {
 	ToolMenuEntry *tme = dynamic_cast<ToolMenuEntry *>(QObject::sender());
 	Q_ASSERT(tme);
@@ -122,7 +122,7 @@ void InstrumentWidget::updateItem()
 	m_toolRunBtn->setChecked(tme->running());
 }
 
-void InstrumentWidget::enterEvent(QEvent *event)
+void ToolMenuItem::enterEvent(QEvent *event)
 {
 #ifndef __ANDROID__
 	setDynamicProperty(this, "allowHover", true);
@@ -130,7 +130,7 @@ void InstrumentWidget::enterEvent(QEvent *event)
 #endif
 }
 
-void InstrumentWidget::leaveEvent(QEvent *event)
+void ToolMenuItem::leaveEvent(QEvent *event)
 {
 #ifndef __ANDROID__
 	setDynamicProperty(this, "allowHover", false);
@@ -138,12 +138,14 @@ void InstrumentWidget::leaveEvent(QEvent *event)
 #endif
 }
 
-QString InstrumentWidget::getId() const { return m_uuid; }
+QString ToolMenuItem::getId() const { return m_uuid; }
 
-void InstrumentWidget::setSelected(bool en)
+void ToolMenuItem::setSelected(bool en)
 {
 	if(!en) {
 		m_toolBtn->setChecked(false);
 	}
 	setDynamicProperty(this, "selected", en);
 }
+
+#include "moc_toolmenuitem.cpp"

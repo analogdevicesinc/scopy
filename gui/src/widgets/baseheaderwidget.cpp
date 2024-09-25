@@ -25,3 +25,5 @@ BaseHeaderWidget::~BaseHeaderWidget() {}
 void BaseHeaderWidget::setTitle(QString title) { m_label->setText(title); }
 
 QString BaseHeaderWidget::title() { return m_label->text(); }
+
+#include "moc_baseheaderwidget.cpp"

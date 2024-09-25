@@ -1,19 +1,19 @@
-#ifndef INSTRUMENTMANAGER_H
-#define INSTRUMENTMANAGER_H
+#ifndef TOOLMENUMANAGER_H
+#define TOOLMENUMANAGER_H
 
-#include "../detachedtoolwindowmanager.h"
-#include "instrumentmenu.h"
-#include "instrumentwidget.h"
+#include "detachedtoolwindowmanager.h"
+#include "toolmenu.h"
+#include "toolmenuitem.h"
 
 #include <QMap>
 #include <QObject>
 #include <menusectionwidget.h>
-#include "../toolstack.h"
+#include "toolstack.h"
 #include <pluginbase/toolmenuentry.h>
-#include "../scopy-core_export.h"
+#include "scopy-core_export.h"
 
 namespace scopy {
-class SCOPY_CORE_EXPORT InstrumentManager : public QObject
+class SCOPY_CORE_EXPORT ToolMenuManager : public QObject
 {
 	Q_OBJECT
 public:
@@ -23,9 +23,8 @@ public:
 		QString uri;
 	} DeviceInfo;
 
-	InstrumentManager(ToolStack *ts, DetachedToolWindowManager *dtm, InstrumentMenu *instrumentMenu,
-			  QObject *parent = nullptr);
-	~InstrumentManager();
+	ToolMenuManager(ToolStack *ts, DetachedToolWindowManager *dtm, ToolMenu *toolMenu, QObject *parent = nullptr);
+	~ToolMenuManager();
 
 	void addMenuItem(QString deviceId, DeviceInfo devInfo, QList<ToolMenuEntry *> tools, int itemIndex = -1);
 	void removeMenuItem(QString deviceId);
@@ -44,27 +43,27 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void updateTool(QWidget *old);
-	void updateToolAttached(bool oldAttach, InstrumentWidget *instrWidget);
+	void updateToolAttached(bool oldAttach, ToolMenuItem *toolMenuItem);
 
 private:
 	void loadToolAttachedState(ToolMenuEntry *tme);
 	void saveToolAttachedState(ToolMenuEntry *tme);
-	void detachSuccesful(InstrumentWidget *instrWidget);
-	void attachSuccesful(InstrumentWidget *instrWidget);
-	void showTool(InstrumentWidget *instrWidget);
-	void selectInstrument(InstrumentWidget *instrWidget, bool on);
+	void detachSuccesful(ToolMenuItem *toolMenuItem);
+	void attachSuccesful(ToolMenuItem *toolMenuItem);
+	void showTool(ToolMenuItem *toolMenuItem);
+	void selectTool(ToolMenuItem *toolMenuItem, bool on);
 	void setTmeAttached(ToolMenuEntry *tme);
 	void createMenuSectionLabel(MenuSectionCollapseWidget *section, QString uri);
-	InstrumentWidget *createInstrWidget(ToolMenuEntry *tme, QWidget *parent = nullptr);
+	ToolMenuItem *createToolMenuItem(ToolMenuEntry *tme, QWidget *parent = nullptr);
 
 	QString m_prevItem;
 	QStringList m_connectedDev;
 	ToolStack *m_ts;
 	DetachedToolWindowManager *m_dtm;
-	InstrumentMenu *m_instrumentMenu;
+	ToolMenu *m_toolMenu;
 	QMap<QString, MenuSectionCollapseWidget *> m_itemMap;
 	QMap<QString, DeviceInfo> m_devInfoMap;
 };
 } // namespace scopy
 
-#endif // INSTRUMENTMANAGER_H
+#endif // TOOLMENUMANAGER_H

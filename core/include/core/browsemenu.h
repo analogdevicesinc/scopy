@@ -1,7 +1,7 @@
 #ifndef BROWSEMENU_H
 #define BROWSEMENU_H
 
-#include "instrumentmenu.h"
+#include "toolmenu.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -23,7 +23,7 @@ public:
 	BrowseMenu(QWidget *parent = nullptr);
 	~BrowseMenu();
 
-	InstrumentMenu *instrumentMenu() const;
+	ToolMenu *toolMenu() const;
 
 Q_SIGNALS:
 	void requestTool(QString tool);
@@ -42,7 +42,7 @@ private:
 	QWidget *m_content;
 	QVBoxLayout *m_contentLay;
 	QSpacerItem *m_spacer;
-	InstrumentMenu *m_instrumentMenu;
+	ToolMenu *m_toolMenu;
 	QPushButton *m_btnCollapse;
 	bool m_collapsed;
 };

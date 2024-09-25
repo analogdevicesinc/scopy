@@ -15,3 +15,5 @@ void CompositeHeaderWidget::add(QWidget *w)
 }
 
 void CompositeHeaderWidget::remove(QWidget *w) { m_lay->removeWidget(w); }
+
+#include "moc_compositeheaderwidget.cpp"
