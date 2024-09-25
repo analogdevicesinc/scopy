@@ -6,6 +6,8 @@
 static int sampleRate = 50;
 static int calibrationTimerRate = 100;
 static int motorCalibrationAcquisitionTimerRate = 20;
+static int utilityTimerRate = 1000;
+
 static int bufferSize = 1;
 static int dataGraphSamples = 100;
 static int tempGraphSamples = 100;
@@ -17,7 +19,6 @@ static int samplesPerCycle = 256;
 static int totalSamplesCount = cycleCount * samplesPerCycle;
 static bool startMotor = false;
 
-static bool isDebug = false;
 static bool isCalibrated = false;
 
 static double motorTimeUnit = 1.048576; // t = 2^24/16Mhz
@@ -46,8 +47,9 @@ using namespace scopy;
 using namespace scopy::admt;
 using namespace scopy::grutil;
 
-HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidget *parent)
+HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool isDebug, QWidget *parent)
 	: QWidget(parent)
+	, isDebug(isDebug)
 	, m_admtController(m_admtController)
 {
 	rotationChannelName = m_admtController->getChannelId(ADMTController::Channel::ROTATION);
@@ -96,10 +98,10 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	angleWidget->contentLayout()->setSpacing(8);
 	countWidget->contentLayout()->setSpacing(8);
 	tempWidget->contentLayout()->setSpacing(8);
-	MenuCollapseSection *rotationSection = new MenuCollapseSection("Rotation", MenuCollapseSection::MHCW_NONE, rotationWidget);
-	MenuCollapseSection *angleSection = new MenuCollapseSection("Angle", MenuCollapseSection::MHCW_NONE, angleWidget);
+	MenuCollapseSection *rotationSection = new MenuCollapseSection("AMR Angle", MenuCollapseSection::MHCW_NONE, rotationWidget);
+	MenuCollapseSection *angleSection = new MenuCollapseSection("GMR Angle", MenuCollapseSection::MHCW_NONE, angleWidget);
 	MenuCollapseSection *countSection = new MenuCollapseSection("Count", MenuCollapseSection::MHCW_NONE, countWidget);
-	MenuCollapseSection *tempSection = new MenuCollapseSection("Temperature", MenuCollapseSection::MHCW_NONE, tempWidget);
+	MenuCollapseSection *tempSection = new MenuCollapseSection("Sensor Temperature", MenuCollapseSection::MHCW_NONE, tempWidget);
 	rotationSection->contentLayout()->setSpacing(8);
 	angleSection->contentLayout()->setSpacing(8);
 	countSection->contentLayout()->setSpacing(8);
@@ -358,6 +360,9 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 	motorCalibrationAcquisitionTimer = new QTimer(this);
 	connect(motorCalibrationAcquisitionTimer, &QTimer::timeout, this, &HarmonicCalibration::motorCalibrationAcquisitionTask);
 
+	utilityTimer = new QTimer(this);
+	connect(utilityTimer, &QTimer::timeout, this, &HarmonicCalibration::utilityTask);
+
 	tabWidget->addTab(createCalibrationWidget(), "Calibration");
 	tabWidget->addTab(createUtilityWidget(), "Utility");
 	tabWidget->addTab(createRegistersWidget(), "Registers");
@@ -367,6 +372,9 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, QWidg
 
 		if(index == 1) { calibrationTimer->start(calibrationTimerRate); }
 		else { calibrationTimer->stop(); }
+
+		if(index == 2) { utilityTimer->start(utilityTimerRate); }
+		else { utilityTimer->stop(); }
 	});
 }
 
@@ -1059,12 +1067,18 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	MenuCollapseSection *commandLogCollapseSection = new MenuCollapseSection("Command Log", MenuCollapseSection::MHCW_NONE, commandLogSectionWidget);
 	commandLogSectionWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	commandLogSectionWidget->contentLayout()->addWidget(commandLogCollapseSection);
+	commandLogCollapseSection->contentLayout()->setSpacing(8);
 
-	QPlainTextEdit *commandLogPlainTextEdit = new QPlainTextEdit(commandLogSectionWidget);
+	commandLogPlainTextEdit = new QPlainTextEdit(commandLogSectionWidget);
 	commandLogPlainTextEdit->setReadOnly(true);
 	commandLogPlainTextEdit->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
+	clearCommandLogButton = new QPushButton("Clear Command Logs", commandLogSectionWidget);
+	StyleHelper::BlueButton(clearCommandLogButton, "clearCommandLogButton");
+	connect(clearCommandLogButton, &QPushButton::clicked, this, &HarmonicCalibration::clearCommandLog);
+
 	commandLogCollapseSection->contentLayout()->addWidget(commandLogPlainTextEdit);
+	commandLogCollapseSection->contentLayout()->addWidget(clearCommandLogButton);
 
 	leftUtilityLayout->addWidget(commandLogSectionWidget, 1);
 	leftUtilityLayout->addStretch();
@@ -1086,12 +1100,12 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	MenuCollapseSection *DIGIOMonitorCollapseSection = new MenuCollapseSection("DIGIO Monitor", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, DIGIOMonitorSectionWidget);
 	DIGIOMonitorSectionWidget->contentLayout()->addWidget(DIGIOMonitorCollapseSection);
 
-	MenuControlButton *DIGIOBusyStatusLED = createStatusLEDWidget("BUSY", statusLEDColor, DIGIOMonitorCollapseSection);
-	MenuControlButton *DIGIOCNVStatusLED = createStatusLEDWidget("CNV", statusLEDColor, DIGIOMonitorCollapseSection);
-	MenuControlButton *DIGIOSENTStatusLED = createStatusLEDWidget("SENT", statusLEDColor, DIGIOMonitorCollapseSection);
-	MenuControlButton *DIGIOACALCStatusLED = createStatusLEDWidget("ACALC", statusLEDColor, DIGIOMonitorCollapseSection);
-	MenuControlButton *DIGIOFaultStatusLED = createStatusLEDWidget("FAULT", statusLEDColor, DIGIOMonitorCollapseSection);
-	MenuControlButton *DIGIOBootloaderStatusLED = createStatusLEDWidget("BOOTLOADER", statusLEDColor, DIGIOMonitorCollapseSection);
+	DIGIOBusyStatusLED = createStatusLEDWidget("BUSY", statusLEDColor, DIGIOMonitorCollapseSection);
+	DIGIOCNVStatusLED = createStatusLEDWidget("CNV", statusLEDColor, DIGIOMonitorCollapseSection);
+	DIGIOSENTStatusLED = createStatusLEDWidget("SENT", statusLEDColor, DIGIOMonitorCollapseSection);
+	DIGIOACALCStatusLED = createStatusLEDWidget("ACALC", statusLEDColor, DIGIOMonitorCollapseSection);
+	DIGIOFaultStatusLED = createStatusLEDWidget("FAULT", statusLEDColor, DIGIOMonitorCollapseSection);
+	DIGIOBootloaderStatusLED = createStatusLEDWidget("BOOTLOADER", statusLEDColor, DIGIOMonitorCollapseSection);
 
 	DIGIOMonitorCollapseSection->contentLayout()->addWidget(DIGIOBusyStatusLED);
 	DIGIOMonitorCollapseSection->contentLayout()->addWidget(DIGIOCNVStatusLED);
@@ -1106,14 +1120,14 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	MenuCollapseSection *MTDIAG1CollapseSection = new MenuCollapseSection("MT Diagnostic Register", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MTDIAG1SectionWidget);
 	MTDIAG1SectionWidget->contentLayout()->addWidget(MTDIAG1CollapseSection);
 
-	MenuControlButton *R0StatusLED = createStatusLEDWidget("R0", statusLEDColor, MTDIAG1SectionWidget);
-	MenuControlButton *R1StatusLED = createStatusLEDWidget("R1", statusLEDColor, MTDIAG1SectionWidget);
-	MenuControlButton *R2StatusLED = createStatusLEDWidget("R2", statusLEDColor, MTDIAG1SectionWidget);
-	MenuControlButton *R3StatusLED = createStatusLEDWidget("R3", statusLEDColor, MTDIAG1SectionWidget);
-	MenuControlButton *R4StatusLED = createStatusLEDWidget("R4", statusLEDColor, MTDIAG1SectionWidget);
-	MenuControlButton *R5StatusLED = createStatusLEDWidget("R5", statusLEDColor, MTDIAG1SectionWidget);
-	MenuControlButton *R6StatusLED = createStatusLEDWidget("R6", statusLEDColor, MTDIAG1SectionWidget);
-	MenuControlButton *R7StatusLED = createStatusLEDWidget("R7", statusLEDColor, MTDIAG1SectionWidget);
+	R0StatusLED = createStatusLEDWidget("R0", statusLEDColor, MTDIAG1SectionWidget);
+	R1StatusLED = createStatusLEDWidget("R1", statusLEDColor, MTDIAG1SectionWidget);
+	R2StatusLED = createStatusLEDWidget("R2", statusLEDColor, MTDIAG1SectionWidget);
+	R3StatusLED = createStatusLEDWidget("R3", statusLEDColor, MTDIAG1SectionWidget);
+	R4StatusLED = createStatusLEDWidget("R4", statusLEDColor, MTDIAG1SectionWidget);
+	R5StatusLED = createStatusLEDWidget("R5", statusLEDColor, MTDIAG1SectionWidget);
+	R6StatusLED = createStatusLEDWidget("R6", statusLEDColor, MTDIAG1SectionWidget);
+	R7StatusLED = createStatusLEDWidget("R7", statusLEDColor, MTDIAG1SectionWidget);
 
 	MTDIAG1CollapseSection->contentLayout()->addWidget(R0StatusLED);
 	MTDIAG1CollapseSection->contentLayout()->addWidget(R1StatusLED);
@@ -1146,12 +1160,18 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	QLabel *AFEDIAG2Label = new QLabel("AFEDIAG2 (V)");
 	StyleHelper::MenuSmallLabel(AFEDIAG2Label, "AFEDIAG2Label");
 
-	QLineEdit *AFEDIAG0LineEdit = new QLineEdit("-57.0312", MTDiagnosticsSectionWidget);
-	QLineEdit *AFEDIAG1LineEdit = new QLineEdit("56.25", MTDiagnosticsSectionWidget);
-	QLineEdit *AFEDIAG2LineEdit = new QLineEdit("-312.499m", MTDiagnosticsSectionWidget);
+	AFEDIAG0LineEdit = new QLineEdit("-57.0312", MTDiagnosticsSectionWidget);
+	AFEDIAG1LineEdit = new QLineEdit("56.25", MTDiagnosticsSectionWidget);
+	AFEDIAG2LineEdit = new QLineEdit("-312.499m", MTDiagnosticsSectionWidget);
 	applyLineEditStyle(AFEDIAG0LineEdit);
 	applyLineEditStyle(AFEDIAG1LineEdit);
 	applyLineEditStyle(AFEDIAG2LineEdit);
+	AFEDIAG0LineEdit->setReadOnly(true);
+	AFEDIAG1LineEdit->setReadOnly(true);
+	AFEDIAG2LineEdit->setReadOnly(true);
+	connectLineEditToNumber(AFEDIAG0LineEdit, afeDiag0, "V");
+	connectLineEditToNumber(AFEDIAG1LineEdit, afeDiag1, "V");
+	connectLineEditToNumber(AFEDIAG2LineEdit, afeDiag2, "V");
 
 	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG0Label);
 	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG0LineEdit);
@@ -1186,26 +1206,26 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	MenuCollapseSection *faultRegisterCollapseSection = new MenuCollapseSection("Fault Register", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, faultRegisterSectionWidget);
 	faultRegisterSectionWidget->contentLayout()->addWidget(faultRegisterCollapseSection);
 	
-	MenuControlButton *vddUnderVoltageStatusLED = createStatusLEDWidget("VDD Under Voltage", faultLEDColor, faultRegisterCollapseSection);
-	MenuControlButton *vddOverVoltageStatusLED = createStatusLEDWidget("VDD Over Voltage", faultLEDColor, faultRegisterCollapseSection);
-	MenuControlButton *vDriveUnderVoltageStatusLED = createStatusLEDWidget("VDRIVE Under Voltage", faultLEDColor, faultRegisterCollapseSection);
-	MenuControlButton *vDriveOverVoltageStatusLED = createStatusLEDWidget("VDRIVE Over Voltage", faultLEDColor, faultRegisterCollapseSection);
-	MenuControlButton *AFEDIAGStatusLED = createStatusLEDWidget("AFEDIAG", faultLEDColor, faultRegisterCollapseSection);
-	MenuControlButton *NVMCRCFaultStatusLED = createStatusLEDWidget("NVM CRC Fault", faultLEDColor, faultRegisterCollapseSection);
-	MenuControlButton *ECCDoubleBitErrorStatusLED = createStatusLEDWidget("ECC Double Bit Error", faultLEDColor, faultRegisterCollapseSection);
-	MenuControlButton *OscillatorDriftStatusLED = createStatusLEDWidget("Oscillator Drift", faultLEDColor, faultRegisterCollapseSection);
-	MenuControlButton *CountSensorFalseStateStatusLED = createStatusLEDWidget("Count Sensor False State", faultLEDColor, faultRegisterCollapseSection);
-	MenuControlButton *AngleCrossCheckStatusLED = createStatusLEDWidget("Angle Cross Check", faultLEDColor, faultRegisterCollapseSection);
-	MenuControlButton *TurnCountSensorLevelsStatusLED = createStatusLEDWidget("Turn Count Sensor Levels", faultLEDColor, faultRegisterCollapseSection);
-	MenuControlButton *MTDIAGStatusLED = createStatusLEDWidget("MTDIAG", faultLEDColor, faultRegisterCollapseSection);
-	MenuControlButton *TurnCounterCrossCheckStatusLED = createStatusLEDWidget("Turn Counter Cross Check", faultLEDColor, faultRegisterCollapseSection);
-	MenuControlButton *RadiusCheckStatusLED = createStatusLEDWidget("Radius Check", faultLEDColor, faultRegisterCollapseSection);
-	MenuControlButton *SequencerWatchdogStatusLED = createStatusLEDWidget("Sequencer Watchdog", faultLEDColor, faultRegisterCollapseSection);
+	VDDUnderVoltageStatusLED = createStatusLEDWidget("VDD Under Voltage", faultLEDColor, faultRegisterCollapseSection);
+	VDDOverVoltageStatusLED = createStatusLEDWidget("VDD Over Voltage", faultLEDColor, faultRegisterCollapseSection);
+	VDRIVEUnderVoltageStatusLED = createStatusLEDWidget("VDRIVE Under Voltage", faultLEDColor, faultRegisterCollapseSection);
+	VDRIVEOverVoltageStatusLED = createStatusLEDWidget("VDRIVE Over Voltage", faultLEDColor, faultRegisterCollapseSection);
+	AFEDIAGStatusLED = createStatusLEDWidget("AFEDIAG", faultLEDColor, faultRegisterCollapseSection);
+	NVMCRCFaultStatusLED = createStatusLEDWidget("NVM CRC Fault", faultLEDColor, faultRegisterCollapseSection);
+	ECCDoubleBitErrorStatusLED = createStatusLEDWidget("ECC Double Bit Error", faultLEDColor, faultRegisterCollapseSection);
+	OscillatorDriftStatusLED = createStatusLEDWidget("Oscillator Drift", faultLEDColor, faultRegisterCollapseSection);
+	CountSensorFalseStateStatusLED = createStatusLEDWidget("Count Sensor False State", faultLEDColor, faultRegisterCollapseSection);
+	AngleCrossCheckStatusLED = createStatusLEDWidget("Angle Cross Check", faultLEDColor, faultRegisterCollapseSection);
+	TurnCountSensorLevelsStatusLED = createStatusLEDWidget("Turn Count Sensor Levels", faultLEDColor, faultRegisterCollapseSection);
+	MTDIAGStatusLED = createStatusLEDWidget("MTDIAG", faultLEDColor, faultRegisterCollapseSection);
+	TurnCounterCrossCheckStatusLED = createStatusLEDWidget("Turn Counter Cross Check", faultLEDColor, faultRegisterCollapseSection);
+	RadiusCheckStatusLED = createStatusLEDWidget("Radius Check", faultLEDColor, faultRegisterCollapseSection);
+	SequencerWatchdogStatusLED = createStatusLEDWidget("Sequencer Watchdog", faultLEDColor, faultRegisterCollapseSection);
 
-	faultRegisterCollapseSection->contentLayout()->addWidget(vddUnderVoltageStatusLED);
-	faultRegisterCollapseSection->contentLayout()->addWidget(vddOverVoltageStatusLED);
-	faultRegisterCollapseSection->contentLayout()->addWidget(vDriveUnderVoltageStatusLED);
-	faultRegisterCollapseSection->contentLayout()->addWidget(vDriveOverVoltageStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(VDDUnderVoltageStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(VDDOverVoltageStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(VDRIVEUnderVoltageStatusLED);
+	faultRegisterCollapseSection->contentLayout()->addWidget(VDRIVEOverVoltageStatusLED);
 	faultRegisterCollapseSection->contentLayout()->addWidget(AFEDIAGStatusLED);
 	faultRegisterCollapseSection->contentLayout()->addWidget(NVMCRCFaultStatusLED);
 	faultRegisterCollapseSection->contentLayout()->addWidget(ECCDoubleBitErrorStatusLED);
@@ -1293,6 +1313,152 @@ void HarmonicCalibration::timerTask(){
 	tempGraph->plot(temp);
 }
 
+void HarmonicCalibration::utilityTask(){
+	updateDigioMonitor();
+	updateFaultRegister();
+	updateMTDiagRegister();
+	updateMTDiagnostics();
+	commandLogWrite("");
+}
+
+void HarmonicCalibration::updateDigioMonitor(){
+	uint32_t *digioRegValue = new uint32_t;
+	uint32_t digioRegisterAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIO);
+
+	if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), digioRegisterAddress, digioRegValue) != -1){
+		std::map<std::string, bool> digioBitMapping =  m_admtController->getDigioenRegisterBitMapping(static_cast<uint16_t>(*digioRegValue));
+		if(digioBitMapping.at("DIGIO0EN")){ changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor, digioBitMapping.at("BUSY")); }
+		else { changeStatusLEDColor(DIGIOBusyStatusLED, faultLEDColor); }
+		if(digioBitMapping.at("DIGIO1EN")){ changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor, digioBitMapping.at("CNV")); }
+		else { changeStatusLEDColor(DIGIOCNVStatusLED, faultLEDColor); }
+		if(digioBitMapping.at("DIGIO2EN")){ changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor, digioBitMapping.at("SENT")); }
+		else { changeStatusLEDColor(DIGIOSENTStatusLED, faultLEDColor); }
+		if(digioBitMapping.at("DIGIO3EN")){ changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor, digioBitMapping.at("ACALC")); }
+		else { changeStatusLEDColor(DIGIOACALCStatusLED, faultLEDColor); }
+		if(digioBitMapping.at("DIGIO4EN")){ changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor, digioBitMapping.at("FAULT")); }
+		else { changeStatusLEDColor(DIGIOFaultStatusLED, faultLEDColor); }
+		if(digioBitMapping.at("DIGIO5EN")){ changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor, digioBitMapping.at("BOOTLOAD")); }
+		else { changeStatusLEDColor(DIGIOBootloaderStatusLED, faultLEDColor); }
+		commandLogWrite("DIGIO: 0x" + QString::number(static_cast<uint16_t>(*digioRegValue), 2).rightJustified(16, '0'));
+	}
+	else{ commandLogWrite("Failed to read DIGIO Register"); }
+}
+
+void HarmonicCalibration::updateMTDiagRegister(){
+	uint32_t *mtDiag1RegValue = new uint32_t;
+	uint32_t *cnvPageRegValue = new	uint32_t;
+	uint32_t mtDiag1RegisterAddress = m_admtController->getSensorRegister(ADMTController::SensorRegister::DIAG1);
+	uint32_t mtDiag1PageValue = m_admtController->getSensorPage(ADMTController::SensorRegister::DIAG1);
+	uint32_t cnvPageAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE);
+
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, mtDiag1PageValue) != -1){
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, cnvPageRegValue) != -1){
+			if(*cnvPageRegValue == mtDiag1PageValue){
+				if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), mtDiag1RegisterAddress, mtDiag1RegValue) != -1){
+					std::map<std::string, bool> mtDiag1BitMapping =  m_admtController->getDiag1RegisterBitMapping_Register(static_cast<uint16_t>(*mtDiag1RegValue));
+					changeStatusLEDColor(R0StatusLED, statusLEDColor, mtDiag1BitMapping.at("R0"));
+					changeStatusLEDColor(R1StatusLED, statusLEDColor, mtDiag1BitMapping.at("R1"));
+					changeStatusLEDColor(R2StatusLED, statusLEDColor, mtDiag1BitMapping.at("R2"));
+					changeStatusLEDColor(R3StatusLED, statusLEDColor, mtDiag1BitMapping.at("R3"));
+					changeStatusLEDColor(R4StatusLED, statusLEDColor, mtDiag1BitMapping.at("R4"));
+					changeStatusLEDColor(R5StatusLED, statusLEDColor, mtDiag1BitMapping.at("R5"));
+					changeStatusLEDColor(R6StatusLED, statusLEDColor, mtDiag1BitMapping.at("R6"));
+					changeStatusLEDColor(R7StatusLED, statusLEDColor, mtDiag1BitMapping.at("R7"));
+					commandLogWrite("DIAG1: 0x" + QString::number(static_cast<uint16_t>(*mtDiag1RegValue), 2).rightJustified(16, '0'));
+				}
+				else{ commandLogWrite("Failed to read MT Diagnostic 1 Register"); }
+			}
+			else{ commandLogWrite("CNVPAGE for MT Diagnostic 1 is a different value, abort reading"); }
+		}
+		else{ commandLogWrite("Failed to read CNVPAGE for MT Diagnostic 1"); }
+	}
+	else{ commandLogWrite("Failed to write CNVPAGE for MT Diagnostic 1"); }
+}
+
+void HarmonicCalibration::updateFaultRegister(){
+	uint32_t *faultRegValue = new uint32_t;
+	uint32_t faultRegisterAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::FAULT);
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), faultRegisterAddress, faultRegValue);
+
+	if(*faultRegValue != -1){
+		std::map<std::string, bool> faultBitMapping =  m_admtController->getFaultRegisterBitMapping(static_cast<uint16_t>(*faultRegValue));
+		changeStatusLEDColor(VDDUnderVoltageStatusLED, faultLEDColor, faultBitMapping.at("VDD Under Voltage"));
+		changeStatusLEDColor(VDDOverVoltageStatusLED, faultLEDColor, faultBitMapping.at("VDD Over Voltage"));
+		changeStatusLEDColor(VDRIVEUnderVoltageStatusLED, faultLEDColor, faultBitMapping.at("VDRIVE Under Voltage"));
+		changeStatusLEDColor(VDRIVEOverVoltageStatusLED, faultLEDColor, faultBitMapping.at("VDRIVE Over Voltage"));
+		changeStatusLEDColor(AFEDIAGStatusLED, faultLEDColor, faultBitMapping.at("AFE Diagnostic"));
+		changeStatusLEDColor(NVMCRCFaultStatusLED, faultLEDColor, faultBitMapping.at("NVM CRC Fault"));
+		changeStatusLEDColor(ECCDoubleBitErrorStatusLED, faultLEDColor, faultBitMapping.at("ECC Double Bit Error"));
+		changeStatusLEDColor(OscillatorDriftStatusLED, faultLEDColor, faultBitMapping.at("Oscillator Drift"));
+		changeStatusLEDColor(CountSensorFalseStateStatusLED, faultLEDColor, faultBitMapping.at("Count Sensor False State"));
+		changeStatusLEDColor(AngleCrossCheckStatusLED, faultLEDColor, faultBitMapping.at("Angle Cross Check"));
+		changeStatusLEDColor(TurnCountSensorLevelsStatusLED, faultLEDColor, faultBitMapping.at("Turn Count Sensor Levels"));
+		changeStatusLEDColor(MTDIAGStatusLED, faultLEDColor, faultBitMapping.at("MT Diagnostic"));
+		changeStatusLEDColor(TurnCounterCrossCheckStatusLED, faultLEDColor, faultBitMapping.at("Turn Counter Cross Check"));
+		changeStatusLEDColor(RadiusCheckStatusLED, faultLEDColor, faultBitMapping.at("AMR Radius Check"));
+		changeStatusLEDColor(SequencerWatchdogStatusLED, faultLEDColor, faultBitMapping.at("Sequencer Watchdog"));
+
+		commandLogWrite("FAULT: 0x" + QString::number(static_cast<uint16_t>(*faultRegValue), 2).rightJustified(16, '0'));
+	}
+	else{ commandLogWrite("Failed to read FAULT Register"); }
+}
+
+void HarmonicCalibration::updateMTDiagnostics(){
+	uint32_t *mtDiag1RegValue = new uint32_t;
+	uint32_t *mtDiag2RegValue = new uint32_t;
+	uint32_t *cnvPageRegValue = new uint32_t;
+
+	uint32_t mtDiag1RegisterAddress = m_admtController->getSensorRegister(ADMTController::SensorRegister::DIAG1);
+	uint32_t mtDiag2RegisterAddress = m_admtController->getSensorRegister(ADMTController::SensorRegister::DIAG2);
+
+	uint32_t mtDiag1PageValue = m_admtController->getSensorPage(ADMTController::SensorRegister::DIAG1);
+	uint32_t mtDiag2PageValue = m_admtController->getSensorPage(ADMTController::SensorRegister::DIAG2);
+
+	uint32_t cnvPageAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE);
+
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, mtDiag1PageValue) != -1){
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, cnvPageRegValue) != -1){
+			if(*cnvPageRegValue == mtDiag1PageValue){
+				if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), mtDiag1RegisterAddress, mtDiag1RegValue) != -1){
+					std::map<std::string, double> mtDiag1BitMapping =  m_admtController->getDiag1RegisterBitMapping_Afe(static_cast<uint16_t>(*mtDiag1RegValue));
+
+					afeDiag2 = mtDiag1BitMapping.at("AFE Diagnostic 2");
+					AFEDIAG2LineEdit->setText(QString::number(afeDiag2) + " V");
+				}
+				else{ commandLogWrite("Failed to read MT Diagnostic 1 Register"); }
+			}
+			else{ commandLogWrite("CNVPAGE for MT Diagnostic 1 is a different value, abort reading"); }
+		}
+		else{ commandLogWrite("Failed to read CNVPAGE for MT Diagnostic 1"); }
+	}
+	else{ commandLogWrite("Failed to write CNVPAGE for MT Diagnostic 1"); }
+
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, mtDiag2PageValue) != -1){
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, cnvPageRegValue) != -1){
+			if(*cnvPageRegValue == mtDiag2PageValue){
+				if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), mtDiag2RegisterAddress, mtDiag2RegValue) != -1){
+					std::map<std::string, double> mtDiag2BitMapping =  m_admtController->getDiag2RegisterBitMapping(static_cast<uint16_t>(*mtDiag2RegValue));
+					
+					afeDiag0 = mtDiag2BitMapping.at("AFE Diagnostic 0 (-57%)");
+					afeDiag1 = mtDiag2BitMapping.at("AFE Diagnostic 1 (+57%)");
+					AFEDIAG0LineEdit->setText(QString::number(afeDiag0) + " V");
+					AFEDIAG1LineEdit->setText(QString::number(afeDiag1) + " V");
+
+					commandLogWrite("DIAG2: 0x" + QString::number(static_cast<uint16_t>(*mtDiag2RegValue), 2).rightJustified(16, '0'));
+				}
+				else{ commandLogWrite("Failed to read MT Diagnostic 2 Register"); }
+			}
+			else{ commandLogWrite("CNVPAGE for MT Diagnostic 2 is a different value, abort reading"); }
+		}
+		else{ commandLogWrite("Failed to read CNVPAGE for MT Diagnostic 2"); }
+	}
+	else{ commandLogWrite("Failed to write CNVPAGE for MT Diagnostic 2"); }
+}
+
+void HarmonicCalibration::clearCommandLog(){
+	commandLogPlainTextEdit->clear();
+}
+
 void HarmonicCalibration::updateChannelValues(){
 	rotation = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), rotationChannelName, bufferSize);
 	angle = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), angleChannelName, bufferSize);
@@ -1325,10 +1491,16 @@ MenuControlButton *HarmonicCalibration::createStatusLEDWidget(const QString titl
 	menuControlButton->setColor(color);
 	menuControlButton->button()->setVisible(false);
 	menuControlButton->setCheckable(true);
-	menuControlButton->checkBox()->setChecked(true);
+	menuControlButton->checkBox()->setChecked(false);
 	menuControlButton->setEnabled(false);
 	menuControlButton->layout()->setMargin(8);
 	return menuControlButton;
+}
+
+void HarmonicCalibration::changeStatusLEDColor(MenuControlButton *menuControlButton, QColor color, bool checked)
+{
+	menuControlButton->setColor(color);
+	menuControlButton->checkBox()->setChecked(checked);
 }
 
 MenuControlButton *HarmonicCalibration::createChannelToggleWidget(const QString title, QColor color, QWidget *parent)
@@ -1359,16 +1531,16 @@ void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, int& vari
     });
 }
 
-void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, double& variable)
+void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, double& variable, QString unit)
 {
-    connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit]() {
+    connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit, unit]() {
         bool ok;
-        double value = lineEdit->text().toDouble(&ok);
+        double value = lineEdit->text().replace(unit, "").trimmed().toDouble(&ok);
         if (ok) {
             variable = value;
 			
         } else {
-            lineEdit->setText(QString::number(variable));
+            lineEdit->setText(QString::number(variable) + " " + unit);
         }
     });
 }
@@ -1703,15 +1875,15 @@ void HarmonicCalibration::calibrateData()
 			 h3MagScaled,
 			 h3PhaseScaled,
 			 h8MagScaled,
-			 h8PhaseScaled,
-			 h1MagConverted,
-			 h1PhaseConverted,
-			 h2MagConverted,
-			 h2PhaseConverted,
-			 h3MagConverted,
-			 h3PhaseConverted,
-			 h8MagConverted,
-			 h8PhaseConverted;
+			 h8PhaseScaled;
+	double h1MagConverted,
+		   h1PhaseConverted,
+		   h2MagConverted,
+		   h2PhaseConverted,
+		   h3MagConverted,
+		   h3PhaseConverted,
+		   h8MagConverted,
+		   h8PhaseConverted;
 
 	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), h1MagCurrent);
 	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), h1PhaseCurrent);
@@ -1787,14 +1959,14 @@ void HarmonicCalibration::calibrateData()
 	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), h8MagCurrent);
 	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), h8PhaseCurrent);
 
-	h1MagConverted = m_admtController->readRegister(static_cast<uint16_t>(*h1MagCurrent), "h1mag");
-	h1PhaseConverted = m_admtController->readRegister(static_cast<uint16_t>(*h1PhaseCurrent), "h1phase");
-	h2MagConverted = m_admtController->readRegister(static_cast<uint16_t>(*h2MagCurrent), "h2mag");
-	h2PhaseConverted = m_admtController->readRegister(static_cast<uint16_t>(*h2PhaseCurrent), "h2phase");
-	h3MagConverted = m_admtController->readRegister(static_cast<uint16_t>(*h3MagCurrent), "h3mag");
-	h3PhaseConverted = m_admtController->readRegister(static_cast<uint16_t>(*h3PhaseCurrent), "h3phase");
-	h8MagConverted = m_admtController->readRegister(static_cast<uint16_t>(*h8MagCurrent), "h8mag");
-	h8PhaseConverted = m_admtController->readRegister(static_cast<uint16_t>(*h8PhaseCurrent), "h8phase");
+	h1MagConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h1MagCurrent), "h1mag");
+	h1PhaseConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h1PhaseCurrent), "h1phase");
+	h2MagConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h2MagCurrent), "h2mag");
+	h2PhaseConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h2PhaseCurrent), "h2phase");
+	h3MagConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h3MagCurrent), "h3mag");
+	h3PhaseConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h3PhaseCurrent), "h3phase");
+	h8MagConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h8MagCurrent), "h8mag");
+	h8PhaseConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h8PhaseCurrent), "h8phase");
 
 	calibrationLogWriteLn();
 	calibrationLogWrite("H1 Mag Converted: " + QString::number(h1MagConverted) + "\n");
@@ -1889,6 +2061,11 @@ void HarmonicCalibration::calibrationLogWrite(QString message)
 void HarmonicCalibration::calibrationLogWriteLn(QString message)
 {
 	logsPlainTextEdit->appendPlainText("\n" + message);
+}
+
+void HarmonicCalibration::commandLogWrite(QString message)
+{
+	commandLogPlainTextEdit->appendPlainText(message);
 }
 
 void HarmonicCalibration::extractCalibrationData()
