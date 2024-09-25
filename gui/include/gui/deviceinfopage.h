@@ -21,6 +21,7 @@ private:
 	Connection *m_conn;
 	InfoPage *m_infoPage;
 	QLabel *m_title;
+	QLabel *m_backendInfo;
 };
 } // namespace scopy
 
