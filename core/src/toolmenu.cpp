@@ -1,9 +1,9 @@
-#include "browsemenu/instrumentmenu.h"
+#include "toolmenu.h"
 #include "qdebug.h"
 
 using namespace scopy;
 
-InstrumentMenu::InstrumentMenu(QWidget *parent)
+ToolMenu::ToolMenu(QWidget *parent)
 	: QWidget(parent)
 	, m_btnGroup(new QButtonGroup(this))
 {
@@ -36,16 +36,16 @@ InstrumentMenu::InstrumentMenu(QWidget *parent)
 	lay->addWidget(m_scroll);
 }
 
-InstrumentMenu::~InstrumentMenu() { qInfo() << "Instrument removed"; }
+ToolMenu::~ToolMenu() { qInfo() << "Instrument removed"; }
 
-void InstrumentMenu::add(QWidget *w)
+void ToolMenu::add(QWidget *w)
 {
 	int spacerIndex = m_layScroll->indexOf(m_spacer);
 	m_layScroll->insertWidget(spacerIndex, w);
 	m_uuid++;
 }
 
-void InstrumentMenu::add(int index, QString itemId, QWidget *w)
+void ToolMenu::add(int index, QString itemId, QWidget *w)
 {
 	m_widgetMap.insert(itemId, w);
 	if(index < 0) {
@@ -55,20 +55,20 @@ void InstrumentMenu::add(int index, QString itemId, QWidget *w)
 	}
 }
 
-void InstrumentMenu::add(int index, QWidget *w)
+void ToolMenu::add(int index, QWidget *w)
 {
 	m_layScroll->insertWidget(index, w);
 	m_uuid++;
 }
-void InstrumentMenu::remove(QWidget *w)
+void ToolMenu::remove(QWidget *w)
 {
 	m_widgetMap.remove(widgetName(w));
 	m_layScroll->removeWidget(w);
 }
 
-int InstrumentMenu::indexOf(QWidget *w) { return m_layScroll->indexOf(w); }
+int ToolMenu::indexOf(QWidget *w) { return m_layScroll->indexOf(w); }
 
-void InstrumentMenu::colapseAll()
+void ToolMenu::colapseAll()
 {
 	for(QWidget *w : qAsConst(m_widgetMap)) {
 		Collapsable *c = dynamic_cast<Collapsable *>(w);
@@ -78,6 +78,8 @@ void InstrumentMenu::colapseAll()
 	}
 }
 
-QButtonGroup *InstrumentMenu::btnGroup() const { return m_btnGroup; }
+QButtonGroup *ToolMenu::btnGroup() const { return m_btnGroup; }
 
-QString InstrumentMenu::widgetName(QWidget *w) { return m_widgetMap.key(w, ""); }
+QString ToolMenu::widgetName(QWidget *w) { return m_widgetMap.key(w, ""); }
+
+#include "moc_toolmenu.cpp"
