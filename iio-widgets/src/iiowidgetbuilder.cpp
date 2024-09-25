@@ -42,6 +42,7 @@ IIOWidgetBuilder::IIOWidgetBuilder(QObject *parent)
 	, m_connection(nullptr)
 	, m_isCompact(false)
 	, m_includeDebugAttrs(Preferences::get("debugger_v2_include_debugfs").toBool())
+	, m_isConfigurable(false)
 	, m_context(nullptr)
 	, m_device(nullptr)
 	, m_channel(nullptr)
@@ -85,6 +86,7 @@ IIOWidget *IIOWidgetBuilder::buildSingle()
 
 	IIOWidget *widget = new IIOWidget(ui, ds, m_widgetParent);
 	widget->setRecipe(m_generatedRecipe);
+	widget->setConfigurable(m_isConfigurable);
 	return widget;
 }
 
@@ -206,6 +208,7 @@ void IIOWidgetBuilder::clear()
 {
 	m_connection = nullptr;
 	m_isCompact = false;
+	m_isConfigurable = false;
 	m_context = nullptr;
 	m_device = nullptr;
 	m_channel = nullptr;
@@ -232,6 +235,12 @@ IIOWidgetBuilder &IIOWidgetBuilder::compactMode(bool isCompact)
 IIOWidgetBuilder &IIOWidgetBuilder::includeDebugAttributes(bool isIncluded)
 {
 	m_includeDebugAttrs = isIncluded;
+	return *this;
+}
+
+IIOWidgetBuilder &IIOWidgetBuilder::configMode(bool isConfigurable)
+{
+	m_isConfigurable = isConfigurable;
 	return *this;
 }
 

@@ -46,13 +46,10 @@ BufferMenu::BufferMenu(QWidget *parent, QString chnlFunction, Connection *conn, 
 					 .parent(this)
 					 .buildSingle();
 		addMenuWidget(m_samplingFreq);
-		connect(dynamic_cast<ComboAttrUi *>(m_samplingFreq->getUiStrategy()), &ComboAttrUi::displayedNewData,
-			this,
+		connect(m_samplingFreq, &IIOWidget::displayedNewData, this,
 			[this](QString data, QString optionalData) { Q_EMIT samplingFrequencyUpdated(data.toInt()); });
-		connect(dynamic_cast<ComboAttrUi *>(m_samplingFreq->getUiStrategy()), &ComboAttrUi::emitData, this,
-			&BufferMenu::freqChangeStart);
-		connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(m_samplingFreq->getDataStrategy()),
-			&CmdQChannelAttrDataStrategy::emitStatus, this, &BufferMenu::freqChangeEnd);
+		connect(m_samplingFreq, &IIOWidget::emitData, this, &BufferMenu::freqChangeStart);
+		connect(m_samplingFreq, &IIOWidget::emitStatus, this, &BufferMenu::freqChangeEnd);
 	}
 }
 
@@ -72,10 +69,7 @@ void BufferMenu::onBroadcastThreshold() {}
 
 void BufferMenu::onDiagSamplingChange() {}
 
-void BufferMenu::onRunBtnsPressed(bool en)
-{
-	dynamic_cast<ComboAttrUi *>(m_samplingFreq->getUiStrategy())->ui()->setEnabled(!en);
-}
+void BufferMenu::onRunBtnsPressed(bool en) { m_samplingFreq->setUIEnabled(!en); }
 
 void BufferMenu::setOffsetScalePair(const std::pair<double, double> &newOffsetScalePair)
 {
@@ -101,14 +95,7 @@ CurrentInLoopMenu::CurrentInLoopMenu(QWidget *parent, QString chnlFunction, Conn
 				     .optionsValues("[0 1 8191]")
 				     .parent(this)
 				     .buildSingle();
-	QLayoutItem *item = dacCode->getUiStrategy()->ui()->layout()->itemAt(0);
-	TitleSpinBox *dacSpin = nullptr;
-	if(item) {
-		dacSpin = dynamic_cast<TitleSpinBox *>(item->widget());
-	}
-	if(dacSpin) {
-		dacSpin->setTitle("DAC_CODE");
-	}
+	dacCode->changeTitle("DAC_CODE");
 	addMenuWidget(dacCode);
 
 	QWidget *cnvtWidget = new QWidget(this);
@@ -121,10 +108,8 @@ CurrentInLoopMenu::CurrentInLoopMenu(QWidget *parent, QString chnlFunction, Conn
 	cnvtLayout->addWidget(m_cnvtLabel);
 	addMenuWidget(cnvtWidget);
 
-	connect(dynamic_cast<RangeAttrUi *>(dacCode->getUiStrategy()), &RangeAttrUi::emitData, this,
-		&CurrentInLoopMenu::updateCnvtLabel);
-	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(dacCode->getDataStrategy()),
-		&CmdQChannelAttrDataStrategy::sendData, this, &CurrentInLoopMenu::updateCnvtLabel);
+	connect(dacCode, &IIOWidget::emitData, this, &CurrentInLoopMenu::updateCnvtLabel);
+	connect(dacCode, &IIOWidget::sendData, this, &CurrentInLoopMenu::updateCnvtLabel);
 }
 
 CurrentInLoopMenu::~CurrentInLoopMenu() {}
@@ -158,11 +143,8 @@ DigitalInLoopMenu::DigitalInLoopMenu(QWidget *parent, QString chnlFunction, Conn
 			      .buildSingle();
 	addMenuWidget(m_threshold);
 
-	CmdQChannelAttrDataStrategy *dataStrategy =
-		dynamic_cast<CmdQChannelAttrDataStrategy *>(m_threshold->getDataStrategy());
-	connect(dynamic_cast<EditableGuiStrategy *>(m_threshold->getUiStrategy()), &EditableGuiStrategy::emitData, this,
-		&BufferMenu::thresholdChangeStart);
-	connect(dataStrategy, &CmdQChannelAttrDataStrategy::emitStatus, this, &DigitalInLoopMenu::onEmitStatus);
+	connect(m_threshold, &IIOWidget::emitData, this, &BufferMenu::thresholdChangeStart);
+	connect(m_threshold, &IIOWidget::emitStatus, this, &DigitalInLoopMenu::onEmitStatus);
 	// dac code - output channel
 	IIOWidget *dacCode = IIOWidgetBuilder()
 				     .connection(const_cast<Connection *>(m_connection))
@@ -171,14 +153,7 @@ DigitalInLoopMenu::DigitalInLoopMenu(QWidget *parent, QString chnlFunction, Conn
 				     .optionsValues("[0 1 8191]")
 				     .parent(this)
 				     .buildSingle();
-	QLayoutItem *item = dacCode->getUiStrategy()->ui()->layout()->itemAt(0);
-	TitleSpinBox *dacSpin = nullptr;
-	if(item) {
-		dacSpin = dynamic_cast<TitleSpinBox *>(item->widget());
-	}
-	if(dacSpin) {
-		dacSpin->setTitle("DAC_CODE");
-	}
+	dacCode->changeTitle("DAC_CODE");
 	addMenuWidget(dacCode);
 
 	QWidget *cnvtWidget = new QWidget(this);
@@ -191,10 +166,8 @@ DigitalInLoopMenu::DigitalInLoopMenu(QWidget *parent, QString chnlFunction, Conn
 	cnvtLayout->addWidget(m_cnvtLabel);
 	addMenuWidget(cnvtWidget);
 
-	connect(dynamic_cast<RangeAttrUi *>(dacCode->getUiStrategy()), &RangeAttrUi::emitData, this,
-		&DigitalInLoopMenu::updateCnvtLabel);
-	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(dacCode->getDataStrategy()),
-		&CmdQChannelAttrDataStrategy::sendData, this, &DigitalInLoopMenu::updateCnvtLabel);
+	connect(dacCode, &IIOWidget::emitData, this, &DigitalInLoopMenu::updateCnvtLabel);
+	connect(dacCode, &IIOWidget::sendData, this, &DigitalInLoopMenu::updateCnvtLabel);
 }
 
 DigitalInLoopMenu::~DigitalInLoopMenu() {}
@@ -214,17 +187,12 @@ void DigitalInLoopMenu::updateCnvtLabel(QString data)
 	m_cnvtLabel->setText(QString::number(convertedData) + " mA");
 }
 
-void DigitalInLoopMenu::onBroadcastThreshold()
-{
-	CmdQChannelAttrDataStrategy *dataStrategy =
-		dynamic_cast<CmdQChannelAttrDataStrategy *>(m_threshold->getDataStrategy());
-	dataStrategy->readAsync();
-}
+void DigitalInLoopMenu::onBroadcastThreshold() { m_threshold->readAsync(); }
 
 void DigitalInLoopMenu::onRunBtnsPressed(bool en)
 {
 	BufferMenu::onRunBtnsPressed(en);
-	m_threshold->getUiStrategy()->ui()->setEnabled(!en);
+	m_threshold->setUIEnabled(!en);
 }
 
 void DigitalInLoopMenu::onEmitStatus(QDateTime timestamp, QString oldData, QString newData, int retCode, bool readOp)
@@ -251,14 +219,7 @@ VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection
 				     .optionsValues("[0 1 8191]")
 				     .parent(this)
 				     .buildSingle();
-	QLayoutItem *item = dacCode->getUiStrategy()->ui()->layout()->itemAt(0);
-	TitleSpinBox *dacSpin = nullptr;
-	if(item) {
-		dacSpin = dynamic_cast<TitleSpinBox *>(item->widget());
-	}
-	if(dacSpin) {
-		dacSpin->setTitle("DAC_CODE");
-	}
+	dacCode->changeTitle("DAC_CODE");
 	addMenuWidget(dacCode);
 
 	QWidget *cnvtWidget = new QWidget(this);
@@ -271,10 +232,8 @@ VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection
 	cnvtLayout->addWidget(m_cnvtLabel);
 	addMenuWidget(cnvtWidget);
 
-	connect(dynamic_cast<RangeAttrUi *>(dacCode->getUiStrategy()), &RangeAttrUi::emitData, this,
-		&VoltageOutMenu::updateCnvtLabel);
-	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(dacCode->getDataStrategy()),
-		&CmdQChannelAttrDataStrategy::sendData, this, &VoltageOutMenu::updateCnvtLabel);
+	connect(dacCode, &IIOWidget::emitData, this, &VoltageOutMenu::updateCnvtLabel);
+	connect(dacCode, &IIOWidget::sendData, this, &VoltageOutMenu::updateCnvtLabel);
 
 	// slew - output channel
 	IIOWidget *slewOptions = IIOWidgetBuilder()
@@ -338,14 +297,7 @@ CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection
 				     .optionsValues("[0 1 8191]")
 				     .parent(this)
 				     .buildSingle();
-	QLayoutItem *item = dacCode->getUiStrategy()->ui()->layout()->itemAt(0);
-	TitleSpinBox *dacSpin = nullptr;
-	if(item) {
-		dacSpin = dynamic_cast<TitleSpinBox *>(item->widget());
-	}
-	if(dacSpin) {
-		dacSpin->setTitle("DAC_CODE");
-	}
+	dacCode->changeTitle("DAC_CODE");
 	addMenuWidget(dacCode);
 
 	QWidget *cnvtWidget = new QWidget(this);
@@ -358,10 +310,8 @@ CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection
 	cnvtLayout->addWidget(m_cnvtLabel);
 	addMenuWidget(cnvtWidget);
 
-	connect(dynamic_cast<RangeAttrUi *>(dacCode->getUiStrategy()), &RangeAttrUi::emitData, this,
-		&CurrentOutMenu::updateCnvtLabel);
-	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(dacCode->getDataStrategy()),
-		&CmdQChannelAttrDataStrategy::sendData, this, &CurrentOutMenu::updateCnvtLabel);
+	connect(dacCode, &IIOWidget::emitData, this, &CurrentOutMenu::updateCnvtLabel);
+	connect(dacCode, &IIOWidget::sendData, this, &CurrentOutMenu::updateCnvtLabel);
 
 	// slew - output channel
 	IIOWidget *slewOptions = IIOWidgetBuilder()
@@ -428,15 +378,14 @@ DiagnosticMenu::DiagnosticMenu(QWidget *parent, QString chnlFunction, Connection
 					 .buildSingle();
 	addMenuWidget(diagOptions);
 
-	connect(dynamic_cast<ComboAttrUi *>(diagOptions->getUiStrategy()), &ComboAttrUi::displayedNewData, this,
+	connect(diagOptions, &IIOWidget::displayedNewData, this,
 		[=, this](QString data, QString dataOptions) { Q_EMIT diagnosticFunctionUpdated(); });
-	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(m_samplingFreq->getDataStrategy()),
-		&CmdQChannelAttrDataStrategy::emitStatus, this, &DiagnosticMenu::onSamplingFreqWrite);
+	connect(m_samplingFreq, &IIOWidget::emitStatus, this, &DiagnosticMenu::onSamplingFreqWrite);
 }
 
 DiagnosticMenu::~DiagnosticMenu() {}
 
-void DiagnosticMenu::onDiagSamplingChange() { m_samplingFreq->getDataStrategy()->readAsync(); }
+void DiagnosticMenu::onDiagSamplingChange() { m_samplingFreq->readAsync(); }
 
 void DiagnosticMenu::onSamplingFreqWrite(QDateTime timestamp, QString oldData, QString newData, int retCode,
 					 bool readOp)
@@ -471,26 +420,18 @@ DigitalInMenu::DigitalInMenu(QWidget *parent, QString chnlFunction, Connection *
 			      .parent(this)
 			      .buildSingle();
 	addMenuWidget(m_threshold);
-	CmdQChannelAttrDataStrategy *dataStrategy =
-		dynamic_cast<CmdQChannelAttrDataStrategy *>(m_threshold->getDataStrategy());
-	connect(dynamic_cast<EditableGuiStrategy *>(m_threshold->getUiStrategy()), &EditableGuiStrategy::emitData, this,
-		&BufferMenu::thresholdChangeStart);
-	connect(dataStrategy, &CmdQChannelAttrDataStrategy::emitStatus, this, &DigitalInMenu::onEmitStatus);
+	connect(m_threshold, &IIOWidget::emitData, this, &BufferMenu::thresholdChangeStart);
+	connect(m_threshold, &IIOWidget::emitStatus, this, &DigitalInMenu::onEmitStatus);
 }
 
 DigitalInMenu::~DigitalInMenu() {}
 
-void DigitalInMenu::onBroadcastThreshold()
-{
-	CmdQChannelAttrDataStrategy *dataStrategy =
-		dynamic_cast<CmdQChannelAttrDataStrategy *>(m_threshold->getDataStrategy());
-	dataStrategy->readAsync();
-}
+void DigitalInMenu::onBroadcastThreshold() { m_threshold->readAsync(); }
 
 void DigitalInMenu::onRunBtnsPressed(bool en)
 {
 	BufferMenu::onRunBtnsPressed(en);
-	m_threshold->getUiStrategy()->ui()->setEnabled(!en);
+	m_threshold->setUIEnabled(!en);
 }
 
 void DigitalInMenu::onEmitStatus(QDateTime timestamp, QString oldData, QString newData, int retCode, bool readOp)

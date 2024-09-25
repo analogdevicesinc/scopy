@@ -49,6 +49,7 @@ public:
 
 public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
+	void changeName(QString name) override;
 
 Q_SIGNALS:
 	void displayedNewData(QString data, QString optionalData) override;
@@ -57,6 +58,7 @@ Q_SIGNALS:
 
 private:
 	QWidget *m_ui;
+	QLabel *m_titleLabel;
 	MenuLineEdit *m_lineEdit;
 	QString m_lastEmittedText;
 };

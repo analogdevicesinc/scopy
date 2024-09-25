@@ -99,6 +99,17 @@ public:
 	IIOWidgetBuilder &includeDebugAttributes(bool isIncluded);
 
 	/**
+	 * @brief configMode Sets the IIOWidget to be configurable. This way, a
+	 * wheel button will be created next to the IIOWidget. Once pressed,
+	 * this button will allow the user to select a new attribute and the
+	 * new data strategy will use that.
+	 * @param isConfigurable If set to true, the IIOWidget will be configurable.
+	 * Default is false.
+	 * @return
+	 */
+	IIOWidgetBuilder &configMode(bool isConfigurable);
+
+	/**
 	 * @brief Sets the context that will be used, if no iio_device or iio_channel
 	 * is set, the build functions will work with the context.
 	 * @param context
@@ -170,6 +181,7 @@ private:
 	Connection *m_connection;
 	bool m_isCompact;
 	bool m_includeDebugAttrs;
+	bool m_isConfigurable;
 	struct iio_context *m_context;
 	struct iio_device *m_device;
 	struct iio_channel *m_channel;

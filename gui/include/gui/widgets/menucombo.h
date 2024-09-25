@@ -19,6 +19,7 @@ public:
 	MenuCombo(QString title, QWidget *parent = nullptr);
 	virtual ~MenuCombo();
 
+	QLabel *label();
 	QComboBox *combo();
 	void applyStylesheet();
 

@@ -78,4 +78,6 @@ void SwitchAttrUi::receiveData(QString currentData, QString optionalData)
 	Q_EMIT displayedNewData(currentData, optionalData);
 }
 
+void SwitchAttrUi::changeName(QString name) { m_menuBigSwitch->setText(name); }
+
 #include "moc_switchguistrategy.cpp"

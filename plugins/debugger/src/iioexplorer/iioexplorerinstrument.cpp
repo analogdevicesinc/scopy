@@ -290,7 +290,7 @@ void IIOExplorerInstrument::triggerReadOnAllChildItems(QStandardItem *item)
 		QList<IIOWidget *> iioWidgets = IIOitem->getIIOWidgets();
 		for(int i = 0; i < iioWidgets.size(); ++i) {
 			qInfo(CAT_DEBUGGERIIOMODEL) << "Reading " << IIOitem->path();
-			iioWidgets.at(i)->getDataStrategy()->readAsync();
+			iioWidgets.at(i)->readAsync();
 		}
 	} else {
 		// not a leaf node, continue recursion

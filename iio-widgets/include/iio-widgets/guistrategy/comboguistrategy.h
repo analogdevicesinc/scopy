@@ -49,6 +49,7 @@ public:
 
 public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
+	void changeName(QString name) override;
 
 Q_SIGNALS:
 	void displayedNewData(QString data, QString optionalData) override;
@@ -58,6 +59,8 @@ Q_SIGNALS:
 private:
 	QWidget *m_ui;
 	QComboBox *m_comboWidget;
+	MenuCombo *m_menuCombo;
+	QLabel *m_compactLabel;
 	bool m_isCompact;
 };
 } // namespace scopy

@@ -2,6 +2,7 @@
 #define CONNECTION_H
 #include "scopy-iioutil_export.h"
 #include "commandqueue.h"
+#include "iiotreescan.h"
 #include <iio.h>
 #include <QObject>
 
@@ -14,6 +15,7 @@ public:
 
 	const QString &uri() const;
 	CommandQueue *commandQueue() const;
+	IIOTreeScan *iioTreeScan() const;
 	struct iio_context *context() const;
 	int refCount() const;
 
@@ -57,6 +59,7 @@ private:
 	friend class ConnectionProvider;
 	QString m_uri;
 	CommandQueue *m_commandQueue;
+	IIOTreeScan *m_iioTreeScan;
 	struct iio_context *m_context;
 	int m_refCount = 0;
 };

@@ -50,6 +50,7 @@ public:
 
 public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
+	void changeName(QString name) override;
 
 Q_SIGNALS:
 	void displayedNewData(QString data, QString optionalData) override;

@@ -85,12 +85,11 @@ void CliDetailsView::setupUi()
 void CliDetailsView::setupChannelAttr()
 {
 	IIOWidget *w = m_channelIIOItem->getIIOWidgets()[0];
-	DataStrategyInterface *ds = w->getDataStrategy();
 
 	m_currentText.append(tabs(4) + "attr " + QString::number(m_noChnlAttributes) + ": " + m_channelIIOItem->name() +
-			     " value: " + ds->data() + "\n");
+			     " value: " + w->data() + "\n");
 	++m_noChnlAttributes;
-	QString channelOptData = ds->optionalData();
+	QString channelOptData = w->optionalData();
 	if(!channelOptData.isEmpty()) {
 		m_currentText.append(tabs(4) + "attr " + QString::number(m_noChnlAttributes) + ": " +
 				     w->getRecipe().iioDataOptions + " value: " + channelOptData + "\n");
@@ -126,13 +125,11 @@ void CliDetailsView::setupChannel()
 void CliDetailsView::setupDeviceAttr()
 {
 	IIOWidget *w = m_deviceIIOItem->getIIOWidgets()[0];
-	DataStrategyInterface *ds = w->getDataStrategy();
-
 	m_deviceAttrsString.append(tabs(4) + "attr " + QString::number(m_noDevAttributes) + ": " +
-				   m_deviceIIOItem->name() + " value: " + ds->data() + "\n");
+				   m_deviceIIOItem->name() + " value: " + w->data() + "\n");
 	++m_noDevAttributes;
 
-	QString deviceOptData = ds->optionalData();
+	QString deviceOptData = w->optionalData();
 	if(!deviceOptData.isEmpty()) {
 		m_deviceAttrsString.append(tabs(4) + "attr " + QString::number(m_noDevAttributes) + ": " +
 					   w->getRecipe().iioDataOptions + " value: " + deviceOptData + "\n");
@@ -182,8 +179,8 @@ void CliDetailsView::setupDevice()
 void CliDetailsView::setupContextAttr()
 {
 	++m_noCtxAttributes;
-	m_currentText.append(tabs(1) + m_contextIIOItem->name() + ": " +
-			     m_contextIIOItem->getIIOWidgets()[0]->getDataStrategy()->data() + "\n");
+	m_currentText.append(tabs(1) + m_contextIIOItem->name() + ": " + m_contextIIOItem->getIIOWidgets()[0]->data() +
+			     "\n");
 }
 
 void CliDetailsView::setupContext()

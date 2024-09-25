@@ -56,6 +56,12 @@ public Q_SLOTS:
 	 * */
 	virtual void receiveData(QString currentData, QString optionalData) = 0;
 
+	/**
+	 * @brief changeName Changes the title of the UI strategy
+	 * @param name The new name/title of the UI strategy
+	 */
+	virtual void changeName(QString name) = 0;
+
 Q_SIGNALS:
 	/**
 	 * @brief This signal is emitted when the ui strategy receives new data from external sources,

@@ -122,6 +122,8 @@ void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 	Q_EMIT displayedNewData(currentData, optionalData);
 }
 
+void RangeAttrUi::changeName(QString name) { m_spinBox->setTitle(name); }
+
 double RangeAttrUi::tryParse(QString number, bool *success)
 {
 	// Try to parse as double first
