@@ -19,6 +19,7 @@
 #include <numeric>
 #include <complex>
 #include <iterator>
+#include <cstdint>
 
 using namespace std;
 
@@ -81,17 +82,54 @@ public:
         HARMONIC_REGISTER_COUNT
     };
 
+    enum ConfigurationRegister
+    {
+        CNVPAGE,
+        DIGIO,
+        FAULT,
+        GENERAL,
+        DIGIOEN,
+        ANGLECK,
+        ECCDCDE,
+        ECCDIS,
+        CONFIGURATION_REGISTER_COUNT
+    };
+
+    enum SensorRegister
+    {
+        ABSANGLE,
+        ANGLEREG,
+        ANGLESEC,
+        SINE,
+        COSINE,
+        SECANGLI,
+        SECANGLQ,
+        RADIUS,
+        DIAG1,
+        DIAG2,
+        TMP0,
+        TMP1,
+        CNVCNT,
+        SENSOR_REGISTER_COUNT
+    };
+
     const char* ChannelIds[CHANNEL_COUNT] = {"rot", "angl", "count", "temp"};
     const char* DeviceIds[DEVICE_COUNT] = {"admt4000", "tmc5240"};
     const char* MotorAttributes[MOTOR_ATTR_COUNT] = {"amax", "rotate_vmax", "dmax",
                                                      "disable", "target_pos", "current_pos",
                                                      "ramp_mode"};
-    const uint32_t HarmonicRegisters[HARMONIC_REGISTER_COUNT] = {0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C};
+    const uint32_t HarmonicRegisters[HARMONIC_REGISTER_COUNT] = { 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
+    const uint32_t ConfigurationRegisters[CONFIGURATION_REGISTER_COUNT] = { 0x01, 0x04, 0x06, 0x10, 0x12, 0x13, 0x1D, 0x23 };
+    const uint32_t SensorRegisters[SENSOR_REGISTER_COUNT] = { 0x03, 0x05, 0x08, 0x10, 0x11, 0x12, 0x13, 0x18, 0x1D, 0x1E, 0x20, 0x23, 0x14 };
+    const uint32_t SensorPages[SENSOR_REGISTER_COUNT] = { UINT32_MAX, UINT32_MAX, UINT32_MAX, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02 };
 
     const char* getChannelId(Channel channel);
     const char* getDeviceId(Device device);
     const char* getMotorAttribute(MotorAttribute attribute);
     const uint32_t getHarmonicRegister(HarmonicRegister registerID);
+    const uint32_t getConfigurationRegister(ConfigurationRegister registerID);
+    const uint32_t getSensorRegister(SensorRegister registerID);
+    const uint32_t getSensorPage(SensorRegister registerID);
 
     void connectADMT();
     void disconnectADMT();
@@ -105,7 +143,13 @@ public:
     void computeSineCosineOfAngles(const vector<double>& angles);
     uint16_t calculateHarmonicCoefficientMagnitude(double harmonicCoefficient, uint16_t originalValue, string key);
     uint16_t calculateHarmonicCoefficientPhase(double harmonicCoefficient, uint16_t originalValue);
-    uint16_t readRegister(uint16_t registerValue, const string key);
+    double getActualHarmonicRegisterValue(uint16_t registerValue, const string key);
+    map<string, bool> getFaultRegisterBitMapping(uint16_t registerValue);
+    map<string, string> getGeneralRegisterBitMapping(uint16_t registerValue);
+    map<string, bool> getDigioenRegisterBitMapping(uint16_t registerValue);
+    map<string, bool> getDiag1RegisterBitMapping_Register(uint16_t registerValue);
+    map<string, double> getDiag1RegisterBitMapping_Afe(uint16_t registerValue);
+    map<string, double> getDiag2RegisterBitMapping(uint16_t registerValue);
 private:
     iio_context *m_iioCtx;
     iio_buffer *m_iioBuffer;
