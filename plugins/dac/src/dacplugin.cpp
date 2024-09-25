@@ -97,8 +97,8 @@ bool DACPlugin::onDisconnect()
 		tool->setRunBtnVisible(false);
 		QWidget *w = tool->tool();
 		if(w) {
-			delete(w);
 			tool->setTool(nullptr);
+			delete(w);
 		}
 	}
 	if(m_ctx) {
