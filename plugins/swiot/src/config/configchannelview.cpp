@@ -40,7 +40,6 @@ ConfigChannelView::ConfigChannelView(int channelIndex, QWidget *parent)
 	StyleHelper::MenuSmallLabel(m_chnlLabel);
 
 	m_chnlCheck = new QCheckBox(this);
-	StyleHelper::BlueSquareCheckbox(m_chnlCheck);
 	Q_EMIT m_chnlCheck->toggled(true);
 
 	m_deviceOptions = new QComboBox(this);

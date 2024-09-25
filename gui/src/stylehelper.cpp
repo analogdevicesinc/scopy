@@ -167,32 +167,6 @@ void StyleHelper::BasicSmallButton(QPushButton *btn, QString objectName)
 	btn->setFixedHeight(Style::getDimension(json::global::unit_3));
 }
 
-void StyleHelper::BlueSquareCheckbox(QCheckBox *chk, QString objectName)
-{
-	// if(!objectName.isEmpty())
-	// 	chk->setObjectName(objectName);
-	// QString style = QString(R"css(
-	// 					QCheckBox {
-	// 						spacing: 8px;
-	// 						background-color: rgba(128,128,128,0);
-	// 						font-size: 14px;
-	// 						font-weight: bold;
-	// 						color: rgba(255, 255, 255, 153);
-	// 					}
-	// 					QCheckBox::indicator {
-	// 						width: 14px;
-	// 						height: 14px;
-	// 						border: 2px solid rgb(74,100,255);
-	// 							border-radius: 4px;
-	// 						image: none;
-	// 					}
-	// 					QCheckBox::indicator:unchecked { background-color: &&content_inverse&&; }
-	// 					QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
-	// 					)css");
-	// style.replace("&&content_inverse&&", StyleHelper::getColor("content_inverse"));
-	// chk->setStyleSheet(style);
-}
-
 void StyleHelper::ColoredCircleCheckbox(QCheckBox *chk, QColor color, QString objectName)
 {
 	if(!objectName.isEmpty())
