@@ -62,6 +62,7 @@ void ADCPlugin::initPreferences()
 	p->init("adc_default_y_mode", 0);
 	p->init("adc_add_remove_plot", false);
 	p->init("adc_add_remove_instrument", false);
+	p->init("adc_acquisition_timeout", 10000);
 }
 
 bool ADCPlugin::loadPreferencesPage()
@@ -98,7 +99,8 @@ bool ADCPlugin::loadPreferencesPage()
 
 	auto adc_default_y_mode = PreferencesHelper::addPreferenceComboList(
 		p, "adc_default_y_mode", "ADC Default Y-Mode", {{"ADC Count", 0}, {"% Full Scale", 1}}, generalSection);
-
+	auto adc_acquisition_timeout = PreferencesHelper::addPreferenceEdit(
+		p, "adc_acquisition_timeout", "ADC Acquisition timeout", m_preferencesPage);
 	auto adc_add_remove_plot = PreferencesHelper::addPreferenceCheckBox(
 		p, "adc_add_remove_plot", "Add/Remove plot feature (EXPERIMENTAL)", m_preferencesPage);
 	auto adc_add_remove_instrument = PreferencesHelper::addPreferenceCheckBox(
@@ -111,6 +113,7 @@ bool ADCPlugin::loadPreferencesPage()
 	generalSection->contentLayout()->addWidget(adc_plot_ycursor_position);
 	generalSection->contentLayout()->addWidget(adc_plot_show_buffer_previewer);
 	generalSection->contentLayout()->addWidget(adc_default_y_mode);
+	generalSection->contentLayout()->addWidget(adc_acquisition_timeout);
 	generalSection->contentLayout()->addWidget(adc_add_remove_plot);
 	generalSection->contentLayout()->addWidget(adc_add_remove_instrument);
 
@@ -350,6 +353,13 @@ void ADCPlugin::preferenceChanged(QString s, QVariant t1)
 	if(s == "adc_add_remove_instrument") {
 		for(ADCInstrumentController *ctrl : m_ctrls) {
 			ctrl->setEnableAddRemoveInstrument(t1.toBool());
+		}
+	}
+	if(s == "adc_acquisition_timeout") {
+		bool ok;
+		Preferences::get("adc_acquisition_timeout").toDouble(&ok);
+		if(!ok) {
+			Preferences::set("adc_acquisition_timeout", 1000);
 		}
 	}
 }
