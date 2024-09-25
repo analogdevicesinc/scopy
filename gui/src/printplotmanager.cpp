@@ -29,7 +29,8 @@ void PrintPlotManager::printPlots(QList<PlotWidget *> plotList, QString toolName
 
 			int widthInPixels = 500;
 			int heightInPixels = 400;
-			pdfWriter.setPageSizeMM(QSize(widthInPixels / 3.78, heightInPixels / 3.78)); // 1 inch = 25.4 mm
+			pdfWriter.setPageSize(QPageSize(QSize(widthInPixels / 3.78, heightInPixels / 3.78),
+							QPageSize::Millimeter)); // 1 inch = 25.4mm
 
 			QPainter painter(&pdfWriter);
 			painter.setRenderHint(QPainter::Antialiasing);
