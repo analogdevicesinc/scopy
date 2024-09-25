@@ -81,8 +81,9 @@ QRect BasicTracker::trackerRect(QSizeF size) const
 		yOffset = m_canvas->height() - bottomRight.y();
 	}
 
-	topLeft.rx() += xOffset;
-	bottomRight.rx() += xOffset;
+	// hackish - magic +-3 so the whole text is visible
+	topLeft.rx() += xOffset - 3;
+	bottomRight.rx() += xOffset + 3;
 	topLeft.ry() += yOffset;
 	bottomRight.ry() += yOffset;
 
