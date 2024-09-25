@@ -4,6 +4,8 @@
 #include "scopy-admt_export.h"
 #include "sismograph.hpp"
 
+#include <cstdint>
+
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
@@ -48,7 +50,7 @@ class SCOPY_ADMT_EXPORT HarmonicCalibration : public QWidget
 {
 	Q_OBJECT
 public:
-	HarmonicCalibration(ADMTController *m_admtController, QWidget *parent = nullptr);
+	HarmonicCalibration(ADMTController *m_admtController, bool isDebug = false, QWidget *parent = nullptr);
 	~HarmonicCalibration();
 	bool running() const;
 	void setRunning(bool newRunning);
@@ -58,6 +60,10 @@ public Q_SLOTS:
 	void start();
 	void restart();
 	void timerTask();
+	void calibrationTask();
+	void motorCalibrationAcquisitionTask();
+	void utilityTask();
+	void clearCommandLog();
 	void canCalibrate(bool);
 Q_SIGNALS:
 	void runningChanged(bool);
@@ -65,15 +71,17 @@ Q_SIGNALS:
 private:
 	ADMTController *m_admtController;
 	iio_context *m_ctx;
-	bool m_running;
+	bool m_running, isDebug;
 	ToolTemplate *tool;
 	GearBtn *settingsButton;
 	InfoBtn *infoButton;
 	RunBtn *runButton;
 
-	double rotation, angle, count, temp, amax, rotate_vmax, dmax, disable, target_pos, current_pos, ramp_mode;
+	double rotation, angle, count, temp, amax, rotate_vmax, dmax, disable, target_pos, current_pos, ramp_mode,
+		afeDiag0, afeDiag1, afeDiag2;
 
-	QPushButton *openLastMenuButton, *calibrationStartMotorButton, *applyCalibrationDataButton, *calibrateDataButton, *extractDataButton;
+	QPushButton *openLastMenuButton, *calibrationStartMotorButton, *applyCalibrationDataButton, *calibrateDataButton, *extractDataButton,
+				*clearCommandLogButton;
 	QButtonGroup *rightMenuButtonGroup;
 
 	QLineEdit 	*graphUpdateIntervalLineEdit, *dataSampleSizeLineEdit,
@@ -81,7 +89,9 @@ private:
 				*calibrationH1MagLineEdit, *calibrationH2MagLineEdit, 
 				*calibrationH3MagLineEdit, *calibrationH8MagLineEdit,
 				*calibrationH1PhaseLineEdit, *calibrationH2PhaseLineEdit, 
-				*calibrationH3PhaseLineEdit, *calibrationH8PhaseLineEdit;
+				*calibrationH3PhaseLineEdit, *calibrationH8PhaseLineEdit,
+				*AFEDIAG0LineEdit, *AFEDIAG1LineEdit, *AFEDIAG2LineEdit;
+
 	QLabel 	*rotationValueLabel, *angleValueLabel, *countValueLabel, *tempValueLabel, 
 			*calibrationMotorCurrentPositionLabel,
 			*motorAmaxValueLabel, *motorRotateVmaxValueLabel, *motorDmaxValueLabel,
@@ -108,7 +118,7 @@ private:
 
 	QListWidget *rawDataListWidget;
 
-	QPlainTextEdit *logsPlainTextEdit;
+	QPlainTextEdit *logsPlainTextEdit, *commandLogPlainTextEdit;
 
 	QCheckBox *autoCalibrateCheckBox;
 
@@ -118,11 +128,17 @@ private:
 
 	HorizontalSpinBox *motorMaxVelocitySpinBox, *motorAccelTimeSpinBox, *motorMaxDisplacementSpinBox, *motorTargetPositionSpinBox;
 
+	MenuControlButton *DIGIOBusyStatusLED ,*DIGIOCNVStatusLED ,*DIGIOSENTStatusLED ,*DIGIOACALCStatusLED ,*DIGIOFaultStatusLED ,*DIGIOBootloaderStatusLED,
+		*R0StatusLED, *R1StatusLED, *R2StatusLED, *R3StatusLED, *R4StatusLED, *R5StatusLED, *R6StatusLED, *R7StatusLED,
+		*VDDUnderVoltageStatusLED, *VDDOverVoltageStatusLED, *VDRIVEUnderVoltageStatusLED, *VDRIVEOverVoltageStatusLED, 
+		*AFEDIAGStatusLED, *NVMCRCFaultStatusLED, *ECCDoubleBitErrorStatusLED, *OscillatorDriftStatusLED, *CountSensorFalseStateStatusLED, 
+		*AngleCrossCheckStatusLED, *TurnCountSensorLevelsStatusLED, *MTDIAGStatusLED, *TurnCounterCrossCheckStatusLED, *RadiusCheckStatusLED, *SequencerWatchdogStatusLED;
+
 	void updateChannelValues();
 	void updateLineEditValues();
 	void updateGeneralSettingEnabled(bool value);
 	void connectLineEditToNumber(QLineEdit* lineEdit, int& variable);
-	void connectLineEditToNumber(QLineEdit* lineEdit, double& variable);
+	void connectLineEditToNumber(QLineEdit* lineEdit, double& variable, QString unit = "");
 	void connectLineEditToGraphSamples(QLineEdit* lineEdit, int& variable, Sismograph* graph);
 	void connectMenuComboToGraphDirection(MenuCombo* menuCombo, Sismograph* graph);
 	void changeGraphColorByChannelName(Sismograph* graph, const char* channelName);
@@ -133,7 +149,6 @@ private:
 	void updateLabelValue(QLabel* label, int channelIndex);
 	void updateLabelValue(QLabel *label, ADMTController::MotorAttribute attribute);
 	void updateChannelValue(int channelIndex);
-	void calibrationTask();
 	void addAngleToRawDataList();
 	void calibrateData();
 	void registerCalibrationData();
@@ -141,6 +156,7 @@ private:
 	void importCalibrationData();
 	void calibrationLogWrite(QString message);
 	void calibrationLogWriteLn(QString message = "");
+	void commandLogWrite(QString message);
 	void readMotorAttributeValue(ADMTController::MotorAttribute attribute, double& value);
 	void writeMotorAttributeValue(ADMTController::MotorAttribute attribute, double value);
 	void applyLineEditStyle(QLineEdit *widget);
@@ -150,7 +166,6 @@ private:
 	void initializeMotor();
 	void stepMotorAcquisition(double step = -408);
 	void clearRawDataList();
-	void motorCalibrationAcquisitionTask();
 	void connectLineEditToRPSConversion(QLineEdit* lineEdit, double& vmax);
 	void connectLineEditToNumberWrite(QLineEdit* lineEdit, double& variable, ADMTController::MotorAttribute attribute);
 	double convertRPStoVMAX(double rps);
@@ -166,8 +181,13 @@ private:
 	void applyTabWidgetStyle(QTabWidget *widget, const QString& styleHelperColor = "ScopyBlue");
 	MenuControlButton *createStatusLEDWidget(const QString title, QColor color, QWidget *parent = nullptr);
 	MenuControlButton *createChannelToggleWidget(const QString title, QColor color, QWidget *parent = nullptr);
+	void updateDigioMonitor();
+	void updateMTDiagRegister();
+	void updateFaultRegister();
+	void updateMTDiagnostics();
+	void changeStatusLEDColor(MenuControlButton *menuControlButton, QColor color, bool checked = true);
 
-	QTimer *timer, *calibrationTimer, *motorCalibrationAcquisitionTimer;
+	QTimer *timer, *calibrationTimer, *motorCalibrationAcquisitionTimer, *utilityTimer;
 
 	int uuid = 0;
 	const char *rotationChannelName, *angleChannelName, *countChannelName, *temperatureChannelName;
