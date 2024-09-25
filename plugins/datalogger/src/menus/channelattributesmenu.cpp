@@ -39,9 +39,8 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, QWidget *p
 
 	if(qobject_cast<DmmDataMonitorModel *>(model)) {
 		QList<IIOWidget *> attrWidgets =
-			IIOWidgetBuilder()
+			IIOWidgetBuilder(parent)
 				.channel(dynamic_cast<DmmDataMonitorModel *>(model)->iioChannel())
-				.parent(parent)
 				.buildAll();
 
 		for(auto w : attrWidgets) {

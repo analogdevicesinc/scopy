@@ -42,6 +42,7 @@ public:
 		TriggerData,
 		DeviceAttrData,
 		ContextAttrData,
+		EmptyData,
 	};
 
 	enum UIS
@@ -53,7 +54,7 @@ public:
 		RangeUi,
 	};
 
-	explicit IIOWidgetBuilder(QObject *parent = nullptr);
+	explicit IIOWidgetBuilder(QWidget *parent = nullptr);
 	~IIOWidgetBuilder();
 
 	/**
@@ -108,6 +109,13 @@ public:
 	 * @return
 	 */
 	IIOWidgetBuilder &configMode(bool isConfigurable);
+
+	/**
+	 * @brief title Sets the title of the IIOWidget
+	 * @param title QString
+	 * @return
+	 */
+	IIOWidgetBuilder &title(QString title);
 
 	/**
 	 * @brief Sets the context that will be used, if no iio_device or iio_channel
@@ -168,12 +176,6 @@ public:
 	 */
 	IIOWidgetBuilder &uiStrategy(IIOWidgetBuilder::UIS uiStrategy);
 
-	/**
-	 * @brief Sets the parent of the IIOWidget that will be built.
-	 * @param parent
-	 */
-	IIOWidgetBuilder &parent(QWidget *parent);
-
 private:
 	DataStrategyInterface *createDS();
 	GuiStrategyInterface *createUIS();
@@ -188,6 +190,7 @@ private:
 	QString m_attribute;
 	QString m_optionsAttribute;
 	QString m_optionsValues;
+	QString m_title;
 	IIOWidgetBuilder::DS m_dataStrategy;
 	IIOWidgetBuilder::UIS m_uiStrategy;
 	QWidget *m_widgetParent;

@@ -77,7 +77,7 @@ void WatchListEntry::setupWidget(IIOWidget *widget)
 {
 	// if you can cast the uiStrategy to combo, this value ui will be a combo, otherwise it will be a lineedit
 	// GuiStrategyInterface *ui = dynamic_cast<ComboAttrUi *>(widget->getUiStrategy());
-	bool isCombo = widget->isDSInstanceOf<ComboAttrUi>();
+	bool isCombo = widget->isUISInstanceOf<ComboAttrUi>();
 	if(isCombo) {
 		// https://forum.qt.io/topic/139728/can-t-set-qcombobox-qslider-margins
 		// QFrame because QWidget does not have the paintEvent implemented
@@ -120,7 +120,7 @@ void WatchListEntry::setupWidget(IIOWidget *widget)
 		m_valueUi = m_lineedit;
 	}
 
-	QObject::connect(dynamic_cast<QObject *>(widget->getDataStrategy()), SIGNAL(sendData(QString, QString)), this,
+	QObject::connect(dynamic_cast<QObject *>(widget), SIGNAL(sendData(QString, QString)), this,
 			 SLOT(setNewData(QString, QString)));
 }
 

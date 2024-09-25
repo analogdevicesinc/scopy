@@ -19,15 +19,17 @@
  */
 
 #include "iiowidget.h"
-#include "channelattrdatastrategy.h"
-#include "contextattrdatastrategy.h"
-#include "deviceattrdatastrategy.h"
-#include "iiowidgetselector.h"
+#include "datastrategy/channelattrdatastrategy.h"
+#include "datastrategy/contextattrdatastrategy.h"
+#include "datastrategy/deviceattrdatastrategy.h"
+#include "datastrategy/emptydatastrategy.h"
+
 #include <iioutil/connectionprovider.h>
-#include <QDateTime>
-#include <QApplication>
 #include <pluginbase/preferences.h>
 #include <gui/utils.h>
+
+#include <QDateTime>
+#include <QApplication>
 
 using namespace scopy;
 
@@ -46,15 +48,27 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 	, m_DStoUI(nullptr)
 	, m_isConfigurable(false)
 {
+	// Config button
+	m_configBtn->setStyleSheet("border-image: url(\":/gui/icons/scopy-default/icons/gear_wheel.svg\");");
+	m_configBtn->setVisible(m_isConfigurable);
+
+	// General layout
 	setLayout(new QVBoxLayout(this));
 	layout()->setContentsMargins(0, 0, 0, 0);
 	layout()->setSpacing(0);
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
+	QWidget *topWidget = new QWidget(this);
+	topWidget->setLayout(new QHBoxLayout(topWidget));
+	topWidget->layout()->setContentsMargins(0, 0, 0, 0);
+
 	QWidget *ui = m_uiStrategy->ui();
 	if(ui) {
-		layout()->addWidget(ui);
+		topWidget->layout()->addWidget(ui);
 	}
+	topWidget->layout()->addWidget(m_configBtn);
+
+	layout()->addWidget(topWidget);
 	layout()->addWidget(m_progressBar);
 
 	QObject *uiStrategyObject = dynamic_cast<QObject *>(m_uiStrategy);
@@ -65,23 +79,31 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 
 	connect(m_progressBar, &SmallProgressBar::progressFinished, this,
 		[this]() { this->convertUItoDS(m_lastData); });
+	connect(m_configBtn, &QPushButton::clicked, this, &IIOWidget::reconfigure);
 
 	connect(uiStrategyObject, SIGNAL(emitData(QString)), this, SLOT(startTimer(QString)));
+	connect(uiStrategyObject, SIGNAL(emitData(QString)), this, SIGNAL(emitData(QString)));
+	connect(uiStrategyObject, SIGNAL(displayedNewData(QString, QString)), this,
+		SIGNAL(displayedNewData(QString, QString)));
 
 	connect(dataStrategyObject, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
 		SLOT(emitDataStatus(QDateTime, QString, QString, int, bool)));
 
 	// forward data request from ui strategy to data strategy
 	connect(uiStrategyObject, SIGNAL(requestData()), dataStrategyObject, SLOT(readAsync()));
+	connect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this, SIGNAL(sendData(QString, QString)));
+	connect(dataStrategyObject, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
+		SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)));
 
 	// forward data from data strategy to ui strategy
 	connect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this, SLOT(convertDStoUI(QString, QString)));
+	connect(dataStrategyObject, SIGNAL(aboutToWrite(QString, QString)), this,
+		SIGNAL(aboutToWrite(QString, QString)));
 
 	// intercept the sendData from dataStrategy to collect information
 	connect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this, SLOT(storeReadInfo(QString, QString)));
 
-	// The data will be populated here
-	bool useLazyLoading = Preferences::GetInstance()->get("iiowidgets_use_lazy_loading").toBool();
+	bool useLazyLoading = Preferences::get("iiowidgets_use_lazy_loading").toBool();
 	if(!useLazyLoading) { // force skip lazy load
 		LAZY_LOAD(initialize);
 	}
@@ -97,41 +119,41 @@ void IIOWidget::writeAsync(QString data) { m_dataStrategy->writeAsync(data); }
 
 DataStrategyInterface *IIOWidget::swapDataStrategy(DataStrategyInterface *dataStrategy)
 {
-	QWidget *dataStrategyWidget = dynamic_cast<QWidget *>(m_dataStrategy);
-	QWidget *uiStrategyWidget = dynamic_cast<QWidget *>(m_uiStrategy);
-	QWidget *newDataStrategyWidget = dynamic_cast<QWidget *>(dataStrategy);
+	QObject *dataStrategyObject = dynamic_cast<QObject *>(m_dataStrategy);
+	QObject *uiStrategyObject = dynamic_cast<QObject *>(m_uiStrategy);
+	QObject *newDataStrategyObject = dynamic_cast<QObject *>(dataStrategy);
 
 	// disconnect old data strategy
-	disconnect(dataStrategyWidget, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
+	disconnect(dataStrategyObject, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
 		   SLOT(emitDataStatus(QDateTime, QString, QString, int, bool)));
-	disconnect(uiStrategyWidget, SIGNAL(requestData()), dataStrategyWidget, SLOT(readAsync()));
-	disconnect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), uiStrategyWidget,
+	disconnect(uiStrategyObject, SIGNAL(requestData()), dataStrategyObject, SLOT(readAsync()));
+	disconnect(dataStrategyObject, SIGNAL(sendData(QString, QString)), uiStrategyObject,
 		   SLOT(receiveData(QString, QString)));
-	disconnect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), this,
+	disconnect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this,
 		   SLOT(storeReadInfo(QString, QString))); // TODO: maybe do something with this slot..
-	disconnect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), this, SIGNAL(sendData(QString, QString)));
-	disconnect(dataStrategyWidget, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
+	disconnect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this, SIGNAL(sendData(QString, QString)));
+	disconnect(dataStrategyObject, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
 		   SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)));
-	disconnect(dataStrategyWidget, SIGNAL(aboutToWrite(QString, QString)), this,
+	disconnect(dataStrategyObject, SIGNAL(aboutToWrite(QString, QString)), this,
 		   SIGNAL(aboutToWrite(QString, QString)));
-	disconnect(uiStrategyWidget, SIGNAL(emitData(QString)), this, SIGNAL(emitData(QString)));
-	disconnect(uiStrategyWidget, SIGNAL(displayedNewData(QString, QString)), this,
+	disconnect(uiStrategyObject, SIGNAL(emitData(QString)), this, SIGNAL(emitData(QString)));
+	disconnect(uiStrategyObject, SIGNAL(displayedNewData(QString, QString)), this,
 		   SIGNAL(displayedNewData(QString, QString)));
 
 	// connect new data strategy
-	connect(newDataStrategyWidget, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
+	connect(newDataStrategyObject, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
 		SLOT(emitDataStatus(QDateTime, QString, QString, int, bool)));
-	connect(uiStrategyWidget, SIGNAL(requestData()), newDataStrategyWidget, SLOT(readAsync()));
-	connect(newDataStrategyWidget, SIGNAL(sendData(QString, QString)), uiStrategyWidget,
+	connect(uiStrategyObject, SIGNAL(requestData()), newDataStrategyObject, SLOT(readAsync()));
+	connect(newDataStrategyObject, SIGNAL(sendData(QString, QString)), uiStrategyObject,
 		SLOT(receiveData(QString, QString)));
-	connect(newDataStrategyWidget, SIGNAL(sendData(QString, QString)), this, SLOT(storeReadInfo(QString, QString)));
-	connect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), this, SIGNAL(sendData(QString, QString)));
-	connect(dataStrategyWidget, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
+	connect(newDataStrategyObject, SIGNAL(sendData(QString, QString)), this, SLOT(storeReadInfo(QString, QString)));
+	connect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this, SLOT(convertDStoUI(QString, QString)));
+	connect(dataStrategyObject, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
 		SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)));
-	connect(dataStrategyWidget, SIGNAL(aboutToWrite(QString, QString)), this,
+	connect(dataStrategyObject, SIGNAL(aboutToWrite(QString, QString)), this,
 		SIGNAL(aboutToWrite(QString, QString)));
-	connect(uiStrategyWidget, SIGNAL(emitData(QString)), this, SIGNAL(emitData(QString)));
-	connect(uiStrategyWidget, SIGNAL(displayedNewData(QString, QString)), this,
+	connect(uiStrategyObject, SIGNAL(emitData(QString)), this, SIGNAL(emitData(QString)));
+	connect(uiStrategyObject, SIGNAL(displayedNewData(QString, QString)), this,
 		SIGNAL(displayedNewData(QString, QString)));
 
 	// save the new data strategy and return the old one
@@ -263,6 +285,13 @@ void IIOWidget::reconfigure()
 
 	connect(m_configPopup, &IIOConfigurationPopup::exitButtonClicked, this,
 		[&]() { m_configPopup->deleteLater(); });
+	connect(m_configPopup, &IIOConfigurationPopup::emptyButtonClicked, this, [&]() {
+		DataStrategyInterface *ds = new EmptyDataStrategy(this);
+		DataStrategyInterface *oldDS = swapDataStrategy(ds);
+		delete oldDS;
+		delete m_configPopup;
+		m_uiStrategy->changeName("Empty");
+	});
 	connect(m_configPopup, &IIOConfigurationPopup::selectButtonClicked, this, [&](IIOItem *item) {
 		DataStrategyInterface *dsCreated = nullptr;
 		switch(item->type()) {

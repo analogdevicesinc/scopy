@@ -37,13 +37,12 @@ BufferMenu::BufferMenu(QWidget *parent, QString chnlFunction, Connection *conn, 
 	, m_chnls(chnls)
 {
 	if(m_chnls.contains(INPUT_CHNL)) {
-		m_samplingFreq = IIOWidgetBuilder()
+		m_samplingFreq = IIOWidgetBuilder(this)
 					 .connection(const_cast<Connection *>(m_connection))
 					 .channel(const_cast<iio_channel *>(m_chnls[INPUT_CHNL]))
 					 .attribute("sampling_frequency")
 					 .optionsAttribute("sampling_frequency_available")
 					 .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
-					 .parent(this)
 					 .buildSingle();
 		addMenuWidget(m_samplingFreq);
 		connect(m_samplingFreq, &IIOWidget::displayedNewData, this,
@@ -88,12 +87,11 @@ CurrentInLoopMenu::CurrentInLoopMenu(QWidget *parent, QString chnlFunction, Conn
 	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
 	// dac code - output channel
-	IIOWidget *dacCode = IIOWidgetBuilder()
+	IIOWidget *dacCode = IIOWidgetBuilder(this)
 				     .connection(const_cast<Connection *>(m_connection))
 				     .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 				     .attribute("raw")
 				     .optionsValues("[0 1 8191]")
-				     .parent(this)
 				     .buildSingle();
 	dacCode->changeTitle("DAC_CODE");
 	addMenuWidget(dacCode);
@@ -134,24 +132,22 @@ DigitalInLoopMenu::DigitalInLoopMenu(QWidget *parent, QString chnlFunction, Conn
 	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
 	// threshold - input channel
-	m_threshold = IIOWidgetBuilder()
+	m_threshold = IIOWidgetBuilder(this)
 			      .connection(const_cast<Connection *>(m_connection))
 			      .channel(const_cast<iio_channel *>(m_chnls[INPUT_CHNL]))
 			      .attribute("threshold")
 			      .optionsValues("[0 1 16000]")
-			      .parent(this)
 			      .buildSingle();
 	addMenuWidget(m_threshold);
 
 	connect(m_threshold, &IIOWidget::emitData, this, &BufferMenu::thresholdChangeStart);
 	connect(m_threshold, &IIOWidget::emitStatus, this, &DigitalInLoopMenu::onEmitStatus);
 	// dac code - output channel
-	IIOWidget *dacCode = IIOWidgetBuilder()
+	IIOWidget *dacCode = IIOWidgetBuilder(this)
 				     .connection(const_cast<Connection *>(m_connection))
 				     .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 				     .attribute("raw")
 				     .optionsValues("[0 1 8191]")
-				     .parent(this)
 				     .buildSingle();
 	dacCode->changeTitle("DAC_CODE");
 	addMenuWidget(dacCode);
@@ -212,12 +208,11 @@ VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection
 	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
 	// dac code - output channel
-	IIOWidget *dacCode = IIOWidgetBuilder()
+	IIOWidget *dacCode = IIOWidgetBuilder(this)
 				     .connection(const_cast<Connection *>(m_connection))
 				     .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 				     .attribute("raw")
 				     .optionsValues("[0 1 8191]")
-				     .parent(this)
 				     .buildSingle();
 	dacCode->changeTitle("DAC_CODE");
 	addMenuWidget(dacCode);
@@ -236,34 +231,31 @@ VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection
 	connect(dacCode, &IIOWidget::sendData, this, &VoltageOutMenu::updateCnvtLabel);
 
 	// slew - output channel
-	IIOWidget *slewOptions = IIOWidgetBuilder()
+	IIOWidget *slewOptions = IIOWidgetBuilder(this)
 					 .connection(const_cast<Connection *>(m_connection))
 					 .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 					 .attribute("slew_en")
 					 .optionsValues("0 1")
-					 .parent(this)
 					 .buildSingle();
 	addMenuWidget(slewOptions);
 
 	// slew step - output channel
-	IIOWidget *slewStep = IIOWidgetBuilder()
+	IIOWidget *slewStep = IIOWidgetBuilder(this)
 				      .connection(const_cast<Connection *>(m_connection))
 				      .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 				      .attribute("slew_step")
 				      .optionsAttribute("slew_step_available")
 				      .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
-				      .parent(this)
 				      .buildSingle();
 	addMenuWidget(slewStep);
 
 	// slew rate - output channel
-	IIOWidget *slewRate = IIOWidgetBuilder()
+	IIOWidget *slewRate = IIOWidgetBuilder(this)
 				      .connection(const_cast<Connection *>(m_connection))
 				      .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 				      .attribute("slew_rate")
 				      .optionsAttribute("slew_rate_available")
 				      .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
-				      .parent(this)
 				      .buildSingle();
 	addMenuWidget(slewRate);
 }
@@ -290,12 +282,11 @@ CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection
 	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
 	// dac code - output channel
-	IIOWidget *dacCode = IIOWidgetBuilder()
+	IIOWidget *dacCode = IIOWidgetBuilder(this)
 				     .connection(const_cast<Connection *>(m_connection))
 				     .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 				     .attribute("raw")
 				     .optionsValues("[0 1 8191]")
-				     .parent(this)
 				     .buildSingle();
 	dacCode->changeTitle("DAC_CODE");
 	addMenuWidget(dacCode);
@@ -314,34 +305,31 @@ CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection
 	connect(dacCode, &IIOWidget::sendData, this, &CurrentOutMenu::updateCnvtLabel);
 
 	// slew - output channel
-	IIOWidget *slewOptions = IIOWidgetBuilder()
+	IIOWidget *slewOptions = IIOWidgetBuilder(this)
 					 .connection(const_cast<Connection *>(m_connection))
 					 .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 					 .attribute("slew_en")
 					 .optionsValues("0 1")
-					 .parent(this)
 					 .buildSingle();
 	addMenuWidget(slewOptions);
 
 	// slew step - output channel
-	IIOWidget *slewStep = IIOWidgetBuilder()
+	IIOWidget *slewStep = IIOWidgetBuilder(this)
 				      .connection(const_cast<Connection *>(m_connection))
 				      .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 				      .attribute("slew_step")
 				      .optionsAttribute("slew_step_available")
 				      .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
-				      .parent(this)
 				      .buildSingle();
 	addMenuWidget(slewStep);
 
 	// slew rate - output channel
-	IIOWidget *slewRate = IIOWidgetBuilder()
+	IIOWidget *slewRate = IIOWidgetBuilder(this)
 				      .connection(const_cast<Connection *>(m_connection))
 				      .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 				      .attribute("slew_rate")
 				      .optionsAttribute("slew_rate_available")
 				      .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
-				      .parent(this)
 				      .buildSingle();
 	addMenuWidget(slewRate);
 }
@@ -368,13 +356,12 @@ DiagnosticMenu::DiagnosticMenu(QWidget *parent, QString chnlFunction, Connection
 	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
 	// diag options - input channel
-	IIOWidget *diagOptions = IIOWidgetBuilder()
+	IIOWidget *diagOptions = IIOWidgetBuilder(this)
 					 .connection(const_cast<Connection *>(m_connection))
 					 .channel(const_cast<iio_channel *>(m_chnls[INPUT_CHNL]))
 					 .attribute("diag_function")
 					 .optionsAttribute("diag_function_available")
 					 .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
-					 .parent(this)
 					 .buildSingle();
 	addMenuWidget(diagOptions);
 
@@ -412,12 +399,11 @@ DigitalInMenu::DigitalInMenu(QWidget *parent, QString chnlFunction, Connection *
 	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
 	// threshold - input channel
-	m_threshold = IIOWidgetBuilder()
+	m_threshold = IIOWidgetBuilder(this)
 			      .connection(const_cast<Connection *>(m_connection))
 			      .channel(const_cast<iio_channel *>(m_chnls[INPUT_CHNL]))
 			      .attribute("threshold")
 			      .optionsValues("[0 1 16000]")
-			      .parent(this)
 			      .buildSingle();
 	addMenuWidget(m_threshold);
 	connect(m_threshold, &IIOWidget::emitData, this, &BufferMenu::thresholdChangeStart);

@@ -25,6 +25,7 @@ public:
 
 Q_SIGNALS:
 	void selectButtonClicked(IIOItem *selected);
+	void emptyButtonClicked();
 	void exitButtonClicked();
 
 protected Q_SLOTS:
@@ -39,6 +40,7 @@ protected:
 	IIOWidgetSelector *m_widgetSelector;
 	QPushButton *m_exitButton;
 	QPushButton *m_selectButton;
+	QPushButton *m_emptyButton;
 	IIOItem *m_root;
 };
 } // namespace scopy

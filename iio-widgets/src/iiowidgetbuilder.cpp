@@ -21,12 +21,15 @@
 #include "iiowidgetbuilder.h"
 #include "guistrategy/editableguistrategy.h"
 #include "guistrategy/switchguistrategy.h"
+#include "guistrategy/comboguistrategy.h"
+#include "guistrategy/rangeguistrategy.h"
 #include "datastrategy/channelattrdatastrategy.h"
 #include "datastrategy/triggerdatastrategy.h"
 #include "datastrategy/deviceattrdatastrategy.h"
 #include "datastrategy/contextattrdatastrategy.h"
 #include "datastrategy/cmdqchannelattrdatastrategy.h"
 #include "datastrategy/cmdqdeviceattrdatastrategy.h"
+#include "datastrategy/emptydatastrategy.h"
 #include "guistrategy/comboguistrategy.h"
 #include "guistrategy/rangeguistrategy.h"
 #include <pluginbase/preferences.h>
@@ -37,7 +40,7 @@
 using namespace scopy;
 Q_LOGGING_CATEGORY(CAT_ATTRBUILDER, "AttrBuilder")
 
-IIOWidgetBuilder::IIOWidgetBuilder(QObject *parent)
+IIOWidgetBuilder::IIOWidgetBuilder(QWidget *parent)
 	: QObject(parent)
 	, m_connection(nullptr)
 	, m_isCompact(false)
@@ -49,9 +52,10 @@ IIOWidgetBuilder::IIOWidgetBuilder(QObject *parent)
 	, m_attribute("")
 	, m_optionsAttribute("")
 	, m_optionsValues("")
+	, m_title("")
 	, m_dataStrategy(DS::NoDataStrategy)
 	, m_uiStrategy(UIS::NoUIStrategy)
-	, m_widgetParent(nullptr)
+	, m_widgetParent(parent)
 {}
 
 IIOWidgetBuilder::~IIOWidgetBuilder() {}
@@ -61,7 +65,7 @@ IIOWidget *IIOWidgetBuilder::buildSingle()
 	DataStrategyInterface *ds = nullptr;
 	GuiStrategyInterface *ui = nullptr;
 
-	if(!m_context && !m_device && !m_channel) {
+	if(!m_context && !m_device && !m_channel && m_dataStrategy != DS::EmptyData) {
 		qWarning(CAT_ATTRBUILDER) << "No channel/device/context set.";
 		return nullptr;
 	}
@@ -87,6 +91,9 @@ IIOWidget *IIOWidgetBuilder::buildSingle()
 	IIOWidget *widget = new IIOWidget(ui, ds, m_widgetParent);
 	widget->setRecipe(m_generatedRecipe);
 	widget->setConfigurable(m_isConfigurable);
+	if(!m_title.isEmpty()) {
+		widget->changeTitle(m_title);
+	}
 	return widget;
 }
 
@@ -215,6 +222,7 @@ void IIOWidgetBuilder::clear()
 	m_attribute = "";
 	m_optionsAttribute = "";
 	m_optionsValues = "";
+	m_title = "";
 	m_dataStrategy = DS::NoDataStrategy;
 	m_uiStrategy = UIS::NoUIStrategy;
 	m_widgetParent = nullptr;
@@ -241,6 +249,12 @@ IIOWidgetBuilder &IIOWidgetBuilder::includeDebugAttributes(bool isIncluded)
 IIOWidgetBuilder &IIOWidgetBuilder::configMode(bool isConfigurable)
 {
 	m_isConfigurable = isConfigurable;
+	return *this;
+}
+
+IIOWidgetBuilder &IIOWidgetBuilder::title(QString title)
+{
+	m_title = title;
 	return *this;
 }
 
@@ -292,12 +306,6 @@ IIOWidgetBuilder &IIOWidgetBuilder::uiStrategy(UIS uiStrategy)
 	return *this;
 }
 
-IIOWidgetBuilder &IIOWidgetBuilder::parent(QWidget *parent)
-{
-	m_widgetParent = parent;
-	return *this;
-}
-
 DataStrategyInterface *IIOWidgetBuilder::createDS()
 {
 	DataStrategyInterface *ds = nullptr;
@@ -337,6 +345,9 @@ DataStrategyInterface *IIOWidgetBuilder::createDS()
 		break;
 	case DS::TriggerData:
 		ds = new TriggerDataStrategy(m_generatedRecipe, m_widgetParent);
+		break;
+	case DS::EmptyData:
+		ds = new EmptyDataStrategy(m_widgetParent);
 		break;
 	default:
 		qWarning(CAT_ATTRBUILDER) << "No valid Data Strategy was provided.";

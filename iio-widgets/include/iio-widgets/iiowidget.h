@@ -124,7 +124,20 @@ public:
 	 */
 	int lastReturnCode();
 
+	/**
+	 * @brief setUItoDataConversion Adds a function that is called before sending the data given as imput by the
+	 * user and modifies this data. The function receives as parameter a QString, converts it and returns the
+	 * converted string that will be sent to the DS after.
+	 * @param func std::function<QString(QString)>
+	 */
 	void setUItoDataConversion(std::function<QString(QString)> func);
+
+	/**
+	 * @brief setDataToUIConversion Adds a function that is called before sending the data read by the IIOWidget
+	 * and modifies this data. The function receives as parameter a QString, converts it and returns the
+	 * converted string that will be sent to the UI after.
+	 * @param func std::function<QString(QString)>
+	 */
 	void setDataToUIConversion(std::function<QString(QString)> func);
 
 	/**
@@ -239,12 +252,12 @@ protected:
 	void setLastOperationTimestamp(QDateTime timestamp);
 	void setLastOperationState(IIOWidget::State state);
 
-	// Core variables
+	/* Core variables */
 	GuiStrategyInterface *m_uiStrategy;
 	DataStrategyInterface *m_dataStrategy;
 	IIOWidgetFactoryRecipe m_recipe;
 
-	// Logged data
+	/* Logged data */
 	QString m_lastData;
 	SmallProgressBar *m_progressBar;
 	QDateTime *m_lastOpTimestamp;
@@ -255,7 +268,7 @@ protected:
 	std::function<QString(QString)> m_UItoDS;
 	std::function<QString(QString)> m_DStoUI;
 
-	// Optional configuration
+	/* Optional configuration */
 	QPushButton *m_configBtn;
 	IIOConfigurationPopup *m_configPopup;
 	bool m_isConfigurable;

@@ -134,6 +134,7 @@ void IIOConfigurationPopup::init()
 
 		Q_EMIT selectButtonClicked(iioItem);
 	});
+	QObject::connect(m_emptyButton, &QPushButton::clicked, this, &IIOConfigurationPopup::emptyButtonClicked);
 	QObject::connect(m_exitButton, &QPushButton::clicked, this, &IIOConfigurationPopup::exitButtonClicked);
 	m_selectButton->setDisabled(true);
 }
@@ -161,12 +162,11 @@ void IIOConfigurationPopup::initUI()
 	buttonGroupLayout->setSpacing(10);
 
 	m_selectButton = new QPushButton("Select", buttonGroup);
-	m_selectButton->setObjectName("selectButton");
-
+	m_emptyButton = new QPushButton("No Data", buttonGroup);
 	m_exitButton = new QPushButton("Exit", buttonGroup);
-	m_exitButton->setObjectName("exitButton");
 
 	buttonGroupLayout->addWidget(m_exitButton);
+	buttonGroupLayout->addWidget(m_emptyButton);
 	buttonGroupLayout->addWidget(m_selectButton);
 
 	backgroundLayout->addWidget(m_titleLabel);
@@ -175,9 +175,10 @@ void IIOConfigurationPopup::initUI()
 
 	backgroundWidget->setLayout(backgroundLayout);
 
-	StyleHelper::TutorialChapterTitleLabel(m_titleLabel, "titleLabel");
-	StyleHelper::BlueButton(m_selectButton, "selectButton");
-	StyleHelper::BlueButton(m_exitButton, "exitButton");
+	StyleHelper::TutorialChapterTitleLabel(m_titleLabel, "TitleLabel");
+	StyleHelper::BlueButton(m_selectButton, "SelectButton");
+	StyleHelper::BlueButton(m_emptyButton, "EmptyButton");
+	StyleHelper::BlueButton(m_exitButton, "ExitButton");
 	StyleHelper::OverlayMenu(this, "IIOConfigurationPopupOverlay");
 }
 
