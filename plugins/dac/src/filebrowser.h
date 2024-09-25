@@ -16,6 +16,7 @@ public:
 	explicit FileBrowser(QWidget *parent = nullptr);
 	~FileBrowser();
 	QString getFilePath() const;
+	void setDefaultDir(QString dir);
 Q_SIGNALS:
 	void load(QString path);
 private Q_SLOTS:
@@ -27,6 +28,7 @@ private:
 	QPushButton *m_fileBufferBrowseBtn;
 	QPushButton *m_fileBufferLoadBtn;
 	QString m_filename;
+	QString m_defaultDir;
 };
 } // namespace dac
 } // namespace scopy

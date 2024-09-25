@@ -39,11 +39,25 @@ if(NOT "${SCOPY_PLUGIN_BUILD_PATH}" STREQUAL "")
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH}) 
 endif() 
 
+set(DAC_CSV_SYSTEM_PATH ${SCOPY_PLUGIN_INSTALL_PATH}/csv)
+set(DAC_CSV_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/csv)
+
+install(FILES res/csv/* DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH}/csv)
+file(GLOB CSVS ${CMAKE_CURRENT_SOURCE_DIR}/res/csv/*)
+foreach(_csv ${CSVS})
+	file(COPY ${_csv} DESTINATION ${DAC_CSV_BUILD_PATH})
+endforeach()
+
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc) 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES}) 
 
 generate_export_header( 
     ${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h 
+)
+
+configure_file(
+	include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h.cmakein
+	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h @ONLY
 )
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include) 
