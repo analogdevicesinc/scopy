@@ -13,6 +13,7 @@ using namespace scopy::dac;
 FileBrowser::FileBrowser(QWidget *parent)
 	: QWidget(parent)
 	, m_filename("")
+	, m_defaultDir("")
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	auto m_layout = new QVBoxLayout();
@@ -22,6 +23,7 @@ FileBrowser::FileBrowser(QWidget *parent)
 
 	MenuSectionWidget *fileBufferContainer = new MenuSectionWidget(this);
 	fileBufferContainer->contentLayout()->setSpacing(10);
+	fileBufferContainer->contentLayout()->setMargin(0);
 
 	m_fileBufferPath = new ProgressLineEdit(this);
 	m_fileBufferPath->getLineEdit()->setReadOnly(true);
@@ -45,13 +47,16 @@ QString FileBrowser::getFilePath() const { return m_filename; }
 
 void FileBrowser::loadFile() { Q_EMIT load(m_filename); }
 
+void FileBrowser::setDefaultDir(QString dir) { m_defaultDir = dir; }
+
 void FileBrowser::chooseFile()
 {
 	QString selectedFilter;
 
 	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
-	QString tmpFilename = QFileDialog::getOpenFileName(this, tr("Import"), "", tr("All Files(*)"), &selectedFilter,
-							   (useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+	QString tmpFilename = QFileDialog::getOpenFileName(
+		this, tr("Import"), m_defaultDir, tr("All Files(*)"), &selectedFilter,
+		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 	if(!tmpFilename.isEmpty()) {
 		m_filename = tmpFilename;
 		m_fileBufferPath->getLineEdit()->setText(m_filename);
