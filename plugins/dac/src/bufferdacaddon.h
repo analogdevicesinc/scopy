@@ -57,6 +57,7 @@ private:
 	QWidget *createMenu(TxNode *node);
 	QWidget *createAttrMenu(TxNode *node, QWidget *parent);
 	void detectSamplingFrequency(IIOWidget *w);
+	void enableFirstChannels(int channelCount);
 };
 } // namespace dac
 } // namespace scopy
