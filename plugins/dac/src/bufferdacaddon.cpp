@@ -141,9 +141,15 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	runConfigLay->addWidget(m_runBtn);
 
 	// File browser section
-	fm = new FileBrowser(this);
+	MenuSectionWidget *fileBrowserSection = new MenuSectionWidget(this);
+	fileBrowserSection->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+	QLabel *fileLbl = new QLabel("Choose file");
+	StyleHelper::MenuSmallLabel(fileLbl);
+	fm = new FileBrowser(fileBrowserSection);
 	fm->setProperty("tutorial_name", "FILE_MANAGER");
 	connect(fm, &FileBrowser::load, this, &BufferDacAddon::load);
+	fileBrowserSection->contentLayout()->addWidget(fileLbl);
+	fileBrowserSection->contentLayout()->addWidget(fm);
 
 	// Channel list section
 	MenuSectionWidget *channelsSection = new MenuSectionWidget(this);
@@ -235,7 +241,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	topSection->setFixedHeight(190);
 	topLayout->setMargin(0);
 	topLayout->setSpacing(5);
-	topLayout->addWidget(fm);
+	topLayout->addWidget(fileBrowserSection);
 	topLayout->addWidget(channelsSection);
 
 	scrollLayout->addWidget(topSection);
