@@ -215,8 +215,8 @@ QWidget *TimeMeasureManager::createMeasurementMenu(QWidget *parent)
 	lay->setSpacing(6);
 	lay->setMargin(0);
 
-	QWidget *hMeasure = createMeasurementMenuSection("HORIZONTAL", parent);
-	QWidget *vMeasure = createMeasurementMenuSection("VERTICAL", parent);
+	QWidget *hMeasure = createMeasurementMenuSection("HORIZONTAL", w);
+	QWidget *vMeasure = createMeasurementMenuSection("VERTICAL", w);
 	lay->addWidget(hMeasure);
 	lay->addWidget(vMeasure);
 	return w;
