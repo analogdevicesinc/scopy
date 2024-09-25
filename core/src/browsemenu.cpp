@@ -1,4 +1,4 @@
-#include "browsemenu/browsemenu.h"
+#include "browsemenu.h"
 
 #include <QPushButton>
 #include <stylehelper.h>
@@ -28,9 +28,9 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	m_spacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Preferred);
 	m_contentLay->addSpacerItem(m_spacer);
 
-	m_instrumentMenu = new InstrumentMenu(m_content);
-	QButtonGroup *btnGroup = m_instrumentMenu->btnGroup();
-	m_instrumentMenu->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+	m_toolMenu = new ToolMenu(m_content);
+	QButtonGroup *btnGroup = m_toolMenu->btnGroup();
+	m_toolMenu->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
 	QPushButton *homeBtn = new QPushButton(tr("Home"), m_content);
 	homeBtn->setIcon(QIcon(":/gui/icons/scopy-default/icons/tool_home.svg"));
@@ -69,10 +69,10 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 
 	add(createHLine(m_content), "headerLine", MA_TOPLAST);
 	add(homeBtn, "homeBtn", MA_TOPLAST);
-	add(createHLine(m_content), "instrMenuLine1", MA_TOPLAST);
-	add(m_instrumentMenu, "instrumentMenu", MA_TOPLAST);
+	add(createHLine(m_content), "toolMenuLine1", MA_TOPLAST);
+	add(m_toolMenu, "toolMenu", MA_TOPLAST);
 
-	add(createHLine(m_content), "instrMenuLine2", MA_BOTTOMLAST);
+	add(createHLine(m_content), "toolMenuLine2", MA_BOTTOMLAST);
 	add(saveLoadWidget, "saveLoad", MA_BOTTOMLAST);
 	add(preferencesBtn, "preferencesBtn", MA_BOTTOMLAST);
 	add(aboutBtn, "aboutBtn", MA_BOTTOMLAST);
@@ -84,7 +84,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 
 BrowseMenu::~BrowseMenu() {}
 
-InstrumentMenu *BrowseMenu::instrumentMenu() const { return m_instrumentMenu; }
+ToolMenu *BrowseMenu::toolMenu() const { return m_toolMenu; }
 
 void BrowseMenu::add(QWidget *w, QString name, MenuAlignment position)
 {
@@ -152,3 +152,5 @@ QLabel *BrowseMenu::createScopyLogo(QWidget *parent)
 	StyleHelper::ScopyLogo(logo, "logo");
 	return logo;
 }
+
+#include "moc_browsemenu.cpp"

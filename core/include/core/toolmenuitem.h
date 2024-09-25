@@ -1,17 +1,17 @@
-#ifndef INSTRUMENTWIDGET_H
-#define INSTRUMENTWIDGET_H
+#ifndef TOOLMENUITEM_H
+#define TOOLMENUITEM_H
 
 #include <QPushButton>
 #include <QWidget>
 #include <customPushButton.h>
 
 namespace scopy {
-class InstrumentWidget : public QWidget
+class ToolMenuItem : public QWidget
 {
 	Q_OBJECT
 public:
-	InstrumentWidget(QString uuid, QString name, QString icon, QWidget *parent = nullptr);
-	~InstrumentWidget();
+	ToolMenuItem(QString uuid, QString name, QString icon, QWidget *parent = nullptr);
+	~ToolMenuItem();
 
 	QPushButton *getToolBtn() const;
 	QPushButton *getToolRunBtn() const;
@@ -50,4 +50,4 @@ private:
 };
 } // namespace scopy
 
-#endif // INSTRUMENTWIDGET_H
+#endif // TOOLMENUITEM_H
