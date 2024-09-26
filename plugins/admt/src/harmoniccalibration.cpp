@@ -2104,9 +2104,10 @@ void HarmonicCalibration::calibrateData()
         frequencyAxis[i] = i; // Replace with actual frequency values if needed
     }
 
-	preCalibrationFFTMagnitudePlotChannel->curve()->setSamples(frequencyAxis.data(), calibrationAngleErrorsFFT.data(), (calibrationAngleErrorsFFT.size())); // divide size by 2 for now, will be half the size
+	preCalibrationFFTMagnitudePlotChannel->curve()->setSamples(frequencyAxis.data(), calibrationAngleErrorsFFT.data(), (calibrationAngleErrorsFFT.size()));
 	preCalibrationFFTPhasePlotChannel->curve()->setSamples(frequencyAxis.data(), calibrationAngleErrorsFFTPhase.data(), calibrationAngleErrorsFFTPhase.size());
-	preCalibrationFFTXPlotAxis->setInterval(0, (calibrationAngleErrorsFFT.size())); // divide size by 2 for now, will be half the size
+	preCalibrationFFTXPlotAxis->setInterval(0, (calibrationAngleErrorsFFT.size()));
+	preCalibrationFFTPlotWidget->replot();
 }
 
 void HarmonicCalibration::updateCalculatedCoeff()
@@ -2206,8 +2207,8 @@ void HarmonicCalibration::extractCalibrationData()
 
 		QVector<double> rawData(rawDataList.begin(), rawDataList.end());
 
-		QVector<double> angleErrorsFFT(m_admtController->angle_errors_fft_pre.begin(), m_admtController->angle_errors_fft_pre.end());
-		QVector<double> angleErrorsFFTPhase(m_admtController->angle_errors_fft_phase_pre.begin(), m_admtController->angle_errors_fft_phase_pre.end());
+		QVector<double> preCalibrationAngleErrorsFFTMagnitude(m_admtController->angle_errors_fft_pre.begin(), m_admtController->angle_errors_fft_pre.end());
+		QVector<double> preCalibrationAngleErrorsFFTPhase(m_admtController->angle_errors_fft_phase_pre.begin(), m_admtController->angle_errors_fft_phase_pre.end());
 
 		QVector<double> h1Mag = { static_cast<double>(m_admtController->HAR_MAG_1) };
 		QVector<double> h2Mag = { static_cast<double>(m_admtController->HAR_MAG_2) };
@@ -2219,8 +2220,8 @@ void HarmonicCalibration::extractCalibrationData()
 		QVector<double> h8Phase = { static_cast<double>(m_admtController->HAR_PHASE_8) };
 
 		fm.save(rawData, "Raw Data");
-		fm.save(angleErrorsFFT, "Angle Errors FFT");
-		fm.save(angleErrorsFFTPhase, "Angle Errors FFT Phase");
+		fm.save(preCalibrationAngleErrorsFFTMagnitude, "Pre-Calibration Angle Errors FFT Magnitude");
+		fm.save(preCalibrationAngleErrorsFFTPhase, "Pre-Calibration Angle Errors FFT Phase");
 		fm.save(h1Mag, "H1 Mag");
 		fm.save(h2Mag, "H2 Mag");
 		fm.save(h3Mag, "H3 Mag");
