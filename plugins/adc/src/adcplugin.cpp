@@ -244,8 +244,7 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root)
 		connect(root, &AcqTreeNode::deletedChild, dynamic_cast<ADCTimeInstrumentController *>(adc),
 			&ADCTimeInstrumentController::removeChannel, Qt::QueuedConnection);
 
-		connect(ui, &ADCInstrument::requestNewInstrument, this,
-			[=](ADCInstrumentType t) { newInstrument(t, root); });
+		connect(ui, &ADCInstrument::requestNewInstrument, this, [=]() { newInstrument(t, root); });
 
 		connect(ui, &ADCInstrument::requestDeleteInstrument, this, [=]() {
 			ToolMenuEntry *t = nullptr;
@@ -278,8 +277,7 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root)
 		connect(root, &AcqTreeNode::deletedChild, dynamic_cast<ADCFFTInstrumentController *>(adc),
 			&ADCFFTInstrumentController::removeChannel, Qt::QueuedConnection);
 
-		connect(ui, &ADCInstrument::requestNewInstrument, this,
-			[=](ADCInstrumentType t) { newInstrument(t, root); });
+		connect(ui, &ADCInstrument::requestNewInstrument, this, [=]() { newInstrument(t, root); });
 
 		connect(ui, &ADCInstrument::requestDeleteInstrument, this, [=]() {
 			ToolMenuEntry *t = nullptr;
