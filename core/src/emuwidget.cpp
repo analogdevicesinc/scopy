@@ -232,7 +232,8 @@ void EmuWidget::configureOption(QString option)
 		QString device = jsonObject.value(QString("device")).toString();
 		if(device == option) {
 			QString currentPath = QDir::currentPath();
-
+			QString xmlDefaultDir = "/plugins/emu_xml/";
+			currentPath += xmlDefaultDir;
 			if(jsonObject.contains("xml_path")) {
 				QString xmlPath = jsonObject.value(QString("xml_path")).toString();
 				m_xmlPathEdit->edit()->setText(currentPath + xmlPath);
