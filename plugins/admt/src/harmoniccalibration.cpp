@@ -222,51 +222,48 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	sequenceWidget->contentLayout()->addWidget(sequenceSection);
 	sequenceSection->contentLayout()->setSpacing(8);
 
-	MenuCombo *sequenceTypeMenuCombo = new MenuCombo("Sequence Type", sequenceSection);
+	sequenceTypeMenuCombo = new MenuCombo("Sequence Type", sequenceSection);
 	QComboBox *sequenceTypeComboBox = sequenceTypeMenuCombo->combo();
 	sequenceTypeComboBox->addItem("Mode 1", QVariant(0));
 	sequenceTypeComboBox->addItem("Mode 2", QVariant(1));
-	sequenceTypeComboBox->setCurrentIndex(1);
 	applyComboBoxStyle(sequenceTypeComboBox);
 
-	MenuCombo *conversionTypeMenuCombo = new MenuCombo("Conversion Type", sequenceSection);
+	conversionTypeMenuCombo = new MenuCombo("Conversion Type", sequenceSection);
 	QComboBox *conversionTypeComboBox = conversionTypeMenuCombo->combo();
-	conversionTypeComboBox->addItem("Continuous", QVariant(0));
-	conversionTypeComboBox->addItem("One Shot", QVariant(1));
+	conversionTypeComboBox->addItem("Continuous conversions", QVariant(0));
+	conversionTypeComboBox->addItem("One-shot conversion", QVariant(1));
 	applyComboBoxStyle(conversionTypeComboBox);
 
-	MenuCombo *cnvSourceMenuCombo = new MenuCombo("CNV Source", sequenceSection);
-	QComboBox *cnvSourceComboBox = cnvSourceMenuCombo->combo();
-	cnvSourceComboBox->addItem("External", QVariant(0));
-	cnvSourceComboBox->addItem("Software", QVariant(1));
-	applyComboBoxStyle(cnvSourceComboBox);
-
-	MenuCombo *convertSynchronizationMenuCombo = new MenuCombo("Convert Synchronization", sequenceSection);
+	convertSynchronizationMenuCombo = new MenuCombo("Convert Synchronization", sequenceSection);
 	QComboBox *convertSynchronizationComboBox = convertSynchronizationMenuCombo->combo();
-	convertSynchronizationComboBox->addItem("Enabled", QVariant(0));
-	convertSynchronizationComboBox->addItem("Disabled", QVariant(1));
-	convertSynchronizationComboBox->setCurrentIndex(1);
+	convertSynchronizationComboBox->addItem("Enabled", QVariant(1));
+	convertSynchronizationComboBox->addItem("Disabled", QVariant(0));
 	applyComboBoxStyle(convertSynchronizationComboBox);
 
-	MenuCombo *angleFilterMenuCombo = new MenuCombo("Angle Filter", sequenceSection);
+	angleFilterMenuCombo = new MenuCombo("Angle Filter", sequenceSection);
 	QComboBox *angleFilterComboBox = angleFilterMenuCombo->combo();
-	angleFilterComboBox->addItem("Enabled", QVariant(0));
-	angleFilterComboBox->addItem("Disabled", QVariant(1));
-	angleFilterComboBox->setCurrentIndex(1);
+	angleFilterComboBox->addItem("Enabled", QVariant(1));
+	angleFilterComboBox->addItem("Disabled", QVariant(0));
 	applyComboBoxStyle(angleFilterComboBox);
 
-	MenuCombo *eighthHarmonicMenuCombo = new MenuCombo("8th Harmonic", sequenceSection);
+	eighthHarmonicMenuCombo = new MenuCombo("8th Harmonic", sequenceSection);
 	QComboBox *eighthHarmonicComboBox = eighthHarmonicMenuCombo->combo();
-	eighthHarmonicComboBox->addItem("Factory Set", QVariant(0));
-	eighthHarmonicComboBox->addItem("User", QVariant(1));
+	eighthHarmonicComboBox->addItem("User-Supplied Values", QVariant(1));
+	eighthHarmonicComboBox->addItem("ADI Factory Values", QVariant(0));
 	applyComboBoxStyle(eighthHarmonicComboBox);
+
+	readSequence();
+
+	applySequenceButton = new QPushButton("Apply", sequenceSection);
+	StyleHelper::BlueButton(applySequenceButton, "applySequenceButton");
+	connect(applySequenceButton, &QPushButton::clicked, this, &HarmonicCalibration::applySequence);
 
 	sequenceSection->contentLayout()->addWidget(sequenceTypeMenuCombo);
 	sequenceSection->contentLayout()->addWidget(conversionTypeMenuCombo);
-	sequenceSection->contentLayout()->addWidget(cnvSourceMenuCombo);
 	sequenceSection->contentLayout()->addWidget(convertSynchronizationMenuCombo);
 	sequenceSection->contentLayout()->addWidget(angleFilterMenuCombo);
 	sequenceSection->contentLayout()->addWidget(eighthHarmonicMenuCombo);
+	sequenceSection->contentLayout()->addWidget(applySequenceButton);
 
 	// Data Graph Setting Widget
 	MenuSectionWidget *dataGraphWidget = new MenuSectionWidget(generalSettingWidget);
@@ -1313,6 +1310,87 @@ void HarmonicCalibration::timerTask(){
 	tempGraph->plot(temp);
 }
 
+void HarmonicCalibration::applySequence(){
+	toggleWidget(applySequenceButton, false);
+	applySequenceButton->setText("Writing...");
+	QTimer::singleShot(2000, this, [this](){
+		this->toggleWidget(applySequenceButton, true);
+		applySequenceButton->setText("Apply");
+	});
+	uint32_t *generalRegValue = new uint32_t;
+	uint32_t generalRegisterAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL);
+	std::map<string, int> settings;
+
+	settings["Convert Synchronization"] = qvariant_cast<int>(convertSynchronizationMenuCombo->combo()->currentData()); // convertSync;
+	settings["Angle Filter"] = qvariant_cast<int>(angleFilterMenuCombo->combo()->currentData()); // angleFilter;
+	settings["8th Harmonic"] = qvariant_cast<int>(eighthHarmonicMenuCombo->combo()->currentData()); // eighthHarmonic;
+	settings["Sequence Type"] = qvariant_cast<int>(sequenceTypeMenuCombo->combo()->currentData()); // sequenceType;
+	settings["Conversion Type"] = qvariant_cast<int>(conversionTypeMenuCombo->combo()->currentData()); // conversionType;
+
+	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+										 generalRegisterAddress, generalRegValue);	
+
+	uint32_t newGeneralRegValue = m_admtController->setGeneralRegisterBitMapping(*generalRegValue, settings);
+	uint32_t generalRegisterPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL);
+
+	if(changeCNVPage(generalRegisterPage, "GENERAL")){
+		if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress, newGeneralRegValue) != -1){
+			//StatusBarManager::pushMessage("WRITE GENERAL: 0x" + QString::number(static_cast<uint16_t>(newGeneralRegValue), 2).rightJustified(16, '0'));
+			
+			readSequence();
+		}
+		else{ StatusBarManager::pushMessage("Failed to write GENERAL Register"); }
+	}
+}
+
+void HarmonicCalibration::toggleWidget(QPushButton *widget, bool value){
+	widget->setEnabled(value);
+}
+
+void HarmonicCalibration::readSequence(){
+	uint32_t *generalRegValue = new uint32_t;
+	uint32_t generalRegisterAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL);
+	uint32_t generalRegisterPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL);
+
+	if(changeCNVPage(generalRegisterPage, "GENERAL")){
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress, generalRegValue) != -1){
+			if(*generalRegValue != UINT32_MAX){
+				std::map<std::string, int> generalBitMapping = m_admtController->getGeneralRegisterBitMapping(static_cast<uint16_t>(*generalRegValue));
+
+				if(generalBitMapping.at("Sequence Type") == -1){ sequenceTypeMenuCombo->combo()->setCurrentText("Reserved"); }
+				else{ sequenceTypeMenuCombo->combo()->setCurrentIndex(sequenceTypeMenuCombo->combo()->findData(generalBitMapping.at("Sequence Type"))); }
+				conversionTypeMenuCombo->combo()->setCurrentIndex(conversionTypeMenuCombo->combo()->findData(generalBitMapping.at("Conversion Type")));
+				// cnvSourceMenuCombo->combo()->setCurrentValue(generalBitMapping.at("Sequence Type"));
+				if(generalBitMapping.at("Convert Synchronization") == -1){ convertSynchronizationMenuCombo->combo()->setCurrentText("Reserved"); }
+				else{ convertSynchronizationMenuCombo->combo()->setCurrentIndex(convertSynchronizationMenuCombo->combo()->findData(generalBitMapping.at("Convert Synchronization"))); }
+				angleFilterMenuCombo->combo()->setCurrentIndex(angleFilterMenuCombo->combo()->findData(generalBitMapping.at("Angle Filter")));
+				eighthHarmonicMenuCombo->combo()->setCurrentIndex(eighthHarmonicMenuCombo->combo()->findData(generalBitMapping.at("8th Harmonic")));
+
+				//StatusBarManager::pushMessage("READ GENERAL: 0x" + QString::number(static_cast<uint16_t>(*generalRegValue), 2).rightJustified(16, '0'));
+			}
+		}
+		else{ StatusBarManager::pushMessage("Failed to read GENERAL Register"); }
+	}
+}
+
+bool HarmonicCalibration::changeCNVPage(uint32_t page, QString registerName){
+	uint32_t *cnvPageRegValue = new uint32_t;
+	uint32_t cnvPageAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE);
+
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, page) != -1){
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, cnvPageRegValue) != -1){
+			if(*cnvPageRegValue == page){
+				return true; 
+			}
+			else{ StatusBarManager::pushMessage("CNVPAGE for " + registerName + " is a different value, abort reading"); }
+		}
+		else{ StatusBarManager::pushMessage("Failed to read CNVPAGE for " + registerName); }
+	}
+	else{ StatusBarManager::pushMessage("Failed to write CNVPAGE for " + registerName); }
+
+	return false;
+}
+
 void HarmonicCalibration::utilityTask(){
 	updateDigioMonitor();
 	updateFaultRegister();
@@ -1594,6 +1672,14 @@ void HarmonicCalibration::connectMenuComboToGraphDirection(MenuCombo* menuCombo,
 }
 
 void HarmonicCalibration::connectMenuComboToNumber(MenuCombo* menuCombo, double& variable)
+{
+	QComboBox *combo = menuCombo->combo();
+	connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, &variable]() {
+		variable = qvariant_cast<int>(combo->currentData());
+	});
+}
+
+void HarmonicCalibration::connectMenuComboToNumber(MenuCombo* menuCombo, int& variable)
 {
 	QComboBox *combo = menuCombo->combo();
 	connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, &variable]() {

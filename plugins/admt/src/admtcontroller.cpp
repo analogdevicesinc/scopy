@@ -89,6 +89,14 @@ const uint32_t ADMTController::getConfigurationRegister(ConfigurationRegister re
 	return UINT32_MAX;
 }
 
+const uint32_t ADMTController::getConfigurationPage(ConfigurationRegister registerID)
+{
+	if(registerID >= 0 && registerID < CONFIGURATION_REGISTER_COUNT){
+		return ConfigurationPages[registerID];
+	}
+	return UINT32_MAX;
+}
+
 const uint32_t ADMTController::getSensorRegister(SensorRegister registerID)
 {
 	if(registerID >= 0 && registerID < SENSOR_REGISTER_COUNT){
@@ -463,7 +471,7 @@ QString ADMTController::calibrate(vector<double> PANG, int cycles, int samplesPe
     vector<double> angle_errors_fft_phase_pre(PANG.size() / 2);
 
     // Call the new function for pre-calibration FFT
-    getPreCalibrationFFT(PANG, cycles, samplesPerCycle, angle_errors_fft_pre, angle_errors_fft_phase_pre);
+    getPreCalibrationFFT(PANG, angle_errors_fft_pre, angle_errors_fft_phase_pre);
 
     // Extract HMag parameters
     double H1Mag = angle_errors_fft_pre[cycles];
@@ -569,7 +577,7 @@ QString ADMTController::calibrate(vector<double> PANG, int cycles, int samplesPe
     return result;
 }
 
-void ADMTController::getPreCalibrationFFT(const vector<double>& PANG, int cycles, int samplesPerCycle, vector<double>& angle_errors_fft_pre, vector<double>& angle_errors_fft_phase_pre) {
+void ADMTController::getPreCalibrationFFT(const vector<double>& PANG, vector<double>& angle_errors_fft_pre, vector<double>& angle_errors_fft_phase_pre) {
     // Calculate the angle errors before calibration
     double max_err_pre = 0;
     vector<double> angle_errors_pre(PANG.size());
@@ -578,10 +586,10 @@ void ADMTController::getPreCalibrationFFT(const vector<double>& PANG, int cycles
     calculate_angle_error(PANG, angle_errors_pre, &max_err_pre);
 
     // Perform FFT on pre-calibration angle errors
-    performFFT(angle_errors_pre, samplesPerCycle, cycles, angle_errors_fft_pre, angle_errors_fft_phase_pre);
+    performFFT(angle_errors_pre, angle_errors_fft_pre, angle_errors_fft_phase_pre);
 }
 
-QString ADMTController::postcalibrate(vector<double> PANG, int cycles, int samplesPerCycle){
+QString ADMTController::postcalibrate(vector<double> PANG){
     int CCW = 0, circshiftData = 0;
     QString result = "";
 
@@ -600,10 +608,10 @@ QString ADMTController::postcalibrate(vector<double> PANG, int cycles, int sampl
     vector<double> angle_errors_fft_phase_post(PANG.size() / 2);
 
     // Call the new function for post-calibration FFT
-    getPostCalibrationFFT(PANG, cycles, samplesPerCycle, angle_errors_fft_post, angle_errors_fft_phase_post);
+    getPostCalibrationFFT(PANG, angle_errors_fft_post, angle_errors_fft_phase_post);
 }
 
-void ADMTController::getPostCalibrationFFT(const vector<double>& updated_PANG, int cycles, int samplesPerCycle, vector<double>& angle_errors_fft_post, vector<double>& angle_errors_fft_phase_post) {
+void ADMTController::getPostCalibrationFFT(const vector<double>& updated_PANG, vector<double>& angle_errors_fft_post, vector<double>& angle_errors_fft_phase_post) {
     // Calculate the angle errors after calibration
     double max_err_post = 0;
     vector<double> angle_errors_post(updated_PANG.size());
@@ -612,10 +620,10 @@ void ADMTController::getPostCalibrationFFT(const vector<double>& updated_PANG, i
     calculate_angle_error(updated_PANG, angle_errors_post, &max_err_post);
 
     // Perform FFT on post-calibration angle errors
-    performFFT(angle_errors_post, samplesPerCycle, cycles, angle_errors_fft_post, angle_errors_fft_phase_post);
+    performFFT(angle_errors_post, angle_errors_fft_post, angle_errors_fft_phase_post);
 }
 
-void performFFT(const vector<double>& angle_errors, vector<double>& angle_errors_fft, vector<double>& angle_errors_fft_phase) {
+void ADMTController::performFFT(const vector<double>& angle_errors, vector<double>& angle_errors_fft, vector<double>& angle_errors_fft_phase) {
     typedef complex<double> cx;
 
     int size = angle_errors.size();
@@ -789,62 +797,62 @@ map<string, bool> ADMTController::getFaultRegisterBitMapping(uint16_t registerVa
 //     std::cout << pair.first << ": " << (pair.second ? "Set" : "Not Set") << std::endl;
 // }
 
-map<string, string> ADMTController::getGeneralRegisterBitMapping(uint16_t registerValue) {
-    map<string, string> result;
+map<string, int> ADMTController::getGeneralRegisterBitMapping(uint16_t registerValue) {
+    map<string, int> result;
 
     // Bit 15: STORAGE[7]
-    result["STORAGE[7]"] = ((registerValue >> 15) & 0x01) ? "Set" : "Not Set";
+    result["STORAGE[7]"] = ((registerValue >> 15) & 0x01) ? 1 : 0; // ? "Set" : "Not Set";
 
     // Bits 14:13: Convert Synchronization
     uint16_t convertSync = (registerValue >> 13) & 0x03;
     switch (convertSync) {
         case 0x00:
-            result["Convert Synchronization"] = "Disabled";
+            result["Convert Synchronization"] = 0; // "Disabled";
             break;
         case 0x03:
-            result["Convert Synchronization"] = "Enabled";
+            result["Convert Synchronization"] = 1; // "Enabled";
             break;
         default:
-            result["Convert Synchronization"] = "Reserved";
+            result["Convert Synchronization"] = -1; // "Reserved";
             break;
     }
 
     // Bit 12: Angle Filter
-    result["Angle Filter"] = ((registerValue >> 12) & 0x01) ? "Enabled" : "Disabled";
+    result["Angle Filter"] = ((registerValue >> 12) & 0x01) ? 1 : 0; // ? "Enabled" : "Disabled";
 
     // Bit 11: STORAGE[6]
-    result["STORAGE[6]"] = ((registerValue >> 11) & 0x01) ? "Set" : "Not Set";
+    result["STORAGE[6]"] = ((registerValue >> 11) & 0x01) ? 1 : 0; // ? "Set" : "Not Set";
 
     // Bit 10: 8th Harmonic
-    result["8th Harmonic"] = ((registerValue >> 10) & 0x01) ? "User-Supplied Values" : "ADI Factory Values";
+    result["8th Harmonic"] = ((registerValue >> 10) & 0x01) ? 1 : 0; // ? "User-Supplied Values" : "ADI Factory Values";
 
     // // Bit 9: Reserved (skipped)
     // result["Reserved"] = "Reserved";
 
     // Bits 8:6: STORAGE[5:3]
-    uint16_t storage_5_3 = (registerValue >> 6) & 0x07;
-    result["STORAGE[5:3]"] = std::to_string(storage_5_3);
+    // uint16_t storage_5_3 = (registerValue >> 6) & 0x07;
+    // result["STORAGE[5:3]"] = std::to_string(storage_5_3);
 
     // Bits 5:4: Sequence Type
     uint16_t sequenceType = (registerValue >> 4) & 0x03;
     switch (sequenceType) {
         case 0x00:
-            result["Sequence Type"] = "Mode 2";
+            result["Sequence Type"] = 1; // "Mode 2";
             break;
         case 0x03:
-            result["Sequence Type"] = "Mode 1";
+            result["Sequence Type"] = 0; // "Mode 1";
             break;
         default:
-            result["Sequence Type"] = "Reserved";
+            result["Sequence Type"] = -1; // "Reserved";
             break;
     }
 
     // Bits 3:1: STORAGE[2:0]
-    uint16_t storage_2_0 = (registerValue >> 1) & 0x07;
-    result["STORAGE[2:0]"] = std::to_string(storage_2_0);
+    // uint16_t storage_2_0 = (registerValue >> 1) & 0x07;
+    // result["STORAGE[2:0]"] = std::to_string(storage_2_0);
 
     // Bit 0: Conversion Type
-    result["Conversion Type"] = (registerValue & 0x01) ? "One-shot conversion" : "Continuous conversions";
+    result["Conversion Type"] = (registerValue & 0x01) ? 1 : 0; // ? "One-shot conversion" : "Continuous conversions";
 
     return result;
 }
@@ -957,4 +965,59 @@ map<string, double> ADMTController::getDiag2RegisterBitMapping(uint16_t register
     result["AFE Diagnostic 0 (-57%)"] = diagnostic0Voltage;
 
     return result;
+}
+
+uint16_t ADMTController::setGeneralRegisterBitMapping(uint16_t currentRegisterValue, map<string, int> settings) {
+    uint16_t registerValue = currentRegisterValue;  // Start with the current register value
+
+    // Bit 15: STORAGE[7] (preserve original value)
+    // Do nothing, as STORAGE[7] is preserved.
+
+    // Bits 14:13: Convert Synchronization
+    if (settings["Convert Synchronization"] == 1) { // Enabled
+        registerValue |= (0x03 << 13);  // Set bits 14:13 to 0b11
+    } else if (settings["Convert Synchronization"] == 0) { // Disabled
+        registerValue &= ~(0x03 << 13);  // Clear bits 14:13 (set to 0b00)
+    }
+
+    // Bit 12: Angle Filter
+    if (settings["Angle Filter"] == 1) { // Enabled
+        registerValue |= (1 << 12);  // Set bit 12
+    } else if (settings["Angle Filter"] == 0) { // Disabled
+        registerValue &= ~(1 << 12);  // Clear bit 12
+    }
+
+    // Bit 11: STORAGE[6] (preserve original value)
+    // Do nothing, as STORAGE[6] is preserved.
+
+    // Bit 10: 8th Harmonic
+    if (settings["8th Harmonic"] == 1) { // User-Supplied Values
+        registerValue |= (1 << 10);  // Set bit 10
+    } else if (settings["8th Harmonic"] == 0) { // ADI Factory Values
+        registerValue &= ~(1 << 10);  // Clear bit 10
+    }
+
+    // Bit 9: Reserved (no change)
+
+    // Bits 8:6: STORAGE[5:3] (preserve original value)
+    // Do nothing, as STORAGE[5:3] is preserved.
+
+    // Bits 5:4: Sequence Type
+    if (settings["Sequence Type"] == 0) { // Mode 1
+        registerValue |= (0x03 << 4);  // Set bits 5:4 to 0b11
+    } else if (settings["Sequence Type"] == 1) { // Mode 2
+        registerValue &= ~(0x03 << 4);  // Clear bits 5:4 (set to 0b00)
+    }
+
+    // Bits 3:1: STORAGE[2:0] (preserve original value)
+    // Do nothing, as STORAGE[2:0] is preserved.
+
+    // Bit 0: Conversion Type
+    if (settings["Conversion Type"] == 1) { // One-shot conversion
+        registerValue |= (1 << 0);  // Set bit 0
+    } else if (settings["Conversion Type"] == 0) { // Continuous conversions
+        registerValue &= ~(1 << 0);  // Clear bit 0
+    }
+
+    return registerValue;
 }
