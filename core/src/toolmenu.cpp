@@ -1,5 +1,4 @@
 #include "toolmenu.h"
-#include "qdebug.h"
 
 using namespace scopy;
 
@@ -36,7 +35,7 @@ ToolMenu::ToolMenu(QWidget *parent)
 	lay->addWidget(m_scroll);
 }
 
-ToolMenu::~ToolMenu() { qInfo() << "Instrument removed"; }
+ToolMenu::~ToolMenu() {}
 
 void ToolMenu::add(QWidget *w)
 {
