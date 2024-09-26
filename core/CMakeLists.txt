@@ -122,7 +122,7 @@ install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH}
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/resources/scopy_emu_options_config.json DESTINATION ${CMAKE_BINARY_DIR}/resources/)
-file(GLOB EMU_FILES ${CMAKE_SOURCE_DIR}/resources/emuXml/*.xml)
+file(GLOB EMU_FILES ${CMAKE_SOURCE_DIR}/resources/emu_xml/*.xml)
 foreach(_emu_file ${EMU_FILES})
-	file(COPY ${_emu_file} DESTINATION ${CMAKE_BINARY_DIR}/resources/emuXml/)
+	file(COPY ${_emu_file} DESTINATION ${CMAKE_BINARY_DIR}/plugins/emu_xml/)
 endforeach()

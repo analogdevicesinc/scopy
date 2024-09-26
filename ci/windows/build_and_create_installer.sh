@@ -28,6 +28,8 @@ PYTHON_FILES=$STAGING_DIR/lib/python3.*
 EMU_BUILD_FOLDER=$WORKDIR/iio-emu/build
 REGMAP_XMLS=$BUILD_FOLDER/plugins/plugins/regmap/xmls
 DAC_WAVEFORM_CSV=$SRC_FOLDER/plugins/dac/res/csv
+EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
+
 # Generate build status info for the about page
 
 # to be added back later
@@ -130,8 +132,8 @@ deploy_app(){
 	if [ -d $REGMAP_XMLS ]; then
 		cp -r $REGMAP_XMLS $DEST_FOLDER/plugins
 	fi
-
 	cp -r $DAC_WAVEFORM_CSV $DEST_FOLDER/plugins
+	cp -r $EMU_XMLS $DEST_FOLDER/plugins
 }
 
 extract_debug_symbols(){

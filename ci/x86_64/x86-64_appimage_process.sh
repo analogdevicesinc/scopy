@@ -361,6 +361,7 @@ create_appdir(){
 	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 1 -type f -name "libscopy*")
 	REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
 	DAC_WAVEFORM_CSV=$SRC_DIR/plugins/dac/res/csv
+	EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
 	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib:$QT_LOCATION/lib
 	DLL_FOLDER=${STAGING_AREA}/dll_folder
@@ -419,6 +420,7 @@ create_appdir(){
 
 	cp -r $DAC_WAVEFORM_CSV $APP_DIR/usr/lib/scopy/plugins
 
+	cp -r $EMU_XMLS $APP_DIR/usr/lib/scopy/plugins
 	cp $STAGING_AREA_DEPS/lib/libspdlog.so* $APP_DIR/usr/lib
 	cp -r $QT_LOCATION/plugins $APP_DIR/usr
 	cp $QT_LOCATION/lib/libQt5XcbQpa.so* $APP_DIR/usr/lib

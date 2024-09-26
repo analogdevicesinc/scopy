@@ -288,6 +288,7 @@ Source: "{#DestFolder}\qt.conf"; DestDir: "{app}"; Components: main; Flags: igno
 //Plugins
 Source: "{#DestFolder}\plugins\plugins\xmls\*"; DestDir: "{app}\plugins\plugins\xmls"; Components: main; Flags: ignoreversion skipifsourcedoesntexist recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\plugins\csv\*"; DestDir: "{app}\plugins\csv"; Components: main; Flags: ignoreversion skipifsourcedoesntexist recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\plugins\emu_xml\*"; DestDir: "{app}\plugins\emu_xml"; Components: main; Flags: ignoreversion skipifsourcedoesntexist recursesubdirs createallsubdirs onlyifdoesntexist
 @PLUGIN_COMPONENTS_FILES@
 
 [Tasks]

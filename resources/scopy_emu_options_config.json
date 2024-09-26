@@ -6,24 +6,24 @@
     },
     {
         "device": "pluto",
-        "xml_path": "/resources/emuXml/pluto.xml",
+	"xml_path": "pluto.xml",
         "uri": "ip:127.0.0.1"
     },
     {
         "device": "pqm",
-        "xml_path": "/plugins/pqm/res/pqm1.xml",
+	"xml_path": "pqm1.xml",
         "uri": "ip:127.0.0.1",
         "rx_tx_device":"iio:device0",
-        "rx_tx_bin_path": "/plugins/pqm/res/data.bin"
+	"rx_tx_bin_path": "pqm1.bin"
     },
     {
         "device": "swiot_config",
-        "xml_path": "/plugins/swiot/res/emu_xml/config.xml",
+	"xml_path": "swiot_config.xml",
         "uri": "ip:127.0.0.1"
     },
     {
         "device": "swiot_runtime",
-        "xml_path": "/plugins/swiot/res/emu_xml/runtime1.xml",
+	"xml_path": "swiot_runtime1.xml",
         "uri": "ip:127.0.0.1"
     },
     {
