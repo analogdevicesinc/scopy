@@ -71,6 +71,12 @@ FFTPlotComponent *FFTPlotManager::plot(uint32_t uuid)
 	return dynamic_cast<FFTPlotComponent *>(PlotManager::plot(uuid));
 }
 
+void FFTPlotManager::enableMeasurementPanel(bool)
+{
+	// TODO: Remove this whole function once the measurements for fft
+	// are implemented. This is just a placeholder.
+}
+
 void FFTPlotManager::multiPlotUpdate()
 {
 	bool b = m_plots.count() > 1;

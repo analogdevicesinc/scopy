@@ -21,6 +21,7 @@ public:
 	virtual uint32_t addPlot(QString name) override;
 	virtual void removePlot(uint32_t uuid) override;
 	FFTPlotComponent *plot(uint32_t uuid);
+	void enableMeasurementPanel(bool) override;
 
 private:
 	PlotComponent *m_primary;
