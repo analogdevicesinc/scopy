@@ -77,7 +77,7 @@ endif()
 
 if(ENABLE_PLUGIN_DAC)
 	add_subdirectory(dac)
-	list(APPEND PLUGINS ${PLUGIN_NAME})
+	list(APPEND PLUGINS ${DAC_TARGET_NAME})
 endif()
 
 if(ENABLE_PLUGIN_SWIOT)
@@ -89,7 +89,6 @@ if(ENABLE_PLUGIN_PQM)
 	add_subdirectory(pqm)
 	list(APPEND PLUGINS ${PQM_TARGET_NAME})
 endif()
-
 
 if(ENABLE_PLUGIN_M2K)
 	if(NOT WITH_PYTHON)
