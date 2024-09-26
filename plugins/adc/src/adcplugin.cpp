@@ -304,6 +304,10 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root)
 
 	adc->setEnableAddRemovePlot(Preferences::get("adc_add_remove_plot").toBool());
 	adc->setEnableAddRemoveInstrument(Preferences::get("adc_add_remove_instrument").toBool());
+
+	// prevent user from deleting first time and fft tool
+	if(idx <= 2)
+		adc->setIsMainInstrument(true);
 }
 
 void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
