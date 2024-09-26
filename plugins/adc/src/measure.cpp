@@ -870,7 +870,6 @@ void TimeMeasureModel::measureTime()
 		endIndex = data_length;
 	}
 
-	m_cross_detect = new CrossingDetection(m_cross_level, m_hysteresis_span, "P");
 	if(using_histogram_method)
 		m_histogram = new int[adc_span]{};
 
@@ -880,9 +879,6 @@ void TimeMeasureModel::measureTime()
 			count--;
 			continue;
 		}
-		// Find level crossings (period detection)
-		m_cross_detect->crossDetectStep(data, i);
-
 		// Min
 		if(data[i] < min) {
 			min = data[i];
@@ -957,6 +953,13 @@ void TimeMeasureModel::measureTime()
 	}
 
 	// Find Period / Frequency
+	m_cross_level = middle;
+	m_cross_detect = new CrossingDetection(m_cross_level, m_hysteresis_span, "P");
+	for(ssize_t i = startIndex; i < endIndex; i++) {
+		// Find level crossings (period detection)
+		m_cross_detect->crossDetectStep(data, i);
+	}
+
 	QList<CrossPoint> periodPoints = m_cross_detect->detectedCrossings();
 	int n = periodPoints.size();
 	if(n > 2) {
