@@ -155,7 +155,7 @@ QWidget *GRDeviceComponent::createMenu(QWidget *parent)
 
 	MenuHeaderWidget *header = new MenuHeaderWidget(name, m_pen, w);
 	QWidget *attrMenu = createAttrMenu(w);
-	QWidget *chcommonattrMenu = createChCommonAttrMenu(w);
+	QWidget *chcommonattrMenu = nullptr; // createChCommonAttrMenu(w);
 
 	lay->addWidget(header);
 	lay->addWidget(scroll);
