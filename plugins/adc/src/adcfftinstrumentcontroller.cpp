@@ -51,6 +51,7 @@ void ADCFFTInstrumentController::init()
 	m_fftPlotSettingsComponent->addPlot(dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(tmp)));
 
 	m_measureComponent = new MeasureComponent(m_ui->getToolTemplate(), m_plotComponentManager, this);
+	m_measureComponent->measureSettings()->getMeasureSection()->setVisible(false);
 	// m_measureComponent->addPlotComponent(m_plotComponentManager);
 
 	addComponent(m_measureComponent);
