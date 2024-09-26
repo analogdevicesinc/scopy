@@ -32,6 +32,9 @@ public:
 public:
 	ADCInstrument *ui() const;
 
+	bool isMainInstrument() const;
+	void setIsMainInstrument(bool newIsMainInstrument);
+
 public Q_SLOTS:
 	virtual void init();
 	virtual void deinit();
@@ -83,6 +86,7 @@ protected:
 	QMap<AcqTreeNode *, ToolComponent *> m_acqNodeComponentMap;
 
 	bool m_refreshTimerRunning;
+	bool m_isMainInstrument = false;
 };
 
 } // namespace adc
