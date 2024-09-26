@@ -5,8 +5,10 @@
 #include <QMouseEvent>
 #include <QVBoxLayout>
 #include <utils.h>
-
 #include <pluginbase/toolmenuentry.h>
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(CAT_TOOLMENUITEM, "ToolMenuItem")
 
 using namespace scopy;
 
@@ -98,14 +100,7 @@ void ToolMenuItem::setName(QString str)
 	m_toolBtn->setText(m_name);
 }
 
-void ToolMenuItem::hideText(bool hidden)
-{
-	if(hidden) {
-		m_toolBtn->setText("");
-	} else {
-		m_toolBtn->setText(m_name);
-	}
-}
+void ToolMenuItem::setSelected(bool en) { setDynamicProperty(this, "selected", en); }
 
 void ToolMenuItem::setDisabled(bool disabled) { setDisabled(disabled); }
 
@@ -120,6 +115,7 @@ void ToolMenuItem::updateItem()
 	m_toolRunBtn->setEnabled(tme->runEnabled());
 	m_toolRunBtn->setEnabled(tme->runBtnVisible());
 	m_toolRunBtn->setChecked(tme->running());
+	qDebug(CAT_TOOLMENUITEM) << "updating toolmenuentry for " << tme->name() << " - " << tme->uuid();
 }
 
 void ToolMenuItem::enterEvent(QEvent *event)
@@ -139,13 +135,5 @@ void ToolMenuItem::leaveEvent(QEvent *event)
 }
 
 QString ToolMenuItem::getId() const { return m_uuid; }
-
-void ToolMenuItem::setSelected(bool en)
-{
-	if(!en) {
-		m_toolBtn->setChecked(false);
-	}
-	setDynamicProperty(this, "selected", en);
-}
 
 #include "moc_toolmenuitem.cpp"

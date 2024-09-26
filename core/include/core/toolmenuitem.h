@@ -16,19 +16,13 @@ public:
 	QPushButton *getToolBtn() const;
 	QPushButton *getToolRunBtn() const;
 
-	void setToolEnabled(bool disabled);
 	void enableDoubleClick(bool enable);
-	void setSeparator(bool top, bool bot);
-
 	bool eventFilter(QObject *watched, QEvent *event);
 
 	void setName(QString str);
-	void hideText(bool hidden);
-
-	QString getId() const;
-
 	void setSelected(bool en);
 
+	QString getId() const;
 Q_SIGNALS:
 	void doubleclick();
 
