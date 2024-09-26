@@ -1,7 +1,9 @@
 #include "emuwidget.h"
 
+#include "common/scopyconfig.h"
 #include "pluginbase/preferences.h"
 
+#include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QLoggingCategory>
@@ -231,9 +233,15 @@ void EmuWidget::configureOption(QString option)
 		QJsonObject jsonObject = jsonArrayItem.toObject();
 		QString device = jsonObject.value(QString("device")).toString();
 		if(device == option) {
-			QString currentPath = QDir::currentPath();
-			QString xmlDefaultDir = "/plugins/emu_xml/";
-			currentPath += xmlDefaultDir;
+
+			// Check the local folder first
+			QString currentPath = QCoreApplication::applicationDirPath() + "/plugins/emu_xml/";
+			if(!QDir(currentPath).exists()) {
+				currentPath = config::defaultPluginFolderPath() + "/emu_xml/";
+			}
+
+			qDebug(CAT_EMU_ADD_PAGE) << "Emu xmls path: " << currentPath;
+
 			if(jsonObject.contains("xml_path")) {
 				QString xmlPath = jsonObject.value(QString("xml_path")).toString();
 				m_xmlPathEdit->edit()->setText(currentPath + xmlPath);
