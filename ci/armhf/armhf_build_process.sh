@@ -294,6 +294,7 @@ create_appdir(){
 	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 1 -type f -name "libscopy*")
 	REGMAP_XMLS=$PLUGINS/regmap/xmls
 	DAC_WAVEFORM_CSV=$SRC_DIR/plugins/dac/res/csv
+	EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
 	COPY_DEPS=$SRC_DIR/ci/armhf/copy-deps.sh
 
@@ -325,6 +326,7 @@ create_appdir(){
 	fi
 
 	cp -r $DAC_WAVEFORM_CSV $APP_DIR/usr/lib/scopy/plugins
+	cp -r $EMU_XMLS $APP_DIR/usr/lib/scopy/plugins
 
 	$COPY_DEPS $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
 	$COPY_DEPS $APP_DIR/usr/bin/iio-emu $APP_DIR/usr/lib
