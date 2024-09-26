@@ -71,7 +71,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	configureinstallersettings(${SCOPY_MODULE} ${INSTALLER_DESCRIPTION} TRUE)
 endif()
 
-file(COPY ${CMAKE_SOURCE_DIR}/plugins/pqm/res/pqm1.xml DESTINATION ${CMAKE_BINARY_DIR}/plugins/pqm/res/)
-file(COPY ${CMAKE_SOURCE_DIR}/plugins/pqm/res/data.bin DESTINATION ${CMAKE_BINARY_DIR}/plugins/pqm/res/)
+file(COPY ${CMAKE_SOURCE_DIR}/plugins/pqm/res/emu_xml/pqm1.xml DESTINATION ${CMAKE_BINARY_DIR}/plugins/emu_xml/)
+file(COPY ${CMAKE_SOURCE_DIR}/plugins/pqm/res/emu_xml/pqm1.bin DESTINATION ${CMAKE_BINARY_DIR}/plugins/emu_xml/)
 
 set(PQM_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
