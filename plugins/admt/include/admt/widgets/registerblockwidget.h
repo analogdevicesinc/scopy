@@ -26,6 +26,7 @@ namespace scopy::admt {
         QPushButton *m_readButton, *m_writeButton;
 
         RegisterBlockWidget(QString header, QString description, uint32_t address, uint32_t defaultValue, RegisterBlockWidget::ACCESS_PERMISSION accessPermission, QWidget *parent = nullptr);
+        virtual ~RegisterBlockWidget();
         QPushButton *readButton();
         QPushButton *writeButton();
         uint32_t getAddress();
@@ -44,6 +45,16 @@ namespace scopy::admt {
         void addWriteButton(QWidget *parent);
         void applyLineEditStyle(QLineEdit *widget);
         void applySpinBoxStyle(QSpinBox *widget);
+    };
+
+    class SCOPY_ADMT_EXPORT PaddedSpinBox : public QSpinBox
+    {
+        Q_OBJECT
+    public:
+        PaddedSpinBox(QWidget *parent = nullptr);
+        virtual ~PaddedSpinBox();
+    protected:
+        QString textFromValue(int value) const override;
     };
 } // namespace scopy::admt
 

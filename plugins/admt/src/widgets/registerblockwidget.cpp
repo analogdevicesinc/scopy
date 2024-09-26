@@ -43,12 +43,9 @@ RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, ui
     // QLineEdit *lineEdit = new QLineEdit(menuSectionWidget);
     // applyLineEditStyle(lineEdit);
 
-    m_spinBox = new QSpinBox(menuSectionWidget);
+    m_spinBox = new PaddedSpinBox(menuSectionWidget);
     applySpinBoxStyle(m_spinBox);
-    m_spinBox->setDisplayIntegerBase(16);
-    m_spinBox->setMinimum(0);
-    m_spinBox->setMaximum(INT_MAX);
-    m_spinBox->setPrefix("0x");
+
     m_value = defaultValue;
     m_spinBox->setValue(m_value);
 
@@ -83,6 +80,8 @@ RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, ui
 
     connect(m_spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &RegisterBlockWidget::onValueChanged);
 }
+
+RegisterBlockWidget::~RegisterBlockWidget() {}
 
 void RegisterBlockWidget::onValueChanged(int newValue){ m_value = static_cast<uint32_t>(newValue); }
 
@@ -152,4 +151,19 @@ void RegisterBlockWidget::applySpinBoxStyle(QSpinBox *widget)
     widget->setAlignment(Qt::AlignRight);
     widget->setContentsMargins(12, 4, 12, 4);
     widget->setButtonSymbols(widget->ButtonSymbols::NoButtons);
+}
+
+PaddedSpinBox::PaddedSpinBox(QWidget *parent)
+    : QSpinBox(parent)
+{
+    setDisplayIntegerBase(16);
+    setMinimum(0);
+    setMaximum(INT_MAX);
+}
+
+PaddedSpinBox::~PaddedSpinBox() {}
+
+QString PaddedSpinBox::textFromValue(int value) const
+{
+    return QString("0x%1").arg(value, 4, 16, QChar('0'));
 }
