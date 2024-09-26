@@ -324,7 +324,7 @@ create_appdir(){
 		cp -r $REGMAP_XMLS $APP_DIR/usr/lib/scopy/plugins
 	fi
 
-	cp -r $DAC_WAVEFORM_CSV $DEST_FOLDER/plugins
+	cp -r $DAC_WAVEFORM_CSV $APP_DIR/usr/lib/scopy/plugins
 
 	$COPY_DEPS $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
 	$COPY_DEPS $APP_DIR/usr/bin/iio-emu $APP_DIR/usr/lib
