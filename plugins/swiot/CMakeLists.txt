@@ -111,7 +111,7 @@ endif()
 
 file(GLOB EMU_FILES ${CMAKE_SOURCE_DIR}/plugins/swiot/res/emu_xml/*.xml)
 foreach(_emu_file ${EMU_FILES})
-	file(COPY ${_emu_file} DESTINATION ${CMAKE_BINARY_DIR}/plugins/swiot/res/emu_xml/)
+	file(COPY ${_emu_file} DESTINATION ${CMAKE_BINARY_DIR}/plugins/emu_xml/)
 endforeach()
 
 set(SWIOT_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)

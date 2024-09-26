@@ -9,7 +9,7 @@ if(ENABLE_AUTOMATED_TESTS)
 
 	# SCOPY GENERIC TESTS
 	add_test(NAME "ScopyDefaultJSTests"
-		 COMMAND bash ${CMAKE_SOURCE_DIR}/js/test.sh "${CMAKE_SOURCE_DIR}/resources/emuXml/"
+		 COMMAND bash ${CMAKE_SOURCE_DIR}/js/test.sh "${CMAKE_SOURCE_DIR}/resources/emu_xml/"
 			 "${CMAKE_SOURCE_DIR}/js/scopyDefaultTests.js"
 	)
 
@@ -18,7 +18,7 @@ if(ENABLE_AUTOMATED_TESTS)
 	# DATALOGGER
 	if(ENABLE_PLUGIN_DATALOGGER)
 		add_test(NAME "DataloggerLogAndLoadJSTests"
-			 COMMAND bash ${CMAKE_SOURCE_DIR}/js/test.sh "${CMAKE_SOURCE_DIR}/resources/emuXml/"
+			 COMMAND bash ${CMAKE_SOURCE_DIR}/js/test.sh "${CMAKE_SOURCE_DIR}/resources/emu_xml/"
 				 "${CMAKE_SOURCE_DIR}/plugins/datalogger/js/dataLoggerAutomatedTest.js"
 		)
 	endif()
