@@ -30,7 +30,6 @@ public:
 	~ScopyHomeAddPage();
 
 Q_SIGNALS:
-	void requestAddDevice(QString, QString);
 	void requestDevice(QString);
 	void newDeviceAvailable(scopy::DeviceImpl *d);
 	void verifyFinished(bool valid);
