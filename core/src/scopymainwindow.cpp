@@ -117,7 +117,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	connect(hp, SIGNAL(requestDevice(QString)), this, SLOT(requestTools(QString)));
 
-	connect(hp, SIGNAL(requestAddDevice(QString, QString)), dm, SLOT(createDevice(QString, QString)));
 	connect(dm, SIGNAL(deviceAdded(QString, Device *)), this, SLOT(addDeviceToUi(QString, Device *)));
 
 	connect(dm, SIGNAL(deviceRemoveStarted(QString, Device *)), scc, SLOT(removeDevice(QString, Device *)));
