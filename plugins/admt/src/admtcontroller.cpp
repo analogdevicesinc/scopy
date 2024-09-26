@@ -374,22 +374,18 @@ int ADMTController::linear_fit(vector<double> x, vector<double> y, double* slope
 }
 
 /* Calculate angle error based on MATLAB and C# implementation */
-int ADMTController::calculate_angle_error(vector<double> angle_meas, vector<double>& angle_error_ret, double* max_angle_err)
+/* Calculate angle error based on MATLAB and C# implementation */
+int ADMTController::calculate_angle_error(vector<double> angle_meas, vector<double>& angle_error_ret, double* max_angle_err, int cycleCount, int samplesPerCycle)
 {
-    // Ideal angles
-    vector<double> expected_angles = { 
-        0.00000, 15.46875, 30.93750, 46.40625, 61.87500, 77.34375, 92.81250, 108.28125, 123.75000, 139.21875, 154.68750, 170.15625, 185.62500, 201.09375, 216.56250, 232.03125, 247.50000, 262.96875, 278.43750, 293.90625, 309.37500, 324.84375, 340.31250, 355.78125,
-        11.25000, 26.71875, 42.18750, 57.65625, 73.12500, 88.59375, 104.06250, 119.53125, 135.00000, 150.46875, 165.93750, 181.40625, 196.87500, 212.34375, 227.81250, 243.28125, 258.75000, 274.21875, 289.68750, 305.15625, 320.62500, 336.09375, 351.56250, 7.03125,
-        22.50000, 37.96875, 53.43750, 68.90625, 84.37500, 99.84375, 115.31250, 130.78125, 146.25000, 161.71875, 177.18750, 192.65625, 208.12500, 223.59375, 239.06250, 254.53125, 270.00000, 285.46875, 300.93750, 316.40625, 331.87500, 347.34375, 2.81250, 18.28125,
-        33.75000, 49.21875, 64.68750, 80.15625, 95.62500, 111.09375, 126.56250, 142.03125, 157.50000, 172.96875, 188.43750, 203.90625, 219.37500, 234.84375, 250.31250, 265.78125, 281.25000, 296.71875, 312.18750, 327.65625, 343.12500, 358.59375, 14.06250, 29.53125,
-        45.00000, 60.46875, 75.93750, 91.40625, 106.87500, 122.34375, 137.81250, 153.28125, 168.75000, 184.21875, 199.68750, 215.15625, 230.62500, 246.09375, 261.56250, 277.03125, 292.50000, 307.96875, 323.43750, 338.90625, 354.37500, 9.84375, 25.31250, 40.78125,
-        56.25000, 71.71875, 87.18750, 102.65625, 118.12500, 133.59375, 149.06250, 164.53125, 180.00000, 195.46875, 210.93750, 226.40625, 241.87500, 257.34375, 272.81250, 288.28125, 303.75000, 319.21875, 334.68750, 350.15625, 5.62500, 21.09375, 36.56250, 52.03125,
-        67.50000, 82.96875, 98.43750, 113.90625, 129.37500, 144.84375, 160.31250, 175.78125, 191.25000, 206.71875, 222.18750, 237.65625, 253.12500, 268.59375, 284.06250, 299.53125, 315.00000, 330.46875, 345.93750, 1.40625, 16.87500, 32.34375, 47.81250, 63.28125,
-        78.75000, 94.21875, 109.68750, 125.15625, 140.62500, 156.09375, 171.56250, 187.03125, 202.50000, 217.96875, 233.43750, 248.90625, 264.37500, 279.84375, 295.31250, 310.78125, 326.25000, 341.71875, 357.18750, 12.65625, 28.12500, 43.59375, 59.06250, 74.53125,
-        90.00000, 105.46875, 120.93750, 136.40625, 151.87500, 167.34375, 182.81250, 198.28125, 213.75000, 229.21875, 244.68750, 260.15625, 275.62500, 291.09375, 306.56250, 322.03125, 337.50000, 352.96875, 8.43750, 23.90625, 39.37500, 54.84375, 70.31250, 85.78125,
-        101.25000, 116.71875, 132.18750, 147.65625, 163.12500, 178.59375, 194.06250, 209.53125, 225.00000, 240.46875, 255.93750, 271.40625, 286.87500, 302.34375, 317.81250, 333.28125, 348.75000, 4.21875, 19.68750, 35.15625, 50.62500, 66.09375, 81.56250, 97.03125,
-        112.50000, 127.96875, 143.43750, 158.90625, 174.37500, 189.84375, 205.31250, 220.78125, 236.25000, 251.71875, 267.18750, 282.65625, 298.12500, 313.59375, 329.06250, 344.53125
-    };
+    // Adjust the expected angles based on samples per cycle and cycle count
+    vector<double> expected_angles;
+    double increment = 360.0 / samplesPerCycle;
+
+    for (int cycle = 0; cycle < cycleCount; ++cycle) {
+        for (int sample = 0; sample < samplesPerCycle; ++sample) {
+            expected_angles.push_back(sample * increment);
+        }
+    }
 
     // Ensure that the angle_meas and expected_angles are of the same size
     if (angle_meas.size() != expected_angles.size()) {
@@ -452,7 +448,7 @@ int ADMTController::calculate_angle_error(vector<double> angle_meas, vector<doub
     return 0;
 }
 
-QString ADMTController::calibrate(vector<double> PANG, int cycles, int samplesPerCycle) {
+QString ADMTController::calibrate(vector<double> PANG, int cycleCount, int samplesPerCycle) {
     int CCW = 0, circshiftData = 0;
     QString result = "";
 
@@ -467,17 +463,17 @@ QString ADMTController::calibrate(vector<double> PANG, int cycles, int samplesPe
     }
 
     // Declare vectors for pre-calibration FFT results
-    vector<double> angle_errors_fft_pre(PANG.size() / 2);
-    vector<double> angle_errors_fft_phase_pre(PANG.size() / 2);
+    angle_errors_fft_pre = vector<double>(PANG.size() / 2);
+    angle_errors_fft_phase_pre = vector<double>(PANG.size() / 2);
 
     // Call the new function for pre-calibration FFT
-    getPreCalibrationFFT(PANG, angle_errors_fft_pre, angle_errors_fft_phase_pre);
+    getPreCalibrationFFT(PANG, angle_errors_fft_pre, angle_errors_fft_phase_pre, cycleCount, samplesPerCycle);
 
     // Extract HMag parameters
-    double H1Mag = angle_errors_fft_pre[cycles];
-    double H2Mag = angle_errors_fft_pre[2 * cycles];
-    double H3Mag = angle_errors_fft_pre[3 * cycles];
-    double H8Mag = angle_errors_fft_pre[8 * cycles];
+    double H1Mag = angle_errors_fft_pre[cycleCount];
+    double H2Mag = angle_errors_fft_pre[2 * cycleCount];
+    double H3Mag = angle_errors_fft_pre[3 * cycleCount];
+    double H8Mag = angle_errors_fft_pre[8 * cycleCount];
 
     /* Display HMAG values */
     result.append("H1Mag = " + QString::number(H1Mag) + "\n");
@@ -486,10 +482,10 @@ QString ADMTController::calibrate(vector<double> PANG, int cycles, int samplesPe
     result.append("H8Mag = " + QString::number(H8Mag) + "\n");
 
     // Extract HPhase parameters
-    double H1Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[cycles]);
-    double H2Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[2 * cycles]);
-    double H3Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[3 * cycles]);
-    double H8Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[8 * cycles]);
+    double H1Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[cycleCount]);
+    double H2Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[2 * cycleCount]);
+    double H3Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[3 * cycleCount]);
+    double H8Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[8 * cycleCount]);
 
     /* Display HPHASE values */
     result.append("H1Phase = " + QString::number(H1Phase) + "\n");
@@ -577,19 +573,19 @@ QString ADMTController::calibrate(vector<double> PANG, int cycles, int samplesPe
     return result;
 }
 
-void ADMTController::getPreCalibrationFFT(const vector<double>& PANG, vector<double>& angle_errors_fft_pre, vector<double>& angle_errors_fft_phase_pre) {
+void ADMTController::getPreCalibrationFFT(const vector<double>& PANG, vector<double>& angle_errors_fft_pre, vector<double>& angle_errors_fft_phase_pre, int cycleCount, int samplesPerCycle) {
     // Calculate the angle errors before calibration
     double max_err_pre = 0;
     vector<double> angle_errors_pre(PANG.size());
-
+    
     // Calculate angle errors
-    calculate_angle_error(PANG, angle_errors_pre, &max_err_pre);
+    calculate_angle_error(PANG, angle_errors_pre, &max_err_pre, cycleCount, samplesPerCycle);
 
     // Perform FFT on pre-calibration angle errors
-    performFFT(angle_errors_pre, angle_errors_fft_pre, angle_errors_fft_phase_pre);
+    performFFT(angle_errors_pre, angle_errors_fft_pre, angle_errors_fft_phase_pre, cycleCount);
 }
 
-QString ADMTController::postcalibrate(vector<double> PANG){
+void ADMTController::postcalibrate(vector<double> PANG, int cycleCount, int samplesPerCycle){
     int CCW = 0, circshiftData = 0;
     QString result = "";
 
@@ -604,26 +600,26 @@ QString ADMTController::postcalibrate(vector<double> PANG){
     }
 
     // Declare vectors for pre-calibration FFT results
-    vector<double> angle_errors_fft_post(PANG.size() / 2);
-    vector<double> angle_errors_fft_phase_post(PANG.size() / 2);
+    angle_errors_fft_post = vector<double>(PANG.size() / 2);
+    angle_errors_fft_phase_post = vector<double>(PANG.size() / 2);
 
     // Call the new function for post-calibration FFT
-    getPostCalibrationFFT(PANG, angle_errors_fft_post, angle_errors_fft_phase_post);
+    getPostCalibrationFFT(PANG, angle_errors_fft_post, angle_errors_fft_phase_post, cycleCount, samplesPerCycle);
 }
 
-void ADMTController::getPostCalibrationFFT(const vector<double>& updated_PANG, vector<double>& angle_errors_fft_post, vector<double>& angle_errors_fft_phase_post) {
+void ADMTController::getPostCalibrationFFT(const vector<double>& updated_PANG, vector<double>& angle_errors_fft_post, vector<double>& angle_errors_fft_phase_post, int cycleCount, int samplesPerCycle) {
     // Calculate the angle errors after calibration
     double max_err_post = 0;
     vector<double> angle_errors_post(updated_PANG.size());
 
     // Calculate angle errors
-    calculate_angle_error(updated_PANG, angle_errors_post, &max_err_post);
+    calculate_angle_error(updated_PANG, angle_errors_post, &max_err_post, cycleCount, samplesPerCycle);
 
     // Perform FFT on post-calibration angle errors
-    performFFT(angle_errors_post, angle_errors_fft_post, angle_errors_fft_phase_post);
+    performFFT(angle_errors_post, angle_errors_fft_post, angle_errors_fft_phase_post, cycleCount);
 }
 
-void ADMTController::performFFT(const vector<double>& angle_errors, vector<double>& angle_errors_fft, vector<double>& angle_errors_fft_phase) {
+void ADMTController::performFFT(const vector<double>& angle_errors, vector<double>& angle_errors_fft, vector<double>& angle_errors_fft_phase, int cycleCount) {
     typedef complex<double> cx;
 
     int size = angle_errors.size();
@@ -647,11 +643,17 @@ void ADMTController::performFFT(const vector<double>& angle_errors, vector<doubl
         angle_errors_fft_phase_temp[i] = atan2(fft_out[i].imag(), fft_out[i].real());
     }
 
+    vector<double> angle_errors_fft_upper_half(size / cycleCount);
+    vector<double> angle_errors_fft_phase_upper_half(size / cycleCount);
+
     // Get upper half only
-    for (int i = 0; i < size / 2; i++) {
-        angle_errors_fft[i] = angle_errors_fft_temp[i];
-        angle_errors_fft_phase[i] = angle_errors_fft_phase_temp[i];
+    for (int i = 0; i < size / cycleCount; i++) {
+        angle_errors_fft_upper_half[i] = angle_errors_fft_temp[i];
+        angle_errors_fft_phase_upper_half[i] = angle_errors_fft_phase_temp[i];
     }
+
+    angle_errors_fft = angle_errors_fft_upper_half;
+    angle_errors_fft_phase = angle_errors_fft_phase_upper_half;
 }
 
 

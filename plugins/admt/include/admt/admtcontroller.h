@@ -33,7 +33,14 @@ public:
 
     int HAR_MAG_1, HAR_MAG_2, HAR_MAG_3, HAR_MAG_8 ,HAR_PHASE_1 ,HAR_PHASE_2 ,HAR_PHASE_3 ,HAR_PHASE_8;
 
-    vector<double> angle_errors_fft, angle_errors_fft_phase, calibration_samples_sine, calibration_samples_cosine, calibration_samples_sine_scaled, calibration_samples_cosine_scaled;
+    vector<double> angle_errors_fft_pre, 
+                   angle_errors_fft_phase_pre,
+                   angle_errors_fft_post,
+                   angle_errors_fft_phase_post,
+                   calibration_samples_sine, 
+                   calibration_samples_cosine, 
+                   calibration_samples_sine_scaled, 
+                   calibration_samples_cosine_scaled;
 
     enum Channel
     {
@@ -153,7 +160,7 @@ public:
     map<string, double> getDiag1RegisterBitMapping_Afe(uint16_t registerValue);
     map<string, double> getDiag2RegisterBitMapping(uint16_t registerValue);
     uint16_t setGeneralRegisterBitMapping(uint16_t currentRegisterValue, map<string, int> settings);
-    QString postcalibrate(vector<double> PANG);
+    void postcalibrate(vector<double> PANG, int cycleCount, int samplesPerCycle);
 private:
     iio_context *m_iioCtx;
     iio_buffer *m_iioBuffer;
@@ -163,11 +170,11 @@ private:
     unsigned int bitReverse(unsigned int x, int log2n);
     template <typename Iter_T>
     void fft(Iter_T a, Iter_T b, int log2n);
-    void performFFT(const vector<double>& angle_errors, vector<double>& angle_errors_fft, vector<double>& angle_errors_fft_phase);
+    void performFFT(const vector<double>& angle_errors, vector<double>& angle_errors_fft, vector<double>& angle_errors_fft_phase, int cycleCount);
     int linear_fit(vector<double> x, vector<double> y, double* slope, double* intercept);
-    int calculate_angle_error(vector<double> angle_meas, vector<double>& angle_error_ret, double* max_angle_err);
-    void getPreCalibrationFFT(const vector<double>& PANG, vector<double>& angle_errors_fft_pre, vector<double>& angle_errors_fft_phase_pre);
-    void getPostCalibrationFFT(const vector<double>& updated_PANG, vector<double>& angle_errors_fft_post, vector<double>& angle_errors_fft_phase_post);
+    int calculate_angle_error(vector<double> angle_meas, vector<double>& angle_error_ret, double* max_angle_err, int cycleCount, int samplesPerCycle);
+    void getPreCalibrationFFT(const vector<double>& PANG, vector<double>& angle_errors_fft_pre, vector<double>& angle_errors_fft_phase_pre, int cycleCount, int samplesPerCycle);
+    void getPostCalibrationFFT(const vector<double>& updated_PANG, vector<double>& angle_errors_fft_post, vector<double>& angle_errors_fft_phase_post, int cycleCount, int samplesPerCycle);
 };
 } // namespace scopy::admt
 
