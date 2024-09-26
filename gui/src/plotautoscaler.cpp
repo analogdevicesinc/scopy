@@ -72,7 +72,7 @@ void PlotAutoscaler::autoscale()
 			if(m_min > sample)
 				m_min = sample;
 		}
-		qInfo(CAT_TIMEYAUTOSCALE)
+		qDebug(CAT_TIMEYAUTOSCALE)
 			<< "Autoscaling channel " << plotCh->name() << "to (" << m_min << ", " << m_max << ")";
 	}
 

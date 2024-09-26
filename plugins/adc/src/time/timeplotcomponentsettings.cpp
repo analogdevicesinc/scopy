@@ -159,6 +159,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 
 	m_plotComponent->timePlot()->plotButtonManager()->add(m_deletePlotHover);
 	m_plotComponent->timePlot()->plotButtonManager()->add(m_settingsPlotHover);
+	m_autoscaleBtn->onOffswitch()->setChecked(true);
 }
 
 void TimePlotComponentSettings::showDeleteButtons(bool b)
