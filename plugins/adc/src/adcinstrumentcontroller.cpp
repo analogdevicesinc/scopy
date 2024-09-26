@@ -48,7 +48,9 @@ void ADCInstrumentController::setEnableAddRemovePlot(bool) {}
 void ADCInstrumentController::setEnableAddRemoveInstrument(bool b)
 {
 	m_ui->addBtn->setVisible(b);
-	m_ui->removeBtn->setVisible(b);
+	if(!m_isMainInstrument) {
+		m_ui->removeBtn->setVisible(b);
+	}
 }
 
 void ADCInstrumentController::init() {}
@@ -184,6 +186,14 @@ void ADCInstrumentController::setupChannelMeasurement(PlotManager *c, ChannelCom
 		connect(chMeasureManager, &MeasureManagerInterface::enableStat, statsPanel, &StatsPanel::addStat);
 		connect(chMeasureManager, &MeasureManagerInterface::disableStat, statsPanel, &StatsPanel::removeStat);
 	}
+}
+
+bool ADCInstrumentController::isMainInstrument() const { return m_isMainInstrument; }
+
+void ADCInstrumentController::setIsMainInstrument(bool newIsMainInstrument)
+{
+	m_isMainInstrument = newIsMainInstrument;
+	m_ui->removeBtn->setVisible(!newIsMainInstrument);
 }
 
 ADCInstrument *ADCInstrumentController::ui() const { return m_ui; }
