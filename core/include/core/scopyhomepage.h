@@ -23,9 +23,6 @@ public:
 	~ScopyHomePage();
 	QPushButton *scanControlBtn();
 Q_SIGNALS:
-
-	void requestAddDevice(QString cat, QString id);
-	void requestRemoveDevice(QString id);
 	void requestDevice(QString id);
 	void deviceAddedToUi(QString id);
 	void newDeviceAvailable(DeviceImpl *d);
