@@ -1335,7 +1335,7 @@ void HarmonicCalibration::applySequence(){
 
 	if(changeCNVPage(generalRegisterPage, "GENERAL")){
 		if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress, newGeneralRegValue) != -1){
-			//StatusBarManager::pushMessage("WRITE GENERAL: 0x" + QString::number(static_cast<uint16_t>(newGeneralRegValue), 2).rightJustified(16, '0'));
+			//StatusBarManager::pushMessage("WRITE GENERAL: 0b" + QString::number(static_cast<uint16_t>(newGeneralRegValue), 2).rightJustified(16, '0'));
 			
 			readSequence();
 		}
@@ -1366,7 +1366,7 @@ void HarmonicCalibration::readSequence(){
 				angleFilterMenuCombo->combo()->setCurrentIndex(angleFilterMenuCombo->combo()->findData(generalBitMapping.at("Angle Filter")));
 				eighthHarmonicMenuCombo->combo()->setCurrentIndex(eighthHarmonicMenuCombo->combo()->findData(generalBitMapping.at("8th Harmonic")));
 
-				//StatusBarManager::pushMessage("READ GENERAL: 0x" + QString::number(static_cast<uint16_t>(*generalRegValue), 2).rightJustified(16, '0'));
+				//StatusBarManager::pushMessage("READ GENERAL: 0b" + QString::number(static_cast<uint16_t>(*generalRegValue), 2).rightJustified(16, '0'));
 			}
 		}
 		else{ StatusBarManager::pushMessage("Failed to read GENERAL Register"); }
@@ -1417,7 +1417,7 @@ void HarmonicCalibration::updateDigioMonitor(){
 		else { changeStatusLEDColor(DIGIOFaultStatusLED, faultLEDColor); }
 		if(digioBitMapping.at("DIGIO5EN")){ changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor, digioBitMapping.at("BOOTLOAD")); }
 		else { changeStatusLEDColor(DIGIOBootloaderStatusLED, faultLEDColor); }
-		commandLogWrite("DIGIO: 0x" + QString::number(static_cast<uint16_t>(*digioRegValue), 2).rightJustified(16, '0'));
+		commandLogWrite("DIGIO: 0b" + QString::number(static_cast<uint16_t>(*digioRegValue), 2).rightJustified(16, '0'));
 	}
 	else{ commandLogWrite("Failed to read DIGIO Register"); }
 }
@@ -1442,7 +1442,7 @@ void HarmonicCalibration::updateMTDiagRegister(){
 					changeStatusLEDColor(R5StatusLED, statusLEDColor, mtDiag1BitMapping.at("R5"));
 					changeStatusLEDColor(R6StatusLED, statusLEDColor, mtDiag1BitMapping.at("R6"));
 					changeStatusLEDColor(R7StatusLED, statusLEDColor, mtDiag1BitMapping.at("R7"));
-					commandLogWrite("DIAG1: 0x" + QString::number(static_cast<uint16_t>(*mtDiag1RegValue), 2).rightJustified(16, '0'));
+					commandLogWrite("DIAG1: 0b" + QString::number(static_cast<uint16_t>(*mtDiag1RegValue), 2).rightJustified(16, '0'));
 				}
 				else{ commandLogWrite("Failed to read MT Diagnostic 1 Register"); }
 			}
@@ -1476,7 +1476,7 @@ void HarmonicCalibration::updateFaultRegister(){
 		changeStatusLEDColor(RadiusCheckStatusLED, faultLEDColor, faultBitMapping.at("AMR Radius Check"));
 		changeStatusLEDColor(SequencerWatchdogStatusLED, faultLEDColor, faultBitMapping.at("Sequencer Watchdog"));
 
-		commandLogWrite("FAULT: 0x" + QString::number(static_cast<uint16_t>(*faultRegValue), 2).rightJustified(16, '0'));
+		commandLogWrite("FAULT: 0b" + QString::number(static_cast<uint16_t>(*faultRegValue), 2).rightJustified(16, '0'));
 	}
 	else{ commandLogWrite("Failed to read FAULT Register"); }
 }
@@ -1522,7 +1522,7 @@ void HarmonicCalibration::updateMTDiagnostics(){
 					AFEDIAG0LineEdit->setText(QString::number(afeDiag0) + " V");
 					AFEDIAG1LineEdit->setText(QString::number(afeDiag1) + " V");
 
-					commandLogWrite("DIAG2: 0x" + QString::number(static_cast<uint16_t>(*mtDiag2RegValue), 2).rightJustified(16, '0'));
+					commandLogWrite("DIAG2: 0b" + QString::number(static_cast<uint16_t>(*mtDiag2RegValue), 2).rightJustified(16, '0'));
 				}
 				else{ commandLogWrite("Failed to read MT Diagnostic 2 Register"); }
 			}
