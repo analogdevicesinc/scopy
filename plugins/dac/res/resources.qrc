@@ -1,12 +1,5 @@
 <RCC>
     <qresource prefix="/dacinstrument">
         <file>tutorial_chapters.json</file>
-        <file>csv/sine_complex_2_15360_sr_15360000_samps_40000_ampl_32767.csv</file>
-        <file>csv/sine_complex_2_30720_sr_15360000_samps_20000_ampl_32767.csv</file>
-        <file>csv/sine_complex_1_30720_sr_15360000_samps_20000_ampl_32767.csv</file>
-        <file>csv/sine_complex_1_15360_sr_15360000_samps_40000_ampl_32767.csv</file>
-        <file>csv/sine_complex_245760_sr_122880000_samps_20000_ampl_32767.csv</file>
-        <file>csv/sine_complex_245760_sr_122880000_samps_20000_ampl_16384.csv</file>
-        <file>csv/sinewave_0.9_2ch.csv</file>
     </qresource>
 </RCC>

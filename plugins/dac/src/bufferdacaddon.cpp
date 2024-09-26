@@ -16,6 +16,7 @@
 #include <iio-widgets/datastrategy/channelattrdatastrategy.h>
 
 #include <QDateTime>
+#include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QFileDialog>
 #include <QString>
@@ -133,6 +134,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	connect(
 		m_fileSizeSpin, &MenuSpinbox::valueChanged, this, [&](double value) { m_model->setFilesize(value); },
 		Qt::QueuedConnection);
+	m_fileSizeSpin->setScaleRange(1, 16 * 1024 * 1024);
 	m_fileSizeSpin->setValue(16);
 	filesizeContainer->contentLayout()->addWidget(m_fileSizeSpin);
 	filesizeContainer->setFixedHeight(48);
@@ -148,7 +150,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	StyleHelper::MenuSmallLabel(fileLbl);
 
 	// Determine default search dir
-	QString defaultDir = "";
+	QString defaultDir = DAC_CSV_BUILD_PATH;
 #ifdef Q_OS_WINDOWS
 	defaultDir = DAC_CSV_PATH_LOCAL;
 #elif defined __APPLE__
@@ -156,7 +158,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 #elif defined(__appimage__)
 	defaultDir = QCoreApplication::applicationDirPath() + "/../lib/scopy/plugins/csv";
 #else
-	defaultDir = DAC_CSV_BUILD_PATH;
+	defaultDir = DAC_CSV_SYSTEM_PATH;
 #endif
 
 	fm = new FileBrowser(fileBrowserSection);
@@ -341,10 +343,10 @@ void BufferDacAddon::updateGuiStrategyWidget()
 		}
 
 		auto fileSize = m_dataBuffer->getDataBufferStrategy()->data().size();
-		m_bufferSizeSpin->setValue(fileSize);
-		m_fileSizeSpin->setValue(fileSize);
 		m_bufferSizeSpin->setMaxValue(fileSize);
 		m_fileSizeSpin->setMaxValue(fileSize);
+		m_bufferSizeSpin->setValue(fileSize);
+		m_fileSizeSpin->setValue(fileSize);
 	}
 }
 
