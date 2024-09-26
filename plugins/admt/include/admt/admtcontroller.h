@@ -120,6 +120,7 @@ public:
                                                      "ramp_mode"};
     const uint32_t HarmonicRegisters[HARMONIC_REGISTER_COUNT] = { 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
     const uint32_t ConfigurationRegisters[CONFIGURATION_REGISTER_COUNT] = { 0x01, 0x04, 0x06, 0x10, 0x12, 0x13, 0x1D, 0x23 };
+    const uint32_t ConfigurationPages[CONFIGURATION_REGISTER_COUNT] = { UINT32_MAX, UINT32_MAX, UINT32_MAX, 0x02, 0x02, 0x02, 0x02, 0x02 };
     const uint32_t SensorRegisters[SENSOR_REGISTER_COUNT] = { 0x03, 0x05, 0x08, 0x10, 0x11, 0x12, 0x13, 0x18, 0x1D, 0x1E, 0x20, 0x23, 0x14 };
     const uint32_t SensorPages[SENSOR_REGISTER_COUNT] = { UINT32_MAX, UINT32_MAX, UINT32_MAX, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02 };
 
@@ -128,6 +129,7 @@ public:
     const char* getMotorAttribute(MotorAttribute attribute);
     const uint32_t getHarmonicRegister(HarmonicRegister registerID);
     const uint32_t getConfigurationRegister(ConfigurationRegister registerID);
+    const uint32_t getConfigurationPage(ConfigurationRegister registerID);
     const uint32_t getSensorRegister(SensorRegister registerID);
     const uint32_t getSensorPage(SensorRegister registerID);
 
@@ -145,11 +147,13 @@ public:
     uint16_t calculateHarmonicCoefficientPhase(double harmonicCoefficient, uint16_t originalValue);
     double getActualHarmonicRegisterValue(uint16_t registerValue, const string key);
     map<string, bool> getFaultRegisterBitMapping(uint16_t registerValue);
-    map<string, string> getGeneralRegisterBitMapping(uint16_t registerValue);
+    map<string, int> getGeneralRegisterBitMapping(uint16_t registerValue);
     map<string, bool> getDigioenRegisterBitMapping(uint16_t registerValue);
     map<string, bool> getDiag1RegisterBitMapping_Register(uint16_t registerValue);
     map<string, double> getDiag1RegisterBitMapping_Afe(uint16_t registerValue);
     map<string, double> getDiag2RegisterBitMapping(uint16_t registerValue);
+    uint16_t setGeneralRegisterBitMapping(uint16_t currentRegisterValue, map<string, int> settings);
+    QString postcalibrate(vector<double> PANG);
 private:
     iio_context *m_iioCtx;
     iio_buffer *m_iioBuffer;
@@ -159,8 +163,11 @@ private:
     unsigned int bitReverse(unsigned int x, int log2n);
     template <typename Iter_T>
     void fft(Iter_T a, Iter_T b, int log2n);
+    void performFFT(const vector<double>& angle_errors, vector<double>& angle_errors_fft, vector<double>& angle_errors_fft_phase);
     int linear_fit(vector<double> x, vector<double> y, double* slope, double* intercept);
     int calculate_angle_error(vector<double> angle_meas, vector<double>& angle_error_ret, double* max_angle_err);
+    void getPreCalibrationFFT(const vector<double>& PANG, vector<double>& angle_errors_fft_pre, vector<double>& angle_errors_fft_phase_pre);
+    void getPostCalibrationFFT(const vector<double>& updated_PANG, vector<double>& angle_errors_fft_post, vector<double>& angle_errors_fft_phase_post);
 };
 } // namespace scopy::admt
 

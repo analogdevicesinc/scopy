@@ -65,6 +65,8 @@ public Q_SLOTS:
 	void utilityTask();
 	void clearCommandLog();
 	void canCalibrate(bool);
+	void applySequence();
+	void readSequence();
 Q_SIGNALS:
 	void runningChanged(bool);
 	void canCalibrateChanged(bool);
@@ -81,7 +83,7 @@ private:
 		afeDiag0, afeDiag1, afeDiag2;
 
 	QPushButton *openLastMenuButton, *calibrationStartMotorButton, *applyCalibrationDataButton, *calibrateDataButton, *extractDataButton,
-				*clearCommandLogButton;
+				*clearCommandLogButton, *applySequenceButton;
 	QButtonGroup *rightMenuButtonGroup;
 
 	QLineEdit 	*graphUpdateIntervalLineEdit, *dataSampleSizeLineEdit,
@@ -112,7 +114,8 @@ private:
 
 	MenuSectionWidget *rightMenuSectionWidget;
 	MenuCollapseSection *rotationCollapse, *angleCollapse, *countCollapse, *tempCollapse;
-	MenuCombo *m_dataGraphChannelMenuCombo, *m_dataGraphDirectionMenuCombo, *m_tempGraphDirectionMenuCombo;
+	MenuCombo *m_dataGraphChannelMenuCombo, *m_dataGraphDirectionMenuCombo, *m_tempGraphDirectionMenuCombo,
+			  *sequenceTypeMenuCombo, *conversionTypeMenuCombo, *cnvSourceMenuCombo, *convertSynchronizationMenuCombo, *angleFilterMenuCombo, *eighthHarmonicMenuCombo;
 
 	QTabWidget *tabWidget;
 
@@ -141,8 +144,10 @@ private:
 	void connectLineEditToNumber(QLineEdit* lineEdit, double& variable, QString unit = "");
 	void connectLineEditToGraphSamples(QLineEdit* lineEdit, int& variable, Sismograph* graph);
 	void connectMenuComboToGraphDirection(MenuCombo* menuCombo, Sismograph* graph);
-	void changeGraphColorByChannelName(Sismograph* graph, const char* channelName);
 	void connectMenuComboToGraphChannel(MenuCombo* menuCombo, Sismograph* graph);
+	void connectMenuComboToNumber(MenuCombo* menuCombo, double& variable);
+	void connectMenuComboToNumber(MenuCombo* menuCombo, int& variable);
+	void changeGraphColorByChannelName(Sismograph* graph, const char* channelName);
 	ToolTemplate* createCalibrationWidget();
 	ToolTemplate* createRegistersWidget();
 	ToolTemplate* createUtilityWidget();
@@ -176,7 +181,6 @@ private:
 	double convertAMAXtoAccelTime(double amax);
 	void updateCalculatedCoeff();
 	void resetCalculatedCoeff();
-	void connectMenuComboToNumber(MenuCombo* menuCombo, double& variable);
 	void appendSamplesToPlotCurve(PlotWidget *plotWidget, QVector<double>& newYData);
 	void applyTabWidgetStyle(QTabWidget *widget, const QString& styleHelperColor = "ScopyBlue");
 	MenuControlButton *createStatusLEDWidget(const QString title, QColor color, QWidget *parent = nullptr);
@@ -186,6 +190,8 @@ private:
 	void updateFaultRegister();
 	void updateMTDiagnostics();
 	void changeStatusLEDColor(MenuControlButton *menuControlButton, QColor color, bool checked = true);
+	bool changeCNVPage(uint32_t page, QString registerName);
+	void toggleWidget(QPushButton *widget, bool value);
 
 	QTimer *timer, *calibrationTimer, *motorCalibrationAcquisitionTimer, *utilityTimer;
 
