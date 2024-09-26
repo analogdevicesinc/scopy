@@ -125,9 +125,9 @@ private:
 
 	QCheckBox *autoCalibrateCheckBox;
 
-	PlotWidget *calibrationFFTDataPlotWidget, *calibrationRawDataPlotWidget;
-	PlotAxis *calibrationFFTXPlotAxis, *calibrationFFTYPlotAxis, *calibrationRawDataXPlotAxis, *calibrationRawDataYPlotAxis;
-	PlotChannel *calibrationFFTPlotChannel, *calibrationFFTPhasePlotChannel, *calibrationRawDataPlotChannel, *calibrationSineDataPlotChannel, *calibrationCosineDataPlotChannel;
+	PlotWidget *preCalibrationFFTPlotWidget, *calibrationRawDataPlotWidget;
+	PlotAxis *preCalibrationFFTXPlotAxis, *preCalibrationFFTYPlotAxis, *calibrationRawDataXPlotAxis, *calibrationRawDataYPlotAxis;
+	PlotChannel *preCalibrationFFTMagnitudePlotChannel, *preCalibrationFFTPhasePlotChannel, *calibrationRawDataPlotChannel, *calibrationSineDataPlotChannel, *calibrationCosineDataPlotChannel;
 
 	HorizontalSpinBox *motorMaxVelocitySpinBox, *motorAccelTimeSpinBox, *motorMaxDisplacementSpinBox, *motorTargetPositionSpinBox;
 
