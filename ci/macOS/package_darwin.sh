@@ -12,6 +12,7 @@ echo "### Copy DLLs to Frameworks folder"
 cp -R $REPO_SRC/plugins/dac/res/csv Scopy.app/Contents/MacOS/plugins/
 cp -R $STAGING_AREA/libiio/build/iio.framework Scopy.app/Contents/Frameworks/
 cp -R $STAGING_AREA/libad9361/build/ad9361.framework Scopy.app/Contents/Frameworks/
+cp -r $BUILDDIR/plugins/emu_xml Scopy.app/Contents/MacOS/plugins
 
 libqwtpath=${STAGING_AREA_DEPS}/lib/libqwt.6.4.0.dylib #hardcoded
 libqwtid="$(otool -D ${libqwtpath} | tail -1)"
