@@ -7,7 +7,7 @@
 #include <compositeheaderwidget.h>
 #include <menuheader.h>
 
-Q_LOGGING_CATEGORY(CAT_INSTR_MANAGER, "ToolMenuManager")
+Q_LOGGING_CATEGORY(CAT_TOOLMENUMANAGER, "ToolMenuManager")
 using namespace scopy;
 
 ToolMenuManager::ToolMenuManager(ToolStack *ts, DetachedToolWindowManager *dtm, ToolMenu *toolMenu, QObject *parent)
@@ -38,13 +38,15 @@ void ToolMenuManager::addMenuItem(QString deviceId, DeviceInfo devInfo, QList<To
 	m_toolMenu->add(itemIndex, deviceId, devSection);
 	m_itemMap[deviceId] = devSection;
 	m_devInfoMap[deviceId] = devInfo;
+	devSection->setCollapsed(false);
 	devSection->hide();
+	qDebug(CAT_TOOLMENUMANAGER) << "Menu item with id" << deviceId << "has been added";
 }
 
 void ToolMenuManager::removeMenuItem(QString deviceId)
 {
 	if(!m_itemMap.contains(deviceId)) {
-		qInfo(CAT_INSTR_MANAGER) << "No entry with id:" << deviceId;
+		qDebug(CAT_TOOLMENUMANAGER) << "No entry with id:" << deviceId;
 		return;
 	}
 	MenuSectionCollapseWidget *devSection = m_itemMap[deviceId];
@@ -53,12 +55,13 @@ void ToolMenuManager::removeMenuItem(QString deviceId)
 	m_devInfoMap.remove(deviceId);
 	delete devSection;
 	devSection = nullptr;
+	qDebug(CAT_TOOLMENUMANAGER) << "Menu item with id" << deviceId << "has been removed";
 }
 
 void ToolMenuManager::changeToolListContents(QString deviceId, QList<ToolMenuEntry *> tools)
 {
 	if(!m_itemMap.contains(deviceId)) {
-		qInfo(CAT_INSTR_MANAGER) << "No entry with id:" << deviceId;
+		qDebug(CAT_TOOLMENUMANAGER) << "No entry with id:" << deviceId;
 		return;
 	}
 	for(ToolMenuEntry *tme : tools) {
@@ -88,6 +91,26 @@ void ToolMenuManager::hideMenuItem(QString id)
 	m_itemMap[id]->hide();
 }
 
+void ToolMenuManager::deviceConnected(QString id)
+{
+	m_connectedDev.append(id);
+	showMenuItem(id);
+}
+
+void ToolMenuManager::deviceDisconnected(QString id)
+{
+	m_connectedDev.removeAll(id);
+	if(m_prevItem.compare(id) != 0) {
+		hideMenuItem(id);
+	}
+}
+
+void ToolMenuManager::onDisplayNameChanged(QString id, QString devName)
+{
+	m_devInfoMap[id].name = devName;
+	m_itemMap[id]->collapseSection()->setTitle(devName);
+}
+
 void ToolMenuManager::updateTool(QWidget *old)
 {
 
@@ -113,7 +136,7 @@ void ToolMenuManager::updateTool(QWidget *old)
 		}
 		loadToolAttachedState(tme);
 	}
-	qDebug(CAT_INSTR_MANAGER) << "updating tool for " << tme->name() << " - " << id;
+	qDebug(CAT_TOOLMENUMANAGER) << "updating tool for " << tme->name() << " - " << id;
 }
 
 void ToolMenuManager::updateToolAttached(bool oldAttach, ToolMenuItem *toolMenuItem)
@@ -156,6 +179,19 @@ void ToolMenuManager::updateToolAttached(bool oldAttach, ToolMenuItem *toolMenuI
 			toolMenuItem->getToolBtn()->toggle();
 		}
 	}
+}
+
+void ToolMenuManager::loadToolAttachedState(ToolMenuEntry *tme)
+{
+	Preferences *p = Preferences::GetInstance();
+	QString prefId;
+	if(!p->get("general_save_attached").toBool())
+		return;
+
+	prefId = tme->id() + "_attached";
+	p->init(prefId, tme->attached());
+	bool attach = p->get(prefId).toBool();
+	tme->setAttached(attach);
 }
 
 void ToolMenuManager::saveToolAttachedState(ToolMenuEntry *tme)
@@ -236,38 +272,6 @@ ToolMenuItem *ToolMenuManager::createToolMenuItem(ToolMenuEntry *tme, QWidget *p
 	connect(tme, &ToolMenuEntry::updateToolEntry, toolMenuItem, &ToolMenuItem::updateItem);
 
 	return toolMenuItem;
-}
-
-void ToolMenuManager::loadToolAttachedState(ToolMenuEntry *tme)
-{
-	Preferences *p = Preferences::GetInstance();
-	QString prefId;
-	if(!p->get("general_save_attached").toBool())
-		return;
-
-	prefId = tme->id() + "_attached";
-	p->init(prefId, tme->attached());
-	bool attach = p->get(prefId).toBool();
-	tme->setAttached(attach);
-}
-void ToolMenuManager::deviceConnected(QString id)
-{
-	m_connectedDev.append(id);
-	showMenuItem(id);
-}
-
-void ToolMenuManager::deviceDisconnected(QString id)
-{
-	m_connectedDev.removeAll(id);
-	if(m_prevItem.compare(id) != 0) {
-		hideMenuItem(id);
-	}
-}
-
-void ToolMenuManager::onDisplayNameChanged(QString id, QString devName)
-{
-	m_devInfoMap[id].name = devName;
-	m_itemMap[id]->collapseSection()->setTitle(devName);
 }
 
 #include "moc_toolmenumanager.cpp"
