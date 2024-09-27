@@ -65,6 +65,14 @@ const char* ADMTController::getDeviceId(Device device)
 	return "Unknown";
 }
 
+const char* ADMTController::getDeviceAttribute(DeviceAttribute attribute)
+{
+	if(attribute >= 0 && attribute < DEVICE_ATTR_COUNT){
+		return DeviceAttributes[attribute];
+	}
+	return "Unknown";
+}
+
 const char* ADMTController::getMotorAttribute(MotorAttribute attribute)
 {
 	if(attribute >= 0 && attribute < MOTOR_ATTR_COUNT){
@@ -1022,4 +1030,21 @@ uint16_t ADMTController::setGeneralRegisterBitMapping(uint16_t currentRegisterVa
     }
 
     return registerValue;
+}
+
+int ADMTController::getAbsAngleTurnCount(uint16_t registerValue) {
+    // Bits 15:8: Turn count in quarter turns
+    uint8_t turnCount = (registerValue & 0xFF00) >> 8;
+
+    if (turnCount <= 0xD5) {
+        // Straight binary turn count
+        return turnCount / 4; // Convert from quarter turns to whole turns
+    } else if (turnCount == 0xD6) {
+        // Invalid turn count
+        return -1;
+    } else {
+        // 2's complement turn count
+        int8_t signedTurnCount = static_cast<int8_t>(turnCount); // Handle as signed value
+        return signedTurnCount / 4; // Convert from quarter turns to whole turns
+    }
 }
