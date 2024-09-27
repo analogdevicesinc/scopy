@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/gui">
         <file>icon.ico</file>
-        <file>open-sans-regular.ttf</file>
         <file>loading.gif</file>
         <file>infoPageMap.json</file>
         <file>Scopy.icns</file>
@@ -167,6 +166,7 @@
         <file>icons/plus.svg</file>
         <file>icons/unlocked.svg</file>
         <file>icons/locked.svg</file>
+        <file>Inter-Regular.ttf</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>

@@ -11,6 +11,7 @@
 #include <utils.h>
 #include <QFileInfo>
 #include <QDirIterator>
+#include <QFontDatabase>
 
 #include <common/scopyconfig.h>
 
@@ -65,6 +66,7 @@ void Style::initPaths()
 
 void Style::init(QString theme)
 {
+	QFontDatabase::addApplicationFont(":/gui/Inter-Regular.ttf");
 	QFile global_file = QFile(m_globalJsonPath);
 	global_file.open(QIODevice::ReadOnly);
 	QByteArray global_data = global_file.readAll();
