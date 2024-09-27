@@ -42,7 +42,6 @@ RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 	m_spinBox->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 	m_spinBox->setScaleRange(1, 1);
 	m_spinBox->setScalingEnabled(false);
-	m_spinBox->setLineVisible(false);
 	m_ui->layout()->addWidget(m_spinBox);
 
 	connect(m_spinBox, &gui::MenuSpinbox::valueChanged, this,

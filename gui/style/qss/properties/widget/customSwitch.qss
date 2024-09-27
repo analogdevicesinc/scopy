@@ -5,7 +5,7 @@ QWidget[&&property&&="left_on"] {
     min-height: &unit_2&;
     padding: 0 &padding_1& 0 &padding_1&;
     background-color: transparent;
-    border: &border_width& solid &interactive_primary_idle&;
+    border: &border_width_interactive& solid &interactive_primary_idle&;
     color: &interactive_primary_idle&;
 }
 QWidget[&&property&&="left_off"] {
@@ -15,7 +15,7 @@ QWidget[&&property&&="left_off"] {
     min-height: &unit_2&;
     padding: 0 &padding_1& 0 &padding_1&;
     background-color: transparent;
-    border: &border_width& solid &interactive_subtle_idle&;
+    border: &border_width_interactive& solid &interactive_subtle_idle&;
     color: &interactive_subtle_idle&;
 }
 QWidget[&&property&&="right_on"] {
@@ -25,7 +25,7 @@ QWidget[&&property&&="right_on"] {
     min-height: &unit_2&;
     padding: 0 &padding_1& 0 &padding_1&;
     background-color: transparent;
-    border: &border_width& solid &interactive_primary_idle&;
+    border: &border_width_interactive& solid &interactive_primary_idle&;
     color: &interactive_primary_idle&;
 }
 QWidget[&&property&&="right_off"] {
@@ -35,6 +35,6 @@ QWidget[&&property&&="right_off"] {
     min-height: &unit_2&;
     padding: 0 &padding_1& 0 &padding_1&;
     background-color: transparent;
-    border: &border_width& solid &interactive_subtle_idle&;
+    border: &border_width_interactive& solid &interactive_subtle_idle&;
     color: &interactive_subtle_idle&;
 }

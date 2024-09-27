@@ -7,6 +7,7 @@
 #include <stylehelper.h>
 
 #include <QFileDialog>
+#include <style.h>
 
 using namespace scopy;
 using namespace scopy::dac;
@@ -35,8 +36,8 @@ FileBrowser::FileBrowser(QWidget *parent)
 	fileBufferContainer->contentLayout()->addWidget(m_fileBufferPath);
 	fileBufferContainer->contentLayout()->addWidget(m_fileBufferBrowseBtn);
 	fileBufferContainer->contentLayout()->addWidget(m_fileBufferLoadBtn);
-	StyleHelper::BlueButton(m_fileBufferBrowseBtn);
-	StyleHelper::BlueButton(m_fileBufferLoadBtn);
+	Style::setStyle(m_fileBufferBrowseBtn, style::properties::button::basicButton);
+	Style::setStyle(m_fileBufferLoadBtn, style::properties::button::basicButton);
 
 	m_layout->addWidget(fileBufferContainer);
 }

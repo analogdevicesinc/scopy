@@ -18,8 +18,8 @@
 using namespace scopy;
 
 Style *Style::pinstance_{nullptr};
-QJsonDocument *Style::m_global_json{nullptr};
-QJsonDocument *Style::m_theme_json{nullptr};
+QJsonDocument *Style::m_global_json{new QJsonDocument()};
+QJsonDocument *Style::m_theme_json{new QJsonDocument()};
 QMap<QString, QString> *Style::m_styleMap{new QMap<QString, QString>()};
 
 Style::Style(QObject *parent)
@@ -47,14 +47,22 @@ Style *Style::GetInstance()
 QString Style::getStylePath(QString relativePath)
 {
 	// Check the local plugins folder first
-	QDir pathDir(config::localStyleFolderPath() + relativePath);
-	QFile pathFile(config::localStyleFolderPath() + relativePath);
+	QString path = config::localStyleFolderPath() + relativePath;
+	QDir *pathDir = new QDir(path);
+	QFile *pathFile = new QFile(path);
 
-	if(pathDir.exists() || pathFile.exists()) {
-		return config::localStyleFolderPath() + relativePath;
+	if(pathDir->exists() || pathFile->exists()) {
+		return path;
 	}
 
-	return config::defaultStyleFolderPath() + relativePath;
+	path = config::defaultStyleFolderPath() + relativePath;
+	pathDir = new QDir(path);
+	pathFile = new QFile(path);
+	if(pathDir->exists() || pathFile->exists()) {
+		return path;
+	}
+
+	return "";
 }
 
 void Style::initPaths()
@@ -81,6 +89,7 @@ void Style::init(QString theme)
 
 void Style::setStyle(QWidget *widget, const char *style, QVariant value, bool force)
 {
+	style = replaceProperty(style);
 	if(!m_styleMap->contains(style)) {
 		qCritical("Style: Failed to set style: %s to widget: %s", widget->objectName().toStdString().c_str(),
 			  style);
@@ -109,7 +118,7 @@ QPixmap Style::getPixmap(QString pixmap, QColor color)
 {
 	if(color.isValid())
 		return Util::ChangeSVGColor(pixmap, color.name(), 1);
-	return Util::ChangeSVGColor(pixmap, getAttribute(json::theme::content_default), 1);
+	return Util::ChangeSVGColor(pixmap, getAttribute(json::theme::pixmap_color), 1);
 }
 
 QString Style::getColorTransparent(const char *key, double transparency)
@@ -191,9 +200,37 @@ QList<QColor> Style::getChannelColorList()
 	return list;
 }
 
+void Style::setBackgroundColor(QWidget *widget, const char *color, bool extend_to_children)
+{
+	setBackgroundColor(widget, getAttribute(color), extend_to_children);
+}
+
+// extending stylesheet to children is not recommended
+void Style::setBackgroundColor(QWidget *widget, QString color, bool extend_to_children)
+{
+	if(extend_to_children) {
+		widget->setStyleSheet(widget->styleSheet() + "\nbackground-color: " + color + ";");
+	} else {
+		widget->setStyleSheet(widget->styleSheet() + "\n.QWidget { background-color: " + color + "; }");
+	}
+}
+
 QColor Style::getColor(const char *key) { return QColor(getAttribute(key)); }
 
 int Style::getDimension(const char *key) { return getAttribute(key).toInt(); }
+
+const char *Style::replaceProperty(const char *prop)
+{
+	for(const QString &key : m_theme_json->object().keys()) {
+		if(prop == key) {
+			QJsonValue value = m_theme_json->object().value(key);
+			prop = value.toString().toLocal8Bit().data();
+			return prop;
+		}
+	}
+
+	return prop;
+}
 
 QString Style::replaceAttributes(QString style, int calls_limit)
 {
@@ -206,6 +243,7 @@ QString Style::replaceAttributes(QString style, int calls_limit)
 			QJsonValue value = m_global_json->object().value(key);
 			style.replace("&" + key + "&", value.toString());
 		}
+
 		replaceAttributes(style, --calls_limit);
 	}
 	if(style.contains('&') && calls_limit <= 0) {

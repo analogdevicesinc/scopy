@@ -54,7 +54,7 @@ ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified, QColor col
 	nameButton()->installEventFilter(this);
 	m_channelWSpacer = new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed);
 	setStyleSheet("scopy--ChannelWidget QPushButton#btn:hover:!pressed:!checked {		      border-image: "
-		      "url(:/gui/icons/setup_btn_hover.svg)		     }");
+		      "url(:/gui/icons/scopy-default/icons/setup_btn_hover.svg)		     }");
 }
 
 ChannelWidget::~ChannelWidget()

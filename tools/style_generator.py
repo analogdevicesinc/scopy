@@ -191,7 +191,7 @@ def generate_qss(has_general_style: bool) -> None:
         generate_qss_variable,
         style_folder,
     )
-    write_header_file(qss_header_path, qss_namespace_code, qss_header_name, "style")
+    write_header_file(qss_header_path, qss_namespace_code, header_name_prefix + qss_header_name, "style")
 
 
 def generate_json() -> None:
@@ -210,7 +210,7 @@ def generate_json() -> None:
         generate_json_variable,
         style_folder,
     )
-    write_header_file(json_header_path, json_namespace_code, json_header_name, "json")
+    write_header_file(json_header_path, json_namespace_code, header_name_prefix + json_header_name, "json")
 
 
 def copy_and_append_jsons(src_dir: str, dest_dir: str, append: bool) -> None:
@@ -259,6 +259,9 @@ if __name__ == "__main__":
     style_folder = sys.argv[2]
     generated_header_folder = sys.argv[3]
     build_folder = sys.argv[4]
+    
+    # this is used for having different names for header defines
+    header_name_prefix = "" if not is_plugin else generated_header_folder[generated_header_folder.rfind("/") + 1:] + "_"
     build_qss_folder = os.path.join(build_folder, "style", "qss")
     build_json_folder = os.path.join(build_folder, "style", "json")
 

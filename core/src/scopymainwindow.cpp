@@ -99,10 +99,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	toolman = new ToolManager(tm, ts, dtm, this);
 	toolman->addToolList("home", {});
 	toolman->addToolList("add", {});
-	// ui->mainWidget->setStyleSheet(
-	// 	"QWidget#mainWidget { background-color: " + Style::getAttribute(json::theme::background_subtle) + ";}");
-	// ts->setStyleSheet(
-	// 	"QWidget#mainWidget { background-color: " + Style::getAttribute(json::theme::background_subtle) + ";}");
+	ui->mainWidget->setStyleSheet("QWidget#mainWidget { background-color: " +
+				      Style::getAttribute(json::theme::background_primary) + ";}");
 	connect(tm, &ToolMenu::toggleAttach, toolman, &ToolManager::toggleAttach);
 	connect(tb, &ToolBrowser::collapsed, [=](bool coll) {
 		ui->animHolder->setAnimMin(50);

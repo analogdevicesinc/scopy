@@ -4,7 +4,7 @@ QPushButton[&&property&&=true] {
     background-color: &interactive_primary_idle&;
     color: &content_inverse&;
     font-weight: 700;
-    qproperty-iconSize: &unit_4&px;
+    /* qproperty-iconSize: &unit_4&px; */
 }
 QPushButton[&&property&&=true]:hover {
     background-color: &interactive_primary_hover&;

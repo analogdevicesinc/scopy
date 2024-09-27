@@ -129,7 +129,6 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	filesizeContainer->setProperty("tutorial_name", "FILESIZE");
 	m_fileSizeSpin =
 		new MenuSpinbox("File size", 0, "samples", 16, 16 * 1024 * 1024, false, false, filesizeContainer);
-	m_fileSizeSpin->setLineVisible(false);
 	m_fileSizeSpin->setIncrementMode(MenuSpinbox::IS_FIXED);
 	StyleHelper::BackgroundWidget(m_fileSizeSpin);
 	connect(
@@ -227,7 +226,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 		chnBtn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 		chnBtn->setName(node->getUuid());
 		chnBtn->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
-		auto color = StyleHelper::getColor("CH" + QString::number(i % 7));
+		auto color = StyleHelper::getChannelColor(i);
 		chnBtn->setColor(color);
 		node->setColor(color);
 		chnBtn->setDoubleClickToOpenMenu(true);

@@ -49,6 +49,7 @@ ToolBrowser::ToolBrowser(QWidget *parent)
 	connect(ui->btnLoad, &QPushButton::clicked, this, [=]() { Q_EMIT requestLoad(); });
 
 	connect(tm, SIGNAL(requestToolSelect(QString)), this, SIGNAL(requestTool(QString)));
+	Style::setBackgroundColor(this, json::theme::background_primary);
 }
 
 ToolMenu *ToolBrowser::getToolMenu() { return ui->wToolMenu; }
