@@ -416,7 +416,7 @@ create_appdir(){
 	mkdir -p $APP_DIR/usr/lib/scopy/translations
 	cp $TRANSLATIONS_QM $APP_DIR/usr/lib/scopy/translations
 	
-	cp -r $STYLE_FOLDER $APP_DIR/usr/lib/scopy/style
+	cp -R $STYLE_FOLDER $APP_DIR/usr/lib/scopy/style
 
 	if [ -d $REGMAP_XMLS ]; then
 		cp -r $REGMAP_XMLS $APP_DIR/usr/lib/scopy/plugins

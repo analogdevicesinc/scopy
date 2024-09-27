@@ -18,8 +18,8 @@ cp $REPO_SRC/resources/scopy_emu_options_config.json Scopy.app/Contents/MacOS/pl
 cp -R $BUILDDIR/translations Scopy.app/Contents/MacOS
 cp -R $BUILDDIR/plugins/regmap/xmls Scopy.app/Contents/MacOS/plugins
 
-cp -r $BUILDDIR/translations $BUILDDIR/Scopy.app/Contents/MacOS/translations
-cp -r $BUILDDIR/style $BUILDDIR/Scopy.app/Contents/MacOS/style
+cp -R $BUILDDIR/translations $BUILDDIR/Scopy.app/Contents/MacOS/translations
+cp -R $BUILDDIR/style $BUILDDIR/Scopy.app/Contents/MacOS/style
 
 libqwtpath=${STAGING_AREA_DEPS}/lib/libqwt.6.4.0.dylib #hardcoded
 libqwtid="$(otool -D ${libqwtpath} | tail -1)"
