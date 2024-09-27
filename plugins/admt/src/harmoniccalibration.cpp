@@ -78,6 +78,35 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 
     runButton = new RunBtn(this);
 
+	QPushButton *resetGMRButton = new QPushButton(this);
+	resetGMRButton->setText("GMR Reset");
+	QString topContainerButtonStyle = QString(R"css(
+			QPushButton {
+				width: 88px;
+				height: 48px;
+				border-radius: 2px;
+				padding-left: 20px;
+				padding-right: 20px;
+				color: white;
+				font-weight: 700;
+				font-size: 14px;
+				background-color: &&ScopyBlue&&;
+			}
+
+			QPushButton:disabled {
+				background-color:#727273; /* design token - uiElement*/
+			}
+
+			QPushButton:checked {
+				background-color:#272730; /* design token - scopy blue*/
+			}
+			QPushButton:pressed {
+				background-color:#272730;
+			}
+			})css");
+	topContainerButtonStyle.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
+	resetGMRButton->setStyleSheet(topContainerButtonStyle);
+	connect(resetGMRButton, &QPushButton::clicked, this, &HarmonicCalibration::GMRReset);
 
 	rightMenuButtonGroup->addButton(settingsButton);
 
@@ -339,6 +368,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	tool->openTopContainerHelper(false);
     tool->addWidgetToTopContainerMenuControlHelper(openLastMenuButton, TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsButton, TTA_LEFT);
+    tool->addWidgetToTopContainerHelper(resetGMRButton, TTA_RIGHT);
     tool->addWidgetToTopContainerHelper(runButton, TTA_RIGHT);
 	tool->leftStack()->add("rawDataScroll", rawDataScroll);
 	tool->rightStack()->add("generalSettingScroll", generalSettingScroll);
@@ -506,10 +536,24 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	preCalibrationFFTLayout->addWidget(preCalibrationFFTChannelsWidget);
 	#pragma endregion
 
-	PlotWidget *postCalibrationAngularErrorPlotWidget = new PlotWidget();
+	#pragma region Post-Calibration Angular Error Plot Widget
+	QWidget *postCalibrationFFTWidget = new QWidget();
+	QVBoxLayout *postCalibrationFFTLayout = new QVBoxLayout(postCalibrationFFTWidget);
+	postCalibrationFFTWidget->setLayout(postCalibrationFFTLayout);
+	postCalibrationFFTLayout->setMargin(0);
+	postCalibrationFFTLayout->setSpacing(0);
+
+	PlotWidget *postCalibrationFFTPlotWidget = new PlotWidget();
+	preCalibrationFFTPlotWidget->setContentsMargins(10, 20, 10, 10);
+	preCalibrationFFTPlotWidget->xAxis()->setVisible(false);
+	preCalibrationFFTPlotWidget->yAxis()->setVisible(false);
+
+	postCalibrationFFTLayout->addWidget(postCalibrationFFTPlotWidget);
+
+	#pragma endregion
 
 	FFTDataGraphTabWidget->addTab(preCalibrationFFTWidget, "Pre-Calibration Angular Error");
-	FFTDataGraphTabWidget->addTab(postCalibrationAngularErrorPlotWidget, "Post-Calibration Angular Error");
+	FFTDataGraphTabWidget->addTab(postCalibrationFFTWidget, "Post-Calibration Angular Error");
 
 	calibrationDataGraphLayout->addWidget(calibrationDataGraphSectionWidget, 0, 0);
 	calibrationDataGraphLayout->addWidget(FFTDataGraphSectionWidget, 1, 0);
@@ -1285,6 +1329,31 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	return tool;
 }
 
+void HarmonicCalibration::GMRReset()
+{
+	// Set Motor Angle to 315 degrees
+	target_pos = 0;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, target_pos); 
+
+	// Write 1 to ADMT IIO Attribute coil_rs
+	m_admtController->setDeviceAttributeValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+											  m_admtController->getDeviceAttribute(ADMTController::DeviceAttribute::SDP_COIL_RS), 1);
+
+	// Write 0xc000 to CNVPAGE
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE), 0xc000) != -1)
+	{
+		// Write 0x0000 to CNVPAGE
+		if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE), 0x0000) != -1)
+		{
+			// Read ABSANGLE
+
+			StatusBarManager::pushMessage("GMR Reset Done");
+		}
+		else { StatusBarManager::pushMessage("Failed to write CNVPAGE Register"); }
+	}
+	else { StatusBarManager::pushMessage("Failed to write CNVPAGE Register"); }
+}
+
 void HarmonicCalibration::restart()
 {
 	if(m_running) {
@@ -1568,8 +1637,17 @@ void HarmonicCalibration::clearCommandLog(){
 void HarmonicCalibration::updateChannelValues(){
 	rotation = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), rotationChannelName, bufferSize);
 	angle = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), angleChannelName, bufferSize);
-	count = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), countChannelName, bufferSize);
+	updateCountValue();
 	temp = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), temperatureChannelName, bufferSize);
+}
+
+void HarmonicCalibration::updateCountValue(){
+	uint32_t *absAngleRegValue = new uint32_t;
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE), 0x0000) != -1){
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getSensorRegister(ADMTController::SensorRegister::ABSANGLE), absAngleRegValue) != -1){
+			count = m_admtController->getAbsAngleTurnCount(static_cast<uint16_t>(*absAngleRegValue));
+		}
+	}
 }
 
 void HarmonicCalibration::updateLineEditValues(){
@@ -2268,15 +2346,14 @@ void HarmonicCalibration::importCalibrationData()
 
 void HarmonicCalibration::initializeMotor()
 {
-	amax = 1200;
+	rotate_vmax = 53687.1;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
+	writeMotorAttributeValue(ADMTController::MotorAttribute::DISABLE, 1);
+	readMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
+	
+	amax = 439.805;
 	writeMotorAttributeValue(ADMTController::MotorAttribute::AMAX, amax);
 	readMotorAttributeValue(ADMTController::MotorAttribute::AMAX, amax);
-
-	rotate_vmax = 600000;
-	writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
-	readMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
-
-	writeMotorAttributeValue(ADMTController::MotorAttribute::DISABLE, 1);
 
 	dmax = 3000;
 	writeMotorAttributeValue(ADMTController::MotorAttribute::DMAX, dmax);
