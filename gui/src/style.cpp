@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonArray>
+#include <iostream>
 #include <utils.h>
 #include <QFileInfo>
 #include <QDirIterator>
@@ -18,8 +19,8 @@
 using namespace scopy;
 
 Style *Style::pinstance_{nullptr};
-QJsonDocument *Style::m_global_json{nullptr};
-QJsonDocument *Style::m_theme_json{nullptr};
+QJsonDocument *Style::m_global_json{new QJsonDocument()};
+QJsonDocument *Style::m_theme_json{new QJsonDocument()};
 QMap<QString, QString> *Style::m_styleMap{new QMap<QString, QString>()};
 
 Style::Style(QObject *parent)
@@ -47,14 +48,22 @@ Style *Style::GetInstance()
 QString Style::getStylePath(QString relativePath)
 {
 	// Check the local plugins folder first
-	QDir pathDir(config::localStyleFolderPath() + relativePath);
-	QFile pathFile(config::localStyleFolderPath() + relativePath);
+	QString path = config::localStyleFolderPath() + relativePath;
+	QDir *pathDir = new QDir(path);
+	QFile *pathFile = new QFile(path);
 
-	if(pathDir.exists() || pathFile.exists()) {
-		return config::localStyleFolderPath() + relativePath;
+	if(pathDir->exists() || pathFile->exists()) {
+		return path;
 	}
 
-	return config::defaultStyleFolderPath() + relativePath;
+	path = config::defaultStyleFolderPath() + relativePath;
+	pathDir = new QDir(path);
+	pathFile = new QFile(path);
+	if(pathDir->exists() || pathFile->exists()) {
+		return path;
+	}
+
+	return  "";
 }
 
 void Style::initPaths()

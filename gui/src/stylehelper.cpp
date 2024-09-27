@@ -843,21 +843,6 @@ void StyleHelper::TutorialChapterTitleLabel(QLabel *w, QString objectName)
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::DeviceIconBackgroundShadow(QAbstractButton *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-
-	QString style = QString(R"css(
-				QAbstractButton[selected=true] {
-					background-color: &&content_inverse&&;
-					border-radius: 4px;
-				}
-				)css");
-	style.replace("&&content_inverse&&", StyleHelper::getColor("content_inverse"));
-	w->setStyleSheet(style);
-}
-
 void StyleHelper::FrameBackgroundShadow(QFrame *w, QString objectName)
 {
 	if(!objectName.isEmpty())

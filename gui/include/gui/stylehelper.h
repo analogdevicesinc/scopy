@@ -91,7 +91,6 @@ public:
 	static void StatsPanelLabel(StatsLabel *w, QString objectName = "");
 	static void MeasurementSelectorItemWidget(QString iconPath, MeasurementSelectorItem *w,
 						  QString objectName = "");
-	static void DeviceIconBackgroundShadow(QAbstractButton *w, QString objectName = "");
 	static void FrameBackgroundShadow(QFrame *w, QString objectName = "");
 	static void HoverWidget(QWidget *w, bool draggable = false, QString objectName = "");
 	static void TransparentWidget(QWidget *w, QString objectName = "");
