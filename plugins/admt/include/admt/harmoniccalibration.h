@@ -192,6 +192,8 @@ private:
 	void changeStatusLEDColor(MenuControlButton *menuControlButton, QColor color, bool checked = true);
 	bool changeCNVPage(uint32_t page, QString registerName);
 	void toggleWidget(QPushButton *widget, bool value);
+	void GMRReset();
+	void updateCountValue();
 
 	QTimer *timer, *calibrationTimer, *motorCalibrationAcquisitionTimer, *utilityTimer;
 
