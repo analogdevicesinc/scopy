@@ -29,6 +29,7 @@ EMU_BUILD_FOLDER=$WORKDIR/iio-emu/build
 REGMAP_XMLS=$BUILD_FOLDER/plugins/plugins/regmap/xmls
 DAC_WAVEFORM_CSV=$SRC_FOLDER/plugins/dac/res/csv
 EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
+EMU_CONFIG=$SRC_FOLDER/resources/scopy_emu_options_config.json
 
 # Generate build status info for the about page
 
@@ -134,7 +135,8 @@ deploy_app(){
 	fi
 	cp -r $DAC_WAVEFORM_CSV $DEST_FOLDER/plugins
 	cp -r $EMU_XMLS $DEST_FOLDER/plugins
-	cp $BUILD_FOLDER/plugins/resources/scopy_emu_options_config.json $DEST_FOLDER/plugins/resources
+	mkdir -p $DEST_FOLDER/plugins/resources
+	cp $EMU_CONFIG $DEST_FOLDER/plugins/resources
 }
 
 extract_debug_symbols(){
