@@ -130,6 +130,8 @@ bool ADCPlugin::loadPage()
 {
 	m_page = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_page);
+	m_page->setLayout(lay);
+	m_page->hide(); // This does not implement a legitimate page, it just adds an empty space on the page
 	return true;
 }
 
