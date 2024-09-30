@@ -27,7 +27,7 @@ if(ENABLE_AUTOMATED_TESTS)
 	if(ENABLE_PLUGIN_REGMAP)
 		add_test(NAME "RegMapJSTests"
 			 COMMAND bash ${CMAKE_SOURCE_DIR}/js/test.sh "${CMAKE_SOURCE_DIR}/resources/emuXml/"
-				 "${CMAKE_SOURCE_DIR}/plugins/regmap/js/regMapFunctions.js"
+				 "${CMAKE_SOURCE_DIR}/plugins/regmap/js/regMapAutomatedTest.js"
 		)
 	endif()
 
