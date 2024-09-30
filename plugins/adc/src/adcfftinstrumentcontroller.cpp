@@ -115,8 +115,9 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 	int idx = chIdP->next();
 	GRIIOFloatChannelNode *griiofcn = dynamic_cast<GRIIOFloatChannelNode *>(node);
 	GRFFTSinkComponent *grtsc = dynamic_cast<GRFFTSinkComponent *>(m_dataProvider);
-	GRFFTChannelComponent *c = new GRFFTChannelComponent(
-		griiofcn, dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(0)), grtsc, chIdP->pen(idx));
+	GRFFTChannelComponent *c =
+		new GRFFTChannelComponent(griiofcn, dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(0)),
+					  grtsc, chIdP->pen(idx), m_ui->rightStack);
 	Q_ASSERT(grtsc);
 
 	m_plotComponentManager->addChannel(c);
@@ -182,7 +183,7 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 	GRFFTSinkComponent *grtsc = dynamic_cast<GRFFTSinkComponent *>(m_dataProvider);
 	GRFFTChannelComponent *c = new GRFFTChannelComponent(
 		griiofcn_I, griiofcn_Q, dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(0)), grtsc,
-		chIdP->pen(idx));
+		chIdP->pen(idx), m_ui->rightStack);
 	Q_ASSERT(grtsc);
 
 	m_plotComponentManager->addChannel(c);
