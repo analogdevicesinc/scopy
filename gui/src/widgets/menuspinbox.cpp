@@ -58,6 +58,7 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	setScaleRange(m_scaleMin, m_scaleMax);
 	setValue(val);
 	m_scalingEnabled = true;
+	setLineVisible(false);
 }
 
 MenuSpinbox::~MenuSpinbox() { delete m_incrementStrategy; }
