@@ -153,8 +153,9 @@ void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 	int idx = chIdP->next();
 	GRIIOFloatChannelNode *griiofcn = dynamic_cast<GRIIOFloatChannelNode *>(node);
 	GRTimeSinkComponent *grtsc = dynamic_cast<GRTimeSinkComponent *>(m_dataProvider);
-	GRTimeChannelComponent *c = new GRTimeChannelComponent(
-		griiofcn, dynamic_cast<TimePlotComponent *>(m_plotComponentManager->plot(0)), grtsc, chIdP->pen(idx));
+	GRTimeChannelComponent *c =
+		new GRTimeChannelComponent(griiofcn, dynamic_cast<TimePlotComponent *>(m_plotComponentManager->plot(0)),
+					   grtsc, chIdP->pen(idx), m_ui->rightStack);
 	Q_ASSERT(grtsc);
 
 	m_plotComponentManager->addChannel(c);
