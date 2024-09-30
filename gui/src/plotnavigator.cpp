@@ -87,6 +87,7 @@ void PlotNavigator::initResetButton()
 	m_resetButton->setFlat(true);
 	StyleHelper::TransparentWidget(m_resetButton);
 	m_resetButton->setIcon(icon);
+	m_resetButton->hide();
 
 	connect(m_resetButton, &QPushButton::clicked, this, [=]() { Q_EMIT reset(); });
 	connect(this, &PlotNavigator::rectChanged, this, [=]() { m_resetButton->setVisible(isZoomed()); });
