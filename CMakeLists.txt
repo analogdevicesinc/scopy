@@ -235,6 +235,9 @@ foreach(child ${alldirs})
 	endif()
 endforeach()
 
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/plugins/resources/scopy_emu_options_config.json
+	DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH}/resources
+)
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/emu_xml DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH})
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/translations DESTINATION ${SCOPY_TRANSLATION_INSTALL_PATH})
 install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
