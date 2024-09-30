@@ -134,6 +134,7 @@ deploy_app(){
 	fi
 	cp -r $DAC_WAVEFORM_CSV $DEST_FOLDER/plugins
 	cp -r $EMU_XMLS $DEST_FOLDER/plugins
+	cp $BUILD_FOLDER/plugins/resources/scopy_emu_options_config.json $DEST_FOLDER/plugins/resources
 }
 
 extract_debug_symbols(){
