@@ -295,6 +295,7 @@ create_appdir(){
 	REGMAP_XMLS=$PLUGINS/regmap/xmls
 	DAC_WAVEFORM_CSV=$SRC_DIR/plugins/dac/res/csv
 	EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
+	EMU_CONFIG=$SRC_DIR/resources/scopy_emu_options_config.json
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
 	COPY_DEPS=$SRC_DIR/ci/armhf/copy-deps.sh
 
@@ -327,6 +328,8 @@ create_appdir(){
 
 	cp -r $DAC_WAVEFORM_CSV $APP_DIR/usr/lib/scopy/plugins
 	cp -r $EMU_XMLS $APP_DIR/usr/lib/scopy/plugins
+	mkdir -p $APP_DIR/usr/lib/scopy/plugins/resources
+	cp $EMU_CONFIG $APP_DIR/usr/lib/scopy/plugins/resources
 
 	$COPY_DEPS $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
 	$COPY_DEPS $APP_DIR/usr/bin/iio-emu $APP_DIR/usr/lib

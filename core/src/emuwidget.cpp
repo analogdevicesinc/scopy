@@ -273,16 +273,14 @@ void EmuWidget::configureOption(QString option)
 
 void EmuWidget::getJsonConfiguration()
 {
-	// Check the local folder first
-	QString currentPath = QCoreApplication::applicationDirPath() + "/plugins";
-	if(!QDir(currentPath).exists()) {
-		currentPath = config::defaultPluginFolderPath();
+	// Check the local file first
+	QString filePath = QCoreApplication::applicationDirPath() + "/resources/scopy_emu_options_config.json";
+	QFile file(filePath);
+	if(!file.exists()) {
+		filePath = config::defaultPluginFolderPath() + "/resources/scopy_emu_options_config.json";
+		file.setFileName(filePath);
 	}
-
-	QString filePath = currentPath + "/resources/scopy_emu_options_config.json";
-	QFile file;
-
-	file.setFileName(filePath);
+	qDebug(CAT_EMU_ADD_PAGE) << "Emu configuration file: " << filePath;
 
 	if(file.exists()) {
 		file.open(QIODevice::ReadOnly | QIODevice::Text);
