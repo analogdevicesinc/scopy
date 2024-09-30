@@ -42,6 +42,7 @@ bool DACPlugin::loadPage()
 	m_page = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_page);
 	m_page->setLayout(lay);
+	m_page->hide(); // This just adds empty space in the page for now
 	return true;
 }
 
