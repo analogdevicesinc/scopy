@@ -105,7 +105,7 @@ void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 	double max = tryParse(optionsList[2], &ok);
 	finalOk &= ok;
 
-	double currentNum = QString(currentData).toDouble(&ok);
+	double currentNum = tryParse(currentData, &ok);
 	finalOk &= ok;
 
 	if(!finalOk) {
