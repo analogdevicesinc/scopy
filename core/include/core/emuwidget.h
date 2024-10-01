@@ -59,6 +59,7 @@ private:
 	AnimationPushButton *m_enDemoBtn;
 
 	QString m_emuPath;
+	QString m_workingDir;
 	bool m_enableDemo;
 	QProcess *m_emuProcess;
 	QStringList m_availableOptions;
