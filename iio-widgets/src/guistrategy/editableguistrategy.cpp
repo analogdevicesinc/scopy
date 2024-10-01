@@ -22,9 +22,9 @@
 
 using namespace scopy;
 
-EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isCompact, QObject *parent)
+EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget *parent)
 	: QObject(parent)
-	, m_ui(new QWidget(nullptr))
+	, m_ui(new QWidget(parent))
 	, m_lineEdit(new MenuLineEdit(m_ui))
 {
 	m_recipe = recipe;

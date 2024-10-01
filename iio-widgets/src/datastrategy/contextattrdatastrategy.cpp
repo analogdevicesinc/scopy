@@ -49,7 +49,7 @@ void ContextAttrDataStrategy::writeAsync(QString data)
 	int res = write(data);
 	// The status needs to be emitted in order to keep the iio-widget from getting stuck in
 	// the "Busy" state
-	Q_EMIT emitStatus(QDateTime::currentDateTime(), m_data, data, 0, false);
+	Q_EMIT emitStatus(QDateTime::currentDateTime(), m_data, data, res, false);
 	readAsync();
 }
 
