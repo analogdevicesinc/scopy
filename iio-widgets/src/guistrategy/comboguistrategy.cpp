@@ -23,9 +23,9 @@
 
 using namespace scopy;
 
-ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QObject *parent)
+ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget *parent)
 	: QObject(parent)
-	, m_ui(new QWidget(nullptr))
+	, m_ui(new QWidget(parent))
 	, m_isCompact(isCompact)
 {
 	m_recipe = recipe;

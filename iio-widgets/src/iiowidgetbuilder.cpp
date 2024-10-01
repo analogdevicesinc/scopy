@@ -350,7 +350,7 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 		if(!m_optionsAttribute.isEmpty()) {
 			// read values from iio and interpret them
 			char buffer[ATTR_BUFFER_SIZE] = {0};
-			ssize_t res;
+			ssize_t res = -1;
 			if(m_channel) {
 				res = iio_channel_attr_read(m_channel, m_optionsAttribute.toStdString().c_str(), buffer,
 							    ATTR_BUFFER_SIZE);
