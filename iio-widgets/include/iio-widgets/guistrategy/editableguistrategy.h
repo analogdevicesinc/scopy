@@ -35,9 +35,10 @@ class SCOPY_IIO_WIDGETS_EXPORT EditableGuiStrategy : public QObject, public GuiS
 	Q_INTERFACES(scopy::GuiStrategyInterface)
 public:
 	/**
-	 * @brief This contain a MenuLineEdit with no validation on what the text can or cannot be set.
+	 * @brief This contain a MenuLineEdit with no validation on what the text can or cannot be set. The
+	 * parent of this QObject will be the parent of the ui() QWidget.
 	 * */
-	explicit EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QObject *parent = nullptr);
+	explicit EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QWidget *parent = nullptr);
 	~EditableGuiStrategy();
 
 	/**
