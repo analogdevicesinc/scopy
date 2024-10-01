@@ -26,17 +26,10 @@ export DEST_FOLDER=$ARTIFACT_FOLDER/scopy-$ARCH # the export is needed for the p
 DEBUG_FOLDER=$ARTIFACT_FOLDER/debug-$ARCH
 PYTHON_FILES=$STAGING_DIR/lib/python3.*
 EMU_BUILD_FOLDER=$WORKDIR/iio-emu/build
-REGMAP_XMLS=$BUILD_FOLDER/plugins/plugins/regmap/xmls
+REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
 DAC_WAVEFORM_CSV=$SRC_FOLDER/plugins/dac/res/csv
 EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
 EMU_CONFIG=$SRC_FOLDER/resources/scopy_emu_options_config.json
-
-# Generate build status info for the about page
-
-# to be added back later
-# cp $BUILD_STATUS_FILE $SRC_FOLDER/build-status
-
-pacman -Qe >> $SRC_FOLDER/build-status
 
 download_tools() {
 	mkdir -p $STAGING_AREA
