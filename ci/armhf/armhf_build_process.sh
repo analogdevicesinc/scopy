@@ -292,7 +292,7 @@ create_appdir(){
 	EMU_BUILD_FOLDER=$STAGING_AREA/iio-emu/build
 	PLUGINS=$BUILD_FOLDER/plugins/plugins
 	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 1 -type f -name "libscopy*")
-	REGMAP_XMLS=$PLUGINS/regmap/xmls
+	REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
 	DAC_WAVEFORM_CSV=$SRC_DIR/plugins/dac/res/csv
 	EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
 	EMU_CONFIG=$SRC_DIR/resources/scopy_emu_options_config.json
