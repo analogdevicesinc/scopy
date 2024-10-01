@@ -25,9 +25,9 @@ using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_ATTR_GUI_STRATEGY, "AttrGuiStrategy")
 
-RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QObject *parent)
+RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget *parent)
 	: QObject(parent)
-	, m_ui(new QWidget(nullptr))
+	, m_ui(new QWidget(parent))
 {
 	m_recipe = recipe;
 	if(!isValid()) {

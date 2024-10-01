@@ -37,7 +37,7 @@ public:
 	/**
 	 * @brief This contain a MenuComboWidget that takes the options for the combo from recipe->linkedAttributeValue.
 	 * */
-	explicit ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QObject *parent = nullptr);
+	explicit ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QWidget *parent = nullptr);
 	~ComboAttrUi();
 
 	/**
