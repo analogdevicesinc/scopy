@@ -21,6 +21,7 @@ EmuWidget::EmuWidget(QWidget *parent)
 	: QWidget(parent)
 	, m_enableDemo(false)
 	, m_emuProcess(nullptr)
+	, m_workingDir("")
 {
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	layout->setSpacing(10);
@@ -160,8 +161,14 @@ QStringList EmuWidget::createArgList()
 	arguments.append(m_emuType);
 
 	if(option.compare("adalm2000") != 0) {
-		arguments.append(m_xmlPathEdit->edit()->text());
+		auto xmlFullPath = m_xmlPathEdit->edit()->text();
+		QFileInfo f(xmlFullPath);
+		m_workingDir = f.absoluteDir().path();
+
+		arguments.append(f.fileName());
 		arguments.append(m_rxTxDevEdit->edit()->text());
+	} else {
+		m_workingDir = "";
 	}
 
 	return arguments;
@@ -191,6 +198,7 @@ void EmuWidget::stopEnableBtn(QString btnText)
 bool EmuWidget::startIioEmuProcess(QString processPath, QStringList arg)
 {
 	m_emuProcess->setProgram(processPath);
+	m_emuProcess->setWorkingDirectory(m_workingDir);
 	m_emuProcess->setArguments(arg);
 	m_emuProcess->start();
 
