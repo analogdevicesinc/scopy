@@ -15,6 +15,8 @@ cp -R $STAGING_AREA/libad9361/build/ad9361.framework Scopy.app/Contents/Framewor
 cp -R $BUILDDIR/plugins/emu_xml Scopy.app/Contents/MacOS/plugins
 mkdir -p Scopy.app/Contents/MacOS/plugins/resources
 cp $REPO_SRC/resources/scopy_emu_options_config.json Scopy.app/Contents/MacOS/plugins/resources/
+cp -R $BUILDDIR/translations Scopy.app/Contents/MacOS
+cp -R $BUILDDIR/plugins/regmap/xmls Scopy.app/Contents/MacOS/plugins
 
 libqwtpath=${STAGING_AREA_DEPS}/lib/libqwt.6.4.0.dylib #hardcoded
 libqwtid="$(otool -D ${libqwtpath} | tail -1)"
