@@ -2,8 +2,8 @@
 #define MENUSPINBOX_H
 
 #include "plot_utils.hpp"
-#include "qboxlayout.h"
 #include "utils.h"
+#include "mousewheelwidgetguard.h"
 #include <cmath>
 #include <scopy-gui_export.h>
 #include <QWidget>
@@ -11,6 +11,7 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QLabel>
+#include <QBoxLayout>
 
 namespace scopy {
 namespace gui {
@@ -167,6 +168,7 @@ private:
 	QPushButton *m_plus;
 	QPushButton *m_minus;
 	QFrame *m_line; // underline
+	MouseWheelWidgetGuard *m_mouseWheelGuard;
 
 	IncrementStrategy *m_incrementStrategy;
 	IncrementMode m_im;
