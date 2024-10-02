@@ -14,6 +14,7 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	m_scaleCb = new QComboBox(parent);
 	m_plus = new QPushButton("+", parent);
 	m_minus = new QPushButton("-", parent);
+	m_mouseWheelGuard = new MouseWheelWidgetGuard(this);
 
 	m_plus->setAutoRepeat(true);
 	m_plus->setAutoRepeatDelay(300);
@@ -59,6 +60,7 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	setValue(val);
 	m_scalingEnabled = true;
 	setLineVisible(false);
+	m_mouseWheelGuard->installEventRecursively(this);
 }
 
 MenuSpinbox::~MenuSpinbox() { delete m_incrementStrategy; }
