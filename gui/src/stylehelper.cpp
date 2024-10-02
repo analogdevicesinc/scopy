@@ -1511,7 +1511,7 @@ void StyleHelper::TableWidgetDebugger(QTableWidget *w, QString objectName)
 void StyleHelper::SplitterStyle(QSplitter *w, QString objectName)
 {
 	if(!objectName.isEmpty()) {
-		w->setStyleSheet(objectName);
+		w->setObjectName(objectName);
 	}
 
 	QString style = QString(R"css(
@@ -1528,7 +1528,7 @@ void StyleHelper::SplitterStyle(QSplitter *w, QString objectName)
 void StyleHelper::TreeViewDebugger(QTreeView *w, QString objectName)
 {
 	if(!objectName.isEmpty()) {
-		w->setStyleSheet(objectName);
+		w->setObjectName(objectName);
 	}
 
 	QString style = R"css(
