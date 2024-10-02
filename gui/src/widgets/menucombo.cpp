@@ -31,6 +31,7 @@ MenuCombo::MenuCombo(QString title, QWidget *parent)
 	: QWidget(parent)
 {
 	auto lay = new QVBoxLayout(this);
+	m_mouseWheelGuard = new MouseWheelWidgetGuard(this);
 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	setLayout(lay);
@@ -43,6 +44,7 @@ MenuCombo::MenuCombo(QString title, QWidget *parent)
 	lay->addWidget(m_label);
 	lay->addWidget(m_combo);
 	applyStylesheet();
+	m_mouseWheelGuard->installEventRecursively(this);
 }
 
 MenuCombo::~MenuCombo() {}
