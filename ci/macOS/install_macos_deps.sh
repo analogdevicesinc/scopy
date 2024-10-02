@@ -4,7 +4,7 @@ set -ex
 REPO_SRC=$(git rev-parse --show-toplevel)
 source $REPO_SRC/ci/macOS/macos_config.sh
 
-PACKAGES=" ${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog "
+PACKAGES="${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libzip glib libusb glog "
 PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libserialport libsndfile"
 
 OS_VERSION=${1:-$(sw_vers -productVersion)}
@@ -26,6 +26,9 @@ install_packages() {
 	# Check if macOS version and upgrade packages only if the version is greater than macOS 12
 	if (( $(echo "$(sw_vers -productVersion) > 13.0" | bc -l) )); then
 		brew upgrade --display-times || true #ignore homebrew upgrade errors
+		# Workaround: Install or update libtool package only if macOS version is greater than 12
+		# Note: libtool (v2.4.7) is pre-installed by default, but it can be updated to v2.5.3
+		PACKAGES="$PACKAGES libtool"
 		brew install --display-times $PACKAGES
 	else
 		HOMEBREW_NO_AUTO_UPDATE=1 brew install --display-times $PACKAGES
