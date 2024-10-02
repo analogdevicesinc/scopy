@@ -8,6 +8,7 @@
 
 #include <scopy-gui_export.h>
 #include <utils.h>
+#include <mousewheelwidgetguard.h>
 
 namespace scopy {
 
@@ -25,6 +26,7 @@ public:
 private:
 	QLabel *m_label;
 	QComboBox *m_combo;
+	MouseWheelWidgetGuard *m_mouseWheelGuard;
 };
 
 class SCOPY_GUI_EXPORT MenuComboWidget : public QWidget
