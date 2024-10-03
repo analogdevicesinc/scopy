@@ -22,13 +22,14 @@ DeviceIconImpl::DeviceIconImpl(Device *d, QWidget *parent)
 	ui->iconPlaceHolder->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	setStyleSheet("QWidget { background-color: transparent; }");
 	Style::setStyle(this, style::properties::widget::deviceIcon, true, true);
+	Style::setStyle(ui->line, style::properties::widget::deviceLine, false, true);
 
 	setCheckable(true);
 }
 
 void DeviceIconImpl::setConnected(bool val)
 {
-	setDynamicProperty(ui->line, "connected", val);
+	Style::setStyle(ui->line, style::properties::widget::deviceLine, val);
 	//	ensurePolished();
 }
 

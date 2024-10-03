@@ -118,7 +118,7 @@ QPixmap Style::getPixmap(QString pixmap, QColor color)
 {
 	if(color.isValid())
 		return Util::ChangeSVGColor(pixmap, color.name(), 1);
-	return Util::ChangeSVGColor(pixmap, getAttribute(json::theme::content_default), 1);
+	return Util::ChangeSVGColor(pixmap, getAttribute(json::theme::pixmap_color), 1);
 }
 
 QString Style::getColorTransparent(const char *key, double transparency)

@@ -739,10 +739,12 @@ void StyleHelper::TabWidgetEastMenu(QTabWidget *w, QString objectName)
 		w->setObjectName(objectName);
 	w->setTabPosition(QTabWidget::TabPosition::East);
 	QString style = QString(R"css(
-		QTabWidget::tab-bar { left: 0; }
+		QTabWidget::tab-bar { left: 0;}
 		QTabWidget::pane { border-top: 0px; }
-		QTabBar { qproperty-drawBase: 0; }
+		QTabBar { qproperty-drawBase: 0;
+			background: &&background_primary&&; }
 		QTabBar::tab {
+			background: &&background_primary&&;
 		 min-width: 150px;
 		 height: 40px;
 		 padding-bottom: 5px;
@@ -757,10 +759,10 @@ void StyleHelper::TabWidgetEastMenu(QTabWidget *w, QString objectName)
 		 border-bottom: 2px solid &&content_default&&;
 		}
 		QTabBar::scroller {
-		 width: 25px;
+			width: 25px;
 		}
 		)css");
-	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
+	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
 	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
 	style.replace("&&interactive_primary_idle&&", StyleHelper::getColor("interactive_primary_idle"));
 	w->tabBar()->setStyleSheet(style);
@@ -1321,9 +1323,9 @@ void StyleHelper::GrayButton(QPushButton *btn, QString objectName)
 
 	QString style = QString(R"css(
 		QPushButton {
-			border: 1px solid &&content_silent&&;
-			border-radius: 0px;
-			background-color: &&content_inverse&&;
+			border: 1px solid &&interactive_subtle_idle&&;
+			border-radius: 4px;
+			background-color: &&background_primary&&;
 
 			color: &&content_default&&;
 			font-weight: 600;
@@ -1343,9 +1345,9 @@ void StyleHelper::GrayButton(QPushButton *btn, QString objectName)
 		}
 	)css");
 
+	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
 	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
 	style.replace("&&content_silent&&", StyleHelper::getColor("content_silent"));
-	style.replace("&&content_inverse&&", StyleHelper::getColor("content_inverse"));
 	style.replace("&&interactive_subtle_idle&&", StyleHelper::getColor("interactive_subtle_idle"));
 	btn->setStyleSheet(style);
 }

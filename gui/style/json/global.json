@@ -10,6 +10,7 @@
 "padding_1": "6",
 "padding_2": "12",
 "border_width": "1",
+"border_width_editable": "1",
 "ch0": "#3A8EE9",
 "ch1": "#B16EE0",
 "ch2": "#2E9E6F",
