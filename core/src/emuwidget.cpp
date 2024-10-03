@@ -282,7 +282,7 @@ void EmuWidget::configureOption(QString option)
 void EmuWidget::getJsonConfiguration()
 {
 	// Check the local file first
-	QString filePath = QCoreApplication::applicationDirPath() + "/resources/scopy_emu_options_config.json";
+	QString filePath = QCoreApplication::applicationDirPath() + "/plugins/resources/scopy_emu_options_config.json";
 	QFile file(filePath);
 	if(!file.exists()) {
 		filePath = config::defaultPluginFolderPath() + "/resources/scopy_emu_options_config.json";
