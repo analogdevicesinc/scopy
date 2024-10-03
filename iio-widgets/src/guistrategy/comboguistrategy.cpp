@@ -34,26 +34,26 @@ ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 		m_ui->setLayout(new QHBoxLayout(m_ui));
 		m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
-		auto label = new QLabel(recipe.data, m_ui);
-		StyleHelper::IIOCompactLabel(label, "IIOTitleLabel");
+		m_compactLabel = new QLabel(recipe.data, m_ui);
+		StyleHelper::IIOCompactLabel(m_compactLabel, "IIOTitleLabel");
 		m_comboWidget = new QComboBox(m_ui);
 		m_comboWidget->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
 
 		StyleHelper::IIOComboBox(m_comboWidget, "IIOComboBox");
 		m_comboWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-		m_ui->layout()->addWidget(label);
+		m_ui->layout()->addWidget(m_compactLabel);
 		m_ui->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
 		m_ui->layout()->addWidget(m_comboWidget);
 	} else {
 		m_ui->setLayout(new QVBoxLayout(m_ui));
 		m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
-		auto comboMenuWidget = new MenuCombo(recipe.data, m_ui);
-		m_comboWidget = comboMenuWidget->combo();
+		m_menuCombo = new MenuCombo(recipe.data, m_ui);
+		m_comboWidget = m_menuCombo->combo();
 		StyleHelper::IIOComboBox(m_comboWidget, "IIOComboBox");
 
-		m_ui->layout()->addWidget(comboMenuWidget);
+		m_ui->layout()->addWidget(m_menuCombo);
 	}
 
 	connect(m_comboWidget, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
@@ -95,6 +95,15 @@ void ComboAttrUi::receiveData(QString currentData, QString optionalData)
 
 	m_comboWidget->setCurrentText(currentData);
 	Q_EMIT displayedNewData(currentData, optionalData);
+}
+
+void ComboAttrUi::changeName(QString name)
+{
+	if(m_isCompact) {
+		m_compactLabel->setText(name);
+	} else {
+		m_menuCombo->label()->setText(name);
+	}
 }
 
 #include "moc_comboguistrategy.cpp"

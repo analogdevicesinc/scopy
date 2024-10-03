@@ -22,11 +22,14 @@
 #define SCOPY_IIOWIDGET_H
 
 #include <QWidget>
+#include "iioconfigurationpopup.h"
 #include "iiowidgetdata.h"
 #include "utils.h"
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/smallprogressbar.h>
+#include <gui/widgets/hoverwidget.h>
+#include <gui/widgets/popupwidget.h>
 #include "guistrategy/guistrategyinterface.h"
 #include "datastrategy/datastrategyinterface.h"
 #include "scopy-iio-widgets_export.h"
@@ -82,16 +85,11 @@ public:
 	void writeAsync(QString data);
 
 	/**
-	 * @brief Returns the UI of the IIOWidget
-	 * @return GuiStrategyInterface
-	 * */
-	GuiStrategyInterface *getUiStrategy();
-
-	/**
-	 * @brief Returns the data save/load strategy
-	 * @return DataStretegyInterface
-	 * */
-	DataStrategyInterface *getDataStrategy();
+	 * @brief swapDataStrategy Disconnects the current Data Strategy and connects the new Data Strategy.
+	 * @param dataStrategy The new Data Strategy that will be connected to the UIC.
+	 * @return The old Data Strategy.
+	 */
+	DataStrategyInterface *swapDataStrategy(DataStrategyInterface *dataStrategy);
 
 	/**
 	 * @brief Returns the recipe that this widget is based on. This is optional, currently serves as a way to pass
@@ -126,8 +124,66 @@ public:
 	 */
 	int lastReturnCode();
 
+	/**
+	 * @brief setUItoDataConversion Adds a function that is called before sending the data given as imput by the
+	 * user and modifies this data. The function receives as parameter a QString, converts it and returns the
+	 * converted string that will be sent to the DS after.
+	 * @param func std::function<QString(QString)>
+	 */
 	void setUItoDataConversion(std::function<QString(QString)> func);
+
+	/**
+	 * @brief setDataToUIConversion Adds a function that is called before sending the data read by the IIOWidget
+	 * and modifies this data. The function receives as parameter a QString, converts it and returns the
+	 * converted string that will be sent to the UI after.
+	 * @param func std::function<QString(QString)>
+	 */
 	void setDataToUIConversion(std::function<QString(QString)> func);
+
+	/**
+	 * @brief setConfigurable A configurable widget will have a wheel button on the right and it will allow the
+	 * use to modify the underlying data strategy at runtime.
+	 * @param isConfigurable If true, the widget is configurable at runtime. The default is false.
+	 */
+	void setConfigurable(bool isConfigurable);
+
+	/**
+	 * @brief setUIEnabled Enables/Disables the UI.
+	 * @param isEnabled True if the UI should be enabled, false if it should be disabled.
+	 */
+	void setUIEnabled(bool isEnabled);
+
+	/**
+	 * @brief optionalData Calls the optionalData function from the data strategy.
+	 * @return QString representing the optional data.
+	 */
+	QString optionalData() const;
+
+	/**
+	 * @brief data Calls the data functipm from the data strategy.
+	 * @return QString represrnting the data.
+	 */
+	QString data() const;
+
+	/**
+	 * @brief isDSInstanceOf Checks whether the current data strategy is an instance of the specified type.
+	 * @return True if the type specified coincides with the type of the data strategy.
+	 */
+	template <typename T>
+	bool isDSInstanceOf() const
+	{
+		return dynamic_cast<T *>(m_dataStrategy) != nullptr;
+	}
+
+	/**
+	 * @brief isUISInstanceO Checks wheter the current UI strategy is an instance of the specified type.
+	 * @return True if the type specified coincides with the type of the UI strategy.
+	 */
+	template <typename T>
+	bool isUISInstanceOf() const
+	{
+		return dynamic_cast<T *>(m_uiStrategy) != nullptr;
+	}
 
 Q_SIGNALS:
 	/**
@@ -135,6 +191,49 @@ Q_SIGNALS:
 	 * elaborate explanation of the current state
 	 * */
 	void currentStateChanged(State currentState, QString explanation = "");
+
+	/**
+	 * @brief sendData Forwards the sendData signal from the Data Strategy (emits the newly read data).
+	 * @param data The data read.
+	 * @param dataOptions The data from the optional attribute read.
+	 */
+	void sendData(QString data, QString dataOptions);
+
+	/**
+	 * @brief emitStatus Forwarded signal from the Data Strategy for emitting the status of
+	 * the operation that was just performed.
+	 * @param timestamp QDateTime that holds the timestamp
+	 * @param oldData The data that is present in the iio-widget before the operation
+	 * @param newData The new data that was given to the operation
+	 * @param returnCode int representing the return code of that operation
+	 * @param isReadOp Boolean value set to true if the operation is a read
+	 * operation and false if it is a write operation.
+	 */
+	void emitStatus(QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp);
+
+	/**
+	 * @brief This signal is emitted before a write operation
+	 * @param oldData String containing the data what is present before the write
+	 * @param newData String containing the data that will be written
+	 * */
+	void aboutToWrite(QString oldData, QString newData);
+
+	/**
+	 * @brief This will be the signal that the user changed the data, it is forwarded from the UI strategy.
+	 * */
+	void emitData(QString data);
+
+	/**
+	 * @brief This signal is emitted when the ui strategy receives new data from external sources,
+	 * not from the user.
+	 * @param data The data that will be displayed.
+	 * @param optionalData The data options, if available. Empty string if the parameter is not
+	 * necessary in this case.
+	 * */
+	void displayedNewData(QString data, QString optionalData);
+
+public Q_SLOTS:
+	void changeTitle(QString title);
 
 protected Q_SLOTS:
 	void saveData(QString data);
@@ -148,14 +247,17 @@ protected Q_SLOTS:
 
 protected:
 	void initialize();
+	void reconfigure();
 
 	void setLastOperationTimestamp(QDateTime timestamp);
 	void setLastOperationState(IIOWidget::State state);
 
+	/* Core variables */
 	GuiStrategyInterface *m_uiStrategy;
 	DataStrategyInterface *m_dataStrategy;
 	IIOWidgetFactoryRecipe m_recipe;
 
+	/* Logged data */
 	QString m_lastData;
 	SmallProgressBar *m_progressBar;
 	QDateTime *m_lastOpTimestamp;
@@ -165,6 +267,11 @@ protected:
 	/* Conversion functions */
 	std::function<QString(QString)> m_UItoDS;
 	std::function<QString(QString)> m_DStoUI;
+
+	/* Optional configuration */
+	QPushButton *m_configBtn;
+	IIOConfigurationPopup *m_configPopup;
+	bool m_isConfigurable;
 };
 } // namespace scopy
 

@@ -19,8 +19,17 @@
  */
 
 #include "iiowidget.h"
-#include <QDateTime>
+#include "datastrategy/channelattrdatastrategy.h"
+#include "datastrategy/contextattrdatastrategy.h"
+#include "datastrategy/deviceattrdatastrategy.h"
+#include "datastrategy/emptydatastrategy.h"
+
+#include <iioutil/connectionprovider.h>
 #include <pluginbase/preferences.h>
+#include <gui/utils.h>
+
+#include <QDateTime>
+#include <QApplication>
 
 using namespace scopy;
 
@@ -31,21 +40,35 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 	, m_uiStrategy(uiStrategy)
 	, m_dataStrategy(dataStrategy)
 	, m_progressBar(new SmallProgressBar(this))
+	, m_configBtn(new QPushButton(this))
 	, m_lastOpTimestamp(nullptr)
 	, m_lastOpState(nullptr)
 	, m_lastReturnCode(0)
 	, m_UItoDS(nullptr)
 	, m_DStoUI(nullptr)
+	, m_isConfigurable(false)
 {
+	// Config button
+	m_configBtn->setStyleSheet("border-image: url(\":/gui/icons/scopy-default/icons/gear_wheel.svg\");");
+	m_configBtn->setVisible(m_isConfigurable);
+
+	// General layout
 	setLayout(new QVBoxLayout(this));
 	layout()->setContentsMargins(0, 0, 0, 0);
 	layout()->setSpacing(0);
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
+	QWidget *topWidget = new QWidget(this);
+	topWidget->setLayout(new QHBoxLayout(topWidget));
+	topWidget->layout()->setContentsMargins(0, 0, 0, 0);
+
 	QWidget *ui = m_uiStrategy->ui();
 	if(ui) {
-		layout()->addWidget(ui);
+		topWidget->layout()->addWidget(ui);
 	}
+	topWidget->layout()->addWidget(m_configBtn);
+
+	layout()->addWidget(topWidget);
 	layout()->addWidget(m_progressBar);
 
 	QObject *uiStrategyObject = dynamic_cast<QObject *>(m_uiStrategy);
@@ -56,23 +79,31 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 
 	connect(m_progressBar, &SmallProgressBar::progressFinished, this,
 		[this]() { this->convertUItoDS(m_lastData); });
+	connect(m_configBtn, &QPushButton::clicked, this, &IIOWidget::reconfigure);
 
 	connect(uiStrategyObject, SIGNAL(emitData(QString)), this, SLOT(startTimer(QString)));
+	connect(uiStrategyObject, SIGNAL(emitData(QString)), this, SIGNAL(emitData(QString)));
+	connect(uiStrategyObject, SIGNAL(displayedNewData(QString, QString)), this,
+		SIGNAL(displayedNewData(QString, QString)));
 
 	connect(dataStrategyObject, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
 		SLOT(emitDataStatus(QDateTime, QString, QString, int, bool)));
 
 	// forward data request from ui strategy to data strategy
 	connect(uiStrategyObject, SIGNAL(requestData()), dataStrategyObject, SLOT(readAsync()));
+	connect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this, SIGNAL(sendData(QString, QString)));
+	connect(dataStrategyObject, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
+		SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)));
 
 	// forward data from data strategy to ui strategy
 	connect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this, SLOT(convertDStoUI(QString, QString)));
+	connect(dataStrategyObject, SIGNAL(aboutToWrite(QString, QString)), this,
+		SIGNAL(aboutToWrite(QString, QString)));
 
 	// intercept the sendData from dataStrategy to collect information
 	connect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this, SLOT(storeReadInfo(QString, QString)));
 
-	// The data will be populated here
-	bool useLazyLoading = Preferences::GetInstance()->get("iiowidgets_use_lazy_loading").toBool();
+	bool useLazyLoading = Preferences::get("iiowidgets_use_lazy_loading").toBool();
 	if(!useLazyLoading) { // force skip lazy load
 		LAZY_LOAD(initialize);
 	}
@@ -86,6 +117,51 @@ void IIOWidget::readAsync() { m_dataStrategy->readAsync(); }
 
 void IIOWidget::writeAsync(QString data) { m_dataStrategy->writeAsync(data); }
 
+DataStrategyInterface *IIOWidget::swapDataStrategy(DataStrategyInterface *dataStrategy)
+{
+	QObject *dataStrategyObject = dynamic_cast<QObject *>(m_dataStrategy);
+	QObject *uiStrategyObject = dynamic_cast<QObject *>(m_uiStrategy);
+	QObject *newDataStrategyObject = dynamic_cast<QObject *>(dataStrategy);
+
+	// disconnect old data strategy
+	disconnect(dataStrategyObject, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
+		   SLOT(emitDataStatus(QDateTime, QString, QString, int, bool)));
+	disconnect(uiStrategyObject, SIGNAL(requestData()), dataStrategyObject, SLOT(readAsync()));
+	disconnect(dataStrategyObject, SIGNAL(sendData(QString, QString)), uiStrategyObject,
+		   SLOT(receiveData(QString, QString)));
+	disconnect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this,
+		   SLOT(storeReadInfo(QString, QString))); // TODO: maybe do something with this slot..
+	disconnect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this, SIGNAL(sendData(QString, QString)));
+	disconnect(dataStrategyObject, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
+		   SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)));
+	disconnect(dataStrategyObject, SIGNAL(aboutToWrite(QString, QString)), this,
+		   SIGNAL(aboutToWrite(QString, QString)));
+	disconnect(uiStrategyObject, SIGNAL(emitData(QString)), this, SIGNAL(emitData(QString)));
+	disconnect(uiStrategyObject, SIGNAL(displayedNewData(QString, QString)), this,
+		   SIGNAL(displayedNewData(QString, QString)));
+
+	// connect new data strategy
+	connect(newDataStrategyObject, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
+		SLOT(emitDataStatus(QDateTime, QString, QString, int, bool)));
+	connect(uiStrategyObject, SIGNAL(requestData()), newDataStrategyObject, SLOT(readAsync()));
+	connect(newDataStrategyObject, SIGNAL(sendData(QString, QString)), uiStrategyObject,
+		SLOT(receiveData(QString, QString)));
+	connect(newDataStrategyObject, SIGNAL(sendData(QString, QString)), this, SLOT(storeReadInfo(QString, QString)));
+	connect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this, SLOT(convertDStoUI(QString, QString)));
+	connect(dataStrategyObject, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
+		SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)));
+	connect(dataStrategyObject, SIGNAL(aboutToWrite(QString, QString)), this,
+		SIGNAL(aboutToWrite(QString, QString)));
+	connect(uiStrategyObject, SIGNAL(emitData(QString)), this, SIGNAL(emitData(QString)));
+	connect(uiStrategyObject, SIGNAL(displayedNewData(QString, QString)), this,
+		SIGNAL(displayedNewData(QString, QString)));
+
+	// save the new data strategy and return the old one
+	DataStrategyInterface *oldDS = m_dataStrategy;
+	m_dataStrategy = dataStrategy;
+	return oldDS;
+}
+
 void IIOWidget::saveData(QString data)
 {
 	setLastOperationState(IIOWidget::Busy);
@@ -96,6 +172,8 @@ void IIOWidget::saveData(QString data)
 	qDebug(CAT_IIOWIDGET) << "Sending data" << data << "to data strategy.";
 	m_dataStrategy->writeAsync(data);
 }
+
+void IIOWidget::changeTitle(QString title) { m_uiStrategy->changeName(title); }
 
 void IIOWidget::emitDataStatus(QDateTime timestamp, QString oldData, QString newData, int status, bool isReadOp)
 {
@@ -133,10 +211,6 @@ void IIOWidget::emitDataStatus(QDateTime timestamp, QString oldData, QString new
 	timer->start(4000);
 }
 
-GuiStrategyInterface *IIOWidget::getUiStrategy() { return m_uiStrategy; }
-
-DataStrategyInterface *IIOWidget::getDataStrategy() { return m_dataStrategy; }
-
 IIOWidgetFactoryRecipe IIOWidget::getRecipe() { return m_recipe; }
 
 void IIOWidget::setRecipe(IIOWidgetFactoryRecipe recipe) { m_recipe = recipe; }
@@ -150,6 +224,18 @@ int IIOWidget::lastReturnCode() { return m_lastReturnCode; }
 void IIOWidget::setUItoDataConversion(std::function<QString(QString)> func) { m_UItoDS = func; }
 
 void IIOWidget::setDataToUIConversion(std::function<QString(QString)> func) { m_DStoUI = func; }
+
+void IIOWidget::setConfigurable(bool isConfigurable)
+{
+	m_isConfigurable = isConfigurable;
+	m_configBtn->setVisible(m_isConfigurable);
+}
+
+void IIOWidget::setUIEnabled(bool isEnabled) { m_uiStrategy->ui()->setEnabled(isEnabled); }
+
+QString IIOWidget::optionalData() const { return m_dataStrategy->optionalData(); }
+
+QString IIOWidget::data() const { return m_dataStrategy->data(); }
 
 void IIOWidget::startTimer(QString data)
 {
@@ -183,6 +269,57 @@ void IIOWidget::convertDStoUI(QString data, QString optionalData)
 }
 
 void IIOWidget::initialize() { m_dataStrategy->readAsync(); }
+
+void IIOWidget::reconfigure()
+{
+	// display the popup and switch the DS
+	if(m_recipe.context) {
+		m_configPopup = new IIOConfigurationPopup(m_recipe.context, qApp->activeWindow());
+	} else if(m_recipe.device) {
+		m_configPopup = new IIOConfigurationPopup(m_recipe.device, qApp->activeWindow());
+	} else if(m_recipe.channel) {
+		m_configPopup = new IIOConfigurationPopup(m_recipe.channel, qApp->activeWindow());
+	} else {
+		qCritical(CAT_IIOWIDGET) << "No available context/device/channel";
+	}
+
+	connect(m_configPopup, &IIOConfigurationPopup::exitButtonClicked, this,
+		[&]() { m_configPopup->deleteLater(); });
+	connect(m_configPopup, &IIOConfigurationPopup::emptyButtonClicked, this, [&]() {
+		DataStrategyInterface *ds = new EmptyDataStrategy(this);
+		DataStrategyInterface *oldDS = swapDataStrategy(ds);
+		delete oldDS;
+		delete m_configPopup;
+		m_uiStrategy->changeName("Empty");
+	});
+	connect(m_configPopup, &IIOConfigurationPopup::selectButtonClicked, this, [&](IIOItem *item) {
+		DataStrategyInterface *dsCreated = nullptr;
+		switch(item->type()) {
+		case IIOItem::CHANNEL_ATTR:
+			dsCreated = new ChannelAttrDataStrategy({.channel = item->chnl(), .data = item->name()}, this);
+			break;
+		case IIOItem::DEVICE_ATTR:
+			dsCreated = new DeviceAttrDataStrategy({.device = item->dev(), .data = item->name()}, this);
+			break;
+		case IIOItem::CONTEXT_ATTR:
+			dsCreated = new ContextAttrDataStrategy({.context = item->ctx(), .data = item->name()}, this);
+		default:
+			break;
+		}
+
+		if(!dsCreated) {
+			qWarning(CAT_IIOWIDGET) << "Could not create a new data strategy.";
+			return;
+		}
+
+		m_uiStrategy->changeName(item->name().toUpper());
+		DataStrategyInterface *oldDS = swapDataStrategy(dsCreated);
+		dsCreated->readAsync();
+		delete oldDS;
+		delete m_configPopup;
+	});
+	m_configPopup->enableTintedOverlay(true);
+}
 
 void IIOWidget::setLastOperationTimestamp(QDateTime timestamp)
 {

@@ -48,6 +48,8 @@ MenuCombo::MenuCombo(QString title, QWidget *parent)
 }
 
 MenuCombo::~MenuCombo() {}
+
+QLabel *MenuCombo::label() { return m_label; }
 QComboBox *MenuCombo::combo() { return m_combo; }
 
 void MenuCombo::applyStylesheet()

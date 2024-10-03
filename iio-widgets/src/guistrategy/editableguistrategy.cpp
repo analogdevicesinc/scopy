@@ -28,20 +28,20 @@ EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isC
 	, m_lineEdit(new MenuLineEdit(m_ui))
 {
 	m_recipe = recipe;
-	QLabel *label = new QLabel(recipe.data, m_ui);
+	m_titleLabel = new QLabel(recipe.data, m_ui);
 
 	if(isCompact) {
 		m_ui->setLayout(new QHBoxLayout(m_ui));
-		StyleHelper::IIOCompactLabel(label, "TitleLabel");
+		StyleHelper::IIOCompactLabel(m_titleLabel, "TitleLabel");
 		m_lineEdit->edit()->setAlignment(Qt::AlignRight);
 	} else {
 		m_ui->setLayout(new QVBoxLayout(m_ui));
-		StyleHelper::MenuSmallLabel(label, "MenuSmallLabel");
+		StyleHelper::MenuSmallLabel(m_titleLabel, "MenuSmallLabel");
 	}
 
 	StyleHelper::IIOLineEdit(m_lineEdit->edit(), "IIOLineEdit");
 	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
-	m_ui->layout()->addWidget(label);
+	m_ui->layout()->addWidget(m_titleLabel);
 	m_ui->layout()->addWidget(m_lineEdit);
 
 	connect(m_lineEdit->edit(), &QLineEdit::editingFinished, this, [this]() {
@@ -74,5 +74,7 @@ void EditableGuiStrategy::receiveData(QString currentData, QString optionalData)
 	m_lineEdit->edit()->setText(currentData);
 	Q_EMIT displayedNewData(currentData, optionalData);
 }
+
+void EditableGuiStrategy::changeName(QString name) { m_titleLabel->setText(name); }
 
 #include "moc_editableguistrategy.cpp"

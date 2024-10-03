@@ -147,8 +147,7 @@ void IIOStandardItem::connectLog()
 	// this is leaf iio widget, it can probably read/write
 	IIOWidget *widget = m_iioWidgets.at(0);
 
-	connect(dynamic_cast<QObject *>(widget->getDataStrategy()),
-		SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
+	connect(widget, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
 		SLOT(forwardLog(QDateTime, QString, QString, int, bool)));
 }
 

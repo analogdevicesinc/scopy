@@ -76,8 +76,9 @@ void WatchListEntry::setupUi()
 void WatchListEntry::setupWidget(IIOWidget *widget)
 {
 	// if you can cast the uiStrategy to combo, this value ui will be a combo, otherwise it will be a lineedit
-	GuiStrategyInterface *ui = dynamic_cast<ComboAttrUi *>(widget->getUiStrategy());
-	if(ui) {
+	// GuiStrategyInterface *ui = dynamic_cast<ComboAttrUi *>(widget->getUiStrategy());
+	bool isCombo = widget->isUISInstanceOf<ComboAttrUi>();
+	if(isCombo) {
 		// https://forum.qt.io/topic/139728/can-t-set-qcombobox-qslider-margins
 		// QFrame because QWidget does not have the paintEvent implemented
 		QFrame *wrapper = new QFrame();
@@ -95,13 +96,12 @@ void WatchListEntry::setupWidget(IIOWidget *widget)
 		})css");
 		wrapper->layout()->addWidget(m_combo);
 
-		QString options = widget->getDataStrategy()->optionalData();
+		QString options = widget->optionalData();
 		QStringList list = options.split(" ", Qt::SkipEmptyParts);
-		m_combo->addItems(widget->getDataStrategy()->optionalData().split(" ", Qt::SkipEmptyParts));
-		m_combo->setCurrentText(widget->getDataStrategy()->data());
-		QObject::connect(m_combo, &QComboBox::currentTextChanged, this, [this, widget, options](QString text) {
-			widget->getDataStrategy()->writeAsync(text);
-		});
+		m_combo->addItems(widget->optionalData().split(" ", Qt::SkipEmptyParts));
+		m_combo->setCurrentText(widget->data());
+		QObject::connect(m_combo, &QComboBox::currentTextChanged, this,
+				 [this, widget, options](QString text) { widget->writeAsync(text); });
 		m_valueUi = wrapper;
 	} else {
 		m_lineedit = new QLineEdit();
@@ -112,15 +112,15 @@ void WatchListEntry::setupWidget(IIOWidget *widget)
 			background-color: transparent;
 			font-size: 13px;
 		})css");
-		m_lineedit->setText(widget->getDataStrategy()->data());
+		m_lineedit->setText(widget->data());
 		QObject::connect(m_lineedit, &QLineEdit::editingFinished, this, [this, widget]() {
 			QString text = m_lineedit->text();
-			widget->getDataStrategy()->writeAsync(text);
+			widget->writeAsync(text);
 		});
 		m_valueUi = m_lineedit;
 	}
 
-	QObject::connect(dynamic_cast<QObject *>(widget->getDataStrategy()), SIGNAL(sendData(QString, QString)), this,
+	QObject::connect(dynamic_cast<QObject *>(widget), SIGNAL(sendData(QString, QString)), this,
 			 SLOT(setNewData(QString, QString)));
 }
 

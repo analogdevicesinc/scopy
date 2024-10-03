@@ -42,6 +42,7 @@ public:
 		TriggerData,
 		DeviceAttrData,
 		ContextAttrData,
+		EmptyData,
 	};
 
 	enum UIS
@@ -53,7 +54,7 @@ public:
 		RangeUi,
 	};
 
-	explicit IIOWidgetBuilder(QObject *parent = nullptr);
+	explicit IIOWidgetBuilder(QWidget *parent = nullptr);
 	~IIOWidgetBuilder();
 
 	/**
@@ -97,6 +98,24 @@ public:
 	 * @return
 	 */
 	IIOWidgetBuilder &includeDebugAttributes(bool isIncluded);
+
+	/**
+	 * @brief configMode Sets the IIOWidget to be configurable. This way, a
+	 * wheel button will be created next to the IIOWidget. Once pressed,
+	 * this button will allow the user to select a new attribute and the
+	 * new data strategy will use that.
+	 * @param isConfigurable If set to true, the IIOWidget will be configurable.
+	 * Default is false.
+	 * @return
+	 */
+	IIOWidgetBuilder &configMode(bool isConfigurable);
+
+	/**
+	 * @brief title Sets the title of the IIOWidget
+	 * @param title QString
+	 * @return
+	 */
+	IIOWidgetBuilder &title(QString title);
 
 	/**
 	 * @brief Sets the context that will be used, if no iio_device or iio_channel
@@ -157,12 +176,6 @@ public:
 	 */
 	IIOWidgetBuilder &uiStrategy(IIOWidgetBuilder::UIS uiStrategy);
 
-	/**
-	 * @brief Sets the parent of the IIOWidget that will be built.
-	 * @param parent
-	 */
-	IIOWidgetBuilder &parent(QWidget *parent);
-
 private:
 	DataStrategyInterface *createDS();
 	GuiStrategyInterface *createUIS();
@@ -170,12 +183,14 @@ private:
 	Connection *m_connection;
 	bool m_isCompact;
 	bool m_includeDebugAttrs;
+	bool m_isConfigurable;
 	struct iio_context *m_context;
 	struct iio_device *m_device;
 	struct iio_channel *m_channel;
 	QString m_attribute;
 	QString m_optionsAttribute;
 	QString m_optionsValues;
+	QString m_title;
 	IIOWidgetBuilder::DS m_dataStrategy;
 	IIOWidgetBuilder::UIS m_uiStrategy;
 	QWidget *m_widgetParent;

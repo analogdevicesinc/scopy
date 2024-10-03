@@ -193,7 +193,7 @@ QWidget *GRTimeChannelAddon::createAttrMenu(QWidget *parent)
 	MenuSectionWidget *attrcontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *attr =
 		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrcontainer);
-	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder().channel(grch()->channel()).buildAll();
+	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(parent).channel(grch()->channel()).buildAll();
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
