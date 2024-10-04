@@ -117,6 +117,9 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 					 registerMapTableWidget->setRegisterSelected(address);
 					 registerChanged(registerMapTemplate->getRegisterTemplate(address));
 					 registerController->blockSignals(false);
+					 if(autoread) {
+						 Q_EMIT registerMapValues->requestRead(address);
+					 }
 				 });
 
 		QObject::connect(registerController, &RegisterController::registerAddressChanged, this,
