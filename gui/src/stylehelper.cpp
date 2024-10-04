@@ -817,11 +817,10 @@ void StyleHelper::MenuSpinboxLine(QFrame *w, QString objectName)
 QFrame {
 height: 1px;
 background-color: transparent;
-color: &&ScopyBlue&&;
+color: &&ProgressBarIdle&&;
 }
 	)css");
-	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
-	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
+	style.replace("&&ProgressBarIdle&&", StyleHelper::getColor("ProgressBarIdle"));
 	w->setStyleSheet(style);
 }
 /*
