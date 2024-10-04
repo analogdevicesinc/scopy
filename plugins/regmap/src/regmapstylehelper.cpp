@@ -226,7 +226,10 @@ void RegmapStyleHelper::regmapSettingsMenu(RegisterMapSettingsMenu *settings, QS
 	style.replace("&&background&&", RegmapStyleHelper::getColor("Transparent"));
 	style.replace("&&textColor&&", RegmapStyleHelper::getColor("LabelText"));
 
-	style += RegmapStyleHelper::BlueButtonStyle();
+	settings->pathButton->setStyleSheet(RegmapStyleHelper::BlueButtonStyle());
+	settings->registerDump->setStyleSheet(RegmapStyleHelper::BlueButtonStyle());
+	settings->readInterval->setStyleSheet(RegmapStyleHelper::BlueButtonStyle());
+	settings->writeListOfValuesButton->setStyleSheet(RegmapStyleHelper::BlueButtonStyle());
 
 	RegmapStyleHelper::checkBox(settings->autoread);
 	RegmapStyleHelper::bigTextLabel(settings->hexaPrefix1);
