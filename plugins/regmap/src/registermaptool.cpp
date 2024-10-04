@@ -137,4 +137,16 @@ void RegisterMapTool::updateActiveRegisterMap(QString registerName)
 	}
 }
 
-void RegisterMapTool::toggleSearchBarEnabled(bool enabled) { searchBarWidget->setEnabled(enabled); }
+void RegisterMapTool::toggleSearchBarEnabled(bool enabled)
+{
+	searchBarWidget->setEnabled(enabled);
+	if(enabled) {
+		tool->getContainerSpacer(tool->topContainer())
+			->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
+		searchBarWidget->show();
+	} else {
+		tool->getContainerSpacer(tool->topContainer())
+			->changeSize(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed);
+		searchBarWidget->hide();
+	}
+}
