@@ -3,6 +3,7 @@
 
 #include <QBoxLayout>
 #include <QComboBox>
+#include <QDesktopServices>
 #include <deviceregistermap.hpp>
 #include <deviceregistermap.hpp>
 #include <registermapsettingsmenu.hpp>
@@ -40,7 +41,10 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 
 	InfoBtn *infoBtn = new InfoBtn(this);
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
-	// TODO on info btn click open wiki page
+	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+		QDesktopServices::openUrl(
+			QUrl("https://analogdevicesinc.github.io/scopy/plugins/registermap/registermap.html"));
+	});
 
 	searchBarWidget = new SearchBarWidget();
 	searchBarWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
