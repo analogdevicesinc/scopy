@@ -1644,4 +1644,22 @@ void StyleHelper::GrayButton(QPushButton *btn, QString objectName)
 	btn->setStyleSheet(style);
 }
 
+void StyleHelper::RoundedCornersWidget(QWidget *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+	w->layout()->setMargin(10);
+	QString style = QString(R"css(
+			QWidget{
+				background-color: &&UIElementBackground&&;
+			}
+			.QWidget{
+				border-radius: 4px;
+				margin-bottom: 3px;
+			}
+			)css");
+	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
+	w->setStyleSheet(style);
+}
+
 #include "moc_stylehelper.cpp"
