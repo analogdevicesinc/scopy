@@ -1048,3 +1048,103 @@ int ADMTController::getAbsAngleTurnCount(uint16_t registerValue) {
         return signedTurnCount / 4; // Convert from quarter turns to whole turns
     }
 }
+
+uint16_t ADMTController::setDIGIOENRegisterBitMapping(uint16_t currentRegisterValue, map<string, int> settings) {
+    uint16_t registerValue = currentRegisterValue;  // Start with the current register value
+
+    // Bits 15:14: (preserve original value)
+
+    // Bit 13: DIGIO5EN
+    if (settings["DIGIO5EN"] == 1) // "Enabled"
+    {
+        registerValue |= (1 << 13);  // Set bit 13 to 1 (Enabled)
+    } 
+    else if (settings["DIGIO5EN"] == 0) // "Disabled"
+    {
+        registerValue &= ~(1 << 13);  // Clear bit 13 (Disabled)
+    }
+
+    // Bit 12: DIGIO4EN
+    if (settings["DIGIO4EN"] == 1) // "Enabled"
+    {
+        registerValue |= (1 << 12);  // Set bit 12 to 1 (Enabled)
+    } 
+    else if (settings["DIGIO4EN"] == 0) // "Disabled"
+    {
+        registerValue &= ~(1 << 12);  // Clear bit 12 (Disabled)
+    }
+
+    // Bit 11: DIGIO3EN
+    if (settings["DIGIO3EN"] == 1) // "Enabled"
+    {
+        registerValue |= (1 << 11);  // Set bit 11 to 1 (Enabled)
+    } 
+    else if (settings["DIGIO3EN"] == 0) // "Disabled"
+    {
+        registerValue &= ~(1 << 11);  // Clear bit 11 (Disabled)
+    }
+
+    // Bit 10: DIGIO2EN
+    if (settings["DIGIO2EN"] == 1) // "Enabled"
+    {
+        registerValue |= (1 << 10);  // Set bit 10 to 1 (Enabled)
+    } 
+    else if (settings["DIGIO2EN"] == 0) // "Disabled"
+    {
+        registerValue &= ~(1 << 10);  // Clear bit 10 (Disabled)
+    }
+
+    // Bit 9: DIGIO1EN
+    if (settings["DIGIO1EN"] == 1) // "Enabled"
+    {
+        registerValue |= (1 << 9);  // Set bit 9 to 1 (Enabled)
+    } 
+    else if (settings["DIGIO1EN"] == 0) // "Disabled"
+    {
+        registerValue &= ~(1 << 9);  // Clear bit 9 (Disabled)
+    }
+
+    // Bit 8: DIGIO0EN
+    if (settings["DIGIO0EN"] == 1) // "Enabled"
+    {
+        registerValue |= (1 << 8);  // Set bit 8 to 1 (Enabled)
+    } 
+    else if (settings["DIGIO0EN"] == 0) // "Disabled"
+    {
+        registerValue &= ~(1 << 8);  // Clear bit 8 (Disabled)
+    }
+
+    // Bits 7:0: (preserve original value)
+
+    return registerValue;
+}
+
+vector<double> unwrapAngles(const vector<double>& wrappedAngles) {
+    vector<double> unwrappedAngles;
+    unwrappedAngles.reserve(wrappedAngles.size());
+
+    // Start with the first angle as it is
+    double previousAngle = wrappedAngles[0];
+    unwrappedAngles.push_back(previousAngle);
+
+    // Initialize an offset for unwrapping
+    double offset = 0.0;
+
+    for (size_t i = 1; i < wrappedAngles.size(); ++i) {
+        double currentAngle = wrappedAngles[i];
+        double delta = currentAngle - previousAngle;
+
+        // Adjust the current angle if it wraps around
+        if (delta < -180.0) {
+            offset += 360.0; // Increment offset for negative wrap
+        } else if (delta > 180.0) {
+            offset -= 360.0; // Decrement offset for positive wrap
+        }
+
+        // Add the offset to the current angle
+        unwrappedAngles.push_back(currentAngle + offset);
+        previousAngle = currentAngle; // Update previous angle
+    }
+
+    return unwrappedAngles;
+}
