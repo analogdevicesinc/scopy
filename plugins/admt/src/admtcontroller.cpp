@@ -330,7 +330,6 @@ unsigned int ADMTController::bitReverse(unsigned int x, int log2n) {
 }
 
 template<class Iter_T>
-/* fft from example codes online */
 void ADMTController::fft(Iter_T a, Iter_T b, int log2n)
 {
     typedef typename iterator_traits<Iter_T>::value_type complex;
@@ -382,7 +381,6 @@ int ADMTController::linear_fit(vector<double> x, vector<double> y, double* slope
 }
 
 /* Calculate angle error based on MATLAB and C# implementation */
-/* Calculate angle error based on MATLAB and C# implementation */
 int ADMTController::calculate_angle_error(vector<double> angle_meas, vector<double>& angle_error_ret, double* max_angle_err, int cycleCount, int samplesPerCycle)
 {
     // Adjust the expected angles based on samples per cycle and cycle count
@@ -391,7 +389,7 @@ int ADMTController::calculate_angle_error(vector<double> angle_meas, vector<doub
 
     for (int cycle = 0; cycle < cycleCount; ++cycle) {
         for (int sample = 0; sample < samplesPerCycle; ++sample) {
-            expected_angles.push_back(sample * increment);
+            expected_angles.push_back((cycle * 360.0) + (sample * increment));
         }
     }
 
