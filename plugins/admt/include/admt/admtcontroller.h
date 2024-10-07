@@ -177,6 +177,8 @@ public:
     uint16_t setGeneralRegisterBitMapping(uint16_t currentRegisterValue, map<string, int> settings);
     void postcalibrate(vector<double> PANG, int cycleCount, int samplesPerCycle);
     int getAbsAngleTurnCount(uint16_t registerValue);
+    uint16_t setDIGIOENRegisterBitMapping(uint16_t currentRegisterValue, map<string, int> settings);
+    vector<double> unwrapAngles(const vector<double>& wrappedAngles);
 private:
     iio_context *m_iioCtx;
     iio_buffer *m_iioBuffer;
