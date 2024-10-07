@@ -27,6 +27,8 @@
 "color_default_hexcode": "101820",
 "color_inverse_hexcode": "5E6773",
 "svg_checkmark": ":/gui/icons/checkmark_light.svg",
-"svg_arrow_down": ":/gui/icons/handle_down_arrow_light.svg"
+"svg_arrow_down": ":/gui/icons/handle_down_arrow_light.svg",
+"sba_cmb_box_arrow_right": ":/gui/icons/scopy-light/icons/sba_cmb_box_arrow_right.svg",
+"sba_cmb_box_arrow": ":/gui/icons/scopy-light/icons/sba_cmb_box_arrow.svg"
 }
 

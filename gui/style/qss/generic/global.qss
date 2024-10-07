@@ -120,12 +120,13 @@ QComboBox::down-arrow {
     image: url(&svg_arrow_down&);
 }
 
-QTabWidget {
-    background: &background_primary&;
-    border: none;
+QTabWidget::pane {
+    background-color: transparent;
+    border: 0;
 }
+
 QTabBar::tab {
-    background: transparent;
+    background-color: transparent;
     color: &content_default&;
     padding: &padding_1&;
 }
@@ -143,7 +144,10 @@ QTabBar::tab:hover {
 QTabBar::tab QLabel {
     background-color: transparent;
     color: &content_default&;
+    padding-right: &padding_2&;;
+    padding-left: &padding_2&;;
 }
+
 
 /* fix this */
 QScrollArea {

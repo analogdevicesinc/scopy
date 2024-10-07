@@ -1,0 +1,7 @@
+QFrame#line[&&property&&=false] {
+    border: 10px solid &content_busy&;
+}
+
+QFrame#line[&&property&&=true] {
+    border: 10px solid &content_success&;
+}
