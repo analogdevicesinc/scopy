@@ -140,9 +140,9 @@ private:
 	void updateChannelValues();
 	void updateLineEditValues();
 	void updateGeneralSettingEnabled(bool value);
-	void connectLineEditToNumber(QLineEdit* lineEdit, int& variable);
+	void connectLineEditToNumber(QLineEdit* lineEdit, int& variable, int min, int max);
 	void connectLineEditToNumber(QLineEdit* lineEdit, double& variable, QString unit = "");
-	void connectLineEditToGraphSamples(QLineEdit* lineEdit, int& variable, Sismograph* graph);
+	void connectLineEditToGraphSamples(QLineEdit* lineEdit, int& variable, Sismograph* graph, int min, int max);
 	void connectMenuComboToGraphDirection(MenuCombo* menuCombo, Sismograph* graph);
 	void connectMenuComboToGraphChannel(MenuCombo* menuCombo, Sismograph* graph);
 	void connectMenuComboToNumber(MenuCombo* menuCombo, double& variable);
