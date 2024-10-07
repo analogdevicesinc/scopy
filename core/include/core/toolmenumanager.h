@@ -17,16 +17,10 @@ class SCOPY_CORE_EXPORT ToolMenuManager : public QObject
 {
 	Q_OBJECT
 public:
-	typedef struct
-	{
-		QString name;
-		QString uri;
-	} DeviceInfo;
-
 	ToolMenuManager(ToolStack *ts, DetachedToolWindowManager *dtm, ToolMenu *toolMenu, QObject *parent = nullptr);
 	~ToolMenuManager();
 
-	void addMenuItem(QString deviceId, DeviceInfo devInfo, QList<ToolMenuEntry *> tools, int itemIndex = -1);
+	void addMenuItem(QString deviceId, QString devName, QList<ToolMenuEntry *> tools, int itemIndex = -1);
 	void removeMenuItem(QString deviceId);
 	void changeToolListContents(QString deviceId, QList<ToolMenuEntry *> tools);
 
@@ -62,7 +56,6 @@ private:
 	DetachedToolWindowManager *m_dtm;
 	ToolMenu *m_toolMenu;
 	QMap<QString, MenuSectionCollapseWidget *> m_itemMap;
-	QMap<QString, DeviceInfo> m_devInfoMap;
 };
 } // namespace scopy
 
