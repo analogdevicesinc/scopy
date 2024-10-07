@@ -16,7 +16,6 @@ IIOExplorerInstrument::IIOExplorerInstrument(struct iio_context *context, QStrin
 	, m_currentlySelectedItem(nullptr)
 {
 	setObjectName("IIODebugInstrument - " + uri);
-
 	setupUi();
 	connectSignalsAndSlots();
 
@@ -53,13 +52,20 @@ void IIOExplorerInstrument::setupUi()
 	m_tabWidget->setCurrentIndex(0);
 	m_tabWidget->setTabPosition(QTabWidget::South);
 
-	QWidget *bottom_container = new QWidget(this);
-	QWidget *tree_view_container = new QWidget(bottom_container);
-	QWidget *right_container = new QWidget(bottom_container);
+	QWidget *bottom_container = new QWidget(m_mainWidget);
+	m_VSplitter = new QSplitter(Qt::Vertical, this);
+	m_HSplitter = new QSplitter(Qt::Horizontal, bottom_container);
+	QWidget *tree_view_container = new QWidget(m_HSplitter);
+	QWidget *right_container = new QWidget(m_HSplitter);
 	QWidget *details_container = new QWidget(right_container);
 	QWidget *watch_list = new QWidget(right_container);
-	m_VSplitter = new QSplitter(Qt::Vertical, this);
-	m_HSplitter = new QSplitter(Qt::Horizontal, this);
+
+	StyleHelper::BackgroundPage(details_container, "DetailsContainer");
+	StyleHelper::BackgroundPage(watch_list, "WatchListContainer");
+	StyleHelper::BackgroundPage(tree_view_container, "TreeViewContainer");
+	StyleHelper::SplitterStyle(m_HSplitter, "HorizontalSplitter");
+	StyleHelper::SplitterStyle(m_VSplitter, "VerticalSplitter");
+	StyleHelper::TabWidgetBarUnderline(m_tabWidget, "IIODebugInstrumentTabWidget");
 
 	m_mainWidget->setLayout(new QVBoxLayout(m_mainWidget));
 	m_mainWidget->layout()->setContentsMargins(0, 0, 0, 0);
@@ -75,8 +81,9 @@ void IIOExplorerInstrument::setupUi()
 	tree_view_container->setLayout(new QVBoxLayout(tree_view_container));
 
 	m_proxyModel = new IIOSortFilterProxyModel(this);
-	m_treeView = new QTreeView(bottom_container);
+	m_treeView = new QTreeView(tree_view_container);
 	m_treeView->setHeaderHidden(true);
+	StyleHelper::TreeViewDebugger(m_treeView, "TreeView");
 	// m_saveContextSetup = new SaveContextSetup(m_treeView, bottom_container);
 	// m_iioModel = new IIOModel(m_context, m_uri, m_treeView);
 
@@ -91,14 +98,6 @@ void IIOExplorerInstrument::setupUi()
 
 	m_proxyModel->setSourceModel(m_iioModel->getModel());
 	m_proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-
-	StyleHelper::BackgroundPage(details_container, "DetailsContainer");
-	StyleHelper::BackgroundPage(watch_list, "WatchListContainer");
-	StyleHelper::BackgroundPage(tree_view_container, "TreeViewContainer");
-	StyleHelper::SplitterStyle(m_HSplitter, "HorizontalSplitter");
-	StyleHelper::SplitterStyle(m_VSplitter, "VerticalSplitter");
-	StyleHelper::TreeViewDebugger(m_treeView, "TreeView");
-	StyleHelper::TabWidgetBarUnderline(m_tabWidget, "IIODebugInstrumentTabWidget");
 
 	m_treeView->setModel(m_proxyModel);
 
