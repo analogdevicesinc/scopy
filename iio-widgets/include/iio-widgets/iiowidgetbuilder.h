@@ -53,7 +53,7 @@ public:
 		RangeUi,
 	};
 
-	explicit IIOWidgetBuilder(QObject *parent = nullptr);
+	explicit IIOWidgetBuilder(QWidget *parent = nullptr);
 	~IIOWidgetBuilder();
 
 	/**
