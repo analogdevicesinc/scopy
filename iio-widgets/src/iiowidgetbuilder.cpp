@@ -37,7 +37,7 @@
 using namespace scopy;
 Q_LOGGING_CATEGORY(CAT_ATTRBUILDER, "AttrBuilder")
 
-IIOWidgetBuilder::IIOWidgetBuilder(QObject *parent)
+IIOWidgetBuilder::IIOWidgetBuilder(QWidget *parent)
 	: QObject(parent)
 	, m_connection(nullptr)
 	, m_isCompact(false)
@@ -50,7 +50,7 @@ IIOWidgetBuilder::IIOWidgetBuilder(QObject *parent)
 	, m_optionsValues("")
 	, m_dataStrategy(DS::NoDataStrategy)
 	, m_uiStrategy(UIS::NoUIStrategy)
-	, m_widgetParent(nullptr)
+	, m_widgetParent(parent)
 {}
 
 IIOWidgetBuilder::~IIOWidgetBuilder() {}
