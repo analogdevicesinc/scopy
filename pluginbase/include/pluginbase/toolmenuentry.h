@@ -18,13 +18,15 @@ class SCOPY_PLUGINBASE_EXPORT ToolMenuEntry : public QObject
 {
 	Q_OBJECT
 public:
-	ToolMenuEntry(QString id, QString name, QString icon, QString pluginName, QObject *parent = nullptr)
+	ToolMenuEntry(QString id, QString name, QString icon, QString pluginName, QString param,
+		      QObject *parent = nullptr)
 		: QObject(parent)
 		, m_id(id)
 		, m_uuid("tme_" + pluginName + "_" + id + "_" + scopy::config::getUuid())
 		, m_name(name)
 		, m_icon(icon)
 		, m_pluginName(pluginName)
+		, m_param(param)
 		, m_visible(true)
 		, m_enabled(false)
 		, m_running(false)
@@ -56,6 +58,7 @@ public:
 	inline QString name() const { return m_name; }
 	inline QString icon() const { return m_icon; }
 	inline QString pluginName() const { return m_pluginName; }
+	inline QString param() const { return m_param; }
 	inline bool visible() const { return m_visible; }
 	inline bool enabled() const { return m_enabled; }
 	inline bool running() const { return m_running; }
@@ -168,6 +171,7 @@ private:
 	QString m_name;
 	QString m_icon;
 	QString m_pluginName;
+	QString m_param;
 	bool m_visible;
 	bool m_enabled;
 	bool m_running;
