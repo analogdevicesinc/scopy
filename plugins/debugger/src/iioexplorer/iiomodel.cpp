@@ -6,10 +6,11 @@
 
 using namespace scopy::debugger;
 
-IIOModel::IIOModel(struct iio_context *context, QString uri, QObject *parent)
+IIOModel::IIOModel(struct iio_context *context, QString uri, QWidget *parent)
 	: QObject(parent)
 	, m_ctx(context)
 	, m_uri(uri)
+	, m_parent(parent)
 {
 	m_model = new QStandardItemModel(this);
 	iioTreeSetup();
@@ -50,7 +51,7 @@ void IIOModel::iioTreeSetup()
 
 void IIOModel::setupCtx()
 {
-	m_ctxList = IIOWidgetBuilder().context(m_ctx).buildAll();
+	m_ctxList = IIOWidgetBuilder(m_parent).context(m_ctx).buildAll();
 	m_rootItem = createIIOStandardItem(m_ctxList, m_rootString, "", m_rootString, IIOStandardItem::Context);
 	// m_rootItem = new IIOStandardItem(m_ctxList, m_rootString, m_rootString, IIOStandardItem::Context);
 	m_rootItem->setEditable(false);
@@ -59,7 +60,7 @@ void IIOModel::setupCtx()
 void IIOModel::generateCtxAttributes()
 {
 	// add attrs from context
-	for(IIOWidget *ctxWidget : m_ctxList) {
+	for(IIOWidget *ctxWidget : qAsConst(m_ctxList)) {
 		m_entries.insert(ctxWidget->getRecipe().data);
 		auto *attrItem = createIIOStandardItem({ctxWidget}, ctxWidget->getRecipe().data, "",
 						       m_rootString + SEPARATOR + ctxWidget->getRecipe().data,
@@ -72,7 +73,7 @@ void IIOModel::generateCtxAttributes()
 void IIOModel::setupCurrentDevice()
 {
 	m_currentDevice = iio_context_get_device(m_ctx, m_currentDeviceIndex);
-	m_devList = IIOWidgetBuilder().device(m_currentDevice).buildAll();
+	m_devList = IIOWidgetBuilder(m_parent).device(m_currentDevice).buildAll();
 	m_currentDeviceName = iio_device_get_name(m_currentDevice);
 	QString currentDeviceId = iio_device_get_id(m_currentDevice);
 	bool is_trigger = iio_device_is_trigger(m_currentDevice);
@@ -110,7 +111,7 @@ void IIOModel::generateDeviceAttributes()
 void IIOModel::setupCurrentChannel()
 {
 	m_currentChannel = iio_device_get_channel(m_currentDevice, m_currentChannelIndex);
-	m_chnlList = IIOWidgetBuilder().channel(m_currentChannel).buildAll();
+	m_chnlList = IIOWidgetBuilder(m_parent).channel(m_currentChannel).buildAll();
 	m_currentChannelName = iio_channel_get_id(m_currentChannel);
 	QString currentChannelId = iio_channel_get_name(m_currentChannel);
 
@@ -154,6 +155,11 @@ IIOStandardItem *IIOModel::createIIOStandardItem(QList<IIOWidget *> widgets, QSt
 		item = new IIOStandardItem(widgets, name, path, type);
 	} else {
 		item = new IIOStandardItem(widgets, name, id, path, type);
+	}
+
+	/* Hide all widgets */
+	for(IIOWidget *widget : qAsConst(widgets)) {
+		widget->hide();
 	}
 
 	connect(item, &IIOStandardItem::emitLog, this, &IIOModel::emitLog);
