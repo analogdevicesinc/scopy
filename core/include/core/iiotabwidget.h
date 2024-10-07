@@ -42,6 +42,7 @@ private:
 	QString getSerialPath();
 	bool isSerialCompatible();
 	void setupBtnLdIcon(AnimationPushButton *btn);
+	void rstUriMsgLabel();
 	QWidget *createFilterWidget(QWidget *parent);
 	QWidget *createAvlCtxWidget(QWidget *parent);
 	QWidget *createSerialSettWidget(QWidget *parent);
