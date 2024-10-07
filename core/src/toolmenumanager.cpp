@@ -19,12 +19,15 @@ ToolMenuManager::ToolMenuManager(ToolStack *ts, DetachedToolWindowManager *dtm, 
 
 ToolMenuManager::~ToolMenuManager() {}
 
-void ToolMenuManager::addMenuItem(QString deviceId, DeviceInfo devInfo, QList<ToolMenuEntry *> tools, int itemIndex)
+void ToolMenuManager::addMenuItem(QString deviceId, QString devName, QList<ToolMenuEntry *> tools, int itemIndex)
 {
+	QString param;
 	MenuSectionCollapseWidget *devSection = new MenuSectionCollapseWidget(
-		devInfo.name, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_COMPOSITEWIDGET, m_toolMenu);
+		devName, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_COMPOSITEWIDGET, m_toolMenu);
 	devSection->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	createMenuSectionLabel(devSection, devInfo.uri);
+	if(!tools.isEmpty())
+		param = tools.at(0)->param();
+	createMenuSectionLabel(devSection, param);
 	QButtonGroup *menuBtnGroup = m_toolMenu->btnGroup();
 	for(ToolMenuEntry *tme : tools) {
 		ToolMenuItem *toolMenuItem = createToolMenuItem(tme, devSection);
@@ -37,7 +40,6 @@ void ToolMenuManager::addMenuItem(QString deviceId, DeviceInfo devInfo, QList<To
 	}
 	m_toolMenu->add(itemIndex, deviceId, devSection);
 	m_itemMap[deviceId] = devSection;
-	m_devInfoMap[deviceId] = devInfo;
 	devSection->setCollapsed(false);
 	devSection->hide();
 	qDebug(CAT_TOOLMENUMANAGER) << "Menu item with id" << deviceId << "has been added";
@@ -52,7 +54,6 @@ void ToolMenuManager::removeMenuItem(QString deviceId)
 	MenuSectionCollapseWidget *devSection = m_itemMap[deviceId];
 	m_itemMap.remove(deviceId);
 	m_toolMenu->remove(devSection);
-	m_devInfoMap.remove(deviceId);
 	delete devSection;
 	devSection = nullptr;
 	qDebug(CAT_TOOLMENUMANAGER) << "Menu item with id" << deviceId << "has been removed";
@@ -67,10 +68,11 @@ void ToolMenuManager::changeToolListContents(QString deviceId, QList<ToolMenuEnt
 	for(ToolMenuEntry *tme : tools) {
 		tme->disconnect(this);
 	}
-	int itemIndex = m_toolMenu->indexOf(m_itemMap[deviceId]);
-	DeviceInfo devInfo = m_devInfoMap[deviceId];
+	MenuSectionCollapseWidget *menuItem = m_itemMap[deviceId];
+	QString devName = menuItem->collapseSection()->title();
+	int itemIndex = m_toolMenu->indexOf(menuItem);
 	removeMenuItem(deviceId);
-	addMenuItem(deviceId, devInfo, tools, itemIndex);
+	addMenuItem(deviceId, devName, tools, itemIndex);
 	showMenuItem(deviceId);
 }
 
@@ -107,7 +109,6 @@ void ToolMenuManager::deviceDisconnected(QString id)
 
 void ToolMenuManager::onDisplayNameChanged(QString id, QString devName)
 {
-	m_devInfoMap[id].name = devName;
 	m_itemMap[id]->collapseSection()->setTitle(devName);
 }
 
