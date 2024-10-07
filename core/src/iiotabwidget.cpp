@@ -1,6 +1,7 @@
 #include "iiotabwidget.h"
 
 #include "iioutil/scopy-iioutil_config.h"
+#include "menusectionwidget.h"
 #include "qtconcurrentrun.h"
 
 #include <iio.h>
@@ -22,54 +23,63 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 	layout->setSpacing(10);
 	setLayout(layout);
 
-	QWidget *gridWidget = new QWidget(this);
-	QGridLayout *gridLay = new QGridLayout(this);
-	gridLay->setSpacing(10);
-	gridLay->setMargin(0);
-	gridWidget->setLayout(gridLay);
+	QWidget *contentWidget = new QWidget(this);
+	QVBoxLayout *contentLay = new QVBoxLayout(this);
+	contentLay->setSpacing(10);
+	contentLay->setMargin(0);
+	contentWidget->setLayout(contentLay);
 
 	QStringList backendsList = computeBackendsList();
 
-	QLabel *filterLabel = new QLabel("Filter:", gridWidget);
+	MenuSectionCollapseWidget *scanSection =
+		new MenuSectionCollapseWidget("Scan", MenuCollapseSection::MHCW_ARROW, contentWidget);
+
+	QWidget *scanWidget = new QWidget(scanSection);
+	QGridLayout *scanGrid = new QGridLayout(scanWidget);
+	scanGrid->setMargin(0);
+	scanWidget->setLayout(scanGrid);
+	QLabel *filterLabel = new QLabel("Filter:", scanWidget);
 	StyleHelper::MenuSmallLabel(filterLabel);
-	m_filterWidget = createFilterWidget(gridWidget);
+
+	m_filterWidget = createFilterWidget(scanWidget);
+	scanGrid->addWidget(filterLabel, 0, 0);
+	scanGrid->addWidget(m_filterWidget, 0, 1);
 	setupFilterWidget(backendsList);
-	gridLay->addWidget(filterLabel, 0, 0);
-	gridLay->addWidget(m_filterWidget, 0, 1);
 
-	QLabel *ctxLabel = new QLabel("Context:", gridWidget);
+	QLabel *ctxLabel = new QLabel("Context:", scanWidget);
 	StyleHelper::MenuSmallLabel(ctxLabel);
-	QWidget *avlContextWidget = createAvlCtxWidget(gridWidget);
+	QWidget *avlContextWidget = createAvlCtxWidget(scanWidget);
 	m_btnScan->setVisible(!backendsList.isEmpty());
-	gridLay->addWidget(ctxLabel, 1, 0);
-	gridLay->addWidget(avlContextWidget, 1, 1);
+	scanGrid->addWidget(ctxLabel, 1, 0);
+	scanGrid->addWidget(avlContextWidget, 1, 1);
 
-	QLabel *serialLabel = new QLabel("Serial:", gridWidget);
-	StyleHelper::MenuSmallLabel(serialLabel);
-	QWidget *serialSettWiedget = createSerialSettWidget(gridWidget);
+	scanSection->add(scanWidget);
+	contentLay->addWidget(scanSection);
+
+	MenuSectionCollapseWidget *serialSection =
+		new MenuSectionCollapseWidget("Serial", MenuCollapseSection::MHCW_ARROW, contentWidget);
+
+	QWidget *serialSettWiedget = createSerialSettWidget(serialSection);
 	bool serialCompatible = isSerialCompatible();
 	serialSettWiedget->setEnabled(serialCompatible);
-	gridLay->addWidget(serialLabel, 2, 0);
-	gridLay->addWidget(serialSettWiedget, 2, 1);
+	serialSection->add(serialSettWiedget);
 
-	QLabel *uriLabel = new QLabel("URI:", gridWidget);
-	StyleHelper::MenuSmallLabel(uriLabel);
-	QWidget *uriWidget = createUriWidget(gridWidget);
-	gridLay->addWidget(uriLabel, 3, 0);
-	gridLay->addWidget(uriWidget, 3, 1);
+	contentLay->addWidget(serialSection);
 
-	QWidget *btnVerifyWidget = createVerifyBtnWidget(gridWidget);
-	gridLay->addWidget(btnVerifyWidget, 4, 1, Qt::AlignRight);
+	QWidget *uriWidget = createUriWidget(contentWidget);
+	contentLay->addWidget(uriWidget);
 
-	gridLay->addItem(new QSpacerItem(0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding), 5, 0);
+	contentLay->addItem(new QSpacerItem(0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding));
 
-	layout->addWidget(gridWidget);
+	layout->addWidget(contentWidget);
 	layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
 	addScanFeedbackMsg("No scanned contexts... Press the refresh button!");
 
 	m_fwScan = new QFutureWatcher<int>(this);
 	m_fwSerialScan = new QFutureWatcher<QVector<QString>>(this);
 	setupConnections();
+	if(serialCompatible)
+		futureSerialScan();
 }
 
 IioTabWidget::~IioTabWidget() {}
@@ -126,6 +136,7 @@ QCheckBox *IioTabWidget::createBackendCheckBox(QString backEnd, QWidget *parent)
 		} else {
 			m_scanParamsList.removeOne(backEnd + ":");
 		}
+		futureScan();
 		m_btnScan->setFocus();
 	});
 	return cb;
@@ -160,8 +171,9 @@ void IioTabWidget::verifyBtnClicked()
 
 void IioTabWidget::onVerifyFinished(bool result)
 {
-	m_uriMsgLabel->clear();
+	rstUriMsgLabel();
 	if(!result) {
+		m_uriMsgLabel->setVisible(true);
 		m_uriMsgLabel->setText("\"" + m_uriEdit->edit()->text() + "\" not a valid context!");
 	}
 	m_btnVerify->stopAnimation();
@@ -188,7 +200,7 @@ void IioTabWidget::scanFinished()
 	int retCode = m_fwScan->result();
 	m_btnScan->stopAnimation();
 	m_avlCtxCb->clear();
-	m_uriMsgLabel->clear();
+	rstUriMsgLabel();
 	if(retCode < 0) {
 		addScanFeedbackMsg("Scan command failed!");
 		qWarning(CAT_IIO_ADD_PAGE) << "iio_scan_context_get_info_list error " << retCode;
@@ -268,6 +280,12 @@ void IioTabWidget::setupBtnLdIcon(AnimationPushButton *btn)
 	btn->setAnimation(icon);
 }
 
+void IioTabWidget::rstUriMsgLabel()
+{
+	m_uriMsgLabel->setVisible(false);
+	m_uriMsgLabel->clear();
+}
+
 QWidget *IioTabWidget::createFilterWidget(QWidget *parent)
 {
 	QWidget *w = new QWidget(parent);
@@ -345,22 +363,26 @@ QWidget *IioTabWidget::createSerialSettWidget(QWidget *parent)
 QWidget *IioTabWidget::createUriWidget(QWidget *parent)
 {
 	QWidget *w = new QWidget(parent);
-	QHBoxLayout *layout = new QHBoxLayout(w);
-	layout->setMargin(0);
-	layout->setSpacing(10);
+	QGridLayout *layout = new QGridLayout(w);
 	w->setLayout(layout);
+	StyleHelper::RoundedCornersWidget(w, "uriAddPage");
 
-	QWidget *msgUriWidget = new QWidget(w);
-	msgUriWidget->setLayout(new QVBoxLayout(msgUriWidget));
-	msgUriWidget->layout()->setMargin(0);
-	msgUriWidget->layout()->setSpacing(0);
-	m_uriEdit = new MenuLineEdit(msgUriWidget);
+	QLabel *uriLabel = new QLabel("URI:", w);
+	StyleHelper::MenuSmallLabel(uriLabel);
+
+	m_uriEdit = new MenuLineEdit(w);
+	m_uriEdit->edit()->setPlaceholderText("uri of the device you are connecting to");
 	m_uriEdit->edit()->setFocusPolicy(Qt::ClickFocus);
-	m_uriMsgLabel = new QLabel(msgUriWidget);
-	msgUriWidget->layout()->addWidget(m_uriEdit);
-	msgUriWidget->layout()->addWidget(m_uriMsgLabel);
+	m_uriMsgLabel = new QLabel(w);
+	m_uriMsgLabel->setVisible(false);
 
-	layout->addWidget(msgUriWidget);
+	QWidget *btnVerifyWidget = createVerifyBtnWidget(w);
+
+	layout->addWidget(uriLabel, 0, 0);
+	layout->addWidget(m_uriEdit, 0, 1);
+	layout->addWidget(btnVerifyWidget, 0, 2, Qt::AlignRight);
+	layout->addWidget(m_uriMsgLabel, 1, 1);
+
 	return w;
 }
 
