@@ -1,2 +1,2 @@
 include/dac/scopy-dac_export.h
-include/adc/scopy-dac_config.h
+include/dac/scopy-dac_config.h
