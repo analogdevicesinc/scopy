@@ -228,7 +228,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	applyLineEditStyle(graphUpdateIntervalLineEdit);
 	graphUpdateIntervalLineEdit->setText(QString::number(sampleRate));
 
-	connectLineEditToNumber(graphUpdateIntervalLineEdit, sampleRate);
+	connectLineEditToNumber(graphUpdateIntervalLineEdit, sampleRate, 20, 5000);
 
 	generalSection->contentLayout()->addWidget(graphUpdateIntervalLabel);
 	generalSection->contentLayout()->addWidget(graphUpdateIntervalLineEdit);
@@ -241,7 +241,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	applyLineEditStyle(dataSampleSizeLineEdit);
 	dataSampleSizeLineEdit->setText(QString::number(bufferSize));
 
-	connectLineEditToNumber(dataSampleSizeLineEdit, bufferSize);
+	connectLineEditToNumber(dataSampleSizeLineEdit, bufferSize, 1, 2048);
 
 	generalSection->contentLayout()->addWidget(dataSampleSizeLabel);
 	generalSection->contentLayout()->addWidget(dataSampleSizeLineEdit);
@@ -320,7 +320,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	applyLineEditStyle(dataGraphSamplesLineEdit);
 	dataGraphSamplesLineEdit->setText(QString::number(dataGraphSamples));
 
-	connectLineEditToGraphSamples(dataGraphSamplesLineEdit, dataGraphSamples, dataGraph);
+	connectLineEditToGraphSamples(dataGraphSamplesLineEdit, dataGraphSamples, dataGraph, 1, 5000);
 	
 	dataGraphSection->contentLayout()->addWidget(dataGraphSamplesLabel);
 	dataGraphSection->contentLayout()->addWidget(dataGraphSamplesLineEdit);
@@ -343,7 +343,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	tempGraphSection->contentLayout()->addWidget(tempGraphSamplesLabel);
 	tempGraphSection->contentLayout()->addWidget(tempGraphSamplesLineEdit);
 
-	connectLineEditToGraphSamples(tempGraphSamplesLineEdit, tempGraphSamples, tempGraph);
+	connectLineEditToGraphSamples(tempGraphSamplesLineEdit, tempGraphSamples, tempGraph, 1, 5000);
 
 	tempGraphWidget->contentLayout()->addWidget(tempGraphSection);
 
@@ -716,14 +716,14 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	QLineEdit *calibrationCycleCountLineEdit = new QLineEdit(calibrationDatasetConfigCollapseSection);
 	applyLineEditStyle(calibrationCycleCountLineEdit);
 	calibrationCycleCountLineEdit->setText(QString::number(cycleCount));
-	connectLineEditToNumber(calibrationCycleCountLineEdit, cycleCount);
+	connectLineEditToNumber(calibrationCycleCountLineEdit, cycleCount, 1, 1000);
 
 	QLabel *calibrationSamplesPerCycleLabel = new QLabel("Samples Per Cycle", calibrationDatasetConfigCollapseSection);
 	StyleHelper::MenuSmallLabel(calibrationSamplesPerCycleLabel);
 	QLineEdit *calibrationSamplesPerCycleLineEdit = new QLineEdit(calibrationDatasetConfigCollapseSection);
 	applyLineEditStyle(calibrationSamplesPerCycleLineEdit);
 	calibrationSamplesPerCycleLineEdit->setText(QString::number(samplesPerCycle));
-	connectLineEditToNumber(calibrationSamplesPerCycleLineEdit, samplesPerCycle);
+	connectLineEditToNumber(calibrationSamplesPerCycleLineEdit, samplesPerCycle, 1, 5000);
 
 	calibrationDatasetConfigCollapseSection->contentLayout()->setSpacing(8);
 	calibrationDatasetConfigCollapseSection->contentLayout()->addWidget(calibrationCycleCountLabel);
@@ -1702,12 +1702,12 @@ MenuControlButton *HarmonicCalibration::createChannelToggleWidget(const QString 
 	return menuControlButton;
 }
 
-void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, int& variable)
+void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, int& variable, int min, int max)
 {
-    connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit]() {
+    connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit, min, max]() {
         bool ok;
         int value = lineEdit->text().toInt(&ok);
-        if (ok) {
+        if (ok && value >= min && value <= max) {
             variable = value;
         } else {
             lineEdit->setText(QString::number(variable));
@@ -1744,12 +1744,12 @@ void HarmonicCalibration::connectLineEditToNumberWrite(QLineEdit* lineEdit, doub
     });
 }
 
-void HarmonicCalibration::connectLineEditToGraphSamples(QLineEdit* lineEdit, int& variable, Sismograph* graph)
+void HarmonicCalibration::connectLineEditToGraphSamples(QLineEdit* lineEdit, int& variable, Sismograph* graph, int min, int max)
 {
-    connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit, graph]() {
+    connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit, graph, min, max]() {
         bool ok;
         int value = lineEdit->text().toInt(&ok);
-        if (ok) {
+        if (ok && value >= min && value <= max) {
             variable = value;
 			graph->setNumSamples(variable);
         } else {
