@@ -127,6 +127,8 @@ public:
 	static void IIOCompactLabel(QLabel *label, QString objectName = "");
 	static void GrayButton(QPushButton *btn, QString objectName = "");
 
+	static void RoundedCornersWidget(QWidget *w, QString objectName = "");
+
 private:
 	QMap<QString, QString> colorMap;
 	static StyleHelper *pinstance_;
