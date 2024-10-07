@@ -933,14 +933,14 @@ map<string, bool> ADMTController::getDiag1RegisterBitMapping_Register(uint16_t r
     return result;
 }
 
-map<string, double> ADMTController::getDiag1RegisterBitMapping_Afe(uint16_t registerValue) {
+map<string, double> ADMTController::getDiag1RegisterBitMapping_Afe(uint16_t registerValue, bool is5V = false) {
     map<string, double> result;
 
     // Bits 7:0: AFE Diagnostic 2 - Measurement of Fixed voltage (stored in 2's complement)
     int8_t afeDiagnostic = static_cast<int8_t>(registerValue & 0x00FF); // Interpret as signed 8-bit
 
     // Choose the correct resolution based on the voltage level (5V or 3.3V part)
-    double resolution = 0.003222; // 0.0048828 if 5V
+    double resolution = is5V ? 0.0048828 : 0.003222; // 0.0048828 for 5V, 0.003222 for 3.3V
 
     // Convert the AFE Diagnostic value to a voltage
     double diagnosticVoltage = static_cast<double>(afeDiagnostic) * resolution;
