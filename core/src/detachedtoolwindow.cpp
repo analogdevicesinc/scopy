@@ -21,7 +21,7 @@ DetachedToolWindow::DetachedToolWindow(QWidget *parent, ToolMenuEntry *tme)
 	lay->setMargin(0);
 	w = tme->tool();
 	setWindowIcon(QApplication::windowIcon());
-	setWindowTitle("Scopy - " + tme->pluginName() + " - " + tme->name());
+	setWindowTitle("Scopy - " + tme->pluginName() + " - " + tme->name() + " - " + tme->param());
 
 	lay->addWidget(w);
 	loadToolGeometry(tme, this);
