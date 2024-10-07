@@ -47,20 +47,20 @@ void GuiDetailsView::setIIOStandardItem(IIOStandardItem *item)
 {
 	m_currentItem = item;
 	clearWidgets();
-	auto iioWidgets = item->getIIOWidgets();
-	for(auto widget : iioWidgets) {
+	QList<IIOWidget *> iioWidgets = item->getIIOWidgets();
+	for(IIOWidget *widget : iioWidgets) {
 		widget->show();
 		m_currentWidgets.append(widget);
 		widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 		m_scrollAreaContents->layout()->addWidget(widget);
 	}
 
-	auto details = item->details();
-	for(const auto &detail : details) {
-		auto label = new QLabel(detail);
-		label->show();
+	QStringList details = item->details();
+	for(const QString &detail : details) {
+		auto label = new QLabel(detail, m_detailsSeparator);
 		m_detailsList.append(label);
 		m_detailsSeparator->contentLayout()->addWidget(label);
+		label->show();
 	}
 
 	QLabel *detailsLabel = dynamic_cast<QLabel *>(m_detailsSeparator->header()->layout()->itemAt(0)->widget());
