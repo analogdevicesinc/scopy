@@ -13,7 +13,7 @@ class IIOModel : public QObject
 {
 	Q_OBJECT
 public:
-	explicit IIOModel(struct iio_context *context, QString uri, QObject *parent = nullptr);
+	explicit IIOModel(struct iio_context *context, QString uri, QWidget *parent = nullptr);
 
 	QStandardItemModel *getModel();
 	QSet<QString> getEntries();
@@ -47,6 +47,7 @@ private:
 	struct iio_context *m_ctx;
 	QSet<QString> m_entries;
 	QString m_uri;
+	QWidget *m_parent;
 
 	// members used in the setup of the iio tree
 	IIOStandardItem *m_rootItem;
