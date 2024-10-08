@@ -10,6 +10,7 @@
 #include <QString>
 
 #include <iioutil/connectionprovider.h>
+#include <pluginbase/statusbarmanager.h>
 
 #include <vector>
 #include <algorithm>
@@ -133,6 +134,15 @@ public:
         SENSOR_REGISTER_COUNT
     };
 
+    enum UniqueIDRegister
+    {
+        UNIQID0,
+        UNIQID1,
+        UNIQID2,
+        UNIQID3,
+        UNIQID_REGISTER_COUNT
+    };
+
     const char* ChannelIds[CHANNEL_COUNT] = { "rot", "angl", "count", "temp" };
     const char* DeviceIds[DEVICE_COUNT] = { "admt4000", "tmc5240" };
     const char* DeviceAttributes[DEVICE_ATTR_COUNT] = { "page", "sequencer_mode", "angle_filt", "conversion_mode", "h8_ctrl", "sdp_gpio_ctrl", "sdp_gpio0_busy", "sdp_coil_rs" };
@@ -144,6 +154,8 @@ public:
     const uint32_t ConfigurationPages[CONFIGURATION_REGISTER_COUNT] = { UINT32_MAX, UINT32_MAX, UINT32_MAX, 0x02, 0x02, 0x02, 0x02, 0x02 };
     const uint32_t SensorRegisters[SENSOR_REGISTER_COUNT] = { 0x03, 0x05, 0x08, 0x10, 0x11, 0x12, 0x13, 0x18, 0x1D, 0x1E, 0x20, 0x23, 0x14 };
     const uint32_t SensorPages[SENSOR_REGISTER_COUNT] = { UINT32_MAX, UINT32_MAX, UINT32_MAX, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02 };
+    const uint32_t UniqueIdRegisters[UNIQID_REGISTER_COUNT] = { 0x1E, 0x1F, 0x20, 0x21 };
+    const uint32_t UniqueIdPages[UNIQID_REGISTER_COUNT] = { 0x02, 0x02, 0x02, 0x02 };
 
     const char* getChannelId(Channel channel);
     const char* getDeviceId(Device device);
@@ -154,6 +166,8 @@ public:
     const uint32_t getConfigurationPage(ConfigurationRegister registerID);
     const uint32_t getSensorRegister(SensorRegister registerID);
     const uint32_t getSensorPage(SensorRegister registerID);
+    const uint32_t getUniqueIdRegister(UniqueIDRegister registerID);
+    const uint32_t getUniqueIdPage(UniqueIDRegister registerID);
 
     void connectADMT();
     void disconnectADMT();
@@ -170,15 +184,17 @@ public:
     double getActualHarmonicRegisterValue(uint16_t registerValue, const string key);
     map<string, bool> getFaultRegisterBitMapping(uint16_t registerValue);
     map<string, int> getGeneralRegisterBitMapping(uint16_t registerValue);
-    map<string, bool> getDigioenRegisterBitMapping(uint16_t registerValue);
+    map<string, bool> getDIGIOENRegisterBitMapping(uint16_t registerValue);
     map<string, bool> getDiag1RegisterBitMapping_Register(uint16_t registerValue);
-    map<string, double> getDiag1RegisterBitMapping_Afe(uint16_t registerValue);
+    map<string, double> getDiag1RegisterBitMapping_Afe(uint16_t registerValue, bool is5V);
     map<string, double> getDiag2RegisterBitMapping(uint16_t registerValue);
     uint16_t setGeneralRegisterBitMapping(uint16_t currentRegisterValue, map<string, int> settings);
     void postcalibrate(vector<double> PANG, int cycleCount, int samplesPerCycle);
     int getAbsAngleTurnCount(uint16_t registerValue);
-    uint16_t setDIGIOENRegisterBitMapping(uint16_t currentRegisterValue, map<string, int> settings);
+    uint16_t setDIGIOENRegisterBitMapping(uint16_t currentRegisterValue, map<string, bool> settings);
     vector<double> unwrapAngles(const vector<double>& wrappedAngles);
+    map<string, string> getUNIQID3RegisterMapping(uint16_t registerValue);
+    vector<double> wrapAngles(const vector<double>& unwrappedAngles);
 private:
     iio_context *m_iioCtx;
     iio_buffer *m_iioBuffer;
