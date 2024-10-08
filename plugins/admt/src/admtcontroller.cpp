@@ -26,7 +26,6 @@ ADMTController::ADMTController(QString uri, QObject *parent)
     :QObject(parent)
     , uri(uri)
 {
-
 }
 
 ADMTController::~ADMTController() {}
@@ -117,6 +116,22 @@ const uint32_t ADMTController::getSensorPage(SensorRegister registerID)
 {
 	if(registerID >= 0 && registerID < SENSOR_REGISTER_COUNT){
 		return SensorPages[registerID];
+	}
+	return UINT32_MAX;
+}
+
+const uint32_t ADMTController::getUniqueIdRegister(UniqueIDRegister registerID)
+{
+	if(registerID >= 0 && registerID < UNIQID_REGISTER_COUNT){
+		return UniqueIdRegisters[registerID];
+	}
+	return UINT32_MAX;
+}
+
+const uint32_t ADMTController::getUniqueIdPage(UniqueIDRegister registerID)
+{
+	if(registerID >= 0 && registerID < UNIQID_REGISTER_COUNT){
+		return UniqueIdPages[registerID];
 	}
 	return UINT32_MAX;
 }
@@ -586,9 +601,11 @@ void ADMTController::getPreCalibrationFFT(const vector<double>& PANG, vector<dou
     
     // Calculate angle errors
     calculate_angle_error(PANG, angle_errors_pre, &max_err_pre, cycleCount, samplesPerCycle);
+    // Angle Error (angle_errors_pre)
 
     // Perform FFT on pre-calibration angle errors
     performFFT(angle_errors_pre, angle_errors_fft_pre, angle_errors_fft_phase_pre, cycleCount);
+    // FFT Angle Error (angle_errors_pre)
 }
 
 void ADMTController::postcalibrate(vector<double> PANG, int cycleCount, int samplesPerCycle){
@@ -620,9 +637,12 @@ void ADMTController::getPostCalibrationFFT(const vector<double>& updated_PANG, v
 
     // Calculate angle errors
     calculate_angle_error(updated_PANG, angle_errors_post, &max_err_post, cycleCount, samplesPerCycle);
+    // Corrected Error (angle_errors_post)
 
     // Perform FFT on post-calibration angle errors
     performFFT(angle_errors_post, angle_errors_fft_post, angle_errors_fft_phase_post, cycleCount);
+    // FFT Corrected Error (angle_errors_post)
+    // FFT Corrected Error Phase (angle_errors_fft_phase_post)
 }
 
 void ADMTController::performFFT(const vector<double>& angle_errors, vector<double>& angle_errors_fft, vector<double>& angle_errors_fft_phase, int cycleCount) {
@@ -869,7 +889,7 @@ map<string, int> ADMTController::getGeneralRegisterBitMapping(uint16_t registerV
 //     std::cout << pair.first << ": " << pair.second << std::endl;
 // }
 
-map<string, bool> ADMTController::getDigioenRegisterBitMapping(uint16_t registerValue) {
+map<string, bool> ADMTController::getDIGIOENRegisterBitMapping(uint16_t registerValue) {
     map<string, bool> result;
 
     // // Bits 15:14: Reserved (skipped)
@@ -897,22 +917,22 @@ map<string, bool> ADMTController::getDigioenRegisterBitMapping(uint16_t register
     // result["Reserved (7:6)"] = "Reserved";
 
     // Bit 5: Bootload
-    result["BOOTLOAD"] = ((registerValue >> 5) & 0x01) ? false : true; // ? "GPIO5" : "Bootload (Output only)";
+    result["BOOTLOAD"] = ((registerValue >> 5) & 0x01) ? true : false; // ? "GPIO5" : "Bootload (Output only)";
 
     // Bit 4: Fault
-    result["FAULT"] = ((registerValue >> 4) & 0x01) ? false : true; // ? "GPIO4" : "Fault (Output only)";
+    result["FAULT"] = ((registerValue >> 4) & 0x01) ? true : false; // ? "GPIO4" : "Fault (Output only)";
 
     // Bit 3: Acalc
-    result["ACALC"] = ((registerValue >> 3) & 0x01) ? false : true; // ? "GPIO3" : "Acalc (Output only)";
+    result["ACALC"] = ((registerValue >> 3) & 0x01) ? true : false; // ? "GPIO3" : "Acalc (Output only)";
 
     // Bit 2: Sent
-    result["SENT"] = ((registerValue >> 2) & 0x01) ? false : true; // ? "GPIO2" : "Sent (Output only)";
+    result["SENT"] = ((registerValue >> 2) & 0x01) ? true : false; // ? "GPIO2" : "Sent (Output only)";
 
     // Bit 1: Cnv
-    result["CNV"] = ((registerValue >> 1) & 0x01) ? false : true; // ? "GPIO1" : "Cnv (Output only)";
+    result["CNV"] = ((registerValue >> 1) & 0x01) ? true : false; // ? "GPIO1" : "Cnv (Output only)";
 
     // Bit 0: Busy
-    result["BUSY"] = (registerValue & 0x01) ? false : true; // ? "GPIO0" : "Busy (Output only)";
+    result["BUSY"] = (registerValue & 0x01) ? true : false; // ? "GPIO0" : "Busy (Output only)";
 
     return result;
 }
@@ -933,7 +953,7 @@ map<string, bool> ADMTController::getDiag1RegisterBitMapping_Register(uint16_t r
     return result;
 }
 
-map<string, double> ADMTController::getDiag1RegisterBitMapping_Afe(uint16_t registerValue, bool is5V = false) {
+map<string, double> ADMTController::getDiag1RegisterBitMapping_Afe(uint16_t registerValue, bool is5V) {
     map<string, double> result;
 
     // Bits 7:0: AFE Diagnostic 2 - Measurement of Fixed voltage (stored in 2's complement)
@@ -1047,67 +1067,67 @@ int ADMTController::getAbsAngleTurnCount(uint16_t registerValue) {
     }
 }
 
-uint16_t ADMTController::setDIGIOENRegisterBitMapping(uint16_t currentRegisterValue, map<string, int> settings) {
+uint16_t ADMTController::setDIGIOENRegisterBitMapping(uint16_t currentRegisterValue, map<string, bool> settings) {
     uint16_t registerValue = currentRegisterValue;  // Start with the current register value
 
     // Bits 15:14: (preserve original value)
 
     // Bit 13: DIGIO5EN
-    if (settings["DIGIO5EN"] == 1) // "Enabled"
+    if (settings["DIGIO5EN"]) // "Enabled"
     {
         registerValue |= (1 << 13);  // Set bit 13 to 1 (Enabled)
     } 
-    else if (settings["DIGIO5EN"] == 0) // "Disabled"
+    else // "Disabled"
     {
         registerValue &= ~(1 << 13);  // Clear bit 13 (Disabled)
     }
 
     // Bit 12: DIGIO4EN
-    if (settings["DIGIO4EN"] == 1) // "Enabled"
+    if (settings["DIGIO4EN"]) // "Enabled"
     {
         registerValue |= (1 << 12);  // Set bit 12 to 1 (Enabled)
     } 
-    else if (settings["DIGIO4EN"] == 0) // "Disabled"
+    else // "Disabled"
     {
         registerValue &= ~(1 << 12);  // Clear bit 12 (Disabled)
     }
 
     // Bit 11: DIGIO3EN
-    if (settings["DIGIO3EN"] == 1) // "Enabled"
+    if (settings["DIGIO3EN"]) // "Enabled"
     {
         registerValue |= (1 << 11);  // Set bit 11 to 1 (Enabled)
     } 
-    else if (settings["DIGIO3EN"] == 0) // "Disabled"
+    else // "Disabled"
     {
         registerValue &= ~(1 << 11);  // Clear bit 11 (Disabled)
     }
 
     // Bit 10: DIGIO2EN
-    if (settings["DIGIO2EN"] == 1) // "Enabled"
+    if (settings["DIGIO2EN"]) // "Enabled"
     {
         registerValue |= (1 << 10);  // Set bit 10 to 1 (Enabled)
     } 
-    else if (settings["DIGIO2EN"] == 0) // "Disabled"
+    else // "Disabled"
     {
         registerValue &= ~(1 << 10);  // Clear bit 10 (Disabled)
     }
 
     // Bit 9: DIGIO1EN
-    if (settings["DIGIO1EN"] == 1) // "Enabled"
+    if (settings["DIGIO1EN"]) // "Enabled"
     {
         registerValue |= (1 << 9);  // Set bit 9 to 1 (Enabled)
     } 
-    else if (settings["DIGIO1EN"] == 0) // "Disabled"
+    else // "Disabled"
     {
         registerValue &= ~(1 << 9);  // Clear bit 9 (Disabled)
     }
 
     // Bit 8: DIGIO0EN
-    if (settings["DIGIO0EN"] == 1) // "Enabled"
+    if (settings["DIGIO0EN"]) // "Enabled"
     {
         registerValue |= (1 << 8);  // Set bit 8 to 1 (Enabled)
     } 
-    else if (settings["DIGIO0EN"] == 0) // "Disabled"
+    else // "Disabled"
     {
         registerValue &= ~(1 << 8);  // Clear bit 8 (Disabled)
     }
@@ -1117,7 +1137,7 @@ uint16_t ADMTController::setDIGIOENRegisterBitMapping(uint16_t currentRegisterVa
     return registerValue;
 }
 
-vector<double> unwrapAngles(const vector<double>& wrappedAngles) {
+vector<double> ADMTController::unwrapAngles(const vector<double>& wrappedAngles) {
     vector<double> unwrappedAngles;
     unwrappedAngles.reserve(wrappedAngles.size());
 
@@ -1145,4 +1165,96 @@ vector<double> unwrapAngles(const vector<double>& wrappedAngles) {
     }
 
     return unwrappedAngles;
+}
+
+vector<double> ADMTController::wrapAngles(const vector<double>& unwrappedAngles) {
+    vector<double> wrapped_angles;
+    wrapped_angles.reserve(unwrappedAngles.size());
+
+    for (const auto& angle : unwrappedAngles) {
+        // Wrap angle to be within [0, 360)
+        double wrapped_angle = fmod(angle, 360.0);
+
+        // Ensure wrapped_angle is positive
+        if (wrapped_angle < 0) {
+            wrapped_angle += 360.0;
+        }
+
+        wrapped_angles.push_back(wrapped_angle);
+    }
+
+    return wrapped_angles;
+}
+
+map<string, string> ADMTController::getUNIQID3RegisterMapping(uint16_t registerValue) {
+    map<string, string> result;
+
+    // Bits 15:11 - Reserved (ignore)
+    
+    // Bits 10:08 - Product ID (3 bits)
+    uint8_t productID = (registerValue >> 8) & 0x07;
+    switch (productID) {
+        case 0x00:
+            result["Product ID"] = "ADMT4000";
+            break;
+        case 0x01:
+            result["Product ID"] = "ADMT4001";
+            break;
+        default:
+            result["Product ID"] = "Unidentified";
+            break;
+    }
+    
+    // Bits 7:06 - Supply ID (2 bits)
+    uint8_t supplyID = (registerValue >> 6) & 0x03;
+    switch (supplyID) {
+        case 0x00:
+            result["Supply ID"] = "3.3V";
+            break;
+        case 0x02:
+            result["Supply ID"] = "5V";
+            break;
+        default:
+            result["Supply ID"] = "Unknown";
+            break;
+    }
+    
+    // Bits 5:03 - ASIL ID (3 bits)
+    uint8_t asilID = (registerValue >> 3) & 0x07; // Show both Seq 1 & 2 if unknown
+    switch (asilID) {
+        case 0x00:
+            result["ASIL ID"] = "ASIL QM";
+            break;
+        case 0x01:
+            result["ASIL ID"] = "ASIL A";
+            break;
+        case 0x02:
+            result["ASIL ID"] = "ASIL B";
+            break;
+        case 0x03:
+            result["ASIL ID"] = "ASIL C";
+            break;
+        case 0x04:
+            result["ASIL ID"] = "ASIL D";
+            break;
+        default:
+            result["ASIL ID"] = "Unidentified ASIL";
+            break;
+    }
+    
+    // Bits 2:00 - Revision ID (3 bits)
+    uint8_t revisionID = registerValue & 0x07;
+    switch (revisionID) {
+        case 0x01:
+            result["Revision ID"] = "S1";
+            break;
+        case 0x02:
+            result["Revision ID"] = "S2";
+            break;
+        default:
+            result["Revision ID"] = "Unknown";
+            break;
+    }
+
+    return result;
 }

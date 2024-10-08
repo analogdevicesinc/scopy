@@ -137,6 +137,8 @@ private:
 		*AFEDIAGStatusLED, *NVMCRCFaultStatusLED, *ECCDoubleBitErrorStatusLED, *OscillatorDriftStatusLED, *CountSensorFalseStateStatusLED, 
 		*AngleCrossCheckStatusLED, *TurnCountSensorLevelsStatusLED, *MTDIAGStatusLED, *TurnCounterCrossCheckStatusLED, *RadiusCheckStatusLED, *SequencerWatchdogStatusLED;
 
+	CustomSwitch *DIGIOBUSYToggleSwitch, *DIGIOCNVToggleSwitch, *DIGIOSENTToggleSwitch, *DIGIOACALCToggleSwitch, *DIGIOFAULTToggleSwitch, *DIGIOBOOTLOADERToggleSwitch, *DIGIOALLToggleSwitch;
+
 	void updateChannelValues();
 	void updateLineEditValues();
 	void updateGeneralSettingEnabled(bool value);
@@ -194,6 +196,11 @@ private:
 	void toggleWidget(QPushButton *widget, bool value);
 	void GMRReset();
 	void updateCountValue();
+	void changeCustomSwitchLabel(CustomSwitch *customSwitch, QString onLabel, QString offLabel);
+	void readDeviceProperties();
+	void toggleAllDIGIO(bool value);
+	void toggleUtilityTask(bool run);
+	void toggleDIGIOEN(string DIGIOENName, bool value);
 
 	QTimer *timer, *calibrationTimer, *motorCalibrationAcquisitionTimer, *utilityTimer;
 
