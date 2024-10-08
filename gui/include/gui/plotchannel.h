@@ -58,6 +58,8 @@ public:
 	void setXAxis(PlotAxis *newXAxis);
 	double getValueAt(double pos);
 
+	bool isEnabled() const;
+
 public Q_SLOTS:
 	void raise();
 	void attach();
@@ -92,6 +94,8 @@ private:
 
 	int m_thickness;
 	int m_style;
+
+	bool m_isEnabled;
 
 	Q_PROPERTY(int thickness READ thickness WRITE setThickness NOTIFY thicknessChanged);
 	Q_PROPERTY(int style READ style WRITE setStyle NOTIFY styleChanged);

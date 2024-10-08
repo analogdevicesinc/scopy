@@ -14,6 +14,7 @@ PlotChannel::PlotChannel(QString name, QPen pen, PlotAxis *xAxis, PlotAxis *yAxi
 	, m_name(name)
 	, m_style(0)
 	, m_thickness(1)
+	, m_isEnabled(false)
 
 {}
 
@@ -46,9 +47,17 @@ void PlotChannel::setEnabled(bool b)
 		m_curve->detach();
 }
 
-void PlotChannel::enable() { setEnabled(true); }
+void PlotChannel::enable()
+{
+	setEnabled(true);
+	m_isEnabled = true;
+}
 
-void PlotChannel::disable() { setEnabled(false); }
+void PlotChannel::disable()
+{
+	setEnabled(false);
+	m_isEnabled = false;
+}
 
 void PlotChannel::setThicknessInternal(int thickness)
 {
@@ -88,6 +97,8 @@ void PlotChannel::setStyleInternal(int style)
 	}
 	Q_EMIT doReplot();
 }
+
+bool PlotChannel::isEnabled() const { return m_isEnabled; }
 
 void PlotChannel::setXAxis(PlotAxis *newXAxis)
 {
