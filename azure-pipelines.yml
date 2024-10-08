@@ -29,9 +29,6 @@ stages:
   - job: macOSBuilds
     strategy:
       matrix:
-        macOS_12:
-          vmImage: 'macOS-12'
-          artifactName: 'macOS-12'
         macOS_13:
           vmImage: 'macOS-13'
           artifactName: 'macOS-13'
