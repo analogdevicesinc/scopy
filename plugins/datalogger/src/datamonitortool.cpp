@@ -52,6 +52,12 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 
 	connect(addMonitorButton, &AddBtn::clicked, this, &DatamonitorTool::requestNewTool);
 
+	removeBtn = new RemoveBtn(this);
+	if(!isDeletable) {
+		removeBtn->setVisible(false);
+	}
+	connect(removeBtn, &AddBtn::clicked, this, &DatamonitorTool::requestDeleteTool);
+
 	monitorsButton = new MenuControlButton(this);
 	monitorsButton->setName("Monitors");
 	monitorsButton->setOpenMenuChecksThis(true);
@@ -79,6 +85,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	tool->addWidgetToTopContainerMenuControlHelper(settingsButton, TTA_LEFT);
 
 	tool->addWidgetToTopContainerHelper(addMonitorButton, TTA_LEFT);
+	tool->addWidgetToTopContainerHelper(removeBtn, TTA_LEFT);
 
 	///// time manager
 	auto &&timeTracker = TimeManager::GetInstance();
@@ -137,14 +144,11 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	centralWidget->addWidget(sevenSegmetMonitors);
 
 	////////////////////////settings //////////////
-	m_dataMonitorSettings = new DataMonitorSettings(m_monitorPlot, isDeletable);
+	m_dataMonitorSettings = new DataMonitorSettings(m_monitorPlot);
 	// TODO GET SETTINGS NAME FROM UTILS
 	m_dataMonitorSettings->init("DataLogger", StyleHelper::getColor("ScopyBlue"));
 
 	tool->rightStack()->add(DataMonitorUtils::getToolSettingsId(), m_dataMonitorSettings);
-
-	connect(m_dataMonitorSettings, &DataMonitorSettings::requestDeleteTool, this,
-		&DatamonitorTool::requestDeleteTool);
 
 	connect(m_dataMonitorSettings, &DataMonitorSettings::titleUpdated, this,
 		&DatamonitorTool::settingsTitleChanged);

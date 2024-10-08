@@ -22,7 +22,7 @@ using namespace datamonitor;
 
 Q_LOGGING_CATEGORY(CAT_DATAMONITOR_SETTINGS, "DataMonitorSettings")
 
-DataMonitorSettings::DataMonitorSettings(MonitorPlot *m_plot, bool isDeletable, QWidget *parent)
+DataMonitorSettings::DataMonitorSettings(MonitorPlot *m_plot, QWidget *parent)
 	: m_plot(m_plot)
 	, QWidget{parent}
 {
@@ -30,8 +30,6 @@ DataMonitorSettings::DataMonitorSettings(MonitorPlot *m_plot, bool isDeletable, 
 	mainLayout->setMargin(0);
 	mainLayout->setSpacing(10);
 	setLayout(mainLayout);
-
-	m_isDeletable = isDeletable;
 }
 
 DataMonitorSettings::~DataMonitorSettings() {}
@@ -77,13 +75,6 @@ void DataMonitorSettings::init(QString title, QColor color)
 	/////// data logging /////////////////
 	dataLoggingMenu = new DataLoggingMenu(this);
 	layout->addWidget(dataLoggingMenu);
-
-	/////// delete monitor /////////////////
-	if(m_isDeletable) {
-		deleteMonitor = new QPushButton("Delete Tool", this);
-		layout->addWidget(deleteMonitor);
-		connect(deleteMonitor, &QPushButton::clicked, this, &DataMonitorSettings::requestDeleteTool);
-	}
 
 	MouseWheelWidgetGuard *mouseWheelWidgetGuard = new MouseWheelWidgetGuard(this);
 	mouseWheelWidgetGuard->installEventRecursively(this);
