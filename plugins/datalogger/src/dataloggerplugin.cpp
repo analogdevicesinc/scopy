@@ -131,13 +131,17 @@ bool DataLoggerPlugin::onDisconnect()
 						  ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
 
 	Q_EMIT toolListChanged();
+
+	toolIndex = 0;
 	return true;
 }
 
 void DataLoggerPlugin::addNewTool()
 {
-	static int i = 0;
-	QString tool_name = (QString("DataLogger ") + QString::number(i));
+	QString tool_name = QString("DataLogger ");
+	if(toolIndex != 0) {
+		tool_name += QString::number(toolIndex);
+	}
 
 	ToolMenuEntry *toolMenuEntry =
 		SCOPY_NEW_TOOLMENUENTRY(tool_name, tool_name, ":/gui/icons/scopy-default/icons/gear_wheel.svg");
@@ -176,7 +180,7 @@ void DataLoggerPlugin::addNewTool()
 		requestTool(tool_name);
 	}
 
-	i++;
+	toolIndex++;
 }
 
 void DataLoggerPlugin::removeTool(QString toolId)

@@ -46,6 +46,7 @@ private:
 	void initApi();
 	DataLogger_API *api;
 	bool isRunning = false;
+	int toolIndex = 0;
 };
 } // namespace scopy::datamonitor
 #endif // DATALOGGERPLUGIN_H
