@@ -32,7 +32,7 @@ class SCOPY_DATALOGGER_EXPORT DataMonitorSettings : public QWidget
 	friend class DataMonitorStyleHelper;
 	Q_OBJECT
 public:
-	explicit DataMonitorSettings(MonitorPlot *m_plot, bool isDeletable = false, QWidget *parent = nullptr);
+	explicit DataMonitorSettings(MonitorPlot *m_plot, QWidget *parent = nullptr);
 	~DataMonitorSettings();
 
 	void init(QString title, QColor color);
@@ -56,7 +56,6 @@ Q_SIGNALS:
 	void plotXAxisMinValueChange(double value);
 	void plotXAxisMaxValueChange(double value);
 	void requestYMinMaxValues();
-	void requestDeleteTool();
 
 private:
 	bool m_isDeletable;

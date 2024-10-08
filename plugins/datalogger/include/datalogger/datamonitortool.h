@@ -54,6 +54,7 @@ private:
 	RunBtn *runBtn;
 	QPushButton *clearBtn;
 	AddBtn *addMonitorButton;
+	RemoveBtn *removeBtn;
 
 	bool first = true;
 	void resetStartTime();
