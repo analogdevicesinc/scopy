@@ -139,7 +139,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	////////////////////////settings //////////////
 	m_dataMonitorSettings = new DataMonitorSettings(m_monitorPlot, isDeletable);
 	// TODO GET SETTINGS NAME FROM UTILS
-	m_dataMonitorSettings->init("DataMonitor", StyleHelper::getColor("ScopyBlue"));
+	m_dataMonitorSettings->init("DataLogger", StyleHelper::getColor("ScopyBlue"));
 
 	tool->rightStack()->add(DataMonitorUtils::getToolSettingsId(), m_dataMonitorSettings);
 
