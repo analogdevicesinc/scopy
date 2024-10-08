@@ -43,6 +43,11 @@ static const QColor cosineColor = QColor("#91e6cf");
 static const QColor faultLEDColor = QColor("#c81a28");
 static const QColor statusLEDColor = QColor("#2e9e6f");
 
+static map<string, string> deviceRegisterMap;
+static QString deviceName = "";
+static QString deviceType = "";
+static bool is5V = false;
+
 using namespace scopy;
 using namespace scopy::admt;
 using namespace scopy::grutil;
@@ -52,6 +57,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	, isDebug(isDebug)
 	, m_admtController(m_admtController)
 {
+	readDeviceProperties();
 	rotationChannelName = m_admtController->getChannelId(ADMTController::Channel::ROTATION);
 	angleChannelName = m_admtController->getChannelId(ADMTController::Channel::ANGLE);
 	countChannelName = m_admtController->getChannelId(ADMTController::Channel::COUNT);
@@ -211,7 +217,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	generalSettingLayout->setMargin(0);
 	generalSettingWidget->setLayout(generalSettingLayout);
 
-	header = new MenuHeaderWidget("ADMT4000", QPen(StyleHelper::getColor("ScopyBlue")), this);
+	header = new MenuHeaderWidget(deviceName + " " + deviceType, QPen(StyleHelper::getColor("ScopyBlue")), this);
 
 	// General Setting Widget
 	MenuSectionWidget *generalWidget = new MenuSectionWidget(generalSettingWidget);
@@ -1164,8 +1170,17 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	centerUtilityLayout->setSpacing(8);
 	// centerUtilityLayout->setAlignment(Qt::AlignTop);
 
+	QScrollArea *DIGIOScrollArea = new QScrollArea(centerUtilityWidget);
+	QWidget *DIGIOWidget = new QWidget(DIGIOScrollArea);
+	DIGIOScrollArea->setWidget(DIGIOWidget);
+	DIGIOScrollArea->setWidgetResizable(true);
+	QVBoxLayout *DIGIOLayout = new QVBoxLayout(DIGIOWidget);
+	DIGIOWidget->setLayout(DIGIOLayout);
+	DIGIOLayout->setMargin(0);
+	DIGIOLayout->setSpacing(5);
+
 	#pragma region DIGIO Monitor
-	MenuSectionWidget *DIGIOMonitorSectionWidget = new MenuSectionWidget(centerUtilityWidget);
+	MenuSectionWidget *DIGIOMonitorSectionWidget = new MenuSectionWidget(DIGIOWidget);
 	MenuCollapseSection *DIGIOMonitorCollapseSection = new MenuCollapseSection("DIGIO Monitor", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, DIGIOMonitorSectionWidget);
 	DIGIOMonitorSectionWidget->contentLayout()->addWidget(DIGIOMonitorCollapseSection);
 
@@ -1183,6 +1198,112 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	DIGIOMonitorCollapseSection->contentLayout()->addWidget(DIGIOFaultStatusLED);
 	DIGIOMonitorCollapseSection->contentLayout()->addWidget(DIGIOBootloaderStatusLED);
 	#pragma endregion
+
+	#pragma region DIGIO Control
+	MenuSectionWidget *DIGIOControlSectionWidget = new MenuSectionWidget(DIGIOWidget);
+	MenuCollapseSection *DIGIOControlCollapseSection = new MenuCollapseSection("GPIO Control", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, DIGIOControlSectionWidget);
+	DIGIOControlSectionWidget->contentLayout()->addWidget(DIGIOControlCollapseSection);
+
+	QWidget *DIGIOControlGridWidget = new QWidget(DIGIOControlSectionWidget);
+	QGridLayout *DIGIOControlGridLayout = new QGridLayout(DIGIOControlGridWidget);
+	DIGIOControlGridWidget->setLayout(DIGIOControlGridLayout);
+	DIGIOControlGridLayout->setMargin(0);
+	DIGIOControlGridLayout->setSpacing(8);
+
+	QLabel *DIGIOBUSYLabel = new QLabel("GPIO0", DIGIOControlGridWidget);
+	StyleHelper::MenuSmallLabel(DIGIOBUSYLabel, "DIGIOBUSYLabel");
+	QLabel *DIGIOCNVLabel = new QLabel("GPIO1", DIGIOControlGridWidget);
+	StyleHelper::MenuSmallLabel(DIGIOCNVLabel, "DIGIOCNVLabel");
+	QLabel *DIGIOSENTLabel = new QLabel("GPIO2", DIGIOControlGridWidget);
+	StyleHelper::MenuSmallLabel(DIGIOSENTLabel, "DIGIOSENTLabel");
+	QLabel *DIGIOACALCLabel = new QLabel("GPIO3", DIGIOControlGridWidget);
+	StyleHelper::MenuSmallLabel(DIGIOACALCLabel, "DIGIOACALCLabel");
+	QLabel *DIGIOFAULTLabel = new QLabel("GPIO4", DIGIOControlGridWidget);
+	StyleHelper::MenuSmallLabel(DIGIOFAULTLabel, "DIGIOFAULTLabel");
+	QLabel *DIGIOBOOTLOADERLabel = new QLabel("GPIO5", DIGIOControlGridWidget);
+	StyleHelper::MenuSmallLabel(DIGIOBOOTLOADERLabel, "DIGIOBOOTLOADERLabel");
+	QLabel *DIGIOALLLabel = new QLabel("GPIO Output", DIGIOControlGridWidget);
+	StyleHelper::MenuSmallLabel(DIGIOALLLabel, "DIGIOALLLabel");
+
+	DIGIOBUSYToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIOBUSYToggleSwitch, "On", "Off");
+	connect(DIGIOBUSYToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+		toggleDIGIOEN("DIGIO0EN", value);
+	});
+
+	DIGIOCNVToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIOCNVToggleSwitch, "On", "Off");
+	connect(DIGIOCNVToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+		toggleDIGIOEN("DIGIO1EN", value);
+	});
+
+	DIGIOSENTToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIOSENTToggleSwitch, "On", "Off");
+	connect(DIGIOSENTToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+		toggleDIGIOEN("DIGIO2EN", value);
+	});
+
+	DIGIOACALCToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIOACALCToggleSwitch, "On", "Off");
+	connect(DIGIOACALCToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+		toggleDIGIOEN("DIGIO3EN", value);
+	});
+
+	DIGIOFAULTToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIOFAULTToggleSwitch, "On", "Off");
+	connect(DIGIOFAULTToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+		toggleDIGIOEN("DIGIO4EN", value);
+	});
+
+	DIGIOBOOTLOADERToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIOBOOTLOADERToggleSwitch, "On", "Off");
+	connect(DIGIOBOOTLOADERToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+		toggleDIGIOEN("DIGIO5EN", value);
+	});
+
+	DIGIOALLToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIOALLToggleSwitch, "On", "Off");
+	connect(DIGIOALLToggleSwitch, &CustomSwitch::toggled, [=](bool value){
+		toggleAllDIGIO(value);
+	});
+	
+	DIGIOControlGridLayout->addWidget(DIGIOALLLabel, 0, 0);
+	DIGIOControlGridLayout->addWidget(DIGIOALLToggleSwitch, 0, 1);
+
+	DIGIOControlGridLayout->addItem(new QSpacerItem(0, 8, QSizePolicy::Fixed, QSizePolicy::Expanding), 1, 0, 1, 2);
+	QFrame *line = new QFrame();
+	line->setFrameShape(QFrame::HLine);
+	line->setFrameShadow(QFrame::Plain);
+	line->setFixedHeight(1);
+	QString lineStyle = QString(R"css(
+				QFrame {
+					border: 1px solid white;
+				}
+				)css");
+	line->setStyleSheet(lineStyle);
+	DIGIOControlGridLayout->addWidget(line, 2, 0, 1, 2);
+
+	DIGIOControlGridLayout->addItem(new QSpacerItem(0, 8, QSizePolicy::Fixed, QSizePolicy::Expanding), 3, 0, 1, 2);
+
+	DIGIOControlGridLayout->addWidget(DIGIOBUSYLabel, 4, 0);
+	DIGIOControlGridLayout->addWidget(DIGIOBUSYToggleSwitch, 4, 1);
+	DIGIOControlGridLayout->addWidget(DIGIOCNVLabel, 5, 0);
+	DIGIOControlGridLayout->addWidget(DIGIOCNVToggleSwitch, 5, 1);
+	DIGIOControlGridLayout->addWidget(DIGIOSENTLabel, 6, 0);
+	DIGIOControlGridLayout->addWidget(DIGIOSENTToggleSwitch, 6, 1);
+	DIGIOControlGridLayout->addWidget(DIGIOACALCLabel, 7, 0);
+	DIGIOControlGridLayout->addWidget(DIGIOACALCToggleSwitch, 7, 1);
+	DIGIOControlGridLayout->addWidget(DIGIOFAULTLabel, 8, 0);
+	DIGIOControlGridLayout->addWidget(DIGIOFAULTToggleSwitch, 8, 1);
+	DIGIOControlGridLayout->addWidget(DIGIOBOOTLOADERLabel, 9, 0);
+	DIGIOControlGridLayout->addWidget(DIGIOBOOTLOADERToggleSwitch, 9, 1);
+
+	DIGIOControlCollapseSection->contentLayout()->addWidget(DIGIOControlGridWidget);
+	#pragma endregion
+
+	DIGIOLayout->addWidget(DIGIOMonitorSectionWidget);
+	DIGIOLayout->addWidget(DIGIOControlSectionWidget);
+	DIGIOLayout->addStretch();
 
 	#pragma region MTDIAG1 Widget
 	MenuSectionWidget *MTDIAG1SectionWidget = new MenuSectionWidget(centerUtilityWidget);
@@ -1214,6 +1335,7 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	MTDiagnosticsScrollArea->setWidget(MTDiagnosticsWidget);
 	MTDiagnosticsScrollArea->setWidgetResizable(true);
 	QVBoxLayout *MTDiagnosticsLayout = new QVBoxLayout(MTDiagnosticsWidget);
+	MTDiagnosticsWidget->setLayout(MTDiagnosticsLayout);
 	MTDiagnosticsLayout->setMargin(0);
 	MTDiagnosticsLayout->setSpacing(5);
 
@@ -1254,7 +1376,7 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	MTDiagnosticsLayout->addStretch();
 	#pragma endregion
 
-	centerUtilityLayout->addWidget(DIGIOMonitorSectionWidget, 1, Qt::AlignTop);
+	centerUtilityLayout->addWidget(DIGIOScrollArea);
 	centerUtilityLayout->addWidget(MTDiagnosticsScrollArea);
 	// centerUtilityLayout->addWidget(MTDIAG1SectionWidget, 0, Qt::AlignTop);
 	// centerUtilityLayout->addWidget(MTDiagnosticsSectionWidget, 0, Qt::AlignTop);
@@ -1327,6 +1449,164 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	tool->rightStack()->addWidget(rightUtilityScrollArea);
 
 	return tool;
+}
+
+void HarmonicCalibration::toggleUtilityTask(bool run)
+{
+	if(run){
+		utilityTimer->start(utilityTimerRate);
+	}
+	else{
+		utilityTimer->stop();
+	}
+}
+
+void HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool value)
+{
+	toggleUtilityTask(false);
+
+	uint32_t *DIGIOENRegisterValue = new uint32_t;
+	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
+
+	if(changeCNVPage(DIGIOENPage, "DIGIOEN"))
+	{
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+											DIGIOENRegisterValue) != -1)
+		{
+			map<string, bool> DIGIOSettings = m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));
+			DIGIOSettings[DIGIOENName] = value;
+
+			uint16_t newRegisterValue = m_admtController->setDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue), DIGIOSettings);
+
+			changeCNVPage(DIGIOENPage, "DIGIOEN");
+
+			if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+													m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+													static_cast<uint32_t>(newRegisterValue)) != -1)
+			{
+				if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+											DIGIOENRegisterValue) != -1)
+				{
+					map<string, bool> DIGIOSettings = m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));
+					DIGIOBUSYToggleSwitch->setChecked(DIGIOSettings["DIGIO0EN"]);
+					DIGIOCNVToggleSwitch->setChecked(DIGIOSettings["DIGIO1EN"]);
+					DIGIOSENTToggleSwitch->setChecked(DIGIOSettings["DIGIO2EN"]);
+					DIGIOACALCToggleSwitch->setChecked(DIGIOSettings["DIGIO3EN"]);
+					DIGIOFAULTToggleSwitch->setChecked(DIGIOSettings["DIGIO4EN"]);
+					DIGIOBOOTLOADERToggleSwitch->setChecked(DIGIOSettings["DIGIO5EN"]);
+					//StatusBarManager::pushMessage(QString::fromStdString(DIGIOENName) + " is " + QString(value ? "enabled" : "disabled"));
+				}
+				else{ StatusBarManager::pushMessage("Failed to read DIGIOEN Register"); }
+			}
+			else{ StatusBarManager::pushMessage("Failed to write DIGIOEN Register"); }
+		}
+	}
+
+	toggleUtilityTask(true);
+}
+
+void HarmonicCalibration::toggleAllDIGIO(bool value)
+{
+	toggleUtilityTask(false);
+	uint32_t *DIGIOENRegisterValue = new uint32_t;
+	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
+
+	if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+										m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+										DIGIOENRegisterValue) != -1)
+	{
+		map<string, bool> DIGIOSettings;
+		DIGIOSettings["DIGIO5EN"] = value;
+		DIGIOSettings["DIGIO4EN"] = value;
+		DIGIOSettings["DIGIO3EN"] = value;
+		DIGIOSettings["DIGIO2EN"] = value;
+		DIGIOSettings["DIGIO1EN"] = value;
+		DIGIOSettings["DIGIO0EN"] = value;
+		uint16_t newRegisterValue = m_admtController->setDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue), DIGIOSettings);
+
+		changeCNVPage(DIGIOENPage, "DIGIOEN");
+		if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+												m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+												static_cast<uint32_t>(newRegisterValue)) != -1)
+		{
+			if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+											DIGIOENRegisterValue) != -1)
+			{
+				map<string, bool> DIGIOSettings = m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));
+				DIGIOBUSYToggleSwitch->setChecked(DIGIOSettings["DIGIO0EN"]);
+				DIGIOCNVToggleSwitch->setChecked(DIGIOSettings["DIGIO1EN"]);
+				DIGIOSENTToggleSwitch->setChecked(DIGIOSettings["DIGIO2EN"]);
+				DIGIOACALCToggleSwitch->setChecked(DIGIOSettings["DIGIO3EN"]);
+				DIGIOFAULTToggleSwitch->setChecked(DIGIOSettings["DIGIO4EN"]);
+				DIGIOBOOTLOADERToggleSwitch->setChecked(DIGIOSettings["DIGIO5EN"]);
+				StatusBarManager::pushMessage("GPIO Outputs are " + QString(value ? "enabled" : "disabled"));
+			}
+			else{ StatusBarManager::pushMessage("Failed to read DIGIOEN Register"); }
+
+		}
+		else{ StatusBarManager::pushMessage("Failed to write DIGIOEN Register"); }
+	}
+	toggleUtilityTask(true);
+}
+
+void HarmonicCalibration::readDeviceProperties()
+{
+	uint32_t *uniqId3RegisterValue = new uint32_t;
+    uint32_t *cnvPageRegValue = new uint32_t;
+    uint32_t page = m_admtController->getUniqueIdPage(ADMTController::UniqueIDRegister::UNIQID3);
+    uint32_t cnvPageAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE);
+
+    if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, page) != -1){
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, cnvPageRegValue) != -1){
+			if(*cnvPageRegValue == page){
+				
+                if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getUniqueIdRegister(ADMTController::UniqueIDRegister::UNIQID3), uniqId3RegisterValue) != -1){
+                    deviceRegisterMap = m_admtController->getUNIQID3RegisterMapping(static_cast<uint16_t>(*uniqId3RegisterValue));
+
+                    if(deviceRegisterMap.at("Supply ID") == "5V")
+                    {
+                        is5V = true;
+                    }
+                    else if(deviceRegisterMap.at("Supply ID") == "3.3V")
+                    {
+                        is5V = false;
+                    }
+                    else
+                    { 
+                        is5V = false; 
+                    }
+
+                    deviceName = QString::fromStdString(deviceRegisterMap.at("Product ID"));
+                    
+                    if(deviceRegisterMap.at("ASIL ID") == "ASIL QM")
+                    {
+                        deviceType = QString::fromStdString("Industrial");
+                    }
+                    else if(deviceRegisterMap.at("ASIL ID") == "ASIL B")
+                    {
+                        deviceType = QString::fromStdString("Automotive");
+                    }
+                    else{
+                        deviceType = QString::fromStdString(deviceRegisterMap.at("ASIL ID"));
+                    }
+                }
+                else{ StatusBarManager::pushMessage("Failed to read UNIQID3 register"); }
+
+			}
+			else{ StatusBarManager::pushMessage("CNVPAGE for UNIQID3 is a different value, abort reading"); }
+		}
+		else{ StatusBarManager::pushMessage("Failed to read CNVPAGE for UNIQID3"); }
+	}
+	else{ StatusBarManager::pushMessage("Failed to write CNVPAGE for UNIQID3"); }
+}
+
+void HarmonicCalibration::changeCustomSwitchLabel(CustomSwitch *customSwitch, QString onLabel, QString offLabel)
+{
+	customSwitch->setOnText(onLabel);
+	customSwitch->setOffText(offLabel);
 }
 
 void HarmonicCalibration::GMRReset()
@@ -1498,25 +1778,30 @@ void HarmonicCalibration::utilityTask(){
 
 void HarmonicCalibration::updateDigioMonitor(){
 	uint32_t *digioRegValue = new uint32_t;
-	uint32_t digioRegisterAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIO);
+	uint32_t digioEnPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
+	if(changeCNVPage(digioEnPage, "DIGIOEN"))
+	{
+		uint32_t digioRegisterAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN);
 
-	if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), digioRegisterAddress, digioRegValue) != -1){
-		std::map<std::string, bool> digioBitMapping =  m_admtController->getDigioenRegisterBitMapping(static_cast<uint16_t>(*digioRegValue));
-		if(digioBitMapping.at("DIGIO0EN")){ changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor, digioBitMapping.at("BUSY")); }
-		else { changeStatusLEDColor(DIGIOBusyStatusLED, faultLEDColor); }
-		if(digioBitMapping.at("DIGIO1EN")){ changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor, digioBitMapping.at("CNV")); }
-		else { changeStatusLEDColor(DIGIOCNVStatusLED, faultLEDColor); }
-		if(digioBitMapping.at("DIGIO2EN")){ changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor, digioBitMapping.at("SENT")); }
-		else { changeStatusLEDColor(DIGIOSENTStatusLED, faultLEDColor); }
-		if(digioBitMapping.at("DIGIO3EN")){ changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor, digioBitMapping.at("ACALC")); }
-		else { changeStatusLEDColor(DIGIOACALCStatusLED, faultLEDColor); }
-		if(digioBitMapping.at("DIGIO4EN")){ changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor, digioBitMapping.at("FAULT")); }
-		else { changeStatusLEDColor(DIGIOFaultStatusLED, faultLEDColor); }
-		if(digioBitMapping.at("DIGIO5EN")){ changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor, digioBitMapping.at("BOOTLOAD")); }
-		else { changeStatusLEDColor(DIGIOBootloaderStatusLED, faultLEDColor); }
-		commandLogWrite("DIGIO: 0b" + QString::number(static_cast<uint16_t>(*digioRegValue), 2).rightJustified(16, '0'));
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), digioRegisterAddress, digioRegValue) != -1){
+			std::map<std::string, bool> digioBitMapping =  m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*digioRegValue));
+			if(digioBitMapping.at("DIGIO0EN")){ changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor, digioBitMapping.at("BUSY")); }
+			else { changeStatusLEDColor(DIGIOBusyStatusLED, faultLEDColor); }
+			if(digioBitMapping.at("DIGIO1EN")){ changeStatusLEDColor(DIGIOCNVStatusLED, statusLEDColor, digioBitMapping.at("CNV")); }
+			else { changeStatusLEDColor(DIGIOCNVStatusLED, faultLEDColor); }
+			if(digioBitMapping.at("DIGIO2EN")){ changeStatusLEDColor(DIGIOSENTStatusLED, statusLEDColor, digioBitMapping.at("SENT")); }
+			else { changeStatusLEDColor(DIGIOSENTStatusLED, faultLEDColor); }
+			if(digioBitMapping.at("DIGIO3EN")){ changeStatusLEDColor(DIGIOACALCStatusLED, statusLEDColor, digioBitMapping.at("ACALC")); }
+			else { changeStatusLEDColor(DIGIOACALCStatusLED, faultLEDColor); }
+			if(digioBitMapping.at("DIGIO4EN")){ changeStatusLEDColor(DIGIOFaultStatusLED, statusLEDColor, digioBitMapping.at("FAULT")); }
+			else { changeStatusLEDColor(DIGIOFaultStatusLED, faultLEDColor); }
+			if(digioBitMapping.at("DIGIO5EN")){ changeStatusLEDColor(DIGIOBootloaderStatusLED, statusLEDColor, digioBitMapping.at("BOOTLOAD")); }
+			else { changeStatusLEDColor(DIGIOBootloaderStatusLED, faultLEDColor); }
+			commandLogWrite("DIGIOEN: 0b" + QString::number(static_cast<uint16_t>(*digioRegValue), 2).rightJustified(16, '0'));
+		}
+		else{ commandLogWrite("Failed to read DIGIOEN Register"); }
 	}
-	else{ commandLogWrite("Failed to read DIGIO Register"); }
+
 }
 
 void HarmonicCalibration::updateMTDiagRegister(){
@@ -1595,7 +1880,7 @@ void HarmonicCalibration::updateMTDiagnostics(){
 		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, cnvPageRegValue) != -1){
 			if(*cnvPageRegValue == mtDiag1PageValue){
 				if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), mtDiag1RegisterAddress, mtDiag1RegValue) != -1){
-					std::map<std::string, double> mtDiag1BitMapping =  m_admtController->getDiag1RegisterBitMapping_Afe(static_cast<uint16_t>(*mtDiag1RegValue));
+					std::map<std::string, double> mtDiag1BitMapping =  m_admtController->getDiag1RegisterBitMapping_Afe(static_cast<uint16_t>(*mtDiag1RegValue), is5V);
 
 					afeDiag2 = mtDiag1BitMapping.at("AFE Diagnostic 2");
 					AFEDIAG2LineEdit->setText(QString::number(afeDiag2) + " V");
