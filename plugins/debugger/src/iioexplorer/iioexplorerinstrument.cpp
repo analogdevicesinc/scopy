@@ -99,8 +99,8 @@ void IIOExplorerInstrument::setupUi()
 	m_proxyModel->setSourceModel(m_iioModel->getModel());
 	m_proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 
-	m_mainWidget->setStyleSheet(".QWidget {background-color: " + Style::getAttribute(json::theme::background_subtle) + ";}");
-	m_debugLogger->setStyleSheet(".QWidget {background-color: " + Style::getAttribute(json::theme::background_subtle) + ";}");
+	Style::setBackgroundColor(m_mainWidget, json::theme::background_subtle);
+	Style::setBackgroundColor(m_debugLogger, json::theme::background_subtle);
 	Style::setStyle(m_treeView, style::properties::treeView);
 
 	m_treeView->setModel(m_proxyModel);

@@ -8,7 +8,6 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonArray>
-#include <iostream>
 #include <utils.h>
 #include <QFileInfo>
 #include <QDirIterator>
@@ -63,7 +62,7 @@ QString Style::getStylePath(QString relativePath)
 		return path;
 	}
 
-	return  "";
+	return "";
 }
 
 void Style::initPaths()
@@ -175,11 +174,6 @@ QStringList Style::getThemeList()
 
 QString Style::getAttribute(const char *key)
 {
-
-	if(QString(key).contains("run_button_color")) {
-		std::cout <<"";
-	}
-
 	QString attr = m_theme_json->object().value(key).toString();
 	if(attr.isEmpty()) {
 		attr = m_global_json->object().value(key).toString();
@@ -203,6 +197,21 @@ QList<QColor> Style::getChannelColorList()
 	}
 
 	return list;
+}
+
+void Style::setBackgroundColor(QWidget *widget, const char *color, bool extend_to_children)
+{
+	setBackgroundColor(widget, getAttribute(color), extend_to_children);
+}
+
+// extending stylesheet to children is not recommended
+void Style::setBackgroundColor(QWidget *widget, QString color, bool extend_to_children)
+{
+	if(extend_to_children) {
+		widget->setStyleSheet(widget->styleSheet() + "\nbackground-color: " + color + ";");
+	} else {
+		widget->setStyleSheet(widget->styleSheet() + "\n.QWidget { background-color: " + color + "; }");
+	}
 }
 
 QColor Style::getColor(const char *key) { return QColor(getAttribute(key)); }

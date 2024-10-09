@@ -10,7 +10,7 @@ ToolTemplate::ToolTemplate(QWidget *parent)
 {
 	m_ui = new Ui::ToolTemplate();
 	m_ui->setupUi(this);
-	setStyleSheet(".QWidget { background-color: " + Style::getAttribute(json::theme::background_subtle) + "; }");
+	Style::setBackgroundColor(this, json::theme::background_subtle);
 
 	m_ui->bottomCentral->setVisible(false);
 	m_ui->topCentral->setVisible(false);
@@ -31,8 +31,8 @@ ToolTemplate::ToolTemplate(QWidget *parent)
 	m_rightStack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_topStack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_bottomStack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	m_ui->leftContainer->setStyleSheet(".QWidget { background-color: transparent; }");
-	m_ui->topContainerMenuControl->setStyleSheet(".QWidget { background-color: " + Style::getAttribute(json::theme::background_primary) + "; }");
+	Style::setBackgroundColor(m_ui->leftContainer, "transparent");
+	Style::setBackgroundColor(m_ui->topContainerMenuControl, json::theme::background_primary);
 }
 
 ToolTemplate::~ToolTemplate() { delete m_ui; }

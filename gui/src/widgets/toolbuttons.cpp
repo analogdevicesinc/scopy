@@ -92,8 +92,7 @@ RunBtn::RunBtn(QWidget *parent)
 	setText("Run");
 	connect(this, &QPushButton::toggled, this, [=](bool b) { setText(b ? "Stop" : "Run"); });
 	Style::setStyle(this, style::properties::button::runSingle);
-	setStyleSheet("background-color: " + Style::getAttribute(json::global::run_button_color) + ";");
-	std::cout << "-------" << Style::getAttribute(json::global::run_button_color).toStdString() << std::endl;
+	Style::setBackgroundColor(this, json::global::run_button_color, true);
 
 	QIcon icon1;
 	icon1.addPixmap(Style::getPixmap(":/gui/icons/play.svg", Style::getColor(json::theme::content_inverse)),

@@ -33,6 +33,8 @@ public:
 	static QString getColorTransparent(const char *key, double transparency);
 	static QColor getChannelColor(int index);
 	static QList<QColor> getChannelColorList();
+	static void setBackgroundColor(QWidget *widget, const char *color, bool extend_to_children = false);
+	static void setBackgroundColor(QWidget *widget, QString color, bool extend_to_children = false);
 
 	QString getTheme();
 	bool setTheme(QString theme);

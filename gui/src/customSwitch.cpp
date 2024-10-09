@@ -77,7 +77,8 @@ void CustomSwitch::onToggle(bool en)
 
 void CustomSwitch::paintEvent(QPaintEvent *event)
 {
-	m_offLabel->move(m_onLabel->width() - Style::getDimension(json::global::border_width_interactive), m_offLabel->pos().y());
+	m_offLabel->move(m_onLabel->width() - Style::getDimension(json::global::border_width_interactive),
+			 m_offLabel->pos().y());
 
 	if(isChecked()) {
 		m_onLabel->raise();

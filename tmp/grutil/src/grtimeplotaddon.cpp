@@ -78,7 +78,7 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	m_xyPlotWidget = new PlotWidget(widget);
 	dynamic_cast<QTabWidget *>(widget)->addTab(m_xyPlotWidget, "X-Y");
 	QPen xychannel_pen = QPen(Style::getAttribute(json::theme::interactive_primary_idle));
-	widget->setStyleSheet("background-color: " + Style::getAttribute(json::theme::background_subtle));
+	Style::setBackgroundColor(widget, json::theme::background_subtle);
 
 	xy_xPlotAxis = new PlotAxis(QwtAxis::XBottom, m_xyPlotWidget, xychannel_pen);
 	xy_yPlotAxis = new PlotAxis(QwtAxis::YLeft, m_xyPlotWidget, xychannel_pen);
