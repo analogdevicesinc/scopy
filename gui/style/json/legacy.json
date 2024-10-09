@@ -34,6 +34,7 @@
 "svg_arrow_down": ":/gui/icons/handle_down_arrow_dark.svg",
 "sba_cmb_box_arrow_right": ":/gui/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg",
 "sba_cmb_box_arrow": ":/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg",
+"font_family": "Open Sans",
 "radius_1": "2",
 "radius_2": "6",
 "padding_1": "6",

@@ -2,7 +2,7 @@
 QWidget {
     background-color: transparent;
     color: &content_default&;
-    font: &font_size& "Inter";
+    font: &font_size& &font_family&;
     font-weight: 500;
 }
 

@@ -169,6 +169,7 @@
         <file>icons/unlocked.svg</file>
         <file>icons/locked.svg</file>
         <file>Inter-Regular.ttf</file>
+        <file>open-sans-regular.ttf</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>
