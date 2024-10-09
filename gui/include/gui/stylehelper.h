@@ -70,11 +70,9 @@ public:
 	static void MenuOnOffSwitchLabel(QLabel *w, QString objectName = "");
 	static void MenuOnOffSwitchButton(SmallOnOffSwitch *w, QString objectName = "");
 	static void MenuCollapseSection(QWidget *w, QString objectName = "");
-	static void MenuCollapseHeaderLabel(QLabel *w, QString objectName = "");
 	static void MenuCollapseHeaderLineEdit(QLineEdit *w, QString objectName = "");
 	static void MenuComboLabel(QLabel *w, QString objectName = "");
 	static void MenuHeaderLabel(QLabel *w, QString objectName = "");
-	static void MenuControlLabel(QLabel *w, QString objectName = "");
 	static void MenuBigSwitch(QWidget *w, QString objectName = "");
 	static void MenuBigSwitchButton(CustomSwitch *w, QString objectName = "");
 	static void MenuLineEdit(QLineEdit *m_edit, QString objectName = "");

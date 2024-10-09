@@ -175,6 +175,11 @@ QStringList Style::getThemeList()
 
 QString Style::getAttribute(const char *key)
 {
+
+	if(QString(key).contains("run_button_color")) {
+		std::cout <<"";
+	}
+
 	QString attr = m_theme_json->object().value(key).toString();
 	if(attr.isEmpty()) {
 		attr = m_global_json->object().value(key).toString();
@@ -215,6 +220,7 @@ QString Style::replaceAttributes(QString style, int calls_limit)
 			QJsonValue value = m_global_json->object().value(key);
 			style.replace("&" + key + "&", value.toString());
 		}
+
 		replaceAttributes(style, --calls_limit);
 	}
 	if(style.contains('&') && calls_limit <= 0) {

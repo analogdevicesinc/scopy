@@ -28,6 +28,7 @@
 #include <QWidget>
 #include <gui/stylehelper.h>
 
+#include <style.h>
 #include <utility>
 
 using namespace scopy::swiot;
@@ -127,12 +128,12 @@ QWidget *FaultsGroup::buildActiveStoredWidget()
 	storedLabel->setText("Stored");
 	storedLabel->setContentsMargins(0, 0, 0, 0);
 	storedLabel->setAlignment(Qt::AlignLeft);
-	StyleHelper::MenuMediumLabel(storedLabel);
+	Style::setStyle(storedLabel, style::properties::label::menuMedium);
 	auto activeLabel = new QLabel(this);
 	activeLabel->setText("Active");
 	activeLabel->setContentsMargins(0, 0, 0, 0);
 	activeLabel->setAlignment(Qt::AlignLeft);
-	StyleHelper::MenuMediumLabel(activeLabel);
+	Style::setStyle(activeLabel, style::properties::label::menuMedium);
 	auto spacer = new QSpacerItem(0, 30, QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	widget->setLayout(new QVBoxLayout(widget));

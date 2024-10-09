@@ -20,11 +20,12 @@ MenuControlButton::MenuControlButton(QWidget *parent)
 	m_chk = new QCheckBox("", this);
 	m_label = new QLabel("", this);
 	m_btn = new QPushButton("", this);
-	m_color = Style::getAttribute(json::theme::interactive_primary_disabled);
+	m_color = Style::getAttribute(json::theme::interactive_primary_idle);
 	m_cs = CS_SQUARE;
 
 	lay->addWidget(m_chk);
 	lay->addWidget(m_label);
+	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
 	lay->addWidget(m_btn);
 	applyStylesheet();
 
@@ -123,7 +124,7 @@ void MenuControlButton::applyStylesheet()
 		// default style
 		break;
 	}
-	StyleHelper::MenuControlLabel(m_label, "name");
+	Style::setStyle(m_label, style::properties::label::menuMedium);
 	StyleHelper::MenuControlButton(m_btn, "btn");
 }
 

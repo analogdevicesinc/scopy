@@ -11,7 +11,8 @@ QWidget {
 }
 
 QLineEdit {
-    border: &border_width_editable& solid &interactive_subtle_idle&;
+    border: &border_width& solid &interactive_subtle_idle&;
+    border-bottom: &border_width_interactive& solid &interactive_subtle_idle&;
     border-radius: &radius_1&px;
     padding: 0 &padding_1&px;
     selection-background-color: &interactive_subtle_pressed&;
@@ -21,10 +22,10 @@ QSplitter {
     background-color: &background_subtle&;
 }
 QSplitter::handle:horizontal {
-    width: &unit_05&;
+    width: &unit_0_5&;
 }
 QSplitter::handle:vertical {
-    height: &unit_05&;
+    height: &unit_0_5&;
 }
 
 QLabel {
@@ -45,18 +46,18 @@ QCheckBox::indicator::unchecked::disabled {
     background-color: &interactive_subtle_disabled&;
 }
 QCheckBox::indicator::unchecked {
-    border: &border_width_editable& solid &interactive_subtle_idle&;
+    border: &border_width_interactive& solid &interactive_subtle_idle&;
     background-color: &content_inverse&;
     image: none;
 }
 
 QCheckBox::indicator::checked::disabled {
-    border: &border_width_editable& solid &interactive_primary_disabled&;
+    border: &border_width_interactive& solid &interactive_primary_disabled&;
     background-color: &interactive_primary_disabled&;
     image: url(&svg_checkmark&);
 }
 QCheckBox::indicator::checked {
-    border: &border_width_editable& solid &content_silent&;
+    border: &border_width_interactive& solid &content_silent&;
     background-color: &interactive_primary_idle&;
     image: url(&svg_checkmark&);
 }
@@ -80,11 +81,11 @@ QPushButton::pressed {
 
 QComboBox::disabled {
     color: &interactive_subtle_disabled&;
-    border: &border_width_editable& solid &interactive_subtle_disabled&;
+    border: &border_width_interactive& solid &interactive_subtle_disabled&;
 }
 QComboBox {
     height: &unit_2&;
-    border: &border_width_editable& solid &interactive_subtle_idle&;
+    border: &border_width_interactive& solid &interactive_subtle_idle&;
     border-radius: &radius_1&;
     background-color: &background_primary&;
     color: &content_default&;
@@ -155,16 +156,16 @@ QScrollArea {
 }
 QScrollBar:vertical {
     max-width: 8px;
-    background: &interactive_subtle_idle&;
-    max-width: &unit_05&;
+    background: &background_subtle&;
+    max-width: &unit_0_5&;
 }
 QScrollBar::handle:vertical {
-    background: &interactive_primary_idle&;
+    background: &interactive_subtle_idle&;
     border: 0;
     border-radius: &radius_1&;
 }
 QScrollBar::handle:vertical:hover {
-    background: &interactive_primary_disabled&;
+    background: &interactive_subtle_hover&;
     border: 0;
     border-radius: &radius_1&;
 }
@@ -178,17 +179,17 @@ QScrollBar::sub-line:vertical {
     background: none;
 }
 QScrollBar:horizontal {
-    background: &interactive_subtle_idle&;
-    max-height: &unit_05&;
+    background: &background_subtle&;
+    max-height: &unit_0_5&;
     border-radius: &radius_1&;
 }
 QScrollBar::handle:horizontal {
-    background: &interactive_primary_idle&;
+    background: &interactive_subtle_idle&;
     border: 0;
     border-radius: &radius_1&;
 }
 QScrollBar::handle:horizontal:hover {
-    background: &interactive_primary_disabled&;
+    background: &interactive_subtle_hover&;
     border: 0;
     border-radius: &radius_1&;
 }
@@ -249,7 +250,7 @@ scopy--BufferPreviewer {
     border: 1px solid &interactive_primary_idle&;
     alternate-background-color: &interactive_primary_disabled&;
     selection-background-color: &background_plot&;
-    selection-color: &interactive_secondary_idle&;
+    selection-color: &interactive_accent_idle&;
     color: &content_default&;
 }
 

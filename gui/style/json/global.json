@@ -1,8 +1,11 @@
 {
 "font_size": "13px",
-"unit_05": "8",
+"font_size_0_5": "12px",
+"font_size_1": "14px",
+"unit_0_5": "8",
 "unit_1": "16",
 "unit_2": "24",
+"unit_2_5": "32",
 "unit_3": "36",
 "unit_4": "48",
 "radius_1": "4",
@@ -10,13 +13,14 @@
 "padding_1": "6",
 "padding_2": "12",
 "border_width": "1",
-"border_width_editable": "1",
-"ch0": "#3A8EE9",
+"border_width_interactive": "1",
+"ch0": "#E76423",
 "ch1": "#B16EE0",
 "ch2": "#2E9E6F",
-"ch3": "#E76423",
+"ch3": "#3A8EE9",
 "ch4": "#F64C5A",
 "ch5": "#1694CA",
 "ch6": "#E84DB4",
-"ch7": "#E9E33A"
+"ch7": "#E9E33A",
+"run_button_color": "&interactive_primary_idle&"
 }

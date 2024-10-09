@@ -1,21 +1,21 @@
 QPushButton[&&property&&=true] {
-    border: &border_width_editable& solid &content_silent&;
+    border: &border_width_interactive& solid &interactive_primary_idle&;
     border-radius: &radius_1&;
     background-color: transparent;
     color: &interactive_primary_idle&;
 }
 QPushButton[&&property&&=true]:pressed {
-    border: &border_width_editable& solid &interactive_primary_pressed&; 
+    border: &border_width_interactive& solid &interactive_primary_pressed&; 
     background-color: transparent;
     color: &interactive_primary_pressed&;
 }
 QPushButton[&&property&&=true]:hover {
-    border: &border_width_editable& solid &interactive_primary_hover&; 
+    border: &border_width_interactive& solid &interactive_primary_hover&; 
     background-color: transparent;
     color: &interactive_primary_hover&;
 }
 QPushButton[&&property&&=true]:disabled {
-    border: &border_width_editable& solid &interactive_primary_disabled&; 
+    border: &border_width_interactive& solid &interactive_primary_disabled&; 
     background-color: transparent;
     color: &interactive_primary_disabled&;
 }

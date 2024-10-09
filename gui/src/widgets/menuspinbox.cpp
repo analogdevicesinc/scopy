@@ -97,13 +97,15 @@ void MenuSpinbox::layoutVertically(bool left)
 		lay->addLayout(btnLay);
 	}
 
+	Style::setStyle(m_label, style::properties::label::subtle);
+
 	int size = Style::getDimension(json::global::unit_3);
 	m_plus->setIcon(Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
-	Style::setStyle(m_plus, style::properties::button::basicButton);
+	Style::setStyle(m_plus, style::properties::button::spinboxButton);
 	m_plus->setFixedSize(size, size);
 
 	m_minus->setIcon(Style::getPixmap(":/gui/icons/minus.svg", Style::getColor(json::theme::content_inverse)));
-	Style::setStyle(m_minus, style::properties::button::basicButton);
+	Style::setStyle(m_minus, style::properties::button::spinboxButton);
 	m_minus->setFixedSize(size, size);
 }
 
@@ -147,13 +149,15 @@ void MenuSpinbox::layoutHorizontally(bool left)
 		lay->addLayout(btnLay);
 	}
 
+	Style::setStyle(m_label, style::properties::label::subtle);
+
 	int size = Style::getDimension(json::global::unit_3);
 	m_plus->setIcon(Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
-	Style::setStyle(m_plus, style::properties::button::basicButton);
+	Style::setStyle(m_plus, style::properties::button::spinboxButton);
 	m_plus->setFixedSize(size, size);
 
 	m_minus->setIcon(Style::getPixmap(":/gui/icons/minus.svg", Style::getColor(json::theme::content_inverse)));
-	Style::setStyle(m_minus, style::properties::button::basicButton);
+	Style::setStyle(m_minus, style::properties::button::spinboxButton);
 	m_minus->setFixedSize(size, size);
 }
 

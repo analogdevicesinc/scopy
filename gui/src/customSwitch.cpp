@@ -21,7 +21,6 @@
 #include "customSwitch.h"
 #include "qcoreevent.h"
 #include "qvariant.h"
-#include <iostream>
 #include <style.h>
 #include <QHBoxLayout>
 
@@ -78,7 +77,7 @@ void CustomSwitch::onToggle(bool en)
 
 void CustomSwitch::paintEvent(QPaintEvent *event)
 {
-	m_offLabel->move(m_onLabel->width() - Style::getDimension(json::global::border_width), m_offLabel->pos().y());
+	m_offLabel->move(m_onLabel->width() - Style::getDimension(json::global::border_width_interactive), m_offLabel->pos().y());
 
 	if(isChecked()) {
 		m_onLabel->raise();
@@ -115,7 +114,7 @@ void CustomSwitch::setOffText(QString text)
 QSize CustomSwitch::sizeHint() const
 {
 	QSize size = layout()->sizeHint();
-	size.rwidth() -= Style::getDimension(json::global::border_width);
+	size.rwidth() -= Style::getDimension(json::global::border_width_interactive);
 	return size;
 }
 

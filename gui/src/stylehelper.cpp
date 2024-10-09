@@ -133,7 +133,7 @@ void StyleHelper::MeasurementSelectorItemWidget(QString iconPath, MeasurementSel
 	w->m_icon->setFixedSize(24, 24);
 
 	w->m_name->setContentsMargins(5, 0, 0, 0);
-	StyleHelper::MenuMediumLabel(w->m_name);
+	Style::setStyle(w->m_name, style::properties::label::menuMedium);
 }
 
 void StyleHelper::BasicButton(QPushButton *btn, QString objectName)
@@ -193,21 +193,7 @@ void StyleHelper::ColoredSquareCheckbox(QCheckBox *chk, QColor color, QString ob
 
 void StyleHelper::MenuMediumLabel(QLabel *lbl, QString objectName)
 {
-	if(!objectName.isEmpty())
-		lbl->setObjectName(objectName);
-	lbl->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	lbl->setMinimumWidth(50);
-	//	lbl->setMaximumWidth(80);
-	QString style = QString(R"css(
-				QLabel {
-					color: &&content_default&&;
-					background-color: rgba(255,255,255,0);
-					font-weight: 700;
-					font-size: 14px;
-					}
-				)css");
-	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
-	lbl->setStyleSheet(style);
+	Style::setStyle(lbl, style::properties::label::menuMedium);
 }
 
 void StyleHelper::MenuControlButton(QPushButton *btn, QString objectName, bool checkable)
@@ -225,15 +211,17 @@ void StyleHelper::MenuControlButton(QPushButton *btn, QString objectName, bool c
 								border-image: url(:/gui/icons/setup_btn_checked.svg)
 							}
 							QPushButton#btn:!pressed {
-								border-image: url(:/gui/icons/setup_btn_unchecked.svg)
+								border-image: url(:/gui/icons/&&theme&&/icons/setup_btn_unchecked.svg)
 							}
 							QPushButton#btn:hover:!pressed:!checked {
-								border-image: url(:/gui/icons/setup_btn_hover.svg)
+								border-image: url(:/gui/icons/&&theme&&/icons/setup_btn_hover.svg)
 							}
 							  QPushButton#btn:checked {
 								border-image: url(:/gui/icons/setup_btn_checked.svg);
 							}
 							)css");
+
+	style.replace("&&theme&&", Style::getAttribute(json::theme::icon_theme_folder));
 	btn->setStyleSheet(style);
 	btn->setIconSize(QSize(48, 48));
 }
@@ -251,23 +239,8 @@ void StyleHelper::MenuSmallLabel(QLabel *m_lbl, QString objectName)
 {
 	if(!objectName.isEmpty())
 		m_lbl->setObjectName(objectName);
-	m_lbl->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-	QString style = QString(R"css(
-				QLabel {
-					color: &&content_default&&;
-					background-color: rgba(255,255,255,0);
-					font-weight: 500;
-					font-family: Open Sans;
-					font-size: 12px;
-					font-style: normal;
-					}
-				QLabel:disabled {
-					color: grey;
-				}
-				)css");
-	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
-	m_lbl->setText(m_lbl->text().toUpper());
+	Style::setStyle(m_lbl, style::properties::label::menuSmall);
 }
 
 void StyleHelper::MenuComboWidget(QWidget *w, QString objectName)
@@ -609,7 +582,6 @@ void StyleHelper::BlueIconButton(QPushButton *w, QIcon icon, QString objectName)
 	int size = 30;
 	w->setIcon(icon);
 	w->setIconSize(QSize(size, size));
-	w->setProperty("blue_button", true);
 	w->setFixedHeight(size);
 	w->setFixedWidth(size);
 
@@ -709,14 +681,7 @@ void StyleHelper::MenuComboLabel(QLabel *w, QString objectName) { StyleHelper::M
 
 void StyleHelper::MenuHeaderLabel(QLabel *w, QString objectName) { StyleHelper::MenuLargeLabel(w, objectName); }
 
-void StyleHelper::MenuControlLabel(QLabel *w, QString objectName) { StyleHelper::MenuMediumLabel(w, objectName); }
-
 void StyleHelper::MenuOnOffSwitchLabel(QLabel *w, QString objectName) { StyleHelper::MenuSmallLabel(w, objectName); }
-
-void StyleHelper::MenuCollapseHeaderLabel(QLabel *w, QString objectName)
-{
-	StyleHelper::MenuMediumLabel(w, objectName);
-}
 
 void StyleHelper::MenuCollapseHeaderLineEdit(QLineEdit *w, QString objectName)
 {
