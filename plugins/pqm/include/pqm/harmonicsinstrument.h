@@ -70,6 +70,7 @@ private:
 	bool selectedFromSameCol(QModelIndexList list);
 
 	QString m_uri;
+	bool m_running;
 	QString m_harmonicsType;
 	QWidget *m_thdWidget;
 	RunBtn *m_runBtn;
