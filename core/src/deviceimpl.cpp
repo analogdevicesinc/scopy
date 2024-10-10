@@ -13,9 +13,12 @@
 #include <QLoggingCategory>
 #include <QTextBrowser>
 #include <QThread>
+#include <QtConcurrent/QtConcurrent>
 
 #include <common/scopyconfig.h>
-#include <widgets/hoverwidget.h>
+#include <gui/widgets/hoverwidget.h>
+#include <gui/widgets/connectionloadingbar.h>
+#include <pluginbase/statusbarmanager.h>
 
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "Device")
 
@@ -301,13 +304,25 @@ void DeviceImpl::connectDev()
 {
 	QElapsedTimer pluginTimer;
 	QElapsedTimer timer;
+	ConnectionLoadingBar *connectionLoadingBar = new ConnectionLoadingBar();
+	connectionLoadingBar->setProgressBarMaximum(m_plugins.size());
+	StatusBarManager::pushUrgentWidget(connectionLoadingBar, "Connection Loading Bar");
+	QEventLoop eventLoop;
 	timer.start();
 	Preferences *pref = Preferences::GetInstance();
 	bool disconnectDevice = false;
+	connbtn->hide();
+	discbtn->show();
+	discbtn->setEnabled(false);
+	eventLoop.processEvents(); // Display the status bar with initial value
 	for(auto &&p : m_plugins) {
 		pluginTimer.start();
+		connectionLoadingBar->setCurrentPlugin(p->name());
+		eventLoop.processEvents(); // Update status bar
 		bool pluginConnectionSucceeded = p->onConnect();
 		qInfo(CAT_BENCHMARK) << p->name() << " connection took: " << pluginTimer.elapsed() << "ms";
+		connectionLoadingBar->addProgress(1); // TODO: might change to better reflect the time
+		eventLoop.processEvents();	      // Update status bar
 		if(pluginConnectionSucceeded) {
 			if(pref->get("general_save_session").toBool()) {
 				QSettings s = QSettings(scopy::config::settingsFolderPath() + "/" + p->name() + ".ini",
@@ -326,10 +341,10 @@ void DeviceImpl::connectDev()
 	if(disconnectDevice || m_connectedPlugins.isEmpty()) {
 		Q_EMIT connectionFailed();
 	} else {
-		connbtn->hide();
-		discbtn->show();
+		discbtn->setEnabled(true);
 		discbtn->setFocus();
 		bindPing();
+		delete connectionLoadingBar;
 		Q_EMIT connected();
 	}
 	qInfo(CAT_BENCHMARK) << this->displayName() << " device connection took: " << timer.elapsed() << "ms";

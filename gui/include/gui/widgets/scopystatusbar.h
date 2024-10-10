@@ -53,7 +53,6 @@ public Q_SLOTS:
 private:
 	void initUi();
 
-	void addToRight(QWidget *widget);
 	void addToLeft(QWidget *widget);
 	void removeLastStatusMessage();
 
@@ -61,7 +60,6 @@ private:
 
 	// UI elements
 	QStackedWidget *m_stackedWidget;
-	QWidget *m_rightWidget;
 	StatusBarManager *m_statusManager;
 };
 } // namespace scopy

@@ -407,12 +407,6 @@ void SWIOTPlugin::setupToolList()
 		&SwiotRuntime::onBackBtnPressed);
 	connect(dynamic_cast<Faults *>(faultsTme->tool()), &Faults::backBtnPressed, m_runtime,
 		&SwiotRuntime::onBackBtnPressed);
-
-	if(!m_isRuntime) {
-		requestTool(configTme->id());
-	} else {
-		requestTool(ad74413rTme->id());
-	}
 }
 
 void SWIOTPlugin::clearPingTask()
