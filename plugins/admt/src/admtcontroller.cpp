@@ -650,8 +650,8 @@ void ADMTController::getPostCalibrationFFT(const vector<double>& updated_PANG, v
 
     // Perform FFT on post-calibration angle errors
     performFFT(angle_errors_post, angle_errors_fft_post, angle_errors_fft_phase_post, cycleCount);
-    // FFT Corrected Error (angle_errors_post)
-    FFTCorrectedErrorMagnitude = angle_errors_post;
+    // FFT Corrected Error (angle_errors_fft_post)
+    FFTCorrectedErrorMagnitude = angle_errors_fft_post;
     // FFT Corrected Error Phase (angle_errors_fft_phase_post)
     FFTCorrectedErrorPhase = angle_errors_fft_phase_post;
 }
