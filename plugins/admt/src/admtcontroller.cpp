@@ -659,14 +659,14 @@ void ADMTController::getPostCalibrationFFT(const vector<double>& updated_PANG, v
 void ADMTController::performFFT(const vector<double>& angle_errors, vector<double>& angle_errors_fft, vector<double>& angle_errors_fft_phase, int cycleCount) {
     typedef complex<double> cx;
 
-    int size = angle_errors.size();
-    int N = pow(2, ceil(log2(size))); // Ensure size is a power of 2 (padding if necessary)
+    int L = angle_errors.size(); // Original signal length (L)
+    int N = pow(2, ceil(log2(L))); // Ensure size is a power of 2 (padding if necessary)
 
-    vector<cx> fft_in(N, cx(0, 0));    // Input signal (zero-padded if necessary)
-    vector<cx> fft_out(N);             // Output signal (complex)
+    vector<cx> fft_in(N, cx(0, 0)); // Input signal (zero-padded if necessary)
+    vector<cx> fft_out(N); // Output signal (complex)
 
     // Format angle errors into the fft_in vector
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < L; i++) {
         fft_in[i] = cx(angle_errors[i], 0);
     }
 
@@ -679,8 +679,8 @@ void ADMTController::performFFT(const vector<double>& angle_errors, vector<doubl
 
     // Calculate magnitude and phase for all values
     for (int i = 0; i < N; i++) {
-        // Magnitude: Normalize by N (to avoid amplitude increase)
-        angle_errors_fft_temp[i] = abs(fft_out[i]) * 2.0 / N;
+        // Magnitude: Normalize by L (original signal length)
+        angle_errors_fft_temp[i] = abs(fft_out[i]) * 2.0 / L;
         angle_errors_fft_phase_temp[i] = atan2(fft_out[i].imag(), fft_out[i].real());
     }
 
@@ -698,7 +698,6 @@ void ADMTController::performFFT(const vector<double>& angle_errors, vector<doubl
     angle_errors_fft = angle_errors_fft_upper_half;
     angle_errors_fft_phase = angle_errors_fft_phase_upper_half;
 }
-
 
 void ADMTController::computeSineCosineOfAngles(const vector<double>& angles) {
     // Vectors to store sine and cosine values
