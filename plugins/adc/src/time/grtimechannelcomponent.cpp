@@ -69,8 +69,10 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 	m_scaleWidget = nullptr;
 	if(m_scaleAvailable) {
 		cb->addItem(m_unit.name, YMODE_SCALE);
-		m_scaleWidget =
-			IIOWidgetBuilder().channel(m_src->channel()).attribute(m_src->scaleAttribute()).buildSingle();
+		m_scaleWidget = IIOWidgetBuilder(m_yaxisMenu)
+					.channel(m_src->channel())
+					.attribute(m_src->scaleAttribute())
+					.buildSingle();
 	}
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_timePlotComponentChannel->m_timePlotYAxis, m_yaxisMenu);
@@ -177,7 +179,7 @@ QWidget *GRTimeChannelComponent::createAttrMenu(QWidget *parent)
 {
 	MenuSectionCollapseWidget *section =
 		new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
-	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder().channel(m_src->channel()).buildAll();
+	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(section).channel(m_src->channel()).buildAll();
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);

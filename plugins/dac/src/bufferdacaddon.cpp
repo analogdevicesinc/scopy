@@ -412,7 +412,7 @@ QWidget *BufferDacAddon::createAttrMenu(TxNode *node, QWidget *parent)
 	MenuSectionWidget *attrContainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *attr =
 		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrContainer);
-	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder().channel(node->getChannel()).buildAll();
+	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(attr).channel(node->getChannel()).buildAll();
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
