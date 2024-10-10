@@ -37,7 +37,7 @@ bool ADCPlugin::compatible(QString m_param, QString category)
 		iio_device *dev = iio_context_get_device(conn->context(), i);
 		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
 			struct iio_channel *chn = iio_device_get_channel(dev, j);
-			if(iio_channel_is_scan_element(chn)) {
+			if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
 				ret = true;
 				goto finish;
 			}
