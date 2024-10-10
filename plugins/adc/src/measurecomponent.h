@@ -12,12 +12,13 @@ namespace adc {
 class SCOPY_ADC_EXPORT MeasureComponent : public QObject, public ToolComponent
 {
 public:
-	MeasureComponent(ToolTemplate *tool, MeasurementPanelInterface *p, QObject *parent);
+	MeasureComponent(ToolTemplate *tool, QButtonGroup *btngroup, MeasurementPanelInterface *p, QObject *parent);
 	MeasurementSettings *measureSettings();
 
 private:
 	void setupMeasureButtonHelper(MenuControlButton *);
 	MeasurementSettings *m_measureSettings;
+	QButtonGroup *hoverBtnGroup;
 
 	QString measureMenuId = "measure";
 	QString statsMenuId = "stats";
