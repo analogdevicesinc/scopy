@@ -8,6 +8,7 @@
 #include <gui/flexgridlayout.hpp>
 #include <QTableWidget>
 #include <QWidget>
+#include <pqmdatalogger.h>
 #include <gui/widgets/measurementlabel.h>
 #include <gui/widgets/menucontrolbutton.h>
 #include <gui/widgets/toolbuttons.h>
@@ -34,6 +35,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void enableTool(bool en, QString toolName = "harmonics");
 	void runTme(bool en);
+	void logData(PqmDataLogger::ActiveInstrument instr, const QString &filePath);
 private Q_SLOTS:
 	void updateTable();
 	void onActiveChnlChannged(QString chnlId);
@@ -45,8 +47,11 @@ private:
 	void initPlot();
 	void setupPlotChannels();
 	QWidget *createThdWidget();
-	QWidget *createSettingsMenu();
+	QWidget *createSettingsMenu(QWidget *parent);
+	QWidget *createMenuGeneralSection(QWidget *parent);
+	QWidget *createMenuLogSection(QWidget *parent);
 	bool selectedFromSameCol(QModelIndexList list);
+	void browseFile(QLineEdit *lineEditPath);
 
 	bool m_running;
 	QString m_harmonicsType;
