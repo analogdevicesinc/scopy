@@ -16,6 +16,7 @@ using namespace scopy::pqm;
 
 WaveformInstrument::WaveformInstrument(QWidget *parent)
 	: QWidget(parent)
+	, m_running(false)
 {
 	initData();
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -171,6 +172,7 @@ void WaveformInstrument::stop() { m_runBtn->setChecked(false); }
 
 void WaveformInstrument::toggleWaveform(bool en)
 {
+	m_running = en;
 	if(en) {
 		ResourceManager::open("pqm", this);
 	} else {
@@ -238,7 +240,7 @@ void WaveformInstrument::onRollingSwitch(bool checked)
 
 void WaveformInstrument::onBufferDataAvailable(QMap<QString, QVector<double>> data)
 {
-	if(!m_runBtn->isChecked() && !m_singleBtn->isChecked()) {
+	if(!m_running) {
 		return;
 	}
 	int samplingFreq = m_plotSampleRate * m_timespanSpin->value();

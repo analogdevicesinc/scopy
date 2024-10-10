@@ -12,6 +12,7 @@ using namespace scopy::pqm;
 
 HarmonicsInstrument::HarmonicsInstrument(QWidget *parent)
 	: QWidget(parent)
+	, m_running(false)
 {
 	initData();
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -233,6 +234,7 @@ void HarmonicsInstrument::stop() { m_runBtn->setChecked(false); }
 
 void HarmonicsInstrument::toggleHarmonics(bool en)
 {
+	m_running = en;
 	if(en) {
 		ResourceManager::open("pqm", this);
 	} else {
@@ -270,22 +272,23 @@ void HarmonicsInstrument::onSelectionChanged()
 
 void HarmonicsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> attr)
 {
-	if(m_runBtn->isChecked() || m_singleBtn->isChecked()) {
-		QString h = m_harmonicsType;
-		for(const QString &ch : m_chnls) {
-			QStringList harmonics = attr[ch][h].split(" ");
-			m_yValues[ch].clear();
-			for(const QString &val : qAsConst(harmonics)) {
-				m_yValues[ch].push_back(val.toDouble());
-			}
-			// thd labels update
-			m_labels[ch]->setValue(attr[ch]["thd"].toDouble());
+	if(!m_running) {
+		return;
+	}
+	QString h = m_harmonicsType;
+	for(const QString &ch : m_chnls) {
+		QStringList harmonics = attr[ch][h].split(" ");
+		m_yValues[ch].clear();
+		for(const QString &val : qAsConst(harmonics)) {
+			m_yValues[ch].push_back(val.toDouble());
 		}
-		updateTable();
-		m_plot->replot();
-		if(m_singleBtn->isChecked()) {
-			m_singleBtn->setChecked(false);
-		}
+		// thd labels update
+		m_labels[ch]->setValue(attr[ch]["thd"].toDouble());
+	}
+	updateTable();
+	m_plot->replot();
+	if(m_singleBtn->isChecked()) {
+		m_singleBtn->setChecked(false);
 	}
 }
 
