@@ -1,11 +1,13 @@
 #include "harmoniccalibration.h"
-#include <widgets/horizontalspinbox.h>
+#include "qtconcurrentrun.h"
 
+#include <widgets/horizontalspinbox.h>
 #include <stylehelper.h>
 
+#include <QFuture>
+
 static int sampleRate = 50;
-static int calibrationTimerRate = 100;
-static int motorCalibrationAcquisitionTimerRate = 20;
+static int calibrationTimerRate = 1000;
 static int utilityTimerRate = 1000;
 
 static int bufferSize = 1;
@@ -17,9 +19,8 @@ static double *dataGraphValue;
 static int cycleCount = 11;
 static int samplesPerCycle = 256;
 static int totalSamplesCount = cycleCount * samplesPerCycle;
-static bool startMotor = false;
-
-static bool isCalibrated = false;
+static bool isStartMotor = false;
+static bool isPostCalibration = false;
 
 static double motorTimeUnit = 1.048576; // t = 2^24/16Mhz
 static int motorMicrostepPerRevolution = 51200;
@@ -36,12 +37,17 @@ static uint32_t h2PhaseDeviceRegister = 0x18;
 static uint32_t h3PhaseDeviceRegister = 0x1A;
 static uint32_t h8PhaseDeviceRegister = 0x1C;
 
-static vector<double> rawDataList;
+static QVector<double> graphDataList, graphPostDataList;
 
+static const QColor scopyBlueColor = scopy::StyleHelper::getColor("ScopyBlue");
 static const QColor sineColor = QColor("#85e94c");
 static const QColor cosineColor = QColor("#91e6cf");
 static const QColor faultLEDColor = QColor("#c81a28");
 static const QColor statusLEDColor = QColor("#2e9e6f");
+
+static const QPen scopyBluePen(scopyBlueColor);
+static const QPen sinePen(sineColor);
+static const QPen cosinePen(cosineColor);
 
 static map<string, string> deviceRegisterMap;
 static QString deviceName = "";
@@ -217,7 +223,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	generalSettingLayout->setMargin(0);
 	generalSettingWidget->setLayout(generalSettingLayout);
 
-	header = new MenuHeaderWidget(deviceName + " " + deviceType, QPen(StyleHelper::getColor("ScopyBlue")), this);
+	header = new MenuHeaderWidget(deviceName + " " + deviceType, scopyBluePen, this);
 
 	// General Setting Widget
 	MenuSectionWidget *generalWidget = new MenuSectionWidget(generalSettingWidget);
@@ -260,7 +266,10 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	sequenceTypeMenuCombo = new MenuCombo("Sequence Type", sequenceSection);
 	QComboBox *sequenceTypeComboBox = sequenceTypeMenuCombo->combo();
 	sequenceTypeComboBox->addItem("Mode 1", QVariant(0));
-	sequenceTypeComboBox->addItem("Mode 2", QVariant(1));
+	if(deviceType.toStdString() == "Automotive")
+	{
+		sequenceTypeComboBox->addItem("Mode 2", QVariant(1));
+	}
 	applyComboBoxStyle(sequenceTypeComboBox);
 
 	conversionTypeMenuCombo = new MenuCombo("Conversion Type", sequenceSection);
@@ -390,9 +399,6 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	calibrationTimer = new QTimer(this);
 	connect(calibrationTimer, &QTimer::timeout, this, &HarmonicCalibration::calibrationTask);
 
-	motorCalibrationAcquisitionTimer = new QTimer(this);
-	connect(motorCalibrationAcquisitionTimer, &QTimer::timeout, this, &HarmonicCalibration::motorCalibrationAcquisitionTask);
-
 	utilityTimer = new QTimer(this);
 	connect(utilityTimer, &QTimer::timeout, this, &HarmonicCalibration::utilityTask);
 
@@ -413,6 +419,32 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 
 HarmonicCalibration::~HarmonicCalibration() {}
 
+void HarmonicCalibration::initializeMotor()
+{
+	rotate_vmax = 53687.0912;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
+	readMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
+	writeMotorAttributeValue(ADMTController::MotorAttribute::DISABLE, 1);
+	
+	amax = 439.8046511104;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::AMAX, amax);
+	readMotorAttributeValue(ADMTController::MotorAttribute::AMAX, amax);
+
+	dmax = 3000;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::DMAX, dmax);
+	readMotorAttributeValue(ADMTController::MotorAttribute::DMAX, dmax);
+
+	ramp_mode = 0;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::RAMP_MODE, ramp_mode);
+	readMotorAttributeValue(ADMTController::MotorAttribute::RAMP_MODE, ramp_mode);
+
+	target_pos = 0;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, target_pos);
+
+	current_pos = 0;
+	readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+}
+
 ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 {
 	initializeMotor();
@@ -426,31 +458,35 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationDataGraphLayout->setSpacing(5);
 
 	MenuSectionWidget *calibrationDataGraphSectionWidget = new MenuSectionWidget(calibrationDataGraphWidget);
-	QTabWidget *calibrationDataGraphTabWidget = new QTabWidget(calibrationDataGraphSectionWidget);
+	calibrationDataGraphTabWidget = new QTabWidget(calibrationDataGraphSectionWidget);
 	applyTabWidgetStyle(calibrationDataGraphTabWidget);
 	calibrationDataGraphSectionWidget->contentLayout()->setSpacing(8);
+	calibrationDataGraphSectionWidget->contentLayout()->addWidget(calibrationDataGraphTabWidget);
 
-	// Raw Data Plot Widget
+	#pragma region Calibration Samples
+	QWidget *calibrationSamplesWidget = new QWidget(calibrationDataGraphTabWidget);
+	QVBoxLayout *calibrationSamplesLayout = new QVBoxLayout(calibrationSamplesWidget);
+	calibrationSamplesWidget->setLayout(calibrationSamplesLayout);
+	calibrationSamplesLayout->setMargin(0);
+	calibrationSamplesLayout->setSpacing(0);
+
 	calibrationRawDataPlotWidget = new PlotWidget();
 	calibrationRawDataPlotWidget->setContentsMargins(10, 20, 10, 10);
 	calibrationRawDataPlotWidget->xAxis()->setVisible(false);
 	calibrationRawDataPlotWidget->yAxis()->setVisible(false);
-	QPen calibrationRawDataPen = QPen(StyleHelper::getColor("ScopyBlue"));
-	QPen calibrationSineDataPen = QPen(sineColor);
-	QPen calibrationCosineDataPen = QPen(cosineColor);
 
-	calibrationRawDataXPlotAxis = new PlotAxis(QwtAxis::XBottom, calibrationRawDataPlotWidget, calibrationRawDataPen);
-	calibrationRawDataYPlotAxis = new PlotAxis(QwtAxis::YLeft, calibrationRawDataPlotWidget, calibrationRawDataPen);
+	calibrationRawDataXPlotAxis = new PlotAxis(QwtAxis::XBottom, calibrationRawDataPlotWidget, scopyBluePen);
+	calibrationRawDataYPlotAxis = new PlotAxis(QwtAxis::YLeft, calibrationRawDataPlotWidget, scopyBluePen);
 	calibrationRawDataYPlotAxis->setInterval(0, 400);
 
-	calibrationRawDataPlotChannel = new PlotChannel("Samples", calibrationRawDataPen, calibrationRawDataXPlotAxis, calibrationRawDataYPlotAxis);
-	calibrationSineDataPlotChannel = new PlotChannel("Sine", calibrationSineDataPen, calibrationRawDataXPlotAxis, calibrationRawDataYPlotAxis);
-	calibrationCosineDataPlotChannel = new PlotChannel("Cosine", calibrationCosineDataPen, calibrationRawDataXPlotAxis, calibrationRawDataYPlotAxis);
+	calibrationRawDataPlotChannel = new PlotChannel("Samples", scopyBluePen, calibrationRawDataXPlotAxis, calibrationRawDataYPlotAxis);
+	calibrationRawDataPlotChannel->xAxis()->setMin(0);
+	calibrationSineDataPlotChannel = new PlotChannel("Sine", sinePen, calibrationRawDataXPlotAxis, calibrationRawDataYPlotAxis);
+	calibrationCosineDataPlotChannel = new PlotChannel("Cosine", cosinePen, calibrationRawDataXPlotAxis, calibrationRawDataYPlotAxis);
 
 	calibrationRawDataPlotWidget->addPlotChannel(calibrationRawDataPlotChannel);
 	calibrationRawDataPlotWidget->addPlotChannel(calibrationSineDataPlotChannel);
 	calibrationRawDataPlotWidget->addPlotChannel(calibrationCosineDataPlotChannel);
-	// calibrationRawDataPlotChannel->setStyle(PlotChannel::PCS_DOTS);
 	calibrationRawDataPlotChannel->setEnabled(true);
 	calibrationSineDataPlotChannel->setEnabled(true);
 	calibrationCosineDataPlotChannel->setEnabled(true);
@@ -461,9 +497,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationRawDataPlotWidget->setShowYAxisLabels(true);
 	calibrationRawDataPlotWidget->showAxisLabels();
 
-	calibrationDataGraphTabWidget->addTab(calibrationRawDataPlotWidget, "Calibration Samples");
-
-	QWidget *calibrationDataGraphChannelsWidget = new QWidget(calibrationDataGraphSectionWidget);
+	QWidget *calibrationDataGraphChannelsWidget = new QWidget(calibrationDataGraphTabWidget);
 	QHBoxLayout *calibrationDataGraphChannelsLayout = new QHBoxLayout(calibrationDataGraphChannelsWidget);
 	calibrationDataGraphChannelsWidget->setLayout(calibrationDataGraphChannelsLayout);
 	QString calibrationDataGraphChannelsStyle = QString(R"css(
@@ -471,98 +505,252 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 														)css");
 	calibrationDataGraphChannelsStyle.replace(QString("&&colorname&&"), StyleHelper::getColor("UIElementBackground"));
 	calibrationDataGraphChannelsWidget->setStyleSheet(calibrationDataGraphChannelsStyle);
-	calibrationDataGraphChannelsLayout->setContentsMargins(20, 5, 20, 5);
+	calibrationDataGraphChannelsLayout->setContentsMargins(20, 13, 20, 5);
 	calibrationDataGraphChannelsLayout->setSpacing(20);
 	
-	MenuControlButton *toggleAngleButton = createChannelToggleWidget("Angle", QColor(StyleHelper::getColor("ScopyBlue")), calibrationDataGraphChannelsWidget);
+	MenuControlButton *toggleAngleButton = createChannelToggleWidget("Angle", scopyBlueColor, calibrationDataGraphChannelsWidget);
 	MenuControlButton *toggleSineButton = createChannelToggleWidget("Sine", sineColor, calibrationDataGraphChannelsWidget);
 	MenuControlButton *toggleCosineButton = createChannelToggleWidget("Cosine", cosineColor, calibrationDataGraphChannelsWidget);
 
 	calibrationDataGraphChannelsLayout->addWidget(toggleAngleButton);
 	calibrationDataGraphChannelsLayout->addWidget(toggleSineButton);
 	calibrationDataGraphChannelsLayout->addWidget(toggleCosineButton);
-	calibrationDataGraphChannelsLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
+	calibrationDataGraphChannelsLayout->addStretch();
 
-	calibrationDataGraphSectionWidget->contentLayout()->addWidget(calibrationDataGraphTabWidget);
-	calibrationDataGraphSectionWidget->contentLayout()->addWidget(calibrationDataGraphChannelsWidget);
-
-	MenuSectionWidget *FFTDataGraphSectionWidget = new MenuSectionWidget(calibrationDataGraphWidget);
-	QTabWidget *FFTDataGraphTabWidget = new QTabWidget(FFTDataGraphSectionWidget);
-	applyTabWidgetStyle(FFTDataGraphTabWidget);
-	FFTDataGraphSectionWidget->contentLayout()->setSpacing(8);
-	FFTDataGraphSectionWidget->contentLayout()->addWidget(FFTDataGraphTabWidget);
-
-	#pragma region Pre-Calibration FFT Data Graph Widget
-	QWidget *preCalibrationFFTWidget = new QWidget();
-	QVBoxLayout *preCalibrationFFTLayout = new QVBoxLayout(preCalibrationFFTWidget);
-	preCalibrationFFTWidget->setLayout(preCalibrationFFTLayout);
-	preCalibrationFFTLayout->setMargin(0);
-	preCalibrationFFTLayout->setSpacing(0);
-
-	preCalibrationFFTPlotWidget = new PlotWidget();
-	preCalibrationFFTPlotWidget->setContentsMargins(10, 20, 10, 10);
-	preCalibrationFFTPlotWidget->xAxis()->setVisible(false);
-	preCalibrationFFTPlotWidget->yAxis()->setVisible(false);
-	QPen calibrationFFTMagnitudePen = QPen(StyleHelper::getColor("CH0"));
-	QPen calibrationFFTPhasePen = QPen(StyleHelper::getColor("CH1"));
-
-	preCalibrationFFTXPlotAxis = new PlotAxis(QwtAxis::XBottom, preCalibrationFFTPlotWidget, calibrationFFTMagnitudePen);
-	preCalibrationFFTYPlotAxis = new PlotAxis(QwtAxis::YLeft, preCalibrationFFTPlotWidget, calibrationFFTMagnitudePen);
-	preCalibrationFFTYPlotAxis->setInterval(-4, 4);
-
-	preCalibrationFFTMagnitudePlotChannel = new PlotChannel("FFT Magnitude", calibrationFFTMagnitudePen, preCalibrationFFTXPlotAxis, preCalibrationFFTYPlotAxis);
-	preCalibrationFFTPhasePlotChannel = new PlotChannel("FFT Phase", calibrationFFTPhasePen, preCalibrationFFTXPlotAxis, preCalibrationFFTYPlotAxis);
-	preCalibrationFFTPlotWidget->addPlotChannel(preCalibrationFFTMagnitudePlotChannel);
-	preCalibrationFFTPlotWidget->addPlotChannel(preCalibrationFFTPhasePlotChannel);
-
-	preCalibrationFFTMagnitudePlotChannel->setEnabled(true);
-	preCalibrationFFTPhasePlotChannel->setEnabled(true);
-	preCalibrationFFTPlotWidget->selectChannel(preCalibrationFFTMagnitudePlotChannel);
-	preCalibrationFFTPlotWidget->replot();
-
-	preCalibrationFFTPlotWidget->setShowXAxisLabels(true);
-	preCalibrationFFTPlotWidget->setShowYAxisLabels(true);
-	preCalibrationFFTPlotWidget->showAxisLabels();
-
-	QWidget *preCalibrationFFTChannelsWidget = new QWidget();
-	QHBoxLayout *preCalibrationFFTChannelsLayout = new QHBoxLayout(preCalibrationFFTChannelsWidget);
-	preCalibrationFFTChannelsWidget->setStyleSheet(calibrationDataGraphChannelsStyle);
-	preCalibrationFFTChannelsWidget->setLayout(preCalibrationFFTChannelsLayout);
-	preCalibrationFFTChannelsLayout->setContentsMargins(20, 13, 20, 5);
-	preCalibrationFFTChannelsLayout->setSpacing(20);
-
-	MenuControlButton *togglePreCalibrationMagnitudeButton = createChannelToggleWidget("Magnitude", QColor(StyleHelper::getColor("CH0")), preCalibrationFFTChannelsWidget);
-	MenuControlButton *togglePreCalibrationPhaseButton = createChannelToggleWidget("Phase", QColor(StyleHelper::getColor("CH1")), preCalibrationFFTChannelsWidget);
-
-	preCalibrationFFTChannelsLayout->addWidget(togglePreCalibrationMagnitudeButton);
-	preCalibrationFFTChannelsLayout->addWidget(togglePreCalibrationPhaseButton);
-	preCalibrationFFTChannelsLayout->addStretch();
-
-	preCalibrationFFTLayout->addWidget(preCalibrationFFTPlotWidget);
-	preCalibrationFFTLayout->addWidget(preCalibrationFFTChannelsWidget);
+	calibrationSamplesLayout->addWidget(calibrationRawDataPlotWidget);
+	calibrationSamplesLayout->addWidget(calibrationDataGraphChannelsWidget);
 	#pragma endregion
 
-	#pragma region Post-Calibration Angular Error Plot Widget
-	QWidget *postCalibrationFFTWidget = new QWidget();
-	QVBoxLayout *postCalibrationFFTLayout = new QVBoxLayout(postCalibrationFFTWidget);
-	postCalibrationFFTWidget->setLayout(postCalibrationFFTLayout);
-	postCalibrationFFTLayout->setMargin(0);
-	postCalibrationFFTLayout->setSpacing(0);
+	#pragma region Post Calibration Samples
+	QWidget *postCalibrationSamplesWidget = new QWidget(calibrationDataGraphTabWidget);
+	QVBoxLayout *postCalibrationSamplesLayout = new QVBoxLayout(postCalibrationSamplesWidget);
+	postCalibrationSamplesWidget->setLayout(postCalibrationSamplesLayout);
+	postCalibrationSamplesLayout->setMargin(0);
+	postCalibrationSamplesLayout->setSpacing(0);
 
-	PlotWidget *postCalibrationFFTPlotWidget = new PlotWidget();
-	preCalibrationFFTPlotWidget->setContentsMargins(10, 20, 10, 10);
-	preCalibrationFFTPlotWidget->xAxis()->setVisible(false);
-	preCalibrationFFTPlotWidget->yAxis()->setVisible(false);
+	postCalibrationRawDataPlotWidget = new PlotWidget();
+	postCalibrationRawDataPlotWidget->setContentsMargins(10, 20, 10, 10);
+	postCalibrationRawDataPlotWidget->xAxis()->setVisible(false);
+	postCalibrationRawDataPlotWidget->yAxis()->setVisible(false);
 
-	postCalibrationFFTLayout->addWidget(postCalibrationFFTPlotWidget);
+	postCalibrationRawDataXPlotAxis = new PlotAxis(QwtAxis::XBottom, postCalibrationRawDataPlotWidget, scopyBluePen);
+	postCalibrationRawDataXPlotAxis->setMin(0);
+	postCalibrationRawDataYPlotAxis = new PlotAxis(QwtAxis::YLeft, postCalibrationRawDataPlotWidget, scopyBluePen);
+	postCalibrationRawDataYPlotAxis->setInterval(0, 400);
 
+	postCalibrationRawDataPlotChannel = new PlotChannel("Samples", scopyBluePen, postCalibrationRawDataXPlotAxis, postCalibrationRawDataYPlotAxis);
+	postCalibrationSineDataPlotChannel = new PlotChannel("Sine", sinePen, postCalibrationRawDataXPlotAxis, postCalibrationRawDataYPlotAxis);
+	postCalibrationCosineDataPlotChannel = new PlotChannel("Cosine", cosinePen, postCalibrationRawDataXPlotAxis, postCalibrationRawDataYPlotAxis);
+
+	postCalibrationRawDataPlotWidget->addPlotChannel(postCalibrationRawDataPlotChannel);
+	postCalibrationRawDataPlotWidget->addPlotChannel(postCalibrationSineDataPlotChannel);
+	postCalibrationRawDataPlotWidget->addPlotChannel(postCalibrationCosineDataPlotChannel);
+
+	postCalibrationRawDataPlotChannel->setEnabled(true);
+	postCalibrationSineDataPlotChannel->setEnabled(true);
+	postCalibrationCosineDataPlotChannel->setEnabled(true);
+	postCalibrationRawDataPlotWidget->selectChannel(postCalibrationRawDataPlotChannel);
+	postCalibrationRawDataPlotWidget->replot();
+
+	postCalibrationRawDataPlotWidget->setShowXAxisLabels(true);
+	postCalibrationRawDataPlotWidget->setShowYAxisLabels(true);
+	postCalibrationRawDataPlotWidget->showAxisLabels();
+
+	QWidget *postCalibrationDataGraphChannelsWidget = new QWidget(calibrationDataGraphTabWidget);
+	QHBoxLayout *postCalibrationDataGraphChannelsLayout = new QHBoxLayout(postCalibrationDataGraphChannelsWidget);
+	postCalibrationDataGraphChannelsWidget->setLayout(postCalibrationDataGraphChannelsLayout);
+	postCalibrationDataGraphChannelsWidget->setStyleSheet(calibrationDataGraphChannelsStyle);
+	postCalibrationDataGraphChannelsLayout->setContentsMargins(20, 13, 20, 5);
+	postCalibrationDataGraphChannelsLayout->setSpacing(20);
+
+	MenuControlButton *togglePostAngleButton = createChannelToggleWidget("Angle", scopyBlueColor, postCalibrationDataGraphChannelsWidget);
+	MenuControlButton *togglePostSineButton = createChannelToggleWidget("Sine", sineColor, postCalibrationDataGraphChannelsWidget);
+	MenuControlButton *togglePostCosineButton = createChannelToggleWidget("Cosine", cosineColor, postCalibrationDataGraphChannelsWidget);
+
+	postCalibrationDataGraphChannelsLayout->addWidget(togglePostAngleButton);
+	postCalibrationDataGraphChannelsLayout->addWidget(togglePostSineButton);
+	postCalibrationDataGraphChannelsLayout->addWidget(togglePostCosineButton);
+	postCalibrationDataGraphChannelsLayout->addStretch();
+
+	postCalibrationSamplesLayout->addWidget(postCalibrationRawDataPlotWidget);
+	postCalibrationSamplesLayout->addWidget(postCalibrationDataGraphChannelsWidget);
 	#pragma endregion
 
-	FFTDataGraphTabWidget->addTab(preCalibrationFFTWidget, "Pre-Calibration Angular Error");
-	FFTDataGraphTabWidget->addTab(postCalibrationFFTWidget, "Post-Calibration Angular Error");
+	calibrationDataGraphTabWidget->addTab(calibrationSamplesWidget, "Calibration Samples");
+	calibrationDataGraphTabWidget->addTab(postCalibrationSamplesWidget, "Post Calibration Samples");
+
+	MenuSectionWidget *resultDataSectionWidget = new MenuSectionWidget(calibrationDataGraphWidget);
+	QTabWidget *resultDataTabWidget = new QTabWidget(resultDataSectionWidget);
+	applyTabWidgetStyle(resultDataTabWidget);
+	resultDataSectionWidget->contentLayout()->setSpacing(8);
+	resultDataSectionWidget->contentLayout()->addWidget(resultDataTabWidget);
+
+	QPen magnitudePen = QPen(StyleHelper::getColor("CH0"));
+	QPen phasePen = QPen(StyleHelper::getColor("CH1"));
+
+	#pragma region Angle Error Widget
+	QWidget *angleErrorWidget = new QWidget();
+	QVBoxLayout *angleErrorLayout = new QVBoxLayout(angleErrorWidget);
+	angleErrorWidget->setLayout(angleErrorLayout);
+	angleErrorLayout->setMargin(0);
+	angleErrorLayout->setSpacing(0);
+
+	angleErrorPlotWidget = new PlotWidget();
+	angleErrorPlotWidget->setContentsMargins(10, 20, 10, 10);
+	angleErrorPlotWidget->xAxis()->setVisible(false);
+	angleErrorPlotWidget->yAxis()->setVisible(false);
+	
+	angleErrorXPlotAxis = new PlotAxis(QwtAxis::XBottom, angleErrorPlotWidget, scopyBluePen);
+	angleErrorYPlotAxis = new PlotAxis(QwtAxis::YLeft, angleErrorPlotWidget, scopyBluePen);
+	angleErrorYPlotAxis->setInterval(-4, 4);
+
+	angleErrorPlotChannel = new PlotChannel("Angle Error", scopyBluePen, angleErrorXPlotAxis, angleErrorYPlotAxis);
+	angleErrorPlotWidget->addPlotChannel(angleErrorPlotChannel);
+
+	angleErrorPlotChannel->setEnabled(true);
+	angleErrorPlotWidget->selectChannel(angleErrorPlotChannel);
+	angleErrorPlotWidget->replot();
+
+	angleErrorPlotWidget->setShowXAxisLabels(true);
+	angleErrorPlotWidget->setShowYAxisLabels(true);
+	angleErrorPlotWidget->showAxisLabels();
+
+	angleErrorLayout->addWidget(angleErrorPlotWidget);
+	#pragma endregion
+
+	#pragma region FFT Angle Error Widget
+	QWidget *FFTAngleErrorWidget = new QWidget();
+	QVBoxLayout *FFTAngleErrorLayout = new QVBoxLayout(FFTAngleErrorWidget);
+	FFTAngleErrorWidget->setLayout(FFTAngleErrorLayout);
+	FFTAngleErrorLayout->setMargin(0);
+	FFTAngleErrorLayout->setSpacing(0);
+
+	FFTAngleErrorPlotWidget = new PlotWidget();
+	FFTAngleErrorPlotWidget->setContentsMargins(10, 20, 10, 10);
+	FFTAngleErrorPlotWidget->xAxis()->setVisible(false);
+	FFTAngleErrorPlotWidget->yAxis()->setVisible(false);
+
+	FFTAngleErrorXPlotAxis = new PlotAxis(QwtAxis::XBottom, FFTAngleErrorPlotWidget, scopyBluePen);
+	FFTAngleErrorYPlotAxis = new PlotAxis(QwtAxis::YLeft, FFTAngleErrorPlotWidget, scopyBluePen);
+	FFTAngleErrorYPlotAxis->setInterval(-4, 4);
+
+	FFTAngleErrorMagnitudeChannel = new PlotChannel("FFT Angle Error Magnitude", magnitudePen, FFTAngleErrorXPlotAxis, FFTAngleErrorYPlotAxis);
+	FFTAngleErrorPhaseChannel = new PlotChannel("FFT Angle Error Phase", phasePen, FFTAngleErrorXPlotAxis, FFTAngleErrorYPlotAxis);
+	FFTAngleErrorPlotWidget->addPlotChannel(FFTAngleErrorMagnitudeChannel);
+	FFTAngleErrorPlotWidget->addPlotChannel(FFTAngleErrorPhaseChannel);
+
+	FFTAngleErrorMagnitudeChannel->setEnabled(true);
+	FFTAngleErrorPhaseChannel->setEnabled(true);
+	FFTAngleErrorPlotWidget->selectChannel(FFTAngleErrorMagnitudeChannel);
+	FFTAngleErrorPlotWidget->replot();
+
+	FFTAngleErrorPlotWidget->setShowXAxisLabels(true);
+	FFTAngleErrorPlotWidget->setShowYAxisLabels(true);
+	FFTAngleErrorPlotWidget->showAxisLabels();
+
+	QWidget *FFTAngleErrorChannelsWidget = new QWidget();
+	QHBoxLayout *FFTAngleErrorChannelsLayout = new QHBoxLayout(FFTAngleErrorChannelsWidget);
+	FFTAngleErrorChannelsWidget->setStyleSheet(calibrationDataGraphChannelsStyle);
+	FFTAngleErrorChannelsWidget->setLayout(FFTAngleErrorChannelsLayout);
+	FFTAngleErrorChannelsLayout->setContentsMargins(20, 13, 20, 5);
+	FFTAngleErrorChannelsLayout->setSpacing(20);
+
+	MenuControlButton *toggleFFTAngleErrorMagnitudeButton = createChannelToggleWidget("Magnitude", QColor(StyleHelper::getColor("CH0")), FFTAngleErrorChannelsWidget);
+	MenuControlButton *toggleFFTAngleErrorPhaseButton = createChannelToggleWidget("Phase", QColor(StyleHelper::getColor("CH1")), FFTAngleErrorChannelsWidget);
+
+	FFTAngleErrorChannelsLayout->addWidget(toggleFFTAngleErrorMagnitudeButton);
+	FFTAngleErrorChannelsLayout->addWidget(toggleFFTAngleErrorPhaseButton);
+	FFTAngleErrorChannelsLayout->addStretch();
+
+	FFTAngleErrorLayout->addWidget(FFTAngleErrorPlotWidget);
+	FFTAngleErrorLayout->addWidget(FFTAngleErrorChannelsWidget);
+	#pragma endregion
+
+	#pragma region Corrected Error Widget
+	QWidget *correctedErrorWidget = new QWidget();
+	QVBoxLayout *correctedErrorLayout = new QVBoxLayout(correctedErrorWidget);
+	correctedErrorWidget->setLayout(correctedErrorLayout);
+	correctedErrorLayout->setMargin(0);
+	correctedErrorLayout->setSpacing(0);
+
+	correctedErrorPlotWidget = new PlotWidget();
+	correctedErrorPlotWidget->setContentsMargins(10, 20, 10, 10);
+	correctedErrorPlotWidget->xAxis()->setVisible(false);
+	correctedErrorPlotWidget->yAxis()->setVisible(false);
+
+	correctedErrorXPlotAxis = new PlotAxis(QwtAxis::XBottom, correctedErrorPlotWidget, scopyBluePen);
+	correctedErrorXPlotAxis->setMin(0);
+	correctedErrorYPlotAxis = new PlotAxis(QwtAxis::YLeft, correctedErrorPlotWidget, scopyBluePen);
+	correctedErrorYPlotAxis->setInterval(-4, 4);
+
+	correctedErrorPlotChannel = new PlotChannel("Corrected Error", scopyBluePen, correctedErrorXPlotAxis, correctedErrorYPlotAxis);
+	correctedErrorPlotWidget->addPlotChannel(correctedErrorPlotChannel);
+
+	correctedErrorPlotChannel->setEnabled(true);
+	correctedErrorPlotWidget->selectChannel(correctedErrorPlotChannel);
+	correctedErrorPlotWidget->replot();
+
+	correctedErrorPlotWidget->setShowXAxisLabels(true);
+	correctedErrorPlotWidget->setShowYAxisLabels(true);
+	correctedErrorPlotWidget->showAxisLabels();
+
+	correctedErrorLayout->addWidget(correctedErrorPlotWidget);
+	#pragma endregion
+
+	#pragma region FFT Corrected Error Widget
+	QWidget *FFTCorrectedErrorWidget = new QWidget();
+	QVBoxLayout *FFTCorrectedErrorLayout = new QVBoxLayout(FFTCorrectedErrorWidget);
+	FFTCorrectedErrorWidget->setLayout(FFTCorrectedErrorLayout);
+	FFTCorrectedErrorLayout->setMargin(0);
+	FFTCorrectedErrorLayout->setSpacing(0);
+
+	FFTCorrectedErrorPlotWidget = new PlotWidget();
+	FFTCorrectedErrorPlotWidget->setContentsMargins(10, 20, 10, 10);
+	FFTCorrectedErrorPlotWidget->xAxis()->setVisible(false);
+	FFTCorrectedErrorPlotWidget->yAxis()->setVisible(false);
+
+	FFTCorrectedErrorXPlotAxis = new PlotAxis(QwtAxis::XBottom, FFTCorrectedErrorPlotWidget, scopyBluePen);
+	FFTCorrectedErrorYPlotAxis = new PlotAxis(QwtAxis::YLeft, FFTCorrectedErrorPlotWidget, scopyBluePen);
+	FFTCorrectedErrorYPlotAxis->setInterval(0, 360);
+
+	FFTCorrectedErrorMagnitudeChannel = new PlotChannel("FFT Corrected Error Magnitude", magnitudePen, FFTCorrectedErrorXPlotAxis, FFTCorrectedErrorYPlotAxis);
+	FFTCorrectedErrorPhaseChannel = new PlotChannel("FFT Corrected Error Phase", phasePen, FFTCorrectedErrorXPlotAxis, FFTCorrectedErrorYPlotAxis);
+	FFTCorrectedErrorPlotWidget->addPlotChannel(FFTCorrectedErrorMagnitudeChannel);
+	FFTCorrectedErrorPlotWidget->addPlotChannel(FFTCorrectedErrorPhaseChannel);
+
+	FFTCorrectedErrorMagnitudeChannel->setEnabled(true);
+	FFTCorrectedErrorPhaseChannel->setEnabled(true);
+	FFTCorrectedErrorPlotWidget->selectChannel(FFTCorrectedErrorMagnitudeChannel);
+	FFTCorrectedErrorPlotWidget->replot();
+
+	FFTCorrectedErrorPlotWidget->setShowXAxisLabels(true);
+	FFTCorrectedErrorPlotWidget->setShowYAxisLabels(true);
+	FFTCorrectedErrorPlotWidget->showAxisLabels();
+
+	QWidget *FFTCorrectedErrorChannelsWidget = new QWidget();
+	QHBoxLayout *FFTCorrectedErrorChannelsLayout = new QHBoxLayout(FFTCorrectedErrorChannelsWidget);
+	FFTCorrectedErrorChannelsWidget->setStyleSheet(calibrationDataGraphChannelsStyle);
+	FFTCorrectedErrorChannelsLayout->setContentsMargins(20, 13, 20, 5);
+	FFTCorrectedErrorChannelsLayout->setSpacing(20);
+
+	MenuControlButton *toggleFFTCorrectedErrorMagnitudeButton = createChannelToggleWidget("Magnitude", QColor(StyleHelper::getColor("CH0")), FFTCorrectedErrorChannelsWidget);
+	MenuControlButton *toggleFFTCorrectedErrorPhaseButton = createChannelToggleWidget("Phase", QColor(StyleHelper::getColor("CH1")), FFTCorrectedErrorChannelsWidget);
+
+	FFTCorrectedErrorChannelsLayout->addWidget(toggleFFTCorrectedErrorMagnitudeButton);
+	FFTCorrectedErrorChannelsLayout->addWidget(toggleFFTCorrectedErrorPhaseButton);
+	FFTCorrectedErrorChannelsLayout->addStretch();
+
+	FFTCorrectedErrorLayout->addWidget(FFTCorrectedErrorPlotWidget);
+	FFTCorrectedErrorLayout->addWidget(FFTCorrectedErrorChannelsWidget);
+	#pragma endregion
+
+	resultDataTabWidget->addTab(angleErrorWidget, "Angle Error");
+	resultDataTabWidget->addTab(FFTAngleErrorWidget, "FFT Angle Error");
+	resultDataTabWidget->addTab(correctedErrorWidget, "Corrected Error");
+	resultDataTabWidget->addTab(FFTCorrectedErrorWidget, "FFT Corrected Error");
 
 	calibrationDataGraphLayout->addWidget(calibrationDataGraphSectionWidget, 0, 0);
-	calibrationDataGraphLayout->addWidget(FFTDataGraphSectionWidget, 1, 0);
+	calibrationDataGraphLayout->addWidget(resultDataSectionWidget, 1, 0);
 
 	calibrationDataGraphLayout->setColumnStretch(0, 1);
 	calibrationDataGraphLayout->setRowStretch(0, 1);
@@ -767,7 +955,9 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	motorConfigurationSectionWidget->contentLayout()->addWidget(motorConfigurationCollapseSection);
 
 	motorMaxVelocitySpinBox = new HorizontalSpinBox("Max Velocity", convertVMAXtoRPS(rotate_vmax), "rps", motorConfigurationSectionWidget);
+	motorMaxVelocitySpinBox->setValue(1);
 	motorAccelTimeSpinBox = new HorizontalSpinBox("Acceleration Time", convertAMAXtoAccelTime(amax), "sec", motorConfigurationSectionWidget);
+	motorAccelTimeSpinBox->setValue(1);
 	motorMaxDisplacementSpinBox = new HorizontalSpinBox("Max Displacement", dmax, "", motorConfigurationSectionWidget);
 
 	MenuCombo *m_calibrationMotorRampModeMenuCombo = new MenuCombo("Ramp Mode", motorConfigurationSectionWidget);
@@ -805,12 +995,10 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	connect(calibrationStartMotorButton, &QPushButton::toggled, this, [=](bool b) { 
 		calibrationStartMotorButton->setText(b ? " Stop Motor" : " Start Motor"); 
 		totalSamplesCount = cycleCount * samplesPerCycle;
-		startMotor = b;
+		isStartMotor = b;
 		if(b){
-			motorCalibrationAcquisitionTimer->start(motorCalibrationAcquisitionTimerRate);
-		}
-		else{
-			motorCalibrationAcquisitionTimer->stop();
+			isPostCalibration = false;
+			startMotor();
 		}
 	});
 	QString calibrationStartMotorButtonStyle = QString(R"css(
@@ -844,10 +1032,11 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	calibrateDataButton = new QPushButton(motorControlSectionWidget);
 	calibrateDataButton->setText("Calibrate");
+	calibrateDataButton->setEnabled(false);
 	StyleHelper::BlueButton(calibrateDataButton, "calibrateDataButton");
 
-	autoCalibrateCheckBox = new QCheckBox("Auto Calibrate", motorControlSectionWidget);
-	StyleHelper::BlueSquareCheckbox(autoCalibrateCheckBox, "autoCalibrateCheckBox");
+	// autoCalibrateCheckBox = new QCheckBox("Auto Calibrate", motorControlSectionWidget);
+	// StyleHelper::BlueSquareCheckbox(autoCalibrateCheckBox, "autoCalibrateCheckBox");
 
 	motorControlCollapseSection->contentLayout()->setSpacing(8);
 	motorControlCollapseSection->contentLayout()->addWidget(currentPositionLabel);
@@ -855,7 +1044,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	motorControlCollapseSection->contentLayout()->addWidget(motorTargetPositionSpinBox);
 	motorControlCollapseSection->contentLayout()->addWidget(calibrationStartMotorButton);
 	motorControlCollapseSection->contentLayout()->addWidget(calibrateDataButton);
-	motorControlCollapseSection->contentLayout()->addWidget(autoCalibrateCheckBox);
+	// motorControlCollapseSection->contentLayout()->addWidget(autoCalibrateCheckBox);
 	#pragma endregion
 
 	#pragma region Logs Section Widget
@@ -899,17 +1088,16 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	connect(calibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::calibrateData);
 	connect(extractDataButton, &QPushButton::clicked, this, &HarmonicCalibration::extractCalibrationData);
 	connect(importDataButton, &QPushButton::clicked, this, &HarmonicCalibration::importCalibrationData);
-	//connect(applyCalibrationDataButton, &QPushButton::clicked, this, &HarmonicCalibration::registerCalibrationData);
 	connect(clearCalibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::clearRawDataList);
 	connectLineEditToRPSConversion(motorMaxVelocitySpinBox->lineEdit(), rotate_vmax);
 	connectLineEditToAMAXConversion(motorAccelTimeSpinBox->lineEdit(), amax);
 	connectLineEditToNumberWrite(motorMaxDisplacementSpinBox->lineEdit(), dmax, ADMTController::MotorAttribute::DMAX);
 	connectLineEditToNumberWrite(motorTargetPositionSpinBox->lineEdit(), target_pos, ADMTController::MotorAttribute::TARGET_POS);
 	connectMenuComboToNumber(m_calibrationMotorRampModeMenuCombo, ramp_mode);
-	connect(autoCalibrateCheckBox, &QCheckBox::toggled, [=](bool toggled){ 
-		autoCalibrate = toggled; 
-		StatusBarManager::pushMessage(QString("Auto Calibrate: ") + QString((toggled ? "True" : "False")));
-	});
+	// connect(autoCalibrateCheckBox, &QCheckBox::toggled, [=](bool toggled){ 
+	// 	autoCalibrate = toggled; 
+	// 	StatusBarManager::pushMessage(QString("Auto Calibrate: ") + QString((toggled ? "True" : "False")));
+	// });
 	connect(toggleAngleButton->checkBox(), &QCheckBox::toggled, this, [=](bool b){
 		calibrationRawDataPlotWidget->selectChannel(calibrationRawDataPlotChannel);
 		calibrationRawDataPlotWidget->selectedChannel()->setEnabled(b);
@@ -922,13 +1110,21 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 		calibrationRawDataPlotWidget->selectChannel(calibrationCosineDataPlotChannel);
 		calibrationRawDataPlotWidget->selectedChannel()->setEnabled(b);
 	});
-	connect(togglePreCalibrationMagnitudeButton->checkBox(), &QCheckBox::toggled, this, [=](bool b){
-		preCalibrationFFTPlotWidget->selectChannel(preCalibrationFFTMagnitudePlotChannel);
-		preCalibrationFFTPlotWidget->selectedChannel()->setEnabled(b);
+	connect(toggleFFTAngleErrorMagnitudeButton->checkBox(), &QCheckBox::toggled, this, [=](bool b){
+		FFTAngleErrorPlotWidget->selectChannel(FFTAngleErrorMagnitudeChannel);
+		FFTAngleErrorPlotWidget->selectedChannel()->setEnabled(b);
 	});
-	connect(togglePreCalibrationPhaseButton->checkBox(), &QCheckBox::toggled, this, [=](bool b){
-		preCalibrationFFTPlotWidget->selectChannel(preCalibrationFFTPhasePlotChannel);
-		preCalibrationFFTPlotWidget->selectedChannel()->setEnabled(b);
+	connect(toggleFFTAngleErrorPhaseButton->checkBox(), &QCheckBox::toggled, this, [=](bool b){
+		FFTAngleErrorPlotWidget->selectChannel(FFTAngleErrorPhaseChannel);
+		FFTAngleErrorPlotWidget->selectedChannel()->setEnabled(b);
+	});
+	connect(toggleFFTCorrectedErrorMagnitudeButton->checkBox(), &QCheckBox::toggled, this, [=](bool b){
+		FFTCorrectedErrorPlotWidget->selectChannel(FFTCorrectedErrorMagnitudeChannel);
+		FFTCorrectedErrorPlotWidget->selectedChannel()->setEnabled(b);
+	});
+	connect(toggleFFTCorrectedErrorPhaseButton->checkBox(), &QCheckBox::toggled, this, [=](bool b){
+		FFTCorrectedErrorPlotWidget->selectChannel(FFTCorrectedErrorPhaseChannel);
+		FFTCorrectedErrorPlotWidget->selectedChannel()->setEnabled(b);
 	});
 
 	return tool;
@@ -1676,7 +1872,6 @@ void HarmonicCalibration::run(bool b)
 void HarmonicCalibration::canCalibrate(bool value)
 {
 	calibrateDataButton->setEnabled(value);
-	
 }
 
 void HarmonicCalibration::timerTask(){
@@ -2238,7 +2433,7 @@ void HarmonicCalibration::readMotorAttributeValue(ADMTController::MotorAttribute
 		int result = m_admtController->getDeviceAttributeValue(m_admtController->getDeviceId(ADMTController::Device::TMC5240),
 															m_admtController->getMotorAttribute(attribute),
 															&value);
-		if(result != 0) { calibrationLogWriteLn(QString(m_admtController->getMotorAttribute(attribute)) + ": Read Error " + QString::number(result)); }
+		if(result != 0) { calibrationLogWrite(QString(m_admtController->getMotorAttribute(attribute)) + ": Read Error " + QString::number(result)); }
 	}
 }
 
@@ -2248,7 +2443,7 @@ void HarmonicCalibration::writeMotorAttributeValue(ADMTController::MotorAttribut
 		int result = m_admtController->setDeviceAttributeValue(m_admtController->getDeviceId(ADMTController::Device::TMC5240), 
 															m_admtController->getMotorAttribute(attribute), 
 															value);
-		if(result != 0) { calibrationLogWriteLn(QString(m_admtController->getMotorAttribute(attribute)) + ": Write Error " + QString::number(result)); }
+		if(result != 0) { calibrationLogWrite(QString(m_admtController->getMotorAttribute(attribute)) + ": Write Error " + QString::number(result)); }
 	}
 }
 
@@ -2286,57 +2481,142 @@ void HarmonicCalibration::calibrationTask()
 	if(!isDebug){
 		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
 		updateLabelValue(calibrationMotorCurrentPositionLabel, ADMTController::MotorAttribute::CURRENT_POS);
-	}
-}
 
-void HarmonicCalibration::motorCalibrationAcquisitionTask()
-{
-	if(startMotor && rawDataList.size() < totalSamplesCount){
-		stepMotorAcquisition();
-		updateChannelValue(ADMTController::Channel::ANGLE);
-		double currentAngle = angle;
-		QVector<double> angles = { currentAngle };
-		appendSamplesToPlotCurve(calibrationRawDataPlotWidget, angles);
-		rawDataList.push_back(currentAngle);
-	}
-	else if(rawDataList.size() == totalSamplesCount)
-	{
-		startMotor = false;
-		calibrationStartMotorButton->setChecked(false);
-	}
-}
-
-void HarmonicCalibration::appendSamplesToPlotCurve(PlotWidget *plotWidget, QVector<double>& newYData)
-{
-	const QwtSeriesData<QPointF> *seriesData = plotWidget->selectedChannel()->curve()->data();
-	QVector<double> yData;
-
-	if(seriesData != nullptr){
-		for (int i = 0; i < seriesData->size(); ++i) {
-			calibrationLogWriteLn("append: " + QString::number(seriesData->sample(i).y()));
-			yData.append(seriesData->sample(i).y());
+		if(isStartMotor)
+		{
+			if(isPostCalibration){
+				postCalibrationRawDataPlotChannel->curve()->setSamples(graphPostDataList);
+				postCalibrationRawDataPlotChannel->xAxis()->setMax(graphPostDataList.size());
+				postCalibrationRawDataPlotWidget->replot();
+			}
+			else{
+				calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
+				calibrationRawDataPlotChannel->xAxis()->setMax(graphDataList.size());
+				calibrationRawDataPlotWidget->replot();
+			}
 		}
 	}
-
-	yData.append(newYData);
-	calibrationLogWriteLn("yData Size: " + QString::number(yData.size()));
-	plotWidget->selectedChannel()->curve()->setSamples(yData);
-	plotWidget->selectedChannel()->xAxis()->setMax(yData.size());
 }
 
-void HarmonicCalibration::addAngleToRawDataList()
+void HarmonicCalibration::getCalibrationSamples()
 {
-	QVector<double> angles = { angle };
-	appendSamplesToPlotCurve(calibrationRawDataPlotWidget, angles);
-	rawDataList.push_back(angle);
+	resetCurrentPositionToZero();
+	if(isPostCalibration){
+		while(isStartMotor && graphPostDataList.size() < totalSamplesCount){
+			stepMotorAcquisition();
+			updateChannelValue(ADMTController::Channel::ANGLE);
+			graphPostDataList.append(angle);
+		}
+	}
+	else{
+		while(isStartMotor && graphDataList.size() < totalSamplesCount){
+			stepMotorAcquisition();
+			updateChannelValue(ADMTController::Channel::ANGLE);
+			graphDataList.append(angle);
+		}
+	}
+}
+
+void HarmonicCalibration::resetCurrentPositionToZero()
+{
+	writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, 0);
+	readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+	while(current_pos != 0){
+		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+	}
+}
+
+void HarmonicCalibration::startMotor()
+{
+	QFuture<void> future = QtConcurrent::run(this, &HarmonicCalibration::getCalibrationSamples);
+	QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
+
+	connect(watcher, &QFutureWatcher<void>::finished, this, [=]() {
+		calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
+		calibrationRawDataPlotChannel->xAxis()->setMax(graphDataList.size());
+		calibrationRawDataPlotWidget->replot();
+		isStartMotor = false;
+		calibrationStartMotorButton->setChecked(false);
+		
+		if(isPostCalibration)
+		{
+			if(graphPostDataList.size() == totalSamplesCount) 
+			{
+				computeSineCosineOfAngles(graphPostDataList);
+				m_admtController->postcalibrate(vector<double>(graphPostDataList.begin(), graphPostDataList.end()), cycleCount, samplesPerCycle);
+				isPostCalibration = false;
+				isStartMotor = false;
+				canStartMotor(true);
+				QVector correctedError(m_admtController->correctedError.begin(), m_admtController->correctedError.end());
+				correctedErrorPlotChannel->curve()->setSamples(correctedError);
+				auto correctedErrorMagnitudeMinMax = std::minmax_element(correctedError.begin(), correctedError.end());
+				correctedErrorYPlotAxis->setInterval(*correctedErrorMagnitudeMinMax.first, *correctedErrorMagnitudeMinMax.second);
+				correctedErrorXPlotAxis->setMax(correctedError.size());
+				correctedErrorPlotWidget->replot();
+
+				QVector FFTCorrectedErrorMagnitude(m_admtController->FFTCorrectedErrorMagnitude.begin(), m_admtController->FFTCorrectedErrorMagnitude.end());
+				QVector FFTCorrectedErrorPhase(m_admtController->FFTCorrectedErrorPhase.begin(), m_admtController->FFTCorrectedErrorPhase.end());
+				FFTCorrectedErrorMagnitudeChannel->curve()->setSamples(FFTCorrectedErrorMagnitude);
+				FFTCorrectedErrorPhaseChannel->curve()->setSamples(FFTCorrectedErrorPhase);
+				auto FFTCorrectedErrorMagnitudeMinMax = std::minmax_element(FFTCorrectedErrorMagnitude.begin(), FFTCorrectedErrorMagnitude.end());
+				auto FFTCorrectedErrorPhaseMinMax = std::minmax_element(FFTCorrectedErrorPhase.begin(), FFTCorrectedErrorPhase.end());
+				double FFTCorrectedErrorPlotMin = *FFTCorrectedErrorMagnitudeMinMax.first < *FFTCorrectedErrorPhaseMinMax.first ? *FFTCorrectedErrorMagnitudeMinMax.first : *FFTCorrectedErrorPhaseMinMax.first;
+				double FFTCorrectedErrorPlotMax = *FFTCorrectedErrorMagnitudeMinMax.second > *FFTCorrectedErrorPhaseMinMax.second ? *FFTCorrectedErrorMagnitudeMinMax.second : *FFTCorrectedErrorPhaseMinMax.second;
+				FFTCorrectedErrorYPlotAxis->setInterval(FFTCorrectedErrorPlotMin, FFTCorrectedErrorPlotMax);
+				FFTCorrectedErrorXPlotAxis->setMax(FFTCorrectedErrorMagnitude.size());
+				FFTCorrectedErrorPlotWidget->replot();
+			}
+		}
+		else{
+			if(graphDataList.size() == totalSamplesCount) 
+			{
+				computeSineCosineOfAngles(graphDataList);
+				canCalibrate(true); 
+			}
+		}
+	});
+	connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));
+	watcher->setFuture(future);
+}
+
+void HarmonicCalibration::canStartMotor(bool value)
+{
+	calibrationStartMotorButton->setEnabled(value);
 }
 
 void HarmonicCalibration::calibrateData()
 {
-	calibrationLogWrite("==== Calibration Start ====\n");
+	calibrationLogWrite("==== Calibration Start ====");
+	
+	calibrationLogWrite(m_admtController->calibrate(vector<double>(graphDataList.begin(), graphDataList.end()), cycleCount, samplesPerCycle));
 
-	calibrationLogWriteLn(m_admtController->calibrate(rawDataList, cycleCount, samplesPerCycle));
+	flashHarmonicValues();
 
+	QVector<double> angleError = QVector<double>(m_admtController->angleError.begin(), m_admtController->angleError.end());
+	QVector<double> FFTAngleErrorMagnitude = QVector<double>(m_admtController->FFTAngleErrorMagnitude.begin(), m_admtController->FFTAngleErrorMagnitude.end());
+	QVector<double> FFTAngleErrorPhase = QVector<double>(m_admtController->FFTAngleErrorPhase.begin(), m_admtController->FFTAngleErrorPhase.end());
+
+	angleErrorPlotChannel->curve()->setSamples(angleError);
+	auto angleErrorMinMax = std::minmax_element(angleError.begin(), angleError.end());
+	angleErrorYPlotAxis->setInterval(*angleErrorMinMax.first, *angleErrorMinMax.second);
+	angleErrorXPlotAxis->setInterval(0, angleError.size());
+	angleErrorPlotWidget->replot();
+	
+	FFTAngleErrorMagnitudeChannel->curve()->setSamples(FFTAngleErrorMagnitude);
+	auto angleErrorMagnitudeMinMax = std::minmax_element(FFTAngleErrorMagnitude.begin(), FFTAngleErrorMagnitude.end());
+	FFTAngleErrorPhaseChannel->curve()->setSamples(FFTAngleErrorPhase);
+	auto angleErrorPhaseMinMax = std::minmax_element(FFTAngleErrorPhase.begin(), FFTAngleErrorPhase.end());
+	double FFTAngleErrorPlotMin = *angleErrorMagnitudeMinMax.first < *angleErrorPhaseMinMax.first ? *angleErrorMagnitudeMinMax.first : *angleErrorPhaseMinMax.first;
+	double FFTAngleErrorPlotMax = *angleErrorMagnitudeMinMax.second > *angleErrorPhaseMinMax.second ? *angleErrorMagnitudeMinMax.second : *angleErrorPhaseMinMax.second;
+	FFTAngleErrorYPlotAxis->setInterval(FFTAngleErrorPlotMin, FFTAngleErrorPlotMax);
+	FFTAngleErrorXPlotAxis->setInterval(0, FFTAngleErrorMagnitude.size());
+	FFTAngleErrorPlotWidget->replot();
+
+	postCalibrateData();
+}	
+
+void HarmonicCalibration::flashHarmonicValues()
+{
 	uint32_t *h1MagCurrent = new uint32_t, 
 			 *h1PhaseCurrent = new uint32_t, 
 			 *h2MagCurrent = new uint32_t,
@@ -2371,15 +2651,15 @@ void HarmonicCalibration::calibrateData()
 	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), h8MagCurrent);
 	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), h8PhaseCurrent);
 
-	calibrationLogWriteLn();
-	calibrationLogWrite("H1 Mag Current: " + QString::number(*h1MagCurrent) + "\n");
-	calibrationLogWrite("H1 Phase Current: " + QString::number(*h1PhaseCurrent) + "\n");
-	calibrationLogWrite("H2 Mag Current: " + QString::number(*h2MagCurrent) + "\n");
-	calibrationLogWrite("H2 Phase Current: " + QString::number(*h2PhaseCurrent) + "\n");
-	calibrationLogWrite("H3 Mag Current: " + QString::number(*h3MagCurrent) + "\n");
-	calibrationLogWrite("H3 Phase Current: " + QString::number(*h3PhaseCurrent) + "\n");
-	calibrationLogWrite("H8 Mag Current: " + QString::number(*h8MagCurrent) + "\n");
-	calibrationLogWrite("H8 Phase Current: " + QString::number(*h8PhaseCurrent) + "\n");
+	calibrationLogWrite();
+	calibrationLogWrite("H1 Mag Current: " + QString::number(*h1MagCurrent));
+	calibrationLogWrite("H1 Phase Current: " + QString::number(*h1PhaseCurrent));
+	calibrationLogWrite("H2 Mag Current: " + QString::number(*h2MagCurrent));
+	calibrationLogWrite("H2 Phase Current: " + QString::number(*h2PhaseCurrent));
+	calibrationLogWrite("H3 Mag Current: " + QString::number(*h3MagCurrent));
+	calibrationLogWrite("H3 Phase Current: " + QString::number(*h3PhaseCurrent));
+	calibrationLogWrite("H8 Mag Current: " + QString::number(*h8MagCurrent));
+	calibrationLogWrite("H8 Phase Current: " + QString::number(*h8PhaseCurrent));
 
 	h1MagScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(m_admtController->HAR_MAG_1, static_cast<uint16_t>(*h1MagCurrent), "h1"));
 	h1PhaseScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(m_admtController->HAR_PHASE_1, static_cast<uint16_t>(*h1PhaseCurrent)));
@@ -2390,15 +2670,15 @@ void HarmonicCalibration::calibrateData()
 	h8MagScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(m_admtController->HAR_MAG_8, static_cast<uint16_t>(*h8MagCurrent), "h8"));
 	h8PhaseScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(m_admtController->HAR_PHASE_8, static_cast<uint16_t>(*h8PhaseCurrent)));
 
-	calibrationLogWriteLn();
-	calibrationLogWrite("H1 Mag Scaled: " + QString::number(h1MagScaled) + "\n");
-	calibrationLogWrite("H1 Phase Scaled: " + QString::number(h1PhaseScaled) + "\n");
-	calibrationLogWrite("H2 Mag Scaled: " + QString::number(h2MagScaled) + "\n");
-	calibrationLogWrite("H2 Phase Scaled: " + QString::number(h2PhaseScaled) + "\n");
-	calibrationLogWrite("H3 Mag Scaled: " + QString::number(h3MagScaled) + "\n");
-	calibrationLogWrite("H3 Phase Scaled: " + QString::number(h3PhaseScaled) + "\n");
-	calibrationLogWrite("H8 Mag Scaled: " + QString::number(h8MagScaled) + "\n");
-	calibrationLogWrite("H8 Phase Scaled: " + QString::number(h8PhaseScaled) + "\n");
+	calibrationLogWrite();
+	calibrationLogWrite("H1 Mag Scaled: " + QString::number(h1MagScaled));
+	calibrationLogWrite("H1 Phase Scaled: " + QString::number(h1PhaseScaled));
+	calibrationLogWrite("H2 Mag Scaled: " + QString::number(h2MagScaled));
+	calibrationLogWrite("H2 Phase Scaled: " + QString::number(h2PhaseScaled));
+	calibrationLogWrite("H3 Mag Scaled: " + QString::number(h3MagScaled));
+	calibrationLogWrite("H3 Phase Scaled: " + QString::number(h3PhaseScaled));
+	calibrationLogWrite("H8 Mag Scaled: " + QString::number(h8MagScaled));
+	calibrationLogWrite("H8 Phase Scaled: " + QString::number(h8PhaseScaled));
 
 	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 0x01, 0x02);
 
@@ -2436,6 +2716,16 @@ void HarmonicCalibration::calibrateData()
 	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), h8MagCurrent);
 	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), h8PhaseCurrent);
 
+	calibrationLogWrite();
+	calibrationLogWrite("H1 Mag After Flash: " + QString::number(*h1MagCurrent));
+	calibrationLogWrite("H1 Phase After Flash: " + QString::number(*h1PhaseCurrent));
+	calibrationLogWrite("H2 Mag After Flash: " + QString::number(*h2MagCurrent));
+	calibrationLogWrite("H2 Phase After Flash: " + QString::number(*h2PhaseCurrent));
+	calibrationLogWrite("H3 Mag After Flash: " + QString::number(*h3MagCurrent));
+	calibrationLogWrite("H3 Phase After Flash: " + QString::number(*h3PhaseCurrent));
+	calibrationLogWrite("H8 Mag After Flash: " + QString::number(*h8MagCurrent));
+	calibrationLogWrite("H8 Phase After Flash: " + QString::number(*h8PhaseCurrent));
+
 	h1MagConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h1MagCurrent), "h1mag");
 	h1PhaseConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h1PhaseCurrent), "h1phase");
 	h2MagConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h2MagCurrent), "h2mag");
@@ -2445,32 +2735,28 @@ void HarmonicCalibration::calibrateData()
 	h8MagConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h8MagCurrent), "h8mag");
 	h8PhaseConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h8PhaseCurrent), "h8phase");
 
-	calibrationLogWriteLn();
-	calibrationLogWrite("H1 Mag Converted: " + QString::number(h1MagConverted) + "\n");
-	calibrationLogWrite("H1 Phase Converted: " + QString::number(h1PhaseConverted) + "\n");
-	calibrationLogWrite("H2 Mag Converted: " + QString::number(h2MagConverted) + "\n");
-	calibrationLogWrite("H2 Phase Converted: " + QString::number(h2PhaseConverted) + "\n");
-	calibrationLogWrite("H3 Mag Converted: " + QString::number(h3MagConverted) + "\n");
-	calibrationLogWrite("H3 Phase Converted: " + QString::number(h3PhaseConverted) + "\n");
-	calibrationLogWrite("H8 Mag Converted: " + QString::number(h8MagConverted) + "\n");
+	calibrationLogWrite();
+	calibrationLogWrite("H1 Mag Converted: " + QString::number(h1MagConverted));
+	calibrationLogWrite("H1 Phase Converted: " + QString::number(h1PhaseConverted));
+	calibrationLogWrite("H2 Mag Converted: " + QString::number(h2MagConverted));
+	calibrationLogWrite("H2 Phase Converted: " + QString::number(h2PhaseConverted));
+	calibrationLogWrite("H3 Mag Converted: " + QString::number(h3MagConverted));
+	calibrationLogWrite("H3 Phase Converted: " + QString::number(h3PhaseConverted));
+	calibrationLogWrite("H8 Mag Converted: " + QString::number(h8MagConverted));
 	calibrationLogWrite("H8 Phase Converted: " + QString::number(h8PhaseConverted));
 
 	updateCalculatedCoeff();
+}
 
-	vector<double> calibrationAngleErrorsFFT = m_admtController->angle_errors_fft_pre;
-	vector<double> calibrationAngleErrorsFFTPhase = m_admtController->angle_errors_fft_phase_pre;
-
-	// Frequency axis (assuming sampling rate of 1 Hz for simplicity)
-    std::vector<double> frequencyAxis(calibrationAngleErrorsFFT.size());
-    for (size_t i = 0; i < frequencyAxis.size(); ++i)
-    {
-        frequencyAxis[i] = i; // Replace with actual frequency values if needed
-    }
-
-	preCalibrationFFTMagnitudePlotChannel->curve()->setSamples(frequencyAxis.data(), calibrationAngleErrorsFFT.data(), (calibrationAngleErrorsFFT.size()));
-	preCalibrationFFTPhasePlotChannel->curve()->setSamples(frequencyAxis.data(), calibrationAngleErrorsFFTPhase.data(), calibrationAngleErrorsFFTPhase.size());
-	preCalibrationFFTXPlotAxis->setInterval(0, (calibrationAngleErrorsFFT.size()));
-	preCalibrationFFTPlotWidget->replot();
+void HarmonicCalibration::postCalibrateData()
+{
+	calibrationLogWrite("==== Post Calibration Start ====\n");
+	canCalibrate(false);
+	canStartMotor(false);
+	calibrationDataGraphTabWidget->setCurrentIndex(1);
+	isPostCalibration = true;
+	isStartMotor = true;
+	startMotor();
 }
 
 void HarmonicCalibration::updateCalculatedCoeff()
@@ -2496,7 +2782,6 @@ void HarmonicCalibration::resetCalculatedCoeff()
 	calibrationH2PhaseLabel->setText("Φ --.--");
 	calibrationH3PhaseLabel->setText("Φ --.--");
 	calibrationH8PhaseLabel->setText("Φ --.--");
-	//applyCalibrationDataButton->setEnabled(false);
 }
 
 void HarmonicCalibration::registerCalibrationData()
@@ -2505,28 +2790,28 @@ void HarmonicCalibration::registerCalibrationData()
 
 	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 		h1MagDeviceRegister, m_admtController->HAR_MAG_1) != 0) 
-		{ calibrationLogWriteLn("Failed to write to H1 Mag Register"); }
+		{ calibrationLogWrite("Failed to write to H1 Mag Register"); }
 	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 		h2MagDeviceRegister, m_admtController->HAR_MAG_2) != 0)
-		{ calibrationLogWriteLn("Failed to write to H2 Mag Register"); }
+		{ calibrationLogWrite("Failed to write to H2 Mag Register"); }
 	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 		h3MagDeviceRegister, m_admtController->HAR_MAG_3) != 0)
-		{ calibrationLogWriteLn("Failed to write to H3 Mag Register"); }
+		{ calibrationLogWrite("Failed to write to H3 Mag Register"); }
 	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 		h8MagDeviceRegister, m_admtController->HAR_MAG_8) != 0)
-		{ calibrationLogWriteLn("Failed to write to H8 Mag Register"); }
+		{ calibrationLogWrite("Failed to write to H8 Mag Register"); }
 	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 		h1PhaseDeviceRegister, m_admtController->HAR_PHASE_1) != 0)
-		{ calibrationLogWriteLn("Failed to write to H1 Phase Register"); }
+		{ calibrationLogWrite("Failed to write to H1 Phase Register"); }
 	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 		h2PhaseDeviceRegister, m_admtController->HAR_PHASE_2) != 0)
-		{ calibrationLogWriteLn("Failed to write to H2 Phase Register"); }
+		{ calibrationLogWrite("Failed to write to H2 Phase Register"); }
 	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 		h3PhaseDeviceRegister, m_admtController->HAR_PHASE_3) != 0)
-		{ calibrationLogWriteLn("Failed to write to H3 Phase Register"); }
+		{ calibrationLogWrite("Failed to write to H3 Phase Register"); }
 	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 		h8PhaseDeviceRegister, m_admtController->HAR_PHASE_8) != 0)
-		{ calibrationLogWriteLn("Failed to write to H8 Phase Register"); }
+		{ calibrationLogWrite("Failed to write to H8 Phase Register"); }
 
 	calibrationLogWrite("=== Calibration Complete ===\n");
 }
@@ -2534,11 +2819,6 @@ void HarmonicCalibration::registerCalibrationData()
 void HarmonicCalibration::calibrationLogWrite(QString message)
 {
 	logsPlainTextEdit->appendPlainText(message);
-}
-
-void HarmonicCalibration::calibrationLogWriteLn(QString message)
-{
-	logsPlainTextEdit->appendPlainText("\n" + message);
 }
 
 void HarmonicCalibration::commandLogWrite(QString message)
@@ -2568,8 +2848,6 @@ void HarmonicCalibration::extractCalibrationData()
 		FileManager fm("HarmonicCalibration");
 		fm.open(fileName, FileManager::EXPORT);
 
-		QVector<double> rawData(rawDataList.begin(), rawDataList.end());
-
 		QVector<double> preCalibrationAngleErrorsFFTMagnitude(m_admtController->angle_errors_fft_pre.begin(), m_admtController->angle_errors_fft_pre.end());
 		QVector<double> preCalibrationAngleErrorsFFTPhase(m_admtController->angle_errors_fft_phase_pre.begin(), m_admtController->angle_errors_fft_phase_pre.end());
 
@@ -2582,7 +2860,7 @@ void HarmonicCalibration::extractCalibrationData()
 		QVector<double> h3Phase = { static_cast<double>(m_admtController->HAR_PHASE_3) };
 		QVector<double> h8Phase = { static_cast<double>(m_admtController->HAR_PHASE_8) };
 
-		fm.save(rawData, "Raw Data");
+		fm.save(graphDataList, "Raw Data");
 		fm.save(preCalibrationAngleErrorsFFTMagnitude, "Pre-Calibration Angle Errors FFT Magnitude");
 		fm.save(preCalibrationAngleErrorsFFTPhase, "Pre-Calibration Angle Errors FFT Phase");
 		fm.save(h1Mag, "H1 Mag");
@@ -2611,56 +2889,40 @@ void HarmonicCalibration::importCalibrationData()
 	try {
 		fm.open(fileName, FileManager::IMPORT);
 
-		QVector<double> data = fm.read(0);
-		if(data.size() > 0)
+		graphDataList = fm.read(0);
+		if(graphDataList.size() > 0)
 		{
-			calibrationRawDataPlotChannel->curve()->setSamples(data.data(), data.size());
-			calibrationRawDataXPlotAxis->setInterval(0, data.size());
-			m_admtController->computeSineCosineOfAngles(vector<double>(data.begin(), data.end()));
-			calibrationSineDataPlotChannel->curve()->setSamples(m_admtController->calibration_samples_sine_scaled.data(), m_admtController->calibration_samples_sine_scaled.size());
-			calibrationCosineDataPlotChannel->curve()->setSamples(m_admtController->calibration_samples_cosine_scaled.data(), m_admtController->calibration_samples_cosine_scaled.size());
-			for(int i = 0; i < data.size(); ++i) {
-				rawDataList.push_back(data[i]);
-			}
+			calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
+			calibrationRawDataXPlotAxis->setInterval(0, graphDataList.size());
+			computeSineCosineOfAngles(graphDataList);
 			calibrationRawDataPlotWidget->replot();
+			canCalibrate(true);
 		}
 	} catch(FileManagerException &ex) {
-		calibrationLogWriteLn(QString(ex.what()));
+		calibrationLogWrite(QString(ex.what()));
 	}
 }
 
-void HarmonicCalibration::initializeMotor()
+void HarmonicCalibration::computeSineCosineOfAngles(QVector<double> graphDataList)
 {
-	rotate_vmax = 53687.1;
-	writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
-	writeMotorAttributeValue(ADMTController::MotorAttribute::DISABLE, 1);
-	readMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
-	
-	amax = 439.805;
-	writeMotorAttributeValue(ADMTController::MotorAttribute::AMAX, amax);
-	readMotorAttributeValue(ADMTController::MotorAttribute::AMAX, amax);
-
-	dmax = 3000;
-	writeMotorAttributeValue(ADMTController::MotorAttribute::DMAX, dmax);
-	readMotorAttributeValue(ADMTController::MotorAttribute::DMAX, dmax);
-
-	ramp_mode = 0;
-	writeMotorAttributeValue(ADMTController::MotorAttribute::RAMP_MODE, ramp_mode);
-	readMotorAttributeValue(ADMTController::MotorAttribute::RAMP_MODE, ramp_mode);
-
-	target_pos = 0;
-	writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, target_pos);
-
-	current_pos = 0;
-	readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+	m_admtController->computeSineCosineOfAngles(vector<double>(graphDataList.begin(), graphDataList.end()));
+	if(isPostCalibration){
+		postCalibrationSineDataPlotChannel->curve()->setSamples(m_admtController->calibration_samples_sine_scaled.data(), m_admtController->calibration_samples_sine_scaled.size());
+		postCalibrationCosineDataPlotChannel->curve()->setSamples(m_admtController->calibration_samples_cosine_scaled.data(), m_admtController->calibration_samples_cosine_scaled.size());
+		postCalibrationRawDataPlotWidget->replot();
+	}
+	else{
+		calibrationSineDataPlotChannel->curve()->setSamples(m_admtController->calibration_samples_sine_scaled.data(), m_admtController->calibration_samples_sine_scaled.size());
+		calibrationCosineDataPlotChannel->curve()->setSamples(m_admtController->calibration_samples_cosine_scaled.data(), m_admtController->calibration_samples_cosine_scaled.size());
+		calibrationRawDataPlotWidget->replot();
+	}
 }
 
 void HarmonicCalibration::stepMotorAcquisition(double step)
 {
-	readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
 	target_pos = current_pos + step;
 	writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, target_pos);
-
+	readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
 	while(target_pos != current_pos) {
 		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
 	}
@@ -2668,16 +2930,27 @@ void HarmonicCalibration::stepMotorAcquisition(double step)
 
 void HarmonicCalibration::clearRawDataList()
 {
-	rawDataList.clear();
+	graphDataList.clear();
+	graphPostDataList.clear();
 
 	calibrationRawDataPlotChannel->curve()->setData(nullptr);
 	calibrationSineDataPlotChannel->curve()->setData(nullptr);
 	calibrationCosineDataPlotChannel->curve()->setData(nullptr);
 	calibrationRawDataPlotWidget->replot();
 
-	preCalibrationFFTMagnitudePlotChannel->curve()->setData(nullptr);
-	preCalibrationFFTPhasePlotChannel->curve()->setData(nullptr);
-	preCalibrationFFTPlotWidget->replot();
+	angleErrorPlotChannel->curve()->setData(nullptr);
+	angleErrorPlotWidget->replot();
+	FFTAngleErrorMagnitudeChannel->curve()->setData(nullptr);
+	FFTAngleErrorPhaseChannel->curve()->setData(nullptr);
+	FFTAngleErrorPlotWidget->replot();
+	correctedErrorPlotChannel->curve()->setData(nullptr);
+	correctedErrorPlotWidget->replot();
+	FFTCorrectedErrorMagnitudeChannel->curve()->setData(nullptr);
+	FFTCorrectedErrorPhaseChannel->curve()->setData(nullptr);
+	FFTCorrectedErrorPlotWidget->replot();
+
+	canCalibrate(false);
+	canStartMotor(true);
 
 	resetCalculatedCoeff();
 }
