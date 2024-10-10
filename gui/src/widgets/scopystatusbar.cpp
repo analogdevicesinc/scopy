@@ -59,23 +59,11 @@ void ScopyStatusBar::initUi()
 	setMaximumHeight(20);
 
 	m_stackedWidget = new QStackedWidget(this);
-
-	m_rightWidget = new QWidget(this);
-	auto rightLayout = new QHBoxLayout(m_rightWidget);
-	rightLayout->setContentsMargins(0, 3, 0, 3);
-	m_rightWidget->setLayout(rightLayout);
-
 	layout()->addWidget(m_stackedWidget);
-	layout()->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
-	layout()->addWidget(m_rightWidget);
-
-	// right layout
 	StyleHelper::ScopyStatusBar(this, "ScopyStatusBar");
 
 	hide();
 }
-
-void ScopyStatusBar::addToRight(QWidget *widget) { m_rightWidget->layout()->addWidget(widget); }
 
 void ScopyStatusBar::addToLeft(QWidget *widget)
 {
