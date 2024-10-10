@@ -65,7 +65,7 @@ void AxisHandle::setHandle(HandleOrientation orientation)
 	m_handle = QPixmap(":/gui/icons/handle_arrow.svg")
 			   .scaled(m_handleSize, m_handleSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-	if(m_handlePos == HandlePos::NORTH_WEST)
+	if(m_handlePos == HandlePos::NORTH_OR_WEST)
 		m_handle = m_handle.transformed(QTransform().scale(-1, -1));
 
 	if(m_axisId.isYAxis())
@@ -83,7 +83,7 @@ void AxisHandle::setHandle(HandleOrientation orientation)
 			m_handle = m_handle.transformed(QTransform().rotate(180));
 		}
 
-		if(m_handlePos == HandlePos::NORTH_WEST) {
+		if(m_handlePos == HandlePos::NORTH_OR_WEST) {
 			m_handle = m_handle.transformed(QTransform().rotate(180));
 		}
 	}
@@ -129,7 +129,7 @@ QRect AxisHandle::getBigRect()
 		rect = QRect(m_pos.x() - m_handleMargins * 2, y, rectWidth, rectHeight);
 	}
 
-	if(m_handlePos == HandlePos::NORTH_WEST) {
+	if(m_handlePos == HandlePos::NORTH_OR_WEST) {
 		if(m_axisId.isXAxis()) {
 			int height = rect.height();
 			rect.setTop(0);
@@ -154,7 +154,7 @@ QRect AxisHandle::getSmallRect()
 		rect = QRect(m_pos.x() - m_handlePadding, y, m_handle.width(), m_handle.height());
 	}
 
-	if(m_handlePos == HandlePos::NORTH_WEST) {
+	if(m_handlePos == HandlePos::NORTH_OR_WEST) {
 		if(m_axisId.isXAxis()) {
 			int height = rect.height();
 			rect.setTop(m_handlePadding);
