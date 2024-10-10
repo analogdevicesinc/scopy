@@ -65,6 +65,7 @@ void ADCInstrument::setupToolLayout()
 
 	channelsBtn = new MenuControlButton(this);
 
+	hoverMenuGroup = new SemiExclusiveButtonGroup(this);
 	m_cursor = new MenuControlButton(this);
 	setupCursorButtonHelper(m_cursor);
 
@@ -219,6 +220,8 @@ ToolTemplate *ADCInstrument::getToolTemplate() { return tool; }
 
 MapStackedWidget *ADCInstrument::getRightStack() { return rightStack; }
 
+QButtonGroup *ADCInstrument::getHoverMenuBtnGroup() { return hoverMenuGroup; }
+
 void ADCInstrument::setupCursorButtonHelper(MenuControlButton *cursor)
 {
 	cursor->setName("Cursors");
@@ -226,4 +229,5 @@ void ADCInstrument::setupCursorButtonHelper(MenuControlButton *cursor)
 	cursor->setDoubleClickToOpenMenu(true);
 	cursor->checkBox()->setVisible(false);
 	cursor->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
+	hoverMenuGroup->addButton(cursor->button());
 }
