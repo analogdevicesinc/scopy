@@ -49,7 +49,8 @@ void ADCTimeInstrumentController::init()
 	// m_cursorComponent = new CursorComponent(m_plotComponentManager, m_tool->getToolTemplate(), this);
 	// addComponent(m_cursorComponent);
 
-	m_measureComponent = new MeasureComponent(m_ui->getToolTemplate(), m_plotComponentManager, this);
+	m_measureComponent = new MeasureComponent(m_ui->getToolTemplate(), m_ui->getHoverMenuBtnGroup(),
+						  m_plotComponentManager, this);
 	// m_measureComponent->addPlotComponent(m_plotComponentManager);
 
 	addComponent(m_measureComponent);
