@@ -21,7 +21,6 @@
 #include "statusbarmanager.h"
 #include <QApplication>
 #include <QLoggingCategory>
-#include <utility>
 
 using namespace scopy;
 
@@ -67,6 +66,11 @@ void StatusBarManager::pushUrgentMessage(const QString &message, int ms)
 	StatusBarManager::GetInstance()->_pushUrgentMessage(message, ms);
 }
 
+void StatusBarManager::pushUrgentWidget(QWidget *widget, QString title, int ms)
+{
+	StatusBarManager::GetInstance()->_pushUrgentWidget(widget, title, ms);
+}
+
 void StatusBarManager::setEnabled(bool enabled) { m_enabled = enabled; }
 
 bool StatusBarManager::isEnabled() const { return m_enabled; }
@@ -102,7 +106,7 @@ void StatusBarManager::_pushMessage(const QString &message, int ms)
 void StatusBarManager::_pushWidget(QWidget *widget, QString title, int ms)
 {
 	auto statusMessage = new StatusMessageWidget(widget, title, ms);
-	if(ms == -1) {
+	if(ms == INDEFINITE_DISPLAY_TIME) {
 		// permanent widget, the creator of this widget is responsible for calling delete on the widget
 		connect(widget, &QWidget::destroyed, this, [this]() {
 			clearDisplay();
@@ -128,6 +132,32 @@ void StatusBarManager::_pushUrgentMessage(const QString &message, int ms)
 	auto statusMessage = new StatusMessageText(message, ms);
 	Q_EMIT sendStatus(statusMessage);
 	m_timer->start(statusMessage->getDisplayTime());
+
+	if(m_enabled) {
+		Q_EMIT messageAdded();
+	}
+}
+
+void StatusBarManager::_pushUrgentWidget(QWidget *widget, QString title, int ms)
+{
+	StatusMessageWidget *statusMessage = new StatusMessageWidget(widget, title, ms);
+	if(ms == INDEFINITE_DISPLAY_TIME) {
+		// permanent widget, the creator of this widget is responsible for calling delete on the widget
+		connect(widget, &QWidget::destroyed, this, [this]() {
+			clearDisplay();
+			processStatusMessage();
+		});
+	}
+
+	if(m_timer->isActive()) {
+		m_timer->stop();
+		clearDisplay();
+	}
+
+	Q_EMIT sendStatus(statusMessage);
+	if(m_enabled) {
+		Q_EMIT messageAdded();
+	}
 }
 
 #include "moc_statusbarmanager.cpp"

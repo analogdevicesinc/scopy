@@ -30,6 +30,7 @@
 
 #define NUMBER_OF_RETAINED_MESSAGES 10
 #define DEFAULT_DISPLAY_TIME 5000
+#define INDEFINITE_DISPLAY_TIME -1
 
 namespace scopy {
 class SCOPY_PLUGINBASE_EXPORT StatusBarManager : public QObject
@@ -46,21 +47,21 @@ public:
 	static StatusBarManager *GetInstance();
 
 	/**
-	 * @brief Ads temporary message in the queue to be displayed, when possible, in the Scopy status bar.
+	 * @brief Adds temporary message in the queue to be displayed, when possible, in the Scopy status bar.
 	 * @param message QString with the message to be displayed
 	 * @param ms The time that the message will be displayed (in milliseconds)
 	 * */
 	static void pushMessage(const QString &message, int ms = DEFAULT_DISPLAY_TIME);
 
 	/**
-	 * @brief Ads temporary QWidget in the queue to be displayed, when possible, in the Scopy status bar. If there
+	 * @brief Adds temporary QWidget in the queue to be displayed, when possible, in the Scopy status bar. If there
 	 * is no display time specified in the "ms" parameter, the creator of the widget is responsible for deleting
 	 * it. This will enable StatusManager to send a signal that closes the display, ensuring a smooth transition.
-	 * @param message QWidget* to be displayed
+	 * @param widget QWidget* to be displayed
 	 * @param title QString with the name of the message
 	 * @param ms The time that the widget will be displayed (in milliseconds)
 	 * */
-	static void pushWidget(QWidget *widget, QString title, int ms = -1);
+	static void pushWidget(QWidget *widget, QString title, int ms = INDEFINITE_DISPLAY_TIME);
 
 	/**
 	 * @brief Overrides any message currently displayed with the message sent as parameter
@@ -68,6 +69,14 @@ public:
 	 * @param ms The time that the message will be displayed (in milliseconds)
 	 * */
 	static void pushUrgentMessage(const QString &message, int ms = DEFAULT_DISPLAY_TIME);
+
+	/**
+	 * @brief pushUrgentWidget Overrides any message currently being displayed with the widget sent as parameter
+	 * @param widget QWidget* to be displayed
+	 * @param title QString with the name of the message
+	 * @param ms The time that the widget will be displayed (in milliseconds)
+	 */
+	static void pushUrgentWidget(QWidget *widget, QString title, int ms = INDEFINITE_DISPLAY_TIME);
 
 	void setEnabled(bool enabled);
 	bool isEnabled() const;
@@ -86,6 +95,7 @@ private:
 	void _pushMessage(const QString &message, int ms);
 	void _pushWidget(QWidget *widget, QString title, int ms);
 	void _pushUrgentMessage(const QString &message, int ms);
+	void _pushUrgentWidget(QWidget *widget, QString title, int ms);
 
 	static StatusBarManager *pinstance_;
 	QList<StatusMessage *> *m_itemQueue;
