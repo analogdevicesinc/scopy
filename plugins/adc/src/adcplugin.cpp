@@ -53,11 +53,11 @@ finish:
 void ADCPlugin::initPreferences()
 {
 	Preferences *p = Preferences::GetInstance();
-	p->init("adc_plot_xaxis_label_position", HandlePos::SOUTH);
-	p->init("adc_plot_yaxis_label_position", HandlePos::WEST);
-	p->init("adc_plot_yaxis_handle_position", HandlePos::WEST);
-	p->init("adc_plot_xcursor_position", HandlePos::SOUTH);
-	p->init("adc_plot_ycursor_position", HandlePos::WEST);
+	p->init("adc_plot_xaxis_label_position", QwtAxis::XBottom);
+	p->init("adc_plot_yaxis_label_position", QwtAxis::YLeft);
+	p->init("adc_plot_yaxis_handle_position", HandlePos::NORTH_OR_WEST);
+	p->init("adc_plot_xcursor_position", HandlePos::SOUTH_OR_EAST);
+	p->init("adc_plot_ycursor_position", HandlePos::NORTH_OR_WEST);
 	p->init("adc_plot_show_buffer_previewer", true);
 	p->init("adc_default_y_mode", 0);
 	p->init("adc_add_remove_plot", false);
@@ -81,19 +81,19 @@ bool ADCPlugin::loadPreferencesPage()
 
 	auto adc_plot_xaxis_label_position = PreferencesHelper::addPreferenceComboList(
 		p, "adc_plot_xaxis_label_position", "Plot X-Axis scale position",
-		{{"Top", HandlePos::NORTH}, {"Bottom", HandlePos::SOUTH}}, generalSection);
+		{{"Top", QwtAxis::XTop}, {"Bottom", QwtAxis::XBottom}}, generalSection);
 	auto adc_plot_yaxis_label_position = PreferencesHelper::addPreferenceComboList(
 		p, "adc_plot_yaxis_label_position", "Plot Y-Axis scale position",
-		{{"Left", HandlePos::WEST}, {"Right", HandlePos::EAST}}, generalSection);
+		{{"Left", QwtAxis::YLeft}, {"Right", QwtAxis::YRight}}, generalSection);
 	auto adc_plot_yaxis_handle_position = PreferencesHelper::addPreferenceComboList(
 		p, "adc_plot_yaxis_handle_position", "Plot channel Y-handle position",
-		{{"Left", HandlePos::WEST}, {"Right", HandlePos::EAST}}, generalSection);
+		{{"Left", HandlePos::NORTH_OR_WEST}, {"Right", HandlePos::SOUTH_OR_EAST}}, generalSection);
 	auto adc_plot_xcursor_position = PreferencesHelper::addPreferenceComboList(
 		p, "adc_plot_xcursor_position", "Plot X-Cursor position",
-		{{"Top", HandlePos::NORTH}, {"Bottom", HandlePos::SOUTH}}, generalSection);
+		{{"Top", HandlePos::NORTH_OR_WEST}, {"Bottom", HandlePos::SOUTH_OR_EAST}}, generalSection);
 	auto adc_plot_ycursor_position = PreferencesHelper::addPreferenceComboList(
 		p, "adc_plot_ycursor_position", "Plot Y-Curosr position",
-		{{"Left", HandlePos::WEST}, {"Right", HandlePos::EAST}}, generalSection);
+		{{"Left", HandlePos::NORTH_OR_WEST}, {"Right", HandlePos::SOUTH_OR_EAST}}, generalSection);
 	auto adc_plot_show_buffer_previewer = PreferencesHelper::addPreferenceCheckBox(
 		p, "adc_plot_show_buffer_previewer", "Show buffer previewer", m_preferencesPage);
 
