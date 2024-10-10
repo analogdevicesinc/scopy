@@ -61,7 +61,6 @@ public Q_SLOTS:
 	void restart();
 	void timerTask();
 	void calibrationTask();
-	void motorCalibrationAcquisitionTask();
 	void utilityTask();
 	void clearCommandLog();
 	void canCalibrate(bool);
@@ -117,7 +116,7 @@ private:
 	MenuCombo *m_dataGraphChannelMenuCombo, *m_dataGraphDirectionMenuCombo, *m_tempGraphDirectionMenuCombo,
 			  *sequenceTypeMenuCombo, *conversionTypeMenuCombo, *cnvSourceMenuCombo, *convertSynchronizationMenuCombo, *angleFilterMenuCombo, *eighthHarmonicMenuCombo;
 
-	QTabWidget *tabWidget;
+	QTabWidget *tabWidget, *calibrationDataGraphTabWidget;
 
 	QListWidget *rawDataListWidget;
 
@@ -125,9 +124,17 @@ private:
 
 	QCheckBox *autoCalibrateCheckBox;
 
-	PlotWidget *preCalibrationFFTPlotWidget, *calibrationRawDataPlotWidget;
-	PlotAxis *preCalibrationFFTXPlotAxis, *preCalibrationFFTYPlotAxis, *calibrationRawDataXPlotAxis, *calibrationRawDataYPlotAxis;
-	PlotChannel *preCalibrationFFTMagnitudePlotChannel, *preCalibrationFFTPhasePlotChannel, *calibrationRawDataPlotChannel, *calibrationSineDataPlotChannel, *calibrationCosineDataPlotChannel;
+	PlotWidget *angleErrorPlotWidget, *calibrationRawDataPlotWidget, *FFTAngleErrorPlotWidget,
+			   *correctedErrorPlotWidget, *postCalibrationRawDataPlotWidget, *FFTCorrectedErrorPlotWidget;
+	PlotAxis *calibrationRawDataXPlotAxis, *calibrationRawDataYPlotAxis, 
+			 *angleErrorXPlotAxis, *angleErrorYPlotAxis, *FFTAngleErrorXPlotAxis, *FFTAngleErrorYPlotAxis,
+			 *correctedErrorXPlotAxis, *correctedErrorYPlotAxis, *FFTCorrectedErrorXPlotAxis, *FFTCorrectedErrorYPlotAxis,
+			 *postCalibrationRawDataXPlotAxis, *postCalibrationRawDataYPlotAxis;
+	PlotChannel *angleErrorPlotChannel, *preCalibrationFFTPhasePlotChannel, *calibrationRawDataPlotChannel, *calibrationSineDataPlotChannel, *calibrationCosineDataPlotChannel,
+				*FFTAngleErrorMagnitudeChannel, *FFTAngleErrorPhaseChannel,
+				*correctedErrorPlotChannel,
+				*postCalibrationRawDataPlotChannel, *postCalibrationSineDataPlotChannel, *postCalibrationCosineDataPlotChannel,
+				*FFTCorrectedErrorMagnitudeChannel, *FFTCorrectedErrorPhaseChannel;
 
 	HorizontalSpinBox *motorMaxVelocitySpinBox, *motorAccelTimeSpinBox, *motorMaxDisplacementSpinBox, *motorTargetPositionSpinBox;
 
@@ -156,13 +163,11 @@ private:
 	void updateLabelValue(QLabel* label, int channelIndex);
 	void updateLabelValue(QLabel *label, ADMTController::MotorAttribute attribute);
 	void updateChannelValue(int channelIndex);
-	void addAngleToRawDataList();
 	void calibrateData();
 	void registerCalibrationData();
 	void extractCalibrationData();
 	void importCalibrationData();
-	void calibrationLogWrite(QString message);
-	void calibrationLogWriteLn(QString message = "");
+	void calibrationLogWrite(QString message = "");
 	void commandLogWrite(QString message);
 	void readMotorAttributeValue(ADMTController::MotorAttribute attribute, double& value);
 	void writeMotorAttributeValue(ADMTController::MotorAttribute attribute, double value);
@@ -183,7 +188,6 @@ private:
 	double convertAMAXtoAccelTime(double amax);
 	void updateCalculatedCoeff();
 	void resetCalculatedCoeff();
-	void appendSamplesToPlotCurve(PlotWidget *plotWidget, QVector<double>& newYData);
 	void applyTabWidgetStyle(QTabWidget *widget, const QString& styleHelperColor = "ScopyBlue");
 	MenuControlButton *createStatusLEDWidget(const QString title, QColor color, QWidget *parent = nullptr);
 	MenuControlButton *createChannelToggleWidget(const QString title, QColor color, QWidget *parent = nullptr);
@@ -201,8 +205,15 @@ private:
 	void toggleAllDIGIO(bool value);
 	void toggleUtilityTask(bool run);
 	void toggleDIGIOEN(string DIGIOENName, bool value);
+	void getCalibrationSamples();
+	void startMotor();
+	void computeSineCosineOfAngles(QVector<double> graphDataList);
+	void postCalibrateData();
+	void canStartMotor(bool value);
+	void resetCurrentPositionToZero();
+	void flashHarmonicValues();
 
-	QTimer *timer, *calibrationTimer, *motorCalibrationAcquisitionTimer, *utilityTimer;
+	QTimer *timer, *calibrationTimer, *utilityTimer;
 
 	int uuid = 0;
 	const char *rotationChannelName, *angleChannelName, *countChannelName, *temperatureChannelName;

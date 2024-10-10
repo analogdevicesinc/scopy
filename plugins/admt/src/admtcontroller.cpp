@@ -602,10 +602,14 @@ void ADMTController::getPreCalibrationFFT(const vector<double>& PANG, vector<dou
     // Calculate angle errors
     calculate_angle_error(PANG, angle_errors_pre, &max_err_pre, cycleCount, samplesPerCycle);
     // Angle Error (angle_errors_pre)
+    angleError = angle_errors_pre;
 
     // Perform FFT on pre-calibration angle errors
     performFFT(angle_errors_pre, angle_errors_fft_pre, angle_errors_fft_phase_pre, cycleCount);
-    // FFT Angle Error (angle_errors_pre)
+    // FFT Angle Error Magnitude (angle_errors_pre)
+    FFTAngleErrorMagnitude = angle_errors_fft_pre;
+    // FFT Angle Error Phase (angle_errors_fft_phase_pre)
+    FFTAngleErrorPhase = angle_errors_fft_phase_pre;
 }
 
 void ADMTController::postcalibrate(vector<double> PANG, int cycleCount, int samplesPerCycle){
@@ -638,11 +642,14 @@ void ADMTController::getPostCalibrationFFT(const vector<double>& updated_PANG, v
     // Calculate angle errors
     calculate_angle_error(updated_PANG, angle_errors_post, &max_err_post, cycleCount, samplesPerCycle);
     // Corrected Error (angle_errors_post)
+    correctedError = angle_errors_post;
 
     // Perform FFT on post-calibration angle errors
     performFFT(angle_errors_post, angle_errors_fft_post, angle_errors_fft_phase_post, cycleCount);
     // FFT Corrected Error (angle_errors_post)
+    FFTCorrectedErrorMagnitude = angle_errors_post;
     // FFT Corrected Error Phase (angle_errors_fft_phase_post)
+    FFTCorrectedErrorPhase = angle_errors_fft_phase_post;
 }
 
 void ADMTController::performFFT(const vector<double>& angle_errors, vector<double>& angle_errors_fft, vector<double>& angle_errors_fft_phase, int cycleCount) {
