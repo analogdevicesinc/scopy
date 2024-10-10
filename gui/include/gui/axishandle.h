@@ -12,12 +12,8 @@ class PlotWidget;
 
 enum HandlePos : int
 {
-	NORTH_WEST = 0,
-	SOUTH_EAST = 1,
-	NORTH = 0,
-	SOUTH = 1,
-	WEST = 0,
-	EAST = 1
+	NORTH_OR_WEST = 0, // west for y axis, north for x axis
+	SOUTH_OR_EAST = 1  // east for y axis, south for x axis
 };
 
 enum HandleOrientation : int
