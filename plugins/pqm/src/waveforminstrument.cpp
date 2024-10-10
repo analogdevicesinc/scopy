@@ -1,6 +1,8 @@
 #include "waveforminstrument.h"
 #include "plotaxis.h"
 #include "plottingstrategybuilder.h"
+#include <QFileDialog>
+#include <menulineedit.h>
 #include <menuonoffswitch.h>
 #include <qwt_legend.h>
 #include <rollingstrategy.h>
@@ -111,18 +113,28 @@ void WaveformInstrument::setupChannels(PlotWidget *plot, QMap<QString, QString> 
 
 QWidget *WaveformInstrument::createSettMenu(QWidget *parent)
 {
-
 	QWidget *widget = new QWidget(parent);
 	QVBoxLayout *layout = new QVBoxLayout(widget);
 	layout->setMargin(0);
 	layout->setSpacing(10);
 
 	MenuHeaderWidget *header = new MenuHeaderWidget("Settings", QPen(StyleHelper::getColor("ScopyBlue")), widget);
-	MenuSectionWidget *plotSettingsContainer = new MenuSectionWidget(widget);
-	MenuCollapseSection *plotSection = new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE, widget);
-	plotSection->setLayout(new QVBoxLayout());
+	QWidget *plotSection = createMenuPlotSection(widget);
+	QWidget *logSection = createMenuLogSection(widget);
+
+	layout->addWidget(header);
+	layout->addWidget(plotSection);
+	layout->addWidget(logSection);
+	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	return widget;
+}
+
+QWidget *WaveformInstrument::createMenuPlotSection(QWidget *parent)
+{
+	MenuSectionCollapseWidget *plotSection =
+		new MenuSectionCollapseWidget("PLOT", MenuCollapseSection::MHCW_NONE, parent);
 	plotSection->contentLayout()->setSpacing(10);
-	plotSection->contentLayout()->setMargin(0);
 
 	// timespan
 	m_timespanSpin = new PositionSpinButton({{"ms", 1E-3}, {"s", 1E0}}, "Timespan", 0.02, 10, true, false);
@@ -157,15 +169,74 @@ QWidget *WaveformInstrument::createSettMenu(QWidget *parent)
 	plottingModeWidget->layout()->addWidget(m_triggeredBy);
 	plottingModeWidget->layout()->addWidget(rollingModeSwitch);
 
-	plotSection->contentLayout()->addWidget(m_timespanSpin);
-	plotSection->contentLayout()->addWidget(plottingModeWidget);
+	plotSection->add(m_timespanSpin);
+	plotSection->add(plottingModeWidget);
 
-	plotSettingsContainer->contentLayout()->addWidget(plotSection);
-	layout->addWidget(header);
-	layout->addWidget(plotSettingsContainer);
-	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	return plotSection;
+}
 
-	return widget;
+QWidget *WaveformInstrument::createMenuLogSection(QWidget *parent)
+{
+	MenuSectionCollapseWidget *logSection =
+		new MenuSectionCollapseWidget("LOG", MenuCollapseSection::MHCW_NONE, parent);
+	logSection->contentLayout()->setSpacing(10);
+
+	QWidget *browseWidget = new QWidget(logSection);
+	browseWidget->setLayout(new QHBoxLayout(browseWidget));
+	browseWidget->layout()->setMargin(0);
+
+	MenuLineEdit *logFilePath = new MenuLineEdit(browseWidget);
+	logFilePath->edit()->setPlaceholderText("path to a csv file");
+	QPushButton *browseBtn = new QPushButton("...", browseWidget);
+	StyleHelper::BrowseButton(browseBtn);
+
+	browseWidget->layout()->addWidget(logFilePath);
+	browseWidget->layout()->addWidget(browseBtn);
+
+	QWidget *btnsWidget = new QWidget(logSection);
+	btnsWidget->setEnabled(false);
+	QHBoxLayout *btnsLay = new QHBoxLayout(btnsWidget);
+	btnsLay->setMargin(0);
+
+	QPushButton *startLog = new QPushButton("Start", logSection);
+	StyleHelper::BlueButton(startLog);
+	startLog->setFixedWidth(128);
+
+	QPushButton *stopLog = new QPushButton("Stop", logSection);
+	StyleHelper::BlueButton(stopLog);
+	stopLog->setFixedWidth(128);
+	stopLog->setVisible(false);
+
+	btnsLay->addWidget(startLog, Qt::AlignCenter);
+	btnsLay->addWidget(stopLog, Qt::AlignCenter);
+
+	connect(this, &WaveformInstrument::enableTool, this, [=, this](bool en) {
+		if(!en && !startLog->isVisible())
+			stopLog->click();
+		btnsWidget->setEnabled(en && !logFilePath->edit()->text().isEmpty());
+	});
+	connect(startLog, &QPushButton::clicked, this, [=, this]() {
+		startLog->setVisible(false);
+		stopLog->setVisible(true);
+		browseWidget->setEnabled(false);
+		Q_EMIT logData(PqmDataLogger::Waveform, logFilePath->edit()->text());
+	});
+	connect(stopLog, &QPushButton::clicked, this, [=, this]() {
+		stopLog->setVisible(false);
+		startLog->setVisible(true);
+		browseWidget->setEnabled(true);
+		Q_EMIT logData(PqmDataLogger::None, logFilePath->edit()->text());
+	});
+
+	connect(logFilePath->edit(), &QLineEdit::textChanged, this, [this, logFilePath, btnsWidget] {
+		btnsWidget->setDisabled(!m_running || logFilePath->edit()->text().isEmpty());
+	});
+	connect(browseBtn, &QPushButton::clicked, this, [this, logFilePath]() { browseFile(logFilePath->edit()); });
+
+	logSection->add(browseWidget);
+	logSection->add(btnsWidget);
+
+	return logSection;
 }
 
 void WaveformInstrument::stop() { m_runBtn->setChecked(false); }
@@ -252,6 +323,14 @@ void WaveformInstrument::onBufferDataAvailable(QMap<QString, QVector<double>> da
 	if(m_singleBtn->isChecked() && processedData.first().size() == samplingFreq) {
 		m_singleBtn->setChecked(false);
 	}
+}
+
+void WaveformInstrument::browseFile(QLineEdit *lineEditPath)
+{
+	QString filePath =
+		QFileDialog::getOpenFileName(this, "Open a file", "directoryToOpen",
+					     "All (*);;XML Files (*.xml);;Text Files (*.txt);;BIN Files (*.bin)");
+	lineEditPath->setText(filePath);
 }
 
 #include "moc_waveforminstrument.cpp"
