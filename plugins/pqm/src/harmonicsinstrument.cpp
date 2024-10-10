@@ -28,6 +28,10 @@
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/widgets/menucontrolbutton.h>
+#include <QDateTime>
+#include <QFileDialog>
+#include <menulineedit.h>
+#include <menusectionwidget.h>
 
 using namespace scopy::pqm;
 
@@ -47,6 +51,8 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 	tool->topContainer()->setVisible(true);
 	tool->centralContainer()->setVisible(true);
 	tool->topContainerMenuControl()->setVisible(false);
+	tool->rightContainer()->setVisible(true);
+	tool->setRightContainerWidth(280);
 	instrumentLayout->addWidget(tool);
 
 	// central widget components
@@ -64,15 +70,9 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 
 	// instrument menu
 	GearBtn *settingsMenuBtn = new GearBtn(this);
-	QWidget *settingsMenu = createSettingsMenu();
-	HoverWidget *menuHover = new HoverWidget(settingsMenu, settingsMenuBtn, tool);
-	menuHover->setAnchorPos(HoverPosition::HP_BOTTOMRIGHT);
-	menuHover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
-	menuHover->setAnchorOffset({0, 10});
-	connect(settingsMenuBtn, &QPushButton::toggled, this, [=, this](bool b) {
-		menuHover->setVisible(b);
-		menuHover->raise();
-	});
+	settingsMenuBtn->setChecked(true);
+	tool->rightStack()->add("settings", createSettingsMenu(this));
+	connect(settingsMenuBtn, &QPushButton::toggled, this, [=, this](bool b) { tool->openRightContainerHelper(b); });
 
 	m_runBtn = new RunBtn(this);
 	m_singleBtn = new SingleShotBtn(this);
@@ -194,22 +194,39 @@ QWidget *HarmonicsInstrument::createThdWidget()
 	return thdWidget;
 }
 
-QWidget *HarmonicsInstrument::createSettingsMenu()
+QWidget *HarmonicsInstrument::createSettingsMenu(QWidget *parent)
 {
-	QWidget *menu = new QWidget(this);
-	menu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	menu->setFixedWidth(185);
-	menu->setStyleSheet("background-color:" + StyleHelper::getColor("UIElementBackground"));
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setMargin(0);
+	layout->setSpacing(10);
 
-	QVBoxLayout *lay = new QVBoxLayout(menu);
-	MenuCombo *harmonicType = new MenuCombo(tr("Harmonics Type"), this);
+	MenuHeaderWidget *header = new MenuHeaderWidget("Settings", QPen(StyleHelper::getColor("ScopyBlue")), widget);
+	QWidget *generalSection = createMenuGeneralSection(widget);
+	QWidget *logSection = createMenuLogSection(widget);
+
+	layout->addWidget(header);
+	layout->addWidget(generalSection);
+	layout->addWidget(logSection);
+	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	return widget;
+}
+
+QWidget *HarmonicsInstrument::createMenuGeneralSection(QWidget *parent)
+{
+	MenuSectionCollapseWidget *generalSection = new MenuSectionCollapseWidget(
+		"GENERAL", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, parent);
+	generalSection->contentLayout()->setSpacing(10);
+
+	MenuCombo *harmonicType = new MenuCombo(tr("Harmonics Type"), generalSection);
 	harmonicType->combo()->addItem("harmonics");
 	harmonicType->combo()->addItem("inter_harmonics");
 	m_harmonicsType = harmonicType->combo()->currentText();
 	connect(harmonicType->combo(), &QComboBox::currentTextChanged, this,
 		[=, this](QString h) { m_harmonicsType = h; });
 
-	MenuCombo *activeChnlCb = new MenuCombo(tr("Active channel"), this);
+	MenuCombo *activeChnlCb = new MenuCombo(tr("Active channel"), generalSection);
 	for(const QString &ch : m_chnls) {
 		activeChnlCb->combo()->addItem(m_chnls.key(ch));
 	}
@@ -222,10 +239,47 @@ QWidget *HarmonicsInstrument::createSettingsMenu()
 	connect(m_table->selectionModel(), &QItemSelectionModel::selectionChanged, this,
 		&HarmonicsInstrument::onSelectionChanged);
 
-	lay->addWidget(harmonicType);
-	lay->addWidget(activeChnlCb);
+	generalSection->add(harmonicType);
+	generalSection->add(activeChnlCb);
 
-	return menu;
+	return generalSection;
+}
+
+QWidget *HarmonicsInstrument::createMenuLogSection(QWidget *parent)
+{
+	MenuSectionCollapseWidget *logSection = new MenuSectionCollapseWidget(
+		"LOG", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, parent);
+	logSection->contentLayout()->setSpacing(10);
+	logSection->setCollapsed(true);
+
+	QWidget *browseWidget = new QWidget(logSection);
+	browseWidget->setLayout(new QHBoxLayout(browseWidget));
+	browseWidget->layout()->setMargin(0);
+
+	MenuLineEdit *logFilePath = new MenuLineEdit(browseWidget);
+	logFilePath->edit()->setPlaceholderText("Select log directory");
+	QPushButton *browseBtn = new QPushButton("...", browseWidget);
+	StyleHelper::BrowseButton(browseBtn);
+
+	browseWidget->layout()->addWidget(logFilePath);
+	browseWidget->layout()->addWidget(browseBtn);
+
+	connect(this, &HarmonicsInstrument::enableTool, this, [this, logFilePath, logSection](bool en) {
+		logSection->setDisabled(en);
+		QString dirPath = logFilePath->edit()->text();
+		QDir logDir = QDir(dirPath);
+		if(dirPath.isEmpty())
+			logSection->setCollapsed(true);
+		if(en && logDir.exists() && !logSection->collapsed())
+			Q_EMIT logData(PqmDataLogger::Harmonics, dirPath);
+		else
+			Q_EMIT logData(PqmDataLogger::None, "");
+	});
+	connect(browseBtn, &QPushButton::clicked, this, [this, logFilePath]() { browseFile(logFilePath->edit()); });
+
+	logSection->add(browseWidget);
+
+	return logSection;
 }
 
 void HarmonicsInstrument::updateTable()
@@ -314,6 +368,14 @@ void HarmonicsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> 
 	if(m_singleBtn->isChecked()) {
 		m_singleBtn->setChecked(false);
 	}
+}
+
+void HarmonicsInstrument::browseFile(QLineEdit *lineEditPath)
+{
+	QString dirPath =
+		QFileDialog::getExistingDirectory(this, "Select a directory", "directoryToOpen",
+						  QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+	lineEditPath->setText(dirPath);
 }
 
 #include "moc_harmonicsinstrument.cpp"
