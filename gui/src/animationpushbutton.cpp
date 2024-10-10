@@ -38,9 +38,9 @@ void AnimationPushButton::setAnimation(QMovie *animation, int maxRunningTimeMsec
 
 void AnimationPushButton::startAnimation()
 {
-	m_currentText = this->text();
-	m_currentIcon = this->icon();
 	if(m_animation->isValid() && (m_animation->state() == QMovie::NotRunning)) {
+		m_currentText = this->text();
+		m_currentIcon = this->icon();
 		m_animation->start();
 		m_timer->start();
 		this->setText("");
