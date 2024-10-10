@@ -442,7 +442,7 @@ void Ad74413r::setupChannel(int chnlIdx, QString function)
 		PlotAxisHandle *chHandle = new PlotAxisHandle(m_plot, chYAxis);
 		chHandle->handle()->setBarVisibility(BarVisibility::ON_HOVER);
 		chHandle->handle()->setColor(chPen.color());
-		chHandle->handle()->setHandlePos(HandlePos::SOUTH_EAST);
+		chHandle->handle()->setHandlePos(HandlePos::SOUTH_OR_EAST);
 		connect(chHandle, &PlotAxisHandle::scalePosChanged, this, [this, chYAxis](double pos) {
 			double min = chYAxis->min() - pos;
 			double max = chYAxis->max() - pos;
