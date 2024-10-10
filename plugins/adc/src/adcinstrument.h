@@ -34,6 +34,7 @@ public:
 
 	ToolTemplate *getToolTemplate();
 	MapStackedWidget *getRightStack();
+	QButtonGroup *getHoverMenuBtnGroup();
 
 	int uuid = 0;
 	const QString channelsMenuId = "channels";
@@ -45,7 +46,6 @@ public:
 	VerticalChannelManager *vcm() const;
 
 	QPushButton *sync() const;
-
 public Q_SLOTS:
 	void stopped();
 	void started();
@@ -68,6 +68,7 @@ private:
 	MapStackedWidget *rightStack;
 	QButtonGroup *rightMenuBtnGrp;
 	QButtonGroup *channelGroup;
+	QButtonGroup *hoverMenuGroup;
 
 	AddBtn *addBtn;
 	RemoveBtn *removeBtn;
