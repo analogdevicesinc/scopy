@@ -198,9 +198,8 @@ public:
     void postcalibrate(vector<double> PANG, int cycleCount, int samplesPerCycle);
     int getAbsAngleTurnCount(uint16_t registerValue);
     uint16_t setDIGIOENRegisterBitMapping(uint16_t currentRegisterValue, map<string, bool> settings);
-    vector<double> unwrapAngles(const vector<double>& wrappedAngles);
+    void unwrapAngles(vector<double>& angles_rad); 
     map<string, string> getUNIQID3RegisterMapping(uint16_t registerValue);
-    vector<double> wrapAngles(const vector<double>& unwrappedAngles);
 private:
     iio_context *m_iioCtx;
     iio_buffer *m_iioBuffer;
