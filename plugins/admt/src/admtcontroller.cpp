@@ -395,7 +395,6 @@ int ADMTController::linear_fit(vector<double> x, vector<double> y, double* slope
     return 0;
 }
 
-/* Calculate angle error based on MATLAB and C# implementation */
 int ADMTController::calculate_angle_error(vector<double> angle_meas, vector<double>& angle_error_ret, double* max_angle_err, int cycleCount, int samplesPerCycle)
 {
     // Adjust the expected angles based on samples per cycle and cycle count
@@ -410,8 +409,7 @@ int ADMTController::calculate_angle_error(vector<double> angle_meas, vector<doub
 
     // Ensure that the angle_meas and expected_angles are of the same size
     if (angle_meas.size() != expected_angles.size()) {
-        // Handle size mismatch error
-        return -1;
+        return -1; // Handle size mismatch error
     }
 
     vector<double> angle_meas_rad(angle_meas.size()); // Convert measured angles to radians
@@ -423,30 +421,19 @@ int ADMTController::calculate_angle_error(vector<double> angle_meas, vector<doub
         expected_angles_rad[i] = expected_angles[i] * M_PI / 180.0;
     }
 
-    // Unwrap the measured angles
-    vector<double> angle_meas_rad_unwrap(angle_meas.size());
-    double num = 0.0;
-    angle_meas_rad_unwrap[0] = angle_meas_rad[0];
-    for (int i = 1; i < angle_meas.size(); i++) {
-        double diff = angle_meas_rad[i] - angle_meas_rad[i - 1];
-        if (diff > M_PI) {
-            num -= 2.0 * M_PI;
-        } else if (diff < -M_PI) {
-            num += 2.0 * M_PI;
-        }
-        angle_meas_rad_unwrap[i] = angle_meas_rad[i] + num;
-    }
+    // Unwrap the measured angles (in radians) to remove any discontinuity
+    unwrap_angles(angle_meas_rad);
 
-    // Set the initial point to zero
-    double offset = angle_meas_rad_unwrap[0];
+    // Set the initial point to zero (optional, to normalize the measurement)
+    double offset = angle_meas_rad[0];
     for (int i = 0; i < angle_meas.size(); i++) {
-        angle_meas_rad_unwrap[i] -= offset;
+        angle_meas_rad[i] -= offset;
     }
 
     // Calculate the angle error using the expected angles (unwrap vs expected)
     angle_error_ret.resize(angle_meas.size());
     for (int i = 0; i < angle_meas.size(); i++) {
-        angle_error_ret[i] = angle_meas_rad_unwrap[i] - expected_angles_rad[i];
+        angle_error_ret[i] = angle_meas_rad[i] - expected_angles_rad[i];
     }
 
     // Find the min/max error for offset correction
@@ -467,6 +454,23 @@ int ADMTController::calculate_angle_error(vector<double> angle_meas, vector<doub
     *max_angle_err = max(fabs(*minmax.first), fabs(*minmax.second)) * (180.0 / M_PI);
 
     return 0;
+}
+
+// Function to unwrap angles that can span multiple cycles
+void unwrap_angles(vector<double>& angles_rad) {
+    for (size_t i = 1; i < angles_rad.size(); ++i) {
+        // Calculate the difference between the current angle and the previous one
+        double diff = angles_rad[i] - angles_rad[i-1];
+        
+        // If the difference is greater than pi, subtract 2*pi (unwrap backward)
+        if (diff > M_PI) {
+            angles_rad[i] -= 2 * M_PI;
+        }
+        // If the difference is less than -pi, add 2*pi (unwrap forward)
+        else if (diff < -M_PI) {
+            angles_rad[i] += 2 * M_PI;
+        }
+    }
 }
 
 QString ADMTController::calibrate(vector<double> PANG, int cycleCount, int samplesPerCycle) {
@@ -656,35 +660,41 @@ void ADMTController::performFFT(const vector<double>& angle_errors, vector<doubl
     typedef complex<double> cx;
 
     int size = angle_errors.size();
-    cx fft_in[size];
-    cx fft_out[size];
+    int N = pow(2, ceil(log2(size))); // Ensure size is a power of 2 (padding if necessary)
 
-    // Format angle errors to match data type used in fft function
+    vector<cx> fft_in(N, cx(0, 0));    // Input signal (zero-padded if necessary)
+    vector<cx> fft_out(N);             // Output signal (complex)
+
+    // Format angle errors into the fft_in vector
     for (int i = 0; i < size; i++) {
         fft_in[i] = cx(angle_errors[i], 0);
     }
 
-    // Invoke FFT function
-    fft(fft_in, fft_out, 8);
+    // Perform FFT
+    fft(fft_in.data(), fft_out.data(), log2(N));
 
-    // Extract magnitude and phase from complex fft_out array
-    vector<double> angle_errors_fft_temp(size);
-    vector<double> angle_errors_fft_phase_temp(size);
+    // Temporary vectors to store magnitude and phase
+    vector<double> angle_errors_fft_temp(N);
+    vector<double> angle_errors_fft_phase_temp(N);
 
-    for (int i = 0; i < size; i++) {
-        angle_errors_fft_temp[i] = sqrt(pow(fft_out[i].real() / size, 2) + pow(fft_out[i].imag() / size, 2)) * 2;
+    // Calculate magnitude and phase for all values
+    for (int i = 0; i < N; i++) {
+        // Magnitude: Normalize by N (to avoid amplitude increase)
+        angle_errors_fft_temp[i] = abs(fft_out[i]) * 2.0 / N;
         angle_errors_fft_phase_temp[i] = atan2(fft_out[i].imag(), fft_out[i].real());
     }
 
-    vector<double> angle_errors_fft_upper_half(size / cycleCount);
-    vector<double> angle_errors_fft_phase_upper_half(size / cycleCount);
+    // Prepare vectors for upper half of FFT (positive frequencies)
+    vector<double> angle_errors_fft_upper_half(N / 2);
+    vector<double> angle_errors_fft_phase_upper_half(N / 2);
 
-    // Get upper half only
-    for (int i = 0; i < size / cycleCount; i++) {
+    // Get upper half only (due to symmetry in real-valued signal FFT)
+    for (int i = 0; i < N / 2; i++) {
         angle_errors_fft_upper_half[i] = angle_errors_fft_temp[i];
         angle_errors_fft_phase_upper_half[i] = angle_errors_fft_phase_temp[i];
     }
 
+    // Resize final vectors based on cycle count (if needed)
     angle_errors_fft = angle_errors_fft_upper_half;
     angle_errors_fft_phase = angle_errors_fft_phase_upper_half;
 }
@@ -1142,55 +1152,6 @@ uint16_t ADMTController::setDIGIOENRegisterBitMapping(uint16_t currentRegisterVa
     // Bits 7:0: (preserve original value)
 
     return registerValue;
-}
-
-vector<double> ADMTController::unwrapAngles(const vector<double>& wrappedAngles) {
-    vector<double> unwrappedAngles;
-    unwrappedAngles.reserve(wrappedAngles.size());
-
-    // Start with the first angle as it is
-    double previousAngle = wrappedAngles[0];
-    unwrappedAngles.push_back(previousAngle);
-
-    // Initialize an offset for unwrapping
-    double offset = 0.0;
-
-    for (size_t i = 1; i < wrappedAngles.size(); ++i) {
-        double currentAngle = wrappedAngles[i];
-        double delta = currentAngle - previousAngle;
-
-        // Adjust the current angle if it wraps around
-        if (delta < -180.0) {
-            offset += 360.0; // Increment offset for negative wrap
-        } else if (delta > 180.0) {
-            offset -= 360.0; // Decrement offset for positive wrap
-        }
-
-        // Add the offset to the current angle
-        unwrappedAngles.push_back(currentAngle + offset);
-        previousAngle = currentAngle; // Update previous angle
-    }
-
-    return unwrappedAngles;
-}
-
-vector<double> ADMTController::wrapAngles(const vector<double>& unwrappedAngles) {
-    vector<double> wrapped_angles;
-    wrapped_angles.reserve(unwrappedAngles.size());
-
-    for (const auto& angle : unwrappedAngles) {
-        // Wrap angle to be within [0, 360)
-        double wrapped_angle = fmod(angle, 360.0);
-
-        // Ensure wrapped_angle is positive
-        if (wrapped_angle < 0) {
-            wrapped_angle += 360.0;
-        }
-
-        wrapped_angles.push_back(wrapped_angle);
-    }
-
-    return wrapped_angles;
 }
 
 map<string, string> ADMTController::getUNIQID3RegisterMapping(uint16_t registerValue) {
