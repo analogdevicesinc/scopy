@@ -422,7 +422,7 @@ int ADMTController::calculate_angle_error(vector<double> angle_meas, vector<doub
     }
 
     // Unwrap the measured angles (in radians) to remove any discontinuity
-    unwrap_angles(angle_meas_rad);
+    unwrapAngles(angle_meas_rad);
 
     // Set the initial point to zero (optional, to normalize the measurement)
     double offset = angle_meas_rad[0];
@@ -457,7 +457,7 @@ int ADMTController::calculate_angle_error(vector<double> angle_meas, vector<doub
 }
 
 // Function to unwrap angles that can span multiple cycles
-void unwrap_angles(vector<double>& angles_rad) {
+void ADMTController::unwrapAngles(vector<double>& angles_rad) {
     for (size_t i = 1; i < angles_rad.size(); ++i) {
         // Calculate the difference between the current angle and the previous one
         double diff = angles_rad[i] - angles_rad[i-1];
