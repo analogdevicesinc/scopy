@@ -20,13 +20,13 @@
  */
 
 #include "pqmplugin.h"
-#include "qlabel.h"
 
 #include <QLoggingCategory>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <acquisitionmanager.h>
 #include <harmonicsinstrument.h>
+#include <pqmdatalogger.h>
 #include <rmsinstrument.h>
 #include <settingsinstrument.h>
 #include <waveforminstrument.h>
@@ -142,6 +142,7 @@ bool PQMPlugin::onConnect()
 	harmonicsTme->setEnabled(true);
 	harmonicsTme->setRunBtnVisible(true);
 	connect(m_acqManager, &AcquisitionManager::pqmAttrsAvailable, harmonics, &HarmonicsInstrument::onAttrAvailable);
+	connect(harmonics, &HarmonicsInstrument::logData, m_acqManager, &AcquisitionManager::logData);
 
 	ToolMenuEntry *waveformTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "pqmwaveform");
 	WaveformInstrument *waveform = new WaveformInstrument(waveformTme, m_param);
@@ -151,6 +152,7 @@ bool PQMPlugin::onConnect()
 	waveformTme->setRunBtnVisible(true);
 	connect(m_acqManager, &AcquisitionManager::bufferDataAvailable, waveform,
 		&WaveformInstrument::onBufferDataAvailable, Qt::QueuedConnection);
+	connect(waveform, &WaveformInstrument::logData, m_acqManager, &AcquisitionManager::logData);
 
 	SettingsInstrument *settings = new SettingsInstrument();
 	m_toolList[3]->setTool(settings);

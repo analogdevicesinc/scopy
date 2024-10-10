@@ -27,6 +27,7 @@
 #include <QWidget>
 #include <menucombo.h>
 #include <plottingstrategy.h>
+#include <pqmdatalogger.h>
 #include <gui/spinbox_a.hpp>
 #include <gui/plotwidget.h>
 #include <gui/tooltemplate.h>
@@ -53,6 +54,7 @@ public Q_SLOTS:
 	void onBufferDataAvailable(QMap<QString, QVector<double>> data);
 Q_SIGNALS:
 	void enableTool(bool en, QString toolName = "waveform");
+	void logData(PqmDataLogger::ActiveInstrument instr, const QString &filePath);
 
 private Q_SLOTS:
 	void onTriggeredChnlChanged(QString triggeredChnl);
@@ -63,11 +65,14 @@ private:
 	void initPlot(PlotWidget *plot, QString unitType, int yMin = -650, int yMax = 650);
 	void setupChannels(PlotWidget *plot, QMap<QString, QString> chnls);
 	QWidget *createSettMenu(QWidget *parent);
+	QWidget *createMenuLogSection(QWidget *parent);
+	QWidget *createMenuPlotSection(QWidget *parent);
 
 	void updateXData(int dataSize);
 	void plotData(QMap<QString, QVector<double>> chnlsData);
 	void deletePlottingStrategy();
 	void createTriggeredStrategy(QString triggerChnl);
+	void browseFile(QLineEdit *lineEditPath);
 
 	bool m_running;
 	PlotWidget *m_voltagePlot;

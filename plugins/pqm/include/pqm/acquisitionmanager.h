@@ -31,6 +31,8 @@
 #include <iioutil/commandqueue.h>
 #include <iioutil/pingtask.h>
 
+#include <pqmdatalogger.h>
+
 #define MAX_ATTR_SIZE 1024
 #define BUFFER_SIZE 256
 #define DEVICE_PQM "pqm"
@@ -52,6 +54,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void pqmAttrsAvailable(QMap<QString, QMap<QString, QString>>);
 	void bufferDataAvailable(QMap<QString, QVector<double>>);
+	void logData(PqmDataLogger::ActiveInstrument instr, const QString &filePath);
 
 private Q_SLOTS:
 	void futureReadData();
@@ -69,6 +72,7 @@ private:
 
 	iio_context *m_ctx;
 	iio_buffer *m_buffer;
+	PqmDataLogger *m_pqmLog;
 
 	QTimer *m_pingTimer = nullptr;
 	PingTask *m_pingTask = nullptr;

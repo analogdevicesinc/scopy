@@ -32,12 +32,14 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QOb
 	, m_ctx(ctx)
 	, m_pingTask(pingTask)
 	, m_buffer(nullptr)
+	, m_pqmLog(nullptr)
 {
 	m_readFw = new QFutureWatcher<void>(this);
 	m_setFw = new QFutureWatcher<void>(this);
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(dev) {
 		// might need to set a trigger for the pqm device
+		m_pqmLog = new PqmDataLogger(this);
 		m_hasFwVers = iio_device_find_attr(dev, "fw_version");
 		readPqmAttributes();
 		enableBufferChnls(dev);
@@ -50,6 +52,7 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QOb
 		connect(m_pingTimer, &QTimer::timeout, this, &AcquisitionManager::pingTimerTimeout);
 		connect(m_readFw, &QFutureWatcher<void>::finished, this, &AcquisitionManager::onReadFinished,
 			Qt::QueuedConnection);
+		connect(this, &AcquisitionManager::logData, m_pqmLog, &PqmDataLogger::logPressed);
 	} else {
 		qWarning(CAT_PQM_ACQ) << "The PQM device is not available!";
 	}
@@ -91,6 +94,7 @@ void AcquisitionManager::enableBufferChnls(iio_device *dev)
 		QString chName(iio_channel_get_name(chnl));
 		m_chnlsName.push_back(chName);
 	}
+	m_pqmLog->setChnlsName(m_chnlsName);
 }
 
 void AcquisitionManager::toolEnabled(bool en, QString toolName)
@@ -160,8 +164,10 @@ bool AcquisitionManager::readPqmAttributes()
 			attrName = iio_channel_get_attr(chnl, j);
 			iio_channel_attr_read(chnl, attrName, dest, MAX_ATTR_SIZE);
 			m_pqmAttr[chnlId][attrName] = QString(dest);
+			m_pqmLog->acquireAttrData(attrName, dest, chnlId);
 		}
 	}
+	m_pqmLog->log();
 	return true;
 }
 
@@ -189,9 +195,11 @@ bool AcquisitionManager::readBufferedData()
 		chnlIdx = samplesCounter % m_chnlsName.size();
 		chnl = m_chnlsName[chnlIdx];
 		double d_ptr = convertFromHwToHost((int)*ptr, chnl);
+		m_pqmLog->acquireBufferData(d_ptr, chnlIdx);
 		m_bufferData[chnl].push_back(d_ptr);
 		samplesCounter++;
 	}
+	m_pqmLog->log();
 	return true;
 }
 
