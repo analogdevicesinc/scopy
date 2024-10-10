@@ -41,7 +41,13 @@ public:
                    calibration_samples_sine, 
                    calibration_samples_cosine, 
                    calibration_samples_sine_scaled, 
-                   calibration_samples_cosine_scaled;
+                   calibration_samples_cosine_scaled,
+                   angleError,
+                   FFTAngleErrorMagnitude,
+                   FFTAngleErrorPhase,
+                   correctedError,
+                   FFTCorrectedErrorMagnitude,
+                   FFTCorrectedErrorPhase;
 
     enum Channel
     {
