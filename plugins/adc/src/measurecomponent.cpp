@@ -1,13 +1,15 @@
 #include "measurecomponent.h"
 #include "menucontrolbutton.h"
 #include "measurementsettings.h"
-
+#include <QButtonGroup>
 using namespace scopy;
 using namespace scopy::adc;
 
-MeasureComponent::MeasureComponent(ToolTemplate *tool, MeasurementPanelInterface *p, QObject *parent)
+MeasureComponent::MeasureComponent(ToolTemplate *tool, QButtonGroup *btngroup, MeasurementPanelInterface *p,
+				   QObject *parent)
 	: QObject(parent)
 	, ToolComponent()
+	, hoverBtnGroup(btngroup)
 {
 
 	m_measurementPanelInterface = p;
@@ -70,6 +72,7 @@ void MeasureComponent::setupMeasureButtonHelper(MenuControlButton *btn)
 	btn->setOpenMenuChecksThis(true);
 	btn->setDoubleClickToOpenMenu(true);
 	btn->checkBox()->setVisible(false);
+	hoverBtnGroup->addButton(btn->button());
 }
 
 MeasurementSettings *MeasureComponent::measureSettings() { return m_measureSettings; }
