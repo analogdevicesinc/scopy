@@ -35,6 +35,8 @@ QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent)
 	const struct iio_device *dev = m_src->iioDev();
 
 	QList<IIOWidget *> attrWidgets;
+	MenuSectionCollapseWidget *attr =
+		new MenuSectionCollapseWidget("COMMON CHANNEL ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
 	const struct iio_context *ctx = iio_device_get_context(dev);
 
 	int chCount = iio_device_get_channels_count(dev);
@@ -65,7 +67,7 @@ QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent)
 		}
 		if(createAttr) {
 			qInfo() << "common " << attrName;
-			IIOWidget *w = IIOWidgetBuilder()
+			IIOWidget *w = IIOWidgetBuilder(attr)
 					       .context(const_cast<iio_context *>(ctx))
 					       .device(const_cast<iio_device *>(dev))
 					       .channel(const_cast<iio_channel *>(ch))
@@ -84,9 +86,6 @@ QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent)
 	if(attrWidgets.count() == 0) {
 		return nullptr;
 	}
-
-	MenuSectionCollapseWidget *attr =
-		new MenuSectionCollapseWidget("COMMON CHANNEL ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
@@ -107,9 +106,9 @@ QWidget *GRDeviceComponent::createAttrMenu(QWidget *parent)
 	MenuSectionCollapseWidget *attr =
 		new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, parent);
 
-	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder().device(m_src->iioDev()).buildAll();
+	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(attr).device(m_src->iioDev()).buildAll();
 	const struct iio_context *ctx = iio_device_get_context(m_src->iioDev());
-	attrWidgets.append(IIOWidgetBuilder()
+	attrWidgets.append(IIOWidgetBuilder(attr)
 				   .context(const_cast<iio_context *>(ctx))
 				   .device(m_src->iioDev())
 				   .attribute("Triggers")

@@ -85,7 +85,7 @@ QWidget *DacDataManager::createAttrMenu(QWidget *parent)
 	MenuSectionWidget *attrContainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *attr =
 		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrContainer);
-	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder().device(m_model->getDev()).buildAll();
+	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(attr).device(m_model->getDev()).buildAll();
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);

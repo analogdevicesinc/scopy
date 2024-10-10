@@ -9,7 +9,6 @@
 #include <gui/widgets/menucombo.h>
 #include <gui/mapstackedwidget.h>
 #include <iio-widgets/iiowidget.h>
-#include <iio-widgets/iiowidgetbuilder.h>
 #include <stylehelper.h>
 
 #include <QHBoxLayout>

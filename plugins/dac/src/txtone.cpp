@@ -34,7 +34,7 @@ TxTone::TxTone(TxNode *node, unsigned int idx, QWidget *parent)
 	StyleHelper::MenuComboLabel(name);
 	StyleHelper::BackgroundWidget(this);
 
-	m_frequency = IIOWidgetBuilder()
+	m_frequency = IIOWidgetBuilder(this)
 			      .channel(m_node->getChannel())
 			      .attribute("frequency")
 			      .uiStrategy(IIOWidgetBuilder::UIS::EditableUi)
@@ -43,7 +43,7 @@ TxTone::TxTone(TxNode *node, unsigned int idx, QWidget *parent)
 	m_frequency->setUItoDataConversion(std::bind(&TxTone::frequencyUItoDS, this, std::placeholders::_1));
 	m_frequency->setDataToUIConversion(std::bind(&TxTone::frequencyDStoUI, this, std::placeholders::_1));
 
-	m_scale = IIOWidgetBuilder()
+	m_scale = IIOWidgetBuilder(this)
 			  .channel(m_node->getChannel())
 			  .attribute("scale")
 			  .uiStrategy(IIOWidgetBuilder::UIS::EditableUi)
@@ -52,7 +52,7 @@ TxTone::TxTone(TxNode *node, unsigned int idx, QWidget *parent)
 	m_scale->setUItoDataConversion(std::bind(&TxTone::scaleUItoDS, std::placeholders::_1));
 	m_scale->setDataToUIConversion(std::bind(&TxTone::scaleDStoUI, std::placeholders::_1));
 
-	m_phase = IIOWidgetBuilder()
+	m_phase = IIOWidgetBuilder(this)
 			  .channel(m_node->getChannel())
 			  .attribute("phase")
 			  .uiStrategy(IIOWidgetBuilder::UIS::EditableUi)
