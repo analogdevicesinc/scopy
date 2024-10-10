@@ -58,6 +58,7 @@ private:
 
 	QString m_uri;
 	ToolMenuEntry *m_tme;
+	bool m_running;
 	RunBtn *m_runBtn;
 	SingleShotBtn *m_singleBtn;
 	PolarPlotWidget *m_voltagePlot;

@@ -39,6 +39,7 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	: QWidget(parent)
 	, m_tme(tme)
 	, m_uri(uri)
+	, m_running(false)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *instrumentLayout = new QHBoxLayout(this);
@@ -219,6 +220,7 @@ void RmsInstrument::stop() { m_runBtn->setChecked(false); }
 
 void RmsInstrument::toggleRms(bool en)
 {
+	m_running = en;
 	if(en) {
 		ResourceManager::open("pqm" + m_uri, this);
 	} else {
@@ -229,14 +231,15 @@ void RmsInstrument::toggleRms(bool en)
 
 void RmsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> data)
 {
-	if(m_runBtn->isChecked() || m_singleBtn->isChecked()) {
-		m_attributes = data;
-		updateLabels();
-		updatePlot(m_voltagePlot, "voltage");
-		updatePlot(m_currentPlot, "current");
-		if(m_singleBtn->isChecked()) {
-			m_singleBtn->setChecked(false);
-		}
+	if(!m_running) {
+		return;
+	}
+	m_attributes = data;
+	updateLabels();
+	updatePlot(m_voltagePlot, "voltage");
+	updatePlot(m_currentPlot, "current");
+	if(m_singleBtn->isChecked()) {
+		m_singleBtn->setChecked(false);
 	}
 }
 
