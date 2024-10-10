@@ -58,8 +58,8 @@ GRTimeChannelAddon::GRTimeChannelAddon(QString ch, GRDeviceAddon *dev, GRTimePlo
 	m_plotAxisHandle = new PlotAxisHandle(plot, m_plotAxis);
 	m_plotAxisHandle->handle()->setBarVisibility(BarVisibility::ON_HOVER);
 	m_plotAxisHandle->handle()->setColor(pen.color());
-	m_plotAxisHandle->handle()->setHandlePos(yPlotAxisHandle == QwtAxis::YLeft ? HandlePos::NORTH_WEST
-										   : HandlePos::SOUTH_EAST);
+	m_plotAxisHandle->handle()->setHandlePos(yPlotAxisHandle == QwtAxis::YLeft ? HandlePos::NORTH_OR_WEST
+										   : HandlePos::SOUTH_OR_EAST);
 	connect(m_plotAxisHandle, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
 		double min = m_plotAxis->min() - pos;
 		double max = m_plotAxis->max() - pos;
@@ -358,8 +358,8 @@ ImportChannelAddon::ImportChannelAddon(QString name, PlotAddon *plotAddon, QPen 
 	m_plotAxisHandle = new PlotAxisHandle(plot, m_plotAxis);
 	m_plotAxisHandle->handle()->setBarVisibility(BarVisibility::ON_HOVER);
 	m_plotAxisHandle->handle()->setColor(pen.color());
-	m_plotAxisHandle->handle()->setHandlePos(yPlotAxisHandle == QwtAxis::YLeft ? HandlePos::NORTH_WEST
-										   : HandlePos::SOUTH_EAST);
+	m_plotAxisHandle->handle()->setHandlePos(yPlotAxisHandle == QwtAxis::YLeft ? HandlePos::NORTH_OR_WEST
+										   : HandlePos::SOUTH_OR_EAST);
 	connect(m_plotAxisHandle, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
 		double min = m_plotAxis->min() - pos;
 		double max = m_plotAxis->max() - pos;
