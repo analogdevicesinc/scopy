@@ -1110,6 +1110,18 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 		calibrationRawDataPlotWidget->selectChannel(calibrationCosineDataPlotChannel);
 		calibrationRawDataPlotWidget->selectedChannel()->setEnabled(b);
 	});
+	connect(togglePostAngleButton->checkBox(), &QCheckBox::toggled, this, [=](bool b){
+		postCalibrationRawDataPlotWidget->selectChannel(postCalibrationRawDataPlotChannel);
+		postCalibrationRawDataPlotWidget->selectedChannel()->setEnabled(b);
+	});
+	connect(togglePostSineButton->checkBox(), &QCheckBox::toggled, this, [=](bool b){
+		postCalibrationRawDataPlotWidget->selectChannel(postCalibrationSineDataPlotChannel);
+		postCalibrationRawDataPlotWidget->selectedChannel()->setEnabled(b);
+	});
+	connect(togglePostCosineButton->checkBox(), &QCheckBox::toggled, this, [=](bool b){
+		postCalibrationRawDataPlotWidget->selectChannel(postCalibrationCosineDataPlotChannel);
+		postCalibrationRawDataPlotWidget->selectedChannel()->setEnabled(b);
+	});
 	connect(toggleFFTAngleErrorMagnitudeButton->checkBox(), &QCheckBox::toggled, this, [=](bool b){
 		FFTAngleErrorPlotWidget->selectChannel(FFTAngleErrorMagnitudeChannel);
 		FFTAngleErrorPlotWidget->selectedChannel()->setEnabled(b);
