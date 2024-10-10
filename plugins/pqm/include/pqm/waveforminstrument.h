@@ -48,6 +48,7 @@ private:
 	void deletePlottingStrategy();
 	void createTriggeredStrategy(QString triggerChnl);
 
+	bool m_running;
 	PlotWidget *m_voltagePlot;
 	PlotWidget *m_currentPlot;
 	RunBtn *m_runBtn;
