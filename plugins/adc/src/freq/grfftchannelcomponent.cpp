@@ -250,7 +250,7 @@ QWidget *GRFFTChannelComponent::createChAttrMenu(iio_channel *ch, QString title,
 {
 	MenuSectionCollapseWidget *section =
 		new MenuSectionCollapseWidget(title, MenuCollapseSection::MHCW_NONE, parent);
-	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder().channel(ch).buildAll();
+	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(section).channel(ch).buildAll();
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
