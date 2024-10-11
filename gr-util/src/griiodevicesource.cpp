@@ -61,7 +61,8 @@ void GRIIODeviceSource::addChannelAtIndex(iio_device *iio_dev, QString channelNa
 	iio_channel *iio_ch = iio_device_find_channel(iio_dev, channel_name.c_str(), false);
 	int idx = iio_channel_get_index(iio_ch);
 
-	while(m_channelNames[idx] != "" && idx < m_channelNames.size()) {
+	while(idx < m_channelNames.size() && m_channelNames[idx] != "" &&
+	      QString::fromStdString(m_channelNames[idx]) != channelName) {
 		idx++;
 	}
 	m_channelNames[idx] = channel_name;
