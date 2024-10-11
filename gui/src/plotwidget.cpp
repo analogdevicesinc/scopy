@@ -233,7 +233,7 @@ PlotButtonManager *PlotWidget::plotButtonManager() const { return m_plotButtonMa
 void PlotWidget::setupPlotInfo()
 {
 	m_plotInfo = new PlotInfo(m_plot->canvas());
-	m_plotInfo->addCustomInfo(new FPSInfo(this), InfoPosition::IP_LEFT);
+	m_plotInfo->addCustomInfo(new FPSInfo(this, this), InfoPosition::IP_LEFT);
 
 	HDivInfo *hDivInfo = new HDivInfo(this);
 	m_plotInfo->addCustomInfo(hDivInfo, InfoPosition::IP_LEFT);
