@@ -34,11 +34,6 @@ install_packages() {
 		HOMEBREW_NO_AUTO_UPDATE=1 brew install --display-times $PACKAGES
 	fi
 
-	brew search ${QT_FORMULAE}
-	for pkg in gcc bison gettext cmake python; do
-		brew link --overwrite --force $pkg
-	done
-
 	pip3 install --break-system-packages mako
 }
 
