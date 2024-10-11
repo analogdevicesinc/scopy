@@ -99,7 +99,8 @@ void FFTSamplingInfo::update(SamplingInfo info)
 }
 
 FPSInfo::FPSInfo(PlotWidget *plot, QWidget *parent)
-	: m_plot(plot)
+	: QLabel(parent)
+	, m_plot(plot)
 	, m_replotTimes(new QList<qint64>())
 	, m_lastTimeStamp(0)
 	, m_avgSize(10)
