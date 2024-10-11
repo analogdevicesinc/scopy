@@ -93,7 +93,12 @@ void IioTabWidget::setupConnections()
 	connect(m_fwScan, &QFutureWatcher<int>::finished, this, &IioTabWidget::scanFinished, Qt::QueuedConnection);
 	connect(m_btnScan, SIGNAL(clicked()), this, SLOT(futureScan()), Qt::QueuedConnection);
 
-	connect(m_avlCtxCb, &QComboBox::textActivated, this, [=]() { Q_EMIT uriChanged(m_avlCtxCb->currentText()); });
+	connect(m_avlCtxCb, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int idx) {
+		if(idx >= 0 && idx < m_scanList.size()) {
+			Q_EMIT uriChanged(m_scanList[idx].second);
+		}
+	});
+
 	// serial scan
 	connect(m_fwSerialScan, &QFutureWatcher<int>::started, m_btnSerialScan, &AnimationPushButton::startAnimation,
 		Qt::QueuedConnection);
@@ -214,9 +219,10 @@ void IioTabWidget::scanFinished()
 		m_avlCtxCb->setEnabled(true);
 	}
 	for(const auto &ctx : qAsConst(m_scanList)) {
-		m_avlCtxCb->addItem(ctx);
+		QString cbEntry = ctx.first + " [" + ctx.second + "]";
+		m_avlCtxCb->addItem(cbEntry);
 	}
-	updateUri(m_avlCtxCb->currentText());
+	updateUri(m_scanList[m_avlCtxCb->currentIndex()].second);
 }
 
 void IioTabWidget::serialScanFinished()
