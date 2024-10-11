@@ -495,10 +495,10 @@ QString ADMTController::calibrate(vector<double> PANG, int cycleCount, int sampl
     getPreCalibrationFFT(PANG, angle_errors_fft_pre, angle_errors_fft_phase_pre, cycleCount, samplesPerCycle);
 
     // Extract HMag parameters
-    double H1Mag = angle_errors_fft_pre[cycleCount];
-    double H2Mag = angle_errors_fft_pre[2 * cycleCount];
-    double H3Mag = angle_errors_fft_pre[3 * cycleCount];
-    double H8Mag = angle_errors_fft_pre[8 * cycleCount];
+    double H1Mag = angle_errors_fft_pre[cycleCount + 1];
+    double H2Mag = angle_errors_fft_pre[2 * cycleCount + 1];
+    double H3Mag = angle_errors_fft_pre[3 * cycleCount + 1];
+    double H8Mag = angle_errors_fft_pre[8 * cycleCount + 1];
 
     /* Display HMAG values */
     result.append("H1Mag = " + QString::number(H1Mag) + "\n");
@@ -507,10 +507,10 @@ QString ADMTController::calibrate(vector<double> PANG, int cycleCount, int sampl
     result.append("H8Mag = " + QString::number(H8Mag) + "\n");
 
     // Extract HPhase parameters
-    double H1Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[cycleCount]);
-    double H2Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[2 * cycleCount]);
-    double H3Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[3 * cycleCount]);
-    double H8Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[8 * cycleCount]);
+    double H1Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[cycleCount + 1]);
+    double H2Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[2 * cycleCount + 1]);
+    double H3Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[3 * cycleCount + 1]);
+    double H8Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[8 * cycleCount + 1]);
 
     /* Display HPHASE values */
     result.append("H1Phase = " + QString::number(H1Phase) + "\n");
@@ -524,7 +524,8 @@ QString ADMTController::calibrate(vector<double> PANG, int cycleCount, int sampl
     double H8 = H8Mag * cos(M_PI / 180 * (H8Phase));
 
     double init_err = H1 + H2 + H3 + H8;
-    double init_angle = PANG[0] - init_err;
+    double init_angle = PANG[1] - init_err;
+    
     double H1PHcor, H2PHcor, H3PHcor, H8PHcor;
 
     /* Counterclockwise, slope of error FIT is negative */
@@ -546,23 +547,6 @@ QString ADMTController::calibrate(vector<double> PANG, int cycleCount, int sampl
     H2PHcor = (int)H2PHcor % 360;
     H3PHcor = (int)H3PHcor % 360;
     H8PHcor = (int)H8PHcor % 360;
-
-    /* Variables declaration for data correction */
-    vector<double> H1c(PANG.size());
-    vector<double> H2c(PANG.size());
-    vector<double> H3c(PANG.size());
-    vector<double> H8c(PANG.size());
-    vector<double> HXcorrection(PANG.size());
-
-    ///* Apply correction and check if working on original data */
-    for (int i = 0; i < PANG.size(); i++) {
-        H1c[i] = H1Mag * sin(M_PI / 180 * (PANG[i]) + M_PI / 180 * (H1PHcor));
-        H2c[i] = H2Mag * sin(2 * M_PI / 180 * (PANG[i]) + M_PI / 180 * (H2PHcor));
-        H3c[i] = H3Mag * sin(3 * M_PI / 180 * (PANG[i]) + M_PI / 180 * (H3PHcor));
-        H8c[i] = H8Mag * sin(8 * M_PI / 180 * (PANG[i]) + M_PI / 180 * (H8PHcor));
-
-        HXcorrection[i] = H1c[i] + H2c[i] + H3c[i] + H8c[i];
-    }
 
     // HMag Scaling
     H1Mag = H1Mag * 0.6072;
@@ -605,15 +589,20 @@ void ADMTController::getPreCalibrationFFT(const vector<double>& PANG, vector<dou
     
     // Calculate angle errors
     calculate_angle_error(PANG, angle_errors_pre, &max_err_pre, cycleCount, samplesPerCycle);
-    // Angle Error (angle_errors_pre)
+    // Store the calculated angle errors (angle_errors_pre)
     angleError = angle_errors_pre;
 
     // Perform FFT on pre-calibration angle errors
     performFFT(angle_errors_pre, angle_errors_fft_pre, angle_errors_fft_phase_pre, cycleCount);
-    // FFT Angle Error Magnitude (angle_errors_pre)
+
+    // Store the FFT Angle Error Magnitude and Phase
     FFTAngleErrorMagnitude = angle_errors_fft_pre;
-    // FFT Angle Error Phase (angle_errors_fft_phase_pre)
     FFTAngleErrorPhase = angle_errors_fft_phase_pre;
+
+    // Multiply the FFT magnitudes by 2
+    for (auto& magnitude : angle_errors_fft_pre) {
+        magnitude *= 2;
+    }
 }
 
 void ADMTController::postcalibrate(vector<double> PANG, int cycleCount, int samplesPerCycle){
@@ -721,47 +710,35 @@ void ADMTController::computeSineCosineOfAngles(const vector<double>& angles) {
     }
 }
 
-// Function to calculate the scaled harmonic coefficient magnitude and return a 16-bit unsigned integer
-uint16_t ADMTController::calculateHarmonicCoefficientMagnitude(double harmonicCoefficient, uint16_t originalValue, string key) {
-    // CORDIC scaler
-    const double cordicScaler = 0.6072;
-
-    // LSB value (0.005493 degrees)
-    const double LSB = 0.005493;
-
-    // Multiply the harmonic coefficient by the CORDIC scaler
-    double scaledValue = harmonicCoefficient * cordicScaler;
-    
+// Function to insert the harmonic coefficient magnitude directly into the register
+uint16_t ADMTController::calculateHarmonicCoefficientMagnitude(uint16_t harmonicCoefficient, uint16_t originalValue, const string& key) {
     uint16_t result = 0;
 
     // Switch case for different bitmapping based on the key
     if (key == "h1" || key == "h2") {
         // For h1 and h2: [15:11 reserved], [10:0 write]
-        result = static_cast<uint16_t>(scaledValue / LSB) & 0x07FF;
+        result = harmonicCoefficient & 0x07FF;
         originalValue = (originalValue & 0xF800) | result;
     } 
     else if (key == "h3" || key == "h8") {
         // For h3 and h8: [15:8 reserved], [7:0 write]
-        result = static_cast<uint16_t>(scaledValue / LSB) & 0x00FF;
+        result = harmonicCoefficient & 0x00FF;
         originalValue = (originalValue & 0xFF00) | result;
     } 
     else {
-        // Handle invalid key, here we return the original value unchanged
+        // Handle invalid key, return the original value unchanged
         return originalValue;
     }
-    return result;
+    
+    return originalValue; // Return the updated original value
 }
 
-// Function to calculate the scaled harmonic coefficient phase and return a 16-bit unsigned integer
-uint16_t ADMTController::calculateHarmonicCoefficientPhase(double harmonicCoefficient, uint16_t originalValue) {
-    // LSB value (0.087891 degrees)
-    const double LSB = 0.087891;
-    
+// Function to insert the harmonic coefficient phase directly into the register
+uint16_t ADMTController::calculateHarmonicCoefficientPhase(uint16_t harmonicPhase, uint16_t originalValue) {
     uint16_t result = 0;
 
-    // Convert the result to an unsigned integer by dividing by LSB, fitting into 12 bits
-    // Mask to keep only bits 11:0
-    result = static_cast<uint16_t>(harmonicCoefficient / LSB) & 0x0FFF; 
+    // Mask to keep only bits 11:0 (since phase is represented in 12 bits)
+    result = harmonicPhase & 0x0FFF;
 
     // Clear bits 11:0 of the original value, keeping bits 15:12 intact
     uint16_t preservedValue = (originalValue & 0xF000) | result;
