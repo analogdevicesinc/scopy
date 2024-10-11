@@ -50,6 +50,7 @@ private:
 	QWidget *createVerifyBtnWidget(QWidget *parent);
 
 	QWidget *m_filterWidget;
+	QLabel *m_ctxUriLabel;
 	QComboBox *m_avlCtxCb;
 	MenuCombo *m_serialPortCb;
 	MenuCombo *m_baudRateCb;
