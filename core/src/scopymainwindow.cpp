@@ -110,7 +110,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ts->add("about", about);
 	ts->add("preferences", prefPage);
 
-	connect(scanTask, SIGNAL(scanFinished(QStringList)), scc, SLOT(update(QStringList)));
+	connect(scanTask, &IIOScanTask::scanFinished, scc, &ScannedIIOContextCollector::update, Qt::QueuedConnection);
 
 	connect(scc, SIGNAL(foundDevice(QString, QString)), dm, SLOT(createDevice(QString, QString)));
 	connect(scc, SIGNAL(lostDevice(QString, QString)), dm, SLOT(removeDevice(QString, QString)));
