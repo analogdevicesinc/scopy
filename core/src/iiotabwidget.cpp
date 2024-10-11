@@ -32,13 +32,13 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 	QStringList backendsList = computeBackendsList();
 
 	MenuSectionCollapseWidget *scanSection =
-		new MenuSectionCollapseWidget("Scan", MenuCollapseSection::MHCW_ARROW, contentWidget);
+		new MenuSectionCollapseWidget("SCAN", MenuCollapseSection::MHCW_ARROW, contentWidget);
 
 	QWidget *scanWidget = new QWidget(scanSection);
 	QGridLayout *scanGrid = new QGridLayout(scanWidget);
 	scanGrid->setMargin(0);
 	scanWidget->setLayout(scanGrid);
-	QLabel *filterLabel = new QLabel("Filter:", scanWidget);
+	QLabel *filterLabel = new QLabel("Filter", scanWidget);
 	StyleHelper::MenuSmallLabel(filterLabel);
 
 	m_filterWidget = createFilterWidget(scanWidget);
@@ -46,23 +46,26 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 	scanGrid->addWidget(m_filterWidget, 0, 1);
 	setupFilterWidget(backendsList);
 
-	QLabel *ctxLabel = new QLabel("Context:", scanWidget);
+	QLabel *ctxLabel = new QLabel("Context", scanWidget);
 	StyleHelper::MenuSmallLabel(ctxLabel);
 	QWidget *avlContextWidget = createAvlCtxWidget(scanWidget);
 	m_btnScan->setVisible(!backendsList.isEmpty());
+	m_ctxUriLabel = new QLabel(scanWidget);
+	m_ctxUriLabel->setVisible(false);
 	scanGrid->addWidget(ctxLabel, 1, 0);
 	scanGrid->addWidget(avlContextWidget, 1, 1);
+	scanGrid->addWidget(m_ctxUriLabel, 2, 1);
 
 	scanSection->add(scanWidget);
 	contentLay->addWidget(scanSection);
 
 	MenuSectionCollapseWidget *serialSection =
-		new MenuSectionCollapseWidget("Serial", MenuCollapseSection::MHCW_ARROW, contentWidget);
+		new MenuSectionCollapseWidget("SERIAL", MenuCollapseSection::MHCW_ARROW, contentWidget);
 
-	QWidget *serialSettWiedget = createSerialSettWidget(serialSection);
+	QWidget *serialSettWidget = createSerialSettWidget(serialSection);
 	bool serialCompatible = isSerialCompatible();
-	serialSettWiedget->setEnabled(serialCompatible);
-	serialSection->add(serialSettWiedget);
+	serialSettWidget->setEnabled(serialCompatible);
+	serialSection->add(serialSettWidget);
 
 	contentLay->addWidget(serialSection);
 
@@ -73,7 +76,7 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 
 	layout->addWidget(contentWidget);
 	layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
-	addScanFeedbackMsg("No scanned contexts... Press the refresh button!");
+	addScanFeedbackMsg("No scanned devices... Press the refresh button!");
 
 	m_fwScan = new QFutureWatcher<int>(this);
 	m_fwSerialScan = new QFutureWatcher<QVector<QString>>(this);
@@ -95,6 +98,7 @@ void IioTabWidget::setupConnections()
 
 	connect(m_avlCtxCb, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int idx) {
 		if(idx >= 0 && idx < m_scanList.size()) {
+			m_ctxUriLabel->setText(m_scanList[idx].second);
 			Q_EMIT uriChanged(m_scanList[idx].second);
 		}
 	});
@@ -205,14 +209,17 @@ void IioTabWidget::scanFinished()
 	int retCode = m_fwScan->result();
 	m_btnScan->stopAnimation();
 	m_avlCtxCb->clear();
+	m_ctxUriLabel->clear();
 	rstUriMsgLabel();
 	if(retCode < 0) {
+		m_ctxUriLabel->setVisible(false);
 		addScanFeedbackMsg("Scan command failed!");
 		qWarning(CAT_IIO_ADD_PAGE) << "iio_scan_context_get_info_list error " << retCode;
 		return;
 	}
 	if(m_scanList.isEmpty()) {
-		addScanFeedbackMsg("No scanned contexts available!");
+		m_ctxUriLabel->setVisible(false);
+		addScanFeedbackMsg("No scanned devices available!");
 		return;
 	}
 	if(!m_avlCtxCb->isEnabled()) {
@@ -222,7 +229,10 @@ void IioTabWidget::scanFinished()
 		QString cbEntry = ctx.first + " [" + ctx.second + "]";
 		m_avlCtxCb->addItem(cbEntry);
 	}
-	updateUri(m_scanList[m_avlCtxCb->currentIndex()].second);
+	int crtIdx = m_avlCtxCb->currentIndex();
+	m_ctxUriLabel->setVisible(true);
+	m_ctxUriLabel->setText(m_scanList[crtIdx].second);
+	updateUri(m_scanList[crtIdx].second);
 }
 
 void IioTabWidget::serialScanFinished()
@@ -267,6 +277,7 @@ void IioTabWidget::updateUri(QString uri)
 
 void IioTabWidget::addScanFeedbackMsg(QString message)
 {
+	m_ctxUriLabel->clear();
 	m_avlCtxCb->clear();
 	m_avlCtxCb->addItem(message);
 	m_avlCtxCb->setEnabled(false);
@@ -373,11 +384,11 @@ QWidget *IioTabWidget::createUriWidget(QWidget *parent)
 	w->setLayout(layout);
 	StyleHelper::RoundedCornersWidget(w, "uriAddPage");
 
-	QLabel *uriLabel = new QLabel("URI:", w);
+	QLabel *uriLabel = new QLabel("URI", w);
 	StyleHelper::MenuSmallLabel(uriLabel);
 
 	m_uriEdit = new MenuLineEdit(w);
-	m_uriEdit->edit()->setPlaceholderText("uri of the device you are connecting to");
+	m_uriEdit->edit()->setPlaceholderText("The device you are connecting to");
 	m_uriEdit->edit()->setFocusPolicy(Qt::ClickFocus);
 	m_uriMsgLabel = new QLabel(w);
 	m_uriMsgLabel->setVisible(false);
