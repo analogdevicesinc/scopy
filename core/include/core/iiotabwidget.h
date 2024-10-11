@@ -63,7 +63,7 @@ private:
 	QFutureWatcher<int> *m_fwScan;
 	QFutureWatcher<QVector<QString>> *m_fwSerialScan;
 	QStringList m_scanParamsList;
-	QStringList m_scanList;
+	QVector<QPair<QString, QString>> m_scanList;
 
 	const QVector<unsigned int> m_availableBaudRates = {2400,  4800,   9600,   14400,  19200, 38400,
 							    57600, 115200, 230400, 460800, 921600};

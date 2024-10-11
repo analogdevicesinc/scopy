@@ -19,13 +19,14 @@ public:
 
 	virtual void run() override;
 	void setScanParams(QString s);
-	static int scan(QStringList *ctxs, QString scanParams);
+	static int scan(QVector<QPair<QString, QString>> *ctxs, QString scanParams);
 	static QVector<QString> getSerialPortsName();
 
 Q_SIGNALS:
-	void scanFinished(QStringList);
+	void scanFinished(QVector<QPair<QString, QString>> ctxs);
 
 protected:
+	static QString parseDescription(const QString &d);
 	QString scanParams = "";
 	bool enabled;
 };

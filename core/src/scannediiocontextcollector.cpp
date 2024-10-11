@@ -14,11 +14,15 @@ ScannedIIOContextCollector::ScannedIIOContextCollector(QObject *parent)
 
 ScannedIIOContextCollector::~ScannedIIOContextCollector() { qDebug(CAT_SCANCTXCOLLECTOR) << "dtor"; }
 
-void ScannedIIOContextCollector::update(QStringList list)
+void ScannedIIOContextCollector::update(QVector<QPair<QString, QString>> ctxsDescription)
 {
 	// Do we need to map Device* to uri in this class ?
+	QSet<QString> updatedUris;
+	for(const auto &pair : ctxsDescription) {
+		// pair.first = description, pair.second = uri
+		updatedUris.insert(pair.second);
+	}
 
-	QSet<QString> updatedUris = QSet<QString>(list.begin(), list.end());
 	updatedUris = updatedUris + lockedUris;
 
 	auto newUris = updatedUris - uris;

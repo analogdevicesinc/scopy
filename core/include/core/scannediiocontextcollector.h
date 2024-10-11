@@ -16,7 +16,7 @@ public:
 	~ScannedIIOContextCollector();
 
 public Q_SLOTS:
-	void update(QStringList uris);
+	void update(QVector<QPair<QString, QString>> ctxsDescription);
 	void clearCache();
 	void lock(QString, Device *);
 	void unlock(QString, Device *);
