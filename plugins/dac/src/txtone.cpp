@@ -169,7 +169,7 @@ void TxTone::setPairedTone(TxTone *tone)
 			m_pairedTone->updatePhase(ph2);
 		});
 		connect(this, &TxTone::scaleUpdated,
-			[=, this](int toneIdx, QString scale) { m_pairedTone->updateScale(scale); });
+			[=, this](int toneIdx, QString oldScale, QString scale) { m_pairedTone->updateScale(scale); });
 	}
 }
 
