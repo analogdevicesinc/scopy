@@ -185,6 +185,7 @@ void DeviceImpl::loadPages()
 	for(auto &&p : plugins()) {
 		if(p->loadPage()) {
 			m_scrollAreaLayout->addWidget(p->page());
+			break; // Only display the page from the plugin with the highest priority
 		}
 	}
 }
