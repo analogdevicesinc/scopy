@@ -12,6 +12,7 @@
 #include <iioutil/connectionprovider.h>
 #include <pluginbase/preferences.h>
 #include <gui/preferenceshelper.h>
+#include <gui/deviceinfopage.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
 
@@ -130,8 +131,14 @@ bool ADCPlugin::loadPage()
 {
 	m_page = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_page);
-	m_page->setLayout(lay);
-	m_page->hide(); // This does not implement a legitimate page, it just adds an empty space on the page
+
+	ConnectionProvider *c = ConnectionProvider::GetInstance();
+	Connection *conn = c->open(m_param);
+	auto deviceInfoPage = new DeviceInfoPage(conn);
+	lay->addWidget(deviceInfoPage);
+	lay->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
+	c->close(m_param);
+
 	return true;
 }
 
