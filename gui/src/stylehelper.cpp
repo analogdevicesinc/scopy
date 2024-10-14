@@ -485,11 +485,6 @@ void StyleHelper::MenuCollapseSection(QWidget *w, QString objectName)
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::MenuSpinboxLine(QFrame *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-}
 /*
 void StyleHelper::MenuSpinBox(SpinBoxA *w, QString objectName)
 {
@@ -620,13 +615,14 @@ void StyleHelper::BackgroundWidget(QWidget *w, QString objectName)
 {
 	if(!objectName.isEmpty())
 		w->setObjectName(objectName);
-	QString style = QString(R"css(
-		QWidget {
-			background-color: &&background_primary&&;
-		}
-		)css");
-	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
-	w->setStyleSheet(style);
+	// QString style = QString(R"css(
+	// 	QWidget {
+	// 		background-color: &&background_primary&&;
+	// 	}
+	// 	)css");
+	// style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
+	// w->setStyleSheet(style);
+	Style::setBackgroundColor(w, json::theme::background_primary);
 }
 
 void StyleHelper::TabWidgetLabel(QLabel *w, QString objectName)
@@ -986,23 +982,6 @@ QLabel {
  background-color: transparent;
 }
 )css");
-
-	w->setStyleSheet(style);
-}
-void StyleHelper::MenuSpinboxLineEdit(QLineEdit *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-
-	QString style = QString(R"css(
-QLineEdit {
- height: 20px;
- width: 75px;
- font-size: 18px;
- border: 0px;
- bottom: 10px;
- background-color: transparent;
-})css");
 
 	w->setStyleSheet(style);
 }

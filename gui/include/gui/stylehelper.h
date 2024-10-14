@@ -104,11 +104,7 @@ public:
 	static void BrowseButton(QPushButton *btn, QString objectName = "");
 	static void SpinBoxUpButton(QPushButton *w, QString objectName = "");
 	static void SpinBoxDownButton(QPushButton *w, QString objectName = "");
-
 	static void MenuSpinboxLabel(QLabel *m_label, QString objectName = "");
-	static void MenuSpinboxLineEdit(QLineEdit *m_edit, QString objectName = "");
-	static void MenuSpinboxLine(QFrame *w, QString objectName = "");
-
 	static void TabWidgetBarUnderline(QTabWidget *w, QString objectName = "");
 	static void TableWidgetDebugger(QTableWidget *w, QString objectName = "");
 	static void SplitterStyle(QSplitter *w, QString objectName = "");

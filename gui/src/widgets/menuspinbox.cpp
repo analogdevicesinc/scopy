@@ -13,6 +13,8 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	m_label = new QLabel(name, parent);
 	m_edit = new QLineEdit("0", parent);
 	m_scaleCb = new QComboBox(parent);
+	m_plus = new QPushButton("", parent);
+	m_minus = new QPushButton("", parent);
 	m_mouseWheelGuard = new MouseWheelWidgetGuard(this);
 
 	m_plus->setAutoRepeat(true);
@@ -87,6 +89,7 @@ void MenuSpinbox::layoutVertically(bool left)
 
 	editLay->addWidget(m_label);
 	editLay->addWidget(m_edit);
+
 	editLay->addWidget(m_scaleCb);
 
 	if(left) {
@@ -97,9 +100,10 @@ void MenuSpinbox::layoutVertically(bool left)
 		lay->addLayout(btnLay);
 	}
 
+
 	Style::setStyle(m_label, style::properties::label::subtle);
 
-	int size = Style::getDimension(json::global::unit_3);
+	int size = Style::getDimension(json::global::unit_2_5);
 	m_plus->setIcon(Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
 	Style::setStyle(m_plus, style::properties::button::spinboxButton);
 	m_plus->setFixedSize(size, size);
@@ -117,7 +121,7 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	lineLay->setMargin(0);
 	setLayout(lineLay);
 
-	// Elements layout
+	       // Elements layout
 	auto lay = new QHBoxLayout(this);
 	lay->setSpacing(5);
 	lay->setMargin(0);
@@ -140,6 +144,7 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	editLay->addWidget(m_edit);
 
 	editLay->addWidget(m_scaleCb);
+	lineLay->addLayout(lay);
 
 	if(left) {
 		lay->addLayout(btnLay);
@@ -151,7 +156,7 @@ void MenuSpinbox::layoutHorizontally(bool left)
 
 	Style::setStyle(m_label, style::properties::label::subtle);
 
-	int size = Style::getDimension(json::global::unit_3);
+	int size = Style::getDimension(json::global::unit_2_5);
 	m_plus->setIcon(Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
 	Style::setStyle(m_plus, style::properties::button::spinboxButton);
 	m_plus->setFixedSize(size, size);
@@ -223,15 +228,13 @@ void MenuSpinbox::setScalingEnabled(bool en)
 	m_scaleCb->setVisible(en);
 }
 
-void MenuSpinbox::setLineVisible(bool isVisible) { m_line->setVisible(isVisible); }
-
 void MenuSpinbox::userInput(QString s)
 {
 	// remove whitespace
 	s = s.simplified();
 	s.replace(" ", "");
 
-	// find last digit position
+	       // find last digit position
 	int i = findLastDigit(s);
 	QString nr = s.left(
 		i + 1); // interpret number up to that digit - this makes sure you can also set stuff like 2e6 or 2M
@@ -300,8 +303,6 @@ void MenuSpinbox::populateWidgets()
 	m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
 	setToolTip(QString::number(m_value, 'f', 6)); // set tooltip
 }
-
-void MenuSpinbox::applyStylesheet() {}
 
 void MenuSpinbox::setScaleRange(double min, double max)
 {

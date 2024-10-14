@@ -58,7 +58,7 @@ PlotWidget::PlotWidget(QWidget *parent)
 
 	m_plot->canvas()->installEventFilter(this);
 	Style::setBackgroundColor(m_plot, "transparent");
-	Style::setBackgroundColor(m_plot->canvas(), json::theme::background_plot);
+	Style::setBackgroundColor(m_plot->canvas(), json::theme::background_plot, true);
 }
 
 void PlotWidget::setupNavigator()
