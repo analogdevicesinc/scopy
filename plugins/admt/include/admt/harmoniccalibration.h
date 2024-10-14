@@ -113,7 +113,7 @@ private:
 
 	MenuSectionWidget *rightMenuSectionWidget;
 	MenuCollapseSection *rotationCollapse, *angleCollapse, *countCollapse, *tempCollapse;
-	MenuCombo *m_dataGraphChannelMenuCombo, *m_dataGraphDirectionMenuCombo, *m_tempGraphDirectionMenuCombo,
+	MenuCombo *m_dataGraphChannelMenuCombo, *m_dataGraphDirectionMenuCombo, *m_tempGraphDirectionMenuCombo, *m_calibrationMotorRampModeMenuCombo,
 			  *sequenceTypeMenuCombo, *conversionTypeMenuCombo, *cnvSourceMenuCombo, *convertSynchronizationMenuCombo, *angleFilterMenuCombo, *eighthHarmonicMenuCombo;
 
 	QTabWidget *tabWidget, *calibrationDataGraphTabWidget;
@@ -144,7 +144,7 @@ private:
 		*AFEDIAGStatusLED, *NVMCRCFaultStatusLED, *ECCDoubleBitErrorStatusLED, *OscillatorDriftStatusLED, *CountSensorFalseStateStatusLED, 
 		*AngleCrossCheckStatusLED, *TurnCountSensorLevelsStatusLED, *MTDIAGStatusLED, *TurnCounterCrossCheckStatusLED, *RadiusCheckStatusLED, *SequencerWatchdogStatusLED;
 
-	CustomSwitch *DIGIOBUSYToggleSwitch, *DIGIOCNVToggleSwitch, *DIGIOSENTToggleSwitch, *DIGIOACALCToggleSwitch, *DIGIOFAULTToggleSwitch, *DIGIOBOOTLOADERToggleSwitch, *DIGIOALLToggleSwitch;
+	CustomSwitch *calibrationDisplayFormatSwitch, *DIGIOBUSYToggleSwitch, *DIGIOCNVToggleSwitch, *DIGIOSENTToggleSwitch, *DIGIOACALCToggleSwitch, *DIGIOFAULTToggleSwitch, *DIGIOBOOTLOADERToggleSwitch, *DIGIOALLToggleSwitch;
 
 	void updateChannelValues();
 	void updateLineEditValues();
@@ -164,7 +164,6 @@ private:
 	void updateLabelValue(QLabel *label, ADMTController::MotorAttribute attribute);
 	void updateChannelValue(int channelIndex);
 	void calibrateData();
-	void registerCalibrationData();
 	void extractCalibrationData();
 	void importCalibrationData();
 	void calibrationLogWrite(QString message = "");
@@ -186,8 +185,8 @@ private:
 	void connectRegisterBlockToRegistry(RegisterBlockWidget* widget);
 	double convertAccelTimetoAMAX(double accelTime);
 	double convertAMAXtoAccelTime(double amax);
-	void updateCalculatedCoeff();
-	void resetCalculatedCoeff();
+	void updateCalculatedCoeffAngle();
+	void resetCalculatedCoeffAngle();
 	void applyTabWidgetStyle(QTabWidget *widget, const QString& styleHelperColor = "ScopyBlue");
 	MenuControlButton *createStatusLEDWidget(const QString title, QColor color, QWidget *parent = nullptr);
 	MenuControlButton *createChannelToggleWidget(const QString title, QColor color, QWidget *parent = nullptr);
@@ -212,6 +211,11 @@ private:
 	void canStartMotor(bool value);
 	void resetCurrentPositionToZero();
 	void flashHarmonicValues();
+	void updateCalculatedCoeffHex();
+	void resetCalculatedCoeffHex();
+	void displayCalculatedCoeff();
+	void toggleMotorControls(bool value);
+	void clearCalibrationSamples();
 
 	QTimer *timer, *calibrationTimer, *utilityTimer;
 

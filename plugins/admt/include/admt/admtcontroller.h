@@ -185,8 +185,8 @@ public:
     int writeDeviceRegistry(const char *deviceName, uint32_t address, uint32_t value);
     int readDeviceRegistry(const char *deviceName, uint32_t address, uint32_t *returnValue);
     void computeSineCosineOfAngles(const vector<double>& angles);
-    uint16_t calculateHarmonicCoefficientMagnitude(double harmonicCoefficient, uint16_t originalValue, string key);
-    uint16_t calculateHarmonicCoefficientPhase(double harmonicCoefficient, uint16_t originalValue);
+    uint16_t calculateHarmonicCoefficientMagnitude(uint16_t harmonicCoefficient, uint16_t originalValue, const string& key);
+    uint16_t calculateHarmonicCoefficientPhase(uint16_t harmonicPhase, uint16_t originalValue);
     double getActualHarmonicRegisterValue(uint16_t registerValue, const string key);
     map<string, bool> getFaultRegisterBitMapping(uint16_t registerValue);
     map<string, int> getGeneralRegisterBitMapping(uint16_t registerValue);
