@@ -93,7 +93,6 @@ QWidget *DdsDacAddon::setupDdsTx(TxNode *txNode)
 	MenuSectionWidget *ddsModeSection = new MenuSectionWidget(this);
 	ddsModeSection->setProperty("tutorial_name", "TX_MODE_SELECTOR");
 	MenuCombo *ddsModeCombo = new MenuCombo("DDS MODE", this);
-	StyleHelper::IIOComboBox(ddsModeCombo->combo());
 	StyleHelper::BackgroundWidget(ddsModeCombo);
 	auto cb = ddsModeCombo->combo();
 	ddsModeCombo->combo()->addItem("Disabled", TxMode::DISABLED);
