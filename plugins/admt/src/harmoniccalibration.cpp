@@ -21,12 +21,15 @@ static int samplesPerCycle = 256;
 static int totalSamplesCount = cycleCount * samplesPerCycle;
 static bool isStartMotor = false;
 static bool isPostCalibration = false;
+static bool isCalculatedCoeff = false;
+static bool isAngleDisplayFormat = false;
+static bool resetToZero = true;
 
 static double motorTimeUnit = 1.048576; // t = 2^24/16Mhz
 static int motorMicrostepPerRevolution = 51200;
 static int motorfCLK = 16000000; // 16Mhz
 
-static bool autoCalibrate = false;
+// static bool autoCalibrate = false;
 
 static uint32_t h1MagDeviceRegister = 0x15;
 static uint32_t h2MagDeviceRegister = 0x17;
@@ -53,6 +56,9 @@ static map<string, string> deviceRegisterMap;
 static QString deviceName = "";
 static QString deviceType = "";
 static bool is5V = false;
+
+static double H1_MAG_ANGLE, H2_MAG_ANGLE, H3_MAG_ANGLE, H8_MAG_ANGLE, H1_PHASE_ANGLE, H2_PHASE_ANGLE, H3_PHASE_ANGLE, H8_PHASE_ANGLE;
+static uint32_t H1_MAG_HEX, H2_MAG_HEX, H3_MAG_HEX, H8_MAG_HEX, H1_PHASE_HEX, H2_PHASE_HEX, H3_PHASE_HEX, H8_PHASE_HEX;
 
 using namespace scopy;
 using namespace scopy::admt;
@@ -409,6 +415,8 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	connect(tabWidget, &QTabWidget::currentChanged, [=](int index){
 		tabWidget->setCurrentIndex(index);
 
+		if(index == 0) { readSequence(); }
+
 		if(index == 1) { calibrationTimer->start(calibrationTimerRate); }
 		else { calibrationTimer->stop(); }
 
@@ -601,6 +609,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	angleErrorPlotWidget->yAxis()->setVisible(false);
 	
 	angleErrorXPlotAxis = new PlotAxis(QwtAxis::XBottom, angleErrorPlotWidget, scopyBluePen);
+	angleErrorXPlotAxis->setMin(0);
 	angleErrorYPlotAxis = new PlotAxis(QwtAxis::YLeft, angleErrorPlotWidget, scopyBluePen);
 	angleErrorYPlotAxis->setInterval(-4, 4);
 
@@ -631,6 +640,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	FFTAngleErrorPlotWidget->yAxis()->setVisible(false);
 
 	FFTAngleErrorXPlotAxis = new PlotAxis(QwtAxis::XBottom, FFTAngleErrorPlotWidget, scopyBluePen);
+	FFTAngleErrorXPlotAxis->setMin(0);
 	FFTAngleErrorYPlotAxis = new PlotAxis(QwtAxis::YLeft, FFTAngleErrorPlotWidget, scopyBluePen);
 	FFTAngleErrorYPlotAxis->setInterval(-4, 4);
 
@@ -710,8 +720,9 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	FFTCorrectedErrorPlotWidget->yAxis()->setVisible(false);
 
 	FFTCorrectedErrorXPlotAxis = new PlotAxis(QwtAxis::XBottom, FFTCorrectedErrorPlotWidget, scopyBluePen);
+	FFTCorrectedErrorXPlotAxis->setMin(0);
 	FFTCorrectedErrorYPlotAxis = new PlotAxis(QwtAxis::YLeft, FFTCorrectedErrorPlotWidget, scopyBluePen);
-	FFTCorrectedErrorYPlotAxis->setInterval(0, 360);
+	FFTCorrectedErrorYPlotAxis->setInterval(-4, 4);
 
 	FFTCorrectedErrorMagnitudeChannel = new PlotChannel("FFT Corrected Error Magnitude", magnitudePen, FFTCorrectedErrorXPlotAxis, FFTCorrectedErrorYPlotAxis);
 	FFTCorrectedErrorPhaseChannel = new PlotChannel("FFT Corrected Error Phase", phasePen, FFTCorrectedErrorXPlotAxis, FFTCorrectedErrorYPlotAxis);
@@ -775,7 +786,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationCalculatedCoeffLabel->setText("Calculated Coefficients");
 	StyleHelper::MenuCollapseHeaderLabel(calibrationCalculatedCoeffLabel, "calibrationCalculatedCoeffLabel");
 
-	CustomSwitch *calibrationDisplayFormatSwitch = new CustomSwitch();
+	calibrationDisplayFormatSwitch = new CustomSwitch();
 	calibrationDisplayFormatSwitch->setOffText("Hex");
 	calibrationDisplayFormatSwitch->setOnText("Angle");
 	calibrationDisplayFormatSwitch->setProperty("bigBtn", true);
@@ -807,8 +818,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	h1RowContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	h1RowLayout->setContentsMargins(12, 4, 12, 4);
 	QLabel *calibrationH1Label = new QLabel("H1", calibrationCalculatedCoeffWidget);
-	calibrationH1MagLabel = new QLabel("--.--°", calibrationCalculatedCoeffWidget);
-	calibrationH1PhaseLabel = new QLabel("Φ --.--", calibrationCalculatedCoeffWidget);
+	calibrationH1MagLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
+	calibrationH1PhaseLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
 	applyTextStyle(calibrationH1Label, "LabelText", true);
 	applyTextStyle(calibrationH1MagLabel, "CH0");
 	applyTextStyle(calibrationH1PhaseLabel, "CH1");
@@ -829,8 +840,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	h2RowContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	h2RowLayout->setContentsMargins(12, 4, 12, 4);
 	QLabel *calibrationH2Label = new QLabel("H2", calibrationCalculatedCoeffWidget);
-	calibrationH2MagLabel = new QLabel("--.--°", calibrationCalculatedCoeffWidget);
-	calibrationH2PhaseLabel = new QLabel("Φ --.--", calibrationCalculatedCoeffWidget);
+	calibrationH2MagLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
+	calibrationH2PhaseLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
 	applyTextStyle(calibrationH2Label, "LabelText", true);
 	applyTextStyle(calibrationH2MagLabel, "CH0");
 	applyTextStyle(calibrationH2PhaseLabel, "CH1");
@@ -851,8 +862,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	h3RowContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	h3RowLayout->setContentsMargins(12, 4, 12, 4);
 	QLabel *calibrationH3Label = new QLabel("H3", calibrationCalculatedCoeffWidget);
-	calibrationH3MagLabel = new QLabel("--.--°", calibrationCalculatedCoeffWidget);
-	calibrationH3PhaseLabel = new QLabel("Φ --.--", calibrationCalculatedCoeffWidget);
+	calibrationH3MagLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
+	calibrationH3PhaseLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
 	applyTextStyle(calibrationH3Label, "LabelText", true);
 	applyTextStyle(calibrationH3MagLabel, "CH0");
 	applyTextStyle(calibrationH3PhaseLabel, "CH1");
@@ -873,8 +884,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	h8RowContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	h8RowLayout->setContentsMargins(12, 4, 12, 4);
 	QLabel *calibrationH8Label = new QLabel("H8", calibrationCalculatedCoeffWidget);
-	calibrationH8MagLabel = new QLabel("--.--°", calibrationCalculatedCoeffWidget);
-	calibrationH8PhaseLabel = new QLabel("Φ --.--", calibrationCalculatedCoeffWidget);
+	calibrationH8MagLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
+	calibrationH8PhaseLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
 	applyTextStyle(calibrationH8Label, "LabelText", true);
 	applyTextStyle(calibrationH8MagLabel, "CH0");
 	applyTextStyle(calibrationH8PhaseLabel, "CH1");
@@ -917,6 +928,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	QLineEdit *calibrationSamplesPerCycleLineEdit = new QLineEdit(calibrationDatasetConfigCollapseSection);
 	applyLineEditStyle(calibrationSamplesPerCycleLineEdit);
 	calibrationSamplesPerCycleLineEdit->setText(QString::number(samplesPerCycle));
+	calibrationSamplesPerCycleLineEdit->setReadOnly(true);
 	connectLineEditToNumber(calibrationSamplesPerCycleLineEdit, samplesPerCycle, 1, 5000);
 
 	calibrationDatasetConfigCollapseSection->contentLayout()->setSpacing(8);
@@ -933,9 +945,9 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationDataSectionWidget->contentLayout()->setSpacing(8);
 	calibrationDataSectionWidget->contentLayout()->addWidget(calibrationDataCollapseSection);
 
-	QPushButton *importDataButton = new QPushButton(calibrationDataCollapseSection);
-	importDataButton->setText("Import from CSV");
-	StyleHelper::BlueButton(importDataButton, "importDataButton");
+	// QPushButton *importDataButton = new QPushButton(calibrationDataCollapseSection);
+	// importDataButton->setText("Import from CSV");
+	// StyleHelper::BlueButton(importDataButton, "importDataButton");
 	QPushButton *extractDataButton = new QPushButton(calibrationDataCollapseSection);
 	extractDataButton->setText("Extract to CSV");
 	StyleHelper::BlueButton(extractDataButton, "extractDataButton");
@@ -944,7 +956,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	StyleHelper::BlueButton(clearCalibrateDataButton, "clearCalibrateDataButton");
 
 	calibrationDataCollapseSection->contentLayout()->setSpacing(8);
-	calibrationDataCollapseSection->contentLayout()->addWidget(importDataButton);
+	// calibrationDataCollapseSection->contentLayout()->addWidget(importDataButton);
 	calibrationDataCollapseSection->contentLayout()->addWidget(extractDataButton);
 	calibrationDataCollapseSection->contentLayout()->addWidget(clearCalibrateDataButton);
 	#pragma endregion
@@ -952,6 +964,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	#pragma region Motor Configuration Section Widget
 	MenuSectionWidget *motorConfigurationSectionWidget = new MenuSectionWidget(calibrationSettingsWidget);
 	MenuCollapseSection *motorConfigurationCollapseSection = new MenuCollapseSection("Motor Configuration", MenuCollapseSection::MHCW_NONE, motorConfigurationSectionWidget);
+	motorConfigurationCollapseSection->header()->toggle();
 	motorConfigurationSectionWidget->contentLayout()->addWidget(motorConfigurationCollapseSection);
 
 	motorMaxVelocitySpinBox = new HorizontalSpinBox("Max Velocity", convertVMAXtoRPS(rotate_vmax), "rps", motorConfigurationSectionWidget);
@@ -960,7 +973,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	motorAccelTimeSpinBox->setValue(1);
 	motorMaxDisplacementSpinBox = new HorizontalSpinBox("Max Displacement", dmax, "", motorConfigurationSectionWidget);
 
-	MenuCombo *m_calibrationMotorRampModeMenuCombo = new MenuCombo("Ramp Mode", motorConfigurationSectionWidget);
+	m_calibrationMotorRampModeMenuCombo = new MenuCombo("Ramp Mode", motorConfigurationSectionWidget);
 	auto calibrationMotorRampModeCombo = m_calibrationMotorRampModeMenuCombo->combo();
 	calibrationMotorRampModeCombo->addItem("Position", QVariant(ADMTController::MotorRampMode::POSITION));
 	calibrationMotorRampModeCombo->addItem("Ramp Mode 1", QVariant(ADMTController::MotorRampMode::RAMP_MODE_1));
@@ -1050,6 +1063,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	#pragma region Logs Section Widget
 	MenuSectionWidget *logsSectionWidget = new MenuSectionWidget(calibrationSettingsWidget);
 	MenuCollapseSection *logsCollapseSection = new MenuCollapseSection("Logs", MenuCollapseSection::MHCW_NONE, logsSectionWidget);
+	logsCollapseSection->header()->toggle();
 	logsSectionWidget->contentLayout()->setSpacing(8);
 	logsSectionWidget->contentLayout()->addWidget(logsCollapseSection);
 
@@ -1063,9 +1077,9 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	calibrationSettingsLayout->setMargin(0);
 	calibrationSettingsLayout->addWidget(calibrationDatasetConfigSectionWidget);
-	calibrationSettingsLayout->addWidget(calibrationDataSectionWidget);
 	calibrationSettingsLayout->addWidget(motorConfigurationSectionWidget);
 	calibrationSettingsLayout->addWidget(motorControlSectionWidget);
+	calibrationSettingsLayout->addWidget(calibrationDataSectionWidget);
 	calibrationSettingsLayout->addWidget(calibrationCoeffSectionWidget);
 	calibrationSettingsLayout->addWidget(logsSectionWidget);
 	calibrationSettingsLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -1085,9 +1099,9 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	tool->addWidgetToCentralContainerHelper(calibrationDataGraphWidget);
 	tool->rightStack()->add("calibrationSettingsScrollArea", calibrationSettingsScrollArea);
 
-	connect(calibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::calibrateData);
+	connect(calibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::postCalibrateData);
 	connect(extractDataButton, &QPushButton::clicked, this, &HarmonicCalibration::extractCalibrationData);
-	connect(importDataButton, &QPushButton::clicked, this, &HarmonicCalibration::importCalibrationData);
+	// connect(importDataButton, &QPushButton::clicked, this, &HarmonicCalibration::importCalibrationData);
 	connect(clearCalibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::clearRawDataList);
 	connectLineEditToRPSConversion(motorMaxVelocitySpinBox->lineEdit(), rotate_vmax);
 	connectLineEditToAMAXConversion(motorAccelTimeSpinBox->lineEdit(), amax);
@@ -1137,6 +1151,10 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	connect(toggleFFTCorrectedErrorPhaseButton->checkBox(), &QCheckBox::toggled, this, [=](bool b){
 		FFTCorrectedErrorPlotWidget->selectChannel(FFTCorrectedErrorPhaseChannel);
 		FFTCorrectedErrorPlotWidget->selectedChannel()->setEnabled(b);
+	});
+	connect(calibrationDisplayFormatSwitch, &CustomSwitch::toggled, this, [=](bool b){
+		isAngleDisplayFormat = b;
+		displayCalculatedCoeff();
 	});
 
 	return tool;
@@ -1418,20 +1436,35 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	DIGIOControlGridLayout->setMargin(0);
 	DIGIOControlGridLayout->setSpacing(8);
 
+	QString labelStyle = QString(R"css(
+				QLabel {
+					color: white;
+					background-color: rgba(255,255,255,0);
+					font-weight: 500;
+					font-family: Open Sans;
+					font-size: 12px;
+					font-style: normal;
+					}
+				QLabel:disabled {
+					color: grey;
+				}
+				)css");
+
 	QLabel *DIGIOBUSYLabel = new QLabel("GPIO0", DIGIOControlGridWidget);
-	StyleHelper::MenuSmallLabel(DIGIOBUSYLabel, "DIGIOBUSYLabel");
 	QLabel *DIGIOCNVLabel = new QLabel("GPIO1", DIGIOControlGridWidget);
-	StyleHelper::MenuSmallLabel(DIGIOCNVLabel, "DIGIOCNVLabel");
 	QLabel *DIGIOSENTLabel = new QLabel("GPIO2", DIGIOControlGridWidget);
-	StyleHelper::MenuSmallLabel(DIGIOSENTLabel, "DIGIOSENTLabel");
 	QLabel *DIGIOACALCLabel = new QLabel("GPIO3", DIGIOControlGridWidget);
-	StyleHelper::MenuSmallLabel(DIGIOACALCLabel, "DIGIOACALCLabel");
 	QLabel *DIGIOFAULTLabel = new QLabel("GPIO4", DIGIOControlGridWidget);
-	StyleHelper::MenuSmallLabel(DIGIOFAULTLabel, "DIGIOFAULTLabel");
 	QLabel *DIGIOBOOTLOADERLabel = new QLabel("GPIO5", DIGIOControlGridWidget);
-	StyleHelper::MenuSmallLabel(DIGIOBOOTLOADERLabel, "DIGIOBOOTLOADERLabel");
 	QLabel *DIGIOALLLabel = new QLabel("GPIO Output", DIGIOControlGridWidget);
-	StyleHelper::MenuSmallLabel(DIGIOALLLabel, "DIGIOALLLabel");
+
+	DIGIOBUSYLabel->setStyleSheet(labelStyle);
+	DIGIOCNVLabel->setStyleSheet(labelStyle);
+	DIGIOSENTLabel->setStyleSheet(labelStyle);
+	DIGIOACALCLabel->setStyleSheet(labelStyle);
+	DIGIOFAULTLabel->setStyleSheet(labelStyle);
+	DIGIOBOOTLOADERLabel->setStyleSheet(labelStyle);
+	DIGIOALLLabel->setStyleSheet(labelStyle);
 
 	DIGIOBUSYToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIOBUSYToggleSwitch, "On", "Off");
@@ -1478,20 +1511,20 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	DIGIOControlGridLayout->addWidget(DIGIOALLLabel, 0, 0);
 	DIGIOControlGridLayout->addWidget(DIGIOALLToggleSwitch, 0, 1);
 
-	DIGIOControlGridLayout->addItem(new QSpacerItem(0, 8, QSizePolicy::Fixed, QSizePolicy::Expanding), 1, 0, 1, 2);
+	DIGIOControlGridLayout->addItem(new QSpacerItem(0, 4, QSizePolicy::Fixed, QSizePolicy::Expanding), 1, 0, 1, 2);
 	QFrame *line = new QFrame();
 	line->setFrameShape(QFrame::HLine);
 	line->setFrameShadow(QFrame::Plain);
 	line->setFixedHeight(1);
 	QString lineStyle = QString(R"css(
 				QFrame {
-					border: 1px solid white;
+					border: 1px solid #808085;
 				}
 				)css");
 	line->setStyleSheet(lineStyle);
 	DIGIOControlGridLayout->addWidget(line, 2, 0, 1, 2);
 
-	DIGIOControlGridLayout->addItem(new QSpacerItem(0, 8, QSizePolicy::Fixed, QSizePolicy::Expanding), 3, 0, 1, 2);
+	DIGIOControlGridLayout->addItem(new QSpacerItem(0, 4, QSizePolicy::Fixed, QSizePolicy::Expanding), 3, 0, 1, 2);
 
 	DIGIOControlGridLayout->addWidget(DIGIOBUSYLabel, 4, 0);
 	DIGIOControlGridLayout->addWidget(DIGIOBUSYToggleSwitch, 4, 1);
@@ -1506,7 +1539,7 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	DIGIOControlGridLayout->addWidget(DIGIOBOOTLOADERLabel, 9, 0);
 	DIGIOControlGridLayout->addWidget(DIGIOBOOTLOADERToggleSwitch, 9, 1);
 
-	DIGIOControlCollapseSection->contentLayout()->addWidget(DIGIOControlGridWidget);
+	DIGIOControlCollapseSection->contentLayout()->addWidget(DIGIOControlGridWidget, 1);
 	#pragma endregion
 
 	DIGIOLayout->addWidget(DIGIOMonitorSectionWidget);
@@ -1559,9 +1592,9 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	QLabel *AFEDIAG2Label = new QLabel("AFEDIAG2 (V)");
 	StyleHelper::MenuSmallLabel(AFEDIAG2Label, "AFEDIAG2Label");
 
-	AFEDIAG0LineEdit = new QLineEdit("-57.0312", MTDiagnosticsSectionWidget);
-	AFEDIAG1LineEdit = new QLineEdit("56.25", MTDiagnosticsSectionWidget);
-	AFEDIAG2LineEdit = new QLineEdit("-312.499m", MTDiagnosticsSectionWidget);
+	AFEDIAG0LineEdit = new QLineEdit(MTDiagnosticsSectionWidget);
+	AFEDIAG1LineEdit = new QLineEdit(MTDiagnosticsSectionWidget);
+	AFEDIAG2LineEdit = new QLineEdit(MTDiagnosticsSectionWidget);
 	applyLineEditStyle(AFEDIAG0LineEdit);
 	applyLineEditStyle(AFEDIAG1LineEdit);
 	applyLineEditStyle(AFEDIAG2LineEdit);
@@ -1657,6 +1690,15 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	tool->rightStack()->addWidget(rightUtilityScrollArea);
 
 	return tool;
+}
+
+void HarmonicCalibration::toggleMotorControls(bool value)
+{
+	motorMaxVelocitySpinBox->setEnabled(value);
+	motorAccelTimeSpinBox->setEnabled(value);
+	motorMaxDisplacementSpinBox->setEnabled(value);
+	m_calibrationMotorRampModeMenuCombo->setEnabled(value);
+	motorTargetPositionSpinBox->setEnabled(value);
 }
 
 void HarmonicCalibration::toggleUtilityTask(bool run)
@@ -2512,7 +2554,9 @@ void HarmonicCalibration::calibrationTask()
 
 void HarmonicCalibration::getCalibrationSamples()
 {
-	resetCurrentPositionToZero();
+	if(resetToZero){
+		resetCurrentPositionToZero();
+	}
 	if(isPostCalibration){
 		while(isStartMotor && graphPostDataList.size() < totalSamplesCount){
 			stepMotorAcquisition();
@@ -2536,14 +2580,22 @@ void HarmonicCalibration::resetCurrentPositionToZero()
 	while(current_pos != 0){
 		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
 	}
+	resetToZero = false;
 }
 
 void HarmonicCalibration::startMotor()
 {
+	toggleMotorControls(false);
+
+	if(resetToZero && !isPostCalibration){
+		clearCalibrationSamples();
+	}
 	QFuture<void> future = QtConcurrent::run(this, &HarmonicCalibration::getCalibrationSamples);
 	QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
 
 	connect(watcher, &QFutureWatcher<void>::finished, this, [=]() {
+		toggleMotorControls(true);
+
 		calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
 		calibrationRawDataPlotChannel->xAxis()->setMax(graphDataList.size());
 		calibrationRawDataPlotWidget->replot();
@@ -2584,6 +2636,33 @@ void HarmonicCalibration::startMotor()
 			{
 				computeSineCosineOfAngles(graphDataList);
 				canCalibrate(true); 
+
+				calibrationLogWrite(m_admtController->calibrate(vector<double>(graphDataList.begin(), graphDataList.end()), cycleCount, samplesPerCycle));
+
+				flashHarmonicValues();
+
+				QVector<double> angleError = QVector<double>(m_admtController->angleError.begin(), m_admtController->angleError.end());
+				QVector<double> FFTAngleErrorMagnitude = QVector<double>(m_admtController->FFTAngleErrorMagnitude.begin(), m_admtController->FFTAngleErrorMagnitude.end());
+				QVector<double> FFTAngleErrorPhase = QVector<double>(m_admtController->FFTAngleErrorPhase.begin(), m_admtController->FFTAngleErrorPhase.end());
+
+				angleErrorPlotChannel->curve()->setSamples(angleError);
+				auto angleErrorMinMax = std::minmax_element(angleError.begin(), angleError.end());
+				angleErrorYPlotAxis->setInterval(*angleErrorMinMax.first, *angleErrorMinMax.second);
+				angleErrorXPlotAxis->setInterval(0, angleError.size());
+				angleErrorPlotWidget->replot();
+				
+				FFTAngleErrorMagnitudeChannel->curve()->setSamples(FFTAngleErrorMagnitude);
+				auto angleErrorMagnitudeMinMax = std::minmax_element(FFTAngleErrorMagnitude.begin(), FFTAngleErrorMagnitude.end());
+				FFTAngleErrorPhaseChannel->curve()->setSamples(FFTAngleErrorPhase);
+				auto angleErrorPhaseMinMax = std::minmax_element(FFTAngleErrorPhase.begin(), FFTAngleErrorPhase.end());
+				double FFTAngleErrorPlotMin = *angleErrorMagnitudeMinMax.first < *angleErrorPhaseMinMax.first ? *angleErrorMagnitudeMinMax.first : *angleErrorPhaseMinMax.first;
+				double FFTAngleErrorPlotMax = *angleErrorMagnitudeMinMax.second > *angleErrorPhaseMinMax.second ? *angleErrorMagnitudeMinMax.second : *angleErrorPhaseMinMax.second;
+				FFTAngleErrorYPlotAxis->setInterval(FFTAngleErrorPlotMin, FFTAngleErrorPlotMax);
+				FFTAngleErrorXPlotAxis->setInterval(0, FFTAngleErrorMagnitude.size());
+				FFTAngleErrorPlotWidget->replot();
+			}
+			else{
+				resetToZero = true;
 			}
 		}
 	});
@@ -2623,8 +2702,6 @@ void HarmonicCalibration::calibrateData()
 	FFTAngleErrorYPlotAxis->setInterval(FFTAngleErrorPlotMin, FFTAngleErrorPlotMax);
 	FFTAngleErrorXPlotAxis->setInterval(0, FFTAngleErrorMagnitude.size());
 	FFTAngleErrorPlotWidget->replot();
-
-	postCalibrateData();
 }	
 
 void HarmonicCalibration::flashHarmonicValues()
@@ -2636,128 +2713,119 @@ void HarmonicCalibration::flashHarmonicValues()
 			 *h3MagCurrent = new uint32_t,
 			 *h3PhaseCurrent = new uint32_t,
 			 *h8MagCurrent = new uint32_t,
-			 *h8PhaseCurrent = new uint32_t,
-			 h1MagScaled,
-			 h1PhaseScaled,
-			 h2MagScaled,
-			 h2PhaseScaled,
-			 h3MagScaled,
-			 h3PhaseScaled,
-			 h8MagScaled,
-			 h8PhaseScaled;
-	double h1MagConverted,
-		   h1PhaseConverted,
-		   h2MagConverted,
-		   h2PhaseConverted,
-		   h3MagConverted,
-		   h3PhaseConverted,
-		   h8MagConverted,
-		   h8PhaseConverted;
+			 *h8PhaseCurrent = new uint32_t;
 
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), h1MagCurrent);
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), h1PhaseCurrent);
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG), h2MagCurrent);
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH), h2PhaseCurrent);
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG), h3MagCurrent);
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH), h3PhaseCurrent);
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), h8MagCurrent);
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), h8PhaseCurrent);
+	if(changeCNVPage(0x02, "Harmonic Registers")){
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), h1MagCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), h1PhaseCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG), h2MagCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH), h2PhaseCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG), h3MagCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH), h3PhaseCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), h8MagCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), h8PhaseCurrent);
 
-	calibrationLogWrite();
-	calibrationLogWrite("H1 Mag Current: " + QString::number(*h1MagCurrent));
-	calibrationLogWrite("H1 Phase Current: " + QString::number(*h1PhaseCurrent));
-	calibrationLogWrite("H2 Mag Current: " + QString::number(*h2MagCurrent));
-	calibrationLogWrite("H2 Phase Current: " + QString::number(*h2PhaseCurrent));
-	calibrationLogWrite("H3 Mag Current: " + QString::number(*h3MagCurrent));
-	calibrationLogWrite("H3 Phase Current: " + QString::number(*h3PhaseCurrent));
-	calibrationLogWrite("H8 Mag Current: " + QString::number(*h8MagCurrent));
-	calibrationLogWrite("H8 Phase Current: " + QString::number(*h8PhaseCurrent));
+		calibrationLogWrite();
+		calibrationLogWrite("H1 Mag Current: " + QString::number(*h1MagCurrent));
+		calibrationLogWrite("H1 Phase Current: " + QString::number(*h1PhaseCurrent));
+		calibrationLogWrite("H2 Mag Current: " + QString::number(*h2MagCurrent));
+		calibrationLogWrite("H2 Phase Current: " + QString::number(*h2PhaseCurrent));
+		calibrationLogWrite("H3 Mag Current: " + QString::number(*h3MagCurrent));
+		calibrationLogWrite("H3 Phase Current: " + QString::number(*h3PhaseCurrent));
+		calibrationLogWrite("H8 Mag Current: " + QString::number(*h8MagCurrent));
+		calibrationLogWrite("H8 Phase Current: " + QString::number(*h8PhaseCurrent));
 
-	h1MagScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(m_admtController->HAR_MAG_1, static_cast<uint16_t>(*h1MagCurrent), "h1"));
-	h1PhaseScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(m_admtController->HAR_PHASE_1, static_cast<uint16_t>(*h1PhaseCurrent)));
-	h2MagScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(m_admtController->HAR_MAG_2, static_cast<uint16_t>(*h2MagCurrent), "h2"));
-	h2PhaseScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(m_admtController->HAR_PHASE_2, static_cast<uint16_t>(*h2PhaseCurrent)));
-	h3MagScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(m_admtController->HAR_MAG_3, static_cast<uint16_t>(*h3MagCurrent), "h3"));
-	h3PhaseScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(m_admtController->HAR_PHASE_3, static_cast<uint16_t>(*h3PhaseCurrent)));
-	h8MagScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(m_admtController->HAR_MAG_8, static_cast<uint16_t>(*h8MagCurrent), "h8"));
-	h8PhaseScaled = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(m_admtController->HAR_PHASE_8, static_cast<uint16_t>(*h8PhaseCurrent)));
+		H1_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_1), static_cast<uint16_t>(*h1MagCurrent), "h1"));
+		H1_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_1), static_cast<uint16_t>(*h1PhaseCurrent)));
+		H2_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_2), static_cast<uint16_t>(*h2MagCurrent), "h2"));
+		H2_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_2), static_cast<uint16_t>(*h2PhaseCurrent)));
+		H3_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_3), static_cast<uint16_t>(*h3MagCurrent), "h3"));
+		H3_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_3), static_cast<uint16_t>(*h3PhaseCurrent)));
+		H8_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_8), static_cast<uint16_t>(*h8MagCurrent), "h8"));
+		H8_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_8), static_cast<uint16_t>(*h8PhaseCurrent)));
 
-	calibrationLogWrite();
-	calibrationLogWrite("H1 Mag Scaled: " + QString::number(h1MagScaled));
-	calibrationLogWrite("H1 Phase Scaled: " + QString::number(h1PhaseScaled));
-	calibrationLogWrite("H2 Mag Scaled: " + QString::number(h2MagScaled));
-	calibrationLogWrite("H2 Phase Scaled: " + QString::number(h2PhaseScaled));
-	calibrationLogWrite("H3 Mag Scaled: " + QString::number(h3MagScaled));
-	calibrationLogWrite("H3 Phase Scaled: " + QString::number(h3PhaseScaled));
-	calibrationLogWrite("H8 Mag Scaled: " + QString::number(h8MagScaled));
-	calibrationLogWrite("H8 Phase Scaled: " + QString::number(h8PhaseScaled));
+		calibrationLogWrite();
+		calibrationLogWrite("H1 Mag Scaled: " + QString::number(H1_MAG_HEX));
+		calibrationLogWrite("H1 Phase Scaled: " + QString::number(H1_PHASE_HEX));
+		calibrationLogWrite("H2 Mag Scaled: " + QString::number(H2_MAG_HEX));
+		calibrationLogWrite("H2 Phase Scaled: " + QString::number(H2_PHASE_HEX));
+		calibrationLogWrite("H3 Mag Scaled: " + QString::number(H3_MAG_HEX));
+		calibrationLogWrite("H3 Phase Scaled: " + QString::number(H3_PHASE_HEX));
+		calibrationLogWrite("H8 Mag Scaled: " + QString::number(H8_MAG_HEX));
+		calibrationLogWrite("H8 Phase Scaled: " + QString::number(H8_PHASE_HEX));
 
-	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 0x01, 0x02);
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 0x01, 0x02);
 
-	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-										  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG),
-										  h1MagScaled);
-	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-										  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH),
-										  h1PhaseScaled);
-	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-										  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG),
-										  h2MagScaled);
-	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-										  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH),
-										  h2PhaseScaled);
-	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-										  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG),
-										  h3MagScaled);
-	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-										  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH),
-										  h3PhaseScaled);
-	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-										  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG),
-										  h8MagScaled);
-	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-										  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH),
-										  h8PhaseScaled);
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG),
+											H1_MAG_HEX);
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH),
+											H1_PHASE_HEX);
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG),
+											H2_MAG_HEX);
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH),
+											H2_PHASE_HEX);
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG),
+											H3_MAG_HEX);
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH),
+											H3_PHASE_HEX);
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG),
+											H8_MAG_HEX);
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH),
+											H8_PHASE_HEX);
 
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), h1MagCurrent);
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), h1PhaseCurrent);
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG), h2MagCurrent);
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH), h2PhaseCurrent);
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG), h3MagCurrent);
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH), h3PhaseCurrent);
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), h8MagCurrent);
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), h8PhaseCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), h1MagCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), h1PhaseCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG), h2MagCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH), h2PhaseCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG), h3MagCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH), h3PhaseCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), h8MagCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), h8PhaseCurrent);
 
-	calibrationLogWrite();
-	calibrationLogWrite("H1 Mag After Flash: " + QString::number(*h1MagCurrent));
-	calibrationLogWrite("H1 Phase After Flash: " + QString::number(*h1PhaseCurrent));
-	calibrationLogWrite("H2 Mag After Flash: " + QString::number(*h2MagCurrent));
-	calibrationLogWrite("H2 Phase After Flash: " + QString::number(*h2PhaseCurrent));
-	calibrationLogWrite("H3 Mag After Flash: " + QString::number(*h3MagCurrent));
-	calibrationLogWrite("H3 Phase After Flash: " + QString::number(*h3PhaseCurrent));
-	calibrationLogWrite("H8 Mag After Flash: " + QString::number(*h8MagCurrent));
-	calibrationLogWrite("H8 Phase After Flash: " + QString::number(*h8PhaseCurrent));
+		calibrationLogWrite();
+		calibrationLogWrite("H1 Mag After Flash: " + QString::number(*h1MagCurrent));
+		calibrationLogWrite("H1 Phase After Flash: " + QString::number(*h1PhaseCurrent));
+		calibrationLogWrite("H2 Mag After Flash: " + QString::number(*h2MagCurrent));
+		calibrationLogWrite("H2 Phase After Flash: " + QString::number(*h2PhaseCurrent));
+		calibrationLogWrite("H3 Mag After Flash: " + QString::number(*h3MagCurrent));
+		calibrationLogWrite("H3 Phase After Flash: " + QString::number(*h3PhaseCurrent));
+		calibrationLogWrite("H8 Mag After Flash: " + QString::number(*h8MagCurrent));
+		calibrationLogWrite("H8 Phase After Flash: " + QString::number(*h8PhaseCurrent));
 
-	h1MagConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h1MagCurrent), "h1mag");
-	h1PhaseConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h1PhaseCurrent), "h1phase");
-	h2MagConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h2MagCurrent), "h2mag");
-	h2PhaseConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h2PhaseCurrent), "h2phase");
-	h3MagConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h3MagCurrent), "h3mag");
-	h3PhaseConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h3PhaseCurrent), "h3phase");
-	h8MagConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h8MagCurrent), "h8mag");
-	h8PhaseConverted = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h8PhaseCurrent), "h8phase");
+		H1_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h1MagCurrent), "h1mag");
+		H1_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h1PhaseCurrent), "h1phase");
+		H2_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h2MagCurrent), "h2mag");
+		H2_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h2PhaseCurrent), "h2phase");
+		H3_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h3MagCurrent), "h3mag");
+		H3_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h3PhaseCurrent), "h3phase");
+		H8_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h8MagCurrent), "h8mag");
+		H8_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h8PhaseCurrent), "h8phase");
 
-	calibrationLogWrite();
-	calibrationLogWrite("H1 Mag Converted: " + QString::number(h1MagConverted));
-	calibrationLogWrite("H1 Phase Converted: " + QString::number(h1PhaseConverted));
-	calibrationLogWrite("H2 Mag Converted: " + QString::number(h2MagConverted));
-	calibrationLogWrite("H2 Phase Converted: " + QString::number(h2PhaseConverted));
-	calibrationLogWrite("H3 Mag Converted: " + QString::number(h3MagConverted));
-	calibrationLogWrite("H3 Phase Converted: " + QString::number(h3PhaseConverted));
-	calibrationLogWrite("H8 Mag Converted: " + QString::number(h8MagConverted));
-	calibrationLogWrite("H8 Phase Converted: " + QString::number(h8PhaseConverted));
+		calibrationLogWrite();
+		calibrationLogWrite("H1 Mag Converted: " + QString::number(H1_MAG_ANGLE));
+		calibrationLogWrite("H1 Phase Converted: " + QString::number(H1_PHASE_ANGLE));
+		calibrationLogWrite("H2 Mag Converted: " + QString::number(H2_MAG_ANGLE));
+		calibrationLogWrite("H2 Phase Converted: " + QString::number(H2_PHASE_ANGLE));
+		calibrationLogWrite("H3 Mag Converted: " + QString::number(H3_MAG_ANGLE));
+		calibrationLogWrite("H3 Phase Converted: " + QString::number(H3_PHASE_ANGLE));
+		calibrationLogWrite("H8 Mag Converted: " + QString::number(H8_MAG_ANGLE));
+		calibrationLogWrite("H8 Phase Converted: " + QString::number(H8_PHASE_ANGLE));
 
-	updateCalculatedCoeff();
+		isCalculatedCoeff = true;
+
+		displayCalculatedCoeff();
+	}
+	else{
+		calibrationLogWrite("Unabled to flash Harmonic Registers!");
+	}
 }
 
 void HarmonicCalibration::postCalibrateData()
@@ -2768,23 +2836,23 @@ void HarmonicCalibration::postCalibrateData()
 	calibrationDataGraphTabWidget->setCurrentIndex(1);
 	isPostCalibration = true;
 	isStartMotor = true;
+	resetToZero = true;
 	startMotor();
 }
 
-void HarmonicCalibration::updateCalculatedCoeff()
+void HarmonicCalibration::updateCalculatedCoeffAngle()
 {
-	calibrationH1MagLabel->setText(QString::number(m_admtController->HAR_MAG_1) + "°");
-	calibrationH2MagLabel->setText(QString::number(m_admtController->HAR_MAG_2) + "°");
-	calibrationH3MagLabel->setText(QString::number(m_admtController->HAR_MAG_3) + "°");
-	calibrationH8MagLabel->setText(QString::number(m_admtController->HAR_MAG_8) + "°");
-	calibrationH1PhaseLabel->setText("Φ " + QString::number(m_admtController->HAR_PHASE_1));
-	calibrationH2PhaseLabel->setText("Φ " + QString::number(m_admtController->HAR_PHASE_2));
-	calibrationH3PhaseLabel->setText("Φ " + QString::number(m_admtController->HAR_PHASE_3));
-	calibrationH8PhaseLabel->setText("Φ " + QString::number(m_admtController->HAR_PHASE_8));
-	//applyCalibrationDataButton->setEnabled(true);
+	calibrationH1MagLabel->setText(QString::number(H1_MAG_ANGLE) + "°");
+	calibrationH2MagLabel->setText(QString::number(H2_MAG_ANGLE) + "°");
+	calibrationH3MagLabel->setText(QString::number(H3_MAG_ANGLE) + "°");
+	calibrationH8MagLabel->setText(QString::number(H8_MAG_ANGLE) + "°");
+	calibrationH1PhaseLabel->setText("Φ " + QString::number(H1_PHASE_ANGLE));
+	calibrationH2PhaseLabel->setText("Φ " + QString::number(H2_PHASE_ANGLE));
+	calibrationH3PhaseLabel->setText("Φ " + QString::number(H3_PHASE_ANGLE));
+	calibrationH8PhaseLabel->setText("Φ " + QString::number(H8_PHASE_ANGLE));
 }
 
-void HarmonicCalibration::resetCalculatedCoeff()
+void HarmonicCalibration::resetCalculatedCoeffAngle()
 {
 	calibrationH1MagLabel->setText("--.--°");
 	calibrationH2MagLabel->setText("--.--°");
@@ -2796,36 +2864,48 @@ void HarmonicCalibration::resetCalculatedCoeff()
 	calibrationH8PhaseLabel->setText("Φ --.--");
 }
 
-void HarmonicCalibration::registerCalibrationData()
+void HarmonicCalibration::updateCalculatedCoeffHex()
 {
-	calibrationLogWrite("=== Apply Calibration ===\n");
+	calibrationH1MagLabel->setText(QString("0x%1").arg(H1_MAG_HEX, 4, 16, QChar('0')));
+	calibrationH2MagLabel->setText(QString("0x%1").arg(H2_MAG_HEX, 4, 16, QChar('0')));
+	calibrationH3MagLabel->setText(QString("0x%1").arg(H3_MAG_HEX, 4, 16, QChar('0')));
+	calibrationH8MagLabel->setText(QString("0x%1").arg(H8_MAG_HEX, 4, 16, QChar('0')));
+	calibrationH1PhaseLabel->setText(QString("0x%1").arg(H1_PHASE_HEX, 4, 16, QChar('0')));
+	calibrationH2PhaseLabel->setText(QString("0x%1").arg(H2_PHASE_HEX, 4, 16, QChar('0')));
+	calibrationH3PhaseLabel->setText(QString("0x%1").arg(H3_PHASE_HEX, 4, 16, QChar('0')));
+	calibrationH8PhaseLabel->setText(QString("0x%1").arg(H8_PHASE_HEX, 4, 16, QChar('0')));
+}
 
-	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-		h1MagDeviceRegister, m_admtController->HAR_MAG_1) != 0) 
-		{ calibrationLogWrite("Failed to write to H1 Mag Register"); }
-	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-		h2MagDeviceRegister, m_admtController->HAR_MAG_2) != 0)
-		{ calibrationLogWrite("Failed to write to H2 Mag Register"); }
-	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-		h3MagDeviceRegister, m_admtController->HAR_MAG_3) != 0)
-		{ calibrationLogWrite("Failed to write to H3 Mag Register"); }
-	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-		h8MagDeviceRegister, m_admtController->HAR_MAG_8) != 0)
-		{ calibrationLogWrite("Failed to write to H8 Mag Register"); }
-	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-		h1PhaseDeviceRegister, m_admtController->HAR_PHASE_1) != 0)
-		{ calibrationLogWrite("Failed to write to H1 Phase Register"); }
-	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-		h2PhaseDeviceRegister, m_admtController->HAR_PHASE_2) != 0)
-		{ calibrationLogWrite("Failed to write to H2 Phase Register"); }
-	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-		h3PhaseDeviceRegister, m_admtController->HAR_PHASE_3) != 0)
-		{ calibrationLogWrite("Failed to write to H3 Phase Register"); }
-	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-		h8PhaseDeviceRegister, m_admtController->HAR_PHASE_8) != 0)
-		{ calibrationLogWrite("Failed to write to H8 Phase Register"); }
+void HarmonicCalibration::resetCalculatedCoeffHex()
+{
+	calibrationH1MagLabel->setText("0x----");
+	calibrationH2MagLabel->setText("0x----");
+	calibrationH3MagLabel->setText("0x----");
+	calibrationH8MagLabel->setText("0x----");
+	calibrationH1PhaseLabel->setText("0x----");
+	calibrationH2PhaseLabel->setText("0x----");
+	calibrationH3PhaseLabel->setText("0x----");
+	calibrationH8PhaseLabel->setText("0x----");
+}
 
-	calibrationLogWrite("=== Calibration Complete ===\n");
+void HarmonicCalibration::displayCalculatedCoeff()
+{
+	if(isAngleDisplayFormat){
+		if(isCalculatedCoeff){
+			updateCalculatedCoeffAngle();
+		}
+		else{
+			resetCalculatedCoeffAngle();
+		}
+	}
+	else{
+		if(isCalculatedCoeff){
+			updateCalculatedCoeffHex();
+		}
+		else{
+			resetCalculatedCoeffHex();
+		}
+	}
 }
 
 void HarmonicCalibration::calibrationLogWrite(QString message)
@@ -2863,14 +2943,14 @@ void HarmonicCalibration::extractCalibrationData()
 		QVector<double> preCalibrationAngleErrorsFFTMagnitude(m_admtController->angle_errors_fft_pre.begin(), m_admtController->angle_errors_fft_pre.end());
 		QVector<double> preCalibrationAngleErrorsFFTPhase(m_admtController->angle_errors_fft_phase_pre.begin(), m_admtController->angle_errors_fft_phase_pre.end());
 
-		QVector<double> h1Mag = { static_cast<double>(m_admtController->HAR_MAG_1) };
-		QVector<double> h2Mag = { static_cast<double>(m_admtController->HAR_MAG_2) };
-		QVector<double> h3Mag = { static_cast<double>(m_admtController->HAR_MAG_3) };
-		QVector<double> h8Mag = { static_cast<double>(m_admtController->HAR_MAG_8) };
-		QVector<double> h1Phase = { static_cast<double>(m_admtController->HAR_PHASE_1) };
-		QVector<double> h2Phase = { static_cast<double>(m_admtController->HAR_PHASE_2) };
-		QVector<double> h3Phase = { static_cast<double>(m_admtController->HAR_PHASE_3) };
-		QVector<double> h8Phase = { static_cast<double>(m_admtController->HAR_PHASE_8) };
+		QVector<double> h1Mag = { H1_MAG_ANGLE };
+		QVector<double> h2Mag = { H2_MAG_ANGLE };
+		QVector<double> h3Mag = { H3_MAG_ANGLE };
+		QVector<double> h8Mag = { H8_MAG_ANGLE };
+		QVector<double> h1Phase = { H1_PHASE_ANGLE };
+		QVector<double> h2Phase = { H2_PHASE_ANGLE };
+		QVector<double> h3Phase = { H3_PHASE_ANGLE };
+		QVector<double> h8Phase = { H8_PHASE_ANGLE };
 
 		fm.save(graphDataList, "Raw Data");
 		fm.save(preCalibrationAngleErrorsFFTMagnitude, "Pre-Calibration Angle Errors FFT Magnitude");
@@ -2942,13 +3022,13 @@ void HarmonicCalibration::stepMotorAcquisition(double step)
 
 void HarmonicCalibration::clearRawDataList()
 {
-	graphDataList.clear();
-	graphPostDataList.clear();
+	clearCalibrationSamples();
 
-	calibrationRawDataPlotChannel->curve()->setData(nullptr);
-	calibrationSineDataPlotChannel->curve()->setData(nullptr);
-	calibrationCosineDataPlotChannel->curve()->setData(nullptr);
-	calibrationRawDataPlotWidget->replot();
+	graphPostDataList.clear();
+	postCalibrationRawDataPlotChannel->curve()->setData(nullptr);
+	postCalibrationSineDataPlotChannel->curve()->setData(nullptr);
+	postCalibrationCosineDataPlotChannel->curve()->setData(nullptr);
+	postCalibrationRawDataPlotWidget->replot();
 
 	angleErrorPlotChannel->curve()->setData(nullptr);
 	angleErrorPlotWidget->replot();
@@ -2963,20 +3043,43 @@ void HarmonicCalibration::clearRawDataList()
 
 	canCalibrate(false);
 	canStartMotor(true);
+	isPostCalibration = false;
+	isCalculatedCoeff = false;
+	resetToZero = true;
+	displayCalculatedCoeff();
+}
 
-	resetCalculatedCoeff();
+void HarmonicCalibration::clearCalibrationSamples()
+{
+	graphDataList.clear();
+	calibrationRawDataPlotChannel->curve()->setData(nullptr);
+	calibrationSineDataPlotChannel->curve()->setData(nullptr);
+	calibrationCosineDataPlotChannel->curve()->setData(nullptr);
+	calibrationRawDataPlotWidget->replot();
 }
 
 void HarmonicCalibration::applyLineEditStyle(QLineEdit *widget)
 {
-	applyTextStyle(widget);
-	QString existingStyle = widget->styleSheet();
 	QString style = QString(R"css(
-								background-color: black;
-								border-radius: 4px;
-								border: none;
+								QLineEdit {
+									font-family: Open Sans;
+									font-size: 16px;
+									font-weight: normal;
+									text-align: right;
+									color: &&colorname&&;
+
+									background-color: black;
+									border-radius: 4px;
+									border: none;
+								}
+
+								QLineEdit:disabled {
+                                    background-color: #18181d;
+									color: #9c4600;
+                                }
 							)css");
-	widget->setStyleSheet(existingStyle + style);
+	style = style.replace(QString("&&colorname&&"), StyleHelper::getColor("CH0"));
+	widget->setStyleSheet(style);
 	widget->setFixedHeight(30);
 	widget->setContentsMargins(0, 0, 0, 0);
 	widget->setTextMargins(12, 4, 12, 4);
@@ -3000,7 +3103,10 @@ void HarmonicCalibration::applyComboBoxStyle(QComboBox *widget, const QString& s
 							font-size: 16px;
 							background-color: black;
 						}
-						QComboBox:disabled, QLineEdit:disabled { color: #555555; }
+						QComboBox:disabled, QLineEdit:disabled {
+							background-color: #18181d;
+							color: #9c4600;
+						}
 						QComboBox QAbstractItemView {
 							border: none;
 							color: transparent;
