@@ -50,6 +50,12 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_yCtrl->maxSpinbox()->setIncrementMode(MenuSpinbox::IS_FIXED);
 	m_yCtrl->minSpinbox()->setUnit("dB");
 	m_yCtrl->maxSpinbox()->setUnit("dB");
+	m_yCtrl->minSpinbox()->setMinValue(-1000);
+	m_yCtrl->maxSpinbox()->setMinValue(-1000);
+	m_yCtrl->minSpinbox()->setMaxValue(1000);
+	m_yCtrl->maxSpinbox()->setMaxValue(1000);
+	m_yCtrl->minSpinbox()->setScaleRange(1, 1);
+	m_yCtrl->maxSpinbox()->setScaleRange(1, 1);
 
 	MenuOnOffSwitch *m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), plotMenu, false);
 	m_autoscaler = new PlotAutoscaler(this);
