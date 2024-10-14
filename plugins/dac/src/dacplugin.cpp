@@ -6,6 +6,7 @@
 #include <QLabel>
 
 #include <iioutil/connectionprovider.h>
+#include <gui/deviceinfopage.h>
 
 using namespace scopy;
 using namespace scopy::dac;
@@ -41,8 +42,14 @@ bool DACPlugin::loadPage()
 {
 	m_page = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_page);
-	m_page->setLayout(lay);
-	m_page->hide(); // This just adds empty space in the page for now
+
+	ConnectionProvider *c = ConnectionProvider::GetInstance();
+	Connection *conn = c->open(m_param);
+	auto deviceInfoPage = new DeviceInfoPage(conn);
+	lay->addWidget(deviceInfoPage);
+	lay->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
+	c->close(m_param);
+
 	return true;
 }
 

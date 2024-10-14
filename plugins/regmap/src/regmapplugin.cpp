@@ -22,6 +22,7 @@
 #include <src/readwrite/iioregisterwritestrategy.hpp>
 #include <pluginbase/preferences.h>
 #include <gui/preferenceshelper.h>
+#include <gui/deviceinfopage.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
 #include <readwrite/fileregisterreadstrategy.hpp>
@@ -42,8 +43,15 @@ using namespace regmap;
 
 bool RegmapPlugin::loadPage()
 {
-	// TODO
 	m_page = new QWidget();
+	QVBoxLayout *lay = new QVBoxLayout(m_page);
+
+	ConnectionProvider *c = ConnectionProvider::GetInstance();
+	Connection *conn = c->open(m_param);
+	auto deviceInfoPage = new DeviceInfoPage(conn);
+	lay->addWidget(deviceInfoPage);
+	lay->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
+	c->close(m_param);
 
 	return true;
 }
