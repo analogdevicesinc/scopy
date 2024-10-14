@@ -408,7 +408,7 @@ void MarkerLabel::updateInfo(QList<MarkerController::MarkerInfo> markers)
 {
 	m_txt->setText(m_name);
 	for(auto m : markers) {
-		m_txt->append(m.name + ": " + m_mpf->format(m.peak.y, "db", 2) + " @ " +
+		m_txt->append(m.name + ": " + m_mpf->format(m.peak.y, "dB", 2) + " @ " +
 			      m_mpf->format(m.peak.x, "Hz", 3));
 	}
 }
