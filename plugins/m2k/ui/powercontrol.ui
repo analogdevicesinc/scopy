@@ -655,7 +655,6 @@ min-height: 30px;
 max-height: 30px;
 min-width: 200px;
 max-width: 200px;
-background-color: black;
 border-radius: 4px;
 }
 
@@ -689,7 +688,6 @@ min-width:100px;
 max-width:100px;
 qproperty-alignment: AlignCenter AlignCenter;
 margin-left: 0px;
-color: white;
 }
 
 QLabel#on:disabled {
@@ -703,7 +701,6 @@ max-height:30px;
 min-width:100px;
 max-width:100px;
 margin-left: 100px;
-color: white;
 qproperty-alignment: AlignCenter AlignCenter;
 }
 
@@ -902,7 +899,6 @@ QSlider::sub-page:horizontal {
   height: 40px;
   border-radius: 4px;
   background-color: #27b34f;
-  color: white;
   font-weight: bold;
 
   text-align: left;
@@ -1027,7 +1023,6 @@ QPushButton:disabled {
   height: 40px;
   border-radius: 4px;
   background-color: #27b34f;
-  color: white;
   font-weight: bold;
 
   text-align: left;

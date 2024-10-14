@@ -1116,7 +1116,6 @@ min-width: 64px;
                       <string notr="true">QPushButton {
 min-width: 280px;
 max-width: 280px;
-background-color: black;
 border-radius: 4px;
 }
 
@@ -1147,7 +1146,6 @@ min-width:140px;
 max-width:140px;
 qproperty-alignment: AlignCenter AlignCenter;
 margin-left: 0px;
-color: white;
 }
 
 QLabel#on:disabled {
@@ -1159,7 +1157,6 @@ margin-top: 0px;
 min-width:140px;
 max-width:140px;
 margin-left: 140px;
-color: white;
 qproperty-alignment: AlignCenter AlignCenter;
 }
 
@@ -1752,8 +1749,6 @@ color: rgba(255,255,255,51);
                       <widget class="QPushButton" name="pushButton_4">
                        <property name="styleSheet">
                         <string notr="true">QPushButton {
-color: white;
-background-color: black;
 
 font-size:14px;
 height: 30px;

@@ -75,15 +75,20 @@ scopy--m2k--DMM #widget_2,
 QMainWindow > .QWidget > .scopy--MenuHAnim {
     background-color: none;
 }
+/*
 QwtPlot,
 QwtPolarPlot,
 pv--view--Viewport,
+*/
 QWidget[plot_container="true"] {
-    background-color: &background_plot&;
+    background-color: &background_subtle&;
 }
 scopy--Sismograph {
     background-color: transparent;
 }
+QwtPlot,
+QwtPolarPlot,
+pv--view--Viewport,
 QwtPlotCanvas {
     background-color: &background_plot&;
 }
@@ -101,14 +106,14 @@ QwtThermo {
 scopy--BufferPreviewer {
  border: 1px solid &interactive_primary_idle&;
  alternate-background-color: &interactive_primary_disabled&;
- selection-background-color: &background_plot&;
+ selection-background-color: &background_subtle&;
  selection-color: &interactive_accent_idle&;
  color: &content_default&;
 }
 */
 QDial {
-    background-color: &background_plot&;
-    color: &interactive_primary_disabled&;
+    background-color: &background_subtle&;
+    color: &interactive_primary_idle&;
 }
 QTabWidget::tab-bar {
     left: 0;
@@ -145,10 +150,10 @@ QRadioButton::indicator {
     height: 14px;
     border: 2px solid;
     border-radius: 9px;
-    border-color: &interactive_primary_disabled&;
+    border-color: &interactive_primary_idle&;
 }
 QRadioButton::indicator:checked {
-    background-color: &interactive_primary_disabled&;
+    background-color: &interactive_primary_idle&;
 }
 QRadioButton::indicator:disabled {
     border-color: &interactive_subtle_disabled&;
@@ -180,12 +185,12 @@ QMessageBox QLabel {
 QMessageBox QPushButton {
     height: 20px;
     width: 120px;
-    background-color: &interactive_primary_disabled&;
+    background-color: &interactive_primary_idle&;
     color: &content_default&;
     font-size: 16px;
     font: bold;
     border-radius: 5px;
-    border-color: &interactive_primary_disabled&;
+    border-color: &interactive_primary_idle&;
     border-style: solid;
     border-width: 1px;
 }
@@ -208,7 +213,7 @@ QScrollArea {
     border: 0px;
 }
 QScrollBar:vertical {
-    background: &background_primary&;
+    background: &background_subtle&;
     max-width: 8px;
 }
 QScrollBar::handle:vertical {
@@ -231,7 +236,7 @@ QScrollBar::sub-line:vertical {
     background: none;
 }
 QScrollBar:horizontal {
-    background: &background_primary&;
+    background: &background_subtle&;
     max-height: 6px;
     border-radius: 3px;
 }
@@ -254,11 +259,13 @@ QScrollBar::sub-line:horizontal {
     border: none;
     background: none;
 }
+
 QDialog {
-    background-color: &content_inverse&;
+    background-color: &background_subtle&;
 }
+
 ScopyAboutDialog QPushButton {
-    background-color: &interactive_primary_disabled&;
+    background-color: &interactive_primary_idle&;
     color: &content_default&;
 }
 QTextBrowser#aboutTextBrowser {
@@ -292,14 +299,14 @@ QLabel[general_settings_label="true"] {
     font-weight: normal;
 }
 QFrame[blue_line="true"] {
-    border: 2px solid &interactive_primary_disabled&;
+    border: 2px solid &interactive_primary_idle&;
 }
 QFrame[drag_widget="true"] {
     border-image: url(:/gui/icons/&icon_theme_folder&/icons/menu.svg);
 }
 
 QWidget[device_page="true"] {
-    background-color: &background_plot&;
+    background-color: &background_subtle&;
 }
 QWidget[device_page="true"] QPushButton[device_page="true"] {
     min-height: 30px;
@@ -309,16 +316,16 @@ QWidget[device_page="true"] QPushButton[device_page="true"] {
 }
 
 QPushButton[blue_button="true"] {
-    background-color: &interactive_primary_disabled&;
-    color: &content_default&;
+    background-color: &interactive_primary_idle&;
+    color: &content_inverse&;
     border-radius: 4px;
     font-size: 14px;
 }
 QPushButton[blue_button="true"]:hover {
-    background-color: &interactive_primary_idle&;
+    background-color: &interactive_primary_hover&;
 }
 QPushButton[blue_button="true"]:pressed {
-    background-color: &interactive_primary_idle&;
+    background-color: &interactive_primary_pressed&;
 }
 QPushButton[blue_button="true"]:disabled {
     background-color: &interactive_subtle_disabled&;
@@ -400,7 +407,7 @@ QWidget[tool_launcher_custom_widget="true"][selected="true"] {
 QWidget[menu_button="true"][selected="true"] {
     opacity: 0.6;
     border-radius: 4px;
-    background-color: &background_plot&;
+    background-color: &background_subtle&;
 }
 QWidget[menu_button="true"][selected="false"] {
     background-color: transparent;
@@ -411,10 +418,10 @@ QWidget#page {
 }
 QWidget#stackedWidgetPage1 {
     border-radius: 12px;
-    background-color: &background_plot&;
+    background-color: &background_subtle&;
 }
 .scopy--m2k--StackedHomepage#stackedWidget {
-    background-color: &background_plot&;
+    background-color: &background_subtle&;
 }
 QFrame[line_separator="true"] {
     background-color: #13&color_default_hexcode&;
@@ -536,14 +543,14 @@ scopy--ChannelWidget QCheckBox#box {
 scopy--ChannelWidget QCheckBox#box::indicator {
     width: 14px;
     height: 14px;
-    border: 2px solid &background_plot&;
+    border: 2px solid &interactive_subtle_idle&;
     border-radius: 9px;
 }
 scopy--ChannelWidget QCheckBox#box::indicator:unchecked {
     background-color: transparent;
 }
 scopy--ChannelWidget QCheckBox#box::indicator:checked {
-    background-color: &background_plot&;
+    background-color: &background_subtle&;
 }
 scopy--ChannelWidget QPushButton#name {
     font-size: 14px;
@@ -582,7 +589,7 @@ scopy--ChannelWidget QFrame#line {
     border: 2px solid transparent;
 }
 scopy--ChannelWidget QFrame#line[selected="true"] {
-    border: 2px solid &background_plot&;
+    border: 2px solid &interactive_subtle_idle&;
 }
 scopy--DropdownSwitchList {
     height: 30px;
@@ -592,7 +599,7 @@ scopy--DropdownSwitchList {
     padding-left: 20px;
 }
 scopy--DropdownSwitchList:editable {
-    background-color: &background_plot&;
+    background-color: &background_subtle&;
     color: &content_default&;
 }
 scopy--DropdownSwitchList::drop-down {
@@ -604,17 +611,17 @@ scopy--DropdownSwitchList::drop-down {
 }
 scopy--DropdownSwitchList QAbstractItemView {
     border: 0px;
-    background-color: &background_plot&;
+    background-color: &background_subtle&;
     font-size: 18px;
     outline: 0px;
-    border-left: 0px solid &background_plot&;
+    border-left: 0px solid &background_subtle&;
 }
 scopy--DropdownSwitchList QAbstractItemView::item {
     color: &content_default&;
     height: 60px;
 }
 scopy--DropdownSwitchList QAbstractItemView::item:hover {
-    background-color: &background_plot&;
+    background-color: &background_subtle&;
     font-weight: bold;
     border-bottom: 0px solid none;
 }
@@ -623,12 +630,12 @@ scopy--DropdownSwitchList QHeaderView {
 }
 scopy--DropdownSwitchList QHeaderView:section {
     color: #99&color_default_hexcode&;
-    background-color: &background_plot&;
+    background-color: &background_subtle&;
     border: 0px;
     font: 14px;
 }
 scopy--DropdownSwitchList QCheckBox {
-    background-color: &background_plot&;
+    background-color: &background_subtle&;
 }
 scopy--DropdownSwitchList QCheckBox::indicator {
     width: 16px;
@@ -656,13 +663,13 @@ QPushButton[userNote="true"]:checked {
 }
 
 *[has_frame="true"] {
-    border-top: 2px solid &background_plot&;
-    border-right: 2px solid &background_plot&;
-    border-left: 2px solid &background_plot&;
+    border-top: 2px solid &interactive_subtle_idle&;
+    border-right: 2px solid &interactive_subtle_idle&;
+    border-left: 2px solid &interactive_subtle_idle&;
 }
 
 *[has_bottom_border="true"] {
-    border-bottom: 2px solid &background_plot&;
+    border-bottom: 2px solid &interactive_subtle_idle&;
 }
 
 *[is_selected="true"] {

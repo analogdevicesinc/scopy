@@ -8,6 +8,11 @@ QWidget {
 
 *:focus {
     outline: &interactive_focus&;
+
+}
+
+QDialog {
+    background-color: &background_primary&;
 }
 
 QLineEdit {
@@ -47,7 +52,7 @@ QCheckBox::indicator::unchecked::disabled {
 }
 QCheckBox::indicator::unchecked {
     border: &border_width_interactive& solid &interactive_subtle_idle&;
-    background-color: &content_inverse&;
+    background-color: &background_subtle&;
     image: none;
 }
 
@@ -81,11 +86,13 @@ QPushButton::pressed {
 
 QComboBox::disabled {
     color: &interactive_subtle_disabled&;
-    border: &border_width_interactive& solid &interactive_subtle_disabled&;
+    border: &border_width& solid &interactive_subtle_disabled&;
+    border-bottom: &border_width_interactive& solid &interactive_subtle_idle&;
 }
 QComboBox {
     height: &unit_2&;
-    border: &border_width_interactive& solid &interactive_subtle_idle&;
+    border: &border_width& solid &interactive_subtle_idle&;
+    border-bottom: &border_width_interactive& solid &interactive_subtle_idle&;
     border-radius: &radius_1&;
     background-color: &background_primary&;
     color: &content_default&;
@@ -247,7 +254,7 @@ QFrame[subsection_line="true"] {
     border: 1px solid &content_silent&;
 }
 scopy--BufferPreviewer {
-    border: 1px solid &interactive_primary_idle&;
+    border: 1px solid &interactive_primary_pressed&;
     alternate-background-color: &interactive_primary_disabled&;
     selection-background-color: &background_plot&;
     selection-color: &interactive_accent_idle&;
