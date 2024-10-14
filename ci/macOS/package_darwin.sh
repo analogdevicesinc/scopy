@@ -47,16 +47,11 @@ m2kid=${m2krpath#"@rpath/"}
 cp ${STAGING_AREA_DEPS}/lib/libm2k.* ./Scopy.app/Contents/Frameworks
 install_name_tool -id @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/Frameworks/${m2kid}
 
-
-echo "### Check available python version"
-for version in 3.8 3.9 3.10 3.11 3.12
-do
-	if [ -e $(brew --prefix python3)/Frameworks/Python.framework/Versions/$version/Python ] ; then
-		pythonpath=$(brew --prefix python3)/Frameworks/Python.framework/Versions/$version/Python
-		pyversion=$version
-		pythonidrpath="$(otool -D $pythonpath | head -2 |  tail -1)"
-	fi
-done
+echo "### Get python version"
+brewprefix=$(brew --prefix python3)
+pyversion=${brewprefix##*@} # extract the text after the last '@'
+pythonpath=$brewprefix/Frameworks/Python.framework/Versions/$pyversion/Python
+pythonidrpath="$(otool -D $pythonpath | head -2 |  tail -1)"
 
 if [ -z $pyversion ] ; then
 	echo "No Python 3.8, 3.9, 3.10, 3.11, 3.12 paths found"
