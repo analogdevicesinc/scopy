@@ -35,36 +35,36 @@ HorizontalSpinBox::HorizontalSpinBox(QString header, double initialValue, QStrin
         lineEditLayout->setMargin(0);
         lineEditLayout->setSpacing(0);
 
-        QLabel *unitLabel = new QLabel(m_unit, controlWidget);
-        applyUnitLabelStyle(unitLabel);
+        m_unitLabel = new QLabel(m_unit, controlWidget);
+        applyUnitLabelStyle(m_unitLabel);
 
         m_lineEdit->setTextMargins(12, 4, 0, 4);
 
         lineEditLayout->addWidget(m_lineEdit);
-        lineEditLayout->addWidget(unitLabel);
+        lineEditLayout->addWidget(m_unitLabel);
         controlLayout->addWidget(lineEditContainer);
     }
     else{
         controlLayout->addWidget(m_lineEdit);
     }
     
-    QPushButton *minusButton = new QPushButton(controlWidget);
-    minusButton->setIcon(QIcon(":/admt/minus.svg"));
-    applyPushButtonStyle(minusButton);
+    m_minusButton = new QPushButton(controlWidget);
+    m_minusButton->setIcon(QIcon(":/admt/minus.svg"));
+    applyPushButtonStyle(m_minusButton);
 
-    QPushButton *plusButton = new QPushButton(controlWidget);
-    plusButton->setIcon(QIcon(":/admt/plus.svg"));
-    applyPushButtonStyle(plusButton, 0, 4, 0, 4);
+    m_plusButton = new QPushButton(controlWidget);
+    m_plusButton->setIcon(QIcon(":/admt/plus.svg"));
+    applyPushButtonStyle(m_plusButton, 0, 4, 0, 4);
 
-    controlLayout->addWidget(minusButton);
-    controlLayout->addWidget(plusButton);
+    controlLayout->addWidget(m_minusButton);
+    controlLayout->addWidget(m_plusButton);
 
     container->addWidget(controlWidget);
 
     setValue(m_value);
     connect(m_lineEdit, SIGNAL(editingFinished()), SLOT(onLineEditTextEdited()));
-    connect(minusButton, SIGNAL(clicked()), SLOT(onMinusButtonPressed()));
-    connect(plusButton, SIGNAL(clicked()), SLOT(onPlusButtonPressed()));
+    connect(m_minusButton, SIGNAL(clicked()), SLOT(onMinusButtonPressed()));
+    connect(m_plusButton, SIGNAL(clicked()), SLOT(onPlusButtonPressed()));
 }
 
 void HorizontalSpinBox::onMinusButtonPressed()
@@ -97,17 +97,37 @@ void HorizontalSpinBox::setValue(double value)
     m_lineEdit->setText(QString::number(value));
 }
 
+void HorizontalSpinBox::setEnabled(double value)
+{
+    m_lineEdit->setEnabled(value);
+    m_minusButton->setEnabled(value);
+    m_plusButton->setEnabled(value);
+    if(QString::compare(m_unit, "") != 0){
+        applyUnitLabelStyle(m_unitLabel, value);
+    }
+}
+
 void HorizontalSpinBox::applyLineEditStyle(QLineEdit *widget)
 {
     QString style = QString(R"css(
-                                background-color: black;
-                                font-family: Open Sans;
-								font-size: 16px;
-                                color: &&colorname&&;
-                                border: none;
-                                border-top-left-radius: 4px;
-                                border-bottom-left-radius: 4px;
-                                qproperty-frame: false;
+                                QLineEdit {
+									font-family: Open Sans;
+									font-size: 16px;
+									font-weight: normal;
+									text-align: right;
+									color: &&colorname&&;
+                                    border-top-left-radius: 4px;
+                                    border-bottom-left-radius: 4px;
+
+									background-color: black;
+									border: none;
+                                    qproperty-frame: false;
+								}
+
+								QLineEdit:disabled {
+                                    background-color: #18181d;
+									color: #9c4600;
+                                }
                                 )css");
     style = style.replace(QString("&&colorname&&"), StyleHelper::getColor("CH0"));
     widget->setStyleSheet(style);
@@ -120,16 +140,22 @@ void HorizontalSpinBox::applyLineEditStyle(QLineEdit *widget)
 void HorizontalSpinBox::applyPushButtonStyle(QPushButton *widget, int topLeftBorderRadius, int topRightBorderRadius, int bottomLeftBorderRadius, int bottomRightBorderRadius)
 {
     QString style = QString(R"css(
-                                background-color: black;
-                                font-family: Open Sans;
-								font-size: 32px;
-								font-weight: bold;
-                                text-align: center center;
-                                color: &&colorname&&;
-                                border-top-left-radius: &&topLeftBorderRadius&&px;
-                                border-top-right-radius: &&topRightBorderRadius&&px;
-                                border-bottom-left-radius: &&bottomLeftBorderRadius&&px;
-                                border-bottom-right-radius: &&bottomRightBorderRadius&&px;
+                                QPushButton{
+                                    background-color: black;
+                                    font-family: Open Sans;
+                                    font-size: 32px;
+                                    font-weight: bold;
+                                    text-align: center center;
+                                    color: &&colorname&&;
+                                    border-top-left-radius: &&topLeftBorderRadius&&px;
+                                    border-top-right-radius: &&topRightBorderRadius&&px;
+                                    border-bottom-left-radius: &&bottomLeftBorderRadius&&px;
+                                    border-bottom-right-radius: &&bottomRightBorderRadius&&px;
+                                }
+                                QPushButton:disabled{
+                                    background-color: #18181d;
+									color: #2d3d9c;
+                                }
                                 )css");
     style = style.replace(QString("&&colorname&&"), StyleHelper::getColor("ScopyBlue"));
     style = style.replace(QString("&&topLeftBorderRadius&&"), QString::number(topLeftBorderRadius));
@@ -141,17 +167,24 @@ void HorizontalSpinBox::applyPushButtonStyle(QPushButton *widget, int topLeftBor
     widget->setFixedWidth(38);
 }
 
-void HorizontalSpinBox::applyUnitLabelStyle(QLabel *widget)
+void HorizontalSpinBox::applyUnitLabelStyle(QLabel *widget, bool isEnabled)
 {
     QString style = QString(R"css(
-                                background-color: black;
+                                background-color: &&backgroundcolor&&;
                                 font-family: Open Sans;
 								font-size: 16px;
                                 text-align: right;
                                 color: &&colorname&&;
                                 border: none;
                                 )css");
-    style = style.replace(QString("&&colorname&&"), StyleHelper::getColor("CH0"));
+    if(isEnabled){
+        style = style.replace(QString("&&backgroundcolor&&"), "black");
+        style = style.replace(QString("&&colorname&&"), StyleHelper::getColor("CH0"));
+    }
+    else{
+        style = style.replace(QString("&&backgroundcolor&&"), "#18181d");
+        style = style.replace(QString("&&colorname&&"), "#9c4600");
+    }
     widget->setStyleSheet(style);
     widget->setFixedHeight(30);
     widget->setAlignment(Qt::AlignRight);
