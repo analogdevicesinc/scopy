@@ -119,7 +119,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	connect(printBtn, &QPushButton::clicked, this, [=, this]() {
 		QList<PlotWidget *> plotList;
 		plotList.push_back(m_monitorPlot->plot());
-		printplotManager->printPlots(plotList, "DataLogger");
+		printplotManager->printPlots(plotList, "Data Logger");
 	});
 
 	/////////////////////text values ////////////
@@ -146,7 +146,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	////////////////////////settings //////////////
 	m_dataMonitorSettings = new DataMonitorSettings(m_monitorPlot);
 	// TODO GET SETTINGS NAME FROM UTILS
-	m_dataMonitorSettings->init("DataLogger", StyleHelper::getColor("ScopyBlue"));
+	m_dataMonitorSettings->init("Data Logger", StyleHelper::getColor("ScopyBlue"));
 
 	tool->rightStack()->add(DataMonitorUtils::getToolSettingsId(), m_dataMonitorSettings);
 
