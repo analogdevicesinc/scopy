@@ -1,4 +1,5 @@
 #include "toolmenu.h"
+#include <QScrollBar>
 
 using namespace scopy;
 
@@ -20,10 +21,11 @@ ToolMenu::ToolMenu(QWidget *parent)
 	wScroll->setLayout(m_layScroll);
 	m_scroll->setWidgetResizable(true);
 	m_scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	m_scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	m_scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	m_scroll->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);
 
 	m_scroll->setWidget(wScroll);
+	m_scroll->verticalScrollBar()->setVisible(false);
 
 	lay->setMargin(0);
 	lay->setSpacing(10);
@@ -33,6 +35,8 @@ ToolMenu::ToolMenu(QWidget *parent)
 	m_layScroll->addSpacerItem(m_spacer);
 
 	lay->addWidget(m_scroll);
+
+	connect(m_scroll->verticalScrollBar(), &QScrollBar::rangeChanged, this, &ToolMenu::onScrollRangeChanged);
 }
 
 ToolMenu::~ToolMenu() {}
@@ -80,5 +84,18 @@ void ToolMenu::colapseAll()
 QButtonGroup *ToolMenu::btnGroup() const { return m_btnGroup; }
 
 QString ToolMenu::widgetName(QWidget *w) { return m_widgetMap.key(w, ""); }
+
+// Used to display the scrollbar when needed and to maintain its size in the scroll area when not needed.
+// We chose this approach because for the Qt::ScrollBarAsNeeded policy the size of the scrollball cannot be retained
+// with Util::retainWidgetSizeWhenHidden because the resizing of the scrollbar is done dynamically (withoud using the
+// show/hide default functions).
+void ToolMenu::onScrollRangeChanged(int min, int max)
+{
+	if(max > min) {
+		m_scroll->verticalScrollBar()->setVisible(true);
+	} else {
+		m_scroll->verticalScrollBar()->setVisible(false);
+	}
+}
 
 #include "moc_toolmenu.cpp"
