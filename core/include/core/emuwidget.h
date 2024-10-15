@@ -31,12 +31,15 @@ private Q_SLOTS:
 	void onEnableDemoClicked();
 	void browseFile(QLineEdit *lineEditPath);
 
+Q_SIGNALS:
+	void demoEnabled(bool en);
+
 private:
 	QWidget *createDemoOptWidget(QWidget *parent);
 	QWidget *createXmlPathWidget(QWidget *parent);
 	QWidget *createRxTxDevWidget(QWidget *parent);
 	QWidget *createUriWidget(QWidget *parent);
-	QWidget *createEnBtnWidget(QWidget *parent);
+	void initEnBtn(QWidget *parent);
 	void init();
 	void enGenericOptWidget(QWidget *xmlPathWidget, QWidget *rxTxDevWidget, QString crtOpt);
 	QStringList createArgList();
@@ -49,8 +52,8 @@ private:
 	void getEmuOptions();
 	void configureOption(QString option);
 	void getJsonConfiguration();
+	void setEnableDemo(bool en);
 
-	QWidget *m_emuWidget;
 	QComboBox *m_demoOptCb;
 	MenuLineEdit *m_xmlPathEdit;
 	MenuLineEdit *m_rxTxDevEdit;
