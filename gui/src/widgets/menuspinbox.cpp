@@ -100,7 +100,6 @@ void MenuSpinbox::layoutVertically(bool left)
 		lay->addLayout(btnLay);
 	}
 
-
 	Style::setStyle(m_label, style::properties::label::subtle);
 
 	int size = Style::getDimension(json::global::unit_2_5);
@@ -121,7 +120,7 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	lineLay->setMargin(0);
 	setLayout(lineLay);
 
-	       // Elements layout
+	// Elements layout
 	auto lay = new QHBoxLayout(this);
 	lay->setSpacing(5);
 	lay->setMargin(0);
@@ -234,7 +233,7 @@ void MenuSpinbox::userInput(QString s)
 	s = s.simplified();
 	s.replace(" ", "");
 
-	       // find last digit position
+	// find last digit position
 	int i = findLastDigit(s);
 	QString nr = s.left(
 		i + 1); // interpret number up to that digit - this makes sure you can also set stuff like 2e6 or 2M
