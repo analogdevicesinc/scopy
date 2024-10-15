@@ -68,6 +68,7 @@ private:
 	QString m_initText;
 	QWidget *tool;
 	QWidget *tool2;
+	QWidget *tool3;
 	QLineEdit *edit;
 	int renameCnt;
 	ApiObject *m_pluginApi;
