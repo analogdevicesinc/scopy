@@ -438,17 +438,20 @@ int ADMTController::calculate_angle_error(vector<double> angle_meas, vector<doub
 
     // Find the min/max error for offset correction
     auto minmax = minmax_element(angle_error_ret.begin(), angle_error_ret.end());
-    double angle_err_offset = (*minmax.first + *minmax.second) / 2;
+    // double angle_err_offset = (*minmax.first + *minmax.second) / 2;
 
-    // Subtract the error offset
-    for (int i = 0; i < angle_meas.size(); i++) {
-        angle_error_ret[i] -= angle_err_offset;
+    // Wrap the angle errors to [-π, π]
+    for (int i = 0; i < angle_error_ret.size(); i++) {
+        angle_error_ret[i] = fmod(angle_error_ret[i] + M_PI, 2 * M_PI);
+        if (angle_error_ret[i] < 0)
+            angle_error_ret[i] += 2 * M_PI;
+        angle_error_ret[i] -= M_PI; // Wrap to [-π, π]
     }
 
-    // Convert angle errors back to degrees
-    for (int i = 0; i < angle_meas.size(); i++) {
-        angle_error_ret[i] *= (180.0 / M_PI);
-    }
+    // // Convert angle errors back to degrees
+    // for (int i = 0; i < angle_error_ret.size(); i++) {
+    //     angle_error_ret[i] *= (180.0 / M_PI);
+    // }
 
     // Find maximum absolute angle error
     *max_angle_err = max(fabs(*minmax.first), fabs(*minmax.second)) * (180.0 / M_PI);
@@ -779,7 +782,7 @@ double ADMTController::getActualHarmonicRegisterValue(uint16_t registerValue, co
         uint16_t extractedValue = registerValue & 0x0FFF;
 
         // Convert the extracted value by applying the LSB
-        result = extractedValue * LSB;
+        result = extractedValue * LSB; 
     } 
     else {
         // Indicating an error or invalid key
