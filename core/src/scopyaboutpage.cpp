@@ -30,6 +30,8 @@
 #include <QVBoxLayout>
 #include <style.h>
 
+#include <QLineEdit>
+#include <QScrollArea>
 #include <stylehelper.h>
 #include <verticaltabwidget.h>
 
