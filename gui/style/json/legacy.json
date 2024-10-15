@@ -43,6 +43,7 @@
 "padding_1": "6",
 "padding_2": "10",
 "border_width": "0",
-"run_button_color": "#27B34F"
+"run_button_color": "#27B34F",
+"qss_properties_button_borderButton": "qss_properties_button_basicButton"
 }
 

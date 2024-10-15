@@ -89,6 +89,7 @@ void Style::init(QString theme)
 
 void Style::setStyle(QWidget *widget, const char *style, QVariant value, bool force)
 {
+	style = replaceProperty(style);
 	if(!m_styleMap->contains(style)) {
 		qCritical("Style: Failed to set style: %s to widget: %s", widget->objectName().toStdString().c_str(),
 			  style);
@@ -217,6 +218,19 @@ void Style::setBackgroundColor(QWidget *widget, QString color, bool extend_to_ch
 QColor Style::getColor(const char *key) { return QColor(getAttribute(key)); }
 
 int Style::getDimension(const char *key) { return getAttribute(key).toInt(); }
+
+const char *Style::replaceProperty(const char *prop)
+{
+	for(const QString &key : m_theme_json->object().keys()) {
+		if(prop == key) {
+			QJsonValue value = m_theme_json->object().value(key);
+			prop = value.toString().toLocal8Bit().data();
+			return prop;
+		}
+	}
+
+	return prop;
+}
 
 QString Style::replaceAttributes(QString style, int calls_limit)
 {

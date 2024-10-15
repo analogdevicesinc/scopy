@@ -22,6 +22,7 @@ private:
 	void genrateStyle();
 	QString getAllProperties();
 	static bool isProperty(QString style);
+	static const char *replaceProperty(const char *prop);
 
 public:
 	static Style *GetInstance();
