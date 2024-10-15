@@ -1,5 +1,6 @@
 #include "testplugin.h"
 
+#include "styletool.h"
 #include "testtool.h"
 #include "tutorialoverlay.h"
 
@@ -97,6 +98,7 @@ void TestPlugin::loadToolList()
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1second", "Second Plugin",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/tool_io.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("teststyle", "Style Preview", ":/gui/icons/home.svg"));
 }
 
 bool TestPlugin::loadExtraButtons()
@@ -205,6 +207,12 @@ bool TestPlugin::onConnect()
 	m_toolList[1]->setTool(tool2);
 	m_toolList[1]->setEnabled(true);
 	m_toolList[1]->setRunBtnVisible(true);
+
+	tool3 = new StyleTool();
+
+	m_toolList[2]->setTool(tool3);
+	m_toolList[2]->setEnabled(true);
+	m_toolList[2]->setRunBtnVisible(false);
 
 	m_pluginApi = new TestPlugin_API(this);
 	m_pluginApi->setObjectName(m_name);
@@ -338,7 +346,7 @@ void TestPlugin::initMetadata()
 	{
 	   "priority":2,
 	   "category":[
-	      "test"
+	      "iio"
 	   ]
 	}
 )plugin");
