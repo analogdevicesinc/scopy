@@ -129,7 +129,6 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	filesizeContainer->setProperty("tutorial_name", "FILESIZE");
 	m_fileSizeSpin =
 		new MenuSpinbox("File size", 0, "samples", 16, 16 * 1024 * 1024, false, false, filesizeContainer);
-	m_fileSizeSpin->setLineVisible(false);
 	m_fileSizeSpin->setIncrementMode(MenuSpinbox::IS_FIXED);
 	StyleHelper::BackgroundWidget(m_fileSizeSpin);
 	connect(
