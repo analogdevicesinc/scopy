@@ -9,7 +9,6 @@
 #include <QLoggingCategory>
 #include <stylehelper.h>
 
-#include <filesystem>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -22,56 +21,58 @@ EmuWidget::EmuWidget(QWidget *parent)
 	, m_enableDemo(false)
 	, m_emuProcess(nullptr)
 	, m_workingDir("")
+	, m_enDemoBtn(nullptr)
 {
-	QHBoxLayout *layout = new QHBoxLayout(this);
+	QGridLayout *layout = new QGridLayout(this);
 	layout->setSpacing(10);
 	setLayout(layout);
-	QWidget *vWidget = new QWidget(this);
-	QVBoxLayout *vLay = new QVBoxLayout(vWidget);
-	vLay->setSpacing(10);
-	vLay->setMargin(0);
-	vWidget->setLayout(vLay);
 
 	getJsonConfiguration();
 	getEmuOptions();
 
-	m_emuWidget = new QWidget(vWidget);
-	QGridLayout *emuWidgetLay = new QGridLayout(m_emuWidget);
+	QWidget *emuWidget = new QWidget(this);
+	QGridLayout *emuWidgetLay = new QGridLayout(emuWidget);
 	emuWidgetLay->setSpacing(10);
-	emuWidgetLay->setMargin(0);
+	StyleHelper::RoundedCornersWidget(emuWidget, "emuWidgetTab");
 
-	QLabel *demoLabel = new QLabel("Demo option:", m_emuWidget);
+	QLabel *demoLabel = new QLabel("Demo option", emuWidget);
 	StyleHelper::MenuSmallLabel(demoLabel);
-	QWidget *demoOptWidget = createDemoOptWidget(m_emuWidget);
+	QWidget *demoOptWidget = createDemoOptWidget(emuWidget);
 	emuWidgetLay->addWidget(demoLabel, 0, 0);
 	emuWidgetLay->addWidget(demoOptWidget, 0, 1);
+	connect(this, &EmuWidget::demoEnabled, demoLabel, &QWidget::setDisabled);
+	connect(this, &EmuWidget::demoEnabled, demoOptWidget, &QWidget::setDisabled);
 
-	QLabel *xmlLabel = new QLabel("XML path:", m_emuWidget);
+	QLabel *xmlLabel = new QLabel("XML path", emuWidget);
 	StyleHelper::MenuSmallLabel(xmlLabel);
-	QWidget *xmlPathWidget = createXmlPathWidget(m_emuWidget);
+	QWidget *xmlPathWidget = createXmlPathWidget(emuWidget);
 	emuWidgetLay->addWidget(xmlLabel, 1, 0);
 	emuWidgetLay->addWidget(xmlPathWidget, 1, 1);
+	connect(this, &EmuWidget::demoEnabled, xmlLabel, &QWidget::setDisabled);
+	connect(this, &EmuWidget::demoEnabled, xmlPathWidget, &QWidget::setDisabled);
 
-	QLabel *rxTxLabel = new QLabel("RX/TX Devices:", m_emuWidget);
+	QLabel *rxTxLabel = new QLabel("RX/TX Devices", emuWidget);
 	StyleHelper::MenuSmallLabel(rxTxLabel);
-	QWidget *rxTxDevWidget = createRxTxDevWidget(m_emuWidget);
+	QWidget *rxTxDevWidget = createRxTxDevWidget(emuWidget);
 	emuWidgetLay->addWidget(rxTxLabel, 2, 0);
 	emuWidgetLay->addWidget(rxTxDevWidget, 2, 1);
+	connect(this, &EmuWidget::demoEnabled, rxTxLabel, &QWidget::setDisabled);
+	connect(this, &EmuWidget::demoEnabled, rxTxDevWidget, &QWidget::setDisabled);
 
-	QLabel *uriLabel = new QLabel("Uri:", m_emuWidget);
+	QLabel *uriLabel = new QLabel("Uri", emuWidget);
 	StyleHelper::MenuSmallLabel(uriLabel);
-	QWidget *uriWidget = createUriWidget(m_emuWidget);
+	QWidget *uriWidget = createUriWidget(emuWidget);
 	emuWidgetLay->addWidget(uriLabel, 3, 0);
 	emuWidgetLay->addWidget(uriWidget, 3, 1);
+	connect(this, &EmuWidget::demoEnabled, uriLabel, &QWidget::setDisabled);
 
-	QWidget *btnWidget = createEnBtnWidget(vWidget);
+	m_uriMsgLabel = new QLabel(emuWidget);
+	m_uriMsgLabel->setVisible(false);
+	emuWidgetLay->addWidget(m_uriMsgLabel, 4, 1);
 
-	vLay->addWidget(m_emuWidget);
-	vLay->addWidget(btnWidget);
-	vLay->addItem(new QSpacerItem(0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding));
-
-	layout->addWidget(vWidget);
-	layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+	layout->addWidget(emuWidget, 0, 0);
+	layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 1);
+	layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding), 1, 0);
 
 	enGenericOptWidget(xmlPathWidget, rxTxDevWidget, m_demoOptCb->currentText());
 	connect(m_demoOptCb, &QComboBox::currentTextChanged, this,
@@ -128,6 +129,7 @@ void EmuWidget::enGenericOptWidget(QWidget *xmlPathWidget, QWidget *rxTxDevWidge
 
 void EmuWidget::setStatusMessage(QString msg)
 {
+	m_uriMsgLabel->setHidden(msg.isEmpty());
 	m_uriMsgLabel->clear();
 	m_uriMsgLabel->setText(msg);
 }
@@ -142,12 +144,11 @@ void EmuWidget::onEnableDemoClicked()
 			stopEnableBtn("Enable Demo");
 			return;
 		}
-		m_emuWidget->setEnabled(false);
 		stopEnableBtn("Disable Demo");
 		if(m_uriEdit->edit()->text().isEmpty()) {
 			m_uriEdit->edit()->setText("ip:127.0.0.1");
 		}
-		m_enableDemo = !m_enableDemo;
+		setEnableDemo(!m_enableDemo);
 		Q_EMIT emuDeviceAvailable(m_uriEdit->edit()->text());
 	} else {
 		killEmuProcess();
@@ -215,9 +216,8 @@ bool EmuWidget::startIioEmuProcess(QString processPath, QStringList arg)
 void EmuWidget::killEmuProcess()
 {
 	m_emuProcess->kill();
-	m_emuWidget->setEnabled(true);
 	stopEnableBtn("Enable Demo");
-	m_enableDemo = !m_enableDemo;
+	setEnableDemo(!m_enableDemo);
 }
 
 void EmuWidget::getEmuOptions()
@@ -300,6 +300,12 @@ void EmuWidget::getJsonConfiguration()
 	}
 }
 
+void EmuWidget::setEnableDemo(bool en)
+{
+	m_enableDemo = en;
+	Q_EMIT demoEnabled(en);
+}
+
 void EmuWidget::browseFile(QLineEdit *lineEditPath)
 {
 	QString filePath =
@@ -374,27 +380,19 @@ QWidget *EmuWidget::createUriWidget(QWidget *parent)
 	layout->setSpacing(10);
 	w->setLayout(layout);
 
-	QWidget *msgUriWidget = new QWidget(w);
-	msgUriWidget->setLayout(new QVBoxLayout(msgUriWidget));
-	msgUriWidget->layout()->setMargin(0);
-	msgUriWidget->layout()->setSpacing(0);
-	m_uriEdit = new MenuLineEdit(msgUriWidget);
+	m_uriEdit = new MenuLineEdit(w);
 	m_uriEdit->edit()->setPlaceholderText("ip:127.0.0.1");
-	m_uriMsgLabel = new QLabel(msgUriWidget);
-	msgUriWidget->layout()->addWidget(m_uriEdit);
-	msgUriWidget->layout()->addWidget(m_uriMsgLabel);
+	connect(this, &EmuWidget::demoEnabled, m_uriEdit, &QWidget::setDisabled);
 
-	layout->addWidget(msgUriWidget);
+	initEnBtn(w);
+
+	layout->addWidget(m_uriEdit);
+	layout->addWidget(m_enDemoBtn);
 	return w;
 }
 
-QWidget *EmuWidget::createEnBtnWidget(QWidget *parent)
+void EmuWidget::initEnBtn(QWidget *parent)
 {
-	QWidget *w = new QWidget(parent);
-	w->setLayout(new QHBoxLayout(w));
-	w->layout()->setMargin(0);
-	w->layout()->setAlignment(Qt::AlignRight);
-
 	m_enDemoBtn = new AnimationPushButton(parent);
 	m_enDemoBtn->setText("Enable demo");
 	StyleHelper::BlueButton(m_enDemoBtn);
@@ -403,9 +401,6 @@ QWidget *EmuWidget::createEnBtnWidget(QWidget *parent)
 	loadingIcon->setFileName(":/gui/loading.gif");
 	m_enDemoBtn->setAnimation(loadingIcon);
 	m_enDemoBtn->setAutoDefault(true);
-
-	w->layout()->addWidget(m_enDemoBtn);
-	return w;
 }
 
 void EmuWidget::showEvent(QShowEvent *event)
