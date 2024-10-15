@@ -86,8 +86,6 @@ void MonitorSelectionMenu::generateDeviceSection(QString device, bool import)
 
 	DataMonitorStyleHelper::MonitorSelectionMenuMenuCollapseSectionStyle(devMonitorsSection);
 
-	devMonitorsSection->header()->setChecked(false);
-
 	deviceMap.insert(device, devMonitorsSection);
 }
 
