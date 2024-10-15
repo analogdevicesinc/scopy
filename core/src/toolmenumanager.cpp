@@ -24,6 +24,13 @@ void ToolMenuManager::addMenuItem(QString deviceId, QString devName, QList<ToolM
 	QString param;
 	MenuSectionCollapseWidget *devSection = new MenuSectionCollapseWidget(
 		devName, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_COMPOSITEWIDGET, m_toolMenu);
+	QLayoutItem *sItem = devSection->layout()->itemAt(0);
+	if(sItem) {
+		MenuSectionWidget *sWidget = dynamic_cast<MenuSectionWidget *>(sItem->widget());
+		if(sWidget) {
+			sWidget->layout()->setMargin(0);
+		}
+	}
 	devSection->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	if(!tools.isEmpty())
 		param = tools.at(0)->param();
