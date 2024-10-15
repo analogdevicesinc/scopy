@@ -146,11 +146,7 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	editLay->addWidget(m_edit);
 
 	editLay->addWidget(m_scaleCb);
-
-	m_line = new QFrame(this);
-	m_line->setFrameShape(QFrame::HLine);
-	m_line->setFrameShadow(QFrame::Plain);
-	StyleHelper::MenuSpinboxLine(m_line);
+	m_line = nullptr;
 
 	if(left) {
 		lay->addLayout(btnLay);
@@ -173,7 +169,6 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	m_scaleCb->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
 	lineLay->addLayout(lay);
-	lineLay->addWidget(m_line);
 }
 
 double MenuSpinbox::value() const { return m_value; }
@@ -238,7 +233,12 @@ void MenuSpinbox::setScalingEnabled(bool en)
 	m_scaleCb->setVisible(en);
 }
 
-void MenuSpinbox::setLineVisible(bool isVisible) { m_line->setVisible(isVisible); }
+void MenuSpinbox::setLineVisible(bool isVisible)
+{
+	if(m_line) {
+		m_line->setVisible(isVisible);
+	}
+}
 
 void MenuSpinbox::userInput(QString s)
 {
