@@ -27,6 +27,7 @@ public:
 private:
 	void add(int index, QWidget *w);
 	QString widgetName(QWidget *w);
+	void onScrollRangeChanged(int min, int max);
 
 	QMap<QString, QWidget *> m_widgetMap;
 	int m_uuid;
