@@ -57,8 +57,13 @@ bool RegmapPlugin::loadIcon()
 
 void RegmapPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(REGMAP_PLUGIN_SCOPY_MODULE, REGMAP_PLUGIN_DISPLAY_NAME,
-						  ":/gui/icons/scopy-default/icons/RegMap.svg"));
+	ToolMenuEntry *toolMenuEntry = SCOPY_NEW_TOOLMENUENTRY(REGMAP_PLUGIN_SCOPY_MODULE, REGMAP_PLUGIN_DISPLAY_NAME,
+							       ":/gui/icons/scopy-default/icons/RegMap.svg");
+	m_toolList.append(toolMenuEntry);
+	m_toolList.last()->setRunBtnVisible(true);
+	m_toolList.last()->setRunEnabled(false);
+
+	Q_EMIT toolListChanged();
 }
 
 void RegmapPlugin::unload()
@@ -186,6 +191,13 @@ bool RegmapPlugin::onConnect()
 		m_toolList[0]->setEnabled(true);
 		m_toolList[0]->setTool(m_registerMapWidget);
 
+		for(auto &tool : m_toolList) {
+			tool->setEnabled(true);
+			tool->setRunBtnVisible(true);
+		}
+
+		Q_EMIT toolListChanged();
+
 		return true;
 	}
 
@@ -198,10 +210,13 @@ bool RegmapPlugin::onDisconnect()
 	auto &&cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
 
-	if(m_registerMapWidget)
-		delete m_registerMapWidget;
-	if(m_deviceList)
-		delete m_deviceList;
+	for(auto &tool : m_toolList) {
+		tool->setEnabled(false);
+		tool->setRunning(false);
+		tool->setRunBtnVisible(false);
+	}
+
+	Q_EMIT toolListChanged();
 
 	return true;
 }
