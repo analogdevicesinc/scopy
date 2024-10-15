@@ -20,7 +20,7 @@
 "content_inverse": "#FFFFFF",
 "danger_default": "#ff7200",
 "interactive_accent_idle": "#F45000",
-"interactive_accent_pressed": "#00427A",
+"interactive_accent_pressed": "#ff7200",
 "background_subtle": "#141416",
 "background_primary": "#272730",
 "background_secondary": "#4a4a4b",
