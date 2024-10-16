@@ -630,7 +630,7 @@ void ADMTController::postcalibrate(vector<double> PANG, int cycleCount, int samp
         rotate(PANG.begin(), PANG.begin() + shift, PANG.end());
     }
 
-    // Declare vectors for pre-calibration FFT results
+    // Declare vectors for post-calibration FFT results
     angle_errors_fft_post = vector<double>(PANG.size() / 2);
     angle_errors_fft_phase_post = vector<double>(PANG.size() / 2);
 
@@ -650,9 +650,9 @@ void ADMTController::getPostCalibrationFFT(const vector<double>& updated_PANG, v
 
     // Perform FFT on post-calibration angle errors
     performFFT(angle_errors_post, angle_errors_fft_post, angle_errors_fft_phase_post);
-    // FFT Corrected Error (angle_errors_fft_post)
+
+    // Store the FFT Angle Error Magnitude and Phase
     FFTCorrectedErrorMagnitude = angle_errors_fft_post;
-    // FFT Corrected Error Phase (angle_errors_fft_phase_post)
     FFTCorrectedErrorPhase = angle_errors_fft_phase_post;
 }
 
