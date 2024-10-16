@@ -47,6 +47,7 @@ private:
 	DataLogger_API *api;
 	bool isRunning = false;
 	int toolIndex = 0;
+	QString toolIcon = ":/gui/icons/scopy-default/icons/tool_datalogger.svg";
 };
 } // namespace scopy::datamonitor
 #endif // DATALOGGERPLUGIN_H
