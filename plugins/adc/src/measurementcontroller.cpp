@@ -233,7 +233,23 @@ QWidget *TimeMeasureManager::createMeasurementMenuSection(QString category, QWid
 	MenuSectionCollapseWidget *measureSection =
 		new MenuSectionCollapseWidget("MEASUREMENT " + category, MenuCollapseSection::MHCW_ARROW,
 					      MenuCollapseSection::MHW_BASEWIDGET, parent);
-	QScrollArea *measureScroll = new QScrollArea(measureSection);
+	QWidget *headerWidget = new QWidget(measureSection);
+	QHBoxLayout *headerLay = new QHBoxLayout(headerWidget);
+	headerLay->setMargin(0);
+
+	headerWidget->setLayout(headerLay);
+	QLabel *lblName = new QLabel("NAME");
+	QLabel *lblMeasure = new QLabel("MEASURE");
+	QLabel *lblStat = new QLabel("STAT");
+	headerLay->addWidget(lblName);
+	headerLay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
+	headerLay->addWidget(lblMeasure);
+	headerLay->addWidget(lblStat);
+	measureSection->contentLayout()->addWidget(headerWidget);
+
+	QWidget *scrollWidget = new QWidget(measureSection);
+	measureSection->contentLayout()->addWidget(scrollWidget);
+	QScrollArea *measureScroll = new QScrollArea(scrollWidget);
 	MeasurementSelector *measureSelector = new MeasurementSelector();
 	measureSection->contentLayout()->addWidget(measureScroll);
 	measureScroll->setWidget(measureSelector);
