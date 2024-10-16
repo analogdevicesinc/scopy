@@ -12,6 +12,7 @@ namespace datamonitor {
 class SCOPY_DATALOGGER_EXPORT SevenSegmentMonitorSettings : public QWidget
 {
 	friend class DataMonitorStyleHelper;
+	friend class DataLogger_API;
 	Q_OBJECT
 public:
 	explicit SevenSegmentMonitorSettings(QWidget *parent = nullptr);

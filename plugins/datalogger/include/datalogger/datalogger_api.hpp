@@ -4,6 +4,8 @@
 #include "scopy-datalogger_export.h"
 
 #include <dataloggerplugin.h>
+#include <sevensegmentdisplay.hpp>
+#include <sevensegmentmonitorsettings.hpp>
 
 namespace scopy::datamonitor {
 
@@ -22,6 +24,12 @@ public:
 	Q_INVOKABLE QString disableMonitor(QString monitor);
 	Q_INVOKABLE void setRunning(bool running);
 	Q_INVOKABLE void clearData();
+	Q_INVOKABLE void print(QString filePath);
+	Q_INVOKABLE void changeTool(QString name);
+	Q_INVOKABLE void setMinMax(bool enable);
+	Q_INVOKABLE void changePrecision(int decimals);
+	Q_INVOKABLE void setMinYAxis(double min);
+	Q_INVOKABLE void setMaxYAxis(double max);
 
 	// TOOL RELATED
 	Q_INVOKABLE QString createTool();
