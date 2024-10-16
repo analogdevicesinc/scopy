@@ -170,7 +170,11 @@ void DeviceImpl::loadPages()
 	m_buttonLayout->addWidget(discbtn);
 	discbtn->setVisible(false);
 
-	connect(connbtn, &QPushButton::clicked, this, &DeviceImpl::connectDev);
+	connect(connbtn, &QPushButton::clicked, this, [this]() {
+		Q_EMIT connectionStarted();
+		connectDev();
+		Q_EMIT connectionFinished();
+	});
 	connect(discbtn, &QPushButton::clicked, this, &DeviceImpl::disconnectDev);
 	connect(this, &DeviceImpl::connectionFailed, this, &DeviceImpl::onConnectionFailed);
 
@@ -307,32 +311,38 @@ void DeviceImpl::connectDev()
 	ConnectionLoadingBar *connectionLoadingBar = new ConnectionLoadingBar();
 	connectionLoadingBar->setProgressBarMaximum(m_plugins.size());
 	StatusBarManager::pushUrgentWidget(connectionLoadingBar, "Connection Loading Bar");
-	QEventLoop eventLoop;
 	timer.start();
 	Preferences *pref = Preferences::GetInstance();
 	bool disconnectDevice = false;
 	connbtn->hide();
 	discbtn->show();
 	discbtn->setEnabled(false);
-	eventLoop.processEvents(); // Display the status bar with initial value
-	for(auto &&p : m_plugins) {
+	QCoreApplication::processEvents();
+	for(int i = 0; i < m_plugins.size(); ++i) {
 		pluginTimer.start();
-		connectionLoadingBar->setCurrentPlugin(p->name());
-		eventLoop.processEvents(); // Update status bar
-		bool pluginConnectionSucceeded = p->onConnect();
-		qInfo(CAT_BENCHMARK) << p->name() << " connection took: " << pluginTimer.elapsed() << "ms";
+		connectionLoadingBar->setCurrentPlugin(m_plugins[i]->name());
+		QCoreApplication::processEvents();
+		bool pluginConnectionSucceeded = m_plugins[i]->onConnect();
+		qInfo(CAT_BENCHMARK) << m_plugins[i]->name() << " connection took: " << pluginTimer.elapsed() << "ms";
 		connectionLoadingBar->addProgress(1); // TODO: might change to better reflect the time
-		eventLoop.processEvents();	      // Update status bar
+		QCoreApplication::processEvents();
 		if(pluginConnectionSucceeded) {
 			if(pref->get("general_save_session").toBool()) {
-				QSettings s = QSettings(scopy::config::settingsFolderPath() + "/" + p->name() + ".ini",
+				QSettings s = QSettings(scopy::config::settingsFolderPath() + "/" +
+								m_plugins[i]->name() + ".ini",
 							QSettings::IniFormat);
-				p->loadSettings(s);
+				m_plugins[i]->loadSettings(s);
 			}
-			m_connectedPlugins.push_back(p);
-			setPingPlugin(p);
+			m_connectedPlugins.push_back(m_plugins[i]);
+			setPingPlugin(m_plugins[i]);
 		} else {
-			disconnectDevice = p->metadata().value("disconnectDevOnConnectFailure").toBool();
+			QJsonValue obj = m_plugins[i]->metadata().value("disconnectDevOnConnectFailure");
+			if(obj != QJsonValue::Undefined) {
+				disconnectDevice = obj.toBool();
+			} else {
+				qWarning(CAT_DEVICEIMPL) << "Undefined json value";
+			}
+
 			if(disconnectDevice) {
 				break;
 			}
@@ -344,9 +354,9 @@ void DeviceImpl::connectDev()
 		discbtn->setEnabled(true);
 		discbtn->setFocus();
 		bindPing();
-		delete connectionLoadingBar;
 		Q_EMIT connected();
 	}
+	delete connectionLoadingBar;
 	qInfo(CAT_BENCHMARK) << this->displayName() << " device connection took: " << timer.elapsed() << "ms";
 }
 
