@@ -56,6 +56,9 @@ Q_SIGNALS:
 	void connectionFailed();
 	void forget();
 
+	void connectionStarted();
+	void connectionFinished();
+
 protected:
 	void removeDisabledPlugins();
 	void loadName();

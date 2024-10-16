@@ -971,7 +971,14 @@ void NetworkAnalyzer::updateGainMode()
 
 unsigned long NetworkAnalyzer::_getBestSampleRate(double frequency, unsigned int chn_idx)
 {
-	std::vector<double> values = m_m2k_analogout->getAvailableSampleRates(chn_idx);
+	std::vector<double> values;
+	try {
+		values = m_m2k_analogout->getAvailableSampleRates(chn_idx);
+	} catch(...) {
+		qWarning() << "M2k retrieve sample rates failed. Returning best sample rate 0.";
+		return 0;
+	}
+
 	std::sort(values.begin(), values.end(), std::less<double>());
 
 	for(const auto &rate : values) {
