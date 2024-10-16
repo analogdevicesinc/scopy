@@ -124,7 +124,7 @@ class Oscilloscope : public M2kTool
 	Q_OBJECT
 
 public:
-	explicit Oscilloscope(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
+	explicit Oscilloscope(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
 			      QJSEngine *engine, QWidget *parent = 0);
 	~Oscilloscope();
 

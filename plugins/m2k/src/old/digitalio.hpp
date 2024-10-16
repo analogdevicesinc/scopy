@@ -104,8 +104,8 @@ private Q_SLOTS:
 	void readPreferences() override;
 
 public:
-	explicit DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuEntry *toolMenuItem, DIOManager *diom,
-			   QJSEngine *engine, QWidget *parent, bool offline_mode = 0);
+	explicit DigitalIO(Filter *filt, ToolMenuEntry *toolMenuItem, DIOManager *diom, QJSEngine *engine,
+			   QWidget *parent, bool offline_mode = 0);
 	~DigitalIO();
 	void setDirection(int ch, int direction);
 	void setOutput(int ch, int out);

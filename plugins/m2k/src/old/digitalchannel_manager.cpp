@@ -51,8 +51,8 @@ namespace scopy {
 
 void DIOManager::init() {}
 
-DIOManager::DIOManager(struct iio_context *ctx, Filter *filt)
-	: m_m2k_context(m2kOpen(ctx, ""))
+DIOManager::DIOManager(libm2k::context::M2k *m2k, Filter *filt)
+	: m_m2k_context(m2k)
 	, digital(m_m2k_context->getDigital())
 {
 	outputEnabled = false;

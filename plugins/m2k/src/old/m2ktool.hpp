@@ -52,8 +52,7 @@ class M2kTool : public QWidget, public ResourceUser
 	Q_OBJECT
 
 public:
-	explicit M2kTool(struct iio_context *ctx, ToolMenuEntry *tme, ApiObject *api, const QString &name,
-			 QWidget *parent);
+	explicit M2kTool(ToolMenuEntry *tme, ApiObject *api, const QString &name, QWidget *parent);
 	~M2kTool();
 
 	const QString &getName();
@@ -76,7 +75,6 @@ public Q_SLOTS:
 	virtual void readPreferences();
 
 protected:
-	struct iio_context *ctx;
 	ApiObject *api;
 	QString name;
 	bool saveOnExit;

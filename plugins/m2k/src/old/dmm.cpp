@@ -64,12 +64,12 @@ using namespace scopy::m2k;
 using namespace libm2k;
 using namespace libm2k::context;
 
-DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man, QWidget *parent)
-	: M2kTool(ctx, tme, new DMM_API(this), "Voltmeter", parent)
+DMM::DMM(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man, QWidget *parent)
+	: M2kTool(tme, new DMM_API(this), "Voltmeter", parent)
 	, ui(new Ui::DMM)
 	, signal(std::make_shared<signal_sample>())
-	, manager(m2k_man->get_instance(ctx, filt->device_name(TOOL_DMM)))
-	, m_m2k_context(m2kOpen(ctx, ""))
+	, manager(m2k_man->get_instance(m2k, filt->device_name(TOOL_DMM)))
+	, m_m2k_context(m2k)
 	, m_m2k_analogin(m_m2k_context->getAnalogIn())
 	, m_adc_nb_channels(m_m2k_analogin->getNbChannels())
 	, interrupt_data_logging(false)
