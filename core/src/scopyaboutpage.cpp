@@ -35,6 +35,7 @@ QWidget *ScopyAboutPage::buildPage(QString src)
 	QWidget *page = new QWidget(this);
 	QVBoxLayout *lay = new QVBoxLayout(page);
 	QTextBrowser *browser = new QTextBrowser(page);
+	browser->setOpenExternalLinks(true);
 
 	lay->addWidget(browser);
 	lay->setMargin(0);
