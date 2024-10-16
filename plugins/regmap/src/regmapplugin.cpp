@@ -59,14 +59,14 @@ bool RegmapPlugin::loadPage()
 bool RegmapPlugin::loadIcon()
 {
 	m_icon = new QLabel("");
-	m_icon->setStyleSheet("border-image: url(:/gui/icons/scopy-default/icons/RegMap.svg);");
+	m_icon->setStyleSheet("border-image: url(:/gui/icons/scopy-default/icons/tool_calibration.svg);");
 	return true;
 }
 
 void RegmapPlugin::loadToolList()
 {
 	ToolMenuEntry *toolMenuEntry = SCOPY_NEW_TOOLMENUENTRY(REGMAP_PLUGIN_SCOPY_MODULE, REGMAP_PLUGIN_DISPLAY_NAME,
-							       ":/gui/icons/scopy-default/icons/RegMap.svg");
+							       ":/gui/icons/scopy-default/icons/tool_calibration.svg");
 	m_toolList.append(toolMenuEntry);
 	m_toolList.last()->setRunBtnVisible(true);
 	m_toolList.last()->setRunEnabled(false);
