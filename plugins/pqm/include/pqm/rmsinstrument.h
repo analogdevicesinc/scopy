@@ -35,6 +35,7 @@ private:
 	void updatePlot(PolarPlotWidget *plot, QString type);
 	QVector<QwtPointPolar> getPolarPlotPoints(QString chnlType);
 
+	bool m_running;
 	RunBtn *m_runBtn;
 	SingleShotBtn *m_singleBtn;
 	PolarPlotWidget *m_voltagePlot;
