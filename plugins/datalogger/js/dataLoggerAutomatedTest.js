@@ -2,6 +2,101 @@
 evaluateFile("../js/scopycommon.js")
 evaluateFile("../plugins/datalogger/js/dataLoggerFunctions.js")
 
+//Plot
+function readDataTest() {
+    connect()
+    scopy.switchTool("DataLogger 0")
+    datalogger.enableMonitorOfTool("DataLogger 0","xadc:temp0")
+    datalogger.setRunning(true)
+    msleep(5000)
+    datalogger.setRunning(false)
+    disconnect()
+}
+
+function readClearDataTest() {
+    connect()
+    scopy.switchTool("DataLogger 0")
+    datalogger.enableMonitorOfTool("DataLogger 0","xadc:temp0")
+    datalogger.setRunning(true)
+    msleep(3000)
+    datalogger.setRunning(false)
+    datalogger.clearData()
+    disconnect()
+}
+
+function readPrintDataTest() {
+    connect()
+    scopy.switchTool("DataLogger 0")
+    datalogger.enableMonitorOfTool("DataLogger 0","xadc:temp0")
+    datalogger.setRunning(true)
+    msleep(3000)
+    datalogger.setRunning(false)
+    datalogger.print("../plugins/datalogger/js")
+    disconnect()
+}
+
+//7 Segment
+function readDataSegmentTest() {
+    connect()
+    scopy.switchTool("DataLogger 0")
+    datalogger.enableMonitorOfTool("DataLogger 0","xadc:temp0")
+    datalogger.changeTool("7 Segment")
+    datalogger.setRunning(true)
+    msleep(2000)
+    datalogger.setRunning(false)
+    disconnect()
+}
+
+function minMaxSegementText() {
+    connect()
+    scopy.switchTool("DataLogger 0")
+    datalogger.enableMonitorOfTool("DataLogger 0","xadc:temp0")
+    datalogger.changeTool("7 Segment")
+    datalogger.setMinMax(false)
+    datalogger.setRunning(true)
+    msleep(2000)
+    datalogger.setRunning(false)
+    disconnect()
+}
+
+function changeSegmentPrecisionTest() {
+    connect()
+    scopy.switchTool("DataLogger 0")
+    datalogger.enableMonitorOfTool("DataLogger 0","xadc:temp0")
+    datalogger.changeTool("7 Segment")
+    datalogger.changePrecision(2)
+    datalogger.setRunning(true)
+    msleep(2000)
+    datalogger.setRunning(false)
+    disconnect()
+}
+
+//Text
+function readDataTextTest() {
+    connect()
+    scopy.switchTool("DataLogger 0")
+    datalogger.enableMonitorOfTool("DataLogger 0","xadc:temp0")
+    datalogger.changeTool("Text")
+    datalogger.setRunning(true)
+    msleep(2000)
+    datalogger.setRunning(false)
+    disconnect()
+}
+
+function readMultipleTextTest() {
+    connect()
+    scopy.switchTool("DataLogger 0")
+    datalogger.enableMonitorOfTool("DataLogger 0", "xadc:temp0")
+    datalogger.enableMonitorOfTool("DataLogger 0", "xadc:voltage0")
+    datalogger.changeTool("Text")
+    datalogger.setRunning(true)
+    msleep(2000)
+    datalogger.disableMonitorOfTool("DataLogger 0", "xadc:voltage0")
+    msleep(2000)
+    datalogger.setRunning(false)
+    disconnect()
+}
+
 function dataLogAndLoadTest(){
     const filePath = "../plugins/datalogger/js/test.csv"
 
