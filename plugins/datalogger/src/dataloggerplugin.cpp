@@ -43,14 +43,13 @@ bool DataLoggerPlugin::loadPage() { return false; }
 
 bool DataLoggerPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/scopy-light/icons/unlocked.svg");
+	SCOPY_PLUGIN_ICON(":/gui/icons/scopy-default/icons/datalogger.svg");
 	return true;
 }
 
 void DataLoggerPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "Data Logger",
-						  ":/gui/icons/scopy-default/icons/tool_debugger.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "Data Logger", toolIcon));
 }
 
 void DataLoggerPlugin::unload()
@@ -127,8 +126,7 @@ bool DataLoggerPlugin::onDisconnect()
 	}
 
 	// add proxy tool to represent the plugin
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "Data Logger",
-						  ":/gui/icons/scopy-default/icons/tool_debugger.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "Data Logger", toolIcon));
 
 	Q_EMIT toolListChanged();
 
@@ -143,8 +141,7 @@ void DataLoggerPlugin::addNewTool()
 		tool_name += QString::number(toolIndex);
 	}
 
-	ToolMenuEntry *toolMenuEntry =
-		SCOPY_NEW_TOOLMENUENTRY(tool_name, tool_name, ":/gui/icons/scopy-default/icons/tool_debugger.svg");
+	ToolMenuEntry *toolMenuEntry = SCOPY_NEW_TOOLMENUENTRY(tool_name, tool_name, toolIcon);
 	m_toolList.append(toolMenuEntry);
 	m_toolList.last()->setEnabled(true);
 	m_toolList.last()->setRunBtnVisible(true);

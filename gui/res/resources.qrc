@@ -161,6 +161,7 @@
         <file>icons/scopy-default/icons/RegMap.svg</file>
         <file>icons/handle_arrow.svg</file>
         <file>icons/search_crossed.svg</file>
+        <file>icons/scopy-default/icons/tool_datalogger.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>
