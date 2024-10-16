@@ -73,6 +73,8 @@ private:
 	m2k_iio_manager *m2k_man;
 	InfoPage *m_m2kInfoPage;
 
+	libm2k::context::M2k *m_m2k;
+
 	const int PING_PERIOD = 5000;
 	const int infoPageTimerTimeout = 1000;
 	const QStringList calibrationToolNames = {"Oscilloscope",     "Spectrum Analyzer", "Network Analyzer",

@@ -56,7 +56,6 @@ extern "C"
 {
 	struct iio_buffer;
 	struct iio_channel;
-	struct iio_context;
 	struct iio_device;
 }
 
@@ -121,7 +120,7 @@ public:
 
 	typedef std::shared_ptr<SpectrumChannel> channel_sptr;
 
-	explicit SpectrumAnalyzer(struct iio_context *iio, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
+	explicit SpectrumAnalyzer(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
 				  QJSEngine *engine, QWidget *parent);
 	~SpectrumAnalyzer();
 	QPushButton *getRunButton();
@@ -252,8 +251,6 @@ private:
 private:
 	libm2k::context::M2k *m_m2k_context;
 	libm2k::analog::M2kAnalogIn *m_m2k_analogin;
-	libm2k::context::Generic *m_generic_context;
-	libm2k::analog::GenericAnalogIn *m_generic_analogin;
 	Ui::SpectrumAnalyzer *ui;
 	scopy::SmallOnOffSwitch *btnSyncPlotCursors;
 	QHBoxLayout *horizontalLockLayout;

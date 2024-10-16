@@ -73,16 +73,16 @@ int lcm(int a, int b)
 
 } // namespace detail
 
-PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, QJSEngine *engine,
+PatternGenerator::PatternGenerator(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, QJSEngine *engine,
 				   DIOManager *diom, QWidget *parent)
-	: M2kTool(nullptr, tme, new PatternGenerator_API(this), "Pattern Generator", parent)
+	: M2kTool(tme, new PatternGenerator_API(this), "Pattern Generator", parent)
 	, m_ui(new Ui::PatternGenerator)
 	, m_plot(this, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter)
 	, m_plotScrollBar(new QScrollBar(Qt::Vertical, this))
 	, m_selectedChannel(-1)
 	, m_nbChannels(DIGITAL_NR_CHANNELS)
 	, m_currentGroupMenu(nullptr)
-	, m_m2k_context(m2kOpen(ctx, ""))
+	, m_m2k_context(m2k)
 	, m_m2kDigital(m_m2k_context->getDigital())
 	, m_bufferSize(1)
 	, m_sampleRate(1)

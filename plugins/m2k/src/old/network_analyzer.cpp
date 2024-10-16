@@ -171,9 +171,9 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/networkanalyzer");
 }
 
-NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
+NetworkAnalyzer::NetworkAnalyzer(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
 				 QJSEngine *engine, QWidget *parent)
-	: M2kTool(ctx, tme, new NetworkAnalyzer_API(this), "Network Analyzer", parent)
+	: M2kTool(tme, new NetworkAnalyzer_API(this), "Network Analyzer", parent)
 	, ui(new Ui::NetworkAnalyzer)
 	, m_m2k_context(nullptr)
 	, m_m2k_analogin(nullptr)
@@ -198,18 +198,15 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenu
 	, m_nb_averaging(1)
 	, m_nb_periods(2)
 {
-	if(ctx) {
-		iio = m2k_man->get_instance(ctx, filt->device_name(TOOL_NETWORK_ANALYZER, 2));
-
-		m_m2k_context = m2kOpen(ctx, "");
-		if(m_m2k_context) {
-			m_m2k_analogin = m_m2k_context->getAnalogIn();
-			m_m2k_analogout = m_m2k_context->getAnalogOut();
-			m_adc_nb_channels = m_m2k_analogin->getNbChannels();
-			m_dac_nb_channels = m_m2k_analogout->getNbChannels();
-			m_m2k_analogout->setKernelBuffersCount(0, 1);
-			m_m2k_analogout->setKernelBuffersCount(1, 1);
-		}
+	if(m2k) {
+		m_m2k_context = m2k;
+		iio = m2k_man->get_instance(m_m2k_context, filt->device_name(TOOL_NETWORK_ANALYZER, 2));
+		m_m2k_analogin = m_m2k_context->getAnalogIn();
+		m_m2k_analogout = m_m2k_context->getAnalogOut();
+		m_adc_nb_channels = m_m2k_analogin->getNbChannels();
+		m_dac_nb_channels = m_m2k_analogout->getNbChannels();
+		m_m2k_analogout->setKernelBuffersCount(0, 1);
+		m_m2k_analogout->setKernelBuffersCount(1, 1);
 	}
 
 	ui->setupUi(this);

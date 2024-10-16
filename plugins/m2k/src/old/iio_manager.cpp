@@ -38,24 +38,21 @@ static constexpr int KERNEL_BUFFERS_DEFAULT = 1;
 
 Q_LOGGING_CATEGORY(CAT_M2K_IIO_MANAGER, "M2kIIOManager");
 
-iio_manager::iio_manager(unsigned int block_id, struct iio_context *ctx, QString _dev, unsigned long _buffer_size)
+iio_manager::iio_manager(unsigned int block_id, libm2k::context::M2k *ctx, QString _dev, unsigned long _buffer_size)
 	: QObject(nullptr)
 	, top_block("IIO Manager " + std::to_string(block_id))
 	, id(block_id)
 	, _started(false)
 	, buffer_size(_buffer_size)
 	, m_mixed_source(nullptr)
+	, m_context(ctx)
 {
-	m_context = libm2k::context::m2kOpen(ctx, "");
 	m_analogin = m_context->getAnalogIn();
-	if(!ctx)
-		throw std::runtime_error("IIO context not created");
-
-	struct iio_device *dev = iio_context_find_device(ctx, _dev.toStdString().c_str());
-	if(!dev)
+	if(m_analogin->getName() != _dev.toStdString()) {
 		throw std::runtime_error("Device not found");
+	}
 
-	nb_channels = iio_device_get_channels_count(dev);
+	nb_channels = m_analogin->getNbChannels();
 
 	Preferences *p = Preferences::GetInstance();
 	double targetFps = p->get("general_plot_target_fps").toString().toDouble(); // get target fps from preferences
@@ -112,7 +109,7 @@ std::shared_ptr<iio_manager> m2k_iio_manager::has_instance(QString _dev)
 	return nullptr;
 }
 
-std::shared_ptr<iio_manager> m2k_iio_manager::get_instance(struct iio_context *ctx, QString _dev,
+std::shared_ptr<iio_manager> m2k_iio_manager::get_instance(libm2k::context::M2k *ctx, QString _dev,
 							   unsigned long buffer_size)
 {
 	auto instance = has_instance(_dev);
