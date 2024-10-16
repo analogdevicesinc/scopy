@@ -97,6 +97,12 @@ private:
 	void _pushUrgentMessage(const QString &message, int ms);
 	void _pushUrgentWidget(QWidget *widget, QString title, int ms);
 
+	enum
+	{
+		SBM_BUSY,
+		SBM_IDLE,
+	} m_status;
+
 	static StatusBarManager *pinstance_;
 	QList<StatusMessage *> *m_itemQueue;
 	QTimer *m_timer;
