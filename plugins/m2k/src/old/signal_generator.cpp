@@ -132,12 +132,12 @@ bool SignalGenerator::chunkCompare(chunk_header_t &ptr, const char *id2)
 	return true;
 }
 
-SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt, ToolMenuEntry *tme, QJSEngine *engine,
+SignalGenerator::SignalGenerator(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, QJSEngine *engine,
 				 QWidget *parent)
-	: M2kTool(_ctx, tme, new SignalGenerator_API(this), "Signal Generator", parent)
+	: M2kTool(tme, new SignalGenerator_API(this), "Signal Generator", parent)
 	, ui(new Ui::SignalGenerator)
 	, time_block_data(new struct time_block_data)
-	, m_m2k_context(m2kOpen(ctx, ""))
+	, m_m2k_context(m2k)
 	, m_m2k_analogout(m_m2k_context->getAnalogOut())
 	, nr_of_periods(2)
 	, currentChannel(0)

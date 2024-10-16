@@ -157,9 +157,9 @@ void DigitalIO::setOutput()
 	}
 }
 
-DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuEntry *toolMenuItem, DIOManager *diom,
-		     QJSEngine *engine, QWidget *parent, bool offline_mode)
-	: M2kTool(ctx, toolMenuItem, new DigitalIO_API(this), "Digital IO", parent)
+DigitalIO::DigitalIO(Filter *filt, ToolMenuEntry *toolMenuItem, DIOManager *diom, QJSEngine *engine, QWidget *parent,
+		     bool offline_mode)
+	: M2kTool(toolMenuItem, new DigitalIO_API(this), "Digital IO", parent)
 	, ui(new Ui::DigitalIO)
 	, offline_mode(offline_mode)
 	, diom(diom)
