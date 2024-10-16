@@ -81,14 +81,99 @@ QString DataLogger_API::disableMonitor(QString monitor)
 
 void DataLogger_API::setRunning(bool running)
 {
-	Q_ASSERT(m_dataLoggerPlugin != nullptr);
-	m_dataLoggerPlugin->toggleRunState(running);
+	Q_ASSERT(m_dataLoggerPlugin->m_dataAcquisitionManager != nullptr);
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	if(tool) {
+		tool->setRunning(running);
+		tool->runToggled(running);
+	}
 }
 
 void DataLogger_API::clearData()
 {
 	Q_ASSERT(m_dataLoggerPlugin->m_dataAcquisitionManager != nullptr);
 	m_dataLoggerPlugin->m_dataAcquisitionManager->clearMonitorsData();
+}
+
+void DataLogger_API::print(QString filepath)
+{
+	Q_ASSERT(m_dataLoggerPlugin->m_dataAcquisitionManager != nullptr);
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	if(tool) {
+		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
+		QList<PlotWidget *> plotList;
+		plotList.push_back(monitorTool->m_monitorPlot->plot());
+		monitorTool->printplotManager->printPlots(plotList, "DataLogger", filepath);
+	}
+}
+
+void DataLogger_API::changeTool(QString name)
+{
+	Q_ASSERT(!m_dataLoggerPlugin->m_toolList.isEmpty());
+
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	if(tool) {
+		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
+		if(name == "Plot") {
+			monitorTool->showPlot->click();
+		} else if(name == "Text") {
+			monitorTool->showText->click();
+		} else if(name == "7 Segment") {
+			monitorTool->showSegments->click();
+		} else {
+			qWarning(CAT_DATAMONITOR_API) << "No tool available with name " << name;
+		}
+	}
+}
+
+void DataLogger_API::setMinMax(bool enable)
+{
+	Q_ASSERT(!m_dataLoggerPlugin->m_toolList.isEmpty());
+
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	if(tool) {
+		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
+		SevenSegmentMonitorSettings *monitorSettings =
+			monitorTool->m_dataMonitorSettings->getSevenSegmentMonitorSettings();
+		monitorTool->sevenSegmetMonitors->togglePeakHolder(enable);
+		monitorSettings->peakHolderToggle->onOffswitch()->setChecked(enable);
+	}
+}
+
+void DataLogger_API::changePrecision(int decimals)
+{
+	Q_ASSERT(!m_dataLoggerPlugin->m_toolList.isEmpty());
+
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	if(tool) {
+		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
+		SevenSegmentMonitorSettings *monitorSettings =
+			monitorTool->m_dataMonitorSettings->getSevenSegmentMonitorSettings();
+		monitorTool->sevenSegmetMonitors->updatePrecision(decimals);
+		monitorSettings->precision->setText(QString::number(decimals));
+	}
+}
+
+void DataLogger_API::setMinYAxis(double min)
+{
+	Q_ASSERT(!m_dataLoggerPlugin->m_toolList.isEmpty());
+
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	if(tool) {
+		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
+		monitorTool->m_monitorPlot->updateYAxisIntervalMin(min);
+	}
+}
+
+void DataLogger_API::setMaxYAxis(double max)
+{
+	Q_ASSERT(!m_dataLoggerPlugin->m_toolList.isEmpty());
+
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	if(tool) {
+		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
+		monitorTool->m_monitorPlot->updateYAxisIntervalMax(max);
+	}
 }
 
 QString DataLogger_API::createTool()

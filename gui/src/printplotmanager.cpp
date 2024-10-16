@@ -11,12 +11,15 @@ PrintPlotManager::PrintPlotManager(QObject *parent)
 	: QObject{parent}
 {}
 
-void PrintPlotManager::printPlots(QList<PlotWidget *> plotList, QString toolName)
+void PrintPlotManager::printPlots(QList<PlotWidget *> plotList, QString toolName, QString folderPath)
 {
 	// select folder where to save
-	QString folderPath = QFileDialog::getExistingDirectory(
-		nullptr, "Select Folder", "",
-		QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks | QFileDialog::DontUseNativeDialog);
+	if(folderPath.isEmpty()) {
+		folderPath =
+			QFileDialog::getExistingDirectory(nullptr, "Select Folder", "",
+							  QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks |
+								  QFileDialog::DontUseNativeDialog);
+	}
 
 	if(!folderPath.isEmpty()) {
 		// use current date and tool name to crete the file name
