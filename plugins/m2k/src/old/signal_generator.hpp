@@ -46,11 +46,6 @@
 #include <libm2k/analog/m2kanalogout.hpp>
 #include <libm2k/m2k.hpp>
 
-extern "C"
-{
-	struct iio_context;
-}
-
 namespace Ui {
 class SignalGenerator;
 }
@@ -143,7 +138,7 @@ class SignalGenerator : public M2kTool
 	Q_OBJECT
 
 public:
-	explicit SignalGenerator(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, QJSEngine *engine,
+	explicit SignalGenerator(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, QJSEngine *engine,
 				 QWidget *parent);
 	~SignalGenerator();
 

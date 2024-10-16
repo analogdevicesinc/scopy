@@ -127,20 +127,18 @@ void SpectrumAnalyzer::initInstrumentStrings()
 	};
 }
 
-SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
-				   QJSEngine *engine, QWidget *parent)
-	: M2kTool(ctx, tme, new SpectrumAnalyzer_API(this), "Spectrum Analyzer", parent)
+SpectrumAnalyzer::SpectrumAnalyzer(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme,
+				   m2k_iio_manager *m2k_man, QJSEngine *engine, QWidget *parent)
+	: M2kTool(tme, new SpectrumAnalyzer_API(this), "Spectrum Analyzer", parent)
 	, ui(new Ui::SpectrumAnalyzer)
-	, m_m2k_context(nullptr)
+	, m_m2k_context(m2k)
 	, m_m2k_analogin(nullptr)
-	, m_generic_context(nullptr)
-	, m_generic_analogin(nullptr)
 	, marker_selector(new DbClickButtons(this))
 	, fft_plot(nullptr)
 	, waterfall_plot(nullptr)
 	, settings_group(new QButtonGroup(this))
 	, channels_group(new QButtonGroup(this))
-	, adc_name(ctx ? filt->device_name(TOOL_SPECTRUM_ANALYZER) : "")
+	, adc_name(filt->device_name(TOOL_SPECTRUM_ANALYZER))
 	, crt_channel_id(0)
 	, crt_peak(0)
 	, max_peak_count(10)
@@ -162,24 +160,17 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt, ToolMe
 	// Get the list of names of the available channels
 	QList<QString> channel_names;
 
-	if(ctx) {
-		auto libm2k_ctx = contextOpen(ctx, "");
-		if(libm2k_ctx->toM2k()) {
-			m_m2k_context = libm2k_ctx->toM2k();
-			m_m2k_analogin = m_m2k_context->getAnalogIn();
-			m_adc_nb_channels = m_m2k_analogin->getNbChannels();
-			m_max_sample_rate = m_m2k_analogin->getMaximumSamplerate();
-		} else {
-			m_generic_context = libm2k_ctx->toGeneric();
-			m_generic_analogin = m_generic_context->getAnalogIn(0);
-			m_adc_nb_channels = m_generic_analogin->getNbChannels();
-		}
-		iio = m2k_man->get_instance(ctx, adc_name);
-
-		for(unsigned int i = 0; i < m_adc_nb_channels; i++) {
-			channel_names.push_back(QString("Channel %1").arg(i + 1));
-		}
+	if(m_m2k_context) {
+		m_m2k_analogin = m_m2k_context->getAnalogIn();
+		m_adc_nb_channels = m_m2k_analogin->getNbChannels();
+		m_max_sample_rate = m_m2k_analogin->getMaximumSamplerate();
+		iio = m2k_man->get_instance(m_m2k_context, adc_name);
 	}
+
+	for(unsigned int i = 0; i < m_adc_nb_channels; i++) {
+		channel_names.push_back(QString("Channel %1").arg(i + 1));
+	}
+
 	sample_rate = m_max_sample_rate;
 
 	ui->setupUi(this);
@@ -508,7 +499,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt, ToolMe
 	connect(this, &SpectrumAnalyzer::selectedChannelChanged, this,
 		[=](int id) { setWaterfallWindow(channels.at(id)->getWindow(), id); });
 
-	if(ctx) {
+	if(m2k) {
 		build_gnuradio_block_chain();
 	} else {
 		build_gnuradio_block_chain_no_ctx();
@@ -2578,10 +2569,6 @@ void SpectrumAnalyzer::writeAllSettingsToHardware()
 					trigger->setAnalogMode(i, libm2k::ALWAYS);
 				}
 			}
-		} else {
-			for(unsigned int i = 0; i < m_adc_nb_channels; i++) {
-				m_generic_analogin->setSampleRate(i, m_generic_analogin->getMaximumSamplerate(i));
-			}
 		}
 	} catch(libm2k::m2k_exception &e) {
 		HANDLE_EXCEPTION(e);
@@ -2702,15 +2689,6 @@ void SpectrumAnalyzer::setSampleRate(double sr)
 			} catch(libm2k::m2k_exception &e) {
 				HANDLE_EXCEPTION(e);
 				qDebug(CAT_M2K_SPECTRUM_ANALYZER) << "Can't write oversampling ratio: " << e.what();
-			}
-		} else {
-			try {
-				for(unsigned int i = 0; i < m_adc_nb_channels; i++) {
-					m_generic_analogin->setSampleRate(i, sr);
-				}
-			} catch(libm2k::m2k_exception &e) {
-				HANDLE_EXCEPTION(e);
-				qDebug(CAT_M2K_SPECTRUM_ANALYZER) << "Can't write sampling frequency: " << e.what();
 			}
 		}
 

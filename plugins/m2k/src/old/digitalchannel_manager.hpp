@@ -57,7 +57,7 @@ class DIOManager : public QObject
 
 public:
 	void init();
-	DIOManager(struct iio_context *ctx, Filter *filt);
+	DIOManager(libm2k::context::M2k *m2k, Filter *filt);
 	~DIOManager();
 	bool getOutputEnabled();
 	void enableOutput(bool output);

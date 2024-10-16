@@ -46,11 +46,11 @@ using namespace libm2k::analog;
 #include <QLoggingCategory>
 Q_LOGGING_CATEGORY(CAT_M2K_POWERCONTROL, "M2KPowerController");
 
-PowerController::PowerController(struct iio_context *ctx, ToolMenuEntry *tme, QJSEngine *engine, QWidget *parent)
-	: M2kTool(ctx, tme, new PowerController_API(this), "Power Supply", parent)
+PowerController::PowerController(libm2k::context::M2k *m2k, ToolMenuEntry *tme, QJSEngine *engine, QWidget *parent)
+	: M2kTool(tme, new PowerController_API(this), "Power Supply", parent)
 	, ui(new Ui::PowerController)
 	, in_sync(false)
-	, m_m2k_context(m2kOpen(ctx, ""))
+	, m_m2k_context(m2k)
 	, m_m2k_powersupply(m_m2k_context->getPowerSupply())
 {
 	ui->setupUi(this);

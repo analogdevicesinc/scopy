@@ -105,10 +105,10 @@ using namespace std::placeholders;
 constexpr int MAX_BUFFER_SIZE_STREAM = 1024 * 1024;
 constexpr int MAX_KERNEL_BUFFERS = 64;
 
-Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
+Oscilloscope::Oscilloscope(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
 			   QJSEngine *engine, QWidget *parent)
-	: M2kTool(ctx, tme, new Oscilloscope_API(this), "Oscilloscope", parent)
-	, m_m2k_context(m2kOpen(ctx, ""))
+	: M2kTool(tme, new Oscilloscope_API(this), "Oscilloscope", parent)
+	, m_m2k_context(m2k)
 	, m_m2k_analogin(m_m2k_context->getAnalogIn())
 	, m_m2k_digital(m_m2k_context->getDigital())
 	, nb_channels(m_m2k_analogin->getNbChannels())
@@ -223,7 +223,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt, ToolMenuEntry 
 	for(uint i = 0; i < nb_channels; i++)
 		fft_plot.setYaxisMouseGesturesEnabled(i, false);
 
-	iio = m2k_man->get_instance(ctx, filt->device_name(TOOL_OSCILLOSCOPE));
+	iio = m2k_man->get_instance(m2k, filt->device_name(TOOL_OSCILLOSCOPE));
 	gr::hier_block2_sptr hier = iio->to_hier_block2();
 	qDebug(CAT_M2K_OSCILLOSCOPE) << "Manager created:\n" << gr::dot_graph(hier).c_str();
 

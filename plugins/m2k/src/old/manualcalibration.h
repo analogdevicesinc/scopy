@@ -102,7 +102,7 @@ class ManualCalibration : public M2kTool
 	Q_OBJECT
 
 public:
-	explicit ManualCalibration(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, QWidget *parent = 0,
+	explicit ManualCalibration(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, QWidget *parent = 0,
 				   Calibration *cal = 0);
 
 	~ManualCalibration();
@@ -155,7 +155,6 @@ private:
 	QJSEngine *eng;
 
 	Calibration *calib;
-	iio_context *ctx;
 
 	struct stCalibStory stCalibrationStory;
 	struct stCalibParam stParameters;

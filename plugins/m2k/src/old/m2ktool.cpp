@@ -25,9 +25,8 @@
 using namespace scopy;
 using namespace scopy::m2k;
 
-M2kTool::M2kTool(struct iio_context *ctx, ToolMenuEntry *tme, ApiObject *api, const QString &name, QWidget *parent)
+M2kTool::M2kTool(ToolMenuEntry *tme, ApiObject *api, const QString &name, QWidget *parent)
 	: QWidget(parent)
-	, ctx(ctx)
 	, api(api)
 	, name(name)
 	, saveOnExit(true)

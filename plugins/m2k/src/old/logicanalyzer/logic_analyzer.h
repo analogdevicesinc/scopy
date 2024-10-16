@@ -77,7 +77,7 @@ class LogicAnalyzer : public M2kTool
 	friend class LogicAnalyzer_API;
 
 public:
-	explicit LogicAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuEntry *toolMenuItem, QJSEngine *engine,
+	explicit LogicAnalyzer(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *toolMenuItem, QJSEngine *engine,
 			       QWidget *parent, bool offline_mode_ = 0);
 	~LogicAnalyzer();
 	void setNativeDialogs(bool nativeDialogs) override;
