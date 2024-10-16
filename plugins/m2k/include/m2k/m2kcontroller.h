@@ -23,7 +23,7 @@ public:
 	void startTemperatureTask();
 	void stopTemperatureTask();
 
-	void connectM2k(iio_context *ctx);
+	void connectM2k(libm2k::context::M2k *m2k);
 	void disconnectM2k();
 
 public Q_SLOTS:
@@ -44,7 +44,6 @@ Q_SIGNALS:
 private:
 	M2kReadTemperatureTask *tempTask;
 	M2kIdentifyTask *identifyTask;
-	iio_context *m_iioctx;
 	QString uri;
 	libm2k::context::M2k *m_m2k;
 

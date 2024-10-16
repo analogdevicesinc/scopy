@@ -59,7 +59,7 @@ class DMM : public M2kTool
 	Q_OBJECT
 
 public:
-	explicit DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *toolMenuItem, m2k_iio_manager *m2k_man,
+	explicit DMM(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *toolMenuItem, m2k_iio_manager *m2k_man,
 		     QWidget *parent = nullptr);
 	QPushButton *getRunButton();
 	~DMM();

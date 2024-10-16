@@ -62,7 +62,7 @@ class PowerController : public M2kTool
 public:
 	const int AVERAGE_COUNT = 5;
 
-	explicit PowerController(struct iio_context *ctx, ToolMenuEntry *tme, QJSEngine *engine, QWidget *parent = 0);
+	explicit PowerController(libm2k::context::M2k *m2k, ToolMenuEntry *tme, QJSEngine *engine, QWidget *parent = 0);
 	~PowerController();
 
 public Q_SLOTS:

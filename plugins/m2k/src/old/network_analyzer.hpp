@@ -56,11 +56,6 @@
 #include <QStackedWidget>
 #include <QtConcurrentRun>
 
-extern "C"
-{
-	struct iio_context;
-}
-
 namespace Ui {
 class NetworkAnalyzer;
 }
@@ -80,7 +75,7 @@ class NetworkAnalyzer : public M2kTool
 	Q_OBJECT
 
 public:
-	explicit NetworkAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuEntry *toolMenuItem,
+	explicit NetworkAnalyzer(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *toolMenuItem,
 				 m2k_iio_manager *m2k_man, QJSEngine *engine, QWidget *parent = nullptr);
 	~NetworkAnalyzer();
 	QPushButton *getRunButton();
