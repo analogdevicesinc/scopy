@@ -55,6 +55,9 @@ Q_SIGNALS:
 	void requestDevice(QString id);
 	void requestTool(QString id);
 
+	void connectionStarted();
+	void connectionFinished();
+
 private:
 	void connectDeviceToManager(DeviceImpl *d);
 	void disconnectDeviceFromManager(DeviceImpl *d);
