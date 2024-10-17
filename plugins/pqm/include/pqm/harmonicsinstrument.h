@@ -1,6 +1,7 @@
 #ifndef HARMONICSINSTRUMENT_H
 #define HARMONICSINSTRUMENT_H
 
+#include "pluginbase/toolmenuentry.h"
 #include <gui/widgets/menucombo.h>
 #include <scopy-pqm_export.h>
 #include <gui/plotwidget.h>
@@ -23,7 +24,7 @@ class SCOPY_PQM_EXPORT HarmonicsInstrument : public QWidget, public ResourceUser
 {
 	Q_OBJECT
 public:
-	HarmonicsInstrument(QWidget *parent = nullptr);
+	HarmonicsInstrument(ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~HarmonicsInstrument();
 
 	void showThdWidget(bool show);
@@ -33,7 +34,6 @@ public Q_SLOTS:
 	void onAttrAvailable(QMap<QString, QMap<QString, QString>> attr);
 Q_SIGNALS:
 	void enableTool(bool en, QString toolName = "harmonics");
-	void runTme(bool en);
 private Q_SLOTS:
 	void updateTable();
 	void onActiveChnlChannged(QString chnlId);
@@ -58,6 +58,7 @@ private:
 	QMap<QString, std::vector<double>> m_yValues;
 	QMap<QString, MeasurementLabel *> m_labels;
 	QMap<QString, PlotChannel *> m_plotChnls;
+	ToolMenuEntry *m_tme;
 	// keys - used for UI labels; values - context channels name
 	const QMap<QString, QString> m_chnls = {{"Ia", "ia"}, {"Ib", "ib"}, {"Ic", "ic"},
 						{"Ua", "ua"}, {"Ub", "ub"}, {"Uc", "uc"}};

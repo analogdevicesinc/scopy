@@ -8,6 +8,7 @@
 #include <gui/widgets/menucontrolbutton.h>
 #include <gui/widgets/toolbuttons.h>
 #include <pluginbase/resourcemanager.h>
+#include <pluginbase/toolmenuentry.h>
 
 #define DEVICE_NAME "pqm"
 
@@ -16,12 +17,11 @@ class SCOPY_PQM_EXPORT RmsInstrument : public QWidget, public ResourceUser
 {
 	Q_OBJECT
 public:
-	RmsInstrument(QWidget *parent = nullptr);
+	RmsInstrument(ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~RmsInstrument();
 
 Q_SIGNALS:
 	void enableTool(bool en, QString toolName = "rms");
-	void runTme(bool en);
 public Q_SLOTS:
 	void stop() override;
 	void toggleRms(bool en);
@@ -35,6 +35,7 @@ private:
 	void updatePlot(PolarPlotWidget *plot, QString type);
 	QVector<QwtPointPolar> getPolarPlotPoints(QString chnlType);
 
+	ToolMenuEntry *m_tme;
 	RunBtn *m_runBtn;
 	SingleShotBtn *m_singleBtn;
 	PolarPlotWidget *m_voltagePlot;
