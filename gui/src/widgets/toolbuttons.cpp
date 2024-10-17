@@ -111,8 +111,7 @@ RunBtn::RunBtn(QWidget *parent)
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	setText("Run");
 	connect(this, &QPushButton::toggled, this, [=](bool b) { setText(b ? "Stop" : "Run"); });
-	Style::setStyle(this, style::properties::button::runSingle);
-	Style::setBackgroundColor(this, json::global::run_button_color, true);
+	Style::setStyle(this, style::properties::button::runButton);
 
 	QIcon icon1;
 	icon1.addPixmap(Style::getPixmap(":/gui/icons/play.svg", Style::getColor(json::theme::content_inverse)),
@@ -132,7 +131,7 @@ SingleShotBtn::SingleShotBtn(QWidget *parent)
 	setChecked(false);
 	setText("Single");
 	connect(this, &QPushButton::toggled, this, [=](bool b) { setText(b ? "Stop" : "Single"); });
-	Style::setStyle(this, style::properties::button::runSingle);
+	Style::setStyle(this, style::properties::button::singleButton);
 	setStyleSheet("background-color: #ff7200;");
 
 	QIcon icon1;
