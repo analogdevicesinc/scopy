@@ -1978,7 +1978,7 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 	}
 
 	if(checked) {
-		ResourceManager::open("m2k-adc", this);
+		ResourceManager::open("m2k-adc" + tme->param(), this);
 
 		if(iio) {
 			writeAllSettingsToHardware();
@@ -1992,7 +1992,7 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 	} else {
 		stop_blockchain_flow();
 		sample_timer->stop();
-		ResourceManager::close("m2k-adc");
+		ResourceManager::close("m2k-adc" + tme->param());
 	}
 
 	if(!checked) {
