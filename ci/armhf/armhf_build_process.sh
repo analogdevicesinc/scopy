@@ -114,6 +114,7 @@ clone() {
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
+	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 	popd
 }
 
@@ -258,6 +259,15 @@ build_libtinyiiod() {
 	echo "### Building libtinyiiod - branch $LIBTINYIIOD_BRANCH"
 	pushd $STAGING_AREA/libtinyiiod
 	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_EXAMPLES=OFF"
+	build_with_cmake
+	sudo make install
+	popd
+}
+
+build_kddock () {
+	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
+	pushd $STAGING_AREA/KDDockWidgets
+	CURRENT_BUILD_CMAKE_OPTS=""
 	build_with_cmake
 	sudo make install
 	popd
@@ -408,6 +418,7 @@ build_deps(){
 	build_qwt
 	build_libsigrokdecode
 	build_libtinyiiod
+	#build_kddock
 }
 
 run_workflow(){

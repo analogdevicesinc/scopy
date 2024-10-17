@@ -78,6 +78,7 @@ clone() {
 	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	[ -d 'iio-emu' ]	|| git clone --recursive https://github.com/analogdevicesinc/iio-emu -b $IIOEMU_BRANCH iio-emu
+	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 	popd
 }
 
@@ -354,6 +355,13 @@ build_libtinyiiod() {
 	build_with_cmake $1
 }
 
+build_kddock () {
+	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
+	pushd $STAGING_AREA/KDDockWidgets
+	CURRENT_BUILD_CMAKE_OPTS=""
+	build_with_cmake $1
+	popd
+}
 
 #
 # Helper functions
@@ -376,6 +384,7 @@ build_deps() {
 	build_qwt ON
 	build_libsigrokdecode ON
 	build_libtinyiiod ON
+	build_kddock ON
 }
 
 
