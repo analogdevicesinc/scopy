@@ -300,7 +300,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_use_opengl", true);
 #endif
 	p->init("general_use_animations", true);
-	p->init("general_theme", "dark");
+	p->init("general_theme", "legacy");
 	p->init("general_language", "en");
 	p->init("show_grid", true);
 	p->init("show_graticule", false);

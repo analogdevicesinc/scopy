@@ -40,8 +40,8 @@ public:
 
 	// set style to a widget using keys in style_properties.h
 	// value: the property value the widget will have. Only change it if the style css code uses different values
-	// force: will do setStyleSheet on the widget. This may be needed if another stylesheet was previously set on this widget.
-	// using force is not recommended
+	// force: will do setStyleSheet on the widget. This may be needed if another stylesheet was previously set on
+	// this widget. using force is not recommended
 	static void setStyle(QWidget *widget, const char *style, QVariant value = true, bool force = false);
 
 	// get pixmap with color changed to json::theme::pixmap_color
