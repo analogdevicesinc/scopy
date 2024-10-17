@@ -97,7 +97,7 @@ void Style::setStyle(QWidget *widget, const char *style, QVariant value, bool fo
 
 	// set property stylesheet directly to the widget
 	// this may be used if the property was overwritten or was not recognized
-	if(force || !isProperty(style)) {
+	if(force) {
 		widget->setStyleSheet(widget->styleSheet() + "\n" + m_styleMap->value(style));
 	}
 
@@ -244,9 +244,9 @@ QString Style::replaceAttributes(QString style, int calls_limit)
 			style.replace("&" + key + "&", value.toString());
 		}
 
-		replaceAttributes(style, --calls_limit);
+		style = replaceAttributes(style, --calls_limit);
 	}
-	if(style.contains('&') && calls_limit <= 0) {
+	if(style.contains('&')) {
 		qCritical("Style: Failed to replace attribute: %s", style.split('&')[1].toStdString().c_str());
 	}
 
