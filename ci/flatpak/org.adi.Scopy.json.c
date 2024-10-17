@@ -432,7 +432,7 @@
 				{
 					"type": "git",
 					"url": "https://github.com/cseci/qwt",
-					"branch": "qwt-multiaxes"
+					"branch": "qwt-multiaxes-updated"
 				},
 				{
 					"type": "script",
