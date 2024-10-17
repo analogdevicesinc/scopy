@@ -87,6 +87,8 @@ protected:
 
 	bool m_refreshTimerRunning;
 	bool m_isMainInstrument = false;
+
+	ToolMenuEntry *m_tme;
 };
 
 } // namespace adc
