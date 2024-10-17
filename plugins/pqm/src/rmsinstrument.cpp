@@ -14,8 +14,9 @@ Q_LOGGING_CATEGORY(CAT_PQM_RMS, "PqmRms")
 
 using namespace scopy::pqm;
 
-RmsInstrument::RmsInstrument(QWidget *parent)
+RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QWidget *parent)
 	: QWidget(parent)
+	, m_tme(tme)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *instrumentLayout = new QHBoxLayout(this);
@@ -80,7 +81,8 @@ RmsInstrument::RmsInstrument(QWidget *parent)
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
 
-	connect(this, &RmsInstrument::runTme, m_runBtn, &QAbstractButton::setChecked);
+	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
+	connect(this, &RmsInstrument::enableTool, m_tme, &ToolMenuEntry::setRunning);
 	connect(m_runBtn, &QAbstractButton::toggled, m_singleBtn, &QAbstractButton::setDisabled);
 	connect(m_runBtn, SIGNAL(toggled(bool)), this, SLOT(toggleRms(bool)));
 	connect(m_singleBtn, &QAbstractButton::toggled, m_runBtn, &QAbstractButton::setDisabled);
@@ -196,9 +198,9 @@ void RmsInstrument::stop() { m_runBtn->setChecked(false); }
 void RmsInstrument::toggleRms(bool en)
 {
 	if(en) {
-		ResourceManager::open("pqm", this);
+		ResourceManager::open("pqm" + m_tme->param(), this);
 	} else {
-		ResourceManager::close("pqm");
+		ResourceManager::close("pqm" + m_tme->param());
 	}
 	Q_EMIT enableTool(en);
 }

@@ -2718,7 +2718,7 @@ void Oscilloscope::runStopToggled(bool checked)
 	Q_EMIT activateExportButton();
 
 	if(checked) {
-		ResourceManager::open("m2k-adc", this);
+		ResourceManager::open("m2k-adc" + tme->param(), this);
 		periodicFlowRestart(true);
 		if(symmBufferMode->isEnhancedMemDepth()) {
 			onCmbMemoryDepthChanged(ch_ui->cmbMemoryDepth->currentText());
@@ -2754,7 +2754,7 @@ void Oscilloscope::runStopToggled(bool checked)
 		toggle_blockchain_flow(false);
 		resetStreamingFlag(symmBufferMode->isEnhancedMemDepth() || plot_samples_sequentially);
 		trigger_settings.setAdcRunningState(false);
-		ResourceManager::close("m2k-adc");
+		ResourceManager::close("m2k-adc" + tme->param());
 	}
 
 	// Update trigger status

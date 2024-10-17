@@ -14,6 +14,7 @@ ADCInstrumentController::ADCInstrumentController(ToolMenuEntry *tme, QString nam
 	, m_plotComponentManager(nullptr)
 	, m_measureComponent(nullptr)
 	, m_started(false)
+	, m_tme(tme)
 {
 	chIdP = new ChannelIdProvider(this);
 	m_tree = tree;
@@ -83,7 +84,7 @@ void ADCInstrumentController::onStop()
 
 void ADCInstrumentController::start()
 {
-	ResourceManager::open("adc", this);
+	ResourceManager::open("adc" + m_tme->param(), this);
 	bool ret = m_dataProvider->start();
 	if(!ret) {
 		Q_EMIT requestDisconnect();
@@ -93,7 +94,7 @@ void ADCInstrumentController::start()
 void ADCInstrumentController::stop()
 {
 	m_dataProvider->stop();
-	ResourceManager::close("adc");
+	ResourceManager::close("adc" + m_tme->param());
 }
 
 void ADCInstrumentController::stopUpdates()

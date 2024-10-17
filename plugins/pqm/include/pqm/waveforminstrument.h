@@ -12,6 +12,7 @@
 #include <gui/widgets/menucontrolbutton.h>
 #include <gui/widgets/toolbuttons.h>
 #include <pluginbase/resourcemanager.h>
+#include <pluginbase/toolmenuentry.h>
 
 #define ROLLING_MODE "rolling"
 #define TRIGGER_MODE "trigger"
@@ -21,7 +22,7 @@ class SCOPY_PQM_EXPORT WaveformInstrument : public QWidget, public ResourceUser
 {
 	Q_OBJECT
 public:
-	WaveformInstrument(QWidget *parent = nullptr);
+	WaveformInstrument(ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~WaveformInstrument();
 
 	void showOneBuffer(bool hasFwVers);
@@ -31,7 +32,6 @@ public Q_SLOTS:
 	void onBufferDataAvailable(QMap<QString, QVector<double>> data);
 Q_SIGNALS:
 	void enableTool(bool en, QString toolName = "waveform");
-	void runTme(bool en);
 
 private Q_SLOTS:
 	void onTriggeredChnlChanged(QString triggeredChnl);
@@ -59,6 +59,8 @@ private:
 	QMap<QString, PlotChannel *> m_plotChnls;
 	QVector<double> m_xTime;
 	PlottingStrategy *m_plottingStrategy = nullptr;
+
+	ToolMenuEntry *m_tme;
 
 	const double m_plotSampleRate = 5120;
 	const QMap<QString, QMap<QString, QString>> m_chnls = {

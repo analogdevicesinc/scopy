@@ -1614,8 +1614,8 @@ void NetworkAnalyzer::startStop(bool pressed)
 	ui->spinBox_periods->setEnabled(!pressed);
 
 	if(pressed) {
-		ResourceManager::open("m2k-adc", this);
-		ResourceManager::open("m2k-dac", this);
+		ResourceManager::open("m2k-adc" + tme->param(), this);
+		ResourceManager::open("m2k-dac" + tme->param(), this);
 		m_m2k_analogin->setKernelBuffersCount(1);
 		if(shouldClear) {
 			m_dBgraph.reset();
@@ -1647,8 +1647,8 @@ void NetworkAnalyzer::startStop(bool pressed)
 		m_dBgraph.sweepDone();
 		m_phaseGraph.sweepDone();
 		ui->statusLabel->setText(tr("Stopped"));
-		ResourceManager::close("m2k-dac");
-		ResourceManager::close("m2k-adc");
+		ResourceManager::close("m2k-dac" + tme->param());
+		ResourceManager::close("m2k-adc" + tme->param());
 		try {
 			m_m2k_analogin->setKernelBuffersCount(KERNEL_BUFFERS_DEFAULT);
 		} catch(libm2k::m2k_exception &e) {
