@@ -485,27 +485,24 @@ void ADMTController::unwrapAngles(vector<double>& angles_rad) {
 }
 
 QString ADMTController::calibrate(vector<double> PANG, int cycleCount, int samplesPerCycle) {
-    // Initialize variables
-    int CCW = 0; // Counterclockwise flag
-    int circshiftData = 0; // Circular shift flag
-    QString result;
+    int CCW = 0, circshiftData = 0;
+    QString result = "";
 
-    // Check CCW flag to know if the array needs to be reversed
-    if (CCW) {
+    /* Check CCW flag to know if array is to be reversed */
+    if (CCW)
         reverse(PANG.begin(), PANG.end());
-    }
 
-    // Randomize starting point of the array if needed
+    /* Randomize starting point of array */
     if (circshiftData) {
         int shift = rand() % PANG.size();
         rotate(PANG.begin(), PANG.begin() + shift, PANG.end());
     }
 
     // Declare vectors for pre-calibration FFT results
-    vector<double> angle_errors_fft_pre(PANG.size() / 2);
-    vector<double> angle_errors_fft_phase_pre(PANG.size() / 2);
+    angle_errors_fft_pre = vector<double>(PANG.size() / 2);
+    angle_errors_fft_phase_pre = vector<double>(PANG.size() / 2);
 
-    // Call the existing FFT function for pre-calibration
+    // Call the new function for pre-calibration FFT
     getPreCalibrationFFT(PANG, angle_errors_fft_pre, angle_errors_fft_phase_pre, cycleCount, samplesPerCycle);
 
     // Extract HMag parameters
@@ -514,34 +511,35 @@ QString ADMTController::calibrate(vector<double> PANG, int cycleCount, int sampl
     double H3Mag = angle_errors_fft_pre[3 * cycleCount + 1];
     double H8Mag = angle_errors_fft_pre[8 * cycleCount + 1];
 
-    // // Display HMAG values
-    // result.append("H1Mag = " + QString::number(H1Mag) + "\n");
-    // result.append("H2Mag = " + QString::number(H2Mag) + "\n");
-    // result.append("H3Mag = " + QString::number(H3Mag) + "\n");
-    // result.append("H8Mag = " + QString::number(H8Mag) + "\n");
+    /* Display HMAG values */
+    result.append("H1Mag = " + QString::number(H1Mag) + "\n");
+    result.append("H2Mag = " + QString::number(H2Mag) + "\n");
+    result.append("H3Mag = " + QString::number(H3Mag) + "\n");
+    result.append("H8Mag = " + QString::number(H8Mag) + "\n");
 
-    // Extract HPhase parameters and convert to degrees
-    double H1Phase = (180 / M_PI) * angle_errors_fft_phase_pre[cycleCount + 1];
-    double H2Phase = (180 / M_PI) * angle_errors_fft_phase_pre[2 * cycleCount + 1];
-    double H3Phase = (180 / M_PI) * angle_errors_fft_phase_pre[3 * cycleCount + 1];
-    double H8Phase = (180 / M_PI) * angle_errors_fft_phase_pre[8 * cycleCount + 1];
+    // Extract HPhase parameters
+    double H1Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[cycleCount + 1]);
+    double H2Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[2 * cycleCount + 1]);
+    double H3Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[3 * cycleCount + 1]);
+    double H8Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[8 * cycleCount + 1]);
 
-    // // Display HPHASE values
-    // result.append("H1Phase = " + QString::number(H1Phase) + "\n");
-    // result.append("H2Phase = " + QString::number(H2Phase) + "\n");
-    // result.append("H3Phase = " + QString::number(H3Phase) + "\n");
-    // result.append("H8Phase = " + QString::number(H8Phase) + "\n");
+    /* Display HPHASE values */
+    result.append("H1Phase = " + QString::number(H1Phase) + "\n");
+    result.append("H2Phase = " + QString::number(H2Phase) + "\n");
+    result.append("H3Phase = " + QString::number(H3Phase) + "\n");
+    result.append("H8Phase = " + QString::number(H8Phase) + "\n");
 
-    // Compute initial errors
-    double H1 = H1Mag * cos(M_PI / 180 * H1Phase);
-    double H2 = H2Mag * cos(M_PI / 180 * H2Phase);
-    double H3 = H3Mag * cos(M_PI / 180 * H3Phase);
-    double H8 = H8Mag * cos(M_PI / 180 * H8Phase);
-    
+    double H1 = H1Mag * cos(M_PI / 180 * (H1Phase));
+    double H2 = H2Mag * cos(M_PI / 180 * (H2Phase));
+    double H3 = H3Mag * cos(M_PI / 180 * (H3Phase));
+    double H8 = H8Mag * cos(M_PI / 180 * (H8Phase));
+
     double init_err = H1 + H2 + H3 + H8;
     double init_angle = PANG[1] - init_err;
+    
+    double H1PHcor, H2PHcor, H3PHcor, H8PHcor;
 
-    // Phase correction for counterclockwise or clockwise direction
+    /* Counterclockwise, slope of error FIT is negative */
     if (CCW) {
         H1Phase *= -1;
         H2Phase *= -1;
@@ -549,41 +547,39 @@ QString ADMTController::calibrate(vector<double> PANG, int cycleCount, int sampl
         H8Phase *= -1;
     }
 
-    // Apply phase correction
-    double H1PHcor = H1Phase - (1 * init_angle - 90);
-    double H2PHcor = H2Phase - (2 * init_angle - 90);
-    double H3PHcor = H3Phase - (3 * init_angle - 90);
-    double H8PHcor = H8Phase - (8 * init_angle - 90);
+    /* Clockwise */
+    H1PHcor = H1Phase - (1 * init_angle - 90);
+    H2PHcor = H2Phase - (2 * init_angle - 90);
+    H3PHcor = H3Phase - (3 * init_angle - 90);
+    H8PHcor = H8Phase - (8 * init_angle - 90);
 
-    // Get modulo from 360
-    H1PHcor = fmod(H1PHcor, 360);
-    H2PHcor = fmod(H2PHcor, 360);
-    H3PHcor = fmod(H3PHcor, 360);
-    H8PHcor = fmod(H8PHcor, 360);
+    /* Get modulo from 360 */
+    H1PHcor = (int)H1PHcor % 360;
+    H2PHcor = (int)H2PHcor % 360;
+    H3PHcor = (int)H3PHcor % 360;
+    H8PHcor = (int)H8PHcor % 360;
 
     // HMag Scaling
-    const double scalingFactor = 0.6072;
-    H1Mag *= scalingFactor;
-    H2Mag *= scalingFactor;
-    H3Mag *= scalingFactor;
-    H8Mag *= scalingFactor;
+    H1Mag = H1Mag * 0.6072;
+    H2Mag = H2Mag * 0.6072;
+    H3Mag = H3Mag * 0.6072;
+    H8Mag = H8Mag * 0.6072;
 
-    // Derive register-compatible HMAG values
+    // Derive register compatible HMAG values
     double mag_scale_factor_11bit = 11.2455 / (1 << 11);
     double mag_scale_factor_8bit = 1.40076 / (1 << 8);
-    HAR_MAG_1 = static_cast<int>(H1Mag / mag_scale_factor_11bit) & 0x7FF; // 11 bit
-    HAR_MAG_2 = static_cast<int>(H2Mag / mag_scale_factor_11bit) & 0x7FF; // 11 bit
-    HAR_MAG_3 = static_cast<int>(H3Mag / mag_scale_factor_8bit) & 0xFF; // 8 bit
-    HAR_MAG_8 = static_cast<int>(H8Mag / mag_scale_factor_8bit) & 0xFF;  // 8 bit
+    HAR_MAG_1 = (int)(H1Mag / mag_scale_factor_11bit) & (0x7FF); // 11 bit 
+    HAR_MAG_2 = (int)(H2Mag / mag_scale_factor_11bit) & (0x7FF); // 11 bit
+    HAR_MAG_3 = (int)(H3Mag / mag_scale_factor_8bit) & (0xFF); // 8 bit
+    HAR_MAG_8 = (int)(H8Mag / mag_scale_factor_8bit) & (0xFF);  // 8 bit
 
-    // Derive register-compatible HPHASE values
-    double pha_scale_factor_12bit = 360.0 / (1 << 12); // in degrees
-    HAR_PHASE_1 = static_cast<int>(H1PHcor / pha_scale_factor_12bit) & 0xFFF; // 12 bit
-    HAR_PHASE_2 = static_cast<int>(H2PHcor / pha_scale_factor_12bit) & 0xFFF; // 12 bit
-    HAR_PHASE_3 = static_cast<int>(H3PHcor / pha_scale_factor_12bit) & 0xFFF; // 12 bit
-    HAR_PHASE_8 = static_cast<int>(H8PHcor / pha_scale_factor_12bit) & 0xFFF; // 12 bit
+    // Derive register compatible HPHASE values
+    double pha_scale_factor_12bit = 360.0 / (1 << 12); // in Deg
+    HAR_PHASE_1 = (int)(H1PHcor / pha_scale_factor_12bit) & (0xFFF); // 12bit number
+    HAR_PHASE_2 = (int)(H2PHcor / pha_scale_factor_12bit) & (0xFFF); // 12bit number
+    HAR_PHASE_3 = (int)(H3PHcor / pha_scale_factor_12bit) & (0xFFF);// 12bit number
+    HAR_PHASE_8 = (int)(H8PHcor / pha_scale_factor_12bit) & (0xFFF); // 12bit number
 
-    // Append results to the output
     result.append("HMAG1: " + QString::number(HAR_MAG_1) + "\n");
     result.append("HMAG2: " + QString::number(HAR_MAG_2) + "\n");
     result.append("HMAG3: " + QString::number(HAR_MAG_3) + "\n");
