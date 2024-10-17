@@ -2,10 +2,12 @@
 #define GRFFTSINKCOMPONENT_H
 
 #include <QObject>
-#include "interfaces.h"
-#include "toolcomponent.h"
+#include "adcinterfaces.h"
 #include <gr-util/time_sink_f.h>
-#include "channelcomponent.h"
+#include <gui/channelcomponent.h>
+#include <gui/toolcomponent.h>
+#include <adcacquisitionmanager.h>
+#include <synccontroller.h>
 
 namespace scopy {
 namespace adc {

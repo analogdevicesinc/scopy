@@ -2,7 +2,6 @@
 #define FFTPLOTMANAGERSETTINGS_H
 
 #include <timeplotcomponent.h>
-#include <toolcomponent.h>
 
 #include <QLabel>
 
@@ -11,9 +10,10 @@
 #include <gui/widgets/menuonoffswitch.h>
 #include <gui/widgets/menuplotaxisrangecontrol.h>
 #include <gui/plotautoscaler.h>
-#include "channelcomponent.h"
-#include "interfaces.h"
 #include <gui/widgets/menusectionwidget.h>
+#include <gui/toolcomponent.h>
+#include <gui/channelcomponent.h>
+#include "adcinterfaces.h"
 
 #include "fftplotmanager.h"
 #include "menuspinbox.h"

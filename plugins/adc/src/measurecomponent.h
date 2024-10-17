@@ -1,10 +1,12 @@
 #ifndef MEASURECOMPONENT_H
 #define MEASURECOMPONENT_H
-#include "toolcomponent.h"
+
+#include "scopy-adc_export.h"
 #include "gui/widgets/measurementsettings.h"
 #include "gui/widgets/menucontrolbutton.h"
-#include "scopy-adc_export.h"
-#include "interfaces.h"
+#include <gui/interfaces.h>
+#include <gui/toolcomponent.h>
+#include "adcinterfaces.h"
 
 namespace scopy {
 namespace adc {

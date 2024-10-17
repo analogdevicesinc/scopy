@@ -2,9 +2,9 @@
 #define TIMEPLOTCOMPONENTSETTINGS_H
 #include <QWidget>
 #include <timeplotcomponent.h>
-#include <toolcomponent.h>
+#include <gui/toolcomponent.h>
 #include "scopy-adc_export.h"
-#include "interfaces.h"
+#include "adcinterfaces.h"
 #include <gui/widgets/menuplotaxisrangecontrol.h>
 #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 

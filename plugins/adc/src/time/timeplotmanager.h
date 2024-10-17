@@ -3,11 +3,11 @@
 #include "plotbufferpreviewer.h"
 #include "scopy-adc_export.h"
 #include <QWidget>
-#include <interfaces.h>
-#include <channelcomponent.h>
+#include "adcinterfaces.h"
 #include <measurementpanel.h>
-#include "plotmanager.h"
 #include "time/timeplotcomponent.h"
+#include <gui/channelcomponent.h>
+#include <gui/plotmanager.h>
 
 namespace scopy {
 namespace adc {

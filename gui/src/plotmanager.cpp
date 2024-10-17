@@ -3,7 +3,6 @@
 #include "plotaxis.h"
 
 using namespace scopy;
-using namespace scopy::adc;
 
 PlotManager::PlotManager(QString name, QWidget *parent)
 	: QWidget(parent)
@@ -135,3 +134,5 @@ void PlotManager::replot()
 	}
 	Q_EMIT newData();
 }
+
+#include "moc_plotmanager.cpp"

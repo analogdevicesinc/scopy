@@ -4,7 +4,7 @@
 #include "menuspinbox.h"
 #include "scopy-adc_export.h"
 #include <timeplotcomponent.h>
-#include <toolcomponent.h>
+#include <gui/toolcomponent.h>
 
 #include <QLabel>
 
@@ -13,8 +13,8 @@
 #include <gui/widgets/menuonoffswitch.h>
 #include <gui/widgets/menuplotaxisrangecontrol.h>
 #include <gui/plotautoscaler.h>
-#include "channelcomponent.h"
-#include "interfaces.h"
+#include <gui/channelcomponent.h>
+#include "adcinterfaces.h"
 #include <gui/widgets/menusectionwidget.h>
 
 #include "timeplotmanager.h"

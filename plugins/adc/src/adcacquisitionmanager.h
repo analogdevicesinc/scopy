@@ -10,6 +10,7 @@
 #include <scopy-adc_export.h>
 #include <QMap>
 #include <interfaces.h>
+#include <adcinterfaces.h>
 #include <synccontroller.h>
 
 namespace scopy {
@@ -106,6 +107,13 @@ public:
 
 private:
 	SnapshotRecipe m_recipe;
+};
+
+class SCOPY_ADC_EXPORT AcqNodeChannelAware
+{
+public:
+	virtual void addChannel(AcqTreeNode *c) = 0;
+	virtual void removeChannel(AcqTreeNode *c) = 0;
 };
 
 /*

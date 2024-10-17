@@ -1,18 +1,23 @@
 #ifndef ADCINSTRUMENTCONTROLLER_H
 #define ADCINSTRUMENTCONTROLLER_H
 
-#include "toolcomponent.h"
 #include "scopy-adc_export.h"
 #include "timeplotcomponent.h"
 #include "measurecomponent.h"
 #include <QMap>
 #include <pluginbase/resourcemanager.h>
 #include <pluginbase/toolmenuentry.h>
-#include "plotmanager.h"
+#include <gui/plotmanager.h>
+#include <gui/toolcomponent.h>
+#include "adcacquisitionmanager.h"
 
 namespace scopy {
-namespace adc {
+
 class ChannelIdProvider;
+
+namespace adc {
+
+class ADCInstrument;
 
 class SCOPY_ADC_EXPORT ADCInstrumentController : public QObject,
 						 public AcqNodeChannelAware,

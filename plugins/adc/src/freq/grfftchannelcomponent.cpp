@@ -9,7 +9,7 @@
 
 #include <iio-widgets/iiowidget.h>
 #include <iio-widgets/iiowidgetbuilder.h>
-#include "fftplotcomponentchannel.h"
+#include <freq/fftplotcomponentchannel.h>
 #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 
 Q_LOGGING_CATEGORY(CAT_GRFFTChannelComponent, "GRFFTChannelComponent");

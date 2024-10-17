@@ -9,22 +9,18 @@
 #include <QtConcurrent>
 #include <QVariant>
 
-#include <gui/widgets/menuonoffswitch.h>
-#include <gui/widgets/menucombo.h>
-#include <gui/plotautoscaler.h>
+#include <widgets/menuonoffswitch.h>
+#include <widgets/menucombo.h>
+#include <plotautoscaler.h>
 
 #include <plotwidget.h>
 #include "plotinfo.h"
 #include "plotcomponent.h"
 #include "fftplotcomponentsettings.h"
-#include <gui/widgets/plotinfowidgets.h>
+#include <widgets/plotinfowidgets.h>
 
-using namespace scopy::gui;
 namespace scopy {
 namespace adc {
-
-class PlotComponentChannel;
-class ChannelComponent;
 
 class SCOPY_ADC_EXPORT FFTPlotComponent : public PlotComponent
 {

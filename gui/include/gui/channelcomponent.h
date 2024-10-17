@@ -1,25 +1,19 @@
 #ifndef CHANNELCOMPONENT_H
 #define CHANNELCOMPONENT_H
 
-#include <scopy-adc_export.h>
+#include <scopy-gui_export.h>
 #include <QWidget>
-#include "toolcomponent.h"
-#include "plotcomponent.h"
 #include "menucontrolbutton.h"
 #include "menuwidget.h"
+#include "toolcomponent.h"
+#include "plotcomponent.h"
+#include "interfaces.h"
 
 namespace scopy {
-namespace adc {
-
-class SCOPY_ADC_EXPORT GRChannel : public DataProcessor
-{
-public:
-	virtual GRSignalPath *sigpath() = 0;
-};
 
 class TimePlotComponentChannel;
 
-class SCOPY_ADC_EXPORT ChannelComponent : public QWidget,
+class SCOPY_GUI_EXPORT ChannelComponent : public QWidget,
 					  public ToolComponent,
 					  public Menu,
 					  public SamplingInfoComponent,
@@ -76,6 +70,5 @@ public Q_SLOTS:
 	virtual void onNewData(const float *xData, const float *yData, size_t size, bool copy) override;
 };
 
-} // namespace adc
 } // namespace scopy
 #endif // CHANNELCOMPONENT_H

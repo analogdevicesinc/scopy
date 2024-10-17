@@ -1,10 +1,13 @@
 #ifndef IMPORTCHANNELCOMPONENT_H
 #define IMPORTCHANNELCOMPONENT_H
 
-#include "channelcomponent.h"
+#include <gui/channelcomponent.h>
 #include <gui/plotautoscaler.h>
 #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 #include <gui/widgets/menuplotaxisrangecontrol.h>
+
+#include <adcacquisitionmanager.h>
+#include <timeplotcomponentchannel.h>
 
 namespace scopy {
 namespace adc {

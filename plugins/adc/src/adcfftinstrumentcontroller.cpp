@@ -6,7 +6,7 @@
 #include "freq/grfftchannelcomponent.h"
 #include "freq/fftplotmanager.h"
 #include "freq/fftplotmanagersettings.h"
-#include "interfaces.h"
+#include "adcinterfaces.h"
 #include "importchannelcomponent.h"
 
 using namespace scopy;

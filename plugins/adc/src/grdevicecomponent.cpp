@@ -1,5 +1,5 @@
 #include "grdevicecomponent.h"
-#include "src/channelcomponent.h"
+#include <gui/channelcomponent.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
 #include <widgets/menuheader.h>
@@ -8,7 +8,6 @@
 
 using namespace scopy;
 using namespace scopy::adc;
-// using namespace scopy::gui;
 using namespace scopy::grutil;
 
 GRDeviceComponent::GRDeviceComponent(GRIIODeviceSourceNode *node, QWidget *parent)
