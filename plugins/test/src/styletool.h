@@ -16,6 +16,7 @@ class SCOPY_TESTPLUGIN_EXPORT StyleTool : public QWidget
 {
 public:
 	StyleTool(QWidget *parent = nullptr);
+
 private:
 	QWidget *buildStylePage();
 	QWidget *buildPageColors();
