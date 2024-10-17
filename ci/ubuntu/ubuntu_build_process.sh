@@ -11,7 +11,7 @@ SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 [ "$CI_SCRIPT" == "ON" ] && USE_STAGING=OFF
 
-LIBIIO_VERSION=libiio-v0
+LIBIIO_VERSION=v0.26
 LIBAD9361_BRANCH=main
 LIBM2K_BRANCH=main
 SPDLOG_BRANCH=v1.x
