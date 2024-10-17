@@ -1315,7 +1315,7 @@ void SignalGenerator::start()
 		return;
 	}
 
-	ResourceManager::open("m2k-dac", this);
+	ResourceManager::open("m2k-dac" + tme->param(), this);
 	m_m2k_analogout->cancelBuffer();
 
 	for(auto it = channels.begin(); it != channels.end(); ++it) {
@@ -1397,7 +1397,7 @@ void SignalGenerator::stop()
 		HANDLE_EXCEPTION(e);
 		qDebug(CAT_M2K_SIGNAL_GENERATOR) << e.what();
 	}
-	ResourceManager::close("m2k-dac");
+	ResourceManager::close("m2k-dac" + tme->param());
 }
 
 void SignalGenerator::startStop(bool pressed)

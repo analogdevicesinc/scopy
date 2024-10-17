@@ -10,8 +10,9 @@
 
 using namespace scopy::pqm;
 
-HarmonicsInstrument::HarmonicsInstrument(QWidget *parent)
+HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QWidget *parent)
 	: QWidget(parent)
+	, m_tme(tme)
 {
 	initData();
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -56,7 +57,8 @@ HarmonicsInstrument::HarmonicsInstrument(QWidget *parent)
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(settingsMenuBtn, TTA_RIGHT);
 
-	connect(this, &HarmonicsInstrument::runTme, m_runBtn, &QAbstractButton::setChecked);
+	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
+	connect(this, &HarmonicsInstrument::enableTool, m_tme, &ToolMenuEntry::setRunning);
 	connect(m_runBtn, &QAbstractButton::toggled, m_singleBtn, &QAbstractButton::setDisabled);
 	connect(m_runBtn, SIGNAL(toggled(bool)), this, SLOT(toggleHarmonics(bool)));
 	connect(m_singleBtn, &QAbstractButton::toggled, m_runBtn, &QAbstractButton::setDisabled);
@@ -234,9 +236,9 @@ void HarmonicsInstrument::stop() { m_runBtn->setChecked(false); }
 void HarmonicsInstrument::toggleHarmonics(bool en)
 {
 	if(en) {
-		ResourceManager::open("pqm", this);
+		ResourceManager::open("pqm" + m_tme->param(), this);
 	} else {
-		ResourceManager::close("pqm");
+		ResourceManager::close("pqm" + m_tme->param());
 	}
 	Q_EMIT enableTool(en);
 }
