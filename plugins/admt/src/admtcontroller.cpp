@@ -604,7 +604,7 @@ void ADMTController::getPreCalibrationFFT(const vector<double>& PANG, vector<dou
     angleError = angle_errors_pre;
 
     // Perform FFT on pre-calibration angle errors
-    performFFT(angle_errors_pre, angle_errors_fft_pre, angle_errors_fft_phase_pre);
+    performFFT(angle_errors_pre, angle_errors_fft_pre, angle_errors_fft_phase_pre, cycleCount);
 
     // Store the FFT Angle Error Magnitude and Phase
     FFTAngleErrorMagnitude = angle_errors_fft_pre;
@@ -649,7 +649,7 @@ void ADMTController::getPostCalibrationFFT(const vector<double>& updated_PANG, v
     correctedError = angle_errors_post;
 
     // Perform FFT on post-calibration angle errors
-    performFFT(angle_errors_post, angle_errors_fft_post, angle_errors_fft_phase_post);
+    performFFT(angle_errors_post, angle_errors_fft_post, angle_errors_fft_phase_post, cycleCount);
     // FFT Corrected Error (angle_errors_fft_post)
     FFTCorrectedErrorMagnitude = angle_errors_fft_post;
     // FFT Corrected Error Phase (angle_errors_fft_phase_post)
@@ -665,7 +665,7 @@ void ADMTController::performFFT(const vector<double>& angle_errors, vector<doubl
     }
 
     // Step 2: Perform FFT (this assumes an FFT function you have implemented)
-    std::vector<std::complex<double>> fft_result = FFT(complex_input);
+    std::vector<std::complex<double>> fft_result = FFT(complex_input); // FFT function must be defined elsewhere
 
     size_t N = fft_result.size();
 
