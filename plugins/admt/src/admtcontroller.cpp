@@ -610,10 +610,10 @@ void ADMTController::getPreCalibrationFFT(const vector<double>& PANG, vector<dou
     FFTAngleErrorMagnitude = angle_errors_fft_pre;
     FFTAngleErrorPhase = angle_errors_fft_phase_pre;
 
-    // // Multiply the FFT magnitudes by 2
-    // for (auto& magnitude : angle_errors_fft_pre) {
-    //     magnitude *= 2;
-    // }
+    // Multiply the FFT magnitudes by 2
+    for (auto& magnitude : angle_errors_fft_pre) {
+        magnitude *= 2;
+    }
 }
 
 void ADMTController::postcalibrate(vector<double> PANG, int cycleCount, int samplesPerCycle){
@@ -656,36 +656,47 @@ void ADMTController::getPostCalibrationFFT(const vector<double>& updated_PANG, v
     FFTCorrectedErrorPhase = angle_errors_fft_phase_post;
 }
 
-void ADMTController::performFFT(const vector<double>& angle_errors, vector<double>& angle_errors_fft, vector<double>& angle_errors_fft_phase) {
-     // Step 1: Prepare the input for FFT, converting real numbers to complex (real, imaginary=0)
-    std::vector<std::complex<double>> complex_input(angle_errors.size());
-    
-    for (size_t i = 0; i < angle_errors.size(); ++i) {
-        complex_input[i] = std::complex<double>(angle_errors[i], 0.0);
+void ADMTController::performFFT(const vector<double>& angle_errors, vector<double>& angle_errors_fft, vector<double>& angle_errors_fft_phase, int cycleCount) {
+    typedef complex<double> cx;
+
+    int L = angle_errors.size(); // Original signal length (L)
+    int N = pow(2, ceil(log2(L))); // Ensure size is a power of 2 (padding if necessary)
+
+    vector<cx> fft_in(N, cx(0, 0)); // Input signal (zero-padded if necessary)
+    vector<cx> fft_out(N); // Output signal (complex)
+
+    // Format angle errors into the fft_in vector
+    for (int i = 0; i < L; i++) {
+        fft_in[i] = cx(angle_errors[i], 0);
     }
 
-    // Step 2: Perform FFT (this assumes an FFT function you have implemented)
-    std::vector<std::complex<double>> fft_result = FFT(complex_input); // FFT function must be defined elsewhere
+    // Perform FFT
+    fft(fft_in.data(), fft_out.data(), log2(N));
 
-    size_t N = fft_result.size();
+    // Temporary vectors to store magnitude and phase
+    vector<double> angle_errors_fft_temp(N);
+    vector<double> angle_errors_fft_phase_temp(N);
 
-    // Step 3: Resize the output vectors to match the expected size (N / 2 + 1 for positive frequencies)
-    angle_errors_fft.resize(N / 2 + 1);
-    angle_errors_fft_phase.resize(N / 2 + 1);
-
-    // Step 4: Compute magnitudes and phases from the FFT results, scaling appropriately
-    for (size_t k = 0; k <= N / 2; ++k) {
-        // Magnitude: sqrt(real^2 + imag^2)
-        angle_errors_fft[k] = 2.0 * std::abs(fft_result[k]);  // Scaling magnitude by 2
-
-        // Phase: atan2(imaginary, real)
-        angle_errors_fft_phase[k] = std::atan2(fft_result[k].imag(), fft_result[k].real()) * 180.0 / M_PI;  // Convert to degrees
+    // Calculate magnitude and phase for all values
+    for (int i = 0; i < N; i++) {
+        // Magnitude: Normalize by L (original signal length)
+        angle_errors_fft_temp[i] = abs(fft_out[i]) * 2.0 / L;
+        angle_errors_fft_phase_temp[i] = atan2(fft_out[i].imag(), fft_out[i].real());
     }
 
-    // Optional: Normalize phases to the [0, 360] degree range
-    for (auto& phase : angle_errors_fft_phase) {
-        if (phase < 0) phase += 360.0;  // Wrap phase to be positive, within [0, 360]
+    // Prepare vectors for upper half of FFT (positive frequencies)
+    vector<double> angle_errors_fft_upper_half(N / 2);
+    vector<double> angle_errors_fft_phase_upper_half(N / 2);
+
+    // Get upper half only (due to symmetry in real-valued signal FFT)
+    for (int i = 0; i < N / 2; i++) {
+        angle_errors_fft_upper_half[i] = angle_errors_fft_temp[i];
+        angle_errors_fft_phase_upper_half[i] = angle_errors_fft_phase_temp[i];
     }
+
+    // Resize final vectors based on cycle count (if needed)
+    angle_errors_fft = angle_errors_fft_upper_half;
+    angle_errors_fft_phase = angle_errors_fft_phase_upper_half;
 }
 
 void ADMTController::computeSineCosineOfAngles(const vector<double>& angles) {
