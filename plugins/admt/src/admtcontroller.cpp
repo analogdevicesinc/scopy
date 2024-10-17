@@ -657,30 +657,29 @@ void ADMTController::getPostCalibrationFFT(const vector<double>& updated_PANG, v
 }
 
 void ADMTController::performFFT(const vector<double>& angle_errors, vector<double>& angle_errors_fft, vector<double>& angle_errors_fft_phase) {
-    int n = angle_errors.size();
-    int log2n = std::log2(n);
-
-    // Step 1: Prepare the input for FFT, converting real numbers to complex (real, imaginary=0)
-    std::vector<std::complex<double>> complex_input(n), complex_output(n);
+     // Step 1: Prepare the input for FFT, converting real numbers to complex (real, imaginary=0)
+    std::vector<std::complex<double>> complex_input(angle_errors.size());
     
-    for (int i = 0; i < n; ++i) {
+    for (size_t i = 0; i < angle_errors.size(); ++i) {
         complex_input[i] = std::complex<double>(angle_errors[i], 0.0);
     }
 
-    // Step 2: Perform FFT using your provided 'fft' function
-    fft(complex_input.begin(), complex_output.begin(), log2n);
+    // Step 2: Perform FFT (this assumes an FFT function you have implemented)
+    std::vector<std::complex<double>> fft_result = FFT(complex_input);
+
+    size_t N = fft_result.size();
 
     // Step 3: Resize the output vectors to match the expected size (N / 2 + 1 for positive frequencies)
-    angle_errors_fft.resize(n / 2 + 1);
-    angle_errors_fft_phase.resize(n / 2 + 1);
+    angle_errors_fft.resize(N / 2 + 1);
+    angle_errors_fft_phase.resize(N / 2 + 1);
 
-    // Step 4: Compute magnitudes and phases from the FFT results
-    for (int k = 0; k <= n / 2; ++k) {
+    // Step 4: Compute magnitudes and phases from the FFT results, scaling appropriately
+    for (size_t k = 0; k <= N / 2; ++k) {
         // Magnitude: sqrt(real^2 + imag^2)
-        angle_errors_fft[k] = 2.0 * std::abs(complex_output[k]);  // Scaling magnitude by 2
+        angle_errors_fft[k] = 2.0 * std::abs(fft_result[k]);  // Scaling magnitude by 2
 
         // Phase: atan2(imaginary, real)
-        angle_errors_fft_phase[k] = std::atan2(complex_output[k].imag(), complex_output[k].real()) * 180.0 / M_PI;  // Convert to degrees
+        angle_errors_fft_phase[k] = std::atan2(fft_result[k].imag(), fft_result[k].real()) * 180.0 / M_PI;  // Convert to degrees
     }
 
     // Optional: Normalize phases to the [0, 360] degree range
