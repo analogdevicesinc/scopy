@@ -98,6 +98,7 @@ def write_header_file(output_file: str, namespace_code: str, name: str, namespac
 
     def_name = name.upper().replace(".", "_")
     with open(output_file, 'w') as f:
+        f.write("// Do not modify this file! This was auto generated.\n")
         f.write("#ifndef " + def_name + "\n")
         f.write("#define " + def_name + "\n")
         f.write("#include <scopy-gui_export.h>\n\n")
