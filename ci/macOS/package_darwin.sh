@@ -120,7 +120,6 @@ echo "=== Fixing libserialport"
 libserialportpath="$(otool -L ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep libserialport | cut -d " " -f 1 | awk '{$1=$1};1')"
 libserialportid="$(echo ${libserialportpath} | rev | cut -d "/" -f 1 | rev)"
 install_name_tool -change ${libserialportpath} @executable_path/../Frameworks/${libserialportid} ./Scopy.app/Contents/Frameworks/iio.framework/iio
-ln -s $BUILDDIR/Scopy.app/Contents/Frameworks/libserialport*.dylib $BUILDDIR/Scopy.app/Contents/Frameworks/libserialport.0.dylib
 
 install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libm2k.dylib
 install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libm2k.?.?.?.dylib

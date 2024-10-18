@@ -101,6 +101,7 @@ clone() {
 	echo "#######CLONE#######"
 	mkdir -p $STAGING_AREA
 	pushd $STAGING_AREA
+	[ -d 'libserialport' ] || git clone --recursive https://github.com/cseci/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
@@ -113,6 +114,20 @@ clone() {
 	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
+	popd
+}
+build_libserialport(){
+	echo "### Building libserialport - branch $LIBSERIALPORT_BRANCH"
+	pushd $STAGING_AREA/libserialport
+	git clean -xdf
+	./autogen.sh
+	./configure ${AUTOCONF_OPTS}
+	make $JOBS
+	patchelf --force-rpath --set-rpath \$ORIGIN $STAGING_AREA/libserialport/.libs/libserialport.so
+	sudo make install
+
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
 	popd
 }
 
@@ -401,6 +416,7 @@ generate_ci_envs()
 # Helper functions
 #
 build_deps(){
+	build_libserialport
 	build_libiio
 	build_libad9361
 	build_spdlog

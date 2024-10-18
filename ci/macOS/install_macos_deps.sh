@@ -5,7 +5,7 @@ REPO_SRC=$(git rev-parse --show-toplevel)
 source $REPO_SRC/ci/macOS/macos_config.sh
 
 PACKAGES="${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libzip glib libusb glog "
-PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libserialport libsndfile"
+PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libsndfile"
 
 OS_VERSION=${1:-$(sw_vers -productVersion)}
 echo "MacOS version $OS_VERSION"
@@ -63,6 +63,7 @@ clone() {
 	echo "#######CLONE#######"
 	mkdir -p $STAGING_AREA
 	pushd $STAGING_AREA
+	git clone --recursive https://github.com/cseci/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 	git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
@@ -99,6 +100,18 @@ build_with_cmake() {
 
 	#clear variable
 	CURRENT_BUILD_CMAKE_OPTS=""
+}
+
+build_libserialport(){
+	CURRENT_BUILD=libserialport
+	pushd $STAGING_AREA/$CURRENT_BUILD
+	save_version_info
+	git clean -xdf
+	./autogen.sh
+	./configure --prefix $STAGING_AREA_DEPS
+	make $JOBS
+	sudo make install
+	popd
 }
 
 build_libiio() {
@@ -295,6 +308,7 @@ build_kddock () {
 }
 
 build_deps(){
+	build_libserialport
 	build_libiio
 	build_libad9361
 	build_libm2k
