@@ -119,7 +119,8 @@ build_with_cmake() {
 		make install
 	fi
 	eval $CURRENT_BUILD_POST_MAKE
-	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
 
 	#clean deps folder
 	if [ "$INSTALL" == "ON" ] && [ "$CI_SCRIPT" == "ON" ];then
@@ -155,7 +156,8 @@ build_libserialport(){
 		git clean -xdf
 	fi
 
-	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
 	popd
 }
 
@@ -310,7 +312,8 @@ EOF
 		git clean -xdf
 	fi
 
-	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
 	popd
 }
 
@@ -344,7 +347,8 @@ build_libsigrokdecode() {
 		git clean -xdf
 	fi
 
-	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
 	popd
 }
 
