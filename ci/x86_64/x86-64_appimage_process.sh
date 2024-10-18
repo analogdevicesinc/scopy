@@ -16,6 +16,7 @@ fi
 
 export APPIMAGE=1
 
+LIBSERIALPORT_BRANCH=scopy-v2
 LIBIIO_VERSION=v0.26
 LIBAD9361_BRANCH=main
 LIBM2K_BRANCH=main
@@ -82,6 +83,7 @@ clone() {
 	echo "#######CLONE#######"
 	mkdir -p $STAGING_AREA
 	pushd $STAGING_AREA
+	[ -d 'libserialport' ] || git clone --recursive https://github.com/cseci/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
@@ -160,12 +162,30 @@ install_packages() {
 		subversion mesa-common-dev graphviz xserver-xorg gettext texinfo mm-common doxygen \
 		libboost-all-dev libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev \
 		libxcb-xinerama0  libgmp3-dev libzip-dev libglib2.0-dev libglibmm-2.4-dev libsigc++-2.0-dev \
-		libclang1-9 libmatio-dev liborc-0.4-dev libgl1-mesa-dev libserialport0 libserialport-dev \
+		libclang1-9 libmatio-dev liborc-0.4-dev libgl1-mesa-dev \
 		libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libavahi-client-dev libsndfile1-dev \
 		libxkbcommon-x11-0 libqt5gui5 libncurses5 libtool libaio-dev libzmq3-dev libxml2-dev
 
 	pip3 install --no-cache-dir mako
 	pip3 install --no-cache-dir packaging
+}
+
+build_libserialport(){
+	CURRENT_BUILD=libserialport
+	pushd $STAGING_AREA/$CURRENT_BUILD
+	git clean -xdf
+
+	INSTALL=$1
+	[ -z $INSTALL ] && INSTALL=ON
+
+	./autogen.sh
+	[ "$USE_STAGING" == "ON" ] && ./configure --prefix $STAGING_AREA_DEPS || ./configure
+	make $JOBS
+	[ "$INSTALL" == "ON" ] && sudo make install
+
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
+	popd
 }
 
 build_libiio() {
@@ -477,6 +497,7 @@ move_appimage(){
 build_deps(){
 	clone
 	download_tools
+	build_libserialport ON
 	build_libiio ON
 	build_libad9361 ON
 	build_spdlog ON
