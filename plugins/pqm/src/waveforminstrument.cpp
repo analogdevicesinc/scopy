@@ -14,8 +14,9 @@
 
 using namespace scopy::pqm;
 
-WaveformInstrument::WaveformInstrument(QWidget *parent)
+WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QWidget *parent)
 	: QWidget(parent)
+	, m_tme(tme)
 {
 	initData();
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -55,7 +56,8 @@ WaveformInstrument::WaveformInstrument(QWidget *parent)
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_settBtn, TTA_RIGHT);
 
-	connect(this, &WaveformInstrument::runTme, m_runBtn, &QAbstractButton::setChecked);
+	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
+	connect(this, &WaveformInstrument::enableTool, m_tme, &ToolMenuEntry::setRunning);
 	connect(m_runBtn, &QAbstractButton::toggled, m_singleBtn, &QAbstractButton::setDisabled);
 	connect(m_runBtn, SIGNAL(toggled(bool)), this, SLOT(toggleWaveform(bool)));
 	connect(m_singleBtn, &QAbstractButton::toggled, m_runBtn, &QAbstractButton::setDisabled);
@@ -173,9 +175,9 @@ void WaveformInstrument::stop() { m_runBtn->setChecked(false); }
 void WaveformInstrument::toggleWaveform(bool en)
 {
 	if(en) {
-		ResourceManager::open("pqm", this);
+		ResourceManager::open("pqm" + m_tme->param(), this);
 	} else {
-		ResourceManager::close("pqm");
+		ResourceManager::close("pqm" + m_tme->param());
 	}
 	m_plottingStrategy->clearSamples();
 	Q_EMIT enableTool(en);

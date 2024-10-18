@@ -107,24 +107,27 @@ bool PQMPlugin::onConnect()
 	m_acqManager = new AcquisitionManager(ctx, m_pingTask, this);
 	bool hasFwVers = m_acqManager->hasFwVers();
 
-	RmsInstrument *rms = new RmsInstrument();
-	m_toolList[0]->setTool(rms);
-	m_toolList[0]->setEnabled(true);
-	m_toolList[0]->setRunBtnVisible(true);
+	ToolMenuEntry *rmsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "pqmrms");
+	RmsInstrument *rms = new RmsInstrument(rmsTme);
+	rmsTme->setTool(rms);
+	rmsTme->setEnabled(true);
+	rmsTme->setRunBtnVisible(true);
 	connect(m_acqManager, &AcquisitionManager::pqmAttrsAvailable, rms, &RmsInstrument::onAttrAvailable);
 
-	HarmonicsInstrument *harmonics = new HarmonicsInstrument();
+	ToolMenuEntry *harmonicsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "pqmharmonics");
+	HarmonicsInstrument *harmonics = new HarmonicsInstrument(harmonicsTme);
 	harmonics->showThdWidget(hasFwVers);
-	m_toolList[1]->setTool(harmonics);
-	m_toolList[1]->setEnabled(true);
-	m_toolList[1]->setRunBtnVisible(true);
+	harmonicsTme->setTool(harmonics);
+	harmonicsTme->setEnabled(true);
+	harmonicsTme->setRunBtnVisible(true);
 	connect(m_acqManager, &AcquisitionManager::pqmAttrsAvailable, harmonics, &HarmonicsInstrument::onAttrAvailable);
 
-	WaveformInstrument *waveform = new WaveformInstrument();
+	ToolMenuEntry *waveformTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "pqmwaveform");
+	WaveformInstrument *waveform = new WaveformInstrument(waveformTme);
 	waveform->showOneBuffer(hasFwVers);
-	m_toolList[2]->setTool(waveform);
-	m_toolList[2]->setEnabled(true);
-	m_toolList[2]->setRunBtnVisible(true);
+	waveformTme->setTool(waveform);
+	waveformTme->setEnabled(true);
+	waveformTme->setRunBtnVisible(true);
 	connect(m_acqManager, &AcquisitionManager::bufferDataAvailable, waveform,
 		&WaveformInstrument::onBufferDataAvailable, Qt::QueuedConnection);
 
@@ -137,10 +140,6 @@ bool PQMPlugin::onConnect()
 	connect(settings, &SettingsInstrument::setAttributes, m_acqManager, &AcquisitionManager::setConfigAttr);
 
 	for(auto &tool : m_toolList) {
-		if(tool->runBtnVisible()) {
-			connect(tool, SIGNAL(runClicked(bool)), tool->tool(), SIGNAL(runTme(bool)));
-			connect(tool->tool(), SIGNAL(enableTool(bool)), tool, SLOT(setRunning(bool)));
-		}
 		connect(tool->tool(), SIGNAL(enableTool(bool, QString)), m_acqManager,
 			SLOT(toolEnabled(bool, QString)));
 	}
