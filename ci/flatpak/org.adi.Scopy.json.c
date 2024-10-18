@@ -289,8 +289,8 @@
 			"sources": [
 				{
 					"type": "git",
-					"url": "https://github.com/sigrokproject/libserialport",
-					"branch" : "master"
+					"url": "https://github.com/cseci/libserialport",
+					"branch" : "scopy-v2"
 				}
 			]
 
