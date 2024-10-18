@@ -23,9 +23,7 @@ build_with_cmake() {
 	make $JOBS
 	CURRENT_BUILD_CMAKE_OPTS=""
 
-	echo "$(basename -a "$(git config --get remote.origin.url)") - \
-	$(git rev-parse --abbrev-ref HEAD) - \
-	$(git rev-parse --short HEAD)" \
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 }
 
@@ -230,9 +228,7 @@ build_qwt() {
 	patchelf --force-rpath --set-rpath \$ORIGIN $STAGING_AREA/qwt/lib/libqwt.so
 	sudo make INSTALL_ROOT=$SYSROOT install
 
-	echo "$(basename -a "$(git config --get remote.origin.url)") - \
-	$(git rev-parse --abbrev-ref HEAD) - \
-	$(git rev-parse --short HEAD)" \
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 	popd
 }
@@ -248,9 +244,7 @@ build_libsigrokdecode() {
 	patchelf --force-rpath --set-rpath \$ORIGIN $STAGING_AREA/libsigrokdecode/.libs/libsigrokdecode.so
 	sudo make install
 
-	echo "$(basename -a "$(git config --get remote.origin.url)") - \
-	$(git rev-parse --abbrev-ref HEAD) - \
-	$(git rev-parse --short HEAD)" \
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 	popd
 }

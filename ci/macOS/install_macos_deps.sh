@@ -83,9 +83,7 @@ generate_status_file(){
 }
 
 save_version_info() {
-	echo "$(basename -a "$(git config --get remote.origin.url)") - \
-	$(git rev-parse --abbrev-ref HEAD) - \
-	$(git rev-parse --short HEAD)" \
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 }
 
