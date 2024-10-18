@@ -144,9 +144,7 @@ build_with_cmake() {
 		if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
 	fi
 	CURRENT_BUILD_CMAKE_OPTS=""
-	echo "$(basename -a "$(git config --get remote.origin.url)") - \
-	$(git rev-parse --abbrev-ref HEAD) - \
-	$(git rev-parse --short HEAD)" \
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 }
 
@@ -286,9 +284,7 @@ build_qwt() {
 		fi
 	fi
 
-	echo "$(basename -a "$(git config --get remote.origin.url)") - \
-	$(git rev-parse --abbrev-ref HEAD) - \
-	$(git rev-parse --short HEAD)" \
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 
 	popd
@@ -316,9 +312,7 @@ build_libsigrokdecode() {
 		if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
 	fi
 
-	echo "$(basename -a "$(git config --get remote.origin.url)") - \
-	$(git rev-parse --abbrev-ref HEAD) - \
-	$(git rev-parse --short HEAD)" \
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 
 	popd
