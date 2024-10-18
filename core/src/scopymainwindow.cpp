@@ -28,6 +28,7 @@
 #include <QTranslator>
 #include <QOpenGLFunctions>
 #include <browsemenu.h>
+#include <deviceautoconnect.h>
 
 #include "logging_categories.h"
 #include "qmessagebox.h"
@@ -128,8 +129,9 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	m_sbc = new ScanButtonController(scanCycle, hp->scanControlBtn(), this);
 	connect(hp->scanBtn(), &QPushButton::clicked, this, [=]() { scanTask->run(); });
 
+	DeviceAutoConnect::initPreferences();
 	dm = new DeviceManager(pm, this);
-	bool general_connect_to_multiple_devices = pref->get("general_connect_to_multiple_devices").toBool();
+	bool general_connect_to_multiple_devices = Preferences::get("general_connect_to_multiple_devices").toBool();
 	dm->setExclusive(!general_connect_to_multiple_devices);
 
 	dtm = new DetachedToolWindowManager(this);
@@ -165,7 +167,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	connect(dm, SIGNAL(requestDevice(QString)), hp, SLOT(viewDevice(QString)));
 
-	if(pref->get("general_scan_for_devices").toBool()) {
+	if(Preferences::get("general_scan_for_devices").toBool()) {
 		scanTask->run();
 	}
 
@@ -182,6 +184,9 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	connect(hp, &ScopyHomePage::newDeviceAvailable, dm, &DeviceManager::addDevice);
 
+	connect(prefPage, &ScopyPreferencesPage::refreshDevicesPressed, dm, &DeviceManager::requestConnectedDev);
+	connect(dm, &DeviceManager::connectedDevices, prefPage, &ScopyPreferencesPage::updateSessionDevices);
+
 	initApi();
 #ifdef SCOPY_DEV_MODE
 	// this is an example of how autoconnect is done
@@ -194,6 +199,9 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	api->connectDevice(id);
 	// api->switchTool(id, "Time");
 #endif
+	if(Preferences::get("autoconnect_previous").toBool())
+		deviceAutoconnect();
+	prefPage->initSessionDevices();
 
 	qInfo(CAT_BENCHMARK) << "ScopyMainWindow constructor took: " << timer.elapsed() << "ms";
 }
@@ -229,6 +237,21 @@ void ScopyMainWindow::enableScanner()
 	handleScanner();
 }
 
+void ScopyMainWindow::deviceAutoconnect()
+{
+	QMap<QString, QVariant> devicesMap = Preferences::get("autoconnect_devices").toMap();
+	const QStringList &keys = devicesMap.keys();
+	for(const QString &uri : keys) {
+		QStringList plugins = devicesMap[uri].toString().split(";");
+		auto id = api->addDevice(uri, plugins, "iio");
+		if(id.isEmpty()) {
+			DeviceAutoConnect::removeDevice(uri);
+		} else {
+			api->connectDevice(id);
+		}
+	}
+}
+
 void ScopyMainWindow::save()
 {
 	QString selectedFilter;
@@ -259,13 +282,19 @@ void ScopyMainWindow::load(QString file)
 	ScopyTitleManager::setIniFileName(file);
 }
 
-void ScopyMainWindow::closeEvent(QCloseEvent *event) { dm->disconnectAll(); }
+void ScopyMainWindow::closeEvent(QCloseEvent *event)
+{
+	DeviceAutoConnect::clear();
+	if(Preferences::get("autoconnect_previous").toBool()) {
+		dm->saveSessionDevices();
+	}
+	dm->disconnectAll();
+}
 
 void ScopyMainWindow::requestTools(QString id) { m_toolMenuManager->showMenuItem(id); }
 
 ScopyMainWindow::~ScopyMainWindow()
 {
-
 	scanCycle->stop();
 	delete ui;
 }
@@ -316,6 +345,7 @@ void ScopyMainWindow::initPreferences()
 	Preferences *p = Preferences::GetInstance();
 	p->setPreferencesFilename(preferencesPath);
 	p->load();
+	p->init("autoconnect_previous", false);
 	p->init("general_first_run", true);
 	p->init("general_save_session", true);
 	p->init("general_save_attached", true);
@@ -471,7 +501,8 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 	} else if(str == "plugins_use_debugger_v2") {
 		Q_EMIT p->restartRequired();
 	} else if(str == "general_connect_to_multiple_devices") {
-		bool general_connect_to_multiple_devices = pref->get("general_connect_to_multiple_devices").toBool();
+		bool general_connect_to_multiple_devices =
+			Preferences::get("general_connect_to_multiple_devices").toBool();
 		dm->setExclusive(!general_connect_to_multiple_devices);
 	} else if(str == "general_scan_for_devices") {
 		enableScanner();

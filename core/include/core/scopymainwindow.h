@@ -106,6 +106,7 @@ private:
 	void initStatusBar();
 	void handleScanner();
 	void enableScanner();
+	void deviceAutoconnect();
 
 protected:
 	void closeEvent(QCloseEvent *event) override;

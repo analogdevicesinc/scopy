@@ -25,12 +25,14 @@
 #include "devicefactory.h"
 #include "deviceimpl.h"
 #include "deviceloader.h"
+#include "pluginbase/preferences.h"
 #include "pluginbase/statusbarmanager.h"
 
 #include <QDebug>
 #include <QLoggingCategory>
 #include <QThread>
 #include <QtConcurrent>
+#include <deviceautoconnect.h>
 
 Q_LOGGING_CATEGORY(CAT_DEVICEMANAGER, "DeviceManager")
 using namespace scopy;
@@ -180,6 +182,22 @@ void DeviceManager::load(QSettings &s)
 	}
 }
 
+void DeviceManager::requestConnectedDev()
+{
+	QMap<QString, QStringList> devMap;
+	for(const QString &d : qAsConst(connectedDev)) {
+		QList<Plugin *> availablePlugins = dynamic_cast<DeviceImpl *>(map[d])->plugins();
+		QStringList enabledPlugins;
+		for(Plugin *p : qAsConst(availablePlugins)) {
+			if(p->enabled()) {
+				enabledPlugins.append(p->name());
+			}
+		}
+		devMap[map[d]->param()] = enabledPlugins;
+	}
+	Q_EMIT connectedDevices(devMap);
+}
+
 void DeviceManager::changeToolListDevice()
 {
 	QString id = dynamic_cast<Device *>(QObject::sender())->id();
@@ -276,5 +294,18 @@ bool DeviceManager::busy()
 }
 
 int DeviceManager::connectedDeviceCount() { return connectedDev.size(); }
+
+void DeviceManager::saveSessionDevices()
+{
+	for(const QString &d : qAsConst(connectedDev)) {
+		QList<Plugin *> availablePlugins = dynamic_cast<DeviceImpl *>(map[d])->plugins();
+		QStringList enabledPlugins;
+		for(Plugin *p : qAsConst(availablePlugins)) {
+			if(p->enabled())
+				enabledPlugins.append(p->name());
+		}
+		DeviceAutoConnect::addDevice(map[d]->param(), enabledPlugins);
+	}
+}
 
 #include "moc_devicemanager.cpp"
