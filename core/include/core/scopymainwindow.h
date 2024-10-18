@@ -84,7 +84,6 @@ private:
 	PluginRepository *pr;
 	ScopyHomePage *hp;
 	DeviceManager *dm;
-	Preferences *pref;
 
 	CyclicalTask *scanCycle;
 	IIOScanTask *scanTask;
