@@ -26,6 +26,8 @@
 
 #include <QTabWidget>
 #include <QVBoxLayout>
+#include <QMap>
+#include <widgets/menusectionwidget.h>
 
 namespace scopy {
 class SCOPY_CORE_EXPORT ScopyPreferencesPage : public QWidget
@@ -36,6 +38,11 @@ public:
 	~ScopyPreferencesPage();
 	QWidget *buildGeneralPreferencesPage();
 	void addHorizontalTab(QWidget *w, QString text);
+	void initSessionDevices();
+public Q_SLOTS:
+	void updateSessionDevices(QMap<QString, QStringList> devices);
+Q_SIGNALS:
+	void refreshDevicesPressed();
 private Q_SLOTS:
 	void resetScopyPreferences();
 
@@ -43,9 +50,12 @@ private:
 	QTabWidget *tabWidget;
 	void initRestartWidget();
 	QWidget *restartWidget;
+	QMap<QString, QWidget *> m_connDevices;
+	QPushButton *m_devRefresh;
 	QWidget *buildSaveSessionPreference();
 	QWidget *buildResetScopyDefaultButton();
 	QVBoxLayout *layout;
+	MenuSectionCollapseWidget *m_autoConnectWidget;
 	void removeIniFiles(bool backup = true);
 	void initUI();
 };

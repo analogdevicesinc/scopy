@@ -45,6 +45,7 @@ public:
 	bool getExclusive() const;
 	bool busy();
 	int connectedDeviceCount();
+	void saveSessionDevices();
 
 public Q_SLOTS:
 
@@ -59,7 +60,11 @@ public Q_SLOTS:
 
 	void save(QSettings &s);
 	void load(QSettings &s);
+	void requestConnectedDev();
 	//	void updateScan(QStringList ls);
+
+Q_SIGNALS:
+	void connectedDevices(QMap<QString, QStringList> connectedDev);
 
 private Q_SLOTS:
 	void changeToolListDevice();
