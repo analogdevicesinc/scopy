@@ -27,6 +27,7 @@
 #include <timeplotcomponentsettings.h>
 
 #include <grtimechannelcomponent.h>
+#include <style.h>
 
 namespace scopy {
 namespace adc {
@@ -49,13 +50,13 @@ TimePlotManagerSettings::~TimePlotManagerSettings() {}
 
 QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 {
-	m_pen = QPen(StyleHelper::getColor("ScopyBlue"));
+	m_pen = QPen(Style::getAttribute(json::theme::interactive_primary_idle));
 	m_menu = new MenuWidget("TIME PLOT", m_pen, parent);
 
 	QWidget *xaxismenu = createXAxisMenu(m_menu);
 
 	m_addPlotBtn = new QPushButton("Add Plot", this);
-	StyleHelper::BlueButton(m_addPlotBtn, "AddPlotButton");
+	StyleHelper::BasicButton(m_addPlotBtn, "AddPlotButton");
 
 	connect(m_addPlotBtn, &QPushButton::clicked, this, [=]() {
 		uint32_t idx = m_plotManager->addPlot("Time Plot " + QString::number(m_plotManager->plots().count()));

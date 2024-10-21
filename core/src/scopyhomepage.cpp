@@ -45,13 +45,16 @@ ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
 					  ";}");
 	// ui->horizontalLayout_2->setStyleSheet(
 	// ".QWidget {border-radius: " + Style::getAttribute(json::global::radius_1) + ";}");
+	// ui->container->setStyleSheet(".QWidget#container { background-color: " + Style::getAttribute(json::theme::background_subtle) + "; }");
+	// Style::setStyle(ui->horizontalLayout_2, style::properties::widget::border);
+	Style::setStyle(ui->wInfoPageStack, style::properties::widget::border);
 
 	is->add("home", new ScopyHomeInfoPage());
 	is->add("add", add);
 
 	//	addDevice("dev1","dev1","descr1",new QPushButton("abc"),new QLabel("page1"));
 
-	StyleHelper::BlueButton(scanBtn());
+	Style::setStyle(scanBtn(), style::properties::button::basicButton);
 	scanBtn()->setFixedWidth(80);
 	connect(hc, SIGNAL(goLeft()), db, SLOT(prevDevice()));
 	connect(hc, SIGNAL(goRight()), db, SLOT(nextDevice()));

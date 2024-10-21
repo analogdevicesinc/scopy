@@ -21,6 +21,7 @@
 
 #include "datamonitorstylehelper.hpp"
 
+#include <style.h>
 #include <stylehelper.h>
 
 using namespace scopy::datamonitor;
@@ -51,7 +52,7 @@ void DataMonitorStyleHelper::DataMonitorToolStyle(DatamonitorTool *tool)
 	tool->clearBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	tool->clearBtn->setStyleSheet(RemoveButtonStyle());
 	tool->textMonitors->setStyleSheet("color: white; font-size: 16px;");
-	tool->tool->setRightContainerWidth(285);
+	tool->tool->setRightContainerWidth(300);
 	tool->tool->setLeftContainerWidth(185);
 	tool->tool->centralContainer()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
@@ -78,8 +79,8 @@ void DataMonitorStyleHelper::SevenSegmentMonitorsStyle(SevenSegmentMonitor *seve
 						}
 						)css");
 
-	style.replace("&&childWidgetBackground&&", StyleHelper::getColor("UIElementBackground"));
-	style.replace("&&hoverBackground&&", StyleHelper::getColor("LabelText"));
+	style.replace("&&childWidgetBackground&&", Style::getAttribute(json::theme::background_primary));
+	style.replace("&&hoverBackground&&", Style::getAttribute(json::theme::content_default));
 	style.replace("&&lcdColor&&", lcdColor);
 
 	sevenSegmentMonitor->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -107,9 +108,9 @@ void DataMonitorStyleHelper::SevenSegmentMonitorMenuStyle(SevenSegmentMonitorSet
 
 void DataMonitorStyleHelper::DataLoggingMenuStyle(DataLoggingMenu *menu)
 {
-	StyleHelper::BlueButton(menu->dataLoggingBrowseBtn);
-	StyleHelper::BlueButton(menu->dataLoggingBtn);
-	StyleHelper::BlueButton(menu->dataLoadingBtn);
+	StyleHelper::BasicButton(menu->dataLoggingBrowseBtn);
+	StyleHelper::BasicButton(menu->dataLoggingBtn);
+	StyleHelper::BasicButton(menu->dataLoadingBtn);
 }
 
 void DataMonitorStyleHelper::MonitorSelectionMenuMenuCollapseSectionStyle(MenuCollapseSection *menu)
@@ -125,7 +126,7 @@ void DataMonitorStyleHelper::MonitorSelectionMenuMenuCollapseSectionStyle(MenuCo
 			)css");
 
 	menu->layout()->setContentsMargins(10, 10, 10, 10);
-	menu->setStyleSheet(style);
+	// menu->setStyleSheet(style);
 }
 
 QString DataMonitorStyleHelper::RemoveButtonStyle()
@@ -151,7 +152,7 @@ QString DataMonitorStyleHelper::RemoveButtonStyle()
 				background-color: &&disabledColor&& ;
 			})css");
 
-	style.replace("&&backgroundColor&&", StyleHelper::getColor("CH6"));
+	style.replace("&&backgroundColor&&", Style::getAttribute(json::theme::content_error));
 	style.replace("&&disabledColor&&", "gray");
 
 	return style;
