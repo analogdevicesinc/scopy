@@ -480,7 +480,7 @@ void RegmapStyleHelper::comboboxStyle(QComboBox *combobox, QString objectName)
 						}
 						QComboBox::drop-down {
 						 subcontrol-position: center right;
-						 border-image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
+						 border-image: url(:/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/sba_cmb_box_arrow.svg);
 						 width: 10px;
 						 height: 6px;
 						 font-size: 16px;
@@ -660,5 +660,5 @@ QString RegmapStyleHelper::sliderStyle()
 QString RegmapStyleHelper::getColorBasedOnValue(QString value)
 {
 	uint32_t colorIndex = Utils::convertQStringToUint32(value) % 16;
-	return Util::getColors().at(colorIndex);
+	return StyleHelper::getChannelColor(colorIndex);
 }

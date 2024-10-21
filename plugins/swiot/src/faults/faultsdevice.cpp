@@ -294,13 +294,13 @@ QWidget *FaultsDevice::createTopWidget(QWidget *parent)
 	m_registerNoLineEdit->setReadOnly(true);
 
 	m_resetBtn = new QPushButton(w);
-	StyleHelper::BlueButton(m_resetBtn);
+	StyleHelper::BasicButton(m_resetBtn);
 	m_resetBtn->setFixedWidth(110);
 	m_resetBtn->setCheckable(false);
 	m_resetBtn->setText("RESET\nSTORED");
 
 	m_clearBtn = new QPushButton(w);
-	StyleHelper::BlueButton(m_clearBtn);
+	StyleHelper::BasicButton(m_clearBtn);
 	m_clearBtn->setFixedWidth(110);
 	m_clearBtn->setCheckable(false);
 	m_clearBtn->setText("CLEAR\nSELECTION");

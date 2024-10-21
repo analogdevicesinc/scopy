@@ -29,6 +29,7 @@
 #include <pqmdatalogger.h>
 #include <rmsinstrument.h>
 #include <settingsinstrument.h>
+#include <style.h>
 #include <waveforminstrument.h>
 
 #include <pluginbase/preferences.h>
@@ -102,13 +103,13 @@ bool PQMPlugin::loadIcon()
 void PQMPlugin::loadToolList()
 {
 	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("pqmrms", "Rms", ":/gui/icons/scopy-default/icons/tool_network_analyzer.svg"));
+		SCOPY_NEW_TOOLMENUENTRY("pqmrms", "Rms", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_network_analyzer.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("pqmharmonics", "Harmonics",
-						  ":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_spectrum_analyzer.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("pqmwaveform", "Waveform",
-						  ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_oscilloscope.svg"));
 	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("pqmsettings", "Settings", ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+		SCOPY_NEW_TOOLMENUENTRY("pqmsettings", "Settings", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg"));
 }
 
 void PQMPlugin::unload() { delete m_infoPage; }
