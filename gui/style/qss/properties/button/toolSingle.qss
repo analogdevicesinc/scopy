@@ -13,7 +13,7 @@ QPushButton[&&property&&=true]:!checked {
 }
 
   QPushButton[&&property&&=true]:checked {
-	background-color: &interactive_secondary_idle&;
+	background-color: &interactive_accent_idle&;
 }
 
 QPushButton[&&property&&=true]:disabled {

@@ -21,12 +21,12 @@
 
 #include <QVBoxLayout>
 #include <QLabel>
-
+#include <style.h>
 #include <gui/stylehelper.h>
-
 #include "iioexplorerinstrument.h"
 #include "iiostandarditem.h"
 #include "debuggerloggingcategories.h"
+#include "style_properties.h"
 
 using namespace scopy::debugger;
 
@@ -89,7 +89,7 @@ void IIOExplorerInstrument::setupUi()
 	StyleHelper::TabWidgetBarUnderline(m_tabWidget, "IIODebugInstrumentTabWidget");
 
 	m_mainWidget->setLayout(new QVBoxLayout(m_mainWidget));
-	m_mainWidget->layout()->setContentsMargins(0, 0, 0, 0);
+	m_mainWidget->layout()->setContentsMargins(10, 10, 10, 10);
 
 	bottom_container->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	bottom_container->setLayout(new QHBoxLayout(bottom_container));
@@ -114,11 +114,15 @@ void IIOExplorerInstrument::setupUi()
 	m_detailsView = new DetailsView(details_container);
 	m_watchListView = new WatchListView(watch_list);
 
-	watch_list->layout()->setContentsMargins(0, 0, 0, 0);
+	watch_list->layout()->setContentsMargins(10, 10, 10, 10);
 	watch_list->layout()->addWidget(m_watchListView);
 
 	m_proxyModel->setSourceModel(m_iioModel->getModel());
 	m_proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+
+	Style::setBackgroundColor(m_mainWidget, json::theme::background_subtle);
+	Style::setBackgroundColor(m_debugLogger, json::theme::background_subtle);
+	Style::setStyle(m_treeView, style::properties::treeView);
 
 	m_treeView->setModel(m_proxyModel);
 
