@@ -75,7 +75,7 @@ class NetworkAnalyzer : public M2kTool
 	Q_OBJECT
 
 public:
-	explicit NetworkAnalyzer(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *toolMenuItem,
+	explicit NetworkAnalyzer(libm2k::context::M2k *m2k, QString uri, Filter *filt, ToolMenuEntry *toolMenuItem,
 				 m2k_iio_manager *m2k_man, QJSEngine *engine, QWidget *parent = nullptr);
 	~NetworkAnalyzer();
 	QPushButton *getRunButton();
@@ -83,6 +83,7 @@ public:
 
 private:
 	Ui::NetworkAnalyzer *ui;
+	QString m_uri;
 	libm2k::context::M2k *m_m2k_context;
 	libm2k::analog::M2kAnalogOut *m_m2k_analogout;
 	libm2k::analog::M2kAnalogIn *m_m2k_analogin;

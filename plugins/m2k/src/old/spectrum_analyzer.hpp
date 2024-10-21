@@ -120,8 +120,8 @@ public:
 
 	typedef std::shared_ptr<SpectrumChannel> channel_sptr;
 
-	explicit SpectrumAnalyzer(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
-				  QJSEngine *engine, QWidget *parent);
+	explicit SpectrumAnalyzer(libm2k::context::M2k *m2k, QString uri, Filter *filt, ToolMenuEntry *tme,
+				  m2k_iio_manager *m2k_man, QJSEngine *engine, QWidget *parent);
 	~SpectrumAnalyzer();
 	QPushButton *getRunButton();
 	void setNativeDialogs(bool nativeDialogs) override;
@@ -249,6 +249,7 @@ private:
 	bool use_float_sink;
 
 private:
+	QString m_uri;
 	libm2k::context::M2k *m_m2k_context;
 	libm2k::analog::M2kAnalogIn *m_m2k_analogin;
 	Ui::SpectrumAnalyzer *ui;

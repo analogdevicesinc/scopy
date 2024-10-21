@@ -246,7 +246,7 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		tme->setEnabled(true);
 		tme->setRunBtnVisible(true);
 
-		adc = new ADCTimeInstrumentController(tme, "adc" + QString::number(idx), root, this);
+		adc = new ADCTimeInstrumentController(tme, m_param, "adc" + QString::number(idx), root, this);
 		adc->init();
 
 		ui = adc->ui();
@@ -284,7 +284,7 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		tme->setEnabled(true);
 		tme->setRunBtnVisible(true);
 
-		adc = new ADCFFTInstrumentController(tme, "adc" + QString::number(idx), root, this);
+		adc = new ADCFFTInstrumentController(tme, m_param, "adc" + QString::number(idx), root, this);
 		adc->init();
 		ui = adc->ui();
 		idx++;

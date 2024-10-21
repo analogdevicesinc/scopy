@@ -423,7 +423,7 @@ bool M2kPlugin::onConnect()
 		auto pgTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "m2kpattern");
 		m_adcBtnGrp = new QButtonGroup(this);
 
-		tools.insert("m2kdmm", new DMM(m_m2k, f, dmmTme, m2k_man));
+		tools.insert("m2kdmm", new DMM(m_m2k, m_param, f, dmmTme, m2k_man));
 		dmmTme->setTool(tools["m2kdmm"]);
 		tools.insert("m2kcal", new ManualCalibration(m_m2k, f, mancalTme, nullptr, calib));
 		mancalTme->setTool(tools["m2kcal"]);
@@ -431,13 +431,13 @@ bool M2kPlugin::onConnect()
 		dioTme->setTool(tools["m2kdio"]);
 		tools.insert("m2kpower", new PowerController(m_m2k, pwrTme, js, nullptr));
 		pwrTme->setTool(tools["m2kpower"]);
-		tools.insert("m2ksiggen", new SignalGenerator(m_m2k, f, siggenTme, js, nullptr));
+		tools.insert("m2ksiggen", new SignalGenerator(m_m2k, m_param, f, siggenTme, js, nullptr));
 		siggenTme->setTool(tools["m2ksiggen"]);
-		tools.insert("m2kspec", new SpectrumAnalyzer(m_m2k, f, specTme, m2k_man, js, nullptr));
+		tools.insert("m2kspec", new SpectrumAnalyzer(m_m2k, m_param, f, specTme, m2k_man, js, nullptr));
 		specTme->setTool(tools["m2kspec"]);
-		tools.insert("m2kosc", new Oscilloscope(m_m2k, f, oscTme, m2k_man, js, nullptr));
+		tools.insert("m2kosc", new Oscilloscope(m_m2k, m_param, f, oscTme, m2k_man, js, nullptr));
 		oscTme->setTool(tools["m2kosc"]);
-		tools.insert("m2knet", new NetworkAnalyzer(m_m2k, f, netTme, m2k_man, js, nullptr));
+		tools.insert("m2knet", new NetworkAnalyzer(m_m2k, m_param, f, netTme, m2k_man, js, nullptr));
 		netTme->setTool(tools["m2knet"]);
 		tools.insert("m2klogic", new logic::LogicAnalyzer(m_m2k, f, laTme, js, nullptr));
 		laTme->setTool(tools["m2klogic"]);

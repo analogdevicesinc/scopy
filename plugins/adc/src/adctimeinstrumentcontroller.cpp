@@ -8,9 +8,9 @@
 using namespace scopy;
 using namespace adc;
 
-ADCTimeInstrumentController::ADCTimeInstrumentController(ToolMenuEntry *tme, QString name, AcqTreeNode *tree,
-							 QObject *parent)
-	: ADCInstrumentController(tme, name, tree, parent)
+ADCTimeInstrumentController::ADCTimeInstrumentController(ToolMenuEntry *tme, QString uri, QString name,
+							 AcqTreeNode *tree, QObject *parent)
+	: ADCInstrumentController(tme, uri, name, tree, parent)
 {
 	m_defaultCh = nullptr;
 }

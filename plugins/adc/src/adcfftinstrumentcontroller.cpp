@@ -12,9 +12,9 @@
 using namespace scopy;
 using namespace adc;
 
-ADCFFTInstrumentController::ADCFFTInstrumentController(ToolMenuEntry *tme, QString name, AcqTreeNode *tree,
+ADCFFTInstrumentController::ADCFFTInstrumentController(ToolMenuEntry *tme, QString uri, QString name, AcqTreeNode *tree,
 						       QObject *parent)
-	: ADCInstrumentController(tme, name, tree, parent)
+	: ADCInstrumentController(tme, uri, name, tree, parent)
 {
 	m_defaultComplexCh = nullptr;
 	m_defaultRealCh = nullptr;

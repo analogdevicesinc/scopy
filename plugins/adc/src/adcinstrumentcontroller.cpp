@@ -8,12 +8,15 @@
 using namespace scopy;
 using namespace scopy::adc;
 
-ADCInstrumentController::ADCInstrumentController(ToolMenuEntry *tme, QString name, AcqTreeNode *tree, QObject *parent)
+ADCInstrumentController::ADCInstrumentController(ToolMenuEntry *tme, QString uri, QString name, AcqTreeNode *tree,
+						 QObject *parent)
 	: QObject(parent)
 	, m_refreshTimerRunning(false)
 	, m_plotComponentManager(nullptr)
 	, m_measureComponent(nullptr)
 	, m_started(false)
+	, m_tme(tme)
+	, m_uri(uri)
 {
 	chIdP = new ChannelIdProvider(this);
 	m_tree = tree;
@@ -83,7 +86,7 @@ void ADCInstrumentController::onStop()
 
 void ADCInstrumentController::start()
 {
-	ResourceManager::open("adc", this);
+	ResourceManager::open("adc" + m_uri, this);
 	bool ret = m_dataProvider->start();
 	if(!ret) {
 		Q_EMIT requestDisconnect();
@@ -93,7 +96,7 @@ void ADCInstrumentController::start()
 void ADCInstrumentController::stop()
 {
 	m_dataProvider->stop();
-	ResourceManager::close("adc");
+	ResourceManager::close("adc" + m_uri);
 }
 
 void ADCInstrumentController::stopUpdates()
