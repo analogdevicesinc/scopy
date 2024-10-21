@@ -30,6 +30,7 @@
 #include <menucontrolbutton.h>
 #include <datamonitor/sevensegmentdisplay.hpp>
 #include <QDesktopServices>
+#include <style.h>
 #include <timemanager.hpp>
 #include <tutorialbuilder.h>
 #include <pluginbase/preferences.h>
@@ -175,7 +176,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	////////////////////////settings //////////////
 	m_dataMonitorSettings = new DataMonitorSettings(m_monitorPlot);
 	// TODO GET SETTINGS NAME FROM UTILS
-	m_dataMonitorSettings->init("Data Logger", StyleHelper::getColor("ScopyBlue"));
+	m_dataMonitorSettings->init("Data Logger", Style::getAttribute(json::theme::interactive_primary_idle));
 
 	tool->rightStack()->add(DataMonitorUtils::getToolSettingsId(), m_dataMonitorSettings);
 

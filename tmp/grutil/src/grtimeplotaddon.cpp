@@ -7,6 +7,7 @@
 #include <QwtWeedingCurveFitter>
 #include <plotinfowidgets.h>
 #include <plotnavigator.hpp>
+#include <style.h>
 
 #include <grdeviceaddon.h>
 #include <grlog.h>
@@ -54,7 +55,7 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	m_fftPlotWidget->xAxis()->setVisible(false);
 	m_fftPlotWidget->yAxis()->setVisible(false);
 	dynamic_cast<QTabWidget *>(widget)->addTab(m_fftPlotWidget, "FFT");
-	QPen fftchannel_pen = QPen(StyleHelper::getColor("ScopyBlue"));
+	QPen fftchannel_pen = QPen(Style::getAttribute(json::theme::interactive_primary_idle));
 
 	fft_xPlotAxis = new PlotAxis(QwtAxis::XBottom, m_fftPlotWidget, fftchannel_pen);
 	fft_yPlotAxis = new PlotAxis(QwtAxis::YLeft, m_fftPlotWidget, fftchannel_pen);
@@ -76,7 +77,8 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	////
 	m_xyPlotWidget = new PlotWidget(widget);
 	dynamic_cast<QTabWidget *>(widget)->addTab(m_xyPlotWidget, "X-Y");
-	QPen xychannel_pen = QPen(StyleHelper::getColor("ScopyBlue"));
+	QPen xychannel_pen = QPen(Style::getAttribute(json::theme::interactive_primary_idle));
+	widget->setStyleSheet("background-color: " + Style::getAttribute(json::theme::background_subtle));
 
 	xy_xPlotAxis = new PlotAxis(QwtAxis::XBottom, m_xyPlotWidget, xychannel_pen);
 	xy_yPlotAxis = new PlotAxis(QwtAxis::YLeft, m_xyPlotWidget, xychannel_pen);

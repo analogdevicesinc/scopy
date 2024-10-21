@@ -20,6 +20,7 @@
 
 #include "configchannelview.h"
 #include <gui/stylehelper.h>
+#include <style.h>
 
 using namespace scopy::swiot;
 
@@ -44,11 +45,9 @@ ConfigChannelView::ConfigChannelView(int channelIndex, QWidget *parent)
 
 	m_deviceOptions = new QComboBox(this);
 	m_deviceOptions->setFixedWidth(DEVICE_COMBO_WIDTH);
-	StyleHelper::MenuComboBox(m_deviceOptions);
 
 	m_functionOptions = new QComboBox(this);
 	m_functionOptions->setFixedWidth(FUNCTION_COMBO_WIDTH);
-	StyleHelper::MenuComboBox(m_functionOptions);
 
 	layout->addWidget(m_chnlLabel);
 	layout->addWidget(m_chnlCheck);
@@ -87,7 +86,7 @@ void ConfigChannelView::connectSignalsAndSlots()
 
 void ConfigChannelView::setHighlightPalette()
 {
-	QString highlightColor = StyleHelper::getColor("UIElementHighlight");
+	QString highlightColor = Style::getAttribute(json::theme::content_default);
 	QPalette newPalette = QPalette(palette());
 	newPalette.setColor(QPalette::Highlight, QColor(highlightColor));
 	setPalette(newPalette);

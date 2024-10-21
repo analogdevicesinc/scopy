@@ -136,11 +136,11 @@ bool SWIOTPlugin::loadIcon()
 void SWIOTPlugin::loadToolList()
 {
 	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY(CONFIG_TME_ID, "Config", ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+		SCOPY_NEW_TOOLMENUENTRY(CONFIG_TME_ID, "Config", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(AD74413R_TME_ID, "AD74413R",
-						  ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_oscilloscope.svg"));
 	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY(MAX14906_TME_ID, "MAX14906", ":/gui/icons/scopy-default/icons/tool_io.svg"));
+		SCOPY_NEW_TOOLMENUENTRY(MAX14906_TME_ID, "MAX14906", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_io.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(FAULTS_TME_ID, "Faults", ":/swiot/tool_faults.svg"));
 }
 
@@ -433,22 +433,22 @@ bool SWIOTPlugin::loadPreferencesPage()
 	connect(resetTutorialConfig, &QPushButton::clicked, this,
 		[=, this]() { p->set("swiote_config_start_tutorial", true); });
 
-	StyleHelper::BlueButton(resetTutorialAd74413r, "resetBtn");
+	Style::setStyle(resetTutorialAd74413r, style::properties::button::basicButton);
 	resetTutorialMax14906WidgetLayout->addWidget(new QLabel("Ad74413r tutorial"), 6);
 	resetTutorialMax14906WidgetLayout->addWidget(resetTutorialAd74413r, 1);
 	generalSection->contentLayout()->addWidget(resetTutorialAd74413rWidget);
 
-	StyleHelper::BlueButton(resetTutorialMax14906, "resetBtn");
+	Style::setStyle(resetTutorialAd74413r, style::properties::button::basicButton);
 	resetTutorialAd74413rWidgetLayout->addWidget(new QLabel("Max14906 tutorial"), 6);
 	resetTutorialAd74413rWidgetLayout->addWidget(resetTutorialMax14906, 1);
 	generalSection->contentLayout()->addWidget(resetTutorialMax14906Widget);
 
-	StyleHelper::BlueButton(resetTutorialFaults, "resetBtn");
+	Style::setStyle(resetTutorialAd74413r, style::properties::button::basicButton);
 	resetTutorialFaultsWidgetLayout->addWidget(new QLabel("Faults tutorial"), 6);
 	resetTutorialFaultsWidgetLayout->addWidget(resetTutorialFaults, 1);
 	generalSection->contentLayout()->addWidget(resetTutorialFaultsWidget);
 
-	StyleHelper::BlueButton(resetTutorialConfig, "resetBtn");
+	Style::setStyle(resetTutorialAd74413r, style::properties::button::basicButton);
 	resetTutorialConfigurationWidgetLayout->addWidget(new QLabel("Configuration tutorial"), 6);
 	resetTutorialConfigurationWidgetLayout->addWidget(resetTutorialConfig, 1);
 	generalSection->contentLayout()->addWidget(resetTutorialConfigurationWidget);
