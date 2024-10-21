@@ -45,6 +45,7 @@ public:
 	explicit DeviceIconImpl(Device *d, QWidget *parent);
 	~DeviceIconImpl();
 public Q_SLOTS:
+	void setConnecting(bool) override;
 	void setConnected(bool) override;
 Q_SIGNALS:
 	void displayNameChanged(QString newName);

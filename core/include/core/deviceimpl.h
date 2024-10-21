@@ -70,15 +70,13 @@ public Q_SLOTS:
 	void onConnectionFailed();
 Q_SIGNALS:
 	void toolListChanged() override;
+	void connecting() override;
 	void connected() override;
 	void disconnected() override;
 	void requestedRestart() override;
 	void requestTool(QString) override;
 	void connectionFailed();
 	void forget();
-
-	void connectionStarted();
-	void connectionFinished();
 
 protected:
 	void removeDisabledPlugins();

@@ -128,7 +128,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ScanButtonController *sbc = new ScanButtonController(scanCycle, hp->scanControlBtn(), this);
 
 	dm = new DeviceManager(pm, this);
-	dm->setExclusive(false);
+	bool general_connect_to_multiple_devices = pref->get("general_connect_to_multiple_devices").toBool();
+	dm->setExclusive(!general_connect_to_multiple_devices);
 
 	dtm = new DetachedToolWindowManager(this);
 	m_toolMenuManager = new ToolMenuManager(ts, dtm, browseMenu->toolMenu(), this);
@@ -149,14 +150,13 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(dm, SIGNAL(deviceRemoveStarted(QString, Device *)), scc, SLOT(removeDevice(QString, Device *)));
 	connect(dm, SIGNAL(deviceRemoveStarted(QString, Device *)), this, SLOT(removeDeviceFromUi(QString)));
 
-	connect(dm, &DeviceManager::connectionStarted, sbc, &ScanButtonController::stopScan);
-	connect(dm, &DeviceManager::connectionFinished, sbc, &ScanButtonController::startScan);
-
 	if(dm->getExclusive()) {
 		// only for device manager exclusive mode - stop scan on connect
 		connect(dm, SIGNAL(deviceConnected(QString, Device *)), sbc, SLOT(stopScan()));
 		connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), sbc, SLOT(startScan()));
 	}
+
+	connect(dm, SIGNAL(deviceConnecting(QString)), hp, SLOT(connectingDevice(QString)));
 
 	connect(dm, SIGNAL(deviceConnected(QString, Device *)), scc, SLOT(lock(QString, Device *)));
 	connect(dm, SIGNAL(deviceConnected(QString, Device *)), hp, SLOT(connectDevice(QString)));
@@ -310,6 +310,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_doubleclick_ctrl_opens_menu", true);
 	p->init("general_check_online_version", false);
 	p->init("general_show_status_bar", true);
+	p->init("general_connect_to_multiple_devices", true);
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 
@@ -438,6 +439,9 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 		StatusBarManager::GetInstance()->setEnabled(val.toBool());
 	} else if(str == "plugins_use_debugger_v2") {
 		Q_EMIT p->restartRequired();
+	} else if(str == "general_connect_to_multiple_devices") {
+		bool general_connect_to_multiple_devices = pref->get("general_connect_to_multiple_devices").toBool();
+		dm->setExclusive(!general_connect_to_multiple_devices);
 	}
 }
 

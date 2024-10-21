@@ -58,6 +58,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	virtual void toolListChanged() = 0;
+	virtual void connecting() = 0;
 	virtual void connected() = 0;
 	virtual void disconnected() = 0;
 	virtual void requestedRestart() = 0;

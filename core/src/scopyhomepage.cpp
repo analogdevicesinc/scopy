@@ -81,6 +81,12 @@ void ScopyHomePage::viewDevice(QString id)
 	Q_EMIT db->requestDevice(id, -1);
 }
 
+void ScopyHomePage::connectingDevice(QString id)
+{
+	auto &&db = ui->wDeviceBrowser;
+	db->connectingDevice(id);
+}
+
 void ScopyHomePage::connectDevice(QString id)
 {
 	auto &&db = ui->wDeviceBrowser;

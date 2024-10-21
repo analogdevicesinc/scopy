@@ -198,6 +198,12 @@ void DeviceBrowser::updateSelectedDeviceIdx(QString k)
 			       << "[" << currentIdx << "] -" << getIdOfIndex(currentIdx);
 }
 
+void DeviceBrowser::connectingDevice(QString id)
+{
+	auto w = dynamic_cast<DeviceIcon *>(getDeviceWidgetFor(id));
+	w->setConnecting(true);
+}
+
 void DeviceBrowser::connectDevice(QString id)
 {
 	auto w = dynamic_cast<DeviceIcon *>(getDeviceWidgetFor(id));
