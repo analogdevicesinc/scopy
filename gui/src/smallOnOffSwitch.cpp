@@ -64,8 +64,8 @@ void SmallOnOffSwitch::initDimensions()
 	m_track_color[false] = Style::getColor(json::theme::interactive_subtle_idle);
 	m_track_color_disabled[true] = Style::getColor(json::theme::interactive_primary_disabled);
 	m_track_color_disabled[false] = Style::getColor(json::theme::interactive_subtle_disabled);
-	m_thumb_color[true] = Style::getColor(json::theme::content_inverse);
-	m_thumb_color[false] = Style::getColor(json::theme::content_inverse);
+	m_thumb_color[true] = Style::getColor(json::theme::background_subtle);
+	m_thumb_color[false] = Style::getColor(json::theme::background_subtle);
 	m_track_opacity = 1.0;
 }
 
@@ -113,7 +113,6 @@ void SmallOnOffSwitch::resizeEvent(QResizeEvent *event)
 
 void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
 {
-	update();
 	QPainter p(this);
 	p.setRenderHint(QPainter::Antialiasing);
 	p.setPen(Qt::NoPen);
@@ -136,10 +135,10 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
 		QPixmap pixmap;
 		if(isChecked()) {
 			pixmap = Style::getPixmap(":/gui/icons/unlocked.svg",
-						  Style::getColor(json::theme::content_inverse));
+						  Style::getColor(json::theme::background_subtle));
 		} else {
 			pixmap = Style::getPixmap(":/gui/icons/locked.svg",
-						  Style::getColor(json::theme::content_inverse));
+						  Style::getColor(json::theme::background_subtle));
 		}
 
 		//		p.drawPixmap(QRect(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 *

@@ -165,7 +165,6 @@ public Q_SLOTS:
 	void setValue(double newValue);
 	void setIncrementMode(IncrementMode is);
 	void setScalingEnabled(bool en);
-	void setLineVisible(bool isVisible);
 
 Q_SIGNALS:
 	void nameChanged(QString);
@@ -177,7 +176,6 @@ private Q_SLOTS:
 	void populateWidgets();
 
 private:
-	void applyStylesheet();
 	int findLastDigit(QString str);
 	void layoutVertically(bool left);
 	void layoutHorizontally(bool left);
@@ -188,7 +186,6 @@ private:
 	QComboBox *m_scaleCb;
 	QPushButton *m_plus;
 	QPushButton *m_minus;
-	QFrame *m_line; // underline
 	MouseWheelWidgetGuard *m_mouseWheelGuard;
 
 	IncrementStrategy *m_incrementStrategy;
