@@ -54,7 +54,7 @@ void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text)
 	QWidget *pane = new QWidget();
 	pane->setStyleSheet(".QWidget{background-color: " + Style::getAttribute(json::theme::background_subtle) + ";}");
 	QHBoxLayout *lay = new QHBoxLayout();
-	lay->setMargin(10);
+	lay->setMargin(20);
 	pane->setLayout(lay);
 
 	QScrollArea *scrollArea = new QScrollArea();

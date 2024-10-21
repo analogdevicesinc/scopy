@@ -7,6 +7,7 @@
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/widgets/menucontrolbutton.h>
+#include <style.h>
 
 using namespace scopy::pqm;
 
@@ -130,7 +131,7 @@ void HarmonicsInstrument::setupPlotChannels()
 	int chNumber = 0;
 	bool first = true;
 	for(const QString &ch : m_chnls) {
-		QPen chPen = QPen(QColor(StyleHelper::getColor("CH" + QString::number(chNumber))), 1);
+		QPen chPen = QPen(QColor(StyleHelper::getChannelColor(chNumber)), 1);
 		PlotChannel *plotCh = new PlotChannel(m_chnls.key(ch), chPen, m_plot->xAxis(), m_plot->yAxis(), this);
 		m_plot->addPlotChannel(plotCh);
 		plotCh->setStyle(PlotChannel::PCS_STICKS);
@@ -158,7 +159,7 @@ QWidget *HarmonicsInstrument::createThdWidget()
 	int chnlIdx = 0;
 	for(const QString &ch : m_chnls) {
 		MeasurementLabel *ml = new MeasurementLabel(this);
-		QString color = StyleHelper::getColor("CH" + QString::number(chnlIdx));
+		QString color = StyleHelper::getChannelColor(chnlIdx);
 		ml->setColor(QColor(color));
 		ml->setName(m_chnls.key(ch));
 		ml->setPrecision(7);
@@ -174,7 +175,7 @@ QWidget *HarmonicsInstrument::createSettingsMenu()
 	QWidget *menu = new QWidget(this);
 	menu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	menu->setFixedWidth(185);
-	menu->setStyleSheet("background-color:" + StyleHelper::getColor("UIElementBackground"));
+	menu->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
 
 	QVBoxLayout *lay = new QVBoxLayout(menu);
 	MenuCombo *harmonicType = new MenuCombo(tr("Harmonics Type"), this);

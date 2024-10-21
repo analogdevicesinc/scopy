@@ -33,7 +33,7 @@ void ADCInstrument::setupToolLayout()
 	tool->bottomCentral()->setVisible(false);
 	lay->addWidget(tool);
 	tool->setLeftContainerWidth(210);
-	tool->setRightContainerWidth(300);
+	tool->setRightContainerWidth(310);
 	tool->setTopContainerHeight(100);
 	tool->setBottomContainerHeight(90);
 
