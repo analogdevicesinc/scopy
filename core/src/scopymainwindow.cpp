@@ -113,6 +113,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 		ui->animHolder->toggleMenu(!coll);
 	});
 	////////
+	Style::setBackgroundColor(ui->centralwidget, json::theme::background_primary);
 
 	scanTask = new IIOScanTask(this);
 	scanTask->setScanParams("usb");
