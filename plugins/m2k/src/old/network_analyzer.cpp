@@ -171,8 +171,8 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/networkanalyzer");
 }
 
-NetworkAnalyzer::NetworkAnalyzer(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
-				 QJSEngine *engine, QWidget *parent)
+NetworkAnalyzer::NetworkAnalyzer(libm2k::context::M2k *m2k, QString uri, Filter *filt, ToolMenuEntry *tme,
+				 m2k_iio_manager *m2k_man, QJSEngine *engine, QWidget *parent)
 	: M2kTool(tme, new NetworkAnalyzer_API(this), "Network Analyzer", parent)
 	, ui(new Ui::NetworkAnalyzer)
 	, m_m2k_context(nullptr)
@@ -197,6 +197,7 @@ NetworkAnalyzer::NetworkAnalyzer(libm2k::context::M2k *m2k, Filter *filt, ToolMe
 	, m_importDataLoaded(false)
 	, m_nb_averaging(1)
 	, m_nb_periods(2)
+	, m_uri(uri)
 {
 	if(m2k) {
 		m_m2k_context = m2k;
@@ -1614,8 +1615,8 @@ void NetworkAnalyzer::startStop(bool pressed)
 	ui->spinBox_periods->setEnabled(!pressed);
 
 	if(pressed) {
-		ResourceManager::open("m2k-adc" + tme->param(), this);
-		ResourceManager::open("m2k-dac" + tme->param(), this);
+		ResourceManager::open("m2k-adc" + m_uri, this);
+		ResourceManager::open("m2k-dac" + m_uri, this);
 		m_m2k_analogin->setKernelBuffersCount(1);
 		if(shouldClear) {
 			m_dBgraph.reset();
@@ -1647,8 +1648,8 @@ void NetworkAnalyzer::startStop(bool pressed)
 		m_dBgraph.sweepDone();
 		m_phaseGraph.sweepDone();
 		ui->statusLabel->setText(tr("Stopped"));
-		ResourceManager::close("m2k-dac" + tme->param());
-		ResourceManager::close("m2k-adc" + tme->param());
+		ResourceManager::close("m2k-dac" + m_uri);
+		ResourceManager::close("m2k-adc" + m_uri);
 		try {
 			m_m2k_analogin->setKernelBuffersCount(KERNEL_BUFFERS_DEFAULT);
 		} catch(libm2k::m2k_exception &e) {

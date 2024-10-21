@@ -26,7 +26,8 @@ class SCOPY_ADC_EXPORT ADCInstrumentController : public QObject,
 {
 	Q_OBJECT
 public:
-	ADCInstrumentController(ToolMenuEntry *tme, QString name, AcqTreeNode *tree, QObject *parent = nullptr);
+	ADCInstrumentController(ToolMenuEntry *tme, QString uri, QString name, AcqTreeNode *tree,
+				QObject *parent = nullptr);
 	virtual ~ADCInstrumentController();
 
 	ChannelIdProvider *getChannelIdProvider();
@@ -94,6 +95,7 @@ protected:
 	bool m_isMainInstrument = false;
 
 	ToolMenuEntry *m_tme;
+	QString m_uri;
 };
 
 } // namespace adc

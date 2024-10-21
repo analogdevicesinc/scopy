@@ -10,9 +10,10 @@
 
 using namespace scopy::pqm;
 
-HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QWidget *parent)
+HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	: QWidget(parent)
 	, m_tme(tme)
+	, m_uri(uri)
 {
 	initData();
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -236,9 +237,9 @@ void HarmonicsInstrument::stop() { m_runBtn->setChecked(false); }
 void HarmonicsInstrument::toggleHarmonics(bool en)
 {
 	if(en) {
-		ResourceManager::open("pqm" + m_tme->param(), this);
+		ResourceManager::open("pqm" + m_uri, this);
 	} else {
-		ResourceManager::close("pqm" + m_tme->param());
+		ResourceManager::close("pqm" + m_uri);
 	}
 	Q_EMIT enableTool(en);
 }
