@@ -43,6 +43,8 @@ public:
 	Device *getDevice(QString id);
 	void setExclusive(bool);
 	bool getExclusive() const;
+	bool busy();
+	int connectedDeviceCount();
 
 public Q_SLOTS:
 
@@ -63,6 +65,7 @@ private Q_SLOTS:
 	void changeToolListDevice();
 	void connectingDevice();
 	void connectDevice();
+	void disconnectingDevice();
 	void disconnectDevice();
 	void restartDevice();
 
@@ -74,6 +77,7 @@ Q_SIGNALS:
 	void deviceRemoved(QString);
 	void deviceConnecting(QString);
 	void deviceConnected(QString id, Device *);
+	void deviceDisconnecting(QString id);
 	void deviceDisconnected(QString id, Device *);
 	void requestDevice(QString id);
 	void requestTool(QString id);
@@ -89,6 +93,7 @@ private:
 	QMap<QString, Device *> map;
 	PluginManager *pm;
 
+	void disconnectingDevice(QString id);
 	void disconnectDevice(QString id);
 	void connectingDevice(QString id);
 	void connectDevice(QString id);

@@ -58,7 +58,7 @@ public:
 	virtual QMap<QString, QString> readDeviceInfo();
 
 	QList<Plugin *> plugins() const;
-
+	DeviceImpl::DeviceState_t state() override;
 public Q_SLOTS:
 	virtual void connectDev() override;
 	virtual void disconnectDev() override;
@@ -72,6 +72,7 @@ Q_SIGNALS:
 	void toolListChanged() override;
 	void connecting() override;
 	void connected() override;
+	void disconnecting() override;
 	void disconnected() override;
 	void requestedRestart() override;
 	void requestTool(QString) override;
@@ -93,6 +94,7 @@ protected:
 	PluginManager *p;
 	QList<Plugin *> m_plugins;
 	QList<Plugin *> m_connectedPlugins;
+	DeviceState_t m_state;
 	QString m_id;
 	QString m_category;
 	QString m_displayName;
