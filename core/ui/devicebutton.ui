@@ -240,6 +240,10 @@ qproperty-alignment: AlignCenter;
 	border: 2px solid transparent;
 }
 
+QFrame#line[connecting=true] {
+	 border: 2px solid yellow;
+}
+
 QFrame#line[connected=true] {
 	 border: 2px solid green;
 }
