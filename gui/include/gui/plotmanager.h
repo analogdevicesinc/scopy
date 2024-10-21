@@ -6,7 +6,7 @@
 #include "measurementpanel.h"
 #include "channelcomponent.h"
 #include "toolcomponent.h"
-#include "markercontroller.h"
+#include "plotmarkercontroller.h"
 
 namespace scopy {
 
