@@ -1973,7 +1973,7 @@ HoverWidget *LogicAnalyzer::createHoverToolTip(QString info, QPoint position)
 	QWidget *content = new QWidget(this);
 	StyleHelper::HoverToolTip(content, info);
 
-	HoverWidget *toolTip = new scopy::HoverWidget(content, &m_plot, QApplication::activeWindow());
+	HoverWidget *toolTip = new scopy::HoverWidget(content, &m_plot, this);
 	toolTip->setAnchorPos(scopy::HoverPosition::HP_TOPLEFT);
 	toolTip->setContentPos(scopy::HoverPosition::HP_TOPLEFT);
 	toolTip->setAnchorOffset(position);
