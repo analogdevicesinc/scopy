@@ -207,5 +207,14 @@ scopy--SpinBoxA QComboBox#SBA_Combobox::drop-down:disabled {
  width: 0px;
  height: 0px;
 }
-QFrame[subsection_line=true]{
-border: 1px solid &content_silent&;}
+QFrame[subsection_line=true]
+{
+ border: 1px solid &content_silent&;
+}
+scopy--BufferPreviewer {
+ border: 1px solid &interactive_primary_idle&;
+ alternate-background-color: &interactive_primary_disabled&;
+ selection-background-color: &background_plot&;
+ selection-color: &interactive_secondary_idle&;
+ color: &content_default&;
+}
