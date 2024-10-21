@@ -122,6 +122,8 @@ deploy_app(){
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
 	mkdir -p $DEST_FOLDER/translations
 	cp $TRANSLATIONS_QM $DEST_FOLDER/translations
+	
+	cp -R $BUILD_FOLDER/style $DEST_FOLDER/style
 
 	if [ -d $REGMAP_XMLS ]; then
 		cp -r $REGMAP_XMLS $DEST_FOLDER/plugins
