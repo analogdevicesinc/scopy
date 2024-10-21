@@ -29,6 +29,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <hoverwidget.h>
 #include <style.h>
 
 using namespace scopy;
