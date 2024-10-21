@@ -19,6 +19,7 @@
  */
 
 #include "cursor_readouts.h"
+#include "style.h"
 
 #include "ui_cursor_readouts.h"
 
@@ -68,26 +69,16 @@ CursorReadouts::~CursorReadouts()
 
 void CursorReadouts::setTransparency(int value)
 {
-	double percent = (100 - value) / 100.0;
-
-	QString color = "";
-	if(QIcon::themeName() == "scopy-default") {
-		color += "rgba(20, 20, 22, ";
-	} else {
-		color += "rgba(197, 197, 197, ";
-	}
-
-	color += QString::number(percent);
-
+	QString color = Style::getColorTransparent(json::theme::background_plot, value);
 	ui->TimeCursors->setStyleSheet("QWidget {"
 				       "background-color: " +
 				       color +
-				       ");"
+				       ";"
 				       "}");
 	ui->VoltageCursors->setStyleSheet("QWidget {"
 					  "background-color: " +
 					  color +
-					  ");"
+					  ";"
 					  "}");
 }
 
