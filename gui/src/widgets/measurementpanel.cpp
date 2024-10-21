@@ -61,8 +61,7 @@ MeasurementsPanel::MeasurementsPanel(QWidget *parent)
 	int idx = panelLayout->indexOf(spacer);
 	m_stacks.append(new VerticalWidgetStack(stackSize, this));
 	panelLayout->insertWidget(idx, m_stacks.last());
-
-	setStyleSheet("background-color: " + Style::getAttribute(json::theme::background_subtle));
+	Style::setBackgroundColor(this, json::theme::background_subtle);
 }
 
 void MeasurementsPanel::addWidget(QWidget *meas)
@@ -211,7 +210,7 @@ StatsPanel::StatsPanel(QWidget *parent)
 
 	panelLayout->setAlignment(Qt::AlignLeft);
 	lay->addWidget(scrollArea);
-	setStyleSheet("background-color: " + Style::getAttribute(json::theme::background_subtle));
+	Style::setBackgroundColor(this, json::theme::background_subtle);
 }
 
 StatsPanel::~StatsPanel() {}

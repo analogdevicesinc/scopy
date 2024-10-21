@@ -33,7 +33,6 @@ DacDataManager::DacDataManager(struct iio_device *dev, QWidget *parent)
 	MenuSectionWidget *modeSection = new MenuSectionWidget(this);
 	m_mode = new MenuCombo("MODE", this);
 	m_mode->setProperty("tutorial_name", "MODE_SELECTOR");
-	StyleHelper::IIOComboBox(m_mode->combo());
 	StyleHelper::BackgroundWidget(m_mode);
 	auto cb = m_mode->combo();
 	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=, this](int idx) {
