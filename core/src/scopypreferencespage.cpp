@@ -84,7 +84,8 @@ void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text)
 	scrollArea->setWidgetResizable(true);
 	scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	lay->addWidget(scrollArea);
-	scrollArea->viewport()->setStyleSheet(".QWidget{background-color: " + Style::getAttribute(json::theme::background_subtle) + ";}");
+	scrollArea->viewport()->setStyleSheet(
+		".QWidget{background-color: " + Style::getAttribute(json::theme::background_subtle) + ";}");
 	tabWidget->addTab(pane, text);
 }
 
@@ -137,7 +138,7 @@ void ScopyPreferencesPage::initRestartWidget()
 	QSpacerItem *space1 = new QSpacerItem(6, 20, QSizePolicy::Expanding, QSizePolicy::Fixed);
 	QSpacerItem *space2 = new QSpacerItem(6, 20, QSizePolicy::Preferred, QSizePolicy::Fixed);
 	QPushButton *btn = new QPushButton("Restart");
-	Style::setStyle(btn, style::button::borderButton);
+	Style::setStyle(btn, style::properties::button::basicButton, true, true);
 	StyleHelper::BackgroundWidget(restartWidget, "restartWidget");
 	btn->setFixedWidth(100);
 
@@ -164,7 +165,7 @@ QWidget *ScopyPreferencesPage::buildSaveSessionPreference()
 	lay->addSpacerItem(new QSpacerItem(40, 40, QSizePolicy::Expanding, QSizePolicy::Fixed));
 	lay->addWidget(new QLabel("Settings files location ", this));
 	QPushButton *navigateBtn = new QPushButton("Open", this);
-	Style::setStyle(navigateBtn, style::button::borderButton);
+	Style::setStyle(navigateBtn, style::properties::button::borderButton);
 	navigateBtn->setMaximumWidth(80);
 	connect(navigateBtn, &QPushButton::clicked, this,
 		[=]() { QDesktopServices::openUrl(scopy::config::settingsFolderPath()); });
@@ -210,7 +211,7 @@ QWidget *ScopyPreferencesPage::buildResetScopyDefaultButton()
 	QHBoxLayout *lay = new QHBoxLayout(w);
 
 	QPushButton *resetBtn = new QPushButton("Reset", this);
-	Style::setStyle(resetBtn, style::button::borderButton);
+	Style::setStyle(resetBtn, style::properties::button::borderButton);
 	resetBtn->setMaximumWidth(80);
 	connect(resetBtn, &QPushButton::clicked, this, &ScopyPreferencesPage::resetScopyPreferences);
 	lay->addWidget(resetBtn);
