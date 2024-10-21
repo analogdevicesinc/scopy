@@ -125,7 +125,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	initTranslations();
 
 	hp = new ScopyHomePage(this, pm);
-	ScanButtonController *sbc = new ScanButtonController(scanCycle, hp->scanControlBtn(), this);
+	m_sbc = new ScanButtonController(scanCycle, hp->scanControlBtn(), this);
+	connect(hp->scanBtn(), &QPushButton::clicked, this, [=]() { scanTask->run(); });
 
 	dm = new DeviceManager(pm, this);
 	bool general_connect_to_multiple_devices = pref->get("general_connect_to_multiple_devices").toBool();
@@ -150,13 +151,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(dm, SIGNAL(deviceRemoveStarted(QString, Device *)), scc, SLOT(removeDevice(QString, Device *)));
 	connect(dm, SIGNAL(deviceRemoveStarted(QString, Device *)), this, SLOT(removeDeviceFromUi(QString)));
 
-	if(dm->getExclusive()) {
-		// only for device manager exclusive mode - stop scan on connect
-		connect(dm, SIGNAL(deviceConnected(QString, Device *)), sbc, SLOT(stopScan()));
-		connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), sbc, SLOT(startScan()));
-	}
-
 	connect(dm, SIGNAL(deviceConnecting(QString)), hp, SLOT(connectingDevice(QString)));
+
+	connect(dm, &DeviceManager::deviceConnecting, this, [=]() { handleScanner(); });
+	connect(dm, &DeviceManager::deviceConnected, this, [=]() { handleScanner(); });
+	connect(dm, &DeviceManager::deviceDisconnecting, this, [=]() { handleScanner(); });
+	connect(dm, &DeviceManager::deviceDisconnected, this, [=]() { handleScanner(); });
 
 	connect(dm, SIGNAL(deviceConnected(QString, Device *)), scc, SLOT(lock(QString, Device *)));
 	connect(dm, SIGNAL(deviceConnected(QString, Device *)), hp, SLOT(connectDevice(QString)));
@@ -164,7 +164,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), hp, SLOT(disconnectDevice(QString)));
 
 	connect(dm, SIGNAL(requestDevice(QString)), hp, SLOT(viewDevice(QString)));
-	sbc->startScan();
+
+	if(pref->get("general_scan_for_devices").toBool()) {
+		scanTask->run();
+	}
+
+	enableScanner();
 
 	connect(dm, &DeviceManager::deviceChangedToolList, m_toolMenuManager, &ToolMenuManager::changeToolListContents);
 	connect(dm, SIGNAL(deviceConnected(QString, Device *)), m_toolMenuManager, SLOT(deviceConnected(QString)));
@@ -198,6 +203,30 @@ void ScopyMainWindow::initStatusBar()
 	// clear all margin, except the bottom one, to make room the status bar
 	statusBar = new ScopyStatusBar(this);
 	ui->mainWidget->layout()->addWidget(statusBar);
+}
+
+void ScopyMainWindow::handleScanner()
+{
+	if(Preferences::get("general_scan_for_devices").toBool()) {
+		if(dm->busy()) {
+			m_sbc->enableScan(false);
+			return;
+		}
+		if(dm->getExclusive() && dm->connectedDeviceCount() == 1) {
+			m_sbc->enableScan(false);
+			return;
+		}
+		m_sbc->enableScan(true);
+	} else {
+		m_sbc->enableScan(false);
+	}
+}
+
+void ScopyMainWindow::enableScanner()
+{
+	bool b = Preferences::get("general_scan_for_devices").toBool();
+	hp->setScannerEnable(b);
+	handleScanner();
 }
 
 void ScopyMainWindow::save()
@@ -311,6 +340,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_check_online_version", false);
 	p->init("general_show_status_bar", true);
 	p->init("general_connect_to_multiple_devices", true);
+	p->init("general_scan_for_devices", true);
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 
@@ -331,6 +361,7 @@ void ScopyMainWindow::initPreferences()
 
 		QMetaObject::invokeMethod(license, &LicenseOverlay::showOverlay, Qt::QueuedConnection);
 	}
+
 	QString theme = p->get("general_theme").toString();
 	QString themeName = "scopy-" + theme;
 	QIcon::setThemeName(themeName);
@@ -442,6 +473,8 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 	} else if(str == "general_connect_to_multiple_devices") {
 		bool general_connect_to_multiple_devices = pref->get("general_connect_to_multiple_devices").toBool();
 		dm->setExclusive(!general_connect_to_multiple_devices);
+	} else if(str == "general_scan_for_devices") {
+		enableScanner();
 	}
 }
 

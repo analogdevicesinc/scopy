@@ -44,6 +44,9 @@ ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
 	is->add("add", add);
 
 	//	addDevice("dev1","dev1","descr1",new QPushButton("abc"),new QLabel("page1"));
+
+	StyleHelper::BlueButton(scanBtn());
+	scanBtn()->setFixedWidth(80);
 	connect(hc, SIGNAL(goLeft()), db, SLOT(prevDevice()));
 	connect(hc, SIGNAL(goRight()), db, SLOT(nextDevice()));
 	connect(db, SIGNAL(requestDevice(QString, int)), is, SLOT(slideInKey(QString, int)));
@@ -98,6 +101,14 @@ void ScopyHomePage::disconnectDevice(QString id)
 	db->disconnectDevice(id);
 }
 
+void ScopyHomePage::setScannerEnable(bool b)
+{
+	ui->btnScan->setVisible(b);
+	ui->label_2->setVisible(b);
+	ui->btnScanNow->setVisible(!b);
+}
 QPushButton *ScopyHomePage::scanControlBtn() { return ui->btnScan; }
+
+QPushButton *ScopyHomePage::scanBtn() { return ui->btnScanNow; }
 
 #include "moc_scopyhomepage.cpp"
