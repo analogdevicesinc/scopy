@@ -13,6 +13,8 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	m_label = new QLabel(name, parent);
 	m_edit = new QLineEdit("0", parent);
 	m_scaleCb = new QComboBox(parent);
+	m_plus = new QPushButton("", parent);
+	m_minus = new QPushButton("", parent);
 	m_mouseWheelGuard = new MouseWheelWidgetGuard(this);
 
 	m_plus->setAutoRepeat(true);
@@ -87,6 +89,7 @@ void MenuSpinbox::layoutVertically(bool left)
 
 	editLay->addWidget(m_label);
 	editLay->addWidget(m_edit);
+
 	editLay->addWidget(m_scaleCb);
 
 	if(left) {
@@ -97,13 +100,15 @@ void MenuSpinbox::layoutVertically(bool left)
 		lay->addLayout(btnLay);
 	}
 
-	int size = Style::getDimension(json::global::unit_3);
+	Style::setStyle(m_label, style::properties::label::subtle);
+
+	int size = Style::getDimension(json::global::unit_2_5);
 	m_plus->setIcon(Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
-	Style::setStyle(m_plus, style::properties::button::basicButton);
+	Style::setStyle(m_plus, style::properties::button::spinboxButton);
 	m_plus->setFixedSize(size, size);
 
 	m_minus->setIcon(Style::getPixmap(":/gui/icons/minus.svg", Style::getColor(json::theme::content_inverse)));
-	Style::setStyle(m_minus, style::properties::button::basicButton);
+	Style::setStyle(m_minus, style::properties::button::spinboxButton);
 	m_minus->setFixedSize(size, size);
 }
 
@@ -138,6 +143,7 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	editLay->addWidget(m_edit);
 
 	editLay->addWidget(m_scaleCb);
+	lineLay->addLayout(lay);
 
 	if(left) {
 		lay->addLayout(btnLay);
@@ -147,13 +153,15 @@ void MenuSpinbox::layoutHorizontally(bool left)
 		lay->addLayout(btnLay);
 	}
 
-	int size = Style::getDimension(json::global::unit_3);
+	Style::setStyle(m_label, style::properties::label::subtle);
+
+	int size = Style::getDimension(json::global::unit_2_5);
 	m_plus->setIcon(Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
-	Style::setStyle(m_plus, style::properties::button::basicButton);
+	Style::setStyle(m_plus, style::properties::button::spinboxButton);
 	m_plus->setFixedSize(size, size);
 
 	m_minus->setIcon(Style::getPixmap(":/gui/icons/minus.svg", Style::getColor(json::theme::content_inverse)));
-	Style::setStyle(m_minus, style::properties::button::basicButton);
+	Style::setStyle(m_minus, style::properties::button::spinboxButton);
 	m_minus->setFixedSize(size, size);
 }
 
@@ -217,13 +225,6 @@ void MenuSpinbox::setScalingEnabled(bool en)
 {
 	m_scalingEnabled = en;
 	m_scaleCb->setVisible(en);
-}
-
-void MenuSpinbox::setLineVisible(bool isVisible)
-{
-	if(m_line) {
-		m_line->setVisible(isVisible);
-	}
 }
 
 void MenuSpinbox::userInput(QString s)
@@ -301,8 +302,6 @@ void MenuSpinbox::populateWidgets()
 	m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
 	setToolTip(QString::number(m_value, 'f', 6)); // set tooltip
 }
-
-void MenuSpinbox::applyStylesheet() {}
 
 void MenuSpinbox::setScaleRange(double min, double max)
 {
