@@ -7,6 +7,7 @@
 #include <qboxlayout.h>
 #include <qlineedit.h>
 #include <qpushbutton.h>
+#include <style.h>
 #include <stylehelper.h>
 #include "regmapstylehelper.hpp"
 
@@ -25,7 +26,7 @@ SearchBarWidget::SearchBarWidget(QWidget *parent)
 	searchBar->setPlaceholderText("Search for register ");
 	searchButton = new QPushButton(this);
 	QIcon icon1;
-	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/search.svg", "white", 1));
+	icon1.addPixmap(Style::getPixmap(":/gui/icons/scopy-default/icons/search.svg"));
 	StyleHelper::SquareToggleButtonWithIcon(searchButton, "search_btn", false);
 	searchButton->setIcon(icon1);
 

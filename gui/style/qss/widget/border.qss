@@ -1,0 +1,4 @@
+*[&&property&&=true] {
+border: &border_width& solid &content_silent&; 
+border-radius: &radius_1&;
+}
