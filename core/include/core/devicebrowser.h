@@ -25,6 +25,7 @@ public:
 	QAbstractButton *getDeviceWidgetFor(QString id);
 	void addDevice(QString id, Device *d, int position = -1);
 	void removeDevice(QString id);
+	void connectingDevice(QString id);
 	void connectDevice(QString id);
 	void disconnectDevice(QString id);
 

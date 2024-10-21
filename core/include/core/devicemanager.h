@@ -40,6 +40,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
 	void changeToolListDevice();
+	void connectingDevice();
 	void connectDevice();
 	void disconnectDevice();
 	void restartDevice();
@@ -50,13 +51,11 @@ Q_SIGNALS:
 	void deviceAdded(QString, Device *);
 	void deviceRemoveStarted(QString, Device *);
 	void deviceRemoved(QString);
+	void deviceConnecting(QString);
 	void deviceConnected(QString id, Device *);
 	void deviceDisconnected(QString id, Device *);
 	void requestDevice(QString id);
 	void requestTool(QString id);
-
-	void connectionStarted();
-	void connectionFinished();
 
 private:
 	void connectDeviceToManager(DeviceImpl *d);
@@ -70,6 +69,7 @@ private:
 	PluginManager *pm;
 
 	void disconnectDevice(QString id);
+	void connectingDevice(QString id);
 	void connectDevice(QString id);
 };
 } // namespace scopy
