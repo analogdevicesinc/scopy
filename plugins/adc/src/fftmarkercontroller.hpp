@@ -1,14 +1,14 @@
 #ifndef FFTMARKERCONTROLLER_HPP
 #define FFTMARKERCONTROLLER_HPP
 
-#include <markercontroller.h>
+#include <plotmarkercontroller.h>
 
 namespace scopy {
 namespace adc {
 
 class FFTPlotComponentChannel;
 
-class FFTMarkerController : public MarkerController
+class FFTMarkerController : public PlotMarkerController
 {
 public:
 	FFTMarkerController(FFTPlotComponentChannel *ch, QObject *parent);

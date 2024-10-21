@@ -5,7 +5,7 @@
 #include <QString>
 #include "measurementcontroller.h"
 #include <gr-util/grsignalpath.h>
-#include <gui/markercontroller.h>
+#include <gui/plotmarkercontroller.h>
 #include <gui/interfaces.h>
 
 namespace scopy {
