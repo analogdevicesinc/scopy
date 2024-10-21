@@ -21,6 +21,7 @@
 
 #include "baseheaderwidget.h"
 #include <smallOnOffSwitch.h>
+#include <style.h>
 #include <widgets/menucollapsesection.h>
 #include <QLoggingCategory>
 #include <compositeheaderwidget.h>
@@ -97,13 +98,19 @@ MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::Men
 	: QWidget(parent)
 	, m_title(title)
 {
-
+	StyleHelper::MenuCollapseSection(this, "menuCollapse");
 	m_lay = new QVBoxLayout(this);
 	m_lay->setMargin(0);
 	m_lay->setSpacing(0);
 	setLayout(m_lay);
 	m_header = new MenuCollapseHeader(m_title, style, headerType, this);
 	m_lay->addWidget(m_header);
+
+	QFrame *line = new QFrame();
+	StyleHelper::MenuHeaderLine(line, QPen(Style::getColor(json::theme::interactive_subtle_idle)));
+	m_lay->addWidget(line);
+	m_lay->addSpacing(Style::getDimension(json::global::unit_1));
+
 	QWidget *container = new QWidget(this);
 	m_lay->addWidget(container);
 	m_contLayout = new QVBoxLayout(container);
@@ -111,7 +118,6 @@ MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::Men
 	m_contLayout->setMargin(0);
 	m_contLayout->setSpacing(0);
 
-	StyleHelper::MenuCollapseSection(this, "menuCollapse");
 	connect(m_header, &QAbstractButton::toggled, container, &QWidget::setVisible);
 }
 

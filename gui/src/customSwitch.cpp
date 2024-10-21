@@ -19,46 +19,59 @@
  */
 
 #include "customSwitch.h"
-
-#include <QDebug>
-#include <QFile>
-#include <QResizeEvent>
+#include "qcoreevent.h"
+#include "qvariant.h"
+#include <style.h>
+#include <QHBoxLayout>
 
 using namespace scopy;
 
 CustomSwitch::CustomSwitch(QWidget *parent)
 	: QPushButton(parent)
-	, on(this)
-	, off(this)
-	, handle(this)
-	, anim(&handle, "geometry")
-	, polarity(false)
+	, m_onLabel(new QLabel("On", this))
+	, m_offLabel(new QLabel("Off", this))
 {
-	on.setObjectName("on");
-	off.setObjectName("off");
-	handle.setObjectName("handle");
-
-	setFlat(true);
 	setCheckable(true);
-	setDuration(100);
-
-	QFile file(":/gui/stylesheets/customSwitch.qss");
-	file.open(QFile::ReadOnly);
-	QString styleSheet = QString::fromLatin1(file.readAll());
-	this->setStyleSheet(styleSheet);
-
-	connect(this, SIGNAL(toggled(bool)), SLOT(toggleAnim(bool)));
-	on.raise();
-	off.raise();
-	on.setText(tr("on"));
-	off.setText(tr("off"));
-	updateOnOffLabels();
+	init();
+	update();
 }
 
-void CustomSwitch::updateOnOffLabels()
+CustomSwitch::CustomSwitch(QString on, QString off, QWidget *parent)
+	: CustomSwitch(parent)
 {
-	on.setEnabled(isChecked() ^ polarity);
-	off.setEnabled(!isChecked() ^ polarity);
+	setOnText(on);
+	setOffText(off);
+}
+
+CustomSwitch::~CustomSwitch() {}
+
+void CustomSwitch::init()
+{
+	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+	m_onLabel->setAlignment(Qt::AlignCenter);
+	Style::setStyle(m_onLabel, style::widget::customSwitchLeft);
+	m_offLabel->setAlignment(Qt::AlignCenter);
+	Style::setStyle(m_offLabel, style::widget::customSwitchRight);
+
+	QHBoxLayout *layout = new QHBoxLayout(this);
+	layout->addWidget(m_onLabel);
+	layout->addWidget(m_offLabel);
+	layout->setContentsMargins(0, 0, 0, 0);
+	layout->setSpacing(0);
+	setLayout(layout);
+}
+
+void CustomSwitch::paintEvent(QPaintEvent *event)
+{
+	m_offLabel->move(m_onLabel->width() - Style::getDimension(json::global::border_width), m_offLabel->pos().y());
+	m_onLabel->raise();
+
+	QString offColor = Style::getAttribute(json::theme::interactive_primary_idle);
+	QString onColor = Style::getAttribute(json::theme::interactive_subtle_idle);
+	if(isChecked()) std::swap(onColor, offColor);
+	m_onLabel->setStyleSheet("color: " + onColor + "; border-color: " + onColor);
+	m_offLabel->setStyleSheet("color: " + offColor + "; border-color: " + offColor);
 }
 
 bool CustomSwitch::event(QEvent *e)
@@ -67,75 +80,36 @@ bool CustomSwitch::event(QEvent *e)
 		QDynamicPropertyChangeEvent *const propEvent = static_cast<QDynamicPropertyChangeEvent *>(e);
 		QString propName = propEvent->propertyName();
 		if(propName == "leftText" && property("leftText").isValid())
-			on.setText(property("leftText").toString());
+			setOnText(property("leftText").toString());
 		if(propName == "rightText" && property("rightText").isValid())
-			off.setText(property("rightText").toString());
-		if(propName == "polarity" && property("polarity").isValid())
-			polarity = property("polarity").toBool();
-		if(propName == "duration" && property("duration").isValid())
-			setDuration(property("duration").toInt());
-		if(propName == "bigBtn" && property("bigBtn").isValid()) {
-			if(property("bigBtn").toBool()) {
-				QFile file(":/gui/stylesheets/bigCustomSwitch.qss");
-				file.open(QFile::ReadOnly);
-				QString styleSheet = QString::fromLatin1(file.readAll());
-				this->setStyleSheet(styleSheet);
-			}
-		}
+			setOffText(property("rightText").toString());
 	}
 	return QPushButton::event(e);
 }
 
-CustomSwitch::~CustomSwitch() {}
-
-void CustomSwitch::setDuration(int ms)
+void CustomSwitch::setOnText(QString text)
 {
-	duration_ms = ms;
-	anim.setDuration(ms);
+	m_onLabel->setText(text);
+	update();
 }
 
-void CustomSwitch::toggleAnim(bool enabled)
+void CustomSwitch::setOffText(QString text)
 {
-	if(!isVisible())
-		return;
-
-	QRect on_rect(0, handle.y(), handle.width(), handle.height());
-	QRect off_rect(width() - handle.width(), handle.y(), handle.width(), handle.height());
-
-	anim.stop();
-
-	if(enabled ^ polarity) {
-		anim.setStartValue(off_rect);
-		anim.setEndValue(on_rect);
-	} else {
-		anim.setStartValue(on_rect);
-		anim.setEndValue(off_rect);
-	}
-
-	updateOnOffLabels();
-	anim.start();
+	m_offLabel->setText(text);
+	update();
 }
 
-void CustomSwitch::showEvent(QShowEvent *event)
+QSize CustomSwitch::sizeHint() const
 {
-	updateOnOffLabels();
-	if(isChecked() ^ polarity) {
-		handle.setGeometry(QRect(0, handle.y(), handle.width(), handle.height()));
-	} else {
-		handle.setGeometry(QRect(width() - handle.width(), handle.y(), handle.width(), handle.height()));
-	}
+	QSize size = layout()->sizeHint();
+	size.rwidth() -= Style::getDimension(json::global::border_width);
+	return size;
 }
 
-const QLabel &CustomSwitch::getOn() const { return on; }
-
-void CustomSwitch::setOnText(const QString &on_) { this->on.setText(on_); }
-
-const QLabel &CustomSwitch::getOff() const { return off; }
-
-void CustomSwitch::setOffText(const QString &off_) { this->off.setText(off_); }
-
-void CustomSwitch::setOn(const QPixmap &pixmap) { this->on.setPixmap(pixmap); }
-
-void CustomSwitch::setOff(const QPixmap &pixmap) { this->off.setPixmap(pixmap); }
+void CustomSwitch::update()
+{
+	QPushButton::update();
+	setMaximumSize(sizeHint());
+}
 
 #include "moc_customSwitch.cpp"
