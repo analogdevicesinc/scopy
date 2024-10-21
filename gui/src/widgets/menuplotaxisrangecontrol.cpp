@@ -21,6 +21,7 @@
 
 #include "menuplotaxisrangecontrol.h"
 #include <cfloat>
+#include <style.h>
 
 using namespace scopy::gui;
 MenuPlotAxisRangeControl::MenuPlotAxisRangeControl(PlotAxis *m_plotAxis, QWidget *parent)

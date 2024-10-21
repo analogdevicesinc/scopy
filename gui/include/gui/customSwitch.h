@@ -21,49 +21,37 @@
 #ifndef CUSTOM_SWITCH_HPP
 #define CUSTOM_SWITCH_HPP
 
-#include "customanimation.h"
 #include "scopy-gui_export.h"
 
 #include <QLabel>
 #include <QPushButton>
-#include <QWidget>
-
-class QShowEvent;
 
 namespace scopy {
 class SCOPY_GUI_EXPORT CustomSwitch : public QPushButton
 {
 	Q_OBJECT
 
-	Q_PROPERTY(int duration_ms MEMBER duration_ms WRITE setDuration);
-
 public:
 	explicit CustomSwitch(QWidget *parent = nullptr);
+	explicit CustomSwitch(QString on, QString off, QWidget *parent = nullptr);
 	~CustomSwitch();
 
-	const QLabel &getOn() const;
-	void setOnText(const QString &on_);
-	void setOn(const QPixmap &pixmap);
+	void setOnText(const QString text);
+	void setOffText(const QString text);
 
-	const QLabel &getOff() const;
-	void setOffText(const QString &off_);
-	void setOff(const QPixmap &pixmap);
+	QSize sizeHint() const override;
+
+public Q_SLOTS:
+	void update();
+
+protected:
+	void init();
+	void paintEvent(QPaintEvent *event) override;
+	bool event(QEvent *) override;
 
 private:
-	QLabel on, off;
-	QWidget handle;
-	CustomAnimation anim;
-	int duration_ms;
-	bool polarity;
-
-	void setDuration(int ms);
-	void updateOnOffLabels();
-
-	void showEvent(QShowEvent *event);
-	bool event(QEvent *);
-
-private Q_SLOTS:
-	void toggleAnim(bool enabled);
+	QLabel *m_onLabel;
+	QLabel *m_offLabel;
 };
 } // namespace scopy
 

@@ -28,6 +28,7 @@
 #include <QTranslator>
 #include <QOpenGLFunctions>
 #include <browsemenu.h>
+#include <style.h>
 
 #include "logging_categories.h"
 #include "qmessagebox.h"
@@ -70,7 +71,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 {
 	QElapsedTimer timer;
 	timer.start();
-	ui->setupUi(this);
+	initPreferences();
 
 	ScopyTitleManager::setMainWindow(this);
 	ScopyTitleManager::setApplicationName("Scopy");
@@ -82,7 +83,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	setAttribute(Qt::WA_QuitOnClose, true);
 	initPythonWIN32();
 	initStatusBar();
-	initPreferences();
 
 	ConnectionProvider::GetInstance();
 	MessageBroker::GetInstance();
@@ -297,7 +297,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_use_opengl", true);
 #endif
 	p->init("general_use_animations", true);
-	p->init("general_theme", "default");
+	p->init("general_theme", "dark");
 	p->init("general_language", "en");
 	p->init("show_grid", true);
 	p->init("show_graticule", false);
@@ -312,6 +312,9 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_show_status_bar", true);
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
+
+	Style::GetInstance()->setTheme(Preferences::GetInstance()->get("general_theme").toString());
+	ui->setupUi(this);
 
 	if(p->get("general_use_opengl").toBool()) {
 		m_glLoader = new QOpenGLWidget(this);
@@ -330,6 +333,7 @@ void ScopyMainWindow::initPreferences()
 
 		QMetaObject::invokeMethod(license, &LicenseOverlay::showOverlay, Qt::QueuedConnection);
 	}
+
 	QString theme = p->get("general_theme").toString();
 	QString themeName = "scopy-" + theme;
 	QIcon::setThemeName(themeName);

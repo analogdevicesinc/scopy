@@ -21,6 +21,7 @@
 
 #include "detailsview.h"
 #include <QVBoxLayout>
+#include <style.h>
 
 #define ADD_ICON ":/gui/icons/green_add.svg"
 #define REMOVE_ICON ":/gui/icons/orange_close.svg"
@@ -104,10 +105,10 @@ void DetailsView::setAddToWatchlistState(bool add)
 {
 	m_addToWatchlistBtn->setEnabled(true);
 	if(add) {
-		m_addToWatchlistBtn->setIcon(QIcon(ADD_ICON));
+		m_addToWatchlistBtn->setIcon(Style::getPixmap(ADD_ICON, Style::getColor(json::theme::content_inverse)));
 		m_addToWatchlistBtn->setToolTip("Add to Watchlist");
 	} else {
-		m_addToWatchlistBtn->setIcon(QIcon(REMOVE_ICON));
+		m_addToWatchlistBtn->setIcon(Style::getPixmap(REMOVE_ICON, Style::getColor(json::theme::content_inverse)));
 		m_addToWatchlistBtn->setToolTip("Remove from Watchlist");
 	}
 }

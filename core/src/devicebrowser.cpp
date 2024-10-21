@@ -30,6 +30,7 @@
 
 #include <QDebug>
 #include <QLoggingCategory>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_DEVBROWSER, "DeviceBrowser")
 
@@ -60,15 +61,19 @@ DeviceBrowser::~DeviceBrowser()
 
 void DeviceBrowser::initBtns()
 {
-	StyleHelper::FrameBackgroundShadow(ui->containerHome);
-	StyleHelper::FrameBackgroundShadow(ui->containerAdd);
+	ui->containerHome->setStyleSheet("border: none");
+	ui->containerAdd->setStyleSheet("border: none");
 
 	bg = new QButtonGroup(this);
 
 	bg->addButton(ui->btnAdd);
 	bg->addButton(ui->btnHome);
 	ui->btnHome->setProperty(devBrowserId, "home");
+	ui->btnHome->setIcon(Style::getPixmap(":/gui/icons/home.svg", Style::getColor(json::theme::content_inverse)));
+	Style::setStyle(ui->btnHome, style::button::basicButton);
 	ui->btnAdd->setProperty(devBrowserId, "add");
+	ui->btnAdd->setIcon(Style::getPixmap(":/gui/icons/add.svg", Style::getColor(json::theme::content_inverse)));
+	Style::setStyle(ui->btnAdd, style::button::basicButton);
 	list.append(ui->btnHome);
 	list.append(ui->btnAdd);
 	ui->btnHome->setChecked(true);

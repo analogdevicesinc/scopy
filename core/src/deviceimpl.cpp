@@ -35,6 +35,7 @@
 #include <QTextBrowser>
 #include <QThread>
 #include <QtConcurrent/QtConcurrent>
+#include <style.h>
 
 #include <common/scopyconfig.h>
 #include <gui/widgets/hoverwidget.h>
@@ -182,11 +183,13 @@ void DeviceImpl::loadPages()
 
 	connbtn->setProperty("device_page", true);
 	connbtn->setProperty("blue_button", true);
+	Style::setStyle(connbtn, style::button::basicButton);
 	connbtn->setAutoDefault(true);
 	m_buttonLayout->addWidget(connbtn);
 
 	discbtn->setProperty("device_page", true);
 	discbtn->setProperty("blue_button", true);
+	Style::setStyle(discbtn, style::button::basicButton);
 	discbtn->setAutoDefault(true);
 	m_buttonLayout->addWidget(discbtn);
 	discbtn->setVisible(false);
@@ -229,7 +232,7 @@ void DeviceImpl::loadBadges()
 {
 	QPushButton *forgetBtn = new QPushButton();
 	forgetBtn->setMaximumSize(25, 25);
-	forgetBtn->setIcon(QIcon(":/gui/icons/orange_close.svg"));
+	forgetBtn->setIcon(Style::getPixmap(":/gui/icons/orange_close.svg", Style::getColor(json::theme::content_inverse)));
 	connect(forgetBtn, &QPushButton::clicked, this, &DeviceImpl::forget);
 	HoverWidget *forgetHover = new HoverWidget(forgetBtn, m_icon, m_icon);
 	forgetHover->setStyleSheet("background-color: transparent; border: 0px;");
@@ -240,7 +243,7 @@ void DeviceImpl::loadBadges()
 
 	QPushButton *warningBtn = new QPushButton();
 	warningBtn->setMaximumSize(25, 25);
-	warningBtn->setIcon(QIcon(":/gui/icons/warning.svg"));
+	warningBtn->setIcon(Style::getPixmap(":/gui/icons/warning.svg"));
 	warningBtn->setToolTip(tr("The device is not available!\n"
 				  "Verify the connection!"));
 	HoverWidget *warningHover = new HoverWidget(warningBtn, m_icon, m_icon);
