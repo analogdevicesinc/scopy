@@ -157,14 +157,14 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 		m_defaultRealCh = c;
 		m_plotComponentManager->selectChannel(c);
 	}
-	connect(c->markerController(), &MarkerController::markerInfoUpdated, this, [=]() {
+	connect(c->markerController(), &PlotMarkerController::markerInfoUpdated, this, [=]() {
 		auto info = c->markerController()->markerInfo();
 		QString name = c->name();
 		m_plotComponentManager->markerPanel()->updateChannel(name, info);
 	});
 
 	auto markerController = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt())->markerController();
-	connect(markerController, &MarkerController::markerEnabled, this, [=](bool b) {
+	connect(markerController, &PlotMarkerController::markerEnabled, this, [=](bool b) {
 		if(b) {
 			m_plotComponentManager->markerPanel()->newChannel(c->name(), c->pen());
 		} else {
@@ -221,13 +221,13 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 		m_defaultComplexCh = c;
 	}
 
-	connect(c->markerController(), &MarkerController::markerInfoUpdated, this, [=]() {
+	connect(c->markerController(), &PlotMarkerController::markerInfoUpdated, this, [=]() {
 		auto info = c->markerController()->markerInfo();
 		m_plotComponentManager->markerPanel()->updateChannel(c->name(), info);
 	});
 
 	auto markerController = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt())->markerController();
-	connect(markerController, &MarkerController::markerEnabled, this, [=](bool b) {
+	connect(markerController, &PlotMarkerController::markerEnabled, this, [=](bool b) {
 		if(b) {
 			m_plotComponentManager->markerPanel()->newChannel(c->name(), c->pen());
 		} else {

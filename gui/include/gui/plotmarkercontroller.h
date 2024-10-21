@@ -1,5 +1,5 @@
-#ifndef MARKERCONTROLLER_H
-#define MARKERCONTROLLER_H
+#ifndef PLOTMARKERCONTROLLER_H
+#define PLOTMARKERCONTROLLER_H
 
 #include <scopy-gui_export.h>
 #include "plot_utils.hpp"
@@ -15,7 +15,7 @@
 namespace scopy {
 
 class PlotComponentChannel;
-class SCOPY_GUI_EXPORT MarkerController : public QObject
+class SCOPY_GUI_EXPORT PlotMarkerController : public QObject
 {
 	Q_OBJECT
 public:
@@ -42,9 +42,9 @@ public:
 		PeakInfo peak;
 	} MarkerInfo;
 
-	MarkerController(PlotComponentChannel *ch, QObject *parent);
-	MarkerController(QObject *parent);
-	~MarkerController();
+	PlotMarkerController(PlotComponentChannel *ch, QObject *parent);
+	PlotMarkerController(QObject *parent);
+	~PlotMarkerController();
 
 	void init();
 	bool enabled() const;
@@ -57,7 +57,7 @@ public:
 
 public Q_SLOTS:
 	void setNrOfMarkers(int);
-	void setMarkerType(MarkerTypes);
+	void setMarkerType(PlotMarkerController::MarkerTypes);
 	void computeMarkers();
 	void setAxes(QwtAxisId x, QwtAxisId y);
 	void setPlot(QwtPlot *);
@@ -117,7 +117,7 @@ public:
 public Q_SLOTS:
 	void newChannel(QString name, QPen c);
 	void deleteChannel(QString name);
-	void updateChannel(QString, QList<MarkerController::MarkerInfo>);
+	void updateChannel(QString, QList<PlotMarkerController::MarkerInfo>);
 	int markerCount();
 
 private:
@@ -134,7 +134,7 @@ public:
 	MarkerLabel(QString name, QPen c, QWidget *parent = nullptr);
 	~MarkerLabel();
 	QString name();
-	void updateInfo(QList<MarkerController::MarkerInfo> m);
+	void updateInfo(QList<PlotMarkerController::MarkerInfo> m);
 
 private:
 	QVBoxLayout *m_lay;
@@ -144,4 +144,4 @@ private:
 };
 } // namespace scopy
 
-#endif // MARKERCONTROLLER_H
+#endif // PLOTMARKERCONTROLLER_H

@@ -1,10 +1,10 @@
-#include "markercontroller.h"
+#include "plotmarkercontroller.h"
 #include <plotcomponent.h>
 #include <qwt_text.h>
 
 using namespace scopy;
 
-MarkerController::MarkerController(PlotComponentChannel *ch, QObject *parent)
+PlotMarkerController::PlotMarkerController(PlotComponentChannel *ch, QObject *parent)
 	: QObject(parent)
 	, m_ch(ch)
 	, m_plot(nullptr)
@@ -14,7 +14,7 @@ MarkerController::MarkerController(PlotComponentChannel *ch, QObject *parent)
 	init();
 }
 
-MarkerController::MarkerController(QObject *parent)
+PlotMarkerController::PlotMarkerController(QObject *parent)
 	: QObject(parent)
 	, m_plot(nullptr)
 	, m_xAxis(QwtAxis::XBottom)
@@ -23,7 +23,7 @@ MarkerController::MarkerController(QObject *parent)
 	init();
 }
 
-void MarkerController::init()
+void PlotMarkerController::init()
 {
 	m_enabled = false;
 	m_complex = false;
@@ -32,9 +32,9 @@ void MarkerController::init()
 	setMarkerType(MC_NONE);
 }
 
-MarkerController::~MarkerController() {}
+PlotMarkerController::~PlotMarkerController() {}
 
-void MarkerController::setNrOfMarkers(int n)
+void PlotMarkerController::setNrOfMarkers(int n)
 {
 	for(int i = 0; i < m_markers.count(); i++) {
 		m_markers[i]->detach();
@@ -69,7 +69,7 @@ void MarkerController::setNrOfMarkers(int n)
 	}
 }
 
-void MarkerController::setMarkerType(MarkerTypes v)
+void PlotMarkerController::setMarkerType(MarkerTypes v)
 {
 	m_markerType = v;
 	setNrOfMarkers(m_nrOfMarkers);
@@ -78,7 +78,7 @@ void MarkerController::setMarkerType(MarkerTypes v)
 	computeMarkers();
 }
 
-void MarkerController::setFixedMarkerFrequency(int idx, double freq)
+void PlotMarkerController::setFixedMarkerFrequency(int idx, double freq)
 {
 
 	if(idx > m_markerInfo.count() - 1)
@@ -86,7 +86,7 @@ void MarkerController::setFixedMarkerFrequency(int idx, double freq)
 	m_markerInfo[idx].peak.x = freq;
 }
 
-void MarkerController::setFixedHandleVisible(bool b)
+void PlotMarkerController::setFixedHandleVisible(bool b)
 {
 	m_handlesVisible = b;
 	if(m_markerType == MC_FIXED) {
@@ -97,7 +97,7 @@ void MarkerController::setFixedHandleVisible(bool b)
 	}
 }
 
-void MarkerController::deinitFixedMarker()
+void PlotMarkerController::deinitFixedMarker()
 {
 	for(auto handle : m_fixedHandles) {
 		delete handle;
@@ -105,16 +105,16 @@ void MarkerController::deinitFixedMarker()
 	m_fixedHandles.clear();
 }
 
-void MarkerController::computeFixedMarkerFrequency()
+void PlotMarkerController::computeFixedMarkerFrequency()
 {
 	for(int i = 0; i < m_nrOfMarkers; i++) {
 		m_markerInfo[i].peak.y = m_ch->plotChannel()->getValueAt(m_markerInfo[i].peak.x);
 	}
 }
 
-const QList<MarkerController::MarkerInfo> &MarkerController::markerInfo() const { return m_markerInfo; }
+const QList<PlotMarkerController::MarkerInfo> &PlotMarkerController::markerInfo() const { return m_markerInfo; }
 
-void MarkerController::computeMarkers()
+void PlotMarkerController::computeMarkers()
 {
 
 	if(m_enabled == false)
@@ -146,7 +146,7 @@ void MarkerController::computeMarkers()
 	m_plot->replot();
 }
 
-void MarkerController::setAxes(QwtAxisId x, QwtAxisId y)
+void PlotMarkerController::setAxes(QwtAxisId x, QwtAxisId y)
 {
 	m_xAxis = x;
 	m_yAxis = y;
@@ -162,7 +162,7 @@ void MarkerController::setAxes(QwtAxisId x, QwtAxisId y)
 	}
 }
 
-void MarkerController::setPlot(QwtPlot *p)
+void PlotMarkerController::setPlot(QwtPlot *p)
 {
 	m_plot = p;
 	for(int i = 0; i < m_markers.count(); i++) {
@@ -179,9 +179,9 @@ void MarkerController::setPlot(QwtPlot *p)
 	}
 }
 
-void MarkerController::setComplex(bool b) { m_complex = b; }
+void PlotMarkerController::setComplex(bool b) { m_complex = b; }
 
-void MarkerController::computePeakMarkers()
+void PlotMarkerController::computePeakMarkers()
 {
 	m_markerInfo.clear();
 	for(int i = 0; i < m_markers.count() && i < m_sortedPeakInfo.count(); i++) {
@@ -191,7 +191,7 @@ void MarkerController::computePeakMarkers()
 	}
 }
 
-void MarkerController::cacheMarkerInfo()
+void PlotMarkerController::cacheMarkerInfo()
 {
 	m_markerCache.clear();
 	for(auto mi : m_markerInfo) {
@@ -200,7 +200,7 @@ void MarkerController::cacheMarkerInfo()
 	m_markerInfo.clear();
 }
 
-double MarkerController::popCacheMarkerInfo()
+double PlotMarkerController::popCacheMarkerInfo()
 {
 	double ret;
 	if(m_markerCache.empty()) {
@@ -212,13 +212,13 @@ double MarkerController::popCacheMarkerInfo()
 	return ret;
 }
 
-PlotComponentChannel *MarkerController::ch() const { return m_ch; }
+PlotComponentChannel *PlotMarkerController::ch() const { return m_ch; }
 
-void MarkerController::setCh(PlotComponentChannel *newCh) { m_ch = newCh; }
+void PlotMarkerController::setCh(PlotComponentChannel *newCh) { m_ch = newCh; }
 
-bool MarkerController::enabled() const { return m_enabled; }
+bool PlotMarkerController::enabled() const { return m_enabled; }
 
-void MarkerController::setEnabled(bool newEnabled)
+void PlotMarkerController::setEnabled(bool newEnabled)
 {
 	m_enabled = newEnabled;
 	for(int i = 0; i < m_markers.count(); i++) {
@@ -262,7 +262,7 @@ void MarkerPanel::deleteChannel(QString name)
 	m_map.remove(name);
 }
 
-void MarkerPanel::updateChannel(QString name, QList<MarkerController::MarkerInfo> mi)
+void MarkerPanel::updateChannel(QString name, QList<PlotMarkerController::MarkerInfo> mi)
 {
 	dynamic_cast<MarkerLabel *>(m_map[name])->updateInfo(mi);
 	setFixedHeight(25 + mi.count() * 20);
@@ -289,7 +289,7 @@ MarkerLabel::~MarkerLabel() {}
 
 QString MarkerLabel::name() { return m_name; }
 
-void MarkerLabel::updateInfo(QList<MarkerController::MarkerInfo> markers)
+void MarkerLabel::updateInfo(QList<PlotMarkerController::MarkerInfo> markers)
 {
 	m_txt->setText(m_name);
 	for(auto m : markers) {
@@ -298,4 +298,4 @@ void MarkerLabel::updateInfo(QList<MarkerController::MarkerInfo> markers)
 	}
 }
 
-#include "moc_markercontroller.cpp"
+#include "moc_plotmarkercontroller.cpp"

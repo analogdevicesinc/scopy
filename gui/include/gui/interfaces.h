@@ -6,7 +6,7 @@
 #include <menuwidget.h>
 #include <plotwidget.h>
 #include <iioutil/iiounits.h>
-#include "markercontroller.h"
+#include "plotmarkercontroller.h"
 
 namespace scopy {
 

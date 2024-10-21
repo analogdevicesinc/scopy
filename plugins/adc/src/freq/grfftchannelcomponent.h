@@ -18,7 +18,7 @@
 #include <gr-util/grsignalpath.h>
 #include <gr-util/grfftfloatproxy.h>
 #include <gr-util/griiocomplexchannelsrc.h>
-#include <gui/markercontroller.h>
+#include <gui/plotmarkercontroller.h>
 
 namespace scopy {
 namespace adc {
@@ -141,7 +141,7 @@ public:
 	~GRFFTChannelComponent();
 
 	MeasureManagerInterface *getMeasureManager() override;
-	MarkerController *markerController();
+	PlotMarkerController *markerController();
 
 	GRSignalPath *sigpath() override;
 	QVBoxLayout *menuLayout();

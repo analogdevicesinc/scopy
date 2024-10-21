@@ -7,7 +7,7 @@ using namespace scopy;
 using namespace adc;
 
 FFTMarkerController::FFTMarkerController(FFTPlotComponentChannel *ch, QObject *parent)
-	: MarkerController(ch, parent)
+	: PlotMarkerController(ch, parent)
 	, m_ch(ch)
 {}
 
