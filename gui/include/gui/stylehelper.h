@@ -91,11 +91,9 @@ public:
 	static void MenuOnOffSwitchLabel(QLabel *w, QString objectName = "");
 	static void MenuOnOffSwitchButton(SmallOnOffSwitch *w, QString objectName = "");
 	static void MenuCollapseSection(QWidget *w, QString objectName = "");
-	static void MenuCollapseHeaderLabel(QLabel *w, QString objectName = "");
 	static void MenuCollapseHeaderLineEdit(QLineEdit *w, QString objectName = "");
 	static void MenuComboLabel(QLabel *w, QString objectName = "");
 	static void MenuHeaderLabel(QLabel *w, QString objectName = "");
-	static void MenuControlLabel(QLabel *w, QString objectName = "");
 	static void MenuBigSwitch(QWidget *w, QString objectName = "");
 	static void MenuBigSwitchButton(CustomSwitch *w, QString objectName = "");
 	static void MenuLineEdit(QLineEdit *m_edit, QString objectName = "");
@@ -112,7 +110,6 @@ public:
 	static void StatsPanelLabel(StatsLabel *w, QString objectName = "");
 	static void MeasurementSelectorItemWidget(QString iconPath, MeasurementSelectorItem *w,
 						  QString objectName = "");
-	static void DeviceIconBackgroundShadow(QAbstractButton *w, QString objectName = "");
 	static void FrameBackgroundShadow(QFrame *w, QString objectName = "");
 	static void HoverWidget(QWidget *w, bool draggable = false, QString objectName = "");
 	static void TransparentWidget(QWidget *w, QString objectName = "");
@@ -128,11 +125,7 @@ public:
 	static void BrowseButton(QPushButton *btn, QString objectName = "");
 	static void SpinBoxUpButton(QPushButton *w, QString objectName = "");
 	static void SpinBoxDownButton(QPushButton *w, QString objectName = "");
-
 	static void MenuSpinboxLabel(QLabel *m_label, QString objectName = "");
-	static void MenuSpinboxLineEdit(QLineEdit *m_edit, QString objectName = "");
-	static void MenuSpinboxLine(QFrame *w, QString objectName = "");
-
 	static void TabWidgetBarUnderline(QTabWidget *w, QString objectName = "");
 	static void TableWidgetDebugger(QTableWidget *w, QString objectName = "");
 	static void SplitterStyle(QSplitter *w, QString objectName = "");

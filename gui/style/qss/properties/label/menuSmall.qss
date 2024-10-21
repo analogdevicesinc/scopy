@@ -1,0 +1,7 @@
+QLabel[&&property&&=true] {
+	font-weight: 700;
+	font-size: &font_size_0_5&;
+}
+QLabel[&&property&&=true]:disabled {
+	color: grey;
+}

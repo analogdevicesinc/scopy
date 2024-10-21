@@ -183,14 +183,10 @@ void DeviceImpl::loadPages()
 	auto m_scrollAreaContents = ui->m_scrollAreaContents;
 	auto m_scrollAreaLayout = ui->m_scrollAreaLayout;
 
-	connbtn->setProperty("device_page", true);
-	connbtn->setProperty("blue_button", true);
 	Style::setStyle(connbtn, style::properties::button::basicButton);
 	connbtn->setAutoDefault(true);
 	m_buttonLayout->addWidget(connbtn);
 
-	discbtn->setProperty("device_page", true);
-	discbtn->setProperty("blue_button", true);
 	Style::setStyle(discbtn, style::properties::button::basicButton);
 	discbtn->setAutoDefault(true);
 	m_buttonLayout->addWidget(discbtn);
