@@ -67,6 +67,10 @@ if(ENABLE_TESTING)
 	add_subdirectory(test)
 endif()
 
+# arguments: --plugin <plugin style folder> <plugin headers folder> <build folder>
+# include(ScopyStyle)
+# generate_style("--plugin" ${CMAKE_CURRENT_SOURCE_DIR}/style ${CMAKE_CURRENT_SOURCE_DIR}/include/adc)
+
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 

@@ -40,7 +40,6 @@ ConfigChannelView::ConfigChannelView(int channelIndex, QWidget *parent)
 	StyleHelper::MenuSmallLabel(m_chnlLabel);
 
 	m_chnlCheck = new QCheckBox(this);
-	StyleHelper::BlueSquareCheckbox(m_chnlCheck);
 	Q_EMIT m_chnlCheck->toggled(true);
 
 	m_deviceOptions = new QComboBox(this);
@@ -86,7 +85,7 @@ void ConfigChannelView::connectSignalsAndSlots()
 
 void ConfigChannelView::setHighlightPalette()
 {
-	QString highlightColor = Style::getAttribute(json::theme::content_default);
+	QString highlightColor = Style::getAttribute(json::theme::content_silent);
 	QPalette newPalette = QPalette(palette());
 	newPalette.setColor(QPalette::Highlight, QColor(highlightColor));
 	setPalette(newPalette);

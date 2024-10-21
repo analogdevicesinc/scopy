@@ -141,7 +141,7 @@ void MenuControlButton::applyStylesheet()
 		StyleHelper::CollapseCheckbox(m_chk, "chk");
 		break;
 	default:
-		StyleHelper::BlueSquareCheckbox(m_chk, "chk");
+		// default style
 		break;
 	}
 	StyleHelper::MenuControlLabel(m_label, "name");

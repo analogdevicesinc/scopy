@@ -55,10 +55,11 @@ void StyleHelper::initColorMap()
 	auto sh = StyleHelper::GetInstance();
 	sh->colorMap.insert("interactive_primary_idle", Style::getAttribute(json::theme::interactive_primary_idle));
 	sh->colorMap.insert("interactive_subtle_idle", Style::getAttribute(json::theme::interactive_subtle_idle));
-	sh->colorMap.insert("interactive_subtle_disabled", Style::getAttribute(json::theme::interactive_subtle_disabled));
+	sh->colorMap.insert("interactive_subtle_disabled",
+			    Style::getAttribute(json::theme::interactive_subtle_disabled));
 	sh->colorMap.insert("background_primary", Style::getAttribute(json::theme::background_primary));
 	sh->colorMap.insert("content_default", Style::getAttribute(json::theme::content_default));
-	sh->colorMap.insert("content_busy",  Style::getAttribute(json::theme::content_busy));
+	sh->colorMap.insert("content_busy", Style::getAttribute(json::theme::content_busy));
 	sh->colorMap.insert("content_inverse", Style::getAttribute(json::theme::content_inverse));
 	sh->colorMap.insert("background_subtle", Style::getAttribute(json::theme::background_subtle));
 	sh->colorMap.insert("danger_default", Style::getAttribute(json::theme::danger_default));
@@ -185,32 +186,6 @@ void StyleHelper::BasicSmallButton(QPushButton *btn, QString objectName)
 {
 	Style::setStyle(btn, style::properties::button::basicButton, true, true);
 	btn->setFixedHeight(Style::getDimension(json::global::unit_3));
-}
-
-void StyleHelper::BlueSquareCheckbox(QCheckBox *chk, QString objectName)
-{
-	if(!objectName.isEmpty())
-		chk->setObjectName(objectName);
-	QString style = QString(R"css(
-						QCheckBox {
-							spacing: 8px;
-							background-color: rgba(128,128,128,0);
-							font-size: 14px;
-							font-weight: bold;
-							color: rgba(255, 255, 255, 153);
-						}
-						QCheckBox::indicator {
-							width: 14px;
-							height: 14px;
-							border: 2px solid rgb(74,100,255);
-								border-radius: 4px;
-							image: none;
-						}
-						QCheckBox::indicator:unchecked { background-color: &&content_inverse&&; }
-						QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
-						)css");
-	style.replace("&&content_inverse&&", StyleHelper::getColor("content_inverse"));
-	chk->setStyleSheet(style);
 }
 
 void StyleHelper::ColoredCircleCheckbox(QCheckBox *chk, QColor color, QString objectName)
@@ -471,9 +446,7 @@ void StyleHelper::MenuEditTextHeaderWidget(QWidget *w, QString objectName)
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::MenuSpinComboBox(QComboBox *w, QString objectName)
-{
-}
+void StyleHelper::MenuSpinComboBox(QComboBox *w, QString objectName) {}
 
 void StyleHelper::MenuOnOffSwitch(QWidget *w, QString objectName)
 {
@@ -613,7 +586,7 @@ void StyleHelper::MenuCollapseSection(QWidget *w, QString objectName)
 	if(!objectName.isEmpty())
 		w->setObjectName(objectName);
 
-	       /// ????
+	/// ????
 	QString style = QString(R"css(
 .QWidget {
 	background-color: transparent;
@@ -1474,8 +1447,8 @@ void StyleHelper::ToolMenuCollapseMini(QPushButton *btn, QString objectName)
 			background-position: center center;
 			)css");
 
-	style.replace("&&content_default&&", StyleHelper::getColor("content_silent"));
-	style.replace("&&content_decontent_silentfault&&", StyleHelper::getColor("content_silent"));
+	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
+	style.replace("&&content_silent&&", StyleHelper::getColor("content_silent"));
 	style.replace("&&content_inverse&&", StyleHelper::getColor("content_inverse"));
 	style.replace("&&interactive_subtle_idle&&", StyleHelper::getColor("interactive_subtle_idle"));
 	btn->setStyleSheet(style);

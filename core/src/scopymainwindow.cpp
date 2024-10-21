@@ -400,7 +400,6 @@ void ScopyMainWindow::initPreferences()
 
 	Style::GetInstance()->setTheme(Preferences::GetInstance()->get("general_theme").toString());
 
-
 	QString theme = p->get("general_theme").toString();
 	QString themeName = "scopy-" + theme;
 	QIcon::setThemeName(themeName);

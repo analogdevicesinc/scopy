@@ -36,6 +36,8 @@ public:
 	static QString localPluginFolderPath();
 	static QString defaultTranslationFolderPath();
 	static QString localTranslationFolderPath();
+	static QString defaultStyleFolderPath();
+	static QString localStyleFolderPath();
 	static QString preferencesFolderPath();
 	static QString settingsFolderPath();
 	static QString executableFolderPath();

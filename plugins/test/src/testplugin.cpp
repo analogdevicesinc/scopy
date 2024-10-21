@@ -115,8 +115,9 @@ void TestPlugin::loadToolList()
 {
 	renameCnt = 0;
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1first", "FirstPlugin", ":/gui/icons/home.svg"));
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("test1second", "Second Plugin", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_io.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1second", "Second Plugin",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_io.svg"));
 }
 
 bool TestPlugin::loadExtraButtons()

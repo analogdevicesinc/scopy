@@ -169,7 +169,7 @@ void RmsInstrument::updateLabels()
 
 void RmsInstrument::initPlot(PolarPlotWidget *plot)
 {
-	plot->setBgColor(QColor(Style::getAttribute(json::theme::background_primary)));
+	plot->setBgColor(QColor(Style::getAttribute(json::theme::background_plot)));
 	plot->setAzimuthInterval(0.0, 360.0, 30.0);
 	plot->plot()->insertLegend(new QwtLegend(), QwtPolarPlot::LeftLegend);
 }

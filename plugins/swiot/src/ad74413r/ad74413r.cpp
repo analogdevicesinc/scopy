@@ -693,7 +693,8 @@ QWidget *Ad74413r::createSettingsMenu(QWidget *parent)
 	layout->setMargin(0);
 	layout->setSpacing(10);
 
-	MenuHeaderWidget *header = new MenuHeaderWidget("AD74413R", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), widget);
+	MenuHeaderWidget *header = new MenuHeaderWidget(
+		"AD74413R", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), widget);
 	MenuSectionWidget *plotSettingsContainer = new MenuSectionWidget(widget);
 	MenuCollapseSection *plotTimespanSection = new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE,
 									   MenuCollapseSection::MHW_BASEWIDGET, widget);

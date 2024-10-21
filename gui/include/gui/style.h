@@ -17,6 +17,8 @@ private:
 	~Style();
 
 	void init(QString theme = "");
+	QString getStylePath(QString relativePath);
+	void initPaths();
 	void genrateStyle();
 	QString getAllProperties();
 	static bool isProperty(QString style);

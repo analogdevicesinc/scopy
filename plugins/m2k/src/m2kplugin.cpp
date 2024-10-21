@@ -93,25 +93,35 @@ void M2kPlugin::loadToolList()
 {
 	Preferences *p = Preferences::GetInstance();
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kosc", tr("Oscilloscope"),
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_oscilloscope.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_oscilloscope.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kspec", tr("Spectrum Analyzer"),
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_spectrum_analyzer.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_spectrum_analyzer.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2knet", tr("Network Analyzer"),
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_network_analyzer.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_network_analyzer.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2ksiggen", tr("Signal Generator"),
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_signal_generator.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_signal_generator.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2klogic", tr("Logic Analyzer"),
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_logic_analyzer.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_logic_analyzer.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kpattern", tr("Pattern Generator"),
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_pattern_generator.svg"));
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("m2kdio", tr("Digital I/O"), ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_io.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_pattern_generator.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kdio", tr("Digital I/O"),
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_io.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kdmm", tr("Voltmeter"),
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_voltmeter.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_voltmeter.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kpower", tr("Power Supply"),
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_power_supply.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_power_supply.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kcal", tr("Calibration"),
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_calibration.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_calibration.svg"));
 	ToolMenuEntry::findToolMenuEntryById(m_toolList, "m2kcal")
 		->setVisible(p->get("m2k_manual_calibration_enable").toBool());
 }

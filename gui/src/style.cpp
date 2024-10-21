@@ -8,10 +8,12 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonArray>
-#include <iostream>
 #include <utils.h>
 #include <QFileInfo>
 #include <QDirIterator>
+#include <QFontDatabase>
+
+#include <common/scopyconfig.h>
 
 using namespace scopy;
 
@@ -22,12 +24,13 @@ QMap<QString, QString> *Style::m_styleMap{new QMap<QString, QString>()};
 
 Style::Style(QObject *parent)
 	: QObject(parent)
-	, m_globalJsonPath("style/json/global.json")
-	, m_themeJsonPath("style/json/dark.json")
+	, m_globalJsonPath("/json/global.json")
+	, m_themeJsonPath("/json/dark.json")
+	, m_qssFolderPath("/qss")
 	, m_qssGlobalFile("global")
-	, m_qssFolderPath("style/qss")
 	, m_m2kqssFile("m2k")
 {
+	initPaths();
 	init();
 }
 
@@ -41,8 +44,29 @@ Style *Style::GetInstance()
 	return pinstance_;
 }
 
+QString Style::getStylePath(QString relativePath)
+{
+	// Check the local plugins folder first
+	QDir pathDir(config::localStyleFolderPath() + relativePath);
+	QFile pathFile(config::localStyleFolderPath() + relativePath);
+
+	if(pathDir.exists() || pathFile.exists()) {
+		return config::localStyleFolderPath() + relativePath;
+	}
+
+	return config::defaultStyleFolderPath() + relativePath;
+}
+
+void Style::initPaths()
+{
+	m_globalJsonPath = getStylePath(m_globalJsonPath);
+	m_themeJsonPath = getStylePath(m_themeJsonPath);
+	m_qssFolderPath = getStylePath(m_qssFolderPath);
+}
+
 void Style::init(QString theme)
 {
+	QFontDatabase::addApplicationFont(":/gui/Inter-Regular.ttf");
 	QFile global_file = QFile(m_globalJsonPath);
 	global_file.open(QIODevice::ReadOnly);
 	QByteArray global_data = global_file.readAll();
@@ -150,10 +174,7 @@ QString Style::getAttribute(const char *key)
 	return replaceAttributes(attr);
 }
 
-QColor Style::getChannelColor(int index)
-{
-	return getChannelColorList()[index];
-}
+QColor Style::getChannelColor(int index) { return getChannelColorList()[index]; }
 
 QList<QColor> Style::getChannelColorList()
 {
