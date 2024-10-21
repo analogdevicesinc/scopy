@@ -132,8 +132,8 @@ bool SignalGenerator::chunkCompare(chunk_header_t &ptr, const char *id2)
 	return true;
 }
 
-SignalGenerator::SignalGenerator(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, QJSEngine *engine,
-				 QWidget *parent)
+SignalGenerator::SignalGenerator(libm2k::context::M2k *m2k, QString uri, Filter *filt, ToolMenuEntry *tme,
+				 QJSEngine *engine, QWidget *parent)
 	: M2kTool(tme, new SignalGenerator_API(this), "Signal Generator", parent)
 	, ui(new Ui::SignalGenerator)
 	, time_block_data(new struct time_block_data)
@@ -146,6 +146,7 @@ SignalGenerator::SignalGenerator(libm2k::context::M2k *m2k, Filter *filt, ToolMe
 	, nb_points(NB_POINTS)
 	, channels_group(new QButtonGroup(this))
 	, m_maxNbOfSamples(4 * 1024 * 1024)
+	, m_uri(uri)
 {
 	zoomT1 = 0;
 	zoomT2 = 1;
@@ -1315,7 +1316,7 @@ void SignalGenerator::start()
 		return;
 	}
 
-	ResourceManager::open("m2k-dac" + tme->param(), this);
+	ResourceManager::open("m2k-dac" + m_uri, this);
 	m_m2k_analogout->cancelBuffer();
 
 	for(auto it = channels.begin(); it != channels.end(); ++it) {
@@ -1397,7 +1398,7 @@ void SignalGenerator::stop()
 		HANDLE_EXCEPTION(e);
 		qDebug(CAT_M2K_SIGNAL_GENERATOR) << e.what();
 	}
-	ResourceManager::close("m2k-dac" + tme->param());
+	ResourceManager::close("m2k-dac" + m_uri);
 }
 
 void SignalGenerator::startStop(bool pressed)

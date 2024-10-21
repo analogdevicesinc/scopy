@@ -17,7 +17,7 @@ class SCOPY_PQM_EXPORT RmsInstrument : public QWidget, public ResourceUser
 {
 	Q_OBJECT
 public:
-	RmsInstrument(ToolMenuEntry *tme, QWidget *parent = nullptr);
+	RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent = nullptr);
 	~RmsInstrument();
 
 Q_SIGNALS:
@@ -35,6 +35,7 @@ private:
 	void updatePlot(PolarPlotWidget *plot, QString type);
 	QVector<QwtPointPolar> getPolarPlotPoints(QString chnlType);
 
+	QString m_uri;
 	ToolMenuEntry *m_tme;
 	RunBtn *m_runBtn;
 	SingleShotBtn *m_singleBtn;

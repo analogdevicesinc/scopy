@@ -108,14 +108,14 @@ bool PQMPlugin::onConnect()
 	bool hasFwVers = m_acqManager->hasFwVers();
 
 	ToolMenuEntry *rmsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "pqmrms");
-	RmsInstrument *rms = new RmsInstrument(rmsTme);
+	RmsInstrument *rms = new RmsInstrument(rmsTme, m_param);
 	rmsTme->setTool(rms);
 	rmsTme->setEnabled(true);
 	rmsTme->setRunBtnVisible(true);
 	connect(m_acqManager, &AcquisitionManager::pqmAttrsAvailable, rms, &RmsInstrument::onAttrAvailable);
 
 	ToolMenuEntry *harmonicsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "pqmharmonics");
-	HarmonicsInstrument *harmonics = new HarmonicsInstrument(harmonicsTme);
+	HarmonicsInstrument *harmonics = new HarmonicsInstrument(harmonicsTme, m_param);
 	harmonics->showThdWidget(hasFwVers);
 	harmonicsTme->setTool(harmonics);
 	harmonicsTme->setEnabled(true);
@@ -123,7 +123,7 @@ bool PQMPlugin::onConnect()
 	connect(m_acqManager, &AcquisitionManager::pqmAttrsAvailable, harmonics, &HarmonicsInstrument::onAttrAvailable);
 
 	ToolMenuEntry *waveformTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "pqmwaveform");
-	WaveformInstrument *waveform = new WaveformInstrument(waveformTme);
+	WaveformInstrument *waveform = new WaveformInstrument(waveformTme, m_param);
 	waveform->showOneBuffer(hasFwVers);
 	waveformTme->setTool(waveform);
 	waveformTme->setEnabled(true);

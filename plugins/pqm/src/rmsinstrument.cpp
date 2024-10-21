@@ -14,9 +14,10 @@ Q_LOGGING_CATEGORY(CAT_PQM_RMS, "PqmRms")
 
 using namespace scopy::pqm;
 
-RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QWidget *parent)
+RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	: QWidget(parent)
 	, m_tme(tme)
+	, m_uri(uri)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *instrumentLayout = new QHBoxLayout(this);
@@ -198,9 +199,9 @@ void RmsInstrument::stop() { m_runBtn->setChecked(false); }
 void RmsInstrument::toggleRms(bool en)
 {
 	if(en) {
-		ResourceManager::open("pqm" + m_tme->param(), this);
+		ResourceManager::open("pqm" + m_uri, this);
 	} else {
-		ResourceManager::close("pqm" + m_tme->param());
+		ResourceManager::close("pqm" + m_uri);
 	}
 	Q_EMIT enableTool(en);
 }

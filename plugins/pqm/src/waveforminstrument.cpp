@@ -14,9 +14,10 @@
 
 using namespace scopy::pqm;
 
-WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QWidget *parent)
+WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	: QWidget(parent)
 	, m_tme(tme)
+	, m_uri(uri)
 {
 	initData();
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -175,9 +176,9 @@ void WaveformInstrument::stop() { m_runBtn->setChecked(false); }
 void WaveformInstrument::toggleWaveform(bool en)
 {
 	if(en) {
-		ResourceManager::open("pqm" + m_tme->param(), this);
+		ResourceManager::open("pqm" + m_uri, this);
 	} else {
-		ResourceManager::close("pqm" + m_tme->param());
+		ResourceManager::close("pqm" + m_uri);
 	}
 	m_plottingStrategy->clearSamples();
 	Q_EMIT enableTool(en);

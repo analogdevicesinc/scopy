@@ -138,8 +138,8 @@ class SignalGenerator : public M2kTool
 	Q_OBJECT
 
 public:
-	explicit SignalGenerator(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, QJSEngine *engine,
-				 QWidget *parent);
+	explicit SignalGenerator(libm2k::context::M2k *m2k, QString uri, Filter *filt, ToolMenuEntry *tme,
+				 QJSEngine *engine, QWidget *parent);
 	~SignalGenerator();
 
 	static const size_t min_buffer_size = 1024;
@@ -152,6 +152,7 @@ public:
 
 private:
 	const size_t m_maxNbOfSamples;
+	QString m_uri;
 	libm2k::context::M2k *m_m2k_context;
 	libm2k::analog::M2kAnalogOut *m_m2k_analogout;
 

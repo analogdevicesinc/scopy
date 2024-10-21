@@ -127,7 +127,7 @@ void SpectrumAnalyzer::initInstrumentStrings()
 	};
 }
 
-SpectrumAnalyzer::SpectrumAnalyzer(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme,
+SpectrumAnalyzer::SpectrumAnalyzer(libm2k::context::M2k *m2k, QString uri, Filter *filt, ToolMenuEntry *tme,
 				   m2k_iio_manager *m2k_man, QJSEngine *engine, QWidget *parent)
 	: M2kTool(tme, new SpectrumAnalyzer_API(this), "Spectrum Analyzer", parent)
 	, ui(new Ui::SpectrumAnalyzer)
@@ -155,6 +155,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(libm2k::context::M2k *m2k, Filter *filt, Tool
 	, fft_ids(nullptr)
 	, m_nb_overlapping_avg(1)
 	, use_float_sink(true)
+	, m_uri(uri)
 {
 	initInstrumentStrings();
 	// Get the list of names of the available channels
@@ -1978,7 +1979,7 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 	}
 
 	if(checked) {
-		ResourceManager::open("m2k-adc" + tme->param(), this);
+		ResourceManager::open("m2k-adc" + m_uri, this);
 
 		if(iio) {
 			writeAllSettingsToHardware();
@@ -1992,7 +1993,7 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 	} else {
 		stop_blockchain_flow();
 		sample_timer->stop();
-		ResourceManager::close("m2k-adc" + tme->param());
+		ResourceManager::close("m2k-adc" + m_uri);
 	}
 
 	if(!checked) {
