@@ -51,7 +51,7 @@ QWidget *ImportChannelComponent::createMenu(QWidget *parent)
 	connect(m_menu->header()->title(), &QLineEdit::textChanged, this, [=](QString s) { m_ctrl->setName(s); });
 
 	QPushButton *m_forget = new QPushButton("Remove reference channel");
-	StyleHelper::BlueButton(m_forget);
+	StyleHelper::BasicButton(m_forget);
 	connect(m_forget, &QAbstractButton::clicked, this, &ImportChannelComponent::forgetChannel);
 
 	m_menu->add(yaxismenu, "yaxis");
@@ -68,7 +68,7 @@ QWidget *ImportChannelComponent::createYAxisMenu(QWidget *parent)
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_timePlotChannelComponent->m_timePlotYAxis, section);
 	m_autoscaleBtn = new QPushButton(tr("AUTOSCALE"), section);
-	StyleHelper::BlueButton(m_autoscaleBtn);
+	StyleHelper::BasicButton(m_autoscaleBtn);
 	m_autoscaler = new PlotAutoscaler(this);
 	m_autoscaler->addChannels(m_timePlotChannelComponent->m_timePlotCh);
 

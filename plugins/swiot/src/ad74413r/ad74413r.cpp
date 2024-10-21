@@ -27,6 +27,7 @@
 #include <measurementlabel.h>
 #include <plotinfo.h>
 #include <plotinfowidgets.h>
+#include <style.h>
 
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menuheader.h>
@@ -429,7 +430,7 @@ void Ad74413r::setupChannel(int chnlIdx, QString function)
 {
 	if(function.compare("no_config") != 0) {
 		QString chnlId(function + " " + QString::number(chnlIdx + 1));
-		QPen chPen = QPen(QColor(StyleHelper::getColor("CH" + QString::number(chnlIdx))), 1);
+		QPen chPen = QPen(QColor(StyleHelper::getChannelColor(chnlIdx)), 1);
 
 		QString unit = m_swiotAdLogic->getPlotChnlUnitOfMeasure(chnlIdx);
 		auto yRange = m_swiotAdLogic->getPlotChnlRangeValues(chnlIdx);
@@ -664,7 +665,7 @@ QWidget *Ad74413r::createSettingsMenu(QWidget *parent)
 	layout->setMargin(0);
 	layout->setSpacing(10);
 
-	MenuHeaderWidget *header = new MenuHeaderWidget("AD74413R", QPen(StyleHelper::getColor("ScopyBlue")), widget);
+	MenuHeaderWidget *header = new MenuHeaderWidget("AD74413R", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), widget);
 	MenuSectionWidget *plotSettingsContainer = new MenuSectionWidget(widget);
 	MenuCollapseSection *plotTimespanSection = new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE,
 									   MenuCollapseSection::MHW_BASEWIDGET, widget);

@@ -88,7 +88,7 @@ void DioDigitalChannel::initPlot()
 	m_plot->setShowYAxisLabels(true);
 	m_plot->replot();
 
-	QPen chPen = QPen(QColor(StyleHelper::getColor("CH0")), 1);
+	QPen chPen = QPen(QColor(StyleHelper::getChannelColor(0)), 1);
 	m_plotCh = new PlotChannel("CH0", chPen, m_plot->xAxis(), m_plot->yAxis(), this);
 	m_plot->addPlotChannel(m_plotCh);
 	m_plotCh->setEnabled(true);

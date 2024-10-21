@@ -16,8 +16,8 @@ void SaveContextSetup::setupUi()
 {
 	setLayout(new QHBoxLayout(this));
 
-	StyleHelper::BlueButton(m_saveBtn, "SaveContextSetupButton");
-	StyleHelper::BlueButton(m_loadBtn, "LoadContextSetupButton");
+	StyleHelper::BasicButton(m_saveBtn, "SaveContextSetupButton");
+	StyleHelper::BasicButton(m_loadBtn, "LoadContextSetupButton");
 
 	layout()->addWidget(m_saveBtn);
 	layout()->addWidget(m_loadBtn);

@@ -111,7 +111,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_curve = new MenuPlotChannelCurveStyleControl(plotMenu);
 
 	m_deletePlot = new QPushButton("DELETE PLOT");
-	StyleHelper::BlueButton(m_deletePlot);
+	StyleHelper::BasicButton(m_deletePlot);
 	connect(m_deletePlot, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
 
 	yaxis->contentLayout()->addWidget(m_autoscaleBtn);

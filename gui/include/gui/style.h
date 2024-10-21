@@ -29,6 +29,8 @@ public:
 	static void setStyle(QWidget *widget, const char *style, QVariant value = true, bool force = false);
 	static QPixmap getPixmap(QString pixmap, QColor color = QColor());
 	static QString getColorTransparent(const char *key, double transparency);
+	static QColor getChannelColor(int index);
+	static QList<QColor> getChannelColorList();
 
 	QString getTheme();
 	bool setTheme(QString theme);
