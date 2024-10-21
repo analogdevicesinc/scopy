@@ -21,55 +21,59 @@
 #ifndef SMALL_ON_OFF_SWITCH_HPP
 #define SMALL_ON_OFF_SWITCH_HPP
 
-#include "customanimation.h"
 #include "scopy-gui_export.h"
 
+#include <QCheckBox>
 #include <QColor>
-#include <QLabel>
-#include <QPushButton>
+#include <QMap>
+#include <QPainter>
+#include <QPropertyAnimation>
 #include <QWidget>
 
 class QShowEvent;
 
 namespace scopy {
-class SCOPY_GUI_EXPORT SmallOnOffSwitch : public QPushButton
+class SCOPY_GUI_EXPORT SmallOnOffSwitch : public QCheckBox
 {
 	Q_OBJECT
-
-	Q_PROPERTY(int duration_ms MEMBER duration_ms WRITE setDuration);
-
-	Q_PROPERTY(QColor color_start MEMBER color_start);
-	Q_PROPERTY(QColor color_end MEMBER color_end);
-	Q_PROPERTY(QColor color MEMBER color WRITE setHandleColor);
+	Q_PROPERTY(int offset READ offset WRITE setOffset)
 
 public:
 	explicit SmallOnOffSwitch(QWidget *parent = nullptr);
+	explicit SmallOnOffSwitch(const QString &text, QWidget *parent = nullptr);
 	~SmallOnOffSwitch();
-	void setEnableAnimation(bool);
+
+	QSize sizeHint() const override;
+	void setSpacing(int spacing);
+
+public Q_SLOTS:
+	void toggleAnim();
+
+protected:
+	void resizeEvent(QResizeEvent *event) override;
+	void paintEvent(QPaintEvent *event) override;
+	void enterEvent(QEvent *event) override;
+	void leaveEvent(QEvent *event) override;
+	void mousePressEvent(QMouseEvent *event) override;
+	int offset() const;
+	void setOffset(int value);
+	void initDimensions();
 
 private:
-	QColor color_start, color_end, color;
-	QLabel on, off;
-	QWidget handle;
-	CustomAnimation anim;
-	CustomAnimation color_anim;
-	QString stylesheet;
-	int duration_ms;
-	bool show_icon;
-	bool bothValid;
+	bool m_is_entered;
+	int m_spacing;
+	int m_btn_width;
+	int m_track_radius;
+	int m_thumb_radius;
+	int m_margin;
+	int m_base_offset;
+	int m_offset;
+	qreal m_track_opacity;
 
-	void setDuration(int ms);
-	void setHandleColor(const QColor &color);
-	void updateOnOffLabels();
-
-	bool event(QEvent *e);
-	void showEvent(QShowEvent *event);
-	void paintEvent(QPaintEvent *);
-
-private Q_SLOTS:
-	void toggleAnim(bool enabled);
-Q_SIGNALS:
-	void animationDone();
+	QMap<bool, QColor> m_track_color;
+	QMap<bool, QColor> m_track_color_disabled;
+	QMap<bool, QColor> m_thumb_color;
+	QMap<bool, std::function<int()>> m_end_offset;
 };
 } // namespace scopy
 

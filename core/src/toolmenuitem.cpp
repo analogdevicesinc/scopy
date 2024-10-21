@@ -28,6 +28,15 @@
 #include <utils.h>
 #include <pluginbase/toolmenuentry.h>
 #include <QLoggingCategory>
+#include "gui/dynamicWidget.h"
+#include "gui/utils.h"
+#include "qdebug.h"
+#include "style_properties.h"
+
+#include <QHBoxLayout>
+#include <QLoggingCategory>
+#include <QSpacerItem>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_TOOLMENUITEM, "ToolMenuItem")
 
@@ -73,13 +82,13 @@ ToolMenuItem::ToolMenuItem(QString uuid, QString name, QString icon, QWidget *pa
 
 	lay->addWidget(toolOption);
 
-	// Load stylesheets
-	setStyleSheet(Util::loadStylesheetFromFile(":/gui/stylesheets/toolMenuItem.qss"));
 	setAttribute(Qt::WA_StyledBackground, true);
 #ifdef __ANDROID__
 	setDynamicProperty(this, "allowHover", false);
 #else
-	setDynamicProperty(this, "allowHover", true);
+	m_toolBtn->setStyleSheet("text-align:left;");
+	Style::setStyle(m_toolRunBtn, style::widget::notInteractive);
+
 	enableDoubleClick(true);
 #endif
 }
