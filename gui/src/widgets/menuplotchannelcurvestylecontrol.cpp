@@ -62,7 +62,6 @@ void MenuPlotChannelCurveStyleControl::createCurveMenu(QWidget *parent)
 	cbStyle->addItem("Steps", PlotChannel::PCS_STEPS);
 	cbStyle->addItem("Sticks", PlotChannel::PCS_STICKS);
 	cbStyle->addItem("Smooth", PlotChannel::PCS_SMOOTH);
-	StyleHelper::MenuComboBox(cbStyle, "cbStyle");
 
 	connect(cbStyle, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		for(auto ch : qAsConst(m_channels)) {

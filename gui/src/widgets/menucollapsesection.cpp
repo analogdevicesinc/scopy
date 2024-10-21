@@ -116,7 +116,7 @@ MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::Men
 	m_contLayout = new QVBoxLayout(container);
 	container->setLayout(m_contLayout);
 	m_contLayout->setMargin(0);
-	m_contLayout->setSpacing(0);
+	m_contLayout->setSpacing(10);
 
 	connect(m_header, &QAbstractButton::toggled, container, &QWidget::setVisible);
 }

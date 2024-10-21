@@ -54,7 +54,7 @@
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>48</height>
+         <height>44</height>
         </size>
        </property>
        <property name="styleSheet">
@@ -79,7 +79,7 @@
         <item>
          <spacer name="topContainerSpacer">
           <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+           <enum>Qt::Orientation::Horizontal</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -109,11 +109,8 @@
        <property name="maximumSize">
         <size>
          <width>384</width>
-         <height>16777215</height>
+         <height>44</height>
         </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color:#272730;</string>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <property name="spacing">
@@ -134,7 +131,7 @@
         <item>
          <spacer name="topContainerMenuControlSpacer">
           <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+           <enum>Qt::Orientation::Horizontal</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -327,7 +324,7 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>304</width>
+          <width>400</width>
           <height>16777215</height>
          </size>
         </property>
@@ -386,7 +383,7 @@
       <item>
        <spacer name="bottomContainerSpacer">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>

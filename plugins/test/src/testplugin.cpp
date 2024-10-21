@@ -34,6 +34,7 @@
 #include <QPainter>
 #include <QPushButton>
 #include <QSpacerItem>
+#include <style.h>
 
 #include <cursorsettings.h>
 #include <gui/utils.h>
@@ -115,7 +116,7 @@ void TestPlugin::loadToolList()
 	renameCnt = 0;
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1first", "FirstPlugin", ":/gui/icons/home.svg"));
 	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("test1second", "Second Plugin", ":/gui/icons/scopy-default/icons/tool_io.svg"));
+		SCOPY_NEW_TOOLMENUENTRY("test1second", "Second Plugin", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_io.svg"));
 }
 
 bool TestPlugin::loadExtraButtons()
@@ -162,7 +163,7 @@ This label is cool
 # Link
 
 For more info, visit [wiki](https://wiki.analog.com/)
-![ADI](:/gui/icons/scopy-default/icons/logo.svg "ADI")
+![ADI](:/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/logo.svg "ADI")
 )story");
 
 	tut->setTitle("Welcome to TestPlugin ! ");

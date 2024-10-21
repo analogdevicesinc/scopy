@@ -39,7 +39,6 @@ ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 		m_comboWidget = new QComboBox(m_ui);
 		m_comboWidget->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
 
-		StyleHelper::IIOComboBox(m_comboWidget, "IIOComboBox");
 		m_comboWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
 		m_ui->layout()->addWidget(label);
@@ -51,7 +50,6 @@ ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 
 		auto comboMenuWidget = new MenuCombo(recipe.data, m_ui);
 		m_comboWidget = comboMenuWidget->combo();
-		StyleHelper::IIOComboBox(m_comboWidget, "IIOComboBox");
 
 		m_ui->layout()->addWidget(comboMenuWidget);
 	}

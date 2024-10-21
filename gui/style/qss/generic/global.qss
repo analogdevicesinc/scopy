@@ -4,6 +4,7 @@
     color: &content_default&;
     font-family: Arial, sans-serif;
     font-size: &font_size&;
+    font-weight: 500;
 }
 
 *:focus {

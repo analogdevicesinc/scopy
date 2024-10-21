@@ -22,6 +22,7 @@
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menuheader.h>
 #include <gui/widgets/menusectionwidget.h>
+#include <style.h>
 
 using namespace scopy::swiot;
 
@@ -34,7 +35,7 @@ DioSettingsTab::DioSettingsTab(QWidget *parent)
 	layout->setSpacing(10);
 	layout->setContentsMargins(0, 0, 0, 0);
 
-	MenuHeaderWidget *header = new MenuHeaderWidget("MAX14906", QPen(StyleHelper::getColor("ScopyBlue")), this);
+	MenuHeaderWidget *header = new MenuHeaderWidget("MAX14906", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), this);
 	MenuSectionWidget *plotSettingsContainer = new MenuSectionWidget(this);
 	MenuCollapseSection *plotTimespanSection = new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE,
 									   MenuCollapseSection::MHW_BASEWIDGET, this);

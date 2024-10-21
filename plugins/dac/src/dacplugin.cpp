@@ -26,6 +26,7 @@
 
 #include <QLabel>
 #include <menusectionwidget.h>
+#include <style.h>
 
 #include <iioutil/connectionprovider.h>
 #include <gui/deviceinfopage.h>
@@ -127,7 +128,7 @@ bool DACPlugin::loadPreferencesPage()
 	resetTutorialWidgetLayout->setMargin(0);
 
 	QPushButton *resetTutorial = new QPushButton("Reset", generalSection);
-	StyleHelper::BlueButton(resetTutorial, "resetBtn");
+	Style::setStyle(resetTutorial, style::properties::button::basicButton);
 	connect(resetTutorial, &QPushButton::clicked, this, [=, this]() { p->set("dacplugin_start_tutorial", true); });
 
 	resetTutorialWidgetLayout->addWidget(new QLabel("DAC tutorial "), 6);

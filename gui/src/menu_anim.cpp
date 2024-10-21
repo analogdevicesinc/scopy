@@ -52,6 +52,7 @@ MenuAnim::MenuAnim(QByteArray minAnimationProperty, QByteArray maxAnimationPrope
 	, animInProg(false)
 	, animationDuration(200)
 {
+	setStyleSheet(".QWidget{ background-color: transparent; }");
 	setAttribute(Qt::WA_StyledBackground, true);
 	open_anim_max.setDuration(animationDuration);
 	open_anim_max.setEasingCurve(QEasingCurve::InOutExpo);

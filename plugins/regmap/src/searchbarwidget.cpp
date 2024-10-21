@@ -46,10 +46,15 @@ SearchBarWidget::SearchBarWidget(QWidget *parent)
 	searchBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	searchBar->setPlaceholderText("Search for register ");
 	searchButton = new QPushButton(this);
-	QIcon icon1;
-	icon1.addPixmap(Style::getPixmap(":/gui/icons/scopy-default/icons/search.svg"));
+
+	QString iconPath = ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/search.svg";
+	searchButton->setIcon(Style::getPixmap(iconPath, Style::getColor(json::theme::content_default)));
+
+	connect(searchButton, &QPushButton::toggled, this, [=](bool toggle) {
+		const char *color = toggle ? json::theme::content_inverse : json::theme::content_default;
+		searchButton->setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
+	});
 	StyleHelper::SquareToggleButtonWithIcon(searchButton, "search_btn", false);
-	searchButton->setIcon(icon1);
 
 	QObject::connect(searchBar, &QLineEdit::returnPressed, searchButton, &QPushButton::pressed);
 

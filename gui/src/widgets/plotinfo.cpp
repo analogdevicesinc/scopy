@@ -22,6 +22,7 @@
 #include "plotinfo.h"
 
 #include <QLabel>
+#include <style.h>
 #include <stylehelper.h>
 
 using namespace scopy;
@@ -73,7 +74,7 @@ void PlotInfo::addCustomInfo(QWidget *info, InfoPosition hpos, InfoPosition vpos
 QLabel *PlotInfo::addLabelInfo(InfoPosition hpos, InfoPosition vpos)
 {
 	QLabel *label = new QLabel();
-	StyleHelper::PlotInfoLabel(label);
+	Style::setStyle(label, style::properties::label::plotInfo, true, true);
 	addCustomInfo(label, hpos, vpos);
 
 	return label;

@@ -87,7 +87,7 @@ ToolMenuItem::ToolMenuItem(QString uuid, QString name, QString icon, QWidget *pa
 	setDynamicProperty(this, "allowHover", false);
 #else
 	m_toolBtn->setStyleSheet("text-align:left;");
-	Style::setStyle(m_toolRunBtn, style::widget::notInteractive);
+	Style::setStyle(m_toolRunBtn, style::properties::widget::notInteractive);
 
 	enableDoubleClick(true);
 #endif

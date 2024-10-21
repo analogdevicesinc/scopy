@@ -25,6 +25,7 @@
 #include <datamonitorstylehelper.hpp>
 #include <menucollapsesection.h>
 #include <menusectionwidget.h>
+#include <style.h>
 #include <timemanager.hpp>
 
 using namespace scopy;
@@ -111,14 +112,14 @@ DataLoggingMenu::DataLoggingMenu(QWidget *parent)
 void DataLoggingMenu::updateDataLoggingStatus(ProgressBarState status)
 {
 	if(status == ProgressBarState::SUCCESS) {
-		dataLoggingFilePath->getProgressBar()->setBarColor(StyleHelper::getColor("ProgressBarSuccess"));
+		dataLoggingFilePath->getProgressBar()->setBarColor(Style::getAttribute(json::theme::content_success));
 	}
 	if(status == ProgressBarState::ERROR) {
-		dataLoggingFilePath->getProgressBar()->setBarColor(StyleHelper::getColor("ProgressBarError"));
+		dataLoggingFilePath->getProgressBar()->setBarColor(Style::getAttribute(json::theme::content_error));
 	}
 	if(status == ProgressBarState::BUSY) {
 		dataLoggingFilePath->getProgressBar()->startProgress();
-		dataLoggingFilePath->getProgressBar()->setBarColor(StyleHelper::getColor("ProgressBarBusy"));
+		dataLoggingFilePath->getProgressBar()->setBarColor(Style::getAttribute(json::theme::content_busy));
 	}
 }
 

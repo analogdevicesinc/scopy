@@ -68,10 +68,11 @@ public:
 public:
 	static void initColorMap();
 	static QString getColor(QString id);
+	static QString getChannelColor(int index);
 	static void SquareToggleButtonWithIcon(QPushButton *btn, QString objectName, bool checkable = false);
-	static void BlueButton(QPushButton *btn, QString objectName = "");
+	static void BasicButton(QPushButton *btn, QString objectName = "");
 	static void RefreshButton(QPushButton *btn, QString objectName = "");
-	static void SmallBlueButton(QPushButton *btn, QString objectName = "");
+	static void BasicSmallButton(QPushButton *btn, QString objectName = "");
 	static void BlueSquareCheckbox(QCheckBox *chk, QString objectName = "");
 	static void CollapseCheckbox(QCheckBox *chk, QString objectName = "");
 	static void ColoredCircleCheckbox(QCheckBox *chk, QColor color, QString objectName = "");
@@ -83,11 +84,9 @@ public:
 	static void MenuHeaderLine(QFrame *line, QPen pen, QString objectName = "");
 	static void MenuHeaderWidget(QWidget *w, QString objectName = "");
 	static void MenuEditTextHeaderWidget(QWidget *w, QString objectName = "");
-	static void MenuComboBox(QComboBox *cb, QString objectName = "");
 	static void MenuSmallLabel(QLabel *lbl, QString objectName = "");
 	static void MenuComboWidget(QWidget *w, QString objectName = "");
 	static void MenuSectionWidget(QWidget *w, QString objectName = "");
-	// static void MenuSpinBox(SpinBoxA *w, QString objectName = "");
 	static void MenuSpinComboBox(QComboBox *w, QString objectName = "");
 	static void MenuOnOffSwitch(QWidget *w, QString objectName = "");
 	static void MenuOnOffSwitchLabel(QLabel *w, QString objectName = "");
@@ -114,7 +113,6 @@ public:
 	static void StatsPanelLabel(StatsLabel *w, QString objectName = "");
 	static void MeasurementSelectorItemWidget(QString iconPath, MeasurementSelectorItem *w,
 						  QString objectName = "");
-	static void PlotInfoLabel(QLabel *w, QString objectName = "");
 	static void DeviceIconBackgroundShadow(QAbstractButton *w, QString objectName = "");
 	static void FrameBackgroundShadow(QFrame *w, QString objectName = "");
 	static void HoverWidget(QWidget *w, bool draggable = false, QString objectName = "");
@@ -122,7 +120,6 @@ public:
 	static void ScopyStatusBar(QWidget *w, QString objectName = "");
 	static void IIOWidget(QWidget *w, QString objectName = "");
 	static void IIOWidgetElement(QWidget *w, QString objectName = "");
-	static void IIOComboBox(QComboBox *w, QString objectName = "");
 	static void IIOLineEdit(QLineEdit *w, QString objectName = "");
 	static void TableViewWidget(QWidget *w, QString objectName = "");
 	static void HoverToolTip(QWidget *w, QString info, QString objectName = "");

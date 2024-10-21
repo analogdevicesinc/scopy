@@ -49,7 +49,6 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm)
 	m_stackedWidget->addWidget(m_tabWidget);
 	m_stackedWidget->addWidget(m_addPage);
 	m_stackedWidget->setCurrentWidget(m_tabWidget);
-	Style::setStyle(m_stackedWidget, style::properties::widget::border);
 
 	layout->addWidget(m_stackedWidget);
 	m_pendingUri = "";
@@ -239,13 +238,13 @@ QWidget *ScopyHomeAddPage::createBtnsWidget(QWidget *parent)
 
 	m_backBtn = new QPushButton(btnsWidget);
 	m_backBtn->setText("BACK");
-	StyleHelper::BlueButton(m_backBtn);
+	StyleHelper::BasicButton(m_backBtn);
 	m_backBtn->setFixedWidth(128);
 
 	m_addBtn = new QPushButton(btnsWidget);
 	m_addBtn->setText("ADD DEVICE");
 	m_addBtn->setAutoDefault(true);
-	StyleHelper::BlueButton(m_addBtn);
+	StyleHelper::BasicButton(m_addBtn);
 	m_addBtn->setFixedWidth(128);
 
 	btnsLay->addWidget(m_backBtn);

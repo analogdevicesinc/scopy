@@ -8,7 +8,7 @@ QPushButton[&&property&&=true] {
 }
 
 QPushButton[&&property&&=true]:checked {
-	background-color: #F45000;
+	background-color: &interactive_secondary_idle&;
 }
 
 QPushButton[&&property&&=true]:disabled {
