@@ -58,7 +58,7 @@ class SCOPY_ADC_EXPORT ADCPlugin : public QObject, public PluginBase
 	Q_OBJECT
 	SCOPY_PLUGIN;
 
-	// Plugin interface
+	       // Plugin interface
 public:
 	void initPreferences() override;
 	void initMetadata() override;

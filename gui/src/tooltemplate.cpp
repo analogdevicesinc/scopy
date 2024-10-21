@@ -52,6 +52,7 @@ ToolTemplate::ToolTemplate(QWidget *parent)
 	m_rightStack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_topStack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_bottomStack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	m_ui->leftContainer->setStyleSheet("background-color: transparent;");
 }
 
 ToolTemplate::~ToolTemplate() { delete m_ui; }
