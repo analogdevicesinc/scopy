@@ -59,12 +59,13 @@ class DMM : public M2kTool
 	Q_OBJECT
 
 public:
-	explicit DMM(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *toolMenuItem, m2k_iio_manager *m2k_man,
-		     QWidget *parent = nullptr);
+	explicit DMM(libm2k::context::M2k *m2k, QString uri, Filter *filt, ToolMenuEntry *toolMenuItem,
+		     m2k_iio_manager *m2k_man, QWidget *parent = nullptr);
 	QPushButton *getRunButton();
 	~DMM();
 
 private:
+	QString m_uri;
 	libm2k::context::M2k *m_m2k_context;
 	libm2k::analog::M2kAnalogIn *m_m2k_analogin;
 	unsigned int m_adc_nb_channels;
