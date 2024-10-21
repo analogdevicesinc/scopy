@@ -41,7 +41,7 @@ class SCOPY_GUI_EXPORT PreferencesHelper
 
 public:
 	static QWidget *addPreferenceCheckBox(Preferences *p, QString id, QString description,
-						QObject *parent = nullptr);
+					      QObject *parent = nullptr);
 	static QWidget *addPreferenceEdit(Preferences *p, QString id, QString description, QObject *parent = nullptr);
 	static QWidget *addPreferenceCombo(Preferences *p, QString id, QString description, QStringList options,
 					   QObject *parent = nullptr);

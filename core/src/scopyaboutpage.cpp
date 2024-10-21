@@ -99,10 +99,7 @@ void ScopyAboutPage::initNavigationWidget(QTextBrowser *browser)
 	hover->show();
 }
 
-void ScopyAboutPage::addHorizontalTab(QWidget *w, QString text)
-{
-	tabWidget->addTab(w, text);
-}
+void ScopyAboutPage::addHorizontalTab(QWidget *w, QString text) { tabWidget->addTab(w, text); }
 
 ScopyAboutPage::~ScopyAboutPage() {}
 

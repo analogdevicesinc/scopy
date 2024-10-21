@@ -26,6 +26,7 @@
 #include <stylehelper.h>
 #include <menusectionwidget.h>
 #include <iioutil/cmdqpingtask.h>
+#include <style.h>
 
 #include "swiot_logging_categories.h"
 #include "max14906/max14906.h"
@@ -296,7 +297,7 @@ void SWIOTPlugin::createStatusContainer()
 	m_statusContainer->layout()->setContentsMargins(0, 0, 0, 0);
 
 	auto exclamationIcon = new QPushButton(m_statusContainer);
-	StyleHelper::NoBackgroundIconButton(exclamationIcon, QIcon::fromTheme(":/swiot/warning.svg"));
+	StyleHelper::NoBackgroundIconButton(exclamationIcon, Style::getPixmap(":/swiot/warning.svg"));
 
 	auto statusLabel = new QLabel("AD-SWIOT1L-SL: The system is powered at limited capacity.");
 	statusLabel->setWordWrap(true);

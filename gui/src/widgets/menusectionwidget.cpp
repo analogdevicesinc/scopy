@@ -34,7 +34,7 @@ MenuSectionWidget::MenuSectionWidget(QWidget *parent)
 	m_layout->setSpacing(0);
 	m_layout->setMargin(0);
 	StyleHelper::MenuSectionWidget(this, "menuSection");
-	Style::setStyle(this, style::widget::border);
+	Style::setStyle(this, style::properties::widget::border);
 }
 
 MenuSectionWidget::~MenuSectionWidget() {}

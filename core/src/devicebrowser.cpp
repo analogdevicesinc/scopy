@@ -70,10 +70,10 @@ void DeviceBrowser::initBtns()
 	bg->addButton(ui->btnHome);
 	ui->btnHome->setProperty(devBrowserId, "home");
 	ui->btnHome->setIcon(Style::getPixmap(":/gui/icons/home.svg", Style::getColor(json::theme::content_inverse)));
-	Style::setStyle(ui->btnHome, style::button::basicButton);
+	Style::setStyle(ui->btnHome, style::properties::button::basicButton);
 	ui->btnAdd->setProperty(devBrowserId, "add");
 	ui->btnAdd->setIcon(Style::getPixmap(":/gui/icons/add.svg", Style::getColor(json::theme::content_inverse)));
-	Style::setStyle(ui->btnAdd, style::button::basicButton);
+	Style::setStyle(ui->btnAdd, style::properties::button::basicButton);
 	list.append(ui->btnHome);
 	list.append(ui->btnAdd);
 	ui->btnHome->setChecked(true);

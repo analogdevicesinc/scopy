@@ -49,7 +49,7 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm)
 	m_stackedWidget->addWidget(m_tabWidget);
 	m_stackedWidget->addWidget(m_addPage);
 	m_stackedWidget->setCurrentWidget(m_tabWidget);
-	Style::setStyle(m_stackedWidget, style::widget::border);
+	Style::setStyle(m_stackedWidget, style::properties::widget::border);
 
 	layout->addWidget(m_stackedWidget);
 	m_pendingUri = "";

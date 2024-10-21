@@ -113,6 +113,7 @@ void SmallOnOffSwitch::resizeEvent(QResizeEvent *event)
 
 void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
 {
+	update();
 	QPainter p(this);
 	p.setRenderHint(QPainter::Antialiasing);
 	p.setPen(Qt::NoPen);
@@ -130,19 +131,16 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
 	p.drawRoundedRect(m_margin, m_margin, m_btn_width - 2 * m_margin, m_track_radius * 2 - 2 * m_margin,
 			  track_radius, track_radius);
 
-	       // use icon (this is used in m2k)
 	if(getDynamicProperty(this, "use_icon")) {
 		QPixmap pixmap;
 		if(isChecked()) {
 			pixmap = Style::getPixmap(":/gui/icons/unlocked.svg",
-						  Style::getColor(json::theme::background_subtle));
+						  Style::getColor(json::theme::content_inverse));
 		} else {
 			pixmap = Style::getPixmap(":/gui/icons/locked.svg",
-						  Style::getColor(json::theme::background_subtle));
+						  Style::getColor(json::theme::content_inverse));
 		}
 
-		       //		p.drawPixmap(QRect(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 *
-		       // m_thumb_radius, 2 * m_thumb_radius), pixmap);
 		p.drawPixmap(QRect(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, pixmap.width(),
 				   pixmap.height()),
 			     pixmap);
