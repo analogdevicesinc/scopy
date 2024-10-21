@@ -19,170 +19,166 @@
  */
 
 #include "smallOnOffSwitch.h"
-
 #include "dynamicWidget.h"
-
+#include "style.h"
 #include <QDebug>
 #include <QFile>
 #include <QResizeEvent>
+#include <QStyleOptionButton>
 #include <QStylePainter>
 
 using namespace scopy;
 
 SmallOnOffSwitch::SmallOnOffSwitch(QWidget *parent)
-	: QPushButton(parent)
-	, color_start("grey")
-	, color_end("blue")
-	, on(this)
-	, off(this)
-	, handle(this)
-	, anim(&handle, "geometry")
-	, color_anim(this, "color")
-	, show_icon(false)
-	, bothValid(false)
+	: QCheckBox(parent)
 {
-	handle.setObjectName("handle");
-	on.setObjectName("on");
-	off.setObjectName("off");
-
-	setFlat(true);
 	setCheckable(true);
-	setDuration(100);
+	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	initDimensions();
 
-	QFile file(":/gui/stylesheets/smallOnOffSwitch.qss");
-	file.open(QFile::ReadOnly);
-	stylesheet = QString::fromLatin1(file.readAll());
-	this->setStyleSheet(stylesheet);
+	connect(this, &QCheckBox::toggled, this, &SmallOnOffSwitch::toggleAnim);
+}
 
-	on.raise();
-	off.raise();
-	connect(this, SIGNAL(toggled(bool)), SLOT(toggleAnim(bool)));
+SmallOnOffSwitch::SmallOnOffSwitch(const QString &text, QWidget *parent)
+	: SmallOnOffSwitch(parent)
+{
+	QCheckBox::setText(text);
 }
 
 SmallOnOffSwitch::~SmallOnOffSwitch() {}
 
-void SmallOnOffSwitch::setEnableAnimation(bool b)
+void SmallOnOffSwitch::initDimensions()
 {
-	if(b == false) {
-		anim.setDuration(0);
+	m_is_entered = false;
+	m_track_radius = Style::getDimension(json::global::unit_1) / 2;
+	m_thumb_radius = Style::getDimension(json::global::unit_1) / 2 - 1;
+	m_btn_width = Style::getDimension(json::global::unit_1) * 2.2;
+	m_spacing = Style::getDimension(json::global::unit_1) / 2;
+	m_margin = std::max(0, m_thumb_radius - m_track_radius);
+	m_base_offset = std::max(m_thumb_radius, m_track_radius);
+	m_end_offset[true] = [this]() { return m_btn_width - m_base_offset; };
+	m_end_offset[false] = [this]() { return m_base_offset; };
+	m_offset = m_base_offset;
+
+	m_track_color[true] = Style::getColor(json::theme::interactive_primary_idle);
+	m_track_color[false] = Style::getColor(json::theme::interactive_subtle_idle);
+	m_track_color_disabled[true] = Style::getColor(json::theme::interactive_primary_disabled);
+	m_track_color_disabled[false] = Style::getColor(json::theme::interactive_subtle_disabled);
+	m_thumb_color[true] = Style::getColor(json::theme::background_subtle);
+	m_thumb_color[false] = Style::getColor(json::theme::background_subtle);
+	m_track_opacity = 1.0;
+}
+
+int SmallOnOffSwitch::offset() const { return m_offset; }
+
+void SmallOnOffSwitch::setSpacing(int spacing)
+{
+	m_spacing = spacing;
+	update();
+}
+
+void SmallOnOffSwitch::setOffset(int value)
+{
+	m_offset = value;
+	update();
+}
+
+QSize SmallOnOffSwitch::sizeHint() const
+{
+	QSize size;
+	if(QCheckBox::text().isEmpty()) {
+		size = QSize(m_btn_width, 2 * m_track_radius);
 	} else {
-		anim.setDuration(100);
-	}
-}
-
-void SmallOnOffSwitch::setDuration(int ms)
-{
-	duration_ms = ms;
-	anim.setDuration(ms);
-	color_anim.setDuration(ms);
-}
-
-void SmallOnOffSwitch::setHandleColor(const QColor &color)
-{
-	QString ss(stylesheet + QString("QWidget#handle { background-color: %1; }").arg(color.name()));
-	this->setStyleSheet(ss);
-}
-
-void SmallOnOffSwitch::toggleAnim(bool enabled)
-{
-	if(!isVisible())
-		return;
-
-	QRect off_rect(0, handle.y(), handle.width(), handle.height());
-	QRect on_rect(width() - handle.width(), handle.y(), handle.width(), handle.height());
-
-	anim.stop();
-	color_anim.stop();
-
-	if(!enabled) {
-		anim.setStartValue(off_rect);
-		anim.setEndValue(on_rect);
-		color_anim.setStartValue(color_start);
-		if(bothValid)
-			color_anim.setEndValue(color_start);
-		else
-			color_anim.setEndValue(color_end);
-	} else {
-		anim.setStartValue(on_rect);
-		anim.setEndValue(off_rect);
-		if(bothValid)
-			color_anim.setStartValue(color_start);
-		else
-			color_anim.setStartValue(color_end);
-
-		color_anim.setEndValue(color_start);
+		size = QCheckBox::sizeHint();
+		size.rwidth() += m_btn_width + m_spacing;
 	}
 
-	anim.start();
-	color_anim.start();
+	return size;
 }
 
-bool SmallOnOffSwitch::event(QEvent *e)
+void SmallOnOffSwitch::toggleAnim()
 {
-	if(e->type() == QEvent::DynamicPropertyChange) {
-		QDynamicPropertyChangeEvent *const propEvent = static_cast<QDynamicPropertyChangeEvent *>(e);
-		QString propName = propEvent->propertyName();
-		if(propName == "leftText" && property("leftText").isValid())
-			on.setText(property("leftText").toString());
-		if(propName == "rightText" && property("rightText").isValid())
-			off.setText(property("rightText").toString());
-		if(propName == "bothValid" && property("bothValid").isValid())
-			bothValid = property("bothValid").toBool();
-		if(propName == "duration" && property("duration").isValid())
-			setDuration(property("duration").toInt());
-	}
-	return QPushButton::event(e);
-}
-void SmallOnOffSwitch::paintEvent(QPaintEvent *e)
-{
-	QPushButton::paintEvent(e);
-	show_icon = getDynamicProperty(this, "use_icon");
-
-	if(!show_icon) {
-		return;
-	}
-
-	QIcon locked = QIcon::fromTheme("locked");
-	QIcon unlocked = QIcon::fromTheme("unlocked");
-	QPixmap pixmap;
-
-	QStylePainter p(this);
-	int w, h;
-	int left = 4, top = 4;
-
-	if(isChecked()) {
-		w = 8;
-		h = 12;
-		pixmap = locked.pixmap(w, h);
-		p.drawPixmap(left + handle.x() + handle.width(), handle.y() + top, w, h, pixmap);
-	} else {
-		w = 10;
-		h = 12;
-		pixmap = unlocked.pixmap(w, h);
-		p.drawPixmap(left, handle.y() + top, w, h, pixmap);
-	}
+	auto *anim = new QPropertyAnimation(this, "offset");
+	anim->setDuration(120);
+	anim->setStartValue(m_offset);
+	anim->setEndValue(m_end_offset[isChecked()]());
+	anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void SmallOnOffSwitch::showEvent(QShowEvent *event)
+void SmallOnOffSwitch::resizeEvent(QResizeEvent *event)
 {
-	if(!isChecked()) {
-		handle.setGeometry(QRect(width() - handle.width(), handle.y(), handle.width(), handle.height()));
-		if(bothValid) {
-			setHandleColor(color_start);
+	QCheckBox::resizeEvent(event);
+	setOffset(m_end_offset[isChecked()]());
+}
+
+void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
+{
+	QPainter p(this);
+	p.setRenderHint(QPainter::Antialiasing);
+	p.setPen(Qt::NoPen);
+
+	QColor track_brush, thumb_brush;
+	track_brush = m_track_color[isChecked()];
+	thumb_brush = m_thumb_color[isChecked()];
+
+	if(!isEnabled()) {
+		track_brush = m_track_color_disabled[isChecked()];
+	}
+
+	p.setBrush(track_brush);
+	int track_radius = !getDynamicProperty(this, "use_icon") ? m_track_radius : m_track_radius / 2;
+	p.drawRoundedRect(m_margin, m_margin, m_btn_width - 2 * m_margin, m_track_radius * 2 - 2 * m_margin,
+			  track_radius, track_radius);
+
+	       // use icon (this is used in m2k)
+	if(getDynamicProperty(this, "use_icon")) {
+		QPixmap pixmap;
+		if(isChecked()) {
+			pixmap = Style::getPixmap(":/gui/icons/unlocked.svg",
+						  Style::getColor(json::theme::background_subtle));
 		} else {
-			setHandleColor(color_end);
+			pixmap = Style::getPixmap(":/gui/icons/locked.svg",
+						  Style::getColor(json::theme::background_subtle));
 		}
+
+		       //		p.drawPixmap(QRect(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 *
+		       // m_thumb_radius, 2 * m_thumb_radius), pixmap);
+		p.drawPixmap(QRect(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, pixmap.width(),
+				   pixmap.height()),
+			     pixmap);
 	} else {
-		setHandleColor(color_start);
-		handle.setGeometry(0, handle.y(), handle.width(), handle.height());
+		p.setBrush(thumb_brush);
+		p.drawEllipse(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 * m_thumb_radius,
+			      2 * m_thumb_radius);
+	}
+
+	if(!QCheckBox::text().isEmpty()) {
+		QStylePainter sp(this);
+		QStyleOptionButton opt;
+		initStyleOption(&opt);
+		opt.rect.setLeft(opt.rect.left() + m_btn_width + m_spacing);
+		opt.rect.setTop(opt.rect.top() - (opt.rect.height() - m_track_radius * 2));
+		sp.drawControl(QStyle::CE_CheckBoxLabel, opt);
 	}
 }
 
-void SmallOnOffSwitch::updateOnOffLabels()
+void SmallOnOffSwitch::enterEvent(QEvent *event)
 {
-	if(!bothValid) {
-		on.setEnabled(isChecked());
-		off.setEnabled(!isChecked());
+	setCursor(Qt::PointingHandCursor);
+	m_is_entered = true;
+	QCheckBox::enterEvent(event);
+}
+
+void SmallOnOffSwitch::leaveEvent(QEvent *event)
+{
+	m_is_entered = false;
+	QCheckBox::enterEvent(event);
+}
+
+void SmallOnOffSwitch::mousePressEvent(QMouseEvent *event)
+{
+	if(event->button() == Qt::LeftButton && m_is_entered) {
+		toggle();
 	}
 }
 
