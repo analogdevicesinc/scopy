@@ -20,6 +20,7 @@
  */
 
 #include "detailsview.h"
+#include "style_properties.h"
 #include <QVBoxLayout>
 #include <style.h>
 
@@ -48,12 +49,11 @@ DetailsView::DetailsView(QWidget *parent)
 void DetailsView::setupUi()
 {
 	setLayout(new QVBoxLayout(this));
-	layout()->setContentsMargins(0, 6, 0, 0);
+	layout()->setContentsMargins(0, 20, 0, 0);
 
 	m_titleContainer->setLayout(new QHBoxLayout(m_titleContainer));
 	m_titleContainer->layout()->setContentsMargins(0, 0, 0, 0);
 
-	m_readBtn->setMaximumWidth(90);
 	m_addToWatchlistBtn->setMaximumSize(25, 25);
 	m_addToWatchlistBtn->setDisabled(true);
 
@@ -71,21 +71,22 @@ void DetailsView::setupUi()
 	QTabBar *tabBar = m_tabWidget->tabBar();
 	tabBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-	StyleHelper::TabWidgetBarUnderline(m_tabWidget, "DetailsTabWidget");
-	m_readBtn->setProperty("blue_button", true);
-	m_readBtn->setIcon(QIcon(":/gui/icons/refresh.svg"));
+	m_readBtn->setIcon(Style::getPixmap(":/gui/icons/refresh.svg"));
 	m_readBtn->setIconSize(QSize(25, 25));
 	m_readBtn->setText("Refresh");
-	m_readBtn->setMinimumHeight(35);
 	m_addToWatchlistBtn->setStyleSheet("QPushButton { background-color: transparent; border: 0px; }");
 
 	m_titleContainer->layout()->addWidget(m_titlePath);
 	m_titleContainer->layout()->addWidget(m_addToWatchlistBtn);
 	m_titleContainer->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
 	m_titleContainer->layout()->addWidget(m_readBtn);
+	m_titleContainer->layout()->setContentsMargins(0, 0, 0, 0);
 
 	layout()->addWidget(m_titleContainer);
 	layout()->addWidget(m_tabWidget);
+	Style::setStyle(m_guiView, style::properties::detailsView, true, true);
+	Style::setStyle(m_iioView, style::properties::detailsView, true, true);
+	Style::setStyle(m_readBtn, style::properties::button::subtleButton);
 }
 
 void DetailsView::setIIOStandardItem(IIOStandardItem *item)

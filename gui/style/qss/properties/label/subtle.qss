@@ -1,0 +1,5 @@
+QLabel[&&property&&=true] {
+	font-weight: 500;
+	color: grey;
+	font-size: &font_size_0_5&;
+}

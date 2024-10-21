@@ -1,5 +1,5 @@
 QWidget {
- background-color: transparent;
+    background-color: transparent;
 }
 QPushButton {
     background-color: transparent;
@@ -7,73 +7,120 @@ QPushButton {
     padding: 0 0;
     font-weight: bold;
 }
-scopy--DetachedToolWindow, QMainWindow > .QWidget, scopy--Sismograph > QwtPlotCanvas, QMessageBox, QToolTip {
- background-color: &interactive_subtle_disabled&;
+scopy--DetachedToolWindow,
+QMainWindow > .QWidget,
+scopy--Sismograph > QwtPlotCanvas,
+QMessageBox,
+QToolTip {
+    background-color: &interactive_subtle_disabled&;
 }
 QDockWidget {
- titlebar-normal-icon: url(:/gui/icons/&icon_theme_folder&/icons/sba_cmb_box_arrow_right.svg);
- background-color: &interactive_subtle_disabled&;
+    titlebar-normal-icon: url(:/gui/icons/&icon_theme_folder&/icons/sba_cmb_box_arrow_right.svg);
+    background-color: &interactive_subtle_disabled&;
 }
 QDockWidget::title {
- background-color: transparent;
+    background-color: transparent;
 }
 QDockWidget::float-button {
- background-color: transparent;
- border: none;
+    background-color: transparent;
+    border: none;
 }
 QDockWidget::float-button:hover {
- background-color: #1E&color_default_hexcode&;
- padding: 2px;
+    background-color: #1E&color_default_hexcode&;
+    padding: 2px;
 }
 QDockWidget::float-button:hover {
- background-color: #3C&color_inverse_hexcode&;
+    background-color: #3C&color_inverse_hexcode&;
 }
 QToolTip {
- padding: 6px;
- border: 1px solid #44&color_default_hexcode&;
- color: &content_default&;
+    padding: 6px;
+    border: 1px solid #44&color_default_hexcode&;
+    color: &content_default&;
 }
 QLabel {
- color: #96&color_default_hexcode&;
- font-size: 13px;
- font-style: normal;
- font-weight: normal;
- text-align: left;
+    color: #96&color_default_hexcode&;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: normal;
+    text-align: left;
 }
-QLabel:disabled, QRadioButton:disabled {color: #50&color_default_hexcode&; }
-QLabel[invalid=true] { color: &danger_default&; }
-QLabel[valid=true] { color: #96&color_default_hexcode& }
-QTextBrowser { background-color: #96&color_inverse_hexcode&; }
-scopy--MenuHAnim, scopy--m2k--DMM #widget_2, .scopy--m2k--PowerController #rightMenu {
- background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #28&color_inverse_hexcode&, stop: 0.15 transparent, stop: 0.85 transparent, stop: 1.0 #28&color_inverse_hexcode&);
+QLabel:disabled,
+QRadioButton:disabled {
+    color: #50&color_default_hexcode&;
 }
-QMainWindow > .QWidget > .scopy--MenuHAnim { background-color: none; }
-QwtPlot, QwtPolarPlot, pv--view--Viewport, QWidget[plot_container=true]{
- background-color: &background_plot&;
+QLabel[invalid="true"] {
+    color: &danger_default&;
 }
-scopy--Sismograph { background-color: transparent; }
-QwtPlotCanvas { background-color: &background_plot&; }
-QwtPolarCanvas { background-color: none; }
-QwtScaleWidget { color: #B4&color_default_hexcode&; }
+QLabel[valid="true"] {
+    color: #96&color_default_hexcode&;
+}
+QTextBrowser {
+    background-color: #96&color_inverse_hexcode&;
+}
+scopy--MenuHAnim,
+scopy--m2k--DMM #widget_2,
+.scopy--m2k--PowerController #rightMenu {
+    background-color: qlineargradient(
+        spread: pad,
+        x1: 0,
+        y1: 0,
+        x2: 0,
+        y2: 1,
+        stop: 0 #28&color_inverse_hexcode&,
+        stop: 0.15 transparent,
+        stop: 0.85 transparent,
+        stop: 1 #28&color_inverse_hexcode&
+    );
+}
+QMainWindow > .QWidget > .scopy--MenuHAnim {
+    background-color: none;
+}
+/*
+QwtPlot,
+QwtPolarPlot,
+pv--view--Viewport,
+*/
+QWidget[plot_container="true"] {
+    background-color: &background_subtle&;
+}
+scopy--Sismograph {
+    background-color: transparent;
+}
+QwtPlot,
+QwtPolarPlot,
+pv--view--Viewport,
+QwtPlotCanvas {
+    background-color: &background_plot&;
+}
+QwtPolarCanvas {
+    background-color: none;
+}
+QwtScaleWidget {
+    color: #B4&color_default_hexcode&;
+}
 QwtThermo {
- color: &content_subtle&;
- font-size: 26px;
+    color: &content_subtle&;
+    font-size: 26px;
 }
 /*
 scopy--BufferPreviewer {
  border: 1px solid &interactive_primary_idle&;
  alternate-background-color: &interactive_primary_disabled&;
- selection-background-color: &background_plot&;
- selection-color: &interactive_secondary_idle&;
+ selection-background-color: &background_subtle&;
+ selection-color: &interactive_accent_idle&;
  color: &content_default&;
 }
 */
 QDial {
- background-color: &background_plot&;
- color: &interactive_primary_disabled&;
+    background-color: &background_subtle&;
+    color: &interactive_primary_idle&;
 }
-QTabWidget::tab-bar { left: 0; }
-QTabWidget::pane { border-top: 0px; }
+QTabWidget::tab-bar {
+    left: 0;
+}
+QTabWidget::pane {
+    border-top: 0px;
+}
 /*
 QTabBar { qproperty-drawBase: 0; }
 QTabBar::tab {
@@ -84,7 +131,7 @@ QTabBar::tab {
 }
 QTabBar::tab:selected {
  color: &content_default&;
- border-bottom: 2px solid &interactive_secondary_idle&;
+ border-bottom: 2px solid &interactive_accent_idle&;
  margin-top: 0px;
 }
 QTabBar::tab:!selected {
@@ -95,467 +142,537 @@ QTabBar::scroller {
 }
 */
 QRadioButton {
- color: &content_default&;
- spacing: 12px;
+    color: &content_default&;
+    spacing: 12px;
 }
 QRadioButton::indicator {
- width: 14px;
- height: 14px;
- border: 2px solid;
- border-radius: 9px;
- border-color: &interactive_primary_disabled&;
+    width: 14px;
+    height: 14px;
+    border: 2px solid;
+    border-radius: 9px;
+    border-color: &interactive_primary_idle&;
 }
-QRadioButton::indicator:checked { background-color: &interactive_primary_disabled&; }
-QRadioButton::indicator:disabled { border-color: &interactive_subtle_disabled&; }
-QRadioButton::indicator:checked:disabled { background-color: &interactive_subtle_disabled&; }
+QRadioButton::indicator:checked {
+    background-color: &interactive_primary_idle&;
+}
+QRadioButton::indicator:disabled {
+    border-color: &interactive_subtle_disabled&;
+}
+QRadioButton::indicator:checked:disabled {
+    background-color: &interactive_subtle_disabled&;
+}
 QLineEdit {
- color: &content_default&;
- font-size: 16px;
- border: 0px solid &content_silent&;
- border-bottom: 1px solid #66&color_default_hexcode&;
- padding: 2px;
+    color: &content_default&;
+    font-size: 16px;
+    border: 0px solid &content_silent&;
+    border-bottom: 1px solid #66&color_default_hexcode&;
+    padding: 2px;
 }
-QLineEdit[valid=true]{ color: &content_default&; }
-QLineEdit[invalid=true]{ color: &danger_default&; }
+QLineEdit[valid="true"] {
+    color: &content_default&;
+}
+QLineEdit[invalid="true"] {
+    color: &danger_default&;
+}
 
 QMessageBox QLabel {
- height: 420px;
- width: 680px;
- color: #F0&color_default_hexcode&;
- font-size: 14px;
- font: bold;
+    height: 420px;
+    width: 680px;
+    color: #F0&color_default_hexcode&;
+    font-size: 14px;
+    font: bold;
 }
 QMessageBox QPushButton {
- height: 20px;
- width: 120px;
- background-color: &interactive_primary_disabled&;
- color: &content_default&;
- font-size: 16px;
- font: bold;
- border-radius: 5px;
- border-color: &interactive_primary_disabled&;
- border-style: solid;
- border-width: 1px;
+    height: 20px;
+    width: 120px;
+    background-color: &interactive_primary_idle&;
+    color: &content_default&;
+    font-size: 16px;
+    font: bold;
+    border-radius: 5px;
+    border-color: &interactive_primary_idle&;
+    border-style: solid;
+    border-width: 1px;
 }
 
 QGroupBox {
- border: 2px solid #28&color_default_hexcode&;
- border-radius: 8px;
- color: #28&color_default_hexcode&;
- font-size: 16px;
- font-weight: bold;
- margin-top: 9px;
- padding-top: 5px;
+    border: 2px solid #28&color_default_hexcode&;
+    border-radius: 8px;
+    color: #28&color_default_hexcode&;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 9px;
+    padding-top: 5px;
 }
 QGroupBox::title {
- subcontrol-origin: margin;
- subcontrol-position: top left;
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
 }
 
-QScrollArea { border: 0px;}
+QScrollArea {
+    border: 0px;
+}
 QScrollBar:vertical {
- background: &background_primary&;
- max-width: 8px;
+    background: &background_subtle&;
+    max-width: 8px;
 }
 QScrollBar::handle:vertical {
- background: &interactive_subtle_disabled&;
- border: 0;
- border-radius: 3px;
+    background: &interactive_subtle_disabled&;
+    border: 0;
+    border-radius: 3px;
 }
 QScrollBar::handle:vertical:hover {
- background: &background_secondary&;
- border: 0;
- border-radius: 3px;
+    background: &background_secondary&;
+    border: 0;
+    border-radius: 3px;
 }
-QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }
-QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
- border: none;
- background: none;
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: none;
+}
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    border: none;
+    background: none;
 }
 QScrollBar:horizontal {
- background: &background_primary&;
- max-height: 6px;
- border-radius: 3px;
+    background: &background_subtle&;
+    max-height: 6px;
+    border-radius: 3px;
 }
 QScrollBar::handle:horizontal {
- background: &interactive_subtle_disabled&;
- border: 0;
- border-radius: 3px;
+    background: &interactive_subtle_disabled&;
+    border: 0;
+    border-radius: 3px;
 }
 QScrollBar::handle:horizontal:hover {
- background: &background_secondary&;
- border: 0;
- border-radius: 3px;
+    background: &background_secondary&;
+    border: 0;
+    border-radius: 3px;
 }
-QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }
-QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
- border: none;
- background: none;
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal {
+    background: none;
 }
-QDialog { background-color: &content_inverse&; }
-ScopyAboutDialog QPushButton{
- background-color: &interactive_primary_disabled&;
- color: &content_default&;
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    border: none;
+    background: none;
 }
-QTextBrowser#aboutTextBrowser{
- background-color: transparent;
- link-color: yellow;
- selection-color: yellow;
- color: &content_default&;
-}
-QLabel[subsection_label=true]{
- font-size: 12px;
- color: #46&color_default_hexcode&;
-}
-QFrame[subsection_line=true]{
-border: 1px solid #46&color_default_hexcode&;}
-QPushButton[subsection_arrow_button=true]{
- max-height: 12px;
- max-width: 12px;
- border: none;
- image: url(:/gui/icons/&icon_theme_folder&/icons/sba_cmb_box_arrow_right.svg);
-}
-QPushButton[subsection_arrow_button=true]:checked{
- max-height: 12px;
- max-width: 12px;
- border: none;
- image: url(:/gui/icons/&icon_theme_folder&/icons/sba_cmb_box_arrow.svg);
-}
-QLabel[general_settings_label=true]{
- color: &content_default&;
- font-size: 14px;
- font-weight: normal;
-}
-QFrame[blue_line=true]{ border: 2px solid &interactive_primary_disabled&; }
-QFrame[drag_widget=true] { border-image:url(:/gui/icons/&icon_theme_folder&/icons/menu.svg); }
 
+QDialog {
+    background-color: &background_subtle&;
+}
+
+ScopyAboutDialog QPushButton {
+    background-color: &interactive_primary_idle&;
+    color: &content_default&;
+}
+QTextBrowser#aboutTextBrowser {
+    background-color: transparent;
+    link-color: yellow;
+    selection-color: yellow;
+    color: &content_default&;
+}
+QLabel[subsection_label="true"] {
+    font-size: 12px;
+    color: #46&color_default_hexcode&;
+}
+QFrame[subsection_line="true"] {
+    border: 1px solid #46&color_default_hexcode&;
+}
+QPushButton[subsection_arrow_button="true"] {
+    max-height: 12px;
+    max-width: 12px;
+    border: none;
+    image: url(:/gui/icons/&icon_theme_folder&/icons/sba_cmb_box_arrow_right.svg);
+}
+QPushButton[subsection_arrow_button="true"]:checked {
+    max-height: 12px;
+    max-width: 12px;
+    border: none;
+    image: url(:/gui/icons/&icon_theme_folder&/icons/sba_cmb_box_arrow.svg);
+}
+QLabel[general_settings_label="true"] {
+    color: &content_default&;
+    font-size: 14px;
+    font-weight: normal;
+}
+QFrame[blue_line="true"] {
+    border: 2px solid &interactive_primary_idle&;
+}
+QFrame[drag_widget="true"] {
+    border-image: url(:/gui/icons/&icon_theme_folder&/icons/menu.svg);
+}
 
 QWidget[device_page="true"] {
-background-color: &background_plot&;
+    background-color: &background_subtle&;
 }
 QWidget[device_page="true"] QPushButton[device_page="true"] {
-min-height: 30px;
-max-height: 30px;
-min-width: 150px;
-max-width: 240px;
+    min-height: 30px;
+    max-height: 30px;
+    min-width: 150px;
+    max-width: 240px;
 }
 
-QPushButton[blue_button=true]{
- background-color: &interactive_primary_disabled&;
- color: &content_default&;
- border-radius: 4px;
- font-size: 14px;
+QPushButton[blue_button="true"] {
+    background-color: &interactive_primary_idle&;
+    color: &content_inverse&;
+    border-radius: 4px;
+    font-size: 14px;
 }
-QPushButton[blue_button=true]:hover{ background-color: &interactive_primary_idle&; }
-QPushButton[blue_button=true]:pressed{ background-color: &interactive_primary_idle&; }
-QPushButton[blue_button=true]:disabled { background-color: &interactive_subtle_disabled&; }
-
-QPushButton[info_button=true]{
- min-height: 40px;
- max-height: 40px;
- min-width: 40px;
- max-width: 40px;
- background-color: transparent;
- border-radius: 4px;
+QPushButton[blue_button="true"]:hover {
+    background-color: &interactive_primary_hover&;
+}
+QPushButton[blue_button="true"]:pressed {
+    background-color: &interactive_primary_pressed&;
+}
+QPushButton[blue_button="true"]:disabled {
+    background-color: &interactive_subtle_disabled&;
 }
 
+QPushButton[info_button="true"] {
+    min-height: 40px;
+    max-height: 40px;
+    min-width: 40px;
+    max-width: 40px;
+    background-color: transparent;
+    border-radius: 4px;
+}
 
-QPushButton[info_button=true]:hover { background-color: #3C&color_inverse_hexcode&; }
-QLabel[menu_title_label=true]{
- color: &content_default&;
- font-weight: normal;
- font-size: 14px;
+QPushButton[info_button="true"]:hover {
+    background-color: #3C&color_inverse_hexcode&;
+}
+QLabel[menu_title_label="true"] {
+    color: &content_default&;
+    font-weight: normal;
+    font-size: 14px;
 }
 
 /* Remove height : 2px; from QSlider groove */
 QSlider::groove {
- border: 1px solid &background_secondary&;
- background: &content_subtle&;
- margin: 2px 0;
- border-radius: 2px;
+    border: 1px solid &background_secondary&;
+    background: &content_subtle&;
+    margin: 2px 0;
+    border-radius: 2px;
 }
 
 QSlider::handle {
- background: &interactive_subtle_disabled&;
- border: 0px solid;
- width: 18px;
- margin: -8px 0;
- border-radius: 8px;
+    background: &interactive_subtle_disabled&;
+    border: 0px solid;
+    width: 18px;
+    margin: -8px 0;
+    border-radius: 8px;
 }
-QSlider::handle:disabled { background: &background_secondary&; }
-QSlider::sub-page:horizontal { background: &interactive_primary_disabled&; }
-QPushButton[menu_icon_button=true] {
- min-height: 40px;
- max-height: 40px;
- min-width: 60px;
- max-width: 60px;
- padding-top:5px
+QSlider::handle:disabled {
+    background: &background_secondary&;
 }
-QPushButton[menu_icon_button=true]:checked { border-top: 1px solid #96&color_default_hexcode&; }
-QPushButton[menu_icon_button=true]:!checked { border-top: 1px solid transparent; }
-QPushButton[menu_icon_button=true]:!checked:hover { border-top: 1px solid transparent; }
-QPushButton[menu_icon_button=true]:checked:hover { border-top: 1px solid #C8&color_default_hexcode&; }
-QPushButton[tool_launcher_custom_widget=true] {
- text-align:left;
- border: none;
- background-color: none;
+QSlider::sub-page:horizontal {
+    background: &interactive_primary_disabled&;
 }
-.QWidget[tool_launcher_custom_widget=true]:hover {
- background-color: #3C&color_inverse_hexcode&;
- border: 1px solid #1E&color_inverse_hexcode&;
- border-radius:5px;
+QPushButton[menu_icon_button="true"] {
+    min-height: 40px;
+    max-height: 40px;
+    min-width: 60px;
+    max-width: 60px;
+    padding-top: 5px;
 }
-QWidget[tool_launcher_custom_widget=true][selected=true] {
- background-color: #3C&color_inverse_hexcode&;
- border: 1px solid #1E&color_inverse_hexcode&;
- border-radius:5px;
+QPushButton[menu_icon_button="true"]:checked {
+    border-top: 1px solid #96&color_default_hexcode&;
 }
-QWidget[menu_button=true][selected=true] {
- opacity: 0.6;
- border-radius: 4px;
- background-color: &background_plot&;
+QPushButton[menu_icon_button="true"]:!checked {
+    border-top: 1px solid transparent;
 }
-QWidget[menu_button=true][selected=false] { background-color: transparent; }
+QPushButton[menu_icon_button="true"]:!checked:hover {
+    border-top: 1px solid transparent;
+}
+QPushButton[menu_icon_button="true"]:checked:hover {
+    border-top: 1px solid #C8&color_default_hexcode&;
+}
+QPushButton[tool_launcher_custom_widget="true"] {
+    text-align: left;
+    border: none;
+    background-color: none;
+}
+.QWidget[tool_launcher_custom_widget="true"]:hover {
+    background-color: #3C&color_inverse_hexcode&;
+    border: 1px solid #1E&color_inverse_hexcode&;
+    border-radius: 5px;
+}
+QWidget[tool_launcher_custom_widget="true"][selected="true"] {
+    background-color: #3C&color_inverse_hexcode&;
+    border: 1px solid #1E&color_inverse_hexcode&;
+    border-radius: 5px;
+}
+QWidget[menu_button="true"][selected="true"] {
+    opacity: 0.6;
+    border-radius: 4px;
+    background-color: &background_subtle&;
+}
+QWidget[menu_button="true"][selected="false"] {
+    background-color: transparent;
+}
 QWidget#page {
- border-radius: 12px;
- background-color: #50&color_inverse_hexcode&;
+    border-radius: 12px;
+    background-color: #50&color_inverse_hexcode&;
 }
 QWidget#stackedWidgetPage1 {
- border-radius: 12px;
- background-color: &background_plot&;
+    border-radius: 12px;
+    background-color: &background_subtle&;
 }
-.scopy--m2k--StackedHomepage#stackedWidget{ background-color: &background_plot&; }
-QFrame[line_separator=true]{ background-color: #13&color_default_hexcode&; }
-.scopy--m2k--PowerController #leftPanel, .scopy--m2k--DMM #leftPanel{
- background-color: #28&color_inverse_hexcode&;
+.scopy--m2k--StackedHomepage#stackedWidget {
+    background-color: &background_subtle&;
 }
-.scopy--m2k--Oscilloscope #mainWidget, .scopy--m2k--SpectrumAnalyzer #mainWidget,
-.scopy--m2k--NetworkAnalyzer #mainWidget, .scopy--m2k--SignalGenerator #mainWidget,
-.scopy--m2k--logic--LogicAnalyzer #mainWidget, .scopy--m2k--logic--PatternGenerator #mainWidget,
-.scopy--m2k--DigitalIO #widget, .scopy--m2k--DMM #hLayout_top_btn_area_voltmeter, .scopy--m2k--PowerController #hWidget_top_area {
- background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #28&color_inverse_hexcode&, stop: 0.1 transparent, stop: 1.0 transparent);
+QFrame[line_separator="true"] {
+    background-color: #13&color_default_hexcode&;
 }
-.scopy--m2k--ExportSettings #mainWidget, .scopy--m2k--ImportSettings #mainWidget {
- background-color: none;
+.scopy--m2k--PowerController #leftPanel,
+.scopy--m2k--DMM #leftPanel {
+    background-color: #28&color_inverse_hexcode&;
+}
+.scopy--m2k--Oscilloscope #mainWidget,
+.scopy--m2k--SpectrumAnalyzer #mainWidget,
+.scopy--m2k--NetworkAnalyzer #mainWidget,
+.scopy--m2k--SignalGenerator #mainWidget,
+.scopy--m2k--logic--LogicAnalyzer #mainWidget,
+.scopy--m2k--logic--PatternGenerator #mainWidget,
+.scopy--m2k--DigitalIO #widget,
+.scopy--m2k--DMM #hLayout_top_btn_area_voltmeter,
+.scopy--m2k--PowerController #hWidget_top_area {
+    background-color: qlineargradient(
+        spread: pad,
+        x1: 0,
+        y1: 0,
+        x2: 1,
+        y2: 0,
+        stop: 0 #28&color_inverse_hexcode&,
+        stop: 0.1 transparent,
+        stop: 1 transparent
+    );
+}
+.scopy--m2k--ExportSettings #mainWidget,
+.scopy--m2k--ImportSettings #mainWidget {
+    background-color: none;
 }
 scopy--CursorReadouts {
- background-color: red;
+    background-color: red;
 }
-QWidget[scopy_logo=true]{
- background-image: url(:/gui/icons/&icon_theme_folder&/icons/logo.svg);
- background-repeat: no-repeat;
- background-position: left center;
+QWidget[scopy_logo="true"] {
+    background-image: url(:/gui/icons/&icon_theme_folder&/icons/logo.svg);
+    background-repeat: no-repeat;
+    background-position: left center;
 }
-QPushButton[menu_icon=true]{
- background-image: url(:/gui/icons/&icon_theme_folder&/icons/menu.svg);
- background-repeat: no-repeat;
- background-position: left center;
+QPushButton[menu_icon="true"] {
+    background-image: url(:/gui/icons/&icon_theme_folder&/icons/menu.svg);
+    background-repeat: no-repeat;
+    background-position: left center;
 }
-QWidget[adi_logo=true]{
- background-image: url(:/gui/icons/&icon_theme_folder&/icons/logo_analog.svg);
- background-repeat: no-repeat;
- background-position: left center;
- min-width: 104px;
- min-height: 30px;
+QWidget[adi_logo="true"] {
+    background-image: url(:/gui/icons/&icon_theme_folder&/icons/logo_analog.svg);
+    background-repeat: no-repeat;
+    background-position: left center;
+    min-width: 104px;
+    min-height: 30px;
 }
-QPushButton[save_logo=true]{
- icon: url(:/gui/icons/&icon_theme_folder&/icons/save.svg);
- text-align: right;
+QPushButton[save_logo="true"] {
+    icon: url(:/gui/icons/&icon_theme_folder&/icons/save.svg);
+    text-align: right;
 }
-QPushButton[load_logo=true]{
- icon: url(:/gui/icons/&icon_theme_folder&/icons/load.svg);
- text-align: left;
+QPushButton[load_logo="true"] {
+    icon: url(:/gui/icons/&icon_theme_folder&/icons/load.svg);
+    text-align: left;
 }
-QPushButton[preferences_icon=true]{
- icon: url(:/gui/icons/&icon_theme_folder&/icons/preferences.svg);
- text-align: center;
- qproperty-text: "Preferences";
+QPushButton[preferences_icon="true"] {
+    icon: url(:/gui/icons/&icon_theme_folder&/icons/preferences.svg);
+    text-align: center;
+    qproperty-text: "Preferences";
 }
-QPushButton[general_settings_icon=true]:checked {
- image: url(:/gui/icons/&icon_theme_folder&/icons/gear_wheel_pressed.svg);
+QPushButton[general_settings_icon="true"]:checked {
+    image: url(:/gui/icons/&icon_theme_folder&/icons/gear_wheel_pressed.svg);
 }
-QPushButton[general_settings_icon=true]:!checked {
- image: url(:/gui/icons/&icon_theme_folder&/icons/gear_wheel.svg);
+QPushButton[general_settings_icon="true"]:!checked {
+    image: url(:/gui/icons/&icon_theme_folder&/icons/gear_wheel.svg);
 }
-QPushButton[general_settings_icon=true]:!checked:hover {
- image: url(:/gui/icons/&icon_theme_folder&/icons/gear_wheel_hover.svg);
+QPushButton[general_settings_icon="true"]:!checked:hover {
+    image: url(:/gui/icons/&icon_theme_folder&/icons/gear_wheel_hover.svg);
 }
-QPushButton[general_settings_icon=true]:checked:hover {
- image: url(:/gui/icons/&icon_theme_folder&/icons/gear_wheel_pressed.svg);
+QPushButton[general_settings_icon="true"]:checked:hover {
+    image: url(:/gui/icons/&icon_theme_folder&/icons/gear_wheel_pressed.svg);
 }
-QPushButton[settings_icon=true]:checked {
- image: url(:/gui/icons/&icon_theme_folder&/icons/setup3_checked_hover.svg);
+QPushButton[settings_icon="true"]:checked {
+    image: url(:/gui/icons/&icon_theme_folder&/icons/setup3_checked_hover.svg);
 }
-QPushButton[settings_icon=true]:!checked {
- image: url(:/gui/icons/&icon_theme_folder&/icons/setup3_unchecked.svg);
+QPushButton[settings_icon="true"]:!checked {
+    image: url(:/gui/icons/&icon_theme_folder&/icons/setup3_unchecked.svg);
 }
-QPushButton[settings_icon=true]:!checked:hover {
- image: url(:/gui/icons/&icon_theme_folder&/icons/setup3_unchecked_hover.svg);
+QPushButton[settings_icon="true"]:!checked:hover {
+    image: url(:/gui/icons/&icon_theme_folder&/icons/setup3_unchecked_hover.svg);
 }
-QPushButton[settings_icon=true]:checked:hover {
- image: url(:/gui/icons/&icon_theme_folder&/icons/setup3_checked_hover.svg);
+QPushButton[settings_icon="true"]:checked:hover {
+    image: url(:/gui/icons/&icon_theme_folder&/icons/setup3_checked_hover.svg);
 }
 QHeaderView::section {
- background-color: transparent;
+    background-color: transparent;
 }
 QHeaderView::section:checked {
- background-color: transparent;
+    background-color: transparent;
 }
 scopy--ChannelWidget QWidget {
- color: #99&color_default_hexcode&;
- border-width: 0px;
- border-radius: 6px;
+    color: #99&color_default_hexcode&;
+    border-width: 0px;
+    border-radius: 6px;
 }
 scopy--ChannelWidget QWidget#widget {
- background-color: transparent;
- border-radius: 4px;
+    background-color: transparent;
+    border-radius: 4px;
 }
-scopy--ChannelWidget QWidget#widget[selected=true] {
- background-color: #99&color_inverse_hexcode&;
+scopy--ChannelWidget QWidget#widget[selected="true"] {
+    background-color: #99&color_inverse_hexcode&;
 }
 .scopy--ChannelWidget QWidget#widget::hover {
-background-color: #3C&color_inverse_hexcode&;
-font-weight: bold;
-border-bottom: 0px solid none;
+    background-color: #3C&color_inverse_hexcode&;
+    font-weight: bold;
+    border-bottom: 0px solid none;
 }
-scopy--ChannelWidget QCheckBox#box{
- spacing: 0px;
- background-color: none;
- font-size: 14px;
- font-weight: bold;
+scopy--ChannelWidget QCheckBox#box {
+    spacing: 0px;
+    background-color: none;
+    font-size: 14px;
+    font-weight: bold;
 }
 scopy--ChannelWidget QCheckBox#box::indicator {
- width: 14px;
- height: 14px;
-  border: 2px solid &background_plot&;
- border-radius: 9px;
+    width: 14px;
+    height: 14px;
+    border: 2px solid &interactive_subtle_idle&;
+    border-radius: 9px;
 }
 scopy--ChannelWidget QCheckBox#box::indicator:unchecked {
- background-color: transparent;
+    background-color: transparent;
 }
 scopy--ChannelWidget QCheckBox#box::indicator:checked {
-  background-color: &background_plot&;
+    background-color: &background_subtle&;
 }
 scopy--ChannelWidget QPushButton#name {
- font-size: 14px;
- font-weight: bold;
- background-color: none;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: none;
 }
 scopy--ChannelWidget QPushButton#delBtn {
- width: 24px;
- height: 24px;
- background-color: transparent;
- background-position: center center;
- background-repeat: no-repeat;
- background-image: url(:/gui/icons/red_x.svg);
+    width: 24px;
+    height: 24px;
+    background-color: transparent;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-image: url(:/gui/icons/red_x.svg);
 }
 scopy--ChannelWidget QPushButton#delBtn::hover {
- background-image: url(:/gui/icons/red_x.svg);
+    background-image: url(:/gui/icons/red_x.svg);
 }
 scopy--ChannelWidget QPushButton#btn {
- width: 40px;
- height: 20px;
- background-color: transparent;
+    width: 40px;
+    height: 20px;
+    background-color: transparent;
 }
 scopy--ChannelWidget QPushButton#btn:pressed {
- border-image: url(:/gui/icons/setup_btn_checked.svg)
+    border-image: url(:/gui/icons/setup_btn_checked.svg);
 }
 scopy--ChannelWidget QPushButton#btn:!pressed {
- border-image: url(:/gui/icons/setup_btn_unchecked.svg)
+    border-image: url(:/gui/icons/scopy-default/icons/setup_btn_unchecked.svg);
 }
 scopy--ChannelWidget QPushButton#btn:hover:!pressed:!checked {
- border-image: url(:/gui/icons/setup_btn_hover.svg)
+    border-image: url(:/gui/icons/scopy-default/icons/setup_btn_hover.svg);
 }
 scopy--ChannelWidget QPushButton#btn:checked {
- border-image: url(:/gui/icons/setup_btn_checked.svg)
+    border-image: url(:/gui/icons/setup_btn_checked.svg);
 }
 scopy--ChannelWidget QFrame#line {
- border: 2px solid transparent;
+    border: 2px solid transparent;
 }
-scopy--ChannelWidget QFrame#line[selected=true] {
-  border: 2px solid &background_plot&;
+scopy--ChannelWidget QFrame#line[selected="true"] {
+    border: 2px solid &interactive_subtle_idle&;
 }
 scopy--DropdownSwitchList {
- height: 30px;
- border: 0px;
- font-size: 18px;
- border-radius: 4px;
- padding-left: 20px;
+    height: 30px;
+    border: 0px;
+    font-size: 18px;
+    border-radius: 4px;
+    padding-left: 20px;
 }
-scopy--DropdownSwitchList:editable{
- background-color: &background_plot&;
- color: &content_default&;
+scopy--DropdownSwitchList:editable {
+    background-color: &background_subtle&;
+    color: &content_default&;
 }
 scopy--DropdownSwitchList::drop-down {
- subcontrol-position: center right;
- width: 10px;
- height: 6px;
+    subcontrol-position: center right;
+    width: 10px;
+    height: 6px;
 
- margin-right: 20px;
+    margin-right: 20px;
 }
 scopy--DropdownSwitchList QAbstractItemView {
- border: 0px;
- background-color: &background_plot&;
- font-size: 18px;
- outline: 0px;
-  border-left: 0px solid &background_plot&;
+    border: 0px;
+    background-color: &background_subtle&;
+    font-size: 18px;
+    outline: 0px;
+    border-left: 0px solid &background_subtle&;
 }
 scopy--DropdownSwitchList QAbstractItemView::item {
- color: &content_default&;
- height: 60px;
+    color: &content_default&;
+    height: 60px;
 }
 scopy--DropdownSwitchList QAbstractItemView::item:hover {
- background-color: &background_plot&;
- font-weight: bold;
- border-bottom: 0px solid none;
+    background-color: &background_subtle&;
+    font-weight: bold;
+    border-bottom: 0px solid none;
 }
 scopy--DropdownSwitchList QHeaderView {
- padding-left: -0px;
+    padding-left: -0px;
 }
 scopy--DropdownSwitchList QHeaderView:section {
- color: #99&color_default_hexcode&;
- background-color: &background_plot&;
- border: 0px;
- font: 14px;
+    color: #99&color_default_hexcode&;
+    background-color: &background_subtle&;
+    border: 0px;
+    font: 14px;
 }
 scopy--DropdownSwitchList QCheckBox {
- background-color: &background_plot&;
+    background-color: &background_subtle&;
 }
 scopy--DropdownSwitchList QCheckBox::indicator {
- width: 16px;
- height: 16px;
- subcontrol-position: center;
+    width: 16px;
+    height: 16px;
+    subcontrol-position: center;
 }
-QPushButton[stopButton=true] {
- background-repeat: no-repeat;
- background-position: center center;
+QPushButton[stopButton="true"] {
+    background-repeat: no-repeat;
+    background-position: center center;
 }
-QPushButton[stopButton=true]:enabled {
- background-image: url(:/gui/icons/&icon_theme_folder&/icons/play_stop.svg);
+QPushButton[stopButton="true"]:enabled {
+    background-image: url(:/gui/icons/&icon_theme_folder&/icons/play_stop.svg);
 }
-QPushButton[stopButton=true][disabled=true][enabled=false] {
- background-image: url(:/gui/icons/&icon_theme_folder&/icons/play_stop.svg);
+QPushButton[stopButton="true"][disabled="true"][enabled="false"] {
+    background-image: url(:/gui/icons/&icon_theme_folder&/icons/play_stop.svg);
 }
-QPushButton[stopButton=true]:checked {
- background-image: url(:/gui/icons/play_green.svg);
+QPushButton[stopButton="true"]:checked {
+    background-image: url(:/gui/icons/play_green.svg);
 }
-QPushButton[userNote=true] {
- background-image: url(:/gui/icons/&icon_theme_folder&/icons/note_unchecked.svg);
+QPushButton[userNote="true"] {
+    background-image: url(:/gui/icons/&icon_theme_folder&/icons/note_unchecked.svg);
 }
-QPushButton[userNote=true]:checked {
- background-image: url(:/gui/icons/&icon_theme_folder&/icons/note_checked.svg);
-}
-
-*[has_frame=true] {
- border-top: 2px solid &background_plot&;
- border-right: 2px solid &background_plot&;
- border-left: 2px solid &background_plot&;
+QPushButton[userNote="true"]:checked {
+    background-image: url(:/gui/icons/&icon_theme_folder&/icons/note_checked.svg);
 }
 
-*[has_bottom_border=true] {
- border-bottom: 2px solid &background_plot&;
+*[has_frame="true"] {
+    border-top: 2px solid &interactive_subtle_idle&;
+    border-right: 2px solid &interactive_subtle_idle&;
+    border-left: 2px solid &interactive_subtle_idle&;
 }
 
-*[is_selected=true] {
- background-color: &interactive_primary_hover&;
+*[has_bottom_border="true"] {
+    border-bottom: 2px solid &interactive_subtle_idle&;
 }
+
+*[is_selected="true"] {
+    background-color: &interactive_primary_hover&;
+}
+
