@@ -40,19 +40,19 @@
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
     <property name="spacing">
-     <number>6</number>
+     <number>0</number>
     </property>
     <property name="leftMargin">
-     <number>9</number>
+     <number>0</number>
     </property>
     <property name="topMargin">
-     <number>9</number>
+     <number>0</number>
     </property>
     <property name="rightMargin">
-     <number>9</number>
+     <number>0</number>
     </property>
     <property name="bottomMargin">
-     <number>9</number>
+     <number>0</number>
     </property>
     <item>
      <widget class="scopy::MenuHAnim" name="animHolder" native="true">
@@ -130,16 +130,16 @@
         <number>0</number>
        </property>
        <property name="leftMargin">
-        <number>0</number>
+        <number>10</number>
        </property>
        <property name="topMargin">
-        <number>0</number>
+        <number>10</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>10</number>
        </property>
        <property name="bottomMargin">
-        <number>0</number>
+        <number>10</number>
        </property>
        <item>
         <widget class="scopy::ToolStack" name="wsToolStack">

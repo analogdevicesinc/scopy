@@ -6,6 +6,7 @@
 #include <QLoggingCategory>
 #include <QtConcurrent>
 #include <menusectionwidget.h>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_HOME_ADD_PAGE, "ScopyHomeAddPage")
 
@@ -16,7 +17,6 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm)
 	, m_pluginManager(pm)
 	, m_deviceImpl(nullptr)
 {
-	StyleHelper::BackgroundAddPage(this, "add");
 	setProperty("device_page", true);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *layout = new QVBoxLayout(this);
@@ -28,6 +28,7 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm)
 	m_stackedWidget->addWidget(m_tabWidget);
 	m_stackedWidget->addWidget(m_addPage);
 	m_stackedWidget->setCurrentWidget(m_tabWidget);
+	Style::setStyle(m_stackedWidget, style::widget::border);
 
 	layout->addWidget(m_stackedWidget);
 	m_pendingUri = "";

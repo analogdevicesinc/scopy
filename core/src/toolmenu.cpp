@@ -1,5 +1,7 @@
 #include "toolmenu.h"
 #include <QScrollBar>
+#include "gui/dynamicWidget.h"
+#include <QDebug>
 
 using namespace scopy;
 
