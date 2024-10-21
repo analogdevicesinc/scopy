@@ -11,7 +11,8 @@ class FFTPlotManagerSettings;
 class SCOPY_ADC_EXPORT ADCFFTInstrumentController : public ADCInstrumentController
 {
 public:
-	ADCFFTInstrumentController(ToolMenuEntry *tme, QString name, AcqTreeNode *tree, QObject *parent = nullptr);
+	ADCFFTInstrumentController(ToolMenuEntry *tme, QString uri, QString name, AcqTreeNode *tree,
+				   QObject *parent = nullptr);
 	~ADCFFTInstrumentController();
 	virtual void init() override;
 	virtual void addChannel(AcqTreeNode *node) override;

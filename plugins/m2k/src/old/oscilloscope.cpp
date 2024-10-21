@@ -105,8 +105,8 @@ using namespace std::placeholders;
 constexpr int MAX_BUFFER_SIZE_STREAM = 1024 * 1024;
 constexpr int MAX_KERNEL_BUFFERS = 64;
 
-Oscilloscope::Oscilloscope(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
-			   QJSEngine *engine, QWidget *parent)
+Oscilloscope::Oscilloscope(libm2k::context::M2k *m2k, QString uri, Filter *filt, ToolMenuEntry *tme,
+			   m2k_iio_manager *m2k_man, QJSEngine *engine, QWidget *parent)
 	: M2kTool(tme, new Oscilloscope_API(this), "Oscilloscope", parent)
 	, m_m2k_context(m2k)
 	, m_m2k_analogin(m_m2k_context->getAnalogIn())
@@ -161,6 +161,7 @@ Oscilloscope::Oscilloscope(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntr
 	, m_logicAnalyzer(nullptr)
 	, m_mixedSignalViewEnabled(false)
 	, logic_top_block(nullptr)
+	, m_uri(uri)
 {
 	ui->setupUi(this);
 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);
@@ -2718,7 +2719,7 @@ void Oscilloscope::runStopToggled(bool checked)
 	Q_EMIT activateExportButton();
 
 	if(checked) {
-		ResourceManager::open("m2k-adc" + tme->param(), this);
+		ResourceManager::open("m2k-adc" + m_uri, this);
 		periodicFlowRestart(true);
 		if(symmBufferMode->isEnhancedMemDepth()) {
 			onCmbMemoryDepthChanged(ch_ui->cmbMemoryDepth->currentText());
@@ -2754,7 +2755,7 @@ void Oscilloscope::runStopToggled(bool checked)
 		toggle_blockchain_flow(false);
 		resetStreamingFlag(symmBufferMode->isEnhancedMemDepth() || plot_samples_sequentially);
 		trigger_settings.setAdcRunningState(false);
-		ResourceManager::close("m2k-adc" + tme->param());
+		ResourceManager::close("m2k-adc" + m_uri);
 	}
 
 	// Update trigger status

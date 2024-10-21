@@ -10,7 +10,8 @@ namespace adc {
 class SCOPY_ADC_EXPORT ADCTimeInstrumentController : public ADCInstrumentController
 {
 public:
-	ADCTimeInstrumentController(ToolMenuEntry *tme, QString name, AcqTreeNode *tree, QObject *parent = nullptr);
+	ADCTimeInstrumentController(ToolMenuEntry *tme, QString uri, QString name, AcqTreeNode *tree,
+				    QObject *parent = nullptr);
 	~ADCTimeInstrumentController();
 	virtual void init() override;
 	virtual void addChannel(AcqTreeNode *node) override;
