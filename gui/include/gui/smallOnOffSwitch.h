@@ -45,6 +45,7 @@ class SCOPY_GUI_EXPORT SmallOnOffSwitch : public QPushButton
 public:
 	explicit SmallOnOffSwitch(QWidget *parent = nullptr);
 	~SmallOnOffSwitch();
+	void setEnableAnimation(bool);
 
 private:
 	QColor color_start, color_end, color;
