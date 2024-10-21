@@ -23,6 +23,7 @@
 
 #include <widgets/menuonoffswitch.h>
 #include <widgets/menusectionwidget.h>
+#include <style.h>
 
 using namespace scopy;
 
@@ -35,6 +36,7 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	lay->setMargin(0);
 
 	measureSection = new MenuSectionWidget(this);
+	Style::setStyle(measureSection, style::properties::widget::border);
 	measurePanelSwitch = new MenuOnOffSwitch("Measure Panel", this);
 	measurePanelSwitch->onOffswitch()->setChecked(true);
 	QHBoxLayout *hlay1 = new QHBoxLayout();
@@ -44,10 +46,10 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	measureSection->contentLayout()->addLayout(hlay1);
 
 	QPushButton *showAllMeasure = new QPushButton("Show All", measureSection);
-	StyleHelper::SmallBlueButton(showAllMeasure);
+	StyleHelper::BasicSmallButton(showAllMeasure);
 
 	QPushButton *hideAllMeasure = new QPushButton("Hide All", measureSection);
-	StyleHelper::SmallBlueButton(hideAllMeasure);
+	StyleHelper::BasicSmallButton(hideAllMeasure);
 
 	hideAllMeasure->setVisible(false);
 
@@ -73,10 +75,10 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	measureSection->contentLayout()->addLayout(hlay2);
 
 	QPushButton *mesaureSortByChannel = new QPushButton("Sort by channel", measureSection);
-	StyleHelper::SmallBlueButton(mesaureSortByChannel);
+	StyleHelper::BasicSmallButton(mesaureSortByChannel);
 
 	QPushButton *measureSortByType = new QPushButton("Sort by type", measureSection);
-	StyleHelper::SmallBlueButton(measureSortByType);
+	StyleHelper::BasicSmallButton(measureSortByType);
 
 	mesaureSortByChannel->setVisible(false);
 
@@ -95,6 +97,7 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	hlay2->addWidget(measureSortByType);
 
 	statsSection = new MenuSectionWidget(this);
+	Style::setStyle(statsSection, style::properties::widget::border);
 	statsPanelSwitch = new MenuOnOffSwitch("Stats Panel", this);
 	connect(statsPanelSwitch->onOffswitch(), &QAbstractButton::toggled, this,
 		[=](bool b) { Q_EMIT enableStatsPanel(b); });
@@ -109,10 +112,10 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	statsSection->contentLayout()->addLayout(hlay3);
 
 	QPushButton *showAllStats = new QPushButton("Show All", statsSection);
-	StyleHelper::SmallBlueButton(showAllStats);
+	StyleHelper::BasicSmallButton(showAllStats);
 
 	QPushButton *hideAllStats = new QPushButton("Hide All", statsSection);
-	StyleHelper::SmallBlueButton(hideAllStats);
+	StyleHelper::BasicSmallButton(hideAllStats);
 
 	hideAllStats->setVisible(false);
 
@@ -138,10 +141,10 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	statsSection->contentLayout()->addLayout(hlay4);
 
 	QPushButton *statsSortByChannel = new QPushButton("Sort by channel", statsSection);
-	StyleHelper::SmallBlueButton(statsSortByChannel);
+	StyleHelper::BasicSmallButton(statsSortByChannel);
 
 	QPushButton *statsSortByType = new QPushButton("Sort by type", statsSection);
-	StyleHelper::SmallBlueButton(statsSortByType);
+	StyleHelper::BasicSmallButton(statsSortByType);
 
 	statsSortByChannel->setVisible(false);
 
@@ -160,6 +163,7 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	hlay4->addWidget(statsSortByType);
 
 	markerSection = new MenuSectionWidget(this);
+	Style::setStyle(markerSection, style::properties::widget::border);
 	markerPanelSwitch = new MenuOnOffSwitch("Marker Panel", this);
 	connect(markerPanelSwitch->onOffswitch(), &QAbstractButton::toggled, this,
 		[=](bool b) { Q_EMIT enableMarkerPanel(b); });

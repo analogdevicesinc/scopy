@@ -391,7 +391,7 @@ void PlotWidget::printPlot(QPainter *painter, bool useSymbols)
 		// save current curve color
 		plotChColors.push_back(getChannels().at(i)->curve()->pen());
 		// get channel colors from StyleHelper
-		printPen.setColor(StyleHelper::getColor("CH" + QString::number(i)));
+		printPen.setColor(StyleHelper::getChannelColor(i));
 		printPen.setWidth(2);
 		getChannels().at(i)->curve()->setPen(printPen);
 		if(useSymbols) {
