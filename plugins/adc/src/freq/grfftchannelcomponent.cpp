@@ -109,7 +109,10 @@ GRFFTChannelComponent::~GRFFTChannelComponent() {}
 
 MeasureManagerInterface *GRFFTChannelComponent::getMeasureManager() { return nullptr; }
 
-MarkerController *GRFFTChannelComponent::markerController() { return m_fftPlotComponentChannel->markerController(); }
+PlotMarkerController *GRFFTChannelComponent::markerController()
+{
+	return m_fftPlotComponentChannel->markerController();
+}
 
 QWidget *GRFFTChannelComponent::createYAxisMenu(QWidget *parent)
 {
@@ -199,11 +202,11 @@ QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent)
 	layout->setMargin(0);
 
 	MenuCombo *markerCb = new MenuCombo("Marker Type", section);
-	markerCb->combo()->addItem("Peak", MarkerController::MC_PEAK);
-	markerCb->combo()->addItem("Fixed", MarkerController::MC_FIXED);
-	markerCb->combo()->addItem("Single Tone", MarkerController::MC_SINGLETONE);
+	markerCb->combo()->addItem("Peak", PlotMarkerController::MC_PEAK);
+	markerCb->combo()->addItem("Fixed", PlotMarkerController::MC_FIXED);
+	markerCb->combo()->addItem("Single Tone", PlotMarkerController::MC_SINGLETONE);
 	if(m_complex) {
-		markerCb->combo()->addItem("Image", MarkerController::MC_IMAGE);
+		markerCb->combo()->addItem("Image", PlotMarkerController::MC_IMAGE);
 	}
 
 	markerCb->combo()->setCurrentIndex(0);
@@ -224,18 +227,20 @@ QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent)
 
 	connect(section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
 		if(b) {
-			auto markerType =
-				static_cast<MarkerController::MarkerTypes>(markerCb->combo()->currentData().toInt());
+			auto markerType = static_cast<PlotMarkerController::MarkerTypes>(
+				markerCb->combo()->currentData().toInt());
 			m_fftPlotComponentChannel->markerController()->setMarkerType(markerType);
 		} else {
-			m_fftPlotComponentChannel->markerController()->setMarkerType(MarkerController::MC_NONE);
+			m_fftPlotComponentChannel->markerController()->setMarkerType(PlotMarkerController::MC_NONE);
 		}
 	});
 
 	connect(markerCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		auto markerType = static_cast<MarkerController::MarkerTypes>(markerCb->combo()->currentData().toInt());
+		auto markerType =
+			static_cast<PlotMarkerController::MarkerTypes>(markerCb->combo()->currentData().toInt());
 		m_fftPlotComponentChannel->markerController()->setMarkerType(markerType);
-		fixedMarkerEditBtn->setVisible(markerCb->combo()->currentData().toInt() == MarkerController::MC_FIXED);
+		fixedMarkerEditBtn->setVisible(markerCb->combo()->currentData().toInt() ==
+					       PlotMarkerController::MC_FIXED);
 	});
 
 	layout->addWidget(markerCb);
