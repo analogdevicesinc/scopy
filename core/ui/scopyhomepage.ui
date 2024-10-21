@@ -37,69 +37,69 @@
      <item>
       <widget class="scopy::DeviceBrowser" name="wDeviceBrowser" native="true">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+	<sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+	 <horstretch>0</horstretch>
+	 <verstretch>0</verstretch>
+	</sizepolicy>
        </property>
       </widget>
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="sizeConstraint">
-        <enum>QLayout::SetMaximumSize</enum>
+	<enum>QLayout::SetMaximumSize</enum>
        </property>
        <property name="topMargin">
-        <number>0</number>
+	<number>0</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+	<number>0</number>
        </property>
        <item>
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Scan</string>
-         </property>
-        </widget>
+	<widget class="QLabel" name="label_2">
+	 <property name="text">
+	  <string>Scan</string>
+	 </property>
+	</widget>
        </item>
        <item>
-        <widget class="scopy::SmallOnOffSwitch" name="btnScan">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
+	<widget class="scopy::SmallOnOffSwitch" name="btnScan">
+	 <property name="text">
+	  <string/>
+	 </property>
+	 <property name="checkable">
+	  <bool>true</bool>
+	 </property>
+	 <property name="checked">
+	  <bool>false</bool>
+	 </property>
+	</widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btnScanNow">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Scan</string>
-         </property>
-        </widget>
+	<widget class="QPushButton" name="btnScanNow">
+	 <property name="sizePolicy">
+	  <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+	   <horstretch>0</horstretch>
+	   <verstretch>0</verstretch>
+	  </sizepolicy>
+	 </property>
+	 <property name="text">
+	  <string>Scan</string>
+	 </property>
+	</widget>
        </item>
        <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
+	<spacer name="verticalSpacer">
+	 <property name="orientation">
+	  <enum>Qt::Vertical</enum>
+	 </property>
+	 <property name="sizeHint" stdset="0">
+	  <size>
+	   <width>20</width>
+	   <height>40</height>
+	  </size>
+	 </property>
+	</spacer>
        </item>
       </layout>
      </item>

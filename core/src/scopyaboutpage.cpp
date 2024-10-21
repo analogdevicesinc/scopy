@@ -63,7 +63,7 @@ QWidget *ScopyAboutPage::buildPage(QString src)
 	lay->addWidget(browser);
 	lay->setMargin(0);
 	initNavigationWidget(browser);
-	browser->setStyleSheet("background-color: " + Style::getAttribute(json::theme::content_inverse));
+	Style::setStyle(browser, style::properties::widget::textBrowser);
 
 	if(QFile::exists(QString(src).replace("qrc:/", ":/"))) {
 		browser->setSource(src);

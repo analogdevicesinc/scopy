@@ -107,6 +107,9 @@ void StyleHelper::BlueGrayButton(QPushButton *btn, QString objectName)
 
 void StyleHelper::MeasurementPanelLabel(MeasurementLabel *w, QString objectName)
 {
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+
 	QString style = QString(R"css(
 						color: &&colorname&&;
 						)css");
@@ -117,6 +120,9 @@ void StyleHelper::MeasurementPanelLabel(MeasurementLabel *w, QString objectName)
 
 void StyleHelper::StatsPanelLabel(StatsLabel *w, QString objectName)
 {
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+
 	QString style = QString(R"css(
 				font-size: 12px;
 				color: &&colorname&&;
@@ -137,6 +143,7 @@ void StyleHelper::MeasurementSelectorItemWidget(QString iconPath, MeasurementSel
 {
 	if(!objectName.isEmpty())
 		w->setObjectName(objectName);
+
 	QHBoxLayout *lay = dynamic_cast<QHBoxLayout *>(w->layout());
 	Q_ASSERT(lay);
 
@@ -147,11 +154,14 @@ void StyleHelper::MeasurementSelectorItemWidget(QString iconPath, MeasurementSel
 	w->m_icon->setFixedSize(24, 24);
 
 	w->m_name->setContentsMargins(5, 0, 0, 0);
-	StyleHelper::MenuMediumLabel(w->m_name);
+	Style::setStyle(w->m_name, style::properties::label::menuMedium);
 }
 
 void StyleHelper::BasicButton(QPushButton *btn, QString objectName)
 {
+	if(!objectName.isEmpty())
+		btn->setObjectName(objectName);
+
 	Style::setStyle(btn, style::properties::button::basicButton, true, true);
 	btn->setFixedHeight(Style::getDimension(json::global::unit_4));
 }
@@ -160,30 +170,18 @@ void StyleHelper::RefreshButton(QPushButton *btn, QString objectName)
 {
 	if(!objectName.isEmpty())
 		btn->setObjectName(objectName);
-	btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	btn->setFixedSize(30, 30);
-	QString style = QString(R"css(
-						QPushButton {
-							font-size: 12px;
-							text-align: center;
-							font-weight: bold;
-							background-color: &&interactive_primary_idle&&;
-						}
-						QPushButton:disabled {
-							background-color:&&interactive_subtle_disabled&&; /* design token - uiElement*/
-						}
-						)css");
 
-	style.replace("&&interactive_primary_idle&&", StyleHelper::getColor("interactive_primary_idle"));
-	style.replace("&&interactive_subtle_disabled&&", StyleHelper::getColor("interactive_subtle_disabled"));
-	btn->setStyleSheet(style);
-	btn->setProperty("blue_button", true);
+	Style::setStyle(btn, style::properties::button::basicButton);
 	btn->setIcon(Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
+	btn->setFixedSize(30, 30);
 	btn->setIconSize(QSize(25, 25));
 }
 
 void StyleHelper::BasicSmallButton(QPushButton *btn, QString objectName)
 {
+	if(!objectName.isEmpty())
+		btn->setObjectName(objectName);
+
 	Style::setStyle(btn, style::properties::button::basicButton, true, true);
 	btn->setFixedHeight(Style::getDimension(json::global::unit_3));
 }
@@ -192,106 +190,31 @@ void StyleHelper::ColoredCircleCheckbox(QCheckBox *chk, QColor color, QString ob
 {
 	if(!objectName.isEmpty())
 		chk->setObjectName(objectName);
-	chk->setFixedSize(16, 16);
-	QString style = QString(R"css(
-						QCheckBox {
-							width:16px;
-							height:16px;
-							background-color: rgba(128,128,128,0);
-							color: rgba(255, 255, 255, 153);
-						}
-						QCheckBox::indicator {
-							width: 12px;
-							height: 12px;
-							border: 2px solid &&content_default&&;
-							border-radius: 7px;
-							image: none;
-						}
-						QCheckBox::indicator:unchecked { background-color: &&background_primary&&; }
-						QCheckBox::indicator:checked { background-color: &&colorname&&; }
-						)css");
-	style.replace("&&colorname&&", color.name());
-	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
-	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
-	chk->setStyleSheet(style);
+
+	chk->setStyleSheet("QCheckBox::indicator:checked { background-color: " + color.name() + "; }");
+	Style::setStyle(chk, style::properties::checkbox::circleCB, true, true);
 }
 
 void StyleHelper::CollapseCheckbox(QCheckBox *chk, QString objectName)
 {
 	if(!objectName.isEmpty())
 		chk->setObjectName(objectName);
-	chk->setFixedSize(16, 16);
-	QString style = QString(R"css(
-						QCheckBox {
-							width:16px;
-							height:16px;
-							background-color: rgba(128,128,128,0);
-							color: rgba(255, 255, 255, 0);
-						}
-						QCheckBox::indicator {
-							width: 12px;
-							height: 12px;
-							border: 2px transparent;
-							background-color: transparent;
-							image: none;
-						}
-						QCheckBox::indicator:unchecked {
-							image: url(:/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/sba_cmb_box_arrow_right.svg);
-							background-color: transparent;
-						}
-						QCheckBox::indicator:checked {
-							image: url(:/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/sba_cmb_box_arrow.svg);
-							background-color: transparent;
-						}
-						)css");
-	chk->setStyleSheet(style);
+
+	Style::setStyle(chk, style::properties::checkbox::collapseCB, true, true);
 }
 
 void StyleHelper::ColoredSquareCheckbox(QCheckBox *chk, QColor color, QString objectName)
 {
 	if(!objectName.isEmpty())
 		chk->setObjectName(objectName);
-	chk->setFixedSize(16, 16);
-	QString style = QString(R"css(
-						QCheckBox {
-							width:16px;
-							height:16px;
-							background-color: rgba(128,128,128,0);
-							color: rgba(255, 255, 255, 153);
-						}
-						QCheckBox::indicator {
-							width: 12px;
-							height: 12px;
-							border: 2px solid &&content_default&&;
-							border-radius: 4px;
-							image: none;
-						}
-						QCheckBox::indicator:unchecked { background-color: &&background_primary&&; }
-						QCheckBox::indicator:checked { background-color: &&colorname&&; }
-						)css");
-	style.replace("&&colorname&&", color.name());
-	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
-	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
-	chk->setStyleSheet(style);
+
+	chk->setStyleSheet("QCheckBox::indicator:checked { background-color: " + color.name() + "; }");
+	Style::setStyle(chk, style::properties::checkbox::squareCB, true, true);
 }
 
 void StyleHelper::MenuMediumLabel(QLabel *lbl, QString objectName)
 {
-	if(!objectName.isEmpty())
-		lbl->setObjectName(objectName);
-	lbl->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	lbl->setMinimumWidth(50);
-	//	lbl->setMaximumWidth(80);
-	QString style = QString(R"css(
-				QLabel {
-					color: &&content_default&&;
-					background-color: rgba(255,255,255,0);
-					font-weight: 700;
-					font-size: 14px;
-					}
-				)css");
-	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
-	lbl->setStyleSheet(style);
+	Style::setStyle(lbl, style::properties::label::menuMedium);
 }
 
 void StyleHelper::MenuControlButton(QPushButton *btn, QString objectName, bool checkable)
@@ -309,15 +232,17 @@ void StyleHelper::MenuControlButton(QPushButton *btn, QString objectName, bool c
 								border-image: url(:/gui/icons/setup_btn_checked.svg)
 							}
 							QPushButton#btn:!pressed {
-								border-image: url(:/gui/icons/setup_btn_unchecked.svg)
+								border-image: url(:/gui/icons/&&theme&&/icons/setup_btn_unchecked.svg)
 							}
 							QPushButton#btn:hover:!pressed:!checked {
-								border-image: url(:/gui/icons/setup_btn_hover.svg)
+								border-image: url(:/gui/icons/&&theme&&/icons/setup_btn_hover.svg)
 							}
 							  QPushButton#btn:checked {
 								border-image: url(:/gui/icons/setup_btn_checked.svg);
 							}
 							)css");
+
+	style.replace("&&theme&&", Style::getAttribute(json::theme::icon_theme_folder));
 	btn->setStyleSheet(style);
 	btn->setIconSize(QSize(48, 48));
 }
@@ -335,23 +260,8 @@ void StyleHelper::MenuSmallLabel(QLabel *m_lbl, QString objectName)
 {
 	if(!objectName.isEmpty())
 		m_lbl->setObjectName(objectName);
-	m_lbl->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-	QString style = QString(R"css(
-				QLabel {
-					color: &&content_default&&;
-					background-color: rgba(255,255,255,0);
-					font-weight: 500;
-					font-family: Open Sans;
-					font-size: 12px;
-					font-style: normal;
-					}
-				QLabel:disabled {
-					color: grey;
-				}
-				)css");
-	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
-	m_lbl->setText(m_lbl->text().toUpper());
+	Style::setStyle(m_lbl, style::properties::label::menuSmall);
 }
 
 void StyleHelper::MenuComboWidget(QWidget *w, QString objectName)
@@ -596,11 +506,6 @@ void StyleHelper::MenuCollapseSection(QWidget *w, QString objectName)
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::MenuSpinboxLine(QFrame *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-}
 /*
 void StyleHelper::MenuSpinBox(SpinBoxA *w, QString objectName)
 {
@@ -693,7 +598,6 @@ void StyleHelper::BlueIconButton(QPushButton *w, QIcon icon, QString objectName)
 	int size = 30;
 	w->setIcon(icon);
 	w->setIconSize(QSize(size, size));
-	w->setProperty("blue_button", true);
 	w->setFixedHeight(size);
 	w->setFixedWidth(size);
 
@@ -732,13 +636,14 @@ void StyleHelper::BackgroundWidget(QWidget *w, QString objectName)
 {
 	if(!objectName.isEmpty())
 		w->setObjectName(objectName);
-	QString style = QString(R"css(
-		QWidget {
-			background-color: &&background_primary&&;
-		}
-		)css");
-	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
-	w->setStyleSheet(style);
+	// QString style = QString(R"css(
+	// 	QWidget {
+	// 		background-color: &&background_primary&&;
+	// 	}
+	// 	)css");
+	// style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
+	// w->setStyleSheet(style);
+	Style::setBackgroundColor(w, json::theme::background_primary);
 }
 
 void StyleHelper::TabWidgetLabel(QLabel *w, QString objectName)
@@ -760,10 +665,12 @@ void StyleHelper::TabWidgetEastMenu(QTabWidget *w, QString objectName)
 		w->setObjectName(objectName);
 	w->setTabPosition(QTabWidget::TabPosition::East);
 	QString style = QString(R"css(
-		QTabWidget::tab-bar { left: 0; }
+		QTabWidget::tab-bar { left: 0;}
 		QTabWidget::pane { border-top: 0px; }
-		QTabBar { qproperty-drawBase: 0; }
+		QTabBar { qproperty-drawBase: 0;
+			background: &&background_primary&&; }
 		QTabBar::tab {
+			background: &&background_primary&&;
 		 min-width: 150px;
 		 height: 40px;
 		 padding-bottom: 5px;
@@ -778,10 +685,10 @@ void StyleHelper::TabWidgetEastMenu(QTabWidget *w, QString objectName)
 		 border-bottom: 2px solid &&content_default&&;
 		}
 		QTabBar::scroller {
-		 width: 25px;
+			width: 25px;
 		}
 		)css");
-	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
+	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
 	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
 	style.replace("&&interactive_primary_idle&&", StyleHelper::getColor("interactive_primary_idle"));
 	w->tabBar()->setStyleSheet(style);
@@ -791,14 +698,7 @@ void StyleHelper::MenuComboLabel(QLabel *w, QString objectName) { StyleHelper::M
 
 void StyleHelper::MenuHeaderLabel(QLabel *w, QString objectName) { StyleHelper::MenuLargeLabel(w, objectName); }
 
-void StyleHelper::MenuControlLabel(QLabel *w, QString objectName) { StyleHelper::MenuMediumLabel(w, objectName); }
-
 void StyleHelper::MenuOnOffSwitchLabel(QLabel *w, QString objectName) { StyleHelper::MenuSmallLabel(w, objectName); }
-
-void StyleHelper::MenuCollapseHeaderLabel(QLabel *w, QString objectName)
-{
-	StyleHelper::MenuMediumLabel(w, objectName);
-}
 
 void StyleHelper::MenuCollapseHeaderLineEdit(QLineEdit *w, QString objectName)
 {
@@ -861,21 +761,6 @@ void StyleHelper::TutorialChapterTitleLabel(QLabel *w, QString objectName)
 				}
 				)css");
 	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
-	w->setStyleSheet(style);
-}
-
-void StyleHelper::DeviceIconBackgroundShadow(QAbstractButton *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-
-	QString style = QString(R"css(
-				QAbstractButton[selected=true] {
-					background-color: &&content_inverse&&;
-					border-radius: 4px;
-				}
-				)css");
-	style.replace("&&content_inverse&&", StyleHelper::getColor("content_inverse"));
 	w->setStyleSheet(style);
 }
 
@@ -1101,27 +986,9 @@ void StyleHelper::BackgroundAddPage(QWidget *w, QString objectName)
 
 void StyleHelper::BrowseButton(QPushButton *btn, QString objectName)
 {
-	if(!objectName.isEmpty())
-		btn->setObjectName(objectName);
-	btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	btn->setFixedSize(30, 30);
-	QString style = QString(R"css(
-						QPushButton {
-							font-size: 12px;
-							text-align: center;
-							font-weight: bold;
-							background-color: &&interactive_primary_idle&&;
-						}
-						QPushButton:disabled {
-							background-color:&&interactive_subtle_disabled&&; /* design token - uiElement*/
-						}
-						)css");
-
-	style.replace("&&interactive_primary_idle&&", StyleHelper::getColor("interactive_primary_idle"));
-	style.replace("&&interactive_subtle_disabled&&", StyleHelper::getColor("interactive_subtle_disabled"));
-	btn->setStyleSheet(style);
-	btn->setProperty("blue_button", true);
+	Style::setStyle(btn, style::properties::button::basicButton);
 	btn->setText("...");
+	btn->setFixedSize(30, 30);
 }
 
 void StyleHelper::MenuSpinboxLabel(QLabel *w, QString objectName)
@@ -1136,23 +1003,6 @@ QLabel {
  background-color: transparent;
 }
 )css");
-
-	w->setStyleSheet(style);
-}
-void StyleHelper::MenuSpinboxLineEdit(QLineEdit *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-
-	QString style = QString(R"css(
-QLineEdit {
- height: 20px;
- width: 75px;
- font-size: 18px;
- border: 0px;
- bottom: 10px;
- background-color: transparent;
-})css");
 
 	w->setStyleSheet(style);
 }
@@ -1357,9 +1207,9 @@ void StyleHelper::GrayButton(QPushButton *btn, QString objectName)
 
 	QString style = QString(R"css(
 		QPushButton {
-			border: 1px solid &&content_silent&&;
-			border-radius: 0px;
-			background-color: &&content_inverse&&;
+			border: 1px solid &&interactive_subtle_idle&&;
+			border-radius: 4px;
+			background-color: &&background_primary&&;
 
 			color: &&content_default&&;
 			font-weight: 600;
@@ -1447,9 +1297,9 @@ void StyleHelper::ToolMenuCollapseMini(QPushButton *btn, QString objectName)
 			background-position: center center;
 			)css");
 
+	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
 	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
 	style.replace("&&content_silent&&", StyleHelper::getColor("content_silent"));
-	style.replace("&&content_inverse&&", StyleHelper::getColor("content_inverse"));
 	style.replace("&&interactive_subtle_idle&&", StyleHelper::getColor("interactive_subtle_idle"));
 	btn->setStyleSheet(style);
 }

@@ -21,10 +21,12 @@
 
 #include "watchlistview.h"
 #include "debuggerloggingcategories.h"
+#include "style_properties.h"
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QHeaderView>
 #include <QScrollBar>
+#include <style.h>
 
 #define NAME_POS 0
 #define VALUE_POS 1
@@ -66,7 +68,7 @@ void WatchListView::setupUi()
 	header->setSectionResizeMode(PATH_POS, QHeaderView::Interactive);
 	header->setSectionResizeMode(CLOSE_BTN_POS, QHeaderView::Interactive);
 
-	StyleHelper::TableWidgetDebugger(this, "DebuggerTableWidget");
+	Style::setStyle(this, style::properties::detailsView);
 	verticalHeader()->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 }
 

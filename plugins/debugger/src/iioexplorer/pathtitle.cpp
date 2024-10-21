@@ -75,4 +75,5 @@ void PathTitle::setupUi()
 {
 	setObjectName("PathTitle");
 	setLayout(new QHBoxLayout(this));
+	layout()->setContentsMargins(0, 0, 0, 0);
 }

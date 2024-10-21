@@ -1,0 +1,6 @@
+QWidget[&&property&&=true]  {
+	min-width: 50;
+	font-weight: 700;
+	font-size: &font_size_1&;
+	text-align: left;
+}

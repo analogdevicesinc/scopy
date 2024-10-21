@@ -50,7 +50,11 @@ ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
 	// style::properties::widget::border); ui->container->setStyleSheet(".QWidget#container { background-color: " +
 	// Style::getAttribute(json::theme::background_subtle) + "; }");
 	// Style::setStyle(ui->horizontalLayout_2, style::properties::widget::border);
-	Style::setStyle(ui->wInfoPageStack, style::properties::widget::border);
+	// Style::setStyle(ui->wInfoPageStack, style::properties::widget::border);
+	// ui->container->setStyleSheet(".QWidget#container { background-color: " +
+				     // Style::getAttribute(json::theme::background_subtle) + "; }");
+	// Style::setStyle(ui->horizontalLayout_2, style::properties::widget::basicComponent);
+	Style::setStyle(ui->wInfoPageStack, style::properties::widget::basicComponent);
 
 	is->add("home", new ScopyHomeInfoPage());
 	is->add("add", add);

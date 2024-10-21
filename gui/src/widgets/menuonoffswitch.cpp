@@ -21,6 +21,7 @@
 
 #include <customSwitch.h>
 #include <smallOnOffSwitch.h>
+#include <style.h>
 #include <widgets/menuonoffswitch.h>
 
 using namespace scopy;
@@ -42,7 +43,7 @@ MenuOnOffSwitch::MenuOnOffSwitch(QString title, QWidget *parent, bool medium)
 		StyleHelper::MenuSmallLabel(m_label, "menuLabel");
 	} else {
 		m_switch = new CustomSwitch(this);
-		StyleHelper::MenuMediumLabel(m_label, "menuLabel");
+		Style::setStyle(m_label, style::properties::label::menuMedium);
 	}
 
 	lay->addWidget(m_label);

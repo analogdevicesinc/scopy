@@ -16,11 +16,10 @@ void VerticalTabBar::paintEvent(QPaintEvent *event)
 	QStyleOptionTab opt;
 
 	QColor tab_selected =
-		Style::getColor(json::theme::interactive_secondary_pressed); // Background color of the selected tab
-	QColor tab_text = Style::getColor(json::theme::content_default);     // Text color of the tabs
-	QColor tab_text_selected = Style::getColor(json::theme::interactive_primary_idle); // Text color of the tabs
-	int borderRadius = Style::getDimension(json::global::radius_1); // Radius for the rounded corners
-	int padding = Style::getDimension(json::global::padding_1);	// Padding for the tab
+		Style::getColor(json::theme::interactive_accent_pressed); // Background color of the selected tab
+	QColor tab_text = Style::getColor(json::theme::content_default);  // Text color of the tabs
+	int borderRadius = Style::getDimension(json::global::radius_1);	  // Radius for the rounded corners
+	int padding = Style::getDimension(json::global::padding_1);	  // Padding for the tab
 
 	for(int i = 0; i < count(); ++i) {
 		initStyleOption(&opt, i);
@@ -32,8 +31,6 @@ void VerticalTabBar::paintEvent(QPaintEvent *event)
 			painter.setBrush(tab_selected);
 			painter.setPen(Qt::NoPen);
 			painter.drawRoundedRect(rect, borderRadius, borderRadius);
-			painter.setPen(tab_text_selected);
-		} else {
 			painter.setPen(tab_text);
 		}
 

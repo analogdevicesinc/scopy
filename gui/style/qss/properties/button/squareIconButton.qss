@@ -1,7 +1,8 @@
 QPushButton[&&property&&=true] {
-	width: &unit_4&px;
-	height: &unit_4&px;
+	width: &unit_2_5&px;
+	height: &unit_2_5&px;
 	border-style: outset;
+    	border-radius: &radius_1&;
 	background-color:&background_primary&;
 	qproperty-iconSize: &unit_4&px;
 }

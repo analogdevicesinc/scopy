@@ -248,7 +248,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 		chnBtn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 		chnBtn->setName(node->getUuid());
 		chnBtn->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
-		auto color = StyleHelper::getColor("CH" + QString::number(i % 7));
+		auto color = StyleHelper::getChannelColor(i);
 		chnBtn->setColor(color);
 		node->setColor(color);
 		chnBtn->setDoubleClickToOpenMenu(true);

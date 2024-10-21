@@ -97,8 +97,10 @@
         <file>icons/scopy-light/icons/unlocked.svg</file>
         <file>icons/setup_btn_checked.svg</file>
         <file>icons/setup_btn_checked_hover.svg</file>
-        <file>icons/setup_btn_hover.svg</file>
-        <file>icons/setup_btn_unchecked.svg</file>
+        <file>icons/scopy-default/icons/setup_btn_hover.svg</file>
+        <file>icons/scopy-default/icons/setup_btn_unchecked.svg</file>
+        <file>icons/scopy-light/icons/setup_btn_hover.svg</file>
+        <file>icons/scopy-light/icons/setup_btn_unchecked.svg</file>
         <file>icons/time_trigger_handle.svg</file>
         <file>icons/time_trigger_left.svg</file>
         <file>icons/time_trigger_right.svg</file>
@@ -163,12 +165,13 @@
         <file>icons/checkmark_light.svg</file>
         <file>icons/checkmark_dark.svg</file>
         <file>icons/handle_down_arrow_dark.svg</file>
-        <file>icons/handle_down_arrow_light.svg</file>
+	<file>icons/handle_down_arrow_light.svg</file>
 	<file>icons/minus.svg</file>
 	<file>icons/plus.svg</file>
 	<file>icons/unlocked.svg</file>
 	<file>icons/locked.svg</file>
-	<file>Inter-Regular.ttf</file>
+        <file>Inter-Regular.ttf</file>
+        <file>open-sans-regular.ttf</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>

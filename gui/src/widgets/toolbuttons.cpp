@@ -19,6 +19,7 @@
  *
  */
 
+#include <iostream>
 #include <style.h>
 #include <stylehelper.h>
 #include <widgets/toolbuttons.h>
@@ -28,9 +29,8 @@ using namespace scopy;
 PrintBtn::PrintBtn(QWidget *parent)
 	: QPushButton(parent)
 {
-	Style::setStyle(this, style::properties::button::subtleButton);
-	Style::setStyle(this, style::properties::button::toolButton);
-	setFixedWidth(128);
+	Style::setStyle(this, style::properties::button::squareIconButton);
+	setFixedWidth(145);
 	setCheckable(false);
 	setText("Print");
 }
@@ -49,8 +49,7 @@ OpenLastMenuBtn::OpenLastMenuBtn(MenuHAnim *menu, bool opened, QWidget *parent)
 	});
 
 	setCheckable(true);
-	Style::setStyle(this, style::properties::button::subtleButton);
-	Style::setStyle(this, style::properties::button::toolButton);
+	Style::setStyle(this, style::properties::button::squareIconButton);
 	setChecked(opened);
 	grp = new SemiExclusiveButtonGroup(this);
 	connect(this, &QPushButton::toggled, m_menu, &MenuHAnim::toggleMenu);
@@ -85,8 +84,7 @@ GearBtn::GearBtn(QWidget *parent)
 	});
 
 	setCheckable(true);
-	Style::setStyle(this, style::properties::button::subtleButton);
-	Style::setStyle(this, style::properties::button::toolButton);
+	Style::setStyle(this, style::properties::button::squareIconButton);
 }
 
 InfoBtn::InfoBtn(QWidget *parent)
@@ -101,8 +99,7 @@ InfoBtn::InfoBtn(QWidget *parent)
 	});
 
 	setCheckable(false);
-	Style::setStyle(this, style::properties::button::subtleButton);
-	Style::setStyle(this, style::properties::button::toolButton);
+	Style::setStyle(this, style::properties::button::squareIconButton);
 }
 
 RunBtn::RunBtn(QWidget *parent)
@@ -115,7 +112,7 @@ RunBtn::RunBtn(QWidget *parent)
 	setText("Run");
 	connect(this, &QPushButton::toggled, this, [=](bool b) { setText(b ? "Stop" : "Run"); });
 	Style::setStyle(this, style::properties::button::runSingle);
-	setStyleSheet("background-color: " + Style::getAttribute(json::theme::interactive_primary_idle) + ";");
+	Style::setBackgroundColor(this, json::global::run_button_color, true);
 
 	QIcon icon1;
 	icon1.addPixmap(Style::getPixmap(":/gui/icons/play.svg", Style::getColor(json::theme::content_inverse)),
@@ -161,8 +158,7 @@ AddBtn::AddBtn(QWidget *parent)
 	});
 
 	setCheckable(false);
-	Style::setStyle(this, style::properties::button::subtleButton);
-	Style::setStyle(this, style::properties::button::toolButton);
+	Style::setStyle(this, style::properties::button::squareIconButton);
 }
 
 RemoveBtn::RemoveBtn(QWidget *parent)
@@ -176,8 +172,7 @@ RemoveBtn::RemoveBtn(QWidget *parent)
 	});
 
 	setCheckable(false);
-	Style::setStyle(this, style::properties::button::subtleButton);
-	Style::setStyle(this, style::properties::button::toolButton);
+	Style::setStyle(this, style::properties::button::squareIconButton);
 }
 
 SyncBtn::SyncBtn(QWidget *parent)
@@ -185,8 +180,7 @@ SyncBtn::SyncBtn(QWidget *parent)
 	QIcon icon1;
 	icon1.addPixmap(Style::getPixmap(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 					 "/icons/gear_wheel.svg"));
-	Style::setStyle(this, style::properties::button::subtleButton);
-	Style::setStyle(this, style::properties::button::toolButton);
+	Style::setStyle(this, style::properties::button::squareIconButton);
 	setText("Sync");
 	setCheckable(true);
 	setIcon(icon1);
