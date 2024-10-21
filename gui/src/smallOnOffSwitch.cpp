@@ -61,6 +61,15 @@ SmallOnOffSwitch::SmallOnOffSwitch(QWidget *parent)
 
 SmallOnOffSwitch::~SmallOnOffSwitch() {}
 
+void SmallOnOffSwitch::setEnableAnimation(bool b)
+{
+	if(b == false) {
+		anim.setDuration(0);
+	} else {
+		anim.setDuration(100);
+	}
+}
+
 void SmallOnOffSwitch::setDuration(int ms)
 {
 	duration_ms = ms;

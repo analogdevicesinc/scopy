@@ -22,6 +22,9 @@ public:
 	explicit ScopyHomePage(QWidget *parent = nullptr, PluginManager *pm = nullptr);
 	~ScopyHomePage();
 	QPushButton *scanControlBtn();
+	QPushButton *scanBtn();
+	void setScannerEnable(bool b);
+
 Q_SIGNALS:
 	void requestDevice(QString id);
 	void deviceAddedToUi(QString id);

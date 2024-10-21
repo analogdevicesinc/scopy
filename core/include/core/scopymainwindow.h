@@ -5,6 +5,7 @@
 #include <QOpenGLWidget>
 
 #include "licenseoverlay.h"
+#include "scanbuttoncontroller.h"
 #include "scopyhomepage.h"
 #include "devicemanager.h"
 #include "scannediiocontextcollector.h"
@@ -76,12 +77,15 @@ private:
 	Ui::ScopyMainWindow *ui;
 	QOpenGLWidget *m_glLoader;
 	ToolMenuManager *m_toolMenuManager;
+	ScanButtonController *m_sbc;
 
 	void loadOpenGL();
 	void initPythonWIN32();
 	void loadDecoders();
 	void initApi();
 	void initStatusBar();
+	void handleScanner();
+	void enableScanner();
 
 protected:
 	void closeEvent(QCloseEvent *event) override;
