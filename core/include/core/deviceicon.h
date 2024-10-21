@@ -38,6 +38,7 @@ public:
 public Q_SLOTS:
 	//	virtual Device* device() = 0;
 	virtual void setConnected(bool) = 0;
+	virtual void setConnecting(bool) = 0;
 Q_SIGNALS:
 	void refresh();
 	void forget();

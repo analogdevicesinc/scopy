@@ -237,6 +237,9 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 		p, "general_theme", "Theme", {"default", "light"}, generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
 		p, "general_language", "Language", t->getLanguages(), generalSection));
+	generalSection->contentLayout()->addWidget(
+		PreferencesHelper::addPreferenceCheckBox(p, "general_connect_to_multiple_devices",
+							 "Connect to multiple devices (EXPERIMENTAL)", generalSection));
 
 	// Debug preferences
 	MenuSectionWidget *debugWidget = new MenuSectionWidget(page);

@@ -191,11 +191,7 @@ void DeviceImpl::loadPages()
 	m_buttonLayout->addWidget(discbtn);
 	discbtn->setVisible(false);
 
-	connect(connbtn, &QPushButton::clicked, this, [this]() {
-		Q_EMIT connectionStarted();
-		connectDev();
-		Q_EMIT connectionFinished();
-	});
+	connect(connbtn, &QPushButton::clicked, this, &DeviceImpl::connectDev);
 	connect(discbtn, &QPushButton::clicked, this, &DeviceImpl::disconnectDev);
 	connect(this, &DeviceImpl::connectionFailed, this, &DeviceImpl::onConnectionFailed);
 
@@ -338,6 +334,8 @@ void DeviceImpl::connectDev()
 	connbtn->hide();
 	discbtn->show();
 	discbtn->setEnabled(false);
+	m_icon->setFocus(); // temporarily set focus somewhere else
+	Q_EMIT connecting();
 	QCoreApplication::processEvents();
 	for(int i = 0; i < m_plugins.size(); ++i) {
 		pluginTimer.start();

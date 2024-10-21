@@ -54,8 +54,16 @@ DeviceIconImpl::DeviceIconImpl(Device *d, QWidget *parent)
 
 DeviceIconImpl::~DeviceIconImpl() {}
 
+void DeviceIconImpl::setConnecting(bool val)
+{
+	setDynamicProperty(ui->line, "connected", false);
+	setDynamicProperty(ui->line, "connecting", val);
+	//	ensurePolished();
+}
+
 void DeviceIconImpl::setConnected(bool val)
 {
+	setDynamicProperty(ui->line, "connecting", false);
 	setDynamicProperty(ui->line, "connected", val);
 	//	ensurePolished();
 }
@@ -84,12 +92,15 @@ void DeviceIconImpl::onPenBtnPressed()
 {
 	ui->name->setReadOnly(false);
 	ui->name->end(false);
+	// ui->name->setEnabled(true);
 	ui->name->setFocus();
 }
 
 void DeviceIconImpl::onEditFinished()
 {
 	ui->name->setReadOnly(true);
+	ui->name->end(false);
+	// ui->name->setEnabled(false);
 	Q_EMIT displayNameChanged(ui->name->text());
 }
 
