@@ -19,7 +19,6 @@
  *
  */
 
-
 #ifndef SCOPY_TESTPLUGIN_EXPORT_H
 #define SCOPY_TESTPLUGIN_EXPORT_H
 

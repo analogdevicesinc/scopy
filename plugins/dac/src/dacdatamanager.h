@@ -19,7 +19,6 @@
  *
  */
 
-
 #ifndef DACDATAMANAGER_H
 #define DACDATAMANAGER_H
 

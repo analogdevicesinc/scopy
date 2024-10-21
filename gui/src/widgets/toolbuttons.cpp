@@ -19,7 +19,6 @@
  *
  */
 
-
 #include <stylehelper.h>
 #include <widgets/toolbuttons.h>
 
