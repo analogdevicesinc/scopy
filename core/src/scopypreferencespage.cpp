@@ -240,6 +240,8 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 	generalSection->contentLayout()->addWidget(
 		PreferencesHelper::addPreferenceCheckBox(p, "general_connect_to_multiple_devices",
 							 "Connect to multiple devices (EXPERIMENTAL)", generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
+		p, "general_scan_for_devices", "Regularly scan for new devices", generalSection));
 
 	// Debug preferences
 	MenuSectionWidget *debugWidget = new MenuSectionWidget(page);

@@ -133,6 +133,7 @@ void DeviceManager::connectDeviceToManager(DeviceImpl *d)
 {
 	connect(d, &DeviceImpl::connecting, this, [=]() { connectingDevice(d->id()); });
 	connect(d, &DeviceImpl::connected, this, [=]() { connectDevice(d->id()); });
+	connect(d, &DeviceImpl::disconnecting, this, [=]() { disconnectingDevice(d->id()); });
 	connect(d, &DeviceImpl::disconnected, this, [=]() { disconnectDevice(d->id()); });
 	connect(d, &DeviceImpl::forget, this, [=]() { removeDeviceById(d->id()); });
 	connect(d, SIGNAL(requestedRestart()), this, SLOT(restartDevice()));
@@ -144,6 +145,7 @@ void DeviceManager::disconnectDeviceFromManager(DeviceImpl *d)
 {
 	disconnect(d, SIGNAL(connecting()));
 	disconnect(d, SIGNAL(connected()));
+	disconnect(d, SIGNAL(disconnecting()));
 	disconnect(d, SIGNAL(disconnected()));
 	disconnect(d, SIGNAL(forget()));
 	disconnect(d, SIGNAL(requestedRestart()), this, SLOT(restartDevice()));
@@ -187,12 +189,6 @@ void DeviceManager::changeToolListDevice()
 	Q_EMIT deviceChangedToolList(id, map[id]->toolList());
 }
 
-void DeviceManager::connectDevice()
-{
-	QString id = dynamic_cast<Device *>(QObject::sender())->id();
-	connectDevice(id);
-}
-
 void DeviceManager::connectingDevice()
 {
 	QString id = dynamic_cast<Device *>(QObject::sender())->id();
@@ -216,12 +212,26 @@ void DeviceManager::connectingDevice(QString id)
 	Q_EMIT deviceConnecting(id);
 }
 
+void DeviceManager::connectDevice()
+{
+	QString id = dynamic_cast<Device *>(QObject::sender())->id();
+	connectDevice(id);
+}
+
 void DeviceManager::connectDevice(QString id)
 {
 	connectedDev.append(id);
 	StatusBarManager::pushMessage("Connected to " + map[id]->id(), 3000);
 	Q_EMIT deviceConnected(id, map[id]);
 }
+
+void DeviceManager::disconnectingDevice()
+{
+	QString id = dynamic_cast<Device *>(QObject::sender())->id();
+	disconnectingDevice(id);
+}
+
+void DeviceManager::disconnectingDevice(QString id) { Q_EMIT deviceDisconnecting(id); }
 
 void DeviceManager::disconnectDevice()
 {
@@ -255,5 +265,19 @@ void DeviceManager::restartDevice()
 	//	connect(this,SIGNAL(deviceAdded(QString,Device*)),this,SIGNAL(requestDevice(QString)));
 	//	Q_EMIT requestDevice(newId);
 }
+
+bool DeviceManager::busy()
+{
+	bool ret = false;
+
+	for(auto dev : map) {
+		if(dev->state() == Device::DEV_ERROR || dev->state() == Device::DEV_INIT ||
+		   dev->state() == Device::DEV_CONNECTING || dev->state() == Device::DEV_DISCONNECTING)
+			return true;
+	}
+	return false;
+}
+
+int DeviceManager::connectedDeviceCount() { return connectedDev.size(); }
 
 #include "moc_devicemanager.cpp"
