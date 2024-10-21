@@ -20,7 +20,7 @@
  */
 
 #include "smallprogressbar.h"
-#include "stylehelper.h"
+#include <style.h>
 
 using namespace scopy;
 
@@ -60,6 +60,7 @@ void SmallProgressBar::setBarColor(QColor color)
 	setStyleSheet(style);
 }
 
-void SmallProgressBar::resetBarColor() { setBarColor(StyleHelper::getColor("ProgressBarIdle")); }
+void SmallProgressBar::resetBarColor() { setBarColor(Style::getAttribute(json::theme::content_subtle)); }
 
 #include "moc_smallprogressbar.cpp"
+

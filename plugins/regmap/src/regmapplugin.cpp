@@ -39,6 +39,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <registermaptool.hpp>
+#include <style.h>
 #include <src/readwrite/iioregisterreadstrategy.hpp>
 #include <src/readwrite/iioregisterwritestrategy.hpp>
 #include <pluginbase/preferences.h>
@@ -82,14 +83,16 @@ bool RegmapPlugin::loadPage()
 bool RegmapPlugin::loadIcon()
 {
 	m_icon = new QLabel("");
-	m_icon->setStyleSheet("border-image: url(:/gui/icons/scopy-default/icons/tool_calibration.svg);");
+	m_icon->setStyleSheet("border-image: url(:/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+			      "/icons/RegMap.svg);");
 	return true;
 }
 
 void RegmapPlugin::loadToolList()
 {
-	ToolMenuEntry *toolMenuEntry = SCOPY_NEW_TOOLMENUENTRY(REGMAP_PLUGIN_SCOPY_MODULE, REGMAP_PLUGIN_DISPLAY_NAME,
-							       ":/gui/icons/scopy-default/icons/tool_calibration.svg");
+	ToolMenuEntry *toolMenuEntry = SCOPY_NEW_TOOLMENUENTRY(
+		REGMAP_PLUGIN_SCOPY_MODULE, REGMAP_PLUGIN_DISPLAY_NAME,
+		":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_calibration.svg");
 	m_toolList.append(toolMenuEntry);
 	m_toolList.last()->setRunBtnVisible(true);
 	m_toolList.last()->setRunEnabled(false);

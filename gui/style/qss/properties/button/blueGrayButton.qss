@@ -1,0 +1,18 @@
+QPushButton[&&property&&=true] {
+border-radius: 0px 2px 2px 0px; /* design token - buttonBorder */
+border-style: outset;
+height: &unit_4&;
+background-color: &background_primary&; /* design token - uiElement */
+color: &content_default&; /* design token - font */
+font-weight: 700;
+font-size: &font_size&;
+qproperty-iconSize: &unit_4&px;
+}
+
+QPushButton[&&property&&=true]:checked {
+background-color: &interactive_primary_idle&; /* design token - scopy blue */
+}
+
+QPushButton[&&property&&=true]:pressed {
+background-color: &interactive_primary_idle&;
+}

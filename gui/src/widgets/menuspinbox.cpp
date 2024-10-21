@@ -20,6 +20,7 @@
  */
 
 #include "menuspinbox.h"
+#include <style.h>
 #include <stylehelper.h>
 
 namespace scopy {
@@ -33,8 +34,6 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	m_label = new QLabel(name, parent);
 	m_edit = new QLineEdit("0", parent);
 	m_scaleCb = new QComboBox(parent);
-	m_plus = new QPushButton("+", parent);
-	m_minus = new QPushButton("-", parent);
 	m_mouseWheelGuard = new MouseWheelWidgetGuard(this);
 
 	m_plus->setAutoRepeat(true);
@@ -109,12 +108,6 @@ void MenuSpinbox::layoutVertically(bool left)
 
 	editLay->addWidget(m_label);
 	editLay->addWidget(m_edit);
-
-	m_line = new QFrame(this);
-	m_line->setFrameShape(QFrame::HLine);
-	m_line->setFrameShadow(QFrame::Plain);
-	editLay->addWidget(m_line);
-	StyleHelper::MenuSpinboxLine(m_line);
 	editLay->addWidget(m_scaleCb);
 
 	if(left) {
@@ -125,15 +118,16 @@ void MenuSpinbox::layoutVertically(bool left)
 		lay->addLayout(btnLay);
 	}
 
-	StyleHelper::MenuSpinboxLabel(m_label);
-	StyleHelper::MenuSpinboxLineEdit(m_edit);
-	StyleHelper::IIOLineEdit(m_edit);
-	StyleHelper::MenuSpinComboBox(m_scaleCb);
+	int size = Style::getDimension(json::global::unit_3);
+	m_plus->setIcon(
+		Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
+	Style::setStyle(m_plus, style::properties::button::basicButton);
+	m_plus->setFixedSize(size, size);
 
-	StyleHelper::SpinBoxUpButton(m_plus, "plus_btn");
-	m_plus->setFixedSize(30, 30);
-	StyleHelper::SpinBoxDownButton(m_minus, "minus_btn");
-	m_minus->setFixedSize(30, 30);
+	m_minus->setIcon(
+		Style::getPixmap(":/gui/icons/minus.svg", Style::getColor(json::theme::content_inverse)));
+	Style::setStyle(m_minus, style::properties::button::basicButton);
+	m_minus->setFixedSize(size, size);
 }
 
 void MenuSpinbox::layoutHorizontally(bool left)
@@ -167,7 +161,6 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	editLay->addWidget(m_edit);
 
 	editLay->addWidget(m_scaleCb);
-	m_line = nullptr;
 
 	if(left) {
 		lay->addLayout(btnLay);
@@ -177,19 +170,16 @@ void MenuSpinbox::layoutHorizontally(bool left)
 		lay->addLayout(btnLay);
 	}
 
-	StyleHelper::MenuSmallLabel(m_label);
-	StyleHelper::IIOLineEdit(m_edit);
-	StyleHelper::MenuComboBox(m_scaleCb);
+	int size = Style::getDimension(json::global::unit_3);
+	m_plus->setIcon(
+		Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
+	Style::setStyle(m_plus, style::properties::button::basicButton);
+	m_plus->setFixedSize(size, size);
 
-	StyleHelper::SpinBoxUpButton(m_plus, "plus_btn");
-	m_plus->setFixedSize(30, 30);
-	StyleHelper::SpinBoxDownButton(m_minus, "minus_btn");
-	m_minus->setFixedSize(30, 30);
-
-	m_edit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	m_scaleCb->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-
-	lineLay->addLayout(lay);
+	m_minus->setIcon(
+		Style::getPixmap(":/gui/icons/minus.svg", Style::getColor(json::theme::content_inverse)));
+	Style::setStyle(m_minus, style::properties::button::basicButton);
+	m_minus->setFixedSize(size, size);
 }
 
 double MenuSpinbox::value() const { return m_value; }

@@ -48,12 +48,6 @@ public:
 	static bool compareNatural(const std::string &a, const std::string &b);
 	static QString doubleToQString(double value);
 	static QWidget *findContainingWindow(QWidget *w);
-	static const QList<QString> getColors()
-	{
-		return {"#F44336", "#4DAF50", "#E91E63", "#9C27B0", "#3F51B5", "#2096F3", "#795448",
-			"#02BCD4", "#019688", "#673AB7", "#8BC34A", "#CDDC39", "#FFEB3B", "#FFC108",
-			"#FF9800", "#FF5721", "#03A9F4", "#9E9E9E", "#607D8B", "#FFFFFF"};
-	}
 	static void SetAttrRecur(QDomElement &elem, QString strtagname, QString strattr, QString strattrval);
 	static QPixmap ChangeSVGColor(QString iconPath, QString color, float opacity);
 };

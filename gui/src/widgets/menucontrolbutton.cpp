@@ -41,7 +41,7 @@ MenuControlButton::MenuControlButton(QWidget *parent)
 	m_chk = new QCheckBox("", this);
 	m_label = new QLabel("", this);
 	m_btn = new QPushButton("", this);
-	m_color = StyleHelper::getColor("ButtonPressed");
+	m_color = Style::getAttribute(json::theme::interactive_primary_disabled);
 	m_cs = CS_SQUARE;
 
 	lay->addWidget(m_chk);

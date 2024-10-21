@@ -76,7 +76,7 @@ void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text)
 	QWidget *pane = new QWidget();
 	pane->setStyleSheet(".QWidget{background-color: " + Style::getAttribute(json::theme::background_subtle) + ";}");
 	QHBoxLayout *lay = new QHBoxLayout();
-	lay->setMargin(10);
+	lay->setMargin(20);
 	pane->setLayout(lay);
 
 	QScrollArea *scrollArea = new QScrollArea();
@@ -294,7 +294,7 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 
 	m_devRefresh = new QPushButton("Refresh", m_autoConnectWidget);
 	m_devRefresh->setMaximumWidth(80);
-	StyleHelper::BlueButton(m_devRefresh);
+	Style::setStyle(m_devRefresh, style::properties::button::basicButton);
 	m_autoConnectWidget->add(m_devRefresh);
 
 	connect(m_devRefresh, &QPushButton::pressed, this, &ScopyPreferencesPage::refreshDevicesPressed);
