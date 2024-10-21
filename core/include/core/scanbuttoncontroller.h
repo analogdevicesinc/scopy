@@ -36,6 +36,9 @@ public:
 	explicit ScanButtonController(CyclicalTask *cs, QPushButton *btn, QObject *parent);
 	~ScanButtonController();
 
+	int scanTimeout() const;
+	void setScanTimeout(int newScanTimeout);
+
 public Q_SLOTS:
 	void enableScan(bool b);
 	void startScan();
@@ -45,6 +48,8 @@ private:
 	QPushButton *btn;
 	CyclicalTask *cs;
 	QMetaObject::Connection conn;
+
+	int m_scanTimeout;
 };
 } // namespace scopy
 
