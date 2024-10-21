@@ -49,7 +49,7 @@ public:
 	void init();
 	bool enabled() const;
 	void setEnabled(bool newEnabled);
-	virtual void attachMarkersToPlot();
+	virtual void attachMarkersToPlot() = 0;
 	const QList<MarkerInfo> &markerInfo() const;
 
 	PlotComponentChannel *ch() const;
@@ -70,11 +70,11 @@ Q_SIGNALS:
 	void markerEnabled(bool b);
 
 protected:
-	virtual int findPeakNearIdx(int idx, int range);
-	virtual void computeImageMarkers();
-	virtual void computeSingleToneMarkers();
-	virtual void computePeaks();
-	virtual void initFixedMarker();
+	virtual int findPeakNearIdx(int idx, int range) = 0;
+	virtual void computeImageMarkers() = 0;
+	virtual void computeSingleToneMarkers() = 0;
+	virtual void computePeaks() = 0;
+	virtual void initFixedMarker() = 0;
 
 	QwtPlot *m_plot;
 	QwtAxisId m_xAxis;
