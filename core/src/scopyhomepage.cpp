@@ -45,7 +45,10 @@ ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
 					  ";}");
 	// ui->horizontalLayout_2->setStyleSheet(
 	// ".QWidget {border-radius: " + Style::getAttribute(json::global::radius_1) + ";}");
-	// ui->container->setStyleSheet(".QWidget#container { background-color: " + Style::getAttribute(json::theme::background_subtle) + "; }");
+	// ui->container->setStyleSheet(".QWidget#container { background-color: " +
+	// Style::getAttribute(json::theme::background_subtle) + "; }"); Style::setStyle(ui->horizontalLayout_2,
+	// style::properties::widget::border); ui->container->setStyleSheet(".QWidget#container { background-color: " +
+	// Style::getAttribute(json::theme::background_subtle) + "; }");
 	// Style::setStyle(ui->horizontalLayout_2, style::properties::widget::border);
 	Style::setStyle(ui->wInfoPageStack, style::properties::widget::border);
 

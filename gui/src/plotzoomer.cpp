@@ -214,7 +214,8 @@ void PlotZoomer::onZoomResize(QMouseEvent *event)
 	   m_rubberBand->geometry().size().height() < m_minZoom) {
 		palette.setBrush(QPalette::Highlight, QBrush(QColor(Style::getAttribute(json::theme::content_error))));
 	} else {
-		palette.setBrush(QPalette::Highlight, QBrush(QColor(Style::getAttribute(json::theme::background_primary))));
+		palette.setBrush(QPalette::Highlight,
+				 QBrush(QColor(Style::getAttribute(json::theme::background_primary))));
 	}
 	m_rubberBand->setPalette(palette);
 }
@@ -232,7 +233,8 @@ void PlotZoomer::onZoomStart(QMouseEvent *event)
 
 void PlotZoomer::onZoomEnd()
 {
-	if(m_rubberBand->palette().color(QPalette::Highlight) == QColor(Style::getAttribute(json::theme::background_primary))) {
+	if(m_rubberBand->palette().color(QPalette::Highlight) ==
+	   QColor(Style::getAttribute(json::theme::background_primary))) {
 		QRectF rect = m_rubberBand->geometry();
 		QwtScaleMap xScaleMap = plot()->canvasMap(m_xAxis);
 		QwtScaleMap yScaleMap = plot()->canvasMap(m_yAxis);

@@ -2,13 +2,16 @@
 * {
     background-color: &background_primary&;
     color: &content_default&;
-    font-family: Arial, sans-serif;
-    font-size: &font_size&;
+    font: &font_size& "Inter";
     font-weight: 500;
 }
 
 *:focus {
     outline: none;
+}
+
+QLabel {
+	background-color: transparent;
 }
 
 QCheckBox {

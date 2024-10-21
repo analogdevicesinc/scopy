@@ -69,9 +69,8 @@ QList<DmmDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
 					dmmReadStrategy->setUmScale(dmmInfo.scale);
 				}
 
-				DmmDataMonitorModel *channelModel =
-					new DmmDataMonitorModel(name, StyleHelper::getChannelColor(j),
-								unitOfMeasurement, dmmReadStrategy);
+				DmmDataMonitorModel *channelModel = new DmmDataMonitorModel(
+					name, StyleHelper::getChannelColor(j), unitOfMeasurement, dmmReadStrategy);
 
 				channelModel->setIioChannel(chn);
 				channelModel->setIioDevice(dev);
