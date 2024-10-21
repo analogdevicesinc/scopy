@@ -22,7 +22,7 @@ class SCOPY_PQM_EXPORT WaveformInstrument : public QWidget, public ResourceUser
 {
 	Q_OBJECT
 public:
-	WaveformInstrument(ToolMenuEntry *tme, QWidget *parent = nullptr);
+	WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent = nullptr);
 	~WaveformInstrument();
 
 	void showOneBuffer(bool hasFwVers);
@@ -61,6 +61,7 @@ private:
 	PlottingStrategy *m_plottingStrategy = nullptr;
 
 	ToolMenuEntry *m_tme;
+	QString m_uri;
 
 	const double m_plotSampleRate = 5120;
 	const QMap<QString, QMap<QString, QString>> m_chnls = {

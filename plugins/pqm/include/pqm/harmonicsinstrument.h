@@ -24,7 +24,7 @@ class SCOPY_PQM_EXPORT HarmonicsInstrument : public QWidget, public ResourceUser
 {
 	Q_OBJECT
 public:
-	HarmonicsInstrument(ToolMenuEntry *tme, QWidget *parent = nullptr);
+	HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent = nullptr);
 	~HarmonicsInstrument();
 
 	void showThdWidget(bool show);
@@ -48,6 +48,7 @@ private:
 	QWidget *createSettingsMenu();
 	bool selectedFromSameCol(QModelIndexList list);
 
+	QString m_uri;
 	QString m_harmonicsType;
 	QWidget *m_thdWidget;
 	RunBtn *m_runBtn;

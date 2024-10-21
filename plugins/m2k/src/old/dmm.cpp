@@ -64,7 +64,8 @@ using namespace scopy::m2k;
 using namespace libm2k;
 using namespace libm2k::context;
 
-DMM::DMM(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man, QWidget *parent)
+DMM::DMM(libm2k::context::M2k *m2k, QString uri, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
+	 QWidget *parent)
 	: M2kTool(tme, new DMM_API(this), "Voltmeter", parent)
 	, ui(new Ui::DMM)
 	, signal(std::make_shared<signal_sample>())
@@ -80,6 +81,7 @@ DMM::DMM(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, m2k_iio_ma
 	, wheelEventGuard(nullptr)
 	, m_autoGainEnabled({true, true})
 	, m_gainHistorySize(25)
+	, m_uri(uri)
 {
 	ui->setupUi(this);
 
@@ -494,7 +496,7 @@ void DMM::toggleTimer(bool start)
 {
 	enableDataLogging(start);
 	if(start) {
-		ResourceManager::open("m2k-adc" + tme->param(), this);
+		ResourceManager::open("m2k-adc" + m_uri, this);
 		manager->set_kernel_buffer_count(4);
 		writeAllSettingsToHardware();
 		manager->start(id_ch1);
@@ -509,7 +511,7 @@ void DMM::toggleTimer(bool start)
 		manager->stop(id_ch1);
 		manager->stop(id_ch2);
 		manager->set_kernel_buffer_count();
-		ResourceManager::close("m2k-adc" + tme->param());
+		ResourceManager::close("m2k-adc" + m_uri);
 	}
 
 	setDynamicProperty(ui->run_button, "running", start);
