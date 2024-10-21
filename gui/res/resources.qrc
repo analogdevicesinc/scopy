@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/gui">
         <file>icon.ico</file>
-        <file>open-sans-regular.ttf</file>
         <file>loading.gif</file>
         <file>infoPageMap.json</file>
         <file>Scopy.icns</file>
@@ -23,7 +22,6 @@
         <file>icons/handle_up_arrow.svg</file>
         <file>icons/launcher_add.svg</file>
         <file>icons/launcher_home.svg</file>
-        <file>icons/add.svg</file>
         <file>icons/home.svg</file>
         <file>icons/level_trigger_down.svg</file>
         <file>icons/level_trigger_handle.svg</file>
@@ -65,7 +63,6 @@
         <file>icons/sba_up_btn.svg</file>
         <file>icons/sba_up_btn_hover.svg</file>
         <file>icons/sba_up_btn_pressed.svg</file>
-        <file>icons/scopy-light/icons/gear_wheel.svg</file>
         <file>icons/scopy-light/icons/gear_wheel_hover.svg</file>
         <file>icons/scopy-light/icons/gear_wheel_pressed.svg</file>
         <file>icons/scopy-light/icons/info.svg</file>
@@ -78,7 +75,6 @@
         <file>icons/scopy-light/icons/note_unchecked.svg</file>
         <file>icons/scopy-light/icons/play_stop.svg</file>
         <file>icons/scopy-light/icons/preferences.svg</file>
-        <file>icons/scopy-light/icons/gear_wheel.svg</file>
         <file>icons/scopy-light/icons/save.svg</file>
         <file>icons/scopy-light/icons/sba_cmb_box_arrow.svg</file>
         <file>icons/scopy-light/icons/sba_cmb_box_arrow_right.svg</file>
@@ -89,7 +85,6 @@
         <file>icons/scopy-light/icons/tool_debugger.svg</file>
         <file>icons/scopy-light/icons/tool_home.svg</file>
         <file>icons/scopy-light/icons/gear_wheel.svg</file>
-        <file>icons/home.svg</file>
         <file>icons/scopy-light/icons/tool_io.svg</file>
         <file>icons/scopy-light/icons/tool_logic_analyzer.svg</file>
         <file>icons/scopy-light/icons/tool_network_analyzer.svg</file>
@@ -139,7 +134,6 @@
         <file>icons/scopy-default/icons/note_unchecked.svg</file>
         <file>icons/scopy-default/icons/play_stop.svg</file>
         <file>icons/scopy-default/icons/preferences.svg</file>
-        <file>icons/scopy-default/icons/gear_wheel.svg</file>
         <file>icons/scopy-default/icons/save.svg</file>
         <file>icons/scopy-default/icons/search.svg</file>
         <file>icons/scopy-default/icons/sba_cmb_box_arrow.svg</file>
@@ -150,8 +144,6 @@
         <file>icons/scopy-default/icons/tool_calibration.svg</file>
         <file>icons/scopy-default/icons/tool_debugger.svg</file>
         <file>icons/scopy-default/icons/tool_home.svg</file>
-        <file>icons/scopy-default/icons/gear_wheel.svg</file>
-        <file>icons/home.svg</file>
         <file>icons/scopy-default/icons/tool_io.svg</file>
         <file>icons/scopy-default/icons/tool_logic_analyzer.svg</file>
         <file>icons/scopy-default/icons/tool_network_analyzer.svg</file>
@@ -174,8 +166,9 @@
         <file>icons/handle_down_arrow_light.svg</file>
 	<file>icons/minus.svg</file>
 	<file>icons/plus.svg</file>
-        <file>icons/unlocked.svg</file>
+	<file>icons/unlocked.svg</file>
 	<file>icons/locked.svg</file>
+	<file>Inter-Regular.ttf</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>
