@@ -32,20 +32,24 @@
 #include <stylehelper.h>
 #include <deviceautoconnect.h>
 #include "gui/preferenceshelper.h"
+#include <style.h>
 #include "application_restarter.h"
+#include "smallOnOffSwitch.h"
 #include <QDir>
 #include <QDebug>
 #include <QLoggingCategory>
 #include <common/scopyconfig.h>
 #include <translationsrepository.h>
 #include <widgets/menucollapsesection.h>
+#include <widgets/menusectionwidget.h>
+#include <verticaltabwidget.h>
 
 Q_LOGGING_CATEGORY(CAT_PREFERENCESPAGE, "ScopyPreferencesPage");
 
 using namespace scopy;
 ScopyPreferencesPage::ScopyPreferencesPage(QWidget *parent)
 	: QWidget(parent)
-	, tabWidget(new QTabWidget(this))
+	, tabWidget(new VerticalTabWidget(this))
 	, layout(new QVBoxLayout(this))
 {
 	initUI();
@@ -70,6 +74,7 @@ void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text)
 	w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	QWidget *pane = new QWidget();
+	pane->setStyleSheet(".QWidget{background-color: " + Style::getAttribute(json::theme::background_subtle) + ";}");
 	QHBoxLayout *lay = new QHBoxLayout();
 	lay->setMargin(10);
 	pane->setLayout(lay);
@@ -79,14 +84,8 @@ void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text)
 	scrollArea->setWidgetResizable(true);
 	scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	lay->addWidget(scrollArea);
-
-	// Hackish - so we don't override paint event
-	tabWidget->addTab(pane, "");
-	QLabel *lbl1 = new QLabel();
-	StyleHelper::TabWidgetLabel(lbl1, "tabWidgetLabel");
-	lbl1->setText(text);
-	QTabBar *tabbar = tabWidget->tabBar();
-	tabbar->setTabButton(tabbar->count() - 1, QTabBar::RightSide, lbl1);
+	scrollArea->viewport()->setStyleSheet(".QWidget{background-color: " + Style::getAttribute(json::theme::background_subtle) + ";}");
+	tabWidget->addTab(pane, text);
 }
 
 void ScopyPreferencesPage::initSessionDevices()
@@ -138,7 +137,7 @@ void ScopyPreferencesPage::initRestartWidget()
 	QSpacerItem *space1 = new QSpacerItem(6, 20, QSizePolicy::Expanding, QSizePolicy::Fixed);
 	QSpacerItem *space2 = new QSpacerItem(6, 20, QSizePolicy::Preferred, QSizePolicy::Fixed);
 	QPushButton *btn = new QPushButton("Restart");
-	StyleHelper::BlueButton(btn, "RestartBtn");
+	Style::setStyle(btn, style::button::borderButton);
 	StyleHelper::BackgroundWidget(restartWidget, "restartWidget");
 	btn->setFixedWidth(100);
 
@@ -165,7 +164,7 @@ QWidget *ScopyPreferencesPage::buildSaveSessionPreference()
 	lay->addSpacerItem(new QSpacerItem(40, 40, QSizePolicy::Expanding, QSizePolicy::Fixed));
 	lay->addWidget(new QLabel("Settings files location ", this));
 	QPushButton *navigateBtn = new QPushButton("Open", this);
-	StyleHelper::BlueButton(navigateBtn, "navigateBtn");
+	Style::setStyle(navigateBtn, style::button::borderButton);
 	navigateBtn->setMaximumWidth(80);
 	connect(navigateBtn, &QPushButton::clicked, this,
 		[=]() { QDesktopServices::openUrl(scopy::config::settingsFolderPath()); });
@@ -211,7 +210,7 @@ QWidget *ScopyPreferencesPage::buildResetScopyDefaultButton()
 	QHBoxLayout *lay = new QHBoxLayout(w);
 
 	QPushButton *resetBtn = new QPushButton("Reset", this);
-	StyleHelper::BlueButton(resetBtn, "resetBtn");
+	Style::setStyle(resetBtn, style::button::borderButton);
 	resetBtn->setMaximumWidth(80);
 	connect(resetBtn, &QPushButton::clicked, this, &ScopyPreferencesPage::resetScopyPreferences);
 	lay->addWidget(resetBtn);
@@ -268,11 +267,11 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 		p, "iiowidgets_use_lazy_loading", "Use Lazy Loading", generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
 		p, "general_use_native_dialogs", "Use native dialogs", generalSection));
-	QCheckBox *autoConnectCb = PreferencesHelper::addPreferenceCheckBox(
+	QWidget *autoConnectCb = PreferencesHelper::addPreferenceCheckBox(
 		p, "autoconnect_previous", "Auto-connect to previous session", generalSection);
 	generalSection->contentLayout()->addWidget(autoConnectCb);
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
-		p, "general_theme", "Theme", {"default", "light"}, generalSection));
+		p, "general_theme", "Theme", Style::GetInstance()->getThemeList(), generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
 		p, "general_language", "Language", t->getLanguages(), generalSection));
 	generalSection->contentLayout()->addWidget(

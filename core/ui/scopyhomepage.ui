@@ -13,9 +13,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,4">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,4">
    <property name="spacing">
-    <number>0</number>
+    <number>10</number>
    </property>
    <property name="leftMargin">
     <number>0</number>
