@@ -28,13 +28,15 @@
 #include <QTabBar>
 #include <QTabWidget>
 #include <QVBoxLayout>
+#include <style.h>
 
 #include <stylehelper.h>
+#include <verticaltabwidget.h>
 
 using namespace scopy;
 ScopyAboutPage::ScopyAboutPage(QWidget *parent)
 	: QWidget(parent)
-	, tabWidget(new QTabWidget(this))
+	, tabWidget(new VerticalTabWidget(this))
 	, layout(new QVBoxLayout(this))
 {
 	initUI();
@@ -61,6 +63,7 @@ QWidget *ScopyAboutPage::buildPage(QString src)
 	lay->addWidget(browser);
 	lay->setMargin(0);
 	initNavigationWidget(browser);
+	browser->setStyleSheet("background-color: " + Style::getAttribute(json::theme::content_inverse));
 
 	if(QFile::exists(QString(src).replace("qrc:/", ":/"))) {
 		browser->setSource(src);
@@ -98,13 +101,7 @@ void ScopyAboutPage::initNavigationWidget(QTextBrowser *browser)
 
 void ScopyAboutPage::addHorizontalTab(QWidget *w, QString text)
 {
-	// Hackish - so we don't override paint event
-	tabWidget->addTab(w, "");
-	QLabel *lbl1 = new QLabel();
-	lbl1->setText(text);
-	StyleHelper::TabWidgetLabel(lbl1, "tabWidgetLabel");
-	QTabBar *tabbar = tabWidget->tabBar();
-	tabbar->setTabButton(tabbar->count() - 1, QTabBar::RightSide, lbl1);
+	tabWidget->addTab(w, text);
 }
 
 ScopyAboutPage::~ScopyAboutPage() {}

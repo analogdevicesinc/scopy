@@ -28,6 +28,7 @@
 #include <QPushButton>
 
 #include <deviceicon.h>
+#include <style.h>
 
 using namespace scopy;
 ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
@@ -39,6 +40,9 @@ ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
 	auto &&hc = is->getHomepageControls();
 	auto &&db = ui->wDeviceBrowser;
 	add = new ScopyHomeAddPage(this, pm);
+
+	ui->wInfoPageStack->setStyleSheet(".QWidget {border-radius: " + Style::getAttribute(json::global::radius_1) + ";}");
+	// ui->horizontalLayout_2->setStyleSheet(".QWidget {border-radius: " + Style::getAttribute(json::global::radius_1) + ";}");
 
 	is->add("home", new ScopyHomeInfoPage());
 	is->add("add", add);
@@ -107,7 +111,7 @@ void ScopyHomePage::setScannerEnable(bool b)
 	ui->label_2->setVisible(b);
 	ui->btnScanNow->setVisible(!b);
 }
-QPushButton *ScopyHomePage::scanControlBtn() { return ui->btnScan; }
+QCheckBox *ScopyHomePage::scanControlBtn() { return ui->btnScan; }
 
 QPushButton *ScopyHomePage::scanBtn() { return ui->btnScanNow; }
 

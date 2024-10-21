@@ -19,6 +19,7 @@
  *
  */
 
+#include "style.h"
 #include <dynamicWidget.h>
 #include <pluginbase/preferences.h>
 #include <stylehelper.h>
@@ -40,7 +41,7 @@ MenuControlButton::MenuControlButton(QWidget *parent)
 	m_chk = new QCheckBox("", this);
 	m_label = new QLabel("", this);
 	m_btn = new QPushButton("", this);
-	m_color = StyleHelper::getColor("ScopyBlue");
+	m_color = StyleHelper::getColor("ButtonPressed");
 	m_cs = CS_SQUARE;
 
 	lay->addWidget(m_chk);
@@ -134,7 +135,7 @@ void MenuControlButton::applyStylesheet()
 		StyleHelper::ColoredCircleCheckbox(m_chk, m_color, "chk");
 		break;
 	case CS_SQUARE:
-		StyleHelper::ColoredSquareCheckbox(m_chk, 0xFFFFFF, "chk");
+		StyleHelper::ColoredSquareCheckbox(m_chk, Style::getAttribute(json::theme::content_default), "chk");
 		break;
 	case CS_COLLAPSE:
 		StyleHelper::CollapseCheckbox(m_chk, "chk");

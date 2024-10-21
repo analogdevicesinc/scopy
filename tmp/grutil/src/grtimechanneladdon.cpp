@@ -11,7 +11,6 @@
 #include <QVBoxLayout>
 
 #include <gui/stylehelper.h>
-#include <gui/widgets/menubigswitch.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/menuheader.h>
@@ -161,7 +160,7 @@ QWidget *GRTimeChannelAddon::createMenu(QWidget *parent)
 	wScroll->setLayout(layScroll);
 	scroll->setWidgetResizable(true);
 	scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	// if ScrollBarAlwaysOn - layScroll->setContentsMargins(0,0,6,0);
 
 	scroll->setWidget(wScroll);

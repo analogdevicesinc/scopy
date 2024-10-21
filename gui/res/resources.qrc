@@ -23,6 +23,8 @@
         <file>icons/handle_up_arrow.svg</file>
         <file>icons/launcher_add.svg</file>
         <file>icons/launcher_home.svg</file>
+        <file>icons/add.svg</file>
+        <file>icons/home.svg</file>
         <file>icons/level_trigger_down.svg</file>
         <file>icons/level_trigger_handle.svg</file>
         <file>icons/level_trigger_up.svg</file>
@@ -76,6 +78,7 @@
         <file>icons/scopy-light/icons/note_unchecked.svg</file>
         <file>icons/scopy-light/icons/play_stop.svg</file>
         <file>icons/scopy-light/icons/preferences.svg</file>
+        <file>icons/scopy-light/icons/gear_wheel.svg</file>
         <file>icons/scopy-light/icons/save.svg</file>
         <file>icons/scopy-light/icons/sba_cmb_box_arrow.svg</file>
         <file>icons/scopy-light/icons/sba_cmb_box_arrow_right.svg</file>
@@ -85,6 +88,8 @@
         <file>icons/scopy-light/icons/tool_calibration.svg</file>
         <file>icons/scopy-light/icons/tool_debugger.svg</file>
         <file>icons/scopy-light/icons/tool_home.svg</file>
+        <file>icons/scopy-light/icons/gear_wheel.svg</file>
+        <file>icons/home.svg</file>
         <file>icons/scopy-light/icons/tool_io.svg</file>
         <file>icons/scopy-light/icons/tool_logic_analyzer.svg</file>
         <file>icons/scopy-light/icons/tool_network_analyzer.svg</file>
@@ -113,14 +118,11 @@
         <file>icons/trigger_rising_disabled.svg</file>
         <file>icons/trigger_rising_enabled.svg</file>
         <file>icons/v_cursor_handle.svg</file>
-        <file>stylesheets/bigCustomSwitch.qss</file>
         <file>stylesheets/browser.qss</file>
         <file>stylesheets/channel_widget.qss</file>
-        <file>stylesheets/customSwitch.qss</file>
         <file>stylesheets/default.qss</file>
         <file>stylesheets/dropdown_switch_list.qss</file>
         <file>stylesheets/light.qss</file>
-        <file>stylesheets/smallOnOffSwitch.qss</file>
         <file>stylesheets/spinbox_type_a.qss</file>
         <file>stylesheets/stopButton.qss</file>
         <file>stylesheets/toolMenuItem.qss</file>
@@ -137,6 +139,7 @@
         <file>icons/scopy-default/icons/note_unchecked.svg</file>
         <file>icons/scopy-default/icons/play_stop.svg</file>
         <file>icons/scopy-default/icons/preferences.svg</file>
+        <file>icons/scopy-default/icons/gear_wheel.svg</file>
         <file>icons/scopy-default/icons/save.svg</file>
         <file>icons/scopy-default/icons/search.svg</file>
         <file>icons/scopy-default/icons/sba_cmb_box_arrow.svg</file>
@@ -147,6 +150,8 @@
         <file>icons/scopy-default/icons/tool_calibration.svg</file>
         <file>icons/scopy-default/icons/tool_debugger.svg</file>
         <file>icons/scopy-default/icons/tool_home.svg</file>
+        <file>icons/scopy-default/icons/gear_wheel.svg</file>
+        <file>icons/home.svg</file>
         <file>icons/scopy-default/icons/tool_io.svg</file>
         <file>icons/scopy-default/icons/tool_logic_analyzer.svg</file>
         <file>icons/scopy-default/icons/tool_network_analyzer.svg</file>
@@ -160,9 +165,15 @@
         <file>icons/warning.svg</file>
         <file>icons/scopy-default/icons/RegMap.svg</file>
         <file>icons/handle_arrow.svg</file>
-        <file>icons/search_crossed.svg</file>
+	<file>icons/search_crossed.svg</file>
         <file>icons/scopy-default/icons/tool_datalogger.svg</file>
-        <file>icons/edit_pen.svg</file>
+	<file>icons/edit_pen.svg</file>
+        <file>icons/checkmark_light.svg</file>
+        <file>icons/checkmark_dark.svg</file>
+        <file>icons/handle_down_arrow_dark.svg</file>
+        <file>icons/handle_down_arrow_light.svg</file>
+        <file>icons/minus.svg</file>
+	<file>icons/plus.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>

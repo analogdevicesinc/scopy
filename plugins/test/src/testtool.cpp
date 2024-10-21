@@ -41,7 +41,6 @@
 #include <gui/menu_anim.hpp>
 #include <gui/stylehelper.h>
 #include <gui/widgets/hoverwidget.h>
-#include <gui/widgets/menubigswitch.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/menucontrolbutton.h>
