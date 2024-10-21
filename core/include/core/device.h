@@ -32,6 +32,15 @@ namespace scopy {
 class SCOPY_CORE_EXPORT Device
 {
 public:
+	typedef enum
+	{
+		DEV_ERROR = -1,
+		DEV_INIT = 0,
+		DEV_IDLE = 1,
+		DEV_CONNECTING = 2,
+		DEV_CONNECTED = 3,
+		DEV_DISCONNECTING = 4,
+	} DeviceState_t;
 	virtual ~Device(){};
 	virtual QString id() = 0;
 	virtual QString category() = 0;
@@ -47,6 +56,7 @@ public:
 	virtual void preload() = 0;
 	virtual void loadPlugins() = 0;
 	virtual void unloadPlugins() = 0;
+	virtual DeviceState_t state() = 0;
 
 public Q_SLOTS:
 	virtual void connectDev() = 0;
@@ -60,6 +70,7 @@ Q_SIGNALS:
 	virtual void toolListChanged() = 0;
 	virtual void connecting() = 0;
 	virtual void connected() = 0;
+	virtual void disconnecting() = 0;
 	virtual void disconnected() = 0;
 	virtual void requestedRestart() = 0;
 	virtual void requestTool(QString) = 0;

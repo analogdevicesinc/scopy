@@ -51,7 +51,7 @@ void IIOScanTask::setScanParams(QString s) { scanParams = s; }
 
 int IIOScanTask::scan(QVector<QPair<QString, QString>> *ctxs, QString scanParams)
 {
-	qDebug(CAT_IIOSCANCTX) << "start scanning";
+	qInfo(CAT_IIOSCANCTX) << "start scanning";
 	struct iio_scan_context *scan_ctx = NULL;
 	struct iio_context_info **info;
 	int num_contexts;
