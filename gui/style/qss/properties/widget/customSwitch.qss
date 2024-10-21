@@ -1,0 +1,40 @@
+QWidget[&&property&&="left_on"] {
+    border-top-left-radius: &radius_1&;
+    border-bottom-left-radius: &radius_1&;
+    max-height: &unit_2&;
+    min-height: &unit_2&;
+    padding: 0 &padding_1& 0 &padding_1&;
+    background-color: transparent;
+    border: &border_width& solid &interactive_primary_idle&;
+    color: &interactive_primary_idle&;
+}
+QWidget[&&property&&="left_off"] {
+    border-top-left-radius: &radius_1&;
+    border-bottom-left-radius: &radius_1&;
+    max-height: &unit_2&;
+    min-height: &unit_2&;
+    padding: 0 &padding_1& 0 &padding_1&;
+    background-color: transparent;
+    border: &border_width& solid &interactive_subtle_idle&;
+    color: &interactive_subtle_idle&;
+}
+QWidget[&&property&&="right_on"] {
+    border-top-right-radius: &radius_1&;
+    border-bottom-right-radius: &radius_1&;
+    max-height: &unit_2&;
+    min-height: &unit_2&;
+    padding: 0 &padding_1& 0 &padding_1&;
+    background-color: transparent;
+    border: &border_width& solid &interactive_primary_idle&;
+    color: &interactive_primary_idle&;
+}
+QWidget[&&property&&="right_off"] {
+    border-top-right-radius: &radius_1&;
+    border-bottom-right-radius: &radius_1&;
+    max-height: &unit_2&;
+    min-height: &unit_2&;
+    padding: 0 &padding_1& 0 &padding_1&;
+    background-color: transparent;
+    border: &border_width& solid &interactive_subtle_idle&;
+    color: &interactive_subtle_idle&;
+}
