@@ -23,7 +23,7 @@
 
 using namespace scopy;
 
-ScanButtonController::ScanButtonController(CyclicalTask *cs, QPushButton *btn, QObject *parent)
+ScanButtonController::ScanButtonController(CyclicalTask *cs, QCheckBox *btn, QObject *parent)
 	: QObject{parent}
 {
 	this->cs = cs;
