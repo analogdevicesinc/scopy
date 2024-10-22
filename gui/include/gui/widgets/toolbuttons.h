@@ -5,6 +5,7 @@
 
 #include <QPushButton>
 
+#include <QBoxLayout>
 #include <menu_anim.hpp>
 #include <scopy-gui_export.h>
 #include <utils.h>
@@ -43,6 +44,11 @@ class SCOPY_GUI_EXPORT InfoBtn : public QPushButton
 	Q_OBJECT
 public:
 	InfoBtn(QWidget *parent = nullptr);
+
+	void addOption(QString name, const std::function<void()> &lambda);
+
+private:
+	QVBoxLayout *infoHoverWidgetLayout;
 };
 
 class SCOPY_GUI_EXPORT RunBtn : public QPushButton
