@@ -51,7 +51,7 @@ ToolMenuItem::ToolMenuItem(QString uuid, QString name, QString icon, QWidget *pa
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	QVBoxLayout *lay = new QVBoxLayout(this);
 	setLayout(lay);
-	setFixedHeight(50);
+	setFixedHeight(Style::getDimension(json::global::unit_3));
 	lay->setSpacing(0);
 	lay->setContentsMargins(0, 0, 0, 0);
 
@@ -66,13 +66,11 @@ ToolMenuItem::ToolMenuItem(QString uuid, QString name, QString icon, QWidget *pa
 	toolLay->addWidget(m_toolBtn, Qt::AlignLeft);
 	toolLay->addWidget(m_toolRunBtn);
 
-	setDynamicProperty(m_toolRunBtn, "stopButton", true);
-	m_toolRunBtn->setMaximumSize(32, 32);
-	m_toolBtn->setMinimumHeight(42);
+	m_toolRunBtn->setMaximumWidth(Style::getDimension(json::global::unit_3));
 
 	m_toolBtn->setIcon(QIcon::fromTheme(m_icon));
 	m_toolBtn->setCheckable(true);
-	m_toolBtn->setIconSize(QSize(32, 32));
+	m_toolBtn->setIconSize(QSize(Style::getDimension(json::global::unit_2_5), Style::getDimension(json::global::unit_2_5)));
 
 	m_toolRunBtn->setCheckable(true);
 	m_toolRunBtn->setText("");
@@ -87,7 +85,9 @@ ToolMenuItem::ToolMenuItem(QString uuid, QString name, QString icon, QWidget *pa
 	setDynamicProperty(this, "allowHover", false);
 #else
 	m_toolBtn->setStyleSheet("text-align:left;");
+	Style::setStyle(m_toolRunBtn, style::properties::button::stopButton);
 	Style::setStyle(m_toolRunBtn, style::properties::widget::notInteractive);
+	Style::setStyle(m_toolBtn, style::properties::button::toolButton);
 
 	enableDoubleClick(true);
 #endif
