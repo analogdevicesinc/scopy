@@ -29,6 +29,7 @@
 
 #include <QCheckBox>
 #include <QLoggingCategory>
+#include <style.h>
 #include <stylehelper.h>
 
 #include <iioutil/iioscantask.h>
@@ -401,7 +402,7 @@ QWidget *IioTabWidget::createUriWidget(QWidget *parent)
 	QWidget *w = new QWidget(parent);
 	QGridLayout *layout = new QGridLayout(w);
 	w->setLayout(layout);
-	StyleHelper::RoundedCornersWidget(w, "uriAddPage");
+	Style::setStyle(w, style::properties::widget::basicComponent);
 
 	QLabel *uriLabel = new QLabel("URI", w);
 	StyleHelper::MenuSmallLabel(uriLabel);

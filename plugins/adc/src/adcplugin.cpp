@@ -266,7 +266,9 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 
 	if(t == TIME) {
 		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("time", "ADC - Time",
-							  ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+							  ":/gui/icons/" +
+								  Style::getAttribute(json::theme::icon_theme_folder) +
+								  "/icons/tool_oscilloscope.svg"));
 		auto tme = m_toolList.last();
 		tme->setEnabled(true);
 		tme->setRunBtnVisible(true);
@@ -303,8 +305,10 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		m_ctrls.append(adc);
 	} else if(t == FREQUENCY) {
 
-		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(
-			"freq", "ADC - Frequency", ":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
+		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("freq", "ADC - Frequency",
+							  ":/gui/icons/" +
+								  Style::getAttribute(json::theme::icon_theme_folder) +
+								  "/icons/tool_spectrum_analyzer.svg"));
 		auto tme = m_toolList.last();
 		tme->setEnabled(true);
 		tme->setRunBtnVisible(true);

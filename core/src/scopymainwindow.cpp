@@ -105,7 +105,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(browseMenu, SIGNAL(requestSave()), this, SLOT(save()));
 	connect(browseMenu, &BrowseMenu::collapsed, this, [this](bool coll) {
 		if(coll) {
-			ui->animHolder->setAnimMin(40);
+			ui->animHolder->setAnimMin(Style::getDimension(json::global::unit_4));
 		} else {
 			ui->animHolder->setAnimMax(230);
 		}
