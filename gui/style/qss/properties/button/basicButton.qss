@@ -1,6 +1,6 @@
 QPushButton[&&property&&=true] {
+    height: &unit_2&;
     border-radius: &radius_1&;
-    border-style: outset;
     background-color: &interactive_primary_idle&;
     color: &content_inverse&;
     font-weight: 700;
