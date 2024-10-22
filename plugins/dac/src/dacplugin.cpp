@@ -79,14 +79,16 @@ bool DACPlugin::loadPage()
 
 bool DACPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/scopy-default/icons/tool_oscilloscope.svg");
+	SCOPY_PLUGIN_ICON(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+			  "/icons/tool_oscilloscope.svg");
 	return true;
 }
 
 void DACPlugin::loadToolList()
 {
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("dac", "DAC", ":/gui/icons/scopy-default/icons/tool_signal_generator.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("dac", "DAC",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_signal_generator.svg"));
 }
 
 void DACPlugin::unload()
