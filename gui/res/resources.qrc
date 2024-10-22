@@ -173,6 +173,7 @@
         <file>Inter-Regular.ttf</file>
         <file>open-sans-regular.ttf</file>
         <file>icons/scopy-light/icons/tool_datalogger.svg</file>
+        <file>icons/scopy-light/icons/search.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>
