@@ -15,8 +15,8 @@ install_packages(){
 download_kuiper(){
 	mkdir -p ${STAGING_AREA}
 	pushd ${STAGING_AREA}
-	[ -f image_2023-12-13-ADI-Kuiper-full.zip ] || wget --progress=dot:giga ${KUIPER_DOWNLOAD_LINK}
-	[ -f 2023-12-13-ADI-Kuiper-full.img ] || unzip image*.zip
+	[ -f image_2023-12-13-ADI-Kuiper-full.zip ] || wget -U Mozilla/5.0 --progress=dot:giga ${KUIPER_DOWNLOAD_LINK}
+	[ -f $IMAGE_FILE ] || unzip image*.zip
 	popd
 }
 
