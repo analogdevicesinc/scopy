@@ -44,7 +44,8 @@ bool DataLoggerPlugin::loadPage() { return false; }
 
 bool DataLoggerPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/scopy-default/icons/datalogger.svg");
+	SCOPY_PLUGIN_ICON(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+			  "/icons/datalogger.svg");
 	return true;
 }
 

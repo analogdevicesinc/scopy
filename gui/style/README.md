@@ -23,7 +23,7 @@ Add new .json file in style/json.
 - properties can also be overwritten. example: "qss_properties_button_borderButton": "qss_properties_button_basicButton"
 
 ## Add plugin style
-Create a style folder in your plugin and use the exact same file structure. Only the qss folder is relevant since the json files cannot be overwritten from other plugins.
+Create a style folder in your plugin and use the exact same file structure. Only the qss folder is relevant since the json files cannot be overwritten from other plugins. You may add a folder in your style/qss/properties folder with the name of your plugin to avoid overwriting other core .qss style files with the same name.
 In your plugin CMakeLists.txt file add the generate_style command.
 arguments: **option, style_folder, header_folder** (option should always be "--plugin")
 

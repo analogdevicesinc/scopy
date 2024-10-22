@@ -149,7 +149,8 @@ QWidget *BrowseMenu::createHeader(QWidget *parent)
 	Style::setStyle(btnCollapseMini, style::properties::widget::toolMenu);
 	Style::setStyle(btnCollapseMini, style::properties::button::toolButton);
 	btnCollapseMini->setCheckable(true);
-	btnCollapseMini->setFixedSize(Style::getDimension(json::global::unit_4), Style::getDimension(json::global::unit_4));
+	btnCollapseMini->setFixedSize(Style::getDimension(json::global::unit_4),
+				      Style::getDimension(json::global::unit_4));
 	headerLay->addWidget(btnCollapseMini);
 
 	m_btnCollapse = new QPushButton(menuHeader);

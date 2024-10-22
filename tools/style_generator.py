@@ -240,10 +240,10 @@ def copy_and_append_jsons(src_dir: str, dest_dir: str, append: bool) -> None:
 """
 options:
 - copy json files, generate qss and headers (for core)
-    arguments: --core <gui style folder> <gui headers folder> <build folder>
+    arguments: --core <gui style folder> <gui headers folder>
     
 - generate qss file and header (for plugins)
-    arguments: --plugin <plugin style folder> <plugin headers folder> <build folder>
+    arguments: --plugin <plugin style folder> <plugin headers folder>
 """
 if __name__ == "__main__":
     if len(sys.argv) != 5:
