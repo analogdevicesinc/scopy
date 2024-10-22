@@ -45,6 +45,7 @@ void ToolMenuManager::addMenuItem(QString deviceId, QString devName, QList<ToolM
 	QString param;
 	MenuSectionCollapseWidget *devSection = new MenuSectionCollapseWidget(
 		devName, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_COMPOSITEWIDGET, m_toolMenu);
+	devSection->contentLayout()->setSpacing(0);
 	QLayoutItem *sItem = devSection->layout()->itemAt(0);
 	if(sItem) {
 		MenuSectionWidget *sWidget = dynamic_cast<MenuSectionWidget *>(sItem->widget());

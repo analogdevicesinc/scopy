@@ -159,19 +159,20 @@
         <file>icons/warning.svg</file>
         <file>icons/scopy-default/icons/RegMap.svg</file>
         <file>icons/handle_arrow.svg</file>
-	<file>icons/search_crossed.svg</file>
+        <file>icons/search_crossed.svg</file>
         <file>icons/scopy-default/icons/tool_datalogger.svg</file>
-	<file>icons/edit_pen.svg</file>
+        <file>icons/edit_pen.svg</file>
         <file>icons/checkmark_light.svg</file>
         <file>icons/checkmark_dark.svg</file>
         <file>icons/handle_down_arrow_dark.svg</file>
-	<file>icons/handle_down_arrow_light.svg</file>
-	<file>icons/minus.svg</file>
-	<file>icons/plus.svg</file>
-	<file>icons/unlocked.svg</file>
-	<file>icons/locked.svg</file>
+        <file>icons/handle_down_arrow_light.svg</file>
+        <file>icons/minus.svg</file>
+        <file>icons/plus.svg</file>
+        <file>icons/unlocked.svg</file>
+        <file>icons/locked.svg</file>
         <file>Inter-Regular.ttf</file>
         <file>open-sans-regular.ttf</file>
+        <file>icons/scopy-light/icons/tool_datalogger.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>
