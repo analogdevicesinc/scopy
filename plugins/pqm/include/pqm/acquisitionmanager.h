@@ -68,7 +68,8 @@ private:
 	bool readPqmAttributes();
 	bool readBufferedData();
 	void setData(QMap<QString, QMap<QString, QString>>);
-	void setProcessData(bool en);
+	void setProcessData(bool val);
+	void storeProcessData();
 
 	iio_context *m_ctx;
 	iio_buffer *m_buffer;
@@ -79,12 +80,13 @@ private:
 	QFutureWatcher<void> *m_readFw;
 	QFutureWatcher<void> *m_setFw;
 
-	QMutex mutex;
+	QMutex m_mutex;
 	QVector<QString> m_chnlsName;
 	QMap<QString, QMap<QString, QString>> m_pqmAttr;
 	QMap<QString, QVector<double>> m_bufferData;
 	QMap<QString, bool> m_tools = {{"rms", false}, {"harmonics", false}, {"waveform", false}, {"settings", false}};
 
+	std::atomic<bool> m_processData = false;
 	bool m_attrHaveBeenRead = false;
 	bool m_buffHaveBeenRead = false;
 	bool m_hasFwVers = false;
