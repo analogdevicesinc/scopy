@@ -42,8 +42,8 @@
      id="namedview6"
      showgrid="false"
      inkscape:zoom="13.111111"
-     inkscape:cx="-4.7288136"
-     inkscape:cy="8.8474576"
+     inkscape:cx="-18.457627"
+     inkscape:cy="8.6949152"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -52,5 +52,5 @@
      d="M10 18V8H18V18H10ZM0 10V0H8V10H0ZM6 8V2H2V8H6ZM0 18V12H8V18H0ZM2 16H6V14H2V16ZM12 16H16V10H12V16ZM10 0H18V6H10V0ZM12 2V4H16V2H12Z"
      fill="#101820"
      id="path2"
-     style="fill:#c5c5c5;fill-opacity:1" />
+     style="fill:#000000;fill-opacity:1;opacity:0.807" />
 </svg>
