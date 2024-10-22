@@ -157,8 +157,7 @@ void RegisterController::setHasMap(bool hasMap)
 		QObject::connect(detailedRegisterToggle, &QPushButton::toggled, this,
 				 &RegisterController::toggleDetailedMenu);
 		writeWidgetLayout->addWidget(detailedRegisterToggle, 0.5, Qt::AlignRight);
-		RegmapStyleHelper::smallBlueButton(detailedRegisterToggle);
-		detailedRegisterToggle->setFixedSize(40, 40);
+		RegmapStyleHelper::iconBlueButton(detailedRegisterToggle);
 	}
 }
 
@@ -166,9 +165,9 @@ void RegisterController::applyStyle()
 {
 	setFixedHeight(72);
 
-	RegmapStyleHelper::BlueButton(readButton);
+	Style::setStyle(readButton, style::properties::button::basicButton, true, true);
 	readButton->setFixedHeight(40);
-	RegmapStyleHelper::BlueButton(writeButton);
+	Style::setStyle(writeButton, style::properties::button::basicButton, true, true);
 	writeButton->setFixedHeight(40);
 	valueLabel->setStyleSheet(RegmapStyleHelper::grayLabelStyle());
 
