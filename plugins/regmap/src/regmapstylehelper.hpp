@@ -69,7 +69,6 @@ public:
 
 	static void regmapSettingsMenu(RegisterMapSettingsMenu *settings, QString objectName = "");
 	static void grayBackgroundHoverWidget(QWidget *widget, QString objectName = "");
-	static QString BlueButtonStyle();
 	static void BlueButton(QPushButton *btn, QString objectName = "");
 	static QString checkBoxStyle();
 	static void checkBox(QCheckBox *checkbox, QString objectName = "");
@@ -83,6 +82,7 @@ public:
 	static void titleSpinBoxStyle(TitleSpinBox *spinbox, QString objectName = "");
 	static void searchBarStyle(SearchBarWidget *searchBar, QString objectName = "");
 	static void smallBlueButton(QPushButton *button, QString objectName = "");
+	static void iconBlueButton(QPushButton *button, QString objectName = "");
 	static QString regmapControllerStyle(QWidget *widget, QString objectName = "");
 	static QString widgetidthRoundCornersStyle(QWidget *widget, QString objectName = "");
 	static QString sliderStyle();
