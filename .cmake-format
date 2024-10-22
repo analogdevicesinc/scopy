@@ -9,3 +9,4 @@ separate_ctrl_name_with_space: false
 separate_fn_name_with_space: false
 tab_size: 8
 use_tabchars: True
+literal-comment-pattern: "\A(?:#.*\n){0,20}\n"
