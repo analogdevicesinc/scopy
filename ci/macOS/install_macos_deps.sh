@@ -232,25 +232,25 @@ patch_qwt() {
 	patch -p1 <<-EOF
 --- a/qwtconfig.pri
 +++ b/qwtconfig.pri
-@@ -19,7 +19,7 @@
- QWT_INSTALL_PREFIX = \$\$[QT_INSTALL_PREFIX]
+@@ -19,7 +19,7 @@ QWT_VERSION      = $${QWT_VER_MAJ}.$${QWT_VER_MIN}.$${QWT_VER_PAT}
+ QWT_INSTALL_PREFIX = $$[QT_INSTALL_PREFIX]
 
  unix {
--    QWT_INSTALL_PREFIX    = /usr/local
+-    QWT_INSTALL_PREFIX    = /usr/local/qwt-$$QWT_VERSION-ma
 +    QWT_INSTALL_PREFIX    = $STAGING_AREA_DEPS
-     # QWT_INSTALL_PREFIX = /usr/local/qwt-\$\$QWT_VERSION-ma-qt-\$\$QT_VERSION
+     # QWT_INSTALL_PREFIX = /usr/local/qwt-$$QWT_VERSION-ma-qt-$$QT_VERSION
  }
 
-@@ -42,7 +42,7 @@ QWT_INSTALL_LIBS      = \$\${QWT_INSTALL_PREFIX}/lib
+@@ -42,7 +42,7 @@ QWT_INSTALL_LIBS      = $${QWT_INSTALL_PREFIX}/lib
  # runtime environment of designer/creator.
  ######################################################################
 
--QWT_INSTALL_PLUGINS   = \$\${QWT_INSTALL_PREFIX}/plugins/designer
-+#QWT_INSTALL_PLUGINS   = \$\${QWT_INSTALL_PREFIX}/plugins/designer
+-QWT_INSTALL_PLUGINS   = $${QWT_INSTALL_PREFIX}/plugins/designer
++#QWT_INSTALL_PLUGINS   = $${QWT_INSTALL_PREFIX}/plugins/designer
 
  # linux distributors often organize the Qt installation
  # their way and QT_INSTALL_PREFIX doesn't offer a good
-@@ -163,7 +163,7 @@ QWT_CONFIG     += QwtOpenGL
+@@ -164,7 +164,7 @@ QWT_CONFIG     += QwtTests
 
  macx:!static:CONFIG(qt_framework, qt_framework|qt_no_framework) {
 
@@ -267,6 +267,8 @@ patch_qwt() {
      }
 +    macx: QWT_SONAME=\$\${QWT_INSTALL_LIBS}/libqwt.dylib
  }
+ else {
+     CONFIG += staticlib
 EOF
 }
 
