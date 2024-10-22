@@ -3,6 +3,7 @@ SHELL ["/bin/bash", "-c"]
 ARG USER=runner
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Bucharest
+ENV CI_SCRIPT=ON
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update && \
 	apt-get -y upgrade && \
@@ -26,18 +27,18 @@ WORKDIR /home/${USER}
 FROM start AS sysroot_builder
 ARG USER=runner
 ENV DEBIAN_FRONTEND=noninteractive
-#Copy all scopy/ci/armhf folder inside the image
-COPY * /home/${USER}
-RUN ./create_sysroot.sh \
+#Copy all scopy/ci/arm folder inside the image
+COPY * /home/${USER}/
+RUN ./create_sysroot.sh arm64 \
 	install_packages \
 	move_and_extract_sysroot \
 	fix_relativelinks
-RUN ./build_qt.sh \
+RUN ./build_qt.sh arm64 \
 	install_packages \
 	download_qt \
 	download_crosscompiler \
-	build_qt5.15.2
-RUN ./armhf_build_process.sh \
+	build
+RUN ./arm_build_process.sh arm64 \
 	install_packages \
 	download_cmake \
 	download_crosscompiler \
@@ -49,15 +50,17 @@ RUN ./armhf_build_process.sh \
 FROM start
 ARG USER=runner
 ENV DEBIAN_FRONTEND=noninteractive
-COPY --from=sysroot_builder /home/${USER}/armhf_build_process.sh /home/${USER}
-COPY --from=sysroot_builder /home/${USER}/armhf_build_config.sh /home/${USER}
+ARG STAGING=/home/${USER}/scopy/ci/armhf/staging
+COPY --from=sysroot_builder /home/${USER}/arm_build_process.sh /home/${USER}
+COPY --from=sysroot_builder /home/${USER}/arm_build_config.sh /home/${USER}
 COPY --from=sysroot_builder /home/${USER}/build-status /home/${USER}/build-status
 RUN mkdir -p /home/${USER}/sysroot
-COPY --from=sysroot_builder /home/${USER}/staging/sysroot/usr /home/${USER}/sysroot/usr
-COPY --from=sysroot_builder /home/${USER}/staging/sysroot/share /home/${USER}/sysroot/share
-COPY --from=sysroot_builder /home/${USER}/staging/sysroot/include /home/${USER}/sysroot/include
+COPY --from=sysroot_builder ${STAGING}/sysroot/usr /home/${USER}/sysroot/usr
+COPY --from=sysroot_builder ${STAGING}/sysroot/share /home/${USER}/sysroot/share
+COPY --from=sysroot_builder ${STAGING}/sysroot/include /home/${USER}/sysroot/include
 WORKDIR /home/${USER}/sysroot
 RUN ln -s usr/bin bin && ln -s usr/lib lib && ln -s usr/sbin sbin
 WORKDIR /home/${USER}
-RUN /home/${USER}/armhf_build_process.sh install_packages download_cmake download_crosscompiler  && \
-	rm /home/${USER}/armhf_build_process.sh /home/${USER}/armhf_build_config.sh
+RUN /home/${USER}/arm_build_process.sh arm64 install_packages download_cmake download_crosscompiler  && \
+	mv ${STAGING} /home/${USER} && \
+	rm -rf /home/${USER}/arm_build_process.sh /home/${USER}/arm_build_config.sh /home/${USER}/scopy
