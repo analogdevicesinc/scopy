@@ -108,14 +108,13 @@ void AcquisitionManager::futureReadData()
 
 void AcquisitionManager::readData()
 {
-	mutex.lock();
+	QMutexLocker locker(&mutex);
 	if(m_tools["rms"] || m_tools["harmonics"] || m_tools["settings"]) {
 		m_attrHaveBeenRead = readPqmAttributes();
 	}
 	if(m_tools["waveform"]) {
 		m_buffHaveBeenRead = readBufferedData();
 	}
-	mutex.unlock();
 }
 
 bool AcquisitionManager::readPqmAttributes()
@@ -200,10 +199,9 @@ void AcquisitionManager::onReadFinished()
 
 void AcquisitionManager::pingTimerTimeout()
 {
-	mutex.lock();
+	QMutexLocker locker(&mutex);
 	m_pingTask->start();
 	m_pingTask->wait(THREAD_FINISH_TIMEOUT);
-	mutex.unlock();
 }
 
 double AcquisitionManager::convertFromHwToHost(int value, QString chnlId)
@@ -232,7 +230,7 @@ void AcquisitionManager::stopPing() { m_pingTimer->stop(); }
 
 void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 {
-	mutex.lock();
+	QMutexLocker locker(&mutex);
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(!dev)
 		return;
@@ -245,11 +243,11 @@ void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 			iio_device_attr_write(dev, key.toStdString().c_str(), newVal.toStdString().c_str());
 		}
 	}
-	mutex.unlock();
 }
 
 void AcquisitionManager::setProcessData(bool en)
 {
+	QMutexLocker locker(&mutex);
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(!dev) {
 		return;
