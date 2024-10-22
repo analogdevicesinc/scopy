@@ -103,8 +103,14 @@ void TestPlugin::loadToolList()
 
 bool TestPlugin::loadExtraButtons()
 {
-	m_extraButtons.append(new QPushButton("Calibrate"));
-	m_extraButtons.append(new QPushButton("Register"));
+	QPushButton *btnCalibrate = new QPushButton("Calibrate");
+	Style::setStyle(btnCalibrate, style::properties::button::grayButton);
+	m_extraButtons.append(btnCalibrate);
+
+	QPushButton *btnRegister = new QPushButton("Register");
+	Style::setStyle(btnRegister, style::properties::button::grayButton);
+	m_extraButtons.append(btnRegister);
+
 	connect(m_extraButtons[0], &QAbstractButton::clicked, this, [=]() { edit->setText("Calibrating"); });
 	connect(m_extraButtons[1], &QAbstractButton::clicked, this, [=]() { edit->setText("Registering"); });
 	return true;

@@ -47,6 +47,8 @@ QWidget *StyleTool::buildStylePage()
 		layout->addWidget(hContainer); // Add the horizontal container to the main layout
 	};
 
+	int i = 0;
+
 	// Add styled buttons
 	addLabeledWidget("Basic Button", new QPushButton("Basic Button"));
 	addLabeledWidget("Single Button", new QPushButton("Single"));
@@ -57,26 +59,29 @@ QWidget *StyleTool::buildStylePage()
 	addLabeledWidget("Stop Button", new QPushButton(""));
 	addLabeledWidget("Subtle Button", new QPushButton("Subtle Button"));
 	addLabeledWidget("Blue Gray Button", new QPushButton("Blue Gray Button"));
+	addLabeledWidget("Gray Button", new QPushButton("Gray Button"));
 
 	// Style the buttons
-	Style::setStyle(layout->itemAt(0)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::button::basicButton, true, true);
-	Style::setStyle(layout->itemAt(1)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::button::singleButton, true, true);
-	Style::setStyle(layout->itemAt(2)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::button::spinboxButton, true, true);
-	Style::setStyle(layout->itemAt(3)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::button::runButton, true, true);
-	Style::setStyle(layout->itemAt(4)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::button::borderButton, true, true);
-	Style::setStyle(layout->itemAt(5)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::button::squareIconButton, true, true);
-	Style::setStyle(layout->itemAt(6)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::button::stopButton, true, true);
-	Style::setStyle(layout->itemAt(7)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::button::subtleButton, true, true);
-	Style::setStyle(layout->itemAt(8)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::button::blueGrayButton, true, true);
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
+			style::properties::button::grayButton, true, true);
 
 	// Add styled widgets (using QWidget instead of QPushButton)
 	addLabeledWidget("Basic Component", new QWidget);
@@ -90,23 +95,23 @@ QWidget *StyleTool::buildStylePage()
 	addLabeledWidget("Border", new QWidget);
 
 	// Style the widgets
-	Style::setStyle(layout->itemAt(9)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::widget::basicComponent, true, true);
-	Style::setStyle(layout->itemAt(10)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::widget::textBrowser, true, true);
-	Style::setStyle(layout->itemAt(11)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::widget::searchbar, true, true);
-	Style::setStyle(layout->itemAt(12)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::widget::deviceLine, true, true);
-	Style::setStyle(layout->itemAt(13)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::widget::solidBorder, true, true);
-	Style::setStyle(layout->itemAt(14)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::widget::deviceIcon, true, true);
-	Style::setStyle(layout->itemAt(15)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::widget::treeView, true, true);
-	Style::setStyle(layout->itemAt(16)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::widget::notInteractive, true, true);
-	Style::setStyle(layout->itemAt(17)->widget()->layout()->itemAt(1)->widget(), style::properties::widget::border,
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(), style::properties::widget::border,
 			true, true);
 
 	// Add styled checkboxes
@@ -115,11 +120,11 @@ QWidget *StyleTool::buildStylePage()
 	addLabeledWidget("Square Checkbox", new QCheckBox("Square Checkbox"));
 
 	// Style the checkboxes
-	Style::setStyle(layout->itemAt(18)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::checkbox::collapseCB, true, true);
-	Style::setStyle(layout->itemAt(19)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::checkbox::circleCB, true, true);
-	Style::setStyle(layout->itemAt(20)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::checkbox::squareCB, true, true);
 
 	// Add styled labels
@@ -129,14 +134,14 @@ QWidget *StyleTool::buildStylePage()
 	addLabeledWidget("Plot Info Label", new QLabel("Plot Info Label"));
 
 	// Style the labels
-	Style::setStyle(layout->itemAt(21)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::label::menuSmall, true, true);
-	Style::setStyle(layout->itemAt(22)->widget()->layout()->itemAt(1)->widget(), style::properties::label::subtle,
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(), style::properties::label::subtle,
 			true, true);
-	Style::setStyle(layout->itemAt(23)->widget()->layout()->itemAt(1)->widget(),
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::label::menuMedium, true, true);
-	Style::setStyle(layout->itemAt(24)->widget()->layout()->itemAt(1)->widget(), style::properties::label::plotInfo,
-			true, true);
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
+			style::properties::label::plotInfo, true, true);
 
 	// Set the layout to the container widget
 	containerWidget->setLayout(layout);
