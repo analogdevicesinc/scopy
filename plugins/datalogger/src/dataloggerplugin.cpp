@@ -259,7 +259,6 @@ void DataLoggerPlugin::initPreferences()
 	p->init("dataloggerplugin_data_storage_size", "10 Kb");
 	p->init("dataloggerplugin_read_interval", "1");
 	p->init("dataloggerplugin_date_time_format", "hh:mm:ss");
-	p->init("dataloggerplugin_start_tutorial", true);
 }
 
 bool DataLoggerPlugin::loadPreferencesPage()
@@ -288,21 +287,6 @@ bool DataLoggerPlugin::loadPreferencesPage()
 
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceEdit(
 		p, "dataloggerplugin_date_time_format", "DateTime format :", generalSection));
-
-	QWidget *resetTutorialWidget = new QWidget();
-	QHBoxLayout *resetTutorialWidgetLayout = new QHBoxLayout();
-
-	resetTutorialWidget->setLayout(resetTutorialWidgetLayout);
-	resetTutorialWidgetLayout->setMargin(0);
-
-	QPushButton *resetTutorial = new QPushButton("Reset", generalSection);
-	Style::setStyle(resetTutorial, style::properties::button::basicButton);
-	connect(resetTutorial, &QPushButton::clicked, this,
-		[=, this]() { p->set("dataloggerplugin_start_tutorial", true); });
-
-	resetTutorialWidgetLayout->addWidget(new QLabel("Data logger tutorial "), 6);
-	resetTutorialWidgetLayout->addWidget(resetTutorial, 1);
-	generalSection->contentLayout()->addWidget(resetTutorialWidget);
 
 	return true;
 }

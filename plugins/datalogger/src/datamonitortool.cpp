@@ -64,19 +64,23 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), true, this);
 	rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn *>(openLastMenuBtn)->getButtonGroup();
 
-	infoBtn = new InfoBtn(this);
 	printplotManager = new PrintPlotManager(this);
 	runBtn = new RunBtn(this);
 	clearBtn = new QPushButton("Clear", this);
 	PrintBtn *printBtn = new PrintBtn(this);
 
-	// connect(infoBtn, &QPushButton::clicked, this, &DatamonitorTool::startTutorial);
-	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
-		QDesktopServices::openUrl(
-			QUrl("https://analogdevicesinc.github.io/scopy/plugins/datalogger/datalogger.html"));
-	});
+	infoBtn = new InfoBtn(this, true);
 
-	// connect(infoBtn, &QPushButton::clicked, this, &DatamonitorTool::startTutorial);
+	connect(infoBtn, &InfoBtn::clicked, this, [=]() {
+		infoBtn->generateInfoPopup(this);
+
+		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, [=]() { this->startTutorial(); });
+
+		connect(infoBtn->getDocumentationButton(), &QPushButton::clicked, this, [=]() {
+			QDesktopServices::openUrl(
+				QUrl("https://analogdevicesinc.github.io/scopy/plugins/datalogger/datalogger.html"));
+		});
+	});
 
 	//// add monitors
 	addMonitorButton = new AddBtn(this);
@@ -354,17 +358,6 @@ void DatamonitorTool::startTutorial()
 		new gui::TutorialBuilder(this, ":/datamonitor/tutorial_chapters.json", "datamonitor", parent);
 	datamonitorTutorial->setTitle("Tutorial");
 	datamonitorTutorial->start();
-}
-
-void DatamonitorTool::showEvent(QShowEvent *event)
-{
-	QWidget::showEvent(event);
-
-	// Handle tutorial
-	if(Preferences::get("dataloggerplugin_start_tutorial").toBool()) {
-		startTutorial();
-		Preferences::set("dataloggerplugin_start_tutorial", false);
-	}
 }
 
 #include "moc_datamonitortool.cpp"
