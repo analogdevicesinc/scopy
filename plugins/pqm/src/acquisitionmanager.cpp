@@ -189,7 +189,7 @@ void AcquisitionManager::onReadFinished()
 		Q_EMIT pqmAttrsAvailable(m_pqmAttr);
 	}
 	if(m_buffHaveBeenRead) {
-		m_attrHaveBeenRead = false;
+		m_buffHaveBeenRead = false;
 		Q_EMIT bufferDataAvailable(m_bufferData);
 	}
 	QMap<QString, bool>::const_iterator it = std::find(m_tools.cbegin(), m_tools.cend(), true);
