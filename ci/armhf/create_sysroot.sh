@@ -9,14 +9,30 @@ IMAGE_FILE=2023-12-13-ADI-Kuiper-full.img
 
 install_packages(){
 	sudo apt update
-	sudo apt -y install git wget unzip python3 python2
+	sudo apt -y install git wget unzip python3 python-is-python3 2to3
 }
 
 download_kuiper(){
 	mkdir -p ${STAGING_AREA}
 	pushd ${STAGING_AREA}
-	[ -f image_2023-12-13-ADI-Kuiper-full.zip ] || wget --progress=dot:giga ${KUIPER_DOWNLOAD_LINK}
-	[ -f 2023-12-13-ADI-Kuiper-full.img ] || unzip image*.zip
+	if [ ! -f image_2023-12-13-ADI-Kuiper-full.zip ]; then
+		wget \
+		--progress=bar:force:noscroll \
+		--progress=dot:giga \
+		--header='User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0' \
+		--header='Accept-Language: en-US,en;q=0.5' \
+		--header='Accept-Encoding: gzip, deflate, br' \
+		--header='Connection: keep-alive' \
+		--header='Upgrade-Insecure-Requests: 1' \
+		--header='Sec-Fetch-Dest: document' \
+		--header='Sec-Fetch-Mode: navigate' \
+		--header='Sec-Fetch-Site: none' \
+		--header='Sec-Fetch-User: ?1' \
+		--header='Pragma: no-cache' \
+		--header='Cache-Control: no-cache' \
+		${KUIPER_DOWNLOAD_LINK}
+	fi
+	[ -f $IMAGE_FILE ] || unzip image*.zip
 	popd
 }
 
