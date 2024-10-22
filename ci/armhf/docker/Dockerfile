@@ -3,6 +3,7 @@ SHELL ["/bin/bash", "-c"]
 ARG USER=runner
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Bucharest
+ENV CI_SCRIPT=ON
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update && \
 	apt-get -y upgrade && \
@@ -49,15 +50,17 @@ RUN ./armhf_build_process.sh \
 FROM start
 ARG USER=runner
 ENV DEBIAN_FRONTEND=noninteractive
+ARG STAGING=/home/${USER}/scopy/ci/armhf/staging
 COPY --from=sysroot_builder /home/${USER}/armhf_build_process.sh /home/${USER}
 COPY --from=sysroot_builder /home/${USER}/armhf_build_config.sh /home/${USER}
 COPY --from=sysroot_builder /home/${USER}/build-status /home/${USER}/build-status
 RUN mkdir -p /home/${USER}/sysroot
-COPY --from=sysroot_builder /home/${USER}/staging/sysroot/usr /home/${USER}/sysroot/usr
-COPY --from=sysroot_builder /home/${USER}/staging/sysroot/share /home/${USER}/sysroot/share
-COPY --from=sysroot_builder /home/${USER}/staging/sysroot/include /home/${USER}/sysroot/include
+COPY --from=sysroot_builder ${STAGING}/sysroot/usr /home/${USER}/sysroot/usr
+COPY --from=sysroot_builder ${STAGING}/sysroot/share /home/${USER}/sysroot/share
+COPY --from=sysroot_builder ${STAGING}/sysroot/include /home/${USER}/sysroot/include
 WORKDIR /home/${USER}/sysroot
 RUN ln -s usr/bin bin && ln -s usr/lib lib && ln -s usr/sbin sbin
 WORKDIR /home/${USER}
 RUN /home/${USER}/armhf_build_process.sh install_packages download_cmake download_crosscompiler  && \
-	rm /home/${USER}/armhf_build_process.sh /home/${USER}/armhf_build_config.sh
+	mv ${STAGING} /home/${USER} && \
+	rm -rf /home/${USER}/armhf_build_process.sh /home/${USER}/armhf_build_config.sh /home/${USER}/scopy

@@ -21,7 +21,7 @@ export APPIMAGE=1
 PYTHON_VERSION=python3.9 # default python version used in CI scripts, can be changed to match locally installed python
 
 SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-STAGING_AREA=$SRC_SCRIPT/staging
+[ $CI_SCRIPT == "ON" ] && STAGING_AREA=$HOME/scopy/ci/armhf/staging || STAGING_AREA=$SRC_SCRIPT/staging
 SYSROOT=$STAGING_AREA/sysroot
 SYSROOT_TAR=$STAGING_AREA/sysroot.tar.gz
 TOOLCHAIN=$STAGING_AREA/cross-pi-gcc
