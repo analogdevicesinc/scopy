@@ -8,6 +8,7 @@
 #include <menus/logdatatofile.hpp>
 #include <menucontrolbutton.h>
 #include <datamonitor/sevensegmentdisplay.hpp>
+#include <QDesktopServices>
 #include <timemanager.hpp>
 #include <tutorialbuilder.h>
 #include "datamonitorstylehelper.hpp"
@@ -40,12 +41,18 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn *>(openLastMenuBtn)->getButtonGroup();
 
 	infoBtn = new InfoBtn(this);
+	infoBtn->setCheckable(true);
+
+	infoBtn->addOption("Tutorial", [=, this]() { this->startTutorial(); });
+	infoBtn->addOption("Doc", [=, this]() {
+		QDesktopServices::openUrl(
+			QUrl("https://analogdevicesinc.github.io/scopy/plugins/datalogger/datalogger.html"));
+	});
+
 	printplotManager = new PrintPlotManager(this);
 	runBtn = new RunBtn(this);
 	clearBtn = new QPushButton("Clear", this);
 	PrintBtn *printBtn = new PrintBtn(this);
-
-	connect(infoBtn, &QPushButton::clicked, this, &DatamonitorTool::startTutorial);
 
 	//// add monitors
 	addMonitorButton = new AddBtn(this);
