@@ -48,7 +48,8 @@ private:
 	DataLogger_API *api;
 	bool isRunning = false;
 	int toolIndex = 0;
-	QString toolIcon = ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_datalogger.svg";
+	QString toolIcon =
+		":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_datalogger.svg";
 };
 } // namespace scopy::datamonitor
 #endif // DATALOGGERPLUGIN_H

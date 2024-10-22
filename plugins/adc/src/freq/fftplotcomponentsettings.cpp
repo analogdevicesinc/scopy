@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QLineEdit>
 #include "fftplotcomponentchannel.h"
+#include <style.h>
 
 #include <gnuradio/fft/window.h>
 
@@ -149,7 +150,8 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 
 	m_settingsPlotHover = new QPushButton("", nullptr);
 	m_settingsPlotHover->setMaximumSize(16, 16);
-	m_settingsPlotHover->setIcon(QIcon(":/gui/icons/scopy-default/icons/preferences.svg"));
+	m_settingsPlotHover->setIcon(
+		QIcon(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/preferences.svg"));
 
 	connect(m_settingsPlotHover, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestSettings(); });
 
