@@ -3,6 +3,8 @@
 
 ## Create new style property
 
+Before creating a new style check if you can use an already existing or combine multiple existing styles. Only create a new one if necessary.
+
 Navigate to style/qss/properties and pick/create a folder which matches the widget type you want to create a property for. Inside the folder create a .qss file.
 - all style code must be surrounded by {} and have set a property "*[&&property&&=true]{ }". Do not replace the property name, keep it "&&property&&"
 - property value can be changed from "true", but when using it in application you also need to specify the correct value
