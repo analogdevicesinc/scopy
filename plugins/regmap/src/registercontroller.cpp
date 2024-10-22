@@ -136,8 +136,7 @@ void RegisterController::setHasMap(bool hasMap)
 		QObject::connect(detailedRegisterToggle, &QPushButton::toggled, this,
 				 &RegisterController::toggleDetailedMenu);
 		writeWidgetLayout->addWidget(detailedRegisterToggle, 0.5, Qt::AlignRight);
-		RegmapStyleHelper::smallBlueButton(detailedRegisterToggle);
-		detailedRegisterToggle->setFixedSize(40, 40);
+		RegmapStyleHelper::iconBlueButton(detailedRegisterToggle);
 	}
 }
 

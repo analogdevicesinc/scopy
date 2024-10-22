@@ -405,11 +405,9 @@ QString RegmapStyleHelper::grayLabelStyle()
                          font-size: 12px;
                          font-style: normal;
                          font-weight: normal;
-                         text-align: left;
-                         color: &&labelColor&& ;
+			 text-align: left;
                         }
-                        )css");
-	style.replace("&&labelColor&&", RegmapStyleHelper::getColor("LabelText2"));
+			)css");
 
 	return style;
 }
@@ -536,28 +534,16 @@ void RegmapStyleHelper::smallBlueButton(QPushButton *button, QString objectName)
 	if(!objectName.isEmpty())
 		button->setObjectName(objectName);
 
-	QString style = QString(R"css(
-						QPushButton {
-							 background-color: &&buttonBackground&& ;
-							 border-radius: 4px;
-							 font-size: 12px;
-							 color: white;
-						}
-						QPushButton:pressed{ background-color: &&pressedColor&& ; }
-						QPushButton:checked{ background-color: &&pressedColor&& ; }
-						QPushButton:hover{ background-color: &&hoverColor&& ; }
-						QPushButton:disabled { background-color: &&diabledColor&& ; }
-						)css");
-
-	style.replace("&&buttonBackground&&", RegmapStyleHelper::getColor("ScopyBlue"));
-	style.replace("&&pressedColor&&", RegmapStyleHelper::getColor("ButtonPressed"));
-	style.replace("&&hoverColor&&", RegmapStyleHelper::getColor("ButtonHover"));
-	style.replace("&&diabledColor&&", RegmapStyleHelper::getColor("ButtonDisabled"));
-
 	button->setFixedSize(16, 16);
-	button->setIconSize(QSize(30, 30));
 	button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	button->setStyleSheet(style);
+	Style::setStyle(button, style::properties::button::smallSquareIconButton, true, true);
+}
+
+void RegmapStyleHelper::iconBlueButton(QPushButton *button, QString objectName)
+{
+	if(!objectName.isEmpty())
+		button->setObjectName(objectName);
+	Style::setStyle(button, style::properties::button::squareIconButton, true, true);
 }
 
 QString RegmapStyleHelper::regmapControllerStyle(QWidget *widget, QString objectName)
@@ -573,12 +559,9 @@ QString RegmapStyleHelper::regmapControllerStyle(QWidget *widget, QString object
 						 font-style: normal;
 						 font-weight: normal;
 						 text-align: left;
-						 color: &&textColor&& ;
 						 border-bottom: 0px;
 						}
 						)css");
-
-	style.replace("&&textColor&&", RegmapStyleHelper::getColor("LabelText"));
 
 	style += RegmapStyleHelper::simpleWidgetStyle();
 

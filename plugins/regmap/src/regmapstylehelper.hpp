@@ -62,6 +62,7 @@ public:
 	static void titleSpinBoxStyle(TitleSpinBox *spinbox, QString objectName = "");
 	static void searchBarStyle(SearchBarWidget *searchBar, QString objectName = "");
 	static void smallBlueButton(QPushButton *button, QString objectName = "");
+	static void iconBlueButton(QPushButton *button, QString objectName = "");
 	static QString regmapControllerStyle(QWidget *widget, QString objectName = "");
 	static QString widgetidthRoundCornersStyle(QWidget *widget, QString objectName = "");
 	static QString sliderStyle();
