@@ -48,7 +48,7 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QOb
 			qWarning(CAT_PQM_ACQ) << "Cannot create the buffer!";
 		}
 		m_pingTimer = new QTimer(this);
-		m_pingTimer->setInterval(2000);
+		m_pingTimer->setInterval(3000);
 		connect(m_pingTimer, &QTimer::timeout, this, &AcquisitionManager::pingTimerTimeout);
 		connect(m_readFw, &QFutureWatcher<void>::finished, this, &AcquisitionManager::onReadFinished,
 			Qt::QueuedConnection);
@@ -101,21 +101,16 @@ void AcquisitionManager::toolEnabled(bool en, QString toolName)
 {
 	m_tools[toolName] = en;
 	QMap<QString, bool>::const_iterator it = std::find(m_tools.cbegin(), m_tools.cend(), true);
-	if(m_tools["rms"] || m_tools["harmonics"] || m_tools["settings"]) {
-		setProcessData(true);
-	}
-	if(m_tools["waveform"]) {
-		setProcessData(false);
-	}
 	if(it != m_tools.cend()) {
 		stopPing();
+		storeProcessData();
 		if(!m_readFw->isRunning()) {
 			futureReadData();
 		}
 	} else {
-		startPing();
 		m_readFw->waitForFinished();
 		m_readFw->cancel();
+		startPing();
 	}
 }
 
@@ -129,14 +124,19 @@ void AcquisitionManager::futureReadData()
 
 void AcquisitionManager::readData()
 {
-	mutex.lock();
+	QMutexLocker locker(&m_mutex);
 	if(m_tools["rms"] || m_tools["harmonics"] || m_tools["settings"]) {
+		if(!m_processData.load()) {
+			setProcessData(true);
+		}
 		m_attrHaveBeenRead = readPqmAttributes();
 	}
 	if(m_tools["waveform"]) {
+		if(m_processData.load()) {
+			setProcessData(false);
+		}
 		m_buffHaveBeenRead = readBufferedData();
 	}
-	mutex.unlock();
 }
 
 bool AcquisitionManager::readPqmAttributes()
@@ -210,7 +210,7 @@ void AcquisitionManager::onReadFinished()
 		Q_EMIT pqmAttrsAvailable(m_pqmAttr);
 	}
 	if(m_buffHaveBeenRead) {
-		m_attrHaveBeenRead = false;
+		m_buffHaveBeenRead = false;
 		Q_EMIT bufferDataAvailable(m_bufferData);
 	}
 	QMap<QString, bool>::const_iterator it = std::find(m_tools.cbegin(), m_tools.cend(), true);
@@ -221,10 +221,9 @@ void AcquisitionManager::onReadFinished()
 
 void AcquisitionManager::pingTimerTimeout()
 {
-	mutex.lock();
+	QMutexLocker locker(&m_mutex);
 	m_pingTask->start();
 	m_pingTask->wait(THREAD_FINISH_TIMEOUT);
-	mutex.unlock();
 }
 
 double AcquisitionManager::convertFromHwToHost(int value, QString chnlId)
@@ -253,7 +252,7 @@ void AcquisitionManager::stopPing() { m_pingTimer->stop(); }
 
 void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 {
-	mutex.lock();
+	QMutexLocker locker(&m_mutex);
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(!dev)
 		return;
@@ -266,19 +265,38 @@ void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 			iio_device_attr_write(dev, key.toStdString().c_str(), newVal.toStdString().c_str());
 		}
 	}
-	mutex.unlock();
 }
 
 void AcquisitionManager::setProcessData(bool en)
 {
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(!dev) {
+		qWarning(CAT_PQM_ACQ) << "Device is unavailable!";
 		return;
 	}
 	int ret = iio_device_attr_write_bool(dev, "process_data", en);
 	if(ret < 0) {
-		qInfo(CAT_PQM_ACQ) << "Cannot write process_data attribute!";
+		qWarning(CAT_PQM_ACQ) << "Cannot write process_data attribute!";
+		return;
 	}
+	m_processData.store(en);
+	qInfo(CAT_PQM_ACQ) << "process_data was written successfully:" << en;
+}
+
+void AcquisitionManager::storeProcessData()
+{
+	QMutexLocker locker(&m_mutex);
+	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
+	if(!dev) {
+		qWarning(CAT_PQM_ACQ) << "Device is unavailable!";
+		return;
+	}
+	bool val = false;
+	int ret = iio_device_attr_read_bool(dev, "process_data", &val);
+	if(ret < 0) {
+		qWarning(CAT_PQM_ACQ) << "Cannot read process_data attribute!";
+	}
+	m_processData.store(val);
 }
 
 bool AcquisitionManager::hasFwVers() const { return m_hasFwVers; }

@@ -354,11 +354,17 @@ void HarmonicsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> 
 		return;
 	}
 	QString h = m_harmonicsType;
+	bool ok = false;
 	for(const QString &ch : m_chnls) {
 		QStringList harmonics = attr[ch][h].split(" ");
 		m_yValues[ch].clear();
 		for(const QString &val : qAsConst(harmonics)) {
-			m_yValues[ch].push_back(val.toDouble());
+			double hValue = val.toDouble(&ok);
+			if(!ok)
+				continue;
+			if(m_yValues[ch].size() >= NUMBER_OF_HARMONICS)
+				break;
+			m_yValues[ch].push_back(hValue);
 		}
 		// thd labels update
 		m_labels[ch]->setValue(attr[ch]["thd"].toDouble());
