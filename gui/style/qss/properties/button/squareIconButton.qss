@@ -14,3 +14,7 @@ QPushButton[&&property&&=true]:checked {
 QPushButton[&&property&&=true]:pressed {
 	background-color:&interactive_primary_idle&;
 }
+
+QPushButton[&&property&&=true]:hover {
+	background-color:&interactive_primary_hover&;
+}

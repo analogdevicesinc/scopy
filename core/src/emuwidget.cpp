@@ -33,6 +33,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_EMU_ADD_PAGE, "EmuAddPage")
 using namespace scopy;
@@ -54,7 +55,7 @@ EmuWidget::EmuWidget(QWidget *parent)
 	QWidget *emuWidget = new QWidget(this);
 	QGridLayout *emuWidgetLay = new QGridLayout(emuWidget);
 	emuWidgetLay->setSpacing(10);
-	StyleHelper::RoundedCornersWidget(emuWidget, "emuWidgetTab");
+	Style::setStyle(emuWidget, style::properties::widget::basicComponent);
 
 	QLabel *demoLabel = new QLabel("Demo option", emuWidget);
 	StyleHelper::MenuSmallLabel(demoLabel);
