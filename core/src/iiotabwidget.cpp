@@ -391,7 +391,7 @@ QWidget *IioTabWidget::createUriWidget(QWidget *parent)
 	QWidget *w = new QWidget(parent);
 	QGridLayout *layout = new QGridLayout(w);
 	w->setLayout(layout);
-	Style::setStyle(w, style::properties::widget::border_interactive);
+	Style::setStyle(w, style::properties::widget::basicComponent);
 
 	QLabel *uriLabel = new QLabel("URI", w);
 	StyleHelper::MenuSmallLabel(uriLabel);

@@ -46,9 +46,10 @@ ToolMenuItem::ToolMenuItem(QString uuid, QString name, QString icon, QWidget *pa
 
 	m_toolRunBtn->setMaximumWidth(Style::getDimension(json::global::unit_3));
 
-	setIcon(QIcon::fromTheme(m_icon));
-	setCheckable(true);
-	setIconSize(QSize(Style::getDimension(json::global::unit_2_5), Style::getDimension(json::global::unit_2_5)));
+	m_toolBtn->setIcon(QIcon::fromTheme(m_icon));
+	m_toolBtn->setCheckable(true);
+	m_toolBtn->setIconSize(
+		QSize(Style::getDimension(json::global::unit_2_5), Style::getDimension(json::global::unit_2_5)));
 
 	m_toolRunBtn->setCheckable(true);
 	m_toolRunBtn->setText("");
