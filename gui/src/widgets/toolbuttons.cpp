@@ -87,9 +87,11 @@ GearBtn::GearBtn(QWidget *parent)
 	Style::setStyle(this, style::properties::button::squareIconButton);
 }
 
-InfoBtn::InfoBtn(QWidget *parent)
+InfoBtn::InfoBtn(QWidget *parent, bool hasTutorial)
 	: QPushButton(parent)
+	, m_hasTutorial(hasTutorial)
 {
+
 	QString iconPath = ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/info.svg";
 	setIcon(Style::getPixmap(iconPath, Style::getColor(json::theme::content_default)));
 
@@ -100,6 +102,55 @@ InfoBtn::InfoBtn(QWidget *parent)
 
 	setCheckable(false);
 	Style::setStyle(this, style::properties::button::squareIconButton);
+
+	if(hasTutorial) {
+		m_popupWidget = new PopupWidget(parent);
+		m_popupWidget->move(parent->rect().center());
+		m_popupWidget->setTitle("Plugin Information");
+		m_popupWidget->setDescription(
+			"To learn more about this plugin, check out the tutorial or read the online documentation.");
+		m_popupWidget->getExitBtn()->setText("Tutorial");
+		m_popupWidget->getContinueBtn()->setText("Documentation");
+
+		connect(m_popupWidget->getExitBtn(), &QPushButton::clicked, this, [=]() {
+			m_popupWidget->hide();
+			m_popupWidget->enableTintedOverlay(false);
+		});
+
+		connect(m_popupWidget->getContinueBtn(), &QPushButton::clicked, this, [=]() {
+			m_popupWidget->hide();
+			m_popupWidget->enableTintedOverlay(false);
+		});
+
+		connect(this, &QPushButton::clicked, this, &InfoBtn::showInfoPopup);
+		m_popupWidget->hide();
+	}
+}
+
+bool InfoBtn::hasTutorial() { return m_hasTutorial; }
+
+void InfoBtn::showInfoPopup()
+{
+	m_popupWidget->enableTintedOverlay(true);
+	m_popupWidget->show();
+	m_popupWidget->raise();
+}
+
+QPushButton *InfoBtn::getTutorialButton()
+{
+	if(m_hasTutorial) {
+		return m_popupWidget->getExitBtn();
+	}
+
+	return nullptr;
+}
+
+QPushButton *InfoBtn::getDocumentationButton()
+{
+	if(m_hasTutorial) {
+		return m_popupWidget->getContinueBtn();
+	}
+	return nullptr;
 }
 
 RunBtn::RunBtn(QWidget *parent)
