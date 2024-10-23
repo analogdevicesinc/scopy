@@ -6,14 +6,13 @@
 #include <customPushButton.h>
 
 namespace scopy {
-class ToolMenuItem : public QWidget
+class ToolMenuItem : public QPushButton
 {
 	Q_OBJECT
 public:
 	ToolMenuItem(QString uuid, QString name, QString icon, QWidget *parent = nullptr);
 	~ToolMenuItem();
 
-	QPushButton *getToolBtn() const;
 	QPushButton *getToolRunBtn() const;
 
 	void enableDoubleClick(bool enable);
@@ -35,7 +34,7 @@ protected:
 	void leaveEvent(QEvent *event);
 
 private:
-	QPushButton *m_toolBtn;
+	// QPushButton *m_toolBtn;
 	CustomPushButton *m_toolRunBtn;
 
 	QString m_uuid;
