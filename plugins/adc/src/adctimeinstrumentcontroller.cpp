@@ -109,6 +109,7 @@ void ADCTimeInstrumentController::init()
 	m_otherCMCB = new CollapsableMenuControlButton(m_ui->vcm());
 	m_otherCMCB->getControlBtn()->button()->setVisible(false);
 	m_otherCMCB->getControlBtn()->setName("Other");
+	m_otherCMCB->hide();
 	m_ui->vcm()->addEnd(m_otherCMCB);
 	m_ui->m_complex->setVisible(false);
 
@@ -225,6 +226,7 @@ void ADCTimeInstrumentController::createImportFloatChannel(AcqTreeNode *node)
 	m_plotComponentManager->addChannel(c);
 	c->menu()->add(m_plotComponentManager->plotCombo(c), "plot", gui::MenuWidget::MA_BOTTOMFIRST);
 
+	m_otherCMCB->show();
 	CompositeWidget *cw = m_otherCMCB;
 	m_acqNodeComponentMap[ifcn] = c;
 	m_ui->addChannel(c->ctrl(), c, cw);
@@ -273,6 +275,11 @@ void ADCTimeInstrumentController::removeChannel(AcqTreeNode *node)
 		removeComponent(c);
 		delete c;
 	}
+
+	if(m_otherCMCB->count() <= 0) {
+		m_otherCMCB->hide();
+	}
+
 	m_plotComponentManager->replot();
 }
 
