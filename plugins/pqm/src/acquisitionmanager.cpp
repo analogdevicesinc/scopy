@@ -27,7 +27,7 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QOb
 			qWarning(CAT_PQM_ACQ) << "Cannot create the buffer!";
 		}
 		m_pingTimer = new QTimer(this);
-		m_pingTimer->setInterval(2000);
+		m_pingTimer->setInterval(3000);
 		connect(m_pingTimer, &QTimer::timeout, this, &AcquisitionManager::pingTimerTimeout);
 		connect(m_readFw, &QFutureWatcher<void>::finished, this, &AcquisitionManager::onReadFinished,
 			Qt::QueuedConnection);
@@ -92,9 +92,9 @@ void AcquisitionManager::toolEnabled(bool en, QString toolName)
 			futureReadData();
 		}
 	} else {
-		startPing();
 		m_readFw->waitForFinished();
 		m_readFw->cancel();
+		startPing();
 	}
 }
 
