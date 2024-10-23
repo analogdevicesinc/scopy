@@ -43,7 +43,7 @@ Q_LOGGING_CATEGORY(CAT_TOOLMENUITEM, "ToolMenuItem")
 using namespace scopy;
 
 ToolMenuItem::ToolMenuItem(QString uuid, QString name, QString icon, QWidget *parent)
-	: QWidget(parent)
+	: QPushButton(parent)
 	, m_uuid(uuid)
 	, m_name(name)
 	, m_icon(icon)
@@ -60,23 +60,20 @@ ToolMenuItem::ToolMenuItem(QString uuid, QString name, QString icon, QWidget *pa
 	QHBoxLayout *toolLay = new QHBoxLayout(toolOption);
 	toolLay->setSpacing(0);
 	toolLay->setContentsMargins(0, 0, 0, 0);
-	m_toolBtn = new QPushButton(m_name);
-	m_toolBtn->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	m_toolRunBtn = new CustomPushButton(toolOption);
-	toolLay->addWidget(m_toolBtn, Qt::AlignLeft);
+	toolLay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
 	toolLay->addWidget(m_toolRunBtn);
 
 	m_toolRunBtn->setMaximumWidth(Style::getDimension(json::global::unit_3));
 
-	m_toolBtn->setIcon(QIcon::fromTheme(m_icon));
-	m_toolBtn->setCheckable(true);
-	m_toolBtn->setIconSize(
-		QSize(Style::getDimension(json::global::unit_2_5), Style::getDimension(json::global::unit_2_5)));
+	setIcon(QIcon::fromTheme(m_icon));
+	setCheckable(true);
+	setIconSize(QSize(Style::getDimension(json::global::unit_2_5), Style::getDimension(json::global::unit_2_5)));
 
 	m_toolRunBtn->setCheckable(true);
 	m_toolRunBtn->setText("");
 
-	m_toolBtn->setFlat(true);
 	m_toolRunBtn->setFlat(true);
 
 	lay->addWidget(toolOption);
@@ -85,10 +82,10 @@ ToolMenuItem::ToolMenuItem(QString uuid, QString name, QString icon, QWidget *pa
 #ifdef __ANDROID__
 	setDynamicProperty(this, "allowHover", false);
 #else
-	m_toolBtn->setStyleSheet("text-align:left;");
+	setStyleSheet("text-align:left;");
 	Style::setStyle(m_toolRunBtn, style::properties::button::stopButton);
 	Style::setStyle(m_toolRunBtn, style::properties::widget::notInteractive);
-	Style::setStyle(m_toolBtn, style::properties::button::toolButton);
+	Style::setStyle(this, style::properties::button::toolButton);
 
 	enableDoubleClick(true);
 #endif
@@ -96,16 +93,14 @@ ToolMenuItem::ToolMenuItem(QString uuid, QString name, QString icon, QWidget *pa
 
 ToolMenuItem::~ToolMenuItem() {}
 
-QPushButton *ToolMenuItem::getToolBtn() const { return m_toolBtn; }
-
 QPushButton *ToolMenuItem::getToolRunBtn() const { return m_toolRunBtn; }
 
 void ToolMenuItem::enableDoubleClick(bool enable)
 {
 	if(enable) {
-		m_toolBtn->installEventFilter(this);
+		installEventFilter(this);
 	} else {
-		m_toolBtn->removeEventFilter(this);
+		removeEventFilter(this);
 		removeEventFilter(this);
 	}
 }
@@ -128,7 +123,7 @@ bool ToolMenuItem::eventFilter(QObject *watched, QEvent *event)
 void ToolMenuItem::setName(QString str)
 {
 	m_name = str;
-	m_toolBtn->setText(m_name);
+	setText(m_name);
 }
 
 void ToolMenuItem::setSelected(bool en) { setDynamicProperty(this, "selected", en); }
