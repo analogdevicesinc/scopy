@@ -189,7 +189,7 @@ DigitalIO::DigitalIO(Filter *filt, ToolMenuEntry *toolMenuItem, DIOManager *diom
 	updateUi();
 	readPreferences();
 
-	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/digitalio");
+	ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/digitalio.html");
 }
 
 void DigitalIO::readPreferences()

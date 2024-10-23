@@ -24,6 +24,7 @@
 #include "dacutils.h"
 #include "dac_logging_categories.h"
 
+#include <QDesktopServices>
 #include <QHBoxLayout>
 #include <stylehelper.h>
 
@@ -68,7 +69,10 @@ DacInstrument::DacInstrument(const Connection *conn, QWidget *parent)
 	rightMenuBtnGrp->addButton(settingsBtn);
 	rightMenuBtnGrp->addButton(devicesBtn->button());
 
-	connect(infoBtn, &QPushButton::clicked, this, &DacInstrument::startTutorial);
+	// connect(infoBtn, &QPushButton::clicked, this, &DacInstrument::startTutorial);
+	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/dac/dac.html"));
+	});
 	connect(devicesBtn, &QPushButton::toggled, dynamic_cast<MenuHAnim *>(tool->leftContainer()),
 		&MenuHAnim::toggleMenu);
 

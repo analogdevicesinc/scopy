@@ -32,6 +32,7 @@
 #include <QFileDialog>
 #include <menulineedit.h>
 #include <menusectionwidget.h>
+#include <QDesktopServices>
 
 using namespace scopy::pqm;
 
@@ -54,6 +55,12 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 	tool->rightContainer()->setVisible(true);
 	tool->setRightContainerWidth(280);
 	instrumentLayout->addWidget(tool);
+
+	InfoBtn *infoBtn = new InfoBtn(this);
+	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
+	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/pqm/harmonics.html"));
+	});
 
 	// central widget components
 	m_thdWidget = createThdWidget();
