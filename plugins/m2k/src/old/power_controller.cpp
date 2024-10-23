@@ -108,7 +108,7 @@ PowerController::PowerController(libm2k::context::M2k *m2k, ToolMenuEntry *tme, 
 
 	readPreferences();
 
-	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/power-supply");
+	ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/power_supply.html");
 }
 
 PowerController::~PowerController()

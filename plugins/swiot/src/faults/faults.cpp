@@ -22,6 +22,7 @@
 
 #include "swiot_logging_categories.h"
 
+#include <QDesktopServices>
 #include <QThread>
 #include <QTimer>
 #include <gui/stylehelper.h>
@@ -49,6 +50,12 @@ Faults::Faults(QString uri, ToolMenuEntry *tme, QWidget *parent)
 	m_tool->topContainer()->setVisible(true);
 
 	layout->addWidget(m_tool);
+
+	InfoBtn *infoBtn = new InfoBtn(this);
+	m_tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
+	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/faults.html"));
+	});
 
 	m_configBtn = createConfigBtn(this);
 	m_runBtn = new RunBtn(this);

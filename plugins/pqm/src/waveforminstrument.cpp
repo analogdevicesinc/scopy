@@ -1,6 +1,7 @@
 #include "waveforminstrument.h"
 #include "plotaxis.h"
 #include "plottingstrategybuilder.h"
+#include <QDesktopServices>
 #include <menuonoffswitch.h>
 #include <qwt_legend.h>
 #include <rollingstrategy.h>
@@ -32,6 +33,13 @@ WaveformInstrument::WaveformInstrument(QWidget *parent)
 	tool->rightContainer()->setVisible(true);
 	tool->setRightContainerWidth(280);
 	layout->addWidget(tool);
+
+	InfoBtn *infoBtn = new InfoBtn(this);
+	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
+	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+		QDesktopServices::openUrl(
+			QUrl("https://analogdevicesinc.github.io/scopy/plugins/registermap/waveform.html"));
+	});
 
 	m_voltagePlot = new PlotWidget(this);
 	initPlot(m_voltagePlot, "V", -400, 400);

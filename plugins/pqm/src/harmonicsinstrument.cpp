@@ -7,6 +7,7 @@
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/widgets/menucontrolbutton.h>
+#include <QDesktopServices>
 
 using namespace scopy::pqm;
 
@@ -24,6 +25,12 @@ HarmonicsInstrument::HarmonicsInstrument(QWidget *parent)
 	tool->centralContainer()->setVisible(true);
 	tool->topContainerMenuControl()->setVisible(false);
 	instrumentLayout->addWidget(tool);
+
+	InfoBtn *infoBtn = new InfoBtn(this);
+	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
+	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/pqm/harmonics.html"));
+	});
 
 	// central widget components
 	m_thdWidget = createThdWidget();
