@@ -771,7 +771,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(libm2k::context::M2k *m2k, QString uri, Filte
 	connect(ui->btnExport, &QPushButton::clicked, this, &SpectrumAnalyzer::btnExportClicked);
 	readPreferences();
 
-	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/spectrumanalyzer");
+	ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/spectrum_analyzer.html");
 
 #ifndef SPECTRAL_MSR
 	// TODO: enable measurements
