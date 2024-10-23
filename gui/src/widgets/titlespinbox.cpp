@@ -20,8 +20,7 @@
  */
 
 #include "titlespinbox.h"
-#include "stylehelper.h"
-
+#include <style.h>
 #include <QBoxLayout>
 #include <QLoggingCategory>
 #include <utils.h>
@@ -42,24 +41,27 @@ TitleSpinBox::TitleSpinBox(QString title, bool isCompact, QWidget *parent)
 	QHBoxLayout *mainLayout = new QHBoxLayout(this);
 	mainLayout->setContentsMargins(0, 0, 0, 0);
 	setLayout(mainLayout);
-	m_lineedit->setStyleSheet("border: 0px solid gray; font-weight: normal;");
+	Style::setStyle(m_lineedit, style::properties::widget::solidBorder);
 
-	StyleHelper::MenuSmallLabel(m_titleLabel);
+	Style::setStyle(m_titleLabel, style::properties::label::subtle);
 	m_lineedit->setMaximumHeight(25);
 
 	QWidget *spinboxWidget = new QWidget(this);
 	QWidget *buttonWidget = new QWidget(this);
 	buttonWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
+	int size = Style::getDimension(json::global::unit_2_5);
 	m_spinBoxUpButton->setAutoRepeat(true); // so the user can hold down the button and it will react
-	StyleHelper::SpinBoxUpButton(m_spinBoxUpButton, "SpinBoxUpButton");
-	m_spinBoxUpButton->setIconSize(QSize(20, 20));
-	m_spinBoxUpButton->setFixedSize(20, 20);
+	m_spinBoxUpButton->setIcon(
+		Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
+	Style::setStyle(m_spinBoxUpButton, style::properties::button::spinboxButton);
+	m_spinBoxUpButton->setFixedSize(size, size);
 
 	m_spinBoxDownButton->setAutoRepeat(true);
-	StyleHelper::SpinBoxDownButton(m_spinBoxDownButton, "SpinBoxDownButton");
-	m_spinBoxDownButton->setIconSize(QSize(20, 20));
-	m_spinBoxDownButton->setFixedSize(20, 20);
+	m_spinBoxDownButton->setIcon(
+		Style::getPixmap(":/gui/icons/minus.svg", Style::getColor(json::theme::content_inverse)));
+	Style::setStyle(m_spinBoxDownButton, style::properties::button::spinboxButton);
+	m_spinBoxDownButton->setFixedSize(size, size);
 
 	QLayout *buttonWidgetLayout;
 	QLayout *spinboxWidgetLayout;
@@ -67,7 +69,6 @@ TitleSpinBox::TitleSpinBox(QString title, bool isCompact, QWidget *parent)
 	if(isCompact) {
 		m_titleLabel->setText(m_titleLabel->text().toUpper());
 		m_titleLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-		StyleHelper::IIOCompactLabel(m_titleLabel, "IIOTitleLabel");
 		m_lineedit->setAlignment(Qt::AlignRight);
 
 		buttonWidgetLayout = new QHBoxLayout(buttonWidget);
