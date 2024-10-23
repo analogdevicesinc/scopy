@@ -182,6 +182,11 @@ void CollapsableMenuControlButton::add(QWidget *ch)
 
 void CollapsableMenuControlButton::remove(QWidget *ch) { m_contLayout->removeWidget(ch); }
 
+int CollapsableMenuControlButton::count()
+{
+	return m_contLayout->count();
+}
+
 MenuControlButton *CollapsableMenuControlButton::getControlBtn() { return m_ctrl; }
 
 #include "moc_menucontrolbutton.cpp"
