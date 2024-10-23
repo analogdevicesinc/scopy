@@ -12,10 +12,10 @@ QCheckBox::indicator[&&property&&=true] {
 	image: none;
 }
 QCheckBox::indicator[&&property&&=true]:unchecked {
-	image: url(&sba_cmb_box_arrow_right&);
+	image: url(&sba_cmb_box_arrow&);
 	background-color: transparent;
 }
 QCheckBox::indicator[&&property&&=true]:checked {
-	image: url(&sba_cmb_box_arrow&);
+	image: url(&sba_cmb_box_arrow_right&);
 	background-color: transparent;
 }
