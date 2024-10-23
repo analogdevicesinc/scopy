@@ -3,7 +3,6 @@
 
 #include <QLineEdit>
 #include <QVBoxLayout>
-#include <stylehelper.h>
 #include <widgets/smallprogressbar.h>
 #include "scopy-gui_export.h"
 
