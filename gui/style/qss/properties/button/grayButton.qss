@@ -2,6 +2,7 @@ QPushButton[&&property&&=true] {
 	text-align:left;
 	height: &unit_2&;
 	background-color: &interactive_subtle_idle&;
+	color: &content_inverse&;
 	border-radius: &radius_1&;
 	text-align:center;
 }
