@@ -207,7 +207,7 @@ DMM::DMM(libm2k::context::M2k *m2k, QString uri, Filter *filt, ToolMenuEntry *tm
 	wheelEventGuard->installEventRecursively(ui->widget_2);
 	readPreferences();
 
-	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/voltmeter");
+	ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/voltmeter.html");
 
 	for(unsigned int i = 0; i < m_adc_nb_channels; i++) {
 		m_gainHistory.push_back(std::deque<libm2k::analog::M2K_RANGE>(m_gainHistorySize));
