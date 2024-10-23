@@ -104,6 +104,7 @@ public:
 
 	void add(QWidget *ch) override;
 	void remove(QWidget *ch) override;
+	int count();
 	MenuControlButton *getControlBtn();
 	MenuControlButton *header() override { return m_ctrl; }
 
