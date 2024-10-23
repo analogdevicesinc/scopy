@@ -23,6 +23,7 @@
 #include "ad74413r/buffermenuview.h"
 #include "swiot_logging_categories.h"
 
+#include <QDesktopServices>
 #include <iio.h>
 #include <measurementlabel.h>
 #include <plotinfo.h>
@@ -594,6 +595,11 @@ void Ad74413r::setupToolTemplate()
 	m_singleBtn->setEnabled(false);
 	m_singleBtn->setChecked(false);
 	m_configBtn = createConfigBtn();
+
+	connect(m_infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+		QDesktopServices::openUrl(
+			QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/ad74413r.html"));
+	});
 
 	MenuControlButton *measure = new MenuControlButton(this);
 	setupMeasureButtonHelper(measure);

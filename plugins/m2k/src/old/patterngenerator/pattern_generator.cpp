@@ -161,7 +161,7 @@ PatternGenerator::PatternGenerator(libm2k::context::M2k *m2k, Filter *filt, Tool
 	api->setObjectName(Filter::tool_name(TOOL_PATTERN_GENERATOR));
 	ScopyJS::GetInstance()->registerApi(api);
 
-	m_ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/pattgen");
+	m_ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/pattern_generator.html");
 }
 
 void PatternGenerator::readPreferences()

@@ -22,6 +22,7 @@
 #include "adcinstrument.h"
 #include <pluginbase/resourcemanager.h>
 #include <gui/smallOnOffSwitch.h>
+#include <QDesktopServices>
 #include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_ADCINSTRUMENT, "ADCInstrument")
@@ -70,6 +71,10 @@ void ADCInstrument::setupToolLayout()
 	printPlotManager = new PrintPlotManager(this);
 	addBtn = new AddBtn(this);
 	removeBtn = new RemoveBtn(this);
+
+	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/adc/adc.html"));
+	});
 
 	m_sync = new QPushButton("Sync");
 	m_sync->setFixedWidth(150);
