@@ -147,6 +147,8 @@ void MenuControlButton::applyStylesheet()
 		// default style
 		break;
 	}
+
+	Style::setStyle(m_label, style::properties::label::menuMedium, "idle");
 	StyleHelper::MenuControlButton(m_btn, "btn");
 }
 
