@@ -29,8 +29,10 @@ MenuControlButton::MenuControlButton(QWidget *parent)
 	lay->addWidget(m_btn);
 	applyStylesheet();
 
-	connect(this, &QAbstractButton::toggled, this,
-		[=](bool b) { setDynamicProperty(this, "selected", b); }); // Hackish - QStyle should be implemented
+	connect(this, &QAbstractButton::toggled, this, [=](bool b) {
+		setDynamicProperty(this, "selected", b);
+		Style::setStyle(m_label, style::properties::label::menuMedium, b ? "selected" : "idle");
+	}); // Hackish - QStyle should be implemented
 
 	dblClickToOpenMenu = QMetaObject::Connection();
 	openMenuChecksThis = QMetaObject::Connection();
@@ -124,7 +126,6 @@ void MenuControlButton::applyStylesheet()
 		// default style
 		break;
 	}
-	Style::setStyle(m_label, style::properties::label::menuMedium);
 	StyleHelper::MenuControlButton(m_btn, "btn");
 }
 
@@ -161,10 +162,7 @@ void CollapsableMenuControlButton::add(QWidget *ch)
 
 void CollapsableMenuControlButton::remove(QWidget *ch) { m_contLayout->removeWidget(ch); }
 
-int CollapsableMenuControlButton::count()
-{
-	return m_contLayout->count();
-}
+int CollapsableMenuControlButton::count() { return m_contLayout->count(); }
 
 MenuControlButton *CollapsableMenuControlButton::getControlBtn() { return m_ctrl; }
 
