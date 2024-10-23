@@ -29,6 +29,7 @@
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/tooltemplate.h>
+#include <QDesktopServices>
 #include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_PQM_RMS, "PqmRms")
@@ -51,6 +52,12 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	tool->centralContainer()->setVisible(true);
 	tool->topContainerMenuControl()->setVisible(false);
 	instrumentLayout->addWidget(tool);
+
+	InfoBtn *infoBtn = new InfoBtn(this);
+	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
+	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/pqm/rms.html"));
+	});
 
 	QWidget *central = new QWidget(this);
 	QHBoxLayout *centralLayout = new QHBoxLayout();
