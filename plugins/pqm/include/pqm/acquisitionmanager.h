@@ -51,7 +51,7 @@ private:
 
 	iio_context *m_ctx;
 	iio_buffer *m_buffer;
-	PqmDataLogger *m_pqmLog;
+	// PqmDataLogger *m_pqmLog;
 
 	QTimer *m_pingTimer = nullptr;
 	PingTask *m_pingTask = nullptr;

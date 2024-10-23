@@ -11,14 +11,14 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QOb
 	, m_ctx(ctx)
 	, m_pingTask(pingTask)
 	, m_buffer(nullptr)
-	, m_pqmLog(nullptr)
+// , m_pqmLog(nullptr)
 {
 	m_readFw = new QFutureWatcher<void>(this);
 	m_setFw = new QFutureWatcher<void>(this);
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(dev) {
 		// might need to set a trigger for the pqm device
-		m_pqmLog = new PqmDataLogger(this);
+		// m_pqmLog = new PqmDataLogger(this);
 		m_hasFwVers = iio_device_find_attr(dev, "fw_version");
 		readPqmAttributes();
 		enableBufferChnls(dev);
@@ -31,7 +31,7 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QOb
 		connect(m_pingTimer, &QTimer::timeout, this, &AcquisitionManager::pingTimerTimeout);
 		connect(m_readFw, &QFutureWatcher<void>::finished, this, &AcquisitionManager::onReadFinished,
 			Qt::QueuedConnection);
-		connect(this, &AcquisitionManager::logData, m_pqmLog, &PqmDataLogger::logPressed);
+		// connect(this, &AcquisitionManager::logData, m_pqmLog, &PqmDataLogger::logPressed);
 	} else {
 		qWarning(CAT_PQM_ACQ) << "The PQM device is not available!";
 	}
@@ -73,7 +73,7 @@ void AcquisitionManager::enableBufferChnls(iio_device *dev)
 		QString chName(iio_channel_get_name(chnl));
 		m_chnlsName.push_back(chName);
 	}
-	m_pqmLog->setChnlsName(m_chnlsName);
+	// m_pqmLog->setChnlsName(m_chnlsName);
 }
 
 void AcquisitionManager::toolEnabled(bool en, QString toolName)
@@ -110,10 +110,14 @@ void AcquisitionManager::readData()
 {
 	QMutexLocker locker(&mutex);
 	if(m_tools["rms"] || m_tools["harmonics"] || m_tools["settings"]) {
+		qDebug(CAT_PQM_ACQ) << "[START] Read pqm attributes! THREAD ID:" << thread()->currentThreadId();
 		m_attrHaveBeenRead = readPqmAttributes();
+		qDebug(CAT_PQM_ACQ) << "[FINISH] Read pqm attributes! THREAD ID:" << thread()->currentThreadId();
 	}
 	if(m_tools["waveform"]) {
+		qDebug(CAT_PQM_ACQ) << "[START] Read buffer! THREAD ID:" << thread()->currentThreadId();
 		m_buffHaveBeenRead = readBufferedData();
+		qDebug(CAT_PQM_ACQ) << "[FINISH] Read buffer! THREAD ID:" << thread()->currentThreadId();
 	}
 }
 
@@ -142,10 +146,10 @@ bool AcquisitionManager::readPqmAttributes()
 			attrName = iio_channel_get_attr(chnl, j);
 			iio_channel_attr_read(chnl, attrName, dest, MAX_ATTR_SIZE);
 			m_pqmAttr[chnlId][attrName] = QString(dest);
-			m_pqmLog->acquireAttrData(attrName, dest, chnlId);
+			// m_pqmLog->acquireAttrData(attrName, dest, chnlId);
 		}
 	}
-	m_pqmLog->log();
+	// m_pqmLog->log();
 	return true;
 }
 
@@ -173,11 +177,11 @@ bool AcquisitionManager::readBufferedData()
 		chnlIdx = samplesCounter % m_chnlsName.size();
 		chnl = m_chnlsName[chnlIdx];
 		double d_ptr = convertFromHwToHost((int)*ptr, chnl);
-		m_pqmLog->acquireBufferData(d_ptr, chnlIdx);
+		// m_pqmLog->acquireBufferData(d_ptr, chnlIdx);
 		m_bufferData[chnl].push_back(d_ptr);
 		samplesCounter++;
 	}
-	m_pqmLog->log();
+	// m_pqmLog->log();
 	return true;
 }
 
@@ -200,8 +204,10 @@ void AcquisitionManager::onReadFinished()
 void AcquisitionManager::pingTimerTimeout()
 {
 	QMutexLocker locker(&mutex);
+	qDebug(CAT_PQM_ACQ) << "[START] Ping! THREAD ID:" << thread()->currentThreadId();
 	m_pingTask->start();
 	m_pingTask->wait(THREAD_FINISH_TIMEOUT);
+	qDebug(CAT_PQM_ACQ) << "[FINISH] Ping! THREAD ID:" << thread()->currentThreadId();
 }
 
 double AcquisitionManager::convertFromHwToHost(int value, QString chnlId)
@@ -231,9 +237,13 @@ void AcquisitionManager::stopPing() { m_pingTimer->stop(); }
 void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 {
 	QMutexLocker locker(&mutex);
+	qDebug(CAT_PQM_ACQ) << "[START] Set data! THREAD ID:" << thread()->currentThreadId();
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
-	if(!dev)
+	if(!dev) {
+		qWarning(CAT_PQM_ACQ) << "Device is unavailable!";
+		qDebug(CAT_PQM_ACQ) << "[FINISH] Set data! THREAD ID:" << thread()->currentThreadId();
 		return;
+	}
 	const QStringList keys = attr[DEVICE_PQM].keys();
 	for(const QString &key : keys) {
 		if(m_pqmAttr[DEVICE_PQM].contains(key) &&
@@ -243,19 +253,24 @@ void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 			iio_device_attr_write(dev, key.toStdString().c_str(), newVal.toStdString().c_str());
 		}
 	}
+	qDebug(CAT_PQM_ACQ) << "[FINISH] Set data! THREAD ID:" << thread()->currentThreadId();
 }
 
 void AcquisitionManager::setProcessData(bool en)
 {
 	QMutexLocker locker(&mutex);
+	qDebug(CAT_PQM_ACQ) << "[START] Set process data! THREAD ID:" << thread()->currentThreadId();
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(!dev) {
+		qWarning(CAT_PQM_ACQ) << "Device is unavailable!";
+		qDebug(CAT_PQM_ACQ) << "[FINISH] Set process data! THREAD ID:" << thread()->currentThreadId();
 		return;
 	}
 	int ret = iio_device_attr_write_bool(dev, "process_data", en);
 	if(ret < 0) {
 		qInfo(CAT_PQM_ACQ) << "Cannot write process_data attribute!";
 	}
+	qDebug(CAT_PQM_ACQ) << "[FINISH] Set process data! THREAD ID:" << thread()->currentThreadId();
 }
 
 bool AcquisitionManager::hasFwVers() const { return m_hasFwVers; }
