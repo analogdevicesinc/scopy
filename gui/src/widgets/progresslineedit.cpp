@@ -1,4 +1,5 @@
 #include "progresslineedit.h"
+#include <style.h>
 
 using namespace scopy;
 
@@ -7,7 +8,7 @@ ProgressLineEdit::ProgressLineEdit(QWidget *parent)
 	, m_lineEdit(new QLineEdit(this))
 	, m_progressBar(new SmallProgressBar(this))
 {
-	m_progressBar->setStyleSheet("background-color: grey;");
+	Style::setStyle(m_lineEdit, style::properties::widget::solidBorder);
 
 	setLayout(new QVBoxLayout(this));
 	layout()->addWidget(m_lineEdit);
