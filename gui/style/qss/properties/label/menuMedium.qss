@@ -4,3 +4,17 @@ QWidget[&&property&&=true]  {
 	font-size: &font_size_1&;
 	text-align: left;
 }
+QWidget[&&property&&="selected"]  {
+	color: &content_inverse&;
+	min-width: 50;
+	font-weight: 700;
+	font-size: &font_size_1&;
+	text-align: left;
+}
+QWidget[&&property&&="idle"]  {
+	color: &content_default&;
+	min-width: 50;
+	font-weight: 700;
+	font-size: &font_size_1&;
+	text-align: left;
+}
