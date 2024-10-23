@@ -7,6 +7,7 @@
 #include <QPushButton>
 
 #include <deviceicon.h>
+#include <style.h>
 
 using namespace scopy;
 ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
@@ -18,6 +19,11 @@ ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
 	auto &&hc = is->getHomepageControls();
 	auto &&db = ui->wDeviceBrowser;
 	add = new ScopyHomeAddPage(this, pm);
+
+	ui->container->setStyleSheet(".QWidget#container { background-color: " +
+				     Style::getAttribute(json::theme::background_subtle) + "; }");
+	Style::setStyle(ui->horizontalLayout_2, style::properties::widget::basicComponent);
+	Style::setStyle(ui->wInfoPageStack, style::properties::widget::basicComponent);
 
 	is->add("home", new ScopyHomeInfoPage());
 	is->add("add", add);
@@ -71,6 +77,6 @@ void ScopyHomePage::disconnectDevice(QString id)
 	db->disconnectDevice(id);
 }
 
-QPushButton *ScopyHomePage::scanControlBtn() { return ui->btnScan; }
+QCheckBox *ScopyHomePage::scanControlBtn() { return ui->btnScan; }
 
 #include "moc_scopyhomepage.cpp"

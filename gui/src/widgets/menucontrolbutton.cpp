@@ -1,3 +1,4 @@
+#include "style.h"
 #include <dynamicWidget.h>
 #include <pluginbase/preferences.h>
 #include <stylehelper.h>
@@ -19,11 +20,12 @@ MenuControlButton::MenuControlButton(QWidget *parent)
 	m_chk = new QCheckBox("", this);
 	m_label = new QLabel("", this);
 	m_btn = new QPushButton("", this);
-	m_color = StyleHelper::getColor("ScopyBlue");
+	m_color = Style::getAttribute(json::theme::interactive_primary_idle);
 	m_cs = CS_SQUARE;
 
 	lay->addWidget(m_chk);
 	lay->addWidget(m_label);
+	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
 	lay->addWidget(m_btn);
 	applyStylesheet();
 
@@ -113,16 +115,16 @@ void MenuControlButton::applyStylesheet()
 		StyleHelper::ColoredCircleCheckbox(m_chk, m_color, "chk");
 		break;
 	case CS_SQUARE:
-		StyleHelper::ColoredSquareCheckbox(m_chk, 0xFFFFFF, "chk");
+		StyleHelper::ColoredSquareCheckbox(m_chk, Style::getAttribute(json::theme::content_default), "chk");
 		break;
 	case CS_COLLAPSE:
 		StyleHelper::CollapseCheckbox(m_chk, "chk");
 		break;
 	default:
-		StyleHelper::BlueSquareCheckbox(m_chk, "chk");
+		// default style
 		break;
 	}
-	StyleHelper::MenuControlLabel(m_label, "name");
+	Style::setStyle(m_label, style::properties::label::menuMedium);
 	StyleHelper::MenuControlButton(m_btn, "btn");
 }
 

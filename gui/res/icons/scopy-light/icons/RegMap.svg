@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="24"
+   height="24"
+   viewBox="0 0 24 24"
+   fill="none"
+   version="1.1"
+   id="svg20"
+   sodipodi:docname="RegMap.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
+  <metadata
+     id="metadata26">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs24" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="723"
+     inkscape:window-height="480"
+     id="namedview22"
+     showgrid="false"
+     inkscape:zoom="9.8333333"
+     inkscape:cx="12"
+     inkscape:cy="12"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg20" />
+  <rect
+     width="24"
+     height="24"
+     fill="white"
+     opacity="0"
+     id="rect2"
+     style="fill:#000000;fill-opacity:1;opacity:0" />
+  <path
+     fill-rule="evenodd"
+     clip-rule="evenodd"
+     d="M3 4V8H11V4H3Z"
+     fill="#ffffff"
+     opacity="0.6"
+     id="path4"
+     style="fill:#000000;fill-opacity:1;opacity:1" />
+  <path
+     fill-rule="evenodd"
+     clip-rule="evenodd"
+     d="M13 4V8H21V4H13Z"
+     fill="#ffffff"
+     opacity="0.6"
+     id="path6"
+     style="fill:#000000;fill-opacity:1;opacity:1" />
+  <path
+     fill-rule="evenodd"
+     clip-rule="evenodd"
+     d="M3 10V12H11V10H3Z"
+     fill="#ffffff"
+     opacity="0.6"
+     id="path8"
+     style="fill:#000000;fill-opacity:1;opacity:1" />
+  <path
+     fill-rule="evenodd"
+     clip-rule="evenodd"
+     d="M3 14V16H11V14H3Z"
+     fill="#ffffff"
+     opacity="0.6"
+     id="path10"
+     style="fill:#000000;fill-opacity:1;opacity:1" />
+  <path
+     fill-rule="evenodd"
+     clip-rule="evenodd"
+     d="M3 18V20H11V18H3Z"
+     fill="#ffffff"
+     opacity="0.6"
+     id="path12"
+     style="fill:#000000;fill-opacity:1;opacity:1" />
+  <path
+     fill-rule="evenodd"
+     clip-rule="evenodd"
+     d="M13 10V12H21V10H13Z"
+     fill="#ffffff"
+     opacity="0.6"
+     id="path14"
+     style="fill:#000000;fill-opacity:1;opacity:1" />
+  <path
+     fill-rule="evenodd"
+     clip-rule="evenodd"
+     d="M13 14V16H21V14H13Z"
+     fill="#ffffff"
+     opacity="0.6"
+     id="path16"
+     style="fill:#000000;fill-opacity:1;opacity:1" />
+  <path
+     fill-rule="evenodd"
+     clip-rule="evenodd"
+     d="M13 18V20H21V18H13Z"
+     fill="#ffffff"
+     opacity="0.6"
+     id="path18"
+     style="fill:#000000;fill-opacity:1;opacity:1" />
+</svg>

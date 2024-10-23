@@ -4,6 +4,7 @@
 #include <datamonitorstylehelper.hpp>
 #include <menucontrolbutton.h>
 #include <menusectionwidget.h>
+#include <style.h>
 #include <datamonitor/readabledatamonitormodel.hpp>
 
 using namespace scopy;
@@ -60,14 +61,16 @@ MonitorSelectionMenu::MonitorSelectionMenu(QMap<QString, DataMonitorModel *> *mo
 
 void MonitorSelectionMenu::generateDeviceSection(QString device, bool import)
 {
-	MenuCollapseSection *devMonitorsSection = new MenuCollapseSection(
-		device, MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_COMPOSITEWIDGET, this);
+	CollapsableMenuControlButton *devMonitorsSection = new CollapsableMenuControlButton(this);
+	devMonitorsSection->getControlBtn()->button()->setVisible(false);
+	devMonitorsSection->getControlBtn()->setName(device);
 
 	if(import) {
 
 		QPushButton *removeBtn = new QPushButton(devMonitorsSection);
 		removeBtn->setMaximumSize(25, 25);
-		removeBtn->setIcon(QIcon(":/gui/icons/orange_close.svg"));
+		removeBtn->setIcon(Style::getPixmap(":/gui/icons/orange_close.svg",
+						    Style::getColor(json::theme::content_inverse)));
 
 		HoverWidget *removeHover = new HoverWidget(removeBtn, devMonitorsSection, devMonitorsSection);
 		removeHover->setStyleSheet("background-color: transparent; border: 0px;");
@@ -85,8 +88,7 @@ void MonitorSelectionMenu::generateDeviceSection(QString device, bool import)
 		deviceChannelsWidget->layout()->addWidget(devMonitorsSection);
 	}
 
-	DataMonitorStyleHelper::MonitorSelectionMenuMenuCollapseSectionStyle(devMonitorsSection);
-
+	devMonitorsSection->header()->setChecked(false);
 	deviceMap.insert(device, devMonitorsSection);
 }
 
@@ -98,7 +100,7 @@ void MonitorSelectionMenu::addMonitor(DataMonitorModel *monitor)
 
 	MenuControlButton *monitorChannel = new MenuControlButton(deviceMap.value(monitor->getDeviceName()));
 	monitorChannel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
-	deviceMap.value(monitor->getDeviceName())->contentLayout()->addWidget(monitorChannel);
+	deviceMap.value(monitor->getDeviceName())->add(monitorChannel);
 	monitorChannel->setName(monitor->getShortName());
 	monitorChannel->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
 	monitorChannel->setOpenMenuChecksThis(true);

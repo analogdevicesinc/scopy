@@ -11,7 +11,6 @@
 #include <QVBoxLayout>
 
 #include <gui/stylehelper.h>
-#include <gui/widgets/menubigswitch.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/menuheader.h>
@@ -130,7 +129,7 @@ QWidget *GRTimeChannelAddon::createYAxisMenu(QWidget *parent)
 QPushButton *GRTimeChannelAddon::createSnapshotButton(QWidget *parent)
 {
 	QPushButton *snapBtn = new QPushButton("Snapshot", parent);
-	StyleHelper::BlueButton(snapBtn);
+	StyleHelper::BasicButton(snapBtn);
 
 	connect(snapBtn, &QPushButton::clicked, this, [=]() {
 		std::vector<float> x, y;
@@ -161,7 +160,7 @@ QWidget *GRTimeChannelAddon::createMenu(QWidget *parent)
 	wScroll->setLayout(layScroll);
 	scroll->setWidgetResizable(true);
 	scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	// if ScrollBarAlwaysOn - layScroll->setContentsMargins(0,0,6,0);
 
 	scroll->setWidget(wScroll);
@@ -461,7 +460,7 @@ QWidget *ImportChannelAddon::createYAxisMenu(QWidget *parent)
 QPushButton *ImportChannelAddon::createForgetButton(QWidget *parent)
 {
 	QPushButton *btn = new QPushButton("Delete", parent);
-	StyleHelper::BlueButton(btn);
+	StyleHelper::BasicButton(btn);
 
 	connect(btn, &QPushButton::clicked, this, [=]() { Q_EMIT requestDeleteChannel(this); });
 

@@ -1,0 +1,6 @@
+*[&&property&&=true] {
+	height: &unit_3&;
+	background-image: url(:/gui/icons/&icon_theme_folder&/icons/logo.svg);
+	background-repeat: no-repeat;
+	background-position: center center;
+}

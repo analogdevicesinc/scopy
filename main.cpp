@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+#include <style.h>
 
 #include <core/application_restarter.h>
 #include <core/cmdlinehandler.h>
@@ -104,8 +105,7 @@ int main(int argc, char *argv[])
 	printRuntimeEnvironmentInfo();
 	ApplicationRestarter restarter(QString::fromLocal8Bit(argv[0]));
 	a.setWindowIcon(QIcon(":/gui/icon.ico"));
-	a.setStyle("Fusion");
-	a.setStyleSheet(Util::loadStylesheetFromFile(":/gui/stylesheets/default.qss"));
+
 	ScopyMainWindow w;
 	w.show();
 

@@ -1,3 +1,4 @@
+#include <style.h>
 #include <stylehelper.h>
 #include <widgets/menusectionwidget.h>
 

@@ -36,6 +36,8 @@
 #include <QRegExpValidator>
 #include <QVBoxLayout>
 #include <qmath.h>
+#include <iostream>
+#include <style.h>
 
 using namespace std;
 using namespace scopy;
@@ -68,6 +70,17 @@ SpinBoxA::SpinBoxA(QWidget *parent)
 	connect(ui->SBA_LineEdit, SIGNAL(editingFinished()), SLOT(onLineEditTextEdited()));
 	connect(ui->SBA_UpButton, SIGNAL(clicked()), SLOT(onUpButtonPressed()));
 	connect(ui->SBA_DownButton, SIGNAL(clicked()), SLOT(onDownButtonPressed()));
+	int size = Style::getDimension(json::global::unit_3);
+
+	ui->SBA_UpButton->setIcon(
+		Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
+	Style::setStyle(ui->SBA_UpButton, style::properties::button::basicButton, true, true);
+	ui->SBA_UpButton->setFixedSize(size, size);
+
+	ui->SBA_DownButton->setIcon(
+		Style::getPixmap(":/gui/icons/minus.svg", Style::getColor(json::theme::content_inverse)));
+	Style::setStyle(ui->SBA_DownButton, style::properties::button::basicButton, true, true);
+	ui->SBA_DownButton->setFixedSize(size, size);
 
 	connect(this, SIGNAL(valueChanged(double)), ui->SBA_CompletionCircle, SLOT(setValueDouble(double)));
 	connect(ui->SBA_CompletionCircle, SIGNAL(toggled(bool)), SLOT(setFineMode(bool)));
@@ -238,8 +251,6 @@ QPushButton *SpinBoxA::downButton() { return ui->SBA_DownButton; }
 QLabel *SpinBoxA::nameLabel() { return ui->SBA_Label; }
 
 QLineEdit *SpinBoxA::lineEdit() { return ui->SBA_LineEdit; }
-
-QFrame *SpinBoxA::line() { return ui->SBA_Line; }
 
 QComboBox *SpinBoxA::comboBox() { return ui->SBA_Combobox; }
 

@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QComboBox>
 #include <QLineEdit>
+#include <style.h>
 #include "dynamicWidget.h"
 #include <pluginbase/preferences.h>
 #include <qboxlayout.h>
@@ -28,14 +29,14 @@ RegmapStyleHelper *RegmapStyleHelper::GetInstance()
 void RegmapStyleHelper::initColorMap()
 {
 	auto sh = RegmapStyleHelper::GetInstance();
-	sh->colorMap.insert("ScopyBlue", "#4A64FF");
-	sh->colorMap.insert("UIElementBackground", "#272730");
-	sh->colorMap.insert("LabelText", "#FFFFFF");
+	sh->colorMap.insert("ScopyBlue", Style::getAttribute(json::theme::interactive_primary_idle));
+	sh->colorMap.insert("UIElementBackground", Style::getAttribute(json::theme::interactive_subtle_disabled));
+	sh->colorMap.insert("LabelText", Style::getAttribute(json::theme::content_default));
 	sh->colorMap.insert("LabelText2", "rgba(255, 255, 255, 150)");
-	sh->colorMap.insert("ScopyBackground", "#141416");
-	sh->colorMap.insert("WidgetBackground", "#272730");
-	sh->colorMap.insert("ButtonPressed", "#2a44df");
-	sh->colorMap.insert("ButtonHover", "#4a34ff");
+	sh->colorMap.insert("ScopyBackground", Style::getAttribute(json::theme::interactive_primary_disabled));
+	sh->colorMap.insert("WidgetBackground", Style::getAttribute(json::theme::interactive_subtle_disabled));
+	sh->colorMap.insert("ButtonPressed", Style::getAttribute(json::theme::content_default));
+	sh->colorMap.insert("ButtonHover", Style::getAttribute(json::theme::interactive_primary_idle));
 	sh->colorMap.insert("ButtonDisabled", "grey");
 	sh->colorMap.insert("Red", "red");
 	sh->colorMap.insert("Transparent", "transparent");
@@ -72,15 +73,15 @@ QString RegmapStyleHelper::FrameWidgetStyle()
                                  border-right: 2px solid black;
                                  border-left: 2px solid black;
                                  border-bottom: 2px solid black;
-                                 background-color: &&background&& ;
+                                 background-color: &&interactive_subtle_disabled&& ;
                         }
 
                         QWidget  {
-                            background-color: &&background&& ;
+                            background-color: &&interactive_subtle_disabled&& ;
                         }
 
                         )css");
-	style.replace("&&background&&", RegmapStyleHelper::getColor("WidgetBackground"));
+	style.replace("&&interactive_subtle_disabled&&", RegmapStyleHelper::getColor("WidgetBackground"));
 
 	return style;
 }
@@ -118,38 +119,12 @@ void RegmapStyleHelper::bigTextLabel(QLabel *label, QString objectName)
 	label->setStyleSheet(RegmapStyleHelper::bigTextLabelStyle());
 }
 
-QString RegmapStyleHelper::BlueButtonStyle()
-{
-	QString style = QString(R"css(
-                        QPushButton {
-                             background-color: &&buttonBackground&& ;
-                             border-radius: 4px;
-                             font-size: 14px;
-                             color: white;
-                             height: 30px;
-                             min-width: 150px;
-
-                        }
-                        QPushButton:pressed{ background-color: &&pressedColor&& ; }
-                        QPushButton:hover{ background-color: &&hoverColor&& ; }
-                        QPushButton:disabled { background-color: &&diabledColor&& ; }
-
-                        )css");
-
-	style.replace("&&buttonBackground&&", RegmapStyleHelper::getColor("ScopyBlue"));
-	style.replace("&&pressedColor&&", RegmapStyleHelper::getColor("ButtonPressed"));
-	style.replace("&&hoverColor&&", RegmapStyleHelper::getColor("ButtonHover"));
-	style.replace("&&diabledColor&&", RegmapStyleHelper::getColor("ButtonDisabled"));
-
-	return style;
-}
-
 void RegmapStyleHelper::BlueButton(QPushButton *btn, QString objectName)
 {
 	if(!objectName.isEmpty())
 		btn->setObjectName(objectName);
 
-	btn->setStyleSheet(RegmapStyleHelper::BlueButtonStyle());
+	Style::setStyle(btn, style::properties::button::basicButton);
 }
 
 QString RegmapStyleHelper::checkBoxStyle()
@@ -212,30 +187,12 @@ void RegmapStyleHelper::regmapSettingsMenu(RegisterMapSettingsMenu *settings, QS
 	if(!objectName.isEmpty() && settings)
 		settings->setObjectName(objectName);
 
-	QString style = QString(R"css(
-                        QWidget {
-                                 background-color: &&background&& ;
-                        }
-                        QWidget {
-                                 font: normal;
-                                 color: &&textColor&& ;
-                                 font-size: 16px;
-                        }
-                        )css");
-
-	style.replace("&&background&&", RegmapStyleHelper::getColor("Transparent"));
-	style.replace("&&textColor&&", RegmapStyleHelper::getColor("LabelText"));
-
-	settings->pathButton->setStyleSheet(RegmapStyleHelper::BlueButtonStyle());
-	settings->registerDump->setStyleSheet(RegmapStyleHelper::BlueButtonStyle());
-	settings->readInterval->setStyleSheet(RegmapStyleHelper::BlueButtonStyle());
-	settings->writeListOfValuesButton->setStyleSheet(RegmapStyleHelper::BlueButtonStyle());
-
-	RegmapStyleHelper::checkBox(settings->autoread);
+	Style::setStyle(settings->pathButton, style::properties::button::basicButton);
+	Style::setStyle(settings->registerDump, style::properties::button::basicButton);
+	Style::setStyle(settings->readInterval, style::properties::button::basicButton);
+	Style::setStyle(settings->writeListOfValuesButton, style::properties::button::basicButton);
 	RegmapStyleHelper::bigTextLabel(settings->hexaPrefix1);
 	RegmapStyleHelper::bigTextLabel(settings->hexaPrefix2);
-
-	settings->setStyleSheet(style);
 }
 
 void RegmapStyleHelper::grayBackgroundHoverWidget(QWidget *widget, QString objectName)
@@ -407,11 +364,9 @@ QString RegmapStyleHelper::grayLabelStyle()
                          font-size: 12px;
                          font-style: normal;
                          font-weight: normal;
-                         text-align: left;
-                         color: &&labelColor&& ;
+			 text-align: left;
                         }
-                        )css");
-	style.replace("&&labelColor&&", RegmapStyleHelper::getColor("LabelText2"));
+			)css");
 
 	return style;
 }
@@ -458,7 +413,7 @@ void RegmapStyleHelper::comboboxStyle(QComboBox *combobox, QString objectName)
 						}
 						QComboBox::drop-down {
 						 subcontrol-position: center right;
-						 border-image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
+						 border-image: url(:/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/sba_cmb_box_arrow.svg);
 						 width: 10px;
 						 height: 6px;
 						 font-size: 16px;
@@ -538,28 +493,16 @@ void RegmapStyleHelper::smallBlueButton(QPushButton *button, QString objectName)
 	if(!objectName.isEmpty())
 		button->setObjectName(objectName);
 
-	QString style = QString(R"css(
-						QPushButton {
-							 background-color: &&buttonBackground&& ;
-							 border-radius: 4px;
-							 font-size: 12px;
-							 color: white;
-						}
-						QPushButton:pressed{ background-color: &&pressedColor&& ; }
-						QPushButton:checked{ background-color: &&pressedColor&& ; }
-						QPushButton:hover{ background-color: &&hoverColor&& ; }
-						QPushButton:disabled { background-color: &&diabledColor&& ; }
-						)css");
-
-	style.replace("&&buttonBackground&&", RegmapStyleHelper::getColor("ScopyBlue"));
-	style.replace("&&pressedColor&&", RegmapStyleHelper::getColor("ButtonPressed"));
-	style.replace("&&hoverColor&&", RegmapStyleHelper::getColor("ButtonHover"));
-	style.replace("&&diabledColor&&", RegmapStyleHelper::getColor("ButtonDisabled"));
-
 	button->setFixedSize(16, 16);
-	button->setIconSize(QSize(30, 30));
 	button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	button->setStyleSheet(style);
+	Style::setStyle(button, style::properties::button::smallSquareIconButton, true, true);
+}
+
+void RegmapStyleHelper::iconBlueButton(QPushButton *button, QString objectName)
+{
+	if(!objectName.isEmpty())
+		button->setObjectName(objectName);
+	Style::setStyle(button, style::properties::button::squareIconButton, true, true);
 }
 
 QString RegmapStyleHelper::regmapControllerStyle(QWidget *widget, QString objectName)
@@ -575,12 +518,9 @@ QString RegmapStyleHelper::regmapControllerStyle(QWidget *widget, QString object
 						 font-style: normal;
 						 font-weight: normal;
 						 text-align: left;
-						 color: &&textColor&& ;
 						 border-bottom: 0px;
 						}
 						)css");
-
-	style.replace("&&textColor&&", RegmapStyleHelper::getColor("LabelText"));
 
 	style += RegmapStyleHelper::simpleWidgetStyle();
 
@@ -638,5 +578,5 @@ QString RegmapStyleHelper::sliderStyle()
 QString RegmapStyleHelper::getColorBasedOnValue(QString value)
 {
 	uint32_t colorIndex = Utils::convertQStringToUint32(value) % 16;
-	return Util::getColors().at(colorIndex);
+	return StyleHelper::getChannelColor(colorIndex);
 }

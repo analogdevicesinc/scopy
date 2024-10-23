@@ -1,6 +1,7 @@
 #include "plotwidget.h"
 
 #include "plotaxis.h"
+#include "style.h"
 
 #include <QDebug>
 #include <QLabel>
@@ -56,6 +57,8 @@ PlotWidget::PlotWidget(QWidget *parent)
 	setupPlotButtonManager();
 
 	m_plot->canvas()->installEventFilter(this);
+	Style::setBackgroundColor(m_plot, "transparent");
+	Style::setBackgroundColor(m_plot->canvas(), json::theme::background_plot, true);
 }
 
 void PlotWidget::setupNavigator()
@@ -367,7 +370,7 @@ void PlotWidget::printPlot(QPainter *painter, bool useSymbols)
 		// save current curve color
 		plotChColors.push_back(getChannels().at(i)->curve()->pen());
 		// get channel colors from StyleHelper
-		printPen.setColor(StyleHelper::getColor("CH" + QString::number(i)));
+		printPen.setColor(StyleHelper::getChannelColor(i));
 		printPen.setWidth(2);
 		getChannels().at(i)->curve()->setPen(printPen);
 		if(useSymbols) {

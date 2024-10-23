@@ -227,8 +227,7 @@ void LogDataToFile::loadData(QString path)
 			} else {
 				DataMonitorModel *channelModel = new DataMonitorModel(
 					monitorName,
-					StyleHelper::getColor(
-						"CH" + QString::number(QRandomGenerator::global()->bounded(0, 7))));
+					StyleHelper::getChannelColor(QRandomGenerator::global()->bounded(0, 7)));
 
 				channelModel->setShortName(it.key());
 				channelModel->setDeviceName(fileTitle);

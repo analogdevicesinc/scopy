@@ -8,6 +8,7 @@
 
 #include <QCheckBox>
 #include <QLoggingCategory>
+#include <style.h>
 #include <stylehelper.h>
 
 #include <iioutil/iioscantask.h>
@@ -322,7 +323,6 @@ QWidget *IioTabWidget::createAvlCtxWidget(QWidget *parent)
 	w->setLayout(layout);
 
 	m_avlCtxCb = new QComboBox(w);
-	StyleHelper::MenuComboBox(m_avlCtxCb, "ctx_combo");
 
 	m_btnScan = new AnimationPushButton(w);
 	setupBtnLdIcon(m_btnScan);
@@ -353,7 +353,6 @@ QWidget *IioTabWidget::createSerialSettWidget(QWidget *parent)
 	lineEditWidget->layout()->setMargin(0);
 	lineEditWidget->layout()->setSpacing(3);
 	QLabel *serialFrameLabel = new QLabel("Port config", lineEditWidget);
-	StyleHelper::MenuComboLabel(serialFrameLabel);
 
 	QRegExp re("[5-9]{1}(n|o|e|m|s){1}[1-2]{1}(x|r|d){0,1}$");
 	QRegExpValidator *validator = new QRegExpValidator(re, this);
@@ -382,7 +381,7 @@ QWidget *IioTabWidget::createUriWidget(QWidget *parent)
 	QWidget *w = new QWidget(parent);
 	QGridLayout *layout = new QGridLayout(w);
 	w->setLayout(layout);
-	StyleHelper::RoundedCornersWidget(w, "uriAddPage");
+	Style::setStyle(w, style::properties::widget::basicComponent);
 
 	QLabel *uriLabel = new QLabel("URI", w);
 	StyleHelper::MenuSmallLabel(uriLabel);
@@ -413,7 +412,7 @@ QWidget *IioTabWidget::createVerifyBtnWidget(QWidget *parent)
 
 	m_btnVerify = new AnimationPushButton(w);
 	setupBtnLdIcon(m_btnVerify);
-	StyleHelper::BlueButton(m_btnVerify);
+	StyleHelper::BasicButton(m_btnVerify);
 	m_btnVerify->setText("Verify");
 	m_btnVerify->setIconSize(QSize(30, 30));
 	m_btnVerify->setFixedWidth(128);

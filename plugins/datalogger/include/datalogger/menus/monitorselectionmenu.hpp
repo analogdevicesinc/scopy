@@ -6,7 +6,7 @@
 #include <QBoxLayout>
 #include <QButtonGroup>
 #include <QWidget>
-#include <menucollapsesection.h>
+#include <menucontrolbutton.h>
 #include <semiexclusivebuttongroup.h>
 
 namespace scopy {
@@ -36,7 +36,7 @@ private:
 	QWidget *importedChannelsWidget;
 	QVBoxLayout *layout;
 	QButtonGroup *m_monitorsGroup;
-	QMap<QString, MenuCollapseSection *> deviceMap;
+	QMap<QString, CollapsableMenuControlButton *> deviceMap;
 
 	void generateDeviceSection(QString device, bool import = false);
 };

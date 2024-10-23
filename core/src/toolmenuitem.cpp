@@ -7,6 +7,15 @@
 #include <utils.h>
 #include <pluginbase/toolmenuentry.h>
 #include <QLoggingCategory>
+#include "gui/dynamicWidget.h"
+#include "gui/utils.h"
+#include "qdebug.h"
+#include "style_properties.h"
+
+#include <QHBoxLayout>
+#include <QLoggingCategory>
+#include <QSpacerItem>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_TOOLMENUITEM, "ToolMenuItem")
 
@@ -21,7 +30,7 @@ ToolMenuItem::ToolMenuItem(QString uuid, QString name, QString icon, QWidget *pa
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	QVBoxLayout *lay = new QVBoxLayout(this);
 	setLayout(lay);
-	setFixedHeight(50);
+	setFixedHeight(Style::getDimension(json::global::unit_3));
 	lay->setSpacing(0);
 	lay->setContentsMargins(0, 0, 0, 0);
 
@@ -36,13 +45,12 @@ ToolMenuItem::ToolMenuItem(QString uuid, QString name, QString icon, QWidget *pa
 	toolLay->addWidget(m_toolBtn, Qt::AlignLeft);
 	toolLay->addWidget(m_toolRunBtn);
 
-	setDynamicProperty(m_toolRunBtn, "stopButton", true);
-	m_toolRunBtn->setMaximumSize(32, 32);
-	m_toolBtn->setMinimumHeight(42);
+	m_toolRunBtn->setMaximumWidth(Style::getDimension(json::global::unit_3));
 
 	m_toolBtn->setIcon(QIcon::fromTheme(m_icon));
 	m_toolBtn->setCheckable(true);
-	m_toolBtn->setIconSize(QSize(32, 32));
+	m_toolBtn->setIconSize(
+		QSize(Style::getDimension(json::global::unit_2_5), Style::getDimension(json::global::unit_2_5)));
 
 	m_toolRunBtn->setCheckable(true);
 	m_toolRunBtn->setText("");
@@ -52,13 +60,15 @@ ToolMenuItem::ToolMenuItem(QString uuid, QString name, QString icon, QWidget *pa
 
 	lay->addWidget(toolOption);
 
-	// Load stylesheets
-	setStyleSheet(Util::loadStylesheetFromFile(":/gui/stylesheets/toolMenuItem.qss"));
 	setAttribute(Qt::WA_StyledBackground, true);
 #ifdef __ANDROID__
 	setDynamicProperty(this, "allowHover", false);
 #else
-	setDynamicProperty(this, "allowHover", true);
+	m_toolBtn->setStyleSheet("text-align:left;");
+	Style::setStyle(m_toolRunBtn, style::properties::button::stopButton);
+	Style::setStyle(m_toolRunBtn, style::properties::widget::notInteractive);
+	Style::setStyle(m_toolBtn, style::properties::button::toolButton);
+
 	enableDoubleClick(true);
 #endif
 }

@@ -12,6 +12,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_EMU_ADD_PAGE, "EmuAddPage")
 using namespace scopy;
@@ -33,7 +34,7 @@ EmuWidget::EmuWidget(QWidget *parent)
 	QWidget *emuWidget = new QWidget(this);
 	QGridLayout *emuWidgetLay = new QGridLayout(emuWidget);
 	emuWidgetLay->setSpacing(10);
-	StyleHelper::RoundedCornersWidget(emuWidget, "emuWidgetTab");
+	Style::setStyle(emuWidget, style::properties::widget::basicComponent);
 
 	QLabel *demoLabel = new QLabel("Demo option", emuWidget);
 	StyleHelper::MenuSmallLabel(demoLabel);
@@ -327,7 +328,6 @@ QWidget *EmuWidget::createDemoOptWidget(QWidget *parent)
 	for(const QString &opt : m_availableOptions) {
 		m_demoOptCb->addItem(opt);
 	}
-	StyleHelper::MenuComboBox(m_demoOptCb, "demo_combo");
 	layout->addWidget(m_demoOptCb);
 	return w;
 }
@@ -395,7 +395,7 @@ void EmuWidget::initEnBtn(QWidget *parent)
 {
 	m_enDemoBtn = new AnimationPushButton(parent);
 	m_enDemoBtn->setText("Enable demo");
-	StyleHelper::BlueButton(m_enDemoBtn);
+	StyleHelper::BasicButton(m_enDemoBtn);
 	m_enDemoBtn->setFixedWidth(128);
 	QMovie *loadingIcon(new QMovie(this));
 	loadingIcon->setFileName(":/gui/loading.gif");

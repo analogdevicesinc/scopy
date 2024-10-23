@@ -1,5 +1,7 @@
 #include "toolmenu.h"
 #include <QScrollBar>
+#include "gui/dynamicWidget.h"
+#include <QDebug>
 
 using namespace scopy;
 
@@ -16,7 +18,7 @@ ToolMenu::ToolMenu(QWidget *parent)
 
 	m_layScroll = new QVBoxLayout();
 	m_layScroll->setMargin(0);
-	m_layScroll->setSpacing(10);
+	m_layScroll->setSpacing(20);
 
 	wScroll->setLayout(m_layScroll);
 	m_scroll->setWidgetResizable(true);

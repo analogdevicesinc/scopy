@@ -81,8 +81,6 @@ void DataMonitorSettings::init(QString title, QColor color)
 
 	QSpacerItem *spacer = new QSpacerItem(10, 10, QSizePolicy::Preferred, QSizePolicy::Expanding);
 	layout->addItem(spacer);
-
-	DataMonitorStyleHelper::DataMonitorSettingsStyle(this);
 }
 
 void DataMonitorSettings::plotYAxisMinValueUpdate(double value) { m_ymin->setValue(value); }

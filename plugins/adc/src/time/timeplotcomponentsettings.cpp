@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QLineEdit>
 #include <timeplotcomponentchannel.h>
+#include <style.h>
 
 using namespace scopy;
 using namespace scopy::adc;
@@ -109,7 +110,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	m_curve = new MenuPlotChannelCurveStyleControl(plotMenu);
 
 	m_deletePlot = new QPushButton("DELETE PLOT");
-	StyleHelper::BlueButton(m_deletePlot);
+	StyleHelper::BasicButton(m_deletePlot);
 	connect(m_deletePlot, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
 
 	yaxis->contentLayout()->setSpacing(2);
@@ -153,7 +154,8 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 
 	m_settingsPlotHover = new QPushButton("", nullptr);
 	m_settingsPlotHover->setMaximumSize(16, 16);
-	m_settingsPlotHover->setIcon(QIcon(":/gui/icons/scopy-default/icons/preferences.svg"));
+	m_settingsPlotHover->setIcon(
+		QIcon(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/preferences.svg"));
 
 	connect(m_settingsPlotHover, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestSettings(); });
 
