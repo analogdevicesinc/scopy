@@ -132,8 +132,7 @@ void Ad74413r::setupConnections()
 	connect(m_acqHandler, &BufferAcquisitionHandler::singleCaptureFinished, this,
 		&Ad74413r::onSingleCaptureFinished, Qt::QueuedConnection);
 
-	connect(m_timespanSpin, &MenuSpinbox::valueChanged, m_acqHandler,
-		&BufferAcquisitionHandler::onTimespanChanged);
+	connect(m_timespanSpin, &MenuSpinbox::valueChanged, m_acqHandler, &BufferAcquisitionHandler::onTimespanChanged);
 
 	connect(m_rstAcqTimer, &QTimer::timeout, this, [&]() {
 		m_rstAcqTimer->stop();
@@ -580,6 +579,7 @@ void Ad74413r::setupToolTemplate()
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *layout = new QHBoxLayout(this);
+	layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(layout);
 	StyleHelper::GetInstance()->initColorMap();
 
@@ -680,7 +680,7 @@ void Ad74413r::setupToolTemplate()
 QPushButton *Ad74413r::createConfigBtn()
 {
 	QPushButton *configBtn = new QPushButton();
-	StyleHelper::BlueGrayButton(configBtn, "config_btn");
+	Style::setStyle(configBtn, style::properties::button::squareIconButton);
 	configBtn->setFixedWidth(128);
 	configBtn->setCheckable(false);
 	configBtn->setText("Config");
