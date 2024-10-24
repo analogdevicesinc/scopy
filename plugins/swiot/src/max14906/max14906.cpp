@@ -32,6 +32,7 @@
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/stylehelper.h>
 #include <pluginbase/preferences.h>
+#include <style.h>
 
 using namespace scopy::swiot;
 
@@ -43,6 +44,7 @@ Max14906::Max14906(QString uri, ToolMenuEntry *tme, QWidget *parent)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *layout = new QHBoxLayout(this);
+	layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(layout);
 
 	// tool template configuration
@@ -308,7 +310,7 @@ QMainWindow *Max14906::createDockableMainWindow(const QString &title, DioDigital
 QPushButton *Max14906::createConfigBtn(QWidget *parent)
 {
 	QPushButton *configBtn = new QPushButton(parent);
-	StyleHelper::BlueGrayButton(configBtn, "back_btn");
+	Style::setStyle(configBtn, style::properties::button::squareIconButton);
 	configBtn->setFixedWidth(128);
 	configBtn->setCheckable(false);
 	configBtn->setText("Config");

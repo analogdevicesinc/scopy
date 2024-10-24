@@ -28,6 +28,7 @@
 #include <tutorialbuilder.h>
 #include <gui/stylehelper.h>
 #include <pluginbase/preferences.h>
+#include <style.h>
 
 using namespace scopy::swiot;
 
@@ -153,7 +154,7 @@ void Faults::pollFaults()
 QPushButton *Faults::createConfigBtn(QWidget *parent)
 {
 	QPushButton *configBtn = new QPushButton(parent);
-	StyleHelper::BlueGrayButton(configBtn, "back_btn");
+	Style::setStyle(configBtn, style::properties::button::squareIconButton);
 	configBtn->setFixedWidth(128);
 	configBtn->setCheckable(false);
 	configBtn->setText("Config");
