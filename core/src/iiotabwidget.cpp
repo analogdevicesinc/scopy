@@ -77,9 +77,14 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 	scanGrid->addWidget(ctxLabel, 1, 0);
 	scanGrid->addWidget(avlContextWidget, 1, 1);
 	scanGrid->addWidget(m_ctxUriLabel, 2, 1);
-
 	scanSection->add(scanWidget);
-	contentLay->addWidget(scanSection);
+
+	QWidget *scanContainer = new QWidget(parent);
+	scanContainer->setLayout(new QGridLayout(scanContainer));
+	Style::setStyle(scanContainer, style::properties::widget::border_interactive);
+	scanContainer->layout()->addWidget(scanSection);
+
+	contentLay->addWidget(scanContainer);
 
 	MenuSectionCollapseWidget *serialSection = new MenuSectionCollapseWidget(
 		"SERIAL", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
@@ -89,7 +94,12 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 	serialSettWidget->setEnabled(serialCompatible);
 	serialSection->add(serialSettWidget);
 
-	contentLay->addWidget(serialSection);
+	QWidget *serialContainer = new QWidget(parent);
+	serialContainer->setLayout(new QGridLayout(serialContainer));
+	Style::setStyle(serialContainer, style::properties::widget::border_interactive);
+	serialContainer->layout()->addWidget(serialSection);
+
+	contentLay->addWidget(serialContainer);
 
 	QWidget *uriWidget = createUriWidget(contentWidget);
 	contentLay->addWidget(uriWidget);
@@ -402,7 +412,7 @@ QWidget *IioTabWidget::createUriWidget(QWidget *parent)
 	QWidget *w = new QWidget(parent);
 	QGridLayout *layout = new QGridLayout(w);
 	w->setLayout(layout);
-	Style::setStyle(w, style::properties::widget::basicComponent);
+	Style::setStyle(w, style::properties::widget::border_interactive);
 
 	QLabel *uriLabel = new QLabel("URI", w);
 	StyleHelper::MenuSmallLabel(uriLabel);
