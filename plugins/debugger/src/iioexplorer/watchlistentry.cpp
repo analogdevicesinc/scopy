@@ -3,6 +3,8 @@
 #include <iio-widgets/guistrategy/comboguistrategy.h>
 #include <QHBoxLayout>
 #include <QComboBox>
+#include <gui/style.h>
+#include "style_properties.h"
 
 using namespace scopy::debugger;
 
@@ -86,13 +88,8 @@ void WatchListEntry::setupWidget(IIOWidget *widget)
 
 		m_combo = new QComboBox();
 		// TODO: maybe move these to the stylehelper as well?
-		m_combo->setStyleSheet(R"css(
-		QComboBox {
-			font-family: Open Sans;
-			border: none;
-			background-color: transparent;
-			font-size: 13px;
-		})css");
+		m_combo->setContentsMargins(0, 0, 0, 0);
+		Style::setStyle(m_combo, style::properties::debugger::watchListCombo);
 		wrapper->layout()->addWidget(m_combo);
 
 		QString options = widget->getDataStrategy()->optionalData();
@@ -105,13 +102,8 @@ void WatchListEntry::setupWidget(IIOWidget *widget)
 		m_valueUi = wrapper;
 	} else {
 		m_lineedit = new QLineEdit();
-		m_lineedit->setStyleSheet(R"css(
-		QLineEdit {
-			font-family: Open Sans;
-			border: none;
-			background-color: transparent;
-			font-size: 13px;
-		})css");
+		m_lineedit->setContentsMargins(0, 0, 0, 0);
+		Style::setStyle(m_lineedit, style::properties::debugger::watchListLineEdit);
 		m_lineedit->setText(widget->getDataStrategy()->data());
 		QObject::connect(m_lineedit, &QLineEdit::editingFinished, this, [this, widget]() {
 			QString text = m_lineedit->text();

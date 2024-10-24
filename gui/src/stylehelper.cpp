@@ -1089,21 +1089,6 @@ void StyleHelper::SplitterStyle(QSplitter *w, QString objectName)
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::TreeViewDebugger(QTreeView *w, QString objectName)
-{
-	if(!objectName.isEmpty()) {
-		w->setObjectName(objectName);
-	}
-
-	QString style = R"css(
-		QTreeView { color: &&content_default&&; show-decoration-selected: 0; }
-		QTreeView::item:selected { background-color: &&interactive_primary_idle&& }
-	)css";
-	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
-	style.replace("&&interactive_primary_idle&&", StyleHelper::getColor("interactive_primary_idle"));
-	w->setStyleSheet(style);
-}
-
 void StyleHelper::OrangeWidget(QWidget *w, QString objectName)
 {
 	if(!objectName.isEmpty())

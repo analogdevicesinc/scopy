@@ -1,0 +1,5 @@
+QLineEdit[&&property&&=true] {
+	border: none;
+	background-color: transparent;
+	font-size: 13px;
+}

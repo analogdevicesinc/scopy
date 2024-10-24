@@ -63,9 +63,9 @@ void DetailsView::setupUi()
 
 	layout()->addWidget(m_titleContainer);
 	layout()->addWidget(m_tabWidget);
-	Style::setStyle(m_guiView, style::properties::detailsView, true, true);
-	Style::setStyle(m_iioView, style::properties::detailsView, true, true);
-	Style::setStyle(m_readBtn, style::properties::button::subtleButton);
+	Style::setStyle(m_guiView, style::properties::debugger::detailsView, true, true);
+	Style::setStyle(m_iioView, style::properties::debugger::detailsView, true, true);
+	Style::setStyle(m_readBtn, style::properties::button::basicButton);
 }
 
 void DetailsView::setIIOStandardItem(IIOStandardItem *item)

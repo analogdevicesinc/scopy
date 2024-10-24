@@ -108,7 +108,6 @@ public:
 	static void TabWidgetBarUnderline(QTabWidget *w, QString objectName = "");
 	static void TableWidgetDebugger(QTableWidget *w, QString objectName = "");
 	static void SplitterStyle(QSplitter *w, QString objectName = "");
-	static void TreeViewDebugger(QTreeView *w, QString objectName = "");
 	static void OrangeWidget(QWidget *w, QString objectName = "");
 	static void ActiveStoredLabel(QLabel *w, QString objectName = "");
 	static void FaultsFrame(QFrame *w, QString objectName = "");
