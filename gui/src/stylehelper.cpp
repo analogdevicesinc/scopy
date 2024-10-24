@@ -59,6 +59,7 @@ void StyleHelper::initColorMap()
 			    Style::getAttribute(json::theme::interactive_subtle_disabled));
 	sh->colorMap.insert("background_primary", Style::getAttribute(json::theme::background_primary));
 	sh->colorMap.insert("content_default", Style::getAttribute(json::theme::content_default));
+	sh->colorMap.insert("content_subtle", Style::getAttribute(json::theme::content_subtle));
 	sh->colorMap.insert("content_busy", Style::getAttribute(json::theme::content_busy));
 	sh->colorMap.insert("content_inverse", Style::getAttribute(json::theme::content_inverse));
 	sh->colorMap.insert("background_subtle", Style::getAttribute(json::theme::background_subtle));
@@ -1119,7 +1120,7 @@ void StyleHelper::OrangeWidget(QWidget *w, QString objectName)
 				color:&&orange&&
 			}
 			)css");
-	style.replace("&&orange&&", StyleHelper::getColor("content_busy"));
+	style.replace("&&orange&&", StyleHelper::getColor("interactive_primary_idle"));
 	w->setStyleSheet(style);
 }
 
@@ -1145,7 +1146,7 @@ void StyleHelper::FaultsFrame(QFrame *w, QString objectName)
 	QString style = QString(R"css(
 			QFrame[pressed=true] { background-color: &&elementHighlight&&; border: 1px solid &&elementBackground&&; border-radius:5px; }
 			)css");
-	style.replace("&&elementHighlight&&", StyleHelper::getColor("content_default"));
+	style.replace("&&elementHighlight&&", StyleHelper::getColor("content_subtle"));
 	style.replace("&&elementBackground&&", StyleHelper::getColor("background_primary"));
 
 	w->setStyleSheet(style);
