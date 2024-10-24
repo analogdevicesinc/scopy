@@ -81,10 +81,10 @@ void AcquisitionManager::toolEnabled(bool en, QString toolName)
 	m_tools[toolName] = en;
 	QMap<QString, bool>::const_iterator it = std::find(m_tools.cbegin(), m_tools.cend(), true);
 	if(m_tools["rms"] || m_tools["harmonics"] || m_tools["settings"]) {
-		m_processData = false;
+		m_processData.store(false);
 	}
 	if(m_tools["waveform"]) {
-		m_processData = true;
+		m_processData.store(true);
 	}
 	if(it != m_tools.cend()) {
 		stopPing();
@@ -110,7 +110,7 @@ void AcquisitionManager::readData()
 {
 	QMutexLocker locker(&mutex);
 	if(m_tools["rms"] || m_tools["harmonics"] || m_tools["settings"]) {
-		if(!m_processData) {
+		if(!m_processData.load()) {
 			setProcessData(true);
 		}
 		qDebug(CAT_PQM_ACQ) << "[START] Read pqm attributes! THREAD ID:" << thread()->currentThreadId();
@@ -118,7 +118,7 @@ void AcquisitionManager::readData()
 		qDebug(CAT_PQM_ACQ) << "[FINISH] Read pqm attributes! THREAD ID:" << thread()->currentThreadId();
 	}
 	if(m_tools["waveform"]) {
-		if(m_processData) {
+		if(m_processData.load()) {
 			setProcessData(false);
 		}
 		qDebug(CAT_PQM_ACQ) << "[START] Read buffer! THREAD ID:" << thread()->currentThreadId();
@@ -275,7 +275,7 @@ void AcquisitionManager::setProcessData(bool en)
 	if(ret < 0) {
 		qInfo(CAT_PQM_ACQ) << "Cannot write process_data attribute!";
 	} else {
-		m_processData = en;
+		m_processData.store(en);
 	}
 	qDebug(CAT_PQM_ACQ) << "[FINISH] Set process data! THREAD ID:" << thread()->currentThreadId();
 }

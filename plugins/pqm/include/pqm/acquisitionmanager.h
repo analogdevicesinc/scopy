@@ -64,7 +64,7 @@ private:
 	QMap<QString, QVector<double>> m_bufferData;
 	QMap<QString, bool> m_tools = {{"rms", false}, {"harmonics", false}, {"waveform", false}, {"settings", false}};
 
-	bool m_processData;
+	std::atomic<bool> m_processData = false;
 	bool m_attrHaveBeenRead = false;
 	bool m_buffHaveBeenRead = false;
 	bool m_hasFwVers = false;
