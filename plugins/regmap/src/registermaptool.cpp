@@ -37,6 +37,7 @@
 #include <style.h>
 #include <stylehelper.h>
 #include <toolbuttons.h>
+#include <tutorialbuilder.h>
 #include <xmlfilemanager.hpp>
 
 #include <readwrite/fileregisterreadstrategy.hpp>
@@ -44,6 +45,8 @@
 #include <readwrite/iioregisterreadstrategy.hpp>
 #include <readwrite/iioregisterwritestrategy.hpp>
 #include <style_properties.h>
+
+#include <pluginbase/preferences.h>
 
 using namespace scopy;
 using namespace regmap;
@@ -105,6 +108,8 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 	QObject::connect(searchBarWidget, &SearchBarWidget::requestSearch, this, [=](QString searchParam) {
 		deviceList->value(registerDeviceList->currentText())->applyFilters(searchParam);
 	});
+
+	initTutorialProperties();
 }
 
 RegisterMapTool::~RegisterMapTool() { delete deviceList; }
@@ -153,6 +158,72 @@ void RegisterMapTool::toggleSettingsMenu(QString registerName, bool toggle)
 	}
 }
 
+void RegisterMapTool::initTutorialProperties()
+{
+	registerDeviceList->setProperty("tutorial_name", "DEVICE_LIST");
+	settingsMenu->setProperty("tutorial_name", "SETTINGS_BUTTON");
+	searchBarWidget->setProperty("tutorial_name", "SEARCH_BAR");
+}
+
+void RegisterMapTool::startTutorial()
+{
+	settingsMenu->setChecked(true);
+
+	QWidget *parent = Util::findContainingWindow(this);
+	gui::TutorialBuilder *registerMapTutorial =
+		new gui::TutorialBuilder(this, ":/registermap/tutorial_chapters.json", "registermap", parent);
+
+	settingsTutorialFinish = connect(registerMapTutorial, &gui::TutorialBuilder::finished, settings,
+					 &RegisterMapSettingsMenu::startTutorial, Qt::UniqueConnection);
+
+	controllerTutorial = connect(
+		settings, &RegisterMapSettingsMenu::tutorialDone, this,
+		[=, this]() { deviceList->value(activeRegisterMap)->startTutorial(); }, Qt::UniqueConnection);
+
+	connect(deviceList->value(activeRegisterMap), &DeviceRegisterMap::tutorialFinished, this,
+		&RegisterMapTool::tutorialAborted);
+	connect(deviceList->value(activeRegisterMap), &DeviceRegisterMap::tutorialAborted, this,
+		&RegisterMapTool::tutorialAborted);
+
+	connect(registerMapTutorial, &gui::TutorialBuilder::aborted, this, &RegisterMapTool::tutorialAborted);
+	connect(settings, &RegisterMapSettingsMenu::tutorialAborted, this, &RegisterMapTool::tutorialAborted);
+
+	registerMapTutorial->setTitle("Tutorial");
+	registerMapTutorial->start();
+}
+
+void RegisterMapTool::startSimpleTutorial()
+{
+	settingsMenu->setChecked(true);
+
+	QWidget *parent = Util::findContainingWindow(this);
+	gui::TutorialBuilder *registerMapTutorial =
+		new gui::TutorialBuilder(this, ":/registermap/tutorial_chapters.json", "simple_registermap", parent);
+
+	settingsTutorialFinish = connect(registerMapTutorial, &gui::TutorialBuilder::finished, settings,
+					 &RegisterMapSettingsMenu::startTutorial, Qt::UniqueConnection);
+
+	controllerTutorial = connect(
+		settings, &RegisterMapSettingsMenu::tutorialDone, this,
+		[=, this]() { deviceList->value(activeRegisterMap)->startSimpleTutorial(); }, Qt::UniqueConnection);
+
+	connect(deviceList->value(activeRegisterMap), &DeviceRegisterMap::simpleTutorialFinished, this,
+		&RegisterMapTool::tutorialAborted);
+	connect(deviceList->value(activeRegisterMap), &DeviceRegisterMap::tutorialAborted, this,
+		&RegisterMapTool::tutorialAborted);
+	connect(registerMapTutorial, &gui::TutorialBuilder::aborted, this, &RegisterMapTool::tutorialAborted);
+	connect(settings, &RegisterMapSettingsMenu::tutorialAborted, this, &RegisterMapTool::tutorialAborted);
+
+	registerMapTutorial->setTitle("Tutorial");
+	registerMapTutorial->start();
+}
+
+void RegisterMapTool::tutorialAborted()
+{
+	disconnect(settingsTutorialFinish);
+	disconnect(controllerTutorial);
+}
+
 void RegisterMapTool::updateActiveRegisterMap(QString registerName)
 {
 	if(activeRegisterMap != "" && registerName != activeRegisterMap) {
@@ -177,5 +248,21 @@ void RegisterMapTool::toggleSearchBarEnabled(bool enabled)
 		tool->getContainerSpacer(tool->topContainer())
 			->changeSize(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed);
 		searchBarWidget->hide();
+	}
+}
+
+void RegisterMapTool::showEvent(QShowEvent *event)
+{
+	QWidget::showEvent(event);
+
+	// Handle tutorial
+	if(Preferences::get("regmapplugin_start_tutorial").toBool()) {
+		if(searchBarWidget->isVisible()) {
+
+			startTutorial();
+		} else {
+			startSimpleTutorial();
+		}
+		Preferences::set("regmapplugin_start_tutorial", false);
 	}
 }
