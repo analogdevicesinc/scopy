@@ -98,11 +98,13 @@ bool SWIOTPlugin::loadPage()
 bool SWIOTPlugin::loadExtraButtons()
 {
 	m_btnIdentify = new QPushButton("Identify");
+	Style::setStyle(m_btnIdentify, style::properties::button::basicButton);
 	m_extraButtons.append(m_btnIdentify);
 	connect(m_btnIdentify, SIGNAL(clicked()), m_swiotController, SLOT(identify()));
 
 	// The tutorial button will only be clickable when the user connects to the device
 	m_btnTutorial = new QPushButton(tr("Tutorial"));
+	Style::setStyle(m_btnTutorial, style::properties::button::basicButton);
 	m_extraButtons.append(m_btnTutorial);
 	m_btnTutorial->setEnabled(false);
 	m_btnTutorial->setToolTip("The tutorial will be available once the device is connected.");
@@ -128,7 +130,9 @@ void SWIOTPlugin::loadToolList()
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(MAX14906_TME_ID, "MAX14906",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/tool_io.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(FAULTS_TME_ID, "Faults", ":/swiot/tool_faults.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(FAULTS_TME_ID, "Faults",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_power_supply.svg"));
 }
 
 void SWIOTPlugin::unload()
