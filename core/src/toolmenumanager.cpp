@@ -87,8 +87,12 @@ void ToolMenuManager::showMenuItem(QString id)
 {
 	if(!m_connectedDev.contains(m_prevItem))
 		hideMenuItem(m_prevItem);
-	if(!m_itemMap.contains(id))
+	if(!m_itemMap.contains(id)) {
+		// if the id is not a device id, it could be a tool id
+		Q_EMIT requestToolSelect(id);
 		return;
+	}
+
 	m_itemMap[id]->show();
 	m_prevItem = id;
 }
