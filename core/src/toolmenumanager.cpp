@@ -27,6 +27,7 @@
 #include <baseheaderwidget.h>
 #include <compositeheaderwidget.h>
 #include <menuheader.h>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_TOOLMENUMANAGER, "ToolMenuManager")
 using namespace scopy;
@@ -52,6 +53,13 @@ void ToolMenuManager::addMenuItem(QString deviceId, QString devName, QList<ToolM
 		if(sWidget) {
 			sWidget->layout()->setMargin(0);
 		}
+	}
+	MenuCollapseHeader *collapseHeader =
+		dynamic_cast<MenuCollapseHeader *>(devSection->collapseSection()->header());
+	if(collapseHeader) {
+		CompositeHeaderWidget *chw = dynamic_cast<CompositeHeaderWidget *>(collapseHeader->headerWidget());
+		if(chw)
+			chw->layout()->setContentsMargins(Style::getDimension(json::global::unit_1), 0, 0, 0);
 	}
 	devSection->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	if(!tools.isEmpty())

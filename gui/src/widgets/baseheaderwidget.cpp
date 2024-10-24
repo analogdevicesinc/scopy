@@ -29,7 +29,7 @@ BaseHeaderWidget::BaseHeaderWidget(QString title, QWidget *parent)
 	: QWidget(parent)
 {
 	m_lay = new QVBoxLayout(this);
-	m_lay->setContentsMargins(Style::getDimension(json::global::unit_1), 0, 0, 0);
+	m_lay->setContentsMargins(0, 0, 0, 0);
 	m_lay->setSpacing(0);
 
 	m_label = new QLineEdit(title, this);
