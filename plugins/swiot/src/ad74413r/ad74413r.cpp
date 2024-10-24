@@ -39,6 +39,7 @@
 #include <iioutil/connectionprovider.h>
 
 using namespace scopy::swiot;
+using namespace scopy::gui;
 using namespace scopy;
 
 Ad74413r::Ad74413r(QString uri, ToolMenuEntry *tme, QWidget *parent)
@@ -128,7 +129,7 @@ void Ad74413r::setupConnections()
 	connect(m_acqHandler, &BufferAcquisitionHandler::singleCaptureFinished, this,
 		&Ad74413r::onSingleCaptureFinished, Qt::QueuedConnection);
 
-	connect(m_timespanSpin, &PositionSpinButton::valueChanged, m_acqHandler,
+	connect(m_timespanSpin, &MenuSpinbox::valueChanged, m_acqHandler,
 		&BufferAcquisitionHandler::onTimespanChanged);
 
 	connect(m_rstAcqTimer, &QTimer::timeout, this, [&]() {
@@ -675,10 +676,9 @@ QWidget *Ad74413r::createSettingsMenu(QWidget *parent)
 	plotTimespanSection->contentLayout()->setMargin(0);
 
 	// timespan
-	m_timespanSpin = new PositionSpinButton({{"ms", 1E-3}, {"s", 1E0}}, "Timespan", 0.1, 10, true, false);
-	m_timespanSpin->setStep(0.1);
-	m_timespanSpin->setValue(1);
-	connect(m_timespanSpin, &PositionSpinButton::valueChanged, this,
+	m_timespanSpin = new MenuSpinbox(tr("Timespan"), 1, "s", 0.1, 10, true, false, plotTimespanSection);
+	m_timespanSpin->setIncrementMode(MenuSpinbox::IS_FIXED);
+	connect(m_timespanSpin, &MenuSpinbox::valueChanged, this,
 		[=, this](double value) { m_plot->xAxis()->setMin(-value); });
 
 	// show labels
