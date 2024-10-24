@@ -16,6 +16,7 @@ using namespace scopy::pqm;
 
 RmsInstrument::RmsInstrument(QWidget *parent)
 	: QWidget(parent)
+	, m_running(false)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *instrumentLayout = new QHBoxLayout(this);
@@ -34,35 +35,37 @@ RmsInstrument::RmsInstrument(QWidget *parent)
 	centralLayout->setSpacing(8);
 	centralLayout->setContentsMargins(0, 0, 0, 0);
 
-	QWidget *voltageWidget = new QWidget(this);
+	QWidget *voltageWidget = new QWidget(central);
 	voltageWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *voltageLayout = new QVBoxLayout();
 	voltageWidget->setLayout(voltageLayout);
 	voltageWidget->setStyleSheet("background-color:" + StyleHelper::getColor("UIElementBackground"));
 
-	MeasurementsPanel *voltagePanel = new MeasurementsPanel(this);
+	MeasurementsPanel *voltagePanel = new MeasurementsPanel(voltageWidget);
 	createLabels(voltagePanel, m_chnls["voltage"].values(),
 		     {"RMS", "Angle", "Deviation under", "Deviation over", "Pinst", "Pst", "Plt"});
 	createLabels(voltagePanel, {DEVICE_NAME}, {"U2", "U0", "Sneg V", "Spos V", "Szro V"});
+	voltagePanel->refreshUi();
 	voltageLayout->addWidget(voltagePanel);
 
-	m_voltagePlot = new PolarPlotWidget(this);
+	m_voltagePlot = new PolarPlotWidget(voltageWidget);
 	initPlot(m_voltagePlot);
 	setupPlotChannels(m_voltagePlot, m_chnls["voltage"]);
 	voltageLayout->addWidget(m_voltagePlot);
 
-	QWidget *currentWidget = new QWidget(this);
+	QWidget *currentWidget = new QWidget(central);
 	currentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *currentLayout = new QVBoxLayout();
 	currentWidget->setLayout(currentLayout);
 	currentWidget->setStyleSheet("background-color:" + StyleHelper::getColor("UIElementBackground"));
 
-	MeasurementsPanel *currentPanel = new MeasurementsPanel(this);
+	MeasurementsPanel *currentPanel = new MeasurementsPanel(currentWidget);
 	createLabels(currentPanel, m_chnls["current"].values(), {"RMS", "Angle"});
 	createLabels(currentPanel, {DEVICE_NAME}, {"I2", "I0", "Sneg I", "Spos I", "Szro I"});
+	currentPanel->refreshUi();
 	currentLayout->addWidget(currentPanel);
 
-	m_currentPlot = new PolarPlotWidget(this);
+	m_currentPlot = new PolarPlotWidget(currentWidget);
 	initPlot(m_currentPlot);
 	setupPlotChannels(m_currentPlot, m_chnls["current"]);
 	currentLayout->addWidget(m_currentPlot);
@@ -102,7 +105,7 @@ void RmsInstrument::createLabels(MeasurementsPanel *mPanel, QStringList chnls, Q
 			c = StyleHelper::getColor("CH" + QString::number(chIdx));
 		}
 		for(const QString &l : labels) {
-			MeasurementLabel *ml = new MeasurementLabel(this);
+			MeasurementLabel *ml = new MeasurementLabel(mPanel);
 			if(!c.isEmpty()) {
 				ml->setColor(QColor(c));
 			}
@@ -195,6 +198,7 @@ void RmsInstrument::stop() { m_runBtn->setChecked(false); }
 
 void RmsInstrument::toggleRms(bool en)
 {
+	m_running = en;
 	if(en) {
 		ResourceManager::open("pqm", this);
 	} else {
@@ -205,14 +209,15 @@ void RmsInstrument::toggleRms(bool en)
 
 void RmsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> data)
 {
-	if(m_runBtn->isChecked() || m_singleBtn->isChecked()) {
-		m_attributes = data;
-		updateLabels();
-		updatePlot(m_voltagePlot, "voltage");
-		updatePlot(m_currentPlot, "current");
-		if(m_singleBtn->isChecked()) {
-			m_singleBtn->setChecked(false);
-		}
+	if(!m_running) {
+		return;
+	}
+	m_attributes = data;
+	updateLabels();
+	updatePlot(m_voltagePlot, "voltage");
+	updatePlot(m_currentPlot, "current");
+	if(m_singleBtn->isChecked()) {
+		m_singleBtn->setChecked(false);
 	}
 }
 
