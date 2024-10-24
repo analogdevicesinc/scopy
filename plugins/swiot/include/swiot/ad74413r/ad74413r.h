@@ -38,7 +38,7 @@
 #include <QWidget>
 #include <measurementpanel.h>
 #include <plotinfo.h>
-#include <spinbox_a.hpp>
+#include <gui/widgets/menuspinbox.h>
 
 #include <iioutil/connection.h>
 #define MAX_CURVES_NUMBER 8
@@ -114,7 +114,7 @@ private:
 
 private:
 	ToolMenuEntry *m_tme;
-	PositionSpinButton *m_timespanSpin;
+	scopy::gui::MenuSpinbox *m_timespanSpin;
 
 	QVector<bool> m_enabledChannels;
 

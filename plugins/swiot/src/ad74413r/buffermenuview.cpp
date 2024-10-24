@@ -26,8 +26,10 @@
 #include <gui/widgets/menuheader.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menucollapsesection.h>
+#include <gui/widgets/menuspinbox.h>
 
 using namespace scopy::swiot;
+using namespace scopy::gui;
 
 BufferMenuView::BufferMenuView(QMap<QString, iio_channel *> chnls, Connection *conn, QWidget *parent)
 	: QWidget(parent)
@@ -137,25 +139,11 @@ QWidget *BufferMenuView::createVerticalSettingsMenu(QString unit, double yMin, d
 	MenuCollapseSection *verticalSettings = new MenuCollapseSection(
 		"Y-AXIS", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, verticalContainer);
 
-	auto m_yMin = new PositionSpinButton(
-		{
-			{"" + unit, 1e0},
-			{"k" + unit, 1e3},
-			{"M" + unit, 1e6},
-			{"G" + unit, 1e9},
-		},
-		"YMin", -DBL_MAX, DBL_MAX, false, false, verticalContainer);
-	m_yMin->setValue(yMin);
+	auto m_yMin = new MenuSpinbox("YMin", yMin, unit, -DBL_MAX, DBL_MAX, true, false, verticalContainer);
+	m_yMin->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 
-	auto m_yMax = new PositionSpinButton(
-		{
-			{"" + unit, 1e0},
-			{"k" + unit, 1e3},
-			{"M" + unit, 1e6},
-			{"G" + unit, 1e9},
-		},
-		"YMax", -DBL_MAX, DBL_MAX, false, false, verticalContainer);
-	m_yMax->setValue(yMax);
+	auto m_yMax = new MenuSpinbox("YMax", yMax, unit, -DBL_MAX, DBL_MAX, true, false, verticalContainer);
+	m_yMax->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 
 	layout->addWidget(m_yMin);
 	layout->addWidget(m_yMax);
@@ -164,13 +152,13 @@ QWidget *BufferMenuView::createVerticalSettingsMenu(QString unit, double yMin, d
 	verticalContainer->contentLayout()->addWidget(verticalSettings);
 
 	// Connects
-	connect(m_yMin, &PositionSpinButton::valueChanged, this, &BufferMenuView::setYMin);
+	connect(m_yMin, &MenuSpinbox::valueChanged, this, &BufferMenuView::setYMin);
 	connect(this, &BufferMenuView::minChanged, this, [=](double min) {
 		QSignalBlocker b(m_yMin);
 		m_yMin->setValue(min);
 	});
 
-	connect(m_yMax, &PositionSpinButton::valueChanged, this, &BufferMenuView::setYMax);
+	connect(m_yMax, &MenuSpinbox::valueChanged, this, &BufferMenuView::setYMax);
 	connect(this, &BufferMenuView::maxChanged, this, [=](double max) {
 		QSignalBlocker b(m_yMax);
 		m_yMax->setValue(max);
