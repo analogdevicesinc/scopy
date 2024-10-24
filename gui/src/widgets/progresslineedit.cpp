@@ -7,7 +7,6 @@ ProgressLineEdit::ProgressLineEdit(QWidget *parent)
 	, m_lineEdit(new QLineEdit(this))
 	, m_progressBar(new SmallProgressBar(this))
 {
-	StyleHelper::MenuLineEdit(m_lineEdit, "lineEdit");
 	m_progressBar->setStyleSheet("background-color: grey;");
 
 	setLayout(new QVBoxLayout(this));
