@@ -58,6 +58,29 @@ InfoBtn::InfoBtn(QWidget *parent)
 	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/info.svg", "white", 1));
 	StyleHelper::SquareToggleButtonWithIcon(this, "info_btn", false);
 	setIcon(icon1);
+
+	this->setCheckable(true);
+
+	QWidget *infoBoddy = new QWidget(this);
+	infoHoverWidgetLayout = new QVBoxLayout();
+	infoBoddy->setLayout(infoHoverWidgetLayout);
+
+	HoverWidget *hoverInfo = new HoverWidget(infoBoddy, this, parent);
+	hoverInfo->setAnchorPos(HoverPosition::HP_BOTTOM);
+	hoverInfo->setContentPos(HoverPosition::HP_BOTTOM);
+	hoverInfo->setAnchorOffset(QPoint(10, 0));
+	hoverInfo->setVisible(false);
+	hoverInfo->raise();
+
+	connect(this, &QPushButton::toggled, this, [=](bool toggled) { hoverInfo->setVisible(toggled); });
+}
+
+void InfoBtn::addOption(QString name, const std::function<void()> &lambda)
+{
+	QPushButton *infoOption = new QPushButton(name);
+	infoHoverWidgetLayout->addWidget(infoOption);
+
+	connect(infoOption, &QAbstractButton::clicked, this, lambda);
 }
 
 RunBtn::RunBtn(QWidget *parent)
