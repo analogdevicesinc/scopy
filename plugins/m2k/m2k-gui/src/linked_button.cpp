@@ -14,8 +14,8 @@ LinkedButton::LinkedButton(QWidget *parent)
 {
 	setDynamicProperty(this, "info_button", true);
 
-	this->setIcon(
-		Style::getPixmap(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/info"));
+	this->setIcon(Style::getPixmap(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+				       "/icons/info.svg"));
 	this->setIconSize(QSize(32, 32));
 
 	this->setToolTip("See more info");
