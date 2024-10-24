@@ -26,6 +26,7 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QOb
 		if(!m_buffer) {
 			qWarning(CAT_PQM_ACQ) << "Cannot create the buffer!";
 		}
+		m_processData.store(getProcessData());
 		m_pingTimer = new QTimer(this);
 		m_pingTimer->setInterval(3000);
 		connect(m_pingTimer, &QTimer::timeout, this, &AcquisitionManager::pingTimerTimeout);
@@ -80,12 +81,7 @@ void AcquisitionManager::toolEnabled(bool en, QString toolName)
 {
 	m_tools[toolName] = en;
 	QMap<QString, bool>::const_iterator it = std::find(m_tools.cbegin(), m_tools.cend(), true);
-	if(m_tools["rms"] || m_tools["harmonics"] || m_tools["settings"]) {
-		m_processData.store(false);
-	}
-	if(m_tools["waveform"]) {
-		m_processData.store(true);
-	}
+
 	if(it != m_tools.cend()) {
 		stopPing();
 		if(!m_readFw->isRunning()) {
@@ -278,6 +274,21 @@ void AcquisitionManager::setProcessData(bool en)
 		m_processData.store(en);
 	}
 	qDebug(CAT_PQM_ACQ) << "[FINISH] Set process data! THREAD ID:" << thread()->currentThreadId();
+}
+
+bool AcquisitionManager::getProcessData()
+{
+	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
+	bool val = false;
+	if(dev) {
+		int ret = iio_device_attr_read_bool(dev, "process_data", &val);
+		if(ret < 0) {
+			qInfo(CAT_PQM_ACQ) << "Cannot read process_data attribute!";
+		}
+	} else {
+		qWarning(CAT_PQM_ACQ) << "Device is unavailable!";
+	}
+	return val;
 }
 
 bool AcquisitionManager::hasFwVers() const { return m_hasFwVers; }

@@ -48,6 +48,7 @@ private:
 	bool readBufferedData();
 	void setData(QMap<QString, QMap<QString, QString>>);
 	void setProcessData(bool en);
+	bool getProcessData();
 
 	iio_context *m_ctx;
 	iio_buffer *m_buffer;
