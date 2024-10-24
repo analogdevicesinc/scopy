@@ -27,6 +27,7 @@
 #include <iioutil/iiocommand/iiodeviceattributeread.h>
 #include <iioutil/iiocommand/iioregisterread.h>
 
+#include <style.h>
 #include <gui/stylehelper.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/dynamicWidget.h>
@@ -287,7 +288,7 @@ QWidget *FaultsDevice::createTopWidget(QWidget *parent)
 	deviceNameLabel->setText(m_name);
 
 	m_registerNoLineEdit = new QLineEdit(w);
-	StyleHelper::MenuLineEdit(m_registerNoLineEdit);
+	Style::setStyle(m_registerNoLineEdit, style::properties::widget::solidBorder);
 	m_registerNoLineEdit->setFixedWidth(140);
 	m_registerNoLineEdit->setPlaceholderText("0x0");
 	m_registerNoLineEdit->setFocusPolicy(Qt::NoFocus);
