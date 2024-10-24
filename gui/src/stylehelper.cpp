@@ -200,7 +200,7 @@ void StyleHelper::CollapseCheckbox(QCheckBox *chk, QString objectName)
 {
 	if(!objectName.isEmpty())
 		chk->setObjectName(objectName);
-
+	chk->setFixedSize(16, 16);
 	Style::setStyle(chk, style::properties::checkbox::collapseCB, true, true);
 }
 
