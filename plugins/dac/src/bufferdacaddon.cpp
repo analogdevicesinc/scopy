@@ -5,6 +5,7 @@
 #include "databuffer.h"
 #include "dac_logging_categories.h"
 #include "scopy-dac_config.h"
+#include <style.h>
 
 #include <menusectionwidget.h>
 #include <menucollapsesection.h>
@@ -122,7 +123,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	connect(this, &BufferDacAddon::toggleCyclic, this,
 		[=, this](bool toggled) { m_cyclicBtn->onOffswitch()->setChecked(toggled); });
 	cyclicContainer->contentLayout()->addWidget(m_cyclicBtn);
-	cyclicContainer->setFixedHeight(48);
+	cyclicContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	m_cyclicBtn->onOffswitch()->setChecked(true);
 
 	// File size and file truncate section
@@ -138,7 +139,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	m_fileSizeSpin->setScaleRange(1, 16 * 1024 * 1024);
 	m_fileSizeSpin->setValue(16);
 	filesizeContainer->contentLayout()->addWidget(m_fileSizeSpin);
-	filesizeContainer->setFixedHeight(48);
+	filesizeContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
 	runConfigLay->addWidget(cyclicContainer);
 	runConfigLay->addWidget(filesizeContainer);
@@ -148,7 +149,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	MenuSectionWidget *fileBrowserSection = new MenuSectionWidget(this);
 	fileBrowserSection->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 	QLabel *fileLbl = new QLabel("Choose file");
-	StyleHelper::MenuSmallLabel(fileLbl);
+	Style::setStyle(fileLbl, style::properties::label::subtle);
 
 	// Determine default search dir
 	QString defaultDir = DAC_CSV_BUILD_PATH;
