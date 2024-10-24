@@ -1,0 +1,4 @@
+QTextBrowser[&&property&&=true] {
+	border: 1px solid &content_silent&;
+	border-radius: &radius_1&;
+}
