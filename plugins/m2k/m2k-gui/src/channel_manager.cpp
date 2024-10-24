@@ -3,6 +3,7 @@
 #include "gui/dynamicWidget.h"
 
 #include <QHBoxLayout>
+#include <style.h>
 
 using namespace scopy;
 using namespace scopy::m2kgui;
@@ -34,7 +35,8 @@ ChannelManager::ChannelManager(ChannelsPositionEnum position, QWidget *parent)
 	toolStatus = new QLabel("");
 	channelManagerToggled = false;
 
-	QStringList icons = QStringList() << ":/gui/icons/scopy-default/icons/menu.svg";
+	QStringList icons = QStringList()
+		<< ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/menu.svg";
 
 	QIcon my_icon;
 	my_icon.addFile(icons[0], QSize(), QIcon::Normal);

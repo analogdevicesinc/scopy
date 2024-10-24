@@ -1,0 +1,27 @@
+QPushButton[&&property&&=true] {
+	text-align:left;
+	height: &unit_2&;
+	background-color: &interactive_subtle_idle&;
+	color: &content_inverse&;
+	border-radius: &radius_1&;
+	text-align:center;
+}
+QPushButton[&&property&&=true]:hover {
+    background-color: &interactive_subtle_hover&;
+    color: &content_inverse&;
+}
+
+QPushButton[&&property&&=true]:pressed {
+    background-color: &interactive_subtle_pressed&;
+    color: &content_inverse&;
+}
+
+QPushButton[&&property&&=true]:checked {
+    background-color: &interactive_subtle_pressed&;
+    color: &content_inverse&;
+}
+
+QPushButton[&&property&&=true]:disabled {
+    background-color: &interactive_subtle_disabled&;
+    color: &content_inverse&;
+}

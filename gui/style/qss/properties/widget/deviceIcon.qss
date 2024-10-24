@@ -1,0 +1,15 @@
+*[&&property&&=true] {
+    background-color: &interactive_subtle_disabled&;
+    color: &content_inverse&;
+    font-weight: 700;
+    border-radius: &radius_1&;
+}
+*[&&property&&=true]:hover {
+    background-color: &content_silent&;
+    color: &content_inverse&;
+}
+*[&&property&&=true]:pressed {
+    background-color: &content_silent&;
+    color: &content_inverse&;
+}
+

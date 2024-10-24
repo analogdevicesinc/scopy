@@ -16,6 +16,7 @@
 #include <QAbstractSpinBox>
 #include <titlespinbox.hpp>
 #include <utils.h>
+#include <style.h>
 
 using namespace scopy;
 using namespace regmap;
@@ -128,7 +129,8 @@ void RegisterController::setHasMap(bool hasMap)
 		detailedRegisterToggle->setCheckable(true);
 		QIcon detailedRegisterToggleIcon;
 		detailedRegisterToggleIcon.addPixmap(
-			Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/tool_calibration.svg", "white", 1));
+			Style::getPixmap(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+					 "/icons/tool_calibration.svg"));
 		detailedRegisterToggle->setIcon(detailedRegisterToggleIcon);
 		detailedRegisterToggle->setChecked(true);
 		QObject::connect(detailedRegisterToggle, &QPushButton::toggled, this,

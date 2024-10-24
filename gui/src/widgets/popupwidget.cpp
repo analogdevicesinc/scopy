@@ -77,8 +77,8 @@ void PopupWidget::initUI()
 	backgroundWidget->setLayout(backgroundLayout);
 
 	StyleHelper::TutorialChapterTitleLabel(m_titleLabel, "titleLabel");
-	StyleHelper::BlueButton(m_continueButton, "continueButton");
-	StyleHelper::BlueButton(m_exitButton, "exitButton");
+	StyleHelper::BasicButton(m_continueButton, "continueButton");
+	StyleHelper::BasicButton(m_exitButton, "exitButton");
 	StyleHelper::OverlayMenu(this, "popupOverlay");
 }
 

@@ -21,6 +21,8 @@ public:
 private:
 	void initUI();
 	void initNavigationWidget(QTextBrowser *browser);
+	QWidget *buildStylePage();
+	QWidget *buildPageColors();
 	QTabWidget *tabWidget;
 	QVBoxLayout *layout;
 };

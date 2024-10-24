@@ -42,13 +42,13 @@
        <number>0</number>
       </property>
       <property name="topMargin">
-       <number>15</number>
+       <number>6</number>
       </property>
       <property name="rightMargin">
        <number>50</number>
       </property>
       <property name="bottomMargin">
-       <number>15</number>
+       <number>6</number>
       </property>
       <item>
        <spacer name="horizontalSpacer_4">
@@ -99,7 +99,6 @@
   height: 40px;
   border-radius: 4px;
   background-color: #27b34f;
-  color: white;
   
   font-weight: bold;
 

@@ -724,11 +724,6 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	auto labelCondition = new QLabel("Condition");
 	externalGridLayout->addWidget(labelCondition, 1, 0);
 
-	QFile file(":stylesheets/stylesheets/customSwitch.qss");
-	file.open(QFile::ReadOnly);
-	QString styleSheet = QString::fromLatin1(file.readAll());
-	externalOnOff->setStyleSheet(styleSheet);
-
 	auto comboBoxCondition = new QComboBox();
 	externalGridLayout->addWidget(comboBoxCondition, 1, 1);
 

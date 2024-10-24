@@ -152,7 +152,7 @@ QWidget *PDKWindow::buildSaveSessionPreference()
 	lay->addSpacerItem(new QSpacerItem(40, 40, QSizePolicy::Expanding, QSizePolicy::Fixed));
 	lay->addWidget(new QLabel("Settings files location ", this));
 	QPushButton *navigateBtn = new QPushButton("Open", this);
-	scopy::StyleHelper::BlueButton(navigateBtn, "navigateBtn");
+	scopy::StyleHelper::BasicButton(navigateBtn, "navigateBtn");
 	navigateBtn->setMaximumWidth(80);
 	connect(navigateBtn, &QPushButton::clicked, this,
 		[=]() { QDesktopServices::openUrl(scopy::config::settingsFolderPath()); });
@@ -376,7 +376,7 @@ MainWidget::MainWidget(QWidget *parent)
 
 	// browse section
 	m_browseBtn = new QPushButton("Browse", this);
-	scopy::StyleHelper::BlueButton(m_browseBtn);
+	scopy::StyleHelper::BasicButton(m_browseBtn);
 	m_browseBtn->setFixedWidth(128);
 	m_browseBtn->setFixedHeight(40);
 
@@ -390,7 +390,7 @@ MainWidget::MainWidget(QWidget *parent)
 
 	// init
 	m_initBtn = new QPushButton("Init", this);
-	scopy::StyleHelper::BlueButton(m_initBtn);
+	scopy::StyleHelper::BasicButton(m_initBtn);
 	m_initBtn->setFixedWidth(128);
 	m_initBtn->setFixedHeight(40);
 	connect(m_initBtn, &QPushButton::clicked, this, &MainWidget::onInit);
@@ -403,14 +403,14 @@ MainWidget::MainWidget(QWidget *parent)
 	loadBtns->layout()->setMargin(0);
 
 	m_loadBtn = new QPushButton("Load", this);
-	scopy::StyleHelper::BlueButton(m_loadBtn);
+	scopy::StyleHelper::BasicButton(m_loadBtn);
 	m_loadBtn->setFixedWidth(128);
 	m_loadBtn->setFixedHeight(40);
 	m_loadBtn->setEnabled(false);
 	connect(m_loadBtn, &QPushButton::clicked, this, &MainWidget::onLoad);
 
 	m_unloadBtn = new QPushButton("Unload", this);
-	scopy::StyleHelper::BlueButton(m_unloadBtn);
+	scopy::StyleHelper::BasicButton(m_unloadBtn);
 	m_unloadBtn->setFixedWidth(128);
 	m_unloadBtn->setFixedHeight(40);
 	m_unloadBtn->setVisible(false);
@@ -434,14 +434,14 @@ MainWidget::MainWidget(QWidget *parent)
 	connBtns->layout()->setMargin(0);
 
 	m_connBtn = new QPushButton("Connect", this);
-	scopy::StyleHelper::BlueButton(m_connBtn);
+	scopy::StyleHelper::BasicButton(m_connBtn);
 	m_connBtn->setFixedWidth(128);
 	m_connBtn->setFixedHeight(40);
 	m_connBtn->setEnabled(false);
 	connect(m_connBtn, &QPushButton::clicked, this, &MainWidget::onConnect);
 
 	m_disconnBtn = new QPushButton("Disconnect", this);
-	scopy::StyleHelper::BlueButton(m_disconnBtn);
+	scopy::StyleHelper::BasicButton(m_disconnBtn);
 	m_disconnBtn->setFixedWidth(128);
 	m_disconnBtn->setFixedHeight(40);
 	m_disconnBtn->setVisible(false);

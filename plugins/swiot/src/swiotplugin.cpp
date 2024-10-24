@@ -4,6 +4,7 @@
 #include <QLabel>
 #include <stylehelper.h>
 #include <iioutil/cmdqpingtask.h>
+#include <style.h>
 
 #include "swiot_logging_categories.h"
 #include "max14906/max14906.h"
@@ -118,12 +119,15 @@ bool SWIOTPlugin::loadIcon()
 
 void SWIOTPlugin::loadToolList()
 {
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY(CONFIG_TME_ID, "Config", ":/gui/icons/scopy-default/icons/tool_debugger.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(CONFIG_TME_ID, "Config",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(AD74413R_TME_ID, "AD74413R",
-						  ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY(MAX14906_TME_ID, "MAX14906", ":/gui/icons/scopy-default/icons/tool_io.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_oscilloscope.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(MAX14906_TME_ID, "MAX14906",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_io.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(FAULTS_TME_ID, "Faults", ":/swiot/tool_faults.svg"));
 }
 
@@ -353,7 +357,7 @@ void SWIOTPlugin::createStatusContainer()
 	m_statusContainer->layout()->setContentsMargins(0, 0, 0, 0);
 
 	auto exclamationIcon = new QPushButton(m_statusContainer);
-	StyleHelper::NoBackgroundIconButton(exclamationIcon, QIcon::fromTheme(":/swiot/warning.svg"));
+	StyleHelper::NoBackgroundIconButton(exclamationIcon, Style::getPixmap(":/swiot/warning.svg"));
 
 	auto statusLabel = new QLabel("AD-SWIOT1L-SL: The system is powered at limited capacity.");
 	statusLabel->setWordWrap(true);

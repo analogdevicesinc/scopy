@@ -8,6 +8,7 @@
 #include <timemanager.hpp>
 #include <datamonitorutils.hpp>
 #include <datalogger_api.hpp>
+#include <style.h>
 
 #include <libm2k/analog/dmm.hpp>
 
@@ -43,13 +44,16 @@ bool DataLoggerPlugin::loadPage() { return false; }
 
 bool DataLoggerPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/scopy-default/icons/datalogger.svg");
+	SCOPY_PLUGIN_ICON(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+			  "/icons/datalogger.svg");
 	return true;
 }
 
 void DataLoggerPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "Data Logger", toolIcon));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "Data Logger",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 }
 
 void DataLoggerPlugin::unload()
@@ -127,7 +131,9 @@ bool DataLoggerPlugin::onDisconnect()
 	}
 
 	// add proxy tool to represent the plugin
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "Data Logger", toolIcon));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "Data Logger",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 
 	Q_EMIT toolListChanged();
 

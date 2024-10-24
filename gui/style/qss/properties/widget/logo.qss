@@ -1,0 +1,7 @@
+*[&&property&&=true] {
+	min-height: &unit_4&;
+	background-image: url(:/gui/icons/&icon_theme_folder&/icons/logo_analog.svg);
+	background-repeat: no-repeat;
+	background-position: center center;
+	min-height: &unit_3&;
+}
