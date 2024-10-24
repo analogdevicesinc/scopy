@@ -8,6 +8,7 @@
 #include <gui/widgets/menuheader.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/stylehelper.h>
+#include <style.h>
 
 using namespace scopy::swiot;
 
@@ -266,7 +267,7 @@ QMainWindow *Max14906::createDockableMainWindow(const QString &title, DioDigital
 QPushButton *Max14906::createConfigBtn(QWidget *parent)
 {
 	QPushButton *configBtn = new QPushButton(parent);
-	StyleHelper::BlueGrayButton(configBtn, "back_btn");
+	Style::setStyle(configBtn, style::properties::button::squareIconButton);
 	configBtn->setFixedWidth(128);
 	configBtn->setCheckable(false);
 	configBtn->setText("Config");

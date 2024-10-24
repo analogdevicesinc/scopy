@@ -652,7 +652,7 @@ void Ad74413r::setupToolTemplate()
 QPushButton *Ad74413r::createConfigBtn()
 {
 	QPushButton *configBtn = new QPushButton();
-	StyleHelper::BlueGrayButton(configBtn, "config_btn");
+	Style::setStyle(configBtn, style::properties::button::squareIconButton);
 	configBtn->setFixedWidth(128);
 	configBtn->setCheckable(false);
 	configBtn->setText("Config");
