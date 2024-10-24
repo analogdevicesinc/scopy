@@ -49,6 +49,8 @@ WatchListView::WatchListView(QWidget *parent)
 
 void WatchListView::setupUi()
 {
+	setContentsMargins(0, 0, 0, 0);
+
 	QStringList headers = {"Name", "Value", "Type", "Path", ""};
 	setColumnCount(headers.size());
 	setHorizontalHeaderLabels(headers);
@@ -67,8 +69,13 @@ void WatchListView::setupUi()
 	header->setSectionResizeMode(TYPE_POS, QHeaderView::Interactive);
 	header->setSectionResizeMode(PATH_POS, QHeaderView::Interactive);
 	header->setSectionResizeMode(CLOSE_BTN_POS, QHeaderView::Interactive);
+	header->setFrameShadow(QFrame::Shadow::Plain);
+	header->setFrameShape(QFrame::Shape::NoFrame);
+	header->setFrameStyle(0);
+	header->setDefaultAlignment(Qt::AlignLeft);
 
-	Style::setStyle(this, style::properties::detailsView);
+	Style::setStyle(this, style::properties::debugger::watchListView);
+	Style::setStyle(header, style::properties::debugger::watchListView, true, true);
 	verticalHeader()->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 }
 
