@@ -1,0 +1,20 @@
+QHeaderView::section[&&property&&=true] {
+	border: none;
+	border-bottom: 2px solid &content_default&;
+	margin-left: 2px;
+	background-color: &background_primary&;
+
+	font: 11pt;
+	font-weight: bold;
+}
+
+QTableWidget::item[&&property&&=true] {
+	color: &content_default&;
+	border-bottom: 1px solid &interactive_subtle_disabled&;
+}
+
+QTableWidget::item::selected[&&property&&=true] {
+	color: &content_default&;
+	background-color: &interactive_focus&;
+}
+

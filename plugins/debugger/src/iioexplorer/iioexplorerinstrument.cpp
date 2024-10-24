@@ -21,6 +21,7 @@
 
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QScrollBar>
 #include <style.h>
 #include <gui/stylehelper.h>
 #include "iioexplorerinstrument.h"
@@ -36,13 +37,13 @@ IIOExplorerInstrument::IIOExplorerInstrument(struct iio_context *context, QStrin
 	, m_uri(uri)
 	, m_currentlySelectedItem(nullptr)
 {
-	setObjectName("IIODebugInstrument - " + uri);
+	setObjectName("IIOExplorerInstrument - " + uri);
 	setupUi();
 	connectSignalsAndSlots();
 
 	// api object for saving the state of widgets
 	m_apiObject = new IIOExplorerInstrument_API(this);
-	m_apiObject->setObjectName("IIODebugInstrument");
+	m_apiObject->setObjectName("IIOExplorerInstrument");
 }
 
 IIOExplorerInstrument::~IIOExplorerInstrument() {}
@@ -104,7 +105,7 @@ void IIOExplorerInstrument::setupUi()
 	m_proxyModel = new IIOSortFilterProxyModel(this);
 	m_treeView = new QTreeView(tree_view_container);
 	m_treeView->setHeaderHidden(true);
-	StyleHelper::TreeViewDebugger(m_treeView, "TreeView");
+
 	// m_saveContextSetup = new SaveContextSetup(m_treeView, bottom_container);
 	// m_iioModel = new IIOModel(m_context, m_uri, m_treeView);
 
@@ -114,7 +115,7 @@ void IIOExplorerInstrument::setupUi()
 	m_detailsView = new DetailsView(details_container);
 	m_watchListView = new WatchListView(watch_list);
 
-	watch_list->layout()->setContentsMargins(10, 10, 10, 10);
+	watch_list->layout()->setContentsMargins(0, 0, 0, 0);
 	watch_list->layout()->addWidget(m_watchListView);
 
 	m_proxyModel->setSourceModel(m_iioModel->getModel());
@@ -122,7 +123,7 @@ void IIOExplorerInstrument::setupUi()
 
 	Style::setBackgroundColor(m_mainWidget, json::theme::background_subtle);
 	Style::setBackgroundColor(m_debugLogger, json::theme::background_subtle);
-	Style::setStyle(m_treeView, style::properties::treeView);
+	Style::setStyle(m_treeView, style::properties::debugger::treeView);
 
 	m_treeView->setModel(m_proxyModel);
 
@@ -145,6 +146,7 @@ void IIOExplorerInstrument::setupUi()
 	right_container->layout()->addWidget(m_VSplitter);
 
 	setLayout(new QVBoxLayout(this));
+	layout()->setContentsMargins(0, 0, 0, 0);
 	layout()->addWidget(m_tabWidget);
 }
 
