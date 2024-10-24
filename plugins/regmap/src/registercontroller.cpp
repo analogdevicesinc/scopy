@@ -119,6 +119,9 @@ RegisterController::RegisterController(QWidget *parent)
 	writeWidgetLayout->addWidget(writeButton, 1, Qt::AlignRight);
 
 	applyStyle();
+
+	readWidget->setProperty("tutorial_name", "READ_WIDGET");
+	writeWidget->setProperty("tutorial_name", "WRITE_WIDGET");
 }
 
 RegisterController::~RegisterController()
@@ -164,6 +167,8 @@ void RegisterController::setHasMap(bool hasMap)
 		writeWidgetLayout->addWidget(detailedRegisterToggle, 0.5, Qt::AlignRight);
 		Style::setStyle(detailedRegisterToggle, style::properties::button::squareIconButton, true, true);
 		detailedRegisterToggle->setFixedSize(32, 32);
+
+		detailedRegisterToggle->setProperty("tutorial_name", "TOGGLE_DETAILED_BUTTON");
 	}
 }
 
@@ -178,4 +183,32 @@ void RegisterController::applyStyle()
 	Style::setStyle(valueLabel, style::properties::label::menuSmall);
 
 	// setStyleSheet(RegmapStyleHelper::regmapControllerStyle(nullptr));
+}
+
+void RegisterController::startTutorial()
+{
+	QWidget *parent = Util::findContainingWindow(this);
+	registerMapTutorial =
+		new gui::TutorialBuilder(this, ":/registermap/tutorial_chapters.json", "register_controller", parent);
+
+	connect(registerMapTutorial, &gui::TutorialBuilder::finished, this, [=]() { Q_EMIT tutorialFinished(); });
+	connect(registerMapTutorial, &gui::TutorialBuilder::aborted, this, &RegisterController::tutorialAborted);
+
+	registerMapTutorial->setTitle("Tutorial");
+	registerMapTutorial->start();
+}
+
+void RegisterController::startSimpleTutorial()
+{
+	QWidget *parent = Util::findContainingWindow(this);
+	registerMapSimpleTutorial = new gui::TutorialBuilder(this, ":/registermap/tutorial_chapters.json",
+							     "simple_register_controller", parent);
+
+	connect(registerMapSimpleTutorial, &gui::TutorialBuilder::finished, this,
+		[=]() { Q_EMIT simpleTutorialFinished(); });
+
+	connect(registerMapSimpleTutorial, &gui::TutorialBuilder::aborted, this, &RegisterController::tutorialAborted);
+
+	registerMapSimpleTutorial->setTitle("Tutorial");
+	registerMapSimpleTutorial->start();
 }
