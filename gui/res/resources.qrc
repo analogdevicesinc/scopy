@@ -115,14 +115,6 @@
         <file>icons/trigger_rising_disabled.svg</file>
         <file>icons/trigger_rising_enabled.svg</file>
         <file>icons/v_cursor_handle.svg</file>
-        <file>stylesheets/browser.qss</file>
-        <file>stylesheets/channel_widget.qss</file>
-        <file>stylesheets/default.qss</file>
-        <file>stylesheets/dropdown_switch_list.qss</file>
-        <file>stylesheets/light.qss</file>
-        <file>stylesheets/spinbox_type_a.qss</file>
-        <file>stylesheets/stopButton.qss</file>
-        <file>stylesheets/toolMenuItem.qss</file>
         <file>icons/scopy-default/icons/gear_wheel.svg</file>
         <file>icons/scopy-default/icons/gear_wheel_hover.svg</file>
         <file>icons/scopy-default/icons/gear_wheel_pressed.svg</file>
