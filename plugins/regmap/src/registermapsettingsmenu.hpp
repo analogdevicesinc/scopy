@@ -21,11 +21,15 @@ class RegisterMapSettingsMenu : public QWidget
 public:
 	explicit RegisterMapSettingsMenu(QWidget *parent = nullptr);
 
+	void startTutorial();
+
 Q_SIGNALS:
 	void autoreadToggled(bool toggled);
 	void requestRead(int address);
 	void requestWrite(uint32_t address, uint32_t value);
 	void requestRegisterDump(QString path);
+	void tutorialDone();
+	void tutorialAborted();
 
 private:
 	MenuHeaderWidget *header;

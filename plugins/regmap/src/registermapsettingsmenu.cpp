@@ -15,6 +15,7 @@
 #include <src/readwrite/fileregisterreadstrategy.hpp>
 
 #include <menusectionwidget.h>
+#include <tutorialbuilder.h>
 
 using namespace scopy;
 using namespace regmap;
@@ -144,6 +145,29 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 	this->layout()->addItem(spacer);
 
 	applyStyle();
+
+	// init tutorial properties
+	autoread->setProperty("tutorial_name", "AUTOREAD");
+	setIntervalWidget->setProperty("tutorial_name", "READ_INTERVAL");
+	findPathWidget->setProperty("tutorial_name", "FIND_PATH");
+	writeListOfValuesButton->setProperty("tutorial_name", "WRITE_VALUES");
+	registerDump->setProperty("tutorial_name", "REGISTER_DUMP");
 }
 
 void RegisterMapSettingsMenu::applyStyle() { RegmapStyleHelper::regmapSettingsMenu(this); }
+
+void RegisterMapSettingsMenu::startTutorial()
+{
+	QWidget *parent = Util::findContainingWindow(this);
+	gui::TutorialBuilder *settingsTutorial =
+		new gui::TutorialBuilder(this, ":/registermap/tutorial_chapters.json", "settings", parent);
+	settingsTutorial->setTitle("Tutorial");
+	settingsTutorial->start();
+
+	auto settingsTutorialFinish = connect(settingsTutorial, &gui::TutorialBuilder::finished, this,
+					      &RegisterMapSettingsMenu::tutorialDone, Qt::UniqueConnection);
+	connect(settingsTutorial, &gui::TutorialBuilder::aborted, this, [=, this]() {
+		disconnect(settingsTutorialFinish);
+		Q_EMIT tutorialAborted();
+	});
+}

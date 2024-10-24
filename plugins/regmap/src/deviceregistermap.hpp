@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QWidget>
 #include <tooltemplate.h>
+#include <tutorialbuilder.h>
 #include "scopy-regmap_export.h"
 
 class QVBoxLayout;
@@ -34,6 +35,16 @@ public:
 	void toggleAutoread(bool toggled);
 	void applyFilters(QString filter);
 	bool hasTemplate();
+	void startTutorial();
+	void startSimpleTutorial();
+
+Q_SIGNALS:
+	void requestRead(uint32_t address);
+	void requestWrite(uint32_t address, uint32_t value);
+	void requestRegisterDump(QString path);
+	void tutorialFinished();
+	void simpleTutorialFinished();
+	void tutorialAborted();
 
 private:
 	ToolTemplate *tool;
@@ -50,10 +61,12 @@ private:
 	void initSettings();
 	int selectedRegister;
 
-Q_SIGNALS:
-	void requestRead(uint32_t address);
-	void requestWrite(uint32_t address, uint32_t value);
-	void requestRegisterDump(QString path);
+	void initTutorial();
+	void initSimpleTutorial();
+	void abortTutorial();
+	gui::TutorialBuilder *tutorial;
+	QMetaObject::Connection controllerTutorialFinish;
+	QMetaObject::Connection mapTutorialFinish;
 };
 } // namespace scopy::regmap
 #endif // DEVICEREGISTERMAP_HPP

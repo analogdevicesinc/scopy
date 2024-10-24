@@ -1,0 +1,161 @@
+{
+    "simple_registermap" : [
+        {
+            "index": 1,
+            "names": ["DEVICE_LIST"],
+            "description": "Select the device",
+            "anchor": "HP_BOTTOM",
+            "content": "HP_BOTTOM",
+            "y_offset": 10
+        },
+        {
+            "index": 2,
+            "names": ["SETTINGS_BUTTON"],
+            "description": "Settings",
+            "anchor": "HP_BOTTOM",
+            "content": "HP_BOTTOM",
+            "y_offset": 10,
+            "x_offset": -120
+        }
+    ],
+    "simple_register_controller" : [
+        {
+            "index": 1,
+            "names": ["READ_WIDGET"],
+            "description": "Read value for selected device",
+            "anchor": "HP_BOTTOM",
+            "content": "HP_BOTTOM",
+            "y_offset": -5
+        },
+        {
+            "index": 2,
+            "names": ["WRITE_WIDGET"],
+            "description": "Write value to selected register. After writing a the register will automatically read value from selected register.",
+            "anchor": "HP_BOTTOM",
+            "content": "HP_BOTTOM",
+            "y_offset": -5
+        }
+    ],
+    "register_controller" : [
+        {
+            "index": 1,
+            "names": ["READ_WIDGET"],
+            "description": "Read value for selected device",
+            "anchor": "HP_TOP",
+            "content": "HP_TOP",
+            "y_offset": -5
+        },
+        {
+            "index": 2,
+            "names": ["WRITE_WIDGET"],
+            "description": "Write value to selected register. After writing a the register will automatically read value from selected register.",
+            "anchor": "HP_TOP",
+            "content": "HP_TOP",
+            "y_offset": -5
+
+        },
+        {
+            "index": 3,
+            "names": ["TOGGLE_DETAILED_BUTTON"],
+            "description": "Show/hide detailed bitfields",
+            "anchor": "HP_TOP",
+            "content": "HP_TOP",
+            "y_offset": -5,
+            "x_offset": -120
+        }
+    ],
+    "registermap": [
+        {
+            "index": 1,
+            "names": ["DEVICE_LIST"],
+            "description": "Select the device",
+            "anchor": "HP_BOTTOM",
+            "content": "HP_BOTTOM",
+            "y_offset": 10
+        },
+        {
+            "index": 2,
+            "names": ["SEARCH_BAR"],
+            "description": "Search regiter by name or address of register or bitfields of register",
+            "anchor": "HP_BOTTOM",
+            "content": "HP_BOTTOM",
+            "y_offset": 10
+        },
+        {
+            "index": 3,
+            "names": ["SETTINGS_BUTTON"],
+            "description": "Settings",
+            "anchor": "HP_BOTTOM",
+            "content": "HP_BOTTOM",
+            "y_offset": 10,
+            "x_offset": -120
+        }
+
+    ],
+    "settings" : [
+        {
+            "index": 1,
+            "names": ["AUTOREAD"],
+            "description": "When enabled each time a new register is selected a read is automatically done.",
+            "anchor": "HP_BOTTOM",
+            "content": "HP_BOTTOM",
+            "y_offset": 10,
+            "x_offset": -120
+        },
+        {
+            "index": 2,
+            "names": ["READ_INTERVAL"],
+            "description": "Provide a start and end interval values to be able to read all registers in that interval.",
+            "anchor": "HP_BOTTOM",
+            "content": "HP_BOTTOM",
+            "y_offset": 10,
+            "x_offset": -120
+        },
+        {
+            "index": 3,
+            "names": ["FIND_PATH"],
+            "description": "Select a file that will be used for Write Values and Register Dump actions.",
+            "anchor": "HP_BOTTOM",
+            "content": "HP_BOTTOM",
+            "y_offset": 10,
+            "x_offset": -120
+        },
+        {
+            "index": 4,
+            "names": ["WRITE_VALUES"],
+            "description": "Write all values from provided files to registers.",
+            "anchor": "HP_BOTTOM",
+            "content": "HP_BOTTOM",
+            "y_offset": 10,
+            "x_offset": -120
+        },
+        {
+            "index": 5,
+            "names": ["REGISTER_DUMP"],
+            "description": "Save all read registers to selected file.",
+            "anchor": "HP_BOTTOM",
+            "content": "HP_BOTTOM",
+            "y_offset": 10,
+            "x_offset": -120
+        }
+    ],
+    "device_register_map": [
+        {
+            "index": 1,
+            "names": ["DETAILED_BITFIELDS"],
+            "description": "Detailed bitfields where you can change individual bitfields values",
+            "anchor": "HP_TOP",
+            "content": "HP_TOP",
+            "y_offset": 10
+        },
+        {
+            "index": 2,
+            "names": ["REGISTER_MAP"],
+            "description": "Map of all registers where you can see values and information",
+            "anchor": "HP_TOP",
+            "content": "HP_TOP",
+            "y_offset": 300,
+            "x_offset": 500
+        }
+    ]
+}

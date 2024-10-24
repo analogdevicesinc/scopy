@@ -19,6 +19,7 @@
 #include <QJsonArray>
 #include <registermaptool.hpp>
 #include <style.h>
+#include <stylehelper.h>
 #include <src/readwrite/iioregisterreadstrategy.hpp>
 #include <src/readwrite/iioregisterwritestrategy.hpp>
 #include <pluginbase/preferences.h>
@@ -111,6 +112,7 @@ void RegmapPlugin::initPreferences()
 {
 	Preferences *p = Preferences::GetInstance();
 	p->init("regmap_color_by_value", "Default");
+	p->init("regmapplugin_start_tutorial", true);
 #if defined __APPLE__
 	p->init("additional_regmap_xml_path", QCoreApplication::applicationDirPath() + "/plugins/xmls");
 #else
@@ -141,6 +143,22 @@ bool RegmapPlugin::loadPreferencesPage()
 		 "Register background and Bitfield background", "Register text and Bitfield text",
 		 "Register background and Bitfield text", "Register text and Bitfield background"},
 		generalSection));
+
+	QWidget *resetTutorialWidget = new QWidget();
+	QHBoxLayout *resetTutorialWidgetLayout = new QHBoxLayout();
+
+	resetTutorialWidget->setLayout(resetTutorialWidgetLayout);
+	resetTutorialWidgetLayout->setMargin(0);
+
+	QPushButton *resetTutorial = new QPushButton("Reset", generalSection);
+	Style::setStyle(resetTutorial, style::properties::button::basicButton);
+	connect(resetTutorial, &QPushButton::clicked, this,
+		[=, this]() { p->set("regmapplugin_start_tutorial", true); });
+
+	resetTutorialWidgetLayout->addWidget(resetTutorial, 1);
+	resetTutorialWidgetLayout->addWidget(new QLabel("Register map tutorial "), 6);
+	generalSection->contentLayout()->addWidget(resetTutorialWidget);
+
 	return true;
 }
 
