@@ -1,0 +1,5 @@
+QScrollBar:vertical[&&property&&=true] {
+	background-color: &background_primary&;
+	border: &border_width_interactive& solid &interactive_subtle_idle&;
+	border-radius: &radius_1&;
+}
