@@ -53,6 +53,7 @@ public:
 	bool collapsed() override;
 	void setCollapsed(bool b) override;
 	MenuCollapseSection *collapseSection();
+	MenuSectionWidget *menuSection();
 
 private:
 	QVBoxLayout *m_layout;

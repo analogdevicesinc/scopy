@@ -63,4 +63,6 @@ bool MenuSectionCollapseWidget::collapsed() { return m_collapse->header()->isChe
 void MenuSectionCollapseWidget::setCollapsed(bool b) { m_collapse->header()->setChecked(!b); }
 
 MenuCollapseSection *MenuSectionCollapseWidget::collapseSection() { return m_collapse; }
+
+MenuSectionWidget *MenuSectionCollapseWidget::menuSection() { return m_section; }
 #include "moc_menusectionwidget.cpp"
