@@ -55,7 +55,7 @@ EmuWidget::EmuWidget(QWidget *parent)
 	QWidget *emuWidget = new QWidget(this);
 	QGridLayout *emuWidgetLay = new QGridLayout(emuWidget);
 	emuWidgetLay->setSpacing(10);
-	Style::setStyle(emuWidget, style::properties::widget::basicComponent);
+	Style::setStyle(emuWidget, style::properties::widget::border_interactive);
 
 	QLabel *demoLabel = new QLabel("Demo option", emuWidget);
 	StyleHelper::MenuSmallLabel(demoLabel);

@@ -452,9 +452,10 @@ void StyleHelper::MenuLineEdit(QLineEdit *w, QString objectName)
 QLineEdit {
  background-color: transparent;
  color: &&content_default&&;
- font-size: 16px;
+ font-size: 15px;
  border: 0px solid transparent;
  border-bottom: 1px solid &&content_default&&;
+ border-radius: 0;
  padding: 2px;
  padding-bottom: 4px;
 }
