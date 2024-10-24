@@ -42,6 +42,7 @@ public:
 private:
 	QVector<BitFieldDetailedWidget *> *bitFieldList;
 	int regWidth;
+
 Q_SIGNALS:
 	void bitFieldValueChanged(QString value);
 };

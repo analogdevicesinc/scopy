@@ -131,7 +131,9 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 		tableHeadWidgetLayout->addWidget(registerTableHead, 1);
 		tableHeadWidgetLayout->addWidget(colBitCount, 8);
 		registerMapTableLayout->addWidget(tableHeadWidget);
+
 		registerMapTableWidget = new RegisterMapTable(registerMapTemplate->getRegisterList(), this);
+		registerMapTable->setProperty("tutorial_name", "REGISTER_MAP");
 
 		QWidget *aux = registerMapTableWidget->getWidget();
 		if(aux) {
@@ -180,12 +182,17 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 	tool->addWidgetToCentralContainerHelper(controllerWidget);
 	controllerLayout->addWidget(registerController);
 
+	initSimpleTutorial();
 	if(registerMapTemplate) {
 		registerChanged(registerMapTemplate->getRegisterList()->first());
+		initTutorial();
+
 	} else {
 		tool->centralContainer()->layout()->addItem(
 			new QSpacerItem(10, 10, QSizePolicy::Preferred, QSizePolicy::Expanding));
 	}
+
+	connect(this, &DeviceRegisterMap::tutorialAborted, this, &DeviceRegisterMap::abortTutorial);
 }
 
 DeviceRegisterMap::~DeviceRegisterMap()
@@ -212,6 +219,7 @@ void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
 	}
 
 	registerDetailedWidget = new RegisterDetailedWidget(regModel, tool->bottomContainer());
+	registerDetailedWidget->setProperty("tutorial_name", "DETAILED_BITFIELDS");
 	registerDetailedWidget->setMaximumHeight(140);
 	tool->bottomCentral()->layout()->addWidget(registerDetailedWidget);
 
@@ -251,6 +259,8 @@ bool DeviceRegisterMap::hasTemplate()
 }
 
 bool DeviceRegisterMap::getAutoread() { return autoread; }
+void DeviceRegisterMap::startTutorial() { registerController->startTutorial(); }
+void DeviceRegisterMap::startSimpleTutorial() { registerController->startSimpleTutorial(); }
 
 void DeviceRegisterMap::initSettings()
 {
@@ -259,3 +269,27 @@ void DeviceRegisterMap::initSettings()
 			 &RegisterMapValues::registerDump);
 	QObject::connect(this, &DeviceRegisterMap::requestWrite, registerMapValues, &RegisterMapValues::requestWrite);
 }
+
+void DeviceRegisterMap::initTutorial()
+{
+
+	controllerTutorialFinish = connect(registerController, &RegisterController::tutorialFinished, this, [=]() {
+		QWidget *parent = Util::findContainingWindow(this);
+		tutorial = new gui::TutorialBuilder(this, ":/registermap/tutorial_chapters.json", "device_register_map",
+						    parent);
+
+		connect(tutorial, &gui::TutorialBuilder::finished, this, [=]() { Q_EMIT tutorialFinished(); });
+		connect(tutorial, &gui::TutorialBuilder::aborted, this, &DeviceRegisterMap::tutorialAborted);
+		tutorial->setTitle("Tutorial");
+		tutorial->start();
+	});
+}
+
+void DeviceRegisterMap::initSimpleTutorial()
+{
+	connect(registerController, &RegisterController::tutorialAborted, this, &DeviceRegisterMap::tutorialAborted);
+	connect(registerController, &RegisterController::simpleTutorialFinished, this,
+		&DeviceRegisterMap::simpleTutorialFinished);
+}
+
+void DeviceRegisterMap::abortTutorial() { disconnect(controllerTutorialFinish); }
