@@ -21,6 +21,8 @@
 
 #include "clidetailsview.h"
 #include "debuggerloggingcategories.h"
+#include <gui/style.h>
+#include "style_properties.h"
 
 using namespace scopy::debugger;
 
@@ -101,11 +103,12 @@ void CliDetailsView::setupUi()
 	QFont mono("Monospace");
 	mono.setStyleHint(QFont::Monospace);
 	m_textBrowser->setFont(mono);
+	Style::setStyle(m_textBrowser, style::properties::debugger::iioview);
 }
 
 void CliDetailsView::setupChannelAttr()
 {
-	IIOWidget *w = m_channelIIOItem->getIIOWidgets()[0];
+	IIOWidget *w = m_channelIIOItem->getIIOWidgets().at(0);
 	DataStrategyInterface *ds = w->getDataStrategy();
 
 	m_currentText.append(tabs(4) + "attr " + QString::number(m_noChnlAttributes) + ": " + m_channelIIOItem->name() +
@@ -146,7 +149,7 @@ void CliDetailsView::setupChannel()
 
 void CliDetailsView::setupDeviceAttr()
 {
-	IIOWidget *w = m_deviceIIOItem->getIIOWidgets()[0];
+	IIOWidget *w = m_deviceIIOItem->getIIOWidgets().at(0);
 	DataStrategyInterface *ds = w->getDataStrategy();
 
 	m_deviceAttrsString.append(tabs(4) + "attr " + QString::number(m_noDevAttributes) + ": " +
@@ -204,7 +207,7 @@ void CliDetailsView::setupContextAttr()
 {
 	++m_noCtxAttributes;
 	m_currentText.append(tabs(1) + m_contextIIOItem->name() + ": " +
-			     m_contextIIOItem->getIIOWidgets()[0]->getDataStrategy()->data() + "\n");
+			     m_contextIIOItem->getIIOWidgets().at(0)->getDataStrategy()->data() + "\n");
 }
 
 void CliDetailsView::setupContext()
