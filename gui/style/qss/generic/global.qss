@@ -16,9 +16,10 @@ QDialog {
 }
 
 QLineEdit {
+    height: &unit_2&;
     border: &border_width& solid &interactive_subtle_idle&;
     border-bottom: &border_width_interactive& solid &interactive_subtle_idle&;
-    border-radius: &radius_1&px;
+    border-radius: &radius_interactive&;
     padding: 0 &padding_1&px;
     selection-background-color: &interactive_subtle_pressed&;
 }
@@ -88,11 +89,13 @@ QComboBox::disabled {
     color: &interactive_subtle_disabled&;
     border: &border_width& solid &interactive_subtle_disabled&;
     border-bottom: &border_width_interactive& solid &interactive_subtle_idle&;
+    border-radius: &radius_interactive&;
 }
 QComboBox {
     height: &unit_2&;
     border: &border_width& solid &interactive_subtle_idle&;
     border-bottom: &border_width_interactive& solid &interactive_subtle_idle&;
+    border-radius: &radius_interactive&;
     border-radius: &radius_1&;
     background-color: &background_primary&;
     color: &content_default&;
