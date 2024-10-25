@@ -82,7 +82,6 @@ void CliDetailsView::setupUi()
 	QFont mono("Monospace");
 	mono.setStyleHint(QFont::Monospace);
 	m_textBrowser->setFont(mono);
-	Style::setStyle(m_textBrowser, style::properties::debugger::iioview);
 }
 
 void CliDetailsView::setupChannelAttr()

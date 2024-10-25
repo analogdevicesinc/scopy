@@ -54,7 +54,7 @@ void WatchListView::setupUi()
 	header->setDefaultAlignment(Qt::AlignLeft);
 
 	Style::setStyle(this, style::properties::debugger::watchListView);
-	Style::setStyle(header, style::properties::debugger::watchListView, true, true);
+	Style::setStyle(header, style::properties::debugger::headerView, true, true);
 	verticalHeader()->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 }
 
