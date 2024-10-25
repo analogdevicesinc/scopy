@@ -82,12 +82,10 @@ void IIOExplorerInstrument::setupUi()
 	QWidget *details_container = new QWidget(right_container);
 	QWidget *watch_list = new QWidget(right_container);
 
-	StyleHelper::BackgroundPage(details_container, "DetailsContainer");
-	StyleHelper::BackgroundPage(watch_list, "WatchListContainer");
-	StyleHelper::BackgroundPage(tree_view_container, "TreeViewContainer");
+	Style::setBackgroundColor(details_container, json::theme::background_subtle);
+	Style::setBackgroundColor(tree_view_container, json::theme::background_subtle);
 	StyleHelper::SplitterStyle(m_HSplitter, "HorizontalSplitter");
 	StyleHelper::SplitterStyle(m_VSplitter, "VerticalSplitter");
-	StyleHelper::TabWidgetBarUnderline(m_tabWidget, "IIODebugInstrumentTabWidget");
 
 	m_mainWidget->setLayout(new QVBoxLayout(m_mainWidget));
 	m_mainWidget->layout()->setContentsMargins(10, 10, 10, 10);
@@ -115,7 +113,6 @@ void IIOExplorerInstrument::setupUi()
 	m_detailsView = new DetailsView(details_container);
 	m_watchListView = new WatchListView(watch_list);
 
-	watch_list->layout()->setContentsMargins(0, 0, 0, 0);
 	watch_list->layout()->addWidget(m_watchListView);
 
 	m_proxyModel->setSourceModel(m_iioModel->getModel());
