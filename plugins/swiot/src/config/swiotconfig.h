@@ -45,6 +45,7 @@ public:
 
 public Q_SLOTS:
 	void onConfigBtnPressed();
+	void startTutorial();
 
 Q_SIGNALS:
 	void writeModeAttribute(QString mode);
@@ -73,6 +74,8 @@ private:
 	void initTutorialProperties();
 	QWidget *createGridHeader(QWidget *parent);
 	QPushButton *createApplyBtn();
+
+	void showEvent(QShowEvent *event) override;
 };
 } // namespace scopy::swiot
 
