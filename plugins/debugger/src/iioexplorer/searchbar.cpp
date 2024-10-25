@@ -36,6 +36,7 @@ SearchBar::SearchBar(QSet<QString> options, QWidget *parent)
 	Style::setStyle(m_label, style::properties::label::menuSmall);
 	m_completer->setCaseSensitivity(Qt::CaseInsensitive);
 	m_completer->setFilterMode(Qt::MatchContains);
+	m_lineEdit->setPlaceholderText("Type to filter");
 	m_lineEdit->setCompleter(m_completer);
 	m_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 

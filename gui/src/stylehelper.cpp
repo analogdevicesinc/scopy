@@ -1186,35 +1186,4 @@ void StyleHelper::IIOCompactLabel(QLabel *w, QString objectName)
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::GrayButton(QPushButton *btn, QString objectName)
-{
-	if(!objectName.isEmpty())
-		btn->setObjectName(objectName);
-
-	QString style = QString(R"css(
-		QPushButton {
-			border: 1px solid &&interactive_subtle_idle&&;
-			border-radius: 4px;
-			background-color: &&background_primary&&;
-
-			color: &&content_default&&;
-			font-weight: 600;
-			font-size: 14px;
-			padding: 4px 8px;
-
-			box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
-		}
-
-		QPushButton:hover {
-			background-color: &&interactive_subtle_idle&&;
-		}
-
-		QPushButton:pressed {
-			background-color: &&interactive_subtle_idle&&;
-			border-style: inset;
-		}
-	)css");
-	btn->setStyleSheet(style);
-}
-
 #include "moc_stylehelper.cpp"
