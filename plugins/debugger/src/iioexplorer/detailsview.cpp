@@ -49,7 +49,7 @@ DetailsView::DetailsView(QWidget *parent)
 void DetailsView::setupUi()
 {
 	setLayout(new QVBoxLayout(this));
-	layout()->setContentsMargins(0, 20, 0, 0);
+	layout()->setContentsMargins(0, 0, 0, 0);
 
 	m_titleContainer->setLayout(new QHBoxLayout(m_titleContainer));
 	m_titleContainer->layout()->setContentsMargins(0, 0, 0, 0);
@@ -71,9 +71,9 @@ void DetailsView::setupUi()
 	QTabBar *tabBar = m_tabWidget->tabBar();
 	tabBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-	m_readBtn->setIcon(Style::getPixmap(":/gui/icons/refresh.svg"));
+	m_readBtn->setIcon(Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
 	m_readBtn->setIconSize(QSize(25, 25));
-	m_readBtn->setText("Refresh");
+	m_readBtn->setText("Read All");
 	m_addToWatchlistBtn->setStyleSheet("QPushButton { background-color: transparent; border: 0px; }");
 
 	m_titleContainer->layout()->addWidget(m_titlePath);
@@ -83,9 +83,21 @@ void DetailsView::setupUi()
 	m_titleContainer->layout()->setContentsMargins(0, 0, 0, 0);
 
 	layout()->addWidget(m_titleContainer);
-	layout()->addWidget(m_tabWidget);
-	Style::setStyle(m_guiView, style::properties::debugger::detailsView, true, true);
-	Style::setStyle(m_iioView, style::properties::debugger::detailsView, true, true);
+
+	QFrame *tabContainer = new QFrame(this);
+	tabContainer->setLayout(new QVBoxLayout(tabContainer));
+	tabContainer->layout()->setContentsMargins(0, 0, 0, 0);
+	tabContainer->layout()->addWidget(m_tabWidget);
+
+	layout()->addWidget(tabContainer);
+
+	Style::setBackgroundColor(this, json::theme::background_subtle);
+	Style::setBackgroundColor(m_guiView, json::theme::background_primary);
+	Style::setBackgroundColor(m_iioView, json::theme::background_primary);
+
+	Style::setStyle(tabContainer, style::properties::debugger::detailsView, true, true);
+	Style::setStyle(m_tabWidget, style::properties::debugger::detailsView, true, true);
+	Style::setStyle(tabBar, style::properties::debugger::tabBar);
 	Style::setStyle(m_readBtn, style::properties::button::basicButton);
 }
 

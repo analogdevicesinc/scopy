@@ -1,5 +1,5 @@
-QTreeView[&&property&&=true] {
-	border: &border_width& solid &content_silent&;
+*[&&property&&=true] {
+	border: &border_width& solid &interactive_subtle_disabled&;
 	border-radius: &radius_1&;
 	background-color: &background_primary&;
 }
