@@ -28,6 +28,8 @@
 #include <QHBoxLayout>
 #include <stylehelper.h>
 
+#include <pluginbase/preferences.h>
+
 using namespace scopy;
 using namespace scopy::dac;
 using namespace scopy::gui;
@@ -69,7 +71,6 @@ DacInstrument::DacInstrument(const Connection *conn, QWidget *parent)
 	rightMenuBtnGrp->addButton(settingsBtn);
 	rightMenuBtnGrp->addButton(devicesBtn->button());
 
-	// connect(infoBtn, &QPushButton::clicked, this, &DacInstrument::startTutorial);
 	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
 		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/dac/dac.html"));
 	});
@@ -186,6 +187,17 @@ void DacInstrument::abortTutorial()
 		   &DacInstrument::startBufferNonCyclicTutorial);
 	disconnect(m_dacBufferNonCyclicTutorial, &gui::TutorialBuilder::finished, this,
 		   &DacInstrument::startDdsTutorial);
+}
+
+void DacInstrument::showEvent(QShowEvent *event)
+{
+	QWidget::showEvent(event);
+
+	// Handle tutorial
+	if(Preferences::get("dacplugin_start_tutorial").toBool()) {
+		startTutorial();
+		Preferences::set("dacplugin_start_tutorial", false);
+	}
 }
 
 void DacInstrument::setupDacDataManagers()

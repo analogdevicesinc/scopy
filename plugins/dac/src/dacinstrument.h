@@ -82,6 +82,8 @@ private:
 	const QString settingsMenuId = "settings";
 	const QString devicesMenuId = "devices";
 	const QString verticalChannelManagerId = "vcm";
+
+	void showEvent(QShowEvent *event) override;
 };
 } // namespace dac
 } // namespace scopy
