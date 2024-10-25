@@ -28,6 +28,7 @@
 #include <measurementlabel.h>
 #include <plotinfo.h>
 #include <plotinfowidgets.h>
+#include <tutorialbuilder.h>
 
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menuheader.h>
@@ -35,6 +36,7 @@
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/stylehelper.h>
 #include <gui/widgets/verticalchannelmanager.h>
+#include <pluginbase/preferences.h>
 
 #include <iioutil/connectionprovider.h>
 
@@ -162,6 +164,16 @@ void Ad74413r::onThresholdWritten(bool written)
 		Q_EMIT broadcastThreshold();
 	}
 	Q_EMIT activateRunBtns(activateBtns && written);
+}
+
+void Ad74413r::startTutorial()
+{
+	qInfo(CAT_SWIOT) << "Starting ad74413r tutorial.";
+	QWidget *parent = Util::findContainingWindow(this);
+	gui::TutorialBuilder *m_ad74413rTutorial =
+		new gui::TutorialBuilder(this, ":/swiot/tutorial_chapters.json", "ad74413r", parent);
+	m_ad74413rTutorial->setTitle("AD74413R");
+	m_ad74413rTutorial->start();
 }
 
 void Ad74413r::onActivateRunBtns(bool enable)
@@ -387,6 +399,16 @@ PlotAxis *Ad74413r::createYChnlAxis(QPen pen, QString unitType, int yMin, int yM
 	chYAxis->scaleDraw()->setFloatPrecision(2);
 	chYAxis->scaleDraw()->setUnitType(unitType);
 	return chYAxis;
+}
+
+void Ad74413r::showEvent(QShowEvent *event)
+{
+	QWidget::showEvent(event);
+
+	if(Preferences::get("ad74413r_start_tutorial").toBool()) {
+		startTutorial();
+		Preferences::set("ad74413r_start_tutorial", false);
+	}
 }
 
 void Ad74413r::setupChannelBtn(MenuControlButton *btn, PlotChannel *ch, QString chnlId, int chnlIdx)

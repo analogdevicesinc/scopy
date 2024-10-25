@@ -25,7 +25,9 @@
 #include "configmodel.h"
 
 #include <QVBoxLayout>
+#include <tutorialbuilder.h>
 #include <gui/stylehelper.h>
+#include <pluginbase/preferences.h>
 
 #include <iioutil/connectionprovider.h>
 
@@ -160,6 +162,25 @@ QPushButton *SwiotConfig::createApplyBtn()
 	applyBtn->setCheckable(false);
 	applyBtn->setText("Apply");
 	return applyBtn;
+}
+
+void SwiotConfig::startTutorial()
+{
+	qInfo(CAT_SWIOT) << "Starting SWIOT config tutorial.";
+	QWidget *parent = Util::findContainingWindow(this);
+	gui::TutorialBuilder *tut = new gui::TutorialBuilder(this, ":/swiot/tutorial_chapters.json", "config", parent);
+	tut->setTitle("CONFIG");
+	tut->start();
+}
+
+void SwiotConfig::showEvent(QShowEvent *event)
+{
+	QWidget::showEvent(event);
+
+	if(Preferences::get("swiote_config_start_tutorial").toBool()) {
+		startTutorial();
+		Preferences::set("swiote_config_start_tutorial", false);
+	}
 }
 
 void SwiotConfig::onConfigBtnPressed() { Q_EMIT writeModeAttribute("runtime"); }

@@ -55,6 +55,8 @@ public:
 	bool compatible(QString param, QString category) override;
 	void initMetadata() override;
 	QString description() override;
+	void initPreferences() override;
+	bool loadPreferencesPage() override;
 
 public Q_SLOTS:
 	bool onConnect() override;
@@ -64,13 +66,6 @@ public Q_SLOTS:
 	void onPausePingTask(bool pause) override;
 
 	void onIsRuntimeCtxChanged(bool isRuntimeCtx);
-
-	void startTutorial();
-	void abortTutorial();
-
-	void startAd74413rTutorial();
-	void startMax14906Tutorial();
-	void startFaultsTutorial();
 
 	void powerSupplyStatus(bool ps);
 
@@ -84,7 +79,6 @@ private:
 	void clearPingTask();
 	void createStatusContainer();
 	QPushButton *m_btnIdentify;
-	QPushButton *m_btnTutorial;
 	QWidget *m_statusContainer;
 	SwiotInfoPage *m_infoPage;
 
@@ -95,10 +89,6 @@ private:
 
 	SwiotController *m_swiotController;
 	SwiotRuntime *m_runtime;
-
-	gui::TutorialBuilder *m_ad74413rTutorial;
-	gui::TutorialBuilder *m_max14906Tutorial;
-	gui::TutorialBuilder *m_faultsTutorial;
 
 	bool m_isRuntime;
 	bool m_switchCmd = false;
