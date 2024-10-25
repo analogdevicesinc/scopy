@@ -25,7 +25,9 @@
 #include <QDesktopServices>
 #include <QThread>
 #include <QTimer>
+#include <tutorialbuilder.h>
 #include <gui/stylehelper.h>
+#include <pluginbase/preferences.h>
 
 using namespace scopy::swiot;
 
@@ -132,6 +134,16 @@ void Faults::singleButtonClicked()
 	m_singleBtn->setChecked(false);
 }
 
+void Faults::startTutorial()
+{
+	qInfo(CAT_SWIOT) << "Starting faults tutorial.";
+	QWidget *parent = Util::findContainingWindow(this);
+	gui::TutorialBuilder *m_faultsTutorial =
+		new gui::TutorialBuilder(this, ":/swiot/tutorial_chapters.json", "faults", parent);
+	m_faultsTutorial->setTitle("FAULTS");
+	m_faultsTutorial->start();
+}
+
 void Faults::pollFaults()
 {
 	qDebug(CAT_SWIOT_FAULTS) << "Polling faults...";
@@ -146,6 +158,16 @@ QPushButton *Faults::createConfigBtn(QWidget *parent)
 	configBtn->setCheckable(false);
 	configBtn->setText("Config");
 	return configBtn;
+}
+
+void Faults::showEvent(QShowEvent *event)
+{
+	QWidget::showEvent(event);
+
+	if(Preferences::get("faults_start_tutorial").toBool()) {
+		startTutorial();
+		Preferences::set("faults_start_tutorial", false);
+	}
 }
 
 void Faults::initTutorialProperties()

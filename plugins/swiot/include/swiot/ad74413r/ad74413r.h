@@ -88,6 +88,7 @@ private Q_SLOTS:
 	void onChannelBtnChecked(int chnWidgetId, bool en);
 	void samplingFreqWritten(bool written);
 	void onThresholdWritten(bool written);
+	void startTutorial();
 
 private:
 	void init();
@@ -155,6 +156,8 @@ private:
 	QTimer *m_rstAcqTimer;
 	const QString channelsMenuId = "channels";
 	const QString measureMenuId = "measure";
+
+	void showEvent(QShowEvent *event) override;
 };
 } // namespace swiot
 } // namespace scopy
