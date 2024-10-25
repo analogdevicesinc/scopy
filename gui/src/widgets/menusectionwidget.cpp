@@ -57,7 +57,7 @@ void MenuSectionCollapseWidget::add(QWidget *w) { m_collapse->contentLayout()->a
 
 void MenuSectionCollapseWidget::remove(QWidget *w) { m_collapse->contentLayout()->removeWidget(w); }
 
-bool MenuSectionCollapseWidget::collapsed() { return m_collapse->header()->isChecked(); }
+bool MenuSectionCollapseWidget::collapsed() { return !m_collapse->header()->isChecked(); }
 
 void MenuSectionCollapseWidget::setCollapsed(bool b) { m_collapse->header()->setChecked(!b); }
 

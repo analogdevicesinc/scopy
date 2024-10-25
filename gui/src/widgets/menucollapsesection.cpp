@@ -34,8 +34,8 @@ MenuCollapseHeader::MenuCollapseHeader(QString title, MenuCollapseSection::MenuH
 	case MenuCollapseSection::MHCW_ARROW:
 		m_ctrl = new QCheckBox(this);
 		StyleHelper::CollapseCheckbox(dynamic_cast<QCheckBox *>(m_ctrl), "menuCollapseButton");
-		connect(this, &QAbstractButton::toggled, this, [=](bool b) { m_ctrl->setChecked(!b); });
-		m_ctrl->setChecked(false);
+		connect(this, &QAbstractButton::toggled, this, [=](bool b) { m_ctrl->setChecked(b); });
+		m_ctrl->setChecked(true);
 		break;
 	case MenuCollapseSection::MHCW_ONOFF:
 		m_ctrl = new SmallOnOffSwitch(this);
