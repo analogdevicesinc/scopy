@@ -57,6 +57,7 @@
 		<attribute name="log_stop_time" value="0000000000000000" />
 		<attribute name="start_logging" value="0" />
 		<attribute name="fw_version" value="0" />
+		<attribute name="process_data" value="0" />
 		<channel id="voltage0" name="ua" type="input" >
 			<scan-element index="0" format="be:u24/32&gt;&gt;0" />
 			<attribute name="rms" filename="in_voltage0_rms" value="200.6921" />
