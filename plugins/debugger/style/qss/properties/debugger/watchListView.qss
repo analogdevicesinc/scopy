@@ -1,13 +1,3 @@
-QHeaderView::section[&&property&&=true] {
-	border: none;
-	border-bottom: 2px solid &content_default&;
-	margin-left: 2px;
-	background-color: &background_primary&;
-
-	font: 11pt;
-	font-weight: bold;
-}
-
 QTableWidget::item[&&property&&=true] {
 	color: &content_default&;
 	border-bottom: 1px solid &interactive_subtle_disabled&;
@@ -18,3 +8,8 @@ QTableWidget::item::selected[&&property&&=true] {
 	background-color: &interactive_focus&;
 }
 
+QTableWidget[&&property&&=true] {
+	border: &border_width& solid &interactive_subtle_disabled&;
+	border-radius: &radius_1&;
+	background-color: &background_primary&;
+}

@@ -23,6 +23,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QDebug>
+#include <style.h>
 #include <gui/stylehelper.h>
 
 // Currently there is no need for a custom split char, so it will be unchangeable
@@ -58,7 +59,7 @@ void PathTitle::setTitle(QString title)
 
 	for(int i = 0; i < segmentStrings.size(); ++i) {
 		QPushButton *btn = new QPushButton(segmentStrings[i], this);
-		StyleHelper::GrayButton(btn, "SegmentButton");
+		Style::setStyle(btn, style::properties::button::borderButton);
 		auxPath.append(segmentStrings[i]);
 		connect(btn, &QPushButton::clicked, this, [this, auxPath]() { Q_EMIT pathSelected(auxPath); });
 		layout()->addWidget(btn);
