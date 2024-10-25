@@ -1,0 +1,11 @@
+QTabBar::tab[&&property&&=true] {
+	background: &background_primary&;
+	font-weight: bold;
+}
+
+QTabBar::tab:selected[&&property&&=true] {
+	background: &background_primary&;
+	color: &interactive_primary_idle&;
+	border-bottom: 1px solid &interactive_primary_idle&;
+}
+
