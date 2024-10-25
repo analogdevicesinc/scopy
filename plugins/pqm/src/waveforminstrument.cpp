@@ -26,6 +26,7 @@
 #include <QFileDialog>
 #include <menulineedit.h>
 #include <menuonoffswitch.h>
+#include <plotnavigator.hpp>
 #include <qwt_legend.h>
 #include <rollingstrategy.h>
 #include <swtriggerstrategy.h>
@@ -69,6 +70,9 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 	initPlot(m_currentPlot, "A", -20, 20);
 	setupChannels(m_currentPlot, m_chnls["current"]);
 	tool->addWidgetToCentralContainerHelper(m_currentPlot);
+
+	PlotNavigator::syncPlotNavigators(m_voltagePlot->navigator(), m_currentPlot->navigator(),
+					  new QSet<QwtAxisId>{m_voltagePlot->xAxis()->axisId()});
 
 	m_runBtn = new RunBtn(this);
 	m_singleBtn = new SingleShotBtn(this);
