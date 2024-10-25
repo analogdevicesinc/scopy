@@ -32,6 +32,7 @@
 #include <QDesktopServices>
 #include <timemanager.hpp>
 #include <tutorialbuilder.h>
+#include <pluginbase/preferences.h>
 #include "datamonitorstylehelper.hpp"
 #include <iioutil/connection.h>
 
@@ -72,6 +73,9 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 		QDesktopServices::openUrl(
 			QUrl("https://analogdevicesinc.github.io/scopy/plugins/datalogger/datalogger.html"));
 	});
+
+	// connect(infoBtn, &QPushButton::clicked, this, &DatamonitorTool::startTutorial);
+
 	//// add monitors
 	addMonitorButton = new AddBtn(this);
 
@@ -348,6 +352,17 @@ void DatamonitorTool::startTutorial()
 		new gui::TutorialBuilder(this, ":/datamonitor/tutorial_chapters.json", "datamonitor", parent);
 	datamonitorTutorial->setTitle("Tutorial");
 	datamonitorTutorial->start();
+}
+
+void DatamonitorTool::showEvent(QShowEvent *event)
+{
+	QWidget::showEvent(event);
+
+	// Handle tutorial
+	if(Preferences::get("dataloggerplugin_start_tutorial").toBool()) {
+		startTutorial();
+		Preferences::set("dataloggerplugin_start_tutorial", false);
+	}
 }
 
 #include "moc_datamonitortool.cpp"
