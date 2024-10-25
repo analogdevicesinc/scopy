@@ -24,6 +24,7 @@
 #include <QLoggingCategory>
 #include <QLabel>
 #include <stylehelper.h>
+#include <menusectionwidget.h>
 #include <iioutil/cmdqpingtask.h>
 
 #include "swiot_logging_categories.h"
@@ -35,6 +36,7 @@
 
 #include <src/config/swiotconfig.h>
 
+#include <pluginbase/preferences.h>
 #include <pluginbase/statusbarmanager.h>
 
 using namespace scopy::swiot;
@@ -92,7 +94,6 @@ bool SWIOTPlugin::loadPage()
 			m_swiotController->stopTemperatureTask();
 		}
 	});
-	connect(m_btnTutorial, &QPushButton::clicked, this, &SWIOTPlugin::startTutorial);
 
 	Connection *conn = ConnectionProvider::open(m_param);
 
@@ -120,12 +121,6 @@ bool SWIOTPlugin::loadExtraButtons()
 	m_btnIdentify = new QPushButton("Identify");
 	m_extraButtons.append(m_btnIdentify);
 	connect(m_btnIdentify, SIGNAL(clicked()), m_swiotController, SLOT(identify()));
-
-	// The tutorial button will only be clickable when the user connects to the device
-	m_btnTutorial = new QPushButton(tr("Tutorial"));
-	m_extraButtons.append(m_btnTutorial);
-	m_btnTutorial->setEnabled(false);
-	m_btnTutorial->setToolTip("The tutorial will be available once the device is connected.");
 
 	return true;
 }
@@ -179,8 +174,6 @@ bool SWIOTPlugin::onConnect()
 	m_swiotController->connectSwiot();
 	m_swiotController->readModeAttribute();
 	m_swiotController->startPowerSupplyTask("ext_psu");
-	m_btnTutorial->setEnabled(true);
-	m_btnTutorial->setToolTip("");
 
 	return true;
 }
@@ -217,8 +210,6 @@ bool SWIOTPlugin::onDisconnect()
 	m_swiotController->stopPowerSupplyTask();
 	m_swiotController->stopTemperatureTask();
 	m_swiotController->disconnectSwiot();
-
-	m_btnTutorial->setEnabled(false);
 
 	if(m_runtime) {
 		disconnect(m_runtime, &SwiotRuntime::writeModeAttribute, this, &SWIOTPlugin::setCtxMode);
@@ -258,75 +249,6 @@ void SWIOTPlugin::onIsRuntimeCtxChanged(bool isRuntimeCtx)
 {
 	m_isRuntime = isRuntimeCtx;
 	setupToolList();
-}
-
-void SWIOTPlugin::startTutorial()
-{
-	if(m_isRuntime) {
-		qInfo(CAT_SWIOT) << "Starting SWIOT runtime tutorial.";
-
-		// The tutorial builder is responsible for deleting itself after the tutorial is finished, so creating
-		// a new one each time the tutorial is started will not create memory leaks.
-		ToolMenuEntry *ad74413rTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, AD74413R_TME_ID);
-		ToolMenuEntry *max14906Tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, MAX14906_TME_ID);
-		ToolMenuEntry *faultsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, FAULTS_TME_ID);
-
-		QWidget *ad74413rTool = ad74413rTme->tool();
-		QWidget *max14906Tool = max14906Tme->tool();
-		QWidget *faultsTool = faultsTme->tool();
-		QWidget *parent = Util::findContainingWindow(ad74413rTool);
-
-		m_ad74413rTutorial =
-			new gui::TutorialBuilder(ad74413rTool, ":/swiot/tutorial_chapters.json", "ad74413r", parent);
-		m_max14906Tutorial =
-			new gui::TutorialBuilder(max14906Tool, ":/swiot/tutorial_chapters.json", "max14906", parent);
-		m_faultsTutorial =
-			new gui::TutorialBuilder(faultsTool, ":/swiot/tutorial_chapters.json", "faults", parent);
-
-		connect(m_ad74413rTutorial, &gui::TutorialBuilder::finished, this, &SWIOTPlugin::startMax14906Tutorial);
-		connect(m_max14906Tutorial, &gui::TutorialBuilder::finished, this, &SWIOTPlugin::startFaultsTutorial);
-		connect(m_ad74413rTutorial, &gui::TutorialBuilder::aborted, this, &SWIOTPlugin::abortTutorial);
-
-		this->startAd74413rTutorial();
-	} else {
-		qInfo(CAT_SWIOT) << "Starting SWIOT config tutorial.";
-		auto configTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, CONFIG_TME_ID);
-
-		auto configTool = configTme->tool();
-		auto parent = Util::findContainingWindow(configTool);
-		auto tut = new gui::TutorialBuilder(configTool, ":/swiot/tutorial_chapters.json", "config", parent);
-
-		tut->setTitle("CONFIG");
-		requestTool(configTme->id());
-		tut->start();
-	}
-}
-
-void SWIOTPlugin::startAd74413rTutorial()
-{
-	qInfo(CAT_SWIOT) << "Starting ad74413r tutorial.";
-	ToolMenuEntry *ad74413rTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, AD74413R_TME_ID);
-	this->requestTool(ad74413rTme->id());
-	m_ad74413rTutorial->setTitle("AD74413R");
-	m_ad74413rTutorial->start();
-}
-
-void SWIOTPlugin::startMax14906Tutorial()
-{
-	qInfo(CAT_SWIOT) << "Starting max14906 tutorial.";
-	ToolMenuEntry *max14906Tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, MAX14906_TME_ID);
-	this->requestTool(max14906Tme->id());
-	m_max14906Tutorial->setTitle("MAX14906");
-	m_max14906Tutorial->start();
-}
-
-void SWIOTPlugin::startFaultsTutorial()
-{
-	qInfo(CAT_SWIOT) << "Starting faults tutorial.";
-	ToolMenuEntry *faultsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, FAULTS_TME_ID);
-	this->requestTool(faultsTme->id());
-	m_faultsTutorial->setTitle("FAULTS");
-	m_faultsTutorial->start();
 }
 
 void SWIOTPlugin::powerSupplyStatus(bool ps)
@@ -442,13 +364,96 @@ void SWIOTPlugin::clearPingTask()
 	}
 }
 
-void SWIOTPlugin::abortTutorial()
+QString SWIOTPlugin::description() { return "Adds functionality specific to SWIOT1L board"; }
+
+void SWIOTPlugin::initPreferences()
 {
-	disconnect(m_ad74413rTutorial, &gui::TutorialBuilder::finished, this, &SWIOTPlugin::startMax14906Tutorial);
-	disconnect(m_max14906Tutorial, &gui::TutorialBuilder::finished, this, &SWIOTPlugin::startFaultsTutorial);
+	Preferences *p = Preferences::GetInstance();
+	p->init("ad74413r_start_tutorial", true);
+	p->init("max14906_start_tutorial", true);
+	p->init("faults_start_tutorial", true);
+	p->init("swiote_config_start_tutorial", true);
 }
 
-QString SWIOTPlugin::description() { return "Adds functionality specific to SWIOT1L board"; }
+bool SWIOTPlugin::loadPreferencesPage()
+{
+	Preferences *p = Preferences::GetInstance();
+
+	m_preferencesPage = new QWidget();
+	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
+
+	MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
+	MenuCollapseSection *generalSection = new MenuCollapseSection(
+		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, generalWidget);
+	generalWidget->contentLayout()->setSpacing(10);
+	generalWidget->contentLayout()->addWidget(generalSection);
+	generalSection->contentLayout()->setSpacing(10);
+	lay->setMargin(0);
+	lay->addWidget(generalWidget);
+	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	QWidget *resetTutorialAd74413rWidget = new QWidget();
+	QHBoxLayout *resetTutorialAd74413rWidgetLayout = new QHBoxLayout();
+
+	resetTutorialAd74413rWidget->setLayout(resetTutorialAd74413rWidgetLayout);
+	resetTutorialAd74413rWidgetLayout->setMargin(0);
+
+	QPushButton *resetTutorialAd74413r = new QPushButton("Reset", generalSection);
+	connect(resetTutorialAd74413r, &QPushButton::clicked, this,
+		[=, this]() { p->set("ad74413r_start_tutorial", true); });
+
+	QWidget *resetTutorialMax14906Widget = new QWidget();
+	QHBoxLayout *resetTutorialMax14906WidgetLayout = new QHBoxLayout();
+
+	resetTutorialMax14906Widget->setLayout(resetTutorialMax14906WidgetLayout);
+	resetTutorialMax14906WidgetLayout->setMargin(0);
+
+	QPushButton *resetTutorialMax14906 = new QPushButton("Reset ", generalSection);
+	connect(resetTutorialMax14906, &QPushButton::clicked, this,
+		[=, this]() { p->set("max14906_start_tutorial", true); });
+
+	QWidget *resetTutorialFaultsWidget = new QWidget();
+	QHBoxLayout *resetTutorialFaultsWidgetLayout = new QHBoxLayout();
+
+	resetTutorialFaultsWidget->setLayout(resetTutorialFaultsWidgetLayout);
+	resetTutorialFaultsWidgetLayout->setMargin(0);
+
+	QPushButton *resetTutorialFaults = new QPushButton("Reset ", generalSection);
+	connect(resetTutorialFaults, &QPushButton::clicked, this,
+		[=, this]() { p->set("faults_start_tutorial", true); });
+
+	QWidget *resetTutorialConfigurationWidget = new QWidget();
+	QHBoxLayout *resetTutorialConfigurationWidgetLayout = new QHBoxLayout();
+
+	resetTutorialConfigurationWidget->setLayout(resetTutorialConfigurationWidgetLayout);
+	resetTutorialConfigurationWidgetLayout->setMargin(0);
+
+	QPushButton *resetTutorialConfig = new QPushButton("Reset ", generalSection);
+	connect(resetTutorialConfig, &QPushButton::clicked, this,
+		[=, this]() { p->set("swiote_config_start_tutorial", true); });
+
+	StyleHelper::BlueButton(resetTutorialAd74413r, "resetBtn");
+	resetTutorialMax14906WidgetLayout->addWidget(new QLabel("Ad74413r tutorial"), 6);
+	resetTutorialMax14906WidgetLayout->addWidget(resetTutorialAd74413r, 1);
+	generalSection->contentLayout()->addWidget(resetTutorialAd74413rWidget);
+
+	StyleHelper::BlueButton(resetTutorialMax14906, "resetBtn");
+	resetTutorialAd74413rWidgetLayout->addWidget(new QLabel("Max14906 tutorial"), 6);
+	resetTutorialAd74413rWidgetLayout->addWidget(resetTutorialMax14906, 1);
+	generalSection->contentLayout()->addWidget(resetTutorialMax14906Widget);
+
+	StyleHelper::BlueButton(resetTutorialFaults, "resetBtn");
+	resetTutorialFaultsWidgetLayout->addWidget(new QLabel("Faults tutorial"), 6);
+	resetTutorialFaultsWidgetLayout->addWidget(resetTutorialFaults, 1);
+	generalSection->contentLayout()->addWidget(resetTutorialFaultsWidget);
+
+	StyleHelper::BlueButton(resetTutorialConfig, "resetBtn");
+	resetTutorialConfigurationWidgetLayout->addWidget(new QLabel("Configuration tutorial"), 6);
+	resetTutorialConfigurationWidgetLayout->addWidget(resetTutorialConfig, 1);
+	generalSection->contentLayout()->addWidget(resetTutorialConfigurationWidget);
+
+	return true;
+}
 
 void SWIOTPlugin::initMetadata()
 {
