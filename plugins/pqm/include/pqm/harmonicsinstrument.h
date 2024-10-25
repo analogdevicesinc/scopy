@@ -37,7 +37,7 @@
 #include <pluginbase/resourcemanager.h>
 
 #define NUMBER_OF_HARMONICS 51
-#define HARMONICS_MIN_DEGREE 1
+#define HARMONICS_MIN_DEGREE 0
 #define HARMONICS_MAX_DEGREE 50
 #define MAX_CHNLS 6
 
