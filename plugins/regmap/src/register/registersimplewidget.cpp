@@ -146,7 +146,7 @@ void RegisterSimpleWidget::valueUpdated(uint32_t value)
 
 void RegisterSimpleWidget::setRegisterSelected(bool selected)
 {
-	scopy::setDynamicProperty(regBaseInfoWidget, "is_selected", selected);
+	RegmapStyleHelper::toggleSelectedRegister(regBaseInfoWidget, selected);
 	for(int i = 0; i < bitFields->length(); ++i) {
 		bitFields->at(i)->setSelected(selected);
 	}

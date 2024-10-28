@@ -92,6 +92,13 @@ int BitFieldSimpleWidget::getStreach() const { return streach; }
 
 void BitFieldSimpleWidget::applyStyle() { RegmapStyleHelper::BitFieldSimpleWidgetStyle(this); }
 
-void BitFieldSimpleWidget::setSelected(bool selected) { scopy::setDynamicProperty(mainFrame, "is_selected", selected); }
+void BitFieldSimpleWidget::setSelected(bool selected)
+{
+	if(selected) {
+		RegmapStyleHelper::toggleSelectedRegister(mainFrame, selected);
 
+	} else {
+		RegmapStyleHelper::BitFieldSimpleWidgetStyle(this);
+	}
+}
 QString BitFieldSimpleWidget::getName() const { return name; }

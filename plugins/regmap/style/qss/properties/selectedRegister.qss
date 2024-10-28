@@ -1,0 +1,8 @@
+QWidget[&&property&&=true]{
+background-color: &interactive_primary_idle&;
+color: &danger_default&;
+}
+
+*[&&property&&=true]{
+color: &danger_default&;
+}

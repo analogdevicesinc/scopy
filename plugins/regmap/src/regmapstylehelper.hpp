@@ -67,6 +67,8 @@ public:
 	static QString sliderStyle();
 	static QString getColorBasedOnValue(QString value);
 
+	static void toggleSelectedRegister(QWidget *widget, bool toggle);
+
 private:
 	QMap<QString, QString> colorMap;
 	static RegmapStyleHelper *pinstance_;

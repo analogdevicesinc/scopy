@@ -13,6 +13,7 @@
 #include <registermapvalues.hpp>
 #include <regmapstylehelper.hpp>
 #include <searchbarwidget.hpp>
+#include <style.h>
 #include <stylehelper.h>
 #include <toolbuttons.h>
 #include <xmlfilemanager.hpp>
@@ -56,6 +57,7 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 	tool->setRightContainerWidth(settings->sizeHint().width());
 
 	settingsMenu = new GearBtn(this);
+	Style::setStyle(settingsMenu, style::properties::button::squareIconButton, true, true);
 
 	connect(settingsMenu, &QAbstractButton::toggled, this, [=](bool toggled) {
 		tool->openRightContainerHelper(toggled);

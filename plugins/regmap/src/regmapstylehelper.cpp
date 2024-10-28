@@ -10,6 +10,7 @@
 #include <qboxlayout.h>
 #include <registermapsettingsmenu.hpp>
 #include <stylehelper.h>
+#include <style_properties.h>
 
 using namespace scopy::regmap;
 
@@ -102,11 +103,9 @@ QString RegmapStyleHelper::bigTextLabelStyle()
 	QString style = QString(R"css(
                         QLabel {
                         font: normal;
-                        font-size: 16px;
-                        color: &&labelColor&& ;
+			font-size: 16px;
                         }
-                        )css");
-	style.replace("&&labelColor&&", RegmapStyleHelper::getColor("LabelText"));
+			)css");
 
 	return style;
 }
@@ -174,11 +173,9 @@ void RegmapStyleHelper::labelStyle(QLabel *label, QString objectName)
 						 font-size: 12px;
                          font-style: normal;
                          font-weight: normal;
-                         text-align: left;
-                         color: &&labelColor&& ;
+			 text-align: left;
                         }
-                        )css");
-	style.replace("&&labelColor&&", RegmapStyleHelper::getColor("LabelText2"));
+			)css");
 	label->setStyleSheet(style);
 }
 
@@ -200,35 +197,16 @@ void RegmapStyleHelper::grayBackgroundHoverWidget(QWidget *widget, QString objec
 	if(!objectName.isEmpty() && widget)
 		widget->setObjectName(objectName);
 
-	QString style = QString(R"css(
+	Style::setStyle(widget, style::properties::hoverWidget, true, true);
+}
 
-                        .QFrame {
-                                background-color: &&frameBackground&& ;
-                                border-radius: 4px;
-                                margin-left: 2px;
-                                margin-right: 2px;
-                                height: 60px;
-
-                        }
-                        QWidget {
-                                background-color: &&childWidgetBackground&& ;
-                                height: 60px;
-                        }
-                        *[is_selected=true] {
-                         background-color: &&selectedBackground&& ;
-                        }
-                        ::hover {
-                            background-color: &&hoverBackground&& ;
-                        }
-
-                        )css");
-
-	style.replace("&&frameBackground&&", RegmapStyleHelper::getColor("WidgetBackground"));
-	style.replace("&&childWidgetBackground&&", RegmapStyleHelper::getColor("Transparent"));
-	style.replace("&&hoverBackground&&", RegmapStyleHelper::getColor("ButtonHover"));
-	style.replace("&&selectedBackground&&", RegmapStyleHelper::getColor("ScopyBlue"));
-
-	widget->setStyleSheet(style);
+void RegmapStyleHelper::toggleSelectedRegister(QWidget *widget, bool toggle)
+{
+	if(toggle) {
+		Style::setStyle(widget, style::properties::selectedRegister, true, true);
+	} else {
+		Style::setStyle(widget, style::properties::hoverWidget, true, true);
+	}
 }
 
 void RegmapStyleHelper::BitFieldDetailedWidgetStyle(BitFieldDetailedWidget *widget, QString objectName)
@@ -276,18 +254,10 @@ void RegmapStyleHelper::BitFieldSimpleWidgetStyle(BitFieldSimpleWidget *widget, 
 	if(!objectName.isEmpty())
 		widget->setObjectName(objectName);
 
-	QString style = QString(R"css(
-						QWidget {
-								background-color: &&widgetBackground&& ;
-						}
-						*[is_selected=true] {
-						 background-color: &&selectedBackground&& ;
-						}
-						)css");
-	style.replace("&&widgetBackground&&", RegmapStyleHelper::getColor("Transparent"));
-	style.replace("&&selectedBackground&&", RegmapStyleHelper::getColor("ScopyBlue"));
 	widget->value->setStyleSheet(RegmapStyleHelper::grayLabelStyle());
+
 	grayBackgroundHoverWidget(widget->mainFrame);
+	Style::setStyle(widget->mainFrame, style::properties::bitfieldSimpleWidget);
 
 	if(widget->value->text() != "N/R") {
 		scopy::Preferences *p = scopy::Preferences::GetInstance();
@@ -302,8 +272,6 @@ void RegmapStyleHelper::BitFieldSimpleWidgetStyle(BitFieldSimpleWidget *widget, 
 			widget->value->setStyleSheet("color: " + getColorBasedOnValue(widget->value->text()));
 		}
 	}
-
-	widget->setStyleSheet(style);
 }
 
 void RegmapStyleHelper::RegisterSimpleWidgetStyle(RegisterSimpleWidget *widget, QString objectName)
@@ -313,29 +281,22 @@ void RegmapStyleHelper::RegisterSimpleWidgetStyle(RegisterSimpleWidget *widget, 
 
 	QString style = QString(R"css(
 
-                        .QFrame {
-                                background-color: &&frameBackground&& ;
-                                border-radius: 4px;
-                                margin-left: 2px;
-                                margin-right: 2px;
-                        }
-                        QWidget {
-                                background-color: &&childWidgetBackground&& ;
-                        }
-                        *[is_selected=true] {
-                         background-color: &&selectedBackground&& ;
-                        }
+			.QFrame {
+				background-color: &&frameBackground&& ;
+				border-radius: 4px;
+				margin-left: 2px;
+				margin-right: 2px;
+			}
 
-						.scopy--regmap--RegisterSimpleWidget:hover  {
-							border: 1px solid &&hoverBackground&& ;
-							border-radius: 4px;
-						}
-						)css");
+
+			.scopy--regmap--RegisterSimpleWidget:hover  {
+				border: 1px solid &&hoverBackground&& ;
+				border-radius: 4px;
+			}
+			)css");
 
 	style.replace("&&hoverBackground&&", RegmapStyleHelper::getColor("LabelText"));
 	style.replace("&&frameBackground&&", RegmapStyleHelper::getColor("WidgetBackground"));
-	style.replace("&&childWidgetBackground&&", RegmapStyleHelper::getColor("Transparent"));
-	style.replace("&&selectedBackground&&", RegmapStyleHelper::getColor("ScopyBlue"));
 
 	grayBackgroundHoverWidget(widget->regBaseInfoWidget);
 	widget->registerNameLabel->setStyleSheet(RegmapStyleHelper::whiteSmallTextLableStyle());
@@ -376,11 +337,9 @@ QString RegmapStyleHelper::whiteSmallTextLableStyle()
 	QString style = QString(R"css(
                         QLabel {
                         font: normal;
-                        font-size: 12px;
-                        color: &&labelColor&& ;
+			font-size: 12px;
                         }
-                        )css");
-	style.replace("&&labelColor&&", RegmapStyleHelper::getColor("LabelText"));
+			)css");
 
 	return style;
 }
