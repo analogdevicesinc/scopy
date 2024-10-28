@@ -1,4 +1,5 @@
 QTabBar::tab[&&property&&=true] {
+	min-width: 100px;
 	background: &background_primary&;
 	font-weight: bold;
 }
