@@ -19,7 +19,7 @@
  *
  */
 
-﻿ #include "scopyhomeaddpage.h"
+#include "scopyhomeaddpage.h"
 #include "devicefactory.h"
 #include "deviceloader.h"
 
@@ -28,9 +28,9 @@
 #include <QtConcurrent>
 #include <menusectionwidget.h>
 
-	Q_LOGGING_CATEGORY(CAT_HOME_ADD_PAGE, "ScopyHomeAddPage")
+Q_LOGGING_CATEGORY(CAT_HOME_ADD_PAGE, "ScopyHomeAddPage")
 
-		using namespace scopy;
+using namespace scopy;
 
 ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm)
 	: QWidget(parent)
