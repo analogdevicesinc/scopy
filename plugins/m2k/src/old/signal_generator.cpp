@@ -482,6 +482,7 @@ SignalGenerator::SignalGenerator(libm2k::context::M2k *m2k, QString uri, Filter 
 	connect(ui->mathWidget, SIGNAL(functionValid(const QString &)), this, SLOT(setFunction(const QString &)));
 
 	connect(ui->run_button, SIGNAL(toggled(bool)), tme, SLOT(setRunning(bool)));
+	connect(ui->run_button, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
 	connect(tme, SIGNAL(runToggled(bool)), ui->run_button, SLOT(toggle(bool)));
 	connect(tme, SIGNAL(runToggled(bool)), this, SLOT(startStop(bool)));
 
@@ -1308,8 +1309,8 @@ void SignalGenerator::loadFile()
 
 void SignalGenerator::start()
 {
-	ui->run_button->toggle(true);
 	m_running = true;
+	ui->run_button->toggle(true);
 
 	/* Avoid from being started twice */
 	if(buffers.size() > 0) {
@@ -1390,9 +1391,9 @@ void SignalGenerator::run() { start(); }
 void SignalGenerator::stop()
 {
 	try {
+		m_running = false;
 		ui->run_button->toggle(false);
 		buffers.clear();
-		m_running = false;
 		m_m2k_analogout->stop();
 	} catch(libm2k::m2k_exception &e) {
 		HANDLE_EXCEPTION(e);
@@ -1403,6 +1404,9 @@ void SignalGenerator::stop()
 
 void SignalGenerator::startStop(bool pressed)
 {
+	if(m_running == pressed) {
+		return;
+	}
 	if(pressed) {
 		start();
 	} else {
