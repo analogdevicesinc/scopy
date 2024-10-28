@@ -19,7 +19,7 @@
  *
  */
 
-﻿ #include "channel_widget.hpp"
+#include "channel_widget.hpp"
 //#include "menu_header.hpp"
 #include "tool_view.hpp"
 
@@ -30,7 +30,7 @@
 #include <QMainWindow>
 #include <QTabWidget>
 
-	using namespace scopy::m2kgui;
+using namespace scopy::m2kgui;
 
 ToolView::ToolView(QWidget *parent)
 	: QWidget(parent)
