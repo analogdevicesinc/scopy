@@ -84,9 +84,12 @@ public:
 	static void smallBlueButton(QPushButton *button, QString objectName = "");
 	static void iconBlueButton(QPushButton *button, QString objectName = "");
 	static QString regmapControllerStyle(QWidget *widget, QString objectName = "");
-	static QString widgetidthRoundCornersStyle(QWidget *widget, QString objectName = "");
 	static QString sliderStyle();
 	static QString getColorBasedOnValue(QString value);
+
+	static void toggleSelectedRegister(QWidget *widget, bool toggle);
+	static void applyBitfieldValueColorPreferences(BitFieldSimpleWidget *widget);
+	static void applyRegisterValueColorPreferences(RegisterSimpleWidget *widget);
 
 private:
 	QMap<QString, QString> colorMap;
