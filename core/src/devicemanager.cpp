@@ -37,10 +37,7 @@ using namespace scopy;
 DeviceManager::DeviceManager(PluginManager *pm, QObject *parent)
 	: QObject{parent}
 	, pm(pm)
-{
-
-	connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()), this, SLOT(disconnectAll()));
-}
+{}
 
 DeviceManager::~DeviceManager() {}
 
