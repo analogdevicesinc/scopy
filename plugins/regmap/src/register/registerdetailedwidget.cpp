@@ -37,6 +37,7 @@
 #include "utils.hpp"
 #include <QtMath>
 #include <menucollapsesection.h>
+#include <style.h>
 
 using namespace scopy;
 using namespace regmap;
@@ -52,15 +53,13 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 	regWidth = regModel->getWidth();
 
 	QWidget *nameDescriptionWidget = new QWidget(this);
-	nameDescriptionWidget->setStyleSheet(RegmapStyleHelper::simpleWidgetStyle());
+	Style::setStyle(nameDescriptionWidget, style::properties::widget::basicComponent, true, true);
 	QHBoxLayout *nameDescriptionLayout = new QHBoxLayout(nameDescriptionWidget);
 	nameDescriptionWidget->setLayout(nameDescriptionLayout);
 	QLabel *nameLabel = new QLabel("Name: " + regModel->getName(), this);
 	QLabel *descriptionLabel = new QLabel("Description: " + regModel->getDescription(), this);
 	nameDescriptionLayout->addWidget(nameLabel);
 	nameDescriptionLayout->addWidget(descriptionLabel);
-	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
-
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 
 	QGridLayout *bitFieldsWidgetLayout = new QGridLayout();

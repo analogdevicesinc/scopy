@@ -54,7 +54,8 @@ SearchBarWidget::SearchBarWidget(QWidget *parent)
 		const char *color = toggle ? json::theme::content_inverse : json::theme::content_default;
 		searchButton->setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
 	});
-	StyleHelper::SquareToggleButtonWithIcon(searchButton, "search_btn", false);
+
+	Style::setStyle(searchButton, style::properties::button::squareIconButton, true, true);
 
 	QObject::connect(searchBar, &QLineEdit::returnPressed, searchButton, &QPushButton::pressed);
 
