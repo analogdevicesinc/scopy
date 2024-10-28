@@ -103,7 +103,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 		tableHeadWidget->setLayout(tableHeadWidgetLayout);
 
 		QWidget *registerTableHead = new QWidget(tableHeadWidget);
-		RegmapStyleHelper::widgetidthRoundCornersStyle(registerTableHead);
+		registerTableHead->setStyleSheet(RegmapStyleHelper::FrameWidgetStyle());
 
 		QHBoxLayout *registerTableHeadLayout = new QHBoxLayout(registerTableHead);
 		registerTableHeadLayout->setSpacing(0);
@@ -114,7 +114,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 		registerTableHead->setFixedWidth(180);
 
 		QWidget *colBitCount = new QWidget(tableHeadWidget);
-		RegmapStyleHelper::widgetidthRoundCornersStyle(colBitCount);
+		colBitCount->setStyleSheet(RegmapStyleHelper::FrameWidgetStyle());
 		QHBoxLayout *tableHead = new QHBoxLayout(colBitCount);
 		colBitCount->setLayout(tableHead);
 
