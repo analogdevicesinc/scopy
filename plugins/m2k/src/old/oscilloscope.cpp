@@ -630,8 +630,8 @@ Oscilloscope::Oscilloscope(libm2k::context::M2k *m2k, QString uri, Filter *filt,
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled, ch_ui->btnAutoset, &QPushButton::setEnabled);
 
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled, [=](bool checked) { tme->setRunning(checked); });
-	connect(tme, &ToolMenuEntry::runToggled, ui->runSingleWidget, &RunSingleWidget::toggle);
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled, this, &Oscilloscope::runStopToggled);
+	connect(tme, &ToolMenuEntry::runToggled, ui->runSingleWidget, &RunSingleWidget::toggle);
 	connect(this, &Oscilloscope::startRunning, ui->runSingleWidget, &RunSingleWidget::toggle);
 
 	connect(gsettings_ui->xyPlotLineType, SIGNAL(toggled(bool)), this, SLOT(xyPlotLineType_toggled(bool)));
