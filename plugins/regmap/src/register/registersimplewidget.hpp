@@ -38,6 +38,7 @@ private:
 	QVector<BitFieldSimpleWidget *> *bitFields;
 	QFrame *regBaseInfoWidget = nullptr;
 	QLabel *registerNameLabel;
+	QLabel *registerAddressLabl;
 	RegisterModel *registerModel;
 
 protected:

@@ -46,10 +46,9 @@ RegisterSimpleWidget::RegisterSimpleWidget(RegisterModel *registerModel, QVector
 	QVBoxLayout *rightLayout = new QVBoxLayout();
 	rightLayout->setAlignment(Qt::AlignRight);
 
-	QLabel *registerAddressLable =
-		new QLabel(Utils::convertToHexa(registerModel->getAddress(), registerModel->getWidth()));
-	registerAddressLable->setAlignment(Qt::AlignRight);
-	rightLayout->addWidget(registerAddressLable);
+	registerAddressLabl = new QLabel(Utils::convertToHexa(registerModel->getAddress(), registerModel->getWidth()));
+	registerAddressLabl->setAlignment(Qt::AlignRight);
+	rightLayout->addWidget(registerAddressLabl);
 	value = new QLabel("N/R");
 	value->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	value->setAlignment(Qt::AlignBottom | Qt::AlignRight);
@@ -141,12 +140,18 @@ void RegisterSimpleWidget::valueUpdated(uint32_t value)
 		}
 	}
 	this->value->setText(Utils::convertToHexa(value, registerModel->getWidth()));
-	applyStyle();
+	RegmapStyleHelper::applyRegisterValueColorPreferences(this);
 }
 
 void RegisterSimpleWidget::setRegisterSelected(bool selected)
 {
-	scopy::setDynamicProperty(regBaseInfoWidget, "is_selected", selected);
+
+	RegmapStyleHelper::toggleSelectedRegister(regBaseInfoWidget, selected);
+
+	if(value->text() != "N/R" && !selected) {
+		RegmapStyleHelper::applyRegisterValueColorPreferences(this);
+	}
+
 	for(int i = 0; i < bitFields->length(); ++i) {
 		bitFields->at(i)->setSelected(selected);
 	}

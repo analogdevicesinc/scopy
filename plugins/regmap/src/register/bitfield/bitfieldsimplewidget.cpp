@@ -36,14 +36,14 @@ BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QStri
 	value->setAlignment(Qt::AlignRight);
 	value->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 	value->setMinimumWidth(25);
-	QLabel *bitfieldWidth = new QLabel(QString::number(regOffset + width - 1) + ":" + QString::number(regOffset));
+	bitfieldWidth = new QLabel(QString::number(regOffset + width - 1) + ":" + QString::number(regOffset));
 	bitfieldWidth->setAlignment(Qt::AlignRight);
 	rightLayout->addWidget(bitfieldWidth);
 	rightLayout->addWidget(value);
 
 	QVBoxLayout *leftLayout = new QVBoxLayout();
 	leftLayout->setAlignment(Qt::AlignTop);
-	QLabel *descriptionLabel = new QLabel(name);
+	descriptionLabel = new QLabel(name);
 	descriptionLabel->setWordWrap(true);
 	descriptionLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 	leftLayout->addWidget(descriptionLabel);
@@ -81,7 +81,7 @@ BitFieldSimpleWidget::~BitFieldSimpleWidget()
 void BitFieldSimpleWidget::updateValue(QString newValue)
 {
 	value->setText(newValue);
-	applyStyle();
+	RegmapStyleHelper::applyBitfieldValueColorPreferences(this);
 }
 
 int BitFieldSimpleWidget::getWidth() const { return width; }
@@ -90,8 +90,17 @@ QString BitFieldSimpleWidget::getDescription() const { return description; }
 
 int BitFieldSimpleWidget::getStreach() const { return streach; }
 
-void BitFieldSimpleWidget::applyStyle() { RegmapStyleHelper::BitFieldSimpleWidgetStyle(this); }
+void BitFieldSimpleWidget::applyStyle()
+{
+	RegmapStyleHelper::toggleSelectedRegister(mainFrame, m_selected);
+	if(!m_selected) {
+		RegmapStyleHelper::BitFieldSimpleWidgetStyle(this);
+	}
+}
 
-void BitFieldSimpleWidget::setSelected(bool selected) { scopy::setDynamicProperty(mainFrame, "is_selected", selected); }
-
+void BitFieldSimpleWidget::setSelected(bool selected)
+{
+	m_selected = selected;
+	applyStyle();
+}
 QString BitFieldSimpleWidget::getName() const { return name; }

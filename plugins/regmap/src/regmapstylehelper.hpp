@@ -67,6 +67,10 @@ public:
 	static QString sliderStyle();
 	static QString getColorBasedOnValue(QString value);
 
+	static void toggleSelectedRegister(QWidget *widget, bool toggle);
+	static void applyBitfieldValueColorPreferences(BitFieldSimpleWidget *widget);
+	static void applyRegisterValueColorPreferences(RegisterSimpleWidget *widget);
+
 private:
 	QMap<QString, QString> colorMap;
 	static RegmapStyleHelper *pinstance_;
