@@ -1,0 +1,11 @@
+QWidget[&&property&&=true]{
+background-color: &background_primary&;
+}
+
+QWidget[&&property&&=true]:hover{
+border: &border_width& solid &content_silent&;
+border-radius: &radius_1&;
+background-color: &interactive_primary_disabled&;
+}
+
+
