@@ -45,15 +45,13 @@ bool DataLoggerPlugin::loadPage() { return false; }
 bool DataLoggerPlugin::loadIcon()
 {
 	SCOPY_PLUGIN_ICON(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-			  "/icons/datalogger.svg");
+			  "/icons/tool_datalogger.svg");
 	return true;
 }
 
 void DataLoggerPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "Data Logger",
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-							  "/icons/gear_wheel.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "Data Logger", toolIcon));
 }
 
 void DataLoggerPlugin::unload()
@@ -133,7 +131,7 @@ bool DataLoggerPlugin::onDisconnect()
 	// add proxy tool to represent the plugin
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "Data Logger",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-							  "/icons/gear_wheel.svg"));
+							  "/icons/tool_datalogger.svg"));
 
 	Q_EMIT toolListChanged();
 
