@@ -30,6 +30,7 @@
 #include <plotinfo.h>
 #include <timemanager.hpp>
 #include <plotnavigator.hpp>
+#include <style.h>
 #include <pluginbase/preferences.h>
 
 using namespace scopy;
@@ -79,6 +80,9 @@ MonitorPlot::MonitorPlot(QWidget *parent)
 	layout->addWidget(m_plot);
 
 	m_monitorCurves = new QMap<QString, MonitorPlotCurve *>();
+
+	QString plotStyle("color: " + Style::getAttribute(json::theme::interactive_subtle_idle));
+	m_plot->setStyleSheet(plotStyle);
 }
 
 PlotWidget *MonitorPlot::plot() const { return m_plot; }
