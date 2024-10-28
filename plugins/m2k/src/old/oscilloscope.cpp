@@ -2329,9 +2329,13 @@ void Oscilloscope::add_math_channel(const std::string &function)
 	QString qname = QString("Math %1").arg(math_chn_counter++);
 	std::string name = qname.toStdString();
 
-	auto math_sink =
-		scope_sink_f::make(noZoomXAxisWidth * getSampleRate() / m_m2k_analogin->getOversamplingRatio(),
-				   getSampleRate() / m_m2k_analogin->getOversamplingRatio(), name, 1, (QObject *)&plot);
+	int osr = m_m2k_analogin->getOversamplingRatio();
+	if(osr == 0) {
+		m_m2k_analogin->setOversamplingRatio(1);
+		osr = 1;
+	}
+	auto math_sink = scope_sink_f::make(noZoomXAxisWidth * getSampleRate() / osr, getSampleRate() / osr, name, 1,
+					    (QObject *)&plot);
 
 	double targetFps = p->get("general_plot_target_fps").toDouble();
 	math_sink->set_update_time(1.0 / targetFps);
@@ -5141,6 +5145,10 @@ double Oscilloscope::getSampleRate()
 		double sr = m_m2k_analogin->getSampleRate();
 		if(m_filtering_enabled == false) {
 			int osr = m_m2k_analogin->getOversamplingRatio();
+			if(osr == 0) {
+				m_m2k_analogin->setOversamplingRatio(1);
+				osr = 1;
+			}
 			sr = (double)(sr / osr);
 		}
 		return sr;
