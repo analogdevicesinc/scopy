@@ -22,5 +22,9 @@ libm2k: ${libm2k_VERSION}-${libm2k_VERSION_GIT}
 
 Scopy dependencies info:
 ${SCOPY_BUILD_STATUS_INFO}
+
+Git log for <b>${SCOPY_REMOTE}</b> on branch <b>${SCOPY_BRANCH}</b>
+
+${SCOPY_GIT_LOG}
 </pre>
 </body>
