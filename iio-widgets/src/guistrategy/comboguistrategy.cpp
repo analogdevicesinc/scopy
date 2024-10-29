@@ -19,6 +19,8 @@
  */
 
 #include "guistrategy/comboguistrategy.h"
+#include "style_properties.h"
+#include <gui/style.h>
 #include <QLoggingCategory>
 
 using namespace scopy;
@@ -53,6 +55,8 @@ ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 
 		m_ui->layout()->addWidget(comboMenuWidget);
 	}
+
+	Style::setStyle(m_comboWidget, style::properties::iiowidgets::comboBox, true, true);
 
 	connect(m_comboWidget, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
 		QString currentData = m_comboWidget->currentText();
