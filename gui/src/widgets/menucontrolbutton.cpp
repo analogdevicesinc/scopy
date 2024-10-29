@@ -53,6 +53,9 @@ MenuControlButton::MenuControlButton(QWidget *parent)
 	connect(this, &QAbstractButton::toggled, this, [=](bool b) {
 		setDynamicProperty(this, "selected", b);
 		Style::setStyle(m_label, style::properties::label::menuMedium, b ? "selected" : "idle");
+		if(m_cs == CS_CIRCLE) {
+			Style::setStyle(m_chk, style::properties::checkbox::circleCB, b ? "selected" : "idle", true);
+		}
 	}); // Hackish - QStyle should be implemented
 
 	dblClickToOpenMenu = QMetaObject::Connection();

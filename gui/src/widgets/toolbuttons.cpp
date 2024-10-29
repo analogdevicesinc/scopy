@@ -132,7 +132,6 @@ SingleShotBtn::SingleShotBtn(QWidget *parent)
 	setText("Single");
 	connect(this, &QPushButton::toggled, this, [=](bool b) { setText(b ? "Stop" : "Single"); });
 	Style::setStyle(this, style::properties::button::singleButton);
-	setStyleSheet("background-color: #ff7200;");
 
 	QIcon icon1;
 	icon1.addPixmap(Style::getPixmap(":/gui/icons/play_oneshot.svg", Style::getColor(json::theme::content_inverse)),

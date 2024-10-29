@@ -59,7 +59,7 @@
      <item>
       <widget class="QFrame" name="containerHome">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -85,15 +85,24 @@
         </property>
         <item>
          <widget class="QPushButton" name="btnHome">
-          <property name="maximumSize">
-           <size>
-            <width>40</width>
-            <height>40</height>
-           </size>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton {height: 40px;width: 40px;border-width: 0px;}</string>
-          </property>
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
           <property name="text">
            <string/>
           </property>
@@ -114,9 +123,6 @@
           <property name="checked">
            <bool>false</bool>
           </property>
-          <property name="blue_button" stdset="0">
-           <bool>true</bool>
-          </property>
          </widget>
         </item>
        </layout>
@@ -125,7 +131,7 @@
      <item>
       <widget class="QFrame" name="containerAdd">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -151,15 +157,24 @@
         </property>
         <item>
          <widget class="QPushButton" name="btnAdd">
-          <property name="maximumSize">
-           <size>
-            <width>40</width>
-            <height>40</height>
-           </size>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton {height: 40px;width: 40px;border-width: 0px;}</string>
-          </property>
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
           <property name="text">
            <string/>
           </property>
@@ -175,9 +190,6 @@
            </size>
           </property>
           <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="blue_button" stdset="0">
            <bool>true</bool>
           </property>
          </widget>
@@ -213,7 +225,7 @@
    <item>
     <spacer name="horizontalSpacer">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>

@@ -18,6 +18,6 @@ QPushButton[&&property&&=true]:checked {
     color: &content_inverse&;
 }
 QPushButton[&&property&&=true]:disabled {
-    background-color: &interactive_secondary_pressed&;
+    background-color: &interactive_secondary_hover&;
     color: &content_inverse&;
 }
