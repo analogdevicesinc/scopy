@@ -56,6 +56,7 @@ QWidget *StyleTool::buildStylePage()
 	addLabeledWidget("Run Button", new QPushButton("Run"));
 	addLabeledWidget("Border Button", new QPushButton("Border Button"));
 	addLabeledWidget("Square Icon Button", new QPushButton("Square Icon Button"));
+	addLabeledWidget("Square Icon Browser Button", new QPushButton("Square Icon Browser Button"));
 	addLabeledWidget("Stop Button", new QPushButton(""));
 	addLabeledWidget("Subtle Button", new QPushButton("Subtle Button"));
 	addLabeledWidget("Blue Gray Button", new QPushButton("Blue Gray Button"));
@@ -74,6 +75,8 @@ QWidget *StyleTool::buildStylePage()
 			style::properties::button::borderButton, true, true);
 	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::button::squareIconButton, true, true);
+	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
+			style::properties::button::squareIconBrowserButton, true, true);
 	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::button::stopButton, true, true);
 	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),

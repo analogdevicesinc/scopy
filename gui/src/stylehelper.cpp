@@ -93,8 +93,8 @@ void StyleHelper::SquareToggleButtonWithIcon(QPushButton *btn, QString objectNam
 		btn->setObjectName(objectName);
 	btn->setCheckable(checkable);
 	btn->setChecked(false);
-	Style::setStyle(btn, style::properties::button::squareIconButton, true, true);
-	Style::setStyle(btn, style::properties::widget::solidBorder, true, true);
+	Style::setStyle(btn, style::properties::button::squareIconButton);
+	Style::setStyle(btn, style::properties::widget::solidBorder);
 }
 
 void StyleHelper::BlueGrayButton(QPushButton *btn, QString objectName)
@@ -103,7 +103,7 @@ void StyleHelper::BlueGrayButton(QPushButton *btn, QString objectName)
 		btn->setObjectName(objectName);
 	btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-	Style::setStyle(btn, style::properties::button::blueGrayButton, true, true);
+	Style::setStyle(btn, style::properties::button::blueGrayButton);
 }
 
 void StyleHelper::MeasurementPanelLabel(MeasurementLabel *w, QString objectName)
@@ -163,7 +163,7 @@ void StyleHelper::BasicButton(QPushButton *btn, QString objectName)
 	if(!objectName.isEmpty())
 		btn->setObjectName(objectName);
 
-	Style::setStyle(btn, style::properties::button::basicButton, true, true);
+	Style::setStyle(btn, style::properties::button::basicButton);
 	btn->setFixedHeight(Style::getDimension(json::global::unit_4));
 }
 
@@ -183,7 +183,7 @@ void StyleHelper::BasicSmallButton(QPushButton *btn, QString objectName)
 	if(!objectName.isEmpty())
 		btn->setObjectName(objectName);
 
-	Style::setStyle(btn, style::properties::button::basicButton, true, true);
+	Style::setStyle(btn, style::properties::button::basicButton);
 	btn->setFixedHeight(Style::getDimension(json::global::unit_3));
 }
 
@@ -193,7 +193,7 @@ void StyleHelper::ColoredCircleCheckbox(QCheckBox *chk, QColor color, QString ob
 		chk->setObjectName(objectName);
 
 	chk->setStyleSheet("QCheckBox::indicator:checked { background-color: " + color.name() + "; }");
-	Style::setStyle(chk, style::properties::checkbox::circleCB, true, true);
+	Style::setStyle(chk, style::properties::checkbox::circleCB, "idle", true);
 }
 
 void StyleHelper::CollapseCheckbox(QCheckBox *chk, QString objectName)
