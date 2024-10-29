@@ -199,7 +199,7 @@ def generate_json() -> None:
     json_header_name = "style_attributes.h"
     json_header_path = os.path.join(generated_header_folder, json_header_name)
     global_json_path = os.path.join(style_folder, "json", "global.json")
-    theme_json_path = os.path.join(style_folder, "json", "dark.json")
+    theme_json_path = os.path.join(style_folder, "json", "Harmonic dark.json")
 
     json_namespace_code = generate_namespace_code(
         create_namespace_structure(".json", global_json_path, "global"),
@@ -260,6 +260,10 @@ if __name__ == "__main__":
     style_folder = sys.argv[2]
     generated_header_folder = sys.argv[3]
     build_folder = sys.argv[4]
+    
+    # remove style folder from previous builds
+    if not is_plugin:
+        shutil.rmtree(os.path.join(build_folder, "style"))
     
     # this is used for having different names for header defines
     header_name_prefix = "" if not is_plugin else generated_header_folder[generated_header_folder.rfind("/") + 1:] + "_"

@@ -352,7 +352,7 @@ void TestPlugin::initMetadata()
 	{
 	   "priority":2,
 	   "category":[
-	      "test"
+	      "iio"
 	   ]
 	}
 )plugin");
