@@ -25,7 +25,7 @@ QMap<QString, QString> *Style::m_styleMap{new QMap<QString, QString>()};
 Style::Style(QObject *parent)
 	: QObject(parent)
 	, m_globalJsonPath("/json/global.json")
-	, m_themeJsonPath("/json/legacy.json")
+	, m_themeJsonPath("/json/Scopy.json")
 	, m_qssFolderPath("/qss")
 	, m_qssGlobalFile("global")
 	, m_m2kqssFile("m2k")
