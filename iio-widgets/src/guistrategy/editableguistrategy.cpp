@@ -19,6 +19,7 @@
  */
 
 #include "guistrategy/editableguistrategy.h"
+#include <gui/style.h>
 
 using namespace scopy;
 
@@ -39,7 +40,8 @@ EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isC
 		StyleHelper::MenuSmallLabel(label, "MenuSmallLabel");
 	}
 
-	StyleHelper::IIOLineEdit(m_lineEdit->edit(), "IIOLineEdit");
+	Style::setStyle(m_lineEdit->edit(), style::properties::iiowidgets::lineEdit, true, true);
+	m_lineEdit->edit()->setCursorPosition(0);
 	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 	m_ui->layout()->addWidget(label);
 	m_ui->layout()->addWidget(m_lineEdit);
