@@ -55,6 +55,8 @@ SettingsInstrument::SettingsInstrument(QWidget *parent)
 	initTimestampSection(tool->centralContainer());
 	initCalibSection(tool->centralContainer());
 	initConfigSection(tool->centralContainer());
+	tool->centralContainer()->layout()->addItem(
+		new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 }
 
 SettingsInstrument::~SettingsInstrument() {}
@@ -268,7 +270,7 @@ void SettingsInstrument::initTimestampSection(QWidget *parent)
 		}
 	});
 
-	QPushButton *timestampBtn = new QPushButton("Set interval", timestampSection);
+	QPushButton *timestampBtn = new QPushButton("Set", timestampSection);
 	timestampBtn->setFixedWidth(88);
 	StyleHelper::BasicButton(timestampBtn, "timestampBtn");
 	connect(timestampBtn, &QPushButton::clicked, this, [this, timestampEdit1, timestampEdit2]() {
