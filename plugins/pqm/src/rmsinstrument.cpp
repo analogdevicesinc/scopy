@@ -73,6 +73,7 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	voltageWidget->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
 
 	MeasurementsPanel *voltagePanel = new MeasurementsPanel(voltageWidget);
+	voltagePanel->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
 	createLabels(voltagePanel, m_chnls["voltage"].values(),
 		     {"RMS", "Angle", "Deviation under", "Deviation over", "Pinst", "Pst", "Plt"});
 	createLabels(voltagePanel, {DEVICE_NAME}, {"U2", "U0", "Sneg V", "Spos V", "Szro V"});
@@ -91,6 +92,7 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	currentWidget->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
 
 	MeasurementsPanel *currentPanel = new MeasurementsPanel(currentWidget);
+	currentPanel->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
 	createLabels(currentPanel, m_chnls["current"].values(), {"RMS", "Angle"});
 	createLabels(currentPanel, {DEVICE_NAME}, {"I2", "I0", "Sneg I", "Spos I", "Szro I"});
 	currentPanel->refreshUi();
