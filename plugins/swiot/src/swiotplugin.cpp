@@ -444,17 +444,17 @@ bool SWIOTPlugin::loadPreferencesPage()
 	resetTutorialMax14906WidgetLayout->addWidget(resetTutorialAd74413r, 1);
 	generalSection->contentLayout()->addWidget(resetTutorialAd74413rWidget);
 
-	Style::setStyle(resetTutorialAd74413r, style::properties::button::basicButton);
+	Style::setStyle(resetTutorialMax14906, style::properties::button::basicButton);
 	resetTutorialAd74413rWidgetLayout->addWidget(new QLabel("Max14906 tutorial"), 6);
 	resetTutorialAd74413rWidgetLayout->addWidget(resetTutorialMax14906, 1);
 	generalSection->contentLayout()->addWidget(resetTutorialMax14906Widget);
 
-	Style::setStyle(resetTutorialAd74413r, style::properties::button::basicButton);
+	Style::setStyle(resetTutorialFaults, style::properties::button::basicButton);
 	resetTutorialFaultsWidgetLayout->addWidget(new QLabel("Faults tutorial"), 6);
 	resetTutorialFaultsWidgetLayout->addWidget(resetTutorialFaults, 1);
 	generalSection->contentLayout()->addWidget(resetTutorialFaultsWidget);
 
-	Style::setStyle(resetTutorialAd74413r, style::properties::button::basicButton);
+	Style::setStyle(resetTutorialConfig, style::properties::button::basicButton);
 	resetTutorialConfigurationWidgetLayout->addWidget(new QLabel("Configuration tutorial"), 6);
 	resetTutorialConfigurationWidgetLayout->addWidget(resetTutorialConfig, 1);
 	generalSection->contentLayout()->addWidget(resetTutorialConfigurationWidget);

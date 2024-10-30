@@ -93,7 +93,6 @@ QWidget *StyleTool::buildStylePage()
 	addLabeledWidget("Device Line", new QFrame);
 	addLabeledWidget("Solid Border", new QWidget);
 	addLabeledWidget("Device Icon", new QWidget);
-	addLabeledWidget("Tree View", new QWidget);
 	addLabeledWidget("Not Interactive", new QWidget);
 	addLabeledWidget("Border", new QWidget);
 
@@ -110,8 +109,6 @@ QWidget *StyleTool::buildStylePage()
 			style::properties::widget::solidBorder, true, true);
 	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::widget::deviceIcon, true, true);
-	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
-			style::properties::widget::treeView, true, true);
 	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::widget::notInteractive, true, true);
 	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(), style::properties::widget::border,
