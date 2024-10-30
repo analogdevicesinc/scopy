@@ -77,6 +77,7 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 		     {"RMS", "Angle", "Deviation under", "Deviation over", "Pinst", "Pst", "Plt"});
 	createLabels(voltagePanel, {DEVICE_NAME}, {"U2", "U0", "Sneg V", "Spos V", "Szro V"});
 	voltagePanel->refreshUi();
+	voltagePanel->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
 	voltageLayout->addWidget(voltagePanel);
 
 	m_voltagePlot = new PolarPlotWidget(voltageWidget);
@@ -94,6 +95,7 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	createLabels(currentPanel, m_chnls["current"].values(), {"RMS", "Angle"});
 	createLabels(currentPanel, {DEVICE_NAME}, {"I2", "I0", "Sneg I", "Spos I", "Szro I"});
 	currentPanel->refreshUi();
+	currentPanel->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
 	currentLayout->addWidget(currentPanel);
 
 	m_currentPlot = new PolarPlotWidget(currentWidget);
