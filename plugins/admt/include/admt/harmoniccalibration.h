@@ -216,6 +216,8 @@ private:
 	void displayCalculatedCoeff();
 	void toggleMotorControls(bool value);
 	void clearCalibrationSamples();
+	void updateSequenceWidget();
+	void toggleFaultRegisterMode(int mode);
 
 	QTimer *timer, *calibrationTimer, *utilityTimer;
 
