@@ -53,6 +53,7 @@ static const QPen sinePen(sineColor);
 static const QPen cosinePen(cosineColor);
 
 static map<string, string> deviceRegisterMap;
+static map<string, int> generalRegisterMap;
 static QString deviceName = "";
 static QString deviceType = "";
 static bool is5V = false;
@@ -420,7 +421,12 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 		if(index == 1) { calibrationTimer->start(calibrationTimerRate); }
 		else { calibrationTimer->stop(); }
 
-		if(index == 2) { utilityTimer->start(utilityTimerRate); }
+		if(index == 2) // Utility Tab
+		{ 
+			utilityTimer->start(utilityTimerRate); 
+			readSequence();
+			toggleFaultRegisterMode(generalRegisterMap.at("Sequence Type"));
+		} 
 		else { utilityTimer->stop(); }
 	});
 }
@@ -1692,6 +1698,28 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	return tool;
 }
 
+void HarmonicCalibration::toggleFaultRegisterMode(int mode)
+{
+	switch(mode){
+		case 0:
+			AFEDIAGStatusLED->hide();
+			OscillatorDriftStatusLED->hide();
+			AngleCrossCheckStatusLED->hide();
+			TurnCountSensorLevelsStatusLED->hide();
+			MTDIAGStatusLED->hide();
+			SequencerWatchdogStatusLED->hide();
+			break;
+		case 1: 
+			AFEDIAGStatusLED->show();
+			OscillatorDriftStatusLED->show();
+			AngleCrossCheckStatusLED->show();
+			TurnCountSensorLevelsStatusLED->show();
+			MTDIAGStatusLED->show();
+			SequencerWatchdogStatusLED->show();
+			break;
+	}
+}
+
 void HarmonicCalibration::toggleMotorControls(bool value)
 {
 	motorMaxVelocitySpinBox->setEnabled(value);
@@ -1981,22 +2009,26 @@ void HarmonicCalibration::readSequence(){
 	if(changeCNVPage(generalRegisterPage, "GENERAL")){
 		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress, generalRegValue) != -1){
 			if(*generalRegValue != UINT32_MAX){
-				std::map<std::string, int> generalBitMapping = m_admtController->getGeneralRegisterBitMapping(static_cast<uint16_t>(*generalRegValue));
+				generalRegisterMap = m_admtController->getGeneralRegisterBitMapping(static_cast<uint16_t>(*generalRegValue));
 
-				if(generalBitMapping.at("Sequence Type") == -1){ sequenceTypeMenuCombo->combo()->setCurrentText("Reserved"); }
-				else{ sequenceTypeMenuCombo->combo()->setCurrentIndex(sequenceTypeMenuCombo->combo()->findData(generalBitMapping.at("Sequence Type"))); }
-				conversionTypeMenuCombo->combo()->setCurrentIndex(conversionTypeMenuCombo->combo()->findData(generalBitMapping.at("Conversion Type")));
-				// cnvSourceMenuCombo->combo()->setCurrentValue(generalBitMapping.at("Sequence Type"));
-				if(generalBitMapping.at("Convert Synchronization") == -1){ convertSynchronizationMenuCombo->combo()->setCurrentText("Reserved"); }
-				else{ convertSynchronizationMenuCombo->combo()->setCurrentIndex(convertSynchronizationMenuCombo->combo()->findData(generalBitMapping.at("Convert Synchronization"))); }
-				angleFilterMenuCombo->combo()->setCurrentIndex(angleFilterMenuCombo->combo()->findData(generalBitMapping.at("Angle Filter")));
-				eighthHarmonicMenuCombo->combo()->setCurrentIndex(eighthHarmonicMenuCombo->combo()->findData(generalBitMapping.at("8th Harmonic")));
+				updateSequenceWidget();
 
 				//StatusBarManager::pushMessage("READ GENERAL: 0b" + QString::number(static_cast<uint16_t>(*generalRegValue), 2).rightJustified(16, '0'));
 			}
 		}
 		else{ StatusBarManager::pushMessage("Failed to read GENERAL Register"); }
 	}
+}
+
+void HarmonicCalibration::updateSequenceWidget(){
+	if(generalRegisterMap.at("Sequence Type") == -1){ sequenceTypeMenuCombo->combo()->setCurrentText("Reserved"); }
+	else{ sequenceTypeMenuCombo->combo()->setCurrentIndex(sequenceTypeMenuCombo->combo()->findData(generalRegisterMap.at("Sequence Type"))); }
+	conversionTypeMenuCombo->combo()->setCurrentIndex(conversionTypeMenuCombo->combo()->findData(generalRegisterMap.at("Conversion Type")));
+	// cnvSourceMenuCombo->combo()->setCurrentValue(generalRegisterMap.at("Sequence Type"));
+	if(generalRegisterMap.at("Convert Synchronization") == -1){ convertSynchronizationMenuCombo->combo()->setCurrentText("Reserved"); }
+	else{ convertSynchronizationMenuCombo->combo()->setCurrentIndex(convertSynchronizationMenuCombo->combo()->findData(generalRegisterMap.at("Convert Synchronization"))); }
+	angleFilterMenuCombo->combo()->setCurrentIndex(angleFilterMenuCombo->combo()->findData(generalRegisterMap.at("Angle Filter")));
+	eighthHarmonicMenuCombo->combo()->setCurrentIndex(eighthHarmonicMenuCombo->combo()->findData(generalRegisterMap.at("8th Harmonic")));
 }
 
 bool HarmonicCalibration::changeCNVPage(uint32_t page, QString registerName){
