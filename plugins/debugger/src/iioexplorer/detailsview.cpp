@@ -97,7 +97,6 @@ void DetailsView::setupUi()
 
 	Style::setStyle(tabContainer, style::properties::debugger::detailsView, true, true);
 	Style::setStyle(m_tabWidget, style::properties::debugger::detailsView, true, true);
-	Style::setStyle(tabBar, style::properties::debugger::tabBar);
 	Style::setStyle(m_readBtn, style::properties::button::basicButton);
 }
 
