@@ -62,7 +62,7 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 
 	InfoBtn *infoBtn = new InfoBtn(this);
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
-	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+	connect(infoBtn, &QAbstractButton::clicked, this, [=]() {
 		QDesktopServices::openUrl(
 			QUrl("https://analogdevicesinc.github.io/scopy/plugins/registermap/registermap.html"));
 	});

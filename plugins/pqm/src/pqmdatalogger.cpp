@@ -126,3 +126,5 @@ void PqmDataLogger::createHeader()
 		qWarning(CAT_PQMLOG) << m_filePath << "cannot be opened!";
 	}
 }
+
+#include "moc_pqmdatalogger.cpp"
