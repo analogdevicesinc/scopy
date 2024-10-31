@@ -110,7 +110,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_windowCb->combo()->setCurrentIndex(0);
 
 	connect(m_windowCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		for(auto c : m_channels) {
+		for(auto c : qAsConst(m_channels)) {
 			if(dynamic_cast<FFTChannel *>(c)) {
 				FFTChannel *fc = dynamic_cast<FFTChannel *>(c);
 				fc->setWindow(m_windowCb->combo()->itemData(idx).toInt());
@@ -120,7 +120,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 
 	m_windowChkb = new MenuOnOffSwitch("Window Correction", this);
 	connect(m_windowChkb->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
-		for(auto c : m_channels) {
+		for(auto c : qAsConst(m_channels)) {
 			if(dynamic_cast<FFTChannel *>(c)) {
 				FFTChannel *fc = dynamic_cast<FFTChannel *>(c);
 				fc->setWindowCorrection(b);

@@ -74,7 +74,7 @@ QWidget *PreferencesHelper::addPreferenceComboList(Preferences *p, QString id, Q
 	QString pref1Val;
 
 	QComboBox *pref = new QComboBox();
-	for(auto option : options) {
+	for(const auto &option : options) {
 		pref->addItem(option.first, option.second);
 		if(option.second == p->get(id)) {
 			pref1Val = option.first;

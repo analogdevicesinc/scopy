@@ -111,7 +111,7 @@ void PlotMarkerController::setFixedHandleVisible(bool b)
 {
 	m_handlesVisible = b;
 	if(m_markerType == MC_FIXED) {
-		for(auto handle : m_fixedHandles) {
+		for(auto handle : qAsConst(m_fixedHandles)) {
 			handle->handle()->setVisible(b);
 			handle->handle()->raise();
 		}
@@ -120,7 +120,7 @@ void PlotMarkerController::setFixedHandleVisible(bool b)
 
 void PlotMarkerController::deinitFixedMarker()
 {
-	for(auto handle : m_fixedHandles) {
+	for(auto handle : qAsConst(m_fixedHandles)) {
 		delete handle;
 	}
 	m_fixedHandles.clear();
@@ -215,7 +215,7 @@ void PlotMarkerController::computePeakMarkers()
 void PlotMarkerController::cacheMarkerInfo()
 {
 	m_markerCache.clear();
-	for(auto mi : m_markerInfo) {
+	for(const auto &mi : qAsConst(m_markerInfo)) {
 		m_markerCache.push_back(mi.peak.x);
 	}
 	m_markerInfo.clear();
@@ -313,7 +313,7 @@ QString MarkerLabel::name() { return m_name; }
 void MarkerLabel::updateInfo(QList<PlotMarkerController::MarkerInfo> markers)
 {
 	m_txt->setText(m_name);
-	for(auto m : markers) {
+	for(const auto &m : markers) {
 		m_txt->append(m.name + ": " + m_mpf->format(m.peak.y, "dB", 2) + " @ " +
 			      m_mpf->format(m.peak.x, "Hz", 3));
 	}

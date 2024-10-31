@@ -361,7 +361,7 @@ void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
 	QWidget *w = tool->tool();
 	if(w) {
 		ADCInstrumentController *found = nullptr;
-		for(ADCInstrumentController *ctrl : m_ctrls) {
+		for(ADCInstrumentController *ctrl : qAsConst(m_ctrls)) {
 			if(ctrl->ui() == tool->tool()) {
 				found = ctrl;
 				break;
@@ -381,12 +381,12 @@ void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
 void ADCPlugin::preferenceChanged(QString s, QVariant t1)
 {
 	if(s == "adc_add_remove_plot") {
-		for(ADCInstrumentController *ctrl : m_ctrls) {
+		for(ADCInstrumentController *ctrl : qAsConst(m_ctrls)) {
 			ctrl->setEnableAddRemovePlot(t1.toBool());
 		}
 	}
 	if(s == "adc_add_remove_instrument") {
-		for(ADCInstrumentController *ctrl : m_ctrls) {
+		for(ADCInstrumentController *ctrl : qAsConst(m_ctrls)) {
 			ctrl->setEnableAddRemoveInstrument(t1.toBool());
 		}
 	}

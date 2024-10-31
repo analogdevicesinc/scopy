@@ -217,7 +217,7 @@ void ChannelManager::changeParent(QWidget *newParent)
 		ch_width = header->width();
 		ch_height = header->height();
 	} else {
-		for(auto ch : m_channelsList) {
+		for(auto ch : qAsConst(m_channelsList)) {
 			ch_width = std::max(ch_width, ch->width());
 			ch_height = std::max(ch_height, ch->height());
 		}
