@@ -28,3 +28,5 @@ Contents
    user_guide/index
    plugins/index
 
+
+   user_guide/bugReport
