@@ -57,7 +57,7 @@ EmuWidget::EmuWidget(QWidget *parent)
 	emuWidgetLay->setSpacing(10);
 	Style::setStyle(emuWidget, style::properties::widget::border_interactive);
 
-	QLabel *demoLabel = new QLabel("Demo option", emuWidget);
+	QLabel *demoLabel = new QLabel("Demo Option", emuWidget);
 	StyleHelper::MenuSmallLabel(demoLabel);
 	QWidget *demoOptWidget = createDemoOptWidget(emuWidget);
 	emuWidgetLay->addWidget(demoLabel, 0, 0);
@@ -65,7 +65,7 @@ EmuWidget::EmuWidget(QWidget *parent)
 	connect(this, &EmuWidget::demoEnabled, demoLabel, &QWidget::setDisabled);
 	connect(this, &EmuWidget::demoEnabled, demoOptWidget, &QWidget::setDisabled);
 
-	QLabel *xmlLabel = new QLabel("XML path", emuWidget);
+	QLabel *xmlLabel = new QLabel("XML Path", emuWidget);
 	StyleHelper::MenuSmallLabel(xmlLabel);
 	QWidget *xmlPathWidget = createXmlPathWidget(emuWidget);
 	emuWidgetLay->addWidget(xmlLabel, 1, 0);
