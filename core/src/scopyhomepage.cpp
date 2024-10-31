@@ -43,17 +43,9 @@ ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
 
 	ui->wInfoPageStack->setStyleSheet(".QWidget {border-radius: " + Style::getAttribute(json::global::radius_1) +
 					  ";}");
-	// ui->horizontalLayout_2->setStyleSheet(
-	// ".QWidget {border-radius: " + Style::getAttribute(json::global::radius_1) + ";}");
-	// ui->container->setStyleSheet(".QWidget#container { background-color: " +
-	// Style::getAttribute(json::theme::background_subtle) + "; }"); Style::setStyle(ui->horizontalLayout_2,
-	// style::properties::widget::border); ui->container->setStyleSheet(".QWidget#container { background-color: " +
-	// Style::getAttribute(json::theme::background_subtle) + "; }");
-	// Style::setStyle(ui->horizontalLayout_2, style::properties::widget::border);
-	// Style::setStyle(ui->wInfoPageStack, style::properties::widget::border);
-	// ui->container->setStyleSheet(".QWidget#container { background-color: " +
-				     // Style::getAttribute(json::theme::background_subtle) + "; }");
-	// Style::setStyle(ui->horizontalLayout_2, style::properties::widget::basicComponent);
+	ui->container->setStyleSheet(".QWidget#container { background-color: " +
+				     Style::getAttribute(json::theme::background_subtle) + "; }");
+	Style::setStyle(ui->horizontalLayout_2, style::properties::widget::basicComponent);
 	Style::setStyle(ui->wInfoPageStack, style::properties::widget::basicComponent);
 
 	is->add("home", new ScopyHomeInfoPage());
