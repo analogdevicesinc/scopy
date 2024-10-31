@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "plotscales.h"
 #include "plotaxis.h"
 #include "qpen.h"
@@ -6,6 +27,7 @@
 #include <QwtPlotScaleItem>
 #include <QwtScaleDiv>
 #include <qwt_scale_widget.h>
+#include <stylehelper.h>
 
 #include <pluginbase/preferences.h>
 
@@ -14,7 +36,7 @@ using namespace scopy;
 PlotScales::PlotScales(PlotWidget *plot)
 	: QObject(plot)
 	, m_plot(plot)
-	, m_color(QColor(0x6E6E6F))
+	, m_color(StyleHelper::GetInstance()->getColor("UIElementHighlight"))
 {
 	initGrid();
 	initGraticule();
@@ -143,11 +165,21 @@ void PlotScales::initGraticule()
 			}
 		});
 	connect(m_plot, &PlotWidget::channelSelected, this, [=](PlotChannel *ch) {
-		m_x1Graticule->setAxes(ch->xAxis()->axisId(), ch->yAxis()->axisId());
-		m_x2Graticule->setAxes(ch->xAxis()->axisId(), ch->yAxis()->axisId());
+		QwtAxisId xAxisId = m_plot->xAxis()->axisId();
+		QwtAxisId yAxisId = m_plot->yAxis()->axisId();
 
-		m_y1Graticule->setAxes(ch->xAxis()->axisId(), ch->yAxis()->axisId());
-		m_y2Graticule->setAxes(ch->xAxis()->axisId(), ch->yAxis()->axisId());
+		if(ch != nullptr) {
+			xAxisId = ch->xAxis()->axisId();
+			yAxisId = ch->yAxis()->axisId();
+		}
+
+		m_x1Graticule->setAxes(xAxisId, yAxisId);
+		m_x2Graticule->setAxes(xAxisId, yAxisId);
+
+		m_y1Graticule->setAxes(xAxisId, yAxisId);
+		m_y2Graticule->setAxes(xAxisId, yAxisId);
 		m_plot->replot();
 	});
 }
+
+#include "moc_plotscales.cpp"

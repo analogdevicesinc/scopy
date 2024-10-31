@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "harmonicsinstrument.h"
 #include "plotaxis.h"
 #include "qheaderview.h"
@@ -7,11 +28,19 @@
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/widgets/menucontrolbutton.h>
+#include <QDateTime>
+#include <QFileDialog>
+#include <menulineedit.h>
+#include <menusectionwidget.h>
+#include <QDesktopServices>
 
 using namespace scopy::pqm;
 
-HarmonicsInstrument::HarmonicsInstrument(QWidget *parent)
+HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	: QWidget(parent)
+	, m_tme(tme)
+	, m_uri(uri)
+	, m_running(false)
 {
 	initData();
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -23,13 +52,20 @@ HarmonicsInstrument::HarmonicsInstrument(QWidget *parent)
 	tool->topContainer()->setVisible(true);
 	tool->centralContainer()->setVisible(true);
 	tool->topContainerMenuControl()->setVisible(false);
+	tool->rightContainer()->setVisible(true);
+	tool->setRightContainerWidth(280);
 	instrumentLayout->addWidget(tool);
 
-	// central widget components
-	QWidget *thdWidget = createThdWidget();
-	tool->addWidgetToCentralContainerHelper(thdWidget);
+	InfoBtn *infoBtn = new InfoBtn(this);
+	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
+	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/pqm/harmonics.html"));
+	});
 
-	//
+	// central widget components
+	m_thdWidget = createThdWidget();
+	tool->addWidgetToCentralContainerHelper(m_thdWidget);
+
 	m_table = new QTableWidget(MAX_CHNLS, NUMBER_OF_HARMONICS, this);
 	initTable();
 	tool->addWidgetToCentralContainerHelper(m_table);
@@ -41,15 +77,9 @@ HarmonicsInstrument::HarmonicsInstrument(QWidget *parent)
 
 	// instrument menu
 	GearBtn *settingsMenuBtn = new GearBtn(this);
-	QWidget *settingsMenu = createSettingsMenu();
-	HoverWidget *menuHover = new HoverWidget(settingsMenu, settingsMenuBtn, tool);
-	menuHover->setAnchorPos(HoverPosition::HP_BOTTOMRIGHT);
-	menuHover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
-	menuHover->setAnchorOffset({0, 10});
-	connect(settingsMenuBtn, &QPushButton::toggled, this, [=, this](bool b) {
-		menuHover->setVisible(b);
-		menuHover->raise();
-	});
+	settingsMenuBtn->setChecked(true);
+	tool->rightStack()->add("settings", createSettingsMenu(this));
+	connect(settingsMenuBtn, &QPushButton::toggled, this, [=, this](bool b) { tool->openRightContainerHelper(b); });
 
 	m_runBtn = new RunBtn(this);
 	m_singleBtn = new SingleShotBtn(this);
@@ -57,7 +87,8 @@ HarmonicsInstrument::HarmonicsInstrument(QWidget *parent)
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(settingsMenuBtn, TTA_RIGHT);
 
-	connect(this, &HarmonicsInstrument::runTme, m_runBtn, &QAbstractButton::setChecked);
+	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
+	connect(this, &HarmonicsInstrument::enableTool, m_tme, &ToolMenuEntry::setRunning);
 	connect(m_runBtn, &QAbstractButton::toggled, m_singleBtn, &QAbstractButton::setDisabled);
 	connect(m_runBtn, SIGNAL(toggled(bool)), this, SLOT(toggleHarmonics(bool)));
 	connect(m_singleBtn, &QAbstractButton::toggled, m_runBtn, &QAbstractButton::setDisabled);
@@ -71,6 +102,8 @@ HarmonicsInstrument::~HarmonicsInstrument()
 	m_labels.clear();
 	m_plotChnls.clear();
 }
+
+void HarmonicsInstrument::showThdWidget(bool show) { m_thdWidget->setVisible(show); }
 
 void HarmonicsInstrument::initData()
 {
@@ -94,6 +127,9 @@ void HarmonicsInstrument::initTable()
 		horHeaderValues.push_back(QString::number(i));
 	}
 	m_table->setHorizontalHeaderLabels(horHeaderValues);
+	for(int i = 0; i < HARMONICS_MIN_DEGREE; i++) {
+		m_table->horizontalHeader()->hideSection(i);
+	}
 	StyleHelper::TableViewWidget(m_table->parentWidget(), "HarmonicsTable");
 	for(int i = 0; i < MAX_CHNLS; i++) {
 		for(int j = 0; j < NUMBER_OF_HARMONICS; j++) {
@@ -114,7 +150,7 @@ void HarmonicsInstrument::initPlot()
 	m_plot->xAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
 	m_plot->xAxis()->scaleDraw()->setFloatPrecision(0);
 	m_plot->xAxis()->scaleDraw()->setUnitType("");
-	m_plot->xAxis()->setInterval(0, HARMONICS_MAX_DEGREE);
+	m_plot->xAxis()->setInterval(HARMONICS_MIN_DEGREE, HARMONICS_MAX_DEGREE);
 
 	m_plot->setShowYAxisLabels(true);
 	m_plot->setShowXAxisLabels(true);
@@ -165,22 +201,39 @@ QWidget *HarmonicsInstrument::createThdWidget()
 	return thdWidget;
 }
 
-QWidget *HarmonicsInstrument::createSettingsMenu()
+QWidget *HarmonicsInstrument::createSettingsMenu(QWidget *parent)
 {
-	QWidget *menu = new QWidget(this);
-	menu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	menu->setFixedWidth(185);
-	menu->setStyleSheet("background-color:" + StyleHelper::getColor("UIElementBackground"));
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setMargin(0);
+	layout->setSpacing(10);
 
-	QVBoxLayout *lay = new QVBoxLayout(menu);
-	MenuCombo *harmonicType = new MenuCombo(tr("Harmonics Type"), this);
+	MenuHeaderWidget *header = new MenuHeaderWidget("Settings", QPen(StyleHelper::getColor("ScopyBlue")), widget);
+	QWidget *generalSection = createMenuGeneralSection(widget);
+	QWidget *logSection = createMenuLogSection(widget);
+
+	layout->addWidget(header);
+	layout->addWidget(generalSection);
+	layout->addWidget(logSection);
+	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	return widget;
+}
+
+QWidget *HarmonicsInstrument::createMenuGeneralSection(QWidget *parent)
+{
+	MenuSectionCollapseWidget *generalSection = new MenuSectionCollapseWidget(
+		"GENERAL", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, parent);
+	generalSection->contentLayout()->setSpacing(10);
+
+	MenuCombo *harmonicType = new MenuCombo(tr("Harmonics Type"), generalSection);
 	harmonicType->combo()->addItem("harmonics");
 	harmonicType->combo()->addItem("inter_harmonics");
 	m_harmonicsType = harmonicType->combo()->currentText();
 	connect(harmonicType->combo(), &QComboBox::currentTextChanged, this,
 		[=, this](QString h) { m_harmonicsType = h; });
 
-	MenuCombo *activeChnlCb = new MenuCombo(tr("Active channel"), this);
+	MenuCombo *activeChnlCb = new MenuCombo(tr("Active channel"), generalSection);
 	for(const QString &ch : m_chnls) {
 		activeChnlCb->combo()->addItem(m_chnls.key(ch));
 	}
@@ -193,10 +246,47 @@ QWidget *HarmonicsInstrument::createSettingsMenu()
 	connect(m_table->selectionModel(), &QItemSelectionModel::selectionChanged, this,
 		&HarmonicsInstrument::onSelectionChanged);
 
-	lay->addWidget(harmonicType);
-	lay->addWidget(activeChnlCb);
+	generalSection->add(harmonicType);
+	generalSection->add(activeChnlCb);
 
-	return menu;
+	return generalSection;
+}
+
+QWidget *HarmonicsInstrument::createMenuLogSection(QWidget *parent)
+{
+	MenuSectionCollapseWidget *logSection = new MenuSectionCollapseWidget(
+		"LOG", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, parent);
+	logSection->contentLayout()->setSpacing(10);
+	logSection->setCollapsed(true);
+
+	QWidget *browseWidget = new QWidget(logSection);
+	browseWidget->setLayout(new QHBoxLayout(browseWidget));
+	browseWidget->layout()->setMargin(0);
+
+	MenuLineEdit *logFilePath = new MenuLineEdit(browseWidget);
+	logFilePath->edit()->setPlaceholderText("Select log directory");
+	QPushButton *browseBtn = new QPushButton("...", browseWidget);
+	StyleHelper::BrowseButton(browseBtn);
+
+	browseWidget->layout()->addWidget(logFilePath);
+	browseWidget->layout()->addWidget(browseBtn);
+
+	connect(this, &HarmonicsInstrument::enableTool, this, [this, logFilePath, logSection](bool en) {
+		logSection->setDisabled(en);
+		QString dirPath = logFilePath->edit()->text();
+		QDir logDir = QDir(dirPath);
+		if(dirPath.isEmpty())
+			logSection->setCollapsed(true);
+		if(en && logDir.exists() && !logSection->collapsed())
+			Q_EMIT logData(PqmDataLogger::Harmonics, dirPath);
+		else
+			Q_EMIT logData(PqmDataLogger::None, "");
+	});
+	connect(browseBtn, &QPushButton::clicked, this, [this, logFilePath]() { browseFile(logFilePath->edit()); });
+
+	logSection->add(browseWidget);
+
+	return logSection;
 }
 
 void HarmonicsInstrument::updateTable()
@@ -229,10 +319,11 @@ void HarmonicsInstrument::stop() { m_runBtn->setChecked(false); }
 
 void HarmonicsInstrument::toggleHarmonics(bool en)
 {
+	m_running = en;
 	if(en) {
-		ResourceManager::open("pqm", this);
+		ResourceManager::open("pqm" + m_uri, this);
 	} else {
-		ResourceManager::close("pqm");
+		ResourceManager::close("pqm" + m_uri);
 	}
 	Q_EMIT enableTool(en);
 }
@@ -254,34 +345,50 @@ void HarmonicsInstrument::onSelectionChanged()
 {
 	QModelIndexList selectedIndexList = m_table->selectionModel()->selectedIndexes();
 	if(selectedIndexList.size() <= 1 || selectedFromSameCol(selectedIndexList)) {
-		m_plot->xAxis()->setInterval(0, HARMONICS_MAX_DEGREE);
+		m_plot->xAxis()->setInterval(HARMONICS_MIN_DEGREE, HARMONICS_MAX_DEGREE);
 		return;
 	}
-	int firstColumnSelected = selectedIndexList.front().column() + 1;
-	int lastColumnSelected = selectedIndexList.back().column() + 1;
-	m_plot->xAxis()->setInterval(std::min(firstColumnSelected, lastColumnSelected),
-				     std::max(firstColumnSelected, lastColumnSelected));
+	int firstColumnSelected = selectedIndexList.front().column();
+	int lastColumnSelected = selectedIndexList.back().column();
+	int lowerIdx = std::min(firstColumnSelected, lastColumnSelected);
+	int minDegree = (lowerIdx < HARMONICS_MIN_DEGREE) ? HARMONICS_MIN_DEGREE : lowerIdx;
+	m_plot->xAxis()->setInterval(minDegree, std::max(firstColumnSelected, lastColumnSelected));
 }
 
 void HarmonicsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> attr)
 {
-	if(m_runBtn->isChecked() || m_singleBtn->isChecked()) {
-		QString h = m_harmonicsType;
-		for(const QString &ch : m_chnls) {
-			QStringList harmonics = attr[ch][h].split(" ");
-			m_yValues[ch].clear();
-			for(const QString &val : qAsConst(harmonics)) {
-				m_yValues[ch].push_back(val.toDouble());
-			}
-			// thd labels update
-			m_labels[ch]->setValue(attr[ch]["thd"].toDouble());
-		}
-		updateTable();
-		m_plot->replot();
-		if(m_singleBtn->isChecked()) {
-			m_singleBtn->setChecked(false);
-		}
+	if(!m_running) {
+		return;
 	}
+	QString h = m_harmonicsType;
+	bool ok = false;
+	for(const QString &ch : m_chnls) {
+		QStringList harmonics = attr[ch][h].split(" ");
+		m_yValues[ch].clear();
+		for(const QString &val : qAsConst(harmonics)) {
+			double hValue = val.toDouble(&ok);
+			if(!ok)
+				continue;
+			if(m_yValues[ch].size() >= NUMBER_OF_HARMONICS)
+				break;
+			m_yValues[ch].push_back(hValue);
+		}
+		// thd labels update
+		m_labels[ch]->setValue(attr[ch]["thd"].toDouble());
+	}
+	updateTable();
+	m_plot->replot();
+	if(m_singleBtn->isChecked()) {
+		m_singleBtn->setChecked(false);
+	}
+}
+
+void HarmonicsInstrument::browseFile(QLineEdit *lineEditPath)
+{
+	QString dirPath =
+		QFileDialog::getExistingDirectory(this, "Select a directory", "directoryToOpen",
+						  QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+	lineEditPath->setText(dirPath);
 }
 
 #include "moc_harmonicsinstrument.cpp"

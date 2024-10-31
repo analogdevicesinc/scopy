@@ -1,3 +1,23 @@
+#
+# Copyright (c) 2024 Analog Devices Inc.
+#
+# This file is part of Scopy
+# (see https://www.github.com/analogdevicesinc/scopy).
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+#
+
 cmake_minimum_required(VERSION 3.9)
 set(SCOPY_MODULE gui)
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
@@ -15,7 +35,6 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
@@ -128,10 +147,8 @@ target_link_libraries(
 	       scopy-pluginbase
 )
 
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_PATH} RUNTIME DESTINATION ${SCOPY_DLL_PATH})
-
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-    $<TARGET_FILE:${PROJECT_NAME}>
-    ${SCOPY_CURRENT_BINARY_PATH}
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH} COMPONENT ${SCOPY_PDK}
+	RUNTIME DESTINATION ${SCOPY_DLL_INSTALL_PATH}
 )
+install(DIRECTORY include/ DESTINATION include/ COMPONENT ${SCOPY_PDK})
+install(DIRECTORY res/ DESTINATION resources/ COMPONENT ${SCOPY_PDK})

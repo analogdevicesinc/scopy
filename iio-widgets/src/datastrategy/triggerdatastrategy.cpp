@@ -26,11 +26,13 @@ using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_TRIGGER_DATA_STRATEGY, "TriggerDataStrategy")
 
-TriggerDataStrategy::TriggerDataStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent)
-	: QWidget(parent)
+TriggerDataStrategy::TriggerDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
+	: QObject(parent)
 {
 	m_recipe = recipe;
 }
+
+TriggerDataStrategy::~TriggerDataStrategy() {}
 
 QString TriggerDataStrategy::data() { return m_data; }
 

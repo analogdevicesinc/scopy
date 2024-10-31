@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "plotchannel.h"
 #include "menuplotchannelcurvestylecontrol.h"
 #include <menusectionwidget.h>
@@ -8,7 +29,6 @@ using namespace scopy::gui;
 MenuPlotChannelCurveStyleControl::MenuPlotChannelCurveStyleControl(QWidget *parent)
 	: QWidget(parent)
 {
-
 	createCurveMenu(this);
 }
 
@@ -58,9 +78,50 @@ void MenuPlotChannelCurveStyleControl::addChannels(PlotChannel *c)
 {
 	c->setThickness(cbThicknessW->combo()->currentText().toInt());
 	c->setStyle(cbStyleW->combo()->currentIndex());
+
+	connect(c, &PlotChannel::styleChanged, this, &MenuPlotChannelCurveStyleControl::setStyleSlot);
+	connect(c, &PlotChannel::thicknessChanged, this, &MenuPlotChannelCurveStyleControl::setThicknessSlot);
+
 	m_channels.append(c);
 }
 
-void MenuPlotChannelCurveStyleControl::removeChannels(PlotChannel *c) { m_channels.removeAll(c); }
+void MenuPlotChannelCurveStyleControl::removeChannels(PlotChannel *c)
+{
+	disconnect(c, &PlotChannel::styleChanged, this, &MenuPlotChannelCurveStyleControl::setStyleSlot);
+	disconnect(c, &PlotChannel::thicknessChanged, this, &MenuPlotChannelCurveStyleControl::setThicknessSlot);
+	m_channels.removeAll(c);
+}
+
+void MenuPlotChannelCurveStyleControl::setStyleSlot()
+{
+	if(m_channels.count() <= 0)
+		return;
+
+	int style = m_channels[0]->style();
+	for(PlotChannel *c : qAsConst(m_channels)) {
+		if(style != c->style()) {
+			// "Mixed style should be written here"
+			return;
+		}
+	}
+
+	cbStyleW->combo()->setCurrentIndex(cbStyleW->combo()->findData(style));
+}
+
+void MenuPlotChannelCurveStyleControl::setThicknessSlot()
+{
+	if(m_channels.count() <= 0)
+		return;
+
+	int thickness = m_channels[0]->thickness();
+	for(PlotChannel *c : qAsConst(m_channels)) {
+		if(thickness != c->thickness()) {
+			// "Mixed thickness should be written here"
+			return;
+		}
+	}
+
+	cbThicknessW->combo()->setCurrentText(QString::number(thickness));
+}
 
 #include "moc_menuplotchannelcurvestylecontrol.cpp"

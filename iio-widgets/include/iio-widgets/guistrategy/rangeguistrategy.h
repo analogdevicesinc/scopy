@@ -23,14 +23,14 @@
 
 #include <QWidget>
 #include <iio.h>
-// #include <gui/spinbox_a.hpp>
-#include <gui/widgets/titlespinbox.h>
+// #include <gui/widgets/titlespinbox.h>
+#include <gui/widgets/menuspinbox.h>
 #include "guistrategy/guistrategyinterface.h"
 #include "iiowidgetdata.h"
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy {
-class SCOPY_IIO_WIDGETS_EXPORT RangeAttrUi : public QWidget, public GuiStrategyInterface
+class SCOPY_IIO_WIDGETS_EXPORT RangeAttrUi : public QObject, public GuiStrategyInterface
 {
 	Q_OBJECT
 	Q_INTERFACES(scopy::GuiStrategyInterface)
@@ -40,7 +40,7 @@ public:
 	 * string from recipe->linkedAttributeValue should look like "[begin step end]" where "begin", "step" and "end"
 	 * will be converted to double.
 	 * */
-	explicit RangeAttrUi(IIOWidgetFactoryRecipe recipe, QWidget *parent = nullptr);
+	explicit RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QWidget *parent = nullptr);
 	~RangeAttrUi();
 
 	/**
@@ -70,7 +70,7 @@ private:
 	double tryParse(QString number, bool *success);
 
 	QWidget *m_ui;
-	TitleSpinBox *m_spinBox;
+	gui::MenuSpinbox *m_spinBox;
 };
 } // namespace scopy
 

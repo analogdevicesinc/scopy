@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "menus/monitorselectionmenu.hpp"
 
 #include <QLabel>
@@ -19,7 +40,7 @@ MonitorSelectionMenu::MonitorSelectionMenu(QMap<QString, DataMonitorModel *> *mo
 	setLayout(mainLayout);
 
 	QWidget *settingsBody = new QWidget(this);
-	layout = new QVBoxLayout(this);
+	layout = new QVBoxLayout();
 	layout->setMargin(0);
 	layout->setSpacing(10);
 	settingsBody->setLayout(layout);
@@ -60,7 +81,8 @@ MonitorSelectionMenu::MonitorSelectionMenu(QMap<QString, DataMonitorModel *> *mo
 
 void MonitorSelectionMenu::generateDeviceSection(QString device, bool import)
 {
-	MenuCollapseSection *devMonitorsSection = new MenuCollapseSection(device, MenuCollapseSection::MHCW_NONE, this);
+	MenuCollapseSection *devMonitorsSection = new MenuCollapseSection(
+		device, MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_COMPOSITEWIDGET, this);
 
 	if(import) {
 
@@ -85,8 +107,6 @@ void MonitorSelectionMenu::generateDeviceSection(QString device, bool import)
 	}
 
 	DataMonitorStyleHelper::MonitorSelectionMenuMenuCollapseSectionStyle(devMonitorsSection);
-
-	devMonitorsSection->header()->setChecked(false);
 
 	deviceMap.insert(device, devMonitorsSection);
 }
@@ -115,7 +135,7 @@ void MonitorSelectionMenu::addMonitor(DataMonitorModel *monitor)
 	monitorChannel->setStyleSheet(monitorChannel->styleSheet() +
 				      QString(":hover{ background-color: %1 ; }").arg(monitor->getColor().name()));
 
-	connect(monitorChannel, &MenuControlButton::toggled, this, [=, this](bool toggled) {
+	connect(monitorChannel, &MenuControlButton::clicked, this, [=, this](bool toggled) {
 		if(!monitorChannel->checkBox()->isChecked()) {
 			monitorChannel->checkBox()->setChecked(true);
 		}

@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "scopyhomepage.h"
 
 #include "scopyhomeinfopage.h"
@@ -23,15 +44,19 @@ ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
 	is->add("add", add);
 
 	//	addDevice("dev1","dev1","descr1",new QPushButton("abc"),new QLabel("page1"));
+
+	StyleHelper::BlueButton(scanBtn());
+	scanBtn()->setFixedWidth(80);
 	connect(hc, SIGNAL(goLeft()), db, SLOT(prevDevice()));
 	connect(hc, SIGNAL(goRight()), db, SLOT(nextDevice()));
 	connect(db, SIGNAL(requestDevice(QString, int)), is, SLOT(slideInKey(QString, int)));
 	connect(db, SIGNAL(requestDevice(QString, int)), this, SIGNAL(requestDevice(QString)));
 	connect(this, SIGNAL(deviceAddedToUi(QString)), add, SLOT(deviceAddedToUi(QString)));
 
-	connect(add, SIGNAL(requestAddDevice(QString, QString)), this, SIGNAL(requestAddDevice(QString, QString)));
 	connect(add, &ScopyHomeAddPage::requestDevice, this, [=](QString id) { Q_EMIT db->requestDevice(id, -1); });
 	connect(add, &ScopyHomeAddPage::newDeviceAvailable, this, [=](DeviceImpl *d) { Q_EMIT newDeviceAvailable(d); });
+
+	connect(db, &DeviceBrowser::displayNameChanged, this, &ScopyHomePage::displayNameChanged);
 }
 
 ScopyHomePage::~ScopyHomePage() { delete ui; }
@@ -59,6 +84,12 @@ void ScopyHomePage::viewDevice(QString id)
 	Q_EMIT db->requestDevice(id, -1);
 }
 
+void ScopyHomePage::connectingDevice(QString id)
+{
+	auto &&db = ui->wDeviceBrowser;
+	db->connectingDevice(id);
+}
+
 void ScopyHomePage::connectDevice(QString id)
 {
 	auto &&db = ui->wDeviceBrowser;
@@ -70,6 +101,14 @@ void ScopyHomePage::disconnectDevice(QString id)
 	db->disconnectDevice(id);
 }
 
+void ScopyHomePage::setScannerEnable(bool b)
+{
+	ui->btnScan->setVisible(b);
+	ui->label_2->setVisible(b);
+	ui->btnScanNow->setVisible(!b);
+}
 QPushButton *ScopyHomePage::scanControlBtn() { return ui->btnScan; }
+
+QPushButton *ScopyHomePage::scanBtn() { return ui->btnScanNow; }
 
 #include "moc_scopyhomepage.cpp"

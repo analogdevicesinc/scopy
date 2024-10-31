@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef TOOLMENUENTRY_H
 #define TOOLMENUENTRY_H
 
@@ -18,18 +39,21 @@ class SCOPY_PLUGINBASE_EXPORT ToolMenuEntry : public QObject
 {
 	Q_OBJECT
 public:
-	ToolMenuEntry(QString id, QString name, QString icon, QString pluginName, QObject *parent = nullptr)
+	ToolMenuEntry(QString id, QString name, QString icon, QString pluginName, QString param,
+		      QObject *parent = nullptr)
 		: QObject(parent)
 		, m_id(id)
 		, m_uuid("tme_" + pluginName + "_" + id + "_" + scopy::config::getUuid())
 		, m_name(name)
 		, m_icon(icon)
 		, m_pluginName(pluginName)
+		, m_param(param)
 		, m_visible(true)
 		, m_enabled(false)
 		, m_running(false)
 		, m_runBtnVisible(false)
 		, m_attached(true)
+		, m_detachable(true)
 		, m_tool(nullptr)
 	{}
 
@@ -43,6 +67,7 @@ public:
 		m_enabled = other.m_enabled;
 		m_running = other.m_running;
 		m_runBtnVisible = other.m_runBtnVisible;
+		m_runEnabled = other.m_runEnabled;
 		m_attached = other.m_attached;
 		m_pluginName = other.m_pluginName;
 		m_tool = other.m_tool;
@@ -54,10 +79,12 @@ public:
 	inline QString name() const { return m_name; }
 	inline QString icon() const { return m_icon; }
 	inline QString pluginName() const { return m_pluginName; }
+	inline QString param() const { return m_param; }
 	inline bool visible() const { return m_visible; }
 	inline bool enabled() const { return m_enabled; }
 	inline bool running() const { return m_running; }
 	inline bool attached() const { return m_attached; }
+	inline bool detachable() const { return m_detachable; }
 	inline bool runEnabled() const { return m_runEnabled; }
 	inline bool runBtnVisible() const { return m_runBtnVisible; }
 	inline QWidget *tool() const { return m_tool; }
@@ -104,6 +131,14 @@ public Q_SLOTS:
 	 * Attaches the tool to the main window
 	 */
 	void setAttached(bool attach);
+
+	/**
+	 * @brief setDetachable
+	 * @param detachable
+	 * Sets the detachment property.
+	 * If false, the tool cannot be detached.
+	 */
+	void setDetachable(bool detachable);
 
 	/**
 	 * @brief setRunEnabled
@@ -157,12 +192,14 @@ private:
 	QString m_name;
 	QString m_icon;
 	QString m_pluginName;
+	QString m_param;
 	bool m_visible;
 	bool m_enabled;
 	bool m_running;
 	bool m_runEnabled;
 	bool m_runBtnVisible;
 	bool m_attached;
+	bool m_detachable;
 	QWidget *m_tool;
 };
 
@@ -243,8 +280,12 @@ inline QWidget *ToolMenuEntry::setTool(QWidget *newTool)
 	return oldTool;
 }
 
+inline void ToolMenuEntry::setDetachable(bool detachable) { m_detachable = detachable; }
+
 inline void ToolMenuEntry::setAttached(bool attach)
 {
+	if(!m_detachable)
+		return;
 	bool oldAttach = m_attached;
 	m_attached = attach;
 	if(oldAttach != m_attached && m_tool) {

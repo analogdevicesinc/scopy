@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "axishandle.h"
 #include "qcoreevent.h"
 #include "qpainter.h"
@@ -65,7 +86,7 @@ void AxisHandle::setHandle(HandleOrientation orientation)
 	m_handle = QPixmap(":/gui/icons/handle_arrow.svg")
 			   .scaled(m_handleSize, m_handleSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-	if(m_handlePos == HandlePos::NORTH_WEST)
+	if(m_handlePos == HandlePos::NORTH_OR_WEST)
 		m_handle = m_handle.transformed(QTransform().scale(-1, -1));
 
 	if(m_axisId.isYAxis())
@@ -83,7 +104,7 @@ void AxisHandle::setHandle(HandleOrientation orientation)
 			m_handle = m_handle.transformed(QTransform().rotate(180));
 		}
 
-		if(m_handlePos == HandlePos::NORTH_WEST) {
+		if(m_handlePos == HandlePos::NORTH_OR_WEST) {
 			m_handle = m_handle.transformed(QTransform().rotate(180));
 		}
 	}
@@ -129,7 +150,7 @@ QRect AxisHandle::getBigRect()
 		rect = QRect(m_pos.x() - m_handleMargins * 2, y, rectWidth, rectHeight);
 	}
 
-	if(m_handlePos == HandlePos::NORTH_WEST) {
+	if(m_handlePos == HandlePos::NORTH_OR_WEST) {
 		if(m_axisId.isXAxis()) {
 			int height = rect.height();
 			rect.setTop(0);
@@ -154,7 +175,7 @@ QRect AxisHandle::getSmallRect()
 		rect = QRect(m_pos.x() - m_handlePadding, y, m_handle.width(), m_handle.height());
 	}
 
-	if(m_handlePos == HandlePos::NORTH_WEST) {
+	if(m_handlePos == HandlePos::NORTH_OR_WEST) {
 		if(m_axisId.isXAxis()) {
 			int height = rect.height();
 			rect.setTop(m_handlePadding);

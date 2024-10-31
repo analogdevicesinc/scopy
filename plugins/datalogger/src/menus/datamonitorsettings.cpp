@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "menus/datamonitorsettings.hpp"
 #include "menus/plottimeaxiscontroller.hpp"
 
@@ -22,7 +43,7 @@ using namespace datamonitor;
 
 Q_LOGGING_CATEGORY(CAT_DATAMONITOR_SETTINGS, "DataMonitorSettings")
 
-DataMonitorSettings::DataMonitorSettings(MonitorPlot *m_plot, bool isDeletable, QWidget *parent)
+DataMonitorSettings::DataMonitorSettings(MonitorPlot *m_plot, QWidget *parent)
 	: m_plot(m_plot)
 	, QWidget{parent}
 {
@@ -30,8 +51,6 @@ DataMonitorSettings::DataMonitorSettings(MonitorPlot *m_plot, bool isDeletable, 
 	mainLayout->setMargin(0);
 	mainLayout->setSpacing(10);
 	setLayout(mainLayout);
-
-	m_isDeletable = isDeletable;
 }
 
 DataMonitorSettings::~DataMonitorSettings() {}
@@ -45,7 +64,7 @@ void DataMonitorSettings::init(QString title, QColor color)
 		[=, this]() { Q_EMIT titleUpdated(header->lineEdit()->text()); });
 
 	settingsBody = new QWidget(this);
-	layout = new QVBoxLayout(this);
+	layout = new QVBoxLayout();
 	layout->setMargin(0);
 	layout->setSpacing(10);
 	settingsBody->setLayout(layout);
@@ -78,13 +97,6 @@ void DataMonitorSettings::init(QString title, QColor color)
 	dataLoggingMenu = new DataLoggingMenu(this);
 	layout->addWidget(dataLoggingMenu);
 
-	/////// delete monitor /////////////////
-	if(m_isDeletable) {
-		deleteMonitor = new QPushButton("Delete Tool", this);
-		layout->addWidget(deleteMonitor);
-		connect(deleteMonitor, &QPushButton::clicked, this, &DataMonitorSettings::requestDeleteTool);
-	}
-
 	MouseWheelWidgetGuard *mouseWheelWidgetGuard = new MouseWheelWidgetGuard(this);
 	mouseWheelWidgetGuard->installEventRecursively(this);
 
@@ -101,8 +113,8 @@ void DataMonitorSettings::plotYAxisMaxValueUpdate(double value) { m_ymax->setVal
 QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 {
 	MenuSectionWidget *yaxisContainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *yAxisSection =
-		new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE, yaxisContainer);
+	MenuCollapseSection *yAxisSection = new MenuCollapseSection(
+		"Y-AXIS", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, yaxisContainer);
 
 	yaxisContainer->contentLayout()->addWidget(yAxisSection);
 
@@ -154,8 +166,8 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 QWidget *DataMonitorSettings::generateCurveStyleSettings(QWidget *parent)
 {
 	MenuSectionWidget *curveStylecontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *curveStyleSection =
-		new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, curveStylecontainer);
+	MenuCollapseSection *curveStyleSection = new MenuCollapseSection(
+		"CURVE", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, curveStylecontainer);
 
 	gui::MenuPlotChannelCurveStyleControl *curveMneu = new gui::MenuPlotChannelCurveStyleControl(curveStyleSection);
 
@@ -174,7 +186,8 @@ QWidget *DataMonitorSettings::generatePlotUiSettings(QWidget *parent)
 {
 	MenuSectionWidget *plotStylecontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *plotStyleSection =
-		new MenuCollapseSection("PLOT SETTINGS", MenuCollapseSection::MHCW_NONE, plotStylecontainer);
+		new MenuCollapseSection("PLOT SETTINGS", MenuCollapseSection::MHCW_NONE,
+					MenuCollapseSection::MHW_BASEWIDGET, plotStylecontainer);
 
 	plotStyleSection->contentLayout()->setSpacing(10);
 

@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2019 Analog Devices Inc.
+ * Copyright (c) 2024 Analog Devices Inc.
  *
  * This file is part of Scopy
- * (see http://www.github.com/analogdevicesinc/scopy).
+ * (see https://www.github.com/analogdevicesinc/scopy).
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,61 +15,49 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 #ifndef TOOLMENU_H
 #define TOOLMENU_H
 
-#include "gui/basemenu.h"
-#include "scopy-core_export.h"
-#include "toolmenuitem.h"
-
+#include <compositewidget.h>
+#include <QMap>
+#include <QScrollArea>
+#include <QVBoxLayout>
 #include <QButtonGroup>
-#include <QLabel>
-#include <QString>
 
 namespace scopy {
-/**
- * @brief The ToolMenu class
- */
-class SCOPY_CORE_EXPORT ToolMenu : public BaseMenu
+
+class ToolMenu : public QWidget, public CompositeWidget
 {
 	Q_OBJECT
 public:
-	explicit ToolMenu(QWidget *parent = nullptr);
+	ToolMenu(QWidget *parent);
 	~ToolMenu();
 
-	ToolMenuItem *getToolMenuItemFor(QString toolId);
-	ToolMenuItem *addTool(QString id, QString name, QString icon, int position = -1);
-	ToolMenuItem *createTool(QString id, QString name, QString icon, int position = -1);
-	bool removeTool(QString id);
-	bool removeTool(ToolMenuItem *tmi);
+	void add(QWidget *w) override;
+	void add(int index, QString itemId, QWidget *w);
+	void remove(QWidget *w) override;
+	int indexOf(QWidget *w);
+	void colapseAll();
 
-	void hideMenuText(bool hidden);
-	const QVector<ToolMenuItem *> &getTools() const;
-
-	QButtonGroup *getButtonGroup() const;
-
-Q_SIGNALS:
-	void toggleAttach(QString);
-	void requestToolSelect(QString);
-
-public Q_SLOTS:
-	void detachSuccesful(QString);
-	void attachSuccesful(QString);
+	QButtonGroup *btnGroup() const;
 
 private:
-	QVector<ToolMenuItem *> tools;
-	QButtonGroup *buttonGroup;
+	void add(int index, QWidget *w);
+	QString widgetName(QWidget *w);
+	void onScrollRangeChanged(int min, int max);
 
-private Q_SLOTS:
-	void _updateToolList(short from, short to);
-
-private:
-	void _saveState();
-	void _loadState();
+	QMap<QString, QWidget *> m_widgetMap;
+	int m_uuid;
+	QScrollArea *m_scroll;
+	QVBoxLayout *m_layScroll;
+	QSpacerItem *m_spacer;
+	QButtonGroup *m_btnGroup;
 };
+
 } // namespace scopy
 
 #endif // TOOLMENU_H

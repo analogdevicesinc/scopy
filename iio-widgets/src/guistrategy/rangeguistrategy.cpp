@@ -25,28 +25,32 @@ using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_ATTR_GUI_STRATEGY, "AttrGuiStrategy")
 
-RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, QWidget *parent)
-	: QWidget(parent)
-	, m_ui(new QWidget(nullptr))
+RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget *parent)
+	: QObject(parent)
+	, m_ui(new QWidget(parent))
 {
 	m_recipe = recipe;
 	if(!isValid()) {
 		qCritical(CAT_ATTR_GUI_STRATEGY)
 			<< "The data you sent to this range gui strategy is not complete. Cannot create object";
 	}
+
 	m_ui->setLayout(new QVBoxLayout(m_ui));
 	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
-	// FIXME: this does not look right when uninitialized, also crashes...
-	m_spinBox = new TitleSpinBox(m_recipe.data.toUpper(), this);
+	m_spinBox = new gui::MenuSpinbox(m_recipe.data.toUpper(), 0, "", 0, 1, true, false, m_ui);
+	m_spinBox->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
+	m_spinBox->setScaleRange(1, 1);
+	m_spinBox->setScalingEnabled(false);
+	m_spinBox->setLineVisible(false);
 	m_ui->layout()->addWidget(m_spinBox);
-	Q_EMIT requestData();
 
-	connect(m_spinBox->getLineEdit(), &QLineEdit::textChanged, this,
-		[this](QString text) { Q_EMIT emitData(text); });
+	connect(m_spinBox, &gui::MenuSpinbox::valueChanged, this,
+		[&](double value) { Q_EMIT emitData(Util::doubleToQString(value)); });
+	Q_EMIT requestData();
 }
 
-RangeAttrUi::~RangeAttrUi() { m_ui->deleteLater(); }
+RangeAttrUi::~RangeAttrUi() {}
 
 QWidget *RangeAttrUi::ui() { return m_ui; }
 
@@ -61,7 +65,7 @@ bool RangeAttrUi::isValid()
 
 void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 {
-	QSignalBlocker blocker(m_spinBox->getLineEdit());
+	QSignalBlocker blocker(m_spinBox);
 	QString availableAttributeValue = QString(optionalData).mid(1, QString(optionalData).size() - 2);
 	QStringList optionsList = availableAttributeValue.split(" ", Qt::SkipEmptyParts);
 	int optionListSize = optionsList.size();
@@ -82,11 +86,10 @@ void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 			qCritical(CAT_ATTR_GUI_STRATEGY)
 				<< "Cannot partially initialize, something is very wrong here. " << currentData
 				<< " is not a double.";
-			m_spinBox->getLineEdit()->setText(currentData);
+			m_spinBox->setValueString(currentData);
 			return;
 		}
 
-		m_spinBox->setStep(1);
 		m_spinBox->setValue(value);
 		return;
 	}
@@ -102,19 +105,19 @@ void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 	double max = tryParse(optionsList[2], &ok);
 	finalOk &= ok;
 
-	double currentNum = QString(currentData).toDouble(&ok);
+	double currentNum = tryParse(currentData, &ok);
 	finalOk &= ok;
 
 	if(!finalOk) {
 		qCritical(CAT_ATTR_GUI_STRATEGY)
 			<< "Could not parse the values from" << availableAttributeValue << "as double or int.";
-		m_spinBox->setSpinButtonsDisabled(true);
-		m_spinBox->getLineEdit()->setText(currentData);
+		m_spinBox->setDisabled(true);
+		m_spinBox->setValueString(currentData);
 	} else {
-		m_spinBox->setSpinButtonsDisabled(false);
-		m_spinBox->setMin(min);
-		m_spinBox->setMax(max);
-		m_spinBox->setStep(step);
+		m_spinBox->setDisabled(false);
+		m_spinBox->setMinValue(min);
+		m_spinBox->setMaxValue(max);
+		m_spinBox->incrementStrategy()->setScale(step);
 		m_spinBox->setValue(currentNum);
 	}
 

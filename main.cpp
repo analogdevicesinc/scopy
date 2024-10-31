@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "core/logging_categories.h"
 #include "core/scopymainwindow.h"
 
@@ -54,7 +75,9 @@ void initLogging()
 						 "CyclicalTask.debug=false\n"
 						 "SWIOTPlugin.debug=true\n"
 						 "AD74413R.debug=true\n"
-						 "ScopyTranslations.debug=true\n");
+						 "ScopyTranslations.debug=true\n"
+						 "GRTimeSinkComponent.debug=true\n"
+						 "GRManager.debug=true\n");
 	}
 	if(!getenv("QT_MESSAGE_PATTERN")) {
 		SetScopyQDebugMessagePattern();
@@ -88,6 +111,7 @@ int main(int argc, char *argv[])
 	parser.addVersionOption();
 	parser.addOptions({
 		{{"s", "script"}, "Run given script.", "script"},
+		{{"S", "script-list"}, "Run given script list.", "script-list"},
 		{{"r", "keep-running"}, "Keep the application session after running a certain script."},
 		{{"a", "accept-license"}, "Accept the license in advance."},
 		{{"l", "logfile"}, "Saves all the logging messages into a file.", "filename"},

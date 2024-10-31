@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include <QOpenGLWidget>
 #include <QSurfaceFormat>
 #include <QLabel>
@@ -6,6 +27,8 @@
 #include <QLoggingCategory>
 #include <QTranslator>
 #include <QOpenGLFunctions>
+#include <browsemenu.h>
+#include <deviceautoconnect.h>
 
 #include "logging_categories.h"
 #include "qmessagebox.h"
@@ -26,17 +49,15 @@
 #include "iioutil/connectionprovider.h"
 #include "pluginbase/messagebroker.h"
 #include "scopy-core_config.h"
-#include "popupwidget.h"
 #include "pluginbase/statusbarmanager.h"
 #include "scopytitlemanager.h"
 #include <common/scopyconfig.h>
 #include <translationsrepository.h>
 #include <libsigrokdecode/libsigrokdecode.h>
-#include <functional>
-#include <utility>
 #include <stylehelper.h>
 #include <scopymainwindow_api.h>
 #include <QVersionNumber>
+#include <iioutil/iiounits.h>
 
 using namespace scopy;
 using namespace scopy::gui;
@@ -58,6 +79,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ScopyTitleManager::setGitHash(QString(SCOPY_VERSION_GIT));
 
 	StyleHelper::GetInstance()->initColorMap();
+	IIOUnitsManager::GetInstance();
 	setAttribute(Qt::WA_QuitOnClose, true);
 	initPythonWIN32();
 	initStatusBar();
@@ -71,9 +93,24 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	vc->subscribe(this,
 		      &ScopyMainWindow::receiveVersionDocument); // 'subscribe' to receive the version QJsonDocument
 
-	auto tb = ui->wToolBrowser;
 	auto ts = ui->wsToolStack;
-	auto tm = tb->getToolMenu();
+
+	////////
+	BrowseMenu *browseMenu = new BrowseMenu(ui->wToolBrowser);
+	ui->wToolBrowser->layout()->addWidget(browseMenu);
+
+	connect(browseMenu, &BrowseMenu::requestTool, ts, &ToolStack::show, Qt::QueuedConnection);
+	connect(browseMenu, SIGNAL(requestLoad()), this, SLOT(load()));
+	connect(browseMenu, SIGNAL(requestSave()), this, SLOT(save()));
+	connect(browseMenu, &BrowseMenu::collapsed, this, [this](bool coll) {
+		if(coll) {
+			ui->animHolder->setAnimMin(40);
+		} else {
+			ui->animHolder->setAnimMax(230);
+		}
+		ui->animHolder->toggleMenu(!coll);
+	});
+	////////
 
 	scanTask = new IIOScanTask(this);
 	scanTask->setScanParams("usb");
@@ -89,78 +126,82 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	initTranslations();
 
 	hp = new ScopyHomePage(this, pm);
-	ScanButtonController *sbc = new ScanButtonController(scanCycle, hp->scanControlBtn(), this);
+	m_sbc = new ScanButtonController(scanCycle, hp->scanControlBtn(), this);
+	connect(hp->scanBtn(), &QPushButton::clicked, this, [=]() { scanTask->run(); });
 
+	DeviceAutoConnect::initPreferences();
 	dm = new DeviceManager(pm, this);
-	dm->setExclusive(true);
+	bool general_connect_to_multiple_devices = Preferences::get("general_connect_to_multiple_devices").toBool();
+	dm->setExclusive(!general_connect_to_multiple_devices);
 
 	dtm = new DetachedToolWindowManager(this);
-	toolman = new ToolManager(tm, ts, dtm, this);
-	toolman->addToolList("home", {});
-	toolman->addToolList("add", {});
-
-	connect(tm, &ToolMenu::toggleAttach, toolman, &ToolManager::toggleAttach);
-	connect(tb, &ToolBrowser::collapsed, [=](bool coll) {
-		ui->animHolder->setAnimMin(50);
-		ui->animHolder->toggleMenu(!coll);
-	});
-	connect(tb, &ToolBrowser::requestTool, ts, &ToolStack::show);
-	connect(tb, &ToolBrowser::requestTool, dtm, &DetachedToolWindowManager::show);
+	m_toolMenuManager = new ToolMenuManager(ts, dtm, browseMenu->toolMenu(), this);
 
 	ts->add("home", hp);
 	ts->add("about", about);
 	ts->add("preferences", prefPage);
 
-	connect(scanTask, SIGNAL(scanFinished(QStringList)), scc, SLOT(update(QStringList)));
+	connect(scanTask, &IIOScanTask::scanFinished, scc, &ScannedIIOContextCollector::update, Qt::QueuedConnection);
 
 	connect(scc, SIGNAL(foundDevice(QString, QString)), dm, SLOT(createDevice(QString, QString)));
 	connect(scc, SIGNAL(lostDevice(QString, QString)), dm, SLOT(removeDevice(QString, QString)));
 
 	connect(hp, SIGNAL(requestDevice(QString)), this, SLOT(requestTools(QString)));
 
-	connect(hp, SIGNAL(requestAddDevice(QString, QString)), dm, SLOT(createDevice(QString, QString)));
 	connect(dm, SIGNAL(deviceAdded(QString, Device *)), this, SLOT(addDeviceToUi(QString, Device *)));
 
 	connect(dm, SIGNAL(deviceRemoveStarted(QString, Device *)), scc, SLOT(removeDevice(QString, Device *)));
 	connect(dm, SIGNAL(deviceRemoveStarted(QString, Device *)), this, SLOT(removeDeviceFromUi(QString)));
 
-	if(dm->getExclusive()) {
-		// only for device manager exclusive mode - stop scan on connect
-		connect(dm, SIGNAL(deviceConnected(QString, Device *)), sbc, SLOT(stopScan()));
-		connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), sbc, SLOT(startScan()));
-	}
+	connect(dm, SIGNAL(deviceConnecting(QString)), hp, SLOT(connectingDevice(QString)));
+
+	connect(dm, &DeviceManager::deviceConnecting, this, [=]() { handleScanner(); });
+	connect(dm, &DeviceManager::deviceConnected, this, [=]() { handleScanner(); });
+	connect(dm, &DeviceManager::deviceDisconnecting, this, [=]() { handleScanner(); });
+	connect(dm, &DeviceManager::deviceDisconnected, this, [=]() { handleScanner(); });
 
 	connect(dm, SIGNAL(deviceConnected(QString, Device *)), scc, SLOT(lock(QString, Device *)));
-	connect(dm, SIGNAL(deviceConnected(QString, Device *)), toolman, SLOT(lockToolList(QString)));
 	connect(dm, SIGNAL(deviceConnected(QString, Device *)), hp, SLOT(connectDevice(QString)));
 	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), scc, SLOT(unlock(QString, Device *)));
-	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), toolman, SLOT(unlockToolList(QString)));
 	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), hp, SLOT(disconnectDevice(QString)));
 
 	connect(dm, SIGNAL(requestDevice(QString)), hp, SLOT(viewDevice(QString)));
-	connect(dm, SIGNAL(requestTool(QString)), toolman, SLOT(showTool(QString)));
 
-	connect(dm, SIGNAL(deviceChangedToolList(QString, QList<ToolMenuEntry *>)), toolman,
-		SLOT(changeToolListContents(QString, QList<ToolMenuEntry *>)));
-	sbc->startScan();
+	if(Preferences::get("general_scan_for_devices").toBool()) {
+		scanTask->run();
+	}
 
-	connect(tb, SIGNAL(requestSave()), this, SLOT(save()));
-	connect(tb, SIGNAL(requestLoad()), this, SLOT(load()));
+	enableScanner();
+
+	connect(dm, &DeviceManager::deviceChangedToolList, m_toolMenuManager, &ToolMenuManager::changeToolListContents);
+	connect(dm, SIGNAL(deviceConnected(QString, Device *)), m_toolMenuManager, SLOT(deviceConnected(QString)));
+	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), m_toolMenuManager,
+		SLOT(deviceDisconnected(QString)));
+	connect(dm, &DeviceManager::requestTool, m_toolMenuManager, &ToolMenuManager::showMenuItem);
+	connect(m_toolMenuManager, &ToolMenuManager::requestToolSelect, ts, &ToolStack::show);
+	connect(m_toolMenuManager, &ToolMenuManager::requestToolSelect, dtm, &DetachedToolWindowManager::show);
+	connect(hp, &ScopyHomePage::displayNameChanged, m_toolMenuManager, &ToolMenuManager::onDisplayNameChanged);
 
 	connect(hp, &ScopyHomePage::newDeviceAvailable, dm, &DeviceManager::addDevice);
+
+	connect(prefPage, &ScopyPreferencesPage::refreshDevicesPressed, dm, &DeviceManager::requestConnectedDev);
+	connect(dm, &DeviceManager::connectedDevices, prefPage, &ScopyPreferencesPage::updateSessionDevices);
 
 	initApi();
 #ifdef SCOPY_DEV_MODE
 	// this is an example of how autoconnect is done
 
-//	 auto id = api->addDevice("m2k","ip:127.0.0.1");
-//	 auto id = api->addDevice("iio","ip:10.48.65.163");
-//	 auto id = api->addDevice("iio","ip:192.168.2.1");
-//	 auto id = api->addDevice("test","");
+	//	 auto id = api->addDevice("ip:127.0.0.1", "m2k");
+	//	 auto id = api->addDevice("ip:10.48.65.163", "iio");
+	auto id = api->addDevice("ip:192.168.2.1", "iio");
+	//	 auto id = api->addDevice("", "test");
 
-//	 api->connectDevice(id);
-//	 api->switchTool(id, "Oscilloscope");
+	api->connectDevice(id);
+	// api->switchTool(id, "Time");
 #endif
+	if(Preferences::get("autoconnect_previous").toBool())
+		deviceAutoconnect();
+	prefPage->initSessionDevices();
 
 	qInfo(CAT_BENCHMARK) << "ScopyMainWindow constructor took: " << timer.elapsed() << "ms";
 }
@@ -170,6 +211,45 @@ void ScopyMainWindow::initStatusBar()
 	// clear all margin, except the bottom one, to make room the status bar
 	statusBar = new ScopyStatusBar(this);
 	ui->mainWidget->layout()->addWidget(statusBar);
+}
+
+void ScopyMainWindow::handleScanner()
+{
+	if(Preferences::get("general_scan_for_devices").toBool()) {
+		if(dm->busy()) {
+			m_sbc->enableScan(false);
+			return;
+		}
+		if(dm->getExclusive() && dm->connectedDeviceCount() == 1) {
+			m_sbc->enableScan(false);
+			return;
+		}
+		m_sbc->enableScan(true);
+	} else {
+		m_sbc->enableScan(false);
+	}
+}
+
+void ScopyMainWindow::enableScanner()
+{
+	bool b = Preferences::get("general_scan_for_devices").toBool();
+	hp->setScannerEnable(b);
+	handleScanner();
+}
+
+void ScopyMainWindow::deviceAutoconnect()
+{
+	QMap<QString, QVariant> devicesMap = Preferences::get("autoconnect_devices").toMap();
+	const QStringList &keys = devicesMap.keys();
+	for(const QString &uri : keys) {
+		QStringList plugins = devicesMap[uri].toString().split(";");
+		auto id = api->addDevice(uri, plugins, "iio");
+		if(id.isEmpty()) {
+			DeviceAutoConnect::removeDevice(uri);
+		} else {
+			api->connectDevice(id);
+		}
+	}
 }
 
 void ScopyMainWindow::save()
@@ -202,13 +282,19 @@ void ScopyMainWindow::load(QString file)
 	ScopyTitleManager::setIniFileName(file);
 }
 
-void ScopyMainWindow::closeEvent(QCloseEvent *event) { dm->disconnectAll(); }
+void ScopyMainWindow::closeEvent(QCloseEvent *event)
+{
+	DeviceAutoConnect::clear();
+	if(Preferences::get("autoconnect_previous").toBool()) {
+		dm->saveSessionDevices();
+	}
+	dm->disconnectAll();
+}
 
-void ScopyMainWindow::requestTools(QString id) { toolman->showToolList(id); }
+void ScopyMainWindow::requestTools(QString id) { m_toolMenuManager->showMenuItem(id); }
 
 ScopyMainWindow::~ScopyMainWindow()
 {
-
 	scanCycle->stop();
 	delete ui;
 }
@@ -259,6 +345,7 @@ void ScopyMainWindow::initPreferences()
 	Preferences *p = Preferences::GetInstance();
 	p->setPreferencesFilename(preferencesPath);
 	p->load();
+	p->init("autoconnect_previous", false);
 	p->init("general_first_run", true);
 	p->init("general_save_session", true);
 	p->init("general_save_attached", true);
@@ -273,14 +360,17 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_language", "en");
 	p->init("show_grid", true);
 	p->init("show_graticule", false);
+	p->init("iiowidgets_use_lazy_loading", true);
 	p->init("general_plot_target_fps", "60");
 	p->init("general_show_plot_fps", true);
-	p->init("general_use_native_dialogs", true);
+	p->init("general_use_native_dialogs", false);
 	p->init("general_additional_plugin_path", "");
 	p->init("general_load_decoders", true);
 	p->init("general_doubleclick_ctrl_opens_menu", true);
 	p->init("general_check_online_version", false);
 	p->init("general_show_status_bar", true);
+	p->init("general_connect_to_multiple_devices", true);
+	p->init("general_scan_for_devices", true);
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 
@@ -301,6 +391,7 @@ void ScopyMainWindow::initPreferences()
 
 		QMetaObject::invokeMethod(license, &LicenseOverlay::showOverlay, Qt::QueuedConnection);
 	}
+
 	QString theme = p->get("general_theme").toString();
 	QString themeName = "scopy-" + theme;
 	QIcon::setThemeName(themeName);
@@ -361,19 +452,23 @@ void ScopyMainWindow::loadPluginsFromRepository(PluginRepository *pr)
 
 	QElapsedTimer timer;
 	timer.start();
-	// Check the local plugins folder first
+	// Check the local build plugins folder first
+	// Check if directory exists and it's not empty
 	QDir pathDir(scopy::config::localPluginFolderPath());
-	if(pathDir.exists()) {
+
+	if(pathDir.exists() && pathDir.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries).count() != 0) {
 		pr->init(scopy::config::localPluginFolderPath());
 	} else {
 		pr->init(scopy::config::defaultPluginFolderPath());
 	}
+
 #ifndef Q_OS_ANDROID
 	QString pluginAdditionalPath = Preferences::GetInstance()->get("general_additional_plugin_path").toString();
 	if(!pluginAdditionalPath.isEmpty()) {
 		pr->init(pluginAdditionalPath);
 	}
 #endif
+
 	qInfo(CAT_BENCHMARK) << "Loading the plugins from the repository took: " << timer.elapsed() << "ms";
 }
 
@@ -403,6 +498,14 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 		Q_EMIT p->restartRequired();
 	} else if(str == "general_show_status_bar") {
 		StatusBarManager::GetInstance()->setEnabled(val.toBool());
+	} else if(str == "plugins_use_debugger_v2") {
+		Q_EMIT p->restartRequired();
+	} else if(str == "general_connect_to_multiple_devices") {
+		bool general_connect_to_multiple_devices =
+			Preferences::get("general_connect_to_multiple_devices").toBool();
+		dm->setExclusive(!general_connect_to_multiple_devices);
+	} else if(str == "general_scan_for_devices") {
+		enableScanner();
 	}
 }
 
@@ -492,13 +595,13 @@ void ScopyMainWindow::initApi()
 
 void ScopyMainWindow::addDeviceToUi(QString id, Device *d)
 {
-	toolman->addToolList(id, d->toolList());
+	m_toolMenuManager->addMenuItem(id, d->displayName(), d->toolList());
 	hp->addDevice(id, d);
 }
 
 void ScopyMainWindow::removeDeviceFromUi(QString id)
 {
-	toolman->removeToolList(id);
+	m_toolMenuManager->removeMenuItem(id);
 	hp->removeDevice(id);
 }
 

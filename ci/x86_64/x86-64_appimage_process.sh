@@ -2,26 +2,26 @@
 set -ex
 
 ## Set STAGING
-USE_STAGING=ON
+USE_STAGING=OFF
 ##
 
-if [ "$CI_SCRIPT" == "ON" ]
-	then
-		SRC_DIR=/home/runner/scopy
-		git config --global --add safe.directory '*'
-		USE_STAGING=OFF
-	else
-		SRC_DIR=$(git rev-parse --show-toplevel)
+SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || echo "No source directory found"
+SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+if [ "$CI_SCRIPT" == "ON" ]; then
+	USE_STAGING=OFF
+	SRC_DIR=$GITHUB_WORKSPACE
 fi
+
 
 export APPIMAGE=1
 
-LIBIIO_VERSION=v0.25
+LIBIIO_VERSION=libiio-v0
 LIBAD9361_BRANCH=main
 LIBM2K_BRANCH=main
 SPDLOG_BRANCH=v1.x
 VOLK_BRANCH=main
-GNURADIO_BRANCH=maint-3.10
+GNURADIO_BRANCH=scopy2-maint-3.10
 GRSCOPY_BRANCH=3.10
 GRM2K_BRANCH=main
 LIBSIGROKDECODE_BRANCH=master
@@ -34,14 +34,16 @@ PYTHON_VERSION=python3.8
 
 QT_LOCATION=/opt/Qt/5.15.2/gcc_64
 
-STAGING_AREA=$SRC_DIR/ci/x86_64/staging
+STAGING_AREA=$SRC_SCRIPT/staging
 QMAKE_BIN=$QT_LOCATION/bin/qmake
 CMAKE_BIN=${STAGING_AREA}/cmake/bin/cmake
 JOBS=-j14
 
 APP_DIR_NAME=scopy.AppDir
-APP_DIR=$SRC_DIR/ci/x86_64/$APP_DIR_NAME
-APP_IMAGE=$SRC_DIR/ci/x86_64/Scopy-x86_64.AppImage
+APP_DIR=$SRC_SCRIPT/$APP_DIR_NAME
+APP_IMAGE=$SRC_SCRIPT/Scopy-x86_64.AppImage
+
+BUILD_STATUS_FILE=$SRC_SCRIPT/build-status
 
 if [ "$USE_STAGING" == "ON" ]
 	then
@@ -86,11 +88,17 @@ clone() {
 	[ -d 'gr-scopy' ]	|| git clone --recursive https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH gr-scopy
 	[ -d 'gr-m2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH gr-m2k
 	[ -d 'volk' ]		|| git clone --recursive https://github.com/gnuradio/volk.git -b $VOLK_BRANCH volk
-	[ -d 'gnuradio' ]	|| git clone --recursive https://github.com/gnuradio/gnuradio.git -b $GNURADIO_BRANCH gnuradio
+	[ -d 'gnuradio' ]	|| git clone --recursive https://github.com/analogdevicesinc/gnuradio.git -b $GNURADIO_BRANCH gnuradio
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	popd
+}
+
+install_qt() {
+	# installing Qt using the aqt tool https://github.com/miurahr/aqtinstall
+	sudo pip3 install --no-cache-dir aqtinstall
+	sudo python3 -m aqt install-qt --outputdir /opt/Qt linux desktop 5.15.2
 }
 
 download_tools() {
@@ -104,12 +112,12 @@ download_tools() {
 
 	# download tools for creating the AppDir and the AppImage
 	if [ ! -f linuxdeploy-x86_64.AppImage ];then
-		wget https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20231026-1/linuxdeploy-x86_64.AppImage
+		wget https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20240109-1/linuxdeploy-x86_64.AppImage
 		chmod +x linuxdeploy-x86_64.AppImage
 	fi
 
 	if [ ! -f linuxdeploy-plugin-qt-x86_64.AppImage ];then
-		wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+		wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/1-alpha-20240109-1/linuxdeploy-plugin-qt-x86_64.AppImage
 		chmod +x linuxdeploy-plugin-qt-x86_64.AppImage
 	fi
 
@@ -134,6 +142,10 @@ build_with_cmake() {
 		if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
 	fi
 	CURRENT_BUILD_CMAKE_OPTS=""
+	echo "$(basename -a "$(git config --get remote.origin.url)") - \
+	$(git rev-parse --abbrev-ref HEAD) - \
+	$(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
 }
 
 install_packages() {
@@ -141,7 +153,7 @@ install_packages() {
 
 	sudo apt-get update
 	sudo apt-get -y upgrade
-	sudo apt-get -y install \
+	sudo apt-get -y --no-install-recommends install \
 		$PYTHON_VERSION-full python3-pip lib$PYTHON_VERSION-dev python3-numpy \
 		keyboard-configuration vim git wget unzip\
 		g++ build-essential cmake curl autogen autoconf autoconf-archive pkg-config flex bison swig \
@@ -152,8 +164,8 @@ install_packages() {
 		libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libavahi-client-dev libsndfile1-dev \
 		libxkbcommon-x11-0 libqt5gui5 libncurses5 libtool libaio-dev libzmq3-dev libxml2-dev
 
-	pip3 install mako
-	pip3 install packaging
+	pip3 install --no-cache-dir mako
+	pip3 install --no-cache-dir packaging
 }
 
 build_libiio() {
@@ -272,6 +284,11 @@ build_qwt() {
 		fi
 	fi
 
+	echo "$(basename -a "$(git config --get remote.origin.url)") - \
+	$(git rev-parse --abbrev-ref HEAD) - \
+	$(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
+
 	popd
 }
 
@@ -296,6 +313,12 @@ build_libsigrokdecode() {
 	if [ "$INSTALL" == "ON" ];then
 		if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
 	fi
+
+	echo "$(basename -a "$(git config --get remote.origin.url)") - \
+	$(git rev-parse --abbrev-ref HEAD) - \
+	$(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
+
 	popd
 }
 
@@ -321,9 +344,10 @@ build_iio-emu() {
 build_scopy() {
 	echo "### Building scopy"
 	pushd $SRC_DIR
+	[ -f /home/runner/build-status ] && cp /home/runner/build-status $SRC_DIR/build-status
+	[ $CI_SCRIPT ] && git config --global --add safe.directory $SRC_DIR
 	CURRENT_BUILD_CMAKE_OPTS="\
-		-DCLONE_IIO_EMU=OFF \
-		-DPYTOHN_EXECUTABLE=/usr/bin/$PYTHON_VERSION
+		-DPYTHON_EXECUTABLE=/usr/bin/$PYTHON_VERSION
 		"
 	build_with_cmake OFF
 	popd
@@ -333,9 +357,12 @@ create_appdir(){
 	pushd ${STAGING_AREA}
 	BUILD_FOLDER=$SRC_DIR/build
 	EMU_BUILD_FOLDER=$STAGING_AREA/iio-emu/build
-	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 2 -type f -name "libscopy*")
 	PLUGINS=$BUILD_FOLDER/plugins/plugins
+	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 1 -type f -name "libscopy*")
 	REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
+	DAC_WAVEFORM_CSV=$SRC_DIR/plugins/dac/res/csv
+	EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
+	EMU_CONFIG=$SRC_DIR/resources/scopy_emu_options_config.json
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
 	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib:$QT_LOCATION/lib
 	DLL_FOLDER=${STAGING_AREA}/dll_folder
@@ -347,7 +374,7 @@ create_appdir(){
 	rm -rf $DLL_FOLDER
 	mkdir $DLL_FOLDER
 	cp $SCOPY_DLL $DLL_FOLDER
-	cp $PLUGINS/* $DLL_FOLDER
+	cp $PLUGINS/*.so $DLL_FOLDER
 
 	export QMAKE=$QMAKE_BIN # this is needed for deploy-plugin-qt.AppImage
 	# inside a docker image you can't run an appimage executable without privileges
@@ -365,7 +392,8 @@ create_appdir(){
 	$COPY_DEPS "$DLL_FOLDER/*" $APP_DIR/usr/lib
 	rm -rf $DLL_FOLDER
 	cp $SCOPY_DLL $APP_DIR/usr/lib
-	cp -r $PLUGINS $APP_DIR/usr/share
+	mkdir -p $APP_DIR/usr/lib/scopy/plugins
+	cp $PLUGINS/*.so $APP_DIR/usr/lib/scopy/plugins
 
 	cp $EMU_BUILD_FOLDER/iio-emu $APP_DIR/usr/bin
 	cp ${STAGING_AREA_DEPS}/lib/tinyiiod.so* $APP_DIR/usr/lib
@@ -384,12 +412,18 @@ create_appdir(){
 		exit 1
 	fi
 	
-	mkdir $APP_DIR/usr/share/translations
-	cp $TRANSLATIONS_QM $APP_DIR/usr/share/translations
+	mkdir -p $APP_DIR/usr/lib/scopy/translations
+	cp $TRANSLATIONS_QM $APP_DIR/usr/lib/scopy/translations
 
 	if [ -d $REGMAP_XMLS ]; then
-		cp -r $REGMAP_XMLS $APP_DIR/usr/share/plugins
+		cp -r $REGMAP_XMLS $APP_DIR/usr/lib/scopy/plugins
 	fi
+
+	cp -r $DAC_WAVEFORM_CSV $APP_DIR/usr/lib/scopy/plugins
+
+	cp -r $EMU_XMLS $APP_DIR/usr/lib/scopy/plugins
+	mkdir -p $APP_DIR/usr/lib/scopy/plugins/resources
+	cp $EMU_CONFIG $APP_DIR/usr/lib/scopy/plugins/resources
 
 	cp $STAGING_AREA_DEPS/lib/libspdlog.so* $APP_DIR/usr/lib
 	cp -r $QT_LOCATION/plugins $APP_DIR/usr
@@ -415,7 +449,16 @@ create_appimage(){
 }
 
 generate_ci_envs(){
-	$GITHUB_WORKSPACE/ci/general/gen_ci_envs.sh > $GITHUB_WORKSPACE/ci/x86_64/gh-actions.envs
+	$SRC_DIR/ci/general/gen_ci_envs.sh > $SRC_DIR/ci/x86_64/gh-actions.envs
+}
+
+# move the staging folder that contains the tools needed for the build to the known location
+move_tools(){
+	[ -d /home/runner/staging ] && mv /home/runner/staging $STAGING_AREA || echo "Staging folder not found or already moved"
+	if [ ! -d $STAGING_AREA ]; then
+		echo "Missing tools folder, downloading now"
+		download_tools
+	fi
 }
 
 move_appimage(){
@@ -428,7 +471,6 @@ move_appimage(){
 #
 
 build_deps(){
-	install_packages
 	clone
 	download_tools
 	build_libiio ON
@@ -445,8 +487,7 @@ build_deps(){
 }
 
 run_workflow(){
-	install_packages
-	download_tools
+	[ "$CI_SCRIPT" == "ON" ] && move_tools || download_tools
 	build_iio-emu
 	build_scopy
 	create_appdir
@@ -467,6 +508,12 @@ generate_appimage(){
 	create_appimage
 }
 
+configure_system(){
+	install_packages
+	install_qt
+	build_deps
+	download_tools
+}
 
 for arg in $@; do
 	$arg

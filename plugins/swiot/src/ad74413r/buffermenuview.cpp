@@ -92,7 +92,8 @@ QWidget *BufferMenuView::createDescriptionSection(QWidget *parent)
 {
 	MenuSectionWidget *descriptionContainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *descriptionSection =
-		new MenuCollapseSection("FUNCTION DESCRIPTION", MenuCollapseSection::MHCW_NONE, descriptionContainer);
+		new MenuCollapseSection("FUNCTION DESCRIPTION", MenuCollapseSection::MHCW_NONE,
+					MenuCollapseSection::MHW_BASEWIDGET, descriptionContainer);
 
 	QLabel *description = new QLabel(descriptionContainer);
 	description->setText(m_swiotAdvMenu->getInfoMessage());
@@ -112,8 +113,8 @@ QWidget *BufferMenuView::createAttrSection(QWidget *parent)
 	layout->setSpacing(10);
 	layout->setMargin(0);
 
-	MenuCollapseSection *attrSection =
-		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrContainer);
+	MenuCollapseSection *attrSection = new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE,
+								   MenuCollapseSection::MHW_BASEWIDGET, attrContainer);
 
 	QList<QWidget *> widgets = m_swiotAdvMenu->getWidgetsList();
 	for(QWidget *w : qAsConst(widgets)) {
@@ -133,8 +134,8 @@ QWidget *BufferMenuView::createVerticalSettingsMenu(QString unit, double yMin, d
 	layout->setSpacing(10);
 	layout->setMargin(0);
 
-	MenuCollapseSection *verticalSettings =
-		new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE, verticalContainer);
+	MenuCollapseSection *verticalSettings = new MenuCollapseSection(
+		"Y-AXIS", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, verticalContainer);
 
 	auto m_yMin = new PositionSpinButton(
 		{

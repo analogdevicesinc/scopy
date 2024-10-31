@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "plotinfo.h"
 
 #include <QLabel>
@@ -18,16 +39,25 @@ PlotInfo::PlotInfo(QWidget *parent)
 
 PlotInfo::~PlotInfo() {}
 
-void PlotInfo::addCustomInfo(QWidget *info, InfoPosition pos)
+void PlotInfo::addCustomInfo(QWidget *info, InfoPosition hpos, InfoPosition vpos)
 {
-	switch(pos) {
+	switch(hpos) {
 	case InfoPosition::IP_LEFT:
-		m_leftLayout->addWidget(info);
+		if(vpos == IP_BOTTOM) {
+			m_leftLayout->addWidget(info);
+		} else {
+			m_leftLayout->insertWidget(0, info);
+		}
 		info->setParent(m_leftInfo);
 		break;
 
 	case InfoPosition::IP_RIGHT:
-		m_rightLayout->addWidget(info);
+	default:
+		if(vpos == IP_BOTTOM) {
+			m_rightLayout->addWidget(info);
+		} else {
+			m_rightLayout->insertWidget(0, info);
+		}
 		info->setParent(m_rightInfo);
 
 		// align to right if it's a label
@@ -40,11 +70,11 @@ void PlotInfo::addCustomInfo(QWidget *info, InfoPosition pos)
 	info->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 }
 
-QLabel *PlotInfo::addLabelInfo(InfoPosition pos)
+QLabel *PlotInfo::addLabelInfo(InfoPosition hpos, InfoPosition vpos)
 {
 	QLabel *label = new QLabel();
 	StyleHelper::PlotInfoLabel(label);
-	addCustomInfo(label, pos);
+	addCustomInfo(label, hpos, vpos);
 
 	return label;
 }
@@ -59,6 +89,7 @@ void PlotInfo::removeInfo(uint index, InfoPosition pos)
 			break;
 
 		case InfoPosition::IP_RIGHT:
+		default:
 			m_rightLayout->removeWidget(widget);
 			break;
 		}
@@ -75,6 +106,7 @@ QWidget *PlotInfo::getInfo(uint index, InfoPosition pos)
 		return m_leftLayout->itemAt(index)->widget();
 
 	case InfoPosition::IP_RIGHT:
+	default:
 		if(index >= m_rightLayout->count())
 			return nullptr;
 		return m_rightLayout->itemAt(index)->widget();

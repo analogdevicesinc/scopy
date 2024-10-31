@@ -135,6 +135,7 @@ void TutorialOverlay::finish()
 	qInfo(CAT_TUTORIALOVERLAY) << "Tutorial Finished";
 	overlay->deleteLater();
 	cleanupChapter();
+	deleteLater();
 
 	Q_EMIT finished();
 }

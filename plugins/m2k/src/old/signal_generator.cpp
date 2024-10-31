@@ -132,12 +132,12 @@ bool SignalGenerator::chunkCompare(chunk_header_t &ptr, const char *id2)
 	return true;
 }
 
-SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt, ToolMenuEntry *tme, QJSEngine *engine,
-				 QWidget *parent)
-	: M2kTool(_ctx, tme, new SignalGenerator_API(this), "Signal Generator", parent)
+SignalGenerator::SignalGenerator(libm2k::context::M2k *m2k, QString uri, Filter *filt, ToolMenuEntry *tme,
+				 QJSEngine *engine, QWidget *parent)
+	: M2kTool(tme, new SignalGenerator_API(this), "Signal Generator", parent)
 	, ui(new Ui::SignalGenerator)
 	, time_block_data(new struct time_block_data)
-	, m_m2k_context(m2kOpen(ctx, ""))
+	, m_m2k_context(m2k)
 	, m_m2k_analogout(m_m2k_context->getAnalogOut())
 	, nr_of_periods(2)
 	, currentChannel(0)
@@ -146,6 +146,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt, ToolMen
 	, nb_points(NB_POINTS)
 	, channels_group(new QButtonGroup(this))
 	, m_maxNbOfSamples(4 * 1024 * 1024)
+	, m_uri(uri)
 {
 	zoomT1 = 0;
 	zoomT2 = 1;
@@ -481,6 +482,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt, ToolMen
 	connect(ui->mathWidget, SIGNAL(functionValid(const QString &)), this, SLOT(setFunction(const QString &)));
 
 	connect(ui->run_button, SIGNAL(toggled(bool)), tme, SLOT(setRunning(bool)));
+	connect(ui->run_button, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
 	connect(tme, SIGNAL(runToggled(bool)), ui->run_button, SLOT(toggle(bool)));
 	connect(tme, SIGNAL(runToggled(bool)), this, SLOT(startStop(bool)));
 
@@ -495,7 +497,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt, ToolMen
 
 	readPreferences();
 
-	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/siggen");
+	ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/signal_generator.html");
 
 	m_plot->setOffsetHandleVisible(0, false);
 	m_plot->setOffsetHandleVisible(1, false);
@@ -1307,15 +1309,15 @@ void SignalGenerator::loadFile()
 
 void SignalGenerator::start()
 {
-	ui->run_button->toggle(true);
 	m_running = true;
+	ui->run_button->toggle(true);
 
 	/* Avoid from being started twice */
 	if(buffers.size() > 0) {
 		return;
 	}
 
-	ResourceManager::open("m2k-dac", this);
+	ResourceManager::open("m2k-dac" + m_uri, this);
 	m_m2k_analogout->cancelBuffer();
 
 	for(auto it = channels.begin(); it != channels.end(); ++it) {
@@ -1389,19 +1391,22 @@ void SignalGenerator::run() { start(); }
 void SignalGenerator::stop()
 {
 	try {
+		m_running = false;
 		ui->run_button->toggle(false);
 		buffers.clear();
-		m_running = false;
 		m_m2k_analogout->stop();
 	} catch(libm2k::m2k_exception &e) {
 		HANDLE_EXCEPTION(e);
 		qDebug(CAT_M2K_SIGNAL_GENERATOR) << e.what();
 	}
-	ResourceManager::close("m2k-dac");
+	ResourceManager::close("m2k-dac" + m_uri);
 }
 
 void SignalGenerator::startStop(bool pressed)
 {
+	if(m_running == pressed) {
+		return;
+	}
 	if(pressed) {
 		start();
 	} else {

@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "rmsinstrument.h"
 #include "measurementlabel.h"
 
@@ -8,14 +29,18 @@
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/tooltemplate.h>
+#include <QDesktopServices>
 #include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_PQM_RMS, "PqmRms")
 
 using namespace scopy::pqm;
 
-RmsInstrument::RmsInstrument(QWidget *parent)
+RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	: QWidget(parent)
+	, m_tme(tme)
+	, m_uri(uri)
+	, m_running(false)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *instrumentLayout = new QHBoxLayout(this);
@@ -28,41 +53,49 @@ RmsInstrument::RmsInstrument(QWidget *parent)
 	tool->topContainerMenuControl()->setVisible(false);
 	instrumentLayout->addWidget(tool);
 
+	InfoBtn *infoBtn = new InfoBtn(this);
+	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
+	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/pqm/rms.html"));
+	});
+
 	QWidget *central = new QWidget(this);
 	QHBoxLayout *centralLayout = new QHBoxLayout();
 	central->setLayout(centralLayout);
 	centralLayout->setSpacing(8);
 	centralLayout->setContentsMargins(0, 0, 0, 0);
 
-	QWidget *voltageWidget = new QWidget(this);
+	QWidget *voltageWidget = new QWidget(central);
 	voltageWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *voltageLayout = new QVBoxLayout();
 	voltageWidget->setLayout(voltageLayout);
 	voltageWidget->setStyleSheet("background-color:" + StyleHelper::getColor("UIElementBackground"));
 
-	MeasurementsPanel *voltagePanel = new MeasurementsPanel(this);
+	MeasurementsPanel *voltagePanel = new MeasurementsPanel(voltageWidget);
 	createLabels(voltagePanel, m_chnls["voltage"].values(),
 		     {"RMS", "Angle", "Deviation under", "Deviation over", "Pinst", "Pst", "Plt"});
 	createLabels(voltagePanel, {DEVICE_NAME}, {"U2", "U0", "Sneg V", "Spos V", "Szro V"});
+	voltagePanel->refreshUi();
 	voltageLayout->addWidget(voltagePanel);
 
-	m_voltagePlot = new PolarPlotWidget(this);
+	m_voltagePlot = new PolarPlotWidget(voltageWidget);
 	initPlot(m_voltagePlot);
 	setupPlotChannels(m_voltagePlot, m_chnls["voltage"]);
 	voltageLayout->addWidget(m_voltagePlot);
 
-	QWidget *currentWidget = new QWidget(this);
+	QWidget *currentWidget = new QWidget(central);
 	currentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *currentLayout = new QVBoxLayout();
 	currentWidget->setLayout(currentLayout);
 	currentWidget->setStyleSheet("background-color:" + StyleHelper::getColor("UIElementBackground"));
 
-	MeasurementsPanel *currentPanel = new MeasurementsPanel(this);
+	MeasurementsPanel *currentPanel = new MeasurementsPanel(currentWidget);
 	createLabels(currentPanel, m_chnls["current"].values(), {"RMS", "Angle"});
 	createLabels(currentPanel, {DEVICE_NAME}, {"I2", "I0", "Sneg I", "Spos I", "Szro I"});
+	currentPanel->refreshUi();
 	currentLayout->addWidget(currentPanel);
 
-	m_currentPlot = new PolarPlotWidget(this);
+	m_currentPlot = new PolarPlotWidget(currentWidget);
 	initPlot(m_currentPlot);
 	setupPlotChannels(m_currentPlot, m_chnls["current"]);
 	currentLayout->addWidget(m_currentPlot);
@@ -80,7 +113,8 @@ RmsInstrument::RmsInstrument(QWidget *parent)
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
 
-	connect(this, &RmsInstrument::runTme, m_runBtn, &QAbstractButton::setChecked);
+	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
+	connect(this, &RmsInstrument::enableTool, m_tme, &ToolMenuEntry::setRunning);
 	connect(m_runBtn, &QAbstractButton::toggled, m_singleBtn, &QAbstractButton::setDisabled);
 	connect(m_runBtn, SIGNAL(toggled(bool)), this, SLOT(toggleRms(bool)));
 	connect(m_singleBtn, &QAbstractButton::toggled, m_runBtn, &QAbstractButton::setDisabled);
@@ -102,7 +136,7 @@ void RmsInstrument::createLabels(MeasurementsPanel *mPanel, QStringList chnls, Q
 			c = StyleHelper::getColor("CH" + QString::number(chIdx));
 		}
 		for(const QString &l : labels) {
-			MeasurementLabel *ml = new MeasurementLabel(this);
+			MeasurementLabel *ml = new MeasurementLabel(mPanel);
 			if(!c.isEmpty()) {
 				ml->setColor(QColor(c));
 			}
@@ -195,24 +229,26 @@ void RmsInstrument::stop() { m_runBtn->setChecked(false); }
 
 void RmsInstrument::toggleRms(bool en)
 {
+	m_running = en;
 	if(en) {
-		ResourceManager::open("pqm", this);
+		ResourceManager::open("pqm" + m_uri, this);
 	} else {
-		ResourceManager::close("pqm");
+		ResourceManager::close("pqm" + m_uri);
 	}
 	Q_EMIT enableTool(en);
 }
 
 void RmsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> data)
 {
-	if(m_runBtn->isChecked() || m_singleBtn->isChecked()) {
-		m_attributes = data;
-		updateLabels();
-		updatePlot(m_voltagePlot, "voltage");
-		updatePlot(m_currentPlot, "current");
-		if(m_singleBtn->isChecked()) {
-			m_singleBtn->setChecked(false);
-		}
+	if(!m_running) {
+		return;
+	}
+	m_attributes = data;
+	updateLabels();
+	updatePlot(m_voltagePlot, "voltage");
+	updatePlot(m_currentPlot, "current");
+	if(m_singleBtn->isChecked()) {
+		m_singleBtn->setChecked(false);
 	}
 }
 

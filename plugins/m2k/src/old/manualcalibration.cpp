@@ -74,15 +74,14 @@ Measure the Voltage on the "V-" and
 enter the value in the field below.
 The value should be around -4.5V)");
 
-ManualCalibration::ManualCalibration(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, QWidget *parent,
+ManualCalibration::ManualCalibration(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, QWidget *parent,
 				     Calibration *cal)
-	: M2kTool(ctx, tme, new ManualCalibration_API(this), "Calibration", parent)
+	: M2kTool(tme, new ManualCalibration_API(this), "Calibration", parent)
 	, ui(new Ui::ManualCalibration)
 	, filter(filt)
-	, ctx(ctx)
 	, calib(cal)
 	, calibrationFilePath("")
-	, m_m2k_context(m2kOpen(ctx, ""))
+	, m_m2k_context(m2k)
 	, m_m2k_powersupply(m_m2k_context->getPowerSupply())
 {
 	ui->setupUi(this);
@@ -495,8 +494,8 @@ void ManualCalibration::displayStartUpCalibrationValues(void)
 void ManualCalibration::initParameters(void)
 {
 	QStringList tableHeader;
-	const char *name;
-	const char *value;
+	QString name;
+	QString value;
 	QTableWidgetItem *item;
 
 	tableHeader << "Name"
@@ -505,12 +504,17 @@ void ManualCalibration::initParameters(void)
 	paramTable->setColumnCount(2);
 	paramTable->setHorizontalHeaderLabels(tableHeader);
 
-	for(int i = 4; i < 12; i++) {
-		if(!iio_context_get_attr(ctx, i, &name, &value)) {
-			item = new QTableWidgetItem(QString(name + 4));
+	unsigned int i = 0;
+	auto ctxAttrs = m_m2k_context->getAvailableContextAttributes();
+	for(auto &&attr : qAsConst(ctxAttrs)) {
+		name = QString::fromStdString(attr);
+		if(name.startsWith("cal,")) {
+			value = QString::fromStdString(m_m2k_context->getContextAttributeValue(attr));
+			item = new QTableWidgetItem(name.mid(4));
 			item->setFlags(Qt::ItemIsSelectable);
-			paramTable->setItem(i - 4, 0, item);
-			paramTable->setItem(i - 4, 1, new QTableWidgetItem(QString(value)));
+			paramTable->setItem(i, 0, item);
+			paramTable->setItem(i, 1, new QTableWidgetItem(value));
+			i++;
 		}
 	}
 

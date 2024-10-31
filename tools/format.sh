@@ -2,7 +2,7 @@
 set -x
 
 SCOPY_REPO=$(git rev-parse --show-toplevel)
-SKIP_BUILD="-not -path */build/*"
+SKIP_BUILD="-not -path */build/* -not -path */ci/flatpak*"
 
 IN_PLACE="-i"
 VERBOSE="--verbose"

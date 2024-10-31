@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "menus/plottimeaxiscontroller.hpp"
 
 #include <QDateTimeEdit>
@@ -6,6 +27,7 @@
 #include <menuonoffswitch.h>
 #include <menusectionwidget.h>
 #include <timemanager.hpp>
+#include <cfloat>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -20,8 +42,8 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 	this->setLayout(layout);
 
 	MenuSectionWidget *xAxisContainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *xAxisSection =
-		new MenuCollapseSection("X-AXIS", MenuCollapseSection::MHCW_NONE, xAxisContainer);
+	MenuCollapseSection *xAxisSection = new MenuCollapseSection(
+		"X-AXIS", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, xAxisContainer);
 
 	xAxisContainer->contentLayout()->addWidget(xAxisSection);
 	xAxisSection->contentLayout()->setSpacing(10);
@@ -43,7 +65,7 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 			{"min", 60},
 			{"hour", 3600},
 		},
-		"Delta", (double)((long)(-1 << 31)), (double)((long)1 << 31), false, false, xAxisContainer);
+		"Delta", -DBL_MAX, DBL_MAX, false, false, xAxisContainer);
 	m_xdelta->setValue(DataMonitorUtils::getAxisDefaultMaxValue());
 
 	auto &&timeTracker = TimeManager::GetInstance();

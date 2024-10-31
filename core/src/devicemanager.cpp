@@ -1,26 +1,45 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "devicemanager.h"
 
 #include "QApplication"
 #include "devicefactory.h"
 #include "deviceimpl.h"
 #include "deviceloader.h"
-#include "iiodeviceimpl.h"
+#include "pluginbase/preferences.h"
 #include "pluginbase/statusbarmanager.h"
 
 #include <QDebug>
 #include <QLoggingCategory>
 #include <QThread>
 #include <QtConcurrent>
+#include <deviceautoconnect.h>
 
 Q_LOGGING_CATEGORY(CAT_DEVICEMANAGER, "DeviceManager")
 using namespace scopy;
 DeviceManager::DeviceManager(PluginManager *pm, QObject *parent)
 	: QObject{parent}
 	, pm(pm)
-{
-
-	connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()), this, SLOT(disconnectAll()));
-}
+{}
 
 DeviceManager::~DeviceManager() {}
 
@@ -46,7 +65,7 @@ void DeviceManager::addDevice(Device *d)
 	Q_EMIT deviceAdded(id, d);
 }
 
-QString DeviceManager::createDevice(QString category, QString param, bool async)
+QString DeviceManager::createDevice(QString category, QString param, bool async, QList<QString> plugins)
 {
 	qInfo(CAT_DEVICEMANAGER) << category << "device with params" << param << "added";
 	Q_EMIT deviceAddStarted(param);
@@ -54,8 +73,17 @@ QString DeviceManager::createDevice(QString category, QString param, bool async)
 	DeviceImpl *d = DeviceFactory::build(param, pm, category);
 	DeviceLoader *dl = new DeviceLoader(d, this);
 
-	connect(dl, &DeviceLoader::initialized, this,
-		[=]() { addDevice(d); }); // add device to manager once it is initialized
+	connect(dl, &DeviceLoader::initialized, this, [=]() {
+		QList<Plugin *> availablePlugins = d->plugins();
+		if(!plugins.isEmpty()) {
+			for(Plugin *p : qAsConst(availablePlugins)) {
+				if(!plugins.contains(p->name())) {
+					p->setEnabled(false);
+				}
+			}
+		}
+		addDevice(d);
+	}); // add device to manager once it is initialized
 	connect(dl, &DeviceLoader::initialized, dl,
 		&QObject::deleteLater); // don't forget to delete loader once we're done
 	dl->init(async);
@@ -102,16 +130,21 @@ void DeviceManager::removeDeviceById(QString id)
 
 void DeviceManager::connectDeviceToManager(DeviceImpl *d)
 {
+	connect(d, &DeviceImpl::connecting, this, [=]() { connectingDevice(d->id()); });
 	connect(d, &DeviceImpl::connected, this, [=]() { connectDevice(d->id()); });
+	connect(d, &DeviceImpl::disconnecting, this, [=]() { disconnectingDevice(d->id()); });
 	connect(d, &DeviceImpl::disconnected, this, [=]() { disconnectDevice(d->id()); });
 	connect(d, &DeviceImpl::forget, this, [=]() { removeDeviceById(d->id()); });
 	connect(d, SIGNAL(requestedRestart()), this, SLOT(restartDevice()));
 	connect(d, SIGNAL(toolListChanged()), this, SLOT(changeToolListDevice()));
 	connect(d, SIGNAL(requestTool(QString)), this, SIGNAL(requestTool(QString)));
 }
+
 void DeviceManager::disconnectDeviceFromManager(DeviceImpl *d)
 {
+	disconnect(d, SIGNAL(connecting()));
 	disconnect(d, SIGNAL(connected()));
+	disconnect(d, SIGNAL(disconnecting()));
 	disconnect(d, SIGNAL(disconnected()));
 	disconnect(d, SIGNAL(forget()));
 	disconnect(d, SIGNAL(requestedRestart()), this, SLOT(restartDevice()));
@@ -149,19 +182,35 @@ void DeviceManager::load(QSettings &s)
 	}
 }
 
+void DeviceManager::requestConnectedDev()
+{
+	QMap<QString, QStringList> devMap;
+	for(const QString &d : qAsConst(connectedDev)) {
+		QList<Plugin *> availablePlugins = dynamic_cast<DeviceImpl *>(map[d])->plugins();
+		QStringList enabledPlugins;
+		for(Plugin *p : qAsConst(availablePlugins)) {
+			if(p->enabled()) {
+				enabledPlugins.append(p->name());
+			}
+		}
+		devMap[map[d]->param()] = enabledPlugins;
+	}
+	Q_EMIT connectedDevices(devMap);
+}
+
 void DeviceManager::changeToolListDevice()
 {
 	QString id = dynamic_cast<Device *>(QObject::sender())->id();
 	Q_EMIT deviceChangedToolList(id, map[id]->toolList());
 }
 
-void DeviceManager::connectDevice()
+void DeviceManager::connectingDevice()
 {
 	QString id = dynamic_cast<Device *>(QObject::sender())->id();
-	connectDevice(id);
+	connectingDevice(id);
 }
 
-void DeviceManager::connectDevice(QString id)
+void DeviceManager::connectingDevice(QString id)
 {
 	qDebug(CAT_DEVICEMANAGER) << "connecting " << id << "...";
 	if(connectedDev.contains(id)) {
@@ -175,11 +224,29 @@ void DeviceManager::connectDevice(QString id)
 				map[connectedDev[i]]->disconnectDev();
 		}
 	}
+	Q_EMIT deviceConnecting(id);
+}
 
+void DeviceManager::connectDevice()
+{
+	QString id = dynamic_cast<Device *>(QObject::sender())->id();
+	connectDevice(id);
+}
+
+void DeviceManager::connectDevice(QString id)
+{
 	connectedDev.append(id);
 	StatusBarManager::pushMessage("Connected to " + map[id]->id(), 3000);
 	Q_EMIT deviceConnected(id, map[id]);
 }
+
+void DeviceManager::disconnectingDevice()
+{
+	QString id = dynamic_cast<Device *>(QObject::sender())->id();
+	disconnectingDevice(id);
+}
+
+void DeviceManager::disconnectingDevice(QString id) { Q_EMIT deviceDisconnecting(id); }
 
 void DeviceManager::disconnectDevice()
 {
@@ -196,7 +263,13 @@ void DeviceManager::disconnectDevice(QString id)
 	Q_EMIT deviceDisconnected(id, map[id]);
 }
 
-void DeviceManager::setExclusive(bool val) { exclusive = val; }
+void DeviceManager::setExclusive(bool val)
+{
+	exclusive = val;
+	if(val == true && connectedDev.size() > 1) {
+		disconnectAll();
+	}
+}
 bool DeviceManager::getExclusive() const { return exclusive; }
 
 void DeviceManager::restartDevice()
@@ -206,6 +279,33 @@ void DeviceManager::restartDevice()
 	QString newId = restartDevice(id);
 	//	connect(this,SIGNAL(deviceAdded(QString,Device*)),this,SIGNAL(requestDevice(QString)));
 	//	Q_EMIT requestDevice(newId);
+}
+
+bool DeviceManager::busy()
+{
+	bool ret = false;
+
+	for(auto dev : map) {
+		if(dev->state() == Device::DEV_ERROR || dev->state() == Device::DEV_INIT ||
+		   dev->state() == Device::DEV_CONNECTING || dev->state() == Device::DEV_DISCONNECTING)
+			return true;
+	}
+	return false;
+}
+
+int DeviceManager::connectedDeviceCount() { return connectedDev.size(); }
+
+void DeviceManager::saveSessionDevices()
+{
+	for(const QString &d : qAsConst(connectedDev)) {
+		QList<Plugin *> availablePlugins = dynamic_cast<DeviceImpl *>(map[d])->plugins();
+		QStringList enabledPlugins;
+		for(Plugin *p : qAsConst(availablePlugins)) {
+			if(p->enabled())
+				enabledPlugins.append(p->name());
+		}
+		DeviceAutoConnect::addDevice(map[d]->param(), enabledPlugins);
+	}
 }
 
 #include "moc_devicemanager.cpp"

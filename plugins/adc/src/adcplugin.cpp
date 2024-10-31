@@ -1,7 +1,27 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "adcplugin.h"
 
-#include "adcinstrument.h"
-#include "gui/stylehelper.h"
+#include "src/adcinstrument.h"
 
 #include <QBoxLayout>
 #include <QJsonDocument>
@@ -12,13 +32,18 @@
 
 #include <iioutil/connectionprovider.h>
 #include <pluginbase/preferences.h>
-#include <pluginbase/preferenceshelper.h>
+#include <gui/preferenceshelper.h>
+#include <gui/deviceinfopage.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
+
+#include "adctimeinstrumentcontroller.h"
+#include "adcfftinstrumentcontroller.h"
 
 Q_LOGGING_CATEGORY(CAT_ADCPLUGIN, "ADCPlugin");
 using namespace scopy;
 using namespace scopy::grutil;
+using namespace scopy::adc;
 
 bool ADCPlugin::compatible(QString m_param, QString category)
 {
@@ -34,7 +59,7 @@ bool ADCPlugin::compatible(QString m_param, QString category)
 		iio_device *dev = iio_context_get_device(conn->context(), i);
 		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
 			struct iio_channel *chn = iio_device_get_channel(dev, j);
-			if(iio_channel_is_scan_element(chn)) {
+			if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
 				ret = true;
 				goto finish;
 			}
@@ -52,11 +77,14 @@ void ADCPlugin::initPreferences()
 	Preferences *p = Preferences::GetInstance();
 	p->init("adc_plot_xaxis_label_position", QwtAxis::XBottom);
 	p->init("adc_plot_yaxis_label_position", QwtAxis::YLeft);
-	p->init("adc_plot_yaxis_handle_position", QwtAxis::YLeft);
-	p->init("adc_plot_xcursor_position", QwtAxis::XBottom);
-	p->init("adc_plot_ycursor_position", QwtAxis::YLeft);
+	p->init("adc_plot_yaxis_handle_position", HandlePos::NORTH_OR_WEST);
+	p->init("adc_plot_xcursor_position", HandlePos::SOUTH_OR_EAST);
+	p->init("adc_plot_ycursor_position", HandlePos::NORTH_OR_WEST);
 	p->init("adc_plot_show_buffer_previewer", true);
 	p->init("adc_default_y_mode", 0);
+	p->init("adc_add_remove_plot", false);
+	p->init("adc_add_remove_instrument", false);
+	p->init("adc_acquisition_timeout", 10000);
 }
 
 bool ADCPlugin::loadPreferencesPage()
@@ -66,13 +94,10 @@ bool ADCPlugin::loadPreferencesPage()
 	m_preferencesPage = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
 
-	MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
-	MenuCollapseSection *generalSection =
-		new MenuCollapseSection("General", MenuCollapseSection::MHCW_NONE, generalWidget);
-	generalWidget->contentLayout()->setSpacing(10);
-	generalWidget->contentLayout()->addWidget(generalSection);
+	MenuSectionCollapseWidget *generalSection = new MenuSectionCollapseWidget(
+		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET);
 	generalSection->contentLayout()->setSpacing(10);
-	lay->addWidget(generalWidget);
+	lay->addWidget(generalSection);
 	lay->setMargin(0);
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
@@ -84,18 +109,24 @@ bool ADCPlugin::loadPreferencesPage()
 		{{"Left", QwtAxis::YLeft}, {"Right", QwtAxis::YRight}}, generalSection);
 	auto adc_plot_yaxis_handle_position = PreferencesHelper::addPreferenceComboList(
 		p, "adc_plot_yaxis_handle_position", "Plot channel Y-handle position",
-		{{"Left", QwtAxis::YLeft}, {"Right", QwtAxis::YRight}}, generalSection);
+		{{"Left", HandlePos::NORTH_OR_WEST}, {"Right", HandlePos::SOUTH_OR_EAST}}, generalSection);
 	auto adc_plot_xcursor_position = PreferencesHelper::addPreferenceComboList(
 		p, "adc_plot_xcursor_position", "Plot X-Cursor position",
-		{{"Top", QwtAxis::XTop}, {"Bottom", QwtAxis::XBottom}}, generalSection);
+		{{"Top", HandlePos::NORTH_OR_WEST}, {"Bottom", HandlePos::SOUTH_OR_EAST}}, generalSection);
 	auto adc_plot_ycursor_position = PreferencesHelper::addPreferenceComboList(
 		p, "adc_plot_ycursor_position", "Plot Y-Curosr position",
-		{{"Left", QwtAxis::YLeft}, {"Right", QwtAxis::YRight}}, generalSection);
+		{{"Left", HandlePos::NORTH_OR_WEST}, {"Right", HandlePos::SOUTH_OR_EAST}}, generalSection);
 	auto adc_plot_show_buffer_previewer = PreferencesHelper::addPreferenceCheckBox(
 		p, "adc_plot_show_buffer_previewer", "Show buffer previewer", m_preferencesPage);
 
 	auto adc_default_y_mode = PreferencesHelper::addPreferenceComboList(
 		p, "adc_default_y_mode", "ADC Default Y-Mode", {{"ADC Count", 0}, {"% Full Scale", 1}}, generalSection);
+	auto adc_acquisition_timeout = PreferencesHelper::addPreferenceEdit(
+		p, "adc_acquisition_timeout", "ADC Acquisition timeout", m_preferencesPage);
+	auto adc_add_remove_plot = PreferencesHelper::addPreferenceCheckBox(
+		p, "adc_add_remove_plot", "Add/Remove plot feature (EXPERIMENTAL)", m_preferencesPage);
+	auto adc_add_remove_instrument = PreferencesHelper::addPreferenceCheckBox(
+		p, "adc_add_remove_instrument", "Add/Remove instrument feature (EXPERIMENTAL)", m_preferencesPage);
 
 	generalSection->contentLayout()->addWidget(adc_plot_xaxis_label_position);
 	generalSection->contentLayout()->addWidget(adc_plot_yaxis_label_position);
@@ -104,7 +135,9 @@ bool ADCPlugin::loadPreferencesPage()
 	generalSection->contentLayout()->addWidget(adc_plot_ycursor_position);
 	generalSection->contentLayout()->addWidget(adc_plot_show_buffer_previewer);
 	generalSection->contentLayout()->addWidget(adc_default_y_mode);
-	//	connect(p, &Preferences::preferenceChanged, )
+	generalSection->contentLayout()->addWidget(adc_acquisition_timeout);
+	generalSection->contentLayout()->addWidget(adc_add_remove_plot);
+	generalSection->contentLayout()->addWidget(adc_add_remove_instrument);
 
 	return true;
 }
@@ -119,117 +152,267 @@ bool ADCPlugin::loadPage()
 {
 	m_page = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_page);
+
+	ConnectionProvider *c = ConnectionProvider::GetInstance();
+	Connection *conn = c->open(m_param);
+	auto deviceInfoPage = new DeviceInfoPage(conn);
+	lay->addWidget(deviceInfoPage);
+	lay->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
+	c->close(m_param);
+
 	return true;
 }
 
 void ADCPlugin::loadToolList()
 {
 	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+		SCOPY_NEW_TOOLMENUENTRY("time", "ADC - Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("freq", "ADC - Frequency",
+						  ":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
 }
 
-PlotProxy *ADCPlugin::createRecipe(iio_context *ctx)
+bool iio_is_buffer_capable(struct iio_device *dev)
 {
-	QStringList deviceList;
-	QMap<QString, QStringList> devChannelMap;
+	for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
+		struct iio_channel *chn = iio_device_get_channel(dev, j);
+		if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void ADCPlugin::createGRIIOTreeNode(GRTopBlockNode *ctxNode, iio_context *ctx)
+{
 	int devCount = iio_context_get_devices_count(ctx);
 	qDebug(CAT_ADCPLUGIN) << " Found " << devCount << "devices";
+	ctxNode->setCtx(ctx);
 	for(int i = 0; i < devCount; i++) {
 		iio_device *dev = iio_context_get_device(ctx, i);
 		QString dev_name = QString::fromLocal8Bit(iio_device_get_name(dev));
 
-		qDebug(CAT_ADCPLUGIN) << "Looking for scanelements in " << dev_name;
-		if(dev_name == "m2k-logic-analyzer-rx")
+		if(dev_name.isEmpty())
 			continue;
-		QStringList channelList;
-		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
+		/*if(dev_name == "m2k-logic-analyzer-rx")
+			continue;*/
 
+		qDebug(CAT_ADCPLUGIN) << "Looking for scanelements in " << dev_name;
+		QStringList channelList;
+
+		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(ctx, dev_name, dev_name, 0x400, ctxNode);
+		GRIIODeviceSourceNode *d = new GRIIODeviceSourceNode(ctxNode, gr_dev, gr_dev);
+
+		if(iio_is_buffer_capable(dev)) { // at least one scan element
+			ctxNode->addTreeChild(d);
+			ctxNode->src()->registerIIODeviceSource(gr_dev);
+		} else {
+			continue;
+		}
+
+		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
 			struct iio_channel *chn = iio_device_get_channel(dev, j);
 			QString chn_name = QString::fromLocal8Bit(iio_channel_get_id(chn));
 			qDebug(CAT_ADCPLUGIN) << "Verify if " << chn_name << "is scan element";
 			if(chn_name == "timestamp" /*|| chn_name == "accel_z" || chn_name =="accel_y"*/)
 				continue;
 			if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
-				channelList.append(chn_name);
+
+				GRIIOFloatChannelSrc *ch = new GRIIOFloatChannelSrc(gr_dev, chn_name, d);
+				GRIIOFloatChannelNode *c = new GRIIOFloatChannelNode(ctxNode, ch, d);
+				d->addTreeChild(c);
 			}
 		}
-		if(channelList.isEmpty())
-			continue;
-		deviceList.append(dev_name);
-		devChannelMap.insert(dev_name, channelList);
 	}
-
-	// should this be wrapped to a register function (?)
-	GRTopBlock *top = new grutil::GRTopBlock("Time", this);
-
-	recipe = new GRTimePlotProxy(this);
-	QString plotRecipePrefix = "time_";
-	recipe->setPrefix(plotRecipePrefix);
-
-	GRTimePlotAddon *p = new GRTimePlotAddon(plotRecipePrefix, top, this);
-	GRTimePlotAddonSettings *s = new GRTimePlotAddonSettings(p, this);
-
-	recipe->setPlotAddon(p, s);
-
-	ChannelIdProvider *chIdProvider = recipe->getChannelIdProvider();
-	for(const QString &iio_dev : deviceList) {
-		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(m_ctx, iio_dev, iio_dev, 0x400, this);
-
-		top->registerIIODeviceSource(gr_dev);
-
-		GRDeviceAddon *d = new GRDeviceAddon(gr_dev, this);
-		connect(s, &GRTimePlotAddonSettings::bufferSizeChanged, d, &GRDeviceAddon::updateBufferSize);
-		recipe->addDeviceAddon(d);
-
-		for(const QString &ch : devChannelMap.value(iio_dev, {})) {
-			int idx = chIdProvider->next();
-			GRTimeChannelAddon *t = new GRTimeChannelAddon(ch, d, p, chIdProvider->pen(idx), this);
-			top->registerSignalPath(t->signalPath());
-			recipe->addChannelAddon(t);
-		}
-	}
-	recipe->setTopBlock(top);
-
-	qDebug(CAT_ADCPLUGIN) << deviceList;
-	qDebug(CAT_ADCPLUGIN) << devChannelMap;
-
-	return recipe;
 }
 
 bool ADCPlugin::onConnect()
 {
+	Preferences *p = Preferences::GetInstance();
+	connect(p, &Preferences::preferenceChanged, this, &ADCPlugin::preferenceChanged);
+	for(auto &tool : m_toolList) {
+		deleteInstrument(tool);
+	}
+
 	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
 	if(conn == nullptr)
 		return false;
 	m_ctx = conn->context();
-	m_toolList[0]->setEnabled(true);
-	m_toolList[0]->setRunBtnVisible(true);
 
 	// create gnuradio flow out of channels
 	// pass channels to ADC instrument - figure out channel model (sample rate/ size/ etc)
+	AcqTreeNode *root = new AcqTreeNode("root", this);
+	GRTopBlock *top = new GRTopBlock("ctx", this);
+	GRTopBlockNode *ctxNode = new GRTopBlockNode(top, nullptr);
+	QMetaObject::invokeMethod(top, &GRTopBlock::suspendBuild, Qt::DirectConnection);
+	root->addTreeChild(ctxNode);
+	createGRIIOTreeNode(ctxNode, m_ctx);
 
-	auto recipe = createRecipe(m_ctx);
-
-	time = new AdcInstrument(recipe);
-	m_toolList[0]->setTool(time);
-
+	newInstrument(TIME, root, top);
+	newInstrument(FREQUENCY, root, top);
+	QMetaObject::invokeMethod(top, &GRTopBlock::unsuspendBuild, Qt::QueuedConnection);
 	return true;
+}
+
+void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock *grtp)
+{
+
+	static int idx = 0;
+	ADCInstrumentController *adc;
+	ADCInstrument *ui;
+
+	if(t == TIME) {
+		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("time", "ADC - Time",
+							  ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+		auto tme = m_toolList.last();
+		tme->setEnabled(true);
+		tme->setRunBtnVisible(true);
+
+		adc = new ADCTimeInstrumentController(tme, m_param, "adc" + QString::number(idx), root, this);
+		adc->init();
+
+		ui = adc->ui();
+		idx++;
+
+		connect(root, &AcqTreeNode::newChild, dynamic_cast<ADCTimeInstrumentController *>(adc),
+			&ADCTimeInstrumentController::addChannel, Qt::QueuedConnection);
+		connect(root, &AcqTreeNode::deletedChild, dynamic_cast<ADCTimeInstrumentController *>(adc),
+			&ADCTimeInstrumentController::removeChannel, Qt::QueuedConnection);
+
+		connect(ui, &ADCInstrument::requestNewInstrument, this, [=]() {
+			QMetaObject::invokeMethod(grtp, &GRTopBlock::suspendBuild, Qt::DirectConnection);
+			newInstrument(t, root, grtp);
+			QMetaObject::invokeMethod(grtp, &GRTopBlock::unsuspendBuild, Qt::QueuedConnection);
+		});
+
+		connect(ui, &ADCInstrument::requestDeleteInstrument, this, [=]() {
+			ToolMenuEntry *t = nullptr;
+			for(auto tool : qAsConst(m_toolList)) {
+				if(tool->tool() == ui) {
+					t = tool;
+				}
+			}
+			deleteInstrument(t);
+		});
+
+		connect(adc, &ADCInstrumentController::requestDisconnect, this, &ADCPlugin::disconnectDevice,
+			Qt::QueuedConnection);
+		m_ctrls.append(adc);
+	} else if(t == FREQUENCY) {
+
+		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(
+			"freq", "ADC - Frequency", ":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
+		auto tme = m_toolList.last();
+		tme->setEnabled(true);
+		tme->setRunBtnVisible(true);
+
+		adc = new ADCFFTInstrumentController(tme, m_param, "adc" + QString::number(idx), root, this);
+		adc->init();
+		ui = adc->ui();
+		idx++;
+
+		connect(root, &AcqTreeNode::newChild, dynamic_cast<ADCFFTInstrumentController *>(adc),
+			&ADCFFTInstrumentController::addChannel, Qt::QueuedConnection);
+		connect(root, &AcqTreeNode::deletedChild, dynamic_cast<ADCFFTInstrumentController *>(adc),
+			&ADCFFTInstrumentController::removeChannel, Qt::QueuedConnection);
+
+		connect(ui, &ADCInstrument::requestNewInstrument, this, [=]() {
+			QMetaObject::invokeMethod(grtp, &GRTopBlock::suspendBuild, Qt::DirectConnection);
+			newInstrument(t, root, grtp);
+			QMetaObject::invokeMethod(grtp, &GRTopBlock::unsuspendBuild, Qt::QueuedConnection);
+		});
+
+		connect(ui, &ADCInstrument::requestDeleteInstrument, this, [=]() {
+			ToolMenuEntry *t = nullptr;
+			for(auto tool : qAsConst(m_toolList)) {
+				if(tool->tool() == ui) {
+					t = tool;
+				}
+			}
+			deleteInstrument(t);
+		});
+
+		connect(adc, &ADCInstrumentController::requestDisconnect, this, &ADCPlugin::disconnectDevice,
+			Qt::QueuedConnection);
+		m_ctrls.append(adc);
+	} else {
+		return;
+	}
+
+	auto tme = m_toolList.last();
+	if(m_toolList.size() > 2) {
+		tme->setDetachable(false);
+	}
+	Q_EMIT toolListChanged();
+	tme->setTool(ui);
+
+	adc->setEnableAddRemovePlot(Preferences::get("adc_add_remove_plot").toBool());
+	adc->setEnableAddRemoveInstrument(Preferences::get("adc_add_remove_instrument").toBool());
+
+	// prevent user from deleting first time and fft tool
+	if(idx <= 2)
+		adc->setIsMainInstrument(true);
+}
+
+void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
+{
+	tool->setEnabled(false);
+	tool->setRunning(false);
+	tool->setRunBtnVisible(false);
+	QWidget *w = tool->tool();
+	if(w) {
+		ADCInstrumentController *found = nullptr;
+		for(ADCInstrumentController *ctrl : m_ctrls) {
+			if(ctrl->ui() == tool->tool()) {
+				found = ctrl;
+				break;
+			}
+		}
+		found->stop();
+		m_ctrls.removeAll(found);
+		tool->setTool(nullptr);
+		delete(w);
+	}
+	m_toolList.removeAll(tool);
+	tool->deleteLater();
+	tool = nullptr;
+	Q_EMIT toolListChanged();
+}
+
+void ADCPlugin::preferenceChanged(QString s, QVariant t1)
+{
+	if(s == "adc_add_remove_plot") {
+		for(ADCInstrumentController *ctrl : m_ctrls) {
+			ctrl->setEnableAddRemovePlot(t1.toBool());
+		}
+	}
+	if(s == "adc_add_remove_instrument") {
+		for(ADCInstrumentController *ctrl : m_ctrls) {
+			ctrl->setEnableAddRemoveInstrument(t1.toBool());
+		}
+	}
+	if(s == "adc_acquisition_timeout") {
+		bool ok;
+		Preferences::get("adc_acquisition_timeout").toDouble(&ok);
+		if(!ok) {
+			Preferences::set("adc_acquisition_timeout", 1000);
+		}
+	}
 }
 
 bool ADCPlugin::onDisconnect()
 {
+	Preferences *p = Preferences::GetInstance();
+	disconnect(p, &Preferences::preferenceChanged, this, &ADCPlugin::preferenceChanged);
 	qDebug(CAT_ADCPLUGIN) << "disconnect";
 	if(m_ctx)
 		ConnectionProvider::GetInstance()->close(m_param);
-	for(auto &tool : m_toolList) {
-		tool->setEnabled(false);
-		tool->setRunBtnVisible(false);
-		QWidget *w = tool->tool();
-		if(w) {
-			tool->setTool(nullptr);
-			delete(w);
-		}
+
+	while(!m_toolList.isEmpty()) {
+		deleteInstrument(m_toolList.first());
 	}
+	loadToolList();
+	Q_EMIT toolListChanged();
+
 	return true;
 }
 

@@ -1,3 +1,24 @@
+/* -*- c++ -*- */
+/*
+ * Copyright 2012,2014 Free Software Foundation, Inc.
+ *
+ * This file is part of GNU Radio
+ *
+ * GNU Radio is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3, or (at your option)
+ * any later version.
+ *
+ * GNU Radio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with GNU Radio; see the file LICENSE.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street,
+ * Boston, MA 02110-1301, USA.
+ */
 /*
  * Copyright (c) 2019 Analog Devices Inc.
  *
@@ -29,22 +50,19 @@ namespace scopy {
 class time_sink_f_impl : public time_sink_f
 {
 public:
-	time_sink_f_impl(int size, float sampleRate, const std::string &name, int nconnections);
+	time_sink_f_impl(int size, size_t vlen, float sampleRate, const std::string &name, int nconnections);
 	~time_sink_f_impl();
 
-	bool check_topology(int ninputs, int noutputs);
-	std::string name() const;
+	bool check_topology(int ninputs, int noutputs) override;
+	std::string name() const override;
 
-	void updateData() override;
+	uint64_t updateData() override;
 
 	bool rollingMode() override;
 	void setRollingMode(bool b) override;
 
 	bool singleShot() override;
 	void setSingleShot(bool b) override;
-
-	bool computeTags() override;
-	void setComputeTags(bool newComputeTags) override;
 
 	float freqOffset() override;
 	void setFreqOffset(float) override;
@@ -57,7 +75,6 @@ public:
 	const std::vector<float> &time() const override;
 	const std::vector<float> &freq() const override;
 	const std::vector<std::vector<float>> &data() const override;
-	const std::vector<std::vector<PlotTag_t>> &tags() const override;
 
 	bool start() override;
 	bool stop() override;
@@ -82,9 +99,10 @@ private:
 	bool m_singleShot;
 	bool m_workFinished;
 	bool m_dataUpdated;
-	bool m_computeTags;
 	float m_freqOffset;
 	bool m_complexFft;
+	uint64_t m_lastUpdateReadItems;
+	size_t m_vlen;
 
 	void generate_time_axis();
 };

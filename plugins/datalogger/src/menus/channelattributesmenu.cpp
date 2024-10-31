@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "menus/channelattributesmenu.hpp"
 
 #include <iiowidgetbuilder.h>
@@ -23,16 +44,14 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, QWidget *p
 	layout->setSpacing(10);
 	settingsBody->setLayout(layout);
 
-	mainLayout->addLayout(layout);
-
 	QScrollArea *scrollArea = new QScrollArea(this);
 	scrollArea->setWidgetResizable(true);
 	scrollArea->setWidget(settingsBody);
 	mainLayout->addWidget(scrollArea);
 
 	MenuSectionWidget *attrcontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *attr =
-		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrcontainer);
+	MenuCollapseSection *attr = new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE,
+							    MenuCollapseSection::MHW_BASEWIDGET, attrcontainer);
 
 	QVBoxLayout *attrLayout = new QVBoxLayout();
 	attrLayout->setSpacing(10);
@@ -41,7 +60,9 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, QWidget *p
 
 	if(qobject_cast<DmmDataMonitorModel *>(model)) {
 		QList<IIOWidget *> attrWidgets =
-			IIOWidgetBuilder().channel(dynamic_cast<DmmDataMonitorModel *>(model)->iioChannel()).buildAll();
+			IIOWidgetBuilder(attr)
+				.channel(dynamic_cast<DmmDataMonitorModel *>(model)->iioChannel())
+				.buildAll();
 
 		for(auto w : attrWidgets) {
 			attrLayout->addWidget(w);

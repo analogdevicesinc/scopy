@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2019 Analog Devices Inc.
+ * Copyright (c) 2024 Analog Devices Inc.
  *
  * This file is part of Scopy
- * (see http://www.github.com/analogdevicesinc/scopy).
+ * (see https://www.github.com/analogdevicesinc/scopy).
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,66 +15,54 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 #ifndef TOOLMENUITEM_H
 #define TOOLMENUITEM_H
 
-#include "gui/basemenuitem.h"
-#include "gui/customPushButton.h"
-#include "scopy-core_export.h"
+#include <QPushButton>
+#include <QWidget>
+#include <customPushButton.h>
 
 namespace scopy {
-/**
- * @brief The ToolMenuItem class
- */
-class SCOPY_CORE_EXPORT ToolMenuItem : public BaseMenuItem
+class ToolMenuItem : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit ToolMenuItem(QString id, QString name, QString iconPath, QWidget *parent = nullptr);
-	virtual ~ToolMenuItem();
+	ToolMenuItem(QString uuid, QString name, QString icon, QWidget *parent = nullptr);
+	~ToolMenuItem();
 
 	QPushButton *getToolBtn() const;
 	QPushButton *getToolRunBtn() const;
 
-	void setToolEnabled(bool disabled);
 	void enableDoubleClick(bool enable);
-	void setSeparator(bool top, bool bot);
-
 	bool eventFilter(QObject *watched, QEvent *event);
 
 	void setName(QString str);
-	void hideText(bool hidden);
+	void setSelected(bool en);
 
-	const QString &getId() const;
-
+	QString getId() const;
 Q_SIGNALS:
 	void doubleclick();
 
 public Q_SLOTS:
 	void setDisabled(bool disabled);
+	void updateItem();
 
 protected:
 	void enterEvent(QEvent *event);
 	void leaveEvent(QEvent *event);
 
-	void dragMoveEvent(QDragMoveEvent *event);
-	void dragLeaveEvent(QDragLeaveEvent *event);
-
-	void mouseMoveEvent(QMouseEvent *event);
-
 private:
-	QPushButton *toolBtn;
-	CustomPushButton *toolRunBtn;
+	QPushButton *m_toolBtn;
+	CustomPushButton *m_toolRunBtn;
 
-	QString id;
-	QString name;
-	QString iconPath;
-
-private:
-	void _buildUI();
+	QString m_uuid;
+	QString m_name;
+	QString m_icon;
 };
 } // namespace scopy
+
 #endif // TOOLMENUITEM_H

@@ -1,3 +1,23 @@
+#
+# Copyright (c) 2024 Analog Devices Inc.
+#
+# This file is part of Scopy
+# (see https://www.github.com/analogdevicesinc/scopy).
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+#
+
 cmake_minimum_required(VERSION 3.9)
 enable_testing()
 
@@ -97,6 +117,22 @@ find_library(
 )
 message("IIO LIBRARIES: " ${IIO_LIBRARIES})
 
+set(SCOPY_DLL_BUILD_PATH ${CMAKE_BINARY_DIR})
+set(SCOPY_DLL_INSTALL_PATH ${CMAKE_INSTALL_FULL_LIBDIR})
+set(SCOPY_PLUGIN_BUILD_PATH ${CMAKE_BINARY_DIR}/plugins/plugins)
+set(SCOPY_PLUGIN_INSTALL_PATH ${CMAKE_INSTALL_FULL_LIBDIR}/scopy/plugins)
+set(SCOPY_TRANSLATION_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/translations)
+set(SCOPY_TRANSLATION_INSTALL_PATH ${CMAKE_INSTALL_FULL_LIBDIR}/scopy/translations)
+set(SCOPY_PDK pdk)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_DLL_BUILD_PATH})
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/Frameworks")
+else()
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_DLL_BUILD_PATH})
+endif()
+
 option(ENABLE_TESTING "Enable unit tests" ON)
 if(ENABLE_TESTING)
 	message(STATUS "Unit tests enabled")
@@ -109,13 +145,6 @@ if(APPLE)
 	include(ScopyMacOS)
 endif(APPLE)
 
-set(SCOPY_DLL_PATH ${CMAKE_INSTALL_LIBDIR})
-set(SCOPY_PLUGIN_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/plugins/plugins)
-set(SCOPY_PLUGIN_INSTALL_PATH ${CMAKE_INSTALL_FULL_DATADIR}/scopy-plugins)
-set(SCOPY_TRANSLATION_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/translations)
-set(SCOPY_TRANSLATION_INSTALL_PATH ${CMAKE_INSTALL_FULL_DATADIR}/translations)
-set(SCOPY_CURRENT_BINARY_PATH ${CMAKE_CURRENT_BINARY_DIR})
-
 add_subdirectory(common)
 add_subdirectory(iioutil)
 add_subdirectory(gui)
@@ -124,6 +153,10 @@ add_subdirectory(pluginbase)
 add_subdirectory(core)
 add_subdirectory(plugins)
 add_subdirectory(iio-widgets)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS")
+endif()
 
 set(SCOPY_DEPENDENCIES ${IIO_LIBRARIES})
 
@@ -196,7 +229,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gui/res/icon_small.svg
 		DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/icons/hicolor/scalable/apps RENAME scopy.svg
 	)
-	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/translations DESTINATION ${CMAKE_INSTALL_FULL_DATADIR})
 endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	include(ScopyWindows)
@@ -209,7 +241,26 @@ if(NOT ENABLE_APPLICATION_BUNDLE)
 	)
 endif()
 
-install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION .)
+file(GLOB alldirs ${CMAKE_CURRENT_SOURCE_DIR}/plugins/*)
+set(childdirlist "")
+foreach(child ${alldirs})
+	set(CHILD_EMU_XML ${child}/res/emu_xml)
+	if(IS_DIRECTORY ${CHILD_EMU_XML})
+		message("-- Found IIO Emulator XMLs in: " ${CHILD_EMU_XML})
+		file(GLOB EMU_FILES ${CHILD_EMU_XML}/*)
+		foreach(_emu_file ${EMU_FILES})
+			file(COPY ${_emu_file} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/plugins/emu_xml/)
+		endforeach()
+
+	endif()
+endforeach()
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/plugins/resources/scopy_emu_options_config.json
+	DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH}/resources
+)
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/emu_xml DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH})
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/translations DESTINATION ${SCOPY_TRANSLATION_INSTALL_PATH})
+install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 
 if(QT_VERSION_MAJOR EQUAL 6)
 	qt_finalize_executable(${PROJECT_NAME})

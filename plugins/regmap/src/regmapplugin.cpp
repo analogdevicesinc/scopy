@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "jsonformatedelement.hpp"
 #include "regmapplugin.h"
 #include "utils.hpp"
@@ -21,18 +42,21 @@
 #include <src/readwrite/iioregisterreadstrategy.hpp>
 #include <src/readwrite/iioregisterwritestrategy.hpp>
 #include <pluginbase/preferences.h>
-#include <pluginbase/preferenceshelper.h>
+#include <gui/preferenceshelper.h>
+#include <gui/deviceinfopage.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
 #include <readwrite/fileregisterreadstrategy.hpp>
 #include <readwrite/fileregisterwritestrategy.hpp>
 #include "logging_categories.h"
+#include <regmap_api.h>
 
 #include "iioutil/connectionprovider.h"
 #include "jsonformatedelement.hpp"
 #include "scopy-regmap_config.h"
 #include "utils.hpp"
 #include "utils.hpp"
+#include <pluginbase/scopyjs.h>
 #if defined __APPLE__
 #include <QApplication>
 #endif
@@ -42,8 +66,15 @@ using namespace regmap;
 
 bool RegmapPlugin::loadPage()
 {
-	// TODO
 	m_page = new QWidget();
+	QVBoxLayout *lay = new QVBoxLayout(m_page);
+
+	ConnectionProvider *c = ConnectionProvider::GetInstance();
+	Connection *conn = c->open(m_param);
+	auto deviceInfoPage = new DeviceInfoPage(conn);
+	lay->addWidget(deviceInfoPage);
+	lay->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
+	c->close(m_param);
 
 	return true;
 }
@@ -51,14 +82,19 @@ bool RegmapPlugin::loadPage()
 bool RegmapPlugin::loadIcon()
 {
 	m_icon = new QLabel("");
-	m_icon->setStyleSheet("border-image: url(:/gui/icons/scopy-default/icons/RegMap.svg);");
+	m_icon->setStyleSheet("border-image: url(:/gui/icons/scopy-default/icons/tool_calibration.svg);");
 	return true;
 }
 
 void RegmapPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(REGMAP_PLUGIN_SCOPY_MODULE, REGMAP_PLUGIN_DISPLAY_NAME,
-						  ":/gui/icons/scopy-default/icons/RegMap.svg"));
+	ToolMenuEntry *toolMenuEntry = SCOPY_NEW_TOOLMENUENTRY(REGMAP_PLUGIN_SCOPY_MODULE, REGMAP_PLUGIN_DISPLAY_NAME,
+							       ":/gui/icons/scopy-default/icons/tool_calibration.svg");
+	m_toolList.append(toolMenuEntry);
+	m_toolList.last()->setRunBtnVisible(true);
+	m_toolList.last()->setRunEnabled(false);
+
+	Q_EMIT toolListChanged();
 }
 
 void RegmapPlugin::unload()
@@ -96,7 +132,7 @@ void RegmapPlugin::initPreferences()
 	Preferences *p = Preferences::GetInstance();
 	p->init("regmap_color_by_value", "Default");
 #if defined __APPLE__
-	p->init("additional_regmap_xml_path", QCoreApplication::applicationDirPath() + "/plugins/plugins/xmls");
+	p->init("additional_regmap_xml_path", QCoreApplication::applicationDirPath() + "/plugins/xmls");
 #else
 	p->init("additional_regmap_xml_path", REGMAP_XML_PATH_LOCAL);
 #endif
@@ -110,8 +146,8 @@ bool RegmapPlugin::loadPreferencesPage()
 	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
 
 	MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
-	MenuCollapseSection *generalSection =
-		new MenuCollapseSection("General", MenuCollapseSection::MHCW_NONE, generalWidget);
+	MenuCollapseSection *generalSection = new MenuCollapseSection(
+		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, generalWidget);
 	generalWidget->contentLayout()->setSpacing(10);
 	generalWidget->contentLayout()->addWidget(generalSection);
 	generalSection->contentLayout()->setSpacing(10);
@@ -185,6 +221,14 @@ bool RegmapPlugin::onConnect()
 
 		m_toolList[0]->setEnabled(true);
 		m_toolList[0]->setTool(m_registerMapWidget);
+		InitApi();
+
+		for(auto &tool : m_toolList) {
+			tool->setEnabled(true);
+			tool->setRunBtnVisible(true);
+		}
+
+		Q_EMIT toolListChanged();
 
 		return true;
 	}
@@ -198,10 +242,15 @@ bool RegmapPlugin::onDisconnect()
 	auto &&cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
 
-	if(m_registerMapWidget)
-		delete m_registerMapWidget;
-	if(m_deviceList)
-		delete m_deviceList;
+	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+		tme->setEnabled(false);
+		tme->setRunBtnVisible(false);
+		tme->setRunning(false);
+		tme->tool()->deleteLater();
+		tme->setTool(nullptr);
+	}
+
+	Q_EMIT toolListChanged();
 
 	return true;
 }
@@ -275,4 +324,11 @@ bool RegmapPlugin::isBufferCapable(iio_device *dev)
 	return false;
 }
 
+void RegmapPlugin::InitApi()
+{
+	api = new RegMap_API(this);
+	ScopyJS *js = ScopyJS::GetInstance();
+	api->setObjectName("regmap");
+	js->registerApi(api);
+}
 #include "moc_regmapplugin.cpp"

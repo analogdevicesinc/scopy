@@ -1,3 +1,23 @@
+#
+# Copyright (c) 2024 Analog Devices Inc.
+#
+# This file is part of Scopy
+# (see https://www.github.com/analogdevicesinc/scopy).
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+#
+
 cmake_minimum_required(VERSION 3.9)
 set(SCOPY_MODULE m2k-gui)
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
@@ -15,12 +35,6 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-else()
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-endif()
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
@@ -75,6 +89,15 @@ set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Xml Svg REQUIRED)
 option(SCOPY_ENABLE_GR_GUI "Build gnuradio addons for scopy-gui" ON)
 option(SCOPY_ENABLE_SIGROK_GUI "Build sigrok addons for scopy-gui" ON)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_DLL_BUILD_PATH})
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/Frameworks")
+else()
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_DLL_BUILD_PATH})
+endif()
+
 if(SCOPY_ENABLE_GR_GUI)
 	add_subdirectory(gr-gui)
 	set(SCOPY_HAVE_GR_GUI ON)
@@ -125,4 +148,6 @@ target_link_libraries(
 	       scopy-gui
 )
 
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_PATH} RUNTIME DESTINATION ${SCOPY_DLL_PATH})
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH}
+	RUNTIME DESTINATION ${SCOPY_DLL_INSTALL_PATH}
+)

@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "griiodevicesource.h"
 
 #include "griiocomplexchannelsrc.h"
@@ -20,6 +41,8 @@ QString GRIIODeviceSource::findAttribute(QStringList possibleNames, iio_device *
 }
 
 iio_device *GRIIODeviceSource::iioDev() const { return m_iioDev; }
+
+iio_context *GRIIODeviceSource::ctx() const { return m_ctx; }
 
 QString GRIIOChannel::findAttribute(QStringList possibleNames, iio_channel *ch)
 {
@@ -58,6 +81,11 @@ void GRIIODeviceSource::addChannelAtIndex(iio_device *iio_dev, QString channelNa
 	std::string channel_name = channelName.toStdString();
 	iio_channel *iio_ch = iio_device_find_channel(iio_dev, channel_name.c_str(), false);
 	int idx = iio_channel_get_index(iio_ch);
+
+	while(idx < m_channelNames.size() && m_channelNames[idx] != "" &&
+	      QString::fromStdString(m_channelNames[idx]) != channelName) {
+		idx++;
+	}
 	m_channelNames[idx] = channel_name;
 }
 
@@ -103,36 +131,56 @@ int GRIIODeviceSource::getOutputIndex(QString ch)
 	return iio_channel_get_data_format(iio_ch);
 }*/
 
+bool GRIIODeviceSource::sampleRateAvailable()
+{
+	if(m_sampleRateAttribute.isEmpty())
+		return false;
+	return true;
+}
+
 double GRIIODeviceSource::readSampleRate()
 {
 	char buffer[20];
 	bool ok = false;
 	double sr;
-	if(!m_sampleRateAttribute.isEmpty()) {
-		iio_device_attr_read(m_iioDev, m_sampleRateAttribute.toStdString().c_str(), buffer, 20);
-		QString str(buffer);
-		sr = str.toDouble(&ok);
-		if(ok) {
-			return sr;
-		}
+	if(!sampleRateAvailable())
+		return -1;
+
+	iio_device_attr_read(m_iioDev, m_sampleRateAttribute.toStdString().c_str(), buffer, 20);
+	QString str(buffer);
+	sr = str.toDouble(&ok);
+	if(ok) {
+		return sr;
+	} else {
+		return -1;
 	}
-	return -1;
 }
 
 void GRIIODeviceSource::matchChannelToBlockOutputs(GRTopBlock *top)
 {
+	QMap<GRIIOChannel *, int> map;
 	for(GRIIOChannel *ch : qAsConst(m_list)) {
 		GRIIOFloatChannelSrc *floatCh = dynamic_cast<GRIIOFloatChannelSrc *>(ch);
 		if(floatCh) {
 			auto start_sptr = floatCh->getGrStartPoint();
-			top->connect(src, getOutputIndex(floatCh->getChannelName()), start_sptr[0], 0);
+
+			int idx = getOutputIndex(floatCh->getChannelName());
+			int mapIdx = map.value(ch, 0);
+			top->connect(src, idx, start_sptr[mapIdx], 0);
+			mapIdx++;
+			map.insert(ch, mapIdx);
 		}
 
 		GRIIOComplexChannelSrc *complexCh = dynamic_cast<GRIIOComplexChannelSrc *>(ch);
 		if(complexCh) {
 			auto start_sptr = complexCh->getGrStartPoint();
-			top->connect(src, getOutputIndex(complexCh->getChannelNameI()), start_sptr[0], 0);
-			top->connect(src, getOutputIndex(complexCh->getChannelNameQ()), start_sptr[1], 0);
+			int idxI = getOutputIndex(complexCh->getChannelNameI());
+			int idxQ = getOutputIndex(complexCh->getChannelNameQ());
+			int mapIdx = map.value(ch, 0);
+			top->connect(src, idxI, start_sptr[mapIdx], 0);
+			top->connect(src, idxQ, start_sptr[mapIdx + 1], 0);
+			mapIdx += 2;
+			map.insert(ch, mapIdx);
 		}
 	}
 }

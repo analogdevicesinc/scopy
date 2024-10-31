@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "scopyconfig.h"
 
 #include "scopy-common_config.h"
@@ -12,38 +33,34 @@ QString scopy::config::tempLogFilePath() { return QDir::cleanPath(settingsFolder
 
 QString scopy::config::defaultPluginFolderPath()
 {
-	// Plugin path is different per system
-	//  - Windows - In Scopy.exe location
-	//  - Linux - /usr/share/scopy/plugins
-	//  -  macOS - similar(?)
-	//  - Android - Only in app cache - On init, copy plugins from data to cache (?))
+
+#ifdef WIN32
+	// Scopy_install_folder/plugins
+	return QCoreApplication::applicationDirPath() + "/plugins";
+#elif defined __APPLE__
+	// Scopy.app/Contents/MacOS/plugins
+	return QCoreApplication::applicationDirPath() + "/plugins";
+#elif defined(__appimage__)
+	// usr/lib/plugins
+	return QCoreApplication::applicationDirPath() + "/../lib/scopy/plugins";
+#endif
+
 	return SCOPY_PLUGIN_INSTALL_PATH;
 }
 
-QString scopy::config::localPluginFolderPath()
-{
+QString scopy::config::localPluginFolderPath() { return SCOPY_PLUGIN_BUILD_PATH; }
 
-#if defined __APPLE__
-	return QCoreApplication::applicationDirPath() + "/plugins/plugins";
-#elif defined(__appimage__)
-	return QCoreApplication::applicationDirPath() + "/../share/plugins";
-#endif
-
-	return SCOPY_PLUGIN_BUILD_PATH;
-}
-
-QString scopy::config::defaultTranslationFolderPath() { return SCOPY_TRANSLATION_INSTALL_PATH; }
-
-QString scopy::config::localTranslationFolderPath()
+QString scopy::config::defaultTranslationFolderPath()
 {
 #if defined __APPLE__
 	return QCoreApplication::applicationDirPath() + "/translations";
 #elif defined(__appimage__)
-	return QCoreApplication::applicationDirPath() + "/../share/translations";
+	return QCoreApplication::applicationDirPath() + "/../lib/scopy/translations";
 #endif
-
-	return SCOPY_TRANSLATION_BUILD_PATH;
+	return SCOPY_TRANSLATION_INSTALL_PATH;
 }
+
+QString scopy::config::localTranslationFolderPath() { return SCOPY_TRANSLATION_BUILD_PATH; }
 
 QString scopy::config::preferencesFolderPath()
 {

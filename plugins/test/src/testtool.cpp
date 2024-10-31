@@ -1,9 +1,36 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "testtool.h"
 
+#include "menuspinbox.h"
 #include "plotaxis.h"
 #include "plotwidget.h"
 #include "spinbox_a.hpp"
+
 #include <iio-widgets/iiowidgetbuilder.h>
+#include <iio-widgets/guistrategy/editableguistrategy.h>
+#include <iio-widgets/guistrategy/comboguistrategy.h>
+#include <iio-widgets/datastrategy/channelattrdatastrategy.h>
+#include <iio-widgets/datastrategy/multidatastrategy.h>
 
 #include <QButtonGroup>
 #include <QDebug>
@@ -140,9 +167,12 @@ TestTool::TestTool(QWidget *parent)
 	measure->setDoubleClickToOpenMenu(true);
 	measure->checkBox()->setVisible(false);
 
+	CursorSettings *cursorSettings = new CursorSettings(this);
 	CursorController *cursorController = new CursorController(plot, this);
 
-	HoverWidget *hoverSettings = new HoverWidget(cursorController->getCursorSettings(), cursor, tool);
+	cursorController->connectSignals(cursorSettings);
+
+	HoverWidget *hoverSettings = new HoverWidget(cursorSettings, cursor, tool);
 	hoverSettings->setAnchorPos(HoverPosition::HP_TOPRIGHT);
 	hoverSettings->setContentPos(HoverPosition::HP_TOPLEFT);
 	hoverSettings->setAnchorOffset(QPoint(0, -10));
@@ -169,8 +199,8 @@ TestTool::TestTool(QWidget *parent)
 	QWidget *wch0 = createMenu(tool);
 	QLabel *wch1 = new QLabel("Channel1Label");
 
-	//		auto *wch2 = iioWidgetsSettingsHelper();
-	auto *wch2 = new QLabel("Channel2Label");
+	auto *wch2 = iioWidgetsSettingsHelper();
+	// auto *wch2 = new QLabel("Channel2Label");
 	// wch2->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::MinimumExpanding));
 
 	tool->rightStack()->add("ch0", wch0);
@@ -249,15 +279,20 @@ QWidget *TestTool::createMenu(QWidget *parent)
 	PositionSpinButton *ssb =
 		new PositionSpinButton({{"Hz", 1e0}, {"kHz", 1e3}, {"MHz", 1e6}}, "Volts", 0, 1000, true, false, vdiv);
 	ssb->setMaxValue(1000);
-	StyleHelper::MenuSpinBox(ssb, "vdivSpin");
+	// StyleHelper::MenuSpinBox(ssb, "vdivSpin");
+
+	gui::MenuSpinbox *msb = new gui::MenuSpinbox("Frequency", 2000000, "Hz", 500000, 6000000000, true, false, this);
 
 	MenuOnOffSwitch *autoscale = new MenuOnOffSwitch(tr("AUTOSCALE"), vdiv, false);
 
-	MenuCollapseSection *section1 = new MenuCollapseSection("SECTION1", MenuCollapseSection::MHCW_ARROW, vdiv);
+	MenuCollapseSection *section1 = new MenuCollapseSection("SECTION1", MenuCollapseSection::MHCW_ARROW,
+								MenuCollapseSection::MHW_BASEWIDGET, vdiv);
 	section1->contentLayout()->addWidget(txt);
 	section1->contentLayout()->addWidget(cbb);
-	MenuCollapseSection *section2 = new MenuCollapseSection("SECTION2", MenuCollapseSection::MHCW_ONOFF, vdiv);
+	MenuCollapseSection *section2 = new MenuCollapseSection("SECTION2", MenuCollapseSection::MHCW_ONOFF,
+								MenuCollapseSection::MHW_BASEWIDGET, vdiv);
 	section2->contentLayout()->addWidget(ssb);
+	section2->contentLayout()->addWidget(msb);
 	section2->contentLayout()->addWidget(autoscale);
 
 	//	MenuBigSwitch *bigsw = new MenuBigSwitch("Yes", "No", vdiv);
@@ -318,15 +353,29 @@ QWidget *TestTool::iioWidgetsSettingsHelper()
 	wch2Scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	wch2Scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	auto wch2 = new QWidget(this);
-	auto channelAttrMenu =
-		new MenuCollapseSection("Channel attributes", scopy::MenuCollapseSection::MHCW_ARROW, wch2);
-	channelAttrMenu->contentLayout()->setContentsMargins(0, 0, 0, 0);
-	channelAttrMenu->contentLayout()->setSpacing(10);
+	auto channelAttrMenu = new QWidget(this);
+	channelAttrMenu->setLayout(new QVBoxLayout(channelAttrMenu));
 	channelAttrMenu->setObjectName("this object");
 	wch2Scroll->setWidget(wch2);
 	wch2->setLayout(new QVBoxLayout(wch2));
 	wch2->layout()->setContentsMargins(0, 0, 0, 0);
+	wch2->layout()->setSpacing(0);
 	QList<IIOWidget *> attrWidgets = {}; // IIOWidgetFactory::buildAllAttrsForChannel(attrChannel);
+	// auto uis = new ComboAttrUi({.channel = attrChannel, .data = "sampling_frequency", .iioDataOptions =
+	// "sampling_frequency_available"}, this); auto ds1 = new ChannelAttrDataStrategy({.channel = attrChannel, .data
+	// = "sampling_frequency", .iioDataOptions = "sampling_frequency_available"}, this); ds1->setObjectName("ds1");
+	// auto ds2 = new ChannelAttrDataStrategy({.channel = iio_device_find_channel(device, "voltage6", false), .data
+	// = "sampling_frequency", .iioDataOptions = "sampling_frequency_available"}, this); ds2->setObjectName("ds2");
+	// auto ds3 = new ChannelAttrDataStrategy({.channel = iio_device_find_channel(device, "voltage5", false), .data
+	// = "sampling_frequency", .iioDataOptions = "sampling_frequency_available"}, this); ds3->setObjectName("ds3");
+	// auto mds = new MultiDataStrategy({ds1, ds2}, this);
+	// mds->addDataStrategy(ds3);
+
+	// auto iiow = new IIOWidget(uis, mds, this);
+	// attrWidgets.append(iiow);
+
+	// auto mw = new IIOMultiWidget(uis, {ds1, ds2, ds3}, this);
+	// attrWidgets.append(mw);
 
 	//	attrWidgets.append(attrFactory->buildSingle(
 	//		AttrFactory::AFH::ExternalSave | AttrFactory::AFH::SwitchUi | AttrFactory::AFH::AttrData,
@@ -347,37 +396,38 @@ QWidget *TestTool::iioWidgetsSettingsHelper()
 	//| 								 IIOWidgetFactory::FileDemoData,
 	//							 {.data = "The Office Cast"}));
 
-	StyleHelper::IIOWidgetElement(channelAttrMenu, "IIOWidget");
+	// StyleHelper::IIOWidgetElement(channelAttrMenu, "IIOWidget");
 	for(auto item : attrWidgets) {
 		if(item) {
-			auto container = new QFrame(channelAttrMenu);
-			auto header = new QWidget(channelAttrMenu);
-			auto title = new QLabel(item->getRecipe().data.replace("_", " ").toUpper(), header);
-			auto errorBox = new ErrorBox(header);
-			header->setLayout(new QHBoxLayout(header));
-			header->layout()->setContentsMargins(0, 0, 0, 0);
-			header->layout()->addWidget(title);
-			header->layout()->addWidget(errorBox);
-			errorBox->changeColor(ErrorBox::AvailableColors::Green);
-			connect(item, &IIOWidget::currentStateChanged, this,
-				[errorBox](IIOWidget::State state, QString explanation) {
-					if(state == IIOWidget::Busy) {
-						errorBox->changeColor(ErrorBox::Yellow);
-					} else if(state == IIOWidget::Correct) {
-						errorBox->changeColor(ErrorBox::Green);
-					} else if(state == IIOWidget::Error) {
-						errorBox->changeColor(ErrorBox::Red);
-					}
-					errorBox->setToolTip(explanation);
-				});
+			// auto container = new QFrame(channelAttrMenu);
+			// auto header = new QWidget(channelAttrMenu);
+			// auto title = new QLabel(item->getRecipe().data.replace("_", " ").toUpper(), header);
+			// auto title = new QLabel("okokk");
+			// auto errorBox = new ErrorBox(header);
+			// header->setLayout(new QHBoxLayout(header));
+			// header->layout()->setContentsMargins(0, 0, 0, 0);
+			// header->layout()->addWidget(title);
+			// header->layout()->addWidget(errorBox);
+			// errorBox->changeColor(ErrorBox::AvailableColors::Green);
+			// connect(item, &IIOWidget::currentStateChanged, this,
+			// 	[errorBox](IIOWidget::State state, QString explanation) {
+			// 		if(state == IIOWidget::Busy) {
+			// 			errorBox->changeColor(ErrorBox::Yellow);
+			// 		} else if(state == IIOWidget::Correct) {
+			// 			errorBox->changeColor(ErrorBox::Green);
+			// 		} else if(state == IIOWidget::Error) {
+			// 			errorBox->changeColor(ErrorBox::Red);
+			// 		}
+			// 		errorBox->setToolTip(explanation);
+			// 	});
 
-			container->setLayout(new QVBoxLayout(container));
-			container->layout()->setContentsMargins(0, 0, 0, 0);
-			container->layout()->addWidget(header);
-			container->layout()->addWidget(item);
+			// container->setLayout(new QVBoxLayout(container));
+			// container->layout()->setContentsMargins(0, 0, 0, 0);
+			// container->layout()->addWidget(header);
+			// container->layout()->addWidget(item);
 
-			StyleHelper::IIOWidget(container, "iioWidgetElement");
-			channelAttrMenu->contentLayout()->addWidget(container);
+			// StyleHelper::IIOWidget(container, "iioWidgetElement");
+			channelAttrMenu->layout()->addWidget(item);
 		}
 	}
 	wch2->layout()->addWidget(channelAttrMenu);

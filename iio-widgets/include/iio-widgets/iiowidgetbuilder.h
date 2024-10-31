@@ -53,7 +53,7 @@ public:
 		RangeUi,
 	};
 
-	explicit IIOWidgetBuilder(QObject *parent = nullptr);
+	explicit IIOWidgetBuilder(QWidget *parent = nullptr);
 	~IIOWidgetBuilder();
 
 	/**
@@ -80,6 +80,23 @@ public:
 	 * @param connection
 	 */
 	IIOWidgetBuilder &connection(scopy::Connection *connection);
+
+	/**
+	 * @brief Sets the UI of the widgets to compact mode, this way, the widget
+	 * sizes will be more compact.
+	 * @param isCompact If this is set to true, the widget will be in compact
+	 * mode. If false, the widget will be in normal mode.
+	 * @return
+	 */
+	IIOWidgetBuilder &compactMode(bool isCompact);
+
+	/**
+	 * @brief includeDebugAttributes If set to true, the buildAll function will
+	 * also include the debugfs attributes when creating the IIOWidgets.
+	 * @param isIncluded Default value is false.
+	 * @return
+	 */
+	IIOWidgetBuilder &includeDebugAttributes(bool isIncluded);
 
 	/**
 	 * @brief Sets the context that will be used, if no iio_device or iio_channel
@@ -151,6 +168,8 @@ private:
 	GuiStrategyInterface *createUIS();
 
 	Connection *m_connection;
+	bool m_isCompact;
+	bool m_includeDebugAttrs;
 	struct iio_context *m_context;
 	struct iio_device *m_device;
 	struct iio_channel *m_channel;

@@ -23,10 +23,12 @@
 #include "ad74413r/buffermenuview.h"
 #include "swiot_logging_categories.h"
 
+#include <QDesktopServices>
 #include <iio.h>
 #include <measurementlabel.h>
 #include <plotinfo.h>
 #include <plotinfowidgets.h>
+#include <tutorialbuilder.h>
 
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menuheader.h>
@@ -34,6 +36,7 @@
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/stylehelper.h>
 #include <gui/widgets/verticalchannelmanager.h>
+#include <pluginbase/preferences.h>
 
 #include <iioutil/connectionprovider.h>
 
@@ -161,6 +164,16 @@ void Ad74413r::onThresholdWritten(bool written)
 		Q_EMIT broadcastThreshold();
 	}
 	Q_EMIT activateRunBtns(activateBtns && written);
+}
+
+void Ad74413r::startTutorial()
+{
+	qInfo(CAT_SWIOT) << "Starting ad74413r tutorial.";
+	QWidget *parent = Util::findContainingWindow(this);
+	gui::TutorialBuilder *m_ad74413rTutorial =
+		new gui::TutorialBuilder(this, ":/swiot/tutorial_chapters.json", "ad74413r", parent);
+	m_ad74413rTutorial->setTitle("AD74413R");
+	m_ad74413rTutorial->start();
 }
 
 void Ad74413r::onActivateRunBtns(bool enable)
@@ -388,6 +401,16 @@ PlotAxis *Ad74413r::createYChnlAxis(QPen pen, QString unitType, int yMin, int yM
 	return chYAxis;
 }
 
+void Ad74413r::showEvent(QShowEvent *event)
+{
+	QWidget::showEvent(event);
+
+	if(Preferences::get("ad74413r_start_tutorial").toBool()) {
+		startTutorial();
+		Preferences::set("ad74413r_start_tutorial", false);
+	}
+}
+
 void Ad74413r::setupChannelBtn(MenuControlButton *btn, PlotChannel *ch, QString chnlId, int chnlIdx)
 {
 	btn->setName(chnlId);
@@ -442,7 +465,7 @@ void Ad74413r::setupChannel(int chnlIdx, QString function)
 		PlotAxisHandle *chHandle = new PlotAxisHandle(m_plot, chYAxis);
 		chHandle->handle()->setBarVisibility(BarVisibility::ON_HOVER);
 		chHandle->handle()->setColor(chPen.color());
-		chHandle->handle()->setHandlePos(HandlePos::SOUTH_EAST);
+		chHandle->handle()->setHandlePos(HandlePos::SOUTH_OR_EAST);
 		connect(chHandle, &PlotAxisHandle::scalePosChanged, this, [this, chYAxis](double pos) {
 			double min = chYAxis->min() - pos;
 			double max = chYAxis->max() - pos;
@@ -595,6 +618,11 @@ void Ad74413r::setupToolTemplate()
 	m_singleBtn->setChecked(false);
 	m_configBtn = createConfigBtn();
 
+	connect(m_infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+		QDesktopServices::openUrl(
+			QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/ad74413r.html"));
+	});
+
 	MenuControlButton *measure = new MenuControlButton(this);
 	setupMeasureButtonHelper(measure);
 	m_measurePanel = new MeasurementsPanel(this);
@@ -666,8 +694,8 @@ QWidget *Ad74413r::createSettingsMenu(QWidget *parent)
 
 	MenuHeaderWidget *header = new MenuHeaderWidget("AD74413R", QPen(StyleHelper::getColor("ScopyBlue")), widget);
 	MenuSectionWidget *plotSettingsContainer = new MenuSectionWidget(widget);
-	MenuCollapseSection *plotTimespanSection =
-		new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE, widget);
+	MenuCollapseSection *plotTimespanSection = new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE,
+									   MenuCollapseSection::MHW_BASEWIDGET, widget);
 	plotTimespanSection->setLayout(new QVBoxLayout());
 	plotTimespanSection->contentLayout()->setSpacing(10);
 	plotTimespanSection->contentLayout()->setMargin(0);

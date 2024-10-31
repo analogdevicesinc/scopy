@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "scopypreferencespage.h"
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -9,7 +30,8 @@
 #include <QCoreApplication>
 #include <QScrollArea>
 #include <stylehelper.h>
-#include "pluginbase/preferenceshelper.h"
+#include <deviceautoconnect.h>
+#include "gui/preferenceshelper.h"
 #include "application_restarter.h"
 #include <QDir>
 #include <QDebug>
@@ -17,7 +39,6 @@
 #include <common/scopyconfig.h>
 #include <translationsrepository.h>
 #include <widgets/menucollapsesection.h>
-#include <widgets/menusectionwidget.h>
 
 Q_LOGGING_CATEGORY(CAT_PREFERENCESPAGE, "ScopyPreferencesPage");
 
@@ -66,6 +87,41 @@ void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text)
 	lbl1->setText(text);
 	QTabBar *tabbar = tabWidget->tabBar();
 	tabbar->setTabButton(tabbar->count() - 1, QTabBar::RightSide, lbl1);
+}
+
+void ScopyPreferencesPage::initSessionDevices()
+{
+	QMap<QString, QStringList> prevSession;
+	QMap<QString, QVariant> devicesMap = Preferences::get("autoconnect_devices").toMap();
+	for(QMap<QString, QVariant>::iterator it = devicesMap.begin(); it != devicesMap.end(); ++it) {
+		QStringList plugins = it.value().toString().split(";");
+		prevSession[it.key()] = plugins;
+	}
+	updateSessionDevices(prevSession);
+}
+
+void ScopyPreferencesPage::updateSessionDevices(QMap<QString, QStringList> devices)
+{
+	int btnIdx = m_autoConnectWidget->contentLayout()->indexOf(m_devRefresh);
+	QStringList keys = devices.keys();
+	for(const QString &uri : qAsConst(keys)) {
+		if(!m_connDevices.contains(uri)) {
+			QString prefId = uri + "_sticky";
+			QCheckBox *devCb = new QCheckBox(uri, m_autoConnectWidget);
+			devCb->setObjectName(uri);
+			devCb->setChecked(Preferences::get(prefId).toBool());
+			m_connDevices[uri] = devCb;
+			m_autoConnectWidget->contentLayout()->insertWidget(btnIdx, devCb);
+			connect(devCb, &QCheckBox::toggled, this, [=](bool en) {
+				if(en) {
+					DeviceAutoConnect::addDevice(uri, devices[uri]);
+				} else {
+					DeviceAutoConnect::removeDevice(uri);
+				}
+				Preferences::set(prefId, en);
+			});
+		}
+	}
 }
 
 ScopyPreferencesPage::~ScopyPreferencesPage() {}
@@ -180,8 +236,8 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 
 	// General preferences
 	MenuSectionWidget *generalWidget = new MenuSectionWidget(page);
-	MenuCollapseSection *generalSection =
-		new MenuCollapseSection("General", MenuCollapseSection::MHCW_NONE, generalWidget);
+	MenuCollapseSection *generalSection = new MenuCollapseSection(
+		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, generalWidget);
 	generalWidget->contentLayout()->setSpacing(10);
 	generalWidget->contentLayout()->addWidget(generalSection);
 	generalSection->contentLayout()->setSpacing(10);
@@ -208,15 +264,45 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 		PreferencesHelper::addPreferenceCheckBox(p, "show_grid", "Show Grid", generalSection));
 	generalSection->contentLayout()->addWidget(
 		PreferencesHelper::addPreferenceCheckBox(p, "show_graticule", "Show Graticule", generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
+		p, "iiowidgets_use_lazy_loading", "Use Lazy Loading", generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
+		p, "general_use_native_dialogs", "Use native dialogs", generalSection));
+	QCheckBox *autoConnectCb = PreferencesHelper::addPreferenceCheckBox(
+		p, "autoconnect_previous", "Auto-connect to previous session", generalSection);
+	generalSection->contentLayout()->addWidget(autoConnectCb);
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
 		p, "general_theme", "Theme", {"default", "light"}, generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
 		p, "general_language", "Language", t->getLanguages(), generalSection));
+	generalSection->contentLayout()->addWidget(
+		PreferencesHelper::addPreferenceCheckBox(p, "general_connect_to_multiple_devices",
+							 "Connect to multiple devices (EXPERIMENTAL)", generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
+		p, "general_scan_for_devices", "Regularly scan for new devices", generalSection));
+
+	// Auto-connect
+	m_autoConnectWidget = new MenuSectionCollapseWidget("Session devices", MenuCollapseSection::MHCW_NONE,
+							    MenuCollapseSection::MHW_COMPOSITEWIDGET, page);
+	MenuCollapseHeader *autoConnectHeader =
+		dynamic_cast<MenuCollapseHeader *>(m_autoConnectWidget->collapseSection()->header());
+	autoConnectHeader->headerWidget()->layout()->addWidget(
+		new QLabel("At each auto-connect session, it will try to connect to the checked devices"));
+	m_autoConnectWidget->contentLayout()->setSpacing(10);
+	lay->addWidget(m_autoConnectWidget);
+	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	m_devRefresh = new QPushButton("Refresh", m_autoConnectWidget);
+	m_devRefresh->setMaximumWidth(80);
+	StyleHelper::BlueButton(m_devRefresh);
+	m_autoConnectWidget->add(m_devRefresh);
+
+	connect(m_devRefresh, &QPushButton::pressed, this, &ScopyPreferencesPage::refreshDevicesPressed);
 
 	// Debug preferences
 	MenuSectionWidget *debugWidget = new MenuSectionWidget(page);
-	MenuCollapseSection *debugSection =
-		new MenuCollapseSection("Debug", MenuCollapseSection::MHCW_NONE, debugWidget);
+	MenuCollapseSection *debugSection = new MenuCollapseSection("Debug", MenuCollapseSection::MHCW_NONE,
+								    MenuCollapseSection::MHW_BASEWIDGET, debugWidget);
 	debugWidget->contentLayout()->setSpacing(10);
 	debugWidget->contentLayout()->addWidget(debugSection);
 	debugSection->contentLayout()->setSpacing(10);

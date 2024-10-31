@@ -64,12 +64,13 @@ using namespace scopy::m2k;
 using namespace libm2k;
 using namespace libm2k::context;
 
-DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man, QWidget *parent)
-	: M2kTool(ctx, tme, new DMM_API(this), "Voltmeter", parent)
+DMM::DMM(libm2k::context::M2k *m2k, QString uri, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
+	 QWidget *parent)
+	: M2kTool(tme, new DMM_API(this), "Voltmeter", parent)
 	, ui(new Ui::DMM)
 	, signal(std::make_shared<signal_sample>())
-	, manager(m2k_man->get_instance(ctx, filt->device_name(TOOL_DMM)))
-	, m_m2k_context(m2kOpen(ctx, ""))
+	, manager(m2k_man->get_instance(m2k, filt->device_name(TOOL_DMM)))
+	, m_m2k_context(m2k)
 	, m_m2k_analogin(m_m2k_context->getAnalogIn())
 	, m_adc_nb_channels(m_m2k_analogin->getNbChannels())
 	, interrupt_data_logging(false)
@@ -80,6 +81,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, m2k_iio_mana
 	, wheelEventGuard(nullptr)
 	, m_autoGainEnabled({true, true})
 	, m_gainHistorySize(25)
+	, m_uri(uri)
 {
 	ui->setupUi(this);
 
@@ -205,7 +207,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, m2k_iio_mana
 	wheelEventGuard->installEventRecursively(ui->widget_2);
 	readPreferences();
 
-	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/voltmeter");
+	ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/voltmeter.html");
 
 	for(unsigned int i = 0; i < m_adc_nb_channels; i++) {
 		m_gainHistory.push_back(std::deque<libm2k::analog::M2K_RANGE>(m_gainHistorySize));
@@ -494,7 +496,7 @@ void DMM::toggleTimer(bool start)
 {
 	enableDataLogging(start);
 	if(start) {
-		ResourceManager::open("m2k-adc", this);
+		ResourceManager::open("m2k-adc" + m_uri, this);
 		manager->set_kernel_buffer_count(4);
 		writeAllSettingsToHardware();
 		manager->start(id_ch1);
@@ -509,7 +511,7 @@ void DMM::toggleTimer(bool start)
 		manager->stop(id_ch1);
 		manager->stop(id_ch2);
 		manager->set_kernel_buffer_count();
-		ResourceManager::close("m2k-adc");
+		ResourceManager::close("m2k-adc" + m_uri);
 	}
 
 	setDynamicProperty(ui->run_button, "running", start);

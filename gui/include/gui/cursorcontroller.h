@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef CURSORCONTROLLER_H
 #define CURSORCONTROLLER_H
 
@@ -15,8 +36,12 @@ public:
 	CursorController(PlotWidget *plot, QObject *parent = nullptr);
 	~CursorController();
 
-	CursorSettings *getCursorSettings();
 	PlotCursors *getPlotCursors();
+	void connectSignals(CursorSettings *cursorSettings);
+
+	void static syncXCursorControllers(CursorController *ctrl1, CursorController *ctrl2);
+	void static unsyncXCursorControllers(CursorController *ctrl1, CursorController *ctrl2);
+	bool isVisible();
 
 public Q_SLOTS:
 	void setVisible(bool visible);
@@ -30,6 +55,10 @@ public Q_SLOTS:
 	void readoutsDragToggled(bool toggled);
 	void onAddedChannel(PlotChannel *ch);
 	void onRemovedChannel(PlotChannel *ch);
+	void updateTracking();
+
+Q_SIGNALS:
+	void visibilityChanged(bool visible);
 
 private:
 	PlotWidget *m_plot;
@@ -46,10 +75,9 @@ private:
 	bool xEn, xLock, xTrack;
 	bool yEn, yLock;
 	bool readoutDragsEn;
+	bool m_visible;
 
 	void initUI();
-	void connectSignals();
-	void initSession();
 };
 } // namespace scopy
 #endif // CURSORCONTROLLER_H

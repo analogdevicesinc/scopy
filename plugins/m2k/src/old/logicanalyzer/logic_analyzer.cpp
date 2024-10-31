@@ -72,9 +72,9 @@ static gint sort_pds(gconstpointer a, gconstpointer b)
 	return strcmp(sda->id, sdb->id);
 }
 
-LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, QJSEngine *engine,
+LogicAnalyzer::LogicAnalyzer(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, QJSEngine *engine,
 			     QWidget *parent, bool offline_mode_)
-	: M2kTool(nullptr, tme, new LogicAnalyzer_API(this), "Logic Analyzer", parent)
+	: M2kTool(tme, new LogicAnalyzer_API(this), "Logic Analyzer", parent)
 	, ui(new Ui::LogicAnalyzer)
 	, m_plot(this, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter)
 	, m_bufferPreviewer(new DigitalBufferPreviewer(40, this))
@@ -97,7 +97,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuEntr
 	, m_sampleRate(1000000)
 	, m_bufferSize(1000)
 	, m_lastCapturedSample(0)
-	, m_m2k_context(m2kOpen(ctx, ""))
+	, m_m2k_context(m2k)
 	, m_m2kDigital(m_m2k_context->getDigital())
 	, m_nbChannels(DIGITAL_NR_CHANNELS)
 	, m_horizOffset(0.0)
@@ -248,7 +248,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuEntr
 	m_wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
 	m_wheelEventGuard->installEventRecursively(ui->mainWidget);
 
-	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/logicanalyzer");
+	ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/logic_analyzer.html");
 }
 
 LogicAnalyzer::~LogicAnalyzer()
@@ -1973,7 +1973,7 @@ HoverWidget *LogicAnalyzer::createHoverToolTip(QString info, QPoint position)
 	QWidget *content = new QWidget(this);
 	StyleHelper::HoverToolTip(content, info);
 
-	HoverWidget *toolTip = new scopy::HoverWidget(content, &m_plot, QApplication::activeWindow());
+	HoverWidget *toolTip = new scopy::HoverWidget(content, &m_plot, this);
 	toolTip->setAnchorPos(scopy::HoverPosition::HP_TOPLEFT);
 	toolTip->setContentPos(scopy::HoverPosition::HP_TOPLEFT);
 	toolTip->setAnchorOffset(position);

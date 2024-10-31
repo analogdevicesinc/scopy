@@ -1,4 +1,25 @@
-﻿#include "scopyhomeaddpage.h"
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
+#include "scopyhomeaddpage.h"
 #include "devicefactory.h"
 #include "deviceloader.h"
 
@@ -187,8 +208,8 @@ QWidget *ScopyHomeAddPage::createInfoSection(QWidget *parent)
 	infoScrollArea->setWidgetResizable(true);
 	infoScrollArea->setWidget(infoSection);
 
-	MenuCollapseSection *deviceInfoSection =
-		new MenuCollapseSection("Device info", MenuCollapseSection::MHCW_ONOFF, infoSection);
+	MenuCollapseSection *deviceInfoSection = new MenuCollapseSection(
+		"Device info", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, infoSection);
 	deviceInfoSection->contentLayout()->setSpacing(10);
 	deviceInfoSection->contentLayout()->setMargin(0);
 
@@ -197,8 +218,8 @@ QWidget *ScopyHomeAddPage::createInfoSection(QWidget *parent)
 	m_deviceInfoPage->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	deviceInfoSection->contentLayout()->addWidget(m_deviceInfoPage);
 
-	m_pluginBrowserSection =
-		new MenuCollapseSection("Compatible plugins", MenuCollapseSection::MHCW_ONOFF, infoSection);
+	m_pluginBrowserSection = new MenuCollapseSection("Compatible plugins", MenuCollapseSection::MHCW_ONOFF,
+							 MenuCollapseSection::MHW_BASEWIDGET, infoSection);
 	m_pluginBrowserSection->contentLayout()->setSpacing(10);
 	m_pluginBrowserSection->contentLayout()->setMargin(0);
 

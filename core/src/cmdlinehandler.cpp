@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "cmdlinehandler.h"
 
 using namespace scopy;
@@ -33,6 +54,13 @@ int CmdLineHandler::handle(QCommandLineParser &parser, ScopyMainWindow_API &scop
 		bool exitApp = !keepRunning;
 		QMetaObject::invokeMethod(&scopyApi, "runScript", Qt::QueuedConnection, Q_ARG(QString, scriptPath),
 					  Q_ARG(bool, exitApp));
+	}
+
+	QStringList scriptListPath = parser.values("script-list");
+	if(!scriptListPath.isEmpty()) {
+		bool exitApp = !keepRunning;
+		QMetaObject::invokeMethod(&scopyApi, "runScriptList", Qt::QueuedConnection,
+					  Q_ARG(QStringList, scriptListPath), Q_ARG(bool, exitApp));
 	}
 	return EXIT_SUCCESS;
 }

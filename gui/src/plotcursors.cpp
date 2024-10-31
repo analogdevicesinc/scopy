@@ -1,10 +1,32 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "plotcursors.h"
 #include "plotaxis.h"
 
 using namespace scopy;
 
-PlotCursors::PlotCursors(PlotWidget *plot)
-	: m_plot(plot)
+PlotCursors::PlotCursors(PlotWidget *plot, QObject *parent)
+	: QObject(parent)
+	, m_plot(plot)
 	, m_tracking(false)
 {
 	initUI();
@@ -15,10 +37,14 @@ PlotCursors::~PlotCursors() {}
 
 void PlotCursors::initUI()
 {
-	m_yCursors.first = new PlotAxisHandle(m_plot, m_plot->selectedChannel()->yAxis());
-	m_yCursors.second = new PlotAxisHandle(m_plot, m_plot->selectedChannel()->yAxis());
-	m_xCursors.first = new PlotAxisHandle(m_plot, m_plot->selectedChannel()->xAxis());
-	m_xCursors.second = new PlotAxisHandle(m_plot, m_plot->selectedChannel()->xAxis());
+	m_yCursors.first = new PlotAxisHandle(m_plot, m_plot->yAxis());
+	m_yCursors.second = new PlotAxisHandle(m_plot, m_plot->yAxis());
+	m_xCursors.first = new PlotAxisHandle(m_plot, m_plot->xAxis());
+	m_xCursors.second = new PlotAxisHandle(m_plot, m_plot->xAxis());
+	m_xCursors.first->setPosition(0);
+	m_xCursors.second->setPosition(0);
+	m_yCursors.first->setPosition(0);
+	m_yCursors.second->setPosition(0);
 
 	plotMarker1 = new QwtPlotMarker();
 	plotMarker2 = new QwtPlotMarker();
@@ -51,10 +77,17 @@ void PlotCursors::connectSignals()
 		}
 	});
 	connect(m_plot, &PlotWidget::channelSelected, this, [=](PlotChannel *ch) {
-		m_yCursors.first->setAxis(ch->yAxis());
-		m_yCursors.second->setAxis(ch->yAxis());
-		m_xCursors.first->setAxis(ch->xAxis());
-		m_xCursors.second->setAxis(ch->xAxis());
+		PlotAxis *xAxis = m_plot->xAxis();
+		PlotAxis *yAxis = m_plot->xAxis();
+
+		if(ch != nullptr) {
+			xAxis = ch->xAxis();
+			yAxis = ch->yAxis();
+		}
+		m_yCursors.first->setAxis(yAxis);
+		m_yCursors.second->setAxis(yAxis);
+		m_xCursors.first->setAxis(xAxis);
+		m_xCursors.second->setAxis(xAxis);
 		Q_EMIT update();
 	});
 }
@@ -128,8 +161,12 @@ void PlotCursors::enableTracking(bool tracking)
 	Q_EMIT update();
 }
 
+bool PlotCursors::tracking() const { return m_tracking; }
+
 void PlotCursors::displayIntersection()
 {
+	if(m_plot->selectedChannel() == nullptr)
+		return;
 	QwtAxisId yaxis = m_plot->selectedChannel()->yAxis()->axisId();
 	QwtAxisId xaxis = m_plot->selectedChannel()->xAxis()->axisId();
 	double h1CursorPos = m_xCursors.first->getPosition();
@@ -138,8 +175,9 @@ void PlotCursors::displayIntersection()
 	plotMarker1->setAxes(xaxis, yaxis);
 	plotMarker2->setAxes(xaxis, yaxis);
 
-	plotMarker1->setValue(h1CursorPos, getHorizIntersectionAt(h1CursorPos));
-	plotMarker2->setValue(h2CursorPos, getHorizIntersectionAt(h2CursorPos));
+	auto ch = m_plot->selectedChannel();
+	plotMarker1->setValue(h1CursorPos, ch->getValueAt(h1CursorPos));
+	plotMarker2->setValue(h2CursorPos, ch->getValueAt(h2CursorPos));
 
 	Q_EMIT m_yCursors.first->scalePosChanged(plotMarker1->yValue());
 	Q_EMIT m_yCursors.second->scalePosChanged(plotMarker2->yValue());
@@ -157,62 +195,6 @@ void PlotCursors::setXHandlePos(HandlePos pos)
 {
 	m_xCursors.first->handle()->setHandlePos(pos);
 	m_xCursors.second->handle()->setHandlePos(pos);
-}
-
-double PlotCursors::getHorizIntersectionAt(double pos)
-{
-	auto tmp = m_plot->selectedChannel();
-	QwtSeriesData<QPointF> *curve_data = tmp->curve()->data();
-	int n = curve_data->size();
-
-	if(n == 0) {
-		return -1;
-	} else {
-		double leftTime, rightTime, leftCustom, rightCustom;
-		int rightIndex = -1;
-		int leftIndex = -1;
-		int left = 0;
-		int right = n - 1;
-
-		if(curve_data->sample(right).x() < pos || curve_data->sample(left).x() > pos) {
-			return -1;
-		}
-
-		while(left <= right) {
-			int mid = (left + right) / 2;
-			double xData = curve_data->sample(mid).x();
-
-			if(xData == pos) {
-				if(mid > 0) {
-					leftIndex = mid - 1;
-					rightIndex = mid;
-				}
-				break;
-			} else if(xData < pos) {
-				left = mid + 1;
-			} else {
-				right = mid - 1;
-			}
-		}
-
-		if((leftIndex == -1 || rightIndex == -1) && left > 0) {
-			leftIndex = left - 1;
-			rightIndex = left;
-		}
-		if(leftIndex == -1 || rightIndex == -1) {
-			return -1;
-		}
-
-		leftTime = curve_data->sample(leftIndex).x();
-		rightTime = curve_data->sample(rightIndex).x();
-
-		leftCustom = curve_data->sample(leftIndex).y();
-		rightCustom = curve_data->sample(rightIndex).y();
-
-		double value = (rightCustom - leftCustom) / (rightTime - leftTime) * (pos - leftTime) + leftCustom;
-
-		return value;
-	}
 }
 
 #include "moc_plotcursors.cpp"

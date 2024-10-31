@@ -1,22 +1,44 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "pqmplugin.h"
-#include "qlabel.h"
 
 #include <QLoggingCategory>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <acquisitionmanager.h>
 #include <harmonicsinstrument.h>
+#include <pqmdatalogger.h>
 #include <rmsinstrument.h>
 #include <settingsinstrument.h>
 #include <waveforminstrument.h>
 
 #include <pluginbase/preferences.h>
 #include <iioutil/connectionprovider.h>
+#include <iioutil/iiopingtask.h>
 
 Q_LOGGING_CATEGORY(CAT_PQMPLUGIN, "PQMPlugin");
 using namespace scopy::pqm;
 
-void PQMPlugin::preload() { m_pqmController = new PqmController(m_param); }
+void PQMPlugin::preload() {}
 
 bool PQMPlugin::compatible(QString m_param, QString category)
 {
@@ -89,14 +111,7 @@ void PQMPlugin::loadToolList()
 						  ":/gui/icons/scopy-default/icons/tool_debugger.svg"));
 }
 
-void PQMPlugin::unload()
-{
-	delete m_infoPage;
-	if(m_pqmController) {
-		delete m_pqmController;
-		m_pqmController = nullptr;
-	}
-}
+void PQMPlugin::unload() { delete m_infoPage; }
 
 QString PQMPlugin::description() { return "Adds functionality specific to PQM board"; }
 
@@ -108,29 +123,36 @@ bool PQMPlugin::onConnect()
 		return false;
 	}
 	struct iio_context *ctx = conn->context();
-	connect(m_pqmController, &PqmController::pingFailed, this, &PQMPlugin::disconnectDevice);
-	m_pqmController->startPingTask(ctx);
+	m_pingTask = new IIOPingTask(ctx, this);
 
-	m_acqManager = new AcquisitionManager(ctx, this);
+	m_acqManager = new AcquisitionManager(ctx, m_pingTask, this);
+	bool hasFwVers = m_acqManager->hasFwVers();
 
-	RmsInstrument *rms = new RmsInstrument();
-	m_toolList[0]->setTool(rms);
-	m_toolList[0]->setEnabled(true);
-	m_toolList[0]->setRunBtnVisible(true);
+	ToolMenuEntry *rmsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "pqmrms");
+	RmsInstrument *rms = new RmsInstrument(rmsTme, m_param);
+	rmsTme->setTool(rms);
+	rmsTme->setEnabled(true);
+	rmsTme->setRunBtnVisible(true);
 	connect(m_acqManager, &AcquisitionManager::pqmAttrsAvailable, rms, &RmsInstrument::onAttrAvailable);
 
-	HarmonicsInstrument *harmonics = new HarmonicsInstrument();
-	m_toolList[1]->setTool(harmonics);
-	m_toolList[1]->setEnabled(true);
-	m_toolList[1]->setRunBtnVisible(true);
+	ToolMenuEntry *harmonicsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "pqmharmonics");
+	HarmonicsInstrument *harmonics = new HarmonicsInstrument(harmonicsTme, m_param);
+	harmonics->showThdWidget(hasFwVers);
+	harmonicsTme->setTool(harmonics);
+	harmonicsTme->setEnabled(true);
+	harmonicsTme->setRunBtnVisible(true);
 	connect(m_acqManager, &AcquisitionManager::pqmAttrsAvailable, harmonics, &HarmonicsInstrument::onAttrAvailable);
+	connect(harmonics, &HarmonicsInstrument::logData, m_acqManager, &AcquisitionManager::logData);
 
-	WaveformInstrument *waveform = new WaveformInstrument();
-	m_toolList[2]->setTool(waveform);
-	m_toolList[2]->setEnabled(true);
-	m_toolList[2]->setRunBtnVisible(true);
+	ToolMenuEntry *waveformTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "pqmwaveform");
+	WaveformInstrument *waveform = new WaveformInstrument(waveformTme, m_param);
+	waveform->showOneBuffer(hasFwVers);
+	waveformTme->setTool(waveform);
+	waveformTme->setEnabled(true);
+	waveformTme->setRunBtnVisible(true);
 	connect(m_acqManager, &AcquisitionManager::bufferDataAvailable, waveform,
-		&WaveformInstrument::onBufferDataAvailable);
+		&WaveformInstrument::onBufferDataAvailable, Qt::QueuedConnection);
+	connect(waveform, &WaveformInstrument::logData, m_acqManager, &AcquisitionManager::logData);
 
 	SettingsInstrument *settings = new SettingsInstrument();
 	m_toolList[3]->setTool(settings);
@@ -141,10 +163,6 @@ bool PQMPlugin::onConnect()
 	connect(settings, &SettingsInstrument::setAttributes, m_acqManager, &AcquisitionManager::setConfigAttr);
 
 	for(auto &tool : m_toolList) {
-		if(tool->runBtnVisible()) {
-			connect(tool, SIGNAL(runClicked(bool)), tool->tool(), SIGNAL(runTme(bool)));
-			connect(tool->tool(), SIGNAL(enableTool(bool)), tool, SLOT(setRunning(bool)));
-		}
 		connect(tool->tool(), SIGNAL(enableTool(bool, QString)), m_acqManager,
 			SLOT(toolEnabled(bool, QString)));
 	}
@@ -153,8 +171,6 @@ bool PQMPlugin::onConnect()
 
 bool PQMPlugin::onDisconnect()
 {
-	m_pqmController->stopPingTask();
-	disconnect(m_pqmController);
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);
@@ -171,10 +187,31 @@ bool PQMPlugin::onDisconnect()
 	disconnect(m_acqManager);
 	delete m_acqManager;
 	m_acqManager = nullptr;
-
+	clearPingTask();
 	ConnectionProvider *cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
 	return true;
+}
+
+void PQMPlugin::startPingTask() { m_acqManager->startPing(); }
+
+void PQMPlugin::stopPingTask() { m_acqManager->stopPing(); }
+
+void PQMPlugin::onPausePingTask(bool pause)
+{
+	if(pause) {
+		m_acqManager->stopPing();
+	} else {
+		m_acqManager->startPing();
+	}
+}
+
+void PQMPlugin::clearPingTask()
+{
+	if(m_pingTask) {
+		m_pingTask->deleteLater();
+		m_pingTask = nullptr;
+	}
 }
 
 void PQMPlugin::initMetadata()

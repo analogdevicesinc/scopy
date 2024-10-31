@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef DEVICE_H
 #define DEVICE_H
 
@@ -11,6 +32,15 @@ namespace scopy {
 class SCOPY_CORE_EXPORT Device
 {
 public:
+	typedef enum
+	{
+		DEV_ERROR = -1,
+		DEV_INIT = 0,
+		DEV_IDLE = 1,
+		DEV_CONNECTING = 2,
+		DEV_CONNECTED = 3,
+		DEV_DISCONNECTING = 4,
+	} DeviceState_t;
 	virtual ~Device(){};
 	virtual QString id() = 0;
 	virtual QString category() = 0;
@@ -18,14 +48,15 @@ public:
 	virtual QString param() = 0;
 	virtual QString displayParam() = 0;
 	virtual QWidget *icon() = 0;
-	;
+
 	virtual QWidget *page() = 0;
-	;
+
 	virtual QList<ToolMenuEntry *> toolList() = 0;
 	virtual void init() = 0;
 	virtual void preload() = 0;
 	virtual void loadPlugins() = 0;
 	virtual void unloadPlugins() = 0;
+	virtual DeviceState_t state() = 0;
 
 public Q_SLOTS:
 	virtual void connectDev() = 0;
@@ -37,7 +68,9 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	virtual void toolListChanged() = 0;
+	virtual void connecting() = 0;
 	virtual void connected() = 0;
+	virtual void disconnecting() = 0;
 	virtual void disconnected() = 0;
 	virtual void requestedRestart() = 0;
 	virtual void requestTool(QString) = 0;

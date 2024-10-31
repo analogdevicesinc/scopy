@@ -168,12 +168,12 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 	// Build the flowgraph only once
 	m_initFlowgraph = false;
 
-	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/networkanalyzer");
+	ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/network_analyzer.html");
 }
 
-NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
-				 QJSEngine *engine, QWidget *parent)
-	: M2kTool(ctx, tme, new NetworkAnalyzer_API(this), "Network Analyzer", parent)
+NetworkAnalyzer::NetworkAnalyzer(libm2k::context::M2k *m2k, QString uri, Filter *filt, ToolMenuEntry *tme,
+				 m2k_iio_manager *m2k_man, QJSEngine *engine, QWidget *parent)
+	: M2kTool(tme, new NetworkAnalyzer_API(this), "Network Analyzer", parent)
 	, ui(new Ui::NetworkAnalyzer)
 	, m_m2k_context(nullptr)
 	, m_m2k_analogin(nullptr)
@@ -197,19 +197,17 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenu
 	, m_importDataLoaded(false)
 	, m_nb_averaging(1)
 	, m_nb_periods(2)
+	, m_uri(uri)
 {
-	if(ctx) {
-		iio = m2k_man->get_instance(ctx, filt->device_name(TOOL_NETWORK_ANALYZER, 2));
-
-		m_m2k_context = m2kOpen(ctx, "");
-		if(m_m2k_context) {
-			m_m2k_analogin = m_m2k_context->getAnalogIn();
-			m_m2k_analogout = m_m2k_context->getAnalogOut();
-			m_adc_nb_channels = m_m2k_analogin->getNbChannels();
-			m_dac_nb_channels = m_m2k_analogout->getNbChannels();
-			m_m2k_analogout->setKernelBuffersCount(0, 1);
-			m_m2k_analogout->setKernelBuffersCount(1, 1);
-		}
+	if(m2k) {
+		m_m2k_context = m2k;
+		iio = m2k_man->get_instance(m_m2k_context, filt->device_name(TOOL_NETWORK_ANALYZER, 2));
+		m_m2k_analogin = m_m2k_context->getAnalogIn();
+		m_m2k_analogout = m_m2k_context->getAnalogOut();
+		m_adc_nb_channels = m_m2k_analogin->getNbChannels();
+		m_dac_nb_channels = m_m2k_analogout->getNbChannels();
+		m_m2k_analogout->setKernelBuffersCount(0, 1);
+		m_m2k_analogout->setKernelBuffersCount(1, 1);
 	}
 
 	ui->setupUi(this);
@@ -974,7 +972,14 @@ void NetworkAnalyzer::updateGainMode()
 
 unsigned long NetworkAnalyzer::_getBestSampleRate(double frequency, unsigned int chn_idx)
 {
-	std::vector<double> values = m_m2k_analogout->getAvailableSampleRates(chn_idx);
+	std::vector<double> values;
+	try {
+		values = m_m2k_analogout->getAvailableSampleRates(chn_idx);
+	} catch(...) {
+		qWarning() << "M2k retrieve sample rates failed. Returning best sample rate 0.";
+		return 0;
+	}
+
 	std::sort(values.begin(), values.end(), std::less<double>());
 
 	for(const auto &rate : values) {
@@ -1273,8 +1278,12 @@ void NetworkAnalyzer::goertzel()
 			mag1_averaged_sum += mag1;
 			mag2_averaged_sum += mag2;
 			dcOffset_averaged_sum += dcOffset;
-			ui->currentAverageLabel->setText(QString(tr("Average: ") + QString::number(avg) + " / " +
-								 QString::number(m_nb_averaging)));
+
+			QString average_label_str = QString(tr("Average: ") + QString::number(avg) + " / " +
+							    QString::number(m_nb_averaging));
+			QMetaObject::invokeMethod(ui->currentAverageLabel, "setText", Qt::QueuedConnection,
+						  Q_ARG(QString, average_label_str));
+
 			if(avg == m_nb_averaging) {
 				mag1 = mag1_averaged_sum / m_nb_averaging;
 				mag2 = mag2_averaged_sum / m_nb_averaging;
@@ -1606,8 +1615,8 @@ void NetworkAnalyzer::startStop(bool pressed)
 	ui->spinBox_periods->setEnabled(!pressed);
 
 	if(pressed) {
-		ResourceManager::open("m2k-adc", this);
-		ResourceManager::open("m2k-dac", this);
+		ResourceManager::open("m2k-adc" + m_uri, this);
+		ResourceManager::open("m2k-dac" + m_uri, this);
 		m_m2k_analogin->setKernelBuffersCount(1);
 		if(shouldClear) {
 			m_dBgraph.reset();
@@ -1639,8 +1648,8 @@ void NetworkAnalyzer::startStop(bool pressed)
 		m_dBgraph.sweepDone();
 		m_phaseGraph.sweepDone();
 		ui->statusLabel->setText(tr("Stopped"));
-		ResourceManager::close("m2k-dac");
-		ResourceManager::close("m2k-adc");
+		ResourceManager::close("m2k-dac" + m_uri);
+		ResourceManager::close("m2k-adc" + m_uri);
 		try {
 			m_m2k_analogin->setKernelBuffersCount(KERNEL_BUFFERS_DEFAULT);
 		} catch(libm2k::m2k_exception &e) {

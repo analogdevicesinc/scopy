@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "iioscantask.h"
 
 #include <iio.h>
@@ -18,7 +39,7 @@ Q_LOGGING_CATEGORY(CAT_IIOSCANCTX, "IIOScanTask");
 
 void IIOScanTask::run()
 {
-	QStringList ctxs;
+	QVector<QPair<QString, QString>> ctxs;
 	int ret = IIOScanTask::scan(&ctxs, scanParams);
 	if(isInterruptionRequested())
 		return;
@@ -28,9 +49,9 @@ void IIOScanTask::run()
 
 void IIOScanTask::setScanParams(QString s) { scanParams = s; }
 
-int IIOScanTask::scan(QStringList *ctxs, QString scanParams)
+int IIOScanTask::scan(QVector<QPair<QString, QString>> *ctxs, QString scanParams)
 {
-	qDebug(CAT_IIOSCANCTX) << "start scanning";
+	qInfo(CAT_IIOSCANCTX) << "start scanning";
 	struct iio_scan_context *scan_ctx = NULL;
 	struct iio_context_info **info;
 	int num_contexts;
@@ -60,7 +81,8 @@ int IIOScanTask::scan(QStringList *ctxs, QString scanParams)
 
 	qDebug(CAT_IIOSCANCTX) << "found " << num_contexts << "contexts in " << et.elapsed() << "miliseconds ";
 	for(i = 0; i < num_contexts; i++) {
-		ctxs->append(QString(iio_context_info_get_uri(info[i])));
+		QString description = parseDescription(QString(iio_context_info_get_description(info[i])));
+		ctxs->append({description, QString(iio_context_info_get_uri(info[i]))});
 	}
 	iio_context_info_list_free(info);
 	qDebug(CAT_IIOSCANCTX) << "scanned " << *ctxs;
@@ -68,6 +90,23 @@ int IIOScanTask::scan(QStringList *ctxs, QString scanParams)
 scan_err:
 	iio_scan_context_destroy(scan_ctx);
 	return ret;
+}
+
+QString IIOScanTask::parseDescription(const QString &d)
+{
+	int startPos = d.indexOf('(');
+	if(startPos == -1) {
+		return d;
+	}
+	int endPos = d.indexOf(")), serial=");
+	if(endPos == -1) {
+		endPos = d.lastIndexOf(')');
+	} else {
+		startPos += 1;
+	}
+
+	QString description = d.mid(startPos, endPos - startPos + 1);
+	return description;
 }
 
 QVector<QString> IIOScanTask::getSerialPortsName()

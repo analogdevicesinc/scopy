@@ -53,7 +53,7 @@ public:
 	typedef gr::blocks::copy::sptr port_id;
 
 	const unsigned id;
-	iio_manager(unsigned int id, struct iio_context *ctx, QString dev, unsigned long buffer_size);
+	iio_manager(unsigned int id, libm2k::context::M2k *ctx, QString dev, unsigned long buffer_size);
 	~iio_manager();
 
 	/* Connect a block to one of the channels of the IIO source.
@@ -180,7 +180,7 @@ public:
 
 	/* Get a shared pointer to the instance of iio_manager that
 	 * manages the requested device */
-	std::shared_ptr<iio_manager> get_instance(struct iio_context *ctx, QString dev,
+	std::shared_ptr<iio_manager> get_instance(libm2k::context::M2k *ctx, QString dev,
 						  unsigned long buffer_size = IIO_BUFFER_SIZE);
 
 private:

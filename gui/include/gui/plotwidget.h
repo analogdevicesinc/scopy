@@ -1,5 +1,27 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef PLOT_H
 #define PLOT_H
+#include "plotbuttonmanager.h"
 #include "plotchannel.h"
 #include "scopy-gui_export.h"
 
@@ -22,17 +44,14 @@ class PlotTracker;
 
 typedef struct _PlotSamplingInfo
 {
-	_PlotSamplingInfo()
-	{
-		startingPoint = 0;
-		freqOffset = 0;
-	}
 	uint32_t bufferSize = 0;
 	uint32_t plotSize = 0;
 	double sampleRate = 0;
 	double startingPoint = 0;
 	double freqOffset = 0;
-} PlotSamplingInfo;
+	bool complexMode = 0;
+	bool rollingMode = 0;
+} SamplingInfo;
 
 class SCOPY_GUI_EXPORT PlotWidget : public QWidget
 {
@@ -78,6 +97,12 @@ public:
 
 	void setUnitsVisible(bool visible);
 
+	void printPlot(QPainter *painter, bool useSymbols = false);
+	void plotChannelChangeYAxis(PlotChannel *c, PlotAxis *y);
+	void plotChannelChangeXAxis(PlotChannel *c, PlotAxis *x);
+
+	PlotButtonManager *plotButtonManager() const;
+
 public Q_SLOTS:
 	void replot();
 	void selectChannel(PlotChannel *);
@@ -121,15 +146,17 @@ private:
 
 	PlotChannel *m_selectedChannel;
 
-	BufferPreviewer *m_bufferPreviewer;
 	PlotInfo *m_plotInfo;
 	PlotScales *m_plotScales;
+	PlotButtonManager *m_plotButtonManager;
 
 	void setupOpenGLCanvas();
 	void setupNavigator();
 	void setupPlotInfo();
 	void setupPlotScales();
 	void setupAxes();
+	void setupPlotButtonManager();
+	QwtSymbol::Style getCurveStyle(int i);
 };
 
 } // namespace scopy

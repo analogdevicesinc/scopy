@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef STYLEHELPER_H
 #define STYLEHELPER_H
 
@@ -66,13 +87,14 @@ public:
 	static void MenuSmallLabel(QLabel *lbl, QString objectName = "");
 	static void MenuComboWidget(QWidget *w, QString objectName = "");
 	static void MenuSectionWidget(QWidget *w, QString objectName = "");
-	static void MenuSpinBox(SpinBoxA *w, QString objectName = "");
-	static void MenuSpinComboBox(QComboBox *w, QString objectName);
+	// static void MenuSpinBox(SpinBoxA *w, QString objectName = "");
+	static void MenuSpinComboBox(QComboBox *w, QString objectName = "");
 	static void MenuOnOffSwitch(QWidget *w, QString objectName = "");
 	static void MenuOnOffSwitchLabel(QLabel *w, QString objectName = "");
 	static void MenuOnOffSwitchButton(SmallOnOffSwitch *w, QString objectName = "");
 	static void MenuCollapseSection(QWidget *w, QString objectName = "");
 	static void MenuCollapseHeaderLabel(QLabel *w, QString objectName = "");
+	static void MenuCollapseHeaderLineEdit(QLineEdit *w, QString objectName = "");
 	static void MenuComboLabel(QLabel *w, QString objectName = "");
 	static void MenuHeaderLabel(QLabel *w, QString objectName = "");
 	static void MenuControlLabel(QLabel *w, QString objectName = "");
@@ -108,8 +130,13 @@ public:
 	static void NoBackgroundIconButton(QPushButton *w, QIcon icon, QString objectName = "");
 	static void BackgroundAddPage(QWidget *w, QString objectName = "");
 	static void BrowseButton(QPushButton *btn, QString objectName = "");
-	static void SpinBoxUpButton(QPushButton *w, QString objectName);
-	static void SpinBoxDownButton(QPushButton *w, QString objectName);
+	static void SpinBoxUpButton(QPushButton *w, QString objectName = "");
+	static void SpinBoxDownButton(QPushButton *w, QString objectName = "");
+
+	static void MenuSpinboxLabel(QLabel *m_label, QString objectName = "");
+	static void MenuSpinboxLineEdit(QLineEdit *m_edit, QString objectName = "");
+	static void MenuSpinboxLine(QFrame *w, QString objectName = "");
+
 	static void TabWidgetBarUnderline(QTabWidget *w, QString objectName = "");
 	static void TableWidgetDebugger(QTableWidget *w, QString objectName = "");
 	static void SplitterStyle(QSplitter *w, QString objectName = "");
@@ -118,6 +145,15 @@ public:
 	static void ActiveStoredLabel(QLabel *w, QString objectName = "");
 	static void FaultsFrame(QFrame *w, QString objectName = "");
 	static void FaultsExplanation(QWidget *w, QString objectName = "");
+	static void IIOCompactLabel(QLabel *label, QString objectName = "");
+	static void GrayButton(QPushButton *btn, QString objectName = "");
+
+	static void RoundedCornersWidget(QWidget *w, QString objectName = "");
+	static void ToolMenuBtn(QPushButton *btn, QString objectName = "");
+	static void ToolMenuHome(QPushButton *btn, QString objectName = "");
+	static void ToolMenuCollapseMini(QPushButton *btn, QString objectName = "");
+	static void ToolMenuCollapse(QPushButton *btn, QString objectName = "");
+	static void ScopyLogo(QLabel *label, QString objectName = "");
 
 private:
 	QMap<QString, QString> colorMap;

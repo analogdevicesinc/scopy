@@ -29,7 +29,7 @@
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy {
-class SCOPY_IIO_WIDGETS_EXPORT ComboAttrUi : public QWidget, public GuiStrategyInterface
+class SCOPY_IIO_WIDGETS_EXPORT ComboAttrUi : public QObject, public GuiStrategyInterface
 {
 	Q_OBJECT
 	Q_INTERFACES(scopy::GuiStrategyInterface)
@@ -37,7 +37,7 @@ public:
 	/**
 	 * @brief This contain a MenuComboWidget that takes the options for the combo from recipe->linkedAttributeValue.
 	 * */
-	explicit ComboAttrUi(IIOWidgetFactoryRecipe recipe, QWidget *parent = nullptr);
+	explicit ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QWidget *parent = nullptr);
 	~ComboAttrUi();
 
 	/**
@@ -57,7 +57,8 @@ Q_SIGNALS:
 
 private:
 	QWidget *m_ui;
-	MenuCombo *m_comboWidget;
+	QComboBox *m_comboWidget;
+	bool m_isCompact;
 };
 } // namespace scopy
 

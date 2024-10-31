@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "plotaxis.h"
 
 #include <QDebug>
@@ -26,7 +47,7 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
 
 	m_formatter = new MetricPrefixFormatter();
 	m_formatter->setTrimZeroes(true);
-	m_formatter->setTwoDecimalMode(true);
+	m_formatter->setTwoDecimalMode(false);
 	m_scaleDraw = new BasicScaleDraw(m_formatter, m_units);
 
 	m_scaleDraw->setColor(pen.color());
@@ -45,6 +66,8 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
 	connect(this, &PlotAxis::maxChanged, this, &PlotAxis::updateAxisScale);
 	setUnitsVisible(false);
 }
+
+PlotAxis::~PlotAxis() {}
 
 void PlotAxis::setUnitsVisible(bool visible) { m_scaleDraw->setUnitsEnabled(visible); }
 

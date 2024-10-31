@@ -46,6 +46,7 @@ public Q_SLOTS:
 	void singleButtonClicked();
 
 private Q_SLOTS:
+	void startTutorial();
 	void onBackBtnPressed();
 
 private:
@@ -64,6 +65,7 @@ private:
 	FaultsPage *m_faultsPage;
 
 	ToolMenuEntry *m_tme;
+	void showEvent(QShowEvent *event) override;
 };
 } // namespace scopy::swiot
 #endif // FAULTS_H

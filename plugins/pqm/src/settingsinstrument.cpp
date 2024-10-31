@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "settingsinstrument.h"
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/menulineedit.h>
@@ -58,6 +79,12 @@ void SettingsInstrument::onReadBtnPressed(bool en)
 	Q_EMIT enableTool(true);
 }
 
+void SettingsInstrument::setDateTimeAttr(QDateTime dateTime, QString attrName)
+{
+	QString systemTimeValue = dateTime.toString("yyyyMMddhhmmsszzz");
+	m_pqmAttr[DEVICE_NAME][attrName] = systemTimeValue;
+}
+
 void SettingsInstrument::updateCbValues(QComboBox *cb, QString attr)
 {
 	if(cb->count() <= 0) {
@@ -109,8 +136,8 @@ QWidget *SettingsInstrument::createConfigEdit(QString name, QString attr)
 
 void SettingsInstrument::initConfigSection(QWidget *parent)
 {
-	MenuCollapseSection *configSection =
-		new MenuCollapseSection("Config values", MenuCollapseSection::MHCW_ARROW, parent);
+	MenuCollapseSection *configSection = new MenuCollapseSection("Config values", MenuCollapseSection::MHCW_ARROW,
+								     MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	QWidget *configWidget = new QWidget(configSection);
 	configWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -179,62 +206,91 @@ void SettingsInstrument::initConfigSection(QWidget *parent)
 
 void SettingsInstrument::initSystemTimeSection(QWidget *parent)
 {
-	MenuCollapseSection *systemTimeSection =
-		new MenuCollapseSection("System time", MenuCollapseSection::MHCW_ARROW, parent);
+	MenuCollapseSection *systemTimeSection = new MenuCollapseSection("System time", MenuCollapseSection::MHCW_ARROW,
+									 MenuCollapseSection::MHW_BASEWIDGET, parent);
 	systemTimeSection->contentLayout()->setSpacing(6);
-	QDateEdit *dateEdit = new QDateEdit(systemTimeSection);
-	dateEdit->setDateTime(QDateTime::currentDateTime());
+	QDateTimeEdit *systemTimeEdit = new QDateTimeEdit(systemTimeSection);
+	systemTimeEdit->setDateTime(QDateTime::currentDateTime());
+	systemTimeEdit->setDisplayFormat("dd:MM:yyyy hh:mm:ss.zzz");
 	QPushButton *systemTimeBtn = new QPushButton("Set", systemTimeSection);
 	systemTimeBtn->setFixedWidth(88);
 	StyleHelper::BlueButton(systemTimeBtn, "systemTimeBtn");
 
-	systemTimeSection->contentLayout()->addWidget(dateEdit);
+	systemTimeSection->contentLayout()->addWidget(systemTimeEdit);
 	systemTimeSection->contentLayout()->addWidget(systemTimeBtn);
+
+	connect(systemTimeBtn, &QPushButton::clicked, this, [this, systemTimeEdit]() {
+		setDateTimeAttr(systemTimeEdit->dateTime(), SYSTEM_TIME_ATTR);
+		onSetBtnPressed();
+	});
 
 	parent->layout()->addWidget(systemTimeSection);
 }
 
 void SettingsInstrument::initTimestampSection(QWidget *parent)
 {
-	MenuCollapseSection *timestampSection =
-		new MenuCollapseSection("Timestamp", MenuCollapseSection::MHCW_ARROW, parent);
+	MenuCollapseSection *timestampSection = new MenuCollapseSection("Logging", MenuCollapseSection::MHCW_ARROW,
+									MenuCollapseSection::MHW_BASEWIDGET, parent);
 	timestampSection->contentLayout()->setSpacing(6);
+
+	QPushButton *startLogBtn = new QPushButton("Start", timestampSection);
+	startLogBtn->setFixedWidth(88);
+	StyleHelper::BlueButton(startLogBtn, "startLogBtn");
+	startLogBtn->setCheckable(true);
+	connect(startLogBtn, &QPushButton::clicked, this, [this, startLogBtn](bool checked) {
+		m_pqmAttr[DEVICE_NAME]["start_logging"] = QString::number(checked);
+		if(checked) {
+			startLogBtn->setText("Stop");
+		} else {
+			startLogBtn->setText("Start");
+		}
+		onSetBtnPressed();
+	});
 
 	QWidget *timestampWidget = new QWidget(timestampSection);
 	timestampWidget->setLayout(new QHBoxLayout());
 	timestampWidget->layout()->setContentsMargins(0, 0, 0, 0);
 	timestampWidget->layout()->setSpacing(10);
 
-	QTimeEdit *timestampEdit1 = new QTimeEdit(timestampSection);
-	timestampEdit1->setTime(QTime::currentTime());
-	timestampEdit1->setDisplayFormat("hh:mm:ss.zzz");
+	QDateTimeEdit *timestampEdit1 = new QDateTimeEdit(timestampSection);
+	timestampEdit1->setDateTime(QDateTime::currentDateTime());
+	timestampEdit1->setDisplayFormat("dd:MM:yyyy hh:mm:ss.zzz");
 
-	QTimeEdit *timestampEdit2 = new QTimeEdit(timestampSection);
-	timestampEdit2->setTime(QTime::currentTime());
-	timestampEdit2->setDisplayFormat("hh:mm:ss.zzz");
+	QDateTimeEdit *timestampEdit2 = new QDateTimeEdit(timestampSection);
+	timestampEdit2->setDateTime(QDateTime::currentDateTime());
+	timestampEdit2->setDisplayFormat("dd:MM:yyyy hh:mm:ss.zzz");
 
-	connect(timestampEdit1, &QTimeEdit::userTimeChanged, this, [=](QTime time) {
-		if(time > timestampEdit2->time()) {
-			timestampEdit1->setTime(timestampEdit2->time());
+	qInfo() << "Date time: " << timestampEdit2->dateTime().toString("yyyyMMddhhmmsszzz");
+
+	connect(timestampEdit1, &QDateTimeEdit::dateTimeChanged, this, [=](QDateTime dateTime) {
+		if(dateTime > timestampEdit2->dateTime()) {
+			timestampEdit1->setDateTime(timestampEdit2->dateTime());
 		}
+	});
+
+	QPushButton *timestampBtn = new QPushButton("Set interval", timestampSection);
+	timestampBtn->setFixedWidth(88);
+	StyleHelper::BlueButton(timestampBtn, "timestampBtn");
+	connect(timestampBtn, &QPushButton::clicked, this, [this, timestampEdit1, timestampEdit2]() {
+		setDateTimeAttr(timestampEdit1->dateTime(), LOG_START_ATTR);
+		setDateTimeAttr(timestampEdit2->dateTime(), LOG_STOP_ATTR);
+		onSetBtnPressed();
 	});
 
 	timestampWidget->layout()->addWidget(timestampEdit1);
 	timestampWidget->layout()->addWidget(timestampEdit2);
+	timestampWidget->layout()->addWidget(timestampBtn);
 
-	QPushButton *timestampBtn = new QPushButton("Set", timestampSection);
-	timestampBtn->setFixedWidth(88);
-	StyleHelper::BlueButton(timestampBtn, "timestampBtn");
+	timestampSection->contentLayout()->addWidget(startLogBtn);
 	timestampSection->contentLayout()->addWidget(timestampWidget);
-	timestampSection->contentLayout()->addWidget(timestampBtn);
 
 	parent->layout()->addWidget(timestampSection);
 }
 
 void SettingsInstrument::initCalibSection(QWidget *parent)
 {
-	MenuCollapseSection *calibrateSection =
-		new MenuCollapseSection("Calibrate", MenuCollapseSection::MHCW_ARROW, parent);
+	MenuCollapseSection *calibrateSection = new MenuCollapseSection("Calibrate", MenuCollapseSection::MHCW_ARROW,
+									MenuCollapseSection::MHW_BASEWIDGET, parent);
 	calibrateSection->contentLayout()->setSpacing(6);
 
 	MenuCombo *calibrateCombo = new MenuCombo("Channel Type", calibrateSection);

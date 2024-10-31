@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "plotinfowidgets.h"
 #include "plotaxis.h"
 #include "plotnavigator.hpp"
@@ -14,6 +35,7 @@ HDivInfo::HDivInfo(PlotWidget *plot, QWidget *parent)
 {
 	StyleHelper::PlotInfoLabel(this);
 	m_mpf->setTrimZeroes(true);
+	m_mpf->setTwoDecimalMode(false);
 	connect(m_plot->navigator(), &PlotNavigator::rectChanged, this, &HDivInfo::onRectChanged);
 
 	onRectChanged();
@@ -55,23 +77,51 @@ TimeSamplingInfo::TimeSamplingInfo(QWidget *parent)
 {
 	StyleHelper::PlotInfoLabel(this);
 	m_mpf->setTrimZeroes(true);
+	m_mpf->setTwoDecimalMode(false);
 }
 
 TimeSamplingInfo::~TimeSamplingInfo() {}
 
-void TimeSamplingInfo::update(PlotSamplingInfo info)
+void TimeSamplingInfo::update(SamplingInfo info)
 {
 	QString text;
-	text = QString("%1").arg(m_mpf->format(info.plotSize, "samples", 2));
+	text = QString("%1 samples").arg(QString::number(info.plotSize));
 	//.arg(m_mpf->format(binfo.bufferSizes, "samples", 2));
 	//	if(info.sampleRate != 1.0)
-	text += QString(" at %2").arg(m_mpf->format(info.sampleRate, "sps", 2));
+	if(info.sampleRate != 1) {
+		text += QString(" at %2").arg(m_mpf->format(info.sampleRate, "sps", 2));
+	}
+
+	setText(text);
+}
+
+FFTSamplingInfo::FFTSamplingInfo(QWidget *parent)
+	: m_mpf(new MetricPrefixFormatter(this))
+{
+	StyleHelper::PlotInfoLabel(this);
+	m_mpf->setTrimZeroes(true);
+	m_mpf->setTwoDecimalMode(false);
+}
+
+FFTSamplingInfo::~FFTSamplingInfo() {}
+
+void FFTSamplingInfo::update(SamplingInfo info)
+{
+	QString text;
+	text = QString("%1").arg(m_mpf->format(info.plotSize, "samples", 3));
+	if(info.sampleRate != 1) {
+		text += QString(" at %2").arg(m_mpf->format(info.sampleRate, "sps", 3));
+	}
+	if(info.freqOffset != 0) {
+		text += QString("\nCenter Frequency: %1").arg(m_mpf->format(info.freqOffset, "Hz", 3));
+	}
 
 	setText(text);
 }
 
 FPSInfo::FPSInfo(PlotWidget *plot, QWidget *parent)
-	: m_plot(plot)
+	: QLabel(parent)
+	, m_plot(plot)
 	, m_replotTimes(new QList<qint64>())
 	, m_lastTimeStamp(0)
 	, m_avgSize(10)
@@ -116,7 +166,7 @@ TimestampInfo::TimestampInfo(PlotWidget *plot, QWidget *parent)
 {
 	StyleHelper::PlotInfoLabel(this);
 	connect(plot, &PlotWidget::newData, this,
-		[=]() { setText(QDateTime::currentDateTime().time().toString("hh:mm:ss.zzz")); });
+		[=]() { setText(QDateTime::currentDateTime().time().toString("hh:mm:ss")); });
 }
 
 TimestampInfo::~TimestampInfo() {}

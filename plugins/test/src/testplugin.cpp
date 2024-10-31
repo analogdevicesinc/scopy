@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "testplugin.h"
 
 #include "testtool.h"
@@ -19,9 +40,10 @@
 #include <gui/widgets/hoverwidget.h>
 #include <pluginbase/messagebroker.h>
 #include <pluginbase/preferences.h>
-#include <pluginbase/preferenceshelper.h>
+#include <gui/preferenceshelper.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
+#include <widgets/menuspinbox.h>
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN, "TestPlugin");
 using namespace scopy;
@@ -50,8 +72,8 @@ bool TestPlugin::loadPreferencesPage()
 	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
 
 	MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
-	MenuCollapseSection *generalSection =
-		new MenuCollapseSection("General", MenuCollapseSection::MHCW_NONE, generalWidget);
+	MenuCollapseSection *generalSection = new MenuCollapseSection(
+		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, generalWidget);
 	generalWidget->contentLayout()->setSpacing(10);
 	generalWidget->contentLayout()->addWidget(generalSection);
 	generalSection->contentLayout()->setSpacing(10);
@@ -179,6 +201,9 @@ bool TestPlugin::onConnect()
 	btn4 = new QPushButton("show hoverwidget", tool);
 	btn4->setCheckable(true);
 
+	gui::MenuSpinbox *m_spin = new gui::MenuSpinbox("Frequency", 1e6, "Hz", 400000, 6000000000, tool);
+	;
+
 	connect(btn, &QPushButton::clicked, this, [=]() { m_toolList[0]->setAttached(!m_toolList[0]->attached()); });
 	connect(btn2, &QPushButton::clicked, this,
 		[=]() { m_toolList[0]->setName("TestPlugin" + QString::number(renameCnt++)); });
@@ -193,6 +218,7 @@ bool TestPlugin::onConnect()
 	lay->addWidget(btn2);
 	lay->addWidget(btn3);
 	lay->addWidget(btn4);
+	lay->addWidget(m_spin);
 
 	tool2 = new TestTool();
 

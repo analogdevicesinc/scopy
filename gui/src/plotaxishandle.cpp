@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "plotaxishandle.h"
 #include "plotaxis.h"
 #include <qwt_scale_map.h>
@@ -5,7 +26,7 @@
 using namespace scopy;
 
 PlotAxisHandle::PlotAxisHandle(PlotWidget *plot, PlotAxis *ax)
-	: QObject(plot)
+	: QWidget(plot)
 	, m_plotWidget(plot)
 	, m_axis(ax)
 	, m_plot(plot->plot())
@@ -13,11 +34,17 @@ PlotAxisHandle::PlotAxisHandle(PlotWidget *plot, PlotAxis *ax)
 	init();
 }
 
-PlotAxisHandle::~PlotAxisHandle() {}
+PlotAxisHandle::~PlotAxisHandle()
+{
+	if(m_handle != nullptr) {
+		delete m_handle;
+	}
+}
 
 void PlotAxisHandle::init()
 {
-	m_handle = new AxisHandle(m_axis->axisId(), HandlePos::SOUTH_EAST, m_plot);
+	m_handle = new AxisHandle(m_axis->axisId(), HandlePos::SOUTH_OR_EAST, m_plot);
+	connect(m_plot, &QObject::destroyed, this, [=]() { m_handle = nullptr; });
 	m_pos = pixelToScale(m_handle->getPos());
 
 	connect(m_plotWidget, &PlotWidget::canvasSizeChanged, this, &PlotAxisHandle::updatePos);

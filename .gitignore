@@ -29,12 +29,12 @@ android*.sh
 !CI/android/*
 html/
 build_arm64-v8a/
-doc/*
 !doc/Doxyfile
 !doc/local-windows-build-readme.md
 .cache/*
 build/*
 .vscode/*
+ci/general/gh-actions.envs
 ci/ubuntu/staging
 ci/macOS/staging
 ci/armhf/staging
@@ -45,6 +45,7 @@ ci/armhf/scopy.AppDir
 ci/armhf/scopy.squashfs
 ci/x86_64/staging
 ci/x86_64/scopy.AppDir
+ci/windows/staging
 windows/*
 core/include/scopy-core_config.h
 core/include/scopy-core_export.h
@@ -59,3 +60,7 @@ iio-widgets/include/iio-widgets/scopy-iio-widgets_export.h
 iioutil/include/iioutil/scopy-iioutil_export.h
 pluginbase/include/pluginbase/scopy-pluginbase_config.h
 pluginbase/include/pluginbase/scopy-pluginbase_export.h
+bin/*
+lib/*
+docs/_build/*
+share/*

@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "dmm.hpp"
 
 #include <datamonitor/readstrategy/dmmreadstrategy.hpp>
@@ -28,34 +49,32 @@ QList<DmmDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
 				QString name = QString::fromStdString(iio_device_get_name(dev)) + ":" +
 					QString::fromStdString(iio_channel_get_id(chn));
 
-				DmmDataMonitorModel *channelModel =
-					new DmmDataMonitorModel(name, StyleHelper::getColor("CH" + QString::number(j)));
+				UnitOfMeasurement *unitOfMeasurement = new UnitOfMeasurement("", "");
+				DMMReadStrategy *dmmReadStrategy = new DMMReadStrategy(dev, chn);
 
-				channelModel->setIioChannel(chn);
-				channelModel->setIioDevice(dev);
+				if(iioChannelHasAttribute(chn, "offset")) {
+					double offset = 0;
+					iio_channel_attr_read_double(chn, "offset", &offset);
+					dmmReadStrategy->setOffset(offset);
+				}
 
 				int type = iio_channel_get_type(chn);
 				if(type != iio_chan_type::IIO_CHAN_TYPE_UNKNOWN) {
-					DMMInfo dmmInfo = m_iioDevices.value(type);
+					IIOUnit dmmInfo = m_iioDevices.value(static_cast<iio_chan_type>(type));
 
 					if(isHwmon(dev, chn)) {
-						dmmInfo = m_hwmonDevices.value(type);
+						dmmInfo = m_hwmonDevices.value(static_cast<hwmon_chan_type>(type));
 					}
-
-					channelModel->setUnitOfMeasure(
-						new UnitOfMeasurement(dmmInfo.key, dmmInfo.key_symbol));
-
-					DMMReadStrategy *dmmReadStrategy = new DMMReadStrategy(dev, chn);
-					dmmReadStrategy->setUmScale(dmmInfo.umScale);
-					channelModel->setReadStrategy(dmmReadStrategy);
-
-					if(iioChannelHasAttribute(chn, "offset")) {
-						double offset = 0;
-						iio_channel_attr_read_double(chn, "offset", &offset);
-
-						dmmReadStrategy->setOffset(offset);
-					}
+					unitOfMeasurement = new UnitOfMeasurement(dmmInfo.name, dmmInfo.symbol);
+					dmmReadStrategy->setUmScale(dmmInfo.scale);
 				}
+
+				DmmDataMonitorModel *channelModel =
+					new DmmDataMonitorModel(name, StyleHelper::getColor("CH" + QString::number(j)),
+								unitOfMeasurement, dmmReadStrategy);
+
+				channelModel->setIioChannel(chn);
+				channelModel->setIioDevice(dev);
 
 				result.push_back(channelModel);
 			}
@@ -103,51 +122,12 @@ bool DMM::iioChannelHasAttribute(iio_channel *chn, const std::string &attr)
 
 void DMM::generateDictionaries()
 {
-	DMMInfo hwmon_voltage = {"Voltage", "V", 0.001};
-	m_hwmonDevices.insert(hwmon_chan_type::HWMON_VOLTAGE, hwmon_voltage);
-
-	DMMInfo hwmon_temp = {"Degree Celsius", "°C", 0.001};
-	m_hwmonDevices.insert(hwmon_chan_type::HWMON_TEMP, hwmon_temp);
-
-	DMMInfo hwmon_current = {"Ampere", "A", 0.001};
-	m_hwmonDevices.insert(hwmon_chan_type::HWMON_CURRENT, hwmon_current);
-
-	DMMInfo hwmon_power = {"milliWatt", "mW", 0.001};
-	m_hwmonDevices.insert(hwmon_chan_type::HWMON_POWER, hwmon_power);
-
-	DMMInfo hwmon_energy = {"milliJoule", "mJ", 0.001};
-	m_hwmonDevices.insert(hwmon_chan_type::HWMON_ENERGY, hwmon_energy);
-
-	DMMInfo hwmon_fan = {"Revolution/Min", "RPM"};
-	m_hwmonDevices.insert(hwmon_chan_type::HWMON_FAN, hwmon_fan);
-
-	DMMInfo hwmon_humidity = {"milli-percent", "pcm"};
-	m_hwmonDevices.insert(hwmon_chan_type::HWMON_HUMIDITY, hwmon_humidity);
-
-	DMMInfo iio_voltage = {"Voltage", "V", 0.001};
-	m_iioDevices.insert(iio_chan_type::IIO_VOLTAGE, iio_voltage);
-
-	DMMInfo iio_temp = {"Degree Celsius", "°C", 0.001};
-	m_iioDevices.insert(iio_chan_type::IIO_TEMP, iio_temp);
-
-	DMMInfo iio_current = {"Ampere", "A", 0.001};
-	m_iioDevices.insert(iio_chan_type::IIO_CURRENT, iio_current);
-
-	DMMInfo iio_pressure = {"Pascal", "Pa", 1000};
-	m_iioDevices.insert(iio_chan_type::IIO_PRESSURE, iio_pressure);
-
-	DMMInfo iio_accel = {"Metre per second squared", "m/s²"};
-	m_iioDevices.insert(iio_chan_type::IIO_ACCEL, iio_accel);
-
-	DMMInfo iio_angl_vel = {"Radian per second", "rad/s"};
-	m_iioDevices.insert(iio_chan_type::IIO_ANGL_VEL, iio_angl_vel);
-
-	DMMInfo iio_magn = {"Gauss", "Gs"};
-	m_iioDevices.insert(iio_chan_type::IIO_MAGN, iio_magn);
+	m_hwmonDevices = IIOUnitsManager::hwmonChannelTypes();
+	m_iioDevices = IIOUnitsManager::iioChannelTypes();
 }
 
-QMap<int, DMMInfo> DMM::iioDevices() const { return m_iioDevices; }
+QMap<iio_chan_type, IIOUnit> DMM::iioDevices() const { return m_iioDevices; }
 
-QMap<int, DMMInfo> DMM::hwmonDevices() const { return m_hwmonDevices; }
+QMap<hwmon_chan_type, IIOUnit> DMM::hwmonDevices() const { return m_hwmonDevices; }
 
 #include "moc_dmm.cpp"

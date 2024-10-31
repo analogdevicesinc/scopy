@@ -1,3 +1,31 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see
+ * https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or
+ * modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation,
+ * either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the
+ * hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have
+ * received a copy of the GNU General Public License
+ * along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "grproxyblock.h"
 
 #include "grlog.h"
@@ -17,6 +45,7 @@ void GRProxyBlock::destroy_blks(GRTopBlock *top) { start_blk.clear(); }
 
 void GRProxyBlock::connect_blk(GRTopBlock *top, GRProxyBlock *src)
 {
+	qInfo() << "created grfftfloatproc";
 	if(src == nullptr) // block is a source
 		return;
 	int nrOfOutputs = src->getGrEndPoint()->output_signature()->min_streams();
@@ -47,9 +76,6 @@ void GRProxyBlock::setEnabled(bool v)
 		return;
 
 	m_enabled = v;
-	blockSignals(false); // make sure request rebuild is sent
-	Q_EMIT requestRebuild();
-	blockSignals(!v); // to prevent rebuilding from non-enabled blocks - maybe
 }
 
 bool GRProxyBlock::enabled() { return m_enabled; }

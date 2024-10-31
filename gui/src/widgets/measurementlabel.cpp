@@ -40,7 +40,7 @@ MeasurementLabel::MeasurementLabel(QWidget *parent)
 	setName("None");
 	m_valueLabel = new QLabel("---", this);
 	m_formatter = nullptr;
-	m_precision = 2;
+	m_precision = 3;
 
 	lay->addWidget(m_nameLabel);
 	lay->addSpacerItem(new QSpacerItem(10, 0, QSizePolicy::Expanding, QSizePolicy::Maximum));

@@ -32,7 +32,6 @@
 
 extern "C"
 {
-	struct iio_context;
 	struct iio_device;
 	struct iio_channel;
 	struct iio_buffer;
@@ -64,7 +63,7 @@ public:
 		HIGH
 	};
 
-	Calibration(struct iio_context *ctx);
+	Calibration(libm2k::context::M2k *m2k);
 	~Calibration();
 
 	bool initialize();
@@ -88,7 +87,6 @@ private:
 	ApiObject *m_api;
 	volatile bool m_cancel;
 
-	struct iio_context *m_ctx;
 	libm2k::context::M2k *m_m2k;
 	bool m_initialized;
 };

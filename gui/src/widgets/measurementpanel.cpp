@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "widgets/measurementpanel.h"
 
 #include <QGridLayout>
@@ -21,6 +42,8 @@ MeasurementsPanel::MeasurementsPanel(QWidget *parent)
 	lay->setSpacing(0);
 	lay->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+
+	stackSize = 4;
 
 	QScrollArea *scrollArea = new QScrollArea(this);
 	scrollArea->setWidgetResizable(true);
@@ -56,14 +79,22 @@ MeasurementsPanel::MeasurementsPanel(QWidget *parent)
 	panelLayout->addSpacerItem(spacer);
 
 	int idx = panelLayout->indexOf(spacer);
-	m_stacks.append(new VerticalWidgetStack(this));
+	m_stacks.append(new VerticalWidgetStack(stackSize, this));
 	panelLayout->insertWidget(idx, m_stacks.last());
 }
 
 void MeasurementsPanel::addWidget(QWidget *meas)
 {
-	if(m_stacks.last()->full()) {
-		m_stacks.append(new VerticalWidgetStack(this));
+	bool createStack = false;
+	if(m_stacks.count() == 0) {
+		createStack = true;
+	} else if(m_stacks.last()->full()) {
+		createStack = true;
+	}
+
+	if(createStack) {
+		m_stacks.append(new VerticalWidgetStack(stackSize, this));
+
 		int idx = panelLayout->indexOf(spacer);
 		panelLayout->insertWidget(idx, m_stacks.last());
 	}
@@ -72,14 +103,39 @@ void MeasurementsPanel::addWidget(QWidget *meas)
 
 void MeasurementsPanel::addMeasurement(MeasurementLabel *meas)
 {
-	addWidget(meas);
+	if(!m_inhibitUpdates) {
+		addWidget(meas);
+	}
 	m_labels.append(meas);
 }
 
 void MeasurementsPanel::removeMeasurement(MeasurementLabel *meas)
 {
+
+	int i = 0;
+	for(i = 0; i < m_stacks.count(); i++) {
+		if(m_stacks[i]->indexOf(meas) != -1) {
+			break;
+		}
+	}
+
 	m_labels.removeAll(meas);
-	//	updateOrder();
+
+	if(m_inhibitUpdates) {
+		return;
+	}
+	int next_stack = i;
+	int remaining_stacks = m_stacks.count() - next_stack;
+	for(i = 0; i < remaining_stacks; i++) {
+		m_stacks.last()->reparentWidgets(nullptr);
+		delete m_stacks.last();
+		m_stacks.removeLast();
+	}
+
+	int idx = next_stack * stackSize;
+	for(i = idx; i < m_labels.count(); i++) {
+		addWidget(m_labels[i]);
+	}
 }
 
 void MeasurementsPanel::sort(int sortType)
@@ -100,7 +156,19 @@ void MeasurementsPanel::sort(int sortType)
 			return first->color().name() > second->color().name();
 		});
 	}
-	updateOrder();
+	refreshUi();
+}
+
+bool MeasurementsPanel::inhibitUpdates() const { return m_inhibitUpdates; }
+
+void MeasurementsPanel::setInhibitUpdates(bool newInhibitUpdates)
+{
+	m_inhibitUpdates = newInhibitUpdates;
+	if(m_inhibitUpdates) {
+		clear();
+	} else {
+		refreshUi();
+	}
 }
 
 /*void MeasurementsPanel::inhibitUpdates(bool b) {
@@ -109,7 +177,17 @@ void MeasurementsPanel::sort(int sortType)
 		updateOrder();
 }*/
 
-void MeasurementsPanel::updateOrder()
+void MeasurementsPanel::clear()
+{
+	for(VerticalWidgetStack *stack : m_stacks) {
+		stack->reparentWidgets(nullptr);
+		panelLayout->removeWidget(stack);
+		delete stack;
+	}
+	m_stacks.clear();
+}
+
+void MeasurementsPanel::refreshUi()
 {
 	for(VerticalWidgetStack *stack : m_stacks) {
 		stack->reparentWidgets(nullptr);
@@ -119,10 +197,10 @@ void MeasurementsPanel::updateOrder()
 	m_stacks.clear();
 
 	int idx = panelLayout->indexOf(spacer);
-	m_stacks.append(new VerticalWidgetStack(this));
+	m_stacks.append(new VerticalWidgetStack(stackSize, this));
 	panelLayout->insertWidget(idx, m_stacks.last());
 
-	for(QWidget *label : m_labels) {
+	for(QWidget *label : qAsConst(m_labels)) {
 		addWidget(label);
 	}
 }

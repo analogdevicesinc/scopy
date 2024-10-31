@@ -1,34 +1,49 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef IIOPINGTASK_H
 #define IIOPINGTASK_H
 
+#include "pingtask.h"
 #include "scopy-iioutil_export.h"
 
 #include <iio.h>
-
-#include <QThread>
 
 namespace scopy {
 /**
  * @brief The IIOPingTask class
  * IIOPingTask verifies IIO connection and emits pingSuccess/pingFailed
  */
-class SCOPY_IIOUTIL_EXPORT IIOPingTask : public QThread
+class SCOPY_IIOUTIL_EXPORT IIOPingTask : public PingTask
 {
 	Q_OBJECT
 public:
 	IIOPingTask(iio_context *c, QObject *parent = nullptr);
 	~IIOPingTask();
 	virtual void run() override;
-
-	static bool ping(iio_context *ctx);
-
-Q_SIGNALS:
-	void pingSuccess();
-	void pingFailed();
+	virtual bool ping() override;
+	static bool pingCtx(iio_context *ctx);
 
 protected:
-	iio_context *c;
-	bool enabled;
+	iio_context *m_ctx;
 };
 } // namespace scopy
 #endif // IIOPINGTASK_H

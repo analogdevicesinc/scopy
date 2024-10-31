@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef IIOTABWIDGET_H
 #define IIOTABWIDGET_H
 
@@ -42,6 +63,7 @@ private:
 	QString getSerialPath();
 	bool isSerialCompatible();
 	void setupBtnLdIcon(AnimationPushButton *btn);
+	void rstUriMsgLabel();
 	QWidget *createFilterWidget(QWidget *parent);
 	QWidget *createAvlCtxWidget(QWidget *parent);
 	QWidget *createSerialSettWidget(QWidget *parent);
@@ -49,6 +71,7 @@ private:
 	QWidget *createVerifyBtnWidget(QWidget *parent);
 
 	QWidget *m_filterWidget;
+	QLabel *m_ctxUriLabel;
 	QComboBox *m_avlCtxCb;
 	MenuCombo *m_serialPortCb;
 	MenuCombo *m_baudRateCb;
@@ -62,7 +85,7 @@ private:
 	QFutureWatcher<int> *m_fwScan;
 	QFutureWatcher<QVector<QString>> *m_fwSerialScan;
 	QStringList m_scanParamsList;
-	QStringList m_scanList;
+	QVector<QPair<QString, QString>> m_scanList;
 
 	const QVector<unsigned int> m_availableBaudRates = {2400,  4800,   9600,   14400,  19200, 38400,
 							    57600, 115200, 230400, 460800, 921600};

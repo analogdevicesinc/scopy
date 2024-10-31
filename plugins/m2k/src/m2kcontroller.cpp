@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "m2kcontroller.h"
 
 #include "m2kcommon.h"
@@ -19,32 +40,10 @@ M2kController::M2kController(QString uri, QObject *parent)
 	, uri(uri)
 {
 	identifyTask = nullptr;
-	pingTask = nullptr;
 	m_m2k = nullptr;
 }
 
 M2kController::~M2kController() {}
-
-void M2kController::startPingTask()
-{
-	pingTask = new IIOPingTask(m_iioctx);
-	pingTimer = new CyclicalTask(pingTask, this);
-	connect(pingTask, SIGNAL(pingSuccess()), this, SIGNAL(pingSuccess()));
-	connect(pingTask, SIGNAL(pingFailed()), this, SIGNAL(pingFailed()));
-	pingTimer->start();
-}
-
-void M2kController::stopPingTask()
-{
-	if(!pingTask) {
-		return;
-	}
-	pingTask->requestInterruption();
-	pingTimer->deleteLater();
-	pingTimer = nullptr;
-	pingTask->deleteLater();
-	pingTask = nullptr;
-}
 
 void M2kController::startTemperatureTask()
 {
@@ -61,10 +60,9 @@ void M2kController::stopTemperatureTask()
 	disconnect(tempTask, SIGNAL(newTemperature(double)), this, SIGNAL(newTemperature(double)));
 }
 
-void M2kController::connectM2k(iio_context *ctx)
+void M2kController::connectM2k(libm2k::context::M2k *m2k)
 {
-	m_iioctx = ctx;
-	m_m2k = m2kOpen(ctx, "");
+	m_m2k = m2k;
 	identify();
 }
 
@@ -77,11 +75,9 @@ void M2kController::disconnectM2k()
 		if(identifyTask && identifyTask->isRunning()) {
 			identifyTask->requestInterruption();
 		}
-		contextCloseAll();
 	} catch(std::exception &ex) {
 		qDebug(CAT_M2KPLUGIN) << ex.what();
 	}
-	m_iioctx = nullptr;
 	m_m2k = nullptr;
 }
 

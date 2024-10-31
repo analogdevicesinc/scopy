@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2019 Analog Devices Inc.
+ * Copyright (c) 2024 Analog Devices Inc.
  *
  * This file is part of Scopy
- * (see http://www.github.com/analogdevicesinc/scopy).
+ * (see https://www.github.com/analogdevicesinc/scopy).
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,34 +15,66 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 #include "toolmenuitem.h"
+#include "dynamicWidget.h"
 
-#include "gui/dynamicWidget.h"
-#include "gui/utils.h"
-#include "qdebug.h"
-
-#include <QHBoxLayout>
+#include <QEvent>
+#include <QMouseEvent>
+#include <QVBoxLayout>
+#include <utils.h>
+#include <pluginbase/toolmenuentry.h>
 #include <QLoggingCategory>
-#include <QSpacerItem>
 
-using namespace scopy;
 Q_LOGGING_CATEGORY(CAT_TOOLMENUITEM, "ToolMenuItem")
 
-ToolMenuItem::ToolMenuItem(QString id, QString name, QString iconPath, QWidget *parent)
-	: BaseMenuItem(parent)
-	, toolBtn(nullptr)
-	, toolRunBtn(nullptr)
-	, id(id)
-	, name(name)
-	, iconPath(iconPath)
+using namespace scopy;
+
+ToolMenuItem::ToolMenuItem(QString uuid, QString name, QString icon, QWidget *parent)
+	: QWidget(parent)
+	, m_uuid(uuid)
+	, m_name(name)
+	, m_icon(icon)
 {
-	_buildUI();
+	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	QVBoxLayout *lay = new QVBoxLayout(this);
+	setLayout(lay);
+	setFixedHeight(50);
+	lay->setSpacing(0);
+	lay->setContentsMargins(0, 0, 0, 0);
+
+	QWidget *toolOption = new QWidget(this);
+	toolOption->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	QHBoxLayout *toolLay = new QHBoxLayout(toolOption);
+	toolLay->setSpacing(0);
+	toolLay->setContentsMargins(0, 0, 0, 0);
+	m_toolBtn = new QPushButton(m_name);
+	m_toolBtn->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	m_toolRunBtn = new CustomPushButton(toolOption);
+	toolLay->addWidget(m_toolBtn, Qt::AlignLeft);
+	toolLay->addWidget(m_toolRunBtn);
+
+	setDynamicProperty(m_toolRunBtn, "stopButton", true);
+	m_toolRunBtn->setMaximumSize(32, 32);
+	m_toolBtn->setMinimumHeight(42);
+
+	m_toolBtn->setIcon(QIcon::fromTheme(m_icon));
+	m_toolBtn->setCheckable(true);
+	m_toolBtn->setIconSize(QSize(32, 32));
+
+	m_toolRunBtn->setCheckable(true);
+	m_toolRunBtn->setText("");
+
+	m_toolBtn->setFlat(true);
+	m_toolRunBtn->setFlat(true);
+
+	lay->addWidget(toolOption);
 
 	// Load stylesheets
-	this->setStyleSheet(Util::loadStylesheetFromFile(":/gui/stylesheets/toolMenuItem.qss"));
+	setStyleSheet(Util::loadStylesheetFromFile(":/gui/stylesheets/toolMenuItem.qss"));
 	setAttribute(Qt::WA_StyledBackground, true);
 #ifdef __ANDROID__
 	setDynamicProperty(this, "allowHover", false);
@@ -54,31 +86,18 @@ ToolMenuItem::ToolMenuItem(QString id, QString name, QString iconPath, QWidget *
 
 ToolMenuItem::~ToolMenuItem() {}
 
-QPushButton *ToolMenuItem::getToolBtn() const { return toolBtn; }
+QPushButton *ToolMenuItem::getToolBtn() const { return m_toolBtn; }
 
-QPushButton *ToolMenuItem::getToolRunBtn() const { return toolRunBtn; }
-
-// void ToolMenuItem::setToolEnabled(bool enabled)
-//{
-//	BaseMenuItem::setVisible(enabled);
-//	Util::retainWidgetSizeWhenHidden(this, enabled);
-//	setEnabled(enabled);
-//}
+QPushButton *ToolMenuItem::getToolRunBtn() const { return m_toolRunBtn; }
 
 void ToolMenuItem::enableDoubleClick(bool enable)
 {
 	if(enable) {
-		toolBtn->installEventFilter(this);
+		m_toolBtn->installEventFilter(this);
 	} else {
-		toolBtn->removeEventFilter(this);
+		m_toolBtn->removeEventFilter(this);
 		removeEventFilter(this);
 	}
-}
-
-void ToolMenuItem::setSeparator(bool top, bool bot)
-{
-	_enableBotSeparator(bot);
-	_enableTopSeparator(top);
 }
 
 bool ToolMenuItem::eventFilter(QObject *watched, QEvent *event)
@@ -98,30 +117,27 @@ bool ToolMenuItem::eventFilter(QObject *watched, QEvent *event)
 
 void ToolMenuItem::setName(QString str)
 {
-	this->name = str;
-	toolBtn->setText(name);
+	m_name = str;
+	m_toolBtn->setText(m_name);
 }
 
-void ToolMenuItem::hideText(bool hidden)
+void ToolMenuItem::setSelected(bool en) { setDynamicProperty(this, "selected", en); }
+
+void ToolMenuItem::setDisabled(bool disabled) { setDisabled(disabled); }
+
+void ToolMenuItem::updateItem()
 {
-	if(hidden) {
-		toolBtn->setText("");
-	} else {
-		toolBtn->setText(name);
-	}
+	ToolMenuEntry *tme = dynamic_cast<ToolMenuEntry *>(QObject::sender());
+	Q_ASSERT(tme);
+	QSignalBlocker sb(m_toolRunBtn);
+	setVisible(tme->visible());
+	setEnabled(tme->enabled());
+	setName(tme->name());
+	m_toolRunBtn->setEnabled(tme->runEnabled());
+	m_toolRunBtn->setEnabled(tme->runBtnVisible());
+	m_toolRunBtn->setChecked(tme->running());
+	qDebug(CAT_TOOLMENUITEM) << "updating toolmenuentry for " << tme->name() << " - " << tme->uuid();
 }
-
-void ToolMenuItem::setDisabled(bool disabled) { BaseMenuItem::setDisabled(disabled); }
-
-void ToolMenuItem::mouseMoveEvent(QMouseEvent *event)
-{
-#ifndef __ANDROID__
-	BaseMenuItem::mouseMoveEvent(event);
-	setDynamicProperty(this, "allowHover", false);
-#endif
-}
-
-const QString &ToolMenuItem::getId() const { return id; }
 
 void ToolMenuItem::enterEvent(QEvent *event)
 {
@@ -139,62 +155,6 @@ void ToolMenuItem::leaveEvent(QEvent *event)
 #endif
 }
 
-void ToolMenuItem::dragMoveEvent(QDragMoveEvent *event)
-{
-#ifndef __ANDROID__
-	setDynamicProperty(this, "allowHover", false);
-	BaseMenuItem::dragMoveEvent(event);
-#endif
-}
-
-void ToolMenuItem::dragLeaveEvent(QDragLeaveEvent *event)
-{
-#ifndef __ANDROID__
-	setDynamicProperty(this, "allowHover", true);
-	BaseMenuItem::dragLeaveEvent(event);
-#endif
-}
-
-void ToolMenuItem::_buildUI()
-{
-	QWidget *main = new QWidget(this);
-	QVBoxLayout *mainLayout = new QVBoxLayout(main);
-	mainLayout->setSpacing(0);
-	mainLayout->setContentsMargins(0, 0, 0, 0);
-
-	QWidget *toolOption = new QWidget(this);
-	QHBoxLayout *layout = new QHBoxLayout(toolOption);
-	layout->setSpacing(0);
-	layout->setContentsMargins(0, 0, 0, 0);
-	toolBtn = new QPushButton(name);
-	toolBtn->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-	toolRunBtn = new CustomPushButton(this);
-	layout->addWidget(toolBtn);
-	layout->addWidget(toolRunBtn);
-
-	setDynamicProperty(toolRunBtn, "stopButton", true);
-	toolRunBtn->setMaximumSize(32, 32);
-	toolBtn->setMinimumHeight(42);
-
-	toolBtn->setIcon(QIcon::fromTheme(iconPath));
-	toolBtn->setCheckable(true);
-	toolBtn->setIconSize(QSize(32, 32));
-
-	toolRunBtn->setCheckable(true);
-	toolRunBtn->setText("");
-
-	toolBtn->setFlat(true);
-	toolRunBtn->setFlat(true);
-	qDebug(CAT_TOOLMENUITEM) << toolRunBtn;
-
-	mainLayout->addWidget(toolOption);
-
-	setMaximumHeight(44);
-
-	setEnabled(false);
-	setVisible(false);
-
-	setWidget(main);
-}
+QString ToolMenuItem::getId() const { return m_uuid; }
 
 #include "moc_toolmenuitem.cpp"

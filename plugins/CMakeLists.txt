@@ -1,3 +1,23 @@
+#
+# Copyright (c) 2024 Analog Devices Inc.
+#
+# This file is part of Scopy
+# (see https://www.github.com/analogdevicesinc/scopy).
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+#
+
 cmake_minimum_required(VERSION 3.9)
 project(scopy-plugins VERSION 0.1 LANGUAGES CXX)
 
@@ -13,12 +33,12 @@ option(ENABLE_PLUGIN_ADC "Enable ADC plugin" ON)
 option(ENABLE_PLUGIN_SWIOT "Enable SWIOT plugin" ON)
 option(ENABLE_PLUGIN_PQM "Enable PQM plugin" ON)
 option(ENABLE_PLUGIN_DATALOGGER "Enable DATALOGGER plugin" ON)
-option(ENABLE_PLUGIN_IIODEBUGPLUGIN "Enable IIODEBUGPLUGIN plugin" ON)
+option(ENABLE_PLUGIN_DAC "Enable DAC plugin" ON)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS/plugins/plugins")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS/plugins")
 else()
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 endif()
@@ -71,14 +91,14 @@ if(ENABLE_PLUGIN_DEBUGGER)
 	list(APPEND PLUGINS ${DEBUGGER_TARGET_NAME})
 endif()
 
-if(ENABLE_PLUGIN_IIODEBUGPLUGIN)
-	add_subdirectory(iiodebug)
-	list(APPEND PLUGINS ${IIODEBUG_TARGET_NAME})
-endif()
-
 if(ENABLE_PLUGIN_DATALOGGER)
 	add_subdirectory(datalogger)
 	list(APPEND PLUGINS ${DATALOGGER_TARGET_NAME})
+endif()
+
+if(ENABLE_PLUGIN_DAC)
+	add_subdirectory(dac)
+	list(APPEND PLUGINS ${DAC_TARGET_NAME})
 endif()
 
 if(ENABLE_PLUGIN_SWIOT)
@@ -106,15 +126,8 @@ if(ENABLE_PLUGIN_M2K)
 	endif()
 endif()
 
-if(ENABLE_PLUGIN_ADMT)
-	add_subdirectory(admt)
-	list(APPEND PLUGINS ${ADMT_TARGET_NAME})
-endif()
+install(TARGETS ${PLUGINS} LIBRARY DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH})
 
 set(PLUGINS ${PLUGINS} PARENT_SCOPE)
 set(PLUGIN_COMPONENTS ${PLUGIN_COMPONENTS} PARENT_SCOPE)
 set(PLUGIN_COMPONENTS_FILES ${PLUGIN_COMPONENTS_FILES} PARENT_SCOPE)
-
-install(TARGETS ${PLUGINS} LIBRARY DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH}
-	RUNTIME DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH}
-)

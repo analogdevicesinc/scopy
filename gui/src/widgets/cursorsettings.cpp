@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include <QVBoxLayout>
 
 #include <stylehelper.h>
@@ -10,6 +31,7 @@ CursorSettings::CursorSettings(QWidget *parent)
 {
 	initUI();
 	connectSignals();
+	initSession();
 }
 
 CursorSettings::~CursorSettings() {}
@@ -86,5 +108,26 @@ QAbstractButton *CursorSettings::getYEn() { return yEn->onOffswitch(); }
 QAbstractButton *CursorSettings::getYLock() { return yLock->onOffswitch(); }
 
 QAbstractButton *CursorSettings::getReadoutsDrag() { return readoutsDrag->onOffswitch(); }
+
+void CursorSettings::initSession()
+{
+	getXEn()->setChecked(true);
+	getXLock()->setChecked(false);
+	getXTrack()->setChecked(false);
+	getYEn()->setChecked(false);
+	getYLock()->setChecked(false);
+	getReadoutsDrag()->setChecked(false);
+}
+
+void CursorSettings::updateSession()
+{
+	Q_EMIT getXEn()->toggled(getXEn()->isChecked());
+	Q_EMIT getXLock()->toggled(getXLock()->isChecked());
+	Q_EMIT getXTrack()->toggled(getXTrack()->isChecked());
+	Q_EMIT getYEn()->toggled(getYEn()->isChecked());
+	Q_EMIT getYLock()->toggled(getYLock()->isChecked());
+	Q_EMIT getReadoutsDrag()->toggled(getReadoutsDrag()->isChecked());
+	Q_EMIT sessionUpdated();
+}
 
 #include "moc_cursorsettings.cpp"

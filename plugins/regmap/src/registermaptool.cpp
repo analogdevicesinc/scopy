@@ -1,8 +1,30 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "registermaptool.hpp"
 #include "utils.hpp"
 
 #include <QBoxLayout>
 #include <QComboBox>
+#include <QDesktopServices>
 #include <deviceregistermap.hpp>
 #include <deviceregistermap.hpp>
 #include <registermapsettingsmenu.hpp>
@@ -40,7 +62,10 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 
 	InfoBtn *infoBtn = new InfoBtn(this);
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
-	// TODO on info btn click open wiki page
+	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+		QDesktopServices::openUrl(
+			QUrl("https://analogdevicesinc.github.io/scopy/plugins/registermap/registermap.html"));
+	});
 
 	searchBarWidget = new SearchBarWidget();
 	searchBarWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -137,4 +162,16 @@ void RegisterMapTool::updateActiveRegisterMap(QString registerName)
 	}
 }
 
-void RegisterMapTool::toggleSearchBarEnabled(bool enabled) { searchBarWidget->setEnabled(enabled); }
+void RegisterMapTool::toggleSearchBarEnabled(bool enabled)
+{
+	searchBarWidget->setEnabled(enabled);
+	if(enabled) {
+		tool->getContainerSpacer(tool->topContainer())
+			->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
+		searchBarWidget->show();
+	} else {
+		tool->getContainerSpacer(tool->topContainer())
+			->changeSize(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed);
+		searchBarWidget->hide();
+	}
+}

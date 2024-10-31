@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef SWIOTPLUGIN_H
 #define SWIOTPLUGIN_H
 
@@ -34,18 +55,17 @@ public:
 	bool compatible(QString param, QString category) override;
 	void initMetadata() override;
 	QString description() override;
+	void initPreferences() override;
+	bool loadPreferencesPage() override;
 
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
+	void startPingTask() override;
+	void stopPingTask() override;
+	void onPausePingTask(bool pause) override;
+
 	void onIsRuntimeCtxChanged(bool isRuntimeCtx);
-
-	void startTutorial();
-	void abortTutorial();
-
-	void startAd74413rTutorial();
-	void startMax14906Tutorial();
-	void startFaultsTutorial();
 
 	void powerSupplyStatus(bool ps);
 
@@ -56,9 +76,9 @@ private Q_SLOTS:
 private:
 	void switchCtx();
 	void setupToolList();
+	void clearPingTask();
 	void createStatusContainer();
 	QPushButton *m_btnIdentify;
-	QPushButton *m_btnTutorial;
 	QWidget *m_statusContainer;
 	SwiotInfoPage *m_infoPage;
 
@@ -70,13 +90,11 @@ private:
 	SwiotController *m_swiotController;
 	SwiotRuntime *m_runtime;
 
-	gui::TutorialBuilder *m_ad74413rTutorial;
-	gui::TutorialBuilder *m_max14906Tutorial;
-	gui::TutorialBuilder *m_faultsTutorial;
-
 	bool m_isRuntime;
 	bool m_switchCmd = false;
 	QString m_ctxMode;
+
+	const int PING_PERIOD = 2000;
 };
 } // namespace scopy::swiot
 #endif // SWIOTPLUGIN_H

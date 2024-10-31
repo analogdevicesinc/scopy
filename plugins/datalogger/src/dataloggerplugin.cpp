@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "dataloggerplugin.h"
 
 #include <QLoggingCategory>
@@ -14,7 +35,7 @@
 #include <iioutil/connectionprovider.h>
 
 #include <pluginbase/preferences.h>
-#include <pluginbase/preferenceshelper.h>
+#include <gui/preferenceshelper.h>
 
 #include <pluginbase/scopyjs.h>
 
@@ -43,14 +64,13 @@ bool DataLoggerPlugin::loadPage() { return false; }
 
 bool DataLoggerPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/scopy-light/icons/unlocked.svg");
+	SCOPY_PLUGIN_ICON(":/gui/icons/scopy-default/icons/datalogger.svg");
 	return true;
 }
 
 void DataLoggerPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "DataLogger",
-						  ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "Data Logger", toolIcon));
 }
 
 void DataLoggerPlugin::unload()
@@ -104,9 +124,23 @@ bool DataLoggerPlugin::onConnect()
 
 bool DataLoggerPlugin::onDisconnect()
 {
+	auto count = dmmList.count();
+	for(int i = 0; i < count; i++) {
+		delete dmmList.takeLast();
+	}
+
+	if(m_dataAcquisitionManager) {
+		delete m_dataAcquisitionManager;
+		m_dataAcquisitionManager = nullptr;
+	}
+
+	ConnectionProvider *cp = ConnectionProvider::GetInstance();
+	cp->close(m_param);
+
 	// This method is called when the disconnect button is pressed
 	// It must remove all connections that were established on the connection
-	for(auto &tool : m_toolList) {
+	while(!m_toolList.isEmpty()) {
+		ToolMenuEntry *tool = m_toolList.first();
 		tool->setEnabled(false);
 		tool->setRunning(false);
 		tool->setRunBtnVisible(false);
@@ -114,20 +148,22 @@ bool DataLoggerPlugin::onDisconnect()
 	}
 
 	// add proxy tool to represent the plugin
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "DataLogger",
-						  ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "Data Logger", toolIcon));
 
 	Q_EMIT toolListChanged();
+
+	toolIndex = 0;
 	return true;
 }
 
 void DataLoggerPlugin::addNewTool()
 {
-	static int i = 0;
-	QString tool_name = (QString("DataLogger ") + QString::number(i));
+	QString tool_name = QString("Data Logger ");
+	if(toolIndex != 0) {
+		tool_name += QString::number(toolIndex);
+	}
 
-	ToolMenuEntry *toolMenuEntry =
-		SCOPY_NEW_TOOLMENUENTRY(tool_name, tool_name, ":/gui/icons/scopy-default/icons/gear_wheel.svg");
+	ToolMenuEntry *toolMenuEntry = SCOPY_NEW_TOOLMENUENTRY(tool_name, tool_name, toolIcon);
 	m_toolList.append(toolMenuEntry);
 	m_toolList.last()->setEnabled(true);
 	m_toolList.last()->setRunBtnVisible(true);
@@ -157,13 +193,15 @@ void DataLoggerPlugin::addNewTool()
 		}
 	});
 
+	toolMenuEntry->setDetachable(false);
+
 	Q_EMIT toolListChanged();
 	m_toolList.last()->setTool(datamonitorTool);
 	if(m_toolList.length() > 1) {
 		requestTool(tool_name);
 	}
 
-	i++;
+	toolIndex++;
 }
 
 void DataLoggerPlugin::removeTool(QString toolId)
@@ -172,13 +210,13 @@ void DataLoggerPlugin::removeTool(QString toolId)
 	auto *tool = ToolMenuEntry::findToolMenuEntryById(m_toolList, toolId);
 	m_toolList.removeOne(tool);
 	QWidget *datamonitorTool = tool->tool();
+	tool->setTool(nullptr);
 	if(datamonitorTool) {
 		delete datamonitorTool;
 	}
 
 	Q_EMIT toolListChanged();
-
-	delete tool;
+	tool->deleteLater();
 }
 
 void DataLoggerPlugin::toggleRunState(bool toggled)
@@ -217,6 +255,7 @@ void DataLoggerPlugin::initPreferences()
 	p->init("dataloggerplugin_data_storage_size", "10 Kb");
 	p->init("dataloggerplugin_read_interval", "1");
 	p->init("dataloggerplugin_date_time_format", "hh:mm:ss");
+	p->init("dataloggerplugin_start_tutorial", true);
 }
 
 bool DataLoggerPlugin::loadPreferencesPage()
@@ -227,8 +266,8 @@ bool DataLoggerPlugin::loadPreferencesPage()
 	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
 
 	MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
-	MenuCollapseSection *generalSection =
-		new MenuCollapseSection("General", MenuCollapseSection::MHCW_NONE, generalWidget);
+	MenuCollapseSection *generalSection = new MenuCollapseSection(
+		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, generalWidget);
 	generalWidget->contentLayout()->setSpacing(10);
 	generalWidget->contentLayout()->addWidget(generalSection);
 	generalSection->contentLayout()->setSpacing(10);
@@ -245,6 +284,22 @@ bool DataLoggerPlugin::loadPreferencesPage()
 
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceEdit(
 		p, "dataloggerplugin_date_time_format", "DateTime format :", generalSection));
+
+	QWidget *resetTutorialWidget = new QWidget();
+	QHBoxLayout *resetTutorialWidgetLayout = new QHBoxLayout();
+
+	resetTutorialWidget->setLayout(resetTutorialWidgetLayout);
+	resetTutorialWidgetLayout->setMargin(0);
+
+	QPushButton *resetTutorial = new QPushButton("Reset", generalSection);
+	StyleHelper::BlueButton(resetTutorial, "resetBtn");
+	connect(resetTutorial, &QPushButton::clicked, this,
+		[=, this]() { p->set("dataloggerplugin_start_tutorial", true); });
+
+	resetTutorialWidgetLayout->addWidget(new QLabel("Data logger tutorial "), 6);
+	resetTutorialWidgetLayout->addWidget(resetTutorial, 1);
+	generalSection->contentLayout()->addWidget(resetTutorialWidget);
+
 	return true;
 }
 

@@ -5,21 +5,18 @@ source $REPO_SRC/ci/macOS/macos_config.sh
 
 pushd $BUILDDIR
 
-SCOPYLIBS="$(find $BUILDDIR -name "*.dylib" -d 2 -type f)
-$(find $BUILDDIR/plugins/m2k/m2k-gui -name "*.dylib" -type f)"
-
-SCOPYPLUGINS=$(find $BUILDDIR/Scopy.app/Contents/MacOs/plugins/plugins -name "*.dylib" -type f)
+SCOPYPLUGINS=$(find $BUILDDIR/Scopy.app/Contents/MacOs/plugins -name "*.dylib" -type f)
+SCOPYLIBS=$(find $BUILDDIR/Scopy.app/Contents/Frameworks -name "*.dylib" -type f)
 
 echo "### Copy DLLs to Frameworks folder"
-mkdir -p $BUILDDIR/Scopy.app/Contents/Frameworks
-cp $SCOPYLIBS $BUILDDIR/Scopy.app/Contents/Frameworks
-SCOPYLIBS=$(find $BUILDDIR/Scopy.app/Contents/Frameworks -name "*.dylib" -type f)
-mkdir -p $BUILDDIR/Scopy.app/Contents/MacOS/plugins/plugins
-mkdir -p $BUILDDIR/Scopy.app/Contents/MacOS/translations
-cp $BUILDDIR/translations/* $BUILDDIR/Scopy.app/Contents/MacOS/translations
-cp -R $BUILDDIR/plugins/regmap/xmls $BUILDDIR/Scopy.app/Contents/MacOS/plugins/plugins
+cp -R $REPO_SRC/plugins/dac/res/csv Scopy.app/Contents/MacOS/plugins/
 cp -R $STAGING_AREA/libiio/build/iio.framework Scopy.app/Contents/Frameworks/
 cp -R $STAGING_AREA/libad9361/build/ad9361.framework Scopy.app/Contents/Frameworks/
+cp -R $BUILDDIR/plugins/emu_xml Scopy.app/Contents/MacOS/plugins
+mkdir -p Scopy.app/Contents/MacOS/plugins/resources
+cp $REPO_SRC/resources/scopy_emu_options_config.json Scopy.app/Contents/MacOS/plugins/resources/
+cp -R $BUILDDIR/translations Scopy.app/Contents/MacOS
+cp -R $BUILDDIR/plugins/regmap/xmls Scopy.app/Contents/MacOS/plugins
 
 libqwtpath=${STAGING_AREA_DEPS}/lib/libqwt.6.4.0.dylib #hardcoded
 libqwtid="$(otool -D ${libqwtpath} | tail -1)"
@@ -50,25 +47,19 @@ m2kid=${m2krpath#"@rpath/"}
 cp ${STAGING_AREA_DEPS}/lib/libm2k.* ./Scopy.app/Contents/Frameworks
 install_name_tool -id @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/Frameworks/${m2kid}
 
-
-echo "### Check available python version"
-for version in 3.8 3.9 3.10 3.11 3.12
-do
-	if [ -e /usr/local/opt/python@$version/Frameworks/Python.framework/Versions/$version/Python ] ; then
-		pythonpath=/usr/local/opt/python@$version/Frameworks/Python.framework/Versions/$version/Python
-		pyversion=$version
-		pythonidrpath="$(otool -D $pythonpath | head -2 |  tail -1)"
-	fi
-done
+echo "### Get python version"
+brewprefix=$(brew --prefix python3)
+pyversion=${brewprefix##*@} # extract the text after the last '@'
+pythonpath=$brewprefix/Frameworks/Python.framework/Versions/$pyversion/Python
+pythonidrpath="$(otool -D $pythonpath | head -2 |  tail -1)"
 
 if [ -z $pyversion ] ; then
 	echo "No Python 3.8, 3.9, 3.10, 3.11, 3.12 paths found"
 	exit 1
 fi
 echo " - Found python$version at $pythonpath"
-pythonid=${pythonidrpath#"/usr/local/opt/python@${pyversion}/Frameworks/"}
-cp -R /usr/local/opt/python@$pyversion/Frameworks/Python.framework Scopy.app/Contents/Frameworks/
-
+pythonid=${pythonidrpath#"$(brew --prefix python3)/Frameworks/"}
+cp -R $(brew --prefix python3)/Frameworks/Python.framework Scopy.app/Contents/Frameworks/
 
 echo "### Fixing scopy libraries and plugins "
 for dylib in ${SCOPYLIBS} ${SCOPYPLUGINS}
@@ -129,6 +120,7 @@ echo "=== Fixing libserialport"
 libserialportpath="$(otool -L ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep libserialport | cut -d " " -f 1 | awk '{$1=$1};1')"
 libserialportid="$(echo ${libserialportpath} | rev | cut -d "/" -f 1 | rev)"
 install_name_tool -change ${libserialportpath} @executable_path/../Frameworks/${libserialportid} ./Scopy.app/Contents/Frameworks/iio.framework/iio
+ln -s $BUILDDIR/Scopy.app/Contents/Frameworks/libserialport*.dylib $BUILDDIR/Scopy.app/Contents/Frameworks/libserialport.0.dylib
 
 install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libm2k.dylib
 install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libm2k.?.?.?.dylib

@@ -32,15 +32,16 @@
 
 #include <errno.h>
 #include <libm2k/m2kexceptions.hpp>
+#include <libm2k/analog/dmm.hpp>
 
 Q_LOGGING_CATEGORY(CAT_M2K_CALIBRATION, "M2KCalibration");
 
 using namespace scopy;
 
-Calibration::Calibration(struct iio_context *ctx)
+Calibration::Calibration(libm2k::context::M2k *m2k)
 	: m_api(new Calibration_API(this))
 	, m_cancel(false)
-	, m_ctx(ctx)
+	, m_m2k(m2k)
 	, m_initialized(false)
 {
 	m_api->setObjectName("calib");
@@ -53,11 +54,6 @@ bool Calibration::initialize()
 {
 	m_initialized = false;
 
-	if(!m_ctx) {
-		return false;
-	}
-
-	m_m2k = libm2k::context::m2kOpen(m_ctx, "");
 	if(!m_m2k) {
 		return false;
 	}
@@ -130,22 +126,9 @@ double Calibration::getIioDevTemp(const QString &devName) const
 {
 	double temp = -273.15;
 
-	struct iio_device *dev = iio_context_find_device(m_ctx, devName.toLatin1().data());
-
-	if(dev) {
-		struct iio_channel *chn = iio_device_find_channel(dev, "temp0", false);
-		if(chn) {
-			double offset;
-			double raw;
-			double scale;
-
-			iio_channel_attr_read_double(chn, "offset", &offset);
-			iio_channel_attr_read_double(chn, "raw", &raw);
-			iio_channel_attr_read_double(chn, "scale", &scale);
-
-			temp = (raw + offset) * scale / 1000;
-		}
+	libm2k::analog::DMM *dmm = m_m2k->getDMM(devName.toStdString());
+	if(dmm) {
+		temp = dmm->readChannel("temp0").value;
 	}
-
 	return temp;
 }

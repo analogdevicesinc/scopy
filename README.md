@@ -17,3 +17,7 @@ Nightly builds are available under the [Continuous build](https://github.com/ana
 - Android (aarch64)
 
 Complete instalation and usage instructions can be found on our [Wiki](https://wiki.analog.com/university/tools/m2k/scopy) page.
+
+## Contributing
+
+See the [CONTRIBUTING file](CONTRIBUTING.md) for guidance on contributing to this project.

@@ -4,7 +4,7 @@ set -ex
 REPO_SRC=$(git rev-parse --show-toplevel)
 source $REPO_SRC/ci/macOS/macos_config.sh
 
-PACKAGES=" ${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog "
+PACKAGES="${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libzip glib libusb glog "
 PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libserialport libsndfile"
 
 OS_VERSION=${1:-$(sw_vers -productVersion)}
@@ -22,12 +22,17 @@ install_packages() {
 	rm /usr/local/bin/python3-config || true
 
 	brew update
-	brew upgrade || true #ignore homebrew upgrade errors
-	brew search ${QT_FORMULAE}
-	brew install --display-times $PACKAGES
-	for pkg in gcc bison gettext cmake python; do
-		brew link --overwrite --force $pkg
-	done
+	# Workaround for brew taking a long time to upgrade existing packages
+	# Check if macOS version and upgrade packages only if the version is greater than macOS 12
+	if (( $(echo "$(sw_vers -productVersion) > 13.0" | bc -l) )); then
+		brew upgrade --display-times || true #ignore homebrew upgrade errors
+		# Workaround: Install or update libtool package only if macOS version is greater than 12
+		# Note: libtool (v2.4.7) is pre-installed by default, but it can be updated to v2.5.3
+		PACKAGES="$PACKAGES libtool"
+		brew install --display-times $PACKAGES
+	else
+		HOMEBREW_NO_AUTO_UPDATE=1 brew install --display-times $PACKAGES
+	fi
 
 	pip3 install --break-system-packages mako
 }
@@ -63,7 +68,7 @@ clone() {
 	git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
 	git clone --recursive https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH gr-scopy
 	git clone --recursive https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH gr-m2k
-	git clone --recursive https://github.com/gnuradio/gnuradio.git -b $GNURADIO_BRANCH gnuradio
+	git clone --recursive https://github.com/analogdevicesinc/gnuradio.git -b $GNURADIO_BRANCH gnuradio
 	git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 	git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
@@ -77,7 +82,10 @@ generate_status_file(){
 }
 
 save_version_info() {
-	echo "$CURRENT_BUILD - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
+	echo "$(basename -a "$(git config --get remote.origin.url)") - \
+	$(git rev-parse --abbrev-ref HEAD) - \
+	$(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
 }
 
 build_with_cmake() {
@@ -97,9 +105,8 @@ build_with_cmake() {
 build_libiio() {
 	echo "### Building libiio - version $LIBIIO_VERSION"
 	CURRENT_BUILD=libiio
-	save_version_info
-
 	pushd $STAGING_AREA/libiio
+	save_version_info
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DWITH_TESTS:BOOL=OFF \
 		-DWITH_DOC:BOOL=OFF \
@@ -143,9 +150,8 @@ build_libm2k() {
 build_libad9361() {
 	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
 	CURRENT_BUILD=libad9361-iio
-	save_version_info
-
 	pushd $STAGING_AREA/libad9361
+	save_version_info
 	build_with_cmake
 	make install
 	popd
@@ -154,9 +160,8 @@ build_libad9361() {
 build_gnuradio() {
 	echo "### Building gnuradio - branch $GNURADIO_BRANCH"
 	CURRENT_BUILD=gnuradio
-	save_version_info
-
 	pushd $STAGING_AREA/gnuradio
+	save_version_info
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DPYTHON_EXECUTABLE=/usr/bin/python3 \
 		-DENABLE_DEFAULT=OFF \
@@ -176,9 +181,8 @@ build_gnuradio() {
 build_grm2k() {
 	echo "### Building gr-m2k - branch $GRM2K_BRANCH"
 	CURRENT_BUILD=gr-m2k
-	save_version_info
-
 	pushd $STAGING_AREA/gr-m2k
+	save_version_info
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PYTHON=OFF \
 		-DDIGITAL=OFF
@@ -191,9 +195,8 @@ build_grm2k() {
 build_grscopy() {
 	echo "### Building gr-scopy - branch $GRSCOPY_BRANCH"
 	CURRENT_BUILD=gr-scopy
-	save_version_info
-
 	pushd $STAGING_AREA/gr-scopy
+	save_version_info
 	CURRENT_BUILD_CMAKE_OPTS="-DWITH_PYTHON=OFF "
 	build_with_cmake
 	make install
@@ -203,9 +206,8 @@ build_grscopy() {
 build_libsigrokdecode() {
 	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
 	CURRENT_BUILD=libsigrokdecode
-	save_version_info
-
 	pushd $STAGING_AREA/libsigrokdecode
+	save_version_info
 	git reset --hard
 	git clean -xdf
 	./autogen.sh
@@ -260,8 +262,8 @@ EOF
 build_qwt() {
 	echo "### Building qwt - branch qwt-multiaxes"
 	CURRENT_BUILD=qwt
-	save_version_info
 	pushd $STAGING_AREA/qwt
+	save_version_info
 	git clean -xdf
 	git reset --hard
 	patch_qwt
@@ -274,9 +276,8 @@ build_qwt() {
 build_libtinyiiod() {
 	echo "### Building libtinyiiod - branch $LIBTINYIIOD_BRANCH"
 	CURRENT_BUILD=libtinyiiod
-	save_version_info
-
 	pushd $STAGING_AREA/libtinyiiod
+	save_version_info
 	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_EXAMPLES=OFF"
 	build_with_cmake
 	make install

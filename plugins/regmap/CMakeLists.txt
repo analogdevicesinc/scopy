@@ -1,3 +1,23 @@
+#
+# Copyright (c) 2024 Analog Devices Inc.
+#
+# This file is part of Scopy
+# (see https://www.github.com/analogdevicesinc/scopy).
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+#
+
 cmake_minimum_required(VERSION 3.9)
 
 set(SCOPY_MODULE regmap)
@@ -58,11 +78,10 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
 
 find_package(libm2k REQUIRED)
 
-set(REGMAP_XML_PATH ${CMAKE_INSTALL_FULL_DATADIR}/regmap)
-set(REGMAP_XML_SYSTEM_PATH ${REGMAP_XML_PATH}/xmls)
+set(REGMAP_XML_SYSTEM_PATH ${SCOPY_PLUGIN_INSTALL_PATH}/xmls)
 set(REGMAP_XML_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/xmls)
 
-install(DIRECTORY xmls DESTINATION ${REGMAP_XML_PATH})
+install(DIRECTORY xmls DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH})
 
 file(GLOB XMLS ${CMAKE_CURRENT_SOURCE_DIR}/xmls/*.xml)
 

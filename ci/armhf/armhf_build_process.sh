@@ -1,10 +1,13 @@
 #!/bin/bash
 
 set -ex
-git config --global --add safe.directory $HOME/scopy
 SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
 SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
-source $SRC_DIR/ci/armhf/armhf_build_config.sh
+SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+BUILD_STATUS_FILE=$SRC_SCRIPT/build-status
+
+source $SRC_SCRIPT/armhf_build_config.sh
 
 echo -- USING CMAKE COMMAND:
 echo $CMAKE
@@ -19,7 +22,11 @@ build_with_cmake() {
 	$CMAKE $CURRENT_BUILD_CMAKE_OPTS ../
 	make $JOBS
 	CURRENT_BUILD_CMAKE_OPTS=""
-	# TODO: Create build-status file
+
+	echo "$(basename -a "$(git config --get remote.origin.url)") - \
+	$(git rev-parse --abbrev-ref HEAD) - \
+	$(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
 }
 
 set_config_opts() {
@@ -103,7 +110,7 @@ clone() {
 	[ -d 'gr-scopy' ]	|| git clone --recursive https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH gr-scopy
 	[ -d 'gr-m2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH gr-m2k
 	[ -d 'volk' ]		|| git clone --recursive https://github.com/gnuradio/volk.git -b $VOLK_BRANCH volk
-	[ -d 'gnuradio' ]	|| git clone --recursive https://github.com/gnuradio/gnuradio.git -b $GNURADIO_BRANCH gnuradio
+	[ -d 'gnuradio' ]	|| git clone --recursive https://github.com/analogdevicesinc/gnuradio.git -b $GNURADIO_BRANCH gnuradio
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
@@ -221,6 +228,11 @@ build_qwt() {
 	make $JOBS
 	patchelf --force-rpath --set-rpath \$ORIGIN $STAGING_AREA/qwt/lib/libqwt.so
 	sudo make INSTALL_ROOT=$SYSROOT install
+
+	echo "$(basename -a "$(git config --get remote.origin.url)") - \
+	$(git rev-parse --abbrev-ref HEAD) - \
+	$(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
 	popd
 }
 
@@ -234,6 +246,11 @@ build_libsigrokdecode() {
 	make $JOBS
 	patchelf --force-rpath --set-rpath \$ORIGIN $STAGING_AREA/libsigrokdecode/.libs/libsigrokdecode.so
 	sudo make install
+
+	echo "$(basename -a "$(git config --get remote.origin.url)") - \
+	$(git rev-parse --abbrev-ref HEAD) - \
+	$(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
 	popd
 }
 
@@ -259,6 +276,7 @@ build_iio-emu(){
 
 build_scopy() {
 	echo "### Building scopy"
+	[ -f /home/runner/build-status ] && cp /home/runner/build-status $SRC_DIR/build-status
 	pushd $SRC_DIR
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PLUGIN_TEST=ON \
@@ -270,17 +288,19 @@ build_scopy() {
 }
 
 create_appdir(){
-
 	BUILD_FOLDER=$SRC_DIR/build
 	EMU_BUILD_FOLDER=$STAGING_AREA/iio-emu/build
-	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 2 -type f -name "libscopy*")
 	PLUGINS=$BUILD_FOLDER/plugins/plugins
+	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 1 -type f -name "libscopy*")
 	REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
+	DAC_WAVEFORM_CSV=$SRC_DIR/plugins/dac/res/csv
+	EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
+	EMU_CONFIG=$SRC_DIR/resources/scopy_emu_options_config.json
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
 	COPY_DEPS=$SRC_DIR/ci/armhf/copy-deps.sh
 
 	rm -rf $APP_DIR
-	mkdir $APP_DIR
+	mkdir -p $APP_DIR
 	mkdir -p $APP_DIR/usr/bin
 	mkdir -p $APP_DIR/usr/lib
 	mkdir -p $APP_DIR/usr/share/applications
@@ -296,19 +316,25 @@ create_appdir(){
 	cp $BUILD_FOLDER/scopy $APP_DIR/usr/bin
 
 	cp $SCOPY_DLL $APP_DIR/usr/lib
-	cp -r $PLUGINS $APP_DIR/usr/share
+	mkdir -p $APP_DIR/usr/lib/scopy/plugins
+	cp $PLUGINS/*.so $APP_DIR/usr/lib/scopy/plugins
 
-	mkdir $APP_DIR/usr/share/translations
-	cp $TRANSLATIONS_QM $APP_DIR/usr/share/translations
+	mkdir -p $APP_DIR/usr/lib/scopy/translations
+	cp $TRANSLATIONS_QM $APP_DIR/usr/lib/scopy/translations
 
 	if [ -d $REGMAP_XMLS ]; then
-		cp -r $REGMAP_XMLS $APP_DIR/usr/share/plugins
+		cp -r $REGMAP_XMLS $APP_DIR/usr/lib/scopy/plugins
 	fi
+
+	cp -r $DAC_WAVEFORM_CSV $APP_DIR/usr/lib/scopy/plugins
+	cp -r $EMU_XMLS $APP_DIR/usr/lib/scopy/plugins
+	mkdir -p $APP_DIR/usr/lib/scopy/plugins/resources
+	cp $EMU_CONFIG $APP_DIR/usr/lib/scopy/plugins/resources
 
 	$COPY_DEPS $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
 	$COPY_DEPS $APP_DIR/usr/bin/iio-emu $APP_DIR/usr/lib
 	$COPY_DEPS $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
-	$COPY_DEPS "$APP_DIR/usr/share/plugins/*.so" $APP_DIR/usr/lib
+	$COPY_DEPS "$APP_DIR/usr/lib/scopy/plugins/*.so" $APP_DIR/usr/lib
 	cp -r $QT_LOCATION/plugins $APP_DIR/usr
 
 	# search for the python version linked by cmake and copy inside the appimage the same version
@@ -343,6 +369,16 @@ move_sysroot(){
 	if [ ! -d $SYSROOT ];then
 		echo "Missing SYSROOT"
 		exit 1
+	fi
+}
+
+# move the staging folder that contains the tools needed for the build to the known location
+move_tools(){
+	[ -d /home/runner/staging ] && mv /home/runner/staging $STAGING_AREA || echo "Staging folder not found or already moved"
+	if [ ! -d $STAGING_AREA ]; then
+		echo "Missing tools folder, downloading now"
+		download_cmake
+		download_crosscompiler
 	fi
 }
 

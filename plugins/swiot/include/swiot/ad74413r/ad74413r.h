@@ -88,6 +88,7 @@ private Q_SLOTS:
 	void onChannelBtnChecked(int chnWidgetId, bool en);
 	void samplingFreqWritten(bool written);
 	void onThresholdWritten(bool written);
+	void startTutorial();
 
 private:
 	void init();
@@ -137,7 +138,7 @@ private:
 
 	PlotWidget *m_plot;
 	PlotInfo *m_info;
-	PlotSamplingInfo m_currentSamplingInfo;
+	SamplingInfo m_currentSamplingInfo;
 	QMap<int, PlotChannel *> m_plotChnls;
 
 	QMap<QString, iio_device *> m_iioDevicesMap;
@@ -155,6 +156,8 @@ private:
 	QTimer *m_rstAcqTimer;
 	const QString channelsMenuId = "channels";
 	const QString measureMenuId = "measure";
+
+	void showEvent(QShowEvent *event) override;
 };
 } // namespace swiot
 } // namespace scopy

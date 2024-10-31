@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef PLOTNAVIGATOR_H
 #define PLOTNAVIGATOR_H
 
@@ -48,6 +69,9 @@ public:
 	void removeChannel(PlotChannel *channel);
 
 	bool isZoomed();
+	void forcePan(QwtAxisId axisId, double factor);
+	void forceMagnify(QwtAxisId axisId, double factor, QPointF cursorPos);
+	void forceZoom(QwtAxisId axisId, const QRectF &rect);
 
 	void setZoomerXAxesEn(bool en);
 	void setZoomerYAxesEn(bool en);
@@ -95,12 +119,14 @@ public:
 	Qt::KeyboardModifier getZoomerXYModifier();
 
 	static void syncPlotNavigators(PlotNavigator *pNav1, PlotNavigator *pNav2, QSet<QwtAxisId> *axes);
+	static void syncPlotNavigators(PlotNavigator *pNav1, PlotNavigator *pNav2);
 	void setResetButtonEn(bool en);
 
 Q_SIGNALS:
 	void reset();
 	void undo();
 	void rectChanged(const QRectF &rect, navigationType type);
+	void addedNavigator(Navigator *nav);
 
 protected:
 	virtual bool eventFilter(QObject *object, QEvent *event) QWT_OVERRIDE;
@@ -115,11 +141,13 @@ private:
 	PlotMagnifier *createMagnifier(QwtAxisId axisId);
 	PlotZoomer *createZoomer(QwtAxisId axisId);
 	void addNavigators(QwtAxisId axisId);
-	void removeNavigators(QwtAxisId axisId);
+	void removeNavigators(QwtAxisId axisId, PlotChannel *channel);
 	void addRectToHistory(Navigator *nav, const QRectF &rect, navigationType type);
 	void onUndo();
 	void onReset();
 	static void syncNavigators(PlotNavigator *pNav1, Navigator *nav1, PlotNavigator *pNav2, Navigator *nav2);
+	static void syncPlotNavigatorSignals(PlotNavigator *pNav1, PlotNavigator *pNav2);
+	static void syncPlotNavigatorAxes(PlotNavigator *pNav1, PlotNavigator *pNav2, QSet<QwtAxisId> *axes);
 
 private:
 	bool m_en;

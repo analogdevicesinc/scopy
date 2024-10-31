@@ -1,13 +1,32 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "widgets/hoverwidget.h"
 
 #include "stylehelper.h"
 
 #include <QDebug>
-#include <QLoggingCategory>
 
 #include <stylehelper.h>
 using namespace scopy;
-Q_LOGGING_CATEGORY(CAT_HOVERWIDGET, "HoverWidget")
 
 HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
 	: QWidget(parent)
@@ -302,9 +321,9 @@ void HoverWidget::moveToAnchor()
 		break;
 	}
 
-	qDebug(CAT_HOVERWIDGET) << "moveAnchor"
-				<< "mapped" << mappedPoint << "contentPosition" << contentPosition << "anchorPosition"
-				<< anchorPosition << "offset" << m_anchorOffset;
+	qDebug() << "moveAnchor"
+		 << "mapped" << mappedPoint << "contentPosition" << contentPosition << "anchorPosition"
+		 << anchorPosition << "offset" << m_anchorOffset;
 	move(mappedPoint + contentPosition + anchorPosition + m_anchorOffset);
 }
 

@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef RMSINSTRUMENT_H
 #define RMSINSTRUMENT_H
 #include <QWidget>
@@ -8,6 +29,7 @@
 #include <gui/widgets/menucontrolbutton.h>
 #include <gui/widgets/toolbuttons.h>
 #include <pluginbase/resourcemanager.h>
+#include <pluginbase/toolmenuentry.h>
 
 #define DEVICE_NAME "pqm"
 
@@ -16,12 +38,11 @@ class SCOPY_PQM_EXPORT RmsInstrument : public QWidget, public ResourceUser
 {
 	Q_OBJECT
 public:
-	RmsInstrument(QWidget *parent = nullptr);
+	RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent = nullptr);
 	~RmsInstrument();
 
 Q_SIGNALS:
 	void enableTool(bool en, QString toolName = "rms");
-	void runTme(bool en);
 public Q_SLOTS:
 	void stop() override;
 	void toggleRms(bool en);
@@ -35,6 +56,9 @@ private:
 	void updatePlot(PolarPlotWidget *plot, QString type);
 	QVector<QwtPointPolar> getPolarPlotPoints(QString chnlType);
 
+	QString m_uri;
+	ToolMenuEntry *m_tme;
+	bool m_running;
 	RunBtn *m_runBtn;
 	SingleShotBtn *m_singleBtn;
 	PolarPlotWidget *m_voltagePlot;

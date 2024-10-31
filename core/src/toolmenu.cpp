@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2019 Analog Devices Inc.
+ * Copyright (c) 2024 Analog Devices Inc.
  *
  * This file is part of Scopy
- * (see http://www.github.com/analogdevicesinc/scopy).
+ * (see https://www.github.com/analogdevicesinc/scopy).
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,150 +15,108 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 #include "toolmenu.h"
-
-#include "gui/dynamicWidget.h"
-
-#include <QDebug>
+#include <QScrollBar>
 
 using namespace scopy;
 
 ToolMenu::ToolMenu(QWidget *parent)
-	: BaseMenu(parent)
+	: QWidget(parent)
+	, m_btnGroup(new QButtonGroup(this))
 {
-	buttonGroup = new QButtonGroup(this);
+	m_uuid = 0;
+	QVBoxLayout *lay = new QVBoxLayout();
+	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
-	connect(this, &ToolMenu::itemMovedFromTo, this, &ToolMenu::_updateToolList);
+	m_scroll = new QScrollArea(parent);
+	QWidget *wScroll = new QWidget(m_scroll);
+
+	m_layScroll = new QVBoxLayout();
+	m_layScroll->setMargin(0);
+	m_layScroll->setSpacing(10);
+
+	wScroll->setLayout(m_layScroll);
+	m_scroll->setWidgetResizable(true);
+	m_scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	m_scroll->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);
+
+	m_scroll->setWidget(wScroll);
+	m_scroll->verticalScrollBar()->setVisible(false);
+
+	lay->setMargin(0);
+	lay->setSpacing(10);
+	setLayout(lay);
+
+	m_spacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+	m_layScroll->addSpacerItem(m_spacer);
+
+	lay->addWidget(m_scroll);
+
+	connect(m_scroll->verticalScrollBar(), &QScrollBar::rangeChanged, this, &ToolMenu::onScrollRangeChanged);
 }
 
-ToolMenuItem *ToolMenu::getToolMenuItemFor(QString toolId)
+ToolMenu::~ToolMenu() {}
+
+void ToolMenu::add(QWidget *w)
 {
-	for(auto &&tool : tools) {
-		if(tool->getId() == toolId)
-			return tool;
-	}
-	return nullptr;
+	int spacerIndex = m_layScroll->indexOf(m_spacer);
+	m_layScroll->insertWidget(spacerIndex, w);
+	m_uuid++;
 }
 
-ToolMenuItem *ToolMenu::createTool(QString id, QString name, QString icon, int position)
+void ToolMenu::add(int index, QString itemId, QWidget *w)
 {
-	ToolMenuItem *t = new ToolMenuItem(id, name, icon, this);
-	insertMenuItem(t, position);
-	if(position == -1) {
-		tools.append(t);
+	m_widgetMap.insert(itemId, w);
+	if(index < 0) {
+		add(w);
 	} else {
-		tools.insert(position, t);
-	}
-	buttonGroup->addButton(t->getToolBtn());
-
-	connect(t->getToolBtn(), &QPushButton::clicked, this, [=]() { Q_EMIT requestToolSelect(t->getId()); });
-
-	connect(t, &ToolMenuItem::doubleclick, this, [=]() { Q_EMIT toggleAttach(t->getId()); });
-
-	connect(t->getToolBtn(), &QPushButton::toggled, this, [=](bool on) {
-		if(buttonGroup->id(t->getToolBtn()) != -1) {
-			setDynamicProperty(t, "selected", on);
-		}
-	});
-
-	return t;
-}
-ToolMenuItem *ToolMenu::addTool(QString id, QString name, QString icon, int position)
-{
-	ToolMenuItem *t = createTool(id, name, icon, position);
-	insertMenuItem(t, position);
-
-	return t;
-}
-
-void ToolMenu::detachSuccesful(QString tool)
-{
-	auto &&t = getToolMenuItemFor(tool);
-	if(t) {
-		setDynamicProperty(t, "selected", false);
-		buttonGroup->removeButton(t->getToolBtn());
+		add(index, w);
 	}
 }
 
-void ToolMenu::attachSuccesful(QString tool)
+void ToolMenu::add(int index, QWidget *w)
 {
-	auto &&t = getToolMenuItemFor(tool);
-	if(t) {
-		buttonGroup->addButton(t->getToolBtn());
-	}
+	m_layScroll->insertWidget(index, w);
+	m_uuid++;
+}
+void ToolMenu::remove(QWidget *w)
+{
+	m_widgetMap.remove(widgetName(w));
+	m_layScroll->removeWidget(w);
 }
 
-bool ToolMenu::removeTool(QString id)
+int ToolMenu::indexOf(QWidget *w) { return m_layScroll->indexOf(w); }
+
+void ToolMenu::colapseAll()
 {
-	for(int i = 0; i < tools.size(); i++) {
-		if(tools[i]->getId() == id) {
-			delete tools[i];
-			tools.remove(i);
-			return true;
+	for(QWidget *w : qAsConst(m_widgetMap)) {
+		Collapsable *c = dynamic_cast<Collapsable *>(w);
+		if(c != nullptr) {
+			c->setCollapsed(true);
 		}
 	}
-	return false;
 }
 
-bool ToolMenu::removeTool(ToolMenuItem *tmi)
+QButtonGroup *ToolMenu::btnGroup() const { return m_btnGroup; }
+
+QString ToolMenu::widgetName(QWidget *w) { return m_widgetMap.key(w, ""); }
+
+// Used to display the scrollbar when needed and to maintain its size in the scroll area when not needed.
+// We chose this approach because for the Qt::ScrollBarAsNeeded policy the size of the scrollball cannot be retained
+// with Util::retainWidgetSizeWhenHidden because the resizing of the scrollbar is done dynamically (withoud using the
+// show/hide default functions).
+void ToolMenu::onScrollRangeChanged(int min, int max)
 {
-	for(int i = 0; i < tools.size(); i++) {
-		if(tools[i] == tmi) {
-			delete tools[i];
-			tools.remove(i);
-			return true;
-		}
+	if(max > min) {
+		m_scroll->verticalScrollBar()->setVisible(true);
+	} else {
+		m_scroll->verticalScrollBar()->setVisible(false);
 	}
-	return false;
-}
-
-const QVector<ToolMenuItem *> &ToolMenu::getTools() const { return tools; }
-
-QButtonGroup *ToolMenu::getButtonGroup() const { return buttonGroup; }
-
-void ToolMenu::_updateToolList(short from, short to)
-{
-	if(d_items == tools.size()) {
-		auto toMove = tools[from];
-		tools.remove(from);
-		tools.insert(to, toMove);
-	}
-}
-
-ToolMenu::~ToolMenu() { _saveState(); }
-
-void ToolMenu::hideMenuText(bool val)
-{
-	for(auto &&tool : tools) {
-		tool->hideText(val);
-	}
-}
-
-void ToolMenu::_saveState()
-{
-	//	QSettings settings;
-
-	//	settings.beginWriteArray("toolMenu/pos");
-	//	for (int i = 0; i < d_tools.size(); ++i) {
-	//		settings.setArrayIndex(i);
-	//		settings.setValue("idx", QVariant(d_tools[i].second));
-	//	}
-	//	settings.endArray();
-}
-
-void ToolMenu::_loadState()
-{
-	//	QSettings settings;
-
-	//	int n = settings.beginReadArray("toolMenu/pos");
-	//	for (int i = 0; i < n; ++i) {
-	//		settings.setArrayIndex(i);
-	//		d_positions.push_back(settings.value("idx").value<int>());
-	//	}
-	//	settings.endArray();
 }
 
 #include "moc_toolmenu.cpp"

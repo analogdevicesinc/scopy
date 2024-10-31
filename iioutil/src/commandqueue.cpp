@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "commandqueue.h"
 
 #include <QDebug>
@@ -13,7 +34,9 @@ Q_LOGGING_CATEGORY(CAT_COMMANDQUEUE, "CommandQueue");
 CommandQueue::CommandQueue(QObject *parent)
 	: QObject(parent)
 	, m_running(false)
-{}
+{
+	m_lastCmdTime = QTime::currentTime();
+}
 
 CommandQueue::~CommandQueue()
 {
@@ -44,6 +67,7 @@ void CommandQueue::start()
 
 void CommandQueue::resolveNext(scopy::Command *cmd)
 {
+	m_lastCmdTime = QTime::currentTime();
 	m_commandQueue.pop_front(); // also delete/disconnect
 	qDebug(CAT_COMMANDQUEUE) << "delete " << cmd;
 	disconnect(cmd, &Command::finished, this, &CommandQueue::resolveNext);
@@ -55,6 +79,8 @@ void CommandQueue::resolveNext(scopy::Command *cmd)
 		runCmd();
 	}
 }
+
+QTime CommandQueue::lastCmdTime() const { return m_lastCmdTime; }
 
 void CommandQueue::runCmd()
 {

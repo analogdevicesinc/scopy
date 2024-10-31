@@ -25,12 +25,14 @@
 Q_LOGGING_CATEGORY(CAT_IIO_DATA_STRATEGY, "AttrDataStrategy")
 using namespace scopy;
 
-ChannelAttrDataStrategy::ChannelAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent)
-	: QWidget(parent)
+ChannelAttrDataStrategy::ChannelAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
+	: QObject(parent)
 {
 	m_recipe = recipe;
 	m_returnCode = 0;
 }
+
+ChannelAttrDataStrategy::~ChannelAttrDataStrategy() {}
 
 QString ChannelAttrDataStrategy::data() { return m_data; }
 

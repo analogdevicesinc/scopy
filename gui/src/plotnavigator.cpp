@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "plotnavigator.hpp"
 #include "plotmagnifier.hpp"
 #include "plotzoomer.hpp"
@@ -87,6 +108,7 @@ void PlotNavigator::initResetButton()
 	m_resetButton->setFlat(true);
 	StyleHelper::TransparentWidget(m_resetButton);
 	m_resetButton->setIcon(icon);
+	m_resetButton->hide();
 
 	connect(m_resetButton, &QPushButton::clicked, this, [=]() { Q_EMIT reset(); });
 	connect(this, &PlotNavigator::rectChanged, this, [=]() { m_resetButton->setVisible(isZoomed()); });
@@ -193,15 +215,33 @@ void PlotNavigator::addNavigators(QwtAxisId axisId)
 				Q_EMIT reset();
 		}
 	});
+
+	Q_EMIT addedNavigator(nav);
 }
 
-void PlotNavigator::removeNavigators(QwtAxisId axisId)
+void PlotNavigator::removeNavigators(QwtAxisId axisId, PlotChannel *channel)
 {
-	for(Navigator *nav : *m_navigators) {
-		if(nav->magnifier->getXAxis() == axisId || nav->magnifier->getYAxis() == axisId) {
-			delete nav;
-			m_navigators->remove(nav);
+	// remove axes if there aren't other channels using them
+	bool found = false;
+
+	for(PlotChannel *ch : *m_channels) {
+		if((ch->xAxis()->axisId() == axisId) || (ch->yAxis()->axisId() == axisId)) {
+			found = true;
 		}
+	}
+
+	QList<Navigator *> toDelete;
+	for(Navigator *nav : *m_navigators) {
+		if((!found && nav->magnifier->getXAxis() == axisId) ||
+		   (!found && nav->magnifier->getYAxis() == axisId)) {
+			toDelete.push_back(nav);
+		}
+	}
+
+	for(Navigator *n : toDelete) {
+		m_navigators->remove(n);
+		delete n;
+		m_axes->remove(axisId);
 	}
 }
 
@@ -284,8 +324,6 @@ QSet<PlotChannel *> *PlotNavigator::channels() { return m_channels; }
 
 void PlotNavigator::addChannel(PlotChannel *channel)
 {
-	m_channels->insert(channel);
-
 	// insert axes if there aren't other channels already using them
 	QwtAxisId axisId = channel->xAxis()->axisId();
 	if(!m_axes->contains(axisId)) {
@@ -301,34 +339,18 @@ void PlotNavigator::addChannel(PlotChannel *channel)
 		setBaseRect(axisId);
 	}
 
+	m_channels->insert(channel);
 	m_visibleZoomer->setEnabled(isZoomerEn());
 }
 
 void PlotNavigator::removeChannel(PlotChannel *channel)
 {
-	m_channels->remove(channel);
-
 	// remove axes if there aren't other channels using them
 	QwtAxisId xAxis = channel->xAxis()->axisId();
-	bool xFound = false;
 	QwtAxisId yAxis = channel->yAxis()->axisId();
-	bool yFound = false;
-
-	for(PlotChannel *ch : *m_channels) {
-		if(ch->xAxis()->axisId() == xAxis) {
-			xFound = true;
-		}
-		if(ch->yAxis()->axisId() == yAxis) {
-			yFound = true;
-		}
-	}
-
-	for(Navigator *nav : *m_navigators) {
-		if((xFound && nav->magnifier->getXAxis() == xAxis) || (yFound && nav->magnifier->getYAxis() == yAxis)) {
-			delete nav;
-			m_navigators->remove(nav);
-		}
-	}
+	removeNavigators(xAxis, channel);
+	removeNavigators(yAxis, channel);
+	m_channels->remove(channel);
 
 	if(m_channels->empty()) {
 		m_visibleZoomer->setEnabled(false);
@@ -348,6 +370,36 @@ bool PlotNavigator::isZoomed()
 	}
 
 	return zoomed;
+}
+
+void PlotNavigator::forcePan(QwtAxisId axisId, double factor)
+{
+	for(Navigator *nav : *m_navigators) {
+		if((nav->magnifier->isXAxisEn() && nav->magnifier->getXAxis() == axisId) ||
+		   (nav->magnifier->isYAxisEn() && nav->magnifier->getYAxis() == axisId)) {
+			nav->magnifier->pan(factor);
+		}
+	}
+}
+
+void PlotNavigator::forceMagnify(QwtAxisId axisId, double factor, QPointF cursorPos)
+{
+	for(Navigator *nav : *m_navigators) {
+		if((nav->magnifier->isXAxisEn() && nav->magnifier->getXAxis() == axisId) ||
+		   (nav->magnifier->isYAxisEn() && nav->magnifier->getYAxis() == axisId)) {
+			nav->magnifier->zoom(factor, cursorPos);
+		}
+	}
+}
+
+void PlotNavigator::forceZoom(QwtAxisId axisId, const QRectF &rect)
+{
+	for(Navigator *nav : *m_navigators) {
+		if((nav->zoomer->isXAxisEn() && nav->zoomer->getXAxis() == axisId) ||
+		   (nav->zoomer->isYAxisEn() && nav->zoomer->getYAxis() == axisId)) {
+			nav->zoomer->zoom(rect);
+		}
+	}
 }
 
 void PlotNavigator::setZoomerXAxesEn(bool en)
@@ -519,14 +571,17 @@ void PlotNavigator::syncNavigators(PlotNavigator *pNav1, Navigator *nav1, PlotNa
 	connect(nav1->zoomer, &PlotZoomer::zoomed, pNav2, [=](const QRectF &rect) {
 		nav2->zoomer->silentZoom(rect);
 		pNav2->addRectToHistory(nav2, rect, navigationType::Zoom);
+		Q_EMIT pNav2->rectChanged(rect, navigationType::Zoom);
 	});
 	connect(nav1->magnifier, &PlotMagnifier::zoomedRect, pNav2, [=](const QRectF &rect) {
 		nav2->zoomer->silentZoom(rect);
 		pNav2->addRectToHistory(nav2, rect, navigationType::Magnify);
+		Q_EMIT pNav2->rectChanged(rect, navigationType::Magnify);
 	});
 	connect(nav1->magnifier, &PlotMagnifier::pannedRect, pNav2, [=](const QRectF &rect) {
 		nav2->zoomer->silentZoom(rect);
 		pNav2->addRectToHistory(nav2, rect, navigationType::Pan);
+		Q_EMIT pNav2->rectChanged(rect, navigationType::Pan);
 	});
 	connect(pNav1, &PlotNavigator::reset, nav2->magnifier, &PlotMagnifier::reset);
 	connect(pNav1, &PlotNavigator::reset, nav2->zoomer, &PlotZoomer::reset);
@@ -535,27 +590,33 @@ void PlotNavigator::syncNavigators(PlotNavigator *pNav1, Navigator *nav1, PlotNa
 	connect(nav2->zoomer, &PlotZoomer::zoomed, pNav1, [=](const QRectF &rect) {
 		nav1->zoomer->silentZoom(rect);
 		pNav1->addRectToHistory(nav1, rect, navigationType::Zoom);
+		Q_EMIT pNav1->rectChanged(rect, navigationType::Zoom);
 	});
 	connect(nav2->magnifier, &PlotMagnifier::zoomedRect, pNav1, [=](const QRectF &rect) {
 		nav1->zoomer->silentZoom(rect);
 		pNav1->addRectToHistory(nav1, rect, navigationType::Magnify);
+		Q_EMIT pNav1->rectChanged(rect, navigationType::Magnify);
 	});
 	connect(nav2->magnifier, &PlotMagnifier::pannedRect, pNav1, [=](const QRectF &rect) {
 		nav1->zoomer->silentZoom(rect);
 		pNav1->addRectToHistory(nav1, rect, navigationType::Pan);
+		Q_EMIT pNav1->rectChanged(rect, navigationType::Pan);
 	});
 	connect(pNav2, &PlotNavigator::reset, nav1->magnifier, &PlotMagnifier::reset);
 	connect(pNav2, &PlotNavigator::reset, nav1->zoomer, &PlotZoomer::reset);
 }
 
-void PlotNavigator::syncPlotNavigators(PlotNavigator *pNav1, PlotNavigator *pNav2, QSet<QwtAxisId> *axes)
+void PlotNavigator::syncPlotNavigatorSignals(PlotNavigator *pNav1, PlotNavigator *pNav2)
 {
 	connect(pNav1, &PlotNavigator::undo, pNav2, &PlotNavigator::onUndo);
 	connect(pNav1, &PlotNavigator::reset, pNav2, &PlotNavigator::onReset);
 
 	connect(pNav2, &PlotNavigator::undo, pNav1, &PlotNavigator::onUndo);
 	connect(pNav2, &PlotNavigator::reset, pNav1, &PlotNavigator::onReset);
+}
 
+void PlotNavigator::syncPlotNavigatorAxes(PlotNavigator *pNav1, PlotNavigator *pNav2, QSet<QwtAxisId> *axes)
+{
 	for(Navigator *nav1 : *pNav1->navigators()) {
 		if((nav1->magnifier->isXAxisEn() && axes->contains(nav1->magnifier->getXAxis())) ||
 		   (nav1->magnifier->isYAxisEn() && axes->contains(nav1->magnifier->getYAxis()))) {
@@ -567,6 +628,47 @@ void PlotNavigator::syncPlotNavigators(PlotNavigator *pNav1, PlotNavigator *pNav
 			}
 		}
 	}
+}
+
+// Sync plot navigators only on the specified axes
+void PlotNavigator::syncPlotNavigators(PlotNavigator *pNav1, PlotNavigator *pNav2, QSet<QwtAxisId> *axes)
+{
+	syncPlotNavigatorSignals(pNav1, pNav2);
+	syncPlotNavigatorAxes(pNav1, pNav2, axes);
+}
+
+// Sync plot navigators on all axes
+// this will also work for axes added/removed later
+void PlotNavigator::syncPlotNavigators(PlotNavigator *pNav1, PlotNavigator *pNav2)
+{
+	syncPlotNavigatorSignals(pNav1, pNav2);
+
+	// sync axes shared by both navigators
+	QSet<QwtAxisId> *axes = new QSet<QwtAxisId>(pNav1->axes()->begin(), pNav1->axes()->end());
+	axes->intersect(*pNav2->axes());
+	syncPlotNavigatorAxes(pNav1, pNav2, axes);
+
+	// sync future axes
+	connect(pNav1, &PlotNavigator::addedNavigator, pNav1, [=](Navigator *nav1) {
+		for(Navigator *nav2 : *pNav2->navigators()) {
+			if((nav1->magnifier->isXAxisEn() && nav2->magnifier->isXAxisEn() &&
+			    nav1->magnifier->getXAxis() == nav2->magnifier->getXAxis()) ||
+			   (nav1->magnifier->isYAxisEn() && nav2->magnifier->isYAxisEn() &&
+			    nav1->magnifier->getYAxis() == nav2->magnifier->getYAxis())) {
+				syncNavigators(pNav1, nav1, pNav2, nav2);
+			}
+		}
+	});
+	connect(pNav2, &PlotNavigator::addedNavigator, pNav2, [=](Navigator *nav2) {
+		for(Navigator *nav1 : *pNav1->navigators()) {
+			if((nav2->magnifier->isXAxisEn() && nav1->magnifier->isXAxisEn() &&
+			    nav2->magnifier->getXAxis() == nav1->magnifier->getXAxis()) ||
+			   (nav2->magnifier->isYAxisEn() && nav1->magnifier->isYAxisEn() &&
+			    nav2->magnifier->getYAxis() == nav1->magnifier->getYAxis())) {
+				syncNavigators(pNav2, nav2, pNav1, nav1);
+			}
+		}
+	});
 }
 
 void PlotNavigator::setResetButtonEn(bool en) { m_resetHover->setVisible(en); }

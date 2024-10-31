@@ -29,16 +29,19 @@
 #include "datastrategy/cmdqdeviceattrdatastrategy.h"
 #include "guistrategy/comboguistrategy.h"
 #include "guistrategy/rangeguistrategy.h"
+#include <pluginbase/preferences.h>
 #include <iioutil/connectionprovider.h>
 #include <QLoggingCategory>
 
 #define ATTR_BUFFER_SIZE 16384
 using namespace scopy;
-Q_LOGGING_CATEGORY(CAT_ATTRFACTORY, "AttrFactory")
+Q_LOGGING_CATEGORY(CAT_ATTRBUILDER, "AttrBuilder")
 
-IIOWidgetBuilder::IIOWidgetBuilder(QObject *parent)
+IIOWidgetBuilder::IIOWidgetBuilder(QWidget *parent)
 	: QObject(parent)
 	, m_connection(nullptr)
+	, m_isCompact(false)
+	, m_includeDebugAttrs(Preferences::get("debugger_v2_include_debugfs").toBool())
 	, m_context(nullptr)
 	, m_device(nullptr)
 	, m_channel(nullptr)
@@ -47,7 +50,7 @@ IIOWidgetBuilder::IIOWidgetBuilder(QObject *parent)
 	, m_optionsValues("")
 	, m_dataStrategy(DS::NoDataStrategy)
 	, m_uiStrategy(UIS::NoUIStrategy)
-	, m_widgetParent(nullptr)
+	, m_widgetParent(parent)
 {}
 
 IIOWidgetBuilder::~IIOWidgetBuilder() {}
@@ -58,12 +61,12 @@ IIOWidget *IIOWidgetBuilder::buildSingle()
 	GuiStrategyInterface *ui = nullptr;
 
 	if(!m_context && !m_device && !m_channel) {
-		qWarning(CAT_ATTRFACTORY) << "No channel/device/context set.";
+		qWarning(CAT_ATTRBUILDER) << "No channel/device/context set.";
 		return nullptr;
 	}
 
 	if(m_attribute.isEmpty()) {
-		qWarning(CAT_ATTRFACTORY) << "No attribute name set.";
+		qWarning(CAT_ATTRBUILDER) << "No attribute name set.";
 		return nullptr;
 	}
 
@@ -97,7 +100,7 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 		for(ssize_t i = 0; i < attrCount; ++i) {
 			attrName = iio_channel_get_attr(m_channel, i);
 			if(!attrName) {
-				qWarning(CAT_ATTRFACTORY)
+				qWarning(CAT_ATTRBUILDER)
 					<< "Could not read the channel attribute name with index" << i;
 				continue;
 			}
@@ -114,13 +117,16 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 			}
 
 			result.append(buildSingle());
+
+			m_attribute = "";
+			m_optionsAttribute = "";
 		}
 	} else if(m_device) {
 		attrCount = iio_device_get_attrs_count(m_device);
 		for(ssize_t i = 0; i < attrCount; ++i) {
 			attrName = iio_device_get_attr(m_device, i);
 			if(!attrName) {
-				qWarning(CAT_ATTRFACTORY) << "Could not read the device attribute name with index" << i;
+				qWarning(CAT_ATTRBUILDER) << "Could not read the device attribute name with index" << i;
 				continue;
 			}
 
@@ -136,24 +142,56 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 			}
 
 			result.append(buildSingle());
+			m_attribute = "";
+			m_optionsAttribute = "";
+		}
+
+		if(m_includeDebugAttrs) {
+			attrCount = iio_device_get_debug_attrs_count(m_device);
+			for(ssize_t i = 0; i < attrCount; ++i) {
+				attrName = iio_device_get_debug_attr(m_device, i);
+
+				if(!attrName) {
+					qWarning(CAT_ATTRBUILDER)
+						<< "Could not read the device DEBUG attribute name with index" << i;
+					continue;
+				}
+
+				m_attribute = attrName;
+				if(QString(attrName).endsWith("_available")) {
+					continue;
+				}
+
+				availableAttr = iio_device_find_debug_attr(
+					m_device, (QString(attrName) + "_available").toStdString().c_str());
+				if(availableAttr) {
+					m_optionsAttribute = availableAttr;
+				}
+
+				result.append(buildSingle());
+				m_attribute = "";
+				m_optionsAttribute = "";
+			}
 		}
 	} else if(m_context) {
-		attrCount = iio_context_get_devices_count(m_context);
+		attrCount = iio_context_get_attrs_count(m_context);
 		for(ssize_t i = 0; i < attrCount; ++i) {
 			const char *name;
 			const char *value;
 			int res = iio_context_get_attr(m_context, i, &name, &value);
 
 			if(res < 0) {
-				qWarning(CAT_ATTRFACTORY) << "Coutd not get the context attribute with index" << i;
+				qWarning(CAT_ATTRBUILDER) << "Coutd not get the context attribute with index" << i;
 				continue;
 			}
 
 			m_attribute = name;
 			result.append(buildSingle());
+			m_attribute = "";
+			m_optionsAttribute = "";
 		}
 	} else {
-		qWarning(CAT_ATTRFACTORY) << "Not enough information to build IIOWidgets";
+		qWarning(CAT_ATTRBUILDER) << "Not enough information to build IIOWidgets";
 		return {};
 	}
 
@@ -167,6 +205,7 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 void IIOWidgetBuilder::clear()
 {
 	m_connection = nullptr;
+	m_isCompact = false;
 	m_context = nullptr;
 	m_device = nullptr;
 	m_channel = nullptr;
@@ -181,6 +220,18 @@ void IIOWidgetBuilder::clear()
 IIOWidgetBuilder &IIOWidgetBuilder::connection(Connection *connection)
 {
 	m_connection = connection;
+	return *this;
+}
+
+IIOWidgetBuilder &IIOWidgetBuilder::compactMode(bool isCompact)
+{
+	m_isCompact = isCompact;
+	return *this;
+}
+
+IIOWidgetBuilder &IIOWidgetBuilder::includeDebugAttributes(bool isIncluded)
+{
+	m_includeDebugAttrs = isIncluded;
 	return *this;
 }
 
@@ -258,7 +309,7 @@ DataStrategyInterface *IIOWidgetBuilder::createDS()
 
 	switch(strategy) {
 	case DS::NoDataStrategy:
-		qWarning(CAT_ATTRFACTORY) << "Could not determine the Data Strategy";
+		qWarning(CAT_ATTRBUILDER) << "Could not determine the Data Strategy";
 		break;
 	case DS::AttrData:
 		if(m_connection)
@@ -279,7 +330,7 @@ DataStrategyInterface *IIOWidgetBuilder::createDS()
 		ds = new TriggerDataStrategy(m_generatedRecipe, m_widgetParent);
 		break;
 	default:
-		qWarning(CAT_ATTRFACTORY) << "No valid Data Strategy was provided.";
+		qWarning(CAT_ATTRBUILDER) << "No valid Data Strategy was provided.";
 		break;
 	}
 
@@ -299,7 +350,7 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 		if(!m_optionsAttribute.isEmpty()) {
 			// read values from iio and interpret them
 			char buffer[ATTR_BUFFER_SIZE] = {0};
-			ssize_t res;
+			ssize_t res = -1;
 			if(m_channel) {
 				res = iio_channel_attr_read(m_channel, m_optionsAttribute.toStdString().c_str(), buffer,
 							    ATTR_BUFFER_SIZE);
@@ -312,7 +363,7 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 			}
 
 			if(res < 0) {
-				qWarning(CAT_ATTRFACTORY) << "Could not read options from" << m_optionsAttribute;
+				qWarning(CAT_ATTRBUILDER) << "Could not read options from" << m_optionsAttribute;
 				strategy = UIS::EditableUi;
 			} else {
 				if(QString(buffer).startsWith('[') && strategy == UIS::NoUIStrategy) {
@@ -335,14 +386,14 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 
 	switch(strategy) {
 	case UIS::EditableUi:
-		ui = new EditableGuiStrategy(m_generatedRecipe, m_widgetParent);
+		ui = new EditableGuiStrategy(m_generatedRecipe, m_isCompact, m_widgetParent);
 		break;
 	case UIS::SwitchUi:
 	case UIS::ComboUi:
-		ui = new ComboAttrUi(m_generatedRecipe, m_widgetParent);
+		ui = new ComboAttrUi(m_generatedRecipe, m_isCompact, m_widgetParent);
 		break;
 	case UIS::RangeUi:
-		ui = new RangeAttrUi(m_generatedRecipe, m_widgetParent);
+		ui = new RangeAttrUi(m_generatedRecipe, m_isCompact, m_widgetParent);
 		break;
 	default:
 		break;

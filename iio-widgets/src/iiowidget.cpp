@@ -20,6 +20,7 @@
 
 #include "iiowidget.h"
 #include <QDateTime>
+#include <pluginbase/preferences.h>
 
 using namespace scopy;
 
@@ -33,42 +34,48 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 	, m_lastOpTimestamp(nullptr)
 	, m_lastOpState(nullptr)
 	, m_lastReturnCode(0)
+	, m_UItoDS(nullptr)
+	, m_DStoUI(nullptr)
 {
 	setLayout(new QVBoxLayout(this));
 	layout()->setContentsMargins(0, 0, 0, 0);
 	layout()->setSpacing(0);
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-	QWidget *ui = uiStrategy->ui();
+	QWidget *ui = m_uiStrategy->ui();
 	if(ui) {
 		layout()->addWidget(ui);
 	}
 	layout()->addWidget(m_progressBar);
 
-	QWidget *uiStrategyWidget = dynamic_cast<QWidget *>(m_uiStrategy);
-	QWidget *dataStrategyWidget = dynamic_cast<QWidget *>(m_dataStrategy);
+	QObject *uiStrategyObject = dynamic_cast<QObject *>(m_uiStrategy);
+	QObject *dataStrategyObject = dynamic_cast<QObject *>(m_dataStrategy);
 
-	connect(m_progressBar, &SmallProgressBar::progressFinished, this, [this]() { this->saveData(m_lastData); });
+	uiStrategyObject->setParent(this);
+	dataStrategyObject->setParent(this);
 
-	connect(uiStrategyWidget, SIGNAL(emitData(QString)), this, SLOT(startTimer(QString)));
+	connect(m_progressBar, &SmallProgressBar::progressFinished, this,
+		[this]() { this->convertUItoDS(m_lastData); });
 
-	connect(dataStrategyWidget, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
+	connect(uiStrategyObject, SIGNAL(emitData(QString)), this, SLOT(startTimer(QString)));
+
+	connect(dataStrategyObject, SIGNAL(emitStatus(QDateTime, QString, QString, int, bool)), this,
 		SLOT(emitDataStatus(QDateTime, QString, QString, int, bool)));
 
 	// forward data request from ui strategy to data strategy
-	connect(uiStrategyWidget, SIGNAL(requestData()), dataStrategyWidget, SLOT(readAsync()));
+	connect(uiStrategyObject, SIGNAL(requestData()), dataStrategyObject, SLOT(readAsync()));
 
 	// forward data from data strategy to ui strategy
-	connect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), uiStrategyWidget,
-		SLOT(receiveData(QString, QString)));
+	connect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this, SLOT(convertDStoUI(QString, QString)));
 
 	// intercept the sendData from dataStrategy to collect information
-	connect(dataStrategyWidget, SIGNAL(sendData(QString, QString)), this, SLOT(storeReadInfo(QString, QString)));
+	connect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this, SLOT(storeReadInfo(QString, QString)));
 
-	connect(dynamic_cast<QWidget *>(m_dataStrategy), SIGNAL(sendData(QString, QString)), this,
-		SLOT(storeReadInfo(QString, QString)));
-
-	m_dataStrategy->readAsync();
+	// The data will be populated here
+	bool useLazyLoading = Preferences::GetInstance()->get("iiowidgets_use_lazy_loading").toBool();
+	if(!useLazyLoading) { // force skip lazy load
+		LAZY_LOAD(initialize);
+	}
 }
 
 QPair<QString, QString> IIOWidget::read() { return m_dataStrategy->read(); }
@@ -140,6 +147,10 @@ IIOWidget::State *IIOWidget::lastOperationState() { return m_lastOpState; }
 
 int IIOWidget::lastReturnCode() { return m_lastReturnCode; }
 
+void IIOWidget::setUItoDataConversion(std::function<QString(QString)> func) { m_UItoDS = func; }
+
+void IIOWidget::setDataToUIConversion(std::function<QString(QString)> func) { m_DStoUI = func; }
+
 void IIOWidget::startTimer(QString data)
 {
 	m_lastData = data;
@@ -154,6 +165,24 @@ void IIOWidget::storeReadInfo(QString data, QString optionalData)
 	Q_UNUSED(optionalData)
 	setLastOperationTimestamp(QDateTime::currentDateTime());
 }
+
+void IIOWidget::convertUItoDS(QString data)
+{
+	if(m_UItoDS) {
+		data = m_UItoDS(data);
+	}
+	this->saveData(data);
+}
+
+void IIOWidget::convertDStoUI(QString data, QString optionalData)
+{
+	if(m_DStoUI) { // only the data should be converted
+		data = m_DStoUI(data);
+	}
+	m_uiStrategy->receiveData(data, optionalData);
+}
+
+void IIOWidget::initialize() { m_dataStrategy->readAsync(); }
 
 void IIOWidget::setLastOperationTimestamp(QDateTime timestamp)
 {

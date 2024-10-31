@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2024 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "menus/channelattributesmenu.hpp"
 #include "datamonitortool.h"
 
@@ -8,8 +29,10 @@
 #include <menus/logdatatofile.hpp>
 #include <menucontrolbutton.h>
 #include <datamonitor/sevensegmentdisplay.hpp>
+#include <QDesktopServices>
 #include <timemanager.hpp>
 #include <tutorialbuilder.h>
+#include <pluginbase/preferences.h>
 #include "datamonitorstylehelper.hpp"
 #include <iioutil/connection.h>
 
@@ -40,16 +63,29 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn *>(openLastMenuBtn)->getButtonGroup();
 
 	infoBtn = new InfoBtn(this);
-	printBtn = new PrintBtn(this);
+	printplotManager = new PrintPlotManager(this);
 	runBtn = new RunBtn(this);
 	clearBtn = new QPushButton("Clear", this);
+	PrintBtn *printBtn = new PrintBtn(this);
 
-	connect(infoBtn, &QPushButton::clicked, this, &DatamonitorTool::startTutorial);
+	// connect(infoBtn, &QPushButton::clicked, this, &DatamonitorTool::startTutorial);
+	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+		QDesktopServices::openUrl(
+			QUrl("https://analogdevicesinc.github.io/scopy/plugins/datalogger/datalogger.html"));
+	});
+
+	// connect(infoBtn, &QPushButton::clicked, this, &DatamonitorTool::startTutorial);
 
 	//// add monitors
 	addMonitorButton = new AddBtn(this);
 
 	connect(addMonitorButton, &AddBtn::clicked, this, &DatamonitorTool::requestNewTool);
+
+	removeBtn = new RemoveBtn(this);
+	if(!isDeletable) {
+		removeBtn->setVisible(false);
+	}
+	connect(removeBtn, &AddBtn::clicked, this, &DatamonitorTool::requestDeleteTool);
 
 	monitorsButton = new MenuControlButton(this);
 	monitorsButton->setName("Monitors");
@@ -78,6 +114,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	tool->addWidgetToTopContainerMenuControlHelper(settingsButton, TTA_LEFT);
 
 	tool->addWidgetToTopContainerHelper(addMonitorButton, TTA_LEFT);
+	tool->addWidgetToTopContainerHelper(removeBtn, TTA_LEFT);
 
 	///// time manager
 	auto &&timeTracker = TimeManager::GetInstance();
@@ -108,6 +145,12 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	m_monitorPlot = new MonitorPlot(this);
 	centralWidget->addWidget(m_monitorPlot);
 
+	connect(printBtn, &QPushButton::clicked, this, [=, this]() {
+		QList<PlotWidget *> plotList;
+		plotList.push_back(m_monitorPlot->plot());
+		printplotManager->printPlots(plotList, "Data Logger");
+	});
+
 	/////////////////////text values ////////////
 	textMonitors = new QTextEdit(this);
 	textMonitors->setReadOnly(true);
@@ -130,14 +173,11 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	centralWidget->addWidget(sevenSegmetMonitors);
 
 	////////////////////////settings //////////////
-	m_dataMonitorSettings = new DataMonitorSettings(m_monitorPlot, isDeletable);
+	m_dataMonitorSettings = new DataMonitorSettings(m_monitorPlot);
 	// TODO GET SETTINGS NAME FROM UTILS
-	m_dataMonitorSettings->init("DataMonitor", StyleHelper::getColor("ScopyBlue"));
+	m_dataMonitorSettings->init("Data Logger", StyleHelper::getColor("ScopyBlue"));
 
 	tool->rightStack()->add(DataMonitorUtils::getToolSettingsId(), m_dataMonitorSettings);
-
-	connect(m_dataMonitorSettings, &DataMonitorSettings::requestDeleteTool, this,
-		&DatamonitorTool::requestDeleteTool);
 
 	connect(m_dataMonitorSettings, &DataMonitorSettings::titleUpdated, this,
 		&DatamonitorTool::settingsTitleChanged);
@@ -312,6 +352,17 @@ void DatamonitorTool::startTutorial()
 		new gui::TutorialBuilder(this, ":/datamonitor/tutorial_chapters.json", "datamonitor", parent);
 	datamonitorTutorial->setTitle("Tutorial");
 	datamonitorTutorial->start();
+}
+
+void DatamonitorTool::showEvent(QShowEvent *event)
+{
+	QWidget::showEvent(event);
+
+	// Handle tutorial
+	if(Preferences::get("dataloggerplugin_start_tutorial").toBool()) {
+		startTutorial();
+		Preferences::set("dataloggerplugin_start_tutorial", false);
+	}
 }
 
 #include "moc_datamonitortool.cpp"
