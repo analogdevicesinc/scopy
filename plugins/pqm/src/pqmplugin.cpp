@@ -95,7 +95,7 @@ bool PQMPlugin::loadPage()
 
 bool PQMPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/adalm.svg");
+	SCOPY_PLUGIN_ICON(":/pqm/pqm_icon.svg");
 	return true;
 }
 
