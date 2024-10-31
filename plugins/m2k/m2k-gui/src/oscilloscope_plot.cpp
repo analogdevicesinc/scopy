@@ -1,5 +1,5 @@
 /*
- * CopQwtAxis::YRight (c) 2019 Analog Devices Inc.
+ * Copyright (c) 2019 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see http://www.github.com/analogdevicesinc/scopy).
