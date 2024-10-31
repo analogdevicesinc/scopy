@@ -345,7 +345,7 @@ QWidget *EmuWidget::createDemoOptWidget(QWidget *parent)
 	w->setLayout(layout);
 
 	m_demoOptCb = new QComboBox(w);
-	for(const QString &opt : m_availableOptions) {
+	for(const QString &opt : qAsConst(m_availableOptions)) {
 		m_demoOptCb->addItem(opt);
 	}
 	StyleHelper::MenuComboBox(m_demoOptCb, "demo_combo");
