@@ -97,6 +97,7 @@ function main() {
     fi
 
     process_files "$FILE_LIST"
+    exit 0
 }
 
 main "$@"
