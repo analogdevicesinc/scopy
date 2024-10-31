@@ -69,7 +69,7 @@ void PlotManager::setXInterval(double xMin, double xMax)
 
 void PlotManager::setXUnit(QString s)
 {
-	for(PlotComponent *p : m_plots) {
+	for(PlotComponent *p : qAsConst(m_plots)) {
 		p->setXUnit(s);
 	}
 }
@@ -150,7 +150,7 @@ QList<PlotComponent *> PlotManager::plots() const { return m_plots; }
 
 void PlotManager::replot()
 {
-	for(PlotComponent *p : m_plots) {
+	for(PlotComponent *p : qAsConst(m_plots)) {
 		p->replot();
 	}
 	Q_EMIT newData();

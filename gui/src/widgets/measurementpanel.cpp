@@ -179,7 +179,7 @@ void MeasurementsPanel::setInhibitUpdates(bool newInhibitUpdates)
 
 void MeasurementsPanel::clear()
 {
-	for(VerticalWidgetStack *stack : m_stacks) {
+	for(VerticalWidgetStack *stack : qAsConst(m_stacks)) {
 		stack->reparentWidgets(nullptr);
 		panelLayout->removeWidget(stack);
 		delete stack;
@@ -189,7 +189,7 @@ void MeasurementsPanel::clear()
 
 void MeasurementsPanel::refreshUi()
 {
-	for(VerticalWidgetStack *stack : m_stacks) {
+	for(VerticalWidgetStack *stack : qAsConst(m_stacks)) {
 		stack->reparentWidgets(nullptr);
 		panelLayout->removeWidget(stack);
 		delete stack;
@@ -247,11 +247,11 @@ void StatsPanel::removeStat(StatsLabel *stat)
 
 void StatsPanel::updateOrder()
 {
-	for(StatsLabel *label : m_labels) {
+	for(StatsLabel *label : qAsConst(m_labels)) {
 		panelLayout->removeWidget(label);
 	}
 
-	for(StatsLabel *label : m_labels) {
+	for(StatsLabel *label : qAsConst(m_labels)) {
 		panelLayout->addWidget(label);
 	}
 }
