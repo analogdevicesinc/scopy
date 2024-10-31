@@ -33,3 +33,9 @@ in which case it will not be configured.
     
 Upon successful connection a different set of instruments will be available 
 to operate and control the system.
+
+Tutorial 
+--------------------------------------------------------------------------------
+
+A tutorial will automatically start first time the tool is open. It can
+be restarted from tool Preferences.
