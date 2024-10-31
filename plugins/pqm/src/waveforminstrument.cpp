@@ -176,10 +176,10 @@ QWidget *WaveformInstrument::createMenuPlotSection(QWidget *parent)
 	plotSection->contentLayout()->setSpacing(10);
 
 	// timespan
-	m_timespanSpin = new PositionSpinButton({{"ms", 1E-3}, {"s", 1E0}}, "Timespan", 0.02, 10, true, false);
-	m_timespanSpin->setStep(0.05);
+	m_timespanSpin = new gui::MenuSpinbox(tr("Timespan"), 1, "s", 0.02, 10, true, false, plotSection);
+	m_timespanSpin->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 	m_timespanSpin->setValue(1);
-	connect(m_timespanSpin, &PositionSpinButton::valueChanged, this, [=, this](double value) {
+	connect(m_timespanSpin, &gui::MenuSpinbox::valueChanged, this, [=, this](double value) {
 		m_voltagePlot->xAxis()->setMin(-value);
 		m_currentPlot->xAxis()->setMin(-value);
 	});
