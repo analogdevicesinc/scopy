@@ -83,6 +83,12 @@ Settings
 
 |
 
+Tutorial 
+--------------------------------------------------------------------------------
+
+A tutorial will automatically start first time the tool is open. It can
+be restarted from tool Preferences.
+
 .. _xml_file_format:
 
 
