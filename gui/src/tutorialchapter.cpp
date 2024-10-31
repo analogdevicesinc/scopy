@@ -34,7 +34,7 @@ TutorialChapter::~TutorialChapter() {}
 
 TutorialChapter *TutorialChapter::build(const QList<QWidget *> &subjects, const QString &description,
 					QWidget *mainSubject, int x_offset, int y_offset, HoverPosition anchor,
-					HoverPosition content, QObject *parent)
+					HoverPosition content, QString api_call, QObject *parent)
 {
 	TutorialChapter *ch = new TutorialChapter(parent);
 	for(QWidget *subject : subjects) {
@@ -46,6 +46,7 @@ TutorialChapter *TutorialChapter::build(const QList<QWidget *> &subjects, const 
 	ch->setYOffset(y_offset);
 	ch->setAnchor(anchor);
 	ch->setContent(content);
+	ch->setApi(api_call);
 	return ch;
 }
 
@@ -80,5 +81,9 @@ void TutorialChapter::setAnchor(scopy::HoverPosition newAnchor) { anchor = newAn
 scopy::HoverPosition TutorialChapter::getContent() const { return content; }
 
 void TutorialChapter::setContent(scopy::HoverPosition newContent) { content = newContent; }
+
+QString TutorialChapter::getApi() const { return api_call; }
+
+void TutorialChapter::setApi(QString apiCall) { api_call = apiCall; }
 
 #include "moc_tutorialchapter.cpp"

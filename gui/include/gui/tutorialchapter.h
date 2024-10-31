@@ -37,7 +37,7 @@ public:
 
 	static TutorialChapter *build(const QList<QWidget *> &subjects, const QString &description,
 				      QWidget *mainSubject, int x_offset, int y_offset, HoverPosition anchor,
-				      HoverPosition content, QObject *parent = nullptr);
+				      HoverPosition content, QString api_call, QObject *parent = nullptr);
 
 	void addSubject(QWidget *s);
 
@@ -48,6 +48,7 @@ public:
 	int y_offset;
 	HoverPosition anchor;
 	HoverPosition content;
+	QString api_call;
 
 	int getXOffset() const;
 	void setXOffset(int xOffset);
@@ -66,6 +67,9 @@ public:
 
 	QWidget *getMainSubject() const;
 	void setMainSubject(QWidget *mainSubject);
+
+	QString getApi() const;
+	void setApi(QString apiCall);
 
 Q_SIGNALS:
 	void chapterStarted();

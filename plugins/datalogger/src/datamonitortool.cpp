@@ -45,7 +45,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	clearBtn = new QPushButton("Clear", this);
 	PrintBtn *printBtn = new PrintBtn(this);
 
-	connect(infoBtn, &QPushButton::clicked, this, &DatamonitorTool::startTutorial);
+	connect(infoBtn, &QPushButton::clicked, this, &DatamonitorTool::startVideoTutorial);
 
 	//// add monitors
 	addMonitorButton = new AddBtn(this);
@@ -314,6 +314,8 @@ void DatamonitorTool::initTutorialProperties()
 	showSegments->setProperty("tutorial_name", "SHOW_7SEG_BUTTON");
 	settingsButton->setProperty("tutorial_name", "SETTINGS_BUTTON");
 	monitorsButton->setProperty("tutorial_name", "MONITORS_MENU_BUTTON");
+	m_monitorPlot->setProperty("tutorial_name", "MONITOR_PLOT");
+	m_monitorSelectionMenu->setProperty("tutorial_name", "MONITOR_MENU");
 }
 
 void DatamonitorTool::startTutorial()
@@ -322,6 +324,15 @@ void DatamonitorTool::startTutorial()
 	gui::TutorialBuilder *datamonitorTutorial =
 		new gui::TutorialBuilder(this, ":/datamonitor/tutorial_chapters.json", "datamonitor", parent);
 	datamonitorTutorial->setTitle("Tutorial");
+	datamonitorTutorial->start();
+}
+
+void DatamonitorTool::startVideoTutorial()
+{
+	QWidget *parent = Util::findContainingWindow(this);
+	gui::TutorialBuilder *datamonitorTutorial =
+		new gui::TutorialBuilder(this, ":/datamonitor/video_tutorial_chapters.json", "datamonitor", parent);
+	datamonitorTutorial->setTitle("Video Tutorial");
 	datamonitorTutorial->start();
 }
 

@@ -1,0 +1,29 @@
+{
+    "datamonitor": [
+        {
+			"index": 1,
+			"names": ["MONITOR_MENU"],
+			"description": "Select the signals you want to log",
+			"anchor": "HP_RIGHT",
+			"content": "HP_RIGHT",
+			"x_offset": 10
+		},
+        {
+			"index": 2,
+			"names": ["RUN_BUTTON"],
+			"description": "Starts data collection",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10,
+            "api_call": "datalogger.setRunning(true)"
+		},
+        {
+			"index": 3,
+			"names": ["MONITOR_PLOT"],
+			"description": "Display values on plot ",
+			"anchor": "HP_RIGHT",
+			"content": "HP_RIGHT",
+			"x_offset": 10
+		}
+    ]
+}

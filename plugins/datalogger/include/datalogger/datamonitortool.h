@@ -72,6 +72,7 @@ private:
 
 	void initTutorialProperties();
 	void startTutorial();
+	void startVideoTutorial();
 };
 } // namespace scopy::datamonitor
 #endif // DATAMONITORTOOL_H

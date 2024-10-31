@@ -97,6 +97,7 @@ private:
 		int y_offset;
 		HoverPosition anchor;
 		HoverPosition content;
+		QString api_call;
 	};
 
 	QMap<uint16_t, ChapterInstructions *> m_chapters;

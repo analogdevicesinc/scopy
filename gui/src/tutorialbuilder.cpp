@@ -124,7 +124,8 @@ uint16_t TutorialBuilder::collectChapters()
 		this->addChapter(chapter->widgets.values(), chapter->description,
 				 (chapter->mainWidget.isNull()) ? chapter->widgets.first()
 								: chapter->widgets[chapter->mainWidget],
-				 chapter->x_offset, chapter->y_offset, chapter->anchor, chapter->content);
+				 chapter->x_offset, chapter->y_offset, chapter->anchor, chapter->content,
+				 chapter->api_call);
 	}
 
 	return chaptersCollected;
@@ -171,6 +172,7 @@ void TutorialBuilder::readTutorialRequirements()
 	//	"y_offset": int, optional
 	//	"anchor": string, HoverPosition, optional
 	//	"content": string, HoverPosition, optional
+	//	"api_call": string, api function call, optional
 	// }
 	QJsonArray chapters_array = value.toArray();
 	for(QJsonValueRef item : chapters_array) {
@@ -189,6 +191,7 @@ void TutorialBuilder::readTutorialRequirements()
 		QString contentString = item_object.value("content").toString();
 		HoverPosition anchor = convertStringToHoverPosition(anchorString);
 		HoverPosition content = convertStringToHoverPosition(contentString);
+		QString api_call = item_object.value("api_call").toString();
 
 		auto *chapterInstructions = new ChapterInstructions;
 		for(const auto &name : qAsConst(names)) {
@@ -200,6 +203,7 @@ void TutorialBuilder::readTutorialRequirements()
 		chapterInstructions->y_offset = y_offset;
 		chapterInstructions->anchor = anchor;
 		chapterInstructions->content = content;
+		chapterInstructions->api_call = api_call;
 		if(m_chapters.contains(index)) {
 			qWarning(CAT_TUTORIALBUILDER) << "There is already a chapter with the key" << index;
 		} else {

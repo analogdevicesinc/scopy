@@ -41,14 +41,14 @@ TutorialOverlay::~TutorialOverlay() { qDebug(CAT_TUTORIALOVERLAY) << "dtor"; }
 
 TutorialChapter *TutorialOverlay::addChapter(const QList<QWidget *> &subjects, const QString &description,
 					     QWidget *mainWidget, int x_offset, int y_offset, HoverPosition anchor,
-					     HoverPosition content)
+					     HoverPosition content, QString api_call)
 {
 	// in case TutorialOverlay is used without TutorialBuilder
 	if(!mainWidget) {
 		mainWidget = subjects[0];
 	}
-	TutorialChapter *ch =
-		TutorialChapter::build(subjects, description, mainWidget, x_offset, y_offset, anchor, content, this);
+	TutorialChapter *ch = TutorialChapter::build(subjects, description, mainWidget, x_offset, y_offset, anchor,
+						     content, api_call, this);
 	chapter.append(ch);
 	ch->setMainSubject(mainWidget);
 	return ch;
@@ -91,7 +91,6 @@ void TutorialOverlay::next()
 		Q_EMIT chapter[cnt - 1]->chapterFinished();
 
 	Q_EMIT chapter[cnt]->chapterStarted();
-
 	initPopupWidget();
 	m_popupWidget->setDescription(chapter[cnt]->description);
 	overlay->raise();

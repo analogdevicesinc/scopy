@@ -46,7 +46,7 @@ public:
 	TutorialChapter *addChapter(const QList<QWidget *> &subjects, const QString &description,
 				    QWidget *mainWidget = nullptr, int x_offset = 0, int y_offset = 0,
 				    HoverPosition anchor = HoverPosition::HP_CENTER,
-				    HoverPosition content = HoverPosition::HP_CENTER);
+				    HoverPosition content = HoverPosition::HP_CENTER, QString api_call = "");
 	TutorialChapter *addChapter(QWidget *subject, QString description);
 	void addChapter(TutorialChapter *ch);
 
