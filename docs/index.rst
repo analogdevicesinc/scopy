@@ -16,10 +16,6 @@ This repository contains Scopy plugins information
    :class: only-light
    :width: 70%
 
-.. image:: sources/scopy.png
-   :class: only-dark
-   :width: 70%
-
 .. hdl-build-status::
 
 Contents

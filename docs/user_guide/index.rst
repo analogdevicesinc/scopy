@@ -450,6 +450,9 @@ Source code
 The source code for the entire application can be found on `github 
 <https://github.com/analogdevicesinc/scopy>`_ 
 
+Old documentation
+---------------------------------------------------------------------
 
+`Our wiki <https://wiki.analog.com/university/tools/m2k/scopy>`_
 
 
