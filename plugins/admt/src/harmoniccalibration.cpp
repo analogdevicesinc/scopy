@@ -6,7 +6,7 @@
 
 #include <QFuture>
 
-static int sampleRate = 50;
+static int acquisitionUITimerRate = 50;
 static int calibrationTimerRate = 1000;
 static int utilityTimerRate = 1000;
 
@@ -15,10 +15,12 @@ static int dataGraphSamples = 100;
 static int tempGraphSamples = 100;
 static bool running = false;
 static double *dataGraphValue;
+static double *tempGraphValue;
 
 static int cycleCount = 11;
 static int samplesPerCycle = 256;
 static int totalSamplesCount = cycleCount * samplesPerCycle;
+static bool isStartAcquisition = false;
 static bool isStartMotor = false;
 static bool isPostCalibration = false;
 static bool isCalculatedCoeff = false;
@@ -71,6 +73,8 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	, m_admtController(m_admtController)
 {
 	readDeviceProperties();
+	initializeMotor();
+
 	rotationChannelName = m_admtController->getChannelId(ADMTController::Channel::ROTATION);
 	angleChannelName = m_admtController->getChannelId(ADMTController::Channel::ANGLE);
 	countChannelName = m_admtController->getChannelId(ADMTController::Channel::COUNT);
@@ -160,12 +164,6 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	countWidget->contentLayout()->addWidget(countSection);
 	tempWidget->contentLayout()->addWidget(tempSection);
 
-	rawDataLayout->addWidget(rotationWidget);
-	rawDataLayout->addWidget(angleWidget);
-	rawDataLayout->addWidget(countWidget);
-	rawDataLayout->addWidget(tempWidget);
-	rawDataLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
-
 	rotationValueLabel = new QLabel(rotationSection);
 	StyleHelper::MenuControlLabel(rotationValueLabel, "rotationValueLabel");
 	angleValueLabel = new QLabel(angleSection);
@@ -185,6 +183,58 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	countSection->contentLayout()->addWidget(countValueLabel);
 	tempSection->contentLayout()->addWidget(tempValueLabel);
 
+	#pragma region Acquisition Motor Configuration Section Widget
+	MenuSectionWidget *motorConfigurationSectionWidget = new MenuSectionWidget(rawDataWidget);
+	MenuCollapseSection *motorConfigurationCollapseSection = new MenuCollapseSection("Motor Configuration", MenuCollapseSection::MHCW_NONE, motorConfigurationSectionWidget);
+	motorConfigurationCollapseSection->header()->toggle();
+	motorConfigurationSectionWidget->contentLayout()->addWidget(motorConfigurationCollapseSection);
+
+	motorMaxVelocitySpinBox = new HorizontalSpinBox("Max Velocity", convertVMAXtoRPS(rotate_vmax), "rps", motorConfigurationSectionWidget);
+	motorMaxVelocitySpinBox->setValue(1);
+	motorAccelTimeSpinBox = new HorizontalSpinBox("Acceleration Time", convertAMAXtoAccelTime(amax), "sec", motorConfigurationSectionWidget);
+	motorAccelTimeSpinBox->setValue(1);
+	motorMaxDisplacementSpinBox = new HorizontalSpinBox("Max Displacement", dmax, "", motorConfigurationSectionWidget);
+
+	m_calibrationMotorRampModeMenuCombo = new MenuCombo("Ramp Mode", motorConfigurationSectionWidget);
+	auto calibrationMotorRampModeCombo = m_calibrationMotorRampModeMenuCombo->combo();
+	calibrationMotorRampModeCombo->addItem("Position", QVariant(ADMTController::MotorRampMode::POSITION));
+	calibrationMotorRampModeCombo->addItem("Ramp Mode 1", QVariant(ADMTController::MotorRampMode::RAMP_MODE_1));
+	applyComboBoxStyle(calibrationMotorRampModeCombo);
+
+	motorConfigurationCollapseSection->contentLayout()->setSpacing(8);
+	motorConfigurationCollapseSection->contentLayout()->addWidget(motorMaxVelocitySpinBox);
+	motorConfigurationCollapseSection->contentLayout()->addWidget(motorAccelTimeSpinBox);
+	motorConfigurationCollapseSection->contentLayout()->addWidget(motorMaxDisplacementSpinBox);
+	motorConfigurationCollapseSection->contentLayout()->addWidget(m_calibrationMotorRampModeMenuCombo);
+	#pragma endregion
+
+	#pragma region Acquisition Motor Control Section Widget
+	MenuSectionWidget *motorControlSectionWidget = new MenuSectionWidget(rawDataWidget);
+	MenuCollapseSection *motorControlCollapseSection = new MenuCollapseSection("Motor Control", MenuCollapseSection::MHCW_NONE, motorControlSectionWidget);
+	motorControlSectionWidget->contentLayout()->setSpacing(8);
+	motorControlSectionWidget->contentLayout()->addWidget(motorControlCollapseSection);
+	QLabel *currentPositionLabel = new QLabel("Current Position", motorControlSectionWidget);
+	StyleHelper::MenuSmallLabel(currentPositionLabel, "currentPositionLabel");
+	acquisitionMotorCurrentPositionLabel = new QLabel("--.--", motorControlSectionWidget);
+	acquisitionMotorCurrentPositionLabel->setAlignment(Qt::AlignRight);
+	applyLabelStyle(acquisitionMotorCurrentPositionLabel);
+
+	motorTargetPositionSpinBox = new HorizontalSpinBox("Target Position", target_pos, "", motorControlSectionWidget);
+
+	motorControlCollapseSection->contentLayout()->setSpacing(8);
+	motorControlCollapseSection->contentLayout()->addWidget(currentPositionLabel);
+	motorControlCollapseSection->contentLayout()->addWidget(acquisitionMotorCurrentPositionLabel);
+	motorControlCollapseSection->contentLayout()->addWidget(motorTargetPositionSpinBox);
+	#pragma endregion
+
+	rawDataLayout->addWidget(rotationWidget);
+	rawDataLayout->addWidget(angleWidget);
+	rawDataLayout->addWidget(countWidget);
+	rawDataLayout->addWidget(tempWidget);
+	rawDataLayout->addWidget(motorConfigurationSectionWidget);
+	rawDataLayout->addWidget(motorControlSectionWidget);
+	rawDataLayout->addStretch();
+
 	QWidget *historicalGraphWidget = new QWidget();
 	QVBoxLayout *historicalGraphLayout = new QVBoxLayout(this);
 
@@ -198,7 +248,6 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	dataGraph->setUnitOfMeasure("Degree", "°");
 	dataGraph->setAutoscale(false);
 	dataGraph->setAxisScale(QwtAxis::YLeft, -30.0, 390.0);
-	//dataGraph->setNumSamples(dataGraphSamples);
 	dataGraph->setHistoryDuration(10.0);
 	dataGraphValue = &rotation;
 
@@ -211,8 +260,9 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	tempGraph->setPlotAxisXTitle("Celsius (°C)");
 	tempGraph->setUnitOfMeasure("Celsius", "°C");
 	tempGraph->setAutoscale(false);
-	tempGraph->addScale(0.0, 100.0, 25, 5);
-	tempGraph->setNumSamples(tempGraphSamples);
+	tempGraph->setAxisScale(QwtAxis::YLeft, 0.0, 100.0);
+	tempGraph->setHistoryDuration(10.0);
+	tempGraphValue = &temp;
 
 	historicalGraphLayout->addWidget(dataGraphLabel);
 	historicalGraphLayout->addWidget(dataGraph);
@@ -236,6 +286,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	MenuSectionWidget *generalWidget = new MenuSectionWidget(generalSettingWidget);
 	generalWidget->contentLayout()->setSpacing(8);
 	MenuCollapseSection *generalSection = new MenuCollapseSection("Data Acquisition", MenuCollapseSection::MHCW_NONE, generalWidget);
+	generalSection->header()->toggle();
 	generalSection->contentLayout()->setSpacing(8);
 	generalWidget->contentLayout()->addWidget(generalSection);
 
@@ -245,9 +296,9 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	StyleHelper::MenuSmallLabel(graphUpdateIntervalLabel, "graphUpdateIntervalLabel");
 	graphUpdateIntervalLineEdit = new QLineEdit(generalSection);
 	applyLineEditStyle(graphUpdateIntervalLineEdit);
-	graphUpdateIntervalLineEdit->setText(QString::number(sampleRate));
+	graphUpdateIntervalLineEdit->setText(QString::number(acquisitionUITimerRate));
 
-	connectLineEditToNumber(graphUpdateIntervalLineEdit, sampleRate, 20, 5000);
+	connectLineEditToNumber(graphUpdateIntervalLineEdit, acquisitionUITimerRate, 1, 5000);
 
 	generalSection->contentLayout()->addWidget(graphUpdateIntervalLabel);
 	generalSection->contentLayout()->addWidget(graphUpdateIntervalLineEdit);
@@ -320,6 +371,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	MenuSectionWidget *dataGraphWidget = new MenuSectionWidget(generalSettingWidget);
 	dataGraphWidget->contentLayout()->setSpacing(8);
 	MenuCollapseSection *dataGraphSection = new MenuCollapseSection("Data Graph", MenuCollapseSection::MHCW_NONE, dataGraphWidget);
+	dataGraphSection->header()->toggle();
 	dataGraphSection->contentLayout()->setSpacing(8);
 
 	// Graph Channel
@@ -353,6 +405,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	MenuSectionWidget *tempGraphWidget = new MenuSectionWidget(generalSettingWidget);
 	tempGraphWidget->contentLayout()->setSpacing(8);
 	MenuCollapseSection *tempGraphSection = new MenuCollapseSection("Temperature Graph", MenuCollapseSection::MHCW_NONE, tempGraphWidget);
+	tempGraphSection->header()->toggle();
 	tempGraphSection->contentLayout()->setSpacing(8);
 
 	// Graph Samples
@@ -371,8 +424,8 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 
 	generalSettingLayout->addWidget(header);
 	generalSettingLayout->addSpacerItem(new QSpacerItem(0, 3, QSizePolicy::Fixed, QSizePolicy::Fixed));
-	generalSettingLayout->addWidget(generalWidget);
 	generalSettingLayout->addWidget(sequenceWidget);
+	generalSettingLayout->addWidget(generalWidget);
 	generalSettingLayout->addWidget(dataGraphWidget);
 	generalSettingLayout->addWidget(tempGraphWidget);
 	generalSettingLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -399,9 +452,17 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	connect(runButton, &QPushButton::toggled, this, &HarmonicCalibration::setRunning);
 	connect(this, &HarmonicCalibration::runningChanged, this, &HarmonicCalibration::run);
 	connect(this, &HarmonicCalibration::runningChanged, runButton, &QAbstractButton::setChecked);
+	connectLineEditToRPSConversion(motorMaxVelocitySpinBox->lineEdit(), rotate_vmax);
+	connectLineEditToAMAXConversion(motorAccelTimeSpinBox->lineEdit(), amax);
+	connectLineEditToNumberWrite(motorMaxDisplacementSpinBox->lineEdit(), dmax, ADMTController::MotorAttribute::DMAX);
+	connectLineEditToNumberWrite(motorTargetPositionSpinBox->lineEdit(), target_pos, ADMTController::MotorAttribute::TARGET_POS);
+	connectMenuComboToNumber(m_calibrationMotorRampModeMenuCombo, ramp_mode);
 
-	timer = new QTimer(this);
-	connect(timer, &QTimer::timeout, this, &HarmonicCalibration::timerTask);
+	acquisitionUITimer = new QTimer(this);
+	connect(acquisitionUITimer, &QTimer::timeout, this, &HarmonicCalibration::acquisitionUITask);
+
+	// timer = new QTimer(this);
+	// connect(timer, &QTimer::timeout, this, &HarmonicCalibration::timerTask);
 
 	calibrationTimer = new QTimer(this);
 	connect(calibrationTimer, &QTimer::timeout, this, &HarmonicCalibration::calibrationTask);
@@ -416,10 +477,19 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	connect(tabWidget, &QTabWidget::currentChanged, [=](int index){
 		tabWidget->setCurrentIndex(index);
 
-		if(index == 0) { readSequence(); }
+		if(index == 0) // Acquisition Tab
+		{ 
+			readSequence();
+		}
 
-		if(index == 1) { calibrationTimer->start(calibrationTimerRate); }
-		else { calibrationTimer->stop(); }
+		if(index == 1) // Calibration Tab
+		{ 
+			calibrationTimer->start(calibrationTimerRate); 
+		}
+		else 
+		{ 
+			calibrationTimer->stop();
+		}
 
 		if(index == 2) // Utility Tab
 		{ 
@@ -432,6 +502,23 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 }
 
 HarmonicCalibration::~HarmonicCalibration() {}
+
+void HarmonicCalibration::startAcquisition()
+{
+	isStartAcquisition = true;
+    QFuture<void> future = QtConcurrent::run(this, &HarmonicCalibration::getAcquisitionSamples);
+}
+
+void HarmonicCalibration::getAcquisitionSamples()
+{
+	while(isStartAcquisition)
+	{
+		updateChannelValues();
+		dataGraph->plot(*dataGraphValue);
+		tempGraph->plot(*tempGraphValue);
+		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+	}
+}
 
 void HarmonicCalibration::initializeMotor()
 {
@@ -461,7 +548,6 @@ void HarmonicCalibration::initializeMotor()
 
 ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 {
-	initializeMotor();
 	ToolTemplate *tool = new ToolTemplate(this);
 
 	#pragma region Calibration Data Graph Widget
@@ -1941,11 +2027,13 @@ void HarmonicCalibration::run(bool b)
 	tim.start();
 
 	if(!b) {
+		isStartAcquisition = false;
+		acquisitionUITimer->stop();
 		runButton->setChecked(false);
-		timer->stop();
 	}
 	else{
-		timer->start(sampleRate);
+		acquisitionUITimer->start(acquisitionUITimerRate);
+		startAcquisition();
 	}
 
 	updateGeneralSettingEnabled(!b);
@@ -1956,12 +2044,10 @@ void HarmonicCalibration::canCalibrate(bool value)
 	calibrateDataButton->setEnabled(value);
 }
 
-void HarmonicCalibration::timerTask(){
-	updateChannelValues();
+void HarmonicCalibration::acquisitionUITask()
+{
 	updateLineEditValues();
-
-	dataGraph->plot(*dataGraphValue);
-	tempGraph->plot(temp);
+	updateLabelValue(acquisitionMotorCurrentPositionLabel, ADMTController::MotorAttribute::CURRENT_POS);
 }
 
 void HarmonicCalibration::applySequence(){
