@@ -420,6 +420,8 @@ void ADCPlugin::saveSettings(QSettings &s) {}
 
 void ADCPlugin::loadSettings(QSettings &s) {}
 
+QString ADCPlugin::description() { return "Tool for generic IIO ADC visualization and control"; }
+
 QString ADCPlugin::about()
 {
 	QString content = "ADC plugin";
