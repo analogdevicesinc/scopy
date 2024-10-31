@@ -72,7 +72,7 @@ void ADCInstrument::setupToolLayout()
 	addBtn = new AddBtn(this);
 	removeBtn = new RemoveBtn(this);
 
-	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+	connect(infoBtn, &QAbstractButton::clicked, this, [=]() {
 		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/adc/adc.html"));
 	});
 
