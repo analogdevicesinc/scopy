@@ -22,6 +22,7 @@
 
 #include <pluginbase/preferences.h>
 #include <QHBoxLayout>
+#include <style.h>
 
 using namespace scopy;
 VersionCheckMessage::VersionCheckMessage(QWidget *parent)
@@ -29,11 +30,13 @@ VersionCheckMessage::VersionCheckMessage(QWidget *parent)
 {
 	setLayout(new QHBoxLayout(this));
 	layout()->setContentsMargins(0, 0, 0, 0);
-	auto textLabel =
-		new QLabel("<p>Should Scopy check for online versions?&nbsp;&nbsp;&nbsp;&nbsp;<a style='color: white; "
-			   "font-weight: bold;' href='yes'>Yes</a>&nbsp;&nbsp;&nbsp;&nbsp;<a style='color: white; "
-			   "font-weight: bold;' href='no'>No</a></p>",
-			   this);
+	auto textLabel = new QLabel(
+		QString("<p>Should Scopy check for online versions?&nbsp;&nbsp;&nbsp;&nbsp;<a style='color: "
+			"text_color; "
+			"font-weight: bold;' href='yes'>Yes</a>&nbsp;&nbsp;&nbsp;&nbsp;<a style='color: text_color; "
+			"font-weight: bold;' href='no'>No</a></p>")
+			.replace("text_color", Style::getAttribute(json::theme::content_default)),
+		this);
 	connect(textLabel, &QLabel::linkActivated, this, [this](const QString &text) {
 		if(text == "yes") {
 			setCheckVersion(true);
