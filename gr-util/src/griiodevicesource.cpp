@@ -31,7 +31,7 @@ QString GRIIODeviceSource::findAttribute(QStringList possibleNames, iio_device *
 {
 
 	const char *attr = nullptr;
-	for(QString name : possibleNames) {
+	for(const QString &name : possibleNames) {
 		attr = iio_device_find_attr(dev, name.toStdString().c_str());
 		if(attr)
 			break;
@@ -47,7 +47,7 @@ iio_context *GRIIODeviceSource::ctx() const { return m_ctx; }
 QString GRIIOChannel::findAttribute(QStringList possibleNames, iio_channel *ch)
 {
 	const char *attr = nullptr;
-	for(QString name : possibleNames) {
+	for(const QString &name : possibleNames) {
 		attr = iio_channel_find_attr(ch, name.toStdString().c_str());
 		if(attr)
 			break;

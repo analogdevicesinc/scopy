@@ -174,7 +174,7 @@ double DataMonitorModel::maxValue() const { return m_maxValue; }
 
 void DataMonitorModel::resetMinMax()
 {
-	for(double val : ydata) {
+	for(double val : qAsConst(ydata)) {
 		checkMinMaxUpdate(val);
 	}
 }

@@ -43,7 +43,7 @@ void FFTMarkerController::init()
 
 void FFTMarkerController::attachMarkersToPlot()
 {
-	for(auto m : this->m_markerInfo) {
+	for(const auto &m : qAsConst(this->m_markerInfo)) {
 		m.marker->setValue(m.peak.x, m.peak.y);
 
 		QwtText lbl;
@@ -137,7 +137,7 @@ void FFTMarkerController::computePeaks()
 	}
 
 	m_sortedPeakInfo.clear();
-	for(auto v : m_peakInfo) {
+	for(auto v : qAsConst(m_peakInfo)) {
 		m_sortedPeakInfo.append(v);
 	}
 
