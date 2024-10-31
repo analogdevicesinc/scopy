@@ -42,7 +42,7 @@ apt -y install build-essential gcc g++ gdb-multiarch cmake autoconf automake bis
 	libgl1-mesa-dev libxcb-composite0-dev libxcb-cursor-dev libxcb-damage0-dev libxcb-xv0-dev \
 	libxcb-dpms0-dev libxcb-dri2-0-dev libxcb-ewmh-dev libxcb-imdkit-dev libxcb-xvmc0-dev \
 	libxcb-present-dev libxcb-record0-dev libxcb-res0-dev libxcb-xrm-dev libx11-xcb-dev libxcb-glx0-dev libxcb-icccm4 libxcb-icccm4-dev libxcb-xkb-dev libxkbcommon-x11-dev \
-	libxcb-screensaver0-dev libxcb-util0-dev libxcb-xf86dri0-dev libxcb-xtest0-dev
+	libxcb-screensaver0-dev libxcb-util0-dev libxcb-xf86dri0-dev libxcb-xtest0-dev libavahi-client* libavahi-common*
 apt -y install libunwind-dev libsndfile1-dev mesa-utils* mesa-common-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev python2 libopenal-dev || true
 apt -y install '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev || true
 

@@ -162,8 +162,8 @@ install_packages() {
 		subversion mesa-common-dev graphviz xserver-xorg gettext texinfo mm-common doxygen \
 		libboost-all-dev libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev \
 		libxcb-xinerama0  libgmp3-dev libzip-dev libglib2.0-dev libglibmm-2.4-dev libsigc++-2.0-dev \
-		libclang1-9 libmatio-dev liborc-0.4-dev libgl1-mesa-dev \
-		libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libavahi-client-dev libsndfile1-dev \
+		libclang1-9 libmatio-dev liborc-0.4-dev libgl1-mesa-dev libavahi-client* libavahi-common* \
+		libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libsndfile1-dev \
 		libxkbcommon-x11-0 libqt5gui5 libncurses5 libtool libaio-dev libzmq3-dev libxml2-dev
 
 	pip3 install --no-cache-dir mako
@@ -194,7 +194,7 @@ build_libiio() {
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DWITH_TESTS:BOOL=OFF \
 		-DWITH_DOC:BOOL=OFF \
-		-DHAVE_DNS_SD:BOOL=OFF\
+		-DHAVE_DNS_SD:BOOL=ON\
 		-DWITH_MATLAB_BINDINGS:BOOL=OFF \
 		-DCSHARP_BINDINGS:BOOL=OFF \
 		-DPYTHON_BINDINGS:BOOL=OFF \
