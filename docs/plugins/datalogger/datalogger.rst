@@ -175,3 +175,9 @@ data will be added to those channels when tool is recording. By pressing the
 “x” button all imported data is removed. Importing data multiple times from 
 same CSV file will override current imported data Importing data from different 
 CSV files will create new menus like the one bellow for each file
+
+Tutorial 
+--------------------------------------------------------------------------------
+
+A tutorial will automatically start first time the tool is open. It can
+be restarted from tool Preferences.

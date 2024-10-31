@@ -78,3 +78,10 @@ Each fault has 3 sections:
  It does not represent  the fault name. The name can be seen by 
  hovering over the fault or by checking the “Faults Explanation” area 
  corresponding to the index.
+
+
+Tutorial 
+---------------------------------------------------------------------
+
+A tutorial will automatically start first time the tool is open. It can
+be restarted from tool Preferences.

@@ -138,3 +138,10 @@ for available TX channels with I/Q corresponding channels.
  
  .. note::
    For scale, "-Inf dB" is equivalent with scale=0 or a disabled channel.
+
+
+Tutorial 
+--------------------------------------------------------------------------------
+
+A tutorial will automatically start first time the tool is open. It can
+be restarted from tool Preferences.

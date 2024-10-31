@@ -98,3 +98,9 @@ Settings tab
  Pressing the config button sets the device mode to configuration. 
  After that, the device will disconnect briefly, reconnect and the 
  Config Instrument will be automatically opened.
+
+Tutorial 
+--------------------------------------------------------------------------------
+
+A tutorial will automatically start first time the tool is open. It can
+be restarted from tool Preferences.
