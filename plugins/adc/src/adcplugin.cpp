@@ -167,7 +167,7 @@ bool ADCPlugin::loadPage()
 
 void ADCPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("time", "Time",
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("time", "ADC - Time",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/tool_oscilloscope.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("freq", "ADC - Frequency",
