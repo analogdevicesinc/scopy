@@ -59,7 +59,6 @@ public Q_SLOTS:
 	void stop();
 	void start();
 	void restart();
-	void timerTask();
 	void calibrationTask();
 	void utilityTask();
 	void clearCommandLog();
@@ -78,7 +77,7 @@ private:
 	InfoBtn *infoButton;
 	RunBtn *runButton;
 
-	double rotation, angle, count, temp, amax, rotate_vmax, dmax, disable, target_pos, current_pos, ramp_mode,
+	double rotation, angle, count, temp = 0.0, amax, rotate_vmax, dmax, disable, target_pos, current_pos, ramp_mode,
 		afeDiag0, afeDiag1, afeDiag2;
 
 	QPushButton *openLastMenuButton, *calibrationStartMotorButton, *applyCalibrationDataButton, *calibrateDataButton, *extractDataButton,
@@ -94,6 +93,7 @@ private:
 				*AFEDIAG0LineEdit, *AFEDIAG1LineEdit, *AFEDIAG2LineEdit;
 
 	QLabel 	*rotationValueLabel, *angleValueLabel, *countValueLabel, *tempValueLabel, 
+			*acquisitionMotorCurrentPositionLabel,
 			*calibrationMotorCurrentPositionLabel,
 			*motorAmaxValueLabel, *motorRotateVmaxValueLabel, *motorDmaxValueLabel,
 			*motorDisableValueLabel, *motorTargetPosValueLabel, *motorCurrentPosValueLabel,
@@ -218,8 +218,11 @@ private:
 	void clearCalibrationSamples();
 	void updateSequenceWidget();
 	void toggleFaultRegisterMode(int mode);
+	void startAcquisition();
+	void getAcquisitionSamples();
+	void acquisitionUITask();
 
-	QTimer *timer, *calibrationTimer, *utilityTimer;
+	QTimer *acquisitionUITimer, *calibrationTimer, *utilityTimer;
 
 	int uuid = 0;
 	const char *rotationChannelName, *angleChannelName, *countChannelName, *temperatureChannelName;
