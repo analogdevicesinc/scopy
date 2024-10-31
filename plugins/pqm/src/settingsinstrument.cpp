@@ -31,6 +31,7 @@
 #include <QDateTimeEdit>
 #include <QScrollArea>
 #include <QTime>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_PQM_SETTINGS, "pqm_settings");
 using namespace scopy::pqm;
@@ -214,6 +215,7 @@ void SettingsInstrument::initSystemTimeSection(QWidget *parent)
 	QDateTimeEdit *systemTimeEdit = new QDateTimeEdit(systemTimeSection);
 	systemTimeEdit->setDateTime(QDateTime::currentDateTime());
 	systemTimeEdit->setDisplayFormat("dd:MM:yyyy hh:mm:ss.zzz");
+	systemTimeEdit->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
 	QPushButton *systemTimeBtn = new QPushButton("Set", systemTimeSection);
 	systemTimeBtn->setFixedWidth(88);
 	StyleHelper::BasicButton(systemTimeBtn, "systemTimeBtn");
@@ -257,10 +259,12 @@ void SettingsInstrument::initTimestampSection(QWidget *parent)
 	QDateTimeEdit *timestampEdit1 = new QDateTimeEdit(timestampSection);
 	timestampEdit1->setDateTime(QDateTime::currentDateTime());
 	timestampEdit1->setDisplayFormat("dd:MM:yyyy hh:mm:ss.zzz");
+	timestampEdit1->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
 
 	QDateTimeEdit *timestampEdit2 = new QDateTimeEdit(timestampSection);
 	timestampEdit2->setDateTime(QDateTime::currentDateTime());
 	timestampEdit2->setDisplayFormat("dd:MM:yyyy hh:mm:ss.zzz");
+	timestampEdit2->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
 
 	qInfo() << "Date time: " << timestampEdit2->dateTime().toString("yyyyMMddhhmmsszzz");
 
