@@ -123,7 +123,7 @@ void DacInstrument::startTutorial()
 
 void DacInstrument::runToggled(bool toggled)
 {
-	for(auto dac : m_dacDataManagers) {
+	for(auto dac : qAsConst(m_dacDataManagers)) {
 		dac->runToggled(toggled);
 	}
 }
@@ -131,7 +131,7 @@ void DacInstrument::runToggled(bool toggled)
 void DacInstrument::dacRunning(bool toggled)
 {
 	bool run = toggled;
-	for(auto dac : m_dacDataManagers) {
+	for(auto dac : qAsConst(m_dacDataManagers)) {
 		run = run || dac->isRunning();
 	}
 	Q_EMIT running(run);

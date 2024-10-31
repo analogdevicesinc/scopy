@@ -178,7 +178,7 @@ void WatchListView::currentTreeSelectionChanged(IIOStandardItem *item)
 
 void WatchListView::refreshWatchlist()
 {
-	for(auto object : m_entryObjects) {
+	for(auto object : qAsConst(m_entryObjects)) {
 		IIOStandardItem::Type type = object->item()->type();
 		if(type == IIOStandardItem::ContextAttribute || type == IIOStandardItem::DeviceAttribute ||
 		   type == IIOStandardItem::ChannelAttribute) {
