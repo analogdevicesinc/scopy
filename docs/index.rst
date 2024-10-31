@@ -33,3 +33,5 @@ Contents
 
    plugins/index
 
+
+   user_guide/bugReport
