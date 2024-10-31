@@ -159,6 +159,7 @@ QFrame *BrowseMenu::createHLine(QWidget *parent)
 	QFrame *line = new QFrame(parent);
 	line->setFrameShape(QFrame::HLine);
 	line->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	Style::setStyle(line, style::properties::widget::bottomBorder);
 	return line;
 }
 
