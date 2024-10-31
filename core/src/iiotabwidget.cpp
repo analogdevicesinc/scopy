@@ -55,6 +55,7 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 
 	MenuSectionCollapseWidget *scanSection = new MenuSectionCollapseWidget(
 		"SCAN", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
+	scanSection->menuSection()->layout()->setMargin(0);
 
 	QWidget *scanWidget = new QWidget(scanSection);
 	QGridLayout *scanGrid = new QGridLayout(scanWidget);
@@ -87,7 +88,8 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 	contentLay->addWidget(scanContainer);
 
 	MenuSectionCollapseWidget *serialSection = new MenuSectionCollapseWidget(
-		"SERIAL", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
+		"SERIAL PORT", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
+	serialSection->menuSection()->layout()->setMargin(0);
 
 	QWidget *serialSettWidget = createSerialSettWidget(serialSection);
 	bool serialCompatible = isSerialCompatible();
@@ -103,7 +105,6 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 
 	QWidget *uriWidget = createUriWidget(contentWidget);
 	contentLay->addWidget(uriWidget);
-
 	contentLay->addItem(new QSpacerItem(0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding));
 
 	layout->addWidget(contentWidget);
@@ -373,8 +374,8 @@ QWidget *IioTabWidget::createSerialSettWidget(QWidget *parent)
 	layout->setSpacing(10);
 	w->setLayout(layout);
 
-	m_serialPortCb = new MenuCombo("Port name", w);
-	m_baudRateCb = new MenuCombo("Baud rate", w);
+	m_serialPortCb = new MenuCombo("Name", w);
+	m_baudRateCb = new MenuCombo("Baud Rate", w);
 	for(int baudRate : m_availableBaudRates) {
 		m_baudRateCb->combo()->addItem(QString::number(baudRate));
 	}
@@ -383,7 +384,7 @@ QWidget *IioTabWidget::createSerialSettWidget(QWidget *parent)
 	lineEditWidget->setLayout(new QVBoxLayout(lineEditWidget));
 	lineEditWidget->layout()->setMargin(0);
 	lineEditWidget->layout()->setSpacing(3);
-	QLabel *serialFrameLabel = new QLabel("Port config", lineEditWidget);
+	QLabel *serialFrameLabel = new QLabel("Config", lineEditWidget);
 
 	QRegExp re("[5-9]{1}(n|o|e|m|s){1}[1-2]{1}(x|r|d){0,1}$");
 	QRegExpValidator *validator = new QRegExpValidator(re, this);
