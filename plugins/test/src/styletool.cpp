@@ -90,7 +90,6 @@ QWidget *StyleTool::buildStylePage()
 	addLabeledWidget("Basic Component", new QWidget);
 	addLabeledWidget("Text Browser", new QTextBrowser);
 	addLabeledWidget("Search Bar", new QLineEdit);
-	addLabeledWidget("Device Line", new QFrame);
 	addLabeledWidget("Solid Border", new QWidget);
 	addLabeledWidget("Device Icon", new QWidget);
 	addLabeledWidget("Not Interactive", new QWidget);
@@ -103,8 +102,6 @@ QWidget *StyleTool::buildStylePage()
 			style::properties::widget::textBrowser, true, true);
 	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::widget::searchbar, true, true);
-	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
-			style::properties::widget::deviceLine, true, true);
 	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::widget::solidBorder, true, true);
 	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
