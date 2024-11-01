@@ -58,6 +58,7 @@ Contents
 ---------------------------------------------------------------------
 
 .. toctree::
+   :includehidden:
    :maxdepth: 3
 
    adc/adc
