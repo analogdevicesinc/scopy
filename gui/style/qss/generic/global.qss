@@ -20,7 +20,7 @@ QLineEdit {
     border: &border_width& solid &interactive_subtle_idle&;
     border-bottom: &border_width_interactive& solid &interactive_subtle_idle&;
     border-radius: &radius_interactive&;
-    padding: 0 &padding_1&px;
+    padding: 0 &padding_interactive& 0 &padding_interactive&;
     selection-background-color: &interactive_subtle_pressed&;
 }
 
@@ -86,17 +86,17 @@ QPushButton::pressed {
 }
 
 QComboBox::disabled {
-    color: &interactive_subtle_disabled&;
+    color: &content_silent&;
     border: &border_width& solid &interactive_subtle_disabled&;
-    border-bottom: &border_width_interactive& solid &interactive_subtle_idle&;
+    border-bottom: &border_width_interactive& solid &interactive_subtle_disabled&;
     border-radius: &radius_interactive&;
 }
 QComboBox {
+    padding: 0 &padding_interactive& 0 &padding_interactive&;
     height: &unit_2&;
     border: &border_width& solid &interactive_subtle_idle&;
     border-bottom: &border_width_interactive& solid &interactive_subtle_idle&;
     border-radius: &radius_interactive&;
-    border-radius: &radius_1&;
     background-color: &background_primary&;
     color: &content_default&;
 }
@@ -167,7 +167,7 @@ QScrollArea {
 }
 QScrollBar:vertical {
     max-width: 8px;
-    background: &background_subtle&;
+    background: &background_primary&;
     max-width: &unit_0_5&;
 }
 QScrollBar::handle:vertical {
@@ -190,7 +190,7 @@ QScrollBar::sub-line:vertical {
     background: none;
 }
 QScrollBar:horizontal {
-    background: &background_subtle&;
+    background: &background_primary&;
     max-height: &unit_0_5&;
     border-radius: &radius_1&;
 }

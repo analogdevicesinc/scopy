@@ -133,11 +133,9 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
 	if(getDynamicProperty(this, "use_icon")) {
 		QPixmap pixmap;
 		if(isChecked()) {
-			pixmap = Style::getPixmap(":/gui/icons/unlocked.svg",
-						  Style::getColor(json::theme::background_subtle));
+			pixmap = Style::getPixmap(":/gui/icons/unlocked.svg", thumb_brush);
 		} else {
-			pixmap = Style::getPixmap(":/gui/icons/locked.svg",
-						  Style::getColor(json::theme::background_subtle));
+			pixmap = Style::getPixmap(":/gui/icons/locked.svg", thumb_brush);
 		}
 
 		p.drawPixmap(QRect(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, pixmap.width(),

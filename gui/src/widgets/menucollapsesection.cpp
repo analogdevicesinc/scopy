@@ -61,7 +61,6 @@ MenuCollapseHeader::MenuCollapseHeader(QString title, MenuCollapseSection::MenuH
 		break;
 	case MenuCollapseSection::MHCW_ONOFF:
 		m_ctrl = new SmallOnOffSwitch(this);
-		StyleHelper::MenuOnOffSwitchButton(dynamic_cast<SmallOnOffSwitch *>(m_ctrl), "menuCollapseButton");
 		connect(this, &QAbstractButton::toggled, [=](bool b) { m_ctrl->setChecked(b); });
 		m_ctrl->setChecked(true);
 		break;
