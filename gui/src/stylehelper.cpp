@@ -638,13 +638,6 @@ void StyleHelper::BackgroundWidget(QWidget *w, QString objectName)
 {
 	if(!objectName.isEmpty())
 		w->setObjectName(objectName);
-	// QString style = QString(R"css(
-	// 	QWidget {
-	// 		background-color: &&background_primary&&;
-	// 	}
-	// 	)css");
-	// style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
-	// w->setStyleSheet(style);
 	Style::setBackgroundColor(w, json::theme::background_primary);
 }
 
@@ -696,12 +689,6 @@ void StyleHelper::TabWidgetEastMenu(QTabWidget *w, QString objectName)
 	w->tabBar()->setStyleSheet(style);
 }
 
-void StyleHelper::MenuComboLabel(QLabel *w, QString objectName) { StyleHelper::MenuSmallLabel(w, objectName); }
-
-void StyleHelper::MenuHeaderLabel(QLabel *w, QString objectName) { StyleHelper::MenuLargeLabel(w, objectName); }
-
-void StyleHelper::MenuOnOffSwitchLabel(QLabel *w, QString objectName) { StyleHelper::MenuSmallLabel(w, objectName); }
-
 void StyleHelper::MenuCollapseHeaderLineEdit(QLineEdit *w, QString objectName)
 {
 	if(!objectName.isEmpty())
@@ -731,12 +718,6 @@ padding-left: -2px;
 	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
 	style.replace("&&content_subtle&&", StyleHelper::getColor("content_subtle"));
 	w->setStyleSheet(style);
-}
-
-void StyleHelper::MenuOnOffSwitchButton(SmallOnOffSwitch *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
 }
 
 void StyleHelper::OverlayMenu(QWidget *w, QString objectName)
