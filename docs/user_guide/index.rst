@@ -1,12 +1,16 @@
 .. _user_guide:
 
-Scopy
+Scopy Overview
 ================================================================================
 
 About 
 ---------------------------------------------------------------------
 Scopy is a multi-functional software toolset with strong capabilities for 
 signal analysis.
+
+.. note::
+
+  Scopy v2.0.0 is now compatible with any IIO system.
 
 
 Download
@@ -52,14 +56,14 @@ Installation
 Once you downloaded the installer, run it and follow all the required steps. 
 After completion, system reboot is required.
 
-Video intalation guide:
+Video installation guide:
 
 .. video:: https://www.youtube.com/watch?v=894HkVXf7-U
 
 
   **Scopy for Linux**
 
-Before downloading and extracting the scopy-v1.1.1-Linux-flatpak.zip archive, 
+Before downloading and extracting the scopy-Linux-flatpak.zip archive,
 you need to setup Flatpak `using this setup guide <https://flatpak.org/setup/>`_ 
 for your Linux distribution.
 
@@ -82,11 +86,11 @@ After this, get the Scopy.flatpak file from the downloaded archive and run:
 
 .. code-block::
 
-    flatpak install scopy-v1.1.1-Linux-flatpak.flatpak
+    flatpak install scopy-Linux-flatpak.flatpak
 
 |
 
-Video intalation guide:
+Video installation guide:
 
 .. video:: https://www.youtube.com/watch?v=9qgxmmTrcSE
 
@@ -101,7 +105,7 @@ up.
 Drag the application from the .dmg window into Applications to install and wait 
 for the process to finish.
 
-Video intalation guide:
+Video installation guide:
 
 .. video:: https://www.youtube.com/watch?v=To0ACQ77tkg
 
@@ -134,179 +138,290 @@ On Linux, you can also run it using:
     flatpak run org.adi.Scopy
 
 
-Usage
+Application Overview
 ---------------------------------------------------------------------
 
-  **Home**
+Homepage layout
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-The Home view is divided into four sections:
-
-* **Devices(1)**: List of devices (USB or remote) that Scopy can connect to. 
-
-USB devices are detected automatically at startup. The Add button can be used 
-to add remote devices to the list.
-
-* **Instruments Menu(2)**: List with instruments provided by the application.
-
-* **Information Window(3)**: Section containing the welcome, add device page 
-
-and for each device a description.
-
-* **General Settings Menu(4)**: Save and load session and the preferences menu.
-
-.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_home_view.png
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-start-page.png
     :align: center
 ..
 
-| 
+The Home view is divided into multiple sections:
 
-  **Connecting to a USB device**
-  
+Device browser
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ Contains a list of devices (USB/serial/network/emulated) that Scopy can connect to.
+
+ USB devices are scanned automatically at startup when the top right "Scan"
+ switch is ON.
+
+Add(+) device page
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ Can be used to connect to devices that are not automatically detected in
+ the above mentioned list.
+
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-iio.png
+    :align: center
+..
+
+ The interface has two tabs for device configuration:
+
+  - **IIO**: adding and configuring IIO devices.
+  - **EMU**: adding and configuring virtually emulated devices using
+    the iio-emulator.
+
+ The **IIO** tab includes settings for scanning, connecting, and configuring
+ various connected devices.
+
+ **SCAN Section**
+
+ - **Filter**: Allows the user to choose which connection types to scan for.
+
+   If none is selected, the application will scan for all types.
+
+   A new scan is triggered every time one of the following
+   options is selected.
+
+    - **Local**: Scans local devices, usually on target.
+    - **IP**: Scans network devices.
+    - **USB**: Scans USB devices.
+ - **Context**: List of currently scanned contexts.
+ - **Refresh**: Button to re-scan and detect available devices.
+
+ **SERIAL Section**
+
+ - **Port Name**: Drop-down to select available serial devices.
+ - **Baud Rate**: Allows setting the communication speed.
+ - **Port Config**: Specifies the data format and parity.
+ - **Refresh**: Refreshes the list of available serial devices.
+
+ **URI**
+
+ - **URI Input**: This is where the user specifies the connection URI.
+   This field is automatically populated based on the selection from one
+   of the previous sections but the user can manually input the URI of
+   the required device.
+ - **Verify**: Button to verify the connection based on the provided URI.
+   This will display an error if no such context is available. On success
+   a different page will be displayed allowing the user to configure
+   compatible plugins.
 
 
-If a compatible USB device is available it will be displayed in the **Devices** 
-section.
+ The **EMU** tab includes settings for selecting the emulation mode,
+ XML configuration files, RX/TX devices, and URI for the emulated device.
 
-To connect to that device click on the device and then click the **Connect** 
-button in the **Information Window.**
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-emu.png
+    :align: center
+..
 
-If the connection was established, the device will have a green status line 
-under it and you will be able to disconnect from it in the same **Information 
+ **DEMO OPTION**:
+   - Drop-down menu to select one of the predefined emulated devices.
+   - Options are: adalm2000, pluto, swiot, pqm and generic.
+     When using the **generic** option, the user must provide a path
+     of the XML for the emulated device. If an existing options is
+     selected, the XML path will be automatically completed in the
+     field.
+
+ **XML PATH**:
+   - Specifies the path to the XML configuration file required for the emulation.
+
+ **RX/TX DEVICES**:
+   - Specifies the RX (receive) and TX (transmit) device files for the emulation mode.
+     These are .bin files containing samples to be used on RX/TX devices.
+   - For detailed examples check the `official iio-emu Github docs
+     <https://github.com/analogdevicesinc/iio-emu/blob/main/GENERIC_EMULATOR.md>`_ .
+
+
+ **URI**:
+   - The URI is automatically set to **ip:127.0.0.1** or **ip:localhost**.
+
+ **Enable Demo Button**:
+   - Validates and activates the demo mode based on the selected configuration.
+   - Automatically displays the IIO tab and populates the URI field
+     if the EMU validation is successful.
+
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-plugin-config.png
+    :align: center
+..
+
+ The add device plugin configuration page will allow the user to
+ select compatible plugins for the newly added device.
+
+ By default, the plugins with the highest priority will be selected.
+ Clicking the **ADD DEVICE** button will finalize the process and
+ create a new device entry in the device browser.
+
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-done.png
+    :align: center
+..
+
+.. tip::
+
+  Scopy can be connected to multiple IIO devices simultaneously starting
+  with v2.0. All the connected or available IIO devices will be available
+  in the device browser.
+
+Instruments Menu
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ This left side area can contain multiple sections of instrument lists,
+ one for each connected or selected device. It can also be empty if
+ no device is connected or selected. If the device is selected but not
+ connected, the instruments will be available only as previews, without
+ responding to any interaction.
+
+ A device section has a collapsible section displaying the name and URI of
+ the device and will contain a list of available instruments for the selected
+ device. The instruments for an IIO device are provided by one or multiple
+ plugins based on compatibility. (Example: An IIO device containing only
+ ADCs will not have the DAC plugin as an available instrument).
+ For more details on the Scopy plugin system and existing plugins please
+ check below the "Plugins" documentation section.
+
+Information Window
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ This area contains the welcome page, add device page and for each device
+ a device page.
+
+ The device page will contain context attributes extracted from the
+ IIO context, as well as specific buttons or controls that can be provided
+ by any compatible plugin (Example: The ADALM2000 has a "Calibrate" button
+ which is only specific to this type of device).
+
+Save & Load session
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  Scopy can save or load different configurations in an .ini file format.
+
+Preferences
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-general-prefs.png
+    :align: center
+..
+
+  Scopy Preferences can be accessed using the bottom left side **preferences
+  button**. On the right side of the page, preferences for each plugin
+  are available. More details can be found in their specific plugin
+  documentation section.
+
+  Clicking the **Reset Scopy** button will reset the application to a default
+  configuration.
+
+  Changing some of the listed preferences will require an application
+  restart.
+
+About page
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-about-page.png
+    :align: center
+..
+
+  Scopy About page can be accessed using the bottom left side **about
+  button**. On the right side of the page, about pages specific for each
+  plugin are available if necessary. More details can be found in their
+  specific plugin documentation section.
+
+  The General About page contains different useful links:
+
+  **Build info** will display the application version, Git commit,
+  build date and whether it was created locally or in a continous
+  integration environment, a list of dependencies and their specific
+  versions or Git commit hashes, a list of the last 100 commits and
+  the Scopy branch.
+
+  These are all important in the debugging process and most of this
+  information should be specified when reporting an issue.
+
+  **License** link to the open-source LICENSE file in the Github
+  repository.
+
+  **Open-source dependencies list** of Scopy includes a number
+  of open source libraries, released under their own licenses.
+
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-deps-licenses.png
+    :align: center
+..
+
+  **Latest release** for quick access to the latest Github release page.
+
+  **Documentation** for quick access to this documentation.
+
+  **Support forum** for quick access to Engineer Zone.
+
+
+Connecting to a device
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To connect to any device on the Device Browser click on the device and
+then click the **Connect** button in the **Information Window.**
+
+If the connection was established, the device will have a green status line
+under it and you will be able to disconnect from it in the same **Information
 Window.**
 
-.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/device_connected.png
-    :align: center
-..
+.. |orange_x| raw:: html
 
-|
+  <img src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/dev/gui/res/icons/orange_close.svg" alt="Inline image" style="display:inline; vertical-align:middle;">
 
-  **Connecting to a remote device**
+.. |edit_pen| raw:: html
 
-To connect to a remote device click on the **Plus** icon. Enter the IP of the 
-remote device into the **Hostname** field and click the **Connect** button. If 
-a device can be detected at the IP you provided, the **Connect** button will 
-change to an **Add** button and you can click on it to add the remote device to 
-the list of detected devices.
+  <img src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/dev/gui/res/icons/edit_pen.svg" alt="Inline image" style="display:inline; vertical-align:middle;">
 
+.. |warning_icon| raw:: html
 
-.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_add_device_page1.png
-    :align: center
-..
+  <img src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/dev/gui/res/icons/warning.svg" alt="Inline image" style="display:inline; width:40px; vertical-align:middle;">
 
-|
-
-.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_add_device_page2.png
-    :align: center
-..
-
-
-Clicking the Forget Device button will remove the device from the list. 
-Clicking the Identify button will make the device blink.
-
-|
-
-  **General Settings Menu**
-
-
-.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_general_settings1.png
-    :align: center
-..
-
-The save/load buttons can be used to save the current session or load another 
-session. The preferences button will open the preferences for Scopy where 
-different options for different tools can be modified.
-
-.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/preferences1.png
-    :align: center
-..
-
-Clicking the **Reset Scopy** button will reset the application to a default 
-configuration.
-
-Checking the **user notes preference** will enable a tool where the user can 
-add different pages with html formatted text
-
-.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/notes1.png
-    :align: center
-..
+- Clicking the |orange_x| button will remove the device from the list.
+- The device title can be modified by hovering over the top right
+  corner of the icon and clicking the |edit_pen| pen icon.
+- If errors are encountered during the connection phase
+  a warning sign |warning_icon| will appear on the bottom left side of the
+  device icon.
 
 
 User Guides
 ---------------------------------------------------------------------
 
-Scopy interacts with only one hardware device at a time. Once a device is 
-selected to be used with the application, a list of instruments that are 
-available for that device will be enabled. Each instrument can be opened from 
-the left menu. The icon on the right of the instrument name specifies that the 
-instrument is enabled and provides a shortcut that allows an instrument to be 
-turned on or off.
+Scopy can now interact with multiple hardware devices at a time. Once a device is
+selected to be used with the application, a list of instruments that are
+available for that device will be visible as a preview. Once connected to a device
+the instruments will be enabled and available.
 
-The instruments menu can be minimized by clicking on the **Scopy** button near 
+Each instrument can be opened from the left menu. The icon on the right of
+the instrument name specifies that the instrument is enabled and provides
+a shortcut that allows an instrument to be turned on or off.
+
+For each connected device, there is an entry in the left side menu, above
+all the instruments, displaying the **Name** and **URI** of the
+connected device.
+
+The instruments menu can be minimized by clicking on the **Scopy** button near
 the top-left window.
 
-|
 
-.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/min_menu.png
-    :align: center
-..
+Detaching Instruments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-|
-
-
-  **Detaching Instruments**
-
-Scopy provides the detaching into multiple windows feature for each instrument 
+Scopy provides the detaching into multiple windows feature for each instrument
 available, providing a better view/manipulation.
 
-There are 2 ways to do this:
+This can be done by double clicking the instrument to detach it.
 
-* **Drag and Drop** - select the desired instrument drag it outside Instrument 
-
- Menu section and drop it inside the application window area.
-
-.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_drag_n_drop.gif
-    :align: center
-..
-
-|
-
-* **Double Click** - first make sure that the **Double click to detach** a tool 
- 
- option is enabled in the **Preferences** menu; double-click on the desired 
- instrument to detach it.
-
-.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_dc_detach.gif
-    :align: center
-..
-
-|
+Please make sure that the **Double click to detach** a tool
+option is enabled in the **Preferences** menu.
 
 
 Instruments Overview
 ---------------------------------------------------------------------
 
-.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_instruments_menu.png
-    :align: center
-..
-
-|
-
-Scopy is using a list of plugins detailed :ref:`here <plugins>`.
-
-Complete user guides on how to use each Scopy instrument:
-
-* ADALM2000 plugins :
-
-    * :ref:`Oscilloscope <oscilloscope>`
-    * :ref:`Spectrum Analyzer <spectrum_analyzer>`
-    * :ref:`Network Analyzer <network_analyzer>`
-    * :ref:`Signal Generator <signal_generator>`
-    * :ref:`Logic Analyzer <logic_analyzer>`
-    * :ref:`Pattern Generator <pattern_generator>`
-    * :ref:`Digital IO <digitalio>`
-    * :ref:`Voltmeter <voltmeter>`
-    * :ref:`Power Supply <power_supply>`
+Scopy provides a list of plugins and instruments
+described :ref:`in the Plugins page <plugins>`
 
 
 Scripting
