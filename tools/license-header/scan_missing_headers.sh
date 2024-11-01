@@ -269,7 +269,6 @@ function identify_license() {
     local unknown=true
 
     # Search for license headers
-
     if has_ADI_disclaimer "$header"; then
         if is_GPL "$header"; then
             if is_Scopy_GPL "$header"; then
@@ -322,6 +321,18 @@ function identify_license() {
 
         # Update the echo command to use the joined string
         echo -e "${indent}${color}├── $relative_path (${joined_licenses})${NC}"
+    fi
+
+    local found=false
+    for license in "${found_licenses_list[@]}"; do
+        if [[ "$license" == "Scopy_GPL" ]]; then
+            found=true
+            break
+        fi
+    done
+
+    if ! $found; then
+        FILES_WITHOUT_LICENSE+=("$relative_path")
     fi
 }
 
