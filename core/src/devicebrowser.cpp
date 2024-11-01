@@ -24,6 +24,7 @@
 #include "deviceicon.h"
 #include "deviceiconimpl.h"
 #include "dynamicWidget.h"
+#include "style_attributes.h"
 #include "stylehelper.h"
 
 #include "ui_devicebrowser.h"
@@ -61,23 +62,23 @@ DeviceBrowser::~DeviceBrowser()
 
 void DeviceBrowser::initBtns()
 {
-	ui->containerHome->setStyleSheet("border: none");
-	ui->containerAdd->setStyleSheet("border: none");
-
 	bg = new QButtonGroup(this);
-
 	bg->addButton(ui->btnAdd);
 	bg->addButton(ui->btnHome);
+
 	ui->btnHome->setProperty(devBrowserId, "home");
 	ui->btnHome->setIcon(Style::getPixmap(":/gui/icons/home.svg", Style::getColor(json::theme::content_inverse)));
 	Style::setStyle(ui->btnHome, style::properties::button::squareIconBrowserButton);
+
 	ui->btnAdd->setProperty(devBrowserId, "add");
 	ui->btnAdd->setIcon(Style::getPixmap(":/gui/icons/add.svg", Style::getColor(json::theme::content_inverse)));
 	Style::setStyle(ui->btnAdd, style::properties::button::squareIconBrowserButton);
+
 	list.append(ui->btnHome);
 	list.append(ui->btnAdd);
+
+	Style::setStyle(ui->containerHome, style::properties::frame::frameContainer, "selected");
 	ui->btnHome->setChecked(true);
-	setDynamicProperty(ui->containerHome, "selected", true); // select home shadow on init
 	currentIdx = 0;
 }
 
@@ -195,8 +196,8 @@ void DeviceBrowser::updateSelectedDeviceIdx(QString k)
 	if(prevDevice == ui->btnAdd)
 		prevDevice = ui->containerAdd;
 
-	setDynamicProperty(prevDevice, "selected", false);
-	setDynamicProperty(currentDevice, "selected", true);
+	Style::setStyle(prevDevice, style::properties::frame::frameContainer, "idle", true);
+	Style::setStyle(currentDevice, style::properties::frame::frameContainer, "selected", true);
 
 	qDebug(CAT_DEVBROWSER) << "prev: "
 			       << "[" << prevIdx << "] -" << getIdOfIndex(prevIdx) << "-> current: "
