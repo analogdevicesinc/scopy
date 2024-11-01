@@ -49,10 +49,13 @@
 #include <QPushButton>
 #include <qboxlayout.h>
 #include <qcheckbox.h>
+#include <style.h>
 
 #include <src/readwrite/fileregisterwritestrategy.hpp>
 #include <src/recyclerview/registermaptable.hpp>
 #include <utils.h>
+
+#include "style_properties.h"
 
 using namespace scopy;
 using namespace regmap;
@@ -74,11 +77,12 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 	tool->bottomCentral()->setVisible(true);
 	layout->addWidget(tool);
 
-	RegmapStyleHelper::DeviceRegisterMap(this);
+	Style::setBackgroundColor(this, Style::getAttribute(json::theme::interactive_primary_disabled));
 
 	initSettings();
 
 	registerController = new RegisterController(this);
+	Style::setStyle(registerController, style::properties::regmap::registercontroller, true, true);
 
 	QWidget *controllerWidget = new QWidget(this);
 	QHBoxLayout *controllerLayout = new QHBoxLayout(controllerWidget);
@@ -103,7 +107,8 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 		tableHeadWidget->setLayout(tableHeadWidgetLayout);
 
 		QWidget *registerTableHead = new QWidget(tableHeadWidget);
-		registerTableHead->setStyleSheet(RegmapStyleHelper::FrameWidgetStyle());
+		Style::setBackgroundColor(registerTableHead,
+					  Style::getAttribute(json::theme::interactive_subtle_disabled));
 
 		QHBoxLayout *registerTableHeadLayout = new QHBoxLayout(registerTableHead);
 		registerTableHeadLayout->setSpacing(0);
@@ -114,7 +119,8 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 		registerTableHead->setFixedWidth(180);
 
 		QWidget *colBitCount = new QWidget(tableHeadWidget);
-		colBitCount->setStyleSheet(RegmapStyleHelper::FrameWidgetStyle());
+		Style::setBackgroundColor(colBitCount, Style::getAttribute(json::theme::interactive_subtle_disabled));
+
 		QHBoxLayout *tableHead = new QHBoxLayout(colBitCount);
 		colBitCount->setLayout(tableHead);
 
