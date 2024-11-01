@@ -7,6 +7,7 @@ QWidget[&&property&&="left_on"] {
     background-color: transparent;
     border: &border_width_interactive& solid &interactive_primary_idle&;
     color: &interactive_primary_idle&;
+    font-weight:600;
 }
 QWidget[&&property&&="left_off"] {
     border-top-left-radius: &radius_1&;
@@ -15,8 +16,9 @@ QWidget[&&property&&="left_off"] {
     min-height: &unit_2&;
     padding: 0 &padding_1& 0 &padding_1&;
     background-color: transparent;
-    border: &border_width_interactive& solid &interactive_subtle_idle&;
-    color: &interactive_subtle_idle&;
+    border: &border_width_interactive& solid &content_subtle&;
+    color: &content_subtle&;
+    font-weight:600;
 }
 QWidget[&&property&&="right_on"] {
     border-top-right-radius: &radius_1&;
@@ -27,6 +29,7 @@ QWidget[&&property&&="right_on"] {
     background-color: transparent;
     border: &border_width_interactive& solid &interactive_primary_idle&;
     color: &interactive_primary_idle&;
+    font-weight:600;
 }
 QWidget[&&property&&="right_off"] {
     border-top-right-radius: &radius_1&;
@@ -35,6 +38,7 @@ QWidget[&&property&&="right_off"] {
     min-height: &unit_2&;
     padding: 0 &padding_1& 0 &padding_1&;
     background-color: transparent;
-    border: &border_width_interactive& solid &interactive_subtle_idle&;
-    color: &interactive_subtle_idle&;
+    border: &border_width_interactive& solid &content_subtle&;
+    color: &content_subtle&;
+    font-weight:600;
 }
