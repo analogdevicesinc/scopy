@@ -1,5 +1,5 @@
 *[&&property&&=true] {
-    background-color: &interactive_subtle_disabled&;
+	border: 1px solid &interactive_subtle_disabled&;
     color: &content_inverse&;
     font-weight: 700;
     border-radius: &radius_1&;
@@ -13,3 +13,11 @@
     color: &content_inverse&;
 }
 
+*[&&property&&="selected"] {
+	background-color: &interactive_subtle_idle&;
+	border-radius: 4px;
+}
+
+*[&&property&&="idle"] {
+	background-color: transparent;
+}
