@@ -24,7 +24,9 @@
 #include "regmapstylehelper.hpp"
 
 #include <QBoxLayout>
+#include <style.h>
 #include <utils.h>
+#include "style_properties.h"
 
 using namespace scopy;
 using namespace regmap;
@@ -39,11 +41,13 @@ TitleSpinBox::TitleSpinBox(QString title, QWidget *parent)
 	setLayout(mainLayout);
 
 	QWidget *spinboxWidget = new QWidget(this);
+	Style::setBackgroundColor(spinboxWidget, json::theme::interactive_subtle_disabled);
 	QVBoxLayout *spinboxWidgetLayout = new QVBoxLayout(spinboxWidget);
 	spinboxWidgetLayout->setSpacing(0);
 	spinboxWidgetLayout->setMargin(0);
 
 	QWidget *buttonWidget = new QWidget(this);
+	Style::setBackgroundColor(buttonWidget, json::theme::interactive_subtle_disabled);
 	QVBoxLayout *buttonWidgetLayout = new QVBoxLayout(buttonWidget);
 	buttonWidgetLayout->setSpacing(0);
 	buttonWidgetLayout->setMargin(0);
@@ -58,6 +62,8 @@ TitleSpinBox::TitleSpinBox(QString title, QWidget *parent)
 	buttonWidgetLayout->addWidget(spinBoxDownButton);
 
 	titleLabel = new QLabel(title);
+	Style::setStyle(titleLabel, style::properties::label::menuSmall);
+	Style::setBackgroundColor(titleLabel, json::theme::interactive_subtle_disabled);
 
 	spinBox = new QSpinBox(spinboxWidget);
 	spinBox->setButtonSymbols(spinBox->ButtonSymbols::NoButtons);
@@ -70,7 +76,9 @@ TitleSpinBox::TitleSpinBox(QString title, QWidget *parent)
 	mainLayout->addWidget(buttonWidget);
 	mainLayout->addWidget(spinboxWidget);
 
-	RegmapStyleHelper::titleSpinBoxStyle(this);
+	Style::setStyle(this, style::properties::regmap::titleSpinbox, true, true);
+	Style::setStyle(spinBox, style::properties::regmap::titleSpinbox, true, true);
+	// RegmapStyleHelper::titleSpinBoxStyle(this);
 }
 
 TitleSpinBox::~TitleSpinBox() {}
