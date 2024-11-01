@@ -52,7 +52,6 @@ TxTone::TxTone(TxNode *node, unsigned int idx, QWidget *parent)
 
 	QLabel *name = new QLabel(this);
 	name->setText("Tone " + QString::number(idx) + " : " + m_node->getUuid());
-	StyleHelper::MenuComboLabel(name);
 	StyleHelper::BackgroundWidget(this);
 
 	m_frequency = IIOWidgetBuilder(this)

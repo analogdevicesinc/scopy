@@ -15,6 +15,7 @@
 "radius_2": "8",
 "padding_1": "6",
 "padding_2": "12",
+"padding_interactive": "5",
 "border_width": "1",
 "border_width_interactive": "1",
 "ch0": "#E76423",

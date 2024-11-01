@@ -39,7 +39,6 @@ MenuOnOffSwitch::MenuOnOffSwitch(QString title, QWidget *parent, bool medium)
 	m_label = new QLabel(title, this);
 	if(medium == false) {
 		m_switch = new SmallOnOffSwitch(this);
-		StyleHelper::MenuOnOffSwitchButton(dynamic_cast<SmallOnOffSwitch *>(m_switch), "menuButton");
 		Style::setStyle(m_label, style::properties::label::subtle);
 	} else {
 		m_switch = new CustomSwitch(this);
