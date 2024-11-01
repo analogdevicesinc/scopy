@@ -26,14 +26,9 @@ Contents
 -------------------------------------------------------------------------------
 
 .. toctree::
-   :titlesonly:
    :includehidden:
    :maxdepth: 3
 
    user_guide/index
-
-.. toctree::
-   :maxdepth: 3
-
    plugins/index
 
