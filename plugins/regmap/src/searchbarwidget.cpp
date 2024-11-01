@@ -31,6 +31,7 @@
 #include <style.h>
 #include <stylehelper.h>
 #include "regmapstylehelper.hpp"
+#include <style_properties.h>
 
 using namespace scopy;
 using namespace regmap;
@@ -80,4 +81,4 @@ void SearchBarWidget::setEnabled(bool enabled)
 	this->searchButton->setVisible(enabled);
 }
 
-void SearchBarWidget::applyStyle() { RegmapStyleHelper::searchBarStyle(this); }
+void SearchBarWidget::applyStyle() { Style::setStyle(searchBar, style::properties::regmap::searchBar, true, true); }
