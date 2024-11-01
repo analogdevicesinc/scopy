@@ -376,9 +376,6 @@ color: rgba(255,255,255,51);
            </item>
            <item>
             <widget class="scopy::SmallOnOffSwitch" name="btnLockHorizontal">
-             <property name="styleSheet">
-              <string notr="true">QPushButton[use_icon=true]</string>
-             </property>
              <property name="text">
               <string/>
              </property>
@@ -527,9 +524,6 @@ color: rgba(255,255,255,51);
             </item>
             <item>
              <widget class="scopy::SmallOnOffSwitch" name="btnLockVertical">
-              <property name="styleSheet">
-               <string notr="true">QPushButton[use_icon=true]</string>
-              </property>
               <property name="text">
                <string/>
               </property>
