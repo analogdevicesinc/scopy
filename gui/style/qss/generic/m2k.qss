@@ -527,10 +527,10 @@ scopy--ChannelWidget QWidget#widget {
     border-radius: 4px;
 }
 scopy--ChannelWidget QWidget#widget[selected="true"] {
-    background-color: #99&color_inverse_hexcode&;
+    background-color: #40&color_inverse_hexcode&;
 }
 .scopy--ChannelWidget QWidget#widget::hover {
-    background-color: #3C&color_inverse_hexcode&;
+    background-color: #20&color_inverse_hexcode&;
     font-weight: bold;
     border-bottom: 0px solid none;
 }
@@ -550,7 +550,7 @@ scopy--ChannelWidget QCheckBox#box::indicator:unchecked {
     background-color: transparent;
 }
 scopy--ChannelWidget QCheckBox#box::indicator:checked {
-    background-color: &background_subtle&;
+    background-color: #3C&color_inverse_hexcode&;
 }
 scopy--ChannelWidget QPushButton#name {
     font-size: 14px;

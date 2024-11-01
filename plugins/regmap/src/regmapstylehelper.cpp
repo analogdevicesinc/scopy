@@ -294,11 +294,6 @@ void RegmapStyleHelper::BitFieldDetailedWidgetStyle(BitFieldDetailedWidget *widg
 	widget->setMinimumWidth(10);
 	widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	widget->nameLabel->setStyleSheet(RegmapStyleHelper::whiteSmallTextLableStyle());
-
-	if(widget->valueSwitch) {
-		StyleHelper::MenuOnOffSwitchButton(dynamic_cast<SmallOnOffSwitch *>(widget->valueSwitch),
-						   "onOffSwitch");
-	}
 	widget->setFixedHeight(96);
 
 	widget->setStyleSheet(style);

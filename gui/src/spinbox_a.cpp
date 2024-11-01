@@ -74,12 +74,12 @@ SpinBoxA::SpinBoxA(QWidget *parent)
 
 	ui->SBA_UpButton->setIcon(
 		Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
-	Style::setStyle(ui->SBA_UpButton, style::properties::button::basicButton, true, true);
+	Style::setStyle(ui->SBA_UpButton, style::properties::button::spinboxButton, true, true);
 	ui->SBA_UpButton->setFixedSize(size, size);
 
 	ui->SBA_DownButton->setIcon(
 		Style::getPixmap(":/gui/icons/minus.svg", Style::getColor(json::theme::content_inverse)));
-	Style::setStyle(ui->SBA_DownButton, style::properties::button::basicButton, true, true);
+	Style::setStyle(ui->SBA_DownButton, style::properties::button::spinboxButton, true, true);
 	ui->SBA_DownButton->setFixedSize(size, size);
 
 	connect(this, SIGNAL(valueChanged(double)), ui->SBA_CompletionCircle, SLOT(setValueDouble(double)));
