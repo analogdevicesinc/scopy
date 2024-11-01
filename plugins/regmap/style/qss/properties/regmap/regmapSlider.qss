@@ -1,0 +1,19 @@
+QSlider[&&property&&=true]:handle {
+	background: #404040;
+	border: 0px;
+	max-width: 8px;
+	margin: -8px 0;
+	border-radius: 3px;
+}
+						
+QSlider[&&property&&=true]:handle:vertical:hover {
+	background: #4a4a4b;
+}
+						
+QSlider[&&property&&=true]:groove {
+	border: 0px;
+	background: Transparent ;
+	margin: 2px 0;
+	border-radius: 0px;
+	max-width: 8px;
+}

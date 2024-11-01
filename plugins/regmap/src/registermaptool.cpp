@@ -43,6 +43,7 @@
 #include <readwrite/fileregisterwritestrategy.hpp>
 #include <readwrite/iioregisterreadstrategy.hpp>
 #include <readwrite/iioregisterwritestrategy.hpp>
+#include <style_properties.h>
 
 using namespace scopy;
 using namespace regmap;
@@ -89,7 +90,8 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 	tool->addWidgetToTopContainerMenuControlHelper(settingsMenu, TTA_RIGHT);
 
 	registerDeviceList = new QComboBox(tool->topContainer());
-	RegmapStyleHelper::comboboxStyle(registerDeviceList);
+	Style::setStyle(registerDeviceList, style::properties::regmap::deviceComboBox, true, true);
+	Style::setStyle(registerDeviceList, style::properties::regmap::simpleWidget);
 	registerDeviceList->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	QObject::connect(registerDeviceList, &QComboBox::currentTextChanged, this,
 			 &RegisterMapTool::updateActiveRegisterMap);
