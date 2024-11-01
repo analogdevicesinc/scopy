@@ -133,10 +133,6 @@ void MonitorSelectionMenu::addMonitor(DataMonitorModel *monitor)
 
 	m_monitorsGroup->addButton(monitorChannel);
 
-	// apply hover to the buttons based on the color they have
-	monitorChannel->setStyleSheet(monitorChannel->styleSheet() +
-				      QString(":hover{ background-color: %1 ; }").arg(monitor->getColor().name()));
-
 	connect(monitorChannel, &MenuControlButton::clicked, this, [=, this](bool toggled) {
 		if(!monitorChannel->checkBox()->isChecked()) {
 			monitorChannel->checkBox()->setChecked(true);
