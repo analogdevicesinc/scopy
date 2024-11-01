@@ -38,6 +38,7 @@
 #include <QtMath>
 #include <menucollapsesection.h>
 #include <style.h>
+#include <style_properties.h>
 
 using namespace scopy;
 using namespace regmap;
@@ -53,7 +54,7 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 	regWidth = regModel->getWidth();
 
 	QWidget *nameDescriptionWidget = new QWidget(this);
-	Style::setStyle(nameDescriptionWidget, style::properties::widget::basicComponent, true, true);
+	Style::setBackgroundColor(nameDescriptionWidget, Style::getAttribute(json::theme::interactive_subtle_disabled));
 	QHBoxLayout *nameDescriptionLayout = new QHBoxLayout(nameDescriptionWidget);
 	nameDescriptionWidget->setLayout(nameDescriptionLayout);
 	QLabel *nameLabel = new QLabel("Name: " + regModel->getName(), this);

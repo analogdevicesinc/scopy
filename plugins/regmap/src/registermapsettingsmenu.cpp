@@ -36,6 +36,7 @@
 #include <src/readwrite/fileregisterreadstrategy.hpp>
 
 #include <menusectionwidget.h>
+#include <style.h>
 
 using namespace scopy;
 using namespace regmap;
@@ -48,7 +49,8 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 	layout->setSpacing(10);
 	setLayout(layout);
 
-	header = new MenuHeaderWidget("Settings", QPen(RegmapStyleHelper::getColor("ScopyBlue")), this);
+	header = new MenuHeaderWidget("Settings", QPen(Style::getAttribute(json::theme::interactive_primary_idle)),
+				      this);
 
 	layout->addWidget(header);
 
