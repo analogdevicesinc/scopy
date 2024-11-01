@@ -30,3 +30,4 @@ Contents
 
 
    user_guide/bugReport
+   user_guide/troubleshooting
