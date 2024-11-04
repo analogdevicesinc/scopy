@@ -2,7 +2,6 @@
 #define HARMONICCALIBRATION_H
 
 #include "scopy-admt_export.h"
-#include "sismograph.hpp"
 
 #include <cstdint>
 
@@ -42,9 +41,14 @@
 #include <customSwitch.h>
 #include <widgets/horizontalspinbox.h>
 #include <widgets/registerblockwidget.h>
+#include <pluginbase/plugin.h>
+#include <pluginbase/pluginbase.h>
 #include <pluginbase/statusbarmanager.h>
+#include <plotwidget.h>
+#include <plotaxis.h>
 
-namespace scopy::admt {
+namespace scopy{
+namespace admt {
 
 class SCOPY_ADMT_EXPORT HarmonicCalibration : public QWidget
 {
@@ -107,8 +111,6 @@ private:
 			*calibrationH8MagLabel,
 			*calibrationH8PhaseLabel;
 
-	Sismograph *dataGraph, *tempGraph, *calibrationRawDataSismograph;
-
 	MenuHeaderWidget *header;
 
 	MenuSectionWidget *rightMenuSectionWidget;
@@ -151,12 +153,12 @@ private:
 	void updateGeneralSettingEnabled(bool value);
 	void connectLineEditToNumber(QLineEdit* lineEdit, int& variable, int min, int max);
 	void connectLineEditToNumber(QLineEdit* lineEdit, double& variable, QString unit = "");
-	void connectLineEditToGraphSamples(QLineEdit* lineEdit, int& variable, Sismograph* graph, int min, int max);
-	void connectMenuComboToGraphDirection(MenuCombo* menuCombo, Sismograph* graph);
-	void connectMenuComboToGraphChannel(MenuCombo* menuCombo, Sismograph* graph);
+	// void connectLineEditToGraphSamples(QLineEdit* lineEdit, int& variable, Sismograph* graph, int min, int max);
+	// void connectMenuComboToGraphDirection(MenuCombo* menuCombo, Sismograph* graph);
+	// void connectMenuComboToGraphChannel(MenuCombo* menuCombo, Sismograph* graph);
 	void connectMenuComboToNumber(MenuCombo* menuCombo, double& variable);
 	void connectMenuComboToNumber(MenuCombo* menuCombo, int& variable);
-	void changeGraphColorByChannelName(Sismograph* graph, const char* channelName);
+	// void changeGraphColorByChannelName(Sismograph* graph, const char* channelName);
 	ToolTemplate* createCalibrationWidget();
 	ToolTemplate* createRegistersWidget();
 	ToolTemplate* createUtilityWidget();
@@ -237,5 +239,6 @@ enum TABS
 
 
 
-} // namespace scopy::admt
+} // namespace admt
+} // namespace scopy
 #endif // HARMONICCALIBRATION_H
