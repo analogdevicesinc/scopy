@@ -33,11 +33,10 @@ EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isC
 
 	if(isCompact) {
 		m_ui->setLayout(new QHBoxLayout(m_ui));
-		StyleHelper::IIOCompactLabel(label, "TitleLabel");
+		Style::setStyle(label, style::properties::label::iioCompactLabel);
 		m_lineEdit->edit()->setAlignment(Qt::AlignRight);
 	} else {
 		m_ui->setLayout(new QVBoxLayout(m_ui));
-		StyleHelper::MenuSmallLabel(label, "MenuSmallLabel");
 	}
 
 	Style::setStyle(m_lineEdit->edit(), style::properties::iiowidgets::lineEdit, true, true);
