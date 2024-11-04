@@ -62,6 +62,7 @@ void IIOExplorerInstrument::loadSettings(QSettings &s)
 
 void IIOExplorerInstrument::setupUi()
 {
+	setMinimumSize(720, 480); // Decent minimum size
 	m_tabWidget = new QTabWidget(this);
 
 	m_mainWidget = new QWidget(m_tabWidget);
