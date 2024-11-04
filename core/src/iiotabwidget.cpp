@@ -26,12 +26,9 @@
 #include "qtconcurrentrun.h"
 
 #include <iio.h>
-
-#include <QCheckBox>
 #include <QLoggingCategory>
 #include <style.h>
 #include <stylehelper.h>
-
 #include <iioutil/iioscantask.h>
 
 Q_LOGGING_CATEGORY(CAT_IIO_ADD_PAGE, "IIOTabWidget")
@@ -54,28 +51,24 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 	QStringList backendsList = computeBackendsList();
 
 	MenuSectionCollapseWidget *scanSection = new MenuSectionCollapseWidget(
-		"SCAN", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
+		"SCAN", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
 	scanSection->menuSection()->layout()->setMargin(0);
 
 	QWidget *scanWidget = new QWidget(scanSection);
 	QGridLayout *scanGrid = new QGridLayout(scanWidget);
 	scanGrid->setMargin(0);
 	scanWidget->setLayout(scanGrid);
-	QLabel *filterLabel = new QLabel("Filter", scanWidget);
-	StyleHelper::MenuSmallLabel(filterLabel);
 
 	m_filterWidget = createFilterWidget(scanWidget);
-	scanGrid->addWidget(filterLabel, 0, 0);
+	scanGrid->addWidget(new QLabel("Filter", scanWidget), 0, 0);
 	scanGrid->addWidget(m_filterWidget, 0, 1);
 	setupFilterWidget(backendsList);
 
-	QLabel *ctxLabel = new QLabel("Context", scanWidget);
-	StyleHelper::MenuSmallLabel(ctxLabel);
 	QWidget *avlContextWidget = createAvlCtxWidget(scanWidget);
 	m_btnScan->setVisible(!backendsList.isEmpty());
 	m_ctxUriLabel = new QLabel(scanWidget);
 	m_ctxUriLabel->setVisible(false);
-	scanGrid->addWidget(ctxLabel, 1, 0);
+	scanGrid->addWidget(new QLabel("Context", scanWidget), 1, 0);
 	scanGrid->addWidget(avlContextWidget, 1, 1);
 	scanGrid->addWidget(m_ctxUriLabel, 2, 1);
 	scanSection->add(scanWidget);
@@ -88,7 +81,7 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 	contentLay->addWidget(scanContainer);
 
 	MenuSectionCollapseWidget *serialSection = new MenuSectionCollapseWidget(
-		"SERIAL PORT", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
+		"SERIAL PORT", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
 	serialSection->menuSection()->layout()->setMargin(0);
 
 	QWidget *serialSettWidget = createSerialSettWidget(serialSection);
@@ -146,11 +139,10 @@ void IioTabWidget::setupConnections()
 	connect(m_serialPortCb->combo(), &QComboBox::textActivated, this,
 		[=]() { Q_EMIT uriChanged(getSerialPath()); });
 	connect(m_baudRateCb->combo(), &QComboBox::textActivated, this, [=]() { Q_EMIT uriChanged(getSerialPath()); });
-	connect(m_serialFrameEdit->edit(), &QLineEdit::returnPressed, this,
-		[=]() { Q_EMIT uriChanged(getSerialPath()); });
+	connect(m_serialFrameEdit, &QLineEdit::returnPressed, this, [=]() { Q_EMIT uriChanged(getSerialPath()); });
 	connect(this, &IioTabWidget::uriChanged, this, &IioTabWidget::updateUri);
-	connect(m_uriEdit->edit(), &QLineEdit::returnPressed, this, [=]() { Q_EMIT m_btnVerify->clicked(); });
-	connect(m_uriEdit->edit(), &QLineEdit::textChanged, this,
+	connect(m_uriEdit, &QLineEdit::returnPressed, this, [=]() { Q_EMIT m_btnVerify->clicked(); });
+	connect(m_uriEdit, &QLineEdit::textChanged, this,
 		[=](QString uri) { m_btnVerify->setEnabled(!uri.isEmpty()); });
 }
 
@@ -198,17 +190,17 @@ void IioTabWidget::verifyBtnClicked()
 {
 	QRegExp ipRegex("^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-"
 			"4][0-9]|25[0-5])$");
-	QString uri(m_uriEdit->edit()->text());
+	QString uri(m_uriEdit->text());
 	bool isIp = uri.contains(ipRegex);
-	if(isIp && !m_uriEdit->edit()->text().contains("ip:")) {
-		m_uriEdit->edit()->blockSignals(true);
-		m_uriEdit->edit()->setText("ip:" + uri);
-		m_uriEdit->edit()->blockSignals(false);
+	if(isIp && !m_uriEdit->text().contains("ip:")) {
+		m_uriEdit->blockSignals(true);
+		m_uriEdit->setText("ip:" + uri);
+		m_uriEdit->blockSignals(false);
 	}
 	m_btnScan->setDisabled(true);
 	m_btnSerialScan->setDisabled(true);
 	m_btnVerify->startAnimation();
-	Q_EMIT startVerify(m_uriEdit->edit()->text(), "iio");
+	Q_EMIT startVerify(m_uriEdit->text(), "iio");
 }
 
 void IioTabWidget::onVerifyFinished(bool result)
@@ -216,7 +208,7 @@ void IioTabWidget::onVerifyFinished(bool result)
 	rstUriMsgLabel();
 	if(!result) {
 		m_uriMsgLabel->setVisible(true);
-		m_uriMsgLabel->setText("\"" + m_uriEdit->edit()->text() + "\" not a valid context!");
+		m_uriMsgLabel->setText("\"" + m_uriEdit->text() + "\" not a valid context!");
 	}
 	m_btnVerify->stopAnimation();
 	m_btnScan->setEnabled(true);
@@ -285,7 +277,7 @@ QString IioTabWidget::getSerialPath()
 	QString serialPath = "serial:";
 	serialPath.append(m_serialPortCb->combo()->currentText());
 	serialPath.append("," + m_baudRateCb->combo()->currentText());
-	serialPath.append("," + m_serialFrameEdit->edit()->text());
+	serialPath.append("," + m_serialFrameEdit->text());
 	return serialPath;
 }
 
@@ -301,8 +293,8 @@ bool IioTabWidget::isSerialCompatible()
 
 void IioTabWidget::updateUri(QString uri)
 {
-	m_uriEdit->edit()->clear();
-	m_uriEdit->edit()->setText(uri);
+	m_uriEdit->clear();
+	m_uriEdit->setText(uri);
 	if(!uri.isEmpty()) {
 		m_btnVerify->setFocus();
 	}
@@ -383,15 +375,15 @@ QWidget *IioTabWidget::createSerialSettWidget(QWidget *parent)
 	QWidget *lineEditWidget = new QWidget(w);
 	lineEditWidget->setLayout(new QVBoxLayout(lineEditWidget));
 	lineEditWidget->layout()->setMargin(0);
-	lineEditWidget->layout()->setSpacing(3);
+	lineEditWidget->layout()->setSpacing(0);
 	QLabel *serialFrameLabel = new QLabel("Config", lineEditWidget);
 
 	QRegExp re("[5-9]{1}(n|o|e|m|s){1}[1-2]{1}(x|r|d){0,1}$");
 	QRegExpValidator *validator = new QRegExpValidator(re, this);
-	m_serialFrameEdit = new MenuLineEdit(lineEditWidget);
-	m_serialFrameEdit->edit()->setValidator(validator);
-	m_serialFrameEdit->edit()->setText("8n1");
-	m_serialFrameEdit->edit()->setFocusPolicy(Qt::ClickFocus);
+	m_serialFrameEdit = new QLineEdit(lineEditWidget);
+	m_serialFrameEdit->setValidator(validator);
+	m_serialFrameEdit->setText("8n1");
+	m_serialFrameEdit->setFocusPolicy(Qt::ClickFocus);
 
 	lineEditWidget->layout()->addWidget(serialFrameLabel);
 	lineEditWidget->layout()->addWidget(m_serialFrameEdit);
@@ -416,11 +408,11 @@ QWidget *IioTabWidget::createUriWidget(QWidget *parent)
 	Style::setStyle(w, style::properties::widget::border_interactive);
 
 	QLabel *uriLabel = new QLabel("URI", w);
-	StyleHelper::MenuSmallLabel(uriLabel);
+	StyleHelper::MenuLargeLabel(uriLabel);
 
-	m_uriEdit = new MenuLineEdit(w);
-	m_uriEdit->edit()->setPlaceholderText("The device you are connecting to");
-	m_uriEdit->edit()->setFocusPolicy(Qt::ClickFocus);
+	m_uriEdit = new QLineEdit(w);
+	m_uriEdit->setPlaceholderText("The device you are connecting to");
+	m_uriEdit->setFocusPolicy(Qt::ClickFocus);
 	m_uriMsgLabel = new QLabel(w);
 	m_uriMsgLabel->setVisible(false);
 
