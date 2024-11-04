@@ -5,6 +5,7 @@
 #include <stylehelper.h>
 
 #include <QFuture>
+#include <QFutureWatcher>
 
 static int acquisitionUITimerRate = 50;
 static int calibrationTimerRate = 1000;
@@ -65,7 +66,6 @@ static uint32_t H1_MAG_HEX, H2_MAG_HEX, H3_MAG_HEX, H8_MAG_HEX, H1_PHASE_HEX, H2
 
 using namespace scopy;
 using namespace scopy::admt;
-using namespace scopy::grutil;
 
 HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool isDebug, QWidget *parent)
 	: QWidget(parent)
@@ -150,10 +150,10 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	angleWidget->contentLayout()->setSpacing(8);
 	countWidget->contentLayout()->setSpacing(8);
 	tempWidget->contentLayout()->setSpacing(8);
-	MenuCollapseSection *rotationSection = new MenuCollapseSection("AMR Angle", MenuCollapseSection::MHCW_NONE, rotationWidget);
-	MenuCollapseSection *angleSection = new MenuCollapseSection("GMR Angle", MenuCollapseSection::MHCW_NONE, angleWidget);
-	MenuCollapseSection *countSection = new MenuCollapseSection("Count", MenuCollapseSection::MHCW_NONE, countWidget);
-	MenuCollapseSection *tempSection = new MenuCollapseSection("Sensor Temperature", MenuCollapseSection::MHCW_NONE, tempWidget);
+	MenuCollapseSection *rotationSection = new MenuCollapseSection("AMR Angle", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, rotationWidget);
+	MenuCollapseSection *angleSection = new MenuCollapseSection("GMR Angle", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, angleWidget);
+	MenuCollapseSection *countSection = new MenuCollapseSection("Count", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, countWidget);
+	MenuCollapseSection *tempSection = new MenuCollapseSection("Sensor Temperature", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, tempWidget);
 	rotationSection->contentLayout()->setSpacing(8);
 	angleSection->contentLayout()->setSpacing(8);
 	countSection->contentLayout()->setSpacing(8);
@@ -185,7 +185,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 
 	#pragma region Acquisition Motor Configuration Section Widget
 	MenuSectionWidget *motorConfigurationSectionWidget = new MenuSectionWidget(rawDataWidget);
-	MenuCollapseSection *motorConfigurationCollapseSection = new MenuCollapseSection("Motor Configuration", MenuCollapseSection::MHCW_NONE, motorConfigurationSectionWidget);
+	MenuCollapseSection *motorConfigurationCollapseSection = new MenuCollapseSection("Motor Configuration", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, motorConfigurationSectionWidget);
 	motorConfigurationCollapseSection->header()->toggle();
 	motorConfigurationSectionWidget->contentLayout()->addWidget(motorConfigurationCollapseSection);
 
@@ -210,7 +210,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 
 	#pragma region Acquisition Motor Control Section Widget
 	MenuSectionWidget *motorControlSectionWidget = new MenuSectionWidget(rawDataWidget);
-	MenuCollapseSection *motorControlCollapseSection = new MenuCollapseSection("Motor Control", MenuCollapseSection::MHCW_NONE, motorControlSectionWidget);
+	MenuCollapseSection *motorControlCollapseSection = new MenuCollapseSection("Motor Control", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, motorControlSectionWidget);
 	motorControlSectionWidget->contentLayout()->setSpacing(8);
 	motorControlSectionWidget->contentLayout()->addWidget(motorControlCollapseSection);
 	QLabel *currentPositionLabel = new QLabel("Current Position", motorControlSectionWidget);
@@ -242,32 +242,32 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	dataGraphLabel->setText("Phase");
 	StyleHelper::MenuSmallLabel(dataGraphLabel, "dataGraphLabel");
 
-	dataGraph = new Sismograph(this);
-	changeGraphColorByChannelName(dataGraph, rotationChannelName);
-	dataGraph->setPlotAxisXTitle("Degree (°)");
-	dataGraph->setUnitOfMeasure("Degree", "°");
-	dataGraph->setAutoscale(false);
-	dataGraph->setAxisScale(QwtAxis::YLeft, -30.0, 390.0);
-	dataGraph->setHistoryDuration(10.0);
-	dataGraphValue = &rotation;
+	// dataGraph = new Sismograph(this);
+	// changeGraphColorByChannelName(dataGraph, rotationChannelName);
+	// dataGraph->setPlotAxisXTitle("Degree (°)");
+	// dataGraph->setUnitOfMeasure("Degree", "°");
+	// dataGraph->setAutoscale(false);
+	// dataGraph->setAxisScale(QwtAxis::YLeft, -30.0, 390.0);
+	// dataGraph->setHistoryDuration(10.0);
+	// dataGraphValue = &rotation;
 
 	QLabel *tempGraphLabel = new QLabel(historicalGraphWidget);
 	tempGraphLabel->setText("Temperature");
 	StyleHelper::MenuSmallLabel(tempGraphLabel, "tempGraphLabel");
 
-	tempGraph = new Sismograph(this);
-	changeGraphColorByChannelName(tempGraph, temperatureChannelName);
-	tempGraph->setPlotAxisXTitle("Celsius (°C)");
-	tempGraph->setUnitOfMeasure("Celsius", "°C");
-	tempGraph->setAutoscale(false);
-	tempGraph->setAxisScale(QwtAxis::YLeft, 0.0, 100.0);
-	tempGraph->setHistoryDuration(10.0);
-	tempGraphValue = &temp;
+	// tempGraph = new Sismograph(this);
+	// changeGraphColorByChannelName(tempGraph, temperatureChannelName);
+	// tempGraph->setPlotAxisXTitle("Celsius (°C)");
+	// tempGraph->setUnitOfMeasure("Celsius", "°C");
+	// tempGraph->setAutoscale(false);
+	// tempGraph->setAxisScale(QwtAxis::YLeft, 0.0, 100.0);
+	// tempGraph->setHistoryDuration(10.0);
+	// tempGraphValue = &temp;
 
 	historicalGraphLayout->addWidget(dataGraphLabel);
-	historicalGraphLayout->addWidget(dataGraph);
+	// historicalGraphLayout->addWidget(dataGraph);
 	historicalGraphLayout->addWidget(tempGraphLabel);
-	historicalGraphLayout->addWidget(tempGraph);
+	// historicalGraphLayout->addWidget(tempGraph);
 
 	historicalGraphWidget->setLayout(historicalGraphLayout);
 
@@ -285,7 +285,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	// General Setting Widget
 	MenuSectionWidget *generalWidget = new MenuSectionWidget(generalSettingWidget);
 	generalWidget->contentLayout()->setSpacing(8);
-	MenuCollapseSection *generalSection = new MenuCollapseSection("Data Acquisition", MenuCollapseSection::MHCW_NONE, generalWidget);
+	MenuCollapseSection *generalSection = new MenuCollapseSection("Data Acquisition", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, generalWidget);
 	generalSection->header()->toggle();
 	generalSection->contentLayout()->setSpacing(8);
 	generalWidget->contentLayout()->addWidget(generalSection);
@@ -317,7 +317,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	generalSection->contentLayout()->addWidget(dataSampleSizeLineEdit);
 
 	MenuSectionWidget *sequenceWidget = new MenuSectionWidget(generalSettingWidget);
-	MenuCollapseSection *sequenceSection = new MenuCollapseSection("Sequence", MenuCollapseSection::MHCW_NONE, sequenceWidget);
+	MenuCollapseSection *sequenceSection = new MenuCollapseSection("Sequence", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, sequenceWidget);
 	sequenceWidget->contentLayout()->addWidget(sequenceSection);
 	sequenceSection->contentLayout()->setSpacing(8);
 
@@ -370,7 +370,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	// Data Graph Setting Widget
 	MenuSectionWidget *dataGraphWidget = new MenuSectionWidget(generalSettingWidget);
 	dataGraphWidget->contentLayout()->setSpacing(8);
-	MenuCollapseSection *dataGraphSection = new MenuCollapseSection("Data Graph", MenuCollapseSection::MHCW_NONE, dataGraphWidget);
+	MenuCollapseSection *dataGraphSection = new MenuCollapseSection("Data Graph", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, dataGraphWidget);
 	dataGraphSection->header()->toggle();
 	dataGraphSection->contentLayout()->setSpacing(8);
 
@@ -382,7 +382,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	dataGraphChannelCombo->addItem("Count", QVariant::fromValue(reinterpret_cast<void*>(const_cast<char*>(countChannelName))));
 	applyComboBoxStyle(dataGraphChannelCombo);
 
-	connectMenuComboToGraphChannel(m_dataGraphChannelMenuCombo, dataGraph);
+	// connectMenuComboToGraphChannel(m_dataGraphChannelMenuCombo, dataGraph);
 
 	dataGraphSection->contentLayout()->addWidget(m_dataGraphChannelMenuCombo);
 
@@ -394,7 +394,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	applyLineEditStyle(dataGraphSamplesLineEdit);
 	dataGraphSamplesLineEdit->setText(QString::number(dataGraphSamples));
 
-	connectLineEditToGraphSamples(dataGraphSamplesLineEdit, dataGraphSamples, dataGraph, 1, 5000);
+	// connectLineEditToGraphSamples(dataGraphSamplesLineEdit, dataGraphSamples, dataGraph, 1, 5000);
 	
 	dataGraphSection->contentLayout()->addWidget(dataGraphSamplesLabel);
 	dataGraphSection->contentLayout()->addWidget(dataGraphSamplesLineEdit);
@@ -404,7 +404,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	// Temperature Graph
 	MenuSectionWidget *tempGraphWidget = new MenuSectionWidget(generalSettingWidget);
 	tempGraphWidget->contentLayout()->setSpacing(8);
-	MenuCollapseSection *tempGraphSection = new MenuCollapseSection("Temperature Graph", MenuCollapseSection::MHCW_NONE, tempGraphWidget);
+	MenuCollapseSection *tempGraphSection = new MenuCollapseSection("Temperature Graph", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, tempGraphWidget);
 	tempGraphSection->header()->toggle();
 	tempGraphSection->contentLayout()->setSpacing(8);
 
@@ -418,7 +418,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	tempGraphSection->contentLayout()->addWidget(tempGraphSamplesLabel);
 	tempGraphSection->contentLayout()->addWidget(tempGraphSamplesLineEdit);
 
-	connectLineEditToGraphSamples(tempGraphSamplesLineEdit, tempGraphSamples, tempGraph, 1, 5000);
+	// connectLineEditToGraphSamples(tempGraphSamplesLineEdit, tempGraphSamples, tempGraph, 1, 5000);
 
 	tempGraphWidget->contentLayout()->addWidget(tempGraphSection);
 
@@ -514,8 +514,8 @@ void HarmonicCalibration::getAcquisitionSamples()
 	while(isStartAcquisition)
 	{
 		updateChannelValues();
-		dataGraph->plot(*dataGraphValue);
-		tempGraph->plot(*tempGraphValue);
+		// dataGraph->plot(*dataGraphValue);
+		// tempGraph->plot(*tempGraphValue);
 		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
 	}
 }
@@ -1004,7 +1004,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	#pragma region Calibration Dataset Configuration
 	MenuSectionWidget *calibrationDatasetConfigSectionWidget = new MenuSectionWidget(calibrationSettingsWidget);
-	MenuCollapseSection *calibrationDatasetConfigCollapseSection = new MenuCollapseSection("Dataset Configuration", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, calibrationDatasetConfigSectionWidget);
+	MenuCollapseSection *calibrationDatasetConfigCollapseSection = new MenuCollapseSection("Dataset Configuration", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, calibrationDatasetConfigSectionWidget);
 	calibrationDatasetConfigSectionWidget->contentLayout()->setSpacing(8);
 	calibrationDatasetConfigSectionWidget->contentLayout()->addWidget(calibrationDatasetConfigCollapseSection);
 
@@ -1033,7 +1033,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	#pragma region Calibration Data Section Widget
 	MenuSectionWidget *calibrationDataSectionWidget = new MenuSectionWidget(calibrationSettingsWidget);
-	MenuCollapseSection *calibrationDataCollapseSection = new MenuCollapseSection("Calibration Data", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, calibrationDataSectionWidget);
+	MenuCollapseSection *calibrationDataCollapseSection = new MenuCollapseSection("Calibration Data", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, calibrationDataSectionWidget);
 	calibrationDataSectionWidget->contentLayout()->setSpacing(8);
 	calibrationDataSectionWidget->contentLayout()->addWidget(calibrationDataCollapseSection);
 
@@ -1055,7 +1055,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	#pragma region Motor Configuration Section Widget
 	MenuSectionWidget *motorConfigurationSectionWidget = new MenuSectionWidget(calibrationSettingsWidget);
-	MenuCollapseSection *motorConfigurationCollapseSection = new MenuCollapseSection("Motor Configuration", MenuCollapseSection::MHCW_NONE, motorConfigurationSectionWidget);
+	MenuCollapseSection *motorConfigurationCollapseSection = new MenuCollapseSection("Motor Configuration", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, motorConfigurationSectionWidget);
 	motorConfigurationCollapseSection->header()->toggle();
 	motorConfigurationSectionWidget->contentLayout()->addWidget(motorConfigurationCollapseSection);
 
@@ -1080,7 +1080,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	#pragma region Motor Control Section Widget
 	MenuSectionWidget *motorControlSectionWidget = new MenuSectionWidget(calibrationSettingsWidget);
-	MenuCollapseSection *motorControlCollapseSection = new MenuCollapseSection("Motor Control", MenuCollapseSection::MHCW_NONE, motorControlSectionWidget);
+	MenuCollapseSection *motorControlCollapseSection = new MenuCollapseSection("Motor Control", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, motorControlSectionWidget);
 	motorControlSectionWidget->contentLayout()->setSpacing(8);
 	motorControlSectionWidget->contentLayout()->addWidget(motorControlCollapseSection);
 	QLabel *currentPositionLabel = new QLabel("Current Position", motorControlSectionWidget);
@@ -1154,7 +1154,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	#pragma region Logs Section Widget
 	MenuSectionWidget *logsSectionWidget = new MenuSectionWidget(calibrationSettingsWidget);
-	MenuCollapseSection *logsCollapseSection = new MenuCollapseSection("Logs", MenuCollapseSection::MHCW_NONE, logsSectionWidget);
+	MenuCollapseSection *logsCollapseSection = new MenuCollapseSection("Logs", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, logsSectionWidget);
 	logsCollapseSection->header()->toggle();
 	logsSectionWidget->contentLayout()->setSpacing(8);
 	logsSectionWidget->contentLayout()->addWidget(logsCollapseSection);
@@ -1457,7 +1457,7 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	leftUtilityLayout->setSpacing(8);
 	#pragma region Command Log Widget
 	MenuSectionWidget *commandLogSectionWidget = new MenuSectionWidget(leftUtilityWidget);
-	MenuCollapseSection *commandLogCollapseSection = new MenuCollapseSection("Command Log", MenuCollapseSection::MHCW_NONE, commandLogSectionWidget);
+	MenuCollapseSection *commandLogCollapseSection = new MenuCollapseSection("Command Log", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, commandLogSectionWidget);
 	commandLogSectionWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	commandLogSectionWidget->contentLayout()->addWidget(commandLogCollapseSection);
 	commandLogCollapseSection->contentLayout()->setSpacing(8);
@@ -1499,7 +1499,7 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 
 	#pragma region DIGIO Monitor
 	MenuSectionWidget *DIGIOMonitorSectionWidget = new MenuSectionWidget(DIGIOWidget);
-	MenuCollapseSection *DIGIOMonitorCollapseSection = new MenuCollapseSection("DIGIO Monitor", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, DIGIOMonitorSectionWidget);
+	MenuCollapseSection *DIGIOMonitorCollapseSection = new MenuCollapseSection("DIGIO Monitor", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, DIGIOMonitorSectionWidget);
 	DIGIOMonitorSectionWidget->contentLayout()->addWidget(DIGIOMonitorCollapseSection);
 
 	DIGIOBusyStatusLED = createStatusLEDWidget("BUSY", statusLEDColor, DIGIOMonitorCollapseSection);
@@ -1519,7 +1519,7 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 
 	#pragma region DIGIO Control
 	MenuSectionWidget *DIGIOControlSectionWidget = new MenuSectionWidget(DIGIOWidget);
-	MenuCollapseSection *DIGIOControlCollapseSection = new MenuCollapseSection("GPIO Control", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, DIGIOControlSectionWidget);
+	MenuCollapseSection *DIGIOControlCollapseSection = new MenuCollapseSection("GPIO Control", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, DIGIOControlSectionWidget);
 	DIGIOControlSectionWidget->contentLayout()->addWidget(DIGIOControlCollapseSection);
 
 	QWidget *DIGIOControlGridWidget = new QWidget(DIGIOControlSectionWidget);
@@ -1640,7 +1640,7 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 
 	#pragma region MTDIAG1 Widget
 	MenuSectionWidget *MTDIAG1SectionWidget = new MenuSectionWidget(centerUtilityWidget);
-	MenuCollapseSection *MTDIAG1CollapseSection = new MenuCollapseSection("MT Diagnostic Register", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MTDIAG1SectionWidget);
+	MenuCollapseSection *MTDIAG1CollapseSection = new MenuCollapseSection("MT Diagnostic Register", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, MTDIAG1SectionWidget);
 	MTDIAG1SectionWidget->contentLayout()->addWidget(MTDIAG1CollapseSection);
 
 	R0StatusLED = createStatusLEDWidget("R0", statusLEDColor, MTDIAG1SectionWidget);
@@ -1673,7 +1673,7 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	MTDiagnosticsLayout->setSpacing(5);
 
 	MenuSectionWidget *MTDiagnosticsSectionWidget = new MenuSectionWidget(centerUtilityWidget);
-	MenuCollapseSection *MTDiagnosticsCollapseSection = new MenuCollapseSection("MT Diagnostics", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MTDiagnosticsSectionWidget);
+	MenuCollapseSection *MTDiagnosticsCollapseSection = new MenuCollapseSection("MT Diagnostics", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, MTDiagnosticsSectionWidget);
 	MTDiagnosticsSectionWidget->contentLayout()->addWidget(MTDiagnosticsCollapseSection);
 	MTDiagnosticsCollapseSection->contentLayout()->setSpacing(8);
 
@@ -1727,7 +1727,7 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	rightUtilityLayout->setSpacing(8);
 
 	MenuSectionWidget *faultRegisterSectionWidget = new MenuSectionWidget(rightUtilityWidget);
-	MenuCollapseSection *faultRegisterCollapseSection = new MenuCollapseSection("Fault Register", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, faultRegisterSectionWidget);
+	MenuCollapseSection *faultRegisterCollapseSection = new MenuCollapseSection("Fault Register", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, faultRegisterSectionWidget);
 	faultRegisterSectionWidget->contentLayout()->addWidget(faultRegisterCollapseSection);
 	
 	VDDUnderVoltageStatusLED = createStatusLEDWidget("VDD Under Voltage", faultLEDColor, faultRegisterCollapseSection);
@@ -2396,38 +2396,38 @@ void HarmonicCalibration::connectLineEditToNumberWrite(QLineEdit* lineEdit, doub
     });
 }
 
-void HarmonicCalibration::connectLineEditToGraphSamples(QLineEdit* lineEdit, int& variable, Sismograph* graph, int min, int max)
-{
-    connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit, graph, min, max]() {
-        bool ok;
-        int value = lineEdit->text().toInt(&ok);
-        if (ok && value >= min && value <= max) {
-            variable = value;
-			graph->setNumSamples(variable);
-        } else {
-            lineEdit->setText(QString::number(variable));
-        }
-    });
-}
+// void HarmonicCalibration::connectLineEditToGraphSamples(QLineEdit* lineEdit, int& variable, Sismograph* graph, int min, int max)
+// {
+//     connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit, graph, min, max]() {
+//         bool ok;
+//         int value = lineEdit->text().toInt(&ok);
+//         if (ok && value >= min && value <= max) {
+//             variable = value;
+// 			graph->setNumSamples(variable);
+//         } else {
+//             lineEdit->setText(QString::number(variable));
+//         }
+//     });
+// }
 
-void HarmonicCalibration::connectMenuComboToGraphDirection(MenuCombo* menuCombo, Sismograph* graph)
-{
-	QComboBox *combo = menuCombo->combo();
-	connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [combo, graph]() {
-		int value = qvariant_cast<int>(combo->currentData());
-		switch(value)
-		{
-			case Sismograph::LEFT_TO_RIGHT:
-				graph->setPlotDirection(Sismograph::LEFT_TO_RIGHT);
-				graph->reset();
-				break;
-			case Sismograph::RIGHT_TO_LEFT:
-				graph->setPlotDirection(Sismograph::RIGHT_TO_LEFT);
-				graph->reset();
-				break;
-		}
-	});
-}
+// void HarmonicCalibration::connectMenuComboToGraphDirection(MenuCombo* menuCombo, Sismograph* graph)
+// {
+// 	QComboBox *combo = menuCombo->combo();
+// 	connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [combo, graph]() {
+// 		int value = qvariant_cast<int>(combo->currentData());
+// 		switch(value)
+// 		{
+// 			case Sismograph::LEFT_TO_RIGHT:
+// 				graph->setPlotDirection(Sismograph::LEFT_TO_RIGHT);
+// 				graph->reset();
+// 				break;
+// 			case Sismograph::RIGHT_TO_LEFT:
+// 				graph->setPlotDirection(Sismograph::RIGHT_TO_LEFT);
+// 				graph->reset();
+// 				break;
+// 		}
+// 	});
+// }
 
 void HarmonicCalibration::connectMenuComboToNumber(MenuCombo* menuCombo, double& variable)
 {
@@ -2445,49 +2445,49 @@ void HarmonicCalibration::connectMenuComboToNumber(MenuCombo* menuCombo, int& va
 	});
 }
 
-void HarmonicCalibration::changeGraphColorByChannelName(Sismograph* graph, const char* channelName)
-{
-	int index = m_admtController->getChannelIndex(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), channelName);
-	if(index > -1){
-		graph->setColor(StyleHelper::getColor( QString::fromStdString("CH" + std::to_string(index) )));
-	}
-}
+// void HarmonicCalibration::changeGraphColorByChannelName(Sismograph* graph, const char* channelName)
+// {
+// 	int index = m_admtController->getChannelIndex(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), channelName);
+// 	if(index > -1){
+// 		graph->setColor(StyleHelper::getColor( QString::fromStdString("CH" + std::to_string(index) )));
+// 	}
+// }
 
-void HarmonicCalibration::connectMenuComboToGraphChannel(MenuCombo* menuCombo, Sismograph* graph)
-{
-	QComboBox *combo = menuCombo->combo();
-	connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, combo, graph]() {
-		int currentIndex = combo->currentIndex();
-		QVariant currentData = combo->currentData();
-		char *value = reinterpret_cast<char*>(currentData.value<void*>());
-		switch(currentIndex)
-		{
-			case ADMTController::Channel::ROTATION:
-				dataGraphValue = &rotation;
-				graph->setUnitOfMeasure("Degree", "°");
-				graph->setAxisScale(QwtAxis::YLeft, -30.0, 390.0);
-				graph->setNumSamples(dataGraphSamples);
-				graph->setAxisTitle(QwtAxis::YLeft, tr("Degree (°)"));
-				break;
-			case ADMTController::Channel::ANGLE:
-				dataGraphValue = &angle;
-				graph->setUnitOfMeasure("Degree", "°");
-				graph->setAxisScale(QwtAxis::YLeft, -30.0, 390.0);
-				graph->setNumSamples(dataGraphSamples);
-				graph->setAxisTitle(QwtAxis::YLeft, tr("Degree (°)"));
-				break;
-			case ADMTController::Channel::COUNT:
-				dataGraphValue = &count;
-				graph->setUnitOfMeasure("Count", "");
-				graph->setAxisScale(QwtAxis::YLeft, -1.0, 20.0);
-				graph->setNumSamples(dataGraphSamples);
-				graph->setAxisTitle(QwtAxis::YLeft, tr("Count"));
-				break;
-		}
-		changeGraphColorByChannelName(graph, value);
-		graph->reset();
-	});
-}
+// void HarmonicCalibration::connectMenuComboToGraphChannel(MenuCombo* menuCombo, Sismograph* graph)
+// {
+// 	QComboBox *combo = menuCombo->combo();
+// 	connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, combo, graph]() {
+// 		int currentIndex = combo->currentIndex();
+// 		QVariant currentData = combo->currentData();
+// 		char *value = reinterpret_cast<char*>(currentData.value<void*>());
+// 		switch(currentIndex)
+// 		{
+// 			case ADMTController::Channel::ROTATION:
+// 				dataGraphValue = &rotation;
+// 				graph->setUnitOfMeasure("Degree", "°");
+// 				graph->setAxisScale(QwtAxis::YLeft, -30.0, 390.0);
+// 				graph->setNumSamples(dataGraphSamples);
+// 				graph->setAxisTitle(QwtAxis::YLeft, tr("Degree (°)"));
+// 				break;
+// 			case ADMTController::Channel::ANGLE:
+// 				dataGraphValue = &angle;
+// 				graph->setUnitOfMeasure("Degree", "°");
+// 				graph->setAxisScale(QwtAxis::YLeft, -30.0, 390.0);
+// 				graph->setNumSamples(dataGraphSamples);
+// 				graph->setAxisTitle(QwtAxis::YLeft, tr("Degree (°)"));
+// 				break;
+// 			case ADMTController::Channel::COUNT:
+// 				dataGraphValue = &count;
+// 				graph->setUnitOfMeasure("Count", "");
+// 				graph->setAxisScale(QwtAxis::YLeft, -1.0, 20.0);
+// 				graph->setNumSamples(dataGraphSamples);
+// 				graph->setAxisTitle(QwtAxis::YLeft, tr("Count"));
+// 				break;
+// 		}
+// 		changeGraphColorByChannelName(graph, value);
+// 		graph->reset();
+// 	});
+// }
 
 void HarmonicCalibration::connectLineEditToRPSConversion(QLineEdit* lineEdit, double& vmax)
 {
