@@ -20,6 +20,7 @@
  */
 
 #include "widgets/menulineedit.h"
+#include "style.h"
 
 using namespace scopy;
 
@@ -44,8 +45,8 @@ QLineEdit *MenuLineEdit::edit() { return m_edit; }
 
 void MenuLineEdit::applyStylesheet()
 {
-	StyleHelper::MenuLineEdit(m_edit, "menuButton");
-	StyleHelper::MenuLineEditWidget(this, "menuBigSwitch");
+	Style::setStyle(m_edit, style::properties::lineedit::menuLineEdit);
+	Style::setStyle(this, style::properties::lineedit::menuLineEditWidget);
 }
 
 #include "moc_menulineedit.cpp"

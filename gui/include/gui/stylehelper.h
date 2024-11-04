@@ -32,6 +32,7 @@
 #include <QTableWidget>
 #include <QSplitter>
 #include <QTreeView>
+#include <QLineEdit>
 
 #include <scopy-gui_export.h>
 #include <utils.h>
@@ -92,8 +93,6 @@ public:
 	static void MenuCollapseHeaderLineEdit(QLineEdit *w, QString objectName = "");
 	static void MenuBigSwitch(QWidget *w, QString objectName = "");
 	static void MenuBigSwitchButton(CustomSwitch *w, QString objectName = "");
-	static void MenuLineEdit(QLineEdit *m_edit, QString objectName = "");
-	static void MenuLineEditWidget(QWidget *w, QString objectName = "");
 	static void BlueGrayButton(QPushButton *btn, QString objectName = "");
 	static void OverlayMenu(QWidget *w, QString objectName = "");
 	static void BlueIconButton(QPushButton *w, QIcon icon, QString objectName = "");
@@ -110,9 +109,6 @@ public:
 	static void HoverWidget(QWidget *w, bool draggable = false, QString objectName = "");
 	static void TransparentWidget(QWidget *w, QString objectName = "");
 	static void ScopyStatusBar(QWidget *w, QString objectName = "");
-	static void IIOWidget(QWidget *w, QString objectName = "");
-	static void IIOWidgetElement(QWidget *w, QString objectName = "");
-	static void IIOLineEdit(QLineEdit *w, QString objectName = "");
 	static void TableViewWidget(QWidget *w, QString objectName = "");
 	static void HoverToolTip(QWidget *w, QString info, QString objectName = "");
 	static void WarningLabel(QLabel *w, QString objectName = "");
@@ -129,7 +125,6 @@ public:
 	static void ActiveStoredLabel(QLabel *w, QString objectName = "");
 	static void FaultsFrame(QFrame *w, QString objectName = "");
 	static void FaultsExplanation(QWidget *w, QString objectName = "");
-	static void IIOCompactLabel(QLabel *label, QString objectName = "");
 
 private:
 	QMap<QString, QString> colorMap;
