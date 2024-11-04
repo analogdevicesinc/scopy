@@ -226,6 +226,7 @@ void MenuSpinbox::setIncrementMode(IncrementMode im)
 
 	m_im = im;
 	delete m_incrementStrategy;
+	bool setScale = true;
 	switch(m_im) {
 
 	case IS_POW2:
@@ -234,12 +235,19 @@ void MenuSpinbox::setIncrementMode(IncrementMode im)
 	case IS_125:
 		m_incrementStrategy = new IncrementStrategy125();
 		break;
+	case IS_BASIC:
+		m_incrementStrategy = new IncrementStrategyBasic();
+		setScalingEnabled(false);
+		setScale = false;
+		break;
 	case IS_FIXED:
 	default:
 		m_incrementStrategy = new IncrementStrategyFixed();
 		break;
 	}
-	m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
+	if(setScale) {
+		m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
+	}
 }
 
 void MenuSpinbox::setScalingEnabled(bool en)
@@ -262,25 +270,27 @@ void MenuSpinbox::userInput(QString s)
 	double val = nr.toDouble(&ok);
 	if(!ok)
 		setValue(m_value); // reset
+	if(m_scalingEnabled) {
+		QString unit = s.mid(i + 1, 1); // isolate prefix and unit from the whole string (mV)
+		if(unit.length() > 0) {		// user wrote a prefix and/or a unit
+			double scale = getScaleForPrefix(unit, Qt::CaseSensitive); // find the unit in the map
+			if(scale == -1) {
+				scale = getScaleForPrefix(
+					unit,
+					Qt::CaseInsensitive); // the user may have written 30K instead of 30k
+			}
 
-	QString unit = s.mid(i + 1, 1); // isolate prefix and unit from the whole string (mV)
-	if(unit.length() > 0) {		// user wrote a prefix and/or a unit
-		double scale = getScaleForPrefix(unit, Qt::CaseSensitive); // find the unit in the map
-		if(scale == -1) {
-			scale = getScaleForPrefix(unit,
-						  Qt::CaseInsensitive); // the user may have written 30K instead of 30k
-		}
-
-		if(scale == -1) {
-			scale = 1; // do not scale the value at all
+			if(scale == -1) {
+				scale = 1; // do not scale the value at all
+			} else {
+				val = val * scale; // scale accordingly
+			}
 		} else {
-			val = val * scale; // scale accordingly
+			val = val *
+				m_scaleCb->currentData()
+					.toDouble(); // the user didnt write a scale => use scale in combobox
 		}
-	} else {
-		val = val *
-			m_scaleCb->currentData().toDouble(); // the user didnt write a scale => use scale in combobox
 	}
-
 	setValue(val);
 }
 

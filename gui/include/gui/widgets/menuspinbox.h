@@ -122,6 +122,17 @@ private:
 	void setScale(double scale) override { m_scale = scale; }
 };
 
+class SCOPY_GUI_EXPORT IncrementStrategyBasic : public IncrementStrategy
+{
+public:
+	IncrementStrategyBasic() {}
+	~IncrementStrategyBasic() {}
+	virtual double increment(double val) override { return ++val; }
+	virtual double decrement(double val) override { return --val; }
+	double m_scale;
+	void setScale(double scale) override { m_scale = scale; }
+};
+
 class SCOPY_GUI_EXPORT UnitPrefix
 {
 public:
@@ -140,6 +151,7 @@ public:
 	{
 		IS_POW2,
 		IS_125,
+		IS_BASIC,
 		IS_FIXED
 
 	} IncrementMode;
