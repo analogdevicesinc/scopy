@@ -126,6 +126,8 @@ private:
 
 	QCheckBox *autoCalibrateCheckBox;
 
+	QScrollArea *MTDiagnosticsScrollArea;
+
 	PlotWidget *angleErrorPlotWidget, *calibrationRawDataPlotWidget, *FFTAngleErrorPlotWidget,
 			   *correctedErrorPlotWidget, *postCalibrationRawDataPlotWidget, *FFTCorrectedErrorPlotWidget;
 	PlotAxis *calibrationRawDataXPlotAxis, *calibrationRawDataYPlotAxis, 
@@ -223,6 +225,7 @@ private:
 	void startAcquisition();
 	void getAcquisitionSamples();
 	void acquisitionUITask();
+	void toggleMTDiagnostics(int mode);
 
 	QTimer *acquisitionUITimer, *calibrationTimer, *utilityTimer;
 
