@@ -2,12 +2,15 @@
 set -ex
 export PS4='+(${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 
-STAGING_AREA=$HOME"/staging"
-STAGING_AREA_DEPS=$STAGING_AREA"/dependencies"
 JOBS=-j1
+SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || echo "No source directory found"
+SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+STAGING_AREA=$SRC_SCRIPT/staging
+STAGING_AREA_DEPS=$STAGING_AREA/dependencies
+
 
 USE_STAGING=OFF
-
 
 LIBIIO_VERSION=v0.26
 LIBM2K_BRANCH=main
@@ -19,8 +22,7 @@ GRM2K_BRANCH=master
 LIBSIGROKDECODE_BRANCH=master
 QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
-IIOEMU_BRANCH=master
-SCOPY_BRANCH=dev
+IIOEMU_BRANCH=main
 
 if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
 	then
@@ -60,11 +62,10 @@ build_with_cmake() {
 	$CMAKE "$@"
 	make $JOBS
 	sudo make $JOBS install
-	sudo ldconfig
 }
 
 clone() {
-	echo "#######CLONE#######"
+	echo "####### CLONE #######"
 	pushd $STAGING_AREA
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
@@ -77,21 +78,20 @@ clone() {
 	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	[ -d 'iio-emu' ]	|| git clone --recursive https://github.com/analogdevicesinc/iio-emu -b $IIOEMU_BRANCH iio-emu
-	[ -d 'scopy' ]		|| git clone --recursive https://github.com/analogdevicesinc/scopy -b $SCOPY_BRANCH scopy
 	popd
 }
 
 install_apt() {
 	sudo apt-get update
 	sudo apt-get -y upgrade
-	sudo apt-get -y install build-essential cmake vim bison flex swig swig4.0 python3 mlocate \
-		libusb-1.0-* libavahi-client* libavahi-common* libxml2* libsndfile-dev libfuse2 libboost1.74-* \
-		qtbase5-dev* qt5-qmake* qttools5-dev* qtdeclarative5-dev libqt5qml* libqt5svg5*
+	sudo apt-get -y install build-essential cmake vim bison flex swig swig4.0 python3 mlocate libfftw3-dev libgsl-dev \
+		libusb-1.0-* libavahi-client* libavahi-common* libxml2* libsndfile-dev libfuse2 libboost1.74-* libglib2.0-dev \
+		qtbase5-dev* qt5-qmake* qttools5-dev* qtdeclarative5-dev libqt5qml* libqt5svg5* libgmp3-dev libgmp-dev libthrift-dev libunwind-dev
 	pip install mako --break-system-packages
 }
 
 build_libiio() {
-	echo "#######build_libiio#######"
+	echo "####### BUILD LIBIIO #######"
 	pushd $STAGING_AREA/libiio
 	build_with_cmake \
 		-DWITH_TESTS:BOOL=OFF \
@@ -108,21 +108,21 @@ build_libiio() {
 }
 
 build_libm2k() {
-	echo "#######build_libm2k#######"
+	echo "####### BUILD LIBM2K #######"
 	pushd $STAGING_AREA/libm2k
 	build_with_cmake -DENABLE_PYTHON=OFF -DENABLE_TOOLS=ON ../
 	popd
 }
 
 build_spdlog() {
-	echo "#######build_spdlog#######"
+	echo "####### BUILD SPDLOG #######"
 	pushd $STAGING_AREA/spdlog
 	build_with_cmake -DSPDLOG_BUILD_SHARED=ON ../
 	popd
 }
 
 build_volk() {
-	echo "#######build_volk#######"
+	echo "####### BUILD VOLK #######"
 	pushd $STAGING_AREA/volk
 	build_with_cmake \
 		-DCMAKE_BUILD_TYPE=Release \
@@ -131,7 +131,7 @@ build_volk() {
 }
 
 build_gnuradio() {
-	echo "#######build_gnuradio#######"
+	echo "####### BUILD GNURADIO #######"
 	pushd $STAGING_AREA/gnuradio
 	build_with_cmake \
 		-DPYTHON_EXECUTABLE=/usr/bin/python3 \
@@ -148,23 +148,24 @@ build_gnuradio() {
 }
 
 build_gr_scopy() {
-	echo "#######build_gr_scopy#######"
+	echo "####### BUILD GR_SCOPY #######"
 	pushd $STAGING_AREA/gr-scopy
 	build_with_cmake -DWITH_PYTHON=OFF  ../
 	popd
 }
 
 build_gr_m2k() {
-	echo "#######build_gr_m2k#######"
+	echo "####### BUILD GR_M2K #######"
 	pushd $STAGING_AREA/gr-m2k
 	build_with_cmake -DWITH_PYTHON=OFF  -DDIGITAL=OFF ../
 	popd
 }
 
 build_qwt() {
-	echo "#######build_qwt#######"
+	echo "####### BUILD QWT #######"
 	pushd $STAGING_AREA/qwt
 	git clean -xdf
+	sed -i 's|/usr/local/qwt-$$QWT_VERSION-ma|/usr/local|g' qwtconfig.pri
 	if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
 	then
 		qmake INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib qwt.pro
@@ -177,12 +178,11 @@ build_qwt() {
 		sudo make install
 	fi
 
-	sudo ldconfig
 	popd
 }
 
 build_libsigrokdecode() {
-	echo "#######build_libsigrokdecode#######"
+	echo "####### BUILD LIBSIGROKDECODE #######"
 	pushd $STAGING_AREA/libsigrokdecode
 	git clean -xdf
 	./autogen.sh
@@ -196,36 +196,38 @@ build_libsigrokdecode() {
 
 	make $JOBS
 	sudo make install
-	sudo ldconfig
 	popd
 }
 
 build_libtinyiiod() {
-	echo "#######build_libtinyiiod#######"
+	echo "####### BUILD LIBTINYIIOD #######"
 	pushd $STAGING_AREA/libtinyiiod
 	build_with_cmake -DBUILD_EXAMPLES=OFF ../
 	popd
 }
 
 build_iio-emu() {
-	echo "#######build_iio-emu#######"
+	echo "####### BUILD IIO-EMU #######"
 	pushd $STAGING_AREA/iio-emu
 	build_with_cmake ../
 	popd
 }
 
 build_scopy() {
-	echo "#######build_scopy#######"
-	pushd $STAGING_AREA/scopy
+	echo "####### BUILD SCOPY #######"
+	pushd $SRC_DIR
 	build_with_cmake ../
 	popd
 }
 
-test_scopy() {
-	echo "#######TEST_SCOPY#######"
-	pushd $STAGING_AREA/scopy/build
-	./scopy
+build_scopy_appimage()
+{
+	pushd $SRC_DIR
+	export APPIMAGE=1
+	build_with_cmake ../
 	popd
+
+	$SRC_DIR/ci/arm/arm_build_process.sh create_appdir create_appimage
 }
 
 buid_deps() {
@@ -242,11 +244,10 @@ buid_deps() {
 }
 
 
-# instal_apt
+# install_apt
 # clone
 # buid_deps
 # build_scopy
-# test_scopy
 
 for arg in $@; do
 	$arg

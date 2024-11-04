@@ -3,7 +3,7 @@
 set -ex
 SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-source $SRC_SCRIPT/armhf_build_config.sh
+source $SRC_SCRIPT/arm_build_config.sh $1
 
 IMAGE_FILE=2023-12-13-ADI-Kuiper-full.img
 
@@ -62,7 +62,11 @@ extract_sysroot(){
 
 # execute chroot inside the sysroot folder and install/remove packages using apt
 configure_sysroot(){
-	cat $SRC_SCRIPT/inside_chroot.sh | sudo chroot ${SYSROOT}
+	if [ $TOOLCHAIN_HOST == "aarch64-linux-gnu"  ]; then
+			cat $SRC_SCRIPT/inside_chroot_arm64.sh | sudo chroot ${SYSROOT}
+	elif [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
+			cat $SRC_SCRIPT/inside_chroot_armhf.sh | sudo chroot ${SYSROOT}
+	fi
 }
 
 move_and_extract_sysroot(){
@@ -81,7 +85,7 @@ fix_relativelinks(){
 	popd
 }
 
-for arg in $@; do
+for arg in "${@:2}"; do
 	$arg
 done
 

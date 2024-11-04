@@ -3,7 +3,8 @@
 set -ex
 SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
 SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
-source $SRC_DIR/ci/armhf/armhf_build_config.sh
+ARCH=$1
+source $SRC_DIR/ci/arm/arm_build_config.sh "$ARCH"
 
 # install docker
 install_packages(){
@@ -16,7 +17,7 @@ install_packages(){
 }
 
 create_sysroot(){
-	$SRC_DIR/ci/armhf/create_sysroot.sh \
+	$SRC_DIR/ci/arm/create_sysroot.sh "$ARCH" \
 		install_packages \
 		download_kuiper \
 		install_qemu \
@@ -28,18 +29,34 @@ create_sysroot(){
 tar_and_move_sysroot(){
 	pushd $STAGING_AREA
 	sudo tar -czf "${SYSROOT_TAR##*/}" sysroot
-	sudo mv $SYSROOT_TAR $SRC_DIR/ci/armhf
+	sudo mv $SYSROOT_TAR $SRC_DIR/ci/arm
 	popd
 }
 
 create_image(){
-	pushd ${SRC_DIR}/ci/armhf
-	docker build --load --progress plain --tag cristianbindea/scopy2-armhf-appimage:testing -f docker/Dockerfile .
-	# DOCKER_BUILDKIT=0 docker build --tag cristianbindea/scopy2-armhf-appimage:testing . # build the image using old backend
+	pushd ${SRC_DIR}/ci/arm
+	if [ "${ARCH}" == "arm32" ]; then
+		DOCKER_TAG=cristianbindea/scopy2-armhf-appimage:testing
+	elif [ "${ARCH}" == "arm64" ]; then
+		DOCKER_TAG=cristianbindea/scopy2-arm64-appimage:testing
+	fi
+
+	# docker build \
+	# 	--load \
+	# 	--progress plain \
+	# 	--tag ${DOCKER_TAG} \
+	# 	-f docker/Dockerfile \
+	# 	--build-arg ARCH=${ARCH} .
+
+	# build the image using old backend
+	DOCKER_BUILDKIT=0 docker build \
+		--tag ${DOCKER_TAG} \
+		-f docker/Dockerfile \
+		--build-arg ARCH=${ARCH} .
 	popd
 }
 
-#install_packages
+install_packages
 create_sysroot
 tar_and_move_sysroot
 create_image
