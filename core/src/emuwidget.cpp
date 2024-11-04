@@ -34,6 +34,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <style.h>
+#include <menusectionwidget.h>
 
 Q_LOGGING_CATEGORY(CAT_EMU_ADD_PAGE, "EmuAddPage")
 using namespace scopy;
@@ -52,37 +53,41 @@ EmuWidget::EmuWidget(QWidget *parent)
 	getJsonConfiguration();
 	getEmuOptions();
 
-	QWidget *emuWidget = new QWidget(this);
-	QGridLayout *emuWidgetLay = new QGridLayout(emuWidget);
-	emuWidgetLay->setSpacing(10);
-	Style::setStyle(emuWidget, style::properties::widget::border_interactive);
+	QWidget *container = new QWidget(this);
+	container->setLayout(new QGridLayout(container));
+	Style::setStyle(container, style::properties::widget::border_interactive);
 
-	QLabel *demoLabel = new QLabel("Demo Option", emuWidget);
-	StyleHelper::MenuSmallLabel(demoLabel);
+	MenuSectionCollapseWidget *configSection = new MenuSectionCollapseWidget(
+		"CONFIGURATION", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, container);
+	configSection->menuSection()->layout()->setMargin(0);
+
+	QWidget *emuWidget = new QWidget(configSection);
+	QGridLayout *emuWidgetLay = new QGridLayout(emuWidget);
+	emuWidgetLay->setMargin(0);
+	emuWidgetLay->setSpacing(10);
+
+	QLabel *demoLabel = new QLabel("Device", emuWidget);
 	QWidget *demoOptWidget = createDemoOptWidget(emuWidget);
 	emuWidgetLay->addWidget(demoLabel, 0, 0);
 	emuWidgetLay->addWidget(demoOptWidget, 0, 1);
 	connect(this, &EmuWidget::demoEnabled, demoLabel, &QWidget::setDisabled);
 	connect(this, &EmuWidget::demoEnabled, demoOptWidget, &QWidget::setDisabled);
 
-	QLabel *xmlLabel = new QLabel("XML Path", emuWidget);
-	StyleHelper::MenuSmallLabel(xmlLabel);
+	QLabel *xmlLabel = new QLabel("XML", emuWidget);
 	QWidget *xmlPathWidget = createXmlPathWidget(emuWidget);
 	emuWidgetLay->addWidget(xmlLabel, 1, 0);
 	emuWidgetLay->addWidget(xmlPathWidget, 1, 1);
 	connect(this, &EmuWidget::demoEnabled, xmlLabel, &QWidget::setDisabled);
 	connect(this, &EmuWidget::demoEnabled, xmlPathWidget, &QWidget::setDisabled);
 
-	QLabel *rxTxLabel = new QLabel("RX/TX Devices", emuWidget);
-	StyleHelper::MenuSmallLabel(rxTxLabel);
+	QLabel *rxTxLabel = new QLabel("Rx/Tx", emuWidget);
 	QWidget *rxTxDevWidget = createRxTxDevWidget(emuWidget);
 	emuWidgetLay->addWidget(rxTxLabel, 2, 0);
 	emuWidgetLay->addWidget(rxTxDevWidget, 2, 1);
 	connect(this, &EmuWidget::demoEnabled, rxTxLabel, &QWidget::setDisabled);
 	connect(this, &EmuWidget::demoEnabled, rxTxDevWidget, &QWidget::setDisabled);
 
-	QLabel *uriLabel = new QLabel("Uri", emuWidget);
-	StyleHelper::MenuSmallLabel(uriLabel);
+	QLabel *uriLabel = new QLabel("URI", emuWidget);
 	QWidget *uriWidget = createUriWidget(emuWidget);
 	emuWidgetLay->addWidget(uriLabel, 3, 0);
 	emuWidgetLay->addWidget(uriWidget, 3, 1);
@@ -92,7 +97,10 @@ EmuWidget::EmuWidget(QWidget *parent)
 	m_uriMsgLabel->setVisible(false);
 	emuWidgetLay->addWidget(m_uriMsgLabel, 4, 1);
 
-	layout->addWidget(emuWidget, 0, 0);
+	configSection->add(emuWidget);
+	container->layout()->addWidget(configSection);
+
+	layout->addWidget(container, 0, 0);
 	layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 1);
 	layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding), 1, 0);
 
@@ -136,9 +144,9 @@ void EmuWidget::init()
 void EmuWidget::enGenericOptWidget(QWidget *xmlPathWidget, QWidget *rxTxDevWidget, QString crtOpt)
 {
 	// when a new option is selected clear all fields
-	m_xmlPathEdit->edit()->setText("");
-	m_rxTxDevEdit->edit()->setText("");
-	m_uriEdit->edit()->setText("");
+	m_xmlPathEdit->setText("");
+	m_rxTxDevEdit->setText("");
+	m_uriEdit->setText("");
 
 	bool isNotAdalm2000 = !crtOpt.contains("adalm2000");
 
@@ -163,15 +171,15 @@ void EmuWidget::onEnableDemoClicked()
 		QStringList arg = createArgList();
 		bool started = startIioEmuProcess(m_emuPath, arg);
 		if(!started) {
-			stopEnableBtn("Enable Demo");
+			stopEnableBtn("Enable");
 			return;
 		}
-		stopEnableBtn("Disable Demo");
-		if(m_uriEdit->edit()->text().isEmpty()) {
-			m_uriEdit->edit()->setText("ip:127.0.0.1");
+		stopEnableBtn("Disable");
+		if(m_uriEdit->text().isEmpty()) {
+			m_uriEdit->setText("ip:127.0.0.1");
 		}
 		setEnableDemo(!m_enableDemo);
-		Q_EMIT emuDeviceAvailable(m_uriEdit->edit()->text());
+		Q_EMIT emuDeviceAvailable(m_uriEdit->text());
 	} else {
 		killEmuProcess();
 	}
@@ -184,12 +192,12 @@ QStringList EmuWidget::createArgList()
 	arguments.append(m_emuType);
 
 	if(option.compare("adalm2000") != 0) {
-		auto xmlFullPath = m_xmlPathEdit->edit()->text();
+		auto xmlFullPath = m_xmlPathEdit->text();
 		QFileInfo f(xmlFullPath);
 		m_workingDir = f.absoluteDir().path();
 
 		arguments.append(f.fileName());
-		arguments.append(m_rxTxDevEdit->edit()->text());
+		arguments.append(m_rxTxDevEdit->text());
 	} else {
 		m_workingDir = "";
 	}
@@ -238,7 +246,7 @@ bool EmuWidget::startIioEmuProcess(QString processPath, QStringList arg)
 void EmuWidget::killEmuProcess()
 {
 	m_emuProcess->kill();
-	stopEnableBtn("Enable Demo");
+	stopEnableBtn("Enable");
 	setEnableDemo(!m_enableDemo);
 }
 
@@ -274,7 +282,7 @@ void EmuWidget::configureOption(QString option)
 
 			if(jsonObject.contains("xml_path")) {
 				QString xmlPath = jsonObject.value(QString("xml_path")).toString();
-				m_xmlPathEdit->edit()->setText(currentPath + xmlPath);
+				m_xmlPathEdit->setText(currentPath + xmlPath);
 			}
 
 			if(jsonObject.contains("rx_tx_device")) {
@@ -282,12 +290,12 @@ void EmuWidget::configureOption(QString option)
 				rxTxDevice += "@";
 				rxTxDevice += currentPath;
 				rxTxDevice += jsonObject.value(QString("rx_tx_bin_path")).toString();
-				m_rxTxDevEdit->edit()->setText(rxTxDevice);
+				m_rxTxDevEdit->setText(rxTxDevice);
 			}
 
 			if(jsonObject.contains("uri")) {
 				QString uri = jsonObject.value(QString("uri")).toString();
-				m_uriEdit->edit()->setText(uri);
+				m_uriEdit->setText(uri);
 			}
 
 			if(jsonObject.contains("emu-type")) {
@@ -361,11 +369,11 @@ QWidget *EmuWidget::createXmlPathWidget(QWidget *parent)
 	layout->setSpacing(10);
 	w->setLayout(layout);
 
-	m_xmlPathEdit = new MenuLineEdit(w);
+	m_xmlPathEdit = new QLineEdit(w);
 
 	QPushButton *xmlPathBtn = new QPushButton("...", w);
 	StyleHelper::BrowseButton(xmlPathBtn);
-	connect(xmlPathBtn, &QPushButton::clicked, this, [=]() { browseFile(m_xmlPathEdit->edit()); });
+	connect(xmlPathBtn, &QPushButton::clicked, this, [=]() { browseFile(m_xmlPathEdit); });
 
 	layout->addWidget(m_xmlPathEdit);
 	layout->addWidget(xmlPathBtn);
@@ -380,13 +388,13 @@ QWidget *EmuWidget::createRxTxDevWidget(QWidget *parent)
 	layout->setSpacing(10);
 	w->setLayout(layout);
 
-	m_rxTxDevEdit = new MenuLineEdit(w);
-	m_rxTxDevEdit->edit()->setPlaceholderText("iio:device0@/absolutePathTo/data.bin");
+	m_rxTxDevEdit = new QLineEdit(w);
+	m_rxTxDevEdit->setPlaceholderText("iio:device0@/absolutePathTo/data.bin");
 
 	QPushButton *rxTxDevBtn = new QPushButton("...", w);
 	StyleHelper::BrowseButton(rxTxDevBtn);
 
-	connect(rxTxDevBtn, &QPushButton::clicked, this, [=]() { browseFile(m_rxTxDevEdit->edit()); });
+	connect(rxTxDevBtn, &QPushButton::clicked, this, [=]() { browseFile(m_rxTxDevEdit); });
 
 	layout->addWidget(m_rxTxDevEdit);
 	layout->addWidget(rxTxDevBtn);
@@ -401,8 +409,8 @@ QWidget *EmuWidget::createUriWidget(QWidget *parent)
 	layout->setSpacing(10);
 	w->setLayout(layout);
 
-	m_uriEdit = new MenuLineEdit(w);
-	m_uriEdit->edit()->setPlaceholderText("ip:127.0.0.1");
+	m_uriEdit = new QLineEdit(w);
+	m_uriEdit->setPlaceholderText("ip:127.0.0.1");
 	connect(this, &EmuWidget::demoEnabled, m_uriEdit, &QWidget::setDisabled);
 
 	initEnBtn(w);
@@ -415,7 +423,7 @@ QWidget *EmuWidget::createUriWidget(QWidget *parent)
 void EmuWidget::initEnBtn(QWidget *parent)
 {
 	m_enDemoBtn = new AnimationPushButton(parent);
-	m_enDemoBtn->setText("Enable demo");
+	m_enDemoBtn->setText("Enable");
 	StyleHelper::BasicButton(m_enDemoBtn);
 	m_enDemoBtn->setFixedWidth(128);
 	QMovie *loadingIcon(new QMovie(this));
