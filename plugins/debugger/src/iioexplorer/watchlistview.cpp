@@ -26,6 +26,7 @@
 #include <QPushButton>
 #include <QHeaderView>
 #include <QScrollBar>
+#include <qnamespace.h>
 #include <style.h>
 
 #define NAME_POS 0
@@ -72,7 +73,7 @@ void WatchListView::setupUi()
 	header->setFrameShadow(QFrame::Shadow::Plain);
 	header->setFrameShape(QFrame::Shape::NoFrame);
 	header->setFrameStyle(0);
-	header->setDefaultAlignment(Qt::AlignLeft);
+	header->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
 	Style::setStyle(this, style::properties::debugger::watchListView);
 	Style::setStyle(header, style::properties::debugger::headerView, true, true);
