@@ -14,7 +14,7 @@ RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, ui
     container->setMargin(0);
     container->setSpacing(0);
     MenuSectionWidget *menuSectionWidget = new MenuSectionWidget(this);
-    MenuCollapseSection *menuCollapseSection = new MenuCollapseSection(header, MenuCollapseSection::MHCW_NONE, menuSectionWidget);
+    MenuCollapseSection *menuCollapseSection = new MenuCollapseSection(header, MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, menuSectionWidget);
     menuCollapseSection->contentLayout()->setSpacing(10);
     menuSectionWidget->setFixedHeight(180);
     menuSectionWidget->contentLayout()->setSpacing(10);

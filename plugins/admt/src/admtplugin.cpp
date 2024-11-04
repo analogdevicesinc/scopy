@@ -8,8 +8,10 @@
 #include <iioutil/connectionprovider.h>
 
 Q_LOGGING_CATEGORY(CAT_ADMTPLUGIN, "ADMTPlugin")
+using namespace scopy;
+// using namespace scopy::grutil;
+// using namespace scopy::m2kgui;
 using namespace scopy::admt;
-using namespace scopy::grutil;
 
 const bool isDebug = false;
 
@@ -80,74 +82,6 @@ void ADMTPlugin::loadToolList()
 void ADMTPlugin::unload() { /*delete m_infoPage;*/ }
 
 QString ADMTPlugin::description() { return "Plugin for ADMT Harmonic Calibration"; }
-
-PlotProxy *ADMTPlugin::createRecipe(iio_context *ctx)
-{
-	QStringList deviceList;
-	QMap<QString, QStringList> devChannelMap;
-	int devCount = iio_context_get_devices_count(ctx);
-	qDebug(CAT_ADMTPLUGIN) << " Found " << devCount << "devices";
-	for(int i = 0; i < devCount; i++) {
-		iio_device *dev = iio_context_get_device(ctx, i);
-		QString dev_name = QString::fromLocal8Bit(iio_device_get_name(dev));
-
-		qDebug(CAT_ADMTPLUGIN) << "Looking for scanelements in " << dev_name;
-		if(dev_name == "m2k-logic-analyzer-rx")
-			continue;
-		QStringList channelList;
-		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
-
-			struct iio_channel *chn = iio_device_get_channel(dev, j);
-			QString chn_name = QString::fromLocal8Bit(iio_channel_get_id(chn));
-			qDebug(CAT_ADMTPLUGIN) << "Verify if " << chn_name << "is scan element";
-			if(chn_name == "timestamp" /*|| chn_name == "accel_z" || chn_name =="accel_y"*/)
-				continue;
-			if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
-				channelList.append(chn_name);
-			}
-		}
-		if(channelList.isEmpty())
-			continue;
-		deviceList.append(dev_name);
-		devChannelMap.insert(dev_name, channelList);
-	}
-
-	// should this be wrapped to a register function (?)
-	GRTopBlock *top = new grutil::GRTopBlock("Time", this);
-
-	recipe = new GRTimePlotProxy(this);
-	QString plotRecipePrefix = "time_";
-	recipe->setPrefix(plotRecipePrefix);
-
-	GRTimePlotAddon *p = new GRTimePlotAddon(plotRecipePrefix, top, this);
-	GRTimePlotAddonSettings *s = new GRTimePlotAddonSettings(p, this);
-
-	recipe->setPlotAddon(p, s);
-
-	ChannelIdProvider *chIdProvider = recipe->getChannelIdProvider();
-	for(const QString &iio_dev : deviceList) {
-		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(m_ctx, iio_dev, iio_dev, 0x400, this);
-
-		top->registerIIODeviceSource(gr_dev);
-
-		GRDeviceAddon *d = new GRDeviceAddon(gr_dev, this);
-		connect(s, &GRTimePlotAddonSettings::bufferSizeChanged, d, &GRDeviceAddon::updateBufferSize);
-		recipe->addDeviceAddon(d);
-
-		for(const QString &ch : devChannelMap.value(iio_dev, {})) {
-			int idx = chIdProvider->next();
-			GRTimeChannelAddon *t = new GRTimeChannelAddon(ch, d, p, chIdProvider->pen(idx), this);
-			top->registerSignalPath(t->signalPath());
-			recipe->addChannelAddon(t);
-		}
-	}
-	recipe->setTopBlock(top);
-
-	qDebug(CAT_ADMTPLUGIN) << deviceList;
-	qDebug(CAT_ADMTPLUGIN) << devChannelMap;
-
-	return recipe;
-}
 
 bool ADMTPlugin::onConnect()
 {
