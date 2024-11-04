@@ -150,6 +150,8 @@ private:
 
 	CustomSwitch *calibrationDisplayFormatSwitch, *DIGIOBUSYToggleSwitch, *DIGIOCNVToggleSwitch, *DIGIOSENTToggleSwitch, *DIGIOACALCToggleSwitch, *DIGIOFAULTToggleSwitch, *DIGIOBOOTLOADERToggleSwitch, *DIGIOALLToggleSwitch;
 
+	RegisterBlockWidget *cnvPageRegisterBlock, *digIORegisterBlock, *faultRegisterBlock, *generalRegisterBlock, *digIOEnRegisterBlock, *angleCkRegisterBlock, *eccDcdeRegisterBlock, *eccDisRegisterBlock, *absAngleRegisterBlock, *angleRegisterBlock, *angleSecRegisterBlock, *sineRegisterBlock, *cosineRegisterBlock, *secAnglIRegisterBlock, *secAnglQRegisterBlock, *radiusRegisterBlock, *diag1RegisterBlock, *diag2RegisterBlock, *tmp0RegisterBlock, *tmp1RegisterBlock, *cnvCntRegisterBlock, *uniqID0RegisterBlock, *uniqID1RegisterBlock, *uniqID2RegisterBlock, *uniqID3RegisterBlock, *h1MagRegisterBlock, *h1PhRegisterBlock, *h2MagRegisterBlock, *h2PhRegisterBlock, *h3MagRegisterBlock, *h3PhRegisterBlock, *h8MagRegisterBlock, *h8PhRegisterBlock;
+
 	void updateChannelValues();
 	void updateLineEditValues();
 	void updateGeneralSettingEnabled(bool value);
@@ -226,6 +228,7 @@ private:
 	void getAcquisitionSamples();
 	void acquisitionUITask();
 	void toggleMTDiagnostics(int mode);
+	void toggleSequenceModeRegisters(int mode);
 
 	QTimer *acquisitionUITimer, *calibrationTimer, *utilityTimer;
 

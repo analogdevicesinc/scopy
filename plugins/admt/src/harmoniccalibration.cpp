@@ -497,8 +497,14 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 			readSequence();
 			toggleFaultRegisterMode(generalRegisterMap.at("Sequence Type"));
 			toggleMTDiagnostics(generalRegisterMap.at("Sequence Type"));
-		} 
+		}	
 		else { utilityTimer->stop(); }
+
+		if(index == 3) // Registers Tab
+		{ 
+			readSequence();
+			toggleSequenceModeRegisters(generalRegisterMap.at("Sequence Type"));
+		}
 	});
 }
 
@@ -1298,65 +1304,65 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	registerSensorDataGridLayout->setMargin(0);
 	registerSensorDataGridLayout->setSpacing(8);
 
-	RegisterBlockWidget *cnvPageRegisterBlock = new RegisterBlockWidget("CNVPAGE", "Convert Start and Page Select", 0x01, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *digIORegisterBlock = new RegisterBlockWidget("DIGIO", "Digital Input Output", 0x04, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *faultRegisterBlock = new RegisterBlockWidget("FAULT", "Fault Register", 0x06, 0xFFFF, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *generalRegisterBlock = new RegisterBlockWidget("GENERAL", "General Device Configuration", 0x10, 0x1230, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *digIOEnRegisterBlock = new RegisterBlockWidget("DIGIOEN", "Enable Digital Input/Outputs", 0x12, 0x241B, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *angleCkRegisterBlock = new RegisterBlockWidget("ANGLECK", "Primary vs Secondary Angle Check", 0x13, 0x000F, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *eccDcdeRegisterBlock = new RegisterBlockWidget("ECCDCDE", "Error Correction Codes", 0x1D, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *eccDisRegisterBlock = new RegisterBlockWidget("ECCDIS", "Error Correction Code disable", 0x23, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	cnvPageRegisterBlock = new RegisterBlockWidget("CNVPAGE", "Convert Start and Page Select", 0x01, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	digIORegisterBlock = new RegisterBlockWidget("DIGIO", "Digital Input Output", 0x04, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	faultRegisterBlock = new RegisterBlockWidget("FAULT", "Fault Register", 0x06, 0xFFFF, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	generalRegisterBlock = new RegisterBlockWidget("GENERAL", "General Device Configuration", 0x10, 0x1230, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	digIOEnRegisterBlock = new RegisterBlockWidget("DIGIOEN", "Enable Digital Input/Outputs", 0x12, 0x241B, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	angleCkRegisterBlock = new RegisterBlockWidget("ANGLECK", "Primary vs Secondary Angle Check", 0x13, 0x000F, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	eccDcdeRegisterBlock = new RegisterBlockWidget("ECCDCDE", "Error Correction Codes", 0x1D, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	eccDisRegisterBlock = new RegisterBlockWidget("ECCDIS", "Error Correction Code disable", 0x23, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 
-	RegisterBlockWidget *absAngleRegisterBlock = new RegisterBlockWidget("ABSANGLE", "Absolute Angle", 0x03, 0xDB00, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *angleRegisterBlock = new RegisterBlockWidget("ANGLE", "Angle Register", 0x05, 0x8000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *angleSecRegisterBlock = new RegisterBlockWidget("ANGLESEC", "Secondary Angle", 0x08, 0x8000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *sineRegisterBlock = new RegisterBlockWidget("SINE", "Sine Measurement", 0x10, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *cosineRegisterBlock = new RegisterBlockWidget("COSINE", "Cosine Measurement", 0x11, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *secAnglIRegisterBlock = new RegisterBlockWidget("SECANGLI", "In-phase secondary angle measurement", 0x12, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *secAnglQRegisterBlock = new RegisterBlockWidget("SECANGLQ", "Quadrature phase secondary angle measurement", 0x13, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *radiusRegisterBlock = new RegisterBlockWidget("RADIUS", "Angle measurement radius", 0x18, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *diag1RegisterBlock = new RegisterBlockWidget("DIAG1", "State of the MT reference resistors and AFE fixed input voltage", 0x1D, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *diag2RegisterBlock = new RegisterBlockWidget("DIAG2", "Measurements of two diagnostics resistors of fixed value", 0x1E, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *tmp0RegisterBlock = new RegisterBlockWidget("TMP0", "Primary Temperature Sensor", 0x20, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *tmp1RegisterBlock = new RegisterBlockWidget("TMP1", "Secondary Temperature Sensor", 0x23, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *cnvCntRegisterBlock = new RegisterBlockWidget("CNVCNT", "Conversion Count", 0x14, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	absAngleRegisterBlock = new RegisterBlockWidget("ABSANGLE", "Absolute Angle", 0x03, 0xDB00, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	angleRegisterBlock = new RegisterBlockWidget("ANGLE", "Angle Register", 0x05, 0x8000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	angleSecRegisterBlock = new RegisterBlockWidget("ANGLESEC", "Secondary Angle", 0x08, 0x8000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	sineRegisterBlock = new RegisterBlockWidget("SINE", "Sine Measurement", 0x10, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	cosineRegisterBlock = new RegisterBlockWidget("COSINE", "Cosine Measurement", 0x11, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	secAnglIRegisterBlock = new RegisterBlockWidget("SECANGLI", "In-phase secondary angle measurement", 0x12, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	secAnglQRegisterBlock = new RegisterBlockWidget("SECANGLQ", "Quadrature phase secondary angle measurement", 0x13, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	radiusRegisterBlock = new RegisterBlockWidget("RADIUS", "Angle measurement radius", 0x18, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	diag1RegisterBlock = new RegisterBlockWidget("DIAG1", "State of the MT reference resistors and AFE fixed input voltage", 0x1D, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	diag2RegisterBlock = new RegisterBlockWidget("DIAG2", "Measurements of two diagnostics resistors of fixed value", 0x1E, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	tmp0RegisterBlock = new RegisterBlockWidget("TMP0", "Primary Temperature Sensor", 0x20, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	tmp1RegisterBlock = new RegisterBlockWidget("TMP1", "Secondary Temperature Sensor", 0x23, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	cnvCntRegisterBlock = new RegisterBlockWidget("CNVCNT", "Conversion Count", 0x14, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 
-	RegisterBlockWidget *uniqID0RegisterBlock = new RegisterBlockWidget("UNIQID0", "Unique ID Register 0", 0x1E, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *uniqID1RegisterBlock = new RegisterBlockWidget("UNIQID1", "Unique ID Register 1", 0x1F, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *uniqID2RegisterBlock = new RegisterBlockWidget("UNIQID2", "Unique ID Register 2", 0x20, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	RegisterBlockWidget *uniqID3RegisterBlock = new RegisterBlockWidget("UNIQID3", "Product, voltage supply. ASIL and ASIC revision identifiers", 0x21, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	uniqID0RegisterBlock = new RegisterBlockWidget("UNIQID0", "Unique ID Register 0", 0x1E, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	uniqID1RegisterBlock = new RegisterBlockWidget("UNIQID1", "Unique ID Register 1", 0x1F, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	uniqID2RegisterBlock = new RegisterBlockWidget("UNIQID2", "Unique ID Register 2", 0x20, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	uniqID3RegisterBlock = new RegisterBlockWidget("UNIQID3", "Product, voltage supply. ASIL and ASIC revision identifiers", 0x21, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 
-	RegisterBlockWidget *h1MagRegisterBlock = new RegisterBlockWidget("H1MAG", "1st Harmonic error magnitude", 0x15, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *h1PhRegisterBlock = new RegisterBlockWidget("H1PH", "1st Harmonic error phase", 0x16, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *h2MagRegisterBlock = new RegisterBlockWidget("H2MAG", "2nd Harmonic error magnitude", 0x17, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *h2PhRegisterBlock = new RegisterBlockWidget("H2PH", "2nd Harmonic error phase", 0x18, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *h3MagRegisterBlock = new RegisterBlockWidget("H3MAG", "3rd Harmonic error magnitude", 0x19, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *h3PhRegisterBlock = new RegisterBlockWidget("H3PH", "3rd Harmonic error phase", 0x1A, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *h8MagRegisterBlock = new RegisterBlockWidget("H8MAG", "8th Harmonic error magnitude", 0x1B, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	RegisterBlockWidget *h8PhRegisterBlock = new RegisterBlockWidget("H8PH", "8th Harmonic error phase", 0x1C, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	h1MagRegisterBlock = new RegisterBlockWidget("H1MAG", "1st Harmonic error magnitude", 0x15, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	h1PhRegisterBlock = new RegisterBlockWidget("H1PH", "1st Harmonic error phase", 0x16, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	h2MagRegisterBlock = new RegisterBlockWidget("H2MAG", "2nd Harmonic error magnitude", 0x17, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	h2PhRegisterBlock = new RegisterBlockWidget("H2PH", "2nd Harmonic error phase", 0x18, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	h3MagRegisterBlock = new RegisterBlockWidget("H3MAG", "3rd Harmonic error magnitude", 0x19, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	h3PhRegisterBlock = new RegisterBlockWidget("H3PH", "3rd Harmonic error phase", 0x1A, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	h8MagRegisterBlock = new RegisterBlockWidget("H8MAG", "8th Harmonic error magnitude", 0x1B, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	h8PhRegisterBlock = new RegisterBlockWidget("H8PH", "8th Harmonic error phase", 0x1C, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 	
 	registerConfigurationGridLayout->addWidget(cnvPageRegisterBlock, 0, 0);
 	registerConfigurationGridLayout->addWidget(digIORegisterBlock, 0, 1);
 	registerConfigurationGridLayout->addWidget(faultRegisterBlock, 0, 2);
 	registerConfigurationGridLayout->addWidget(generalRegisterBlock, 0, 3);
 	registerConfigurationGridLayout->addWidget(digIOEnRegisterBlock, 0, 4);
-	registerConfigurationGridLayout->addWidget(angleCkRegisterBlock, 1, 0);
-	registerConfigurationGridLayout->addWidget(eccDcdeRegisterBlock, 1, 1);
-	registerConfigurationGridLayout->addWidget(eccDisRegisterBlock, 1, 2);
+	registerConfigurationGridLayout->addWidget(eccDcdeRegisterBlock, 1, 0);
+	registerConfigurationGridLayout->addWidget(eccDisRegisterBlock, 1, 1);
+	registerConfigurationGridLayout->addWidget(angleCkRegisterBlock, 1, 2);
 
 	registerSensorDataGridLayout->addWidget(absAngleRegisterBlock, 0, 0);
 	registerSensorDataGridLayout->addWidget(angleRegisterBlock, 0, 1);
-	registerSensorDataGridLayout->addWidget(angleSecRegisterBlock, 0, 2);
-	registerSensorDataGridLayout->addWidget(sineRegisterBlock, 0, 3);
-	registerSensorDataGridLayout->addWidget(cosineRegisterBlock, 0, 4);
-	registerSensorDataGridLayout->addWidget(secAnglIRegisterBlock, 1, 0);
-	registerSensorDataGridLayout->addWidget(secAnglQRegisterBlock, 1, 1);
-	registerSensorDataGridLayout->addWidget(radiusRegisterBlock, 1, 2);
-	registerSensorDataGridLayout->addWidget(diag1RegisterBlock, 1, 3);
-	registerSensorDataGridLayout->addWidget(diag2RegisterBlock, 1, 4);
-	registerSensorDataGridLayout->addWidget(tmp0RegisterBlock, 2, 0);
-	registerSensorDataGridLayout->addWidget(tmp1RegisterBlock, 2, 1);
-	registerSensorDataGridLayout->addWidget(cnvCntRegisterBlock, 2, 2);
+	registerSensorDataGridLayout->addWidget(sineRegisterBlock, 0, 2);
+	registerSensorDataGridLayout->addWidget(cosineRegisterBlock, 0, 3);
+	registerSensorDataGridLayout->addWidget(cnvCntRegisterBlock, 0, 4);
+	registerSensorDataGridLayout->addWidget(tmp0RegisterBlock, 1, 0);
+	registerSensorDataGridLayout->addWidget(tmp1RegisterBlock, 1, 1);
+	registerSensorDataGridLayout->addWidget(diag1RegisterBlock, 1, 2);
+	registerSensorDataGridLayout->addWidget(diag2RegisterBlock, 1, 3);
+	registerSensorDataGridLayout->addWidget(radiusRegisterBlock, 1, 4);
+	registerSensorDataGridLayout->addWidget(angleSecRegisterBlock, 2, 0);
+	registerSensorDataGridLayout->addWidget(secAnglIRegisterBlock, 2, 1);
+	registerSensorDataGridLayout->addWidget(secAnglQRegisterBlock, 2, 2);
 
 	registerDeviceIDGridLayout->addWidget(uniqID0RegisterBlock, 0, 0);
 	registerDeviceIDGridLayout->addWidget(uniqID1RegisterBlock, 0, 1);
@@ -1815,6 +1821,32 @@ void HarmonicCalibration::toggleMTDiagnostics(int mode)
 			break;
 		case 1:
 			MTDiagnosticsScrollArea->show();
+			break;
+	}
+}
+
+void HarmonicCalibration::toggleSequenceModeRegisters(int mode)
+{
+	switch(mode){
+		case 0:
+			angleSecRegisterBlock->hide();
+			secAnglIRegisterBlock->hide();
+			secAnglQRegisterBlock->hide();
+			tmp1RegisterBlock->hide();
+			angleCkRegisterBlock->hide();
+			radiusRegisterBlock->hide();
+			diag1RegisterBlock->hide();
+			diag2RegisterBlock->hide();
+			break;
+		case 1:
+			angleSecRegisterBlock->show();
+			secAnglIRegisterBlock->show();
+			secAnglQRegisterBlock->show();
+			tmp1RegisterBlock->show();
+			angleCkRegisterBlock->show();
+			radiusRegisterBlock->show();
+			diag1RegisterBlock->show();
+			diag2RegisterBlock->show();
 			break;
 	}
 }
