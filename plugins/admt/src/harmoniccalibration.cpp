@@ -496,6 +496,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 			utilityTimer->start(utilityTimerRate); 
 			readSequence();
 			toggleFaultRegisterMode(generalRegisterMap.at("Sequence Type"));
+			toggleMTDiagnostics(generalRegisterMap.at("Sequence Type"));
 		} 
 		else { utilityTimer->stop(); }
 	});
@@ -1663,7 +1664,7 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	#pragma endregion
 
 	#pragma region MT Diagnostics
-	QScrollArea *MTDiagnosticsScrollArea = new QScrollArea(centerUtilityWidget);
+	MTDiagnosticsScrollArea = new QScrollArea(centerUtilityWidget);
 	QWidget *MTDiagnosticsWidget = new QWidget(MTDiagnosticsScrollArea);
 	MTDiagnosticsScrollArea->setWidget(MTDiagnosticsWidget);
 	MTDiagnosticsScrollArea->setWidgetResizable(true);
@@ -1802,6 +1803,18 @@ void HarmonicCalibration::toggleFaultRegisterMode(int mode)
 			TurnCountSensorLevelsStatusLED->show();
 			MTDIAGStatusLED->show();
 			SequencerWatchdogStatusLED->show();
+			break;
+	}
+}
+
+void HarmonicCalibration::toggleMTDiagnostics(int mode)
+{
+	switch(mode){
+		case 0:
+			MTDiagnosticsScrollArea->hide();
+			break;
+		case 1:
+			MTDiagnosticsScrollArea->show();
 			break;
 	}
 }
