@@ -177,7 +177,11 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 		if(xcb->itemData(idx) == XMODE_SAMPLES) {
 			m_sampleRateSpin->setValue(1);
 			m_xmin->setUnit("samples");
+			m_xmin->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
+			m_xmin->setScalingEnabled(true);
 			m_xmax->setUnit("samples");
+			m_xmax->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
+			m_xmax->setScalingEnabled(true);
 			m_plotManager->setXUnit("samples");
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<TimePlotComponent *>(plt);
@@ -190,7 +194,9 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_sampleRateSpin->setEnabled(false);
 			m_sampleRateSpin->setValue(readSampleRate());
 			m_xmin->setUnit("s");
+			m_xmin->setIncrementMode(MenuSpinbox::IS_BASIC);
 			m_xmax->setUnit("s");
+			m_xmax->setIncrementMode(MenuSpinbox::IS_BASIC);
 			m_plotManager->setXUnit("s");
 
 			for(PlotComponent *plt : m_plotManager->plots()) {
@@ -205,7 +211,9 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_sampleRateSpin->setEnabled(true);
 
 			m_xmin->setUnit("s");
+			m_xmin->setIncrementMode(MenuSpinbox::IS_BASIC);
 			m_xmax->setUnit("s");
+			m_xmax->setIncrementMode(MenuSpinbox::IS_BASIC);
 			m_plotManager->setXUnit("s");
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<TimePlotComponent *>(plt);
