@@ -52,7 +52,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	StyleHelper::MenuSmallLabel(plotTitleLabel);
 
 	QLineEdit *plotTitle = new QLineEdit(m_plotComponent->name());
-	StyleHelper::MenuLineEdit(plotTitle);
+	Style::setStyle(plotTitle, style::properties::lineedit::menuLineEdit);
 	connect(plotTitle, &QLineEdit::textChanged, this, [=](QString s) {
 		m_plotComponent->setName(s);
 		//	plotMenu->setTitle("PLOT - " + s);

@@ -37,7 +37,7 @@ ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 		m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
 		auto label = new QLabel(recipe.data, m_ui);
-		StyleHelper::IIOCompactLabel(label, "IIOTitleLabel");
+		Style::setStyle(label, style::properties::label::iioCompactLabel);
 		m_comboWidget = new QComboBox(m_ui);
 		m_comboWidget->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
 
