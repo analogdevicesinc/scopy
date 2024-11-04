@@ -7,19 +7,20 @@ SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 BUILD_STATUS_FILE=$SRC_SCRIPT/build-status
 
-source $SRC_SCRIPT/armhf_build_config.sh
+source $SRC_SCRIPT/arm_build_config.sh $1
 
 echo -- USING CMAKE COMMAND:
 echo $CMAKE
-echo -- USING QT: $QT
+echo -- USING QT: $QT_LOCATION
 echo -- USING QMAKE: $QMAKE_BIN
+echo -- SYSROOT: $SYSROOT
 
 build_with_cmake() {
 	BUILD_FOLDER=$PWD/build
 	rm -rf $BUILD_FOLDER
 	mkdir -p $BUILD_FOLDER
 	cd $BUILD_FOLDER
-	$CMAKE $CURRENT_BUILD_CMAKE_OPTS ../
+	eval "$CMAKE $CURRENT_BUILD_CMAKE_OPTS ../"
 	make $JOBS
 	CURRENT_BUILD_CMAKE_OPTS=""
 
@@ -29,31 +30,38 @@ build_with_cmake() {
 
 set_config_opts() {
 	CPP="${TOOLCHAIN_BIN}/${TOOLCHAIN_HOST}-cpp"
-	CC="${TOOLCHAIN_BIN}/${TOOLCHAIN_HOST}-gcc"
+	CC="${TOOLCHAIN_BIN}/${TOOLCHAIN_HOST}-gcc -v"
 	CXX="${TOOLCHAIN_BIN}/${TOOLCHAIN_HOST}-g++"
 	LD="${TOOLCHAIN_BIN}/${TOOLCHAIN_HOST}-ld"
 	AS="${TOOLCHAIN_BIN}/${TOOLCHAIN_HOST}-as"
 	AR="${TOOLCHAIN_BIN}/${TOOLCHAIN_HOST}-ar"
 	RANLIB="${TOOLCHAIN_BIN}/${TOOLCHAIN_HOST}-ranlib"
 
-	CFLAGS=" -I${SYSROOT}/include -I${SYSROOT}/include/arm-linux-gnueabihf -I${SYSROOT}/usr/include -I${SYSROOT}/usr/include/arm-linux-gnueabihf -I${TOOLCHAIN}/include- -fPIC"
+	CFLAGS=" -I${SYSROOT}/include -I${SYSROOT}/include/${TOOLCHAIN_HOST} -I${SYSROOT}/usr/include -I${SYSROOT}/usr/include/${TOOLCHAIN_HOST} -I${TOOLCHAIN}/include- -fPIC"
 	CPPFLAGS="-fexceptions ${CFLAGS}"
-	LDFLAGS="-Wl,-rpath=XORIGIN -L${TOOLCHAIN}/arm-linux-gnueabihf/lib -L${TOOLCHAIN}/arm-linux-gnueabihf/libc/lib -L${TOOLCHAIN}/arm-linux-gnueabihf/libc/usr/lib -L${SYSROOT}/lib -L${SYSROOT}/usr/lib -L${SYSROOT}/usr/lib/arm-linux-gnueabihf -L${SYSROOT}/usr/lib/arm-linux-gnueabihf"
+	LDFLAGS="--sysroot=${SYSROOT} -Wl,-rpath=XORIGIN -L${SYSROOT}/lib -L${SYSROOT}/usr/lib -L${SYSROOT}/usr/lib/${TOOLCHAIN_HOST} -L${SYSROOT}/usr/lib/${TOOLCHAIN_HOST}"
 
 	CONFIG_OPTS=()
 	CONFIG_OPTS+=("--prefix=${SYSROOT}")
 	CONFIG_OPTS+=("--host=${TOOLCHAIN_HOST}")
 	CONFIG_OPTS+=("--with-sysroot=${SYSROOT}")
-	CONFIG_OPTS+=("CFLAGS=${CFLAGS}")
-	CONFIG_OPTS+=("CPPFLAGS=${CPPFLAGS}")
-	CONFIG_OPTS+=("LDFLAGS=${LDFLAGS}")
-	CONFIG_OPTS+=("PKG_CONFIG=${SYSROOT}/usr/bin/arm-linux-gnueabihf-pkg-config" )
 	CONFIG_OPTS+=("PKG_CONFIG_DIR=")
-	CONFIG_OPTS+=("PKG_CONFIG_LIBDIR=${SYSROOT}/usr/lib/arm-linux-gnueabihf/pkgconfig:${SYSROOT}/usr/share/pkgconfig:${SYSROOT}/usr/lib/arm-linux-gnueabihf/pkgconfig:${SYSROOT}/usr/local/lib/pkgconfig")
+	CONFIG_OPTS+=("PKG_CONFIG_LIBDIR=${SYSROOT}/usr/lib/${TOOLCHAIN_HOST}/pkgconfig:${SYSROOT}/usr/share/pkgconfig:${SYSROOT}/usr/lib/${TOOLCHAIN_HOST}/pkgconfig:${SYSROOT}/usr/local/lib/pkgconfig")
 	CONFIG_OPTS+=("PKG_CONFIG_SYSROOT=${SYSROOT}")
 	CONFIG_OPTS+=("PKG_CONFIG_SYSROOT_DIR=${SYSROOT}")
-	CONFIG_OPTS+=("PKG_CONFIG_PATH=${SYSROOT}/usr/bin/arm-linux-gnueabihf-pkg-config")
+
+	if [ "$TOOLCHAIN_HOST" == "aarch64-linux-gnu" ]; then
+		CONFIG_OPTS+=("PKG_CONFIG_PATH=${SYSROOT}/usr/lib/${TOOLCHAIN_HOST}/pkgconfig")
+		CONFIG_OPTS+=("PKG_CONFIG=/usr/bin/${TOOLCHAIN_HOST}-pkg-config" )
+	elif [ "$TOOLCHAIN_HOST" == "arm-linux-gnueabihf" ]; then
+		CONFIG_OPTS+=("PKG_CONFIG_PATH=${SYSROOT}/usr/bin/arm-linux-gnueabihf-pkg-config")
+		CONFIG_OPTS+=("PKG_CONFIG=${SYSROOT}/usr/bin/${TOOLCHAIN_HOST}-pkg-config" )
+	fi
+
 	CONFIG_OPTS+=("PKG_CONFIG_ALLOW_CROSS=1")
+	CONFIG_OPTS+=("LDFLAGS=${LDFLAGS}")
+	CONFIG_OPTS+=("CFLAGS=${CFLAGS}")
+	CONFIG_OPTS+=("CPPFLAGS=${CPPFLAGS}")
 	CONFIG_OPTS+=("CPP=${CPP}")
 	CONFIG_OPTS+=("CC=${CC}")
 	CONFIG_OPTS+=("CXX=${CXX}")
@@ -66,8 +74,8 @@ set_config_opts() {
 install_packages() {
 	sudo apt update
 	sudo apt install -y build-essential cmake unzip gfortran gcc git bison libtool \
-		${PYTHON_VERSION}-full pip gperf pkg-config gdb-multiarch g++ flex texinfo gawk openssl \
-		pigz libncurses-dev autoconf automake tar figlet liborc-0.4-dev* patchelf libc6-dev-armhf-cross squashfs-tools
+		python3 pip gperf pkg-config gdb-multiarch g++ flex texinfo gawk openssl pkg-config-aarch64-linux-gnu \
+		pigz libncurses-dev autoconf automake tar figlet liborc-0.4-dev* patchelf libc6-dev-arm64-cross squashfs-tools
 	pip install mako
 }
 
@@ -116,6 +124,7 @@ clone() {
 	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 	popd
 }
+
 build_libserialport(){
 	echo "### Building libserialport - branch $LIBSERIALPORT_BRANCH"
 	pushd $STAGING_AREA/libserialport
@@ -143,14 +152,10 @@ build_libiio() {
 		-DPYTHON_BINDINGS:BOOL=OFF \
 		-DWITH_SERIAL_BACKEND:BOOL=ON \
 		-DENABLE_IPV6:BOOL=OFF \
-		-DINSTALL_UDEV_RULE:BOOL=OFF
+		-DINSTALL_UDEV_RULE:BOOL=OFF \
 		"
-	if [ -d 'build' ];then
-		echo "### IIO-EMU already built --- skipping"
-	else
 		build_with_cmake
 		sudo make install
-	fi
 	popd
 }
 
@@ -180,7 +185,7 @@ build_libm2k() {
 		-DBUILD_EXAMPLES=OFF \
 		-DENABLE_TOOLS=OFF \
 		-DINSTALL_UDEV_RULES=OFF \
-		-DENABLE_LOG=OFF
+		-DENABLE_LOG=OFF \
 		"
 	build_with_cmake
 	sudo make install
@@ -206,7 +211,7 @@ build_gnuradio() {
 		-DENABLE_GR_FFT=ON \
 		-DENABLE_GR_FILTER=ON \
 		-DENABLE_GR_IIO=ON \
-		-DENABLE_POSTINSTALL=OFF
+		-DENABLE_POSTINSTALL=OFF \
 		"
 	build_with_cmake
 	sudo make install
@@ -226,7 +231,7 @@ build_grm2k() {
 	pushd $STAGING_AREA/gr-m2k
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PYTHON=OFF \
-		-DDIGITAL=OFF
+		-DDIGITAL=OFF \
 		"
 	build_with_cmake
 	sudo make install
@@ -238,7 +243,7 @@ build_qwt() {
 	pushd $STAGING_AREA/qwt
 	git clean -xdf
 	sed -i 's|/usr/local/qwt-$$QWT_VERSION-ma|/usr/local|g' qwtconfig.pri
-	$QMAKE_BIN INCLUDEPATH=$SYSROOT/include LIBS=-L$SYSROOT/lib qwt.pro
+	$QMAKE_BIN INCLUDEPATH=$SYSROOT/include LIBS=-L$SYSROOT/lib LIBS+=-L$SYSROOT/lib/$TOOLCHAIN_HOST qwt.pro
 	make $JOBS
 	patchelf --force-rpath --set-rpath \$ORIGIN $STAGING_AREA/qwt/lib/libqwt.so
 	sudo make INSTALL_ROOT=$SYSROOT install
@@ -287,6 +292,7 @@ build_iio-emu(){
 	pushd $STAGING_AREA
 	[ -d 'iio-emu' ] || git clone --recursive https://github.com/analogdevicesinc/iio-emu -b $IIOEMU_BRANCH iio-emu
 	pushd $STAGING_AREA/iio-emu
+	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_EXE_LINKER_FLAGS=\"-ldl -lz -licuuc -licudata -llzma\"" # ???
 	build_with_cmake
 	sudo make install
 	popd
@@ -300,7 +306,6 @@ build_scopy() {
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PLUGIN_TEST=ON \
 		-DENABLE_TESTING=ON \
-		-DPYTHON_EXECUTABLE=/usr/bin/python3.9
 		"
 	build_with_cmake
 	popd
@@ -317,7 +322,7 @@ create_appdir(){
 	EMU_CONFIG=$SRC_DIR/resources/scopy_emu_options_config.json
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
 	STYLE_FOLDER=$BUILD_FOLDER/style
-	COPY_DEPS=$SRC_DIR/ci/armhf/copy-deps.sh
+	COPY_DEPS=$SRC_DIR/ci/arm/copy-deps.sh
 
 	rm -rf $APP_DIR
 	mkdir -p $APP_DIR
@@ -353,10 +358,10 @@ create_appdir(){
 	mkdir -p $APP_DIR/usr/lib/scopy/plugins/resources
 	cp $EMU_CONFIG $APP_DIR/usr/lib/scopy/plugins/resources
 
-	$COPY_DEPS $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
-	$COPY_DEPS $APP_DIR/usr/bin/iio-emu $APP_DIR/usr/lib
-	$COPY_DEPS $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
-	$COPY_DEPS "$APP_DIR/usr/lib/scopy/plugins/*.so" $APP_DIR/usr/lib
+	$COPY_DEPS ${TOOLCHAIN_HOST} $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
+	$COPY_DEPS ${TOOLCHAIN_HOST} $APP_DIR/usr/bin/iio-emu $APP_DIR/usr/lib
+	$COPY_DEPS ${TOOLCHAIN_HOST} $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
+	$COPY_DEPS ${TOOLCHAIN_HOST} "$APP_DIR/usr/lib/scopy/plugins/*.so" $APP_DIR/usr/lib
 	cp -r $QT_LOCATION/plugins $APP_DIR/usr
 
 	# search for the python version linked by cmake and copy inside the appimage the same version
@@ -369,17 +374,18 @@ create_appdir(){
 	cp $QT_LOCATION/lib/libQt5XcbQpa.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5EglFSDeviceIntegration.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5DBus.so* $APP_DIR/usr/lib
-	cp $SYSROOT/lib/arm-linux-gnueabihf/libGLESv2.so* $APP_DIR/usr/lib
-	cp $SYSROOT/lib/arm-linux-gnueabihf/libbsd.so* $APP_DIR/usr/lib
-	cp $SYSROOT/lib/arm-linux-gnueabihf/libXdmcp.so* $APP_DIR/usr/lib
-	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libXau.so* $APP_DIR/usr/lib
-	cp $SYSROOT/usr/lib/arm-linux-gnueabihf/libffi.so* $APP_DIR/usr/lib
+	cp $QT_LOCATION/lib/libQt5OpenGL.so* $APP_DIR/usr/lib
+	cp $SYSROOT/lib/${TOOLCHAIN_HOST}/libGLESv2.so* $APP_DIR/usr/lib
+	cp $SYSROOT/lib/${TOOLCHAIN_HOST}/libbsd.so* $APP_DIR/usr/lib
+	cp $SYSROOT/lib/${TOOLCHAIN_HOST}/libXdmcp.so* $APP_DIR/usr/lib
+	cp $SYSROOT/usr/lib/${TOOLCHAIN_HOST}/libXau.so* $APP_DIR/usr/lib
+	cp $SYSROOT/usr/lib/${TOOLCHAIN_HOST}/libffi.so* $APP_DIR/usr/lib
 }
 
 create_appimage(){
 	rm -rf $APP_IMAGE
 	mksquashfs $APP_DIR  $APP_SQUASHFS -root-owned -noappend
-	cat $RUNTIME_ARMHF >> $APP_IMAGE
+	cat $RUNTIME_ARM >> $APP_IMAGE
 	cat $APP_SQUASHFS >> $APP_IMAGE
 	chmod a+x $APP_IMAGE
 }
@@ -406,7 +412,11 @@ move_tools(){
 
 # move and rename the AppImage artifact
 move_appimage(){
-	mv $APP_IMAGE $SRC_DIR/Scopy-armhf.AppImage
+	if [ $TOOLCHAIN_HOST == "aarch64-linux-gnu"  ]; then
+		mv $APP_IMAGE $SRC_DIR/Scopy-arm64.AppImage
+	elif [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
+		mv $APP_IMAGE $SRC_DIR/Scopy-armhf.AppImage
+	fi
 }
 
 generate_ci_envs()
@@ -419,6 +429,7 @@ generate_ci_envs()
 # Helper functions
 #
 build_deps(){
+	clone
 	build_libserialport
 	build_libiio
 	build_libad9361
@@ -431,13 +442,12 @@ build_deps(){
 	build_qwt
 	build_libsigrokdecode
 	build_libtinyiiod
-	#build_kddock
+	# build_kddock temporary disabled
 }
 
 run_workflow(){
 	install_packages
-	download_cmake
-	download_crosscompiler
+	move_tools
 	move_sysroot
 	build_iio-emu
 	build_scopy
@@ -448,8 +458,7 @@ run_workflow(){
 
 get_tools(){
 	install_packages
-	download_cmake
-	download_crosscompiler
+	move_tools
 	move_sysroot
 }
 
@@ -461,26 +470,32 @@ generate_appimage(){
 }
 
 dev_setup(){
-	# for the local development of Scopy armhf the easyest method is to download the docker image
-	# a temporary docker volume is created to bridge the local environment and the docker container
-	# the compiling is done inside the container unsing the already prepared filesystem
-	docker pull cristianbindea/scopy2-armhf-appimage:latest
+	# for the local development of Scopy arm the easyest method is to download the docker image
+	# after that, a temporary docker volume is created to bridge the local environment and the docker container
+	# and the compiling is done inside the container unsing the already prepared filesystem
+
+	# for example, if you want to develop for ARMHF architecture, you would execute:
+	docker pull cristianbindea/scopy2-armhf-appimage:latest # to download the image
+
+	# and to run the image, while creating a docker volume, you would run:
 	docker run -it \
 		--mount type=bind,source="$SRC_DIR",target=/home/runner/scopy \
 		cristianbindea/scopy2-armhf-appimage:latest
+
+
 	# now this repository folder it shared with the docker container
 
-	# to compile the application use "scopy/ci/armhf/armhf_build_process.sh get_tools generate_appimage"
-	# after the first compilation just use "scopy/ci/armhf/armhf_build_process.sh generate_appimage"
-	# to continue using the same docker container use docker start (container id) and "docker attach (container id)"
+	# to compile and package the application use "scopy/ci/arm/arm_build_process.sh run_workflow"
+	
+	# to continue using the same docker container use "docker start (container id)" and "docker attach (container id)"
 
 	# finally after the development is done use this to clean the system
 	# "docker container rm -v (container id)"
-	# "docker image rm cristianbindea/scopy2-armhf-appimage:latest"
+	# "docker image rm cristianbindea/scopy2-arm-appimage:latest"
 
-	# to get the container id use "docker container ls -a"
+	# **to get the container id use "docker container ls -a"
 }
 
-for arg in $@; do
+for arg in "${@:2}"; do
 	$arg
 done

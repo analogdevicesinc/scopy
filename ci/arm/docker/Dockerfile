@@ -1,5 +1,6 @@
 FROM --platform=linux/amd64 ubuntu:20.04 AS start
 SHELL ["/bin/bash", "-c"]
+ARG ARCH
 ARG USER=runner
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Bucharest
@@ -26,19 +27,20 @@ WORKDIR /home/${USER}
 
 FROM start AS sysroot_builder
 ARG USER=runner
+ARG ARCH
 ENV DEBIAN_FRONTEND=noninteractive
-#Copy all scopy/ci/armhf folder inside the image
-COPY * /home/${USER}
-RUN ./create_sysroot.sh \
+#Copy all scopy/ci/arm folder inside the image
+COPY * /home/${USER}/
+RUN ./create_sysroot.sh ${ARCH} \
 	install_packages \
 	move_and_extract_sysroot \
 	fix_relativelinks
-RUN ./build_qt.sh \
+RUN ./build_qt.sh ${ARCH} \
 	install_packages \
 	download_qt \
 	download_crosscompiler \
-	build_qt5.15.2
-RUN ./armhf_build_process.sh \
+	build
+RUN ./arm_build_process.sh ${ARCH} \
 	install_packages \
 	download_cmake \
 	download_crosscompiler \
@@ -49,10 +51,11 @@ RUN ./armhf_build_process.sh \
 
 FROM start
 ARG USER=runner
+ARG ARCH
 ENV DEBIAN_FRONTEND=noninteractive
-ARG STAGING=/home/${USER}/scopy/ci/armhf/staging
-COPY --from=sysroot_builder /home/${USER}/armhf_build_process.sh /home/${USER}
-COPY --from=sysroot_builder /home/${USER}/armhf_build_config.sh /home/${USER}
+ARG STAGING=/home/${USER}/scopy/ci/arm/staging
+COPY --from=sysroot_builder /home/${USER}/arm_build_process.sh /home/${USER}
+COPY --from=sysroot_builder /home/${USER}/arm_build_config.sh /home/${USER}
 COPY --from=sysroot_builder /home/${USER}/build-status /home/${USER}/build-status
 RUN mkdir -p /home/${USER}/sysroot
 COPY --from=sysroot_builder ${STAGING}/sysroot/usr /home/${USER}/sysroot/usr
@@ -61,6 +64,6 @@ COPY --from=sysroot_builder ${STAGING}/sysroot/include /home/${USER}/sysroot/inc
 WORKDIR /home/${USER}/sysroot
 RUN ln -s usr/bin bin && ln -s usr/lib lib && ln -s usr/sbin sbin
 WORKDIR /home/${USER}
-RUN /home/${USER}/armhf_build_process.sh install_packages download_cmake download_crosscompiler  && \
+RUN /home/${USER}/arm_build_process.sh ${ARCH} install_packages download_cmake download_crosscompiler  && \
 	mv ${STAGING} /home/${USER} && \
-	rm -rf /home/${USER}/armhf_build_process.sh /home/${USER}/armhf_build_config.sh /home/${USER}/scopy
+	rm -rf /home/${USER}/arm_build_process.sh /home/${USER}/arm_build_config.sh /home/${USER}/scopy
