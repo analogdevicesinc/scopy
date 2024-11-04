@@ -165,13 +165,13 @@ bool M2kPlugin::loadExtraButtons()
 {
 
 	m_btnIdentify = new QPushButton("Identify");
-	Style::setStyle(m_btnIdentify, style::properties::button::grayButton);
+	Style::setStyle(m_btnIdentify, style::properties::button::basicButton);
 	m_extraButtons.append(m_btnIdentify);
 	m_btnCalibrate = new QPushButton("Calibrate");
-	Style::setStyle(m_btnCalibrate, style::properties::button::grayButton);
+	Style::setStyle(m_btnCalibrate, style::properties::button::basicButton);
 	m_extraButtons.append(m_btnCalibrate);
 	m_btnRegister = new QPushButton("Register");
-	Style::setStyle(m_btnRegister, style::properties::button::grayButton);
+	Style::setStyle(m_btnRegister, style::properties::button::basicButton);
 	m_extraButtons.append(m_btnRegister);
 
 	m_btnCalibrate->setDisabled(true);
