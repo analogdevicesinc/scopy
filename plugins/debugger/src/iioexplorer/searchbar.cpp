@@ -34,10 +34,12 @@ SearchBar::SearchBar(QSet<QString> options, QWidget *parent)
 {
 	Style::setStyle(m_lineEdit, style::properties::debugger::searchBar);
 	Style::setStyle(m_label, style::properties::label::menuSmall);
+	setFixedHeight(34); // Hardcoded to match similar container
 	m_completer->setCaseSensitivity(Qt::CaseInsensitive);
 	m_completer->setFilterMode(Qt::MatchContains);
 	m_lineEdit->setPlaceholderText("Type to filter");
 	m_lineEdit->setCompleter(m_completer);
+	m_lineEdit->setMinimumHeight(31);
 	m_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 	setLayout(new QHBoxLayout(this));
