@@ -21,7 +21,6 @@
 
 #include "stylehelper.h"
 #include <QApplication>
-#include "ui_spinbox_a.h"
 
 #include <dynamicWidget.h>
 #include <menu_anim.hpp>
@@ -445,42 +444,6 @@ color: rgba(255,255,255,51);
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::MenuLineEdit(QLineEdit *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-	QString style = QString(R"css(
-QLineEdit {
- background-color: transparent;
- color: &&content_default&&;
- font-size: 15px;
- border: 0px solid transparent;
- border-bottom: 1px solid &&content_default&&;
- border-radius: 0;
- padding: 2px;
- padding-bottom: 4px;
-}
-QLineEdit:disabled {
-color: &&content_subtle&&;
-}
-	)css");
-	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
-	style.replace("&&content_subtle&&", StyleHelper::getColor("content_subtle"));
-	w->setStyleSheet(style);
-}
-
-void StyleHelper::MenuLineEditWidget(QWidget *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-	QString style = QString(R"css(
-	scopy--MenuLineEdit {
-	background-color: transparent;
-	}
-	)css");
-	w->setStyleSheet(style);
-}
-
 void StyleHelper::MenuBigSwitch(QWidget *w, QString objectName)
 {
 	if(!objectName.isEmpty())
@@ -812,75 +775,6 @@ void StyleHelper::ScopyStatusBar(QWidget *w, QString objectName)
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::IIOWidget(QWidget *w, QString objectName)
-{
-	if(!objectName.isEmpty()) {
-		w->setObjectName(objectName);
-	}
-
-	w->layout()->setContentsMargins(10, 10, 10, 10);
-	// background-color: &&background_primary&&;
-
-	QString style = QString(R"css(
-		QFrame#&&ObjectName&& {
-			border: 3px solid &&background_primary&&;
-			border-radius: 4px;
-			margin-bottom: 3px;
-		}
-
-		QProgressBar {
-			background-color: &&danger_default&&;
-		}
-	)css");
-
-	style.replace("&&ObjectName&&", objectName);
-	style.replace("&&danger_default&&", StyleHelper::getColor("danger_default"));
-	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
-	w->setStyleSheet(style);
-}
-
-void StyleHelper::IIOWidgetElement(QWidget *w, QString objectName)
-{
-	if(!objectName.isEmpty()) {
-		w->setObjectName(objectName);
-	}
-
-	w->layout()->setContentsMargins(10, 10, 10, 10);
-	QString style = QString(R"css(
-		QWidget {
-			background-color: &&background_primary&&;
-			border-radius: 4px;
-			margin-bottom: 3px;
-		}
-
-		QProgressBar {
-			background-color: &&danger_default&&;
-		}
-	)css");
-
-	style.replace("&&danger_default&&", StyleHelper::getColor("danger_default"));
-	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
-	w->setStyleSheet(style);
-}
-
-void StyleHelper::IIOLineEdit(QLineEdit *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-	QString style = QString(R"css(
-QLineEdit {
- background-color: transparent;
- color: &&content_default&&;
- font-size: 16px;
- border: 0px solid &&interactive_subtle_idle&&;
- padding: 2px;
-}
-	)css");
-	style.replace("&&interactive_subtle_idle&&", StyleHelper::getColor("interactive_subtle_idle"));
-	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
-	w->setStyleSheet(style);
-}
-
 void StyleHelper::TableViewWidget(QWidget *w, QString objectName)
 {
 	if(!objectName.isEmpty())
@@ -1142,28 +1036,6 @@ void StyleHelper::FaultsExplanation(QWidget *w, QString objectName)
 			QWidget{color:&&defaultColor&&;}
 			)css");
 	style.replace("&&defaultColor&&", StyleHelper::getColor("interactive_subtle_idle"));
-	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
-	w->setStyleSheet(style);
-}
-
-void StyleHelper::IIOCompactLabel(QLabel *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-	w->setText(w->text().toUpper());
-	w->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-	QString style = R"css(
-			QLabel {
-				color: &&content_default&&;
-				background-color: rgba(255,255,255,0);
-				font-weight: 500;
-				font-family: Open Sans;
-				font-size: 12px;
-				font-style: normal;
-			}
-				QLabel:disabled {
-					color: grey;
-			})css";
 	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
 	w->setStyleSheet(style);
 }
