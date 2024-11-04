@@ -3,6 +3,7 @@ QHeaderView::section[&&property&&=true] {
 	border-bottom: 2px solid &content_default&;
 	margin-left: 2px;
 	background-color: &background_primary&;
+	height: 30;
 
 	font: 11pt;
 	font-weight: bold;
