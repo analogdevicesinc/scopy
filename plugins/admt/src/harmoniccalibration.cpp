@@ -578,16 +578,14 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationSamplesLayout->setSpacing(0);
 
 	calibrationRawDataPlotWidget = new PlotWidget();
-	calibrationRawDataPlotWidget->setContentsMargins(10, 20, 10, 10);
-	calibrationRawDataPlotWidget->xAxis()->setVisible(false);
-	calibrationRawDataPlotWidget->yAxis()->setVisible(false);
+	applyPlotWidgetStyle(calibrationRawDataPlotWidget);
 
 	calibrationRawDataXPlotAxis = new PlotAxis(QwtAxis::XBottom, calibrationRawDataPlotWidget, scopyBluePen);
+	calibrationRawDataXPlotAxis->setMin(0);
 	calibrationRawDataYPlotAxis = new PlotAxis(QwtAxis::YLeft, calibrationRawDataPlotWidget, scopyBluePen);
 	calibrationRawDataYPlotAxis->setInterval(0, 400);
 
 	calibrationRawDataPlotChannel = new PlotChannel("Samples", scopyBluePen, calibrationRawDataXPlotAxis, calibrationRawDataYPlotAxis);
-	calibrationRawDataPlotChannel->xAxis()->setMin(0);
 	calibrationSineDataPlotChannel = new PlotChannel("Sine", sinePen, calibrationRawDataXPlotAxis, calibrationRawDataYPlotAxis);
 	calibrationCosineDataPlotChannel = new PlotChannel("Cosine", cosinePen, calibrationRawDataXPlotAxis, calibrationRawDataYPlotAxis);
 
@@ -598,11 +596,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationSineDataPlotChannel->setEnabled(true);
 	calibrationCosineDataPlotChannel->setEnabled(true);
 	calibrationRawDataPlotWidget->selectChannel(calibrationRawDataPlotChannel);
-	calibrationRawDataPlotWidget->replot();
 
-	calibrationRawDataPlotWidget->setShowXAxisLabels(true);
-	calibrationRawDataPlotWidget->setShowYAxisLabels(true);
-	calibrationRawDataPlotWidget->showAxisLabels();
+	calibrationRawDataPlotWidget->replot();
 
 	QWidget *calibrationDataGraphChannelsWidget = new QWidget(calibrationDataGraphTabWidget);
 	QHBoxLayout *calibrationDataGraphChannelsLayout = new QHBoxLayout(calibrationDataGraphChannelsWidget);
@@ -636,7 +631,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	postCalibrationSamplesLayout->setSpacing(0);
 
 	postCalibrationRawDataPlotWidget = new PlotWidget();
-	postCalibrationRawDataPlotWidget->setContentsMargins(10, 20, 10, 10);
+	applyPlotWidgetStyle(postCalibrationRawDataPlotWidget);
 	postCalibrationRawDataPlotWidget->xAxis()->setVisible(false);
 	postCalibrationRawDataPlotWidget->yAxis()->setVisible(false);
 
@@ -703,7 +698,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	angleErrorLayout->setSpacing(0);
 
 	angleErrorPlotWidget = new PlotWidget();
-	angleErrorPlotWidget->setContentsMargins(10, 20, 10, 10);
+	applyPlotWidgetStyle(angleErrorPlotWidget);
 	angleErrorPlotWidget->xAxis()->setVisible(false);
 	angleErrorPlotWidget->yAxis()->setVisible(false);
 	
@@ -734,7 +729,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	FFTAngleErrorLayout->setSpacing(0);
 
 	FFTAngleErrorPlotWidget = new PlotWidget();
-	FFTAngleErrorPlotWidget->setContentsMargins(10, 20, 10, 10);
+	applyPlotWidgetStyle(FFTAngleErrorPlotWidget);
 	FFTAngleErrorPlotWidget->xAxis()->setVisible(false);
 	FFTAngleErrorPlotWidget->yAxis()->setVisible(false);
 
@@ -783,7 +778,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	correctedErrorLayout->setSpacing(0);
 
 	correctedErrorPlotWidget = new PlotWidget();
-	correctedErrorPlotWidget->setContentsMargins(10, 20, 10, 10);
+	applyPlotWidgetStyle(correctedErrorPlotWidget);
 	correctedErrorPlotWidget->xAxis()->setVisible(false);
 	correctedErrorPlotWidget->yAxis()->setVisible(false);
 
@@ -814,7 +809,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	FFTCorrectedErrorLayout->setSpacing(0);
 
 	FFTCorrectedErrorPlotWidget = new PlotWidget();
-	FFTCorrectedErrorPlotWidget->setContentsMargins(10, 20, 10, 10);
+	applyPlotWidgetStyle(FFTCorrectedErrorPlotWidget);
 	FFTCorrectedErrorPlotWidget->xAxis()->setVisible(false);
 	FFTCorrectedErrorPlotWidget->yAxis()->setVisible(false);
 
@@ -1388,7 +1383,12 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	for(int c=0; c < registerHarmonicsGridLayout->columnCount(); ++c) registerHarmonicsGridLayout->setColumnStretch(c,1);
 	for(int c=0; c < registerSensorDataGridLayout->columnCount(); ++c) registerSensorDataGridLayout->setColumnStretch(c,1);
 
+	QPushButton *readAllRegistersButton = new QPushButton("Read All Registers", registerWidget);
+	StyleHelper::BlueButton(readAllRegistersButton, "readAllRegistersButton");
+	connect(readAllRegistersButton, &QPushButton::clicked, this, &HarmonicCalibration::readAllRegisters);
+
 	// registerLayout->addWidget(registerGridWidget);
+	registerLayout->addWidget(readAllRegistersButton);
 	registerLayout->addWidget(registerConfigurationLabel);
 	registerLayout->addWidget(registerConfigurationGridWidget);
 	registerLayout->addWidget(registerSensorDataLabel);
@@ -1789,6 +1789,11 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	tool->rightStack()->addWidget(rightUtilityScrollArea);
 
 	return tool;
+}
+
+void HarmonicCalibration::readAllRegisters()
+{
+
 }
 
 void HarmonicCalibration::toggleFaultRegisterMode(int mode)
@@ -3365,4 +3370,10 @@ void HarmonicCalibration::applyTabWidgetStyle(QTabWidget *widget, const QString&
 	style.replace("&&ScopyBlue&&", StyleHelper::getColor(styleHelperColor));
 	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
 	widget->tabBar()->setStyleSheet(style);
+}
+
+void HarmonicCalibration::applyPlotWidgetStyle(PlotWidget *widget)
+{
+	widget->setContentsMargins(10, 10, 10, 6);
+	widget->plot()->canvas()->setStyleSheet("background-color: black;");
 }
