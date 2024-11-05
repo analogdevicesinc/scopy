@@ -237,7 +237,7 @@ void DeviceImpl::loadBadges()
 
 	QPushButton *warningBtn = new QPushButton();
 	warningBtn->setMaximumSize(25, 25);
-	warningBtn->setIcon(Style::getPixmap(":/gui/icons/warning.svg"));
+	warningBtn->setIcon(QPixmap(":/gui/icons/warning.svg"));
 	warningBtn->setToolTip(tr("The device is not available!\n"
 				  "Verify the connection!"));
 	HoverWidget *warningHover = new HoverWidget(warningBtn, m_icon, m_icon);
