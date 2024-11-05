@@ -100,7 +100,11 @@ public:
 class SCOPY_GUI_EXPORT IncrementStrategyFixed : public IncrementStrategy
 {
 public:
-	IncrementStrategyFixed(double k = 1) { m_k = k; };
+	IncrementStrategyFixed(double k = 1)
+	{
+		m_k = k;
+		m_scale = 1;
+	};
 	~IncrementStrategyFixed(){};
 	virtual double increment(double val) override
 	{
