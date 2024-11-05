@@ -221,7 +221,7 @@ Add(+) device page
    - Drop-down menu to select one of the predefined emulated devices.
    - Options are: adalm2000, pluto, swiot, pqm and generic.
      When using the **generic** option, the user must provide a path
-     of the XML for the emulated device. If an existing options is
+     of the XML for the emulated device. If an existing option is
      selected, the XML path will be automatically completed in the
      field.
 
@@ -330,7 +330,7 @@ About page
   The General About page contains different useful links:
 
   **Build info** will display the application version, Git commit,
-  build date and whether it was created locally or in a continous
+  build date and whether it was created locally or in a continuous
   integration environment, a list of dependencies and their specific
   versions or Git commit hashes, a list of the last 100 commits and
   the Scopy branch.
@@ -371,17 +371,17 @@ Window.**
 
 .. |edit_pen| raw:: html
 
-  <img src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/dev/gui/res/icons/edit_pen.svg" alt="Inline image" style="display:inline; vertical-align:middle;">
+  <img src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/dev/gui/res/icons/edit_pen.svg" alt="Inline image" style="display:inline; scale:80%; vertical-align:middle;">
 
 .. |warning_icon| raw:: html
 
-  <img src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/dev/gui/res/icons/warning.svg" alt="Inline image" style="display:inline; width:40px; vertical-align:middle;">
+  <img src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/dev/gui/res/icons/warning.svg" alt="Inline image" style="display:inline; width:30px; vertical-align:middle;">
 
 - Clicking the |orange_x| button will remove the device from the list.
 - The device title can be modified by hovering over the top right
   corner of the icon and clicking the |edit_pen| pen icon.
 - If errors are encountered during the connection phase
-  a warning sign |warning_icon| will appear on the bottom left side of the
+  a warning sign |warning_icon| will appear on the top right side of the
   device icon.
 
 
