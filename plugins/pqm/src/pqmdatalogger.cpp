@@ -106,11 +106,11 @@ void PqmDataLogger::logPressed(ActiveInstrument instr, const QString &filePath)
 	switch(m_crtInstr) {
 	case Waveform:
 		m_filePath = logDir.filePath("waveform_" +
-					     QDateTime::currentDateTime().toString("dd.MM.yyyy_hh:mm:ss") + ".csv");
+					     QDateTime::currentDateTime().toString("dd-MM-yyyy_hh-mm-ss") + ".csv");
 		break;
 	case Harmonics:
 		m_filePath = logDir.filePath("harmonics_" +
-					     QDateTime::currentDateTime().toString("dd.MM.yyyy_hh:mm:ss") + ".csv");
+					     QDateTime::currentDateTime().toString("dd-MM-yyyy_hh-mm-ss") + ".csv");
 		break;
 	default:
 		m_filePath = "";
