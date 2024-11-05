@@ -11,6 +11,15 @@ QWidget {
 
 }
 
+QToolTip {
+    	color: &white&;
+    	background-color: &background_subtle&;
+	border-radius: &radius_1&;
+	border: &border_width_interactive& solid &interactive_subtle_idle&;
+	padding: 2;
+    	
+}
+
 QDialog {
     background-color: &background_primary&;
 }
@@ -100,6 +109,9 @@ QComboBox {
     background-color: &background_primary&;
     color: &content_default&;
 }
+QComboBox::disabled {
+	border: none;
+}
 QComboBox::item::disabled {
     color: &interactive_subtle_disabled&;
 }
@@ -126,6 +138,9 @@ QComboBox::indicator {
     selection-background-color: transparent;
     color: transparent;
     selection-color: transparent;
+}
+QComboBox::down-arrow::disabled {
+    image: none;
 }
 QComboBox::down-arrow {
     image: url(&svg_arrow_down&);
