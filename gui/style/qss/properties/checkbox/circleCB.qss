@@ -1,33 +1,29 @@
 QCheckBox[&&property&&="selected"] {
-	width: 16px;
-	height: 16px;
+	width: &unit_1&;
+	height: &unit_1&;
 	background-color: transparent;
 	color: rgba(255, 255, 255, 153);
 }
 QCheckBox::indicator[&&property&&="selected"] {
 	width: 12px;
 	height: 12px;
-	border: 2px solid &content_default&;
+	border: 2 solid &content_default&;
 	border-radius: 7px;
 	image: none;
 }
 QCheckBox::indicator[&&property&&="selected"]:unchecked { 
 	background-color: &background_primary&; 
 }
-QCheckBox::indicator[&&property&&="selected"]:checked { 
-	background-color: &content_default&; 
-}
-
 QCheckBox[&&property&&="idle"] {
-	width: 16px;
-	height: 16px;
+	width: &unit_1&;
+	height: &unit_1&;
 	background-color: transparent;
 	color: rgba(255, 255, 255, 153);
 }
 QCheckBox::indicator[&&property&&="idle"] {
 	width: 12px;
 	height: 12px;
-	border: 2px solid &content_default&;
+	border: 2 solid &content_default&;
 	border-radius: 7px;
 	image: none;
 }
