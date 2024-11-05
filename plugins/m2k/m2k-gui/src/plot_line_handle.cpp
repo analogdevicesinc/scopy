@@ -21,6 +21,7 @@
 #include "plot_line_handle.h"
 
 #include "handles_area.hpp"
+#include <gui/style.h>
 
 #include <QApplication>
 #include <QDebug>
@@ -28,6 +29,7 @@
 #include <QMoveEvent>
 #include <QPainter>
 
+using namespace scopy;
 PlotLineHandle::PlotLineHandle(const QPixmap &handleIcon, QWidget *parent)
 	: QWidget(parent)
 	, m_enable_silent_move(false)
@@ -669,11 +671,7 @@ void RoundedHandleV::paintEvent(QPaintEvent *pv)
 	QRect rect(x, 0, m_image.width() - 1, m_image.height() - 1);
 
 	if(m_selected && m_selectable) {
-		if(QIcon::themeName() == "scopy-default") {
-			p.setPen(QPen(Qt::white, 2, Qt::SolidLine));
-		} else {
-			p.setPen(QPen(Qt::black, 2, Qt::SolidLine));
-		}
+		p.setPen(QPen(Style::getColor(json::theme::content_default), 2, Qt::SolidLine));
 	} else {
 		p.setPen(QPen(m_roundRectColor, 1, Qt::SolidLine));
 	}
