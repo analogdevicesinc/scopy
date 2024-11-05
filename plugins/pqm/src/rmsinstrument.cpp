@@ -70,10 +70,10 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	voltageWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *voltageLayout = new QVBoxLayout();
 	voltageWidget->setLayout(voltageLayout);
-	voltageWidget->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
+	Style::setBackgroundColor(voltageWidget, Style::getAttribute(json::theme::background_primary), true);
 
 	MeasurementsPanel *voltagePanel = new MeasurementsPanel(voltageWidget);
-	voltagePanel->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
+	Style::setBackgroundColor(voltagePanel, Style::getAttribute(json::theme::background_primary));
 	createLabels(voltagePanel, m_chnls["voltage"].values(),
 		     {"RMS", "Angle", "Deviation under", "Deviation over", "Pinst", "Pst", "Plt"});
 	createLabels(voltagePanel, {DEVICE_NAME}, {"U2", "U0", "Sneg V", "Spos V", "Szro V"});
@@ -89,10 +89,10 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	currentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *currentLayout = new QVBoxLayout();
 	currentWidget->setLayout(currentLayout);
-	currentWidget->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
+	Style::setBackgroundColor(currentWidget, Style::getAttribute(json::theme::background_primary), true);
 
 	MeasurementsPanel *currentPanel = new MeasurementsPanel(currentWidget);
-	currentPanel->setStyleSheet("background-color:" + Style::getAttribute(json::theme::background_primary));
+	Style::setBackgroundColor(currentPanel, Style::getAttribute(json::theme::background_primary));
 	createLabels(currentPanel, m_chnls["current"].values(), {"RMS", "Angle"});
 	createLabels(currentPanel, {DEVICE_NAME}, {"I2", "I0", "Sneg I", "Spos I", "Szro I"});
 	currentPanel->refreshUi();
