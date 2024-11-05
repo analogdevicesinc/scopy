@@ -229,6 +229,8 @@ private:
 	void acquisitionUITask();
 	void toggleMTDiagnostics(int mode);
 	void toggleSequenceModeRegisters(int mode);
+	void readAllRegisters();
+	void applyPlotWidgetStyle(PlotWidget *widget);
 
 	QTimer *acquisitionUITimer, *calibrationTimer, *utilityTimer;
 
