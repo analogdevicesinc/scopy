@@ -68,6 +68,7 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 	tool->addWidgetToCentralContainerHelper(m_thdWidget);
 
 	m_table = new QTableWidget(MAX_CHNLS, NUMBER_OF_HARMONICS, this);
+	Style::setBackgroundColor(m_table, Style::getAttribute(json::theme::background_primary), true);
 	initTable();
 	tool->addWidgetToCentralContainerHelper(m_table);
 
@@ -209,7 +210,8 @@ QWidget *HarmonicsInstrument::createSettingsMenu(QWidget *parent)
 	layout->setMargin(0);
 	layout->setSpacing(10);
 
-	MenuHeaderWidget *header = new MenuHeaderWidget("Settings", QPen(StyleHelper::getColor("ScopyBlue")), widget);
+	MenuHeaderWidget *header = new MenuHeaderWidget(
+		"Settings", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), widget);
 	QWidget *generalSection = createMenuGeneralSection(widget);
 	QWidget *logSection = createMenuLogSection(widget);
 
