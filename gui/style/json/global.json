@@ -26,5 +26,7 @@
 "ch5": "#1694CA",
 "ch6": "#E84DB4",
 "ch7": "#c7c10a",
+"white": "#FFFFFF",
+"black": "#000000",
 "run_button_color": "&interactive_primary_idle&"
 }
