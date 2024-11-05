@@ -16,8 +16,8 @@ QWidget[&&property&&="left_off"] {
     min-height: &unit_2&;
     padding: 0 &padding_1& 0 &padding_1&;
     background-color: transparent;
-    border: &border_width_interactive& solid &content_subtle&;
-    color: &content_subtle&;
+    border: &border_width_interactive& solid &content_silent&;
+    color: &content_silent&;
     font-weight:600;
 }
 QWidget[&&property&&="right_on"] {
@@ -38,7 +38,7 @@ QWidget[&&property&&="right_off"] {
     min-height: &unit_2&;
     padding: 0 &padding_1& 0 &padding_1&;
     background-color: transparent;
-    border: &border_width_interactive& solid &content_subtle&;
-    color: &content_subtle&;
+    border: &border_width_interactive& solid &content_silent&;
+    color: &content_silent&;
     font-weight:600;
 }
