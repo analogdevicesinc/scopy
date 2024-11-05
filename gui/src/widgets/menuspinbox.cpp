@@ -263,24 +263,27 @@ void MenuSpinbox::userInput(QString s)
 	if(!ok)
 		setValue(m_value); // reset
 
-	QString unit = s.mid(i + 1, 1); // isolate prefix and unit from the whole string (mV)
-	if(unit.length() > 0) {		// user wrote a prefix and/or a unit
-		double scale = getScaleForPrefix(unit, Qt::CaseSensitive); // find the unit in the map
-		if(scale == -1) {
-			scale = getScaleForPrefix(unit,
-						  Qt::CaseInsensitive); // the user may have written 30K instead of 30k
-		}
+	if(m_scalingEnabled) {
+		QString unit = s.mid(i + 1, 1); // isolate prefix and unit from the whole string (mV)
+		if(unit.length() > 0) {		// user wrote a prefix and/or a unit
+			double scale = getScaleForPrefix(unit, Qt::CaseSensitive); // find the unit in the map
+			if(scale == -1) {
+				scale = getScaleForPrefix(
+					unit,
+					Qt::CaseInsensitive); // the user may have written 30K instead of 30k
+			}
 
-		if(scale == -1) {
-			scale = 1; // do not scale the value at all
+			if(scale == -1) {
+				scale = 1; // do not scale the value at all
+			} else {
+				val = val * scale; // scale accordingly
+			}
 		} else {
-			val = val * scale; // scale accordingly
+			val = val *
+				m_scaleCb->currentData()
+					.toDouble(); // the user didnt write a scale => use scale in combobox
 		}
-	} else {
-		val = val *
-			m_scaleCb->currentData().toDouble(); // the user didnt write a scale => use scale in combobox
 	}
-
 	setValue(val);
 }
 
