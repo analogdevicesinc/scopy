@@ -1,10 +1,10 @@
 QHeaderView::section[&&property&&=true] {
 	border: none;
-	border-bottom: 2px solid &content_default&;
+	border-bottom: 1px solid &content_default&;
 	margin-left: 2px;
 	background-color: &background_primary&;
 	height: 30;
 
-	font: 11pt;
+	font: 9pt;
 	font-weight: bold;
 }
