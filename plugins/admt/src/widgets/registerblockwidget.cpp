@@ -4,9 +4,10 @@
 using namespace scopy;
 using namespace scopy::admt;
 
-RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, uint32_t address, uint32_t defaultValue, RegisterBlockWidget::ACCESS_PERMISSION accessPermission, QWidget *parent)
+RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, uint32_t address, uint32_t cnvPage, RegisterBlockWidget::ACCESS_PERMISSION accessPermission, QWidget *parent)
     : QWidget(parent)
     , m_address(address)
+    , m_cnvPage(cnvPage)
     , m_accessPermission(accessPermission)
 {
     QVBoxLayout *container = new QVBoxLayout(this);
@@ -40,13 +41,10 @@ RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, ui
     descriptionLabel->setAlignment(Qt::AlignTop);
     descriptionLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 
-    // QLineEdit *lineEdit = new QLineEdit(menuSectionWidget);
-    // applyLineEditStyle(lineEdit);
-
     m_spinBox = new PaddedSpinBox(menuSectionWidget);
     applySpinBoxStyle(m_spinBox);
 
-    m_value = defaultValue;
+    m_value = 0x00;
     m_spinBox->setValue(m_value);
 
     QWidget *buttonsWidget = new QWidget(menuSectionWidget);
@@ -94,6 +92,8 @@ void RegisterBlockWidget::setValue(uint32_t value)
 }
 
 uint32_t RegisterBlockWidget::getAddress() { return m_address; }
+
+uint32_t RegisterBlockWidget::getCnvPage() { return m_cnvPage; }
 
 RegisterBlockWidget::ACCESS_PERMISSION RegisterBlockWidget::getAccessPermission() { return m_accessPermission; }
 

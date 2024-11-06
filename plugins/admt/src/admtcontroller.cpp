@@ -17,7 +17,6 @@
 #include <iterator>
 #include <iomanip>
 
-
 static const size_t maxAttrSize = 512;
 
 using namespace scopy::admt;
@@ -86,7 +85,15 @@ const uint32_t ADMTController::getHarmonicRegister(HarmonicRegister registerID)
 	if(registerID >= 0 && registerID < HARMONIC_REGISTER_COUNT){
 		return HarmonicRegisters[registerID];
 	}
-	return 0x0;
+	return UINT32_MAX;
+}
+
+const uint32_t ADMTController::getHarmonicPage(HarmonicRegister registerID)
+{
+	if(registerID >= 0 && registerID < HARMONIC_REGISTER_COUNT){
+		return HarmonicPages[registerID];
+	}
+	return UINT32_MAX;
 }
 
 const uint32_t ADMTController::getConfigurationRegister(ConfigurationRegister registerID)
