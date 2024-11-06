@@ -65,7 +65,7 @@ void ScopyPreferencesPage::initUI()
 	this->setLayout(layout);
 	layout->addWidget(tabWidget);
 
-	StyleHelper::BackgroundPage(tabWidget, "preferencesTable");
+	Style::setStyle(tabWidget, style::properties::widget::backgroundPage, true, true);
 	StyleHelper::TabWidgetEastMenu(tabWidget, "preferencesTable");
 }
 
