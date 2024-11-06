@@ -182,7 +182,7 @@ void StyleHelper::BasicSmallButton(QPushButton *btn, QString objectName)
 	if(!objectName.isEmpty())
 		btn->setObjectName(objectName);
 
-	Style::setStyle(btn, style::properties::button::basicButton);
+	Style::setStyle(btn, style::properties::button::basicButton, true, true);
 	btn->setFixedHeight(Style::getDimension(json::global::unit_3));
 }
 
@@ -362,13 +362,12 @@ void StyleHelper::MenuOnOffSwitch(QWidget *w, QString objectName)
 {
 	if(!objectName.isEmpty())
 		w->setObjectName(objectName);
+
 	QString style = QString(R"css(
 	scopy--MenuOnOffSwitch {
-	background-color: transparent;
-	}
-	)css");
-	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
-	style.replace("&&interactive_primary_idle&&", StyleHelper::getColor("interactive_primary_idle"));
+		background-color: transparent;
+	})css");
+
 	w->setStyleSheet(style);
 }
 
