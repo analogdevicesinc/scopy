@@ -94,22 +94,17 @@ public:
 	static void MenuBigSwitch(QWidget *w, QString objectName = "");
 	static void MenuBigSwitchButton(CustomSwitch *w, QString objectName = "");
 	static void BlueGrayButton(QPushButton *btn, QString objectName = "");
-	static void OverlayMenu(QWidget *w, QString objectName = "");
 	static void BlueIconButton(QPushButton *w, QIcon icon, QString objectName = "");
 	static void TabWidgetEastMenu(QTabWidget *w, QString objectName = "");
 	static void BackgroundPage(QWidget *w, QString objectName = "");
 	static void BackgroundWidget(QWidget *w, QString objectName = "");
-	static void TabWidgetLabel(QLabel *w, QString objectName = "");
-	static void TutorialChapterTitleLabel(QLabel *w, QString objectName = "");
 	static void MeasurementPanelLabel(MeasurementLabel *w, QString objectName = "");
 	static void StatsPanelLabel(StatsLabel *w, QString objectName = "");
 	static void MeasurementSelectorItemWidget(QString iconPath, MeasurementSelectorItem *w,
 						  QString objectName = "");
-	static void FrameBackgroundShadow(QFrame *w, QString objectName = "");
 	static void HoverWidget(QWidget *w, bool draggable = false, QString objectName = "");
 	static void TransparentWidget(QWidget *w, QString objectName = "");
 	static void ScopyStatusBar(QWidget *w, QString objectName = "");
-	static void TableViewWidget(QWidget *w, QString objectName = "");
 	static void HoverToolTip(QWidget *w, QString info, QString objectName = "");
 	static void WarningLabel(QLabel *w, QString objectName = "");
 	static void NoBackgroundIconButton(QPushButton *w, QIcon icon, QString objectName = "");
