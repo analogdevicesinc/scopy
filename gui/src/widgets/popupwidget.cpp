@@ -75,10 +75,10 @@ void PopupWidget::initUI()
 
 	backgroundWidget->setLayout(backgroundLayout);
 
-	StyleHelper::TutorialChapterTitleLabel(m_titleLabel, "titleLabel");
+	Style::setStyle(m_titleLabel, style::properties::label::tutorialChapterTitle);
 	Style::setStyle(m_continueButton, style::properties::button::basicButton, true, true);
 	Style::setStyle(m_exitButton, style::properties::button::basicButton, true, true);
-	StyleHelper::OverlayMenu(this, "popupOverlay");
+	Style::setStyle(this, style::properties::widget::overlayMenu);
 }
 
 void PopupWidget::setFocusOnContinueButton()
