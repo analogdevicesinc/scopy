@@ -4,9 +4,6 @@
 #include <widgets/horizontalspinbox.h>
 #include <stylehelper.h>
 
-#include <QFuture>
-#include <QFutureWatcher>
-
 static int acquisitionUITimerRate = 50;
 static int calibrationTimerRate = 1000;
 static int utilityTimerRate = 1000;
@@ -1001,7 +998,6 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationCoeffSectionWidget->contentLayout()->addWidget(calibrationDisplayFormatSwitch);
 	calibrationCoeffSectionWidget->contentLayout()->addWidget(calibrationCalculatedCoeffLabel);
 	calibrationCoeffSectionWidget->contentLayout()->addWidget(calibrationCalculatedCoeffWidget);
-	// calibrationCoeffSectionWidget->contentLayout()->addWidget(applyCalibrationDataButton);
 	#pragma endregion
 
 	#pragma region Calibration Dataset Configuration
@@ -1039,9 +1035,6 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationDataSectionWidget->contentLayout()->setSpacing(8);
 	calibrationDataSectionWidget->contentLayout()->addWidget(calibrationDataCollapseSection);
 
-	// QPushButton *importDataButton = new QPushButton(calibrationDataCollapseSection);
-	// importDataButton->setText("Import from CSV");
-	// StyleHelper::BlueButton(importDataButton, "importDataButton");
 	QPushButton *extractDataButton = new QPushButton(calibrationDataCollapseSection);
 	extractDataButton->setText("Extract to CSV");
 	StyleHelper::BlueButton(extractDataButton, "extractDataButton");
@@ -1050,7 +1043,6 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	StyleHelper::BlueButton(clearCalibrateDataButton, "clearCalibrateDataButton");
 
 	calibrationDataCollapseSection->contentLayout()->setSpacing(8);
-	// calibrationDataCollapseSection->contentLayout()->addWidget(importDataButton);
 	calibrationDataCollapseSection->contentLayout()->addWidget(extractDataButton);
 	calibrationDataCollapseSection->contentLayout()->addWidget(clearCalibrateDataButton);
 	#pragma endregion
@@ -1142,16 +1134,12 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrateDataButton->setEnabled(false);
 	StyleHelper::BlueButton(calibrateDataButton, "calibrateDataButton");
 
-	// autoCalibrateCheckBox = new QCheckBox("Auto Calibrate", motorControlSectionWidget);
-	// StyleHelper::BlueSquareCheckbox(autoCalibrateCheckBox, "autoCalibrateCheckBox");
-
 	motorControlCollapseSection->contentLayout()->setSpacing(8);
 	motorControlCollapseSection->contentLayout()->addWidget(currentPositionLabel);
 	motorControlCollapseSection->contentLayout()->addWidget(calibrationMotorCurrentPositionLabel);
 	motorControlCollapseSection->contentLayout()->addWidget(motorTargetPositionSpinBox);
 	motorControlCollapseSection->contentLayout()->addWidget(calibrationStartMotorButton);
 	motorControlCollapseSection->contentLayout()->addWidget(calibrateDataButton);
-	// motorControlCollapseSection->contentLayout()->addWidget(autoCalibrateCheckBox);
 	#pragma endregion
 
 	#pragma region Logs Section Widget
@@ -1195,17 +1183,12 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	connect(calibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::postCalibrateData);
 	connect(extractDataButton, &QPushButton::clicked, this, &HarmonicCalibration::extractCalibrationData);
-	// connect(importDataButton, &QPushButton::clicked, this, &HarmonicCalibration::importCalibrationData);
 	connect(clearCalibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::clearRawDataList);
 	connectLineEditToRPSConversion(motorMaxVelocitySpinBox->lineEdit(), rotate_vmax);
 	connectLineEditToAMAXConversion(motorAccelTimeSpinBox->lineEdit(), amax);
 	connectLineEditToNumberWrite(motorMaxDisplacementSpinBox->lineEdit(), dmax, ADMTController::MotorAttribute::DMAX);
 	connectLineEditToNumberWrite(motorTargetPositionSpinBox->lineEdit(), target_pos, ADMTController::MotorAttribute::TARGET_POS);
 	connectMenuComboToNumber(m_calibrationMotorRampModeMenuCombo, ramp_mode);
-	// connect(autoCalibrateCheckBox, &QCheckBox::toggled, [=](bool toggled){ 
-	// 	autoCalibrate = toggled; 
-	// 	StatusBarManager::pushMessage(QString("Auto Calibrate: ") + QString((toggled ? "True" : "False")));
-	// });
 	connect(toggleAngleButton->checkBox(), &QCheckBox::toggled, this, [=](bool b){
 		calibrationRawDataPlotWidget->selectChannel(calibrationRawDataPlotChannel);
 		calibrationRawDataPlotWidget->selectedChannel()->setEnabled(b);
@@ -1299,42 +1282,42 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	registerSensorDataGridLayout->setMargin(0);
 	registerSensorDataGridLayout->setSpacing(8);
 
-	cnvPageRegisterBlock = new RegisterBlockWidget("CNVPAGE", "Convert Start and Page Select", 0x01, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	digIORegisterBlock = new RegisterBlockWidget("DIGIO", "Digital Input Output", 0x04, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	faultRegisterBlock = new RegisterBlockWidget("FAULT", "Fault Register", 0x06, 0xFFFF, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	generalRegisterBlock = new RegisterBlockWidget("GENERAL", "General Device Configuration", 0x10, 0x1230, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	digIOEnRegisterBlock = new RegisterBlockWidget("DIGIOEN", "Enable Digital Input/Outputs", 0x12, 0x241B, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	angleCkRegisterBlock = new RegisterBlockWidget("ANGLECK", "Primary vs Secondary Angle Check", 0x13, 0x000F, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	eccDcdeRegisterBlock = new RegisterBlockWidget("ECCDCDE", "Error Correction Codes", 0x1D, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	eccDisRegisterBlock = new RegisterBlockWidget("ECCDIS", "Error Correction Code disable", 0x23, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	cnvPageRegisterBlock = new RegisterBlockWidget("CNVPAGE", "Convert Start and Page Select", m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE), m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::CNVPAGE), RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	digIORegisterBlock = new RegisterBlockWidget("DIGIO", "Digital Input Output", m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIO), m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIO), RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	faultRegisterBlock = new RegisterBlockWidget("FAULT", "Fault Register", m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::FAULT), m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::FAULT), RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	generalRegisterBlock = new RegisterBlockWidget("GENERAL", "General Device Configuration", m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL), m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL), RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	digIOEnRegisterBlock = new RegisterBlockWidget("DIGIOEN", "Enable Digital Input/Outputs", m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN), RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	angleCkRegisterBlock = new RegisterBlockWidget("ANGLECK", "Primary vs Secondary Angle Check", m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::ANGLECK), m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::ANGLECK), RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	eccDcdeRegisterBlock = new RegisterBlockWidget("ECCDCDE", "Error Correction Codes", m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::ECCDCDE), m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::ECCDCDE), RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	eccDisRegisterBlock = new RegisterBlockWidget("ECCDIS", "Error Correction Code disable", m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::ECCDIS), m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::ECCDIS), RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 
-	absAngleRegisterBlock = new RegisterBlockWidget("ABSANGLE", "Absolute Angle", 0x03, 0xDB00, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	angleRegisterBlock = new RegisterBlockWidget("ANGLE", "Angle Register", 0x05, 0x8000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	angleSecRegisterBlock = new RegisterBlockWidget("ANGLESEC", "Secondary Angle", 0x08, 0x8000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	sineRegisterBlock = new RegisterBlockWidget("SINE", "Sine Measurement", 0x10, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	cosineRegisterBlock = new RegisterBlockWidget("COSINE", "Cosine Measurement", 0x11, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	secAnglIRegisterBlock = new RegisterBlockWidget("SECANGLI", "In-phase secondary angle measurement", 0x12, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	secAnglQRegisterBlock = new RegisterBlockWidget("SECANGLQ", "Quadrature phase secondary angle measurement", 0x13, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	radiusRegisterBlock = new RegisterBlockWidget("RADIUS", "Angle measurement radius", 0x18, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	diag1RegisterBlock = new RegisterBlockWidget("DIAG1", "State of the MT reference resistors and AFE fixed input voltage", 0x1D, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	diag2RegisterBlock = new RegisterBlockWidget("DIAG2", "Measurements of two diagnostics resistors of fixed value", 0x1E, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	tmp0RegisterBlock = new RegisterBlockWidget("TMP0", "Primary Temperature Sensor", 0x20, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	tmp1RegisterBlock = new RegisterBlockWidget("TMP1", "Secondary Temperature Sensor", 0x23, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	cnvCntRegisterBlock = new RegisterBlockWidget("CNVCNT", "Conversion Count", 0x14, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	absAngleRegisterBlock = new RegisterBlockWidget("ABSANGLE", "Absolute Angle", m_admtController->getSensorRegister(ADMTController::SensorRegister::ABSANGLE), m_admtController->getSensorPage(ADMTController::SensorRegister::ABSANGLE), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	angleRegisterBlock = new RegisterBlockWidget("ANGLE", "Angle Register", m_admtController->getSensorRegister(ADMTController::SensorRegister::ANGLEREG), m_admtController->getSensorPage(ADMTController::SensorRegister::ANGLEREG), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	angleSecRegisterBlock = new RegisterBlockWidget("ANGLESEC", "Secondary Angle", m_admtController->getSensorRegister(ADMTController::SensorRegister::ANGLESEC), m_admtController->getSensorPage(ADMTController::SensorRegister::ANGLESEC), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	sineRegisterBlock = new RegisterBlockWidget("SINE", "Sine Measurement", m_admtController->getSensorRegister(ADMTController::SensorRegister::SINE), m_admtController->getSensorPage(ADMTController::SensorRegister::SINE), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	cosineRegisterBlock = new RegisterBlockWidget("COSINE", "Cosine Measurement", m_admtController->getSensorRegister(ADMTController::SensorRegister::COSINE), m_admtController->getSensorPage(ADMTController::SensorRegister::COSINE), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	secAnglIRegisterBlock = new RegisterBlockWidget("SECANGLI", "In-phase secondary angle measurement", m_admtController->getSensorRegister(ADMTController::SensorRegister::SECANGLI), m_admtController->getSensorPage(ADMTController::SensorRegister::SECANGLI), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	secAnglQRegisterBlock = new RegisterBlockWidget("SECANGLQ", "Quadrature phase secondary angle measurement", m_admtController->getSensorRegister(ADMTController::SensorRegister::SECANGLQ), m_admtController->getSensorPage(ADMTController::SensorRegister::SECANGLQ), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	radiusRegisterBlock = new RegisterBlockWidget("RADIUS", "Angle measurement radius", m_admtController->getSensorRegister(ADMTController::SensorRegister::RADIUS), m_admtController->getSensorPage(ADMTController::SensorRegister::RADIUS), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	diag1RegisterBlock = new RegisterBlockWidget("DIAG1", "State of the MT reference resistors and AFE fixed input voltage", m_admtController->getSensorRegister(ADMTController::SensorRegister::DIAG1), m_admtController->getSensorPage(ADMTController::SensorRegister::DIAG1), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	diag2RegisterBlock = new RegisterBlockWidget("DIAG2", "Measurements of two diagnostics resistors of fixed value", m_admtController->getSensorRegister(ADMTController::SensorRegister::DIAG2), m_admtController->getSensorPage(ADMTController::SensorRegister::DIAG2), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	tmp0RegisterBlock = new RegisterBlockWidget("TMP0", "Primary Temperature Sensor", m_admtController->getSensorRegister(ADMTController::SensorRegister::TMP0), m_admtController->getSensorPage(ADMTController::SensorRegister::TMP0), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	tmp1RegisterBlock = new RegisterBlockWidget("TMP1", "Secondary Temperature Sensor", m_admtController->getSensorRegister(ADMTController::SensorRegister::TMP1), m_admtController->getSensorPage(ADMTController::SensorRegister::TMP1), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	cnvCntRegisterBlock = new RegisterBlockWidget("CNVCNT", "Conversion Count", m_admtController->getSensorRegister(ADMTController::SensorRegister::CNVCNT), m_admtController->getSensorPage(ADMTController::SensorRegister::CNVCNT), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 
-	uniqID0RegisterBlock = new RegisterBlockWidget("UNIQID0", "Unique ID Register 0", 0x1E, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	uniqID1RegisterBlock = new RegisterBlockWidget("UNIQID1", "Unique ID Register 1", 0x1F, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	uniqID2RegisterBlock = new RegisterBlockWidget("UNIQID2", "Unique ID Register 2", 0x20, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
-	uniqID3RegisterBlock = new RegisterBlockWidget("UNIQID3", "Product, voltage supply. ASIL and ASIC revision identifiers", 0x21, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	uniqID0RegisterBlock = new RegisterBlockWidget("UNIQID0", "Unique ID Register 0", m_admtController->getUniqueIdRegister(ADMTController::UniqueIDRegister::UNIQID0), m_admtController->getUniqueIdPage(ADMTController::UniqueIDRegister::UNIQID0), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	uniqID1RegisterBlock = new RegisterBlockWidget("UNIQID1", "Unique ID Register 1", m_admtController->getUniqueIdRegister(ADMTController::UniqueIDRegister::UNIQID1), m_admtController->getUniqueIdPage(ADMTController::UniqueIDRegister::UNIQID1), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	uniqID2RegisterBlock = new RegisterBlockWidget("UNIQID2", "Unique ID Register 2", m_admtController->getUniqueIdRegister(ADMTController::UniqueIDRegister::UNIQID2), m_admtController->getUniqueIdPage(ADMTController::UniqueIDRegister::UNIQID2), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
+	uniqID3RegisterBlock = new RegisterBlockWidget("UNIQID3", "Product, voltage supply. ASIL and ASIC revision identifiers", m_admtController->getUniqueIdRegister(ADMTController::UniqueIDRegister::UNIQID3), m_admtController->getUniqueIdPage(ADMTController::UniqueIDRegister::UNIQID3), RegisterBlockWidget::ACCESS_PERMISSION::READ, registerWidget);
 
-	h1MagRegisterBlock = new RegisterBlockWidget("H1MAG", "1st Harmonic error magnitude", 0x15, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	h1PhRegisterBlock = new RegisterBlockWidget("H1PH", "1st Harmonic error phase", 0x16, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	h2MagRegisterBlock = new RegisterBlockWidget("H2MAG", "2nd Harmonic error magnitude", 0x17, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	h2PhRegisterBlock = new RegisterBlockWidget("H2PH", "2nd Harmonic error phase", 0x18, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	h3MagRegisterBlock = new RegisterBlockWidget("H3MAG", "3rd Harmonic error magnitude", 0x19, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	h3PhRegisterBlock = new RegisterBlockWidget("H3PH", "3rd Harmonic error phase", 0x1A, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	h8MagRegisterBlock = new RegisterBlockWidget("H8MAG", "8th Harmonic error magnitude", 0x1B, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	h8PhRegisterBlock = new RegisterBlockWidget("H8PH", "8th Harmonic error phase", 0x1C, 0x0000, RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	h1MagRegisterBlock = new RegisterBlockWidget("H1MAG", "1st Harmonic error magnitude", m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), m_admtController->getHarmonicPage(ADMTController::HarmonicRegister::H1MAG), RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	h1PhRegisterBlock = new RegisterBlockWidget("H1PH", "1st Harmonic error phase", m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), m_admtController->getHarmonicPage(ADMTController::HarmonicRegister::H1PH), RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	h2MagRegisterBlock = new RegisterBlockWidget("H2MAG", "2nd Harmonic error magnitude", m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG), m_admtController->getHarmonicPage(ADMTController::HarmonicRegister::H2MAG), RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	h2PhRegisterBlock = new RegisterBlockWidget("H2PH", "2nd Harmonic error phase", m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH), m_admtController->getHarmonicPage(ADMTController::HarmonicRegister::H2PH), RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	h3MagRegisterBlock = new RegisterBlockWidget("H3MAG", "3rd Harmonic error magnitude", m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG), m_admtController->getHarmonicPage(ADMTController::HarmonicRegister::H3MAG), RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	h3PhRegisterBlock = new RegisterBlockWidget("H3PH", "3rd Harmonic error phase", m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH), m_admtController->getHarmonicPage(ADMTController::HarmonicRegister::H3PH), RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	h8MagRegisterBlock = new RegisterBlockWidget("H8MAG", "8th Harmonic error magnitude", m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), m_admtController->getHarmonicPage(ADMTController::HarmonicRegister::H8MAG), RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
+	h8PhRegisterBlock = new RegisterBlockWidget("H8PH", "8th Harmonic error phase", m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), m_admtController->getHarmonicPage(ADMTController::HarmonicRegister::H8PH), RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 	
 	registerConfigurationGridLayout->addWidget(cnvPageRegisterBlock, 0, 0);
 	registerConfigurationGridLayout->addWidget(digIORegisterBlock, 0, 1);
@@ -1375,19 +1358,16 @@ ToolTemplate* HarmonicCalibration::createRegistersWidget()
 	registerHarmonicsGridLayout->addWidget(h8MagRegisterBlock, 1, 1);
 	registerHarmonicsGridLayout->addWidget(h8PhRegisterBlock, 1, 2);
 	
-
-	// for(int c=0; c < registerGridLayout->columnCount(); ++c) registerGridLayout->setColumnStretch(c,1);
-	// for(int r=0; r < registerGridLayout->rowCount(); ++r)  registerGridLayout->setRowStretch(r,1);
 	for(int c=0; c < registerConfigurationGridLayout->columnCount(); ++c) registerConfigurationGridLayout->setColumnStretch(c,1);
 	for(int c=0; c < registerDeviceIDGridLayout->columnCount(); ++c) registerDeviceIDGridLayout->setColumnStretch(c,1);
 	for(int c=0; c < registerHarmonicsGridLayout->columnCount(); ++c) registerHarmonicsGridLayout->setColumnStretch(c,1);
 	for(int c=0; c < registerSensorDataGridLayout->columnCount(); ++c) registerSensorDataGridLayout->setColumnStretch(c,1);
 
-	QPushButton *readAllRegistersButton = new QPushButton("Read All Registers", registerWidget);
+	readAllRegistersButton = new QPushButton("Read All Registers", registerWidget);
 	StyleHelper::BlueButton(readAllRegistersButton, "readAllRegistersButton");
+	readAllRegistersButton->setFixedWidth(270);
 	connect(readAllRegistersButton, &QPushButton::clicked, this, &HarmonicCalibration::readAllRegisters);
 
-	// registerLayout->addWidget(registerGridWidget);
 	registerLayout->addWidget(readAllRegistersButton);
 	registerLayout->addWidget(registerConfigurationLabel);
 	registerLayout->addWidget(registerConfigurationGridWidget);
@@ -1493,7 +1473,6 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	centerUtilityWidget->setLayout(centerUtilityLayout);
 	centerUtilityLayout->setMargin(0);
 	centerUtilityLayout->setSpacing(8);
-	// centerUtilityLayout->setAlignment(Qt::AlignTop);
 
 	QScrollArea *DIGIOScrollArea = new QScrollArea(centerUtilityWidget);
 	QWidget *DIGIOWidget = new QWidget(DIGIOScrollArea);
@@ -1718,8 +1697,6 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 
 	centerUtilityLayout->addWidget(DIGIOScrollArea);
 	centerUtilityLayout->addWidget(MTDiagnosticsScrollArea);
-	// centerUtilityLayout->addWidget(MTDIAG1SectionWidget, 0, Qt::AlignTop);
-	// centerUtilityLayout->addWidget(MTDiagnosticsSectionWidget, 0, Qt::AlignTop);
 
 	#pragma endregion
 
@@ -1793,7 +1770,49 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 
 void HarmonicCalibration::readAllRegisters()
 {
+	readAllRegistersButton->setEnabled(false);
+	readAllRegistersButton->setText(QString("Reading Registers..."));
+	QTimer::singleShot(1000, this, [this](){
+		readAllRegistersButton->setEnabled(true);
+		readAllRegistersButton->setText(QString("Read All Registers"));
+	});
 
+	cnvPageRegisterBlock->readButton()->click();
+	digIORegisterBlock->readButton()->click();
+	faultRegisterBlock->readButton()->click();
+	generalRegisterBlock->readButton()->click();
+	digIOEnRegisterBlock->readButton()->click();
+	eccDcdeRegisterBlock->readButton()->click();
+	eccDisRegisterBlock->readButton()->click();
+	absAngleRegisterBlock->readButton()->click();
+	angleRegisterBlock->readButton()->click();
+	sineRegisterBlock->readButton()->click();
+	cosineRegisterBlock->readButton()->click();
+	tmp0RegisterBlock->readButton()->click();
+	cnvCntRegisterBlock->readButton()->click();
+	uniqID0RegisterBlock->readButton()->click();
+	uniqID1RegisterBlock->readButton()->click();
+	uniqID2RegisterBlock->readButton()->click();
+	uniqID3RegisterBlock->readButton()->click();
+	h1MagRegisterBlock->readButton()->click();
+	h1PhRegisterBlock->readButton()->click();
+	h2MagRegisterBlock->readButton()->click();
+	h2PhRegisterBlock->readButton()->click();
+	h3MagRegisterBlock->readButton()->click();
+	h3PhRegisterBlock->readButton()->click();
+	h8MagRegisterBlock->readButton()->click();
+	h8PhRegisterBlock->readButton()->click();
+
+	if(generalRegisterMap.at("Sequence Type") == 1){
+		angleSecRegisterBlock->readButton()->click();
+		secAnglIRegisterBlock->readButton()->click();
+		secAnglQRegisterBlock->readButton()->click();
+		tmp1RegisterBlock->readButton()->click();
+		angleCkRegisterBlock->readButton()->click();
+		radiusRegisterBlock->readButton()->click();
+		diag1RegisterBlock->readButton()->click();
+		diag2RegisterBlock->readButton()->click();
+	}
 }
 
 void HarmonicCalibration::toggleFaultRegisterMode(int mode)
@@ -1882,7 +1901,9 @@ void HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool value)
 	uint32_t *DIGIOENRegisterValue = new uint32_t;
 	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
 
-	if(changeCNVPage(DIGIOENPage, "DIGIOEN"))
+	bool success = false;
+
+	if(changeCNVPage(DIGIOENPage))
 	{
 		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
 											m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
@@ -1893,7 +1914,7 @@ void HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool value)
 
 			uint16_t newRegisterValue = m_admtController->setDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue), DIGIOSettings);
 
-			changeCNVPage(DIGIOENPage, "DIGIOEN");
+			changeCNVPage(DIGIOENPage);
 
 			if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
 													m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
@@ -1910,13 +1931,13 @@ void HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool value)
 					DIGIOACALCToggleSwitch->setChecked(DIGIOSettings["DIGIO3EN"]);
 					DIGIOFAULTToggleSwitch->setChecked(DIGIOSettings["DIGIO4EN"]);
 					DIGIOBOOTLOADERToggleSwitch->setChecked(DIGIOSettings["DIGIO5EN"]);
-					//StatusBarManager::pushMessage(QString::fromStdString(DIGIOENName) + " is " + QString(value ? "enabled" : "disabled"));
+					success = true;
 				}
-				else{ StatusBarManager::pushMessage("Failed to read DIGIOEN Register"); }
 			}
-			else{ StatusBarManager::pushMessage("Failed to write DIGIOEN Register"); }
 		}
 	}
+
+	if(!success) { StatusBarManager::pushMessage("Failed to toggle" + QString::fromStdString(DIGIOENName) + " " + QString(value ? "on" : "off")); }
 
 	toggleUtilityTask(true);
 }
@@ -1926,6 +1947,8 @@ void HarmonicCalibration::toggleAllDIGIO(bool value)
 	toggleUtilityTask(false);
 	uint32_t *DIGIOENRegisterValue = new uint32_t;
 	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
+
+	bool success = false;
 
 	if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
 										m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
@@ -1940,7 +1963,7 @@ void HarmonicCalibration::toggleAllDIGIO(bool value)
 		DIGIOSettings["DIGIO0EN"] = value;
 		uint16_t newRegisterValue = m_admtController->setDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue), DIGIOSettings);
 
-		changeCNVPage(DIGIOENPage, "DIGIOEN");
+		changeCNVPage(DIGIOENPage);
 		if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
 												m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
 												static_cast<uint32_t>(newRegisterValue)) != -1)
@@ -1956,13 +1979,13 @@ void HarmonicCalibration::toggleAllDIGIO(bool value)
 				DIGIOACALCToggleSwitch->setChecked(DIGIOSettings["DIGIO3EN"]);
 				DIGIOFAULTToggleSwitch->setChecked(DIGIOSettings["DIGIO4EN"]);
 				DIGIOBOOTLOADERToggleSwitch->setChecked(DIGIOSettings["DIGIO5EN"]);
-				StatusBarManager::pushMessage("GPIO Outputs are " + QString(value ? "enabled" : "disabled"));
+				success = true;
 			}
-			else{ StatusBarManager::pushMessage("Failed to read DIGIOEN Register"); }
-
 		}
-		else{ StatusBarManager::pushMessage("Failed to write DIGIOEN Register"); }
 	}
+
+	if(!success) { StatusBarManager::pushMessage("Failed to toggle all GPIO outputs " + QString(value ? "on" : "off")); }
+
 	toggleUtilityTask(true);
 }
 
@@ -1973,48 +1996,31 @@ void HarmonicCalibration::readDeviceProperties()
     uint32_t page = m_admtController->getUniqueIdPage(ADMTController::UniqueIDRegister::UNIQID3);
     uint32_t cnvPageAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE);
 
+	bool success = false;
+
     if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, page) != -1){
 		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, cnvPageRegValue) != -1){
 			if(*cnvPageRegValue == page){
-				
                 if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getUniqueIdRegister(ADMTController::UniqueIDRegister::UNIQID3), uniqId3RegisterValue) != -1){
                     deviceRegisterMap = m_admtController->getUNIQID3RegisterMapping(static_cast<uint16_t>(*uniqId3RegisterValue));
 
-                    if(deviceRegisterMap.at("Supply ID") == "5V")
-                    {
-                        is5V = true;
-                    }
-                    else if(deviceRegisterMap.at("Supply ID") == "3.3V")
-                    {
-                        is5V = false;
-                    }
-                    else
-                    { 
-                        is5V = false; 
-                    }
+                    if(deviceRegisterMap.at("Supply ID") == "5V") { is5V = true; }
+                    else if(deviceRegisterMap.at("Supply ID") == "3.3V") { is5V = false; }
+                    else { is5V = false; }
 
                     deviceName = QString::fromStdString(deviceRegisterMap.at("Product ID"));
                     
-                    if(deviceRegisterMap.at("ASIL ID") == "ASIL QM")
-                    {
-                        deviceType = QString::fromStdString("Industrial");
-                    }
-                    else if(deviceRegisterMap.at("ASIL ID") == "ASIL B")
-                    {
-                        deviceType = QString::fromStdString("Automotive");
-                    }
-                    else{
-                        deviceType = QString::fromStdString(deviceRegisterMap.at("ASIL ID"));
-                    }
-                }
-                else{ StatusBarManager::pushMessage("Failed to read UNIQID3 register"); }
+                    if(deviceRegisterMap.at("ASIL ID") == "ASIL QM") { deviceType = QString::fromStdString("Industrial"); }
+                    else if(deviceRegisterMap.at("ASIL ID") == "ASIL B") { deviceType = QString::fromStdString("Automotive"); }
+                    else { deviceType = QString::fromStdString(deviceRegisterMap.at("ASIL ID")); }
 
+					success = true;
+                }
 			}
-			else{ StatusBarManager::pushMessage("CNVPAGE for UNIQID3 is a different value, abort reading"); }
 		}
-		else{ StatusBarManager::pushMessage("Failed to read CNVPAGE for UNIQID3"); }
 	}
-	else{ StatusBarManager::pushMessage("Failed to write CNVPAGE for UNIQID3"); }
+
+	if(!success) { StatusBarManager::pushMessage("Failed to read device properties"); }
 }
 
 void HarmonicCalibration::changeCustomSwitchLabel(CustomSwitch *customSwitch, QString onLabel, QString offLabel)
@@ -2103,7 +2109,7 @@ void HarmonicCalibration::acquisitionUITask()
 void HarmonicCalibration::applySequence(){
 	toggleWidget(applySequenceButton, false);
 	applySequenceButton->setText("Writing...");
-	QTimer::singleShot(2000, this, [this](){
+	QTimer::singleShot(1000, this, [this](){
 		this->toggleWidget(applySequenceButton, true);
 		applySequenceButton->setText("Apply");
 	});
@@ -2123,37 +2129,52 @@ void HarmonicCalibration::applySequence(){
 	uint32_t newGeneralRegValue = m_admtController->setGeneralRegisterBitMapping(*generalRegValue, settings);
 	uint32_t generalRegisterPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL);
 
-	if(changeCNVPage(generalRegisterPage, "GENERAL")){
+	bool success = false;
+
+	if(changeCNVPage(generalRegisterPage)){
 		if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress, newGeneralRegValue) != -1){
 			//StatusBarManager::pushMessage("WRITE GENERAL: 0b" + QString::number(static_cast<uint16_t>(newGeneralRegValue), 2).rightJustified(16, '0'));
 			
-			readSequence();
+			if(readSequence()){
+				if(settings.at("Convert Synchronization") == generalRegisterMap.at("Convert Synchronization") &&
+					settings.at("Angle Filter") == generalRegisterMap.at("Angle Filter") &&
+					settings.at("8th Harmonic") == generalRegisterMap.at("8th Harmonic") &&
+					settings.at("Sequence Type") == generalRegisterMap.at("Sequence Type") &&
+					settings.at("Conversion Type") == generalRegisterMap.at("Conversion Type"))
+				{
+					StatusBarManager::pushMessage("Sequence settings applied successfully");
+					success = true;
+				}
+			}
 		}
-		else{ StatusBarManager::pushMessage("Failed to write GENERAL Register"); }
 	}
+
+	if(!success){ StatusBarManager::pushMessage("Failed to apply sequence settings"); }
 }
 
 void HarmonicCalibration::toggleWidget(QPushButton *widget, bool value){
 	widget->setEnabled(value);
 }
 
-void HarmonicCalibration::readSequence(){
+bool HarmonicCalibration::readSequence(){
 	uint32_t *generalRegValue = new uint32_t;
 	uint32_t generalRegisterAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL);
 	uint32_t generalRegisterPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL);
 
-	if(changeCNVPage(generalRegisterPage, "GENERAL")){
+	bool success = false;
+
+	if(changeCNVPage(generalRegisterPage)){
 		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress, generalRegValue) != -1){
 			if(*generalRegValue != UINT32_MAX){
 				generalRegisterMap = m_admtController->getGeneralRegisterBitMapping(static_cast<uint16_t>(*generalRegValue));
 
 				updateSequenceWidget();
-
-				//StatusBarManager::pushMessage("READ GENERAL: 0b" + QString::number(static_cast<uint16_t>(*generalRegValue), 2).rightJustified(16, '0'));
+				success = true;
 			}
 		}
-		else{ StatusBarManager::pushMessage("Failed to read GENERAL Register"); }
 	}
+
+	return success;
 }
 
 void HarmonicCalibration::updateSequenceWidget(){
@@ -2167,7 +2188,7 @@ void HarmonicCalibration::updateSequenceWidget(){
 	eighthHarmonicMenuCombo->combo()->setCurrentIndex(eighthHarmonicMenuCombo->combo()->findData(generalRegisterMap.at("8th Harmonic")));
 }
 
-bool HarmonicCalibration::changeCNVPage(uint32_t page, QString registerName){
+bool HarmonicCalibration::changeCNVPage(uint32_t page){
 	uint32_t *cnvPageRegValue = new uint32_t;
 	uint32_t cnvPageAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE);
 
@@ -2176,11 +2197,8 @@ bool HarmonicCalibration::changeCNVPage(uint32_t page, QString registerName){
 			if(*cnvPageRegValue == page){
 				return true; 
 			}
-			else{ StatusBarManager::pushMessage("CNVPAGE for " + registerName + " is a different value, abort reading"); }
 		}
-		else{ StatusBarManager::pushMessage("Failed to read CNVPAGE for " + registerName); }
 	}
-	else{ StatusBarManager::pushMessage("Failed to write CNVPAGE for " + registerName); }
 
 	return false;
 }
@@ -2196,7 +2214,7 @@ void HarmonicCalibration::utilityTask(){
 void HarmonicCalibration::updateDigioMonitor(){
 	uint32_t *digioRegValue = new uint32_t;
 	uint32_t digioEnPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
-	if(changeCNVPage(digioEnPage, "DIGIOEN"))
+	if(changeCNVPage(digioEnPage))
 	{
 		uint32_t digioRegisterAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN);
 
@@ -2576,17 +2594,43 @@ void HarmonicCalibration::connectRegisterBlockToRegistry(RegisterBlockWidget* wi
 {
 	uint32_t *readValue = new uint32_t;
 	connect(widget->readButton(), &QPushButton::clicked, this, [=]{
-		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), widget->getAddress(), readValue) == 0)
-		{ widget->setValue(*readValue); }
+		bool ok = false, success = false;
+
+		if(widget->getCnvPage() != UINT32_MAX)
+		{
+			ok = this->changeCNVPage(widget->getCnvPage());
+		}
+		else { ok = true; }
+
+		if(ok){
+			if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), widget->getAddress(), readValue) == 0)
+			{ widget->setValue(*readValue); }
+		}
+		else{ StatusBarManager::pushMessage("Failed to read registry"); }
 	});
 	if(widget->getAccessPermission() == RegisterBlockWidget::ACCESS_PERMISSION::READWRITE || 
 	   widget->getAccessPermission() == RegisterBlockWidget::ACCESS_PERMISSION::WRITE){
 		connect(widget->writeButton(), &QPushButton::clicked, this, [=]{
-			if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), widget->getAddress(), widget->getValue()) == 0)
-			{ 
-				if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), widget->getAddress(), readValue) == 0)
-				{ widget->setValue(*readValue); }
+			bool ok = false, success = false;
+
+			if(widget->getCnvPage() != UINT32_MAX)
+			{
+				ok = this->changeCNVPage(widget->getCnvPage());
 			}
+			else { ok = true; }
+
+			if(ok){
+				if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), widget->getAddress(), widget->getValue()) == 0)
+				{ 
+					if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), widget->getAddress(), readValue) == 0)
+					{ 
+						widget->setValue(*readValue); 
+						success = true;
+					}
+				}
+			}
+			
+			if(!success) { StatusBarManager::pushMessage("Failed to write to registry"); }
 		});
 	}
 }
@@ -2649,24 +2693,26 @@ void HarmonicCalibration::updateChannelValue(int channelIndex)
 	}
 }
 
-void HarmonicCalibration::readMotorAttributeValue(ADMTController::MotorAttribute attribute, double& value)
+int HarmonicCalibration::readMotorAttributeValue(ADMTController::MotorAttribute attribute, double& value)
 {
+	int result = -1;
 	if(!isDebug){
-		int result = m_admtController->getDeviceAttributeValue(m_admtController->getDeviceId(ADMTController::Device::TMC5240),
+		result = m_admtController->getDeviceAttributeValue(m_admtController->getDeviceId(ADMTController::Device::TMC5240),
 															m_admtController->getMotorAttribute(attribute),
 															&value);
-		if(result != 0) { calibrationLogWrite(QString(m_admtController->getMotorAttribute(attribute)) + ": Read Error " + QString::number(result)); }
 	}
+	return result;
 }
 
-void HarmonicCalibration::writeMotorAttributeValue(ADMTController::MotorAttribute attribute, double value)
+int HarmonicCalibration::writeMotorAttributeValue(ADMTController::MotorAttribute attribute, double value)
 {
+	int result = -1;
 	if(!isDebug){
-		int result = m_admtController->setDeviceAttributeValue(m_admtController->getDeviceId(ADMTController::Device::TMC5240), 
+		result = m_admtController->setDeviceAttributeValue(m_admtController->getDeviceId(ADMTController::Device::TMC5240), 
 															m_admtController->getMotorAttribute(attribute), 
 															value);
-		if(result != 0) { calibrationLogWrite(QString(m_admtController->getMotorAttribute(attribute)) + ": Write Error " + QString::number(result)); }
 	}
+	return result;
 }
 
 void HarmonicCalibration::updateLabelValue(QLabel *label, ADMTController::MotorAttribute attribute)
@@ -2883,7 +2929,7 @@ void HarmonicCalibration::flashHarmonicValues()
 			 *h8MagCurrent = new uint32_t,
 			 *h8PhaseCurrent = new uint32_t;
 
-	if(changeCNVPage(0x02, "Harmonic Registers")){
+	if(changeCNVPage(0x02)){
 		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), h1MagCurrent);
 		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), h1PhaseCurrent);
 		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG), h2MagCurrent);
