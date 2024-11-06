@@ -73,13 +73,11 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	QPushButton *saveBtn = createBtn(
 		"Save", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/save.svg",
 		saveLoadWidget);
-	saveBtn->setCheckable(false);
 	connect(saveBtn, &QPushButton::clicked, this, &BrowseMenu::requestSave);
 
 	QPushButton *loadBtn = createBtn(
 		"Load", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/load.svg",
 		saveLoadWidget);
-	loadBtn->setCheckable(true);
 	connect(loadBtn, &QPushButton::clicked, this, &BrowseMenu::requestLoad);
 
 	saveLoadWidget->layout()->addWidget(saveBtn);
