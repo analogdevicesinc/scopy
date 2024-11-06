@@ -60,6 +60,7 @@ void SmallOnOffSwitch::initDimensions()
 	m_end_offset[false] = [this]() { return m_base_offset; };
 	m_offset = m_base_offset;
 
+	m_icon_color = Style::getColor(json::theme::background_primary);
 	m_track_color[true] = Style::getColor(json::theme::interactive_primary_idle);
 	m_track_color[false] = Style::getColor(json::theme::interactive_subtle_idle);
 	m_track_color_disabled[true] = Style::getColor(json::theme::interactive_primary_disabled);
@@ -133,14 +134,20 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
 	if(getDynamicProperty(this, "use_icon")) {
 		QPixmap pixmap;
 		if(isChecked()) {
-			pixmap = Style::getPixmap(":/gui/icons/unlocked.svg", thumb_brush);
+			pixmap = Style::getPixmap(":/gui/icons/unlocked.svg", m_icon_color);
 		} else {
-			pixmap = Style::getPixmap(":/gui/icons/locked.svg", thumb_brush);
+			pixmap = Style::getPixmap(":/gui/icons/locked.svg", m_icon_color);
 		}
 
-		p.drawPixmap(QRect(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, pixmap.width(),
-				   pixmap.height()),
+		pixmap = pixmap.scaled(QSize(m_thumb_radius * 2, m_thumb_radius * 2));
+		p.drawPixmap(QRect((m_btn_width - m_offset + 1) - m_thumb_radius, m_base_offset - m_thumb_radius,
+				   pixmap.width(), pixmap.height()),
 			     pixmap);
+
+		p.setBrush(thumb_brush);
+		p.drawRoundedRect(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 * m_thumb_radius,
+				  2 * m_thumb_radius, track_radius, track_radius);
+
 	} else {
 		p.setBrush(thumb_brush);
 		p.drawEllipse(m_offset - m_thumb_radius, m_base_offset - m_thumb_radius, 2 * m_thumb_radius,
