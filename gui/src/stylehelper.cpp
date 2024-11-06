@@ -583,37 +583,11 @@ void StyleHelper::BlueIconButton(QPushButton *w, QIcon icon, QString objectName)
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::BackgroundPage(QWidget *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-	QString style = QString(R"css(
-		.QWidget {
-			background-color: &&background_primary&&;
-		}
-		)css");
-	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
-	w->setStyleSheet(style);
-}
-
 void StyleHelper::BackgroundWidget(QWidget *w, QString objectName)
 {
 	if(!objectName.isEmpty())
 		w->setObjectName(objectName);
 	Style::setBackgroundColor(w, json::theme::background_primary);
-}
-
-void StyleHelper::TabWidgetLabel(QLabel *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-	QString style = QString(R"css(
-		QLabel {
-			font-weight: bold;
-			font-size: 11;
-		}"
-		)css");
-	w->setStyleSheet(style);
 }
 
 void StyleHelper::TabWidgetEastMenu(QTabWidget *w, QString objectName)
@@ -682,48 +656,6 @@ padding-left: -2px;
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::OverlayMenu(QWidget *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-	QString style = QString(R"css(
-				.QWidget {
-					background-color: &&background_primary&&;
-					border-radius: 4px;
-				})css");
-	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
-	w->setStyleSheet(style);
-}
-
-void StyleHelper::TutorialChapterTitleLabel(QLabel *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-	QString style = QString(R"css(
-				QLabel {
-					font-weight: bold;
-					color: &&content_default&&;
-				}
-				)css");
-	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
-	w->setStyleSheet(style);
-}
-
-void StyleHelper::FrameBackgroundShadow(QFrame *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-
-	QString style = QString(R"css(
-				.QFrame[selected=true] {
-					background-color: &&content_inverse&&;
-					border-radius: 4px;
-				}
-				)css");
-	style.replace("&&content_inverse&&", StyleHelper::getColor("content_inverse"));
-	w->setStyleSheet(style);
-}
-
 void StyleHelper::HoverWidget(QWidget *w, bool draggable, QString objectName)
 {
 	if(!objectName.isEmpty())
@@ -771,26 +703,6 @@ void StyleHelper::ScopyStatusBar(QWidget *w, QString objectName)
 				}
 				)css");
 	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
-	w->setStyleSheet(style);
-}
-
-void StyleHelper::TableViewWidget(QWidget *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-	QString style = QString(R"css(
-				QHeaderView::section {
-					font: 11pt;
-					border: 1px solid &&content_default&&;
-					background-color:&&background_primary&&;
-				}
-				QTableWidget::item {
-					border-right:1px dashed &&content_default&&;
-					border-bottom:1px dashed &&content_default&&;
-				}
-				)css");
-	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
-	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
 	w->setStyleSheet(style);
 }
 

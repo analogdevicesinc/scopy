@@ -131,7 +131,7 @@ void HarmonicsInstrument::initTable()
 	for(int i = 0; i < HARMONICS_MIN_DEGREE; i++) {
 		m_table->horizontalHeader()->hideSection(i);
 	}
-	StyleHelper::TableViewWidget(m_table->parentWidget(), "HarmonicsTable");
+	Style::setStyle(m_table->parentWidget(), style::properties::widget::tableViewWidget, true, true);
 	for(int i = 0; i < MAX_CHNLS; i++) {
 		for(int j = 0; j < NUMBER_OF_HARMONICS; j++) {
 			QTableWidgetItem *tableItem = new QTableWidgetItem();
