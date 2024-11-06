@@ -5,7 +5,7 @@ QWidget[&&property&&=true]  {
 	text-align: left;
 }
 QWidget[&&property&&="selected"]  {
-	color: &white&;
+	color: &content_inverse&;
 	min-width: 50;
 	font-weight: 700;
 	font-size: &font_size_1&;

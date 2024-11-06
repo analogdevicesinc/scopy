@@ -13,7 +13,7 @@
 "interactive_secondary_idle": "#5b5b6b",
 "interactive_secondary_hover": "#535361",
 "interactive_secondary_pressed": "#4c4c59",
-"interactive_secondary_disabled": "#3c3c45",
+"interactive_secondary_disabled": "#35353d",
 "content_default": "#e1e1e3",
 "content_subtle": "#bac2cc",
 "content_silent": "#848491",
