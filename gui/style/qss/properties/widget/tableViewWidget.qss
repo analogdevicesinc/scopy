@@ -1,0 +1,10 @@
+QHeaderView::section {
+	font: 11pt;
+	border: 1px solid &content_default&;
+	background-color: &background_primary&;
+}
+
+QTableWidget::item {
+	border-right: 1px dashed &content_default&;
+	border-bottom: 1px dashed &content_default&;
+}
