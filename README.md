@@ -7,9 +7,6 @@
 # Scopy [![GitHub Release](https://img.shields.io/github/release/analogdevicesinc/scopy.svg)](https://github.com/analogdevicesinc/scopy/releases/latest)  [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://github.com/analogdevicesinc/scopy/blob/update-readme/LICENSE)
 Scopy is a software oscilloscope and signal analysis toolset.
 
-## Builds
-Nightly builds are available under the [Continuous build](https://github.com/analogdevicesinc/scopy/releases/tag/continous) tag.
-
 ### Supported platforms
 - Windows (x86-64)
 - Linux flatpak (x86-64, arm32)

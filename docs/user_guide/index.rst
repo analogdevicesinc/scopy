@@ -42,11 +42,11 @@ Download
 
 .. warning::
 
-  In order to have Scopy working with `ADALM2000 <https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/ADALM2000.html>`__  please make sure that the Device Drivers are 
+  In order to have Scopy working with `ADALM2000 <https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/ADALM2000.html>`__
+  or `ADALM-Pluto <https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html>`__
+  please make sure that the Device Drivers are  installed. A guide on this topic can be found in the section:
 
-  installed. A guide on this topic can be found in the section:
-
-    * `ADALM2000 for End Users <https://wiki.analog.com/university/tools/m2k/users>`__ 
+    * `ADALM2000 and ADALM-Pluto drivers <https://wiki.analog.com/university/tools/pluto/drivers/windows?s[]=adalm&s[]=pluto#windows_drivers>`__
 
 Installation
 ---------------------------------------------------------------------
@@ -335,8 +335,10 @@ About page
   versions or Git commit hashes, a list of the last 100 commits and
   the Scopy branch.
 
+.. warning::
   These are all important in the debugging process and most of this
   information should be specified when reporting an issue.
+..
 
   **License** link to the open-source LICENSE file in the Github
   repository.
