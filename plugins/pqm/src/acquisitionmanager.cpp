@@ -163,7 +163,9 @@ bool AcquisitionManager::readPqmAttributes()
 		for(int j = 0; j < attrNo; j++) {
 			attrName = iio_channel_get_attr(chnl, j);
 			iio_channel_attr_read(chnl, attrName, dest, MAX_ATTR_SIZE);
-			m_pqmAttr[chnlId][attrName] = QString(dest);
+			QString attrValue(dest);
+			computeAdjustedAngle(attrName, attrValue);
+			m_pqmAttr[chnlId][attrName] = attrValue;
 			m_pqmLog->acquireAttrData(attrName, dest, chnlId);
 		}
 	}
@@ -297,6 +299,22 @@ void AcquisitionManager::storeProcessData()
 		qWarning(CAT_PQM_ACQ) << "Cannot read process_data attribute!";
 	}
 	m_processData.store(val);
+}
+
+void AcquisitionManager::computeAdjustedAngle(const QString &attrName, QString &angle)
+{
+	if(attrName.compare("angle") != 0) {
+		return;
+	}
+	bool ok = false;
+	double adjustedAngle = angle.toDouble(&ok);
+	if(!ok) {
+		return;
+	}
+	// The angle we receive from the device represents the delay, which is why the following operation needs to be
+	// performed
+	adjustedAngle = 360 - adjustedAngle;
+	angle = QString::number(adjustedAngle);
 }
 
 bool AcquisitionManager::hasFwVers() const { return m_hasFwVers; }
