@@ -3,7 +3,12 @@
 Plugins
 ================================================================================
 
-What is a Scopy plugin ?
+Scopy plugins act as intermediaries, allowing users to control and interact with devices in a way
+that's intuitive and easy to understand.
+
+* **Generic** plugins offer basic commands and actions that work across a wide range of devices.
+* **Device-specific** plugins are tailored to a particular device, enabling users to access its
+  unique features and functions.
 
 General IIO plugins
 
