@@ -24,6 +24,8 @@
 #include <QIcon>
 #include <QPen>
 #include <QCheckBox>
+#include <QFuture>
+#include <QFutureWatcher>
 
 #include <iio.h>
 #include <iioutil/connectionprovider.h>
@@ -68,7 +70,7 @@ public Q_SLOTS:
 	void clearCommandLog();
 	void canCalibrate(bool);
 	void applySequence();
-	void readSequence();
+	bool readSequence();
 Q_SIGNALS:
 	void runningChanged(bool);
 	void canCalibrateChanged(bool);
@@ -85,7 +87,7 @@ private:
 		afeDiag0, afeDiag1, afeDiag2;
 
 	QPushButton *openLastMenuButton, *calibrationStartMotorButton, *applyCalibrationDataButton, *calibrateDataButton, *extractDataButton,
-				*clearCommandLogButton, *applySequenceButton;
+				*clearCommandLogButton, *applySequenceButton, *readAllRegistersButton;
 	QButtonGroup *rightMenuButtonGroup;
 
 	QLineEdit 	*graphUpdateIntervalLineEdit, *dataSampleSizeLineEdit,
@@ -174,8 +176,8 @@ private:
 	void importCalibrationData();
 	void calibrationLogWrite(QString message = "");
 	void commandLogWrite(QString message);
-	void readMotorAttributeValue(ADMTController::MotorAttribute attribute, double& value);
-	void writeMotorAttributeValue(ADMTController::MotorAttribute attribute, double value);
+	int readMotorAttributeValue(ADMTController::MotorAttribute attribute, double& value);
+	int writeMotorAttributeValue(ADMTController::MotorAttribute attribute, double value);
 	void applyLineEditStyle(QLineEdit *widget);
 	void applyComboBoxStyle(QComboBox *widget, const QString& styleHelperColor = "CH0");
 	void applyTextStyle(QWidget *widget, const QString& styleHelperColor = "CH0", bool isBold = false);
@@ -201,7 +203,7 @@ private:
 	void updateFaultRegister();
 	void updateMTDiagnostics();
 	void changeStatusLEDColor(MenuControlButton *menuControlButton, QColor color, bool checked = true);
-	bool changeCNVPage(uint32_t page, QString registerName);
+	bool changeCNVPage(uint32_t page);
 	void toggleWidget(QPushButton *widget, bool value);
 	void GMRReset();
 	void updateCountValue();
