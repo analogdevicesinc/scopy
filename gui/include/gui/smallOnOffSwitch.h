@@ -70,6 +70,7 @@ private:
 	int m_offset;
 	qreal m_track_opacity;
 
+	QColor m_icon_color;
 	QMap<bool, QColor> m_track_color;
 	QMap<bool, QColor> m_track_color_disabled;
 	QMap<bool, QColor> m_thumb_color;
