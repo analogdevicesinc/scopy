@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Scopy &#8212; Scopy  documentation</title>
+    <title>Scopy Overview &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../_static/style.min.css?v=95305861" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -99,13 +99,29 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">Scopy</a><ul>
+<li><a class="reference internal" href="#">Scopy Overview</a><ul>
 <li><a class="reference internal" href="#about">About</a></li>
 <li><a class="reference internal" href="#download">Download</a></li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#launch">Launch</a></li>
-<li><a class="reference internal" href="#usage">Usage</a></li>
-<li><a class="reference internal" href="#user-guides">User Guides</a></li>
+<li><a class="reference internal" href="#application-overview">Application Overview</a><ul>
+<li><a class="reference internal" href="#homepage-layout">Homepage layout</a><ul>
+<li><a class="reference internal" href="#device-browser">Device browser</a></li>
+<li><a class="reference internal" href="#add-device-page">Add(+) device page</a></li>
+<li><a class="reference internal" href="#instruments-menu">Instruments Menu</a></li>
+<li><a class="reference internal" href="#information-window">Information Window</a></li>
+<li><a class="reference internal" href="#save-load-session">Save &amp; Load session</a></li>
+<li><a class="reference internal" href="#preferences">Preferences</a></li>
+<li><a class="reference internal" href="#about-page">About page</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#connecting-to-a-device">Connecting to a device</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#user-guides">User Guides</a><ul>
+<li><a class="reference internal" href="#detaching-instruments">Detaching Instruments</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#instruments-overview">Instruments Overview</a></li>
 <li><a class="reference internal" href="#scripting">Scripting</a></li>
 <li><a class="reference internal" href="#building-from-source">Building from source</a></li>
@@ -149,9 +165,7 @@ Content on this topic
 <div class="toc-tree">
   <html>
   <body><ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Scopy</a></li>
-</ul>
-<ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Scopy Overview</a></li>
 <li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../plugins/index.html">Plugins</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
 <li class="toctree-l2"><a class="reference internal" href="../plugins/adc/adc.html">ADC plugin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../plugins/dac/dac.html">DAC plugin</a></li>
@@ -204,12 +218,16 @@ Content on this topic
         <div class="bodywrapper" id="top-anchor">
           <div class="body" role="main">
             
-  <section id="scopy">
-<span id="user-guide"></span><h1>Scopy<a class="headerlink" href="#scopy" title="Link to this heading">#</a></h1>
+  <section id="scopy-overview">
+<span id="user-guide"></span><h1>Scopy Overview<a class="headerlink" href="#scopy-overview" title="Link to this heading">#</a></h1>
 <section id="about">
 <h2>About<a class="headerlink" href="#about" title="Link to this heading">#</a></h2>
 <p>Scopy is a multi-functional software toolset with strong capabilities for
 signal analysis.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Scopy v2.0.0 is now compatible with any IIO system.</p>
+</div>
 </section>
 <section id="download">
 <h2>Download<a class="headerlink" href="#download" title="Link to this heading">#</a></h2>
@@ -249,11 +267,12 @@ signal analysis.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>In order to have Scopy working with <a class="reference external" href="https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/ADALM2000.html">ADALM2000</a>  please make sure that the Device Drivers are</p>
-<p>installed. A guide on this topic can be found in the section:</p>
+<p>In order to have Scopy working with <a class="reference external" href="https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/ADALM2000.html">ADALM2000</a>
+or <a class="reference external" href="https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html">ADALM-Pluto</a>
+please make sure that the Device Drivers are  installed. A guide on this topic can be found in the section:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><a class="reference external" href="https://wiki.analog.com/university/tools/m2k/users">ADALM2000 for End Users</a></p></li>
+<li><p><a class="reference external" href="https://wiki.analog.com/university/tools/pluto/drivers/windows?s[]=adalm&amp;s[]=pluto#windows_drivers">ADALM2000 and ADALM-Pluto drivers</a></p></li>
 </ul>
 </div></blockquote>
 </div>
@@ -265,12 +284,12 @@ signal analysis.</p>
 </div></blockquote>
 <p>Once you downloaded the installer, run it and follow all the required steps.
 After completion, system reboot is required.</p>
-<p>Video intalation guide:</p>
+<p>Video installation guide:</p>
 <div class="iframe-video"><iframe class="only-screen" src="https://www.youtube-nocookie.com/embed/894HkVXf7-U"></iframe><span class="only-screen"><p><strong>Scopy for Linux</strong></p>
 </span><div class="admonition video only-print"><p class="admonition-title">Video</p>
 <p><strong>Scopy for Linux</strong></p>
 <p><a href="https://www.youtube.com/watch?v=894HkVXf7-U"><span>https://www.youtube.com/watch?v=894HkVXf7-U</span></a></p>
-</div></div><p>Before downloading and extracting the scopy-v1.1.1-Linux-flatpak.zip archive,
+</div></div><p>Before downloading and extracting the scopy-Linux-flatpak.zip archive,
 you need to setup Flatpak <a class="reference external" href="https://flatpak.org/setup/">using this setup guide</a>
 for your Linux distribution.</p>
 <p>For Ubuntu, you can use the following steps:</p>
@@ -284,13 +303,13 @@ for your Linux distribution.</p>
 </pre></div>
 </div>
 <p>After this, get the Scopy.flatpak file from the downloaded archive and run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">flatpak</span> <span class="n">install</span> <span class="n">scopy</span><span class="o">-</span><span class="n">v1</span><span class="mf">.1.1</span><span class="o">-</span><span class="n">Linux</span><span class="o">-</span><span class="n">flatpak</span><span class="o">.</span><span class="n">flatpak</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">flatpak</span> <span class="n">install</span> <span class="n">scopy</span><span class="o">-</span><span class="n">Linux</span><span class="o">-</span><span class="n">flatpak</span><span class="o">.</span><span class="n">flatpak</span>
 </pre></div>
 </div>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<p>Video intalation guide:</p>
+<p>Video installation guide:</p>
 <div class="iframe-video"><iframe class="only-screen" src="https://www.youtube-nocookie.com/embed/9qgxmmTrcSE"></iframe><span class="only-screen"></span><div class="admonition video only-print"><p class="admonition-title">Video</p>
 <p><a href="https://www.youtube.com/watch?v=9qgxmmTrcSE"><span>https://www.youtube.com/watch?v=9qgxmmTrcSE</span></a></p>
 </div></div><div class="line-block">
@@ -304,7 +323,7 @@ will show up in the Finder sidebar and a window showing the content should open
 up.
 Drag the application from the .dmg window into Applications to install and wait
 for the process to finish.</p>
-<p>Video intalation guide:</p>
+<p>Video installation guide:</p>
 <div class="iframe-video"><iframe class="only-screen" src="https://www.youtube-nocookie.com/embed/To0ACQ77tkg"></iframe><span class="only-screen"><p><strong>Scopy for Android</strong></p>
 </span><div class="admonition video only-print"><p class="admonition-title">Video</p>
 <p><strong>Scopy for Android</strong></p>
@@ -326,145 +345,252 @@ your device and the USB cable, as shown in the image below.</p>
 </pre></div>
 </div>
 </section>
-<section id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading">#</a></h2>
+<section id="application-overview">
+<h2>Application Overview<a class="headerlink" href="#application-overview" title="Link to this heading">#</a></h2>
+<section id="homepage-layout">
+<h3>Homepage layout<a class="headerlink" href="#homepage-layout" title="Link to this heading">#</a></h3>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-start-page.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-start-page.png" />
+<p>The Home view is divided into multiple sections:</p>
+<section id="device-browser">
+<h4>Device browser<a class="headerlink" href="#device-browser" title="Link to this heading">#</a></h4>
 <blockquote>
-<div><p><strong>Home</strong></p>
+<div><p>Contains a list of devices (USB/serial/network/emulated) that Scopy can connect to.</p>
+<p>USB devices are scanned automatically at startup when the top right “Scan”
+switch is ON.</p>
 </div></blockquote>
-<p>The Home view is divided into four sections:</p>
-<ul class="simple">
-<li><p><strong>Devices(1)</strong>: List of devices (USB or remote) that Scopy can connect to.</p></li>
-</ul>
-<p>USB devices are detected automatically at startup. The Add button can be used
-to add remote devices to the list.</p>
-<ul class="simple">
-<li><p><strong>Instruments Menu(2)</strong>: List with instruments provided by the application.</p></li>
-<li><p><strong>Information Window(3)</strong>: Section containing the welcome, add device page</p></li>
-</ul>
-<p>and for each device a description.</p>
-<ul class="simple">
-<li><p><strong>General Settings Menu(4)</strong>: Save and load session and the preferences menu.</p></li>
-</ul>
-<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_home_view.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_home_view.png" />
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-<blockquote>
-<div><p><strong>Connecting to a USB device</strong></p>
-</div></blockquote>
-<p>If a compatible USB device is available it will be displayed in the <strong>Devices</strong>
-section.</p>
-<p>To connect to that device click on the device and then click the <strong>Connect</strong>
-button in the <strong>Information Window.</strong></p>
-<p>If the connection was established, the device will have a green status line
-under it and you will be able to disconnect from it in the same <strong>Information
-Window.</strong></p>
-<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/device_connected.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/device_connected.png" />
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-<blockquote>
-<div><p><strong>Connecting to a remote device</strong></p>
-</div></blockquote>
-<p>To connect to a remote device click on the <strong>Plus</strong> icon. Enter the IP of the
-remote device into the <strong>Hostname</strong> field and click the <strong>Connect</strong> button. If
-a device can be detected at the IP you provided, the <strong>Connect</strong> button will
-change to an <strong>Add</strong> button and you can click on it to add the remote device to
-the list of detected devices.</p>
-<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_add_device_page1.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_add_device_page1.png" />
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_add_device_page2.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_add_device_page2.png" />
-<p>Clicking the Forget Device button will remove the device from the list.
-Clicking the Identify button will make the device blink.</p>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-<blockquote>
-<div><p><strong>General Settings Menu</strong></p>
-</div></blockquote>
-<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_general_settings1.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_general_settings1.png" />
-<p>The save/load buttons can be used to save the current session or load another
-session. The preferences button will open the preferences for Scopy where
-different options for different tools can be modified.</p>
-<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/preferences1.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/preferences1.png" />
-<p>Clicking the <strong>Reset Scopy</strong> button will reset the application to a default
-configuration.</p>
-<p>Checking the <strong>user notes preference</strong> will enable a tool where the user can
-add different pages with html formatted text</p>
-<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/notes1.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/notes1.png" />
 </section>
-<section id="user-guides">
-<h2>User Guides<a class="headerlink" href="#user-guides" title="Link to this heading">#</a></h2>
-<p>Scopy interacts with only one hardware device at a time. Once a device is
-selected to be used with the application, a list of instruments that are
-available for that device will be enabled. Each instrument can be opened from
-the left menu. The icon on the right of the instrument name specifies that the
-instrument is enabled and provides a shortcut that allows an instrument to be
-turned on or off.</p>
-<p>The instruments menu can be minimized by clicking on the <strong>Scopy</strong> button near
-the top-left window.</p>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/min_menu.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/min_menu.png" />
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
+<section id="add-device-page">
+<h4>Add(+) device page<a class="headerlink" href="#add-device-page" title="Link to this heading">#</a></h4>
 <blockquote>
-<div><p><strong>Detaching Instruments</strong></p>
+<div><p>Can be used to connect to devices that are not automatically detected in
+the above mentioned list.</p>
 </div></blockquote>
-<p>Scopy provides the detaching into multiple windows feature for each instrument
-available, providing a better view/manipulation.</p>
-<p>There are 2 ways to do this:</p>
-<ul class="simple">
-<li><p><strong>Drag and Drop</strong> - select the desired instrument drag it outside Instrument</p></li>
-</ul>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-iio.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-iio.png" />
 <blockquote>
-<div><p>Menu section and drop it inside the application window area.</p>
-</div></blockquote>
-<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_drag_n_drop.gif" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_drag_n_drop.gif" />
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-<ul class="simple">
-<li><p><strong>Double Click</strong> - first make sure that the <strong>Double click to detach</strong> a tool</p></li>
-</ul>
-<blockquote>
-<div><p>option is enabled in the <strong>Preferences</strong> menu; double-click on the desired
-instrument to detach it.</p>
-</div></blockquote>
-<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_dc_detach.gif" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_dc_detach.gif" />
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-</section>
-<section id="instruments-overview">
-<h2>Instruments Overview<a class="headerlink" href="#instruments-overview" title="Link to this heading">#</a></h2>
-<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_instruments_menu.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy_instruments_menu.png" />
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-<p>Scopy is using a list of plugins detailed <a class="reference internal" href="../plugins/index.html#plugins"><span class="std std-ref">here</span></a>.</p>
-<p>Complete user guides on how to use each Scopy instrument:</p>
-<ul>
-<li><p>ADALM2000 plugins :</p>
+<div><p>The interface has two tabs for device configuration:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><a class="reference internal" href="../plugins/m2k/oscilloscope.html#oscilloscope"><span class="std std-ref">Oscilloscope</span></a></p></li>
-<li><p><a class="reference internal" href="../plugins/m2k/spectrum_analyzer.html#spectrum-analyzer"><span class="std std-ref">Spectrum Analyzer</span></a></p></li>
-<li><p><a class="reference internal" href="../plugins/m2k/network_analyzer.html#network-analyzer"><span class="std std-ref">Network Analyzer</span></a></p></li>
-<li><p><a class="reference internal" href="../plugins/m2k/signal_generator.html#signal-generator"><span class="std std-ref">Signal Generator</span></a></p></li>
-<li><p><a class="reference internal" href="../plugins/m2k/logic_analyzer.html#logic-analyzer"><span class="std std-ref">Logic Analyzer</span></a></p></li>
-<li><p><a class="reference internal" href="../plugins/m2k/pattern_generator.html#pattern-generator"><span class="std std-ref">Pattern Generator</span></a></p></li>
-<li><p><a class="reference internal" href="../plugins/m2k/digitalio.html#digitalio"><span class="std std-ref">Digital IO</span></a></p></li>
-<li><p><a class="reference internal" href="../plugins/m2k/voltmeter.html#voltmeter"><span class="std std-ref">Voltmeter</span></a></p></li>
-<li><p><a class="reference internal" href="../plugins/m2k/power_supply.html#power-supply"><span class="std std-ref">Power Supply</span></a></p></li>
+<li><p><strong>IIO</strong>: adding and configuring IIO devices.</p></li>
+<li><p><strong>EMU</strong>: adding and configuring virtually emulated devices using
+the iio-emulator.</p></li>
+</ul>
+</div></blockquote>
+<p>The <strong>IIO</strong> tab includes settings for scanning, connecting, and configuring
+various connected devices.</p>
+<p><strong>SCAN Section</strong></p>
+<ul>
+<li><p><strong>Filter</strong>: Allows the user to choose which connection types to scan for.</p>
+<p>If none is selected, the application will scan for all types.</p>
+<p>A new scan is triggered every time one of the following
+options is selected.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Local</strong>: Scans local devices, usually on target.</p></li>
+<li><p><strong>IP</strong>: Scans network devices.</p></li>
+<li><p><strong>USB</strong>: Scans USB devices.</p></li>
 </ul>
 </div></blockquote>
 </li>
+<li><p><strong>Context</strong>: List of currently scanned contexts.</p></li>
+<li><p><strong>Refresh</strong>: Button to re-scan and detect available devices.</p></li>
 </ul>
+<p><strong>SERIAL Section</strong></p>
+<ul class="simple">
+<li><p><strong>Port Name</strong>: Drop-down to select available serial devices.</p></li>
+<li><p><strong>Baud Rate</strong>: Allows setting the communication speed.</p></li>
+<li><p><strong>Port Config</strong>: Specifies the data format and parity.</p></li>
+<li><p><strong>Refresh</strong>: Refreshes the list of available serial devices.</p></li>
+</ul>
+<p><strong>URI</strong></p>
+<ul class="simple">
+<li><p><strong>URI Input</strong>: This is where the user specifies the connection URI.
+This field is automatically populated based on the selection from one
+of the previous sections but the user can manually input the URI of
+the required device.</p></li>
+<li><p><strong>Verify</strong>: Button to verify the connection based on the provided URI.
+This will display an error if no such context is available. On success
+a different page will be displayed allowing the user to configure
+compatible plugins.</p></li>
+</ul>
+<p>The <strong>EMU</strong> tab includes settings for selecting the emulation mode,
+XML configuration files, RX/TX devices, and URI for the emulated device.</p>
+</div></blockquote>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-emu.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-emu.png" />
+<blockquote>
+<div><dl class="simple">
+<dt><strong>DEMO OPTION</strong>:</dt><dd><ul class="simple">
+<li><p>Drop-down menu to select one of the predefined emulated devices.</p></li>
+<li><p>Options are: adalm2000, pluto, swiot, pqm and generic.
+When using the <strong>generic</strong> option, the user must provide a path
+of the XML for the emulated device. If an existing option is
+selected, the XML path will be automatically completed in the
+field.</p></li>
+</ul>
+</dd>
+<dt><strong>XML PATH</strong>:</dt><dd><ul class="simple">
+<li><p>Specifies the path to the XML configuration file required for the emulation.</p></li>
+</ul>
+</dd>
+<dt><strong>RX/TX DEVICES</strong>:</dt><dd><ul class="simple">
+<li><p>Specifies the RX (receive) and TX (transmit) device files for the emulation mode.
+These are .bin files containing samples to be used on RX/TX devices.</p></li>
+<li><p>For detailed examples check the <a class="reference external" href="https://github.com/analogdevicesinc/iio-emu/blob/main/GENERIC_EMULATOR.md">official iio-emu Github docs</a> .</p></li>
+</ul>
+</dd>
+<dt><strong>URI</strong>:</dt><dd><ul class="simple">
+<li><p>The URI is automatically set to <strong>ip:127.0.0.1</strong> or <strong>ip:localhost</strong>.</p></li>
+</ul>
+</dd>
+<dt><strong>Enable Demo Button</strong>:</dt><dd><ul class="simple">
+<li><p>Validates and activates the demo mode based on the selected configuration.</p></li>
+<li><p>Automatically displays the IIO tab and populates the URI field
+if the EMU validation is successful.</p></li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-plugin-config.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-plugin-config.png" />
+<blockquote>
+<div><p>The add device plugin configuration page will allow the user to
+select compatible plugins for the newly added device.</p>
+<p>By default, the plugins with the highest priority will be selected.
+Clicking the <strong>ADD DEVICE</strong> button will finalize the process and
+create a new device entry in the device browser.</p>
+</div></blockquote>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-done.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-done.png" />
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Scopy can be connected to multiple IIO devices simultaneously starting
+with v2.0. All the connected or available IIO devices will be available
+in the device browser.</p>
+</div>
+</section>
+<section id="instruments-menu">
+<h4>Instruments Menu<a class="headerlink" href="#instruments-menu" title="Link to this heading">#</a></h4>
+<blockquote>
+<div><p>This left side area can contain multiple sections of instrument lists,
+one for each connected or selected device. It can also be empty if
+no device is connected or selected. If the device is selected but not
+connected, the instruments will be available only as previews, without
+responding to any interaction.</p>
+<p>A device section has a collapsible section displaying the name and URI of
+the device and will contain a list of available instruments for the selected
+device. The instruments for an IIO device are provided by one or multiple
+plugins based on compatibility. (Example: An IIO device containing only
+ADCs will not have the DAC plugin as an available instrument).
+For more details on the Scopy plugin system and existing plugins please
+check below the “Plugins” documentation section.</p>
+</div></blockquote>
+</section>
+<section id="information-window">
+<h4>Information Window<a class="headerlink" href="#information-window" title="Link to this heading">#</a></h4>
+<blockquote>
+<div><p>This area contains the welcome page, add device page and for each device
+a device page.</p>
+<p>The device page will contain context attributes extracted from the
+IIO context, as well as specific buttons or controls that can be provided
+by any compatible plugin (Example: The ADALM2000 has a “Calibrate” button
+which is only specific to this type of device).</p>
+</div></blockquote>
+</section>
+<section id="save-load-session">
+<h4>Save &amp; Load session<a class="headerlink" href="#save-load-session" title="Link to this heading">#</a></h4>
+<blockquote>
+<div><p>Scopy can save or load different configurations in an .ini file format.</p>
+</div></blockquote>
+</section>
+<section id="preferences">
+<h4>Preferences<a class="headerlink" href="#preferences" title="Link to this heading">#</a></h4>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-general-prefs.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-general-prefs.png" />
+<blockquote>
+<div><p>Scopy Preferences can be accessed using the bottom left side <strong>preferences
+button</strong>. On the right side of the page, preferences for each plugin
+are available. More details can be found in their specific plugin
+documentation section.</p>
+<p>Clicking the <strong>Reset Scopy</strong> button will reset the application to a default
+configuration.</p>
+<p>Changing some of the listed preferences will require an application
+restart.</p>
+</div></blockquote>
+</section>
+<section id="about-page">
+<h4>About page<a class="headerlink" href="#about-page" title="Link to this heading">#</a></h4>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-about-page.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-about-page.png" />
+<blockquote>
+<div><p>Scopy About page can be accessed using the bottom left side <strong>about
+button</strong>. On the right side of the page, about pages specific for each
+plugin are available if necessary. More details can be found in their
+specific plugin documentation section.</p>
+<p>The General About page contains different useful links:</p>
+<p><strong>Build info</strong> will display the application version, Git commit,
+build date and whether it was created locally or in a continuous
+integration environment, a list of dependencies and their specific
+versions or Git commit hashes, a list of the last 100 commits and
+the Scopy branch.</p>
+</div></blockquote>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>These are all important in the debugging process and most of this
+information should be specified when reporting an issue.</p>
+</div>
+<blockquote>
+<div><p><strong>License</strong> link to the open-source LICENSE file in the Github
+repository.</p>
+<p><strong>Open-source dependencies list</strong> of Scopy includes a number
+of open source libraries, released under their own licenses.</p>
+</div></blockquote>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-deps-licenses.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-deps-licenses.png" />
+<blockquote>
+<div><p><strong>Latest release</strong> for quick access to the latest Github release page.</p>
+<p><strong>Documentation</strong> for quick access to this documentation.</p>
+<p><strong>Support forum</strong> for quick access to Engineer Zone.</p>
+</div></blockquote>
+</section>
+</section>
+<section id="connecting-to-a-device">
+<h3>Connecting to a device<a class="headerlink" href="#connecting-to-a-device" title="Link to this heading">#</a></h3>
+<p>To connect to any device on the Device Browser click on the device and
+then click the <strong>Connect</strong> button in the <strong>Information Window.</strong></p>
+<p>If the connection was established, the device will have a green status line
+under it and you will be able to disconnect from it in the same <strong>Information
+Window.</strong></p>
+<ul class="simple">
+<li><p>Clicking the <img src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/dev/gui/res/icons/orange_close.svg" alt="Inline image" style="display:inline; vertical-align:middle;"> button will remove the device from the list.</p></li>
+<li><p>The device title can be modified by hovering over the top right
+corner of the icon and clicking the <img src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/dev/gui/res/icons/edit_pen.svg" alt="Inline image" style="display:inline; scale:80%; vertical-align:middle;"> pen icon.</p></li>
+<li><p>If errors are encountered during the connection phase
+a warning sign <img src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/dev/gui/res/icons/warning.svg" alt="Inline image" style="display:inline; width:30px; vertical-align:middle;"> will appear on the top right side of the
+device icon.</p></li>
+</ul>
+</section>
+</section>
+<section id="user-guides">
+<h2>User Guides<a class="headerlink" href="#user-guides" title="Link to this heading">#</a></h2>
+<p>Scopy can now interact with multiple hardware devices at a time. Once a device is
+selected to be used with the application, a list of instruments that are
+available for that device will be visible as a preview. Once connected to a device
+the instruments will be enabled and available.</p>
+<p>Each instrument can be opened from the left menu. The icon on the right of
+the instrument name specifies that the instrument is enabled and provides
+a shortcut that allows an instrument to be turned on or off.</p>
+<p>For each connected device, there is an entry in the left side menu, above
+all the instruments, displaying the <strong>Name</strong> and <strong>URI</strong> of the
+connected device.</p>
+<p>The instruments menu can be minimized by clicking on the <strong>Scopy</strong> button near
+the top-left window.</p>
+<section id="detaching-instruments">
+<h3>Detaching Instruments<a class="headerlink" href="#detaching-instruments" title="Link to this heading">#</a></h3>
+<p>Scopy provides the detaching into multiple windows feature for each instrument
+available, providing a better view/manipulation.</p>
+<p>This can be done by double clicking the instrument to detach it.</p>
+<p>Please make sure that the <strong>Double click to detach</strong> a tool
+option is enabled in the <strong>Preferences</strong> menu.</p>
+</section>
+</section>
+<section id="instruments-overview">
+<h2>Instruments Overview<a class="headerlink" href="#instruments-overview" title="Link to this heading">#</a></h2>
+<p>Scopy provides a list of plugins and instruments
+described <a class="reference internal" href="../plugins/index.html#plugins"><span class="std std-ref">in the Plugins page</span></a></p>
 </section>
 <section id="scripting">
 <h2>Scripting<a class="headerlink" href="#scripting" title="Link to this heading">#</a></h2>
