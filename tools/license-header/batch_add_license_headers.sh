@@ -81,6 +81,10 @@ function process_files() {
         "$add_license_header" "$file" \
             --template "$TEMPLATE_FILE" \
             --params "$PARAMS_FILE"
+        if [[ $? -ne 0 ]]; then
+            echo "Error: Failed to add license header to $file"
+            exit 1
+        fi
     done <"$file_list"
 }
 

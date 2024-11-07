@@ -240,9 +240,10 @@ function main() {
     
     FILE_EXTENSION="${FILE##*.}"
 
-    COMMENT_STYLE=${COMMENT_STYLES[$FILE_EXTENSION]}
+    COMMENT_STYLE=${COMMENT_STYLES[$FILE_EXTENSION]:-}
     if [[ -z "$COMMENT_STYLE" ]]; then
-        echo "Unsupported file extension: $FILE_EXTENSION" >&2
+        echo "Error: Unsupported file extension '${FILE_EXTENSION}' found in file '${FILE}'" >&2
+        echo "Define 'COMMENT_STYLE' for '$FILE_EXTENSION' in .comment_styles.conf" >&2
         exit 1
     fi
 
