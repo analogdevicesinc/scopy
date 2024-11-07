@@ -9,7 +9,6 @@ BASE_DIR_PATH=""
 FILES_WITHOUT_LICENSE=()
 FILE_EXTENSIONS=()
 N_LINES=80 # When searching for license headers, use the first N lines of the file
-VERBOSE=false
 
 # Define colors used for logging
 NC='\033[0m'         # No Color
@@ -38,14 +37,12 @@ Options:
 
     -h, --help          Display this help message.
 
-    -v, --verbose       Display verbose output.
-
 EOF
 }
 
 function parse_arguments() {
-    LONG_OPTS=dirs:,files:,path:,help,verbose
-    OPTIONS=d:f:p:h:v
+    LONG_OPTS=dirs:,files:,path:,help
+    OPTIONS=d:f:p:h
     VALID_ARGS=$(getopt --options=$OPTIONS --longoptions=$LONG_OPTS --name "$0" -- "$@")
 
     if [[ $? -ne 0 ]]; then
@@ -56,7 +53,7 @@ function parse_arguments() {
 
     getopt --test >/dev/null && true
     if [[ $? -ne 4 ]]; then
-        echo "$(getopt --test) failed in this environment."
+        echo "$(getopt --test) failed in this environment."  >&2
         exit 1
     fi
 
@@ -83,10 +80,6 @@ function parse_arguments() {
         -p | --path)
             BASE_DIR_PATH="$2"
             shift 2
-            ;;
-        -v | --verbose)
-            VERBOSE=true
-            shift
             ;;
         --)
             shift
@@ -248,7 +241,8 @@ function identify_license() {
     depth=$(echo "$relative_path" | awk -F'/' '{print NF-1}')
     indent=$(printf "%*s" $((depth * 4)) "")
 
-    local header=$(read_header "$file" "$n_lines" | normalize_text) 
+    # Sanitize the header text -> remove null characters and normalize the text
+    local header=$(read_header "$file" "$n_lines" | tr -d '\0' | normalize_text)
 
     ((total_checks++))
 
@@ -256,9 +250,7 @@ function identify_license() {
         ((no_license_count++))
         FILES_WITHOUT_LICENSE+=("$relative_path")
 
-        if $VERBOSE; then
-            echo -e "${indent}${RED}├── $relative_path (No License)${NC}"
-        fi
+        echo -e "${indent}${RED}├── $relative_path (No License)${NC}"  >&2
         # Stop execution if no license is found
         return 
     fi
@@ -307,21 +299,19 @@ function identify_license() {
         ((unknown_license_count++))
     fi
 
-    if $VERBOSE; then
-        # Join the elements of found_licenses_list with a | separator
-        local joined_licenses=$(
-            IFS='|'
-            echo "${found_licenses_list[*]}"
-        )
+    # Join the elements of found_licenses_list with a | separator
+    local joined_licenses=$(
+        IFS='|'
+        echo "${found_licenses_list[*]}"
+    )
 
-        # Check if the joined string is empty
-        if [ -z "$joined_licenses" ]; then
-            joined_licenses="Unknown"
-        fi
-
-        # Update the echo command to use the joined string
-        echo -e "${indent}${color}├── $relative_path (${joined_licenses})${NC}"
+    # Check if the joined string is empty
+    if [ -z "$joined_licenses" ]; then
+        joined_licenses="Unknown"
     fi
+
+    # Update the echo command to use the joined string
+    echo -e "${indent}${color}├── $relative_path (${joined_licenses})${NC}" >&2
 
     local found=false
     for license in "${found_licenses_list[@]}"; do
@@ -346,16 +336,16 @@ function scan_directory() {
     # Use the --build option to exclude directories
     if [ ${#OMITTED_DIRS[@]} -gt 0 ]; then
         for dir in "${OMITTED_DIRS[@]}"; do
-            dir_excludes+=(-o -iname "$dir")
+            dir_excludes+=(-o -iwholename "$dir")
         done
-        dir_excludes=(-type d \( -iname "${dir_excludes[@]:2}" \) -prune)
+        dir_excludes=(-type d \( -iwholename "${dir_excludes[@]:2}" \) -prune)
     fi
     # Use the --files option to exclude figles
     if [ ${#OMITTED_FILES[@]} -gt 0 ]; then
         for file in "${OMITTED_FILES[@]}"; do
-            file_excludes+=(-o -iname "$file")
+            file_excludes+=(-o -iwholename "$file")
         done
-        file_excludes=(-type f ! \( -iname "${file_excludes[@]:2}" \))
+        file_excludes=(-type f ! \( -iwholename "${file_excludes[@]:2}" \))
     fi
 
     # Build the find command
@@ -393,41 +383,38 @@ function main() {
     unknown_license_count=0
 
     # Store the number of unique file extensions
-    if $VERBOSE; then
-        # Find all files recursively in the base directory and extract unique file extensions
-        mapfile -t FILE_EXTENSIONS < <(scan_directory "$BASE_DIR_PATH" -type f | awk -F. '{if (NF>1) print $NF}' | sort -u)
-        echo "Unique file extensions: ${FILE_EXTENSIONS[*]}"
-    fi
+    # Find all files recursively in the base directory and extract unique file extensions
+    mapfile -t FILE_EXTENSIONS < <(scan_directory "$BASE_DIR_PATH" -type f | awk -F. '{if (NF>1) print $NF}' | sort -u)
+    echo "Unique file extensions: ${FILE_EXTENSIONS[*]}" >&2
 
+    echo "Scanning project for license headers from path: $BASE_DIR_PATH ..." >&2
     while read -r file; do
         if [[ -f "$file" ]]; then
             identify_license "$file" "$N_LINES"
         fi
     done < <(scan_directory "$BASE_DIR_PATH" | sort)
 
-    if $VERBOSE; then
-        echo -e "##################################################"
-        echo -e "License count summary:"
-        echo -e "LGPL : [$lgpl_count/$total_checks]"
-        echo -e "Scopy_GPL: [$scopy_gpl_count/$total_checks]"
-        echo -e "GPL: [$gpl_count/$total_checks]"
-        echo -e "ADI-BSD: [$adi_bsd_count/$total_checks]"
-        echo -e "GNU Radio: [$gr_count/$total_checks]"
-        echo -e "No-license: [$no_license_count/$total_checks]"
-        echo -e "Unknown-license: [$unknown_license_count/$total_checks]\n"
-        echo "Scanning project for license headers from path: $BASE_DIR_PATH ..." >&2
-    fi
-
+    echo -e "##################################################" >&2
+    echo -e "License count summary:" >&2
+    echo -e "LGPL : [$lgpl_count/$total_checks]" >&2
+    echo -e "Scopy_GPL: [$scopy_gpl_count/$total_checks]" >&2
+    echo -e "GPL: [$gpl_count/$total_checks]" >&2
+    echo -e "ADI-BSD: [$adi_bsd_count/$total_checks]" >&2
+    echo -e "GNU Radio: [$gr_count/$total_checks]" >&2
+    echo -e "No-license: [$no_license_count/$total_checks]" >&2
+    echo -e "Unknown-license: [$unknown_license_count/$total_checks]\n" >&2
+    echo -e "##################################################" >&2
     if [ ${#FILES_WITHOUT_LICENSE[@]} -gt 0 ]; then
         for file in "${FILES_WITHOUT_LICENSE[@]}"; do
             echo -e "$BASE_DIR_PATH/$file"
         done
         exit 1
+    else
+        echo "All files have a form of license." >&2
     fi
-
-    echo "All files have a license."
+    echo -e "##################################################" >&2
     if [ "$total_checks" -ne "$scopy_gpl_count" ]; then
-        echo "Error: Not all files have the Scopy GPL license."
+        echo "Error: Not all files have the Scopy GPL license."  >&2
         exit 1
     fi
     exit 0
