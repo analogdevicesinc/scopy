@@ -46,6 +46,7 @@
 #include <QFutureWatcher>
 #include <QTabWidget>
 #include <QtConcurrentRun>
+#include <style.h>
 
 #include <libm2k/m2kexceptions.hpp>
 #include <libsigrokdecode/libsigrokdecode.h>
@@ -1258,6 +1259,12 @@ void LogicAnalyzer::setupUi()
 	// Hide the run button
 	//	ui->runSingleWidget->enableRunButton(false);
 
+	// this size has been set to fit all menu widgets
+	ui->generalSettings->setMinimumWidth(350);
+
+	Style::setBackgroundColor(ui->groupSizeSpinBox, Style::getAttribute(json::theme::background_primary), true);
+	Style::setBackgroundColor(ui->groupOffsetSpinBox, Style::getAttribute(json::theme::background_primary), true);
+
 	int gsettings_panel = ui->stackedWidget->indexOf(ui->generalSettings);
 	ui->btnGeneralSettings->setProperty("id", QVariant(-gsettings_panel));
 
@@ -1278,9 +1285,6 @@ void LogicAnalyzer::setupUi()
 
 	// default trigger menu?
 	m_menuOrder.push_back(ui->btnTrigger);
-
-	// set default menu width to 0
-	ui->rightMenu->setMaximumWidth(0);
 
 	// Plot positioning and settings
 	m_plot.disableLegend();
@@ -1884,6 +1888,7 @@ void LogicAnalyzer::settingsPanelUpdate(int id)
 		QWidget *widget = ui->stackedWidget->widget(i);
 		widget->setSizePolicy(policy, policy);
 	}
+
 	ui->stackedWidget->adjustSize();
 }
 
