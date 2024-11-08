@@ -446,7 +446,7 @@
               <number>0</number>
              </property>
              <property name="topMargin">
-              <number>20</number>
+              <number>0</number>
              </property>
              <property name="rightMargin">
               <number>0</number>
@@ -480,16 +480,16 @@
                   <number>15</number>
                  </property>
                  <property name="leftMargin">
-                  <number>20</number>
+                  <number>10</number>
                  </property>
                  <property name="topMargin">
-                  <number>20</number>
+                  <number>10</number>
                  </property>
                  <property name="rightMargin">
-                  <number>0</number>
+                  <number>10</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>20</number>
+                  <number>10</number>
                  </property>
                  <item>
                   <widget class="QScrollArea" name="scrollArea">
@@ -516,8 +516,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>300</width>
-                      <height>474</height>
+                      <width>280</width>
+                      <height>536</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -549,7 +549,7 @@
                       <number>0</number>
                      </property>
                      <property name="rightMargin">
-                      <number>10</number>
+                      <number>0</number>
                      </property>
                      <property name="bottomMargin">
                       <number>0</number>
@@ -943,16 +943,16 @@ color: rgba(255,255,255,51);
                   <number>15</number>
                  </property>
                  <property name="leftMargin">
-                  <number>20</number>
+                  <number>10</number>
                  </property>
                  <property name="topMargin">
-                  <number>20</number>
+                  <number>10</number>
                  </property>
                  <property name="rightMargin">
-                  <number>20</number>
+                  <number>10</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>20</number>
+                  <number>10</number>
                  </property>
                  <item>
                   <widget class="QLabel" name="label_9">
@@ -1342,16 +1342,16 @@ color: rgba(255,255,255,51);
                   <number>15</number>
                  </property>
                  <property name="leftMargin">
-                  <number>20</number>
+                  <number>10</number>
                  </property>
                  <property name="topMargin">
-                  <number>20</number>
+                  <number>10</number>
                  </property>
                  <property name="rightMargin">
-                  <number>20</number>
+                  <number>10</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>20</number>
+                  <number>10</number>
                  </property>
                  <item>
                   <widget class="QScrollArea" name="generalSettingsScrollArea">
@@ -1372,7 +1372,7 @@ color: rgba(255,255,255,51);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>220</width>
+                      <width>200</width>
                       <height>134</height>
                      </rect>
                     </property>
@@ -1393,7 +1393,7 @@ color: rgba(255,255,255,51);
                       <number>0</number>
                      </property>
                      <property name="rightMargin">
-                      <number>20</number>
+                      <number>0</number>
                      </property>
                      <property name="bottomMargin">
                       <number>0</number>
@@ -1814,7 +1814,6 @@ QPushButton:checked { border-image: url(:/gui/icons/setup_btn_checked.svg); }</s
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../gui/res/resources.qrc"/>
   <include location="../../../gui/res/resources.qrc"/>
  </resources>
  <connections>

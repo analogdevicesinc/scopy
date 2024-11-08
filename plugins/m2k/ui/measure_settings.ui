@@ -24,16 +24,16 @@
     <number>0</number>
    </property>
    <property name="leftMargin">
-    <number>18</number>
+    <number>10</number>
    </property>
    <property name="topMargin">
     <number>10</number>
    </property>
    <property name="rightMargin">
-    <number>8</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>10</number>
    </property>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -47,93 +47,99 @@
       <number>0</number>
      </property>
      <item>
-      <layout class="QHBoxLayout" name="hLayout_titleBar">
+      <layout class="QVBoxLayout" name="verticalLayout_5">
        <property name="spacing">
+        <number>15</number>
+       </property>
+       <property name="leftMargin">
         <number>0</number>
        </property>
+       <property name="rightMargin">
+        <number>10</number>
+       </property>
        <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Measure</string>
+        <layout class="QHBoxLayout" name="hLayout_titleBar">
+         <property name="spacing">
+          <number>0</number>
          </property>
-         <property name="general_settings_label" stdset="0">
-          <bool>true</bool>
+         <property name="leftMargin">
+          <number>0</number>
          </property>
-        </widget>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Measure</string>
+           </property>
+           <property name="general_settings_label" stdset="0">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblChanName">
+           <property name="text">
+            <string>Channel</string>
+           </property>
+           <property name="general_settings_label" stdset="0">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+        <widget class="Line" name="line">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <property name="sizeHint" stdset="0">
+         <property name="minimumSize">
           <size>
-           <width>40</width>
-           <height>0</height>
+           <width>0</width>
+           <height>2</height>
           </size>
          </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QLabel" name="lblChanName">
-         <property name="text">
-          <string>Channel</string>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>2</height>
+          </size>
          </property>
-         <property name="general_settings_label" stdset="0">
-          <bool>true</bool>
+         <property name="styleSheet">
+          <string notr="true">border: 2px solid rgb(255, 114, 0);</string>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
       </layout>
      </item>
      <item>
-      <spacer name="verticalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>0</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="Line" name="line">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>2</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>2</height>
-        </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 2px solid rgb(255, 114, 0);</string>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QScrollArea" name="scrollArea">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -153,7 +159,7 @@
           <x>0</x>
           <y>0</y>
           <width>311</width>
-          <height>674</height>
+          <height>667</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -189,21 +195,21 @@
            <property name="horizontalSpacing">
             <number>0</number>
            </property>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_6">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+           <item row="0" column="0" colspan="2">
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
              </property>
-             <property name="text">
-              <string>MEASUREMENTS </string>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
              </property>
-             <property name="subsection_label" stdset="0">
-              <bool>true</bool>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
              </property>
-            </widget>
+            </spacer>
            </item>
            <item row="1" column="1">
             <widget class="Line" name="line_2">
@@ -237,21 +243,21 @@
              </property>
             </spacer>
            </item>
-           <item row="0" column="0" colspan="2">
-            <spacer name="verticalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_6">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
              </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
+             <property name="text">
+              <string>MEASUREMENTS </string>
              </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
+             <property name="subsection_label" stdset="0">
+              <bool>true</bool>
              </property>
-            </spacer>
+            </widget>
            </item>
           </layout>
          </item>
