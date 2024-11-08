@@ -747,7 +747,7 @@ border: 5px solid gray;
           <item>
            <widget class="scopy::MenuHAnim" name="rightMenu" native="true">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -789,7 +789,7 @@ border: 5px solid gray;
                 </size>
                </property>
                <property name="currentIndex">
-                <number>0</number>
+                <number>2</number>
                </property>
                <widget class="QWidget" name="page_3">
                 <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -833,8 +833,8 @@ border: 5px solid gray;
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>340</width>
-                      <height>1036</height>
+                      <width>577</width>
+                      <height>1016</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -851,16 +851,16 @@ border: 5px solid gray;
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_11">
                      <property name="leftMargin">
-                      <number>20</number>
+                      <number>10</number>
                      </property>
                      <property name="topMargin">
-                      <number>20</number>
+                      <number>10</number>
                      </property>
                      <property name="rightMargin">
-                      <number>20</number>
+                      <number>10</number>
                      </property>
                      <property name="bottomMargin">
-                      <number>20</number>
+                      <number>10</number>
                      </property>
                      <item>
                       <widget class="QLabel" name="label_5">
@@ -2015,16 +2015,16 @@ padding-left: 20px;
                   <number>0</number>
                  </property>
                  <property name="leftMargin">
-                  <number>20</number>
+                  <number>0</number>
                  </property>
                  <property name="topMargin">
-                  <number>20</number>
+                  <number>0</number>
                  </property>
                  <property name="rightMargin">
-                  <number>20</number>
+                  <number>0</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>20</number>
+                  <number>0</number>
                  </property>
                  <item>
                   <widget class="QScrollArea" name="scrollArea_2">
@@ -2042,11 +2042,23 @@ padding-left: 20px;
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>261</width>
-                      <height>529</height>
+                      <width>591</width>
+                      <height>599</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_23">
+                     <property name="leftMargin">
+                      <number>10</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>10</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>10</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>10</number>
+                     </property>
                      <item>
                       <widget class="QLabel" name="label_7">
                        <property name="text">
@@ -2651,10 +2663,16 @@ padding-left: 20px;
                <widget class="QWidget" name="page_5">
                 <layout class="QVBoxLayout" name="verticalLayout_12">
                  <property name="leftMargin">
-                  <number>18</number>
+                  <number>10</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>10</number>
                  </property>
                  <property name="rightMargin">
-                  <number>18</number>
+                  <number>10</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>10</number>
                  </property>
                  <item>
                   <widget class="QLabel" name="label_8">
@@ -3150,6 +3168,11 @@ QLabel {
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>scopy::SmallOnOffSwitch</class>
+   <extends>QPushButton</extends>
+   <header>gui/smallOnOffSwitch.h</header>
+  </customwidget>
+  <customwidget>
    <class>scopy::dBgraph</class>
    <extends>QFrame</extends>
    <header>dbgraph.hpp</header>
@@ -3167,14 +3190,8 @@ QLabel {
    <header>m2k-gui/customplotpositionbutton.h</header>
    <container>1</container>
   </customwidget>
-  <customwidget>
-   <class>scopy::SmallOnOffSwitch</class>
-   <extends>QPushButton</extends>
-   <header>gui/smallOnOffSwitch.h</header>
-  </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../gui/res/resources.qrc"/>
   <include location="../../../gui/res/resources.qrc"/>
  </resources>
  <connections/>

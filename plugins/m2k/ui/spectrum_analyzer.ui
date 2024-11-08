@@ -490,7 +490,7 @@ min-width: 6em;
            <item>
             <widget class="QStackedWidget" name="stackedWidget">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -504,16 +504,16 @@ min-width: 6em;
                 <number>15</number>
                </property>
                <property name="leftMargin">
-                <number>20</number>
+                <number>10</number>
                </property>
                <property name="topMargin">
-                <number>25</number>
+                <number>10</number>
                </property>
                <property name="rightMargin">
-                <number>20</number>
+                <number>10</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>10</number>
                </property>
                <item>
                 <widget class="QLabel" name="channelSettingsTitle">
@@ -888,16 +888,16 @@ min-width: 64px;
                 <number>0</number>
                </property>
                <property name="leftMargin">
-                <number>18</number>
+                <number>10</number>
                </property>
                <property name="topMargin">
-                <number>20</number>
+                <number>10</number>
                </property>
                <property name="rightMargin">
-                <number>18</number>
+                <number>10</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>10</number>
                </property>
                <item>
                 <widget class="QLabel" name="labelGeneralSettingsTitle">
@@ -1014,16 +1014,16 @@ min-width: 64px;
                 <number>0</number>
                </property>
                <property name="leftMargin">
-                <number>18</number>
+                <number>0</number>
                </property>
                <property name="topMargin">
-                <number>20</number>
+                <number>10</number>
                </property>
                <property name="rightMargin">
-                <number>18</number>
+                <number>0</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>10</number>
                </property>
                <item>
                 <widget class="QScrollArea" name="scrollArea">
@@ -1033,6 +1033,9 @@ min-width: 64px;
                  <property name="horizontalScrollBarPolicy">
                   <enum>Qt::ScrollBarAlwaysOff</enum>
                  </property>
+                 <property name="sizeAdjustPolicy">
+                  <enum>QAbstractScrollArea::AdjustToContents</enum>
+                 </property>
                  <property name="widgetResizable">
                   <bool>true</bool>
                  </property>
@@ -1041,8 +1044,8 @@ min-width: 64px;
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>298</width>
-                    <height>523</height>
+                    <width>336</width>
+                    <height>545</height>
                    </rect>
                   </property>
                   <property name="sizePolicy">
@@ -1052,10 +1055,22 @@ min-width: 64px;
                    </sizepolicy>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_16">
+                   <property name="leftMargin">
+                    <number>10</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>10</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
                    <item>
                     <layout class="QHBoxLayout" name="hLayout_title">
                      <property name="bottomMargin">
-                      <number>14</number>
+                      <number>9</number>
                      </property>
                      <item>
                       <widget class="QLabel" name="labelSettingsTitle">
@@ -1112,6 +1127,12 @@ min-width: 64px;
                    </item>
                    <item>
                     <widget class="scopy::CustomSwitch" name="logBtn">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton {
 min-width: 280px;
@@ -1567,16 +1588,16 @@ color: rgba(255,255,255,51);
                 <number>0</number>
                </property>
                <property name="leftMargin">
-                <number>18</number>
+                <number>0</number>
                </property>
                <property name="topMargin">
-                <number>20</number>
+                <number>10</number>
                </property>
                <property name="rightMargin">
-                <number>18</number>
+                <number>0</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>10</number>
                </property>
                <item>
                 <widget class="QScrollArea" name="scrollArea_2">
@@ -1594,11 +1615,23 @@ color: rgba(255,255,255,51);
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>268</width>
-                    <height>547</height>
+                    <width>336</width>
+                    <height>545</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_17">
+                   <property name="leftMargin">
+                    <number>10</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>10</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
                    <item>
                     <layout class="QHBoxLayout" name="hLayout_markers_title">
                      <property name="bottomMargin">
@@ -2113,16 +2146,16 @@ border-width: 0px;
              <widget class="QWidget" name="addReference">
               <layout class="QVBoxLayout" name="verticalLayout_13">
                <property name="leftMargin">
-                <number>18</number>
+                <number>10</number>
                </property>
                <property name="topMargin">
-                <number>20</number>
+                <number>10</number>
                </property>
                <property name="rightMargin">
-                <number>18</number>
+                <number>10</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>10</number>
                </property>
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_14">
