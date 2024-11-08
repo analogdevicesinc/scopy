@@ -1,4 +1,4 @@
-QLineEdit {
+QLineEdit[&&property&&=true] {
 	background-color: transparent;
 	color: &content_default&;
 	font-size: 15px;
@@ -9,6 +9,6 @@ QLineEdit {
 	padding-bottom: 4px;
 }
 
-QLineEdit:disabled {
+QLineEdit[&&property&&=true]:disabled {
 	color: &content_subtle&;
 }

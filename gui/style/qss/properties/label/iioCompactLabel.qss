@@ -1,4 +1,4 @@
-QLabel {
+QLabel[&&property&&=true] {
 	color: &content_default&;
 	background-color: rgba(255,255,255,0);
 	font-weight: 500;
@@ -7,6 +7,6 @@ QLabel {
 	font-style: normal;
 }
 
-QLabel:disabled {
+QLabel[&&property&&=true]:disabled {
 	color: grey;
 }
