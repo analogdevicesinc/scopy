@@ -898,16 +898,16 @@ QLabel{font-size:35pt;}</string>
          <number>0</number>
         </property>
         <property name="leftMargin">
-         <number>25</number>
+         <number>0</number>
         </property>
         <property name="topMargin">
-         <number>20</number>
+         <number>10</number>
         </property>
         <property name="rightMargin">
-         <number>5</number>
+         <number>0</number>
         </property>
         <property name="bottomMargin">
-         <number>0</number>
+         <number>10</number>
         </property>
         <item>
          <widget class="QScrollArea" name="scrollArea">
@@ -932,6 +932,9 @@ QLabel{font-size:35pt;}</string>
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
           </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustToContents</enum>
+          </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
@@ -955,7 +958,7 @@ QLabel{font-size:35pt;}</string>
              <number>15</number>
             </property>
             <property name="leftMargin">
-             <number>0</number>
+             <number>10</number>
             </property>
             <property name="topMargin">
              <number>0</number>
@@ -2032,7 +2035,6 @@ line-height: 14px;
  </customwidgets>
  <resources>
   <include location="../../../gui/res/resources.qrc"/>
-  <include location="../../../gui/res/resources.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -2069,7 +2071,7 @@ line-height: 14px;
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>
