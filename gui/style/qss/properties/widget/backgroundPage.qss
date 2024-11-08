@@ -1,3 +1,0 @@
-.QWidget {
-	background-color: &background_primary&;
-}
