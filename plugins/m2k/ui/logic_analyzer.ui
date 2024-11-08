@@ -476,7 +476,7 @@
                 <string notr="true"/>
                </property>
                <property name="currentIndex">
-                <number>1</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="channelSettings">
                 <property name="minimumSize">
@@ -490,16 +490,16 @@
                   <number>15</number>
                  </property>
                  <property name="leftMargin">
-                  <number>20</number>
+                  <number>0</number>
                  </property>
                  <property name="topMargin">
-                  <number>20</number>
+                  <number>0</number>
                  </property>
                  <property name="rightMargin">
-                  <number>10</number>
+                  <number>0</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>20</number>
+                  <number>0</number>
                  </property>
                  <item>
                   <widget class="QScrollArea" name="scrollArea">
@@ -526,8 +526,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>200</width>
-                      <height>360</height>
+                      <width>400</width>
+                      <height>604</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -553,16 +553,16 @@
                       <number>15</number>
                      </property>
                      <property name="leftMargin">
-                      <number>0</number>
+                      <number>10</number>
                      </property>
                      <property name="topMargin">
-                      <number>0</number>
+                      <number>10</number>
                      </property>
                      <property name="rightMargin">
                       <number>10</number>
                      </property>
                      <property name="bottomMargin">
-                      <number>0</number>
+                      <number>10</number>
                      </property>
                      <item>
                       <widget class="QLabel" name="label_5">
@@ -930,16 +930,16 @@ border-color: grey;
                   <number>15</number>
                  </property>
                  <property name="leftMargin">
-                  <number>20</number>
+                  <number>10</number>
                  </property>
                  <property name="topMargin">
-                  <number>20</number>
+                  <number>10</number>
                  </property>
                  <property name="rightMargin">
-                  <number>20</number>
+                  <number>10</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>20</number>
+                  <number>10</number>
                  </property>
                  <item>
                   <widget class="QLabel" name="label_9">
@@ -1382,16 +1382,16 @@ color: rgba(255,255,255,51);
                   <number>15</number>
                  </property>
                  <property name="leftMargin">
-                  <number>20</number>
+                  <number>0</number>
                  </property>
                  <property name="topMargin">
-                  <number>20</number>
+                  <number>0</number>
                  </property>
                  <property name="rightMargin">
                   <number>0</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>20</number>
+                  <number>0</number>
                  </property>
                  <item>
                   <widget class="QScrollArea" name="generalSettingsScrollArea">
@@ -1415,8 +1415,8 @@ color: rgba(255,255,255,51);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>320</width>
-                      <height>304</height>
+                      <width>522</width>
+                      <height>604</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1430,16 +1430,16 @@ color: rgba(255,255,255,51);
                       <number>15</number>
                      </property>
                      <property name="leftMargin">
-                      <number>0</number>
+                      <number>10</number>
                      </property>
                      <property name="topMargin">
-                      <number>0</number>
+                      <number>10</number>
                      </property>
                      <property name="rightMargin">
-                      <number>20</number>
+                      <number>10</number>
                      </property>
                      <property name="bottomMargin">
-                      <number>0</number>
+                      <number>10</number>
                      </property>
                      <item>
                       <widget class="QLabel" name="label_3">
@@ -1802,16 +1802,16 @@ color: rgba(255,255,255,51);
                   <number>0</number>
                  </property>
                  <property name="leftMargin">
-                  <number>0</number>
+                  <number>10</number>
                  </property>
                  <property name="topMargin">
                   <number>10</number>
                  </property>
                  <property name="rightMargin">
-                  <number>0</number>
+                  <number>10</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>0</number>
+                  <number>10</number>
                  </property>
                  <item>
                   <layout class="QVBoxLayout" name="wDecoderSettingsContainer">
@@ -1833,10 +1833,10 @@ color: rgba(255,255,255,51);
                       <number>6</number>
                      </property>
                      <property name="leftMargin">
-                      <number>10</number>
+                      <number>0</number>
                      </property>
                      <property name="rightMargin">
-                      <number>10</number>
+                      <number>0</number>
                      </property>
                      <item>
                       <widget class="QPushButton" name="btnCollapseSettings">
@@ -1911,6 +1911,12 @@ color: rgba(255,255,255,51);
                      <layout class="QGridLayout" name="wDecoderSettings" columnstretch="0,0" columnminimumwidth="150,0">
                       <property name="sizeConstraint">
                        <enum>QLayout::SetMinimumSize</enum>
+                      </property>
+                      <property name="leftMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>0</number>
                       </property>
                       <property name="bottomMargin">
                        <number>2</number>
@@ -2123,13 +2129,13 @@ color: rgba(255,255,255,51);
                     <number>2</number>
                    </property>
                    <property name="leftMargin">
-                    <number>10</number>
+                    <number>0</number>
                    </property>
                    <property name="topMargin">
                     <number>0</number>
                    </property>
                    <property name="rightMargin">
-                    <number>10</number>
+                    <number>0</number>
                    </property>
                    <property name="bottomMargin">
                     <number>0</number>
@@ -2171,10 +2177,10 @@ color: rgba(255,255,255,51);
                     <number>0</number>
                    </property>
                    <property name="leftMargin">
-                    <number>6</number>
+                    <number>0</number>
                    </property>
                    <property name="rightMargin">
-                    <number>6</number>
+                    <number>0</number>
                    </property>
                    <item>
                     <widget class="scopy::m2k::logic::DecoderTable" name="decoderTableView">
