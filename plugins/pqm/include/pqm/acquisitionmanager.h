@@ -70,7 +70,8 @@ private:
 	void setData(QMap<QString, QMap<QString, QString>>);
 	void setProcessData(bool val);
 	void storeProcessData();
-	void computeAdjustedAngle(const QString &attrName, QString &angle);
+	void adjustMap(const QString &attr, std::function<void(QString &)> adjuster);
+	static void computeAdjustedAngle(QString &angle);
 
 	iio_context *m_ctx;
 	iio_buffer *m_buffer;

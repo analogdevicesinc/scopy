@@ -130,6 +130,7 @@ void AcquisitionManager::readData()
 			setProcessData(true);
 		}
 		m_attrHaveBeenRead = readPqmAttributes();
+		adjustMap("angle", &AcquisitionManager::computeAdjustedAngle);
 	}
 	if(m_tools["waveform"]) {
 		if(m_processData.load()) {
@@ -163,9 +164,7 @@ bool AcquisitionManager::readPqmAttributes()
 		for(int j = 0; j < attrNo; j++) {
 			attrName = iio_channel_get_attr(chnl, j);
 			iio_channel_attr_read(chnl, attrName, dest, MAX_ATTR_SIZE);
-			QString attrValue(dest);
-			computeAdjustedAngle(attrName, attrValue);
-			m_pqmAttr[chnlId][attrName] = attrValue;
+			m_pqmAttr[chnlId][attrName] = QString(dest);
 			m_pqmLog->acquireAttrData(attrName, dest, chnlId);
 		}
 	}
@@ -301,11 +300,8 @@ void AcquisitionManager::storeProcessData()
 	m_processData.store(val);
 }
 
-void AcquisitionManager::computeAdjustedAngle(const QString &attrName, QString &angle)
+void AcquisitionManager::computeAdjustedAngle(QString &angle)
 {
-	if(attrName.compare("angle") != 0) {
-		return;
-	}
 	bool ok = false;
 	double adjustedAngle = angle.toDouble(&ok);
 	if(!ok) {
@@ -315,6 +311,16 @@ void AcquisitionManager::computeAdjustedAngle(const QString &attrName, QString &
 	// performed
 	adjustedAngle = 360 - adjustedAngle;
 	angle = QString::number(adjustedAngle);
+}
+
+void AcquisitionManager::adjustMap(const QString &attr, std::function<void(QString &value)> adjuster)
+{
+	for(auto it = m_pqmAttr.begin(); it != m_pqmAttr.end(); ++it) {
+		if(!it.value().contains(attr)) {
+			continue;
+		}
+		adjuster(it.value()[attr]);
+	}
 }
 
 bool AcquisitionManager::hasFwVers() const { return m_hasFwVers; }
