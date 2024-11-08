@@ -69,6 +69,7 @@ OMIT_FILES_LIST=(
     \*.bin
     \*.xml
     \*.cmakein
+    \*.qss
     # Files specific to your local environment that are not part of the repository
     \*.build
     \*.git
