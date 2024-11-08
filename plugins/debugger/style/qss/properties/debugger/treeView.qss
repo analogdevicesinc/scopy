@@ -5,7 +5,7 @@ QTreeView[&&property&&=true] {
 	show-decoration-selected: 0;
 }
 
-QTreeView::item:selected {
+QTreeView::item[&&property&&=true]:selected {
 	background-color: &interactive_primary_idle&;
 }
 

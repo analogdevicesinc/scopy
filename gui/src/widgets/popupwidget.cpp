@@ -75,7 +75,8 @@ void PopupWidget::initUI()
 
 	backgroundWidget->setLayout(backgroundLayout);
 
-	Style::setStyle(m_titleLabel, style::properties::label::tutorialChapterTitle);
+	Style::setStyle(m_titleLabel, style::properties::label::tutorialChapter);
+	Style::setStyle(m_descriptionTextBrowser, style::properties::label::tutorialChapter);
 	Style::setStyle(m_continueButton, style::properties::button::basicButton, true, true);
 	Style::setStyle(m_exitButton, style::properties::button::basicButton, true, true);
 	Style::setStyle(this, style::properties::widget::overlayMenu);
