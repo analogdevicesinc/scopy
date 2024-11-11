@@ -41,7 +41,7 @@ PqmDataLogger::PqmDataLogger(QObject *parent)
 
 PqmDataLogger::~PqmDataLogger() {}
 
-void PqmDataLogger::setChnlsName(QVector<QString> chnlsName) { m_chnlsName = chnlsName.toList(); }
+void PqmDataLogger::setChnlsName(QStringList chnlsName) { m_chnlsName = chnlsName; }
 
 void PqmDataLogger::acquireBufferData(double val, int chIdx)
 {
@@ -55,9 +55,9 @@ void PqmDataLogger::acquireBufferData(double val, int chIdx)
 	m_logQue.enqueue(QString::number(val) + "\t");
 }
 
-void PqmDataLogger::acquireHarmonics(QString value, QString chId)
+void PqmDataLogger::acquireHarmonics(QString attrName, QString value, QString chId)
 {
-	if(m_crtInstr != Harmonics) {
+	if(attrName.compare("harmonics") != 0) {
 		return;
 	}
 	QMutexLocker locker(&m_mutex);
@@ -67,9 +67,18 @@ void PqmDataLogger::acquireHarmonics(QString value, QString chId)
 
 void PqmDataLogger::acquireAttrData(QString attrName, QString value, QString chId)
 {
-	if(attrName.compare("harmonics") == 0) {
-		acquireHarmonics(value, chId);
+	if(m_crtInstr == Harmonics) {
+		acquireHarmonics(attrName, value, chId);
 	}
+}
+
+void PqmDataLogger::acquirePqEvents(QString event)
+{
+	if(m_crtInstr == None) {
+		return;
+	}
+	QMutexLocker locker(&m_mutex);
+	m_logQue.enqueue("\n PQEvents \n" + event + "\n");
 }
 
 void PqmDataLogger::log()
