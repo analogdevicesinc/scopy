@@ -55,6 +55,7 @@ Q_SIGNALS:
 	void pqmAttrsAvailable(QMap<QString, QMap<QString, QString>>);
 	void bufferDataAvailable(QMap<QString, QVector<double>>);
 	void logData(PqmDataLogger::ActiveInstrument instr, const QString &filePath);
+	void pqEvent();
 
 private Q_SLOTS:
 	void futureReadData();
@@ -70,6 +71,7 @@ private:
 	void setData(QMap<QString, QMap<QString, QString>>);
 	void setProcessData(bool val);
 	void storeProcessData();
+	void handlePQEvents();
 	void adjustMap(const QString &attr, std::function<void(QString &)> adjuster);
 	static void computeAdjustedAngle(QString &angle);
 
@@ -83,7 +85,8 @@ private:
 	QFutureWatcher<void> *m_setFw;
 
 	QMutex m_mutex;
-	QVector<QString> m_chnlsName;
+	QStringList m_buffChnls;
+	QStringList m_eventsChnls;
 	QMap<QString, QMap<QString, QString>> m_pqmAttr;
 	QMap<QString, QVector<double>> m_bufferData;
 	QMap<QString, bool> m_tools = {{"rms", false}, {"harmonics", false}, {"waveform", false}, {"settings", false}};
