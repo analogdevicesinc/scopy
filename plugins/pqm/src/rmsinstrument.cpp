@@ -30,8 +30,12 @@
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/tooltemplate.h>
 #include <QDesktopServices>
+#include <QDir>
+#include <QFileDialog>
 #include <QLoggingCategory>
 #include <style.h>
+#include <menuheader.h>
+#include <menulineedit.h>
 
 Q_LOGGING_CATEGORY(CAT_PQM_RMS, "PqmRms")
 
@@ -53,6 +57,8 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	tool->topContainer()->setVisible(true);
 	tool->centralContainer()->setVisible(true);
 	tool->topContainerMenuControl()->setVisible(false);
+	tool->rightContainer()->setVisible(true);
+	tool->setRightContainerWidth(280);
 	instrumentLayout->addWidget(tool);
 
 	InfoBtn *infoBtn = new InfoBtn(this);
@@ -111,11 +117,16 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 
 	tool->addWidgetToCentralContainerHelper(central);
 
+	GearBtn *settingsBtn = new GearBtn(this);
+	settingsBtn->setChecked(true);
+	tool->rightStack()->add("settings", createSettingsMenu(this));
+	connect(settingsBtn, &QPushButton::toggled, this, [=, this](bool b) { tool->openRightContainerHelper(b); });
 	m_runBtn = new RunBtn(this);
 	m_singleBtn = new SingleShotBtn(this);
 
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
+	tool->addWidgetToTopContainerHelper(settingsBtn, TTA_RIGHT);
 
 	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
 	connect(this, &RmsInstrument::enableTool, m_tme, &ToolMenuEntry::setRunning);
@@ -254,6 +265,69 @@ void RmsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> data)
 	if(m_singleBtn->isChecked()) {
 		m_singleBtn->setChecked(false);
 	}
+}
+
+QWidget *RmsInstrument::createSettingsMenu(QWidget *parent)
+{
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setMargin(0);
+	layout->setSpacing(10);
+
+	MenuHeaderWidget *header = new MenuHeaderWidget(
+		"Settings", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), widget);
+	QWidget *logSection = createMenuLogSection(widget);
+
+	layout->addWidget(header);
+	layout->addWidget(logSection);
+	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	return widget;
+}
+
+QWidget *RmsInstrument::createMenuLogSection(QWidget *parent)
+{
+	MenuSectionCollapseWidget *logSection = new MenuSectionCollapseWidget(
+		"LOG", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, parent);
+	logSection->contentLayout()->setSpacing(10);
+	logSection->setCollapsed(true);
+
+	QWidget *browseWidget = new QWidget(logSection);
+	browseWidget->setLayout(new QHBoxLayout(browseWidget));
+	browseWidget->layout()->setMargin(0);
+
+	MenuLineEdit *logFilePath = new MenuLineEdit(browseWidget);
+	logFilePath->edit()->setPlaceholderText("Select log directory");
+	QPushButton *browseBtn = new QPushButton("...", browseWidget);
+	StyleHelper::BrowseButton(browseBtn);
+
+	browseWidget->layout()->addWidget(logFilePath);
+	browseWidget->layout()->addWidget(browseBtn);
+
+	connect(this, &RmsInstrument::enableTool, this, [this, logFilePath, logSection](bool en) {
+		logSection->setDisabled(en);
+		QString dirPath = logFilePath->edit()->text();
+		QDir logDir = QDir(dirPath);
+		if(dirPath.isEmpty())
+			logSection->setCollapsed(true);
+		if(en && logDir.exists() && !logSection->collapsed())
+			Q_EMIT logData(PqmDataLogger::Rms, dirPath);
+		else
+			Q_EMIT logData(PqmDataLogger::None, "");
+	});
+	connect(browseBtn, &QPushButton::clicked, this, [this, logFilePath]() { browseFile(logFilePath->edit()); });
+
+	logSection->add(browseWidget);
+
+	return logSection;
+}
+
+void RmsInstrument::browseFile(QLineEdit *lineEditPath)
+{
+	QString dirPath =
+		QFileDialog::getExistingDirectory(this, "Select a directory", "directoryToOpen",
+						  QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+	lineEditPath->setText(dirPath);
 }
 
 #include "moc_rmsinstrument.cpp"
