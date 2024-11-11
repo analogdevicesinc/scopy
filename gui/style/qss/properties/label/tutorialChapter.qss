@@ -1,4 +1,0 @@
-*[&&property&&=true] {
-	font-weight: bold;
-	color: &white&;
-}
