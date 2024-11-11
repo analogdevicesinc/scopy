@@ -36,7 +36,8 @@ public:
 	{
 		None,
 		Waveform,
-		Harmonics
+		Harmonics,
+		Rms
 	};
 	PqmDataLogger(QObject *parent = nullptr);
 	~PqmDataLogger();
