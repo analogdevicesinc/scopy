@@ -80,7 +80,7 @@ AcquisitionManager::~AcquisitionManager()
 	}
 	m_pingTask = nullptr;
 	// buffer destroy?
-	m_chnlsName.clear();
+	m_buffChnls.clear();
 	m_bufferData.clear();
 	m_pqmAttr.clear();
 }
@@ -90,11 +90,15 @@ void AcquisitionManager::enableBufferChnls(iio_device *dev)
 	int chnlsNo = iio_device_get_channels_count(dev);
 	for(int i = 0; i < chnlsNo; i++) {
 		iio_channel *chnl = iio_device_get_channel(dev, i);
-		iio_channel_enable(chnl);
 		QString chName(iio_channel_get_name(chnl));
-		m_chnlsName.push_back(chName);
+		if(iio_channel_is_output(chnl)) {
+			m_eventsChnls.push_back(chName);
+			continue;
+		}
+		iio_channel_enable(chnl);
+		m_buffChnls.push_back(chName);
 	}
-	m_pqmLog->setChnlsName(m_chnlsName);
+	m_pqmLog->setChnlsName(m_buffChnls);
 }
 
 void AcquisitionManager::toolEnabled(bool en, QString toolName)
@@ -168,6 +172,7 @@ bool AcquisitionManager::readPqmAttributes()
 			m_pqmLog->acquireAttrData(attrName, dest, chnlId);
 		}
 	}
+	handlePQEvents();
 	m_pqmLog->log();
 	return true;
 }
@@ -188,13 +193,13 @@ bool AcquisitionManager::readBufferedData()
 	QString chnl;
 	int16_t *startAdr = (int16_t *)iio_buffer_start(m_buffer);
 	int16_t *endAdr = (int16_t *)iio_buffer_end(m_buffer);
-	for(const QString &ch : qAsConst(m_chnlsName)) {
+	for(const QString &ch : qAsConst(m_buffChnls)) {
 		m_bufferData[ch].clear();
 		m_bufferData[ch] = {};
 	}
 	for(int16_t *ptr = startAdr; ptr != endAdr; ptr++) {
-		chnlIdx = samplesCounter % m_chnlsName.size();
-		chnl = m_chnlsName[chnlIdx];
+		chnlIdx = samplesCounter % m_buffChnls.size();
+		chnl = m_buffChnls[chnlIdx];
 		double d_ptr = convertFromHwToHost((int)*ptr, chnl);
 		m_pqmLog->acquireBufferData(d_ptr, chnlIdx);
 		m_bufferData[chnl].push_back(d_ptr);
@@ -298,6 +303,25 @@ void AcquisitionManager::storeProcessData()
 		qWarning(CAT_PQM_ACQ) << "Cannot read process_data attribute!";
 	}
 	m_processData.store(val);
+}
+
+void AcquisitionManager::handlePQEvents()
+{
+	QString logMsg = "";
+	for(const QString &ch : qAsConst(m_eventsChnls)) {
+		if(m_pqmAttr[ch]["countEvent"].toInt() == 0) {
+			continue;
+		}
+		logMsg.append(ch + "\t");
+		for(auto it = m_pqmAttr[ch].begin(); it != m_pqmAttr[ch].end(); ++it) {
+			logMsg.append(it.key() + "\t" + it.value() + "\t");
+		}
+		logMsg.append("\n \t");
+	}
+	if(!logMsg.isEmpty()) {
+		m_pqmLog->acquirePqEvents(logMsg);
+		Q_EMIT pqEvent();
+	}
 }
 
 void AcquisitionManager::computeAdjustedAngle(QString &angle)
