@@ -24,6 +24,7 @@
 #include <QWidget>
 #include <gui/widgets/measurementlabel.h>
 #include <measurementpanel.h>
+#include <pqmdatalogger.h>
 #include <scopy-pqm_export.h>
 #include <gui/polarplotwidget.h>
 #include <gui/widgets/menucontrolbutton.h>
@@ -43,6 +44,7 @@ public:
 
 Q_SIGNALS:
 	void enableTool(bool en, QString toolName = "rms");
+	void logData(PqmDataLogger::ActiveInstrument instr, const QString &filePath);
 public Q_SLOTS:
 	void stop() override;
 	void toggleRms(bool en);
@@ -55,6 +57,9 @@ private:
 	void setupPlotChannels(PolarPlotWidget *plot, QMap<QString, QString> channels, int thickness = 5);
 	void updatePlot(PolarPlotWidget *plot, QString type);
 	QVector<QwtPointPolar> getPolarPlotPoints(QString chnlType);
+	QWidget *createSettingsMenu(QWidget *parent);
+	QWidget *createMenuLogSection(QWidget *parent);
+	void browseFile(QLineEdit *lineEditPath);
 
 	QString m_uri;
 	ToolMenuEntry *m_tme;
