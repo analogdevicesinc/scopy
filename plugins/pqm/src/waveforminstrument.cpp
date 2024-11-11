@@ -238,12 +238,12 @@ QWidget *WaveformInstrument::createMenuLogSection(QWidget *parent)
 		logSection->setDisabled(en);
 		QString dirPath = logFilePath->edit()->text();
 		QDir logDir = QDir(dirPath);
-		if(dirPath.isEmpty())
-			logSection->setCollapsed(true);
-		if(en && logDir.exists() && !logSection->collapsed())
+		logSection->setCollapsed(dirPath.isEmpty() || !logDir.exists());
+		if(en && !logSection->collapsed()) {
 			Q_EMIT logData(PqmDataLogger::Waveform, dirPath);
-		else
+		} else {
 			Q_EMIT logData(PqmDataLogger::None, "");
+		}
 	});
 	connect(this, &WaveformInstrument::enableTool, browseWidget, &QWidget::setDisabled);
 	connect(browseBtn, &QPushButton::clicked, this, [this, logFilePath]() { browseFile(logFilePath->edit()); });
