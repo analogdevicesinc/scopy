@@ -21,11 +21,10 @@
 
 #include "widgets/hoverwidget.h"
 
-#include "stylehelper.h"
-
 #include <QDebug>
-
+#include <style.h>
 #include <stylehelper.h>
+
 using namespace scopy;
 
 HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
@@ -40,7 +39,7 @@ HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
 	, m_relative(false)
 	, m_relativeOffset(nullptr)
 {
-	StyleHelper::TransparentWidget(this, "hoverWidget");
+	Style::setBackgroundColor(this, json::theme::background_primary);
 	m_lay = new QHBoxLayout(this);
 	m_lay->setSizeConstraint(QLayout::SetFixedSize);
 	m_lay->setContentsMargins(0, 0, 0, 0);
