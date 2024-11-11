@@ -41,16 +41,17 @@ public:
 	PqmDataLogger(QObject *parent = nullptr);
 	~PqmDataLogger();
 
-	void setChnlsName(QVector<QString> chnlsName);
+	void setChnlsName(QStringList chnlsName);
 	void acquireBufferData(double val, int chIdx);
 	void acquireAttrData(QString attrName, QString value, QString chId);
+	void acquirePqEvents(QString event);
 	void log();
 	void writeToFile();
 public Q_SLOTS:
 	void logPressed(ActiveInstrument instr, const QString &filePath = "");
 
 private:
-	void acquireHarmonics(QString value, QString chId);
+	void acquireHarmonics(QString attrName, QString value, QString chId);
 	void createHeader();
 
 	ActiveInstrument m_crtInstr;
