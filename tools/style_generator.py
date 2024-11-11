@@ -34,7 +34,9 @@ def create_namespace_structure(extension: str, path: str, root_namespace: str = 
 
 # Replaces a placeholder property in a file with a given value
 def replace_property(in_file: str, value: str) -> bool:
-    out_file = os.path.join(build_qss_folder, value + ".qss")
+    out_file = os.path.join(os.path.join(build_folder, "style"), value + ".qss").replace("\\", "/")
+    out_dir = os.path.dirname(out_file)
+    os.makedirs(out_dir, exist_ok=True)
     search_text = "&&property&&"
 
     with open(in_file, 'r') as file:
@@ -52,6 +54,7 @@ def generate_qss_variable(filepath: str, indent: str, root_folder: str) -> str:
     if not replace_property(filepath, value):
         return ""
 
+    value = value.replace("\\", "/")
     return f'{indent}const char *const ' + os.path.basename(filepath).replace(".qss", '') + f' = "{value}";'
 
 
@@ -67,7 +70,8 @@ def generate_namespace_code(namespace_structure: Dict[str, Dict[str, str]], vari
                 code_lines.append(variable_func(filepath, f'{indent}\t', root_folder))
         else:
             subnamespace = {k: v for k, v in namespace_structure.items() if
-                            k.startswith('/'.join(folder[:level + 1]) + '/')}
+                            k.startswith('/'.join(folder[:level + 1]) + '/') or
+                            k.startswith('/'.join(folder[:level + 1]) + '\\')}
             if subnamespace:
                 for subpath, subfiles in subnamespace.items():
                     subpath_parts = subpath.split(os.sep)
