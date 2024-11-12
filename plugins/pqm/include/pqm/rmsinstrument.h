@@ -43,6 +43,7 @@ public:
 	~RmsInstrument();
 
 Q_SIGNALS:
+	void pqEvent();
 	void enableTool(bool en, QString toolName = "rms");
 	void logData(PqmDataLogger::ActiveInstrument instr, const QString &filePath);
 public Q_SLOTS:
@@ -59,6 +60,7 @@ private:
 	QVector<QwtPointPolar> getPolarPlotPoints(QString chnlType);
 	QWidget *createSettingsMenu(QWidget *parent);
 	QWidget *createMenuLogSection(QWidget *parent);
+	QPushButton *createPQEventsBtn(QWidget *parent);
 	void browseFile(QLineEdit *lineEditPath);
 
 	QString m_uri;
