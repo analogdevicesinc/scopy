@@ -57,7 +57,6 @@ SettingsInstrument::SettingsInstrument(QWidget *parent)
 
 	initSystemTimeSection(tool->centralContainer());
 	initTimestampSection(tool->centralContainer());
-	initCalibSection(tool->centralContainer());
 	initConfigSection(tool->centralContainer());
 	tool->centralContainer()->layout()->addItem(
 		new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -311,31 +310,6 @@ void SettingsInstrument::initTimestampSection(QWidget *parent)
 	timestampSection->add(timestampWidget);
 
 	container->layout()->addWidget(timestampSection);
-	parent->layout()->addWidget(container);
-}
-
-void SettingsInstrument::initCalibSection(QWidget *parent)
-{
-	QWidget *container = new QWidget(parent);
-	container->setLayout(new QGridLayout(container));
-	Style::setStyle(container, style::properties::widget::border_interactive);
-	Style::setBackgroundColor(container, json::theme::background_primary);
-
-	MenuSectionCollapseWidget *calibrateSection = new MenuSectionCollapseWidget(
-		"Calibrate", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, container);
-	calibrateSection->menuSection()->contentLayout()->setMargin(0);
-	calibrateSection->contentLayout()->setSpacing(6);
-
-	MenuCombo *calibrateCombo = new MenuCombo("Channel Type", calibrateSection);
-	calibrateSection->add(calibrateCombo);
-	calibrateSection->add(createConfigEdit("Excepted RMS", "excepted_rms"));
-
-	QPushButton *calibrateBtn = new QPushButton("Calibrate", calibrateSection);
-	calibrateBtn->setFixedWidth(88);
-	StyleHelper::BasicButton(calibrateBtn, "calibrateBtn");
-	calibrateSection->add(calibrateBtn);
-
-	container->layout()->addWidget(calibrateSection);
 	parent->layout()->addWidget(container);
 }
 
