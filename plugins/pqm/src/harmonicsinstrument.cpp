@@ -112,6 +112,7 @@ HarmonicsInstrument::~HarmonicsInstrument()
 	m_yValues.clear();
 	m_labels.clear();
 	m_plotChnls.clear();
+	ResourceManager::close("pqm" + m_uri);
 }
 
 void HarmonicsInstrument::showThdWidget(bool show) { m_thdWidget->setVisible(show); }
