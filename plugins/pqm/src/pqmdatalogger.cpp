@@ -78,7 +78,7 @@ void PqmDataLogger::acquirePqEvents(QString event)
 		return;
 	}
 	QMutexLocker locker(&m_mutex);
-	m_logQue.enqueue("\n PQEvents \n" + event + "\n");
+	m_logQue.enqueue("\n" + QTime::currentTime().toString("hh:mm:ss.zzz") + "\t PQEvents \n \t" + event + "\n");
 }
 
 void PqmDataLogger::log()
@@ -120,6 +120,10 @@ void PqmDataLogger::logPressed(ActiveInstrument instr, const QString &filePath)
 	case Harmonics:
 		m_filePath = logDir.filePath("harmonics_" +
 					     QDateTime::currentDateTime().toString("dd-MM-yyyy_hh-mm-ss") + ".csv");
+		break;
+	case Rms:
+		m_filePath =
+			logDir.filePath("rms_" + QDateTime::currentDateTime().toString("dd-MM-yyyy_hh-mm-ss") + ".csv");
 		break;
 	default:
 		m_filePath = "";
