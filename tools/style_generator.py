@@ -34,9 +34,7 @@ def create_namespace_structure(extension: str, path: str, root_namespace: str = 
 
 # Replaces a placeholder property in a file with a given value
 def replace_property(in_file: str, value: str) -> bool:
-    out_file = os.path.join(os.path.join(build_folder, "style"), value + ".qss").replace("\\", "/")
-    out_dir = os.path.dirname(out_file)
-    os.makedirs(out_dir, exist_ok=True)
+    out_file = os.path.join(build_qss_folder, value + ".qss")
     search_text = "&&property&&"
 
     with open(in_file, 'r') as file:
@@ -50,11 +48,9 @@ def replace_property(in_file: str, value: str) -> bool:
 
 # Generates a QSS variable for a given file
 def generate_qss_variable(filepath: str, indent: str, root_folder: str) -> str:
-    value = os.path.relpath(filepath, root_folder).replace("/", "_").replace(".qss", "")
+    value = os.path.relpath(filepath, root_folder).replace("/", "_").replace('\\', '_').replace(".qss", "")
     if not replace_property(filepath, value):
         return ""
-
-    value = value.replace("\\", "/")
     return f'{indent}const char *const ' + os.path.basename(filepath).replace(".qss", '') + f' = "{value}";'
 
 
