@@ -123,10 +123,17 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	connect(settingsBtn, &QPushButton::toggled, this, [=, this](bool b) { tool->openRightContainerHelper(b); });
 	m_runBtn = new RunBtn(this);
 	m_singleBtn = new SingleShotBtn(this);
+	QPushButton *pqEventsBtn = createPQEventsBtn(this);
+	connect(this, &RmsInstrument::pqEvent, this, [this, pqEventsBtn]() {
+		if(!pqEventsBtn->isChecked()) {
+			pqEventsBtn->setChecked(m_running);
+		}
+	});
 
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(settingsBtn, TTA_RIGHT);
+	tool->addWidgetToTopContainerHelper(pqEventsBtn, TTA_LEFT);
 
 	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
 	connect(this, &RmsInstrument::enableTool, m_tme, &ToolMenuEntry::setRunning);
@@ -320,6 +327,28 @@ QWidget *RmsInstrument::createMenuLogSection(QWidget *parent)
 	logSection->add(browseWidget);
 
 	return logSection;
+}
+
+QPushButton *RmsInstrument::createPQEventsBtn(QWidget *parent)
+{
+	QPushButton *btn = new QPushButton("PQEvents", parent);
+	btn->setCheckable(true);
+	btn->setChecked(false);
+	btn->setEnabled(false);
+	Style::setStyle(btn, style::properties::button::squareIconButton);
+	btn->setFixedWidth(128);
+
+	QIcon bellIcon;
+	bellIcon.addPixmap(
+		Style::getPixmap(":/gui/icons/notification_bell.svg", Style::getColor(json::theme::content_inverse)),
+		QIcon::Normal, QIcon::Off);
+	bellIcon.addPixmap(Style::getPixmap(":/gui/icons/notification_bell.svg", QColor("red")), QIcon::Normal,
+			   QIcon::On);
+	btn->setIcon(bellIcon);
+	btn->setLayoutDirection(Qt::RightToLeft);
+	connect(btn, &QPushButton::toggled, btn, &QPushButton::setEnabled);
+
+	return btn;
 }
 
 void RmsInstrument::browseFile(QLineEdit *lineEditPath)
