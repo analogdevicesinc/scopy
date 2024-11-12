@@ -3,6 +3,7 @@
 
 #include <widgets/horizontalspinbox.h>
 #include <stylehelper.h>
+#include <admtstylehelper.h>
 
 static int acquisitionUITimerRate = 50;
 static int calibrationTimerRate = 1000;
@@ -83,11 +84,6 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	setLayout(lay);
     lay->setMargin(0);
 	tabWidget = new QTabWidget(this);
-	tabWidget->setObjectName("HarmonicTabWidget");
-	QString tabWidgetStyle = QString(R"css(
-						QTabWidget::tab-bar { left: 240px; }
-						)css");
-	tabWidget->tabBar()->setStyleSheet(tabWidgetStyle);
 	tabWidget->addTab(tool, "Acquisition");
 
     openLastMenuButton = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), true, this);
@@ -100,37 +96,12 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 
 	QPushButton *resetGMRButton = new QPushButton(this);
 	resetGMRButton->setText("GMR Reset");
-	QString topContainerButtonStyle = QString(R"css(
-			QPushButton {
-				width: 88px;
-				height: 48px;
-				border-radius: 2px;
-				padding-left: 20px;
-				padding-right: 20px;
-				color: white;
-				font-weight: 700;
-				font-size: 14px;
-				background-color: &&ScopyBlue&&;
-			}
-
-			QPushButton:disabled {
-				background-color:#727273; /* design token - uiElement*/
-			}
-
-			QPushButton:checked {
-				background-color:#272730; /* design token - scopy blue*/
-			}
-			QPushButton:pressed {
-				background-color:#272730;
-			}
-			})css");
-	topContainerButtonStyle.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
-	resetGMRButton->setStyleSheet(topContainerButtonStyle);
+	ADMTStyleHelper::TopContainerButtonStyle(resetGMRButton);
 	connect(resetGMRButton, &QPushButton::clicked, this, &HarmonicCalibration::GMRReset);
 
 	rightMenuButtonGroup->addButton(settingsButton);
 
-	// Raw Data Widget
+	#pragma region Raw Data Widget
 	QScrollArea *rawDataScroll = new QScrollArea(this);
 	rawDataScroll->setWidgetResizable(true);
 	QWidget *rawDataWidget = new QWidget(rawDataScroll);
@@ -196,7 +167,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	auto calibrationMotorRampModeCombo = m_calibrationMotorRampModeMenuCombo->combo();
 	calibrationMotorRampModeCombo->addItem("Position", QVariant(ADMTController::MotorRampMode::POSITION));
 	calibrationMotorRampModeCombo->addItem("Ramp Mode 1", QVariant(ADMTController::MotorRampMode::RAMP_MODE_1));
-	applyComboBoxStyle(calibrationMotorRampModeCombo);
+	ADMTStyleHelper::ComboBoxStyle(calibrationMotorRampModeCombo);
 
 	motorConfigurationCollapseSection->contentLayout()->setSpacing(8);
 	motorConfigurationCollapseSection->contentLayout()->addWidget(motorMaxVelocitySpinBox);
@@ -231,44 +202,22 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	rawDataLayout->addWidget(motorConfigurationSectionWidget);
 	rawDataLayout->addWidget(motorControlSectionWidget);
 	rawDataLayout->addStretch();
+	#pragma endregion
 
-	QWidget *historicalGraphWidget = new QWidget();
-	QVBoxLayout *historicalGraphLayout = new QVBoxLayout(this);
+	#pragma region Acquisition Graph Section Widget
+	MenuSectionWidget *acquisitionGraphSectionWidget = new MenuSectionWidget(this);
+	MenuCollapseSection *acquisitionGraphCollapseSection = new MenuCollapseSection("Captured Data", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, acquisitionGraphSectionWidget);
+	acquisitionGraphSectionWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+	acquisitionGraphSectionWidget->contentLayout()->addWidget(acquisitionGraphCollapseSection);
 
-	QLabel *dataGraphLabel = new QLabel(historicalGraphWidget);
-	dataGraphLabel->setText("Phase");
-	StyleHelper::MenuSmallLabel(dataGraphLabel, "dataGraphLabel");
+	acquisitionGraphWidget = new PlotWidget();
+	ADMTStyleHelper::PlotWidgetStyle(acquisitionGraphWidget);
+	acquisitionGraphWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
-	// dataGraph = new Sismograph(this);
-	// changeGraphColorByChannelName(dataGraph, rotationChannelName);
-	// dataGraph->setPlotAxisXTitle("Degree (°)");
-	// dataGraph->setUnitOfMeasure("Degree", "°");
-	// dataGraph->setAutoscale(false);
-	// dataGraph->setAxisScale(QwtAxis::YLeft, -30.0, 390.0);
-	// dataGraph->setHistoryDuration(10.0);
-	// dataGraphValue = &rotation;
+	acquisitionGraphCollapseSection->contentLayout()->addWidget(acquisitionGraphWidget);
+	#pragma endregion
 
-	QLabel *tempGraphLabel = new QLabel(historicalGraphWidget);
-	tempGraphLabel->setText("Temperature");
-	StyleHelper::MenuSmallLabel(tempGraphLabel, "tempGraphLabel");
-
-	// tempGraph = new Sismograph(this);
-	// changeGraphColorByChannelName(tempGraph, temperatureChannelName);
-	// tempGraph->setPlotAxisXTitle("Celsius (°C)");
-	// tempGraph->setUnitOfMeasure("Celsius", "°C");
-	// tempGraph->setAutoscale(false);
-	// tempGraph->setAxisScale(QwtAxis::YLeft, 0.0, 100.0);
-	// tempGraph->setHistoryDuration(10.0);
-	// tempGraphValue = &temp;
-
-	historicalGraphLayout->addWidget(dataGraphLabel);
-	// historicalGraphLayout->addWidget(dataGraph);
-	historicalGraphLayout->addWidget(tempGraphLabel);
-	// historicalGraphLayout->addWidget(tempGraph);
-
-	historicalGraphWidget->setLayout(historicalGraphLayout);
-
-	// General Setting
+	#pragma region General Setting
 	QScrollArea *generalSettingScroll = new QScrollArea(this);
 	generalSettingScroll->setWidgetResizable(true);
 	QWidget *generalSettingWidget = new QWidget(generalSettingScroll);
@@ -292,7 +241,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	graphUpdateIntervalLabel->setText("Graph Update Interval (ms)");
 	StyleHelper::MenuSmallLabel(graphUpdateIntervalLabel, "graphUpdateIntervalLabel");
 	graphUpdateIntervalLineEdit = new QLineEdit(generalSection);
-	applyLineEditStyle(graphUpdateIntervalLineEdit);
+	ADMTStyleHelper::LineEditStyle(graphUpdateIntervalLineEdit);
 	graphUpdateIntervalLineEdit->setText(QString::number(acquisitionUITimerRate));
 
 	connectLineEditToNumber(graphUpdateIntervalLineEdit, acquisitionUITimerRate, 1, 5000);
@@ -305,7 +254,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	dataSampleSizeLabel->setText("Data Sample Size");
 	StyleHelper::MenuSmallLabel(dataSampleSizeLabel, "dataSampleSizeLabel");
 	dataSampleSizeLineEdit = new QLineEdit(generalSection);
-	applyLineEditStyle(dataSampleSizeLineEdit);
+	ADMTStyleHelper::LineEditStyle(dataSampleSizeLineEdit);
 	dataSampleSizeLineEdit->setText(QString::number(bufferSize));
 
 	connectLineEditToNumber(dataSampleSizeLineEdit, bufferSize, 1, 2048);
@@ -325,31 +274,31 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	{
 		sequenceTypeComboBox->addItem("Mode 2", QVariant(1));
 	}
-	applyComboBoxStyle(sequenceTypeComboBox);
+	ADMTStyleHelper::ComboBoxStyle(sequenceTypeComboBox);
 
 	conversionTypeMenuCombo = new MenuCombo("Conversion Type", sequenceSection);
 	QComboBox *conversionTypeComboBox = conversionTypeMenuCombo->combo();
 	conversionTypeComboBox->addItem("Continuous conversions", QVariant(0));
 	conversionTypeComboBox->addItem("One-shot conversion", QVariant(1));
-	applyComboBoxStyle(conversionTypeComboBox);
+	ADMTStyleHelper::ComboBoxStyle(conversionTypeComboBox);
 
 	convertSynchronizationMenuCombo = new MenuCombo("Convert Synchronization", sequenceSection);
 	QComboBox *convertSynchronizationComboBox = convertSynchronizationMenuCombo->combo();
 	convertSynchronizationComboBox->addItem("Enabled", QVariant(1));
 	convertSynchronizationComboBox->addItem("Disabled", QVariant(0));
-	applyComboBoxStyle(convertSynchronizationComboBox);
+	ADMTStyleHelper::ComboBoxStyle(convertSynchronizationComboBox);
 
 	angleFilterMenuCombo = new MenuCombo("Angle Filter", sequenceSection);
 	QComboBox *angleFilterComboBox = angleFilterMenuCombo->combo();
 	angleFilterComboBox->addItem("Enabled", QVariant(1));
 	angleFilterComboBox->addItem("Disabled", QVariant(0));
-	applyComboBoxStyle(angleFilterComboBox);
+	ADMTStyleHelper::ComboBoxStyle(angleFilterComboBox);
 
 	eighthHarmonicMenuCombo = new MenuCombo("8th Harmonic", sequenceSection);
 	QComboBox *eighthHarmonicComboBox = eighthHarmonicMenuCombo->combo();
 	eighthHarmonicComboBox->addItem("User-Supplied Values", QVariant(1));
 	eighthHarmonicComboBox->addItem("ADI Factory Values", QVariant(0));
-	applyComboBoxStyle(eighthHarmonicComboBox);
+	ADMTStyleHelper::ComboBoxStyle(eighthHarmonicComboBox);
 
 	readSequence();
 
@@ -377,7 +326,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	dataGraphChannelCombo->addItem("Rotation", QVariant::fromValue(reinterpret_cast<void*>(const_cast<char*>(rotationChannelName))));
 	dataGraphChannelCombo->addItem("Angle", QVariant::fromValue(reinterpret_cast<void*>(const_cast<char*>(angleChannelName))));
 	dataGraphChannelCombo->addItem("Count", QVariant::fromValue(reinterpret_cast<void*>(const_cast<char*>(countChannelName))));
-	applyComboBoxStyle(dataGraphChannelCombo);
+	ADMTStyleHelper::ComboBoxStyle(dataGraphChannelCombo);
 
 	// connectMenuComboToGraphChannel(m_dataGraphChannelMenuCombo, dataGraph);
 
@@ -388,7 +337,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	dataGraphSamplesLabel->setText("Samples");
 	StyleHelper::MenuSmallLabel(dataGraphSamplesLabel, "dataGraphSamplesLabel");
 	dataGraphSamplesLineEdit = new QLineEdit(generalSection);
-	applyLineEditStyle(dataGraphSamplesLineEdit);
+	ADMTStyleHelper::LineEditStyle(dataGraphSamplesLineEdit);
 	dataGraphSamplesLineEdit->setText(QString::number(dataGraphSamples));
 
 	// connectLineEditToGraphSamples(dataGraphSamplesLineEdit, dataGraphSamples, dataGraph, 1, 5000);
@@ -410,7 +359,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	tempGraphSamplesLabel->setText("Samples");
 	StyleHelper::MenuSmallLabel(tempGraphSamplesLabel, "tempGraphSamplesLabel");
 	tempGraphSamplesLineEdit = new QLineEdit(generalSection);
-	applyLineEditStyle(tempGraphSamplesLineEdit);
+	ADMTStyleHelper::LineEditStyle(tempGraphSamplesLineEdit);
 	tempGraphSamplesLineEdit->setText(QString::number(tempGraphSamples));
 	tempGraphSection->contentLayout()->addWidget(tempGraphSamplesLabel);
 	tempGraphSection->contentLayout()->addWidget(tempGraphSamplesLineEdit);
@@ -426,16 +375,16 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	generalSettingLayout->addWidget(dataGraphWidget);
 	generalSettingLayout->addWidget(tempGraphWidget);
 	generalSettingLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	#pragma endregion
 
 	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tool->topContainer()->setVisible(true);
 	tool->leftContainer()->setVisible(true);
 	tool->rightContainer()->setVisible(true);
-	tool->bottomContainer()->setVisible(true);
+	tool->bottomContainer()->setVisible(false);
     tool->setLeftContainerWidth(210);
 	tool->setRightContainerWidth(300);
 	tool->setTopContainerHeight(100);
-	tool->setBottomContainerHeight(90);
 	tool->openBottomContainerHelper(false);
 	tool->openTopContainerHelper(false);
     tool->addWidgetToTopContainerMenuControlHelper(openLastMenuButton, TTA_RIGHT);
@@ -444,7 +393,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
     tool->addWidgetToTopContainerHelper(runButton, TTA_RIGHT);
 	tool->leftStack()->add("rawDataScroll", rawDataScroll);
 	tool->rightStack()->add("generalSettingScroll", generalSettingScroll);
-	tool->addWidgetToCentralContainerHelper(historicalGraphWidget);
+	tool->addWidgetToCentralContainerHelper(acquisitionGraphSectionWidget);
 
 	connect(runButton, &QPushButton::toggled, this, &HarmonicCalibration::setRunning);
 	connect(this, &HarmonicCalibration::runningChanged, this, &HarmonicCalibration::run);
@@ -575,7 +524,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationSamplesLayout->setSpacing(0);
 
 	calibrationRawDataPlotWidget = new PlotWidget();
-	applyPlotWidgetStyle(calibrationRawDataPlotWidget);
+	ADMTStyleHelper::PlotWidgetStyle(calibrationRawDataPlotWidget);
 
 	calibrationRawDataXPlotAxis = new PlotAxis(QwtAxis::XBottom, calibrationRawDataPlotWidget, scopyBluePen);
 	calibrationRawDataXPlotAxis->setMin(0);
@@ -632,7 +581,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	postCalibrationSamplesLayout->setSpacing(0);
 
 	postCalibrationRawDataPlotWidget = new PlotWidget();
-	applyPlotWidgetStyle(postCalibrationRawDataPlotWidget);
+	ADMTStyleHelper::PlotWidgetStyle(postCalibrationRawDataPlotWidget);
 	postCalibrationRawDataPlotWidget->xAxis()->setVisible(false);
 	postCalibrationRawDataPlotWidget->yAxis()->setVisible(false);
 
@@ -699,7 +648,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	angleErrorLayout->setSpacing(0);
 
 	angleErrorPlotWidget = new PlotWidget();
-	applyPlotWidgetStyle(angleErrorPlotWidget);
+	ADMTStyleHelper::PlotWidgetStyle(angleErrorPlotWidget);
 	angleErrorPlotWidget->xAxis()->setVisible(false);
 	angleErrorPlotWidget->yAxis()->setVisible(false);
 	
@@ -730,7 +679,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	FFTAngleErrorLayout->setSpacing(0);
 
 	FFTAngleErrorPlotWidget = new PlotWidget();
-	applyPlotWidgetStyle(FFTAngleErrorPlotWidget);
+	ADMTStyleHelper::PlotWidgetStyle(FFTAngleErrorPlotWidget);
 	FFTAngleErrorPlotWidget->xAxis()->setVisible(false);
 	FFTAngleErrorPlotWidget->yAxis()->setVisible(false);
 
@@ -779,7 +728,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	correctedErrorLayout->setSpacing(0);
 
 	correctedErrorPlotWidget = new PlotWidget();
-	applyPlotWidgetStyle(correctedErrorPlotWidget);
+	ADMTStyleHelper::PlotWidgetStyle(correctedErrorPlotWidget);
 	correctedErrorPlotWidget->xAxis()->setVisible(false);
 	correctedErrorPlotWidget->yAxis()->setVisible(false);
 
@@ -810,7 +759,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	FFTCorrectedErrorLayout->setSpacing(0);
 
 	FFTCorrectedErrorPlotWidget = new PlotWidget();
-	applyPlotWidgetStyle(FFTCorrectedErrorPlotWidget);
+	ADMTStyleHelper::PlotWidgetStyle(FFTCorrectedErrorPlotWidget);
 	FFTCorrectedErrorPlotWidget->xAxis()->setVisible(false);
 	FFTCorrectedErrorPlotWidget->yAxis()->setVisible(false);
 
@@ -1013,14 +962,14 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	QLabel *calibrationCycleCountLabel = new QLabel("Cycle Count", calibrationDatasetConfigCollapseSection);
 	StyleHelper::MenuSmallLabel(calibrationCycleCountLabel);
 	QLineEdit *calibrationCycleCountLineEdit = new QLineEdit(calibrationDatasetConfigCollapseSection);
-	applyLineEditStyle(calibrationCycleCountLineEdit);
+	ADMTStyleHelper::LineEditStyle(calibrationCycleCountLineEdit);
 	calibrationCycleCountLineEdit->setText(QString::number(cycleCount));
 	connectLineEditToNumber(calibrationCycleCountLineEdit, cycleCount, 1, 1000);
 
 	QLabel *calibrationSamplesPerCycleLabel = new QLabel("Samples Per Cycle", calibrationDatasetConfigCollapseSection);
 	StyleHelper::MenuSmallLabel(calibrationSamplesPerCycleLabel);
 	QLineEdit *calibrationSamplesPerCycleLineEdit = new QLineEdit(calibrationDatasetConfigCollapseSection);
-	applyLineEditStyle(calibrationSamplesPerCycleLineEdit);
+	ADMTStyleHelper::LineEditStyle(calibrationSamplesPerCycleLineEdit);
 	calibrationSamplesPerCycleLineEdit->setText(QString::number(samplesPerCycle));
 	calibrationSamplesPerCycleLineEdit->setReadOnly(true);
 	connectLineEditToNumber(calibrationSamplesPerCycleLineEdit, samplesPerCycle, 1, 5000);
@@ -1067,7 +1016,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	auto calibrationMotorRampModeCombo = m_calibrationMotorRampModeMenuCombo->combo();
 	calibrationMotorRampModeCombo->addItem("Position", QVariant(ADMTController::MotorRampMode::POSITION));
 	calibrationMotorRampModeCombo->addItem("Ramp Mode 1", QVariant(ADMTController::MotorRampMode::RAMP_MODE_1));
-	applyComboBoxStyle(calibrationMotorRampModeCombo);
+	ADMTStyleHelper::ComboBoxStyle(calibrationMotorRampModeCombo);
 
 	motorConfigurationCollapseSection->contentLayout()->setSpacing(8);
 	motorConfigurationCollapseSection->contentLayout()->addWidget(motorMaxVelocitySpinBox);
@@ -1677,9 +1626,9 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	AFEDIAG0LineEdit = new QLineEdit(MTDiagnosticsSectionWidget);
 	AFEDIAG1LineEdit = new QLineEdit(MTDiagnosticsSectionWidget);
 	AFEDIAG2LineEdit = new QLineEdit(MTDiagnosticsSectionWidget);
-	applyLineEditStyle(AFEDIAG0LineEdit);
-	applyLineEditStyle(AFEDIAG1LineEdit);
-	applyLineEditStyle(AFEDIAG2LineEdit);
+	ADMTStyleHelper::LineEditStyle(AFEDIAG0LineEdit);
+	ADMTStyleHelper::LineEditStyle(AFEDIAG1LineEdit);
+	ADMTStyleHelper::LineEditStyle(AFEDIAG2LineEdit);
 	AFEDIAG0LineEdit->setReadOnly(true);
 	AFEDIAG1LineEdit->setReadOnly(true);
 	AFEDIAG2LineEdit->setReadOnly(true);
@@ -3276,93 +3225,6 @@ void HarmonicCalibration::clearCalibrationSamples()
 	calibrationRawDataPlotWidget->replot();
 }
 
-void HarmonicCalibration::applyLineEditStyle(QLineEdit *widget)
-{
-	QString style = QString(R"css(
-								QLineEdit {
-									font-family: Open Sans;
-									font-size: 16px;
-									font-weight: normal;
-									text-align: right;
-									color: &&colorname&&;
-
-									background-color: black;
-									border-radius: 4px;
-									border: none;
-								}
-
-								QLineEdit:disabled {
-                                    background-color: #18181d;
-									color: #9c4600;
-                                }
-							)css");
-	style = style.replace(QString("&&colorname&&"), StyleHelper::getColor("CH0"));
-	widget->setStyleSheet(style);
-	widget->setFixedHeight(30);
-	widget->setContentsMargins(0, 0, 0, 0);
-	widget->setTextMargins(12, 4, 12, 4);
-	widget->setAlignment(Qt::AlignRight);
-}
-
-void HarmonicCalibration::applyComboBoxStyle(QComboBox *widget, const QString& styleHelperColor)
-{
-	QString style = QString(R"css(
-						QWidget {
-						}
-						QComboBox {
-							text-align: right;
-							color: &&colorname&&;
-							border-radius: 4px;
-							height: 30px;
-							border-bottom: 0px solid none;
-							padding-left: 12px;
-							padding-right: 12px;
-							font-weight: normal;
-							font-size: 16px;
-							background-color: black;
-						}
-						QComboBox:disabled, QLineEdit:disabled {
-							background-color: #18181d;
-							color: #9c4600;
-						}
-						QComboBox QAbstractItemView {
-							border: none;
-							color: transparent;
-							outline: none;
-							background-color: black;
-							border-bottom: 0px solid transparent;
- 							border-top: 0px solid transparent;
-						}
-						QComboBox QAbstractItemView::item {
-							text-align: right;
-						}
-						QComboBox::item:selected {
-							font-weight: bold;
-							font-size: 18px;
-							background-color: transparent;
-						}
-						QComboBox::drop-down  {
-							border-image: none;
-							border: 0px;
-							width: 16px;
- 							height: 16px;
-							margin-right: 12px;
-						}
-						QComboBox::down-arrow {
-							image: url(:/admt/chevron-down-s.svg);
-						}
-						QComboBox::indicator {
-							background-color: transparent;
-							selection-background-color: transparent;
-							color: transparent;
-							selection-color: transparent;
-						}
-						)css");
-	style = style.replace(QString("&&colorname&&"), StyleHelper::getColor(styleHelperColor));
-	widget->setStyleSheet(style);
-	widget->setFixedHeight(30);
-}
-
 void HarmonicCalibration::applyTextStyle(QWidget *widget, const QString& styleHelperColor, bool isBold)
 {
 	QString existingStyle = widget->styleSheet();
@@ -3420,10 +3282,4 @@ void HarmonicCalibration::applyTabWidgetStyle(QTabWidget *widget, const QString&
 	style.replace("&&ScopyBlue&&", StyleHelper::getColor(styleHelperColor));
 	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
 	widget->tabBar()->setStyleSheet(style);
-}
-
-void HarmonicCalibration::applyPlotWidgetStyle(PlotWidget *widget)
-{
-	widget->setContentsMargins(10, 10, 10, 6);
-	widget->plot()->canvas()->setStyleSheet("background-color: black;");
 }
