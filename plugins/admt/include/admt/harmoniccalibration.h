@@ -130,7 +130,7 @@ private:
 
 	QScrollArea *MTDiagnosticsScrollArea;
 
-	PlotWidget *angleErrorPlotWidget, *calibrationRawDataPlotWidget, *FFTAngleErrorPlotWidget,
+	PlotWidget *acquisitionGraphWidget, *angleErrorPlotWidget, *calibrationRawDataPlotWidget, *FFTAngleErrorPlotWidget,
 			   *correctedErrorPlotWidget, *postCalibrationRawDataPlotWidget, *FFTCorrectedErrorPlotWidget;
 	PlotAxis *calibrationRawDataXPlotAxis, *calibrationRawDataYPlotAxis, 
 			 *angleErrorXPlotAxis, *angleErrorYPlotAxis, *FFTAngleErrorXPlotAxis, *FFTAngleErrorYPlotAxis,
@@ -178,8 +178,6 @@ private:
 	void commandLogWrite(QString message);
 	int readMotorAttributeValue(ADMTController::MotorAttribute attribute, double& value);
 	int writeMotorAttributeValue(ADMTController::MotorAttribute attribute, double value);
-	void applyLineEditStyle(QLineEdit *widget);
-	void applyComboBoxStyle(QComboBox *widget, const QString& styleHelperColor = "CH0");
 	void applyTextStyle(QWidget *widget, const QString& styleHelperColor = "CH0", bool isBold = false);
 	void applyLabelStyle(QLabel *widget);
 	void initializeMotor();
@@ -232,7 +230,6 @@ private:
 	void toggleMTDiagnostics(int mode);
 	void toggleSequenceModeRegisters(int mode);
 	void readAllRegisters();
-	void applyPlotWidgetStyle(PlotWidget *widget);
 
 	QTimer *acquisitionUITimer, *calibrationTimer, *utilityTimer;
 
