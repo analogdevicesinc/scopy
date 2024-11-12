@@ -185,15 +185,11 @@ bool PQMPlugin::onDisconnect()
 		tool->setRunBtnVisible(false);
 		QWidget *w = tool->tool();
 		if(w) {
-			disconnect(tool);
-			disconnect(tool->tool());
 			tool->setTool(nullptr);
 			delete(w);
 		}
 	}
-	ResourceManager::close("pqm");
-	disconnect(m_acqManager);
-	delete m_acqManager;
+	delete(m_acqManager);
 	m_acqManager = nullptr;
 	clearPingTask();
 	ConnectionProvider *cp = ConnectionProvider::GetInstance();
