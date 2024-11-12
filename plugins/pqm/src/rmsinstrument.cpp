@@ -147,6 +147,7 @@ RmsInstrument::~RmsInstrument()
 {
 	m_labels.clear();
 	m_attributes.clear();
+	ResourceManager::close("pqm" + m_uri);
 }
 
 void RmsInstrument::createLabels(MeasurementsPanel *mPanel, QStringList chnls, QStringList labels, QString color)
