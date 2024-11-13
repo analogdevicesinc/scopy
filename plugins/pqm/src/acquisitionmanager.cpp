@@ -78,8 +78,11 @@ AcquisitionManager::~AcquisitionManager()
 	if(m_ctx) {
 		m_ctx = nullptr;
 	}
+	if(m_buffer) {
+		iio_buffer_destroy(m_buffer);
+		m_buffer = nullptr;
+	}
 	m_pingTask = nullptr;
-	// buffer destroy?
 	m_buffChnls.clear();
 	m_bufferData.clear();
 	m_pqmAttr.clear();
