@@ -90,7 +90,7 @@ private:
 				*clearCommandLogButton, *applySequenceButton, *readAllRegistersButton;
 	QButtonGroup *rightMenuButtonGroup;
 
-	QLineEdit 	*graphUpdateIntervalLineEdit, *dataSampleSizeLineEdit,
+	QLineEdit 	*graphUpdateIntervalLineEdit, *displayLengthLineEdit,
 				*dataGraphSamplesLineEdit, *tempGraphSamplesLineEdit, 
 				*calibrationH1MagLineEdit, *calibrationH2MagLineEdit, 
 				*calibrationH3MagLineEdit, *calibrationH8MagLineEdit,
@@ -230,6 +230,9 @@ private:
 	void toggleMTDiagnostics(int mode);
 	void toggleSequenceModeRegisters(int mode);
 	void readAllRegisters();
+	void prependAcquisitionData(double& data, QVector<double>& list);
+	void plotAcquisition(QVector<double>& list, PlotChannel* channel, PlotWidget* plot);
+	void resizeAquisitionData(QVector<double>& list);
 
 	QTimer *acquisitionUITimer, *calibrationTimer, *utilityTimer;
 
