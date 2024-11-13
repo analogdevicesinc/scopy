@@ -46,7 +46,7 @@ QLineEdit *MenuLineEdit::edit() { return m_edit; }
 void MenuLineEdit::applyStylesheet()
 {
 	Style::setStyle(m_edit, style::properties::lineedit::menuLineEdit);
-	Style::setBackgroundColor(this, "transparent");
+	Style::setBackgroundColor(this, QString("transparent"));
 }
 
 #include "moc_menulineedit.cpp"
