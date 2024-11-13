@@ -25,6 +25,7 @@
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QLoggingCategory>
+#include <style.h>
 
 #include <pluginbase/preferences.h>
 
@@ -46,6 +47,7 @@ DetachedToolWindow::DetachedToolWindow(QWidget *parent, ToolMenuEntry *tme)
 
 	lay->addWidget(w);
 	loadToolGeometry(tme, this);
+	Style::setStyle(this, style::properties::widget::basicBackground);
 	tme->tool()->show();
 	show();
 }

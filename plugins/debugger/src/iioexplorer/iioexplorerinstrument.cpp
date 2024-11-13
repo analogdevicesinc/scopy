@@ -89,7 +89,7 @@ void IIOExplorerInstrument::setupUi()
 	StyleHelper::SplitterStyle(m_VSplitter, "VerticalSplitter");
 
 	m_mainWidget->setLayout(new QVBoxLayout(m_mainWidget));
-	m_mainWidget->layout()->setContentsMargins(10, 10, 10, 10);
+	m_mainWidget->layout()->setContentsMargins(0, 0, 0, 0);
 
 	bottom_container->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	bottom_container->setLayout(new QHBoxLayout(bottom_container));

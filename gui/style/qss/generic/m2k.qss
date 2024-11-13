@@ -395,7 +395,7 @@ QPushButton[tool_launcher_custom_widget="true"] {
     border: none;
     background-color: none;
 }
-.QWidget[tool_launcher_custom_widget="true"]:hover {
+QWidget[tool_launcher_custom_widget="true"]:hover {
     background-color: #3C&color_inverse_hexcode&;
     border: 1px solid #1E&color_inverse_hexcode&;
     border-radius: 5px;
@@ -421,25 +421,25 @@ QWidget#stackedWidgetPage1 {
     border-radius: 12px;
     background-color: &background_subtle&;
 }
-.scopy--m2k--StackedHomepage#stackedWidget {
+scopy--m2k--StackedHomepage#stackedWidget {
     background-color: &background_subtle&;
 }
 QFrame[line_separator="true"] {
     background-color: #13&color_default_hexcode&;
 }
-.scopy--m2k--PowerController #leftPanel,
-.scopy--m2k--DMM #leftPanel {
+scopy--m2k--PowerController #leftPanel,
+scopy--m2k--DMM #leftPanel {
     background-color: #28&color_inverse_hexcode&;
 }
-.scopy--m2k--Oscilloscope #mainWidget,
-.scopy--m2k--SpectrumAnalyzer #mainWidget,
-.scopy--m2k--NetworkAnalyzer #mainWidget,
-.scopy--m2k--SignalGenerator #mainWidget,
-.scopy--m2k--logic--LogicAnalyzer #mainWidget,
-.scopy--m2k--logic--PatternGenerator #mainWidget,
-.scopy--m2k--DigitalIO #widget,
-.scopy--m2k--DMM #hLayout_top_btn_area_voltmeter,
-.scopy--m2k--PowerController #hWidget_top_area {
+scopy--m2k--Oscilloscope #mainWidget,
+scopy--m2k--SpectrumAnalyzer #mainWidget,
+scopy--m2k--NetworkAnalyzer #mainWidget,
+scopy--m2k--SignalGenerator #mainWidget,
+scopy--m2k--logic--LogicAnalyzer #mainWidget,
+scopy--m2k--logic--PatternGenerator #mainWidget,
+scopy--m2k--DigitalIO #widget,
+scopy--m2k--DMM #hLayout_top_btn_area_voltmeter,
+scopy--m2k--PowerController #hWidget_top_area {
     background-color: qlineargradient(
         spread: pad,
         x1: 0,
@@ -451,8 +451,8 @@ QFrame[line_separator="true"] {
         stop: 1 transparent
     );
 }
-.scopy--m2k--ExportSettings #mainWidget,
-.scopy--m2k--ImportSettings #mainWidget {
+scopy--m2k--ExportSettings #mainWidget,
+scopy--m2k--ImportSettings #mainWidget {
     background-color: none;
 }
 scopy--CursorReadouts {
@@ -530,7 +530,7 @@ scopy--ChannelWidget QWidget#widget {
 scopy--ChannelWidget QWidget#widget[selected="true"] {
     background-color: #40&color_inverse_hexcode&;
 }
-.scopy--ChannelWidget QWidget#widget::hover {
+scopy--ChannelWidget QWidget#widget::hover {
     background-color: #20&color_inverse_hexcode&;
     font-weight: bold;
     border-bottom: 0px solid none;
