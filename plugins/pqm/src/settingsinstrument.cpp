@@ -44,6 +44,7 @@ SettingsInstrument::SettingsInstrument(QWidget *parent)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *instrumentLayout = new QVBoxLayout(this);
 	setLayout(instrumentLayout);
+	instrumentLayout->setMargin(0);
 
 	ToolTemplate *tool = new ToolTemplate(this);
 	tool->topContainer()->setVisible(false);

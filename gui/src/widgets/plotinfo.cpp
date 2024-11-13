@@ -74,7 +74,6 @@ void PlotInfo::addCustomInfo(QWidget *info, InfoPosition hpos, InfoPosition vpos
 QLabel *PlotInfo::addLabelInfo(InfoPosition hpos, InfoPosition vpos)
 {
 	QLabel *label = new QLabel();
-	Style::setStyle(label, style::properties::label::plotInfo, true, true);
 	addCustomInfo(label, hpos, vpos);
 
 	return label;
