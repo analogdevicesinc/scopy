@@ -41,15 +41,18 @@ static uint32_t h2PhaseDeviceRegister = 0x18;
 static uint32_t h3PhaseDeviceRegister = 0x1A;
 static uint32_t h8PhaseDeviceRegister = 0x1C;
 
-static QVector<double> graphDataList, graphPostDataList;
+static int acquisitionDisplayLength = 200;
+static QVector<double> acquisitionAngleList(acquisitionDisplayLength), graphDataList, graphPostDataList;
 
 static const QColor scopyBlueColor = scopy::StyleHelper::getColor("ScopyBlue");
+static const QColor channel0Color = scopy::StyleHelper::getColor("CH0");
 static const QColor sineColor = QColor("#85e94c");
 static const QColor cosineColor = QColor("#91e6cf");
 static const QColor faultLEDColor = QColor("#c81a28");
 static const QColor statusLEDColor = QColor("#2e9e6f");
 
 static const QPen scopyBluePen(scopyBlueColor);
+static const QPen channel0Pen(channel0Color);
 static const QPen sinePen(sineColor);
 static const QPen cosinePen(cosineColor);
 
@@ -218,12 +221,12 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	acquisitionGraphPlotWidget->setShowYAxisLabels(true);
 	acquisitionGraphPlotWidget->showAxisLabels();
 
-	acquisitionXPlotAxis = new PlotAxis(QwtAxis::XBottom, acquisitionGraphPlotWidget, scopyBluePen);
-	acquisitionXPlotAxis->setMin(0);
-	acquisitionYPlotAxis = new PlotAxis(QwtAxis::YLeft, acquisitionGraphPlotWidget, scopyBluePen);
-	acquisitionYPlotAxis->setInterval(0, 400);
+	acquisitionXPlotAxis = new PlotAxis(QwtAxis::XBottom, acquisitionGraphPlotWidget, channel0Pen);
+	acquisitionXPlotAxis->setInterval(0, acquisitionDisplayLength);
+	acquisitionYPlotAxis = new PlotAxis(QwtAxis::YLeft, acquisitionGraphPlotWidget, channel0Pen);
+	acquisitionYPlotAxis->setInterval(0, 360);
 
-	acquisitionAnglePlotChannel = new PlotChannel("Angle", scopyBluePen, acquisitionXPlotAxis, acquisitionYPlotAxis);
+	acquisitionAnglePlotChannel = new PlotChannel("Angle", channel0Pen, acquisitionXPlotAxis, acquisitionYPlotAxis);
 
 	acquisitionGraphPlotWidget->addPlotChannel(acquisitionAnglePlotChannel);
 	acquisitionAnglePlotChannel->setEnabled(true);
@@ -267,17 +270,16 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	generalSection->contentLayout()->addWidget(graphUpdateIntervalLineEdit);
 
 	// Data Sample Size
-	QLabel *dataSampleSizeLabel = new QLabel(generalSection);
-	dataSampleSizeLabel->setText("Data Sample Size");
-	StyleHelper::MenuSmallLabel(dataSampleSizeLabel, "dataSampleSizeLabel");
-	dataSampleSizeLineEdit = new QLineEdit(generalSection);
-	ADMTStyleHelper::LineEditStyle(dataSampleSizeLineEdit);
-	dataSampleSizeLineEdit->setText(QString::number(bufferSize));
+	QLabel *displayLengthLabel = new QLabel("Display Length", generalSection);
+	StyleHelper::MenuSmallLabel(displayLengthLabel);
+	displayLengthLineEdit = new QLineEdit(generalSection);
+	ADMTStyleHelper::LineEditStyle(displayLengthLineEdit);
+	displayLengthLineEdit->setText(QString::number(acquisitionDisplayLength));
 
-	connectLineEditToNumber(dataSampleSizeLineEdit, bufferSize, 1, 2048);
+	connectLineEditToNumber(displayLengthLineEdit, acquisitionDisplayLength, 1, 2048);
 
-	generalSection->contentLayout()->addWidget(dataSampleSizeLabel);
-	generalSection->contentLayout()->addWidget(dataSampleSizeLineEdit);
+	generalSection->contentLayout()->addWidget(displayLengthLabel);
+	generalSection->contentLayout()->addWidget(displayLengthLineEdit);
 
 	MenuSectionWidget *sequenceWidget = new MenuSectionWidget(generalSettingWidget);
 	MenuCollapseSection *sequenceSection = new MenuCollapseSection("Sequence", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, sequenceWidget);
@@ -330,67 +332,10 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	sequenceSection->contentLayout()->addWidget(eighthHarmonicMenuCombo);
 	sequenceSection->contentLayout()->addWidget(applySequenceButton);
 
-	// Data Graph Setting Widget
-	MenuSectionWidget *dataGraphWidget = new MenuSectionWidget(generalSettingWidget);
-	dataGraphWidget->contentLayout()->setSpacing(8);
-	MenuCollapseSection *dataGraphSection = new MenuCollapseSection("Data Graph", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, dataGraphWidget);
-	dataGraphSection->header()->toggle();
-	dataGraphSection->contentLayout()->setSpacing(8);
-
-	// Graph Channel
-	m_dataGraphChannelMenuCombo = new MenuCombo("Channel", dataGraphSection);
-	auto dataGraphChannelCombo = m_dataGraphChannelMenuCombo->combo();
-	dataGraphChannelCombo->addItem("Rotation", QVariant::fromValue(reinterpret_cast<void*>(const_cast<char*>(rotationChannelName))));
-	dataGraphChannelCombo->addItem("Angle", QVariant::fromValue(reinterpret_cast<void*>(const_cast<char*>(angleChannelName))));
-	dataGraphChannelCombo->addItem("Count", QVariant::fromValue(reinterpret_cast<void*>(const_cast<char*>(countChannelName))));
-	ADMTStyleHelper::ComboBoxStyle(dataGraphChannelCombo);
-
-	// connectMenuComboToGraphChannel(m_dataGraphChannelMenuCombo, dataGraph);
-
-	dataGraphSection->contentLayout()->addWidget(m_dataGraphChannelMenuCombo);
-
-	// Graph Samples
-	QLabel *dataGraphSamplesLabel = new QLabel(generalSection);
-	dataGraphSamplesLabel->setText("Samples");
-	StyleHelper::MenuSmallLabel(dataGraphSamplesLabel, "dataGraphSamplesLabel");
-	dataGraphSamplesLineEdit = new QLineEdit(generalSection);
-	ADMTStyleHelper::LineEditStyle(dataGraphSamplesLineEdit);
-	dataGraphSamplesLineEdit->setText(QString::number(dataGraphSamples));
-
-	// connectLineEditToGraphSamples(dataGraphSamplesLineEdit, dataGraphSamples, dataGraph, 1, 5000);
-	
-	dataGraphSection->contentLayout()->addWidget(dataGraphSamplesLabel);
-	dataGraphSection->contentLayout()->addWidget(dataGraphSamplesLineEdit);
-
-	dataGraphWidget->contentLayout()->addWidget(dataGraphSection);
-
-	// Temperature Graph
-	MenuSectionWidget *tempGraphWidget = new MenuSectionWidget(generalSettingWidget);
-	tempGraphWidget->contentLayout()->setSpacing(8);
-	MenuCollapseSection *tempGraphSection = new MenuCollapseSection("Temperature Graph", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, tempGraphWidget);
-	tempGraphSection->header()->toggle();
-	tempGraphSection->contentLayout()->setSpacing(8);
-
-	// Graph Samples
-	QLabel *tempGraphSamplesLabel = new QLabel(generalSection);
-	tempGraphSamplesLabel->setText("Samples");
-	StyleHelper::MenuSmallLabel(tempGraphSamplesLabel, "tempGraphSamplesLabel");
-	tempGraphSamplesLineEdit = new QLineEdit(generalSection);
-	ADMTStyleHelper::LineEditStyle(tempGraphSamplesLineEdit);
-	tempGraphSamplesLineEdit->setText(QString::number(tempGraphSamples));
-	tempGraphSection->contentLayout()->addWidget(tempGraphSamplesLabel);
-	tempGraphSection->contentLayout()->addWidget(tempGraphSamplesLineEdit);
-
-	// connectLineEditToGraphSamples(tempGraphSamplesLineEdit, tempGraphSamples, tempGraph, 1, 5000);
-
-	tempGraphWidget->contentLayout()->addWidget(tempGraphSection);
-
 	generalSettingLayout->addWidget(header);
 	generalSettingLayout->addSpacerItem(new QSpacerItem(0, 3, QSizePolicy::Fixed, QSizePolicy::Fixed));
 	generalSettingLayout->addWidget(sequenceWidget);
 	generalSettingLayout->addWidget(generalWidget);
-	generalSettingLayout->addWidget(dataGraphWidget);
-	generalSettingLayout->addWidget(tempGraphWidget);
 	generalSettingLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 	#pragma endregion
 
@@ -476,6 +421,8 @@ HarmonicCalibration::~HarmonicCalibration() {}
 void HarmonicCalibration::startAcquisition()
 {
 	isStartAcquisition = true;
+	acquisitionXPlotAxis->setInterval(0, acquisitionDisplayLength);
+	resizeAquisitionData(acquisitionAngleList);
     QFuture<void> future = QtConcurrent::run(this, &HarmonicCalibration::getAcquisitionSamples);
 }
 
@@ -484,10 +431,25 @@ void HarmonicCalibration::getAcquisitionSamples()
 	while(isStartAcquisition)
 	{
 		updateChannelValues();
-		// dataGraph->plot(*dataGraphValue);
-		// tempGraph->plot(*tempGraphValue);
+		prependAcquisitionData(angle, acquisitionAngleList);
 		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
 	}
+}
+
+void HarmonicCalibration::resizeAquisitionData(QVector<double>& list)
+{
+	list.resize(acquisitionDisplayLength);
+}
+
+void HarmonicCalibration::prependAcquisitionData(double& data, QVector<double>& list)
+{
+	list.prepend(data);
+}
+
+void HarmonicCalibration::plotAcquisition(QVector<double>& list, PlotChannel* channel, PlotWidget* plot)
+{
+	channel->curve()->setSamples(list);
+	plot->replot();
 }
 
 void HarmonicCalibration::initializeMotor()
@@ -2074,6 +2036,7 @@ void HarmonicCalibration::canCalibrate(bool value)
 
 void HarmonicCalibration::acquisitionUITask()
 {
+	plotAcquisition(acquisitionAngleList, acquisitionAnglePlotChannel, acquisitionGraphPlotWidget);
 	updateLineEditValues();
 	updateLabelValue(acquisitionMotorCurrentPositionLabel, ADMTController::MotorAttribute::CURRENT_POS);
 }
@@ -2352,9 +2315,9 @@ void HarmonicCalibration::updateLineEditValues(){
 void HarmonicCalibration::updateGeneralSettingEnabled(bool value)
 {
 	graphUpdateIntervalLineEdit->setEnabled(value);
-	dataSampleSizeLineEdit->setEnabled(value);
-	dataGraphSamplesLineEdit->setEnabled(value);
-	tempGraphSamplesLineEdit->setEnabled(value);
+	displayLengthLineEdit->setEnabled(value);
+	// dataGraphSamplesLineEdit->setEnabled(value);
+	// tempGraphSamplesLineEdit->setEnabled(value);
 }
 
 MenuControlButton *HarmonicCalibration::createStatusLEDWidget(const QString title, QColor color, QWidget *parent)
