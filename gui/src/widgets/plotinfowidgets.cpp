@@ -34,7 +34,6 @@ HDivInfo::HDivInfo(PlotWidget *plot, QWidget *parent)
 	: m_mpf(new MetricPrefixFormatter(this))
 	, m_plot(plot)
 {
-	Style::setStyle(this, style::properties::label::plotInfo, true, true);
 	m_mpf->setTrimZeroes(true);
 	m_mpf->setTwoDecimalMode(false);
 	connect(m_plot->navigator(), &PlotNavigator::rectChanged, this, &HDivInfo::onRectChanged);
@@ -76,7 +75,6 @@ void HDivInfo::update(double val, bool zoomed)
 TimeSamplingInfo::TimeSamplingInfo(QWidget *parent)
 	: m_mpf(new MetricPrefixFormatter(this))
 {
-	Style::setStyle(this, style::properties::label::plotInfo, true, true);
 	m_mpf->setTrimZeroes(true);
 	m_mpf->setTwoDecimalMode(false);
 }
@@ -99,7 +97,6 @@ void TimeSamplingInfo::update(SamplingInfo info)
 FFTSamplingInfo::FFTSamplingInfo(QWidget *parent)
 	: m_mpf(new MetricPrefixFormatter(this))
 {
-	Style::setStyle(this, style::properties::label::plotInfo, true, true);
 	m_mpf->setTrimZeroes(true);
 	m_mpf->setTwoDecimalMode(false);
 }
@@ -127,7 +124,6 @@ FPSInfo::FPSInfo(PlotWidget *plot, QWidget *parent)
 	, m_lastTimeStamp(0)
 	, m_avgSize(10)
 {
-	Style::setStyle(this, style::properties::label::plotInfo, true, true);
 	setVisible(Preferences::GetInstance()->get("general_show_plot_fps").toBool());
 
 	connect(m_plot, &PlotWidget::newData, this, [=]() { update(QDateTime::currentMSecsSinceEpoch()); });
@@ -165,7 +161,6 @@ void FPSInfo::update(qint64 timestamp)
 
 TimestampInfo::TimestampInfo(PlotWidget *plot, QWidget *parent)
 {
-	Style::setStyle(this, style::properties::label::plotInfo, true, true);
 	connect(plot, &PlotWidget::newData, this,
 		[=]() { setText(QDateTime::currentDateTime().time().toString("hh:mm:ss")); });
 }

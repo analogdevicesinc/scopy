@@ -78,7 +78,7 @@ PlotWidget::PlotWidget(QWidget *parent)
 	setupPlotButtonManager();
 
 	m_plot->canvas()->installEventFilter(this);
-	Style::setBackgroundColor(m_plot, "transparent");
+	Style::setBackgroundColor(m_plot, QString("transparent"));
 	Style::setBackgroundColor(m_plot->canvas(), json::theme::background_plot, true);
 }
 
