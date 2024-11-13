@@ -210,11 +210,28 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	acquisitionGraphSectionWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	acquisitionGraphSectionWidget->contentLayout()->addWidget(acquisitionGraphCollapseSection);
 
-	acquisitionGraphWidget = new PlotWidget();
-	ADMTStyleHelper::PlotWidgetStyle(acquisitionGraphWidget);
-	acquisitionGraphWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+	acquisitionGraphPlotWidget = new PlotWidget();
+	ADMTStyleHelper::PlotWidgetStyle(acquisitionGraphPlotWidget);
+	acquisitionGraphPlotWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
-	acquisitionGraphCollapseSection->contentLayout()->addWidget(acquisitionGraphWidget);
+	acquisitionGraphPlotWidget->setShowXAxisLabels(true);
+	acquisitionGraphPlotWidget->setShowYAxisLabels(true);
+	acquisitionGraphPlotWidget->showAxisLabels();
+
+	acquisitionXPlotAxis = new PlotAxis(QwtAxis::XBottom, acquisitionGraphPlotWidget, scopyBluePen);
+	acquisitionXPlotAxis->setMin(0);
+	acquisitionYPlotAxis = new PlotAxis(QwtAxis::YLeft, acquisitionGraphPlotWidget, scopyBluePen);
+	acquisitionYPlotAxis->setInterval(0, 400);
+
+	acquisitionAnglePlotChannel = new PlotChannel("Angle", scopyBluePen, acquisitionXPlotAxis, acquisitionYPlotAxis);
+
+	acquisitionGraphPlotWidget->addPlotChannel(acquisitionAnglePlotChannel);
+	acquisitionAnglePlotChannel->setEnabled(true);
+	acquisitionGraphPlotWidget->selectChannel(acquisitionAnglePlotChannel);
+
+	acquisitionGraphPlotWidget->replot();
+
+	acquisitionGraphCollapseSection->contentLayout()->addWidget(acquisitionGraphPlotWidget);
 	#pragma endregion
 
 	#pragma region General Setting
@@ -988,14 +1005,15 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationDataSectionWidget->contentLayout()->setSpacing(8);
 	calibrationDataSectionWidget->contentLayout()->addWidget(calibrationDataCollapseSection);
 
-	QPushButton *extractDataButton = new QPushButton(calibrationDataCollapseSection);
-	extractDataButton->setText("Extract to CSV");
-	StyleHelper::BlueButton(extractDataButton, "extractDataButton");
-	QPushButton *clearCalibrateDataButton = new QPushButton(calibrationDataCollapseSection);
-	clearCalibrateDataButton->setText("Clear All Data");
-	StyleHelper::BlueButton(clearCalibrateDataButton, "clearCalibrateDataButton");
+	QPushButton *importSamplesButton = new QPushButton("Import Samples", calibrationDataCollapseSection);
+	QPushButton *extractDataButton = new QPushButton("Save to CSV", calibrationDataCollapseSection);
+	QPushButton *clearCalibrateDataButton = new QPushButton("Clear All Data", calibrationDataCollapseSection);
+	StyleHelper::BlueButton(importSamplesButton);
+	StyleHelper::BlueButton(extractDataButton);
+	StyleHelper::BlueButton(clearCalibrateDataButton);
 
 	calibrationDataCollapseSection->contentLayout()->setSpacing(8);
+	calibrationDataCollapseSection->contentLayout()->addWidget(importSamplesButton);
 	calibrationDataCollapseSection->contentLayout()->addWidget(extractDataButton);
 	calibrationDataCollapseSection->contentLayout()->addWidget(clearCalibrateDataButton);
 	#pragma endregion
@@ -1136,6 +1154,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	connect(calibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::postCalibrateData);
 	connect(extractDataButton, &QPushButton::clicked, this, &HarmonicCalibration::extractCalibrationData);
+	connect(importSamplesButton, &QPushButton::clicked, this, &HarmonicCalibration::importCalibrationData);
 	connect(clearCalibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::clearRawDataList);
 	connectLineEditToRPSConversion(motorMaxVelocitySpinBox->lineEdit(), rotate_vmax);
 	connectLineEditToAMAXConversion(motorAccelTimeSpinBox->lineEdit(), amax);

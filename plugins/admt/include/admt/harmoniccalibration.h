@@ -130,13 +130,13 @@ private:
 
 	QScrollArea *MTDiagnosticsScrollArea;
 
-	PlotWidget *acquisitionGraphWidget, *angleErrorPlotWidget, *calibrationRawDataPlotWidget, *FFTAngleErrorPlotWidget,
+	PlotWidget *acquisitionGraphPlotWidget, *angleErrorPlotWidget, *calibrationRawDataPlotWidget, *FFTAngleErrorPlotWidget,
 			   *correctedErrorPlotWidget, *postCalibrationRawDataPlotWidget, *FFTCorrectedErrorPlotWidget;
-	PlotAxis *calibrationRawDataXPlotAxis, *calibrationRawDataYPlotAxis, 
+	PlotAxis *acquisitionXPlotAxis, *acquisitionYPlotAxis, *calibrationRawDataXPlotAxis, *calibrationRawDataYPlotAxis, 
 			 *angleErrorXPlotAxis, *angleErrorYPlotAxis, *FFTAngleErrorXPlotAxis, *FFTAngleErrorYPlotAxis,
 			 *correctedErrorXPlotAxis, *correctedErrorYPlotAxis, *FFTCorrectedErrorXPlotAxis, *FFTCorrectedErrorYPlotAxis,
 			 *postCalibrationRawDataXPlotAxis, *postCalibrationRawDataYPlotAxis;
-	PlotChannel *angleErrorPlotChannel, *preCalibrationFFTPhasePlotChannel, *calibrationRawDataPlotChannel, *calibrationSineDataPlotChannel, *calibrationCosineDataPlotChannel,
+	PlotChannel *acquisitionAnglePlotChannel, *angleErrorPlotChannel, *preCalibrationFFTPhasePlotChannel, *calibrationRawDataPlotChannel, *calibrationSineDataPlotChannel, *calibrationCosineDataPlotChannel,
 				*FFTAngleErrorMagnitudeChannel, *FFTAngleErrorPhaseChannel,
 				*correctedErrorPlotChannel,
 				*postCalibrationRawDataPlotChannel, *postCalibrationSineDataPlotChannel, *postCalibrationCosineDataPlotChannel,
