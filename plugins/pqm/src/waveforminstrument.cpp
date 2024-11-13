@@ -51,6 +51,7 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	setLayout(layout);
+	layout->setMargin(0);
 	StyleHelper::GetInstance()->initColorMap();
 
 	m_plottingStrategy = PlottingStrategyBuilder::build("trigger", m_plotSampleRate);

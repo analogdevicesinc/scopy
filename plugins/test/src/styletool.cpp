@@ -149,7 +149,6 @@ QWidget *StyleTool::buildStylePage()
 	addLabeledWidget("Menu Small Label", new QLabel("Menu Small Label"));
 	addLabeledWidget("Subtle Label", new QLabel("Subtle Label"));
 	addLabeledWidget("Menu Medium Label", new QLabel("Menu Medium Label"));
-	addLabeledWidget("Plot Info Label", new QLabel("Plot Info Label"));
 
 	// Style the labels
 	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
@@ -158,8 +157,7 @@ QWidget *StyleTool::buildStylePage()
 			true, true);
 	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::label::menuMedium, true, true);
-	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
-			style::properties::label::plotInfo, true, true);
+
 
 	// Set the layout to the container widget
 	containerWidget->setLayout(layout);

@@ -39,7 +39,7 @@ HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
 	, m_relative(false)
 	, m_relativeOffset(nullptr)
 {
-	Style::setBackgroundColor(this, json::theme::background_primary);
+	Style::setBackgroundColor(this, QString("transparent"), true);
 	m_lay = new QHBoxLayout(this);
 	m_lay->setSizeConstraint(QLayout::SetFixedSize);
 	m_lay->setContentsMargins(0, 0, 0, 0);
