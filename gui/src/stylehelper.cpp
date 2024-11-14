@@ -249,7 +249,7 @@ void StyleHelper::MenuControlButton(QPushButton *btn, QString objectName, bool c
 
 void StyleHelper::MenuControlWidget(QWidget *w, QColor color, QString objectName)
 {
-	QString style = "scopy--MenuControlButton {background-color: &&background_primary&&; border-radius: 4px;}"
+	QString style = "scopy--MenuControlButton {background-color: &&background_primary&&;}"
 			"scopy--MenuControlButton[selected=true] { background-color:&&colorname&&;}";
 	style.replace("&&colorname&&", color.name());
 	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
@@ -289,7 +289,7 @@ void StyleHelper::MenuLargeLabel(QLabel *m_lbl, QString objectName)
 				QLabel {
 					color: &&content_default&&;
 					background-color: rgba(255,255,255,0);
-					font-weight: 700;
+					font-weight: bold;
 					font-family: Open Sans;
 					font-size: 14px;
 					font-style: normal;
@@ -636,7 +636,7 @@ void StyleHelper::MenuCollapseHeaderLineEdit(QLineEdit *w, QString objectName)
 				QLineEdit {
 					color: &&content_default&&;
 					background-color: rgba(255,255,255,0);
-					font-weight: 800;
+					font-weight: bold;
 					font-family: Open Sans;
 					font-size: 14px;
 					font-style: normal;

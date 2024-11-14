@@ -1,5 +1,14 @@
 QWidget {
     background-color: transparent;
+    color: &content_default&;
+    font: &font_size& &font_family&;
+    font-style: normal;
+}
+QWidget {
+    background-color: transparent;
+}
+QAbstractSpinBox {
+    background-color: &background_primary&;
 }
 QPushButton {
     background-color: transparent;

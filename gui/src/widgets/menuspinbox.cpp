@@ -122,6 +122,7 @@ void MenuSpinbox::layoutVertically(bool left)
 	}
 
 	Style::setStyle(m_label, style::properties::label::subtle);
+	Style::setStyle(m_scaleCb, style::properties::widget::noBorder);
 
 	int size = Style::getDimension(json::global::unit_2_5);
 	m_plus->setIcon(Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
