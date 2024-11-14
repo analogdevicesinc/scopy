@@ -4,7 +4,7 @@ QWidget[&&property&&=true]  {
 	font-weight: normal;
 	text-align: left;
 	color: &content_default& ;
-	background-color: &interactive_subtle_disabled& ;
+	background-color: &interactive_secondary_disabled& ;
 }
 						
 QSpinBox[&&property&&=true] {
