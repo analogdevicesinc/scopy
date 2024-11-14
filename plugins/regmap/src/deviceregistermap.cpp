@@ -77,7 +77,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 	tool->bottomCentral()->setVisible(true);
 	layout->addWidget(tool);
 
-	Style::setBackgroundColor(this, Style::getAttribute(json::theme::interactive_primary_disabled));
+	Style::setBackgroundColor(this, Style::getAttribute(json::theme::interactive_secondary_disabled));
 
 	initSettings();
 
@@ -96,6 +96,8 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 
 		QWidget *registerMapTable = new QWidget();
 		QVBoxLayout *registerMapTableLayout = new QVBoxLayout(registerMapTable);
+		registerMapTableLayout->setMargin(0);
+		registerMapTableLayout->setSpacing(0);
 		Utils::removeLayoutMargins(registerMapTableLayout);
 		registerMapTable->setLayout(registerMapTableLayout);
 		tool->addWidgetToCentralContainerHelper(registerMapTable);
@@ -108,7 +110,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 
 		QWidget *registerTableHead = new QWidget(tableHeadWidget);
 		Style::setBackgroundColor(registerTableHead,
-					  Style::getAttribute(json::theme::interactive_subtle_disabled));
+					  Style::getAttribute(json::theme::interactive_secondary_disabled));
 
 		QHBoxLayout *registerTableHeadLayout = new QHBoxLayout(registerTableHead);
 		registerTableHeadLayout->setSpacing(0);
@@ -119,7 +121,8 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 		registerTableHead->setFixedWidth(180);
 
 		QWidget *colBitCount = new QWidget(tableHeadWidget);
-		Style::setBackgroundColor(colBitCount, Style::getAttribute(json::theme::interactive_subtle_disabled));
+		Style::setBackgroundColor(colBitCount,
+					  Style::getAttribute(json::theme::interactive_secondary_disabled));
 
 		QHBoxLayout *tableHead = new QHBoxLayout(colBitCount);
 		colBitCount->setLayout(tableHead);

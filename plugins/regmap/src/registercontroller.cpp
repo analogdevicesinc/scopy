@@ -181,8 +181,6 @@ void RegisterController::applyStyle()
 	Style::setStyle(writeButton, style::properties::button::basicButton, true, true);
 	writeButton->setFixedHeight(40);
 	Style::setStyle(valueLabel, style::properties::label::menuSmall);
-
-	// setStyleSheet(RegmapStyleHelper::regmapControllerStyle(nullptr));
 }
 
 void RegisterController::startTutorial()

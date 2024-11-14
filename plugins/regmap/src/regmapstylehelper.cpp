@@ -64,8 +64,7 @@ void RegmapStyleHelper::toggleSelectedRegister(QWidget *widget, bool toggle)
 {
 	QString styleSheet = "";
 	if(toggle) {
-		styleSheet =
-			"background-color:" + Style::getAttribute(json::theme::interactive_primary_disabled) + " ;";
+		styleSheet = "background-color:" + Style::getAttribute(json::theme::interactive_primary_idle) + " ;";
 	} else {
 		styleSheet = "background-color:" + Style::getAttribute(json::theme::background_primary) + " ;";
 	}
@@ -134,7 +133,7 @@ void RegmapStyleHelper::BitFieldDetailedWidgetStyle(BitFieldDetailedWidget *widg
 						}
                         )css");
 
-	style.replace("&&frameBackground&&", Style::getAttribute(json::theme::interactive_subtle_disabled));
+	style.replace("&&frameBackground&&", Style::getAttribute(json::theme::interactive_secondary_disabled));
 
 	widget->setMinimumWidth(10);
 	widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
