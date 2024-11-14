@@ -49,19 +49,22 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 	QVBoxLayout *layout = new QVBoxLayout(this);
 	Utils::removeLayoutMargins(layout);
 	setLayout(layout);
-	layout->setSpacing(5);
+	layout->setSpacing(0);
 
 	regWidth = regModel->getWidth();
 
 	QWidget *nameDescriptionWidget = new QWidget(this);
-	Style::setBackgroundColor(nameDescriptionWidget, Style::getAttribute(json::theme::interactive_subtle_disabled));
+	Style::setBackgroundColor(nameDescriptionWidget,
+				  Style::getAttribute(json::theme::interactive_secondary_disabled));
 	QHBoxLayout *nameDescriptionLayout = new QHBoxLayout(nameDescriptionWidget);
 	nameDescriptionWidget->setLayout(nameDescriptionLayout);
+	// nameDescriptionLayout->setMargin(10);
+
 	QLabel *nameLabel = new QLabel("Name: " + regModel->getName(), this);
 	QLabel *descriptionLabel = new QLabel("Description: " + regModel->getDescription(), this);
 	nameDescriptionLayout->addWidget(nameLabel);
 	nameDescriptionLayout->addWidget(descriptionLabel);
-	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
 
 	QGridLayout *bitFieldsWidgetLayout = new QGridLayout();
 	bitFieldsWidgetLayout->setMargin(0);
@@ -70,12 +73,15 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 	bitFieldList = new QVector<BitFieldDetailedWidget *>();
 	BitFieldDetailedWidgetFactory bitFieldDetailedWidgetFactory;
 	QWidget *bitFieldsWidget = new QWidget();
+	bitFieldsWidget->setContentsMargins(0, 0, 2, 0);
 	bitFieldsWidget->setLayout(bitFieldsWidgetLayout);
 	VerticalScrollArea *scrollArea = new VerticalScrollArea();
 	scrollArea->setWidget(bitFieldsWidget);
+
+	// layout->addWidget(nameDescriptionWidget);
 	layout->addWidget(scrollArea);
 
-	bitFieldsWidgetLayout->addWidget(nameDescriptionWidget, 0, 0, 1, 8);
+	bitFieldsWidgetLayout->addWidget(nameDescriptionWidget, 0, 0, 1, 3);
 	int currentBitFieldCount = 0;
 	int row = 1;
 	int col = 0;
@@ -106,7 +112,7 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 			bitFieldsWidgetLayout->setColumnStretch(col, 1);
 			col++;
 		}
-		bitFieldsWidgetLayout->addItem(new QSpacerItem(10, 10, QSizePolicy::Preferred, QSizePolicy::Expanding),
+		bitFieldsWidgetLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding),
 					       row + 1, col);
 	}
 }
