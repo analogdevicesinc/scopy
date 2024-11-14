@@ -155,7 +155,7 @@ void IIOWidget::setDataToUIConversion(std::function<QString(QString)> func) { m_
 void IIOWidget::startTimer(QString data)
 {
 	m_lastData = data;
-	m_progressBar->setBarColor(Style::getAttribute(json::theme::interactive_primary_idle));
+	m_progressBar->setBarColor(Style::getAttribute(json::theme::interactive_subtle_idle));
 	m_progressBar->startProgress();
 }
 
