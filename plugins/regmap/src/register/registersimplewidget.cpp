@@ -57,7 +57,7 @@ RegisterSimpleWidget::RegisterSimpleWidget(RegisterModel *registerModel, QVector
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
 
 	QHBoxLayout *layout = new QHBoxLayout();
-	layout->setMargin(2);
+	layout->setContentsMargins(0, 2, 0, 2);
 	layout->setSpacing(4);
 	setLayout(layout);
 
