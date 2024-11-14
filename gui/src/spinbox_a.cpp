@@ -72,6 +72,8 @@ SpinBoxA::SpinBoxA(QWidget *parent)
 	connect(ui->SBA_DownButton, SIGNAL(clicked()), SLOT(onDownButtonPressed()));
 	int size = Style::getDimension(json::global::unit_3);
 
+	Style::setStyle(ui->SBA_Combobox, style::properties::widget::noBorder);
+
 	ui->SBA_UpButton->setIcon(
 		Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
 	Style::setStyle(ui->SBA_UpButton, style::properties::button::spinboxButton, true, true);

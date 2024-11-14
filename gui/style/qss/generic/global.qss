@@ -3,12 +3,21 @@ QWidget {
     background-color: transparent;
     color: &content_default&;
     font: &font_size& &font_family&;
-    font-weight: 500;
+    font-style: normal;
+    font-weight: normal;
+}
+
+QTextBrowser {
+    border: none;
 }
 
 *:focus {
     outline: &interactive_focus&;
 
+}
+
+QAbstractSpinBox {
+    	background-color: &background_primary&;
 }
 
 QToolTip {

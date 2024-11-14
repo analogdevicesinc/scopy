@@ -1,7 +1,7 @@
 *[&&property&&=true] {
 	border: 1px solid &interactive_subtle_disabled&;
     color: &content_inverse&;
-    font-weight: 700;
+    font-weight: bold;
     border-radius: &radius_1&;
 }
 *[&&property&&=true]:hover {

@@ -167,6 +167,7 @@
         <file>open-sans-regular.ttf</file>
         <file>icons/scopy-light/icons/tool_datalogger.svg</file>
         <file>icons/scopy-light/icons/search.svg</file>
+        <file>Arial.ttf</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>
