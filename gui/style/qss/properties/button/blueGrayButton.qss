@@ -4,7 +4,7 @@ QPushButton[&&property&&=true] {
 	height: &unit_4&;
 	background-color: &background_primary&;
 	color: &content_default&;
-	font-weight: 700;
+	font-weight: bold;
 	font-size: &font_size&;
 	qproperty-iconSize: &unit_4&px;
 }

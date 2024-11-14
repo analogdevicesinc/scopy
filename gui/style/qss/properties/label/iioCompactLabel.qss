@@ -1,7 +1,7 @@
 QLabel[&&property&&=true] {
 	color: &content_default&;
 	background-color: rgba(255,255,255,0);
-	font-weight: 500;
+	font-weight: normal;
 	font-family: Open Sans;
 	font-size: 12px;
 	font-style: normal;
