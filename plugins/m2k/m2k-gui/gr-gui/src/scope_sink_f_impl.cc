@@ -339,7 +339,7 @@ int scope_sink_f_impl::work(int noutput_items, gr_vector_const_void_star &input_
 		if((gr::high_res_timer_now() - d_last_time > d_update_time) || !d_cleanBuffers) {
 			d_last_time = gr::high_res_timer_now();
 			if(d_qApplication) {
-				qInfo() << QString::fromStdString(d_name);
+				qDebug() << QString::fromStdString(d_name);
 
 				d_qApplication->postEvent(
 					this->plot,
