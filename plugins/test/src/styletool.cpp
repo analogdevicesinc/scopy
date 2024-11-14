@@ -158,7 +158,6 @@ QWidget *StyleTool::buildStylePage()
 	Style::setStyle(layout->itemAt(i++)->widget()->layout()->itemAt(1)->widget(),
 			style::properties::label::menuMedium, true, true);
 
-
 	// Set the layout to the container widget
 	containerWidget->setLayout(layout);
 

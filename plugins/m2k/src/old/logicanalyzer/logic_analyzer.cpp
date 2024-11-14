@@ -195,7 +195,6 @@ LogicAnalyzer::LogicAnalyzer(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEn
 	// decoder table dropdown menu
 	connect(ui->btnCollapseSettings, &QPushButton::clicked,
 		[=](bool check) { ui->wDecoderSettings_2->setVisible(check); });
-	ui->btnCollapseSettings->click();
 	ui->statusLabel->setStyleSheet("QLabel { color : #4A64FF; }");
 
 	// Add propper zoomer
@@ -1261,9 +1260,6 @@ void LogicAnalyzer::setupUi()
 
 	// this size has been set to fit all menu widgets
 	ui->generalSettings->setMinimumWidth(350);
-
-	Style::setBackgroundColor(ui->groupSizeSpinBox, Style::getAttribute(json::theme::background_primary), true);
-	Style::setBackgroundColor(ui->groupOffsetSpinBox, Style::getAttribute(json::theme::background_primary), true);
 
 	int gsettings_panel = ui->stackedWidget->indexOf(ui->generalSettings);
 	ui->btnGeneralSettings->setProperty("id", QVariant(-gsettings_panel));

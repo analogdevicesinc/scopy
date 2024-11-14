@@ -230,7 +230,6 @@ void SettingsInstrument::initSystemTimeSection(QWidget *parent)
 	QDateTimeEdit *systemTimeEdit = new QDateTimeEdit(systemTimeSection);
 	systemTimeEdit->setDateTime(QDateTime::currentDateTime());
 	systemTimeEdit->setDisplayFormat("dd:MM:yyyy hh:mm:ss.zzz");
-	Style::setBackgroundColor(systemTimeEdit, json::theme::background_primary, true);
 
 	QPushButton *systemTimeBtn = new QPushButton("Set", systemTimeSection);
 	systemTimeBtn->setFixedWidth(88);
@@ -282,12 +281,10 @@ void SettingsInstrument::initTimestampSection(QWidget *parent)
 	QDateTimeEdit *timestampEdit1 = new QDateTimeEdit(timestampSection);
 	timestampEdit1->setDateTime(QDateTime::currentDateTime());
 	timestampEdit1->setDisplayFormat("dd:MM:yyyy hh:mm:ss.zzz");
-	Style::setBackgroundColor(timestampEdit1, json::theme::background_primary, true);
 
 	QDateTimeEdit *timestampEdit2 = new QDateTimeEdit(timestampSection);
 	timestampEdit2->setDateTime(QDateTime::currentDateTime());
 	timestampEdit2->setDisplayFormat("dd:MM:yyyy hh:mm:ss.zzz");
-	Style::setBackgroundColor(timestampEdit2, json::theme::background_primary, true);
 
 	qInfo() << "Date time: " << timestampEdit2->dateTime().toString("yyyyMMddhhmmsszzz");
 
