@@ -375,7 +375,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_save_session", true);
 	p->init("general_save_attached", true);
 	p->init("general_doubleclick_attach", true);
-#if defined(__arm__)
+#if defined(__linux__) && (defined(__arm__) || defined(__aarch64__))
 	p->init("general_use_opengl", false);
 #else
 	p->init("general_use_opengl", true);
