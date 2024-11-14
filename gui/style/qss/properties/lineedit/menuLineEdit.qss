@@ -1,12 +1,11 @@
 QLineEdit[&&property&&=true] {
 	background-color: transparent;
 	color: &content_default&;
-	font-size: 15px;
+	font-size: &font_size&;
 	border: 0px solid transparent;
 	border-bottom: 1px solid &content_default&;
 	border-radius: 0;
-	padding: 2px;
-	padding-bottom: 4px;
+	padding: 0 &padding_interactive& 0 &padding_interactive&;
 }
 
 QLineEdit[&&property&&=true]:disabled {

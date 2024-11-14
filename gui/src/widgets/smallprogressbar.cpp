@@ -60,6 +60,6 @@ void SmallProgressBar::setBarColor(QColor color)
 	setStyleSheet(style);
 }
 
-void SmallProgressBar::resetBarColor() { setBarColor(Style::getAttribute(json::theme::content_subtle)); }
+void SmallProgressBar::resetBarColor() { setBarColor(Style::getAttribute(json::theme::interactive_subtle_idle)); }
 
 #include "moc_smallprogressbar.cpp"

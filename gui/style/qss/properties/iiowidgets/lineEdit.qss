@@ -1,5 +1,5 @@
 QLineEdit[&&property&&=true] {
-	border: &border_width& solid &content_subtle&;
+	border: &border_width& solid &interactive_subtle_idle&;
 	border-top-left-radius: 2px;
 	border-top-right-radius: 2px;
 	border-bottom-left-radius: 0px;
