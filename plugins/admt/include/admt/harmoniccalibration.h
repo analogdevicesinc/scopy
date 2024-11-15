@@ -232,7 +232,6 @@ private:
 	void readAllRegisters();
 	void prependAcquisitionData(double& data, QVector<double>& list);
 	void plotAcquisition(QVector<double>& list, PlotChannel* channel, PlotWidget* plot);
-	void resizeAquisitionData(QVector<double>& list);
 	void populateAngleErrorGraphs();
 
 	QTimer *acquisitionUITimer, *calibrationUITimer, *utilityTimer;
