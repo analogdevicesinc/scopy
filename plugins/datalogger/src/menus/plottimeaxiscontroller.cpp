@@ -59,14 +59,29 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 	timeEdit->setDisplayFormat("hh:mm:ss");
 	timeEdit->setVisible(false);
 
-	m_xdelta = new PositionSpinButton(
-		{
-			{"s", 1},
-			{"min", 60},
-			{"hour", 3600},
-		},
-		"Delta", -DBL_MAX, DBL_MAX, false, false, xAxisContainer);
+	// m_xdelta = new PositionSpinButton(
+	// 	{
+	// 		{"s", 1},
+	// 		{"min", 60},
+	// 		{"hour", 3600},
+	// 	},
+	// 	"Delta", -DBL_MAX, DBL_MAX, false, false, xAxisContainer);
+
+	m_xdelta = new gui::TestSpinbox("Delta", 0, "s", 0, DBL_MAX, false, false, xAxisContainer);
+	m_xdelta->setIncrementMode(gui::TestSpinbox::IS_FIXED);
+	m_xdelta->scale()->setHasPrefix(false);
+	m_xdelta->scale()->setScaleOptions({{QString("s"), 1}, {QString("min"), 60}, {QString("h"), 3600}});
 	m_xdelta->setValue(DataMonitorUtils::getAxisDefaultMaxValue());
+
+	gui::TestSpinbox *test = new gui::TestSpinbox("Metric", 10, "m", 0, DBL_MAX, false, false, xAxisContainer);
+	test->setIncrementMode(gui::TestSpinbox::IS_FIXED);
+
+	gui::TestSpinbox *test2 =
+		new gui::TestSpinbox("Custom", 0, "samples", 0, DBL_MAX, false, false, xAxisContainer);
+	test2->setIncrementMode(gui::TestSpinbox::IS_FIXED);
+	test2->scale()->setScalePrefixes(
+		{{QString(""), 1e0}, {QString("k"), 1e3}, {QString("M"), 1e6}, {QString("G"), 1e9}});
+	test2->setValue(100);
 
 	auto &&timeTracker = TimeManager::GetInstance();
 
@@ -89,7 +104,10 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 	connect(dateEdit, &QDateEdit::dateChanged, this, &PlotTimeAxisController::updatePlotStartPoint);
 	connect(timeEdit, &QTimeEdit::timeChanged, this, &PlotTimeAxisController::updatePlotStartPoint);
 
-	connect(m_xdelta, &PositionSpinButton::valueChanged, this,
+	// connect(m_xdelta, &PositionSpinButton::valueChanged, this,
+	// 	[=, this](double value) { m_plot->updateXAxisIntervalMax(value); });
+
+	connect(m_xdelta, &gui::TestSpinbox::valueChanged, this,
 		[=, this](double value) { m_plot->updateXAxisIntervalMax(value); });
 
 	xAxisSection->contentLayout()->addWidget(realTimeToggle);
@@ -97,6 +115,9 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 	xAxisSection->contentLayout()->addWidget(dateEdit);
 	xAxisSection->contentLayout()->addWidget(timeEdit);
 	xAxisSection->contentLayout()->addWidget(m_xdelta);
+
+	xAxisSection->contentLayout()->addWidget(test);
+	xAxisSection->contentLayout()->addWidget(test2);
 
 	layout->addWidget(xAxisContainer);
 }

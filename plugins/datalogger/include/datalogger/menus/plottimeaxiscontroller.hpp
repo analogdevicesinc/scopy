@@ -27,6 +27,7 @@
 #include <menuonoffswitch.h>
 #include <monitorplot.hpp>
 #include <spinbox_a.hpp>
+#include <testspinbox.h>
 #include "scopy-datalogger_export.h"
 
 namespace scopy {
@@ -45,7 +46,8 @@ signals:
 
 private:
 	MonitorPlot *m_plot;
-	PositionSpinButton *m_xdelta;
+	// PositionSpinButton *m_xdelta;
+	gui::TestSpinbox *m_xdelta;
 	QDateEdit *dateEdit;
 	QTimeEdit *timeEdit;
 	MenuOnOffSwitch *realTimeToggle;
