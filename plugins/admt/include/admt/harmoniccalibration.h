@@ -65,7 +65,7 @@ public Q_SLOTS:
 	void stop();
 	void start();
 	void restart();
-	void calibrationTask();
+	void calibrationUITask();
 	void utilityTask();
 	void clearCommandLog();
 	void canCalibrate(bool);
@@ -120,7 +120,7 @@ private:
 	MenuCombo *m_dataGraphChannelMenuCombo, *m_dataGraphDirectionMenuCombo, *m_tempGraphDirectionMenuCombo, *m_calibrationMotorRampModeMenuCombo,
 			  *sequenceTypeMenuCombo, *conversionTypeMenuCombo, *cnvSourceMenuCombo, *convertSynchronizationMenuCombo, *angleFilterMenuCombo, *eighthHarmonicMenuCombo;
 
-	QTabWidget *tabWidget, *calibrationDataGraphTabWidget;
+	QTabWidget *tabWidget, *calibrationDataGraphTabWidget, *resultDataTabWidget;
 
 	QListWidget *rawDataListWidget;
 
@@ -233,8 +233,9 @@ private:
 	void prependAcquisitionData(double& data, QVector<double>& list);
 	void plotAcquisition(QVector<double>& list, PlotChannel* channel, PlotWidget* plot);
 	void resizeAquisitionData(QVector<double>& list);
+	void populateAngleErrorGraphs();
 
-	QTimer *acquisitionUITimer, *calibrationTimer, *utilityTimer;
+	QTimer *acquisitionUITimer, *calibrationUITimer, *utilityTimer;
 
 	int uuid = 0;
 	const char *rotationChannelName, *angleChannelName, *countChannelName, *temperatureChannelName;

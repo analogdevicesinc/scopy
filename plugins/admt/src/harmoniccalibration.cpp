@@ -6,7 +6,7 @@
 #include <admtstylehelper.h>
 
 static int acquisitionUITimerRate = 50;
-static int calibrationTimerRate = 1000;
+static int calibrationUITimerRate = 50;
 static int utilityTimerRate = 1000;
 
 static int bufferSize = 1;
@@ -19,12 +19,14 @@ static double *tempGraphValue;
 static int cycleCount = 11;
 static int samplesPerCycle = 256;
 static int totalSamplesCount = cycleCount * samplesPerCycle;
+static int samplesCollected = 0;
 static bool isStartAcquisition = false;
 static bool isStartMotor = false;
 static bool isPostCalibration = false;
 static bool isCalculatedCoeff = false;
 static bool isAngleDisplayFormat = false;
 static bool resetToZero = true;
+static bool hasMTDiagnostics = false;
 
 static double motorTimeUnit = 1.048576; // t = 2^24/16Mhz
 static int motorMicrostepPerRevolution = 51200;
@@ -372,8 +374,8 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	// timer = new QTimer(this);
 	// connect(timer, &QTimer::timeout, this, &HarmonicCalibration::timerTask);
 
-	calibrationTimer = new QTimer(this);
-	connect(calibrationTimer, &QTimer::timeout, this, &HarmonicCalibration::calibrationTask);
+	calibrationUITimer = new QTimer(this);
+	connect(calibrationUITimer, &QTimer::timeout, this, &HarmonicCalibration::calibrationUITask);
 
 	utilityTimer = new QTimer(this);
 	connect(utilityTimer, &QTimer::timeout, this, &HarmonicCalibration::utilityTask);
@@ -392,11 +394,11 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 
 		if(index == 1) // Calibration Tab
 		{ 
-			calibrationTimer->start(calibrationTimerRate); 
+			calibrationUITimer->start(calibrationUITimerRate); 
 		}
 		else 
 		{ 
-			calibrationTimer->stop();
+			calibrationUITimer->stop();
 		}
 
 		if(index == 2) // Utility Tab
@@ -611,7 +613,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationDataGraphTabWidget->addTab(postCalibrationSamplesWidget, "Post Calibration Samples");
 
 	MenuSectionWidget *resultDataSectionWidget = new MenuSectionWidget(calibrationDataGraphWidget);
-	QTabWidget *resultDataTabWidget = new QTabWidget(resultDataSectionWidget);
+	resultDataTabWidget = new QTabWidget(resultDataSectionWidget);
 	applyTabWidgetStyle(resultDataTabWidget);
 	resultDataSectionWidget->contentLayout()->setSpacing(8);
 	resultDataSectionWidget->contentLayout()->addWidget(resultDataTabWidget);
@@ -1776,9 +1778,11 @@ void HarmonicCalibration::toggleMTDiagnostics(int mode)
 	switch(mode){
 		case 0:
 			MTDiagnosticsScrollArea->hide();
+			hasMTDiagnostics = false;
 			break;
 		case 1:
 			MTDiagnosticsScrollArea->show();
+			hasMTDiagnostics = true;
 			break;
 	}
 }
@@ -2141,8 +2145,10 @@ bool HarmonicCalibration::changeCNVPage(uint32_t page){
 void HarmonicCalibration::utilityTask(){
 	updateDigioMonitor();
 	updateFaultRegister();
-	updateMTDiagRegister();
-	updateMTDiagnostics();
+	if(hasMTDiagnostics){
+		updateMTDiagRegister();
+		updateMTDiagnostics();
+	}
 	commandLogWrite("");
 }
 
@@ -2679,7 +2685,7 @@ void HarmonicCalibration::updateLabelValue(QLabel *label, ADMTController::MotorA
 	}
 }
 
-void HarmonicCalibration::calibrationTask()
+void HarmonicCalibration::calibrationUITask()
 {
 	if(!isDebug){
 		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
@@ -2753,7 +2759,7 @@ void HarmonicCalibration::startMotor()
 		
 		if(isPostCalibration)
 		{
-			if(graphPostDataList.size() == totalSamplesCount) 
+			if(samplesCollected == totalSamplesCount) 
 			{
 				computeSineCosineOfAngles(graphPostDataList);
 				m_admtController->postcalibrate(vector<double>(graphPostDataList.begin(), graphPostDataList.end()), cycleCount, samplesPerCycle);
@@ -2781,7 +2787,7 @@ void HarmonicCalibration::startMotor()
 			}
 		}
 		else{
-			if(graphDataList.size() == totalSamplesCount) 
+			if(samplesCollected == totalSamplesCount) 
 			{
 				computeSineCosineOfAngles(graphDataList);
 				canCalibrate(true); 
@@ -2790,25 +2796,7 @@ void HarmonicCalibration::startMotor()
 
 				flashHarmonicValues();
 
-				QVector<double> angleError = QVector<double>(m_admtController->angleError.begin(), m_admtController->angleError.end());
-				QVector<double> FFTAngleErrorMagnitude = QVector<double>(m_admtController->FFTAngleErrorMagnitude.begin(), m_admtController->FFTAngleErrorMagnitude.end());
-				QVector<double> FFTAngleErrorPhase = QVector<double>(m_admtController->FFTAngleErrorPhase.begin(), m_admtController->FFTAngleErrorPhase.end());
-
-				angleErrorPlotChannel->curve()->setSamples(angleError);
-				auto angleErrorMinMax = std::minmax_element(angleError.begin(), angleError.end());
-				angleErrorYPlotAxis->setInterval(*angleErrorMinMax.first, *angleErrorMinMax.second);
-				angleErrorXPlotAxis->setInterval(0, angleError.size());
-				angleErrorPlotWidget->replot();
-				
-				FFTAngleErrorMagnitudeChannel->curve()->setSamples(FFTAngleErrorMagnitude);
-				auto angleErrorMagnitudeMinMax = std::minmax_element(FFTAngleErrorMagnitude.begin(), FFTAngleErrorMagnitude.end());
-				FFTAngleErrorPhaseChannel->curve()->setSamples(FFTAngleErrorPhase);
-				auto angleErrorPhaseMinMax = std::minmax_element(FFTAngleErrorPhase.begin(), FFTAngleErrorPhase.end());
-				double FFTAngleErrorPlotMin = *angleErrorMagnitudeMinMax.first < *angleErrorPhaseMinMax.first ? *angleErrorMagnitudeMinMax.first : *angleErrorPhaseMinMax.first;
-				double FFTAngleErrorPlotMax = *angleErrorMagnitudeMinMax.second > *angleErrorPhaseMinMax.second ? *angleErrorMagnitudeMinMax.second : *angleErrorPhaseMinMax.second;
-				FFTAngleErrorYPlotAxis->setInterval(FFTAngleErrorPlotMin, FFTAngleErrorPlotMax);
-				FFTAngleErrorXPlotAxis->setInterval(0, FFTAngleErrorMagnitude.size());
-				FFTAngleErrorPlotWidget->replot();
+				populateAngleErrorGraphs();
 			}
 			else{
 				resetToZero = true;
@@ -2817,6 +2805,31 @@ void HarmonicCalibration::startMotor()
 	});
 	connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));
 	watcher->setFuture(future);
+}
+
+void HarmonicCalibration::populateAngleErrorGraphs()
+{
+	QVector<double> angleError = QVector<double>(m_admtController->angleError.begin(), m_admtController->angleError.end());
+	QVector<double> FFTAngleErrorMagnitude = QVector<double>(m_admtController->FFTAngleErrorMagnitude.begin(), m_admtController->FFTAngleErrorMagnitude.end());
+	QVector<double> FFTAngleErrorPhase = QVector<double>(m_admtController->FFTAngleErrorPhase.begin(), m_admtController->FFTAngleErrorPhase.end());
+
+	angleErrorPlotChannel->curve()->setSamples(angleError);
+	auto angleErrorMinMax = std::minmax_element(angleError.begin(), angleError.end());
+	angleErrorYPlotAxis->setInterval(*angleErrorMinMax.first, *angleErrorMinMax.second);
+	angleErrorXPlotAxis->setInterval(0, angleError.size());
+	angleErrorPlotWidget->replot();
+	
+	FFTAngleErrorMagnitudeChannel->curve()->setSamples(FFTAngleErrorMagnitude);
+	auto angleErrorMagnitudeMinMax = std::minmax_element(FFTAngleErrorMagnitude.begin(), FFTAngleErrorMagnitude.end());
+	FFTAngleErrorPhaseChannel->curve()->setSamples(FFTAngleErrorPhase);
+	auto angleErrorPhaseMinMax = std::minmax_element(FFTAngleErrorPhase.begin(), FFTAngleErrorPhase.end());
+	double FFTAngleErrorPlotMin = *angleErrorMagnitudeMinMax.first < *angleErrorPhaseMinMax.first ? *angleErrorMagnitudeMinMax.first : *angleErrorPhaseMinMax.first;
+	double FFTAngleErrorPlotMax = *angleErrorMagnitudeMinMax.second > *angleErrorPhaseMinMax.second ? *angleErrorMagnitudeMinMax.second : *angleErrorPhaseMinMax.second;
+	FFTAngleErrorYPlotAxis->setInterval(FFTAngleErrorPlotMin, FFTAngleErrorPlotMax);
+	FFTAngleErrorXPlotAxis->setInterval(0, FFTAngleErrorMagnitude.size());
+	FFTAngleErrorPlotWidget->replot();
+
+	resultDataTabWidget->setCurrentIndex(0); // Set tab to Angle Error
 }
 
 void HarmonicCalibration::canStartMotor(bool value)
@@ -3135,9 +3148,14 @@ void HarmonicCalibration::importCalibrationData()
 		{
 			calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
 			calibrationRawDataXPlotAxis->setInterval(0, graphDataList.size());
-			computeSineCosineOfAngles(graphDataList);
 			calibrationRawDataPlotWidget->replot();
+
+			computeSineCosineOfAngles(graphDataList);
+			canStartMotor(false);
 			canCalibrate(true);
+			calibrationLogWrite(m_admtController->calibrate(vector<double>(graphDataList.begin(), graphDataList.end()), cycleCount, samplesPerCycle));
+			flashHarmonicValues();
+			populateAngleErrorGraphs();
 		}
 	} catch(FileManagerException &ex) {
 		calibrationLogWrite(QString(ex.what()));
