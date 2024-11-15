@@ -75,6 +75,7 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 
 	gui::TestSpinbox *test = new gui::TestSpinbox("Metric", 10, "m", 0, DBL_MAX, false, false, xAxisContainer);
 	test->setIncrementMode(gui::TestSpinbox::IS_FIXED);
+	// test->scale()->setScalingEnabled(false);
 
 	gui::TestSpinbox *test2 =
 		new gui::TestSpinbox("Custom", 0, "samples", 0, DBL_MAX, false, false, xAxisContainer);
