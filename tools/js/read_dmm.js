@@ -79,30 +79,23 @@ function run_tests() {
 	siggen.running = false
 }
 
-function connect(host) {
-	print("Connecting to " + host + "...")
-
-	var success = launcher.connect("ip:" + host)
-
-	if (success)
-		print("Connected!")
-	else
-		print("Failed!")
-
-	return success;
-}
-
 function main() {
-	/* hardcoded for now */
-	var host = "192.168.2.1"
+	/* Feel free to modify this as needed */
+	var uri = "ip:192.168.2.1"
 
-	var connected = connect(host)
+	var devId = scopy.addDevice(uri)
+	var connected = scopy.connectDevice(devId)
+	msleep(1000)
 	if (!connected)
 		return Error()
 
 	run_tests()
 
-	launcher.disconnect()
+	scopy.disconnectDevice(devId)
+	scopy.removeDevice(uri)
+	msleep(1000)
 }
 
+/* To keep the application session after running a certain script */
+/* use the command line options: -r or --keep-running. */
 main()

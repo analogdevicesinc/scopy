@@ -1,27 +1,12 @@
 #!/usr/bin/scopy -s
 
-/* This is the script that starts scopy up and connects to the emulator */
-var host = "127.0.0.1"
-
-
-function connect(host) {
-	print("Connecting to " + host + "...")
-
-	var success = launcher.connect("ip:" + host)
-
-	if (success)
-		print("Connected!")
-	else
-		print("Failed!")
-
-	return success;
-}
-
+/* Before running this example it is necessary to run: iio-emu adalm2000 */
+var uri = "127.0.0.1"
 
 function main() {
-	/* hardcoded for now */
 
-	var connected = connect(host)
+	var devId = scopy.addDevice(uri)
+	var connected = scopy.connectDevice(devId)
 	if (!connected)
 		return Error()
 
@@ -30,9 +15,9 @@ function main() {
 	/* Run oscilloscope */
 	osc.running=true
 	/* Focus oscilloscope */
-	launcher.focused_instrument=0
-	/* Resume control to the application*/
-	returnToApplication();
+	scopy.switchTool("Oscilloscope")
 }
 
+/* To keep the application session after running a certain script */
+/* use the command line options: -r or --keep-running. */
 main()
