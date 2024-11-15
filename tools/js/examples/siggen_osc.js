@@ -37,9 +37,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
 
-/* Perform tool reset */
-launcher.reset()
-
 /*Setup Signal Generator*/
 function set_signal_generator(){
 
@@ -92,20 +89,38 @@ function set_oscilloscope(){
 
 /* Setup main function */
 function main(){
-	
+	/* Feel free to modify this as needed */
+	var uri = "ip:192.168.2.1"
+
+	var devId = scopy.addDevice(uri)
+	var connected = scopy.connectDevice(devId)
+	msleep(1000)
+	if (!connected)
+		return Error()
+
+	scopy.switchTool("Signal Generator")
+
 	set_signal_generator()
 	
 	msleep(1000)
+
+	scopy.switchTool("Oscilloscope")
 	
 	set_oscilloscope()
-	
-	msleep(1000)
 	
 	/* Read Channel 1 Peak-to-Peak Value */
 	var pp = osc.channels[0].peak_to_peak
 	
+	msleep(1000)
+	
 	/* Print value to Console */
 	printToConsole(pp)
+	
+	scopy.disconnectDevice(devId)
+	scopy.removeDevice(uri)
+	msleep(1000)
 }
 
+/* To keep the application session after running a certain script */
+/* use the command line options: -r or --keep-running. */
 main()
