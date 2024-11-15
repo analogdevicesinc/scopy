@@ -44,7 +44,7 @@ static uint32_t h3PhaseDeviceRegister = 0x1A;
 static uint32_t h8PhaseDeviceRegister = 0x1C;
 
 static int acquisitionDisplayLength = 200;
-static QVector<double> acquisitionAngleList(acquisitionDisplayLength), graphDataList, graphPostDataList;
+static QVector<double> acquisitionAngleList, graphDataList, graphPostDataList;
 
 static const QColor scopyBlueColor = scopy::StyleHelper::getColor("ScopyBlue");
 static const QColor channel0Color = scopy::StyleHelper::getColor("CH0");
@@ -424,7 +424,6 @@ void HarmonicCalibration::startAcquisition()
 {
 	isStartAcquisition = true;
 	acquisitionXPlotAxis->setInterval(0, acquisitionDisplayLength);
-	resizeAquisitionData(acquisitionAngleList);
     QFuture<void> future = QtConcurrent::run(this, &HarmonicCalibration::getAcquisitionSamples);
 }
 
@@ -436,11 +435,6 @@ void HarmonicCalibration::getAcquisitionSamples()
 		prependAcquisitionData(angle, acquisitionAngleList);
 		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
 	}
-}
-
-void HarmonicCalibration::resizeAquisitionData(QVector<double>& list)
-{
-	list.resize(acquisitionDisplayLength);
 }
 
 void HarmonicCalibration::prependAcquisitionData(double& data, QVector<double>& list)
