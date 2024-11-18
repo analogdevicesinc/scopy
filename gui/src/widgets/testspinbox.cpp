@@ -35,7 +35,7 @@ TestSpinbox::TestSpinbox(QString name, double val, QString unit, double min, dou
 	m_value = val;
 
 	m_label = new QLabel(name, parent);
-	m_edit = new QLineEdit("0", parent);
+	m_edit = new ProgressLineEdit(parent);
 	m_plus = new QPushButton("", parent);
 	m_minus = new QPushButton("", parent);
 	m_mouseWheelGuard = new MouseWheelWidgetGuard(this);
@@ -79,24 +79,29 @@ TestSpinbox::TestSpinbox(QString name, double val, QString unit, double min, dou
 		}
 	});
 
-	connect(m_edit, &QLineEdit::editingFinished, this, [=]() {
-		m_edit->blockSignals(true);
-		double value = userInput(m_edit->text());
+	connect(m_edit->getLineEdit(), &QLineEdit::editingFinished, this, [=]() {
+		m_edit->getLineEdit()->blockSignals(true);
+		updateValueStatus(ProgressBarState::BUSY);
+		double value = userInput(m_edit->getLineEdit()->text());
 		if(qIsNaN(value)) {
 			updateWidgetsVal();
+			updateValueStatus(ProgressBarState::ERROR);
 		} else {
 			setValue(value);
+			updateValueStatus(ProgressBarState::SUCCESS);
 		}
-		m_edit->blockSignals(false);
+		m_edit->getLineEdit()->blockSignals(false);
 	});
 
 	connect(m_scale->scaleCb(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=]() {
-		// double value = m_userInputStrategy->userInput(m_edit->text(), m_scale);
-		double value = userInput(m_edit->text());
+		updateValueStatus(ProgressBarState::BUSY);
+		double value = userInput(m_edit->getLineEdit()->text());
 		if(qIsNaN(value)) {
 			updateWidgetsVal();
+			updateValueStatus(ProgressBarState::ERROR);
 		} else {
 			setValue(value);
+			updateValueStatus(ProgressBarState::SUCCESS);
 		}
 	});
 }
@@ -204,8 +209,35 @@ void TestSpinbox::layoutHorizontally(bool left)
 double TestSpinbox::clamp(double val, double min, double max)
 {
 	val = std::max(val, min);
+	if(val == min) {
+		m_minus->setEnabled(false);
+	} else {
+		m_minus->setEnabled(true);
+	}
+
 	val = std::min(val, max);
+
+	if(val == max) {
+		m_plus->setEnabled(false);
+	} else {
+		m_plus->setEnabled(true);
+	}
+
 	return val;
+}
+
+void TestSpinbox::updateValueStatus(ProgressBarState status)
+{
+	if(status == ProgressBarState::SUCCESS) {
+		m_edit->getProgressBar()->setBarColor(Style::getAttribute(json::theme::content_success));
+	}
+	if(status == ProgressBarState::ERROR) {
+		m_edit->getProgressBar()->setBarColor(Style::getAttribute(json::theme::content_error));
+	}
+	if(status == ProgressBarState::BUSY) {
+		m_edit->getProgressBar()->startProgress(100, 10);
+		m_edit->getProgressBar()->setBarColor(Style::getAttribute(json::theme::content_busy));
+	}
 }
 
 Scale *TestSpinbox::scale() const { return m_scale; }
@@ -295,7 +327,7 @@ void TestSpinbox::setValueForce(double newValue, bool force)
 {
 
 	if(qFuzzyCompare(m_value, newValue) || force) {
-		if(QString::number(m_value).compare(m_edit->text()) != 0)
+		if(QString::number(m_value).compare(m_edit->getLineEdit()->text()) != 0)
 			updateWidgetsVal();
 		return;
 	}
@@ -309,7 +341,7 @@ void TestSpinbox::updateWidgetsVal()
 {
 	// block all signals that affect value changes before updating widgets
 	// update values for edittext
-	m_edit->blockSignals(true);
+	m_edit->getLineEdit()->blockSignals(true);
 
 	if(m_scale->scalingEnabled()) {
 
@@ -318,7 +350,7 @@ void TestSpinbox::updateWidgetsVal()
 		double scale = m_scale->scaleCb()->currentData().toDouble();
 
 		// print value based on scale
-		m_edit->setText(QString::number(m_value / scale));
+		m_edit->getLineEdit()->setText(QString::number(m_value / scale));
 		setToolTip(QString::number(m_value, 'f', 6)); // set tooltip
 
 		// update scale for increment strategy
@@ -327,9 +359,9 @@ void TestSpinbox::updateWidgetsVal()
 
 	} else {
 		// when no scaling is enabled we just update value
-		m_edit->setText(QString::number(m_value));
+		m_edit->getLineEdit()->setText(QString::number(m_value));
 	}
-	m_edit->blockSignals(false);
+	m_edit->getLineEdit()->blockSignals(false);
 }
 
 #include "moc_testspinbox.cpp"

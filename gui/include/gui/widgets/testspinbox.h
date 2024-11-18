@@ -22,6 +22,8 @@
 #ifndef TESTSPINBOX_H
 #define TESTSPINBOX_H
 
+#include "progresslineedit.h"
+
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
@@ -38,6 +40,13 @@ class SCOPY_GUI_EXPORT TestSpinbox : public QWidget
 {
 	Q_OBJECT
 public:
+	typedef enum
+	{
+		SUCCESS,
+		ERROR,
+		BUSY
+	} ProgressBarState;
+
 	typedef enum
 	{
 		IS_POW2,
@@ -75,12 +84,14 @@ private:
 	double clamp(double val, double min, double max);
 
 	QLabel *m_label;
-	QLineEdit *m_edit;
 	QPushButton *m_plus;
 	QPushButton *m_minus;
 	MouseWheelWidgetGuard *m_mouseWheelGuard;
+	ProgressLineEdit *m_edit;
+	void updateValueStatus(ProgressBarState status);
 
 	double m_value, m_min, m_max;
+	void minMaxReached();
 
 	IncrementStrategy *m_incrementStrategy;
 	IncrementMode m_im;
