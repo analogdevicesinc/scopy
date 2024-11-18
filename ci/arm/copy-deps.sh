@@ -1,43 +1,122 @@
 #!/bin/bash
 
 set -e
-SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
-SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
-source $SRC_DIR/ci/arm/arm_build_config.sh $1
 
-BINARY=$2
-LOCATION=$3
+usage()
+{
+	echo "test"
+
+}
+COPY=""
+
+while [ "$1" != "" ]
+do
+    case "$1" in
+        "--help"| "-h")
+            usage
+            exit
+            ;;
+        "--lib-dir" | "-l")
+            SYSROOT="$2:$SYSROOT"
+            shift
+            ;;
+        "--output-dir" | "-o")
+            OUTPUT_DIR="$2"
+            COPY="true"
+            shift
+            ;;
+        *)
+            FILES="$FILES $1"
+            ;;
+    esac
+    shift
+done
+
 LIBS_ARRAY=()
-BLACKLISTED=($(wget --quiet https://raw.githubusercontent.com/probonopd/AppImages/master/excludelist -O - | sort | uniq | cut -d '#' -f 1 | grep -v "^#.*" | grep "[^-\s]"))
+# Separate SYSROOT into an array of SEARCH_PATHS
+IFS=":" read -r -a SEARCH_PATHS <<< "$SYSROOT"
 
-if [ ! -f "${SRC_DIR}"/ci/arm/ldd-mod ]; then
-	if [ ${TOOLCHAIN_HOST} == "aarch64-linux-gnu" ];then
-		sed 's|.*RTLDLIST=.*|RTLDLIST="/usr/aarch64-linux-gnu/lib/ld-2.31.so /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1"|' /usr/bin/ldd | tee "${SRC_DIR}"/ci/arm/ldd-mod
-	elif [ ${TOOLCHAIN_HOST} == "arm-linux-gnueabihf" ]; then
-		sed 's|.*RTLDLIST=.*|RTLDLIST="/usr/arm-linux-gnueabihf/lib/ld-2.31.so /usr/arm-linux-gnueabihf/lib/ld-linux-armhf.so.3"|' /usr/bin/ldd | tee "${SRC_DIR}"/ci/arm/ldd-mod
-	fi
-	chmod +x "${SRC_DIR}"/ci/arm/ldd-mod
+# If COPY is not true, display all dependencies without excluding any from the blacklist
+if [[ $COPY != "true" ]]; then
+    BLACKLISTED=""
+else
+    BLACKLISTED=($(wget --quiet https://raw.githubusercontent.com/probonopd/AppImages/master/excludelist -O - | sort | uniq | cut -d '#' -f 1 | grep -v "^#.*" | grep "[^-\s]"))
+    BLACKLISTED+=(ld-linux-armhf.so)
+    BLACKLISTED+=(ld-linux-aarch64.so)
+    BLACKLISTED+=(ld-linux-armhf.so.3)
+    BLACKLISTED+=(ld-linux-aarch64.so.1)
 fi
 
-export LD_LIBRARY_PATH="${APP_DIR}/usr/lib:${SYSROOT}/lib:${SYSROOT}/lib/${TOOLCHAIN_HOST}:${SYSROOT}/usr/${TOOLCHAIN_HOST}/lib:${SYSROOT}/usr/local/qt5.15/lib:${SYSROOT}/usr/local/lib:${SRC_DIR}/build"
-run_ldd(){
-	for library in $("${SRC_DIR}"/ci/arm/ldd-mod "$1" | cut -d '>' -f 2 | awk '{print $1}')
-	do
-		# check if the library exists at that path and if it was processed already or blacklisted
-		if ! [[ "${BLACKLISTED[*]}" =~ "${library##*/}" ]]; then
-			if [ -f "${library}" ] && ! [[ "${LIBS_ARRAY[*]}" =~ "${library}" ]]; then
-				LIBS_ARRAY+=("${library}")
-				echo "---Added new lib: ${library}"
-				if [ ! -f "${LOCATION}"/"${library##*/}" ]; then
-					cp "${library}" "${LOCATION}"
-					[ -L "${library}" ] && cp "$(realpath "${library}")" "${LOCATION}"
-				fi
-				run_ldd "${library}"
-			fi
-		fi
-	done
+findlib()
+{
+    LIB=$1
+    for path in "${SEARCH_PATHS[@]}"
+    do
+        LIB_PATH=$(find "$path" -name "${LIB%%.so*}.so*" -type f  2>/dev/null | sort | head -1)
+        [ "$LIB_PATH" != "" ] && break # Exit for at first succesful find
+    done
+
+    [ "$LIB_PATH" = "" ] && LIB_PATH="not found"
+    echo "$LIB_PATH"
 }
 
-for arg in $BINARY; do
-	run_ldd "${arg}"
+copylib()
+{
+    library=$1
+    destination=$2
+
+    lib_location=${library%/*}
+    lib_name=${library##*/}
+    lib_name_without_version=${lib_name%%.so*}.so
+
+    echo "${lib_name_without_version}"
+    echo -n copied:
+    cp --verbose "${library}" "${destination}"
+
+    #IFS=$'\n' read -r -a symlinks < <(find "$lib_location" -name "${lib_name_without_version}*" -type l 2>/dev/null) || echo "No symlinks to copy"
+
+    symlinks=($(find "$lib_location" -name "${lib_name_without_version}*" -type l 2>/dev/null))
+    for link in "${symlinks[@]}"
+    do
+       pushd ${destination} > /dev/null
+       [ -L "${link##*/}" ] && rm "${link##*/}"
+       echo -n linked:
+       ln --symbolic --verbose "${library##*/}" "${link##*/}"
+       popd > /dev/null
+    done
+}
+
+process_lib(){
+    DEPS=$(readelf -d "$1"  2> /dev/null | \
+                grep NEEDED | \
+                cut -d ":" -f 2 | \
+                sed -e 's,\[,,g' -e 's,],,g' -e 's,[ ]*,,g'| \
+                sort)
+
+    for library in $DEPS
+    do
+        # Check if the library is blacklisted or was already processed
+        if  [[ ! "${BLACKLISTED[*]}" =~ "${library}"  && ! "${LIBS_ARRAY[*]}" =~ "${library}" ]]; then
+
+        LIBS_ARRAY+=("${library}")
+        LIB_PATH=$(findlib "$library") # try to find the library in sysroot
+
+        if [[ $COPY == "true" ]]; then
+            if [[ $LIB_PATH == "not found" ]]; then
+                echo "Error: ${library} not found"
+                exit 1
+            fi
+            mkdir -p "$OUTPUT_DIR"
+            copylib "$LIB_PATH" "$OUTPUT_DIR"
+        fi
+
+        # If COPY is not true, display only the library and its location if found
+        [ "$COPY" != "true" ] && echo "$library => $LIB_PATH"
+        process_lib "$LIB_PATH"
+        fi
+    done
+}
+
+for arg in $FILES; do
+    process_lib "${arg}"
 done
