@@ -359,10 +359,10 @@ create_appdir(){
 	mkdir -p $APP_DIR/usr/lib/scopy/plugins/resources
 	cp $EMU_CONFIG $APP_DIR/usr/lib/scopy/plugins/resources
 
-	$COPY_DEPS ${TOOLCHAIN_HOST} $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
-	$COPY_DEPS ${TOOLCHAIN_HOST} $APP_DIR/usr/bin/iio-emu $APP_DIR/usr/lib
-	$COPY_DEPS ${TOOLCHAIN_HOST} $APP_DIR/usr/bin/scopy $APP_DIR/usr/lib
-	$COPY_DEPS ${TOOLCHAIN_HOST} "$APP_DIR/usr/lib/scopy/plugins/*.so" $APP_DIR/usr/lib
+	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/scopy
+	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/iio-emu
+	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/scopy
+	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib "$APP_DIR/usr/lib/scopy/plugins/*.so"
 	cp -r $QT_LOCATION/plugins $APP_DIR/usr
 
 	# search for the python version linked by cmake and copy inside the appimage the same version
