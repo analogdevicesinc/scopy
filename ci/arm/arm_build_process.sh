@@ -306,6 +306,7 @@ build_scopy() {
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PLUGIN_TEST=ON \
 		-DENABLE_TESTING=ON \
+		-DPYTHON_EXECUTABLE=$SYSROOT/bin/python3 \
 		"
 	build_with_cmake
 	popd
