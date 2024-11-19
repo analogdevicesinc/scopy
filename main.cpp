@@ -29,8 +29,9 @@
 #include <core/application_restarter.h>
 #include <core/cmdlinehandler.h>
 #include <core/scopymainwindow_api.h>
-#include <gui/utils.h>
 #include <core/crashreport.h>
+#include <gui/utils.h>
+#include <gui/docking/docksettings.h>
 
 using namespace scopy;
 
@@ -126,7 +127,7 @@ int main(int argc, char *argv[])
 	printRuntimeEnvironmentInfo();
 	ApplicationRestarter restarter(QString::fromLocal8Bit(argv[0]));
 	a.setWindowIcon(QIcon(":/gui/icon.ico"));
-
+	scopy::initDockWidgets();
 	ScopyMainWindow w;
 	w.show();
 
