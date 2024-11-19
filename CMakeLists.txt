@@ -59,6 +59,13 @@ include(GNUInstallDirs)
 
 find_package(QT NAMES Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
+find_package(KDDockWidgets QUIET)
+if(KDDockWidgets_FOUND)
+	message(STATUS "Using KDDockWidgets")
+	add_compile_definitions(USE_KDDOCKWIDGETS)
+else()
+	message(STATUS "Not using KDDockWidgets")
+endif()
 
 if(Qt5Widgets_VERSION VERSION_LESS 5.15.2)
 	message(FATAL_ERROR "Minimum supported Qt 5.15.2")
@@ -239,6 +246,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${S
 
 if(KF5Archive_FOUND)
 	target_link_libraries(${PROJECT_NAME} PUBLIC KF5::Archive)
+endif()
+
+# Link optional libraries
+if(KDDockWidgets_FOUND)
+	target_link_libraries(${PROJECT_NAME} PUBLIC KDAB::kddockwidgets)
 endif()
 
 # Compiler options

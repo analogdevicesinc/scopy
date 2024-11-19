@@ -32,6 +32,8 @@
 #include <gui/utils.h>
 #include <gui/widgets/scopysplashscreen.h>
 #include <core/crashreport.h>
+#include <gui/utils.h>
+#include <gui/docking/docksettings.h>
 
 using namespace scopy;
 
@@ -51,7 +53,7 @@ void SetScopyQDebugMessagePattern()
 				   QDEBUG_LOG_DATE_STR
 #endif
 #ifdef QDEBUG_LOG_CATEGORY
-					   QDEBUG_CATEGORY_STR
+			   QDEBUG_CATEGORY_STR
 #endif
 			   " ] "
 #ifdef QDEBUG_LOG_FILE
@@ -130,7 +132,7 @@ int main(int argc, char *argv[])
 	printRuntimeEnvironmentInfo();
 	ApplicationRestarter restarter(QString::fromLocal8Bit(argv[0]));
 	a.setWindowIcon(QIcon(":/gui/icon.ico"));
-
+	scopy::initDockWidgets();
 	ScopyMainWindow w;
 	w.show();
 
