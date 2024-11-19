@@ -58,9 +58,9 @@ void PqmDataLogger::acquireBufferData(double val, int chIdx)
 	}
 	QMutexLocker locker(&m_mutex);
 	if(chIdx == 0) {
-		m_logQue.enqueue("\n" + QTime::currentTime().toString("hh:mm:ss.zzz") + "\t");
+		m_logQue.enqueue("\n" + QTime::currentTime().toString("hh:mm:ss.zzz") + ",");
 	}
-	m_logQue.enqueue(QString::number(val) + "\t");
+	m_logQue.enqueue(QString::number(val) + ",");
 }
 
 void PqmDataLogger::acquireHarmonics(QString attrName, QString value, QString chId)
@@ -69,8 +69,8 @@ void PqmDataLogger::acquireHarmonics(QString attrName, QString value, QString ch
 		return;
 	}
 	QMutexLocker locker(&m_mutex);
-	m_logQue.enqueue(QTime::currentTime().toString("hh:mm:ss.zzz") + "\t" + chId + "\t" +
-			 value.split(" ").join("\t") + "\n");
+	m_logQue.enqueue(QTime::currentTime().toString("hh:mm:ss.zzz") + "," + chId + "," + value.split(" ").join(",") +
+			 "\n");
 }
 
 void PqmDataLogger::acquireAttrData(QString attrName, QString value, QString chId)
@@ -86,7 +86,7 @@ void PqmDataLogger::acquirePqEvents(QString event)
 		return;
 	}
 	QMutexLocker locker(&m_mutex);
-	m_logQue.enqueue("\n" + QTime::currentTime().toString("hh:mm:ss.zzz") + "\t PQEvents \n \t" + event + "\n");
+	m_logQue.enqueue("\n" + QTime::currentTime().toString("hh:mm:ss.zzz") + ", PQEvents \n ," + event + "\n");
 }
 
 void PqmDataLogger::log()
@@ -149,15 +149,15 @@ void PqmDataLogger::createHeader()
 	QFile f(m_filePath);
 	if(f.open(QIODevice::WriteOnly)) {
 		QTextStream stream(&f);
-		stream << "Time \t";
+		stream << "Time ,";
 		switch(m_crtInstr) {
 		case Waveform:
-			stream << m_chnlsName.join("\t");
+			stream << m_chnlsName.join(",");
 			break;
 		case Harmonics:
-			stream << "Phase \t";
+			stream << "Phase ,";
 			for(int i = 0; i <= 50; i++) {
-				stream << i << "\t";
+				stream << i << ",";
 			}
 			stream << "\n";
 			break;
