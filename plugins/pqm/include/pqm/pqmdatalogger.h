@@ -44,7 +44,7 @@ public:
 
 	void setChnlsName(QStringList chnlsName);
 	void acquireBufferData(double val, int chIdx);
-	void acquireAttrData(QString attrName, QString value, QString chId);
+	void acquireAttrData(QMap<QString, QMap<QString, QString>> pqmAttr);
 	void acquirePqEvents(QString event);
 	void log();
 	void writeToFile();
@@ -52,7 +52,9 @@ public Q_SLOTS:
 	void logPressed(ActiveInstrument instr, const QString &filePath = "");
 
 private:
-	void acquireHarmonics(QString attrName, QString value, QString chId);
+	void acquireHarmonics(QMap<QString, QMap<QString, QString>> pqmAttr);
+	void acquireRmsChnlAttr(QMap<QString, QMap<QString, QString>> pqmAttr);
+	void acquireRmsDeviceAttr(QMap<QString, QMap<QString, QString>> pqmAttr);
 	void createHeader();
 
 	ActiveInstrument m_crtInstr;
@@ -62,6 +64,12 @@ private:
 	QQueue<QString> m_logQue;
 	QFutureWatcher<void> *m_writeFw;
 	QMutex m_mutex;
+	const QString ATTR_HARMONICS = "harmonics";
+	const QString PQM_DEVICE = "pqm";
+	const QStringList m_rmsHeader{"rms", "angle", "deviation_under", "deviation_over", "pinst", "pst", "plt"};
+	const QMap<QString, QStringList> m_rmsDeviceAttr{
+		{"voltage", {"u2", "u0", "sneg_voltage", "spos_voltage", "szro_voltage"}},
+		{"current", {"i2", "i0", "sneg_current", "spos_current", "szro_current"}}};
 };
 
 } // namespace scopy::pqm
