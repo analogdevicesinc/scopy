@@ -172,9 +172,9 @@ bool AcquisitionManager::readPqmAttributes()
 			attrName = iio_channel_get_attr(chnl, j);
 			iio_channel_attr_read(chnl, attrName, dest, MAX_ATTR_SIZE);
 			m_pqmAttr[chnlId][attrName] = QString(dest);
-			m_pqmLog->acquireAttrData(attrName, dest, chnlId);
 		}
 	}
+	m_pqmLog->acquireAttrData(m_pqmAttr);
 	handlePQEvents();
 	m_pqmLog->log();
 	return true;
