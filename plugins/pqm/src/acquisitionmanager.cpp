@@ -315,11 +315,11 @@ void AcquisitionManager::handlePQEvents()
 		if(m_pqmAttr[ch]["countEvent"].toInt() == 0) {
 			continue;
 		}
-		logMsg.append(ch + "\t");
+		logMsg.append(ch + ",");
 		for(auto it = m_pqmAttr[ch].begin(); it != m_pqmAttr[ch].end(); ++it) {
-			logMsg.append(it.key() + "\t" + it.value() + "\t");
+			logMsg.append(it.key() + "," + it.value() + ",");
 		}
-		logMsg.append("\n \t");
+		logMsg.append("\n,");
 	}
 	if(!logMsg.isEmpty()) {
 		m_pqmLog->acquirePqEvents(logMsg);
