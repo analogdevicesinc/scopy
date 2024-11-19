@@ -63,20 +63,64 @@ void PqmDataLogger::acquireBufferData(double val, int chIdx)
 	m_logQue.enqueue(QString::number(val) + ",");
 }
 
-void PqmDataLogger::acquireHarmonics(QString attrName, QString value, QString chId)
+void PqmDataLogger::acquireHarmonics(QMap<QString, QMap<QString, QString>> pqmAttr)
 {
-	if(attrName.compare("harmonics") != 0) {
-		return;
-	}
 	QMutexLocker locker(&m_mutex);
-	m_logQue.enqueue(QTime::currentTime().toString("hh:mm:ss.zzz") + "," + chId + "," + value.split(" ").join(",") +
-			 "\n");
+	for(const QString &ch : qAsConst(m_chnlsName)) {
+		if(!pqmAttr[ch].contains(ATTR_HARMONICS)) {
+			continue;
+		}
+		QString harmonics = pqmAttr[ch][ATTR_HARMONICS];
+		m_logQue.enqueue(QTime::currentTime().toString("hh:mm:ss.zzz") + "," + ch + "," +
+				 harmonics.split(" ").join(",") + "\n");
+	}
 }
 
-void PqmDataLogger::acquireAttrData(QString attrName, QString value, QString chId)
+void PqmDataLogger::acquireRmsChnlAttr(QMap<QString, QMap<QString, QString>> pqmAttr)
+{
+	QMutexLocker locker(&m_mutex);
+	m_logQue.enqueue("Time,Phase," + m_rmsHeader.join(",") + "\n");
+	for(const QString &ch : qAsConst(m_chnlsName)) {
+		m_logQue.enqueue(QTime::currentTime().toString("hh:mm:ss.zzz") + "," + ch + ",");
+		for(const QString &attr : m_rmsHeader) {
+			if(!pqmAttr[ch].contains(attr)) {
+				m_logQue.enqueue("-,");
+				continue;
+			}
+			m_logQue.enqueue(pqmAttr[ch][attr] + ",");
+		}
+		m_logQue.enqueue("\n");
+	}
+	m_logQue.enqueue("\n");
+}
+
+void PqmDataLogger::acquireRmsDeviceAttr(QMap<QString, QMap<QString, QString>> pqmAttr)
+{
+	QMutexLocker locker(&m_mutex);
+	for(auto it = m_rmsDeviceAttr.begin(); it != m_rmsDeviceAttr.end(); ++it) {
+		const QStringList attributes = it.value();
+		m_logQue.enqueue(QTime::currentTime().toString("hh:mm:ss.zzz") + "," + it.key() + "," +
+				 attributes.join(",") + "\n,,");
+		for(const QString &attr : attributes) {
+			if(!pqmAttr[PQM_DEVICE].contains(attr)) {
+				m_logQue.enqueue("-,");
+				continue;
+			}
+			m_logQue.enqueue(pqmAttr[PQM_DEVICE][attr] + ",");
+		}
+		m_logQue.enqueue("\n");
+	}
+	m_logQue.enqueue("\n");
+}
+
+void PqmDataLogger::acquireAttrData(QMap<QString, QMap<QString, QString>> pqmAttr)
 {
 	if(m_crtInstr == Harmonics) {
-		acquireHarmonics(attrName, value, chId);
+		acquireHarmonics(pqmAttr);
+	}
+	if(m_crtInstr == Rms) {
+		acquireRmsChnlAttr(pqmAttr);
+		acquireRmsDeviceAttr(pqmAttr);
 	}
 }
 
@@ -149,13 +193,12 @@ void PqmDataLogger::createHeader()
 	QFile f(m_filePath);
 	if(f.open(QIODevice::WriteOnly)) {
 		QTextStream stream(&f);
-		stream << "Time ,";
 		switch(m_crtInstr) {
 		case Waveform:
-			stream << m_chnlsName.join(",");
+			stream << "Time," << m_chnlsName.join(",");
 			break;
 		case Harmonics:
-			stream << "Phase ,";
+			stream << "Time,Phase,";
 			for(int i = 0; i <= 50; i++) {
 				stream << i << ",";
 			}
