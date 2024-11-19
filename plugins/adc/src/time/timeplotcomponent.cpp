@@ -20,6 +20,7 @@
  */
 
 #include "timeplotcomponent.h"
+#include "docking/dockwrapper.h"
 #include "plotaxis.h"
 
 #include <gui/widgets/menucollapsesection.h>
@@ -31,8 +32,6 @@
 #include <qwt_point_data.h>
 #include <QLineEdit>
 #include <timeplotcomponentsettings.h>
-
-#include <gui/widgets/plotinfowidgets.h>
 
 using namespace scopy;
 using namespace scopy::adc;

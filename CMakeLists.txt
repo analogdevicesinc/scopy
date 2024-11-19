@@ -55,6 +55,13 @@ include(GNUInstallDirs)
 
 find_package(QT NAMES Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
+find_package(KDDockWidgets QUIET)
+if(KDDockWidgets_FOUND)
+	message(STATUS "Using KDDockWidgets")
+	add_compile_definitions(USE_KDDOCKWIDGETS)
+else()
+	message(STATUS "Not using KDDockWidgets")
+endif()
 
 if(Qt5Widgets_VERSION VERSION_LESS 5.15.2)
 	message(FATAL_ERROR "Minimum supported Qt 5.15.2")
@@ -209,6 +216,11 @@ add_definitions(-DQT_NO_KEYWORDS)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-gui scopy-core)
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${SCOPY_DEPENDENCIES} scopy-core scopy-gui)
+
+# Link optional libraries
+if(KDDockWidgets_FOUND)
+	target_link_libraries(${PROJECT_NAME} PUBLIC KDAB::kddockwidgets)
+endif()
 
 # Compiler options
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall)
