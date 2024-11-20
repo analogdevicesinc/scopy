@@ -54,7 +54,7 @@ ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
 	//	addDevice("dev1","dev1","descr1",new QPushButton("abc"),new QLabel("page1"));
 
 	Style::setStyle(scanBtn(), style::properties::button::basicButton);
-	scanBtn()->setFixedWidth(80);
+	scanBtn()->setFixedWidth(Style::getDimension(json::global::unit_5));
 	connect(hc, SIGNAL(goLeft()), db, SLOT(prevDevice()));
 	connect(hc, SIGNAL(goRight()), db, SLOT(nextDevice()));
 	connect(db, SIGNAL(requestDevice(QString, int)), is, SLOT(slideInKey(QString, int)));

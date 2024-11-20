@@ -165,7 +165,7 @@ QWidget *ScopyPreferencesPage::buildSaveSessionPreference()
 	lay->addWidget(new QLabel("Settings files location ", this));
 	QPushButton *navigateBtn = new QPushButton("Open", this);
 	Style::setStyle(navigateBtn, style::properties::button::borderButton);
-	navigateBtn->setMaximumWidth(80);
+	navigateBtn->setMaximumWidth(Style::getDimension(json::global::unit_5));
 	connect(navigateBtn, &QPushButton::clicked, this,
 		[=]() { QDesktopServices::openUrl(scopy::config::settingsFolderPath()); });
 	lay->addWidget(navigateBtn);
@@ -211,7 +211,7 @@ QWidget *ScopyPreferencesPage::buildResetScopyDefaultButton()
 
 	QPushButton *resetBtn = new QPushButton("Reset", this);
 	Style::setStyle(resetBtn, style::properties::button::borderButton);
-	resetBtn->setMaximumWidth(80);
+	resetBtn->setMaximumWidth(Style::getDimension(json::global::unit_5));
 	connect(resetBtn, &QPushButton::clicked, this, &ScopyPreferencesPage::resetScopyPreferences);
 	lay->addWidget(resetBtn);
 	lay->setMargin(0);
@@ -271,6 +271,9 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 		p, "autoconnect_previous", "Auto-connect to previous session", generalSection);
 	generalSection->contentLayout()->addWidget(autoConnectCb);
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
+		p, "font_scale", "Font scale (EXPERIMENTAL)", {"1", "1.15", "1.3", "1.45", "1.6", "1.75", "1.9"},
+		generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
 		p, "general_theme", "Theme", Style::GetInstance()->getThemeList(), generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
 		p, "general_language", "Language", t->getLanguages(), generalSection));
@@ -292,7 +295,7 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	m_devRefresh = new QPushButton("Refresh", m_autoConnectWidget);
-	m_devRefresh->setMaximumWidth(80);
+	m_devRefresh->setMaximumWidth(Style::getDimension(json::global::unit_5));
 	Style::setStyle(m_devRefresh, style::properties::button::basicButton);
 	m_autoConnectWidget->add(m_devRefresh);
 

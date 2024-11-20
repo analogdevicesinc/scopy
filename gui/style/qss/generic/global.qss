@@ -138,7 +138,7 @@ QComboBox::drop-down {
     padding-right: &padding_2&;
     width: 10px;
     height: 6px;
-    font-size: 16px;
+    font-size: &font_size_2&;
     text-align: left;
 }
 QComboBox::indicator {
@@ -264,7 +264,7 @@ scopy--SpinBoxA QPushButton#SBA_UpButton {
 scopy--SpinBoxA QLineEdit#SBA_LineEdit {
     height: 20px;
     width: 75px;
-    font-size: 18px;
+    font-size: &font_size_2&;
     border: 0px;
     bottom: 10px;
 }

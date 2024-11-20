@@ -239,13 +239,13 @@ QWidget *ScopyHomeAddPage::createBtnsWidget(QWidget *parent)
 	m_backBtn = new QPushButton(btnsWidget);
 	m_backBtn->setText("BACK");
 	StyleHelper::BasicButton(m_backBtn);
-	m_backBtn->setFixedWidth(128);
+	m_backBtn->setFixedWidth(Style::getDimension(json::global::unit_6));
 
 	m_addBtn = new QPushButton(btnsWidget);
 	m_addBtn->setText("ADD DEVICE");
 	m_addBtn->setAutoDefault(true);
 	StyleHelper::BasicButton(m_addBtn);
-	m_addBtn->setFixedWidth(128);
+	m_addBtn->setFixedWidth(Style::getDimension(json::global::unit_6));
 
 	btnsLay->addWidget(m_backBtn);
 	btnsLay->addWidget(m_addBtn);
