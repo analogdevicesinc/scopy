@@ -29,9 +29,9 @@ install_packages() {
 		# Workaround: Install or update libtool package only if macOS version is greater than 12
 		# Note: libtool (v2.4.7) is pre-installed by default, but it can be updated to v2.5.3
 		PACKAGES="$PACKAGES libtool"
-		brew install --display-times $PACKAGES
+		brew install --overwrite --display-times $PACKAGES
 	else
-		HOMEBREW_NO_AUTO_UPDATE=1 brew install --display-times $PACKAGES
+		HOMEBREW_NO_AUTO_UPDATE=1 brew install --overwrite --display-times $PACKAGES
 	fi
 
 	pip3 install --break-system-packages mako
