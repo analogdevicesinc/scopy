@@ -51,8 +51,7 @@ DioSettingsTab::DioSettingsTab(QWidget *parent)
 
 	// timespan
 	m_maxSpinButton = new MenuSpinbox(tr("Timespan"), 10, "s", 1, 300, true, false, this);
-	m_maxSpinButton->setIncrementMode(MenuSpinbox::IS_FIXED);
-	m_maxSpinButton->setScaleRange(1, 1);
+	m_maxSpinButton->scale()->setHasPrefix(false);
 
 	connect(m_maxSpinButton, &MenuSpinbox::valueChanged, this,
 		[this]() { Q_EMIT timeValueChanged(m_maxSpinButton->value()); });

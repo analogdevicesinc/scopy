@@ -80,6 +80,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	buffersizeContainer->setProperty("tutorial_name", "BUFFERSIZE");
 	m_bufferSizeSpin =
 		new MenuSpinbox("Buffer size", 0, "samples", 16, 16 * 1024 * 1024, true, false, buffersizeContainer);
+	m_bufferSizeSpin->scale()->setScalePrefixes({{QString(""), 1e0}, {QString("k"), 1e3}, {QString("M"), 1e6}});
 	StyleHelper::BackgroundWidget(m_bufferSizeSpin);
 	connect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, this,
 		[&](double value) { m_model->setBuffersize(value); });
@@ -91,7 +92,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	MenuSectionWidget *kernelContainer = new MenuSectionWidget(this);
 	kernelContainer->setProperty("tutorial_name", "KERNEL_BUFFERS");
 	m_kernelCountSpin = new MenuSpinbox("Kernel buffers", 0, "", 1, 64, true, false, buffersizeContainer);
-	m_kernelCountSpin->setIncrementMode(MenuSpinbox::IS_FIXED);
+	m_kernelCountSpin->setScalingEnabled(false);
 	StyleHelper::BackgroundWidget(m_kernelCountSpin);
 	connect(m_kernelCountSpin, &MenuSpinbox::valueChanged, this,
 		[&](double value) { m_model->setKernelBuffersCount(value); });
@@ -101,6 +102,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 
 	// Decimation section - hidden for now
 	MenuSpinbox *decimationSpin = new MenuSpinbox("Decimation", 0, "", 1, 1000, true, false, bufferConfigSection);
+	decimationSpin->setIncrementMode(MenuSpinbox::IS_POW2);
 	StyleHelper::BackgroundWidget(decimationSpin);
 	connect(decimationSpin, &MenuSpinbox::valueChanged, this, [&](double value) { m_model->setDecimation(value); });
 	decimationSpin->setValue(1);
@@ -162,12 +164,11 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	filesizeContainer->setProperty("tutorial_name", "FILESIZE");
 	m_fileSizeSpin =
 		new MenuSpinbox("File size", 0, "samples", 16, 16 * 1024 * 1024, false, false, filesizeContainer);
-	m_fileSizeSpin->setIncrementMode(MenuSpinbox::IS_FIXED);
 	StyleHelper::BackgroundWidget(m_fileSizeSpin);
 	connect(
 		m_fileSizeSpin, &MenuSpinbox::valueChanged, this, [&](double value) { m_model->setFilesize(value); },
 		Qt::QueuedConnection);
-	m_fileSizeSpin->setScaleRange(1, 16 * 1024 * 1024);
+	m_fileSizeSpin->scale()->setScalePrefixes({{QString(""), 1e0}, {QString("k"), 1e3}, {QString("M"), 1e6}});
 	m_fileSizeSpin->setValue(16);
 	filesizeContainer->contentLayout()->addWidget(m_fileSizeSpin);
 	filesizeContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);

@@ -239,8 +239,7 @@ QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent)
 	fixedMarkerEditBtn->setVisible(false);
 
 	MenuSpinbox *markerCnt = new MenuSpinbox("Marker count", 5, "markers", 0, 9, true, false, section);
-	markerCnt->setIncrementMode(MenuSpinbox::IS_FIXED);
-	markerCnt->setScaleRange(1, 10);
+	markerCnt->scale()->setHasPrefix(false);
 	markerCnt->setValue(5);
 
 	connect(markerCnt, &MenuSpinbox::valueChanged, this, [=](double cnt) {

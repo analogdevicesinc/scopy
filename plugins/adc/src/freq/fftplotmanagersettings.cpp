@@ -108,7 +108,8 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 									   MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	m_bufferSizeSpin = new MenuSpinbox("Buffer Size", 16, "samples", 0, 4000000, true, false, section);
-	m_bufferSizeSpin->setScaleRange(1, 1e6);
+	m_bufferSizeSpin->setIncrementMode(MenuSpinbox::IS_POW2);
+	m_bufferSizeSpin->scale()->setScalePrefixes({{QString(""), 1e0}, {QString("k"), 1e3}, {QString("M"), 1e6}});
 	connect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, this, [=](double val) { setBufferSize((uint32_t)val); });
 
 	QWidget *xMinMax = new QWidget(section);
@@ -118,10 +119,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 	xMinMax->setLayout(xMinMaxLayout);
 
 	m_xmin = new MenuSpinbox("XMin", 0, "samples", -DBL_MAX, DBL_MAX, true, false, xMinMax);
-	m_xmin->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
-
 	m_xmax = new MenuSpinbox("XMax", 0, "samples", -DBL_MAX, DBL_MAX, true, false, xMinMax);
-	m_xmax->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 
 	connect(m_xmin, &MenuSpinbox::valueChanged, this,
 		[=](double min) { m_plotManager->setXInterval(m_xmin->value(), m_xmax->value()); });
@@ -194,6 +192,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 	m_sampleRateSpin = new MenuSpinbox("Sample Rate", 1, "Hz", 0, DBL_MAX, true, false, section);
 	m_sampleRateSpin->setIncrementMode(MenuSpinbox::IS_125);
+	m_sampleRateSpin->scale()->setHasPrefix(false);
 
 	m_sampleRateSpin->setValue(10);
 	m_sampleRateSpin->setEnabled(false);

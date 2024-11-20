@@ -182,7 +182,6 @@ QWidget *WaveformInstrument::createMenuPlotSection(QWidget *parent)
 
 	// timespan
 	m_timespanSpin = new gui::MenuSpinbox(tr("Timespan"), 1, "s", 0.02, 10, true, false, plotSection);
-	m_timespanSpin->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 	m_timespanSpin->setValue(1);
 	connect(m_timespanSpin, &gui::MenuSpinbox::valueChanged, this, [=, this](double value) {
 		m_voltagePlot->xAxis()->setMin(-value);

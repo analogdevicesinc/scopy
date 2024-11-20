@@ -28,17 +28,24 @@ namespace gui {
 
 MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, double max, bool vertical, bool left,
 			 bool large_widget, QWidget *parent)
-	: QWidget(parent)
+	: m_name(name)
+	, m_min(min)
+	, m_max(max)
+	, QWidget(parent)
 {
 	m_large_widget = large_widget;
 	m_label = new QLabel(name, parent);
 	Style::setStyle(m_label, style::properties::label::subtle);
 
 	m_edit = new QLineEdit("0", parent);
-	m_scaleCb = new QComboBox(parent);
 	m_plus = new QPushButton("", parent);
 	m_minus = new QPushButton("", parent);
 	m_mouseWheelGuard = new MouseWheelWidgetGuard(this);
+
+	////SCALE
+	m_scale = new Scale(unit, min, max);
+
+	m_incrementStrategy = new IncrementStrategyFixed();
 
 	m_plus->setAutoRepeat(true);
 	m_plus->setAutoRepeatDelay(300);
@@ -54,35 +61,41 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 		layoutHorizontally(left);
 	}
 
-	m_incrementStrategy = new IncrementStrategyPower2();
+	setValue(val);
 
 	connect(m_plus, &QAbstractButton::clicked, this, [=]() { setValue(m_incrementStrategy->increment(m_value)); });
-	connect(m_minus, &QAbstractButton::clicked, this, [=]() { setValue(m_incrementStrategy->decrement(m_value)); });
-
-	connect(m_edit, &QLineEdit::editingFinished, this, [=]() { userInput(m_edit->text()); });
-
-	connect(m_scaleCb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		m_incrementStrategy->setScale(m_scaleCb->itemData(idx).toDouble());
+	connect(m_minus, &QAbstractButton::clicked, this, [=]() {
+		double newValue = m_incrementStrategy->decrement(m_value);
+		if(m_scale->scalingEnabled()) {
+			// if value would be 0 check if lower scale available
+			int idx = m_scale->scaleCb()->currentIndex();
+			if(newValue == 0 && (idx - 1) >= 0) {
+				// found lower scale update value based on that
+				setValue(m_value - (1 * m_scale->scaleCb()->itemData(idx - 1).toDouble()));
+			} else {
+				setValue(newValue);
+			}
+		} else {
+			setValue(newValue);
+		}
+	});
+	connect(m_edit, &QLineEdit::editingFinished, this, [=]() {
+		m_edit->blockSignals(true);
 		userInput(m_edit->text());
+		m_edit->blockSignals(false);
 	});
 
-	m_scales.append({QString("n"), 1e-9});
-	m_scales.append({QString("u"), 1e-6});
-	m_scales.append({QString("m"), 1e-3});
-	m_scales.append({QString(""), 1e0});
-	m_scales.append({QString("k"), 1e3});
-	m_scales.append({QString("M"), 1e6});
-	m_scales.append({QString("G"), 1e9});
+	connect(m_scale->scaleCb(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=]() {
+		userInput(m_edit->text());
+		// if the value is 0 we still need to consider scale options
+		if(m_value == 0) {
+			m_incrementStrategy->setScale(m_scale->scaleCb()->currentData().toDouble());
+		}
+	});
 
-	m_name = name;
-	m_unit = unit;
-	m_min = min;
-	m_max = max;
-	m_scaleMin = min;
-	m_scaleMax = max;
-	setScaleRange(m_scaleMin, m_scaleMax);
-	setValue(val);
-	m_scalingEnabled = true;
+	connect(m_scale, &Scale::unitChanged, this, &MenuSpinbox::unitChanged);
+	connect(m_scale, &Scale::scaleUpdated, this, &MenuSpinbox::populateWidgets);
+
 	m_mouseWheelGuard->installEventRecursively(this);
 }
 
@@ -113,7 +126,7 @@ void MenuSpinbox::layoutVertically(bool left)
 	editLay->addWidget(m_label);
 	editLay->addWidget(m_edit);
 
-	editLay->addWidget(m_scaleCb);
+	editLay->addWidget(m_scale->scaleCb());
 
 	if(left) {
 		lay->addLayout(btnLay);
@@ -123,7 +136,8 @@ void MenuSpinbox::layoutVertically(bool left)
 		lay->addLayout(btnLay);
 	}
 
-	Style::setStyle(m_scaleCb, style::properties::widget::noBorder);
+	Style::setStyle(m_label, style::properties::label::subtle);
+	Style::setStyle(m_scale->scaleCb(), style::properties::widget::noBorder);
 	int size = m_large_widget ? Style::getDimension(json::global::unit_2_5)
 				  : Style::getDimension(json::global::unit_1);
 
@@ -172,7 +186,7 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	editLay->addWidget(m_label);
 	editLay->addWidget(m_edit);
 
-	editLay->addWidget(m_scaleCb);
+	editLay->addWidget(m_scale->scaleCb());
 	lineLay->addLayout(lay);
 
 	if(left) {
@@ -201,8 +215,20 @@ void MenuSpinbox::setValue(double newValue) { setValueForce(newValue, 0); }
 
 void MenuSpinbox::setValueForce(double newValue, bool force)
 {
-	if(qFuzzyCompare(m_value, newValue) || force)
+	// when force is true value does not consider min/max limits
+	if(force) {
+		m_value = newValue;
+		populateWidgets();
+		Q_EMIT valueChanged(m_value);
 		return;
+	}
+
+	if(qFuzzyCompare(m_value, newValue)) {
+		// check if text in edit changed even if value does not
+		if(QString::number(m_value).compare(m_edit->text()) != 0)
+			populateWidgets(); // reset value
+		return;
+	}
 
 	m_value = clamp(newValue, m_min, m_max);
 	populateWidgets();
@@ -211,16 +237,9 @@ void MenuSpinbox::setValueForce(double newValue, bool force)
 
 void MenuSpinbox::setValueString(QString s) { userInput(s); }
 
-QString MenuSpinbox::unit() const { return m_unit; }
+QString MenuSpinbox::unit() const { return m_scale->unit(); }
 
-void MenuSpinbox::setUnit(const QString &newUnit)
-{
-	if(m_unit == newUnit)
-		return;
-	m_unit = newUnit;
-	setScaleRange(m_scaleMin, m_scaleMax);
-	Q_EMIT unitChanged(newUnit);
-}
+void MenuSpinbox::setUnit(const QString &newUnit) { m_scale->setUnit(newUnit); }
 
 void MenuSpinbox::setMinValue(double min) { m_min = min; }
 
@@ -248,14 +267,26 @@ void MenuSpinbox::setIncrementMode(IncrementMode im)
 		m_incrementStrategy = new IncrementStrategyFixed();
 		break;
 	}
-	m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
+
+	// when scalling is not enbaled scale will be set to 1
+	if(scallingEnabled()) {
+		m_incrementStrategy->setScale(m_scale->scaleCb()->currentData().toDouble());
+	} else {
+		m_incrementStrategy->setScale(1);
+	}
 }
 
 void MenuSpinbox::setScalingEnabled(bool en)
 {
-	m_scalingEnabled = en;
-	m_scaleCb->setVisible(en);
+	m_scale->setScalingEnabled(en);
+	if(en) {
+		m_incrementStrategy->setScale(m_scale->scaleCb()->currentData().toDouble());
+	} else {
+		m_incrementStrategy->setScale(1);
+	}
 }
+
+bool MenuSpinbox::scallingEnabled() { return m_scale->scalingEnabled(); }
 
 void MenuSpinbox::userInput(QString s)
 {
@@ -270,82 +301,55 @@ void MenuSpinbox::userInput(QString s)
 	bool ok;
 	double val = nr.toDouble(&ok);
 	if(!ok)
-		setValue(m_value); // reset
+		populateWidgets(); // reset
 
-	if(m_scalingEnabled) {
-		QString unit = s.mid(i + 1, 1); // isolate prefix and unit from the whole string (mV)
-		if(unit.length() > 0) {		// user wrote a prefix and/or a unit
-			double scale = getScaleForPrefix(unit, Qt::CaseSensitive); // find the unit in the map
-			if(scale == -1) {
-				scale = getScaleForPrefix(
-					unit,
-					Qt::CaseInsensitive); // the user may have written 30K instead of 30k
-			}
-
-			if(scale == -1) {
-				scale = 1; // do not scale the value at all
+	if(m_scale->scalingEnabled()) {
+		QString unit = s.mid(i + 1, s.length() - 1); // isolate unit from the whole string (min)
+		if(unit.length() > 0) {			     // user wrote a unit
+			double scaleValue = m_scale->getScaleForSymbol(unit); // find the unit in the map
+			if(scaleValue == -1) {
+				populateWidgets(); // inputed prefix is invalid
 			} else {
-				val = val * scale; // scale accordingly
+				val = val * scaleValue; // scale accordingly
 			}
+
 		} else {
-			val = val *
-				m_scaleCb->currentData()
-					.toDouble(); // the user didnt write a scale => use scale in combobox
+			// Apply current scale to value
+			double scaleValue = m_scale->scaleCb()->currentData().toDouble();
+			val = val * scaleValue;
 		}
 	}
+
 	setValue(val);
 }
 
 void MenuSpinbox::populateWidgets()
 {
-	// TODO: Review this function
-	if(!m_scalingEnabled) {
-		QSignalBlocker sb1(m_edit);
-		QSignalBlocker sb2(m_scaleCb);
-		m_edit->setText(Util::doubleToQString(m_value));
+	// block all signals that affect value changes before updating widgets
+	// update values for edittext
+	m_edit->blockSignals(true);
+
+	if(m_scale->scalingEnabled() && m_value != 0) {
+
+		m_scale->scaleCb()->blockSignals(true);
+		m_scale->computeScale(m_value);
+		double scale = m_scale->scaleCb()->currentData().toDouble();
+
+		// print value based on scale
+		m_edit->setText(QString::number(m_value / scale, 'f', m_precision));
 		setToolTip(QString::number(m_value, 'f', 6)); // set tooltip
-		return;
-	}
 
-	int i = 0;
-	double scale = 1;
-	double absvalue = abs(m_value);
-	if(qFuzzyCompare(absvalue, 0)) {
-		scale = 1;
-		for(i = m_scaleCb->count() - 1; i >= 0; i--) { // find most suitable scale
-			if(m_scaleCb->itemData(i).toDouble() == 1)
-				break;
-		}
+		// update scale for increment strategy
+		m_incrementStrategy->setScale(scale);
+		m_scale->scaleCb()->blockSignals(false);
+
 	} else {
-		for(i = m_scaleCb->count() - 1; i >= 0; i--) { // find most suitable scale
-			scale = m_scaleCb->itemData(i).toDouble();
-			if(absvalue / scale >= 10)
-				break;
-		}
-		if(i < 0) {
-			i = 0;
-			scale = m_scaleCb->itemData(i).toDouble();
-		}
+		// when no scaling is enabled we just update value
+		m_edit->setText(QString::number(m_value, 'f', m_precision));
 	}
+	m_edit->blockSignals(false);
 
-	QSignalBlocker sb1(m_edit);
-	QSignalBlocker sb2(m_scaleCb);
-	m_edit->setText(QString::number(m_value / scale)); // reduce number to a meaningful value
-	m_scaleCb->setCurrentIndex(i);			   // set apropriate scale in combobox
-	m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
 	setToolTip(QString::number(m_value, 'f', 6)); // set tooltip
-}
-
-void MenuSpinbox::setScaleRange(double min, double max)
-{
-	m_scaleCb->clear();
-	for(int i = 0; i < m_scales.count(); i++) {
-		auto scale = m_scales[i].scale;
-		if(scale >= min && scale <= max) {
-			m_scaleCb->addItem(m_scales[i].prefix + m_unit, scale);
-		}
-	}
-	m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
 }
 
 int MenuSpinbox::findLastDigit(QString str)
@@ -362,8 +366,34 @@ double MenuSpinbox::clamp(double val, double min, double max)
 {
 	val = std::max(val, min);
 	val = std::min(val, max);
+	minMaxReached(val);
 	return val;
 }
+
+void MenuSpinbox::minMaxReached(double val)
+{
+	// disable decrement button if min is reached
+	if(val == m_min) {
+		m_minus->setEnabled(false);
+	} else {
+		m_minus->setEnabled(true);
+	}
+
+	// disable increment button if max is reached
+	if(val == m_max) {
+		m_plus->setEnabled(false);
+	} else {
+		m_plus->setEnabled(true);
+	}
+}
+
+int MenuSpinbox::precision() const { return m_precision; }
+
+void MenuSpinbox::setPrecision(int newPrecision) { m_precision = newPrecision; }
+
+Scale *MenuSpinbox::scale() const { return m_scale; }
+
+void MenuSpinbox::setScale(Scale *newScale) { m_scale = newScale; }
 
 QString MenuSpinbox::name() const { return m_name; }
 
@@ -374,22 +404,6 @@ void MenuSpinbox::setName(const QString &newName)
 	m_name = newName;
 	m_label->setText(m_name);
 	Q_EMIT nameChanged(newName);
-}
-
-double MenuSpinbox::getScaleForPrefix(QString prefix, Qt::CaseSensitivity s)
-{
-	for(int i = 0; i < m_scales.count(); i++) {
-		if(s == Qt::CaseSensitive) {
-			if(m_scales[i].prefix == prefix) {
-				return m_scales[i].scale;
-			}
-		} else {
-			if(m_scales[i].prefix.toLower() == prefix.toLower()) {
-				return m_scales[i].scale;
-			}
-		}
-	}
-	return -1;
 }
 
 } // namespace gui

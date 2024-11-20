@@ -32,13 +32,17 @@ MenuPlotAxisRangeControl::MenuPlotAxisRangeControl(PlotAxis *m_plotAxis, QWidget
 	setLayout(minMaxLayout);
 	minMaxLayout->setMargin(0);
 	minMaxLayout->setSpacing(10);
-	QString unit = m_plotAxis->getUnits();
 
 	m_min = new MenuSpinbox("Min", 0, "counts", -1e9, 1e9, true, false, this);
 	m_max = new MenuSpinbox("Max", 0, "counts", -1e9, 1e9, true, false, this);
 
-	m_min->setScaleRange(1, 1e9);
-	m_max->setScaleRange(1, 1e9);
+	m_min->setIncrementMode(MenuSpinbox::IS_POW2);
+	m_max->setIncrementMode(MenuSpinbox::IS_POW2);
+
+	m_min->scale()->setScalePrefixes(
+		{{QString(""), 1e0}, {QString("k"), 1e3}, {QString("M"), 1e6}, {QString("G"), 1e9}});
+	m_max->scale()->setScalePrefixes(
+		{{QString(""), 1e0}, {QString("k"), 1e3}, {QString("M"), 1e6}, {QString("G"), 1e9}});
 
 	addAxis(m_plotAxis);
 	minMaxLayout->addWidget(m_min);

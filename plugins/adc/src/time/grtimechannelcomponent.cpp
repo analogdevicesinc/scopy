@@ -274,8 +274,8 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 		}
 		scale = 1.0 / ((float)((uint64_t)1 << fmt->bits));
 		if(fmt->is_signed) {
-			ymin = -0.5;
-			ymax = 0.5;
+			ymin = -1;
+			ymax = 1;
 		} else {
 			ymin = 0;
 			ymax = 1;

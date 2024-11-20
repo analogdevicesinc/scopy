@@ -700,7 +700,7 @@ QWidget *Ad74413r::createSettingsMenu(QWidget *parent)
 
 	// timespan
 	m_timespanSpin = new MenuSpinbox(tr("Timespan"), 1, "s", 0.1, 10, true, false, plotTimespanSection);
-	m_timespanSpin->setIncrementMode(MenuSpinbox::IS_FIXED);
+	m_timespanSpin->scale()->setHasPrefix(false);
 	connect(m_timespanSpin, &MenuSpinbox::valueChanged, this,
 		[=, this](double value) { m_plot->xAxis()->setMin(-value); });
 

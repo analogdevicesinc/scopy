@@ -394,3 +394,5 @@ QString Style::adjustForScaling(QString key, QString value, float scale)
 
 	return value;
 }
+
+#include "moc_style.cpp"

@@ -306,6 +306,11 @@ void TimePlotComponentSettings::updateYAxis()
 			min = s->yMin();
 		}
 	}
+	m_yCtrl->minSpinbox()->setMinValue(min);
+	m_yCtrl->minSpinbox()->setMaxValue(max);
+	m_yCtrl->maxSpinbox()->setMinValue(min);
+	m_yCtrl->maxSpinbox()->setMaxValue(max);
+
 	m_yCtrl->setMin(min);
 	m_yCtrl->setMax(max);
 
