@@ -40,9 +40,6 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="styleSheet">
-      <string notr="true">font-size: 14px;</string>
-     </property>
      <property name="text">
       <string>Avg:</string>
      </property>
@@ -55,9 +52,6 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font-size: 14px;</string>
      </property>
      <property name="text">
       <string>0.000</string>
@@ -72,9 +66,6 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="styleSheet">
-      <string notr="true">font-size: 14px;</string>
-     </property>
      <property name="text">
       <string>Min:</string>
      </property>
@@ -87,9 +78,6 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font-size: 14px;</string>
      </property>
      <property name="text">
       <string>0.000</string>
@@ -104,9 +92,6 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="styleSheet">
-      <string notr="true">font-size: 14px;</string>
-     </property>
      <property name="text">
       <string>Max:</string>
      </property>
@@ -119,9 +104,6 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font-size: 14px;</string>
      </property>
      <property name="text">
       <string>0.000</string>

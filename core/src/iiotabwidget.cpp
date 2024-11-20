@@ -439,7 +439,7 @@ QWidget *IioTabWidget::createVerifyBtnWidget(QWidget *parent)
 	StyleHelper::BasicButton(m_btnVerify);
 	m_btnVerify->setText("Verify");
 	m_btnVerify->setIconSize(QSize(30, 30));
-	m_btnVerify->setFixedWidth(128);
+	m_btnVerify->setFixedWidth(Style::getDimension(json::global::unit_6));
 	m_btnVerify->setEnabled(false);
 	m_btnVerify->setAutoDefault(true);
 

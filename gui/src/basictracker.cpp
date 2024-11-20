@@ -103,9 +103,8 @@ QRect BasicTracker::trackerRect(QSizeF size) const
 		yOffset = m_canvas->height() - bottomRight.y();
 	}
 
-	// hackish - magic +-3 so the whole text is visible
-	topLeft.rx() += xOffset - 3;
-	bottomRight.rx() += xOffset + 3;
+	topLeft.rx() += xOffset;
+	bottomRight.rx() += xOffset;
 	topLeft.ry() += yOffset;
 	bottomRight.ry() += yOffset;
 
@@ -114,6 +113,7 @@ QRect BasicTracker::trackerRect(QSizeF size) const
 
 QwtText *BasicTracker::trackerText(QPoint pos) const
 {
+	QString padding = " ";
 	QString xText = "";
 	QString yText = "";
 	QString separator = "";
@@ -140,8 +140,12 @@ QwtText *BasicTracker::trackerText(QPoint pos) const
 		separator = ", ";
 	}
 
-	QwtText *text = new QwtText(xText + separator + yText);
+	QwtText *text = new QwtText(padding + xText + separator + yText + padding);
 	text->setColor(m_color);
+
+	QFont font = QFont();
+	font.setPixelSize(Style::getDimension(json::global::font_size));
+	text->setFont(font);
 
 	return text;
 }

@@ -381,6 +381,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_use_opengl", true);
 #endif
 	p->init("general_use_animations", true);
+	p->init("font_scale", "1");
 	p->init("general_theme", "Scopy");
 	p->init("general_language", "en");
 	p->init("show_grid", true);
@@ -496,13 +497,12 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 
 	if(str == "general_use_opengl") {
 		Q_EMIT p->restartRequired();
-
 	} else if(str == "general_use_animations") {
 		AnimationManager::getInstance().toggleAnimations(val.toBool());
-
 	} else if(str == "general_theme") {
 		Q_EMIT p->restartRequired();
-
+	} else if(str == "font_scale") {
+		Q_EMIT p->restartRequired();
 	} else if(str == "general_language") {
 		Q_EMIT p->restartRequired();
 	} else if(str == "general_show_status_bar") {
