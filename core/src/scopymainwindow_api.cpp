@@ -386,6 +386,9 @@ void ScopyMainWindow_API::setPreference(QString prefName, QVariant value)
 	} else if(prefName == "general_theme") {
 		qWarning(CAT_SCOPY_API) << "Restart is required for the change to take place";
 
+	} else if(prefName == "font_scale") {
+		qWarning(CAT_SCOPY_API) << "Restart is required for the change to take place";
+
 	} else if(prefName == "general_language") {
 		qWarning(CAT_SCOPY_API) << "Restart is required for the change to take place";
 	}

@@ -1,5 +1,4 @@
 QHeaderView::section[&&property&&=true] {
-	font: 11pt;
 	border: 1px solid &content_default&;
 	background-color: &background_primary&;
 }

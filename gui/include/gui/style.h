@@ -44,6 +44,8 @@ private:
 	QString getAllProperties();
 	static bool isProperty(QString style);
 	static const char *replaceProperty(const char *prop);
+	static QString scaleNumberInString(QString string, float factor);
+	static QString adjustForScaling(QString key, QString value);
 
 public:
 	static Style *GetInstance();

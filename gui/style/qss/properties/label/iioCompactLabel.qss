@@ -3,7 +3,7 @@ QLabel[&&property&&=true] {
 	background-color: rgba(255,255,255,0);
 	font-weight: normal;
 	font-family: Open Sans;
-	font-size: 12px;
+	font-size: &font_size_0_5&;
 	font-style: normal;
 }
 
