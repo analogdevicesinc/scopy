@@ -5,6 +5,6 @@ QHeaderView::section[&&property&&=true] {
 	background-color: &background_primary&;
 	height: 30;
 
-	font: 9pt;
+	font: &font_size_0_5&;
 	font-weight: bold;
 }

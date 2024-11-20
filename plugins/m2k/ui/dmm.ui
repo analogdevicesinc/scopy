@@ -237,8 +237,7 @@ QPushButton:disabled {
                 <item>
                  <widget class="QLabel" name="ch1ErrorLabel">
                   <property name="styleSheet">
-                   <string notr="true">font-size: 13px;
-color: red;
+                   <string notr="true">color: red;
 text-align:right;</string>
                   </property>
                   <property name="text">
@@ -252,8 +251,7 @@ text-align:right;</string>
                 <item>
                  <widget class="QLabel" name="currentGainCh1Label">
                   <property name="styleSheet">
-                   <string notr="true">font-size: 13px;
-text-align:center;</string>
+                   <string notr="true">text-align:center;</string>
                   </property>
                   <property name="text">
                    <string>±25V</string>
@@ -577,8 +575,7 @@ QLabel{font-size:35pt;}</string>
                 <item>
                  <widget class="QLabel" name="ch2ErrorLabel">
                   <property name="styleSheet">
-                   <string notr="true">font-size: 13px;
-color: red;
+                   <string notr="true">color: red;
 text-align:right;</string>
                   </property>
                   <property name="text">
@@ -592,8 +589,7 @@ text-align:right;</string>
                 <item>
                  <widget class="QLabel" name="currentGainCh2Label">
                   <property name="styleSheet">
-                   <string notr="true">font-size: 13px;
-text-align:center;</string>
+                   <string notr="true">text-align:center;</string>
                   </property>
                   <property name="text">
                    <string>±25V</string>
@@ -1655,8 +1651,6 @@ QLabel{font-size:35pt;}</string>
                    <property name="styleSheet">
                     <string notr="true">QPushButton{
 height:25px;
-
-font-size: 12px;
 line-height: 14px;
 }</string>
                    </property>
@@ -1875,8 +1869,6 @@ border-color: grey;
                       <property name="styleSheet">
                        <string notr="true">QPushButton{
 height:25px;
-
-font-size: 12px;
 line-height: 14px;
 }</string>
                       </property>

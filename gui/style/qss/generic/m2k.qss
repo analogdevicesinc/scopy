@@ -48,7 +48,7 @@ QToolTip {
 }
 QLabel {
     color: #96&color_default_hexcode&;
-    font-size: 13px;
+    font-size: &font_size&;
     font-style: normal;
     font-weight: normal;
     text-align: left;
@@ -172,7 +172,7 @@ QRadioButton::indicator:checked:disabled {
 }
 QLineEdit {
     color: &content_default&;
-    font-size: 16px;
+    font-size: &font_size_2&;
     border: &border_width& solid &interactive_subtle_idle&;
     border-bottom: &border_width_interactive& solid &interactive_subtle_idle&;
     border-radius: &radius_interactive&;
@@ -189,7 +189,7 @@ QMessageBox QLabel {
     height: 420px;
     width: 680px;
     color: #F0&color_default_hexcode&;
-    font-size: 14px;
+    font-size: &font_size_1&;
     font: bold;
 }
 QMessageBox QPushButton {
@@ -197,7 +197,7 @@ QMessageBox QPushButton {
     width: 120px;
     background-color: &interactive_primary_idle&;
     color: &content_default&;
-    font-size: 16px;
+    font-size: &font_size_2&;
     font: bold;
     border-radius: 5px;
     border-color: &interactive_primary_idle&;
@@ -209,7 +209,7 @@ QGroupBox {
     border: 2px solid #28&color_default_hexcode&;
     border-radius: 8px;
     color: #28&color_default_hexcode&;
-    font-size: 16px;
+    font-size: &font_size_2&;
     font-weight: bold;
     margin-top: 9px;
     padding-top: 5px;
@@ -285,7 +285,7 @@ QTextBrowser#aboutTextBrowser {
     color: &content_default&;
 }
 QLabel[subsection_label="true"] {
-    font-size: 12px;
+    font-size: &font_size_0_5&;
     color: #46&color_default_hexcode&;
 }
 QFrame[subsection_line="true"] {
@@ -305,7 +305,7 @@ QPushButton[subsection_arrow_button="true"]:checked {
 }
 QLabel[general_settings_label="true"] {
     color: &content_default&;
-    font-size: 14px;
+    font-size: &font_size_1&;
     font-weight: normal;
 }
 QFrame[blue_line="true"] {
@@ -329,7 +329,7 @@ QPushButton[blue_button="true"] {
     background-color: &interactive_primary_idle&;
     color: &content_inverse&;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: &font_size_1&;
 }
 QPushButton[blue_button="true"]:hover {
     background-color: &interactive_primary_hover&;
@@ -356,7 +356,7 @@ QPushButton[info_button="true"]:hover {
 QLabel[menu_title_label="true"] {
     color: &content_default&;
     font-weight: normal;
-    font-size: 14px;
+    font-size: &font_size_1&;
 }
 
 /* Remove height : 2px; from QSlider groove */
@@ -547,7 +547,7 @@ scopy--ChannelWidget QWidget#widget::hover {
 scopy--ChannelWidget QCheckBox#box {
     spacing: 0px;
     background-color: none;
-    font-size: 14px;
+    font-size: &font_size_1&;
     font-weight: bold;
 }
 scopy--ChannelWidget QCheckBox#box::indicator {
@@ -563,7 +563,7 @@ scopy--ChannelWidget QCheckBox#box::indicator:checked {
     background-color: #3C&color_inverse_hexcode&;
 }
 scopy--ChannelWidget QPushButton#name {
-    font-size: 14px;
+    font-size: &font_size_1&;
     font-weight: bold;
     background-color: none;
 }
@@ -604,7 +604,7 @@ scopy--ChannelWidget QFrame#line[selected="true"] {
 scopy--DropdownSwitchList {
     height: 30px;
     border: 0px;
-    font-size: 18px;
+    font-size: &font_size_3&;
     border-radius: 4px;
     padding-left: 20px;
 }
@@ -622,7 +622,7 @@ scopy--DropdownSwitchList::drop-down {
 scopy--DropdownSwitchList QAbstractItemView {
     border: 0px;
     background-color: &background_subtle&;
-    font-size: 18px;
+    font-size: &font_size_3&;
     outline: 0px;
     border-left: 0px solid &background_subtle&;
 }
@@ -642,7 +642,7 @@ scopy--DropdownSwitchList QHeaderView:section {
     color: #99&color_default_hexcode&;
     background-color: &background_subtle&;
     border: 0px;
-    font: 14px;
+    font: &font_size_1&;
 }
 scopy--DropdownSwitchList QCheckBox {
     background-color: &background_subtle&;

@@ -425,7 +425,7 @@ void EmuWidget::initEnBtn(QWidget *parent)
 	m_enDemoBtn = new AnimationPushButton(parent);
 	m_enDemoBtn->setText("Enable");
 	StyleHelper::BasicButton(m_enDemoBtn);
-	m_enDemoBtn->setFixedWidth(128);
+	m_enDemoBtn->setFixedWidth(Style::getDimension(json::global::unit_6));
 	QMovie *loadingIcon(new QMovie(this));
 	loadingIcon->setFileName(":/gui/loading.gif");
 	m_enDemoBtn->setAnimation(loadingIcon);

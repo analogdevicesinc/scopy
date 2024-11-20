@@ -36,6 +36,8 @@
 
 #include <common/scopyconfig.h>
 
+#include <pluginbase/preferences.h>
+
 using namespace scopy;
 
 Style *Style::pinstance_{nullptr};
@@ -201,7 +203,7 @@ QString Style::getAttribute(const char *key)
 		attr = m_global_json->object().value(key).toString();
 	}
 
-	return replaceAttributes(attr);
+	return replaceAttributes(adjustForScaling(key, attr));
 }
 
 QColor Style::getChannelColor(int index) { return getChannelColorList()[index]; }
@@ -238,7 +240,24 @@ void Style::setBackgroundColor(QWidget *widget, QString color, bool extend_to_ch
 
 QColor Style::getColor(const char *key) { return QColor(getAttribute(key)); }
 
-int Style::getDimension(const char *key) { return getAttribute(key).toInt(); }
+int Style::getDimension(const char *key)
+{
+	QString attr = getAttribute(key);
+	int number = attr.toInt();
+
+	// this is for attributes with a string suffix. like "10px"
+	if(number == 0) {
+		QRegularExpression regex("(\\d+)");
+		QRegularExpressionMatch match = regex.match(attr);
+
+		if(match.hasMatch()) {
+			QString numberStr = match.captured(1);
+			number = numberStr.toInt();
+		}
+	}
+
+	return number;
+}
 
 const char *Style::replaceProperty(const char *prop)
 {
@@ -257,12 +276,12 @@ QString Style::replaceAttributes(QString style, int calls_limit)
 {
 	if(style.contains('&') && calls_limit > 0) {
 		for(const QString &key : m_theme_json->object().keys()) {
-			QJsonValue value = m_theme_json->object().value(key);
-			style.replace("&" + key + "&", value.toString());
+			QString value = m_theme_json->object().value(key).toString();
+			style.replace("&" + key + "&", adjustForScaling(QString(key), value));
 		}
 		for(const QString &key : m_global_json->object().keys()) {
-			QJsonValue value = m_global_json->object().value(key);
-			style.replace("&" + key + "&", value.toString());
+			QString value = m_global_json->object().value(key).toString();
+			style.replace("&" + key + "&", adjustForScaling(QString(key), value));
 		}
 
 		style = replaceAttributes(style, --calls_limit);
@@ -312,3 +331,31 @@ void Style::setGlobalStyle(QWidget *widget)
 }
 
 void Style::setM2KStylesheet(QWidget *widget) { widget->setStyleSheet(m_styleMap->value(m_m2kqssFile)); }
+
+QString Style::scaleNumberInString(QString string, float factor)
+{
+	QRegularExpression regex("(\\d+)");
+	QRegularExpressionMatch match = regex.match(string);
+
+	if(match.hasMatch()) {
+		QString numberStr = match.captured(1);
+		int number = numberStr.toInt();
+		int scaledNumber = number * factor;
+		return string.replace(regex, QString::number(scaledNumber));
+	}
+
+	return string;
+}
+
+QString Style::adjustForScaling(QString key, QString value)
+{
+	if(QString(key).startsWith("font_size")) {
+		value = scaleNumberInString(value, Preferences::GetInstance()->get("font_scale").toFloat());
+	}
+	if(QString(key).startsWith("unit_")) {
+		value = scaleNumberInString(value,
+					    (Preferences::GetInstance()->get("font_scale").toFloat() - 1) / 2 + 1);
+	}
+
+	return value;
+}
