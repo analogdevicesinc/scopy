@@ -189,7 +189,7 @@ QTabWidget *ScopyHomeAddPage::createTabWidget(QWidget *parent)
 	m_iioTabWidget = new IioTabWidget(tabWidget);
 	tabWidget->addTab(m_iioTabWidget, "IIO");
 	m_emuWidget = new EmuWidget(tabWidget);
-	tabWidget->addTab(m_emuWidget, "EMU");
+	tabWidget->addTab(m_emuWidget, "Emulator");
 	tabWidget->setCurrentWidget(m_iioTabWidget);
 	return tabWidget;
 }
