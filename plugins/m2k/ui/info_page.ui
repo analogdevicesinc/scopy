@@ -170,9 +170,6 @@
      </property>
      <item>
       <widget class="QLabel" name="lblFirmware">
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string/>
        </property>
@@ -180,9 +177,6 @@
      </item>
      <item>
       <widget class="QLabel" name="lblCalibrationInfo">
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string/>
        </property>
@@ -210,9 +204,6 @@
          <width>16777215</width>
          <height>20</height>
         </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
        </property>
        <property name="text">
         <string/>
@@ -242,9 +233,6 @@
          <height>20</height>
         </size>
        </property>
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string/>
        </property>
@@ -272,9 +260,6 @@
          <width>16777215</width>
          <height>20</height>
         </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
        </property>
        <property name="text">
         <string/>

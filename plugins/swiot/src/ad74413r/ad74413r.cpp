@@ -681,7 +681,7 @@ QPushButton *Ad74413r::createConfigBtn()
 {
 	QPushButton *configBtn = new QPushButton();
 	Style::setStyle(configBtn, style::properties::button::squareIconButton);
-	configBtn->setFixedWidth(128);
+	configBtn->setFixedWidth(Style::getDimension(json::global::unit_6));
 	configBtn->setCheckable(false);
 	configBtn->setText("Config");
 	return configBtn;

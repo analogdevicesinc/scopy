@@ -124,16 +124,17 @@ void StyleHelper::StatsPanelLabel(StatsLabel *w, QString objectName)
 		w->setObjectName(objectName);
 
 	QString style = QString(R"css(
-				font-size: 12px;
+				font-size: &&font_size_0_5&&;
 				color: &&colorname&&;
 				)css");
 	style.replace(QString("&&colorname&&"), w->m_color.name());
+	style.replace(QString("&&font_size_0_5&&"), Style::getAttribute(json::global::font_size_0_5));
 	w->m_nameLabel->setStyleSheet(style);
 
 	style = QString(R"css(
-				font-size: 12px;
+				font-size: &&font_size_0_5&&;
 				)css");
-	style.replace(QString("&&colorname&&"), w->m_color.name());
+	style.replace(QString("&&font_size_0_5&&"), Style::getAttribute(json::global::font_size_0_5));
 	w->m_avgLabel->setStyleSheet(style);
 	w->m_minLabel->setStyleSheet(style);
 	w->m_maxLabel->setStyleSheet(style);
@@ -173,8 +174,11 @@ void StyleHelper::RefreshButton(QPushButton *btn, QString objectName)
 
 	Style::setStyle(btn, style::properties::button::basicButton);
 	btn->setIcon(Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
-	btn->setFixedSize(30, 30);
-	btn->setIconSize(QSize(25, 25));
+
+	int icon_size = Style::getAttribute(json::global::unit_2).toInt();
+	int size = Style::getAttribute(json::global::unit_2_5).toInt();
+	btn->setIconSize(QSize(icon_size, icon_size));
+	btn->setFixedSize(QSize(size, size));
 }
 
 void StyleHelper::BasicSmallButton(QPushButton *btn, QString objectName)
@@ -291,12 +295,13 @@ void StyleHelper::MenuLargeLabel(QLabel *m_lbl, QString objectName)
 					background-color: rgba(255,255,255,0);
 					font-weight: bold;
 					font-family: Open Sans;
-					font-size: 14px;
+					font-size: &&font_size_1&&;
 					font-style: normal;
 					}
 				)css");
 	m_lbl->setText(m_lbl->text().toUpper());
 	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
+	style.replace(QString("&&font_size_1&&"), Style::getAttribute(json::global::font_size_1));
 	m_lbl->setStyleSheet(style);
 }
 
@@ -346,13 +351,14 @@ void StyleHelper::MenuEditTextHeaderWidget(QWidget *w, QString objectName)
 			QLineEdit {
 			 background-color: transparent;
 			 color: &&content_default&&;
-			 font-size: 16px;
+			 font-size: &&font_size_2&&;
 			 border: none;
 			 padding: 2px;
 			}
 			)css");
 	style.replace("&&background_primary&&", StyleHelper::getColor("background_primary"));
 	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
+	style.replace(QString("&&font_size_2&&"), Style::getAttribute(json::global::font_size_2));
 	w->setStyleSheet(style);
 }
 
@@ -402,7 +408,7 @@ background-color: &&interactive_subtle_idle&&;
 QLabel {
 margin-top: 6px;
 background-color: transparent;
-font: 14px;
+font: &&font_size_1&&;
 }
 
 QLabel#on {
@@ -435,6 +441,7 @@ QLabel#off:disabled {
 color: rgba(255,255,255,51);
 }
 	)css");
+	style.replace(QString("&&font_size_1&&"), Style::getAttribute(json::global::font_size_1));
 	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
 	style.replace("&&interactive_primary_idle&&", StyleHelper::getColor("interactive_primary_idle"));
 	style.replace("&&interactive_subtle_disabled&&", StyleHelper::getColor("interactive_subtle_disabled"));
@@ -470,77 +477,6 @@ void StyleHelper::MenuCollapseSection(QWidget *w, QString objectName)
 	w->setStyleSheet(style);
 }
 
-/*
-void StyleHelper::MenuSpinBox(SpinBoxA *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-
-     QString style = QString(R"css(
-scopy--SpinBoxA {
-     background-color: transparent;
-}
-
-scopy--SpinBoxA QPushButton#SBA_UpButton {
-width: 30px;
-height: 30px;
-border-image: url(:/gui/icons/sba_up_btn.svg);
-border: 0px;
-
-}
-scopy--SpinBoxA QPushButton#SBA_UpButton:pressed {
-border-image: url(:/gui/icons/sba_up_btn_pressed.svg);
-}
-scopy--SpinBoxA QPushButton#SBA_UpButton:hover:!pressed {
-border-image: url(:/gui/icons/sba_up_btn_hover.svg);
-}
-scopy--SpinBoxA QPushButton#SBA_DownButton {
-width: 30px;
-height: 30px;
-border-image: url(:/gui/icons/sba_dn_btn.svg);
-border: 0px;
-}
-scopy--SpinBoxA QPushButton#SBA_DownButton:pressed {
-border-image: url(:/gui/icons/sba_dn_btn_pressed.svg);
-}
-scopy--SpinBoxA QPushButton#SBA_DownButton:hover:!pressed {
-border-image: url(:/gui/icons/sba_dn_btn_hover.svg);
-}
-scopy--SpinBoxA QLabel#SBA_Label {
-color: rgba(255, 255, 255, 102);
-font-size: 14px;
-background-color: transparent;
-}
-scopy--SpinBoxA QLineEdit#SBA_LineEdit {
-height: 20px;
-width: 75px;
-font-size: 18px;
-border: 0px;
-bottom: 10px;
-background-color: transparent;
-}
-scopy--SpinBoxA QFrame#SBA_Line {
-height: 1px;
-background-color: transparent;
-color: &&interactive_primary_idle&&;
-}
-
-scopy--SpinBoxA QFrame#SBA_Line:disabled {
-color: &&interactive_subtle_disabled&&;
-}
-
-scopy--SpinBoxA QDial#SBA_CompletionCircle {
-background-color: &&content_inverse&&;
-color: &&interactive_primary_idle&&;
-}
-		     )css");
-style.replace("&&content_inverse&&", StyleHelper::getColor("content_inverse"));
-style.replace("&&interactive_primary_idle&&", StyleHelper::getColor("interactive_primary_idle"));
-style.replace("&&interactive_subtle_disabled&&", StyleHelper::getColor("interactive_subtle_disabled"));
-w->setStyleSheet(style);
-MenuSpinComboBox(w->ui->SBA_Combobox, ""); // Should this be refactored ?
-}*/
-
 void StyleHelper::MenuSectionWidget(QWidget *w, QString objectName)
 {
 	if(!objectName.isEmpty())
@@ -570,15 +506,14 @@ void StyleHelper::BlueIconButton(QPushButton *w, QIcon icon, QString objectName)
 			 background-color: &&interactive_primary_idle&&;
 			 color: &&content_default&&;
 			 border-radius: 4px;
-			 font-size: 14px;
+			 font-size: &&font_size_1&&;
 			}
 			QPushButton:hover:!pressed { background-color: &&interactive_primary_idle&&; }
 			QPushButton:pressed { background-color: &&interactive_primary_idle&&; }
 			QPushButton:disabled { background-color: grey; }
 			)css");
-	style.replace("&&interactive_primary_idle&&", StyleHelper::getColor("interactive_primary_idle"));
 	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
-	style.replace("&&interactive_primary_idle&&", StyleHelper::getColor("interactive_primary_idle"));
+	style.replace(QString("&&font_size_1&&"), Style::getAttribute(json::global::font_size_1));
 	style.replace("&&interactive_primary_idle&&", StyleHelper::getColor("interactive_primary_idle"));
 	w->setStyleSheet(style);
 }
@@ -638,7 +573,7 @@ void StyleHelper::MenuCollapseHeaderLineEdit(QLineEdit *w, QString objectName)
 					background-color: rgba(255,255,255,0);
 					font-weight: bold;
 					font-family: Open Sans;
-					font-size: 14px;
+					font-size: &&font_size_1&&;
 					font-style: normal;
 					border: 0px solid &&content_subtle&&;
 					border-bottom: 1px solid rgba(255, 255, 255, 102);
@@ -652,6 +587,7 @@ padding-left: -2px;
 
 				)css");
 	style.replace("&&content_default&&", StyleHelper::getColor("content_default"));
+	style.replace(QString("&&font_size_1&&"), Style::getAttribute(json::global::font_size_1));
 	style.replace("&&content_subtle&&", StyleHelper::getColor("content_subtle"));
 	w->setStyleSheet(style);
 }
@@ -735,7 +671,6 @@ void StyleHelper::WarningLabel(QLabel *w, QString objectName)
 {
 	QString style = QString(R"css(
 					color: &&content_busy&&;
-					font-size: 11pt;
 							)css");
 	style.replace("&&content_busy&&", StyleHelper::getColor("content_busy"));
 	w->setStyleSheet(style);
@@ -787,10 +722,11 @@ void StyleHelper::MenuSpinboxLabel(QLabel *w, QString objectName)
 	QString style = QString(R"css(
 QLabel {
  color: rgba(255, 255, 255, 102);
- font-size: 14px;
+ font-size: &&font_size_1&&;
  background-color: transparent;
 }
 )css");
+	style.replace(QString("&&font_size_1&&"), Style::getAttribute(json::global::font_size_1));
 
 	w->setStyleSheet(style);
 }
@@ -856,7 +792,6 @@ void StyleHelper::TableWidgetDebugger(QTableWidget *w, QString objectName)
 
 	QString style = QString(R"css(
 				QHeaderView::section {
-					font: 11pt;
 					border: none;
 					background-color:&&background_primary&&;
 					font-family: Open Sans;

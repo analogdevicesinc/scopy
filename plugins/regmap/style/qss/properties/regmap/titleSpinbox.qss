@@ -1,5 +1,5 @@
 QWidget[&&property&&=true]  {
-	font-size: 18px;
+	font-size: &font_size_3&;
 	font-style: normal;
 	font-weight: normal;
 	text-align: left;
