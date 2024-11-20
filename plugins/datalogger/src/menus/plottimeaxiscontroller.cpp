@@ -61,8 +61,8 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 
 	m_xdelta = new gui::MenuSpinbox("Delta", DataMonitorUtils::getAxisDefaultMaxValue(), "s", 0, DBL_MAX, false,
 					false, xAxisContainer);
-	m_xdelta->setScaleRange(1, 1);
-	m_xdelta->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
+	m_xdelta->scale()->setHasPrefix(false);
+	m_xdelta->scale()->setScaleOptions({{QString("s"), 1}, {QString("min"), 60}, {QString("h"), 3600}});
 	m_xdelta->setValue(DataMonitorUtils::getAxisDefaultMaxValue());
 
 	auto &&timeTracker = TimeManager::GetInstance();

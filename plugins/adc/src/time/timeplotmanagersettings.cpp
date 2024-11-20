@@ -109,7 +109,8 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	bufferPlotSize->setLayout(bufferPlotSizeLayout);
 
 	m_bufferSizeSpin = new MenuSpinbox("Buffer Size", 16, "samples", 16, 4000000, true, false, bufferPlotSize);
-	m_bufferSizeSpin->setScaleRange(1, 1e6);
+	m_bufferSizeSpin->setIncrementMode(MenuSpinbox::IS_POW2);
+	m_bufferSizeSpin->scale()->setScalePrefixes({{QString(""), 1e0}, {QString("k"), 1e3}, {QString("M"), 1e6}});
 
 	connect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, this, [=](double val) {
 		if(m_plotSizeSpin->value() < val) {
@@ -122,7 +123,8 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	connect(this, &TimePlotManagerSettings::bufferSizeChanged, m_bufferSizeSpin, &MenuSpinbox::setValue);
 
 	m_plotSizeSpin = new MenuSpinbox("Plot Size", 16, "samples", 0, 4000000, true, false, bufferPlotSize);
-	m_plotSizeSpin->setScaleRange(1, 1e6);
+	m_plotSizeSpin->setIncrementMode(MenuSpinbox::IS_POW2);
+	m_plotSizeSpin->scale()->setScalePrefixes({{QString(""), 1e0}, {QString("k"), 1e3}, {QString("M"), 1e6}});
 
 	connect(m_plotSizeSpin, &MenuSpinbox::valueChanged, this, [=](double val) { setPlotSize((uint32_t)val); });
 
@@ -153,10 +155,7 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	xMinMax->setLayout(xMinMaxLayout);
 
 	m_xmin = new MenuSpinbox("XMin", -1, "samples", -DBL_MAX, DBL_MAX, true, false, xMinMax);
-	m_xmin->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
-
 	m_xmax = new MenuSpinbox("XMax", -1, "samples", -DBL_MAX, DBL_MAX, true, false, xMinMax);
-	m_xmax->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 
 	connect(m_xmin, &MenuSpinbox::valueChanged, this,
 		[=](double min) { m_plotManager->setXInterval(m_xmin->value(), m_xmax->value()); });
@@ -177,9 +176,14 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 		if(xcb->itemData(idx) == XMODE_SAMPLES) {
 			m_sampleRateSpin->setValue(1);
 			m_xmin->setUnit("samples");
-			m_xmin->setScaleRange(1, 1e6);
+			m_xmin->scale()->setHasPrefix(true);
+			m_xmin->scale()->setScalePrefixes(
+				{{QString(""), 1e0}, {QString("k"), 1e3}, {QString("M"), 1e6}});
+
 			m_xmax->setUnit("samples");
-			m_xmax->setScaleRange(1, 1e6);
+			m_xmax->scale()->setHasPrefix(true);
+			m_xmax->scale()->setScalePrefixes(
+				{{QString(""), 1e0}, {QString("k"), 1e3}, {QString("M"), 1e6}});
 			m_plotManager->setXUnit("samples");
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<TimePlotComponent *>(plt);
@@ -191,10 +195,21 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setEnabled(false);
 			m_sampleRateSpin->setValue(readSampleRate());
+
 			m_xmin->setUnit("s");
-			m_xmin->setScaleRange(0, 1);
+			m_xmin->scale()->setHasPrefix(false);
+			m_xmin->scale()->setScaleOptions({{QString("ns"), 1e-9},
+							  {QString("us"), 1e-6},
+							  {QString("ms"), 1e-3},
+							  {QString("s"), 1}});
+
 			m_xmax->setUnit("s");
-			m_xmax->setScaleRange(0, 1);
+			m_xmax->scale()->setHasPrefix(false);
+			m_xmax->scale()->setScaleOptions({{QString("ns"), 1e-9},
+							  {QString("us"), 1e-6},
+							  {QString("ms"), 1e-3},
+							  {QString("s"), 1}});
+
 			m_plotManager->setXUnit("s");
 
 			for(PlotComponent *plt : m_plotManager->plots()) {
@@ -209,9 +224,19 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_sampleRateSpin->setEnabled(true);
 
 			m_xmin->setUnit("s");
-			m_xmin->setScaleRange(0, 1);
+			m_xmin->scale()->setHasPrefix(false);
+			m_xmin->scale()->setScaleOptions({{QString("ns"), 1e-9},
+							  {QString("us"), 1e-6},
+							  {QString("ms"), 1e-3},
+							  {QString("s"), 1}});
+
 			m_xmax->setUnit("s");
-			m_xmax->setScaleRange(0, 1);
+			m_xmax->scale()->setHasPrefix(false);
+			m_xmax->scale()->setScaleOptions({{QString("ns"), 1e-9},
+							  {QString("us"), 1e-6},
+							  {QString("ms"), 1e-3},
+							  {QString("s"), 1}});
+
 			m_plotManager->setXUnit("s");
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<TimePlotComponent *>(plt);

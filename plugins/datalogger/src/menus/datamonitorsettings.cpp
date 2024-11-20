@@ -129,7 +129,6 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 	plotAutoscaler->setTolerance(10);
 
 	MenuOnOffSwitch *autoscale = new MenuOnOffSwitch(tr("AUTOSCALE"), yAxisSection, false);
-	autoscale->onOffswitch()->setChecked(true);
 
 	connect(autoscale->onOffswitch(), &QAbstractButton::toggled, this, [=, this](bool toggled) {
 		plotYAxisController->setEnabled(!toggled);
@@ -139,6 +138,8 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 			plotAutoscaler->stop();
 		}
 	});
+
+	autoscale->onOffswitch()->setChecked(true);
 
 	auto &&timeTracker = TimeManager::GetInstance();
 
