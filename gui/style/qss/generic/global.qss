@@ -168,20 +168,27 @@ QTabBar::tab:hover {
 QTabBar::tab QLabel {
     background-color: transparent;
     color: &content_default&;
-    padding-right: &padding_2&;;
-    padding-left: &padding_2&;;
 }
 
 QTabBar::tab {
-	min-width: 100px;
-	background: &background_primary&;
-	font-weight: bold;
+    min-width: &unit_5&;
+    background: &background_primary&;
+    font-size: &font_size_1&;
+    font-weight: bold;
+    padding-right: &padding_2&;
+    padding-left: &padding_2&;
+    padding-top: &padding_1&;
+    padding-bottom: &padding_1&;
 }
 
 QTabBar::tab:selected {
 	background: &background_primary&;
 	color: &interactive_primary_idle&;
 	border-bottom: 1px solid &interactive_primary_idle&;
+}
+
+QTabWidget::tab-bar {
+	alignment: left;
 }
 
 
