@@ -57,7 +57,7 @@ DacInstrument::DacInstrument(const Connection *conn, QWidget *parent)
 	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), true, this);
 	rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn *>(openLastMenuBtn)->getButtonGroup();
 
-	infoBtn = new InfoBtn(this);
+	infoBtn = new InfoBtn(this, true);
 	settingsBtn = new GearBtn(this);
 
 	devicesGroup = new QButtonGroup(this);
@@ -70,10 +70,17 @@ DacInstrument::DacInstrument(const Connection *conn, QWidget *parent)
 
 	rightMenuBtnGrp->addButton(settingsBtn);
 	rightMenuBtnGrp->addButton(devicesBtn->button());
+	connect(infoBtn, &InfoBtn::clicked, this, [=]() {
+		infoBtn->generateInfoPopup(this);
 
-	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
-		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/dac/dac.html"));
+		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, [=]() { this->startTutorial(); });
+
+		connect(infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, [=, this]() {
+			QDesktopServices::openUrl(
+				QUrl("https://analogdevicesinc.github.io/scopy/plugins/dac/dac.html"));
+		});
 	});
+
 	connect(devicesBtn, &QPushButton::toggled, dynamic_cast<MenuHAnim *>(tool->leftContainer()),
 		&MenuHAnim::toggleMenu);
 
@@ -187,17 +194,6 @@ void DacInstrument::abortTutorial()
 		   &DacInstrument::startBufferNonCyclicTutorial);
 	disconnect(m_dacBufferNonCyclicTutorial, &gui::TutorialBuilder::finished, this,
 		   &DacInstrument::startDdsTutorial);
-}
-
-void DacInstrument::showEvent(QShowEvent *event)
-{
-	QWidget::showEvent(event);
-
-	// Handle tutorial
-	if(Preferences::get("dacplugin_start_tutorial").toBool()) {
-		startTutorial();
-		Preferences::set("dacplugin_start_tutorial", false);
-	}
 }
 
 void DacInstrument::setupDacDataManagers()
