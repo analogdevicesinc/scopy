@@ -48,6 +48,7 @@ public:
 	QString category() override;
 	QString param() override;
 	QWidget *icon() override;
+	QPixmap iconPixmap() override;
 	QWidget *page() override;
 	QList<ToolMenuEntry *> toolList() override;
 	virtual void init() override;

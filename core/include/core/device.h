@@ -48,6 +48,7 @@ public:
 	virtual QString param() = 0;
 	virtual QString displayParam() = 0;
 	virtual QWidget *icon() = 0;
+	virtual QPixmap iconPixmap() = 0;
 
 	virtual QWidget *page() = 0;
 
