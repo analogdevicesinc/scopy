@@ -20,6 +20,9 @@
  */
 
 #include "iiomodel.h"
+#include "datastrategy/channelattrdatastrategy.h"
+#include "datastrategy/contextattrdatastrategy.h"
+#include "datastrategy/deviceattrdatastrategy.h"
 #include <QLoggingCategory>
 
 #define BUFFER_SIZE 256
@@ -88,6 +91,11 @@ void IIOModel::generateCtxAttributes()
 						       IIOStandardItem::ContextAttribute);
 		attrItem->setEditable(false);
 		m_rootItem->appendRow(attrItem);
+		connect(dynamic_cast<ContextAttrDataStrategy *>(ctxWidget->getDataStrategy()),
+			&ContextAttrDataStrategy::emitStatus, this,
+			[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+				Q_EMIT iioEvent(returnCode);
+			});
 	}
 }
 
@@ -130,6 +138,11 @@ void IIOModel::generateDeviceAttributes()
 		attrItem->setDevice(m_currentDevice);
 		attrItem->setEditable(false);
 		m_currentDeviceItem->appendRow(attrItem);
+		connect(dynamic_cast<DeviceAttrDataStrategy *>(m_devList[j]->getDataStrategy()),
+			&DeviceAttrDataStrategy::emitStatus, this,
+			[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+				Q_EMIT iioEvent(returnCode);
+			});
 	}
 }
 
@@ -169,6 +182,11 @@ void IIOModel::generateChannelAttributes()
 		attr_item->setChannel(m_currentChannel);
 		attr_item->setEditable(false);
 		m_currentChannelItem->appendRow(attr_item);
+		connect(dynamic_cast<ChannelAttrDataStrategy *>(m_chnlList[i]->getDataStrategy()),
+			&ChannelAttrDataStrategy::emitStatus, this,
+			[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+				Q_EMIT iioEvent(returnCode);
+			});
 	}
 }
 
