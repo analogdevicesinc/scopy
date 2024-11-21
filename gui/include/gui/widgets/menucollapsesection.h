@@ -51,7 +51,8 @@ public:
 	typedef enum
 	{
 		MHW_BASEWIDGET,
-		MHW_COMPOSITEWIDGET
+		MHW_COMPOSITEWIDGET,
+		MHW_TOOLMENUWIDGET
 	} MenuHeaderWidgetType;
 
 	MenuCollapseSection(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style = MHCW_ARROW,
@@ -81,7 +82,6 @@ public:
 			   MenuCollapseSection::MenuHeaderWidgetType headerType, QWidget *parent);
 	~MenuCollapseHeader();
 	QString title();
-
 	QWidget *headerWidget() const;
 
 private:
