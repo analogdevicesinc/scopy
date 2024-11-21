@@ -269,7 +269,9 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	////generate channel settings for compatible monitors
 	foreach(QString monitor, m_dataAcquisitionManager->getDataMonitorMap()->keys()) {
 		auto monitorModel = m_dataAcquisitionManager->getDataMonitorMap()->value(monitor);
-		tool->rightStack()->add(monitor, new ChannelAttributesMenu(monitorModel, this));
+		ChannelAttributesMenu *chnlAttrMenu = new ChannelAttributesMenu(monitorModel, this);
+		tool->rightStack()->add(monitor, chnlAttrMenu);
+		connect(chnlAttrMenu, &ChannelAttributesMenu::iioEvent, this, &DatamonitorTool::iioEvent);
 	}
 
 	/////////////////monitor selection menu ///////////////
@@ -282,7 +284,9 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	connect(m_dataAcquisitionManager, &DataAcquisitionManager::monitorAdded, this,
 		[=, this](DataMonitorModel *monitor) {
 			m_monitorSelectionMenu->addMonitor(monitor);
-			tool->rightStack()->add(monitor->getName(), new ChannelAttributesMenu(monitor, this));
+			ChannelAttributesMenu *chnlAttrMenu = new ChannelAttributesMenu(monitor, this);
+			tool->rightStack()->add(monitor->getName(), chnlAttrMenu);
+			connect(chnlAttrMenu, &ChannelAttributesMenu::iioEvent, this, &DatamonitorTool::iioEvent);
 		});
 
 	connect(m_dataAcquisitionManager, &DataAcquisitionManager::monitorRemoved, this,
