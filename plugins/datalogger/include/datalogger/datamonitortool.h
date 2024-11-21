@@ -44,7 +44,7 @@ namespace scopy::datamonitor {
 class SevenSegmentDisplay;
 
 class DataMonitorSettings;
-class SCOPY_DATALOGGER_EXPORT DatamonitorTool : public QWidget
+class SCOPY_DATALOGGER_EXPORT DatamonitorTool : public QWidget, public IIOEventEmitter
 {
 	friend class DataLogger_API;
 	friend class DataMonitorStyleHelper;
@@ -61,6 +61,7 @@ Q_SIGNALS:
 	void runToggled(bool toggled);
 	void settingsTitleChanged(QString newTitle);
 	void requestDeleteTool();
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 private:
 	MenuControlButton *monitorsButton;

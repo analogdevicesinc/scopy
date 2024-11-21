@@ -23,11 +23,12 @@
 #define IREGISTERREADSTRATEGY_HPP
 
 #include <QObject>
+#include <iioutil/iioeventemitter.h>
 #include "../../scopy-datalogger_export.h"
 
 namespace scopy {
 namespace datamonitor {
-class SCOPY_DATALOGGER_EXPORT IReadStrategy : public QObject
+class SCOPY_DATALOGGER_EXPORT IReadStrategy : public QObject, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -36,6 +37,7 @@ public:
 Q_SIGNALS:
 	void readDone(double time, double value);
 	void readError(const char *err);
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 };
 } // namespace datamonitor
 } // namespace scopy

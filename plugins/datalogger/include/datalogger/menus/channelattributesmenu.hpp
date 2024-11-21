@@ -29,11 +29,14 @@
 
 namespace scopy {
 namespace datamonitor {
-class SCOPY_DATALOGGER_EXPORT ChannelAttributesMenu : public QWidget
+class SCOPY_DATALOGGER_EXPORT ChannelAttributesMenu : public QWidget, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
 	explicit ChannelAttributesMenu(DataMonitorModel *model, QWidget *parent = nullptr);
+
+Q_SIGNALS:
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 };
 } // namespace datamonitor
 } // namespace scopy

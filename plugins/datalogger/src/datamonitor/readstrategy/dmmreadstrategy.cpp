@@ -47,11 +47,12 @@ void DMMReadStrategy::read()
 		char err[1024];
 		iio_strerror(-(int)readRaw, err, sizeof(err));
 		qDebug() << "device read error " << err;
-
+		Q_EMIT iioEvent(readRaw);
 	} else if(readScale < 0) {
 		char err[1024];
 		iio_strerror(-(int)readScale, err, sizeof(err));
 		qDebug() << "device read error " << err;
+		Q_EMIT iioEvent(readScale);
 	} else {
 		double result = (raw + m_offset) * scale * m_umScale;
 		qDebug() << "dmm read success  ";
@@ -60,6 +61,7 @@ void DMMReadStrategy::read()
 		double currentTime = QwtDate::toDouble(timeTracker->lastReadValue());
 
 		Q_EMIT readDone(currentTime, result);
+		Q_EMIT iioEvent(IIO_SUCCESS);
 	}
 }
 

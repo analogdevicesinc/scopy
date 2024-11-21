@@ -50,6 +50,7 @@ DmmDataMonitorModel::DmmDataMonitorModel(QString name, QColor color, UnitOfMeasu
 
 	setDataStorageSize();
 	setReadStrategy(readStrategy);
+	connect(readStrategy, &DMMReadStrategy::iioEvent, this, &DmmDataMonitorModel::iioEvent);
 }
 
 iio_channel *DmmDataMonitorModel::iioChannel() const { return m_iioChannel; }
