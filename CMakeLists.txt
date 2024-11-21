@@ -29,6 +29,14 @@ if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Default build type: RelWithDebInfo" FORCE)
 endif()
 
+find_program(CCACHE_FOUND ccache)
+if(NOT DEFINED ENV{BUILD_HOST} AND CCACHE_FOUND)
+	message(STATUS "Using ccache.")
+	set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+else()
+	message(STATUS "Not using ccache.")
+endif()
+
 # Make sure our local CMake Modules path comes first
 list(INSERT CMAKE_MODULE_PATH 0 ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
