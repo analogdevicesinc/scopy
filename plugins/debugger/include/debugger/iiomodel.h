@@ -30,7 +30,7 @@
 #include "iiostandarditem.h"
 
 namespace scopy::debugger {
-class IIOModel : public QObject
+class IIOModel : public QObject, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -42,6 +42,7 @@ public:
 Q_SIGNALS:
 	void emitLog(QDateTime timestamp, bool isRead, QString path, QString oldValue, QString newValue,
 		     int returnCode);
+	void iioEvent(int retCode) override;
 
 private:
 	void iioTreeSetup();
