@@ -655,7 +655,8 @@ void ScopyMainWindow::initApi()
 
 void ScopyMainWindow::addDeviceToUi(QString id, Device *d)
 {
-	m_toolMenuManager->addMenuItem(id, d->displayName(), d->toolList());
+	DeviceInfo dInfo = {d->displayName(), d->param(), d->iconPixmap(), d->toolList()};
+	m_toolMenuManager->addMenuItem(id, dInfo);
 	hp->addDevice(id, d);
 }
 

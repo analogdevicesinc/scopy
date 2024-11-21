@@ -28,6 +28,7 @@
 #include <compositeheaderwidget.h>
 #include <menuheader.h>
 #include <style.h>
+#include <toolmenuheaderwidget.h>
 
 Q_LOGGING_CATEGORY(CAT_TOOLMENUMANAGER, "ToolMenuManager")
 using namespace scopy;
@@ -41,14 +42,11 @@ ToolMenuManager::ToolMenuManager(ToolStack *ts, DetachedToolWindowManager *dtm, 
 
 ToolMenuManager::~ToolMenuManager() {}
 
-void ToolMenuManager::addMenuItem(QString deviceId, QString devName, QList<ToolMenuEntry *> tools, int itemIndex)
+void ToolMenuManager::addMenuItem(QString deviceId, DeviceInfo dInfo, int itemIndex)
 {
-	QString param;
-	if(!tools.isEmpty())
-		param = tools.at(0)->param();
-	MenuSectionCollapseWidget *devSection = createMenuSectionItem(devName, param);
+	MenuSectionCollapseWidget *devSection = createMenuSectionItem(dInfo.name, dInfo.param, dInfo.icon);
 	QButtonGroup *menuBtnGroup = m_toolMenu->btnGroup();
-	for(ToolMenuEntry *tme : tools) {
+	for(ToolMenuEntry *tme : qAsConst(dInfo.tools)) {
 		ToolMenuItem *toolMenuItem = createToolMenuItem(tme, devSection);
 		devSection->add(toolMenuItem);
 		menuBtnGroup->addButton(toolMenuItem);
@@ -59,6 +57,7 @@ void ToolMenuManager::addMenuItem(QString deviceId, QString devName, QList<ToolM
 	}
 	m_toolMenu->add(itemIndex, deviceId, devSection);
 	m_itemMap[deviceId] = devSection;
+	m_dInfoMap[deviceId] = dInfo;
 	qDebug(CAT_TOOLMENUMANAGER) << "Menu item with id" << deviceId << "has been added";
 }
 
@@ -85,11 +84,11 @@ void ToolMenuManager::changeToolListContents(QString deviceId, QList<ToolMenuEnt
 	for(ToolMenuEntry *tme : tools) {
 		tme->disconnect(this);
 	}
+	m_dInfoMap[deviceId].tools = tools;
 	MenuSectionCollapseWidget *menuItem = m_itemMap[deviceId];
-	QString devName = menuItem->collapseSection()->title();
 	int itemIndex = m_toolMenu->indexOf(menuItem);
 	removeMenuItem(deviceId);
-	addMenuItem(deviceId, devName, tools, itemIndex);
+	addMenuItem(deviceId, m_dInfoMap[deviceId], itemIndex);
 	showMenuItem(deviceId);
 	highlightCrtItem();
 }
@@ -133,6 +132,7 @@ void ToolMenuManager::deviceDisconnected(QString id)
 void ToolMenuManager::onDisplayNameChanged(QString id, QString devName)
 {
 	m_itemMap[id]->collapseSection()->setTitle(devName);
+	m_dInfoMap[id].name = devName;
 }
 
 void ToolMenuManager::updateTool(QWidget *old)
@@ -265,20 +265,21 @@ void ToolMenuManager::setTmeAttached(ToolMenuEntry *tme)
 	tme->setAttached(!tme->attached());
 }
 
-MenuSectionCollapseWidget *ToolMenuManager::createMenuSectionItem(QString deviceName, QString uri)
+MenuSectionCollapseWidget *ToolMenuManager::createMenuSectionItem(QString devName, QString uri, QPixmap icon)
 {
 	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget(
-		deviceName, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_COMPOSITEWIDGET, m_toolMenu);
+		devName, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_TOOLMENUWIDGET, m_toolMenu);
 	section->contentLayout()->setSpacing(0);
 	section->menuSection()->layout()->setMargin(0);
 	section->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-	MenuCollapseHeader *collapseHeader = dynamic_cast<MenuCollapseHeader *>(section->collapseSection()->header());
+	MenuCollapseHeader *collapseHeader = getCollapseSectionHeader(section);
 	if(collapseHeader) {
-		CompositeHeaderWidget *chw = dynamic_cast<CompositeHeaderWidget *>(collapseHeader->headerWidget());
-		if(chw) {
-			chw->add(new QLabel(uri, chw));
-			chw->layout()->setContentsMargins(Style::getDimension(json::global::unit_1), 0, 0, 0);
+		ToolMenuHeaderWidget *thw = dynamic_cast<ToolMenuHeaderWidget *>(collapseHeader->headerWidget());
+		if(thw) {
+			thw->setUri(uri);
+			thw->setDeviceIcon(icon);
+			thw->layout()->setContentsMargins(Style::getDimension(json::global::unit_1), 0, 0, 0);
 		}
 		Style::setStyle(collapseHeader, style::properties::widget::bottomBorder);
 	}
@@ -298,6 +299,11 @@ ToolMenuItem *ToolMenuManager::createToolMenuItem(ToolMenuEntry *tme, QWidget *p
 	connect(this, &ToolMenuManager::toolStackChanged, toolMenuItem, &ToolMenuItem::selectCrtItem);
 
 	return toolMenuItem;
+}
+
+MenuCollapseHeader *ToolMenuManager::getCollapseSectionHeader(MenuSectionCollapseWidget *section)
+{
+	return dynamic_cast<MenuCollapseHeader *>(section->collapseSection()->header());
 }
 
 #include "moc_toolmenumanager.cpp"
