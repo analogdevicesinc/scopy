@@ -54,12 +54,16 @@ Faults::Faults(QString uri, ToolMenuEntry *tme, QWidget *parent)
 
 	layout->addWidget(m_tool);
 
-	InfoBtn *infoBtn = new InfoBtn(this);
+	InfoBtn *infoBtn = new InfoBtn(this, true);
 	m_tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
-	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
-		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/faults.html"));
+	connect(infoBtn, &InfoBtn::clicked, this, [=]() {
+		infoBtn->generateInfoPopup(this);
+		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, [=]() { this->startTutorial(); });
+		connect(infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, [=, this]() {
+			QDesktopServices::openUrl(
+				QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/faults.html"));
+		});
 	});
-
 	m_configBtn = createConfigBtn(this);
 	m_runBtn = new RunBtn(this);
 	m_singleBtn = new SingleShotBtn(this);
@@ -159,16 +163,6 @@ QPushButton *Faults::createConfigBtn(QWidget *parent)
 	configBtn->setCheckable(false);
 	configBtn->setText("Config");
 	return configBtn;
-}
-
-void Faults::showEvent(QShowEvent *event)
-{
-	QWidget::showEvent(event);
-
-	if(Preferences::get("faults_start_tutorial").toBool()) {
-		startTutorial();
-		Preferences::set("faults_start_tutorial", false);
-	}
 }
 
 void Faults::initTutorialProperties()

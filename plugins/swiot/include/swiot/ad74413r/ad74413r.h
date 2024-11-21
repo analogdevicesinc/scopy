@@ -156,8 +156,6 @@ private:
 	QTimer *m_rstAcqTimer;
 	const QString channelsMenuId = "channels";
 	const QString measureMenuId = "measure";
-
-	void showEvent(QShowEvent *event) override;
 };
 } // namespace swiot
 } // namespace scopy
