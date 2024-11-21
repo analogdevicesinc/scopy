@@ -21,6 +21,7 @@
 #include "faults/faultspage.h"
 #include "swiot_logging_categories.h"
 #include <QScrollArea>
+#include <faultspage.h>
 #include <gui/stylehelper.h>
 #include <iioutil/connectionprovider.h>
 
@@ -80,6 +81,7 @@ void FaultsPage::setupDevices()
 			QVector<uint32_t> faultRegistersAddr = {0x02e};
 			m_ad74413rFaultsDevice = new FaultsDevice("ad74413r", ":/swiot/swiot_faults.json", m_uri,
 								  faultRegistersAddr, this);
+			connect(m_ad74413rFaultsDevice, &FaultsDevice::iioEvent, this, &FaultsPage::iioEvent);
 		} else {
 			qCritical(CAT_SWIOT_FAULTS) << "Error: did not find ad74413r device.";
 		}
@@ -88,6 +90,7 @@ void FaultsPage::setupDevices()
 			QVector<uint32_t> faultRegistersAddr = {0x04, 0x05, 0x06, 0x07};
 			m_max14906FaultsDevice = new FaultsDevice("max14906", ":/swiot/swiot_faults.json", m_uri,
 								  faultRegistersAddr, this);
+			connect(m_max14906FaultsDevice, &FaultsDevice::iioEvent, this, &FaultsPage::iioEvent);
 		} else {
 			qCritical(CAT_SWIOT_FAULTS) << "Error: did not find max14906 device.";
 		}

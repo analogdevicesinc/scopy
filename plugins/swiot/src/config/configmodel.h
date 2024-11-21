@@ -21,6 +21,7 @@
 #ifndef CONFIGMODEL_H
 #define CONFIGMODEL_H
 
+#include "iioutil/iioeventemitter.h"
 #include <QObject>
 
 #include <QMap>
@@ -33,7 +34,7 @@ extern "C"
 }
 
 namespace scopy::swiot {
-class ConfigModel : public QObject
+class ConfigModel : public QObject, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -61,6 +62,8 @@ Q_SIGNALS:
 	void configChannelEnabled();
 	void configChannelDevice();
 	void configChannelFunction();
+
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE);
 
 private:
 	struct iio_device *m_device;
