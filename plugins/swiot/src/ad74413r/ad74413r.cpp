@@ -402,16 +402,6 @@ PlotAxis *Ad74413r::createYChnlAxis(QPen pen, QString unitType, int yMin, int yM
 	return chYAxis;
 }
 
-void Ad74413r::showEvent(QShowEvent *event)
-{
-	QWidget::showEvent(event);
-
-	if(Preferences::get("ad74413r_start_tutorial").toBool()) {
-		startTutorial();
-		Preferences::set("ad74413r_start_tutorial", false);
-	}
-}
-
 void Ad74413r::setupChannelBtn(MenuControlButton *btn, PlotChannel *ch, QString chnlId, int chnlIdx)
 {
 	btn->setName(chnlId);
@@ -609,7 +599,7 @@ void Ad74413r::setupToolTemplate()
 	setupDeviceBtn();
 	m_tool->addWidgetToCentralContainerHelper(m_plot);
 
-	m_infoBtn = new InfoBtn(this);
+	m_infoBtn = new InfoBtn(this, true);
 	m_infoBtn->installEventFilter(this);
 	m_settingsBtn = new GearBtn(this);
 	m_runBtn = new RunBtn(this);
@@ -620,9 +610,13 @@ void Ad74413r::setupToolTemplate()
 	m_singleBtn->setChecked(false);
 	m_configBtn = createConfigBtn();
 
-	connect(m_infoBtn, &QAbstractButton::clicked, this, [=, this]() {
-		QDesktopServices::openUrl(
-			QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/ad74413r.html"));
+	connect(m_infoBtn, &InfoBtn::clicked, this, [=]() {
+		m_infoBtn->generateInfoPopup(this);
+		connect(m_infoBtn->getTutorialButton(), &QPushButton::clicked, this, [=]() { this->startTutorial(); });
+		connect(m_infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, [=, this]() {
+			QDesktopServices::openUrl(
+				QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/ad74413r.html"));
+		});
 	});
 
 	MenuControlButton *measure = new MenuControlButton(this);
