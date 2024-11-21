@@ -30,6 +30,7 @@
 #include <pluginbase/toolmenuentry.h>
 #include <gui/plotmanager.h>
 #include <gui/toolcomponent.h>
+#include <iioutil/iioeventemitter.h>
 #include "adcacquisitionmanager.h"
 
 namespace scopy {
@@ -43,7 +44,8 @@ class ADCInstrument;
 class SCOPY_ADC_EXPORT ADCInstrumentController : public QObject,
 						 public AcqNodeChannelAware,
 						 public MetaComponent,
-						 public ResourceUser
+						 public ResourceUser,
+						 public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -70,6 +72,9 @@ public Q_SLOTS:
 
 	virtual void start();
 	virtual void stop() override;
+
+Q_SIGNALS:
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 protected Q_SLOTS:
 	virtual void stopUpdates();

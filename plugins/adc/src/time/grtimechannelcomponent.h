@@ -35,6 +35,7 @@
 #include "adcinterfaces.h"
 #include <iio-widgets/iiowidget.h>
 #include <gui/widgets/menuwidget.h>
+#include <iioutil/iioeventemitter.h>
 #include "time/timeplotcomponent.h"
 
 namespace scopy {
@@ -84,7 +85,8 @@ class SCOPY_ADC_EXPORT GRTimeChannelComponent : public ChannelComponent,
 						public GRChannel,
 						public MeasurementProvider,
 						public SampleRateProvider,
-						public ScaleProvider
+						public ScaleProvider,
+						public IIOEventEmitter
 
 {
 	Q_OBJECT
@@ -129,6 +131,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void yModeChanged();
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 private:
 	GRIIOFloatChannelNode *m_node;

@@ -167,6 +167,7 @@ void ADCTimeInstrumentController::createIIODevice(AcqTreeNode *node)
 	m_timePlotSettingsComponent->addSampleRateProvider(d);
 	addComponent(d);
 
+	connect(d, &GRDeviceComponent::iioEvent, this, &ADCInstrumentController::iioEvent);
 	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::bufferSizeChanged, d,
 		&GRDeviceComponent::setBufferSize);
 }
@@ -179,6 +180,7 @@ void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 	GRTimeChannelComponent *c =
 		new GRTimeChannelComponent(griiofcn, dynamic_cast<TimePlotComponent *>(m_plotComponentManager->plot(0)),
 					   grtsc, chIdP->pen(idx), m_ui->rightStack);
+	connect(c, &GRTimeChannelComponent::iioEvent, this, &ADCInstrumentController::iioEvent);
 	Q_ASSERT(grtsc);
 
 	m_plotComponentManager->addChannel(c);
@@ -215,6 +217,7 @@ void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 		m_defaultCh = c;
 		m_plotComponentManager->selectChannel(c);
 	}
+	connect(dc, &GRDeviceComponent::iioEvent, this, &ADCInstrumentController::iioEvent);
 }
 
 void ADCTimeInstrumentController::createImportFloatChannel(AcqTreeNode *node)

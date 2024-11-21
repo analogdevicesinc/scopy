@@ -20,6 +20,7 @@
  */
 
 #include "grdevicecomponent.h"
+#include "datastrategy/deviceattrdatastrategy.h"
 #include <gui/channelcomponent.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
@@ -27,6 +28,7 @@
 #include <iio-widgets/iiowidget.h>
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <style.h>
+#include <datastrategy/multidatastrategy.h>
 
 using namespace scopy;
 using namespace scopy::adc;
@@ -116,6 +118,10 @@ QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent)
 
 	for(auto w : attrWidgets) {
 		layout->addWidget(w);
+		connect(dynamic_cast<MultiDataStrategy *>(w->getDataStrategy()), &MultiDataStrategy::emitStatus, this,
+			[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+				Q_EMIT iioEvent(returnCode);
+			});
 	}
 
 	attr->contentLayout()->addLayout(layout);
@@ -145,6 +151,11 @@ QWidget *GRDeviceComponent::createAttrMenu(QWidget *parent)
 
 	for(auto w : attrWidgets) {
 		layout->addWidget(w);
+		connect(dynamic_cast<DeviceAttrDataStrategy *>(w->getDataStrategy()),
+			&DeviceAttrDataStrategy::emitStatus, this,
+			[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+				Q_EMIT iioEvent(returnCode);
+			});
 	}
 
 	attr->contentLayout()->addLayout(layout);

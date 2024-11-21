@@ -20,6 +20,7 @@
  */
 
 #include "grtimechannelcomponent.h"
+#include "datastrategy/channelattrdatastrategy.h"
 #include <pluginbase/preferences.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menucollapsesection.h>
@@ -95,6 +96,11 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 					.channel(m_src->channel())
 					.attribute(m_src->scaleAttribute())
 					.buildSingle();
+		connect(dynamic_cast<ChannelAttrDataStrategy *>(m_scaleWidget->getDataStrategy()),
+			&ChannelAttrDataStrategy::emitStatus, this,
+			[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+				Q_EMIT iioEvent(returnCode);
+			});
 	}
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_timePlotComponentChannel->m_timePlotYAxis, m_yaxisMenu);
@@ -210,6 +216,11 @@ QWidget *GRTimeChannelComponent::createAttrMenu(QWidget *parent)
 
 	for(auto w : attrWidgets) {
 		layout->addWidget(w);
+		connect(dynamic_cast<ChannelAttrDataStrategy *>(w->getDataStrategy()),
+			&ChannelAttrDataStrategy::emitStatus, this,
+			[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+				Q_EMIT iioEvent(returnCode);
+			});
 	}
 
 	section->contentLayout()->addLayout(layout);

@@ -29,6 +29,7 @@
 
 #include <gr-util/griiodevicesource.h>
 #include <gui/widgets/menucontrolbutton.h>
+#include <iioutil/iioeventemitter.h>
 
 #include <QLabel>
 #include <QPen>
@@ -38,7 +39,10 @@
 namespace scopy::adc {
 // class GRTimeChannelAddon;
 
-class SCOPY_ADC_EXPORT GRDeviceComponent : public QWidget, public ToolComponent, public SampleRateProvider
+class SCOPY_ADC_EXPORT GRDeviceComponent : public QWidget,
+					   public ToolComponent,
+					   public SampleRateProvider,
+					   public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -60,6 +64,9 @@ public Q_SLOTS:
 
 	void removeChannel(ChannelComponent *c);
 	void addChannel(ChannelComponent *c);
+
+Q_SIGNALS:
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 private:
 	QString name;
