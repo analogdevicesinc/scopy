@@ -67,6 +67,9 @@ void CommandQueue::start()
 
 void CommandQueue::resolveNext(scopy::Command *cmd)
 {
+	if(cmd->getReturnCode() < 0) {
+		Q_EMIT iioEvent(cmd->getReturnCode());
+	}
 	m_lastCmdTime = QTime::currentTime();
 	m_commandQueue.pop_front(); // also delete/disconnect
 	qDebug(CAT_COMMANDQUEUE) << "delete " << cmd;
@@ -94,6 +97,7 @@ void CommandQueue::runCmd()
 					  m_commandQueue.at(0)->execute();
 					  qDebug(CAT_COMMANDQUEUE) << "execute stop " << m_commandQueue.at(0);
 				  }));
+		Q_EMIT iioEvent(IIO_SUCCESS);
 	}
 }
 
