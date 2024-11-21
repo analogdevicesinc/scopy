@@ -432,6 +432,20 @@ QString DeviceImpl::param() { return m_param; }
 
 QWidget *DeviceImpl::icon() { return m_icon; }
 
+QPixmap DeviceImpl::iconPixmap()
+{
+	QPixmap pixmap;
+	QLayoutItem *item = m_icon->layout()->itemAt(0);
+	if(!item || !item->widget()) {
+		return pixmap;
+	}
+	QLabel *iconLabel = dynamic_cast<QLabel *>(item->widget());
+	if(iconLabel) {
+		pixmap = iconLabel->grab();
+	}
+	return pixmap;
+}
+
 QWidget *DeviceImpl::page() { return m_page; }
 
 QList<ToolMenuEntry *> DeviceImpl::toolList()
