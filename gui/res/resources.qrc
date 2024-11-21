@@ -169,6 +169,7 @@
         <file>icons/scopy-light/icons/search.svg</file>
         <file>Arial.ttf</file>
         <file>icons/notification_bell.svg</file>
+        <file>icons/circle_led.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>
