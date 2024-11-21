@@ -20,6 +20,7 @@
  */
 
 #include "menus/channelattributesmenu.hpp"
+#include "datastrategy/channelattrdatastrategy.h"
 
 #include <iiowidgetbuilder.h>
 #include <menuheader.h>
@@ -66,6 +67,10 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, QWidget *p
 
 		for(auto w : attrWidgets) {
 			attrLayout->addWidget(w);
+			connect(dynamic_cast<ChannelAttrDataStrategy *>(w->getDataStrategy()),
+				&ChannelAttrDataStrategy::emitStatus, this,
+				[this](QDateTime timestamp, QString oldData, QString newData, int returnCode,
+				       bool isReadOp) { Q_EMIT iioEvent(returnCode); });
 		}
 
 	} else {
