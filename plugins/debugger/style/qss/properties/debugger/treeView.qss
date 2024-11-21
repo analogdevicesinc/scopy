@@ -3,9 +3,20 @@ QTreeView[&&property&&=true] {
 	border-radius: &radius_1&;
 	background-color: &background_primary&;
 	show-decoration-selected: 0;
+	color: &content_default&;
 }
 
 QTreeView::item[&&property&&=true]:selected {
 	background-color: &interactive_primary_idle&;
+	color: &content_default&;
 }
 
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings  {
+    border-image: url(&svg_arrow_down&);
+}
+
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+    border-image: url(&svg_arrow_right&);
+}
