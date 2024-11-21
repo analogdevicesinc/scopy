@@ -89,8 +89,6 @@ private:
 	static QMainWindow *createDockableMainWindow(const QString &title, DioDigitalChannel *digitalChannel,
 						     QWidget *parent);
 	QPushButton *createConfigBtn(QWidget *parent = nullptr);
-
-	void showEvent(QShowEvent *event) override;
 };
 } // namespace scopy::swiot
 #endif // MAX14906_H
