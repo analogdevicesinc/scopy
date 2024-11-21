@@ -22,7 +22,7 @@ QAbstractSpinBox {
 
 QToolTip {
     	color: &white&;
-    	background-color: &background_subtle&;
+	background-color: &black&;
 	border-radius: &radius_1&;
 	border: &border_width_interactive& solid &interactive_subtle_idle&;
 	padding: 2;
