@@ -120,6 +120,7 @@ TxTone *TxChannel::setupTxTone(TxNode *nodeTone, unsigned int index)
 {
 	TxTone *tone = new TxTone(nodeTone, index, this);
 	m_tones.insert(index, tone);
+	connect(tone, &TxTone::iioEvent, this, &TxChannel::iioEvent);
 	return tone;
 }
 

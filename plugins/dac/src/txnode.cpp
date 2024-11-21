@@ -75,12 +75,14 @@ bool TxNode::enableDds(bool enable)
 			int ret = iio_channel_attr_write_bool(m_channel, "raw", enable);
 			if(ret < 0) {
 				qDebug(CAT_DAC_DATA) << QString("Can't enable DDS channel, error: %1").arg(ret);
+				Q_EMIT iioEvent(ret);
 				return false;
 			}
 			qDebug(CAT_DAC_DATA) << QString("DDS channel %1 enabled: %2, ret code %3")
 							.arg(m_txUuid)
 							.arg(enable)
 							.arg(ret);
+			Q_EMIT iioEvent(ret);
 		} else {
 			qDebug(CAT_DAC_DATA) << QString("%1 not a DDS channel").arg(m_txUuid);
 			return false;

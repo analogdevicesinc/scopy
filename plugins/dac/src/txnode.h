@@ -22,6 +22,7 @@
 #ifndef TXNODE_H
 #define TXNODE_H
 
+#include "iioutil/iioeventemitter.h"
 #include <QObject>
 #include <QMap>
 #include <QString>
@@ -31,7 +32,7 @@
 
 namespace scopy {
 namespace dac {
-class TxNode : public QObject
+class TxNode : public QObject, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -50,6 +51,9 @@ public:
 
 	const QColor &getColor() const;
 	void setColor(const QColor &newColor);
+
+Q_SIGNALS:
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 private:
 	QString m_txUuid;
