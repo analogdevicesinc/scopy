@@ -21,6 +21,7 @@
 
 #include <QAbstractButton>
 #include <QCoreApplication>
+#include <style.h>
 
 #include <licenseoverlay.h>
 #include <pluginbase/preferences.h>
@@ -40,12 +41,15 @@ LicenseOverlay::LicenseOverlay(QWidget *parent)
 	connect(m_popupWidget->getContinueBtn(), &QAbstractButton::clicked, [&]() {
 		Preferences::GetInstance()->set("general_first_run", false);
 		deleteLater();
+		m_popupWidget->deleteLater();
 	});
 	Preferences::connect(m_popupWidget->getExitBtn(), &QAbstractButton::clicked,
 			     [&]() { QCoreApplication::quit(); });
+
+	Style::setBackgroundColor(m_popupWidget, json::theme::background_primary);
 }
 
-LicenseOverlay::~LicenseOverlay() { delete m_popupWidget; }
+LicenseOverlay::~LicenseOverlay() {}
 
 void LicenseOverlay::showOverlay()
 {
