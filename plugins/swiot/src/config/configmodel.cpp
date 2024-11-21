@@ -51,6 +51,7 @@ void ConfigModel::readEnabled()
 		[=, this](scopy::Command *cmd) {
 			IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
 			if(!tcmd) {
+				Q_EMIT iioEvent(IIO_ERROR);
 				return;
 			}
 
@@ -66,6 +67,7 @@ void ConfigModel::readEnabled()
 				qCritical(CAT_SWIOT_CONFIG) << "Error: could not read attribute \"enable\" on channel"
 							    << m_channelId << "error id ->" << tcmd->getReturnCode();
 			}
+			Q_EMIT iioEvent(tcmd->getReturnCode());
 		},
 		Qt::QueuedConnection);
 	m_commandQueue->enqueue(enabledChnCmd);
@@ -80,6 +82,7 @@ void ConfigModel::writeEnabled(const QString &enabled)
 		[=, this](scopy::Command *cmd) {
 			IioDeviceAttributeWrite *tcmd = dynamic_cast<IioDeviceAttributeWrite *>(cmd);
 			if(!tcmd) {
+				Q_EMIT iioEvent(IIO_ERROR);
 				return;
 			}
 			if(tcmd->getReturnCode() < 0) {
@@ -89,6 +92,7 @@ void ConfigModel::writeEnabled(const QString &enabled)
 			} else {
 				Q_EMIT configChannelEnabled();
 			}
+			Q_EMIT iioEvent(tcmd->getReturnCode());
 		},
 		Qt::QueuedConnection);
 	m_commandQueue->enqueue(enabledChnCmd);
@@ -102,6 +106,7 @@ void ConfigModel::readDevice()
 		[=, this](scopy::Command *cmd) {
 			IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
 			if(!tcmd) {
+				Q_EMIT iioEvent(IIO_ERROR);
 				return;
 			}
 
@@ -112,6 +117,7 @@ void ConfigModel::readDevice()
 				qDebug(CAT_SWIOT_CONFIG) << "Can't read value from device on channel" << m_channelId
 							 << "error id ->" << tcmd->getReturnCode();
 			}
+			Q_EMIT iioEvent(tcmd->getReturnCode());
 		},
 		Qt::QueuedConnection);
 	m_commandQueue->enqueue(deviceChnCmd);
@@ -126,6 +132,7 @@ void ConfigModel::writeDevice(const QString &device)
 		[=, this](scopy::Command *cmd) {
 			IioDeviceAttributeWrite *tcmd = dynamic_cast<IioDeviceAttributeWrite *>(cmd);
 			if(!tcmd) {
+				Q_EMIT iioEvent(IIO_ERROR);
 				return;
 			}
 			if(tcmd->getReturnCode() < 0) {
@@ -135,6 +142,7 @@ void ConfigModel::writeDevice(const QString &device)
 			} else {
 				Q_EMIT configChannelDevice();
 			}
+			Q_EMIT iioEvent(tcmd->getReturnCode());
 		},
 		Qt::QueuedConnection);
 	m_commandQueue->enqueue(deviceChnCmd);
@@ -149,6 +157,7 @@ void ConfigModel::readFunction()
 		[=, this](scopy::Command *cmd) {
 			IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
 			if(!tcmd) {
+				Q_EMIT iioEvent(IIO_ERROR);
 				return;
 			}
 
@@ -159,6 +168,7 @@ void ConfigModel::readFunction()
 				qCritical(CAT_SWIOT_CONFIG) << "Error: could not read attribute \"function\" on channel"
 							    << m_channelId << "error id ->" << tcmd->getReturnCode();
 			}
+			Q_EMIT iioEvent(tcmd->getReturnCode());
 		},
 		Qt::QueuedConnection);
 	m_commandQueue->enqueue(functionChnCmd);
@@ -173,6 +183,7 @@ void ConfigModel::writeFunction(const QString &function)
 		[=, this](scopy::Command *cmd) {
 			IioDeviceAttributeWrite *tcmd = dynamic_cast<IioDeviceAttributeWrite *>(cmd);
 			if(!tcmd) {
+				Q_EMIT iioEvent(IIO_ERROR);
 				return;
 			}
 			if(tcmd->getReturnCode() < 0) {
@@ -182,6 +193,7 @@ void ConfigModel::writeFunction(const QString &function)
 			} else {
 				Q_EMIT configChannelFunction();
 			}
+			Q_EMIT iioEvent(tcmd->getReturnCode());
 		},
 		Qt::QueuedConnection);
 	m_commandQueue->enqueue(functionChnCmd);
@@ -196,6 +208,7 @@ void ConfigModel::readDeviceAvailable()
 		[=, this](scopy::Command *cmd) {
 			IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
 			if(!tcmd) {
+				Q_EMIT iioEvent(IIO_ERROR);
 				return;
 			}
 
@@ -208,6 +221,7 @@ void ConfigModel::readDeviceAvailable()
 					<< "Error: could not read attribute \"function available\" on channel"
 					<< m_channelId << "error id ->" << tcmd->getReturnCode();
 			}
+			Q_EMIT iioEvent(tcmd->getReturnCode());
 		},
 		Qt::QueuedConnection);
 	m_commandQueue->enqueue(deviceAvailableChnCmd);
@@ -222,6 +236,7 @@ void ConfigModel::readFunctionAvailable()
 		[=, this](scopy::Command *cmd) {
 			IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
 			if(!tcmd) {
+				Q_EMIT iioEvent(IIO_ERROR);
 				return;
 			}
 
@@ -234,6 +249,7 @@ void ConfigModel::readFunctionAvailable()
 					<< "Error: could not read attribute \"device available\" on channel"
 					<< m_channelId << "error id ->" << tcmd->getReturnCode();
 			}
+			Q_EMIT iioEvent(tcmd->getReturnCode());
 		},
 		Qt::QueuedConnection);
 	m_commandQueue->enqueue(functionAvailableChnCmd);

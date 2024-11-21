@@ -27,9 +27,10 @@
 
 #include <iioutil/command.h>
 #include <iioutil/connection.h>
+#include <iioutil/iioeventemitter.h>
 
 namespace scopy::swiot {
-class SwiotReadTemperatureTask : public QThread
+class SwiotReadTemperatureTask : public QThread, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -39,6 +40,7 @@ public:
 
 Q_SIGNALS:
 	void newTemperature(double value);
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 private Q_SLOTS:
 	void readRawCommandFinished(scopy::Command *cmd);

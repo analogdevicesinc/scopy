@@ -90,6 +90,7 @@ void SwiotController::startTemperatureTask()
 	temperatureTask = new SwiotReadTemperatureTask(uri, this);
 	temperatureTimer = new CyclicalTask(temperatureTask);
 	connect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
+	connect(temperatureTask, &SwiotReadTemperatureTask::iioEvent, this, &SwiotController::iioEvent);
 	temperatureTimer->start(2000);
 	m_temperatureReadEn = true;
 }
@@ -102,6 +103,7 @@ void SwiotController::stopTemperatureTask()
 	temperatureTask->requestInterruption();
 	temperatureTimer->stop();
 	disconnect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
+	disconnect(temperatureTask, &SwiotReadTemperatureTask::iioEvent, this, &SwiotController::iioEvent);
 	temperatureTimer->deleteLater();
 	temperatureTask->deleteLater();
 	m_temperatureReadEn = false;
@@ -141,6 +143,7 @@ void SwiotController::writeModeCommandFinished(scopy::Command *cmd)
 {
 	IioDeviceAttributeWrite *tcmd = dynamic_cast<IioDeviceAttributeWrite *>(cmd);
 	if(!tcmd) {
+		Q_EMIT iioEvent(IIO_ERROR);
 		return;
 	}
 	if(tcmd->getReturnCode() >= 0) {
@@ -174,6 +177,7 @@ void SwiotController::readModeCommandFinished(scopy::Command *cmd)
 {
 	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
 	if(!tcmd) {
+		Q_EMIT iioEvent(IIO_ERROR);
 		return;
 	}
 	if(tcmd->getReturnCode() >= 0) {
@@ -184,6 +188,7 @@ void SwiotController::readModeCommandFinished(scopy::Command *cmd)
 		qDebug(CAT_SWIOT) << R"(Critical error: could not read mode attribute, error code:)"
 				  << tcmd->getReturnCode();
 	}
+	Q_EMIT iioEvent(tcmd->getReturnCode());
 }
 
 void SwiotController::setIsRuntimeCtx(bool runtimeCtx)

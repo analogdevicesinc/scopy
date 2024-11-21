@@ -188,19 +188,23 @@ void FaultsDevice::readRegister()
 				IioRegisterRead *tcmd = dynamic_cast<IioRegisterRead *>(cmd);
 				if(!tcmd) {
 					qCritical(CAT_SWIOT_FAULTS) << m_name << "faults register could not be read.";
+					Q_EMIT iioEvent(IIO_ERROR);
 					return;
 				}
 				uint32_t reg = tcmd->getResult();
 
 				if(tcmd->getReturnCode() < 0) {
 					qCritical(CAT_SWIOT_FAULTS) << m_name << "faults register could not be read.";
+					Q_EMIT iioEvent(IIO_ERROR);
 				} else {
 					qDebug(CAT_SWIOT_FAULTS) << m_name << "faults register read val:" << reg;
 					try {
 						Q_EMIT faultRegisterRead(i, reg);
+						Q_EMIT iioEvent(IIO_SUCCESS);
 					} catch(std::invalid_argument &exception) {
 						qCritical(CAT_SWIOT_FAULTS)
 							<< m_name << "faults register could not be read.";
+						Q_EMIT iioEvent(IIO_ERROR);
 					}
 				}
 			},
@@ -214,16 +218,19 @@ void FaultsDevice::functionConfigCmdFinished(scopy::Command *cmd)
 	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
 	if(!tcmd) {
 		qCritical(CAT_SWIOT_FAULTS) << "Error: cannot read swiot special fault property";
+		Q_EMIT iioEvent(IIO_ERROR);
 		return;
 	}
 
 	if(tcmd->getReturnCode() < 0) {
 		qCritical(CAT_SWIOT_FAULTS) << "Error: cannot read swiot special fault property";
+
 	} else {
 		int cmdIndex = m_functionConfigCmds.indexOf(cmd);
 		char *readFunction = tcmd->getResult();
 		Q_EMIT specialFaultsUpdated(cmdIndex, QString(readFunction));
 		disconnect(cmd, &scopy::Command::finished, this, &FaultsDevice::deviceConfigCmdFinished);
+		Q_EMIT iioEvent(IIO_SUCCESS);
 	}
 }
 
@@ -232,11 +239,13 @@ void FaultsDevice::deviceConfigCmdFinished(scopy::Command *cmd)
 	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
 	if(!tcmd) {
 		qCritical(CAT_SWIOT_FAULTS) << "Error: cannot read swiot special fault config property";
+		Q_EMIT iioEvent(IIO_ERROR);
 		return;
 	}
 
 	if(tcmd->getReturnCode() < 0) {
 		qCritical(CAT_SWIOT_FAULTS) << "Error: cannot read swiot special fault config property";
+		Q_EMIT iioEvent(IIO_ERROR);
 	} else {
 		char *readDevice = tcmd->getResult();
 		int cmdIndex = m_deviceConfigCmds.indexOf(cmd);
@@ -249,6 +258,7 @@ void FaultsDevice::deviceConfigCmdFinished(scopy::Command *cmd)
 				&FaultsDevice::functionConfigCmdFinished, Qt::QueuedConnection);
 			disconnect(cmd, &scopy::Command::finished, this, &FaultsDevice::deviceConfigCmdFinished);
 			m_cmdQueue->enqueue(m_functionConfigCmds.at(cmdIndex));
+			Q_EMIT iioEvent(IIO_SUCCESS);
 		}
 	}
 }

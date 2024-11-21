@@ -128,6 +128,7 @@ void Ad74413r::setupConnections()
 		&BufferAcquisitionHandler::onBufferRefilled, Qt::QueuedConnection);
 	connect(m_readerThread, &ReaderThread::readerThreadFinished, this, &Ad74413r::onReaderThreadFinished,
 		Qt::QueuedConnection);
+	connect(m_readerThread, &ReaderThread::iioEvent, m_tme, &ToolMenuEntry::iioEvent);
 	connect(m_acqHandler, &BufferAcquisitionHandler::bufferDataReady, this, &Ad74413r::onBufferRefilled);
 	connect(m_acqHandler, &BufferAcquisitionHandler::singleCaptureFinished, this,
 		&Ad74413r::onSingleCaptureFinished, Qt::QueuedConnection);
@@ -508,6 +509,7 @@ void Ad74413r::setupChannel(int chnlIdx, QString function)
 		connect(menu, &BufferMenuView::diagnosticFunctionUpdated, this, &Ad74413r::onDiagnosticFunctionUpdated);
 		connect(menu, &BufferMenuView::samplingFreqWritten, this, &Ad74413r::samplingFreqWritten);
 		connect(menu, &BufferMenuView::thresholdWritten, this, &Ad74413r::onThresholdWritten);
+		connect(menu, &BufferMenuView::iioEvent, m_tme, &ToolMenuEntry::iioEvent);
 		connect(this, &Ad74413r::broadcastThreshold, menu, &BufferMenuView::broadcastThreshold);
 		connect(this, &Ad74413r::updateDiagSamplingFreq, menu, &BufferMenuView::updateDiagSamplingFreq);
 	}

@@ -66,11 +66,13 @@ void ReaderThread::createDioChannelCommand(int index)
 		[=, this](scopy::Command *cmd) {
 			IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
 			if(!tcmd) {
+				Q_EMIT iioEvent(IIO_ERROR);
 				return;
 			}
 
 			auto channel = tcmd->getChannel();
 			if(!channel) {
+				Q_EMIT iioEvent(IIO_ERROR);
 				return;
 			}
 			int channelIndex = m_dioChannels.key(channel);
@@ -87,6 +89,7 @@ void ReaderThread::createDioChannelCommand(int index)
 				qCritical(CAT_SWIOT_MAX14906)
 					<< "Failed to acquire data on DioReaderThread " << tcmd->getReturnCode();
 			}
+			Q_EMIT iioEvent(tcmd->getReturnCode());
 		},
 		Qt::QueuedConnection);
 	m_cmdQueue->enqueue(dioChannelReadCommand);
@@ -171,9 +174,11 @@ void ReaderThread::bufferRefillCommandFinished(scopy::Command *cmd)
 	std::unique_lock<std::mutex> lock(m_mutex);
 	IioBufferRefill *tcmd = dynamic_cast<IioBufferRefill *>(cmd);
 	if(!tcmd) {
+		Q_EMIT iioEvent(IIO_ERROR, IIOCallType::STREAM);
 		return;
 	}
 	if(m_bufferInvalid) {
+		Q_EMIT iioEvent(IIO_ERROR, IIOCallType::STREAM);
 		return;
 	}
 	if(tcmd->getReturnCode() > 0) {
@@ -200,6 +205,7 @@ void ReaderThread::bufferRefillCommandFinished(scopy::Command *cmd)
 		qDebug(CAT_SWIOT_AD74413R) << "Refill error " << QString(strerror(-tcmd->getReturnCode()));
 	}
 	start();
+	Q_EMIT iioEvent(tcmd->getReturnCode(), IIOCallType::STREAM);
 }
 
 void ReaderThread::bufferCreateCommandFinished(scopy::Command *cmd)
@@ -207,6 +213,7 @@ void ReaderThread::bufferCreateCommandFinished(scopy::Command *cmd)
 	std::unique_lock<std::mutex> lock(m_mutex);
 	IioDeviceCreateBuffer *tcmd = dynamic_cast<IioDeviceCreateBuffer *>(cmd);
 	if(!tcmd) {
+		Q_EMIT iioEvent(IIO_ERROR);
 		return;
 	}
 	if(tcmd->getReturnCode() < 0) {
@@ -216,6 +223,7 @@ void ReaderThread::bufferCreateCommandFinished(scopy::Command *cmd)
 		m_bufferInvalid = false;
 		start();
 	}
+	Q_EMIT iioEvent(tcmd->getReturnCode());
 }
 
 void ReaderThread::bufferCancelCommandFinished(scopy::Command *cmd)

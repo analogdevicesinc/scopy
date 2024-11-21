@@ -53,6 +53,11 @@ BufferMenu::BufferMenu(QWidget *parent, QString chnlFunction, Connection *conn, 
 			&BufferMenu::freqChangeStart);
 		connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(m_samplingFreq->getDataStrategy()),
 			&CmdQChannelAttrDataStrategy::emitStatus, this, &BufferMenu::freqChangeEnd);
+		connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(m_samplingFreq->getDataStrategy()),
+			&CmdQChannelAttrDataStrategy::emitStatus, this,
+			[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+				Q_EMIT iioEvent(returnCode);
+			});
 	}
 }
 
@@ -124,6 +129,11 @@ CurrentInLoopMenu::CurrentInLoopMenu(QWidget *parent, QString chnlFunction, Conn
 		&CurrentInLoopMenu::updateCnvtLabel);
 	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(dacCode->getDataStrategy()),
 		&CmdQChannelAttrDataStrategy::sendData, this, &CurrentInLoopMenu::updateCnvtLabel);
+	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(dacCode->getDataStrategy()),
+		&CmdQChannelAttrDataStrategy::emitStatus, this,
+		[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+			Q_EMIT iioEvent(returnCode);
+		});
 }
 
 CurrentInLoopMenu::~CurrentInLoopMenu() {}
@@ -161,6 +171,10 @@ DigitalInLoopMenu::DigitalInLoopMenu(QWidget *parent, QString chnlFunction, Conn
 	connect(dynamic_cast<EditableGuiStrategy *>(m_threshold->getUiStrategy()), &EditableGuiStrategy::emitData, this,
 		&BufferMenu::thresholdChangeStart);
 	connect(dataStrategy, &CmdQChannelAttrDataStrategy::emitStatus, this, &DigitalInLoopMenu::onEmitStatus);
+	connect(dataStrategy, &CmdQChannelAttrDataStrategy::emitStatus, this,
+		[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+			Q_EMIT iioEvent(returnCode);
+		});
 	// dac code - output channel
 	IIOWidget *dacCode = IIOWidgetBuilder(this)
 				     .connection(const_cast<Connection *>(m_connection))
@@ -192,6 +206,11 @@ DigitalInLoopMenu::DigitalInLoopMenu(QWidget *parent, QString chnlFunction, Conn
 		&DigitalInLoopMenu::updateCnvtLabel);
 	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(dacCode->getDataStrategy()),
 		&CmdQChannelAttrDataStrategy::sendData, this, &DigitalInLoopMenu::updateCnvtLabel);
+	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(dacCode->getDataStrategy()),
+		&CmdQChannelAttrDataStrategy::emitStatus, this,
+		[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+			Q_EMIT iioEvent(returnCode);
+		});
 }
 
 DigitalInLoopMenu::~DigitalInLoopMenu() {}
@@ -271,6 +290,11 @@ VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection
 		&VoltageOutMenu::updateCnvtLabel);
 	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(dacCode->getDataStrategy()),
 		&CmdQChannelAttrDataStrategy::sendData, this, &VoltageOutMenu::updateCnvtLabel);
+	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(dacCode->getDataStrategy()),
+		&CmdQChannelAttrDataStrategy::emitStatus, this,
+		[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+			Q_EMIT iioEvent(returnCode);
+		});
 
 	// slew - output channel
 	IIOWidget *slewOptions = IIOWidgetBuilder(this)
@@ -280,6 +304,11 @@ VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection
 					 .optionsValues("0 1")
 					 .buildSingle();
 	addMenuWidget(slewOptions);
+	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(slewOptions->getDataStrategy()),
+		&CmdQChannelAttrDataStrategy::emitStatus, this,
+		[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+			Q_EMIT iioEvent(returnCode);
+		});
 
 	// slew step - output channel
 	IIOWidget *slewStep = IIOWidgetBuilder(this)
@@ -290,6 +319,11 @@ VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection
 				      .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
 				      .buildSingle();
 	addMenuWidget(slewStep);
+	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(slewStep->getDataStrategy()),
+		&CmdQChannelAttrDataStrategy::emitStatus, this,
+		[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+			Q_EMIT iioEvent(returnCode);
+		});
 
 	// slew rate - output channel
 	IIOWidget *slewRate = IIOWidgetBuilder(this)
@@ -300,6 +334,11 @@ VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection
 				      .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
 				      .buildSingle();
 	addMenuWidget(slewRate);
+	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(slewRate->getDataStrategy()),
+		&CmdQChannelAttrDataStrategy::emitStatus, this,
+		[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+			Q_EMIT iioEvent(returnCode);
+		});
 }
 
 VoltageOutMenu::~VoltageOutMenu() {}
@@ -354,6 +393,11 @@ CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection
 		&CurrentOutMenu::updateCnvtLabel);
 	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(dacCode->getDataStrategy()),
 		&CmdQChannelAttrDataStrategy::sendData, this, &CurrentOutMenu::updateCnvtLabel);
+	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(dacCode->getDataStrategy()),
+		&CmdQChannelAttrDataStrategy::emitStatus, this,
+		[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+			Q_EMIT iioEvent(returnCode);
+		});
 
 	// slew - output channel
 	IIOWidget *slewOptions = IIOWidgetBuilder(this)
@@ -363,6 +407,11 @@ CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection
 					 .optionsValues("0 1")
 					 .buildSingle();
 	addMenuWidget(slewOptions);
+	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(slewOptions->getDataStrategy()),
+		&CmdQChannelAttrDataStrategy::emitStatus, this,
+		[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+			Q_EMIT iioEvent(returnCode);
+		});
 
 	// slew step - output channel
 	IIOWidget *slewStep = IIOWidgetBuilder(this)
@@ -373,6 +422,11 @@ CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection
 				      .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
 				      .buildSingle();
 	addMenuWidget(slewStep);
+	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(slewStep->getDataStrategy()),
+		&CmdQChannelAttrDataStrategy::emitStatus, this,
+		[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+			Q_EMIT iioEvent(returnCode);
+		});
 
 	// slew rate - output channel
 	IIOWidget *slewRate = IIOWidgetBuilder(this)
@@ -383,6 +437,11 @@ CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection
 				      .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
 				      .buildSingle();
 	addMenuWidget(slewRate);
+	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(slewRate->getDataStrategy()),
+		&CmdQChannelAttrDataStrategy::emitStatus, this,
+		[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+			Q_EMIT iioEvent(returnCode);
+		});
 }
 
 CurrentOutMenu::~CurrentOutMenu() {}
@@ -420,6 +479,11 @@ DiagnosticMenu::DiagnosticMenu(QWidget *parent, QString chnlFunction, Connection
 		[=, this](QString data, QString dataOptions) { Q_EMIT diagnosticFunctionUpdated(); });
 	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(m_samplingFreq->getDataStrategy()),
 		&CmdQChannelAttrDataStrategy::emitStatus, this, &DiagnosticMenu::onSamplingFreqWrite);
+	connect(dynamic_cast<CmdQChannelAttrDataStrategy *>(diagOptions->getDataStrategy()),
+		&CmdQChannelAttrDataStrategy::emitStatus, this,
+		[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+			Q_EMIT iioEvent(returnCode);
+		});
 }
 
 DiagnosticMenu::~DiagnosticMenu() {}
@@ -463,6 +527,10 @@ DigitalInMenu::DigitalInMenu(QWidget *parent, QString chnlFunction, Connection *
 	connect(dynamic_cast<EditableGuiStrategy *>(m_threshold->getUiStrategy()), &EditableGuiStrategy::emitData, this,
 		&BufferMenu::thresholdChangeStart);
 	connect(dataStrategy, &CmdQChannelAttrDataStrategy::emitStatus, this, &DigitalInMenu::onEmitStatus);
+	connect(dataStrategy, &CmdQChannelAttrDataStrategy::emitStatus, this,
+		[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+			Q_EMIT iioEvent(returnCode);
+		});
 }
 
 DigitalInMenu::~DigitalInMenu() {}

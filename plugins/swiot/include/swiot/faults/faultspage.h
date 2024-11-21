@@ -31,7 +31,7 @@
 namespace scopy::swiot {
 class FaultsDevice;
 
-class FaultsPage : public QWidget
+class FaultsPage : public QWidget, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -39,6 +39,8 @@ public:
 	~FaultsPage();
 
 	void update();
+Q_SIGNALS:
+	void iioEvent(int retCode, scopy::IIOCallType type);
 
 private:
 	QString m_uri;

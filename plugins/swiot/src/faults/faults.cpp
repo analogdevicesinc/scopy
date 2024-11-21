@@ -101,6 +101,7 @@ void Faults::connectSignalsAndSlots()
 	});
 
 	QObject::connect(m_tme, &ToolMenuEntry::runToggled, m_runBtn, &QPushButton::setChecked);
+	QObject::connect(m_faultsPage, &FaultsPage::iioEvent, m_tme, &ToolMenuEntry::iioEvent);
 }
 
 void Faults::onBackBtnPressed()

@@ -29,11 +29,12 @@
 
 #include <iio.h>
 #include <iioutil/commandqueue.h>
+#include <iioutil/iioeventemitter.h>
 
 namespace scopy::swiot {
 class FaultsGroup;
 
-class FaultsDevice : public QWidget
+class FaultsDevice : public QWidget, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -55,6 +56,7 @@ Q_SIGNALS:
 	void specialFaultsUpdated(int index, QString channelFunction);
 	void faultNumericUpdated();
 	void faultRegisterRead(int iReg, uint32_t value);
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 private Q_SLOTS:
 	void updateMinimumHeight();
