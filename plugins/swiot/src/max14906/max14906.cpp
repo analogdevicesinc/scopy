@@ -131,6 +131,7 @@ void Max14906::connectSignalsAndSlots()
 	connect(m_max14906SettingsTab, &DioSettingsTab::timeValueChanged, this, &Max14906::timerChanged);
 	connect(m_qTimer, &QTimer::timeout, this, [&]() { m_readerThread->start(); });
 	connect(m_readerThread, &ReaderThread::started, this, [&]() { m_qTimer->start(1000); });
+	connect(m_readerThread, &ReaderThread::iioEvent, m_tme, &ToolMenuEntry::iioEvent);
 
 	connect(m_tme, &ToolMenuEntry::runToggled, m_runBtn, &QPushButton::setChecked);
 }
@@ -269,6 +270,7 @@ void Max14906::initChannels()
 
 		m_channelControls.insert(i, channel_control);
 		m_readerThread->addDioChannel(i, channel);
+		connect(channel_control, &DioDigitalChannelController::iioEvent, m_tme, &ToolMenuEntry::iioEvent);
 		connect(m_readerThread, &ReaderThread::channelDataChanged, channel_control,
 			[this, i](int index, double value) {
 				if(i == index) {

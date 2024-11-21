@@ -2288,7 +2288,9 @@ void Oscilloscope::import()
 	} catch(FileManagerException &ex) {
 		import_error = QString(ex.what());
 		Q_EMIT importFileLoaded(false);
+		Q_EMIT iioEvent(IIO_ERROR);
 	}
+	Q_EMIT iioEvent(IIO_SUCCESS);
 }
 
 unsigned int Oscilloscope::find_curve_number()
@@ -4768,9 +4770,11 @@ void Oscilloscope::resetStreamingFlag(bool enable)
 
 	try {
 		m_m2k_analogin->getTrigger()->setAnalogStreamingFlag(false);
+		Q_EMIT iioEvent(IIO_SUCCESS);
 	} catch(libm2k::m2k_exception &e) {
 		HANDLE_EXCEPTION(e)
 		qDebug(CAT_M2K_OSCILLOSCOPE) << e.what();
+		Q_EMIT iioEvent(IIO_ERROR);
 	}
 	cleanBuffersAllSinks();
 
@@ -4781,9 +4785,11 @@ void Oscilloscope::resetStreamingFlag(bool enable)
 		if(enable && !d_displayOneBuffer) {
 			m_m2k_analogin->getTrigger()->setAnalogStreamingFlag(true);
 		}
+		Q_EMIT iioEvent(IIO_SUCCESS);
 	} catch(libm2k::m2k_exception &e) {
 		HANDLE_EXCEPTION(e)
 		qDebug(CAT_M2K_OSCILLOSCOPE) << e.what();
+		Q_EMIT iioEvent(IIO_ERROR);
 	}
 
 	/* Single capture done */
@@ -4841,6 +4847,7 @@ void Oscilloscope::onPlotNewData()
 	updateBufferPreviewer();
 
 	trigger_input = true; // used to read trigger status from Js
+	Q_EMIT iioEvent(IIO_SUCCESS, IIOCallType::STREAM);
 }
 
 void Oscilloscope::onTriggerModeChanged(int mode)
@@ -4965,10 +4972,11 @@ void Oscilloscope::setGainMode(uint chnIdx, libm2k::analog::M2K_RANGE gain_mode)
 		try {
 			libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(chnIdx);
 			runInHwThreadPool(m_m2k_analogin->setRange(chn, gain_mode));
-
+			Q_EMIT iioEvent(IIO_SUCCESS);
 		} catch(libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e)
 			qDebug(CAT_M2K_OSCILLOSCOPE) << e.what();
+			Q_EMIT iioEvent(IIO_ERROR);
 		}
 	}
 
@@ -4987,10 +4995,12 @@ void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset)
 		try {
 			libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(chnIdx);
 			runInHwThreadPool(m_m2k_analogin->setVerticalOffset(chn, offset););
+			Q_EMIT iioEvent(IIO_SUCCESS);
 
 		} catch(libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e)
 			qDebug(CAT_M2K_OSCILLOSCOPE) << e.what();
+			Q_EMIT iioEvent(IIO_ERROR);
 		}
 	}
 }
@@ -5037,8 +5047,10 @@ void Oscilloscope::writeAllSettingsToHardware()
 			} catch(libm2k::m2k_exception &e) {
 				HANDLE_EXCEPTION(e)
 				qDebug(CAT_M2K_OSCILLOSCOPE) << e.what();
+				Q_EMIT iioEvent(IIO_ERROR);
 			}
 		}
+		Q_EMIT iioEvent(IIO_SUCCESS);
 		setSampleRate(active_sample_rate);
 	}
 	for(size_t i = 0; i < nb_channels; i++) {
@@ -5155,10 +5167,12 @@ double Oscilloscope::getSampleRate()
 			}
 			sr = (double)(sr / osr);
 		}
+		Q_EMIT iioEvent(IIO_SUCCESS, IIOCallType::STREAM);
 		return sr;
 	} catch(libm2k::m2k_exception &e) {
 		HANDLE_EXCEPTION(e);
 		qDebug(CAT_M2K_OSCILLOSCOPE) << e.what();
+		Q_EMIT iioEvent(IIO_ERROR, IIOCallType::STREAM);
 		return 0;
 	}
 }

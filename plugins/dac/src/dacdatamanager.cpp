@@ -28,6 +28,7 @@
 #include <gui/widgets/menuheader.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menucollapsesection.h>
+#include <datastrategy/deviceattrdatastrategy.h>
 
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <iio-widgets/iiowidget.h>
@@ -87,6 +88,7 @@ DacDataManager::DacDataManager(struct iio_device *dev, QWidget *parent)
 
 	// Setup menu widget
 	m_widget = createMenu();
+	connect(m_model, &DacDataModel::iioEvent, this, &DacDataManager::iioEvent);
 }
 
 DacDataManager::~DacDataManager() {}
@@ -115,6 +117,11 @@ QWidget *DacDataManager::createAttrMenu(QWidget *parent)
 
 	for(auto w : attrWidgets) {
 		layout->addWidget(w);
+		connect(dynamic_cast<DeviceAttrDataStrategy *>(w->getDataStrategy()),
+			&DeviceAttrDataStrategy::emitStatus, this,
+			[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+				Q_EMIT iioEvent(returnCode);
+			});
 	}
 
 	attr->contentLayout()->addLayout(layout);
@@ -186,6 +193,7 @@ void DacDataManager::setupDacMode(QString mode_name, unsigned int mode)
 	}
 	connect(dac, &DacAddon::requestChannelMenu, this, &DacDataManager::handleChannelMenuRequest);
 	connect(dac, &DacAddon::running, this, &DacDataManager::running);
+	connect(dac, &DacAddon::iioEvent, this, &DacDataManager::iioEvent);
 	dacAddonStack->add(QString::number(mode), dac);
 	m_mode->combo()->addItem(mode_name, mode);
 }

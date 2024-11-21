@@ -151,9 +151,11 @@ bool AcquisitionManager::readPqmAttributes()
 {
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(!dev) {
+		Q_EMIT iioEvent(IIO_ERROR);
 		qDebug(CAT_PQM_ACQ) << "Device is unavailable!";
 		return false;
 	}
+	int retCode = IIO_SUCCESS;
 	int attrNo = iio_device_get_attrs_count(dev);
 	int chnlsNo = iio_device_get_channels_count(dev);
 	const char *attrName = nullptr;
@@ -161,8 +163,12 @@ bool AcquisitionManager::readPqmAttributes()
 	char dest[MAX_ATTR_SIZE];
 	for(int i = 0; i < attrNo; i++) {
 		attrName = iio_device_get_attr(dev, i);
-		iio_device_attr_read(dev, attrName, dest, MAX_ATTR_SIZE);
+		int ret = iio_device_attr_read(dev, attrName, dest, MAX_ATTR_SIZE);
 		m_pqmAttr[DEVICE_PQM][attrName] = QString(dest);
+		retCode |= ret;
+		if(ret < 0) {
+			qWarning(CAT_PQM_ACQ) << "Cannot read device attribute:" << attrName;
+		}
 	}
 	for(int i = 0; i < chnlsNo; i++) {
 		iio_channel *chnl = iio_device_get_channel(dev, i);
@@ -170,24 +176,36 @@ bool AcquisitionManager::readPqmAttributes()
 		chnlId = iio_channel_get_name(chnl);
 		for(int j = 0; j < attrNo; j++) {
 			attrName = iio_channel_get_attr(chnl, j);
-			iio_channel_attr_read(chnl, attrName, dest, MAX_ATTR_SIZE);
+			int ret = iio_channel_attr_read(chnl, attrName, dest, MAX_ATTR_SIZE);
 			m_pqmAttr[chnlId][attrName] = QString(dest);
+			retCode |= ret;
+			if(ret < 0) {
+				qWarning(CAT_PQM_ACQ) << "Cannot read channel" << chnlId << "attribute:" << attrName;
+			}
 		}
 	}
 	m_pqmLog->acquireAttrData(m_pqmAttr);
 	handlePQEvents();
 	m_pqmLog->log();
+	if(m_tools["settings"]) {
+		Q_EMIT iioEvent(retCode, IIOCallType::SINGLE);
+	} else {
+		Q_EMIT iioEvent(retCode);
+	}
+
 	return true;
 }
 
 bool AcquisitionManager::readBufferedData()
 {
 	if(!m_buffer) {
+		Q_EMIT iioEvent(IIO_ERROR);
 		qWarning(CAT_PQM_ACQ) << "The buffer is NULL!";
 		return false;
 	}
 	ssize_t ret = iio_buffer_refill(m_buffer);
 	if(ret < 0) {
+		Q_EMIT iioEvent(IIO_ERROR);
 		qWarning(CAT_PQM_ACQ) << "An error occurred while refilling! [" << ret << "]";
 		return false;
 	}
@@ -208,6 +226,7 @@ bool AcquisitionManager::readBufferedData()
 		m_bufferData[chnl].push_back(d_ptr);
 		samplesCounter++;
 	}
+	Q_EMIT iioEvent(IIO_SUCCESS);
 	m_pqmLog->log();
 	return true;
 }
@@ -263,8 +282,10 @@ void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 {
 	QMutexLocker locker(&m_mutex);
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
-	if(!dev)
+	if(!dev) {
+		Q_EMIT iioEvent(IIO_ERROR, IIOCallType::SINGLE);
 		return;
+	}
 	const QStringList keys = attr[DEVICE_PQM].keys();
 	for(const QString &key : keys) {
 		if(m_pqmAttr[DEVICE_PQM].contains(key) &&
@@ -274,6 +295,7 @@ void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 			iio_device_attr_write(dev, key.toStdString().c_str(), newVal.toStdString().c_str());
 		}
 	}
+	Q_EMIT iioEvent(IIO_SUCCESS, IIOCallType::SINGLE);
 }
 
 void AcquisitionManager::setProcessData(bool en)

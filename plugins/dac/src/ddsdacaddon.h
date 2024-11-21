@@ -48,7 +48,7 @@ private:
 	QWidget *setupTxMode(TxNode *txNode, unsigned int mode);
 };
 
-class TxMode : public QWidget
+class TxMode : public QWidget, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -65,6 +65,9 @@ public:
 
 	void read();
 	void enable(bool enable);
+
+Q_SIGNALS:
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 private:
 	TxNode *m_node;

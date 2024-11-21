@@ -57,10 +57,12 @@ ADCInstrumentController::ADCInstrumentController(ToolMenuEntry *tme, QString uri
 			update();
 			if(m_refreshTimerRunning)
 				m_plotTimer->start();
+			Q_EMIT iioEvent(IIO_SUCCESS, IIOCallType::STREAM);
 		},
 		Qt::QueuedConnection);
 
 	m_ui = new ADCInstrument(tme, nullptr);
+	connect(this, &ADCInstrumentController::iioEvent, m_tme, &ToolMenuEntry::iioEvent);
 }
 
 ADCInstrumentController::~ADCInstrumentController() {}
@@ -110,6 +112,7 @@ void ADCInstrumentController::start()
 	ResourceManager::open("adc" + m_uri, this);
 	bool ret = m_dataProvider->start();
 	if(!ret) {
+		Q_EMIT iioEvent(IIO_ERROR);
 		Q_EMIT requestDisconnect();
 	}
 }

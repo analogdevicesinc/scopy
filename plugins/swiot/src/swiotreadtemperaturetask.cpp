@@ -100,6 +100,7 @@ void SwiotReadTemperatureTask::readRawCommandFinished(Command *cmd)
 	}
 	IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
 	if(!tcmd) {
+		Q_EMIT iioEvent(IIO_ERROR);
 		return;
 	}
 	if(tcmd->getReturnCode() >= 0) {
@@ -116,6 +117,7 @@ void SwiotReadTemperatureTask::readRawCommandFinished(Command *cmd)
 		qDebug(CAT_SWIOT) << "Error, could not read \"raw\" attribute from " << DEVICE_NAME
 				  << ". Temperature not available.";
 	}
+	Q_EMIT iioEvent(tcmd->getReturnCode());
 }
 
 void SwiotReadTemperatureTask::readScaleCommandFinished(Command *cmd)

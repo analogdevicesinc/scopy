@@ -20,6 +20,7 @@
  */
 
 #include "grfftchannelcomponent.h"
+#include "datastrategy/channelattrdatastrategy.h"
 #include <pluginbase/preferences.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menucollapsesection.h>
@@ -286,6 +287,11 @@ QWidget *GRFFTChannelComponent::createChAttrMenu(iio_channel *ch, QString title,
 
 	for(auto w : attrWidgets) {
 		layout->addWidget(w);
+		connect(dynamic_cast<ChannelAttrDataStrategy *>(w->getDataStrategy()),
+			&ChannelAttrDataStrategy::emitStatus, this,
+			[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+				Q_EMIT iioEvent(returnCode);
+			});
 	}
 
 	section->contentLayout()->addLayout(layout);

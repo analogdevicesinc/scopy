@@ -25,13 +25,14 @@
 #include <iio-widgets/iiowidget.h>
 #include <gui/spinbox_a.hpp>
 #include <iioutil/connection.h>
+#include <iioutil/iioeventemitter.h>
 
 #define OUTPUT_CHNL "output"
 #define INPUT_CHNL "input"
 
 namespace scopy::swiot {
 
-class BufferMenu : public QWidget
+class BufferMenu : public QWidget, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -60,6 +61,7 @@ Q_SIGNALS:
 	void freqChangeEnd();
 	void thresholdChangeStart();
 	void thresholdChangeEnd();
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 protected:
 	IIOWidget *m_samplingFreq;

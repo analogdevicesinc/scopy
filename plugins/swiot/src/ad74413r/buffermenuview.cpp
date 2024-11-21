@@ -86,6 +86,7 @@ void BufferMenuView::createConnections()
 	connect(this, &BufferMenuView::updateDiagSamplingFreq, m_swiotAdvMenu, &BufferMenu::onDiagSamplingChange);
 	connect(m_swiotAdvMenu, &BufferMenu::freqChangeStart, this, [&]() { Q_EMIT samplingFreqWritten(false); });
 	connect(m_swiotAdvMenu, &BufferMenu::freqChangeEnd, this, [&]() { Q_EMIT samplingFreqWritten(true); });
+	connect(m_swiotAdvMenu, &BufferMenu::iioEvent, this, &BufferMenuView::iioEvent);
 
 	connect(this, &BufferMenuView::runBtnsPressed, m_swiotAdvMenu, &BufferMenu::onRunBtnsPressed);
 }

@@ -22,6 +22,7 @@
 #ifndef DACDATAMANAGER_H
 #define DACDATAMANAGER_H
 
+#include "iioutil/iioeventemitter.h"
 #include <QWidget>
 #include <QList>
 #include <QPushButton>
@@ -39,7 +40,7 @@ namespace scopy {
 namespace dac {
 class DacDataModel;
 class DacAddon;
-class DacDataManager : public QWidget
+class DacDataManager : public QWidget, IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -75,6 +76,7 @@ private Q_SLOTS:
 Q_SIGNALS:
 	void running(bool toggled);
 	void requestMenu();
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 private:
 	QVBoxLayout *m_layout;

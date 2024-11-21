@@ -131,6 +131,7 @@ bool DebuggerPlugin::onConnect()
 	if(m_useDebuggerV2) {
 		m_iioDebugger = new IIOExplorerInstrument(m_conn->context(), nullptr, nullptr);
 		dbgTme->setTool(m_iioDebugger);
+		connect(m_iioDebugger, &IIOExplorerInstrument::iioEvent, dbgTme, &ToolMenuEntry::iioEvent);
 	} else {
 		dbgTme->setTool(new DebuggerInstrument(m_conn->context(), nullptr, nullptr));
 	}
