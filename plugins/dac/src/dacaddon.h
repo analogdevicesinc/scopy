@@ -22,13 +22,14 @@
 #ifndef DACADDON_H_
 #define DACADDON_H_
 
+#include "iioutil/iioeventemitter.h"
 #include <QWidget>
 #include <QMap>
 #include <menucontrolbutton.h>
 
 namespace scopy {
 namespace dac {
-class DacAddon : public QWidget
+class DacAddon : public QWidget, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -42,6 +43,7 @@ public:
 Q_SIGNALS:
 	void running(bool enabled);
 	void requestChannelMenu(QString uuid);
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 protected:
 	QMap<QString, MenuControlButton *> m_channelBtns;

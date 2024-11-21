@@ -62,6 +62,11 @@ TxTone::TxTone(TxNode *node, unsigned int idx, QWidget *parent)
 			      .buildSingle();
 	m_frequency->setUItoDataConversion(std::bind(&TxTone::frequencyUItoDS, this, std::placeholders::_1));
 	m_frequency->setDataToUIConversion(std::bind(&TxTone::frequencyDStoUI, this, std::placeholders::_1));
+	connect(dynamic_cast<ChannelAttrDataStrategy *>(m_frequency->getDataStrategy()),
+		&ChannelAttrDataStrategy::emitStatus, this,
+		[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+			Q_EMIT iioEvent(returnCode);
+		});
 
 	m_scale = IIOWidgetBuilder(this)
 			  .channel(m_node->getChannel())
@@ -71,6 +76,11 @@ TxTone::TxTone(TxNode *node, unsigned int idx, QWidget *parent)
 			  .buildSingle();
 	m_scale->setUItoDataConversion(std::bind(&TxTone::scaleUItoDS, std::placeholders::_1));
 	m_scale->setDataToUIConversion(std::bind(&TxTone::scaleDStoUI, std::placeholders::_1));
+	connect(dynamic_cast<ChannelAttrDataStrategy *>(m_scale->getDataStrategy()),
+		&ChannelAttrDataStrategy::emitStatus, this,
+		[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+			Q_EMIT iioEvent(returnCode);
+		});
 
 	m_phase = IIOWidgetBuilder(this)
 			  .channel(m_node->getChannel())
@@ -78,9 +88,13 @@ TxTone::TxTone(TxNode *node, unsigned int idx, QWidget *parent)
 			  .uiStrategy(IIOWidgetBuilder::UIS::EditableUi)
 			  .parent(this)
 			  .buildSingle();
-
 	m_phase->setUItoDataConversion(std::bind(&TxTone::phaseUItoDS, this, std::placeholders::_1));
 	m_phase->setDataToUIConversion(std::bind(&TxTone::phaseDStoUI, this, std::placeholders::_1));
+	connect(dynamic_cast<ChannelAttrDataStrategy *>(m_phase->getDataStrategy()),
+		&ChannelAttrDataStrategy::emitStatus, this,
+		[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+			Q_EMIT iioEvent(returnCode);
+		});
 
 	connect(dynamic_cast<ChannelAttrDataStrategy *>(m_frequency->getDataStrategy()),
 		&ChannelAttrDataStrategy::emitStatus, this, &TxTone::forwardFreqChange);
