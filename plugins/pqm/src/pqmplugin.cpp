@@ -173,6 +173,7 @@ bool PQMPlugin::onConnect()
 	for(auto &tool : m_toolList) {
 		connect(tool->tool(), SIGNAL(enableTool(bool, QString)), m_acqManager,
 			SLOT(toolEnabled(bool, QString)));
+		connect(m_acqManager, &AcquisitionManager::iioEvent, tool, &ToolMenuEntry::iioEvent);
 	}
 	return true;
 }
