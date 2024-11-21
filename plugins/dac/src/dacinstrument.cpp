@@ -241,6 +241,8 @@ void DacInstrument::setupDacDataManagers()
 				for(MenuControlButton *btn : qAsConst(menuBtns)) {
 					devicesGroup->addButton(btn);
 				}
+
+				connect(dm, &DacDataManager::iioEvent, this, &DacInstrument::iioEvent);
 				break;
 			}
 		}

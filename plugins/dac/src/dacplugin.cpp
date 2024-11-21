@@ -116,6 +116,7 @@ bool DACPlugin::onConnect()
 	m_toolList[0]->setTool(dac);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
+	connect(dynamic_cast<DacInstrument *>(dac), &DacInstrument::iioEvent, m_toolList[0], &ToolMenuEntry::iioEvent);
 	connect(m_toolList.last(), &ToolMenuEntry::runToggled, dynamic_cast<DacInstrument *>(dac),
 		&DacInstrument::runToggled);
 	connect(dynamic_cast<DacInstrument *>(dac), &DacInstrument::running, m_toolList[0], &ToolMenuEntry::setRunning);

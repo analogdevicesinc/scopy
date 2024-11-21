@@ -28,7 +28,7 @@
 namespace scopy {
 namespace dac {
 class TxNode;
-class TxTone : public QWidget
+class TxTone : public QWidget, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -47,6 +47,7 @@ Q_SIGNALS:
 	void frequencyUpdated(unsigned int toneIdx, QString frequency);
 	void scaleUpdated(unsigned int toneIdx, QString oldScale, QString scale);
 	void phaseUpdated(unsigned int toneIdx, QString phase);
+	void iioEvent(int retCode) override;
 
 public Q_SLOTS:
 	void updateFrequency(QString frequency);

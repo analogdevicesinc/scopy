@@ -146,6 +146,7 @@ QWidget *DdsDacAddon::setupDdsTx(TxNode *txNode)
 QWidget *DdsDacAddon::setupTxMode(TxNode *txNode, unsigned int mode)
 {
 	TxMode *txModeWidget = new TxMode(txNode, mode, this);
+	connect(txModeWidget, &TxMode::iioEvent, this, &DdsDacAddon::iioEvent);
 	return txModeWidget;
 }
 
@@ -184,6 +185,7 @@ TxMode::TxMode(TxNode *node, unsigned int mode, QWidget *parent)
 		} else {
 			txChn->setVisible(false);
 		}
+		connect(txChn, &TxChannel::iioEvent, this, &TxMode::iioEvent);
 	}
 
 	auto emitterChannel = m_txChannels.at(0);
