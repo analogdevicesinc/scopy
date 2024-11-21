@@ -173,6 +173,7 @@
         <file>icons/scopy-light/icons/sba_cmb_box_arrow_up.svg</file>
         <file>scopy.png</file>
         <file>icons/choose_file.svg</file>
+        <file>icons/circle_led.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>
