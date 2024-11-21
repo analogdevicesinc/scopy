@@ -39,7 +39,7 @@
 #include <QTabWidget>
 
 namespace scopy::debugger {
-class SCOPY_DEBUGGER_EXPORT IIOExplorerInstrument : public QWidget
+class SCOPY_DEBUGGER_EXPORT IIOExplorerInstrument : public QWidget, public IIOEventEmitter
 {
 	Q_OBJECT
 	friend class IIOExplorerInstrument_API;
@@ -50,6 +50,9 @@ public:
 
 	void saveSettings(QSettings &);
 	void loadSettings(QSettings &);
+
+Q_SIGNALS:
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 private Q_SLOTS:
 	void applySelection(const QItemSelection &selected, const QItemSelection &deselected);

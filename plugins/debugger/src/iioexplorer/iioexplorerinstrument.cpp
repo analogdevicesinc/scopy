@@ -147,6 +147,8 @@ void IIOExplorerInstrument::setupUi()
 	setLayout(new QVBoxLayout(this));
 	layout()->setContentsMargins(0, 0, 0, 0);
 	layout()->addWidget(m_tabWidget);
+
+	connect(m_iioModel, &IIOModel::iioEvent, this, &IIOExplorerInstrument::iioEvent);
 }
 
 void IIOExplorerInstrument::connectSignalsAndSlots()
