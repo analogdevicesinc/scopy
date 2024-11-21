@@ -36,7 +36,12 @@ PopupWidget::PopupWidget(QWidget *parent)
 	m_continueButton->setFocus();
 }
 
-PopupWidget::~PopupWidget() { delete m_tintedOverlay; }
+PopupWidget::~PopupWidget()
+{
+	if(m_tintedOverlay != nullptr) {
+		m_tintedOverlay->deleteLater();
+	}
+}
 
 void PopupWidget::initUI()
 {
@@ -122,7 +127,7 @@ void PopupWidget::enableTintedOverlay(bool enable)
 		m_tintedOverlay->show();
 		raise();
 		show();
-	} else {
+	} else if(m_tintedOverlay != nullptr) {
 		delete m_tintedOverlay;
 		m_tintedOverlay = nullptr;
 	}
