@@ -222,6 +222,10 @@ bool RegmapPlugin::onConnect()
 			} else {
 				generateDevice(templatePath, dev, devName, iioReadStrategy, iioWriteStrategy);
 			}
+			connect(iioReadStrategy, &IIORegisterReadStrategy::iioEvent, m_toolList.last(),
+				&ToolMenuEntry::iioEvent);
+			connect(iioWriteStrategy, &IIORegisterWriteStrategy::iioEvent, m_toolList.last(),
+				&ToolMenuEntry::iioEvent);
 		}
 
 		m_toolList[0]->setEnabled(true);
