@@ -345,7 +345,7 @@ void SWIOTPlugin::setupToolList()
 		max14906Tme->setTool(new swiot::Max14906(m_param, max14906Tme));
 		faultsTme->setTool(new swiot::Faults(m_param, faultsTme));
 	} else {
-		configTme->setTool(new swiot::SwiotConfig(m_param));
+		configTme->setTool(new swiot::SwiotConfig(m_param, configTme));
 	}
 
 	connect(dynamic_cast<SwiotConfig *>(configTme->tool()), &SwiotConfig::writeModeAttribute, this,

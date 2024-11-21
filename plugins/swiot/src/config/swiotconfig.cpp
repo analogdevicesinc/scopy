@@ -34,9 +34,11 @@
 
 using namespace scopy::swiot;
 
-SwiotConfig::SwiotConfig(QString uri, QWidget *parent)
+SwiotConfig::SwiotConfig(QString uri, ToolMenuEntry *tme, QWidget *parent)
 	: QWidget(parent)
 	, m_uri(uri)
+	, m_tme(tme)
+
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *layout = new QHBoxLayout(this);
@@ -70,6 +72,7 @@ void SwiotConfig::provideDeviceConnection()
 	if(m_swiotDevice == nullptr) {
 		qCritical(CAT_SWIOT_CONFIG) << "Critical error: the \"swiot\" device was not found.";
 	}
+	connect(m_commandQueue, &CommandQueue::iioEvent, m_tme, &ToolMenuEntry::iioEvent);
 }
 
 void SwiotConfig::setupUiElements()
