@@ -43,6 +43,7 @@ void IIORegisterWriteStrategy::write(uint32_t address, uint32_t val)
 			<< "device write successfull for register " << address << " with value " << val;
 		Q_EMIT writeSuccess(address);
 	}
+	Q_EMIT iioEvent(write);
 }
 
 uint32_t IIORegisterWriteStrategy::getAddressSpace() const { return addressSpace; }

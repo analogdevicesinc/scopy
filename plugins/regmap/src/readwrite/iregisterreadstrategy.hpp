@@ -24,8 +24,10 @@
 
 #include <QObject>
 
+#include <iioutil/iioeventemitter.h>
+
 namespace scopy::regmap {
-class IRegisterReadStrategy : public QObject
+class IRegisterReadStrategy : public QObject, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -34,6 +36,7 @@ public:
 Q_SIGNALS:
 	void readDone(uint32_t address, uint32_t value);
 	void readError(const char *err);
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 };
 } // namespace scopy::regmap
 #endif // IREGISTERREADSTRATEGY_HPP
