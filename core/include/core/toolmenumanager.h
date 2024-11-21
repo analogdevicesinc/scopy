@@ -34,6 +34,15 @@
 #include "scopy-core_export.h"
 
 namespace scopy {
+
+typedef struct
+{
+	QString name;
+	QString param;
+	QPixmap icon;
+	QList<ToolMenuEntry *> tools;
+} DeviceInfo;
+
 class SCOPY_CORE_EXPORT ToolMenuManager : public QObject
 {
 	Q_OBJECT
@@ -41,7 +50,7 @@ public:
 	ToolMenuManager(ToolStack *ts, DetachedToolWindowManager *dtm, ToolMenu *toolMenu, QObject *parent = nullptr);
 	~ToolMenuManager();
 
-	void addMenuItem(QString deviceId, QString devName, QList<ToolMenuEntry *> tools, int itemIndex = -1);
+	void addMenuItem(QString deviceId, DeviceInfo dInfo, int itemIndex = -1);
 	void removeMenuItem(QString deviceId);
 	void changeToolListContents(QString deviceId, QList<ToolMenuEntry *> tools);
 
@@ -69,8 +78,9 @@ private:
 	void attachSuccesful(ToolMenuItem *toolMenuItem);
 	void showTool(ToolMenuItem *toolMenuItem);
 	void setTmeAttached(ToolMenuEntry *tme);
-	MenuSectionCollapseWidget *createMenuSectionItem(QString deviceName, QString uri = "");
+	MenuSectionCollapseWidget *createMenuSectionItem(QString devName, QString uri, QPixmap icon);
 	ToolMenuItem *createToolMenuItem(ToolMenuEntry *tme, QWidget *parent = nullptr);
+	MenuCollapseHeader *getCollapseSectionHeader(MenuSectionCollapseWidget *section);
 
 	QString m_prevItem;
 	QStringList m_connectedDev;
@@ -78,6 +88,7 @@ private:
 	DetachedToolWindowManager *m_dtm;
 	ToolMenu *m_toolMenu;
 	QMap<QString, MenuSectionCollapseWidget *> m_itemMap;
+	QMap<QString, DeviceInfo> m_dInfoMap;
 };
 } // namespace scopy
 
