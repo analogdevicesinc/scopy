@@ -68,11 +68,23 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 	tool->centralContainer()->layout()->setSpacing(0);
 	lay->addWidget(tool);
 
-	InfoBtn *infoBtn = new InfoBtn(this);
+	InfoBtn *infoBtn = new InfoBtn(this, true);
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
-	connect(infoBtn, &QAbstractButton::clicked, this, [=]() {
-		QDesktopServices::openUrl(
-			QUrl("https://analogdevicesinc.github.io/scopy/plugins/registermap/registermap.html"));
+
+	connect(infoBtn, &InfoBtn::clicked, this, [=]() {
+		infoBtn->generateInfoPopup(this);
+		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, [=]() {
+			if(searchBarWidget->isVisible()) {
+				startTutorial();
+			} else {
+				startSimpleTutorial();
+			}
+		});
+
+		connect(infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, [=]() {
+			QDesktopServices::openUrl(
+				QUrl("https://analogdevicesinc.github.io/scopy/plugins/registermap/registermap.html"));
+		});
 	});
 
 	searchBarWidget = new SearchBarWidget();
@@ -251,21 +263,5 @@ void RegisterMapTool::toggleSearchBarEnabled(bool enabled)
 		tool->getContainerSpacer(tool->topContainer())
 			->changeSize(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed);
 		searchBarWidget->hide();
-	}
-}
-
-void RegisterMapTool::showEvent(QShowEvent *event)
-{
-	QWidget::showEvent(event);
-
-	// Handle tutorial
-	if(Preferences::get("regmapplugin_start_tutorial").toBool()) {
-		if(searchBarWidget->isVisible()) {
-
-			startTutorial();
-		} else {
-			startSimpleTutorial();
-		}
-		Preferences::set("regmapplugin_start_tutorial", false);
 	}
 }
