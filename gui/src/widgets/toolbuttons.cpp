@@ -102,35 +102,25 @@ InfoBtn::InfoBtn(QWidget *parent, bool hasTutorial)
 
 	setCheckable(false);
 	Style::setStyle(this, style::properties::button::squareIconButton);
-
-	if(hasTutorial) {
-		m_popupWidget = new PopupWidget(parent);
-		m_popupWidget->move(parent->rect().center());
-		m_popupWidget->setTitle("Plugin Information");
-		m_popupWidget->setDescription(
-			"To learn more about this plugin, check out the tutorial or read the online documentation.");
-		m_popupWidget->getExitBtn()->setText("Tutorial");
-		m_popupWidget->getContinueBtn()->setText("Documentation");
-
-		connect(m_popupWidget->getExitBtn(), &QPushButton::clicked, this, [=]() {
-			m_popupWidget->hide();
-			m_popupWidget->enableTintedOverlay(false);
-		});
-
-		connect(m_popupWidget->getContinueBtn(), &QPushButton::clicked, this, [=]() {
-			m_popupWidget->hide();
-			m_popupWidget->enableTintedOverlay(false);
-		});
-
-		connect(this, &QPushButton::clicked, this, &InfoBtn::showInfoPopup);
-		m_popupWidget->hide();
-	}
 }
 
 bool InfoBtn::hasTutorial() { return m_hasTutorial; }
 
-void InfoBtn::showInfoPopup()
+void InfoBtn::generateInfoPopup(QWidget *parent)
 {
+	m_popupWidget = new PopupWidget(parent);
+	m_popupWidget->move(parent->rect().center() - m_popupWidget->rect().center());
+	m_popupWidget->setTitle("Plugin Information");
+	m_popupWidget->setDescription(
+		"To learn more about this plugin, check out the tutorial or read the online documentation.");
+	m_popupWidget->getExitBtn()->setText("Tutorial");
+	m_popupWidget->getContinueBtn()->setText("Documentation");
+	m_popupWidget->enableCloseButton(true);
+
+	connect(m_popupWidget->getExitBtn(), &QPushButton::clicked, this, [=]() { m_popupWidget->deleteLater(); });
+
+	connect(m_popupWidget->getContinueBtn(), &QPushButton::clicked, this, [=]() { m_popupWidget->deleteLater(); });
+
 	m_popupWidget->enableTintedOverlay(true);
 	m_popupWidget->show();
 	m_popupWidget->raise();
