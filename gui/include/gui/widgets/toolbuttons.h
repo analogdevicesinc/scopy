@@ -69,11 +69,11 @@ public:
 	bool hasTutorial();
 	QPushButton *getTutorialButton();
 	QPushButton *getDocumentationButton();
+	void generateInfoPopup(QWidget *parent);
 
 private:
 	PopupWidget *m_popupWidget;
 	bool m_hasTutorial;
-	void showInfoPopup();
 };
 
 class SCOPY_GUI_EXPORT RunBtn : public QPushButton

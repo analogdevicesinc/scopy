@@ -78,6 +78,36 @@ void PopupWidget::initUI()
 	Style::setStyle(m_continueButton, style::properties::button::basicButton, true, true);
 	Style::setStyle(m_exitButton, style::properties::button::basicButton, true, true);
 	Style::setStyle(this, style::properties::widget::overlayMenu);
+
+	m_closeButton = nullptr;
+	m_closeHover = nullptr;
+}
+
+void PopupWidget::enableCloseButton(bool en)
+{
+	if(en) {
+		m_closeButton = new QPushButton(this);
+		m_closeButton->setMaximumSize(20, 20);
+		m_closeButton->setIcon(Style::getPixmap(":/gui/icons/close_hovered.svg",
+							Style::getColor(json::theme::interactive_subtle_idle)));
+		Style::setStyle(m_closeButton, style::properties::widget::notInteractive);
+
+		m_closeHover = new HoverWidget(m_closeButton, this, this);
+		m_closeHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+		m_closeHover->setContentPos(HoverPosition::HP_CENTER);
+		m_closeHover->setAnchorOffset(QPoint(-20, 20));
+		m_closeHover->setVisible(true);
+		m_closeHover->raise();
+
+		connect(m_closeButton, &QPushButton::clicked, this, [=]() { deleteLater(); });
+	} else {
+		if(m_closeButton != nullptr) {
+			delete m_closeButton;
+		}
+		if(m_closeHover != nullptr) {
+			delete m_closeHover;
+		}
+	}
 }
 
 void PopupWidget::setFocusOnContinueButton()
