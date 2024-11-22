@@ -3,7 +3,7 @@ QLineEdit[&&property&&=true] {
 	color: &content_default&;
 	font-size: &font_size&;
 	border: 0px solid transparent;
-	border-bottom: 1px solid &content_default&;
+	border-bottom: 1px solid &interactive_subtle_idle&;
 	border-radius: 0;
 	padding: 0 &padding_interactive& 0 &padding_interactive&;
 }
