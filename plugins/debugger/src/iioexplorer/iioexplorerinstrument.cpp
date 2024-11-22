@@ -98,8 +98,11 @@ void IIOExplorerInstrument::setupUi()
 	right_container->setLayout(new QVBoxLayout(right_container));
 	right_container->layout()->setContentsMargins(0, 0, 0, 0);
 	details_container->setLayout(new QVBoxLayout(details_container));
+	details_container->layout()->setContentsMargins(2, 9, 9, 2);
 	watch_list->setLayout(new QVBoxLayout(watch_list));
+	watch_list->layout()->setContentsMargins(2, 2, 9, 9);
 	tree_view_container->setLayout(new QVBoxLayout(tree_view_container));
+	tree_view_container->layout()->setContentsMargins(9, 9, 2, 9);
 
 	m_proxyModel = new IIOSortFilterProxyModel(this);
 	m_treeView = new QTreeView(tree_view_container);
