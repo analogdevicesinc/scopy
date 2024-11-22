@@ -447,9 +447,11 @@ SpectrumAnalyzer::SpectrumAnalyzer(libm2k::context::M2k *m2k, QString uri, Filte
 			if(canConvRawToVolts) {
 				fft_plot->setScaleFactor(crt_channel, m_m2k_analogin->getScalingFactor(chn));
 			}
+			Q_EMIT iioEvent(IIO_SUCCESS);
 		} catch(libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e);
 			qDebug(CAT_M2K_SPECTRUM_ANALYZER) << e.what();
+			Q_EMIT iioEvent(IIO_ERROR);
 		}
 
 		if(started) {
@@ -525,6 +527,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(libm2k::context::M2k *m2k, QString uri, Filte
 				iio->stop(fft_ids[i]);
 			}
 		}
+		Q_EMIT iioEvent(IIO_SUCCESS, IIOCallType::STREAM);
 	});
 
 	connect(waterfall_plot, &WaterfallDisplayPlot::newWaterfallData, this, [=]() {
@@ -539,6 +542,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(libm2k::context::M2k *m2k, QString uri, Filte
 				iio->stop(waterfall_ids[i]);
 			}
 		}
+		Q_EMIT iioEvent(IIO_SUCCESS, IIOCallType::STREAM);
 	});
 
 	connect(fft_plot, SIGNAL(currentAverageIndex(unsigned int, unsigned int)),
@@ -2572,9 +2576,11 @@ void SpectrumAnalyzer::writeAllSettingsToHardware()
 				}
 			}
 		}
+		Q_EMIT iioEvent(IIO_SUCCESS);
 	} catch(libm2k::m2k_exception &e) {
 		HANDLE_EXCEPTION(e);
 		qDebug(CAT_M2K_SPECTRUM_ANALYZER) << "Can't write settings to hardware: " << e.what();
+		Q_EMIT iioEvent(IIO_ERROR);
 	}
 }
 
@@ -2688,9 +2694,11 @@ void SpectrumAnalyzer::setSampleRate(double sr)
 		if(m_m2k_analogin) {
 			try {
 				m_m2k_analogin->setOversamplingRatio(sample_rate_divider);
+				Q_EMIT iioEvent(IIO_SUCCESS);
 			} catch(libm2k::m2k_exception &e) {
 				HANDLE_EXCEPTION(e);
 				qDebug(CAT_M2K_SPECTRUM_ANALYZER) << "Can't write oversampling ratio: " << e.what();
+				Q_EMIT iioEvent(IIO_ERROR);
 			}
 		}
 

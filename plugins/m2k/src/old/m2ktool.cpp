@@ -41,6 +41,7 @@ M2kTool::M2kTool(ToolMenuEntry *tme, ApiObject *api, const QString &name, QWidge
 	tme->setEnabled(true);
 	p = Preferences::GetInstance();
 	connect(p, &Preferences::preferenceChanged, this, &M2kTool::readPreferences);
+	connect(this, &M2kTool::iioEvent, tme, &ToolMenuEntry::iioEvent);
 	M2kTool::readPreferences();
 	Style::GetInstance()->setM2KStylesheet(this);
 }
