@@ -171,7 +171,7 @@ QTabBar::tab QLabel {
 }
 
 QTabBar::tab {
-    min-width: &unit_5&;
+    min-width: &unit_6&;
     background: &background_primary&;
     font-size: &font_size_1&;
     font-weight: bold;
