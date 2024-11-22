@@ -415,12 +415,15 @@ void DMM::checkAndUpdateGainMode(const std::vector<double> &volts)
 				if(currentChannelGain[i] ==
 				   libm2k::analog::PLUS_MINUS_2_5V) { // only show out of range for +/- 2.5
 					errorLabels[i]->setText("Out of range");
+					Q_EMIT iioEvent(IIO_ERROR);
 				} else {
 					errorLabels[i]->setText("");
+					Q_EMIT iioEvent(IIO_SUCCESS);
 				}
 			}
 		} else {
 			errorLabels[i]->setText("");
+			Q_EMIT iioEvent(IIO_SUCCESS);
 		}
 	}
 
@@ -851,8 +854,10 @@ void DMM::writeAllSettingsToHardware()
 					trigger->setAnalogMode(i, libm2k::ALWAYS);
 				}
 			}
+			Q_EMIT iioEvent(IIO_SUCCESS);
 		} catch(libm2k::m2k_exception &e) {
 			qDebug(CAT_VOLTMETER) << "Can't write to hardware: " << e.what();
+			Q_EMIT iioEvent(IIO_ERROR);
 		}
 	}
 }

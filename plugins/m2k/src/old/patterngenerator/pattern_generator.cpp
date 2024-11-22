@@ -745,10 +745,11 @@ void PatternGenerator::startStop(bool start)
 				0.2 + static_cast<double>(m_bufferSize) / static_cast<double>(m_sampleRate);
 			// * 1000.0 (timeout is in seconds, start expects milliseconds)
 			m_singleTimer->start(timeout * 1000.0);
-
+			Q_EMIT iioEvent(IIO_SUCCESS);
 		} catch(libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
+			Q_EMIT iioEvent(IIO_ERROR);
 		}
 	} else {
 		try {
@@ -764,9 +765,11 @@ void PatternGenerator::startStop(bool start)
 					m_m2kDigital->enableChannel(i, false);
 				}
 			}
+			Q_EMIT iioEvent(IIO_SUCCESS);
 		} catch(libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
+			Q_EMIT iioEvent(IIO_ERROR);
 		}
 	}
 
