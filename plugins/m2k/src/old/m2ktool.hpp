@@ -34,6 +34,8 @@
 #include <pluginbase/preferences.h>
 #include <pluginbase/resourcemanager.h>
 
+#include <iioutil/iioeventemitter.h>
+
 class QJSEngine;
 class QPushButton;
 
@@ -47,7 +49,7 @@ class ApiObject;
 class ToolLauncher;
 
 namespace m2k {
-class M2kTool : public QWidget, public ResourceUser
+class M2kTool : public QWidget, public ResourceUser, public IIOEventEmitter
 {
 	Q_OBJECT
 
@@ -66,6 +68,7 @@ public:
 
 Q_SIGNALS:
 	void detachedState(bool detached);
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 public Q_SLOTS:
 	virtual void run();

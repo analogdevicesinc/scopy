@@ -1109,8 +1109,9 @@ bool SignalGenerator::loadParametersFromFile(QSharedPointer<signal_generator_dat
 			ptr->file_nr_of_samples.push_back(0);
 			ptr->file_type = FORMAT_NO_FILE;
 		}
-		if(!ok)
+		if(!ok) {
 			return false;
+		}
 
 		riff_header_t riff;
 		chunk_header_t chunk;
@@ -1122,6 +1123,7 @@ bool SignalGenerator::loadParametersFromFile(QSharedPointer<signal_generator_dat
 		f.read(riff.data, 12);
 
 		if(!riffCompare(riff, "WAVE")) {
+			Q_EMIT iioEvent(IIO_ERROR);
 			return false;
 		}
 
@@ -1384,6 +1386,7 @@ void SignalGenerator::start()
 
 	m_m2k_analogout->setCyclic(true);
 	m_m2k_analogout->push(buffers);
+	Q_EMIT iioEvent(IIO_SUCCESS);
 }
 
 void SignalGenerator::run() { start(); }
@@ -1395,9 +1398,11 @@ void SignalGenerator::stop()
 		ui->run_button->toggle(false);
 		buffers.clear();
 		m_m2k_analogout->stop();
+		Q_EMIT iioEvent(IIO_SUCCESS);
 	} catch(libm2k::m2k_exception &e) {
 		HANDLE_EXCEPTION(e);
 		qDebug(CAT_M2K_SIGNAL_GENERATOR) << e.what();
+		Q_EMIT iioEvent(IIO_ERROR);
 	}
 	ResourceManager::close("m2k-dac" + m_uri);
 }
@@ -1558,11 +1563,12 @@ void SignalGenerator::loadFileChannelData(int chIdx)
 			return;
 		}
 #endif
-
+		Q_EMIT iioEvent(IIO_SUCCESS);
 	} catch(FileManagerException &e) {
 		ptr->file_message = QString::fromLocal8Bit(e.what());
 		ptr->file_nr_of_samples.push_back(0);
 		ptr->file_type = FORMAT_NO_FILE;
+		Q_EMIT iioEvent(IIO_ERROR);
 	}
 }
 
@@ -1686,6 +1692,7 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj, double samp_rate, 
 				} catch(std::runtime_error &e) {
 					ptr->file_message = QString::fromLocal8Bit(e.what());
 					fs = blocks::null_source::make(sizeof(float));
+					Q_EMIT iioEvent(IIO_ERROR);
 				}
 				for(size_t i = 0; i < ptr->file_nr_of_channels; i++) {
 					if(i == ptr->file_channel) {

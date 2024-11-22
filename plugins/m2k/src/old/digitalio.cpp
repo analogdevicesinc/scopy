@@ -257,6 +257,7 @@ void DigitalIO::updateUi()
 		if(groups[1]->ui->inout->isChecked()) {
 			groups[1]->ui->horizontalSlider->setValue(gpigrp2);
 		}
+		Q_EMIT iioEvent(IIO_SUCCESS, IIOCallType::STREAM);
 	}
 }
 
