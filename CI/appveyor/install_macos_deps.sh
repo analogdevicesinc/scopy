@@ -32,9 +32,9 @@ brew update
 # Check if macOS version and upgrade packages only if the version is greater than macOS 12
 if (( $(echo "$(sw_vers -productVersion) > 13.0" | bc -l) )); then
 	brew upgrade --display-times || true #ignore homebrew upgrade errors
-	brew install --display-times $PACKAGES
+	brew install --overwrite --display-times $PACKAGES
 else
-	HOMEBREW_NO_AUTO_UPDATE=1 brew install --display-times $PACKAGES
+	HOMEBREW_NO_AUTO_UPDATE=1 brew install --overwrite --display-times $PACKAGES
 fi
 
 brew search ${QT_FORMULAE}
