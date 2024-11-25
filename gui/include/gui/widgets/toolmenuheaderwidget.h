@@ -44,6 +44,7 @@ public:
 	QString title() override;
 	void setDeviceIcon(QPixmap icon);
 	void setUri(QString uri);
+	QPushButton *deviceBtn() const;
 
 Q_SIGNALS:
 	void blinkLed(int retCode);

@@ -65,6 +65,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void requestToolSelect(QString id);
 	void toolStackChanged(QString id);
+	void requestDevicePage(QString id);
 
 private Q_SLOTS:
 	void updateTool(QWidget *old);
@@ -78,7 +79,7 @@ private:
 	void attachSuccesful(ToolMenuItem *toolMenuItem);
 	void showTool(ToolMenuItem *toolMenuItem);
 	void setTmeAttached(ToolMenuEntry *tme);
-	MenuSectionCollapseWidget *createMenuSectionItem(QString devName, QString uri, QPixmap icon);
+	MenuSectionCollapseWidget *createMenuSectionItem(QString deviceId, DeviceInfo dInfo);
 	ToolMenuItem *createToolMenuItem(ToolMenuEntry *tme, QWidget *parent = nullptr);
 	MenuCollapseHeader *getCollapseSectionHeader(MenuSectionCollapseWidget *section);
 
