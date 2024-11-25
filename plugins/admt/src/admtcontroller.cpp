@@ -172,16 +172,15 @@ int ADMTController::getChannelIndex(const char *deviceName, const char *channelN
 double ADMTController::getChannelValue(const char *deviceName, const char *channelName, int bufferSize)
 {
 	double value;
-	char converted[bufferSize] = "";
 
 	int deviceCount = iio_context_get_devices_count(m_iioCtx);
-	//if(deviceCount < 1) return QString("No devices found");
+	if(deviceCount < 1) return static_cast<double>(UINT64_MAX); // return QString("No devices found");
 
 	iio_device *admtDevice = iio_context_find_device(m_iioCtx, deviceName);
-	//if(admtDevice == NULL) return QString("No ADMT4000 device");
+	if(admtDevice == NULL) return static_cast<double>(UINT64_MAX); // return QString("No ADMT4000 device");
 
 	int channelCount = iio_device_get_channels_count(admtDevice);
-	//if(channelCount < 1) return QString("No channels found.");
+	if(channelCount < 1) return static_cast<double>(UINT64_MAX); // return QString("No channels found.");
 
 	iio_channel *channel;
 	std::string message = "";
@@ -197,9 +196,7 @@ double ADMTController::getChannelValue(const char *deviceName, const char *chann
 			channel = NULL;
 		}
 	}
-	if(channel == NULL) {
-		//return QString::fromStdString(message);
-	}
+	if(channel == NULL) return static_cast<double>(UINT64_MAX); // return QString("Channel not found.");
 	iio_channel_enable(channel);
 
 	double scale = 1.0;
@@ -207,13 +204,13 @@ double ADMTController::getChannelValue(const char *deviceName, const char *chann
 	const char *scaleAttrName = "scale";
 	const char *offsetAttrName = "offset";
 	const char *scaleAttr = iio_channel_find_attr(channel, scaleAttrName);
-	//if(scaleAttr == NULL) return QString("No scale attribute");
+	if(scaleAttr == NULL) return static_cast<double>(UINT64_MAX); // return QString("No scale attribute");
 	const char *offsetAttr = iio_channel_find_attr(channel, offsetAttrName);
-	//if(offsetAttr == NULL) return QString("No offset attribute");
+	if(offsetAttr == NULL) return static_cast<double>(UINT64_MAX); // return QString("No offset attribute");
 
 	double *scaleVal = new double(1);
 	int scaleRet = iio_channel_attr_read_double(channel, scaleAttr, scaleVal);
-	//if(scaleRet != 0) return QString("Cannot read scale attribute");
+	if(scaleRet != 0) return static_cast<double>(UINT64_MAX); // return QString("Cannot read scale attribute");
 	scale = *scaleVal;
 
 	char *offsetDst = new char[maxAttrSize];
@@ -221,7 +218,7 @@ double ADMTController::getChannelValue(const char *deviceName, const char *chann
 	offsetAttrVal = std::atoi(offsetDst);
 
 	iio_buffer *iioBuffer = iio_device_create_buffer(admtDevice, bufferSize, false);
-	//if(!iioBuffer) return QString("Cannot create buffer.");
+	if(iioBuffer == NULL) return static_cast<double>(UINT64_MAX); // return QString("Cannot create buffer.");
 
 	ssize_t numBytesRead;
 	int8_t *pointerData, *pointerEnd;
@@ -229,7 +226,7 @@ double ADMTController::getChannelValue(const char *deviceName, const char *chann
 	ptrdiff_t pointerIncrement;
 
 	numBytesRead = iio_buffer_refill(iioBuffer);
-	//if(numBytesRead < 1) return QString("Cannot refill buffer.");
+	if(numBytesRead < 0) return static_cast<double>(UINT64_MAX); // return QString("Cannot refill buffer.");
 
 	pointerIncrement = reinterpret_cast<ptrdiff_t>(iio_buffer_step(iioBuffer));
 	pointerEnd = static_cast<int8_t*>(iio_buffer_end(iioBuffer));
