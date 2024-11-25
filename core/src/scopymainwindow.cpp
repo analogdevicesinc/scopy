@@ -174,7 +174,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	}
 
 	enableScanner();
-
 	connect(dm, &DeviceManager::deviceChangedToolList, m_toolMenuManager, &ToolMenuManager::changeToolListContents);
 	connect(dm, SIGNAL(deviceConnected(QString, Device *)), m_toolMenuManager, SLOT(deviceConnected(QString)));
 	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), m_toolMenuManager,
@@ -182,6 +181,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(dm, &DeviceManager::requestTool, m_toolMenuManager, &ToolMenuManager::showMenuItem);
 	connect(m_toolMenuManager, &ToolMenuManager::requestToolSelect, ts, &ToolStack::show);
 	connect(m_toolMenuManager, &ToolMenuManager::requestToolSelect, dtm, &DetachedToolWindowManager::show);
+	connect(m_toolMenuManager, &ToolMenuManager::requestDevicePage, this,
+		[this, ts](QString id) { showDevicePage(id, ts); });
 	connect(hp, &ScopyHomePage::displayNameChanged, m_toolMenuManager, &ToolMenuManager::onDisplayNameChanged);
 
 	connect(hp, &ScopyHomePage::newDeviceAvailable, dm, &DeviceManager::addDevice);
@@ -252,6 +253,13 @@ void ScopyMainWindow::deviceAutoconnect()
 			api->connectDevice(id);
 		}
 	}
+}
+
+void ScopyMainWindow::showDevicePage(QString id, ToolStack *ts)
+{
+	QString hpKey = ts->getKey(hp);
+	ts->show(hpKey);
+	hp->viewDevice(id);
 }
 
 void ScopyMainWindow::save()

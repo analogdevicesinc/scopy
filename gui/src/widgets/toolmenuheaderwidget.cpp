@@ -81,4 +81,6 @@ void ToolMenuHeaderWidget::setUri(QString uri)
 
 void ToolMenuHeaderWidget::onBlinkLed(int retCode) { m_ledBtn->ledOn(retCode >= 0); }
 
+QPushButton *ToolMenuHeaderWidget::deviceBtn() const { return m_deviceBtn; }
+
 #include "moc_toolmenuheaderwidget.cpp"
