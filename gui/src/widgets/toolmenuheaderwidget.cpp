@@ -95,4 +95,6 @@ void ToolMenuHeaderWidget::setUri(QString uri)
 // To be implemented after IIOManager is available
 void ToolMenuHeaderWidget::onBlinkLed(int retCode) {}
 
+QPushButton *ToolMenuHeaderWidget::deviceBtn() const { return m_deviceBtn; }
+
 #include "moc_toolmenuheaderwidget.cpp"

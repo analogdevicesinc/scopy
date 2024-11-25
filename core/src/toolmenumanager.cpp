@@ -44,7 +44,7 @@ ToolMenuManager::~ToolMenuManager() {}
 
 void ToolMenuManager::addMenuItem(QString deviceId, DeviceInfo dInfo, int itemIndex)
 {
-	MenuSectionCollapseWidget *devSection = createMenuSectionItem(dInfo.name, dInfo.param, dInfo.icon);
+	MenuSectionCollapseWidget *devSection = createMenuSectionItem(deviceId, dInfo);
 	QButtonGroup *menuBtnGroup = m_toolMenu->btnGroup();
 	for(ToolMenuEntry *tme : qAsConst(dInfo.tools)) {
 		ToolMenuItem *toolMenuItem = createToolMenuItem(tme, devSection);
@@ -265,10 +265,10 @@ void ToolMenuManager::setTmeAttached(ToolMenuEntry *tme)
 	tme->setAttached(!tme->attached());
 }
 
-MenuSectionCollapseWidget *ToolMenuManager::createMenuSectionItem(QString devName, QString uri, QPixmap icon)
+MenuSectionCollapseWidget *ToolMenuManager::createMenuSectionItem(QString deviceId, DeviceInfo dInfo)
 {
 	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget(
-		devName, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_TOOLMENUWIDGET, m_toolMenu);
+		dInfo.name, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_TOOLMENUWIDGET, m_toolMenu);
 	section->contentLayout()->setSpacing(0);
 	section->menuSection()->layout()->setMargin(0);
 	section->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -277,9 +277,11 @@ MenuSectionCollapseWidget *ToolMenuManager::createMenuSectionItem(QString devNam
 	if(collapseHeader) {
 		ToolMenuHeaderWidget *thw = dynamic_cast<ToolMenuHeaderWidget *>(collapseHeader->headerWidget());
 		if(thw) {
-			thw->setUri(uri);
-			thw->setDeviceIcon(icon);
+			thw->setUri(dInfo.param);
+			thw->setDeviceIcon(dInfo.icon);
 			thw->layout()->setContentsMargins(Style::getDimension(json::global::unit_1), 0, 0, 0);
+			connect(thw->deviceBtn(), &QPushButton::pressed, this,
+				[this, deviceId]() { Q_EMIT requestDevicePage(deviceId); });
 		}
 		Style::setStyle(collapseHeader, style::properties::widget::bottomBorder);
 	}
