@@ -110,4 +110,6 @@ void ToolMenuHeaderWidget::onBlinkLed(int retCode, IIOCallType type)
 	m_ledBtn->ledOn(retCode >= 0, LED_ON_MSEC);
 }
 
+QPushButton *ToolMenuHeaderWidget::deviceBtn() const { return m_deviceBtn; }
+
 #include "moc_toolmenuheaderwidget.cpp"

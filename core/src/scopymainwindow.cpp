@@ -174,7 +174,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	}
 
 	enableScanner();
-
 	connect(dm, &DeviceManager::deviceChangedToolList, m_toolMenuManager, &ToolMenuManager::changeToolListContents);
 	connect(dm, SIGNAL(deviceConnected(QString, Device *)), m_toolMenuManager, SLOT(deviceConnected(QString)));
 	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), m_toolMenuManager,
@@ -183,6 +182,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(m_toolMenuManager, &ToolMenuManager::requestToolSelect, ts, &ToolStack::show);
 	connect(m_toolMenuManager, &ToolMenuManager::requestToolSelect, dtm, &DetachedToolWindowManager::show);
 	connect(m_toolMenuManager, &ToolMenuManager::toolStackChanged, browseMenu, &BrowseMenu::onToolStackChanged);
+	connect(m_toolMenuManager, &ToolMenuManager::requestDevicePage, this,
+		[this, ts](QString id) { showDevicePage(id, ts); });
 	connect(hp, &ScopyHomePage::displayNameChanged, m_toolMenuManager, &ToolMenuManager::onDisplayNameChanged);
 	connect(ts, &ToolStack::currentChanged, this, [this, ts](int idx) { highlightMenuItem(ts, idx); });
 
@@ -262,6 +263,13 @@ void ScopyMainWindow::highlightMenuItem(ToolStack *ts, int idx)
 	QWidget *crtWidget = ts->widget(idx);
 	QString id = ts->getKey(crtWidget);
 	Q_EMIT m_toolMenuManager->toolStackChanged(id);
+}
+
+void ScopyMainWindow::showDevicePage(QString id, ToolStack *ts)
+{
+	QString hpKey = ts->getKey(hp);
+	ts->show(hpKey);
+	hp->viewDevice(id);
 }
 
 void ScopyMainWindow::save()
