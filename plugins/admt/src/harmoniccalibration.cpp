@@ -2207,6 +2207,7 @@ void HarmonicCalibration::updateMTDiagRegister(){
 void HarmonicCalibration::updateFaultRegister(){
 	uint32_t *faultRegValue = new uint32_t;
 	uint32_t faultRegisterAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::FAULT);
+	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), faultRegisterAddress, 0); // Write all zeros to fault before read
 	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), faultRegisterAddress, faultRegValue);
 
 	if(*faultRegValue != -1){
