@@ -2056,31 +2056,30 @@ void HarmonicCalibration::applySequence(){
 	settings["Sequence Type"] = qvariant_cast<int>(sequenceTypeMenuCombo->combo()->currentData()); // sequenceType;
 	settings["Conversion Type"] = qvariant_cast<int>(conversionTypeMenuCombo->combo()->currentData()); // conversionType;
 
-	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-										 generalRegisterAddress, generalRegValue);	
-
-	uint32_t newGeneralRegValue = m_admtController->setGeneralRegisterBitMapping(*generalRegValue, settings);
-	uint32_t generalRegisterPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL);
-
 	bool success = false;
 
-	if(changeCNVPage(generalRegisterPage)){
-		if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress, newGeneralRegValue) != -1){
-			//StatusBarManager::pushMessage("WRITE GENERAL: 0b" + QString::number(static_cast<uint16_t>(newGeneralRegValue), 2).rightJustified(16, '0'));
-			
-			if(readSequence()){
-				if(settings.at("Convert Synchronization") == generalRegisterMap.at("Convert Synchronization") &&
-					settings.at("Angle Filter") == generalRegisterMap.at("Angle Filter") &&
-					settings.at("8th Harmonic") == generalRegisterMap.at("8th Harmonic") &&
-					settings.at("Sequence Type") == generalRegisterMap.at("Sequence Type") &&
-					settings.at("Conversion Type") == generalRegisterMap.at("Conversion Type"))
-				{
-					StatusBarManager::pushMessage("Sequence settings applied successfully");
-					success = true;
+	if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress, generalRegValue) != -1){
+
+		uint32_t newGeneralRegValue = m_admtController->setGeneralRegisterBitMapping(*generalRegValue, settings);
+		uint32_t generalRegisterPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL);
+
+		if(changeCNVPage(generalRegisterPage)){
+			if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress, newGeneralRegValue) != -1){
+				if(readSequence()){
+					if(settings.at("Convert Synchronization") == generalRegisterMap.at("Convert Synchronization") &&
+						settings.at("Angle Filter") == generalRegisterMap.at("Angle Filter") &&
+						settings.at("8th Harmonic") == generalRegisterMap.at("8th Harmonic") &&
+						settings.at("Sequence Type") == generalRegisterMap.at("Sequence Type") &&
+						settings.at("Conversion Type") == generalRegisterMap.at("Conversion Type"))
+					{
+						StatusBarManager::pushMessage("Sequence settings applied successfully");
+						success = true;
+					}
 				}
 			}
 		}
 	}
+
 
 	if(!success){ StatusBarManager::pushMessage("Failed to apply sequence settings"); }
 }
@@ -2298,18 +2297,25 @@ void HarmonicCalibration::updateChannelValues(){
 
 void HarmonicCalibration::updateCountValue(){
 	uint32_t *absAngleRegValue = new uint32_t;
+	bool success = false;
 	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE), 0x0000) != -1){
 		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getSensorRegister(ADMTController::SensorRegister::ABSANGLE), absAngleRegValue) != -1){
 			count = m_admtController->getAbsAngleTurnCount(static_cast<uint16_t>(*absAngleRegValue));
+			success = true;
 		}
 	}
+	if(!success){ count = static_cast<double>(UINT64_MAX); }
 }
 
 void HarmonicCalibration::updateLineEditValues(){
-	rotationValueLabel->setText(QString::number(rotation) + "°");
-	angleValueLabel->setText(QString::number(angle) + "°");
-	countValueLabel->setText(QString::number(count));
-	tempValueLabel->setText(QString::number(temp) + " °C");
+	if(rotation == static_cast<double>(UINT64_MAX)) { rotationValueLabel->setText("N/A"); }
+	else { rotationValueLabel->setText(QString::number(rotation) + "°"); }
+	if(angle == static_cast<double>(UINT64_MAX)) { angleValueLabel->setText("N/A"); }
+	else { angleValueLabel->setText(QString::number(angle) + "°"); }
+	if(count == static_cast<double>(UINT64_MAX)) { countValueLabel->setText("N/A"); }
+	else { countValueLabel->setText(QString::number(count)); }
+	if(temp == static_cast<double>(UINT64_MAX)) { tempValueLabel->setText("N/A"); }
+	else { tempValueLabel->setText(QString::number(temp) + " °C"); }
 }
 
 void HarmonicCalibration::updateGeneralSettingEnabled(bool value)
