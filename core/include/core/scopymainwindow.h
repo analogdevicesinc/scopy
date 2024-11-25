@@ -108,6 +108,7 @@ private:
 	void handleScanner();
 	void enableScanner();
 	void deviceAutoconnect();
+	void showDevicePage(QString id, ToolStack *ts);
 
 protected:
 	void closeEvent(QCloseEvent *event) override;
