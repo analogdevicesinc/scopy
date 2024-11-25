@@ -18,7 +18,7 @@
 
 
 cmake_minimum_required(VERSION 3.5)
-project(scopy LANGUAGES C CXX VERSION 1.4.1)
+project(scopy LANGUAGES C CXX VERSION 1.5.0)
 
 set(Python_ADDITIONAL_VERSIONS 3)
 if(PYTHON_EXECUTABLE)
