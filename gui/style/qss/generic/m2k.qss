@@ -84,11 +84,6 @@ scopy--m2k--DMM #widget_2,
 QMainWindow > .QWidget > .scopy--MenuHAnim {
     background-color: none;
 }
-/*
-QwtPlot,
-QwtPolarPlot,
-pv--view--Viewport,
-*/
 QWidget[plot_container="true"] {
     background-color: &background_subtle&;
 }
@@ -111,15 +106,6 @@ QwtThermo {
     color: &content_subtle&;
     font-size: 26px;
 }
-/*
-scopy--BufferPreviewer {
- border: 1px solid &interactive_primary_idle&;
- alternate-background-color: &interactive_primary_disabled&;
- selection-background-color: &background_subtle&;
- selection-color: &interactive_accent_idle&;
- color: &content_default&;
-}
-*/
 QDial {
     background-color: &background_subtle&;
     color: &interactive_primary_idle&;
@@ -130,26 +116,11 @@ QTabWidget::tab-bar {
 QTabWidget::pane {
     border-top: 0px;
 }
-/*
-QTabBar { qproperty-drawBase: 0; }
+
 QTabBar::tab {
- min-width: 100px;
- min-height: 32px;
- padding-bottom: 5px;
- font: normal;
+    min-width: &unit_5&;
 }
-QTabBar::tab:selected {
- color: &content_default&;
- border-bottom: 2px solid &interactive_accent_idle&;
- margin-top: 0px;
-}
-QTabBar::tab:!selected {
- border-bottom: 2px solid &interactive_subtle_disabled&;
-}
-QTabBar::scroller {
- width: 25px;
-}
-*/
+    
 QRadioButton {
     color: &content_default&;
     spacing: 12px;
