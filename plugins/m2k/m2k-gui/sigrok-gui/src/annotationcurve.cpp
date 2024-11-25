@@ -672,16 +672,27 @@ uint64_t AnnotationCurve::getMaxAnnotationCount(int index)
 // shorten text to fit maxWidth pixels in width
 QString AnnotationCurve::shortenAnnotationText(const QString text, const double maxWidth, QPainter *painter) const
 {
-	const int padding = 12;
-	const QString extension = "...";
+	const int PADDING = 12;
+	const QString EXTENSION = "...";
 	int count = 0;
 
-	// find maximum number of characters that fit
-	while(QSizeF(QwtText(text.left(count) + extension).textSize(painter->font())).width() <= maxWidth - padding) {
-		count++;
+	bool isWithinTextLength = true;
+	bool isWithinMaxWidth = true;
+
+	// Empty text or maxWidth is too small to even fit the extension
+	if(text.isEmpty() || maxWidth <= PADDING + painter->fontMetrics().horizontalAdvance(EXTENSION)) {
+		return EXTENSION;
 	}
 
-	return count ? text.left(count) + extension : "";
+	// find maximum number of characters that fit
+	while(isWithinTextLength && isWithinMaxWidth) {
+		count++;
+		isWithinTextLength = count < text.length();
+		isWithinMaxWidth = QSizeF(QwtText(text.left(count) + EXTENSION).textSize(painter->font())).width() <=
+			maxWidth - PADDING;
+	}
+
+	return isWithinTextLength ? text.left(count) + EXTENSION : "";
 }
 
 void AnnotationCurve::drawTwoSampleAnnotation(int row, const Annotation &ann, QPainter *painter,
