@@ -1,0 +1,13 @@
+QLineEdit[&&property&&=true] {
+	font-weight: bold;
+	font-size: &font_size_1&;
+	font-style: normal;
+	border: 0px solid &content_subtle&;
+	border-bottom: 1px solid rgba(255, 255, 255, 102);
+	padding-left: -2px;
+}
+QLineEdit[&&property&&=true]:disabled {
+	border: 0px solid &content_subtle&;
+	border-bottom: 0px solid rgba(255, 255, 255, 102);
+	padding-left: -2px;
+}

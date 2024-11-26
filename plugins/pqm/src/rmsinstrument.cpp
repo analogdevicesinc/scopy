@@ -51,7 +51,6 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	QHBoxLayout *instrumentLayout = new QHBoxLayout(this);
 	setLayout(instrumentLayout);
 	instrumentLayout->setMargin(0);
-	StyleHelper::GetInstance()->initColorMap();
 
 	ToolTemplate *tool = new ToolTemplate(this);
 	tool->topContainer()->setVisible(true);
