@@ -45,9 +45,13 @@ public:
 	QString title() override;
 	void setDeviceIcon(QPixmap icon);
 	void setUri(QString uri);
+	void setDeviceId(QString deviceId);
 	QPushButton *deviceBtn() const;
 
+	void setState(QString id, bool state, QWidget *parent);
+
 Q_SIGNALS:
+	void connState(QString id, bool isConnected);
 	void blinkLed(int retCode, IIOCallType type);
 
 private Q_SLOTS:
@@ -55,6 +59,7 @@ private Q_SLOTS:
 
 private:
 	QTimer *m_timer;
+	QString m_id;
 	LedButton *m_ledBtn;
 	QPushButton *m_deviceBtn;
 	QLineEdit *m_title;
