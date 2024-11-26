@@ -36,6 +36,7 @@
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <style.h>
 
 #include <gui/cursorcontroller.h>
 #include <gui/menu_anim.hpp>
@@ -72,7 +73,6 @@ TestTool::TestTool(QWidget *parent)
 	tool->rightContainer()->setVisible(true);
 	lay->addWidget(tool);
 
-	StyleHelper::GetInstance()->initColorMap();
 	btn3 = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), false, this);
 	tool->setLeftContainerWidth(200);
 	tool->setRightContainerWidth(300);
@@ -268,7 +268,7 @@ QWidget *TestTool::createMenu(QWidget *parent)
 	MenuSectionWidget *vdiv = new MenuSectionWidget(w);
 
 	QLabel *txt = new QLabel("VDiv", vdiv);
-	StyleHelper::MenuSmallLabel(txt, "vdivLabel");
+	Style::setStyle(txt, style::properties::label::menuSmall);
 	QComboBox *cbb = new QComboBox(vdiv);
 	cbb->addItem("Lorem");
 	cbb->addItem("Ipsum");
@@ -295,7 +295,7 @@ QWidget *TestTool::createMenu(QWidget *parent)
 
 	//	MenuBigSwitch *bigsw = new MenuBigSwitch("Yes", "No", vdiv);
 	QLabel *lbl = new QLabel("AUTOSCALE");
-	StyleHelper::MenuSmallLabel(lbl, "edit");
+	Style::setStyle(lbl, style::properties::label::menuSmall);
 	MenuLineEdit *edit = new MenuLineEdit(vdiv);
 
 	vdiv->contentLayout()->addWidget(section1);

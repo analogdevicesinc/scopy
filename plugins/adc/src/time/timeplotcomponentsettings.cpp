@@ -49,7 +49,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 		"SETTINGS", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	QLabel *plotTitleLabel = new QLabel("Plot title");
-	StyleHelper::MenuSmallLabel(plotTitleLabel);
+	Style::setStyle(plotTitleLabel, style::properties::label::menuSmall);
 
 	QLineEdit *plotTitle = new QLineEdit(m_plotComponent->name());
 	Style::setStyle(plotTitle, style::properties::lineedit::menuLineEdit);

@@ -97,7 +97,7 @@ MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::Men
 	: QWidget(parent)
 	, m_title(title)
 {
-	StyleHelper::MenuCollapseSection(this, "menuCollapse");
+	Style::setBackgroundColor(this, QString("transparent"));
 	m_lay = new QVBoxLayout(this);
 	m_lay->setMargin(0);
 	m_lay->setSpacing(0);

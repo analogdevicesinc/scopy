@@ -19,6 +19,7 @@
  *
  */
 
+#include <style.h>
 #include <verticaltabbar.h>
 #include <verticaltabwidget.h>
 
@@ -28,4 +29,6 @@ VerticalTabWidget::VerticalTabWidget(QWidget *parent)
 	: QTabWidget(parent)
 {
 	setTabBar(new VerticalTabBar(this));
+	setTabPosition(QTabWidget::TabPosition::East);
+	Style::setStyle(tabBar(), style::properties::tabwidget::eastTabMenu, true, true);
 }

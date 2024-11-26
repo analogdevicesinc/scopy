@@ -223,6 +223,8 @@ QList<QColor> Style::getChannelColorList()
 	return list;
 }
 
+// using setStyle is more efficient if possible
+// for example if the color is background_primary, you may use style::properties::widget::basicBackground
 void Style::setBackgroundColor(QWidget *widget, const char *color, bool extend_to_children)
 {
 	setBackgroundColor(widget, getAttribute(color), extend_to_children);

@@ -66,7 +66,6 @@ void ScopyPreferencesPage::initUI()
 	layout->addWidget(tabWidget);
 
 	Style::setBackgroundColor(tabWidget, json::theme::background_primary);
-	StyleHelper::TabWidgetEastMenu(tabWidget, "preferencesTable");
 }
 
 void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text)

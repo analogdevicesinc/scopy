@@ -35,6 +35,7 @@
 #include <QRandomGenerator>
 #include <QLabel>
 #include <QScrollArea>
+#include <style.h>
 
 using namespace scopy;
 using namespace scopy::dac;
@@ -77,7 +78,7 @@ DacDataManager::DacDataManager(struct iio_device *dev, QWidget *parent)
 	Q_EMIT m_mode->combo()->currentIndexChanged(0);
 	modeSection->contentLayout()->addWidget(m_mode);
 
-	m_color = StyleHelper::getColor("interactive_primary_idle");
+	m_color = Style::getAttribute(json::theme::interactive_primary_idle);
 	m_layout->addWidget(modeSection);
 	m_layout->addWidget(dacAddonStack);
 	m_layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
