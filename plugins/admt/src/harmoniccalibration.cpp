@@ -51,6 +51,7 @@ static const QColor channel0Color = scopy::StyleHelper::getColor("CH0");
 static const QColor sineColor = QColor("#85e94c");
 static const QColor cosineColor = QColor("#91e6cf");
 static const QColor faultLEDColor = QColor("#c81a28");
+static const QColor gpioLEDColor = scopyBlueColor;
 static const QColor statusLEDColor = QColor("#2e9e6f");
 
 static const QPen scopyBluePen(scopyBlueColor);
@@ -391,6 +392,10 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 		{ 
 			readSequence();
 		}
+		else
+		{
+			stop();
+		}
 
 		if(index == 1) // Calibration Tab
 		{ 
@@ -407,6 +412,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 			readSequence();
 			toggleFaultRegisterMode(generalRegisterMap.at("Sequence Type"));
 			toggleMTDiagnostics(generalRegisterMap.at("Sequence Type"));
+			updateDIGIOToggle();
 		}	
 		else { utilityTimer->stop(); }
 
@@ -1435,7 +1441,7 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 
 	#pragma region DIGIO Control
 	MenuSectionWidget *DIGIOControlSectionWidget = new MenuSectionWidget(DIGIOWidget);
-	MenuCollapseSection *DIGIOControlCollapseSection = new MenuCollapseSection("GPIO Control", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, DIGIOControlSectionWidget);
+	MenuCollapseSection *DIGIOControlCollapseSection = new MenuCollapseSection("DIGIO Control", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, DIGIOControlSectionWidget);
 	DIGIOControlSectionWidget->contentLayout()->addWidget(DIGIOControlCollapseSection);
 
 	QWidget *DIGIOControlGridWidget = new QWidget(DIGIOControlSectionWidget);
@@ -1458,66 +1464,112 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 				}
 				)css");
 
-	QLabel *DIGIOBUSYLabel = new QLabel("GPIO0", DIGIOControlGridWidget);
-	QLabel *DIGIOCNVLabel = new QLabel("GPIO1", DIGIOControlGridWidget);
-	QLabel *DIGIOSENTLabel = new QLabel("GPIO2", DIGIOControlGridWidget);
-	QLabel *DIGIOACALCLabel = new QLabel("GPIO3", DIGIOControlGridWidget);
-	QLabel *DIGIOFAULTLabel = new QLabel("GPIO4", DIGIOControlGridWidget);
-	QLabel *DIGIOBOOTLOADERLabel = new QLabel("GPIO5", DIGIOControlGridWidget);
-	QLabel *DIGIOALLLabel = new QLabel("GPIO Output", DIGIOControlGridWidget);
+	QLabel *DIGIO0Label = new QLabel("DIGIO0", DIGIOControlGridWidget);
+	QLabel *DIGIO1Label = new QLabel("DIGIO1", DIGIOControlGridWidget);
+	QLabel *DIGIO2Label = new QLabel("DIGIO2", DIGIOControlGridWidget);
+	QLabel *DIGIO3Label = new QLabel("DIGIO3", DIGIOControlGridWidget);
+	QLabel *DIGIO4Label = new QLabel("DIGIO4", DIGIOControlGridWidget);
+	QLabel *DIGIO5Label = new QLabel("DIGIO5", DIGIOControlGridWidget);
+	QLabel *DIGIOALLLabel = new QLabel("All DIGIO Output", DIGIOControlGridWidget);
 
-	DIGIOBUSYLabel->setStyleSheet(labelStyle);
-	DIGIOCNVLabel->setStyleSheet(labelStyle);
-	DIGIOSENTLabel->setStyleSheet(labelStyle);
-	DIGIOACALCLabel->setStyleSheet(labelStyle);
-	DIGIOFAULTLabel->setStyleSheet(labelStyle);
-	DIGIOBOOTLOADERLabel->setStyleSheet(labelStyle);
+	DIGIO0Label->setStyleSheet(labelStyle);
+	DIGIO1Label->setStyleSheet(labelStyle);
+	DIGIO2Label->setStyleSheet(labelStyle);
+	DIGIO3Label->setStyleSheet(labelStyle);
+	DIGIO4Label->setStyleSheet(labelStyle);
+	DIGIO5Label->setStyleSheet(labelStyle);
 	DIGIOALLLabel->setStyleSheet(labelStyle);
 
-	DIGIOBUSYToggleSwitch = new CustomSwitch();
-	changeCustomSwitchLabel(DIGIOBUSYToggleSwitch, "On", "Off");
-	connect(DIGIOBUSYToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+	DIGIO0ENToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIO0ENToggleSwitch, "Enable", "Disable");
+	connect(DIGIO0ENToggleSwitch, &CustomSwitch::clicked, [=](bool value){
 		toggleDIGIOEN("DIGIO0EN", value);
 	});
 
-	DIGIOCNVToggleSwitch = new CustomSwitch();
-	changeCustomSwitchLabel(DIGIOCNVToggleSwitch, "On", "Off");
-	connect(DIGIOCNVToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+	DIGIO0FNCToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIO0FNCToggleSwitch, "GPIO0", "BUSY");
+	connect(DIGIO0FNCToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+		toggleDIGIOEN("BUSY", value);
+	});
+
+	DIGIO1ENToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIO1ENToggleSwitch, "Enable", "Disable");
+	connect(DIGIO1ENToggleSwitch, &CustomSwitch::clicked, [=](bool value){
 		toggleDIGIOEN("DIGIO1EN", value);
 	});
 
-	DIGIOSENTToggleSwitch = new CustomSwitch();
-	changeCustomSwitchLabel(DIGIOSENTToggleSwitch, "On", "Off");
-	connect(DIGIOSENTToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+	DIGIO1FNCToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIO1FNCToggleSwitch, "GPIO1", "CNV");
+	connect(DIGIO1FNCToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+		toggleDIGIOEN("CNV", value);
+	});
+
+	DIGIO2ENToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIO2ENToggleSwitch, "Enable", "Disable");
+	connect(DIGIO2ENToggleSwitch, &CustomSwitch::clicked, [=](bool value){
 		toggleDIGIOEN("DIGIO2EN", value);
 	});
 
-	DIGIOACALCToggleSwitch = new CustomSwitch();
-	changeCustomSwitchLabel(DIGIOACALCToggleSwitch, "On", "Off");
-	connect(DIGIOACALCToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+	DIGIO2FNCToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIO2FNCToggleSwitch, "GPIO2", "SENT");
+	connect(DIGIO2FNCToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+		toggleDIGIOEN("SENT", value);
+	});
+
+	DIGIO3ENToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIO3ENToggleSwitch, "Enable", "Disable");
+	connect(DIGIO3ENToggleSwitch, &CustomSwitch::clicked, [=](bool value){
 		toggleDIGIOEN("DIGIO3EN", value);
 	});
 
-	DIGIOFAULTToggleSwitch = new CustomSwitch();
-	changeCustomSwitchLabel(DIGIOFAULTToggleSwitch, "On", "Off");
-	connect(DIGIOFAULTToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+	DIGIO3FNCToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIO3FNCToggleSwitch, "GPIO3", "ACALC");
+	connect(DIGIO3FNCToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+		toggleDIGIOEN("ACALC", value);
+	});
+
+	DIGIO4ENToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIO4ENToggleSwitch, "Enable", "Disable");
+	connect(DIGIO4ENToggleSwitch, &CustomSwitch::clicked, [=](bool value){
 		toggleDIGIOEN("DIGIO4EN", value);
 	});
 
-	DIGIOBOOTLOADERToggleSwitch = new CustomSwitch();
-	changeCustomSwitchLabel(DIGIOBOOTLOADERToggleSwitch, "On", "Off");
-	connect(DIGIOBOOTLOADERToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+	DIGIO4FNCToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIO4FNCToggleSwitch, "GPIO4", "FAULT");
+	connect(DIGIO4FNCToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+		toggleDIGIOEN("FAULT", value);
+	});
+
+	DIGIO5ENToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIO5ENToggleSwitch, "Enable", "Disable");
+	connect(DIGIO5ENToggleSwitch, &CustomSwitch::clicked, [=](bool value){
 		toggleDIGIOEN("DIGIO5EN", value);
 	});
 
+	DIGIO5FNCToggleSwitch = new CustomSwitch();
+	changeCustomSwitchLabel(DIGIO5FNCToggleSwitch, "GPIO5", "BOOT");
+	connect(DIGIO5FNCToggleSwitch, &CustomSwitch::clicked, [=](bool value){
+		toggleDIGIOEN("BOOTLOAD", value);
+	});
+
 	DIGIOALLToggleSwitch = new CustomSwitch();
-	changeCustomSwitchLabel(DIGIOALLToggleSwitch, "On", "Off");
+	changeCustomSwitchLabel(DIGIOALLToggleSwitch, "Enable", "Disable");
 	connect(DIGIOALLToggleSwitch, &CustomSwitch::toggled, [=](bool value){
-		toggleAllDIGIO(value);
+		toggleAllDIGIOEN(value);
+		// toggleAllDIGIO(value);
+	});
+
+	QPushButton *DIGIOResetButton = new QPushButton("Reset DIGIO", DIGIOControlGridWidget);
+	DIGIOResetButton->setFixedWidth(100);
+	StyleHelper::BlueButton(DIGIOResetButton);
+	connect(DIGIOResetButton, &QPushButton::clicked, [=]{
+		resetDIGIO();
+		updateDIGIOToggle();
 	});
 	
 	DIGIOControlGridLayout->addWidget(DIGIOALLLabel, 0, 0);
 	DIGIOControlGridLayout->addWidget(DIGIOALLToggleSwitch, 0, 1);
+	DIGIOControlGridLayout->addWidget(DIGIOResetButton, 0, 2);
 
 	DIGIOControlGridLayout->addItem(new QSpacerItem(0, 4, QSizePolicy::Fixed, QSizePolicy::Expanding), 1, 0, 1, 2);
 	QFrame *line = new QFrame();
@@ -1531,21 +1583,26 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 				)css");
 	line->setStyleSheet(lineStyle);
 	DIGIOControlGridLayout->addWidget(line, 2, 0, 1, 2);
+	DIGIOControlGridLayout->addItem(new QSpacerItem(0, 4, QSizePolicy::Fixed, QSizePolicy::Expanding), 3, 0, 1, 3);
 
-	DIGIOControlGridLayout->addItem(new QSpacerItem(0, 4, QSizePolicy::Fixed, QSizePolicy::Expanding), 3, 0, 1, 2);
-
-	DIGIOControlGridLayout->addWidget(DIGIOBUSYLabel, 4, 0);
-	DIGIOControlGridLayout->addWidget(DIGIOBUSYToggleSwitch, 4, 1);
-	DIGIOControlGridLayout->addWidget(DIGIOCNVLabel, 5, 0);
-	DIGIOControlGridLayout->addWidget(DIGIOCNVToggleSwitch, 5, 1);
-	DIGIOControlGridLayout->addWidget(DIGIOSENTLabel, 6, 0);
-	DIGIOControlGridLayout->addWidget(DIGIOSENTToggleSwitch, 6, 1);
-	DIGIOControlGridLayout->addWidget(DIGIOACALCLabel, 7, 0);
-	DIGIOControlGridLayout->addWidget(DIGIOACALCToggleSwitch, 7, 1);
-	DIGIOControlGridLayout->addWidget(DIGIOFAULTLabel, 8, 0);
-	DIGIOControlGridLayout->addWidget(DIGIOFAULTToggleSwitch, 8, 1);
-	DIGIOControlGridLayout->addWidget(DIGIOBOOTLOADERLabel, 9, 0);
-	DIGIOControlGridLayout->addWidget(DIGIOBOOTLOADERToggleSwitch, 9, 1);
+	DIGIOControlGridLayout->addWidget(DIGIO0Label, 4, 0);
+	DIGIOControlGridLayout->addWidget(DIGIO0ENToggleSwitch, 4, 1);
+	DIGIOControlGridLayout->addWidget(DIGIO0FNCToggleSwitch, 4, 2);
+	DIGIOControlGridLayout->addWidget(DIGIO1Label, 5, 0);
+	DIGIOControlGridLayout->addWidget(DIGIO1ENToggleSwitch, 5, 1);
+	DIGIOControlGridLayout->addWidget(DIGIO1FNCToggleSwitch, 5, 2);
+	DIGIOControlGridLayout->addWidget(DIGIO2Label, 6, 0);
+	DIGIOControlGridLayout->addWidget(DIGIO2ENToggleSwitch, 6, 1);
+	DIGIOControlGridLayout->addWidget(DIGIO2FNCToggleSwitch, 6, 2);
+	DIGIOControlGridLayout->addWidget(DIGIO3Label, 7, 0);
+	DIGIOControlGridLayout->addWidget(DIGIO3ENToggleSwitch, 7, 1);
+	DIGIOControlGridLayout->addWidget(DIGIO3FNCToggleSwitch, 7, 2);
+	DIGIOControlGridLayout->addWidget(DIGIO4Label, 8, 0);
+	DIGIOControlGridLayout->addWidget(DIGIO4ENToggleSwitch, 8, 1);
+	DIGIOControlGridLayout->addWidget(DIGIO4FNCToggleSwitch, 8, 2);
+	DIGIOControlGridLayout->addWidget(DIGIO5Label, 9, 0);
+	DIGIOControlGridLayout->addWidget(DIGIO5ENToggleSwitch, 9, 1);
+	DIGIOControlGridLayout->addWidget(DIGIO5FNCToggleSwitch, 9, 2);
 
 	DIGIOControlCollapseSection->contentLayout()->addWidget(DIGIOControlGridWidget, 1);
 	#pragma endregion
@@ -1698,6 +1755,13 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	return tool;
 }
 
+void HarmonicCalibration::resetDIGIO()
+{
+	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+										m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+										0x241b);
+}
+
 void HarmonicCalibration::readAllRegisters()
 {
 	readAllRegistersButton->setEnabled(false);
@@ -1826,7 +1890,7 @@ void HarmonicCalibration::toggleUtilityTask(bool run)
 	}
 }
 
-void HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool value)
+void HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool& value)
 {
 	toggleUtilityTask(false);
 
@@ -1838,34 +1902,24 @@ void HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool value)
 	if(changeCNVPage(DIGIOENPage))
 	{
 		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-											m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
-											DIGIOENRegisterValue) != -1)
+			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+			DIGIOENRegisterValue) != -1)
 		{
 			map<string, bool> DIGIOSettings = m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));
+
 			DIGIOSettings[DIGIOENName] = value;
 
 			uint16_t newRegisterValue = m_admtController->setDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue), DIGIOSettings);
 
-			changeCNVPage(DIGIOENPage);
-
-			if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-													m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
-													static_cast<uint32_t>(newRegisterValue)) != -1)
-			{
-				if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-											m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
-											DIGIOENRegisterValue) != -1)
+			if(changeCNVPage(DIGIOENPage)){
+				if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+														m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+														static_cast<uint32_t>(newRegisterValue)) != -1)
 				{
-					map<string, bool> DIGIOSettings = m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));
-					DIGIOBUSYToggleSwitch->setChecked(DIGIOSettings["DIGIO0EN"]);
-					DIGIOCNVToggleSwitch->setChecked(DIGIOSettings["DIGIO1EN"]);
-					DIGIOSENTToggleSwitch->setChecked(DIGIOSettings["DIGIO2EN"]);
-					DIGIOACALCToggleSwitch->setChecked(DIGIOSettings["DIGIO3EN"]);
-					DIGIOFAULTToggleSwitch->setChecked(DIGIOSettings["DIGIO4EN"]);
-					DIGIOBOOTLOADERToggleSwitch->setChecked(DIGIOSettings["DIGIO5EN"]);
-					success = true;
+					success = updateDIGIOToggle();
 				}
 			}
+
 		}
 	}
 
@@ -1874,7 +1928,37 @@ void HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool value)
 	toggleUtilityTask(true);
 }
 
-void HarmonicCalibration::toggleAllDIGIO(bool value)
+bool HarmonicCalibration::updateDIGIOToggle()
+{
+	uint32_t *DIGIOENRegisterValue = new uint32_t;
+	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
+	bool success = false;
+
+	if(changeCNVPage(DIGIOENPage)){
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+			DIGIOENRegisterValue) != -1)
+		{
+			map<string, bool> DIGIOSettings = m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));
+			DIGIO0ENToggleSwitch->setChecked(DIGIOSettings["DIGIO0EN"]);
+			DIGIO1ENToggleSwitch->setChecked(DIGIOSettings["DIGIO1EN"]);
+			DIGIO2ENToggleSwitch->setChecked(DIGIOSettings["DIGIO2EN"]);
+			DIGIO3ENToggleSwitch->setChecked(DIGIOSettings["DIGIO3EN"]);
+			DIGIO4ENToggleSwitch->setChecked(DIGIOSettings["DIGIO4EN"]);
+			DIGIO5ENToggleSwitch->setChecked(DIGIOSettings["DIGIO5EN"]);
+			DIGIO0FNCToggleSwitch->setChecked(DIGIOSettings["BUSY"]);
+			DIGIO1FNCToggleSwitch->setChecked(DIGIOSettings["CNV"]);
+			DIGIO2FNCToggleSwitch->setChecked(DIGIOSettings["SENT"]);
+			DIGIO3FNCToggleSwitch->setChecked(DIGIOSettings["ACALC"]);
+			DIGIO4FNCToggleSwitch->setChecked(DIGIOSettings["FAULT"]);
+			DIGIO5FNCToggleSwitch->setChecked(DIGIOSettings["BOOTLOAD"]);
+			success = true;
+		}
+	}
+	return success;
+}
+
+void HarmonicCalibration::toggleAllDIGIOEN(bool value)
 {
 	toggleUtilityTask(false);
 	uint32_t *DIGIOENRegisterValue = new uint32_t;
@@ -1882,36 +1966,28 @@ void HarmonicCalibration::toggleAllDIGIO(bool value)
 
 	bool success = false;
 
-	if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-										m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
-										DIGIOENRegisterValue) != -1)
+	if(changeCNVPage(DIGIOENPage))
 	{
-		map<string, bool> DIGIOSettings;
-		DIGIOSettings["DIGIO5EN"] = value;
-		DIGIOSettings["DIGIO4EN"] = value;
-		DIGIOSettings["DIGIO3EN"] = value;
-		DIGIOSettings["DIGIO2EN"] = value;
-		DIGIOSettings["DIGIO1EN"] = value;
-		DIGIOSettings["DIGIO0EN"] = value;
-		uint16_t newRegisterValue = m_admtController->setDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue), DIGIOSettings);
-
-		changeCNVPage(DIGIOENPage);
-		if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-												m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
-												static_cast<uint32_t>(newRegisterValue)) != -1)
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+			DIGIOENRegisterValue) != -1)
 		{
-			if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-											m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
-											DIGIOENRegisterValue) != -1)
-			{
-				map<string, bool> DIGIOSettings = m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));
-				DIGIOBUSYToggleSwitch->setChecked(DIGIOSettings["DIGIO0EN"]);
-				DIGIOCNVToggleSwitch->setChecked(DIGIOSettings["DIGIO1EN"]);
-				DIGIOSENTToggleSwitch->setChecked(DIGIOSettings["DIGIO2EN"]);
-				DIGIOACALCToggleSwitch->setChecked(DIGIOSettings["DIGIO3EN"]);
-				DIGIOFAULTToggleSwitch->setChecked(DIGIOSettings["DIGIO4EN"]);
-				DIGIOBOOTLOADERToggleSwitch->setChecked(DIGIOSettings["DIGIO5EN"]);
-				success = true;
+			map<string, bool> DIGIOSettings = m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));;
+			DIGIOSettings["DIGIO5EN"] = value;
+			DIGIOSettings["DIGIO4EN"] = value;
+			DIGIOSettings["DIGIO3EN"] = value;
+			DIGIOSettings["DIGIO2EN"] = value;
+			DIGIOSettings["DIGIO1EN"] = value;
+			DIGIOSettings["DIGIO0EN"] = value;
+			uint16_t newRegisterValue = m_admtController->setDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue), DIGIOSettings);
+
+			if(changeCNVPage(DIGIOENPage)){
+				if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+					m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+					static_cast<uint32_t>(newRegisterValue)) != -1)
+				{
+					success = updateDIGIOToggle();
+				}
 			}
 		}
 	}
@@ -2154,18 +2230,96 @@ void HarmonicCalibration::updateDigioMonitor(){
 
 		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), digioRegisterAddress, digioRegValue) != -1){
 			std::map<std::string, bool> digioBitMapping =  m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*digioRegValue));
-			if(digioBitMapping.at("DIGIO0EN")){ changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor, digioBitMapping.at("BUSY")); }
-			else { changeStatusLEDColor(DIGIOBusyStatusLED, faultLEDColor); }
-			if(digioBitMapping.at("DIGIO1EN")){ changeStatusLEDColor(DIGIOCNVStatusLED, statusLEDColor, digioBitMapping.at("CNV")); }
-			else { changeStatusLEDColor(DIGIOCNVStatusLED, faultLEDColor); }
-			if(digioBitMapping.at("DIGIO2EN")){ changeStatusLEDColor(DIGIOSENTStatusLED, statusLEDColor, digioBitMapping.at("SENT")); }
-			else { changeStatusLEDColor(DIGIOSENTStatusLED, faultLEDColor); }
-			if(digioBitMapping.at("DIGIO3EN")){ changeStatusLEDColor(DIGIOACALCStatusLED, statusLEDColor, digioBitMapping.at("ACALC")); }
-			else { changeStatusLEDColor(DIGIOACALCStatusLED, faultLEDColor); }
-			if(digioBitMapping.at("DIGIO4EN")){ changeStatusLEDColor(DIGIOFaultStatusLED, statusLEDColor, digioBitMapping.at("FAULT")); }
-			else { changeStatusLEDColor(DIGIOFaultStatusLED, faultLEDColor); }
-			if(digioBitMapping.at("DIGIO5EN")){ changeStatusLEDColor(DIGIOBootloaderStatusLED, statusLEDColor, digioBitMapping.at("BOOTLOAD")); }
-			else { changeStatusLEDColor(DIGIOBootloaderStatusLED, faultLEDColor); }
+			if(digioBitMapping.at("DIGIO0EN")){ 
+				if(!digioBitMapping.at("BUSY")){ 
+					changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor); 
+					DIGIOBusyStatusLED->setName("BUSY");
+				}
+				else{
+					changeStatusLEDColor(DIGIOBusyStatusLED, gpioLEDColor); 
+					DIGIOBusyStatusLED->setName("GPIO0");
+				}
+			}
+			else { 
+				changeStatusLEDColor(DIGIOBusyStatusLED, faultLEDColor, false); 
+				DIGIOBusyStatusLED->setName("DIGIO0");
+			}
+
+			if(digioBitMapping.at("DIGIO1EN")){ 
+				if(!digioBitMapping.at("CNV")){ 
+					changeStatusLEDColor(DIGIOCNVStatusLED, statusLEDColor); 
+					DIGIOCNVStatusLED->setName("CNV");
+				}
+				else{
+					changeStatusLEDColor(DIGIOCNVStatusLED, gpioLEDColor); 
+					DIGIOCNVStatusLED->setName("GPIO1");
+				}
+			}
+			else { 
+				changeStatusLEDColor(DIGIOCNVStatusLED, faultLEDColor, false); 
+				DIGIOCNVStatusLED->setName("DIGIO1");
+			}
+
+			if(digioBitMapping.at("DIGIO2EN")){ 
+				if(!digioBitMapping.at("SENT")){ 
+					changeStatusLEDColor(DIGIOSENTStatusLED, statusLEDColor); 
+					DIGIOSENTStatusLED->setName("SENT");
+				}
+				else{
+					changeStatusLEDColor(DIGIOSENTStatusLED, gpioLEDColor); 
+					DIGIOSENTStatusLED->setName("GPIO2");
+				}
+			}
+			else { 
+				changeStatusLEDColor(DIGIOSENTStatusLED, faultLEDColor, false); 
+				DIGIOSENTStatusLED->setName("DIGIO2");
+			}
+
+			if(digioBitMapping.at("DIGIO3EN")){ 
+				if(!digioBitMapping.at("ACALC")){ 
+					changeStatusLEDColor(DIGIOACALCStatusLED, statusLEDColor); 
+					DIGIOACALCStatusLED->setName("ACALC");
+				}
+				else{
+					changeStatusLEDColor(DIGIOACALCStatusLED, gpioLEDColor); 
+					DIGIOACALCStatusLED->setName("GPIO3");
+				}
+			}
+			else { 
+				changeStatusLEDColor(DIGIOACALCStatusLED, faultLEDColor, false); 
+				DIGIOACALCStatusLED->setName("DIGIO3");
+			}
+
+			if(digioBitMapping.at("DIGIO4EN")){ 
+				if(!digioBitMapping.at("FAULT")){ 
+					changeStatusLEDColor(DIGIOFaultStatusLED, statusLEDColor); 
+					DIGIOFaultStatusLED->setName("FAULT");
+				}
+				else{
+					changeStatusLEDColor(DIGIOFaultStatusLED, gpioLEDColor); 
+					DIGIOFaultStatusLED->setName("GPIO4");
+				}
+			}
+			else { 
+				changeStatusLEDColor(DIGIOFaultStatusLED, faultLEDColor, false); 
+				DIGIOFaultStatusLED->setName("DIGIO4");
+			}
+
+			if(digioBitMapping.at("DIGIO5EN")){ 
+				if(!digioBitMapping.at("BOOTLOAD")){ 
+					changeStatusLEDColor(DIGIOBootloaderStatusLED, statusLEDColor); 
+					DIGIOBootloaderStatusLED->setName("BOOTLOAD");
+				}
+				else{
+					changeStatusLEDColor(DIGIOBootloaderStatusLED, gpioLEDColor); 
+					DIGIOBootloaderStatusLED->setName("GPIO5");
+				}
+			}
+			else { 
+				changeStatusLEDColor(DIGIOBootloaderStatusLED, faultLEDColor, false); 
+				DIGIOBootloaderStatusLED->setName("DIGIO5");
+			}
+
 			commandLogWrite("DIGIOEN: 0b" + QString::number(static_cast<uint16_t>(*digioRegValue), 2).rightJustified(16, '0'));
 		}
 		else{ commandLogWrite("Failed to read DIGIOEN Register"); }
