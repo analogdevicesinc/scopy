@@ -150,7 +150,14 @@ private:
 		*AFEDIAGStatusLED, *NVMCRCFaultStatusLED, *ECCDoubleBitErrorStatusLED, *OscillatorDriftStatusLED, *CountSensorFalseStateStatusLED, 
 		*AngleCrossCheckStatusLED, *TurnCountSensorLevelsStatusLED, *MTDIAGStatusLED, *TurnCounterCrossCheckStatusLED, *RadiusCheckStatusLED, *SequencerWatchdogStatusLED;
 
-	CustomSwitch *calibrationDisplayFormatSwitch, *DIGIOBUSYToggleSwitch, *DIGIOCNVToggleSwitch, *DIGIOSENTToggleSwitch, *DIGIOACALCToggleSwitch, *DIGIOFAULTToggleSwitch, *DIGIOBOOTLOADERToggleSwitch, *DIGIOALLToggleSwitch;
+	CustomSwitch *calibrationDisplayFormatSwitch, 
+		*DIGIO0ENToggleSwitch, *DIGIO0FNCToggleSwitch, 
+		*DIGIO1ENToggleSwitch, *DIGIO1FNCToggleSwitch,
+		*DIGIO2ENToggleSwitch, *DIGIO2FNCToggleSwitch,
+		*DIGIO3ENToggleSwitch, *DIGIO3FNCToggleSwitch,
+		*DIGIO4ENToggleSwitch, *DIGIO4FNCToggleSwitch,
+		*DIGIO5ENToggleSwitch, *DIGIO5FNCToggleSwitch, 
+		*DIGIOALLToggleSwitch;
 
 	RegisterBlockWidget *cnvPageRegisterBlock, *digIORegisterBlock, *faultRegisterBlock, *generalRegisterBlock, *digIOEnRegisterBlock, *angleCkRegisterBlock, *eccDcdeRegisterBlock, *eccDisRegisterBlock, *absAngleRegisterBlock, *angleRegisterBlock, *angleSecRegisterBlock, *sineRegisterBlock, *cosineRegisterBlock, *secAnglIRegisterBlock, *secAnglQRegisterBlock, *radiusRegisterBlock, *diag1RegisterBlock, *diag2RegisterBlock, *tmp0RegisterBlock, *tmp1RegisterBlock, *cnvCntRegisterBlock, *uniqID0RegisterBlock, *uniqID1RegisterBlock, *uniqID2RegisterBlock, *uniqID3RegisterBlock, *h1MagRegisterBlock, *h1PhRegisterBlock, *h2MagRegisterBlock, *h2PhRegisterBlock, *h3MagRegisterBlock, *h3PhRegisterBlock, *h8MagRegisterBlock, *h8PhRegisterBlock;
 
@@ -207,9 +214,9 @@ private:
 	void updateCountValue();
 	void changeCustomSwitchLabel(CustomSwitch *customSwitch, QString onLabel, QString offLabel);
 	void readDeviceProperties();
-	void toggleAllDIGIO(bool value);
+	void toggleAllDIGIOEN(bool value);
 	void toggleUtilityTask(bool run);
-	void toggleDIGIOEN(string DIGIOENName, bool value);
+	void toggleDIGIOEN(string DIGIOENName, bool& value);
 	void getCalibrationSamples();
 	void startMotor();
 	void computeSineCosineOfAngles(QVector<double> graphDataList);
@@ -233,6 +240,8 @@ private:
 	void prependAcquisitionData(double& data, QVector<double>& list);
 	void plotAcquisition(QVector<double>& list, PlotChannel* channel, PlotWidget* plot);
 	void populateAngleErrorGraphs();
+	void resetDIGIO();
+	bool updateDIGIOToggle();
 
 	QTimer *acquisitionUITimer, *calibrationUITimer, *utilityTimer;
 

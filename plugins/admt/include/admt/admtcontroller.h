@@ -193,6 +193,7 @@ public:
     map<string, bool> getFaultRegisterBitMapping(uint16_t registerValue);
     map<string, int> getGeneralRegisterBitMapping(uint16_t registerValue);
     map<string, bool> getDIGIOENRegisterBitMapping(uint16_t registerValue);
+    map<string, bool> getDIGIORegisterBitMapping(uint16_t registerValue);
     map<string, bool> getDiag1RegisterBitMapping_Register(uint16_t registerValue);
     map<string, double> getDiag1RegisterBitMapping_Afe(uint16_t registerValue, bool is5V);
     map<string, double> getDiag2RegisterBitMapping(uint16_t registerValue);
@@ -200,6 +201,7 @@ public:
     void postcalibrate(vector<double> PANG, int cycleCount, int samplesPerCycle);
     int getAbsAngleTurnCount(uint16_t registerValue);
     uint16_t setDIGIOENRegisterBitMapping(uint16_t currentRegisterValue, map<string, bool> settings);
+    uint16_t setDIGIORegisterBitMapping(uint16_t currentRegisterValue, map<string, bool> settings);
     void unwrapAngles(vector<double>& angles_rad); 
     map<string, string> getUNIQID3RegisterMapping(uint16_t registerValue);
 private:

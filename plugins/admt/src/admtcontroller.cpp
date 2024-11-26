@@ -945,6 +945,32 @@ map<string, bool> ADMTController::getDIGIOENRegisterBitMapping(uint16_t register
     return result;
 }
 
+map<string, bool> ADMTController::getDIGIORegisterBitMapping(uint16_t registerValue) {
+    map<string, bool> result;
+
+    // Bits 15:6: Reserved (skipped)
+
+    // Bit 5: GPIO5
+    result["GPIO5"] = ((registerValue >> 5) & 0x01) ? true : false; 
+
+    // Bit 4: GPIO4
+    result["GPIO4"] = ((registerValue >> 4) & 0x01) ? true : false;
+
+    // Bit 3: GPIO3
+    result["GPIO3"] = ((registerValue >> 3) & 0x01) ? true : false;
+
+    // Bit 2: GPIO2
+    result["GPIO2"] = ((registerValue >> 2) & 0x01) ? true : false; 
+
+    // Bit 1: GPIO1
+    result["GPIO1"] = ((registerValue >> 1) & 0x01) ? true : false; 
+
+    // Bit 0: GPIO0
+    result["GPIO0"] = (registerValue & 0x01) ? true : false; 
+
+    return result;
+}
+
 map<string, bool> ADMTController::getDiag1RegisterBitMapping_Register(uint16_t registerValue) {
     map<string, bool> result;
 
@@ -1140,7 +1166,135 @@ uint16_t ADMTController::setDIGIOENRegisterBitMapping(uint16_t currentRegisterVa
         registerValue &= ~(1 << 8);  // Clear bit 8 (Disabled)
     }
 
-    // Bits 7:0: (preserve original value)
+    // Bits 7:6: (preserve original value)
+
+    // Bit 5: Bootload
+    if (settings["BOOTLOAD"]) // "Enabled"
+    {
+        registerValue |= (1 << 5);  // Set bit 5 to 1 (Enabled)
+    } 
+    else // "Disabled"
+    {
+        registerValue &= ~(1 << 5);  // Clear bit 5 (Disabled)
+    }
+
+    // Bit 4: Fault
+    if (settings["FAULT"]) // "Enabled"
+    {
+        registerValue |= (1 << 4);  // Set bit 4 to 1 (Enabled)
+    } 
+    else // "Disabled"
+    {
+        registerValue &= ~(1 << 4);  // Clear bit 4 (Disabled)
+    }
+
+    // Bit 3: Acalc
+    if (settings["ACALC"]) // "Enabled"
+    {
+        registerValue |= (1 << 3);  // Set bit 3 to 1 (Enabled)
+    } 
+    else // "Disabled"
+    {
+        registerValue &= ~(1 << 3);  // Clear bit 3 (Disabled)
+    }
+
+    // Bit 2: Sent
+    if (settings["SENT"]) // "Enabled"
+    {
+        registerValue |= (1 << 2);  // Set bit 2 to 1 (Enabled)
+    } 
+    else // "Disabled"
+    {
+        registerValue &= ~(1 << 2);  // Clear bit 2 (Disabled)
+    }
+
+    // Bit 1: Cnv
+    if (settings["CNV"]) // "Enabled"
+    {
+        registerValue |= (1 << 1);  // Set bit 1 to 1 (Enabled)
+    } 
+    else // "Disabled"
+    {
+        registerValue &= ~(1 << 1);  // Clear bit 1 (Disabled)
+    }
+
+    // Bit 0: Sent
+    if (settings["BUSY"]) // "Enabled"
+    {
+        registerValue |= (1 << 0);  // Set bit 0 to 1 (Enabled)
+    } 
+    else // "Disabled"
+    {
+        registerValue &= ~(1 << 0);  // Clear bit 0 (Disabled)
+    }
+
+    return registerValue;
+}
+
+uint16_t ADMTController::setDIGIORegisterBitMapping(uint16_t currentRegisterValue, map<string, bool> settings) {
+    uint16_t registerValue = currentRegisterValue;  // Start with the current register value
+
+    // Bits 15:6: (preserve original value)
+
+    // Bit 5: GPIO5
+    if (settings["GPIO5"]) // "Enabled"
+    {
+        registerValue |= (1 << 5);  // Set bit 5 to 1 (Enabled)
+    } 
+    else // "Disabled"
+    {
+        registerValue &= ~(1 << 5);  // Clear bit 5 (Disabled)
+    }
+
+    // Bit 4: GPIO4
+    if (settings["GPIO4"]) // "Enabled"
+    {
+        registerValue |= (1 << 4);  // Set bit 4 to 1 (Enabled)
+    } 
+    else // "Disabled"
+    {
+        registerValue &= ~(1 << 4);  // Clear bit 4 (Disabled)
+    }
+
+    // Bit 3: GPIO3
+    if (settings["GPIO3"]) // "Enabled"
+    {
+        registerValue |= (1 << 3);  // Set bit 3 to 1 (Enabled)
+    } 
+    else // "Disabled"
+    {
+        registerValue &= ~(1 << 3);  // Clear bit 3 (Disabled)
+    }
+
+    // Bit 2: GPIO2
+    if (settings["GPIO2"]) // "Enabled"
+    {
+        registerValue |= (1 << 2);  // Set bit 2 to 1 (Enabled)
+    } 
+    else // "Disabled"
+    {
+        registerValue &= ~(1 << 2);  // Clear bit 2 (Disabled)
+    }
+
+    // Bit 1: GPIO1
+    if (settings["GPIO1"]) // "Enabled"
+    {
+        registerValue |= (1 << 1);  // Set bit 1 to 1 (Enabled)
+    } 
+    else // "Disabled"
+    {
+        registerValue &= ~(1 << 1);  // Clear bit 1 (Disabled)
+    }
+
+    // Bit 0: GPIO0
+    if (settings["GPIO0"]) // "Enabled"
+    {
+        registerValue |= (1 << 0);  // Set bit 0 to 1 (Enabled)
+    } 
+    else // "Disabled"
+    {
+        registerValue &= ~(1 << 0);  // Clear bit 0 (Disabled)
+    }
 
     return registerValue;
 }
