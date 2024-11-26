@@ -55,7 +55,10 @@ ToolMenuHeaderWidget::ToolMenuHeaderWidget(QString title, QWidget *parent)
 	hLay->addWidget(titleWidget);
 	hLay->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
 	hLay->addWidget(m_ledBtn);
+
 	connect(this, &ToolMenuHeaderWidget::blinkLed, this, &ToolMenuHeaderWidget::onBlinkLed);
+	connect(this, &ToolMenuHeaderWidget::connState, this,
+		[this, parent](QString id, bool isConnected) { setState(id, isConnected, parent); });
 }
 
 ToolMenuHeaderWidget::~ToolMenuHeaderWidget() {}
@@ -79,8 +82,17 @@ void ToolMenuHeaderWidget::setUri(QString uri)
 	m_uriLabel->setText(uri);
 }
 
+void ToolMenuHeaderWidget::setDeviceId(QString deviceId) { m_id = deviceId; }
+
 void ToolMenuHeaderWidget::onBlinkLed(int retCode) { m_ledBtn->ledOn(retCode >= 0); }
 
 QPushButton *ToolMenuHeaderWidget::deviceBtn() const { return m_deviceBtn; }
+
+void ToolMenuHeaderWidget::setState(QString id, bool state, QWidget *parent)
+{
+	if(m_id == id) {
+		Style::setStyle(parent, style::properties::widget::ledBorder, state);
+	}
+}
 
 #include "moc_toolmenuheaderwidget.cpp"
