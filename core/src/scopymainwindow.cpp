@@ -30,6 +30,7 @@
 #include <browsemenu.h>
 #include <deviceautoconnect.h>
 #include <style.h>
+#include <whatsnewoverlay.h>
 
 #include "logging_categories.h"
 #include "qmessagebox.h"
@@ -254,6 +255,13 @@ void ScopyMainWindow::deviceAutoconnect()
 	}
 }
 
+void ScopyMainWindow::showWhatsNew()
+{
+	WhatsNewOverlay *whatsNew = new WhatsNewOverlay(this);
+	whatsNew->move(this->rect().center() - whatsNew->rect().center());
+	QMetaObject::invokeMethod(whatsNew, &WhatsNewOverlay::showOverlay, Qt::QueuedConnection);
+}
+
 void ScopyMainWindow::save()
 {
 	QString selectedFilter;
@@ -351,6 +359,7 @@ void ScopyMainWindow::setupPreferences()
 	if(p->get("general_show_status_bar").toBool()) {
 		StatusBarManager::GetInstance()->setEnabled(true);
 	}
+
 	if(p->get("general_first_run").toBool()) {
 		license = new LicenseOverlay(this);
 		auto versionCheckInfo = new VersionCheckMessage(this);
@@ -358,9 +367,15 @@ void ScopyMainWindow::setupPreferences()
 		StatusBarManager::pushWidget(versionCheckInfo, "Should Scopy check for online versions?");
 
 		QMetaObject::invokeMethod(license, &LicenseOverlay::showOverlay, Qt::QueuedConnection);
+
+		connect(license->getContinueBtn(), &QPushButton::clicked, this, &ScopyMainWindow::showWhatsNew,
+			Qt::QueuedConnection);
+	}
+
+	if(p->get("general_show_whats_new").toBool() && !p->get("general_first_run").toBool()) {
+		showWhatsNew();
 	}
 }
-
 void ScopyMainWindow::initPreferences()
 {
 	QElapsedTimer timer;
@@ -374,6 +389,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_save_session", true);
 	p->init("general_save_attached", true);
 	p->init("general_doubleclick_attach", true);
+	p->init("general_show_whats_new", true);
 #if defined(__linux__) && (defined(__arm__) || defined(__aarch64__))
 	p->init("general_use_opengl", false);
 #else
