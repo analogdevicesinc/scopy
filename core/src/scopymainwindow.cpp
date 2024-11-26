@@ -80,7 +80,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ScopyTitleManager::setScopyVersion("v" + QString(scopy::config::version()));
 	ScopyTitleManager::setGitHash(QString(SCOPY_VERSION_GIT));
 
-	StyleHelper::GetInstance()->initColorMap();
 	IIOUnitsManager::GetInstance();
 	setAttribute(Qt::WA_QuitOnClose, true);
 	initPythonWIN32();

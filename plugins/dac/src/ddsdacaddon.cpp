@@ -35,6 +35,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QScrollArea>
+#include <style.h>
 
 using namespace scopy;
 using namespace scopy::dac;
@@ -93,7 +94,7 @@ QWidget *DdsDacAddon::setupDdsTx(TxNode *txNode)
 	MenuSectionWidget *txLabelSection = new MenuSectionWidget(this);
 	txLabelSection->setProperty("tutorial_name", "TX_INDICATOR");
 	QLabel *txLabel = new QLabel(txNode->getUuid(), txLabelSection);
-	StyleHelper::MenuMediumLabel(txLabel);
+	Style::setStyle(txLabel, style::properties::label::menuMedium);
 	txLabelSection->contentLayout()->addWidget(txLabel);
 	txLabelSection->setFixedHeight(63);
 
