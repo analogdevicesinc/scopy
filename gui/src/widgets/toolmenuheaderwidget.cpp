@@ -69,6 +69,8 @@ ToolMenuHeaderWidget::ToolMenuHeaderWidget(QString title, QWidget *parent)
 	connect(m_timer, &QTimer::timeout, m_timer, &QTimer::stop);
 
 	connect(this, &ToolMenuHeaderWidget::blinkLed, this, &ToolMenuHeaderWidget::onBlinkLed);
+	connect(this, &ToolMenuHeaderWidget::connState, this,
+		[this, parent](QString id, bool isConnected) { setState(id, isConnected, parent); });
 }
 
 ToolMenuHeaderWidget::~ToolMenuHeaderWidget() {}
@@ -92,9 +94,18 @@ void ToolMenuHeaderWidget::setUri(QString uri)
 	m_uriLabel->setText(uri);
 }
 
+void ToolMenuHeaderWidget::setDeviceId(QString deviceId) { m_id = deviceId; }
+
 // To be implemented after IIOManager is available
 void ToolMenuHeaderWidget::onBlinkLed(int retCode) {}
 
 QPushButton *ToolMenuHeaderWidget::deviceBtn() const { return m_deviceBtn; }
+
+void ToolMenuHeaderWidget::setState(QString id, bool state, QWidget *parent)
+{
+	if(m_id == id) {
+		Style::setStyle(parent, style::properties::widget::ledBorder, state);
+	}
+}
 
 #include "moc_toolmenuheaderwidget.cpp"
