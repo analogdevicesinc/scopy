@@ -75,6 +75,13 @@ file(GLOB UI_LIST *.ui)
 
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
+include(ScopyWhatsNew)
+set(FOLDER ${CMAKE_SOURCE_DIR}/resources/whatsnew/)
+set(RESOURCE_FILE ${CMAKE_SOURCE_DIR}/resources/whatsnew/whatsnew.qrc)
+generate_whats_new("${RESOURCE_FILE}" "${FOLDER}")
+file(GLOB WHATS_NEW_RESOURCES resources/whatsnew/whatsnew.qrc)
+qt_add_resources(SCOPY_RESOURCES ${WHATS_NEW_RESOURCES})
+
 include(ScopyAbout)
 configure_about(./resources/about)
 file(GLOB SCOPY_RESOURCE_FILES gui/res/resources.qrc resources/aboutpage.qrc)
