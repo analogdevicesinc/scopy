@@ -571,7 +571,6 @@ void Ad74413r::setupToolTemplate()
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(layout);
-	StyleHelper::GetInstance()->initColorMap();
 
 	m_tool = new ToolTemplate(this);
 	m_tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

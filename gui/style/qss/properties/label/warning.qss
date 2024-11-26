@@ -1,0 +1,3 @@
+QLabel[&&property&&=true] {
+	color: &content_busy&;
+}

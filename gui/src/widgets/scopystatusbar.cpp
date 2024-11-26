@@ -24,6 +24,7 @@
 #include <QApplication>
 #include <QTimer>
 #include <QSizeGrip>
+#include <style.h>
 
 using namespace scopy;
 
@@ -60,7 +61,7 @@ void ScopyStatusBar::initUi()
 
 	m_stackedWidget = new QStackedWidget(this);
 	layout()->addWidget(m_stackedWidget);
-	StyleHelper::ScopyStatusBar(this, "ScopyStatusBar");
+	Style::setStyle(this, style::properties::widget::basicComponent);
 
 	hide();
 }

@@ -20,6 +20,7 @@
 
 #include "faults/faultwidget.h"
 
+#include <style.h>
 #include <utility>
 #include <gui/dynamicWidget.h>
 #include <gui/stylehelper.h>
@@ -48,7 +49,7 @@ FaultWidget::FaultWidget(unsigned int id, QString name, QString faultExplanation
 
 	m_titleLabel = new QLabel(this);
 	m_titleLabel->setText("Bit" + QString::number(m_id));
-	StyleHelper::MenuSmallLabel(m_titleLabel);
+	Style::setStyle(m_titleLabel, style::properties::label::menuSmall);
 
 	layout->addWidget(m_activeLabel, 0, Qt::AlignCenter);
 	layout->addWidget(m_storedLabel, 0, Qt::AlignCenter);

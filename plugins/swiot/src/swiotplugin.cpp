@@ -307,7 +307,7 @@ void SWIOTPlugin::createStatusContainer()
 
 	auto statusLabel = new QLabel("AD-SWIOT1L-SL: The system is powered at limited capacity.");
 	statusLabel->setWordWrap(true);
-	StyleHelper::WarningLabel(statusLabel, "extPsuStatusLabel");
+	Style::setStyle(statusLabel, style::properties::label::warning);
 
 	m_statusContainer->layout()->addWidget(exclamationIcon);
 	m_statusContainer->layout()->addWidget(statusLabel);

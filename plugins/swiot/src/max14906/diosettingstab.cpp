@@ -47,7 +47,7 @@ DioSettingsTab::DioSettingsTab(QWidget *parent)
 
 	QLabel *label = new QLabel(this);
 	label->setText("Polling at 1 sample/second");
-	StyleHelper::MenuSmallLabel(label);
+	Style::setStyle(label, style::properties::label::menuSmall);
 
 	// timespan
 	m_maxSpinButton = new MenuSpinbox(tr("Timespan"), 10, "s", 1, 300, true, false, this);

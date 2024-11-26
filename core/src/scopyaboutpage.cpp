@@ -51,8 +51,6 @@ void ScopyAboutPage::initUI()
 	layout->setSpacing(0);
 	this->setLayout(layout);
 	layout->addWidget(tabWidget);
-
-	StyleHelper::TabWidgetEastMenu(tabWidget, "aboutPageTable");
 }
 
 QWidget *ScopyAboutPage::buildPage(QString src)
