@@ -48,13 +48,10 @@ MenuOnOffSwitch::MenuOnOffSwitch(QString title, QWidget *parent, bool medium)
 	lay->addWidget(m_label);
 	lay->addSpacerItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
 	lay->addWidget(m_switch);
-	applyStylesheet();
 }
 
 MenuOnOffSwitch::~MenuOnOffSwitch() {}
 
 QAbstractButton *MenuOnOffSwitch::onOffswitch() { return m_switch; }
-
-void MenuOnOffSwitch::applyStylesheet() { StyleHelper::MenuOnOffSwitch(this, "menuOnOffSwitch"); }
 
 #include "moc_menuonoffswitch.cpp"

@@ -195,7 +195,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	MenuSectionWidget *channelsSection = new MenuSectionWidget(this);
 	channelsSection->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
 	QLabel *channelsLbl = new QLabel("Channels");
-	StyleHelper::MenuSmallLabel(channelsLbl);
+	Style::setStyle(channelsLbl, style::properties::label::menuSmall);
 
 	QScrollArea *scrollArea = new QScrollArea(channelsSection);
 	scrollArea->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);

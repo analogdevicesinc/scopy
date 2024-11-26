@@ -38,7 +38,6 @@ DacInstrument::DacInstrument(const Connection *conn, QWidget *parent)
 	: QWidget(parent)
 	, m_conn(conn)
 {
-	StyleHelper::GetInstance()->initColorMap();
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *lay = new QHBoxLayout(this);
 	lay->setMargin(0);
