@@ -46,7 +46,7 @@ ToolMenuManager::~ToolMenuManager() {}
 
 void ToolMenuManager::addMenuItem(QString deviceId, DeviceInfo dInfo, int itemIndex)
 {
-	MenuSectionCollapseWidget *devSection = createMenuSectionItem(deviceId, dInfo);
+	MenuSectionCollapseWidget *devSection = createMenuSectionItem(dInfo, deviceId);
 	QButtonGroup *menuBtnGroup = m_toolMenu->btnGroup();
 	for(ToolMenuEntry *tme : qAsConst(dInfo.tools)) {
 		ToolMenuItem *toolMenuItem = createToolMenuItem(tme, devSection);
@@ -288,29 +288,64 @@ void ToolMenuManager::setTmeAttached(ToolMenuEntry *tme)
 	tme->setAttached(!tme->attached());
 }
 
-MenuSectionCollapseWidget *ToolMenuManager::createMenuSectionItem(QString deviceId, DeviceInfo dInfo)
+MenuSectionCollapseWidget *ToolMenuManager::createMenuSectionItem(const DeviceInfo &dInfo, const QString &deviceId)
 {
-	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget(
-		dInfo.name, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_TOOLMENUWIDGET, m_toolMenu);
+	MenuCollapseSection::MenuHeaderWidgetType type = Preferences::get("device_menu_item").toBool()
+		? MenuCollapseSection::MHW_TOOLMENUWIDGET
+		: MenuCollapseSection::MHW_COMPOSITEWIDGET;
+	MenuSectionCollapseWidget *section =
+		new MenuSectionCollapseWidget(dInfo.name, MenuCollapseSection::MHCW_ARROW, type, m_toolMenu);
 	section->contentLayout()->setSpacing(0);
 	section->menuSection()->layout()->setMargin(0);
 	section->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
 	MenuCollapseHeader *collapseHeader = getCollapseSectionHeader(section);
 	if(collapseHeader) {
-		ToolMenuHeaderWidget *thw = dynamic_cast<ToolMenuHeaderWidget *>(collapseHeader->headerWidget());
-		if(thw) {
-			thw->setUri(dInfo.param);
-			thw->setDeviceIcon(dInfo.icon);
-			thw->layout()->setContentsMargins(Style::getDimension(json::global::unit_1), 0, 0, 0);
-			connect(thw->deviceBtn(), &QPushButton::pressed, this,
-				[this, deviceId]() { Q_EMIT requestDevicePage(deviceId); });
-		}
+		initHeaderWidget(type, collapseHeader, dInfo, deviceId);
 		Style::setStyle(collapseHeader, style::properties::widget::bottomBorder);
 	}
 	section->setCollapsed(false);
 	section->hide();
 	return section;
+}
+
+void ToolMenuManager::initHeaderWidget(MenuCollapseSection::MenuHeaderWidgetType type, MenuCollapseHeader *header,
+				       const DeviceInfo &dInfo, const QString &deviceId)
+{
+	switch(type) {
+	case MenuCollapseSection::MHW_TOOLMENUWIDGET:
+		initToolMenuHeaderWidget(header, dInfo, deviceId);
+		break;
+	case MenuCollapseSection::MHW_COMPOSITEWIDGET:
+		initCompositeHeaderWidget(header, dInfo);
+		break;
+	default:
+		break;
+	}
+}
+
+void ToolMenuManager::initToolMenuHeaderWidget(MenuCollapseHeader *header, const DeviceInfo &dInfo,
+					       const QString &deviceId)
+{
+	ToolMenuHeaderWidget *thw = dynamic_cast<ToolMenuHeaderWidget *>(header->headerWidget());
+	if(!thw) {
+		return;
+	}
+	thw->setUri(dInfo.param);
+	thw->setDeviceIcon(dInfo.icon);
+	thw->layout()->setContentsMargins(Style::getDimension(json::global::unit_1), 0, 0, 0);
+	connect(thw->deviceBtn(), &QPushButton::pressed, this,
+		[this, deviceId]() { Q_EMIT requestDevicePage(deviceId); });
+}
+
+void ToolMenuManager::initCompositeHeaderWidget(MenuCollapseHeader *header, const DeviceInfo &dInfo)
+{
+	CompositeHeaderWidget *chw = dynamic_cast<CompositeHeaderWidget *>(header->headerWidget());
+	if(!chw) {
+		return;
+	}
+	chw->add(new QLabel(dInfo.param));
+	chw->layout()->setContentsMargins(Style::getDimension(json::global::unit_1), 0, 0, 0);
 }
 
 ToolMenuItem *ToolMenuManager::createToolMenuItem(ToolMenuEntry *tme, QWidget *parent)
