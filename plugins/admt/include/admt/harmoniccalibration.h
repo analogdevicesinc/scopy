@@ -178,7 +178,6 @@ private:
 	void updateLabelValue(QLabel* label, int channelIndex);
 	void updateLabelValue(QLabel *label, ADMTController::MotorAttribute attribute);
 	void updateChannelValue(int channelIndex);
-	void calibrateData();
 	void extractCalibrationData();
 	void importCalibrationData();
 	void calibrationLogWrite(QString message = "");
@@ -189,7 +188,7 @@ private:
 	void applyLabelStyle(QLabel *widget);
 	void initializeMotor();
 	void stepMotorAcquisition(double step = -408);
-	void clearRawDataList();
+	void resetAllCalibrationState();
 	void connectLineEditToRPSConversion(QLineEdit* lineEdit, double& vmax);
 	void connectLineEditToNumberWrite(QLineEdit* lineEdit, double& variable, ADMTController::MotorAttribute attribute);
 	double convertRPStoVMAX(double rps);
@@ -240,8 +239,13 @@ private:
 	void prependAcquisitionData(double& data, QVector<double>& list);
 	void plotAcquisition(QVector<double>& list, PlotChannel* channel, PlotWidget* plot);
 	void populateAngleErrorGraphs();
+	void populateCorrectedAngleErrorGraphs();
 	void resetDIGIO();
 	bool updateDIGIOToggle();
+	void clearPostCalibrationSamples();
+	void clearAngleErrorGraphs();
+	void clearCorrectedAngleErrorGraphs();
+	void clearCalibrationSineCosine();
 
 	QTimer *acquisitionUITimer, *calibrationUITimer, *utilityTimer;
 
