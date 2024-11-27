@@ -335,6 +335,13 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 				     "allowing the application to automatically populate the device list with connected"
 				     "devices. Otherwise, all devices need to be added manually from the Add page.",
 				     generalSection));
+	generalSection->contentLayout()->addWidget(PREFERENCE_CHECK_BOX(
+		p, "device_menu_item", "Show detailed device header in tool menu",
+		"Toggle the display of a detailed device header in the tool menu. "
+		"This header includes the device name, URI, icon, and status indicators. "
+		"Clicking the device icon navigates to the device configuration page, if available. "
+		"Note: Enabling this option requires removing and re-adding all devices in the tool menu.",
+		generalSection));
 	generalSection->contentLayout()->addWidget(PREFERENCE_FILE_BROWSER(
 		p, "iio_emu_dir_path", "Set the iio-emu location",
 		"Specifies the location of the iio-emu executable. By default, iio-emu is located next "

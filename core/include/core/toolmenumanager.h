@@ -79,9 +79,13 @@ private:
 	void attachSuccesful(ToolMenuItem *toolMenuItem);
 	void showTool(ToolMenuItem *toolMenuItem);
 	void setTmeAttached(ToolMenuEntry *tme);
-	MenuSectionCollapseWidget *createMenuSectionItem(QString deviceId, DeviceInfo dInfo);
+	MenuSectionCollapseWidget *createMenuSectionItem(const DeviceInfo &dInfo, const QString &deviceId);
 	ToolMenuItem *createToolMenuItem(ToolMenuEntry *tme, QWidget *parent = nullptr);
 	MenuCollapseHeader *getCollapseSectionHeader(MenuSectionCollapseWidget *section);
+	void initHeaderWidget(MenuCollapseSection::MenuHeaderWidgetType type, MenuCollapseHeader *header,
+			      const DeviceInfo &dInfo, const QString &deviceId);
+	void initToolMenuHeaderWidget(MenuCollapseHeader *header, const DeviceInfo &dInfo, const QString &deviceId);
+	void initCompositeHeaderWidget(MenuCollapseHeader *header, const DeviceInfo &dInfo);
 
 	QString m_prevItem;
 	QStringList m_connectedDev;
