@@ -6,7 +6,7 @@
 #include <admtstylehelper.h>
 
 static int acquisitionUITimerRate = 50;
-static int calibrationUITimerRate = 50;
+static int calibrationUITimerRate = 300;
 static int utilityTimerRate = 1000;
 
 static int bufferSize = 1;
@@ -19,7 +19,6 @@ static double *tempGraphValue;
 static int cycleCount = 11;
 static int samplesPerCycle = 256;
 static int totalSamplesCount = cycleCount * samplesPerCycle;
-static int samplesCollected = 0;
 static bool isStartAcquisition = false;
 static bool isStartMotor = false;
 static bool isPostCalibration = false;
@@ -1032,6 +1031,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 		isStartMotor = b;
 		if(b){
 			isPostCalibration = false;
+			graphPostDataList.reserve(totalSamplesCount);
+			graphDataList.reserve(totalSamplesCount);
 			startMotor();
 		}
 	});
@@ -1119,7 +1120,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	connect(calibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::postCalibrateData);
 	connect(extractDataButton, &QPushButton::clicked, this, &HarmonicCalibration::extractCalibrationData);
 	connect(importSamplesButton, &QPushButton::clicked, this, &HarmonicCalibration::importCalibrationData);
-	connect(clearCalibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::clearRawDataList);
+	connect(clearCalibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::resetAllCalibrationState);
 	connectLineEditToRPSConversion(motorMaxVelocitySpinBox->lineEdit(), rotate_vmax);
 	connectLineEditToAMAXConversion(motorAccelTimeSpinBox->lineEdit(), amax);
 	connectLineEditToNumberWrite(motorMaxDisplacementSpinBox->lineEdit(), dmax, ADMTController::MotorAttribute::DMAX);
@@ -2560,39 +2561,6 @@ void HarmonicCalibration::connectLineEditToNumberWrite(QLineEdit* lineEdit, doub
     });
 }
 
-// void HarmonicCalibration::connectLineEditToGraphSamples(QLineEdit* lineEdit, int& variable, Sismograph* graph, int min, int max)
-// {
-//     connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit, graph, min, max]() {
-//         bool ok;
-//         int value = lineEdit->text().toInt(&ok);
-//         if (ok && value >= min && value <= max) {
-//             variable = value;
-// 			graph->setNumSamples(variable);
-//         } else {
-//             lineEdit->setText(QString::number(variable));
-//         }
-//     });
-// }
-
-// void HarmonicCalibration::connectMenuComboToGraphDirection(MenuCombo* menuCombo, Sismograph* graph)
-// {
-// 	QComboBox *combo = menuCombo->combo();
-// 	connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [combo, graph]() {
-// 		int value = qvariant_cast<int>(combo->currentData());
-// 		switch(value)
-// 		{
-// 			case Sismograph::LEFT_TO_RIGHT:
-// 				graph->setPlotDirection(Sismograph::LEFT_TO_RIGHT);
-// 				graph->reset();
-// 				break;
-// 			case Sismograph::RIGHT_TO_LEFT:
-// 				graph->setPlotDirection(Sismograph::RIGHT_TO_LEFT);
-// 				graph->reset();
-// 				break;
-// 		}
-// 	});
-// }
-
 void HarmonicCalibration::connectMenuComboToNumber(MenuCombo* menuCombo, double& variable)
 {
 	QComboBox *combo = menuCombo->combo();
@@ -2608,50 +2576,6 @@ void HarmonicCalibration::connectMenuComboToNumber(MenuCombo* menuCombo, int& va
 		variable = qvariant_cast<int>(combo->currentData());
 	});
 }
-
-// void HarmonicCalibration::changeGraphColorByChannelName(Sismograph* graph, const char* channelName)
-// {
-// 	int index = m_admtController->getChannelIndex(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), channelName);
-// 	if(index > -1){
-// 		graph->setColor(StyleHelper::getColor( QString::fromStdString("CH" + std::to_string(index) )));
-// 	}
-// }
-
-// void HarmonicCalibration::connectMenuComboToGraphChannel(MenuCombo* menuCombo, Sismograph* graph)
-// {
-// 	QComboBox *combo = menuCombo->combo();
-// 	connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, combo, graph]() {
-// 		int currentIndex = combo->currentIndex();
-// 		QVariant currentData = combo->currentData();
-// 		char *value = reinterpret_cast<char*>(currentData.value<void*>());
-// 		switch(currentIndex)
-// 		{
-// 			case ADMTController::Channel::ROTATION:
-// 				dataGraphValue = &rotation;
-// 				graph->setUnitOfMeasure("Degree", "°");
-// 				graph->setAxisScale(QwtAxis::YLeft, -30.0, 390.0);
-// 				graph->setNumSamples(dataGraphSamples);
-// 				graph->setAxisTitle(QwtAxis::YLeft, tr("Degree (°)"));
-// 				break;
-// 			case ADMTController::Channel::ANGLE:
-// 				dataGraphValue = &angle;
-// 				graph->setUnitOfMeasure("Degree", "°");
-// 				graph->setAxisScale(QwtAxis::YLeft, -30.0, 390.0);
-// 				graph->setNumSamples(dataGraphSamples);
-// 				graph->setAxisTitle(QwtAxis::YLeft, tr("Degree (°)"));
-// 				break;
-// 			case ADMTController::Channel::COUNT:
-// 				dataGraphValue = &count;
-// 				graph->setUnitOfMeasure("Count", "");
-// 				graph->setAxisScale(QwtAxis::YLeft, -1.0, 20.0);
-// 				graph->setNumSamples(dataGraphSamples);
-// 				graph->setAxisTitle(QwtAxis::YLeft, tr("Count"));
-// 				break;
-// 		}
-// 		changeGraphColorByChannelName(graph, value);
-// 		graph->reset();
-// 	});
-// }
 
 void HarmonicCalibration::connectLineEditToRPSConversion(QLineEdit* lineEdit, double& vmax)
 {
@@ -2875,6 +2799,7 @@ void HarmonicCalibration::getCalibrationSamples()
 		}
 	}
 	else{
+		clearCalibrationSineCosine();
 		while(isStartMotor && graphDataList.size() < totalSamplesCount){
 			stepMotorAcquisition();
 			updateChannelValue(ADMTController::Channel::ANGLE);
@@ -2899,7 +2824,16 @@ void HarmonicCalibration::startMotor()
 
 	if(resetToZero && !isPostCalibration){
 		clearCalibrationSamples();
+		clearPostCalibrationSamples();
+		clearAngleErrorGraphs();
+		clearCorrectedAngleErrorGraphs();
 	}
+
+	if(isPostCalibration) 
+		calibrationDataGraphTabWidget->setCurrentIndex(1); // Set tab to Post Calibration Samples
+	else
+		calibrationDataGraphTabWidget->setCurrentIndex(0); // Set tab to Calibration Samples
+
 	QFuture<void> future = QtConcurrent::run(this, &HarmonicCalibration::getCalibrationSamples);
 	QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
 
@@ -2914,44 +2848,25 @@ void HarmonicCalibration::startMotor()
 		
 		if(isPostCalibration)
 		{
-			if(samplesCollected == totalSamplesCount) 
+			if(static_cast<int>(graphPostDataList.size()) == totalSamplesCount) 
 			{
 				computeSineCosineOfAngles(graphPostDataList);
 				m_admtController->postcalibrate(vector<double>(graphPostDataList.begin(), graphPostDataList.end()), cycleCount, samplesPerCycle);
+				populateCorrectedAngleErrorGraphs();
 				isPostCalibration = false;
 				isStartMotor = false;
 				canStartMotor(true);
-				QVector correctedError(m_admtController->correctedError.begin(), m_admtController->correctedError.end());
-				correctedErrorPlotChannel->curve()->setSamples(correctedError);
-				auto correctedErrorMagnitudeMinMax = std::minmax_element(correctedError.begin(), correctedError.end());
-				correctedErrorYPlotAxis->setInterval(*correctedErrorMagnitudeMinMax.first, *correctedErrorMagnitudeMinMax.second);
-				correctedErrorXPlotAxis->setMax(correctedError.size());
-				correctedErrorPlotWidget->replot();
-
-				QVector FFTCorrectedErrorMagnitude(m_admtController->FFTCorrectedErrorMagnitude.begin(), m_admtController->FFTCorrectedErrorMagnitude.end());
-				QVector FFTCorrectedErrorPhase(m_admtController->FFTCorrectedErrorPhase.begin(), m_admtController->FFTCorrectedErrorPhase.end());
-				FFTCorrectedErrorMagnitudeChannel->curve()->setSamples(FFTCorrectedErrorMagnitude);
-				FFTCorrectedErrorPhaseChannel->curve()->setSamples(FFTCorrectedErrorPhase);
-				auto FFTCorrectedErrorMagnitudeMinMax = std::minmax_element(FFTCorrectedErrorMagnitude.begin(), FFTCorrectedErrorMagnitude.end());
-				auto FFTCorrectedErrorPhaseMinMax = std::minmax_element(FFTCorrectedErrorPhase.begin(), FFTCorrectedErrorPhase.end());
-				double FFTCorrectedErrorPlotMin = *FFTCorrectedErrorMagnitudeMinMax.first < *FFTCorrectedErrorPhaseMinMax.first ? *FFTCorrectedErrorMagnitudeMinMax.first : *FFTCorrectedErrorPhaseMinMax.first;
-				double FFTCorrectedErrorPlotMax = *FFTCorrectedErrorMagnitudeMinMax.second > *FFTCorrectedErrorPhaseMinMax.second ? *FFTCorrectedErrorMagnitudeMinMax.second : *FFTCorrectedErrorPhaseMinMax.second;
-				FFTCorrectedErrorYPlotAxis->setInterval(FFTCorrectedErrorPlotMin, FFTCorrectedErrorPlotMax);
-				FFTCorrectedErrorXPlotAxis->setMax(FFTCorrectedErrorMagnitude.size());
-				FFTCorrectedErrorPlotWidget->replot();
+				resetToZero = true;
 			}
 		}
 		else{
-			if(samplesCollected == totalSamplesCount) 
+			if(static_cast<int>(graphDataList.size()) == totalSamplesCount) 
 			{
 				computeSineCosineOfAngles(graphDataList);
-				canCalibrate(true); 
-
 				calibrationLogWrite(m_admtController->calibrate(vector<double>(graphDataList.begin(), graphDataList.end()), cycleCount, samplesPerCycle));
-
 				flashHarmonicValues();
-
 				populateAngleErrorGraphs();
+				canCalibrate(true); 
 			}
 			else{
 				resetToZero = true;
@@ -2960,6 +2875,31 @@ void HarmonicCalibration::startMotor()
 	});
 	connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));
 	watcher->setFuture(future);
+}
+
+void HarmonicCalibration::populateCorrectedAngleErrorGraphs()
+{
+	QVector<double> correctedError(m_admtController->correctedError.begin(), m_admtController->correctedError.end());
+	QVector<double> FFTCorrectedErrorMagnitude(m_admtController->FFTCorrectedErrorMagnitude.begin(), m_admtController->FFTCorrectedErrorMagnitude.end());
+	QVector<double> FFTCorrectedErrorPhase(m_admtController->FFTCorrectedErrorPhase.begin(), m_admtController->FFTCorrectedErrorPhase.end());
+
+	correctedErrorPlotChannel->curve()->setSamples(correctedError);
+	auto correctedErrorMagnitudeMinMax = std::minmax_element(correctedError.begin(), correctedError.end());
+	correctedErrorYPlotAxis->setInterval(*correctedErrorMagnitudeMinMax.first, *correctedErrorMagnitudeMinMax.second);
+	correctedErrorXPlotAxis->setMax(correctedError.size());
+	correctedErrorPlotWidget->replot();
+
+	FFTCorrectedErrorMagnitudeChannel->curve()->setSamples(FFTCorrectedErrorMagnitude);
+	FFTCorrectedErrorPhaseChannel->curve()->setSamples(FFTCorrectedErrorPhase);
+	auto FFTCorrectedErrorMagnitudeMinMax = std::minmax_element(FFTCorrectedErrorMagnitude.begin(), FFTCorrectedErrorMagnitude.end());
+	auto FFTCorrectedErrorPhaseMinMax = std::minmax_element(FFTCorrectedErrorPhase.begin(), FFTCorrectedErrorPhase.end());
+	double FFTCorrectedErrorPlotMin = *FFTCorrectedErrorMagnitudeMinMax.first < *FFTCorrectedErrorPhaseMinMax.first ? *FFTCorrectedErrorMagnitudeMinMax.first : *FFTCorrectedErrorPhaseMinMax.first;
+	double FFTCorrectedErrorPlotMax = *FFTCorrectedErrorMagnitudeMinMax.second > *FFTCorrectedErrorPhaseMinMax.second ? *FFTCorrectedErrorMagnitudeMinMax.second : *FFTCorrectedErrorPhaseMinMax.second;
+	FFTCorrectedErrorYPlotAxis->setInterval(FFTCorrectedErrorPlotMin, FFTCorrectedErrorPlotMax);
+	FFTCorrectedErrorXPlotAxis->setMax(FFTCorrectedErrorMagnitude.size());
+	FFTCorrectedErrorPlotWidget->replot();
+
+	resultDataTabWidget->setCurrentIndex(2); // Set tab to Angle Error
 }
 
 void HarmonicCalibration::populateAngleErrorGraphs()
@@ -2991,35 +2931,6 @@ void HarmonicCalibration::canStartMotor(bool value)
 {
 	calibrationStartMotorButton->setEnabled(value);
 }
-
-void HarmonicCalibration::calibrateData()
-{
-	calibrationLogWrite("==== Calibration Start ====");
-	
-	calibrationLogWrite(m_admtController->calibrate(vector<double>(graphDataList.begin(), graphDataList.end()), cycleCount, samplesPerCycle));
-
-	flashHarmonicValues();
-
-	QVector<double> angleError = QVector<double>(m_admtController->angleError.begin(), m_admtController->angleError.end());
-	QVector<double> FFTAngleErrorMagnitude = QVector<double>(m_admtController->FFTAngleErrorMagnitude.begin(), m_admtController->FFTAngleErrorMagnitude.end());
-	QVector<double> FFTAngleErrorPhase = QVector<double>(m_admtController->FFTAngleErrorPhase.begin(), m_admtController->FFTAngleErrorPhase.end());
-
-	angleErrorPlotChannel->curve()->setSamples(angleError);
-	auto angleErrorMinMax = std::minmax_element(angleError.begin(), angleError.end());
-	angleErrorYPlotAxis->setInterval(*angleErrorMinMax.first, *angleErrorMinMax.second);
-	angleErrorXPlotAxis->setInterval(0, angleError.size());
-	angleErrorPlotWidget->replot();
-	
-	FFTAngleErrorMagnitudeChannel->curve()->setSamples(FFTAngleErrorMagnitude);
-	auto angleErrorMagnitudeMinMax = std::minmax_element(FFTAngleErrorMagnitude.begin(), FFTAngleErrorMagnitude.end());
-	FFTAngleErrorPhaseChannel->curve()->setSamples(FFTAngleErrorPhase);
-	auto angleErrorPhaseMinMax = std::minmax_element(FFTAngleErrorPhase.begin(), FFTAngleErrorPhase.end());
-	double FFTAngleErrorPlotMin = *angleErrorMagnitudeMinMax.first < *angleErrorPhaseMinMax.first ? *angleErrorMagnitudeMinMax.first : *angleErrorPhaseMinMax.first;
-	double FFTAngleErrorPlotMax = *angleErrorMagnitudeMinMax.second > *angleErrorPhaseMinMax.second ? *angleErrorMagnitudeMinMax.second : *angleErrorPhaseMinMax.second;
-	FFTAngleErrorYPlotAxis->setInterval(FFTAngleErrorPlotMin, FFTAngleErrorPlotMax);
-	FFTAngleErrorXPlotAxis->setInterval(0, FFTAngleErrorMagnitude.size());
-	FFTAngleErrorPlotWidget->replot();
-}	
 
 void HarmonicCalibration::flashHarmonicValues()
 {
@@ -3306,11 +3217,11 @@ void HarmonicCalibration::importCalibrationData()
 			calibrationRawDataPlotWidget->replot();
 
 			computeSineCosineOfAngles(graphDataList);
-			canStartMotor(false);
-			canCalibrate(true);
 			calibrationLogWrite(m_admtController->calibrate(vector<double>(graphDataList.begin(), graphDataList.end()), cycleCount, samplesPerCycle));
 			flashHarmonicValues();
 			populateAngleErrorGraphs();
+			canStartMotor(false);
+			canCalibrate(true);
 		}
 	} catch(FileManagerException &ex) {
 		calibrationLogWrite(QString(ex.what()));
@@ -3342,26 +3253,13 @@ void HarmonicCalibration::stepMotorAcquisition(double step)
 	}
 }
 
-void HarmonicCalibration::clearRawDataList()
+void HarmonicCalibration::resetAllCalibrationState()
 {
 	clearCalibrationSamples();
+	clearPostCalibrationSamples();
 
-	graphPostDataList.clear();
-	postCalibrationRawDataPlotChannel->curve()->setData(nullptr);
-	postCalibrationSineDataPlotChannel->curve()->setData(nullptr);
-	postCalibrationCosineDataPlotChannel->curve()->setData(nullptr);
-	postCalibrationRawDataPlotWidget->replot();
-
-	angleErrorPlotChannel->curve()->setData(nullptr);
-	angleErrorPlotWidget->replot();
-	FFTAngleErrorMagnitudeChannel->curve()->setData(nullptr);
-	FFTAngleErrorPhaseChannel->curve()->setData(nullptr);
-	FFTAngleErrorPlotWidget->replot();
-	correctedErrorPlotChannel->curve()->setData(nullptr);
-	correctedErrorPlotWidget->replot();
-	FFTCorrectedErrorMagnitudeChannel->curve()->setData(nullptr);
-	FFTCorrectedErrorPhaseChannel->curve()->setData(nullptr);
-	FFTCorrectedErrorPlotWidget->replot();
+	clearAngleErrorGraphs();
+	clearCorrectedAngleErrorGraphs();
 
 	canCalibrate(false);
 	canStartMotor(true);
@@ -3378,6 +3276,40 @@ void HarmonicCalibration::clearCalibrationSamples()
 	calibrationSineDataPlotChannel->curve()->setData(nullptr);
 	calibrationCosineDataPlotChannel->curve()->setData(nullptr);
 	calibrationRawDataPlotWidget->replot();
+}
+
+void HarmonicCalibration::clearCalibrationSineCosine()
+{
+	calibrationSineDataPlotChannel->curve()->setData(nullptr);
+	calibrationCosineDataPlotChannel->curve()->setData(nullptr);
+	calibrationRawDataPlotWidget->replot();
+}
+
+void HarmonicCalibration::clearPostCalibrationSamples()
+{
+	graphPostDataList.clear();
+	postCalibrationRawDataPlotChannel->curve()->setData(nullptr);
+	postCalibrationSineDataPlotChannel->curve()->setData(nullptr);
+	postCalibrationCosineDataPlotChannel->curve()->setData(nullptr);
+	postCalibrationRawDataPlotWidget->replot();
+}
+
+void HarmonicCalibration::clearAngleErrorGraphs()
+{
+	angleErrorPlotChannel->curve()->setData(nullptr);
+	angleErrorPlotWidget->replot();
+	FFTAngleErrorMagnitudeChannel->curve()->setData(nullptr);
+	FFTAngleErrorPhaseChannel->curve()->setData(nullptr);
+	FFTAngleErrorPlotWidget->replot();
+}
+
+void HarmonicCalibration::clearCorrectedAngleErrorGraphs()
+{
+	correctedErrorPlotChannel->curve()->setData(nullptr);
+	correctedErrorPlotWidget->replot();
+	FFTCorrectedErrorMagnitudeChannel->curve()->setData(nullptr);
+	FFTCorrectedErrorPhaseChannel->curve()->setData(nullptr);
+	FFTCorrectedErrorPlotWidget->replot();
 }
 
 void HarmonicCalibration::applyTextStyle(QWidget *widget, const QString& styleHelperColor, bool isBold)
