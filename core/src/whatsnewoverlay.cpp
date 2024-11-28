@@ -65,7 +65,6 @@ WhatsNewOverlay::WhatsNewOverlay(QWidget *parent)
 
 	// version picker
 	m_versionCb = new QComboBox(optionsoverlayControllWidget);
-	optionsControllLayout->addWidget(m_versionCb);
 
 	connect(m_versionCb, qOverload<int>(&QComboBox::currentIndexChanged), this,
 		[=](int idx) { m_carouselWidget->setCurrentIndex(idx); });
@@ -76,6 +75,7 @@ WhatsNewOverlay::WhatsNewOverlay(QWidget *parent)
 	optionsControllLayout->addWidget(okButton);
 
 	mainLayout->addWidget(m_carouselWidget);
+	mainLayout->addWidget(m_versionCb);
 	mainLayout->addWidget(overlayControllWidget);
 	Style::setBackgroundColor(this, json::theme::background_primary);
 
