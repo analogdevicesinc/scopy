@@ -33,6 +33,7 @@ ToolMenuHeaderWidget::ToolMenuHeaderWidget(QString title, QWidget *parent)
 	hLay->setSpacing(10);
 
 	m_deviceBtn = new QPushButton(this);
+	m_deviceBtn->setCheckable(true);
 
 	QWidget *titleWidget = new QWidget(this);
 	QVBoxLayout *titleLay = new QVBoxLayout(titleWidget);
