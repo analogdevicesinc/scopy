@@ -181,8 +181,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(m_toolMenuManager, &ToolMenuManager::requestToolSelect, ts, &ToolStack::show);
 	connect(m_toolMenuManager, &ToolMenuManager::requestToolSelect, dtm, &DetachedToolWindowManager::show);
 	connect(m_toolMenuManager, &ToolMenuManager::toolStackChanged, browseMenu, &BrowseMenu::onToolStackChanged);
-	connect(m_toolMenuManager, &ToolMenuManager::requestDevicePage, this,
-		[this, ts](QString id) { showDevicePage(id, ts); });
 	connect(hp, &ScopyHomePage::displayNameChanged, m_toolMenuManager, &ToolMenuManager::onDisplayNameChanged);
 	connect(ts, &ToolStack::currentChanged, this, [this, ts](int idx) { highlightMenuItem(ts, idx); });
 
@@ -267,13 +265,6 @@ void ScopyMainWindow::highlightMenuItem(ToolStack *ts, int idx)
 	QWidget *crtWidget = ts->widget(idx);
 	QString id = ts->getKey(crtWidget);
 	Q_EMIT m_toolMenuManager->toolStackChanged(id);
-}
-
-void ScopyMainWindow::showDevicePage(QString id, ToolStack *ts)
-{
-	QString hpKey = ts->getKey(hp);
-	ts->show(hpKey);
-	hp->viewDevice(id);
 }
 
 void ScopyMainWindow::save()
@@ -667,12 +658,16 @@ void ScopyMainWindow::addDeviceToUi(QString id, Device *d)
 	DeviceInfo dInfo = {id, d->displayName(), d->param(), d->iconPixmap(), d->toolList()};
 	m_toolMenuManager->addMenuItem(dInfo);
 	hp->addDevice(id, d);
+	auto ts = ui->wsToolStack;
+	ts->add(id, d->configPage());
 }
 
 void ScopyMainWindow::removeDeviceFromUi(QString id)
 {
 	m_toolMenuManager->removeMenuItem(id);
 	hp->removeDevice(id);
+	auto ts = ui->wsToolStack;
+	ts->remove(id);
 }
 
 void ScopyMainWindow::receiveVersionDocument(QJsonDocument document)

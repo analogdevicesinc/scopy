@@ -87,6 +87,7 @@ void DeviceImpl::loadPlugins()
 	loadIcons();
 	loadBadges();
 	loadPages();
+	loadConfigPage();
 	loadToolList();
 	if(m_plugins.isEmpty()) {
 		connbtn->hide();
@@ -208,6 +209,18 @@ void DeviceImpl::loadPages()
 		if(p->loadPage()) {
 			m_scrollAreaLayout->addWidget(p->page());
 			break; // Only display the page from the plugin with the highest priority
+		}
+	}
+}
+
+void DeviceImpl::loadConfigPage()
+{
+	m_configPage = new QTabWidget();
+	m_configPage->setTabPosition(QTabWidget::South);
+
+	for(auto &&p : plugins()) {
+		if(p->loadConfigPage()) {
+			m_configPage->addTab(p->configPage(), p->name());
 		}
 	}
 }
@@ -445,6 +458,8 @@ QPixmap DeviceImpl::iconPixmap()
 	}
 	return pixmap;
 }
+
+QWidget *DeviceImpl::configPage() { return m_configPage; }
 
 QWidget *DeviceImpl::page() { return m_page; }
 
