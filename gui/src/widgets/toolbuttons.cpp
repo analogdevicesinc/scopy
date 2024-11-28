@@ -109,7 +109,7 @@ bool InfoBtn::hasTutorial() { return m_hasTutorial; }
 void InfoBtn::generateInfoPopup(QWidget *parent)
 {
 	m_popupWidget = new PopupWidget(parent);
-	m_popupWidget->move(parent->rect().center() - m_popupWidget->rect().center());
+	m_popupWidget->enableCenterOnParent(true);
 	m_popupWidget->setTitle("Plugin Information");
 	m_popupWidget->setDescription(
 		"To learn more about this plugin, check out the tutorial or read the online documentation.");
