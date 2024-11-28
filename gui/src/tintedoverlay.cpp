@@ -30,9 +30,10 @@ TintedOverlay::TintedOverlay(QWidget *parent, QColor color)
 	this->parent = parent;
 	holes.clear();
 
-	QRect geo = parent->rect();
-	setGeometry(geo);
+	setGeometry(parent->rect());
 	setAttribute(Qt::WA_TransparentForMouseEvents, false);
+
+	parent->installEventFilter(this);
 }
 
 TintedOverlay::~TintedOverlay() {}
@@ -63,6 +64,15 @@ void TintedOverlay::paintEvent(QPaintEvent *ev)
 		setMask(rect());
 	}
 	painter.fillRect(rect(), color);
+}
+
+bool TintedOverlay::eventFilter(QObject *watched, QEvent *event)
+{
+	if(event->type() == QEvent::Resize) {
+		setGeometry(parent->rect());
+	}
+
+	return QObject::eventFilter(watched, event);
 }
 
 void TintedOverlay::mousePressEvent(QMouseEvent *ev)

@@ -37,6 +37,7 @@ LicenseOverlay::LicenseOverlay(QWidget *parent)
 	m_popupWidget->enableTitleBar(false);
 	m_popupWidget->enableTintedOverlay(true);
 	m_popupWidget->setDescription(getLicense());
+	m_popupWidget->enableCenterOnParent(true);
 
 	connect(m_popupWidget->getContinueBtn(), &QAbstractButton::clicked, [&]() {
 		Preferences::GetInstance()->set("general_first_run", false);
@@ -55,7 +56,6 @@ void LicenseOverlay::showOverlay()
 {
 	raise();
 	show();
-	m_popupWidget->move(parent->rect().center() - m_popupWidget->rect().center());
 }
 
 QPushButton *LicenseOverlay::getContinueBtn() { return m_popupWidget->getContinueBtn(); }
