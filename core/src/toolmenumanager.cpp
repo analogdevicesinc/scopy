@@ -344,7 +344,7 @@ void ToolMenuManager::initToolMenuHeaderWidget(MenuCollapseHeader *header, const
 	connect(thw->deviceBtn(), &QPushButton::toggled, this, [=](bool en) {
 		if(en) {
 			Style::setStyle(header, style::properties::widget::deviceHeaderWidget, "selected");
-			Q_EMIT requestDevicePage(dInfo.id);
+			Q_EMIT requestToolSelect(dInfo.id);
 		} else {
 			Style::setStyle(header, style::properties::widget::deviceHeaderWidget, "idle");
 		}

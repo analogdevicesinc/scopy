@@ -66,7 +66,6 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void requestToolSelect(QString id);
-	void requestDevicePage(QString id);
 	void connState(QString id, bool isConnected);
 
 private Q_SLOTS:
