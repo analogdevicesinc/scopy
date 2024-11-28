@@ -191,6 +191,13 @@ public:
 	 */
 	virtual bool loadPage() = 0;
 	/**
+	 * @brief loadConfigPage
+	 * is called postcompatible. initialize m_configPage widget. This widget is added to the device configpage
+	 * @return bool if page is loaded
+	 * Default implementation in PluginBase - can be overriden
+	 */
+	virtual bool loadConfigPage() = 0;
+	/**
 	 * @brief loadToolList
 	 * is called postcompatible. initialize m_toolList. m_toolList is used to populate tool menu
 	 * Default implementation in PluginBase - can be overriden
@@ -288,6 +295,13 @@ public:
 	 * Default implementation in PluginBase - override not recommended
 	 */
 	virtual QWidget *page() = 0;
+
+	/**
+	 * @brief configPage
+	 * @return plugin m_configPage getter - plugin configpage widget. used to create device configpage
+	 * Default implementation in PluginBase - override not recommended
+	 */
+	virtual QWidget *configPage() = 0;
 
 	/**
 	 * @brief preferencesPage
