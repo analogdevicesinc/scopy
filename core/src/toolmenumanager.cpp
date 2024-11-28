@@ -304,6 +304,7 @@ MenuSectionCollapseWidget *ToolMenuManager::createMenuSectionItem(const DeviceIn
 	if(collapseHeader) {
 		initHeaderWidget(type, collapseHeader, dInfo);
 		Style::setStyle(collapseHeader, style::properties::widget::bottomBorder);
+		Style::setStyle(collapseHeader, style::properties::widget::deviceHeaderWidget, "idle");
 	}
 	section->setCollapsed(false);
 	section->hide();
@@ -329,6 +330,7 @@ void ToolMenuManager::initToolMenuHeaderWidget(MenuCollapseHeader *header, const
 {
 	bool isConnected = m_connectedDev.contains(dInfo.id);
 	ToolMenuHeaderWidget *thw = dynamic_cast<ToolMenuHeaderWidget *>(header->headerWidget());
+	QButtonGroup *menuBtnGroup = m_toolMenu->btnGroup();
 	if(!thw) {
 		return;
 	}
@@ -338,7 +340,15 @@ void ToolMenuManager::initToolMenuHeaderWidget(MenuCollapseHeader *header, const
 	thw->layout()->setContentsMargins(Style::getDimension(json::global::unit_1), 0, 0, 0);
 	Style::setStyle(header, style::properties::widget::ledBorder, isConnected);
 
-	connect(thw->deviceBtn(), &QPushButton::pressed, this, [this, dInfo]() { Q_EMIT requestDevicePage(dInfo.id); });
+	menuBtnGroup->addButton(thw->deviceBtn());
+	connect(thw->deviceBtn(), &QPushButton::toggled, this, [=](bool en) {
+		if(en) {
+			Style::setStyle(header, style::properties::widget::deviceHeaderWidget, "selected");
+			Q_EMIT requestDevicePage(dInfo.id);
+		} else {
+			Style::setStyle(header, style::properties::widget::deviceHeaderWidget, "idle");
+		}
+	});
 	connect(this, &ToolMenuManager::connState, thw, &ToolMenuHeaderWidget::connState);
 }
 
