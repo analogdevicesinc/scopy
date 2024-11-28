@@ -51,6 +51,7 @@ public:
 	virtual QPixmap iconPixmap() = 0;
 
 	virtual QWidget *page() = 0;
+	virtual QWidget *configPage() = 0;
 
 	virtual QList<ToolMenuEntry *> toolList() = 0;
 	virtual void init() = 0;
