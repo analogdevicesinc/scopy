@@ -1,0 +1,14 @@
+QWidget[&&property&&="idle"] {
+	background-color: transparent;
+	color: &content_default&;
+}
+
+QWidget[&&property&&="idle"]:hover {
+	background-color: &content_silent&;
+	color: &content_default&;
+}
+
+QWidget[&&property&&="selected"] {
+	background-color: &interactive_subtle_disabled&;
+	color: &content_default&;
+}
