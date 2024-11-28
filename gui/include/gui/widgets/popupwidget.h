@@ -46,6 +46,7 @@ public:
 	void enableTitleBar(bool enable = true);
 	void enableTintedOverlay(bool enable = true);
 	void setEnableExternalLinks(bool enable = true);
+	void enableCenterOnParent(bool enable = true);
 
 	QString getDescription();
 	void setDescription(const QString &description);
@@ -57,6 +58,8 @@ public:
 	QPushButton *getContinueBtn();
 
 	void enableCloseButton(bool en);
+
+	bool eventFilter(QObject *watched, QEvent *event) override;
 
 Q_SIGNALS:
 	void continueButtonClicked();

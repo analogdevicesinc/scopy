@@ -168,4 +168,23 @@ void PopupWidget::setEnableExternalLinks(bool enable)
 	m_descriptionTextBrowser->setProperty("openExternalLinks", enable);
 }
 
+bool PopupWidget::eventFilter(QObject *watched, QEvent *event)
+{
+	if(event->type() == QEvent::Resize) {
+		move(parentWidget()->rect().center() - rect().center());
+	}
+
+	return QObject::eventFilter(watched, event);
+}
+
+void PopupWidget::enableCenterOnParent(bool enable)
+{
+	if(enable) {
+		move(parentWidget()->rect().center() - rect().center());
+		parentWidget()->installEventFilter(this);
+	} else {
+		parentWidget()->removeEventFilter(this);
+	}
+}
+
 #include "moc_popupwidget.cpp"
