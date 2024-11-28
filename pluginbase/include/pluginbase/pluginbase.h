@@ -51,6 +51,7 @@ public:
 
 	virtual bool loadIcon() override;
 	virtual bool loadPage() override;
+	virtual bool loadConfigPage() override;
 	virtual void loadToolList() override;
 	virtual bool loadPreferencesPage() override;
 	virtual bool loadExtraButtons() override;
@@ -67,6 +68,7 @@ public:
 	virtual QString displayParam() override;
 	virtual QWidget *icon() override;
 	virtual QWidget *page() override;
+	virtual QWidget *configPage() override;
 	virtual QWidget *preferencesPage() override;
 	virtual QList<QAbstractButton *> extraButtons() override;
 	virtual QList<ToolMenuEntry *> toolList() override;
@@ -97,6 +99,7 @@ protected:
 	QString m_displayName;
 	QString m_displayParam;
 	QWidget *m_page;
+	QWidget *m_configPage;
 	QWidget *m_preferencesPage;
 	QWidget *m_icon;
 	QList<ToolMenuEntry *> m_toolList;
