@@ -461,37 +461,25 @@ void Preferences::initializePreferences()
 	ui->enableAnimCheckBox->setChecked(animations_enabled);
 	ui->oscFilteringCheckBox->setChecked(osc_filtering_enabled);
 	ui->histCheckBox->setChecked(mini_hist_enabled);
+	ui->decodersCheckBox->setChecked(digital_decoders_enabled);
 	ui->oscADCFiltersCheckBox->setChecked(show_ADC_digital_filters);
+	ui->languageCombo->setCurrentText(language);
 	ui->logicAnalyzerDisplaySamplingPoints->setChecked(m_displaySamplingPoints);
 	ui->logicAnalyzerSeparateAnnotations->setChecked(m_separateAnnotations);
 	ui->logicAnalyzerTableInfo->setChecked(m_tableInfo);
 	ui->instrumentNotesCheckbox->setChecked(m_instrument_notes_active);
 	ui->debugMessagesCheckbox->setChecked(m_debug_messages_active);
+	ui->debugInstrumentCheckbox->setChecked(debugger_enabled);
 	ui->tempLutCalibCheckbox->setChecked(m_attemptTempLutCalib);
 	ui->skipCalCheckbox->setChecked(m_skipCalIfCalibrated);
 	ui->showPlotFps->setChecked(m_show_plot_fps);
+	ui->useOpenGl->setChecked(m_use_open_gl);
 	ui->cmbPlotTargetFps->setCurrentText(QString::number(m_target_fps));
 
 	// requires restart after stateChanged, we avoid that here
 	ui->enableDockableWidgetsCheckBox->blockSignals(true);
 	ui->enableDockableWidgetsCheckBox->setChecked(m_docking_enabled);
 	ui->enableDockableWidgetsCheckBox->blockSignals(false);
-
-	ui->decodersCheckBox->blockSignals(true);
-	ui->decodersCheckBox->setChecked(digital_decoders_enabled);
-	ui->decodersCheckBox->blockSignals(false);
-
-	ui->languageCombo->blockSignals(true);
-	ui->languageCombo->setCurrentText(language);
-	ui->languageCombo->blockSignals(false);
-
-	ui->debugInstrumentCheckbox->blockSignals(true);
-	ui->debugInstrumentCheckbox->setChecked(debugger_enabled);
-	ui->debugInstrumentCheckbox->blockSignals(false);
-
-	ui->useOpenGl->blockSignals(true);
-	ui->useOpenGl->setChecked(m_use_open_gl);
-	ui->useOpenGl->blockSignals(false);
 
 	// by this point the preferences menu is initialized
 	m_initialized = true;

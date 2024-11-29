@@ -101,9 +101,10 @@ public:
 	double getStartFrequency() const;
 	double getStopFrequency() const;
 
-	void plotNewData(const std::vector<double*> &dataPoints,
+	void plotNewData(const std::vector<double*> dataPoints,
 			 const int64_t numDataPoints,
-			 gr::high_res_timer_type acquisitionTime);
+			 gr::high_res_timer_type acquisitionTime,
+			 const int droppedFrames);
 
 	void setIntensityRange(double minIntensity, double maxIntensity);
 	double getMinIntensity(unsigned int which) const;
@@ -147,9 +148,6 @@ public:
 	void setupReadouts();
 	void updateCursorsData();
 
-	void useLogFreq(bool use_log_freq);
-	void updateZoomerBase();
-
 public Q_SLOTS:
 	void
 	setIntensityColorMapType(const unsigned int, const int, const QColor, const QColor);
@@ -176,7 +174,6 @@ Q_SIGNALS:
 	void updatedLowerIntensityLevel(const double);
 	void updatedUpperIntensityLevel(const double);
 	void newWaterfallData();
-	void resetWaterfallData();
 
 private:
 	void _updateIntensityRangeDisplay();

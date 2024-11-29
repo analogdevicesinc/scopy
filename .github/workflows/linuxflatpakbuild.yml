@@ -12,9 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - name: Pull the Docker Image
-      run: docker pull astanea/scopy1-flatpak:1.5.0
+      run: docker pull analogdevices/scopy-build:flatpak
 
     - name: Run Docker Image
       run: |
@@ -22,9 +22,9 @@ jobs:
             docker run --privileged \
                 -v `pwd`:$GITHUB_WORKSPACE:rw \
                 --env-file $GITHUB_WORKSPACE/CI/appveyor/gh-actions.envs \
-                astanea/scopy1-flatpak:1.5.0 /bin/bash -xe $GITHUB_WORKSPACE/CI/appveyor/inside_flatpak_docker.sh
+                analogdevices/scopy-build:flatpak /bin/bash -xe $GITHUB_WORKSPACE/CI/appveyor/inside_flatpak_docker.sh
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v2
       with:
         name: Scopy.flatpak
         path: ${{ github.workspace }}/Scopy.flatpak

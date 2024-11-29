@@ -1,18 +1,17 @@
 buildscript {
     repositories {
         google()
-	mavenCentral()
+        jcenter()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.0'
-	//https://central.sonatype.com/artifact/com.github.hazendaz.gradle/gradle/7.5
+        classpath 'com.android.tools.build:gradle:3.6.0'
     }
 }
 
 repositories {
     google()
-    mavenCentral()
+    jcenter()
 }
 
 apply plugin: 'com.android.application'
@@ -37,7 +36,7 @@ android {
 
     compileSdkVersion androidCompileSdkVersion.toInteger()
 
-    buildToolsVersion '33.0.1'
+    buildToolsVersion '28.0.3'
 
     sourceSets {
         main {
