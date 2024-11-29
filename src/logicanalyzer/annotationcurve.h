@@ -151,7 +151,7 @@ private:
 
     QString formatSeconds(double time) const;
 
-    QString shortenAnnotationText(const QString text, const double maxWidth, QPainter *painter) const;
+
 
 private:
 

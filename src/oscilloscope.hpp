@@ -98,10 +98,6 @@ namespace Ui {
 	class CursorsSettings;
 }
 
-namespace scopy {
-	class MousePlotMagnifier;
-}
-
 namespace adiscope {
 	class CustomPushButton;
 	class Oscilloscope_API;
@@ -349,6 +345,7 @@ namespace adiscope {
 
 		QMap<QString, QPair<gr::basic_block_sptr,
 		gr::basic_block_sptr>> math_sinks;
+        QMap<QString, std::shared_ptr<gr::analog::rail_ff>> math_rails;
         std::vector<std::shared_ptr<gr::blocks::multiply_const_ff>> math_probe_atten;
 
 		iio_manager::port_id *ids;

@@ -77,11 +77,11 @@ else
 fi
 
 
-echo "### Creating installer... "
+echo "### Creating archives & installer... "
 mkdir -p $ARTIFACT_FOLDER
 cd $WORKDIR
-cp -R $WORKDIR/scopy_${ARCH} $ARTIFACT_FOLDER/scopy-${ARCH}
-cp -R $WORKDIR/debug_${ARCH} $ARTIFACT_FOLDER/debug-${ARCH}
+zip -r "$ARTIFACT_FOLDER/scopy-${ARCH}.zip" scopy_$ARCH
+zip -r "$ARTIFACT_FOLDER/debug-${ARCH}.zip" debug_$ARCH
 PATH=/c/innosetup:$PATH
 iscc //p $BUILD_FOLDER/scopy-$ARCH_BIT.iss
 mv $WORKDIR/scopy-$ARCH_BIT-setup.exe $ARTIFACT_FOLDER

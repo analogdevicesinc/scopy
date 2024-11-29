@@ -46,7 +46,6 @@
 #include <libm2k/digital/m2kdigital.hpp>
 #include <libm2k/enums.hpp>
 #include <gui/dropdown_switch_list.h>
-#include <gui/hoverwidget.h>
 
 constexpr int DIGITAL_NR_CHANNELS = 16;
 
@@ -122,7 +121,6 @@ public: // Mixed Signal View Interface
 	int getGroupOffset();
 Q_SIGNALS:
 	void showTool();
-	void deleteToolTips();
 
 private Q_SLOTS:
 
@@ -182,9 +180,6 @@ private:
 	QVector<QVector<QString>> createDecoderData(bool separate_annotations);
 
 	void waitForDecoders();
-
-	scopy::HoverWidget *createHoverToolTip(QString info, QPoint position);
-	void initDecoderToolTips();
 
 private:
 	// TODO: consisten naming (m_ui, m_crUi)
@@ -261,7 +256,7 @@ private:
 	DropdownSwitchList* filterMessages;
 	int filterCount = 0;
 
-	const QString *lastToolTipAnn;
+
 };
 } // namespace logic
 } // namespace adiscope

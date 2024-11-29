@@ -27,12 +27,12 @@ stages:
   - job: macOSBuilds
     strategy:
       matrix:
-        macOS_13:
-          vmImage: 'macOS-13'
-          artifactName: 'macOS-13'
-        macOS_14:
-          vmImage: 'macOS-14'
-          artifactName: 'macOS-14'
+        macOS_10_15:
+          vmImage: 'macOS-10.15'
+          artifactName: 'macOS-10.15'
+        macOS_11:
+          vmImage: 'macOS-11'
+          artifactName: 'macOS-11'
     pool:
       vmImage: $[ variables['vmImage'] ]
     steps:
@@ -67,7 +67,6 @@ stages:
             echo "PROJECT_NAME = " ${PROJECT_NAME}
             MACOS_VERSION=$(/usr/libexec/PlistBuddy -c "Print:ProductVersion" /System/Library/CoreServices/SystemVersion.plist)
             DEPLOY_FILE=Scopy-macos${MACOS_VERSION}-${CURRENT_COMMIT:0:7}.dmg
-            cp build/ScopyApp.zip ${BUILD_ARTIFACTSTAGINGDIRECTORY}
             cp build/Scopy.dmg ${BUILD_ARTIFACTSTAGINGDIRECTORY}/${DEPLOY_FILE}
             cd ${BUILD_ARTIFACTSTAGINGDIRECTORY}
             tar czvf Scopy-macos${MACOS_VERSION}.tar.gz ${DEPLOY_FILE}

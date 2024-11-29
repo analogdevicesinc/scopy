@@ -1,0 +1,56 @@
+clone_depth: 1
+#init:
+#    - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
+image: Visual Studio 2019
+
+environment:
+    BUILD_NO: $(APPVEYOR_BUILD_NUMBER)
+    BRANCH: $(APPVEYOR_REPO_BRANCH)
+    REPO: $(APPVEYOR_REPO_NAME)
+    CI_BUILD: 1
+    matrix:
+        - ARCH: x86_64
+          ARCH_BIT: 64
+          APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
+          PKG_MANAGER_UPDATE_CMD: "sudo apt-get -y update"
+          BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/install_ubuntu_20_deps.sh /home/appveyor/Qt/5.14.2"
+          BUILD_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_ubuntu.sh /home/appveyor/Qt/5.14.2"
+          PACKAGE_CMD: ""
+          DEPLOY_FILE: ""
+
+#        - ARCH: x86_64
+#          ARCH_BIT: 64
+#          APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
+#          BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_flatpak.sh $BRANCH $REPO"
+#          BUILD_CMD: ""
+#          PACKAGE_CMD: ""
+#          DEPLOY_FILE: "/home/appveyor/projects/scopy/Scopy.flatpak"
+
+install:
+    # Install Inno Setup
+    - cmd: choco install InnoSetup
+
+build_script:
+    # Update MSYS2 - https://www.msys2.org/docs/ci/#appveyor
+    - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Syuu"  # Core update (in case any core packages are outdated)
+    - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Syuu"  # Normal update
+
+    # Then run your code
+    - cmd: set CHERE_INVOKING='yes'  # Preserve the current working directory
+    - cmd: set MSYSTEM='MINGW64'  # Start a 64 bit Mingw environment
+    - cmd: C:\msys64\usr\bin\bash -lc "/c/projects/scopy/CI/appveyor/extract_msys_deps.sh"
+    - cmd: set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 6"
+    - cmd: "%BUILD_DEPS_CMD%"
+
+    - sh: $PKG_MANAGER_UPDATE_CMD
+    - sh: echo $BUILD_DEPS_CMD
+    - sh: $BUILD_DEPS_CMD
+    - sh: $BUILD_CMD
+    - sh: $PACKAGE_CMD
+
+    - echo "### Push artifacts ... "
+    - sh: if [[ $DEPLOY_FILE != "" ]]; then appveyor PushArtifact $DEPLOY_FILE; fi
+
+#on_finish:
+#    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
