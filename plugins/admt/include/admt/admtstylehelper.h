@@ -28,6 +28,7 @@ public:
     static void PlotWidgetStyle(PlotWidget *widget, QString objectName = "");
     static void ComboBoxStyle(QComboBox *widget, QString objectName = "");
     static void LineEditStyle(QLineEdit *widget, QString objectName = "");
+    static void ColoredSquareCheckbox(QCheckBox *chk, QColor color, QString objectName = "");
 private:
     static ADMTStyleHelper *pinstance_;
 };
