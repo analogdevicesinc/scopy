@@ -49,13 +49,13 @@ Q_SIGNALS:
 public Q_SLOTS:
 	void setDisabled(bool disabled);
 	void updateItem();
+	void onCollapsed(bool collapsed);
 
 protected:
 	void enterEvent(QEvent *event);
 	void leaveEvent(QEvent *event);
 
 private:
-	// QPushButton *m_toolBtn;
 	CustomPushButton *m_toolRunBtn;
 
 	QString m_uuid;

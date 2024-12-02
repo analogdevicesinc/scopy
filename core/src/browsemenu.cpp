@@ -63,6 +63,8 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	homeBtn->setIconSize(QSize(32, 32));
 	homeBtn->setStyleSheet("text-align: left");
 	connect(homeBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("home"); });
+	connect(this, &BrowseMenu::collapsed, homeBtn,
+		[this, homeBtn](bool collapsed) { hideBtnText(homeBtn, tr("Home"), collapsed); });
 
 	QWidget *saveLoadWidget = new QWidget(m_content);
 	saveLoadWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -93,6 +95,8 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	QPushButton *aboutBtn = createBtn(
 		"About", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/info.svg",
 		m_content);
+	aboutBtn->setIconSize(
+		QSize(Style::getDimension(json::global::unit_2), Style::getDimension(json::global::unit_2)));
 	connect(aboutBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("about"); });
 	aboutBtn->setCheckable(true);
 
@@ -139,8 +143,16 @@ void BrowseMenu::toggleCollapsed()
 {
 	m_collapsed = !m_collapsed;
 	m_btnCollapse->setHidden(m_collapsed);
-	m_content->setHidden(m_collapsed);
 	Q_EMIT collapsed(m_collapsed);
+}
+
+void BrowseMenu::hideBtnText(QPushButton *btn, QString name, bool hide)
+{
+	if(hide) {
+		btn->setText("");
+	} else {
+		btn->setText(name);
+	}
 }
 
 QPushButton *BrowseMenu::createBtn(QString name, QString iconPath, QWidget *parent)
@@ -148,7 +160,9 @@ QPushButton *BrowseMenu::createBtn(QString name, QString iconPath, QWidget *pare
 	QPushButton *btn = new QPushButton(parent);
 	btn->setIcon(QIcon(iconPath));
 	btn->setText(tr(name.toStdString().c_str()));
-	Style::setStyle(btn, style::properties::button::toolButton);
+	Style::setStyle(btn, style::properties::button::toolButton, true);
+	connect(this, &BrowseMenu::collapsed, btn,
+		[this, btn, name](bool collapsed) { hideBtnText(btn, tr(name.toStdString().c_str()), collapsed); });
 	return btn;
 }
 
@@ -172,7 +186,7 @@ QWidget *BrowseMenu::createHeader(QWidget *parent)
 	Style::setStyle(btnCollapseMini, style::properties::widget::toolMenu);
 	Style::setStyle(btnCollapseMini, style::properties::button::toolButton);
 	btnCollapseMini->setCheckable(true);
-	btnCollapseMini->setFixedSize(Style::getDimension(json::global::unit_4),
+	btnCollapseMini->setFixedSize(Style::getDimension(json::global::unit_4_5),
 				      Style::getDimension(json::global::unit_4));
 	headerLay->addWidget(btnCollapseMini);
 
@@ -190,6 +204,7 @@ QLabel *BrowseMenu::createScopyLogo(QWidget *parent)
 {
 	QLabel *logo = new QLabel(m_content);
 	Style::setStyle(logo, style::properties::widget::logo);
+	connect(this, &BrowseMenu::collapsed, logo, &QWidget::setHidden);
 	return logo;
 }
 

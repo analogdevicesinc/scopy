@@ -144,6 +144,16 @@ void ToolMenuItem::updateItem()
 	qDebug(CAT_TOOLMENUITEM) << "updating toolmenuentry for " << tme->name() << " - " << tme->uuid();
 }
 
+void ToolMenuItem::onCollapsed(bool collapsed)
+{
+	m_toolRunBtn->setHidden(collapsed);
+	if(collapsed) {
+		setText("");
+	} else {
+		setText(m_name);
+	}
+}
+
 void ToolMenuItem::enterEvent(QEvent *event)
 {
 #ifndef __ANDROID__

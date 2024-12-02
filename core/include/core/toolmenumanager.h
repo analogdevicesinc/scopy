@@ -67,10 +67,12 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void requestToolSelect(QString id);
 	void connState(QString id, bool isConnected);
+	void menuCollapsed(bool collapsed);
 
 private Q_SLOTS:
 	void updateTool(QWidget *old);
 	void updateToolAttached(bool oldAttach, ToolMenuItem *toolMenuItem);
+	void setCollapsed(bool collapse);
 
 private:
 	void loadToolAttachedState(ToolMenuEntry *tme);
@@ -88,6 +90,7 @@ private:
 	void initToolMenuHeaderWidget(MenuCollapseHeader *header, const DeviceInfo &dInfo);
 	void initCompositeHeaderWidget(MenuCollapseHeader *header, const DeviceInfo &dInfo);
 
+	bool m_collapsed;
 	QString m_prevItem;
 	QStringList m_connectedDev;
 	ToolStack *m_ts;
