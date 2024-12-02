@@ -156,7 +156,6 @@ void ToolMenuManager::onIioEvent(QString id, int retCode, IIOCallType type)
 
 void ToolMenuManager::updateTool(QWidget *old)
 {
-
 	ToolMenuEntry *tme = dynamic_cast<ToolMenuEntry *>(QObject::sender());
 	Q_ASSERT(tme);
 	QString id = tme->uuid();
@@ -223,6 +222,8 @@ void ToolMenuManager::updateToolAttached(bool oldAttach, ToolMenuItem *toolMenuI
 		}
 	}
 }
+
+void ToolMenuManager::setCollapsed(bool collapse) { m_collapsed = collapse; }
 
 void ToolMenuManager::loadToolAttachedState(ToolMenuEntry *tme)
 {
@@ -360,11 +361,14 @@ void ToolMenuManager::initCompositeHeaderWidget(MenuCollapseHeader *header, cons
 	}
 	chw->add(new QLabel(dInfo.param));
 	chw->layout()->setContentsMargins(Style::getDimension(json::global::unit_1), 0, 0, 0);
+	chw->setHidden(m_collapsed);
+	connect(this, &ToolMenuManager::menuCollapsed, chw, &QWidget::setHidden);
 }
 
 ToolMenuItem *ToolMenuManager::createToolMenuItem(ToolMenuEntry *tme, QWidget *parent)
 {
 	ToolMenuItem *toolMenuItem = new ToolMenuItem(tme->uuid(), tme->name(), tme->icon(), parent);
+	toolMenuItem->onCollapsed(m_collapsed);
 	connect(toolMenuItem->getToolRunBtn(), &QPushButton::toggled, tme, &ToolMenuEntry::runToggled);
 	connect(toolMenuItem->getToolRunBtn(), &QPushButton::clicked, tme, &ToolMenuEntry::runClicked);
 	connect(toolMenuItem, &QPushButton::clicked, this, [=]() { Q_EMIT requestToolSelect(toolMenuItem->getId()); });
@@ -372,6 +376,7 @@ ToolMenuItem *ToolMenuManager::createToolMenuItem(ToolMenuEntry *tme, QWidget *p
 		[this, toolMenuItem](bool on) { selectTool(toolMenuItem, on); });
 	connect(toolMenuItem, &ToolMenuItem::doubleclick, this, [this, tme]() { setTmeAttached(tme); });
 	connect(tme, &ToolMenuEntry::updateToolEntry, toolMenuItem, &ToolMenuItem::updateItem);
+	connect(this, &ToolMenuManager::menuCollapsed, toolMenuItem, &ToolMenuItem::onCollapsed);
 
 	return toolMenuItem;
 }
