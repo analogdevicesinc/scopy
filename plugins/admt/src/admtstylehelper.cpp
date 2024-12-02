@@ -146,4 +146,29 @@ void ADMTStyleHelper::LineEditStyle(QLineEdit *widget, QString objectName)
 	widget->setAlignment(Qt::AlignRight);
 }
 
+void ADMTStyleHelper::ColoredSquareCheckbox(QCheckBox *chk, QColor color, QString objectName)
+{
+	if(!objectName.isEmpty())
+		chk->setObjectName(objectName);
+	QString style = QString(R"css(
+						QCheckBox {
+							width:16px;
+							height:16px;
+							background-color: rgba(128,128,128,0);
+							color: rgba(255, 255, 255, 153);
+						}
+						QCheckBox::indicator {
+							width: 12px;
+							height: 12px;
+							border: 2px solid #FFFFFF;
+							border-radius: 4px;
+						}
+						QCheckBox::indicator:unchecked { background-color: &&UIElementBackground&&; }
+						QCheckBox::indicator:checked { background-color: &&colorname&&; }
+						)css");
+	style.replace("&&colorname&&", color.name());
+	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
+	chk->setStyleSheet(style);
+}
+
 #include "moc_admtstylehelper.cpp"

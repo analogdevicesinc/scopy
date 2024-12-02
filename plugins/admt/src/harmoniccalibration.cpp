@@ -43,10 +43,10 @@ static uint32_t h3PhaseDeviceRegister = 0x1A;
 static uint32_t h8PhaseDeviceRegister = 0x1C;
 
 static int acquisitionDisplayLength = 200;
-static QVector<double> acquisitionAngleList, graphDataList, graphPostDataList;
+static QVector<double> acquisitionAngleList, acquisitionABSAngleList, acquisitionTurnCountList, acquisitionTmp0List,
+						graphDataList, graphPostDataList;
 
 static const QColor scopyBlueColor = scopy::StyleHelper::getColor("ScopyBlue");
-static const QColor channel0Color = scopy::StyleHelper::getColor("CH0");
 static const QColor sineColor = QColor("#85e94c");
 static const QColor cosineColor = QColor("#91e6cf");
 static const QColor faultLEDColor = QColor("#c81a28");
@@ -54,7 +54,10 @@ static const QColor gpioLEDColor = scopyBlueColor;
 static const QColor statusLEDColor = QColor("#2e9e6f");
 
 static const QPen scopyBluePen(scopyBlueColor);
-static const QPen channel0Pen(channel0Color);
+static const QPen channel0Pen(scopy::StyleHelper::getColor("CH0"));
+static const QPen channel1Pen(scopy::StyleHelper::getColor("CH1"));
+static const QPen channel2Pen(scopy::StyleHelper::getColor("CH2"));
+static const QPen channel3Pen(scopy::StyleHelper::getColor("CH3"));
 static const QPen sinePen(sineColor);
 static const QPen cosinePen(cosineColor);
 
@@ -66,6 +69,25 @@ static bool is5V = false;
 
 static double H1_MAG_ANGLE, H2_MAG_ANGLE, H3_MAG_ANGLE, H8_MAG_ANGLE, H1_PHASE_ANGLE, H2_PHASE_ANGLE, H3_PHASE_ANGLE, H8_PHASE_ANGLE;
 static uint32_t H1_MAG_HEX, H2_MAG_HEX, H3_MAG_HEX, H8_MAG_HEX, H1_PHASE_HEX, H2_PHASE_HEX, H3_PHASE_HEX, H8_PHASE_HEX;
+
+static std::map<AcquisitionDataKey, bool> acquisitionDataMap = {
+    {RADIUS, false},
+    {ANGLE, false},
+    {TURNCOUNT, false},
+    {ABSANGLE, false},
+    {SINE, false},
+    {COSINE, false},
+    {SECANGLI, false},
+    {SECANGLQ, false},
+    {ANGLESEC, false},
+    {DIAG1, false},
+    {DIAG2, false},
+    {TMP0, false},
+    {TMP1, false},
+    {CNVCNT, false},
+    {SCRADIUS, false},
+    {SPIFAULT, false}
+};
 
 using namespace scopy;
 using namespace scopy::admt;
@@ -214,6 +236,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	MenuCollapseSection *acquisitionGraphCollapseSection = new MenuCollapseSection("Captured Data", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, acquisitionGraphSectionWidget);
 	acquisitionGraphSectionWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	acquisitionGraphSectionWidget->contentLayout()->addWidget(acquisitionGraphCollapseSection);
+	acquisitionGraphCollapseSection->contentLayout()->setSpacing(8);
 
 	acquisitionGraphPlotWidget = new PlotWidget();
 	ADMTStyleHelper::PlotWidgetStyle(acquisitionGraphPlotWidget);
@@ -229,14 +252,53 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	acquisitionYPlotAxis->setInterval(0, 360);
 
 	acquisitionAnglePlotChannel = new PlotChannel("Angle", channel0Pen, acquisitionXPlotAxis, acquisitionYPlotAxis);
+	acquisitionABSAnglePlotChannel = new PlotChannel("ABS Angle", channel1Pen, acquisitionXPlotAxis, acquisitionYPlotAxis);
+	acquisitionTurnCountPlotChannel = new PlotChannel("Turn Count", channel2Pen, acquisitionXPlotAxis, acquisitionYPlotAxis);
+	acquisitionTmp0PlotChannel = new PlotChannel("TMP 0", channel3Pen, acquisitionXPlotAxis, acquisitionYPlotAxis);
 
 	acquisitionGraphPlotWidget->addPlotChannel(acquisitionAnglePlotChannel);
+	acquisitionGraphPlotWidget->addPlotChannel(acquisitionABSAnglePlotChannel);
+	acquisitionGraphPlotWidget->addPlotChannel(acquisitionTurnCountPlotChannel);
+	acquisitionGraphPlotWidget->addPlotChannel(acquisitionTmp0PlotChannel);
 	acquisitionAnglePlotChannel->setEnabled(true);
+	acquisitionABSAnglePlotChannel->setEnabled(true);
+	acquisitionTurnCountPlotChannel->setEnabled(true);
+	acquisitionTmp0PlotChannel->setEnabled(true);
 	acquisitionGraphPlotWidget->selectChannel(acquisitionAnglePlotChannel);
 
 	acquisitionGraphPlotWidget->replot();
 
+	#pragma region Channel Selection
+	QWidget *acquisitionGraphChannelWidget = new QWidget(acquisitionGraphSectionWidget);
+	QGridLayout *acquisitionGraphChannelGridLayout = new QGridLayout(acquisitionGraphChannelWidget);
+	// QHBoxLayout *acquisitionGraphChannelLayout = new QHBoxLayout(acquisitionGraphChannelWidget);
+	acquisitionGraphChannelGridLayout->setContentsMargins(16, 8, 8, 16);
+	acquisitionGraphChannelGridLayout->setSpacing(8);
+
+	QCheckBox *angleCheckBox = new QCheckBox("Angle", acquisitionGraphChannelWidget);
+	ADMTStyleHelper::ColoredSquareCheckbox(angleCheckBox, channel0Pen.color());
+	connectCheckBoxToAcquisitionGraph(angleCheckBox, acquisitionAnglePlotChannel, ANGLE);
+
+	QCheckBox *absAngleCheckBox = new QCheckBox("ABS Angle", acquisitionGraphChannelWidget);
+	ADMTStyleHelper::ColoredSquareCheckbox(absAngleCheckBox, channel1Pen.color());
+	connectCheckBoxToAcquisitionGraph(absAngleCheckBox, acquisitionABSAnglePlotChannel, ABSANGLE);
+
+	QCheckBox *countCheckBox = new QCheckBox("Count", acquisitionGraphChannelWidget);
+	ADMTStyleHelper::ColoredSquareCheckbox(countCheckBox, channel2Pen.color());
+	connectCheckBoxToAcquisitionGraph(countCheckBox, acquisitionTurnCountPlotChannel, TURNCOUNT);
+
+	QCheckBox *temp0CheckBox = new QCheckBox("Temp 0", acquisitionGraphChannelWidget);
+	ADMTStyleHelper::ColoredSquareCheckbox(temp0CheckBox, channel3Pen.color());
+	connectCheckBoxToAcquisitionGraph(temp0CheckBox, acquisitionTmp0PlotChannel, TMP0);
+
+	acquisitionGraphChannelGridLayout->addWidget(angleCheckBox, 0, 0);
+	acquisitionGraphChannelGridLayout->addWidget(absAngleCheckBox, 0, 1);
+	acquisitionGraphChannelGridLayout->addWidget(countCheckBox, 0, 2);
+	acquisitionGraphChannelGridLayout->addWidget(temp0CheckBox, 0, 3);
+	#pragma endregion
+
 	acquisitionGraphCollapseSection->contentLayout()->addWidget(acquisitionGraphPlotWidget);
+	acquisitionGraphCollapseSection->contentLayout()->addWidget(acquisitionGraphChannelWidget);
 	#pragma endregion
 
 	#pragma region General Setting
@@ -268,9 +330,6 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 
 	connectLineEditToNumber(graphUpdateIntervalLineEdit, acquisitionUITimerRate, 1, 5000);
 
-	generalSection->contentLayout()->addWidget(graphUpdateIntervalLabel);
-	generalSection->contentLayout()->addWidget(graphUpdateIntervalLineEdit);
-
 	// Data Sample Size
 	QLabel *displayLengthLabel = new QLabel("Display Length", generalSection);
 	StyleHelper::MenuSmallLabel(displayLengthLabel);
@@ -280,6 +339,8 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 
 	connectLineEditToNumber(displayLengthLineEdit, acquisitionDisplayLength, 1, 2048);
 
+	generalSection->contentLayout()->addWidget(graphUpdateIntervalLabel);
+	generalSection->contentLayout()->addWidget(graphUpdateIntervalLineEdit);
 	generalSection->contentLayout()->addWidget(displayLengthLabel);
 	generalSection->contentLayout()->addWidget(displayLengthLineEdit);
 
@@ -437,7 +498,19 @@ void HarmonicCalibration::getAcquisitionSamples()
 	while(isStartAcquisition)
 	{
 		updateChannelValues();
-		prependAcquisitionData(angle, acquisitionAngleList);
+
+		if(acquisitionDataMap.at(ANGLE)) prependAcquisitionData(angle, acquisitionAngleList);
+		else if(acquisitionDataMap.at(ANGLE) == false && acquisitionAngleList.size() > 0) acquisitionAngleList.clear();
+		
+		if(acquisitionDataMap.at(ABSANGLE)) prependAcquisitionData(rotation, acquisitionABSAngleList);
+		else if(acquisitionDataMap.at(ABSANGLE) == false && acquisitionABSAngleList.size() > 0) acquisitionABSAngleList.clear();
+
+		if(acquisitionDataMap.at(TURNCOUNT)) prependAcquisitionData(count, acquisitionTurnCountList);
+		else if(acquisitionDataMap.at(TURNCOUNT) == false && acquisitionTurnCountList.size() > 0) acquisitionTurnCountList.clear();
+
+		if(acquisitionDataMap.at(TMP0)) prependAcquisitionData(temp, acquisitionTmp0List);
+		else if(acquisitionDataMap.at(TMP0) == false && acquisitionTmp0List.size() > 0) acquisitionTmp0List.clear();
+
 		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
 	}
 }
@@ -447,10 +520,14 @@ void HarmonicCalibration::prependAcquisitionData(double& data, QVector<double>& 
 	list.prepend(data);
 }
 
-void HarmonicCalibration::plotAcquisition(QVector<double>& list, PlotChannel* channel, PlotWidget* plot)
+void HarmonicCalibration::prependNullAcquisitionData(QVector<double>& list)
+{
+	list.prepend(qQNaN());
+}
+
+void HarmonicCalibration::plotAcquisition(QVector<double>& list, PlotChannel* channel)
 {
 	channel->curve()->setSamples(list);
-	plot->replot();
 }
 
 void HarmonicCalibration::initializeMotor()
@@ -2111,7 +2188,16 @@ void HarmonicCalibration::canCalibrate(bool value)
 
 void HarmonicCalibration::acquisitionUITask()
 {
-	plotAcquisition(acquisitionAngleList, acquisitionAnglePlotChannel, acquisitionGraphPlotWidget);
+	if(acquisitionDataMap.at(ANGLE))
+		plotAcquisition(acquisitionAngleList, acquisitionAnglePlotChannel);
+	if(acquisitionDataMap.at(ABSANGLE))
+		plotAcquisition(acquisitionABSAngleList, acquisitionABSAnglePlotChannel);
+	if(acquisitionDataMap.at(TURNCOUNT))
+		plotAcquisition(acquisitionTurnCountList, acquisitionTurnCountPlotChannel);
+	if(acquisitionDataMap.at(TMP0))
+		plotAcquisition(acquisitionTmp0List, acquisitionTmp0PlotChannel);
+
+	acquisitionGraphPlotWidget->replot();
 	updateLineEditValues();
 	updateLabelValue(acquisitionMotorCurrentPositionLabel, ADMTController::MotorAttribute::CURRENT_POS);
 }
@@ -2653,6 +2739,20 @@ void HarmonicCalibration::connectRegisterBlockToRegistry(RegisterBlockWidget* wi
 			if(!success) { StatusBarManager::pushMessage("Failed to write to registry"); }
 		});
 	}
+}
+
+void HarmonicCalibration::connectCheckBoxToAcquisitionGraph(QCheckBox* widget, PlotChannel* channel, AcquisitionDataKey key)
+{
+	connect(widget, &QCheckBox::stateChanged, [=](int state){
+		if(state == Qt::Checked){
+			channel->setEnabled(true);
+			acquisitionDataMap[key] = true;
+		}
+		else{
+			channel->setEnabled(false);
+			acquisitionDataMap[key] = false;
+		}
+	});
 }
 
 double HarmonicCalibration::convertRPStoVMAX(double rps) 
