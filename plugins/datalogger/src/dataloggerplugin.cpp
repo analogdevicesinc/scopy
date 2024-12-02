@@ -102,6 +102,8 @@ bool DataLoggerPlugin::onConnect()
 
 	foreach(ReadableDataMonitorModel *monitor, dmmList) {
 		m_dataAcquisitionManager->getDataMonitorMap()->insert(monitor->getName(), monitor);
+		connect(monitor, &ReadableDataMonitorModel::iioEvent, m_dataAcquisitionManager,
+			&DataAcquisitionManager::iioEvent);
 	}
 
 	Preferences *p = Preferences::GetInstance();
@@ -201,6 +203,9 @@ void DataLoggerPlugin::addNewTool()
 
 	Q_EMIT toolListChanged();
 	m_toolList.last()->setTool(datamonitorTool);
+	connect(datamonitorTool, &DatamonitorTool::iioEvent, m_toolList.last(), &ToolMenuEntry::iioEvent);
+	connect(m_dataAcquisitionManager, &DataAcquisitionManager::iioEvent, m_toolList.last(),
+		&ToolMenuEntry::iioEvent);
 	if(m_toolList.length() > 1) {
 		requestTool(tool_name);
 	}

@@ -29,10 +29,12 @@
 #include <QColor>
 #include <QObject>
 
+#include <iioutil/iioeventemitter.h>
+
 namespace scopy {
 namespace datamonitor {
 
-class SCOPY_DATALOGGER_EXPORT DataMonitorModel : public QObject
+class SCOPY_DATALOGGER_EXPORT DataMonitorModel : public QObject, public IIOEventEmitter
 {
 
 	Q_OBJECT
@@ -83,6 +85,7 @@ Q_SIGNALS:
 	void minValueUpdated(double value);
 	void maxValueUpdated(double value);
 	void dataCleared();
+	void iioEvent(int retCode) override;
 
 protected:
 	void setDataStorageSize();

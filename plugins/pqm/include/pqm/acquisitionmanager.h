@@ -37,7 +37,7 @@
 #define BUFFER_SIZE 256
 #define DEVICE_PQM "pqm"
 namespace scopy::pqm {
-class AcquisitionManager : public QObject
+class AcquisitionManager : public QObject, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -56,6 +56,7 @@ Q_SIGNALS:
 	void bufferDataAvailable(QMap<QString, QVector<double>>);
 	void logData(PqmDataLogger::ActiveInstrument instr, const QString &filePath);
 	void pqEvent();
+	void iioEvent(int retCode) override;
 
 private Q_SLOTS:
 	void futureReadData();

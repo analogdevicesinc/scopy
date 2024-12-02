@@ -62,6 +62,7 @@ Ad74413r::Ad74413r(QString uri, ToolMenuEntry *tme, QWidget *parent)
 		m_cmdQueue = m_conn->commandQueue();
 		createDevicesMap(m_ctx);
 		init();
+		connect(m_cmdQueue, &CommandQueue::iioEvent, m_tme, &ToolMenuEntry::iioEvent);
 	}
 	initTutorialProperties();
 }

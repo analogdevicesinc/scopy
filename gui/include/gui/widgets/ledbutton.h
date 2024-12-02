@@ -19,26 +19,26 @@
  *
  */
 
-#ifndef IREGISTERREADSTRATEGY_HPP
-#define IREGISTERREADSTRATEGY_HPP
+#ifndef LEDBUTTON_H
+#define LEDBUTTON_H
 
-#include <QObject>
-#include <iioutil/iioeventemitter.h>
-#include "../../scopy-datalogger_export.h"
+#include <QPushButton>
+#include <QTimer>
 
 namespace scopy {
-namespace datamonitor {
-class SCOPY_DATALOGGER_EXPORT IReadStrategy : public QObject, public IIOEventEmitter
+class LedButton : public QPushButton
 {
 	Q_OBJECT
 public:
-	virtual void read() = 0;
+	LedButton(QWidget *parent = nullptr);
+	~LedButton();
 
-Q_SIGNALS:
-	void readDone(double time, double value);
-	void readError(const char *err);
-	void iioEvent(int retCode) override;
+	void ledOn(bool ledState, int runningTimeMsec = 100);
+	void ledOff();
+
+private:
+	QTimer *m_timer;
 };
-} // namespace datamonitor
 } // namespace scopy
-#endif // IREGISTERREADSTRATEGY_HPP
+
+#endif // LEDBUTTON_H

@@ -19,26 +19,16 @@
  *
  */
 
-#ifndef IREGISTERREADSTRATEGY_HPP
-#define IREGISTERREADSTRATEGY_HPP
-
-#include <QObject>
-#include <iioutil/iioeventemitter.h>
-#include "../../scopy-datalogger_export.h"
+#ifndef IIOEVENTEMITTER_H
+#define IIOEVENTEMITTER_H
 
 namespace scopy {
-namespace datamonitor {
-class SCOPY_DATALOGGER_EXPORT IReadStrategy : public QObject, public IIOEventEmitter
+class IIOEventEmitter
 {
-	Q_OBJECT
-public:
-	virtual void read() = 0;
-
-Q_SIGNALS:
-	void readDone(double time, double value);
-	void readError(const char *err);
-	void iioEvent(int retCode) override;
+	virtual void iioEvent(int retCode) = 0;
 };
-} // namespace datamonitor
+const int IIO_SUCCESS = 0;
+const int IIO_ERROR = -1;
 } // namespace scopy
-#endif // IREGISTERREADSTRATEGY_HPP
+
+#endif // IIOEVENTEMITTER_H

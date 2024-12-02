@@ -23,6 +23,7 @@
 #define IIOCOMMANDQUEUE_H
 
 #include "command.h"
+#include "iioeventemitter.h"
 
 #include <QThread>
 #include <QThreadPool>
@@ -31,7 +32,7 @@
 #include <deque>
 
 namespace scopy {
-class SCOPY_IIOUTIL_EXPORT CommandQueue : public QObject
+class SCOPY_IIOUTIL_EXPORT CommandQueue : public QObject, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -48,6 +49,9 @@ public:
 	void requestStop();
 	void runCmd();
 	QTime lastCmdTime() const;
+
+Q_SIGNALS:
+	void iioEvent(int retCode) override;
 
 private Q_SLOTS:
 	void resolveNext(scopy::Command *cmd);

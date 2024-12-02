@@ -38,7 +38,7 @@
 namespace scopy {
 namespace dac {
 class DacDataManager;
-class SCOPY_DAC_EXPORT DacInstrument : public QWidget
+class SCOPY_DAC_EXPORT DacInstrument : public QWidget, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -51,6 +51,7 @@ public Q_SLOTS:
 	void dacRunning(bool toggled);
 Q_SIGNALS:
 	void running(bool toggled);
+	void iioEvent(int retCode) override;
 
 private:
 	void setupDacDataManagers();

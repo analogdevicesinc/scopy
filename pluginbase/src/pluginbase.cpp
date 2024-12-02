@@ -56,6 +56,12 @@ bool PluginBase::loadPage()
 	return false;
 }
 
+bool PluginBase::loadConfigPage()
+{
+	m_configPage = nullptr;
+	return false;
+}
+
 void PluginBase::loadToolList() {}
 
 bool PluginBase::loadPreferencesPage()
@@ -94,7 +100,10 @@ QString PluginBase::displayName() { return m_displayName; }
 QString PluginBase::displayParam() { return m_displayParam; }
 
 QWidget *PluginBase::icon() { return m_icon; }
+
 QWidget *PluginBase::page() { return m_page; }
+
+QWidget *PluginBase::configPage() { return m_configPage; }
 
 QWidget *PluginBase::preferencesPage() { return m_preferencesPage; }
 

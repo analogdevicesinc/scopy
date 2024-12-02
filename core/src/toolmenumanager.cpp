@@ -28,6 +28,7 @@
 #include <compositeheaderwidget.h>
 #include <menuheader.h>
 #include <style.h>
+#include <toolmenuheaderwidget.h>
 
 Q_LOGGING_CATEGORY(CAT_TOOLMENUMANAGER, "ToolMenuManager")
 using namespace scopy;
@@ -37,29 +38,32 @@ ToolMenuManager::ToolMenuManager(ToolStack *ts, DetachedToolWindowManager *dtm, 
 	, m_ts(ts)
 	, m_dtm(dtm)
 	, m_toolMenu(toolMenu)
-{}
+	, m_collapsed(false)
+{
+	connect(this, &ToolMenuManager::menuCollapsed, this, &ToolMenuManager::setCollapsed);
+}
 
 ToolMenuManager::~ToolMenuManager() {}
 
-void ToolMenuManager::addMenuItem(QString deviceId, QString devName, QList<ToolMenuEntry *> tools, int itemIndex)
+void ToolMenuManager::addMenuItem(DeviceInfo dInfo, int itemIndex)
 {
-	QString param;
-	if(!tools.isEmpty())
-		param = tools.at(0)->param();
-	MenuSectionCollapseWidget *devSection = createMenuSectionItem(devName, param);
+	QString id = dInfo.id;
+	MenuSectionCollapseWidget *devSection = createMenuSectionItem(dInfo);
 	QButtonGroup *menuBtnGroup = m_toolMenu->btnGroup();
-	for(ToolMenuEntry *tme : tools) {
+	for(ToolMenuEntry *tme : qAsConst(dInfo.tools)) {
 		ToolMenuItem *toolMenuItem = createToolMenuItem(tme, devSection);
 		devSection->add(toolMenuItem);
 		menuBtnGroup->addButton(toolMenuItem);
 		connect(tme, &ToolMenuEntry::updateTool, this, &ToolMenuManager::updateTool);
 		connect(tme, &ToolMenuEntry::updateToolAttached, this,
 			[this, toolMenuItem](bool oldAttach) { updateToolAttached(oldAttach, toolMenuItem); });
+		connect(tme, &ToolMenuEntry::iioEvent, this, [this, id](int retCode) { onIioEvent(id, retCode); });
 		Q_EMIT tme->updateToolEntry();
 	}
-	m_toolMenu->add(itemIndex, deviceId, devSection);
-	m_itemMap[deviceId] = devSection;
-	qDebug(CAT_TOOLMENUMANAGER) << "Menu item with id" << deviceId << "has been added";
+	m_toolMenu->add(itemIndex, id, devSection);
+	m_itemMap[id] = devSection;
+	m_dInfoMap[id] = dInfo;
+	qDebug(CAT_TOOLMENUMANAGER) << "Menu item with id" << id << "has been added";
 }
 
 void ToolMenuManager::removeMenuItem(QString deviceId)
@@ -85,11 +89,11 @@ void ToolMenuManager::changeToolListContents(QString deviceId, QList<ToolMenuEnt
 	for(ToolMenuEntry *tme : tools) {
 		tme->disconnect(this);
 	}
+	m_dInfoMap[deviceId].tools = tools;
 	MenuSectionCollapseWidget *menuItem = m_itemMap[deviceId];
-	QString devName = menuItem->collapseSection()->title();
 	int itemIndex = m_toolMenu->indexOf(menuItem);
 	removeMenuItem(deviceId);
-	addMenuItem(deviceId, devName, tools, itemIndex);
+	addMenuItem(m_dInfoMap[deviceId], itemIndex);
 	showMenuItem(deviceId);
 }
 
@@ -102,7 +106,6 @@ void ToolMenuManager::showMenuItem(QString id)
 		Q_EMIT requestToolSelect(id);
 		return;
 	}
-
 	m_itemMap[id]->show();
 	m_prevItem = id;
 }
@@ -118,6 +121,7 @@ void ToolMenuManager::deviceConnected(QString id)
 {
 	m_connectedDev.append(id);
 	showMenuItem(id);
+	Q_EMIT connState(id, true);
 }
 
 void ToolMenuManager::deviceDisconnected(QString id)
@@ -126,16 +130,32 @@ void ToolMenuManager::deviceDisconnected(QString id)
 	if(m_prevItem.compare(id) != 0) {
 		hideMenuItem(id);
 	}
+	Q_EMIT connState(id, false);
 }
 
 void ToolMenuManager::onDisplayNameChanged(QString id, QString devName)
 {
 	m_itemMap[id]->collapseSection()->setTitle(devName);
+	m_dInfoMap[id].name = devName;
+}
+
+void ToolMenuManager::onIioEvent(QString id, int retCode)
+{
+	if(!m_itemMap.contains(id)) {
+		return;
+	}
+	MenuCollapseHeader *collapseHeader = getCollapseSectionHeader(m_itemMap[id]);
+	if(!collapseHeader) {
+		return;
+	}
+	ToolMenuHeaderWidget *thw = dynamic_cast<ToolMenuHeaderWidget *>(collapseHeader->headerWidget());
+	if(thw) {
+		Q_EMIT thw->blinkLed(retCode);
+	}
 }
 
 void ToolMenuManager::updateTool(QWidget *old)
 {
-
 	ToolMenuEntry *tme = dynamic_cast<ToolMenuEntry *>(QObject::sender());
 	Q_ASSERT(tme);
 	QString id = tme->uuid();
@@ -203,6 +223,8 @@ void ToolMenuManager::updateToolAttached(bool oldAttach, ToolMenuItem *toolMenuI
 	}
 }
 
+void ToolMenuManager::setCollapsed(bool collapse) { m_collapsed = collapse; }
+
 void ToolMenuManager::loadToolAttachedState(ToolMenuEntry *tme)
 {
 	Preferences *p = Preferences::GetInstance();
@@ -268,31 +290,85 @@ void ToolMenuManager::setTmeAttached(ToolMenuEntry *tme)
 	tme->setAttached(!tme->attached());
 }
 
-MenuSectionCollapseWidget *ToolMenuManager::createMenuSectionItem(QString deviceName, QString uri)
+MenuSectionCollapseWidget *ToolMenuManager::createMenuSectionItem(const DeviceInfo &dInfo)
 {
-	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget(
-		deviceName, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_COMPOSITEWIDGET, m_toolMenu);
+	MenuCollapseSection::MenuHeaderWidgetType type = Preferences::get("device_menu_item").toBool()
+		? MenuCollapseSection::MHW_TOOLMENUWIDGET
+		: MenuCollapseSection::MHW_COMPOSITEWIDGET;
+	MenuSectionCollapseWidget *section =
+		new MenuSectionCollapseWidget(dInfo.name, MenuCollapseSection::MHCW_ARROW, type, m_toolMenu);
 	section->contentLayout()->setSpacing(0);
 	section->menuSection()->layout()->setMargin(0);
 	section->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-	MenuCollapseHeader *collapseHeader = dynamic_cast<MenuCollapseHeader *>(section->collapseSection()->header());
+	MenuCollapseHeader *collapseHeader = getCollapseSectionHeader(section);
 	if(collapseHeader) {
-		CompositeHeaderWidget *chw = dynamic_cast<CompositeHeaderWidget *>(collapseHeader->headerWidget());
-		if(chw) {
-			chw->add(new QLabel(uri, chw));
-			chw->layout()->setContentsMargins(Style::getDimension(json::global::unit_1), 0, 0, 0);
-		}
+		initHeaderWidget(type, collapseHeader, dInfo);
 		Style::setStyle(collapseHeader, style::properties::widget::bottomBorder);
+		Style::setStyle(collapseHeader, style::properties::widget::deviceHeaderWidget, "idle");
 	}
 	section->setCollapsed(false);
 	section->hide();
 	return section;
 }
 
+void ToolMenuManager::initHeaderWidget(MenuCollapseSection::MenuHeaderWidgetType type, MenuCollapseHeader *header,
+				       const DeviceInfo &dInfo)
+{
+	switch(type) {
+	case MenuCollapseSection::MHW_TOOLMENUWIDGET:
+		initToolMenuHeaderWidget(header, dInfo);
+		break;
+	case MenuCollapseSection::MHW_COMPOSITEWIDGET:
+		initCompositeHeaderWidget(header, dInfo);
+		break;
+	default:
+		break;
+	}
+}
+
+void ToolMenuManager::initToolMenuHeaderWidget(MenuCollapseHeader *header, const DeviceInfo &dInfo)
+{
+	bool isConnected = m_connectedDev.contains(dInfo.id);
+	ToolMenuHeaderWidget *thw = dynamic_cast<ToolMenuHeaderWidget *>(header->headerWidget());
+	QButtonGroup *menuBtnGroup = m_toolMenu->btnGroup();
+	if(!thw) {
+		return;
+	}
+	thw->setDeviceId(dInfo.id);
+	thw->setUri(dInfo.param);
+	thw->setDeviceIcon(dInfo.icon);
+	thw->layout()->setContentsMargins(Style::getDimension(json::global::unit_1), 0, 0, 0);
+	Style::setStyle(header, style::properties::widget::ledBorder, isConnected);
+
+	menuBtnGroup->addButton(thw->deviceBtn());
+	connect(thw->deviceBtn(), &QPushButton::toggled, this, [=](bool en) {
+		if(en) {
+			Style::setStyle(header, style::properties::widget::deviceHeaderWidget, "selected");
+			Q_EMIT requestToolSelect(dInfo.id);
+		} else {
+			Style::setStyle(header, style::properties::widget::deviceHeaderWidget, "idle");
+		}
+	});
+	connect(this, &ToolMenuManager::connState, thw, &ToolMenuHeaderWidget::connState);
+}
+
+void ToolMenuManager::initCompositeHeaderWidget(MenuCollapseHeader *header, const DeviceInfo &dInfo)
+{
+	CompositeHeaderWidget *chw = dynamic_cast<CompositeHeaderWidget *>(header->headerWidget());
+	if(!chw) {
+		return;
+	}
+	chw->add(new QLabel(dInfo.param));
+	chw->layout()->setContentsMargins(Style::getDimension(json::global::unit_1), 0, 0, 0);
+	chw->setHidden(m_collapsed);
+	connect(this, &ToolMenuManager::menuCollapsed, chw, &QWidget::setHidden);
+}
+
 ToolMenuItem *ToolMenuManager::createToolMenuItem(ToolMenuEntry *tme, QWidget *parent)
 {
 	ToolMenuItem *toolMenuItem = new ToolMenuItem(tme->uuid(), tme->name(), tme->icon(), parent);
+	toolMenuItem->onCollapsed(m_collapsed);
 	connect(toolMenuItem->getToolRunBtn(), &QPushButton::toggled, tme, &ToolMenuEntry::runToggled);
 	connect(toolMenuItem->getToolRunBtn(), &QPushButton::clicked, tme, &ToolMenuEntry::runClicked);
 	connect(toolMenuItem, &QPushButton::clicked, this, [=]() { Q_EMIT requestToolSelect(toolMenuItem->getId()); });
@@ -300,8 +376,14 @@ ToolMenuItem *ToolMenuManager::createToolMenuItem(ToolMenuEntry *tme, QWidget *p
 		[this, toolMenuItem](bool on) { selectTool(toolMenuItem, on); });
 	connect(toolMenuItem, &ToolMenuItem::doubleclick, this, [this, tme]() { setTmeAttached(tme); });
 	connect(tme, &ToolMenuEntry::updateToolEntry, toolMenuItem, &ToolMenuItem::updateItem);
+	connect(this, &ToolMenuManager::menuCollapsed, toolMenuItem, &ToolMenuItem::onCollapsed);
 
 	return toolMenuItem;
+}
+
+MenuCollapseHeader *ToolMenuManager::getCollapseSectionHeader(MenuSectionCollapseWidget *section)
+{
+	return dynamic_cast<MenuCollapseHeader *>(section->collapseSection()->header());
 }
 
 #include "moc_toolmenumanager.cpp"

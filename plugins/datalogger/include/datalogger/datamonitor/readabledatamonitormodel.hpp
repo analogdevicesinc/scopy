@@ -42,8 +42,6 @@ public:
 	void setReadStrategy(IReadStrategy *newReadStrategy);
 	void resetMinMax();
 
-signals:
-
 private:
 	IReadStrategy *m_readStrategy;
 };

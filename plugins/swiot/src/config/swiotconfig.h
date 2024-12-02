@@ -22,6 +22,7 @@
 #define SWIOTCONFIG_H
 
 #include "configcontroller.h"
+#include "pluginbase/toolmenuentry.h"
 #include "src/config/drawarea.h"
 
 #include <QMap>
@@ -40,7 +41,7 @@ class SwiotConfig : public QWidget
 {
 	Q_OBJECT
 public:
-	SwiotConfig(QString uri, QWidget *parent = nullptr);
+	SwiotConfig(QString uri, ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~SwiotConfig();
 
 public Q_SLOTS:
@@ -52,6 +53,7 @@ Q_SIGNALS:
 	void configBtnPressed();
 
 private:
+	ToolMenuEntry *m_tme;
 	QString m_uri;
 	QMap<QString, struct iio_device *> m_iioDevices;
 	iio_context *m_context;

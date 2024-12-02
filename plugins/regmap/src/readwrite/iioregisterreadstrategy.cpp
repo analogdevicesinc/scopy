@@ -47,6 +47,7 @@ void IIORegisterReadStrategy::read(uint32_t address)
 			<< "device read success for register " << address << " with value " << reg_val;
 		Q_EMIT readDone(address, reg_val);
 	}
+	Q_EMIT iioEvent(read);
 }
 
 uint32_t IIORegisterReadStrategy::getAddressSpace() const { return addressSpace; }

@@ -186,6 +186,12 @@ Q_SIGNALS:
 	 */
 	void runClicked(bool);
 
+	/**
+	 * @brief iioEvent
+	 * The signal must be emitted whenever an iio command is executed
+	 */
+	void iioEvent(int);
+
 private:
 	QString m_id;
 	QString m_uuid;
