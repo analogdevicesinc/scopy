@@ -96,22 +96,13 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	auto ts = ui->wsToolStack;
 
-	////////
 	BrowseMenu *browseMenu = new BrowseMenu(ui->wToolBrowser);
 	ui->wToolBrowser->layout()->addWidget(browseMenu);
-
 	connect(browseMenu, &BrowseMenu::requestTool, ts, &ToolStack::show, Qt::QueuedConnection);
 	connect(browseMenu, SIGNAL(requestLoad()), this, SLOT(load()));
 	connect(browseMenu, SIGNAL(requestSave()), this, SLOT(save()));
-	connect(browseMenu, &BrowseMenu::collapsed, this, [this](bool coll) {
-		if(coll) {
-			ui->animHolder->setAnimMin(Style::getDimension(json::global::unit_4));
-		} else {
-			ui->animHolder->setAnimMax(230);
-		}
-		ui->animHolder->toggleMenu(!coll);
-	});
-	////////
+	connect(browseMenu, &BrowseMenu::collapsed, this, &ScopyMainWindow::collapseToolMenu);
+
 	Style::setBackgroundColor(ui->centralwidget, json::theme::background_primary);
 
 	scanTask = new IIOScanTask(this);
@@ -251,6 +242,16 @@ void ScopyMainWindow::deviceAutoconnect()
 			api->connectDevice(id);
 		}
 	}
+}
+
+void ScopyMainWindow::collapseToolMenu(bool collapse)
+{
+	if(collapse) {
+		ui->animHolder->setAnimMin(Style::getDimension(json::global::unit_4));
+	} else {
+		ui->animHolder->setAnimMax(230);
+	}
+	ui->animHolder->toggleMenu(!collapse);
 }
 
 void ScopyMainWindow::save()
