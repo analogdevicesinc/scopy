@@ -26,6 +26,7 @@
 #include <QCheckBox>
 #include <QFuture>
 #include <QFutureWatcher>
+#include <QtMath>
 
 #include <iio.h>
 #include <iioutil/connectionprovider.h>
@@ -48,6 +49,26 @@
 #include <pluginbase/statusbarmanager.h>
 #include <plotwidget.h>
 #include <plotaxis.h>
+
+enum AcquisitionDataKey
+{
+	RADIUS,
+	ANGLE,
+	TURNCOUNT,
+	ABSANGLE,
+	SINE,
+	COSINE,
+	SECANGLI,
+	SECANGLQ,
+	ANGLESEC,
+	DIAG1,
+	DIAG2,
+	TMP0,
+	TMP1,
+	CNVCNT,
+	SCRADIUS,
+	SPIFAULT
+};
 
 namespace scopy{
 namespace admt {
@@ -136,7 +157,8 @@ private:
 			 *angleErrorXPlotAxis, *angleErrorYPlotAxis, *FFTAngleErrorXPlotAxis, *FFTAngleErrorYPlotAxis,
 			 *correctedErrorXPlotAxis, *correctedErrorYPlotAxis, *FFTCorrectedErrorXPlotAxis, *FFTCorrectedErrorYPlotAxis,
 			 *postCalibrationRawDataXPlotAxis, *postCalibrationRawDataYPlotAxis;
-	PlotChannel *acquisitionAnglePlotChannel, *angleErrorPlotChannel, *preCalibrationFFTPhasePlotChannel, *calibrationRawDataPlotChannel, *calibrationSineDataPlotChannel, *calibrationCosineDataPlotChannel,
+	PlotChannel *acquisitionAnglePlotChannel, *acquisitionABSAnglePlotChannel, *acquisitionTurnCountPlotChannel, *acquisitionTmp0PlotChannel,
+	 			*angleErrorPlotChannel, *preCalibrationFFTPhasePlotChannel, *calibrationRawDataPlotChannel, *calibrationSineDataPlotChannel, *calibrationCosineDataPlotChannel,
 				*FFTAngleErrorMagnitudeChannel, *FFTAngleErrorPhaseChannel,
 				*correctedErrorPlotChannel,
 				*postCalibrationRawDataPlotChannel, *postCalibrationSineDataPlotChannel, *postCalibrationCosineDataPlotChannel,
@@ -166,12 +188,8 @@ private:
 	void updateGeneralSettingEnabled(bool value);
 	void connectLineEditToNumber(QLineEdit* lineEdit, int& variable, int min, int max);
 	void connectLineEditToNumber(QLineEdit* lineEdit, double& variable, QString unit = "");
-	// void connectLineEditToGraphSamples(QLineEdit* lineEdit, int& variable, Sismograph* graph, int min, int max);
-	// void connectMenuComboToGraphDirection(MenuCombo* menuCombo, Sismograph* graph);
-	// void connectMenuComboToGraphChannel(MenuCombo* menuCombo, Sismograph* graph);
 	void connectMenuComboToNumber(MenuCombo* menuCombo, double& variable);
 	void connectMenuComboToNumber(MenuCombo* menuCombo, int& variable);
-	// void changeGraphColorByChannelName(Sismograph* graph, const char* channelName);
 	ToolTemplate* createCalibrationWidget();
 	ToolTemplate* createRegistersWidget();
 	ToolTemplate* createUtilityWidget();
@@ -237,7 +255,7 @@ private:
 	void toggleSequenceModeRegisters(int mode);
 	void readAllRegisters();
 	void prependAcquisitionData(double& data, QVector<double>& list);
-	void plotAcquisition(QVector<double>& list, PlotChannel* channel, PlotWidget* plot);
+	void plotAcquisition(QVector<double>& list, PlotChannel* channel);
 	void populateAngleErrorGraphs();
 	void populateCorrectedAngleErrorGraphs();
 	void resetDIGIO();
@@ -246,6 +264,8 @@ private:
 	void clearAngleErrorGraphs();
 	void clearCorrectedAngleErrorGraphs();
 	void clearCalibrationSineCosine();
+	void connectCheckBoxToAcquisitionGraph(QCheckBox* widget, PlotChannel* channel, AcquisitionDataKey key);
+	void prependNullAcquisitionData(QVector<double>& list);
 
 	QTimer *acquisitionUITimer, *calibrationUITimer, *utilityTimer;
 
