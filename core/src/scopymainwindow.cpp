@@ -174,6 +174,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(m_toolMenuManager, &ToolMenuManager::toolStackChanged, browseMenu, &BrowseMenu::onToolStackChanged);
 	connect(hp, &ScopyHomePage::displayNameChanged, m_toolMenuManager, &ToolMenuManager::onDisplayNameChanged);
 	connect(ts, &ToolStack::currentChanged, this, [this, ts](int idx) { highlightMenuItem(ts, idx); });
+	connect(browseMenu, &BrowseMenu::collapsed, m_toolMenuManager, &ToolMenuManager::menuCollapsed);
 
 	connect(hp, &ScopyHomePage::newDeviceAvailable, dm, &DeviceManager::addDevice);
 
@@ -261,7 +262,7 @@ void ScopyMainWindow::highlightMenuItem(ToolStack *ts, int idx)
 void ScopyMainWindow::collapseToolMenu(bool collapse)
 {
 	if(collapse) {
-		ui->animHolder->setAnimMin(Style::getDimension(json::global::unit_4));
+		ui->animHolder->setAnimMin(Style::getDimension(json::global::unit_4_5));
 	} else {
 		ui->animHolder->setAnimMax(230);
 	}
