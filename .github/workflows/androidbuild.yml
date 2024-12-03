@@ -12,18 +12,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - name: Pull the Docker Image
-      run: docker pull astanea/scopy1-android:1.5.0
+      run: docker pull analogdevices/scopy-build:1.4.1-android
     - name: Run Docker Image
       run: |
             $GITHUB_WORKSPACE/CI/appveyor/gen_ci_envs.sh > $GITHUB_WORKSPACE/CI/appveyor/gh-actions.envs
             docker run --privileged --net=host \
-                -v $(pwd):$GITHUB_WORKSPACE:rw \
+                -v `pwd`:$GITHUB_WORKSPACE:rw \
                 -e "BRANCH=${GITHUB_REF#refs/heads/}" \
                 --env-file $GITHUB_WORKSPACE/CI/appveyor/gh-actions.envs \
-                astanea/scopy1-android:1.5.0 /bin/bash -xe $GITHUB_WORKSPACE/CI/appveyor/build_scopy_apk.sh
-    - uses: actions/upload-artifact@v3
+                analogdevices/scopy-build:1.4.1-android /bin/bash -xe $GITHUB_WORKSPACE/CI/appveyor/build_scopy_apk.sh
+    - uses: actions/upload-artifact@v2
       with:
         name: scopy-android
         path: |

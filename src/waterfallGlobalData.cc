@@ -31,6 +31,7 @@
 #define WATERFALL_GLOBAL_DATA_CPP
 
 #include "waterfallGlobalData.h"
+#include "qdebug.h"
 #include <float.h>
 #include <cstdio>
 
@@ -65,7 +66,8 @@ WaterfallData::~WaterfallData() {}
 
 void WaterfallData::reset()
 {
-	std::fill(std::begin(_spectrumData), std::end(_spectrumData), std::vector<double>(_fftPoints, -DBL_MAX));
+	std::fill(std::begin(_spectrumData), std::end(_spectrumData), -DBL_MAX);
+
 	_numLinesToUpdate = -1;
 }
 
@@ -76,14 +78,16 @@ void WaterfallData::copy(const WaterfallData* rhs)
 			(boundingRect() != rhs->boundingRect())) {
 		_fftPoints = rhs->getNumFFTPoints();
 		setBoundingRect(rhs->boundingRect());
-		_spectrumData.clear();
+		_spectrumData.resize(_fftPoints * _historyLength);
 	}
 #else
 	if (_fftPoints != rhs->getNumFFTPoints()) {
 		_fftPoints = rhs->getNumFFTPoints();
-		_spectrumData.clear();
+		_spectrumData.resize(_fftPoints * _historyLength);
 	}
 #endif
+
+	reset();
 	setSpectrumDataBuffer(rhs->getSpectrumDataBuffer());
 	setNumLinesToUpdate(rhs->getNumLinesToUpdate());
 
@@ -109,22 +113,23 @@ void WaterfallData::resizeData(const double startFreq,
 		setBoundingRect(QwtDoubleRect(
 					startFreq, 0, stopFreq - startFreq, static_cast<double>(_historyLength)));
 		_fftPoints = fftPoints;
-		_spectrumData.clear();
+		_spectrumData.resize(_fftPoints * _historyLength);
 	}
 
 #else
 	if ((fftPoints != getNumFFTPoints()) ||
 			(interval(Qt::XAxis).width() != (stopFreq - startFreq)) ||
-			(interval(Qt::XAxis).minValue() != startFreq)) {
+			(interval(Qt::XAxis).minValue() != startFreq) ||
+			(_historyLength != history)) {
+		if (history > 0) {
+			_historyLength = history;
+		}
 
-		reset();
 		setInterval(Qt::XAxis, QwtInterval(startFreq, stopFreq));
-		_fftPoints = fftPoints;
-	}
-
-	if (_historyLength != history && history > 0) {
-		_historyLength = history;
 		setInterval(Qt::YAxis, QwtInterval(0, _historyLength));
+
+		_fftPoints = fftPoints;
+		_spectrumData.resize(_fftPoints * _historyLength);
 	}
 #endif
 }
@@ -165,7 +170,7 @@ QwtInterval WaterfallData::interval(Qt::Axis a) const { return d_intervals[a]; }
 
 double WaterfallData::value(double x, double y) const
 {
-	double returnValue = -DBL_MAX;
+	double returnValue = 0.0;
 
 #if QWT_VERSION < 0x060000
 	const unsigned int intY = static_cast<unsigned int>(
@@ -181,25 +186,14 @@ double WaterfallData::value(double x, double y) const
 	double ylen = static_cast<double>(_historyLength - 1);
 	double xlen = static_cast<double>(_fftPoints - 1);
 	const unsigned int intY = static_cast<unsigned int>((1.0 - y / height) * ylen);
-	const unsigned int intX = static_cast<unsigned int>((((x - left) / (right - left)) * xlen) + 0.5);
-
-	size_t spectrumData_size = _spectrumData.size();
+	const unsigned int intX =
+			static_cast<unsigned int>((((x - left) / (right - left)) * xlen) + 0.5);
 #endif
 
-	if (spectrumData_size > 0 && intY >= 0 && intY < _historyLength && intX >= 0 && intX < _fftPoints) {
-		switch (flow_direction) {
-		case WaterfallFlowDirection::DOWN:
-			if (intY < spectrumData_size) {
-				returnValue = _spectrumData.at(spectrumData_size - intY - 1).at(intX);
-			}
-			break;
-		case WaterfallFlowDirection::UP:
-			auto empty_lines = _historyLength -spectrumData_size;
-			if (intY > empty_lines + 1) {
-				returnValue = _spectrumData.at(intY - (empty_lines)).at(intX);
-			}
-			break;
-		}
+	const int location = (intY * _fftPoints) + intX;
+	if ((location > -1) &&
+			(location < static_cast<int64_t>(_fftPoints * _historyLength))) {
+		returnValue = _spectrumData[location];
 	}
 
 	return returnValue;
@@ -218,37 +212,60 @@ void WaterfallData::setFlowDirection(WaterfallFlowDirection direction)
 }
 
 void WaterfallData::addFFTData(const double* fftData,
-			       const uint64_t fftDataSize)
+			       const uint64_t fftDataSize,
+			       const int droppedFrames)
 {
 	if (fftDataSize == _fftPoints) {
-		int64_t heightOffset = _historyLength - 1;
+		int64_t heightOffset = _historyLength - 1 - droppedFrames;
+		uint64_t drawingDroppedFrames = droppedFrames;
 
 		// Any valid data rolled off the display so just fill in zeros and write new data
 		if (heightOffset < 0) {
 			heightOffset = 0;
+			drawingDroppedFrames = static_cast<uint64_t>(_historyLength - 1);
 		}
 
-		std::vector<double> new_data;
-		for (int i = 0; i < fftDataSize; i++) {
-			new_data.push_back(fftData[i]);
+		// Copy the old data over if any available
+		if (heightOffset > 0) {
+			switch (flow_direction) {
+			case WaterfallFlowDirection::UP:
+				memmove(_spectrumData.data(),
+					&_spectrumData[(drawingDroppedFrames + 1) * _fftPoints],
+						heightOffset * _fftPoints * sizeof(double));
+				break;
+			case WaterfallFlowDirection::DOWN:
+				memmove(&_spectrumData[(drawingDroppedFrames + 1) * _fftPoints],
+					_spectrumData.data(),
+						heightOffset * _fftPoints * sizeof(double));
+				break;
+			}
+
 		}
 
-		_spectrumData.push_back(new_data);
-
-		while (_spectrumData.size() > _historyLength) {
-			_spectrumData.pop_front();
+		if (drawingDroppedFrames > 0) {
+			// Fill in zeros data for dropped data
+			memset(&_spectrumData[heightOffset * _fftPoints],
+					0x00,
+					static_cast<int64_t>(drawingDroppedFrames) * _fftPoints *
+					sizeof(double));
 		}
+
+		// add the new buffer
+		int index = flow_direction == WaterfallFlowDirection::UP ? _historyLength - 1 : 0;
+		memcpy(&_spectrumData[index * _fftPoints],
+				fftData,
+				_fftPoints * sizeof(double));
 	}
 }
 
-const std::deque<std::vector<double>> WaterfallData::getSpectrumDataBuffer() const
+const double* WaterfallData::getSpectrumDataBuffer() const
 {
-	return _spectrumData;
+	return _spectrumData.data();
 }
 
-void WaterfallData::setSpectrumDataBuffer(const std::deque<std::vector<double>> newData)
+void WaterfallData::setSpectrumDataBuffer(const double* newData)
 {
-	_spectrumData = newData;
+	memcpy(_spectrumData.data(), newData, _fftPoints * _historyLength * sizeof(double));
 }
 
 int WaterfallData::getNumLinesToUpdate() const { return _numLinesToUpdate; }

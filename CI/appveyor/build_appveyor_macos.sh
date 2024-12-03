@@ -20,8 +20,9 @@ mkdir -p build
 cd build
 
 MACOS_VERSION=$(/usr/libexec/PlistBuddy -c "Print:ProductVersion" /System/Library/CoreServices/SystemVersion.plist)
-export MACOSX_DEPLOYMENT_TARGET=11.0
-
+if [[ "$MACOS_VERSION" == "10.14."* ]] ; then
+	export MACOSX_DEPLOYMENT_TARGET=10.13
+fi
 cmake -DCMAKE_STAGING_PREFIX="${STAGINGDIR}" \
 	-DCMAKE_PREFIX_PATH="${STAGINGDIR};${STAGINGDIR}/lib/cmake;${STAGINGDIR}/lib/pkgconfig;${STAGINGDIR}/lib/cmake/gnuradio;${STAGINGDIR}/lib/cmake/iio;${QT_PATH}/lib/cmake" \
 	-DCMAKE_INSTALL_PREFIX="${STAGINGDIR}" \

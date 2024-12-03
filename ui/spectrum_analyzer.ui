@@ -1539,35 +1539,7 @@ color: rgba(255,255,255,51);
                     </layout>
                    </item>
                    <item>
-                    <layout class="QVBoxLayout" name="vLayout_waterfall">
-                     <item>
-                      <layout class="QHBoxLayout" name="hLayout_toggle_waterfall">
-                       <property name="rightMargin">
-                        <number>12</number>
-                       </property>
-                       <item>
-                        <widget class="QLabel" name="label_12">
-                         <property name="text">
-                          <string>Waterfall</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="adiscope::CustomSwitch" name="btnToggleWaterfall">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <property name="text">
-                          <string/>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                    </layout>
+                    <layout class="QVBoxLayout" name="vLayout_waterfall"/>
                    </item>
                    <item>
                     <spacer name="verticalSpacer_6">

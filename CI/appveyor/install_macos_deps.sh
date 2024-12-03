@@ -1,49 +1,32 @@
 #!/bin/bash
 
-set -xe
-
-LIBIIO_VERSION=libiio-v0
-LIBAD9361_BRANCH=main
-LIBM2K_BRANCH=main
+LIBIIO_VERSION=0ed18cd8f6b2fac5204a99e38922bea73f1f778c
+LIBAD9361_BRANCH=master
+LIBM2K_BRANCH=master
 GNURADIO_BRANCH=maint-3.10
 GRSCOPY_BRANCH=3.10
-GRM2K_BRANCH=main
+GRM2K_BRANCH=master
 QWT_BRANCH=qwt-multiaxes
-LIBSIGROKDECODE_BRANCH=decoders/AD559XR
+LIBSIGROKDECODE_BRANCH=master
 LIBTINYIIOD_BRANCH=master
 
 PYTHON="python3"
-PACKAGES=" ${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog"
-PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libsndfile"
+PACKAGES=" ${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog $PYTHON"
+PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr"
 
+set -e
 REPO_SRC=$BUILD_REPOSITORY_LOCALPATH
 WORKDIR=${PWD}
 JOBS=4
 
-# Workaround: Homebrew fails to upgrade Python's 2to3 due to conflicting symlinks  https://github.com/actions/runner-images/issues/6817
-rm /usr/local/bin/2to3 || true
-rm /usr/local/bin/idle3 || true
-rm /usr/local/bin/pydoc3 || true
-rm /usr/local/bin/python3 || true
-rm /usr/local/bin/python3-config || true
-
-brew update
-# Workaround for brew taking a long time to upgrade existing packages
-# Check if macOS version and upgrade packages only if the version is greater than macOS 12
-if (( $(echo "$(sw_vers -productVersion) > 13.0" | bc -l) )); then
-	brew upgrade --display-times || true #ignore homebrew upgrade errors
-	brew install --overwrite --display-times $PACKAGES
-else
-	HOMEBREW_NO_AUTO_UPDATE=1 brew install --overwrite --display-times $PACKAGES
-fi
-
 brew search ${QT_FORMULAE}
-brew install --display-times $PACKAGES
+brew install $PACKAGES
+
 for pkg in gcc bison gettext cmake python; do
 	brew link --overwrite --force $pkg
 done
 
-pip3 install --break-system-packages mako
+pip3 install mako
 
 # Generate build status info for the about page
 BUILD_STATUS_FILE=${REPO_SRC}/build-status
@@ -59,13 +42,11 @@ export PATH="${QT_PATH}:$PATH"
 export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libzip/lib/pkgconfig"
 export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libffi/lib/pkgconfig"
 export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$STAGINGDIR/lib/pkgconfig"
-export PKG_CONFIG_PATH="$(brew --prefix python3)/lib/pkgconfig:$PKG_CONFIG_PATH"
-export PATH="$(brew --prefix python3)/bin:$PATH"
 
+echo $PKG_CONFIG_PATH
 QMAKE="$(command -v qmake)"
-CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$STAGINGDIR -DCMAKE_INSTALL_PREFIX=$STAGINGDIR"
 
-export 
+CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$STAGINGDIR -DCMAKE_INSTALL_PREFIX=$STAGINGDIR"
 
 save_version_info() {
 	echo "$CURRENT_BUILD - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
@@ -207,10 +188,34 @@ build_grscopy() {
 	make -j $JOBS
 	sudo make -j $JOBS install
 }
+build_glibmm() {
+	echo "### Building glibmm - 2.64.0"
+	cd ${WORKDIR}
+	wget http://ftp.acc.umu.se/pub/gnome/sources/glibmm/2.64/glibmm-2.64.0.tar.xz
+	tar xzvf glibmm-2.64.0.tar.xz
+	cd glibmm-2.64.0
+	echo "libglibmm - v2.64.0" >> $BUILD_STATUS_FILE
+	./configure --prefix=$STAGINGDIR
+	make -j $JOBS
+	sudo make -j $JOBS install
+}
+
+build_sigcpp() {
+	echo "### Building libsigc++ -2.10.0"
+	cd ${WORKDIR}
+	wget http://ftp.acc.umu.se/pub/GNOME/sources/libsigc++/2.10/libsigc++-2.10.0.tar.xz
+	tar xvzf libsigc++-2.10.0.tar.xz
+	cd libsigc++-2.10.0
+	echo "libsigc++ - v2.10.0" >> $BUILD_STATUS_FILE
+	./configure --prefix=$STAGINGDIR
+	make -j $JOBS
+	sudo make -j $JOBS install
+}
+
 build_libsigrokdecode() {
 	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
 
-	git clone --depth 1 https://github.com/analogdevicesinc/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH ${WORKDIR}/libsigrokdecode
+	git clone --depth 1 https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH ${WORKDIR}/libsigrokdecode
 	cd ${WORKDIR}/libsigrokdecode
 	CURRENT_BUILD=libsigrokdecode
 	save_version_info
@@ -246,6 +251,8 @@ build_libtinyiiod() {
 	sudo make -j $JOBS install
 }
 
+build_sigcpp
+build_glibmm
 build_libiio
 build_libad9361
 build_libm2k

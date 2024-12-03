@@ -18,27 +18,12 @@
 
 
 cmake_minimum_required(VERSION 3.5)
-project(scopy LANGUAGES C CXX VERSION 1.5.0)
+project(scopy LANGUAGES C CXX VERSION 1.4.1)
 
 set(Python_ADDITIONAL_VERSIONS 3)
-if(PYTHON_EXECUTABLE)
-	message(STATUS "Using custom Python EXECUTABLE: ${PYTHON_EXECUTABLE}")
-	set(Python3_EXECUTABLE ${PYTHON_EXECUTABLE})
-else()
-	message(STATUS "Using default Python EXECUTABLE")
-endif()
+FIND_PACKAGE(PythonInterp REQUIRED)
+set(PYTHON_VERSION python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
 
-if(CMAKE_SYSTEM_PROCESSOR MATCHES arm)
-	find_package(Python3 3.9 EXACT REQUIRED COMPONENTS Interpreter)
-	message (STATUS "Host Python Interpreter " ${Python3_EXECUTABLE})
-	set(Python3_EXECUTABLE ${CMAKE_SYSROOT}/bin/python3.9)
-	message (STATUS "Target Python Interpreter " ${Python3_EXECUTABLE})
-else()
-	find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
-	message (STATUS "Python Interpreter " ${Python3_EXECUTABLE})
-	message (STATUS "Python Libraries " ${Python3_LIBRARIES})
-endif()
-set(PYTHON_VERSION python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR} CACHE STRING "PYTHON_USED")
 
 function(dump_cmake_variables)
     get_cmake_property(_variableNames VARIABLES)
@@ -497,10 +482,6 @@ endif()
 # Compiler options
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall)
 
-if(DEFINED ENV{APPIMAGE})
-	add_compile_definitions(__appimage__)
-endif()
-
 #List of warnings to be treated as errors
 target_compile_options(${PROJECT_NAME} PUBLIC
 	-Werror=return-type
@@ -510,7 +491,7 @@ target_compile_options(${PROJECT_NAME} PUBLIC
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-		CXX_STANDARD 17
+		CXX_STANDARD 11
 		CXX_STANDARD_REQUIRED ON
 		CXX_EXTENSIONS OFF
 		MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist

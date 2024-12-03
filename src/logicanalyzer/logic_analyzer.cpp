@@ -209,10 +209,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 
 	// Add propper zoomer
 	m_plot.addZoomer(0);
-	m_plot.addMagnifier(0);
-	m_plot.getMagnifier()->setYAxisEnabled(false);
 
 	m_plot.setZoomerParams(true, 20);
+
+	m_plot.zoomBaseUpdate();
 
 	connect(&m_plot, &CapturePlot::timeTriggerValueChanged, [=](double value){
 		double delay = (value - 1.0 / m_sampleRate * m_bufferSize / 2.0 ) / (1.0 / m_sampleRate);
@@ -254,7 +254,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 							  TOOL_LOGIC_ANALYZER)));
 	api->load(*settings);
 	api->js_register(engine);
-	m_plot.zoomBaseUpdate();
 
 	// Scroll wheel event filter
 	m_wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
@@ -799,7 +798,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 	m_oscChannelSelectedConnection = connect(m_oscPlot, &CapturePlot::channelSelected, [=](int chIdx, bool selected){
 		chIdx -= m_oscAnalogChannels;
-		if (chIdx >= m_oscAnalogChannels && selected) {
+		if (m_oscChannelSelected != chIdx && selected) {
 			m_oscChannelSelected = chIdx;
 			nameLineEdit->setEnabled(true);
 			nameLineEdit->setText(m_oscPlotCurves[chIdx]->getName());
@@ -1744,12 +1743,6 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut){
 		updateBufferPreviewer(0, m_lastCapturedSample);
 	});
-	connect(m_plot.getMagnifier(), &scopy::MousePlotMagnifier::zoomed, [=](double factor, QPointF cursorPos){
-		updateBufferPreviewer(0, m_lastCapturedSample);
-	});
-	connect(m_plot.getMagnifier(), &scopy::MousePlotMagnifier::panned, [=](double factor){
-		updateBufferPreviewer(0, m_lastCapturedSample);
-	});
 
 	connect(m_sampleRateButton, &ScaleSpinButton::valueChanged,
 		this, &LogicAnalyzer::onSampleRateValueChanged);
@@ -1869,8 +1862,6 @@ void LogicAnalyzer::connectSignalsAndSlots()
 			}
 		}
 	});
-
-	initDecoderToolTips();
 }
 
 void LogicAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
@@ -1978,12 +1969,6 @@ void LogicAnalyzer::initBufferScrolling()
 	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut){
 		m_horizOffset = m_plot.HorizOffset();
 	});
-	connect(m_plot.getMagnifier(), &scopy::MousePlotMagnifier::zoomed, [=](double factor, QPointF cursorPos){
-		m_horizOffset = m_plot.HorizOffset();
-	});
-	connect(m_plot.getMagnifier(), &scopy::MousePlotMagnifier::panned, [=](double factor){
-		m_horizOffset = m_plot.HorizOffset();
-	});
 
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, [=](int value) {
 		m_resetHorizAxisOffset = false;
@@ -2011,74 +1996,20 @@ void LogicAnalyzer::initBufferScrolling()
 		m_horizOffset = 1.0 / m_sampleRate * m_bufferSize / 2.0 +
 				(ui->btnStreamOneShot ? 0 : m_timeTriggerOffset / m_sampleRate);
 	});
-}
 
+	// When the plot is clicked emit the clicked signal on the curve
+	m_plot.setMouseTracking(true);
+	connect(&m_plot, &CapturePlot::mouseButtonRelease, [=](const QMouseEvent *event) {
+		if (event == nullptr) return;
 
-scopy::HoverWidget *LogicAnalyzer::createHoverToolTip(QString info, QPoint position)
-{
-	QLabel *label = new QLabel(info);
-	label->setStyleSheet("QLabel {"
-			     "	font-weight: bold;"
-			     "	color: #FFFFFF;"
-			     "}");
-
-	QWidget *content = new QWidget();
-	content->setStyleSheet("QWidget {"
-			     "	background-color: #272730;"
-			     "}");
-
-	QHBoxLayout *layout = new QHBoxLayout(content);
-	layout->addWidget(label);
-
-	scopy::HoverWidget *toolTip = new scopy::HoverWidget(content, &m_plot, QApplication::activeWindow());
-	toolTip->setAnchorPos(scopy::HoverPosition::HP_TOPLEFT);
-	toolTip->setContentPos(scopy::HoverPosition::HP_TOPLEFT);
-	toolTip->setAnchorOffset(position);
-
-	return toolTip;
-}
-
-void LogicAnalyzer::initDecoderToolTips()
-{
-	QTimer *timer = new QTimer(this);
-	timer->setInterval(500);
-	lastToolTipAnn = NULL;
-
-	connect(timer, &QTimer::timeout, this, [=]() {
-		QPoint pos = m_plot.mapFromGlobal(QCursor::pos());
-		if(!m_plot.underMouse()) {
-			lastToolTipAnn = NULL;
-			Q_EMIT deleteToolTips();
-			return;
-		}
-
-		GenericLogicPlotCurve *curve = m_plot.curveAt(pos);
-		if(curve) {
-			const QPointF curvePos = curve->screenPosToCurvePoint(pos);
-			const QString *annInfo =
-				&dynamic_cast<AnnotationCurve *>(curve)->annotationAt(curvePos).ann->annotations()[0];
-
-			if(lastToolTipAnn != annInfo) {
-				scopy::HoverWidget *toolTip = createHoverToolTip(*annInfo, pos);
-				QTimer::singleShot(500, [toolTip, annInfo, this]() {
-					if(toolTip && lastToolTipAnn == annInfo)
-						toolTip->show();
-				});
-				Q_EMIT deleteToolTips();
-
-				lastToolTipAnn = annInfo;
-				connect(this, &LogicAnalyzer::deleteToolTips, toolTip,
-					&scopy::HoverWidget::deleteLater);
+		if (event->button() == Qt::LeftButton) {
+			// qDebug() << "Plot clicked" << Qt::endl;
+			if (const auto curve = m_plot.curveAt(event->pos())) {
+				const QPointF p = curve->screenPosToCurvePoint(event->pos());
+				Q_EMIT curve->clicked(p);
 			}
-		} else {
-			if(lastToolTipAnn != NULL) {
-				Q_EMIT deleteToolTips();
-			}
-			lastToolTipAnn = NULL;
 		}
 	});
-
-	timer->start();
 }
 
 void LogicAnalyzer::fitViewport(double min, double max)
@@ -2129,6 +2060,7 @@ void LogicAnalyzer::resetViewport()
 	m_timerTimeout = 1.0 / m_sampleRate * m_bufferSize * 1000.0 + 100;
 
 	m_plot.cancelZoom();
+	m_plot.zoomBaseUpdate();
 	m_plot.replot();
 
 	updateBufferPreviewer(0, m_lastCapturedSample);
@@ -2136,8 +2068,6 @@ void LogicAnalyzer::resetViewport()
 	double maxT = (1 << 13) * (1.0 / m_sampleRate) - 1.0 / m_sampleRate * m_bufferSize / 2.0; // 8192 * time between samples
 	double minT = -((1 << 13) - 1) * (1.0 / m_sampleRate) - 1.0 / m_sampleRate * m_bufferSize / 2.0; // (2 << 13) - 1 max hdl fifo depth
 	m_plot.setTimeTriggerInterval(minT, maxT);
-
-	m_plot.zoomBaseUpdate();
 }
 
 void LogicAnalyzer::startStop(bool start)

@@ -37,7 +37,6 @@
 #include "gui/animationmanager.h"
 #include "singletone_wrapper.h"
 #include "phonehome.h"
-#include "scopytitlemanager.h"
 
 #include "ui_device.h"
 #include "ui_tool_launcher.h"
@@ -144,10 +143,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 #endif
 
 	// TO DO: remove this when the About menu becomes available
-	ScopyTitleManager::setMainWindow(this);
-	ScopyTitleManager::setApplicationName("Scopy");
-	ScopyTitleManager::setScopyVersion("v" + QString(PROJECT_VERSION));
-	ScopyTitleManager::setGitHash(QString(SCOPY_VERSION_GIT));
+	setWindowTitle(QString("Scopy - ") + QString("v"+QString(PROJECT_VERSION)) + " - " + QString(SCOPY_VERSION_GIT));
 
 	prefPanel = new Preferences(this);
 	prefPanel->setVisible(false);
@@ -553,7 +549,6 @@ void ToolLauncher::saveSession()
 		qDebug()<<fi.absoluteFilePath();
 		if (!fileName.isEmpty()) {
 			this->tl_api->save(fileName);
-			ScopyTitleManager::setIniFileName(fileName);
 		}
 	}
 }
@@ -600,7 +595,6 @@ void ToolLauncher::loadSession()
 		this->tl_api->load(fileName);
 		updateHomepage();
 		setupHomepage();
-		ScopyTitleManager::setIniFileName(fileName);
 	}
 }
 
@@ -1430,7 +1424,7 @@ void adiscope::ToolLauncher::destroyContext()
 			dev->setConnected(false, false);
 		if (m_m2k) {
 			try {
-				libm2k::context::contextCloseAll();
+				libm2k::context::contextClose(m_m2k);
 			} catch (libm2k::m2k_exception &e) {
 				HANDLE_EXCEPTION(e);
 				qDebug() << e.what();
@@ -1825,8 +1819,6 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 			} else {
 #if defined __APPLE__
 				bool success = loadDecoders(QCoreApplication::applicationDirPath() + "/decoders");
-#elif defined(__appimage__)
-				bool success = loadDecoders(QCoreApplication::applicationDirPath() + "/../lib/decoders");
 #else
 				bool success = loadDecoders("decoders");
 #endif

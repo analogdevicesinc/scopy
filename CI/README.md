@@ -76,7 +76,7 @@ How to install Qt from qt.io : https://github.com/analogdevicesinc/scopy-android
 | volk | src | with GR | with GR | src | with GR | src |
 | fftw3 | pacman| src | apt | src | brew| src|
 | libgmp | pacman | src | apt | src | brew | src |
-| boost | 1.85 | 1.72 | apt/src | 1.72 | brew | Boost-for-Android |
+| boost | 1.75 | 1.72 | apt/src | 1.72 | brew | Boost-for-Android |
 | gnuradio | src | src | apt/src | src | src | src |
 | gr-iio | src | src | src | src | src | src |
 | gr-m2k | src | src | src | src | src | src |

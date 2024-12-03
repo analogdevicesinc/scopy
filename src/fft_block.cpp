@@ -52,6 +52,7 @@ fft_block::fft_block(bool use_complex, size_t fft_size, unsigned int nbthreads)
 	else
 		d_fft = fft::fft_v<float, true>::make(fft_size,
 						      window, false, nbthreads);
+
 	/* Connect everything */
 	hier_block2::connect(this->self(), 0, d_s2v_overlap, 0);
 	hier_block2::connect(d_s2v_overlap, 0, d_fft, 0);

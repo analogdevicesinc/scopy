@@ -6,11 +6,13 @@ else
 	ARTIFACT_LOCATION=$GITHUB_WORKSPACE
 fi
 
+apt-get install -y jq
+
 REPO_LOCAL=/home/docker/scopy-flatpak
 cd "$REPO_LOCAL"
 # this ensures that latest master is pulled from origin while keeping file cache
 # the cache should be updated from time to time locally
-git fetch && git reset origin/Scopy-1.5.0 --hard
+git fetch && git reset origin/qt5-gr3.10 --hard
 
 #workaround for https://github.blog/2021-10-18-git-security-vulnerabilities-announced/#cve-2022-39253
 git config --global protocol.file.allow always

@@ -144,9 +144,7 @@ public:
   long dataStartingPoint() const;
 
   void addZoomer(unsigned int zoomerIdx);
-  void addMagnifier(unsigned int magnifierIdx);
   void removeZoomer(unsigned int zoomerIdx);
-  void removeMagnifier(unsigned int magnifierIdx);
   void setXAxisNumPoints(unsigned int);
 
   void registerReferenceWaveform(QString name, QVector<double> xData, QVector<double> yData);

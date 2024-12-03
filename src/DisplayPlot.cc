@@ -59,7 +59,6 @@
 #include <QIcon>
 #include <QGridLayout>
 #include <qwt_plot_opengl_canvas.h>
-#include "gui/mouseplotmagnifier.hpp"
 
 using namespace adiscope;
 
@@ -613,10 +612,9 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,  bool isdBgraph,
 
 	d_bottomHandlesArea->setMinimumHeight(50);
 	d_rightHandlesArea->setMinimumWidth(50);
-//	d_bottomHandlesArea->setLargestChildWidth(60);
-//	d_rightHandlesArea->setLargestChildHeight(60);
+	d_bottomHandlesArea->setLargestChildWidth(60);
+	d_rightHandlesArea->setLargestChildHeight(60);
 	d_rightHandlesArea->setMinimumHeight(this->minimumHeight());
-	d_rightHandlesArea->setBottomPadding(50);
 
 	d_formatter = static_cast<PrefixFormatter *>(new MetricPrefixFormatter);
 
@@ -637,17 +635,6 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,  bool isdBgraph,
 	setupReadouts();
 }
 
-scopy::MousePlotMagnifier *DisplayPlot::getMagnifier()
-{
-	if(d_magnifier.size())
-		return d_magnifier[0];
-	return nullptr;
-}
-
-QVector<scopy::MousePlotMagnifier*> DisplayPlot::getMagnifierList()
-{
-	return d_magnifier;
-}
 
 void DisplayPlot::setupDisplayPlotDiv(bool isdBgraph) {
     if(!isdBgraph)
@@ -1307,10 +1294,8 @@ DisplayPlot::setAllYAxis(double min, double max)
 	}
 
 	if (!d_autoscale_state) {
-		for (int i = 0; i < d_zoomer.size(); ++i) {
+		for (int i = 0; i < d_zoomer.size(); ++i)
 			d_zoomer[i]->setZoomBase();
-			d_magnifier[i]->setBaseRect(d_zoomer[i]->zoomBase());
-		}
 	}
 }
 
@@ -1319,10 +1304,8 @@ DisplayPlot::setYaxis(double min, double max)
 {
   setAxisScale(QwtAxis::YLeft, min, max);
   if(!d_autoscale_state) {
-	  for (int i = 0; i < d_zoomer.size(); ++i) {
-		  d_zoomer[i]->setZoomBase();
-		  d_magnifier[i]->setBaseRect(d_zoomer[i]->zoomBase());
-	  }
+    for (unsigned int i = 0; i < d_zoomer.size(); ++i)
+	    d_zoomer[i]->setZoomBase();
   }
 }
 
@@ -1330,10 +1313,8 @@ void
 DisplayPlot::setXaxis(double min, double max)
 {
   setAxisScale(QwtAxis::XBottom, min, max);
-  for(unsigned int i = 0; i < d_zoomer.size(); ++i) {
+  for (unsigned int i = 0; i < d_zoomer.size(); ++i)
 	  d_zoomer[i]->setZoomBase();
-	  d_magnifier[i]->setBaseRect(d_zoomer[i]->zoomBase());
-  }
 }
 
 void
@@ -1696,10 +1677,8 @@ DisplayPlot::onPickerPointSelected6(const QPointF & p)
 
 void DisplayPlot::zoomBaseUpdate(bool force)
 {
-	for(unsigned int i = 0; i < d_zoomer.size(); ++i) {
+	for (unsigned int i = 0; i < d_zoomer.size(); ++i)
 		d_zoomer[i]->setZoomBase(force);
-		d_magnifier[i]->setBaseRect(d_zoomer[i]->zoomBase());
-	}
 }
 
 void DisplayPlot::AddAxisOffset(int axisPos, int axisIdx, double offset)
@@ -1827,39 +1806,6 @@ void DisplayPlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
 		scaleDraw->setColor(getLineColor(axisIdx));
 		scaleDraw->invalidateCache();
 	}
-}
-
-// remove empty space above plot
-// assumes that axis labels are left and bottom, cursor handles are right and bottom
-void DisplayPlot::adjustHandleAreasSize(bool cursors)
-{
-	int top_height = cursors ? d_vCursorHandle1->height() / 2 : 2;
-	topHandlesArea()->setMinimumHeight(top_height);
-	topHandlesArea()->setMaximumHeight(top_height);
-
-	d_leftHandlesArea->setTopPadding(top_height);
-	d_rightHandlesArea->setTopPadding(top_height);
-
-	int bottom_height = cursors ? d_hCursorHandle1->height() : axisWidget(QwtAxis::XBottom)->height();
-	bottomHandlesArea()->setMinimumHeight(bottom_height);
-	bottomHandlesArea()->setMaximumHeight(bottom_height);
-
-	d_leftHandlesArea->setBottomPadding(bottom_height);
-	d_rightHandlesArea->setBottomPadding(bottom_height);
-
-	int right_width = cursors ? d_vCursorHandle1->width() : 2;
-	rightHandlesArea()->setMinimumWidth(right_width);
-	rightHandlesArea()->setMaximumWidth(right_width);
-
-	d_topHandlesArea->setRightPadding(right_width);
-	d_bottomHandlesArea->setRightPadding(right_width);
-
-	int left_width = axisWidget(QwtAxis::YLeft)->width();
-	leftHandlesArea()->setMinimumWidth(left_width);
-	leftHandlesArea()->setMaximumWidth(left_width);
-
-	d_topHandlesArea->setLeftPadding(left_width);
-	d_bottomHandlesArea->setLeftPadding(left_width);
 }
 
 int DisplayPlot::activeVertAxis()
@@ -2047,7 +1993,6 @@ void DisplayPlot::mousePressEvent(QMouseEvent *event)
 		for (unsigned int i = 0; i < d_zoomer.size(); ++i) {
 			OscPlotZoomer *zoomer = static_cast<OscPlotZoomer *>(d_zoomer[i]);
 			zoomer->popZoom();
-			Q_EMIT d_magnifier[i]->reset();
 		}
 	}
 }
@@ -2067,14 +2012,9 @@ void DisplayPlot::setZoomerParams(bool bounded, int maxStackDepth)
 		return;
 	}
 
-	for (auto zoomer: d_zoomer) {
-		zoomer->setMaxStackDepth(maxStackDepth);
-		dynamic_cast<LimitedPlotZoomer*>(zoomer)->setBoundVertical(bounded);
-	}
-
-	for (auto magnifier: d_magnifier) {
-		magnifier->setBounded(bounded);
-	}
+	auto zoomer = dynamic_cast<LimitedPlotZoomer*>(d_zoomer[0]);
+	zoomer->setMaxStackDepth(maxStackDepth);
+	zoomer->setBoundVertical(bounded);
 }
 
 void DisplayPlot::horizAxisScaleIncrease()

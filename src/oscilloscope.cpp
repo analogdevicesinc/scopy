@@ -70,7 +70,6 @@
 #include <tool_launcher.hpp>
 
 #include "gui/runsinglewidget.h"
-#include "gui/mouseplotmagnifier.hpp"
 
 /* Generated UI */
 #include "ui_channel_settings.h"
@@ -282,8 +281,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	connect(triggerUpdater, SIGNAL(outputChanged(int)),
 		&plot, SLOT(setTriggerState(int)));
 
+	//plot.setZoomerEnabled(true);
 	fft_plot.setZoomerEnabled();
-	fft_plot.setMagnifierEnabled(false);
 	create_add_channel_panel();
 
 	/* Gnuradio Blocks Connections */
@@ -496,10 +495,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 				QwtAxisId(QwtAxis::XBottom, 0),
 				QwtAxisId(QwtAxis::YLeft, i));
 		plot.addZoomer(i);
-		plot.addMagnifier(i);
-		connect(plot.getMagnifierList()[i], &::scopy::MousePlotMagnifier::zoomed, this, &Oscilloscope::updateBufferPreviewer);
-		connect(plot.getMagnifierList()[i], &::scopy::MousePlotMagnifier::panned, this, &Oscilloscope::updateBufferPreviewer);
-
 		probe_attenuation.push_back(1);
 		auto multiply = gr::blocks::multiply_const_ff::make(1);
 		auto null_sink = gr::blocks::null_sink::make(sizeof(float));
@@ -852,6 +847,12 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 		auto max_elem = max_element(probe_attenuation.begin(), probe_attenuation.begin() + nb_channels);
 
+		auto const values = math_rails.values();
+		for (auto rail : values) {
+			rail->set_lo(MIN_MATH_RANGE);
+			rail->set_hi(MAX_MATH_RANGE);
+		}
+
 		if (started)
 			iio->unlock();
 
@@ -1144,9 +1145,6 @@ void Oscilloscope::add_ref_waveform(QString name, QVector<double> xData, QVector
 		QwtAxisId(QwtAxis::YLeft, curve_id));
 	plot.Curve(curve_id)->setTitle("REF " + QString::number(nb_ref_channels + 1));
 	plot.addZoomer(curve_id);
-	plot.addMagnifier(curve_id);
-	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::zoomed, this, &Oscilloscope::updateBufferPreviewer);
-	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::panned, this, &Oscilloscope::updateBufferPreviewer);
 	plot.replot();
 
 	nb_ref_channels++;
@@ -1265,9 +1263,6 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 	        QwtAxisId(QwtAxis::YLeft, curve_id));
 	plot.Curve(curve_id)->setTitle("REF " + QString::number(nb_ref_channels + 1));
 	plot.addZoomer(curve_id);
-	plot.addMagnifier(curve_id);
-	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::zoomed, this, &Oscilloscope::updateBufferPreviewer);
-	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::panned, this, &Oscilloscope::updateBufferPreviewer);
 	plot.replot();
 
 	nb_ref_channels++;
@@ -2475,6 +2470,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 		return;
 	}
 
+	auto rail = gr::analog::rail_ff::make(MIN_MATH_RANGE, MAX_MATH_RANGE);
 	auto math = gr::scopy::iio_math::make(function, nb_channels);
 	unsigned int curve_id = nb_channels + nb_math_channels + nb_ref_channels;
 	unsigned int curve_number = find_curve_number();
@@ -2496,6 +2492,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	auto math_pair = QPair<gr::basic_block_sptr, gr::basic_block_sptr>(
 				math, math_sink);
 	math_sinks.insert(qname, math_pair);
+	math_rails.insert(qname, rail);
 
 	/* Lock the flowgraph if we are already started */
 	bool started = isIioManagerStarted();
@@ -2507,7 +2504,8 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		iio->connect(math_probe_atten.at(i), 0, math, i);
 	}
-	iio->connect(math, 0, math_sink, 0);
+	iio->connect(math, 0, rail, 0);
+	iio->connect(rail, 0, math_sink, 0);
 
 	if (started)
 		iio->unlock();
@@ -2567,9 +2565,6 @@ void Oscilloscope::add_math_channel(const std::string& function)
 			QwtAxisId(QwtAxis::YLeft, curve_id));
 	plot.Curve(curve_id)->setTitle("M " + QString::number(curve_number + 1));
 	plot.addZoomer(curve_id);
-	plot.addMagnifier(curve_id);
-	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::zoomed, this, &Oscilloscope::updateBufferPreviewer);
-	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::panned, this, &Oscilloscope::updateBufferPreviewer);
 	plot.replot();
 
 	/* We added a Math channel that is enabled by default,
@@ -2675,12 +2670,14 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 
 		/* Disconnect the blocks from the running flowgraph */
 		auto pair = math_sinks.take(qname);
+		auto rail = math_rails.take(qname);
 
 		for (unsigned int i = 0; i < nb_channels; i++) {
 			iio->disconnect(math_probe_atten.at(i), 0, pair.first, i);
 		}
 
-		iio->disconnect(pair.first, 0, pair.second, 0);
+		iio->disconnect(pair.first, 0, rail, 0);
+		iio->disconnect(rail, 0, pair.second, 0);
 
 		if (xy_is_visible) {
 			setup_xy_channels();
@@ -3272,11 +3269,8 @@ void Oscilloscope::onTriggerSourceChanged(int chnIdx)
 
 void Oscilloscope::onTimeTriggerDelayChanged(double value)
 {
-	if (timePosition->value() != value) {
-		cancelZoom();
-		plot.zoomBaseUpdate();
+	if (timePosition->value() != value)
 		Q_EMIT triggerPositionChanged(value);
-	}
 }
 
 void Oscilloscope::onTriggerLevelChanged(double value)
@@ -3492,7 +3486,6 @@ QString adiscope::Oscilloscope::getChannelRangeStringVDivHelper(int ch)
 void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 {
 	cancelZoom();
-
 	if (value != plot.VertUnitsPerDiv(current_ch_widget)) {
 		plot.setVertUnitsPerDiv(value, current_ch_widget);
 		plot.replot();
@@ -3533,14 +3526,11 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 	}
 	str.append(getChannelRangeStringVDivHelper(current_ch_widget));
 	label->setText(str);
-
-	plot.zoomBaseUpdate();
 }
 
 
 void Oscilloscope::onCmbMemoryDepthChanged(QString value)
 {
-	cancelZoom();
 	bool ok, started;
 	unsigned long bufferSize = value.toInt(&ok);
 	if (!ok) {
@@ -3580,6 +3570,7 @@ void Oscilloscope::onCmbMemoryDepthChanged(QString value)
 	plot.setHorizOffset(params.timePos);
 	plot.setDataStartingPoint(active_trig_sample_count);
 	plot.resetXaxisOnNextReceivedData();
+	plot.cancelZoom();
 
 	if (zoom_level == 0) {
 		noZoomXAxisWidth = plot.axisInterval(QwtAxis::XBottom).width();
@@ -3629,8 +3620,6 @@ void Oscilloscope::onCmbMemoryDepthChanged(QString value)
 	resetStreamingFlag(true);
 	double maxT = (1 << 13) * (1.0 / active_sample_rate) - 1.0 / active_sample_rate * active_plot_sample_count / 2.0;
 	plot.setTimeTriggerInterval(-36E2, maxT);
-
-	plot.zoomBaseUpdate();
 }
 
 void Oscilloscope::setSinksDisplayOneBuffer(bool val)
@@ -3808,8 +3797,6 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 
 	double maxT = (1 << 13) * (1.0 / active_sample_rate) - 1.0 / active_sample_rate * active_plot_sample_count / 2.0;
 	plot.setTimeTriggerInterval(-36E2, maxT);
-
-	plot.zoomBaseUpdate();
 }
 
 bool adiscope::Oscilloscope::gainUpdateNeeded()
@@ -3846,6 +3833,8 @@ void Oscilloscope::updateXyPlotScales()
 
 void adiscope::Oscilloscope::onVertOffsetValueChanged(double value)
 {
+	cancelZoom();
+
 	if (value != -plot.VertOffset(current_ch_widget)) {
 		plot.setVertOffset(-value, current_ch_widget);
 	}
@@ -3981,8 +3970,6 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 	fft_plot_size = pow(2, power);
 	fft_size = active_sample_count;
 	onFFT_view_toggled(fft_is_visible);
-
-	plot.zoomBaseUpdate();
 }
 
 void adiscope::Oscilloscope::rightMenuFinished(bool opened)
@@ -4254,20 +4241,24 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 		setup_xy_channels();
 	}
 	auto pair = math_sinks.value(qname);
+	auto rail_old = math_rails.value(qname);
 	for (unsigned int i = 0; i < nb_channels; ++i) {
 		iio->disconnect(math_probe_atten.at(i), 0, pair.first, i);
 	}
-	iio->disconnect(pair.first, 0, pair.second, 0);
+	iio->disconnect(pair.first, 0, rail_old, 0);
+	iio->disconnect(rail_old, 0, pair.second, 0);
 
 	auto math_pair = QPair<gr::basic_block_sptr, gr::basic_block_sptr>(
 				math, pair.second);
 
 	math_sinks.insert(qname, math_pair);
+	math_rails.insert(qname, rail);
 
 	for (unsigned int i = 0; i < nb_channels; ++i) {
 		iio->connect(math_probe_atten.at(i), 0, math, i);
 	}
-	iio->connect(math, 0, pair.second, 0);
+	iio->connect(math, 0, rail, 0);
+	iio->connect(rail, 0, pair.second, 0);
 
 	if(xy_is_visible) {
 		gsettings_ui->cmb_x_channel->blockSignals(true);

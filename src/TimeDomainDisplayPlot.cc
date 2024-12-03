@@ -249,14 +249,6 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, bool isdBgraph, un
   for (int i = 0; i < 6; i++) {
 	  d_zoomer.push_back(new TimeDomainDisplayZoomer(this->canvas()));
 	  d_zoomer[i]->setEnabled(false);
-
-	  d_magnifier.push_back(new scopy::MousePlotMagnifier(canvas()));
-	  d_magnifier[i]->setBounded(true);
-	  d_magnifier[i]->setFactor(0.99);
-	  d_magnifier[i]->setYAxisEnabled(false);
-	  connect(d_magnifier[i], &scopy::MousePlotMagnifier::reset, this, [=](){
-		  d_zoomer[i]->zoom(0);
-	  });
   }
 }
 
@@ -632,21 +624,6 @@ TimeDomainDisplayPlot::addZoomer(unsigned int zoomerIdx)
 	d_zoomer[zoomerIdx]->setAxes(QwtAxisId(QwtAxis::XBottom, 0), QwtAxisId(QwtAxis::YLeft, zoomerIdx));
 }
 
-
-void TimeDomainDisplayPlot::addMagnifier(unsigned int magnifierIdx)
-{
-	d_magnifier[magnifierIdx]->setEnabled(true);
-	connect(d_magnifier[magnifierIdx], &scopy::MousePlotMagnifier::reset, this, [=](){
-		d_zoomer[magnifierIdx]->zoom(0);
-	});
-
-	d_magnifier[magnifierIdx]->setBounded(true);
-	d_magnifier[magnifierIdx]->setFactor(0.99);
-	d_magnifier[magnifierIdx]->setXAxis(QwtAxisId(QwtAxis::XBottom, 0));
-	d_magnifier[magnifierIdx]->setYAxis(QwtAxisId(QwtAxis::YLeft, magnifierIdx));
-	d_magnifier[magnifierIdx]->setBaseRect(d_zoomer[magnifierIdx]->zoomBase());
-}
-
 void
 TimeDomainDisplayPlot::removeZoomer(unsigned int zoomerIdx)
 {
@@ -671,32 +648,6 @@ TimeDomainDisplayPlot::removeZoomer(unsigned int zoomerIdx)
 		if (d_zoomer[i]->isEnabled()) {
 			d_zoomer[i]->setAxes(QwtAxisId(QwtAxis::XBottom, 0), QwtAxisId(QwtAxis::YLeft, i));
 			d_zoomer[i]->setTrackerPen(getLineColor(i));
-		}
-	}
-}
-
-void TimeDomainDisplayPlot::removeMagnifier(unsigned int magnifierIdx)
-{
-	if(magnifierIdx == 0 || magnifierIdx == 1) {
-		d_magnifier[magnifierIdx]->setEnabled(false);
-		return;
-	}
-
-	int toDisable = magnifierIdx;
-	while(d_magnifier[toDisable]->isEnabled() && toDisable < d_magnifier.size() - 1) {
-		toDisable++;
-	}
-
-	if(toDisable == d_magnifier.size() - 1 && d_magnifier[toDisable]->isEnabled()) {
-		d_magnifier[toDisable]->setEnabled(false);
-	} else {
-		d_magnifier[toDisable - 1]->setEnabled(false);
-	}
-
-	for(int i = 0; i < d_zoomer.size(); ++i) {
-		if(d_magnifier[i]->isEnabled()) {
-			d_magnifier[magnifierIdx]->setXAxis(QwtAxisId(QwtAxis::XBottom, 0));
-			d_magnifier[magnifierIdx]->setYAxis(QwtAxisId(QwtAxis::YLeft, i));
 		}
 	}
 }
@@ -966,10 +917,8 @@ TimeDomainDisplayPlot::setTagBackgroundStyle(Qt::BrushStyle b)
 
 void TimeDomainDisplayPlot::setZoomerEnabled(bool en)
 {
-	for (unsigned int i = 0; i < d_zoomer.size(); ++i) {
+	for (unsigned int i = 0; i < d_zoomer.size(); ++i)
 		d_zoomer[i]->setEnabled(en);
-		d_magnifier[i]->setEnabled(en);
-	}
 }
 
 bool TimeDomainDisplayPlot::isZoomerEnabled()
@@ -1470,9 +1419,6 @@ void TimeDomainDisplayPlot::cleanUpJustBeforeChannelRemoval(int)
 void TimeDomainDisplayPlot::cancelZoom()
 {
 	for (unsigned int i = 0; i < d_zoomer.size(); ++i) {
-		if (getMagnifierList()[i]->isZoomed())
-			Q_EMIT getMagnifierList()[i]->reset();
-
 		OscPlotZoomer *zoomer = static_cast<OscPlotZoomer *>(d_zoomer[i]);
 		zoomer->resetZoom();
 	}

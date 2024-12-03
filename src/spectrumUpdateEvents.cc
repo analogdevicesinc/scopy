@@ -400,7 +400,7 @@ ConstUpdateEvent::getNumDataPoints() const
 /***************************************************************************/
 
 
-WaterfallUpdateEvent::WaterfallUpdateEvent(const std::vector<double*> &dataPoints,
+WaterfallUpdateEvent::WaterfallUpdateEvent(const std::vector<volk::vector<double>> dataPoints,
 					   const uint64_t numDataPoints,
 					   const gr::high_res_timer_type dataTimestamp)
   : QEvent(QEvent::Type(SpectrumUpdateEventType))
@@ -415,7 +415,7 @@ if (numDataPoints < 1) {
     for (size_t i = 0; i < _nplots; i++) {
 	_dataPoints.push_back(new double[_numDataPoints]);
 	if (numDataPoints > 0) {
-		memcpy(_dataPoints[i], dataPoints[i], _numDataPoints * sizeof(double));
+	    memcpy(_dataPoints[i], dataPoints[i].data(), _numDataPoints * sizeof(double));
 	}
     }
 
