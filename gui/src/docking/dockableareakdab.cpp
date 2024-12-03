@@ -42,6 +42,7 @@ void DockableArea::addDockWrapper(DockWrapperInterface *dockWrapper)
 {
 	KDDockWidgets::QtWidgets::DockWidget *dockWrapperWidget =
 		dynamic_cast<KDDockWidgets::QtWidgets::DockWidget *>(dockWrapper);
+	dockWrapperWidget->setAffinities({uniqueName()});
 	if(dockWrapperWidget) {
 		addDockWidget(dockWrapperWidget, KDDockWidgets::Location_OnRight);
 	} else {
