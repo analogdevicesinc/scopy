@@ -45,6 +45,7 @@ PopupWidget::~PopupWidget()
 
 void PopupWidget::initUI()
 {
+	Style::setBackgroundColor(this, json::theme::background_primary);
 	this->setObjectName("PopupWidget");
 	this->resize(500, 300);
 	auto verticalLayout = new QVBoxLayout(this);
