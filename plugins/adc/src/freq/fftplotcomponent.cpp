@@ -22,6 +22,8 @@
 #include "fftplotcomponent.h"
 #include "plotaxis.h"
 
+#include <gui/docking/dockablearea.h>
+#include <gui/docking/dockwrapper.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
 #include <widgets/menuplotaxisrangecontrol.h>
@@ -36,10 +38,11 @@ using namespace adc;
 FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	: PlotComponent(name, uuid, parent)
 {
-	m_dockableArea = new DockableArea(this);
-	m_plotLayout->addWidget(m_dockableArea);
+	m_dockableArea = createDockableArea(this);
+	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
+	m_plotLayout->addWidget(dockableAreaWidget);
 
-	m_fftDockWrapper = new DockWrapper("FFT Plot");
+	m_fftDockWrapper = createDockWrapper("FFT Plot");
 	m_fftPlot = new PlotWidget(this);
 	m_fftPlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_fftPlot->xAxis()->setInterval(0, 1);

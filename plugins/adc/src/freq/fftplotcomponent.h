@@ -38,8 +38,8 @@
 #include "plotcomponent.h"
 #include "fftplotcomponentsettings.h"
 #include <widgets/plotinfowidgets.h>
-#include <gui/docking/dockablearea.h>
-#include <gui/docking/dockwrapper.h>
+#include <gui/docking/dockableareainterface.h>
+#include <gui/docking/dockwrapperinterface.h>
 
 namespace scopy {
 namespace adc {
@@ -66,8 +66,8 @@ private:
 	PlotWidget *m_fftPlot;
 	FFTSamplingInfo *m_fftInfo;
 
-	DockableArea *m_dockableArea;
-	DockWrapper *m_fftDockWrapper;
+	DockableAreaInterface *m_dockableArea;
+	DockWrapperInterface *m_fftDockWrapper;
 
 	FFTPlotComponentSettings *m_plotMenu;
 };

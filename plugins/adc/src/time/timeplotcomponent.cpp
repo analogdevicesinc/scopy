@@ -23,6 +23,8 @@
 #include "docking/dockwrapper.h"
 #include "plotaxis.h"
 
+#include <gui/docking/dockablearea.h>
+#include <gui/docking/dockwrapper.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menuplotaxisrangecontrol.h>
@@ -43,17 +45,18 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 	, m_XYXChannel(nullptr)
 	, m_singleYMode(true)
 {
-	m_dockableArea = new DockableArea(this);
-	m_plotLayout->addWidget(m_dockableArea);
+	m_dockableArea = createDockableArea(this);
+	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
+	m_plotLayout->addWidget(dockableAreaWidget);
 
-	m_timeDockWidget = new DockWrapper("Time Plot");
+	m_timeDockWidget = createDockWrapper("Time Plot");
 	m_timePlot = new PlotWidget(this);
 	m_timePlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_timePlot->xAxis()->setInterval(0, 1);
 	m_timePlot->xAxis()->setVisible(true);
 	m_timeDockWidget->setInnerWidget(m_timePlot);
 
-	m_xyDockWidget = new DockWrapper("XY Plot");
+	m_xyDockWidget = createDockWrapper("XY Plot");
 	m_xyPlot = new PlotWidget(this);
 	m_xyPlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_xyPlot->xAxis()->setInterval(-2048, 2048);
@@ -227,6 +230,6 @@ TimePlotComponentSettings *TimePlotComponent::createPlotMenu(QWidget *parent) { 
 
 TimePlotComponentSettings *TimePlotComponent::plotMenu() { return m_plotMenu; }
 
-DockWrapper *TimePlotComponent::timeDockWidget() const { return m_timeDockWidget; }
+DockWrapperInterface *TimePlotComponent::timeDockWidget() const { return m_timeDockWidget; }
 
-DockWrapper *TimePlotComponent::xyDockWidget() const { return m_xyDockWidget; }
+DockWrapperInterface *TimePlotComponent::xyDockWidget() const { return m_xyDockWidget; }
