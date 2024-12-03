@@ -60,9 +60,9 @@ Max14906::Max14906(QString uri, ToolMenuEntry *tme, QWidget *parent)
 
 	InfoBtn *infoBtn = new InfoBtn(this, true);
 	m_tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
-	connect(infoBtn, &InfoBtn::clicked, this, [=]() {
+	connect(infoBtn, &InfoBtn::clicked, this, [this, infoBtn]() {
 		infoBtn->generateInfoPopup(this);
-		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, [=]() { this->startTutorial(); });
+		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, &Max14906::startTutorial);
 
 		connect(infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, [=, this]() {
 			QDesktopServices::openUrl(

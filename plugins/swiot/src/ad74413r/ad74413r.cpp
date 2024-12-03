@@ -609,9 +609,9 @@ void Ad74413r::setupToolTemplate()
 	m_singleBtn->setChecked(false);
 	m_configBtn = createConfigBtn();
 
-	connect(m_infoBtn, &InfoBtn::clicked, this, [=]() {
+	connect(m_infoBtn, &InfoBtn::clicked, this, [this]() {
 		m_infoBtn->generateInfoPopup(this);
-		connect(m_infoBtn->getTutorialButton(), &QPushButton::clicked, this, [=]() { this->startTutorial(); });
+		connect(m_infoBtn->getTutorialButton(), &QPushButton::clicked, this, &Ad74413r::startTutorial);
 		connect(m_infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, [=, this]() {
 			QDesktopServices::openUrl(
 				QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/ad74413r.html"));

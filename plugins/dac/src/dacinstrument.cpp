@@ -69,11 +69,10 @@ DacInstrument::DacInstrument(const Connection *conn, QWidget *parent)
 
 	rightMenuBtnGrp->addButton(settingsBtn);
 	rightMenuBtnGrp->addButton(devicesBtn->button());
-	connect(infoBtn, &InfoBtn::clicked, this, [=]() {
+	connect(infoBtn, &InfoBtn::clicked, this, [this]() {
 		infoBtn->generateInfoPopup(this);
 
-		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, [=]() { this->startTutorial(); });
-
+		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, &DacInstrument::startTutorial);
 		connect(infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, [=, this]() {
 			QDesktopServices::openUrl(
 				QUrl("https://analogdevicesinc.github.io/scopy/plugins/dac/dac.html"));
