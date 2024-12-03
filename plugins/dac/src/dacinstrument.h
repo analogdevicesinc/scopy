@@ -49,8 +49,12 @@ public Q_SLOTS:
 	void startTutorial();
 	void runToggled(bool toggled);
 	void dacRunning(bool toggled);
+
 Q_SIGNALS:
 	void running(bool toggled);
+
+private Q_SLOTS:
+	void startDdsTutorial();
 
 private:
 	void setupDacDataManagers();
@@ -59,7 +63,6 @@ private:
 	void setupDacDataDeviceButtons();
 	void startBufferTutorial();
 	void startBufferNonCyclicTutorial();
-	void startDdsTutorial();
 	void abortTutorial();
 
 	const Connection *m_conn;

@@ -71,11 +71,10 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 
 	infoBtn = new InfoBtn(this, true);
 
-	connect(infoBtn, &InfoBtn::clicked, this, [=]() {
+	connect(infoBtn, &InfoBtn::clicked, this, [this]() {
 		infoBtn->generateInfoPopup(this);
 
-		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, [=]() { this->startTutorial(); });
-
+		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, &DatamonitorTool::startTutorial);
 		connect(infoBtn->getDocumentationButton(), &QPushButton::clicked, this, [=]() {
 			QDesktopServices::openUrl(
 				QUrl("https://analogdevicesinc.github.io/scopy/plugins/datalogger/datalogger.html"));

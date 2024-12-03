@@ -62,6 +62,9 @@ Q_SIGNALS:
 	void settingsTitleChanged(QString newTitle);
 	void requestDeleteTool();
 
+private Q_SLOTS:
+	void startTutorial();
+
 private:
 	MenuControlButton *monitorsButton;
 	DataAcquisitionManager *m_dataAcquisitionManager;
@@ -92,7 +95,6 @@ private:
 	MonitorSelectionMenu *m_monitorSelectionMenu;
 
 	void initTutorialProperties();
-	void startTutorial();
 };
 } // namespace scopy::datamonitor
 #endif // DATAMONITORTOOL_H
