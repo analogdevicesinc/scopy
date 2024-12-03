@@ -37,6 +37,9 @@ else()
 	message(STATUS "Not using ccache.")
 endif()
 
+# Create the "compile_commands.json" file
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Make sure our local CMake Modules path comes first
 list(INSERT CMAKE_MODULE_PATH 0 ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
