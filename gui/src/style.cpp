@@ -361,3 +361,5 @@ QString Style::adjustForScaling(QString key, QString value)
 
 	return value;
 }
+
+#include "moc_style.cpp"

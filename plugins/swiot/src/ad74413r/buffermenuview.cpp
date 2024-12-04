@@ -140,11 +140,7 @@ QWidget *BufferMenuView::createVerticalSettingsMenu(QString unit, double yMin, d
 		"Y-AXIS", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, verticalContainer);
 
 	auto m_yMin = new MenuSpinbox("YMin", yMin, unit, -DBL_MAX, DBL_MAX, true, false, verticalContainer);
-	m_yMin->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
-
 	auto m_yMax = new MenuSpinbox("YMax", yMax, unit, -DBL_MAX, DBL_MAX, true, false, verticalContainer);
-	m_yMax->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
-
 	layout->addWidget(m_yMin);
 	layout->addWidget(m_yMax);
 

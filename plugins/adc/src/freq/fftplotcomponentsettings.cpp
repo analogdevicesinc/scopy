@@ -68,6 +68,8 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 									 MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_plotComponent->fftPlot()->yAxis(), this);
+	m_yCtrl->minSpinbox()->scale()->setHasPrefix(false);
+	m_yCtrl->maxSpinbox()->scale()->setHasPrefix(false);
 	m_yCtrl->minSpinbox()->setIncrementMode(MenuSpinbox::IS_FIXED);
 	m_yCtrl->maxSpinbox()->setIncrementMode(MenuSpinbox::IS_FIXED);
 	m_yCtrl->minSpinbox()->setUnit("dB");
@@ -76,8 +78,6 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_yCtrl->maxSpinbox()->setMinValue(-1000);
 	m_yCtrl->minSpinbox()->setMaxValue(1000);
 	m_yCtrl->maxSpinbox()->setMaxValue(1000);
-	m_yCtrl->minSpinbox()->setScaleRange(1, 1);
-	m_yCtrl->maxSpinbox()->setScaleRange(1, 1);
 
 	MenuOnOffSwitch *m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), plotMenu, false);
 	m_autoscaler = new PlotAutoscaler(this);
@@ -96,8 +96,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_plotComponent->fftPlot()->yAxis()->getFormatter()->setTwoDecimalMode(false);
 
 	m_yPwrOffset = new MenuSpinbox("Power Offset", 0, "dB", -300, 300, true, false, yaxis);
-	m_yPwrOffset->setScaleRange(1, 1);
-	m_yPwrOffset->setIncrementMode(MenuSpinbox::IS_FIXED);
+	m_yPwrOffset->scale()->setHasPrefix(false);
 
 	m_windowCb = new MenuCombo("Window", yaxis);
 
