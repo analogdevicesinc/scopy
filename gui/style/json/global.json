@@ -31,5 +31,7 @@
 "ch7": "#c7c10a",
 "white": "#FFFFFF",
 "black": "#000000",
+"led_success": "#2E9E6F",
+"led_error": "#F64C5A",
 "run_button_color": "&interactive_primary_idle&"
 }
