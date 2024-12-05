@@ -10,6 +10,7 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QPushButton>
+#include <QDoubleValidator>
 
 namespace scopy::admt {
     class SCOPY_ADMT_EXPORT HorizontalSpinBox : public QWidget

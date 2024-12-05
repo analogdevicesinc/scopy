@@ -26,6 +26,9 @@ HorizontalSpinBox::HorizontalSpinBox(QString header, double initialValue, QStrin
     controlLayout->setSpacing(2);
 
     m_lineEdit = new QLineEdit(controlWidget);
+    QDoubleValidator *validator = new QDoubleValidator(this);
+    validator->setNotation(QDoubleValidator::StandardNotation);
+    m_lineEdit->setValidator(validator);
     applyLineEditStyle(m_lineEdit);
 
     if(QString::compare(m_unit, "") != 0) {
