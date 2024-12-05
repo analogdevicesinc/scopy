@@ -171,4 +171,42 @@ void ADMTStyleHelper::ColoredSquareCheckbox(QCheckBox *chk, QColor color, QStrin
 	chk->setStyleSheet(style);
 }
 
+void ADMTStyleHelper::StartButtonStyle(QPushButton *btn, QString objectName)
+{
+	if(!objectName.isEmpty())
+		btn->setObjectName(objectName);
+	QString style = QString(R"css(
+			QPushButton {
+				border-radius: 2px;
+				padding-left: 20px;
+				padding-right: 20px;
+				color: white;
+				font-weight: 700;
+				font-size: 14px;
+			}
+
+			QPushButton:!checked {
+				background-color: #27b34f;
+			}
+
+			  QPushButton:checked {
+				background-color: #F45000;
+			}
+
+			QPushButton:disabled {
+				background-color: grey;
+			})css");
+	btn->setCheckable(true);
+	btn->setChecked(false);
+	btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	btn->setFixedHeight(36);
+	btn->setStyleSheet(style);
+	QIcon playIcon;
+	playIcon.addPixmap(Util::ChangeSVGColor(":/gui/icons/play.svg", "white", 1), QIcon::Normal, QIcon::Off);
+	playIcon.addPixmap(Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/play_stop.svg", "white", 1),
+			QIcon::Normal, QIcon::On);
+	btn->setIcon(playIcon);
+	btn->setIconSize(QSize(64, 64));
+}
+
 #include "moc_admtstylehelper.cpp"
