@@ -7,6 +7,8 @@
 #include <QApplication>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QCheckBox>
+#include <QIcon>
 
 #include <plotwidget.h>
 
@@ -29,6 +31,7 @@ public:
     static void ComboBoxStyle(QComboBox *widget, QString objectName = "");
     static void LineEditStyle(QLineEdit *widget, QString objectName = "");
     static void ColoredSquareCheckbox(QCheckBox *chk, QColor color, QString objectName = "");
+    static void StartButtonStyle(QPushButton *btn, QString objectName = "");
 private:
     static ADMTStyleHelper *pinstance_;
 };
