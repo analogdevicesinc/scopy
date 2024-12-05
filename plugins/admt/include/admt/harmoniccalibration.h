@@ -27,6 +27,8 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QtMath>
+#include <QIntValidator>
+#include <QDoubleValidator>
 
 #include <iio.h>
 #include <iioutil/connectionprovider.h>
@@ -107,21 +109,22 @@ private:
 	double rotation, angle, count, temp = 0.0, amax, rotate_vmax, dmax, disable, target_pos, current_pos, ramp_mode,
 		afeDiag0, afeDiag1, afeDiag2;
 
-	QPushButton *openLastMenuButton, *calibrationStartMotorButton, *applyCalibrationDataButton, *calibrateDataButton, *extractDataButton,
+	QPushButton *openLastMenuButton, *calibrationStartMotorButton,
+				*calibrateDataButton, *extractDataButton, *clearCalibrateDataButton,
 				*clearCommandLogButton, *applySequenceButton, *readAllRegistersButton;
 	QButtonGroup *rightMenuButtonGroup;
 
 	QLineEdit 	*graphUpdateIntervalLineEdit, *displayLengthLineEdit,
 				*dataGraphSamplesLineEdit, *tempGraphSamplesLineEdit, 
+				*acquisitionMotorCurrentPositionLineEdit,
 				*calibrationH1MagLineEdit, *calibrationH2MagLineEdit, 
 				*calibrationH3MagLineEdit, *calibrationH8MagLineEdit,
 				*calibrationH1PhaseLineEdit, *calibrationH2PhaseLineEdit, 
 				*calibrationH3PhaseLineEdit, *calibrationH8PhaseLineEdit,
+				*calibrationMotorCurrentPositionLineEdit,
 				*AFEDIAG0LineEdit, *AFEDIAG1LineEdit, *AFEDIAG2LineEdit;
 
-	QLabel 	*rotationValueLabel, *angleValueLabel, *countValueLabel, *tempValueLabel, 
-			*acquisitionMotorCurrentPositionLabel,
-			*calibrationMotorCurrentPositionLabel,
+	QLabel 	*rotationValueLabel, *angleValueLabel, *countValueLabel, *tempValueLabel,
 			*motorAmaxValueLabel, *motorRotateVmaxValueLabel, *motorDmaxValueLabel,
 			*motorDisableValueLabel, *motorTargetPosValueLabel, *motorCurrentPosValueLabel,
 			*motorRampModeValueLabel,
@@ -205,7 +208,7 @@ private:
 	void applyTextStyle(QWidget *widget, const QString& styleHelperColor = "CH0", bool isBold = false);
 	void applyLabelStyle(QLabel *widget);
 	void initializeMotor();
-	void stepMotorAcquisition(double step = -408);
+	void moveMotorToPosition(double& position, bool validate = true);
 	void resetAllCalibrationState();
 	void connectLineEditToRPSConversion(QLineEdit* lineEdit, double& vmax);
 	void connectLineEditToNumberWrite(QLineEdit* lineEdit, double& variable, ADMTController::MotorAttribute attribute);
@@ -266,6 +269,12 @@ private:
 	void clearCalibrationSineCosine();
 	void connectCheckBoxToAcquisitionGraph(QCheckBox* widget, PlotChannel* channel, AcquisitionDataKey key);
 	void prependNullAcquisitionData(QVector<double>& list);
+	void startMotorContinuous();
+	void stopMotor();
+	void calculateHarmonicValues();
+	void connectLineEditToDouble(QLineEdit* lineEdit, double& variable);
+	void updateLineEditValue(QLineEdit* lineEdit, double value);
+	void toggleTabSwitching(bool value);
 
 	QTimer *acquisitionUITimer, *calibrationUITimer, *utilityTimer;
 

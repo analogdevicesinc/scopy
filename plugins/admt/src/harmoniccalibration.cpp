@@ -145,10 +145,10 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	angleWidget->contentLayout()->setSpacing(8);
 	countWidget->contentLayout()->setSpacing(8);
 	tempWidget->contentLayout()->setSpacing(8);
-	MenuCollapseSection *rotationSection = new MenuCollapseSection("AMR Angle", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, rotationWidget);
-	MenuCollapseSection *angleSection = new MenuCollapseSection("GMR Angle", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, angleWidget);
+	MenuCollapseSection *rotationSection = new MenuCollapseSection("ABS Angle", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, rotationWidget);
+	MenuCollapseSection *angleSection = new MenuCollapseSection("Angle", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, angleWidget);
 	MenuCollapseSection *countSection = new MenuCollapseSection("Count", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, countWidget);
-	MenuCollapseSection *tempSection = new MenuCollapseSection("Sensor Temperature", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, tempWidget);
+	MenuCollapseSection *tempSection = new MenuCollapseSection("Temp 0", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, tempWidget);
 	rotationSection->contentLayout()->setSpacing(8);
 	angleSection->contentLayout()->setSpacing(8);
 	countSection->contentLayout()->setSpacing(8);
@@ -210,20 +210,21 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	motorControlSectionWidget->contentLayout()->addWidget(motorControlCollapseSection);
 	QLabel *currentPositionLabel = new QLabel("Current Position", motorControlSectionWidget);
 	StyleHelper::MenuSmallLabel(currentPositionLabel, "currentPositionLabel");
-	acquisitionMotorCurrentPositionLabel = new QLabel("--.--", motorControlSectionWidget);
-	acquisitionMotorCurrentPositionLabel->setAlignment(Qt::AlignRight);
-	applyLabelStyle(acquisitionMotorCurrentPositionLabel);
+	acquisitionMotorCurrentPositionLineEdit = new QLineEdit("--.--", motorControlSectionWidget);
+	acquisitionMotorCurrentPositionLineEdit->setReadOnly(true);
+	ADMTStyleHelper::LineEditStyle(acquisitionMotorCurrentPositionLineEdit);
+	connectLineEditToDouble(acquisitionMotorCurrentPositionLineEdit, current_pos);
 
 	motorTargetPositionSpinBox = new HorizontalSpinBox("Target Position", target_pos, "", motorControlSectionWidget);
 
 	motorControlCollapseSection->contentLayout()->setSpacing(8);
 	motorControlCollapseSection->contentLayout()->addWidget(currentPositionLabel);
-	motorControlCollapseSection->contentLayout()->addWidget(acquisitionMotorCurrentPositionLabel);
+	motorControlCollapseSection->contentLayout()->addWidget(acquisitionMotorCurrentPositionLineEdit);
 	motorControlCollapseSection->contentLayout()->addWidget(motorTargetPositionSpinBox);
 	#pragma endregion
 
-	rawDataLayout->addWidget(rotationWidget);
 	rawDataLayout->addWidget(angleWidget);
+	rawDataLayout->addWidget(rotationWidget);
 	rawDataLayout->addWidget(countWidget);
 	rawDataLayout->addWidget(tempWidget);
 	rawDataLayout->addWidget(motorConfigurationSectionWidget);
@@ -278,6 +279,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	QCheckBox *angleCheckBox = new QCheckBox("Angle", acquisitionGraphChannelWidget);
 	ADMTStyleHelper::ColoredSquareCheckbox(angleCheckBox, channel0Pen.color());
 	connectCheckBoxToAcquisitionGraph(angleCheckBox, acquisitionAnglePlotChannel, ANGLE);
+	angleCheckBox->setChecked(true);
 
 	QCheckBox *absAngleCheckBox = new QCheckBox("ABS Angle", acquisitionGraphChannelWidget);
 	ADMTStyleHelper::ColoredSquareCheckbox(absAngleCheckBox, channel1Pen.color());
@@ -586,7 +588,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationRawDataXPlotAxis = new PlotAxis(QwtAxis::XBottom, calibrationRawDataPlotWidget, scopyBluePen);
 	calibrationRawDataXPlotAxis->setMin(0);
 	calibrationRawDataYPlotAxis = new PlotAxis(QwtAxis::YLeft, calibrationRawDataPlotWidget, scopyBluePen);
-	calibrationRawDataYPlotAxis->setInterval(0, 400);	
+	calibrationRawDataYPlotAxis->setInterval(0, 360);	
 
 	calibrationRawDataPlotChannel = new PlotChannel("Samples", scopyBluePen, calibrationRawDataXPlotAxis, calibrationRawDataYPlotAxis);
 	calibrationSineDataPlotChannel = new PlotChannel("Sine", sinePen, calibrationRawDataXPlotAxis, calibrationRawDataYPlotAxis);
@@ -595,9 +597,9 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationRawDataPlotWidget->addPlotChannel(calibrationRawDataPlotChannel);
 	calibrationRawDataPlotWidget->addPlotChannel(calibrationSineDataPlotChannel);
 	calibrationRawDataPlotWidget->addPlotChannel(calibrationCosineDataPlotChannel);
-	calibrationRawDataPlotChannel->setEnabled(true);
 	calibrationSineDataPlotChannel->setEnabled(true);
 	calibrationCosineDataPlotChannel->setEnabled(true);
+	calibrationRawDataPlotChannel->setEnabled(true);
 	calibrationRawDataPlotWidget->selectChannel(calibrationRawDataPlotChannel);
 
 	calibrationRawDataPlotWidget->setShowXAxisLabels(true);
@@ -645,7 +647,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	postCalibrationRawDataXPlotAxis = new PlotAxis(QwtAxis::XBottom, postCalibrationRawDataPlotWidget, scopyBluePen);
 	postCalibrationRawDataXPlotAxis->setMin(0);
 	postCalibrationRawDataYPlotAxis = new PlotAxis(QwtAxis::YLeft, postCalibrationRawDataPlotWidget, scopyBluePen);
-	postCalibrationRawDataYPlotAxis->setInterval(0, 400);
+	postCalibrationRawDataYPlotAxis->setInterval(0, 360);
 
 	postCalibrationRawDataPlotChannel = new PlotChannel("Samples", scopyBluePen, postCalibrationRawDataXPlotAxis, postCalibrationRawDataYPlotAxis);
 	postCalibrationSineDataPlotChannel = new PlotChannel("Sine", sinePen, postCalibrationRawDataXPlotAxis, postCalibrationRawDataYPlotAxis);
@@ -655,9 +657,9 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	postCalibrationRawDataPlotWidget->addPlotChannel(postCalibrationSineDataPlotChannel);
 	postCalibrationRawDataPlotWidget->addPlotChannel(postCalibrationCosineDataPlotChannel);
 
-	postCalibrationRawDataPlotChannel->setEnabled(true);
 	postCalibrationSineDataPlotChannel->setEnabled(true);
 	postCalibrationCosineDataPlotChannel->setEnabled(true);
+	postCalibrationRawDataPlotChannel->setEnabled(true);
 	postCalibrationRawDataPlotWidget->selectChannel(postCalibrationRawDataPlotChannel);
 	postCalibrationRawDataPlotWidget->replot();
 
@@ -750,8 +752,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	FFTAngleErrorPlotWidget->addPlotChannel(FFTAngleErrorMagnitudeChannel);
 	FFTAngleErrorPlotWidget->addPlotChannel(FFTAngleErrorPhaseChannel);
 
-	FFTAngleErrorMagnitudeChannel->setEnabled(true);
 	FFTAngleErrorPhaseChannel->setEnabled(true);
+	FFTAngleErrorMagnitudeChannel->setEnabled(true);
 	FFTAngleErrorPlotWidget->selectChannel(FFTAngleErrorMagnitudeChannel);
 	FFTAngleErrorPlotWidget->replot();
 
@@ -830,8 +832,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	FFTCorrectedErrorPlotWidget->addPlotChannel(FFTCorrectedErrorMagnitudeChannel);
 	FFTCorrectedErrorPlotWidget->addPlotChannel(FFTCorrectedErrorPhaseChannel);
 
-	FFTCorrectedErrorMagnitudeChannel->setEnabled(true);
 	FFTCorrectedErrorPhaseChannel->setEnabled(true);
+	FFTCorrectedErrorMagnitudeChannel->setEnabled(true);
 	FFTCorrectedErrorPlotWidget->selectChannel(FFTCorrectedErrorMagnitudeChannel);
 	FFTCorrectedErrorPlotWidget->replot();
 
@@ -870,6 +872,51 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	#pragma endregion
 	
 	#pragma region Calibration Settings Widget
+	QWidget *calibrationSettingsGroupWidget = new QWidget();
+	QVBoxLayout *calibrationSettingsGroupLayout = new QVBoxLayout(calibrationSettingsGroupWidget);
+	calibrationSettingsGroupWidget->setLayout(calibrationSettingsGroupLayout);
+	calibrationSettingsGroupLayout->setMargin(0);
+	calibrationSettingsGroupLayout->setSpacing(8);
+
+	#pragma region Acquire Calibration Samples Button
+	calibrationStartMotorButton = new QPushButton(calibrationSettingsGroupWidget);
+	ADMTStyleHelper::StartButtonStyle(calibrationStartMotorButton);
+	calibrationStartMotorButton->setText(" Acquire Samples");
+	
+	connect(calibrationStartMotorButton, &QPushButton::toggled, this, [=](bool toggled) { 
+		calibrationStartMotorButton->setText(toggled ? " Stop Acquisition" : " Acquire Samples"); 
+		totalSamplesCount = cycleCount * samplesPerCycle;
+		isStartMotor = toggled;
+		if(toggled){
+			isPostCalibration = false;
+			graphPostDataList.reserve(totalSamplesCount);
+			graphDataList.reserve(totalSamplesCount);
+			startMotor();
+		}
+	});
+	#pragma endregion
+
+	#pragma region Start Calibration Button
+	calibrateDataButton = new QPushButton(calibrationSettingsGroupWidget);
+	ADMTStyleHelper::StartButtonStyle(calibrateDataButton);
+	calibrateDataButton->setText(" Calibrate");
+	calibrateDataButton->setEnabled(false);
+
+	connect(calibrateDataButton, &QPushButton::toggled, this, [=](bool toggled) {
+		calibrateDataButton->setText(toggled ? " Stop Calibration" : " Calibrate");
+		if(toggled) postCalibrateData();
+	});
+	#pragma endregion
+
+	#pragma region Reset Calibration Button
+	clearCalibrateDataButton = new QPushButton("Reset Calibration", calibrationSettingsGroupWidget);
+	StyleHelper::BlueButton(clearCalibrateDataButton);
+	QIcon resetIcon;
+	resetIcon.addPixmap(Util::ChangeSVGColor(":/gui/icons/refresh.svg", "white", 1), QIcon::Normal, QIcon::Off);
+	clearCalibrateDataButton->setIcon(resetIcon);
+	clearCalibrateDataButton->setIconSize(QSize(26, 26));
+	#pragma endregion
+
 	QScrollArea *calibrationSettingsScrollArea = new QScrollArea();
 	QWidget *calibrationSettingsWidget = new QWidget(calibrationSettingsScrollArea);
 	QVBoxLayout *calibrationSettingsLayout = new QVBoxLayout(calibrationSettingsWidget);
@@ -877,6 +924,11 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationSettingsScrollArea->setWidget(calibrationSettingsWidget);
 	calibrationSettingsWidget->setFixedWidth(260);
 	calibrationSettingsWidget->setLayout(calibrationSettingsLayout);
+
+	calibrationSettingsGroupLayout->addWidget(calibrationStartMotorButton);
+	calibrationSettingsGroupLayout->addWidget(calibrateDataButton);
+	calibrationSettingsGroupLayout->addWidget(clearCalibrateDataButton);
+	calibrationSettingsGroupLayout->addWidget(calibrationSettingsScrollArea);
 
 	#pragma region Calibration Coefficient Section Widget
 	MenuSectionWidget *calibrationCoeffSectionWidget = new MenuSectionWidget(calibrationSettingsWidget);
@@ -925,8 +977,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	applyTextStyle(calibrationH1MagLabel, "CH0");
 	applyTextStyle(calibrationH1PhaseLabel, "CH1");
 	calibrationH1Label->setFixedWidth(24);
-	calibrationH1MagLabel->setContentsMargins(0, 0, 48, 0);
-	calibrationH1PhaseLabel->setFixedWidth(56);
+	calibrationH1MagLabel->setContentsMargins(0, 0, 32, 0);
+	calibrationH1PhaseLabel->setFixedWidth(72);
 
 	h1RowLayout->addWidget(calibrationH1Label);
 	h1RowLayout->addWidget(calibrationH1MagLabel, 0, Qt::AlignRight);
@@ -947,8 +999,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	applyTextStyle(calibrationH2MagLabel, "CH0");
 	applyTextStyle(calibrationH2PhaseLabel, "CH1");
 	calibrationH2Label->setFixedWidth(24);
-	calibrationH2MagLabel->setContentsMargins(0, 0, 48, 0);
-	calibrationH2PhaseLabel->setFixedWidth(56);
+	calibrationH2MagLabel->setContentsMargins(0, 0, 32, 0);
+	calibrationH2PhaseLabel->setFixedWidth(72);
 
 	h2RowLayout->addWidget(calibrationH2Label);
 	h2RowLayout->addWidget(calibrationH2MagLabel, 0, Qt::AlignRight);
@@ -969,8 +1021,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	applyTextStyle(calibrationH3MagLabel, "CH0");
 	applyTextStyle(calibrationH3PhaseLabel, "CH1");
 	calibrationH3Label->setFixedWidth(24);
-	calibrationH3MagLabel->setContentsMargins(0, 0, 48, 0);
-	calibrationH3PhaseLabel->setFixedWidth(56);
+	calibrationH3MagLabel->setContentsMargins(0, 0, 32, 0);
+	calibrationH3PhaseLabel->setFixedWidth(72);
 
 	h3RowLayout->addWidget(calibrationH3Label);
 	h3RowLayout->addWidget(calibrationH3MagLabel, 0, Qt::AlignRight);
@@ -991,8 +1043,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	applyTextStyle(calibrationH8MagLabel, "CH0");
 	applyTextStyle(calibrationH8PhaseLabel, "CH1");
 	calibrationH8Label->setFixedWidth(24);
-	calibrationH8MagLabel->setContentsMargins(0, 0, 48, 0);
-	calibrationH8PhaseLabel->setFixedWidth(56);
+	calibrationH8MagLabel->setContentsMargins(0, 0, 32, 0);
+	calibrationH8PhaseLabel->setFixedWidth(72);
 
 	h8RowLayout->addWidget(calibrationH8Label);
 	h8RowLayout->addWidget(calibrationH8MagLabel, 0, Qt::AlignRight);
@@ -1047,15 +1099,12 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	QPushButton *importSamplesButton = new QPushButton("Import Samples", calibrationDataCollapseSection);
 	QPushButton *extractDataButton = new QPushButton("Save to CSV", calibrationDataCollapseSection);
-	QPushButton *clearCalibrateDataButton = new QPushButton("Clear All Data", calibrationDataCollapseSection);
 	StyleHelper::BlueButton(importSamplesButton);
 	StyleHelper::BlueButton(extractDataButton);
-	StyleHelper::BlueButton(clearCalibrateDataButton);
 
 	calibrationDataCollapseSection->contentLayout()->setSpacing(8);
 	calibrationDataCollapseSection->contentLayout()->addWidget(importSamplesButton);
 	calibrationDataCollapseSection->contentLayout()->addWidget(extractDataButton);
-	calibrationDataCollapseSection->contentLayout()->addWidget(clearCalibrateDataButton);
 	#pragma endregion
 
 	#pragma region Motor Configuration Section Widget
@@ -1090,69 +1139,17 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	motorControlSectionWidget->contentLayout()->addWidget(motorControlCollapseSection);
 	QLabel *currentPositionLabel = new QLabel("Current Position", motorControlSectionWidget);
 	StyleHelper::MenuSmallLabel(currentPositionLabel, "currentPositionLabel");
-	calibrationMotorCurrentPositionLabel = new QLabel("--.--", motorControlSectionWidget);
-	calibrationMotorCurrentPositionLabel->setAlignment(Qt::AlignRight);
-	applyLabelStyle(calibrationMotorCurrentPositionLabel);
+	calibrationMotorCurrentPositionLineEdit = new QLineEdit("--.--", motorControlSectionWidget);
+	calibrationMotorCurrentPositionLineEdit->setReadOnly(true);
+	ADMTStyleHelper::LineEditStyle(calibrationMotorCurrentPositionLineEdit);
+	connectLineEditToDouble(calibrationMotorCurrentPositionLineEdit, current_pos);
 
 	motorTargetPositionSpinBox = new HorizontalSpinBox("Target Position", target_pos, "", motorControlSectionWidget);
 
-	calibrationStartMotorButton = new QPushButton(motorControlSectionWidget);
-	calibrationStartMotorButton->setCheckable(true);
-	calibrationStartMotorButton->setChecked(false);
-	calibrationStartMotorButton->setText("Start Motor");
-	calibrationStartMotorButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	calibrationStartMotorButton->setFixedHeight(36);
-	connect(calibrationStartMotorButton, &QPushButton::toggled, this, [=](bool b) { 
-		calibrationStartMotorButton->setText(b ? " Stop Motor" : " Start Motor"); 
-		totalSamplesCount = cycleCount * samplesPerCycle;
-		isStartMotor = b;
-		if(b){
-			isPostCalibration = false;
-			graphPostDataList.reserve(totalSamplesCount);
-			graphDataList.reserve(totalSamplesCount);
-			startMotor();
-		}
-	});
-	QString calibrationStartMotorButtonStyle = QString(R"css(
-			QPushButton {
-				border-radius: 2px;
-				padding-left: 20px;
-				padding-right: 20px;
-				color: white;
-				font-weight: 700;
-				font-size: 14px;
-			}
-
-			QPushButton:!checked {
-				background-color: #27b34f;
-			}
-
-			  QPushButton:checked {
-				background-color: #F45000;
-			}
-
-			QPushButton:disabled {
-				background-color: grey;
-			})css");
-	calibrationStartMotorButton->setStyleSheet(calibrationStartMotorButtonStyle);
-	QIcon playIcon;
-	playIcon.addPixmap(Util::ChangeSVGColor(":/gui/icons/play.svg", "white", 1), QIcon::Normal, QIcon::Off);
-	playIcon.addPixmap(Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/play_stop.svg", "white", 1),
-			QIcon::Normal, QIcon::On);
-	calibrationStartMotorButton->setIcon(playIcon);
-	calibrationStartMotorButton->setIconSize(QSize(64, 64));
-
-	calibrateDataButton = new QPushButton(motorControlSectionWidget);
-	calibrateDataButton->setText("Calibrate");
-	calibrateDataButton->setEnabled(false);
-	StyleHelper::BlueButton(calibrateDataButton, "calibrateDataButton");
-
 	motorControlCollapseSection->contentLayout()->setSpacing(8);
 	motorControlCollapseSection->contentLayout()->addWidget(currentPositionLabel);
-	motorControlCollapseSection->contentLayout()->addWidget(calibrationMotorCurrentPositionLabel);
+	motorControlCollapseSection->contentLayout()->addWidget(calibrationMotorCurrentPositionLineEdit);
 	motorControlCollapseSection->contentLayout()->addWidget(motorTargetPositionSpinBox);
-	motorControlCollapseSection->contentLayout()->addWidget(calibrationStartMotorButton);
-	motorControlCollapseSection->contentLayout()->addWidget(calibrateDataButton);
 	#pragma endregion
 
 	#pragma region Logs Section Widget
@@ -1172,10 +1169,10 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	calibrationSettingsLayout->setMargin(0);
 	calibrationSettingsLayout->addWidget(calibrationDatasetConfigSectionWidget);
-	calibrationSettingsLayout->addWidget(motorConfigurationSectionWidget);
-	calibrationSettingsLayout->addWidget(motorControlSectionWidget);
-	calibrationSettingsLayout->addWidget(calibrationDataSectionWidget);
 	calibrationSettingsLayout->addWidget(calibrationCoeffSectionWidget);
+	calibrationSettingsLayout->addWidget(motorControlSectionWidget);
+	calibrationSettingsLayout->addWidget(motorConfigurationSectionWidget);
+	calibrationSettingsLayout->addWidget(calibrationDataSectionWidget);
 	calibrationSettingsLayout->addWidget(logsSectionWidget);
 	calibrationSettingsLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 	#pragma endregion
@@ -1192,9 +1189,8 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	tool->openTopContainerHelper(false);
 
 	tool->addWidgetToCentralContainerHelper(calibrationDataGraphWidget);
-	tool->rightStack()->add("calibrationSettingsScrollArea", calibrationSettingsScrollArea);
+	tool->rightStack()->add("calibrationSettingsGroupWidget", calibrationSettingsGroupWidget);
 
-	connect(calibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::postCalibrateData);
 	connect(extractDataButton, &QPushButton::clicked, this, &HarmonicCalibration::extractCalibrationData);
 	connect(importSamplesButton, &QPushButton::clicked, this, &HarmonicCalibration::importCalibrationData);
 	connect(clearCalibrateDataButton, &QPushButton::clicked, this, &HarmonicCalibration::resetAllCalibrationState);
@@ -2199,7 +2195,7 @@ void HarmonicCalibration::acquisitionUITask()
 
 	acquisitionGraphPlotWidget->replot();
 	updateLineEditValues();
-	updateLabelValue(acquisitionMotorCurrentPositionLabel, ADMTController::MotorAttribute::CURRENT_POS);
+	updateLineEditValue(acquisitionMotorCurrentPositionLineEdit, current_pos);
 }
 
 void HarmonicCalibration::applySequence(){
@@ -2560,6 +2556,11 @@ void HarmonicCalibration::updateLineEditValues(){
 	else { tempValueLabel->setText(QString::number(temp) + " °C"); }
 }
 
+void HarmonicCalibration::updateLineEditValue(QLineEdit* lineEdit, double value){
+	if(value == static_cast<double>(UINT64_MAX)) { lineEdit->setText("N/A"); }
+	else { lineEdit->setText(QString::number(value)); }
+}
+
 void HarmonicCalibration::updateGeneralSettingEnabled(bool value)
 {
 	graphUpdateIntervalLineEdit->setEnabled(value);
@@ -2607,6 +2608,8 @@ MenuControlButton *HarmonicCalibration::createChannelToggleWidget(const QString 
 
 void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, int& variable, int min, int max)
 {
+	QIntValidator *validator = new QIntValidator(min, max, this);
+	lineEdit->setValidator(validator);
     connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit, min, max]() {
         bool ok;
         int value = lineEdit->text().toInt(&ok);
@@ -2614,6 +2617,22 @@ void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, int& vari
             variable = value;
         } else {
             lineEdit->setText(QString::number(variable));
+        }
+    });
+}
+
+void HarmonicCalibration::connectLineEditToDouble(QLineEdit* lineEdit, double& variable)
+{
+	// QDoubleValidator *validator = new QDoubleValidator(this);
+	// validator->setNotation(QDoubleValidator::StandardNotation);
+	// lineEdit->setValidator(validator);
+    connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit]() {
+        bool ok;
+        double value = lineEdit->text().toDouble(&ok);
+        if (ok){
+            variable = value;
+        } else {
+            lineEdit->setText(QString::number(variable, 'f', 2));
         }
     });
 }
@@ -2634,6 +2653,9 @@ void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, double& v
 
 void HarmonicCalibration::connectLineEditToNumberWrite(QLineEdit* lineEdit, double& variable, ADMTController::MotorAttribute attribute)
 {
+	QDoubleValidator *validator = new QDoubleValidator(this);
+	validator->setNotation(QDoubleValidator::StandardNotation);
+	lineEdit->setValidator(validator);
     connect(lineEdit, &QLineEdit::editingFinished, [=, &variable]() {
         bool ok;
         double value = lineEdit->text().toDouble(&ok);
@@ -2860,7 +2882,6 @@ void HarmonicCalibration::updateLabelValue(QLabel *label, ADMTController::MotorA
 		case ADMTController::MotorAttribute::RAMP_MODE:
 			label->setText(QString::number(ramp_mode));
 			break;
-
 	}
 }
 
@@ -2868,18 +2889,16 @@ void HarmonicCalibration::calibrationUITask()
 {
 	if(!isDebug){
 		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
-		updateLabelValue(calibrationMotorCurrentPositionLabel, ADMTController::MotorAttribute::CURRENT_POS);
+		updateLineEditValue(calibrationMotorCurrentPositionLineEdit, current_pos);
 
 		if(isStartMotor)
 		{
 			if(isPostCalibration){
 				postCalibrationRawDataPlotChannel->curve()->setSamples(graphPostDataList);
-				postCalibrationRawDataPlotChannel->xAxis()->setMax(graphPostDataList.size());
 				postCalibrationRawDataPlotWidget->replot();
 			}
 			else{
 				calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
-				calibrationRawDataPlotChannel->xAxis()->setMax(graphDataList.size());
 				calibrationRawDataPlotWidget->replot();
 			}
 		}
@@ -2888,24 +2907,30 @@ void HarmonicCalibration::calibrationUITask()
 
 void HarmonicCalibration::getCalibrationSamples()
 {
-	if(resetToZero){
-		resetCurrentPositionToZero();
-	}
+	resetCurrentPositionToZero();
+
 	if(isPostCalibration){
-		while(isStartMotor && graphPostDataList.size() < totalSamplesCount){
-			stepMotorAcquisition();
+		int currentSamplesCount = graphPostDataList.size();
+		while(isStartMotor && currentSamplesCount < totalSamplesCount){
+			target_pos = current_pos + -408;
+			moveMotorToPosition(target_pos, true);
 			updateChannelValue(ADMTController::Channel::ANGLE);
 			graphPostDataList.append(angle);
+			currentSamplesCount++;
 		}
 	}
 	else{
-		clearCalibrationSineCosine();
-		while(isStartMotor && graphDataList.size() < totalSamplesCount){
-			stepMotorAcquisition();
+		int currentSamplesCount = graphDataList.size();
+		while(isStartMotor && currentSamplesCount < totalSamplesCount){
+			target_pos = current_pos + -408;
+			moveMotorToPosition(target_pos, true);
 			updateChannelValue(ADMTController::Channel::ANGLE);
 			graphDataList.append(angle);
+			currentSamplesCount++;
 		}
 	}
+
+	stopMotor();
 }
 
 void HarmonicCalibration::resetCurrentPositionToZero()
@@ -2920,6 +2945,7 @@ void HarmonicCalibration::resetCurrentPositionToZero()
 
 void HarmonicCalibration::startMotor()
 {
+	toggleTabSwitching(false);
 	toggleMotorControls(false);
 
 	if(resetToZero && !isPostCalibration){
@@ -2929,15 +2955,22 @@ void HarmonicCalibration::startMotor()
 		clearCorrectedAngleErrorGraphs();
 	}
 
+	if(isPostCalibration)
+		postCalibrationRawDataXPlotAxis->setInterval(0, totalSamplesCount);
+	else
+		calibrationRawDataXPlotAxis->setInterval(0, totalSamplesCount);
+
 	if(isPostCalibration) 
 		calibrationDataGraphTabWidget->setCurrentIndex(1); // Set tab to Post Calibration Samples
 	else
 		calibrationDataGraphTabWidget->setCurrentIndex(0); // Set tab to Calibration Samples
 
+	clearCalibrateDataButton->setEnabled(false);
 	QFuture<void> future = QtConcurrent::run(this, &HarmonicCalibration::getCalibrationSamples);
 	QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
 
 	connect(watcher, &QFutureWatcher<void>::finished, this, [=]() {
+		toggleTabSwitching(true);
 		toggleMotorControls(true);
 
 		calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
@@ -2945,6 +2978,7 @@ void HarmonicCalibration::startMotor()
 		calibrationRawDataPlotWidget->replot();
 		isStartMotor = false;
 		calibrationStartMotorButton->setChecked(false);
+		clearCalibrateDataButton->setEnabled(true);
 		
 		if(isPostCalibration)
 		{
@@ -2955,8 +2989,8 @@ void HarmonicCalibration::startMotor()
 				populateCorrectedAngleErrorGraphs();
 				isPostCalibration = false;
 				isStartMotor = false;
-				canStartMotor(true);
 				resetToZero = true;
+				canCalibrate(false);
 			}
 		}
 		else{
@@ -2964,8 +2998,9 @@ void HarmonicCalibration::startMotor()
 			{
 				computeSineCosineOfAngles(graphDataList);
 				calibrationLogWrite(m_admtController->calibrate(vector<double>(graphDataList.begin(), graphDataList.end()), cycleCount, samplesPerCycle));
-				flashHarmonicValues();
 				populateAngleErrorGraphs();
+				calculateHarmonicValues();
+				canStartMotor(false);
 				canCalibrate(true); 
 			}
 			else{
@@ -2975,6 +3010,13 @@ void HarmonicCalibration::startMotor()
 	});
 	connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));
 	watcher->setFuture(future);
+}
+
+void HarmonicCalibration::toggleTabSwitching(bool value)
+{
+	tabWidget->setTabEnabled(0, value);
+	tabWidget->setTabEnabled(2, value);
+	tabWidget->setTabEnabled(3, value);
 }
 
 void HarmonicCalibration::populateCorrectedAngleErrorGraphs()
@@ -2989,8 +3031,8 @@ void HarmonicCalibration::populateCorrectedAngleErrorGraphs()
 	correctedErrorXPlotAxis->setMax(correctedError.size());
 	correctedErrorPlotWidget->replot();
 
-	FFTCorrectedErrorMagnitudeChannel->curve()->setSamples(FFTCorrectedErrorMagnitude);
 	FFTCorrectedErrorPhaseChannel->curve()->setSamples(FFTCorrectedErrorPhase);
+	FFTCorrectedErrorMagnitudeChannel->curve()->setSamples(FFTCorrectedErrorMagnitude);
 	auto FFTCorrectedErrorMagnitudeMinMax = std::minmax_element(FFTCorrectedErrorMagnitude.begin(), FFTCorrectedErrorMagnitude.end());
 	auto FFTCorrectedErrorPhaseMinMax = std::minmax_element(FFTCorrectedErrorPhase.begin(), FFTCorrectedErrorPhase.end());
 	double FFTCorrectedErrorPlotMin = *FFTCorrectedErrorMagnitudeMinMax.first < *FFTCorrectedErrorPhaseMinMax.first ? *FFTCorrectedErrorMagnitudeMinMax.first : *FFTCorrectedErrorPhaseMinMax.first;
@@ -3014,9 +3056,9 @@ void HarmonicCalibration::populateAngleErrorGraphs()
 	angleErrorXPlotAxis->setInterval(0, angleError.size());
 	angleErrorPlotWidget->replot();
 	
+	FFTAngleErrorPhaseChannel->curve()->setSamples(FFTAngleErrorPhase);
 	FFTAngleErrorMagnitudeChannel->curve()->setSamples(FFTAngleErrorMagnitude);
 	auto angleErrorMagnitudeMinMax = std::minmax_element(FFTAngleErrorMagnitude.begin(), FFTAngleErrorMagnitude.end());
-	FFTAngleErrorPhaseChannel->curve()->setSamples(FFTAngleErrorPhase);
 	auto angleErrorPhaseMinMax = std::minmax_element(FFTAngleErrorPhase.begin(), FFTAngleErrorPhase.end());
 	double FFTAngleErrorPlotMin = *angleErrorMagnitudeMinMax.first < *angleErrorPhaseMinMax.first ? *angleErrorMagnitudeMinMax.first : *angleErrorPhaseMinMax.first;
 	double FFTAngleErrorPlotMax = *angleErrorMagnitudeMinMax.second > *angleErrorPhaseMinMax.second ? *angleErrorMagnitudeMinMax.second : *angleErrorPhaseMinMax.second;
@@ -3034,54 +3076,7 @@ void HarmonicCalibration::canStartMotor(bool value)
 
 void HarmonicCalibration::flashHarmonicValues()
 {
-	uint32_t *h1MagCurrent = new uint32_t, 
-			 *h1PhaseCurrent = new uint32_t, 
-			 *h2MagCurrent = new uint32_t,
-			 *h2PhaseCurrent = new uint32_t,
-			 *h3MagCurrent = new uint32_t,
-			 *h3PhaseCurrent = new uint32_t,
-			 *h8MagCurrent = new uint32_t,
-			 *h8PhaseCurrent = new uint32_t;
-
 	if(changeCNVPage(0x02)){
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), h1MagCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), h1PhaseCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG), h2MagCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH), h2PhaseCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG), h3MagCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH), h3PhaseCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), h8MagCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), h8PhaseCurrent);
-
-		calibrationLogWrite();
-		calibrationLogWrite("H1 Mag Current: " + QString::number(*h1MagCurrent));
-		calibrationLogWrite("H1 Phase Current: " + QString::number(*h1PhaseCurrent));
-		calibrationLogWrite("H2 Mag Current: " + QString::number(*h2MagCurrent));
-		calibrationLogWrite("H2 Phase Current: " + QString::number(*h2PhaseCurrent));
-		calibrationLogWrite("H3 Mag Current: " + QString::number(*h3MagCurrent));
-		calibrationLogWrite("H3 Phase Current: " + QString::number(*h3PhaseCurrent));
-		calibrationLogWrite("H8 Mag Current: " + QString::number(*h8MagCurrent));
-		calibrationLogWrite("H8 Phase Current: " + QString::number(*h8PhaseCurrent));
-
-		H1_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_1), static_cast<uint16_t>(*h1MagCurrent), "h1"));
-		H1_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_1), static_cast<uint16_t>(*h1PhaseCurrent)));
-		H2_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_2), static_cast<uint16_t>(*h2MagCurrent), "h2"));
-		H2_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_2), static_cast<uint16_t>(*h2PhaseCurrent)));
-		H3_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_3), static_cast<uint16_t>(*h3MagCurrent), "h3"));
-		H3_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_3), static_cast<uint16_t>(*h3PhaseCurrent)));
-		H8_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_8), static_cast<uint16_t>(*h8MagCurrent), "h8"));
-		H8_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_8), static_cast<uint16_t>(*h8PhaseCurrent)));
-
-		calibrationLogWrite();
-		calibrationLogWrite("H1 Mag Scaled: " + QString::number(H1_MAG_HEX));
-		calibrationLogWrite("H1 Phase Scaled: " + QString::number(H1_PHASE_HEX));
-		calibrationLogWrite("H2 Mag Scaled: " + QString::number(H2_MAG_HEX));
-		calibrationLogWrite("H2 Phase Scaled: " + QString::number(H2_PHASE_HEX));
-		calibrationLogWrite("H3 Mag Scaled: " + QString::number(H3_MAG_HEX));
-		calibrationLogWrite("H3 Phase Scaled: " + QString::number(H3_PHASE_HEX));
-		calibrationLogWrite("H8 Mag Scaled: " + QString::number(H8_MAG_HEX));
-		calibrationLogWrite("H8 Phase Scaled: " + QString::number(H8_PHASE_HEX));
-
 		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 0x01, 0x02);
 
 		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
@@ -3109,46 +3104,7 @@ void HarmonicCalibration::flashHarmonicValues()
 											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH),
 											H8_PHASE_HEX);
 
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), h1MagCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), h1PhaseCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG), h2MagCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH), h2PhaseCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG), h3MagCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH), h3PhaseCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), h8MagCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), h8PhaseCurrent);
-
-		calibrationLogWrite();
-		calibrationLogWrite("H1 Mag After Flash: " + QString::number(*h1MagCurrent));
-		calibrationLogWrite("H1 Phase After Flash: " + QString::number(*h1PhaseCurrent));
-		calibrationLogWrite("H2 Mag After Flash: " + QString::number(*h2MagCurrent));
-		calibrationLogWrite("H2 Phase After Flash: " + QString::number(*h2PhaseCurrent));
-		calibrationLogWrite("H3 Mag After Flash: " + QString::number(*h3MagCurrent));
-		calibrationLogWrite("H3 Phase After Flash: " + QString::number(*h3PhaseCurrent));
-		calibrationLogWrite("H8 Mag After Flash: " + QString::number(*h8MagCurrent));
-		calibrationLogWrite("H8 Phase After Flash: " + QString::number(*h8PhaseCurrent));
-
-		H1_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h1MagCurrent), "h1mag");
-		H1_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h1PhaseCurrent), "h1phase");
-		H2_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h2MagCurrent), "h2mag");
-		H2_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h2PhaseCurrent), "h2phase");
-		H3_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h3MagCurrent), "h3mag");
-		H3_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h3PhaseCurrent), "h3phase");
-		H8_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h8MagCurrent), "h8mag");
-		H8_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(*h8PhaseCurrent), "h8phase");
-
-		calibrationLogWrite();
-		calibrationLogWrite("H1 Mag Converted: " + QString::number(H1_MAG_ANGLE));
-		calibrationLogWrite("H1 Phase Converted: " + QString::number(H1_PHASE_ANGLE));
-		calibrationLogWrite("H2 Mag Converted: " + QString::number(H2_MAG_ANGLE));
-		calibrationLogWrite("H2 Phase Converted: " + QString::number(H2_PHASE_ANGLE));
-		calibrationLogWrite("H3 Mag Converted: " + QString::number(H3_MAG_ANGLE));
-		calibrationLogWrite("H3 Phase Converted: " + QString::number(H3_PHASE_ANGLE));
-		calibrationLogWrite("H8 Mag Converted: " + QString::number(H8_MAG_ANGLE));
-		calibrationLogWrite("H8 Phase Converted: " + QString::number(H8_PHASE_ANGLE));
-
 		isCalculatedCoeff = true;
-
 		displayCalculatedCoeff();
 	}
 	else{
@@ -3156,11 +3112,79 @@ void HarmonicCalibration::flashHarmonicValues()
 	}
 }
 
+void HarmonicCalibration::calculateHarmonicValues()
+{
+	uint32_t *h1MagCurrent = new uint32_t, 
+			 *h1PhaseCurrent = new uint32_t, 
+			 *h2MagCurrent = new uint32_t,
+			 *h2PhaseCurrent = new uint32_t,
+			 *h3MagCurrent = new uint32_t,
+			 *h3PhaseCurrent = new uint32_t,
+			 *h8MagCurrent = new uint32_t,
+			 *h8PhaseCurrent = new uint32_t;
+	
+	if(changeCNVPage(0x02))
+	{
+		// Read and store current harmonic values
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), h1MagCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG), h2MagCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG), h3MagCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), h8MagCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), h1PhaseCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH), h2PhaseCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH), h3PhaseCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), h8PhaseCurrent);
+
+		// Calculate harmonic coefficients (Hex)
+		H1_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_1), static_cast<uint16_t>(*h1MagCurrent), "h1"));
+		H2_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_2), static_cast<uint16_t>(*h2MagCurrent), "h2"));
+		H3_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_3), static_cast<uint16_t>(*h3MagCurrent), "h3"));
+		H8_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_8), static_cast<uint16_t>(*h8MagCurrent), "h8"));
+		H1_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_1), static_cast<uint16_t>(*h1PhaseCurrent)));
+		H2_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_2), static_cast<uint16_t>(*h2PhaseCurrent)));
+		H3_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_3), static_cast<uint16_t>(*h3PhaseCurrent)));
+		H8_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_8), static_cast<uint16_t>(*h8PhaseCurrent)));
+
+		calibrationLogWrite();
+		calibrationLogWrite(QString("Calculated H1 Mag (Hex): 0x%1").arg(QString::number(H1_MAG_HEX, 16).rightJustified(4, '0')));
+		calibrationLogWrite(QString("Calculated H1 Phase (Hex): 0x%1").arg(QString::number(H1_PHASE_HEX, 16).rightJustified(4, '0')));
+		calibrationLogWrite(QString("Calculated H2 Mag (Hex): 0x%1").arg(QString::number(H2_MAG_HEX, 16).rightJustified(4, '0')));
+		calibrationLogWrite(QString("Calculated H2 Phase (Hex): 0x%1").arg(QString::number(H2_PHASE_HEX, 16).rightJustified(4, '0')));
+		calibrationLogWrite(QString("Calculated H3 Mag (Hex): 0x%1").arg(QString::number(H3_MAG_HEX, 16).rightJustified(4, '0')));
+		calibrationLogWrite(QString("Calculated H3 Phase (Hex): 0x%1").arg(QString::number(H3_PHASE_HEX, 16).rightJustified(4, '0')));
+		calibrationLogWrite(QString("Calculated H8 Mag (Hex): 0x%1").arg(QString::number(H8_MAG_HEX, 16).rightJustified(4, '0')));
+		calibrationLogWrite(QString("Calculated H8 Phase (Hex): 0x%1").arg(QString::number(H8_PHASE_HEX, 16).rightJustified(4, '0')));
+
+		// Get actual harmonic values from hex
+		H1_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H1_MAG_HEX), "h1mag");
+		H1_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H1_PHASE_HEX), "h1phase");
+		H2_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H2_MAG_HEX), "h2mag");
+		H2_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H2_PHASE_HEX), "h2phase");
+		H3_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H3_MAG_HEX), "h3mag");
+		H3_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H3_PHASE_HEX), "h3phase");
+		H8_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H8_MAG_HEX), "h8mag");
+		H8_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H8_PHASE_HEX), "h8phase");
+
+		calibrationLogWrite();
+		calibrationLogWrite(QString("Calculated H1 Mag (Angle): 0x%1").arg(QString::number(H1_MAG_ANGLE)));
+		calibrationLogWrite(QString("Calculated H1 Phase (Angle): 0x%1").arg(QString::number(H1_PHASE_ANGLE)));
+		calibrationLogWrite(QString("Calculated H2 Mag (Angle): 0x%1").arg(QString::number(H2_MAG_ANGLE)));
+		calibrationLogWrite(QString("Calculated H2 Phase (Angle): 0x%1").arg(QString::number(H2_PHASE_ANGLE)));
+		calibrationLogWrite(QString("Calculated H3 Mag (Angle): 0x%1").arg(QString::number(H3_MAG_ANGLE)));
+		calibrationLogWrite(QString("Calculated H3 Phase (Angle): 0x%1").arg(QString::number(H3_PHASE_ANGLE)));
+		calibrationLogWrite(QString("Calculated H8 Mag (Angle): 0x%1").arg(QString::number(H8_MAG_ANGLE)));
+		calibrationLogWrite(QString("Calculated H8 Phase (Angle): 0x%1").arg(QString::number(H8_PHASE_ANGLE)));
+
+		if(isAngleDisplayFormat) updateCalculatedCoeffAngle();
+		else updateCalculatedCoeffHex();
+		isCalculatedCoeff = true;
+	}
+}
+
 void HarmonicCalibration::postCalibrateData()
 {
 	calibrationLogWrite("==== Post Calibration Start ====\n");
-	canCalibrate(false);
-	canStartMotor(false);
+	flashHarmonicValues();
 	calibrationDataGraphTabWidget->setCurrentIndex(1);
 	isPostCalibration = true;
 	isStartMotor = true;
@@ -3170,14 +3194,14 @@ void HarmonicCalibration::postCalibrateData()
 
 void HarmonicCalibration::updateCalculatedCoeffAngle()
 {
-	calibrationH1MagLabel->setText(QString::number(H1_MAG_ANGLE) + "°");
-	calibrationH2MagLabel->setText(QString::number(H2_MAG_ANGLE) + "°");
-	calibrationH3MagLabel->setText(QString::number(H3_MAG_ANGLE) + "°");
-	calibrationH8MagLabel->setText(QString::number(H8_MAG_ANGLE) + "°");
-	calibrationH1PhaseLabel->setText("Φ " + QString::number(H1_PHASE_ANGLE));
-	calibrationH2PhaseLabel->setText("Φ " + QString::number(H2_PHASE_ANGLE));
-	calibrationH3PhaseLabel->setText("Φ " + QString::number(H3_PHASE_ANGLE));
-	calibrationH8PhaseLabel->setText("Φ " + QString::number(H8_PHASE_ANGLE));
+	calibrationH1MagLabel->setText(QString::number(H1_MAG_ANGLE, 'f', 2) + "°");
+	calibrationH2MagLabel->setText(QString::number(H2_MAG_ANGLE, 'f', 2) + "°");
+	calibrationH3MagLabel->setText(QString::number(H3_MAG_ANGLE, 'f', 2) + "°");
+	calibrationH8MagLabel->setText(QString::number(H8_MAG_ANGLE, 'f', 2) + "°");
+	calibrationH1PhaseLabel->setText("Φ " + QString::number(H1_PHASE_ANGLE, 'f', 2));
+	calibrationH2PhaseLabel->setText("Φ " + QString::number(H2_PHASE_ANGLE, 'f', 2));
+	calibrationH3PhaseLabel->setText("Φ " + QString::number(H3_PHASE_ANGLE, 'f', 2));
+	calibrationH8PhaseLabel->setText("Φ " + QString::number(H8_PHASE_ANGLE, 'f', 2));
 }
 
 void HarmonicCalibration::resetCalculatedCoeffAngle()
@@ -3318,7 +3342,6 @@ void HarmonicCalibration::importCalibrationData()
 
 			computeSineCosineOfAngles(graphDataList);
 			calibrationLogWrite(m_admtController->calibrate(vector<double>(graphDataList.begin(), graphDataList.end()), cycleCount, samplesPerCycle));
-			flashHarmonicValues();
 			populateAngleErrorGraphs();
 			canStartMotor(false);
 			canCalibrate(true);
@@ -3343,26 +3366,40 @@ void HarmonicCalibration::computeSineCosineOfAngles(QVector<double> graphDataLis
 	}
 }
 
-void HarmonicCalibration::stepMotorAcquisition(double step)
+void HarmonicCalibration::moveMotorToPosition(double& position, bool validate)
 {
-	target_pos = current_pos + step;
-	writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, target_pos);
-	readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
-	while(target_pos != current_pos) {
+	writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, position);
+	if(validate){
 		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+		while(target_pos != current_pos) {
+			readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+		}
 	}
+}
+
+void HarmonicCalibration::startMotorContinuous()
+{
+	writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
+}
+
+void HarmonicCalibration::stopMotor()
+{
+	writeMotorAttributeValue(ADMTController::MotorAttribute::DISABLE, 1);
 }
 
 void HarmonicCalibration::resetAllCalibrationState()
 {
 	clearCalibrationSamples();
 	clearPostCalibrationSamples();
+	calibrationDataGraphTabWidget->setCurrentIndex(0);
 
 	clearAngleErrorGraphs();
 	clearCorrectedAngleErrorGraphs();
+	resultDataTabWidget->setCurrentIndex(0);
 
-	canCalibrate(false);
 	canStartMotor(true);
+	canCalibrate(false);
+	calibrateDataButton->setChecked(false);
 	isPostCalibration = false;
 	isCalculatedCoeff = false;
 	resetToZero = true;
