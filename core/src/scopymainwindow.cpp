@@ -34,6 +34,7 @@
 #include <pkg-manager/pkgmanager.h>
 #include <pkgwidget.h>
 #include <pluginstab.h>
+#include <scriptingtool.h>
 
 #include <common/debugtimer.h>
 #include "logging_categories.h"
@@ -147,11 +148,13 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	m_toolMenuManager = new ToolMenuManager(ts, dtm, browseMenu->toolMenu(), this);
 
 	PkgWidget *pkgWidget = new PkgWidget(this);
+	ScriptingTool *scriptingTool = new ScriptingTool(this);
 
 	ts->add("home", hp);
 	ts->add("about", about);
 	ts->add("preferences", prefPage);
 	ts->add("package", pkgWidget);
+	ts->add("scripting", scriptingTool);
 
 	connect(scanTask, &IIOScanTask::scanFinished, scc, &ScannedIIOContextCollector::update, Qt::QueuedConnection);
 
