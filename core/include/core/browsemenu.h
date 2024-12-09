@@ -75,6 +75,7 @@ private:
 	const QString HOME_ID = "home";
 	const QString PREFERENCES_ID = "preferences";
 	const QString ABOUT_ID = "about";
+	const QString SCRIPTING_ID = "scripting";
 };
 } // namespace scopy
 
