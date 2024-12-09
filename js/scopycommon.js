@@ -32,3 +32,5 @@ function disconnect(){
     scopy.disconnectDevice()
     exit(0)
 }
+
+
