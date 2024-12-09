@@ -19,18 +19,35 @@
  *
  */
 
-function connect(){
-    //TEST WITH EMU
-    var  deviceID = scopy.addDevice("127.0.0.0")
-    //CONNECT TO DEVICE
-    scopy.connectDevice(deviceID)
-    msleep(1000)
-}
+#ifndef SCRIPTINGTOOL_H
+#define SCRIPTINGTOOL_H
 
-function disconnect(){
-    //DISCONNECT FROM DEVICE
-    scopy.disconnectDevice()
-    exit(0)
-}
+#include <QPlainTextEdit>
+#include <QWidget>
+#include "scopy-scripting_export.h"
+#include "scopycodeeditor.h"
 
+namespace scopy {
+namespace scripting {
 
+class SCOPY_SCRIPTING_EXPORT ScriptingTool : public QWidget
+{
+	Q_OBJECT
+public:
+	explicit ScriptingTool(QWidget *parent = nullptr);
+
+signals:
+
+private:
+	QString fileName = "";
+	ScopyCodeEditor *codeEditor;
+	QPlainTextEdit *codeOutput;
+
+	void loadFile();
+	void saveToFile();
+	void compileCode();
+};
+
+} // namespace scripting
+} // namespace scopy
+#endif // SCRIPTINGTOOL_H
