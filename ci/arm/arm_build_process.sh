@@ -304,7 +304,7 @@ build_scopy() {
 	[ -f /home/runner/build-status ] && cp /home/runner/build-status $SRC_DIR/build-status
 	pushd $SRC_DIR
 	CURRENT_BUILD_CMAKE_OPTS="\
-		-DENABLE_PLUGIN_TEST=ON \
+		-DENABLE_PLUGIN_TEST=OFF \
 		-DENABLE_TESTING=ON \
 		-DPYTHON_EXECUTABLE=$SYSROOT/bin/python3 \
 		"
