@@ -33,6 +33,7 @@ option(ENABLE_PLUGIN_SWIOT "Enable SWIOT plugin" ON)
 option(ENABLE_PLUGIN_PQM "Enable PQM plugin" ON)
 option(ENABLE_PLUGIN_DATALOGGER "Enable DATALOGGER plugin" ON)
 option(ENABLE_PLUGIN_DAC "Enable DAC plugin" ON)
+option(ENABLE_PLUGIN_SCRIPTING "Enable SCRIPTING plugin" ON)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
@@ -109,6 +110,12 @@ if(ENABLE_PLUGIN_PQM)
 	add_subdirectory(pqm)
 	list(APPEND PLUGINS ${PQM_TARGET_NAME})
 endif()
+
+if(ENABLE_PLUGIN_SCRIPTING)
+        add_subdirectory(scripting)
+        list(APPEND PLUGINS ${PLUGIN_NAME})
+endif()
+
 
 if(ENABLE_PLUGIN_M2K)
 	if(NOT WITH_PYTHON)
