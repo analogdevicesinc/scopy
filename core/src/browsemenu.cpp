@@ -103,6 +103,36 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	preferencesBtn->setCheckable(true);
 	m_btnsMap[PREFERENCES_ID] = preferencesBtn;
 
+	QPushButton *toolsBtn = createBtn("Tools",
+					  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+						  "/icons/preferences.svg",
+					  m_content);
+	toolsBtn->setCheckable(true);
+
+	// popup widget for tools
+	QWidget *toolsPopup = new QWidget(nullptr, Qt::Popup);
+	QVBoxLayout *popupLayout = new QVBoxLayout(toolsPopup);
+	Style::setStyle(toolsPopup, style::properties::widget::basicComponent);
+	Style::setStyle(toolsPopup, style::properties::widget::border_interactive);
+	popupLayout->setContentsMargins(0, 0, 0, 0);
+
+	// Scripting btn
+	QPushButton *scriptingBtn = new QPushButton(tr("Scripting"), toolsPopup);
+	scriptingBtn->setCheckable(false);
+	popupLayout->addWidget(scriptingBtn);
+
+	connect(scriptingBtn, &QPushButton::clicked, this, [=]() {
+		Q_EMIT requestTool(SCRIPTING_ID);
+		toolsPopup->hide();
+	});
+
+	connect(toolsBtn, &QPushButton::clicked, this, [=]() {
+		QPoint pos = toolsBtn->mapToGlobal(QPoint(toolsBtn->width(), 0));
+		toolsPopup->move(pos);
+		toolsPopup->show();
+	});
+
+	// About button
 	QPushButton *aboutBtn = createBtn(
 		"About", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/info.svg",
 		m_content);
@@ -117,6 +147,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	btnGroup->addButton(homeBtn);
 	btnGroup->addButton(pkgBtn);
 	btnGroup->addButton(preferencesBtn);
+	btnGroup->addButton(toolsBtn);
 	btnGroup->addButton(aboutBtn);
 
 	add(createHLine(m_content), "headerLine", MA_TOPLAST);
@@ -128,6 +159,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	add(saveLoadWidget, "saveLoad", MA_BOTTOMLAST);
 	add(pkgBtn, "pkgBtn", MA_BOTTOMLAST);
 	add(preferencesBtn, "preferencesBtn", MA_BOTTOMLAST);
+	add(toolsBtn, "toolsBtn", MA_BOTTOMLAST);
 	add(aboutBtn, "aboutBtn", MA_BOTTOMLAST);
 	add(logo, "logo", MA_BOTTOMLAST);
 
