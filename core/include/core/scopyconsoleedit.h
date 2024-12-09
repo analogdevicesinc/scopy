@@ -19,18 +19,27 @@
  *
  */
 
-function connect(){
-    //TEST WITH EMU
-    var  deviceID = scopy.addDevice("127.0.0.0")
-    //CONNECT TO DEVICE
-    scopy.connectDevice(deviceID)
-    msleep(1000)
-}
+#ifndef SCOPYCONSOLEEDIT_H
+#define SCOPYCONSOLEEDIT_H
 
-function disconnect(){
-    //DISCONNECT FROM DEVICE
-    scopy.disconnectDevice()
-    exit(0)
-}
+#include "scopy-core_export.h"
+#include <QPlainTextEdit>
+#include <QWidget>
 
+namespace scopy {
+class SCOPY_CORE_EXPORT ScopyConsoleEdit : public QPlainTextEdit
+{
+	Q_OBJECT
+public:
+	explicit ScopyConsoleEdit(QWidget *parent = nullptr);
 
+	QString prompt;
+
+signals:
+	void lineEntered(const QString &line);
+
+protected:
+	void keyPressEvent(QKeyEvent *e) override;
+};
+} // namespace scopy
+#endif // SCOPYCONSOLEEDIT_H
