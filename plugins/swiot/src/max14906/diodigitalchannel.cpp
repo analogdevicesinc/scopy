@@ -26,6 +26,7 @@
 #include <style.h>
 #include <gui/plotaxis.h>
 #include <gui/stylehelper.h>
+#include "style_properties.h"
 
 using namespace scopy::swiot;
 
@@ -183,7 +184,7 @@ QWidget *DioDigitalChannel::createBottomContainer(QWidget *parent)
 	m_lcdNumber->setPrecision(0);
 	m_lcdNumber->setSegmentStyle(QLCDNumber::Flat);
 	m_lcdNumber->setFrameShape(QFrame::NoFrame);
-	StyleHelper::OrangeWidget(m_lcdNumber);
+	Style::setStyle(m_lcdNumber, style::properties::swiot::lcdNumber);
 	readBackWidget->layout()->addWidget(m_lcdNumber);
 
 	layout->addWidget(readBackWidget);
