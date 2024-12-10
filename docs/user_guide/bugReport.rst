@@ -111,9 +111,9 @@ Example Report
 
 **Operating System:** Linux
 
-**Scopy Version:** v1.2.0 or git tag
+**Scopy Version:** v2.0.0 or git tag
 
-**Firmware Version:** 0.25
+**Firmware Version:** 0.33
 
 **Steps to reproduce the bug**:
 

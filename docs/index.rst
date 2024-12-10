@@ -29,5 +29,6 @@ Contents
    plugins/index
 
 
+   user_guide/preferences
    user_guide/bugReport
    user_guide/troubleshooting
