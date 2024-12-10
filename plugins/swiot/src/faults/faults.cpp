@@ -56,6 +56,7 @@ Faults::Faults(QString uri, ToolMenuEntry *tme, QWidget *parent)
 
 	InfoBtn *infoBtn = new InfoBtn(this, true);
 	m_tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
+
 	connect(infoBtn, &InfoBtn::clicked, this, [this, infoBtn]() {
 		infoBtn->generateInfoPopup(this);
 		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, &Faults::startTutorial);

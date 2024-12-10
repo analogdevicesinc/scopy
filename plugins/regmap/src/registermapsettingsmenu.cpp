@@ -189,7 +189,7 @@ void RegisterMapSettingsMenu::startTutorial()
 
 	auto settingsTutorialFinish = connect(settingsTutorial, &gui::TutorialBuilder::finished, this,
 					      &RegisterMapSettingsMenu::tutorialDone, Qt::UniqueConnection);
-	connect(settingsTutorial, &gui::TutorialBuilder::aborted, this, [=, this]() {
+	connect(settingsTutorial, &gui::TutorialBuilder::aborted, this, [settingsTutorialFinish, this]() {
 		disconnect(settingsTutorialFinish);
 		Q_EMIT tutorialAborted();
 	});
