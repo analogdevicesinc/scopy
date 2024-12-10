@@ -9,7 +9,6 @@ trigger:
     - main
     - master
     - dev
-    - scopy2-ci-macOS
     - ci-*
   tags:
     include:
@@ -35,6 +34,10 @@ stages:
         macOS_14:
           vmImage: 'macOS-14'
           artifactName: 'macOS-14'
+        macOS_15:
+          vmImage: 'macOS-15'
+          artifactName: 'macOS-15'
+
     pool:
       vmImage: $[ variables['vmImage'] ]
     steps:
