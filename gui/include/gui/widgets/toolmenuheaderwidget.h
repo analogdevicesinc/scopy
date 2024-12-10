@@ -32,12 +32,20 @@
 #include <QLabel>
 #include <QTimer>
 #include <ledbutton.h>
+#include <QElapsedTimer>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT ToolMenuHeaderWidget : public QWidget, public BaseHeader
 {
 	Q_OBJECT
 public:
+	typedef enum
+	{
+		SINGLE_INTERRUPT,
+		STREAM_RUNNING,
+		SINGLE_RUNNING,
+		IDLE
+	} LedState;
 	ToolMenuHeaderWidget(QString title, QWidget *parent);
 	~ToolMenuHeaderWidget();
 
@@ -56,16 +64,23 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void onBlinkLed(int retCode, IIOCallType type);
+	void refresh();
+	void onTimeout();
 
 private:
+	void handleSingle(bool isSuccess);
+	void handleStream(bool isSuccess);
+
+	QTimer *m_refreshTimer;
 	QTimer *m_timer;
 	QString m_id;
 	LedButton *m_ledBtn;
 	QPushButton *m_deviceBtn;
 	QLineEdit *m_title;
 	QLabel *m_uriLabel;
+	LedState m_ledState;
 
-	const int LED_ON_MSEC = 200;
+	const int LED_ON_MSEC = 100;
 	const int WAITING_FACTOR = 10;
 };
 } // namespace scopy

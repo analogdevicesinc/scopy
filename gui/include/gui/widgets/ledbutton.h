@@ -33,7 +33,8 @@ public:
 	LedButton(QWidget *parent = nullptr);
 	~LedButton();
 
-	void ledOn(bool ledState, int runningTimeMsec = 100);
+	void setLedState(bool ledState);
+	void ledOn();
 	void ledOff();
 
 private:
