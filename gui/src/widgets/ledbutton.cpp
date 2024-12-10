@@ -41,25 +41,15 @@ LedButton::LedButton(QWidget *parent)
 	setFixedSize(size);
 
 	m_timer = new QTimer(this);
-	connect(m_timer, &QTimer::timeout, this, &LedButton::ledOff);
+	connect(m_timer, &QTimer::timeout, m_timer, &QTimer::stop);
 }
 
 LedButton::~LedButton() {}
 
-void LedButton::ledOn(bool ledState, int runningTimeMsec)
-{
-	if(m_timer->isActive()) {
-		return;
-	}
-	setChecked(ledState);
-	setVisible(true);
-	m_timer->start(runningTimeMsec);
-}
+void LedButton::setLedState(bool ledState) { setChecked(ledState); }
 
-void LedButton::ledOff()
-{
-	m_timer->stop();
-	setVisible(false);
-}
+void LedButton::ledOn() { setVisible(true); }
+
+void LedButton::ledOff() { setVisible(false); }
 
 #include "moc_ledbutton.cpp"
