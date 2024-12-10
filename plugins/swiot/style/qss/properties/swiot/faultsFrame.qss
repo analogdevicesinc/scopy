@@ -1,0 +1,5 @@
+QFrame[&&property&&=true] {
+	background-color: &content_subtle&; 
+	border: 1px solid &background_primary&; 
+	border-radius:5px;
+}

@@ -89,14 +89,9 @@ public:
 	static void MeasurementSelectorItemWidget(QString iconPath, MeasurementSelectorItem *w,
 						  QString objectName = "");
 	static void HoverWidget(QWidget *w, bool draggable = false, QString objectName = "");
-	static void TransparentWidget(QWidget *w, QString objectName = "");
 	static void HoverToolTip(QWidget *w, QString info, QString objectName = "");
 	static void NoBackgroundIconButton(QPushButton *w, QIcon icon, QString objectName = "");
 	static void BrowseButton(QPushButton *btn, QString objectName = "");
-	static void OrangeWidget(QWidget *w, QString objectName = "");
-	static void ActiveStoredLabel(QLabel *w, QString objectName = "");
-	static void FaultsFrame(QFrame *w, QString objectName = "");
-	static void FaultsExplanation(QWidget *w, QString objectName = "");
 
 private:
 	static StyleHelper *pinstance_;

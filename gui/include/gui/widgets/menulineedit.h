@@ -40,7 +40,6 @@ public:
 	virtual ~MenuLineEdit();
 
 	QLineEdit *edit();
-	void applyStylesheet();
 
 private:
 	QLineEdit *m_edit;

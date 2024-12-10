@@ -303,14 +303,6 @@ void StyleHelper::HoverWidget(QWidget *w, bool draggable, QString objectName)
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::TransparentWidget(QWidget *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-	QString style = QString(R"css(background-color: transparent;)css");
-	w->setStyleSheet(style);
-}
-
 void StyleHelper::HoverToolTip(QWidget *w, QString info, QString objectName)
 {
 	if(!objectName.isEmpty())
@@ -361,62 +353,5 @@ void StyleHelper::BrowseButton(QPushButton *btn, QString objectName)
 	int size = Style::getDimension(json::global::unit_2_5);
 	btn->setFixedSize(size, size);
 }
-
-// TODO: move these functions to SWIOT specicfic style structure
-// SWIOT -------------------------------------------------------
-void StyleHelper::OrangeWidget(QWidget *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-	QString style = QString(R"css(
-					QWidget{
-				color:&&orange&&
-			}
-			)css");
-	style.replace("&&orange&&", Style::getAttribute(json::theme::interactive_primary_idle));
-	w->setStyleSheet(style);
-}
-
-void StyleHelper::ActiveStoredLabel(QLabel *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-	QString style = QString(R"css(
-			QLabel{
-				background-color:  transparent; width: 40px; height: 14px; border: 2px solid ; border-radius: 8px; border-color: &&content_default&&;
-			}
-			QLabel[high=false] { border-color: &&content_default&&; background-color:  transparent; }
-			QLabel[high=true] { border-color: &&content_default&&; background-color: &&content_default&&; }
-			)css");
-	style.replace("&&content_default&&", Style::getAttribute(json::theme::content_default));
-	w->setStyleSheet(style);
-}
-
-void StyleHelper::FaultsFrame(QFrame *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-	QString style = QString(R"css(
-			QFrame[pressed=true] { background-color: &&elementHighlight&&; border: 1px solid &&elementBackground&&; border-radius:5px; }
-			)css");
-	style.replace("&&elementHighlight&&", Style::getAttribute(json::theme::content_subtle));
-	style.replace("&&elementBackground&&", Style::getAttribute(json::theme::background_primary));
-
-	w->setStyleSheet(style);
-}
-
-void StyleHelper::FaultsExplanation(QWidget *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-	QString style = QString(R"css(
-			QWidget[highlighted=true]{color:&&content_default&&;}
-			QWidget{color:&&defaultColor&&;}
-			)css");
-	style.replace("&&defaultColor&&", Style::getAttribute(json::theme::interactive_subtle_idle));
-	style.replace("&&content_default&&", Style::getAttribute(json::theme::content_default));
-	w->setStyleSheet(style);
-}
-// SWIOT -------------------------------------------------------
 
 #include "moc_stylehelper.cpp"
