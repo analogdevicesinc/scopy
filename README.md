@@ -10,11 +10,12 @@ Scopy is a software oscilloscope and signal analysis toolset.
 
 ### Supported platforms
 - Windows (x86-64)
-- Linux flatpak (x86-64, armhf, arm64)
+- Linux AppImage (x86-64, armhf, arm64)
+- Linux flatpak (x86-64)
 - macOS (x86-64, arm64)
 - Android (aarch64)
 
-Complete instalation and usage instructions can be found on our [Wiki](https://wiki.analog.com/university/tools/m2k/scopy) page.
+Complete installation and usage instructions can be found on our [official documentation](https://analogdevicesinc.github.io/scopy/) page.
 
 ## Contributing
 

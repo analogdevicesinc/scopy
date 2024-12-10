@@ -51,14 +51,6 @@ Application Specific plugins
     * :ref:`Settings <settings>`
 
 
-Each plugin:
-Description
-Compatible
-Description
-Usage
-Usecases
-
-
 Contents
 ---------------------------------------------------------------------
 
