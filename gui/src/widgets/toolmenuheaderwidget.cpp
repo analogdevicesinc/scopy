@@ -27,6 +27,8 @@
 using namespace scopy;
 
 ToolMenuHeaderWidget::ToolMenuHeaderWidget(QString title, QWidget *parent)
+	: QWidget(parent)
+	, m_ledState(IDLE)
 {
 	QHBoxLayout *hLay = new QHBoxLayout(this);
 	hLay->setMargin(0);
@@ -64,9 +66,13 @@ ToolMenuHeaderWidget::ToolMenuHeaderWidget(QString title, QWidget *parent)
 	hLay->addWidget(titleWidget);
 	hLay->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
+	m_refreshTimer = new QTimer(this);
+	m_refreshTimer->setInterval(LED_ON_MSEC * WAITING_FACTOR);
+	connect(m_refreshTimer, &QTimer::timeout, this, &ToolMenuHeaderWidget::refresh);
+
 	m_timer = new QTimer(this);
-	m_timer->setInterval(LED_ON_MSEC * WAITING_FACTOR);
-	connect(m_timer, &QTimer::timeout, m_timer, &QTimer::stop);
+	m_timer->setInterval(LED_ON_MSEC);
+	connect(m_timer, &QTimer::timeout, this, &ToolMenuHeaderWidget::onTimeout);
 
 	connect(this, &ToolMenuHeaderWidget::blinkLed, this, &ToolMenuHeaderWidget::onBlinkLed);
 	connect(this, &ToolMenuHeaderWidget::connState, this,
@@ -98,20 +104,74 @@ void ToolMenuHeaderWidget::setDeviceId(QString deviceId) { m_id = deviceId; }
 
 void ToolMenuHeaderWidget::onBlinkLed(int retCode, IIOCallType type)
 {
+	bool isSuccess = (retCode >= 0);
+	if(m_ledState == IDLE) {
+		m_refreshTimer->start();
+	}
+	if(!m_refreshTimer->isActive()) {
+		return;
+	}
 	switch(type) {
 	case IIOCallType::SINGLE:
-		m_timer->stop();
+		handleSingle(isSuccess);
 		break;
 	case IIOCallType::STREAM:
-		if(m_timer->isActive()) {
-			return;
-		}
-		m_timer->start();
+		handleStream(isSuccess);
 		break;
 	default:
 		break;
 	}
-	m_ledBtn->ledOn(retCode >= 0, LED_ON_MSEC);
+}
+
+void ToolMenuHeaderWidget::handleSingle(bool isSuccess)
+{
+	if(m_ledState != IDLE && m_ledState != STREAM_RUNNING) {
+		return;
+	}
+	if(m_ledState == IDLE) {
+		m_ledBtn->ledOn();
+		m_ledState = SINGLE_RUNNING;
+	} else {
+		m_ledBtn->ledOff();
+		m_ledState = SINGLE_INTERRUPT;
+	}
+	m_ledBtn->setLedState(isSuccess);
+	m_timer->start();
+}
+
+void ToolMenuHeaderWidget::handleStream(bool isSuccess)
+{
+	if(m_ledState != STREAM_RUNNING && m_ledState != IDLE) {
+		return;
+	}
+	m_ledState = STREAM_RUNNING;
+	m_ledBtn->setLedState(isSuccess);
+	m_ledBtn->ledOn();
+	m_timer->start();
+}
+
+void ToolMenuHeaderWidget::onTimeout()
+{
+	switch(m_ledState) {
+	case SINGLE_INTERRUPT:
+		m_ledBtn->ledOn();
+		m_ledState = SINGLE_RUNNING;
+		break;
+	case IDLE:
+		m_ledBtn->ledOff();
+		m_timer->stop();
+		break;
+	default:
+		m_ledState = IDLE;
+		break;
+	}
+}
+
+void ToolMenuHeaderWidget::refresh()
+{
+	m_refreshTimer->stop();
+	m_ledBtn->ledOff();
+	m_timer->start();
 }
 
 QPushButton *ToolMenuHeaderWidget::deviceBtn() const { return m_deviceBtn; }
