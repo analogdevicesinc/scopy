@@ -15,11 +15,11 @@ source ${REPO_SRC}/ci/macOS/before_install_lib.sh
 install_packages() {
 
 	# Workaround: Homebrew fails to upgrade Python's 2to3 due to conflicting symlinks  https://github.com/actions/runner-images/issues/6817
-	rm /usr/local/bin/2to3 || true
-	rm /usr/local/bin/idle3 || true
-	rm /usr/local/bin/pydoc3 || true
-	rm /usr/local/bin/python3 || true
-	rm /usr/local/bin/python3-config || true
+	rm -v /usr/local/bin/2to3* || true
+	rm -v /usr/local/bin/idle3* || true
+	rm -v /usr/local/bin/pydoc3* || true
+	rm -v /usr/local/bin/python3* || true
+	rm -v /usr/local/bin/python3-config || true
 
 	brew update
 	# Workaround for brew taking a long time to upgrade existing packages
