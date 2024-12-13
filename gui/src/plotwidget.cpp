@@ -426,4 +426,11 @@ void PlotWidget::printPlot(QPainter *painter, bool useSymbols)
 
 PlotChannel *PlotWidget::selectedChannel() const { return m_selectedChannel; }
 
+// NOTE: Hackish, but the QwtPlot::XAxis enforces a minimumSizeHint if the parent
+// does not provide a strict max size. This means that this widget will always have
+// the minimum size dicated by the XAxis and it cannot be changed. This would be ok,
+// but the XAxix can always be smalled by reducing the number of segments (e.g. if it
+// doesn't fit). This hack just lets the parent tell the XAxis to be smaller.
+QSize PlotWidget::minimumSizeHint() const { return QSize(0, 0); }
+
 #include "moc_plotwidget.cpp"

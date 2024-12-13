@@ -29,6 +29,7 @@
 #include <QWidget>
 #include <QwtPlot>
 #include <QwtPlotZoomer>
+#include <QSize>
 #include <plotinfo.h>
 
 #include <buffer_previewer.hpp>
@@ -121,6 +122,9 @@ Q_SIGNALS:
 	void removedChannel(PlotChannel *ch);
 	void plotScaleChanged();
 	void newData();
+
+protected:
+	QSize minimumSizeHint() const override;
 
 private:
 	QwtPlot *m_plot;
