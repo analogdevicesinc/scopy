@@ -107,7 +107,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	m_xAxisShow = new MenuOnOffSwitch("XY - Plot X source", plotMenu, false);
 
 	connect(xySwitch, &QAbstractButton::toggled, this, [=](bool b) {
-		m_plotComponent->xyPlot()->setVisible(b);
+		m_plotComponent->xyDockWidget()->setActivated(b);
 		m_xAxisSrc->setVisible(b);
 		m_xAxisShow->setVisible(b);
 	});
