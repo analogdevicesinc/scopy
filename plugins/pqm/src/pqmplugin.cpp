@@ -25,6 +25,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <acquisitionmanager.h>
+#include <deviceiconbuilder.h>
 #include <harmonicsinstrument.h>
 #include <pqmdatalogger.h>
 #include <rmsinstrument.h>
@@ -96,7 +97,16 @@ bool PQMPlugin::loadPage()
 
 bool PQMPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/pqm/pqm_icon.svg");
+	QLabel *logo = new QLabel();
+	QPixmap pixmap(":/gui/icons/scopy-default/icons/logo_analog.svg");
+	int pixmapHeight = 14;
+	pixmap = pixmap.scaledToHeight(pixmapHeight, Qt::SmoothTransformation);
+	logo->setPixmap(pixmap);
+
+	QLabel *footer = new QLabel("PQMON");
+	Style::setStyle(footer, style::properties::label::deviceIcon, true);
+
+	m_icon = DeviceIconBuilder().shape(DeviceIconBuilder::SQUARE).headerWidget(logo).footerWidget(footer).build();
 	return true;
 }
 
