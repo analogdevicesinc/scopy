@@ -20,6 +20,9 @@
  */
 
 #include "rmsinstrument.h"
+#include "dockablearea.h"
+#include "dockableareainterface.h"
+#include "dockwrapper.h"
 #include "measurementlabel.h"
 
 #include <stylehelper.h>
@@ -53,6 +56,8 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	setLayout(instrumentLayout);
 	instrumentLayout->setMargin(0);
 
+	m_dockableArea = createDockableArea(this);
+
 	ToolTemplate *tool = new ToolTemplate(this);
 	tool->topContainer()->setVisible(true);
 	tool->centralContainer()->setVisible(true);
@@ -67,13 +72,11 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/pqm/rms.html"));
 	});
 
-	QWidget *central = new QWidget(this);
-	QHBoxLayout *centralLayout = new QHBoxLayout();
-	central->setLayout(centralLayout);
-	centralLayout->setSpacing(8);
-	centralLayout->setContentsMargins(0, 0, 0, 0);
+	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
+	tool->addWidgetToCentralContainerHelper(dockableAreaWidget);
 
-	QWidget *voltageWidget = new QWidget(central);
+	m_voltageDockWrapper = createDockWrapper("Voltage Plot");
+	QWidget *voltageWidget = new QWidget(dockableAreaWidget);
 	voltageWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *voltageLayout = new QVBoxLayout();
 	voltageWidget->setLayout(voltageLayout);
@@ -91,8 +94,11 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	initPlot(m_voltagePlot);
 	setupPlotChannels(m_voltagePlot, m_chnls["voltage"]);
 	voltageLayout->addWidget(m_voltagePlot);
+	m_voltageDockWrapper->setInnerWidget(voltageWidget);
+	m_dockableArea->addDockWrapper(m_voltageDockWrapper, DockableAreaInterface::Direction_LEFT);
 
-	QWidget *currentWidget = new QWidget(central);
+	m_currentDockWrapper = createDockWrapper("Current Plot");
+	QWidget *currentWidget = new QWidget(dockableAreaWidget);
 	currentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *currentLayout = new QVBoxLayout();
 	currentWidget->setLayout(currentLayout);
@@ -109,13 +115,8 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	initPlot(m_currentPlot);
 	setupPlotChannels(m_currentPlot, m_chnls["current"]);
 	currentLayout->addWidget(m_currentPlot);
-
-	centralLayout->addWidget(voltageWidget);
-	centralLayout->setStretchFactor(voltageWidget, 1);
-	centralLayout->addWidget(currentWidget);
-	centralLayout->setStretchFactor(currentWidget, 1);
-
-	tool->addWidgetToCentralContainerHelper(central);
+	m_currentDockWrapper->setInnerWidget(currentWidget);
+	m_dockableArea->addDockWrapper(m_currentDockWrapper, DockableAreaInterface::Direction_RIGHT);
 
 	GearBtn *settingsBtn = new GearBtn(this);
 	settingsBtn->setChecked(true);
