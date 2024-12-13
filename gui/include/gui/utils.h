@@ -42,14 +42,23 @@
 class SCOPY_GUI_EXPORT Util
 {
 public:
+	typedef struct
+	{
+		QString tag;
+		QString id;
+		QString attrName;
+		QString attrVal;
+	} SVGSpec;
+
 	static void retainWidgetSizeWhenHidden(QWidget *w, bool retain = true);
 	static void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars = 0);
 	static QString loadStylesheetFromFile(const QString &path);
 	static bool compareNatural(const std::string &a, const std::string &b);
 	static QString doubleToQString(double value);
 	static QWidget *findContainingWindow(QWidget *w);
-	static void SetAttrRecur(QDomElement &elem, QString strtagname, QString strattr, QString strattrval);
+	static void SetAttrRecur(QDomElement &elem, SVGSpec s);
 	static QPixmap ChangeSVGColor(QString iconPath, QString color, float opacity);
+	static QPixmap ChangeSVGAttr(QString iconPath, QList<SVGSpec> list);
 };
 
 #define PLOT_MENU_BAR_ENABLED
