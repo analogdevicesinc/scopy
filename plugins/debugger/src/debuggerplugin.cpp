@@ -31,6 +31,7 @@
 #include <QLabel>
 #include <QLoggingCategory>
 #include <QVBoxLayout>
+#include <deviceiconbuilder.h>
 #include <preferenceshelper.h>
 #include <style.h>
 
@@ -177,7 +178,16 @@ bool DebuggerPlugin::loadPage()
 
 bool DebuggerPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/adalm.svg");
+	QLabel *logo = new QLabel();
+	QPixmap pixmap(":/gui/icons/scopy-default/icons/logo_analog.svg");
+	int pixmapHeight = 14;
+	pixmap = pixmap.scaledToHeight(pixmapHeight, Qt::SmoothTransformation);
+	logo->setPixmap(pixmap);
+
+	QLabel *footer = new QLabel("DEBUG");
+	Style::setStyle(footer, style::properties::label::deviceIcon, true);
+
+	m_icon = DeviceIconBuilder().shape(DeviceIconBuilder::SQUARE).headerWidget(logo).footerWidget(footer).build();
 	return true;
 }
 
