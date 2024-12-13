@@ -31,6 +31,7 @@
 
 #include <QDebug>
 #include <QLoggingCategory>
+#include <qscrollbar.h>
 #include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_DEVBROWSER, "DeviceBrowser")
@@ -45,13 +46,19 @@ DeviceBrowser::DeviceBrowser(QWidget *parent)
 	this->setFixedHeight(185);
 
 	auto dbm = ui->wDeviceBrowserMenu;
-	layout = new QHBoxLayout(dbm);
+	layout = dynamic_cast<QHBoxLayout *>(dbm->layout());
+
+	auto scrollArea = ui->scrollArea;
+	scrollArea->horizontalScrollBar()->setVisible(false);
 
 	initBtns();
 
 	connect(ui->btnHome, SIGNAL(clicked()), this, SLOT(forwardRequestDeviceWithDirection()));
 	connect(ui->btnAdd, SIGNAL(clicked()), this, SLOT(forwardRequestDeviceWithDirection()));
 	connect(this, SIGNAL(requestDevice(QString, int)), this, SLOT(updateSelectedDeviceIdx(QString)));
+
+	connect(scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged, this,
+		&DeviceBrowser::onScrollRangeChanged);
 }
 
 DeviceBrowser::~DeviceBrowser()
@@ -96,13 +103,16 @@ void DeviceBrowser::addDevice(QString id, Device *d, int position)
 {
 	qInfo(CAT_DEVBROWSER) << "adding device " << id;
 	auto w = dynamic_cast<QAbstractButton *>(buildDeviceIcon(d, this));
+	int spacerIndex = layout->indexOf(ui->hSpacer);
 	w->setProperty(devBrowserId, id);
-	layout->insertWidget(position, w);
 	bg->addButton(w);
-	if(position == -1)
+	if(position == -1) {
+		layout->insertWidget(spacerIndex, w);
 		list.append(w);
-	else
+	} else {
+		layout->insertWidget(position, w);
 		list.insert(position, w);
+	}
 
 	connect(w, &QAbstractButton::clicked, this, &DeviceBrowser::forwardRequestDeviceWithDirection);
 }
@@ -228,6 +238,20 @@ DeviceIcon *DeviceBrowser::buildDeviceIcon(Device *d, QWidget *parent)
 	connect(devIcon, &DeviceIconImpl::displayNameChanged, this,
 		[this, d](QString newName) { Q_EMIT displayNameChanged(d->id(), newName); });
 	return devIcon;
+}
+
+// Used to display the scrollbar when needed and to maintain its size in the scroll area when not needed.
+// We chose this approach because for the Qt::ScrollBarAsNeeded policy the size of the scrollball cannot be retained
+// with Util::retainWidgetSizeWhenHidden because the resizing of the scrollbar is done dynamically (withoud using the
+// show/hide default functions).
+void DeviceBrowser::onScrollRangeChanged(int min, int max)
+{
+	auto scrollArea = ui->scrollArea;
+	if(max > min) {
+		scrollArea->horizontalScrollBar()->setVisible(true);
+	} else {
+		scrollArea->horizontalScrollBar()->setVisible(false);
+	}
 }
 
 /*
