@@ -38,8 +38,6 @@ public:
 	uint32_t getAddressSpace() const;
 	void setAddressSpace(uint32_t newAddressSpace);
 
-Q_SIGNALS:
-
 private:
 	struct iio_device *dev;
 	uint32_t addressSpace = 0;

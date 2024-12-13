@@ -248,10 +248,12 @@ bool DacDataModel::validateBufferParams()
 
 	auto enabledChannelsCount = getEnabledChannelsCount();
 	ssize_t s_size = iio_device_get_sample_size(m_dev);
+
 	if(!s_size || enabledChannelsCount == 0) {
 		auto msg = "Unable to create buffer, no channel enabled.";
 		qDebug(CAT_DAC_DATA) << msg;
 		Q_EMIT log(msg);
+		Q_EMIT iioEvent(IIO_ERROR);
 		return false;
 	}
 
@@ -259,6 +261,7 @@ bool DacDataModel::validateBufferParams()
 		auto msg = "Unable to create buffer due to data size.";
 		qDebug(CAT_DAC_DATA) << msg;
 		Q_EMIT log(msg);
+		Q_EMIT iioEvent(IIO_ERROR);
 		return false;
 	}
 
@@ -266,6 +269,7 @@ bool DacDataModel::validateBufferParams()
 		auto msg = "Not enough data columns for all enabled channels.";
 		qDebug(CAT_DAC_DATA) << msg;
 		Q_EMIT log(msg);
+		Q_EMIT iioEvent(IIO_ERROR);
 		return false;
 	}
 
@@ -273,6 +277,7 @@ bool DacDataModel::validateBufferParams()
 		auto msg = "Unable to create buffer due to incompatible channels enabled.";
 		qDebug(CAT_DAC_DATA) << msg;
 		Q_EMIT log(msg);
+		Q_EMIT iioEvent(IIO_ERROR);
 		return false;
 	}
 
@@ -289,10 +294,11 @@ bool DacDataModel::validateBufferParams()
 			auto msg = "Unable to create buffer due to high decimation.";
 			qDebug(CAT_DAC_DATA) << msg;
 			Q_EMIT log(msg);
+			Q_EMIT iioEvent(IIO_ERROR);
 			return false;
 		}
 	}
-
+	Q_EMIT iioEvent(IIO_SUCCESS);
 	return true;
 }
 
@@ -331,6 +337,7 @@ void DacDataModel::push()
 		QString logMsg = QString("Unable to create buffer: %1").arg(strerror(errno));
 		qDebug(CAT_DAC_DATA) << logMsg;
 		Q_EMIT log(logMsg);
+		Q_EMIT iioEvent(IIO_ERROR);
 		return;
 	}
 
@@ -383,6 +390,7 @@ void DacDataModel::push()
 	if(m_interrupted) {
 		Q_EMIT log(QString("Aborting thread..."));
 	}
+	Q_EMIT iioEvent(IIO_SUCCESS, IIOCallType::STREAM);
 }
 
 void DacDataModel::start() { initBuffer(); }
@@ -419,6 +427,7 @@ bool DacDataModel::initBufferDac()
 			QString uuid = iio_device_get_name(m_dev);
 			uuid += ":" + id;
 			m_bufferTxs.insert(uuid, new TxNode(uuid, chn, this));
+			connect(m_bufferTxs[uuid], &TxNode::iioEvent, this, &DacDataModel::iioEvent);
 		}
 	}
 	return (txCount != 0);
@@ -453,6 +462,7 @@ bool DacDataModel::initDdsDac()
 		if(!parentTxNode) {
 			parentTxNode = new TxNode(txNameCurrent, nullptr, this);
 			m_ddsTxs.insert(txNameCurrent, parentTxNode);
+			connect(parentTxNode, &TxNode::iioEvent, this, &DacDataModel::iioEvent);
 		}
 		if(txNodesNames.size() == 2) {
 			QString toneName = txNodesNames.at(1);
@@ -462,6 +472,7 @@ bool DacDataModel::initDdsDac()
 			QString toneName = txNodesNames.at(2);
 			TxNode *complexChnNode = parentTxNode->addChildNode(complexChnName, nullptr);
 			complexChnNode->addChildNode(toneName, chn);
+			connect(complexChnNode, &TxNode::iioEvent, this, &DacDataModel::iioEvent);
 		}
 	}
 	return (ddsTonesCount != 0);

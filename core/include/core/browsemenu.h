@@ -55,6 +55,7 @@ Q_SIGNALS:
 private:
 	void add(QWidget *w, QString name, MenuAlignment position);
 	void toggleCollapsed();
+	void hideBtnText(QPushButton *btn, QString name, bool hide);
 	QPushButton *createBtn(QString name, QString iconPath, QWidget *parent = nullptr);
 	QFrame *createHLine(QWidget *parent = nullptr);
 	QWidget *createHeader(QWidget *parent = nullptr);

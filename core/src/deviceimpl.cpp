@@ -35,6 +35,7 @@
 #include <QTextBrowser>
 #include <QThread>
 #include <QtConcurrent/QtConcurrent>
+#include <deviceiconbuilder.h>
 #include <style.h>
 
 #include <common/scopyconfig.h>
@@ -45,6 +46,7 @@
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "Device")
 
 namespace scopy {
+
 DeviceImpl::DeviceImpl(QString param, PluginManager *p, QString category, QObject *parent)
 	: QObject{parent}
 	, m_param(param)
@@ -89,6 +91,7 @@ void DeviceImpl::loadPlugins()
 	loadIcons();
 	loadBadges();
 	loadPages();
+	loadConfigPage();
 	loadToolList();
 	if(m_plugins.isEmpty()) {
 		connbtn->hide();
@@ -156,17 +159,22 @@ void DeviceImpl::loadName()
 void DeviceImpl::loadIcons()
 {
 	m_icon = new QWidget();
+	QHBoxLayout *lay = new QHBoxLayout(m_icon);
 	m_icon->setFixedHeight(100);
 	m_icon->setFixedWidth(100);
-	new QHBoxLayout(m_icon);
 	for(auto &p : m_plugins) {
 		if(p->loadIcon()) {
-			m_icon->layout()->addWidget(p->icon());
+			lay->addWidget(p->icon());
 			return;
 		}
 	}
 
-	new QLabel("No PLUGIN", m_icon);
+	QLabel *header = new QLabel("No Plugin");
+	Style::setStyle(header, style::properties::label::deviceIcon, true);
+
+	QWidget *noPluginIcon =
+		DeviceIconBuilder().shape(DeviceIconBuilder::SQUARE).color("gray").headerWidget(header).build();
+	lay->addWidget(noPluginIcon);
 }
 
 void DeviceImpl::loadPages()
@@ -211,6 +219,18 @@ void DeviceImpl::loadPages()
 		if(p->loadPage()) {
 			m_scrollAreaLayout->addWidget(p->page());
 			break; // Only display the page from the plugin with the highest priority
+		}
+	}
+}
+
+void DeviceImpl::loadConfigPage()
+{
+	m_configPage = new QTabWidget();
+	m_configPage->setTabPosition(QTabWidget::South);
+
+	for(auto &&p : plugins()) {
+		if(p->loadConfigPage()) {
+			m_configPage->addTab(p->configPage(), p->name());
 		}
 	}
 }
@@ -434,6 +454,22 @@ QString DeviceImpl::displayParam() { return m_displayParam; }
 QString DeviceImpl::param() { return m_param; }
 
 QWidget *DeviceImpl::icon() { return m_icon; }
+
+QPixmap DeviceImpl::iconPixmap()
+{
+	QPixmap pixmap;
+	QLayoutItem *item = m_icon->layout()->itemAt(0);
+	if(!item || !item->widget()) {
+		return pixmap;
+	}
+	QLabel *iconLabel = dynamic_cast<QLabel *>(item->widget());
+	if(iconLabel) {
+		pixmap = iconLabel->grab();
+	}
+	return pixmap;
+}
+
+QWidget *DeviceImpl::configPage() { return m_configPage; }
 
 QWidget *DeviceImpl::page() { return m_page; }
 

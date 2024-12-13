@@ -91,6 +91,7 @@ void DioDigitalChannelController::createWriteRawCommand(bool value)
 		[=, this](scopy::Command *cmd) {
 			IioChannelAttributeWrite *tcmd = dynamic_cast<IioChannelAttributeWrite *>(cmd);
 			if(!tcmd) {
+				Q_EMIT iioEvent(IIO_ERROR);
 				return;
 			}
 			if(tcmd->getReturnCode() < 0) {
@@ -98,6 +99,7 @@ void DioDigitalChannelController::createWriteRawCommand(bool value)
 					<< "Could not write value " << value << " to channel " << m_channelName
 					<< " error code" << tcmd->getReturnCode();
 			}
+			Q_EMIT iioEvent(tcmd->getReturnCode());
 		},
 		Qt::QueuedConnection);
 	m_cmdQueue->enqueue(writeRawCmd);
@@ -221,24 +223,28 @@ void DioDigitalChannelController::writeCurrentLimitCmdFinished(Command *cmd)
 {
 	IioChannelAttributeWrite *tcmd = dynamic_cast<IioChannelAttributeWrite *>(cmd);
 	if(!tcmd) {
+		Q_EMIT iioEvent(IIO_ERROR);
 		return;
 	}
 	if(tcmd->getReturnCode() < 0) {
 		qCritical(CAT_SWIOT_MAX14906) << "Could not write current limit value to channel " << m_channelName
 					      << " error code " << tcmd->getReturnCode();
 	}
+	Q_EMIT iioEvent(tcmd->getReturnCode());
 }
 
 void DioDigitalChannelController::writeTypeCmdFinished(Command *cmd)
 {
 	IioChannelAttributeWrite *tcmd = dynamic_cast<IioChannelAttributeWrite *>(cmd);
 	if(!tcmd) {
+		Q_EMIT iioEvent(IIO_ERROR);
 		return;
 	}
 	if(tcmd->getReturnCode() < 0) {
 		qCritical(CAT_SWIOT_MAX14906) << "Could not write attr to channel " << m_channelName << " error code "
 					      << tcmd->getReturnCode();
 	}
+	Q_EMIT iioEvent(tcmd->getReturnCode());
 }
 
 #include "moc_diodigitalchannelcontroller.cpp"

@@ -30,7 +30,7 @@
 #include <iio.h>
 
 namespace scopy::swiot {
-class BufferMenuView : public QWidget
+class BufferMenuView : public QWidget, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -56,6 +56,7 @@ Q_SIGNALS:
 	void samplingFreqWritten(bool written);
 
 	void runBtnsPressed(bool en);
+	void iioEvent(int retCode, scopy::IIOCallType type);
 
 private:
 	void createConnections();

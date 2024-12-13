@@ -31,7 +31,7 @@
 #include <QObject>
 
 namespace scopy::swiot {
-class SwiotController : public QObject
+class SwiotController : public QObject, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -60,6 +60,8 @@ Q_SIGNALS:
 	void modeAttributeChanged(QString mode);
 	void isRuntimeCtxChanged(bool isRuntimeCtx);
 	void writeModeFailed();
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
+
 private Q_SLOTS:
 	void writeModeCommandFinished(scopy::Command *cmd);
 	void readModeCommandFinished(scopy::Command *cmd);

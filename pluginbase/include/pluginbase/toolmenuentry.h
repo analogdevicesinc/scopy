@@ -22,6 +22,7 @@
 #ifndef TOOLMENUENTRY_H
 #define TOOLMENUENTRY_H
 
+#include "iioutil/iioeventemitter.h"
 #include "scopy-pluginbase_export.h"
 
 #include <QObject>
@@ -185,6 +186,12 @@ Q_SIGNALS:
 	 * Signal is emitted when the run button is clicked from Scopy UI
 	 */
 	void runClicked(bool);
+
+	/**
+	 * @brief iioEvent
+	 * The signal must be emitted whenever an iio command is executed
+	 */
+	void iioEvent(int retCode, scopy::IIOCallType type);
 
 private:
 	QString m_id;

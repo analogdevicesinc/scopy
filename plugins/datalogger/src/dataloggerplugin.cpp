@@ -30,6 +30,7 @@
 #include <datamonitorutils.hpp>
 #include <datalogger_api.hpp>
 #include <style.h>
+#include <deviceiconbuilder.h>
 
 #include <libm2k/analog/dmm.hpp>
 
@@ -65,8 +66,16 @@ bool DataLoggerPlugin::loadPage() { return false; }
 
 bool DataLoggerPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-			  "/icons/tool_datalogger.svg");
+	QLabel *logo = new QLabel();
+	QPixmap pixmap(":/gui/icons/scopy-default/icons/logo_analog.svg");
+	int pixmapHeight = 14;
+	pixmap = pixmap.scaledToHeight(pixmapHeight, Qt::SmoothTransformation);
+	logo->setPixmap(pixmap);
+
+	QLabel *footer = new QLabel("DLOG");
+	Style::setStyle(footer, style::properties::label::deviceIcon, true);
+
+	m_icon = DeviceIconBuilder().shape(DeviceIconBuilder::SQUARE).headerWidget(logo).footerWidget(footer).build();
 	return true;
 }
 
@@ -102,6 +111,8 @@ bool DataLoggerPlugin::onConnect()
 
 	foreach(ReadableDataMonitorModel *monitor, dmmList) {
 		m_dataAcquisitionManager->getDataMonitorMap()->insert(monitor->getName(), monitor);
+		connect(monitor, &ReadableDataMonitorModel::iioEvent, m_dataAcquisitionManager,
+			&DataAcquisitionManager::iioEvent);
 	}
 
 	Preferences *p = Preferences::GetInstance();
@@ -201,6 +212,9 @@ void DataLoggerPlugin::addNewTool()
 
 	Q_EMIT toolListChanged();
 	m_toolList.last()->setTool(datamonitorTool);
+	connect(datamonitorTool, &DatamonitorTool::iioEvent, m_toolList.last(), &ToolMenuEntry::iioEvent);
+	connect(m_dataAcquisitionManager, &DataAcquisitionManager::iioEvent, m_toolList.last(),
+		&ToolMenuEntry::iioEvent);
 	if(m_toolList.length() > 1) {
 		requestTool(tool_name);
 	}

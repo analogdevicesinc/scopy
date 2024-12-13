@@ -34,6 +34,16 @@
 #include "scopy-core_export.h"
 
 namespace scopy {
+
+typedef struct
+{
+	QString id;
+	QString name;
+	QString param;
+	QPixmap icon;
+	QList<ToolMenuEntry *> tools;
+} DeviceInfo;
+
 class SCOPY_CORE_EXPORT ToolMenuManager : public QObject
 {
 	Q_OBJECT
@@ -41,7 +51,7 @@ public:
 	ToolMenuManager(ToolStack *ts, DetachedToolWindowManager *dtm, ToolMenu *toolMenu, QObject *parent = nullptr);
 	~ToolMenuManager();
 
-	void addMenuItem(QString deviceId, QString devName, QList<ToolMenuEntry *> tools, int itemIndex = -1);
+	void addMenuItem(DeviceInfo dInfo, int itemIndex = -1);
 	void removeMenuItem(QString deviceId);
 	void changeToolListContents(QString deviceId, QList<ToolMenuEntry *> tools);
 
@@ -52,13 +62,17 @@ public Q_SLOTS:
 	void deviceConnected(QString id);
 	void deviceDisconnected(QString id);
 	void onDisplayNameChanged(QString id, QString devName);
+	void onIioEvent(QString id, int retCode, IIOCallType type);
 
 Q_SIGNALS:
 	void requestToolSelect(QString id);
+	void connState(QString id, bool isConnected);
+	void menuCollapsed(bool collapsed);
 
 private Q_SLOTS:
 	void updateTool(QWidget *old);
 	void updateToolAttached(bool oldAttach, ToolMenuItem *toolMenuItem);
+	void setCollapsed(bool collapse);
 
 private:
 	void loadToolAttachedState(ToolMenuEntry *tme);
@@ -68,15 +82,22 @@ private:
 	void showTool(ToolMenuItem *toolMenuItem);
 	void selectTool(ToolMenuItem *toolMenuItem, bool on);
 	void setTmeAttached(ToolMenuEntry *tme);
-	MenuSectionCollapseWidget *createMenuSectionItem(QString deviceName, QString uri = "");
+	MenuSectionCollapseWidget *createMenuSectionItem(const DeviceInfo &dInfo);
 	ToolMenuItem *createToolMenuItem(ToolMenuEntry *tme, QWidget *parent = nullptr);
+	MenuCollapseHeader *getCollapseSectionHeader(MenuSectionCollapseWidget *section);
+	void initHeaderWidget(MenuCollapseSection::MenuHeaderWidgetType type, MenuCollapseHeader *header,
+			      const DeviceInfo &dInfo);
+	void initToolMenuHeaderWidget(MenuCollapseHeader *header, const DeviceInfo &dInfo);
+	void initCompositeHeaderWidget(MenuCollapseHeader *header, const DeviceInfo &dInfo);
 
+	bool m_collapsed;
 	QString m_prevItem;
 	QStringList m_connectedDev;
 	ToolStack *m_ts;
 	DetachedToolWindowManager *m_dtm;
 	ToolMenu *m_toolMenu;
 	QMap<QString, MenuSectionCollapseWidget *> m_itemMap;
+	QMap<QString, DeviceInfo> m_dInfoMap;
 };
 } // namespace scopy
 

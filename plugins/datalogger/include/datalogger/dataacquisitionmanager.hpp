@@ -26,13 +26,15 @@
 #include <QMap>
 #include <QObject>
 
+#include <iioutil/iioeventemitter.h>
+
 #include "datamonitor/datamonitormodel.hpp"
 #include "scopy-datalogger_export.h"
 
 namespace scopy {
 namespace datamonitor {
 
-class SCOPY_DATALOGGER_EXPORT DataAcquisitionManager : public QObject
+class SCOPY_DATALOGGER_EXPORT DataAcquisitionManager : public QObject, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -56,6 +58,7 @@ Q_SIGNALS:
 	void monitorAdded(DataMonitorModel *monitor);
 	void monitorRemoved(QString monitorName);
 	void deviceRemoved(QString deviceName);
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 private:
 	QMap<QString, int> *m_activeMonitorsMap;
