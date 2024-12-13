@@ -22,6 +22,8 @@
 #include "fftplotcomponent.h"
 #include "plotaxis.h"
 
+#include <gui/docking/dockablearea.h>
+#include <gui/docking/dockwrapper.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
 #include <widgets/menuplotaxisrangecontrol.h>
@@ -36,15 +38,19 @@ using namespace adc;
 FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	: PlotComponent(name, uuid, parent)
 {
-	m_fftPlot = new PlotWidget(this);
+	m_dockableArea = createDockableArea(this);
+	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
+	m_plotLayout->addWidget(dockableAreaWidget);
 
+	m_fftDockWrapper = createDockWrapper("FFT Plot");
+	m_fftPlot = new PlotWidget(this);
 	m_fftPlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_fftPlot->xAxis()->setInterval(0, 1);
 	m_fftPlot->xAxis()->setVisible(true);
 	m_fftPlot->yAxis()->setUnits("dBFS");
+	m_fftDockWrapper->setInnerWidget(m_fftPlot);
 
 	m_plots.append(m_fftPlot);
-	m_plotLayout->addWidget(m_fftPlot);
 
 	auto nameLbl = m_fftPlot->getPlotInfo()->addLabelInfo(IP_LEFT, IP_TOP);
 	nameLbl->setText(m_name);
@@ -58,6 +64,7 @@ FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 
 	m_plotMenu = new FFTPlotComponentSettings(this, parent);
 	addComponent(m_plotMenu);
+	m_dockableArea->addDockWrapper(m_fftDockWrapper);
 
 	connect(m_plotMenu, &FFTPlotComponentSettings::requestDeletePlot, this, [=]() { Q_EMIT requestDeletePlot(); });
 	m_cursor = new CursorController(m_fftPlot, this);
