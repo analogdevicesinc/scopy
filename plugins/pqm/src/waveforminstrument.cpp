@@ -39,6 +39,8 @@
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menuheader.h>
+#include <gui/docking/dockablearea.h>
+#include <gui/docking/dockwrapper.h>
 
 using namespace scopy::pqm;
 
@@ -53,6 +55,8 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	setLayout(layout);
 	layout->setMargin(0);
+
+	m_dockableArea = createDockableArea(this);
 
 	m_plottingStrategy = PlottingStrategyBuilder::build("trigger", m_plotSampleRate);
 	ToolTemplate *tool = new ToolTemplate(this);
@@ -70,15 +74,22 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/pqm/waveform.html"));
 	});
 
-	m_voltagePlot = new PlotWidget(this);
+	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
+	tool->addWidgetToCentralContainerHelper(dockableAreaWidget);
+
+	m_voltageDockWrapper = createDockWrapper("Voltage Plot");
+	m_voltagePlot = new PlotWidget(dockableAreaWidget);
 	initPlot(m_voltagePlot, "V", -400, 400);
 	setupChannels(m_voltagePlot, m_chnls["voltage"]);
-	tool->addWidgetToCentralContainerHelper(m_voltagePlot);
+	m_voltageDockWrapper->setInnerWidget(m_voltagePlot);
+	m_dockableArea->addDockWrapper(m_voltageDockWrapper);
 
-	m_currentPlot = new PlotWidget(this);
+	m_currentDockWrapper = createDockWrapper("Current Plot");
+	m_currentPlot = new PlotWidget(dockableAreaWidget);
 	initPlot(m_currentPlot, "A", -20, 20);
 	setupChannels(m_currentPlot, m_chnls["current"]);
-	tool->addWidgetToCentralContainerHelper(m_currentPlot);
+	m_currentDockWrapper->setInnerWidget(m_currentPlot);
+	m_dockableArea->addDockWrapper(m_currentDockWrapper);
 
 	PlotNavigator::syncPlotNavigators(m_voltagePlot->navigator(), m_currentPlot->navigator(),
 					  new QSet<QwtAxisId>{m_voltagePlot->xAxis()->axisId()});
@@ -146,7 +157,7 @@ void WaveformInstrument::setupChannels(PlotWidget *plot, QMap<QString, QString> 
 	int chnlIdx = 0;
 	for(const QString &chnlId : chnls) {
 		QPen chPen = QPen(QColor(StyleHelper::getChannelColor(chnlIdx)), 1);
-		PlotChannel *plotCh = new PlotChannel(chnls.key(chnlId), chPen, plot->xAxis(), plot->yAxis(), this);
+		PlotChannel *plotCh = new PlotChannel(chnls.key(chnlId), chPen, plot->xAxis(), plot->yAxis(), plot);
 		plot->addPlotChannel(plotCh);
 		plotCh->setEnabled(true);
 		m_plotChnls[chnlId] = plotCh;
