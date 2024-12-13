@@ -168,25 +168,38 @@ void DockerUtils::configureTopBar(QDockWidget *docker)
 	});
 }
 
-void Util::SetAttrRecur(QDomElement &elem, QString strtagname, QString strattr, QString strattrval)
+void Util::SetAttrRecur(QDomElement &elem, SVGSpec s)
 {
 	// if it has the tagname then overwritte desired attribute
-	if(elem.tagName().compare(strtagname) == 0) {
-		elem.setAttribute(strattr, strattrval);
+	if(elem.tagName().compare(s.tag) == 0) {
+		if(s.id.isEmpty()) {
+			elem.setAttribute(s.attrName, s.attrVal);
+		} else if(elem.attribute("id").compare(s.id) == 0) {
+			elem.setAttribute(s.attrName, s.attrVal);
+		}
 	}
+
 	// loop all children
 	for(int i = 0; i < elem.childNodes().count(); i++) {
 		if(!elem.childNodes().at(i).isElement()) {
 			continue;
 		}
 		QDomElement docElem = elem.childNodes().at(i).toElement(); //<-- make const "variable"
-		SetAttrRecur(docElem, strtagname, strattr, strattrval);
+		SetAttrRecur(docElem, s);
 	}
 }
 
 /*QIcon*/ QPixmap Util::ChangeSVGColor(QString iconPath, QString color, float opacity)
 {
-	// open svg resource load contents to qbytearray
+	SVGSpec pathFill{"path", "", "fill", color};
+	SVGSpec pathOpacity{"path", "", "opacity", QString::number(opacity, 'g', 2)};
+	SVGSpec polygonFill{"polygon", "", "fill", color};
+	QPixmap pix = ChangeSVGAttr(iconPath, {pathFill, pathOpacity, polygonFill});
+	return pix;
+}
+
+QPixmap Util::ChangeSVGAttr(QString iconPath, QList<SVGSpec> list)
+{
 	QFile file(iconPath);
 	if(!file.open(QIODevice::ReadOnly))
 		return {};
@@ -196,11 +209,9 @@ void Util::SetAttrRecur(QDomElement &elem, QString strtagname, QString strattr, 
 	doc.setContent(baData);
 	// recurivelly change color
 	QDomElement docElem = doc.documentElement(); //<-- make const "variable"
-	SetAttrRecur(docElem, "path", "fill", color);
-	//	SetAttrRecur(docElem, "rect", "fill", color);
-	SetAttrRecur(docElem, "polygon", "fill", color);
-	SetAttrRecur(docElem, "path", "opacity", QString::number(opacity, 'g', 2));
-	// create svg renderer with edited contents
+	for(const SVGSpec &s : list) {
+		SetAttrRecur(docElem, s);
+	}
 	QSvgRenderer svgRenderer(doc.toByteArray());
 	// create pixmap target (could be a QImage)
 	QPixmap pix(svgRenderer.defaultSize());
@@ -210,6 +221,4 @@ void Util::SetAttrRecur(QDomElement &elem, QString strtagname, QString strattr, 
 	// use renderer to render over painter which paints on pixmap
 	svgRenderer.render(&pixPainter);
 	return pix;
-	//	QIcon myicon(pix);
-	//	return myicon;
 }
