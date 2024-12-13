@@ -19,6 +19,7 @@
  */
 
 // Avoid compiling this file if option not enabled
+#include "dockableareainterface.h"
 #ifdef USE_KDDOCKWIDGETS
 
 #include "docking/dockableareakdab.h"
@@ -38,30 +39,31 @@ DockableArea::DockableArea(QWidget *parent)
 	setAffinities({uniqueName()});
 }
 
-void DockableArea::addDockWrapper(DockWrapperInterface *dockWrapper)
+void DockableArea::addDockWrapper(DockWrapperInterface *dockWrapper, Direction direction)
 {
 	KDDockWidgets::QtWidgets::DockWidget *dockWrapperWidget =
 		dynamic_cast<KDDockWidgets::QtWidgets::DockWidget *>(dockWrapper);
+	dockWrapperWidget->setAffinities({uniqueName()});
 	if(dockWrapperWidget) {
-		addDockWidget(dockWrapperWidget, KDDockWidgets::Location_OnRight);
+		addDockWidget(dockWrapperWidget, translateLocation(direction));
 	} else {
 		qWarning() << "Cannot cast dockWrapperInterface to DockWidget";
 	}
 }
 
-void DockableArea::setAllDockWrappers(const QList<DockWrapperInterface *> &wrappers)
+KDDockWidgets::Location DockableArea::translateLocation(Direction direction)
 {
-	QString affinitiesName = uniqueName(); // Set this uname as affinity to all DockWidgets
-	for(DockWrapperInterface *dockWrapper : wrappers) {
-		KDDockWidgets::QtWidgets::DockWidget *dockWrapperWidget =
-			dynamic_cast<KDDockWidgets::QtWidgets::DockWidget *>(dockWrapper);
-		if(dockWrapperWidget) {
-			dockWrapperWidget->setAffinities({affinitiesName});
-			addDockWidget(dockWrapperWidget, KDDockWidgets::Location_OnRight);
-		} else {
-			qWarning() << "Cannot cast dockWrapperInterface to DockWidget";
-		}
+	switch(direction) {
+	case DockableAreaInterface::Direction_LEFT:
+		return KDDockWidgets::Location::Location_OnLeft;
+	case DockableAreaInterface::Direction_RIGHT:
+		return KDDockWidgets::Location::Location_OnRight;
+	case DockableAreaInterface::Direction_TOP:
+		return KDDockWidgets::Location::Location_OnTop;
+	case DockableAreaInterface::Direction_BOTTOM:
+		return KDDockWidgets::Location::Location_OnBottom;
 	}
+	return KDDockWidgets::Location::Location_OnRight;
 }
 
 #endif // USE_KDDOCKWIDGETS

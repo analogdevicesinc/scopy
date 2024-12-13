@@ -396,6 +396,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_show_status_bar", true);
 	p->init("general_connect_to_multiple_devices", true);
 	p->init("general_scan_for_devices", true);
+	p->init("general_use_docking_if_available", true);
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 
@@ -507,6 +508,8 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 	} else if(str == "general_show_status_bar") {
 		StatusBarManager::GetInstance()->setEnabled(val.toBool());
 	} else if(str == "plugins_use_debugger_v2") {
+		Q_EMIT p->restartRequired();
+	} else if(str == "general_use_docking_if_available") {
 		Q_EMIT p->restartRequired();
 	} else if(str == "general_connect_to_multiple_devices") {
 		bool general_connect_to_multiple_devices =
