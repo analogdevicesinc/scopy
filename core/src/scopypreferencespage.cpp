@@ -358,6 +358,12 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 		"to the scopy executable. However, if it cannot be found or is not installed on the "
 		"system, this preference offers the possibility to manually set the path to it.",
 		FileBrowserWidget::DIRECTORY, generalSection));
+	generalSection->contentLayout()->addWidget(PREFERENCE_CHECK_BOX(
+		p, "general_use_docking_if_available", "Use docking elements if available",
+		"If the application was built with the docking feature, enable it. This will make some plots and "
+		"elements detachable, thus enabling the user to configure the position of these elements in the "
+		"application.",
+		generalSection));
 
 	generalSection->contentLayout()->addWidget(
 		PREFERENCE_FILE_BROWSER(p, "packages_path", "Packages location",

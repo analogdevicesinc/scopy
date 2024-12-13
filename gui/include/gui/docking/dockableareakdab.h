@@ -29,6 +29,7 @@
 #include <QList>
 #include "docking/dockableareainterface.h"
 #include "docking/dockwrapperinterface.h"
+#include <kddockwidgets/KDDockWidgets.h>
 #include <kddockwidgets/qtwidgets/views/MainWindow.h>
 
 namespace scopy::kdab {
@@ -38,13 +39,11 @@ public:
 	explicit DockableArea(QWidget *parent = nullptr);
 	~DockableArea() override = default;
 
-	// Does not set affinities
-	void addDockWrapper(DockWrapperInterface *wrapper) override;
-
-	// Preffered as it also sets affinities
-	void setAllDockWrappers(const QList<DockWrapperInterface *> &wrappers) override;
+	void addDockWrapper(DockWrapperInterface *wrapper, Direction direction = Direction_RIGHT) override;
 
 private:
+	KDDockWidgets::Location translateLocation(Direction direction);
+
 	static int s_dockableAreaId;
 };
 } // namespace scopy::kdab

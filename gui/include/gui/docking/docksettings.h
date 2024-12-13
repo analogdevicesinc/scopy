@@ -30,11 +30,17 @@ static void initDockWidgets() {}
 #include "style.h"
 #include "style_attributes.h"
 
+#include <kddockwidgets/KDDockWidgets.h>
 #include <kddockwidgets/Config.h>
+
 #include <kddockwidgets/core/TitleBar.h>
 #include <kddockwidgets/core/View.h>
+#include <kddockwidgets/core/Group.h>
+#include <kddockwidgets/core/Group.h>
+
 #include <kddockwidgets/qtwidgets/TitleBar.h>
 #include <kddockwidgets/qtwidgets/ViewFactory.h>
+#include <kddockwidgets/qtwidgets/Group.h>
 
 namespace scopy {
 // All of this just to hide a button
