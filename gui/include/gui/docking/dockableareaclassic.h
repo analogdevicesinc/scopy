@@ -34,11 +34,11 @@ public:
 	explicit DockableArea(QWidget *parent = nullptr);
 	~DockableArea() override = default;
 
-	void addDockWrapper(DockWrapperInterface *wrapper) override;
-	void setAllDockWrappers(const QList<DockWrapperInterface *> &wrappers) override;
+	void addDockWrapper(DockWrapperInterface *wrapper, Direction direction = Direction_RIGHT) override;
 
 private:
-	void init();
+	void init(Direction direction);
+	bool m_isInitialized;
 };
 } // namespace scopy::classic
 
