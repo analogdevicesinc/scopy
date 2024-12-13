@@ -52,6 +52,7 @@
 #include <readwrite/fileregisterwritestrategy.hpp>
 #include "logging_categories.h"
 #include <regmap_api.h>
+#include <deviceiconbuilder.h>
 
 #include "iioutil/connectionprovider.h"
 #include "jsonformatedelement.hpp"
@@ -83,9 +84,16 @@ bool RegmapPlugin::loadPage()
 
 bool RegmapPlugin::loadIcon()
 {
-	m_icon = new QLabel("");
-	m_icon->setStyleSheet("border-image: url(:/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-			      "/icons/RegMap.svg);");
+	QLabel *logo = new QLabel();
+	QPixmap pixmap(":/gui/icons/scopy-default/icons/logo_analog.svg");
+	int pixmapHeight = 14;
+	pixmap = pixmap.scaledToHeight(pixmapHeight, Qt::SmoothTransformation);
+	logo->setPixmap(pixmap);
+
+	QLabel *footer = new QLabel("REGMAP");
+	Style::setStyle(footer, style::properties::label::deviceIcon, true);
+
+	m_icon = DeviceIconBuilder().shape(DeviceIconBuilder::SQUARE).headerWidget(logo).footerWidget(footer).build();
 	return true;
 }
 
