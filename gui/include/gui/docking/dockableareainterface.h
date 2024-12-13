@@ -29,9 +29,16 @@ namespace scopy {
 class SCOPY_GUI_EXPORT DockableAreaInterface
 {
 public:
+	enum Direction
+	{
+		Direction_LEFT,
+		Direction_RIGHT,
+		Direction_TOP,
+		Direction_BOTTOM,
+	};
+
 	virtual ~DockableAreaInterface() = default;
-	virtual void addDockWrapper(DockWrapperInterface *wrapper) = 0;
-	virtual void setAllDockWrappers(const QList<DockWrapperInterface *> &wrappers) = 0;
+	virtual void addDockWrapper(DockWrapperInterface *, Direction = Direction_RIGHT) = 0;
 };
 } // namespace scopy
 

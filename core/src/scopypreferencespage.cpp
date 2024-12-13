@@ -281,6 +281,8 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 							 "Connect to multiple devices (EXPERIMENTAL)", generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
 		p, "general_scan_for_devices", "Regularly scan for new devices", generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
+		p, "general_use_docking_if_available", "Use docking elements if available", generalSection));
 
 	// Auto-connect
 	m_autoConnectWidget = new MenuSectionCollapseWidget("Session devices", MenuCollapseSection::MHCW_NONE,

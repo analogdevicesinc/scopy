@@ -19,36 +19,51 @@
  */
 
 #include "docking/dockableareaclassic.h"
+#include "docking/dockableareainterface.h"
+
 #include <QHBoxLayout>
 #include <QDebug>
+#include <QBoxLayout>
 
 using namespace scopy::classic;
 
 DockableArea::DockableArea(QWidget *parent)
 	: QWidget(parent)
 {
-	init();
+	// Simulate lazy init in order to decide de layout type (V or H)
+	m_isInitialized = false;
 }
 
-void DockableArea::addDockWrapper(DockWrapperInterface *dockWrapper)
+void DockableArea::addDockWrapper(DockWrapperInterface *dockWrapper, Direction direction)
 {
+	if(!m_isInitialized) {
+		init(direction);
+	}
+
 	QWidget *dockWrapperWidget = dynamic_cast<QWidget *>(dockWrapper);
 	if(dockWrapperWidget) {
-		layout()->addWidget(dockWrapperWidget);
+		if(direction == Direction_RIGHT || direction == Direction_BOTTOM) {
+			layout()->addWidget(dockWrapperWidget);
+		} else {
+			QVBoxLayout *vlayout = dynamic_cast<QVBoxLayout *>(layout());
+			if(vlayout) {
+				vlayout->insertWidget(0, dockWrapperWidget);
+			} else {
+				QHBoxLayout *hlayout = dynamic_cast<QHBoxLayout *>(layout());
+				hlayout->insertWidget(0, dockWrapperWidget);
+			}
+		}
 	} else {
 		qWarning() << "Cannot cast dockWrapperInterface to QWidget*";
 	}
 }
 
-void DockableArea::setAllDockWrappers(const QList<DockWrapperInterface *> &wrappers)
+void DockableArea::init(Direction direction)
 {
-	for(DockWrapperInterface *dockWrapper : wrappers) {
-		addDockWrapper(dockWrapper);
+	if(direction == Direction_LEFT || direction == Direction_RIGHT) {
+		setLayout(new QHBoxLayout(this));
+	} else {
+		setLayout(new QVBoxLayout(this));
 	}
-}
-
-void DockableArea::init()
-{
-	setLayout(new QHBoxLayout(this));
 	layout()->setContentsMargins(0, 0, 0, 0);
 }

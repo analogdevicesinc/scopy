@@ -23,14 +23,28 @@
 
 #ifdef USE_KDDOCKWIDGETS
 #include "docking/dockableareakdab.h"
+#include "docking/dockableareaclassic.h"
+#include "docking/dockableareainterface.h"
+#include <pluginbase/preferences.h>
+
 namespace scopy {
 using DockableArea = kdab::DockableArea;
+
+// If you want the user to choose (preferences) what dockable area to use
+static DockableAreaInterface *createDockableArea(QWidget *parent = nullptr)
+{
+	if(Preferences::get("general_use_docking_if_available").toBool()) {
+		return new DockableArea(parent);
+	}
+	return new classic::DockableArea(parent);
 }
+} // namespace scopy
 #else
 #include "docking/dockableareaclassic.h"
 namespace scopy {
 using DockableArea = classic::DockableArea;
-}
+static DockableAreaInterface *createDockableArea(QWidget *parent = nullptr) { return new DockableArea(parent); }
+} // namespace scopy
 #endif
 
 #endif // DOCKABLEAREA_H
