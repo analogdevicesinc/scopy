@@ -34,6 +34,8 @@
 #include <gui/tooltemplate.h>
 #include <gui/widgets/menucontrolbutton.h>
 #include <gui/widgets/toolbuttons.h>
+#include <gui/docking/dockableareainterface.h>
+#include <gui/docking/dockwrapperinterface.h>
 #include <pluginbase/resourcemanager.h>
 #include <pluginbase/toolmenuentry.h>
 
@@ -83,6 +85,10 @@ private:
 	GearBtn *m_settBtn;
 	gui::MenuSpinbox *m_timespanSpin;
 	MenuCombo *m_triggeredBy;
+
+	DockableAreaInterface *m_dockableArea;
+	DockWrapperInterface *m_voltageDockWrapper;
+	DockWrapperInterface *m_currentDockWrapper;
 
 	QMap<QString, PlotChannel *> m_plotChnls;
 	QVector<double> m_xTime;

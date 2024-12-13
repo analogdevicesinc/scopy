@@ -22,13 +22,15 @@
 #ifndef RMSINSTRUMENT_H
 #define RMSINSTRUMENT_H
 #include <QWidget>
-#include <gui/widgets/measurementlabel.h>
 #include <measurementpanel.h>
 #include <pqmdatalogger.h>
 #include <scopy-pqm_export.h>
 #include <gui/polarplotwidget.h>
 #include <gui/widgets/menucontrolbutton.h>
 #include <gui/widgets/toolbuttons.h>
+#include <gui/widgets/measurementlabel.h>
+#include <gui/docking/dockwrapperinterface.h>
+#include <gui/docking/dockableareainterface.h>
 #include <pluginbase/resourcemanager.h>
 #include <pluginbase/toolmenuentry.h>
 
@@ -46,6 +48,7 @@ Q_SIGNALS:
 	void pqEvent();
 	void enableTool(bool en, QString toolName = "rms");
 	void logData(PqmDataLogger::ActiveInstrument instr, const QString &filePath);
+
 public Q_SLOTS:
 	void stop() override;
 	void toggleRms(bool en);
@@ -62,6 +65,10 @@ private:
 	QWidget *createMenuLogSection(QWidget *parent);
 	QPushButton *createPQEventsBtn(QWidget *parent);
 	void browseFile(QLineEdit *lineEditPath);
+
+	DockableAreaInterface *m_dockableArea;
+	DockWrapperInterface *m_voltageDockWrapper;
+	DockWrapperInterface *m_currentDockWrapper;
 
 	QString m_uri;
 	ToolMenuEntry *m_tme;
