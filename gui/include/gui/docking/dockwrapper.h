@@ -23,9 +23,27 @@
 
 #ifdef USE_KDDOCKWIDGETS
 #include "docking/dockwrapperkdab.h"
-using DockWrapper = scopy::kdab::DockWrapper;
+#include "dockwrapperclassic.h"
+#include "dockwrapperinterface.h"
+#include <pluginbase/preferences.h>
+
+namespace scopy {
+using DockWrapper = kdab::DockWrapper;
+
+// If you want the user to choose (preferences) what dockable area to use
+static DockWrapperInterface *createDockWrapper(QString name)
+{
+	if(Preferences::get("general_use_docking_if_available").toBool()) {
+		return new DockWrapper(name);
+	}
+	return new classic::DockWrapper(name);
+}
+} // namespace scopy
 #else
 #include "docking/dockwrapperclassic.h"
-using DockWrapper = scopy::classic::DockWrapper;
+namespace scopy {
+using DockWrapper = classic::DockWrapper;
+static DockWrapperInterface *createDockWrapper(QString name) { return new DockWrapper(name); }
+} // namespace scopy
 #endif // USE_KDDOCKWIDGETS
 #endif // DOCKWRAPPER_H
