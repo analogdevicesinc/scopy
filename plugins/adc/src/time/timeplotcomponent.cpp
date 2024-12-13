@@ -23,6 +23,8 @@
 #include "docking/dockwrapper.h"
 #include "plotaxis.h"
 
+#include <gui/docking/dockablearea.h>
+#include <gui/docking/dockwrapper.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menuplotaxisrangecontrol.h>
@@ -43,15 +45,25 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 	, m_XYXChannel(nullptr)
 	, m_singleYMode(true)
 {
+	m_dockableArea = createDockableArea(this);
+	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
+	m_plotLayout->addWidget(dockableAreaWidget);
+
+	m_timeDockWidget = createDockWrapper("Time Plot");
 	m_timePlot = new PlotWidget(this);
 	m_timePlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_timePlot->xAxis()->setInterval(0, 1);
 	m_timePlot->xAxis()->setVisible(true);
+	m_timeDockWidget->setInnerWidget(m_timePlot);
+	m_dockableArea->addDockWrapper(m_timeDockWidget);
 
+	m_xyDockWidget = createDockWrapper("XY Plot");
 	m_xyPlot = new PlotWidget(this);
 	m_xyPlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_xyPlot->xAxis()->setInterval(-2048, 2048);
 	m_xyPlot->xAxis()->setVisible(true);
+	m_xyDockWidget->setInnerWidget(m_xyPlot);
+	m_dockableArea->addDockWrapper(m_xyDockWidget);
 
 	m_plots.append(m_timePlot);
 	m_plots.append(m_xyPlot);
@@ -70,8 +82,11 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 		[=]() { m_info->update(m_currentSamplingInfo); });
 	*/
 
-	m_plotLayout->addWidget(m_timePlot);
-	m_plotLayout->addWidget(m_xyPlot);
+	// m_plotLayout->addWidget(m_timePlot);
+	// m_plotLayout->addWidget(m_xyPlot);
+
+	// Need to set this for some reason .. spinboxes should be refactored
+	m_timePlot->yAxis()->setUnits("V");
 
 	m_plotMenu = new TimePlotComponentSettings(this, parent);
 	addComponent(m_plotMenu);
@@ -217,3 +232,7 @@ bool TimePlotComponent::singleYMode() const { return m_singleYMode; }
 TimePlotComponentSettings *TimePlotComponent::createPlotMenu(QWidget *parent) { return m_plotMenu; }
 
 TimePlotComponentSettings *TimePlotComponent::plotMenu() { return m_plotMenu; }
+
+DockWrapperInterface *TimePlotComponent::timeDockWidget() const { return m_timeDockWidget; }
+
+DockWrapperInterface *TimePlotComponent::xyDockWidget() const { return m_xyDockWidget; }
