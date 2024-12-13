@@ -111,7 +111,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	InfoIconWidget::addHoveringInfoToWidget(
 		m_xAxisShow->label(), "Plots selected channel by itself over the current XY plot", m_xAxisShow);
 	connect(xySwitch, &QAbstractButton::toggled, this, [=](bool b) {
-		m_plotComponent->xyPlot()->setVisible(b);
+		m_plotComponent->xyDockWidget()->setActivated(b);
 		m_xAxisSrc->setVisible(b);
 		m_xAxisShow->setVisible(b);
 	});
