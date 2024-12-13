@@ -35,6 +35,7 @@
 #include <QTextBrowser>
 #include <QThread>
 #include <QtConcurrent/QtConcurrent>
+#include <deviceiconbuilder.h>
 #include <style.h>
 
 #include <common/scopyconfig.h>
@@ -45,6 +46,7 @@
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "Device")
 
 namespace scopy {
+
 DeviceImpl::DeviceImpl(QString param, PluginManager *p, QString category, QObject *parent)
 	: QObject{parent}
 	, m_param(param)
@@ -157,17 +159,22 @@ void DeviceImpl::loadName()
 void DeviceImpl::loadIcons()
 {
 	m_icon = new QWidget();
+	QHBoxLayout *lay = new QHBoxLayout(m_icon);
 	m_icon->setFixedHeight(100);
 	m_icon->setFixedWidth(100);
-	new QHBoxLayout(m_icon);
 	for(auto &p : m_plugins) {
 		if(p->loadIcon()) {
-			m_icon->layout()->addWidget(p->icon());
+			lay->addWidget(p->icon());
 			return;
 		}
 	}
 
-	new QLabel("No PLUGIN", m_icon);
+	QLabel *header = new QLabel("No Plugin");
+	Style::setStyle(header, style::properties::label::deviceIcon, true);
+
+	QWidget *noPluginIcon =
+		DeviceIconBuilder().shape(DeviceIconBuilder::SQUARE).color("gray").headerWidget(header).build();
+	lay->addWidget(noPluginIcon);
 }
 
 void DeviceImpl::loadPages()
