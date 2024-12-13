@@ -38,6 +38,8 @@
 #include "plotinfo.h"
 #include <gui/plotcomponent.h>
 #include <gui/widgets/plotinfowidgets.h>
+#include <gui/docking/dockwrapperinterface.h>
+#include <gui/docking/dockableareainterface.h>
 
 namespace scopy {
 namespace adc {
@@ -74,6 +76,9 @@ public:
 	TimePlotComponentSettings *createPlotMenu(QWidget *parent);
 	TimePlotComponentSettings *plotMenu();
 
+	DockWrapperInterface *timeDockWidget() const;
+	DockWrapperInterface *xyDockWidget() const;
+
 	bool singleYMode() const;
 
 	TimeSamplingInfo *timePlotInfo() const;
@@ -95,6 +100,10 @@ private:
 	ChannelComponent *m_XYXChannel;
 	TimeSamplingInfo *m_timePlotInfo;
 	const float *xyXData;
+
+	DockableAreaInterface *m_dockableArea;
+	DockWrapperInterface *m_timeDockWidget;
+	DockWrapperInterface *m_xyDockWidget;
 
 private:
 	QMetaObject::Connection xyDataConn;
