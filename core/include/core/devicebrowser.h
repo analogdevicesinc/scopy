@@ -64,6 +64,8 @@ private Q_SLOTS:
 	void updateSelectedDeviceIdx(QString);
 	void forwardRequestDeviceWithDirection();
 
+	void onScrollRangeChanged(int min, int max);
+
 private:
 	void initBtns();
 	DeviceIcon *buildDeviceIcon(Device *d, QWidget *parent = nullptr);
