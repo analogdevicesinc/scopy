@@ -26,6 +26,7 @@
 #include <stylehelper.h>
 #include <menusectionwidget.h>
 #include <iioutil/cmdqpingtask.h>
+#include <deviceiconbuilder.h>
 #include <style.h>
 
 #include "swiot_logging_categories.h"
@@ -129,8 +130,16 @@ bool SWIOTPlugin::loadExtraButtons()
 
 bool SWIOTPlugin::loadIcon()
 {
-	m_icon = new QLabel("");
-	m_icon->setStyleSheet("border-image: url(:/swiot/swiot_icon.svg);");
+	QLabel *logo = new QLabel();
+	QPixmap pixmap(":/gui/icons/scopy-default/icons/logo_analog.svg");
+	int pixmapHeight = 14;
+	pixmap = pixmap.scaledToHeight(pixmapHeight, Qt::SmoothTransformation);
+	logo->setPixmap(pixmap);
+
+	QLabel *footer = new QLabel("SWIOT1L");
+	Style::setStyle(footer, style::properties::label::deviceIcon, true);
+
+	m_icon = DeviceIconBuilder().shape(DeviceIconBuilder::SQUARE).headerWidget(logo).footerWidget(footer).build();
 	return true;
 }
 
