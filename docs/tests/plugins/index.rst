@@ -4,6 +4,7 @@ Plugins Test Cases
 ===============================================================================
 
 * :ref:`Datalogger <datalogger_tests>`
+* :ref:`Register Map <registermap_tests>` 
 
 Contents
 ---------------------------------------------------------------------
@@ -21,7 +22,7 @@ Contents
    m2k/power_supply_tests
    m2k/oscilloscope_tests
    m2k/network_analyzer_tests
-
+   registermap/registermap_tests
 ..
  add the path to each plugin test case here
  example dac/dac_tests
