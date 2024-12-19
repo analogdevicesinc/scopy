@@ -35,6 +35,7 @@
 
 #include <QDebug>
 #include <QDockWidget>
+#include <style.h>
 #include <stylehelper.h>
 
 #include <libm2k/m2kexceptions.hpp>
@@ -922,6 +923,12 @@ void PatternGenerator::connectSignalsAndSlots()
 		m_plot.setChannelName(text, m_selectedChannel);
 		m_plotCurves[m_selectedChannel]->setName(text);
 	});
+
+	Style::setStyle(m_ui->btnGroupChannels, style::properties::button::darkGrayButton, true, true);
+	m_ui->btnGroupChannels->setFixedHeight(40);
+
+	Style::setStyle(m_ui->printBtn, style::properties::button::darkGrayButton, true, true);
+	m_ui->printBtn->setFixedHeight(40);
 
 	connect(m_ui->printBtn, &QPushButton::clicked, [=]() { m_plot.printWithNoBackground("Pattern Generator"); });
 
