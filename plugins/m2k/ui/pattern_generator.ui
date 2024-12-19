@@ -121,9 +121,6 @@
             <height>10</height>
            </size>
           </property>
-          <property name="blue_button" stdset="0">
-           <bool>true</bool>
-          </property>
          </widget>
         </item>
         <item>
@@ -143,9 +140,6 @@
            <string>Group</string>
           </property>
           <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="blue_button" stdset="0">
            <bool>true</bool>
           </property>
          </widget>
