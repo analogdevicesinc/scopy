@@ -59,18 +59,9 @@ void M2kTool::setName(const QString &name) { this->name = name; }
 
 void M2kTool::settingsLoaded() {}
 
-/* Tools that use file dialogs should overload this method
-to ensure their file dialogs are configured correspondingly */
-void M2kTool::setNativeDialogs(bool nativeDialogs) { m_useNativeDialogs = nativeDialogs; }
-
 ApiObject *M2kTool::getApi() { return api; }
 
-void M2kTool::readPreferences()
-{
-	saveOnExit = p->get("general_save_on_exit").toBool();
-	m_useNativeDialogs = p->get("general_native_dialogs").toBool();
-	;
-}
+void M2kTool::readPreferences() { saveOnExit = p->get("general_save_on_exit").toBool(); }
 
 ToolMenuEntry *M2kTool::getTme() const { return tme; }
 

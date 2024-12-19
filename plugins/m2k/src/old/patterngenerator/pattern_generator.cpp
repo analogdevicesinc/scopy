@@ -200,12 +200,6 @@ PatternGenerator::~PatternGenerator()
 	delete m_ui;
 }
 
-void PatternGenerator::setNativeDialogs(bool nativeDialogs)
-{
-	M2kTool::setNativeDialogs(nativeDialogs);
-	m_plot.setUseNativeDialog(nativeDialogs);
-}
-
 void PatternGenerator::setupUi()
 {
 	m_ui->setupUi(this);

@@ -989,12 +989,6 @@ void Oscilloscope::remove_ref_waveform(QString name)
 	}
 }
 
-void Oscilloscope::setNativeDialogs(bool nativeDialogs)
-{
-	M2kTool::setNativeDialogs(nativeDialogs);
-	plot.setUseNativeDialog(nativeDialogs);
-}
-
 void Oscilloscope::setLogicAnalyzer(logic::LogicAnalyzer *la)
 {
 	qDebug() << "Logic Analyzer: " << la;
@@ -1506,9 +1500,10 @@ void Oscilloscope::init_channel_settings()
 
 			QString selectedFilter = filter[0];
 
+			bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 			QString fileName = QFileDialog::getSaveFileName(
 				this, tr("Export"), "", filter.join(";;"), &selectedFilter,
-				(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+				(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 			if(fileName.split(".").size() <= 1) {
 				// file name w/o extension. Let's append it
@@ -1933,9 +1928,10 @@ void Oscilloscope::btnExport_clicked()
 
 	QString selectedFilter = filter[0];
 
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 	QString fileName = QFileDialog::getSaveFileName(
 		this, tr("Export"), "", filter.join(";;"), &selectedFilter,
-		(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	if(fileName.split(".").size() <= 1) {
 		// file name w/o extension. Let's append it
@@ -2246,11 +2242,12 @@ void Oscilloscope::create_add_channel_panel()
 
 void Oscilloscope::import()
 {
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 	QString fileName = QFileDialog::getOpenFileName(
 		this, tr("Import"), "",
 		tr("Comma-separated values files (*.csv);;"
 		   "Tab-delimited values files (*.txt)"),
-		nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+		nullptr, (useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	FileManager fm("Oscilloscope");
 

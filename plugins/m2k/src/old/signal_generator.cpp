@@ -1291,13 +1291,14 @@ void SignalGenerator::loadFileFromPath(QString filename)
 
 void SignalGenerator::loadFile()
 {
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 	QString fileName = QFileDialog::getOpenFileName(
 		this, tr("Open File"), "",
 		tr("Comma-separated values files (*.csv);;"
 		   "Tab-delimited values files (*.txt);;"
 		   "Waveform Audio File Format (*.wav);;"
 		   "Matlab files (*.mat)"),
-		nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+		nullptr, (useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	if(fileName.isEmpty()) { // user hit cancel
 		return;

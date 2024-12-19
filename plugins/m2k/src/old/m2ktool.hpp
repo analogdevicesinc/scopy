@@ -58,7 +58,6 @@ public:
 	const QString &getName();
 	void setName(const QString &name);
 	virtual void settingsLoaded();
-	virtual void setNativeDialogs(bool nativeDialogs);
 
 	ApiObject *getApi();
 
@@ -83,7 +82,6 @@ protected:
 	QMainWindow *window;
 	ToolMenuEntry *tme;
 	Preferences *p;
-	bool m_useNativeDialogs;
 	QWidget *m_centralWidget;
 };
 } // namespace m2k

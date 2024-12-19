@@ -299,7 +299,8 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 	QWidget *refreshWidget = new QWidget(m_autoConnectWidget);
 	QHBoxLayout *refreshLayout = new QHBoxLayout(refreshWidget);
 	refreshLayout->setMargin(0);
-	refreshLayout->addWidget(new QLabel("At each auto-connect session, it will try to connect to the checked devices"));
+	refreshLayout->addWidget(
+		new QLabel("At each auto-connect session, it will try to connect to the checked devices"));
 	refreshLayout->addWidget(m_devRefresh);
 	m_autoConnectWidget->contentLayout()->addWidget(refreshWidget);
 

@@ -124,7 +124,6 @@ public:
 				  m2k_iio_manager *m2k_man, QJSEngine *engine, QWidget *parent);
 	~SpectrumAnalyzer();
 	QPushButton *getRunButton();
-	void setNativeDialogs(bool nativeDialogs) override;
 	void setCurrentAverageIndexLabel(uint chnIdx);
 public Q_SLOTS:
 	void readPreferences();

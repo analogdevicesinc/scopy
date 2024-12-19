@@ -27,6 +27,7 @@
 #include <menusectionwidget.h>
 #include <style.h>
 #include <timemanager.hpp>
+#include <pluginbase/preferences.h>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -130,10 +131,11 @@ void DataLoggingMenu::chooseFile()
 	// turn off live data logging when switching files
 	liveDataLoggingButton->onOffswitch()->setChecked(false);
 
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 	QString selectedFilter;
 	filename = QFileDialog::getSaveFileName(
 		this, tr("Export"), "", tr("Comma-separated values files (*.csv);;All Files(*)"), &selectedFilter,
-		QFileDialog::Options(QFileDialog::DontUseNativeDialog));
+		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 	dataLoggingFilePath->getLineEdit()->setText(filename);
 }
 
