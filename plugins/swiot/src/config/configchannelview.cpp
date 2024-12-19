@@ -46,12 +46,12 @@ ConfigChannelView::ConfigChannelView(int channelIndex, QWidget *parent)
 
 	m_deviceOptions = new QComboBox(this);
 	m_deviceOptions->setFixedWidth(DEVICE_COMBO_WIDTH);
-	StyleHelper::TransparentWidget(m_deviceOptions, "deviceOptions");
+	Style::setBackgroundColor(m_deviceOptions, QString("transparent"), true);
 	Style::setStyle(m_deviceOptions, style::properties::widget::solidBorder);
 
 	m_functionOptions = new QComboBox(this);
+	Style::setBackgroundColor(m_functionOptions, QString("transparent"), true);
 	m_functionOptions->setFixedWidth(FUNCTION_COMBO_WIDTH);
-	StyleHelper::TransparentWidget(m_functionOptions, "functionOptions");
 	Style::setStyle(m_functionOptions, style::properties::widget::solidBorder);
 
 	layout->addWidget(m_chnlLabel);

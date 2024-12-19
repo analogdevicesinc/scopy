@@ -32,6 +32,7 @@
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/dynamicWidget.h>
 #include <utility>
+#include "style_properties.h"
 
 #define FAULT_CHANNEL_NAME "voltage"
 #define SWIOT_NB_CHANNELS 4
@@ -114,12 +115,6 @@ void FaultsDevice::updateExplanations()
 	if(selected.empty()) {
 		for(int i = 0; i < m_faultExplanationWidgets.size(); ++i) {
 			m_faultExplanationWidgets[i]->show();
-
-			if(actives.contains(i)) {
-				setDynamicProperty(m_faultExplanationWidgets[i], "highlighted", true);
-			} else {
-				setDynamicProperty(m_faultExplanationWidgets[i], "highlighted", false);
-			}
 		}
 	} else {
 		for(int i = 0; i < m_faultExplanationWidgets.size(); ++i) {
@@ -127,12 +122,6 @@ void FaultsDevice::updateExplanations()
 				m_faultExplanationWidgets[i]->show();
 			} else {
 				m_faultExplanationWidgets[i]->hide();
-			}
-
-			if(actives.contains(i)) {
-				setDynamicProperty(m_faultExplanationWidgets[i], "highlighted", true);
-			} else {
-				setDynamicProperty(m_faultExplanationWidgets[i], "highlighted", false);
 			}
 		}
 	}
@@ -326,7 +315,7 @@ QWidget *FaultsDevice::createExplanationSection(QWidget *parent)
 		auto widget = new QLabel(item, m_faultsExplanation);
 		widget->setTextFormat(Qt::PlainText);
 		widget->setWordWrap(true);
-		StyleHelper::FaultsExplanation(widget);
+		Style::setStyle(widget, style::properties::label::subtle);
 
 		m_faultExplanationWidgets.push_back(widget);
 		m_faultsExplanation->layout()->addWidget(widget);

@@ -36,17 +36,11 @@ MenuLineEdit::MenuLineEdit(QWidget *parent)
 	m_edit = new QLineEdit(this);
 
 	lay->addWidget(m_edit);
-	applyStylesheet();
+	Style::setStyle(m_edit, style::properties::lineedit::menuLineEdit);
 }
 
 MenuLineEdit::~MenuLineEdit() {}
 
 QLineEdit *MenuLineEdit::edit() { return m_edit; }
-
-void MenuLineEdit::applyStylesheet()
-{
-	Style::setStyle(m_edit, style::properties::lineedit::menuLineEdit);
-	Style::setBackgroundColor(this, QString("transparent"));
-}
 
 #include "moc_menulineedit.cpp"

@@ -71,9 +71,12 @@ public:
 	QPushButton *getDocumentationButton();
 	void generateInfoPopup(QWidget *parent);
 
+	virtual bool eventFilter(QObject *watched, QEvent *event);
+
 private:
 	PopupWidget *m_popupWidget;
 	bool m_hasTutorial;
+	QString m_iconPath;
 };
 
 class SCOPY_GUI_EXPORT RunBtn : public QPushButton

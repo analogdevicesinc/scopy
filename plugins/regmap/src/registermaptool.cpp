@@ -193,7 +193,7 @@ void RegisterMapTool::startTutorial()
 
 	controllerTutorial = connect(
 		settings, &RegisterMapSettingsMenu::tutorialDone, this,
-		[=, this]() { deviceList->value(activeRegisterMap)->startTutorial(); }, Qt::UniqueConnection);
+		[this]() { deviceList->value(activeRegisterMap)->startTutorial(); }, Qt::UniqueConnection);
 
 	connect(deviceList->value(activeRegisterMap), &DeviceRegisterMap::tutorialFinished, this,
 		&RegisterMapTool::tutorialAborted);
@@ -220,7 +220,7 @@ void RegisterMapTool::startSimpleTutorial()
 
 	controllerTutorial = connect(
 		settings, &RegisterMapSettingsMenu::tutorialDone, this,
-		[=, this]() { deviceList->value(activeRegisterMap)->startSimpleTutorial(); }, Qt::UniqueConnection);
+		[this]() { deviceList->value(activeRegisterMap)->startSimpleTutorial(); }, Qt::UniqueConnection);
 
 	connect(deviceList->value(activeRegisterMap), &DeviceRegisterMap::simpleTutorialFinished, this,
 		&RegisterMapTool::tutorialAborted);

@@ -95,8 +95,10 @@ void DecoderTable::exportData()
 
 	filter += QString(tr("Comma-separated row per sample (*.csv)"));
 	filter += QString(tr("Tab-delimited row per annotation (*.txt)"));
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Export"), "", filter.join(";;"), &selectedFilter,
-							QFileDialog::DontUseNativeDialog);
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
+	QString fileName = QFileDialog::getSaveFileName(
+		this, tr("Export"), "", filter.join(";;"), &selectedFilter,
+		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	if(fileName.isEmpty()) {
 		return;

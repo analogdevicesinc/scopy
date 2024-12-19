@@ -106,7 +106,6 @@ void PlotNavigator::initResetButton()
 	m_resetButton = new QPushButton(m_plot->canvas());
 	QIcon icon(QPixmap(":/gui/icons/search_crossed.svg"));
 	m_resetButton->setFlat(true);
-	StyleHelper::TransparentWidget(m_resetButton);
 	m_resetButton->setIcon(icon);
 	m_resetButton->hide();
 

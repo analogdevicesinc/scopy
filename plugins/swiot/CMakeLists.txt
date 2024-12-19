@@ -78,6 +78,9 @@ file(
 	include/${SCOPY_MODULE}/config/*.hpp
 )
 
+include(ScopyStyle)
+generate_style("--plugin" ${CMAKE_CURRENT_SOURCE_DIR}/style ${CMAKE_CURRENT_SOURCE_DIR}/include/swiot)
+
 if(ENABLE_TESTING)
 	add_subdirectory(test)
 endif()

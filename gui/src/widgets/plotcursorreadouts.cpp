@@ -19,6 +19,7 @@
  *
  */
 
+#include <style.h>
 #include <widgets/plotcursorreadouts.h>
 
 using namespace scopy;
@@ -143,7 +144,7 @@ void PlotCursorReadouts::initContent()
 	x_contents_lay->addWidget(invDeltaX_val, 3, 1);
 
 	for(auto w : this->findChildren<QWidget *>()) {
-		StyleHelper::TransparentWidget(w);
+		Style::setBackgroundColor(w, QString("transparent"), true);
 	}
 }
 

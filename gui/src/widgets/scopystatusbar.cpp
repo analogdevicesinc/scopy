@@ -61,7 +61,6 @@ void ScopyStatusBar::initUi()
 
 	m_stackedWidget = new QStackedWidget(this);
 	layout()->addWidget(m_stackedWidget);
-	Style::setStyle(this, style::properties::widget::basicComponent);
 
 	hide();
 }

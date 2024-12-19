@@ -1,0 +1,3 @@
+QWidget[&&property&&=true] {
+	color: &interactive_primary_idle&
+}

@@ -277,12 +277,6 @@ LogicAnalyzer::~LogicAnalyzer()
 	delete ui;
 }
 
-void LogicAnalyzer::setNativeDialogs(bool nativeDialogs)
-{
-	M2kTool::setNativeDialogs(nativeDialogs);
-	m_plot.setUseNativeDialog(nativeDialogs);
-}
-
 void LogicAnalyzer::setData(const uint16_t *const data, int size)
 {
 
@@ -1772,6 +1766,11 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		updateStackDecoderButton();
 	});
 
+	Style::setStyle(ui->btnGroupChannels, style::properties::button::darkGrayButton, true, true);
+	ui->btnGroupChannels->setFixedHeight(40);
+
+	Style::setStyle(ui->printBtn, style::properties::button::darkGrayButton, true, true);
+	ui->printBtn->setFixedHeight(40);
 	connect(ui->printBtn, &QPushButton::clicked, [=]() { m_plot.printWithNoBackground("Logic Analyzer"); });
 
 	connect(ui->decoderTableView, &DecoderTable::clicked, [=](const QModelIndex &index) {
@@ -2820,9 +2819,10 @@ void LogicAnalyzer::exportData()
 	filter += QString(tr("Value Change Dump(*.vcd)"));
 	filter += QString(tr("All Files(*)"));
 
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 	QString fileName = QFileDialog::getSaveFileName(
 		this, tr("Export"), "", filter.join(";;"), &selectedFilter,
-		(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	if(fileName.isEmpty()) {
 		return;

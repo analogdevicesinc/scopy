@@ -25,6 +25,7 @@
 #include <QFileDialog>
 #include <QDateTime>
 #include <QCoreApplication>
+#include <pluginbase/preferences.h>
 
 using namespace scopy;
 
@@ -35,9 +36,12 @@ PrintPlotManager::PrintPlotManager(QObject *parent)
 void PrintPlotManager::printPlots(QList<PlotWidget *> plotList, QString toolName)
 {
 	// select folder where to save
-	QString folderPath = QFileDialog::getExistingDirectory(
-		nullptr, "Select Folder", "",
-		QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks | QFileDialog::DontUseNativeDialog);
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
+	QString folderPath = QFileDialog::getExistingDirectory(nullptr, "Select Folder", "",
+							       (useNativeDialogs ? QFileDialog::Options()
+										 : QFileDialog::ShowDirsOnly |
+										QFileDialog::DontResolveSymlinks |
+										QFileDialog::DontUseNativeDialog));
 
 	if(!folderPath.isEmpty()) {
 		// use current date and tool name to crete the file name

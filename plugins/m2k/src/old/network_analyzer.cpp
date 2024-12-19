@@ -600,6 +600,8 @@ NetworkAnalyzer::NetworkAnalyzer(libm2k::context::M2k *m2k, QString uri, Filter 
 
 	wheelEventGuard->installEventRecursively(ui->mainWidget);
 
+	Style::setStyle(ui->btnPrint, style::properties::button::darkGrayButton, true, true);
+	ui->btnPrint->setFixedHeight(40);
 	connect(ui->btnPrint, &QPushButton::clicked, [=]() {
 		QWidget *widget = ui->stackedWidget->currentWidget();
 		QImage img(widget->width(), widget->height(), QImage::Format_ARGB32);
@@ -620,10 +622,11 @@ NetworkAnalyzer::NetworkAnalyzer(libm2k::context::M2k *m2k, QString uri, Filter 
 			}
 		}
 
+		bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 		QString selectedFilter = filter[0];
 		QString fileName = QFileDialog::getSaveFileName(
 			this, tr("Save to"), fileNameHint, filter.join(";;"), &selectedFilter,
-			(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+			(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 		if(fileName.split(".").size() <= 1) {
 			// file name w/o extension. Let's append it
@@ -677,11 +680,12 @@ NetworkAnalyzer::NetworkAnalyzer(libm2k::context::M2k *m2k, QString uri, Filter 
 	});
 
 	connect(ui->importBtn, &QPushButton::clicked, [=]() {
+		bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 		QString fileName = QFileDialog::getOpenFileName(
 			this, tr("Import"), "",
 			tr("Comma-separated values files (*.csv);;"
 			   "Tab-delimited values files (*.txt)"),
-			nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+			nullptr, (useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 		FileManager fm("Network Analyzer");
 
@@ -848,9 +852,10 @@ void NetworkAnalyzer::on_btnExport_clicked()
 
 	QString selectedFilter = filter[0];
 
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 	QString fileName = QFileDialog::getSaveFileName(
 		this, tr("Export"), "", filter.join(";;"), &selectedFilter,
-		(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	if(fileName.split(".").size() <= 1) {
 		// file name w/o extension. Let's append it

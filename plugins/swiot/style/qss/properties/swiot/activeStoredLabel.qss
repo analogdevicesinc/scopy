@@ -1,0 +1,17 @@
+QLabel[&&property&&="low"] { 
+	width: 40px; 
+	height: 14px; 
+	border: 2px solid; 
+	border-radius: 8px; 
+	border-color: &content_default&; 
+	background-color: transparent; 
+}
+QLabel[&&property&&="high"] { 
+	width: 40px; 
+	height: 14px; 
+	border: 2px solid; 
+	border-radius: 8px; 
+	border-color: &content_default&; 
+	background-color: &content_default&; 
+}
+			

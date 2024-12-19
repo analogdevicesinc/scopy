@@ -84,7 +84,7 @@ void MenuControlButton::setDoubleClickToOpenMenu(bool b)
 		dblClickToOpenMenu = connect(this, &MenuControlButton::doubleClicked, this, [=]() {
 			setChecked(true);
 			if(m_btn->isVisible()) {
-				m_btn->toggle();
+				m_btn->click();
 			}
 		});
 	} else {

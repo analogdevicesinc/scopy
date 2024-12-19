@@ -611,6 +611,7 @@ void Ad74413r::setupToolTemplate()
 
 	connect(m_infoBtn, &InfoBtn::clicked, this, [this]() {
 		m_infoBtn->generateInfoPopup(this);
+
 		connect(m_infoBtn->getTutorialButton(), &QPushButton::clicked, this, &Ad74413r::startTutorial);
 		connect(m_infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, [=, this]() {
 			QDesktopServices::openUrl(

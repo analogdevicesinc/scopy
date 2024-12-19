@@ -92,16 +92,32 @@ InfoBtn::InfoBtn(QWidget *parent, bool hasTutorial)
 	, m_hasTutorial(hasTutorial)
 {
 
-	QString iconPath = ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/info.svg";
-	setIcon(Style::getPixmap(iconPath, Style::getColor(json::theme::content_default)));
-
-	connect(this, &QPushButton::toggled, this, [=](bool toggle) {
-		const char *color = toggle ? json::theme::content_inverse : json::theme::content_default;
-		setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
-	});
+	m_iconPath = ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/info.svg";
+	setIcon(Style::getPixmap(m_iconPath, Style::getColor(json::theme::content_default)));
 
 	setCheckable(false);
 	Style::setStyle(this, style::properties::button::squareIconButton);
+	installEventFilter(this);
+}
+
+bool InfoBtn::eventFilter(QObject *watched, QEvent *event)
+{
+	QPushButton *button = qobject_cast<QPushButton *>(watched);
+	if(!button) {
+		return false;
+	}
+
+	if(event->type() == QEvent::Enter) {
+		setIcon(Style::getPixmap(m_iconPath, Style::getColor(json::theme::content_inverse)));
+		return true;
+	}
+
+	if(event->type() == QEvent::Leave) {
+		setIcon(Style::getPixmap(m_iconPath, Style::getColor(json::theme::content_default)));
+		return true;
+	}
+
+	return false;
 }
 
 bool InfoBtn::hasTutorial() { return m_hasTutorial; }

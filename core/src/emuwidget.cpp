@@ -338,9 +338,11 @@ void EmuWidget::setEnableDemo(bool en)
 
 void EmuWidget::browseFile(QLineEdit *lineEditPath)
 {
-	QString filePath =
-		QFileDialog::getOpenFileName(this, "Open a file", "directoryToOpen",
-					     "All (*);;XML Files (*.xml);;Text Files (*.txt);;BIN Files (*.bin)");
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
+	QString filePath = QFileDialog::getOpenFileName(
+		this, "Open a file", "directoryToOpen",
+		"All (*);;XML Files (*.xml);;Text Files (*.txt);;BIN Files (*.bin)", nullptr,
+		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 	lineEditPath->setText(filePath);
 	m_enDemoBtn->setFocus();
 }

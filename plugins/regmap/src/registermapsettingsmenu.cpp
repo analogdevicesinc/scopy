@@ -39,6 +39,8 @@
 #include <style.h>
 #include <tutorialbuilder.h>
 
+#include <pluginbase/preferences.h>
+
 using namespace scopy;
 using namespace regmap;
 
@@ -125,8 +127,12 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 	filePath->setPlaceholderText("File path");
 	pathButton = new QPushButton("Find path");
 
-	QObject::connect(pathButton, &QPushButton::clicked, this,
-			 [=]() { filePath->setText(QFileDialog::getOpenFileName(this, ("Open File"), "")); });
+	QObject::connect(pathButton, &QPushButton::clicked, this, [=]() {
+		bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
+		filePath->setText(QFileDialog::getOpenFileName(
+			this, ("Open File"), "", QString(), nullptr,
+			(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog)));
+	});
 
 	findPathLayout->addWidget(filePath);
 	findPathLayout->addWidget(pathButton);
@@ -189,7 +195,7 @@ void RegisterMapSettingsMenu::startTutorial()
 
 	auto settingsTutorialFinish = connect(settingsTutorial, &gui::TutorialBuilder::finished, this,
 					      &RegisterMapSettingsMenu::tutorialDone, Qt::UniqueConnection);
-	connect(settingsTutorial, &gui::TutorialBuilder::aborted, this, [=, this]() {
+	connect(settingsTutorial, &gui::TutorialBuilder::aborted, this, [settingsTutorialFinish, this]() {
 		disconnect(settingsTutorialFinish);
 		Q_EMIT tutorialAborted();
 	});
