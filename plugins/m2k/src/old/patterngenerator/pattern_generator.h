@@ -70,7 +70,6 @@ public:
 	explicit PatternGenerator(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *tme, QJSEngine *engine,
 				  DIOManager *diom, QWidget *parent);
 	~PatternGenerator();
-	void setNativeDialogs(bool nativeDialogs) override;
 
 Q_SIGNALS:
 	void dataAvailable(uint64_t, uint64_t, uint16_t *data);

@@ -256,16 +256,22 @@ void ScopyMainWindow::deviceAutoconnect()
 
 void ScopyMainWindow::save()
 {
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 	QString selectedFilter;
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Save"), "", "", &selectedFilter);
+	QString fileName = QFileDialog::getSaveFileName(
+		this, tr("Save"), "", "", &selectedFilter,
+		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 	save(fileName);
 	ScopyTitleManager::setIniFileName(fileName);
 }
 
 void ScopyMainWindow::load()
 {
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 	QString selectedFilter;
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Open"), "", "", &selectedFilter);
+	QString fileName = QFileDialog::getOpenFileName(
+		this, tr("Open"), "", "", &selectedFilter,
+		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 	load(fileName);
 	ScopyTitleManager::setIniFileName(fileName);
 }

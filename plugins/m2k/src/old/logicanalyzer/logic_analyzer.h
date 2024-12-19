@@ -80,7 +80,6 @@ public:
 	explicit LogicAnalyzer(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEntry *toolMenuItem, QJSEngine *engine,
 			       QWidget *parent, bool offline_mode_ = 0);
 	~LogicAnalyzer();
-	void setNativeDialogs(bool nativeDialogs) override;
 
 public: // Mixed Signal View Interface
 	// enable mixed signal view

@@ -530,10 +530,11 @@ void ManualCalibration::on_saveButton_clicked()
 	QString fileName;
 	QString selectedFilter;
 
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 	if(calibrationFilePath == "") {
 		fileName = QFileDialog::getSaveFileName(
 			this, tr("Save file"), "", tr("Ini files (*.ini)"), &selectedFilter,
-			(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+			(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 	} else {
 		fileName = calibrationFilePath;
 	}

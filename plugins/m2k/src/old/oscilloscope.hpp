@@ -136,7 +136,6 @@ public:
 
 	void add_ref_waveform(QString name, QVector<double> xData, QVector<double> yData, unsigned int sampleRate);
 	void remove_ref_waveform(QString name);
-	void setNativeDialogs(bool nativeDialogs) override;
 
 	void setLogicAnalyzer(logic::LogicAnalyzer *la);
 

@@ -23,13 +23,13 @@
 #include <QDateTime>
 #include <QFileDialog>
 #include <QImageWriter>
+#include <pluginbase/preferences.h>
 
 using namespace scopy;
 
 PrintablePlot::PrintablePlot(QWidget *parent)
 	: BasicPlot(parent)
 	, d_plotRenderer(new QwtPlotRenderer(this))
-	, d_useNativeDialog(true)
 {
 	dropBackground(true);
 }
@@ -39,8 +39,6 @@ void PrintablePlot::dropBackground(bool drop)
 	d_plotRenderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, drop);
 	d_plotRenderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground, drop);
 }
-
-void PrintablePlot::setUseNativeDialog(bool nativeDialog) { d_useNativeDialog = nativeDialog; }
 
 void PrintablePlot::printPlot(const QString &toolName)
 {
@@ -71,10 +69,11 @@ void PrintablePlot::printPlot(const QString &toolName)
 		}
 	}
 
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 	QString selectedFilter = QString("PDF ") + tr("Documents") + " (*.pdf)";
 	fileName = QFileDialog::getSaveFileName(
 		nullptr, tr("Export File Name"), fileName, filter.join(";;"), &selectedFilter,
-		(d_useNativeDialog ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	if(fileName.split(".").size() <= 1) {
 		// file name w/o extension. Let's append it
