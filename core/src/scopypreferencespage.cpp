@@ -242,7 +242,6 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 	lay->addWidget(generalWidget);
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
-	generalSection->contentLayout()->addWidget(buildSaveSessionPreference());
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
 		p, "general_save_attached", "Save/Load tool attached state", generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
@@ -266,9 +265,6 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 		p, "iiowidgets_use_lazy_loading", "Use Lazy Loading", generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
 		p, "general_use_native_dialogs", "Use native dialogs", generalSection));
-	QWidget *autoConnectCb = PreferencesHelper::addPreferenceCheckBox(
-		p, "autoconnect_previous", "Auto-connect to previous session", generalSection);
-	generalSection->contentLayout()->addWidget(autoConnectCb);
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
 		p, "font_scale", "Font scale (EXPERIMENTAL)", {"1", "1.15", "1.3", "1.45", "1.6", "1.75", "1.9"},
 		generalSection));
@@ -283,20 +279,29 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 		p, "general_scan_for_devices", "Regularly scan for new devices", generalSection));
 
 	// Auto-connect
-	m_autoConnectWidget = new MenuSectionCollapseWidget("Session devices", MenuCollapseSection::MHCW_NONE,
+	m_autoConnectWidget = new MenuSectionCollapseWidget("Session ", MenuCollapseSection::MHCW_NONE,
 							    MenuCollapseSection::MHW_COMPOSITEWIDGET, page);
 	MenuCollapseHeader *autoConnectHeader =
 		dynamic_cast<MenuCollapseHeader *>(m_autoConnectWidget->collapseSection()->header());
-	autoConnectHeader->headerWidget()->layout()->addWidget(
-		new QLabel("At each auto-connect session, it will try to connect to the checked devices"));
 	m_autoConnectWidget->contentLayout()->setSpacing(10);
 	lay->addWidget(m_autoConnectWidget);
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
+	QWidget *autoConnectCb = PreferencesHelper::addPreferenceCheckBox(
+		p, "autoconnect_previous", "Auto-connect to previous session", generalSection);
+	m_autoConnectWidget->contentLayout()->addWidget(autoConnectCb);
+
+	m_autoConnectWidget->contentLayout()->addWidget(buildSaveSessionPreference());
+
 	m_devRefresh = new QPushButton("Refresh", m_autoConnectWidget);
 	m_devRefresh->setMaximumWidth(Style::getDimension(json::global::unit_5));
-	Style::setStyle(m_devRefresh, style::properties::button::basicButton);
-	m_autoConnectWidget->add(m_devRefresh);
+	Style::setStyle(m_devRefresh, style::properties::button::borderButton);
+	QWidget *refreshWidget = new QWidget(m_autoConnectWidget);
+	QHBoxLayout *refreshLayout = new QHBoxLayout(refreshWidget);
+	refreshLayout->setMargin(0);
+	refreshLayout->addWidget(new QLabel("At each auto-connect session, it will try to connect to the checked devices"));
+	refreshLayout->addWidget(m_devRefresh);
+	m_autoConnectWidget->contentLayout()->addWidget(refreshWidget);
 
 	connect(m_devRefresh, &QPushButton::pressed, this, &ScopyPreferencesPage::refreshDevicesPressed);
 
