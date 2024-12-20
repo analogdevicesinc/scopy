@@ -1632,8 +1632,8 @@ void I2CPatternUI::build_ui(QWidget *parent, uint16_t number_of_channels)
 
 	// ui->LE_toSend->setText(QString::fromStdString(pattern->get_string()));
 	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this, SLOT(parse_ui()));
-	connect(ui->PB_MSB, SIGNAL(clicked()), this, SLOT(parse_ui()));
-	connect(ui->PB_readWrite, SIGNAL(clicked()), this, SLOT(parse_ui()));
+	connect(ui->PB_MSB, SIGNAL(toggled(bool)), this, SLOT(parse_ui()));
+	connect(ui->PB_readWrite, SIGNAL(toggled(bool)), this, SLOT(parse_ui()));
 	connect(ui->LE_IFS, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
 	connect(ui->LE_address, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
 	connect(ui->LE_toSend, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
@@ -1942,10 +1942,10 @@ void SPIPatternUI::build_ui(QWidget *parent, uint16_t number_of_channels)
 	// ui->LE_toSend->setText(QString::fromStdString(pattern->get_string()));
 	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this, SLOT(parse_ui()));
 
-	connect(ui->PB_CPHA, SIGNAL(clicked()), this, SLOT(parse_ui()));
-	connect(ui->PB_CPOL, SIGNAL(clicked()), this, SLOT(parse_ui()));
-	connect(ui->PB_CS, SIGNAL(clicked()), this, SLOT(parse_ui()));
-	connect(ui->PB_MSB, SIGNAL(clicked()), this, SLOT(parse_ui()));
+	connect(ui->PB_CPHA, SIGNAL(toggled(bool)), this, SLOT(parse_ui()));
+	connect(ui->PB_CPOL, SIGNAL(toggled(bool)), this, SLOT(parse_ui()));
+	connect(ui->PB_CS, SIGNAL(toggled(bool)), this, SLOT(parse_ui()));
+	connect(ui->PB_MSB, SIGNAL(toggled(bool)), this, SLOT(parse_ui()));
 
 	connect(ui->LE_BPF, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
 	connect(ui->LE_IFS, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
