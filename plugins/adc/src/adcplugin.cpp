@@ -103,31 +103,32 @@ bool ADCPlugin::loadPreferencesPage()
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	auto adc_plot_xaxis_label_position = PreferencesHelper::addPreferenceComboList(
-		p, "adc_plot_xaxis_label_position", "Plot X-Axis scale position",
+		p, "adc_plot_xaxis_label_position", "Plot X-Axis scale position", "",
 		{{"Top", QwtAxis::XTop}, {"Bottom", QwtAxis::XBottom}}, generalSection);
 	auto adc_plot_yaxis_label_position = PreferencesHelper::addPreferenceComboList(
-		p, "adc_plot_yaxis_label_position", "Plot Y-Axis scale position",
+		p, "adc_plot_yaxis_label_position", "Plot Y-Axis scale position", "",
 		{{"Left", QwtAxis::YLeft}, {"Right", QwtAxis::YRight}}, generalSection);
 	auto adc_plot_yaxis_handle_position = PreferencesHelper::addPreferenceComboList(
-		p, "adc_plot_yaxis_handle_position", "Plot channel Y-handle position",
+		p, "adc_plot_yaxis_handle_position", "Plot channel Y-handle position", "",
 		{{"Left", HandlePos::NORTH_OR_WEST}, {"Right", HandlePos::SOUTH_OR_EAST}}, generalSection);
 	auto adc_plot_xcursor_position = PreferencesHelper::addPreferenceComboList(
-		p, "adc_plot_xcursor_position", "Plot X-Cursor position",
+		p, "adc_plot_xcursor_position", "Plot X-Cursor position", "",
 		{{"Top", HandlePos::NORTH_OR_WEST}, {"Bottom", HandlePos::SOUTH_OR_EAST}}, generalSection);
 	auto adc_plot_ycursor_position = PreferencesHelper::addPreferenceComboList(
-		p, "adc_plot_ycursor_position", "Plot Y-Curosr position",
+		p, "adc_plot_ycursor_position", "Plot Y-Curosr position", "",
 		{{"Left", HandlePos::NORTH_OR_WEST}, {"Right", HandlePos::SOUTH_OR_EAST}}, generalSection);
 	auto adc_plot_show_buffer_previewer = PreferencesHelper::addPreferenceCheckBox(
-		p, "adc_plot_show_buffer_previewer", "Show buffer previewer", m_preferencesPage);
+		p, "adc_plot_show_buffer_previewer", "Show buffer previewer", "", m_preferencesPage);
 
-	auto adc_default_y_mode = PreferencesHelper::addPreferenceComboList(
-		p, "adc_default_y_mode", "ADC Default Y-Mode", {{"ADC Count", 0}, {"% Full Scale", 1}}, generalSection);
+	auto adc_default_y_mode =
+		PreferencesHelper::addPreferenceComboList(p, "adc_default_y_mode", "ADC Default Y-Mode", "",
+							  {{"ADC Count", 0}, {"% Full Scale", 1}}, generalSection);
 	auto adc_acquisition_timeout = PreferencesHelper::addPreferenceEdit(
-		p, "adc_acquisition_timeout", "ADC Acquisition timeout", m_preferencesPage);
+		p, "adc_acquisition_timeout", "ADC Acquisition timeout", "", m_preferencesPage);
 	auto adc_add_remove_plot = PreferencesHelper::addPreferenceCheckBox(
-		p, "adc_add_remove_plot", "Add/Remove plot feature (EXPERIMENTAL)", m_preferencesPage);
+		p, "adc_add_remove_plot", "Add/Remove plot feature (EXPERIMENTAL)", "", m_preferencesPage);
 	auto adc_add_remove_instrument = PreferencesHelper::addPreferenceCheckBox(
-		p, "adc_add_remove_instrument", "Add/Remove instrument feature (EXPERIMENTAL)", m_preferencesPage);
+		p, "adc_add_remove_instrument", "Add/Remove instrument feature (EXPERIMENTAL)", "", m_preferencesPage);
 
 	generalSection->contentLayout()->addWidget(adc_plot_xaxis_label_position);
 	generalSection->contentLayout()->addWidget(adc_plot_yaxis_label_position);

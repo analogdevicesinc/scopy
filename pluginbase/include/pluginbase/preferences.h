@@ -52,6 +52,18 @@ public:
 	 */
 	static void init(QString, QVariant);
 	void _init(QString, QVariant);
+
+	/**
+	 * @brief initDescription
+	 * Initialize a map with title and description for each preference
+	 * to be later used in docs and hover widgets in the Scopy prefs page.
+	 * @param k
+	 * @param title
+	 * @param description
+	 */
+	void initDescription(QString k, QString title, QString description);
+	void _initDescription(QString k, QString title, QString description);
+
 	/**
 	 * @brief clear
 	 * clears preferences table
@@ -73,6 +85,7 @@ public:
 	QMap<QString, QVariant> getPreferences() const;
 	void setPreferences(QMap<QString, QVariant> s);
 
+	QMap<QString, QVector<QString>> getPreferencesDescriptions() const;
 public Q_SLOTS:
 	/**
 	 * @brief setPreferencesFilename
@@ -109,6 +122,7 @@ Q_SIGNALS:
 
 private:
 	QMap<QString, QVariant> p;
+	QMap<QString, QVector<QString>> pDescriptions;
 	QSettings *s;
 	static Preferences *pinstance_;
 };

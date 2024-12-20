@@ -47,6 +47,13 @@ void Preferences::_init(QString k, QVariant v)
 	// else - map contains key so it is already initialized to the correct value, nothing to do
 }
 
+void Preferences::_initDescription(QString k, QString title, QString description)
+{
+	if(!pDescriptions.contains(k)) {
+		pDescriptions.insert(k, QVector<QString>{title, description});
+	}
+}
+
 QVariant Preferences::_get(QString k)
 {
 	QVariant v = QVariant();
@@ -70,6 +77,8 @@ void Preferences::clear() { p.clear(); }
 QVariant Preferences::get(QString val) { return Preferences::GetInstance()->_get(val); }
 
 QMap<QString, QVariant> Preferences::getPreferences() const { return p; }
+
+QMap<QString, QVector<QString>> Preferences::getPreferencesDescriptions() const { return pDescriptions; }
 
 void Preferences::setPreferences(QMap<QString, QVariant> s) { p = s; }
 
@@ -112,5 +121,10 @@ Preferences *Preferences::GetInstance()
 }
 
 void Preferences::init(QString k, QVariant v) { return Preferences::GetInstance()->_init(k, v); }
+
+void Preferences::initDescription(QString k, QString title, QString description)
+{
+	return Preferences::GetInstance()->_initDescription(k, title, description);
+}
 
 #include "moc_preferences.cpp"

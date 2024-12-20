@@ -26,7 +26,8 @@
 #include <smallOnOffSwitch.h>
 
 using namespace scopy;
-QWidget *PreferencesHelper::addPreferenceCheckBox(Preferences *p, QString id, QString description, QObject *parent)
+QWidget *PreferencesHelper::addPreferenceCheckBox(Preferences *p, QString id, QString title, QString description,
+						  QObject *parent)
 {
 	QWidget *widget = new QWidget();
 	QHBoxLayout *layout = new QHBoxLayout();
@@ -39,9 +40,11 @@ QWidget *PreferencesHelper::addPreferenceCheckBox(Preferences *p, QString id, QS
 	pref->setChecked(p->get(id).toBool());
 	parent->connect(pref, &SmallOnOffSwitch::toggled, parent, [p, id](bool b) { p->set(id, b); });
 
+	p->initDescription(id, title, description);
+
 	QSpacerItem *space = new QSpacerItem(20, 20, QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-	layout->addWidget(new QLabel(description, widget));
+	layout->addWidget(new QLabel(title, widget));
 	layout->addSpacerItem(space);
 	layout->addWidget(pref);
 	widget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -49,7 +52,8 @@ QWidget *PreferencesHelper::addPreferenceCheckBox(Preferences *p, QString id, QS
 	return widget;
 }
 
-QWidget *PreferencesHelper::addPreferenceEdit(Preferences *p, QString id, QString description, QObject *parent)
+QWidget *PreferencesHelper::addPreferenceEdit(Preferences *p, QString id, QString title, QString description,
+					      QObject *parent)
 {
 	QWidget *widget = new QWidget();
 	QHBoxLayout *layout = new QHBoxLayout();
@@ -63,7 +67,8 @@ QWidget *PreferencesHelper::addPreferenceEdit(Preferences *p, QString id, QStrin
 	pref->setText(pref1Val);
 	parent->connect(pref, &QLineEdit::textChanged, parent, [p, id](QString b) { p->set(id, b); });
 
-	QLabel *label = new QLabel(description);
+	QLabel *label = new QLabel(title);
+	p->initDescription(id, title, description);
 
 	QSpacerItem *space = new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Preferred);
 
@@ -73,7 +78,7 @@ QWidget *PreferencesHelper::addPreferenceEdit(Preferences *p, QString id, QStrin
 	return widget;
 }
 
-QWidget *PreferencesHelper::addPreferenceComboList(Preferences *p, QString id, QString description,
+QWidget *PreferencesHelper::addPreferenceComboList(Preferences *p, QString id, QString title, QString description,
 						   QList<QPair<QString, QVariant>> options, QObject *parent)
 {
 	QWidget *w = new QWidget();
@@ -82,7 +87,8 @@ QWidget *PreferencesHelper::addPreferenceComboList(Preferences *p, QString id, Q
 	lay->setSpacing(0);
 	lay->setMargin(0);
 	w->setLayout(lay);
-	QLabel *lab = new QLabel(description);
+	QLabel *lab = new QLabel(title);
+	p->initDescription(id, title, description);
 	QSpacerItem *space = new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Preferred);
 	QString pref1Val;
 
@@ -106,15 +112,16 @@ QWidget *PreferencesHelper::addPreferenceComboList(Preferences *p, QString id, Q
 	return w;
 }
 
-QWidget *PreferencesHelper::addPreferenceCombo(Preferences *p, QString id, QString description, QStringList options,
-					       QObject *parent)
+QWidget *PreferencesHelper::addPreferenceCombo(Preferences *p, QString id, QString title, QString description,
+					       QStringList options, QObject *parent)
 {
 	QWidget *w = new QWidget();
 	QHBoxLayout *lay = new QHBoxLayout();
 	lay->setSpacing(0);
 	lay->setMargin(0);
 	w->setLayout(lay);
-	QLabel *lab = new QLabel(description);
+	QLabel *lab = new QLabel(title);
+	p->initDescription(id, title, description);
 	QSpacerItem *space = new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Preferred);
 	QString pref1Val = p->get(id).toString();
 	QComboBox *pref = new QComboBox();

@@ -56,6 +56,7 @@ public:
 	Q_INVOKABLE QStringList getToolsForPlugin(QString plugin);
 	Q_INVOKABLE QPair<QString, QVariant> getPreference(QString prfName);
 	Q_INVOKABLE QMap<QString, QVariant> getPreferences();
+	Q_INVOKABLE QVector<QString> getPreferenceDescription(QString prefName);
 	Q_INVOKABLE void setPreference(QString preName, QVariant value);
 	Q_INVOKABLE void aboutPage();
 	Q_INVOKABLE QStringList getPlugins(int idx);

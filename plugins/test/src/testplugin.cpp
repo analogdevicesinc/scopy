@@ -84,13 +84,13 @@ bool TestPlugin::loadPreferencesPage()
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	generalSection->contentLayout()->addWidget(
-		PreferencesHelper::addPreferenceCheckBox(p, "pref1", "First Option", generalSection));
+		PreferencesHelper::addPreferenceCheckBox(p, "pref1", "First Option", "", generalSection));
 	generalSection->contentLayout()->addWidget(
-		PreferencesHelper::addPreferenceCheckBox(p, "pref2", "Second Option", generalSection));
+		PreferencesHelper::addPreferenceCheckBox(p, "pref2", "Second Option", "", generalSection));
 	generalSection->contentLayout()->addWidget(
-		PreferencesHelper::addPreferenceEdit(p, "prefstr", "PreferenceString", generalSection));
+		PreferencesHelper::addPreferenceEdit(p, "prefstr", "PreferenceString", "", generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
-		p, "pref4", "languages", {"english", "french", "italian"}, generalSection));
+		p, "pref4", "languages", "", {"english", "french", "italian"}, generalSection));
 
 	return true;
 }

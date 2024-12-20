@@ -81,9 +81,9 @@ bool DebuggerPlugin::loadPreferencesPage()
 	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	auto use_debugger_v2 = PreferencesHelper::addPreferenceCheckBox(p, "plugins_use_debugger_v2",
-									"Use Debugger V2 plugin", generalSection);
+									"Use Debugger V2 plugin", "", generalSection);
 	auto debugger_include_debugfs = PreferencesHelper::addPreferenceCheckBox(
-		p, "debugger_v2_include_debugfs", "Include debug attributes in IIO Explorer", generalSection);
+		p, "debugger_v2_include_debugfs", "Include debug attributes in IIO Explorer", "", generalSection);
 
 	generalSection->contentLayout()->addWidget(use_debugger_v2);
 	generalSection->contentLayout()->addWidget(debugger_include_debugfs);
