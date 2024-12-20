@@ -1,7 +1,291 @@
 .. _troubleshooting:
 
 Scopy troubleshooting guide
-===========================
+===========================================================
+
+Scopy v2 after Scopy v1?
+------------------------------------------------------------
+
+If this is the first time installing Scopy v2 after using
+any Scopy v1 on your system, we **strongly** recommend to
+uninstall the old Scopy properly.
+
+Doing this we make sure that the configuration files for
+Scopy v2 are not in any way influenced by Scopy v1.
+
+
+Any unexpected behavior? Send us the log!
+------------------------------------------------------------
+
+Scopy v2 brings a new logging mechanism for an easier navigation of the
+debugging process. Whether starting Scopy on Linux (with **flatpak** or **appimage**),
+on MacOS (from **command line**) or Windows, Scopy will display a filtered log of
+operations.
+
+The filter is configured by default to display only a few main
+components. This filter can be modified at runtime, by manipulating
+the responsible environment variable: QT_LOGGING_RULES.
+
+This environment variable is part of the Qt mechanism for exposing
+warning and debugging messages. Read more detailed information
+in the official `Qt documentation <https://doc.qt.io/qt-5/qloggingcategory.html>`__
+
+.. tip::
+
+   Send us the log output of Scopy to make it easier for us to reproduce
+   the issue!
+
+How to set the environment variable:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We can modify the debug output of Scopy even if the release has a
+preconfigured filter.
+
+The default Scopy configuration is the following:
+
+.. code-block:: cpp
+
+						 "*.debug=false\n"
+						 "ToolStack.debug=true\n"
+						 "ToolManager.debug=true\n"
+						 "DeviceManager.debug=true\n"
+						 "Device.debug=true\n"
+						 "TestPlugin.debug=true\n"
+						 "Plugin.debug=true\n"
+						 "swiotConfig.debug=true\n"
+						 "CyclicalTask.debug=false\n"
+						 "SWIOTPlugin.debug=true\n"
+						 "AD74413R.debug=true\n"
+						 "ScopyTranslations.debug=true\n"
+						 "GRTimeSinkComponent.debug=true\n"
+						 "GRManager.debug=true\n"
+
+
+Using **\*.debug=false** will suppress all the debug output of Scopy.
+
+Now let's take some examples and check them on different Operating Systems:
+
+.. code-block:: shell
+
+   ## This will disable all the output and only enable logs
+   ## for the ADC Plugin
+   "*.debug=false;ADCPlugin.debug=true"
+
+
+Linux x86_64, arm64, arm32, MacOS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to modify the Scopy logging rules, open up a terminal
+and run the following:
+
+.. code-block:: shell
+
+   export QT_LOGGING_RULES="*.debug=false;ADCPlugin.debug=true"
+
+After that, run Scopy (specific to each OS type) and observe
+the log output changing.
+
+
+Windows
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In the Scopy install location on Windows you will find 2 separate
+executables: **Scopy.exe** and **Scopy-console.exe**. In order to view
+the debug log of Scopy, you need to run the latter: *Scopy-console.exe*.
+This will not only open the Scopy window, it will also start a command
+prompt in which all the output will be visible.
+
+In order to modify the QT_LOGGING_RULES on Windows, firstly open a
+command prompt and run the following:
+
+.. code-block:: shell
+
+   set QT_LOGGING_RULES="*.debug=false;ADCPlugin.debug=true"
+
+After that, you can run *Scopy-console.exe* from the **same** command
+prompt.
+
+
+Available configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A list of all the available Scopy class filters is:
+
+.. list-table::
+   :widths: 50
+   :header-rows: 1
+
+   * - SCOPY CLASS FILTER
+   * - AnimationPushButton
+   * - MapStackedWidget
+   * - TimeChannelComponent
+   * - TutorialOverlay
+   * - Time Y-Autoscale
+   * - TutorialChapter
+   * - PageNavigationWidget
+   * - TitleSpinBox
+   * - ScopyStatusBar
+   * - MenuCollapseSection
+   * - iioWidget
+   * - AttrDataStrategy
+   * - MultiDataStrategy
+   * - CmdQDeviceDataStrategy
+   * - CmdQChannelDataStrategy
+   * - ContextAttrDataStrategy
+   * - TriggerDataStrategy
+   * - DeviceDataStrategy
+   * - SwitchGuiStrategy
+   * - AttrGuiStrategy
+   * - TimeChannelAddon
+   * - GRTimePlotAddon
+   * - GRTimeChannel
+   * - RuntimeEnvironmentInfo
+   * - CrashReport
+   * - toolLauncher
+   * - oscilloscope
+   * - signalGenerator
+   * - voltmeter
+   * - powerController
+   * - spectrumAnalyzer
+   * - networkAnalyzer
+   * - digitalIO
+   * - logicAnalyzer
+   * - patternGenerator
+   * - calibration
+   * - calibration.manual
+   * - iioManager
+   * - plot
+   * - Benchmark
+   * - DetachedToolWindow
+   * - ScopyTitleManager
+   * - DeviceManager
+   * - ScopyPreferencesPage
+   * - ToolStack
+   * - EmuAddPage
+   * - Scopy
+   * - DeviceBrowser
+   * - InfoPageStack
+   * - ScopyHomeAddPage
+   * - PluginManager
+   * - Device
+   * - ToolMenuItem
+   * - Scopy_API
+   * - PluginRepository
+   * - ScopyTranslations
+   * - ScannedIIOContextCollector
+   * - IIODevice
+   * - ToolMenuManager
+   * - IIOTabWidget
+   * - GRManager
+   * - TimeSink_f
+   * - CmdQPingTask
+   * - CyclicalTask
+   * - CommandQueue
+   * - ConnectionProvider
+   * - IIOScanTask
+   * - GUITestPlugin
+   * - BareMinimum
+   * - DacPlugin
+   * - DacInstrument
+   * - DacDds
+   * - DacBuffer
+   * - DacData
+   * - DacDataBuilder
+   * - DacFileManager
+   * - DacDataStrategy
+   * - RegReadWrite
+   * - oscilloscope
+   * - signalGenerator
+   * - voltmeter
+   * - powerController
+   * - spectrumAnalyzer
+   * - networkAnalyzer
+   * - digitalIO
+   * - logicAnalyzer
+   * - patternGenerator
+   * - calibration
+   * - calibration.manual
+   * - iioManager
+   * - plot
+   * - REGISTERMAP
+   * - RegisterMapTable
+   * - RegMap_API
+   * - MeasurementController
+   * - ADCInstrument
+   * - ADCPlugin
+   * - AcqTreeNode
+   * - GRFFTSinkComponent
+   * - GRFFTChannelComponent
+   * - GRTimeSinkComponent
+   * - GRTimeChannelComponent
+   * - PqmRms
+   * - PQMLog
+   * - PqmAqcManager
+   * - PQMPlugin
+   * - pqm_settings
+   * - M2kDigitalIo
+   * - M2kIIOManager
+   * - M2kCalibrationManual
+   * - M2KPowerController
+   * - M2kSiggen
+   * - M2kNetworkAnalyzer
+   * - M2kOscilloscope
+   * - M2KCalibration
+   * - M2kSpectrumAnalyzer
+   * - M2kDMM
+   * - M2KPLUGIN
+   * - Benchmark
+   * - Plot
+   * - SWIOTPlugin
+   * - AD74413R
+   * - SWIOTConfig
+   * - SWIOTFaults
+   * - MAX14906
+   * - DebuggerTreeView
+   * - DebuggerDetailsView
+   * - DebuggerWatchList
+   * - DebuggerIIOModel
+   * - IIODebugger
+   * - DEBUGGERPLUGIN
+   * - Benchmark
+   * - TestPluginIp
+   * - TestPlugin
+   * - TimeTracker
+   * - DataMonitor_API
+   * - DataMonitorSettings
+   * - DataLoggerPlugin
+   * - DataLoggerPlugin
+   * - DataMonitorTool
+   * - ApiObject
+   * - ResourceManager
+   * - VersionCache
+   * - Scopy_JS
+   * - Plugin
+   * - StatusBarManager
+   * - Preferences
+
+If you need to regenerate this list after updating parts of Scopy, you can
+use the following command:
+
+.. code-block:: shell
+
+   grep -InH -r --exclude="*.rst*" --exclude="*.mako" --exclude="*build*" --exclude="*html*" "Q_LOGGING_CATEGORY" . | sed 's/.*Q_LOGGING_CATEGORY([^,]*, *"\([^"]*\)").*/\1/'
+
+
+Linux Wayland crash
+----------------------------
+
+If you are using Scopy on a Linux system with Wayland and you encounter a crash
+when trying to open the application, you can run Scopy with XCB.
+
+.. tip::
+
+    flatpak run --env=QT_QPA_PLATFORM=xcb org.adi.Scopy
+
+.. tip::
+
+    QT_QPA_PLATFORM=xcb ./Scopy.AppImage
+
 
 Device doesn't show up
 -------------------------------------
@@ -41,6 +325,9 @@ In order to reset them, go to: These file are located in:
 and delete (or rename) **Scopy.ini** **Scopy.ini.bak** **Preferences.ini**
 **Preferences.ini.bak** The preference is to rename things with a different
 suffix, so if you need to report a bug, the file still exists.
+
+You can also reset these files to default using the **Reset button** from 
+the Preferences page.
 
 Scopy configuration can sometimes get messed up when updating as opposed to
 uninstall/reinstall. If you are facing this issue, you can try uninstalling
@@ -113,6 +400,15 @@ or
 
    iio_info -u "ip:192.168.2.1"
 
+
+Emulator not found
+--------------------------------------------------------
+
+If you are using any binary from the official release artifacts
+and you get something similar to: *"iio-emu not found"* when
+trying to use the Emulator functionality, go to **Preferences**,
+use the **Reset button** to set everything to its default value
+and restart Scopy.
 
 
 Scopy white screen on Windows

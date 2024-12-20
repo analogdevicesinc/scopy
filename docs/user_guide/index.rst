@@ -20,11 +20,12 @@ Download
 
       **Scopy for Windows**
 
-        * Download: `Installer for latest release (Windows 64/32-bit) <https://github.com/analogdevicesinc/scopy/releases/latest>`_ 
+        * Download: `Installer for latest release (Windows 64-bit) <https://github.com/analogdevicesinc/scopy/releases/latest>`_
 
       **Scopy for Linux**
 
         * Download: `Scopy Flatpak installer <https://github.com/analogdevicesinc/scopy/releases/latest>`_  
+        * Download: `Scopy AppImage executable <https://github.com/analogdevicesinc/scopy/releases/latest>`_
 
       **Scopy for OSX**
 
@@ -32,13 +33,15 @@ Download
 
       **Scopy for Android**
 
-        * Download: `Android installer <https://github.com/analogdevicesinc/scopy/releases/latest>`_ 
-  
-        * Google Play store link: `Scopy <https://play.google.com/store/apps/details?id=org.adi.scopy>`_ 
+        * APK soon available
 
-      **Scopy all platforms latest(nightly) builds**
+      **ARM64**
 
-        * Download:`Installer for latest (nightly) build <https://github.com/analogdevicesinc/scopy/releases/tag/continous>`_ 
+        * Download: `Scopy AppImage executable for ARM64 <https://github.com/analogdevicesinc/scopy/releases/latest>`_
+
+      **ARM32**
+
+        * Download: `Scopy AppImage executable for ARM32 <https://github.com/analogdevicesinc/scopy/releases/latest>`_
 
 .. warning::
 
@@ -63,11 +66,12 @@ Video installation guide:
 
   **Scopy for Linux**
 
-Before downloading and extracting the scopy-Linux-flatpak.zip archive,
+**AppImage**: Make the application executable by running **chmod +x ./Scopy.AppImage** in a command line,
+then run Scopy as any other Linux executable. These steps are applicable for ARM64 and ARM32 also.
+
+**Flatpak**: Before downloading and extracting the scopy-Linux-flatpak.zip archive,
 you need to setup Flatpak `using this setup guide <https://flatpak.org/setup/>`_ 
 for your Linux distribution.
-
-
 
 For Ubuntu, you can use the following steps:
 
@@ -111,7 +115,7 @@ Video installation guide:
 
 
 
-  **Scopy for Android**
+  **Scopy for Android** - APK coming soon
 
 Tap on the downloaded .apk file to start the installation process and proceed 
 by hitting the “Install” button. Optionally, you may be warned that this 
@@ -135,7 +139,24 @@ On Linux, you can also run it using:
 
 .. code-block::
 
+    chmod +x Scopy.AppImage
+    ./Scopy.AppImage
+
+OR
+
+.. code-block::
+
     flatpak run org.adi.Scopy
+
+
+.. tip::
+
+    If the latter raises issues related to platform display plugins use the following modified command
+    to solve it.
+
+    flatpak run --env=QT_QPA_PLATFORM=xcb org.adi.Scopy
+
+    QT_QPA_PLATFORM=xcb ./Scopy.AppImage
 
 
 Application Overview
@@ -300,20 +321,8 @@ Save & Load session
 Preferences
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-general-prefs.png
-    :align: center
-..
-
-  Scopy Preferences can be accessed using the bottom left side **preferences
-  button**. On the right side of the page, preferences for each plugin
-  are available. More details can be found in their specific plugin
-  documentation section.
-
-  Clicking the **Reset Scopy** button will reset the application to a default
-  configuration.
-
-  Changing some of the listed preferences will require an application
-  restart.
+Scopy allows multiple application specific user preference configurations
+described :ref:`in the Scopy general preferences page <preferences>`
 
 About page
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -437,11 +446,7 @@ User guide on how to use scripts with Scopy:
 Building from source
 ---------------------------------------------------------------------
 
-Complete Scopy build guides on:
-
-* `Windows <https://wiki.analog.com/university/tools/m2k/scopy/build-windows>`_ 
-* `Linux <https://wiki.analog.com/university/tools/m2k/scopy/build-linux>`_ 
-* `OSX <https://wiki.analog.com/university/tools/m2k/scopy/build-osx>`_ 
+Complete Scopy v2.0.0 build guides **coming soon**!
 
 
 Source code
@@ -449,6 +454,7 @@ Source code
 
 The source code for the entire application can be found on `github 
 <https://github.com/analogdevicesinc/scopy>`_ 
+
 
 Old documentation
 ---------------------------------------------------------------------
