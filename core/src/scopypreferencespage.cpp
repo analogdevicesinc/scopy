@@ -158,8 +158,10 @@ QWidget *ScopyPreferencesPage::buildSaveSessionPreference()
 	QHBoxLayout *lay = new QHBoxLayout(w);
 	lay->setMargin(0);
 
-	lay->addWidget(
-		PreferencesHelper::addPreferenceCheckBox(p, "general_save_session", "Save/Load Scopy session", this));
+	lay->addWidget(PREFERENCE_CHECK_BOX(p, "general_save_session", "Save/Load Scopy session",
+					    "Allow Scopy to automatically save/load the session "
+					    "using .ini files into a predefined location.",
+					    this));
 	lay->addSpacerItem(new QSpacerItem(40, 40, QSizePolicy::Expanding, QSizePolicy::Fixed));
 	lay->addWidget(new QLabel("Settings files location ", this));
 	QPushButton *navigateBtn = new QPushButton("Open", this);
@@ -242,41 +244,96 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 	lay->addWidget(generalWidget);
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "general_save_attached", "Save/Load tool attached state", generalSection));
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "general_doubleclick_attach", "Doubleclick to attach/detach tool", generalSection));
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "general_doubleclick_ctrl_opens_menu", "Doubleclick control buttons to open menu", generalSection));
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "general_use_opengl", "Enable OpenGL plotting", generalSection));
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "general_use_animations", "Enable menu animations", generalSection));
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "general_check_online_version", "Enable automatic online check for updates.", generalSection));
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_CHECK_BOX(p, "general_save_attached", "Save/Load tool attached state",
+				     "Allow Scopy to save the state of all instruments, whether they were "
+				     "detached/attached when the application was closed, and load this "
+				     "state accordingly when the application restarts.",
+				     generalSection));
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_CHECK_BOX(p, "general_doubleclick_attach", "Doubleclick to attach/detach tool",
+				     "Indicates whether double-clicking attaches instruments in the application. "
+				     "Enabling this option allows the user to quickly attach instruments by "
+				     "double-clicking on them.",
+				     generalSection));
+	generalSection->contentLayout()->addWidget(PREFERENCE_CHECK_BOX(
+		p, "general_doubleclick_ctrl_opens_menu", "Doubleclick control buttons to open menu",
+		"Enable the double click action for menu opening.", generalSection));
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_CHECK_BOX(p, "general_use_opengl", "Enable OpenGL plotting",
+				     "Use OpenGL accelerated plotting in order to speed-up the process and "
+				     "avoid blocking the application while large numbers of samples are "
+				     "displayed. This feature may not be supported on all systems.",
+				     generalSection));
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_CHECK_BOX(p, "general_use_animations", "Enable menu animations",
+				     "Enable a smooth sliding transition effect for menus when they are "
+				     "opened or closed.",
+				     generalSection));
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_CHECK_BOX(p, "general_check_online_version", "Enable automatic online check for updates.",
+				     "Indicates whether the application should check for online version updates. "
+				     "Enabling this option allows the application to automatically check for and "
+				     "notify the user of available updates at startup.",
+				     generalSection));
+	generalSection->contentLayout()->addWidget(PREFERENCE_CHECK_BOX(
 		p, "general_show_status_bar", "Enable the status bar for displaying important messages.",
+		"Indicates whether the status bar should be displayed in the application. This setting "
+		"allows the user to enable or disable the status bar, which provides information about "
+		"the current state of the application. "
+		"Important messages such as connection done or alerts are displayed here.",
 		generalSection));
 	generalSection->contentLayout()->addWidget(
-		PreferencesHelper::addPreferenceCheckBox(p, "show_grid", "Show Grid", generalSection));
+		PREFERENCE_CHECK_BOX(p, "show_grid", "Show Grid",
+				     "Indicates whether the plot grid is visible across the application. "
+				     "The user can enable or disable this in order to configure the ",
+				     generalSection));
 	generalSection->contentLayout()->addWidget(
-		PreferencesHelper::addPreferenceCheckBox(p, "show_graticule", "Show Graticule", generalSection));
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "iiowidgets_use_lazy_loading", "Use Lazy Loading", generalSection));
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "general_use_native_dialogs", "Use native dialogs", generalSection));
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
-		p, "font_scale", "Font scale (EXPERIMENTAL)", {"1", "1.15", "1.3", "1.45", "1.6", "1.75", "1.9"},
+		PREFERENCE_CHECK_BOX(p, "show_graticule", "Show Graticule",
+				     "This setting allows the user to enable or disable the display of the graticule "
+				     "on all the plots in the application for better signal visualization.",
+				     generalSection));
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_CHECK_BOX(p, "iiowidgets_use_lazy_loading", "Use Lazy Loading",
+				     "Indicates whether lazy loading should be used for IIO widgets. "
+				     "Enabling this option allows the application to load IIO widgets only "
+				     "when they are needed, improving startup performance.",
+				     generalSection));
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_CHECK_BOX(p, "general_use_native_dialogs", "Use native dialogs",
+				     "Indicates whether native dialogs should be used in the application. "
+				     "This setting allows the user to enable or disable the use of native file "
+				     "dialogs and other system dialogs within the application.",
+				     generalSection));
+
+	QStringList font_scale_options = {"1", "1.15", "1.3", "1.45", "1.6", "1.75", "1.9"};
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_COMBO(p, "font_scale", "Font scale (EXPERIMENTAL)",
+				 "Scale factor for the font size used across the application, suitable for "
+				 "different display settings.",
+				 font_scale_options, generalSection));
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_COMBO(p, "general_theme", "Theme",
+				 "Theme setting for the application interface. "
+				 "The user can choose between Harmonic style (light or dark) or Scopy style.",
+				 Style::GetInstance()->getThemeList(), generalSection));
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_COMBO(p, "general_language", "Language",
+				 "Language setting for the application interface. "
+				 "Multiple options available, check out the documentation if a new language is needed.",
+				 t->getLanguages(), generalSection));
+	generalSection->contentLayout()->addWidget(PREFERENCE_CHECK_BOX(
+		p, "general_connect_to_multiple_devices", "Connect to multiple devices (EXPERIMENTAL)",
+		"Allows the application to connect to multiple devices simultaneously, providing a mechanism "
+		"to handle them separately using different sections in the left side menu. "
+		"Due to not being tested using enough scenarios it is still marked as an experimental feature.",
 		generalSection));
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
-		p, "general_theme", "Theme", Style::GetInstance()->getThemeList(), generalSection));
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
-		p, "general_language", "Language", t->getLanguages(), generalSection));
 	generalSection->contentLayout()->addWidget(
-		PreferencesHelper::addPreferenceCheckBox(p, "general_connect_to_multiple_devices",
-							 "Connect to multiple devices (EXPERIMENTAL)", generalSection));
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "general_scan_for_devices", "Regularly scan for new devices", generalSection));
+		PREFERENCE_CHECK_BOX(p, "general_scan_for_devices", "Regularly scan for new devices",
+				     "Select whether Scopy should be able to search for new devices periodically, "
+				     "allowing the application to automatically populate the device list with connected"
+				     "devices. Otherwise, all devices need to be added manually from the Add page.",
+				     generalSection));
 
 	// Auto-connect
 	m_autoConnectWidget = new MenuSectionCollapseWidget("Session ", MenuCollapseSection::MHCW_NONE,
@@ -287,8 +344,11 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 	lay->addWidget(m_autoConnectWidget);
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
-	QWidget *autoConnectCb = PreferencesHelper::addPreferenceCheckBox(
-		p, "autoconnect_previous", "Auto-connect to previous session", generalSection);
+	QWidget *autoConnectCb = PREFERENCE_CHECK_BOX(p, "autoconnect_previous", "Auto-connect to previous session",
+						      "Automatically use the saved URI to connect to previous devices, "
+						      "if available, when the application starts. This speeds up the "
+						      "connection process and reduces the number of necessary steps.",
+						      generalSection);
 	m_autoConnectWidget->contentLayout()->addWidget(autoConnectCb);
 
 	m_autoConnectWidget->contentLayout()->addWidget(buildSaveSessionPreference());
@@ -317,9 +377,16 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	debugSection->contentLayout()->addWidget(
-		PreferencesHelper::addPreferenceCheckBox(p, "general_show_plot_fps", "Show plot FPS", debugSection));
-	debugSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
-		p, "general_plot_target_fps", "Plot target FPS", {"15", "20", "30", "60"}, debugSection));
+		PREFERENCE_CHECK_BOX(p, "general_show_plot_fps", "Show plot FPS",
+				     "Indicates whether the frames per second should be displayed in plots "
+				     "across the entire application.",
+				     debugSection));
+
+	QStringList fps_options = {"15", "20", "30", "60"};
+	debugSection->contentLayout()->addWidget(
+		PREFERENCE_COMBO(p, "general_plot_target_fps", "Plot target FPS",
+				 "Select the Frames per second value for rendering plots in the entire application.",
+				 fps_options, debugSection));
 	debugSection->contentLayout()->addWidget(buildResetScopyDefaultButton());
 
 	return page;

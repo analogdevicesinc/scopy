@@ -29,6 +29,18 @@
 
 #include <pluginbase/preferences.h>
 
+#define PREFERENCE_CHECK_BOX(p, id, title, description, parent)                                                        \
+	PreferencesHelper::addPreferenceCheckBox(p, id, title, description, parent)
+
+#define PREFERENCE_EDIT(p, id, title, description, parent)                                                             \
+	PreferencesHelper::addPreferenceEdit(p, id, title, description, parent)
+
+#define PREFERENCE_COMBO(p, id, title, description, options, parent)                                                   \
+	PreferencesHelper::addPreferenceCombo(p, id, title, description, options, parent)
+
+#define PREFERENCE_COMBO_LIST(p, id, title, description, options, parent)                                              \
+	PreferencesHelper::addPreferenceComboList(p, id, title, description, options, parent)
+
 namespace scopy {
 
 class SmallOnOffSwitch;
@@ -40,13 +52,15 @@ class SCOPY_GUI_EXPORT PreferencesHelper
 {
 
 public:
-	static QWidget *addPreferenceCheckBox(Preferences *p, QString id, QString description,
+	static QWidget *addPreferenceCheckBox(Preferences *p, QString id, QString title, QString description,
 					      QObject *parent = nullptr);
-	static QWidget *addPreferenceEdit(Preferences *p, QString id, QString description, QObject *parent = nullptr);
-	static QWidget *addPreferenceCombo(Preferences *p, QString id, QString description, QStringList options,
-					   QObject *parent = nullptr);
-	static QWidget *addPreferenceComboList(Preferences *p, QString id, QString description,
+	static QWidget *addPreferenceEdit(Preferences *p, QString id, QString title, QString description,
+					  QObject *parent = nullptr);
+	static QWidget *addPreferenceCombo(Preferences *p, QString id, QString title, QString description,
+					   QStringList options, QObject *parent = nullptr);
+	static QWidget *addPreferenceComboList(Preferences *p, QString id, QString title, QString description,
 					       QList<QPair<QString, QVariant>> options, QObject *parent);
+	static QWidget *setupDescriptionButton(QString id, QString description, QObject *parent);
 };
 } // namespace scopy
 #endif // PREFERENCESHELPER_H
