@@ -181,3 +181,27 @@ Tutorial
 
 A tutorial will automatically start first time the tool is open. It can
 be restarted from tool Preferences.
+
+
+Preferences
+--------------------------------------------------------------------------------
+
+This documentation describes the options available in the Preferences page for 
+the Data Logger Plugin.
+
+1. **Maximum Channel Data Storage**
+
+  - Allows the user to set the maximum data storage for each 
+    monitor.
+  - **Default Value**: 10Mb
+
+2. **Read Interval**
+
+  - Allows the user to set the interval at which data is read.
+  - **Default Value**: 1 second
+
+3. **X-Axis Date Time Format**
+
+  - Allows the user to set the date time format for the X Axis.
+  - **Default Value**: hh:mm:ss
+
