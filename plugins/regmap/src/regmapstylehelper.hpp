@@ -70,6 +70,7 @@ public:
 private:
 	QMap<QString, QString> colorMap;
 	static RegmapStyleHelper *pinstance_;
+	static QString getRegmapValueColor(int index);
 };
 } // namespace scopy::regmap
 #endif // REGMAPSTYLEHELPER_HPP

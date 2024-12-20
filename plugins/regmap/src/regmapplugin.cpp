@@ -166,6 +166,35 @@ bool RegmapPlugin::loadPreferencesPage()
 		 "Register background and Bitfield text", "Register text and Bitfield background"},
 		generalSection));
 
+	QWidget *colorWidget = new QWidget(m_preferencesPage);
+	QVBoxLayout *colorWidgetLayout = new QVBoxLayout(colorWidget);
+	colorWidgetLayout->setContentsMargins(0, 0, 0, 0);
+
+	for(int i = 0; i < 16; i++) {
+		QString regmapValueColorString = "regmap_value_color_";
+		QColor color =
+			Style::getAttribute(QString(regmapValueColorString + QString::number(i)).toStdString().c_str());
+
+		QWidget *hContainer = new QWidget; // Horizontal container
+		QHBoxLayout *hLayout = new QHBoxLayout(hContainer);
+		hLayout->setContentsMargins(0, 0, 0, 0); // Remove margins for tight layout
+
+		// Create a color square
+		QFrame *colorSquare = new QFrame;
+		colorSquare->setFixedSize(40, 40); // Increased size of the square
+		colorSquare->setStyleSheet("background-color: " + color.name() + ";");
+
+		QLabel *label = new QLabel("Color for value : " + QString::number(i, 16));
+		label->setMargin(0); // Remove default margins for the label
+		hLayout->addWidget(colorSquare);
+		hLayout->addWidget(label);
+		hLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+
+		colorWidgetLayout->addWidget(hContainer); // Add the horizontal container to the main layout
+	}
+
+	lay->addWidget(colorWidget);
+
 	return true;
 }
 
@@ -337,3 +366,4 @@ void RegmapPlugin::InitApi()
 	js->registerApi(api);
 }
 #include "moc_regmapplugin.cpp"
+#include "regmapstylehelper.hpp"

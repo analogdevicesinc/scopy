@@ -31,5 +31,21 @@
 "ch7": "#c7c10a",
 "white": "#FFFFFF",
 "black": "#000000",
-"run_button_color": "&interactive_primary_idle&"
+"run_button_color": "&interactive_primary_idle&",
+"regmap_value_color_0": "#FF0000",
+"regmap_value_color_1": "#00FF00",
+"regmap_value_color_2": "#E76423",
+"regmap_value_color_3": "#B16EE0",
+"regmap_value_color_4": "#2E9E6F",
+"regmap_value_color_5": "#3A8EE9",
+"regmap_value_color_6": "#F64C5A",
+"regmap_value_color_7": "#1694CA",
+"regmap_value_color_8": "#E84DB4",
+"regmap_value_color_9": "#0000FF",
+"regmap_value_color_10": "#FFFF00",
+"regmap_value_color_11": "#00FFFF",
+"regmap_value_color_12": "#FF00FF",
+"regmap_value_color_13": "#8B4513",
+"regmap_value_color_14": "#8A2BE2",
+"regmap_value_color_15": "#DEB887"
 }
