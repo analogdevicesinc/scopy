@@ -165,8 +165,9 @@ QWidget *ScopyPreferencesPage::buildSaveSessionPreference()
 	QPushButton *navigateBtn = new QPushButton("Open", this);
 	Style::setStyle(navigateBtn, style::properties::button::borderButton);
 	navigateBtn->setMaximumWidth(Style::getDimension(json::global::unit_5));
-	connect(navigateBtn, &QPushButton::clicked, this,
-		[=]() { QDesktopServices::openUrl(scopy::config::settingsFolderPath()); });
+	connect(navigateBtn, &QPushButton::clicked, []() {
+		QDesktopServices::openUrl(scopy::config::settingsFolderPath());
+	});
 	lay->addWidget(navigateBtn);
 	return w;
 }
