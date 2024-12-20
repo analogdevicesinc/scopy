@@ -279,14 +279,14 @@ bool DataLoggerPlugin::loadPreferencesPage()
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
-		p, "dataloggerplugin_data_storage_size", "Maximum data stored for each monitor", {"10 Kb", "1 Mb"},
+		p, "dataloggerplugin_data_storage_size", "Maximum data stored for each monitor", "", {"10 Kb", "1 Mb"},
 		generalSection));
 
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceEdit(
-		p, "dataloggerplugin_read_interval", "Read interval (seconds) ", generalSection));
+		p, "dataloggerplugin_read_interval", "Read interval (seconds) ", "", generalSection));
 
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceEdit(
-		p, "dataloggerplugin_date_time_format", "DateTime format :", generalSection));
+		p, "dataloggerplugin_date_time_format", "DateTime format :", "", generalSection));
 
 	return true;
 }

@@ -298,7 +298,7 @@ bool M2kPlugin::loadPreferencesPage()
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "m2k_instrument_notes_active", "Instrument Notes", generalSection));
+		p, "m2k_instrument_notes_active", "Instrument Notes", "", generalSection));
 
 	// Analog tools preferences
 	MenuSectionWidget *analogWidget = new MenuSectionWidget(m_preferencesPage);
@@ -311,21 +311,22 @@ bool M2kPlugin::loadPreferencesPage()
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	analogSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "m2k_show_adc_filters", "Show ADC digital filter config", analogSection));
-	analogSection->contentLayout()->addWidget(
-		PreferencesHelper::addPreferenceCheckBox(p, "m2k_show_graticule", "Enable graticule", analogSection));
+		p, "m2k_show_adc_filters", "Show ADC digital filter config", "", analogSection));
 	analogSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "m2k_mini_histogram", "Enable mini histogram", analogSection));
+		p, "m2k_show_graticule", "Enable graticule", "", analogSection));
 	analogSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "m2k_osc_filtering", "Enable sample rate filters", analogSection));
+		p, "m2k_mini_histogram", "Enable mini histogram", "", analogSection));
 	analogSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "m2k_osc_label", "Enable labels on the plot", analogSection));
+		p, "m2k_osc_filtering", "Enable sample rate filters", "", analogSection));
 	analogSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "m2k_spectrum_visible_peak_search", "Only search marker peaks in visible domain", analogSection));
+		p, "m2k_osc_label", "Enable labels on the plot", "", analogSection));
 	analogSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "m2k_na_show_zero", "Always display 0db value on the graph", analogSection));
+		p, "m2k_spectrum_visible_peak_search", "Only search marker peaks in visible domain", "",
+		analogSection));
+	analogSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
+		p, "m2k_na_show_zero", "Always display 0db value on the graph", "", analogSection));
 	analogSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceEdit(
-		p, "m2k_siggen_periods", "Number of displayed periods", analogSection));
+		p, "m2k_siggen_periods", "Number of displayed periods", "", analogSection));
 
 	// Logic tools preferences
 	MenuSectionWidget *logicWidget = new MenuSectionWidget(m_preferencesPage);
@@ -338,11 +339,11 @@ bool M2kPlugin::loadPreferencesPage()
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	logicSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "m2k_logic_separate_annotations", "Separate decoder annotations when exporting", logicSection));
+		p, "m2k_logic_separate_annotations", "Separate decoder annotations when exporting", "", logicSection));
 	logicSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "m2k_logic_display_sampling_points", "Display sampling points when zoomed", logicSection));
+		p, "m2k_logic_display_sampling_points", "Display sampling points when zoomed", "", logicSection));
 	logicSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "m2k_logic_display_sample_time", "Show sample and time info in decoder table", logicSection));
+		p, "m2k_logic_display_sample_time", "Show sample and time info in decoder table", "", logicSection));
 
 	return true;
 }

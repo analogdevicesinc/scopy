@@ -31,7 +31,9 @@ using namespace scopy;
 
 ApiObject::ApiObject(QObject *parent)
 	: QObject(parent)
-{}
+{
+	qRegisterMetaType<QPair<QString, QString>>("QPair<QString, QString>");
+}
 
 ApiObject::~ApiObject() {}
 

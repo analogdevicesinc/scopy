@@ -40,12 +40,13 @@ class SCOPY_GUI_EXPORT PreferencesHelper
 {
 
 public:
-	static QWidget *addPreferenceCheckBox(Preferences *p, QString id, QString description,
+	static QWidget *addPreferenceCheckBox(Preferences *p, QString id, QString title, QString description,
 					      QObject *parent = nullptr);
-	static QWidget *addPreferenceEdit(Preferences *p, QString id, QString description, QObject *parent = nullptr);
-	static QWidget *addPreferenceCombo(Preferences *p, QString id, QString description, QStringList options,
-					   QObject *parent = nullptr);
-	static QWidget *addPreferenceComboList(Preferences *p, QString id, QString description,
+	static QWidget *addPreferenceEdit(Preferences *p, QString id, QString title, QString description,
+					  QObject *parent = nullptr);
+	static QWidget *addPreferenceCombo(Preferences *p, QString id, QString title, QString description,
+					   QStringList options, QObject *parent = nullptr);
+	static QWidget *addPreferenceComboList(Preferences *p, QString id, QString title, QString description,
 					       QList<QPair<QString, QVariant>> options, QObject *parent);
 };
 } // namespace scopy

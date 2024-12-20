@@ -160,7 +160,7 @@ bool RegmapPlugin::loadPreferencesPage()
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
-		p, "regmap_color_by_value", "Use color to reflect value",
+		p, "regmap_color_by_value", "Use color to reflect value", "",
 		{"Default", "Bitfield background", "Bitfield text", "Register background", "Register text",
 		 "Register background and Bitfield background", "Register text and Bitfield text",
 		 "Register background and Bitfield text", "Register text and Bitfield background"},

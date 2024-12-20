@@ -376,6 +376,16 @@ QMap<QString, QVariant> ScopyMainWindow_API::getPreferences()
 	return prefMap;
 }
 
+QVector<QString> ScopyMainWindow_API::getPreferenceDescription(QString prefName)
+{
+	Preferences *p = Preferences::GetInstance();
+	QMap<QString, QVector<QString>> prefMap = p->getPreferencesDescriptions();
+	if(prefName != NULL) {
+		return prefMap[prefName];
+	}
+	return {};
+}
+
 void ScopyMainWindow_API::setPreference(QString prefName, QVariant value)
 {
 	Preferences *p = Preferences::GetInstance();
