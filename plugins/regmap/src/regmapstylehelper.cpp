@@ -204,5 +204,19 @@ void RegmapStyleHelper::smallBlueButton(QPushButton *button, QString objectName)
 QString RegmapStyleHelper::getColorBasedOnValue(QString value)
 {
 	uint32_t colorIndex = Utils::convertQStringToUint32(value) % 16;
-	return StyleHelper::getChannelColor(colorIndex);
+	return RegmapStyleHelper::getRegmapValueColor(colorIndex);
 }
+
+QString RegmapStyleHelper::getRegmapValueColor(int index)
+{
+	if(index <= 15) {
+		QColor color(regmapValueColorVector.at(index));
+		return color.name();
+	} else {
+		return "";
+	}
+}
+
+const QVector<QString> RegmapStyleHelper::regmapValueColorVector = {
+	"#FF0000", "#00FF00", "#E76423", "#B16EE0", "#2E9E6F", "#3A8EE9", "#F64C5A", "#1694CA",
+	"#E84DB4", "#0000FF", "#FFFF00", "#00FFFF", "#FF00FF", "#8B4513", "#8A2BE2", "#DEB887"};
