@@ -132,3 +132,36 @@ The structure of an Option type object:
    User can create it's own .xml file for any device and add it to where scopy 
    is build in "/plugins/regmap/xmls/" to be able to see the register map table 
 
+
+Preferences
+--------------------------------------------------------------------------------
+
+This plugin provides functionality to visualize register and bitfield values with color coding. 
+Users have the option to choose from the following visualization methods:
+
+1. Change the background color of the register to reflect its value.
+2. Change the text color of the register value to reflect its value.
+3. Change the background color of the bitfield to reflect its value.
+4. Change the text color of the bitfield value to reflect its value.
+
+Users can select any combination of the above options, but only one method can be applied to the register and one method to the bitfield at a time.
+
+Value to Color Mapping
+^^^^^^^^^^^^^^^^^^^^^^^
+      1. **#FF0000** - represents value 0x0
+      2. **#00FF00** - represents value 0x1
+      3. **#E76423** - represents value 0x2
+      4. **#B16EE0** - represents value 0x3
+      5. **#2E9E6F** - represents value 0x4
+      6. **#3A8EE9** - represents value 0x5
+      7. **#F64C5A** - represents value 0x6
+      8. **#1694CA** - represents value 0x7
+      9. **#E84DB4** - represents value 0x8
+      10. **#0000FF** - represents value 0x9
+      11. **#FFFF00** - represents value 0xA
+      12. **#00FFFF** - represents value 0xB
+      13. **#FF00FF** - represents value 0xC
+      14. **#8B4513** - represents value 0xD
+      15. **#8A2BE2** - represents value 0xE
+      16. **#DEB887** - represents value 0xF
+
