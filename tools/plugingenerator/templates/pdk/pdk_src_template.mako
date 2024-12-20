@@ -148,7 +148,7 @@ QWidget *PDKWindow::buildSaveSessionPreference()
 	lay->setMargin(0);
 
 	lay->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(p, "general_save_session",
-								       "Save/Load Scopy session", this));
+								       "Save/Load Scopy session", "", this));
 	lay->addSpacerItem(new QSpacerItem(40, 40, QSizePolicy::Expanding, QSizePolicy::Fixed));
 	lay->addWidget(new QLabel("Settings files location ", this));
 	QPushButton *navigateBtn = new QPushButton("Open", this);
@@ -183,32 +183,32 @@ QWidget *PDKWindow::generalPreferences()
 
 	generalSection->contentLayout()->addWidget(buildSaveSessionPreference());
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
-		p, "general_save_attached", "Save/Load tool attached state", generalSection));
+		p, "general_save_attached", "Save/Load tool attached state", "", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
-		p, "general_doubleclick_attach", "Doubleclick to attach/detach tool", generalSection));
+		p, "general_doubleclick_attach", "Doubleclick to attach/detach tool", "", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
-		p, "general_doubleclick_ctrl_opens_menu", "Doubleclick control buttons to open menu", generalSection));
+		p, "general_doubleclick_ctrl_opens_menu", "Doubleclick control buttons to open menu", "", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
-		p, "general_use_opengl", "Enable OpenGL plotting", generalSection));
+		p, "general_use_opengl", "Enable OpenGL plotting", "", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
-		p, "general_use_animations", "Enable menu animations", generalSection));
+		p, "general_use_animations", "Enable menu animations", "", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
-		p, "general_check_online_version", "Enable automatic online check for updates.", generalSection));
+		p, "general_check_online_version", "Enable automatic online check for updates.", "", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
 		p, "general_show_status_bar", "Enable the status bar for displaying important messages.",
-		generalSection));
+		"", generalSection));
 	generalSection->contentLayout()->addWidget(
-		scopy::PreferencesHelper::addPreferenceCheckBox(p, "show_grid", "Show Grid", generalSection));
+		scopy::PreferencesHelper::addPreferenceCheckBox(p, "show_grid", "Show Grid", "", generalSection));
 	generalSection->contentLayout()->addWidget(
-		scopy::PreferencesHelper::addPreferenceCheckBox(p, "show_graticule", "Show Graticule", generalSection));
+		scopy::PreferencesHelper::addPreferenceCheckBox(p, "show_graticule", "Show Graticule", "", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
-		p, "iiowidgets_use_lazy_loading", "Use Lazy Loading", generalSection));
+		p, "iiowidgets_use_lazy_loading", "Use Lazy Loading", "", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
-		p, "plugins_use_debugger_v2", "Use Debugger V2 plugin", generalSection));
+		p, "plugins_use_debugger_v2", "Use Debugger V2 plugin", "", generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "general_use_native_dialogs", "Use native dialogs", generalSection));
+		p, "general_use_native_dialogs", "Use native dialogs", "", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCombo(
-		p, "general_theme", "Theme", {"default", "light"}, generalSection));
+		p, "general_theme", "Theme", {"default", "light"}, "", generalSection));
 
 	// Debug preferences
 	scopy::MenuSectionWidget *debugWidget = new scopy::MenuSectionWidget(page);
@@ -221,9 +221,9 @@ QWidget *PDKWindow::generalPreferences()
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	debugSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
-		p, "general_show_plot_fps", "Show plot FPS", debugSection));
+		p, "general_show_plot_fps", "Show plot FPS", "", debugSection));
 	debugSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCombo(
-		p, "general_plot_target_fps", "Plot target FPS", {"15", "20", "30", "60"}, debugSection));
+		p, "general_plot_target_fps", "Plot target FPS", "", {"15", "20", "30", "60"}, debugSection));
 
 	return page;
 }

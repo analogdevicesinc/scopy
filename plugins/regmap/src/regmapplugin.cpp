@@ -159,12 +159,20 @@ bool RegmapPlugin::loadPreferencesPage()
 	lay->addWidget(generalWidget);
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
-		p, "regmap_color_by_value", "Use color to reflect value",
-		{"Default", "Bitfield background", "Bitfield text", "Register background", "Register text",
-		 "Register background and Bitfield background", "Register text and Bitfield text",
-		 "Register background and Bitfield text", "Register text and Bitfield background"},
-		generalSection));
+	QStringList color_value_options = {"Default",
+					   "Bitfield background",
+					   "Bitfield text",
+					   "Register background",
+					   "Register text",
+					   "Register background and Bitfield background",
+					   "Register text and Bitfield text",
+					   "Register background and Bitfield text",
+					   "Register text and Bitfield background"};
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_COMBO(p, "regmap_color_by_value", "Use color to reflect value",
+				 "Select from various configurations available which elements in the Register Map "
+				 "are color coded for better visual interpretation.",
+				 color_value_options, generalSection));
 
 	return true;
 }

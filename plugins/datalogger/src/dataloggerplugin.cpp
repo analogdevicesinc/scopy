@@ -277,15 +277,19 @@ bool DataLoggerPlugin::loadPreferencesPage()
 	lay->addWidget(generalWidget);
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
-		p, "dataloggerplugin_data_storage_size", "Maximum data stored for each monitor", {"10 Kb", "1 Mb"},
-		generalSection));
+	QStringList storage_options = {"10 Kb", "1 Mb"};
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_COMBO(p, "dataloggerplugin_data_storage_size", "Maximum data stored for each monitor",
+				 "Select the maximum data storage size for each monitor in the datalogger.",
+				 storage_options, generalSection));
 
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceEdit(
-		p, "dataloggerplugin_read_interval", "Read interval (seconds) ", generalSection));
+	generalSection->contentLayout()->addWidget(PREFERENCE_EDIT(
+		p, "dataloggerplugin_read_interval", "Read interval (seconds) ",
+		"Select the time interval, in seconds, for data polling in the instrument.", generalSection));
 
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceEdit(
-		p, "dataloggerplugin_date_time_format", "DateTime format :", generalSection));
+	generalSection->contentLayout()->addWidget(PREFERENCE_EDIT(
+		p, "dataloggerplugin_date_time_format", "DateTime format :",
+		"Select the date time format of the instrument. Default value is: hh:mm:ss", generalSection));
 
 	return true;
 }
