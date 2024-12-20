@@ -67,6 +67,11 @@ void DeviceManager::addDevice(Device *d)
 
 QString DeviceManager::createDevice(QString category, QString param, bool async, QList<QString> plugins)
 {
+	for(Device *val : qAsConst(map)) {
+		if(val->param() == param) {
+			return "";
+		}
+	}
 	qInfo(CAT_DEVICEMANAGER) << category << "device with params" << param << "added";
 	Q_EMIT deviceAddStarted(param);
 
