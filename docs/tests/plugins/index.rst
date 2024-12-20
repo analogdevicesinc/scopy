@@ -14,6 +14,7 @@ Contents
 
    pqm/pqm_tests
    datalogger/datalogger_test
+   dac/dac_tests
 
 ..
  add the path to each plugin test case here
