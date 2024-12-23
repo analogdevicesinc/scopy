@@ -182,6 +182,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(dm, &DeviceManager::requestTool, m_toolMenuManager, &ToolMenuManager::showMenuItem);
 	connect(m_toolMenuManager, &ToolMenuManager::requestToolSelect, ts, &ToolStack::show);
 	connect(m_toolMenuManager, &ToolMenuManager::requestToolSelect, dtm, &DetachedToolWindowManager::show);
+	connect(m_toolMenuManager, &ToolMenuManager::toolStackChanged, browseMenu, &BrowseMenu::onToolStackChanged);
 	connect(hp, &ScopyHomePage::displayNameChanged, m_toolMenuManager, &ToolMenuManager::onDisplayNameChanged);
 
 	connect(hp, &ScopyHomePage::newDeviceAvailable, dm, &DeviceManager::addDevice);

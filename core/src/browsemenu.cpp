@@ -62,7 +62,8 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	homeBtn->setCheckable(true);
 	homeBtn->setIconSize(QSize(32, 32));
 	homeBtn->setStyleSheet("text-align: left");
-	connect(homeBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("home"); });
+	connect(homeBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool(HOME_ID); });
+	m_btnsMap[HOME_ID] = homeBtn;
 
 	QWidget *saveLoadWidget = new QWidget(m_content);
 	saveLoadWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -87,14 +88,16 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 						":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							"/icons/preferences.svg",
 						m_content);
-	connect(preferencesBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("preferences"); });
+	connect(preferencesBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool(PREFERENCES_ID); });
 	preferencesBtn->setCheckable(true);
+	m_btnsMap[PREFERENCES_ID] = preferencesBtn;
 
 	QPushButton *aboutBtn = createBtn(
 		"About", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/info.svg",
 		m_content);
-	connect(aboutBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("about"); });
+	connect(aboutBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool(ABOUT_ID); });
 	aboutBtn->setCheckable(true);
+	m_btnsMap[ABOUT_ID] = aboutBtn;
 
 	QLabel *logo = createScopyLogo(m_content);
 
@@ -120,6 +123,13 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 BrowseMenu::~BrowseMenu() {}
 
 ToolMenu *BrowseMenu::toolMenu() const { return m_toolMenu; }
+
+void BrowseMenu::onToolStackChanged(QString id)
+{
+	if(m_btnsMap.contains(id)) {
+		m_btnsMap[id]->setChecked(true);
+	}
+}
 
 void BrowseMenu::add(QWidget *w, QString name, MenuAlignment position)
 {

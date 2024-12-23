@@ -126,10 +126,6 @@ void ToolMenuItem::setName(QString str)
 	setText(m_name);
 }
 
-void ToolMenuItem::setSelected(bool en) { setDynamicProperty(this, "selected", en); }
-
-void ToolMenuItem::setDisabled(bool disabled) { setDisabled(disabled); }
-
 void ToolMenuItem::updateItem()
 {
 	ToolMenuEntry *tme = dynamic_cast<ToolMenuEntry *>(QObject::sender());
