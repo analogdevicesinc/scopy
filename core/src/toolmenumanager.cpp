@@ -161,6 +161,13 @@ void ToolMenuManager::updateTool(QWidget *old)
 	qDebug(CAT_TOOLMENUMANAGER) << "updating tool for " << tme->name() << " - " << id;
 }
 
+void ToolMenuManager::updateMenuAfterDetach(ToolMenuItem *toolMenuItem, QString id)
+{
+	if(id == toolMenuItem->getId()) {
+		toolMenuItem->setChecked(true);
+	}
+}
+
 void ToolMenuManager::updateToolAttached(bool oldAttach, ToolMenuItem *toolMenuItem)
 {
 	ToolMenuEntry *tme = dynamic_cast<ToolMenuEntry *>(QObject::sender());
@@ -192,14 +199,14 @@ void ToolMenuManager::updateToolAttached(bool oldAttach, ToolMenuItem *toolMenuI
 		// the selected tool just attached, so it will be at the top of the stack, therefore highlighted
 		if(toolMenuItem) {
 			toolMenuItem->setChecked(true);
-			toolMenuItem->setSelected(true);
 		}
 	} else {
-		// the top tool just detached, so we need to find the tool that is positioned at the new top of the
-		// stack.
-		if(toolMenuItem) {
-			toolMenuItem->toggle();
+		QWidget *wAfterDetach = m_ts->currentWidget();
+		if(!wAfterDetach) {
+			return;
 		}
+		QString toolMenuItemId = m_ts->getKey(wAfterDetach);
+		Q_EMIT toolStackChanged(toolMenuItemId);
 	}
 }
 
@@ -231,7 +238,7 @@ void ToolMenuManager::detachSuccesful(ToolMenuItem *toolMenuItem)
 {
 	QButtonGroup *menuBtnGroup = m_toolMenu->btnGroup();
 	if(toolMenuItem) {
-		toolMenuItem->setSelected(false);
+		toolMenuItem->setCheckable(false);
 		menuBtnGroup->removeButton(toolMenuItem);
 	}
 }
@@ -240,6 +247,7 @@ void ToolMenuManager::attachSuccesful(ToolMenuItem *toolMenuItem)
 {
 	QButtonGroup *menuBtnGroup = m_toolMenu->btnGroup();
 	if(toolMenuItem) {
+		toolMenuItem->setCheckable(true);
 		menuBtnGroup->addButton(toolMenuItem);
 	}
 }
@@ -250,14 +258,6 @@ void ToolMenuManager::showTool(ToolMenuItem *toolMenuItem)
 		toolMenuItem->setChecked(true);
 	}
 	Q_EMIT requestToolSelect(toolMenuItem->getId());
-}
-
-void ToolMenuManager::selectTool(ToolMenuItem *toolMenuItem, bool on)
-{
-	QButtonGroup *menuBtnGroup = m_toolMenu->btnGroup();
-	if(menuBtnGroup->id(toolMenuItem) != -1) {
-		toolMenuItem->setSelected(on);
-	}
 }
 
 void ToolMenuManager::setTmeAttached(ToolMenuEntry *tme)
@@ -296,9 +296,9 @@ ToolMenuItem *ToolMenuManager::createToolMenuItem(ToolMenuEntry *tme, QWidget *p
 	connect(toolMenuItem->getToolRunBtn(), &QPushButton::toggled, tme, &ToolMenuEntry::runToggled);
 	connect(toolMenuItem->getToolRunBtn(), &QPushButton::clicked, tme, &ToolMenuEntry::runClicked);
 	connect(toolMenuItem, &QPushButton::clicked, this, [=]() { Q_EMIT requestToolSelect(toolMenuItem->getId()); });
-	connect(toolMenuItem, &QPushButton::toggled, this,
-		[this, toolMenuItem](bool on) { selectTool(toolMenuItem, on); });
 	connect(toolMenuItem, &ToolMenuItem::doubleclick, this, [this, tme]() { setTmeAttached(tme); });
+	connect(this, &ToolMenuManager::toolStackChanged, this,
+		[this, toolMenuItem](QString id) { updateMenuAfterDetach(toolMenuItem, id); });
 	connect(tme, &ToolMenuEntry::updateToolEntry, toolMenuItem, &ToolMenuItem::updateItem);
 
 	return toolMenuItem;

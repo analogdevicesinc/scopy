@@ -46,6 +46,9 @@ public:
 
 	ToolMenu *toolMenu() const;
 
+public Q_SLOTS:
+	void onToolStackChanged(QString id);
+
 Q_SIGNALS:
 	void requestTool(QString tool);
 	void requestSave();
@@ -65,7 +68,12 @@ private:
 	QSpacerItem *m_spacer;
 	ToolMenu *m_toolMenu;
 	QPushButton *m_btnCollapse;
+	QMap<QString, QPushButton *> m_btnsMap;
 	bool m_collapsed;
+
+	const QString HOME_ID = "home";
+	const QString PREFERENCES_ID = "preferences";
+	const QString ABOUT_ID = "about";
 };
 } // namespace scopy
 
