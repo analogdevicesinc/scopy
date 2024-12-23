@@ -40,14 +40,12 @@ public:
 	bool eventFilter(QObject *watched, QEvent *event);
 
 	void setName(QString str);
-	void setSelected(bool en);
 
 	QString getId() const;
 Q_SIGNALS:
 	void doubleclick();
 
 public Q_SLOTS:
-	void setDisabled(bool disabled);
 	void updateItem();
 
 protected:
@@ -55,7 +53,6 @@ protected:
 	void leaveEvent(QEvent *event);
 
 private:
-	// QPushButton *m_toolBtn;
 	CustomPushButton *m_toolRunBtn;
 
 	QString m_uuid;
