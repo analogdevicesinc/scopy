@@ -55,9 +55,11 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void requestToolSelect(QString id);
+	void toolStackChanged(QString id);
 
 private Q_SLOTS:
 	void updateTool(QWidget *old);
+	void updateMenuAfterDetach(ToolMenuItem *toolMenuItem, QString id);
 	void updateToolAttached(bool oldAttach, ToolMenuItem *toolMenuItem);
 
 private:
@@ -66,7 +68,6 @@ private:
 	void detachSuccesful(ToolMenuItem *toolMenuItem);
 	void attachSuccesful(ToolMenuItem *toolMenuItem);
 	void showTool(ToolMenuItem *toolMenuItem);
-	void selectTool(ToolMenuItem *toolMenuItem, bool on);
 	void setTmeAttached(ToolMenuEntry *tme);
 	MenuSectionCollapseWidget *createMenuSectionItem(QString deviceName, QString uri = "");
 	ToolMenuItem *createToolMenuItem(ToolMenuEntry *tme, QWidget *parent = nullptr);
