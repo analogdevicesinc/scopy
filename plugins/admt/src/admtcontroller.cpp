@@ -171,6 +171,7 @@ int ADMTController::getChannelIndex(const char *deviceName, const char *channelN
 
 double ADMTController::getChannelValue(const char *deviceName, const char *channelName, int bufferSize)
 {
+    if(!m_iioCtx){ return static_cast<double>(UINT64_MAX); } // return QString("No context available.");
 	double value;
 
 	int deviceCount = iio_context_get_devices_count(m_iioCtx);
@@ -280,6 +281,7 @@ double ADMTController::getChannelValue(const char *deviceName, const char *chann
  * @return On error, -1 is returned. */
 int ADMTController::getDeviceAttributeValue(const char *deviceName, const char *attributeName, double *returnValue)
 {
+    if(!m_iioCtx) { return -1; }
     int result = -1;
     int deviceCount = iio_context_get_devices_count(m_iioCtx);
     if(deviceCount == 0) { return result; }
@@ -301,6 +303,7 @@ int ADMTController::getDeviceAttributeValue(const char *deviceName, const char *
  * @return On error, -1 is returned. */
 int ADMTController::setDeviceAttributeValue(const char *deviceName, const char *attributeName, double writeValue)
 {
+    if(!m_iioCtx) { return -1; }
     int result = -1;
     int deviceCount = iio_context_get_devices_count(m_iioCtx);
     if(deviceCount == 0) { return result; }
@@ -315,6 +318,7 @@ int ADMTController::setDeviceAttributeValue(const char *deviceName, const char *
 
 int ADMTController::writeDeviceRegistry(const char *deviceName, uint32_t address, uint32_t value)
 {
+    if(!m_iioCtx) { return -1; }
     int result = -1;
     int deviceCount = iio_context_get_devices_count(m_iioCtx);
     if(deviceCount == 0) { return result; }
@@ -327,6 +331,8 @@ int ADMTController::writeDeviceRegistry(const char *deviceName, uint32_t address
 
 int ADMTController::readDeviceRegistry(const char *deviceName, uint32_t address, uint32_t *returnValue)
 {
+    if(!m_iioCtx) { return -1; }
+    if(address == UINT32_MAX) { return -1; }
     int result = -1;
     int deviceCount = iio_context_get_devices_count(m_iioCtx);
     if(deviceCount == 0) { return result; }
@@ -1368,6 +1374,145 @@ map<string, string> ADMTController::getUNIQID3RegisterMapping(uint16_t registerV
             result["Revision ID"] = "Unknown";
             break;
     }
+
+    return result;
+}
+
+map<string, double> ADMTController::getSineRegisterBitMapping(uint16_t registerValue) {
+    map<string, double> result;
+
+    // Bit 0 - Extract the status
+    result["Status"] = (registerValue & 0x01) ? 1.0 : 0.0;
+
+    // Bit 1 - Reserved (ignore)
+
+    // Bits 15:2 - Extract the sine value
+    int16_t sineValueRaw = (registerValue >> 2); // Shift right by 2 to discard Bits [1:0]
+
+    // Check if the value is negative (2's complement format)
+    if (sineValueRaw & 0x2000) {
+        sineValueRaw |= 0xC000;
+    }
+
+    // Convert the raw uncorrected sine value to a double
+    result["SINE"] = static_cast<double>(sineValueRaw);
+
+    return result;
+}
+
+map<string, double> ADMTController::getCosineRegisterBitMapping(uint16_t registerValue) {
+    map<string, double> result;
+
+    // Bit 0 - Extract the status
+    result["Status"] = (registerValue & 0x01) ? 1.0 : 0.0;
+
+    // Bit 1 - Reserved (ignore)
+
+    // Bits 15:2 - Extract the cosine value
+    int16_t cosineValueRaw = (registerValue >> 2); // Shift right by 2 to discard Bits [1:0]
+
+    // Check if the value is negative (2's complement format)
+    if (cosineValueRaw & 0x2000) {
+        cosineValueRaw |= 0xC000;
+    }
+
+    // Convert the raw uncorrected cosine value to a double
+    result["COSINE"] = static_cast<double>(cosineValueRaw);
+
+    return result;
+}
+
+map<string, double> ADMTController::getRadiusRegisterBitMapping(uint16_t registerValue) {
+    map<string, double> result;
+
+    // Bit 0 - Extract the STATUS
+    result["Status"] = (registerValue & 0x01) ? 1.0 : 0.0;
+
+    // Bits 15:1 - Extract the RADIUS value 
+    uint16_t radiusRaw = (registerValue >> 1); // Shift right by 1 to discard Bit 0
+
+    // Apply the resolution to convert the raw value
+    constexpr double resolution = 0.000924; // mV/V
+    result["RADIUS"] = static_cast<double>(radiusRaw) * resolution;
+
+    return result;
+}
+
+map<string, double> ADMTController::getAngleSecRegisterBitMapping(uint16_t registerValue) {
+    map<string, double> result;
+
+    // Bit 0 - Extract the STATUS
+    result["Status"] = (registerValue & 0x01) ? 1.0 : 0.0;
+
+    // Bits 15:4 - Extract the ANGLESEC value
+    uint16_t angleSecRaw = (registerValue >> 4); // Right-shift by 4 to discard Bits [3:0]
+
+    // Calculate the actual angle using the given resolution (360° / 4096)
+    constexpr double resolution = 360.0 / 4096.0; // 0.087890625 degrees per LSB
+    result["ANGLESEC"] = angleSecRaw * resolution;
+
+    return result;
+}
+
+map<string, double> ADMTController::getSecAnglQRegisterBitMapping(uint16_t registerValue) {
+    map<string, double> result;
+
+    // Bit 0 - Extract the STATUS
+    result["Status"] = (registerValue & 0x01) ? 1.0 : 0.0;
+
+    // Bits 15:2 - Extract the SECANGLQ raw value
+    int16_t secAnglQRaw = static_cast<int16_t>((registerValue & 0xFFFC) >> 2); // Mask Bits [1:0] and shift right by 2
+
+    // Convert the 2's complement raw value to the actual signed value
+    if (secAnglQRaw & 0x2000) { // Check the sign bit (Bit 13)
+        secAnglQRaw |= 0xC000; // Sign extend to preserve the 16-bit signed value
+    }
+
+    // Store the SECANGLQ raw uncorrected value
+    result["SECANGLQ"] = static_cast<double>(secAnglQRaw);
+
+    return result;
+}
+
+map<string, double> ADMTController::getSecAnglIRegisterBitMapping(uint16_t registerValue) {
+    map<string, double> result;
+
+    // Bit 0 - Extract the STATUS bit
+    result["Status"] = (registerValue & 0x01) ? 1.0 : 0.0;
+
+    // Bits 15:2 - Extract the SECANGLI raw value
+    int16_t secAnglIRaw = static_cast<int16_t>((registerValue & 0xFFFC) >> 2); // Mask Bits [1:0] and shift right by 2
+
+    // Convert the 2's complement raw value to the actual signed value
+    if (secAnglIRaw & 0x2000) { // Check the sign bit (Bit 13)
+        secAnglIRaw |= 0xC000; // Sign extend to preserve the 16-bit signed value
+    }
+
+    // Store the SECANGLI raw value (optional, for debugging or diagnostic purposes)
+    result["SECANGLI"] = static_cast<double>(secAnglIRaw);
+
+    return result;
+}
+
+map<string, double> ADMTController::getTmp1RegisterBitMapping(uint16_t registerValue, bool is5V) {
+    map<string, double> result;
+
+    // Bits 15:4 - Extract the TMP1 raw value
+    uint16_t tmp1Raw = (registerValue & 0xFFF0) >> 4;
+
+    // Store the raw TMP1 value (for diagnostics)
+    result["TMP1Raw"] = static_cast<double>(tmp1Raw);
+
+    // Calculate TMP1 temperature in degrees Celsius based on VDD
+    double tmp1DegC = 0.0;
+    if (is5V == true) {
+        tmp1DegC = (tmp1Raw - 1238.0) / 13.45;
+    } else {
+        tmp1DegC = (tmp1Raw - 1208.0) / 13.61;
+    }
+
+    // Store the calculated temperature in degrees Celsius
+    result["TMP1"] = tmp1DegC;
 
     return result;
 }

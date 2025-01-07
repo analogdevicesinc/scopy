@@ -204,6 +204,13 @@ public:
     uint16_t setDIGIORegisterBitMapping(uint16_t currentRegisterValue, map<string, bool> settings);
     void unwrapAngles(vector<double>& angles_rad); 
     map<string, string> getUNIQID3RegisterMapping(uint16_t registerValue);
+    map<string, double> getSineRegisterBitMapping(uint16_t registerValue);
+    map<string, double> getCosineRegisterBitMapping(uint16_t registerValue);
+    map<string, double> getRadiusRegisterBitMapping(uint16_t registerValue);
+    map<string, double> getAngleSecRegisterBitMapping(uint16_t registerValue);
+    map<string, double> getSecAnglQRegisterBitMapping(uint16_t registerValue);
+    map<string, double> getSecAnglIRegisterBitMapping(uint16_t registerValue);
+    map<string, double> getTmp1RegisterBitMapping(uint16_t registerValue, bool is5V);
 private:
     iio_context *m_iioCtx;
     iio_buffer *m_iioBuffer;
