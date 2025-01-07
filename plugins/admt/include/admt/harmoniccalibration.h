@@ -161,6 +161,8 @@ private:
 			 *correctedErrorXPlotAxis, *correctedErrorYPlotAxis, *FFTCorrectedErrorXPlotAxis, *FFTCorrectedErrorYPlotAxis,
 			 *postCalibrationRawDataXPlotAxis, *postCalibrationRawDataYPlotAxis;
 	PlotChannel *acquisitionAnglePlotChannel, *acquisitionABSAnglePlotChannel, *acquisitionTurnCountPlotChannel, *acquisitionTmp0PlotChannel,
+				*acquisitionTmp1PlotChannel, *acquisitionSinePlotChannel, *acquisitionCosinePlotChannel, *acquisitionRadiusPlotChannel, 
+				*acquisitionSecAnglQPlotChannel, *acquisitionSecAnglIPlotChannel,
 	 			*angleErrorPlotChannel, *preCalibrationFFTPhasePlotChannel, *calibrationRawDataPlotChannel, *calibrationSineDataPlotChannel, *calibrationCosineDataPlotChannel,
 				*FFTAngleErrorMagnitudeChannel, *FFTAngleErrorPhaseChannel,
 				*correctedErrorPlotChannel,
@@ -186,7 +188,7 @@ private:
 
 	RegisterBlockWidget *cnvPageRegisterBlock, *digIORegisterBlock, *faultRegisterBlock, *generalRegisterBlock, *digIOEnRegisterBlock, *angleCkRegisterBlock, *eccDcdeRegisterBlock, *eccDisRegisterBlock, *absAngleRegisterBlock, *angleRegisterBlock, *angleSecRegisterBlock, *sineRegisterBlock, *cosineRegisterBlock, *secAnglIRegisterBlock, *secAnglQRegisterBlock, *radiusRegisterBlock, *diag1RegisterBlock, *diag2RegisterBlock, *tmp0RegisterBlock, *tmp1RegisterBlock, *cnvCntRegisterBlock, *uniqID0RegisterBlock, *uniqID1RegisterBlock, *uniqID2RegisterBlock, *uniqID3RegisterBlock, *h1MagRegisterBlock, *h1PhRegisterBlock, *h2MagRegisterBlock, *h2PhRegisterBlock, *h3MagRegisterBlock, *h3PhRegisterBlock, *h8MagRegisterBlock, *h8PhRegisterBlock;
 
-	void updateChannelValues();
+	bool updateChannelValues();
 	void updateLineEditValues();
 	void updateGeneralSettingEnabled(bool value);
 	void connectLineEditToNumber(QLineEdit* lineEdit, int& variable, int min, int max);
@@ -198,7 +200,7 @@ private:
 	ToolTemplate* createUtilityWidget();
 	void updateLabelValue(QLabel* label, int channelIndex);
 	void updateLabelValue(QLabel *label, ADMTController::MotorAttribute attribute);
-	void updateChannelValue(int channelIndex);
+	bool updateChannelValue(int channelIndex);
 	void extractCalibrationData();
 	void importCalibrationData();
 	void calibrationLogWrite(QString message = "");
@@ -208,7 +210,7 @@ private:
 	void applyTextStyle(QWidget *widget, const QString& styleHelperColor = "CH0", bool isBold = false);
 	void applyLabelStyle(QLabel *widget);
 	void initializeMotor();
-	void moveMotorToPosition(double& position, bool validate = true);
+	bool moveMotorToPosition(double& position, bool validate = true);
 	void resetAllCalibrationState();
 	void connectLineEditToRPSConversion(QLineEdit* lineEdit, double& vmax);
 	void connectLineEditToNumberWrite(QLineEdit* lineEdit, double& variable, ADMTController::MotorAttribute attribute);
@@ -257,7 +259,7 @@ private:
 	void toggleMTDiagnostics(int mode);
 	void toggleSequenceModeRegisters(int mode);
 	void readAllRegisters();
-	void prependAcquisitionData(double& data, QVector<double>& list);
+	void prependAcquisitionData(const double& data, QVector<double>& list);
 	void plotAcquisition(QVector<double>& list, PlotChannel* channel);
 	void populateAngleErrorGraphs();
 	void populateCorrectedAngleErrorGraphs();
@@ -275,6 +277,7 @@ private:
 	void connectLineEditToDouble(QLineEdit* lineEdit, double& variable);
 	void updateLineEditValue(QLineEdit* lineEdit, double value);
 	void toggleTabSwitching(bool value);
+	double getAcquisitionParameterValue(const AcquisitionDataKey &key);
 
 	QTimer *acquisitionUITimer, *calibrationUITimer, *utilityTimer;
 
