@@ -17,6 +17,29 @@ ADMTStyleHelper *ADMTStyleHelper::GetInstance()
 
 ADMTStyleHelper::~ADMTStyleHelper() {}
 
+void ADMTStyleHelper::initColorMap()
+{
+	auto sh = ADMTStyleHelper::GetInstance();
+	sh->colorMap.insert("CH0", "#FF7200");
+	sh->colorMap.insert("CH1", "#9013FE");
+	sh->colorMap.insert("CH2", "#27B34F");
+	sh->colorMap.insert("CH3", "#F8E71C");
+	sh->colorMap.insert("CH4", "#4A64FF");
+	sh->colorMap.insert("CH5", "#02BCD4");
+	sh->colorMap.insert("CH6", "#F44336");
+	sh->colorMap.insert("CH7", "#F5A623");
+	sh->colorMap.insert("CH8", "#1981AE");
+	sh->colorMap.insert("CH9", "#6FCEA6");
+	sh->colorMap.insert("CH10", "#F7A1DA");
+	sh->colorMap.insert("CH11", "#E3F5FC");
+}
+
+QString ADMTStyleHelper::getColor(QString id)
+{
+	auto sh = ADMTStyleHelper::GetInstance();
+	return sh->colorMap[id];
+}
+
 void ADMTStyleHelper::TopContainerButtonStyle(QPushButton *btn, QString objectName)
 {
     if(!objectName.isEmpty())

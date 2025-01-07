@@ -44,7 +44,8 @@ static uint32_t h8PhaseDeviceRegister = 0x1C;
 
 static int acquisitionDisplayLength = 200;
 static QVector<double> acquisitionAngleList, acquisitionABSAngleList, acquisitionTurnCountList, acquisitionTmp0List,
-						graphDataList, graphPostDataList;
+					   acquisitionTmp1List, acquisitionSineList, acquisitionCosineList, acquisitionRadiusList,
+					   graphDataList, graphPostDataList;
 
 static const QColor scopyBlueColor = scopy::StyleHelper::getColor("ScopyBlue");
 static const QColor sineColor = QColor("#85e94c");
@@ -58,6 +59,10 @@ static const QPen channel0Pen(scopy::StyleHelper::getColor("CH0"));
 static const QPen channel1Pen(scopy::StyleHelper::getColor("CH1"));
 static const QPen channel2Pen(scopy::StyleHelper::getColor("CH2"));
 static const QPen channel3Pen(scopy::StyleHelper::getColor("CH3"));
+static const QPen channel4Pen(scopy::StyleHelper::getColor("CH4"));
+static const QPen channel5Pen(scopy::StyleHelper::getColor("CH5"));
+static const QPen channel6Pen(scopy::StyleHelper::getColor("CH6"));
+static const QPen channel7Pen(scopy::StyleHelper::getColor("CH7"));
 static const QPen sinePen(sineColor);
 static const QPen cosinePen(cosineColor);
 
@@ -69,6 +74,9 @@ static bool is5V = false;
 
 static double H1_MAG_ANGLE, H2_MAG_ANGLE, H3_MAG_ANGLE, H8_MAG_ANGLE, H1_PHASE_ANGLE, H2_PHASE_ANGLE, H3_PHASE_ANGLE, H8_PHASE_ANGLE;
 static uint32_t H1_MAG_HEX, H2_MAG_HEX, H3_MAG_HEX, H8_MAG_HEX, H1_PHASE_HEX, H2_PHASE_HEX, H3_PHASE_HEX, H8_PHASE_HEX;
+
+static int acquisitionGraphYMin = 0;
+static int acquisitionGraphYMax = 360;
 
 static std::map<AcquisitionDataKey, bool> acquisitionDataMap = {
     {RADIUS, false},
@@ -97,7 +105,9 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	, isDebug(isDebug)
 	, m_admtController(m_admtController)
 {
+	ADMTStyleHelper::GetInstance()->initColorMap();
 	readDeviceProperties();
+	readSequence();
 	initializeMotor();
 
 	rotationChannelName = m_admtController->getChannelId(ADMTController::Channel::ROTATION);
@@ -256,15 +266,33 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	acquisitionABSAnglePlotChannel = new PlotChannel("ABS Angle", channel1Pen, acquisitionXPlotAxis, acquisitionYPlotAxis);
 	acquisitionTurnCountPlotChannel = new PlotChannel("Turn Count", channel2Pen, acquisitionXPlotAxis, acquisitionYPlotAxis);
 	acquisitionTmp0PlotChannel = new PlotChannel("TMP 0", channel3Pen, acquisitionXPlotAxis, acquisitionYPlotAxis);
+	acquisitionTmp1PlotChannel = new PlotChannel("TMP 1", channel4Pen, acquisitionXPlotAxis, acquisitionYPlotAxis);
+	acquisitionSinePlotChannel = new PlotChannel("Sine", sinePen, acquisitionXPlotAxis, acquisitionYPlotAxis);
+	acquisitionCosinePlotChannel = new PlotChannel("Cosine", cosinePen, acquisitionXPlotAxis, acquisitionYPlotAxis);
+	acquisitionRadiusPlotChannel = new PlotChannel("Radius", channel5Pen, acquisitionXPlotAxis, acquisitionYPlotAxis);
+	acquisitionSecAnglQPlotChannel = new PlotChannel("SECANGLQ", channel6Pen, acquisitionXPlotAxis, acquisitionYPlotAxis);
+	acquisitionSecAnglIPlotChannel = new PlotChannel("SECANGLI", channel7Pen, acquisitionXPlotAxis, acquisitionYPlotAxis);
 
 	acquisitionGraphPlotWidget->addPlotChannel(acquisitionAnglePlotChannel);
 	acquisitionGraphPlotWidget->addPlotChannel(acquisitionABSAnglePlotChannel);
 	acquisitionGraphPlotWidget->addPlotChannel(acquisitionTurnCountPlotChannel);
 	acquisitionGraphPlotWidget->addPlotChannel(acquisitionTmp0PlotChannel);
+	acquisitionGraphPlotWidget->addPlotChannel(acquisitionTmp1PlotChannel);
+	acquisitionGraphPlotWidget->addPlotChannel(acquisitionSinePlotChannel);
+	acquisitionGraphPlotWidget->addPlotChannel(acquisitionCosinePlotChannel);
+	acquisitionGraphPlotWidget->addPlotChannel(acquisitionRadiusPlotChannel);
+	acquisitionGraphPlotWidget->addPlotChannel(acquisitionSecAnglQPlotChannel);
+	acquisitionGraphPlotWidget->addPlotChannel(acquisitionSecAnglIPlotChannel);
 	acquisitionAnglePlotChannel->setEnabled(true);
 	acquisitionABSAnglePlotChannel->setEnabled(true);
 	acquisitionTurnCountPlotChannel->setEnabled(true);
 	acquisitionTmp0PlotChannel->setEnabled(true);
+	acquisitionTmp1PlotChannel->setEnabled(true);
+	acquisitionSinePlotChannel->setEnabled(true);
+	acquisitionCosinePlotChannel->setEnabled(true);
+	acquisitionRadiusPlotChannel->setEnabled(true);
+	acquisitionSecAnglQPlotChannel->setEnabled(true);
+	acquisitionSecAnglIPlotChannel->setEnabled(true);
 	acquisitionGraphPlotWidget->selectChannel(acquisitionAnglePlotChannel);
 
 	acquisitionGraphPlotWidget->replot();
@@ -285,18 +313,45 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	ADMTStyleHelper::ColoredSquareCheckbox(absAngleCheckBox, channel1Pen.color());
 	connectCheckBoxToAcquisitionGraph(absAngleCheckBox, acquisitionABSAnglePlotChannel, ABSANGLE);
 
-	QCheckBox *countCheckBox = new QCheckBox("Count", acquisitionGraphChannelWidget);
-	ADMTStyleHelper::ColoredSquareCheckbox(countCheckBox, channel2Pen.color());
-	connectCheckBoxToAcquisitionGraph(countCheckBox, acquisitionTurnCountPlotChannel, TURNCOUNT);
+	// QCheckBox *countCheckBox = new QCheckBox("Count", acquisitionGraphChannelWidget);
+	// ADMTStyleHelper::ColoredSquareCheckbox(countCheckBox, channel2Pen.color());
+	// connectCheckBoxToAcquisitionGraph(countCheckBox, acquisitionTurnCountPlotChannel, TURNCOUNT);
 
 	QCheckBox *temp0CheckBox = new QCheckBox("Temp 0", acquisitionGraphChannelWidget);
 	ADMTStyleHelper::ColoredSquareCheckbox(temp0CheckBox, channel3Pen.color());
 	connectCheckBoxToAcquisitionGraph(temp0CheckBox, acquisitionTmp0PlotChannel, TMP0);
 
-	acquisitionGraphChannelGridLayout->addWidget(angleCheckBox, 0, 0);
-	acquisitionGraphChannelGridLayout->addWidget(absAngleCheckBox, 0, 1);
-	acquisitionGraphChannelGridLayout->addWidget(countCheckBox, 0, 2);
-	acquisitionGraphChannelGridLayout->addWidget(temp0CheckBox, 0, 3);
+	QCheckBox *sineCheckBox = new QCheckBox("Sine", acquisitionGraphChannelWidget);
+	ADMTStyleHelper::ColoredSquareCheckbox(sineCheckBox, sineColor);
+	connectCheckBoxToAcquisitionGraph(sineCheckBox, acquisitionSinePlotChannel, SINE);
+
+	QCheckBox *cosineCheckBox = new QCheckBox("Cosine", acquisitionGraphChannelWidget);
+	ADMTStyleHelper::ColoredSquareCheckbox(cosineCheckBox, cosineColor);
+	connectCheckBoxToAcquisitionGraph(cosineCheckBox, acquisitionCosinePlotChannel, COSINE);
+
+	QCheckBox *radiusCheckBox = new QCheckBox("Radius", acquisitionGraphChannelWidget);
+	ADMTStyleHelper::ColoredSquareCheckbox(radiusCheckBox, channel5Pen.color());
+	connectCheckBoxToAcquisitionGraph(radiusCheckBox, acquisitionRadiusPlotChannel, RADIUS);
+
+	if(generalRegisterMap.at("Sequence Type") == 0) // Sequence Mode 1
+	{
+		acquisitionGraphChannelGridLayout->addWidget(angleCheckBox, 0, 0);
+		acquisitionGraphChannelGridLayout->addWidget(sineCheckBox, 0, 1);
+		acquisitionGraphChannelGridLayout->addWidget(cosineCheckBox, 0, 2);
+		acquisitionGraphChannelGridLayout->addWidget(radiusCheckBox, 0, 3);
+		acquisitionGraphChannelGridLayout->addWidget(absAngleCheckBox, 1, 0);
+		acquisitionGraphChannelGridLayout->addWidget(temp0CheckBox, 1, 1);
+	}
+	else if(generalRegisterMap.at("Sequence Type") == 1) // Sequence Mode 2
+	{
+		acquisitionGraphChannelGridLayout->addWidget(angleCheckBox, 0, 0);
+		acquisitionGraphChannelGridLayout->addWidget(sineCheckBox, 0, 1);
+		acquisitionGraphChannelGridLayout->addWidget(cosineCheckBox, 0, 2);
+		acquisitionGraphChannelGridLayout->addWidget(radiusCheckBox, 0, 3);
+		acquisitionGraphChannelGridLayout->addWidget(absAngleCheckBox, 1, 0);
+		acquisitionGraphChannelGridLayout->addWidget(temp0CheckBox, 1, 1);
+	}
+	// acquisitionGraphChannelGridLayout->addWidget(countCheckBox, 0, 2);
 	#pragma endregion
 
 	acquisitionGraphCollapseSection->contentLayout()->addWidget(acquisitionGraphPlotWidget);
@@ -384,7 +439,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	eighthHarmonicComboBox->addItem("ADI Factory Values", QVariant(0));
 	ADMTStyleHelper::ComboBoxStyle(eighthHarmonicComboBox);
 
-	readSequence();
+	updateSequenceWidget();
 
 	applySequenceButton = new QPushButton("Apply", sequenceSection);
 	StyleHelper::BlueButton(applySequenceButton, "applySequenceButton");
@@ -499,7 +554,7 @@ void HarmonicCalibration::getAcquisitionSamples()
 {
 	while(isStartAcquisition)
 	{
-		updateChannelValues();
+		if(!updateChannelValues()) { break; }
 
 		if(acquisitionDataMap.at(ANGLE)) prependAcquisitionData(angle, acquisitionAngleList);
 		else if(acquisitionDataMap.at(ANGLE) == false && acquisitionAngleList.size() > 0) acquisitionAngleList.clear();
@@ -513,11 +568,58 @@ void HarmonicCalibration::getAcquisitionSamples()
 		if(acquisitionDataMap.at(TMP0)) prependAcquisitionData(temp, acquisitionTmp0List);
 		else if(acquisitionDataMap.at(TMP0) == false && acquisitionTmp0List.size() > 0) acquisitionTmp0List.clear();
 
+		if(acquisitionDataMap.at(SINE)) prependAcquisitionData(getAcquisitionParameterValue(SINE), acquisitionSineList);
+		else if(acquisitionDataMap.at(SINE) == false && acquisitionSineList.size() > 0) acquisitionSineList.clear();
+
+		if(acquisitionDataMap.at(COSINE)) prependAcquisitionData(getAcquisitionParameterValue(COSINE), acquisitionCosineList);
+		else if(acquisitionDataMap.at(COSINE) == false && acquisitionCosineList.size() > 0) acquisitionCosineList.clear();
+
+		if(acquisitionDataMap.at(RADIUS)) prependAcquisitionData(getAcquisitionParameterValue(RADIUS), acquisitionRadiusList);
+		else if(acquisitionDataMap.at(RADIUS) == false && acquisitionRadiusList.size() > 0) acquisitionRadiusList.clear();
+
 		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
 	}
 }
 
-void HarmonicCalibration::prependAcquisitionData(double& data, QVector<double>& list)
+double HarmonicCalibration::getAcquisitionParameterValue(const AcquisitionDataKey &key)
+{
+	uint32_t *readValue = new uint32_t;
+	switch(key)
+	{
+		case SINE:
+		{
+			if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+				m_admtController->getSensorRegister(ADMTController::SensorRegister::SINE),
+				readValue) == -1) return qQNaN();
+			map<string, double> sineRegisterMap = m_admtController->getSineRegisterBitMapping(static_cast<uint16_t>(*readValue));
+			return sineRegisterMap.at("SINE");
+			break;
+		}
+		case COSINE:
+		{
+			if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+				m_admtController->getSensorRegister(ADMTController::SensorRegister::COSINE),
+				readValue) == -1) return qQNaN();
+			map<string, double> cosineRegisterMap = m_admtController->getCosineRegisterBitMapping(static_cast<uint16_t>(*readValue));
+			return cosineRegisterMap.at("COSINE");
+			break;
+		}
+		case RADIUS:
+		{
+			if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+				m_admtController->getSensorRegister(ADMTController::SensorRegister::RADIUS),
+				readValue) == -1) return qQNaN();
+			map<string, double> radiusRegisterMap = m_admtController->getRadiusRegisterBitMapping(static_cast<uint16_t>(*readValue));
+			return radiusRegisterMap.at("RADIUS");
+			break;
+		}
+		default: 
+			return qQNaN();
+			break;
+	}
+}
+
+void HarmonicCalibration::prependAcquisitionData(const double& data, QVector<double>& list)
 {
 	list.prepend(data);
 }
@@ -530,6 +632,9 @@ void HarmonicCalibration::prependNullAcquisitionData(QVector<double>& list)
 void HarmonicCalibration::plotAcquisition(QVector<double>& list, PlotChannel* channel)
 {
 	channel->curve()->setSamples(list);
+	auto result = std::minmax_element(list.begin(), list.end());
+	if(*result.first < acquisitionGraphYMin) acquisitionGraphYMin = *result.first;
+	if(*result.second > acquisitionGraphYMax) acquisitionGraphYMax = *result.second;
 }
 
 void HarmonicCalibration::initializeMotor()
@@ -2192,7 +2297,14 @@ void HarmonicCalibration::acquisitionUITask()
 		plotAcquisition(acquisitionTurnCountList, acquisitionTurnCountPlotChannel);
 	if(acquisitionDataMap.at(TMP0))
 		plotAcquisition(acquisitionTmp0List, acquisitionTmp0PlotChannel);
+	if(acquisitionDataMap.at(SINE))
+		plotAcquisition(acquisitionSineList, acquisitionSinePlotChannel);
+	if(acquisitionDataMap.at(COSINE))
+		plotAcquisition(acquisitionCosineList, acquisitionCosinePlotChannel);
+	if(acquisitionDataMap.at(RADIUS))
+		plotAcquisition(acquisitionRadiusList, acquisitionRadiusPlotChannel);
 
+	acquisitionYPlotAxis->setInterval(acquisitionGraphYMin, acquisitionGraphYMax);
 	acquisitionGraphPlotWidget->replot();
 	updateLineEditValues();
 	updateLineEditValue(acquisitionMotorCurrentPositionLineEdit, current_pos);
@@ -2258,8 +2370,6 @@ bool HarmonicCalibration::readSequence(){
 		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress, generalRegValue) != -1){
 			if(*generalRegValue != UINT32_MAX){
 				generalRegisterMap = m_admtController->getGeneralRegisterBitMapping(static_cast<uint16_t>(*generalRegValue));
-
-				updateSequenceWidget();
 				success = true;
 			}
 		}
@@ -2526,11 +2636,17 @@ void HarmonicCalibration::clearCommandLog(){
 	commandLogPlainTextEdit->clear();
 }
 
-void HarmonicCalibration::updateChannelValues(){
+bool HarmonicCalibration::updateChannelValues(){
+	bool success = false;
 	rotation = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), rotationChannelName, bufferSize);
+	if(rotation == static_cast<double>(UINT64_MAX)) { return false; }
 	angle = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), angleChannelName, bufferSize);
+	if(angle == static_cast<double>(UINT64_MAX)) { return false; }
 	updateCountValue();
+	if(count == static_cast<double>(UINT64_MAX)) { return false; }
 	temp = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), temperatureChannelName, bufferSize);
+	if(temp == static_cast<double>(UINT64_MAX)) { return false; }
+	return success = true;
 }
 
 void HarmonicCalibration::updateCountValue(){
@@ -2816,23 +2932,29 @@ void HarmonicCalibration::updateLabelValue(QLabel* label, int channelIndex)
 	}
 }
 
-void HarmonicCalibration::updateChannelValue(int channelIndex)
+bool HarmonicCalibration::updateChannelValue(int channelIndex)
 {
+	bool success = false;
 	switch(channelIndex)
 	{
 		case ADMTController::Channel::ROTATION:
 			rotation = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), rotationChannelName, 1);
+			if(rotation == static_cast<double>(UINT64_MAX)) { success = false; }
 			break;
 		case ADMTController::Channel::ANGLE:
 			angle = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), angleChannelName, 1);
+			if(angle == static_cast<double>(UINT64_MAX)) { success = false; }
 			break;
 		case ADMTController::Channel::COUNT:
 			count = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), countChannelName, 1);
+			if(count == static_cast<double>(UINT64_MAX)) { success = false; }
 			break;
 		case ADMTController::Channel::TEMPERATURE:
 			temp = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), temperatureChannelName, 1);
+			if(temp == static_cast<double>(UINT64_MAX)) { success = false; }
 			break;
 	}
+	return success;
 }
 
 int HarmonicCalibration::readMotorAttributeValue(ADMTController::MotorAttribute attribute, double& value)
@@ -2923,8 +3045,8 @@ void HarmonicCalibration::getCalibrationSamples()
 		int currentSamplesCount = graphDataList.size();
 		while(isStartMotor && currentSamplesCount < totalSamplesCount){
 			target_pos = current_pos + -408;
-			moveMotorToPosition(target_pos, true);
-			updateChannelValue(ADMTController::Channel::ANGLE);
+			if(moveMotorToPosition(target_pos, true) == false) { m_admtController->disconnectADMT(); }
+			if(updateChannelValue(ADMTController::Channel::ANGLE)) { break; }
 			graphDataList.append(angle);
 			currentSamplesCount++;
 		}
@@ -3366,15 +3488,23 @@ void HarmonicCalibration::computeSineCosineOfAngles(QVector<double> graphDataLis
 	}
 }
 
-void HarmonicCalibration::moveMotorToPosition(double& position, bool validate)
+bool HarmonicCalibration::moveMotorToPosition(double& position, bool validate)
 {
-	writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, position);
-	if(validate){
-		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
-		while(target_pos != current_pos) {
-			readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+	bool success = false;
+	bool canRead = true;
+	if(writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, position) == 0){
+		if(validate){
+			if(readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) == 0)
+			{
+				while(target_pos != current_pos && canRead) {
+					canRead = readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) == 0 ? true : false;
+				}
+				if(canRead)	success = true;
+			}
 		}
 	}
+
+	return success;
 }
 
 void HarmonicCalibration::startMotorContinuous()
