@@ -29,6 +29,7 @@
 #include <QtMath>
 #include <QIntValidator>
 #include <QDoubleValidator>
+#include <QThread>
 
 #include <iio.h>
 #include <iioutil/connectionprovider.h>
@@ -254,8 +255,9 @@ private:
 	void updateSequenceWidget();
 	void toggleFaultRegisterMode(int mode);
 	void startAcquisition();
-	void getAcquisitionSamples();
-	void acquisitionUITask();
+	void getAcquisitionSamples(int sampleRate);
+	void acquisitionUITask(int sampleRate);
+	void acquisitionPlotTask(int sampleRate);
 	void toggleMTDiagnostics(int mode);
 	void toggleSequenceModeRegisters(int mode);
 	void readAllRegisters();
@@ -278,6 +280,7 @@ private:
 	void updateLineEditValue(QLineEdit* lineEdit, double value);
 	void toggleTabSwitching(bool value);
 	double getAcquisitionParameterValue(const AcquisitionDataKey &key);
+	void resetYAxisScale();
 
 	QTimer *acquisitionUITimer, *calibrationUITimer, *utilityTimer;
 
