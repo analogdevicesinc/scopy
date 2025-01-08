@@ -45,10 +45,10 @@ Application Specific plugins
     * :ref:`Faults <faults>`
 
 * PQM
-    * :ref:`RMS <rms>`
-    * :ref:`Harmonics <harmonics>`
-    * :ref:`Waveform <waveform>`
-    * :ref:`Settings <settings>`
+    * :ref:`RMS <pqm-rms>`
+    * :ref:`Harmonics <pqm-harmonics>`
+    * :ref:`Waveform <pqm-waveform>`
+    * :ref:`Settings <pqm-settings>`
 
 
 Each plugin:
