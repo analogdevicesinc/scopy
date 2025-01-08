@@ -10,6 +10,12 @@ Contents
    :includehidden:
    :maxdepth: 3
 
+   core/hp_tests
+   core/add_dev_tests
+   core/connection_tests
+   core/emu_tests
+   core/dev_tests
+
 ..
  add the path to each core feature test case here
  example core/homepage_tests
