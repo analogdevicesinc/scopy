@@ -8,6 +8,7 @@
 static int acquisitionUITimerRate = 50;
 static int calibrationUITimerRate = 300;
 static int utilityTimerRate = 1000;
+static int acquisitionSampleRate = 16; // In ms
 
 static int bufferSize = 1;
 static int dataGraphSamples = 100;
@@ -396,10 +397,15 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 
 	connectLineEditToNumber(displayLengthLineEdit, acquisitionDisplayLength, 1, 2048);
 
+	QPushButton *resetYAxisButton = new QPushButton("Reset Y-Axis Scale", generalSection);
+	StyleHelper::BlueButton(resetYAxisButton, "resetYAxisButton");
+	connect(resetYAxisButton, &QPushButton::clicked, this, &HarmonicCalibration::resetYAxisScale);
+
 	generalSection->contentLayout()->addWidget(graphUpdateIntervalLabel);
 	generalSection->contentLayout()->addWidget(graphUpdateIntervalLineEdit);
 	generalSection->contentLayout()->addWidget(displayLengthLabel);
 	generalSection->contentLayout()->addWidget(displayLengthLineEdit);
+	generalSection->contentLayout()->addWidget(resetYAxisButton);
 
 	MenuSectionWidget *sequenceWidget = new MenuSectionWidget(generalSettingWidget);
 	MenuCollapseSection *sequenceSection = new MenuCollapseSection("Sequence", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, sequenceWidget);
@@ -452,6 +458,26 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	sequenceSection->contentLayout()->addWidget(eighthHarmonicMenuCombo);
 	sequenceSection->contentLayout()->addWidget(applySequenceButton);
 
+	#pragma region Device Status Widget
+	MenuSectionWidget *acquisitionDeviceStatusWidget = new MenuSectionWidget(generalSettingWidget);
+	acquisitionDeviceStatusWidget->contentLayout()->setSpacing(8);
+	MenuCollapseSection *acquisitionDeviceStatusSection = new MenuCollapseSection("Device Status", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, generalWidget);
+	acquisitionDeviceStatusSection->contentLayout()->setSpacing(8);
+	acquisitionDeviceStatusWidget->contentLayout()->addWidget(acquisitionDeviceStatusSection);
+
+	MenuControlButton *acquisitionFaultRegisterLEDWidget = createStatusLEDWidget("Fault Register", statusLEDColor, acquisitionDeviceStatusSection);
+	acquisitionDeviceStatusSection->contentLayout()->addWidget(acquisitionFaultRegisterLEDWidget);
+
+	if(deviceType == "Automotive" && generalRegisterMap.at("Sequence Type") == 1) // Automotive & Sequence Mode 2
+	{
+		MenuControlButton *acquisitionSPICRCLEDWidget = createStatusLEDWidget("SPI CRC", statusLEDColor, acquisitionDeviceStatusSection);
+		MenuControlButton *acquisitionSPIFlagLEDWidget = createStatusLEDWidget("SPI Flag", statusLEDColor, acquisitionDeviceStatusSection);
+		acquisitionDeviceStatusSection->contentLayout()->addWidget(acquisitionSPICRCLEDWidget);
+		acquisitionDeviceStatusSection->contentLayout()->addWidget(acquisitionSPIFlagLEDWidget);
+	}
+	#pragma endregion
+
+	generalSettingLayout->addWidget(acquisitionDeviceStatusWidget);
 	generalSettingLayout->addWidget(header);
 	generalSettingLayout->addSpacerItem(new QSpacerItem(0, 3, QSizePolicy::Fixed, QSizePolicy::Fixed));
 	generalSettingLayout->addWidget(sequenceWidget);
@@ -485,12 +511,6 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	connectLineEditToNumberWrite(motorMaxDisplacementSpinBox->lineEdit(), dmax, ADMTController::MotorAttribute::DMAX);
 	connectLineEditToNumberWrite(motorTargetPositionSpinBox->lineEdit(), target_pos, ADMTController::MotorAttribute::TARGET_POS);
 	connectMenuComboToNumber(m_calibrationMotorRampModeMenuCombo, ramp_mode);
-
-	acquisitionUITimer = new QTimer(this);
-	connect(acquisitionUITimer, &QTimer::timeout, this, &HarmonicCalibration::acquisitionUITask);
-
-	// timer = new QTimer(this);
-	// connect(timer, &QTimer::timeout, this, &HarmonicCalibration::timerTask);
 
 	calibrationUITimer = new QTimer(this);
 	connect(calibrationUITimer, &QTimer::timeout, this, &HarmonicCalibration::calibrationUITask);
@@ -543,41 +563,47 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 
 HarmonicCalibration::~HarmonicCalibration() {}
 
+void HarmonicCalibration::resetYAxisScale()
+{
+	acquisitionGraphYMin = 0;
+	acquisitionGraphYMax = 360;
+	acquisitionYPlotAxis->setInterval(acquisitionGraphYMin, acquisitionGraphYMax);
+	acquisitionGraphPlotWidget->replot();
+}
+
 void HarmonicCalibration::startAcquisition()
 {
 	isStartAcquisition = true;
 	acquisitionXPlotAxis->setInterval(0, acquisitionDisplayLength);
-    QFuture<void> future = QtConcurrent::run(this, &HarmonicCalibration::getAcquisitionSamples);
+
+    QtConcurrent::run(this, &HarmonicCalibration::getAcquisitionSamples, acquisitionSampleRate);
+	QtConcurrent::run(this, &HarmonicCalibration::acquisitionPlotTask, acquisitionUITimerRate);
+	QtConcurrent::run(this, &HarmonicCalibration::acquisitionUITask, 200);
 }
 
-void HarmonicCalibration::getAcquisitionSamples()
+void HarmonicCalibration::getAcquisitionSamples(int sampleRate)
 {
 	while(isStartAcquisition)
 	{
 		if(!updateChannelValues()) { break; }
 
+		if(acquisitionDataMap.at(ANGLE) == false && acquisitionAngleList.size() > 0) acquisitionAngleList.clear();
+		if(acquisitionDataMap.at(ABSANGLE) == false && acquisitionABSAngleList.size() > 0) acquisitionABSAngleList.clear();
+		if(acquisitionDataMap.at(TURNCOUNT) == false && acquisitionTurnCountList.size() > 0) acquisitionTurnCountList.clear();
+		if(acquisitionDataMap.at(TMP0) == false && acquisitionTmp0List.size() > 0) acquisitionTmp0List.clear();
+		if(acquisitionDataMap.at(SINE) == false && acquisitionSineList.size() > 0) acquisitionSineList.clear();
+		if(acquisitionDataMap.at(COSINE) == false && acquisitionCosineList.size() > 0) acquisitionCosineList.clear();
+		if(acquisitionDataMap.at(RADIUS) == false && acquisitionRadiusList.size() > 0) acquisitionRadiusList.clear();
+
 		if(acquisitionDataMap.at(ANGLE)) prependAcquisitionData(angle, acquisitionAngleList);
-		else if(acquisitionDataMap.at(ANGLE) == false && acquisitionAngleList.size() > 0) acquisitionAngleList.clear();
-		
 		if(acquisitionDataMap.at(ABSANGLE)) prependAcquisitionData(rotation, acquisitionABSAngleList);
-		else if(acquisitionDataMap.at(ABSANGLE) == false && acquisitionABSAngleList.size() > 0) acquisitionABSAngleList.clear();
-
 		if(acquisitionDataMap.at(TURNCOUNT)) prependAcquisitionData(count, acquisitionTurnCountList);
-		else if(acquisitionDataMap.at(TURNCOUNT) == false && acquisitionTurnCountList.size() > 0) acquisitionTurnCountList.clear();
-
 		if(acquisitionDataMap.at(TMP0)) prependAcquisitionData(temp, acquisitionTmp0List);
-		else if(acquisitionDataMap.at(TMP0) == false && acquisitionTmp0List.size() > 0) acquisitionTmp0List.clear();
-
 		if(acquisitionDataMap.at(SINE)) prependAcquisitionData(getAcquisitionParameterValue(SINE), acquisitionSineList);
-		else if(acquisitionDataMap.at(SINE) == false && acquisitionSineList.size() > 0) acquisitionSineList.clear();
-
 		if(acquisitionDataMap.at(COSINE)) prependAcquisitionData(getAcquisitionParameterValue(COSINE), acquisitionCosineList);
-		else if(acquisitionDataMap.at(COSINE) == false && acquisitionCosineList.size() > 0) acquisitionCosineList.clear();
-
 		if(acquisitionDataMap.at(RADIUS)) prependAcquisitionData(getAcquisitionParameterValue(RADIUS), acquisitionRadiusList);
-		else if(acquisitionDataMap.at(RADIUS) == false && acquisitionRadiusList.size() > 0) acquisitionRadiusList.clear();
 
-		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+		QThread::msleep(sampleRate);
 	}
 }
 
@@ -622,6 +648,10 @@ double HarmonicCalibration::getAcquisitionParameterValue(const AcquisitionDataKe
 void HarmonicCalibration::prependAcquisitionData(const double& data, QVector<double>& list)
 {
 	list.prepend(data);
+	if(list.size() >= acquisitionDisplayLength){
+		list.resize(acquisitionDisplayLength);
+		list.squeeze();
+	}
 }
 
 void HarmonicCalibration::prependNullAcquisitionData(QVector<double>& list)
@@ -2271,11 +2301,11 @@ void HarmonicCalibration::run(bool b)
 
 	if(!b) {
 		isStartAcquisition = false;
-		acquisitionUITimer->stop();
+		// acquisitionUITimer->stop();
 		runButton->setChecked(false);
 	}
 	else{
-		acquisitionUITimer->start(acquisitionUITimerRate);
+		// acquisitionUITimer->start(acquisitionUITimerRate);
 		startAcquisition();
 	}
 
@@ -2287,27 +2317,41 @@ void HarmonicCalibration::canCalibrate(bool value)
 	calibrateDataButton->setEnabled(value);
 }
 
-void HarmonicCalibration::acquisitionUITask()
+void HarmonicCalibration::acquisitionPlotTask(int sampleRate)
 {
-	if(acquisitionDataMap.at(ANGLE))
-		plotAcquisition(acquisitionAngleList, acquisitionAnglePlotChannel);
-	if(acquisitionDataMap.at(ABSANGLE))
-		plotAcquisition(acquisitionABSAngleList, acquisitionABSAnglePlotChannel);
-	if(acquisitionDataMap.at(TURNCOUNT))
-		plotAcquisition(acquisitionTurnCountList, acquisitionTurnCountPlotChannel);
-	if(acquisitionDataMap.at(TMP0))
-		plotAcquisition(acquisitionTmp0List, acquisitionTmp0PlotChannel);
-	if(acquisitionDataMap.at(SINE))
-		plotAcquisition(acquisitionSineList, acquisitionSinePlotChannel);
-	if(acquisitionDataMap.at(COSINE))
-		plotAcquisition(acquisitionCosineList, acquisitionCosinePlotChannel);
-	if(acquisitionDataMap.at(RADIUS))
-		plotAcquisition(acquisitionRadiusList, acquisitionRadiusPlotChannel);
+	while(isStartAcquisition){
+		if(acquisitionDataMap.at(ANGLE))
+			plotAcquisition(acquisitionAngleList, acquisitionAnglePlotChannel);
+		if(acquisitionDataMap.at(ABSANGLE))
+			plotAcquisition(acquisitionABSAngleList, acquisitionABSAnglePlotChannel);
+		if(acquisitionDataMap.at(TURNCOUNT))
+			plotAcquisition(acquisitionTurnCountList, acquisitionTurnCountPlotChannel);
+		if(acquisitionDataMap.at(TMP0))
+			plotAcquisition(acquisitionTmp0List, acquisitionTmp0PlotChannel);
+		if(acquisitionDataMap.at(SINE))
+			plotAcquisition(acquisitionSineList, acquisitionSinePlotChannel);
+		if(acquisitionDataMap.at(COSINE))
+			plotAcquisition(acquisitionCosineList, acquisitionCosinePlotChannel);
+		if(acquisitionDataMap.at(RADIUS))
+			plotAcquisition(acquisitionRadiusList, acquisitionRadiusPlotChannel);
 
-	acquisitionYPlotAxis->setInterval(acquisitionGraphYMin, acquisitionGraphYMax);
-	acquisitionGraphPlotWidget->replot();
-	updateLineEditValues();
-	updateLineEditValue(acquisitionMotorCurrentPositionLineEdit, current_pos);
+		acquisitionYPlotAxis->setInterval(acquisitionGraphYMin, acquisitionGraphYMax);
+		acquisitionGraphPlotWidget->replot();
+
+		QThread::msleep(sampleRate);
+	}
+}
+
+void HarmonicCalibration::acquisitionUITask(int sampleRate)
+{
+	while(isStartAcquisition)
+	{
+		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+
+		updateLineEditValues();
+		updateLineEditValue(acquisitionMotorCurrentPositionLineEdit, current_pos);
+		QThread::msleep(sampleRate);
+	}
 }
 
 void HarmonicCalibration::applySequence(){
@@ -2808,11 +2852,11 @@ void HarmonicCalibration::connectLineEditToRPSConversion(QLineEdit* lineEdit, do
         double rps = lineEdit->text().toDouble(&ok);
         if (ok) {
             vmax = convertRPStoVMAX(rps);
-			StatusBarManager::pushMessage("Converted VMAX: " + QString::number(vmax));
+			// StatusBarManager::pushMessage("Converted VMAX: " + QString::number(vmax));
 			writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, vmax);
 			writeMotorAttributeValue(ADMTController::MotorAttribute::DISABLE, 1);
 			amax = convertAccelTimetoAMAX(motorAccelTimeSpinBox->lineEdit()->text().toDouble());
-			StatusBarManager::pushMessage("Converted AMAX: " + QString::number(amax));
+			// StatusBarManager::pushMessage("Converted AMAX: " + QString::number(amax));
 			writeMotorAttributeValue(ADMTController::MotorAttribute::AMAX, amax);
         } else {
             lineEdit->setText(QString::number(convertVMAXtoRPS(vmax)));
@@ -2827,7 +2871,7 @@ void HarmonicCalibration::connectLineEditToAMAXConversion(QLineEdit* lineEdit, d
         double accelTime = lineEdit->text().toDouble(&ok);
         if (ok) {
             amax = convertAccelTimetoAMAX(accelTime);
-			StatusBarManager::pushMessage("Converted AMAX: " + QString::number(amax));
+			// StatusBarManager::pushMessage("Converted AMAX: " + QString::number(amax));
         } else {
             lineEdit->setText(QString::number(convertAMAXtoAccelTime(amax)));
         }
