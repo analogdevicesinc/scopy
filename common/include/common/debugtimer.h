@@ -19,37 +19,38 @@
  *
  */
 
-#ifndef SCOPYBENCHMARK_H
-#define SCOPYBENCHMARK_H
+#ifndef DEBUGTIMER_H
+#define DEBUGTIMER_H
 
 #include <QElapsedTimer>
 #include <QString>
+#include <QFile>
 #include "scopy-common_export.h"
 
-#define CONSOLE_LOG(logger, msg) logger.log(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
-#define CONSOLE_LOG_RESET(logger, msg) logger.logAndReset(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
-#define FILE_LOG(logger, msg, path) logger.log(path, msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
-#define FILE_LOG_RESET(logger, msg, path) logger.logAndReset(path, msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
+#define DEBUGTIMER_LOG(logger, msg) logger.log(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
 
 namespace scopy {
-class SCOPY_COMMON_EXPORT ScopyBenchmark
+class SCOPY_COMMON_EXPORT DebugTimer
 {
 public:
-	ScopyBenchmark();
-	~ScopyBenchmark();
+	DebugTimer(QString filePath = "");
+	~DebugTimer();
 
 	void startTimer();
 	void restartTimer();
 
+	void setSingleMode(bool b);
+	bool singleMode();
+
 	void log(const QString &msg, const char *function, const char *file, int line);
-	void log(const QString &filePath, const QString &msg, const char *function, const char *file, int line);
-	void logAndReset(const QString &msg, const char *function, const char *file, int line);
-	void logAndReset(const QString &filePath, const QString &msg, const char *function, const char *file, int line);
 
 private:
 	QElapsedTimer m_timer;
+	QString m_filePath;
+	bool m_singleMode;
+	QFile f;
 };
 
 } // namespace scopy
 
-#endif // SCOPYBENCHMARK_H
+#endif // DEBUGTIMER_H

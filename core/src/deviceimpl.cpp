@@ -21,7 +21,6 @@
 
 #include "deviceimpl.h"
 
-#include "logging_categories.h"
 #include "pluginbase/preferences.h"
 #include "qboxlayout.h"
 #include "qpushbutton.h"
@@ -37,6 +36,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <style.h>
 
+#include <common/debugtimer.h>
 #include <common/scopyconfig.h>
 #include <gui/widgets/hoverwidget.h>
 #include <gui/widgets/connectionloadingbar.h>
@@ -58,8 +58,7 @@ DeviceImpl::DeviceImpl(QString param, PluginManager *p, QString category, QObjec
 
 void DeviceImpl::init()
 {
-	QElapsedTimer timer;
-	timer.start();
+	DebugTimer benchmark;
 	m_plugins = p->getCompatiblePlugins(m_param, m_category);
 	for(Plugin *p : qAsConst(m_plugins)) {
 		QObject *obj = dynamic_cast<QObject *>(p);
@@ -69,7 +68,7 @@ void DeviceImpl::init()
 			qWarning(CAT_DEVICEIMPL, "Plugin not a QObject");
 		}
 	}
-	qInfo(CAT_BENCHMARK) << this->displayName() << " init took: " << timer.elapsed() << "ms";
+	DEBUGTIMER_LOG(benchmark, "Dev init took:");
 }
 
 void DeviceImpl::preload()
@@ -81,8 +80,7 @@ void DeviceImpl::preload()
 
 void DeviceImpl::loadPlugins()
 {
-	QElapsedTimer timer;
-	timer.start();
+	DebugTimer benchmark;
 	removeDisabledPlugins();
 	preload();
 	loadName();
@@ -103,13 +101,12 @@ void DeviceImpl::loadPlugins()
 		p->postload();
 	}
 	m_state = DEV_IDLE;
-	qInfo(CAT_BENCHMARK) << this->displayName() << " plugins load took: " << timer.elapsed() << "ms";
+	DEBUGTIMER_LOG(benchmark, this->displayName() + " plugins load took:");
 }
 
 void DeviceImpl::unloadPlugins()
 {
-	QElapsedTimer timer;
-	timer.start();
+	DebugTimer benchmark;
 	QList<Plugin *>::const_iterator pI = m_plugins.constEnd();
 	while(pI != m_plugins.constBegin()) {
 		--pI;
@@ -123,7 +120,7 @@ void DeviceImpl::unloadPlugins()
 		delete(*pI);
 	}
 	m_plugins.clear();
-	qInfo(CAT_BENCHMARK) << this->displayName() << " plugins unload took: " << timer.elapsed() << "ms";
+	DEBUGTIMER_LOG(benchmark, this->displayName() + " plugins unload took:");
 }
 
 bool DeviceImpl::verify() { return true; }
@@ -330,12 +327,12 @@ void DeviceImpl::load(QSettings &s)
 void DeviceImpl::connectDev()
 {
 	m_state = DEV_CONNECTING;
-	QElapsedTimer pluginTimer;
-	QElapsedTimer timer;
+	DebugTimer pluginConnBm;
+	DebugTimer connectDevBm;
 	ConnectionLoadingBar *connectionLoadingBar = new ConnectionLoadingBar();
 	connectionLoadingBar->setProgressBarMaximum(m_plugins.size());
 	StatusBarManager::pushUrgentWidget(connectionLoadingBar, "Connection Loading Bar");
-	timer.start();
+	connectDevBm.startTimer();
 	Preferences *pref = Preferences::GetInstance();
 	bool disconnectDevice = false;
 	connbtn->hide();
@@ -348,11 +345,11 @@ void DeviceImpl::connectDev()
 	Q_EMIT connecting();
 	QCoreApplication::processEvents();
 	for(int i = 0; i < m_plugins.size(); ++i) {
-		pluginTimer.start();
+		pluginConnBm.startTimer();
 		connectionLoadingBar->setCurrentPlugin(m_plugins[i]->name());
 		QCoreApplication::processEvents();
 		bool pluginConnectionSucceeded = m_plugins[i]->onConnect();
-		qInfo(CAT_BENCHMARK) << m_plugins[i]->name() << " connection took: " << pluginTimer.elapsed() << "ms";
+		DEBUGTIMER_LOG(pluginConnBm, m_plugins[i]->name() + " connection took:");
 		connectionLoadingBar->addProgress(1); // TODO: might change to better reflect the time
 		QCoreApplication::processEvents();
 		if(pluginConnectionSucceeded) {
@@ -390,16 +387,16 @@ void DeviceImpl::connectDev()
 	m_state = DEV_CONNECTED;
 	Q_EMIT connected();
 	delete connectionLoadingBar;
-	qInfo(CAT_BENCHMARK) << this->displayName() << " device connection took: " << timer.elapsed() << "ms";
+	DEBUGTIMER_LOG(connectDevBm, this->displayName() + " device connection took:");
 }
 
 void DeviceImpl::disconnectDev()
 {
-	QElapsedTimer pluginTimer;
-	QElapsedTimer timer;
-	timer.start();
+	DebugTimer pluginDisconnBm;
+	DebugTimer disconnectDevBm;
 	m_state = DEV_DISCONNECTING;
 	Q_EMIT disconnecting();
+
 	unbindPing();
 	connbtn->show();
 	discbtn->hide();
@@ -410,15 +407,15 @@ void DeviceImpl::disconnectDev()
 						QSettings::IniFormat);
 			p->saveSettings(s);
 		}
-		pluginTimer.start();
+		pluginDisconnBm.startTimer();
 		p->onDisconnect();
-		qInfo(CAT_BENCHMARK) << p->name() << " disconnection took: " << pluginTimer.elapsed() << "ms";
+		DEBUGTIMER_LOG(pluginDisconnBm, p->name() + " disconnection took:");
 	}
 	m_connectedPlugins.clear();
 	connbtn->setFocus();
 	m_state = DEV_IDLE;
+	DEBUGTIMER_LOG(disconnectDevBm, this->displayName() + " device disconnection took:");
 	Q_EMIT disconnected();
-	qInfo(CAT_BENCHMARK) << this->displayName() << " device disconnection took: " << timer.elapsed() << "ms";
 }
 
 DeviceImpl::~DeviceImpl() { qDebug(CAT_DEVICEIMPL) << m_id << "dtor"; }

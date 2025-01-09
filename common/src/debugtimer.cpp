@@ -19,7 +19,8 @@
  *
  */
 
-#include "scopybenchmark.h"
+#include "debugtimer.h"
+#include <QFile>
 #include <QDate>
 #include <QFile>
 #include <QLoggingCategory>
@@ -27,40 +28,44 @@
 Q_LOGGING_CATEGORY(CAT_BENCHMARK, "Benchmark")
 using namespace scopy;
 
-ScopyBenchmark::ScopyBenchmark() {}
-
-ScopyBenchmark::~ScopyBenchmark() {}
-
-void ScopyBenchmark::startTimer() { m_timer.start(); }
-
-void ScopyBenchmark::restartTimer() { m_timer.restart(); }
-
-void ScopyBenchmark::log(const QString &msg, const char *function, const char *file, int line)
+DebugTimer::DebugTimer(QString filePath)
 {
-	QMessageLogger(file, line, function).info(CAT_BENCHMARK) << function << msg << m_timer.elapsed() << "ms";
+
+	m_filePath = filePath;
+	f.setFileName(m_filePath);
+	if(!m_filePath.isEmpty() && !f.open(QIODevice::WriteOnly | QIODevice::Append)) {
+		qWarning(CAT_BENCHMARK) << "file " + m_filePath + "cannot be opened";
+		m_filePath.clear();
+	}
+
+	m_timer.start();
 }
 
-void ScopyBenchmark::log(const QString &filePath, const QString &msg, const char *function, const char *file, int line)
+DebugTimer::~DebugTimer() { f.close(); }
+
+void DebugTimer::startTimer() { m_timer.start(); }
+
+void DebugTimer::restartTimer() { m_timer.restart(); }
+
+void DebugTimer::setSingleMode(bool b) { m_singleMode = b; }
+
+bool DebugTimer::singleMode() { return m_singleMode; }
+
+void DebugTimer::log(const QString &msg, const char *function, const char *file, int line)
 {
-	QFile f(filePath);
-	if(f.open(QIODevice::WriteOnly | QIODevice::Append)) {
+	if(f.isOpen()) {
 		QTextStream stream(&f);
-		stream << QDateTime::currentDateTime().toString("dd:MM:yyyy hh:mm:ss.zzz") << "\t" << file << ":"
+
+		stream << QDateTime::currentDateTime().toString("yyyy:MM:dd hh:mm:ss.zzz") << "\t" << file << ":"
 		       << line << "\t" << function << "\t" << msg << "\t" << m_timer.elapsed() << "\t"
 		       << "ms"
 		       << "\n";
+	} else {
+		QMessageLogger(file, line, function).info(CAT_BENCHMARK)
+			<< function << msg << m_timer.elapsed() << "ms";
 	}
-}
 
-void ScopyBenchmark::logAndReset(const QString &msg, const char *function, const char *file, int line)
-{
-	log(msg, function, file, line);
-	m_timer.restart();
-}
-
-void ScopyBenchmark::logAndReset(const QString &filePath, const QString &msg, const char *function, const char *file,
-				 int line)
-{
-	log(filePath, msg, function, file, line);
-	m_timer.restart();
+	if(m_singleMode) {
+		m_timer.restart();
+	}
 }
