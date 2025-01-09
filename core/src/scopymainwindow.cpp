@@ -31,6 +31,7 @@
 #include <deviceautoconnect.h>
 #include <style.h>
 
+#include <common/scopybenchmark.h>
 #include "logging_categories.h"
 #include "qmessagebox.h"
 #include "scopymainwindow.h"
@@ -70,8 +71,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	, ui(new Ui::ScopyMainWindow)
 	, m_glLoader(nullptr)
 {
-	QElapsedTimer timer;
-	timer.start();
+	ScopyBenchmark benchmark;
+	benchmark.startTimer();
 	initPreferences();
 	ui->setupUi(this);
 
@@ -207,7 +208,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 		deviceAutoconnect();
 	prefPage->initSessionDevices();
 
-	qInfo(CAT_BENCHMARK) << "ScopyMainWindow constructor took: " << timer.elapsed() << "ms";
+	CONSOLE_LOG(benchmark, "ScopyMainWindow constructor took:");
 }
 
 void ScopyMainWindow::initStatusBar()
@@ -319,8 +320,8 @@ ScopyMainWindow::~ScopyMainWindow()
 
 void ScopyMainWindow::initAboutPage(PluginManager *pm)
 {
-	QElapsedTimer timer;
-	timer.start();
+	ScopyBenchmark benchmark;
+	benchmark.startTimer();
 	about = new ScopyAboutPage(this);
 	if(!pm)
 		return;
@@ -331,7 +332,7 @@ void ScopyMainWindow::initAboutPage(PluginManager *pm)
 			about->addHorizontalTab(about->buildPage(content), p->name());
 		}
 	}
-	qInfo(CAT_BENCHMARK) << " Init about page took: " << timer.elapsed() << "ms";
+	CONSOLE_LOG(benchmark, "Init about page took:");
 }
 
 void ScopyMainWindow::initPreferencesPage(PluginManager *pm)
@@ -379,8 +380,8 @@ void ScopyMainWindow::setupPreferences()
 
 void ScopyMainWindow::initPreferences()
 {
-	QElapsedTimer timer;
-	timer.start();
+	ScopyBenchmark benchmark;
+	benchmark.startTimer();
 	QString preferencesPath = scopy::config::preferencesFolderPath() + "/preferences.ini";
 	Preferences *p = Preferences::GetInstance();
 	p->setPreferencesFilename(preferencesPath);
@@ -421,7 +422,7 @@ void ScopyMainWindow::initPreferences()
 	QString themeName = "scopy-" + theme;
 	QIcon::setThemeName(themeName);
 	QIcon::setThemeSearchPaths({":/gui/icons/" + themeName});
-	qInfo(CAT_BENCHMARK) << "Init preferences took: " << timer.elapsed() << "ms";
+	CONSOLE_LOG(benchmark, "Init preferences took:");
 }
 
 void ScopyMainWindow::loadOpenGL()
@@ -475,8 +476,8 @@ void ScopyMainWindow::loadOpenGL()
 void ScopyMainWindow::loadPluginsFromRepository(PluginRepository *pr)
 {
 
-	QElapsedTimer timer;
-	timer.start();
+	ScopyBenchmark benchmark;
+	benchmark.startTimer();
 	// Check the local build plugins folder first
 	// Check if directory exists and it's not empty
 	QDir pathDir(scopy::config::localPluginFolderPath());
@@ -494,7 +495,7 @@ void ScopyMainWindow::loadPluginsFromRepository(PluginRepository *pr)
 	}
 #endif
 
-	qInfo(CAT_BENCHMARK) << "Loading the plugins from the repository took: " << timer.elapsed() << "ms";
+	CONSOLE_LOG(benchmark, "Loading the plugins from the repository took:");
 }
 
 void ScopyMainWindow::showEvent(QShowEvent *event)
@@ -565,8 +566,8 @@ void ScopyMainWindow::initPythonWIN32()
 
 void ScopyMainWindow::loadDecoders()
 {
-	QElapsedTimer timer;
-	timer.start();
+	ScopyBenchmark benchmark;
+	benchmark.startTimer();
 #if defined(WITH_SIGROK) && defined(WITH_PYTHON)
 #if defined __APPLE__
 	QString path = QCoreApplication::applicationDirPath() + "/decoders";
@@ -606,7 +607,7 @@ void ScopyMainWindow::loadDecoders()
 #else
 	qInfo(CAT_SCOPY) << "Python or libsigrokdecode are disabled, can't load decoders";
 #endif
-	qInfo(CAT_BENCHMARK) << "Loading the decoders took: " << timer.elapsed() << "ms";
+	CONSOLE_LOG(benchmark, "Loading the decoders took:");
 }
 
 void ScopyMainWindow::initApi()
