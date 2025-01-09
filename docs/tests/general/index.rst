@@ -19,7 +19,8 @@ Contents
    core/dev_tests
 
    instrument_detaching
-
+   general_preferences_tests
+   
 ..
  add the path to each core feature test case here
  example core/homepage_tests

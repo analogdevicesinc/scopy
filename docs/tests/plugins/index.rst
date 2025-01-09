@@ -17,6 +17,7 @@ Contents
    datalogger/datalogger_test
    dac/dac_tests
    swiot1l/swiot1l_tests
+   adc/adc_tests
 
    m2k/digital_io_tests
    m2k/logic_analyzer_tests
