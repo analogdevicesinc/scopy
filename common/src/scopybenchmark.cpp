@@ -51,3 +51,16 @@ void ScopyBenchmark::log(const QString &filePath, const QString &msg, const char
 		       << "\n";
 	}
 }
+
+void ScopyBenchmark::logAndReset(const QString &msg, const char *function, const char *file, int line)
+{
+	log(msg, function, file, line);
+	m_timer.restart();
+}
+
+void ScopyBenchmark::logAndReset(const QString &filePath, const QString &msg, const char *function, const char *file,
+				 int line)
+{
+	log(filePath, msg, function, file, line);
+	m_timer.restart();
+}
