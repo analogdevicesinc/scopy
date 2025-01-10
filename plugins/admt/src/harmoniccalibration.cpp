@@ -5,10 +5,13 @@
 #include <stylehelper.h>
 #include <admtstylehelper.h>
 
-static int acquisitionUITimerRate = 50;
-static int calibrationUITimerRate = 300;
+static int acquisitionUITimerRate = 500;
+static int calibrationUITimerRate = 500;
 static int utilityTimerRate = 1000;
-static int acquisitionSampleRate = 16; // In ms
+
+static int deviceStatusMonitorRate = 500; // In ms
+static int acquisitionSampleRate = 20; // In ms
+static int acquisitionGraphSampleRate = 100; // In ms
 
 static int bufferSize = 1;
 static int dataGraphSamples = 100;
@@ -20,7 +23,6 @@ static double *tempGraphValue;
 static int cycleCount = 11;
 static int samplesPerCycle = 256;
 static int totalSamplesCount = cycleCount * samplesPerCycle;
-static bool isStartAcquisition = false;
 static bool isStartMotor = false;
 static bool isPostCalibration = false;
 static bool isCalculatedCoeff = false;
@@ -78,6 +80,11 @@ static uint32_t H1_MAG_HEX, H2_MAG_HEX, H3_MAG_HEX, H8_MAG_HEX, H1_PHASE_HEX, H2
 
 static int acquisitionGraphYMin = 0;
 static int acquisitionGraphYMax = 360;
+static bool deviceStatusFault = false;
+static bool isStartAcquisition = false;
+static bool isDeviceStatusMonitor = false;
+
+static int readMotorDebounce = 50; // In ms
 
 static std::map<AcquisitionDataKey, bool> acquisitionDataMap = {
     {RADIUS, false},
@@ -384,9 +391,9 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	StyleHelper::MenuSmallLabel(graphUpdateIntervalLabel, "graphUpdateIntervalLabel");
 	graphUpdateIntervalLineEdit = new QLineEdit(generalSection);
 	ADMTStyleHelper::LineEditStyle(graphUpdateIntervalLineEdit);
-	graphUpdateIntervalLineEdit->setText(QString::number(acquisitionUITimerRate));
+	graphUpdateIntervalLineEdit->setText(QString::number(acquisitionGraphSampleRate));
 
-	connectLineEditToNumber(graphUpdateIntervalLineEdit, acquisitionUITimerRate, 1, 5000);
+	connectLineEditToNumber(graphUpdateIntervalLineEdit, acquisitionGraphSampleRate, 1, 5000);
 
 	// Data Sample Size
 	QLabel *displayLengthLabel = new QLabel("Display Length", generalSection);
@@ -465,7 +472,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	acquisitionDeviceStatusSection->contentLayout()->setSpacing(8);
 	acquisitionDeviceStatusWidget->contentLayout()->addWidget(acquisitionDeviceStatusSection);
 
-	MenuControlButton *acquisitionFaultRegisterLEDWidget = createStatusLEDWidget("Fault Register", statusLEDColor, acquisitionDeviceStatusSection);
+	acquisitionFaultRegisterLEDWidget = createStatusLEDWidget("Fault Register", statusLEDColor, acquisitionDeviceStatusSection);
 	acquisitionDeviceStatusSection->contentLayout()->addWidget(acquisitionFaultRegisterLEDWidget);
 
 	if(deviceType == "Automotive" && generalRegisterMap.at("Sequence Type") == 1) // Automotive & Sequence Mode 2
@@ -512,6 +519,9 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	connectLineEditToNumberWrite(motorTargetPositionSpinBox->lineEdit(), target_pos, ADMTController::MotorAttribute::TARGET_POS);
 	connectMenuComboToNumber(m_calibrationMotorRampModeMenuCombo, ramp_mode);
 
+	acquisitionUITimer = new QTimer(this);
+	connect(acquisitionUITimer, &QTimer::timeout, this, &HarmonicCalibration::acquisitionUITask);
+
 	calibrationUITimer = new QTimer(this);
 	connect(calibrationUITimer, &QTimer::timeout, this, &HarmonicCalibration::calibrationUITask);
 
@@ -525,18 +535,31 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	connect(tabWidget, &QTabWidget::currentChanged, [=](int index){
 		tabWidget->setCurrentIndex(index);
 
+		if(index == 0 || index == 1)
+		{
+			if(isDeviceStatusMonitor) isDeviceStatusMonitor = false;
+
+			if(index == 0) startAcquisitionDeviceStatusMonitor();
+			else startCalibrationDeviceStatusMonitor();
+		}
+		else{
+			isDeviceStatusMonitor = false;
+		}
+
 		if(index == 0) // Acquisition Tab
 		{ 
+			acquisitionUITimer->start(acquisitionUITimerRate);
 			readSequence();
 		}
 		else
 		{
+			acquisitionUITimer->stop();
 			stop();
 		}
 
 		if(index == 1) // Calibration Tab
 		{ 
-			calibrationUITimer->start(calibrationUITimerRate); 
+			calibrationUITimer->start(calibrationUITimerRate);
 		}
 		else 
 		{ 
@@ -559,9 +582,26 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 			toggleSequenceModeRegisters(generalRegisterMap.at("Sequence Type"));
 		}
 	});
+
+	acquisitionUITimer->start(acquisitionUITimerRate);
+	startAcquisitionDeviceStatusMonitor();
 }
 
 HarmonicCalibration::~HarmonicCalibration() {}
+
+void HarmonicCalibration::startAcquisitionDeviceStatusMonitor()
+{
+	isDeviceStatusMonitor = true;
+	m_deviceStatusThread = QtConcurrent::run(this, &HarmonicCalibration::getDeviceFaultStatus, deviceStatusMonitorRate);
+	m_deviceStatusWatcher.setFuture(m_deviceStatusThread);
+}
+
+void HarmonicCalibration::startCalibrationDeviceStatusMonitor()
+{
+	isDeviceStatusMonitor = true;
+	m_deviceStatusThread = QtConcurrent::run(this, &HarmonicCalibration::getDeviceFaultStatus, deviceStatusMonitorRate);
+	m_deviceStatusWatcher.setFuture(m_deviceStatusThread);
+}
 
 void HarmonicCalibration::resetYAxisScale()
 {
@@ -576,9 +616,10 @@ void HarmonicCalibration::startAcquisition()
 	isStartAcquisition = true;
 	acquisitionXPlotAxis->setInterval(0, acquisitionDisplayLength);
 
-    QtConcurrent::run(this, &HarmonicCalibration::getAcquisitionSamples, acquisitionSampleRate);
-	QtConcurrent::run(this, &HarmonicCalibration::acquisitionPlotTask, acquisitionUITimerRate);
-	QtConcurrent::run(this, &HarmonicCalibration::acquisitionUITask, 200);
+    m_acquisitionDataThread = QtConcurrent::run(this, &HarmonicCalibration::getAcquisitionSamples, acquisitionSampleRate);
+	m_acquisitionDataWatcher.setFuture(m_acquisitionDataThread);
+	m_acquisitionGraphThread = QtConcurrent::run(this, &HarmonicCalibration::acquisitionPlotTask, acquisitionGraphSampleRate);
+	m_acquisitionGraphWatcher.setFuture(m_acquisitionGraphThread);
 }
 
 void HarmonicCalibration::getAcquisitionSamples(int sampleRate)
@@ -642,6 +683,33 @@ double HarmonicCalibration::getAcquisitionParameterValue(const AcquisitionDataKe
 		default: 
 			return qQNaN();
 			break;
+	}
+}
+
+void HarmonicCalibration::getDeviceFaultStatus(int sampleRate)
+{
+	while(isDeviceStatusMonitor)
+	{
+		uint32_t *readValue = new uint32_t;
+		if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::FAULT), 0) == 0)
+		{
+			if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::FAULT), readValue) == 0)
+			{
+				deviceStatusFault = m_admtController->checkRegisterFault(static_cast<uint16_t>(*readValue), generalRegisterMap.at("Sequence Type") == 0 ? true : false);
+			}
+			else
+			{
+				deviceStatusFault = true;
+			}
+		}
+		else
+		{
+			deviceStatusFault = true;
+		}
+
+		QThread::msleep(sampleRate);
 	}
 }
 
@@ -1013,6 +1081,25 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationSettingsGroupLayout->setMargin(0);
 	calibrationSettingsGroupLayout->setSpacing(8);
 
+	#pragma region Device Status Widget
+	MenuSectionWidget *calibrationDeviceStatusWidget = new MenuSectionWidget(calibrationSettingsGroupWidget);
+	calibrationDeviceStatusWidget->contentLayout()->setSpacing(8);
+	MenuCollapseSection *calibrationDeviceStatusSection = new MenuCollapseSection("Device Status", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, calibrationSettingsGroupWidget);
+	calibrationDeviceStatusSection->contentLayout()->setSpacing(8);
+	calibrationDeviceStatusWidget->contentLayout()->addWidget(calibrationDeviceStatusSection);
+
+	calibrationFaultRegisterLEDWidget = createStatusLEDWidget("Fault Register", statusLEDColor, calibrationDeviceStatusSection);
+	calibrationDeviceStatusSection->contentLayout()->addWidget(calibrationFaultRegisterLEDWidget);
+
+	if(deviceType == "Automotive" && generalRegisterMap.at("Sequence Type") == 1) // Automotive & Sequence Mode 2
+	{
+		MenuControlButton *calibrationSPICRCLEDWidget = createStatusLEDWidget("SPI CRC", statusLEDColor, calibrationDeviceStatusSection);
+		MenuControlButton *calibrationSPIFlagLEDWidget = createStatusLEDWidget("SPI Flag", statusLEDColor, calibrationDeviceStatusSection);
+		calibrationDeviceStatusSection->contentLayout()->addWidget(calibrationSPICRCLEDWidget);
+		calibrationDeviceStatusSection->contentLayout()->addWidget(calibrationSPIFlagLEDWidget);
+	}
+	#pragma endregion
+
 	#pragma region Acquire Calibration Samples Button
 	calibrationStartMotorButton = new QPushButton(calibrationSettingsGroupWidget);
 	ADMTStyleHelper::StartButtonStyle(calibrationStartMotorButton);
@@ -1060,6 +1147,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationSettingsWidget->setFixedWidth(260);
 	calibrationSettingsWidget->setLayout(calibrationSettingsLayout);
 
+	calibrationSettingsGroupLayout->addWidget(calibrationDeviceStatusWidget);
 	calibrationSettingsGroupLayout->addWidget(calibrationStartMotorButton);
 	calibrationSettingsGroupLayout->addWidget(calibrateDataButton);
 	calibrationSettingsGroupLayout->addWidget(clearCalibrateDataButton);
@@ -2301,11 +2389,9 @@ void HarmonicCalibration::run(bool b)
 
 	if(!b) {
 		isStartAcquisition = false;
-		// acquisitionUITimer->stop();
 		runButton->setChecked(false);
 	}
 	else{
-		// acquisitionUITimer->start(acquisitionUITimerRate);
 		startAcquisition();
 	}
 
@@ -2342,16 +2428,22 @@ void HarmonicCalibration::acquisitionPlotTask(int sampleRate)
 	}
 }
 
-void HarmonicCalibration::acquisitionUITask(int sampleRate)
+void HarmonicCalibration::acquisitionUITask()
 {
-	while(isStartAcquisition)
+	updateFaultStatusLEDColor(acquisitionFaultRegisterLEDWidget, deviceStatusFault);
+
+	if(isStartAcquisition)
 	{
 		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
-
 		updateLineEditValues();
 		updateLineEditValue(acquisitionMotorCurrentPositionLineEdit, current_pos);
-		QThread::msleep(sampleRate);
 	}
+}
+
+void HarmonicCalibration::updateFaultStatusLEDColor(MenuControlButton *widget, bool value)
+{
+	if(value) changeStatusLEDColor(widget, faultLEDColor); 
+	else changeStatusLEDColor(widget, statusLEDColor); 
 }
 
 void HarmonicCalibration::applySequence(){
@@ -3053,60 +3145,76 @@ void HarmonicCalibration::updateLabelValue(QLabel *label, ADMTController::MotorA
 
 void HarmonicCalibration::calibrationUITask()
 {
-	if(!isDebug){
-		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
-		updateLineEditValue(calibrationMotorCurrentPositionLineEdit, current_pos);
+	readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+	updateLineEditValue(calibrationMotorCurrentPositionLineEdit, current_pos);
+	updateFaultStatusLEDColor(calibrationFaultRegisterLEDWidget, deviceStatusFault);
 
-		if(isStartMotor)
-		{
-			if(isPostCalibration){
-				postCalibrationRawDataPlotChannel->curve()->setSamples(graphPostDataList);
-				postCalibrationRawDataPlotWidget->replot();
-			}
-			else{
-				calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
-				calibrationRawDataPlotWidget->replot();
-			}
+	if(isStartMotor)
+	{
+		if(isPostCalibration){
+			postCalibrationRawDataPlotChannel->curve()->setSamples(graphPostDataList);
+			postCalibrationRawDataPlotWidget->replot();
+		}
+		else{
+			calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
+			calibrationRawDataPlotWidget->replot();
 		}
 	}
 }
 
 void HarmonicCalibration::getCalibrationSamples()
 {
-	resetCurrentPositionToZero();
-
-	if(isPostCalibration){
-		int currentSamplesCount = graphPostDataList.size();
-		while(isStartMotor && currentSamplesCount < totalSamplesCount){
-			target_pos = current_pos + -408;
-			moveMotorToPosition(target_pos, true);
-			updateChannelValue(ADMTController::Channel::ANGLE);
-			graphPostDataList.append(angle);
-			currentSamplesCount++;
+	if(resetCurrentPositionToZero()){
+		if(isPostCalibration){
+			int currentSamplesCount = graphPostDataList.size();
+			while(isStartMotor && currentSamplesCount < totalSamplesCount){
+				target_pos = current_pos + -408;
+				moveMotorToPosition(target_pos, true);
+				updateChannelValue(ADMTController::Channel::ANGLE);
+				graphPostDataList.append(angle);
+				currentSamplesCount++;
+			}
 		}
-	}
-	else{
-		int currentSamplesCount = graphDataList.size();
-		while(isStartMotor && currentSamplesCount < totalSamplesCount){
-			target_pos = current_pos + -408;
-			if(moveMotorToPosition(target_pos, true) == false) { m_admtController->disconnectADMT(); }
-			if(updateChannelValue(ADMTController::Channel::ANGLE)) { break; }
-			graphDataList.append(angle);
-			currentSamplesCount++;
+		else{
+			int currentSamplesCount = graphDataList.size();
+			while(isStartMotor && currentSamplesCount < totalSamplesCount){
+				target_pos = current_pos + -408;
+				if(moveMotorToPosition(target_pos, true) == false) { m_admtController->disconnectADMT(); }
+				if(updateChannelValue(ADMTController::Channel::ANGLE)) { break; }
+				graphDataList.append(angle);
+				currentSamplesCount++;
+			}
 		}
 	}
 
 	stopMotor();
 }
 
-void HarmonicCalibration::resetCurrentPositionToZero()
+bool HarmonicCalibration::resetCurrentPositionToZero()
 {
-	writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, 0);
-	readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
-	while(current_pos != 0){
-		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+	bool success = false;
+	if(readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) == 0)
+	{
+		if(current_pos != 0 &&
+		   writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, 0) == 0 &&
+		   readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) == 0)
+		{
+			while(current_pos != 0){
+				if(readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) != 0) break;
+				QThread::msleep(readMotorDebounce);
+			}
+			if(current_pos == 0)
+			{
+				resetToZero = false;
+				success = true;
+			}
+		}
+		else{
+			success = true;
+		}
 	}
-	resetToZero = false;
+	
+	return success;
 }
 
 void HarmonicCalibration::startMotor()
@@ -3680,4 +3788,18 @@ void HarmonicCalibration::applyTabWidgetStyle(QTabWidget *widget, const QString&
 	style.replace("&&ScopyBlue&&", StyleHelper::getColor(styleHelperColor));
 	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
 	widget->tabBar()->setStyleSheet(style);
+}
+
+void HarmonicCalibration::requestDisconnect()
+{
+	isStartAcquisition = false;
+	isDeviceStatusMonitor = false;
+
+	m_deviceStatusThread.cancel();
+	m_acquisitionDataThread.cancel();
+	m_acquisitionGraphThread.cancel();
+
+	m_deviceStatusWatcher.waitForFinished();
+	m_acquisitionDataWatcher.waitForFinished();
+	m_acquisitionGraphWatcher.waitForFinished();
 }
