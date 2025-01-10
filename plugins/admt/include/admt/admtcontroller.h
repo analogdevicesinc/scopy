@@ -211,6 +211,8 @@ public:
     map<string, double> getSecAnglQRegisterBitMapping(uint16_t registerValue);
     map<string, double> getSecAnglIRegisterBitMapping(uint16_t registerValue);
     map<string, double> getTmp1RegisterBitMapping(uint16_t registerValue, bool is5V);
+    bool checkRegisterFault(uint16_t registerValue, bool isMode1);
+
 private:
     iio_context *m_iioCtx;
     iio_buffer *m_iioBuffer;

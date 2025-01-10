@@ -84,12 +84,12 @@ public:
 	~HarmonicCalibration();
 	bool running() const;
 	void setRunning(bool newRunning);
+	void requestDisconnect();
 public Q_SLOTS:
 	void run(bool);
 	void stop();
 	void start();
 	void restart();
-	void calibrationUITask();
 	void utilityTask();
 	void clearCommandLog();
 	void canCalibrate(bool);
@@ -172,7 +172,7 @@ private:
 
 	HorizontalSpinBox *motorMaxVelocitySpinBox, *motorAccelTimeSpinBox, *motorMaxDisplacementSpinBox, *motorTargetPositionSpinBox;
 
-	MenuControlButton *DIGIOBusyStatusLED ,*DIGIOCNVStatusLED ,*DIGIOSENTStatusLED ,*DIGIOACALCStatusLED ,*DIGIOFaultStatusLED ,*DIGIOBootloaderStatusLED,
+	MenuControlButton *acquisitionFaultRegisterLEDWidget, *calibrationFaultRegisterLEDWidget, *DIGIOBusyStatusLED ,*DIGIOCNVStatusLED ,*DIGIOSENTStatusLED ,*DIGIOACALCStatusLED ,*DIGIOFaultStatusLED ,*DIGIOBootloaderStatusLED,
 		*R0StatusLED, *R1StatusLED, *R2StatusLED, *R3StatusLED, *R4StatusLED, *R5StatusLED, *R6StatusLED, *R7StatusLED,
 		*VDDUnderVoltageStatusLED, *VDDOverVoltageStatusLED, *VDRIVEUnderVoltageStatusLED, *VDRIVEOverVoltageStatusLED, 
 		*AFEDIAGStatusLED, *NVMCRCFaultStatusLED, *ECCDoubleBitErrorStatusLED, *OscillatorDriftStatusLED, *CountSensorFalseStateStatusLED, 
@@ -188,6 +188,9 @@ private:
 		*DIGIOALLToggleSwitch;
 
 	RegisterBlockWidget *cnvPageRegisterBlock, *digIORegisterBlock, *faultRegisterBlock, *generalRegisterBlock, *digIOEnRegisterBlock, *angleCkRegisterBlock, *eccDcdeRegisterBlock, *eccDisRegisterBlock, *absAngleRegisterBlock, *angleRegisterBlock, *angleSecRegisterBlock, *sineRegisterBlock, *cosineRegisterBlock, *secAnglIRegisterBlock, *secAnglQRegisterBlock, *radiusRegisterBlock, *diag1RegisterBlock, *diag2RegisterBlock, *tmp0RegisterBlock, *tmp1RegisterBlock, *cnvCntRegisterBlock, *uniqID0RegisterBlock, *uniqID1RegisterBlock, *uniqID2RegisterBlock, *uniqID3RegisterBlock, *h1MagRegisterBlock, *h1PhRegisterBlock, *h2MagRegisterBlock, *h2PhRegisterBlock, *h3MagRegisterBlock, *h3PhRegisterBlock, *h8MagRegisterBlock, *h8PhRegisterBlock;
+
+	QFuture<void> m_deviceStatusThread, m_acquisitionDataThread, m_acquisitionGraphThread;
+	QFutureWatcher<void> m_deviceStatusWatcher, m_acquisitionDataWatcher, m_acquisitionGraphWatcher;
 
 	bool updateChannelValues();
 	void updateLineEditValues();
@@ -245,7 +248,7 @@ private:
 	void computeSineCosineOfAngles(QVector<double> graphDataList);
 	void postCalibrateData();
 	void canStartMotor(bool value);
-	void resetCurrentPositionToZero();
+	bool resetCurrentPositionToZero();
 	void flashHarmonicValues();
 	void updateCalculatedCoeffHex();
 	void resetCalculatedCoeffHex();
@@ -256,7 +259,7 @@ private:
 	void toggleFaultRegisterMode(int mode);
 	void startAcquisition();
 	void getAcquisitionSamples(int sampleRate);
-	void acquisitionUITask(int sampleRate);
+	void acquisitionUITask();
 	void acquisitionPlotTask(int sampleRate);
 	void toggleMTDiagnostics(int mode);
 	void toggleSequenceModeRegisters(int mode);
@@ -281,6 +284,11 @@ private:
 	void toggleTabSwitching(bool value);
 	double getAcquisitionParameterValue(const AcquisitionDataKey &key);
 	void resetYAxisScale();
+	void getDeviceFaultStatus(int sampleRate);
+	void startAcquisitionDeviceStatusMonitor();
+	void startCalibrationDeviceStatusMonitor();
+	void updateFaultStatusLEDColor(MenuControlButton *widget, bool value);
+	void calibrationUITask();
 
 	QTimer *acquisitionUITimer, *calibrationUITimer, *utilityTimer;
 
