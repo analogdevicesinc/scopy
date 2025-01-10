@@ -1,6 +1,6 @@
-.. _tests_scopy:
+.. _tests_general:
 
-Test Cases
+General Test Cases
 ===============================================================================
 
 Contents
@@ -10,5 +10,7 @@ Contents
    :includehidden:
    :maxdepth: 3
 
-   plugins/index
-   general/index
+..
+ add the path to each core feature test case here
+ example core/homepage_tests
+
