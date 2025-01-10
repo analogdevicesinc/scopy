@@ -41,11 +41,10 @@ void ADMTController::disconnectADMT()
 	if(!m_conn || !m_iioCtx){
 		return;
 	}
-
+    
 	ConnectionProvider::close(uri);
 	m_conn = nullptr;
 	m_iioCtx = nullptr;
-
 }
 
 const char* ADMTController::getChannelId(Channel channel)
@@ -1515,4 +1514,37 @@ map<string, double> ADMTController::getTmp1RegisterBitMapping(uint16_t registerV
     result["TMP1"] = tmp1DegC;
 
     return result;
+}
+
+bool ADMTController::checkRegisterFault(uint16_t registerValue, bool isMode1) {
+    // Mode-specific checks
+    if (isMode1) {
+        return ((registerValue >> 14) & 0x01) || // AMR Radius Check
+               ((registerValue >> 13) & 0x01) || // Turn Counter Cross Check
+               ((registerValue >> 9)  & 0x01) || // Count Sensor False State
+               ((registerValue >> 7)  & 0x01) || // ECC Double Bit Error
+               ((registerValue >> 5)  & 0x01) || // NVM CRC Fault
+               ((registerValue >> 3)  & 0x01) || // VDRIVE Over Voltage
+               ((registerValue >> 2)  & 0x01) || // VDRIVE Under Voltage
+               ((registerValue >> 1)  & 0x01) || // VDD Over Voltage
+               ((registerValue >> 0)  & 0x01);  // VDD Under Voltage
+    } else {
+        // Check all bits if not in Mode 1
+        return ((registerValue >> 15) & 0x01) || // Sequencer Watchdog
+               ((registerValue >> 14) & 0x01) || // AMR Radius Check
+               ((registerValue >> 13) & 0x01) || // Turn Counter Cross Check
+               ((registerValue >> 12) & 0x01) || // MT Diagnostic
+               ((registerValue >> 11) & 0x01) || // Turn Count Sensor Levels
+               ((registerValue >> 10) & 0x01) || // Angle Cross Check
+               ((registerValue >> 9)  & 0x01) || // Count Sensor False State
+               ((registerValue >> 8)  & 0x01) || // Oscillator Drift
+               ((registerValue >> 7)  & 0x01) || // ECC Double Bit Error
+               ((registerValue >> 6)  & 0x01) || // Reserved
+               ((registerValue >> 5)  & 0x01) || // NVM CRC Fault
+               ((registerValue >> 4)  & 0x01) || // AFE Diagnostic
+               ((registerValue >> 3)  & 0x01) || // VDRIVE Over Voltage
+               ((registerValue >> 2)  & 0x01) || // VDRIVE Under Voltage
+               ((registerValue >> 1)  & 0x01) || // VDD Over Voltage
+               ((registerValue >> 0)  & 0x01);  // VDD Under Voltage
+    }
 }
