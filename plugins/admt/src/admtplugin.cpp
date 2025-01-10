@@ -94,7 +94,7 @@ bool ADMTPlugin::onConnect()
 		return false;
 	m_ctx = conn->context();
 	m_toolList[0]->setEnabled(true);
-	m_toolList[0]->setRunBtnVisible(true);
+	m_toolList[0]->setRunBtnVisible(false);
 
 	//auto recipe = createRecipe(m_ctx);
 
@@ -110,6 +110,9 @@ bool ADMTPlugin::onDisconnect()
 {
 	// This method is called when the disconnect button is pressed
 	// It must remove all connections that were established on the connection
+
+	dynamic_cast<HarmonicCalibration *>(harmonicCalibration)->requestDisconnect();
+	
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);
