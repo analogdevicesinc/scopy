@@ -29,6 +29,9 @@
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menuplotaxisrangecontrol.h>
 #include <gui/channelcomponent.h>
+#include <gui/style.h>
+#include <gui/style_attributes.h>
+
 #include <pluginbase/preferences.h>
 #include <timeplotcomponentchannel.h>
 #include <qwt_point_data.h>
@@ -47,6 +50,7 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 {
 	m_dockableArea = createDockableArea(this);
 	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
+	Style::setBackgroundColor(dockableAreaWidget, json::theme::background_subtle, true);
 	m_plotLayout->addWidget(dockableAreaWidget);
 
 	m_timeDockWidget = createDockWrapper("Time Plot");
