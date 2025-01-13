@@ -3,9 +3,7 @@ General Settings - Test Case
 
 Initial Setup
 -----------------------------------------------
-In order to proceed through the test case, first of all delete the Scopy \*.ini file (saves previous settings made in Scopy tool) from the following path on Windows: ``C:\Users\your_username\AppData\Roaming\ADI``.
-
-Open Scopy instrument. The interface should look like the pictures below:
+In order to proceed through the test case, first of all delete the Scopy \*.ini file (saves previous settings made in Scopy tool).
 
 Test Case
 -----------------------------------------------
