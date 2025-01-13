@@ -75,6 +75,7 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 	});
 
 	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
+	Style::setBackgroundColor(dockableAreaWidget, json::theme::background_subtle, true);
 	tool->addWidgetToCentralContainerHelper(dockableAreaWidget);
 
 	m_voltageDockWrapper = createDockWrapper("Voltage Plot");
