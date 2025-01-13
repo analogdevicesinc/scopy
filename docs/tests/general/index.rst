@@ -16,6 +16,8 @@ Contents
    core/emu_tests
    core/dev_tests
 
+   instrument_detaching
+
 ..
  add the path to each core feature test case here
  example core/homepage_tests
