@@ -22,11 +22,14 @@
 #include "fftplotcomponent.h"
 #include "plotaxis.h"
 
+#include <gui/style.h>
+#include <gui/style_attributes.h>
 #include <gui/docking/dockablearea.h>
 #include <gui/docking/dockwrapper.h>
-#include <widgets/menucollapsesection.h>
-#include <widgets/menusectionwidget.h>
-#include <widgets/menuplotaxisrangecontrol.h>
+#include <gui/widgets/menucollapsesection.h>
+#include <gui/widgets/menusectionwidget.h>
+#include <gui/widgets/menuplotaxisrangecontrol.h>
+
 #include <pluginbase/preferences.h>
 #include <qwt_point_data.h>
 #include <QLineEdit>
@@ -40,6 +43,7 @@ FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 {
 	m_dockableArea = createDockableArea(this);
 	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
+	Style::setBackgroundColor(dockableAreaWidget, json::theme::background_subtle, true);
 	m_plotLayout->addWidget(dockableAreaWidget);
 
 	m_fftDockWrapper = createDockWrapper("FFT Plot");
