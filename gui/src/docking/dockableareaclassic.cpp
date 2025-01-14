@@ -42,16 +42,22 @@ void DockableArea::addDockWrapper(DockWrapperInterface *dockWrapper, Direction d
 
 	QWidget *dockWrapperWidget = dynamic_cast<QWidget *>(dockWrapper);
 	if(dockWrapperWidget) {
+		QVBoxLayout *vlayout = dynamic_cast<QVBoxLayout *>(layout());
+		QHBoxLayout *hlayout = dynamic_cast<QHBoxLayout *>(layout());
 		if(direction == Direction_RIGHT || direction == Direction_BOTTOM) {
 			layout()->addWidget(dockWrapperWidget);
 		} else {
-			QVBoxLayout *vlayout = dynamic_cast<QVBoxLayout *>(layout());
 			if(vlayout) {
 				vlayout->insertWidget(0, dockWrapperWidget);
 			} else {
-				QHBoxLayout *hlayout = dynamic_cast<QHBoxLayout *>(layout());
 				hlayout->insertWidget(0, dockWrapperWidget);
 			}
+		}
+
+		if(vlayout) {
+			vlayout->setStretchFactor(dockWrapperWidget, 1);
+		} else {
+			hlayout->setStretchFactor(dockWrapperWidget, 1);
 		}
 	} else {
 		qWarning() << "Cannot cast dockWrapperInterface to QWidget*";
@@ -66,4 +72,5 @@ void DockableArea::init(Direction direction)
 		setLayout(new QVBoxLayout(this));
 	}
 	layout()->setContentsMargins(0, 0, 0, 0);
+	m_isInitialized = true;
 }
