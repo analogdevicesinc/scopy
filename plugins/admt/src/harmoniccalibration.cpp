@@ -125,18 +125,80 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QHBoxLayout *lay = new QHBoxLayout(this);
-    tool = new ToolTemplate(this);
+	tabWidget = new QTabWidget(this);
+
 	setLayout(lay);
     lay->setMargin(0);
-	tabWidget = new QTabWidget(this);
-	tabWidget->addTab(tool, "Acquisition");
+	lay->insertWidget(1, tabWidget);
+	tabWidget->addTab(createAcquisitionWidget(), "Acquisition");
+	tabWidget->addTab(createCalibrationWidget(), "Calibration");
+	tabWidget->addTab(createUtilityWidget(), "Utility");
+	tabWidget->addTab(createRegistersWidget(), "Registers");
 
-    openLastMenuButton = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), true, this);
+	connect(tabWidget, &QTabWidget::currentChanged, [=](int index){
+		tabWidget->setCurrentIndex(index);
+
+		if(index == 0 || index == 1)
+		{
+			if(isDeviceStatusMonitor) isDeviceStatusMonitor = false;
+
+			if(index == 0) startAcquisitionDeviceStatusMonitor();
+			else startCalibrationDeviceStatusMonitor();
+		}
+		else{
+			isDeviceStatusMonitor = false;
+		}
+
+		if(index == 0) // Acquisition Tab
+		{ 
+			acquisitionUITimer->start(acquisitionUITimerRate);
+			readSequence();
+		}
+		else
+		{
+			acquisitionUITimer->stop();
+			stop();
+		}
+
+		if(index == 1) // Calibration Tab
+		{ 
+			calibrationUITimer->start(calibrationUITimerRate);
+		}
+		else 
+		{ 
+			calibrationUITimer->stop();
+		}
+
+		if(index == 2) // Utility Tab
+		{ 
+			utilityTimer->start(utilityTimerRate); 
+			readSequence();
+			toggleFaultRegisterMode(generalRegisterMap.at("Sequence Type"));
+			toggleMTDiagnostics(generalRegisterMap.at("Sequence Type"));
+			updateDIGIOToggle();
+		}	
+		else { utilityTimer->stop(); }
+
+		if(index == 3) // Registers Tab
+		{ 
+			readSequence();
+			toggleRegisters(generalRegisterMap.at("Sequence Type"));
+		}
+	});
+
+	acquisitionUITimer->start(acquisitionUITimerRate);
+	startAcquisitionDeviceStatusMonitor();
+}
+
+HarmonicCalibration::~HarmonicCalibration() {}
+
+ToolTemplate* HarmonicCalibration::createAcquisitionWidget()
+{
+	tool = new ToolTemplate(this);
+	openLastMenuButton = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), true, this);
 	rightMenuButtonGroup = dynamic_cast<OpenLastMenuBtn *>(openLastMenuButton)->getButtonGroup();
 
     settingsButton = new GearBtn(this);
-	lay->insertWidget(1, tabWidget);
-
     runButton = new RunBtn(this);
 
 	QPushButton *resetGMRButton = new QPushButton(this);
@@ -406,7 +468,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 
 	QPushButton *resetYAxisButton = new QPushButton("Reset Y-Axis Scale", generalSection);
 	StyleHelper::BlueButton(resetYAxisButton, "resetYAxisButton");
-	connect(resetYAxisButton, &QPushButton::clicked, this, &HarmonicCalibration::resetYAxisScale);
+	connect(resetYAxisButton, &QPushButton::clicked, this, &HarmonicCalibration::resetAcquisitionYAxisScale);
 
 	generalSection->contentLayout()->addWidget(graphUpdateIntervalLabel);
 	generalSection->contentLayout()->addWidget(graphUpdateIntervalLineEdit);
@@ -528,237 +590,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	utilityTimer = new QTimer(this);
 	connect(utilityTimer, &QTimer::timeout, this, &HarmonicCalibration::utilityTask);
 
-	tabWidget->addTab(createCalibrationWidget(), "Calibration");
-	tabWidget->addTab(createUtilityWidget(), "Utility");
-	tabWidget->addTab(createRegistersWidget(), "Registers");
-
-	connect(tabWidget, &QTabWidget::currentChanged, [=](int index){
-		tabWidget->setCurrentIndex(index);
-
-		if(index == 0 || index == 1)
-		{
-			if(isDeviceStatusMonitor) isDeviceStatusMonitor = false;
-
-			if(index == 0) startAcquisitionDeviceStatusMonitor();
-			else startCalibrationDeviceStatusMonitor();
-		}
-		else{
-			isDeviceStatusMonitor = false;
-		}
-
-		if(index == 0) // Acquisition Tab
-		{ 
-			acquisitionUITimer->start(acquisitionUITimerRate);
-			readSequence();
-		}
-		else
-		{
-			acquisitionUITimer->stop();
-			stop();
-		}
-
-		if(index == 1) // Calibration Tab
-		{ 
-			calibrationUITimer->start(calibrationUITimerRate);
-		}
-		else 
-		{ 
-			calibrationUITimer->stop();
-		}
-
-		if(index == 2) // Utility Tab
-		{ 
-			utilityTimer->start(utilityTimerRate); 
-			readSequence();
-			toggleFaultRegisterMode(generalRegisterMap.at("Sequence Type"));
-			toggleMTDiagnostics(generalRegisterMap.at("Sequence Type"));
-			updateDIGIOToggle();
-		}	
-		else { utilityTimer->stop(); }
-
-		if(index == 3) // Registers Tab
-		{ 
-			readSequence();
-			toggleSequenceModeRegisters(generalRegisterMap.at("Sequence Type"));
-		}
-	});
-
-	acquisitionUITimer->start(acquisitionUITimerRate);
-	startAcquisitionDeviceStatusMonitor();
-}
-
-HarmonicCalibration::~HarmonicCalibration() {}
-
-void HarmonicCalibration::startAcquisitionDeviceStatusMonitor()
-{
-	isDeviceStatusMonitor = true;
-	m_deviceStatusThread = QtConcurrent::run(this, &HarmonicCalibration::getDeviceFaultStatus, deviceStatusMonitorRate);
-	m_deviceStatusWatcher.setFuture(m_deviceStatusThread);
-}
-
-void HarmonicCalibration::startCalibrationDeviceStatusMonitor()
-{
-	isDeviceStatusMonitor = true;
-	m_deviceStatusThread = QtConcurrent::run(this, &HarmonicCalibration::getDeviceFaultStatus, deviceStatusMonitorRate);
-	m_deviceStatusWatcher.setFuture(m_deviceStatusThread);
-}
-
-void HarmonicCalibration::resetYAxisScale()
-{
-	acquisitionGraphYMin = 0;
-	acquisitionGraphYMax = 360;
-	acquisitionYPlotAxis->setInterval(acquisitionGraphYMin, acquisitionGraphYMax);
-	acquisitionGraphPlotWidget->replot();
-}
-
-void HarmonicCalibration::startAcquisition()
-{
-	isStartAcquisition = true;
-	acquisitionXPlotAxis->setInterval(0, acquisitionDisplayLength);
-
-    m_acquisitionDataThread = QtConcurrent::run(this, &HarmonicCalibration::getAcquisitionSamples, acquisitionSampleRate);
-	m_acquisitionDataWatcher.setFuture(m_acquisitionDataThread);
-	m_acquisitionGraphThread = QtConcurrent::run(this, &HarmonicCalibration::acquisitionPlotTask, acquisitionGraphSampleRate);
-	m_acquisitionGraphWatcher.setFuture(m_acquisitionGraphThread);
-}
-
-void HarmonicCalibration::getAcquisitionSamples(int sampleRate)
-{
-	while(isStartAcquisition)
-	{
-		if(!updateChannelValues()) { break; }
-
-		if(acquisitionDataMap.at(ANGLE) == false && acquisitionAngleList.size() > 0) acquisitionAngleList.clear();
-		if(acquisitionDataMap.at(ABSANGLE) == false && acquisitionABSAngleList.size() > 0) acquisitionABSAngleList.clear();
-		if(acquisitionDataMap.at(TURNCOUNT) == false && acquisitionTurnCountList.size() > 0) acquisitionTurnCountList.clear();
-		if(acquisitionDataMap.at(TMP0) == false && acquisitionTmp0List.size() > 0) acquisitionTmp0List.clear();
-		if(acquisitionDataMap.at(SINE) == false && acquisitionSineList.size() > 0) acquisitionSineList.clear();
-		if(acquisitionDataMap.at(COSINE) == false && acquisitionCosineList.size() > 0) acquisitionCosineList.clear();
-		if(acquisitionDataMap.at(RADIUS) == false && acquisitionRadiusList.size() > 0) acquisitionRadiusList.clear();
-
-		if(acquisitionDataMap.at(ANGLE)) prependAcquisitionData(angle, acquisitionAngleList);
-		if(acquisitionDataMap.at(ABSANGLE)) prependAcquisitionData(rotation, acquisitionABSAngleList);
-		if(acquisitionDataMap.at(TURNCOUNT)) prependAcquisitionData(count, acquisitionTurnCountList);
-		if(acquisitionDataMap.at(TMP0)) prependAcquisitionData(temp, acquisitionTmp0List);
-		if(acquisitionDataMap.at(SINE)) prependAcquisitionData(getAcquisitionParameterValue(SINE), acquisitionSineList);
-		if(acquisitionDataMap.at(COSINE)) prependAcquisitionData(getAcquisitionParameterValue(COSINE), acquisitionCosineList);
-		if(acquisitionDataMap.at(RADIUS)) prependAcquisitionData(getAcquisitionParameterValue(RADIUS), acquisitionRadiusList);
-
-		QThread::msleep(sampleRate);
-	}
-}
-
-double HarmonicCalibration::getAcquisitionParameterValue(const AcquisitionDataKey &key)
-{
-	uint32_t *readValue = new uint32_t;
-	switch(key)
-	{
-		case SINE:
-		{
-			if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-				m_admtController->getSensorRegister(ADMTController::SensorRegister::SINE),
-				readValue) == -1) return qQNaN();
-			map<string, double> sineRegisterMap = m_admtController->getSineRegisterBitMapping(static_cast<uint16_t>(*readValue));
-			return sineRegisterMap.at("SINE");
-			break;
-		}
-		case COSINE:
-		{
-			if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-				m_admtController->getSensorRegister(ADMTController::SensorRegister::COSINE),
-				readValue) == -1) return qQNaN();
-			map<string, double> cosineRegisterMap = m_admtController->getCosineRegisterBitMapping(static_cast<uint16_t>(*readValue));
-			return cosineRegisterMap.at("COSINE");
-			break;
-		}
-		case RADIUS:
-		{
-			if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-				m_admtController->getSensorRegister(ADMTController::SensorRegister::RADIUS),
-				readValue) == -1) return qQNaN();
-			map<string, double> radiusRegisterMap = m_admtController->getRadiusRegisterBitMapping(static_cast<uint16_t>(*readValue));
-			return radiusRegisterMap.at("RADIUS");
-			break;
-		}
-		default: 
-			return qQNaN();
-			break;
-	}
-}
-
-void HarmonicCalibration::getDeviceFaultStatus(int sampleRate)
-{
-	while(isDeviceStatusMonitor)
-	{
-		uint32_t *readValue = new uint32_t;
-		if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::FAULT), 0) == 0)
-		{
-			if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::FAULT), readValue) == 0)
-			{
-				deviceStatusFault = m_admtController->checkRegisterFault(static_cast<uint16_t>(*readValue), generalRegisterMap.at("Sequence Type") == 0 ? true : false);
-			}
-			else
-			{
-				deviceStatusFault = true;
-			}
-		}
-		else
-		{
-			deviceStatusFault = true;
-		}
-
-		QThread::msleep(sampleRate);
-	}
-}
-
-void HarmonicCalibration::prependAcquisitionData(const double& data, QVector<double>& list)
-{
-	list.prepend(data);
-	if(list.size() >= acquisitionDisplayLength){
-		list.resize(acquisitionDisplayLength);
-		list.squeeze();
-	}
-}
-
-void HarmonicCalibration::prependNullAcquisitionData(QVector<double>& list)
-{
-	list.prepend(qQNaN());
-}
-
-void HarmonicCalibration::plotAcquisition(QVector<double>& list, PlotChannel* channel)
-{
-	channel->curve()->setSamples(list);
-	auto result = std::minmax_element(list.begin(), list.end());
-	if(*result.first < acquisitionGraphYMin) acquisitionGraphYMin = *result.first;
-	if(*result.second > acquisitionGraphYMax) acquisitionGraphYMax = *result.second;
-}
-
-void HarmonicCalibration::initializeMotor()
-{
-	rotate_vmax = 53687.0912;
-	writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
-	readMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
-	writeMotorAttributeValue(ADMTController::MotorAttribute::DISABLE, 1);
-	
-	amax = 439.8046511104;
-	writeMotorAttributeValue(ADMTController::MotorAttribute::AMAX, amax);
-	readMotorAttributeValue(ADMTController::MotorAttribute::AMAX, amax);
-
-	dmax = 3000;
-	writeMotorAttributeValue(ADMTController::MotorAttribute::DMAX, dmax);
-	readMotorAttributeValue(ADMTController::MotorAttribute::DMAX, dmax);
-
-	ramp_mode = 0;
-	writeMotorAttributeValue(ADMTController::MotorAttribute::RAMP_MODE, ramp_mode);
-	readMotorAttributeValue(ADMTController::MotorAttribute::RAMP_MODE, ramp_mode);
-
-	target_pos = 0;
-	writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, target_pos);
-
-	current_pos = 0;
-	readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+	return tool;
 }
 
 ToolTemplate* HarmonicCalibration::createCalibrationWidget()
@@ -774,7 +606,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	MenuSectionWidget *calibrationDataGraphSectionWidget = new MenuSectionWidget(calibrationDataGraphWidget);
 	calibrationDataGraphTabWidget = new QTabWidget(calibrationDataGraphSectionWidget);
-	applyTabWidgetStyle(calibrationDataGraphTabWidget);
+	ADMTStyleHelper::TabWidgetStyle(calibrationDataGraphTabWidget);
 	calibrationDataGraphSectionWidget->contentLayout()->setSpacing(8);
 	calibrationDataGraphSectionWidget->contentLayout()->addWidget(calibrationDataGraphTabWidget);
 
@@ -812,13 +644,9 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationRawDataPlotWidget->replot();
 
 	QWidget *calibrationDataGraphChannelsWidget = new QWidget(calibrationDataGraphTabWidget);
+	ADMTStyleHelper::UIBackgroundStyle(calibrationDataGraphChannelsWidget);
 	QHBoxLayout *calibrationDataGraphChannelsLayout = new QHBoxLayout(calibrationDataGraphChannelsWidget);
 	calibrationDataGraphChannelsWidget->setLayout(calibrationDataGraphChannelsLayout);
-	QString calibrationDataGraphChannelsStyle = QString(R"css(
-														background-color: &&colorname&&;
-														)css");
-	calibrationDataGraphChannelsStyle.replace(QString("&&colorname&&"), StyleHelper::getColor("UIElementBackground"));
-	calibrationDataGraphChannelsWidget->setStyleSheet(calibrationDataGraphChannelsStyle);
 	calibrationDataGraphChannelsLayout->setContentsMargins(20, 13, 20, 5);
 	calibrationDataGraphChannelsLayout->setSpacing(20);
 	
@@ -872,10 +700,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	QWidget *postCalibrationDataGraphChannelsWidget = new QWidget(calibrationDataGraphTabWidget);
 	QHBoxLayout *postCalibrationDataGraphChannelsLayout = new QHBoxLayout(postCalibrationDataGraphChannelsWidget);
-	postCalibrationDataGraphChannelsWidget->setLayout(postCalibrationDataGraphChannelsLayout);
-	postCalibrationDataGraphChannelsWidget->setStyleSheet(calibrationDataGraphChannelsStyle);
-	postCalibrationDataGraphChannelsLayout->setContentsMargins(20, 13, 20, 5);
-	postCalibrationDataGraphChannelsLayout->setSpacing(20);
+	ADMTStyleHelper::GraphChannelStyle(postCalibrationDataGraphChannelsWidget, postCalibrationDataGraphChannelsLayout);
 
 	MenuControlButton *togglePostAngleButton = createChannelToggleWidget("Angle", scopyBlueColor, postCalibrationDataGraphChannelsWidget);
 	MenuControlButton *togglePostSineButton = createChannelToggleWidget("Sine", sineColor, postCalibrationDataGraphChannelsWidget);
@@ -895,7 +720,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	MenuSectionWidget *resultDataSectionWidget = new MenuSectionWidget(calibrationDataGraphWidget);
 	resultDataTabWidget = new QTabWidget(resultDataSectionWidget);
-	applyTabWidgetStyle(resultDataTabWidget);
+	ADMTStyleHelper::TabWidgetStyle(resultDataTabWidget);
 	resultDataSectionWidget->contentLayout()->setSpacing(8);
 	resultDataSectionWidget->contentLayout()->addWidget(resultDataTabWidget);
 
@@ -966,10 +791,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	QWidget *FFTAngleErrorChannelsWidget = new QWidget();
 	QHBoxLayout *FFTAngleErrorChannelsLayout = new QHBoxLayout(FFTAngleErrorChannelsWidget);
-	FFTAngleErrorChannelsWidget->setStyleSheet(calibrationDataGraphChannelsStyle);
-	FFTAngleErrorChannelsWidget->setLayout(FFTAngleErrorChannelsLayout);
-	FFTAngleErrorChannelsLayout->setContentsMargins(20, 13, 20, 5);
-	FFTAngleErrorChannelsLayout->setSpacing(20);
+	ADMTStyleHelper::GraphChannelStyle(FFTAngleErrorChannelsWidget, FFTAngleErrorChannelsLayout);
 
 	MenuControlButton *toggleFFTAngleErrorMagnitudeButton = createChannelToggleWidget("Magnitude", QColor(StyleHelper::getColor("CH0")), FFTAngleErrorChannelsWidget);
 	MenuControlButton *toggleFFTAngleErrorPhaseButton = createChannelToggleWidget("Phase", QColor(StyleHelper::getColor("CH1")), FFTAngleErrorChannelsWidget);
@@ -1046,9 +868,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	QWidget *FFTCorrectedErrorChannelsWidget = new QWidget();
 	QHBoxLayout *FFTCorrectedErrorChannelsLayout = new QHBoxLayout(FFTCorrectedErrorChannelsWidget);
-	FFTCorrectedErrorChannelsWidget->setStyleSheet(calibrationDataGraphChannelsStyle);
-	FFTCorrectedErrorChannelsLayout->setContentsMargins(20, 13, 20, 5);
-	FFTCorrectedErrorChannelsLayout->setSpacing(20);
+	ADMTStyleHelper::GraphChannelStyle(FFTCorrectedErrorChannelsWidget, FFTCorrectedErrorChannelsLayout);
 
 	MenuControlButton *toggleFFTCorrectedErrorMagnitudeButton = createChannelToggleWidget("Magnitude", QColor(StyleHelper::getColor("CH0")), FFTCorrectedErrorChannelsWidget);
 	MenuControlButton *toggleFFTCorrectedErrorPhaseButton = createChannelToggleWidget("Phase", QColor(StyleHelper::getColor("CH1")), FFTCorrectedErrorChannelsWidget);
@@ -1167,111 +987,41 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationDisplayFormatSwitch->setOnText("Angle");
 	calibrationDisplayFormatSwitch->setProperty("bigBtn", true);
 
-	// Calculated Coefficients Widget
 	QWidget *calibrationCalculatedCoeffWidget = new QWidget(calibrationCoeffSectionWidget);
 	QGridLayout *calibrationCalculatedCoeffLayout = new QGridLayout(calibrationCalculatedCoeffWidget);
+
 	calibrationCalculatedCoeffWidget->setLayout(calibrationCalculatedCoeffLayout);
 	calibrationCalculatedCoeffLayout->setMargin(0);
 	calibrationCalculatedCoeffLayout->setVerticalSpacing(4);
-	QString calibrationCalculatedCoeffStyle = QString(R"css(
-													background-color: &&colorname&&;
-													)css");
-	calibrationCalculatedCoeffStyle.replace(QString("&&colorname&&"), StyleHelper::getColor("UIElementBackground"));
-	calibrationCalculatedCoeffWidget->setStyleSheet(calibrationCalculatedCoeffStyle);
+	ADMTStyleHelper::UIBackgroundStyle(calibrationCalculatedCoeffWidget);
 
-	QString rowContainerStyle = QString(R"css(
-										background-color: &&colorname&&;
-										border-radius: 4px;
-										)css");
-	rowContainerStyle.replace(QString("&&colorname&&"), StyleHelper::getColor("ScopyBackground"));
-
-	// H1
 	QWidget *h1RowContainer = new QWidget(calibrationCalculatedCoeffWidget);
 	QHBoxLayout *h1RowLayout = new QHBoxLayout(h1RowContainer);
-	h1RowContainer->setLayout(h1RowLayout);
-	h1RowContainer->setStyleSheet(rowContainerStyle);
-	h1RowContainer->setFixedHeight(30);
-	h1RowContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	h1RowLayout->setContentsMargins(12, 4, 12, 4);
 	QLabel *calibrationH1Label = new QLabel("H1", calibrationCalculatedCoeffWidget);
 	calibrationH1MagLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
 	calibrationH1PhaseLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
-	applyTextStyle(calibrationH1Label, "LabelText", true);
-	applyTextStyle(calibrationH1MagLabel, "CH0");
-	applyTextStyle(calibrationH1PhaseLabel, "CH1");
-	calibrationH1Label->setFixedWidth(24);
-	calibrationH1MagLabel->setContentsMargins(0, 0, 32, 0);
-	calibrationH1PhaseLabel->setFixedWidth(72);
+	ADMTStyleHelper::CalculatedCoeffWidgetRowStyle(h1RowContainer, h1RowLayout, calibrationH1Label, calibrationH1MagLabel, calibrationH1PhaseLabel);
 
-	h1RowLayout->addWidget(calibrationH1Label);
-	h1RowLayout->addWidget(calibrationH1MagLabel, 0, Qt::AlignRight);
-	h1RowLayout->addWidget(calibrationH1PhaseLabel);
-
-	// H2
 	QWidget *h2RowContainer = new QWidget(calibrationCalculatedCoeffWidget);
 	QHBoxLayout *h2RowLayout = new QHBoxLayout(h2RowContainer);
-	h2RowContainer->setLayout(h2RowLayout);
-	h2RowContainer->setStyleSheet(rowContainerStyle);
-	h2RowContainer->setFixedHeight(30);
-	h2RowContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	h2RowLayout->setContentsMargins(12, 4, 12, 4);
 	QLabel *calibrationH2Label = new QLabel("H2", calibrationCalculatedCoeffWidget);
 	calibrationH2MagLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
 	calibrationH2PhaseLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
-	applyTextStyle(calibrationH2Label, "LabelText", true);
-	applyTextStyle(calibrationH2MagLabel, "CH0");
-	applyTextStyle(calibrationH2PhaseLabel, "CH1");
-	calibrationH2Label->setFixedWidth(24);
-	calibrationH2MagLabel->setContentsMargins(0, 0, 32, 0);
-	calibrationH2PhaseLabel->setFixedWidth(72);
+	ADMTStyleHelper::CalculatedCoeffWidgetRowStyle(h2RowContainer, h2RowLayout, calibrationH2Label, calibrationH2MagLabel, calibrationH2PhaseLabel);
 
-	h2RowLayout->addWidget(calibrationH2Label);
-	h2RowLayout->addWidget(calibrationH2MagLabel, 0, Qt::AlignRight);
-	h2RowLayout->addWidget(calibrationH2PhaseLabel);
-
-	// H3
 	QWidget *h3RowContainer = new QWidget(calibrationCalculatedCoeffWidget);
 	QHBoxLayout *h3RowLayout = new QHBoxLayout(h3RowContainer);
-	h3RowContainer->setLayout(h3RowLayout);
-	h3RowContainer->setStyleSheet(rowContainerStyle);
-	h3RowContainer->setFixedHeight(30);
-	h3RowContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	h3RowLayout->setContentsMargins(12, 4, 12, 4);
 	QLabel *calibrationH3Label = new QLabel("H3", calibrationCalculatedCoeffWidget);
 	calibrationH3MagLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
 	calibrationH3PhaseLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
-	applyTextStyle(calibrationH3Label, "LabelText", true);
-	applyTextStyle(calibrationH3MagLabel, "CH0");
-	applyTextStyle(calibrationH3PhaseLabel, "CH1");
-	calibrationH3Label->setFixedWidth(24);
-	calibrationH3MagLabel->setContentsMargins(0, 0, 32, 0);
-	calibrationH3PhaseLabel->setFixedWidth(72);
+	ADMTStyleHelper::CalculatedCoeffWidgetRowStyle(h3RowContainer, h3RowLayout, calibrationH3Label, calibrationH3MagLabel, calibrationH3PhaseLabel);
 
-	h3RowLayout->addWidget(calibrationH3Label);
-	h3RowLayout->addWidget(calibrationH3MagLabel, 0, Qt::AlignRight);
-	h3RowLayout->addWidget(calibrationH3PhaseLabel);
-
-	// H8
 	QWidget *h8RowContainer = new QWidget(calibrationCalculatedCoeffWidget);
 	QHBoxLayout *h8RowLayout = new QHBoxLayout(h8RowContainer);
-	h8RowContainer->setLayout(h8RowLayout);
-	h8RowContainer->setStyleSheet(rowContainerStyle);
-	h8RowContainer->setFixedHeight(30);
-	h8RowContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	h8RowLayout->setContentsMargins(12, 4, 12, 4);
 	QLabel *calibrationH8Label = new QLabel("H8", calibrationCalculatedCoeffWidget);
 	calibrationH8MagLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
 	calibrationH8PhaseLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
-	applyTextStyle(calibrationH8Label, "LabelText", true);
-	applyTextStyle(calibrationH8MagLabel, "CH0");
-	applyTextStyle(calibrationH8PhaseLabel, "CH1");
-	calibrationH8Label->setFixedWidth(24);
-	calibrationH8MagLabel->setContentsMargins(0, 0, 32, 0);
-	calibrationH8PhaseLabel->setFixedWidth(72);
-
-	h8RowLayout->addWidget(calibrationH8Label);
-	h8RowLayout->addWidget(calibrationH8MagLabel, 0, Qt::AlignRight);
-	h8RowLayout->addWidget(calibrationH8PhaseLabel);
+	ADMTStyleHelper::CalculatedCoeffWidgetRowStyle(h8RowContainer, h8RowLayout, calibrationH8Label, calibrationH8MagLabel, calibrationH8PhaseLabel);
 
 	calibrationCalculatedCoeffLayout->addWidget(h1RowContainer, 0, 0);
 	calibrationCalculatedCoeffLayout->addWidget(h2RowContainer, 1, 0);
@@ -1747,20 +1497,6 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	DIGIOControlGridLayout->setMargin(0);
 	DIGIOControlGridLayout->setSpacing(8);
 
-	QString labelStyle = QString(R"css(
-				QLabel {
-					color: white;
-					background-color: rgba(255,255,255,0);
-					font-weight: 500;
-					font-family: Open Sans;
-					font-size: 12px;
-					font-style: normal;
-					}
-				QLabel:disabled {
-					color: grey;
-				}
-				)css");
-
 	QLabel *DIGIO0Label = new QLabel("DIGIO0", DIGIOControlGridWidget);
 	QLabel *DIGIO1Label = new QLabel("DIGIO1", DIGIOControlGridWidget);
 	QLabel *DIGIO2Label = new QLabel("DIGIO2", DIGIOControlGridWidget);
@@ -1769,13 +1505,13 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	QLabel *DIGIO5Label = new QLabel("DIGIO5", DIGIOControlGridWidget);
 	QLabel *DIGIOALLLabel = new QLabel("All DIGIO Output", DIGIOControlGridWidget);
 
-	DIGIO0Label->setStyleSheet(labelStyle);
-	DIGIO1Label->setStyleSheet(labelStyle);
-	DIGIO2Label->setStyleSheet(labelStyle);
-	DIGIO3Label->setStyleSheet(labelStyle);
-	DIGIO4Label->setStyleSheet(labelStyle);
-	DIGIO5Label->setStyleSheet(labelStyle);
-	DIGIOALLLabel->setStyleSheet(labelStyle);
+	ADMTStyleHelper::MenuSmallLabel(DIGIO0Label);
+	ADMTStyleHelper::MenuSmallLabel(DIGIO1Label);
+	ADMTStyleHelper::MenuSmallLabel(DIGIO2Label);
+	ADMTStyleHelper::MenuSmallLabel(DIGIO3Label);
+	ADMTStyleHelper::MenuSmallLabel(DIGIO4Label);
+	ADMTStyleHelper::MenuSmallLabel(DIGIO5Label);
+	ADMTStyleHelper::MenuSmallLabel(DIGIOALLLabel);
 
 	DIGIO0ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO0ENToggleSwitch, "Enable", "Disable");
@@ -1870,15 +1606,7 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 
 	DIGIOControlGridLayout->addItem(new QSpacerItem(0, 4, QSizePolicy::Fixed, QSizePolicy::Expanding), 1, 0, 1, 2);
 	QFrame *line = new QFrame();
-	line->setFrameShape(QFrame::HLine);
-	line->setFrameShadow(QFrame::Plain);
-	line->setFixedHeight(1);
-	QString lineStyle = QString(R"css(
-				QFrame {
-					border: 1px solid #808085;
-				}
-				)css");
-	line->setStyleSheet(lineStyle);
+	ADMTStyleHelper::LineStyle(line);
 	DIGIOControlGridLayout->addWidget(line, 2, 0, 1, 2);
 	DIGIOControlGridLayout->addItem(new QSpacerItem(0, 4, QSizePolicy::Fixed, QSizePolicy::Expanding), 3, 0, 1, 3);
 
@@ -2052,248 +1780,6 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	return tool;
 }
 
-void HarmonicCalibration::resetDIGIO()
-{
-	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-										m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
-										0x241b);
-}
-
-void HarmonicCalibration::readAllRegisters()
-{
-	readAllRegistersButton->setEnabled(false);
-	readAllRegistersButton->setText(QString("Reading Registers..."));
-	QTimer::singleShot(1000, this, [this](){
-		readAllRegistersButton->setEnabled(true);
-		readAllRegistersButton->setText(QString("Read All Registers"));
-	});
-
-	cnvPageRegisterBlock->readButton()->click();
-	digIORegisterBlock->readButton()->click();
-	faultRegisterBlock->readButton()->click();
-	generalRegisterBlock->readButton()->click();
-	digIOEnRegisterBlock->readButton()->click();
-	eccDcdeRegisterBlock->readButton()->click();
-	eccDisRegisterBlock->readButton()->click();
-	absAngleRegisterBlock->readButton()->click();
-	angleRegisterBlock->readButton()->click();
-	sineRegisterBlock->readButton()->click();
-	cosineRegisterBlock->readButton()->click();
-	tmp0RegisterBlock->readButton()->click();
-	cnvCntRegisterBlock->readButton()->click();
-	uniqID0RegisterBlock->readButton()->click();
-	uniqID1RegisterBlock->readButton()->click();
-	uniqID2RegisterBlock->readButton()->click();
-	uniqID3RegisterBlock->readButton()->click();
-	h1MagRegisterBlock->readButton()->click();
-	h1PhRegisterBlock->readButton()->click();
-	h2MagRegisterBlock->readButton()->click();
-	h2PhRegisterBlock->readButton()->click();
-	h3MagRegisterBlock->readButton()->click();
-	h3PhRegisterBlock->readButton()->click();
-	h8MagRegisterBlock->readButton()->click();
-	h8PhRegisterBlock->readButton()->click();
-
-	if(generalRegisterMap.at("Sequence Type") == 1){
-		angleSecRegisterBlock->readButton()->click();
-		secAnglIRegisterBlock->readButton()->click();
-		secAnglQRegisterBlock->readButton()->click();
-		tmp1RegisterBlock->readButton()->click();
-		angleCkRegisterBlock->readButton()->click();
-		radiusRegisterBlock->readButton()->click();
-		diag1RegisterBlock->readButton()->click();
-		diag2RegisterBlock->readButton()->click();
-	}
-}
-
-void HarmonicCalibration::toggleFaultRegisterMode(int mode)
-{
-	switch(mode){
-		case 0:
-			AFEDIAGStatusLED->hide();
-			OscillatorDriftStatusLED->hide();
-			AngleCrossCheckStatusLED->hide();
-			TurnCountSensorLevelsStatusLED->hide();
-			MTDIAGStatusLED->hide();
-			SequencerWatchdogStatusLED->hide();
-			break;
-		case 1: 
-			AFEDIAGStatusLED->show();
-			OscillatorDriftStatusLED->show();
-			AngleCrossCheckStatusLED->show();
-			TurnCountSensorLevelsStatusLED->show();
-			MTDIAGStatusLED->show();
-			SequencerWatchdogStatusLED->show();
-			break;
-	}
-}
-
-void HarmonicCalibration::toggleMTDiagnostics(int mode)
-{
-	switch(mode){
-		case 0:
-			MTDiagnosticsScrollArea->hide();
-			hasMTDiagnostics = false;
-			break;
-		case 1:
-			MTDiagnosticsScrollArea->show();
-			hasMTDiagnostics = true;
-			break;
-	}
-}
-
-void HarmonicCalibration::toggleSequenceModeRegisters(int mode)
-{
-	switch(mode){
-		case 0:
-			angleSecRegisterBlock->hide();
-			secAnglIRegisterBlock->hide();
-			secAnglQRegisterBlock->hide();
-			tmp1RegisterBlock->hide();
-			angleCkRegisterBlock->hide();
-			radiusRegisterBlock->hide();
-			diag1RegisterBlock->hide();
-			diag2RegisterBlock->hide();
-			break;
-		case 1:
-			angleSecRegisterBlock->show();
-			secAnglIRegisterBlock->show();
-			secAnglQRegisterBlock->show();
-			tmp1RegisterBlock->show();
-			angleCkRegisterBlock->show();
-			radiusRegisterBlock->show();
-			diag1RegisterBlock->show();
-			diag2RegisterBlock->show();
-			break;
-	}
-}
-
-void HarmonicCalibration::toggleMotorControls(bool value)
-{
-	motorMaxVelocitySpinBox->setEnabled(value);
-	motorAccelTimeSpinBox->setEnabled(value);
-	motorMaxDisplacementSpinBox->setEnabled(value);
-	m_calibrationMotorRampModeMenuCombo->setEnabled(value);
-	motorTargetPositionSpinBox->setEnabled(value);
-}
-
-void HarmonicCalibration::toggleUtilityTask(bool run)
-{
-	if(run){
-		utilityTimer->start(utilityTimerRate);
-	}
-	else{
-		utilityTimer->stop();
-	}
-}
-
-void HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool& value)
-{
-	toggleUtilityTask(false);
-
-	uint32_t *DIGIOENRegisterValue = new uint32_t;
-	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
-
-	bool success = false;
-
-	if(changeCNVPage(DIGIOENPage))
-	{
-		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
-			DIGIOENRegisterValue) != -1)
-		{
-			map<string, bool> DIGIOSettings = m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));
-
-			DIGIOSettings[DIGIOENName] = value;
-
-			uint16_t newRegisterValue = m_admtController->setDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue), DIGIOSettings);
-
-			if(changeCNVPage(DIGIOENPage)){
-				if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-														m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
-														static_cast<uint32_t>(newRegisterValue)) != -1)
-				{
-					success = updateDIGIOToggle();
-				}
-			}
-
-		}
-	}
-
-	if(!success) { StatusBarManager::pushMessage("Failed to toggle" + QString::fromStdString(DIGIOENName) + " " + QString(value ? "on" : "off")); }
-
-	toggleUtilityTask(true);
-}
-
-bool HarmonicCalibration::updateDIGIOToggle()
-{
-	uint32_t *DIGIOENRegisterValue = new uint32_t;
-	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
-	bool success = false;
-
-	if(changeCNVPage(DIGIOENPage)){
-		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
-			DIGIOENRegisterValue) != -1)
-		{
-			map<string, bool> DIGIOSettings = m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));
-			DIGIO0ENToggleSwitch->setChecked(DIGIOSettings["DIGIO0EN"]);
-			DIGIO1ENToggleSwitch->setChecked(DIGIOSettings["DIGIO1EN"]);
-			DIGIO2ENToggleSwitch->setChecked(DIGIOSettings["DIGIO2EN"]);
-			DIGIO3ENToggleSwitch->setChecked(DIGIOSettings["DIGIO3EN"]);
-			DIGIO4ENToggleSwitch->setChecked(DIGIOSettings["DIGIO4EN"]);
-			DIGIO5ENToggleSwitch->setChecked(DIGIOSettings["DIGIO5EN"]);
-			DIGIO0FNCToggleSwitch->setChecked(DIGIOSettings["BUSY"]);
-			DIGIO1FNCToggleSwitch->setChecked(DIGIOSettings["CNV"]);
-			DIGIO2FNCToggleSwitch->setChecked(DIGIOSettings["SENT"]);
-			DIGIO3FNCToggleSwitch->setChecked(DIGIOSettings["ACALC"]);
-			DIGIO4FNCToggleSwitch->setChecked(DIGIOSettings["FAULT"]);
-			DIGIO5FNCToggleSwitch->setChecked(DIGIOSettings["BOOTLOAD"]);
-			success = true;
-		}
-	}
-	return success;
-}
-
-void HarmonicCalibration::toggleAllDIGIOEN(bool value)
-{
-	toggleUtilityTask(false);
-	uint32_t *DIGIOENRegisterValue = new uint32_t;
-	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
-
-	bool success = false;
-
-	if(changeCNVPage(DIGIOENPage))
-	{
-		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
-			DIGIOENRegisterValue) != -1)
-		{
-			map<string, bool> DIGIOSettings = m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));;
-			DIGIOSettings["DIGIO5EN"] = value;
-			DIGIOSettings["DIGIO4EN"] = value;
-			DIGIOSettings["DIGIO3EN"] = value;
-			DIGIOSettings["DIGIO2EN"] = value;
-			DIGIOSettings["DIGIO1EN"] = value;
-			DIGIOSettings["DIGIO0EN"] = value;
-			uint16_t newRegisterValue = m_admtController->setDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue), DIGIOSettings);
-
-			if(changeCNVPage(DIGIOENPage)){
-				if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-					m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
-					static_cast<uint32_t>(newRegisterValue)) != -1)
-				{
-					success = updateDIGIOToggle();
-				}
-			}
-		}
-	}
-
-	if(!success) { StatusBarManager::pushMessage("Failed to toggle all GPIO outputs " + QString(value ? "on" : "off")); }
-
-	toggleUtilityTask(true);
-}
-
 void HarmonicCalibration::readDeviceProperties()
 {
 	uint32_t *uniqId3RegisterValue = new uint32_t;
@@ -2328,10 +1814,364 @@ void HarmonicCalibration::readDeviceProperties()
 	if(!success) { StatusBarManager::pushMessage("Failed to read device properties"); }
 }
 
-void HarmonicCalibration::changeCustomSwitchLabel(CustomSwitch *customSwitch, QString onLabel, QString offLabel)
+bool HarmonicCalibration::readSequence(){
+	uint32_t *generalRegValue = new uint32_t;
+	uint32_t generalRegisterAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL);
+	uint32_t generalRegisterPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL);
+
+	bool success = false;
+
+	if(changeCNVPage(generalRegisterPage)){
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress, generalRegValue) != -1){
+			if(*generalRegValue != UINT32_MAX){
+				generalRegisterMap = m_admtController->getGeneralRegisterBitMapping(static_cast<uint16_t>(*generalRegValue));
+				success = true;
+			}
+		}
+	}
+
+	return success;
+}
+
+void HarmonicCalibration::applySequence(){
+	toggleWidget(applySequenceButton, false);
+	applySequenceButton->setText("Writing...");
+	QTimer::singleShot(1000, this, [this](){
+		this->toggleWidget(applySequenceButton, true);
+		applySequenceButton->setText("Apply");
+	});
+	uint32_t *generalRegValue = new uint32_t;
+	uint32_t generalRegisterAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL);
+	std::map<string, int> settings;
+
+	settings["Convert Synchronization"] = qvariant_cast<int>(convertSynchronizationMenuCombo->combo()->currentData()); // convertSync;
+	settings["Angle Filter"] = qvariant_cast<int>(angleFilterMenuCombo->combo()->currentData()); // angleFilter;
+	settings["8th Harmonic"] = qvariant_cast<int>(eighthHarmonicMenuCombo->combo()->currentData()); // eighthHarmonic;
+	settings["Sequence Type"] = qvariant_cast<int>(sequenceTypeMenuCombo->combo()->currentData()); // sequenceType;
+	settings["Conversion Type"] = qvariant_cast<int>(conversionTypeMenuCombo->combo()->currentData()); // conversionType;
+
+	bool success = false;
+
+	if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress, generalRegValue) != -1){
+
+		uint32_t newGeneralRegValue = m_admtController->setGeneralRegisterBitMapping(*generalRegValue, settings);
+		uint32_t generalRegisterPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL);
+
+		if(changeCNVPage(generalRegisterPage)){
+			if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress, newGeneralRegValue) != -1){
+				if(readSequence()){
+					if(settings.at("Convert Synchronization") == generalRegisterMap.at("Convert Synchronization") &&
+						settings.at("Angle Filter") == generalRegisterMap.at("Angle Filter") &&
+						settings.at("8th Harmonic") == generalRegisterMap.at("8th Harmonic") &&
+						settings.at("Sequence Type") == generalRegisterMap.at("Sequence Type") &&
+						settings.at("Conversion Type") == generalRegisterMap.at("Conversion Type"))
+					{
+						StatusBarManager::pushMessage("Sequence settings applied successfully");
+						success = true;
+					}
+				}
+			}
+		}
+	}
+
+
+	if(!success){ StatusBarManager::pushMessage("Failed to apply sequence settings"); }
+}
+
+bool HarmonicCalibration::changeCNVPage(uint32_t page){
+	uint32_t *cnvPageRegValue = new uint32_t;
+	uint32_t cnvPageAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE);
+
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, page) != -1){
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, cnvPageRegValue) != -1){
+			if(*cnvPageRegValue == page){
+				return true; 
+			}
+		}
+	}
+
+	return false;
+}
+
+void HarmonicCalibration::initializeMotor()
 {
-	customSwitch->setOnText(onLabel);
-	customSwitch->setOffText(offLabel);
+	rotate_vmax = 53687.0912;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
+	readMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
+	writeMotorAttributeValue(ADMTController::MotorAttribute::DISABLE, 1);
+	
+	amax = 439.8046511104;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::AMAX, amax);
+	readMotorAttributeValue(ADMTController::MotorAttribute::AMAX, amax);
+
+	dmax = 3000;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::DMAX, dmax);
+	readMotorAttributeValue(ADMTController::MotorAttribute::DMAX, dmax);
+
+	ramp_mode = 0;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::RAMP_MODE, ramp_mode);
+	readMotorAttributeValue(ADMTController::MotorAttribute::RAMP_MODE, ramp_mode);
+
+	target_pos = 0;
+	writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, target_pos);
+
+	current_pos = 0;
+	readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+}
+
+void HarmonicCalibration::getDeviceFaultStatus(int sampleRate)
+{
+	while(isDeviceStatusMonitor)
+	{
+		uint32_t *readValue = new uint32_t;
+		if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::FAULT), 0) == 0)
+		{
+			if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::FAULT), readValue) == 0)
+			{
+				deviceStatusFault = m_admtController->checkRegisterFault(static_cast<uint16_t>(*readValue), generalRegisterMap.at("Sequence Type") == 0 ? true : false);
+			}
+			else
+			{
+				deviceStatusFault = true;
+			}
+		}
+		else
+		{
+			deviceStatusFault = true;
+		}
+
+		QThread::msleep(sampleRate);
+	}
+}
+
+void HarmonicCalibration::requestDisconnect()
+{
+	isStartAcquisition = false;
+	isDeviceStatusMonitor = false;
+
+	m_deviceStatusThread.cancel();
+	m_acquisitionDataThread.cancel();
+	m_acquisitionGraphThread.cancel();
+
+	m_deviceStatusWatcher.waitForFinished();
+	m_acquisitionDataWatcher.waitForFinished();
+	m_acquisitionGraphWatcher.waitForFinished();
+}
+
+#pragma region Acquisition Methods
+bool HarmonicCalibration::updateChannelValues(){
+	bool success = false;
+	rotation = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), rotationChannelName, bufferSize);
+	if(rotation == static_cast<double>(UINT64_MAX)) { return false; }
+	angle = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), angleChannelName, bufferSize);
+	if(angle == static_cast<double>(UINT64_MAX)) { return false; }
+	updateCountValue();
+	if(count == static_cast<double>(UINT64_MAX)) { return false; }
+	temp = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), temperatureChannelName, bufferSize);
+	if(temp == static_cast<double>(UINT64_MAX)) { return false; }
+	return success = true;
+}
+
+void HarmonicCalibration::updateCountValue(){
+	uint32_t *absAngleRegValue = new uint32_t;
+	bool success = false;
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE), 0x0000) != -1){
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getSensorRegister(ADMTController::SensorRegister::ABSANGLE), absAngleRegValue) != -1){
+			count = m_admtController->getAbsAngleTurnCount(static_cast<uint16_t>(*absAngleRegValue));
+			success = true;
+		}
+	}
+	if(!success){ count = static_cast<double>(UINT64_MAX); }
+}
+
+void HarmonicCalibration::updateLineEditValues(){
+	if(rotation == static_cast<double>(UINT64_MAX)) { rotationValueLabel->setText("N/A"); }
+	else { rotationValueLabel->setText(QString::number(rotation) + "°"); }
+	if(angle == static_cast<double>(UINT64_MAX)) { angleValueLabel->setText("N/A"); }
+	else { angleValueLabel->setText(QString::number(angle) + "°"); }
+	if(count == static_cast<double>(UINT64_MAX)) { countValueLabel->setText("N/A"); }
+	else { countValueLabel->setText(QString::number(count)); }
+	if(temp == static_cast<double>(UINT64_MAX)) { tempValueLabel->setText("N/A"); }
+	else { tempValueLabel->setText(QString::number(temp) + " °C"); }
+}
+
+void HarmonicCalibration::startAcquisition()
+{
+	isStartAcquisition = true;
+	acquisitionXPlotAxis->setInterval(0, acquisitionDisplayLength);
+
+    m_acquisitionDataThread = QtConcurrent::run(this, &HarmonicCalibration::getAcquisitionSamples, acquisitionSampleRate);
+	m_acquisitionDataWatcher.setFuture(m_acquisitionDataThread);
+	m_acquisitionGraphThread = QtConcurrent::run(this, &HarmonicCalibration::acquisitionPlotTask, acquisitionGraphSampleRate);
+	m_acquisitionGraphWatcher.setFuture(m_acquisitionGraphThread);
+}
+
+void HarmonicCalibration::startAcquisitionDeviceStatusMonitor()
+{
+	isDeviceStatusMonitor = true;
+	m_deviceStatusThread = QtConcurrent::run(this, &HarmonicCalibration::getDeviceFaultStatus, deviceStatusMonitorRate);
+	m_deviceStatusWatcher.setFuture(m_deviceStatusThread);
+}
+
+void HarmonicCalibration::getAcquisitionSamples(int sampleRate)
+{
+	while(isStartAcquisition)
+	{
+		if(!updateChannelValues()) { break; }
+
+		if(acquisitionDataMap.at(ANGLE) == false && acquisitionAngleList.size() > 0) acquisitionAngleList.clear();
+		if(acquisitionDataMap.at(ABSANGLE) == false && acquisitionABSAngleList.size() > 0) acquisitionABSAngleList.clear();
+		if(acquisitionDataMap.at(TURNCOUNT) == false && acquisitionTurnCountList.size() > 0) acquisitionTurnCountList.clear();
+		if(acquisitionDataMap.at(TMP0) == false && acquisitionTmp0List.size() > 0) acquisitionTmp0List.clear();
+		if(acquisitionDataMap.at(SINE) == false && acquisitionSineList.size() > 0) acquisitionSineList.clear();
+		if(acquisitionDataMap.at(COSINE) == false && acquisitionCosineList.size() > 0) acquisitionCosineList.clear();
+		if(acquisitionDataMap.at(RADIUS) == false && acquisitionRadiusList.size() > 0) acquisitionRadiusList.clear();
+
+		if(acquisitionDataMap.at(ANGLE)) prependAcquisitionData(angle, acquisitionAngleList);
+		if(acquisitionDataMap.at(ABSANGLE)) prependAcquisitionData(rotation, acquisitionABSAngleList);
+		if(acquisitionDataMap.at(TURNCOUNT)) prependAcquisitionData(count, acquisitionTurnCountList);
+		if(acquisitionDataMap.at(TMP0)) prependAcquisitionData(temp, acquisitionTmp0List);
+		if(acquisitionDataMap.at(SINE)) prependAcquisitionData(getAcquisitionParameterValue(SINE), acquisitionSineList);
+		if(acquisitionDataMap.at(COSINE)) prependAcquisitionData(getAcquisitionParameterValue(COSINE), acquisitionCosineList);
+		if(acquisitionDataMap.at(RADIUS)) prependAcquisitionData(getAcquisitionParameterValue(RADIUS), acquisitionRadiusList);
+
+		QThread::msleep(sampleRate);
+	}
+}
+
+double HarmonicCalibration::getAcquisitionParameterValue(const AcquisitionDataKey &key)
+{
+	uint32_t *readValue = new uint32_t;
+	switch(key)
+	{
+		case SINE:
+		{
+			if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+				m_admtController->getSensorRegister(ADMTController::SensorRegister::SINE),
+				readValue) == -1) return qQNaN();
+			map<string, double> sineRegisterMap = m_admtController->getSineRegisterBitMapping(static_cast<uint16_t>(*readValue));
+			return sineRegisterMap.at("SINE");
+			break;
+		}
+		case COSINE:
+		{
+			if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+				m_admtController->getSensorRegister(ADMTController::SensorRegister::COSINE),
+				readValue) == -1) return qQNaN();
+			map<string, double> cosineRegisterMap = m_admtController->getCosineRegisterBitMapping(static_cast<uint16_t>(*readValue));
+			return cosineRegisterMap.at("COSINE");
+			break;
+		}
+		case RADIUS:
+		{
+			if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+				m_admtController->getSensorRegister(ADMTController::SensorRegister::RADIUS),
+				readValue) == -1) return qQNaN();
+			map<string, double> radiusRegisterMap = m_admtController->getRadiusRegisterBitMapping(static_cast<uint16_t>(*readValue));
+			return radiusRegisterMap.at("RADIUS");
+			break;
+		}
+		default: 
+			return qQNaN();
+			break;
+	}
+}
+
+void HarmonicCalibration::plotAcquisition(QVector<double>& list, PlotChannel* channel)
+{
+	channel->curve()->setSamples(list);
+	auto result = std::minmax_element(list.begin(), list.end());
+	if(*result.first < acquisitionGraphYMin) acquisitionGraphYMin = *result.first;
+	if(*result.second > acquisitionGraphYMax) acquisitionGraphYMax = *result.second;
+}
+
+void HarmonicCalibration::prependAcquisitionData(const double& data, QVector<double>& list)
+{
+	list.prepend(data);
+	if(list.size() >= acquisitionDisplayLength){
+		list.resize(acquisitionDisplayLength);
+		list.squeeze();
+	}
+}
+
+void HarmonicCalibration::resetAcquisitionYAxisScale()
+{
+	acquisitionGraphYMin = 0;
+	acquisitionGraphYMax = 360;
+	acquisitionYPlotAxis->setInterval(acquisitionGraphYMin, acquisitionGraphYMax);
+	acquisitionGraphPlotWidget->replot();
+}
+
+void HarmonicCalibration::acquisitionPlotTask(int sampleRate)
+{
+	while(isStartAcquisition){
+		if(acquisitionDataMap.at(ANGLE))
+			plotAcquisition(acquisitionAngleList, acquisitionAnglePlotChannel);
+		if(acquisitionDataMap.at(ABSANGLE))
+			plotAcquisition(acquisitionABSAngleList, acquisitionABSAnglePlotChannel);
+		if(acquisitionDataMap.at(TURNCOUNT))
+			plotAcquisition(acquisitionTurnCountList, acquisitionTurnCountPlotChannel);
+		if(acquisitionDataMap.at(TMP0))
+			plotAcquisition(acquisitionTmp0List, acquisitionTmp0PlotChannel);
+		if(acquisitionDataMap.at(SINE))
+			plotAcquisition(acquisitionSineList, acquisitionSinePlotChannel);
+		if(acquisitionDataMap.at(COSINE))
+			plotAcquisition(acquisitionCosineList, acquisitionCosinePlotChannel);
+		if(acquisitionDataMap.at(RADIUS))
+			plotAcquisition(acquisitionRadiusList, acquisitionRadiusPlotChannel);
+
+		acquisitionYPlotAxis->setInterval(acquisitionGraphYMin, acquisitionGraphYMax);
+		acquisitionGraphPlotWidget->replot();
+
+		QThread::msleep(sampleRate);
+	}
+}
+
+void HarmonicCalibration::acquisitionUITask()
+{
+	updateFaultStatusLEDColor(acquisitionFaultRegisterLEDWidget, deviceStatusFault);
+
+	if(isStartAcquisition)
+	{
+		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+		updateLineEditValues();
+		updateLineEditValue(acquisitionMotorCurrentPositionLineEdit, current_pos);
+	}
+}
+
+void HarmonicCalibration::updateSequenceWidget(){
+	if(generalRegisterMap.at("Sequence Type") == -1){ sequenceTypeMenuCombo->combo()->setCurrentText("Reserved"); }
+	else{ sequenceTypeMenuCombo->combo()->setCurrentIndex(sequenceTypeMenuCombo->combo()->findData(generalRegisterMap.at("Sequence Type"))); }
+	conversionTypeMenuCombo->combo()->setCurrentIndex(conversionTypeMenuCombo->combo()->findData(generalRegisterMap.at("Conversion Type")));
+	// cnvSourceMenuCombo->combo()->setCurrentValue(generalRegisterMap.at("Sequence Type"));
+	if(generalRegisterMap.at("Convert Synchronization") == -1){ convertSynchronizationMenuCombo->combo()->setCurrentText("Reserved"); }
+	else{ convertSynchronizationMenuCombo->combo()->setCurrentIndex(convertSynchronizationMenuCombo->combo()->findData(generalRegisterMap.at("Convert Synchronization"))); }
+	angleFilterMenuCombo->combo()->setCurrentIndex(angleFilterMenuCombo->combo()->findData(generalRegisterMap.at("Angle Filter")));
+	eighthHarmonicMenuCombo->combo()->setCurrentIndex(eighthHarmonicMenuCombo->combo()->findData(generalRegisterMap.at("8th Harmonic")));
+}
+
+void HarmonicCalibration::updateGeneralSettingEnabled(bool value)
+{
+	graphUpdateIntervalLineEdit->setEnabled(value);
+	displayLengthLineEdit->setEnabled(value);
+	// dataGraphSamplesLineEdit->setEnabled(value);
+	// tempGraphSamplesLineEdit->setEnabled(value);
+}
+
+void HarmonicCalibration::connectCheckBoxToAcquisitionGraph(QCheckBox* widget, PlotChannel* channel, AcquisitionDataKey key)
+{
+	connect(widget, &QCheckBox::stateChanged, [=](int state){
+		if(state == Qt::Checked){
+			channel->setEnabled(true);
+			acquisitionDataMap[key] = true;
+		}
+		else{
+			channel->setEnabled(false);
+			acquisitionDataMap[key] = false;
+		}
+	});
 }
 
 void HarmonicCalibration::GMRReset()
@@ -2397,116 +2237,576 @@ void HarmonicCalibration::run(bool b)
 
 	updateGeneralSettingEnabled(!b);
 }
+#pragma endregion
+
+#pragma region Calibration Methods
+void HarmonicCalibration::startCalibrationDeviceStatusMonitor()
+{
+	isDeviceStatusMonitor = true;
+	m_deviceStatusThread = QtConcurrent::run(this, &HarmonicCalibration::getDeviceFaultStatus, deviceStatusMonitorRate);
+	m_deviceStatusWatcher.setFuture(m_deviceStatusThread);
+}
+
+void HarmonicCalibration::calibrationUITask()
+{
+	readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+	updateLineEditValue(calibrationMotorCurrentPositionLineEdit, current_pos);
+	updateFaultStatusLEDColor(calibrationFaultRegisterLEDWidget, deviceStatusFault);
+
+	if(isStartMotor)
+	{
+		if(isPostCalibration){
+			postCalibrationRawDataPlotChannel->curve()->setSamples(graphPostDataList);
+			postCalibrationRawDataPlotWidget->replot();
+		}
+		else{
+			calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
+			calibrationRawDataPlotWidget->replot();
+		}
+	}
+}
+
+void HarmonicCalibration::getCalibrationSamples()
+{
+	if(resetCurrentPositionToZero()){
+		if(isPostCalibration){
+			int currentSamplesCount = graphPostDataList.size();
+			while(isStartMotor && currentSamplesCount < totalSamplesCount){
+				target_pos = current_pos + -408;
+				moveMotorToPosition(target_pos, true);
+				updateChannelValue(ADMTController::Channel::ANGLE);
+				graphPostDataList.append(angle);
+				currentSamplesCount++;
+			}
+		}
+		else{
+			int currentSamplesCount = graphDataList.size();
+			while(isStartMotor && currentSamplesCount < totalSamplesCount){
+				target_pos = current_pos + -408;
+				if(moveMotorToPosition(target_pos, true) == false) { m_admtController->disconnectADMT(); }
+				if(updateChannelValue(ADMTController::Channel::ANGLE)) { break; }
+				graphDataList.append(angle);
+				currentSamplesCount++;
+			}
+		}
+	}
+
+	stopMotor();
+}
+
+void HarmonicCalibration::startMotor()
+{
+	toggleTabSwitching(false);
+	toggleMotorControls(false);
+
+	if(resetToZero && !isPostCalibration){
+		clearCalibrationSamples();
+		clearPostCalibrationSamples();
+		clearAngleErrorGraphs();
+		clearCorrectedAngleErrorGraphs();
+	}
+
+	if(isPostCalibration)
+		postCalibrationRawDataXPlotAxis->setInterval(0, totalSamplesCount);
+	else
+		calibrationRawDataXPlotAxis->setInterval(0, totalSamplesCount);
+
+	if(isPostCalibration) 
+		calibrationDataGraphTabWidget->setCurrentIndex(1); // Set tab to Post Calibration Samples
+	else
+		calibrationDataGraphTabWidget->setCurrentIndex(0); // Set tab to Calibration Samples
+
+	clearCalibrateDataButton->setEnabled(false);
+	QFuture<void> future = QtConcurrent::run(this, &HarmonicCalibration::getCalibrationSamples);
+	QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
+
+	connect(watcher, &QFutureWatcher<void>::finished, this, [=]() {
+		toggleTabSwitching(true);
+		toggleMotorControls(true);
+
+		calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
+		calibrationRawDataPlotChannel->xAxis()->setMax(graphDataList.size());
+		calibrationRawDataPlotWidget->replot();
+		isStartMotor = false;
+		calibrationStartMotorButton->setChecked(false);
+		clearCalibrateDataButton->setEnabled(true);
+		
+		if(isPostCalibration)
+		{
+			if(static_cast<int>(graphPostDataList.size()) == totalSamplesCount) 
+			{
+				computeSineCosineOfAngles(graphPostDataList);
+				m_admtController->postcalibrate(vector<double>(graphPostDataList.begin(), graphPostDataList.end()), cycleCount, samplesPerCycle);
+				populateCorrectedAngleErrorGraphs();
+				isPostCalibration = false;
+				isStartMotor = false;
+				resetToZero = true;
+				canCalibrate(false);
+			}
+		}
+		else{
+			if(static_cast<int>(graphDataList.size()) == totalSamplesCount) 
+			{
+				computeSineCosineOfAngles(graphDataList);
+				calibrationLogWrite(m_admtController->calibrate(vector<double>(graphDataList.begin(), graphDataList.end()), cycleCount, samplesPerCycle));
+				populateAngleErrorGraphs();
+				calculateHarmonicValues();
+				canStartMotor(false);
+				canCalibrate(true); 
+			}
+			else{
+				resetToZero = true;
+			}
+		}
+	});
+	connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));
+	watcher->setFuture(future);
+}
+
+void HarmonicCalibration::startMotorContinuous()
+{
+	writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
+}
+
+void HarmonicCalibration::postCalibrateData()
+{
+	calibrationLogWrite("==== Post Calibration Start ====\n");
+	flashHarmonicValues();
+	calibrationDataGraphTabWidget->setCurrentIndex(1);
+	isPostCalibration = true;
+	isStartMotor = true;
+	resetToZero = true;
+	startMotor();
+}
+
+void HarmonicCalibration::resetAllCalibrationState()
+{
+	clearCalibrationSamples();
+	clearPostCalibrationSamples();
+	calibrationDataGraphTabWidget->setCurrentIndex(0);
+
+	clearAngleErrorGraphs();
+	clearCorrectedAngleErrorGraphs();
+	resultDataTabWidget->setCurrentIndex(0);
+
+	canStartMotor(true);
+	canCalibrate(false);
+	calibrateDataButton->setChecked(false);
+	isPostCalibration = false;
+	isCalculatedCoeff = false;
+	resetToZero = true;
+	displayCalculatedCoeff();
+}
+
+void HarmonicCalibration::computeSineCosineOfAngles(QVector<double> graphDataList)
+{
+	m_admtController->computeSineCosineOfAngles(vector<double>(graphDataList.begin(), graphDataList.end()));
+	if(isPostCalibration){
+		postCalibrationSineDataPlotChannel->curve()->setSamples(m_admtController->calibration_samples_sine_scaled.data(), m_admtController->calibration_samples_sine_scaled.size());
+		postCalibrationCosineDataPlotChannel->curve()->setSamples(m_admtController->calibration_samples_cosine_scaled.data(), m_admtController->calibration_samples_cosine_scaled.size());
+		postCalibrationRawDataPlotWidget->replot();
+	}
+	else{
+		calibrationSineDataPlotChannel->curve()->setSamples(m_admtController->calibration_samples_sine_scaled.data(), m_admtController->calibration_samples_sine_scaled.size());
+		calibrationCosineDataPlotChannel->curve()->setSamples(m_admtController->calibration_samples_cosine_scaled.data(), m_admtController->calibration_samples_cosine_scaled.size());
+		calibrationRawDataPlotWidget->replot();
+	}
+}
+
+void HarmonicCalibration::populateAngleErrorGraphs()
+{
+	QVector<double> angleError = QVector<double>(m_admtController->angleError.begin(), m_admtController->angleError.end());
+	QVector<double> FFTAngleErrorMagnitude = QVector<double>(m_admtController->FFTAngleErrorMagnitude.begin(), m_admtController->FFTAngleErrorMagnitude.end());
+	QVector<double> FFTAngleErrorPhase = QVector<double>(m_admtController->FFTAngleErrorPhase.begin(), m_admtController->FFTAngleErrorPhase.end());
+
+	angleErrorPlotChannel->curve()->setSamples(angleError);
+	auto angleErrorMinMax = std::minmax_element(angleError.begin(), angleError.end());
+	angleErrorYPlotAxis->setInterval(*angleErrorMinMax.first, *angleErrorMinMax.second);
+	angleErrorXPlotAxis->setInterval(0, angleError.size());
+	angleErrorPlotWidget->replot();
+	
+	FFTAngleErrorPhaseChannel->curve()->setSamples(FFTAngleErrorPhase);
+	FFTAngleErrorMagnitudeChannel->curve()->setSamples(FFTAngleErrorMagnitude);
+	auto angleErrorMagnitudeMinMax = std::minmax_element(FFTAngleErrorMagnitude.begin(), FFTAngleErrorMagnitude.end());
+	auto angleErrorPhaseMinMax = std::minmax_element(FFTAngleErrorPhase.begin(), FFTAngleErrorPhase.end());
+	double FFTAngleErrorPlotMin = *angleErrorMagnitudeMinMax.first < *angleErrorPhaseMinMax.first ? *angleErrorMagnitudeMinMax.first : *angleErrorPhaseMinMax.first;
+	double FFTAngleErrorPlotMax = *angleErrorMagnitudeMinMax.second > *angleErrorPhaseMinMax.second ? *angleErrorMagnitudeMinMax.second : *angleErrorPhaseMinMax.second;
+	FFTAngleErrorYPlotAxis->setInterval(FFTAngleErrorPlotMin, FFTAngleErrorPlotMax);
+	FFTAngleErrorXPlotAxis->setInterval(0, FFTAngleErrorMagnitude.size());
+	FFTAngleErrorPlotWidget->replot();
+
+	resultDataTabWidget->setCurrentIndex(0); // Set tab to Angle Error
+}
+
+void HarmonicCalibration::populateCorrectedAngleErrorGraphs()
+{
+	QVector<double> correctedError(m_admtController->correctedError.begin(), m_admtController->correctedError.end());
+	QVector<double> FFTCorrectedErrorMagnitude(m_admtController->FFTCorrectedErrorMagnitude.begin(), m_admtController->FFTCorrectedErrorMagnitude.end());
+	QVector<double> FFTCorrectedErrorPhase(m_admtController->FFTCorrectedErrorPhase.begin(), m_admtController->FFTCorrectedErrorPhase.end());
+
+	correctedErrorPlotChannel->curve()->setSamples(correctedError);
+	auto correctedErrorMagnitudeMinMax = std::minmax_element(correctedError.begin(), correctedError.end());
+	correctedErrorYPlotAxis->setInterval(*correctedErrorMagnitudeMinMax.first, *correctedErrorMagnitudeMinMax.second);
+	correctedErrorXPlotAxis->setMax(correctedError.size());
+	correctedErrorPlotWidget->replot();
+
+	FFTCorrectedErrorPhaseChannel->curve()->setSamples(FFTCorrectedErrorPhase);
+	FFTCorrectedErrorMagnitudeChannel->curve()->setSamples(FFTCorrectedErrorMagnitude);
+	auto FFTCorrectedErrorMagnitudeMinMax = std::minmax_element(FFTCorrectedErrorMagnitude.begin(), FFTCorrectedErrorMagnitude.end());
+	auto FFTCorrectedErrorPhaseMinMax = std::minmax_element(FFTCorrectedErrorPhase.begin(), FFTCorrectedErrorPhase.end());
+	double FFTCorrectedErrorPlotMin = *FFTCorrectedErrorMagnitudeMinMax.first < *FFTCorrectedErrorPhaseMinMax.first ? *FFTCorrectedErrorMagnitudeMinMax.first : *FFTCorrectedErrorPhaseMinMax.first;
+	double FFTCorrectedErrorPlotMax = *FFTCorrectedErrorMagnitudeMinMax.second > *FFTCorrectedErrorPhaseMinMax.second ? *FFTCorrectedErrorMagnitudeMinMax.second : *FFTCorrectedErrorPhaseMinMax.second;
+	FFTCorrectedErrorYPlotAxis->setInterval(FFTCorrectedErrorPlotMin, FFTCorrectedErrorPlotMax);
+	FFTCorrectedErrorXPlotAxis->setMax(FFTCorrectedErrorMagnitude.size());
+	FFTCorrectedErrorPlotWidget->replot();
+
+	resultDataTabWidget->setCurrentIndex(2); // Set tab to Angle Error
+}
+
+void HarmonicCalibration::flashHarmonicValues()
+{
+	if(changeCNVPage(0x02)){
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 0x01, 0x02);
+
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG),
+											H1_MAG_HEX);
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH),
+											H1_PHASE_HEX);
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG),
+											H2_MAG_HEX);
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH),
+											H2_PHASE_HEX);
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG),
+											H3_MAG_HEX);
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH),
+											H3_PHASE_HEX);
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG),
+											H8_MAG_HEX);
+		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH),
+											H8_PHASE_HEX);
+
+		isCalculatedCoeff = true;
+		displayCalculatedCoeff();
+	}
+	else{
+		calibrationLogWrite("Unabled to flash Harmonic Registers!");
+	}
+}
+
+void HarmonicCalibration::calculateHarmonicValues()
+{
+	uint32_t *h1MagCurrent = new uint32_t, 
+			 *h1PhaseCurrent = new uint32_t, 
+			 *h2MagCurrent = new uint32_t,
+			 *h2PhaseCurrent = new uint32_t,
+			 *h3MagCurrent = new uint32_t,
+			 *h3PhaseCurrent = new uint32_t,
+			 *h8MagCurrent = new uint32_t,
+			 *h8PhaseCurrent = new uint32_t;
+	
+	if(changeCNVPage(0x02))
+	{
+		// Read and store current harmonic values
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), h1MagCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG), h2MagCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG), h3MagCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), h8MagCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), h1PhaseCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH), h2PhaseCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH), h3PhaseCurrent);
+		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), h8PhaseCurrent);
+
+		// Calculate harmonic coefficients (Hex)
+		H1_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_1), static_cast<uint16_t>(*h1MagCurrent), "h1"));
+		H2_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_2), static_cast<uint16_t>(*h2MagCurrent), "h2"));
+		H3_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_3), static_cast<uint16_t>(*h3MagCurrent), "h3"));
+		H8_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_8), static_cast<uint16_t>(*h8MagCurrent), "h8"));
+		H1_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_1), static_cast<uint16_t>(*h1PhaseCurrent)));
+		H2_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_2), static_cast<uint16_t>(*h2PhaseCurrent)));
+		H3_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_3), static_cast<uint16_t>(*h3PhaseCurrent)));
+		H8_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_8), static_cast<uint16_t>(*h8PhaseCurrent)));
+
+		calibrationLogWrite();
+		calibrationLogWrite(QString("Calculated H1 Mag (Hex): 0x%1").arg(QString::number(H1_MAG_HEX, 16).rightJustified(4, '0')));
+		calibrationLogWrite(QString("Calculated H1 Phase (Hex): 0x%1").arg(QString::number(H1_PHASE_HEX, 16).rightJustified(4, '0')));
+		calibrationLogWrite(QString("Calculated H2 Mag (Hex): 0x%1").arg(QString::number(H2_MAG_HEX, 16).rightJustified(4, '0')));
+		calibrationLogWrite(QString("Calculated H2 Phase (Hex): 0x%1").arg(QString::number(H2_PHASE_HEX, 16).rightJustified(4, '0')));
+		calibrationLogWrite(QString("Calculated H3 Mag (Hex): 0x%1").arg(QString::number(H3_MAG_HEX, 16).rightJustified(4, '0')));
+		calibrationLogWrite(QString("Calculated H3 Phase (Hex): 0x%1").arg(QString::number(H3_PHASE_HEX, 16).rightJustified(4, '0')));
+		calibrationLogWrite(QString("Calculated H8 Mag (Hex): 0x%1").arg(QString::number(H8_MAG_HEX, 16).rightJustified(4, '0')));
+		calibrationLogWrite(QString("Calculated H8 Phase (Hex): 0x%1").arg(QString::number(H8_PHASE_HEX, 16).rightJustified(4, '0')));
+
+		// Get actual harmonic values from hex
+		H1_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H1_MAG_HEX), "h1mag");
+		H1_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H1_PHASE_HEX), "h1phase");
+		H2_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H2_MAG_HEX), "h2mag");
+		H2_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H2_PHASE_HEX), "h2phase");
+		H3_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H3_MAG_HEX), "h3mag");
+		H3_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H3_PHASE_HEX), "h3phase");
+		H8_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H8_MAG_HEX), "h8mag");
+		H8_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H8_PHASE_HEX), "h8phase");
+
+		calibrationLogWrite();
+		calibrationLogWrite(QString("Calculated H1 Mag (Angle): 0x%1").arg(QString::number(H1_MAG_ANGLE)));
+		calibrationLogWrite(QString("Calculated H1 Phase (Angle): 0x%1").arg(QString::number(H1_PHASE_ANGLE)));
+		calibrationLogWrite(QString("Calculated H2 Mag (Angle): 0x%1").arg(QString::number(H2_MAG_ANGLE)));
+		calibrationLogWrite(QString("Calculated H2 Phase (Angle): 0x%1").arg(QString::number(H2_PHASE_ANGLE)));
+		calibrationLogWrite(QString("Calculated H3 Mag (Angle): 0x%1").arg(QString::number(H3_MAG_ANGLE)));
+		calibrationLogWrite(QString("Calculated H3 Phase (Angle): 0x%1").arg(QString::number(H3_PHASE_ANGLE)));
+		calibrationLogWrite(QString("Calculated H8 Mag (Angle): 0x%1").arg(QString::number(H8_MAG_ANGLE)));
+		calibrationLogWrite(QString("Calculated H8 Phase (Angle): 0x%1").arg(QString::number(H8_PHASE_ANGLE)));
+
+		if(isAngleDisplayFormat) updateCalculatedCoeffAngle();
+		else updateCalculatedCoeffHex();
+		isCalculatedCoeff = true;
+	}
+}
+
+void HarmonicCalibration::updateCalculatedCoeffAngle()
+{
+	calibrationH1MagLabel->setText(QString::number(H1_MAG_ANGLE, 'f', 2) + "°");
+	calibrationH2MagLabel->setText(QString::number(H2_MAG_ANGLE, 'f', 2) + "°");
+	calibrationH3MagLabel->setText(QString::number(H3_MAG_ANGLE, 'f', 2) + "°");
+	calibrationH8MagLabel->setText(QString::number(H8_MAG_ANGLE, 'f', 2) + "°");
+	calibrationH1PhaseLabel->setText("Φ " + QString::number(H1_PHASE_ANGLE, 'f', 2));
+	calibrationH2PhaseLabel->setText("Φ " + QString::number(H2_PHASE_ANGLE, 'f', 2));
+	calibrationH3PhaseLabel->setText("Φ " + QString::number(H3_PHASE_ANGLE, 'f', 2));
+	calibrationH8PhaseLabel->setText("Φ " + QString::number(H8_PHASE_ANGLE, 'f', 2));
+}
+
+void HarmonicCalibration::updateCalculatedCoeffHex()
+{
+	calibrationH1MagLabel->setText(QString("0x%1").arg(H1_MAG_HEX, 4, 16, QChar('0')));
+	calibrationH2MagLabel->setText(QString("0x%1").arg(H2_MAG_HEX, 4, 16, QChar('0')));
+	calibrationH3MagLabel->setText(QString("0x%1").arg(H3_MAG_HEX, 4, 16, QChar('0')));
+	calibrationH8MagLabel->setText(QString("0x%1").arg(H8_MAG_HEX, 4, 16, QChar('0')));
+	calibrationH1PhaseLabel->setText(QString("0x%1").arg(H1_PHASE_HEX, 4, 16, QChar('0')));
+	calibrationH2PhaseLabel->setText(QString("0x%1").arg(H2_PHASE_HEX, 4, 16, QChar('0')));
+	calibrationH3PhaseLabel->setText(QString("0x%1").arg(H3_PHASE_HEX, 4, 16, QChar('0')));
+	calibrationH8PhaseLabel->setText(QString("0x%1").arg(H8_PHASE_HEX, 4, 16, QChar('0')));
+}
+
+void HarmonicCalibration::resetCalculatedCoeffAngle()
+{
+	calibrationH1MagLabel->setText("--.--°");
+	calibrationH2MagLabel->setText("--.--°");
+	calibrationH3MagLabel->setText("--.--°");
+	calibrationH8MagLabel->setText("--.--°");
+	calibrationH1PhaseLabel->setText("Φ --.--");
+	calibrationH2PhaseLabel->setText("Φ --.--");
+	calibrationH3PhaseLabel->setText("Φ --.--");
+	calibrationH8PhaseLabel->setText("Φ --.--");
+}
+
+void HarmonicCalibration::resetCalculatedCoeffHex()
+{
+	calibrationH1MagLabel->setText("0x----");
+	calibrationH2MagLabel->setText("0x----");
+	calibrationH3MagLabel->setText("0x----");
+	calibrationH8MagLabel->setText("0x----");
+	calibrationH1PhaseLabel->setText("0x----");
+	calibrationH2PhaseLabel->setText("0x----");
+	calibrationH3PhaseLabel->setText("0x----");
+	calibrationH8PhaseLabel->setText("0x----");
+}
+
+void HarmonicCalibration::displayCalculatedCoeff()
+{
+	if(isAngleDisplayFormat){
+		if(isCalculatedCoeff){
+			updateCalculatedCoeffAngle();
+		}
+		else{
+			resetCalculatedCoeffAngle();
+		}
+	}
+	else{
+		if(isCalculatedCoeff){
+			updateCalculatedCoeffHex();
+		}
+		else{
+			resetCalculatedCoeffHex();
+		}
+	}
+}
+
+void HarmonicCalibration::calibrationLogWrite(QString message)
+{
+	logsPlainTextEdit->appendPlainText(message);
+}
+
+void HarmonicCalibration::importCalibrationData()
+{
+	QString fileName = QFileDialog::getOpenFileName(
+		this, tr("Import"), "",
+		tr("Comma-separated values files (*.csv);;"
+		   "Tab-delimited values files (*.txt)"),
+		nullptr, QFileDialog::Options());
+
+	FileManager fm("HarmonicCalibration");
+
+	try {
+		fm.open(fileName, FileManager::IMPORT);
+
+		graphDataList = fm.read(0);
+		if(graphDataList.size() > 0)
+		{
+			calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
+			calibrationRawDataXPlotAxis->setInterval(0, graphDataList.size());
+			calibrationRawDataPlotWidget->replot();
+
+			computeSineCosineOfAngles(graphDataList);
+			calibrationLogWrite(m_admtController->calibrate(vector<double>(graphDataList.begin(), graphDataList.end()), cycleCount, samplesPerCycle));
+			populateAngleErrorGraphs();
+			canStartMotor(false);
+			canCalibrate(true);
+		}
+	} catch(FileManagerException &ex) {
+		calibrationLogWrite(QString(ex.what()));
+	}
+}
+
+void HarmonicCalibration::extractCalibrationData()
+{
+	QStringList filter;
+	filter += QString(tr("Comma-separated values files (*.csv)"));
+	filter += QString(tr("Tab-delimited values files (*.txt)"));
+	filter += QString(tr("All Files(*)"));
+
+	QString selectedFilter = filter[0];
+
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Export"), "", filter.join(";;"), &selectedFilter, QFileDialog::Options());
+
+	if(fileName.split(".").size() <= 1) {
+		// file name w/o extension. Let's append it
+		QString ext = selectedFilter.split(".")[1].split(")")[0];
+		fileName += "." + ext;
+	}
+
+	if(!fileName.isEmpty()) {
+		bool withScopyHeader = false;
+		FileManager fm("HarmonicCalibration");
+		fm.open(fileName, FileManager::EXPORT);
+
+		QVector<double> preCalibrationAngleErrorsFFTMagnitude(m_admtController->angle_errors_fft_pre.begin(), m_admtController->angle_errors_fft_pre.end());
+		QVector<double> preCalibrationAngleErrorsFFTPhase(m_admtController->angle_errors_fft_phase_pre.begin(), m_admtController->angle_errors_fft_phase_pre.end());
+
+		QVector<double> h1Mag = { H1_MAG_ANGLE };
+		QVector<double> h2Mag = { H2_MAG_ANGLE };
+		QVector<double> h3Mag = { H3_MAG_ANGLE };
+		QVector<double> h8Mag = { H8_MAG_ANGLE };
+		QVector<double> h1Phase = { H1_PHASE_ANGLE };
+		QVector<double> h2Phase = { H2_PHASE_ANGLE };
+		QVector<double> h3Phase = { H3_PHASE_ANGLE };
+		QVector<double> h8Phase = { H8_PHASE_ANGLE };
+
+		fm.save(graphDataList, "Raw Data");
+		fm.save(preCalibrationAngleErrorsFFTMagnitude, "Pre-Calibration Angle Errors FFT Magnitude");
+		fm.save(preCalibrationAngleErrorsFFTPhase, "Pre-Calibration Angle Errors FFT Phase");
+		fm.save(h1Mag, "H1 Mag");
+		fm.save(h2Mag, "H2 Mag");
+		fm.save(h3Mag, "H3 Mag");
+		fm.save(h8Mag, "H8 Mag");
+		fm.save(h1Phase, "H1 Phase");
+		fm.save(h2Phase, "H2 Phase");
+		fm.save(h3Phase, "H3 Phase");
+		fm.save(h8Phase, "H8 Phase");
+
+		fm.performWrite(withScopyHeader);
+	}
+}
+
+void HarmonicCalibration::toggleTabSwitching(bool value)
+{
+	tabWidget->setTabEnabled(0, value);
+	tabWidget->setTabEnabled(2, value);
+	tabWidget->setTabEnabled(3, value);
+}
+
+void HarmonicCalibration::canStartMotor(bool value)
+{
+	calibrationStartMotorButton->setEnabled(value);
+}
 
 void HarmonicCalibration::canCalibrate(bool value)
 {
 	calibrateDataButton->setEnabled(value);
 }
 
-void HarmonicCalibration::acquisitionPlotTask(int sampleRate)
+void HarmonicCalibration::toggleMotorControls(bool value)
 {
-	while(isStartAcquisition){
-		if(acquisitionDataMap.at(ANGLE))
-			plotAcquisition(acquisitionAngleList, acquisitionAnglePlotChannel);
-		if(acquisitionDataMap.at(ABSANGLE))
-			plotAcquisition(acquisitionABSAngleList, acquisitionABSAnglePlotChannel);
-		if(acquisitionDataMap.at(TURNCOUNT))
-			plotAcquisition(acquisitionTurnCountList, acquisitionTurnCountPlotChannel);
-		if(acquisitionDataMap.at(TMP0))
-			plotAcquisition(acquisitionTmp0List, acquisitionTmp0PlotChannel);
-		if(acquisitionDataMap.at(SINE))
-			plotAcquisition(acquisitionSineList, acquisitionSinePlotChannel);
-		if(acquisitionDataMap.at(COSINE))
-			plotAcquisition(acquisitionCosineList, acquisitionCosinePlotChannel);
-		if(acquisitionDataMap.at(RADIUS))
-			plotAcquisition(acquisitionRadiusList, acquisitionRadiusPlotChannel);
-
-		acquisitionYPlotAxis->setInterval(acquisitionGraphYMin, acquisitionGraphYMax);
-		acquisitionGraphPlotWidget->replot();
-
-		QThread::msleep(sampleRate);
-	}
+	motorMaxVelocitySpinBox->setEnabled(value);
+	motorAccelTimeSpinBox->setEnabled(value);
+	motorMaxDisplacementSpinBox->setEnabled(value);
+	m_calibrationMotorRampModeMenuCombo->setEnabled(value);
+	motorTargetPositionSpinBox->setEnabled(value);
 }
 
-void HarmonicCalibration::acquisitionUITask()
+void HarmonicCalibration::clearCalibrationSamples()
 {
-	updateFaultStatusLEDColor(acquisitionFaultRegisterLEDWidget, deviceStatusFault);
-
-	if(isStartAcquisition)
-	{
-		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
-		updateLineEditValues();
-		updateLineEditValue(acquisitionMotorCurrentPositionLineEdit, current_pos);
-	}
+	graphDataList.clear();
+	calibrationRawDataPlotChannel->curve()->setData(nullptr);
+	calibrationSineDataPlotChannel->curve()->setData(nullptr);
+	calibrationCosineDataPlotChannel->curve()->setData(nullptr);
+	calibrationRawDataPlotWidget->replot();
 }
 
-void HarmonicCalibration::updateFaultStatusLEDColor(MenuControlButton *widget, bool value)
+void HarmonicCalibration::clearCalibrationSineCosine()
 {
-	if(value) changeStatusLEDColor(widget, faultLEDColor); 
-	else changeStatusLEDColor(widget, statusLEDColor); 
+	calibrationSineDataPlotChannel->curve()->setData(nullptr);
+	calibrationCosineDataPlotChannel->curve()->setData(nullptr);
+	calibrationRawDataPlotWidget->replot();
 }
 
-void HarmonicCalibration::applySequence(){
-	toggleWidget(applySequenceButton, false);
-	applySequenceButton->setText("Writing...");
-	QTimer::singleShot(1000, this, [this](){
-		this->toggleWidget(applySequenceButton, true);
-		applySequenceButton->setText("Apply");
-	});
-	uint32_t *generalRegValue = new uint32_t;
-	uint32_t generalRegisterAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL);
-	std::map<string, int> settings;
+void HarmonicCalibration::clearPostCalibrationSamples()
+{
+	graphPostDataList.clear();
+	postCalibrationRawDataPlotChannel->curve()->setData(nullptr);
+	postCalibrationSineDataPlotChannel->curve()->setData(nullptr);
+	postCalibrationCosineDataPlotChannel->curve()->setData(nullptr);
+	postCalibrationRawDataPlotWidget->replot();
+}
 
-	settings["Convert Synchronization"] = qvariant_cast<int>(convertSynchronizationMenuCombo->combo()->currentData()); // convertSync;
-	settings["Angle Filter"] = qvariant_cast<int>(angleFilterMenuCombo->combo()->currentData()); // angleFilter;
-	settings["8th Harmonic"] = qvariant_cast<int>(eighthHarmonicMenuCombo->combo()->currentData()); // eighthHarmonic;
-	settings["Sequence Type"] = qvariant_cast<int>(sequenceTypeMenuCombo->combo()->currentData()); // sequenceType;
-	settings["Conversion Type"] = qvariant_cast<int>(conversionTypeMenuCombo->combo()->currentData()); // conversionType;
+void HarmonicCalibration::clearAngleErrorGraphs()
+{
+	angleErrorPlotChannel->curve()->setData(nullptr);
+	angleErrorPlotWidget->replot();
+	FFTAngleErrorMagnitudeChannel->curve()->setData(nullptr);
+	FFTAngleErrorPhaseChannel->curve()->setData(nullptr);
+	FFTAngleErrorPlotWidget->replot();
+}
 
+void HarmonicCalibration::clearCorrectedAngleErrorGraphs()
+{
+	correctedErrorPlotChannel->curve()->setData(nullptr);
+	correctedErrorPlotWidget->replot();
+	FFTCorrectedErrorMagnitudeChannel->curve()->setData(nullptr);
+	FFTCorrectedErrorPhaseChannel->curve()->setData(nullptr);
+	FFTCorrectedErrorPlotWidget->replot();
+}
+#pragma endregion
+
+#pragma region Motor Methods
+bool HarmonicCalibration::moveMotorToPosition(double& position, bool validate)
+{
 	bool success = false;
-
-	if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress, generalRegValue) != -1){
-
-		uint32_t newGeneralRegValue = m_admtController->setGeneralRegisterBitMapping(*generalRegValue, settings);
-		uint32_t generalRegisterPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL);
-
-		if(changeCNVPage(generalRegisterPage)){
-			if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress, newGeneralRegValue) != -1){
-				if(readSequence()){
-					if(settings.at("Convert Synchronization") == generalRegisterMap.at("Convert Synchronization") &&
-						settings.at("Angle Filter") == generalRegisterMap.at("Angle Filter") &&
-						settings.at("8th Harmonic") == generalRegisterMap.at("8th Harmonic") &&
-						settings.at("Sequence Type") == generalRegisterMap.at("Sequence Type") &&
-						settings.at("Conversion Type") == generalRegisterMap.at("Conversion Type"))
-					{
-						StatusBarManager::pushMessage("Sequence settings applied successfully");
-						success = true;
-					}
+	bool canRead = true;
+	if(writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, position) == 0){
+		if(validate){
+			if(readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) == 0)
+			{
+				while(target_pos != current_pos && canRead) {
+					canRead = readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) == 0 ? true : false;
 				}
-			}
-		}
-	}
-
-
-	if(!success){ StatusBarManager::pushMessage("Failed to apply sequence settings"); }
-}
-
-void HarmonicCalibration::toggleWidget(QPushButton *widget, bool value){
-	widget->setEnabled(value);
-}
-
-bool HarmonicCalibration::readSequence(){
-	uint32_t *generalRegValue = new uint32_t;
-	uint32_t generalRegisterAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL);
-	uint32_t generalRegisterPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL);
-
-	bool success = false;
-
-	if(changeCNVPage(generalRegisterPage)){
-		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress, generalRegValue) != -1){
-			if(*generalRegValue != UINT32_MAX){
-				generalRegisterMap = m_admtController->getGeneralRegisterBitMapping(static_cast<uint16_t>(*generalRegValue));
-				success = true;
+				if(canRead)	success = true;
 			}
 		}
 	}
@@ -2514,32 +2814,62 @@ bool HarmonicCalibration::readSequence(){
 	return success;
 }
 
-void HarmonicCalibration::updateSequenceWidget(){
-	if(generalRegisterMap.at("Sequence Type") == -1){ sequenceTypeMenuCombo->combo()->setCurrentText("Reserved"); }
-	else{ sequenceTypeMenuCombo->combo()->setCurrentIndex(sequenceTypeMenuCombo->combo()->findData(generalRegisterMap.at("Sequence Type"))); }
-	conversionTypeMenuCombo->combo()->setCurrentIndex(conversionTypeMenuCombo->combo()->findData(generalRegisterMap.at("Conversion Type")));
-	// cnvSourceMenuCombo->combo()->setCurrentValue(generalRegisterMap.at("Sequence Type"));
-	if(generalRegisterMap.at("Convert Synchronization") == -1){ convertSynchronizationMenuCombo->combo()->setCurrentText("Reserved"); }
-	else{ convertSynchronizationMenuCombo->combo()->setCurrentIndex(convertSynchronizationMenuCombo->combo()->findData(generalRegisterMap.at("Convert Synchronization"))); }
-	angleFilterMenuCombo->combo()->setCurrentIndex(angleFilterMenuCombo->combo()->findData(generalRegisterMap.at("Angle Filter")));
-	eighthHarmonicMenuCombo->combo()->setCurrentIndex(eighthHarmonicMenuCombo->combo()->findData(generalRegisterMap.at("8th Harmonic")));
-}
-
-bool HarmonicCalibration::changeCNVPage(uint32_t page){
-	uint32_t *cnvPageRegValue = new uint32_t;
-	uint32_t cnvPageAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE);
-
-	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, page) != -1){
-		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, cnvPageRegValue) != -1){
-			if(*cnvPageRegValue == page){
-				return true; 
+bool HarmonicCalibration::resetCurrentPositionToZero()
+{
+	bool success = false;
+	if(readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) == 0)
+	{
+		if(current_pos != 0 &&
+		   writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, 0) == 0 &&
+		   readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) == 0)
+		{
+			while(current_pos != 0){
+				if(readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) != 0) break;
+				QThread::msleep(readMotorDebounce);
+			}
+			if(current_pos == 0)
+			{
+				resetToZero = false;
+				success = true;
 			}
 		}
+		else{
+			success = true;
+		}
 	}
-
-	return false;
+	
+	return success;
 }
 
+void HarmonicCalibration::stopMotor()
+{
+	writeMotorAttributeValue(ADMTController::MotorAttribute::DISABLE, 1);
+}
+
+int HarmonicCalibration::readMotorAttributeValue(ADMTController::MotorAttribute attribute, double& value)
+{
+	int result = -1;
+	if(!isDebug){
+		result = m_admtController->getDeviceAttributeValue(m_admtController->getDeviceId(ADMTController::Device::TMC5240),
+															m_admtController->getMotorAttribute(attribute),
+															&value);
+	}
+	return result;
+}
+
+int HarmonicCalibration::writeMotorAttributeValue(ADMTController::MotorAttribute attribute, double value)
+{
+	int result = -1;
+	if(!isDebug){
+		result = m_admtController->setDeviceAttributeValue(m_admtController->getDeviceId(ADMTController::Device::TMC5240), 
+															m_admtController->getMotorAttribute(attribute), 
+															value);
+	}
+	return result;
+}
+#pragma endregion
+
+#pragma region Utility Methods
 void HarmonicCalibration::utilityTask(){
 	updateDigioMonitor();
 	updateFaultRegister();
@@ -2548,6 +2878,16 @@ void HarmonicCalibration::utilityTask(){
 		updateMTDiagnostics();
 	}
 	commandLogWrite("");
+}
+
+void HarmonicCalibration::toggleUtilityTask(bool run)
+{
+	if(run){
+		utilityTimer->start(utilityTimerRate);
+	}
+	else{
+		utilityTimer->stop();
+	}
 }
 
 void HarmonicCalibration::updateDigioMonitor(){
@@ -2656,6 +2996,88 @@ void HarmonicCalibration::updateDigioMonitor(){
 
 }
 
+bool HarmonicCalibration::updateDIGIOToggle()
+{
+	uint32_t *DIGIOENRegisterValue = new uint32_t;
+	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
+	bool success = false;
+
+	if(changeCNVPage(DIGIOENPage)){
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+			DIGIOENRegisterValue) != -1)
+		{
+			map<string, bool> DIGIOSettings = m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));
+			DIGIO0ENToggleSwitch->setChecked(DIGIOSettings["DIGIO0EN"]);
+			DIGIO1ENToggleSwitch->setChecked(DIGIOSettings["DIGIO1EN"]);
+			DIGIO2ENToggleSwitch->setChecked(DIGIOSettings["DIGIO2EN"]);
+			DIGIO3ENToggleSwitch->setChecked(DIGIOSettings["DIGIO3EN"]);
+			DIGIO4ENToggleSwitch->setChecked(DIGIOSettings["DIGIO4EN"]);
+			DIGIO5ENToggleSwitch->setChecked(DIGIOSettings["DIGIO5EN"]);
+			DIGIO0FNCToggleSwitch->setChecked(DIGIOSettings["BUSY"]);
+			DIGIO1FNCToggleSwitch->setChecked(DIGIOSettings["CNV"]);
+			DIGIO2FNCToggleSwitch->setChecked(DIGIOSettings["SENT"]);
+			DIGIO3FNCToggleSwitch->setChecked(DIGIOSettings["ACALC"]);
+			DIGIO4FNCToggleSwitch->setChecked(DIGIOSettings["FAULT"]);
+			DIGIO5FNCToggleSwitch->setChecked(DIGIOSettings["BOOTLOAD"]);
+			success = true;
+		}
+	}
+	return success;
+}
+
+void HarmonicCalibration::updateMTDiagnostics(){
+	uint32_t *mtDiag1RegValue = new uint32_t;
+	uint32_t *mtDiag2RegValue = new uint32_t;
+	uint32_t *cnvPageRegValue = new uint32_t;
+
+	uint32_t mtDiag1RegisterAddress = m_admtController->getSensorRegister(ADMTController::SensorRegister::DIAG1);
+	uint32_t mtDiag2RegisterAddress = m_admtController->getSensorRegister(ADMTController::SensorRegister::DIAG2);
+
+	uint32_t mtDiag1PageValue = m_admtController->getSensorPage(ADMTController::SensorRegister::DIAG1);
+	uint32_t mtDiag2PageValue = m_admtController->getSensorPage(ADMTController::SensorRegister::DIAG2);
+
+	uint32_t cnvPageAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE);
+
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, mtDiag1PageValue) != -1){
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, cnvPageRegValue) != -1){
+			if(*cnvPageRegValue == mtDiag1PageValue){
+				if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), mtDiag1RegisterAddress, mtDiag1RegValue) != -1){
+					std::map<std::string, double> mtDiag1BitMapping =  m_admtController->getDiag1RegisterBitMapping_Afe(static_cast<uint16_t>(*mtDiag1RegValue), is5V);
+
+					afeDiag2 = mtDiag1BitMapping.at("AFE Diagnostic 2");
+					AFEDIAG2LineEdit->setText(QString::number(afeDiag2) + " V");
+				}
+				else{ commandLogWrite("Failed to read MT Diagnostic 1 Register"); }
+			}
+			else{ commandLogWrite("CNVPAGE for MT Diagnostic 1 is a different value, abort reading"); }
+		}
+		else{ commandLogWrite("Failed to read CNVPAGE for MT Diagnostic 1"); }
+	}
+	else{ commandLogWrite("Failed to write CNVPAGE for MT Diagnostic 1"); }
+
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, mtDiag2PageValue) != -1){
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, cnvPageRegValue) != -1){
+			if(*cnvPageRegValue == mtDiag2PageValue){
+				if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), mtDiag2RegisterAddress, mtDiag2RegValue) != -1){
+					std::map<std::string, double> mtDiag2BitMapping =  m_admtController->getDiag2RegisterBitMapping(static_cast<uint16_t>(*mtDiag2RegValue));
+					
+					afeDiag0 = mtDiag2BitMapping.at("AFE Diagnostic 0 (-57%)");
+					afeDiag1 = mtDiag2BitMapping.at("AFE Diagnostic 1 (+57%)");
+					AFEDIAG0LineEdit->setText(QString::number(afeDiag0) + " V");
+					AFEDIAG1LineEdit->setText(QString::number(afeDiag1) + " V");
+
+					commandLogWrite("DIAG2: 0b" + QString::number(static_cast<uint16_t>(*mtDiag2RegValue), 2).rightJustified(16, '0'));
+				}
+				else{ commandLogWrite("Failed to read MT Diagnostic 2 Register"); }
+			}
+			else{ commandLogWrite("CNVPAGE for MT Diagnostic 2 is a different value, abort reading"); }
+		}
+		else{ commandLogWrite("Failed to read CNVPAGE for MT Diagnostic 2"); }
+	}
+	else{ commandLogWrite("Failed to write CNVPAGE for MT Diagnostic 2"); }
+}
+
 void HarmonicCalibration::updateMTDiagRegister(){
 	uint32_t *mtDiag1RegValue = new uint32_t;
 	uint32_t *cnvPageRegValue = new	uint32_t;
@@ -2716,96 +3138,282 @@ void HarmonicCalibration::updateFaultRegister(){
 	else{ commandLogWrite("Failed to read FAULT Register"); }
 }
 
-void HarmonicCalibration::updateMTDiagnostics(){
-	uint32_t *mtDiag1RegValue = new uint32_t;
-	uint32_t *mtDiag2RegValue = new uint32_t;
-	uint32_t *cnvPageRegValue = new uint32_t;
+void HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool& value)
+{
+	toggleUtilityTask(false);
 
-	uint32_t mtDiag1RegisterAddress = m_admtController->getSensorRegister(ADMTController::SensorRegister::DIAG1);
-	uint32_t mtDiag2RegisterAddress = m_admtController->getSensorRegister(ADMTController::SensorRegister::DIAG2);
+	uint32_t *DIGIOENRegisterValue = new uint32_t;
+	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
 
-	uint32_t mtDiag1PageValue = m_admtController->getSensorPage(ADMTController::SensorRegister::DIAG1);
-	uint32_t mtDiag2PageValue = m_admtController->getSensorPage(ADMTController::SensorRegister::DIAG2);
+	bool success = false;
 
-	uint32_t cnvPageAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE);
+	if(changeCNVPage(DIGIOENPage))
+	{
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+			DIGIOENRegisterValue) != -1)
+		{
+			map<string, bool> DIGIOSettings = m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));
 
-	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, mtDiag1PageValue) != -1){
-		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, cnvPageRegValue) != -1){
-			if(*cnvPageRegValue == mtDiag1PageValue){
-				if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), mtDiag1RegisterAddress, mtDiag1RegValue) != -1){
-					std::map<std::string, double> mtDiag1BitMapping =  m_admtController->getDiag1RegisterBitMapping_Afe(static_cast<uint16_t>(*mtDiag1RegValue), is5V);
+			DIGIOSettings[DIGIOENName] = value;
 
-					afeDiag2 = mtDiag1BitMapping.at("AFE Diagnostic 2");
-					AFEDIAG2LineEdit->setText(QString::number(afeDiag2) + " V");
+			uint16_t newRegisterValue = m_admtController->setDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue), DIGIOSettings);
+
+			if(changeCNVPage(DIGIOENPage)){
+				if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+														m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+														static_cast<uint32_t>(newRegisterValue)) != -1)
+				{
+					success = updateDIGIOToggle();
 				}
-				else{ commandLogWrite("Failed to read MT Diagnostic 1 Register"); }
 			}
-			else{ commandLogWrite("CNVPAGE for MT Diagnostic 1 is a different value, abort reading"); }
+
 		}
-		else{ commandLogWrite("Failed to read CNVPAGE for MT Diagnostic 1"); }
 	}
-	else{ commandLogWrite("Failed to write CNVPAGE for MT Diagnostic 1"); }
 
-	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, mtDiag2PageValue) != -1){
-		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, cnvPageRegValue) != -1){
-			if(*cnvPageRegValue == mtDiag2PageValue){
-				if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), mtDiag2RegisterAddress, mtDiag2RegValue) != -1){
-					std::map<std::string, double> mtDiag2BitMapping =  m_admtController->getDiag2RegisterBitMapping(static_cast<uint16_t>(*mtDiag2RegValue));
-					
-					afeDiag0 = mtDiag2BitMapping.at("AFE Diagnostic 0 (-57%)");
-					afeDiag1 = mtDiag2BitMapping.at("AFE Diagnostic 1 (+57%)");
-					AFEDIAG0LineEdit->setText(QString::number(afeDiag0) + " V");
-					AFEDIAG1LineEdit->setText(QString::number(afeDiag1) + " V");
+	if(!success) { StatusBarManager::pushMessage("Failed to toggle" + QString::fromStdString(DIGIOENName) + " " + QString(value ? "on" : "off")); }
 
-					commandLogWrite("DIAG2: 0b" + QString::number(static_cast<uint16_t>(*mtDiag2RegValue), 2).rightJustified(16, '0'));
+	toggleUtilityTask(true);
+}
+
+void HarmonicCalibration::toggleAllDIGIOEN(bool value)
+{
+	toggleUtilityTask(false);
+	uint32_t *DIGIOENRegisterValue = new uint32_t;
+	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
+
+	bool success = false;
+
+	if(changeCNVPage(DIGIOENPage))
+	{
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+			DIGIOENRegisterValue) != -1)
+		{
+			map<string, bool> DIGIOSettings = m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));;
+			DIGIOSettings["DIGIO5EN"] = value;
+			DIGIOSettings["DIGIO4EN"] = value;
+			DIGIOSettings["DIGIO3EN"] = value;
+			DIGIOSettings["DIGIO2EN"] = value;
+			DIGIOSettings["DIGIO1EN"] = value;
+			DIGIOSettings["DIGIO0EN"] = value;
+			uint16_t newRegisterValue = m_admtController->setDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue), DIGIOSettings);
+
+			if(changeCNVPage(DIGIOENPage)){
+				if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+					m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+					static_cast<uint32_t>(newRegisterValue)) != -1)
+				{
+					success = updateDIGIOToggle();
 				}
-				else{ commandLogWrite("Failed to read MT Diagnostic 2 Register"); }
 			}
-			else{ commandLogWrite("CNVPAGE for MT Diagnostic 2 is a different value, abort reading"); }
 		}
-		else{ commandLogWrite("Failed to read CNVPAGE for MT Diagnostic 2"); }
 	}
-	else{ commandLogWrite("Failed to write CNVPAGE for MT Diagnostic 2"); }
+
+	if(!success) { StatusBarManager::pushMessage("Failed to toggle all GPIO outputs " + QString(value ? "on" : "off")); }
+
+	toggleUtilityTask(true);
+}
+
+void HarmonicCalibration::toggleMTDiagnostics(int mode)
+{
+	switch(mode){
+		case 0:
+			MTDiagnosticsScrollArea->hide();
+			hasMTDiagnostics = false;
+			break;
+		case 1:
+			MTDiagnosticsScrollArea->show();
+			hasMTDiagnostics = true;
+			break;
+	}
+}
+
+void HarmonicCalibration::toggleFaultRegisterMode(int mode)
+{
+	switch(mode){
+		case 0:
+			AFEDIAGStatusLED->hide();
+			OscillatorDriftStatusLED->hide();
+			AngleCrossCheckStatusLED->hide();
+			TurnCountSensorLevelsStatusLED->hide();
+			MTDIAGStatusLED->hide();
+			SequencerWatchdogStatusLED->hide();
+			break;
+		case 1: 
+			AFEDIAGStatusLED->show();
+			OscillatorDriftStatusLED->show();
+			AngleCrossCheckStatusLED->show();
+			TurnCountSensorLevelsStatusLED->show();
+			MTDIAGStatusLED->show();
+			SequencerWatchdogStatusLED->show();
+			break;
+	}
+}
+
+void HarmonicCalibration::resetDIGIO()
+{
+	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+										m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
+										0x241b);
+}
+
+void HarmonicCalibration::commandLogWrite(QString message)
+{
+	commandLogPlainTextEdit->appendPlainText(message);
 }
 
 void HarmonicCalibration::clearCommandLog(){
 	commandLogPlainTextEdit->clear();
 }
+#pragma endregion
 
-bool HarmonicCalibration::updateChannelValues(){
-	bool success = false;
-	rotation = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), rotationChannelName, bufferSize);
-	if(rotation == static_cast<double>(UINT64_MAX)) { return false; }
-	angle = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), angleChannelName, bufferSize);
-	if(angle == static_cast<double>(UINT64_MAX)) { return false; }
-	updateCountValue();
-	if(count == static_cast<double>(UINT64_MAX)) { return false; }
-	temp = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), temperatureChannelName, bufferSize);
-	if(temp == static_cast<double>(UINT64_MAX)) { return false; }
-	return success = true;
-}
+#pragma region Register Methods
+void HarmonicCalibration::readAllRegisters()
+{
+	readAllRegistersButton->setEnabled(false);
+	readAllRegistersButton->setText(QString("Reading Registers..."));
+	QTimer::singleShot(1000, this, [this](){
+		readAllRegistersButton->setEnabled(true);
+		readAllRegistersButton->setText(QString("Read All Registers"));
+	});
 
-void HarmonicCalibration::updateCountValue(){
-	uint32_t *absAngleRegValue = new uint32_t;
-	bool success = false;
-	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE), 0x0000) != -1){
-		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getSensorRegister(ADMTController::SensorRegister::ABSANGLE), absAngleRegValue) != -1){
-			count = m_admtController->getAbsAngleTurnCount(static_cast<uint16_t>(*absAngleRegValue));
-			success = true;
-		}
+	cnvPageRegisterBlock->readButton()->click();
+	digIORegisterBlock->readButton()->click();
+	faultRegisterBlock->readButton()->click();
+	generalRegisterBlock->readButton()->click();
+	digIOEnRegisterBlock->readButton()->click();
+	eccDcdeRegisterBlock->readButton()->click();
+	eccDisRegisterBlock->readButton()->click();
+	absAngleRegisterBlock->readButton()->click();
+	angleRegisterBlock->readButton()->click();
+	sineRegisterBlock->readButton()->click();
+	cosineRegisterBlock->readButton()->click();
+	tmp0RegisterBlock->readButton()->click();
+	cnvCntRegisterBlock->readButton()->click();
+	uniqID0RegisterBlock->readButton()->click();
+	uniqID1RegisterBlock->readButton()->click();
+	uniqID2RegisterBlock->readButton()->click();
+	uniqID3RegisterBlock->readButton()->click();
+	h1MagRegisterBlock->readButton()->click();
+	h1PhRegisterBlock->readButton()->click();
+	h2MagRegisterBlock->readButton()->click();
+	h2PhRegisterBlock->readButton()->click();
+	h3MagRegisterBlock->readButton()->click();
+	h3PhRegisterBlock->readButton()->click();
+	h8MagRegisterBlock->readButton()->click();
+	h8PhRegisterBlock->readButton()->click();
+
+	if(generalRegisterMap.at("Sequence Type") == 1){
+		angleSecRegisterBlock->readButton()->click();
+		secAnglIRegisterBlock->readButton()->click();
+		secAnglQRegisterBlock->readButton()->click();
+		tmp1RegisterBlock->readButton()->click();
+		angleCkRegisterBlock->readButton()->click();
+		radiusRegisterBlock->readButton()->click();
+		diag1RegisterBlock->readButton()->click();
+		diag2RegisterBlock->readButton()->click();
 	}
-	if(!success){ count = static_cast<double>(UINT64_MAX); }
 }
 
-void HarmonicCalibration::updateLineEditValues(){
-	if(rotation == static_cast<double>(UINT64_MAX)) { rotationValueLabel->setText("N/A"); }
-	else { rotationValueLabel->setText(QString::number(rotation) + "°"); }
-	if(angle == static_cast<double>(UINT64_MAX)) { angleValueLabel->setText("N/A"); }
-	else { angleValueLabel->setText(QString::number(angle) + "°"); }
-	if(count == static_cast<double>(UINT64_MAX)) { countValueLabel->setText("N/A"); }
-	else { countValueLabel->setText(QString::number(count)); }
-	if(temp == static_cast<double>(UINT64_MAX)) { tempValueLabel->setText("N/A"); }
-	else { tempValueLabel->setText(QString::number(temp) + " °C"); }
+void HarmonicCalibration::toggleRegisters(int mode)
+{
+	switch(mode){
+		case 0:
+			angleSecRegisterBlock->hide();
+			secAnglIRegisterBlock->hide();
+			secAnglQRegisterBlock->hide();
+			tmp1RegisterBlock->hide();
+			angleCkRegisterBlock->hide();
+			radiusRegisterBlock->hide();
+			diag1RegisterBlock->hide();
+			diag2RegisterBlock->hide();
+			break;
+		case 1:
+			angleSecRegisterBlock->show();
+			secAnglIRegisterBlock->show();
+			secAnglQRegisterBlock->show();
+			tmp1RegisterBlock->show();
+			angleCkRegisterBlock->show();
+			radiusRegisterBlock->show();
+			diag1RegisterBlock->show();
+			diag2RegisterBlock->show();
+			break;
+	}
+}
+#pragma endregion
+
+#pragma region UI Helper Methods
+void HarmonicCalibration::updateLabelValue(QLabel* label, int channelIndex)
+{
+	switch(channelIndex)
+	{
+		case ADMTController::Channel::ROTATION:
+			label->setText(QString("%1").arg(rotation, 0, 'f', 2) + "°");
+			break;
+		case ADMTController::Channel::ANGLE:
+			label->setText(QString("%1").arg(angle, 0, 'f', 2) + "°");
+			break;
+		case ADMTController::Channel::COUNT:
+			label->setText(QString::number(count));
+			break;
+		case ADMTController::Channel::TEMPERATURE:
+			label->setText(QString("%1").arg(temp, 0, 'f', 2) + "°C");
+			break;
+	}
+}
+
+void HarmonicCalibration::updateLabelValue(QLabel *label, ADMTController::MotorAttribute attribute)
+{
+	switch(attribute)
+	{
+		case ADMTController::MotorAttribute::AMAX:
+			label->setText(QString::number(amax));
+			break;
+		case ADMTController::MotorAttribute::ROTATE_VMAX:
+			label->setText(QString::number(rotate_vmax));
+			break;
+		case ADMTController::MotorAttribute::DMAX:
+			label->setText(QString::number(dmax));
+			break;
+		case ADMTController::MotorAttribute::DISABLE:
+			label->setText(QString::number(disable));
+			break;
+		case ADMTController::MotorAttribute::TARGET_POS:
+			label->setText(QString::number(target_pos));
+			break;
+		case ADMTController::MotorAttribute::CURRENT_POS:
+			label->setText(QString::number(current_pos));
+			break;
+		case ADMTController::MotorAttribute::RAMP_MODE:
+			label->setText(QString::number(ramp_mode));
+			break;
+	}
+}
+
+bool HarmonicCalibration::updateChannelValue(int channelIndex)
+{
+	bool success = false;
+	switch(channelIndex)
+	{
+		case ADMTController::Channel::ROTATION:
+			rotation = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), rotationChannelName, 1);
+			if(rotation == static_cast<double>(UINT64_MAX)) { success = false; }
+			break;
+		case ADMTController::Channel::ANGLE:
+			angle = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), angleChannelName, 1);
+			if(angle == static_cast<double>(UINT64_MAX)) { success = false; }
+			break;
+		case ADMTController::Channel::COUNT:
+			count = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), countChannelName, 1);
+			if(count == static_cast<double>(UINT64_MAX)) { success = false; }
+			break;
+		case ADMTController::Channel::TEMPERATURE:
+			temp = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), temperatureChannelName, 1);
+			if(temp == static_cast<double>(UINT64_MAX)) { success = false; }
+			break;
+	}
+	return success;
 }
 
 void HarmonicCalibration::updateLineEditValue(QLineEdit* lineEdit, double value){
@@ -2813,12 +3421,26 @@ void HarmonicCalibration::updateLineEditValue(QLineEdit* lineEdit, double value)
 	else { lineEdit->setText(QString::number(value)); }
 }
 
-void HarmonicCalibration::updateGeneralSettingEnabled(bool value)
+void HarmonicCalibration::toggleWidget(QPushButton *widget, bool value){
+	widget->setEnabled(value);
+}
+
+void HarmonicCalibration::changeCustomSwitchLabel(CustomSwitch *customSwitch, QString onLabel, QString offLabel)
 {
-	graphUpdateIntervalLineEdit->setEnabled(value);
-	displayLengthLineEdit->setEnabled(value);
-	// dataGraphSamplesLineEdit->setEnabled(value);
-	// tempGraphSamplesLineEdit->setEnabled(value);
+	customSwitch->setOnText(onLabel);
+	customSwitch->setOffText(offLabel);
+}
+
+void HarmonicCalibration::changeStatusLEDColor(MenuControlButton *menuControlButton, QColor color, bool checked)
+{
+	menuControlButton->setColor(color);
+	menuControlButton->checkBox()->setChecked(checked);
+}
+
+void HarmonicCalibration::updateFaultStatusLEDColor(MenuControlButton *widget, bool value)
+{
+	if(value) changeStatusLEDColor(widget, faultLEDColor); 
+	else changeStatusLEDColor(widget, statusLEDColor); 
 }
 
 MenuControlButton *HarmonicCalibration::createStatusLEDWidget(const QString title, QColor color, QWidget *parent)
@@ -2837,12 +3459,6 @@ MenuControlButton *HarmonicCalibration::createStatusLEDWidget(const QString titl
 	return menuControlButton;
 }
 
-void HarmonicCalibration::changeStatusLEDColor(MenuControlButton *menuControlButton, QColor color, bool checked)
-{
-	menuControlButton->setColor(color);
-	menuControlButton->checkBox()->setChecked(checked);
-}
-
 MenuControlButton *HarmonicCalibration::createChannelToggleWidget(const QString title, QColor color, QWidget *parent)
 {
 	MenuControlButton *menuControlButton = new MenuControlButton(parent);
@@ -2857,7 +3473,55 @@ MenuControlButton *HarmonicCalibration::createChannelToggleWidget(const QString 
 	menuControlButton->layout()->setMargin(0);
 	return menuControlButton;
 }
+#pragma endregion
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#pragma region Connect Methods
 void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, int& variable, int min, int max)
 {
 	QIntValidator *validator = new QIntValidator(min, max, this);
@@ -2869,6 +3533,20 @@ void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, int& vari
             variable = value;
         } else {
             lineEdit->setText(QString::number(variable));
+        }
+    });
+}
+
+void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, double& variable, QString unit)
+{
+    connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit, unit]() {
+        bool ok;
+        double value = lineEdit->text().replace(unit, "").trimmed().toDouble(&ok);
+        if (ok) {
+            variable = value;
+			
+        } else {
+            lineEdit->setText(QString::number(variable) + " " + unit);
         }
     });
 }
@@ -2885,20 +3563,6 @@ void HarmonicCalibration::connectLineEditToDouble(QLineEdit* lineEdit, double& v
             variable = value;
         } else {
             lineEdit->setText(QString::number(variable, 'f', 2));
-        }
-    });
-}
-
-void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, double& variable, QString unit)
-{
-    connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit, unit]() {
-        bool ok;
-        double value = lineEdit->text().replace(unit, "").trimmed().toDouble(&ok);
-        if (ok) {
-            variable = value;
-			
-        } else {
-            lineEdit->setText(QString::number(variable) + " " + unit);
         }
     });
 }
@@ -3014,21 +3678,9 @@ void HarmonicCalibration::connectRegisterBlockToRegistry(RegisterBlockWidget* wi
 		});
 	}
 }
+#pragma endregion
 
-void HarmonicCalibration::connectCheckBoxToAcquisitionGraph(QCheckBox* widget, PlotChannel* channel, AcquisitionDataKey key)
-{
-	connect(widget, &QCheckBox::stateChanged, [=](int state){
-		if(state == Qt::Checked){
-			channel->setEnabled(true);
-			acquisitionDataMap[key] = true;
-		}
-		else{
-			channel->setEnabled(false);
-			acquisitionDataMap[key] = false;
-		}
-	});
-}
-
+#pragma region Convert Methods
 double HarmonicCalibration::convertRPStoVMAX(double rps) 
 { 
 	return (rps * motorMicrostepPerRevolution * motorTimeUnit); 
@@ -3048,758 +3700,44 @@ double HarmonicCalibration::convertAMAXtoAccelTime(double amax)
 {
 	return ((rotate_vmax * 131072) / (amax * motorfCLK));
 }
+#pragma endregion
 
-void HarmonicCalibration::updateLabelValue(QLabel* label, int channelIndex)
-{
-	switch(channelIndex)
-	{
-		case ADMTController::Channel::ROTATION:
-			label->setText(QString("%1").arg(rotation, 0, 'f', 2) + "°");
-			break;
-		case ADMTController::Channel::ANGLE:
-			label->setText(QString("%1").arg(angle, 0, 'f', 2) + "°");
-			break;
-		case ADMTController::Channel::COUNT:
-			label->setText(QString::number(count));
-			break;
-		case ADMTController::Channel::TEMPERATURE:
-			label->setText(QString("%1").arg(temp, 0, 'f', 2) + "°C");
-			break;
-	}
-}
-
-bool HarmonicCalibration::updateChannelValue(int channelIndex)
-{
-	bool success = false;
-	switch(channelIndex)
-	{
-		case ADMTController::Channel::ROTATION:
-			rotation = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), rotationChannelName, 1);
-			if(rotation == static_cast<double>(UINT64_MAX)) { success = false; }
-			break;
-		case ADMTController::Channel::ANGLE:
-			angle = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), angleChannelName, 1);
-			if(angle == static_cast<double>(UINT64_MAX)) { success = false; }
-			break;
-		case ADMTController::Channel::COUNT:
-			count = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), countChannelName, 1);
-			if(count == static_cast<double>(UINT64_MAX)) { success = false; }
-			break;
-		case ADMTController::Channel::TEMPERATURE:
-			temp = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), temperatureChannelName, 1);
-			if(temp == static_cast<double>(UINT64_MAX)) { success = false; }
-			break;
-	}
-	return success;
-}
-
-int HarmonicCalibration::readMotorAttributeValue(ADMTController::MotorAttribute attribute, double& value)
-{
-	int result = -1;
-	if(!isDebug){
-		result = m_admtController->getDeviceAttributeValue(m_admtController->getDeviceId(ADMTController::Device::TMC5240),
-															m_admtController->getMotorAttribute(attribute),
-															&value);
-	}
-	return result;
-}
-
-int HarmonicCalibration::writeMotorAttributeValue(ADMTController::MotorAttribute attribute, double value)
-{
-	int result = -1;
-	if(!isDebug){
-		result = m_admtController->setDeviceAttributeValue(m_admtController->getDeviceId(ADMTController::Device::TMC5240), 
-															m_admtController->getMotorAttribute(attribute), 
-															value);
-	}
-	return result;
-}
-
-void HarmonicCalibration::updateLabelValue(QLabel *label, ADMTController::MotorAttribute attribute)
-{
-	switch(attribute)
-	{
-		case ADMTController::MotorAttribute::AMAX:
-			label->setText(QString::number(amax));
-			break;
-		case ADMTController::MotorAttribute::ROTATE_VMAX:
-			label->setText(QString::number(rotate_vmax));
-			break;
-		case ADMTController::MotorAttribute::DMAX:
-			label->setText(QString::number(dmax));
-			break;
-		case ADMTController::MotorAttribute::DISABLE:
-			label->setText(QString::number(disable));
-			break;
-		case ADMTController::MotorAttribute::TARGET_POS:
-			label->setText(QString::number(target_pos));
-			break;
-		case ADMTController::MotorAttribute::CURRENT_POS:
-			label->setText(QString::number(current_pos));
-			break;
-		case ADMTController::MotorAttribute::RAMP_MODE:
-			label->setText(QString::number(ramp_mode));
-			break;
-	}
-}
-
-void HarmonicCalibration::calibrationUITask()
-{
-	readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
-	updateLineEditValue(calibrationMotorCurrentPositionLineEdit, current_pos);
-	updateFaultStatusLEDColor(calibrationFaultRegisterLEDWidget, deviceStatusFault);
-
-	if(isStartMotor)
-	{
-		if(isPostCalibration){
-			postCalibrationRawDataPlotChannel->curve()->setSamples(graphPostDataList);
-			postCalibrationRawDataPlotWidget->replot();
-		}
-		else{
-			calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
-			calibrationRawDataPlotWidget->replot();
-		}
-	}
-}
-
-void HarmonicCalibration::getCalibrationSamples()
-{
-	if(resetCurrentPositionToZero()){
-		if(isPostCalibration){
-			int currentSamplesCount = graphPostDataList.size();
-			while(isStartMotor && currentSamplesCount < totalSamplesCount){
-				target_pos = current_pos + -408;
-				moveMotorToPosition(target_pos, true);
-				updateChannelValue(ADMTController::Channel::ANGLE);
-				graphPostDataList.append(angle);
-				currentSamplesCount++;
-			}
-		}
-		else{
-			int currentSamplesCount = graphDataList.size();
-			while(isStartMotor && currentSamplesCount < totalSamplesCount){
-				target_pos = current_pos + -408;
-				if(moveMotorToPosition(target_pos, true) == false) { m_admtController->disconnectADMT(); }
-				if(updateChannelValue(ADMTController::Channel::ANGLE)) { break; }
-				graphDataList.append(angle);
-				currentSamplesCount++;
-			}
-		}
-	}
-
-	stopMotor();
-}
-
-bool HarmonicCalibration::resetCurrentPositionToZero()
-{
-	bool success = false;
-	if(readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) == 0)
-	{
-		if(current_pos != 0 &&
-		   writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, 0) == 0 &&
-		   readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) == 0)
-		{
-			while(current_pos != 0){
-				if(readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) != 0) break;
-				QThread::msleep(readMotorDebounce);
-			}
-			if(current_pos == 0)
-			{
-				resetToZero = false;
-				success = true;
-			}
-		}
-		else{
-			success = true;
-		}
-	}
-	
-	return success;
-}
-
-void HarmonicCalibration::startMotor()
-{
-	toggleTabSwitching(false);
-	toggleMotorControls(false);
-
-	if(resetToZero && !isPostCalibration){
-		clearCalibrationSamples();
-		clearPostCalibrationSamples();
-		clearAngleErrorGraphs();
-		clearCorrectedAngleErrorGraphs();
-	}
-
-	if(isPostCalibration)
-		postCalibrationRawDataXPlotAxis->setInterval(0, totalSamplesCount);
-	else
-		calibrationRawDataXPlotAxis->setInterval(0, totalSamplesCount);
-
-	if(isPostCalibration) 
-		calibrationDataGraphTabWidget->setCurrentIndex(1); // Set tab to Post Calibration Samples
-	else
-		calibrationDataGraphTabWidget->setCurrentIndex(0); // Set tab to Calibration Samples
-
-	clearCalibrateDataButton->setEnabled(false);
-	QFuture<void> future = QtConcurrent::run(this, &HarmonicCalibration::getCalibrationSamples);
-	QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
-
-	connect(watcher, &QFutureWatcher<void>::finished, this, [=]() {
-		toggleTabSwitching(true);
-		toggleMotorControls(true);
-
-		calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
-		calibrationRawDataPlotChannel->xAxis()->setMax(graphDataList.size());
-		calibrationRawDataPlotWidget->replot();
-		isStartMotor = false;
-		calibrationStartMotorButton->setChecked(false);
-		clearCalibrateDataButton->setEnabled(true);
-		
-		if(isPostCalibration)
-		{
-			if(static_cast<int>(graphPostDataList.size()) == totalSamplesCount) 
-			{
-				computeSineCosineOfAngles(graphPostDataList);
-				m_admtController->postcalibrate(vector<double>(graphPostDataList.begin(), graphPostDataList.end()), cycleCount, samplesPerCycle);
-				populateCorrectedAngleErrorGraphs();
-				isPostCalibration = false;
-				isStartMotor = false;
-				resetToZero = true;
-				canCalibrate(false);
-			}
-		}
-		else{
-			if(static_cast<int>(graphDataList.size()) == totalSamplesCount) 
-			{
-				computeSineCosineOfAngles(graphDataList);
-				calibrationLogWrite(m_admtController->calibrate(vector<double>(graphDataList.begin(), graphDataList.end()), cycleCount, samplesPerCycle));
-				populateAngleErrorGraphs();
-				calculateHarmonicValues();
-				canStartMotor(false);
-				canCalibrate(true); 
-			}
-			else{
-				resetToZero = true;
-			}
-		}
-	});
-	connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));
-	watcher->setFuture(future);
-}
-
-void HarmonicCalibration::toggleTabSwitching(bool value)
-{
-	tabWidget->setTabEnabled(0, value);
-	tabWidget->setTabEnabled(2, value);
-	tabWidget->setTabEnabled(3, value);
-}
-
-void HarmonicCalibration::populateCorrectedAngleErrorGraphs()
-{
-	QVector<double> correctedError(m_admtController->correctedError.begin(), m_admtController->correctedError.end());
-	QVector<double> FFTCorrectedErrorMagnitude(m_admtController->FFTCorrectedErrorMagnitude.begin(), m_admtController->FFTCorrectedErrorMagnitude.end());
-	QVector<double> FFTCorrectedErrorPhase(m_admtController->FFTCorrectedErrorPhase.begin(), m_admtController->FFTCorrectedErrorPhase.end());
-
-	correctedErrorPlotChannel->curve()->setSamples(correctedError);
-	auto correctedErrorMagnitudeMinMax = std::minmax_element(correctedError.begin(), correctedError.end());
-	correctedErrorYPlotAxis->setInterval(*correctedErrorMagnitudeMinMax.first, *correctedErrorMagnitudeMinMax.second);
-	correctedErrorXPlotAxis->setMax(correctedError.size());
-	correctedErrorPlotWidget->replot();
-
-	FFTCorrectedErrorPhaseChannel->curve()->setSamples(FFTCorrectedErrorPhase);
-	FFTCorrectedErrorMagnitudeChannel->curve()->setSamples(FFTCorrectedErrorMagnitude);
-	auto FFTCorrectedErrorMagnitudeMinMax = std::minmax_element(FFTCorrectedErrorMagnitude.begin(), FFTCorrectedErrorMagnitude.end());
-	auto FFTCorrectedErrorPhaseMinMax = std::minmax_element(FFTCorrectedErrorPhase.begin(), FFTCorrectedErrorPhase.end());
-	double FFTCorrectedErrorPlotMin = *FFTCorrectedErrorMagnitudeMinMax.first < *FFTCorrectedErrorPhaseMinMax.first ? *FFTCorrectedErrorMagnitudeMinMax.first : *FFTCorrectedErrorPhaseMinMax.first;
-	double FFTCorrectedErrorPlotMax = *FFTCorrectedErrorMagnitudeMinMax.second > *FFTCorrectedErrorPhaseMinMax.second ? *FFTCorrectedErrorMagnitudeMinMax.second : *FFTCorrectedErrorPhaseMinMax.second;
-	FFTCorrectedErrorYPlotAxis->setInterval(FFTCorrectedErrorPlotMin, FFTCorrectedErrorPlotMax);
-	FFTCorrectedErrorXPlotAxis->setMax(FFTCorrectedErrorMagnitude.size());
-	FFTCorrectedErrorPlotWidget->replot();
-
-	resultDataTabWidget->setCurrentIndex(2); // Set tab to Angle Error
-}
-
-void HarmonicCalibration::populateAngleErrorGraphs()
-{
-	QVector<double> angleError = QVector<double>(m_admtController->angleError.begin(), m_admtController->angleError.end());
-	QVector<double> FFTAngleErrorMagnitude = QVector<double>(m_admtController->FFTAngleErrorMagnitude.begin(), m_admtController->FFTAngleErrorMagnitude.end());
-	QVector<double> FFTAngleErrorPhase = QVector<double>(m_admtController->FFTAngleErrorPhase.begin(), m_admtController->FFTAngleErrorPhase.end());
-
-	angleErrorPlotChannel->curve()->setSamples(angleError);
-	auto angleErrorMinMax = std::minmax_element(angleError.begin(), angleError.end());
-	angleErrorYPlotAxis->setInterval(*angleErrorMinMax.first, *angleErrorMinMax.second);
-	angleErrorXPlotAxis->setInterval(0, angleError.size());
-	angleErrorPlotWidget->replot();
-	
-	FFTAngleErrorPhaseChannel->curve()->setSamples(FFTAngleErrorPhase);
-	FFTAngleErrorMagnitudeChannel->curve()->setSamples(FFTAngleErrorMagnitude);
-	auto angleErrorMagnitudeMinMax = std::minmax_element(FFTAngleErrorMagnitude.begin(), FFTAngleErrorMagnitude.end());
-	auto angleErrorPhaseMinMax = std::minmax_element(FFTAngleErrorPhase.begin(), FFTAngleErrorPhase.end());
-	double FFTAngleErrorPlotMin = *angleErrorMagnitudeMinMax.first < *angleErrorPhaseMinMax.first ? *angleErrorMagnitudeMinMax.first : *angleErrorPhaseMinMax.first;
-	double FFTAngleErrorPlotMax = *angleErrorMagnitudeMinMax.second > *angleErrorPhaseMinMax.second ? *angleErrorMagnitudeMinMax.second : *angleErrorPhaseMinMax.second;
-	FFTAngleErrorYPlotAxis->setInterval(FFTAngleErrorPlotMin, FFTAngleErrorPlotMax);
-	FFTAngleErrorXPlotAxis->setInterval(0, FFTAngleErrorMagnitude.size());
-	FFTAngleErrorPlotWidget->replot();
-
-	resultDataTabWidget->setCurrentIndex(0); // Set tab to Angle Error
-}
-
-void HarmonicCalibration::canStartMotor(bool value)
-{
-	calibrationStartMotorButton->setEnabled(value);
-}
-
-void HarmonicCalibration::flashHarmonicValues()
-{
-	if(changeCNVPage(0x02)){
-		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 0x01, 0x02);
-
-		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG),
-											H1_MAG_HEX);
-		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH),
-											H1_PHASE_HEX);
-		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG),
-											H2_MAG_HEX);
-		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH),
-											H2_PHASE_HEX);
-		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG),
-											H3_MAG_HEX);
-		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH),
-											H3_PHASE_HEX);
-		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG),
-											H8_MAG_HEX);
-		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-											m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH),
-											H8_PHASE_HEX);
-
-		isCalculatedCoeff = true;
-		displayCalculatedCoeff();
-	}
-	else{
-		calibrationLogWrite("Unabled to flash Harmonic Registers!");
-	}
-}
-
-void HarmonicCalibration::calculateHarmonicValues()
-{
-	uint32_t *h1MagCurrent = new uint32_t, 
-			 *h1PhaseCurrent = new uint32_t, 
-			 *h2MagCurrent = new uint32_t,
-			 *h2PhaseCurrent = new uint32_t,
-			 *h3MagCurrent = new uint32_t,
-			 *h3PhaseCurrent = new uint32_t,
-			 *h8MagCurrent = new uint32_t,
-			 *h8PhaseCurrent = new uint32_t;
-	
-	if(changeCNVPage(0x02))
-	{
-		// Read and store current harmonic values
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), h1MagCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG), h2MagCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG), h3MagCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), h8MagCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), h1PhaseCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH), h2PhaseCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH), h3PhaseCurrent);
-		m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), h8PhaseCurrent);
-
-		// Calculate harmonic coefficients (Hex)
-		H1_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_1), static_cast<uint16_t>(*h1MagCurrent), "h1"));
-		H2_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_2), static_cast<uint16_t>(*h2MagCurrent), "h2"));
-		H3_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_3), static_cast<uint16_t>(*h3MagCurrent), "h3"));
-		H8_MAG_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientMagnitude(static_cast<uint16_t>(m_admtController->HAR_MAG_8), static_cast<uint16_t>(*h8MagCurrent), "h8"));
-		H1_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_1), static_cast<uint16_t>(*h1PhaseCurrent)));
-		H2_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_2), static_cast<uint16_t>(*h2PhaseCurrent)));
-		H3_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_3), static_cast<uint16_t>(*h3PhaseCurrent)));
-		H8_PHASE_HEX = static_cast<uint32_t>(m_admtController->calculateHarmonicCoefficientPhase(static_cast<uint16_t>(m_admtController->HAR_PHASE_8), static_cast<uint16_t>(*h8PhaseCurrent)));
-
-		calibrationLogWrite();
-		calibrationLogWrite(QString("Calculated H1 Mag (Hex): 0x%1").arg(QString::number(H1_MAG_HEX, 16).rightJustified(4, '0')));
-		calibrationLogWrite(QString("Calculated H1 Phase (Hex): 0x%1").arg(QString::number(H1_PHASE_HEX, 16).rightJustified(4, '0')));
-		calibrationLogWrite(QString("Calculated H2 Mag (Hex): 0x%1").arg(QString::number(H2_MAG_HEX, 16).rightJustified(4, '0')));
-		calibrationLogWrite(QString("Calculated H2 Phase (Hex): 0x%1").arg(QString::number(H2_PHASE_HEX, 16).rightJustified(4, '0')));
-		calibrationLogWrite(QString("Calculated H3 Mag (Hex): 0x%1").arg(QString::number(H3_MAG_HEX, 16).rightJustified(4, '0')));
-		calibrationLogWrite(QString("Calculated H3 Phase (Hex): 0x%1").arg(QString::number(H3_PHASE_HEX, 16).rightJustified(4, '0')));
-		calibrationLogWrite(QString("Calculated H8 Mag (Hex): 0x%1").arg(QString::number(H8_MAG_HEX, 16).rightJustified(4, '0')));
-		calibrationLogWrite(QString("Calculated H8 Phase (Hex): 0x%1").arg(QString::number(H8_PHASE_HEX, 16).rightJustified(4, '0')));
-
-		// Get actual harmonic values from hex
-		H1_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H1_MAG_HEX), "h1mag");
-		H1_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H1_PHASE_HEX), "h1phase");
-		H2_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H2_MAG_HEX), "h2mag");
-		H2_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H2_PHASE_HEX), "h2phase");
-		H3_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H3_MAG_HEX), "h3mag");
-		H3_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H3_PHASE_HEX), "h3phase");
-		H8_MAG_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H8_MAG_HEX), "h8mag");
-		H8_PHASE_ANGLE = m_admtController->getActualHarmonicRegisterValue(static_cast<uint16_t>(H8_PHASE_HEX), "h8phase");
-
-		calibrationLogWrite();
-		calibrationLogWrite(QString("Calculated H1 Mag (Angle): 0x%1").arg(QString::number(H1_MAG_ANGLE)));
-		calibrationLogWrite(QString("Calculated H1 Phase (Angle): 0x%1").arg(QString::number(H1_PHASE_ANGLE)));
-		calibrationLogWrite(QString("Calculated H2 Mag (Angle): 0x%1").arg(QString::number(H2_MAG_ANGLE)));
-		calibrationLogWrite(QString("Calculated H2 Phase (Angle): 0x%1").arg(QString::number(H2_PHASE_ANGLE)));
-		calibrationLogWrite(QString("Calculated H3 Mag (Angle): 0x%1").arg(QString::number(H3_MAG_ANGLE)));
-		calibrationLogWrite(QString("Calculated H3 Phase (Angle): 0x%1").arg(QString::number(H3_PHASE_ANGLE)));
-		calibrationLogWrite(QString("Calculated H8 Mag (Angle): 0x%1").arg(QString::number(H8_MAG_ANGLE)));
-		calibrationLogWrite(QString("Calculated H8 Phase (Angle): 0x%1").arg(QString::number(H8_PHASE_ANGLE)));
-
-		if(isAngleDisplayFormat) updateCalculatedCoeffAngle();
-		else updateCalculatedCoeffHex();
-		isCalculatedCoeff = true;
-	}
-}
-
-void HarmonicCalibration::postCalibrateData()
-{
-	calibrationLogWrite("==== Post Calibration Start ====\n");
-	flashHarmonicValues();
-	calibrationDataGraphTabWidget->setCurrentIndex(1);
-	isPostCalibration = true;
-	isStartMotor = true;
-	resetToZero = true;
-	startMotor();
-}
-
-void HarmonicCalibration::updateCalculatedCoeffAngle()
-{
-	calibrationH1MagLabel->setText(QString::number(H1_MAG_ANGLE, 'f', 2) + "°");
-	calibrationH2MagLabel->setText(QString::number(H2_MAG_ANGLE, 'f', 2) + "°");
-	calibrationH3MagLabel->setText(QString::number(H3_MAG_ANGLE, 'f', 2) + "°");
-	calibrationH8MagLabel->setText(QString::number(H8_MAG_ANGLE, 'f', 2) + "°");
-	calibrationH1PhaseLabel->setText("Φ " + QString::number(H1_PHASE_ANGLE, 'f', 2));
-	calibrationH2PhaseLabel->setText("Φ " + QString::number(H2_PHASE_ANGLE, 'f', 2));
-	calibrationH3PhaseLabel->setText("Φ " + QString::number(H3_PHASE_ANGLE, 'f', 2));
-	calibrationH8PhaseLabel->setText("Φ " + QString::number(H8_PHASE_ANGLE, 'f', 2));
-}
-
-void HarmonicCalibration::resetCalculatedCoeffAngle()
-{
-	calibrationH1MagLabel->setText("--.--°");
-	calibrationH2MagLabel->setText("--.--°");
-	calibrationH3MagLabel->setText("--.--°");
-	calibrationH8MagLabel->setText("--.--°");
-	calibrationH1PhaseLabel->setText("Φ --.--");
-	calibrationH2PhaseLabel->setText("Φ --.--");
-	calibrationH3PhaseLabel->setText("Φ --.--");
-	calibrationH8PhaseLabel->setText("Φ --.--");
-}
-
-void HarmonicCalibration::updateCalculatedCoeffHex()
-{
-	calibrationH1MagLabel->setText(QString("0x%1").arg(H1_MAG_HEX, 4, 16, QChar('0')));
-	calibrationH2MagLabel->setText(QString("0x%1").arg(H2_MAG_HEX, 4, 16, QChar('0')));
-	calibrationH3MagLabel->setText(QString("0x%1").arg(H3_MAG_HEX, 4, 16, QChar('0')));
-	calibrationH8MagLabel->setText(QString("0x%1").arg(H8_MAG_HEX, 4, 16, QChar('0')));
-	calibrationH1PhaseLabel->setText(QString("0x%1").arg(H1_PHASE_HEX, 4, 16, QChar('0')));
-	calibrationH2PhaseLabel->setText(QString("0x%1").arg(H2_PHASE_HEX, 4, 16, QChar('0')));
-	calibrationH3PhaseLabel->setText(QString("0x%1").arg(H3_PHASE_HEX, 4, 16, QChar('0')));
-	calibrationH8PhaseLabel->setText(QString("0x%1").arg(H8_PHASE_HEX, 4, 16, QChar('0')));
-}
-
-void HarmonicCalibration::resetCalculatedCoeffHex()
-{
-	calibrationH1MagLabel->setText("0x----");
-	calibrationH2MagLabel->setText("0x----");
-	calibrationH3MagLabel->setText("0x----");
-	calibrationH8MagLabel->setText("0x----");
-	calibrationH1PhaseLabel->setText("0x----");
-	calibrationH2PhaseLabel->setText("0x----");
-	calibrationH3PhaseLabel->setText("0x----");
-	calibrationH8PhaseLabel->setText("0x----");
-}
-
-void HarmonicCalibration::displayCalculatedCoeff()
-{
-	if(isAngleDisplayFormat){
-		if(isCalculatedCoeff){
-			updateCalculatedCoeffAngle();
-		}
-		else{
-			resetCalculatedCoeffAngle();
-		}
-	}
-	else{
-		if(isCalculatedCoeff){
-			updateCalculatedCoeffHex();
-		}
-		else{
-			resetCalculatedCoeffHex();
-		}
-	}
-}
-
-void HarmonicCalibration::calibrationLogWrite(QString message)
-{
-	logsPlainTextEdit->appendPlainText(message);
-}
-
-void HarmonicCalibration::commandLogWrite(QString message)
-{
-	commandLogPlainTextEdit->appendPlainText(message);
-}
-
-void HarmonicCalibration::extractCalibrationData()
-{
-	QStringList filter;
-	filter += QString(tr("Comma-separated values files (*.csv)"));
-	filter += QString(tr("Tab-delimited values files (*.txt)"));
-	filter += QString(tr("All Files(*)"));
-
-	QString selectedFilter = filter[0];
-
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Export"), "", filter.join(";;"), &selectedFilter, QFileDialog::Options());
-
-	if(fileName.split(".").size() <= 1) {
-		// file name w/o extension. Let's append it
-		QString ext = selectedFilter.split(".")[1].split(")")[0];
-		fileName += "." + ext;
-	}
-
-	if(!fileName.isEmpty()) {
-		bool withScopyHeader = false;
-		FileManager fm("HarmonicCalibration");
-		fm.open(fileName, FileManager::EXPORT);
-
-		QVector<double> preCalibrationAngleErrorsFFTMagnitude(m_admtController->angle_errors_fft_pre.begin(), m_admtController->angle_errors_fft_pre.end());
-		QVector<double> preCalibrationAngleErrorsFFTPhase(m_admtController->angle_errors_fft_phase_pre.begin(), m_admtController->angle_errors_fft_phase_pre.end());
-
-		QVector<double> h1Mag = { H1_MAG_ANGLE };
-		QVector<double> h2Mag = { H2_MAG_ANGLE };
-		QVector<double> h3Mag = { H3_MAG_ANGLE };
-		QVector<double> h8Mag = { H8_MAG_ANGLE };
-		QVector<double> h1Phase = { H1_PHASE_ANGLE };
-		QVector<double> h2Phase = { H2_PHASE_ANGLE };
-		QVector<double> h3Phase = { H3_PHASE_ANGLE };
-		QVector<double> h8Phase = { H8_PHASE_ANGLE };
-
-		fm.save(graphDataList, "Raw Data");
-		fm.save(preCalibrationAngleErrorsFFTMagnitude, "Pre-Calibration Angle Errors FFT Magnitude");
-		fm.save(preCalibrationAngleErrorsFFTPhase, "Pre-Calibration Angle Errors FFT Phase");
-		fm.save(h1Mag, "H1 Mag");
-		fm.save(h2Mag, "H2 Mag");
-		fm.save(h3Mag, "H3 Mag");
-		fm.save(h8Mag, "H8 Mag");
-		fm.save(h1Phase, "H1 Phase");
-		fm.save(h2Phase, "H2 Phase");
-		fm.save(h3Phase, "H3 Phase");
-		fm.save(h8Phase, "H8 Phase");
-
-		fm.performWrite(withScopyHeader);
-	}
-}
-
-void HarmonicCalibration::importCalibrationData()
-{
-	QString fileName = QFileDialog::getOpenFileName(
-		this, tr("Import"), "",
-		tr("Comma-separated values files (*.csv);;"
-		   "Tab-delimited values files (*.txt)"),
-		nullptr, QFileDialog::Options());
-
-	FileManager fm("HarmonicCalibration");
-
-	try {
-		fm.open(fileName, FileManager::IMPORT);
-
-		graphDataList = fm.read(0);
-		if(graphDataList.size() > 0)
-		{
-			calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
-			calibrationRawDataXPlotAxis->setInterval(0, graphDataList.size());
-			calibrationRawDataPlotWidget->replot();
-
-			computeSineCosineOfAngles(graphDataList);
-			calibrationLogWrite(m_admtController->calibrate(vector<double>(graphDataList.begin(), graphDataList.end()), cycleCount, samplesPerCycle));
-			populateAngleErrorGraphs();
-			canStartMotor(false);
-			canCalibrate(true);
-		}
-	} catch(FileManagerException &ex) {
-		calibrationLogWrite(QString(ex.what()));
-	}
-}
-
-void HarmonicCalibration::computeSineCosineOfAngles(QVector<double> graphDataList)
-{
-	m_admtController->computeSineCosineOfAngles(vector<double>(graphDataList.begin(), graphDataList.end()));
-	if(isPostCalibration){
-		postCalibrationSineDataPlotChannel->curve()->setSamples(m_admtController->calibration_samples_sine_scaled.data(), m_admtController->calibration_samples_sine_scaled.size());
-		postCalibrationCosineDataPlotChannel->curve()->setSamples(m_admtController->calibration_samples_cosine_scaled.data(), m_admtController->calibration_samples_cosine_scaled.size());
-		postCalibrationRawDataPlotWidget->replot();
-	}
-	else{
-		calibrationSineDataPlotChannel->curve()->setSamples(m_admtController->calibration_samples_sine_scaled.data(), m_admtController->calibration_samples_sine_scaled.size());
-		calibrationCosineDataPlotChannel->curve()->setSamples(m_admtController->calibration_samples_cosine_scaled.data(), m_admtController->calibration_samples_cosine_scaled.size());
-		calibrationRawDataPlotWidget->replot();
-	}
-}
-
-bool HarmonicCalibration::moveMotorToPosition(double& position, bool validate)
-{
-	bool success = false;
-	bool canRead = true;
-	if(writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, position) == 0){
-		if(validate){
-			if(readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) == 0)
-			{
-				while(target_pos != current_pos && canRead) {
-					canRead = readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) == 0 ? true : false;
-				}
-				if(canRead)	success = true;
-			}
-		}
-	}
-
-	return success;
-}
-
-void HarmonicCalibration::startMotorContinuous()
-{
-	writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
-}
-
-void HarmonicCalibration::stopMotor()
-{
-	writeMotorAttributeValue(ADMTController::MotorAttribute::DISABLE, 1);
-}
-
-void HarmonicCalibration::resetAllCalibrationState()
-{
-	clearCalibrationSamples();
-	clearPostCalibrationSamples();
-	calibrationDataGraphTabWidget->setCurrentIndex(0);
-
-	clearAngleErrorGraphs();
-	clearCorrectedAngleErrorGraphs();
-	resultDataTabWidget->setCurrentIndex(0);
-
-	canStartMotor(true);
-	canCalibrate(false);
-	calibrateDataButton->setChecked(false);
-	isPostCalibration = false;
-	isCalculatedCoeff = false;
-	resetToZero = true;
-	displayCalculatedCoeff();
-}
-
-void HarmonicCalibration::clearCalibrationSamples()
-{
-	graphDataList.clear();
-	calibrationRawDataPlotChannel->curve()->setData(nullptr);
-	calibrationSineDataPlotChannel->curve()->setData(nullptr);
-	calibrationCosineDataPlotChannel->curve()->setData(nullptr);
-	calibrationRawDataPlotWidget->replot();
-}
-
-void HarmonicCalibration::clearCalibrationSineCosine()
-{
-	calibrationSineDataPlotChannel->curve()->setData(nullptr);
-	calibrationCosineDataPlotChannel->curve()->setData(nullptr);
-	calibrationRawDataPlotWidget->replot();
-}
-
-void HarmonicCalibration::clearPostCalibrationSamples()
-{
-	graphPostDataList.clear();
-	postCalibrationRawDataPlotChannel->curve()->setData(nullptr);
-	postCalibrationSineDataPlotChannel->curve()->setData(nullptr);
-	postCalibrationCosineDataPlotChannel->curve()->setData(nullptr);
-	postCalibrationRawDataPlotWidget->replot();
-}
-
-void HarmonicCalibration::clearAngleErrorGraphs()
-{
-	angleErrorPlotChannel->curve()->setData(nullptr);
-	angleErrorPlotWidget->replot();
-	FFTAngleErrorMagnitudeChannel->curve()->setData(nullptr);
-	FFTAngleErrorPhaseChannel->curve()->setData(nullptr);
-	FFTAngleErrorPlotWidget->replot();
-}
-
-void HarmonicCalibration::clearCorrectedAngleErrorGraphs()
-{
-	correctedErrorPlotChannel->curve()->setData(nullptr);
-	correctedErrorPlotWidget->replot();
-	FFTCorrectedErrorMagnitudeChannel->curve()->setData(nullptr);
-	FFTCorrectedErrorPhaseChannel->curve()->setData(nullptr);
-	FFTCorrectedErrorPlotWidget->replot();
-}
-
-void HarmonicCalibration::applyTextStyle(QWidget *widget, const QString& styleHelperColor, bool isBold)
-{
-	QString existingStyle = widget->styleSheet();
-	QString style = QString(R"css(
-								font-family: Open Sans;
-								font-size: 16px;
-								font-weight: &&fontweight&&;
-								text-align: right;
-								color: &&colorname&&;
-							)css");
-	style = style.replace(QString("&&colorname&&"), StyleHelper::getColor(styleHelperColor));
-	QString fontWeight = QString("normal");
-	if(isBold){
-		fontWeight = QString("bold");
-	}
-	style = style.replace(QString("&&fontweight&&"), fontWeight);
-	widget->setStyleSheet(existingStyle + style);
-}
-
-void HarmonicCalibration::applyLabelStyle(QLabel *widget)
-{
-	applyTextStyle(widget);
-	QString existingStyle = widget->styleSheet();
-	QString style = QString(R"css(
-								background-color: black;
-								border-radius: 4px;
-								border: none;
-							)css");
-	widget->setStyleSheet(existingStyle + style);
-	widget->setFixedHeight(30);
-	widget->setContentsMargins(12, 4, 12, 4);
-}
-
-void HarmonicCalibration::applyTabWidgetStyle(QTabWidget *widget, const QString& styleHelperColor)
-{
-	QString style = QString(R"css(
-		QTabWidget::tab-bar {
-		 left: 5px; /* move to the right by 5px */
-		}
-		QTabBar::tab {
-		 min-width: 100px;
-		 min-height: 32px;
-		 padding-bottom: 5px;
-		 padding-left: 16px;
-		 padding-right: 16px;
-		 background-color: &&UIElementBackground&&;
-		 font: normal;
-		}
-		QTabBar::tab:selected {
-		 color: white;
-		 border-bottom: 2px solid &&ScopyBlue&&;
-		 margin-top: 0px;
-		}
-		)css");
-	style.replace("&&ScopyBlue&&", StyleHelper::getColor(styleHelperColor));
-	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
-	widget->tabBar()->setStyleSheet(style);
-}
-
-void HarmonicCalibration::requestDisconnect()
-{
-	isStartAcquisition = false;
-	isDeviceStatusMonitor = false;
-
-	m_deviceStatusThread.cancel();
-	m_acquisitionDataThread.cancel();
-	m_acquisitionGraphThread.cancel();
-
-	m_deviceStatusWatcher.waitForFinished();
-	m_acquisitionDataWatcher.waitForFinished();
-	m_acquisitionGraphWatcher.waitForFinished();
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -36,6 +36,13 @@ public:
     static void LineEditStyle(QLineEdit *widget, QString objectName = "");
     static void ColoredSquareCheckbox(QCheckBox *chk, QColor color, QString objectName = "");
     static void StartButtonStyle(QPushButton *btn, QString objectName = "");
+    static void TabWidgetStyle(QTabWidget *widget, const QString& styleHelperColor = "ScopyBlue", QString objectName = "");
+    static void TextStyle(QWidget *widget, const QString& styleHelperColor, bool isBold = false, QString objectName = "");
+    static void MenuSmallLabel(QLabel *label, QString objectName = "");
+    static void LineStyle(QFrame *line, QString objectName = "");
+    static void UIBackgroundStyle(QWidget *widget, QString objectName = "");
+    static void GraphChannelStyle(QWidget *widget, QLayout *layout, QString objectName = "");
+    static void CalculatedCoeffWidgetRowStyle(QWidget *widget, QHBoxLayout *layout, QLabel *hLabel, QLabel *hMagLabel, QLabel *hPhaseLabel, QString objectName = "");
 private:
     QMap<QString, QString> colorMap;
     static ADMTStyleHelper *pinstance_;
