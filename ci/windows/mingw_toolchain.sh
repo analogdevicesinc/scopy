@@ -6,7 +6,7 @@ export WORKFOLDER=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null &&
 
 BUILD_STATUS_FILE=$WORKFOLDER/build-status
 
-LIBSERIALPORT_BRANCH=scopy-v2
+LIBSERIALPORT_BRANCH=master
 LIBIIO_VERSION=v0.26
 LIBAD9361_BRANCH=main
 LIBM2K_BRANCH=main
