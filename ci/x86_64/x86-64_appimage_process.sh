@@ -17,7 +17,7 @@ fi
 
 export APPIMAGE=1
 
-LIBSERIALPORT_BRANCH=scopy-v2
+LIBSERIALPORT_BRANCH=master
 LIBIIO_VERSION=v0.26
 LIBAD9361_BRANCH=main
 LIBM2K_BRANCH=main
@@ -84,7 +84,7 @@ clone() {
 	echo "#######CLONE#######"
 	mkdir -p $STAGING_AREA
 	pushd $STAGING_AREA
-	[ -d 'libserialport' ] || git clone --recursive https://github.com/cseci/libserialport -b $LIBSERIALPORT_BRANCH libserialport
+	[ -d 'libserialport' ] || git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
