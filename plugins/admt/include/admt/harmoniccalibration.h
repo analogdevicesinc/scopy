@@ -90,11 +90,6 @@ public Q_SLOTS:
 	void stop();
 	void start();
 	void restart();
-	void utilityTask();
-	void clearCommandLog();
-	void canCalibrate(bool);
-	void applySequence();
-	bool readSequence();
 Q_SIGNALS:
 	void runningChanged(bool);
 	void canCalibrateChanged(bool);
@@ -106,6 +101,8 @@ private:
 	GearBtn *settingsButton;
 	InfoBtn *infoButton;
 	RunBtn *runButton;
+
+	const char *rotationChannelName, *angleChannelName, *countChannelName, *temperatureChannelName;
 
 	double rotation, angle, count, temp = 0.0, amax, rotate_vmax, dmax, disable, target_pos, current_pos, ramp_mode,
 		afeDiag0, afeDiag1, afeDiag2;
@@ -192,119 +189,134 @@ private:
 	QFuture<void> m_deviceStatusThread, m_acquisitionDataThread, m_acquisitionGraphThread;
 	QFutureWatcher<void> m_deviceStatusWatcher, m_acquisitionDataWatcher, m_acquisitionGraphWatcher;
 
-	bool updateChannelValues();
-	void updateLineEditValues();
-	void updateGeneralSettingEnabled(bool value);
-	void connectLineEditToNumber(QLineEdit* lineEdit, int& variable, int min, int max);
-	void connectLineEditToNumber(QLineEdit* lineEdit, double& variable, QString unit = "");
-	void connectMenuComboToNumber(MenuCombo* menuCombo, double& variable);
-	void connectMenuComboToNumber(MenuCombo* menuCombo, int& variable);
+	QTimer *acquisitionUITimer, *calibrationUITimer, *utilityTimer;
+
+
+	ToolTemplate* createAcquisitionWidget();
 	ToolTemplate* createCalibrationWidget();
 	ToolTemplate* createRegistersWidget();
 	ToolTemplate* createUtilityWidget();
-	void updateLabelValue(QLabel* label, int channelIndex);
-	void updateLabelValue(QLabel *label, ADMTController::MotorAttribute attribute);
-	bool updateChannelValue(int channelIndex);
-	void extractCalibrationData();
-	void importCalibrationData();
-	void calibrationLogWrite(QString message = "");
-	void commandLogWrite(QString message);
-	int readMotorAttributeValue(ADMTController::MotorAttribute attribute, double& value);
-	int writeMotorAttributeValue(ADMTController::MotorAttribute attribute, double value);
-	void applyTextStyle(QWidget *widget, const QString& styleHelperColor = "CH0", bool isBold = false);
-	void applyLabelStyle(QLabel *widget);
-	void initializeMotor();
-	bool moveMotorToPosition(double& position, bool validate = true);
-	void resetAllCalibrationState();
-	void connectLineEditToRPSConversion(QLineEdit* lineEdit, double& vmax);
-	void connectLineEditToNumberWrite(QLineEdit* lineEdit, double& variable, ADMTController::MotorAttribute attribute);
-	double convertRPStoVMAX(double rps);
-	double convertVMAXtoRPS(double vmax);
-	void connectLineEditToAMAXConversion(QLineEdit* lineEdit, double& amax);
-	void connectRegisterBlockToRegistry(RegisterBlockWidget* widget);
-	double convertAccelTimetoAMAX(double accelTime);
-	double convertAMAXtoAccelTime(double amax);
-	void updateCalculatedCoeffAngle();
-	void resetCalculatedCoeffAngle();
-	void applyTabWidgetStyle(QTabWidget *widget, const QString& styleHelperColor = "ScopyBlue");
-	MenuControlButton *createStatusLEDWidget(const QString title, QColor color, QWidget *parent = nullptr);
-	MenuControlButton *createChannelToggleWidget(const QString title, QColor color, QWidget *parent = nullptr);
-	void updateDigioMonitor();
-	void updateMTDiagRegister();
-	void updateFaultRegister();
-	void updateMTDiagnostics();
-	void changeStatusLEDColor(MenuControlButton *menuControlButton, QColor color, bool checked = true);
-	bool changeCNVPage(uint32_t page);
-	void toggleWidget(QPushButton *widget, bool value);
-	void GMRReset();
-	void updateCountValue();
-	void changeCustomSwitchLabel(CustomSwitch *customSwitch, QString onLabel, QString offLabel);
+
 	void readDeviceProperties();
-	void toggleAllDIGIOEN(bool value);
-	void toggleUtilityTask(bool run);
-	void toggleDIGIOEN(string DIGIOENName, bool& value);
+	bool readSequence();
+	void applySequence();
+	bool changeCNVPage(uint32_t page);
+	void initializeMotor();
+	void getDeviceFaultStatus(int sampleRate);
+
+	#pragma region Acquisition Methods
+	bool updateChannelValues();
+	void updateCountValue();
+	void updateLineEditValues();
+	void startAcquisition();
+	void startAcquisitionDeviceStatusMonitor();
+	void getAcquisitionSamples(int sampleRate);
+	double getAcquisitionParameterValue(const AcquisitionDataKey &key);
+	void plotAcquisition(QVector<double>& list, PlotChannel* channel);
+	void prependAcquisitionData(const double& data, QVector<double>& list);
+	void resetAcquisitionYAxisScale();
+	void acquisitionPlotTask(int sampleRate);
+	void acquisitionUITask();
+	void updateSequenceWidget();
+	void updateGeneralSettingEnabled(bool value);
+	void connectCheckBoxToAcquisitionGraph(QCheckBox* widget, PlotChannel* channel, AcquisitionDataKey key);
+	void GMRReset();
+	#pragma endregion
+
+	#pragma region Calibration Methods
+	void startCalibrationDeviceStatusMonitor();
+	void calibrationUITask();
 	void getCalibrationSamples();
 	void startMotor();
-	void computeSineCosineOfAngles(QVector<double> graphDataList);
+	void startMotorContinuous();
 	void postCalibrateData();
-	void canStartMotor(bool value);
-	bool resetCurrentPositionToZero();
-	void flashHarmonicValues();
-	void updateCalculatedCoeffHex();
-	void resetCalculatedCoeffHex();
-	void displayCalculatedCoeff();
-	void toggleMotorControls(bool value);
-	void clearCalibrationSamples();
-	void updateSequenceWidget();
-	void toggleFaultRegisterMode(int mode);
-	void startAcquisition();
-	void getAcquisitionSamples(int sampleRate);
-	void acquisitionUITask();
-	void acquisitionPlotTask(int sampleRate);
-	void toggleMTDiagnostics(int mode);
-	void toggleSequenceModeRegisters(int mode);
-	void readAllRegisters();
-	void prependAcquisitionData(const double& data, QVector<double>& list);
-	void plotAcquisition(QVector<double>& list, PlotChannel* channel);
+	void resetAllCalibrationState();
+	void computeSineCosineOfAngles(QVector<double> graphDataList);
 	void populateAngleErrorGraphs();
 	void populateCorrectedAngleErrorGraphs();
-	void resetDIGIO();
-	bool updateDIGIOToggle();
+	void flashHarmonicValues();
+	void calculateHarmonicValues();
+	void updateCalculatedCoeffAngle();
+	void updateCalculatedCoeffHex();
+	void resetCalculatedCoeffAngle();
+	void resetCalculatedCoeffHex();
+	void displayCalculatedCoeff();
+	void calibrationLogWrite(QString message = "");
+	void importCalibrationData();
+	void extractCalibrationData();
+	void toggleTabSwitching(bool value);
+	void canStartMotor(bool value);
+	void canCalibrate(bool);
+	void toggleMotorControls(bool value);
+	void clearCalibrationSamples();
+	void clearCalibrationSineCosine();
 	void clearPostCalibrationSamples();
 	void clearAngleErrorGraphs();
 	void clearCorrectedAngleErrorGraphs();
-	void clearCalibrationSineCosine();
-	void connectCheckBoxToAcquisitionGraph(QCheckBox* widget, PlotChannel* channel, AcquisitionDataKey key);
-	void prependNullAcquisitionData(QVector<double>& list);
-	void startMotorContinuous();
+	#pragma endregion
+
+	#pragma region Motor Methods
+	bool moveMotorToPosition(double& position, bool validate = true);
+	bool resetCurrentPositionToZero();
 	void stopMotor();
-	void calculateHarmonicValues();
-	void connectLineEditToDouble(QLineEdit* lineEdit, double& variable);
+	int readMotorAttributeValue(ADMTController::MotorAttribute attribute, double& value);
+	int writeMotorAttributeValue(ADMTController::MotorAttribute attribute, double value);
+	#pragma endregion
+
+	#pragma region Utility Methods
+	void utilityTask();
+	void toggleUtilityTask(bool run);
+	void updateDigioMonitor();
+	bool updateDIGIOToggle();
+	void updateMTDiagnostics();
+	void updateMTDiagRegister();
+	void updateFaultRegister();
+	void toggleDIGIOEN(string DIGIOENName, bool& value);
+	void toggleAllDIGIOEN(bool value);
+	void toggleMTDiagnostics(int mode);
+	void toggleFaultRegisterMode(int mode);
+	void resetDIGIO();
+	void commandLogWrite(QString message);
+	void clearCommandLog();
+	#pragma endregion
+
+	#pragma region Register Methods
+	void readAllRegisters();
+	void toggleRegisters(int mode);
+	#pragma endregion
+
+	#pragma region UI Helper Methods
+	void updateLabelValue(QLabel* label, int channelIndex);
+	void updateLabelValue(QLabel *label, ADMTController::MotorAttribute attribute);
+	bool updateChannelValue(int channelIndex);
 	void updateLineEditValue(QLineEdit* lineEdit, double value);
-	void toggleTabSwitching(bool value);
-	double getAcquisitionParameterValue(const AcquisitionDataKey &key);
-	void resetYAxisScale();
-	void getDeviceFaultStatus(int sampleRate);
-	void startAcquisitionDeviceStatusMonitor();
-	void startCalibrationDeviceStatusMonitor();
+	void toggleWidget(QPushButton *widget, bool value);
+	void changeCustomSwitchLabel(CustomSwitch *customSwitch, QString onLabel, QString offLabel);
+	void changeStatusLEDColor(MenuControlButton *menuControlButton, QColor color, bool checked = true);
 	void updateFaultStatusLEDColor(MenuControlButton *widget, bool value);
-	void calibrationUITask();
+	MenuControlButton *createStatusLEDWidget(const QString title, QColor color, QWidget *parent = nullptr);
+	MenuControlButton *createChannelToggleWidget(const QString title, QColor color, QWidget *parent = nullptr);
+	#pragma endregion
 
-	QTimer *acquisitionUITimer, *calibrationUITimer, *utilityTimer;
+	#pragma region Connect Methods
+	void connectLineEditToNumber(QLineEdit* lineEdit, int& variable, int min, int max);
+	void connectLineEditToNumber(QLineEdit* lineEdit, double& variable, QString unit = "");
+	void connectLineEditToDouble(QLineEdit* lineEdit, double& variable);
+	void connectLineEditToNumberWrite(QLineEdit* lineEdit, double& variable, ADMTController::MotorAttribute attribute);
+	void connectMenuComboToNumber(MenuCombo* menuCombo, double& variable);
+	void connectMenuComboToNumber(MenuCombo* menuCombo, int& variable);
+	void connectLineEditToRPSConversion(QLineEdit* lineEdit, double& vmax);
+	void connectLineEditToAMAXConversion(QLineEdit* lineEdit, double& amax);
+	void connectRegisterBlockToRegistry(RegisterBlockWidget* widget);
+	#pragma endregion
 
-	int uuid = 0;
-	const char *rotationChannelName, *angleChannelName, *countChannelName, *temperatureChannelName;
+	#pragma region Convert Methods
+	double convertRPStoVMAX(double rps);
+	double convertVMAXtoRPS(double vmax);
+	double convertAccelTimetoAMAX(double accelTime);
+	double convertAMAXtoAccelTime(double amax);
+	#pragma endregion
 };
-
-enum TABS
-{
-	ACQUISITION = 0,
-	UTILITIES = 1,
-	CALIBRATION = 2,
-};
-
-
-
 } // namespace admt
 } // namespace scopy
 #endif // HARMONICCALIBRATION_H

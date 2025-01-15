@@ -232,4 +232,140 @@ void ADMTStyleHelper::StartButtonStyle(QPushButton *btn, QString objectName)
 	btn->setIconSize(QSize(64, 64));
 }
 
+void ADMTStyleHelper::TabWidgetStyle(QTabWidget *widget, const QString& styleHelperColor, QString objectName)
+{
+	if(!objectName.isEmpty())
+		widget->setObjectName(objectName);
+	QString style = QString(R"css(
+		QTabWidget::tab-bar {
+		 left: 5px; /* move to the right by 5px */
+		}
+		QTabBar::tab {
+		 min-width: 100px;
+		 min-height: 32px;
+		 padding-bottom: 5px;
+		 padding-left: 16px;
+		 padding-right: 16px;
+		 background-color: &&UIElementBackground&&;
+		 font: normal;
+		}
+		QTabBar::tab:selected {
+		 color: white;
+		 border-bottom: 2px solid &&ScopyBlue&&;
+		 margin-top: 0px;
+		}
+		)css");
+	style.replace("&&ScopyBlue&&", StyleHelper::getColor(styleHelperColor));
+	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
+	widget->tabBar()->setStyleSheet(style);
+}
+
+void ADMTStyleHelper::TextStyle(QWidget *widget, const QString& styleHelperColor, bool isBold, QString objectName)
+{
+	if(!objectName.isEmpty())
+		widget->setObjectName(objectName);
+	QString existingStyle = widget->styleSheet();
+	QString style = QString(R"css(
+								font-family: Open Sans;
+								font-size: 16px;
+								font-weight: &&fontweight&&;
+								text-align: right;
+								color: &&colorname&&;
+							)css");
+	style = style.replace(QString("&&colorname&&"), StyleHelper::getColor(styleHelperColor));
+	QString fontWeight = QString("normal");
+	if(isBold){
+		fontWeight = QString("bold");
+	}
+	style = style.replace(QString("&&fontweight&&"), fontWeight);
+	widget->setStyleSheet(existingStyle + style);
+}
+
+void ADMTStyleHelper::MenuSmallLabel(QLabel *label, QString objectName)
+{
+	if(!objectName.isEmpty())
+		label->setObjectName(objectName);
+	label->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+
+	QString style = QString(R"css(
+				QLabel {
+					color: white;
+					background-color: rgba(255,255,255,0);
+					font-weight: 500;
+					font-family: Open Sans;
+					font-size: 12px;
+					font-style: normal;
+					}
+				QLabel:disabled {
+					color: grey;
+				}
+				)css");
+	label->setStyleSheet(style);
+}
+
+void ADMTStyleHelper::LineStyle(QFrame *line, QString objectName)
+{
+	if(!objectName.isEmpty())
+		line->setObjectName(objectName);
+	line->setFrameShape(QFrame::HLine);
+	line->setFrameShadow(QFrame::Plain);
+	line->setFixedHeight(1);
+	QString lineStyle = QString(R"css(
+				QFrame {
+					border: 1px solid #808085;
+				}
+				)css");
+	line->setStyleSheet(lineStyle);
+}
+
+void ADMTStyleHelper::UIBackgroundStyle(QWidget *widget, QString objectName)
+{
+	if(!objectName.isEmpty())
+		widget->setObjectName(objectName);
+	QString style = QString(R"css(
+								background-color: &&colorname&&;
+							)css");
+	style.replace(QString("&&colorname&&"), StyleHelper::getColor("UIElementBackground"));
+	widget->setStyleSheet(style);
+}
+
+void ADMTStyleHelper::GraphChannelStyle(QWidget *widget, QLayout *layout, QString objectName)
+{
+	if(!objectName.isEmpty())
+		widget->setObjectName(objectName);
+	widget->setLayout(layout);
+	ADMTStyleHelper::UIBackgroundStyle(widget);
+	layout->setContentsMargins(20, 13, 20, 5);
+	layout->setSpacing(20);
+}
+
+void ADMTStyleHelper::CalculatedCoeffWidgetRowStyle(QWidget *widget, QHBoxLayout *layout, QLabel *hLabel, QLabel *hMagLabel, QLabel *hPhaseLabel, QString objectName)
+{
+	if(!objectName.isEmpty())
+		widget->setObjectName(objectName);
+
+	widget->setLayout(layout);
+	QString style = QString(R"css(
+								background-color: &&colorname&&;
+								border-radius: 4px;
+							)css");
+	style.replace(QString("&&colorname&&"), StyleHelper::getColor("ScopyBackground"));
+	widget->setStyleSheet(style);
+	widget->setFixedHeight(30);
+	widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	layout->setContentsMargins(12, 4, 12, 4);
+
+	ADMTStyleHelper::TextStyle(hLabel, "LabelText", true);
+	ADMTStyleHelper::TextStyle(hMagLabel, "CH0");
+	ADMTStyleHelper::TextStyle(hPhaseLabel, "CH1");
+
+	hLabel->setFixedWidth(24);
+	hMagLabel->setContentsMargins(0, 0, 32, 0);
+	hPhaseLabel->setFixedWidth(72);
+
+	layout->addWidget(hLabel);
+	layout->addWidget(hMagLabel, 0, Qt::AlignRight);
+	layout->addWidget(hPhaseLabel);
+}
+
 #include "moc_admtstylehelper.cpp"
