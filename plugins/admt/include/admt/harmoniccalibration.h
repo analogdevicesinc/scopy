@@ -227,6 +227,8 @@ private:
 	void startCalibrationDeviceStatusMonitor();
 	void calibrationUITask();
 	void getCalibrationSamples();
+	void startCalibration();
+	void stopCalibration();
 	void startMotor();
 	void startMotorContinuous();
 	void postCalibrateData();

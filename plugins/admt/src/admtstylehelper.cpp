@@ -254,6 +254,9 @@ void ADMTStyleHelper::TabWidgetStyle(QTabWidget *widget, const QString& styleHel
 		 border-bottom: 2px solid &&ScopyBlue&&;
 		 margin-top: 0px;
 		}
+		QTabBar::tab:disabled{
+		 color: grey;
+		}
 		)css");
 	style.replace("&&ScopyBlue&&", StyleHelper::getColor(styleHelperColor));
 	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));

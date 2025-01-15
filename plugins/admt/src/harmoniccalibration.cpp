@@ -126,6 +126,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QHBoxLayout *lay = new QHBoxLayout(this);
 	tabWidget = new QTabWidget(this);
+	ADMTStyleHelper::TabWidgetStyle(tabWidget);
 
 	setLayout(lay);
     lay->setMargin(0);
@@ -921,19 +922,18 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	#pragma endregion
 
 	#pragma region Acquire Calibration Samples Button
-	calibrationStartMotorButton = new QPushButton(calibrationSettingsGroupWidget);
+	calibrationStartMotorButton = new QPushButton(" Acquire Samples", calibrationSettingsGroupWidget);
 	ADMTStyleHelper::StartButtonStyle(calibrationStartMotorButton);
-	calibrationStartMotorButton->setText(" Acquire Samples");
 	
 	connect(calibrationStartMotorButton, &QPushButton::toggled, this, [=](bool toggled) { 
 		calibrationStartMotorButton->setText(toggled ? " Stop Acquisition" : " Acquire Samples"); 
-		totalSamplesCount = cycleCount * samplesPerCycle;
 		isStartMotor = toggled;
 		if(toggled){
 			isPostCalibration = false;
-			graphPostDataList.reserve(totalSamplesCount);
-			graphDataList.reserve(totalSamplesCount);
-			startMotor();
+			startCalibration();			
+		}
+		else{
+			stopCalibration();
 		}
 	});
 	#pragma endregion
@@ -947,6 +947,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	connect(calibrateDataButton, &QPushButton::toggled, this, [=](bool toggled) {
 		calibrateDataButton->setText(toggled ? " Stop Calibration" : " Calibrate");
 		if(toggled) postCalibrateData();
+		else stopCalibration();
 	});
 	#pragma endregion
 
@@ -2294,16 +2295,39 @@ void HarmonicCalibration::getCalibrationSamples()
 	stopMotor();
 }
 
-void HarmonicCalibration::startMotor()
+void HarmonicCalibration::startCalibration()
 {
+	totalSamplesCount = cycleCount * samplesPerCycle;
+
+	graphPostDataList.reserve(totalSamplesCount);
+	graphPostDataList.squeeze();
+	graphDataList.reserve(totalSamplesCount);
+	graphDataList.squeeze();
+
 	toggleTabSwitching(false);
 	toggleMotorControls(false);
 
+	startMotor();
+}
+
+void HarmonicCalibration::stopCalibration()
+{
+	isStartMotor = false;
+
+	toggleTabSwitching(true);
+	toggleMotorControls(true);
+}
+
+void HarmonicCalibration::startMotor()
+{
 	if(resetToZero && !isPostCalibration){
 		clearCalibrationSamples();
 		clearPostCalibrationSamples();
 		clearAngleErrorGraphs();
 		clearCorrectedAngleErrorGraphs();
+	}
+	else if(resetToZero){
+		clearPostCalibrationSamples();
 	}
 
 	if(isPostCalibration)
@@ -2376,6 +2400,10 @@ void HarmonicCalibration::postCalibrateData()
 	isPostCalibration = true;
 	isStartMotor = true;
 	resetToZero = true;
+
+	toggleTabSwitching(false);
+	toggleMotorControls(false);
+
 	startMotor();
 }
 
