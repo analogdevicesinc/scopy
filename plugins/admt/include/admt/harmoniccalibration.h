@@ -198,6 +198,7 @@ private:
 	ToolTemplate* createUtilityWidget();
 
 	void readDeviceProperties();
+	void initializeADMT();
 	bool readSequence();
 	void applySequence();
 	bool changeCNVPage(uint32_t page);
@@ -218,6 +219,7 @@ private:
 	void acquisitionPlotTask(int sampleRate);
 	void acquisitionUITask();
 	void updateSequenceWidget();
+	void applySequenceAndUpdate();
 	void updateGeneralSettingEnabled(bool value);
 	void connectCheckBoxToAcquisitionGraph(QCheckBox* widget, PlotChannel* channel, AcquisitionDataKey key);
 	void GMRReset();
@@ -273,11 +275,10 @@ private:
 	void updateMTDiagnostics();
 	void updateMTDiagRegister();
 	void updateFaultRegister();
-	void toggleDIGIOEN(string DIGIOENName, bool& value);
-	void toggleAllDIGIOEN(bool value);
+	void toggleDIGIOEN(string DIGIOENName, bool value);
 	void toggleMTDiagnostics(int mode);
 	void toggleFaultRegisterMode(int mode);
-	void resetDIGIO();
+	bool resetDIGIO();
 	void commandLogWrite(QString message);
 	void clearCommandLog();
 	#pragma endregion
