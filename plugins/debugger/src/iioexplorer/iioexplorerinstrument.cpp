@@ -167,6 +167,12 @@ void IIOExplorerInstrument::connectSignalsAndSlots()
 			 &IIOExplorerInstrument::applySelection);
 
 	QObject::connect(m_watchListView, &WatchListView::selectedItem, this, &IIOExplorerInstrument::selectItem);
+
+	QObject::connect(m_watchListView, &WatchListView::removeItem, this, [this](IIOStandardItem *item) {
+		item->setWatched(false);
+		m_detailsView->setAddToWatchlistState(true);
+	});
+
 	QObject::connect(m_detailsView->readBtn(), &QPushButton::clicked, this, [this]() {
 		qDebug(CAT_DEBUGGERIIOMODEL) << "Read button pressed.";
 		triggerReadOnAllChildItems(m_currentlySelectedItem);

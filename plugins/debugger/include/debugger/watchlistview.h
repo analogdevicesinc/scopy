@@ -52,6 +52,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void selectedItem(IIOStandardItem *item);
+	void removeItem(IIOStandardItem *item);
 
 protected:
 	void resizeEvent(QResizeEvent *event) override;
@@ -67,11 +68,8 @@ class WatchListView_API : public ApiObject
 	Q_OBJECT
 	Q_PROPERTY(QList<int> offsets READ offsets WRITE setOffsets FINAL)
 public:
-	explicit WatchListView_API(WatchListView *p)
-		: ApiObject(p)
-		, p(p)
-	{}
-	~WatchListView_API(){};
+	explicit WatchListView_API(WatchListView *p);
+	~WatchListView_API() = default;
 
 	QList<int> tableHeader() const;
 	void setTableHeader(const QList<int> &newTableHeader);

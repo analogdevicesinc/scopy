@@ -26,7 +26,6 @@
 #include <QPushButton>
 #include <QHeaderView>
 #include <QScrollBar>
-#include <qnamespace.h>
 #include <style.h>
 
 #define NAME_POS 0
@@ -144,6 +143,8 @@ void WatchListView::addToWatchlist(IIOStandardItem *item)
 
 		item->setWatched(false);
 		entry->deleteLater();
+
+		Q_EMIT removeItem(item);
 	});
 }
 
@@ -210,6 +211,13 @@ void WatchListView::resizeEvent(QResizeEvent *event)
 	setColumnWidth(CLOSE_BTN_POS, sectionWidth + m_offsets[CLOSE_BTN_POS]);
 
 	QTableWidget::resizeEvent(event);
+}
+
+WatchListView_API::WatchListView_API(WatchListView *p)
+	: ApiObject(p)
+	, p(p)
+{
+	setObjectName("WatchListView_API");
 }
 
 QList<int> WatchListView_API::tableHeader() const
