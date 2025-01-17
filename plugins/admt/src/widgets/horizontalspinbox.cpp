@@ -1,4 +1,5 @@
 #include <stylehelper.h>
+#include <style.h>
 #include "widgets/horizontalspinbox.h"
 
 using namespace scopy::admt;
@@ -15,7 +16,7 @@ HorizontalSpinBox::HorizontalSpinBox(QString header, double initialValue, QStrin
 
     if(header != ""){
         QLabel *headerLabel = new QLabel(header, this);
-        StyleHelper::MenuSmallLabel(headerLabel, "headerLabel");
+        Style::setStyle(headerLabel, style::properties::label::menuSmall);
         container->addWidget(headerLabel);
     }
 
@@ -132,7 +133,7 @@ void HorizontalSpinBox::applyLineEditStyle(QLineEdit *widget)
 									color: #9c4600;
                                 }
                                 )css");
-    style = style.replace(QString("&&colorname&&"), StyleHelper::getColor("CH0"));
+    style = style.replace(QString("&&colorname&&"), Style::getAttribute(json::global::ch0));
     widget->setStyleSheet(style);
     widget->setFixedHeight(30);
     widget->setAlignment(Qt::AlignRight);
@@ -160,7 +161,7 @@ void HorizontalSpinBox::applyPushButtonStyle(QPushButton *widget, int topLeftBor
 									color: #2d3d9c;
                                 }
                                 )css");
-    style = style.replace(QString("&&colorname&&"), StyleHelper::getColor("ScopyBlue"));
+    style = style.replace(QString("&&colorname&&"), Style::getAttribute(json::theme::interactive_primary_idle));
     style = style.replace(QString("&&topLeftBorderRadius&&"), QString::number(topLeftBorderRadius));
     style = style.replace(QString("&&topRightBorderRadius&&"), QString::number(topRightBorderRadius));
     style = style.replace(QString("&&bottomLeftBorderRadius&&"), QString::number(bottomLeftBorderRadius));
@@ -182,7 +183,7 @@ void HorizontalSpinBox::applyUnitLabelStyle(QLabel *widget, bool isEnabled)
                                 )css");
     if(isEnabled){
         style = style.replace(QString("&&backgroundcolor&&"), "black");
-        style = style.replace(QString("&&colorname&&"), StyleHelper::getColor("CH0"));
+        style = style.replace(QString("&&colorname&&"), Style::getAttribute(json::global::ch0));
     }
     else{
         style = style.replace(QString("&&backgroundcolor&&"), "#18181d");
