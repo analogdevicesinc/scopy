@@ -112,7 +112,7 @@ private:
 				*clearCommandLogButton, *applySequenceButton, *readAllRegistersButton;
 	QButtonGroup *rightMenuButtonGroup;
 
-	QLineEdit 	*graphUpdateIntervalLineEdit, *displayLengthLineEdit,
+	QLineEdit 	*motorTargetPositionLineEdit, *graphUpdateIntervalLineEdit, *displayLengthLineEdit,
 				*dataGraphSamplesLineEdit, *tempGraphSamplesLineEdit, 
 				*acquisitionMotorCurrentPositionLineEdit,
 				*calibrationH1MagLineEdit, *calibrationH2MagLineEdit, 

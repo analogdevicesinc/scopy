@@ -1,5 +1,6 @@
 #include "admtstylehelper.h"
 #include "stylehelper.h"
+#include <style.h>
 
 using namespace scopy::admt;
 
@@ -68,7 +69,7 @@ void ADMTStyleHelper::TopContainerButtonStyle(QPushButton *btn, QString objectNa
 				background-color:#272730;
 			}
 			})css");
-	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
+	style.replace("&&ScopyBlue&&", Style::getAttribute(json::theme::interactive_primary_idle));
     btn->setStyleSheet(style);
 }
 
@@ -136,7 +137,7 @@ void ADMTStyleHelper::ComboBoxStyle(QComboBox *widget, QString objectName)
             selection-color: transparent;
         }
     )css");
-	style = style.replace(QString("&&colorname&&"), StyleHelper::getColor("CH0"));
+	style = style.replace(QString("&&colorname&&"), Style::getAttribute(json::global::ch0));
 	widget->setStyleSheet(style);
 	widget->setFixedHeight(30);
 }
@@ -161,7 +162,7 @@ void ADMTStyleHelper::LineEditStyle(QLineEdit *widget, QString objectName)
 									color: #9c4600;
                                 }
 							)css");
-	style = style.replace(QString("&&colorname&&"), StyleHelper::getColor("CH0"));
+	style = style.replace(QString("&&colorname&&"), Style::getAttribute(json::global::ch0));
 	widget->setStyleSheet(style);
 	widget->setFixedHeight(30);
 	widget->setContentsMargins(0, 0, 0, 0);
@@ -190,7 +191,7 @@ void ADMTStyleHelper::ColoredSquareCheckbox(QCheckBox *chk, QColor color, QStrin
 						QCheckBox::indicator:checked { background-color: &&colorname&&; }
 						)css");
 	style.replace("&&colorname&&", color.name());
-	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
+	style.replace("&&UIElementBackground&&", Style::getAttribute(json::theme::background_primary));
 	chk->setStyleSheet(style);
 }
 
@@ -258,8 +259,8 @@ void ADMTStyleHelper::TabWidgetStyle(QTabWidget *widget, const QString& styleHel
 		 color: grey;
 		}
 		)css");
-	style.replace("&&ScopyBlue&&", StyleHelper::getColor(styleHelperColor));
-	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
+	style.replace("&&ScopyBlue&&", Style::getAttribute(json::theme::interactive_primary_idle));
+	style.replace("&&UIElementBackground&&", Style::getAttribute(json::theme::background_primary));
 	widget->tabBar()->setStyleSheet(style);
 }
 
@@ -275,7 +276,7 @@ void ADMTStyleHelper::TextStyle(QWidget *widget, const QString& styleHelperColor
 								text-align: right;
 								color: &&colorname&&;
 							)css");
-	style = style.replace(QString("&&colorname&&"), StyleHelper::getColor(styleHelperColor));
+	style = style.replace(QString("&&colorname&&"), Style::getAttribute(json::theme::content_default));
 	QString fontWeight = QString("normal");
 	if(isBold){
 		fontWeight = QString("bold");
@@ -328,7 +329,7 @@ void ADMTStyleHelper::UIBackgroundStyle(QWidget *widget, QString objectName)
 	QString style = QString(R"css(
 								background-color: &&colorname&&;
 							)css");
-	style.replace(QString("&&colorname&&"), StyleHelper::getColor("UIElementBackground"));
+	style.replace(QString("&&colorname&&"), Style::getAttribute(json::theme::background_primary));
 	widget->setStyleSheet(style);
 }
 
@@ -352,7 +353,7 @@ void ADMTStyleHelper::CalculatedCoeffWidgetRowStyle(QWidget *widget, QHBoxLayout
 								background-color: &&colorname&&;
 								border-radius: 4px;
 							)css");
-	style.replace(QString("&&colorname&&"), StyleHelper::getColor("ScopyBackground"));
+	style.replace(QString("&&colorname&&"), Style::getAttribute(json::theme::background_primary));
 	widget->setStyleSheet(style);
 	widget->setFixedHeight(30);
 	widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);

@@ -9,8 +9,6 @@
 
 Q_LOGGING_CATEGORY(CAT_ADMTPLUGIN, "ADMTPlugin")
 using namespace scopy;
-// using namespace scopy::grutil;
-// using namespace scopy::m2kgui;
 using namespace scopy::admt;
 
 const bool isDebug = false;
@@ -95,8 +93,6 @@ bool ADMTPlugin::onConnect()
 	m_ctx = conn->context();
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
-
-	//auto recipe = createRecipe(m_ctx);
 
 	m_admtController = new ADMTController(m_param, this);
 	m_admtController->connectADMT();
