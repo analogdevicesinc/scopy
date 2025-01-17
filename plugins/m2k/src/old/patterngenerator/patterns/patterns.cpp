@@ -36,6 +36,7 @@
 
 #include <errno.h>
 #include <math.h>
+#include <style.h>
 
 using namespace std;
 using namespace scopy::m2k;
@@ -3048,20 +3049,22 @@ void ImportPatternUI::setStylesheet()
 			"height: 30px;"
 			"border-radius: 4px;"
 			"background-color: #4a64ff;"
-			"font-size: 14px;"
-			"font-weight: normal;"
-			"font-style: normal;"
-			"text-align: center;"
-			"color: #ffffff;"
-			"}"
-			"QPushButton:disabled {"
-			"background-color: gray;"
-			"color:white;"
-			"}"
-			"QPushButton:hover"
-			"{"
-			"background-color: #4a34ff;"
-			"}";
+			"font-size: " +
+		Style::getAttribute(json::global::font_size_1) +
+		";"
+		"font-weight: normal;"
+		"font-style: normal;"
+		"text-align: center;"
+		"color: #ffffff;"
+		"}"
+		"QPushButton:disabled {"
+		"background-color: gray;"
+		"color:white;"
+		"}"
+		"QPushButton:hover"
+		"{"
+		"background-color: #4a34ff;"
+		"}";
 	openFileBtn->setStyleSheet(style);
 	importBtn->setStyleSheet(style);
 }

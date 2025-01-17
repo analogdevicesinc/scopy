@@ -16,7 +16,7 @@ GRDeviceAddon::GRDeviceAddon(GRIIODeviceSource *src, QObject *parent)
 	: QObject(parent)
 {
 	name = src->deviceName();
-	m_pen = QPen(StyleHelper::getColor("ScopyBlue"));
+	m_pen = QPen(Style::getAttribute(json::theme::interactive_primary_idle));
 	m_src = src;
 	connect(this, &GRDeviceAddon::updateBufferSize, this, &GRDeviceAddon::setBufferSize);
 	widget = createMenu();

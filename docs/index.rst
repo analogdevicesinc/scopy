@@ -16,24 +16,18 @@ This repository contains Scopy plugins information
    :class: only-light
    :width: 70%
 
-.. image:: sources/scopy.png
-   :class: only-dark
-   :width: 70%
-
 .. hdl-build-status::
 
 Contents
 -------------------------------------------------------------------------------
 
 .. toctree::
-   :titlesonly:
    :includehidden:
    :maxdepth: 3
 
    user_guide/index
-
-.. toctree::
-   :maxdepth: 3
-
    plugins/index
 
+
+   user_guide/bugReport
+   user_guide/troubleshooting

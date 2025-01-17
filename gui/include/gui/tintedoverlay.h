@@ -42,6 +42,7 @@ public:
 	const QList<QWidget *> &getHoles() const;
 	void setHoles(const QList<QWidget *> &newHoles);
 	void clearHoles();
+	bool eventFilter(QObject *watched, QEvent *event) override;
 
 protected:
 	void paintEvent(QPaintEvent *ev) override;

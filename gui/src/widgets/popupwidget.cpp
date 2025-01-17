@@ -19,7 +19,7 @@
  */
 
 #include "widgets/popupwidget.h"
-
+#include <style.h>
 #include "stylehelper.h"
 
 using namespace scopy;
@@ -36,12 +36,16 @@ PopupWidget::PopupWidget(QWidget *parent)
 	m_continueButton->setFocus();
 }
 
-PopupWidget::~PopupWidget() { delete m_tintedOverlay; }
+PopupWidget::~PopupWidget()
+{
+	if(m_tintedOverlay != nullptr) {
+		m_tintedOverlay->deleteLater();
+	}
+}
 
 void PopupWidget::initUI()
 {
 	this->setObjectName("PopupWidget");
-	this->setStyleSheet("");
 	this->resize(500, 300);
 	auto verticalLayout = new QVBoxLayout(this);
 	this->setLayout(verticalLayout);
@@ -76,10 +80,39 @@ void PopupWidget::initUI()
 
 	backgroundWidget->setLayout(backgroundLayout);
 
-	StyleHelper::TutorialChapterTitleLabel(m_titleLabel, "titleLabel");
-	StyleHelper::BlueButton(m_continueButton, "continueButton");
-	StyleHelper::BlueButton(m_exitButton, "exitButton");
-	StyleHelper::OverlayMenu(this, "popupOverlay");
+	Style::setStyle(m_continueButton, style::properties::button::basicButton, true, true);
+	Style::setStyle(m_exitButton, style::properties::button::basicButton, true, true);
+	Style::setStyle(this, style::properties::widget::overlayMenu);
+
+	m_closeButton = nullptr;
+	m_closeHover = nullptr;
+}
+
+void PopupWidget::enableCloseButton(bool en)
+{
+	if(en) {
+		m_closeButton = new QPushButton(this);
+		m_closeButton->setMaximumSize(20, 20);
+		m_closeButton->setIcon(Style::getPixmap(":/gui/icons/close_hovered.svg",
+							Style::getColor(json::theme::interactive_subtle_idle)));
+		Style::setStyle(m_closeButton, style::properties::widget::notInteractive);
+
+		m_closeHover = new HoverWidget(m_closeButton, this, this);
+		m_closeHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+		m_closeHover->setContentPos(HoverPosition::HP_CENTER);
+		m_closeHover->setAnchorOffset(QPoint(-20, 20));
+		m_closeHover->setVisible(true);
+		m_closeHover->raise();
+
+		connect(m_closeButton, &QPushButton::clicked, this, [=]() { deleteLater(); });
+	} else {
+		if(m_closeButton != nullptr) {
+			delete m_closeButton;
+		}
+		if(m_closeHover != nullptr) {
+			delete m_closeHover;
+		}
+	}
 }
 
 void PopupWidget::setFocusOnContinueButton()
@@ -124,7 +157,7 @@ void PopupWidget::enableTintedOverlay(bool enable)
 		m_tintedOverlay->show();
 		raise();
 		show();
-	} else {
+	} else if(m_tintedOverlay != nullptr) {
 		delete m_tintedOverlay;
 		m_tintedOverlay = nullptr;
 	}
@@ -133,6 +166,25 @@ void PopupWidget::enableTintedOverlay(bool enable)
 void PopupWidget::setEnableExternalLinks(bool enable)
 {
 	m_descriptionTextBrowser->setProperty("openExternalLinks", enable);
+}
+
+bool PopupWidget::eventFilter(QObject *watched, QEvent *event)
+{
+	if(event->type() == QEvent::Resize) {
+		move(parentWidget()->rect().center() - rect().center());
+	}
+
+	return QObject::eventFilter(watched, event);
+}
+
+void PopupWidget::enableCenterOnParent(bool enable)
+{
+	if(enable) {
+		move(parentWidget()->rect().center() - rect().center());
+		parentWidget()->installEventFilter(this);
+	} else {
+		parentWidget()->removeEventFilter(this);
+	}
 }
 
 #include "moc_popupwidget.cpp"

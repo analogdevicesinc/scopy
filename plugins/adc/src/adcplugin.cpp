@@ -21,14 +21,14 @@
 
 #include "adcplugin.h"
 
-#include "src/adcinstrument.h"
-
+#include "adcinstrument.h"
 #include <QBoxLayout>
 #include <QJsonDocument>
 #include <QLabel>
 #include <QLoggingCategory>
 #include <QPushButton>
 #include <QSpacerItem>
+#include <style.h>
 
 #include <iioutil/connectionprovider.h>
 #include <pluginbase/preferences.h>
@@ -98,6 +98,7 @@ bool ADCPlugin::loadPreferencesPage()
 		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET);
 	generalSection->contentLayout()->setSpacing(10);
 	lay->addWidget(generalSection);
+
 	lay->setMargin(0);
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
@@ -144,7 +145,8 @@ bool ADCPlugin::loadPreferencesPage()
 
 bool ADCPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/scopy-default/icons/tool_oscilloscope.svg");
+	SCOPY_PLUGIN_ICON(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+			  "/icons/tool_oscilloscope.svg");
 	return true;
 }
 
@@ -165,10 +167,12 @@ bool ADCPlugin::loadPage()
 
 void ADCPlugin::loadToolList()
 {
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("time", "ADC - Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("time", "ADC - Time",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_oscilloscope.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("freq", "ADC - Frequency",
-						  ":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_spectrum_analyzer.svg"));
 }
 
 bool iio_is_buffer_capable(struct iio_device *dev)
@@ -262,7 +266,9 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 
 	if(t == TIME) {
 		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("time", "ADC - Time",
-							  ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+							  ":/gui/icons/" +
+								  Style::getAttribute(json::theme::icon_theme_folder) +
+								  "/icons/tool_oscilloscope.svg"));
 		auto tme = m_toolList.last();
 		tme->setEnabled(true);
 		tme->setRunBtnVisible(true);
@@ -299,8 +305,10 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		m_ctrls.append(adc);
 	} else if(t == FREQUENCY) {
 
-		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(
-			"freq", "ADC - Frequency", ":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
+		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("freq", "ADC - Frequency",
+							  ":/gui/icons/" +
+								  Style::getAttribute(json::theme::icon_theme_folder) +
+								  "/icons/tool_spectrum_analyzer.svg"));
 		auto tme = m_toolList.last();
 		tme->setEnabled(true);
 		tme->setRunBtnVisible(true);
@@ -361,7 +369,7 @@ void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
 	QWidget *w = tool->tool();
 	if(w) {
 		ADCInstrumentController *found = nullptr;
-		for(ADCInstrumentController *ctrl : m_ctrls) {
+		for(ADCInstrumentController *ctrl : qAsConst(m_ctrls)) {
 			if(ctrl->ui() == tool->tool()) {
 				found = ctrl;
 				break;
@@ -381,12 +389,12 @@ void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
 void ADCPlugin::preferenceChanged(QString s, QVariant t1)
 {
 	if(s == "adc_add_remove_plot") {
-		for(ADCInstrumentController *ctrl : m_ctrls) {
+		for(ADCInstrumentController *ctrl : qAsConst(m_ctrls)) {
 			ctrl->setEnableAddRemovePlot(t1.toBool());
 		}
 	}
 	if(s == "adc_add_remove_instrument") {
-		for(ADCInstrumentController *ctrl : m_ctrls) {
+		for(ADCInstrumentController *ctrl : qAsConst(m_ctrls)) {
 			ctrl->setEnableAddRemoveInstrument(t1.toBool());
 		}
 	}
@@ -419,6 +427,8 @@ bool ADCPlugin::onDisconnect()
 void ADCPlugin::saveSettings(QSettings &s) {}
 
 void ADCPlugin::loadSettings(QSettings &s) {}
+
+QString ADCPlugin::description() { return "Tool for generic IIO ADC visualization and control"; }
 
 QString ADCPlugin::about()
 {

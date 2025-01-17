@@ -42,13 +42,13 @@
        <number>0</number>
       </property>
       <property name="topMargin">
-       <number>15</number>
+       <number>6</number>
       </property>
       <property name="rightMargin">
        <number>50</number>
       </property>
       <property name="bottomMargin">
-       <number>15</number>
+       <number>6</number>
       </property>
       <item>
        <spacer name="horizontalSpacer_4">
@@ -99,7 +99,6 @@
   height: 40px;
   border-radius: 4px;
   background-color: #27b34f;
-  color: white;
   
   font-weight: bold;
 
@@ -238,8 +237,7 @@ QPushButton:disabled {
                 <item>
                  <widget class="QLabel" name="ch1ErrorLabel">
                   <property name="styleSheet">
-                   <string notr="true">font-size: 13px;
-color: red;
+                   <string notr="true">color: red;
 text-align:right;</string>
                   </property>
                   <property name="text">
@@ -253,8 +251,7 @@ text-align:right;</string>
                 <item>
                  <widget class="QLabel" name="currentGainCh1Label">
                   <property name="styleSheet">
-                   <string notr="true">font-size: 13px;
-text-align:center;</string>
+                   <string notr="true">text-align:center;</string>
                   </property>
                   <property name="text">
                    <string>±25V</string>
@@ -578,8 +575,7 @@ QLabel{font-size:35pt;}</string>
                 <item>
                  <widget class="QLabel" name="ch2ErrorLabel">
                   <property name="styleSheet">
-                   <string notr="true">font-size: 13px;
-color: red;
+                   <string notr="true">color: red;
 text-align:right;</string>
                   </property>
                   <property name="text">
@@ -593,8 +589,7 @@ text-align:right;</string>
                 <item>
                  <widget class="QLabel" name="currentGainCh2Label">
                   <property name="styleSheet">
-                   <string notr="true">font-size: 13px;
-text-align:center;</string>
+                   <string notr="true">text-align:center;</string>
                   </property>
                   <property name="text">
                    <string>±25V</string>
@@ -899,16 +894,16 @@ QLabel{font-size:35pt;}</string>
          <number>0</number>
         </property>
         <property name="leftMargin">
-         <number>25</number>
+         <number>0</number>
         </property>
         <property name="topMargin">
-         <number>20</number>
+         <number>10</number>
         </property>
         <property name="rightMargin">
-         <number>5</number>
+         <number>0</number>
         </property>
         <property name="bottomMargin">
-         <number>0</number>
+         <number>10</number>
         </property>
         <item>
          <widget class="QScrollArea" name="scrollArea">
@@ -933,6 +928,9 @@ QLabel{font-size:35pt;}</string>
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
           </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustToContents</enum>
+          </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
@@ -956,7 +954,7 @@ QLabel{font-size:35pt;}</string>
              <number>15</number>
             </property>
             <property name="leftMargin">
-             <number>0</number>
+             <number>10</number>
             </property>
             <property name="topMargin">
              <number>0</number>
@@ -1653,8 +1651,6 @@ QLabel{font-size:35pt;}</string>
                    <property name="styleSheet">
                     <string notr="true">QPushButton{
 height:25px;
-
-font-size: 12px;
 line-height: 14px;
 }</string>
                    </property>
@@ -1873,8 +1869,6 @@ border-color: grey;
                       <property name="styleSheet">
                        <string notr="true">QPushButton{
 height:25px;
-
-font-size: 12px;
 line-height: 14px;
 }</string>
                       </property>
@@ -2033,7 +2027,6 @@ line-height: 14px;
  </customwidgets>
  <resources>
   <include location="../../../gui/res/resources.qrc"/>
-  <include location="../../../gui/res/resources.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -2070,7 +2063,7 @@ line-height: 14px;
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

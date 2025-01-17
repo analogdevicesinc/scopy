@@ -285,7 +285,7 @@ bool DeviceManager::busy()
 {
 	bool ret = false;
 
-	for(auto dev : map) {
+	for(auto dev : qAsConst(map)) {
 		if(dev->state() == Device::DEV_ERROR || dev->state() == Device::DEV_INIT ||
 		   dev->state() == Device::DEV_CONNECTING || dev->state() == Device::DEV_DISCONNECTING)
 			return true;

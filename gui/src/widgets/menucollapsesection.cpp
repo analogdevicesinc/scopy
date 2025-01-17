@@ -21,6 +21,7 @@
 
 #include "baseheaderwidget.h"
 #include <smallOnOffSwitch.h>
+#include <style.h>
 #include <widgets/menucollapsesection.h>
 #include <QLoggingCategory>
 #include <compositeheaderwidget.h>
@@ -60,7 +61,6 @@ MenuCollapseHeader::MenuCollapseHeader(QString title, MenuCollapseSection::MenuH
 		break;
 	case MenuCollapseSection::MHCW_ONOFF:
 		m_ctrl = new SmallOnOffSwitch(this);
-		StyleHelper::MenuOnOffSwitchButton(dynamic_cast<SmallOnOffSwitch *>(m_ctrl), "menuCollapseButton");
 		connect(this, &QAbstractButton::toggled, [=](bool b) { m_ctrl->setChecked(b); });
 		m_ctrl->setChecked(true);
 		break;
@@ -97,7 +97,7 @@ MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::Men
 	: QWidget(parent)
 	, m_title(title)
 {
-
+	Style::setBackgroundColor(this, QString("transparent"));
 	m_lay = new QVBoxLayout(this);
 	m_lay->setMargin(0);
 	m_lay->setSpacing(0);
@@ -111,7 +111,6 @@ MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::Men
 	m_contLayout->setMargin(0);
 	m_contLayout->setSpacing(0);
 
-	StyleHelper::MenuCollapseSection(this, "menuCollapse");
 	connect(m_header, &QAbstractButton::toggled, container, &QWidget::setVisible);
 }
 

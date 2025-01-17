@@ -28,6 +28,7 @@
 #include <QPushButton>
 
 #include <deviceicon.h>
+#include <style.h>
 
 using namespace scopy;
 ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
@@ -40,13 +41,20 @@ ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
 	auto &&db = ui->wDeviceBrowser;
 	add = new ScopyHomeAddPage(this, pm);
 
+	ui->wInfoPageStack->setStyleSheet(".QWidget {border-radius: " + Style::getAttribute(json::global::radius_1) +
+					  ";}");
+	ui->container->setStyleSheet(".QWidget#container { background-color: " +
+				     Style::getAttribute(json::theme::background_subtle) + "; }");
+	Style::setStyle(ui->horizontalLayout_2, style::properties::widget::basicComponent);
+	Style::setStyle(ui->wInfoPageStack, style::properties::widget::basicComponent);
+
 	is->add("home", new ScopyHomeInfoPage());
 	is->add("add", add);
 
 	//	addDevice("dev1","dev1","descr1",new QPushButton("abc"),new QLabel("page1"));
 
-	StyleHelper::BlueButton(scanBtn());
-	scanBtn()->setFixedWidth(80);
+	Style::setStyle(scanBtn(), style::properties::button::basicButton);
+	scanBtn()->setFixedWidth(Style::getDimension(json::global::unit_5));
 	connect(hc, SIGNAL(goLeft()), db, SLOT(prevDevice()));
 	connect(hc, SIGNAL(goRight()), db, SLOT(nextDevice()));
 	connect(db, SIGNAL(requestDevice(QString, int)), is, SLOT(slideInKey(QString, int)));
@@ -107,7 +115,7 @@ void ScopyHomePage::setScannerEnable(bool b)
 	ui->label_2->setVisible(b);
 	ui->btnScanNow->setVisible(!b);
 }
-QPushButton *ScopyHomePage::scanControlBtn() { return ui->btnScan; }
+QCheckBox *ScopyHomePage::scanControlBtn() { return ui->btnScan; }
 
 QPushButton *ScopyHomePage::scanBtn() { return ui->btnScanNow; }
 

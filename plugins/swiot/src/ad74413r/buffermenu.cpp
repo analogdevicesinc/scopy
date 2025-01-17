@@ -22,6 +22,7 @@
 #include "swiot_logging_categories.h"
 
 #include <QLabel>
+#include <style.h>
 #include <titlespinbox.h>
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <iio-widgets/datastrategy/cmdqchannelattrdatastrategy.h>
@@ -439,7 +440,7 @@ WithoutAdvSettings::WithoutAdvSettings(QWidget *parent, QString chnlFunction, Co
 	: BufferMenu(parent, chnlFunction, conn, chnls)
 {
 	QLabel *msgLabel = new QLabel("No advanced settings available", this);
-	StyleHelper::MenuSmallLabel(msgLabel);
+	Style::setStyle(msgLabel, style::properties::label::menuSmall);
 	addMenuWidget(msgLabel);
 }
 

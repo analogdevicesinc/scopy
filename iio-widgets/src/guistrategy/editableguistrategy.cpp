@@ -19,6 +19,7 @@
  */
 
 #include "guistrategy/editableguistrategy.h"
+#include <gui/style.h>
 
 using namespace scopy;
 
@@ -32,14 +33,14 @@ EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isC
 
 	if(isCompact) {
 		m_ui->setLayout(new QHBoxLayout(m_ui));
-		StyleHelper::IIOCompactLabel(label, "TitleLabel");
+		Style::setStyle(label, style::properties::label::iioCompactLabel);
 		m_lineEdit->edit()->setAlignment(Qt::AlignRight);
 	} else {
 		m_ui->setLayout(new QVBoxLayout(m_ui));
-		StyleHelper::MenuSmallLabel(label, "MenuSmallLabel");
 	}
 
-	StyleHelper::IIOLineEdit(m_lineEdit->edit(), "IIOLineEdit");
+	Style::setStyle(m_lineEdit->edit(), style::properties::iiowidgets::lineEdit, true, true);
+	m_lineEdit->edit()->setCursorPosition(0);
 	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 	m_ui->layout()->addWidget(label);
 	m_ui->layout()->addWidget(m_lineEdit);

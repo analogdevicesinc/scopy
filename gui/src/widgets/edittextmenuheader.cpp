@@ -21,6 +21,7 @@
 
 #include "edittextmenuheader.h"
 
+#include <style.h>
 #include <stylehelper.h>
 
 using namespace scopy;
@@ -51,7 +52,8 @@ QLineEdit *EditTextMenuHeader::lineEdit() const { return m_lineEdit; }
 void EditTextMenuHeader::applyStylesheet()
 {
 	StyleHelper::MenuHeaderLine(m_line, m_pen, "menuSeparator");
-	StyleHelper::MenuEditTextHeaderWidget(this, "menuHeader");
+	Style::setStyle(m_lineEdit, style::properties::widget::noBorder);
+	StyleHelper::MenuHeaderWidget(this);
 }
 
 #include "moc_edittextmenuheader.cpp"

@@ -20,6 +20,7 @@
  */
 
 #include "scopyhomeinfopage.h"
+#include "style.h"
 
 #include "ui_scopyhomeinfopage.h"
 
@@ -42,7 +43,7 @@ ScopyHomeInfoPage::~ScopyHomeInfoPage() { delete ui; }
 void ScopyHomeInfoPage::initReportButton()
 {
 	auto reportButton = new QPushButton("Report a bug");
-	StyleHelper::BlueButton(reportButton, "reportButton");
+	StyleHelper::BasicButton(reportButton, "reportButton");
 	reportButton->setFixedSize(100, 40);
 
 	auto reportBtnHoverWidget = new HoverWidget(reportButton, ui->textBrowser, this);

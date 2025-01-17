@@ -1,0 +1,3 @@
+*[&&property&&=true] {
+	background-color: &background_primary&;
+}

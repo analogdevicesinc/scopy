@@ -1,0 +1,20 @@
+QWidget[&&property&&=true]  {
+	border-radius: 4px;
+	background-color: &interactive_subtle_disabled&;
+}
+
+QLineEdit[&&property&&=true]  {
+	color: &content_default&;
+	font-size: &font_size_0_5&;
+	padding-left: 16px;
+	padding-right: 16px;
+	border-bottom: 0px;
+}
+
+QLineEdit[&&property&&=true]:hover {
+	border: 1px solid &interactive_primary_idle&;
+	border-radius: 4px;
+}
+
+
+

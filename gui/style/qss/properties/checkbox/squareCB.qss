@@ -1,0 +1,16 @@
+QCheckBox[&&property&&=true] {
+	width:16px;
+	height:16px;
+	background-color: rgba(128,128,128,0);
+	color: rgba(255, 255, 255, 153);
+}
+QCheckBox::indicator[&&property&&=true] {
+	width: 12px;
+	height: 12px;
+	border: 2px solid &content_default&;
+	border-radius: 4px;
+	image: none;
+}
+QCheckBox::indicator[&&property&&=true]:unchecked { 
+	background-color: &background_primary&; 
+}

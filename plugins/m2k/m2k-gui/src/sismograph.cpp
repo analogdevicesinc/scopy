@@ -26,6 +26,7 @@
 #include <qwt_plot_layout.h>
 #include <qwt_scale_engine.h>
 
+#include <gui/style.h>
 #include <cmath>
 #include <cstdlib>
 
@@ -41,6 +42,9 @@ Sismograph::Sismograph(QWidget *parent)
 	, autoscale(true)
 	, plotDirection(LEFT_TO_RIGHT)
 {
+	Style::setBackgroundColor(this, json::theme::background_primary, true);
+	Style::setBackgroundColor(this->canvas(), json::theme::background_plot, true);
+
 	setAxisVisible(QwtAxis::XBottom, true);
 	setAxisVisible(QwtAxis::YLeft, true);
 	setAxisVisible(QwtAxis::YRight, false);

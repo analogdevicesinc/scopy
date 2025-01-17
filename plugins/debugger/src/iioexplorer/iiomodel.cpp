@@ -117,6 +117,10 @@ void IIOModel::generateDeviceAttributes()
 	// add all attrs to current device
 	for(int j = 0; j < m_devList.size(); ++j) {
 		QString device_attr = iio_device_get_attr(m_currentDevice, j);
+		if(device_attr.isEmpty()) {
+			// Probably a debug attribute
+			device_attr = iio_device_get_debug_attr(m_currentDevice, j);
+		}
 
 		m_entries.insert(device_attr);
 		auto *attrItem =

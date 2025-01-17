@@ -22,6 +22,7 @@
 #include "basictracker.hpp"
 #include "stylehelper.h"
 #include <QwtText>
+#include <style.h>
 
 using namespace scopy;
 
@@ -33,7 +34,7 @@ BasicTracker::BasicTracker(QwtPlot *plot)
 	, m_yAxisEn(true)
 	, m_xAxis(QwtAxis::XBottom)
 	, m_yAxis(QwtAxis::YLeft)
-	, m_color(QColor(StyleHelper::getColor("LabelText")))
+	, m_color(QColor(Style::getAttribute(json::theme::content_default)))
 	, m_xAxisUnit("")
 	, m_yAxisUnit("")
 	, m_xFormatter(nullptr)
@@ -102,9 +103,8 @@ QRect BasicTracker::trackerRect(QSizeF size) const
 		yOffset = m_canvas->height() - bottomRight.y();
 	}
 
-	// hackish - magic +-3 so the whole text is visible
-	topLeft.rx() += xOffset - 3;
-	bottomRight.rx() += xOffset + 3;
+	topLeft.rx() += xOffset;
+	bottomRight.rx() += xOffset;
 	topLeft.ry() += yOffset;
 	bottomRight.ry() += yOffset;
 
@@ -113,6 +113,7 @@ QRect BasicTracker::trackerRect(QSizeF size) const
 
 QwtText *BasicTracker::trackerText(QPoint pos) const
 {
+	QString padding = " ";
 	QString xText = "";
 	QString yText = "";
 	QString separator = "";
@@ -139,8 +140,12 @@ QwtText *BasicTracker::trackerText(QPoint pos) const
 		separator = ", ";
 	}
 
-	QwtText *text = new QwtText(xText + separator + yText);
+	QwtText *text = new QwtText(padding + xText + separator + yText + padding);
 	text->setColor(m_color);
+
+	QFont font = QFont();
+	font.setPixelSize(Style::getDimension(json::global::font_size));
+	text->setFont(font);
 
 	return text;
 }

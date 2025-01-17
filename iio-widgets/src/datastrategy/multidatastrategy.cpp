@@ -31,7 +31,7 @@ MultiDataStrategy::MultiDataStrategy(QList<DataStrategyInterface *> strategies, 
 	, m_optionalData("")
 	, m_returnCode(0)
 {
-	for(DataStrategyInterface *ds : m_dataStrategies) {
+	for(DataStrategyInterface *ds : qAsConst(m_dataStrategies)) {
 		QWidget *widgetDS = dynamic_cast<QWidget *>(ds);
 		if(!widgetDS) {
 			qWarning(CAT_MULTI_DATA_STRATEGY) << "Data strategy not valid.";
@@ -97,7 +97,7 @@ QString MultiDataStrategy::optionalData() { return m_optionalData; }
 int MultiDataStrategy::write(QString data)
 {
 	int res = 0;
-	for(DataStrategyInterface *ds : m_dataStrategies) {
+	for(DataStrategyInterface *ds : qAsConst(m_dataStrategies)) {
 		int currentRet = ds->write(data);
 		if(currentRet < 0) {
 			res = currentRet;
@@ -125,14 +125,14 @@ QPair<QString, QString> MultiDataStrategy::read()
 
 void MultiDataStrategy::writeAsync(QString data)
 {
-	for(DataStrategyInterface *ds : m_dataStrategies) {
+	for(DataStrategyInterface *ds : qAsConst(m_dataStrategies)) {
 		ds->writeAsync(data);
 	}
 }
 
 void MultiDataStrategy::readAsync()
 {
-	for(DataStrategyInterface *ds : m_dataStrategies) {
+	for(DataStrategyInterface *ds : qAsConst(m_dataStrategies)) {
 		ds->readAsync();
 	}
 }
@@ -146,7 +146,7 @@ void MultiDataStrategy::receiveSingleRead(QString data, QString optionalData)
 	if(m_receivedSignals == m_expectedSignals) {
 		qDebug(CAT_MULTI_DATA_STRATEGY) << "Received all signals!";
 		bool ok = true;
-		for(QPair<QString, QString> ss : m_receivedData) {
+		for(const QPair<QString, QString> &ss : qAsConst(m_receivedData)) {
 			if(ss.first != data || ss.second != optionalData) {
 				ok = false;
 				Q_EMIT sendData("DIFFERENT RESULTS", "");

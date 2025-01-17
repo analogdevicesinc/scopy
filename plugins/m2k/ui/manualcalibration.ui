@@ -117,9 +117,6 @@ QTabBar::tab:left:only-one, QTabBar::tab:right:only-one {
     margin-bottom: 0;
 }
 
-QListWidget{
-	font-size: 14px;
-}
 </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">

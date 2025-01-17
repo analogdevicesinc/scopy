@@ -25,9 +25,9 @@
 #include <pluginbase/preferences.h>
 #include <menusectionwidget.h>
 #include <menucollapsesection.h>
-#include <stylehelper.h>
 
 #include <QFileDialog>
+#include <style.h>
 
 using namespace scopy;
 using namespace scopy::dac;
@@ -39,7 +39,7 @@ FileBrowser::FileBrowser(QWidget *parent)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	auto m_layout = new QVBoxLayout();
 	m_layout->setMargin(0);
-	m_layout->setSpacing(10);
+	m_layout->setSpacing(0);
 	setLayout(m_layout);
 
 	MenuSectionWidget *fileBufferContainer = new MenuSectionWidget(this);
@@ -56,8 +56,8 @@ FileBrowser::FileBrowser(QWidget *parent)
 	fileBufferContainer->contentLayout()->addWidget(m_fileBufferPath);
 	fileBufferContainer->contentLayout()->addWidget(m_fileBufferBrowseBtn);
 	fileBufferContainer->contentLayout()->addWidget(m_fileBufferLoadBtn);
-	StyleHelper::BlueButton(m_fileBufferBrowseBtn);
-	StyleHelper::BlueButton(m_fileBufferLoadBtn);
+	Style::setStyle(m_fileBufferBrowseBtn, style::properties::button::basicButton);
+	Style::setStyle(m_fileBufferLoadBtn, style::properties::button::basicButton);
 
 	m_layout->addWidget(fileBufferContainer);
 }

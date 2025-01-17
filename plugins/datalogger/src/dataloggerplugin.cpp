@@ -29,6 +29,7 @@
 #include <timemanager.hpp>
 #include <datamonitorutils.hpp>
 #include <datalogger_api.hpp>
+#include <style.h>
 
 #include <libm2k/analog/dmm.hpp>
 
@@ -64,7 +65,8 @@ bool DataLoggerPlugin::loadPage() { return false; }
 
 bool DataLoggerPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/scopy-default/icons/datalogger.svg");
+	SCOPY_PLUGIN_ICON(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+			  "/icons/tool_datalogger.svg");
 	return true;
 }
 
@@ -148,7 +150,9 @@ bool DataLoggerPlugin::onDisconnect()
 	}
 
 	// add proxy tool to represent the plugin
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "Data Logger", toolIcon));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("DataMonitorPreview", "Data Logger",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_datalogger.svg"));
 
 	Q_EMIT toolListChanged();
 
@@ -255,7 +259,6 @@ void DataLoggerPlugin::initPreferences()
 	p->init("dataloggerplugin_data_storage_size", "10 Kb");
 	p->init("dataloggerplugin_read_interval", "1");
 	p->init("dataloggerplugin_date_time_format", "hh:mm:ss");
-	p->init("dataloggerplugin_start_tutorial", true);
 }
 
 bool DataLoggerPlugin::loadPreferencesPage()
@@ -284,21 +287,6 @@ bool DataLoggerPlugin::loadPreferencesPage()
 
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceEdit(
 		p, "dataloggerplugin_date_time_format", "DateTime format :", generalSection));
-
-	QWidget *resetTutorialWidget = new QWidget();
-	QHBoxLayout *resetTutorialWidgetLayout = new QHBoxLayout();
-
-	resetTutorialWidget->setLayout(resetTutorialWidgetLayout);
-	resetTutorialWidgetLayout->setMargin(0);
-
-	QPushButton *resetTutorial = new QPushButton("Reset", generalSection);
-	StyleHelper::BlueButton(resetTutorial, "resetBtn");
-	connect(resetTutorial, &QPushButton::clicked, this,
-		[=, this]() { p->set("dataloggerplugin_start_tutorial", true); });
-
-	resetTutorialWidgetLayout->addWidget(new QLabel("Data logger tutorial "), 6);
-	resetTutorialWidgetLayout->addWidget(resetTutorial, 1);
-	generalSection->contentLayout()->addWidget(resetTutorialWidget);
 
 	return true;
 }

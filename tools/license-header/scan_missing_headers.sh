@@ -1,13 +1,14 @@
 #!/bin/bash
 
+# set -x
+
 # Initialize global variables
 OMITTED_DIRS=()
 OMITTED_FILES=()
-BASE_DIR_PATH=$(git rev-parse --show-toplevel)
+BASE_DIR_PATH=""
 FILES_WITHOUT_LICENSE=()
 FILE_EXTENSIONS=()
-N_LINES=80                      # When searching for license headers, use the first N lines of the file
-VERBOSE=false
+N_LINES=80 # When searching for license headers, use the first N lines of the file
 
 # Define colors used for logging
 NC='\033[0m'         # No Color
@@ -17,34 +18,31 @@ YELLOW='\033[1;33m'  # Files with ADI-BSD license
 RED='\033[0;31m'     # Files with no license header
 MAGENTA='\033[0;35m' # Files with unknown license header
 
-
-function usage() {
+usage() {
     cat <<EOF
-    Usage: license_scanner.sh --path /path/to/directory [options]
-    Scan files for licenses.
-    Options:
-        -d, --dirs          Comma-separated list of directory names to omit.
-                            Example: license_scanner.sh --dirs=build,examples
+Usage: license_scanner.sh --path /path/to/directory [options]
+Scan files for licenses.
+Options:
+    -d, --dirs          Comma-separated list of directory names to omit.
+                        Example: license_scanner.sh --dirs=build,examples
 
-        -f, --files         Comma-separated list of file names to omit.
-                            Example: license_scanner.sh --files=LICENSE,README.md
+    -f, --files         Comma-separated list of file names to omit.
+                        Example: license_scanner.sh --files=LICENSE,README.md
 
-        -p, --path          Path of the base directory to scan.
-                            Example: license_scanner.sh --path /path/to/directory
+    -p, --path          Path of the base directory to scan.
+                        Example: license_scanner.sh --path /path/to/directory
 
-        -l, --lines         Number of lines to search for license headers.
-                            Default: 80
+    -l, --lines         Number of lines to search for license headers.
+                        Default: 80
 
-        -h, --help          Display this help message.
-
-        -v, --verbose       Display verbose output.
+    -h, --help          Display this help message.
 
 EOF
 }
 
 function parse_arguments() {
-    LONG_OPTS=dirs:,files:,path:,help,verbose
-    OPTIONS=d:f:p:h:v
+    LONG_OPTS=dirs:,files:,path:,help
+    OPTIONS=d:f:p:h
     VALID_ARGS=$(getopt --options=$OPTIONS --longoptions=$LONG_OPTS --name "$0" -- "$@")
 
     if [[ $? -ne 0 ]]; then
@@ -55,7 +53,7 @@ function parse_arguments() {
 
     getopt --test >/dev/null && true
     if [[ $? -ne 4 ]]; then
-        echo "$(getopt --test) failed in this environment."
+        echo "$(getopt --test) failed in this environment."  >&2
         exit 1
     fi
 
@@ -83,10 +81,6 @@ function parse_arguments() {
             BASE_DIR_PATH="$2"
             shift 2
             ;;
-        -v | --verbose)
-            VERBOSE=true
-            shift
-            ;;
         --)
             shift
             break
@@ -106,74 +100,73 @@ function validate_base_path() {
     fi
 }
 
-function is_LGPL() {
+function read_header() {
     local file="$1"
+    local n_lines="$2"
+    head -n "$n_lines" "$file"
+}
 
-    # Check if file exists and is readable
-    if [[ ! -f "$file" || ! -r "$file" ]]; then
-        echo "Error: File '$file' does not exist or is not readable." >&2
+function test_regex() {
+    local content="$1"
+    local regex="$2"
+
+    if echo "$content" | grep --quiet --ignore-case --extended-regexp "$regex"; then
+        return 0
+    else
         return 1
     fi
+}
 
+function normalize_text() {
+    # Remove comment characters and leading/trailing whitespaces from lines that start with a comment
+    sed -E 's/^[[:space:]]*(#|\/\/|\/\*|\*|<!--)[[:space:]]*//; s/[[:space:]]*$//' |
+        # Replace multiple spaces with a single space
+        tr -s '[:space:]' ' ' |
+        # Trim leading/trailing spaces
+        sed 's/^ *//;s/ *$//'
+}
+
+function is_LGPL() {
+    local header="$1"
     local lgpl_patterns=(
         "GNU\s*Lesser\s*General\s*Public\s*License" # Standard LGPL reference
         "LGPL"                                      # Short form LGPL
         "LGPLv[23](\.[01])?"                        # Specific verion of LGPL
         "Lesser\s*General\s*Public\s*License,\s*Version\s*[23](\.[01])?"
     )
-    local pattern
-    pattern=$(
-        IFS="|"
-        echo "${lgpl_patterns[*]}"
-    )
-
-    if head --lines "$N_LINES" "$file" | grep --quiet --ignore-case --null-data --extended-regexp "$pattern"; then
-        return 0
-    else
-        return 1
-    fi
+    # Match any of the patterns
+    for pattern in "${lgpl_patterns[@]}"; do
+        if test_regex "$header" "$pattern"; then
+            return 0
+        fi
+    done
+    return 1
 }
 
 function is_GPL() {
-    local file="$1"
-
-    # Check if file exists and is readable
-    if [[ ! -f "$file" || ! -r "$file" ]]; then
-        echo "Error: File '$file' does not exist or is not readable." >&2
-        return 1
-    fi
-
-    # TODO: review way to avoid mismatch between GLP and LGPL since the pattern is similar
-    # local abort_pattern="The\s*GNU\s*General\s*Public\s*License\s*does\s*not\s*permit\s*incorporating\s*your\s*program.*use\s*the\s*GNU\s*Lesser\s*General\s*Public\s*License\s*instead\s*of\s*this\s*License"
-    # if grep --ignore-case --quiet --null-data "$abort_pattern" "$file"; then
-    #     return 2
-    # fi
-
+    local header="$1"
     local gpl_patterns=(
         "GNU\s*General\s*Public\s*License" # Standard GPL reference
-        # "GPL"                              # Short form GPL
+        "GPL"                              # Short form GPL
     )
-    local pattern
-    pattern=$(
-        IFS="|"
-        echo "${gpl_patterns[*]}"
-    )
-
-    if head --lines "$N_LINES" "$file" | grep --quiet --ignore-case --null-data --extended-regexp "$pattern"; then
-        return 0
-    else
-        return 3
-    fi
+    # Match any of the patterns
+    for pattern in "${gpl_patterns[@]}"; do
+        if test_regex "$header" "$pattern"; then
+            return 0
+        fi
+    done
+    return 1
 }
 
-function is_ADI_BSD() {
-    local file="$1"
+function is_Scopy_GPL() {
+    local header="$1"
+    local scopy_license_regex='Copyright \(c\) \b[0-9]{4}\b Analog Devices Inc. This file is part of Scopy \(see http[s]?://www.github.com/analogdevicesinc/scopy\). This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or \(at your option\) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY\; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program. If not, see <http[s]?://www.gnu.org/licenses/>.'
+    test_regex "$header" "$scopy_license_regex"
+}
 
-    # Check if file exists and is readable
-    if [[ ! -f "$file" || ! -r "$file" ]]; then
-        echo "Error: File '$file' does not exist or is not readable." >&2
-        return 1
-    fi
+# TODO: normalize header and adapt pattern
+function is_ADI_BSD() {
+    local header="$1"
     local adi_bsd_patterns=(
         "THIS\s*SOFTWARE\s*IS\s*PROVIDED\s*BY\s*ANALOG\s*DEVICES\s*\"?AS\s*IS\"?"
         "IMPLIED\s*WARRANTIES,\s*INCLUDING,\s*BUT\s*NOT\s*LIMITED\s*TO,\s*NON-INFRINGEMENT"
@@ -184,199 +177,155 @@ function is_ADI_BSD() {
         "WHETHER\s*IN\s*CONTRACT,\s*STRICT\s*LIABILITY,\s*OR\s*TORT\s*\(INCLUDING\s*NEGLIGENCE\)"
         "EVEN\s*IF\s*ADVISED\s*OF\s*THE\s*POSSIBILITY\s*OF\s*SUCH\s*DAMAGE"
     )
-    local pattern
-    pattern=$(
-        IFS="|"
-        echo "${adi_bsd_patterns[*]}"
-    )
-
-    if head --lines "$N_LINES" "$file" | grep --ignore-case --quiet --null-data --extended-regexp "$pattern"; then
-        return 0
-    else
-        return 1
-    fi
+    # Match all of the patterns
+    for pattern in "${adi_bsd_patterns[@]}"; do
+        if ! test_regex "$header" "$pattern"; then
+            return 1
+        fi
+    done
+    return 0
 }
 
 function is_GNU_radio() {
-    local file="$1"
-
-    # Check if file exists and is readable
-    if [[ ! -f "$file" || ! -r "$file" ]]; then
-        echo "Error: File '$file' does not exist or is not readable." >&2
-        return 1
-    fi
+    local header="$1"
     local gr_patterns=(
         "This\s*file\s*is\s*part\s*of\s*GNU\s*Radio"
     )
-    local pattern
-    pattern=$(
-        IFS="|"
-        echo "${gr_patterns[*]}"
-    )
-
-    if head --lines "$N_LINES" "$file" | grep --quiet --ignore-case --null-data --extended-regexp "$pattern"; then
-        return 0
-    else
-        return 1
-    fi
+    # Match any of the patterns
+    for pattern in "${gr_patterns[@]}"; do
+        if test_regex "$header" "$pattern"; then
+            return 0
+        fi
+    done
+    return 1
 }
 
 function has_ADI_disclaimer() {
-    local file="$1"
-
-    if [[ ! -f "$file" || ! -r "$file" ]]; then
-        echo "Error: File '$file' does not exist or is not readable." >&2
-        return 1
-    fi
-
-    local gr_patterns=(
+    local header="$1"
+    local adi_disclaimer_patterns=(
         "Analog\s*Devices\s*Inc\."
     )
-    local pattern
-    pattern=$(
-        IFS="|"
-        echo "${gr_patterns[*]}"
-    )
-
-    if head --lines "$N_LINES" "$file" | grep --quiet --ignore-case --null-data --extended-regexp "$pattern"; then
-        return 0
-    else
-        return 1
-    fi
+    # Match any of the patterns
+    for pattern in "${adi_disclaimer_patterns[@]}"; do
+        if test_regex "$header" "$pattern"; then
+            return 0
+        fi
+    done
+    return 1
 }
 
 function has_license_disclaimer() {
-    local file="$1"
-
-    # Check if file exists and is readable
-    if [[ ! -f "$file" || ! -r "$file" ]]; then
-        echo "Error: File '$file' does not exist or is not readable." >&2
-        return 1
-    fi
+    local header="$1"
     local license_patterns=(
         "license"
         "copyright"
         "disclaimer"
         "reserved"
     )
-    local pattern
-    pattern=$(
-        IFS="|"
-        echo "${license_patterns[*]}"
-    )
-
-    if head --lines "$N_LINES" "$file" | grep --quiet --ignore-case --null-data --extended-regexp "$pattern"; then
-        return 0
-    else
-        return 1
-    fi
+    # Match any of the patterns
+    for pattern in "${license_patterns[@]}"; do
+        if test_regex "$header" "$pattern"; then
+            return 0
+        fi
+    done
+    return 1
 }
 
 function identify_license() {
     local file=$1
+    local n_lines=$2
     local relative_path
     relative_path=$(realpath --relative-to="$BASE_DIR_PATH" "$file")
+
     local depth indent
     depth=$(echo "$relative_path" | awk -F'/' '{print NF-1}')
     indent=$(printf "%*s" $((depth * 4)) "")
 
-    if ! has_license_disclaimer "$file"; then
+    # Sanitize the header text -> remove null characters and normalize the text
+    local header=$(read_header "$file" "$n_lines" | tr -d '\0' | normalize_text)
+
+    ((total_checks++))
+
+    if ! has_license_disclaimer "$header"; then
+        ((no_license_count++))
         FILES_WITHOUT_LICENSE+=("$relative_path")
 
-        if $VERBOSE; then
-            echo -e "${indent}${RED}├── $relative_path (No License)${NC}"
-        fi
-        return # Stop execution if no license if found
+        echo -e "${indent}${RED}├── $relative_path (No License)${NC}"  >&2
+        # Stop execution if no license is found
+        return 
     fi
 
     local found_licenses_list=()
     local color=$MAGENTA
 
-    if $VERBOSE; then
-        if is_GNU_radio "$file"; then
-            # echo -e "${indent}${YELLOW}├── $relative_path (GNU Radio)${NC}"
-
-            color=$YELLOW
-            found_licenses_list+=("GNU Radio")
-        fi
-
-        if has_ADI_disclaimer "$file"; then
-            if is_GPL "$file"; then
-                if is_LGPL "$file"; then
-                    # echo -e "${indent}${GREEN}├── $relative_path (LGPL)${NC}"
-
-                    color=$GREEN
-                    found_licenses_list+=("LGPL")
-                else
-                    # echo -e "${indent}${BLUE}├── $relative_path (GPL)${NC}"
-
-                    color=$BLUE
-                    found_licenses_list+=("GPL")
-                fi
-            fi
-
-            if is_ADI_BSD "$file"; then
-                # echo -e "${indent}${YELLOW}├── $relative_path (ADI-BSD)${NC}"
-
-                color=$YELLOW
-                found_licenses_list+=("ADI-BSD")
-            fi
-        fi
-
-        # Join the elements of found_licenses_list with a | separator
-        joined_licenses=$(IFS='|'; echo "${found_licenses_list[*]}")
-
-        # Check if the joined string is empty
-        if [ -z "$joined_licenses" ]; then
-            joined_licenses="Unknown"
-        fi
-
-        # Update the echo command to use the joined string
-        echo -e "${indent}${color}├── $relative_path (${joined_licenses})${NC}"
-        # else
-        #     echo -e "${indent}${MAGENTA}├── $relative_path (Unknown License)${NC}"
-        # fi
-    fi
-}
-
-function count_licenses() {
-    local file=$1
-    ((total_checks++))
-    if ! has_license_disclaimer $file; then
-        ((no_license_count++))
-        return
-    fi
-
     local unknown=true
-    if is_GNU_radio $file; then
-        ((gr_count++))
-        unknown=false
-    fi
 
-    if has_ADI_disclaimer $file; then
-        if is_GPL $file; then
-            if is_LGPL $file; then
+    # Search for license headers
+    if has_ADI_disclaimer "$header"; then
+        if is_GPL "$header"; then
+            if is_Scopy_GPL "$header"; then
+                ((scopy_gpl_count++))
+                unknown=false
+                color=$GREEN
+                found_licenses_list+=("Scopy_GPL")
+            elif is_LGPL "$header"; then
                 ((lgpl_count++))
                 unknown=false
+                color=$GREEN
+                found_licenses_list+=("LGPL")
             else
                 ((gpl_count++))
                 unknown=false
+                color=$BLUE
+                found_licenses_list+=("GPL")
             fi
         fi
-
-        if is_ADI_BSD $file; then
+        if is_ADI_BSD "$header"; then
             ((adi_bsd_count++))
             unknown=false
+            color=$YELLOW
+            found_licenses_list+=("ADI-BSD")
         fi
-    
     fi
 
+    if is_GNU_radio "$header"; then
+        ((gr_count++))
+        unknown=false
+        color=$YELLOW
+        found_licenses_list+=("GNU Radio")
+    fi
 
     if $unknown; then
         ((unknown_license_count++))
     fi
 
+    # Join the elements of found_licenses_list with a | separator
+    local joined_licenses=$(
+        IFS='|'
+        echo "${found_licenses_list[*]}"
+    )
+
+    # Check if the joined string is empty
+    if [ -z "$joined_licenses" ]; then
+        joined_licenses="Unknown"
+    fi
+
+    # Update the echo command to use the joined string
+    echo -e "${indent}${color}├── $relative_path (${joined_licenses})${NC}" >&2
+
+    local found=false
+    for license in "${found_licenses_list[@]}"; do
+        if [[ "$license" == "Scopy_GPL" ]]; then
+            found=true
+            break
+        fi
+    done
+
+    if ! $found; then
+        FILES_WITHOUT_LICENSE+=("$relative_path")
+    fi
 }
+
 
 function scan_directory() {
     local BASE_DIR_PATH=$1
@@ -387,16 +336,16 @@ function scan_directory() {
     # Use the --build option to exclude directories
     if [ ${#OMITTED_DIRS[@]} -gt 0 ]; then
         for dir in "${OMITTED_DIRS[@]}"; do
-            dir_excludes+=(-o -iname "$dir")
+            dir_excludes+=(-o -iwholename "$dir")
         done
-        dir_excludes=(-type d \( -iname "${dir_excludes[@]:2}" \) -prune)
+        dir_excludes=(-type d \( -iwholename "${dir_excludes[@]:2}" \) -prune)
     fi
-    # Use the --files option to exclude files
+    # Use the --files option to exclude figles
     if [ ${#OMITTED_FILES[@]} -gt 0 ]; then
         for file in "${OMITTED_FILES[@]}"; do
-            file_excludes+=(-o -iname "$file")
+            file_excludes+=(-o -iwholename "$file")
         done
-        file_excludes=(-type f ! \( -iname "${file_excludes[@]:2}" \))
+        file_excludes=(-type f ! \( -iwholename "${file_excludes[@]:2}" \))
     fi
 
     # Build the find command
@@ -422,56 +371,53 @@ function scan_directory() {
 
 function main() {
     parse_arguments "$@"
+    validate_base_path
 
     total_checks=0
     no_license_count=0
     lgpl_count=0
+    scopy_gpl_count=0
     gpl_count=0
     adi_bsd_count=0
     gr_count=0
     unknown_license_count=0
 
     # Store the number of unique file extensions
-    if $VERBOSE; then
-        # Find all files recursively in the base directory and extract unique file extensions
-        mapfile -t FILE_EXTENSIONS < <(scan_directory "$BASE_DIR_PATH" -type f | awk -F. '{if (NF>1) print $NF}' | sort -u)
-        echo "Unique file extensions: ${FILE_EXTENSIONS[*]}"
-    fi
+    # Find all files recursively in the base directory and extract unique file extensions
+    mapfile -t FILE_EXTENSIONS < <(scan_directory "$BASE_DIR_PATH" -type f | awk -F. '{if (NF>1) print $NF}' | sort -u)
+    echo "Unique file extensions: ${FILE_EXTENSIONS[*]}" >&2
 
-    # Count licenses in the files
+    echo "Scanning project for license headers from path: $BASE_DIR_PATH ..." >&2
     while read -r file; do
         if [[ -f "$file" ]]; then
-            count_licenses "$file"
+            identify_license "$file" "$N_LINES"
         fi
     done < <(scan_directory "$BASE_DIR_PATH" | sort)
 
-    if $VERBOSE; then
-        echo -e "License count summary:"
-        echo -e "LGPL : [$lgpl_count/$total_checks]"
-        echo -e "GPL: [$gpl_count/$total_checks]"
-        echo -e "ADI-BSD: [$adi_bsd_count/$total_checks]"
-        echo -e "GNU Radio: [$gr_count/$total_checks]"
-        echo -e "No-license: [$no_license_count/$total_checks]"
-        echo -e "Unknown-license: [$unknown_license_count/$total_checks]\n"
-
-        echo "Scanning project for license headers from path: $BASE_DIR_PATH ..." >&2
-    fi
-
-    while read -r file; do
-        if [[ -f "$file" ]]; then
-            identify_license "$file"
-        fi
-    done < <(scan_directory "$BASE_DIR_PATH" | sort)
-
+    echo -e "##################################################" >&2
+    echo -e "License count summary:" >&2
+    echo -e "LGPL : [$lgpl_count/$total_checks]" >&2
+    echo -e "Scopy_GPL: [$scopy_gpl_count/$total_checks]" >&2
+    echo -e "GPL: [$gpl_count/$total_checks]" >&2
+    echo -e "ADI-BSD: [$adi_bsd_count/$total_checks]" >&2
+    echo -e "GNU Radio: [$gr_count/$total_checks]" >&2
+    echo -e "No-license: [$no_license_count/$total_checks]" >&2
+    echo -e "Unknown-license: [$unknown_license_count/$total_checks]\n" >&2
+    echo -e "##################################################" >&2
     if [ ${#FILES_WITHOUT_LICENSE[@]} -gt 0 ]; then
         for file in "${FILES_WITHOUT_LICENSE[@]}"; do
             echo -e "$BASE_DIR_PATH/$file"
         done
         exit 1
     else
-        echo "All files have a license."
-        exit 0
+        echo "All files have a form of license." >&2
     fi
+    echo -e "##################################################" >&2
+    if [ "$total_checks" -ne "$scopy_gpl_count" ]; then
+        echo "Error: Not all files have the Scopy GPL license."  >&2
+        exit 1
+    fi
+    exit 0
 }
 
 main "$@"

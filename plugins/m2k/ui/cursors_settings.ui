@@ -18,13 +18,13 @@
     <number>0</number>
    </property>
    <property name="leftMargin">
-    <number>18</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
-    <number>5</number>
+    <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>18</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
     <number>0</number>
@@ -54,11 +54,23 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>278</width>
-        <height>598</height>
+        <width>314</width>
+        <height>603</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_7">
+       <property name="leftMargin">
+        <number>10</number>
+       </property>
+       <property name="topMargin">
+        <number>10</number>
+       </property>
+       <property name="rightMargin">
+        <number>10</number>
+       </property>
+       <property name="bottomMargin">
+        <number>10</number>
+       </property>
        <item>
         <widget class="QLabel" name="label">
          <property name="sizePolicy">
@@ -76,28 +88,6 @@
         </widget>
        </item>
        <item>
-        <widget class="Line" name="line">
-         <property name="minimumSize">
-          <size>
-           <width>240</width>
-           <height>2</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>280</width>
-           <height>2</height>
-          </size>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="blue_line" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -108,10 +98,38 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>0</width>
-           <height>15</height>
+           <height>9</height>
           </size>
          </property>
         </spacer>
+       </item>
+       <item>
+        <widget class="Line" name="line">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>240</width>
+           <height>2</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>2</height>
+          </size>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="blue_line" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -161,12 +179,18 @@
                <bool>true</bool>
               </property>
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
               <property name="minimumSize">
+               <size>
+                <width>238</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
                <size>
                 <width>238</width>
                 <height>30</height>
@@ -376,9 +400,6 @@ color: rgba(255,255,255,51);
            </item>
            <item>
             <widget class="scopy::SmallOnOffSwitch" name="btnLockHorizontal">
-             <property name="styleSheet">
-              <string notr="true">QPushButton[use_icon=true]</string>
-             </property>
              <property name="text">
               <string/>
              </property>
@@ -527,9 +548,6 @@ color: rgba(255,255,255,51);
             </item>
             <item>
              <widget class="scopy::SmallOnOffSwitch" name="btnLockVertical">
-              <property name="styleSheet">
-               <string notr="true">QPushButton[use_icon=true]</string>
-              </property>
               <property name="text">
                <string/>
               </property>
@@ -739,8 +757,8 @@ color: rgba(255,255,255,51);
               </property>
               <property name="minimumSize">
                <size>
-                <width>80</width>
-                <height>80</height>
+                <width>100</width>
+                <height>100</height>
                </size>
               </property>
              </widget>
@@ -776,7 +794,7 @@ color: rgba(255,255,255,51);
   <customwidget>
    <class>scopy::CustomSwitch</class>
    <extends>QPushButton</extends>
-   <header>customSwitch.h</header>
+   <header>gui/customSwitch.h</header>
   </customwidget>
   <customwidget>
    <class>scopy::SmallOnOffSwitch</class>

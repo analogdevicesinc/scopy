@@ -289,8 +289,8 @@
 			"sources": [
 				{
 					"type": "git",
-					"url": "https://github.com/sigrokproject/libserialport",
-					"branch" : "master"
+					"url": "https://github.com/cseci/libserialport",
+					"branch" : "scopy-v2"
 				}
 			]
 
@@ -317,7 +317,7 @@
 				{
 					"type": "git",
 					"url": "https://github.com/analogdevicesinc/libiio",
-					"tag": "libiio-v0"
+					"tag": "v0.26"
 				}
 			]
 		},
@@ -432,7 +432,7 @@
 				{
 					"type": "git",
 					"url": "https://github.com/cseci/qwt",
-					"branch": "qwt-multiaxes"
+					"branch": "qwt-multiaxes-updated"
 				},
 				{
 					"type": "script",
@@ -485,7 +485,21 @@
 				}
 			]
 		},
-
+		{
+			"name": "KDDockWidgets",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app"
+			],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/KDAB/KDDockWidgets.git",
+					"branch": "2.1"
+				}
+			]
+		},
 		{
 			"name": "iio-emu",
 			"builddir": true,

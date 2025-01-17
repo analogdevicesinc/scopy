@@ -36,26 +36,58 @@
     <number>0</number>
    </property>
    <property name="leftMargin">
-    <number>18</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>10</number>
    </property>
    <property name="rightMargin">
-    <number>8</number>
-   </property>
-   <property name="bottomMargin">
     <number>0</number>
    </property>
+   <property name="bottomMargin">
+    <number>10</number>
+   </property>
    <item>
-    <widget class="QLabel" name="label_title">
-     <property name="text">
-      <string>Trigger Settings</string>
+    <layout class="QVBoxLayout" name="verticalLayout_13">
+     <property name="spacing">
+      <number>15</number>
      </property>
-     <property name="general_settings_label" stdset="0">
-      <bool>true</bool>
+     <property name="leftMargin">
+      <number>10</number>
      </property>
-    </widget>
+     <item>
+      <widget class="QLabel" name="label_title">
+       <property name="text">
+        <string>Trigger Settings</string>
+       </property>
+       <property name="general_settings_label" stdset="0">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line_under_title">
+       <property name="minimumSize">
+        <size>
+         <width>240</width>
+         <height>2</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>240</width>
+         <height>2</height>
+        </size>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="blue_line" stdset="0">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <spacer name="verticalSpacer_2">
@@ -74,28 +106,6 @@
     </spacer>
    </item>
    <item>
-    <widget class="Line" name="line_under_title">
-     <property name="minimumSize">
-      <size>
-       <width>240</width>
-       <height>2</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>240</width>
-       <height>2</height>
-      </size>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="blue_line" stdset="0">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QScrollArea" name="scrollArea">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
@@ -111,8 +121,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>266</width>
-        <height>959</height>
+        <width>292</width>
+        <height>958</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -120,13 +130,13 @@
         <number>20</number>
        </property>
        <property name="leftMargin">
-        <number>0</number>
+        <number>10</number>
        </property>
        <property name="topMargin">
         <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>2</number>
+        <number>10</number>
        </property>
        <property name="bottomMargin">
         <number>0</number>

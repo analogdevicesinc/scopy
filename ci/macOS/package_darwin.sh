@@ -18,6 +18,9 @@ cp $REPO_SRC/resources/scopy_emu_options_config.json Scopy.app/Contents/MacOS/pl
 cp -R $BUILDDIR/translations Scopy.app/Contents/MacOS
 cp -R $BUILDDIR/plugins/regmap/xmls Scopy.app/Contents/MacOS/plugins
 
+cp -R $BUILDDIR/translations $BUILDDIR/Scopy.app/Contents/MacOS/translations
+cp -R $BUILDDIR/style $BUILDDIR/Scopy.app/Contents/MacOS/style
+
 libqwtpath=${STAGING_AREA_DEPS}/lib/libqwt.6.4.0.dylib #hardcoded
 libqwtid="$(otool -D ${libqwtpath} | tail -1)"
 echo "=== Fixing libqwt"
@@ -120,7 +123,6 @@ echo "=== Fixing libserialport"
 libserialportpath="$(otool -L ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep libserialport | cut -d " " -f 1 | awk '{$1=$1};1')"
 libserialportid="$(echo ${libserialportpath} | rev | cut -d "/" -f 1 | rev)"
 install_name_tool -change ${libserialportpath} @executable_path/../Frameworks/${libserialportid} ./Scopy.app/Contents/Frameworks/iio.framework/iio
-ln -s $BUILDDIR/Scopy.app/Contents/Frameworks/libserialport*.dylib $BUILDDIR/Scopy.app/Contents/Frameworks/libserialport.0.dylib
 
 install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libm2k.dylib
 install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libm2k.?.?.?.dylib

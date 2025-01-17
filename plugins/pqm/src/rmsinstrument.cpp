@@ -30,7 +30,12 @@
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/tooltemplate.h>
 #include <QDesktopServices>
+#include <QDir>
+#include <QFileDialog>
 #include <QLoggingCategory>
+#include <style.h>
+#include <menuheader.h>
+#include <menulineedit.h>
 
 Q_LOGGING_CATEGORY(CAT_PQM_RMS, "PqmRms")
 
@@ -45,12 +50,14 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *instrumentLayout = new QHBoxLayout(this);
 	setLayout(instrumentLayout);
-	StyleHelper::GetInstance()->initColorMap();
+	instrumentLayout->setMargin(0);
 
 	ToolTemplate *tool = new ToolTemplate(this);
 	tool->topContainer()->setVisible(true);
 	tool->centralContainer()->setVisible(true);
 	tool->topContainerMenuControl()->setVisible(false);
+	tool->rightContainer()->setVisible(true);
+	tool->setRightContainerWidth(280);
 	instrumentLayout->addWidget(tool);
 
 	InfoBtn *infoBtn = new InfoBtn(this);
@@ -69,9 +76,10 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	voltageWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *voltageLayout = new QVBoxLayout();
 	voltageWidget->setLayout(voltageLayout);
-	voltageWidget->setStyleSheet("background-color:" + StyleHelper::getColor("UIElementBackground"));
+	Style::setBackgroundColor(voltageWidget, Style::getAttribute(json::theme::background_primary), true);
 
 	MeasurementsPanel *voltagePanel = new MeasurementsPanel(voltageWidget);
+	Style::setBackgroundColor(voltagePanel, Style::getAttribute(json::theme::background_primary));
 	createLabels(voltagePanel, m_chnls["voltage"].values(),
 		     {"RMS", "Angle", "Deviation under", "Deviation over", "Pinst", "Pst", "Plt"});
 	createLabels(voltagePanel, {DEVICE_NAME}, {"U2", "U0", "Sneg V", "Spos V", "Szro V"});
@@ -87,9 +95,10 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	currentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *currentLayout = new QVBoxLayout();
 	currentWidget->setLayout(currentLayout);
-	currentWidget->setStyleSheet("background-color:" + StyleHelper::getColor("UIElementBackground"));
+	Style::setBackgroundColor(currentWidget, Style::getAttribute(json::theme::background_primary), true);
 
 	MeasurementsPanel *currentPanel = new MeasurementsPanel(currentWidget);
+	Style::setBackgroundColor(currentPanel, Style::getAttribute(json::theme::background_primary));
 	createLabels(currentPanel, m_chnls["current"].values(), {"RMS", "Angle"});
 	createLabels(currentPanel, {DEVICE_NAME}, {"I2", "I0", "Sneg I", "Spos I", "Szro I"});
 	currentPanel->refreshUi();
@@ -107,11 +116,23 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 
 	tool->addWidgetToCentralContainerHelper(central);
 
+	GearBtn *settingsBtn = new GearBtn(this);
+	settingsBtn->setChecked(true);
+	tool->rightStack()->add("settings", createSettingsMenu(this));
+	connect(settingsBtn, &QPushButton::toggled, this, [=, this](bool b) { tool->openRightContainerHelper(b); });
 	m_runBtn = new RunBtn(this);
 	m_singleBtn = new SingleShotBtn(this);
+	QPushButton *pqEventsBtn = createPQEventsBtn(this);
+	connect(this, &RmsInstrument::pqEvent, this, [this, pqEventsBtn]() {
+		if(!pqEventsBtn->isChecked()) {
+			pqEventsBtn->setChecked(m_running);
+		}
+	});
 
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
+	tool->addWidgetToTopContainerHelper(settingsBtn, TTA_RIGHT);
+	tool->addWidgetToTopContainerHelper(pqEventsBtn, TTA_LEFT);
 
 	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
 	connect(this, &RmsInstrument::enableTool, m_tme, &ToolMenuEntry::setRunning);
@@ -125,6 +146,7 @@ RmsInstrument::~RmsInstrument()
 {
 	m_labels.clear();
 	m_attributes.clear();
+	ResourceManager::close("pqm" + m_uri);
 }
 
 void RmsInstrument::createLabels(MeasurementsPanel *mPanel, QStringList chnls, QStringList labels, QString color)
@@ -133,7 +155,7 @@ void RmsInstrument::createLabels(MeasurementsPanel *mPanel, QStringList chnls, Q
 	QString c = color;
 	for(const QString &ch : chnls) {
 		if(chnls.size() > 1) {
-			c = StyleHelper::getColor("CH" + QString::number(chIdx));
+			c = StyleHelper::getChannelColor(chIdx);
 		}
 		for(const QString &l : labels) {
 			MeasurementLabel *ml = new MeasurementLabel(mPanel);
@@ -168,7 +190,7 @@ void RmsInstrument::updateLabels()
 
 void RmsInstrument::initPlot(PolarPlotWidget *plot)
 {
-	plot->setBgColor(QColor(StyleHelper::getColor("ScopyBackground")));
+	plot->setBgColor(QColor(Style::getAttribute(json::theme::background_plot)));
 	plot->setAzimuthInterval(0.0, 360.0, 30.0);
 	plot->plot()->insertLegend(new QwtLegend(), QwtPolarPlot::LeftLegend);
 }
@@ -177,7 +199,7 @@ void RmsInstrument::setupPlotChannels(PolarPlotWidget *plot, QMap<QString, QStri
 {
 	int chIdx = 0;
 	for(const QString &ch : channels) {
-		QPen chPen = QPen(QColor(StyleHelper::getColor("CH" + QString::number(chIdx))), 1);
+		QPen chPen = QPen(QColor(StyleHelper::getChannelColor(chIdx)), 1);
 		PolarPlotChannel *plotCh = new PolarPlotChannel(channels.key(ch), chPen, plot, this);
 		plotCh->setThickness(thickness);
 		plotCh->setEnabled(true);
@@ -250,6 +272,91 @@ void RmsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> data)
 	if(m_singleBtn->isChecked()) {
 		m_singleBtn->setChecked(false);
 	}
+}
+
+QWidget *RmsInstrument::createSettingsMenu(QWidget *parent)
+{
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setMargin(0);
+	layout->setSpacing(10);
+
+	MenuHeaderWidget *header = new MenuHeaderWidget(
+		"Settings", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), widget);
+	QWidget *logSection = createMenuLogSection(widget);
+
+	layout->addWidget(header);
+	layout->addWidget(logSection);
+	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	return widget;
+}
+
+QWidget *RmsInstrument::createMenuLogSection(QWidget *parent)
+{
+	MenuSectionCollapseWidget *logSection = new MenuSectionCollapseWidget(
+		"LOG", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, parent);
+	logSection->contentLayout()->setSpacing(10);
+	logSection->setCollapsed(true);
+
+	QWidget *browseWidget = new QWidget(logSection);
+	browseWidget->setLayout(new QHBoxLayout(browseWidget));
+	browseWidget->layout()->setMargin(0);
+
+	MenuLineEdit *logFilePath = new MenuLineEdit(browseWidget);
+	logFilePath->edit()->setPlaceholderText("Select log directory");
+	QPushButton *browseBtn = new QPushButton("...", browseWidget);
+	StyleHelper::BrowseButton(browseBtn);
+
+	browseWidget->layout()->addWidget(logFilePath);
+	browseWidget->layout()->addWidget(browseBtn);
+
+	connect(this, &RmsInstrument::enableTool, this, [this, logFilePath, logSection](bool en) {
+		logSection->setDisabled(en);
+		QString dirPath = logFilePath->edit()->text();
+		QDir logDir = QDir(dirPath);
+		logSection->setCollapsed(dirPath.isEmpty() || !logDir.exists());
+		if(en && !logSection->collapsed()) {
+			Q_EMIT logData(PqmDataLogger::Rms, dirPath);
+		} else {
+			Q_EMIT logData(PqmDataLogger::None, "");
+		}
+	});
+	connect(browseBtn, &QPushButton::clicked, this, [this, logFilePath]() { browseFile(logFilePath->edit()); });
+
+	logSection->add(browseWidget);
+
+	return logSection;
+}
+
+QPushButton *RmsInstrument::createPQEventsBtn(QWidget *parent)
+{
+	QPushButton *btn = new QPushButton("PQEvents", parent);
+	btn->setCheckable(true);
+	btn->setChecked(false);
+	btn->setEnabled(false);
+	Style::setStyle(btn, style::properties::button::squareIconButton);
+	btn->setFixedWidth(128);
+
+	QIcon bellIcon;
+	bellIcon.addPixmap(
+		Style::getPixmap(":/gui/icons/notification_bell.svg", Style::getColor(json::theme::content_inverse)),
+		QIcon::Normal, QIcon::Off);
+	bellIcon.addPixmap(Style::getPixmap(":/gui/icons/notification_bell.svg", QColor("red")), QIcon::Normal,
+			   QIcon::On);
+	btn->setIcon(bellIcon);
+	btn->setLayoutDirection(Qt::RightToLeft);
+	connect(btn, &QPushButton::toggled, btn, &QPushButton::setEnabled);
+
+	return btn;
+}
+
+void RmsInstrument::browseFile(QLineEdit *lineEditPath)
+{
+	QString dirPath =
+		QFileDialog::getExistingDirectory(this, "Select a directory", "directoryToOpen",
+						  QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+	lineEditPath->setText(dirPath);
 }
 
 #include "moc_rmsinstrument.cpp"

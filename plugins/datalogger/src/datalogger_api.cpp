@@ -124,7 +124,7 @@ QString DataLogger_API::getToolList()
 {
 	Q_ASSERT(!m_dataLoggerPlugin->m_toolList.isEmpty());
 	QString tools = "";
-	for(ToolMenuEntry *tool : m_dataLoggerPlugin->m_toolList) {
+	for(ToolMenuEntry *tool : qAsConst(m_dataLoggerPlugin->m_toolList)) {
 		if(tool->pluginName() == "DataLoggerPlugin") {
 			tools += tool->name() + "\n";
 		}

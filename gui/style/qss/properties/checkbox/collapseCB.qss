@@ -1,0 +1,21 @@
+QCheckBox[&&property&&=true] {
+	width:16px;
+	height:16px;
+	background-color: rgba(128,128,128,0);
+	color: rgba(255, 255, 255, 0);
+}
+QCheckBox::indicator[&&property&&=true] {
+	width: 12px;
+	height: 12px;
+	border: 2px transparent;
+	background-color: transparent;
+	image: none;
+}
+QCheckBox::indicator[&&property&&=true]:unchecked {
+	image: url(&sba_cmb_box_arrow_right&);
+	background-color: transparent;
+}
+QCheckBox::indicator[&&property&&=true]:checked {
+	image: url(&sba_cmb_box_arrow&);
+	background-color: transparent;
+}

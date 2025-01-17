@@ -29,6 +29,7 @@
 #include <QOpenGLFunctions>
 #include <browsemenu.h>
 #include <deviceautoconnect.h>
+#include <style.h>
 
 #include "logging_categories.h"
 #include "qmessagebox.h"
@@ -71,6 +72,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 {
 	QElapsedTimer timer;
 	timer.start();
+	initPreferences();
 	ui->setupUi(this);
 
 	ScopyTitleManager::setMainWindow(this);
@@ -78,12 +80,11 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ScopyTitleManager::setScopyVersion("v" + QString(scopy::config::version()));
 	ScopyTitleManager::setGitHash(QString(SCOPY_VERSION_GIT));
 
-	StyleHelper::GetInstance()->initColorMap();
 	IIOUnitsManager::GetInstance();
 	setAttribute(Qt::WA_QuitOnClose, true);
 	initPythonWIN32();
 	initStatusBar();
-	initPreferences();
+	setupPreferences();
 
 	ConnectionProvider::GetInstance();
 	MessageBroker::GetInstance();
@@ -104,13 +105,14 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(browseMenu, SIGNAL(requestSave()), this, SLOT(save()));
 	connect(browseMenu, &BrowseMenu::collapsed, this, [this](bool coll) {
 		if(coll) {
-			ui->animHolder->setAnimMin(40);
+			ui->animHolder->setAnimMin(Style::getDimension(json::global::unit_4));
 		} else {
 			ui->animHolder->setAnimMax(230);
 		}
 		ui->animHolder->toggleMenu(!coll);
 	});
 	////////
+	Style::setBackgroundColor(ui->centralwidget, json::theme::background_primary);
 
 	scanTask = new IIOScanTask(this);
 	scanTask->setScanParams("usb");
@@ -337,43 +339,9 @@ void ScopyMainWindow::initTranslations()
 	t->loadTranslations(Preferences::GetInstance()->get("general_language").toString());
 }
 
-void ScopyMainWindow::initPreferences()
+void ScopyMainWindow::setupPreferences()
 {
-	QElapsedTimer timer;
-	timer.start();
-	QString preferencesPath = scopy::config::preferencesFolderPath() + "/preferences.ini";
-	Preferences *p = Preferences::GetInstance();
-	p->setPreferencesFilename(preferencesPath);
-	p->load();
-	p->init("autoconnect_previous", false);
-	p->init("general_first_run", true);
-	p->init("general_save_session", true);
-	p->init("general_save_attached", true);
-	p->init("general_doubleclick_attach", true);
-#if defined(__arm__)
-	p->init("general_use_opengl", false);
-#else
-	p->init("general_use_opengl", true);
-#endif
-	p->init("general_use_animations", true);
-	p->init("general_theme", "default");
-	p->init("general_language", "en");
-	p->init("show_grid", true);
-	p->init("show_graticule", false);
-	p->init("iiowidgets_use_lazy_loading", true);
-	p->init("general_plot_target_fps", "60");
-	p->init("general_show_plot_fps", true);
-	p->init("general_use_native_dialogs", false);
-	p->init("general_additional_plugin_path", "");
-	p->init("general_load_decoders", true);
-	p->init("general_doubleclick_ctrl_opens_menu", true);
-	p->init("general_check_online_version", false);
-	p->init("general_show_status_bar", true);
-	p->init("general_connect_to_multiple_devices", true);
-	p->init("general_scan_for_devices", true);
-
-	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
-
+	auto p = Preferences::GetInstance();
 	if(p->get("general_use_opengl").toBool()) {
 		m_glLoader = new QOpenGLWidget(this);
 	}
@@ -391,6 +359,47 @@ void ScopyMainWindow::initPreferences()
 
 		QMetaObject::invokeMethod(license, &LicenseOverlay::showOverlay, Qt::QueuedConnection);
 	}
+}
+
+void ScopyMainWindow::initPreferences()
+{
+	QElapsedTimer timer;
+	timer.start();
+	QString preferencesPath = scopy::config::preferencesFolderPath() + "/preferences.ini";
+	Preferences *p = Preferences::GetInstance();
+	p->setPreferencesFilename(preferencesPath);
+	p->load();
+	p->init("autoconnect_previous", false);
+	p->init("general_first_run", true);
+	p->init("general_save_session", true);
+	p->init("general_save_attached", true);
+	p->init("general_doubleclick_attach", true);
+#if defined(__linux__) && (defined(__arm__) || defined(__aarch64__))
+	p->init("general_use_opengl", false);
+#else
+	p->init("general_use_opengl", true);
+#endif
+	p->init("general_use_animations", true);
+	p->init("font_scale", "1");
+	p->init("general_theme", "Scopy");
+	p->init("general_language", "en");
+	p->init("show_grid", true);
+	p->init("show_graticule", false);
+	p->init("iiowidgets_use_lazy_loading", true);
+	p->init("general_plot_target_fps", "60");
+	p->init("general_show_plot_fps", false);
+	p->init("general_use_native_dialogs", false);
+	p->init("general_additional_plugin_path", "");
+	p->init("general_load_decoders", true);
+	p->init("general_doubleclick_ctrl_opens_menu", true);
+	p->init("general_check_online_version", false);
+	p->init("general_show_status_bar", true);
+	p->init("general_connect_to_multiple_devices", true);
+	p->init("general_scan_for_devices", true);
+
+	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
+
+	Style::GetInstance()->setTheme(Preferences::GetInstance()->get("general_theme").toString());
 
 	QString theme = p->get("general_theme").toString();
 	QString themeName = "scopy-" + theme;
@@ -487,13 +496,12 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 
 	if(str == "general_use_opengl") {
 		Q_EMIT p->restartRequired();
-
 	} else if(str == "general_use_animations") {
 		AnimationManager::getInstance().toggleAnimations(val.toBool());
-
 	} else if(str == "general_theme") {
 		Q_EMIT p->restartRequired();
-
+	} else if(str == "font_scale") {
+		Q_EMIT p->restartRequired();
 	} else if(str == "general_language") {
 		Q_EMIT p->restartRequired();
 	} else if(str == "general_show_status_bar") {

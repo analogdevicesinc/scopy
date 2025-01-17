@@ -11,7 +11,8 @@ SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 [ "$CI_SCRIPT" == "ON" ] && USE_STAGING=OFF
 
-LIBIIO_VERSION=libiio-v0
+LIBSERIALPORT_BRANCH=scopy-v2
+LIBIIO_VERSION=v0.26
 LIBAD9361_BRANCH=main
 LIBM2K_BRANCH=main
 SPDLOG_BRANCH=v1.x
@@ -23,6 +24,7 @@ LIBSIGROKDECODE_BRANCH=master
 QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 IIOEMU_BRANCH=main
+KDDOCK_BRANCH=2.1
 
 QT=/opt/Qt/5.15.2/gcc_64
 QMAKE_BIN=$QT/bin/qmake
@@ -66,6 +68,7 @@ clone() {
 	echo "#######CLONE#######"
 	mkdir -p $STAGING_AREA
 	pushd $STAGING_AREA
+	[ -d 'libserialport' ] || git clone --recursive https://github.com/cseci/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
@@ -78,6 +81,7 @@ clone() {
 	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	[ -d 'iio-emu' ]	|| git clone --recursive https://github.com/analogdevicesinc/iio-emu -b $IIOEMU_BRANCH iio-emu
+	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 	popd
 }
 
@@ -101,8 +105,8 @@ install_packages() {
 	sudo apt -y upgrade
 	sudo apt -y --no-install-recommends install autoconf autogen bison build-essential cmake curl doxygen flex g++ git graphviz libaio-dev libavahi-client-dev \
 		libboost-all-dev libfftw3-3 libfftw3-bin libfftw3-dev libgmp3-dev libglib2.0-dev libglibmm-2.4-dev \
-		libgl1-mesa-dev liblog4cpp5-dev liblog4cpp5v5 libmatio-dev liborc-0.4-dev libpython3-all-dev libserialport0 \
-		libserialport-dev libsigc++-2.0-dev libsndfile1-dev libtool libusb-1.0-0-dev libxml2-dev libzip-dev \
+		libgl1-mesa-dev liblog4cpp5-dev liblog4cpp5v5 libmatio-dev liborc-0.4-dev libpython3-all-dev \
+		libsigc++-2.0-dev libsndfile1-dev libtool libusb-1.0-0-dev libxml2-dev libzip-dev \
 		libzmq3-dev mesa-common-dev pkg-config python3-dev python3 python3-numpy python3-pip subversion swig vim wget unzip
 
 	pip3 install --no-cache-dir mako
@@ -113,6 +117,22 @@ install_qt() {
 	# installing Qt using the aqt tool https://github.com/miurahr/aqtinstall
 	sudo pip3 install --no-cache-dir aqtinstall
 	sudo python3 -m aqt install-qt --outputdir /opt/Qt linux desktop 5.15.2
+}
+
+build_libserialport(){
+	CURRENT_BUILD=libserialport
+	pushd $STAGING_AREA/$CURRENT_BUILD
+	git clean -xdf
+
+	INSTALL=$1
+	[ -z $INSTALL ] && INSTALL=ON
+
+	./autogen.sh
+	[ "$USE_STAGING" == "ON" ] && ./configure --prefix $STAGING_AREA_DEPS  || ./configure
+
+	make $JOBS
+	[ "$INSTALL" == "ON" ] && sudo make install
+	popd
 }
 
 build_libiio() {
@@ -270,6 +290,14 @@ build_libtinyiiod() {
 	popd
 }
 
+build_kddock () {
+	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
+	pushd $STAGING_AREA/KDDockWidgets
+	CURRENT_BUILD_CMAKE_OPTS=""
+	build_with_cmake $1
+	popd
+}
+
 build_iio-emu() {
 	echo "### Building iio-emu - branch $IIOEMU_BRANCH"
 	pushd $STAGING_AREA/iio-emu
@@ -295,6 +323,7 @@ build_scopy() {
 
 build_deps(){
 	clone
+	build_libserialport ON
 	build_libiio ON
 	build_libad9361 ON
 	build_spdlog ON
@@ -306,6 +335,7 @@ build_deps(){
 	build_qwt ON
 	build_libsigrokdecode ON
 	build_libtinyiiod ON
+	build_kddock ON
 	build_iio-emu ON
 }
 

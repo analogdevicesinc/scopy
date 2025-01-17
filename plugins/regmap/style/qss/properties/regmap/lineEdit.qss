@@ -1,0 +1,7 @@
+QLineEdit[&&property&&=true]  {
+    font-size: &unit_1&px;
+	font-style: normal;
+	font-weight: normal;
+	text-align: left;
+	border-bottom: 0px;
+}

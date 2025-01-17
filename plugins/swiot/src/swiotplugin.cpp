@@ -26,6 +26,7 @@
 #include <stylehelper.h>
 #include <menusectionwidget.h>
 #include <iioutil/cmdqpingtask.h>
+#include <style.h>
 
 #include "swiot_logging_categories.h"
 #include "max14906/max14906.h"
@@ -119,6 +120,7 @@ bool SWIOTPlugin::loadPage()
 bool SWIOTPlugin::loadExtraButtons()
 {
 	m_btnIdentify = new QPushButton("Identify");
+	Style::setStyle(m_btnIdentify, style::properties::button::basicButton);
 	m_extraButtons.append(m_btnIdentify);
 	connect(m_btnIdentify, SIGNAL(clicked()), m_swiotController, SLOT(identify()));
 
@@ -134,13 +136,18 @@ bool SWIOTPlugin::loadIcon()
 
 void SWIOTPlugin::loadToolList()
 {
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY(CONFIG_TME_ID, "Config", ":/gui/icons/scopy-default/icons/tool_debugger.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(CONFIG_TME_ID, "Config",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(AD74413R_TME_ID, "AD74413R",
-						  ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY(MAX14906_TME_ID, "MAX14906", ":/gui/icons/scopy-default/icons/tool_io.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(FAULTS_TME_ID, "Faults", ":/swiot/tool_faults.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_oscilloscope.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(MAX14906_TME_ID, "MAX14906",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_io.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(FAULTS_TME_ID, "Faults",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_power_supply.svg"));
 }
 
 void SWIOTPlugin::unload()
@@ -296,11 +303,11 @@ void SWIOTPlugin::createStatusContainer()
 	m_statusContainer->layout()->setContentsMargins(0, 0, 0, 0);
 
 	auto exclamationIcon = new QPushButton(m_statusContainer);
-	StyleHelper::NoBackgroundIconButton(exclamationIcon, QIcon::fromTheme(":/swiot/warning.svg"));
+	StyleHelper::NoBackgroundIconButton(exclamationIcon, Style::getPixmap(":/swiot/warning.svg"));
 
 	auto statusLabel = new QLabel("AD-SWIOT1L-SL: The system is powered at limited capacity.");
 	statusLabel->setWordWrap(true);
-	StyleHelper::WarningLabel(statusLabel, "extPsuStatusLabel");
+	Style::setStyle(statusLabel, style::properties::label::warning);
 
 	m_statusContainer->layout()->addWidget(exclamationIcon);
 	m_statusContainer->layout()->addWidget(statusLabel);
@@ -365,95 +372,6 @@ void SWIOTPlugin::clearPingTask()
 }
 
 QString SWIOTPlugin::description() { return "Adds functionality specific to SWIOT1L board"; }
-
-void SWIOTPlugin::initPreferences()
-{
-	Preferences *p = Preferences::GetInstance();
-	p->init("ad74413r_start_tutorial", true);
-	p->init("max14906_start_tutorial", true);
-	p->init("faults_start_tutorial", true);
-	p->init("swiote_config_start_tutorial", true);
-}
-
-bool SWIOTPlugin::loadPreferencesPage()
-{
-	Preferences *p = Preferences::GetInstance();
-
-	m_preferencesPage = new QWidget();
-	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
-
-	MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
-	MenuCollapseSection *generalSection = new MenuCollapseSection(
-		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, generalWidget);
-	generalWidget->contentLayout()->setSpacing(10);
-	generalWidget->contentLayout()->addWidget(generalSection);
-	generalSection->contentLayout()->setSpacing(10);
-	lay->setMargin(0);
-	lay->addWidget(generalWidget);
-	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
-
-	QWidget *resetTutorialAd74413rWidget = new QWidget();
-	QHBoxLayout *resetTutorialAd74413rWidgetLayout = new QHBoxLayout();
-
-	resetTutorialAd74413rWidget->setLayout(resetTutorialAd74413rWidgetLayout);
-	resetTutorialAd74413rWidgetLayout->setMargin(0);
-
-	QPushButton *resetTutorialAd74413r = new QPushButton("Reset", generalSection);
-	connect(resetTutorialAd74413r, &QPushButton::clicked, this,
-		[=, this]() { p->set("ad74413r_start_tutorial", true); });
-
-	QWidget *resetTutorialMax14906Widget = new QWidget();
-	QHBoxLayout *resetTutorialMax14906WidgetLayout = new QHBoxLayout();
-
-	resetTutorialMax14906Widget->setLayout(resetTutorialMax14906WidgetLayout);
-	resetTutorialMax14906WidgetLayout->setMargin(0);
-
-	QPushButton *resetTutorialMax14906 = new QPushButton("Reset ", generalSection);
-	connect(resetTutorialMax14906, &QPushButton::clicked, this,
-		[=, this]() { p->set("max14906_start_tutorial", true); });
-
-	QWidget *resetTutorialFaultsWidget = new QWidget();
-	QHBoxLayout *resetTutorialFaultsWidgetLayout = new QHBoxLayout();
-
-	resetTutorialFaultsWidget->setLayout(resetTutorialFaultsWidgetLayout);
-	resetTutorialFaultsWidgetLayout->setMargin(0);
-
-	QPushButton *resetTutorialFaults = new QPushButton("Reset ", generalSection);
-	connect(resetTutorialFaults, &QPushButton::clicked, this,
-		[=, this]() { p->set("faults_start_tutorial", true); });
-
-	QWidget *resetTutorialConfigurationWidget = new QWidget();
-	QHBoxLayout *resetTutorialConfigurationWidgetLayout = new QHBoxLayout();
-
-	resetTutorialConfigurationWidget->setLayout(resetTutorialConfigurationWidgetLayout);
-	resetTutorialConfigurationWidgetLayout->setMargin(0);
-
-	QPushButton *resetTutorialConfig = new QPushButton("Reset ", generalSection);
-	connect(resetTutorialConfig, &QPushButton::clicked, this,
-		[=, this]() { p->set("swiote_config_start_tutorial", true); });
-
-	StyleHelper::BlueButton(resetTutorialAd74413r, "resetBtn");
-	resetTutorialMax14906WidgetLayout->addWidget(new QLabel("Ad74413r tutorial"), 6);
-	resetTutorialMax14906WidgetLayout->addWidget(resetTutorialAd74413r, 1);
-	generalSection->contentLayout()->addWidget(resetTutorialAd74413rWidget);
-
-	StyleHelper::BlueButton(resetTutorialMax14906, "resetBtn");
-	resetTutorialAd74413rWidgetLayout->addWidget(new QLabel("Max14906 tutorial"), 6);
-	resetTutorialAd74413rWidgetLayout->addWidget(resetTutorialMax14906, 1);
-	generalSection->contentLayout()->addWidget(resetTutorialMax14906Widget);
-
-	StyleHelper::BlueButton(resetTutorialFaults, "resetBtn");
-	resetTutorialFaultsWidgetLayout->addWidget(new QLabel("Faults tutorial"), 6);
-	resetTutorialFaultsWidgetLayout->addWidget(resetTutorialFaults, 1);
-	generalSection->contentLayout()->addWidget(resetTutorialFaultsWidget);
-
-	StyleHelper::BlueButton(resetTutorialConfig, "resetBtn");
-	resetTutorialConfigurationWidgetLayout->addWidget(new QLabel("Configuration tutorial"), 6);
-	resetTutorialConfigurationWidgetLayout->addWidget(resetTutorialConfig, 1);
-	generalSection->contentLayout()->addWidget(resetTutorialConfigurationWidget);
-
-	return true;
-}
 
 void SWIOTPlugin::initMetadata()
 {

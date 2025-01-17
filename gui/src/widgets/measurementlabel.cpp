@@ -20,6 +20,7 @@
 #include "widgets/measurementlabel.h"
 
 #include <QLabel>
+#include <style.h>
 
 using namespace scopy;
 
@@ -47,7 +48,7 @@ MeasurementLabel::MeasurementLabel(QWidget *parent)
 	lay->addWidget(m_valueLabel);
 	m_valueLabel->setAlignment(Qt::AlignRight);
 
-	m_color = StyleHelper::getColor("LabelText");
+	m_color = Style::getAttribute(json::theme::content_default);
 	StyleHelper::MeasurementPanelLabel(this, m_name + "MeasurementLabel");
 }
 

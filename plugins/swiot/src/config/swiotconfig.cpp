@@ -28,6 +28,7 @@
 #include <tutorialbuilder.h>
 #include <gui/stylehelper.h>
 #include <pluginbase/preferences.h>
+#include <style.h>
 
 #include <iioutil/connectionprovider.h>
 
@@ -39,6 +40,7 @@ SwiotConfig::SwiotConfig(QString uri, QWidget *parent)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *layout = new QHBoxLayout(this);
+	layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(layout);
 
 	// tool template configuration
@@ -89,12 +91,12 @@ QWidget *SwiotConfig::createGridHeader(QWidget *parent)
 
 	QLabel *deviceLabel = new QLabel(labels);
 	deviceLabel->setText("Device");
-	StyleHelper::MenuSmallLabel(deviceLabel);
+	Style::setStyle(deviceLabel, style::properties::label::menuSmall);
 	deviceLabel->setFixedWidth(DEVICE_COMBO_WIDTH);
 
 	QLabel *functionLabel = new QLabel(labels);
 	functionLabel->setText("Function");
-	StyleHelper::MenuSmallLabel(functionLabel);
+	Style::setStyle(functionLabel, style::properties::label::menuSmall);
 	functionLabel->setFixedWidth(FUNCTION_COMBO_WIDTH);
 
 	layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
@@ -158,7 +160,7 @@ void SwiotConfig::initTutorialProperties()
 QPushButton *SwiotConfig::createApplyBtn()
 {
 	auto *applyBtn = new QPushButton(this);
-	StyleHelper::BlueGrayButton(applyBtn, "applyBtn");
+	Style::setStyle(applyBtn, style::properties::button::basicButton);
 	applyBtn->setCheckable(false);
 	applyBtn->setText("Apply");
 	return applyBtn;

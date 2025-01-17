@@ -19,7 +19,10 @@
  */
 
 #include "configchannelview.h"
-#include <gui/stylehelper.h>
+#include <QHBoxLayout>
+#include <QEvent>
+#include <style.h>
+#include <stylehelper.h>
 
 using namespace scopy::swiot;
 
@@ -36,19 +39,20 @@ ConfigChannelView::ConfigChannelView(int channelIndex, QWidget *parent)
 
 	m_chnlLabel = new QLabel(this);
 	m_chnlLabel->setText(QString::fromStdString("Channel ") + QString::number(m_channelIndex + 1));
-	StyleHelper::MenuSmallLabel(m_chnlLabel);
+	Style::setStyle(m_chnlLabel, style::properties::label::menuSmall);
 
 	m_chnlCheck = new QCheckBox(this);
-	StyleHelper::BlueSquareCheckbox(m_chnlCheck);
 	Q_EMIT m_chnlCheck->toggled(true);
 
 	m_deviceOptions = new QComboBox(this);
 	m_deviceOptions->setFixedWidth(DEVICE_COMBO_WIDTH);
-	StyleHelper::MenuComboBox(m_deviceOptions);
+	StyleHelper::TransparentWidget(m_deviceOptions, "deviceOptions");
+	Style::setStyle(m_deviceOptions, style::properties::widget::solidBorder);
 
 	m_functionOptions = new QComboBox(this);
 	m_functionOptions->setFixedWidth(FUNCTION_COMBO_WIDTH);
-	StyleHelper::MenuComboBox(m_functionOptions);
+	StyleHelper::TransparentWidget(m_functionOptions, "functionOptions");
+	Style::setStyle(m_functionOptions, style::properties::widget::solidBorder);
 
 	layout->addWidget(m_chnlLabel);
 	layout->addWidget(m_chnlCheck);
@@ -87,7 +91,7 @@ void ConfigChannelView::connectSignalsAndSlots()
 
 void ConfigChannelView::setHighlightPalette()
 {
-	QString highlightColor = StyleHelper::getColor("UIElementHighlight");
+	QString highlightColor = Style::getAttribute(json::theme::content_silent);
 	QPalette newPalette = QPalette(palette());
 	newPalette.setColor(QPalette::Highlight, QColor(highlightColor));
 	setPalette(newPalette);

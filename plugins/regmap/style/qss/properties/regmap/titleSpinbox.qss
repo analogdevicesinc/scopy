@@ -1,0 +1,12 @@
+QWidget[&&property&&=true]  {
+	font-size: &font_size_3&;
+	font-style: normal;
+	font-weight: normal;
+	text-align: left;
+	color: &content_default& ;
+	background-color: &interactive_secondary_disabled& ;
+}
+						
+QSpinBox[&&property&&=true] {
+	border: 0px;
+}

@@ -28,6 +28,7 @@
 #include <QPushButton>
 #include <QTextBrowser>
 #include <QWidget>
+#include <hoverwidget.h>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT PopupWidget : public QWidget
@@ -45,6 +46,7 @@ public:
 	void enableTitleBar(bool enable = true);
 	void enableTintedOverlay(bool enable = true);
 	void setEnableExternalLinks(bool enable = true);
+	void enableCenterOnParent(bool enable = true);
 
 	QString getDescription();
 	void setDescription(const QString &description);
@@ -54,6 +56,10 @@ public:
 
 	QPushButton *getExitBtn();
 	QPushButton *getContinueBtn();
+
+	void enableCloseButton(bool en);
+
+	bool eventFilter(QObject *watched, QEvent *event) override;
 
 Q_SIGNALS:
 	void continueButtonClicked();
@@ -66,6 +72,8 @@ protected:
 	QTextBrowser *m_descriptionTextBrowser;
 	QPushButton *m_exitButton;
 	QPushButton *m_continueButton;
+	QPushButton *m_closeButton;
+	HoverWidget *m_closeHover;
 };
 } // namespace scopy
 

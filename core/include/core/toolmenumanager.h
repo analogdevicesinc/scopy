@@ -68,7 +68,7 @@ private:
 	void showTool(ToolMenuItem *toolMenuItem);
 	void selectTool(ToolMenuItem *toolMenuItem, bool on);
 	void setTmeAttached(ToolMenuEntry *tme);
-	void createMenuSectionLabel(MenuSectionCollapseWidget *section, QString uri);
+	MenuSectionCollapseWidget *createMenuSectionItem(QString deviceName, QString uri = "");
 	ToolMenuItem *createToolMenuItem(ToolMenuEntry *tme, QWidget *parent = nullptr);
 
 	QString m_prevItem;

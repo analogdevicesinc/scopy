@@ -27,6 +27,7 @@
 #include "scopy-regmap_export.h"
 
 #include <QWidget>
+#include <tutorialbuilder.h>
 
 class QHBoxLayout;
 class QSpinBox;
@@ -54,6 +55,18 @@ public:
 	void registerValueChanged(QString value);
 	QString getAddress();
 	void setHasMap(bool hasMap);
+	void startTutorial();
+	void startSimpleTutorial();
+
+Q_SIGNALS:
+	void requestRead(uint32_t address);
+	void requestWrite(uint32_t address, uint32_t value);
+	void registerAddressChanged(uint32_t address);
+	void valueChanged(QString value);
+	void toggleDetailedMenu(bool toggled);
+	void tutorialFinished();
+	void simpleTutorialFinished();
+	void tutorialAborted();
 
 private:
 	QHBoxLayout *mainLayout;
@@ -72,13 +85,8 @@ private:
 	bool addressChanged = false;
 	bool hasMap = false;
 	void applyStyle();
-
-Q_SIGNALS:
-	void requestRead(uint32_t address);
-	void requestWrite(uint32_t address, uint32_t value);
-	void registerAddressChanged(uint32_t address);
-	void valueChanged(QString value);
-	void toggleDetailedMenu(bool toggled);
+	gui::TutorialBuilder *registerMapTutorial;
+	gui::TutorialBuilder *registerMapSimpleTutorial;
 };
 } // namespace scopy::regmap
 #endif // REGISTERCONTROLLER_HPP

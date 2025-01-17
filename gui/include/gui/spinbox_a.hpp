@@ -79,7 +79,6 @@ public:
 	QPushButton *downButton();
 	QLabel *nameLabel();
 	QLineEdit *lineEdit();
-	QFrame *line();
 	QComboBox *comboBox();
 
 	double value();

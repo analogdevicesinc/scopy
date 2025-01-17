@@ -54,11 +54,14 @@ public Q_SLOTS:
 private:
 	QHBoxLayout *layout;
 	QLabel *value;
+	QLabel *bitfieldWidth;
+	QLabel *descriptionLabel;
 	int width;
 	int streach;
 	QString description;
 	QString name;
 	QFrame *mainFrame;
+	bool m_selected = false;
 
 Q_SIGNALS:
 };

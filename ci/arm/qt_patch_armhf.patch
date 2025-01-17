@@ -1,0 +1,54 @@
+--- new/qt-everywhere-src-5.15.2/qtbase/src/3rdparty/angle/include/EGL/eglplatform.h
++++ qt-everywhere-src-5.15.2/qtbase/src/3rdparty/angle/include/EGL/eglplatform.h
+@@ -141,6 +141,7 @@
+  */
+ typedef khronos_int32_t EGLint;
+ 
++typedef uint32_t DISPMANX_ELEMENT_HANDLE_T;
+ 
+ /* C++ / C typecast macros for special EGL handle values */
+ #if defined(__cplusplus)
+--- new/qt-everywhere-src-5.15.2/qtbase/src/gui/configure.json
++++ qt-everywhere-src-5.15.2/qtbase/src/gui/configure.json
+@@ -862,7 +862,10 @@
+             "type": "compile",
+             "test": {
+                 "include": [ "EGL/egl.h", "bcm_host.h" ],
+-                "main": "vc_dispmanx_display_open(0);"
++                "main": [
++                    "vc_dispmanx_display_open(0);",
++                    "EGL_DISPMANX_WINDOW_T *eglWindow = new EGL_DISPMANX_WINDOW_T;"
++                ]
+             },
+             "use": "egl bcm_host"
+         },
+--- new/qt-everywhere-src-5.15.2/qtbase/src/plugins/platforms/eglfs/deviceintegration/eglfs_brcm/qeglfsbrcmintegration.cpp
++++ qt-everywhere-src-5.15.2/qtbase/src/plugins/platforms/eglfs/deviceintegration/eglfs_brcm/qeglfsbrcmintegration.cpp
+@@ -44,6 +44,12 @@
+ 
+ static DISPMANX_DISPLAY_HANDLE_T dispman_display = 0;
+ 
++typedef struct {
++  DISPMANX_ELEMENT_HANDLE_T element;
++  int width;   /* This is necessary because dispmanx elements are not queriable. */
++  int height;
++} EGL_DISPMANX_WINDOW_T;
++
+ static EGLNativeWindowType createDispmanxLayer(const QPoint &pos, const QSize &size, int z, DISPMANX_FLAGS_ALPHA_T flags)
+ {
+     VC_RECT_T dst_rect;
+@@ -76,12 +82,12 @@
+     eglWindow->width = size.width();
+     eglWindow->height = size.height();
+ 
+-    return eglWindow;
++    return (EGLNativeWindowType)eglWindow;
+ }
+ 
+ static void destroyDispmanxLayer(EGLNativeWindowType window)
+ {
+-    EGL_DISPMANX_WINDOW_T *eglWindow = static_cast<EGL_DISPMANX_WINDOW_T *>(window);
++    EGL_DISPMANX_WINDOW_T *eglWindow = (EGL_DISPMANX_WINDOW_T*)(window);
+     DISPMANX_UPDATE_HANDLE_T dispman_update = vc_dispmanx_update_start(0);
+     vc_dispmanx_element_remove(dispman_update, eglWindow->element);
+     vc_dispmanx_update_submit_sync(dispman_update);

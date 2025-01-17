@@ -37,9 +37,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
 
-/* Perform tool reset */
-launcher.reset()
-
 /* Set Power Supply */
 function set_power_supply(){
 	
@@ -93,11 +90,23 @@ function set_dmm(){
 
 /* main function */
 function main(){
+	/* Feel free to modify this as needed */
+	var uri = "ip:192.168.2.1"
+
+	var devId = scopy.addDevice(uri)
+	var connected = scopy.connectDevice(devId)
+	msleep(1000)
+	if (!connected)
+		return Error()
+	
+	scopy.switchTool("Power Supply")
 	
 	set_power_supply()
 	
 	msleep(1000)
 	
+	scopy.switchTool("Digital I/O")
+
 	set_dmm()
 	
 	msleep(1000)
@@ -113,7 +122,12 @@ function main(){
 	
 	/* Print Channel 2 value to console */
 	printToConsole(ch2)
-	
+
+	scopy.disconnectDevice(devId)
+	scopy.removeDevice(uri)
+	msleep(1000)
 }
 
+/* To keep the application session after running a certain script */
+/* use the command line options: -r or --keep-running. */
 main()

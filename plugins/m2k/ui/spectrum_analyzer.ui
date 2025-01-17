@@ -13,9 +13,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true"/>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>0</number>
@@ -62,13 +59,13 @@
          <number>20</number>
         </property>
         <property name="topMargin">
-         <number>12</number>
+         <number>0</number>
         </property>
         <property name="rightMargin">
          <number>15</number>
         </property>
         <property name="bottomMargin">
-         <number>12</number>
+         <number>0</number>
         </property>
         <item>
          <spacer name="horizontalSpacer_11">
@@ -493,7 +490,7 @@ min-width: 6em;
            <item>
             <widget class="QStackedWidget" name="stackedWidget">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -507,16 +504,16 @@ min-width: 6em;
                 <number>15</number>
                </property>
                <property name="leftMargin">
-                <number>20</number>
+                <number>10</number>
                </property>
                <property name="topMargin">
-                <number>25</number>
+                <number>10</number>
                </property>
                <property name="rightMargin">
-                <number>20</number>
+                <number>10</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>10</number>
                </property>
                <item>
                 <widget class="QLabel" name="channelSettingsTitle">
@@ -891,16 +888,16 @@ min-width: 64px;
                 <number>0</number>
                </property>
                <property name="leftMargin">
-                <number>18</number>
+                <number>10</number>
                </property>
                <property name="topMargin">
-                <number>20</number>
+                <number>10</number>
                </property>
                <property name="rightMargin">
-                <number>18</number>
+                <number>10</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>10</number>
                </property>
                <item>
                 <widget class="QLabel" name="labelGeneralSettingsTitle">
@@ -1017,16 +1014,16 @@ min-width: 64px;
                 <number>0</number>
                </property>
                <property name="leftMargin">
-                <number>18</number>
+                <number>0</number>
                </property>
                <property name="topMargin">
-                <number>20</number>
+                <number>10</number>
                </property>
                <property name="rightMargin">
-                <number>18</number>
+                <number>0</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>10</number>
                </property>
                <item>
                 <widget class="QScrollArea" name="scrollArea">
@@ -1036,6 +1033,9 @@ min-width: 64px;
                  <property name="horizontalScrollBarPolicy">
                   <enum>Qt::ScrollBarAlwaysOff</enum>
                  </property>
+                 <property name="sizeAdjustPolicy">
+                  <enum>QAbstractScrollArea::AdjustToContents</enum>
+                 </property>
                  <property name="widgetResizable">
                   <bool>true</bool>
                  </property>
@@ -1044,8 +1044,8 @@ min-width: 64px;
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>298</width>
-                    <height>523</height>
+                    <width>336</width>
+                    <height>545</height>
                    </rect>
                   </property>
                   <property name="sizePolicy">
@@ -1055,10 +1055,22 @@ min-width: 64px;
                    </sizepolicy>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_16">
+                   <property name="leftMargin">
+                    <number>10</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>10</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
                    <item>
                     <layout class="QHBoxLayout" name="hLayout_title">
                      <property name="bottomMargin">
-                      <number>14</number>
+                      <number>9</number>
                      </property>
                      <item>
                       <widget class="QLabel" name="labelSettingsTitle">
@@ -1114,30 +1126,17 @@ min-width: 64px;
                     </widget>
                    </item>
                    <item>
-                    <spacer name="verticalSpacer_10">
-                     <property name="orientation">
-                      <enum>Qt::Vertical</enum>
-                     </property>
-                     <property name="sizeType">
-                      <enum>QSizePolicy::Fixed</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>20</width>
-                       <height>25</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                   <item>
                     <widget class="scopy::CustomSwitch" name="logBtn">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton {
-min-height: 30px;
-max-height: 30px;
 min-width: 280px;
 max-width: 280px;
-background-color: black;
 border-radius: 4px;
 }
 
@@ -1146,8 +1145,6 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.501, y2:0, stop
 }
 
 QWidget#handle {
-min-height: 30px;
-max-height: 30px;
 min-width: 142px;
 max-width: 142px;
 background-color: #4a64ff;
@@ -1166,13 +1163,10 @@ line-height: 19px;
 
 QLabel#on {
 margin-top: 0px;
-min-height:30px;
-max-height:30px;
 min-width:140px;
 max-width:140px;
 qproperty-alignment: AlignCenter AlignCenter;
 margin-left: 0px;
-color: white;
 }
 
 QLabel#on:disabled {
@@ -1181,12 +1175,9 @@ color: rgba(255,255,255,102);
 
 QLabel#off {
 margin-top: 0px;
-min-height:30px;
-max-height:30px;
 min-width:140px;
 max-width:140px;
 margin-left: 140px;
-color: white;
 qproperty-alignment: AlignCenter AlignCenter;
 }
 
@@ -1597,16 +1588,16 @@ color: rgba(255,255,255,51);
                 <number>0</number>
                </property>
                <property name="leftMargin">
-                <number>18</number>
+                <number>0</number>
                </property>
                <property name="topMargin">
-                <number>20</number>
+                <number>10</number>
                </property>
                <property name="rightMargin">
-                <number>18</number>
+                <number>0</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>10</number>
                </property>
                <item>
                 <widget class="QScrollArea" name="scrollArea_2">
@@ -1624,11 +1615,23 @@ color: rgba(255,255,255,51);
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>268</width>
-                    <height>547</height>
+                    <width>336</width>
+                    <height>545</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_17">
+                   <property name="leftMargin">
+                    <number>10</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>10</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
                    <item>
                     <layout class="QHBoxLayout" name="hLayout_markers_title">
                      <property name="bottomMargin">
@@ -1779,10 +1782,7 @@ color: rgba(255,255,255,51);
                       <widget class="QPushButton" name="pushButton_4">
                        <property name="styleSheet">
                         <string notr="true">QPushButton {
-color: white;
-background-color: black;
 
-font-size:14px;
 height: 30px;
 width: 120px;
 border-width: 0px;
@@ -2145,16 +2145,16 @@ border-width: 0px;
              <widget class="QWidget" name="addReference">
               <layout class="QVBoxLayout" name="verticalLayout_13">
                <property name="leftMargin">
-                <number>18</number>
+                <number>10</number>
                </property>
                <property name="topMargin">
-                <number>20</number>
+                <number>10</number>
                </property>
                <property name="rightMargin">
-                <number>18</number>
+                <number>10</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>10</number>
                </property>
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -2381,8 +2381,8 @@ border-width: 0px;
   background-color: transparent;
 }
 QPushButton:pressed { border-image: url(:/gui/icons/setup_btn_checked.svg); }
-QPushButton:!pressed { border-image: url(:/gui/icons/setup_btn_unchecked.svg); }
-QPushButton:hover:!pressed:!checked { border-image: url(:/gui/icons/setup_btn_hover.svg); }
+QPushButton:!pressed { border-image: url(:/gui/icons/scopy-default/icons/setup_btn_unchecked.svg); }
+QPushButton:hover:!pressed:!checked { border-image: url(:/gui/icons/scopy-default/icons/setup_btn_hover.svg); }
 QPushButton:checked { border-image: url(:/gui/icons/setup_btn_checked.svg); }</string>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout">
@@ -2568,7 +2568,6 @@ QPushButton:checked { border-image: url(:/gui/icons/setup_btn_checked.svg); }</s
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../gui/res/resources.qrc"/>
   <include location="../../../gui/res/resources.qrc"/>
  </resources>
  <connections>

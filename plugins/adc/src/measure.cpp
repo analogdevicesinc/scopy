@@ -1172,7 +1172,7 @@ void MeasureModel::setGatingEnabled(bool enable) { m_gatingEnabled = enable; }
 
 void MeasureModel::clearStats()
 {
-	for(auto meas : m_measurements) {
+	for(auto meas : qAsConst(m_measurements)) {
 		meas->clearStat();
 	}
 }
@@ -1183,7 +1183,7 @@ std::shared_ptr<MeasurementData> MeasureModel::measurement(int id) { return m_me
 
 std::shared_ptr<MeasurementData> MeasureModel::measurement(QString str)
 {
-	for(auto meas : m_measurements) {
+	for(auto meas : qAsConst(m_measurements)) {
 		if(meas->name() == str)
 			return meas;
 	}

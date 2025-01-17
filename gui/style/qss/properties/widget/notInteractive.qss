@@ -1,0 +1,6 @@
+*[&&property&&=true]::hover {
+background-color: transparent;
+}
+*[&&property&&=true]::pressed {
+background-color: transparent;
+}

@@ -31,6 +31,7 @@ git checkout -b <new_branch_name>
 
 - Implement feature – commit and push work as needed – refer to commit message structure
 - Apply code styling - (usually done by running `./tools/format.sh`)
+- Run license header completion - (usually done by running `./tools/license.sh`)
 - Resynchronize with latest changes to starting point and push again. Example
 ```bash
 git fetch

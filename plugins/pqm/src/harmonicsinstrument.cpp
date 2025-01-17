@@ -33,6 +33,7 @@
 #include <menulineedit.h>
 #include <menusectionwidget.h>
 #include <QDesktopServices>
+#include <style.h>
 
 using namespace scopy::pqm;
 
@@ -46,7 +47,7 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *instrumentLayout = new QHBoxLayout(this);
 	setLayout(instrumentLayout);
-	StyleHelper::GetInstance()->initColorMap();
+	instrumentLayout->setMargin(0);
 
 	ToolTemplate *tool = new ToolTemplate(this);
 	tool->topContainer()->setVisible(true);
@@ -67,6 +68,7 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 	tool->addWidgetToCentralContainerHelper(m_thdWidget);
 
 	m_table = new QTableWidget(MAX_CHNLS, NUMBER_OF_HARMONICS, this);
+	Style::setBackgroundColor(m_table, Style::getAttribute(json::theme::background_primary), true);
 	initTable();
 	tool->addWidgetToCentralContainerHelper(m_table);
 
@@ -83,9 +85,17 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 
 	m_runBtn = new RunBtn(this);
 	m_singleBtn = new SingleShotBtn(this);
+	QPushButton *pqEventsBtn = createPQEventsBtn(this);
+	connect(this, &HarmonicsInstrument::pqEvent, this, [this, pqEventsBtn]() {
+		if(!pqEventsBtn->isChecked()) {
+			pqEventsBtn->setChecked(m_running);
+		}
+	});
+
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(settingsMenuBtn, TTA_RIGHT);
+	tool->addWidgetToTopContainerHelper(pqEventsBtn, TTA_LEFT);
 
 	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
 	connect(this, &HarmonicsInstrument::enableTool, m_tme, &ToolMenuEntry::setRunning);
@@ -101,6 +111,7 @@ HarmonicsInstrument::~HarmonicsInstrument()
 	m_yValues.clear();
 	m_labels.clear();
 	m_plotChnls.clear();
+	ResourceManager::close("pqm" + m_uri);
 }
 
 void HarmonicsInstrument::showThdWidget(bool show) { m_thdWidget->setVisible(show); }
@@ -130,7 +141,7 @@ void HarmonicsInstrument::initTable()
 	for(int i = 0; i < HARMONICS_MIN_DEGREE; i++) {
 		m_table->horizontalHeader()->hideSection(i);
 	}
-	StyleHelper::TableViewWidget(m_table->parentWidget(), "HarmonicsTable");
+	Style::setStyle(m_table->parentWidget(), style::properties::widget::tableViewWidget, true, true);
 	for(int i = 0; i < MAX_CHNLS; i++) {
 		for(int j = 0; j < NUMBER_OF_HARMONICS; j++) {
 			QTableWidgetItem *tableItem = new QTableWidgetItem();
@@ -162,7 +173,7 @@ void HarmonicsInstrument::setupPlotChannels()
 	int chNumber = 0;
 	bool first = true;
 	for(const QString &ch : m_chnls) {
-		QPen chPen = QPen(QColor(StyleHelper::getColor("CH" + QString::number(chNumber))), 1);
+		QPen chPen = QPen(QColor(StyleHelper::getChannelColor(chNumber)), 1);
 		PlotChannel *plotCh = new PlotChannel(m_chnls.key(ch), chPen, m_plot->xAxis(), m_plot->yAxis(), this);
 		m_plot->addPlotChannel(plotCh);
 		plotCh->setStyle(PlotChannel::PCS_STICKS);
@@ -190,7 +201,7 @@ QWidget *HarmonicsInstrument::createThdWidget()
 	int chnlIdx = 0;
 	for(const QString &ch : m_chnls) {
 		MeasurementLabel *ml = new MeasurementLabel(this);
-		QString color = StyleHelper::getColor("CH" + QString::number(chnlIdx));
+		QString color = StyleHelper::getChannelColor(chnlIdx);
 		ml->setColor(QColor(color));
 		ml->setName(m_chnls.key(ch));
 		ml->setPrecision(7);
@@ -208,7 +219,8 @@ QWidget *HarmonicsInstrument::createSettingsMenu(QWidget *parent)
 	layout->setMargin(0);
 	layout->setSpacing(10);
 
-	MenuHeaderWidget *header = new MenuHeaderWidget("Settings", QPen(StyleHelper::getColor("ScopyBlue")), widget);
+	MenuHeaderWidget *header = new MenuHeaderWidget(
+		"Settings", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), widget);
 	QWidget *generalSection = createMenuGeneralSection(widget);
 	QWidget *logSection = createMenuLogSection(widget);
 
@@ -275,12 +287,12 @@ QWidget *HarmonicsInstrument::createMenuLogSection(QWidget *parent)
 		logSection->setDisabled(en);
 		QString dirPath = logFilePath->edit()->text();
 		QDir logDir = QDir(dirPath);
-		if(dirPath.isEmpty())
-			logSection->setCollapsed(true);
-		if(en && logDir.exists() && !logSection->collapsed())
+		logSection->setCollapsed(dirPath.isEmpty() || !logDir.exists());
+		if(en && !logSection->collapsed()) {
 			Q_EMIT logData(PqmDataLogger::Harmonics, dirPath);
-		else
+		} else {
 			Q_EMIT logData(PqmDataLogger::None, "");
+		}
 	});
 	connect(browseBtn, &QPushButton::clicked, this, [this, logFilePath]() { browseFile(logFilePath->edit()); });
 
@@ -381,6 +393,28 @@ void HarmonicsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> 
 	if(m_singleBtn->isChecked()) {
 		m_singleBtn->setChecked(false);
 	}
+}
+
+QPushButton *HarmonicsInstrument::createPQEventsBtn(QWidget *parent)
+{
+	QPushButton *btn = new QPushButton("PQEvents", parent);
+	btn->setCheckable(true);
+	btn->setChecked(false);
+	btn->setEnabled(false);
+	Style::setStyle(btn, style::properties::button::squareIconButton);
+	btn->setFixedWidth(128);
+
+	QIcon bellIcon;
+	bellIcon.addPixmap(
+		Style::getPixmap(":/gui/icons/notification_bell.svg", Style::getColor(json::theme::content_inverse)),
+		QIcon::Normal, QIcon::Off);
+	bellIcon.addPixmap(Style::getPixmap(":/gui/icons/notification_bell.svg", QColor("red")), QIcon::Normal,
+			   QIcon::On);
+	btn->setIcon(bellIcon);
+	btn->setLayoutDirection(Qt::RightToLeft);
+	connect(btn, &QPushButton::toggled, btn, &QPushButton::setEnabled);
+
+	return btn;
 }
 
 void HarmonicsInstrument::browseFile(QLineEdit *lineEditPath)

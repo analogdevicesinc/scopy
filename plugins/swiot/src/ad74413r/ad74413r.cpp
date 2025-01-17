@@ -29,6 +29,7 @@
 #include <plotinfo.h>
 #include <plotinfowidgets.h>
 #include <tutorialbuilder.h>
+#include <style.h>
 
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menuheader.h>
@@ -41,6 +42,7 @@
 #include <iioutil/connectionprovider.h>
 
 using namespace scopy::swiot;
+using namespace scopy::gui;
 using namespace scopy;
 
 Ad74413r::Ad74413r(QString uri, ToolMenuEntry *tme, QWidget *parent)
@@ -130,8 +132,7 @@ void Ad74413r::setupConnections()
 	connect(m_acqHandler, &BufferAcquisitionHandler::singleCaptureFinished, this,
 		&Ad74413r::onSingleCaptureFinished, Qt::QueuedConnection);
 
-	connect(m_timespanSpin, &PositionSpinButton::valueChanged, m_acqHandler,
-		&BufferAcquisitionHandler::onTimespanChanged);
+	connect(m_timespanSpin, &MenuSpinbox::valueChanged, m_acqHandler, &BufferAcquisitionHandler::onTimespanChanged);
 
 	connect(m_rstAcqTimer, &QTimer::timeout, this, [&]() {
 		m_rstAcqTimer->stop();
@@ -401,16 +402,6 @@ PlotAxis *Ad74413r::createYChnlAxis(QPen pen, QString unitType, int yMin, int yM
 	return chYAxis;
 }
 
-void Ad74413r::showEvent(QShowEvent *event)
-{
-	QWidget::showEvent(event);
-
-	if(Preferences::get("ad74413r_start_tutorial").toBool()) {
-		startTutorial();
-		Preferences::set("ad74413r_start_tutorial", false);
-	}
-}
-
 void Ad74413r::setupChannelBtn(MenuControlButton *btn, PlotChannel *ch, QString chnlId, int chnlIdx)
 {
 	btn->setName(chnlId);
@@ -452,7 +443,7 @@ void Ad74413r::setupChannel(int chnlIdx, QString function)
 {
 	if(function.compare("no_config") != 0) {
 		QString chnlId(function + " " + QString::number(chnlIdx + 1));
-		QPen chPen = QPen(QColor(StyleHelper::getColor("CH" + QString::number(chnlIdx))), 1);
+		QPen chPen = QPen(QColor(StyleHelper::getChannelColor(chnlIdx)), 1);
 
 		QString unit = m_swiotAdLogic->getPlotChnlUnitOfMeasure(chnlIdx);
 		auto yRange = m_swiotAdLogic->getPlotChnlRangeValues(chnlIdx);
@@ -578,8 +569,8 @@ void Ad74413r::setupToolTemplate()
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *layout = new QHBoxLayout(this);
+	layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(layout);
-	StyleHelper::GetInstance()->initColorMap();
 
 	m_tool = new ToolTemplate(this);
 	m_tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -607,7 +598,7 @@ void Ad74413r::setupToolTemplate()
 	setupDeviceBtn();
 	m_tool->addWidgetToCentralContainerHelper(m_plot);
 
-	m_infoBtn = new InfoBtn(this);
+	m_infoBtn = new InfoBtn(this, true);
 	m_infoBtn->installEventFilter(this);
 	m_settingsBtn = new GearBtn(this);
 	m_runBtn = new RunBtn(this);
@@ -618,9 +609,13 @@ void Ad74413r::setupToolTemplate()
 	m_singleBtn->setChecked(false);
 	m_configBtn = createConfigBtn();
 
-	connect(m_infoBtn, &QAbstractButton::clicked, this, [=, this]() {
-		QDesktopServices::openUrl(
-			QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/ad74413r.html"));
+	connect(m_infoBtn, &InfoBtn::clicked, this, [=]() {
+		m_infoBtn->generateInfoPopup(this);
+		connect(m_infoBtn->getTutorialButton(), &QPushButton::clicked, this, [=]() { this->startTutorial(); });
+		connect(m_infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, [=, this]() {
+			QDesktopServices::openUrl(
+				QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/ad74413r.html"));
+		});
 	});
 
 	MenuControlButton *measure = new MenuControlButton(this);
@@ -678,8 +673,8 @@ void Ad74413r::setupToolTemplate()
 QPushButton *Ad74413r::createConfigBtn()
 {
 	QPushButton *configBtn = new QPushButton();
-	StyleHelper::BlueGrayButton(configBtn, "config_btn");
-	configBtn->setFixedWidth(128);
+	Style::setStyle(configBtn, style::properties::button::squareIconButton);
+	configBtn->setFixedWidth(Style::getDimension(json::global::unit_6));
 	configBtn->setCheckable(false);
 	configBtn->setText("Config");
 	return configBtn;
@@ -692,7 +687,8 @@ QWidget *Ad74413r::createSettingsMenu(QWidget *parent)
 	layout->setMargin(0);
 	layout->setSpacing(10);
 
-	MenuHeaderWidget *header = new MenuHeaderWidget("AD74413R", QPen(StyleHelper::getColor("ScopyBlue")), widget);
+	MenuHeaderWidget *header = new MenuHeaderWidget(
+		"AD74413R", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), widget);
 	MenuSectionWidget *plotSettingsContainer = new MenuSectionWidget(widget);
 	MenuCollapseSection *plotTimespanSection = new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE,
 									   MenuCollapseSection::MHW_BASEWIDGET, widget);
@@ -701,10 +697,9 @@ QWidget *Ad74413r::createSettingsMenu(QWidget *parent)
 	plotTimespanSection->contentLayout()->setMargin(0);
 
 	// timespan
-	m_timespanSpin = new PositionSpinButton({{"ms", 1E-3}, {"s", 1E0}}, "Timespan", 0.1, 10, true, false);
-	m_timespanSpin->setStep(0.1);
-	m_timespanSpin->setValue(1);
-	connect(m_timespanSpin, &PositionSpinButton::valueChanged, this,
+	m_timespanSpin = new MenuSpinbox(tr("Timespan"), 1, "s", 0.1, 10, true, false, plotTimespanSection);
+	m_timespanSpin->setIncrementMode(MenuSpinbox::IS_FIXED);
+	connect(m_timespanSpin, &MenuSpinbox::valueChanged, this,
 		[=, this](double value) { m_plot->xAxis()->setMin(-value); });
 
 	// show labels

@@ -59,13 +59,13 @@
          <number>6</number>
         </property>
         <property name="topMargin">
-         <number>15</number>
+         <number>0</number>
         </property>
         <property name="rightMargin">
          <number>40</number>
         </property>
         <property name="bottomMargin">
-         <number>16</number>
+         <number>0</number>
         </property>
         <item>
          <spacer name="horizontalSpacer_8">
@@ -172,21 +172,21 @@
             <number>0</number>
            </property>
            <property name="leftMargin">
-            <number>20</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
-            <number>25</number>
-           </property>
-           <property name="rightMargin">
             <number>10</number>
            </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
            <property name="bottomMargin">
-            <number>20</number>
+            <number>10</number>
            </property>
            <item>
             <widget class="QScrollArea" name="scrollArea">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -209,54 +209,48 @@
              <property name="horizontalScrollBarPolicy">
               <enum>Qt::ScrollBarAlwaysOff</enum>
              </property>
+             <property name="sizeAdjustPolicy">
+              <enum>QAbstractScrollArea::AdjustToContents</enum>
+             </property>
              <property name="widgetResizable">
               <bool>true</bool>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
              </property>
              <widget class="QWidget" name="scrollAreaWidgetContents">
               <property name="geometry">
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>314</width>
-                <height>594</height>
+                <width>400</width>
+                <height>646</height>
                </rect>
               </property>
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>380</width>
-                <height>16777215</height>
-               </size>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_10">
                <property name="spacing">
                 <number>0</number>
                </property>
                <property name="leftMargin">
-                <number>0</number>
+                <number>10</number>
                </property>
                <property name="topMargin">
                 <number>0</number>
                </property>
                <property name="rightMargin">
-                <number>0</number>
+                <number>10</number>
                </property>
                <property name="bottomMargin">
                 <number>0</number>
                </property>
                <item>
                 <widget class="QTabWidget" name="tabWidget">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
                  <property name="styleSheet">
                   <string notr="true"/>
                  </property>
@@ -267,12 +261,6 @@
                   <bool>false</bool>
                  </property>
                  <widget class="QWidget" name="tabConstant">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
                   <attribute name="title">
                    <string>Constant</string>
                   </attribute>
@@ -334,12 +322,6 @@
                   </layout>
                  </widget>
                  <widget class="QWidget" name="tabWaveform">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
                   <attribute name="title">
                    <string>Waveform</string>
                   </attribute>
@@ -531,12 +513,6 @@
                   </layout>
                  </widget>
                  <widget class="QWidget" name="tabBuffer">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
                   <attribute name="title">
                    <string>Buffer</string>
                   </attribute>
@@ -936,12 +912,6 @@ background-repeat: no-repeat;
                   </layout>
                  </widget>
                  <widget class="QWidget" name="tabMath">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
                   <attribute name="title">
                    <string>Math</string>
                   </attribute>

@@ -1,0 +1,4 @@
+QWidget[&&property&&=true]  {
+	font-size: &font_size_2&;
+        text-align: left;
+}

@@ -46,6 +46,7 @@
 #include <QFutureWatcher>
 #include <QTabWidget>
 #include <QtConcurrentRun>
+#include <style.h>
 
 #include <libm2k/m2kexceptions.hpp>
 #include <libsigrokdecode/libsigrokdecode.h>
@@ -194,7 +195,6 @@ LogicAnalyzer::LogicAnalyzer(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEn
 	// decoder table dropdown menu
 	connect(ui->btnCollapseSettings, &QPushButton::clicked,
 		[=](bool check) { ui->wDecoderSettings_2->setVisible(check); });
-	ui->btnCollapseSettings->click();
 	ui->statusLabel->setStyleSheet("QLabel { color : #4A64FF; }");
 
 	// Add propper zoomer
@@ -723,11 +723,6 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	externalGridLayout->addWidget(externalOnOff, 0, 0);
 	auto labelCondition = new QLabel("Condition");
 	externalGridLayout->addWidget(labelCondition, 1, 0);
-
-	QFile file(":stylesheets/stylesheets/customSwitch.qss");
-	file.open(QFile::ReadOnly);
-	QString styleSheet = QString::fromLatin1(file.readAll());
-	externalOnOff->setStyleSheet(styleSheet);
 
 	auto comboBoxCondition = new QComboBox();
 	externalGridLayout->addWidget(comboBoxCondition, 1, 1);
@@ -1263,6 +1258,9 @@ void LogicAnalyzer::setupUi()
 	// Hide the run button
 	//	ui->runSingleWidget->enableRunButton(false);
 
+	// this size has been set to fit all menu widgets
+	ui->generalSettings->setMinimumWidth(350);
+
 	int gsettings_panel = ui->stackedWidget->indexOf(ui->generalSettings);
 	ui->btnGeneralSettings->setProperty("id", QVariant(-gsettings_panel));
 
@@ -1283,9 +1281,6 @@ void LogicAnalyzer::setupUi()
 
 	// default trigger menu?
 	m_menuOrder.push_back(ui->btnTrigger);
-
-	// set default menu width to 0
-	ui->rightMenu->setMaximumWidth(0);
 
 	// Plot positioning and settings
 	m_plot.disableLegend();
@@ -1889,6 +1884,7 @@ void LogicAnalyzer::settingsPanelUpdate(int id)
 		QWidget *widget = ui->stackedWidget->widget(i);
 		widget->setSizePolicy(policy, policy);
 	}
+
 	ui->stackedWidget->adjustSize();
 }
 

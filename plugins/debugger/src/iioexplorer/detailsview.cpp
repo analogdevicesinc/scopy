@@ -20,7 +20,9 @@
  */
 
 #include "detailsview.h"
+#include "style_properties.h"
 #include <QVBoxLayout>
+#include <style.h>
 
 #define ADD_ICON ":/gui/icons/green_add.svg"
 #define REMOVE_ICON ":/gui/icons/orange_close.svg"
@@ -47,12 +49,11 @@ DetailsView::DetailsView(QWidget *parent)
 void DetailsView::setupUi()
 {
 	setLayout(new QVBoxLayout(this));
-	layout()->setContentsMargins(0, 6, 0, 0);
+	layout()->setContentsMargins(0, 0, 0, 0);
 
 	m_titleContainer->setLayout(new QHBoxLayout(m_titleContainer));
 	m_titleContainer->layout()->setContentsMargins(0, 0, 0, 0);
 
-	m_readBtn->setMaximumWidth(90);
 	m_addToWatchlistBtn->setMaximumSize(25, 25);
 	m_addToWatchlistBtn->setDisabled(true);
 
@@ -70,21 +71,33 @@ void DetailsView::setupUi()
 	QTabBar *tabBar = m_tabWidget->tabBar();
 	tabBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-	StyleHelper::TabWidgetBarUnderline(m_tabWidget, "DetailsTabWidget");
-	m_readBtn->setProperty("blue_button", true);
-	m_readBtn->setIcon(QIcon(":/gui/icons/refresh.svg"));
+	m_readBtn->setIcon(Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
 	m_readBtn->setIconSize(QSize(25, 25));
-	m_readBtn->setText("Refresh");
-	m_readBtn->setMinimumHeight(35);
+	m_readBtn->setText("Read All");
 	m_addToWatchlistBtn->setStyleSheet("QPushButton { background-color: transparent; border: 0px; }");
 
 	m_titleContainer->layout()->addWidget(m_titlePath);
 	m_titleContainer->layout()->addWidget(m_addToWatchlistBtn);
 	m_titleContainer->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
 	m_titleContainer->layout()->addWidget(m_readBtn);
+	m_titleContainer->layout()->setContentsMargins(0, 0, 0, 0);
 
 	layout()->addWidget(m_titleContainer);
-	layout()->addWidget(m_tabWidget);
+
+	QFrame *tabContainer = new QFrame(this);
+	tabContainer->setLayout(new QVBoxLayout(tabContainer));
+	tabContainer->layout()->setContentsMargins(0, 0, 0, 0);
+	tabContainer->layout()->addWidget(m_tabWidget);
+
+	layout()->addWidget(tabContainer);
+
+	Style::setBackgroundColor(this, json::theme::background_subtle);
+	Style::setBackgroundColor(m_guiView, json::theme::background_primary);
+	Style::setBackgroundColor(m_iioView, json::theme::background_primary);
+
+	Style::setStyle(tabContainer, style::properties::debugger::detailsView, true, true);
+	Style::setStyle(m_tabWidget, style::properties::debugger::detailsView, true, true);
+	Style::setStyle(m_readBtn, style::properties::button::basicButton);
 }
 
 void DetailsView::setIIOStandardItem(IIOStandardItem *item)
@@ -104,10 +117,11 @@ void DetailsView::setAddToWatchlistState(bool add)
 {
 	m_addToWatchlistBtn->setEnabled(true);
 	if(add) {
-		m_addToWatchlistBtn->setIcon(QIcon(ADD_ICON));
+		m_addToWatchlistBtn->setIcon(Style::getPixmap(ADD_ICON, Style::getColor(json::theme::content_inverse)));
 		m_addToWatchlistBtn->setToolTip("Add to Watchlist");
 	} else {
-		m_addToWatchlistBtn->setIcon(QIcon(REMOVE_ICON));
+		m_addToWatchlistBtn->setIcon(
+			Style::getPixmap(REMOVE_ICON, Style::getColor(json::theme::content_inverse)));
 		m_addToWatchlistBtn->setToolTip("Remove from Watchlist");
 	}
 }

@@ -37,6 +37,8 @@
 #include <QAbstractSpinBox>
 #include <titlespinbox.hpp>
 #include <utils.h>
+#include <style.h>
+#include "style_properties.h"
 
 using namespace scopy;
 using namespace regmap;
@@ -81,6 +83,7 @@ RegisterController::RegisterController(QWidget *parent)
 
 	readWidgetLayout->addWidget(readButton, 1, Qt::AlignRight);
 
+	Style::setStyle(readWidget, style::properties::regmap::registercontroller);
 	QWidget *writeWidget = new QWidget(this);
 	writeWidget->setFixedHeight(72);
 	mainLayout->addWidget(writeWidget);
@@ -103,6 +106,8 @@ RegisterController::RegisterController(QWidget *parent)
 	writeWidgetLeftLayout->addWidget(regValue);
 	writeWidgetLayout->addLayout(writeWidgetLeftLayout, 3);
 
+	Style::setStyle(regValue, style::properties::regmap::lineEdit);
+	Style::setStyle(writeWidget, style::properties::regmap::registercontroller);
 	writeButton = new QPushButton("Write", writeWidget);
 	// request write on register
 	QObject::connect(writeButton, &QPushButton::clicked, this, [=]() {
@@ -114,6 +119,9 @@ RegisterController::RegisterController(QWidget *parent)
 	writeWidgetLayout->addWidget(writeButton, 1, Qt::AlignRight);
 
 	applyStyle();
+
+	readWidget->setProperty("tutorial_name", "READ_WIDGET");
+	writeWidget->setProperty("tutorial_name", "WRITE_WIDGET");
 }
 
 RegisterController::~RegisterController()
@@ -149,14 +157,18 @@ void RegisterController::setHasMap(bool hasMap)
 		detailedRegisterToggle->setCheckable(true);
 		QIcon detailedRegisterToggleIcon;
 		detailedRegisterToggleIcon.addPixmap(
-			Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/tool_calibration.svg", "white", 1));
+			Style::getPixmap(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+						 "/icons/tool_calibration.svg",
+					 Style::getColor(json::theme::content_inverse)));
 		detailedRegisterToggle->setIcon(detailedRegisterToggleIcon);
 		detailedRegisterToggle->setChecked(true);
 		QObject::connect(detailedRegisterToggle, &QPushButton::toggled, this,
 				 &RegisterController::toggleDetailedMenu);
 		writeWidgetLayout->addWidget(detailedRegisterToggle, 0.5, Qt::AlignRight);
-		RegmapStyleHelper::smallBlueButton(detailedRegisterToggle);
-		detailedRegisterToggle->setFixedSize(40, 40);
+		Style::setStyle(detailedRegisterToggle, style::properties::button::squareIconButton, true, true);
+		detailedRegisterToggle->setFixedSize(32, 32);
+
+		detailedRegisterToggle->setProperty("tutorial_name", "TOGGLE_DETAILED_BUTTON");
 	}
 }
 
@@ -164,11 +176,37 @@ void RegisterController::applyStyle()
 {
 	setFixedHeight(72);
 
-	RegmapStyleHelper::BlueButton(readButton);
+	Style::setStyle(readButton, style::properties::button::basicButton, true, true);
 	readButton->setFixedHeight(40);
-	RegmapStyleHelper::BlueButton(writeButton);
+	Style::setStyle(writeButton, style::properties::button::basicButton, true, true);
 	writeButton->setFixedHeight(40);
-	valueLabel->setStyleSheet(RegmapStyleHelper::grayLabelStyle());
+	Style::setStyle(valueLabel, style::properties::label::menuSmall);
+}
 
-	setStyleSheet(RegmapStyleHelper::regmapControllerStyle(nullptr));
+void RegisterController::startTutorial()
+{
+	QWidget *parent = Util::findContainingWindow(this);
+	registerMapTutorial =
+		new gui::TutorialBuilder(this, ":/registermap/tutorial_chapters.json", "register_controller", parent);
+
+	connect(registerMapTutorial, &gui::TutorialBuilder::finished, this, [=]() { Q_EMIT tutorialFinished(); });
+	connect(registerMapTutorial, &gui::TutorialBuilder::aborted, this, &RegisterController::tutorialAborted);
+
+	registerMapTutorial->setTitle("Tutorial");
+	registerMapTutorial->start();
+}
+
+void RegisterController::startSimpleTutorial()
+{
+	QWidget *parent = Util::findContainingWindow(this);
+	registerMapSimpleTutorial = new gui::TutorialBuilder(this, ":/registermap/tutorial_chapters.json",
+							     "simple_register_controller", parent);
+
+	connect(registerMapSimpleTutorial, &gui::TutorialBuilder::finished, this,
+		[=]() { Q_EMIT simpleTutorialFinished(); });
+
+	connect(registerMapSimpleTutorial, &gui::TutorialBuilder::aborted, this, &RegisterController::tutorialAborted);
+
+	registerMapSimpleTutorial->setTitle("Tutorial");
+	registerMapSimpleTutorial->start();
 }

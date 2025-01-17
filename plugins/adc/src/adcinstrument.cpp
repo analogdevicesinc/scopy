@@ -24,6 +24,7 @@
 #include <gui/smallOnOffSwitch.h>
 #include <QDesktopServices>
 #include <QLoggingCategory>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_ADCINSTRUMENT, "ADCInstrument")
 
@@ -55,7 +56,7 @@ void ADCInstrument::setupToolLayout()
 	tool->bottomCentral()->setVisible(false);
 	lay->addWidget(tool);
 	tool->setLeftContainerWidth(210);
-	tool->setRightContainerWidth(300);
+	tool->setRightContainerWidth(310);
 	tool->setTopContainerHeight(100);
 	tool->setBottomContainerHeight(90);
 
@@ -72,19 +73,21 @@ void ADCInstrument::setupToolLayout()
 	addBtn = new AddBtn(this);
 	removeBtn = new RemoveBtn(this);
 
-	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
+	connect(infoBtn, &QAbstractButton::clicked, this, [=]() {
 		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/adc/adc.html"));
 	});
 
 	m_sync = new QPushButton("Sync");
 	m_sync->setFixedWidth(150);
 	m_sync->setCheckable(true);
-	StyleHelper::BlueGrayButton(m_sync);
+	Style::setStyle(m_sync, style::properties::button::blueGrayButton);
+	Style::setStyle(m_sync, style::properties::label::menuMedium);
 
 	m_complex = new QPushButton("Complex");
 	m_complex->setCheckable(true);
 	m_complex->setFixedWidth(150);
-	StyleHelper::BlueGrayButton(m_complex);
+	Style::setStyle(m_complex, style::properties::button::blueGrayButton);
+	Style::setStyle(m_complex, style::properties::label::menuMedium);
 
 	m_runBtn = new RunBtn(this);
 	m_singleBtn = new SingleShotBtn(this);

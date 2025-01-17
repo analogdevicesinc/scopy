@@ -29,6 +29,7 @@
 #include <pqmdatalogger.h>
 #include <rmsinstrument.h>
 #include <settingsinstrument.h>
+#include <style.h>
 #include <waveforminstrument.h>
 
 #include <pluginbase/preferences.h>
@@ -95,20 +96,24 @@ bool PQMPlugin::loadPage()
 
 bool PQMPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/adalm.svg");
+	SCOPY_PLUGIN_ICON(":/pqm/pqm_icon.svg");
 	return true;
 }
 
 void PQMPlugin::loadToolList()
 {
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("pqmrms", "Rms", ":/gui/icons/scopy-default/icons/tool_network_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("pqmrms", "Rms",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_network_analyzer.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("pqmharmonics", "Harmonics",
-						  ":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_spectrum_analyzer.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("pqmwaveform", "Waveform",
-						  ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_oscilloscope.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("pqmsettings", "Settings",
-						  ":/gui/icons/scopy-default/icons/tool_debugger.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 }
 
 void PQMPlugin::unload() { delete m_infoPage; }
@@ -134,6 +139,8 @@ bool PQMPlugin::onConnect()
 	rmsTme->setEnabled(true);
 	rmsTme->setRunBtnVisible(true);
 	connect(m_acqManager, &AcquisitionManager::pqmAttrsAvailable, rms, &RmsInstrument::onAttrAvailable);
+	connect(m_acqManager, &AcquisitionManager::pqEvent, rms, &RmsInstrument::pqEvent);
+	connect(rms, &RmsInstrument::logData, m_acqManager, &AcquisitionManager::logData);
 
 	ToolMenuEntry *harmonicsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "pqmharmonics");
 	HarmonicsInstrument *harmonics = new HarmonicsInstrument(harmonicsTme, m_param);
@@ -142,6 +149,7 @@ bool PQMPlugin::onConnect()
 	harmonicsTme->setEnabled(true);
 	harmonicsTme->setRunBtnVisible(true);
 	connect(m_acqManager, &AcquisitionManager::pqmAttrsAvailable, harmonics, &HarmonicsInstrument::onAttrAvailable);
+	connect(m_acqManager, &AcquisitionManager::pqEvent, harmonics, &HarmonicsInstrument::pqEvent);
 	connect(harmonics, &HarmonicsInstrument::logData, m_acqManager, &AcquisitionManager::logData);
 
 	ToolMenuEntry *waveformTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "pqmwaveform");
@@ -177,15 +185,11 @@ bool PQMPlugin::onDisconnect()
 		tool->setRunBtnVisible(false);
 		QWidget *w = tool->tool();
 		if(w) {
-			disconnect(tool);
-			disconnect(tool->tool());
 			tool->setTool(nullptr);
 			delete(w);
 		}
 	}
-	ResourceManager::close("pqm");
-	disconnect(m_acqManager);
-	delete m_acqManager;
+	delete(m_acqManager);
 	m_acqManager = nullptr;
 	clearPingTask();
 	ConnectionProvider *cp = ConnectionProvider::GetInstance();

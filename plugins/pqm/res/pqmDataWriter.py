@@ -49,8 +49,10 @@ while True:
         inter_harmonics = map(str, interharmonics_list)
         strHarmonics = " ".join(harmonics)
         strInterHarmonics = " ".join(inter_harmonics)
-        ch.attrs["rms"]._write(str(rms))
-        ch.attrs["angle"]._write(str(angle))
+        if "rms" in ch.attrs:
+            ch.attrs["rms"]._write(str(rms))
+        if "angle" in ch.attrs:
+            ch.attrs["angle"]._write(str(angle))
         if "harmonics" in ch.attrs:
             ch.attrs["harmonics"]._write(strHarmonics)
         if "inter_harmonics" in ch.attrs:

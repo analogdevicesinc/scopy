@@ -59,13 +59,10 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 	timeEdit->setDisplayFormat("hh:mm:ss");
 	timeEdit->setVisible(false);
 
-	m_xdelta = new PositionSpinButton(
-		{
-			{"s", 1},
-			{"min", 60},
-			{"hour", 3600},
-		},
-		"Delta", -DBL_MAX, DBL_MAX, false, false, xAxisContainer);
+	m_xdelta = new gui::MenuSpinbox("Delta", DataMonitorUtils::getAxisDefaultMaxValue(), "s", 0, DBL_MAX, false,
+					false, xAxisContainer);
+	m_xdelta->setScaleRange(1, 1);
+	m_xdelta->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 	m_xdelta->setValue(DataMonitorUtils::getAxisDefaultMaxValue());
 
 	auto &&timeTracker = TimeManager::GetInstance();
@@ -89,7 +86,7 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 	connect(dateEdit, &QDateEdit::dateChanged, this, &PlotTimeAxisController::updatePlotStartPoint);
 	connect(timeEdit, &QTimeEdit::timeChanged, this, &PlotTimeAxisController::updatePlotStartPoint);
 
-	connect(m_xdelta, &PositionSpinButton::valueChanged, this,
+	connect(m_xdelta, &gui::MenuSpinbox::valueChanged, this,
 		[=, this](double value) { m_plot->updateXAxisIntervalMax(value); });
 
 	xAxisSection->contentLayout()->addWidget(realTimeToggle);

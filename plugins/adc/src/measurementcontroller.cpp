@@ -28,7 +28,6 @@
 #include <QLoggingCategory>
 
 #include <gui/stylehelper.h>
-#include <gui/widgets/menubigswitch.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/menulineedit.h>
@@ -45,10 +44,10 @@ MeasurementController::MeasurementController(QPen pen, MeasureModel *msr, QObjec
 	, m_pen(pen)
 {
 	connect(m_measure, &MeasureModel::newMeasurementsAvailable, this, [=]() {
-		for(auto lbl : m_measureLabels) {
+		for(auto lbl : qAsConst(m_measureLabels)) {
 			lbl->setValue(m_measure->measurement(lbl->name())->value());
 		}
-		for(auto lbl : m_statsLabels) {
+		for(auto lbl : qAsConst(m_statsLabels)) {
 			auto stat = m_measure->measurement(lbl->name())->stat();
 			lbl->setValue(stat.average(), stat.min(), stat.max());
 		}

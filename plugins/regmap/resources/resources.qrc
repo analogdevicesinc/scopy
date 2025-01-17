@@ -1,3 +1,5 @@
 <RCC>
-    <qresource prefix="/icons"/>
+    <qresource prefix="/registermap">
+        <file>tutorial_chapters.json</file>
+    </qresource>
 </RCC>

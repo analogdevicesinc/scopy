@@ -23,6 +23,7 @@
 #include "swiot_logging_categories.h"
 #include <QColor>
 #include <QLineEdit>
+#include <style.h>
 #include <gui/plotaxis.h>
 #include <gui/stylehelper.h>
 
@@ -88,7 +89,7 @@ void DioDigitalChannel::initPlot()
 	m_plot->setShowYAxisLabels(true);
 	m_plot->replot();
 
-	QPen chPen = QPen(QColor(StyleHelper::getColor("CH0")), 1);
+	QPen chPen = QPen(QColor(StyleHelper::getChannelColor(0)), 1);
 	m_plotCh = new PlotChannel("CH0", chPen, m_plot->xAxis(), m_plot->yAxis(), this);
 	m_plot->addPlotChannel(m_plotCh);
 	m_plotCh->setEnabled(true);
@@ -174,7 +175,7 @@ QWidget *DioDigitalChannel::createBottomContainer(QWidget *parent)
 
 	QLabel *readValueLabel = new QLabel(readBackWidget);
 	readValueLabel->setText("Readback");
-	StyleHelper::MenuSmallLabel(readValueLabel);
+	Style::setStyle(readValueLabel, style::properties::label::menuSmall);
 	readBackWidget->layout()->addWidget(readValueLabel);
 
 	m_lcdNumber = new LcdNumber(readBackWidget);
@@ -196,7 +197,7 @@ QWidget *DioDigitalChannel::createTopContainer(QWidget *parent)
 	QHBoxLayout *layout = new QHBoxLayout(topWidget);
 
 	m_channelName = new QLabel(topWidget);
-	StyleHelper::MenuSmallLabel(m_channelName);
+	Style::setStyle(m_channelName, style::properties::label::menuSmall);
 	layout->addWidget(m_channelName, 0, Qt::AlignLeft);
 
 	QLineEdit *channelTitleLineEdit = new QLineEdit(topWidget);
@@ -206,7 +207,7 @@ QWidget *DioDigitalChannel::createTopContainer(QWidget *parent)
 	layout->addSpacerItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
 	m_channelType = new QLabel(topWidget);
-	StyleHelper::MenuSmallLabel(m_channelType);
+	Style::setStyle(m_channelType, style::properties::label::menuSmall);
 	layout->addWidget(m_channelType, 0, Qt::AlignRight);
 
 	m_valueSwitch = new SmallOnOffSwitch(topWidget);

@@ -65,7 +65,6 @@ private:
 	FaultsPage *m_faultsPage;
 
 	ToolMenuEntry *m_tme;
-	void showEvent(QShowEvent *event) override;
 };
 } // namespace scopy::swiot
 #endif // FAULTS_H

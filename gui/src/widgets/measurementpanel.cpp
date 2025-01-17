@@ -24,6 +24,7 @@
 #include <QGridLayout>
 #include <QScrollArea>
 #include <QWidget>
+#include <style.h>
 
 #include <measurementlabel.h>
 
@@ -81,6 +82,7 @@ MeasurementsPanel::MeasurementsPanel(QWidget *parent)
 	int idx = panelLayout->indexOf(spacer);
 	m_stacks.append(new VerticalWidgetStack(stackSize, this));
 	panelLayout->insertWidget(idx, m_stacks.last());
+	Style::setBackgroundColor(this, json::theme::background_subtle);
 }
 
 void MeasurementsPanel::addWidget(QWidget *meas)
@@ -179,7 +181,7 @@ void MeasurementsPanel::setInhibitUpdates(bool newInhibitUpdates)
 
 void MeasurementsPanel::clear()
 {
-	for(VerticalWidgetStack *stack : m_stacks) {
+	for(VerticalWidgetStack *stack : qAsConst(m_stacks)) {
 		stack->reparentWidgets(nullptr);
 		panelLayout->removeWidget(stack);
 		delete stack;
@@ -189,7 +191,7 @@ void MeasurementsPanel::clear()
 
 void MeasurementsPanel::refreshUi()
 {
-	for(VerticalWidgetStack *stack : m_stacks) {
+	for(VerticalWidgetStack *stack : qAsConst(m_stacks)) {
 		stack->reparentWidgets(nullptr);
 		panelLayout->removeWidget(stack);
 		delete stack;
@@ -229,6 +231,7 @@ StatsPanel::StatsPanel(QWidget *parent)
 
 	panelLayout->setAlignment(Qt::AlignLeft);
 	lay->addWidget(scrollArea);
+	Style::setBackgroundColor(this, json::theme::background_subtle);
 }
 
 StatsPanel::~StatsPanel() {}
@@ -247,11 +250,11 @@ void StatsPanel::removeStat(StatsLabel *stat)
 
 void StatsPanel::updateOrder()
 {
-	for(StatsLabel *label : m_labels) {
+	for(StatsLabel *label : qAsConst(m_labels)) {
 		panelLayout->removeWidget(label);
 	}
 
-	for(StatsLabel *label : m_labels) {
+	for(StatsLabel *label : qAsConst(m_labels)) {
 		panelLayout->addWidget(label);
 	}
 }

@@ -1,0 +1,4 @@
+QWidget[&&property&&=true]{
+background-color: &content_default&;
+color: &content_default&;
+}

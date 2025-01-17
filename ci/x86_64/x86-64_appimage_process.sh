@@ -16,7 +16,8 @@ fi
 
 export APPIMAGE=1
 
-LIBIIO_VERSION=libiio-v0
+LIBSERIALPORT_BRANCH=scopy-v2
+LIBIIO_VERSION=v0.26
 LIBAD9361_BRANCH=main
 LIBM2K_BRANCH=main
 SPDLOG_BRANCH=v1.x
@@ -28,6 +29,7 @@ LIBSIGROKDECODE_BRANCH=master
 QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 IIOEMU_BRANCH=master
+KDDOCK_BRANCH=2.1
 
 # default python version used in CI scripts, can be changed to match locally installed python
 PYTHON_VERSION=python3.8
@@ -81,6 +83,7 @@ clone() {
 	echo "#######CLONE#######"
 	mkdir -p $STAGING_AREA
 	pushd $STAGING_AREA
+	[ -d 'libserialport' ] || git clone --recursive https://github.com/cseci/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
@@ -92,6 +95,7 @@ clone() {
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
+	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 	popd
 }
 
@@ -142,9 +146,7 @@ build_with_cmake() {
 		if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
 	fi
 	CURRENT_BUILD_CMAKE_OPTS=""
-	echo "$(basename -a "$(git config --get remote.origin.url)") - \
-	$(git rev-parse --abbrev-ref HEAD) - \
-	$(git rev-parse --short HEAD)" \
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 }
 
@@ -160,12 +162,30 @@ install_packages() {
 		subversion mesa-common-dev graphviz xserver-xorg gettext texinfo mm-common doxygen \
 		libboost-all-dev libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev \
 		libxcb-xinerama0  libgmp3-dev libzip-dev libglib2.0-dev libglibmm-2.4-dev libsigc++-2.0-dev \
-		libclang1-9 libmatio-dev liborc-0.4-dev libgl1-mesa-dev libserialport0 libserialport-dev \
-		libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libavahi-client-dev libsndfile1-dev \
+		libclang1-9 libmatio-dev liborc-0.4-dev libgl1-mesa-dev libavahi-client* libavahi-common* \
+		libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libsndfile1-dev \
 		libxkbcommon-x11-0 libqt5gui5 libncurses5 libtool libaio-dev libzmq3-dev libxml2-dev
 
 	pip3 install --no-cache-dir mako
 	pip3 install --no-cache-dir packaging
+}
+
+build_libserialport(){
+	CURRENT_BUILD=libserialport
+	pushd $STAGING_AREA/$CURRENT_BUILD
+	git clean -xdf
+
+	INSTALL=$1
+	[ -z $INSTALL ] && INSTALL=ON
+
+	./autogen.sh
+	[ "$USE_STAGING" == "ON" ] && ./configure --prefix $STAGING_AREA_DEPS || ./configure
+	make $JOBS
+	[ "$INSTALL" == "ON" ] && sudo make install
+
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
+	popd
 }
 
 build_libiio() {
@@ -174,7 +194,7 @@ build_libiio() {
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DWITH_TESTS:BOOL=OFF \
 		-DWITH_DOC:BOOL=OFF \
-		-DHAVE_DNS_SD:BOOL=OFF\
+		-DHAVE_DNS_SD:BOOL=ON\
 		-DWITH_MATLAB_BINDINGS:BOOL=OFF \
 		-DCSHARP_BINDINGS:BOOL=OFF \
 		-DPYTHON_BINDINGS:BOOL=OFF \
@@ -284,9 +304,7 @@ build_qwt() {
 		fi
 	fi
 
-	echo "$(basename -a "$(git config --get remote.origin.url)") - \
-	$(git rev-parse --abbrev-ref HEAD) - \
-	$(git rev-parse --short HEAD)" \
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 
 	popd
@@ -314,9 +332,7 @@ build_libsigrokdecode() {
 		if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
 	fi
 
-	echo "$(basename -a "$(git config --get remote.origin.url)") - \
-	$(git rev-parse --abbrev-ref HEAD) - \
-	$(git rev-parse --short HEAD)" \
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 
 	popd
@@ -338,6 +354,14 @@ build_iio-emu() {
 	pushd $STAGING_AREA/iio-emu
 	build_with_cmake OFF
 	popd
+	popd
+}
+
+build_kddock () {
+	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
+	pushd $STAGING_AREA/KDDockWidgets
+	CURRENT_BUILD_CMAKE_OPTS=""
+	build_with_cmake $1
 	popd
 }
 
@@ -364,6 +388,7 @@ create_appdir(){
 	EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
 	EMU_CONFIG=$SRC_DIR/resources/scopy_emu_options_config.json
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
+	STYLE_FOLDER=$BUILD_FOLDER/style
 	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib:$QT_LOCATION/lib
 	DLL_FOLDER=${STAGING_AREA}/dll_folder
 	COPY_DEPS=${SRC_DIR}/ci/x86_64/copy-deps.sh
@@ -414,6 +439,8 @@ create_appdir(){
 	
 	mkdir -p $APP_DIR/usr/lib/scopy/translations
 	cp $TRANSLATIONS_QM $APP_DIR/usr/lib/scopy/translations
+	
+	cp -R $STYLE_FOLDER $APP_DIR/usr/lib/scopy/style
 
 	if [ -d $REGMAP_XMLS ]; then
 		cp -r $REGMAP_XMLS $APP_DIR/usr/lib/scopy/plugins
@@ -473,6 +500,7 @@ move_appimage(){
 build_deps(){
 	clone
 	download_tools
+	build_libserialport ON
 	build_libiio ON
 	build_libad9361 ON
 	build_spdlog ON
@@ -484,6 +512,7 @@ build_deps(){
 	build_qwt ON
 	build_libsigrokdecode ON
 	build_libtinyiiod ON
+	build_kddock ON
 }
 
 run_workflow(){

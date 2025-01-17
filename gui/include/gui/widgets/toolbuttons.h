@@ -27,6 +27,7 @@
 #include <QPushButton>
 
 #include <menu_anim.hpp>
+#include <popupwidget.h>
 #include <scopy-gui_export.h>
 #include <utils.h>
 
@@ -63,7 +64,16 @@ class SCOPY_GUI_EXPORT InfoBtn : public QPushButton
 {
 	Q_OBJECT
 public:
-	InfoBtn(QWidget *parent = nullptr);
+	InfoBtn(QWidget *parent = nullptr, bool hasTutorial = false);
+
+	bool hasTutorial();
+	QPushButton *getTutorialButton();
+	QPushButton *getDocumentationButton();
+	void generateInfoPopup(QWidget *parent);
+
+private:
+	PopupWidget *m_popupWidget;
+	bool m_hasTutorial;
 };
 
 class SCOPY_GUI_EXPORT RunBtn : public QPushButton

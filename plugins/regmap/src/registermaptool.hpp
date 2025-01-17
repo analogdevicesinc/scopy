@@ -32,6 +32,10 @@
 
 class QComboBox;
 namespace scopy {
+
+namespace gui {
+class TutorialBuilder;
+}
 namespace regmap {
 
 class RegisterMapValues;
@@ -65,6 +69,13 @@ private:
 	QMap<QString, DeviceRegisterMap *> *deviceList;
 	bool first = true;
 	void toggleSettingsMenu(QString registerName, bool toggle);
+
+	void initTutorialProperties();
+	void startTutorial();
+	void startSimpleTutorial();
+	void tutorialAborted();
+	QMetaObject::Connection settingsTutorialFinish;
+	QMetaObject::Connection controllerTutorial;
 
 private Q_SLOTS:
 	void updateActiveRegisterMap(QString registerName);

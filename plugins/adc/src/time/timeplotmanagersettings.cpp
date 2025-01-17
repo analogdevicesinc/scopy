@@ -27,6 +27,7 @@
 #include <timeplotcomponentsettings.h>
 
 #include <grtimechannelcomponent.h>
+#include <style.h>
 
 namespace scopy {
 namespace adc {
@@ -49,13 +50,13 @@ TimePlotManagerSettings::~TimePlotManagerSettings() {}
 
 QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 {
-	m_pen = QPen(StyleHelper::getColor("ScopyBlue"));
+	m_pen = QPen(Style::getAttribute(json::theme::interactive_primary_idle));
 	m_menu = new MenuWidget("TIME PLOT", m_pen, parent);
 
 	QWidget *xaxismenu = createXAxisMenu(m_menu);
 
 	m_addPlotBtn = new QPushButton("Add Plot", this);
-	StyleHelper::BlueButton(m_addPlotBtn, "AddPlotButton");
+	StyleHelper::BasicButton(m_addPlotBtn, "AddPlotButton");
 
 	connect(m_addPlotBtn, &QPushButton::clicked, this, [=]() {
 		uint32_t idx = m_plotManager->addPlot("Time Plot " + QString::number(m_plotManager->plots().count()));
@@ -176,7 +177,9 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 		if(xcb->itemData(idx) == XMODE_SAMPLES) {
 			m_sampleRateSpin->setValue(1);
 			m_xmin->setUnit("samples");
+			m_xmin->setScaleRange(1, 1e6);
 			m_xmax->setUnit("samples");
+			m_xmax->setScaleRange(1, 1e6);
 			m_plotManager->setXUnit("samples");
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<TimePlotComponent *>(plt);
@@ -189,7 +192,9 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_sampleRateSpin->setEnabled(false);
 			m_sampleRateSpin->setValue(readSampleRate());
 			m_xmin->setUnit("s");
+			m_xmin->setScaleRange(0, 1);
 			m_xmax->setUnit("s");
+			m_xmax->setScaleRange(0, 1);
 			m_plotManager->setXUnit("s");
 
 			for(PlotComponent *plt : m_plotManager->plots()) {
@@ -204,7 +209,9 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_sampleRateSpin->setEnabled(true);
 
 			m_xmin->setUnit("s");
+			m_xmin->setScaleRange(0, 1);
 			m_xmax->setUnit("s");
+			m_xmax->setScaleRange(0, 1);
 			m_plotManager->setXUnit("s");
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<TimePlotComponent *>(plt);

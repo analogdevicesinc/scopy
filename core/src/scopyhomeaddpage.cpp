@@ -27,6 +27,7 @@
 #include <QLoggingCategory>
 #include <QtConcurrent>
 #include <menusectionwidget.h>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_HOME_ADD_PAGE, "ScopyHomeAddPage")
 
@@ -37,7 +38,6 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm)
 	, m_pluginManager(pm)
 	, m_deviceImpl(nullptr)
 {
-	StyleHelper::BackgroundAddPage(this, "add");
 	setProperty("device_page", true);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *layout = new QVBoxLayout(this);
@@ -189,7 +189,7 @@ QTabWidget *ScopyHomeAddPage::createTabWidget(QWidget *parent)
 	m_iioTabWidget = new IioTabWidget(tabWidget);
 	tabWidget->addTab(m_iioTabWidget, "IIO");
 	m_emuWidget = new EmuWidget(tabWidget);
-	tabWidget->addTab(m_emuWidget, "EMU");
+	tabWidget->addTab(m_emuWidget, "Emulator");
 	tabWidget->setCurrentWidget(m_iioTabWidget);
 	return tabWidget;
 }
@@ -238,14 +238,14 @@ QWidget *ScopyHomeAddPage::createBtnsWidget(QWidget *parent)
 
 	m_backBtn = new QPushButton(btnsWidget);
 	m_backBtn->setText("BACK");
-	StyleHelper::BlueButton(m_backBtn);
-	m_backBtn->setFixedWidth(128);
+	StyleHelper::BasicButton(m_backBtn);
+	m_backBtn->setFixedWidth(Style::getDimension(json::global::unit_6));
 
 	m_addBtn = new QPushButton(btnsWidget);
 	m_addBtn->setText("ADD DEVICE");
 	m_addBtn->setAutoDefault(true);
-	StyleHelper::BlueButton(m_addBtn);
-	m_addBtn->setFixedWidth(128);
+	StyleHelper::BasicButton(m_addBtn);
+	m_addBtn->setFixedWidth(Style::getDimension(json::global::unit_6));
 
 	btnsLay->addWidget(m_backBtn);
 	btnsLay->addWidget(m_addBtn);

@@ -65,7 +65,7 @@ QStringList TranslationsRepository::getLanguages()
 {
 	QDir directory(TranslationsRepository::getTranslationsPath());
 	QStringList languages = directory.entryList(QStringList() << "*.qm", QDir::Files).replaceInStrings(".qm", "");
-	for(const QString &lang : languages) {
+	for(const QString &lang : qAsConst(languages)) {
 		if(lang.contains("_"))
 			languages.removeOne(lang);
 	}

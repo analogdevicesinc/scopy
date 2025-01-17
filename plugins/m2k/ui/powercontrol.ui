@@ -45,13 +45,13 @@
        <number>0</number>
       </property>
       <property name="topMargin">
-       <number>15</number>
+       <number>0</number>
       </property>
       <property name="rightMargin">
        <number>50</number>
       </property>
       <property name="bottomMargin">
-       <number>15</number>
+       <number>0</number>
       </property>
       <item>
        <spacer name="horizontalSpacer_8">
@@ -567,16 +567,16 @@ color: #9013fe;
          <number>10</number>
         </property>
         <property name="leftMargin">
-         <number>26</number>
+         <number>10</number>
         </property>
         <property name="topMargin">
-         <number>26</number>
+         <number>10</number>
         </property>
         <property name="rightMargin">
-         <number>26</number>
+         <number>10</number>
         </property>
         <property name="bottomMargin">
-         <number>26</number>
+         <number>10</number>
         </property>
         <item>
          <widget class="QScrollArea" name="scrollArea">
@@ -592,6 +592,9 @@ color: #9013fe;
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
           </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustToContents</enum>
+          </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
@@ -600,11 +603,23 @@ color: #9013fe;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>218</width>
-             <height>473</height>
+             <width>200</width>
+             <height>535</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
             <item>
              <widget class="QLabel" name="label_12">
               <property name="text">
@@ -655,7 +670,6 @@ min-height: 30px;
 max-height: 30px;
 min-width: 200px;
 max-width: 200px;
-background-color: black;
 border-radius: 4px;
 }
 
@@ -689,7 +703,6 @@ min-width:100px;
 max-width:100px;
 qproperty-alignment: AlignCenter AlignCenter;
 margin-left: 0px;
-color: white;
 }
 
 QLabel#on:disabled {
@@ -703,7 +716,6 @@ max-height:30px;
 min-width:100px;
 max-width:100px;
 margin-left: 100px;
-color: white;
 qproperty-alignment: AlignCenter AlignCenter;
 }
 
@@ -902,7 +914,6 @@ QSlider::sub-page:horizontal {
   height: 40px;
   border-radius: 4px;
   background-color: #27b34f;
-  color: white;
   font-weight: bold;
 
   text-align: left;
@@ -1027,7 +1038,6 @@ QPushButton:disabled {
   height: 40px;
   border-radius: 4px;
   background-color: #27b34f;
-  color: white;
   font-weight: bold;
 
   text-align: left;
@@ -1121,7 +1131,6 @@ QPushButton:disabled {
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../gui/res/resources.qrc"/>
   <include location="../../../gui/res/resources.qrc"/>
  </resources>
  <connections>

@@ -22,6 +22,7 @@
 #include "polarplotwidget.h"
 
 #include <QGridLayout>
+#include <style.h>
 
 using namespace scopy;
 
@@ -37,7 +38,7 @@ PolarPlotWidget::PolarPlotWidget(QWidget *parent)
 
 	setAzimuthInterval(0.0, 360.0, 45.0);
 	setRadiusInterval(0.0, 1.0, 0.2);
-	setGridPen(QPen(Qt::white));
+	setGridPen(QPen(Style::getColor(json::theme::content_default)));
 	showMinorGrid();
 	setMinorGridPen(MinorGridStyle::MGS_DOT);
 	showRadiusAxis(false, true, true, false);

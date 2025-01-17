@@ -47,7 +47,12 @@ int DeviceAttrDataStrategy::write(QString data)
 	ssize_t res =
 		iio_device_attr_write(m_recipe.device, m_recipe.data.toStdString().c_str(), data.toStdString().c_str());
 	if(res < 0) {
-		qWarning(CAT_DEVICE_DATA_STRATEGY) << "Cannot write" << data << "to" << m_recipe.data;
+		// Might be a debug attribute
+		res = iio_device_debug_attr_write(m_recipe.device, m_recipe.data.toStdString().c_str(),
+						  data.toStdString().c_str());
+		if(res < 0) {
+			qWarning(CAT_DEVICE_DATA_STRATEGY) << "Cannot write" << data << "to" << m_recipe.data;
+		}
 	}
 
 	return res;
@@ -61,11 +66,17 @@ QPair<QString, QString> DeviceAttrDataStrategy::read()
 	}
 
 	char options[BUFFER_SIZE] = {0}, currentValue[BUFFER_SIZE] = {0};
+
 	m_returnCode =
 		iio_device_attr_read(m_recipe.device, m_recipe.data.toStdString().c_str(), currentValue, BUFFER_SIZE);
 	if(m_returnCode < 0) {
-		qWarning(CAT_DEVICE_DATA_STRATEGY)
-			<< "Could not read" << m_recipe.data << "error code:" << m_returnCode;
+		// Might be a debug attribute
+		m_returnCode = iio_device_debug_attr_read(m_recipe.device, m_recipe.data.toStdString().c_str(),
+							  currentValue, BUFFER_SIZE);
+		if(m_returnCode < 0) {
+			qWarning(CAT_DEVICE_DATA_STRATEGY)
+				<< "Could not read" << m_recipe.data << "error code:" << m_returnCode;
+		}
 	}
 
 	if(m_recipe.iioDataOptions != "") {

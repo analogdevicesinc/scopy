@@ -42,6 +42,7 @@ MeasureComponent::MeasureComponent(ToolTemplate *tool, QButtonGroup *btngroup, M
 	measurePanelManagerHover->setContent(m_measureSettings);
 	measurePanelManagerHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
 	measurePanelManagerHover->setContentPos(HoverPosition::HP_TOPLEFT);
+	measurePanelManagerHover->setAnchorOffset(QPoint(0, -10));
 	connect(measure->button(), &QPushButton::toggled, this, [=](bool b) {
 		measurePanelManagerHover->setVisible(b);
 		measurePanelManagerHover->raise();

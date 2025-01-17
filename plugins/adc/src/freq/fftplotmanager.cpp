@@ -106,7 +106,7 @@ void FFTPlotManager::multiPlotUpdate()
 		plt->plotMenu()->showDeleteButtons(b);
 	}
 
-	for(PlotManagerCombobox *cb : m_channelPlotcomboMap) {
+	for(PlotManagerCombobox *cb : qAsConst(m_channelPlotcomboMap)) {
 		cb->setVisible(b);
 	}
 }

@@ -1,0 +1,4 @@
+*[&&property&&=true] {
+	border-bottom: &border_width_interactive& solid &interactive_subtle_idle&;
+	border-radius: 0;
+}

@@ -35,6 +35,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QScrollArea>
+#include <style.h>
 
 using namespace scopy;
 using namespace scopy::dac;
@@ -93,7 +94,7 @@ QWidget *DdsDacAddon::setupDdsTx(TxNode *txNode)
 	MenuSectionWidget *txLabelSection = new MenuSectionWidget(this);
 	txLabelSection->setProperty("tutorial_name", "TX_INDICATOR");
 	QLabel *txLabel = new QLabel(txNode->getUuid(), txLabelSection);
-	StyleHelper::MenuMediumLabel(txLabel);
+	Style::setStyle(txLabel, style::properties::label::menuMedium);
 	txLabelSection->contentLayout()->addWidget(txLabel);
 	txLabelSection->setFixedHeight(63);
 
@@ -114,14 +115,13 @@ QWidget *DdsDacAddon::setupDdsTx(TxNode *txNode)
 	MenuSectionWidget *ddsModeSection = new MenuSectionWidget(this);
 	ddsModeSection->setProperty("tutorial_name", "TX_MODE_SELECTOR");
 	MenuCombo *ddsModeCombo = new MenuCombo("DDS MODE", this);
-	StyleHelper::IIOComboBox(ddsModeCombo->combo());
 	StyleHelper::BackgroundWidget(ddsModeCombo);
 	auto cb = ddsModeCombo->combo();
 	ddsModeCombo->combo()->addItem("Disabled", TxMode::DISABLED);
 	ddsModeCombo->combo()->addItem("One CW Tone", TxMode::ONE_TONE);
 	ddsModeCombo->combo()->addItem("Two CW Tones", TxMode::TWO_TONES);
 	ddsModeCombo->combo()->addItem("Independent I/Q Control", TxMode::INDEPENDENT_IQ_CTRL);
-	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), [=, this](int idx) {
 		auto mode = cb->itemData(idx).toInt();
 		ddsModeStack->show(QString::number(mode));
 		TxMode *current = dynamic_cast<TxMode *>(ddsModeStack->get(QString::number(mode)));

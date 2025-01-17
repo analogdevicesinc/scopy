@@ -37,9 +37,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
 
-/* Perform tool reset */
-launcher.reset()
-
 /* Setup DigitalIO */
 function set_dio(){
 	
@@ -82,11 +79,25 @@ function binary_counter(){
 
 /* main function */
 function main(){
+	/* Feel free to modify this as needed */
+	var uri = "ip:192.168.2.1"
 
+	var devId = scopy.addDevice(uri)
+	var connected = scopy.connectDevice(devId)
+	msleep(1000)
+	if (!connected)
+		return Error()
+	scopy.switchTool("Digital I/O")
 	set_dio()
-	
 	binary_counter()
 	
+	msleep(1000)
+
+	scopy.disconnectDevice(devId)
+	scopy.removeDevice(uri)
+	msleep(1000)
 }
 
+/* To keep the application session after running a certain script */
+/* use the command line options: -r or --keep-running. */
 main()

@@ -1,0 +1,32 @@
+QCheckBox[&&property&&="selected"] {
+	width: &unit_1&;
+	height: &unit_1&;
+	background-color: transparent;
+	color: rgba(255, 255, 255, 153);
+}
+QCheckBox::indicator[&&property&&="selected"] {
+	width: 12px;
+	height: 12px;
+	border: 2 solid &content_default&;
+	border-radius: 7px;
+	image: none;
+}
+QCheckBox::indicator[&&property&&="selected"]:unchecked { 
+	background-color: &background_primary&; 
+}
+QCheckBox[&&property&&="idle"] {
+	width: &unit_1&;
+	height: &unit_1&;
+	background-color: transparent;
+	color: rgba(255, 255, 255, 153);
+}
+QCheckBox::indicator[&&property&&="idle"] {
+	width: 12px;
+	height: 12px;
+	border: 2 solid &content_default&;
+	border-radius: 7px;
+	image: none;
+}
+QCheckBox::indicator[&&property&&="idle"]:unchecked { 
+	background-color: &background_primary&; 
+}

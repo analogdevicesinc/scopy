@@ -51,7 +51,6 @@ private:
 	void initConfigSection(QWidget *parent);
 	void initSystemTimeSection(QWidget *parent);
 	void initTimestampSection(QWidget *parent);
-	void initCalibSection(QWidget *parent);
 	QWidget *createMenuCombo(QString name, QString attr);
 	QWidget *createConfigEdit(QString name, QString attr);
 	void updateCbValues(QComboBox *cb, QString attr);

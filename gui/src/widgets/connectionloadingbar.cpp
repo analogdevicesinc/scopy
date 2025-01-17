@@ -21,6 +21,7 @@
 
 #include "connectionloadingbar.h"
 #include <QHBoxLayout>
+#include <style.h>
 #include <stylehelper.h>
 
 using namespace scopy;
@@ -66,7 +67,8 @@ void ConnectionLoadingBar::setupUi()
 	m_progressBar->setMaximumHeight(10);
 	m_progressBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	m_progressBar->setValue(0);
-	QString style = QString("QProgressBar::chunk {background-color: %1;}").arg(StyleHelper::getColor("ScopyBlue"));
+	QString style = QString("QProgressBar::chunk {background-color: %1;}")
+				.arg(Style::getAttribute(json::theme::interactive_primary_idle));
 	setStyleSheet(style);
 
 	layout()->addWidget(m_loadingLabel);

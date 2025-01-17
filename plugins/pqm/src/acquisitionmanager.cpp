@@ -78,9 +78,12 @@ AcquisitionManager::~AcquisitionManager()
 	if(m_ctx) {
 		m_ctx = nullptr;
 	}
+	if(m_buffer) {
+		iio_buffer_destroy(m_buffer);
+		m_buffer = nullptr;
+	}
 	m_pingTask = nullptr;
-	// buffer destroy?
-	m_chnlsName.clear();
+	m_buffChnls.clear();
 	m_bufferData.clear();
 	m_pqmAttr.clear();
 }
@@ -90,11 +93,15 @@ void AcquisitionManager::enableBufferChnls(iio_device *dev)
 	int chnlsNo = iio_device_get_channels_count(dev);
 	for(int i = 0; i < chnlsNo; i++) {
 		iio_channel *chnl = iio_device_get_channel(dev, i);
-		iio_channel_enable(chnl);
 		QString chName(iio_channel_get_name(chnl));
-		m_chnlsName.push_back(chName);
+		if(iio_channel_is_output(chnl)) {
+			m_eventsChnls.push_back(chName);
+			continue;
+		}
+		iio_channel_enable(chnl);
+		m_buffChnls.push_back(chName);
 	}
-	m_pqmLog->setChnlsName(m_chnlsName);
+	m_pqmLog->setChnlsName(m_buffChnls);
 }
 
 void AcquisitionManager::toolEnabled(bool en, QString toolName)
@@ -130,6 +137,7 @@ void AcquisitionManager::readData()
 			setProcessData(true);
 		}
 		m_attrHaveBeenRead = readPqmAttributes();
+		adjustMap("angle", &AcquisitionManager::computeAdjustedAngle);
 	}
 	if(m_tools["waveform"]) {
 		if(m_processData.load()) {
@@ -164,9 +172,10 @@ bool AcquisitionManager::readPqmAttributes()
 			attrName = iio_channel_get_attr(chnl, j);
 			iio_channel_attr_read(chnl, attrName, dest, MAX_ATTR_SIZE);
 			m_pqmAttr[chnlId][attrName] = QString(dest);
-			m_pqmLog->acquireAttrData(attrName, dest, chnlId);
 		}
 	}
+	m_pqmLog->acquireAttrData(m_pqmAttr);
+	handlePQEvents();
 	m_pqmLog->log();
 	return true;
 }
@@ -187,13 +196,13 @@ bool AcquisitionManager::readBufferedData()
 	QString chnl;
 	int16_t *startAdr = (int16_t *)iio_buffer_start(m_buffer);
 	int16_t *endAdr = (int16_t *)iio_buffer_end(m_buffer);
-	for(const QString &ch : qAsConst(m_chnlsName)) {
+	for(const QString &ch : qAsConst(m_buffChnls)) {
 		m_bufferData[ch].clear();
 		m_bufferData[ch] = {};
 	}
 	for(int16_t *ptr = startAdr; ptr != endAdr; ptr++) {
-		chnlIdx = samplesCounter % m_chnlsName.size();
-		chnl = m_chnlsName[chnlIdx];
+		chnlIdx = samplesCounter % m_buffChnls.size();
+		chnl = m_buffChnls[chnlIdx];
 		double d_ptr = convertFromHwToHost((int)*ptr, chnl);
 		m_pqmLog->acquireBufferData(d_ptr, chnlIdx);
 		m_bufferData[chnl].push_back(d_ptr);
@@ -297,6 +306,48 @@ void AcquisitionManager::storeProcessData()
 		qWarning(CAT_PQM_ACQ) << "Cannot read process_data attribute!";
 	}
 	m_processData.store(val);
+}
+
+void AcquisitionManager::handlePQEvents()
+{
+	QString logMsg = "";
+	for(const QString &ch : qAsConst(m_eventsChnls)) {
+		if(m_pqmAttr[ch]["countEvent"].toInt() == 0) {
+			continue;
+		}
+		logMsg.append(ch + ",");
+		for(auto it = m_pqmAttr[ch].begin(); it != m_pqmAttr[ch].end(); ++it) {
+			logMsg.append(it.key() + "," + it.value() + ",");
+		}
+		logMsg.append("\n,");
+	}
+	if(!logMsg.isEmpty()) {
+		m_pqmLog->acquirePqEvents(logMsg);
+		Q_EMIT pqEvent();
+	}
+}
+
+void AcquisitionManager::computeAdjustedAngle(QString &angle)
+{
+	bool ok = false;
+	double adjustedAngle = angle.toDouble(&ok);
+	if(!ok) {
+		return;
+	}
+	// The angle we receive from the device represents the delay, which is why the following operation needs to be
+	// performed
+	adjustedAngle = 360 - adjustedAngle;
+	angle = QString::number(adjustedAngle);
+}
+
+void AcquisitionManager::adjustMap(const QString &attr, std::function<void(QString &value)> adjuster)
+{
+	for(auto it = m_pqmAttr.begin(); it != m_pqmAttr.end(); ++it) {
+		if(!it.value().contains(attr)) {
+			continue;
+		}
+		adjuster(it.value()[attr]);
+	}
 }
 
 bool AcquisitionManager::hasFwVers() const { return m_hasFwVers; }

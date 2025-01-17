@@ -28,12 +28,8 @@
 #include <QLineEdit>
 #include <QProcess>
 #include <QWidget>
+#include <QLabel>
 #include <animationpushbutton.h>
-#include <menulineedit.h>
-
-namespace Ui {
-class EmuWidget;
-}
 
 namespace scopy {
 class SCOPY_CORE_EXPORT EmuWidget : public QWidget
@@ -76,9 +72,9 @@ private:
 	void setEnableDemo(bool en);
 
 	QComboBox *m_demoOptCb;
-	MenuLineEdit *m_xmlPathEdit;
-	MenuLineEdit *m_rxTxDevEdit;
-	MenuLineEdit *m_uriEdit;
+	QLineEdit *m_xmlPathEdit;
+	QLineEdit *m_rxTxDevEdit;
+	QLineEdit *m_uriEdit;
 	QLabel *m_uriMsgLabel;
 	AnimationPushButton *m_enDemoBtn;
 

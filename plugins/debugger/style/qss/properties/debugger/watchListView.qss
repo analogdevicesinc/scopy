@@ -1,0 +1,15 @@
+QTableWidget::item[&&property&&=true] {
+	color: &content_default&;
+	border-bottom: 1px solid &interactive_subtle_disabled&;
+}
+
+QTableWidget::item::selected[&&property&&=true] {
+	color: &content_default&;
+	background-color: &interactive_focus&;
+}
+
+QTableWidget[&&property&&=true] {
+	border: &border_width& solid &interactive_subtle_disabled&;
+	border-radius: &radius_1&;
+	background-color: &background_primary&;
+}

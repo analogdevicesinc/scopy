@@ -19,6 +19,8 @@
  *
  */
 
+#include <iostream>
+#include <style.h>
 #include <stylehelper.h>
 #include <widgets/toolbuttons.h>
 
@@ -27,8 +29,8 @@ using namespace scopy;
 PrintBtn::PrintBtn(QWidget *parent)
 	: QPushButton(parent)
 {
-	StyleHelper::BlueGrayButton(this, "print_btn");
-	setFixedWidth(128);
+	Style::setStyle(this, style::properties::button::squareIconButton);
+	setFixedWidth(145);
 	setCheckable(false);
 	setText("Print");
 }
@@ -37,10 +39,17 @@ OpenLastMenuBtn::OpenLastMenuBtn(MenuHAnim *menu, bool opened, QWidget *parent)
 	: QPushButton(parent)
 	, m_menu(menu)
 {
-	QIcon icon1;
-	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/setup3_unchecked_hover.svg", "white", 1));
-	setIcon(icon1);
-	StyleHelper::SquareToggleButtonWithIcon(this, "open_last_menu_btn", true);
+	QString iconPath = ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+		"/icons/setup3_unchecked_hover.svg";
+	setIcon(Style::getPixmap(iconPath, Style::getColor(json::theme::content_default)));
+
+	connect(this, &QPushButton::toggled, this, [=](bool toggle) {
+		const char *color = toggle ? json::theme::content_inverse : json::theme::content_default;
+		setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
+	});
+
+	setCheckable(true);
+	Style::setStyle(this, style::properties::button::squareIconButton);
 	setChecked(opened);
 	grp = new SemiExclusiveButtonGroup(this);
 	connect(this, &QPushButton::toggled, m_menu, &MenuHAnim::toggleMenu);
@@ -65,19 +74,73 @@ QButtonGroup *OpenLastMenuBtn::getButtonGroup() { return grp; }
 GearBtn::GearBtn(QWidget *parent)
 	: QPushButton(parent)
 {
-	QIcon icon1;
-	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/gear_wheel_hover.svg", "white", 1));
-	StyleHelper::SquareToggleButtonWithIcon(this, "gear_btn", true);
-	setIcon(icon1);
+	QString iconPath =
+		":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg";
+	setIcon(Style::getPixmap(iconPath, Style::getColor(json::theme::content_default)));
+
+	connect(this, &QPushButton::toggled, this, [=](bool toggle) {
+		const char *color = toggle ? json::theme::content_inverse : json::theme::content_default;
+		setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
+	});
+
+	setCheckable(true);
+	Style::setStyle(this, style::properties::button::squareIconButton);
 }
 
-InfoBtn::InfoBtn(QWidget *parent)
+InfoBtn::InfoBtn(QWidget *parent, bool hasTutorial)
 	: QPushButton(parent)
+	, m_hasTutorial(hasTutorial)
 {
-	QIcon icon1;
-	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/info.svg", "white", 1));
-	StyleHelper::SquareToggleButtonWithIcon(this, "info_btn", false);
-	setIcon(icon1);
+
+	QString iconPath = ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/info.svg";
+	setIcon(Style::getPixmap(iconPath, Style::getColor(json::theme::content_default)));
+
+	connect(this, &QPushButton::toggled, this, [=](bool toggle) {
+		const char *color = toggle ? json::theme::content_inverse : json::theme::content_default;
+		setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
+	});
+
+	setCheckable(false);
+	Style::setStyle(this, style::properties::button::squareIconButton);
+}
+
+bool InfoBtn::hasTutorial() { return m_hasTutorial; }
+
+void InfoBtn::generateInfoPopup(QWidget *parent)
+{
+	m_popupWidget = new PopupWidget(parent);
+	m_popupWidget->enableCenterOnParent(true);
+	m_popupWidget->setTitle("Plugin Information");
+	m_popupWidget->setDescription(
+		"To learn more about this plugin, check out the tutorial or read the online documentation.");
+	m_popupWidget->getExitBtn()->setText("Tutorial");
+	m_popupWidget->getContinueBtn()->setText("Documentation");
+	m_popupWidget->enableCloseButton(true);
+
+	connect(m_popupWidget->getExitBtn(), &QPushButton::clicked, this, [=]() { m_popupWidget->deleteLater(); });
+
+	connect(m_popupWidget->getContinueBtn(), &QPushButton::clicked, this, [=]() { m_popupWidget->deleteLater(); });
+
+	m_popupWidget->enableTintedOverlay(true);
+	m_popupWidget->show();
+	m_popupWidget->raise();
+}
+
+QPushButton *InfoBtn::getTutorialButton()
+{
+	if(m_hasTutorial) {
+		return m_popupWidget->getExitBtn();
+	}
+
+	return nullptr;
+}
+
+QPushButton *InfoBtn::getDocumentationButton()
+{
+	if(m_hasTutorial) {
+		return m_popupWidget->getContinueBtn();
+	}
+	return nullptr;
 }
 
 RunBtn::RunBtn(QWidget *parent)
@@ -89,38 +152,16 @@ RunBtn::RunBtn(QWidget *parent)
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	setText("Run");
 	connect(this, &QPushButton::toggled, this, [=](bool b) { setText(b ? "Stop" : "Run"); });
-	QString style = QString(R"css(
-			QPushButton {
-				width: 88px;
-				height: 48px;
-					border-radius: 2px;
-					text-align: left;
-					padding-left: 20px;
-					padding-right: 20px;
-				color: white;
-					font-weight: 700;
-					font-size: 14px;
-			}
+	Style::setStyle(this, style::properties::button::runButton);
 
-			QPushButton:!checked {
-				background-color: #27b34f;
-			}
-
-			  QPushButton:checked {
-				background-color: #F45000;
-			}
-
-			QPushButton:disabled {
-				background-color: grey;
-			})css");
-
-	setStyleSheet(style);
 	QIcon icon1;
-	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/play.svg", "white", 1), QIcon::Normal, QIcon::Off);
-	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/play_stop.svg", "white", 1),
+	icon1.addPixmap(Style::getPixmap(":/gui/icons/play.svg", Style::getColor(json::theme::content_inverse)),
+			QIcon::Normal, QIcon::Off);
+	icon1.addPixmap(Style::getPixmap(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+						 "/icons/play_stop.svg",
+					 Style::getColor(json::theme::content_inverse)),
 			QIcon::Normal, QIcon::On);
 	setIcon(icon1);
-	setLayoutDirection(Qt::RightToLeft);
 }
 
 SingleShotBtn::SingleShotBtn(QWidget *parent)
@@ -131,65 +172,54 @@ SingleShotBtn::SingleShotBtn(QWidget *parent)
 	setChecked(false);
 	setText("Single");
 	connect(this, &QPushButton::toggled, this, [=](bool b) { setText(b ? "Stop" : "Single"); });
-	QString style = QString(R"css(
-			QPushButton {
-				width: 88px;
-				height: 48px;
-					border-radius: 2px;
-					text-align: left;
-					padding-left: 20px;
-					padding-right: 20px;
-				color: white;
-					font-weight: 700;
-					font-size: 14px;
-				opacity: 80;
-			}
+	Style::setStyle(this, style::properties::button::singleButton);
 
-			QPushButton:!checked {
-				background-color: #ff7200;
-			}
-
-			  QPushButton:checked {
-				background-color: #F45000;
-			}
-
-			QPushButton:disabled {
-				background-color: grey;
-			}
-			)css");
-
-	setStyleSheet(style);
 	QIcon icon1;
-	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/play_oneshot.svg", "white", 1), QIcon::Normal, QIcon::Off);
-	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/play_stop.svg", "white", 1),
+	icon1.addPixmap(Style::getPixmap(":/gui/icons/play_oneshot.svg", Style::getColor(json::theme::content_inverse)),
+			QIcon::Normal, QIcon::Off);
+	icon1.addPixmap(Style::getPixmap(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+						 "/icons/play_stop.svg",
+					 Style::getColor(json::theme::content_inverse)),
 			QIcon::Normal, QIcon::On);
 	setIcon(icon1);
-	setLayoutDirection(Qt::RightToLeft);
 }
 
 #include "moc_toolbuttons.cpp"
 
 AddBtn::AddBtn(QWidget *parent)
 {
-	QIcon icon1;
-	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/launcher_add.svg", "white", 1));
-	StyleHelper::SquareToggleButtonWithIcon(this, "add_btn", false);
-	setIcon(icon1);
+	QString iconPath = ":/gui/icons/add.svg";
+	setIcon(Style::getPixmap(iconPath, Style::getColor(json::theme::content_default)));
+
+	connect(this, &QPushButton::toggled, this, [=](bool toggle) {
+		const char *color = toggle ? json::theme::content_inverse : json::theme::content_default;
+		setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
+	});
+
+	setCheckable(false);
+	Style::setStyle(this, style::properties::button::squareIconButton);
 }
 
 RemoveBtn::RemoveBtn(QWidget *parent)
 {
-	QIcon icon1;
-	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/red_x.svg", "white", 1));
-	StyleHelper::SquareToggleButtonWithIcon(this, "remove_btn", false);
-	setIcon(icon1);
+	QString iconPath = ":/gui/icons/red_x.svg";
+	setIcon(Style::getPixmap(iconPath, Style::getColor(json::theme::content_default)));
+
+	connect(this, &QPushButton::toggled, this, [=](bool toggle) {
+		const char *color = toggle ? json::theme::content_inverse : json::theme::content_default;
+		setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
+	});
+
+	setCheckable(false);
+	Style::setStyle(this, style::properties::button::squareIconButton);
 }
 
 SyncBtn::SyncBtn(QWidget *parent)
 {
 	QIcon icon1;
-	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/gear_wheel_hover.svg", "white", 1));
-	StyleHelper::BlueGrayButton(this, "sync_btn");
+	icon1.addPixmap(Style::getPixmap(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+					 "/icons/gear_wheel.svg"));
+	Style::setStyle(this, style::properties::button::squareIconButton);
 	setText("Sync");
 	setCheckable(true);
 	setIcon(icon1);

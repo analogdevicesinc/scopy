@@ -24,6 +24,7 @@
 #include "gui/dynamicWidget.h"
 
 #include <QHBoxLayout>
+#include <style.h>
 
 using namespace scopy;
 using namespace scopy::m2kgui;
@@ -55,13 +56,15 @@ ChannelManager::ChannelManager(ChannelsPositionEnum position, QWidget *parent)
 	toolStatus = new QLabel("");
 	channelManagerToggled = false;
 
-	QStringList icons = QStringList() << ":/gui/icons/scopy-default/icons/menu.svg";
+	QStringList icons = QStringList()
+		<< ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/menu.svg";
 
 	QIcon my_icon;
 	my_icon.addFile(icons[0], QSize(), QIcon::Normal);
 
 	toggleChannels = new QPushButton(this);
-	toggleChannels->setStyleSheet("font-size: 12px; color: rgba(255, 255, 255, 70);");
+	toggleChannels->setStyleSheet("font-size: " + Style::getAttribute(json::global::font_size_0_5) +
+				      "; color: rgba(255, 255, 255, 70);");
 	toggleChannels->setIcon(my_icon);
 	toggleChannels->setIconSize(QSize(24, 24));
 	toggleChannels->setFixedWidth(20);
@@ -217,7 +220,7 @@ void ChannelManager::changeParent(QWidget *newParent)
 		ch_width = header->width();
 		ch_height = header->height();
 	} else {
-		for(auto ch : m_channelsList) {
+		for(auto ch : qAsConst(m_channelsList)) {
 			ch_width = std::max(ch_width, ch->width());
 			ch_height = std::max(ch_height, ch->height());
 		}

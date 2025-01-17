@@ -181,3 +181,9 @@ General settings layout
 
  The menu can be detached and reattached by pressing the arrow button 
  in the top right corner.
+
+Tutorial 
+--------------------------------------------------------------------------------
+
+A tutorial will automatically start first time the tool is open. It can
+be restarted from tool Preferences.

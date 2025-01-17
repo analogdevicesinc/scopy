@@ -93,8 +93,6 @@ private:
 
 	void initTutorialProperties();
 	void startTutorial();
-
-	void showEvent(QShowEvent *event) override;
 };
 } // namespace scopy::datamonitor
 #endif // DATAMONITORTOOL_H

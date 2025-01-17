@@ -26,6 +26,7 @@
 
 #include <QLabel>
 #include <menusectionwidget.h>
+#include <style.h>
 
 #include <iioutil/connectionprovider.h>
 #include <gui/deviceinfopage.h>
@@ -78,14 +79,16 @@ bool DACPlugin::loadPage()
 
 bool DACPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/scopy-default/icons/tool_oscilloscope.svg");
+	SCOPY_PLUGIN_ICON(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+			  "/icons/tool_oscilloscope.svg");
 	return true;
 }
 
 void DACPlugin::loadToolList()
 {
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("dac", "DAC", ":/gui/icons/scopy-default/icons/tool_signal_generator.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("dac", "DAC",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_signal_generator.svg"));
 }
 
 void DACPlugin::unload()
@@ -96,46 +99,6 @@ void DACPlugin::unload()
 }
 
 QString DACPlugin::description() { return "Tool for generic IIO DAC control."; }
-
-void DACPlugin::initPreferences()
-{
-	Preferences *p = Preferences::GetInstance();
-	p->init("dacplugin_start_tutorial", true);
-}
-
-bool DACPlugin::loadPreferencesPage()
-{
-	Preferences *p = Preferences::GetInstance();
-
-	m_preferencesPage = new QWidget();
-	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
-
-	MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
-	MenuCollapseSection *generalSection = new MenuCollapseSection(
-		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, generalWidget);
-	generalWidget->contentLayout()->setSpacing(10);
-	generalWidget->contentLayout()->addWidget(generalSection);
-	generalSection->contentLayout()->setSpacing(10);
-	lay->setMargin(0);
-	lay->addWidget(generalWidget);
-	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
-
-	QWidget *resetTutorialWidget = new QWidget();
-	QHBoxLayout *resetTutorialWidgetLayout = new QHBoxLayout();
-
-	resetTutorialWidget->setLayout(resetTutorialWidgetLayout);
-	resetTutorialWidgetLayout->setMargin(0);
-
-	QPushButton *resetTutorial = new QPushButton("Reset", generalSection);
-	StyleHelper::BlueButton(resetTutorial, "resetBtn");
-	connect(resetTutorial, &QPushButton::clicked, this, [=, this]() { p->set("dacplugin_start_tutorial", true); });
-
-	resetTutorialWidgetLayout->addWidget(new QLabel("DAC tutorial "), 6);
-	resetTutorialWidgetLayout->addWidget(resetTutorial, 1);
-	generalSection->contentLayout()->addWidget(resetTutorialWidget);
-
-	return true;
-}
 
 QString DACPlugin::about()
 {

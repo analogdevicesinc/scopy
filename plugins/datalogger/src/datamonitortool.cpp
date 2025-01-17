@@ -30,6 +30,7 @@
 #include <menucontrolbutton.h>
 #include <datamonitor/sevensegmentdisplay.hpp>
 #include <QDesktopServices>
+#include <style.h>
 #include <timemanager.hpp>
 #include <tutorialbuilder.h>
 #include <pluginbase/preferences.h>
@@ -46,6 +47,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	, QWidget{parent}
 {
 	QHBoxLayout *lay = new QHBoxLayout(this);
+	lay->setMargin(0);
 	setLayout(lay);
 
 	tool = new ToolTemplate(this);
@@ -62,19 +64,23 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), true, this);
 	rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn *>(openLastMenuBtn)->getButtonGroup();
 
-	infoBtn = new InfoBtn(this);
 	printplotManager = new PrintPlotManager(this);
 	runBtn = new RunBtn(this);
 	clearBtn = new QPushButton("Clear", this);
 	PrintBtn *printBtn = new PrintBtn(this);
 
-	// connect(infoBtn, &QPushButton::clicked, this, &DatamonitorTool::startTutorial);
-	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
-		QDesktopServices::openUrl(
-			QUrl("https://analogdevicesinc.github.io/scopy/plugins/datalogger/datalogger.html"));
-	});
+	infoBtn = new InfoBtn(this, true);
 
-	// connect(infoBtn, &QPushButton::clicked, this, &DatamonitorTool::startTutorial);
+	connect(infoBtn, &InfoBtn::clicked, this, [=]() {
+		infoBtn->generateInfoPopup(this);
+
+		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, [=]() { this->startTutorial(); });
+
+		connect(infoBtn->getDocumentationButton(), &QPushButton::clicked, this, [=]() {
+			QDesktopServices::openUrl(
+				QUrl("https://analogdevicesinc.github.io/scopy/plugins/datalogger/datalogger.html"));
+		});
+	});
 
 	//// add monitors
 	addMonitorButton = new AddBtn(this);
@@ -175,7 +181,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	////////////////////////settings //////////////
 	m_dataMonitorSettings = new DataMonitorSettings(m_monitorPlot);
 	// TODO GET SETTINGS NAME FROM UTILS
-	m_dataMonitorSettings->init("Data Logger", StyleHelper::getColor("ScopyBlue"));
+	m_dataMonitorSettings->init("Data Logger", Style::getAttribute(json::theme::interactive_primary_idle));
 
 	tool->rightStack()->add(DataMonitorUtils::getToolSettingsId(), m_dataMonitorSettings);
 
@@ -352,17 +358,6 @@ void DatamonitorTool::startTutorial()
 		new gui::TutorialBuilder(this, ":/datamonitor/tutorial_chapters.json", "datamonitor", parent);
 	datamonitorTutorial->setTitle("Tutorial");
 	datamonitorTutorial->start();
-}
-
-void DatamonitorTool::showEvent(QShowEvent *event)
-{
-	QWidget::showEvent(event);
-
-	// Handle tutorial
-	if(Preferences::get("dataloggerplugin_start_tutorial").toBool()) {
-		startTutorial();
-		Preferences::set("dataloggerplugin_start_tutorial", false);
-	}
 }
 
 #include "moc_datamonitortool.cpp"

@@ -25,6 +25,8 @@
 
 #include "ui_statistic.h"
 
+#include <style.h>
+
 namespace scopy {
 class Formatter
 {
@@ -123,7 +125,9 @@ int StatisticWidget::channelId() const { return m_channelId; }
 void StatisticWidget::setTitleColor(const QColor &color)
 {
 	QString stylesheet = QString(""
-				     "font-size: 14px;"
+				     "font-size: " +
+				     Style::getAttribute(json::global::font_size_1) +
+				     ";"
 				     "font-weight: bold;"
 				     "color: %1;")
 				     .arg(color.name());

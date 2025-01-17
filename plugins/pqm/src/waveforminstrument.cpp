@@ -30,6 +30,7 @@
 #include <plotnavigator.hpp>
 #include <qwt_legend.h>
 #include <rollingstrategy.h>
+#include <style.h>
 #include <swtriggerstrategy.h>
 #include <gui/stylehelper.h>
 #include <gui/widgets/verticalchannelmanager.h>
@@ -50,7 +51,7 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	setLayout(layout);
-	StyleHelper::GetInstance()->initColorMap();
+	layout->setMargin(0);
 
 	m_plottingStrategy = PlottingStrategyBuilder::build("trigger", m_plotSampleRate);
 	ToolTemplate *tool = new ToolTemplate(this);
@@ -101,7 +102,11 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 	connect(m_singleBtn, SIGNAL(toggled(bool)), this, SLOT(toggleWaveform(bool)));
 }
 
-WaveformInstrument::~WaveformInstrument() { m_xTime.clear(); }
+WaveformInstrument::~WaveformInstrument()
+{
+	m_xTime.clear();
+	ResourceManager::close("pqm" + m_uri);
+}
 
 void WaveformInstrument::showOneBuffer(bool hasFwVers)
 {
@@ -138,7 +143,7 @@ void WaveformInstrument::setupChannels(PlotWidget *plot, QMap<QString, QString> 
 {
 	int chnlIdx = 0;
 	for(const QString &chnlId : chnls) {
-		QPen chPen = QPen(QColor(StyleHelper::getColor("CH" + QString::number(chnlIdx))), 1);
+		QPen chPen = QPen(QColor(StyleHelper::getChannelColor(chnlIdx)), 1);
 		PlotChannel *plotCh = new PlotChannel(chnls.key(chnlId), chPen, plot->xAxis(), plot->yAxis(), this);
 		plot->addPlotChannel(plotCh);
 		plotCh->setEnabled(true);
@@ -154,7 +159,8 @@ QWidget *WaveformInstrument::createSettMenu(QWidget *parent)
 	layout->setMargin(0);
 	layout->setSpacing(10);
 
-	MenuHeaderWidget *header = new MenuHeaderWidget("Settings", QPen(StyleHelper::getColor("ScopyBlue")), widget);
+	MenuHeaderWidget *header = new MenuHeaderWidget(
+		"Settings", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), widget);
 	QWidget *plotSection = createMenuPlotSection(widget);
 	QWidget *logSection = createMenuLogSection(widget);
 
@@ -170,13 +176,14 @@ QWidget *WaveformInstrument::createMenuPlotSection(QWidget *parent)
 {
 	MenuSectionCollapseWidget *plotSection = new MenuSectionCollapseWidget(
 		"PLOT", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, parent);
+
 	plotSection->contentLayout()->setSpacing(10);
 
 	// timespan
-	m_timespanSpin = new PositionSpinButton({{"ms", 1E-3}, {"s", 1E0}}, "Timespan", 0.02, 10, true, false);
-	m_timespanSpin->setStep(0.05);
+	m_timespanSpin = new gui::MenuSpinbox(tr("Timespan"), 1, "s", 0.02, 10, true, false, plotSection);
+	m_timespanSpin->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 	m_timespanSpin->setValue(1);
-	connect(m_timespanSpin, &PositionSpinButton::valueChanged, this, [=, this](double value) {
+	connect(m_timespanSpin, &gui::MenuSpinbox::valueChanged, this, [=, this](double value) {
 		m_voltagePlot->xAxis()->setMin(-value);
 		m_currentPlot->xAxis()->setMin(-value);
 	});
@@ -234,12 +241,12 @@ QWidget *WaveformInstrument::createMenuLogSection(QWidget *parent)
 		logSection->setDisabled(en);
 		QString dirPath = logFilePath->edit()->text();
 		QDir logDir = QDir(dirPath);
-		if(dirPath.isEmpty())
-			logSection->setCollapsed(true);
-		if(en && logDir.exists() && !logSection->collapsed())
+		logSection->setCollapsed(dirPath.isEmpty() || !logDir.exists());
+		if(en && !logSection->collapsed()) {
 			Q_EMIT logData(PqmDataLogger::Waveform, dirPath);
-		else
+		} else {
 			Q_EMIT logData(PqmDataLogger::None, "");
+		}
 	});
 	connect(this, &WaveformInstrument::enableTool, browseWidget, &QWidget::setDisabled);
 	connect(browseBtn, &QPushButton::clicked, this, [this, logFilePath]() { browseFile(logFilePath->edit()); });

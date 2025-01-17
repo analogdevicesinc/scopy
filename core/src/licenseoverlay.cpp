@@ -21,6 +21,7 @@
 
 #include <QAbstractButton>
 #include <QCoreApplication>
+#include <style.h>
 
 #include <licenseoverlay.h>
 #include <pluginbase/preferences.h>
@@ -36,22 +37,25 @@ LicenseOverlay::LicenseOverlay(QWidget *parent)
 	m_popupWidget->enableTitleBar(false);
 	m_popupWidget->enableTintedOverlay(true);
 	m_popupWidget->setDescription(getLicense());
+	m_popupWidget->enableCenterOnParent(true);
 
 	connect(m_popupWidget->getContinueBtn(), &QAbstractButton::clicked, [&]() {
 		Preferences::GetInstance()->set("general_first_run", false);
 		deleteLater();
+		m_popupWidget->deleteLater();
 	});
 	Preferences::connect(m_popupWidget->getExitBtn(), &QAbstractButton::clicked,
 			     [&]() { QCoreApplication::quit(); });
+
+	Style::setBackgroundColor(m_popupWidget, json::theme::background_primary);
 }
 
-LicenseOverlay::~LicenseOverlay() { delete m_popupWidget; }
+LicenseOverlay::~LicenseOverlay() {}
 
 void LicenseOverlay::showOverlay()
 {
 	raise();
 	show();
-	m_popupWidget->move(parent->rect().center() - m_popupWidget->rect().center());
 }
 
 QPushButton *LicenseOverlay::getContinueBtn() { return m_popupWidget->getContinueBtn(); }

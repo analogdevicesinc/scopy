@@ -21,12 +21,13 @@
 
 #include <QVBoxLayout>
 #include <QLabel>
-
+#include <QScrollBar>
+#include <style.h>
 #include <gui/stylehelper.h>
-
 #include "iioexplorerinstrument.h"
 #include "iiostandarditem.h"
 #include "debuggerloggingcategories.h"
+#include "style_properties.h"
 
 using namespace scopy::debugger;
 
@@ -36,13 +37,13 @@ IIOExplorerInstrument::IIOExplorerInstrument(struct iio_context *context, QStrin
 	, m_uri(uri)
 	, m_currentlySelectedItem(nullptr)
 {
-	setObjectName("IIODebugInstrument - " + uri);
+	setObjectName("IIOExplorerInstrument - " + uri);
 	setupUi();
 	connectSignalsAndSlots();
 
 	// api object for saving the state of widgets
 	m_apiObject = new IIOExplorerInstrument_API(this);
-	m_apiObject->setObjectName("IIODebugInstrument");
+	m_apiObject->setObjectName("IIOExplorerInstrument");
 }
 
 IIOExplorerInstrument::~IIOExplorerInstrument() {}
@@ -61,6 +62,7 @@ void IIOExplorerInstrument::loadSettings(QSettings &s)
 
 void IIOExplorerInstrument::setupUi()
 {
+	setMinimumSize(720, 480); // Decent minimum size
 	m_tabWidget = new QTabWidget(this);
 
 	m_mainWidget = new QWidget(m_tabWidget);
@@ -81,12 +83,8 @@ void IIOExplorerInstrument::setupUi()
 	QWidget *details_container = new QWidget(right_container);
 	QWidget *watch_list = new QWidget(right_container);
 
-	StyleHelper::BackgroundPage(details_container, "DetailsContainer");
-	StyleHelper::BackgroundPage(watch_list, "WatchListContainer");
-	StyleHelper::BackgroundPage(tree_view_container, "TreeViewContainer");
-	StyleHelper::SplitterStyle(m_HSplitter, "HorizontalSplitter");
-	StyleHelper::SplitterStyle(m_VSplitter, "VerticalSplitter");
-	StyleHelper::TabWidgetBarUnderline(m_tabWidget, "IIODebugInstrumentTabWidget");
+	Style::setBackgroundColor(details_container, json::theme::background_subtle);
+	Style::setBackgroundColor(tree_view_container, json::theme::background_subtle);
 
 	m_mainWidget->setLayout(new QVBoxLayout(m_mainWidget));
 	m_mainWidget->layout()->setContentsMargins(0, 0, 0, 0);
@@ -98,13 +96,16 @@ void IIOExplorerInstrument::setupUi()
 	right_container->setLayout(new QVBoxLayout(right_container));
 	right_container->layout()->setContentsMargins(0, 0, 0, 0);
 	details_container->setLayout(new QVBoxLayout(details_container));
+	details_container->layout()->setContentsMargins(2, 9, 9, 2);
 	watch_list->setLayout(new QVBoxLayout(watch_list));
+	watch_list->layout()->setContentsMargins(2, 2, 9, 9);
 	tree_view_container->setLayout(new QVBoxLayout(tree_view_container));
+	tree_view_container->layout()->setContentsMargins(9, 9, 2, 9);
 
 	m_proxyModel = new IIOSortFilterProxyModel(this);
 	m_treeView = new QTreeView(tree_view_container);
 	m_treeView->setHeaderHidden(true);
-	StyleHelper::TreeViewDebugger(m_treeView, "TreeView");
+
 	// m_saveContextSetup = new SaveContextSetup(m_treeView, bottom_container);
 	// m_iioModel = new IIOModel(m_context, m_uri, m_treeView);
 
@@ -114,11 +115,14 @@ void IIOExplorerInstrument::setupUi()
 	m_detailsView = new DetailsView(details_container);
 	m_watchListView = new WatchListView(watch_list);
 
-	watch_list->layout()->setContentsMargins(0, 0, 0, 0);
 	watch_list->layout()->addWidget(m_watchListView);
 
 	m_proxyModel->setSourceModel(m_iioModel->getModel());
 	m_proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+
+	Style::setBackgroundColor(m_mainWidget, json::theme::background_subtle);
+	Style::setBackgroundColor(m_debugLogger, json::theme::background_subtle);
+	Style::setStyle(m_treeView, style::properties::debugger::treeView);
 
 	m_treeView->setModel(m_proxyModel);
 
@@ -141,6 +145,7 @@ void IIOExplorerInstrument::setupUi()
 	right_container->layout()->addWidget(m_VSplitter);
 
 	setLayout(new QVBoxLayout(this));
+	layout()->setContentsMargins(0, 0, 0, 0);
 	layout()->addWidget(m_tabWidget);
 }
 

@@ -27,7 +27,8 @@
 #include <QFutureWatcher>
 #include <QWidget>
 #include <animationpushbutton.h>
-#include <menulineedit.h>
+#include <QLineEdit>
+#include <QCheckBox>
 
 namespace scopy {
 
@@ -75,8 +76,8 @@ private:
 	QComboBox *m_avlCtxCb;
 	MenuCombo *m_serialPortCb;
 	MenuCombo *m_baudRateCb;
-	MenuLineEdit *m_serialFrameEdit;
-	MenuLineEdit *m_uriEdit;
+	QLineEdit *m_serialFrameEdit;
+	QLineEdit *m_uriEdit;
 	QLabel *m_uriMsgLabel;
 	AnimationPushButton *m_btnScan;
 	AnimationPushButton *m_btnSerialScan;

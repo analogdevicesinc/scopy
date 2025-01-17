@@ -26,6 +26,7 @@
 
 #include <QWidget>
 #include <menucombo.h>
+#include <menuspinbox.h>
 #include <plottingstrategy.h>
 #include <pqmdatalogger.h>
 #include <gui/spinbox_a.hpp>
@@ -80,7 +81,7 @@ private:
 	RunBtn *m_runBtn;
 	SingleShotBtn *m_singleBtn;
 	GearBtn *m_settBtn;
-	PositionSpinButton *m_timespanSpin;
+	gui::MenuSpinbox *m_timespanSpin;
 	MenuCombo *m_triggeredBy;
 
 	QMap<QString, PlotChannel *> m_plotChnls;

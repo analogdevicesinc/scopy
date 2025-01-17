@@ -22,8 +22,10 @@
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menuheader.h>
 #include <gui/widgets/menusectionwidget.h>
+#include <style.h>
 
 using namespace scopy::swiot;
+using namespace scopy::gui;
 
 DioSettingsTab::DioSettingsTab(QWidget *parent)
 	: QWidget(parent)
@@ -34,7 +36,8 @@ DioSettingsTab::DioSettingsTab(QWidget *parent)
 	layout->setSpacing(10);
 	layout->setContentsMargins(0, 0, 0, 0);
 
-	MenuHeaderWidget *header = new MenuHeaderWidget("MAX14906", QPen(StyleHelper::getColor("ScopyBlue")), this);
+	MenuHeaderWidget *header = new MenuHeaderWidget(
+		"MAX14906", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), this);
 	MenuSectionWidget *plotSettingsContainer = new MenuSectionWidget(this);
 	MenuCollapseSection *plotTimespanSection = new MenuCollapseSection("PLOT", MenuCollapseSection::MHCW_NONE,
 									   MenuCollapseSection::MHW_BASEWIDGET, this);
@@ -44,12 +47,14 @@ DioSettingsTab::DioSettingsTab(QWidget *parent)
 
 	QLabel *label = new QLabel(this);
 	label->setText("Polling at 1 sample/second");
-	StyleHelper::MenuSmallLabel(label);
+	Style::setStyle(label, style::properties::label::menuSmall);
 
 	// timespan
-	m_maxSpinButton = new PositionSpinButton({{tr("s"), 1}}, tr("Timespan"), 1, 300, true, false, this);
-	m_maxSpinButton->setValue(10);
-	connect(m_maxSpinButton, &PositionSpinButton::valueChanged, this,
+	m_maxSpinButton = new MenuSpinbox(tr("Timespan"), 10, "s", 1, 300, true, false, this);
+	m_maxSpinButton->setIncrementMode(MenuSpinbox::IS_FIXED);
+	m_maxSpinButton->setScaleRange(1, 1);
+
+	connect(m_maxSpinButton, &MenuSpinbox::valueChanged, this,
 		[this]() { Q_EMIT timeValueChanged(m_maxSpinButton->value()); });
 
 	plotTimespanSection->contentLayout()->addWidget(label);

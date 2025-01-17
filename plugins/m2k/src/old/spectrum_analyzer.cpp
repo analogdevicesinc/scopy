@@ -175,6 +175,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(libm2k::context::M2k *m2k, QString uri, Filte
 	sample_rate = m_max_sample_rate;
 
 	ui->setupUi(this);
+	ui->sweepSettings->setMinimumWidth(350);
 	// Temporarily disable the delta marker button
 	ui->pushButton_4->hide();
 

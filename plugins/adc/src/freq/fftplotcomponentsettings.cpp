@@ -25,6 +25,7 @@
 #include <QWidget>
 #include <QLineEdit>
 #include "fftplotcomponentchannel.h"
+#include <style.h>
 
 #include <gnuradio/fft/window.h>
 
@@ -50,10 +51,10 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 		"SETTINGS", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	QLabel *plotTitleLabel = new QLabel("Plot title");
-	StyleHelper::MenuSmallLabel(plotTitleLabel);
+	Style::setStyle(plotTitleLabel, style::properties::label::menuSmall);
 
 	QLineEdit *plotTitle = new QLineEdit(m_plotComponent->name());
-	StyleHelper::MenuLineEdit(plotTitle);
+	Style::setStyle(plotTitle, style::properties::lineedit::menuLineEdit);
 	connect(plotTitle, &QLineEdit::textChanged, this, [=](QString s) {
 		m_plotComponent->setName(s);
 		//	plotMenu->setTitle("PLOT - " + s);
@@ -110,7 +111,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_windowCb->combo()->setCurrentIndex(0);
 
 	connect(m_windowCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		for(auto c : m_channels) {
+		for(auto c : qAsConst(m_channels)) {
 			if(dynamic_cast<FFTChannel *>(c)) {
 				FFTChannel *fc = dynamic_cast<FFTChannel *>(c);
 				fc->setWindow(m_windowCb->combo()->itemData(idx).toInt());
@@ -120,7 +121,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 
 	m_windowChkb = new MenuOnOffSwitch("Window Correction", this);
 	connect(m_windowChkb->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
-		for(auto c : m_channels) {
+		for(auto c : qAsConst(m_channels)) {
 			if(dynamic_cast<FFTChannel *>(c)) {
 				FFTChannel *fc = dynamic_cast<FFTChannel *>(c);
 				fc->setWindowCorrection(b);
@@ -132,7 +133,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_curve = new MenuPlotChannelCurveStyleControl(plotMenu);
 
 	m_deletePlot = new QPushButton("DELETE PLOT");
-	StyleHelper::BlueButton(m_deletePlot);
+	StyleHelper::BasicButton(m_deletePlot);
 	connect(m_deletePlot, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
 
 	yaxis->contentLayout()->addWidget(m_autoscaleBtn);
@@ -170,7 +171,8 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 
 	m_settingsPlotHover = new QPushButton("", nullptr);
 	m_settingsPlotHover->setMaximumSize(16, 16);
-	m_settingsPlotHover->setIcon(QIcon(":/gui/icons/scopy-default/icons/preferences.svg"));
+	m_settingsPlotHover->setIcon(
+		QIcon(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/preferences.svg"));
 
 	connect(m_settingsPlotHover, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestSettings(); });
 

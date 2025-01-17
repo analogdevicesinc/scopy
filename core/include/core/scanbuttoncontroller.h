@@ -25,15 +25,15 @@
 #include "iioutil/cyclicaltask.h"
 #include "scopy-core_export.h"
 
+#include <QCheckBox>
 #include <QObject>
-#include <QPushButton>
 
 namespace scopy {
 class SCOPY_CORE_EXPORT ScanButtonController : public QObject
 {
 	Q_OBJECT
 public:
-	explicit ScanButtonController(CyclicalTask *cs, QPushButton *btn, QObject *parent);
+	explicit ScanButtonController(CyclicalTask *cs, QCheckBox *btn, QObject *parent);
 	~ScanButtonController();
 
 	int scanTimeout() const;
@@ -45,7 +45,7 @@ public Q_SLOTS:
 	void stopScan();
 
 private:
-	QPushButton *btn;
+	QCheckBox *btn;
 	CyclicalTask *cs;
 	QMetaObject::Connection conn;
 

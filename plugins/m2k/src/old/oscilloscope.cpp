@@ -78,6 +78,7 @@
 #include <gnuradio/m2k/mixed_signal_source.h>
 
 #include <QLoggingCategory>
+#include <style.h>
 
 #include <functional>
 #include <gui/utils.h>
@@ -2061,7 +2062,9 @@ void Oscilloscope::create_add_channel_panel()
 				   "height:25px;"
 				   "background-color: #4A64FF;"
 				   "border-radius: 4px;"
-				   "font-size: 12px;"
+				   "font-size: " +
+				   Style::getAttribute(json::global::font_size_0_5) +
+				   ";"
 				   "line-height: 14px;"
 				   "color: #FFFFFF;}"
 				   "QPushButton:hover{"
@@ -4349,7 +4352,7 @@ void Oscilloscope::measure_panel_init()
 
 	// Avoid labels jumping around to left or right by imposing a min width
 	QLabel *label = new QLabel(this);
-	label->setStyleSheet("font-size: 14px");
+	label->setStyleSheet("font-size: " + Style::getAttribute(json::global::font_size_1));
 	label->setText("-999.999 ns");
 	double minWidth = label->minimumSizeHint().width();
 	cursor_readouts_ui->cursorT1->setMinimumWidth(minWidth);

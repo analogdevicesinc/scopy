@@ -57,6 +57,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void enableTool(bool en, QString toolName = "harmonics");
 	void logData(PqmDataLogger::ActiveInstrument instr, const QString &filePath);
+	void pqEvent();
 private Q_SLOTS:
 	void updateTable();
 	void onActiveChnlChannged(QString chnlId);
@@ -72,6 +73,7 @@ private:
 	QWidget *createMenuGeneralSection(QWidget *parent);
 	QWidget *createMenuLogSection(QWidget *parent);
 	bool selectedFromSameCol(QModelIndexList list);
+	QPushButton *createPQEventsBtn(QWidget *parent);
 	void browseFile(QLineEdit *lineEditPath);
 
 	QString m_uri;

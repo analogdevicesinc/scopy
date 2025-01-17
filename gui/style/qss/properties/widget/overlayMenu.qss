@@ -1,0 +1,4 @@
+QWidget[&&property&&=true] {
+	background-color: &background_primary&;
+	border-radius: 4px;
+}

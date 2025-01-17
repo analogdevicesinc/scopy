@@ -20,6 +20,7 @@
  */
 
 #include "browsemenu.h"
+#include "style.h"
 
 #include <QPushButton>
 #include <stylehelper.h>
@@ -54,8 +55,13 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	m_toolMenu->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
 	QPushButton *homeBtn = new QPushButton(tr("Home"), m_content);
-	homeBtn->setIcon(QIcon(":/gui/icons/scopy-default/icons/tool_home.svg"));
-	StyleHelper::ToolMenuHome(homeBtn, "toolMenuHome");
+	Style::setStyle(homeBtn, style::properties::button::toolButton);
+	homeBtn->setIcon(
+		QIcon(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_home.svg"));
+	homeBtn->setFixedHeight(Style::getDimension(json::global::unit_4));
+	homeBtn->setCheckable(true);
+	homeBtn->setIconSize(QSize(32, 32));
+	homeBtn->setStyleSheet("text-align: left");
 	connect(homeBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("home"); });
 
 	QWidget *saveLoadWidget = new QWidget(m_content);
@@ -64,23 +70,31 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	saveLoadWidget->layout()->setSpacing(0);
 	saveLoadWidget->layout()->setMargin(0);
 
-	QPushButton *saveBtn = createBtn("Save", ":/gui/icons/scopy-default/icons/save.svg", saveLoadWidget);
-	saveBtn->setCheckable(false);
+	QPushButton *saveBtn = createBtn(
+		"Save", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/save.svg",
+		saveLoadWidget);
 	connect(saveBtn, &QPushButton::clicked, this, &BrowseMenu::requestSave);
 
-	QPushButton *loadBtn = createBtn("Load", ":/gui/icons/scopy-default/icons/load.svg", saveLoadWidget);
-	loadBtn->setCheckable(false);
+	QPushButton *loadBtn = createBtn(
+		"Load", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/load.svg",
+		saveLoadWidget);
 	connect(loadBtn, &QPushButton::clicked, this, &BrowseMenu::requestLoad);
 
 	saveLoadWidget->layout()->addWidget(saveBtn);
 	saveLoadWidget->layout()->addWidget(loadBtn);
 
-	QPushButton *preferencesBtn =
-		createBtn("Preferences", ":/gui/icons/scopy-default/icons/preferences.svg", m_content);
+	QPushButton *preferencesBtn = createBtn("Preferences",
+						":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							"/icons/preferences.svg",
+						m_content);
 	connect(preferencesBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("preferences"); });
+	preferencesBtn->setCheckable(true);
 
-	QPushButton *aboutBtn = createBtn("About", ":/gui/icons/scopy-default/icons/info.svg", m_content);
+	QPushButton *aboutBtn = createBtn(
+		"About", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/info.svg",
+		m_content);
 	connect(aboutBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("about"); });
+	aboutBtn->setCheckable(true);
 
 	QLabel *logo = createScopyLogo(m_content);
 
@@ -134,7 +148,7 @@ QPushButton *BrowseMenu::createBtn(QString name, QString iconPath, QWidget *pare
 	QPushButton *btn = new QPushButton(parent);
 	btn->setIcon(QIcon(iconPath));
 	btn->setText(tr(name.toStdString().c_str()));
-	StyleHelper::ToolMenuBtn(btn, name + "ToolMenuBtn");
+	Style::setStyle(btn, style::properties::button::toolButton);
 	return btn;
 }
 
@@ -143,6 +157,7 @@ QFrame *BrowseMenu::createHLine(QWidget *parent)
 	QFrame *line = new QFrame(parent);
 	line->setFrameShape(QFrame::HLine);
 	line->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	Style::setStyle(line, style::properties::widget::bottomBorder);
 	return line;
 }
 
@@ -154,14 +169,18 @@ QWidget *BrowseMenu::createHeader(QWidget *parent)
 	headerLay->setSpacing(0);
 	headerLay->setMargin(0);
 	QPushButton *btnCollapseMini = new QPushButton(menuHeader);
-	StyleHelper::ToolMenuCollapseMini(btnCollapseMini, "CollapseMiniBtn");
+	Style::setStyle(btnCollapseMini, style::properties::widget::toolMenu);
+	Style::setStyle(btnCollapseMini, style::properties::button::toolButton);
+	btnCollapseMini->setCheckable(true);
+	btnCollapseMini->setFixedSize(Style::getDimension(json::global::unit_4),
+				      Style::getDimension(json::global::unit_4));
 	headerLay->addWidget(btnCollapseMini);
 
 	m_btnCollapse = new QPushButton(menuHeader);
-	StyleHelper::ToolMenuCollapse(m_btnCollapse, "ToolMenuCollapse");
+	Style::setStyle(m_btnCollapse, style::properties::widget::toolMenuLogo);
+	Style::setStyle(m_btnCollapse, style::properties::widget::notInteractive);
 
 	headerLay->addWidget(m_btnCollapse);
-	connect(m_btnCollapse, &QPushButton::clicked, this, &BrowseMenu::toggleCollapsed);
 	connect(btnCollapseMini, &QPushButton::clicked, this, &BrowseMenu::toggleCollapsed);
 
 	return menuHeader;
@@ -170,7 +189,7 @@ QWidget *BrowseMenu::createHeader(QWidget *parent)
 QLabel *BrowseMenu::createScopyLogo(QWidget *parent)
 {
 	QLabel *logo = new QLabel(m_content);
-	StyleHelper::ScopyLogo(logo, "logo");
+	Style::setStyle(logo, style::properties::widget::logo);
 	return logo;
 }
 

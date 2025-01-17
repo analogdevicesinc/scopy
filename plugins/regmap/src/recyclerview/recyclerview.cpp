@@ -31,6 +31,8 @@
 #include <regmapstylehelper.hpp>
 
 #include <src/verticalscrollarea.hpp>
+#include "style_properties.h"
+#include <style.h>
 
 using namespace scopy::regmap;
 
@@ -60,7 +62,7 @@ RecyclerView::RecyclerView(QList<int> *widgets, QWidget *parent)
 	slider->setInvertedAppearance(true);
 	slider->setInvertedControls(true);
 	slider->setFixedWidth(8);
-	slider->setStyleSheet(RegmapStyleHelper::sliderStyle());
+	Style::setStyle(slider, style::properties::regmap::regmapSlider);
 
 	QObject::connect(m_scrollArea->verticalScrollBar(), &QAbstractSlider::valueChanged, this, [=](int value) {
 		if(value == m_scrollArea->verticalScrollBar()->minimum()) {

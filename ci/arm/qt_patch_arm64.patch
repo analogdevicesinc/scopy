@@ -1,0 +1,41 @@
+diff -Naur qt-everywhere-src/qtbase/mkspecs/devices/linux-rasp-pi4-aarch64/qmake.conf qt-everywhere-src-5.15.10/qtbase/mkspecs/devices/linux-rasp-pi4-aarch64/qmake.conf
+--- qt-everywhere-src/qtbase/mkspecs/devices/linux-rasp-pi4-aarch64/qmake.conf	2024-10-16 12:06:03.801661834 +0300
++++ qt-everywhere-src-5.15.10/qtbase/mkspecs/devices/linux-rasp-pi4-aarch64/qmake.conf	1970-01-01 02:00:00.000000000 +0200
+@@ -1,25 +0,0 @@
+-#
+-# Generic qmake configuration for building with g++ on Raspberry Pi 4 (64-bit).
+-#
+-# Tested with Raspberry Pi OS 64-bit and aarch64 gcc compiler from Debian package repository
+-#
+-# A minimal configure line could look something like this:
+-# ./configure -release -opengl es2 -device linux-rasp-pi4-aarch64 -device-option CROSS_COMPILE=aarch64-linux-gnu- -sysroot ~/rpi-sysroot -prefix /usr/local/qt6 -extprefix $HOME/qt-raspi
+-
+-DISTRO_OPTS            += deb-multi-arch
+-
+-include(../common/linux_device_pre.conf)
+-
+-QMAKE_LIBS_EGL         += -lEGL
+-QMAKE_LIBS_OPENGL_ES2  += -lGLESv2 -lEGL
+-
+-QMAKE_CFLAGS            += -march=armv8-a
+-QMAKE_CXXFLAGS          += $$QMAKE_CFLAGS
+-
+-EGLFS_DEVICE_INTEGRATION = eglfs_kms
+-
+-LINKER_FLAGS   += -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed
+-
+-include(../common/linux_device_post.conf)
+-
+-load(qt_config)
+diff -Naur qt-everywhere-src/qtbase/mkspecs/devices/linux-rasp-pi4-aarch64/qplatformdefs.h qt-everywhere-src-5.15.10/qtbase/mkspecs/devices/linux-rasp-pi4-aarch64/qplatformdefs.h
+--- qt-everywhere-src/qtbase/mkspecs/devices/linux-rasp-pi4-aarch64/qplatformdefs.h	2024-10-16 12:06:21.493092913 +0300
++++ qt-everywhere-src-5.15.10/qtbase/mkspecs/devices/linux-rasp-pi4-aarch64/qplatformdefs.h	1970-01-01 02:00:00.000000000 +0200
+@@ -1,8 +0,0 @@
+-/****************************************************************************
+-**
+-** Copyright (C) 2022 The Qt Company Ltd.
+-** SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+-**
+-****************************************************************************/
+-
+-#include "../../linux-g++/qplatformdefs.h"

@@ -1,4 +1,62 @@
-<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="16" height="16" rx="8" fill="#2FAD51"/>
-<path transform="translate(8, -3) rotate(45)" d="M9.00125 8L12 4.99751L11.0037 4L8.00498 7.00249L7.99502 6.99252L7.98508 7.00249L4.99626 4L4 4.99751L6.9908 8L4 11.0025L4.99626 12L7.98508 8.99751L7.99502 9.00748L8.00498 8.99751L11.0037 12L12 11.0025L9.00125 8Z" fill="white"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="16"
+   height="16"
+   viewBox="0 0 16 16"
+   fill="none"
+   version="1.1"
+   id="svg6"
+   sodipodi:docname="green_add.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
+  <metadata
+     id="metadata12">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs10" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1158"
+     inkscape:window-height="931"
+     id="namedview8"
+     showgrid="false"
+     inkscape:zoom="14.75"
+     inkscape:cx="8"
+     inkscape:cy="8"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg6" />
+  <rect
+     width="16"
+     height="16"
+     rx="8"
+     fill="#2FAD51"
+     id="rect2" />
+  <path
+     transform="translate(8, -3) rotate(45)"
+     d="M9.00125 8L12 4.99751L11.0037 4L8.00498 7.00249L7.99502 6.99252L7.98508 7.00249L4.99626 4L4 4.99751L6.9908 8L4 11.0025L4.99626 12L7.98508 8.99751L7.99502 9.00748L8.00498 8.99751L11.0037 12L12 11.0025L9.00125 8Z"
+     fill="white"
+     id="plus" />
 </svg>

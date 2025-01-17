@@ -32,6 +32,7 @@
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/stylehelper.h>
 #include <pluginbase/preferences.h>
+#include <style.h>
 
 using namespace scopy::swiot;
 
@@ -43,6 +44,7 @@ Max14906::Max14906(QString uri, ToolMenuEntry *tme, QWidget *parent)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *layout = new QHBoxLayout(this);
+	layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(layout);
 
 	// tool template configuration
@@ -56,13 +58,17 @@ Max14906::Max14906(QString uri, ToolMenuEntry *tme, QWidget *parent)
 
 	layout->addWidget(m_tool);
 
-	InfoBtn *infoBtn = new InfoBtn(this);
+	InfoBtn *infoBtn = new InfoBtn(this, true);
 	m_tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
-	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
-		QDesktopServices::openUrl(
-			QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/max14906.html"));
-	});
+	connect(infoBtn, &InfoBtn::clicked, this, [=]() {
+		infoBtn->generateInfoPopup(this);
+		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, [=]() { this->startTutorial(); });
 
+		connect(infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, [=, this]() {
+			QDesktopServices::openUrl(
+				QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/max14906.html"));
+		});
+	});
 	m_configBtn = createConfigBtn(this);
 	m_runBtn = new RunBtn(this);
 	m_gearBtn = new GearBtn(this);
@@ -308,21 +314,11 @@ QMainWindow *Max14906::createDockableMainWindow(const QString &title, DioDigital
 QPushButton *Max14906::createConfigBtn(QWidget *parent)
 {
 	QPushButton *configBtn = new QPushButton(parent);
-	StyleHelper::BlueGrayButton(configBtn, "back_btn");
-	configBtn->setFixedWidth(128);
+	Style::setStyle(configBtn, style::properties::button::squareIconButton);
+	configBtn->setFixedWidth(Style::getDimension(json::global::unit_6));
 	configBtn->setCheckable(false);
 	configBtn->setText("Config");
 	return configBtn;
-}
-
-void Max14906::showEvent(QShowEvent *event)
-{
-	QWidget::showEvent(event);
-
-	if(Preferences::get("max14906_start_tutorial").toBool()) {
-		startTutorial();
-		Preferences::set("max14906_start_tutorial", false);
-	}
 }
 
 #include "moc_max14906.cpp"

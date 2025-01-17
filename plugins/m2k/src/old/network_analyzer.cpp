@@ -31,6 +31,8 @@
 
 #include <iio.h>
 
+#include <gui/style.h>
+
 #include <gnuradio/analog/sig_source.h>
 #include <gnuradio/analog/sig_source_waveform.h>
 #include <gnuradio/blocks/float_to_short.h>
@@ -211,6 +213,8 @@ NetworkAnalyzer::NetworkAnalyzer(libm2k::context::M2k *m2k, QString uri, Filter 
 	}
 
 	ui->setupUi(this);
+	Style::setStyle(ui->spinBox_averaging, style::properties::widget::bottomBorder);
+	Style::setStyle(ui->spinBox_periods, style::properties::widget::bottomBorder);
 
 	bufferPreviewer = new NetworkAnalyzerBufferViewer();
 	bufferPreviewer->setVisible(false);

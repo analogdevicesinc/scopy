@@ -35,6 +35,7 @@
 #include <QRandomGenerator>
 #include <QLabel>
 #include <QScrollArea>
+#include <style.h>
 
 using namespace scopy;
 using namespace scopy::dac;
@@ -54,7 +55,6 @@ DacDataManager::DacDataManager(struct iio_device *dev, QWidget *parent)
 	MenuSectionWidget *modeSection = new MenuSectionWidget(this);
 	m_mode = new MenuCombo("MODE", this);
 	m_mode->setProperty("tutorial_name", "MODE_SELECTOR");
-	StyleHelper::IIOComboBox(m_mode->combo());
 	StyleHelper::BackgroundWidget(m_mode);
 	auto cb = m_mode->combo();
 	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=, this](int idx) {
@@ -78,7 +78,7 @@ DacDataManager::DacDataManager(struct iio_device *dev, QWidget *parent)
 	Q_EMIT m_mode->combo()->currentIndexChanged(0);
 	modeSection->contentLayout()->addWidget(m_mode);
 
-	m_color = StyleHelper::getColor("ScopyBlue");
+	m_color = Style::getAttribute(json::theme::interactive_primary_idle);
 	m_layout->addWidget(modeSection);
 	m_layout->addWidget(dacAddonStack);
 	m_layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));

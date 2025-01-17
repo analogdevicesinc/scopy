@@ -23,6 +23,7 @@
 #include "debuggerloggingcategories.h"
 #include <QVBoxLayout>
 #include <QFont>
+#include <style.h>
 
 using namespace scopy::debugger;
 
@@ -44,6 +45,7 @@ void IIODebugLogger::setupUi()
 	mono.setStyleHint(QFont::Monospace);
 	m_textBrowser->setFont(mono);
 	m_textBrowser->setReadOnly(true);
+	Style::setStyle(m_textBrowser, style::properties::widget::textBrowser);
 }
 
 void IIODebugLogger::appendLog(QString log)

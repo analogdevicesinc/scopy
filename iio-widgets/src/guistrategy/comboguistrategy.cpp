@@ -19,6 +19,8 @@
  */
 
 #include "guistrategy/comboguistrategy.h"
+#include "style_properties.h"
+#include <gui/style.h>
 #include <QLoggingCategory>
 
 using namespace scopy;
@@ -35,11 +37,10 @@ ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 		m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
 		auto label = new QLabel(recipe.data, m_ui);
-		StyleHelper::IIOCompactLabel(label, "IIOTitleLabel");
+		Style::setStyle(label, style::properties::label::iioCompactLabel);
 		m_comboWidget = new QComboBox(m_ui);
 		m_comboWidget->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
 
-		StyleHelper::IIOComboBox(m_comboWidget, "IIOComboBox");
 		m_comboWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
 		m_ui->layout()->addWidget(label);
@@ -51,10 +52,11 @@ ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 
 		auto comboMenuWidget = new MenuCombo(recipe.data, m_ui);
 		m_comboWidget = comboMenuWidget->combo();
-		StyleHelper::IIOComboBox(m_comboWidget, "IIOComboBox");
 
 		m_ui->layout()->addWidget(comboMenuWidget);
 	}
+
+	Style::setStyle(m_comboWidget, style::properties::iiowidgets::comboBox, true, true);
 
 	connect(m_comboWidget, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
 		QString currentData = m_comboWidget->currentText();

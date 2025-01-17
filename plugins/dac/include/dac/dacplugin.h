@@ -48,8 +48,6 @@ public:
 	QString about() override;
 	QString version() override;
 	QString description() override;
-	void initPreferences() override;
-	bool loadPreferencesPage() override;
 
 public Q_SLOTS:
 	bool onConnect() override;

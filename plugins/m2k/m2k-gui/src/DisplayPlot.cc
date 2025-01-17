@@ -1885,12 +1885,12 @@ void DisplayPlot::setZoomerParams(bool bounded, int maxStackDepth)
 		return;
 	}
 
-	for(auto zoomer : d_zoomer) {
+	for(auto zoomer : qAsConst(d_zoomer)) {
 		zoomer->setMaxStackDepth(maxStackDepth);
 		dynamic_cast<LimitedPlotZoomer *>(zoomer)->setBoundVertical(bounded);
 	}
 
-	for(auto magnifier : d_magnifier) {
+	for(auto magnifier : qAsConst(d_magnifier)) {
 		magnifier->setBounded(bounded);
 	}
 }

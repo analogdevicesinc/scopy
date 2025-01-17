@@ -25,6 +25,7 @@
 
 #include <QStandardItemModel>
 #include <QStyledItemDelegate>
+#include <style.h>
 
 using namespace scopy;
 
@@ -99,7 +100,7 @@ MarkerTable::MarkerTable(QWidget *parent)
 	ui->tableView->hideColumn(COL_ID);
 	ui->tableView->setShowGrid(false);
 	ui->tableView->setSelectionMode(QAbstractItemView::NoSelection);
-	ui->tableView->setStyleSheet("font-size: 14px;");
+	ui->tableView->setStyleSheet("font-size: " + Style::getAttribute(json::global::font_size_1) + ";");
 
 	FrequencyDelegate *freqDelegate = new FrequencyDelegate(this);
 	ui->tableView->setItemDelegateForColumn(COL_FREQ, freqDelegate);

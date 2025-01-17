@@ -37,9 +37,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
 
-/* Perform tool reset */
-launcher.reset()
-
 /* Comparator Input Voltage */
 var input_voltage = 2
 
@@ -193,12 +190,21 @@ function successive_approximation(max_val) {
 			max = digital_output - 1
 		else
 			break
-     }
+    }
 }
 
 /* Main function */
 function main (){
 	
+	/* Feel free to modify this as needed */
+	var uri = "ip:192.168.2.1"
+
+	var devId = scopy.addDevice(uri)
+	var connected = scopy.connectDevice(devId)
+	msleep(1000)
+	if (!connected)
+		return Error()
+
 	set_signal_generator()
 	
 	msleep(100)
@@ -219,4 +225,6 @@ function main (){
 	
 }
 
+/* To keep the application session after running a certain script */
+/* use the command line options: -r or --keep-running. */
 main()
