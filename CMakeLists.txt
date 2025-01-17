@@ -279,3 +279,27 @@ install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 if(QT_VERSION_MAJOR EQUAL 6)
 	qt_finalize_executable(${PROJECT_NAME})
 endif()
+
+# make uninstall
+add_custom_target("uninstall" COMMENT "Uninstall installed files")
+add_custom_command(
+	TARGET "uninstall"
+	POST_BUILD
+	COMMENT "Uninstall files with install_manifest.txt"
+	COMMAND xargs rm -vf < install_manifest.txt || echo Nothing in install_manifest.txt to be uninstalled!
+)
+
+# CPack config
+set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
+set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+set(CPACK_GENERATOR "ZIP")
+
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${PROJECT_VERSION}")
+
+set(CPACK_PACKAGE_DIRECTORY "${CMAKE_BINARY_DIR}/package")
+set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY OFF)
+set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+set(CPACK_SET_DESTDIR ON)
+set(CPACK_COMPONENTS_ALL ${SCOPY_PDK})
+include(CPack)
