@@ -1,4 +1,5 @@
 #include <stylehelper.h>
+#include <style.h>
 #include "widgets/registerblockwidget.h"
 
 using namespace scopy;
@@ -22,27 +23,14 @@ RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, ui
     menuSectionWidget->contentLayout()->addWidget(menuCollapseSection);
 
     QLabel *descriptionLabel = new QLabel(description, menuSectionWidget);
-    QString labelStyle = QString(R"css(
-				QLabel {
-					color: white;
-					background-color: rgba(255,255,255,0);
-					font-weight: 500;
-					font-family: Open Sans;
-					font-size: 12px;
-					font-style: normal;
-					}
-				QLabel:disabled {
-					color: grey;
-				}
-				)css");
-    descriptionLabel->setStyleSheet(labelStyle);
     descriptionLabel->setWordWrap(true);
     descriptionLabel->setMinimumHeight(24);
     descriptionLabel->setAlignment(Qt::AlignTop);
     descriptionLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 
     m_spinBox = new PaddedSpinBox(menuSectionWidget);
-    applySpinBoxStyle(m_spinBox);
+    Style::setStyle(m_spinBox, style::properties::lineedit::headerLineEdit, "", true);
+    m_spinBox->setButtonSymbols(m_spinBox->ButtonSymbols::NoButtons);
 
     m_value = 0x00;
     m_spinBox->setValue(m_value);
@@ -100,7 +88,7 @@ RegisterBlockWidget::ACCESS_PERMISSION RegisterBlockWidget::getAccessPermission(
 void RegisterBlockWidget::addReadButton(QWidget *parent)
 {
     m_readButton = new QPushButton("Read", parent);
-    StyleHelper::BlueButton(m_readButton, "readButton");
+    StyleHelper::BasicButton(m_readButton);
     parent->layout()->addWidget(m_readButton);
 }
 
@@ -109,7 +97,7 @@ QPushButton *RegisterBlockWidget::readButton() { return m_readButton; }
 void RegisterBlockWidget::addWriteButton(QWidget *parent)
 {
     m_writeButton = new QPushButton("Write", parent);
-    StyleHelper::BlueButton(m_writeButton, "writeButton");
+    StyleHelper::BasicButton(m_writeButton);
     parent->layout()->addWidget(m_writeButton);
 }
 
@@ -126,7 +114,7 @@ void RegisterBlockWidget::applyLineEditStyle(QLineEdit *widget)
                                 border-radius: 4px;
                                 qproperty-frame: false;
                                 )css");
-    style = style.replace(QString("&&colorname&&"), StyleHelper::getColor("CH0"));
+    style = style.replace(QString("&&colorname&&"), Style::getAttribute(json::global::ch0));
     widget->setStyleSheet(style);
     widget->setFixedHeight(30);
     widget->setAlignment(Qt::AlignRight);
@@ -145,7 +133,7 @@ void RegisterBlockWidget::applySpinBoxStyle(QSpinBox *widget)
                                 border-radius: 4px;
                                 font-weight: normal;
                                 )css");
-    style = style.replace(QString("&&colorname&&"), StyleHelper::getColor("CH0"));
+    style = style.replace(QString("&&colorname&&"), Style::getAttribute(json::global::ch0));
     widget->setStyleSheet(style);
     widget->setFixedHeight(30);
     widget->setAlignment(Qt::AlignRight);
