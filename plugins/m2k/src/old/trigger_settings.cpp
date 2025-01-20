@@ -116,7 +116,7 @@ TriggerSettings::TriggerSettings(M2kAnalogIn *libm2k_adc, QWidget *parent)
 	connect(trigger_level, SIGNAL(valueChanged(double)), SLOT(onSpinboxTriggerLevelChanged(double)));
 	connect(trigger_hysteresis, SIGNAL(valueChanged(double)), SLOT(onSpinboxTriggerHystChanged(double)));
 
-	connect(ui->btnTrigger, SIGNAL(clicked()), this, SLOT(autoTriggerEnable()));
+	connect(ui->btnTrigger, &CustomSwitch::toggled, [=](bool toggled) { autoTriggerEnable(); });
 
 	// Default GUI settings
 	ui->cmb_source->setCurrentIndex(0);
@@ -416,7 +416,7 @@ void TriggerSettings::on_cmb_analog_extern_currentIndexChanged(int index)
 
 void TriggerSettings::autoTriggerDisable()
 {
-	if(!ui->btnTrigger->isChecked()) {
+	if(ui->btnTrigger->isChecked()) {
 		writeHwMode(libm2k::ALWAYS);
 		temporarily_disabled = true;
 	}
@@ -424,7 +424,7 @@ void TriggerSettings::autoTriggerDisable()
 
 void TriggerSettings::autoTriggerEnable()
 {
-	if(!ui->btnTrigger->isChecked()) {
+	if(ui->btnTrigger->isChecked()) {
 		if(temporarily_disabled) {
 			writeHwMode(determineTriggerMode(ui->intern_en->isChecked(), ui->extern_en->isChecked()));
 
@@ -440,14 +440,14 @@ bool TriggerSettings::triggerIsArmed() const { return ui->intern_en->isChecked()
 void TriggerSettings::on_btnTrigger_toggled(bool checked)
 {
 	trigger_auto_mode = checked;
-	int mode = checked ? NORMAL : AUTO;
+	int mode = checked ? AUTO : NORMAL;
 
 	Q_EMIT triggerModeChanged(mode);
 }
 
 TriggerSettings::TriggerMode TriggerSettings::triggerMode() const
 {
-	return ui->btnTrigger->isChecked() ? NORMAL : AUTO;
+	return ui->btnTrigger->isChecked() ? AUTO : NORMAL;
 }
 
 void TriggerSettings::updateHwVoltLevels(int chnIdx)
