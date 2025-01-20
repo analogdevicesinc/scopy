@@ -11,4 +11,4 @@ Contents
    :maxdepth: 3
 
    debugger_tests
-   debugger_preferences
+   debugger_preferences_tests
