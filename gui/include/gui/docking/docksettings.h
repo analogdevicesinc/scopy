@@ -27,8 +27,6 @@ static void initDockWidgets() {}
 } // namespace scopy
 #else
 #include "scopy-gui_export.h"
-#include "style.h"
-#include "style_attributes.h"
 
 #include <kddockwidgets/KDDockWidgets.h>
 #include <kddockwidgets/Config.h>
@@ -47,18 +45,9 @@ namespace scopy {
 class SCOPY_GUI_EXPORT NoCloseTitleBar : public KDDockWidgets::QtWidgets::TitleBar
 {
 public:
-	explicit NoCloseTitleBar(KDDockWidgets::Core::TitleBar *controller, KDDockWidgets::Core::View *parent = nullptr)
-		: KDDockWidgets::QtWidgets::TitleBar(controller, parent)
-		, m_controller(controller)
-	{
-		Style::setBackgroundColor(this, json::theme::background_subtle, true);
-	}
-
-	void init() override
-	{
-		m_controller->setHideDisabledButtons(KDDockWidgets::TitleBarButtonType::Close);
-		KDDockWidgets::QtWidgets::TitleBar::init();
-	}
+	explicit NoCloseTitleBar(KDDockWidgets::Core::TitleBar *controller,
+				 KDDockWidgets::Core::View *parent = nullptr);
+	void init() override;
 
 private:
 	KDDockWidgets::Core::TitleBar *const m_controller;
@@ -67,13 +56,9 @@ private:
 class SCOPY_GUI_EXPORT TitleBarFactory : public KDDockWidgets::QtWidgets::ViewFactory
 {
 public:
-	TitleBarFactory() = default;
-
+	explicit TitleBarFactory();
 	KDDockWidgets::Core::View *createTitleBar(KDDockWidgets::Core::TitleBar *controller,
-						  KDDockWidgets::Core::View *parent) const override
-	{
-		return new NoCloseTitleBar(controller, parent);
-	}
+						  KDDockWidgets::Core::View *parent) const override;
 };
 
 // Mark as static or inline to avoid ODR violation, this should only be used once in main.cpp anyway
