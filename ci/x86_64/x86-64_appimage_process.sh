@@ -5,7 +5,8 @@ set -ex
 USE_STAGING=OFF
 ##
 
-SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || echo "No source directory found"
+SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
+SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
 SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 if [ "$CI_SCRIPT" == "ON" ]; then

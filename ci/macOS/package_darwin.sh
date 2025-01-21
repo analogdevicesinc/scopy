@@ -142,6 +142,9 @@ echo $STAGING_AREA_DEPS/lib | dylibbundler -ns -of -b \
 
 echo "=== Bundle the Qt libraries & Create Scopy.dmg"
 macdeployqt Scopy.app -verbose=3
-zip -Xvr ScopyApp.zip Scopy.app
-macdeployqt Scopy.app -dmg -verbose=3
+
+if [ "$TF_BUILD" == "true" ];then
+	zip -Xvr ScopyApp.zip Scopy.app
+	macdeployqt Scopy.app -dmg -verbose=3
+fi
 popd

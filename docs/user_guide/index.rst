@@ -446,8 +446,12 @@ User guide on how to use scripts with Scopy:
 Building from source
 ---------------------------------------------------------------------
 
-Complete Scopy v2.0.0 build guides **coming soon**!
+.. toctree::
+    :titlesonly:
 
+    build_instructions/windowsBuild
+    build_instructions/linuxBuild
+    build_instructions/macosBuild
 
 Source code
 ---------------------------------------------------------------------
