@@ -53,7 +53,7 @@ void SetScopyQDebugMessagePattern()
 				   QDEBUG_LOG_DATE_STR
 #endif
 #ifdef QDEBUG_LOG_CATEGORY
-			   QDEBUG_CATEGORY_STR
+					   QDEBUG_CATEGORY_STR
 #endif
 			   " ] "
 #ifdef QDEBUG_LOG_FILE
