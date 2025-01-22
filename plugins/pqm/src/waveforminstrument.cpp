@@ -20,6 +20,7 @@
  */
 
 #include "waveforminstrument.h"
+#include "dockableareainterface.h"
 #include "plotaxis.h"
 #include "plottingstrategybuilder.h"
 #include <QDate>
@@ -83,14 +84,14 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 	initPlot(m_voltagePlot, "V", -400, 400);
 	setupChannels(m_voltagePlot, m_chnls["voltage"]);
 	m_voltageDockWrapper->setInnerWidget(m_voltagePlot);
-	m_dockableArea->addDockWrapper(m_voltageDockWrapper);
+	m_dockableArea->addDockWrapper(m_voltageDockWrapper, DockableAreaInterface::Direction_TOP);
 
 	m_currentDockWrapper = createDockWrapper("Current Plot");
 	m_currentPlot = new PlotWidget(dockableAreaWidget);
 	initPlot(m_currentPlot, "A", -20, 20);
 	setupChannels(m_currentPlot, m_chnls["current"]);
 	m_currentDockWrapper->setInnerWidget(m_currentPlot);
-	m_dockableArea->addDockWrapper(m_currentDockWrapper);
+	m_dockableArea->addDockWrapper(m_currentDockWrapper, DockableAreaInterface::Direction_BOTTOM);
 
 	PlotNavigator::syncPlotNavigators(m_voltagePlot->navigator(), m_currentPlot->navigator(),
 					  new QSet<QwtAxisId>{m_voltagePlot->xAxis()->axisId()});
