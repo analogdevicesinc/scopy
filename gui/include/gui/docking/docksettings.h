@@ -34,7 +34,6 @@ static void initDockWidgets() {}
 #include <kddockwidgets/core/TitleBar.h>
 #include <kddockwidgets/core/View.h>
 #include <kddockwidgets/core/Group.h>
-#include <kddockwidgets/core/Group.h>
 
 #include <kddockwidgets/qtwidgets/TitleBar.h>
 #include <kddockwidgets/qtwidgets/ViewFactory.h>
