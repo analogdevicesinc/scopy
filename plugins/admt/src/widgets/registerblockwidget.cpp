@@ -1,6 +1,7 @@
 #include <stylehelper.h>
 #include <style.h>
 #include "widgets/registerblockwidget.h"
+#include "style_properties.h"
 
 using namespace scopy;
 using namespace scopy::admt;
@@ -29,7 +30,7 @@ RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, ui
     descriptionLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 
     m_spinBox = new PaddedSpinBox(menuSectionWidget);
-    Style::setStyle(m_spinBox, style::properties::lineedit::headerLineEdit, "", true);
+    Style::setStyle(m_spinBox, style::properties::admt::spinBox);
     m_spinBox->setButtonSymbols(m_spinBox->ButtonSymbols::NoButtons);
 
     m_value = 0x00;
