@@ -3,6 +3,7 @@
 
 #include "scopy-admt_export.h"
 #include "stylehelper.h"
+#include "style.h"
 
 #include <QApplication>
 #include <QComboBox>
@@ -37,7 +38,7 @@ public:
     static void ColoredSquareCheckbox(QCheckBox *chk, QColor color, QString objectName = "");
     static void StartButtonStyle(QPushButton *btn, QString objectName = "");
     static void TabWidgetStyle(QTabWidget *widget, const QString& styleHelperColor = "ScopyBlue", QString objectName = "");
-    static void TextStyle(QWidget *widget, const QString& styleHelperColor, bool isBold = false, QString objectName = "");
+    static void TextStyle(QWidget *widget, const char *styleHelperColor = json::global::white, bool isBold = false, QString objectName = "");// void TextStyle(QWidget *widget, const QString& styleHelperColor, bool isBold = false, QString objectName = "");
     static void MenuSmallLabel(QLabel *label, QString objectName = "");
     static void LineStyle(QFrame *line, QString objectName = "");
     static void UIBackgroundStyle(QWidget *widget, QString objectName = "");

@@ -77,6 +77,9 @@ generate_export_header(
     ${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h 
 )
 
+include(ScopyStyle)
+generate_style("--plugin" ${CMAKE_CURRENT_SOURCE_DIR}/style ${CMAKE_CURRENT_SOURCE_DIR}/include/admt)
+
 configure_file(
 	include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h.cmakein
 	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h @ONLY

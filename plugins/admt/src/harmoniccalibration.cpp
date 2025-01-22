@@ -588,7 +588,7 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 
 	MenuSectionWidget *calibrationDataGraphSectionWidget = new MenuSectionWidget(calibrationDataGraphWidget);
 	calibrationDataGraphTabWidget = new QTabWidget(calibrationDataGraphSectionWidget);
-	calibrationDataGraphTabWidget->tabBar()->setStyleSheet("QTabBar::tab { width: 160px; }");
+	calibrationDataGraphTabWidget->tabBar()->setStyleSheet("QTabBar::tab { width: 176px; }");
 	calibrationDataGraphSectionWidget->contentLayout()->setSpacing(8);
 	calibrationDataGraphSectionWidget->contentLayout()->addWidget(calibrationDataGraphTabWidget);
 
