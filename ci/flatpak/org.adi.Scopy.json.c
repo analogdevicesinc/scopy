@@ -77,7 +77,7 @@
 			"sources": [
 				{
 					"type": "archive",
-					"url": "https://boostorg.jfrog.io/artifactory/main/release/1.73.0/source/boost_1_73_0.tar.gz",
+					"url": "https://sourceforge.net/projects/boost/files/boost/1.73.0/boost_1_73_0.tar.gz",
 					"sha256": "9995e192e68528793755692917f9eb6422f3052a53c5e13ba278a228af6c7acf"
 				},
 				{
