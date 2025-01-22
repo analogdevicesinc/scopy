@@ -60,6 +60,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 		QIcon(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_home.svg"));
 	homeBtn->setFixedHeight(Style::getDimension(json::global::unit_4));
 	homeBtn->setCheckable(true);
+	homeBtn->setChecked(true);
 	homeBtn->setIconSize(QSize(32, 32));
 	homeBtn->setStyleSheet("text-align: left");
 	connect(homeBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool(HOME_ID); });

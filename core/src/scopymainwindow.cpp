@@ -184,6 +184,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(m_toolMenuManager, &ToolMenuManager::requestToolSelect, dtm, &DetachedToolWindowManager::show);
 	connect(m_toolMenuManager, &ToolMenuManager::toolStackChanged, browseMenu, &BrowseMenu::onToolStackChanged);
 	connect(hp, &ScopyHomePage::displayNameChanged, m_toolMenuManager, &ToolMenuManager::onDisplayNameChanged);
+	connect(ts, &ToolStack::currentChanged, this, [this, ts](int idx) { highlightMenuItem(ts, idx); });
 
 	connect(hp, &ScopyHomePage::newDeviceAvailable, dm, &DeviceManager::addDevice);
 
@@ -253,6 +254,14 @@ void ScopyMainWindow::deviceAutoconnect()
 			api->connectDevice(id);
 		}
 	}
+}
+
+void ScopyMainWindow::highlightMenuItem(ToolStack *ts, int idx)
+{
+	// Highlight the menu item associated with the top widget in the tool stack.
+	QWidget *crtWidget = ts->widget(idx);
+	QString id = ts->getKey(crtWidget);
+	Q_EMIT m_toolMenuManager->toolStackChanged(id);
 }
 
 void ScopyMainWindow::save()

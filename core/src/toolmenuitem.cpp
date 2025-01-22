@@ -140,6 +140,13 @@ void ToolMenuItem::updateItem()
 	qDebug(CAT_TOOLMENUITEM) << "updating toolmenuentry for " << tme->name() << " - " << tme->uuid();
 }
 
+void ToolMenuItem::selectCrtItem(QString uuid)
+{
+	if(uuid == m_uuid) {
+		setChecked(true);
+	}
+}
+
 void ToolMenuItem::enterEvent(QEvent *event)
 {
 #ifndef __ANDROID__
