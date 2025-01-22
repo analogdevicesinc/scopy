@@ -40,7 +40,7 @@ DockWrapper::DockWrapper(QString name, QWidget *parent)
 	: KDDockWidgets::QtWidgets::DockWidget(name + QString::number(s_dockWrapperId++),
 					       KDDockWidgets::DockWidgetOption_NotClosable)
 {
-	this->setTitle(name); // Not unique name
+	this->setTitle(" " + name); // Not unique name. Starts with space to ensure the title is shown
 	// HACKISH: This connect is required as the DockWrapper cannot be closed (hidden) until it is
 	// added to a layout (and gets a parent). So any call to setActivated has not effect. This is
 	// just to propagate the effect set before the layouting.
