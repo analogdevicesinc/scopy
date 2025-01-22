@@ -91,12 +91,14 @@ void ToolMenuManager::changeToolListContents(QString deviceId, QList<ToolMenuEnt
 	removeMenuItem(deviceId);
 	addMenuItem(deviceId, devName, tools, itemIndex);
 	showMenuItem(deviceId);
+	highlightCrtItem();
 }
 
 void ToolMenuManager::showMenuItem(QString id)
 {
-	if(!m_connectedDev.contains(m_prevItem))
+	if(!m_connectedDev.contains(m_prevItem)) {
 		hideMenuItem(m_prevItem);
+	}
 	if(!m_itemMap.contains(id)) {
 		// if the id is not a device id, it could be a tool id
 		Q_EMIT requestToolSelect(id);
@@ -161,13 +163,6 @@ void ToolMenuManager::updateTool(QWidget *old)
 	qDebug(CAT_TOOLMENUMANAGER) << "updating tool for " << tme->name() << " - " << id;
 }
 
-void ToolMenuManager::updateMenuAfterDetach(ToolMenuItem *toolMenuItem, QString id)
-{
-	if(id == toolMenuItem->getId()) {
-		toolMenuItem->setChecked(true);
-	}
-}
-
 void ToolMenuManager::updateToolAttached(bool oldAttach, ToolMenuItem *toolMenuItem)
 {
 	ToolMenuEntry *tme = dynamic_cast<ToolMenuEntry *>(QObject::sender());
@@ -200,13 +195,15 @@ void ToolMenuManager::updateToolAttached(bool oldAttach, ToolMenuItem *toolMenuI
 		if(toolMenuItem) {
 			toolMenuItem->setChecked(true);
 		}
-	} else {
-		QWidget *wAfterDetach = m_ts->currentWidget();
-		if(!wAfterDetach) {
-			return;
-		}
-		QString toolMenuItemId = m_ts->getKey(wAfterDetach);
-		Q_EMIT toolStackChanged(toolMenuItemId);
+	}
+}
+
+void ToolMenuManager::highlightCrtItem()
+{
+	QWidget *crtStackWidget = m_ts->currentWidget();
+	if(crtStackWidget) {
+		QString id = m_ts->getKey(crtStackWidget);
+		Q_EMIT toolStackChanged(id);
 	}
 }
 
@@ -297,9 +294,8 @@ ToolMenuItem *ToolMenuManager::createToolMenuItem(ToolMenuEntry *tme, QWidget *p
 	connect(toolMenuItem->getToolRunBtn(), &QPushButton::clicked, tme, &ToolMenuEntry::runClicked);
 	connect(toolMenuItem, &QPushButton::clicked, this, [=]() { Q_EMIT requestToolSelect(toolMenuItem->getId()); });
 	connect(toolMenuItem, &ToolMenuItem::doubleclick, this, [this, tme]() { setTmeAttached(tme); });
-	connect(this, &ToolMenuManager::toolStackChanged, this,
-		[this, toolMenuItem](QString id) { updateMenuAfterDetach(toolMenuItem, id); });
 	connect(tme, &ToolMenuEntry::updateToolEntry, toolMenuItem, &ToolMenuItem::updateItem);
+	connect(this, &ToolMenuManager::toolStackChanged, toolMenuItem, &ToolMenuItem::selectCrtItem);
 
 	return toolMenuItem;
 }

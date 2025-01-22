@@ -47,6 +47,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 	void updateItem();
+	void selectCrtItem(QString uuid);
 
 protected:
 	void enterEvent(QEvent *event);

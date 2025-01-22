@@ -59,8 +59,8 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void updateTool(QWidget *old);
-	void updateMenuAfterDetach(ToolMenuItem *toolMenuItem, QString id);
 	void updateToolAttached(bool oldAttach, ToolMenuItem *toolMenuItem);
+	void highlightCrtItem();
 
 private:
 	void loadToolAttachedState(ToolMenuEntry *tme);
