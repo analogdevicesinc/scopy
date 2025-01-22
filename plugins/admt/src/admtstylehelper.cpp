@@ -264,19 +264,18 @@ void ADMTStyleHelper::TabWidgetStyle(QTabWidget *widget, const QString& styleHel
 	widget->tabBar()->setStyleSheet(style);
 }
 
-void ADMTStyleHelper::TextStyle(QWidget *widget, const QString& styleHelperColor, bool isBold, QString objectName)
+void ADMTStyleHelper::TextStyle(QWidget *widget, const char *styleHelperColor, bool isBold, QString objectName)
 {
 	if(!objectName.isEmpty())
 		widget->setObjectName(objectName);
 	QString existingStyle = widget->styleSheet();
 	QString style = QString(R"css(
-								font-family: Open Sans;
 								font-size: 16px;
 								font-weight: &&fontweight&&;
 								text-align: right;
 								color: &&colorname&&;
 							)css");
-	style = style.replace(QString("&&colorname&&"), Style::getAttribute(json::theme::content_default));
+	style = style.replace(QString("&&colorname&&"), Style::getAttribute(styleHelperColor));
 	QString fontWeight = QString("normal");
 	if(isBold){
 		fontWeight = QString("bold");
@@ -353,15 +352,15 @@ void ADMTStyleHelper::CalculatedCoeffWidgetRowStyle(QWidget *widget, QHBoxLayout
 								background-color: &&colorname&&;
 								border-radius: 4px;
 							)css");
-	style.replace(QString("&&colorname&&"), Style::getAttribute(json::theme::background_primary));
+	style.replace(QString("&&colorname&&"), Style::getAttribute(json::theme::background_subtle));
 	widget->setStyleSheet(style);
 	widget->setFixedHeight(30);
 	widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	layout->setContentsMargins(12, 4, 12, 4);
 
-	ADMTStyleHelper::TextStyle(hLabel, "LabelText", true);
-	ADMTStyleHelper::TextStyle(hMagLabel, "CH0");
-	ADMTStyleHelper::TextStyle(hPhaseLabel, "CH1");
+	ADMTStyleHelper::TextStyle(hLabel, json::global::white, true);
+	ADMTStyleHelper::TextStyle(hMagLabel, json::global::ch0);
+	ADMTStyleHelper::TextStyle(hPhaseLabel, json::global::ch1);
 
 	hLabel->setFixedWidth(24);
 	hMagLabel->setContentsMargins(0, 0, 32, 0);
