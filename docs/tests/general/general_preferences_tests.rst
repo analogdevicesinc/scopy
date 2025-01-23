@@ -51,13 +51,13 @@ states (only applies to plugins which have this implemented).
        - **Expected result:** time base is 1s
    6. Redo all the steps with the preference disabled
        - **Expected result:** time base is the default value
-   7. Press the "Settings file location" open buttons
+   7. Press the "Settings file location" open button within the preference menu
        - **Expected results:** should open a file browser containing 
          .ini files for every plugins' session saved
 
 **Result**: PASS/FAIL
 
-Test 2 - Doubleclick to attach/detach tool
+Test 2 - Double click to attach/detach tool
 --------------------------------------------------
 
 .. _TST.PREF.DOUBLECLICK_ATTACH_DETACH:
@@ -65,7 +65,7 @@ Test 2 - Doubleclick to attach/detach tool
 **UID:** TST.PREF.DOUBLECLICK_ATTACH_DETACH  
 
 **Description:** Tools can be detached from the main window by 
-double-clicking them in the left menu.  
+double clicking them in the left menu.  
 
 **Preconditions:**  
    - Emulator tests  
@@ -74,7 +74,7 @@ double-clicking them in the left menu.
 
 **Steps:**  
    1. Set preference to enabled.  
-   2. Double-click Oscilloscope tool to detach it.  
+   2. Double click Oscilloscope tool to detach it.  
        - **Expected result:** Oscilloscope tool should detach from 
          the main window into a new one.  
    3. Redo all the steps with the preference disabled.  
@@ -93,13 +93,13 @@ Test 3 - Save/Load tool attached state
 
 **Preconditions:**  
    - Emulator tests  
-   - Depends on Test 2  
+   - Depends on :ref:`Test 2<TST.PREF.DOUBLECLICK_ATTACH_DETACH>`
    - :ref:`M2k.emu<m2k_emu_setup>`
    - OS: ALL  
 
 **Steps:**  
    1. Set preference to enabled.  
-   2. Double-click Oscilloscope tool to detach it.  
+   2. Double click Oscilloscope tool to detach it.  
    3. Close Scopy.  
    4. Open the app using the same setup.  
        - **Expected result:** Oscilloscope is still detached.  
@@ -108,14 +108,14 @@ Test 3 - Save/Load tool attached state
 
 **Result**: PASS/FAIL
 
-Test 4 - Doubleclick control buttons to open menu
+Test 4 - Double click control buttons to open menu
 --------------------------------------------------
 
 .. _TST.PREF.DOUBLECLICK_CONTROL_MENU:
 
 **UID:** TST.PREF.DOUBLECLICK_CONTROL_MENU  
 
-**Description:** Open menu from MenuControlButtons by double-clicking them.  
+**Description:** Open menu from MenuControlButtons by double clicking them.  
 
 **Preconditions:**
    - Emulator tests 
@@ -125,7 +125,7 @@ Test 4 - Doubleclick control buttons to open menu
 **Steps:**
    1. Set preference to enabled.  
    2. Open ADC - Time tool.  
-   3. Double-click Cursors button in the bottom right (
+   3. Double click Cursors button in the bottom right (
       do not click on the button's icon).  
       
        - **Expected result:** A hovering menu should open above the button.  
@@ -464,7 +464,7 @@ Test 18 - Session devices
 
 **Preconditions:**
    - :ref:`Pluto.usb<pluto_emu_usb_setup>`
-   - "Auto-connect to previous session" needs to be enabled.  
+   - :ref:`"Auto-connect to previous session"<TST.PREF.AUTO_CONNECT_PREVIOUS_SESSION>` preference needs to be enabled
    - OS: ANY  
 
 **Steps:**
