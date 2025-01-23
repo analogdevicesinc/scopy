@@ -428,6 +428,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_show_status_bar", true);
 	p->init("general_connect_to_multiple_devices", true);
 	p->init("general_scan_for_devices", true);
+	p->init("device_menu_item", true);
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 	DEBUGTIMER_LOG(benchmark, "Init preferences took:");
