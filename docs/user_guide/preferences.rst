@@ -8,10 +8,13 @@ Scopy Preferences
     :align: center
 ..
 
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-general-prefs2.png
+    :align: center
+..
+
   Scopy Preferences can be accessed using the bottom left side **preferences
   button**. On the right side of the page, preferences for each plugin
-  are available. More details can be found in their specific plugin
-  documentation section.
+  are available. 
 
   The **Open** button will try to open the specific OS explorer in 
   order to find the preference storage file.
@@ -20,7 +23,8 @@ Scopy Preferences
   configuration.
 
   Changing some of the listed preferences will require an application
-  restart. More details on each preference are listed below.
+  restart. More details on each preference, as well as their ID - used to 
+  identify them in the .ini files, can be found in the table below.
 
-
-
+.. include:: preferences_table.rst
+  

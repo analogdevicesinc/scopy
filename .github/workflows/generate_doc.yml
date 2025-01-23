@@ -27,6 +27,7 @@ jobs:
     - name: Build doc
       working-directory: docs
       run: |
+        python3 extract_macros.py ../ user_guide/preferences_table.rst
         make html SPHINXOPTS='-W --keep-going'
 
     - name: Store the generated doc
