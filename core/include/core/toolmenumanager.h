@@ -41,6 +41,7 @@ typedef struct
 	QString name;
 	QString param;
 	QPixmap icon;
+	bool hasConfigPage;
 	QList<ToolMenuEntry *> tools;
 } DeviceInfo;
 

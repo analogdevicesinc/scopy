@@ -318,7 +318,7 @@ void ToolMenuManager::initToolMenuHeaderWidget(MenuCollapseHeader *header, const
 	thw->setDeviceIcon(dInfo.icon);
 	thw->layout()->setContentsMargins(Style::getDimension(json::global::unit_1), 0, 0, 0);
 	Style::setStyle(header, style::properties::widget::ledBorder, isConnected);
-
+	thw->deviceBtn()->setCheckable(dInfo.hasConfigPage);
 	menuBtnGroup->addButton(thw->deviceBtn());
 	connect(thw->deviceBtn(), &QPushButton::toggled, this, [=](bool en) {
 		if(en) {

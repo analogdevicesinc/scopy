@@ -225,10 +225,15 @@ void DeviceImpl::loadConfigPage()
 	m_configPage = new QTabWidget();
 	m_configPage->setTabPosition(QTabWidget::South);
 
-	for(auto &&p : plugins()) {
+	for(auto &&p : m_plugins) {
 		if(p->loadConfigPage()) {
 			m_configPage->addTab(p->configPage(), p->name());
 		}
+	}
+	// If no plugin has a configuration page, the device-level configuration page should not exist
+	if(m_configPage->count() == 0) {
+		delete m_configPage;
+		m_configPage = nullptr;
 	}
 }
 

@@ -658,11 +658,14 @@ void ScopyMainWindow::initApi()
 
 void ScopyMainWindow::addDeviceToUi(QString id, Device *d)
 {
-	DeviceInfo dInfo = {id, d->displayName(), d->param(), d->iconPixmap(), d->toolList()};
+	bool hasConfigPage = (bool)d->configPage();
+	DeviceInfo dInfo = {id, d->displayName(), d->param(), d->iconPixmap(), hasConfigPage, d->toolList()};
 	m_toolMenuManager->addMenuItem(dInfo);
 	hp->addDevice(id, d);
 	auto ts = ui->wsToolStack;
-	ts->add(id, d->configPage());
+	if(hasConfigPage) {
+		ts->add(id, d->configPage());
+	}
 }
 
 void ScopyMainWindow::removeDeviceFromUi(QString id)
