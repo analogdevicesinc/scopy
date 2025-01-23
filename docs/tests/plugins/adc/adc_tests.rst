@@ -16,6 +16,14 @@ Setup environment
    - Connect a pluto device via usb to your PC
    - connect to the device in Scopy with ADCPlugin enabled
 
+.. _adalm-pluto_device_emu:
+
+**Pluto.emu:**
+   - Press the add device button and go to emulator
+   - Select pluto device
+   - Enable, verify and select all plugins available
+   - Connect to the device
+
 .. _adalm-pluto_device_siggen:
 
 **Pluto.signalGenerator:**
@@ -26,8 +34,11 @@ Setup environment
      TX1_I_F1 scale: -40, TX1_I_F2: -40, TX1_Q_F1: -30, TX1_Q_F2: -30. set all frequency values to 1MHz.
    - Run DAC plugin.
 
+
+.. _adc_time_tests:
+
 ADC-Time
-^^^^^^^^^
+^^^^^^^^
 
 Test 1 - X-AXIS
 ---------------
@@ -39,7 +50,7 @@ Test 1 - X-AXIS
 **Description:** Verify X-axis behavior under different configurations
 
 **Preconditions:**
-   - Pluto.usb setup
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
@@ -70,7 +81,7 @@ Test 2 - Y-AXIS
 **Description:** Verify Y-axis behavior under different configurations
 
 **Preconditions:**
-   - Pluto.usb setup
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
@@ -97,8 +108,8 @@ Test 3 - XY PLOT
 **Description:** Verify XY plot functionality and visualization
 
 **Preconditions:**
-   - Pluto.usb setup
-   - Pluto.signalGenerator setup
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
+   - :ref:`Pluto.signalGenerator<adalm-pluto_device_siggen>`
    - OS: ANY
 
 **Steps:**
@@ -128,7 +139,7 @@ Test 4 - Settings
 **Description:** Change Plot Title and toggle various plot settings
 
 **Preconditions:**
-   - Setup Pluto.usb
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
@@ -152,12 +163,14 @@ Test 5 - Print
 **Description:** Save the plot as a PDF file via the print functionality
 
 **Preconditions:**
-   - Setup Pluto.usb
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
-   1. Run Pluto.signalGenerator setup
-   2. Press the single button and then the print button. Select a folder and save the file
+   1. Run :ref:`Pluto.signalGenerator<adalm-pluto_device_siggen>` setup
+   2. Press the single button 
+   3. Press the print button
+   4. Select a folder and save the file
        - **Expected result:** a new PDF file should appear within the folder containing 
          the last view of the plot
 
@@ -174,7 +187,7 @@ Test 6 - Info
 **Description:** Open the ADC plugin documentation via the info button
 
 **Preconditions:**
-   - Setup Pluto.usb
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
@@ -194,7 +207,7 @@ Test 7 - Plot Navigation
 **Description:** Test plot zooming, panning, and undo features
 
 **Preconditions:**
-   - Setup Pluto.usb
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
@@ -222,7 +235,7 @@ Test 8 - ADC-Time Channel Settings
 **Description:** Test Y-axis settings and adjustments for the ADC-Time tool
 
 **Preconditions:**
-   - Setup Pluto.usb
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
@@ -247,7 +260,7 @@ Test 9 - Measure
 and checking frequency and stats
 
 **Preconditions:**
-   - Setup Pluto.usb
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
@@ -275,12 +288,12 @@ Test 10 - Cursors
 tracking, and moving readouts
 
 **Preconditions:**
-   - Setup Pluto.usb
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
    1. Double-click on the voltage0 channel and go to the right menu which pops up
-   2. Run Pluto.signalGenerator setup
+   2. Run :ref:`Pluto.signalGenerator<adalm-pluto_device_siggen>` setup
    3. In ADC, set X-AXIS buffer size to 200, XMode to Sample, and TMode to ADC Counts
    4. Open the Cursors menu at the bottom of the window. Enable X and Enable Y
    5. Move the X cursors on the plot via the axis handles and place one on voltage0 sine high peak and the other on the next low peak
@@ -299,8 +312,10 @@ tracking, and moving readouts
 **Result**: PASS/FAIL
 
 
+.. _adc_frequency_tests:
+
 ADC-Frequency
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
 
 Test 1 - X-Axis settings
 -------------------------
@@ -313,7 +328,7 @@ Test 1 - X-Axis settings
 plotting in the ADC plugin
 
 **Preconditions:**
-   - Setup Pluto.usb
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
@@ -339,7 +354,7 @@ Test 2 - Y-Axis settings
 range settings
 
 **Preconditions:**
-   - Setup Pluto.usb
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
@@ -367,7 +382,7 @@ Test 3 - Settings adjustment
 and style
 
 **Preconditions:**
-   - Setup Pluto.usb
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
@@ -390,11 +405,11 @@ Test 4 - Print plot
 **Description:** Print the current plot to a PDF file
 
 **Preconditions:**
-   - Setup Pluto.usb
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
-   1. Run Pluto.signalGenerator setup
+   1. Run :ref:`Pluto.signalGenerator<adalm-pluto_device_siggen>` setup
    2. Press the single button and then the print button
    3. Select a folder and save the file
        - **Expected result:** A new PDF file should appear in the folder containing the last view of the plot
@@ -412,7 +427,7 @@ Test 5 - View plugin documentation
 **Description:** Open the ADC plugin documentation
 
 **Preconditions:**
-   - Setup Pluto.usb
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
@@ -432,7 +447,7 @@ Test 6 - Y-Axis channel settings
 **Description:** Adjust the Y-axis for individual channel curve manipulation
 
 **Preconditions:**
-   - Setup Pluto.usb
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
@@ -455,20 +470,22 @@ Test 7 - Marker settings
 **Description:** Use markers to identify peaks on channel curves
 
 **Preconditions:**
-   - Setup Pluto.usb
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
-   1. Run Pluto.signalGenerator setup
+   1. Run :ref:`Pluto.signalGenerator<adalm-pluto_device_siggen>` setup
    2. Press run and enable the marker
    3. Set marker type to peak and count to 5
        - **Expected result:** 5 markers should appear on voltage0's curve at the highest peaks
    4. Repeat the process with a count of 7
+       - **Expected result:** 7 markers should appear on voltage0's curve at the highest peaks
    5. Check the table below the plot in peak mode
        - **Expected result:** The highest peak should be at 1 MHz
    6. Set marker type to fixed and count to 5
        - **Expected result:** 5 movable cursors should appear
    7. Repeat for a count of 7
+       - **Expected result:** 7 movable cursors should appear
 
 **Result**: PASS/FAIL
 
@@ -483,11 +500,11 @@ Test 8 - Cursor settings
 **Description:** Use cursors to measure specific points on channel curves.
 
 **Preconditions:**
-   - Setup Pluto.usb
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
    - OS: ANY
 
 **Steps:**
-   1. Run Pluto.signalGenerator setup
+   1. Run :ref:`Pluto.signalGenerator<adalm-pluto_device_siggen>` setup
    2. Press run and set X-Axis buffer size to 200, XMode to Sample, and TMode to ADC Counts
    3. Open the Cursors menu and enable X and Y cursors
    4. Move the X cursor on the plot and place one on voltage0's highest peak
@@ -503,9 +520,10 @@ Test 8 - Cursor settings
 
 **Result**: PASS/FAIL
 
+.. _adc_preferences_tests:
 
 Preferences
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
 Test 1 - X Scale Position
 --------------------------
@@ -518,7 +536,7 @@ Test 1 - X Scale Position
 position on the plot
 
 **Preconditions:**
-   - Pluto.emu
+   - :ref:`Pluto.emu<adalm-pluto_device_emu>`
    - Press the add device button.
    - Enable emulator for Pluto.
    - Verify and add device with ADCPlugin enabled.
@@ -545,7 +563,7 @@ Test 2 - Y Scale Position
 position on the plot
 
 **Preconditions:**
-   - Pluto.emu
+   - :ref:`Pluto.emu<adalm-pluto_device_emu>`
    - Press the add device button
    - Enable emulator for Pluto
    - Verify and add device with ADCPlugin enabled
@@ -572,7 +590,7 @@ Test 3 - Channel Handle Position
 of the handle
 
 **Preconditions:**
-   - Pluto.emu
+   - :ref:`Pluto.emu<adalm-pluto_device_emu>`
    - Press the add device button
    - Enable emulator for Pluto
    - Verify and add device with ADCPlugin enabled
@@ -600,7 +618,7 @@ Test 4 - X Cursor Position
 **Description:** Change the X-cursor position and verify the cursor's appearance.
 
 **Preconditions:**
-   - Pluto.emu
+   - :ref:`Pluto.emu<adalm-pluto_device_emu>`
    - Press the add device button
    - Enable emulator for Pluto
    - Verify and add device with ADCPlugin enabled
@@ -628,7 +646,7 @@ Test 5 - Y Cursor Position
 cursor's appearance
 
 **Preconditions:**
-   - Pluto.emu
+   - :ref:`Pluto.emu<adalm-pluto_device_emu>`
    - Press the add device button
    - Enable emulator for Pluto
    - Verify and add device with ADCPlugin enabled
@@ -655,7 +673,7 @@ Test 6 - Show Buffer
 **Description:** Enable/disable the buffer and verify its appearance on the plot
 
 **Preconditions:**
-   - Pluto.emu
+   - :ref:`Pluto.emu<adalm-pluto_device_emu>`
    - Press the add device button
    - Enable emulator for Pluto
    - Verify and add device with ADCPlugin enabled
@@ -680,7 +698,7 @@ Test 7 - Default YMode
 **Description:** Set the default Y-mode and verify its behavior in ADC-Time
 
 **Preconditions:**
-   - Pluto.emu
+   - :ref:`Pluto.emu<adalm-pluto_device_emu>`
    - Press the add device button
    - Enable emulator for Pluto
    - Verify and add device with ADCPlugin enabled
