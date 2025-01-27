@@ -267,7 +267,7 @@ const char *Style::replaceProperty(const char *prop)
 		if(prop == key) {
 			QJsonValue value = m_theme_json->object().value(key);
 			prop = value.toString().toLocal8Bit().data();
-			return prop;
+			return strdup(prop);
 		}
 	}
 
