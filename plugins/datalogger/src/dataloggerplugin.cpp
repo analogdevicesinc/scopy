@@ -47,7 +47,6 @@ bool DataLoggerPlugin::compatible(QString m_param, QString category)
 {
 	// This function defines the characteristics according to which the
 	// plugin is compatible with a specific device
-	m_name = "DataLogger";
 	ConnectionProvider *cp = ConnectionProvider::GetInstance();
 	Connection *conn = cp->open(m_param);
 
@@ -247,7 +246,6 @@ void DataLoggerPlugin::initMetadata()
 	   "category":[
 		  "iio"
 	   ],
-	   "exclude":[""]
 	}
 )plugin");
 }
