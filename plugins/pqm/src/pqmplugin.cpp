@@ -227,7 +227,7 @@ void PQMPlugin::initMetadata()
 	   "category":[
 	      "iio"
 	   ],
-	   "exclude":["*"]
+	   "exclude":["*", "!debuggerplugin"]
 	}
 )plugin");
 }

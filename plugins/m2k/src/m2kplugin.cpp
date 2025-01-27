@@ -552,7 +552,7 @@ void M2kPlugin::initMetadata()
 	      "iio",
 	      "m2k"
 	   ],
-	   "exclude":["*", "!debugger"]
+	   "exclude":["*", "!debuggerplugin"]
 	}
 )plugin");
 }

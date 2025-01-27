@@ -108,7 +108,6 @@ void RegmapPlugin::unload()
 
 bool RegmapPlugin::compatible(QString m_param, QString category)
 {
-	m_name = REGMAP_PLUGIN_DISPLAY_NAME;
 	auto &&cp = ConnectionProvider::GetInstance();
 	Connection *conn = cp->open(m_param);
 
