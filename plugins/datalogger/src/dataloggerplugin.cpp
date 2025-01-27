@@ -245,7 +245,7 @@ void DataLoggerPlugin::initMetadata()
 	   "priority":3,
 	   "category":[
 		  "iio"
-	   ],
+	   ]
 	}
 )plugin");
 }
