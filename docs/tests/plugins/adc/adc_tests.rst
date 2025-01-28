@@ -532,14 +532,13 @@ Test 1 - X Scale Position
 
 **UID:** TST.PREF.X_SCALE_POS
 
-**Description:** Change the X-axis scale position and verify the label's 
-position on the plot
+**Description:** Change the X-axis scale position and verify the label's position on the plot
+
+**Test prerequisites:**
+   - Emulator tests
 
 **Preconditions:**
    - :ref:`Pluto.emu<adalm-pluto_device_emu>`
-   - Press the add device button.
-   - Enable emulator for Pluto.
-   - Verify and add device with ADCPlugin enabled.
    - OS: ANY
 
 **Steps:**
@@ -562,11 +561,11 @@ Test 2 - Y Scale Position
 **Description:** Change the Y-axis scale position and verify the label's 
 position on the plot
 
+**Test prerequisites:**
+   - Emulator tests
+
 **Preconditions:**
    - :ref:`Pluto.emu<adalm-pluto_device_emu>`
-   - Press the add device button
-   - Enable emulator for Pluto
-   - Verify and add device with ADCPlugin enabled
    - OS: ANY
 
 **Steps:**
@@ -586,14 +585,13 @@ Test 3 - Channel Handle Position
 
 **UID:** TST.PREF.CH_HANDLE_POS
 
-**Description:** Change the Y-handle position and verify the appearance 
-of the handle
+**Description:** Change the Y-handle position and verify the appearance of the handle
+
+**Test prerequisites:**
+   - Emulator tests
 
 **Preconditions:**
    - :ref:`Pluto.emu<adalm-pluto_device_emu>`
-   - Press the add device button
-   - Enable emulator for Pluto
-   - Verify and add device with ADCPlugin enabled
    - OS: ANY
    
 **Steps:**
@@ -617,11 +615,11 @@ Test 4 - X Cursor Position
 
 **Description:** Change the X-cursor position and verify the cursor's appearance.
 
+**Test prerequisites:**
+   - Emulator tests
+
 **Preconditions:**
    - :ref:`Pluto.emu<adalm-pluto_device_emu>`
-   - Press the add device button
-   - Enable emulator for Pluto
-   - Verify and add device with ADCPlugin enabled
    - OS: ANY
 
 **Steps:**
@@ -642,14 +640,13 @@ Test 5 - Y Cursor Position
 
 **UID:** TST.PREF.Y_CURSOR_POS
 
-**Description:** Change the Y-cursor position and verify the 
-cursor's appearance
+**Description:** Change the Y-cursor position and verify the cursor's appearance
+
+**Test prerequisites:**
+   - Emulator tests
 
 **Preconditions:**
    - :ref:`Pluto.emu<adalm-pluto_device_emu>`
-   - Press the add device button
-   - Enable emulator for Pluto
-   - Verify and add device with ADCPlugin enabled
    - OS: ANY
 
 **Steps:**
@@ -672,11 +669,11 @@ Test 6 - Show Buffer
 
 **Description:** Enable/disable the buffer and verify its appearance on the plot
 
+**Test prerequisites:**
+   - Emulator tests
+
 **Preconditions:**
    - :ref:`Pluto.emu<adalm-pluto_device_emu>`
-   - Press the add device button
-   - Enable emulator for Pluto
-   - Verify and add device with ADCPlugin enabled
    - OS: ANY
 
 **Steps:**
@@ -697,11 +694,11 @@ Test 7 - Default YMode
 
 **Description:** Set the default Y-mode and verify its behavior in ADC-Time
 
+**Test prerequisites:**
+   - Emulator tests
+
 **Preconditions:**
    - :ref:`Pluto.emu<adalm-pluto_device_emu>`
-   - Press the add device button
-   - Enable emulator for Pluto
-   - Verify and add device with ADCPlugin enabled
    - OS: ANY
 
 **Steps:**
