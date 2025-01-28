@@ -37,8 +37,10 @@ Test 1 - Save/Load Scopy session
 **Description:** Manage sessions to retain or load overall application 
 states (only applies to plugins which have this implemented).
 
-**Preconditions:**
+**Test prerequisites:**
    - Emulator tests
+
+**Preconditions:**
    - :ref:`M2K.emu<m2k_emu_setup>`
    - OS: ALL
 
@@ -67,8 +69,10 @@ Test 2 - Double click to attach/detach tool
 **Description:** Tools can be detached from the main window by 
 double clicking them in the left menu.  
 
+**Test prerequisites:**
+   - Emulator tests
+
 **Preconditions:**  
-   - Emulator tests  
    - :ref:`M2k.emu<m2k_emu_setup>`
    - OS: ALL  
 
@@ -91,9 +95,11 @@ Test 3 - Save/Load tool attached state
 
 **Description:** Manage sessions to retain tool attached states.  
 
+**Test prerequisites:**
+   - Emulator tests
+   - Depends on :ref:`Test Double click to attach/detach tool<TST.PREF.DOUBLECLICK_ATTACH_DETACH>`
+
 **Preconditions:**  
-   - Emulator tests  
-   - Depends on :ref:`Test 2<TST.PREF.DOUBLECLICK_ATTACH_DETACH>`
    - :ref:`M2k.emu<m2k_emu_setup>`
    - OS: ALL  
 
@@ -117,8 +123,10 @@ Test 4 - Double click control buttons to open menu
 
 **Description:** Open menu from MenuControlButtons by double clicking them.  
 
+**Test prerequisites:**
+   - Emulator tests
+
 **Preconditions:**
-   - Emulator tests 
    - :ref:`Pluto.emu<pluto_emu_setup>`
    - OS: ALL  
 
@@ -144,9 +152,11 @@ Test 5 - Enable OpenGL plotting
 
 **Description:** Use GPU acceleration for rendering plots (OpenGL-based).  
 
-**Preconditions:**  
-   - Emulator tests  
+**Test prerequisites:**
+   - Emulator tests
    - Depends on Test "Plot FPS"  
+
+**Preconditions:**  
    - :ref:`M2k.emu<m2k_emu_setup>`
    - OS: ALL  
 
@@ -171,8 +181,10 @@ Test 6 - Enable menu animations
 
 **Description:** Toggle visual animations for menu transitions.  
 
-**Preconditions:**  
+**Test prerequisites:**
    - Emulator tests
+
+**Preconditions:**  
    - :ref:`M2k.emu<m2k_emu_setup>`
    - OS: ANY  
 
@@ -195,8 +207,10 @@ Test 7 - Enable the status bar for displaying important messages
 
 **Description:** Show status messages on the bottom of the app window.  
 
+**Test prerequisites:**
+   - Emulator tests
+
 **Preconditions:**  
-   - Emulator tests  
    - :ref:`M2k.emu<m2k_emu_setup>`
    - OS: ANY  
 
@@ -219,8 +233,10 @@ Test 8 - Show Grid
 
 **Description:** Display grid lines for better visual referencing on plots.  
 
+**Test prerequisites:**
+   - Emulator tests
+
 **Preconditions:**
-   - Emulator tests  
    - :ref:`Pluto.emu<pluto_emu_setup>`
    - OS: ANY  
 
@@ -243,8 +259,10 @@ Test 9 - Show Graticule
 
 **Description:** Display lines for axes centered on 0 points on plots.
 
+**Test prerequisites:**
+   - Emulator tests
+
 **Preconditions:**
-   - Emulator tests  
    - :ref:`Pluto.emu<pluto_emu_setup>`
    - OS: ANY  
 
@@ -267,11 +285,12 @@ Test 10 - Use Lazy Loading
 
 **UID:** TST.PREF.USE_LAZY_LOADING
 
-**Description:** Load IIO resources as needed to improve initial 
-load performance.
+**Description:** Load IIO resources as needed to improve initial load performance.
+
+**Test prerequisites:**
+   - Emulator tests
 
 **Preconditions:**
-   - Emulator tests
    - :ref:`Pluto.emu<pluto_emu_usb_setup>`
    - OS: Windows  
 
@@ -298,7 +317,6 @@ Test 11 - Use native dialogs
 **Description:** Use system-native dialog windows.
 
 **Preconditions:**
-   - None
    - OS: ALL  
 
 **Steps:**  
@@ -320,8 +338,10 @@ Test 12 - Auto-connect to previous session
 
 **Description:** Automatically reconnect to the last used devices on startup.
 
+**Test prerequisites:**
+   - Emulator tests
+
 **Preconditions:**  
-   - Emulator tests  
    - :ref:`Pluto.emu<pluto_emu_setup>`
    - OS: ANY  
 
@@ -346,8 +366,10 @@ Test 13 - Font scale
 **Description:** Adjust font size within the app (this is experimental, 
 so some layout artifacts may appear).  
 
-**Preconditions:**
+**Test prerequisites:**
    - Emulator tests
+
+**Preconditions:**
    - :ref:`Pluto.emu<pluto_emu_setup>`
    - OS: ANY
 
@@ -369,8 +391,10 @@ Test 14 - Theme
 
 **Description:** Change application theme.  
 
-**Preconditions:**
+**Test prerequisites:**
    - Emulator tests
+
+**Preconditions:**
    - :ref:`Pluto.emu<pluto_emu_setup>`
    - OS: ANY
 
@@ -391,8 +415,10 @@ Test 15 - Language
 
 **Description:** Change the language of the application interface.
 
-**Preconditions:**
+**Test prerequisites:**
    - Emulator tests
+
+**Preconditions:**
    - :ref:`M2k.emu<m2k_emu_setup>`
    - OS: ANY  
 
@@ -410,10 +436,12 @@ Test 16 - Connect to multiple devices
 **UID:** TST.PREF.CONNECT_MULTIPLE_DEVICES
 
 **Description:** Enable connections to multiple hardware and emulator 
+
+**Test prerequisites:**
+   - Emulator tests
 devices at once.
 
 **Preconditions:**
-   - Emulator tests  
    - :ref:`Pluto.emu<pluto_emu_setup>` and :ref:`M2k.emu<m2k_emu_setup>`
    - OS: ANY
 
@@ -437,8 +465,10 @@ Test 17 - Regularly scan for new devices
 
 **Description:** Continuously scan and recognize newly connected devices.
 
+**Test prerequisites:**
+   - Emulator tests
+
 **Preconditions:**
-   - Emulator tests  
    - :ref:`Pluto.usb<pluto_emu_usb_setup>`
    - OS: ANY
 
@@ -487,8 +517,10 @@ Test 19 - Show plot FPS
 
 **Description:** Show FPS on plots.
 
+**Test prerequisites:**
+   - Emulator tests
+
 **Preconditions:**
-   - Emulator tests  
    - :ref:`M2k.emu<m2k_emu_setup>` and :ref:`Pluto.usb<pluto_emu_usb_setup>`
    - OS: ANY  
 
@@ -512,8 +544,10 @@ Test 20 - Plot target FPS
 **Description:** Manage the maximum FPS plots should run at 
 (this may also affect the IIO acquisition).
 
+**Test prerequisites:**
+   - Emulator tests
+
 **Preconditions:**
-   - Emulator tests  
    - :ref:`Pluto.usb<pluto_emu_usb_setup>`
    - "Show plot FPS" needs to be enabled.  
    - OS: ANY  
@@ -533,8 +567,10 @@ Test 21 - Reset settings and plugins to default
 
 **Description:** Resets all settings and plugins to default values.
 
+**Test prerequisites:**
+   - Emulator tests
+
 **Preconditions:**
-   - Emulator tests  
    - :ref:`M2k.emu<m2k_emu_setup>` 
    - OS: ANY  
 
