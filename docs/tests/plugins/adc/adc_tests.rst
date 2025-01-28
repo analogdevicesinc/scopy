@@ -38,10 +38,10 @@ Setup environment
 .. _adc_time_tests:
 
 ADC-Time
-^^^^^^^^
+--------
 
 Test 1 - X-AXIS
----------------
+^^^^^^^^^^^^^^^
 
 .. _TST.ADC_TIME.X_AXIS:
 
@@ -73,7 +73,7 @@ Test 1 - X-AXIS
 **Result**: PASS/FAIL
 
 Test 2 - Y-AXIS
----------------
+^^^^^^^^^^^^^^^
 .. _TST.ADC_TIME.Y_AXIS:
 
 **UID:** TST.ADC_TIME.Y_AXIS
@@ -99,7 +99,7 @@ Test 2 - Y-AXIS
 
 
 Test 3 - XY PLOT
-----------------
+^^^^^^^^^^^^^^^^
 
 .. _TST.ADC_TIME.XY_PLOT:
 
@@ -130,7 +130,7 @@ Test 3 - XY PLOT
 
 
 Test 4 - Settings
------------------
+^^^^^^^^^^^^^^^^^
 
 .. _TST.ADC_TIME.SETTINGS:
 
@@ -154,7 +154,7 @@ Test 4 - Settings
 
 
 Test 5 - Print
---------------
+^^^^^^^^^^^^^^
 
 .. _TST.ADC_TIME.PRINT:
 
@@ -178,7 +178,7 @@ Test 5 - Print
 
 
 Test 6 - Info
---------------
+^^^^^^^^^^^^^
 
 .. _TST.ADC_TIME.INFO:
 
@@ -198,7 +198,7 @@ Test 6 - Info
 
 
 Test 7 - Plot Navigation
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.PLOT_NAVIGATION:
 
@@ -226,7 +226,7 @@ Test 7 - Plot Navigation
 **Result**: PASS/FAIL
 
 Test 8 - ADC-Time Channel Settings
------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.ADC_TIME_CHANNEL_SETTINGS:
 
@@ -250,7 +250,7 @@ Test 8 - ADC-Time Channel Settings
 
 
 Test 9 - Measure
-----------------
+^^^^^^^^^^^^^^^^
 
 .. _TST.MEASURE:
 
@@ -278,7 +278,7 @@ and checking frequency and stats
 
 
 Test 10 - Cursors
------------------
+^^^^^^^^^^^^^^^^^
 
 .. _TST.CURSORS:
 
@@ -315,10 +315,10 @@ tracking, and moving readouts
 .. _adc_frequency_tests:
 
 ADC-Frequency
-^^^^^^^^^^^^^
+-------------
 
 Test 1 - X-Axis settings
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.ADC_FREQ.X_AXIS_SETTINGS:
 
@@ -344,7 +344,7 @@ plotting in the ADC plugin
 
 
 Test 2 - Y-Axis settings
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.ADC_FREQ.Y_AXIS_SETTINGS:
 
@@ -372,7 +372,7 @@ range settings
 
 
 Test 3 - Settings adjustment
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.ADC_FREQ.SETTINGS_ADJUSTMENT:
 
@@ -396,7 +396,7 @@ and style
 **Result**: PASS/FAIL
 
 Test 4 - Print plot
---------------------
+^^^^^^^^^^^^^^^^^^^
 
 .. _TST.ADC_FREQ.PRINT_PLOT:
 
@@ -418,7 +418,7 @@ Test 4 - Print plot
 
 
 Test 5 - View plugin documentation
------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.ADC_FREQ.VIEW_PLUGIN_DOC:
 
@@ -438,7 +438,7 @@ Test 5 - View plugin documentation
 
 
 Test 6 - Y-Axis channel settings
----------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.ADC_FREQ.Y_AXIS_CHANNEL_SETTINGS:
 
@@ -461,7 +461,7 @@ Test 6 - Y-Axis channel settings
 
 
 Test 7 - Marker settings
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.ADC_FREQ.MARKER_SETTINGS:
 
@@ -491,7 +491,7 @@ Test 7 - Marker settings
 
 
 Test 8 - Cursor settings
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.ADC_FREQ.CURSOR_SETTINGS:
 
@@ -523,10 +523,10 @@ Test 8 - Cursor settings
 .. _adc_preferences_tests:
 
 Preferences
-^^^^^^^^^^^
+-----------
 
 Test 1 - X Scale Position
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.PREF.X_SCALE_POS:
 
@@ -552,7 +552,7 @@ Test 1 - X Scale Position
 **Result**: PASS/FAIL
 
 Test 2 - Y Scale Position
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.PREF.Y_SCALE_POS:
 
@@ -579,7 +579,7 @@ position on the plot
 **Result**: PASS/FAIL
 
 Test 3 - Channel Handle Position
---------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.PREF.CH_HANDLE_POS:
 
@@ -607,7 +607,7 @@ Test 3 - Channel Handle Position
 **Result**: PASS/FAIL
 
 Test 4 - X Cursor Position
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.PREF.X_CURSOR_POS:
 
@@ -634,7 +634,7 @@ Test 4 - X Cursor Position
 
 
 Test 5 - Y Cursor Position
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.PREF.Y_CURSOR_POS:
 
@@ -661,7 +661,7 @@ Test 5 - Y Cursor Position
 
 
 Test 6 - Show Buffer
---------------------
+^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.PREF.SHOW_BUFFER:
 
@@ -686,7 +686,7 @@ Test 6 - Show Buffer
 
 
 Test 7 - Default YMode
-----------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.PREF.DEFAULT_YMODE:
 

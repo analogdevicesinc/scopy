@@ -439,7 +439,6 @@ Test 16 - Connect to multiple devices
 
 **Test prerequisites:**
    - Emulator tests
-devices at once.
 
 **Preconditions:**
    - :ref:`Pluto.emu<pluto_emu_setup>` and :ref:`M2k.emu<m2k_emu_setup>`
@@ -581,3 +580,4 @@ Test 21 - Reset settings and plugins to default
          the default values.  
 
 **Result:** PASS/FAIL
+
