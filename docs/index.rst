@@ -27,8 +27,10 @@ Contents
 
    user_guide/index
    plugins/index
+   developer_guide/index
 
 
    user_guide/preferences
    user_guide/bugReport
    user_guide/troubleshooting
+   
