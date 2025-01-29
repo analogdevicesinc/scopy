@@ -44,6 +44,7 @@ file(
 	SRC_LIST
 	src/*.cpp
 	src/widgets/*.cpp
+	src/docking/*.cpp
 	src/*.cc
 	src/binding/*.cpp
 	src/prop/*.cpp
@@ -54,6 +55,7 @@ file(
 	include/${SCOPY_MODULE}/*.h
 	include/${SCOPY_MODULE}/*.hpp
 	include/${SCOPY_MODULE}/widgets/*.h
+	include/${SCOPY_MODULE}/docking/*.h
 	include/${SCOPY_MODULE}/binding/*.hpp
 	include/${SCOPY_MODULE}/prop/*.hpp
 )
@@ -95,7 +97,7 @@ else()
 		      /opt/local/lib64
 		      REQUIRED
 	)
-	message("QWT LIBRARIES: " ${QWT_LIBRARIES})
+	message(STATUS "QWT LIBRARIES: " ${QWT_LIBRARIES})
 
 endif()
 
@@ -106,6 +108,7 @@ endif()
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Xml Svg REQUIRED)
+find_package(KDDockWidgets QUIET)
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
 find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
@@ -122,13 +125,17 @@ configure_file(
 )
 
 target_include_directories(
-	${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
-				  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/widgets
+	${PROJECT_NAME}
+	INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/widgets
+		  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/docking
 )
 target_include_directories(
 	${PROJECT_NAME}
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/
-		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/widgets scopy-common scopy-pluginbase
+		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/widgets
+		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/docking
+		scopy-common
+		scopy-pluginbase
 )
 
 target_include_directories(
@@ -146,6 +153,11 @@ target_link_libraries(
 	       scopy-common
 	       scopy-pluginbase
 )
+
+# Link optional libraries
+if(KDDockWidgets_FOUND)
+	target_link_libraries(${PROJECT_NAME} PUBLIC KDAB::kddockwidgets)
+endif()
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH} COMPONENT ${SCOPY_PDK}
 	RUNTIME DESTINATION ${SCOPY_DLL_INSTALL_PATH}

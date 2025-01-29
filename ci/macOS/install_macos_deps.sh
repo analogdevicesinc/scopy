@@ -301,7 +301,7 @@ build_libtinyiiod() {
 build_kddock () {
 	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
 	pushd $STAGING_AREA/KDDockWidgets
-	CURRENT_BUILD_CMAKE_OPTS=""
+	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS"
 	build_with_cmake
 	make install
 	popd

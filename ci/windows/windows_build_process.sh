@@ -361,10 +361,9 @@ build_libtinyiiod() {
 
 build_kddock () {
 	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
-	pushd $STAGING_AREA/KDDockWidgets
+	CURRENT_BUILD=KDDockWidgets
 	CURRENT_BUILD_CMAKE_OPTS=""
 	build_with_cmake $1
-	popd
 }
 
 #
