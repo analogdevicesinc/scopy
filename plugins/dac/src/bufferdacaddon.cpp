@@ -445,6 +445,11 @@ QWidget *BufferDacAddon::createAttrMenu(TxNode *node, QWidget *parent)
 	for(IIOWidget *w : qAsConst(attrWidgets)) {
 		layout->addWidget(w);
 		detectSamplingFrequency(w);
+		connect(dynamic_cast<ChannelAttrDataStrategy *>(w->getDataStrategy()),
+			&ChannelAttrDataStrategy::emitStatus, this,
+			[this](QDateTime timestamp, QString oldData, QString newData, int returnCode, bool isReadOp) {
+				Q_EMIT iioEvent(returnCode);
+			});
 	}
 
 	attr->contentLayout()->addLayout(layout);

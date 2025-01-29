@@ -25,9 +25,10 @@
 #include <iio.h>
 
 #include <iioutil/commandqueue.h>
+#include <iioutil/iioeventemitter.h>
 
 namespace scopy::swiot {
-class DioDigitalChannelController : public QWidget
+class DioDigitalChannelController : public QWidget, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -36,6 +37,10 @@ public:
 	~DioDigitalChannelController() override;
 
 	DioDigitalChannel *getDigitalChannel() const;
+
+Q_SIGNALS:
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
+
 private Q_SLOTS:
 	void createWriteCurrentLimitCommand(int index);
 	void createWriteRawCommand(bool value);

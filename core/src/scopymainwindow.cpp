@@ -96,22 +96,13 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	auto ts = ui->wsToolStack;
 
-	////////
 	BrowseMenu *browseMenu = new BrowseMenu(ui->wToolBrowser);
 	ui->wToolBrowser->layout()->addWidget(browseMenu);
-
 	connect(browseMenu, &BrowseMenu::requestTool, ts, &ToolStack::show, Qt::QueuedConnection);
 	connect(browseMenu, SIGNAL(requestLoad()), this, SLOT(load()));
 	connect(browseMenu, SIGNAL(requestSave()), this, SLOT(save()));
-	connect(browseMenu, &BrowseMenu::collapsed, this, [this](bool coll) {
-		if(coll) {
-			ui->animHolder->setAnimMin(Style::getDimension(json::global::unit_4));
-		} else {
-			ui->animHolder->setAnimMax(230);
-		}
-		ui->animHolder->toggleMenu(!coll);
-	});
-	////////
+	connect(browseMenu, &BrowseMenu::collapsed, this, &ScopyMainWindow::collapseToolMenu);
+
 	Style::setBackgroundColor(ui->centralwidget, json::theme::background_primary);
 
 	scanTask = new IIOScanTask(this);
@@ -174,7 +165,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	}
 
 	enableScanner();
-
 	connect(dm, &DeviceManager::deviceChangedToolList, m_toolMenuManager, &ToolMenuManager::changeToolListContents);
 	connect(dm, SIGNAL(deviceConnected(QString, Device *)), m_toolMenuManager, SLOT(deviceConnected(QString)));
 	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), m_toolMenuManager,
@@ -185,6 +175,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(m_toolMenuManager, &ToolMenuManager::toolStackChanged, browseMenu, &BrowseMenu::onToolStackChanged);
 	connect(hp, &ScopyHomePage::displayNameChanged, m_toolMenuManager, &ToolMenuManager::onDisplayNameChanged);
 	connect(ts, &ToolStack::currentChanged, this, [this, ts](int idx) { highlightMenuItem(ts, idx); });
+	connect(browseMenu, &BrowseMenu::collapsed, m_toolMenuManager, &ToolMenuManager::menuCollapsed);
 
 	connect(hp, &ScopyHomePage::newDeviceAvailable, dm, &DeviceManager::addDevice);
 
@@ -262,6 +253,16 @@ void ScopyMainWindow::highlightMenuItem(ToolStack *ts, int idx)
 	QWidget *crtWidget = ts->widget(idx);
 	QString id = ts->getKey(crtWidget);
 	Q_EMIT m_toolMenuManager->toolStackChanged(id);
+}
+
+void ScopyMainWindow::collapseToolMenu(bool collapse)
+{
+	if(collapse) {
+		ui->animHolder->setAnimMin(Style::getDimension(json::global::unit_4_5));
+	} else {
+		ui->animHolder->setAnimMax(230);
+	}
+	ui->animHolder->toggleMenu(!collapse);
 }
 
 void ScopyMainWindow::save()
@@ -412,6 +413,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_show_status_bar", true);
 	p->init("general_connect_to_multiple_devices", true);
 	p->init("general_scan_for_devices", true);
+	p->init("device_menu_item", true);
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 
@@ -619,14 +621,22 @@ void ScopyMainWindow::initApi()
 
 void ScopyMainWindow::addDeviceToUi(QString id, Device *d)
 {
-	m_toolMenuManager->addMenuItem(id, d->displayName(), d->toolList());
+	bool hasConfigPage = (bool)d->configPage();
+	DeviceInfo dInfo = {id, d->displayName(), d->param(), d->iconPixmap(), hasConfigPage, d->toolList()};
+	m_toolMenuManager->addMenuItem(dInfo);
 	hp->addDevice(id, d);
+	auto ts = ui->wsToolStack;
+	if(hasConfigPage) {
+		ts->add(id, d->configPage());
+	}
 }
 
 void ScopyMainWindow::removeDeviceFromUi(QString id)
 {
 	m_toolMenuManager->removeMenuItem(id);
 	hp->removeDevice(id);
+	auto ts = ui->wsToolStack;
+	ts->remove(id);
 }
 
 void ScopyMainWindow::receiveVersionDocument(QJsonDocument document)

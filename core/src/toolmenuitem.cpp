@@ -147,6 +147,16 @@ void ToolMenuItem::selectCrtItem(QString uuid)
 	}
 }
 
+void ToolMenuItem::onCollapsed(bool collapsed)
+{
+	m_toolRunBtn->setHidden(collapsed);
+	if(collapsed) {
+		setText("");
+	} else {
+		setText(m_name);
+	}
+}
+
 void ToolMenuItem::enterEvent(QEvent *event)
 {
 #ifndef __ANDROID__

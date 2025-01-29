@@ -40,6 +40,7 @@
 #include <gr-util/grfftfloatproxy.h>
 #include <gr-util/griiocomplexchannelsrc.h>
 #include <gui/plotmarkercontroller.h>
+#include <iioutil/iioeventemitter.h>
 
 namespace scopy {
 namespace adc {
@@ -151,7 +152,8 @@ class SCOPY_ADC_EXPORT GRFFTChannelComponent : public ChannelComponent,
 					       public GRChannel,
 					       public MeasurementProvider,
 					       public SampleRateProvider,
-					       public FFTChannel
+					       public FFTChannel,
+					       public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -198,6 +200,7 @@ Q_SIGNALS:
 	void powerOffsetChanged(double);
 	void windowChanged(int);
 	void windowCorrectionChanged(bool);
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 private:
 	double m_powerOffset;

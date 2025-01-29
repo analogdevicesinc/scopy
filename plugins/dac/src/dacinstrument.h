@@ -21,6 +21,7 @@
 
 #ifndef DACINSTRUMENT_H
 #define DACINSTRUMENT_H
+#include "iioutil/iioeventemitter.h"
 #include "scopy-dac_export.h"
 
 #include <QWidget>
@@ -38,7 +39,7 @@
 namespace scopy {
 namespace dac {
 class DacDataManager;
-class SCOPY_DAC_EXPORT DacInstrument : public QWidget
+class SCOPY_DAC_EXPORT DacInstrument : public QWidget, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -52,6 +53,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void running(bool toggled);
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 private Q_SLOTS:
 	void startDdsTutorial();

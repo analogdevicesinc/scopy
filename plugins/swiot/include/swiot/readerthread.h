@@ -31,9 +31,10 @@
 
 #include <atomic>
 #include <iioutil/commandqueue.h>
+#include <iioutil/iioeventemitter.h>
 
 namespace scopy::swiot {
-class ReaderThread : public QThread
+class ReaderThread : public QThread, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -77,6 +78,7 @@ Q_SIGNALS:
 	void readerThreadFinished();
 	void bufferRefilled(QMap<int, QVector<double>> bufferData, int bufferCounter);
 	void channelDataChanged(int channelId, double value);
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 private Q_SLOTS:
 	void bufferRefillCommandFinished(scopy::Command *cmd);

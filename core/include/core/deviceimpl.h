@@ -30,6 +30,7 @@
 #include <QCheckBox>
 #include <QObject>
 #include <QPushButton>
+#include <QTabWidget>
 
 namespace scopy {
 
@@ -48,7 +49,9 @@ public:
 	QString category() override;
 	QString param() override;
 	QWidget *icon() override;
+	QPixmap iconPixmap() override;
 	QWidget *page() override;
+	QWidget *configPage() override;
 	QList<ToolMenuEntry *> toolList() override;
 	virtual void init() override;
 	virtual void preload() override;
@@ -84,6 +87,7 @@ protected:
 	void loadName();
 	void loadIcons();
 	void loadPages();
+	void loadConfigPage();
 	void loadToolList();
 	void loadBadges();
 	void setPingPlugin(Plugin *plugin);
@@ -102,6 +106,7 @@ protected:
 	QString m_param;
 	QWidget *m_icon;
 	QWidget *m_page;
+	QTabWidget *m_configPage;
 	QPushButton *connbtn, *discbtn;
 	Plugin *m_pingPlugin = nullptr;
 };

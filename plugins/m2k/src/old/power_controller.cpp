@@ -153,9 +153,11 @@ void PowerController::dac1_set_value(double value)
 {
 	try {
 		m_m2k_powersupply->pushChannel(0, value);
+		Q_EMIT iioEvent(IIO_SUCCESS);
 	} catch(libm2k::m2k_exception &e) {
 		HANDLE_EXCEPTION(e);
 		qDebug(CAT_M2K_POWERCONTROL) << "Can't write push value: " << e.what();
+		Q_EMIT iioEvent(IIO_ERROR);
 	}
 	averageVoltageCh1.clear();
 
@@ -171,9 +173,11 @@ void PowerController::dac2_set_value(double value)
 {
 	try {
 		m_m2k_powersupply->pushChannel(1, value);
+		Q_EMIT iioEvent(IIO_SUCCESS);
 	} catch(libm2k::m2k_exception &e) {
 		HANDLE_EXCEPTION(e);
 		qDebug(CAT_M2K_POWERCONTROL) << "Can't write push value: " << e.what();
+		Q_EMIT iioEvent(IIO_ERROR);
 	}
 	averageVoltageCh2.clear();
 }
@@ -182,9 +186,11 @@ void PowerController::dac1_set_enabled(bool enabled)
 {
 	try {
 		m_m2k_powersupply->enableChannel(0, enabled);
+		Q_EMIT iioEvent(IIO_SUCCESS);
 	} catch(libm2k::m2k_exception &e) {
 		HANDLE_EXCEPTION(e);
 		qDebug(CAT_M2K_POWERCONTROL) << "Can't enable channel: " << e.what();
+		Q_EMIT iioEvent(IIO_ERROR);
 	}
 	averageVoltageCh1.clear();
 
@@ -199,9 +205,11 @@ void PowerController::dac2_set_enabled(bool enabled)
 {
 	try {
 		m_m2k_powersupply->enableChannel(1, enabled);
+		Q_EMIT iioEvent(IIO_SUCCESS);
 	} catch(libm2k::m2k_exception &e) {
 		HANDLE_EXCEPTION(e);
 		qDebug(CAT_M2K_POWERCONTROL) << "Can't enable channel: " << e.what();
+		Q_EMIT iioEvent(IIO_ERROR);
 	}
 	averageVoltageCh2.clear();
 	setDynamicProperty(ui->dac2, "running", enabled);
@@ -230,9 +238,11 @@ void PowerController::update_lcd()
 	try {
 		value1 = m_m2k_powersupply->readChannel(0);
 		value2 = m_m2k_powersupply->readChannel(1);
+		Q_EMIT iioEvent(IIO_SUCCESS, IIOCallType::STREAM);
 	} catch(libm2k::m2k_exception &e) {
 		HANDLE_EXCEPTION(e);
 		qDebug(CAT_M2K_POWERCONTROL) << "Can't read value: " << e.what();
+		Q_EMIT iioEvent(IIO_ERROR, IIOCallType::STREAM);
 	}
 
 	averageVoltageCh1.push_back(value1);

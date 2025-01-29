@@ -22,6 +22,7 @@
 #ifndef DACDATAMODEL_H
 #define DACDATAMODEL_H
 
+#include "iioutil/iioeventemitter.h"
 #include <QObject>
 #include <QString>
 #include <QMap>
@@ -32,7 +33,7 @@
 namespace scopy {
 namespace dac {
 class TxNode;
-class DacDataModel : public QObject
+class DacDataModel : public QObject, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -67,6 +68,7 @@ Q_SIGNALS:
 	void invalidRunParams();
 	void updateBuffersize(unsigned int bf);
 	void updateKernelBuffers(unsigned int kb);
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
 
 public Q_SLOTS:
 	void reset();

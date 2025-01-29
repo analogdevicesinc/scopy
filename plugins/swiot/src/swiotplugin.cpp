@@ -26,6 +26,7 @@
 #include <stylehelper.h>
 #include <menusectionwidget.h>
 #include <iioutil/cmdqpingtask.h>
+#include <deviceiconbuilder.h>
 #include <style.h>
 
 #include "swiot_logging_categories.h"
@@ -129,8 +130,16 @@ bool SWIOTPlugin::loadExtraButtons()
 
 bool SWIOTPlugin::loadIcon()
 {
-	m_icon = new QLabel("");
-	m_icon->setStyleSheet("border-image: url(:/swiot/swiot_icon.svg);");
+	QLabel *logo = new QLabel();
+	QPixmap pixmap(":/gui/icons/scopy-default/icons/logo_analog.svg");
+	int pixmapHeight = 14;
+	pixmap = pixmap.scaledToHeight(pixmapHeight, Qt::SmoothTransformation);
+	logo->setPixmap(pixmap);
+
+	QLabel *footer = new QLabel("SWIOT1L");
+	Style::setStyle(footer, style::properties::label::deviceIcon, true);
+
+	m_icon = DeviceIconBuilder().shape(DeviceIconBuilder::SQUARE).headerWidget(logo).footerWidget(footer).build();
 	return true;
 }
 
@@ -200,6 +209,8 @@ bool SWIOTPlugin::onDisconnect()
 		tme->setTool(nullptr);
 	}
 
+	disconnect(m_swiotController, &SwiotController::iioEvent, ad74413rTme, &ToolMenuEntry::iioEvent);
+	disconnect(m_swiotController, &SwiotController::iioEvent, configTme, &ToolMenuEntry::iioEvent);
 	disconnect(dynamic_cast<SwiotConfig *>(configTme->tool()), &SwiotConfig::writeModeAttribute, this,
 		   &SWIOTPlugin::setCtxMode);
 	disconnect(dynamic_cast<Ad74413r *>(ad74413rTme->tool()), &Ad74413r::configBtnPressed, m_runtime,
@@ -344,8 +355,10 @@ void SWIOTPlugin::setupToolList()
 		ad74413rTme->setTool(new swiot::Ad74413r(m_param, ad74413rTme));
 		max14906Tme->setTool(new swiot::Max14906(m_param, max14906Tme));
 		faultsTme->setTool(new swiot::Faults(m_param, faultsTme));
+		connect(m_swiotController, &SwiotController::iioEvent, ad74413rTme, &ToolMenuEntry::iioEvent);
 	} else {
-		configTme->setTool(new swiot::SwiotConfig(m_param));
+		configTme->setTool(new swiot::SwiotConfig(m_param, configTme));
+		connect(m_swiotController, &SwiotController::iioEvent, configTme, &ToolMenuEntry::iioEvent);
 	}
 
 	connect(dynamic_cast<SwiotConfig *>(configTme->tool()), &SwiotConfig::writeModeAttribute, this,

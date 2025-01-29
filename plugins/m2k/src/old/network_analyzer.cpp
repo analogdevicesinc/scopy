@@ -1202,6 +1202,7 @@ void NetworkAnalyzer::goertzel()
 				m_m2k_analogout->push(buffers);
 			} catch(libm2k::m2k_exception &e) {
 				HANDLE_EXCEPTION(e)
+				Q_EMIT iioEvent(IIO_ERROR, IIOCallType::STREAM);
 				return;
 			}
 		}
@@ -1234,6 +1235,7 @@ void NetworkAnalyzer::goertzel()
 			} catch(libm2k::m2k_exception &e) {
 				HANDLE_EXCEPTION(e)
 				qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
+				Q_EMIT iioEvent(IIO_ERROR, IIOCallType::STREAM);
 			}
 		}
 
@@ -1250,6 +1252,7 @@ void NetworkAnalyzer::goertzel()
 				} catch(libm2k::m2k_exception &e) {
 					HANDLE_EXCEPTION(e)
 					qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
+					Q_EMIT iioEvent(IIO_ERROR, IIOCallType::STREAM);
 					return;
 				}
 				if(m_stop) {
@@ -1316,7 +1319,7 @@ void NetworkAnalyzer::goertzel()
 				m_averaged_count = 0;
 			}
 		}
-
+		Q_EMIT iioEvent(IIO_SUCCESS, IIOCallType::STREAM);
 		m_m2k_analogout->stop();
 
 		// Process was cancelled
@@ -1653,6 +1656,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 		} catch(libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e)
 			qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
+			Q_EMIT iioEvent(IIO_ERROR);
 		}
 		m_dBgraph.sweepDone();
 		m_phaseGraph.sweepDone();
@@ -1663,6 +1667,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 			m_m2k_analogin->setKernelBuffersCount(KERNEL_BUFFERS_DEFAULT);
 		} catch(libm2k::m2k_exception &e) {
 			qDebug() << e.what();
+			Q_EMIT iioEvent(IIO_ERROR);
 		}
 	}
 }
@@ -1681,6 +1686,7 @@ std::vector<double> NetworkAnalyzer::generateSinWave(unsigned int chn_idx, doubl
 		} catch(libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e)
 			qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
+			Q_EMIT iioEvent(IIO_ERROR, IIOCallType::STREAM);
 		}
 	}
 

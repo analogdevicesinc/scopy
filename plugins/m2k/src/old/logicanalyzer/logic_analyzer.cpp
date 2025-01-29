@@ -2113,6 +2113,7 @@ void LogicAnalyzer::startStop(bool start)
 					m_m2kDigital->setKernelBuffersCountIn(1);
 				} catch(libm2k::m2k_exception &e) {
 					qDebug() << e.what();
+					Q_EMIT iioEvent(IIO_ERROR);
 				}
 
 				chunk_size = bufferSizeAdjusted;
@@ -2177,6 +2178,7 @@ void LogicAnalyzer::startStop(bool start)
 					m_m2kDigital->setKernelBuffersCountIn(m_currentKernelBuffers);
 				} catch(libm2k::m2k_exception &e) {
 					qDebug() << e.what();
+					Q_EMIT iioEvent(IIO_ERROR);
 				}
 
 				// time for one kernel buffer + 100ms for the transfer
@@ -2226,6 +2228,7 @@ void LogicAnalyzer::startStop(bool start)
 
 				} catch(libm2k::m2k_exception &e) {
 					qDebug() << e.what() << " code: " << e.iioCode();
+					Q_EMIT iioEvent(IIO_ERROR, IIOCallType::STREAM);
 					break;
 				}
 
@@ -2234,6 +2237,7 @@ void LogicAnalyzer::startStop(bool start)
 				}
 
 				Q_EMIT dataAvailable(absIndex - captureSize, absIndex, m_buffer);
+				Q_EMIT iioEvent(IIO_SUCCESS, IIOCallType::STREAM);
 
 				QMetaObject::invokeMethod(&m_plot, // trigger replot on Main Thread
 							  "replot", Qt::QueuedConnection);
@@ -2298,6 +2302,7 @@ void LogicAnalyzer::startStop(bool start)
 				m_m2kDigital->cancelAcquisition(); // cancelBufferIn
 			} catch(...) {
 				qDebug() << "Error";
+				Q_EMIT iioEvent(IIO_ERROR);
 			}
 
 			m_captureThread->join();

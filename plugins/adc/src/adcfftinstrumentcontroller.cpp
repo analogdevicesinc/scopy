@@ -122,13 +122,13 @@ void ADCFFTInstrumentController::createIIODevice(AcqTreeNode *node)
 {
 	GRIIODeviceSourceNode *griiodsn = dynamic_cast<GRIIODeviceSourceNode *>(node);
 	GRDeviceComponent *d = new GRDeviceComponent(griiodsn);
-	addComponent(d);
 	m_ui->addDevice(d->ctrl(), d);
 
 	m_acqNodeComponentMap[griiodsn] = (d);
 	m_fftPlotSettingsComponent->addSampleRateProvider(d);
 	addComponent(d);
 
+	connect(d, &GRDeviceComponent::iioEvent, this, &ADCInstrumentController::iioEvent);
 	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, this,
 		[=](SamplingInfo p) { d->setBufferSize(p.bufferSize); });
 }
@@ -141,6 +141,7 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 	GRFFTChannelComponent *c =
 		new GRFFTChannelComponent(griiofcn, dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(0)),
 					  grtsc, chIdP->pen(idx), m_ui->rightStack);
+	connect(c, &GRFFTChannelComponent::iioEvent, this, &ADCInstrumentController::iioEvent);
 	Q_ASSERT(grtsc);
 
 	m_plotComponentManager->addChannel(c);
@@ -164,6 +165,7 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 
 	m_ui->addChannel(c->ctrl(), c, cw);
 
+	connect(dc, &GRDeviceComponent::iioEvent, this, &ADCInstrumentController::iioEvent);
 	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
 
 	grtsc->addChannel(c);			   // For matching Sink To Channels
@@ -228,6 +230,7 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 
 	m_ui->addChannel(c->ctrl(), c, cw);
 
+	connect(dc, &GRDeviceComponent::iioEvent, this, &ADCInstrumentController::iioEvent);
 	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
 
 	grtsc->addChannel(c);			   // For matching Sink To Channels

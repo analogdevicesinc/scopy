@@ -48,6 +48,7 @@ Q_SIGNALS:
 public Q_SLOTS:
 	void updateItem();
 	void selectCrtItem(QString uuid);
+	void onCollapsed(bool collapsed);
 
 protected:
 	void enterEvent(QEvent *event);

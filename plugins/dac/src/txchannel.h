@@ -22,6 +22,7 @@
 #ifndef TXCHANNEL_H
 #define TXCHANNEL_H
 
+#include "iioutil/iioeventemitter.h"
 #include <QWidget>
 #include <QMap>
 
@@ -29,7 +30,7 @@ namespace scopy {
 namespace dac {
 class TxNode;
 class TxTone;
-class TxChannel : public QWidget
+class TxChannel : public QWidget, public IIOEventEmitter
 {
 	Q_OBJECT
 public:
@@ -46,6 +47,8 @@ public:
 	QMap<QString, QWidget *> getToneMenus() const;
 Q_SIGNALS:
 	void resetChannelScales();
+	void iioEvent(int retCode, scopy::IIOCallType type = IIOCallType::SINGLE) override;
+
 public Q_SLOTS:
 	void scaleUpdated(int toneIdx, QString oldScale, QString newScale);
 

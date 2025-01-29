@@ -34,9 +34,11 @@
 
 using namespace scopy::swiot;
 
-SwiotConfig::SwiotConfig(QString uri, QWidget *parent)
+SwiotConfig::SwiotConfig(QString uri, ToolMenuEntry *tme, QWidget *parent)
 	: QWidget(parent)
 	, m_uri(uri)
+	, m_tme(tme)
+
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *layout = new QHBoxLayout(this);
@@ -132,6 +134,7 @@ void SwiotConfig::buildGridLayout()
 
 		QObject::connect(configController, &ConfigController::clearDrawArea, this,
 				 [this]() { m_drawArea->deactivateConnections(); });
+		QObject::connect(configModel, &ConfigModel::iioEvent, m_tme, &ToolMenuEntry::iioEvent);
 	}
 	// The apply button will always be at the end of the channel widgets
 	m_chnlsGrid->layout()->addWidget(m_applyBtn);
