@@ -7,6 +7,22 @@ Homepage
 
     User guide: :ref:`Scopy Overview <user_guide>`.
 
+.. note::
+    .. list-table:: 
+       :widths: 50 30 30 50 50
+       :header-rows: 1
+
+       * - Tester
+         - Test Date
+         - Scopy version
+         - Plugin version (N/A if not applicable)
+         - Comments
+       * - 
+         - 
+         - 
+         - 
+         - 
+
 Test 1: The homepage displays correctly when running the application.
 ---------------------------------------------------------------------
 
@@ -23,8 +39,27 @@ Test 1: The homepage displays correctly when running the application.
     2. Observe the application's behavior.
         - **Expected result:** The application launches without errors and the 
           home page is displayed.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 2: Verifying the "Add device" (+) button.
 ----------------------------------------------
@@ -44,8 +79,27 @@ Test 2: Verifying the "Add device" (+) button.
     4. Observe the application's behavior.
         - **Expected result:** The page for adding a new device is displayed in 
           the info page section.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _tst-hp-auto-scan-on:
 
@@ -70,8 +124,27 @@ Test 3: Verifying the auto-scan feature (ON).
     4. Observe the application's behavior.
         - **Expected result:** After a short period, the device appears in the 
           device browser section. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _tst-hp-auto-scan-off:
 
@@ -96,8 +169,27 @@ scan is turned off.
     4. Observe the application's behavior.
         - **Expected result:** The device should not be visible in the device 
           browser. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _tst-hp-manual-scan:
 
@@ -123,8 +215,27 @@ all available devices correctly.
     4. Click on the **Scan** button.
     5. Observe the application's behavior.
         - **Expected result:** The device appears in the device browser section.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 6: Navigation using the buttons in the info page.
 ------------------------------------------------------
@@ -156,8 +267,26 @@ Test 6: Navigation using the buttons in the info page.
     8. Click on the left arrow button.
         - **Expected result:** The device's page is displayed and the device 
           icon is highlighted. 
+        - **Actual result:**
 
-**Result:** PASS/FAIL 
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
 
 Test 7: Auto-scan behavior when the device is unplugged.
 --------------------------------------------------------
@@ -182,5 +311,23 @@ available devices correctly.
     5. Unplug the device.
     6. Observe the application's behavior.
         - **Expected result:** The device is removed from device browser.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).

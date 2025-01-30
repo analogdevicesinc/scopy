@@ -3,6 +3,22 @@
 General Preferences - Test Suite
 ==================================
 
+.. note::
+    .. list-table:: 
+       :widths: 50 30 30 50 50
+       :header-rows: 1
+
+       * - Tester
+         - Test Date
+         - Scopy version
+         - Plugin version (N/A if not applicable)
+         - Comments
+       * - 
+         - 
+         - 
+         - 
+         - 
+
 Setup environment:
 ------------------
 
@@ -51,13 +67,44 @@ states (only applies to plugins which have this implemented).
    4. Close Scopy
    5. Open the app using the same setup and check if the time base
        - **Expected result:** time base is 1s
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
    6. Redo all the steps with the preference disabled
        - **Expected result:** time base is the default value
-   7. Press the "Settings file location" open button within the preference menu
-       - **Expected results:** should open a file browser containing 
-         .ini files for every plugins' session saved
+       - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+   7. Press the "Settings file location" open button within the preference menu
+       - **Expected result:** should open a file browser containing 
+         .ini files for every plugins' session saved
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 2 - Double click to attach/detach tool
 --------------------------------------------------
@@ -80,11 +127,36 @@ double clicking them in the left menu.
    1. Set preference to enabled.  
    2. Double click Oscilloscope tool to detach it.  
        - **Expected result:** Oscilloscope tool should detach from 
-         the main window into a new one.  
-   3. Redo all the steps with the preference disabled.  
-       - **Expected result:** Nothing should happen.
+         the main window into a new one.    
+       - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+   3. Redo all the steps with the preference disabled.  
+       - **Expected result:** Nothing should happen.  
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 3 - Save/Load tool attached state
 --------------------------------------------------
@@ -108,11 +180,36 @@ Test 3 - Save/Load tool attached state
    2. Double click Oscilloscope tool to detach it.  
    3. Close Scopy.  
    4. Open the app using the same setup.  
-       - **Expected result:** Oscilloscope is still detached.  
-   5. Redo all the steps with the preference disabled.  
-       - **Expected result:** Oscilloscope should not be detached.  
+       - **Expected result:** Oscilloscope is still detached.    
+       - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+   5. Redo all the steps with the preference disabled.  
+       - **Expected result:** Oscilloscope should not be detached.    
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 4 - Double click control buttons to open menu
 --------------------------------------------------
@@ -136,11 +233,36 @@ Test 4 - Double click control buttons to open menu
    3. Double click Cursors button in the bottom right (
       do not click on the button's icon).  
       
-       - **Expected result:** A hovering menu should open above the button.  
-   4. Redo all the steps with the preference disabled.  
-       - **Expected result:** No menu should open.  
+       - **Expected result:** A hovering menu should open above the button.
+       - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+   4. Redo all the steps with the preference disabled.  
+       - **Expected result:** No menu should open.
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 
 Test 5 - Enable OpenGL plotting
@@ -165,12 +287,37 @@ Test 5 - Enable OpenGL plotting
    2. Set Debug preference "Show plot FPS" to enabled.  
    3. Open Oscilloscope tool and run it.  
        - **Expected result:** The red text inside the plot 
-         should contain "OpenGL rendering."  
+         should contain "OpenGL rendering."
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
    4. Redo all the steps with the preference disabled.  
        - **Expected result:** The red text inside the plot
-         should contain "Software rendering."  
+         should contain "Software rendering."
+       - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 6 - Enable menu animations
 --------------------------------------------------
@@ -191,11 +338,36 @@ Test 6 - Enable menu animations
 **Steps:**  
    1. Set preference to enabled.  
    2. Open Oscilloscope tool and toggle between trigger and channel menus.  
-       - **Expected result:** Opening menus should be animated.  
-   3. Redo all the steps with the preference disabled.  
-       - **Expected result:** Opening menus shouldn't have any animations.  
+       - **Expected result:** Opening menus should be animated.    
+       - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+   3. Redo all the steps with the preference disabled.  
+       - **Expected result:** Opening menus shouldn't have any animations.    
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 
 Test 7 - Enable the status bar for displaying important messages
@@ -217,11 +389,36 @@ Test 7 - Enable the status bar for displaying important messages
 Steps  
    1. Set preference to enabled.  
    2. Do the setup again and look for a message bar when pressing "connect."  
-       - **Expected result:** A message about connecting should appear at the bottom of the window.  
-   3. Redo all the steps with the preference disabled.  
-       - **Expected result:** No message should pop up.  
+       - **Expected result:** A message about connecting should appear at the bottom of the window.    
+       - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+   3. Redo all the steps with the preference disabled.  
+       - **Expected result:** No message should pop up.    
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 
 Test 8 - Show Grid
@@ -243,11 +440,36 @@ Test 8 - Show Grid
 **Steps:**
    1. Set preference to enabled.  
    2. Open ADC - Time tool.  
-       - **Expected result:** A grid should be visible on the plot.  
-   3. Redo all the steps with the preference disabled.  
-       - **Expected result:** No grid on the plot.  
+       - **Expected result:** A grid should be visible on the plot.
+       - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+   3. Redo all the steps with the preference disabled.
+       - **Expected result:** No grid on the plot.
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 
 Test 9 - Show Graticule
@@ -271,12 +493,37 @@ Test 9 - Show Graticule
    2. Open ADC - Time tool.  
        - **Expected result:** A horizontal and a vertical 
          measurement line should be centered on the 0-axis 
-         points (both may not be visible at the same time).  
-   3. Redo all the steps with the preference disabled.  
-       - **Expected result:** The lines should border the entire 
-         plot instead of centering on 0 points.  
+         points (both may not be visible at the same time).
+       - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+   3. Redo all the steps with the preference disabled.
+       - **Expected result:** The lines should border the entire
+         plot instead of centering on 0 points.
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 10 - Use Lazy Loading
 --------------------------------------------------
@@ -298,14 +545,33 @@ Test 10 - Use Lazy Loading
    1. Set preference to enabled.  
    2. Open Scopy console executable.  
    3. After connecting to Pluto as described in the setup, look 
-      in the console for "device connection took:" times.  
+      in the console for "device connection took:" times.
    4. Redo all the steps with the preference disabled and 
       compare the elapsed times.  
 
        - **Expected result:** Elapsed times connecting to some 
-         plugins should be lower when lazy loading is enabled.  
+         plugins should be lower when lazy loading is enabled.
+       - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 11 - Use native dialogs
 -------------------------------
@@ -322,12 +588,37 @@ Test 11 - Use native dialogs
 **Steps:**  
    1. Set preference to enabled.  
    2. Press the Load button on the left menu.  
-       - **Expected result:** A native file browser window should open.  
+       - **Expected result:** A native file browser window should open.
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
    3. Redo all the steps with the preference disabled.  
        - **Expected result:** A non-native, Scopy-specific, 
-         file browser window should open.  
+         file browser window should open.
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 12 - Auto-connect to previous session
 --------------------------------------------------
@@ -350,11 +641,36 @@ Test 12 - Auto-connect to previous session
    2. Connect to the device and then close the application.  
    3. Open Scopy.  
        - **Expected result:** Scopy should automatically connect 
-         to the Pluto device.  
-   4. Redo all the steps with the preference disabled.  
-       - **Expected result:** Should not connect automatically.  
+         to the Pluto device.    
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+   4. Redo all the steps with the preference disabled.
+       - **Expected result:** Should not connect automatically.
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 13 - Font scale
 --------------------------------------------------
@@ -375,11 +691,36 @@ so some layout artifacts may appear).
 
 **Steps:**
    1. Set preference to 1.45, restart Scopy, and inspect some tools.  
-       - **Expected result:** All app text and some buttons should be larger.  
+       - **Expected result:** All app text and some buttons should be larger.    
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
    2. Repeat the steps for font size 1.  
-       - **Expected result:** Text should return to default size.  
+       - **Expected result:** Text should return to default size.
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 
 Test 14 - Theme
@@ -402,8 +743,27 @@ Test 14 - Theme
    1. Set preference to a different theme and restart the app.
        - **Expected result:** Themes should change while retaining 
          the same UX and usability in all tools.
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 
 Test 15 - Language
@@ -423,10 +783,29 @@ Test 15 - Language
    - OS: ANY  
 
 Steps
-   1. Set preference to a different language and restart the app.  
-       - **Expected result:** Some text language should change in the M2K tools.  
+   1. Set preference to a different language and restart the app.
+       - **Expected result:** Some text language should change in the M2K tools.
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 16 - Connect to multiple devices
 --------------------------------------------------
@@ -449,11 +828,36 @@ Test 16 - Connect to multiple devices
    2. Connect to 2 devices following the setup.
        - **Expected result:** Two devices should appear in the left 
          menu and be fully functional.  
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
    3. Repeat the steps with the preference disabled.  
        - **Expected result:** When connecting to the second device, 
-         the first one should automatically disconnect.  
+         the first one should automatically disconnect.    
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 17 - Regularly scan for new devices
 --------------------------------------------------
@@ -475,12 +879,37 @@ Test 17 - Regularly scan for new devices
    1. Connect the Pluto to the machine via USB.  
        - **Expected result:** Pluto should automatically appear in 
          the device list, and a toggle switch for scanning should 
-         appear in the top right.  
-   2. Repeat the steps with the preference disabled.  
+         appear in the top right.
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+   2. Repeat the steps with the preference disabled.
        - **Expected result:** Pluto should not appear automatically, 
-         only when pressing the on-demand Scan button.  
+         only when pressing the on-demand Scan button.
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 18 - Session devices
 --------------------------------------------------
@@ -503,9 +932,28 @@ Test 18 - Session devices
       "X" button on the device.  
    4. Close and reopen Scopy.  
        - **Expected result:** Should automatically connect to the URI you 
-         checked.  
+         checked.
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 19 - Show plot FPS
 --------------------------------------------------
@@ -527,11 +975,36 @@ Test 19 - Show plot FPS
    1. Open Oscilloscope and run it.  
    2. Open ADC - Time and run it.  
        - **Expected result:** Should show the FPS on the plot 
-         (M2K may look different from other plugins).  
+         (M2K may look different from other plugins).    
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
    3. Repeat the steps with the preference disabled.  
-       - **Expected result:** No FPS should be visible.  
+       - **Expected result:** No FPS should be visible.    
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 20 - Plot target FPS
 --------------------------------------------------
@@ -553,9 +1026,28 @@ Test 20 - Plot target FPS
 
 **Steps:**  
    1. Set the preference to each value and run ADC - Time to check FPS.  
-       - **Expected result:** Plot FPS should be capped at the selected value.  
+       - **Expected result:** Plot FPS should be capped at the selected value.    
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 21 - Reset settings and plugins to default
 --------------------------------------------------
@@ -577,7 +1069,26 @@ Test 21 - Reset settings and plugins to default
    1. Change general preferences and M2K preferences.  
    2. Press the "Restart" button and restart the app.  
        - **Expected result:** All changed preferences should have 
-         the default values.  
+         the default values.    
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
