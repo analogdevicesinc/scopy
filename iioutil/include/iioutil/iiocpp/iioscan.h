@@ -18,36 +18,39 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef IIOATTRIBUTE_H
-#define IIOATTRIBUTE_H
+#ifndef IIOSCAN_H
+#define IIOSCAN_H
 
 #include "scopy-iioutil_export.h"
 #include <QObject>
 #include <iio/iio.h>
 
+#include "iiocpp/iioresult.h"
+
 namespace scopy {
-class SCOPY_IIOUTIL_EXPORT IIOAttribute : public QObject
+class SCOPY_IIOUTIL_EXPORT IIOScan : public QObject
 {
 	Q_OBJECT
+	// FIXME: Do we actually need it to be a singleton, come back when signals are implemented?
 protected:
-	IIOAttribute(QObject *parent = nullptr);
-	~IIOAttribute();
+	IIOScan(QObject *parent = nullptr);
+	~IIOScan();
 
 public:
-	IIOAttribute(const IIOAttribute &) = delete;
-	IIOAttribute &operator=(const IIOAttribute &) = delete;
+	IIOScan(const IIOScan &) = delete;
+	IIOScan &operator=(const IIOScan &) = delete;
 
-	static IIOAttribute *GetInstance();
+	static IIOScan *GetInstance();
 
-	static ssize_t read_raw(const iio_attr *attr, char *dst, size_t len);
-	static ssize_t write_raw(const iio_attr *attr, const void *src, size_t len);
-	static const char *get_name(const iio_attr *attr);
-	static const char *get_filename(const iio_attr *attr);
-	static const char *get_static_value(const iio_attr *attr);
+	static IIOResult<struct iio_scan *> scan(const struct iio_context_params *params, const char *backends);
+	static void destroy(struct iio_scan *ctx);
+	static size_t get_results_count(const struct iio_scan *ctx);
+	static const char *get_description(const struct iio_scan *ctx, size_t idx);
+	static const char *get_uri(const struct iio_scan *ctx, size_t idx);
 
 private:
-	static IIOAttribute *pinstance_;
+	static IIOScan *pinstance_;
 };
 } // namespace scopy
 
-#endif // IIOATTRIBUTE_H
+#endif // IIOSCAN_H

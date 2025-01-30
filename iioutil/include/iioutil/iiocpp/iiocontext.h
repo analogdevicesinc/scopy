@@ -21,15 +21,46 @@
 #ifndef IIOCONTEXT_H
 #define IIOCONTEXT_H
 
+#include "iiocpp/iioresult.h"
 #include "scopy-iioutil_export.h"
-#include <iio.h>
+#include <iio/iio.h>
 #include <QObject>
 
 namespace scopy {
 class SCOPY_IIOUTIL_EXPORT IIOContext : public QObject
 {
 	Q_OBJECT
+protected:
+	IIOContext(QObject *parent = nullptr);
+	~IIOContext();
+
 public:
+	IIOContext(const IIOContext &) = delete;
+	IIOContext &operator=(const IIOContext &) = delete;
+
+	static IIOContext *GetInstance();
+
+	static IIOResult<iio_context *> create_context(const iio_context_params *params, const char *uri);
+	static void destroy(iio_context *ctx);
+	static unsigned int get_version_major(const iio_context *ctx);
+	static unsigned int get_version_minor(const iio_context *ctx);
+	static const char *get_version_tag(const iio_context *ctx);
+	static IIOResult<char *> get_xml(const iio_context *ctx);
+	static const char *get_name(const iio_context *ctx);
+	static const char *get_description(const iio_context *ctx);
+	static unsigned int get_attrs_count(const iio_context *ctx);
+	static IIOResult<const iio_attr *> get_attr(const iio_context *ctx, unsigned int index);
+	static IIOResult<const iio_attr *> find_attr(const iio_context *ctx, const char *name);
+	static unsigned int get_devices_count(const iio_context *ctx);
+	static IIOResult<iio_device *> get_device(const iio_context *ctx, unsigned int index);
+	static IIOResult<iio_device *> find_device(const iio_context *ctx, const char *name);
+	static int set_timeout(iio_context *ctx, unsigned int timeout_ms);
+	static const iio_context_params *get_params(const iio_context *ctx);
+	static void set_data(iio_context *ctx, void *data);
+	static void *get_data(const iio_context *ctx);
+
+private:
+	static IIOContext *pinstance_;
 };
 
 } // namespace scopy

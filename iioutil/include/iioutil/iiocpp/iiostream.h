@@ -18,36 +18,35 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef IIOATTRIBUTE_H
-#define IIOATTRIBUTE_H
+#ifndef IIOSTREAM_H
+#define IIOSTREAM_H
 
+#include "iiocpp/iioresult.h"
 #include "scopy-iioutil_export.h"
 #include <QObject>
 #include <iio/iio.h>
 
 namespace scopy {
-class SCOPY_IIOUTIL_EXPORT IIOAttribute : public QObject
+class SCOPY_IIOUTIL_EXPORT IIOStream : public QObject
 {
 	Q_OBJECT
 protected:
-	IIOAttribute(QObject *parent = nullptr);
-	~IIOAttribute();
+	IIOStream(QObject *parent = nullptr);
+	~IIOStream();
 
 public:
-	IIOAttribute(const IIOAttribute &) = delete;
-	IIOAttribute &operator=(const IIOAttribute &) = delete;
+	IIOStream(const IIOStream &) = delete;
+	IIOStream &operator=(const IIOStream &) = delete;
 
-	static IIOAttribute *GetInstance();
+	static IIOStream *GetInstance();
 
-	static ssize_t read_raw(const iio_attr *attr, char *dst, size_t len);
-	static ssize_t write_raw(const iio_attr *attr, const void *src, size_t len);
-	static const char *get_name(const iio_attr *attr);
-	static const char *get_filename(const iio_attr *attr);
-	static const char *get_static_value(const iio_attr *attr);
+	static IIOResult<iio_stream *> create_stream(iio_buffer *buffer, size_t nb_blocks, size_t samples_count);
+	static void destroy(iio_stream *stream);
+	static IIOResult<const iio_block *> get_next_block(iio_stream *stream);
 
 private:
-	static IIOAttribute *pinstance_;
+	static IIOStream *pinstance_;
 };
 } // namespace scopy
 
-#endif // IIOATTRIBUTE_H
+#endif // IIOSTREAM_H
