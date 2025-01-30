@@ -7,6 +7,22 @@ EMU
 
     User guide: :ref:`Scopy Overview <user_guide>`.
 
+.. note::
+    .. list-table:: 
+       :widths: 50 30 30 50 50
+       :header-rows: 1
+
+       * - Tester
+         - Test Date
+         - Scopy version
+         - Plugin version (N/A if not applicable)
+         - Comments
+       * - 
+         - 
+         - 
+         - 
+         - 
+
 .. _tst-emu-en:
 
 Test 1: Enable the emulator.
@@ -30,8 +46,27 @@ correctly.
     5. Click on **Enable** button.
         - **Expected result:** The IIO device tab is selected, and the URI 
           "ip:127.0.0.1" is entered in the corresponding section. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 2: EMU is not installed.
 -----------------------------
@@ -55,8 +90,27 @@ when the IIO emulator is not found.
     3. Click on **Emulator** tab.
         - **Expected result:** All the components are disabled and the message 
           "Can't find iio-emu in the system!" is displayed. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 3: Disable the emulator.
 -----------------------------
@@ -84,8 +138,27 @@ correctly.
     7. Click on **Disable** button.
         - **Expected result:** The fields in this tab become editable, and the 
           **Enable** button appears. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 4: Disable the emulator while the emulated device is connected.
 --------------------------------------------------------------------
@@ -115,8 +188,27 @@ when an emulated device is connected and the "iio-emu" process is stopped.
         - **Expected result:** The fields in this tab become editable, and the 
           **Enable** button appears. After a few seconds, the device is 
           disconnected.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 5: Verify adalm2000 emu device.
 ------------------------------------
@@ -144,8 +236,27 @@ correctly (using adalm2000 device).
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: M2kPlugin (checked), ADCPlugin, DACPlugin, DataLoggerPlugin, 
           DebuggerPlugin, RegmapPlugin.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 6: Verify pluto emu device.
 --------------------------------
@@ -173,8 +284,27 @@ correctly (using pluto device).
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: ADCPlugin (checked), DACPlugin (checked), DataLoggerPlugin 
           (checked), DebuggerPlugin (checked), RegmapPlugin (checked). 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 7: Verify pqm emu device.
 ------------------------------
@@ -202,9 +332,27 @@ correctly (using pqm device).
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: PQMPlugin (checked), ADCPlugin, DACPlugin, DataLoggerPlugin, 
           DebuggerPlugin.
+        - **Actual result:**
 
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 8: Verify swiot_config emu device.
 ---------------------------------------
@@ -231,8 +379,27 @@ correctly (using swiot_config device).
     6. Click on **Verify** button.
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: SWIOTPlugin (checked), DataLoggerPlugin, DebuggerPlugin.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 9: Verify swiot_runtime emu device.
 ----------------------------------------
@@ -260,8 +427,27 @@ correctly (using swiot_runtime device).
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: SWIOTPlugin (checked), ADCPlugin, DataLoggerPlugin, 
           DebuggerPlugin, RegmapPlugin.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 10: Verify generic emu device.
 -----------------------------------
@@ -288,5 +474,23 @@ correctly (using generic device).
     6. Click on **Verify** button.
         - **Expected result:** The message **"ip:127.0.0.1" not a valid 
           context!** is displayed. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).

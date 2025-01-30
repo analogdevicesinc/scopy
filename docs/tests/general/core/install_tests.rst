@@ -3,6 +3,21 @@
 Installers
 ===================================
 
+.. note::
+    .. list-table:: 
+       :widths: 50 30 30 50 50
+       :header-rows: 1
+
+       * - Tester
+         - Test Date
+         - Scopy version
+         - Plugin version (N/A if not applicable)
+         - Comments
+       * - 
+         - 
+         - 
+         - 
+         - 
 
 Test 1: Check Scopy AppImage x86_64
 ------------------------------------
@@ -21,6 +36,12 @@ Linux Operating System with x86_64 architecture.
     1. Download Scopy Linux AppImage x86_64 from the `release page <https://github.com/analogdevicesinc/scopy/releases>`_.
     2. Unzip the archive.
         - **Expected result:** a file named **Scopy-x86_64.AppImage** should be extracted.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Grant execution permission to the file using the terminal.
 
         .. code-block:: shell
@@ -40,14 +61,44 @@ Linux Operating System with x86_64 architecture.
           application should be displayed inside the terminal. Inside the application,
           a window containing the license agreement should appear with 2 buttons
           "Exit" and "Continue".
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Press "Exit".
         - **Expected result:** Scopy should gracefully close.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Start again the application, just like in step 4.
     7. Press "Continue".
         - **Expected result:** The window containing the license agreement
           should close and Scopy should be still running.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
 
 
 Test 2: Check Scopy AppImage arm32
@@ -67,6 +118,12 @@ Linux Operating System with arm32 architecture.
     1. Download Scopy Linux AppImage arm32 from the `release page <https://github.com/analogdevicesinc/scopy/releases>`_.
     2. Unzip the archive.
         - **Expected result:** a file named **Scopy-armhf.AppImage** should be extracted.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Grant execution permission to the file using the terminal.
 
         .. code-block:: shell
@@ -86,14 +143,45 @@ Linux Operating System with arm32 architecture.
           application should be displayed inside the terminal. Inside the application,
           a window containing the license agreement should appear with 2 buttons
           "Exit" and "Continue".
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Press "Exit".
         - **Expected result:** Scopy should gracefully close.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Start again the application, just like in step 4.
     7. Press "Continue".
         - **Expected result:** The window containing the license agreement
           should close and Scopy should be still running.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 3: Check if Scopy AppImage arm64 opens correctly
 -------------------------------------------------------
@@ -112,6 +200,12 @@ Linux Operating System with arm64 architecture.
     1. Download Scopy Linux AppImage arm64 from the `release page <https://github.com/analogdevicesinc/scopy/releases>`_.
     2. Unzip the archive.
         - **Expected result:** a file named **Scopy-arm64.AppImage** should be extracted.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Grant execution permission to the file using the terminal.
 
         .. code-block:: shell
@@ -131,14 +225,45 @@ Linux Operating System with arm64 architecture.
           application should be displayed inside the terminal. Inside the application,
           a window containing the license agreement should appear with 2 buttons
           "Exit" and "Continue".
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Press "Exit".
         - **Expected result:** Scopy should gracefully close.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Start again the application, just like in step 4.
     7. Press "Continue".
         - **Expected result:** The window containing the license agreement
           should close and Scopy should be still running.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 
 Test 4: Check Scopy macOS
@@ -158,25 +283,80 @@ system with an x86_64 architecture.
     2. Unzip the archive.
         - **Expected result:** A DMG file named **Scopy-macos** should be extracted.
           (the file name will also contain the macOS version and the commit hash)
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Double-click the file.
         - **Expected result:** A pop-up that contains the Scopy icon will appear
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Install the application by right clicking the file and click on **Open**.
         - **Expected result:** A error pop-up will appear.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Click on **Cancel** and after that repeat the step 4, right click on the file, and click on **Open**.
-        - **Expected result** A warning pop-up will appear. Different than
+        - **Expected result:** A warning pop-up will appear. Different than
           the first one by including an Open button.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Click on **Open**
         - **Expected result:** After a while, a window with the GUI of the application
           should open. Inside the application, a window containing the license
           agreement should appear with 2 buttons "Exit" and "Continue".
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Press "Exit".
         - **Expected result:** Scopy should gracefully close.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     8. Start again the application by right-clicking and click on **Open**.
     9. Press "Continue".
         - **Expected result:** The window containing the license agreement
           should close and Scopy should be still running.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 
 Test 5: Check Scopy Windows installer
@@ -197,26 +377,87 @@ system with an x86_64 architecture.
         - **Expected result:** A window containing the installation wizard
           should open. It should contain a drop-down menu from which can be
           selected the language during the installation.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Click on **OK**
         - **Expected result:** The installer continues with the `License Agreement` tab.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Click on **I accept the agreement** and on **Next**.
         - **Expected result:** The installer continues with the location where
           the application will be installed.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Select a location and click on **Next**.
         - **Expected result:** The installer continues with the list of components
           that will be installed.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Click on **Next**.
         - **Expected result:** The installer continues with the `Additional Tasks` tab.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Check the `"Install drivers for ADALM2000 - Requires Administrative Rights"` box and click on **Next**.
         - **Expected result:** The installer continues with the installation summary.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     8. Click on **Install**.
         - **Expected result:** The application should start installing. At the end of
           the installation, it should ask for Administrative Rights in order to install
           ADALM2000 drivers.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     9. Inside the newly opened window. Follow the ADALM2000 drivers installation by clicking **Next** and **Finish**.
         - **Expected result:** Both the application and the ADALM2000 drivers
           installed successfully. And optionally, you can check to restart the
           computer or not.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     10. Click on **Finish**.
 
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).

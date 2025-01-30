@@ -7,6 +7,22 @@ Connection flow
 
     User guide: :ref:`Scopy Overview <user_guide>`.
 
+.. note::
+    .. list-table:: 
+       :widths: 50 30 30 50 50
+       :header-rows: 1
+
+       * - Tester
+         - Test Date
+         - Scopy version
+         - Plugin version (N/A if not applicable)
+         - Comments
+       * - 
+         - 
+         - 
+         - 
+         - 
+
 Setup environment:
 ------------------
 
@@ -51,8 +67,27 @@ Test 1: Verify the connection flow.
           appears in the application's status bar. After a while, the connection 
           is established, the status LED turns green, and the tools in the menu 
           become accessible. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 2: Unplug the device while connecting (AUTO-SCAN).
 -------------------------------------------------------
@@ -77,8 +112,27 @@ unplugged during the connection process.
     2. Click on **Connect** button.
     3. Unplug the device while connecting. 
         - **Expected result:** The device is removed from device browser. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 3: Unplug the device while connecting (MANUAL-SCAN).
 ---------------------------------------------------------
@@ -106,8 +160,27 @@ unplugged during the connection process.
           of the device in the device browser, and when hovered over, the 
           message "The device is not available! Verify the connection!" is 
           displayed.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 4: Unplug the device before connecting.
 --------------------------------------------
@@ -133,8 +206,27 @@ unplugged before the connection process.
     3. Click on **Connect** button.
         - **Expected result:** The connection process starts but does not 
           complete. A warning icon appears in the top-right corner.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 5: Disconnecting a device.
 -------------------------------
@@ -160,5 +252,23 @@ Test 5: Disconnecting a device.
         - **Expected result:** The device is disconnected, the **Connect** 
           button appears, the device remains in the device browser, and the 
           tools in the menu are no longer accessible.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
