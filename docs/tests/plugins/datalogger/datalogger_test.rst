@@ -269,7 +269,7 @@ Test 8: Print Collected Data
     3. Press **Run** button
     4. Wait for some data to be collected
     5. Press **Print** button
-    6. Chose directory where to save the file
+    6. Choose directory where to save the file
 
         - **Expected result:** 
              
@@ -895,7 +895,7 @@ Test 28: Choose File for Data Logging
 
             - **Expected result:** A file explorer window is opened
 
-    4. Chose a ".csv" file to save data to
+    4. Choose a ".csv" file to save data to
 
             - **Expected result:** The file path is displayed in the settings menu
 
@@ -989,7 +989,7 @@ the user to import data from a file
     2. Open the settings menu
     3. Press **Import Data** button
             - **Expected result:** A file explorer window is opened
-    4. Chose a ".csv" file to import data from
+    4. Choose a ".csv" file to import data from
             - **Expected result:** 
   
                - in the channel menu a new virtual device 
@@ -1085,3 +1085,5 @@ date time format for the X Axis
     6. Change the **Date time format** from "hh:mm:ss" to "mm:ss"
     7. Open Data Logger plugin 
             - **Expected result:** X Axis displays date time in the format "mm:ss"
+
+**Result:** PASS/FAIL

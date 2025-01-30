@@ -47,7 +47,7 @@ Linux Operating System with x86_64 architecture.
         - **Expected result:** The window containing the license agreement
           should close and Scopy should be still running.
 
-**RESULT:** PASS/FAIL
+**Result:** PASS/FAIL
 
 
 Test 2: Check Scopy AppImage arm32
@@ -93,7 +93,7 @@ Linux Operating System with arm32 architecture.
         - **Expected result:** The window containing the license agreement
           should close and Scopy should be still running.
 
-**RESULT:** PASS/FAIL
+**Result:** PASS/FAIL
 
 Test 3: Check if Scopy AppImage arm64 opens correctly
 -------------------------------------------------------
@@ -138,7 +138,7 @@ Linux Operating System with arm64 architecture.
         - **Expected result:** The window containing the license agreement
           should close and Scopy should be still running.
 
-**RESULT:** PASS/FAIL
+**Result:** PASS/FAIL
 
 
 Test 4: Check Scopy macOS
@@ -176,7 +176,7 @@ system with an x86_64 architecture.
         - **Expected result:** The window containing the license agreement
           should close and Scopy should be still running.
 
-**RESULT:** PASS/FAIL
+**Result:** PASS/FAIL
 
 
 Test 5: Check Scopy Windows installer
@@ -219,4 +219,4 @@ system with an x86_64 architecture.
           computer or not.
     10. Click on **Finish**.
 
-**RESULT:** PASS/FAIL
+**Result:** PASS/FAIL
