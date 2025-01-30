@@ -7,6 +7,22 @@ Add device
 
     User guide: :ref:`Scopy Overview <user_guide>`.
 
+.. note::
+    .. list-table:: 
+       :widths: 50 30 30 50 50
+       :header-rows: 1
+
+       * - Tester
+         - Test Date
+         - Scopy version
+         - Plugin version (N/A if not applicable)
+         - Comments
+       * - 
+         - 
+         - 
+         - 
+         - 
+
 Setup environment:
 ------------------
 
@@ -39,8 +55,26 @@ lists available devices when initiated.
         - **Expected result:** In the "Context" dropdown, all available devices 
           are listed, each item containing the device name/description and URI. The 
           **ADALM2000** device [usb] must appear in the list.
+        - **Actual result:** 
+        
+        ..
+          Actual test result goes here.
+        ..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+.. 
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+.. 
+  The result of the test goes here (PASS/FAIL).
 
 Test 2: Verifying the local device scanning functionality.
 ----------------------------------------------------------
@@ -65,8 +99,26 @@ lists available local devices when initiated.
           devices are listed, each item containing the device name/description and URI. 
           If there is no available device the "No scanned devices available!" message 
           is displayed.
+        - **Actual result:** 
+        
+        ..
+          Actual test result goes here.
+        ..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+.. 
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+.. 
+  The result of the test goes here (PASS/FAIL).
 
 Test 3: Verifying the ip device scanning functionality.
 -------------------------------------------------------
@@ -91,8 +143,26 @@ lists available ip devices when initiated.
           devices are listed, each item containing the device name/description and URI. 
           If there is no available device the "No scanned devices available!" message 
           is displayed.
+        - **Actual result:** 
+        
+        ..
+          Actual test result goes here.
+        ..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+.. 
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+.. 
+  The result of the test goes here (PASS/FAIL).
 
 Test 4: Verifying the usb device scanning functionality.
 --------------------------------------------------------
@@ -115,8 +185,26 @@ lists available usb devices when initiated.
         - **Expected result:** In the "Context" dropdown, all available usb 
           devices are listed, each item containing the device name/description 
           and URI. The **ADALM2000** device must appear in the list. 
+        - **Actual result:** 
+        
+        ..
+          Actual test result goes here.
+        ..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+.. 
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+.. 
+  The result of the test goes here (PASS/FAIL).
 
 Test 5: Verifying the serial device scanning functionality.
 -----------------------------------------------------------
@@ -142,8 +230,26 @@ lists available serial devices when initiated.
           devices are listed, each item containing the device name/description 
           and URI. If there is no available device the "No scanned devices 
           available!" message is displayed.
+        - **Actual result:** 
+        
+        ..
+          Actual test result goes here.
+        ..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+.. 
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+.. 
+  The result of the test goes here (PASS/FAIL).
 
 Test 6: Scanning with no device.
 --------------------------------
@@ -165,8 +271,26 @@ when no device is found.
     5. Wait until the refresh animation stops.
         - **Expected result:** The "No scanned devices available!" message is 
           displayed.
+        - **Actual result:** 
+        
+        ..
+          Actual test result goes here.
+        ..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+.. 
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+.. 
+  The result of the test goes here (PASS/FAIL).
 
 .. _tst-add-verify:
 
@@ -192,8 +316,26 @@ Test 7: Device validation.
     3. Click on **Verify** button.
         - **Expected result:** A loading animation starts and after a short time 
           a page with device details and compatible plugins is displayed. 
+        - **Actual result:** 
+        
+        ..
+          Actual test result goes here.
+        ..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+.. 
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+.. 
+  The result of the test goes here (PASS/FAIL).
 
 Test 8: Verify the "BACK" button from compatible plugin page.
 -------------------------------------------------------------
@@ -217,8 +359,26 @@ Test 8: Verify the "BACK" button from compatible plugin page.
     3. Click on **Verify** button.
     4. Click on **BACK** button.
         - **Expected result:** The verify page is displayed.
+        - **Actual result:** 
+        
+        ..
+          Actual test result goes here.
+        ..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+.. 
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+.. 
+  The result of the test goes here (PASS/FAIL).
 
 .. _tst-add-plugins-add:
 
@@ -245,12 +405,36 @@ Only the main plugin of the device is used.
     3. Click on **Verify** button.
         - **Expected result:** Only the M2kPlugin should be selected in the 
           compatible plugins section.
+        - **Actual result:** 
+        
+..
+  Actual test result goes here.
+..
+
     4. Click on **ADD DEVICE** button.
         - **Expected result:** The device is added to the device browser, the 
           device's info page is displayed, and the m2k tools are added to the 
           tool menu. 
+        - **Actual result:** 
+        
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+.. 
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+.. 
+  The result of the test goes here (PASS/FAIL).
 
 Test 10: Verify the "ADD DEVICE" button from compatible plugin page (multiple plugins).
 ---------------------------------------------------------------------------------------
@@ -275,13 +459,37 @@ Multiple plugins are used.
     3. Click on **Verify** button.
         - **Expected result:** Only the M2kPlugin should be selected in the 
           compatible plugins section.
+        - **Actual result:** 
+        
+..
+  Actual test result goes here.
+..
+
     4. Select the DebuggerPlugin.
     5. Click on **ADD DEVICE** button.
         - **Expected result:** The device is added to the device browser, the 
           device's info page is displayed, and all tools, including the debugger, are added 
           to the tool menu.
+        - **Actual result:** 
+        
+        ..
+          Actual test result goes here.
+        ..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+.. 
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+.. 
+  The result of the test goes here (PASS/FAIL).
 
 Test 11: Verify the "ADD DEVICE" button from compatible plugin page with no plugin selected.
 --------------------------------------------------------------------------------------------
@@ -305,9 +513,33 @@ Test 11: Verify the "ADD DEVICE" button from compatible plugin page with no plug
     3. Click on **Verify** button.
         - **Expected result:** Only the M2kPlugin should be selected in the 
           compatible plugins section.
+        - **Actual result:** 
+
+..
+  Actual test result goes here.
+..
+
     4. Uncheck the M2kPlugin.
     5. Click on **ADD DEVICE** button.
         - **Expected result:** A NO_PLUGIN device is added in device browser and 
           in tool menu.
+        - **Actual result:** 
+
+        ..
+          Actual test result goes here.
+        ..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+.. 
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+.. 
+  The result of the test goes here (PASS/FAIL).
