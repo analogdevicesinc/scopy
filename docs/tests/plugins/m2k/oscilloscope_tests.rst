@@ -820,7 +820,7 @@ Test 22 - ADC Digital Filters
     - :ref:`Adalm2000.Osc.CH1:<adalm2000_osc_setup_ch1>`
     - OS: ANY
 
-****Resources:****
+**Resources:**
     - `ADC Digital Filters documentation<https://wiki.analog.com/university/tools/m2k/scopy/adcdigitalfilters>``
 
 **Steps:**

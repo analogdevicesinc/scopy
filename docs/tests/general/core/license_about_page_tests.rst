@@ -27,7 +27,7 @@ Test 1: Check license pop-up
         - **Expected result:** The application will display the home screen with
           the text "Welcome to Scopy!".
 
-**RESULT:** PASS/FAIL
+**Result:** PASS/FAIL
 
 
 Test 2: Check links from About Page
@@ -72,4 +72,4 @@ Test 2: Check links from About Page
            named `ADI EngineerZone`.
 
 
-**RESULT:** PASS/FAIL
+**Result:** PASS/FAIL

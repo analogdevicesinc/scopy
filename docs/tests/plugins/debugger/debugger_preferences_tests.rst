@@ -24,7 +24,7 @@ Test 1: Control debugger version
         - Use :ref:`pluto-usb <pluto-usb>` setup.
         - OS: ANY
 
-**Step**:
+**Steps**:
         1. Click on the connected Pluto device and connect to it. Select the Debugger plugin. By default, the IIO Explorer (Debugger v2) should be displayed.
                 - **Expected Result:** The IIO Explorer (Debugger v2) should be displayed. If you notice the navigation bar with devices and attributes on the left side, the IIO Explorer is displayed.
         2. Go to the Preferences page (lower left corner, above the Analog Devices logo and the About button). From there, select the Debugger Plugin from the right-hand side menu. Uncheck the "Use debugger V2 plugin" option.
@@ -45,14 +45,14 @@ Test 2: Include debug attributes in IIO Explorer
 
 **Description**: This option allows you to include IIO debug attributes in the IIO Explorer. When this option is checked, debug attributes are included in the IIO Explorer. When it is unchecked, debug attributes are not included in the IIO Explorer. After changing this option, a restart of Scopy is required for the change to take effect.
 
-Test prerequisites:
+**Test prerequisites:**
         - :ref:`TST.DBG.EXPLR.NAV <tst-dbg-explr-nav>`
 
 **Preconditions**:
         - Use :ref:`pluto-usb <pluto-usb>` setup.
         - OS: ANY
 
-**Step**:
+**Steps**:
         1. Click on the connected Pluto device and connect to it. Select the Debugger plugin. By default, the IIO Explorer (Debugger v2) should be displayed.
         2. Go to the Preferences page (lower left corner, above the Analog Devices logo and the About button). From there, select the Debugger Plugin from the right-hand side menu. Check the "Include debug attributes in IIO Explorer" option. (if it is checked, leave it as it is)
         3. Go back to the Debugger plugin and notice the navigation bar on the left side. Double click on ad9361-phy and scroll down a bit.

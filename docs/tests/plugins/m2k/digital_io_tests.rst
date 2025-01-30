@@ -79,6 +79,8 @@ Test 1 - Check individual digital pin state
 
          - **Expected Result**: All the expected results in step 6 to 11 are met.
 
+**Result**: PASS/FAIL
+
 Test 2 - Checking grouped digital pin states
 ----------------------------------------------------
 
@@ -106,3 +108,5 @@ are working correctly.
         - **Expected Result**: DIO 0-7 value indicates the same value as DIO 8-15 group.
     8. Set DIO 8-15 to value 128.
         - **Expected Result**: DIO 0-7 value indicates the same value as DIO 8-15 group.
+
+**Result**: PASS/FAIL
