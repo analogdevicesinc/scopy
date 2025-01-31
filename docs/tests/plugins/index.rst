@@ -14,7 +14,7 @@ Contents
    :maxdepth: 3
 
    pqm/pqm_tests
-   datalogger/datalogger_test
+   datalogger/datalogger_tests
    dac/dac_tests
    swiot1l/swiot1l_tests
    adc/adc_tests
