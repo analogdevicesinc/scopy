@@ -14,6 +14,22 @@ The tests are divided into two main categories: **CONFIG** AND **RUNTIME**.
 The following apply for all the test cases in this suite.
 If the test case has special requirements, they will be listed in the test case section.
 
+.. note::
+    .. list-table:: 
+       :widths: 50 30 30 50 50
+       :header-rows: 1
+
+       * - Tester
+         - Test Date
+         - Scopy version
+         - Plugin version (N/A if not applicable)
+         - Comments
+       * - 
+         - 
+         - 
+         - 
+         - 
+
 Setup environment
 ------------------
 
@@ -95,8 +111,27 @@ with the selected device and that the plugin is able to correctly parse it.
         - **Expected Result**:
             - The plugin is able to connect to the device.
             - The Config instrument shows 4 disabled channels.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 
 Test 2 - Mode switching
@@ -121,6 +156,12 @@ to switch between Config and Runtime modes.
               automatically.
             - Upon reconnection, the Config instrument is replaced 
               by 3 instruments: AD74413R, MAX14906, and Faults.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Open the AD74413R instrument.
     4. Click the **Config** button.
         - **Expected Result**:
@@ -128,6 +169,12 @@ to switch between Config and Runtime modes.
               automatically.
             - The AD74413R, MAX14906 and Faults instruments are replaced 
               by the Config instrument.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Open the Config instrument.
     6. Click the **Apply** button.
         - **Expected Result**:
@@ -135,6 +182,12 @@ to switch between Config and Runtime modes.
               automatically.
             - Upon reconnection, the Config instrument is replaced 
               by 3 instruments: AD74413R, MAX14906, and Faults.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Open the MAX14906 instrument.    
     8. Click the **Config** button.
         - **Expected Result**:
@@ -142,6 +195,12 @@ to switch between Config and Runtime modes.
               automatically.
             - The AD74413R, MAX14906 and Faults instruments are replaced 
               by the Config instrument.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     9. Open the Config instrument.
     10. Click the **Apply** button.
          - **Expected Result**:
@@ -149,14 +208,41 @@ to switch between Config and Runtime modes.
               automatically.
             - Upon reconnection, the Config instrument is replaced 
               by 3 instruments: AD74413R, MAX14906, and Faults.
+
+         - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     11. Open the Faults instrument.    
     12. Click the **Config** button.
          - **Expected Result**:
             - The device disconnects for a moment and then reconnects automatically.
             - The AD74413R, MAX14906 and Faults instruments are replaced 
-              by the Config instrument.    
+              by the Config instrument.
 
-**Result**: PASS/FAIL
+         - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 3 - SWIOT config mode
 --------------------------
@@ -178,6 +264,12 @@ is able to configure the device correctly.
         - **Expected Result**:
             - Their respective dropdowns for device and function are 
               accessible and not greyed out anymore.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Configure SWIOT in the following way:
         - Channel 1: device **ad74413r** and function **voltage_out**
         - Channel 2: device **ad74413r** and function **voltage_in**
@@ -189,18 +281,50 @@ is able to configure the device correctly.
               automatically.
             - Upon reconnection, the Config instrument is replaced 
               by 3 instruments: AD74413R, MAX14906, and Faults.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Open the AD74413R instrument and check the channels configured 
        as AD74413R channels:
         
         - **Expected Result**:
             - There are 6 channels available in the channel manager:
               4 diagnostic channels, **voltage_out 1** and **voltage_in 2**.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Open the MAX14906 instrument and check the channels configured:
         - **Expected result:** There are 2 channels available in the 
           channel manager **voltage 2** as INPUT and **voltage 3** as 
           OUTPUT.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 4 - AD74413R plot operations
 ----------------------------------
@@ -225,17 +349,48 @@ plot changes such as labels and timestamp are correctly modified.
             - The labels are displayed on the right side of the plot.
             - The X axis of the plot shows a 4s timespan, 
               using the -4 to 0 range.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Enable channel **voltage_out 1** and run a **Single** capture:
         - **Expected Result**:
             - The voltage_out 1 data is displayed on the plot 
               from the right to the left side.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Click the **Measure** button to enable measurements:
         - **Expected Result**:
             - The measurements are displayed above the plot
               and the instant value for the first channel is
               around 0A.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 5 - AD74413R channel operations
 -------------------------------------
@@ -264,9 +419,22 @@ displayed on the plot and measured by the instrument.
             - A green animation appears while underlining the field value.
             - On the top right on the plot the status message 
               displays: a number of samples at **1.2ksps**.
+        
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Set YMin to -1A and YMax to 10A.
         - **Expected result:** 
             - The plot Y axis is scaled between -5A and 5A.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Open the channel settings menu for the **voltage_in 2** channel 
        and set YMin to 0V and YMax to 20V.
     7. Go back to the first channel menu and set the **RAW** output 
@@ -275,12 +443,31 @@ displayed on the plot and measured by the instrument.
         - **Expected result:** 
             - The value is automatically changed to 8191.
             - Below the field the value 10.9V is displayed.
+        
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     8. Run a Single capture and check the measurements:
         - **Expected result:** 
             - The instant value of **voltage_in 2** shows 10V.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     9. Run a Continuous capture and check the measurements:
         - **Expected result:** 
             - The instant value of **voltage_in 2** shows 10V.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     10. While running change the RAW value to **4096**:
          - **Expected result:** 
             - Below the field the value 5.5V is displayed.
@@ -288,6 +475,12 @@ displayed on the plot and measured by the instrument.
               dropping from the previous value to 5.5V.
             - The same value is displayed in the instant value 
               measurement.
+         - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     11. While running change the RAW value to **-1**:
          - **Expected result:**
             - The value is automatically set to 0V.
@@ -296,8 +489,28 @@ displayed on the plot and measured by the instrument.
               dropping to 0V.
             - The same value is displayed in the instant value 
               measurement.
+         - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 6 - AD74413R diagnostic channels
 --------------------------------------
@@ -328,16 +541,48 @@ displayed on the instrument.
         - **Expected result:** 
             - The instant value of **diagnostic 5** shows around 10V,
               the same as **voltage_in 2**.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. While running change the RAW value to **4096**:
         - **Expected result:** 
             - Both the **diagnostic 5** and **voltage_in 2** signals 
               are dropping from the previous value to 5.5V.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     8. While running change the RAW value to **2000**:
         - **Expected result:** 
             - Both the **diagnostic 5** and **voltage_in 2** signals 
               are dropping from the previous value to around 2.7V.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 7 - AD74413R sampling frequency
 -------------------------------------
@@ -362,12 +607,39 @@ the number of enabled channels.
         - **Expected result:** 
             - The status message on the top right of the plot 
               displays a number of samples at **800 sps**.
+        
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Disable the last two diagnostic channels:
         - **Expected result:** 
             - The status message on the top right of the plot 
               displays a number of samples at **1.2 ksps**. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 8 - AD74413R tutorial & docs
 ----------------------------------
@@ -390,26 +662,70 @@ and the documentation is accessible.
         - **Expected result:** 
             - A pop up with 2 options (Tutorial and Documentation) 
               is displayed.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Click the **Documentation** button.
         - **Expected result:** 
             - The AD74413R documentation is opened in a browser.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Click the info button.
     5. Click the **Tutorial** button.
         - **Expected result:** 
             - The AD74413R tutorial starts, guiding the user 
               through the instrument's features and providing 
               a button to Exit the tutorial.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Click the **Continue** button.
         - **Expected result:** 
             - The tutorial continues with the next step, always
               greying out the background and highlighting only 
               the explained item.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Click the **Exit** button.
         - **Expected result:** 
             - The tutorial is closed and the user is returned 
               to the instrument.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 9 - MAX14906 plot operations
 ----------------------------------
@@ -431,12 +747,38 @@ time span can be correctly modified.
         - **Expected result:** 
             - The X axis of the plots shows a 10s timespan, 
               using the 0 to 10 range.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Set the Timespan to 1s.
         - **Expected result:** 
             - The X axis of the plots shows a 1s timespan, 
               using the 0 to 1 range.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 10 - MAX14906 channel operations
 -------------------------------------
@@ -461,12 +803,38 @@ displayed on the plot and measured by the instrument.
         - **Expected result:** 
             - The plot trace rises from 0 to 1 for 
               both channels.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Set the **Output** for **voltage3** to OFF.
         - **Expected result:** 
             - The plot trace drops from 1 to 0 for 
               both channels.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 11 - MAX14906 tutorial & docs
 ----------------------------------
@@ -489,26 +857,70 @@ and the documentation is accessible.
         - **Expected result:** 
             - A pop up with 2 options (Tutorial and Documentation) 
               is displayed.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Click the **Documentation** button.
         - **Expected result:** 
             - The MAX14906 documentation is opened in a browser.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Click the info button.
     5. Click the **Tutorial** button.
         - **Expected result:** 
             - The MAX14906 tutorial starts, guiding the user 
               through the instrument's features and providing 
               a button to Exit the tutorial.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Click the **Continue** button.
         - **Expected result:** 
             - The tutorial continues with the next step, always
               greying out the background and highlighting only 
               the explained item.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Click the **Exit** button.
         - **Expected result:** 
             - The tutorial is closed and the user is returned 
               to the instrument.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 
 Test 12 - Faults Run Single
@@ -531,15 +943,47 @@ can poll faults values for both devices.
     2. Open the Faults instrument and run a **Single** capture.
         - **Expected result:** 
             - Bit 10 is enabled on the AD74413R device.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Click on Bit 10:
         - **Expected result:** 
             - The section below the leds only displays the 
               fault explanation for the selected bit.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Turn **Faults explanation** off:
         - **Expected result:** 
             - The section below the leds is hidden.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 13 - Faults clear and reset
 --------------------------------
@@ -565,11 +1009,37 @@ can reset the polled values after a capture.
         - **Expected result:** 
             - Bit 10 is not selected and the Faults explanation
               display all the text greyed out.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Run a **Reset stored** capture.
         - **Expected result:** 
             - Both the leds for Bit 10 are turned off.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 14 - Faults Run continuous
 --------------------------------
@@ -591,13 +1061,39 @@ can poll faults values for both devices in continuous mode.
     2. Open the Faults instrument and run a **Continuous**  capture.
         - **Expected result:** 
             - Bit 10 is enabled on the AD74413R device.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. While running click the **Reset stored** button:
         - **Expected result:** 
             - The **STORED** LED is turned off until the next
               polled value turns it on again.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Stop the Faults instrument.
 
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 15 - Faults tutorial & docs
 --------------------------------
@@ -620,26 +1116,70 @@ and the documentation is accessible.
         - **Expected result:** 
             - A pop up with 2 options (Tutorial and Documentation) 
               is displayed.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Click the **Documentation** button.
         - **Expected result:** 
             - The Faults documentation is opened in a browser.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Click the info button.
     5. Click the **Tutorial** button.
         - **Expected result:** 
             - The Faults tutorial starts, guiding the user 
               through the instrument's features and providing 
               a button to Exit the tutorial.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Click the **Continue** button.
         - **Expected result:** 
             - The tutorial continues with the next step, always
               greying out the background and highlighting only 
               the explained item.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Click the **Exit** button.
         - **Expected result:** 
             - The tutorial is closed and the user is returned 
               to the instrument.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 
 Test 16 - SWIOT external supply
@@ -664,8 +1204,34 @@ power supply switch is turned off.
             - A status bar is displayed at the bottom of the instrument
               with a warning message that the system is not running at 
               full capacity due to not being powered by the external supply.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Turn on the external power supply switch on the SWIOT device.
         - **Expected result:** 
             - The status bar is not displayed.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+

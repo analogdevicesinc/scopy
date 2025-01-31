@@ -14,6 +14,22 @@ The following apply to all tests below, any special requirements will be mention
     - Tests listed as dependencies are successfully completed
     - Reset .ini files to default by pressing **Reset** button in Preferences
 
+.. note::
+    .. list-table:: 
+       :widths: 50 30 30 50 50
+       :header-rows: 1
+
+       * - Tester
+         - Test Date
+         - Scopy version
+         - Plugin version (N/A if not applicable)
+         - Comments
+       * - 
+         - 
+         - 
+         - 
+         - 
+
 Setup Environment
 ------------------
 
@@ -57,14 +73,36 @@ Test 1: Enable and Disable Data Logger Channel
     2. Using channel menu enable channel **voltage0** of **xadc** device
     3. Press **Run** button
     4. Wait for some data to be collected
+        - **Expected result:** Curve will be displayed on the plot
+        - **Actual result:**
 
-                - **Expected result:** Curve will be displayed on the plot
-                
+..
+  Actual test result goes here.
+..
+
     5. Using channel menu disable channel **voltage0** of **xadc** device
+        - **Expected result:** Curve will be removed from the plot
+        - **Actual result:**
 
-                - **Expected result:** Curve will be removed from the plot
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_RUN_STOP_DATA_LOGGING:
 
@@ -88,20 +126,40 @@ Test 2: Run and Stop Data Logging
     1. Open Data Logger plugin
     2. Using channel menu enable channel **voltage0** of **xadc** device
     3. Press **Run** button
+        - **Expected result:** 
+            - Data is being collected and displayed on the plot
+            - **Run** button is changed to **Stop**
+        - **Actual result:**
 
-             - **Expected result:** 
-  
-               - Data is being collected and displayed on the plot
-               - **Run** button is changed to **Stop**
+..
+  Actual test result goes here.
+..
 
     4. Press **Stop** button
+        - **Expected result:** 
+            - Data is no longer being collected and displayed on the plot
+            - **Stop** button is changed to **Run**
+        - **Actual result:**
 
-             - **Expected result:** 
-  
-               - Data is no longer being collected and displayed on the plot
-               - **Stop** button is changed to **Run**
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_CLEAR_COLLECTED_DATA:
 
@@ -128,10 +186,29 @@ Test 3: Clear Collected Data
     4. Wait for some data to be collected
     5. Press **Stop** button
     6. Press **Clear** button
+        - **Expected result:** Data is removed from the plot
+        - **Actual result:**
 
-             - **Expected result:** Data is removed from the plot
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_CLEAR_DATA_WHILE_RUNNING:
 
@@ -157,13 +234,30 @@ Test 4: Clear data while running
     3. Press **Run** button
     4. Wait for some data to be collected
     5. Press **Clear** button
+        - **Expected result:** 
+            - Data is removed from the plot
+            - Buffer is cleared and the starting point is reset to "0"
+        - **Actual result:**
 
-             - **Expected result:** 
-  
-               - Data is removed from the plot
-               - Buffer is cleared and the starting point is reset to "0"
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_CREATE_NEW_DATA_LOGGER_TOOL:
 
@@ -183,13 +277,32 @@ Test 5: Create a New Data Logger Tool
 **Steps:**
     1. Open Data Logger plugin
     2. Press **+** button
+        - **Expected result:** 
+            - New tool is created
+            - We are moved to the new tool
+            - The new tool has **x** button next to **+**
 
-          - **Expected result:** 
-             - New tool is created
-             - We are moved to the new tool
-             - The new tool has **x** button next to **+**
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_REMOVE_A_CREATED_TOOL:
 
@@ -213,10 +326,29 @@ Test 6: Remove a Created Tool
     1. Open Data Logger plugin
     2. Press **+** button
     3. Press **x** button next to **+**
+        - **Expected result:** Tool is removed
+        - **Actual result:**
 
-             - **Expected result:** Tool is removed
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_VERIFY_REMOVAL_DISABLED_FOR_DEFAULT_TOOL:
 
@@ -236,14 +368,38 @@ Test 7: Verify Removal Disabled for Default Tool
 **Steps:**
     1. Open Data Logger plugin
     2. Press **+** button
+        - **Expected result:** A new tool where **x** button is available is created 
+        - **Actual result:**
 
-             - **Expected result:** A new tool where **x** button is available is created 
+..
+  Actual test result goes here.
+..
+
 
     3. Open original Data Logger tool
+        - **Expected result:** No **x** button is available
+        - **Actual result:**
 
-             - **Expected result:** No **x** button is available
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_PRINT_COLLECTED_DATA:
 
@@ -270,13 +426,30 @@ Test 8: Print Collected Data
     4. Wait for some data to be collected
     5. Press **Print** button
     6. Choose directory where to save the file
-
         - **Expected result:** 
-             
             - Data is saved to a pdf file in the chosen directory
             - The file name structure is "Sopy-Data-Logger-<date>-<time>.pdf"
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_INFO_BUTTON_DOCUMENTATION:
 
@@ -298,10 +471,29 @@ Test 9: Info button documentation
     1. Open Data Logger plugin
     2. Press **Info** button
     3. Press **Documentation** button
+        - **Expected result:** A browser window is opened with the documentation page
+        - **Actual result:**
 
-             - **Expected result:** A browser window is opened with the documentation page
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_INFO_BUTTON_TUTORIAL:
 
@@ -322,10 +514,28 @@ Test 10: Info button tutorial
     1. Open Data Logger plugin
     2. Press **Info** button
     3. Press **Tutorial** button
+        - **Expected result:** A tutorial explaining how to use the Data Logger is displayed
+        - **Actual result:**
 
-             - **Expected result:** A tutorial explaining how to use the Data Logger is displayed
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_SETTINGS_CHANGE_DATA_LOGGER_TOOL_NAME:
 
@@ -346,10 +556,28 @@ Test 11: Settings Change Data Logger Tool Name
     1. Open Data Logger plugin
     2. Press **Settings** button
     3. Change the tool name at the top of the Settings menu from "Data Logger" to "Test Tool"
+        - **Expected result:** Tool name is changed in the tools menu
+        - **Actual result:**
 
-             - **Expected result:** Tool name is changed in the tools menu
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_SET_VALID_X_AXIS_DELTA_VALUE:
 
@@ -376,10 +604,28 @@ Test 12: Set Valid X-Axis Delta Value
     4. Wait for at least "20" seconds
     5. Press **Settings** button
     6. Change the X-Axis Delta Value from "10" to "20" then press enter
+        - **Expected result:** X-Axis displays "20" seconds of data instead of "10" seconds
+        - **Actual result:**
 
-             - **Expected result:** X-Axis displays "20" seconds of data instead of "10" seconds
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_HANDLE_INVALID_X_AXIS_DELTA_VALUE_INPUT:
 
@@ -406,10 +652,28 @@ Test 13: Handle Invalid X-Axis Delta Value Input
     4. Wait for at least "20" seconds
     5. Press **Settings** button
     6. Change the X-Axis Delta Value from "10" to "test" then press enter
+        - **Expected result:** X-Axis displays "10" seconds 
+        - **Actual result:**
 
-             - **Expected result:** X-Axis displays "10" seconds 
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_ADJUST_X_AXIS_DELTA_VALUE_USING_BUTTONS:
 
@@ -435,14 +699,38 @@ Test 14: Adjust X-Axis Delta Value Using Buttons
     3. Press **Run** button
     4. Press **Settings** button
     5. Press **+** button next to X-Axis Delta Value
+        - **Expected result:** X-Axis displays "11" seconds of data instead of "10" seconds
+        - **Actual result:**
 
-             - **Expected result:** X-Axis displays "11" seconds of data instead of "10" seconds
+..
+  Actual test result goes here.
+..
+
 
     6. Press **-** button next to X-Axis Delta Value
+        - **Expected result:** X-Axis displays "10" seconds of data instead of "11" seconds
+        - **Actual result:**
 
-             - **Expected result:** X-Axis displays "10" seconds of data instead of "11" seconds
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_TOGGLE_X_AXIS_UTC_TIME_DISPLAY:
 
@@ -468,14 +756,36 @@ Test 15: Toggle X-Axis UTC Time Display
     3. Press **Run** button
     4. Press **Settings** button
     5. Toggle the **X-Axis UTC Time** on
+        - **Expected result:** X-Axis displays UTC time instead of delta value
+        - **Actual result:**
 
-             - **Expected result:** X-Axis displays UTC time instead of delta value
+..
+  Actual test result goes here.
+..
 
     6. Toggle the **X-Axis UTC Time** off
+        - **Expected result:** X-Axis displays delta value instead of UTC time
+        - **Actual result:**
 
-             - **Expected result:** X-Axis displays delta value instead of UTC time
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_TOGGLE_X_AXIS_LIVE_PLOTTING:
 
@@ -499,18 +809,39 @@ Test 16: Toggle X-Axis Live Plotting
     1. Open Data Logger plugin
     2. Enable channel **voltage0** of **xadc** device
     3. Press **Run** button
+        - **Expected result:** X-Axis is updated so the last point added is always visible
+        - **Actual result:**
 
-             - **Expected result:** X-Axis is updated so the last point added is always visible
+..
+  Actual test result goes here.
+..
 
     4. Press **Settings** button
     5. Toggle the **X-Axis Live plotting** off
+        - **Expected result:** 
+            - X-Axis displays data collected but the last point added is not always visible
+            - Settings for picking date time value to show is now available
+        - **Actual result:**
 
-             - **Expected result:** 
-  
-               - X-Axis displays data collected but the last point added is not always visible
-               - Settings for picking date time value to show is now available
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_TOGGLE_Y_AXIS_AUTOSCALE:
 
@@ -536,20 +867,40 @@ Test 17: Toggle Y-Axis Autoscale
     3. Press **Run** button
     4. Press **Settings** button
     5. Toggle the **Y-Axis autoscale** off
+        - **Expected result:** 
+            - Y-Axis displays data without autoscale
+            - Settings for picking min and max value are now enabled
+        - **Actual result:**
 
-             - **Expected result:** 
-  
-               - Y-Axis displays data without autoscale
-               - Settings for picking min and max value are now enabled
+..
+  Actual test result goes here.
+..
 
     6. Toggle the **Y-Axis autoscale** on
+        - **Expected result:** 
+            - Y-Axis displays data with autoscale 
+            - Settings for picking min and max value is now disabled
+        - **Actual result:**
 
-             - **Expected result:** 
-  
-               - Y-Axis displays data with autoscale 
-               - Settings for picking min and max value is now disabled
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_SET_Y_AXIS_MIN_MAX_VALUES:
 
@@ -576,14 +927,36 @@ Test 18: Set Y-Axis Minimum and Maximum Values
     4. Press **Settings** button
     5. Toggle the **Y-Axis autoscale** off
     6. Change the Y-Axis min value to "0" then press enter
+        - **Expected result:** Y-Axis displays data has now "0" as bottom value
+        - **Actual result:**
 
-             - **Expected result:** Y-Axis displays data has now "0" as bottom value
+..
+  Actual test result goes here.
+..
 
     7. Change the Y-Axis max value to "2" then press enter
+        - **Expected result:** Y-Axis displays data has now "2" as top value
+        - **Actual result:**
 
-             - **Expected result:** Y-Axis displays data has now "2" as top value
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_ADJUST_CURVE_THICKNESS:
 
@@ -609,10 +982,28 @@ Test 19: Adjust Curve Thickness
     3. Press **Run** button
     4. Press **Settings** button
     5. Change the curve thickness to "2" then press enter
+        - **Expected result:** Curve thickness is changed to "2"
+        - **Actual result:**
 
-             - **Expected result:** Curve thickness is changed to "2"
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_CHANGE_CURVE_STYLE:
 
@@ -638,10 +1029,28 @@ Test 20: Change Curve Style
     3. Press **Run** button
     4. Press **Settings** button
     5. Change the curve style to **dots** then press enter
+        - **Expected result:** Curve data is displayed as dots instead of lines
+        - **Actual result:**
 
-             - **Expected result:** Curve data is displayed as dots instead of lines
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_ADJUST_PLOT_DISPLAY_SETTINGS:
 
@@ -665,30 +1074,68 @@ Test 21: Adjust Plot Display Settings
     1. Open Data Logger plugin
     2. Press **Settings** button
     3. Toggle **Buffer Preview** off
+        - **Expected result:** Buffer preview is not displayed
+        - **Actual result:**
 
-             - **Expected result:** Buffer preview is not displayed
+..
+  Actual test result goes here.
+..
 
     4. Toggle **Buffer Preview** on 
+        - **Expected result:** Buffer preview is displayed 
+        - **Actual result:**
 
-             - **Expected result:** Buffer preview is displayed
+..
+  Actual test result goes here.
+..
 
     5. Toggle **X-AXIS label** off
+        - **Expected result:** X-Axis labels are not displayed
+        - **Actual result:**
 
-             - **Expected result:** X-Axis labels are not displayed
+..
+  Actual test result goes here.
+..
 
     6. Toggle **X-AXIS label** on
+        - **Expected result:** X-Axis labels are displayed
+        - **Actual result:**
 
-                - **Expected result:** X-Axis labels are displayed
+..
+  Actual test result goes here.
+..
 
     7. Toggle **Y-AXIS label** off 
+        - **Expected result:** Y-Axis labels are not displayed 
+        - **Actual result:**
 
-                - **Expected result:** Y-Axis labels are not displayed
+..
+  Actual test result goes here.
+..
 
     8. Toggle **Y-AXIS label** on
+        - **Expected result:** Y-Axis labels are displayed
+        - **Actual result:**
 
-                - **Expected result:** Y-Axis labels are displayed
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_VERIFY_PLOT_DISPLAY_METHOD:
 
@@ -712,10 +1159,28 @@ Test 22: Verify Plot Display Method
     1. Open Data Logger plugin
     2. Enable channel **voltage0** of **xadc** device
     3. Press **Run** button
+        - **Expected result:** Data is displayed in the plot mode
+        - **Actual result:**
 
-            - **Expected result:** Data is displayed in the plot mode
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_VERIFY_PLAIN_TEXT_DISPLAY_METHOD:
 
@@ -740,10 +1205,28 @@ Test 23: Verify Plain Text Display Method
     2. Enable channel **voltage0** of **xadc** device
     3. Press **Run** button
     4. Press **Text** button
+        - **Expected result:** Data is displayed in the plain text mode
+        - **Actual result:**
 
-            - **Expected result:** Data is displayed in the plain text mode
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_VERIFY_7_SEGMENT_DISPLAY_METHOD:
 
@@ -768,10 +1251,28 @@ Test 24: Verify 7 Segment Display Method
     2. Enable channel **voltage0** of **xadc** device
     3. Press **Run** button
     4. Press **7 Segment** button
+        - **Expected result:** Data is displayed in the 7 segment mode
+        - **Actual result:**
 
-            - **Expected result:** Data is displayed in the 7 segment mode
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_TOGGLE_BETWEEN_DISPLAY_METHODS:
 
@@ -796,18 +1297,45 @@ Test 25: Toggle Between Display Methods
     2. Enable channel **voltage0** of **xadc** device
     3. Press **Run** button
     4. Press **Text** button
+        - **Expected result:** Data is displayed in the plain text mode
+        - **Actual result:**
 
-            - **Expected result:** Data is displayed in the plain text mode
+..
+  Actual test result goes here.
+..
 
     5. Press **7 Segment** button
+        - **Expected result:** Data is displayed in the 7 segment mode
+        - **Actual result:**
 
-            - **Expected result:** Data is displayed in the 7 segment mode
+..
+  Actual test result goes here.
+..
 
     6. Press **Plot** button
+        - **Expected result:** Data is displayed in the plot mode
+        - **Actual result:**
 
-            - **Expected result:** Data is displayed in the plot mode
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_SET_7_SEGMENT_DISPLAY_PRECISION:
 
@@ -834,10 +1362,28 @@ Test 26: Set 7 Segment Display Precision
     4. Press **7 Segment** button
     5. Press **Settings** button
     6. Change the 7 Segment precision to "2" then press enter
+        - **Expected result:** 7 Segment displays data with "2" decimal points
+        - **Actual result:**
 
-            - **Expected result:** 7 Segment displays data with "2" decimal points
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_TOGGLE_7_SEGMENT_MIN_MAX_DISPLAY:
 
@@ -864,14 +1410,36 @@ Test 27: Toggle 7 Segment Min/Max Display
     4. Press **7 Segment** button
     5. Press **Settings** button
     6. Toggle the **7 Segment min/max** off
+        - **Expected result:** 7 Segment displays data without min/max values
+        - **Actual result:**
 
-            - **Expected result:** 7 Segment displays data without min/max values
+..
+  Actual test result goes here.
+..
 
     7. Toggle the **7 Segment min/max** on
+        - **Expected result:** 7 Segment displays data with min/max values
+        - **Actual result:**
 
-            - **Expected result:** 7 Segment displays data with min/max values
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_CHOOSE_FILE_FOR_DATA_LOGGING:
 
@@ -892,12 +1460,36 @@ Test 28: Choose File for Data Logging
     1. Open Data Logger plugin
     2. Open the settings menu
     3. Press **Browse** button
+        - **Expected result:** A file explorer window is opened
+        - **Actual result:**
 
-            - **Expected result:** A file explorer window is opened
+..
+  Actual test result goes here.
+..
 
     4. Choose a ".csv" file to save data to
+        - **Expected result:** The file path is displayed in the settings menu
+        - **Actual result:**
 
-            - **Expected result:** The file path is displayed in the settings menu
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_SAVE_COLLECTED_DATA_TO_FILE:
 
@@ -926,10 +1518,29 @@ collected data to a file when the “Save Data” function is triggered.
     4. Wait for some data to be collected
     5. Open the settings menu
     6. Press **Save Data** button
-   
-            - **Expected result:** Data is saved to a file in the chosen file 
+        - **Expected result:** Data is saved to a file in the chosen file.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_ENABLE_LIVE_DATA_LOGGING:
 
@@ -957,11 +1568,30 @@ file when the “Live Data Logging” function is triggered.
     3. Press **Run** button
     4. Open the settings menu
     5. Toggle **Live Data Logging** on
+        - **Expected result:** 
+            - Data is saved to a file in the chosen file continuously
+            - **Save Data** and **Import data** buttons are disabled
+        - **Actual result:**
 
-            - **Expected result:** Data is saved to a file in the chosen file continuously
-            - **Expected result:** **Save Data** and **Import data** buttons are disabled
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_IMPORT_DATA_FROM_FILE:
 
@@ -989,16 +1619,46 @@ the user to import data from a file
     2. Open the settings menu
     3. Press **Import Data** button
             - **Expected result:** A file explorer window is opened
+            - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Choose a ".csv" file to import data from
-            - **Expected result:** 
-  
-               - in the channel menu a new virtual device 
-                 called "Import: <file name>" is created
-               - channel **xadc-voltage0** is available under 
-                 the "Import: <file name>" device
+        - **Expected result:** 
+            - in the channel menu a new virtual device  called "Import: <file name>" is created
+            - channel **xadc-voltage0** is available under the "Import: <file name>" device
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
 
     5. Enable channel **xadc-voltage0** of "Import: <file name>" device 
-            - **Expected result:** Data from the file is displayed on the plot relative to the time and date it was recorded
+        - **Expected result:** Data from the file is displayed on the plot relative to the time and date it was recorded 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_SET_MAXIMUM_CHANNEL_DATA_STORAGE:
 
@@ -1019,12 +1679,29 @@ user to set the maximum channel data storage
 **Steps:**
     1. Open Preferences
     2. Go to "DataLoggerPlugin" tab
-    3. Change the "Maximum data stored for each monitor" from "10Kb" to 
-       "1Mb"
+    3. Change the "Maximum data stored for each monitor" from "10Kb" to "1Mb"
+        - **Expected result:** The maximum channel data storage is set to "1Mb"
+        - **Actual result:**
 
-       - **Expected result:** The maximum channel data storage is set to "1Mb"
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_SET_DATA_LOGGER_READ_INTERVAL:
 
@@ -1053,9 +1730,28 @@ user to set the read interval
     5. Go to "DataLoggerPlugin" tab
     6. Change the "Read interval" from "1" to "2"
     7. Open Data Logger plugin 
-            - **Expected result:** Data is collected every "2" seconds instead of "1" second
+        - **Expected result:** Data is collected every "2" seconds instead of "1" second 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _TST_DATALOGGER_SET_X_AXIS_DATE_TIME_FORMAT:
 
@@ -1084,6 +1780,25 @@ date time format for the X Axis
     5. Go to DataLoggerPlugin tab
     6. Change the **Date time format** from "hh:mm:ss" to "mm:ss"
     7. Open Data Logger plugin 
-            - **Expected result:** X Axis displays date time in the format "mm:ss"
+        - **Expected result:** X Axis displays date time in the format "mm:ss" 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
