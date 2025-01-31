@@ -10,6 +10,23 @@ Rms tool
 
     User guide: :ref:`Rms <pqm-rms>`.
 
+
+.. note::
+    .. list-table:: 
+       :widths: 50 30 30 50 50
+       :header-rows: 1
+
+       * - Tester
+         - Test Date
+         - Scopy version
+         - Plugin version (N/A if not applicable)
+         - Comments
+       * - 
+         - 
+         - 
+         - 
+         - 
+
 Setup environment:
 ^^^^^^^^^^^^^^^^^^
 
@@ -48,8 +65,28 @@ accessible without errors.
           and a Settings button. The Settings menu is open, and the Settings 
           button is in a checked state. In the center of the widget, there are 
           two plots, each with labels positioned above them.
+        - **Actual result:**
 
-**Result:** PASS/FAIL 
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+ 
 
 Test 2: Info button check.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -72,8 +109,28 @@ Test 2: Info button check.
     2. Click on the **Info** button.
         - **Expected result:** The RMS documentation page is opened in the 
           browser. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 3: Single acquisition.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -96,8 +153,28 @@ Test 3: Single acquisition.
     2. Click on the **Single** button.
         - **Expected result:** Both the plot and the header labels are populated 
           with values. A single block of data is acquired.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _tst-pqm-rms-run:
 
@@ -122,10 +199,36 @@ Test 4: Data acquisition.
     2. Click on the **Start** button.
         - **Expected result:** Both the plot and the header labels are 
           populated with values. The data is updated every few seconds.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Click on the **Stop** button.
         - **Expected result:** The data acquisition stops.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 5: Settings button check.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -148,8 +251,28 @@ Test 5: Settings button check.
     2. Click on the **Settings** button.
         - **Expected result:** The settings menu collapses and the button 
           becomes unchecked. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 6: Data logging.
 ^^^^^^^^^^^^^^^^^^^^^
@@ -173,22 +296,66 @@ Test 6: Data logging.
     3. Make sure that data acquisition is stopped.
         - If data acquisition is running, the log section cannot be accessed.
     4. Click on the **LOG** switch button.  
-        - **Expected result:** A browse section is displayed.  
+        - **Expected result:** A browse section is displayed.    
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Click on the **Browse** button.
         - **Expected result:** A explorer window is displayed. Only directories 
           can be selected.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Select a directory and click on the **Open** button.
         - **Expected result:** The explorer window is closed and the path to 
           that directory is introduced in the browser section.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Click on the **Run** button.
         - **Expected result:** The **LOG** section remains open, but its 
           elements can no longer be accessed and a .csv file is created in 
           the selected directory.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     8. Click on the **Stop** button.
         - **Expected result:** The **LOG** section can now be accessed, 
           and the .csv file is populated with data.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 7: Data logging wrong path.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -212,15 +379,47 @@ Test 7: Data logging wrong path.
     3. Make sure that data acquisition is stopped.
         - If data acquisition is running, the log section cannot be accessed.
     4. Click on the **LOG** switch button.  
-        - **Expected result:** A browse section is displayed.  
+        - **Expected result:** A browse section is displayed.    
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Enter an invalid path in the line edit.
     6. Click on the **Run** button.
         - **Expected result:** The **LOG** section get closed and no .csv 
           file is created.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Click on the **Stop** button.
         - **Expected result:** The **LOG** section remains closed.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 8: PQEvents.
 ^^^^^^^^^^^^^^^^^
@@ -243,13 +442,45 @@ Test 8: PQEvents.
     2. Click on the **Run** button.
     3. Run ``iio_attr -u ip:127.0.0.1 -c pqm count0 countEvent 1`` command.
         - **Expected result:**  The PQEvents indicator becomes active.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Click on the **Stop** button.
         - **Expected result:**  The PQEvents indicator is still active. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Click on the **PQEvents** indicator.
         - **Expected result:**  The PQEvents indicator becomes inactive. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Run ``iio_attr -u ip:127.0.0.1 -c pqm count0 countEvent 0`` command.
 
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Harmonics tool
 --------------
@@ -257,6 +488,23 @@ Harmonics tool
 .. note::
 
     User guide: :ref:`Harmonics <pqm-harmonics>`.
+
+
+.. note::
+    .. list-table:: 
+       :widths: 50 30 30 50 50
+       :header-rows: 1
+
+       * - Tester
+         - Test Date
+         - Scopy version
+         - Plugin version (N/A if not applicable)
+         - Comments
+       * - 
+         - 
+         - 
+         - 
+         - 
 
 Setup environment:
 ^^^^^^^^^^^^^^^^^^
@@ -296,8 +544,28 @@ and is accessible without errors.
           and a Settings button. The Settings menu is open, and the Settings 
           button is in a checked state. In the center, there are three 
           components: THD, a table, and a plot.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 2: Info button check.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -320,8 +588,28 @@ Test 2: Info button check.
     2. Click on the **Info** button.
         - **Expected result:** The Harmonics documentation page is opened in the 
           browser. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _tst-pqm-harmonics-single:
 
@@ -347,8 +635,28 @@ Test 3: Single acquisition.
         - **Expected result:** All the components are populated with values. The 
           data in the table must be reflected on the plot. A single block of data is 
           acquired.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _tst-pqm-harmonics-run:
 
@@ -374,10 +682,36 @@ Test 4: Data acquisition.
         - **Expected result:** The data is updated every few seconds (only the 
           values from the table and from the plot are updated). The data in the table must 
           be reflected on the plot.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Click on the **Stop** button.
         - **Expected result:** The data acquisition stops.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 5: The features of the table.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -400,16 +734,48 @@ Test 5: The features of the table.
     2. Click on the **Single** button.
         - **Expected result:** The row Ia is highlighted and the corresponding 
           values are drawn on the plot.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Make sure that the settings menu is visible.
     4. Click on the **Ib** row from the table.
         - **Expected result:** The entire row is selected and the Ib values are 
           displayed on the plot. In the setting menu, the active channel is also Ib.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Select the first 6 values from row **Ic** (click on the first value and hold it down until you reach column 5).
         - **Expected result:** Only the respective values remain highlighted, 
           and only the selected columns appear on the plot. The drawing color 
           is another one. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 6: Settings button check.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -432,17 +798,49 @@ Test 6: Settings button check.
     2. Click on the **Settings** button.
         - **Expected result:** The settings menu collapses and the button 
           becomes unchecked. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Click on the **Settings** button.
         - **Expected result:** The settings menu opens, and the button is 
           checked. The menu contains two sections: **General** and **Log**. 
           The **General** section contains **Harmonics type** (set to 
           *harmonics* by default) and **Active channel** (set to *Ia* by 
           default).
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Select **Ib** from active channels dropdown.
         - **Expected result:** The Ib row from the table is highlighted (if the 
           table is populated, then the plot data is changed accordingly). 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 7: Data logging.
 ^^^^^^^^^^^^^^^^^^^^^
@@ -465,21 +863,65 @@ Test 7: Data logging.
     2. Make sure that data acquisition is stopped.
         - If data acquisition is running, the log section cannot be accessed.
     3. Click on the **LOG** switch button.  
-        - **Expected result:** A browse section is displayed.
+        - **Expected result:** A browse section is displayed.  
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Click on the **Browse** button.
         - **Expected result:** An explorer window is displayed. Only directories 
           can be selected.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Select a directory and click on the **Open** button.
         - **Expected result:** The explorer window is closed and the path to that 
           directory is introduced in the browse section.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Click on the **Run** button.
         - **Expected result:** The **LOG** section remains open, but its elements 
           can no longer be accessed and a .csv file is created in the selected directory.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Click on the **Stop** button.
         - **Expected result:** The **LOG** section can now be accessed, and the 
           .csv file is populated with data.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 8: Data logging wrong path.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -502,15 +944,47 @@ Test 8: Data logging wrong path.
     2. Make sure that data acquisition is stopped.
         - If data acquisition is running, the log section cannot be accessed.
     3. Click on the **LOG** switch button.  
-        - **Expected result:** A browse section is displayed.  
+        - **Expected result:** A browse section is displayed.    
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Enter an invalid path in the line edit.
     5. Click on the **Run** button.
         - **Expected result:** The **LOG** section is closed and no .csv file is 
           created.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Click on the **Stop** button.
         - **Expected result:** The **LOG** section remains closed.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 9: PQEvents.
 ^^^^^^^^^^^^^^^^^
@@ -532,13 +1006,45 @@ Test 9: PQEvents.
     1. Click on the **Run** button.
     2. Run ``iio_attr -u ip:127.0.0.1 -c pqm count0 countEvent 1`` command.
         - **Expected result:**  The PQEvents indicator becomes active.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Click on the **Stop** button.
         - **Expected result:**  The PQEvents indicator is still active. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Click on the **PQEvents** indicator.
         - **Expected result:**  The PQEvents indicator becomes inactive. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Run ``iio_attr -u ip:127.0.0.1 -c pqm count0 countEvent 0`` command.
 
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Waveform tool
 -------------
@@ -546,6 +1052,23 @@ Waveform tool
 .. note::
 
     User guide: :ref:`Waveform <pqm-waveform>`.
+
+
+.. note::
+    .. list-table:: 
+       :widths: 50 30 30 50 50
+       :header-rows: 1
+
+       * - Tester
+         - Test Date
+         - Scopy version
+         - Plugin version (N/A if not applicable)
+         - Comments
+       * - 
+         - 
+         - 
+         - 
+         - 
 
 Setup environment:
 ^^^^^^^^^^^^^^^^^^
@@ -583,8 +1106,28 @@ is accessible without errors.
           an Info button, a Run button, a Single button, and a Settings button. 
           The Settings menu is open, and the Settings button is in a checked 
           state. In the center, there are two plots.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 2: Info button check.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -607,8 +1150,28 @@ Test 2: Info button check.
     2. Click on the **Info** button.
         - **Expected result:** The Waveform documentation page is opened in the 
           browser. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 3: Settings button check.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -631,11 +1194,37 @@ Test 3: Settings button check.
     2. Click on the **Settings** button.
         - **Expected result:** The settings menu collapses and the button 
           becomes unchecked. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Click on the **Settings** button.
         - **Expected result:** The settings menu opens, and the button is 
           checked.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 4: Settings timespan check.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -658,12 +1247,38 @@ Test 4: Settings timespan check.
     2. Make sure that the settings menu is open.
     3. Click on (+) button. 
         - **Expected result:** The timespan is increased and the x-axis range is 
-          now  [-newValue, 0]. The maximum value must be 10.
+          now  [-newValue, 0]. The maximum value must be 10. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Click on (-) button. 
         - **Expected result:** The timespan is decreased and the x-axis range is 
-          now  [-newValue, 0]. The minimum value must be 0.02.
+          now  [-newValue, 0]. The minimum value must be 0.02. 
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 5: Settings rolling switch check.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -687,8 +1302,28 @@ Test 5: Settings rolling switch check.
     3. Enable **Rolling mode** swich.
         - **Expected result:** The switch is turned on, and the "triggered by" 
           dropdown is inactive.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 6: Single acquisition triggered.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -713,8 +1348,28 @@ Test 6: Single acquisition triggered.
     3. Click on the **Single** button.
         - **Expected result:** The curves are displayed on the plot in single 
           shot format. A single block of data is acquired.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 7: Single acquisition rolling.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -740,8 +1395,28 @@ Test 7: Single acquisition rolling.
         - **Expected result:** The curves are drawn from right to left until all 
           the required samples for the plot are acquired. A single block of data is 
           acquired.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 8: Data acquisition triggered.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -766,10 +1441,36 @@ Test 8: Data acquisition triggered.
     3. Click on the **Start** button.
         - **Expected result:** The curves are displayed on the plot in single 
           shot format. When new data is available, it is displayed on the screen.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Click on the **Stop** button.
         - **Expected result:** The data acquisition stops.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 .. _tst-pqm-waveform-run-roll:
 
@@ -797,10 +1498,36 @@ Test 9: Data acquisition rolling.
         - **Expected result:** The curves are drawn from right to left until all 
           the required samples for the plot are acquired. If there are non-zero values, a 
           continuous motion illusion is created.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Click on the **Stop** button.
         - **Expected result:** The data acquisition stops.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 10: Plot zoom.
 ^^^^^^^^^^^^^^^^^^^
@@ -824,8 +1551,28 @@ range of the other plot is modified and matches the zoom range.
     2. Zoom in on the first plot to a range smaller than the x-axis range.
         - **Expected result:** The x-axis range of the second plot is modified 
           and matches the range of the first plot.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 11: Data logging.
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -848,22 +1595,66 @@ Test 11: Data logging.
     2. Make sure that data acquisition is stopped.
         - If data acquisition is running, the log section cannot be accessed.
     3. Click on the **LOG** switch button.  
-        - **Expected result:** A browse section is displayed.  
+        - **Expected result:** A browse section is displayed.    
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Click on the **Browse** button.
         - **Expected result:** An explorer window is displayed. Only directories 
           can be selected.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Select a directory and click on the **Open** button.
         - **Expected result:** The explorer window is closed and the path to that 
           directory is introduced in the browser section.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Click on the **Run** button.
         - **Expected result:** The **LOG** section remains open, but its elements 
           can no longer be accessed and a .csv file is created in the selected 
           directory.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Click on the **Stop** button.
         - **Expected result:** The **LOG** section can now be accessed, and the 
           .csv file is populated with data.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 12: Data logging wrong path.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -886,15 +1677,47 @@ Test 12: Data logging wrong path.
     2. Make sure that data acquisition is stopped.
         - If data acquisition is running, the log section cannot be accessed.
     3. Click on the **LOG** switch button.  
-        - **Expected result:** A browse section is displayed.  
+        - **Expected result:** A browse section is displayed.    
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Enter an invalid path in the line edit.
     5. Click on the **Run** button.
         - **Expected result:** The **LOG** section is closed and no .csv file is 
           created.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Click on the **Stop** button.
         - **Expected result:** The **LOG** section remains closed.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Settings tool
 -------------
@@ -902,6 +1725,23 @@ Settings tool
 .. note::
 
     User guide: :ref:`Settings <pqm-settings>`.
+
+
+.. note::
+    .. list-table:: 
+       :widths: 50 30 30 50 50
+       :header-rows: 1
+
+       * - Tester
+         - Test Date
+         - Scopy version
+         - Plugin version (N/A if not applicable)
+         - Comments
+       * - 
+         - 
+         - 
+         - 
+         - 
 
 Setup environment:
 ^^^^^^^^^^^^^^^^^^
@@ -937,8 +1777,28 @@ is accessible without errors.
     2. Observe the application's behavior.
         - **Expected result:** Three sections are displayed: **System Time**, 
           **Logging**, and **Config Values**.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 2: Read config values.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -963,8 +1823,28 @@ correctly.
        and **Set** buttons.
     3. Click on the **Read** button.
         - **Expected result:** All fields in the section are populated.  
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 3: Write config values.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -989,10 +1869,33 @@ correctly.
        and **Set** buttons.
     3. Click on the **Read** button.
         - **Expected result:** All fields in the section are populated.  
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Change the **MsV Threshold** value to 0.40.
     5. Click on the **Write** button.
     6. Click on the **Read** button.
-        - **Expected result:** The **MsV Threshold** attribute value must be 
-          0.40. 
+        - **Expected result:** The **MsV Threshold** attribute value must be 0.40.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
