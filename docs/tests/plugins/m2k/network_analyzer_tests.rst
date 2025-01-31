@@ -7,6 +7,23 @@ Network Analyzer - Test Suite
 
     User guide: :ref:`Network Analyzer user guide<network_analyzer>`
 
+
+.. note::
+    .. list-table:: 
+       :widths: 50 30 30 50 50
+       :header-rows: 1
+
+       * - Tester
+         - Test Date
+         - Scopy version
+         - Plugin version (N/A if not applicable)
+         - Comments
+       * - 
+         - 
+         - 
+         - 
+         - 
+
 Setup environment:
 ------------------
 
@@ -59,23 +76,74 @@ using a Low Pass Filter.
     2. Run the Network Analyzer. Check the frequency response in the Bode plot.
         - **Expected result:** On the Magnitude Plot, after a flat section (passband),
           response, the trace drops at around 340Hz (cutoff frequency).
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Enable the “Cursor” and move it to find the -3dB point on the trace.
         - **Expected result:** The magnitude indicates -3dB at approximately 
           340 Hz. The phase corresponding to the same frequency is also displayed.
+
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Disable the cursor by clicking the box again.
         - **Expected result:** The cursor controls disappear from the interface.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Open the General Settings and change the plot type to **Nyquist**:
         - **Expected result:** The Magnitude and Phase plot are replaced by 
           a Polar plot.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Change the plot type to **Nichols**.
         - **Expected result:** The polar plot is replaced by a single plot 
           with the magnitude on the Y Axis and phase on the X Axis.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Change the plot type to **Bode** and switch to **Linear** sweep type.
         - **Expected result:** The plot frequency scale changes to a linear one.
           The signal drops abruptly until it reaches -3dB at around 340Hz, then 
           the trace flattens.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 2 - Low Pass Filter CH2 340Hz
 ---------------------------------------
@@ -111,23 +179,74 @@ using a Low Pass Filter.
     2. Run the Network Analyzer. Check the frequency response in the Bode plot.
         - **Expected result:** On the Magnitude Plot, after a flat section (passband),
           response, the trace drops at around 340Hz (cutoff frequency).
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Enable the “Cursor” and move it to find the -3dB point on the trace.
         - **Expected result:** The magnitude indicates -3dB at approximately 
           340 Hz. The phase corresponding to the same frequency is also displayed.
+
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Disable the cursor by clicking the box again.
         - **Expected result:** The cursor controls disappear from the interface.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Open the General Settings and change the plot type to **Nyquist**:
         - **Expected result:** The Magnitude and Phase plot are replaced by 
           a Polar plot.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Change the plot type to **Nichols**.
         - **Expected result:** The polar plot is replaced by a single plot 
           with the magnitude on the Y Axis and phase on the X Axis.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Change the plot type to **Bode** and switch to **Linear** sweep type.
         - **Expected result:** The plot frequency scale changes to a linear one.
           The signal drops abruptly until it reaches -3dB at around 340Hz, then 
           the trace flattens.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 3 - Low Pass Filter CH1 1.59MHz
 -----------------------------------------
@@ -163,16 +282,55 @@ using a Low Pass Filter.
     2. Run the Network Analyzer. Check the frequency response in the Bode plot.
         - **Expected result:** On the Magnitude Plot, after a flat section (passband),
           response, the trace drops at around 1.5 MHz (cutoff frequency).
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Enable the “Cursor” and move it to find the -3dB point on the trace.
         - **Expected result:** The magnitude indicates -3dB at approximately 
           1.5MHz. The phase corresponding to the same frequency is also displayed.
+
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Disable the cursor by clicking the box again.
         - **Expected result:** The cursor controls disappear from the interface.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Switch to **Linear** sweep type.
         - **Expected result:** The plot frequency scale changes to a linear one.
           The signal gradually drops and reaches -3dB at around 1.59MHz.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 4 - High Pass Filter CH1 340Hz
 ----------------------------------------
@@ -211,13 +369,46 @@ using a High Pass Filter.
           which is the cutoff frequency. After the cutoff frequency, the 
           magnitude plot flattens, indicating the high pass allows the frequencies
           to pass without attenuation.          
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Enable the “Cursor” and move it to find the -3dB point on the trace.
         - **Expected result:** The magnitude indicates -3dB at approximately 
           340 Hz. The phase corresponding to the same frequency is also displayed.
+
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Disable the cursor by clicking the box again.
         - **Expected result:** The cursor controls disappear from the interface.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 5 - Band Pass Filter CH1
 ----------------------------------
@@ -262,13 +453,47 @@ frequency of 15.9kHz.
           which is the lower cutoff frequency. The trace section after the lower 
           cutoff frequency is a the passband. The trace drops from -3dB at around 
           15.9kHz which is the higher cutoff frequency.
+
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Enable the “Cursor” and move it to find the -3dB points on the trace.
         - **Expected result:** The magnitude indicates -3dB at approximately 
           1.59 kHz and 15.9 kHz.
+
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Disable the cursor by clicking the box again.
         - **Expected result:** The cursor controls disappear from the interface.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 6 - Band Stop Filter CH1
 ----------------------------------
@@ -315,12 +540,44 @@ using a Band Stop notch Filter with a notch frequency of 795Hz.
         - **Expected result:** On the Magnitude Plot, the trace is around -3dB
           on the entire spectrum, except at around 795Hz where the trace drops 
           and then rises again to -3dB.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Enable the “Cursor” and move it to find the low point on the trace.
         - **Expected result:** The magnitude drops at around 795Hz.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Disable the cursor by clicking the box again.
         - **Expected result:** The cursor controls disappear from the interface.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
 
 **Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 
 Test 7 - Print Plot
@@ -344,10 +601,36 @@ by exporting the low pass filter plot screenshot to a PDF file.
     2. Click the Print plot button and choose a name and location for the file.
         - **Expected result:** The file is saved as a PDF in the selected 
           location.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     3. Open the exported file and verify it:
         - **Expected result:** The plot is correctly saved in the PDF file.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 8 - Buffer Previewer
 ----------------------------
@@ -373,23 +656,67 @@ by viewing the acquired data in the Oscilloscope and analyzing measurements.
     2. Run a Single capture in the Network Analyzer.
     3. In the Sweep settings menu, enable the Buffer Previewer.
         - **Expected result:** A time domain plot appears above the Bode plot.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Slide the blue handle at the leftmost end of the plot.
         - **Expected result:** 
             - A sinewave is displayed on the time plot.
             - Below the time plot the Sample Count is 1/10, Current Frequency is 20Hz.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. In the Sweep settings menu click the **ViewInOsc** button.
         - **Expected result:**
             - The Oscilloscope instrument is opened.
             - The data is displayed as reference waveform in the Oscilloscope.
             - The measurements show a frequency of 20Hz.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Slide the blue handle at the rightmost end of the plot.
         - **Expected result:** 
             - A sinewave is displayed on the time plot.
             - Below the time plot the Sample Count is 10/10, Current Frequency is 1MHz.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. In the Sweep settings menu click the **ViewInOsc** button.
         - **Expected result:**
             - The Oscilloscope instrument is opened.
             - The data is displayed as reference waveform in the Oscilloscope.
             - The measurements show a frequency of 1MHz.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     
-**Result**: PASS/FAIL
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
