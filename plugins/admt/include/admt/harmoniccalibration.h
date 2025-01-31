@@ -30,6 +30,8 @@
 #include <QIntValidator>
 #include <QDoubleValidator>
 #include <QThread>
+#include <QMetaObject>
+#include <QMap>
 
 #include <iio.h>
 #include <iioutil/connectionprovider.h>
@@ -90,9 +92,24 @@ public Q_SLOTS:
 	void stop();
 	void start();
 	void restart();
+	void commandLogWrite(QString message);
+	void updateFaultStatus(bool value);
+	void updateMotorPosition(double position);
+	void updateDIGIOUI(uint32_t *registerValue);
+	void updateFaultRegisterUI(uint32_t *registerValue);
+	void updateMTDiagnosticRegisterUI(uint32_t *registerValue);
+	void updateMTDiagnosticsUI(uint32_t *registerValue);
 Q_SIGNALS:
 	void runningChanged(bool);
 	void canCalibrateChanged(bool);
+	void updateUtilityUI();
+	void commandLogWriteSignal(QString message);
+	void updateFaultStatusSignal(bool value);
+	void motorPositionChanged(double position);
+	void DIGIORegisterChanged(uint32_t *registerValue);
+	void FaultRegisterChanged(uint32_t *registerValue);
+	void DIAG1RegisterChanged(uint32_t *registerValue);
+	void DIAG2RegisterChanged(uint32_t *registerValue);
 private:
 	ADMTController *m_admtController;
 	iio_context *m_ctx;
@@ -148,7 +165,12 @@ private:
 
 	QPlainTextEdit *logsPlainTextEdit, *commandLogPlainTextEdit;
 
-	QCheckBox *autoCalibrateCheckBox;
+	QCheckBox *acquisitionFaultRegisterLEDWidget, *calibrationFaultRegisterLEDWidget, 
+			  *DIGIOBusyStatusLED ,*DIGIOCNVStatusLED ,*DIGIOSENTStatusLED ,*DIGIOACALCStatusLED ,*DIGIOFaultStatusLED ,*DIGIOBootloaderStatusLED,
+			  *R0StatusLED, *R1StatusLED, *R2StatusLED, *R3StatusLED, *R4StatusLED, *R5StatusLED, *R6StatusLED, *R7StatusLED,
+			  *VDDUnderVoltageStatusLED, *VDDOverVoltageStatusLED, *VDRIVEUnderVoltageStatusLED, *VDRIVEOverVoltageStatusLED, *AFEDIAGStatusLED, 
+			  *NVMCRCFaultStatusLED, *ECCDoubleBitErrorStatusLED, *OscillatorDriftStatusLED, *CountSensorFalseStateStatusLED, *AngleCrossCheckStatusLED,
+			  *TurnCountSensorLevelsStatusLED, *MTDIAGStatusLED, *TurnCounterCrossCheckStatusLED, *RadiusCheckStatusLED, *SequencerWatchdogStatusLED;
 
 	QScrollArea *MTDiagnosticsScrollArea;
 
@@ -169,12 +191,6 @@ private:
 
 	HorizontalSpinBox *motorMaxVelocitySpinBox, *motorAccelTimeSpinBox, *motorMaxDisplacementSpinBox, *motorTargetPositionSpinBox;
 
-	MenuControlButton *acquisitionFaultRegisterLEDWidget, *calibrationFaultRegisterLEDWidget, *DIGIOBusyStatusLED ,*DIGIOCNVStatusLED ,*DIGIOSENTStatusLED ,*DIGIOACALCStatusLED ,*DIGIOFaultStatusLED ,*DIGIOBootloaderStatusLED,
-		*R0StatusLED, *R1StatusLED, *R2StatusLED, *R3StatusLED, *R4StatusLED, *R5StatusLED, *R6StatusLED, *R7StatusLED,
-		*VDDUnderVoltageStatusLED, *VDDOverVoltageStatusLED, *VDRIVEUnderVoltageStatusLED, *VDRIVEOverVoltageStatusLED, 
-		*AFEDIAGStatusLED, *NVMCRCFaultStatusLED, *ECCDoubleBitErrorStatusLED, *OscillatorDriftStatusLED, *CountSensorFalseStateStatusLED, 
-		*AngleCrossCheckStatusLED, *TurnCountSensorLevelsStatusLED, *MTDIAGStatusLED, *TurnCounterCrossCheckStatusLED, *RadiusCheckStatusLED, *SequencerWatchdogStatusLED;
-
 	CustomSwitch *calibrationDisplayFormatSwitch, 
 		*DIGIO0ENToggleSwitch, *DIGIO0FNCToggleSwitch, 
 		*DIGIO1ENToggleSwitch, *DIGIO1FNCToggleSwitch,
@@ -186,11 +202,12 @@ private:
 
 	RegisterBlockWidget *cnvPageRegisterBlock, *digIORegisterBlock, *faultRegisterBlock, *generalRegisterBlock, *digIOEnRegisterBlock, *angleCkRegisterBlock, *eccDcdeRegisterBlock, *eccDisRegisterBlock, *absAngleRegisterBlock, *angleRegisterBlock, *angleSecRegisterBlock, *sineRegisterBlock, *cosineRegisterBlock, *secAnglIRegisterBlock, *secAnglQRegisterBlock, *radiusRegisterBlock, *diag1RegisterBlock, *diag2RegisterBlock, *tmp0RegisterBlock, *tmp1RegisterBlock, *cnvCntRegisterBlock, *uniqID0RegisterBlock, *uniqID1RegisterBlock, *uniqID2RegisterBlock, *uniqID3RegisterBlock, *h1MagRegisterBlock, *h1PhRegisterBlock, *h2MagRegisterBlock, *h2PhRegisterBlock, *h3MagRegisterBlock, *h3PhRegisterBlock, *h8MagRegisterBlock, *h8PhRegisterBlock;
 
-	QFuture<void> m_deviceStatusThread, m_acquisitionDataThread, m_acquisitionGraphThread;
-	QFutureWatcher<void> m_deviceStatusWatcher, m_acquisitionDataWatcher, m_acquisitionGraphWatcher;
-
-	QTimer *acquisitionUITimer, *calibrationUITimer, *utilityTimer;
-
+	QFuture<void> m_deviceStatusThread, m_currentMotorPositionThread,
+				  m_acquisitionUIThread, m_acquisitionDataThread, m_acquisitionGraphThread,
+				  m_calibrationUIThread, m_utilityUIThread, m_utilityThread;
+	QFutureWatcher<void> m_deviceStatusWatcher, m_currentMotorPositionWatcher,
+						 m_acquisitionUIWatcher, m_acquisitionDataWatcher, m_acquisitionGraphWatcher,
+						 m_calibrationUIWatcher, m_utilityUIWatcher, m_utilityWatcher;
 
 	ToolTemplate* createAcquisitionWidget();
 	ToolTemplate* createCalibrationWidget();
@@ -203,21 +220,29 @@ private:
 	void applySequence();
 	bool changeCNVPage(uint32_t page);
 	void initializeMotor();
+	void startDeviceStatusMonitor();
+	void stopDeviceStatusMonitor();
 	void getDeviceFaultStatus(int sampleRate);
+	void startCurrentMotorPositionMonitor();
+	void stopCurrentMotorPositionMonitor();
+	void currentMotorPositionTask(int sampleRate);
+	bool resetGENERAL();
 
 	#pragma region Acquisition Methods
 	bool updateChannelValues();
 	void updateCountValue();
 	void updateLineEditValues();
 	void startAcquisition();
-	void startAcquisitionDeviceStatusMonitor();
+	void stopAcquisition();
 	void getAcquisitionSamples(int sampleRate);
 	double getAcquisitionParameterValue(const AcquisitionDataKey &key);
 	void plotAcquisition(QVector<double>& list, PlotChannel* channel);
 	void prependAcquisitionData(const double& data, QVector<double>& list);
 	void resetAcquisitionYAxisScale();
 	void acquisitionPlotTask(int sampleRate);
-	void acquisitionUITask();
+	void acquisitionUITask(int sampleRate);
+	void startAcquisitionUITask();
+	void stopAcquisitionUITask();
 	void updateSequenceWidget();
 	void applySequenceAndUpdate();
 	void updateGeneralSettingEnabled(bool value);
@@ -226,8 +251,9 @@ private:
 	#pragma endregion
 
 	#pragma region Calibration Methods
-	void startCalibrationDeviceStatusMonitor();
-	void calibrationUITask();
+	void startCalibrationUITask();
+	void stopCalibrationUITask();
+	void calibrationUITask(int sampleRate);
 	void getCalibrationSamples();
 	void startCalibration();
 	void stopCalibration();
@@ -268,18 +294,20 @@ private:
 	#pragma endregion
 
 	#pragma region Utility Methods
-	void utilityTask();
+	void startUtilityTask();
+	void stopUtilityTask();
+	void utilityTask(int sampleRate);
 	void toggleUtilityTask(bool run);
-	void updateDigioMonitor();
-	bool updateDIGIOToggle();
-	void updateMTDiagnostics();
-	void updateMTDiagRegister();
-	void updateFaultRegister();
+	void getDIGIOENRegister();
+	void updateDIGIOMonitorUI();
+	void updateDIGIOControlUI();
+	void getDIAG2Register();
+	void getDIAG1Register();
+	void getFAULTRegister();
 	void toggleDIGIOEN(string DIGIOENName, bool value);
 	void toggleMTDiagnostics(int mode);
 	void toggleFaultRegisterMode(int mode);
 	bool resetDIGIO();
-	void commandLogWrite(QString message);
 	void clearCommandLog();
 	#pragma endregion
 
@@ -296,8 +324,11 @@ private:
 	void toggleWidget(QPushButton *widget, bool value);
 	void changeCustomSwitchLabel(CustomSwitch *customSwitch, QString onLabel, QString offLabel);
 	void changeStatusLEDColor(MenuControlButton *menuControlButton, QColor color, bool checked = true);
+	void changeStatusLEDColor(QCheckBox *widget, const char *colorAttribute);
 	void updateFaultStatusLEDColor(MenuControlButton *widget, bool value);
+	void toggleStatusLEDColor(QCheckBox *widget, const char *trueAttribute, const char* falseAttribute, bool value);
 	MenuControlButton *createStatusLEDWidget(const QString title, QColor color, QWidget *parent = nullptr);
+	QCheckBox *createStatusLEDWidget(const QString &text, const char *colorAttribute, bool checked = false, QWidget *parent = nullptr);
 	MenuControlButton *createChannelToggleWidget(const QString title, QColor color, QWidget *parent = nullptr);
 	#pragma endregion
 

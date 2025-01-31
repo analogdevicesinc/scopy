@@ -1,18 +1,21 @@
 #include "harmoniccalibration.h"
 #include "qtconcurrentrun.h"
 #include "style.h"
+#include "style_properties.h"
 
 #include <widgets/horizontalspinbox.h>
 #include <stylehelper.h>
 #include <admtstylehelper.h>
 
-static int acquisitionUITimerRate = 500;
-static int calibrationUITimerRate = 500;
-static int utilityTimerRate = 1000;
+static int acquisitionUITimerRate = 500; // In ms
+static int acquisitionSampleRate = 20; 
+static int acquisitionGraphSampleRate = 100;
 
-static int deviceStatusMonitorRate = 500; // In ms
-static int acquisitionSampleRate = 20; // In ms
-static int acquisitionGraphSampleRate = 100; // In ms
+static int calibrationUITimerRate = 500;
+static int utilityUITimerRate = 1000;
+
+static int deviceStatusMonitorRate = 500;
+static int motorPositionMonitorRate = 500;
 
 static int bufferSize = 1;
 static int dataGraphSamples = 100;
@@ -70,6 +73,12 @@ static const QPen cosinePen(cosineColor);
 
 static map<string, string> deviceRegisterMap;
 static map<string, int> generalRegisterMap;
+static map<string, bool> DIGIOENRegisterMap;
+static map<string, bool> FAULTRegisterMap;
+static map<string, bool> DIAG1RegisterMap;
+static map<string, double> DIAG2RegisterMap;
+static map<string, double> DIAG1AFERegisterMap;
+
 static QString deviceName = "";
 static QString deviceType = "";
 static bool is5V = false;
@@ -79,13 +88,21 @@ static uint32_t H1_MAG_HEX, H2_MAG_HEX, H3_MAG_HEX, H8_MAG_HEX, H1_PHASE_HEX, H2
 
 static int acquisitionGraphYMin = 0;
 static int acquisitionGraphYMax = 360;
+
 static bool deviceStatusFault = false;
+
+static bool isAcquisitionTab = false;
+static bool isCalibrationTab = false;
+static bool isUtilityTab = false;
+
 static bool isStartAcquisition = false;
+
 static bool isDeviceStatusMonitor = false;
+static bool isMotorPositionMonitor = false;
 
 static int readMotorDebounce = 50; // In ms
 
-static std::map<AcquisitionDataKey, bool> acquisitionDataMap = {
+static map<AcquisitionDataKey, bool> acquisitionDataMap = {
     {RADIUS, false},
     {ANGLE, false},
     {TURNCOUNT, false},
@@ -141,44 +158,48 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 		if(index == 0 || index == 1)
 		{
 			if(isDeviceStatusMonitor) isDeviceStatusMonitor = false;
+			if(isMotorPositionMonitor) isMotorPositionMonitor = false;
 
-			if(index == 0) startAcquisitionDeviceStatusMonitor();
-			else startCalibrationDeviceStatusMonitor();
+			startDeviceStatusMonitor();
+			if(index == 1) startCurrentMotorPositionMonitor();
 		}
 		else{
 			isDeviceStatusMonitor = false;
+			isMotorPositionMonitor = false;
 		}
 
 		if(index == 0) // Acquisition Tab
 		{ 
-			acquisitionUITimer->start(acquisitionUITimerRate);
+			startAcquisitionUITask();
 			readSequence();
 			updateSequenceWidget();
 		}
 		else
 		{
-			acquisitionUITimer->stop();
+			stopAcquisitionUITask();
 			stop();
 		}
 
 		if(index == 1) // Calibration Tab
 		{ 
-			calibrationUITimer->start(calibrationUITimerRate);
+			startCalibrationUITask();
 		}
 		else 
 		{ 
-			calibrationUITimer->stop();
+			stopCalibrationUITask();
 		}
 
 		if(index == 2) // Utility Tab
 		{ 
-			utilityTimer->start(utilityTimerRate); 
 			readSequence();
 			toggleFaultRegisterMode(generalRegisterMap.at("Sequence Type"));
 			toggleMTDiagnostics(generalRegisterMap.at("Sequence Type"));
-			updateDIGIOToggle();
+			toggleUtilityTask(true);
 		}	
-		else { utilityTimer->stop(); }
+		else 
+		{
+			toggleUtilityTask(false);
+		}
 
 		if(index == 3) // Registers Tab
 		{ 
@@ -187,11 +208,24 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 		}
 	});
 
-	acquisitionUITimer->start(acquisitionUITimerRate);
-	startAcquisitionDeviceStatusMonitor();
+	connect(this, &HarmonicCalibration::updateFaultStatusSignal, this, &HarmonicCalibration::updateFaultStatus);
+	connect(this, &HarmonicCalibration::motorPositionChanged, this, &HarmonicCalibration::updateMotorPosition);
+
+	connect(this, &HarmonicCalibration::commandLogWriteSignal, this, &HarmonicCalibration::commandLogWrite);
+	connect(this, &HarmonicCalibration::DIGIORegisterChanged, this, &HarmonicCalibration::updateDIGIOUI);
+	connect(this, &HarmonicCalibration::FaultRegisterChanged, this, &HarmonicCalibration::updateFaultRegisterUI);
+	connect(this, &HarmonicCalibration::DIAG1RegisterChanged, this, &HarmonicCalibration::updateMTDiagnosticRegisterUI);
+	connect(this, &HarmonicCalibration::DIAG2RegisterChanged, this, &HarmonicCalibration::updateMTDiagnosticsUI);
+
+	startAcquisitionUITask();
+	startDeviceStatusMonitor();
+	startCurrentMotorPositionMonitor();
 }
 
-HarmonicCalibration::~HarmonicCalibration() {}
+HarmonicCalibration::~HarmonicCalibration() 
+{
+	requestDisconnect();
+}
 
 ToolTemplate* HarmonicCalibration::createAcquisitionWidget()
 {
@@ -516,13 +550,13 @@ ToolTemplate* HarmonicCalibration::createAcquisitionWidget()
 	acquisitionDeviceStatusSection->contentLayout()->setSpacing(8);
 	acquisitionDeviceStatusWidget->contentLayout()->addWidget(acquisitionDeviceStatusSection);
 
-	acquisitionFaultRegisterLEDWidget = createStatusLEDWidget("Fault Register", statusLEDColor, acquisitionDeviceStatusSection);
+	acquisitionFaultRegisterLEDWidget = createStatusLEDWidget("Fault Register", json::theme::content_success, true, acquisitionDeviceStatusSection);
 	acquisitionDeviceStatusSection->contentLayout()->addWidget(acquisitionFaultRegisterLEDWidget);
 
 	if(deviceType == "Automotive" && generalRegisterMap.at("Sequence Type") == 1) // Automotive & Sequence Mode 2
 	{
-		MenuControlButton *acquisitionSPICRCLEDWidget = createStatusLEDWidget("SPI CRC", statusLEDColor, acquisitionDeviceStatusSection);
-		MenuControlButton *acquisitionSPIFlagLEDWidget = createStatusLEDWidget("SPI Flag", statusLEDColor, acquisitionDeviceStatusSection);
+		QCheckBox *acquisitionSPICRCLEDWidget = createStatusLEDWidget("SPI CRC", json::theme::content_success, true, acquisitionDeviceStatusSection);
+		QCheckBox *acquisitionSPIFlagLEDWidget = createStatusLEDWidget("SPI Flag", json::theme::content_success, true, acquisitionDeviceStatusSection);
 		acquisitionDeviceStatusSection->contentLayout()->addWidget(acquisitionSPICRCLEDWidget);
 		acquisitionDeviceStatusSection->contentLayout()->addWidget(acquisitionSPIFlagLEDWidget);
 	}
@@ -562,15 +596,6 @@ ToolTemplate* HarmonicCalibration::createAcquisitionWidget()
 	connectLineEditToNumberWrite(motorMaxDisplacementSpinBox->lineEdit(), dmax, ADMTController::MotorAttribute::DMAX);
 	connectLineEditToNumberWrite(motorTargetPositionLineEdit, target_pos, ADMTController::MotorAttribute::TARGET_POS);
 	connectMenuComboToNumber(m_calibrationMotorRampModeMenuCombo, ramp_mode);
-
-	acquisitionUITimer = new QTimer(this);
-	connect(acquisitionUITimer, &QTimer::timeout, this, &HarmonicCalibration::acquisitionUITask);
-
-	calibrationUITimer = new QTimer(this);
-	connect(calibrationUITimer, &QTimer::timeout, this, &HarmonicCalibration::calibrationUITask);
-
-	utilityTimer = new QTimer(this);
-	connect(utilityTimer, &QTimer::timeout, this, &HarmonicCalibration::utilityTask);
 
 	return tool;
 }
@@ -892,13 +917,13 @@ ToolTemplate* HarmonicCalibration::createCalibrationWidget()
 	calibrationDeviceStatusSection->contentLayout()->setSpacing(8);
 	calibrationDeviceStatusWidget->contentLayout()->addWidget(calibrationDeviceStatusSection);
 
-	calibrationFaultRegisterLEDWidget = createStatusLEDWidget("Fault Register", statusLEDColor, calibrationDeviceStatusSection);
+	calibrationFaultRegisterLEDWidget = createStatusLEDWidget("Fault Register", json::theme::content_success, true, calibrationDeviceStatusSection);
 	calibrationDeviceStatusSection->contentLayout()->addWidget(calibrationFaultRegisterLEDWidget);
 
 	if(deviceType == "Automotive" && generalRegisterMap.at("Sequence Type") == 1) // Automotive & Sequence Mode 2
 	{
-		MenuControlButton *calibrationSPICRCLEDWidget = createStatusLEDWidget("SPI CRC", statusLEDColor, calibrationDeviceStatusSection);
-		MenuControlButton *calibrationSPIFlagLEDWidget = createStatusLEDWidget("SPI Flag", statusLEDColor, calibrationDeviceStatusSection);
+		QCheckBox *calibrationSPICRCLEDWidget = createStatusLEDWidget("SPI CRC", json::theme::content_success, true, calibrationDeviceStatusSection);
+		QCheckBox *calibrationSPIFlagLEDWidget = createStatusLEDWidget("SPI Flag", json::theme::content_success, true, calibrationDeviceStatusSection);
 		calibrationDeviceStatusSection->contentLayout()->addWidget(calibrationSPICRCLEDWidget);
 		calibrationDeviceStatusSection->contentLayout()->addWidget(calibrationSPIFlagLEDWidget);
 	}
@@ -1446,19 +1471,20 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	QVBoxLayout *DIGIOLayout = new QVBoxLayout(DIGIOWidget);
 	DIGIOWidget->setLayout(DIGIOLayout);
 	DIGIOLayout->setMargin(0);
-	DIGIOLayout->setSpacing(5);
+	DIGIOLayout->setSpacing(8);
 
 	#pragma region DIGIO Monitor
 	MenuSectionWidget *DIGIOMonitorSectionWidget = new MenuSectionWidget(DIGIOWidget);
 	MenuCollapseSection *DIGIOMonitorCollapseSection = new MenuCollapseSection("DIGIO Monitor", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, DIGIOMonitorSectionWidget);
 	DIGIOMonitorSectionWidget->contentLayout()->addWidget(DIGIOMonitorCollapseSection);
+	DIGIOMonitorCollapseSection->contentLayout()->setSpacing(8);
 
-	DIGIOBusyStatusLED = createStatusLEDWidget("BUSY (Output)", statusLEDColor, DIGIOMonitorCollapseSection);
-	DIGIOCNVStatusLED = createStatusLEDWidget("CNV (Input)", statusLEDColor, DIGIOMonitorCollapseSection);
-	DIGIOSENTStatusLED = createStatusLEDWidget("SENT (Output)", statusLEDColor, DIGIOMonitorCollapseSection);
-	DIGIOACALCStatusLED = createStatusLEDWidget("ACALC (Output)", statusLEDColor, DIGIOMonitorCollapseSection);
-	DIGIOFaultStatusLED = createStatusLEDWidget("FAULT (Output)", statusLEDColor, DIGIOMonitorCollapseSection);
-	DIGIOBootloaderStatusLED = createStatusLEDWidget("BOOTLOADER (Output)", statusLEDColor, DIGIOMonitorCollapseSection);
+	DIGIOBusyStatusLED = createStatusLEDWidget("BUSY (Output)", json::theme::background_primary, true, DIGIOMonitorCollapseSection);
+	DIGIOCNVStatusLED = createStatusLEDWidget("CNV (Input)", json::theme::background_primary, true, DIGIOMonitorCollapseSection);
+	DIGIOSENTStatusLED = createStatusLEDWidget("SENT (Output)", json::theme::background_primary, true, DIGIOMonitorCollapseSection);
+	DIGIOACALCStatusLED = createStatusLEDWidget("ACALC (Output)", json::theme::background_primary, true, DIGIOMonitorCollapseSection);
+	DIGIOFaultStatusLED = createStatusLEDWidget("FAULT (Output)", json::theme::background_primary, true, DIGIOMonitorCollapseSection);
+	DIGIOBootloaderStatusLED = createStatusLEDWidget("BOOTLOADER (Output)", json::theme::background_primary, true, DIGIOMonitorCollapseSection);
 
 	DIGIOMonitorCollapseSection->contentLayout()->addWidget(DIGIOBusyStatusLED);
 	DIGIOMonitorCollapseSection->contentLayout()->addWidget(DIGIOCNVStatusLED);
@@ -1565,8 +1591,9 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	DIGIOResetButton->setFixedWidth(100);
 	StyleHelper::BasicButton(DIGIOResetButton);
 	connect(DIGIOResetButton, &QPushButton::clicked, [=]{
+		toggleUtilityTask(false);
 		resetDIGIO();
-		updateDIGIOToggle();
+		toggleUtilityTask(true);
 	});
 
 	DIGIOControlGridLayout->addWidget(DIGIOFunctionLabel, 0, 1);
@@ -1617,15 +1644,16 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	MenuSectionWidget *MTDIAG1SectionWidget = new MenuSectionWidget(centerUtilityWidget);
 	MenuCollapseSection *MTDIAG1CollapseSection = new MenuCollapseSection("MT Diagnostic Register", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, MTDIAG1SectionWidget);
 	MTDIAG1SectionWidget->contentLayout()->addWidget(MTDIAG1CollapseSection);
+	MTDIAG1CollapseSection->contentLayout()->setSpacing(8);
 
-	R0StatusLED = createStatusLEDWidget("R0", statusLEDColor, MTDIAG1SectionWidget);
-	R1StatusLED = createStatusLEDWidget("R1", statusLEDColor, MTDIAG1SectionWidget);
-	R2StatusLED = createStatusLEDWidget("R2", statusLEDColor, MTDIAG1SectionWidget);
-	R3StatusLED = createStatusLEDWidget("R3", statusLEDColor, MTDIAG1SectionWidget);
-	R4StatusLED = createStatusLEDWidget("R4", statusLEDColor, MTDIAG1SectionWidget);
-	R5StatusLED = createStatusLEDWidget("R5", statusLEDColor, MTDIAG1SectionWidget);
-	R6StatusLED = createStatusLEDWidget("R6", statusLEDColor, MTDIAG1SectionWidget);
-	R7StatusLED = createStatusLEDWidget("R7", statusLEDColor, MTDIAG1SectionWidget);
+	R0StatusLED = createStatusLEDWidget("R0", json::theme::background_primary, true, MTDIAG1SectionWidget);
+	R1StatusLED = createStatusLEDWidget("R1", json::theme::background_primary, true, MTDIAG1SectionWidget);
+	R2StatusLED = createStatusLEDWidget("R2", json::theme::background_primary, true, MTDIAG1SectionWidget);
+	R3StatusLED = createStatusLEDWidget("R3", json::theme::background_primary, true, MTDIAG1SectionWidget);
+	R4StatusLED = createStatusLEDWidget("R4", json::theme::background_primary, true, MTDIAG1SectionWidget);
+	R5StatusLED = createStatusLEDWidget("R5", json::theme::background_primary, true, MTDIAG1SectionWidget);
+	R6StatusLED = createStatusLEDWidget("R6", json::theme::background_primary, true, MTDIAG1SectionWidget);
+	R7StatusLED = createStatusLEDWidget("R7", json::theme::background_primary, true, MTDIAG1SectionWidget);
 
 	MTDIAG1CollapseSection->contentLayout()->addWidget(R0StatusLED);
 	MTDIAG1CollapseSection->contentLayout()->addWidget(R1StatusLED);
@@ -1645,7 +1673,7 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	QVBoxLayout *MTDiagnosticsLayout = new QVBoxLayout(MTDiagnosticsWidget);
 	MTDiagnosticsWidget->setLayout(MTDiagnosticsLayout);
 	MTDiagnosticsLayout->setMargin(0);
-	MTDiagnosticsLayout->setSpacing(5);
+	MTDiagnosticsLayout->setSpacing(8);
 
 	MenuSectionWidget *MTDiagnosticsSectionWidget = new MenuSectionWidget(centerUtilityWidget);
 	MenuCollapseSection *MTDiagnosticsCollapseSection = new MenuCollapseSection("MT Diagnostics", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, MTDiagnosticsSectionWidget);
@@ -1699,22 +1727,23 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	MenuSectionWidget *faultRegisterSectionWidget = new MenuSectionWidget(rightUtilityWidget);
 	MenuCollapseSection *faultRegisterCollapseSection = new MenuCollapseSection("Fault Register", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, faultRegisterSectionWidget);
 	faultRegisterSectionWidget->contentLayout()->addWidget(faultRegisterCollapseSection);
+	faultRegisterCollapseSection->contentLayout()->setSpacing(8);
 	
-	VDDUnderVoltageStatusLED = createStatusLEDWidget("VDD Under Voltage", faultLEDColor, faultRegisterCollapseSection);
-	VDDOverVoltageStatusLED = createStatusLEDWidget("VDD Over Voltage", faultLEDColor, faultRegisterCollapseSection);
-	VDRIVEUnderVoltageStatusLED = createStatusLEDWidget("VDRIVE Under Voltage", faultLEDColor, faultRegisterCollapseSection);
-	VDRIVEOverVoltageStatusLED = createStatusLEDWidget("VDRIVE Over Voltage", faultLEDColor, faultRegisterCollapseSection);
-	AFEDIAGStatusLED = createStatusLEDWidget("AFEDIAG", faultLEDColor, faultRegisterCollapseSection);
-	NVMCRCFaultStatusLED = createStatusLEDWidget("NVM CRC Fault", faultLEDColor, faultRegisterCollapseSection);
-	ECCDoubleBitErrorStatusLED = createStatusLEDWidget("ECC Double Bit Error", faultLEDColor, faultRegisterCollapseSection);
-	OscillatorDriftStatusLED = createStatusLEDWidget("Oscillator Drift", faultLEDColor, faultRegisterCollapseSection);
-	CountSensorFalseStateStatusLED = createStatusLEDWidget("Count Sensor False State", faultLEDColor, faultRegisterCollapseSection);
-	AngleCrossCheckStatusLED = createStatusLEDWidget("Angle Cross Check", faultLEDColor, faultRegisterCollapseSection);
-	TurnCountSensorLevelsStatusLED = createStatusLEDWidget("Turn Count Sensor Levels", faultLEDColor, faultRegisterCollapseSection);
-	MTDIAGStatusLED = createStatusLEDWidget("MTDIAG", faultLEDColor, faultRegisterCollapseSection);
-	TurnCounterCrossCheckStatusLED = createStatusLEDWidget("Turn Counter Cross Check", faultLEDColor, faultRegisterCollapseSection);
-	RadiusCheckStatusLED = createStatusLEDWidget("Radius Check", faultLEDColor, faultRegisterCollapseSection);
-	SequencerWatchdogStatusLED = createStatusLEDWidget("Sequencer Watchdog", faultLEDColor, faultRegisterCollapseSection);
+	VDDUnderVoltageStatusLED = createStatusLEDWidget("VDD Under Voltage", json::theme::content_error, true, faultRegisterCollapseSection);
+	VDDOverVoltageStatusLED = createStatusLEDWidget("VDD Over Voltage", json::theme::content_error, true, faultRegisterCollapseSection);
+	VDRIVEUnderVoltageStatusLED = createStatusLEDWidget("VDRIVE Under Voltage", json::theme::content_error, true, faultRegisterCollapseSection);
+	VDRIVEOverVoltageStatusLED = createStatusLEDWidget("VDRIVE Over Voltage", json::theme::content_error, true, faultRegisterCollapseSection);
+	AFEDIAGStatusLED = createStatusLEDWidget("AFEDIAG", json::theme::content_error, true, faultRegisterCollapseSection);
+	NVMCRCFaultStatusLED = createStatusLEDWidget("NVM CRC Fault", json::theme::content_error, true, faultRegisterCollapseSection);
+	ECCDoubleBitErrorStatusLED = createStatusLEDWidget("ECC Double Bit Error", json::theme::content_error, true, faultRegisterCollapseSection);
+	OscillatorDriftStatusLED = createStatusLEDWidget("Oscillator Drift", json::theme::content_error, true, faultRegisterCollapseSection);
+	CountSensorFalseStateStatusLED = createStatusLEDWidget("Count Sensor False State", json::theme::content_error, true, faultRegisterCollapseSection);
+	AngleCrossCheckStatusLED = createStatusLEDWidget("Angle Cross Check", json::theme::content_error, true, faultRegisterCollapseSection);
+	TurnCountSensorLevelsStatusLED = createStatusLEDWidget("Turn Count Sensor Levels", json::theme::content_error, true, faultRegisterCollapseSection);
+	MTDIAGStatusLED = createStatusLEDWidget("MTDIAG", json::theme::content_error, true, faultRegisterCollapseSection);
+	TurnCounterCrossCheckStatusLED = createStatusLEDWidget("Turn Counter Cross Check", json::theme::content_error, true, faultRegisterCollapseSection);
+	RadiusCheckStatusLED = createStatusLEDWidget("Radius Check", json::theme::content_error, true, faultRegisterCollapseSection);
+	SequencerWatchdogStatusLED = createStatusLEDWidget("Sequencer Watchdog", json::theme::content_error, true, faultRegisterCollapseSection);
 
 	faultRegisterCollapseSection->contentLayout()->addWidget(VDDUnderVoltageStatusLED);
 	faultRegisterCollapseSection->contentLayout()->addWidget(VDDOverVoltageStatusLED);
@@ -1742,8 +1771,8 @@ ToolTemplate* HarmonicCalibration::createUtilityWidget()
 	tool->leftContainer()->setVisible(true);
 	tool->rightContainer()->setVisible(true);
 	tool->bottomContainer()->setVisible(false);
-	tool->setLeftContainerWidth(270);
-	tool->setRightContainerWidth(270);
+	tool->setLeftContainerWidth(240);
+	tool->setRightContainerWidth(224);
 	tool->openBottomContainerHelper(false);
 	tool->openTopContainerHelper(false);
 
@@ -1791,6 +1820,7 @@ void HarmonicCalibration::readDeviceProperties()
 void HarmonicCalibration::initializeADMT()
 {
 	bool success = resetDIGIO();
+	success = resetGENERAL();
 
 	if(!success){ StatusBarManager::pushMessage("Failed initialize ADMT"); }
 }
@@ -1823,7 +1853,7 @@ void HarmonicCalibration::applySequence(){
 	});
 	uint32_t *generalRegValue = new uint32_t;
 	uint32_t generalRegisterAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL);
-	std::map<string, int> settings;
+	map<string, int> settings;
 
 	settings["Convert Synchronization"] = qvariant_cast<int>(convertSynchronizationMenuCombo->combo()->currentData()); // convertSync;
 	settings["Angle Filter"] = qvariant_cast<int>(angleFilterMenuCombo->combo()->currentData()); // angleFilter;
@@ -1900,27 +1930,46 @@ void HarmonicCalibration::initializeMotor()
 	readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
 }
 
+void HarmonicCalibration::startDeviceStatusMonitor()
+{
+	isDeviceStatusMonitor = true;
+	m_deviceStatusThread = QtConcurrent::run(this, &HarmonicCalibration::getDeviceFaultStatus, deviceStatusMonitorRate);
+	m_deviceStatusWatcher.setFuture(m_deviceStatusThread);
+}
+
+void HarmonicCalibration::stopDeviceStatusMonitor()
+{
+	isDeviceStatusMonitor = false;
+	if(m_deviceStatusThread.isRunning())
+	{
+		m_deviceStatusThread.cancel();
+		m_deviceStatusWatcher.waitForFinished();
+	}
+}
+
 void HarmonicCalibration::getDeviceFaultStatus(int sampleRate)
 {
+	uint32_t *readValue = new uint32_t;
+	bool registerFault = false;
 	while(isDeviceStatusMonitor)
 	{
-		uint32_t *readValue = new uint32_t;
 		if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::FAULT), 0) == 0)
 		{
 			if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::FAULT), readValue) == 0)
 			{
-				deviceStatusFault = m_admtController->checkRegisterFault(static_cast<uint16_t>(*readValue), generalRegisterMap.at("Sequence Type") == 0 ? true : false);
+				registerFault = m_admtController->checkRegisterFault(static_cast<uint16_t>(*readValue), generalRegisterMap.at("Sequence Type") == 0 ? true : false);
+				Q_EMIT updateFaultStatusSignal(registerFault);
 			}
 			else
 			{
-				deviceStatusFault = true;
+				Q_EMIT updateFaultStatusSignal(true);
 			}
 		}
 		else
 		{
-			deviceStatusFault = true;
+			Q_EMIT updateFaultStatusSignal(true);
 		}
 
 		QThread::msleep(sampleRate);
@@ -1929,16 +1978,67 @@ void HarmonicCalibration::getDeviceFaultStatus(int sampleRate)
 
 void HarmonicCalibration::requestDisconnect()
 {
-	isStartAcquisition = false;
-	isDeviceStatusMonitor = false;
+	stopAcquisition();
 
-	m_deviceStatusThread.cancel();
-	m_acquisitionDataThread.cancel();
-	m_acquisitionGraphThread.cancel();
+	stopAcquisitionUITask();
+	stopCalibrationUITask();
+	stopUtilityTask();
 
-	m_deviceStatusWatcher.waitForFinished();
-	m_acquisitionDataWatcher.waitForFinished();
-	m_acquisitionGraphWatcher.waitForFinished();
+	stopDeviceStatusMonitor();
+	stopCurrentMotorPositionMonitor();
+}
+
+void HarmonicCalibration::startCurrentMotorPositionMonitor()
+{
+	isMotorPositionMonitor = true;
+	m_currentMotorPositionThread = QtConcurrent::run(this, &HarmonicCalibration::currentMotorPositionTask, motorPositionMonitorRate);
+	m_currentMotorPositionWatcher.setFuture(m_currentMotorPositionThread);
+}
+
+void HarmonicCalibration::stopCurrentMotorPositionMonitor()
+{
+	isMotorPositionMonitor = false;
+	if(m_currentMotorPositionThread.isRunning())
+	{
+		m_currentMotorPositionThread.cancel();
+		m_currentMotorPositionWatcher.waitForFinished();
+	}
+}
+
+void HarmonicCalibration::currentMotorPositionTask(int sampleRate)
+{
+	double motorPosition = 0;
+	while(isMotorPositionMonitor)
+	{
+		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, motorPosition);
+
+		Q_EMIT motorPositionChanged(motorPosition);
+
+		QThread::msleep(sampleRate);
+	}
+}
+
+void HarmonicCalibration::updateMotorPosition(double position)
+{
+	current_pos = position;
+	if(isAcquisitionTab) updateLineEditValue(acquisitionMotorCurrentPositionLineEdit, current_pos);
+	else if(isCalibrationTab) updateLineEditValue(calibrationMotorCurrentPositionLineEdit, current_pos);
+}
+
+bool HarmonicCalibration::resetGENERAL()
+{
+	bool success = false;
+
+	uint32_t resetValue = 0x0000;
+	if(deviceRegisterMap.at("ASIL ID") == "ASIL QM") { resetValue = 0x1230; } // Industrial or ASIL QM
+	else if(deviceRegisterMap.at("ASIL ID") == "ASIL B") { resetValue = 0x1200; } // Automotive or ASIL B
+
+	if(resetValue != 0x0000){
+		if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+											  m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL), resetValue) == 0) { success = true; }
+	}
+
+	return success;
 }
 
 #pragma region Acquisition Methods
@@ -1987,13 +2087,36 @@ void HarmonicCalibration::startAcquisition()
 	m_acquisitionDataWatcher.setFuture(m_acquisitionDataThread);
 	m_acquisitionGraphThread = QtConcurrent::run(this, &HarmonicCalibration::acquisitionPlotTask, acquisitionGraphSampleRate);
 	m_acquisitionGraphWatcher.setFuture(m_acquisitionGraphThread);
+
+	startCurrentMotorPositionMonitor();
 }
 
-void HarmonicCalibration::startAcquisitionDeviceStatusMonitor()
+void HarmonicCalibration::stopAcquisition()
 {
-	isDeviceStatusMonitor = true;
-	m_deviceStatusThread = QtConcurrent::run(this, &HarmonicCalibration::getDeviceFaultStatus, deviceStatusMonitorRate);
-	m_deviceStatusWatcher.setFuture(m_deviceStatusThread);
+	isStartAcquisition = false;
+	if(m_acquisitionDataThread.isRunning())
+	{
+		m_acquisitionDataThread.cancel();
+		m_acquisitionDataWatcher.waitForFinished();
+	}
+	if(m_acquisitionGraphThread.isRunning())
+	{
+		m_acquisitionGraphThread.cancel();
+		m_acquisitionGraphWatcher.waitForFinished();
+	}
+
+	stopCurrentMotorPositionMonitor();
+}
+
+void HarmonicCalibration::updateFaultStatus(bool status)
+{
+	bool isChanged = (deviceStatusFault != status);
+	if(isChanged)
+	{
+		deviceStatusFault = status;
+		toggleStatusLEDColor(acquisitionFaultRegisterLEDWidget, json::theme::content_error, json::theme::content_success, deviceStatusFault);
+		toggleStatusLEDColor(calibrationFaultRegisterLEDWidget, json::theme::content_error, json::theme::content_success, deviceStatusFault);
+	}
 }
 
 void HarmonicCalibration::getAcquisitionSamples(int sampleRate)
@@ -2063,7 +2186,7 @@ double HarmonicCalibration::getAcquisitionParameterValue(const AcquisitionDataKe
 void HarmonicCalibration::plotAcquisition(QVector<double>& list, PlotChannel* channel)
 {
 	channel->curve()->setSamples(list);
-	auto result = std::minmax_element(list.begin(), list.end());
+	auto result = minmax_element(list.begin(), list.end());
 	if(*result.first < acquisitionGraphYMin) acquisitionGraphYMin = *result.first;
 	if(*result.second > acquisitionGraphYMax) acquisitionGraphYMax = *result.second;
 }
@@ -2110,15 +2233,30 @@ void HarmonicCalibration::acquisitionPlotTask(int sampleRate)
 	}
 }
 
-void HarmonicCalibration::acquisitionUITask()
+void HarmonicCalibration::acquisitionUITask(int sampleRate)
 {
-	updateFaultStatusLEDColor(acquisitionFaultRegisterLEDWidget, deviceStatusFault);
-
-	if(isStartAcquisition)
+	while(isAcquisitionTab)
 	{
-		readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
-		updateLineEditValues();
-		updateLineEditValue(acquisitionMotorCurrentPositionLineEdit, current_pos);
+		if(isStartAcquisition) updateLineEditValues();
+
+		QThread::msleep(sampleRate);
+	}
+}
+
+void HarmonicCalibration::startAcquisitionUITask()
+{
+	isAcquisitionTab = true;
+	m_acquisitionUIThread = QtConcurrent::run(this, &HarmonicCalibration::acquisitionUITask, acquisitionUITimerRate);
+	m_acquisitionUIWatcher.setFuture(m_acquisitionUIThread);
+}
+
+void HarmonicCalibration::stopAcquisitionUITask()
+{
+	isAcquisitionTab = false;
+	if(m_acquisitionUIThread.isRunning())
+	{
+		m_acquisitionUIThread.cancel();
+		m_acquisitionUIWatcher.waitForFinished();
 	}
 }
 
@@ -2224,29 +2362,40 @@ void HarmonicCalibration::run(bool b)
 #pragma endregion
 
 #pragma region Calibration Methods
-void HarmonicCalibration::startCalibrationDeviceStatusMonitor()
+void HarmonicCalibration::startCalibrationUITask()
 {
-	isDeviceStatusMonitor = true;
-	m_deviceStatusThread = QtConcurrent::run(this, &HarmonicCalibration::getDeviceFaultStatus, deviceStatusMonitorRate);
-	m_deviceStatusWatcher.setFuture(m_deviceStatusThread);
+	isCalibrationTab = true;
+	m_calibrationUIThread = QtConcurrent::run(this, &HarmonicCalibration::calibrationUITask, calibrationUITimerRate);
+	m_calibrationUIWatcher.setFuture(m_calibrationUIThread);
 }
 
-void HarmonicCalibration::calibrationUITask()
+void HarmonicCalibration::stopCalibrationUITask()
 {
-	readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
-	updateLineEditValue(calibrationMotorCurrentPositionLineEdit, current_pos);
-	updateFaultStatusLEDColor(calibrationFaultRegisterLEDWidget, deviceStatusFault);
-
-	if(isStartMotor)
+	isCalibrationTab = false;
+	if(m_calibrationUIThread.isRunning())
 	{
-		if(isPostCalibration){
-			postCalibrationRawDataPlotChannel->curve()->setSamples(graphPostDataList);
-			postCalibrationRawDataPlotWidget->replot();
+		m_calibrationUIThread.cancel();
+		m_calibrationUIWatcher.waitForFinished();
+	}
+}
+
+void HarmonicCalibration::calibrationUITask(int sampleRate)
+{
+	while (isCalibrationTab)
+	{
+		if(isStartMotor)
+		{
+			if(isPostCalibration){
+				postCalibrationRawDataPlotChannel->curve()->setSamples(graphPostDataList);
+				postCalibrationRawDataPlotWidget->replot();
+			}
+			else{
+				calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
+				calibrationRawDataPlotWidget->replot();
+			}
 		}
-		else{
-			calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
-			calibrationRawDataPlotWidget->replot();
-		}
+
+		QThread::msleep(sampleRate);
 	}
 }
 
@@ -2431,15 +2580,15 @@ void HarmonicCalibration::populateAngleErrorGraphs()
 	QVector<double> FFTAngleErrorPhase = QVector<double>(m_admtController->FFTAngleErrorPhase.begin(), m_admtController->FFTAngleErrorPhase.end());
 
 	angleErrorPlotChannel->curve()->setSamples(angleError);
-	auto angleErrorMinMax = std::minmax_element(angleError.begin(), angleError.end());
+	auto angleErrorMinMax = minmax_element(angleError.begin(), angleError.end());
 	angleErrorYPlotAxis->setInterval(*angleErrorMinMax.first, *angleErrorMinMax.second);
 	angleErrorXPlotAxis->setInterval(0, angleError.size());
 	angleErrorPlotWidget->replot();
 	
 	FFTAngleErrorPhaseChannel->curve()->setSamples(FFTAngleErrorPhase);
 	FFTAngleErrorMagnitudeChannel->curve()->setSamples(FFTAngleErrorMagnitude);
-	auto angleErrorMagnitudeMinMax = std::minmax_element(FFTAngleErrorMagnitude.begin(), FFTAngleErrorMagnitude.end());
-	auto angleErrorPhaseMinMax = std::minmax_element(FFTAngleErrorPhase.begin(), FFTAngleErrorPhase.end());
+	auto angleErrorMagnitudeMinMax = minmax_element(FFTAngleErrorMagnitude.begin(), FFTAngleErrorMagnitude.end());
+	auto angleErrorPhaseMinMax = minmax_element(FFTAngleErrorPhase.begin(), FFTAngleErrorPhase.end());
 	double FFTAngleErrorPlotMin = *angleErrorMagnitudeMinMax.first < *angleErrorPhaseMinMax.first ? *angleErrorMagnitudeMinMax.first : *angleErrorPhaseMinMax.first;
 	double FFTAngleErrorPlotMax = *angleErrorMagnitudeMinMax.second > *angleErrorPhaseMinMax.second ? *angleErrorMagnitudeMinMax.second : *angleErrorPhaseMinMax.second;
 	FFTAngleErrorYPlotAxis->setInterval(FFTAngleErrorPlotMin, FFTAngleErrorPlotMax);
@@ -2456,15 +2605,15 @@ void HarmonicCalibration::populateCorrectedAngleErrorGraphs()
 	QVector<double> FFTCorrectedErrorPhase(m_admtController->FFTCorrectedErrorPhase.begin(), m_admtController->FFTCorrectedErrorPhase.end());
 
 	correctedErrorPlotChannel->curve()->setSamples(correctedError);
-	auto correctedErrorMagnitudeMinMax = std::minmax_element(correctedError.begin(), correctedError.end());
+	auto correctedErrorMagnitudeMinMax = minmax_element(correctedError.begin(), correctedError.end());
 	correctedErrorYPlotAxis->setInterval(*correctedErrorMagnitudeMinMax.first, *correctedErrorMagnitudeMinMax.second);
 	correctedErrorXPlotAxis->setMax(correctedError.size());
 	correctedErrorPlotWidget->replot();
 
 	FFTCorrectedErrorPhaseChannel->curve()->setSamples(FFTCorrectedErrorPhase);
 	FFTCorrectedErrorMagnitudeChannel->curve()->setSamples(FFTCorrectedErrorMagnitude);
-	auto FFTCorrectedErrorMagnitudeMinMax = std::minmax_element(FFTCorrectedErrorMagnitude.begin(), FFTCorrectedErrorMagnitude.end());
-	auto FFTCorrectedErrorPhaseMinMax = std::minmax_element(FFTCorrectedErrorPhase.begin(), FFTCorrectedErrorPhase.end());
+	auto FFTCorrectedErrorMagnitudeMinMax = minmax_element(FFTCorrectedErrorMagnitude.begin(), FFTCorrectedErrorMagnitude.end());
+	auto FFTCorrectedErrorPhaseMinMax = minmax_element(FFTCorrectedErrorPhase.begin(), FFTCorrectedErrorPhase.end());
 	double FFTCorrectedErrorPlotMin = *FFTCorrectedErrorMagnitudeMinMax.first < *FFTCorrectedErrorPhaseMinMax.first ? *FFTCorrectedErrorMagnitudeMinMax.first : *FFTCorrectedErrorPhaseMinMax.first;
 	double FFTCorrectedErrorPlotMax = *FFTCorrectedErrorMagnitudeMinMax.second > *FFTCorrectedErrorPhaseMinMax.second ? *FFTCorrectedErrorMagnitudeMinMax.second : *FFTCorrectedErrorPhaseMinMax.second;
 	FFTCorrectedErrorYPlotAxis->setInterval(FFTCorrectedErrorPlotMin, FFTCorrectedErrorPlotMax);
@@ -2880,27 +3029,53 @@ int HarmonicCalibration::writeMotorAttributeValue(ADMTController::MotorAttribute
 #pragma endregion
 
 #pragma region Utility Methods
-void HarmonicCalibration::utilityTask(){
-	updateDigioMonitor();
-	updateFaultRegister();
-	if(hasMTDiagnostics){
-		updateMTDiagRegister();
-		updateMTDiagnostics();
+void HarmonicCalibration::startUtilityTask()
+{
+	isUtilityTab = true;
+	m_utilityThread = QtConcurrent::run(this, &HarmonicCalibration::utilityTask, utilityUITimerRate);
+	m_utilityWatcher.setFuture(m_utilityThread);
+}
+
+void HarmonicCalibration::stopUtilityTask()
+{
+	isUtilityTab = false;
+	if(m_utilityThread.isRunning())
+	{
+		m_utilityThread.cancel();
+		m_utilityWatcher.waitForFinished();
 	}
-	commandLogWrite("");
+}
+
+void HarmonicCalibration::utilityTask(int sampleRate){
+	while(isUtilityTab)
+	{
+		getDIGIOENRegister();
+		getFAULTRegister();
+		if(hasMTDiagnostics)
+		{
+			getDIAG1Register();
+			getDIAG2Register();
+		}
+
+		Q_EMIT commandLogWriteSignal("");
+
+		QThread::msleep(sampleRate);
+	}
 }
 
 void HarmonicCalibration::toggleUtilityTask(bool run)
 {
-	if(run){
-		utilityTimer->start(utilityTimerRate);
+	if(run)
+	{
+		startUtilityTask();
 	}
-	else{
-		utilityTimer->stop();
+	else
+	{
+		stopUtilityTask();
 	}
 }
 
-void HarmonicCalibration::updateDigioMonitor(){
+void HarmonicCalibration::getDIGIOENRegister(){
 	uint32_t *digioRegValue = new uint32_t;
 	uint32_t digioEnPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
 	if(changeCNVPage(digioEnPage))
@@ -2908,187 +3083,149 @@ void HarmonicCalibration::updateDigioMonitor(){
 		uint32_t digioRegisterAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN);
 
 		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), digioRegisterAddress, digioRegValue) != -1){
-			std::map<std::string, bool> digioBitMapping =  m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*digioRegValue));
-			if(digioBitMapping.at("DIGIO0EN")){ 
-				if(!digioBitMapping.at("BUSY")){ 
-					changeStatusLEDColor(DIGIOBusyStatusLED, statusLEDColor); 
-					DIGIOBusyStatusLED->setName("BUSY (Output)");
-				}
-				else{
-					changeStatusLEDColor(DIGIOBusyStatusLED, gpioLEDColor); 
-					DIGIOBusyStatusLED->setName("GPIO0 (Output)");
-				}
-			}
-			else { 
-				changeStatusLEDColor(DIGIOBusyStatusLED, gpioLEDColor); 
-				DIGIOBusyStatusLED->setName("GPIO0 (Input)");
-			}
 
-			if(digioBitMapping.at("DIGIO1EN")){ 
-				if(!digioBitMapping.at("CNV")){ 
-					changeStatusLEDColor(DIGIOCNVStatusLED, statusLEDColor); 
-					DIGIOCNVStatusLED->setName("CNV (Input)");
-				}
-				else{
-					changeStatusLEDColor(DIGIOCNVStatusLED, gpioLEDColor); 
-					DIGIOCNVStatusLED->setName("GPIO1 (Output)");
-				}
-			}
-			else { 
-				changeStatusLEDColor(DIGIOCNVStatusLED, gpioLEDColor); 
-				DIGIOCNVStatusLED->setName("GPIO1 (Input)");
-			}
+			Q_EMIT DIGIORegisterChanged(digioRegValue);
 
-			if(digioBitMapping.at("DIGIO2EN")){ 
-				if(!digioBitMapping.at("SENT")){ 
-					changeStatusLEDColor(DIGIOSENTStatusLED, statusLEDColor); 
-					DIGIOSENTStatusLED->setName("SENT (Output)");
-				}
-				else{
-					changeStatusLEDColor(DIGIOSENTStatusLED, gpioLEDColor); 
-					DIGIOSENTStatusLED->setName("GPIO2 (Output)");
-				}
-			}
-			else { 
-				changeStatusLEDColor(DIGIOSENTStatusLED, gpioLEDColor); 
-				DIGIOSENTStatusLED->setName("GPIO2 (Input)");
-			}
-
-			if(digioBitMapping.at("DIGIO3EN")){ 
-				if(!digioBitMapping.at("ACALC")){ 
-					changeStatusLEDColor(DIGIOACALCStatusLED, statusLEDColor); 
-					DIGIOACALCStatusLED->setName("ACALC (Output)");
-				}
-				else{
-					changeStatusLEDColor(DIGIOACALCStatusLED, gpioLEDColor); 
-					DIGIOACALCStatusLED->setName("GPIO3 (Output)");
-				}
-			}
-			else { 
-				changeStatusLEDColor(DIGIOACALCStatusLED, gpioLEDColor); 
-				DIGIOACALCStatusLED->setName("GPIO3 (Input)");
-			}
-
-			if(digioBitMapping.at("DIGIO4EN")){ 
-				if(!digioBitMapping.at("FAULT")){ 
-					changeStatusLEDColor(DIGIOFaultStatusLED, statusLEDColor); 
-					DIGIOFaultStatusLED->setName("FAULT (Output)");
-				}
-				else{
-					changeStatusLEDColor(DIGIOFaultStatusLED, gpioLEDColor); 
-					DIGIOFaultStatusLED->setName("GPIO4 (Output)");
-				}
-			}
-			else { 
-				changeStatusLEDColor(DIGIOFaultStatusLED, gpioLEDColor); 
-				DIGIOFaultStatusLED->setName("GPIO4 (Input)");
-			}
-
-			if(digioBitMapping.at("DIGIO5EN")){ 
-				if(!digioBitMapping.at("BOOTLOAD")){ 
-					changeStatusLEDColor(DIGIOBootloaderStatusLED, statusLEDColor); 
-					DIGIOBootloaderStatusLED->setName("BOOTLOAD (Output)");
-				}
-				else{
-					changeStatusLEDColor(DIGIOBootloaderStatusLED, gpioLEDColor); 
-					DIGIOBootloaderStatusLED->setName("GPIO5 (Output)");
-				}
-			}
-			else { 
-				changeStatusLEDColor(DIGIOBootloaderStatusLED, gpioLEDColor); 
-				DIGIOBootloaderStatusLED->setName("GPIO5 (Input)");
-			}
-
-			commandLogWrite("DIGIOEN: 0b" + QString::number(static_cast<uint16_t>(*digioRegValue), 2).rightJustified(16, '0'));
+			Q_EMIT commandLogWriteSignal("DIGIOEN: 0b" + QString::number(static_cast<uint16_t>(*digioRegValue), 2).rightJustified(16, '0'));
 		}
-		else{ commandLogWrite("Failed to read DIGIOEN Register"); }
+		else{ Q_EMIT commandLogWriteSignal("Failed to read DIGIOEN Register"); }
 	}
 
+	delete digioRegValue;
 }
 
-bool HarmonicCalibration::updateDIGIOToggle()
+void HarmonicCalibration::updateDIGIOUI(uint32_t *registerValue)
 {
-	uint32_t *DIGIOENRegisterValue = new uint32_t;
-	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
-	bool success = false;
-
-	if(changeCNVPage(DIGIOENPage)){
-		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
-			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
-			DIGIOENRegisterValue) != -1)
-		{
-			map<string, bool> DIGIOSettings = m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));
-			DIGIO0ENToggleSwitch->setChecked(DIGIOSettings["DIGIO0EN"]);
-			DIGIO1ENToggleSwitch->setChecked(DIGIOSettings["DIGIO1EN"]);
-			DIGIO2ENToggleSwitch->setChecked(DIGIOSettings["DIGIO2EN"]);
-			DIGIO3ENToggleSwitch->setChecked(DIGIOSettings["DIGIO3EN"]);
-			DIGIO4ENToggleSwitch->setChecked(DIGIOSettings["DIGIO4EN"]);
-			DIGIO5ENToggleSwitch->setChecked(DIGIOSettings["DIGIO5EN"]);
-			DIGIO0FNCToggleSwitch->setChecked(DIGIOSettings["BUSY"]);
-			DIGIO1FNCToggleSwitch->setChecked(DIGIOSettings["CNV"]);
-			DIGIO2FNCToggleSwitch->setChecked(DIGIOSettings["SENT"]);
-			DIGIO3FNCToggleSwitch->setChecked(DIGIOSettings["ACALC"]);
-			DIGIO4FNCToggleSwitch->setChecked(DIGIOSettings["FAULT"]);
-			DIGIO5FNCToggleSwitch->setChecked(DIGIOSettings["BOOTLOAD"]);
-			success = true;
-		}
-	}
-	return success;
+	DIGIOENRegisterMap = m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*registerValue));
+	updateDIGIOMonitorUI();
+	updateDIGIOControlUI();
 }
 
-void HarmonicCalibration::updateMTDiagnostics(){
-	uint32_t *mtDiag1RegValue = new uint32_t;
+void HarmonicCalibration::updateDIGIOMonitorUI()
+{
+	map<string, bool> registerMap = DIGIOENRegisterMap;
+	if(!registerMap.at("BUSY")){ 
+		changeStatusLEDColor(DIGIOBusyStatusLED, json::theme::content_success); 
+		DIGIOBusyStatusLED->setText("BUSY (Output)");
+	}
+	else{
+		changeStatusLEDColor(DIGIOBusyStatusLED, json::theme::interactive_primary_idle); 
+		if(registerMap.at("DIGIO0EN")) DIGIOBusyStatusLED->setText("GPIO0 (Output)");
+		else DIGIOBusyStatusLED->setText("GPIO0 (Input)");
+	}
+
+	if(!registerMap.at("CNV")){ 
+		changeStatusLEDColor(DIGIOCNVStatusLED, json::theme::content_success); 
+		DIGIOCNVStatusLED->setText("CNV (Input)");
+	}
+	else{
+		changeStatusLEDColor(DIGIOCNVStatusLED, json::theme::interactive_primary_idle); 
+		if(registerMap.at("DIGIO1EN")) DIGIOCNVStatusLED->setText("GPIO1 (Output)");
+		else DIGIOCNVStatusLED->setText("GPIO1 (Input)");
+	}
+
+	if(!registerMap.at("SENT")){ 
+		changeStatusLEDColor(DIGIOSENTStatusLED, json::theme::content_success); 
+		DIGIOSENTStatusLED->setText("SENT (Output)");
+	}
+	else{
+		changeStatusLEDColor(DIGIOSENTStatusLED, json::theme::interactive_primary_idle); 
+		if(registerMap.at("DIGIO2EN")) DIGIOSENTStatusLED->setText("GPIO2 (Output)");
+		else DIGIOSENTStatusLED->setText("GPIO2 (Input)");
+	}
+
+	if(!registerMap.at("ACALC")){ 
+		changeStatusLEDColor(DIGIOACALCStatusLED, json::theme::content_success); 
+		DIGIOACALCStatusLED->setText("ACALC (Output)");
+	}
+	else{
+		changeStatusLEDColor(DIGIOACALCStatusLED, json::theme::interactive_primary_idle); 
+		if(registerMap.at("DIGIO3EN")) DIGIOACALCStatusLED->setText("GPIO3 (Output)");
+		else DIGIOACALCStatusLED->setText("GPIO3 (Input)");
+	}
+
+	if(!registerMap.at("FAULT")){ 
+		changeStatusLEDColor(DIGIOFaultStatusLED, json::theme::content_success); 
+		DIGIOFaultStatusLED->setText("FAULT (Output)");
+	}
+	else{
+		changeStatusLEDColor(DIGIOFaultStatusLED, json::theme::interactive_primary_idle); 
+		if(registerMap.at("DIGIO4EN")) DIGIOFaultStatusLED->setText("GPIO4 (Output)");
+		else DIGIOFaultStatusLED->setText("GPIO4 (Input)");
+	}
+
+	if(!registerMap.at("BOOTLOAD")){ 
+		changeStatusLEDColor(DIGIOBootloaderStatusLED, json::theme::content_success); 
+		DIGIOBootloaderStatusLED->setText("BOOTLOAD (Output)");
+	}
+	else{
+		changeStatusLEDColor(DIGIOBootloaderStatusLED, json::theme::interactive_primary_idle); 
+		if(registerMap.at("DIGIO5EN")) DIGIOBootloaderStatusLED->setText("GPIO5 (Output)");
+		else DIGIOBootloaderStatusLED->setText("GPIO5 (Input)");
+	}
+}
+
+void HarmonicCalibration::updateDIGIOControlUI()
+{
+	map<string, bool> registerMap = DIGIOENRegisterMap;
+
+	DIGIO0ENToggleSwitch->setChecked(registerMap.at("DIGIO0EN"));
+	DIGIO1ENToggleSwitch->setChecked(registerMap.at("DIGIO1EN"));
+	DIGIO2ENToggleSwitch->setChecked(registerMap.at("DIGIO2EN"));
+	DIGIO3ENToggleSwitch->setChecked(registerMap.at("DIGIO3EN"));
+	DIGIO4ENToggleSwitch->setChecked(registerMap.at("DIGIO4EN"));
+	DIGIO5ENToggleSwitch->setChecked(registerMap.at("DIGIO5EN"));
+	DIGIO0FNCToggleSwitch->setChecked(registerMap.at("BUSY"));
+	DIGIO1FNCToggleSwitch->setChecked(registerMap.at("CNV"));
+	DIGIO2FNCToggleSwitch->setChecked(registerMap.at("SENT"));
+	DIGIO3FNCToggleSwitch->setChecked(registerMap.at("ACALC"));
+	DIGIO4FNCToggleSwitch->setChecked(registerMap.at("FAULT"));
+	DIGIO5FNCToggleSwitch->setChecked(registerMap.at("BOOTLOAD"));
+}
+
+void HarmonicCalibration::getDIAG2Register(){
 	uint32_t *mtDiag2RegValue = new uint32_t;
 	uint32_t *cnvPageRegValue = new uint32_t;
 
-	uint32_t mtDiag1RegisterAddress = m_admtController->getSensorRegister(ADMTController::SensorRegister::DIAG1);
 	uint32_t mtDiag2RegisterAddress = m_admtController->getSensorRegister(ADMTController::SensorRegister::DIAG2);
 
-	uint32_t mtDiag1PageValue = m_admtController->getSensorPage(ADMTController::SensorRegister::DIAG1);
 	uint32_t mtDiag2PageValue = m_admtController->getSensorPage(ADMTController::SensorRegister::DIAG2);
 
 	uint32_t cnvPageAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE);
-
-	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, mtDiag1PageValue) != -1){
-		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, cnvPageRegValue) != -1){
-			if(*cnvPageRegValue == mtDiag1PageValue){
-				if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), mtDiag1RegisterAddress, mtDiag1RegValue) != -1){
-					std::map<std::string, double> mtDiag1BitMapping =  m_admtController->getDiag1RegisterBitMapping_Afe(static_cast<uint16_t>(*mtDiag1RegValue), is5V);
-
-					afeDiag2 = mtDiag1BitMapping.at("AFE Diagnostic 2");
-					AFEDIAG2LineEdit->setText(QString::number(afeDiag2) + " V");
-				}
-				else{ commandLogWrite("Failed to read MT Diagnostic 1 Register"); }
-			}
-			else{ commandLogWrite("CNVPAGE for MT Diagnostic 1 is a different value, abort reading"); }
-		}
-		else{ commandLogWrite("Failed to read CNVPAGE for MT Diagnostic 1"); }
-	}
-	else{ commandLogWrite("Failed to write CNVPAGE for MT Diagnostic 1"); }
 
 	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, mtDiag2PageValue) != -1){
 		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, cnvPageRegValue) != -1){
 			if(*cnvPageRegValue == mtDiag2PageValue){
 				if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), mtDiag2RegisterAddress, mtDiag2RegValue) != -1){
-					std::map<std::string, double> mtDiag2BitMapping =  m_admtController->getDiag2RegisterBitMapping(static_cast<uint16_t>(*mtDiag2RegValue));
 					
-					afeDiag0 = mtDiag2BitMapping.at("AFE Diagnostic 0 (-57%)");
-					afeDiag1 = mtDiag2BitMapping.at("AFE Diagnostic 1 (+57%)");
-					AFEDIAG0LineEdit->setText(QString::number(afeDiag0) + " V");
-					AFEDIAG1LineEdit->setText(QString::number(afeDiag1) + " V");
+					Q_EMIT DIAG2RegisterChanged(mtDiag2RegValue);
 
-					commandLogWrite("DIAG2: 0b" + QString::number(static_cast<uint16_t>(*mtDiag2RegValue), 2).rightJustified(16, '0'));
+					Q_EMIT commandLogWriteSignal("DIAG2: 0b" + QString::number(static_cast<uint16_t>(*mtDiag2RegValue), 2).rightJustified(16, '0'));
 				}
-				else{ commandLogWrite("Failed to read MT Diagnostic 2 Register"); }
+				else{ Q_EMIT commandLogWriteSignal("Failed to read MT Diagnostic 2 Register"); }
 			}
-			else{ commandLogWrite("CNVPAGE for MT Diagnostic 2 is a different value, abort reading"); }
+			else{ Q_EMIT commandLogWriteSignal("CNVPAGE for MT Diagnostic 2 is a different value, abort reading"); }
 		}
-		else{ commandLogWrite("Failed to read CNVPAGE for MT Diagnostic 2"); }
+		else{ Q_EMIT commandLogWriteSignal("Failed to read CNVPAGE for MT Diagnostic 2"); }
 	}
-	else{ commandLogWrite("Failed to write CNVPAGE for MT Diagnostic 2"); }
+	else{ Q_EMIT commandLogWriteSignal("Failed to write CNVPAGE for MT Diagnostic 2"); }
+
+	delete mtDiag2RegValue;
+	delete cnvPageRegValue;
 }
 
-void HarmonicCalibration::updateMTDiagRegister(){
+void HarmonicCalibration::updateMTDiagnosticsUI(uint32_t *registerValue)
+{
+	DIAG2RegisterMap =  m_admtController->getDiag2RegisterBitMapping(static_cast<uint16_t>(*registerValue));
+
+	map<string, double> regmap = DIAG2RegisterMap;
+	afeDiag0 = regmap.at("AFE Diagnostic 0 (-57%)");
+	afeDiag1 = regmap.at("AFE Diagnostic 1 (+57%)");
+	AFEDIAG0LineEdit->setText(QString::number(afeDiag0) + " V");
+	AFEDIAG1LineEdit->setText(QString::number(afeDiag1) + " V");
+}
+
+void HarmonicCalibration::getDIAG1Register(){
 	uint32_t *mtDiag1RegValue = new uint32_t;
 	uint32_t *cnvPageRegValue = new	uint32_t;
 	uint32_t mtDiag1RegisterAddress = m_admtController->getSensorRegister(ADMTController::SensorRegister::DIAG1);
@@ -3099,53 +3236,78 @@ void HarmonicCalibration::updateMTDiagRegister(){
 		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), cnvPageAddress, cnvPageRegValue) != -1){
 			if(*cnvPageRegValue == mtDiag1PageValue){
 				if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), mtDiag1RegisterAddress, mtDiag1RegValue) != -1){
-					std::map<std::string, bool> mtDiag1BitMapping =  m_admtController->getDiag1RegisterBitMapping_Register(static_cast<uint16_t>(*mtDiag1RegValue));
-					changeStatusLEDColor(R0StatusLED, statusLEDColor, mtDiag1BitMapping.at("R0"));
-					changeStatusLEDColor(R1StatusLED, statusLEDColor, mtDiag1BitMapping.at("R1"));
-					changeStatusLEDColor(R2StatusLED, statusLEDColor, mtDiag1BitMapping.at("R2"));
-					changeStatusLEDColor(R3StatusLED, statusLEDColor, mtDiag1BitMapping.at("R3"));
-					changeStatusLEDColor(R4StatusLED, statusLEDColor, mtDiag1BitMapping.at("R4"));
-					changeStatusLEDColor(R5StatusLED, statusLEDColor, mtDiag1BitMapping.at("R5"));
-					changeStatusLEDColor(R6StatusLED, statusLEDColor, mtDiag1BitMapping.at("R6"));
-					changeStatusLEDColor(R7StatusLED, statusLEDColor, mtDiag1BitMapping.at("R7"));
-					commandLogWrite("DIAG1: 0b" + QString::number(static_cast<uint16_t>(*mtDiag1RegValue), 2).rightJustified(16, '0'));
+					
+					Q_EMIT DIAG1RegisterChanged(mtDiag1RegValue);
+
+					Q_EMIT commandLogWriteSignal("DIAG1: 0b" + QString::number(static_cast<uint16_t>(*mtDiag1RegValue), 2).rightJustified(16, '0'));
 				}
-				else{ commandLogWrite("Failed to read MT Diagnostic 1 Register"); }
+				else{ Q_EMIT commandLogWriteSignal("Failed to read MT Diagnostic 1 Register"); }
 			}
-			else{ commandLogWrite("CNVPAGE for MT Diagnostic 1 is a different value, abort reading"); }
+			else{ Q_EMIT commandLogWriteSignal("CNVPAGE for MT Diagnostic 1 is a different value, abort reading"); }
 		}
-		else{ commandLogWrite("Failed to read CNVPAGE for MT Diagnostic 1"); }
+		else{ Q_EMIT commandLogWriteSignal("Failed to read CNVPAGE for MT Diagnostic 1"); }
 	}
-	else{ commandLogWrite("Failed to write CNVPAGE for MT Diagnostic 1"); }
+	else{ Q_EMIT commandLogWriteSignal("Failed to write CNVPAGE for MT Diagnostic 1"); }
+
+	delete mtDiag1RegValue;
+	delete cnvPageRegValue;
 }
 
-void HarmonicCalibration::updateFaultRegister(){
+void HarmonicCalibration::updateMTDiagnosticRegisterUI(uint32_t *registerValue)
+{
+	DIAG1RegisterMap =  m_admtController->getDiag1RegisterBitMapping_Register(static_cast<uint16_t>(*registerValue));
+	DIAG1AFERegisterMap = m_admtController->getDiag1RegisterBitMapping_Afe(static_cast<uint16_t>(*registerValue), is5V);
+
+	map<string, bool> regmap = DIAG1RegisterMap;
+	map<string, double> afeRegmap = DIAG1AFERegisterMap;
+	toggleStatusLEDColor(R0StatusLED, json::theme::content_success, json::theme::background_primary, DIAG1RegisterMap.at("R0"));
+	toggleStatusLEDColor(R1StatusLED, json::theme::content_success, json::theme::background_primary, DIAG1RegisterMap.at("R1"));
+	toggleStatusLEDColor(R2StatusLED, json::theme::content_success, json::theme::background_primary, DIAG1RegisterMap.at("R2"));
+	toggleStatusLEDColor(R3StatusLED, json::theme::content_success, json::theme::background_primary, DIAG1RegisterMap.at("R3"));
+	toggleStatusLEDColor(R4StatusLED, json::theme::content_success, json::theme::background_primary, DIAG1RegisterMap.at("R4"));
+	toggleStatusLEDColor(R5StatusLED, json::theme::content_success, json::theme::background_primary, DIAG1RegisterMap.at("R5"));
+	toggleStatusLEDColor(R6StatusLED, json::theme::content_success, json::theme::background_primary, DIAG1RegisterMap.at("R6"));
+	toggleStatusLEDColor(R7StatusLED, json::theme::content_success, json::theme::background_primary, DIAG1RegisterMap.at("R7"));
+	afeDiag2 = afeRegmap.at("AFE Diagnostic 2");
+	AFEDIAG2LineEdit->setText(QString::number(afeDiag2) + " V");
+}
+
+void HarmonicCalibration::getFAULTRegister(){
 	uint32_t *faultRegValue = new uint32_t;
 	uint32_t faultRegisterAddress = m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::FAULT);
 	m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), faultRegisterAddress, 0); // Write all zeros to fault before read
 	m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), faultRegisterAddress, faultRegValue);
 
 	if(*faultRegValue != -1){
-		std::map<std::string, bool> faultBitMapping =  m_admtController->getFaultRegisterBitMapping(static_cast<uint16_t>(*faultRegValue));
-		changeStatusLEDColor(VDDUnderVoltageStatusLED, faultLEDColor, faultBitMapping.at("VDD Under Voltage"));
-		changeStatusLEDColor(VDDOverVoltageStatusLED, faultLEDColor, faultBitMapping.at("VDD Over Voltage"));
-		changeStatusLEDColor(VDRIVEUnderVoltageStatusLED, faultLEDColor, faultBitMapping.at("VDRIVE Under Voltage"));
-		changeStatusLEDColor(VDRIVEOverVoltageStatusLED, faultLEDColor, faultBitMapping.at("VDRIVE Over Voltage"));
-		changeStatusLEDColor(AFEDIAGStatusLED, faultLEDColor, faultBitMapping.at("AFE Diagnostic"));
-		changeStatusLEDColor(NVMCRCFaultStatusLED, faultLEDColor, faultBitMapping.at("NVM CRC Fault"));
-		changeStatusLEDColor(ECCDoubleBitErrorStatusLED, faultLEDColor, faultBitMapping.at("ECC Double Bit Error"));
-		changeStatusLEDColor(OscillatorDriftStatusLED, faultLEDColor, faultBitMapping.at("Oscillator Drift"));
-		changeStatusLEDColor(CountSensorFalseStateStatusLED, faultLEDColor, faultBitMapping.at("Count Sensor False State"));
-		changeStatusLEDColor(AngleCrossCheckStatusLED, faultLEDColor, faultBitMapping.at("Angle Cross Check"));
-		changeStatusLEDColor(TurnCountSensorLevelsStatusLED, faultLEDColor, faultBitMapping.at("Turn Count Sensor Levels"));
-		changeStatusLEDColor(MTDIAGStatusLED, faultLEDColor, faultBitMapping.at("MT Diagnostic"));
-		changeStatusLEDColor(TurnCounterCrossCheckStatusLED, faultLEDColor, faultBitMapping.at("Turn Counter Cross Check"));
-		changeStatusLEDColor(RadiusCheckStatusLED, faultLEDColor, faultBitMapping.at("AMR Radius Check"));
-		changeStatusLEDColor(SequencerWatchdogStatusLED, faultLEDColor, faultBitMapping.at("Sequencer Watchdog"));
+		Q_EMIT FaultRegisterChanged(faultRegValue);
 
-		commandLogWrite("FAULT: 0b" + QString::number(static_cast<uint16_t>(*faultRegValue), 2).rightJustified(16, '0'));
+		Q_EMIT commandLogWriteSignal("FAULT: 0b" + QString::number(static_cast<uint16_t>(*faultRegValue), 2).rightJustified(16, '0'));
 	}
-	else{ commandLogWrite("Failed to read FAULT Register"); }
+	else{ Q_EMIT commandLogWriteSignal("Failed to read FAULT Register"); }
+
+	delete faultRegValue;
+}
+
+void HarmonicCalibration::updateFaultRegisterUI(uint32_t *faultRegValue)
+{
+	FAULTRegisterMap = m_admtController->getFaultRegisterBitMapping(static_cast<uint16_t>(*faultRegValue));
+
+	map<string, bool> regmap = FAULTRegisterMap;
+	toggleStatusLEDColor(VDDUnderVoltageStatusLED, json::theme::content_error, json::theme::background_primary, regmap.at("VDD Under Voltage"));
+	toggleStatusLEDColor(VDDOverVoltageStatusLED, json::theme::content_error, json::theme::background_primary, regmap.at("VDD Over Voltage"));
+	toggleStatusLEDColor(VDRIVEUnderVoltageStatusLED, json::theme::content_error, json::theme::background_primary, regmap.at("VDRIVE Under Voltage"));
+	toggleStatusLEDColor(VDRIVEOverVoltageStatusLED, json::theme::content_error, json::theme::background_primary, regmap.at("VDRIVE Over Voltage"));
+	toggleStatusLEDColor(AFEDIAGStatusLED, json::theme::content_error, json::theme::background_primary, regmap.at("AFE Diagnostic"));
+	toggleStatusLEDColor(NVMCRCFaultStatusLED, json::theme::content_error, json::theme::background_primary, regmap.at("NVM CRC Fault"));
+	toggleStatusLEDColor(ECCDoubleBitErrorStatusLED, json::theme::content_error, json::theme::background_primary, regmap.at("ECC Double Bit Error"));
+	toggleStatusLEDColor(OscillatorDriftStatusLED, json::theme::content_error, json::theme::background_primary, regmap.at("Oscillator Drift"));
+	toggleStatusLEDColor(CountSensorFalseStateStatusLED, json::theme::content_error, json::theme::background_primary, regmap.at("Count Sensor False State"));
+	toggleStatusLEDColor(AngleCrossCheckStatusLED, json::theme::content_error, json::theme::background_primary, regmap.at("Angle Cross Check"));
+	toggleStatusLEDColor(TurnCountSensorLevelsStatusLED, json::theme::content_error, json::theme::background_primary, regmap.at("Turn Count Sensor Levels"));
+	toggleStatusLEDColor(MTDIAGStatusLED, json::theme::content_error, json::theme::background_primary, regmap.at("MT Diagnostic"));
+	toggleStatusLEDColor(TurnCounterCrossCheckStatusLED, json::theme::content_error, json::theme::background_primary, regmap.at("Turn Counter Cross Check"));
+	toggleStatusLEDColor(RadiusCheckStatusLED, json::theme::content_error, json::theme::background_primary, regmap.at("AMR Radius Check"));
+	toggleStatusLEDColor(SequencerWatchdogStatusLED, json::theme::content_error, json::theme::background_primary, regmap.at("Sequencer Watchdog"));
 }
 
 void HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool value)
@@ -3154,8 +3316,6 @@ void HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool value)
 
 	uint32_t *DIGIOENRegisterValue = new uint32_t;
 	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
-
-	bool success = false;
 
 	if(changeCNVPage(DIGIOENPage))
 	{
@@ -3174,14 +3334,12 @@ void HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool value)
 														m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN), 
 														static_cast<uint32_t>(newRegisterValue)) != -1)
 				{
-					success = updateDIGIOToggle();
+					updateDIGIOControlUI();
 				}
 			}
 
 		}
 	}
-
-	if(!success) { StatusBarManager::pushMessage("Failed to toggle" + QString::fromStdString(DIGIOENName) + " " + QString(value ? "on" : "off")); }
 
 	toggleUtilityTask(true);
 }
@@ -3408,10 +3566,29 @@ void HarmonicCalibration::changeStatusLEDColor(MenuControlButton *menuControlBut
 	menuControlButton->checkBox()->setChecked(checked);
 }
 
+void HarmonicCalibration::changeStatusLEDColor(QCheckBox *widget, const char *colorAttribute)
+{
+	Style::setStyle(widget, style::properties::admt::checkBoxLED, true, true);
+	QString style = QString(R"css(
+		QCheckBox::indicator:checked {
+			background-color: &&LEDColor&&;
+		}
+		)css");
+	style.replace("&&LEDColor&&", Style::getAttribute(colorAttribute));
+	widget->setStyleSheet(widget->styleSheet() + "\n" + style);
+	widget->update();
+}
+
 void HarmonicCalibration::updateFaultStatusLEDColor(MenuControlButton *widget, bool value)
 {
 	if(value) changeStatusLEDColor(widget, faultLEDColor); 
 	else changeStatusLEDColor(widget, statusLEDColor); 
+}
+
+void HarmonicCalibration::toggleStatusLEDColor(QCheckBox *widget, const char *trueAttribute, const char* falseAttribute, bool value)
+{
+	if(value) changeStatusLEDColor(widget, trueAttribute);
+	else changeStatusLEDColor(widget, falseAttribute);
 }
 
 MenuControlButton *HarmonicCalibration::createStatusLEDWidget(const QString title, QColor color, QWidget *parent)
@@ -3430,6 +3607,15 @@ MenuControlButton *HarmonicCalibration::createStatusLEDWidget(const QString titl
 	return menuControlButton;
 }
 
+QCheckBox *HarmonicCalibration::createStatusLEDWidget(const QString &text, const char *colorAttribute, bool checked, QWidget *parent)
+{
+	QCheckBox *checkBox = new QCheckBox(text, parent);
+	Style::setStyle(checkBox, style::properties::admt::checkBoxLED, true, true);
+	checkBox->setChecked(checked);
+	checkBox->setEnabled(false);
+	return checkBox;
+}
+
 MenuControlButton *HarmonicCalibration::createChannelToggleWidget(const QString title, QColor color, QWidget *parent)
 {
 	MenuControlButton *menuControlButton = new MenuControlButton(parent);
@@ -3445,52 +3631,6 @@ MenuControlButton *HarmonicCalibration::createChannelToggleWidget(const QString 
 	return menuControlButton;
 }
 #pragma endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #pragma region Connect Methods
 void HarmonicCalibration::connectLineEditToNumber(QLineEdit* lineEdit, int& variable, int min, int max)
@@ -3666,43 +3806,3 @@ double HarmonicCalibration::convertAMAXtoAccelTime(double amax)
 	return ((rotate_vmax * 131072) / (amax * motorfCLK));
 }
 #pragma endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
