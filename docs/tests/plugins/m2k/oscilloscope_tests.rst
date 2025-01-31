@@ -10,6 +10,23 @@ Oscilloscope - Test Suite
 The following test cases are designed to verify the functionality of 
 the Oscilloscope plugin.
 
+
+.. note::
+    .. list-table:: 
+       :widths: 50 30 30 50 50
+       :header-rows: 1
+
+       * - Tester
+         - Test Date
+         - Scopy version
+         - Plugin version (N/A if not applicable)
+         - Comments
+       * - 
+         - 
+         - 
+         - 
+         - 
+
 Setup environment:
 ------------------
 
@@ -57,14 +74,40 @@ volts/div knobs.
             - The Time Base value changes to 200ns and 500ns after the + button.
             - The Volts/Div value changes to 1V, 500, 200, 100 mV after the - button.
             - The Volts/Div value changes to 200mV and 500mV after the + button.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Set the knob to small increment (orange dot in the center).
        Set the Time Base to 2us and the Volts/Div to 2 Volts.
     5. Use the + and - button once on each knob:
         - **Expected result:**
             - The Time Base value changes to 3us and back to 2us.
             - The Volts/Div value changes to 3V and back to 2V.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 2 - Position Knob
 -----------------------
@@ -89,11 +132,23 @@ which depends on the value of the Time Base.
             - The position changes to 200ns and 400ns after the + 
               and back to 200ns and 0 after the - button.
             - The plot handle position also changes accordingly.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Set the Time Base to 1us and the horizontal position to 0.
         - **Expected result:**
             - The position changes to 100ns and 200ns after the + button and 
               back to 100ns and 0 after the - button.
             - The plot handle position also changes accordingly.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Set the Position knob to small increment (orange dot in the center).
        Set the Time Base to 2us and the horizontal position to 0.
     6. Use the + button 2 times and the - button 2 times on the horizontal Position knob:
@@ -101,8 +156,28 @@ which depends on the value of the Time Base.
             - The position changes to 20ns and 40ns after the + button and 
               back to 20ns and 0 after the - button.
             - The plot handle position also changes accordingly.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 3 - Constant Signal Check
 -------------------------------
@@ -127,11 +202,37 @@ oscilloscope using Channel 1.
     5. Monitor the Oscilloscope RMS measurement:
         - **Expected result:**
             - The RMS reading is within 3.2V to 3.4V.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Change the value to 0V in the Signal Generator and monitor it on the Oscilloscope:
         - **Expected result:** 
             - The reading is within 4.9V to 5.1V.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 4 - Sine Wave Signal Check
 -------------------------------
@@ -161,13 +262,39 @@ using Channel 1.
             - The plot displays 1.5 periods.
             - The measurements display: Period: 5ms, Frequency: 200 Hz,
               Peak-peak: 1.9Vpp to 2.1Vpp, RMS: 0.6Vrms to 0.8Vrms.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Change the Signal Generator amplitude to 5V and the frequency to 500Hz:
         - **Expected result:**
             - The plot displays 4 periods.
             - The measurements display: Period: 2ms, Frequency: 500 Hz,
               Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.74Vrms to 1.78Vrms.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 5 - Square Wave Signal Check
 ---------------------------------
@@ -197,6 +324,12 @@ the oscilloscope using Channel 1.
             - The plot displays 4 square waves.
             - The measurements display: Period: 2ms, Frequency: 500 Hz,
               Amplitude: 4.9Vpp to 5.1Vpp, RMS: 2.4Vrms to 2.6Vrms.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Change the Signal Generator amplitude to 8V and the frequency to 2 kHz.
        Change the Oscilloscope Time Base to 200us/div:
         
@@ -204,8 +337,29 @@ the oscilloscope using Channel 1.
             - The plot displays 6 square waves.
             - The measurements display: Period: 500us, Frequency: 2 kHz,
               Amplitude: 7.9Vpp to 8.1Vpp, RMS: 3.9Vrms to 4.1Vrms.
+        
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 6 - Triangle Wave Signal Check
 -----------------------------------
@@ -235,6 +389,12 @@ the oscilloscope using Channel 1.
             - The plot displays 6 triangle waves.
             - The measurements display: Period: 500us, Frequency: 2 kHz,
               Peak-peak: 3.9Vpp to 4.1Vpp, RMS: 1.0Vrms to 1.2Vrms.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Change the Signal Generator amplitude to 5V and the frequency to 20kHz.
        Change the Oscilloscope Time Base to 5us/dev.
         
@@ -242,8 +402,29 @@ the oscilloscope using Channel 1.
             - The plot displays 6 triangle waves.
             - The measurements display: Period: 50us, Frequency: 20 kHz,
               Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.3Vrms to 1.5Vrms.
+        
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
               
-**Result**: PASS/FAIL
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 7 - Rising/Falling Ramp Sawtooth Wave
 ------------------------------------------
@@ -273,13 +454,39 @@ the signal generator on the oscilloscope using Channel 1.
             - The plot displays 3 sawtooth waves.
             - The measurements display: Period: 50us, Frequency: 20 kHz,
               Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2Vrms to 2.4Vrms.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Change the Signal Generator configuration to Falling Ramp Sawtooth:
         - **Expected result:**
             - The plot displays 3 sawtooth waves.
             - The measurements display: Period: 50us, Frequency: 20 kHz,
               Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2Vrms to 2.4Vrms.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
               
-**Result**: PASS/FAIL
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 8 - Cursor Reading Check
 ------------------------------
@@ -311,19 +518,59 @@ Channel 1.
         
         - **Expected result:**
             - The frequency 1/ΔT is around 200Hz.
+        
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Adjust the vertical cursors to measure the peak-peak amplitude:
        place cursor V1 on the crest and V2 on the bottom of the sine wave:
         
         - **Expected result:**
             - The peak-peak amplitude is around 2V.
+        
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. In the Cursors Settings menu turn off the Horizontal cursors:
         - **Expected result:**
             - The horizontal cursors disappear from the plot as well as from the readouts.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. In the Cursors Settings menu turn off the Vertical cursors:
         - **Expected result:**
             - The vertical cursors disappear from the plot as well as from the readouts.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
               
-**Result**: PASS/FAIL
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
     
 Test 9 - Trigger Function Check
 -------------------------------
@@ -356,32 +603,88 @@ with different trigger configurations.
         - **Expected result:**
             - The plot time handle is centered at the rising edge of the triangle wave.
             - The signal is static (not moving around at each triggered sample).
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Change the Trigger Condition to Falling Edge:
         - **Expected result:**
             - The plot time handle is centered at the falling edge of the triangle wave.
             - The signal is static (not moving around at each triggered sample).
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Set the Hysteresis value to 1.25V and Level to -1.7V:
         - **Expected result:**
             - The signal on the plot is not triggered and unstable.
             - The plot level is outside the triggered range of ~1.3V to +2.5V.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     8. Set the Hysteresis value to 1.25V and Level to -1.2V:
         - **Expected result:**
             - The signal on the plot is triggered and stable.
             - The plot level is in the triggered range of ~1.3V to +2.5V.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     9. Set the Hysteresis value to 2.5V and Level to -2.5V:
         - **Expected result:**
             - The signal on the plot is not triggered and unstable.
             - The plot level is outside the triggered range of 0V to +2.5V.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     10. Set the Hysteresis value to 2.5V and Level to 0.1V:
          - **Expected result:**
             - The signal on the plot is triggered and stable.
             - The plot level is in the triggered range of 0V to +2.5V.
+         - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     11. Set the Hysteresis value to 2.5V and Level to 3V:
          - **Expected result:**
             - The signal on the plot is not triggered and unstable.
             - The plot level is outside the triggered range of 0V to +2.5V.
+         - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
               
-**Result**: PASS/FAIL
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 10 - Math Channel Operations
 ---------------------------------
@@ -409,11 +712,23 @@ Test 10 - Math Channel Operations
         - *sqrt(t0*t0)*
         - **Expected result:**
             - The plot contains a new Channel having all the samples from Channel 1.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5.  Add a new Math Channel with the following function:
          - *2\*(t1+t1)*
          - **Expected result:**
             - The plot contains a new Channel having the amplitude of 
               Channel 2 increased 4 times.
+         - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Change the Signal Generator configuration to:
         - Channel 1: Square wave, 5Vpp, 200Hz
         - Channel 2: Sine wave, 3Vpp, 200Hz
@@ -422,8 +737,28 @@ Test 10 - Math Channel Operations
         - **Expected result:**
             - The plot contains a new Channel having the sum of Channel 1 and Channel 2.
             - Math channel measurement: Vpp: 8V, Period: 5ms, Frequency: 200Hz.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 11 - FFT Function
 -----------------------
@@ -447,8 +782,28 @@ Test 11 - FFT Function
     3. Run the Oscilloscope and verify the plot:
         - **Expected result:** The resulting spectrum shows 
           a series of peaks at the fundamental frequency and its harmonics.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 12 - XY Function
 ----------------------
@@ -473,17 +828,57 @@ The plot displays the current vs voltage characteristics of a PN junction diode.
     3. Run both instruments.
         - **Expected result:** The plot displays a horizontal line on level 
           0 of the Y-Axis and in range 1 to 5 on the X-Axis.
+
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Change the Signal Generator offset to 2V:
         - **Expected result:** The plot displays a horizontal line on level 
           0 of the Y-Axis and in range 0 to 4 on the X-Axis.
+
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Set the X-Y configuration to CH1 on both X-Axis and Y-Axis:
         - **Expected result:** The plot displays a diagonal line 
           in the range 0 to 4 on both axes.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Set the X-Y configuration to CH2 on X-Axis and CH1 on Y-Axis:
         - **Expected result:** The plot displays a vertical line 
           from 0 to 4 on the Y-Axis and 0 on the X-Axis.
+        - **Actual result:**
 
-**Result**: PASS/FAIL        
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+        
 
 Test 13 - Export feature
 ------------------------
@@ -512,24 +907,62 @@ Test 13 - Export feature
     5. Click **Export** and choose a name, the CSV format and location to save the file.
         - **Expected result:** The file is saved successfully at the 
           specified location.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Open the file and verify the data.
         - **Expected result:**
             - The first 7 lines of the CSV contain metadata such as: timestamp, 
               device name, number of samples, sample rate, instrument name.
             - The file contains 3 columns: sample number, time, voltage.
             - The data matches with that samples displayed on the plot.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. In the Export menu, turn on "Export All".
     8. Click **Export** and choose a name, the CSV format and location to save the file.
         - **Expected result:** The file is saved successfully at the 
           specified location.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     9. Open the file and verify the data.
         - **Expected result:**
             - The first 7 lines of the CSV contain metadata such as: timestamp, 
               device name, number of samples, sample rate, instrument name.
             - The file contains 4 columns: sample number, time, voltage1, voltage2.
             - The data matches with that samples displayed on the plot.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 14 - Software AC coupling
 -----------------------------------------
@@ -557,12 +990,38 @@ the Oscilloscope should be able to center the trace at 0V.
         - **Expected result:**
             - The trace moves towards 0V until it is centered at level 0V.
             - The measurement Mean is around 0V.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Turn off Software AC Coupling.
         - **Expected result:**
             - The trace moves back to the original position.
             - The measurement Mean is around 0V.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 15 - Probe Attenuation
 ---------------------------
@@ -589,16 +1048,48 @@ Test 15 - Probe Attenuation
         - **Expected result:**
             - The measurement Vpp is 200mV.
             - The Volts/Div is 100mV.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Change the Probe Attenuation to 100.
         - **Expected result:**
             - The measurement Vpp is 200V.
             - The Volts/Div is 100V.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Change the Probe Attenuation to 1.
         - **Expected result:**
             - The measurement Vpp is 2V.
             - The Volts/Div is 1V.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 16 - External Trigger
 --------------------------
@@ -632,9 +1123,21 @@ using the TI pin and the digital DIO1 pin of the ADALM2000 device.
     5. Run all instruments:
         - **Expected result:** The 5Vpp sinewave is displayed on CH2 
           of the Osc plot.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Stop the Pattern Generator:
         - **Expected result:** The plot stops updating and the status 
           displays "Waiting".
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Stop the Pattern Generator.
     8. Open the Logic Analyzer and set a Rising Edge trigger on DIO1.
     9. In the Oscilloscope Trigger settings set the following:
@@ -644,12 +1147,38 @@ using the TI pin and the digital DIO1 pin of the ADALM2000 device.
         - Source: Logic Analyzer
         - **Expected result:**
             - The plot is not trigger and the status displays "Waiting".
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     10. Open the DigitalIO, detach the instrument and run it.
     11. Manually toggle DIO1 from output to input and viceversa:
          - **Expected result:**
             - The Osc plot is triggered when toggling the digital pin.
+         - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 17 - Autoset
 -----------------
@@ -681,8 +1210,28 @@ using a configuration that displays too many periods on the plot.
             - The horizontal Time Base is adjusted to 50us/div.
             - The horizontal and vertical positions are at 0.
             - The trigger level is at 0V.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 18 - Print Plot
 ---------------------
@@ -707,11 +1256,37 @@ Test 18 - Print Plot
     4. Click the Print button and choose a name and location for the PDF file:
         - **Expected result:**
             - The file is saved successfully at the specified location.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Open the file and verify the data.
         - **Expected result:**
             - The file contains a screenshot of the instrument with inverted colors.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 19 - Curve style
 ----------------------
@@ -737,14 +1312,46 @@ and plot the signal using lines, dots, sticks or steps.
     4. Open the Channel 1 settings menu and set the curve style to Dots:
         - **Expected result:**
             - The plot is displayed using dots (when zoomed in to samples).
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Set the curve style to Sticks:
         - **Expected result:**
             - The plot is displayed using lines (the sinewave looks "full").
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     6. Set the curve style to Smooth:
         - **Expected result:**
             - The plot is displayed using a smoother lines.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 20 - Gating
 -------------------------
@@ -772,11 +1379,38 @@ Apply the measurements on a gated portion of the acquired signal.
         
         - **Expected result:**
             - The measurement Vpp is half the set amplitude: 2.5V.
+        
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Move the sliders to the left and right ends of the plot:
         - **Expected result:**
             - The measurement Vpp is the set amplitude: 5V.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 21 - Histogram
 --------------------
@@ -801,11 +1435,37 @@ Test 21 - Histogram
     4. In the Oscilloscope General settings menu enable the Histogram:
         - **Expected result:**
             - A histogram is displayed above the time plot.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Change the Signal Generator to output a Square wave:
         - **Expected result:**
             - The histogram shows the min and max of the square wave.
+        - **Actual result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 22 - ADC Digital Filters
 -------------------------------
@@ -831,4 +1491,18 @@ Test 22 - ADC Digital Filters
         - Channel 1 Vertical: Volts/Div: 500mV/div, Position: 0V
     3. TBD
 
-**Result**: PASS/FAIL
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+

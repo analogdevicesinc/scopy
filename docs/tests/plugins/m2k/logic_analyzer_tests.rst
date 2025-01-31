@@ -13,6 +13,23 @@ Logic Analyzer instrument of the ADALM2000 plugin in Scopy.
 The following apply for all the test cases in this suite.
 If the test case has special requirements, they will be listed in the test case section.
 
+
+.. note::
+    .. list-table:: 
+       :widths: 50 30 30 50 50
+       :header-rows: 1
+
+       * - Tester
+         - Test Date
+         - Scopy version
+         - Plugin version (N/A if not applicable)
+         - Comments
+       * - 
+         - 
+         - 
+         - 
+         - 
+
 Setup environment:
 ------------------
 
@@ -63,30 +80,68 @@ digital channels - rising edge, falling edge, high, low, any edge.
     6. In the Logic Analyzer set DIO0’s trigger to **rising edge** configuration.
     7. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     8. In the Digital IO, change DIO0’s output from 0 to 1.
-        - **Expected Result**:
-            - The logic analyzer initiates a capture.
+        - **Expected Result**: The logic analyzer initiates a capture.
+        - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     9. Stop the Logic Analyzer and set DIO0’s trigger to **rising edge** configuration.
     10. Run the Logic Analyzer instrument.
     11. In the Digital IO, change DIO0’s output from 1 to 0.
-         - **Expected Result**:
-             - The logic analyzer initiates a capture.
+         - **Expected Result**: The logic analyzer initiates a capture.
+         - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     12. Stop the Logic Analyzer and set DIO0’s trigger to **any edge** configuration.
     13. Run the Logic Analyzer instrument.
     14. In the Digital IO, change DIO0’s output from 0 to 1 or 1 to 0.
-         - **Expected Result**:
-             - The logic analyzer initiates a capture.
+         - **Expected Result**: The logic analyzer initiates a capture.
+         - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     15. Stop the Logic Analyzer and set DIO0’s trigger to **low** configuration.
     16. Run the Logic Analyzer instrument.
     17. In the Digital IO, set DIO0’s output to 0.
-         - **Expected Result**:
-             - The logic analyzer continuously captures the signal.
+         - **Expected Result**: The logic analyzer continuously captures the signal.
+         - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     18. Stop the Logic Analyzer and set DIO0’s trigger to **high** configuration.
     19. Run the Logic Analyzer instrument.
     20. In the Digital IO, set DIO0’s output to 1.
-         - **Expected Result**:
-             - The logic analyzer continuously captures the signal.
+         - **Expected Result**: The logic analyzer continuously captures the signal.
+         - **Actual Result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 2 - External Channel Trigger Function
 ---------------------------------------------
@@ -118,37 +173,80 @@ Test 2 - External Channel Trigger Function
     6. Open the Logic Analyzer trigger menu and turn on the External trigger.
        Select the source as **External Trigger In**.
         
-        - **Expected Result**:
-            - Triggers set on every DIO channels are automatically turned off.
+        - **Expected Result**: Triggers set on every DIO channels are automatically turned off.
+        - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Connect Trigger in 1 to DIO0 using a loopback cable.
     8. In the Logic Analyzer Trigger settings menu set the External Trigger In condition
        to **rising edge**.
     9. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     10. In the Digital IO, change DIO0’s output from 0 to 1.
-         - **Expected Result**:
-             - The logic analyzer initiates a capture.
+         - **Expected Result**: The logic analyzer initiates a capture.
+         - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     11. Stop all instruments and set the External Trigger In condition to **falling edge**.
     12. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     13. In the Digital IO, change DIO0’s output from 1 to 0.
-         - **Expected Result**:
-             - The logic analyzer initiates a capture.
+         - **Expected Result**: The logic analyzer initiates a capture.
+         - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     14. Stop all instruments and set the External Trigger In condition to **any edge**.
     15. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     16. In the Digital IO, change DIO0’s output from 0 to 1 or 1 to 0.
-         - **Expected Result**:
-             - The logic analyzer initiates a capture.
+         - **Expected Result**: The logic analyzer initiates a capture.
+         - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     17. Stop all instruments and set the External Trigger In condition to **low**.
     18. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     19. In the Digital IO, set DIO0’s output to 0.
-         - **Expected Result**:
-             - The logic analyzer continuously captures the signal.
+         - **Expected Result**: The logic analyzer continuously captures the signal.
+         - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     20. Stop all instruments and set the External Trigger In condition to **high**.
     21. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     22. In the Digital IO, set DIO0’s output to 1.
-         - **Expected Result**:
-             - The logic analyzer continuously captures the signal.
+         - **Expected Result**: The logic analyzer continuously captures the signal.
+         - **Actual Result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 3 - Oscilloscope Source External Trigger
 ---------------------------------------------
@@ -188,26 +286,63 @@ Oscilloscope as the source.
             - If you drag the horizontal cursor in the Oscilloscope window above or 
               below the signal, it should be in Waiting state, and Logic analyzer will
               be Waiting too.
+        - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     8. Open the Oscilloscope trigger menu and set the trigger condition to **falling edge**.
     9. Verify that the Logic Analyzer is triggered at the same time with the Oscilloscope.
         - **Expected Result**:
             - If you drag the horizontal cursor in the Oscilloscope window above or 
               below the signal, it should be in Waiting state, and Logic analyzer will
               be Waiting too.
+        - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     10. Open the Oscilloscope trigger menu and set the trigger condition to **low**.
     11. Verify that the Logic Analyzer is triggered at the same time with the Oscilloscope.
          - **Expected Result**:
              - If you drag the horizontal cursor in the Oscilloscope window above or 
                below the signal, it should be in Waiting state, and Logic analyzer will
                be Waiting too.
+         - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     12. Open the Oscilloscope trigger menu and set the trigger condition to **high**.
     13. Verify that the Logic Analyzer is triggered at the same time with the Oscilloscope.
          - **Expected Result**:
              - If you drag the horizontal cursor in the Oscilloscope window above or 
                below the signal, it should be in Waiting state, and Logic analyzer will
                be Waiting too.
+         - **Actual Result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 4 - Trigger Modes
 ---------------------------------------------
@@ -239,21 +374,55 @@ Test 4 - Trigger Modes
     7. In the Logic Analyzer trigger configuration, set the trigger logic to **OR**.
     8. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     9. In the Digital IO instrument set DIO0’s output to 0 and DIO1’s output to 0.
-        - **Expected Result**:
-            - The logic analyzer does not start capturing.
+        - **Expected Result**: The logic analyzer does not start capturing.
+        - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     10. In the Digital IO instrument set DIO0 or DIO1’s output to 1.
-         - **Expected Result**:
-             - The logic analyzer starts capturing signal when either of the DIO0 OR DIO1 is HIGH.
+         - **Expected Result**: The logic analyzer starts capturing signal when either of the DIO0 OR DIO1 is HIGH.
+         - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     11. Stop all instruments and set the trigger logic to **AND**.
     12. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     13. In the Digital IO instrument set DIO0’s output to 0 and DIO1’s output to 1.
-         - **Expected Result**:
-             - The logic analyzer does not start capturing.
-    14. In the Digital IO instrument set DIO0 and DIO1’s output to 1.
-         - **Expected Result**:
-             - The logic analyzer starts capturing signal only when DIO0 AND DIO1 are HIGH.
+         - **Expected Result**: The logic analyzer does not start capturing.
+         - **Actual Result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+    14. In the Digital IO instrument set DIO0 and DIO1’s output to 1.
+         - **Expected Result**: The logic analyzer starts capturing signal only when DIO0 AND DIO1 are HIGH.
+         - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 5 - Clock signal measurement accuracy
 ---------------------------------------------
@@ -284,13 +453,23 @@ Test 5 - Clock signal measurement accuracy
     5. Run a single capture of the Logic Analyzer and move the cursor handles to the 
        consecutive rising edges or consecutive falling edges of the signal.
         
-        - **Expected Result**:
-            - The data measured by the cursor is close to ∆t: 10ms and 1/∆t: 100Hz.
+        - **Expected Result**: The data measured by the cursor is close to ∆t: 10ms and 1/∆t: 100Hz.
+        - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     6. In the Cursors settings menu enable **Cursors lock** and measure the next 
        set of edges.
         
-        - **Expected Result**:
-            - The data measured by the cursor is close to ∆t: 10ms and 1/∆t: 100Hz.
+        - **Expected Result**: The data measured by the cursor is close to ∆t: 10ms and 1/∆t: 100Hz.
+        - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Set the Logic Analyzer sample rate to 100Msps and position to 0s.
     8. Set the Pattern Generator DIO 0 parameters to:
         - Pattern: clock.
@@ -298,13 +477,23 @@ Test 5 - Clock signal measurement accuracy
     9. Run a single capture of the Logic Analyzer and move the cursor handles to the 
        consecutive rising edges or consecutive falling edges of the signal.
         
-        - **Expected Result**:
-            - The data measured by the cursor is close to ∆t: 400ns and 1/∆t: 2.5MHz.
+        - **Expected Result**: The data measured by the cursor is close to ∆t: 400ns and 1/∆t: 2.5MHz.
+        - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     10. In the Cursors settings menu enable **Cursors lock** and measure the next
         set of edges.
          
-         - **Expected Result**:
-             - The data measured by the cursor is close to ∆t: 400ns and 1/∆t: 2.5MHz.
+         - **Expected Result**: The data measured by the cursor is close to ∆t: 400ns and 1/∆t: 2.5MHz.
+         - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     11. Set the Logic Analyzer sample rate to 20ksps.
     12. Set the Pattern Generator DIO 0 parameters to:
          - Pattern: clock.
@@ -313,13 +502,36 @@ Test 5 - Clock signal measurement accuracy
     13. Run a single capture of the Logic Analyzer and move the cursor handles to the 
         rising and falling edge of the upper limit.
          
-         - **Expected Result**:
-             - The data measured by the cursor is close to ∆t: 7ms.
-    14. Move the cursors to the falling and rising edge of the lower limit.
-         - **Expected Result**:
-             - The data measured by the cursor is close to ∆t: 3ms.
+         - **Expected Result**: The data measured by the cursor is close to ∆t: 7ms.
+         - **Actual Result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+    14. Move the cursors to the falling and rising edge of the lower limit.
+         - **Expected Result**: The data measured by the cursor is close to ∆t: 3ms.
+         - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 6 - Parallel Decoder
 ---------------------------------------------
@@ -344,14 +556,38 @@ Test 6 - Parallel Decoder
        Set the number value to 50 (it is read as decimal).
     4. Run the Pattern Generator and Logic Analyzer instrument.
     5. Verify the Logic Analyze decoded value.
-        - **Expected Result**:
-            - The reading is in hex format. For reference, 50 decimal = 32 hex.
+        - **Expected Result**: The reading is in hex format. For reference, 50 decimal = 32 hex.
+        - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     6. In the Pattern Generator set the number value to 250.
     7. Verify the Logic Analyzer decoded value.
-        - **Expected Result**:
-            - The reading is in hex format. For reference, 250 decimal = FA.
+        - **Expected Result**: The reading is in hex format. For reference, 250 decimal = FA.
+        - **Actual Result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 7 - SPI decoder
 ---------------------------------------------
@@ -383,11 +619,28 @@ Test 7 - SPI decoder
         - Data: insert 4 bytes in hex form e.g: AB CD EF 15.
     5. Run the Pattern Generator and Logic Analyzer instrument.
     6. Verify the Logic Analyzer plot for the decoder output:
-        - **Expected Result**:
-            - The MISO data has 2 bytes per frame and the decoded data is 
-              AB CD EF 15.
+        - **Expected Result**: The MISO data has 2 bytes per frame and the decoded data is AB CD EF 15.
+        - **Actual Result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 8 - UART decoder
 ---------------------------------------------
@@ -424,17 +677,45 @@ Test 8 - UART decoder
     5. Connect DIO0 to DIO1 using a loopback cable.
     6. Run the Pattern Generator and Logic Analyzer instrument.
     7. Verify the Logic Analyzer plot for the decoder output:
-        - **Expected Result**:
-            - The RX decoded data is "M2K".
+        - **Expected Result**: The RX decoded data is "M2K".
+        - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     8. In the Pattern Generator change the baud rate to 115200.
     9. Verify the Logic Analyzer plot for the decoder output:
-        - **Expected Result**:
-            - The RX decoded data is not "M2K".
-    10. In the Logic Analyzer change the baud rate to 115200:
-         - **Expected Result**:
-             - The RX decoded data is "M2K".    
+        - **Expected Result**: The RX decoded data is not "M2K".
+        - **Actual Result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+    10. In the Logic Analyzer change the baud rate to 115200:
+         - **Expected Result**: The RX decoded data is "M2K".
+         - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 9 - PWM Decoder
 ---------------------------------------------
@@ -458,10 +739,28 @@ Test 9 - PWM Decoder
        and set the duty cycle to 5%, 30%, 50%, 75% and 95% verifying the Logic Analyzer
        decoded data in between changes:
         
-        - **Expected Result**:
-            - The data follows the duty cycle set in the pattern generator.
+        - **Expected Result**: The data follows the duty cycle set in the pattern generator.
+        - **Actual Result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 10 - Channel visual representation
 ---------------------------------------------
@@ -482,16 +781,44 @@ trace height and plot color.
     2. Enable DIO0 and open the channel settings by double clicking
        the channel handle.
     3. Change the channel name to "D0" and verify the channel handle:
-        - **Expected Result**:
-            - The channel handle displays "D0".
-    4. Change the trace height to 50:
-        - **Expected Result**:
-            - The trace height on the plot is doubled.
-    5. Change the color to **transparent** and verify the channel on plot:
-        - **Expected Result**:
-            - The channel is no longer seen on the plot.
+        - **Expected Result**: The channel handle displays "D0".
+        - **Actual Result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+    4. Change the trace height to 50:
+        - **Expected Result**: The trace height on the plot is doubled.
+        - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
+    5. Change the color to **transparent** and verify the channel on plot:
+        - **Expected Result**: The channel is no longer seen on the plot.
+        - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 11 - Export Functionality
 ---------------------------------------------
@@ -521,13 +848,36 @@ of the Logic Analyzer.
     3. In the Logic Analyzer General Settings menu set the Export All to **On** and 
        click the Export button.
     4. Select the file name, location and choose .csv format.
-        - **Expected Result**:
-            - The file is created in the specified location.
-    5. Open the file and verify the data:
-        - **Expected Result**:
-            - The exported data is in .csv format and correspods to the data on the plot.
+        - **Expected Result**: The file is created in the specified location.
+        - **Actual Result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+    5. Open the file and verify the data:
+        - **Expected Result**: The exported data is in .csv format and correspods to the data on the plot.
+        - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 12 - Print Plot
 ---------------------------------------------
@@ -551,11 +901,30 @@ of the Logic Analyzer.
         - DIO0 and DIO1: Pattern: Clock, Frequency: 100Hz, Phase: 0 and Duty Cycle: 50%.
     3. Run the Logic Analyzer and Pattern Generator.
     4. Press the Print Plot button and choose a location for the exported file:
-        - **Expected Result**:
-            - The file is created in the specified location.
+        - **Expected Result**: The file is created in the specified location.
+        - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
     5. Open the .pdf exported file and visually compare it to the application plot.
 
-**Result**: PASS/FAIL
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 13 - Decoder Table
 ---------------------------------------------
@@ -591,11 +960,40 @@ Test 13 - Decoder Table
         - **Expected Result**:
             - Each table row has RX data and time annotations.
             - The RX data corresponds to the data sent by the Pattern Generator.
-    7. Write "^3$" in the Regex search box and press Enter.
-        - **Expected Result**:
-            - Only the RX data equal to "3" is displayed in the table.
-    8. Double click on the first RX data row of the decoder table:
-        - **Expected Result**:
-            - The plot is zoomed in and centered on the corresponding data.
+        - **Actual Result:**
 
-**Result**: PASS/FAIL
+..
+  Actual test result goes here.
+..
+
+    7. Write "^3$" in the Regex search box and press Enter.
+        - **Expected Result**: Only the RX data equal to "3" is displayed in the table.
+        - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
+    8. Double click on the first RX data row of the decoder table:
+        - **Expected Result**: The plot is zoomed in and centered on the corresponding data.
+        - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
