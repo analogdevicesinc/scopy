@@ -3,9 +3,6 @@
 Plugins Test Cases
 ===============================================================================
 
-* :ref:`Datalogger <datalogger_tests>`
-* :ref:`Register Map <registermap_tests>` 
-
 Contents
 ---------------------------------------------------------------------
 
