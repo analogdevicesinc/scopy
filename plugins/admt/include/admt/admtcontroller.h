@@ -96,6 +96,7 @@ public:
         SDP_GPIO_CTRL,
         SDP_GPIO0_BUSY,
         SDP_COIL_RS,
+        REGMAP_DUMP,
         DEVICE_ATTR_COUNT
     };
 
@@ -172,7 +173,7 @@ public:
 
     const char* ChannelIds[CHANNEL_COUNT] = { "rot", "angl", "count", "temp" };
     const char* DeviceIds[DEVICE_COUNT] = { "admt4000", "tmc5240" };
-    const char* DeviceAttributes[DEVICE_ATTR_COUNT] = { "page", "sequencer_mode", "angle_filt", "conversion_mode", "h8_ctrl", "sdp_gpio_ctrl", "sdp_gpio0_busy", "sdp_coil_rs" };
+    const char* DeviceAttributes[DEVICE_ATTR_COUNT] = { "page", "sequencer_mode", "angle_filt", "conversion_mode", "h8_ctrl", "sdp_gpio_ctrl", "sdp_gpio0_busy", "sdp_coil_rs", "regmap_dump" };
     const char* MotorAttributes[MOTOR_ATTR_COUNT] = { "amax", "rotate_vmax", "dmax",
                                                      "disable", "target_pos", "current_pos",
                                                      "ramp_mode" };
@@ -203,6 +204,7 @@ public:
     int getChannelIndex(const char *deviceName, const char *channelName);
     double getChannelValue(const char *deviceName, const char *channelName, int bufferSize = 1);
     int getDeviceAttributeValue(const char *deviceName, const char *attributeName, double *returnValue);
+    int getDeviceAttributeValueString(const char *deviceName, const char *attributeName, char *returnValue, size_t byteLength = 512);
     int setDeviceAttributeValue(const char *deviceName, const char *attributeName, double writeValue);
     QString calibrate(vector<double> PANG, int cycles = 11, int samplesPerCycle = 256);
     int writeDeviceRegistry(const char *deviceName, uint32_t address, uint32_t value);

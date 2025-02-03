@@ -295,15 +295,10 @@ ToolTemplate* HarmonicCalibration::createAcquisitionWidget()
 	countWidget->contentLayout()->addWidget(countSection);
 	tempWidget->contentLayout()->addWidget(tempSection);
 
-	rotationValueLabel = new QLabel(rotationSection);
-	angleValueLabel = new QLabel(angleSection);
-	countValueLabel = new QLabel(countSection);
-	tempValueLabel = new QLabel(tempSection);
-	
-	rotationValueLabel->setText("--.--°");
-	angleValueLabel->setText("--.--°");
-	countValueLabel->setText("--");
-	tempValueLabel->setText("--.-- °C");
+	rotationValueLabel = new QLabel("--.--°", rotationSection);
+	angleValueLabel = new QLabel("--.--°", angleSection);
+	countValueLabel = new QLabel("--", countSection);
+	tempValueLabel = new QLabel("--.-- °C", tempSection);
 
 	rotationSection->contentLayout()->addWidget(rotationValueLabel);
 	angleSection->contentLayout()->addWidget(angleValueLabel);
@@ -2079,8 +2074,8 @@ bool HarmonicCalibration::updateChannelValues(){
 void HarmonicCalibration::updateCountValue(){
 	uint32_t *absAngleRegValue = new uint32_t;
 	bool success = false;
-	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE), 0x0000) != -1){
-		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getSensorRegister(ADMTController::SensorRegister::ABSANGLE), absAngleRegValue) != -1){
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE), 0x0000) == 0){
+		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), m_admtController->getSensorRegister(ADMTController::SensorRegister::ABSANGLE), absAngleRegValue) == 0){
 			count = m_admtController->getAbsAngleTurnCount(static_cast<uint16_t>(*absAngleRegValue));
 			success = true;
 		}
@@ -3825,5 +3820,19 @@ double HarmonicCalibration::convertAccelTimetoAMAX(double accelTime)
 double HarmonicCalibration::convertAMAXtoAccelTime(double amax)
 {
 	return ((rotate_vmax * 131072) / (amax * motorfCLK));
+}
+#pragma endregion
+
+#pragma region Debug Methods
+QString HarmonicCalibration::readRegmapDumpAttributeValue()
+{
+	QString output = "";
+	char value[1024];
+	int result = -1;
+	result = m_admtController->getDeviceAttributeValueString(m_admtController->getDeviceId(ADMTController::Device::ADMT4000), 
+													m_admtController->getDeviceAttribute(ADMTController::DeviceAttribute::REGMAP_DUMP), 
+													value, 1024);
+	output = QString(value);
+	return output;
 }
 #pragma endregion

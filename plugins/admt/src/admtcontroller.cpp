@@ -314,6 +314,21 @@ int ADMTController::getDeviceAttributeValue(const char *deviceName, const char *
     return result;
 }
 
+int ADMTController::getDeviceAttributeValueString(const char *deviceName, const char *attributeName, char *returnValue, size_t byteLength)
+{
+    if(!m_iioCtx) { return -1; }
+    int result = -1;
+    int deviceCount = iio_context_get_devices_count(m_iioCtx);
+    if(deviceCount == 0) { return result; }
+	iio_device *iioDevice = iio_context_find_device(m_iioCtx, deviceName);
+    if(iioDevice == NULL) { return result; }
+    const char* hasAttr = iio_device_find_attr(iioDevice, attributeName);
+    if(hasAttr == NULL) { return result; }
+    result = iio_device_attr_read(iioDevice, attributeName, returnValue, byteLength);
+
+    return result;
+}
+
 /** @brief Set the attribute value of a device
  * @param deviceName A pointer to the device name
  * @param attributeName A NULL-terminated string corresponding to the name of the
