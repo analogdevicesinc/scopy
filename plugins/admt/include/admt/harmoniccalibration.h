@@ -160,7 +160,8 @@ private:
 				*calibrationMotorCurrentPositionLineEdit,
 				*AFEDIAG0LineEdit, *AFEDIAG1LineEdit, *AFEDIAG2LineEdit;
 
-	QLabel 	*rotationValueLabel, *angleValueLabel, *countValueLabel, *tempValueLabel,
+	QLabel 	*rawAngleValueLabel,
+			*rotationValueLabel, *angleValueLabel, *countValueLabel, *tempValueLabel,
 			*motorAmaxValueLabel, *motorRotateVmaxValueLabel, *motorDmaxValueLabel,
 			*motorDisableValueLabel, *motorTargetPosValueLabel, *motorCurrentPosValueLabel,
 			*motorRampModeValueLabel,
@@ -370,6 +371,10 @@ private:
 	double convertVMAXtoRPS(double vmax);
 	double convertAccelTimetoAMAX(double accelTime);
 	double convertAMAXtoAccelTime(double amax);
+	#pragma endregion
+
+	#pragma region Debug Methods
+	QString readRegmapDumpAttributeValue();
 	#pragma endregion
 };
 } // namespace admt
