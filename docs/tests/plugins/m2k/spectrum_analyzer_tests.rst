@@ -1,6 +1,6 @@
 .. _m2k_spectrum_analyzer_tests:
 
-M2K Spectrum Analyzer - Test Suite
+Spectrum Analyzer - Test Suite
 ====================================================================================================
 
 .. note::

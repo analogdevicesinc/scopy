@@ -1,6 +1,6 @@
 .. _m2k_pattern_generator_tests:
 
-M2K Pattern Generator - Test Suite
+Pattern Generator - Test Suite
 ====================================================================================================
 
 .. note::

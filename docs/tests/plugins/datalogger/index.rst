@@ -1,6 +1,6 @@
-.. _tests_debugger:
+.. _tests_datalogger:
 
-Debugger
+Datalogger
 ===============================================================================
 
 Contents
@@ -10,5 +10,4 @@ Contents
    :includehidden:
    :maxdepth: 3
 
-   debugger_tests
-   debugger_preferences_tests
+   datalogger_tests
