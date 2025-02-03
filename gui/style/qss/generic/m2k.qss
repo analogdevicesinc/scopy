@@ -7,9 +7,6 @@ QWidget {
 QWidget {
     background-color: transparent;
 }
-QAbstractSpinBox {
-    background-color: &background_primary&;
-}
 QPushButton {
     background-color: transparent;
     border: none;
@@ -257,7 +254,7 @@ QTextBrowser#aboutTextBrowser {
 }
 QLabel[subsection_label="true"] {
     font-size: &font_size_0_5&;
-    color: #46&color_default_hexcode&;
+    color: #CC&color_default_hexcode&;
 }
 QFrame[subsection_line="true"] {
     border: 1px solid #46&color_default_hexcode&;
