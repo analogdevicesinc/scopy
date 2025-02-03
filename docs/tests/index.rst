@@ -10,5 +10,6 @@ Contents
    :includehidden:
    :maxdepth: 3
 
+   testing_guide
    plugins/index
    general/index

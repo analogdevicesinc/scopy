@@ -163,5 +163,6 @@ GITINORE_FILES_LIST=(
     # plugins/regmap/.gitinore
     plugins/regmap/include/regmap/scopy-regmap_export.h
     plugins/regmap/include/regmap/scopy-regmap_config.h
+    testing_results/*
 )
 GITINORE_FILES_LIST=("${GITINORE_FILES_LIST[@]/#/*\/}")
