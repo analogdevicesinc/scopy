@@ -1,6 +1,6 @@
 .. _m2k_signal_generator_tests:
 
-M2K Signal Generator - Test Suite
+Signal Generator - Test Suite
 =======================================================
 
 .. note::

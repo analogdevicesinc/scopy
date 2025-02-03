@@ -1,6 +1,6 @@
-.. _tests_debugger:
+.. _tests_adc:
 
-Debugger
+ADC
 ===============================================================================
 
 Contents
@@ -10,5 +10,4 @@ Contents
    :includehidden:
    :maxdepth: 3
 
-   debugger_tests
-   debugger_preferences_tests
+   adc_tests
