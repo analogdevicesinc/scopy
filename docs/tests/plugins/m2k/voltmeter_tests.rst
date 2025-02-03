@@ -1,6 +1,6 @@
 .. _m2k_voltmeter_tests:
 
-M2K Voltmeter - Test Suite
+Voltmeter - Test Suite
 ===============================================================================
 
 .. note::

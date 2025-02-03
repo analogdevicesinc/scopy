@@ -1,6 +1,6 @@
-.. _tests_debugger:
+.. _tests_registermap:
 
-Debugger
+Register Map
 ===============================================================================
 
 Contents
@@ -10,5 +10,4 @@ Contents
    :includehidden:
    :maxdepth: 3
 
-   debugger_tests
-   debugger_preferences_tests
+   registermap_tests
