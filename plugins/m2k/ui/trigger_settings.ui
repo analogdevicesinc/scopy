@@ -237,10 +237,10 @@ color: rgba(255,255,255,51);
               <string/>
              </property>
              <property name="leftText" stdset="0">
-              <string>auto</string>
+              <string>normal</string>
              </property>
              <property name="rightText" stdset="0">
-              <string>normal</string>
+              <string>auto</string>
              </property>
              <property name="duration_ms" stdset="0">
               <number>0</number>

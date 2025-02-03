@@ -1,8 +1,67 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="6px" height="10px" version="1.1" viewBox="0 0 6 10" xmlns="http://www.w3.org/2000/svg">
- <g fill="#fff" opacity=".6" fill-rule="evenodd">
-  <g transform="translate(-418 -105)">
-   <polygon transform="translate(421.02 110.02) rotate(-90) translate(-421.02 -110.02)" points="426.03 108 421.01 113.02 416 108 417 107 421.01 111.02 425.03 107"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="6px"
+   height="10px"
+   version="1.1"
+   viewBox="0 0 6 10"
+   id="svg8"
+   sodipodi:docname="sba_cmb_box_arrow_right.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
+  <metadata
+     id="metadata14">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs12" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="741"
+     inkscape:window-height="480"
+     id="namedview10"
+     showgrid="false"
+     inkscape:zoom="23.6"
+     inkscape:cx="-4.6271186"
+     inkscape:cy="5"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg8" />
+  <g
+     fill="#fff"
+     opacity=".6"
+     fill-rule="evenodd"
+     id="g6"
+     style="opacity:0.8">
+    <g
+       transform="translate(-418 -105)"
+       id="g4"
+       style="">
+      <polygon
+         transform="translate(421.02 110.02) rotate(-90) translate(-421.02 -110.02)"
+         points="426.03 108 421.01 113.02 416 108 417 107 421.01 111.02 425.03 107"
+         id="polygon2"
+         style="" />
+    </g>
   </g>
- </g>
 </svg>

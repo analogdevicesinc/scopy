@@ -419,7 +419,6 @@ void ScopyMainWindow::initPreferences()
 
 	QString theme = p->get("general_theme").toString();
 	QString themeName = "scopy-" + theme;
-	QIcon::setThemeName(themeName);
 	QIcon::setThemeSearchPaths({":/gui/icons/" + themeName});
 	qInfo(CAT_BENCHMARK) << "Init preferences took: " << timer.elapsed() << "ms";
 }
