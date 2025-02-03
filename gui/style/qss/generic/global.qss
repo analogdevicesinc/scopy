@@ -24,7 +24,32 @@ QTextBrowser {
 }
 
 QAbstractSpinBox {
-    	background-color: &background_primary&;
+    padding: 0 &padding_interactive& 0 &padding_interactive&;
+    height: &unit_2&;
+    border: &border_width& solid &interactive_subtle_idle&;
+    border-bottom: &border_width_interactive& solid &interactive_subtle_idle&;
+    border-radius: &radius_interactive&;
+    background-color: &background_primary&;
+    color: &content_default&;
+}
+
+QSpinBox::up-button
+{
+    border: 0px;
+    padding-right: &padding_2&;
+    padding-top: 3;
+    width: 10px;
+    height: 6px;
+    image: url(&sba_cmb_box_arrow_up&) 1;
+}
+QSpinBox::down-button
+{
+    border: 0px;
+    padding-right: &padding_2&;
+    padding-bottom: 3;
+    width: 10px;
+    height: 6px;
+    image: url(&sba_cmb_box_arrow&) 1;
 }
 
 QToolTip {

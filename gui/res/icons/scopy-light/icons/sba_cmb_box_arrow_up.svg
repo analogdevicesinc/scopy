@@ -12,7 +12,7 @@
    viewBox="0 0 10 6"
    version="1.1"
    id="svg4"
-   sodipodi:docname="sba_cmb_box_arrow.svg"
+   sodipodi:docname="sba_cmb_box_arrow_up.svg"
    inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
   <metadata
      id="metadata10">
@@ -48,8 +48,8 @@
      inkscape:window-maximized="1"
      inkscape:current-layer="svg4" />
   <path
-     d="m 9.9869452,1.0546083 -5,4.99 -4.99999999,-4.99 1,-0.99999998 3.99999999,3.99999998 4,-3.99999998 z"
+     d="M 0,4.99 5,0 l 5,4.99 -1,1 -4,-4 -4,4 z"
      id="path2"
      inkscape:connector-curvature="0"
-     style="opacity:0.8;fill:#ffffff;fill-opacity:1;fill-rule:evenodd" />
+     style="opacity:0.8;fill:#000000;fill-rule:evenodd" />
 </svg>

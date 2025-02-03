@@ -175,6 +175,7 @@ bool Style::setTheme(QString theme)
 		m_theme_json = new QJsonDocument(QJsonDocument::fromJson(theme_data));
 
 		genrateStyle();
+		QIcon::setThemeName(getAttribute(json::theme::icon_theme_folder));
 		return true;
 	}
 
