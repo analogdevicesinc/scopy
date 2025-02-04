@@ -31,7 +31,7 @@ class SCOPY_IIOUTIL_EXPORT IioBufferCancel : public Command
 {
 	Q_OBJECT
 public:
-	explicit IioBufferCancel(struct iio_buffer *buffer, QObject *parent)
+	explicit IioBufferCancel(iio_buffer *buffer, QObject *parent)
 		: m_buffer(buffer)
 	{
 		this->setParent(parent);

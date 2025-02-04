@@ -41,7 +41,7 @@ file(GLOB HEADER_LIST include/*.h include/*.hpp)
 configure_file(include/pdk-util_config.h.cmakein ${"${CMAKE_CURRENT_SOURCE_DIR}"}/include/pdk-util_config.h @ONLY)
 
 set(PROJECT_SOURCES ${"${SRC_LIST}"} ${"${HEADER_LIST}"} ${"${CMAKE_CURRENT_SOURCE_DIR}"}/include/pdk-util_config.h)
-find_path(IIO_INCLUDE_DIRS iio.h REQUIRED)
+find_path(IIO_INCLUDE_DIRS iio/iio.h REQUIRED)
 find_library(IIO_LIBRARIES NAMES iio libiio REQUIRED)
 
 add_subdirectory(plugin/${plugin_dir})

@@ -35,6 +35,7 @@ protected:
 	IIODevice(QObject *parent = nullptr);
 	~IIODevice();
 
+	// NOTE: Should there be macros with the types? e.g. iiores_cnst_attr_t = IIOResult<const iio_attr *>
 public:
 	IIODevice(const IIODevice &) = delete;
 	IIODevice &operator=(const IIODevice &) = delete;
@@ -53,9 +54,19 @@ public:
 	static IIOResult<const iio_attr *> find_attr(const iio_device *dev, const char *name);
 	static void set_data(iio_device *dev, void *data);
 	static void *get_data(const iio_device *dev);
+
+	/* Trigger related functions */
 	static IIOResult<const iio_device *> get_trigger(const iio_device *dev);
 	static int set_trigger(iio_device *dev, const iio_device *trigger);
 	static bool is_trigger(const iio_device *dev);
+
+	/* Low level and debug functions */
+	static ssize_t get_sample_size(const iio_device *dev, const iio_channels_mask *mask);
+	static unsigned int get_debug_attrs_count(const iio_device *dev);
+	static IIOResult<const iio_attr *> get_debug_attr(const iio_device *dev, unsigned int index);
+	static IIOResult<const iio_attr *> find_debug_attr(const iio_device *dev, const char *name);
+	static int reg_write(iio_device *dev, uint32_t address, uint32_t value);
+	static int reg_read(iio_device *dev, uint32_t address, uint32_t *value);
 
 private:
 	static IIODevice *pinstance_;

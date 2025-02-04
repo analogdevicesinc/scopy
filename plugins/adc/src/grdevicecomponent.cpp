@@ -24,8 +24,15 @@
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
 #include <widgets/menuheader.h>
+
 #include <iio-widgets/iiowidget.h>
 #include <iio-widgets/iiowidgetbuilder.h>
+
+#include <iioutil/iiocpp/iiodevice.h>
+#include <iioutil/iiocpp/iiochannel.h>
+#include <iioutil/iiocpp/iioattribute.h>
+#include <iioutil/iiocpp/iioresult.h>
+
 #include <style.h>
 
 using namespace scopy;
@@ -59,29 +66,45 @@ QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent)
 	MenuSectionCollapseWidget *attr =
 		new MenuSectionCollapseWidget("COMMON CHANNEL ATTRIBUTES", MenuCollapseSection::MHCW_NONE,
 					      MenuCollapseSection::MHW_BASEWIDGET, parent);
-	const struct iio_context *ctx = iio_device_get_context(dev);
+	const iio_context *ctx = IIODevice::get_context(dev);
 
-	int chCount = iio_device_get_channels_count(dev);
+	int chCount = IIODevice::get_channels_count(dev);
 	if(chCount < 2) {
 		return nullptr;
 	}
 
-	const struct iio_channel *ch = iio_device_get_channel(dev, 0);
+	IIOResult<const iio_channel *> res1 = IIODevice::get_channel(dev, 0);
+	if(!res1.ok()) {
+		qDebug() << "Failed to get channel 0" << res1.error();
+		return nullptr;
+	}
+	const iio_channel *ch = res1.data();
 
-	int attrCount = iio_channel_get_attrs_count(ch);
+	int attrCount = IIOChannel::get_attrs_count(ch);
 
 	for(int i = 0; i < attrCount; i++) {
 		bool createAttr = true;
-		const char *attrName = iio_channel_get_attr(ch, i);
-		if(attrName == nullptr) {
+		IIOResult<const iio_attr *> res = IIOChannel::get_attr(ch, i);
+		if(!res.ok()) {
+			qDebug() << "Failed to get attribute" << i << res.error();
 			continue;
 		}
+		const char *attrName = IIOAttribute::get_name(res.data());
+
 		for(int j = 1; j < chCount; j++) {
-			const struct iio_channel *ch1 = iio_device_get_channel(dev, j);
-			const char *attr1Name = iio_channel_find_attr(ch1, attrName);
-			if(attr1Name == nullptr) {
+			IIOResult<const iio_channel *> res1 = IIODevice::get_channel(dev, j);
+			if(!res1.ok()) {
+				qDebug() << "Failed to get channel" << j << res1.error();
 				continue;
 			}
+			const iio_channel *ch1 = res1.data();
+			IIOResult<const iio_attr *> res2 = IIOChannel::find_attr(ch1, attrName);
+			if(!res2.ok()) {
+				qDebug() << "Failed to find attribute" << attrName << "in channel" << j << res2.error();
+				continue;
+			}
+			const char *attr1Name = IIOAttribute::get_name(res2.data());
+
 			if(strcmp(attrName, attr1Name) != 0) {
 				createAttr = false;
 				break;
@@ -129,7 +152,7 @@ QWidget *GRDeviceComponent::createAttrMenu(QWidget *parent)
 									MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(attr).device(m_src->iioDev()).buildAll();
-	const struct iio_context *ctx = iio_device_get_context(m_src->iioDev());
+	const iio_context *ctx = IIODevice::get_context(m_src->iioDev());
 	attrWidgets.append(IIOWidgetBuilder(attr)
 				   .context(const_cast<iio_context *>(ctx))
 				   .device(m_src->iioDev())

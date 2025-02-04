@@ -19,16 +19,25 @@
  */
 
 #include "iiowidgetbuilder.h"
-#include "guistrategy/editableguistrategy.h"
-#include "guistrategy/switchguistrategy.h"
+
 #include "datastrategy/channelattrdatastrategy.h"
 #include "datastrategy/triggerdatastrategy.h"
 #include "datastrategy/deviceattrdatastrategy.h"
 #include "datastrategy/contextattrdatastrategy.h"
 #include "datastrategy/cmdqchannelattrdatastrategy.h"
 #include "datastrategy/cmdqdeviceattrdatastrategy.h"
+
 #include "guistrategy/comboguistrategy.h"
 #include "guistrategy/rangeguistrategy.h"
+#include "guistrategy/editableguistrategy.h"
+#include "guistrategy/switchguistrategy.h"
+
+#include <iioutil/iiocpp/iiocontext.h>
+#include <iioutil/iiocpp/iiodevice.h>
+#include <iioutil/iiocpp/iiochannel.h>
+#include <iioutil/iiocpp/iioattribute.h>
+#include <iioutil/iiocpp/iioresult.h>
+
 #include <pluginbase/preferences.h>
 #include <iioutil/connectionprovider.h>
 #include <QLoggingCategory>
@@ -51,7 +60,8 @@ IIOWidgetBuilder::IIOWidgetBuilder(QWidget *parent)
 	, m_dataStrategy(DS::NoDataStrategy)
 	, m_uiStrategy(UIS::NoUIStrategy)
 	, m_widgetParent(parent)
-{}
+{
+}
 
 IIOWidgetBuilder::~IIOWidgetBuilder() {}
 
@@ -92,53 +102,51 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 {
 	QList<IIOWidget *> result;
 	ssize_t attrCount = 0;
-	const char *attrName = nullptr;
-	const char *availableAttr = nullptr;
 
 	if(m_channel) {
-		attrCount = iio_channel_get_attrs_count(m_channel);
+		attrCount = IIOChannel::get_attrs_count(m_channel);
 		for(ssize_t i = 0; i < attrCount; ++i) {
-			attrName = iio_channel_get_attr(m_channel, i);
-			if(!attrName) {
-				qWarning(CAT_ATTRBUILDER)
-					<< "Could not read the channel attribute name with index" << i;
+			IIOResult<const iio_attr *> res = IIOChannel::get_attr(m_channel, i);
+			if(!res.ok()) {
+				qWarning(CAT_ATTRBUILDER) << "Could not read the channel attribute with index" << i;
 				continue;
 			}
 
-			m_attribute = attrName;
-			if(QString(attrName).endsWith("_available")) {
+			const iio_attr *attr = res.data();
+			m_attribute = IIOAttribute::get_name(attr);
+			if(QString(m_attribute).endsWith("_available")) {
 				continue;
 			}
 
-			availableAttr = iio_channel_find_attr(m_channel,
-							      (QString(attrName) + "_available").toStdString().c_str());
-			if(availableAttr) {
-				m_optionsAttribute = availableAttr;
+			IIOResult<const iio_attr *> availableAttrRes = IIOChannel::find_attr(
+				m_channel, (QString(m_attribute) + "_available").toStdString().c_str());
+			if(availableAttrRes.ok()) {
+				m_optionsAttribute = IIOAttribute::get_name(availableAttrRes.data());
 			}
 
 			result.append(buildSingle());
-
 			m_attribute = "";
 			m_optionsAttribute = "";
 		}
 	} else if(m_device) {
-		attrCount = iio_device_get_attrs_count(m_device);
+		attrCount = IIODevice::get_attrs_count(m_device);
 		for(ssize_t i = 0; i < attrCount; ++i) {
-			attrName = iio_device_get_attr(m_device, i);
-			if(!attrName) {
-				qWarning(CAT_ATTRBUILDER) << "Could not read the device attribute name with index" << i;
+			IIOResult<const iio_attr *> res = IIODevice::get_attr(m_device, i);
+			if(!res.ok()) {
+				qWarning(CAT_ATTRBUILDER) << "Could not read the device attribute with index" << i;
 				continue;
 			}
 
-			m_attribute = attrName;
-			if(QString(attrName).endsWith("_available")) {
+			const iio_attr *attr = res.data();
+			m_attribute = IIOAttribute::get_name(attr);
+			if(QString(m_attribute).endsWith("_available")) {
 				continue;
 			}
 
-			availableAttr = iio_device_find_attr(m_device,
-							     (QString(attrName) + "_available").toStdString().c_str());
-			if(availableAttr) {
-				m_optionsAttribute = availableAttr;
+			IIOResult<const iio_attr *> availableAttrRes = IIODevice::find_attr(
+				m_device, (QString(m_attribute) + "_available").toStdString().c_str());
+			if(availableAttrRes.ok()) {
+				m_optionsAttribute = IIOAttribute::get_name(availableAttrRes.data());
 			}
 
 			result.append(buildSingle());
@@ -147,25 +155,26 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 		}
 
 		if(m_includeDebugAttrs) {
-			attrCount = iio_device_get_debug_attrs_count(m_device);
+			attrCount = IIODevice::get_debug_attrs_count(m_device);
 			for(ssize_t i = 0; i < attrCount; ++i) {
-				attrName = iio_device_get_debug_attr(m_device, i);
-
-				if(!attrName) {
+				IIOResult<const iio_attr *> res = IIODevice::get_debug_attr(m_device, i);
+				if(!res.ok()) {
 					qWarning(CAT_ATTRBUILDER)
-						<< "Could not read the device DEBUG attribute name with index" << i;
+						<< "Could not read the device DEBUG attribute with index" << i;
 					continue;
 				}
 
-				m_attribute = attrName;
-				if(QString(attrName).endsWith("_available")) {
+				const iio_attr *debugAttr = res.data();
+				m_attribute = IIOAttribute::get_name(debugAttr);
+
+				if(QString(m_attribute).endsWith("_available")) {
 					continue;
 				}
 
-				availableAttr = iio_device_find_debug_attr(
-					m_device, (QString(attrName) + "_available").toStdString().c_str());
-				if(availableAttr) {
-					m_optionsAttribute = availableAttr;
+				IIOResult<const iio_attr *> availableDebugAttr = IIODevice::find_debug_attr(
+					m_device, (QString(m_attribute) + "_available").toStdString().c_str());
+				if(availableDebugAttr.ok()) {
+					m_optionsAttribute = IIOAttribute::get_name(availableDebugAttr.data());
 				}
 
 				result.append(buildSingle());
@@ -174,18 +183,17 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 			}
 		}
 	} else if(m_context) {
-		attrCount = iio_context_get_attrs_count(m_context);
+		attrCount = IIOContext::get_attrs_count(m_context);
 		for(ssize_t i = 0; i < attrCount; ++i) {
-			const char *name;
-			const char *value;
-			int res = iio_context_get_attr(m_context, i, &name, &value);
-
-			if(res < 0) {
-				qWarning(CAT_ATTRBUILDER) << "Coutd not get the context attribute with index" << i;
+			IIOResult<const iio_attr *> res = IIOContext::get_attr(m_context, i);
+			if(!res.ok()) {
+				qWarning(CAT_ATTRBUILDER) << "Could not read the context attribute with index" << i;
 				continue;
 			}
 
-			m_attribute = name;
+			const iio_attr *attr = res.data();
+			m_attribute = IIOAttribute::get_name(attr);
+
 			result.append(buildSingle());
 			m_attribute = "";
 			m_optionsAttribute = "";
@@ -352,11 +360,23 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 			char buffer[ATTR_BUFFER_SIZE] = {0};
 			ssize_t res = -1;
 			if(m_channel) {
-				res = iio_channel_attr_read(m_channel, m_optionsAttribute.toStdString().c_str(), buffer,
-							    ATTR_BUFFER_SIZE);
+				IIOResult<const iio_attr *> attrRes =
+					IIOChannel::find_attr(m_channel, m_optionsAttribute.toStdString().c_str());
+				if(!attrRes.ok()) {
+					qWarning(CAT_ATTRBUILDER)
+						<< "Could not find options attribute" << m_optionsAttribute;
+					strategy = UIS::EditableUi;
+				}
+				res = IIOAttribute::read_raw(attrRes.data(), buffer, ATTR_BUFFER_SIZE);
 			} else if(m_device) {
-				res = iio_device_attr_read(m_device, m_optionsAttribute.toStdString().c_str(), buffer,
-							   ATTR_BUFFER_SIZE);
+				IIOResult<const iio_attr *> attrRes =
+					IIODevice::find_attr(m_device, m_optionsAttribute.toStdString().c_str());
+				if(!attrRes.ok()) {
+					qWarning(CAT_ATTRBUILDER)
+						<< "Could not find options attribute" << m_optionsAttribute;
+					strategy = UIS::EditableUi;
+				}
+				res = IIOAttribute::read_raw(attrRes.data(), buffer, ATTR_BUFFER_SIZE);
 			} else { // context
 				// editable as context attrs are read only and cannot be changed
 				strategy = UIS::EditableUi;

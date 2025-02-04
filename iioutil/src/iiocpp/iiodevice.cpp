@@ -106,3 +106,38 @@ IIOResult<const iio_device *> IIODevice::get_trigger(const iio_device *dev)
 int IIODevice::set_trigger(iio_device *dev, const iio_device *trigger) { return iio_device_set_trigger(dev, trigger); }
 
 bool IIODevice::is_trigger(const iio_device *dev) { return iio_device_is_trigger(dev); }
+
+ssize_t IIODevice::get_sample_size(const iio_device *dev, const iio_channels_mask *mask)
+{
+	return iio_device_get_sample_size(dev, mask);
+}
+
+unsigned int IIODevice::get_debug_attrs_count(const iio_device *dev) { return iio_device_get_debug_attrs_count(dev); }
+
+IIOResult<const iio_attr *> IIODevice::get_debug_attr(const iio_device *dev, unsigned int index)
+{
+	const iio_attr *attr = iio_device_get_debug_attr(dev, index);
+	if(!attr) {
+		return IIOResult<const iio_attr *>(-EINVAL);
+	}
+	return IIOResult<const iio_attr *>(attr);
+}
+
+IIOResult<const iio_attr *> IIODevice::find_debug_attr(const iio_device *dev, const char *name)
+{
+	const iio_attr *attr = iio_device_find_debug_attr(dev, name);
+	if(!attr) {
+		return IIOResult<const iio_attr *>(-EINVAL);
+	}
+	return IIOResult<const iio_attr *>(attr);
+}
+
+int IIODevice::reg_write(iio_device *dev, uint32_t address, uint32_t value)
+{
+	return iio_device_reg_write(dev, address, value);
+}
+
+int IIODevice::reg_read(iio_device *dev, uint32_t address, uint32_t *value)
+{
+	return iio_device_reg_read(dev, address, value);
+}

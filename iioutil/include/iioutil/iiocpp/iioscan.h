@@ -28,6 +28,8 @@
 #include "iiocpp/iioresult.h"
 
 namespace scopy {
+struct iio_scan;
+
 class SCOPY_IIOUTIL_EXPORT IIOScan : public QObject
 {
 	Q_OBJECT
@@ -42,11 +44,16 @@ public:
 
 	static IIOScan *GetInstance();
 
-	static IIOResult<struct iio_scan *> scan(const struct iio_context_params *params, const char *backends);
-	static void destroy(struct iio_scan *ctx);
+	static IIOResult<iio_scan *> scan(const iio_context_params *params, const char *backends);
+	static void destroy(iio_scan *ctx);
 	static size_t get_results_count(const struct iio_scan *ctx);
 	static const char *get_description(const struct iio_scan *ctx, size_t idx);
 	static const char *get_uri(const struct iio_scan *ctx, size_t idx);
+
+	/* Top level functions, but are related to iio_scan */
+	static unsigned int get_builtin_backends_count(void);
+	static const char *get_builtin_backend(unsigned int idx);
+	static bool has_backend(const iio_context_params *params, const char *backend);
 
 private:
 	static IIOScan *pinstance_;

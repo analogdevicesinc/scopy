@@ -21,12 +21,13 @@
 #ifndef IIORESULT_H
 #define IIORESULT_H
 
+#include "scopy-iioutil_export.h"
 #include <stdexcept>
 #include <type_traits>
 #include <variant>
 
 namespace scopy {
-class IIO_RESULT_ERROR : public std::runtime_error
+class SCOPY_IIOUTIL_EXPORT IIO_RESULT_ERROR : public std::runtime_error
 {
 public:
 	IIO_RESULT_ERROR(char const *const message) throw();
@@ -34,7 +35,7 @@ public:
 };
 
 template <typename T>
-class IIOResult
+class SCOPY_IIOUTIL_EXPORT IIOResult
 {
 	// Ensure T is a pointer type
 	static_assert(std::is_pointer_v<T>, "IIOResult must hold a pointer type");

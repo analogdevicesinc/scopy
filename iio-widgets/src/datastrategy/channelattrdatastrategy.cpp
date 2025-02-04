@@ -19,6 +19,9 @@
  */
 
 #include "datastrategy/channelattrdatastrategy.h"
+#include <iioutil/iiocpp/iiochannel.h>
+#include <iioutil/iiocpp/iioattribute.h>
+#include <iioutil/iiocpp/iioresult.h>
 #include <QFile>
 #define BUFFER_SIZE 16384
 
@@ -62,12 +65,16 @@ int ChannelAttrDataStrategy::write(QString data)
 	}
 
 	Q_EMIT aboutToWrite(m_data, data);
-	ssize_t res = iio_channel_attr_write(m_recipe.channel, m_recipe.data.toStdString().c_str(),
-					     data.toStdString().c_str());
-	if(res < 0) {
-		qWarning(CAT_IIO_DATA_STRATEGY) << "Cannot write" << data << "to" << m_recipe.data;
+
+	const char *attrName = m_recipe.data.toLocal8Bit().data();
+	IIOResult<const iio_attr *> attrRes = IIOChannel::find_attr(m_recipe.channel, attrName);
+	if(!attrRes.ok()) {
+		qWarning(CAT_IIO_DATA_STRATEGY) << "Could not find attribute" << m_recipe.data;
+		return attrRes.error();
 	}
 
+	const iio_attr *attr = attrRes.data();
+	ssize_t res = IIOAttribute::write_raw(attr, data.toStdString().c_str(), data.size());
 	return res;
 }
 
@@ -79,20 +86,29 @@ QPair<QString, QString> ChannelAttrDataStrategy::read()
 	}
 
 	char options[BUFFER_SIZE] = {0}, currentValue[BUFFER_SIZE] = {0};
-
-	m_returnCode =
-		iio_channel_attr_read(m_recipe.channel, m_recipe.data.toStdString().c_str(), currentValue, BUFFER_SIZE);
-	if(m_returnCode < 0) {
-		qWarning(CAT_IIO_DATA_STRATEGY) << "Could not read" << m_recipe.data << "error code:" << m_returnCode;
+	const char *attrName = m_recipe.data.toLocal8Bit().data();
+	IIOResult<const iio_attr *> attrRes = IIOChannel::find_attr(m_recipe.channel, attrName);
+	if(!attrRes.ok()) {
+		qWarning(CAT_IIO_DATA_STRATEGY) << "Could not find attribute" << m_recipe.data;
+		return {};
 	}
 
-	if(m_recipe.iioDataOptions != "") {
-		ssize_t optionsResult = iio_channel_attr_read(
-			m_recipe.channel, m_recipe.iioDataOptions.toStdString().c_str(), options, BUFFER_SIZE);
-		if(optionsResult < 0) {
-			qWarning(CAT_IIO_DATA_STRATEGY)
-				<< "Could not read" << m_recipe.data << "error code:" << optionsResult;
+	const iio_attr *attr = attrRes.data();
+	m_returnCode = IIOAttribute::read_raw(attr, currentValue, BUFFER_SIZE);
+
+	if(!m_recipe.iioDataOptions.isEmpty()) {
+		const char *optionsAttrName = m_recipe.iioDataOptions.toLocal8Bit().data();
+		IIOResult<const iio_attr *> optionsRes = IIOChannel::find_attr(m_recipe.channel, optionsAttrName);
+		if(!optionsRes.ok()) {
+			qWarning(CAT_IIO_DATA_STRATEGY) << "Could not find attribute" << m_recipe.data;
+			return {};
 		}
+
+		const iio_attr *optionsAttr = optionsRes.data();
+		ssize_t optionsResult = IIOAttribute::read_raw(optionsAttr, options, BUFFER_SIZE);
+
+		// FIXME: Should this emit be here?
+		Q_EMIT emitStatus(QDateTime::currentDateTime(), m_optionalData, options, m_returnCode, true);
 	}
 
 	if(m_recipe.constDataOptions != "") {

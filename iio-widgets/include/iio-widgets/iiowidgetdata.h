@@ -21,7 +21,7 @@
 #ifndef SCOPY_IIOWIDGETDATA_H
 #define SCOPY_IIOWIDGETDATA_H
 
-#include <iio.h>
+#include <iio/iio.h>
 #include <QString>
 #include <iioutil/connection.h>
 #include "scopy-iio-widgets_export.h"

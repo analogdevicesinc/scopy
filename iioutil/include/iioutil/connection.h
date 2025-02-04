@@ -23,7 +23,7 @@
 #define CONNECTION_H
 #include "scopy-iioutil_export.h"
 #include "commandqueue.h"
-#include <iio.h>
+#include <iio/iio.h>
 #include <QObject>
 
 namespace scopy {
@@ -35,7 +35,7 @@ public:
 
 	const QString &uri() const;
 	CommandQueue *commandQueue() const;
-	struct iio_context *context() const;
+	iio_context *context() const;
 	int refCount() const;
 
 protected:
@@ -78,7 +78,7 @@ private:
 	friend class ConnectionProvider;
 	QString m_uri;
 	CommandQueue *m_commandQueue;
-	struct iio_context *m_context;
+	iio_context *m_context;
 	int m_refCount = 0;
 };
 } // namespace scopy

@@ -64,7 +64,7 @@ endif()
 
 option(WITH_LIBSERIALPORT "Add serial backend support to Scopy - also needs to be enabled in libiio" ON)
 find_library(IIO_LIBRARIES NAMES iio libiio REQUIRED)
-find_path(IIO_INCLUDE_DIRS iio.h REQUIRED)
+find_path(IIO_INCLUDE_DIRS iio/iio.h REQUIRED)
 if(${WITH_LIBSERIALPORT})
 	find_library(LIBSERIALPORT_LIBRARIES serialport REQUIRED)
 	find_path(LIBSERIALPORT_INCLUDE_DIR libserialport.h REQUIRED)

@@ -20,6 +20,9 @@
  */
 
 #include "contextattrdatastrategy.h"
+#include <iioutil/iiocpp/iiocontext.h>
+#include <iioutil/iiocpp/iioresult.h>
+#include <iioutil/iiocpp/iioattribute.h>
 #include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_CONTEXT_ATTR_DATA_STRATEGY, "ContextAttrDataStrategy")
@@ -51,7 +54,15 @@ QPair<QString, QString> ContextAttrDataStrategy::read()
 		return {};
 	}
 
-	const char *value = iio_context_get_attr_value(m_recipe.context, m_recipe.data.toStdString().c_str());
+	const char *attrName = m_recipe.data.toLocal8Bit().data();
+	IIOResult<const iio_attr *> attrRes = IIOContext::find_attr(m_recipe.context, attrName);
+	if(!attrRes.ok()) {
+		qWarning(CAT_CONTEXT_ATTR_DATA_STRATEGY) << "Could not find attribute" << m_recipe.data;
+		return {};
+	}
+
+	const iio_attr *attr = attrRes.data();
+	const char *value = IIOAttribute::get_static_value(attr);
 
 	if(value == nullptr) {
 		qWarning(CAT_CONTEXT_ATTR_DATA_STRATEGY) << "Could not read value from context attr" << m_recipe.data;

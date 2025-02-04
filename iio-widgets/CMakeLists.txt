@@ -74,7 +74,7 @@ endif()
 set(SCOPY_QT_COMPONENTS Core Widgets)
 
 find_library(IIO_LIBRARIES NAMES iio libiio REQUIRED)
-find_path(IIO_INCLUDE_DIRS iio.h REQUIRED)
+find_path(IIO_INCLUDE_DIRS iio/iio.h REQUIRED)
 
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 

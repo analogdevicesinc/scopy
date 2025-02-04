@@ -23,7 +23,6 @@
 #define SCOPY_CONTEXTATTRDATASTRATEGY_H
 
 #include <QWidget>
-#include <iio.h>
 #include "datastrategyinterface.h"
 #include "scopy-iio-widgets_export.h"
 

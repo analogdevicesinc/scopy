@@ -20,6 +20,7 @@
  */
 
 #include "connection.h"
+#include "iiocpp/iiocontext.h"
 
 using namespace scopy;
 
@@ -38,7 +39,7 @@ Connection::~Connection()
 		this->m_commandQueue = nullptr;
 	}
 	if(this->m_context) {
-		iio_context_destroy(this->m_context);
+		IIOContext::destroy(this->m_context);
 		this->m_context = nullptr;
 	}
 }
@@ -54,10 +55,13 @@ int Connection::refCount() const { return m_refCount; }
 void Connection::open()
 {
 	if(!this->m_context) {
-		this->m_context = iio_create_context_from_uri(this->m_uri.toStdString().c_str());
-		if(this->m_context) {
+		IIOResult<iio_context *> res = IIOContext::create_context(nullptr, this->m_uri.toStdString().c_str());
+		if(res.ok()) {
+			this->m_context = res.data();
 			this->m_commandQueue = new CommandQueue();
 			this->m_refCount++;
+		} else {
+			qWarning() << "Failed to create context: " << res.error();
 		}
 	} else {
 		this->m_refCount++;

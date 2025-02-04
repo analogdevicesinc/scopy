@@ -19,7 +19,9 @@
  */
 
 #include "datastrategy/triggerdatastrategy.h"
-#include <utility>
+#include <iioutil/iiocpp/iiodevice.h>
+#include <iioutil/iiocpp/iioresult.h>
+#include <iioutil/iiocpp/iiocontext.h>
 #include <QFile>
 
 using namespace scopy;
@@ -60,21 +62,22 @@ int TriggerDataStrategy::write(QString data)
 		return -EINVAL;
 	}
 
-	struct iio_device *trigger = iio_context_find_device(m_recipe.context, data.toStdString().c_str());
-	if(trigger == nullptr) {
-		qWarning(CAT_TRIGGER_DATA_STRATEGY) << "Invalid arguments, no trigger with name" << data << "was found";
+	IIOResult<iio_device *> triggerRes = IIOContext::find_device(m_recipe.context, data.toStdString().c_str());
+	if(!triggerRes.ok()) {
+		qWarning(CAT_TRIGGER_DATA_STRATEGY)
+			<< "Invalid arguments, no trigger with name" << data << "was found" << triggerRes.error();
 	}
 
 	Q_EMIT aboutToWrite(m_data, data);
 	int res;
 	if(data == "None") {
-		res = iio_device_set_trigger(m_recipe.device, nullptr);
+		res = IIODevice::set_trigger(m_recipe.device, nullptr);
 
 		if(res < 0) {
 			qWarning(CAT_TRIGGER_DATA_STRATEGY) << "Cannot clear trigger";
 		}
 	} else {
-		res = iio_device_set_trigger(m_recipe.device, trigger);
+		res = IIODevice::set_trigger(m_recipe.device, triggerRes.data());
 
 		if(res < 0) {
 			qWarning(CAT_TRIGGER_DATA_STRATEGY) << "Cannot set trigger" << data;
@@ -93,28 +96,29 @@ QPair<QString, QString> TriggerDataStrategy::read()
 		return {};
 	}
 
-	const struct iio_device *currentTrigger;
-	ssize_t res = iio_device_get_trigger(m_recipe.device, &currentTrigger);
-	if(res < 0) {
+	const iio_device *currentTrigger;
+	IIOResult<const iio_device *> triggerRes = IIODevice::get_trigger(m_recipe.device);
+	if(!triggerRes.ok()) {
 		qWarning(CAT_TRIGGER_DATA_STRATEGY) << "Cannot read trigger";
 		currentTrigger = nullptr;
 		currentTriggerName = "None";
+	} else {
+		currentTrigger = triggerRes.data();
+		currentTriggerName = IIODevice::get_name(currentTrigger);
 	}
 
-	if(currentTrigger != nullptr) {
-		currentTriggerName = iio_device_get_name(currentTrigger);
-	}
-
-	unsigned int deviceCount = iio_context_get_devices_count(m_recipe.context);
+	unsigned int deviceCount = IIOContext::get_devices_count(m_recipe.context);
 	for(int i = 0; i < deviceCount; ++i) {
-		struct iio_device *dev = iio_context_get_device(m_recipe.context, i);
-		if(dev == nullptr) {
-			qDebug(CAT_TRIGGER_DATA_STRATEGY) << "No device with index" << i << "was found.";
+		IIOResult<iio_device *> devRes = IIOContext::get_device(m_recipe.context, i);
+		if(!devRes.ok()) {
+			qWarning(CAT_TRIGGER_DATA_STRATEGY) << "Cannot get device" << i << "error:" << devRes.error();
 			continue;
 		}
-		bool isTrigger = iio_device_is_trigger(dev);
+		iio_device *dev = devRes.data();
+
+		bool isTrigger = IIODevice::is_trigger(dev);
 		if(isTrigger) {
-			QString name = iio_device_get_name(dev);
+			QString name = IIODevice::get_name(dev);
 			if(!name.isEmpty()) {
 				triggerOptions += name + " ";
 			}

@@ -108,7 +108,7 @@ endif()
 
 find_path(
 	IIO_INCLUDE_DIRS
-	NAMES iio.h
+	NAMES iio/iio.h
 	HINTS ${CMAKE_INSTALL_PREFIX}/include
 	      /include
 	      /usr/include

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Analog Devices Inc.
+ * Copyright (c) 2025 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see https://www.github.com/analogdevicesinc/scopy).
@@ -16,40 +16,31 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
- *
  */
 
-#ifndef SWIOTPINGTASK_H
-#define SWIOTPINGTASK_H
+#ifndef IIOOPERATIONINTERFACE_H
+#define IIOOPERATIONINTERFACE_H
 
-#include <iio/iio.h>
-
-#include <QThread>
-
-#include "command.h"
-#include "connection.h"
-#include "pingtask.h"
+#include "scopy-iioutil_export.h"
+#include <QtXml/qdom.h>
+#include <qobject.h>
 
 namespace scopy {
-class SCOPY_IIOUTIL_EXPORT CmdQPingTask : public PingTask
+class SCOPY_IIOUTIL_EXPORT IIOOperationInterface
 {
-	Q_OBJECT
 public:
-	CmdQPingTask(Connection *conn, QObject *parent = nullptr);
-	CmdQPingTask(Connection *conn, QString pingDevice, QObject *parent = nullptr);
-	~CmdQPingTask();
-	void run() override;
-	bool ping() override;
+	enum IIOOperationType
+	{
+		SCAN,
+		CONTEXT,
+		DEVICE,
+		CHANNEL,
+		ATTRIBUTE,
+	};
 
-protected:
-	QString m_pingDevice = "";
-	Connection *c;
-
-private Q_SLOTS:
-	void getTriggerCommandFinished(scopy::Command *cmd);
-
-private:
-	const int MS_TO_WAIT = 2000;
+	virtual ~IIOOperationInterface() = default;
 };
 } // namespace scopy
-#endif // SWIOTPINGTASK_H
+
+Q_DECLARE_INTERFACE(scopy::IIOOperationInterface, "scopy::IIOOperationInterface")
+#endif // IIOOPERATIONINTERFACE_H

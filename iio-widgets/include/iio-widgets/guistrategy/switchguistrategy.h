@@ -22,7 +22,6 @@
 #define SCOPY_SWITCHGUISTRATEGY_H
 
 #include <QWidget>
-#include <iio.h>
 #include <gui/customSwitch.h>
 #include "guistrategy/guistrategyinterface.h"
 #include "iiowidgetdata.h"

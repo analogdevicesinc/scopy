@@ -20,6 +20,9 @@
  */
 
 #include "deviceinfopage.h"
+#include <iioutil/iiocpp/iiocontext.h>
+#include <iioutil/iiocpp/iioattribute.h>
+#include <iioutil/iiocpp/iioresult.h>
 #include <QVBoxLayout>
 #include <QDebug>
 
@@ -55,17 +58,14 @@ void DeviceInfoPage::setupInfoPage()
 
 	QString backendName, description;
 	unsigned int major, minor;
-	char git_tag[8] = "0000000";
-	int ret = EXIT_FAILURE;
-	ret = iio_context_get_version(m_conn->context(), &major, &minor, git_tag);
-	if(ret) {
-		qWarning() << "Error, cannot read backend version.";
-		major = 'x';
-		minor = 'x';
-	}
+	const char *versionTag;
 
-	backendName = iio_context_get_name(m_conn->context());
-	description = iio_context_get_description(m_conn->context());
+	major = IIOContext::get_version_major(m_conn->context());
+	minor = IIOContext::get_version_minor(m_conn->context());
+	versionTag = IIOContext::get_version_tag(m_conn->context());
+
+	backendName = IIOContext::get_name(m_conn->context());
+	description = IIOContext::get_description(m_conn->context());
 
 	QString backendText = "IIO context created with %1 backend.\n"
 			      "Backend version: %2.%3 (git tag: %4)\n"
@@ -73,15 +73,21 @@ void DeviceInfoPage::setupInfoPage()
 	m_backendInfo->setText(backendText.arg(backendName)
 				       .arg(QString::number(major))
 				       .arg(QString::number(minor))
-				       .arg(git_tag)
+				       .arg(versionTag)
 				       .arg(description));
 
 	const char *name;
 	const char *value;
-	for(int i = 0; i < iio_context_get_attrs_count(m_conn->context()); ++i) {
-		int ret = iio_context_get_attr(m_conn->context(), i, &name, &value);
-		if(ret != 0)
+	for(int i = 0; i < IIOContext::get_attrs_count(m_conn->context()); ++i) {
+		IIOResult<const iio_attr *> res = IIOContext::get_attr(m_conn->context(), i, &name, &value);
+		if(!res.ok()) {
+			qDebug() << "Error getting attribute at index" << i << "error code:" << res.error();
 			continue;
+		}
+
+		// TODO: check that get_static_value_works
+		name = IIOAttribute::get_name(res.data());
+		value = IIOAttribute::get_static_value(res.data());
 
 		m_infoPage->update(name, value);
 	}

@@ -21,7 +21,10 @@
 
 #include "iiodeviceimpl.h"
 
-#include "iioutil/connectionprovider.h"
+#include <iioutil/connectionprovider.h>
+#include <iioutil/iiocpp/iioresult.h>
+#include <iioutil/iiocpp/iioattribute.h>
+#include <iioutil/iiocpp/iiocontext.h>
 
 #include <QLoggingCategory>
 
@@ -56,12 +59,16 @@ QMap<QString, QString> IIODeviceImpl::readDeviceInfo()
 	if(!conn) {
 		qWarning(CAT_IIO_DEVICEIMPL) << "Cannot read the device info! (unavailable context)";
 	} else {
-		for(int i = 0; i < iio_context_get_attrs_count(conn->context()); i++) {
-			const char *name;
-			const char *value;
-			int ret = iio_context_get_attr(conn->context(), i, &name, &value);
-			if(ret != 0)
+		for(int i = 0; i < IIOContext::get_attrs_count(conn->context()); i++) {
+			IIOResult<const iio_attr *> attrRes = IIOContext::get_attr(conn->context(), i);
+			if(!attrRes.ok()) {
+				qWarning(CAT_IIO_DEVICEIMPL) << "Cannot read the device info! (unavailable attribute)";
 				continue;
+			}
+
+			const iio_attr *attr = attrRes.data();
+			const char *name = IIOAttribute::get_name(attr);
+			const char *value = IIOAttribute::get_static_value(attr); // FIXME: This should work
 			contextAttributes[name] = value;
 		}
 		ConnectionProvider::GetInstance()->close(m_param);

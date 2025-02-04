@@ -22,6 +22,7 @@
 #include "gr-util/grproxyblock.h"
 #include "gr-util/grsignalpath.h"
 #include "gr-util/grtopblock.h"
+#include <iioutil/iiocpp/iiocontext.h>
 
 #include <gnuradio/blocks/head.h>
 #include <gnuradio/blocks/stream_to_vector.h>
@@ -661,7 +662,7 @@ void TST_GRBlocks::test5()
 	top.registerSignalPath(ch2);
 	ch3 = new GRSignalPath("complex", &top);
 
-	iio_context *ctx = iio_create_context_from_uri("ip:192.168.2.1");
+	iio_context *ctx = scopy::IIOContext::create_context(nullptr, "ip:192.168.2.1");
 	if(!ctx) {
 		QSKIP("No context. Skipping");
 	}

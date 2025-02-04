@@ -20,6 +20,7 @@
 
 #include "iiocpp/iioattribute.h"
 #include <QApplication>
+#include <iio/iio.h>
 
 using namespace scopy;
 
@@ -38,6 +39,19 @@ IIOAttribute *IIOAttribute::GetInstance()
 		pinstance_ = new IIOAttribute(QApplication::instance());
 	}
 	return pinstance_;
+}
+
+ssize_t IIOAttribute::read(const iio_attr *attr, char *dst, size_t len)
+{
+	const char *value = iio_attr_get_static_value(attr);
+	ssize_t ret = 0;
+	if(value) {
+		dst = const_cast<char *>(value);
+		return ret;
+	}
+
+	ret = iio_attr_read_raw(attr, dst, len);
+	return ret;
 }
 
 ssize_t IIOAttribute::read_raw(const iio_attr *attr, char *dst, size_t len)

@@ -22,10 +22,12 @@
 #include "iiotabwidget.h"
 
 #include "iioutil/scopy-iioutil_config.h"
+#include <iioutil/iiocpp/iioscan.h>
+
 #include "menusectionwidget.h"
 #include "qtconcurrentrun.h"
 
-#include <iio.h>
+// #include <iio.h>
 #include <QLoggingCategory>
 #include <style.h>
 #include <stylehelper.h>
@@ -149,9 +151,9 @@ void IioTabWidget::setupConnections()
 QStringList IioTabWidget::computeBackendsList()
 {
 	QStringList list;
-	int backEndsCount = iio_get_backends_count();
-	for(int i = 0; i < backEndsCount; i++) {
-		QString backEnd(iio_get_backend(i));
+	unsigned int backEndsCount = IIOScan::get_builtin_backends_count();
+	for(unsigned i = 0; i < backEndsCount; i++) {
+		QString backEnd(IIOScan::get_builtin_backend(i));
 		if(backEnd.compare("xml") == 0 || backEnd.compare("serial") == 0) {
 			continue;
 		}
@@ -287,7 +289,7 @@ bool IioTabWidget::isSerialCompatible()
 #ifdef WITH_LIBSERIALPORT
 	hasLibSerialPort = true;
 #endif
-	bool hasSerialBackend = iio_has_backend("serial");
+	bool hasSerialBackend = IIOScan::has_backend(nullptr, "serial");
 	return hasLibSerialPort && hasSerialBackend;
 }
 

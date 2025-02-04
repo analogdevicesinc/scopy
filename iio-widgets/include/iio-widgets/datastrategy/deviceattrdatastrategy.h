@@ -22,7 +22,6 @@
 #define SCOPY_DEVICEATTRDATASTRATEGY_H
 
 #include <QWidget>
-#include <iio.h>
 #include "datastrategy/datastrategyinterface.h"
 #include "iiowidgetdata.h"
 #include "scopy-iio-widgets_export.h"

@@ -39,6 +39,18 @@ public:
 
 	static IIOAttribute *GetInstance();
 
+	/**
+	 * @brief Get the value of an attribute. This is a generalization for reading the value of an attribute.
+	 * Normally get_static_value or read_raw should be used, but if the attribute is not static the read_raw fails
+	 * and if it is, the get_static_value fails. This function will try both and return the one that succeeds.
+	 * @param attr Attribute to get the value from.
+	 * @param dst Destination buffer.
+	 * @param len Length of the destination buffer.
+	 * @return Number of bytes read or -errno on error.
+	 */
+	static ssize_t read(const iio_attr *attr, char *dst, size_t len);
+
+	/* Functions duplicated from libiio */
 	static ssize_t read_raw(const iio_attr *attr, char *dst, size_t len);
 	static ssize_t write_raw(const iio_attr *attr, const void *src, size_t len);
 	static const char *get_name(const iio_attr *attr);

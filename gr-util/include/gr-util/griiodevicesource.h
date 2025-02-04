@@ -25,7 +25,7 @@
 #include "grproxyblock.h"
 #include "scopy-gr-util_export.h"
 
-#include <iio.h>
+#include <iio/iio.h>
 
 #include <gnuradio/iio/device_source.h>
 
@@ -40,7 +40,8 @@ public:
 		: GRProxyBlock(parent)
 		, channelName(channelName)
 		, m_dev(dev)
-	{}
+	{
+	}
 	GRIIODeviceSource *getDeviceSrc() { return m_dev; }
 	QString getChannelName() { return channelName; }
 	virtual bool samplerateAttributeAvailable() { return false; }

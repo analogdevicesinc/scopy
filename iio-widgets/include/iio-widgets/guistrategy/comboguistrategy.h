@@ -22,7 +22,6 @@
 #define SCOPY_COMBOGUISTRATEGY_H
 
 #include <QWidget>
-#include <iio.h>
 #include <gui/widgets/menucombo.h>
 #include "guistrategy/guistrategyinterface.h"
 #include "iiowidgetdata.h"

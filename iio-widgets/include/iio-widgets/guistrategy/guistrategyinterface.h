@@ -23,7 +23,6 @@
 
 #include <QWidget>
 #include <QLoggingCategory>
-#include <iio.h>
 #include <gui/widgets/menulineedit.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/customSwitch.h>

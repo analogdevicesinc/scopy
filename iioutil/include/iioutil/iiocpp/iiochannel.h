@@ -59,6 +59,14 @@ public:
 	static enum iio_chan_type get_type(const iio_channel *chn);
 	static enum iio_modifier get_modifier(const iio_channel *chn);
 
+	/* Low level and debug functions */
+	static iio_channels_mask *create_channels_mask(unsigned int nb_channels);
+	static void destroy_channels_mask(iio_channels_mask *mask);
+	static long get_index(const iio_channel *chn);
+	static const iio_data_format *get_data_format(const iio_channel *chn);
+	static void convert(const iio_channel *chn, void *dst, const void *src);
+	static void convert_inverse(const iio_channel *chn, void *dst, const void *src);
+
 private:
 	static IIOChannel *pinstance_;
 };

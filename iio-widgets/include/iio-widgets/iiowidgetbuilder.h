@@ -26,7 +26,7 @@
 #include <QMap>
 #include <QLabel>
 #include <QTimer>
-#include <iio.h>
+#include <iio/iio.h>
 #include "iiowidget.h"
 #include "scopy-iio-widgets_export.h"
 
@@ -170,9 +170,9 @@ private:
 	Connection *m_connection;
 	bool m_isCompact;
 	bool m_includeDebugAttrs;
-	struct iio_context *m_context;
-	struct iio_device *m_device;
-	struct iio_channel *m_channel;
+	iio_context *m_context;
+	iio_device *m_device;
+	iio_channel *m_channel;
 	QString m_attribute;
 	QString m_optionsAttribute;
 	QString m_optionsValues;

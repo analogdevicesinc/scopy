@@ -20,7 +20,6 @@
  */
 
 #include "iiocpp/iioscan.h"
-#include "iiocpp/iioresult.h"
 #include <QApplication>
 
 using namespace scopy;
@@ -63,3 +62,12 @@ const char *IIOScan::get_description(const struct iio_scan *ctx, size_t idx)
 }
 
 const char *IIOScan::get_uri(const struct iio_scan *ctx, size_t idx) { return iio_scan_get_uri(ctx, idx); }
+
+unsigned int IIOScan::get_builtin_backends_count(void) { return iio_get_builtin_backends_count(); }
+
+const char *IIOScan::get_builtin_backend(unsigned int idx) { return iio_get_builtin_backend(idx); }
+
+bool IIOScan::has_backend(const iio_context_params *params, const char *backend)
+{
+	return iio_has_backend(params, backend);
+}

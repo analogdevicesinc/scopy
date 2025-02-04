@@ -19,6 +19,9 @@
  */
 
 #include "datastrategy/deviceattrdatastrategy.h"
+#include <iioutil/iiocpp/iiodevice.h>
+#include <iioutil/iiocpp/iioresult.h>
+#include <iioutil/iiocpp/iioattribute.h>
 #define BUFFER_SIZE 16384
 
 Q_LOGGING_CATEGORY(CAT_DEVICE_DATA_STRATEGY, "DeviceDataStrategy")
@@ -44,16 +47,17 @@ int DeviceAttrDataStrategy::write(QString data)
 	}
 
 	Q_EMIT aboutToWrite(m_data, data);
-	ssize_t res =
-		iio_device_attr_write(m_recipe.device, m_recipe.data.toStdString().c_str(), data.toStdString().c_str());
-	if(res < 0) {
-		// Might be a debug attribute
-		res = iio_device_debug_attr_write(m_recipe.device, m_recipe.data.toStdString().c_str(),
-						  data.toStdString().c_str());
-		if(res < 0) {
-			qWarning(CAT_DEVICE_DATA_STRATEGY) << "Cannot write" << data << "to" << m_recipe.data;
-		}
+
+	// TODO: Eventually, this class should dissapear and a generic impl should take its place
+	const char *attrName = m_recipe.data.toLocal8Bit().data();
+	IIOResult<const iio_attr *> attrRes = IIODevice::find_attr(m_recipe.device, attrName);
+	if(!attrRes.ok()) {
+		qWarning(CAT_DEVICE_DATA_STRATEGY) << "Could not find attribute" << m_recipe.data;
+		return attrRes.error();
 	}
+
+	const iio_attr *attr = attrRes.data();
+	ssize_t res = IIOAttribute::write_raw(attr, data.toStdString().c_str(), data.size());
 
 	return res;
 }
@@ -66,26 +70,27 @@ QPair<QString, QString> DeviceAttrDataStrategy::read()
 	}
 
 	char options[BUFFER_SIZE] = {0}, currentValue[BUFFER_SIZE] = {0};
-
-	m_returnCode =
-		iio_device_attr_read(m_recipe.device, m_recipe.data.toStdString().c_str(), currentValue, BUFFER_SIZE);
-	if(m_returnCode < 0) {
-		// Might be a debug attribute
-		m_returnCode = iio_device_debug_attr_read(m_recipe.device, m_recipe.data.toStdString().c_str(),
-							  currentValue, BUFFER_SIZE);
-		if(m_returnCode < 0) {
-			qWarning(CAT_DEVICE_DATA_STRATEGY)
-				<< "Could not read" << m_recipe.data << "error code:" << m_returnCode;
-		}
+	const char *attrName = m_recipe.data.toLocal8Bit().data();
+	IIOResult<const iio_attr *> attrRes = IIODevice::find_attr(m_recipe.device, attrName);
+	if(!attrRes.ok()) {
+		qWarning(CAT_DEVICE_DATA_STRATEGY) << "Could not find attribute" << m_recipe.data;
+		return {};
 	}
 
-	if(m_recipe.iioDataOptions != "") {
-		ssize_t optionsResult = iio_device_attr_read(
-			m_recipe.device, m_recipe.iioDataOptions.toStdString().c_str(), options, BUFFER_SIZE);
-		if(optionsResult < 0) {
-			qWarning(CAT_DEVICE_DATA_STRATEGY)
-				<< "Could not read" << m_recipe.data << "error code:" << optionsResult;
+	const iio_attr *attr = attrRes.data();
+	m_returnCode = IIOAttribute::read_raw(attr, currentValue, BUFFER_SIZE);
+
+	if(!m_recipe.iioDataOptions.isEmpty()) {
+		const char *optionsAttrName = m_recipe.iioDataOptions.toLocal8Bit().data();
+		IIOResult<const iio_attr *> optionsRes = IIODevice::find_attr(m_recipe.device, optionsAttrName);
+		if(!optionsRes.ok()) {
+			qWarning(CAT_DEVICE_DATA_STRATEGY) << "Could not find attribute" << m_recipe.data;
+			return {};
 		}
+
+		const iio_attr *optionsAttr = optionsRes.data();
+		ssize_t optionsResult = IIOAttribute::read_raw(optionsAttr, options, BUFFER_SIZE);
+
 		Q_EMIT emitStatus(QDateTime::currentDateTime(), m_optionalData, options, m_returnCode, true);
 	}
 

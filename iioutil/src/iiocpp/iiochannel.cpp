@@ -20,6 +20,7 @@
 
 #include "iiocpp/iiochannel.h"
 #include <QApplication>
+#include <iio/iio.h>
 
 using namespace scopy;
 
@@ -40,19 +41,19 @@ IIOChannel *IIOChannel::GetInstance()
 	return pinstance_;
 }
 
-const struct iio_device *IIOChannel::get_device(const struct iio_channel *chn) { return iio_channel_get_device(chn); }
+const iio_device *IIOChannel::get_device(const iio_channel *chn) { return iio_channel_get_device(chn); }
 
-const char *IIOChannel::get_id(const struct iio_channel *chn) { return iio_channel_get_id(chn); }
+const char *IIOChannel::get_id(const iio_channel *chn) { return iio_channel_get_id(chn); }
 
-const char *IIOChannel::get_name(const struct iio_channel *chn) { return iio_channel_get_name(chn); }
+const char *IIOChannel::get_name(const iio_channel *chn) { return iio_channel_get_name(chn); }
 
-const char *IIOChannel::get_label(const struct iio_channel *chn) { return iio_channel_get_label(chn); }
+const char *IIOChannel::get_label(const iio_channel *chn) { return iio_channel_get_label(chn); }
 
-bool IIOChannel::is_output(const struct iio_channel *chn) { return iio_channel_is_output(chn); }
+bool IIOChannel::is_output(const iio_channel *chn) { return iio_channel_is_output(chn); }
 
-bool IIOChannel::is_scan_element(const struct iio_channel *chn) { return iio_channel_is_scan_element(chn); }
+bool IIOChannel::is_scan_element(const iio_channel *chn) { return iio_channel_is_scan_element(chn); }
 
-unsigned int IIOChannel::get_attrs_count(const struct iio_channel *chn) { return iio_channel_get_attrs_count(chn); }
+unsigned int IIOChannel::get_attrs_count(const iio_channel *chn) { return iio_channel_get_attrs_count(chn); }
 
 IIOResult<const iio_attr *> IIOChannel::get_attr(const iio_channel *chn, unsigned int index)
 {
@@ -72,35 +73,47 @@ IIOResult<const iio_attr *> IIOChannel::find_attr(const iio_channel *chn, const 
 	return IIOResult<const iio_attr *>(attr);
 }
 
-void IIOChannel::enable(const struct iio_channel *chn, struct iio_channels_mask *mask)
-{
-	iio_channel_enable(chn, mask);
-}
+void IIOChannel::enable(const iio_channel *chn, iio_channels_mask *mask) { iio_channel_enable(chn, mask); }
 
-void IIOChannel::disable(const struct iio_channel *chn, struct iio_channels_mask *mask)
-{
-	iio_channel_disable(chn, mask);
-}
+void IIOChannel::disable(const iio_channel *chn, iio_channels_mask *mask) { iio_channel_disable(chn, mask); }
 
-bool IIOChannel::is_enabled(const struct iio_channel *chn, const struct iio_channels_mask *mask)
+bool IIOChannel::is_enabled(const iio_channel *chn, const iio_channels_mask *mask)
 {
 	return iio_channel_is_enabled(chn, mask);
 }
 
-size_t IIOChannel::read(const struct iio_channel *chn, const struct iio_block *block, void *dst, size_t len, bool raw)
+size_t IIOChannel::read(const iio_channel *chn, const iio_block *block, void *dst, size_t len, bool raw)
 {
 	return iio_channel_read(chn, block, dst, len, raw);
 }
 
-size_t IIOChannel::write(const struct iio_channel *chn, struct iio_block *block, const void *src, size_t len, bool raw)
+size_t IIOChannel::write(const iio_channel *chn, iio_block *block, const void *src, size_t len, bool raw)
 {
 	return iio_channel_write(chn, block, src, len, raw);
 }
 
-void IIOChannel::set_data(struct iio_channel *chn, void *data) { iio_channel_set_data(chn, data); }
+void IIOChannel::set_data(iio_channel *chn, void *data) { iio_channel_set_data(chn, data); }
 
-void *IIOChannel::get_data(const struct iio_channel *chn) { return iio_channel_get_data(chn); }
+void *IIOChannel::get_data(const iio_channel *chn) { return iio_channel_get_data(chn); }
 
-enum iio_chan_type IIOChannel::get_type(const struct iio_channel *chn) { return iio_channel_get_type(chn); }
+enum iio_chan_type IIOChannel::get_type(const iio_channel *chn) { return iio_channel_get_type(chn); }
 
-enum iio_modifier IIOChannel::get_modifier(const struct iio_channel *chn) { return iio_channel_get_modifier(chn); }
+enum iio_modifier IIOChannel::get_modifier(const iio_channel *chn) { return iio_channel_get_modifier(chn); }
+
+iio_channels_mask *IIOChannel::create_channels_mask(unsigned int nb_channels)
+{
+	return iio_create_channels_mask(nb_channels);
+}
+
+void IIOChannel::destroy_channels_mask(iio_channels_mask *mask) { iio_channels_mask_destroy(mask); }
+
+long IIOChannel::get_index(const iio_channel *chn) { return iio_channel_get_index(chn); }
+
+const iio_data_format *IIOChannel::get_data_format(const iio_channel *chn) { return iio_channel_get_data_format(chn); }
+
+void IIOChannel::convert(const iio_channel *chn, void *dst, const void *src) { iio_channel_convert(chn, dst, src); }
+
+void IIOChannel::convert_inverse(const iio_channel *chn, void *dst, const void *src)
+{
+	iio_channel_convert_inverse(chn, dst, src);
+}

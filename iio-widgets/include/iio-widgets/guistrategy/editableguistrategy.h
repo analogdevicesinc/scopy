@@ -22,7 +22,6 @@
 #define SCOPY_EDITABLEGUISTRATEGY_H
 
 #include <QWidget>
-#include <iio.h>
 #include "guistrategy/guistrategyinterface.h"
 #include <gui/widgets/menulineedit.h>
 #include "iiowidgetdata.h"

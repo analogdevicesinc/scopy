@@ -30,8 +30,6 @@
 #include "pluginmanager.h"
 #include "scopy-core_export.h"
 
-#include <iio.h>
-
 #include <QFuture>
 #include <QStackedWidget>
 #include <QWidget>
