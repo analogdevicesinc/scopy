@@ -24,6 +24,11 @@ jobs:
         pip install pip --upgrade
         pip install -r requirements.txt
 
+    - name: Generate test report files
+      working-directory: docs
+      run: |
+        python3 tests/test_report_generator.py . ../testing_results/
+
     - name: Build doc
       working-directory: docs
       run: |
