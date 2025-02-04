@@ -11,7 +11,7 @@ def create_namespace_structure(extension: str, path: str, root_namespace: str = 
 
     if os.path.isfile(path):
         namespace_structure[root_namespace] = {
-            os.path.splitext(path)[0]: path.replace('\\', '/')
+            os.path.splitext(path)[0]: path
         }
         return namespace_structure
 
@@ -25,7 +25,7 @@ def create_namespace_structure(extension: str, path: str, root_namespace: str = 
             if relative_path == ".":
                 relative_path = root_namespace
             namespace_structure[relative_path] = {
-                os.path.splitext(f)[0]: os.path.join(dirpath, f).replace('\\', '/')
+                os.path.splitext(f)[0]: os.path.join(dirpath, f)
                 for f in files
             }
 
@@ -48,7 +48,7 @@ def replace_property(in_file: str, value: str) -> bool:
 
 # Generates a QSS variable for a given file
 def generate_qss_variable(filepath: str, indent: str, root_folder: str) -> str:
-    value = os.path.relpath(filepath, root_folder).replace("/", "_").replace(".qss", "")
+    value = os.path.relpath(filepath, root_folder).replace(os.sep, "_").replace(".qss", "")
     if not replace_property(filepath, value):
         return ""
 
@@ -67,7 +67,7 @@ def generate_namespace_code(namespace_structure: Dict[str, Dict[str, str]], vari
                 code_lines.append(variable_func(filepath, f'{indent}\t', root_folder))
         else:
             subnamespace = {k: v for k, v in namespace_structure.items() if
-                            k.startswith('/'.join(folder[:level + 1]) + '/')}
+                            k.startswith(os.sep.join(folder[:level + 1]) + os.sep)}
             if subnamespace:
                 for subpath, subfiles in subnamespace.items():
                     subpath_parts = subpath.split(os.sep)
@@ -137,7 +137,7 @@ def parse_json_file(filepath: str, root_folder: str) -> Dict[str, str]:
     for item in items:
         key, value = item.split(':', 1)
         key = key.strip().strip('"')
-        formatted_key = os.path.relpath(filepath, root_folder).replace("/", "_").replace(".json", "") + "_" + key
+        formatted_key = os.path.relpath(filepath, root_folder).replace(os.sep, "_").replace(".json", "") + "_" + key
         json_content[key] = formatted_key
 
     return json_content
