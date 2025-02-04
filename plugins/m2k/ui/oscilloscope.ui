@@ -101,25 +101,10 @@
           <property name="layoutDirection">
            <enum>Qt::RightToLeft</enum>
           </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton{
-  width: 80px;
-  height: 40px;
-
-  text-align: left;
-  font-weight: bold;
-  padding-left: 15px;
-  padding-right: 15px;
-}</string>
-          </property>
           <property name="text">
            <string>Print</string>
           </property>
-          <property name="icon">
-           <iconset resource="../../../gui/res/resources.qrc">
-            <normaloff>:/gui/icons/printer.svg</normaloff>:/gui/icons/printer.svg</iconset>
-          </property>
-          <property name="iconSize">
+           <property name="iconSize">
            <size>
             <width>10</width>
             <height>10</height>
@@ -129,18 +114,6 @@
         </item>
         <item>
          <widget class="QPushButton" name="mixedSignalBtn">
-          <property name="styleSheet">
-           <string notr="true">QPushButton{
-  width: 95px;
-  height: 40px;
-
-  font-size: 12px;
-  text-align: center;
-  font-weight: bold;
-  padding-left: 15px;
-  padding-right: 15px;
-}</string>
-          </property>
           <property name="text">
            <string>Enable Mixed
 Signal View</string>

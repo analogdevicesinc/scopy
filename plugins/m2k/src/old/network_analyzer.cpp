@@ -600,8 +600,9 @@ NetworkAnalyzer::NetworkAnalyzer(libm2k::context::M2k *m2k, QString uri, Filter 
 
 	wheelEventGuard->installEventRecursively(ui->mainWidget);
 
-	Style::setStyle(ui->btnPrint, style::properties::button::darkGrayButton, true, true);
-	ui->btnPrint->setFixedHeight(40);
+	Style::setStyle(ui->btnPrint, style::properties::button::basicButtonBig, true, true);
+	ui->btnPrint->setIcon(
+		Style::getPixmap(":/gui/icons/printer.svg", Style::getColor(json::theme::content_inverse)));
 	connect(ui->btnPrint, &QPushButton::clicked, [=]() {
 		QWidget *widget = ui->stackedWidget->currentWidget();
 		QImage img(widget->width(), widget->height(), QImage::Format_ARGB32);

@@ -97,23 +97,8 @@
           <property name="layoutDirection">
            <enum>Qt::RightToLeft</enum>
           </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton{
-  width: 80px;
-  height: 40px;
-
-  text-align: left;
-  font-weight: bold;
-  padding-left: 15px;
-  padding-right: 15px;
-}</string>
-          </property>
           <property name="text">
            <string>Print</string>
-          </property>
-          <property name="icon">
-           <iconset resource="../../../gui/res/resources.qrc">
-            <normaloff>:/gui/icons/printer.svg</normaloff>:/gui/icons/printer.svg</iconset>
           </property>
           <property name="iconSize">
            <size>
