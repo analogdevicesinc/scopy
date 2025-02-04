@@ -918,11 +918,10 @@ void PatternGenerator::connectSignalsAndSlots()
 		m_plotCurves[m_selectedChannel]->setName(text);
 	});
 
-	Style::setStyle(m_ui->btnGroupChannels, style::properties::button::darkGrayButton, true, true);
-	m_ui->btnGroupChannels->setFixedHeight(40);
-
-	Style::setStyle(m_ui->printBtn, style::properties::button::darkGrayButton, true, true);
-	m_ui->printBtn->setFixedHeight(40);
+	Style::setStyle(m_ui->btnGroupChannels, style::properties::button::basicButtonBig, true, true);
+	Style::setStyle(m_ui->printBtn, style::properties::button::basicButtonBig, true, true);
+	m_ui->printBtn->setIcon(
+		Style::getPixmap(":/gui/icons/printer.svg", Style::getColor(json::theme::content_inverse)));
 
 	connect(m_ui->printBtn, &QPushButton::clicked, [=]() { m_plot.printWithNoBackground("Pattern Generator"); });
 

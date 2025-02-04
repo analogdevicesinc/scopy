@@ -855,8 +855,9 @@ Oscilloscope::Oscilloscope(libm2k::context::M2k *m2k, QString uri, Filter *filt,
 
 	readPreferences();
 
-	Style::setStyle(ui->printBtn, style::properties::button::darkGrayButton, true, true);
-	ui->printBtn->setFixedHeight(40);
+	Style::setStyle(ui->printBtn, style::properties::button::basicButtonBig, true, true);
+	ui->printBtn->setIcon(
+		Style::getPixmap(":/gui/icons/printer.svg", Style::getColor(json::theme::content_inverse)));
 	connect(ui->printBtn, &QPushButton::clicked, [=]() { plot.printWithNoBackground(api->objectName()); });
 
 	// workaround for a bug that selected channel settings for disabled channels
@@ -2094,8 +2095,7 @@ void Oscilloscope::create_add_channel_panel()
 
 	tabWidget->addTab(logic, tr("Logic"));
 
-	Style::setStyle(ui->mixedSignalBtn, style::properties::button::darkGrayButton, true, true);
-	ui->mixedSignalBtn->setFixedHeight(40);
+	Style::setStyle(ui->mixedSignalBtn, style::properties::button::basicButtonBig, true, true);
 	connect(ui->mixedSignalBtn, &QPushButton::clicked, [=]() {
 		if(!m_mixedSignalViewEnabled) {
 			ui->btnAddMath->click();

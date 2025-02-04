@@ -1766,11 +1766,10 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		updateStackDecoderButton();
 	});
 
-	Style::setStyle(ui->btnGroupChannels, style::properties::button::darkGrayButton, true, true);
-	ui->btnGroupChannels->setFixedHeight(40);
-
-	Style::setStyle(ui->printBtn, style::properties::button::darkGrayButton, true, true);
-	ui->printBtn->setFixedHeight(40);
+	Style::setStyle(ui->btnGroupChannels, style::properties::button::basicButtonBig, true, true);
+	Style::setStyle(ui->printBtn, style::properties::button::basicButtonBig, true, true);
+	ui->printBtn->setIcon(
+		Style::getPixmap(":/gui/icons/printer.svg", Style::getColor(json::theme::content_inverse)));
 	connect(ui->printBtn, &QPushButton::clicked, [=]() { m_plot.printWithNoBackground("Logic Analyzer"); });
 
 	connect(ui->decoderTableView, &DecoderTable::clicked, [=](const QModelIndex &index) {

@@ -33,9 +33,11 @@ using namespace scopy;
 LinkedButton::LinkedButton(QWidget *parent)
 	: QPushButton(parent)
 {
-	Style::setStyle(this, style::properties::button::darkGrayButton, true, true);
+	Style::setStyle(this, style::properties::button::basicButtonBig, true, true);
+	setFixedWidth(40);
 	this->setIcon(Style::getPixmap(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-				       "/icons/info.svg"));
+					       "/icons/info.svg",
+				       Style::getColor(json::theme::content_inverse)));
 	this->setIconSize(QSize(40, 40));
 
 	this->setToolTip("See more info");

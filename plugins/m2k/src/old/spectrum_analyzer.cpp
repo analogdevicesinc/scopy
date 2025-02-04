@@ -647,7 +647,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(libm2k::context::M2k *m2k, QString uri, Filte
 	connect(ui->rightMenu, &MenuHAnim::finished, this, &SpectrumAnalyzer::rightMenuFinished);
 	menuOrder.push_back(ui->btnSweep);
 
-	Style::setStyle(ui->btnPrint, style::properties::button::darkGrayButton, true, true);
+	Style::setStyle(ui->btnPrint, style::properties::button::basicButtonBig, true, true);
+	ui->btnPrint->setIcon(
+		Style::getPixmap(":/gui/icons/printer.svg", Style::getColor(json::theme::content_inverse)));
 	connect(ui->btnPrint, &QPushButton::clicked,
 		[=]() { fft_plot->printWithNoBackground(api->objectName(), false); });
 
