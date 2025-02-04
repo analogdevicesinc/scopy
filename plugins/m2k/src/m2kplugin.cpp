@@ -262,6 +262,7 @@ void M2kPlugin::initPreferences()
 {
 	Preferences *p = Preferences::GetInstance();
 	p->init("m2k_instrument_notes_active", false);
+	p->init("m2k_debugger_plugin_included", false);
 	p->init("m2k_manual_calibration_enable", false);
 
 	p->init("m2k_show_adc_filters", false);
@@ -302,6 +303,12 @@ bool M2kPlugin::loadPreferencesPage()
 		"Enable or disable a text section at the bottom of each ADALM2000 instrument, allowing "
 		"the user to take notes. Disabled by default.",
 		generalSection));
+
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_CHECK_BOX(p, "m2k_debugger_plugin_included", "Include debugger plugin",
+				     "Include the Debugger in the current instrument list "
+				     "when connected to an ADALM2000 device. Disabled by default.",
+				     generalSection));
 
 	// Analog tools preferences
 	MenuSectionWidget *analogWidget = new MenuSectionWidget(m_preferencesPage);
@@ -582,9 +589,18 @@ void M2kPlugin::initMetadata()
 	      "iio",
 	      "m2k"
 	   ],
-	   "exclude":["*", "!debuggerplugin"]
+	   "exclude":["*"]
 	}
 )plugin");
+
+	// Add !debuggerplugin to exclude list
+	if(Preferences::get("m2k_debugger_plugin_included").toBool()) {
+		if(!m_metadata.contains("exclude")) {
+			qWarning(CAT_M2KPLUGIN) << "Cannot find \"exclude\" key in M2kPlugin metadata";
+		} else {
+			m_metadata["exclude"] = QJsonArray({"*", "!debuggerplugin"});
+		}
+	}
 }
 
 #include "moc_m2kplugin.cpp"
