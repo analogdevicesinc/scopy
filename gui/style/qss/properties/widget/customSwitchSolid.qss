@@ -1,0 +1,38 @@
+QWidget[&&property&&="left_on"] {
+    border-radius: &radius_1&;
+    max-height: &unit_2&;
+    min-height: &unit_2&;
+    padding: 0 &padding_1& 0 &padding_1&;
+    background-color: &interactive_primary_idle&;
+    border: none;
+    color: &content_default&;
+}
+QWidget[&&property&&="left_off"] {
+    border-top-left-radius: &radius_1&;
+    border-bottom-left-radius: &radius_1&;
+    max-height: &unit_2&;
+    min-height: &unit_2&;
+    padding: 0 &padding_1& 0 &padding_1&;
+    background-color: &background_subtle&;
+    border: none;
+    color: &content_silent&;
+}
+QWidget[&&property&&="right_on"] {
+    border-radius: &radius_1&;
+    max-height: &unit_2&;
+    min-height: &unit_2&;
+    padding: 0 &padding_1& 0 &padding_1&;
+    background-color: &interactive_primary_idle&;
+    border: none;
+    color: &content_default&;
+}
+QWidget[&&property&&="right_off"] {
+    border-top-right-radius: &radius_1&;
+    border-bottom-right-radius: &radius_1&;
+    max-height: &unit_2&;
+    min-height: &unit_2&;
+    padding: 0 &padding_1& 0 &padding_1&;
+    background-color: &background_subtle&;
+    border: none;
+    color: &content_silent&;
+}

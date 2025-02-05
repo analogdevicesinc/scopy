@@ -44,6 +44,7 @@
 "radius_interactive": "0",
 "padding_interactive": "0",
 "run_button_color": "#27B34F",
-"qss_properties_button_borderButton": "qss_properties_button_basicButton"
+"qss_properties_button_borderButton": "qss_properties_button_basicButton",
+"qss_properties_widget_customSwitch": "qss_properties_widget_customSwitchSolid"
 }
 
