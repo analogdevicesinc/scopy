@@ -3,7 +3,7 @@
 Testing Guide
 ===============================================================================
 
-Test cases, test results and test reports for Scopy are found in the sorce code 
+Test cases, test results and test reports for Scopy are found in the source code 
 repository. This approach allows for the test cases to be versioned and
 maintained along with the source code.
 

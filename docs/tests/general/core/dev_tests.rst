@@ -240,8 +240,13 @@ Test 5: Select a tool.
     1. Click on the device icon from device browser.
     2. Click on **Connect** button.
     3. Click on "Oscilloscope" tool.
-        - **Expected result:** The "Oscilloscope" tool is displayed and the 
-          tool menu item is highlighted.
+        - **Expected result:** The "Oscilloscope" tool is displayed and the tool menu item is highlighted.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     4. Click on "Home" menu entry.
         - **Expected result:** The device page is displayed and the home menu 
           item is highlighted.
