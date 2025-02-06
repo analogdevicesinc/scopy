@@ -136,9 +136,7 @@ QPushButton::pressed {
 }
 
 QComboBox::disabled {
-    border: &border_width& solid &interactive_subtle_disabled&;
-    border-bottom: &border_width_interactive& solid &interactive_subtle_disabled&;
-    border-radius: &radius_interactive&;
+    color: &interactive_subtle_idle&;
 }
 QComboBox {
     padding: 0 &padding_interactive& 0 &padding_interactive&;

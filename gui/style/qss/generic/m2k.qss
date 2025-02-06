@@ -4,9 +4,6 @@ QWidget {
     font: &font_size& &font_family&;
     font-style: normal;
 }
-QWidget {
-    background-color: transparent;
-}
 QPushButton {
     background-color: transparent;
     border: none;
@@ -653,4 +650,9 @@ QPushButton[userNote="true"]:checked {
 *[is_selected="true"] {
     background-color: &interactive_primary_hover&;
 }
-
+QComboBox::disabled {
+    color: &interactive_subtle_idle&;
+}
+QLineEdit::disabled {
+    color: &interactive_subtle_idle&;
+}
