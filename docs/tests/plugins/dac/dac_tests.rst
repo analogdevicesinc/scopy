@@ -691,3 +691,74 @@ Test 10 - Channel attributes
   The result of the test goes here (PASS/FAIL).
 
 
+Test 11 - Repeat data option
+--------------------------------------------
+
+.. _TST.DAC.REPEAT_DATA:
+
+**UID:** TST.DAC.REPEAT_DATA
+
+**Description:** This test verifies the DAC plugin repeat data option.
+The data sets loaded from the file should be repeated to fill in all the enabled
+channels.
+
+**Preconditions:**
+    - :ref:`AdalmPluto.Device<adalm_pluto_device_setup>`
+    - Enable 2 TX channels on your Pluto device.
+    - OS: ANY
+
+**Resources:**
+    - `<https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sinewave_0.9_2ch.csv>`__
+
+**Steps:**
+    1. Open the DAC plugin.
+    2. Switch the "Mode" to "Buffer".
+    3. Browse and select the *sinewave_0.9_2ch.csv* file.
+    4. Press the "Load" button.
+        - **Expected result:** The first 2 channels are enabled.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    5. Enable the remaining 2 channels from the channel list.
+    6. Set the **Repeat data** option to true and press **Run**.
+        - **Expected result:** The console log displays the following message: *Pushed 8444 samples, 67552 bytes (1/1 buffers).*
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    7. Set the **Repeat data** option to false and press **Run**.
+        - **Expected result:** The console log displays the following message: *Not enough data columns for all enabled channels.*
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    8. Leave the **Repeat data** as is, disable the last 2 channels and press **Run**:
+        - **Expected result:** The console log displays the following message: *Pushed 8444 samples, 33776 bytes (1/1 buffers).*
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
