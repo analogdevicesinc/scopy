@@ -26,6 +26,14 @@
 		},
 		{
 			"index": 4,
+			"names": ["REPEAT_FILE_BUFFER_BUTTON"],
+			"description": "Repeat the data columns from the loaded file to match the number of enabled channels.",
+			"anchor": "HP_BOTTOM",
+			"content": "HP_BOTTOM",
+			"y_offset": 10
+		},
+		{
+			"index": 5,
 			"names": ["CYCLIC_BUTTON"],
 			"description": "Select whether to use cyclic or non-cyclic buffer",
 			"anchor": "HP_BOTTOM",
@@ -33,7 +41,7 @@
 			"y_offset": 10
 		},
 		{
-			"index": 5,
+			"index": 6,
 			"names": ["FILESIZE"],
 			"description": "Displays the number of samples in file, can be used to truncate the file",
 			"anchor": "HP_BOTTOM",
@@ -41,7 +49,7 @@
 			"y_offset": 10
 		},
 		{
-			"index": 6,
+			"index": 7,
 			"names": ["RUN_BUTTON"],
 			"description": "Start the DAC buffer output.",
 			"anchor": "HP_BOTTOM",
@@ -49,7 +57,7 @@
 			"y_offset": 10
 		},
 		{
-			"index": 7,
+			"index": 8,
 			"names": ["CONSOLE_LOG"],
 			"description": "Displays information on file load status, buffer output status or other errors.",
 			"anchor": "HP_TOP",

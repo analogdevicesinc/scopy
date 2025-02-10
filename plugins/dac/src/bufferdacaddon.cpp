@@ -133,6 +133,16 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 		m_model, &DacDataModel::invalidRunParams, this, [this]() { m_runBtn->setChecked(false); },
 		Qt::QueuedConnection);
 
+	// Repeat file buffer section
+	MenuSectionWidget *repeatFileBufferContainer = new MenuSectionWidget(this);
+	repeatFileBufferContainer->setProperty("tutorial_name", "REPEAT_FILE_BUFFER_BUTTON");
+	m_repeatFileBufferBtn = new MenuOnOffSwitch("Repeat data", repeatFileBufferContainer);
+	connect(m_repeatFileBufferBtn->onOffswitch(), &QPushButton::toggled, this,
+		[=, this](bool toggled) { m_model->setRepeatFileBuffer(toggled); });
+	repeatFileBufferContainer->contentLayout()->addWidget(m_repeatFileBufferBtn);
+	repeatFileBufferContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	m_repeatFileBufferBtn->onOffswitch()->setChecked(true);
+
 	// Cyclic buffer section
 	MenuSectionWidget *cyclicContainer = new MenuSectionWidget(this);
 	cyclicContainer->setProperty("tutorial_name", "CYCLIC_BUTTON");
@@ -162,6 +172,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	filesizeContainer->contentLayout()->addWidget(m_fileSizeSpin);
 	filesizeContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
+	runConfigLay->addWidget(repeatFileBufferContainer);
 	runConfigLay->addWidget(cyclicContainer);
 	runConfigLay->addWidget(filesizeContainer);
 	runConfigLay->addWidget(m_runBtn);

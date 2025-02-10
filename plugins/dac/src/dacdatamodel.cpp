@@ -39,6 +39,7 @@ DacDataModel::DacDataModel(struct iio_device *dev, QObject *parent)
 	, m_activeBuffer(false)
 	, m_buffer(nullptr)
 	, m_cyclicBuffer(true)
+	, m_repeatFileBuffer(true)
 	, m_interrupted(false)
 	, m_userBuffersize(0)
 	, m_userKernelBufferCount(0)
@@ -115,6 +116,14 @@ void DacDataModel::enableDds(bool enable)
 QMap<QString, TxNode *> DacDataModel::getBufferTxs() const { return m_bufferTxs; }
 
 QMap<QString, TxNode *> DacDataModel::getDdsTxs() const { return m_ddsTxs; }
+
+void DacDataModel::setRepeatFileBuffer(bool repeat)
+{
+	requestInterruption();
+	m_repeatFileBuffer = repeat;
+	autoBuffersizeAndKernelBuffers();
+	Q_EMIT reqInitBuffer();
+}
 
 void DacDataModel::requestInterruption()
 {
@@ -262,7 +271,7 @@ bool DacDataModel::validateBufferParams()
 		return false;
 	}
 
-	if(m_data[0].size() < enabledChannelsCount) {
+	if(m_data[0].size() < enabledChannelsCount && !m_repeatFileBuffer) {
 		auto msg = "Not enough data columns for all enabled channels.";
 		qDebug(CAT_DAC_DATA) << msg;
 		Q_EMIT log(msg);
@@ -339,11 +348,13 @@ void DacDataModel::push()
 	if(!m_cyclicBuffer) {
 		additionalSamples = m_filesize % m_buffersize;
 	}
+
+	unsigned int available_data_columns = m_data[0].size();
 	for(int ch = 0; ch < enChannelsCount; ch++) {
 		allDataC.push_back({});
 		for(unsigned int i = 0; i < m_filesize + additionalSamples; i += m_decimation) {
 			sampleIdx = std::min(i, m_filesize - 1);
-			allDataC[ch].append(m_data[sampleIdx][ch]);
+			allDataC[ch].append(m_data[sampleIdx][ch % available_data_columns]);
 		}
 		totalSize += allDataC[ch].size();
 	}

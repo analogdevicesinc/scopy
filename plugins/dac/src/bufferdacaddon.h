@@ -71,6 +71,7 @@ private:
 	gui::MenuSpinbox *m_fileSizeSpin;
 	gui::MenuSpinbox *m_kernelCountSpin;
 	MenuOnOffSwitch *m_cyclicBtn;
+	MenuOnOffSwitch *m_repeatFileBufferBtn;
 	QTextBrowser *m_logText;
 	FileBrowser *fm;
 

@@ -49,6 +49,7 @@ public:
 	QMap<QString, TxNode *> getBufferTxs() const;
 	QMap<QString, TxNode *> getDdsTxs() const;
 
+	void setRepeatFileBuffer(bool repeat);
 	void setCyclic(bool cyclic);
 	void setKernelBuffersCount(unsigned int kernelCount);
 	void setDecimation(double decimation);
@@ -89,6 +90,7 @@ private:
 	bool m_isBufferCapable;
 	bool m_isDds;
 	bool m_cyclicBuffer;
+	bool m_repeatFileBuffer;
 	int m_decimation;
 
 	bool m_activeDds;
