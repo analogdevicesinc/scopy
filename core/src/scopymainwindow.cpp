@@ -415,8 +415,7 @@ void ScopyMainWindow::initPreferences()
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 
-	Style::GetInstance()->setTheme(Preferences::GetInstance()->get("general_theme").toString());
-
+	Style::GetInstance()->init(p->get("general_theme").toString(), p->get("font_scale").toFloat());
 	QString theme = p->get("general_theme").toString();
 	QString themeName = "scopy-" + theme;
 	QIcon::setThemeSearchPaths({":/gui/icons/" + themeName});

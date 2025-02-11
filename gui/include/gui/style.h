@@ -37,7 +37,7 @@ private:
 	Style(QObject *parent = nullptr);
 	~Style();
 
-	void init(QString theme = "");
+	bool setTheme(QString theme, float fontScale);
 	QString getStylePath(QString relativePath);
 	void initPaths();
 	void genrateStyle();
@@ -45,10 +45,14 @@ private:
 	static bool isProperty(QString style);
 	static const char *replaceProperty(const char *prop);
 	static QString scaleNumberInString(QString string, float factor);
-	static QString adjustForScaling(QString key, QString value);
+	static QString adjustForScaling(QString key, QString value, float scale);
+	static void adjustJsonForScaling(float scale);
 
 public:
 	static Style *GetInstance();
+
+	// initialize style. This must be done as soon as possible in the application's lifetime
+	void init(QString theme = "", float fontScale = 1);
 
 	// get value from json file using the keys in style_attributes.h as QString
 	static QString getAttribute(const char *key);
@@ -90,7 +94,6 @@ public:
 	static void setBackgroundColor(QWidget *widget, QString color, bool extend_to_children = false);
 
 	QString getTheme();
-	bool setTheme(QString theme);
 	QStringList getThemeList();
 
 	// recursively replaces keys from style_attributes.h
