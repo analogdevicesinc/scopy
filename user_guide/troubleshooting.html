@@ -7,20 +7,20 @@
 
     <title>Scopy troubleshooting guide &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/style.min.css?v=95305861" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=9cb8e28d" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script defer="" src="../_static/app.umd.js?v=c93eadd1"></script>
+    <script defer="" src="../_static/app.umd.js?v=8d0ced9f"></script>
     <link rel="icon" href="../_static/scopy.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="prev" title="Reporting a Bug" href="bugReport.html" />
    
   
-  <meta name="global_root" content="../../">
-  <meta name="repo" content="scopy">
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
   
 
 
@@ -40,7 +40,6 @@
   }
 </style>
   </head><body>
-  <div class="banner"></div>
   <input type="checkbox" id="input-show-toc">
   <input type="checkbox" id="input-show-localtoc">
   <input type="checkbox" id="input-show-repotoc">
@@ -77,28 +76,28 @@
 
   <div class="repotoc-tree overlay">
     <root>
-  <a href="../../documentation/index.html">System Level</a>
-  <a href="../../hdl/index.html">HDL</a>
-  <a href="../../testbenches/index.html">HDL Testbenches</a>
-  <a href="../../pyadi-iio/index.html">Hardware Python Interfaces</a>
-  <a href="../../libiio/index.html">libiio</a>
-  <a href="../../no-OS/index.html">no-OS</a>
-  <a href="../../precision-converters-firmware/index.html">Precision Converters Firmware</a>
-  <a href="../../PrecisionToolbox/index.html">Precision Toolbox</a>
   <a href="../index.html" class="current">Scopy</a>
-  <a href="../../doctools/index.html">Doctools</a>
 </root>
 
   </div>
     <div class="localtoc">
       <div class="tocwrapper">
         <div>
-          <div class="localtoc-header">On this page</div>
+          <div class="localtoc-header"></div>
           <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
         </div>
         <nav>
           <ul>
 <li><a class="reference internal" href="#">Scopy troubleshooting guide</a><ul>
+<li><a class="reference internal" href="#scopy-v2-after-scopy-v1">Scopy v2 after Scopy v1?</a></li>
+<li><a class="reference internal" href="#any-unexpected-behavior-send-us-the-log">Any unexpected behavior? Send us the log!</a><ul>
+<li><a class="reference internal" href="#how-to-set-the-environment-variable">How to set the environment variable:</a></li>
+<li><a class="reference internal" href="#linux-x86-64-arm64-arm32-macos">Linux x86_64, arm64, arm32, MacOS</a></li>
+<li><a class="reference internal" href="#windows">Windows</a></li>
+<li><a class="reference internal" href="#available-configuration">Available configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#linux-wayland-crash">Linux Wayland crash</a></li>
 <li><a class="reference internal" href="#device-doesn-t-show-up">Device doesn’t show up</a></li>
 <li><a class="reference internal" href="#use-compliant-usb-cable">Use compliant USB cable</a></li>
 <li><a class="reference internal" href="#reinstall-ini-files">Reinstall &amp; INI files</a></li>
@@ -107,6 +106,7 @@
 <li><a class="reference internal" href="#uninstall-and-reinstall-the-software">Uninstall and reinstall the software</a></li>
 <li><a class="reference internal" href="#make-sure-the-system-doesn-t-limit-the-usb-power-consumption">Make sure the system doesn’t limit the USB power consumption</a></li>
 <li><a class="reference internal" href="#run-iio-info-a-for-board-diagnostics">Run iio_info -a for board diagnostics</a></li>
+<li><a class="reference internal" href="#emulator-not-found">Emulator not found</a></li>
 <li><a class="reference internal" href="#scopy-white-screen-on-windows">Scopy white screen on Windows</a></li>
 </ul>
 </li>
@@ -131,34 +131,30 @@ Content on this topic
 </label>
 <div class="repotoc-tree">
   <root>
-  <a href="../../documentation/index.html">System Level</a>
-  <a href="../../hdl/index.html">HDL</a>
-  <a href="../../testbenches/index.html">HDL Testbenches</a>
-  <a href="../../pyadi-iio/index.html">Hardware Python Interfaces</a>
-  <a href="../../libiio/index.html">libiio</a>
-  <a href="../../no-OS/index.html">no-OS</a>
-  <a href="../../precision-converters-firmware/index.html">Precision Converters Firmware</a>
-  <a href="../../PrecisionToolbox/index.html">Precision Toolbox</a>
   <a href="../index.html" class="current">Scopy</a>
-  <a href="../../doctools/index.html">Doctools</a>
 </root>
 
 </div>
 <div class="toc-tree">
   <html>
   <body><ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="index.html">Scopy Overview</a></li>
-<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../plugins/index.html">Plugins</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
 <li class="toctree-l2"><a class="reference internal" href="../plugins/adc/adc.html">ADC plugin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../plugins/dac/dac.html">DAC plugin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../plugins/datalogger/datalogger.html">Datalogger</a></li>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-1" id="toctree-collapse-1-1"/><div class="collapse"><a class="reference internal" href="../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
 <li class="toctree-l3"><a class="reference internal" href="../plugins/debugger/debugger.html">Debugger</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../plugins/registermap/registermap.html">Register Map</a></li>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-2" id="toctree-collapse-1-2"/><div class="collapse"><a class="reference internal" href="../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
 <li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
@@ -170,14 +166,14 @@ Content on this topic
 <li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/power_supply.html">Power Supply</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-3" id="toctree-collapse-1-3"/><div class="collapse"><a class="reference internal" href="../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
 <li class="toctree-l3"><a class="reference internal" href="../plugins/pqm/rms.html">RMS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../plugins/pqm/harmonics.html">Harmonics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../plugins/pqm/waveform.html">Waveform</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../plugins/pqm/settings.html">System settings</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1-4" id="toctree-collapse-1-4"/><div class="collapse"><a class="reference internal" href="../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
 <li class="toctree-l3"><a class="reference internal" href="../plugins/swiot1l/swiot_config.html">Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../plugins/swiot1l/max14906.html">MAX14906</a></li>
@@ -187,6 +183,72 @@ Content on this topic
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4"/><div class="collapse"><a class="reference internal" href="../tests/index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tests/testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1"/><div class="collapse"><a class="reference internal" href="../tests/plugins/index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../tests/plugins/pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../tests/plugins/datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../tests/plugins/dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../tests/plugins/swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../tests/plugins/adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../tests/plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../tests/plugins/registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../tests/plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../tests/general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="preferences.html">Scopy Preferences</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bugReport.html">Reporting a Bug</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Scopy troubleshooting guide</a></li>
 </ul>
@@ -203,9 +265,418 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="scopy-troubleshooting-guide">
-<span id="troubleshooting"></span><h1>Scopy troubleshooting guide<a class="headerlink" href="#scopy-troubleshooting-guide" title="Link to this heading">#</a></h1>
+<span id="troubleshooting"></span><h1>Scopy troubleshooting guide<a class="headerlink" href="#scopy-troubleshooting-guide" title="Link to this heading"></a></h1>
+<section id="scopy-v2-after-scopy-v1">
+<h2>Scopy v2 after Scopy v1?<a class="headerlink" href="#scopy-v2-after-scopy-v1" title="Link to this heading"></a></h2>
+<p>If this is the first time installing Scopy v2 after using
+any Scopy v1 on your system, we <strong>strongly</strong> recommend to
+uninstall the old Scopy properly.</p>
+<p>Doing this we make sure that the configuration files for
+Scopy v2 are not in any way influenced by Scopy v1.</p>
+</section>
+<section id="any-unexpected-behavior-send-us-the-log">
+<h2>Any unexpected behavior? Send us the log!<a class="headerlink" href="#any-unexpected-behavior-send-us-the-log" title="Link to this heading"></a></h2>
+<p>Scopy v2 brings a new logging mechanism for an easier navigation of the
+debugging process. Whether starting Scopy on Linux (with <strong>flatpak</strong> or <strong>appimage</strong>),
+on MacOS (from <strong>command line</strong>) or Windows, Scopy will display a filtered log of
+operations.</p>
+<p>The filter is configured by default to display only a few main
+components. This filter can be modified at runtime, by manipulating
+the responsible environment variable: QT_LOGGING_RULES.</p>
+<p>This environment variable is part of the Qt mechanism for exposing
+warning and debugging messages. Read more detailed information
+in the official <a class="reference external" href="https://doc.qt.io/qt-5/qloggingcategory.html">Qt documentation</a></p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Send us the log output of Scopy to make it easier for us to reproduce
+the issue!</p>
+</div>
+<section id="how-to-set-the-environment-variable">
+<h3>How to set the environment variable:<a class="headerlink" href="#how-to-set-the-environment-variable" title="Link to this heading"></a></h3>
+<p>We can modify the debug output of Scopy even if the release has a
+preconfigured filter.</p>
+<p>The default Scopy configuration is the following:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;*.debug=false</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="s">&quot;ToolStack.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="s">&quot;ToolManager.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="s">&quot;DeviceManager.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="s">&quot;Device.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="s">&quot;TestPlugin.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="s">&quot;Plugin.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="s">&quot;swiotConfig.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="s">&quot;CyclicalTask.debug=false</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="s">&quot;SWIOTPlugin.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="s">&quot;AD74413R.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="s">&quot;ScopyTranslations.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="s">&quot;GRTimeSinkComponent.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="s">&quot;GRManager.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
+</pre></div>
+</div>
+<p>Using <strong>*.debug=false</strong> will suppress all the debug output of Scopy.</p>
+<p>Now let’s take some examples and check them on different Operating Systems:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1">## This will disable all the output and only enable logs</span>
+<span class="c1">## for the ADC Plugin</span>
+<span class="s2">&quot;*.debug=false;ADCPlugin.debug=true&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="linux-x86-64-arm64-arm32-macos">
+<h3>Linux x86_64, arm64, arm32, MacOS<a class="headerlink" href="#linux-x86-64-arm64-arm32-macos" title="Link to this heading"></a></h3>
+<p>In order to modify the Scopy logging rules, open up a terminal
+and run the following:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">QT_LOGGING_RULES</span><span class="o">=</span><span class="s2">&quot;*.debug=false;ADCPlugin.debug=true&quot;</span>
+</pre></div>
+</div>
+<p>After that, run Scopy (specific to each OS type) and observe
+the log output changing.</p>
+</section>
+<section id="windows">
+<h3>Windows<a class="headerlink" href="#windows" title="Link to this heading"></a></h3>
+<p>In the Scopy install location on Windows you will find 2 separate
+executables: <strong>Scopy.exe</strong> and <strong>Scopy-console.exe</strong>. In order to view
+the debug log of Scopy, you need to run the latter: <em>Scopy-console.exe</em>.
+This will not only open the Scopy window, it will also start a command
+prompt in which all the output will be visible.</p>
+<p>In order to modify the QT_LOGGING_RULES on Windows, firstly open a
+command prompt and run the following:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">set</span><span class="w"> </span><span class="nv">QT_LOGGING_RULES</span><span class="o">=</span><span class="s2">&quot;*.debug=false;ADCPlugin.debug=true&quot;</span>
+</pre></div>
+</div>
+<p>After that, you can run <em>Scopy-console.exe</em> from the <strong>same</strong> command
+prompt.</p>
+</section>
+<section id="available-configuration">
+<h3>Available configuration<a class="headerlink" href="#available-configuration" title="Link to this heading"></a></h3>
+<p>A list of all the available Scopy class filters is:</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 100.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>SCOPY CLASS FILTER</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>AnimationPushButton</p></td>
+</tr>
+<tr class="row-odd"><td><p>MapStackedWidget</p></td>
+</tr>
+<tr class="row-even"><td><p>TimeChannelComponent</p></td>
+</tr>
+<tr class="row-odd"><td><p>TutorialOverlay</p></td>
+</tr>
+<tr class="row-even"><td><p>Time Y-Autoscale</p></td>
+</tr>
+<tr class="row-odd"><td><p>TutorialChapter</p></td>
+</tr>
+<tr class="row-even"><td><p>PageNavigationWidget</p></td>
+</tr>
+<tr class="row-odd"><td><p>TitleSpinBox</p></td>
+</tr>
+<tr class="row-even"><td><p>ScopyStatusBar</p></td>
+</tr>
+<tr class="row-odd"><td><p>MenuCollapseSection</p></td>
+</tr>
+<tr class="row-even"><td><p>iioWidget</p></td>
+</tr>
+<tr class="row-odd"><td><p>AttrDataStrategy</p></td>
+</tr>
+<tr class="row-even"><td><p>MultiDataStrategy</p></td>
+</tr>
+<tr class="row-odd"><td><p>CmdQDeviceDataStrategy</p></td>
+</tr>
+<tr class="row-even"><td><p>CmdQChannelDataStrategy</p></td>
+</tr>
+<tr class="row-odd"><td><p>ContextAttrDataStrategy</p></td>
+</tr>
+<tr class="row-even"><td><p>TriggerDataStrategy</p></td>
+</tr>
+<tr class="row-odd"><td><p>DeviceDataStrategy</p></td>
+</tr>
+<tr class="row-even"><td><p>SwitchGuiStrategy</p></td>
+</tr>
+<tr class="row-odd"><td><p>AttrGuiStrategy</p></td>
+</tr>
+<tr class="row-even"><td><p>TimeChannelAddon</p></td>
+</tr>
+<tr class="row-odd"><td><p>GRTimePlotAddon</p></td>
+</tr>
+<tr class="row-even"><td><p>GRTimeChannel</p></td>
+</tr>
+<tr class="row-odd"><td><p>RuntimeEnvironmentInfo</p></td>
+</tr>
+<tr class="row-even"><td><p>CrashReport</p></td>
+</tr>
+<tr class="row-odd"><td><p>toolLauncher</p></td>
+</tr>
+<tr class="row-even"><td><p>oscilloscope</p></td>
+</tr>
+<tr class="row-odd"><td><p>signalGenerator</p></td>
+</tr>
+<tr class="row-even"><td><p>voltmeter</p></td>
+</tr>
+<tr class="row-odd"><td><p>powerController</p></td>
+</tr>
+<tr class="row-even"><td><p>spectrumAnalyzer</p></td>
+</tr>
+<tr class="row-odd"><td><p>networkAnalyzer</p></td>
+</tr>
+<tr class="row-even"><td><p>digitalIO</p></td>
+</tr>
+<tr class="row-odd"><td><p>logicAnalyzer</p></td>
+</tr>
+<tr class="row-even"><td><p>patternGenerator</p></td>
+</tr>
+<tr class="row-odd"><td><p>calibration</p></td>
+</tr>
+<tr class="row-even"><td><p>calibration.manual</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioManager</p></td>
+</tr>
+<tr class="row-even"><td><p>plot</p></td>
+</tr>
+<tr class="row-odd"><td><p>Benchmark</p></td>
+</tr>
+<tr class="row-even"><td><p>DetachedToolWindow</p></td>
+</tr>
+<tr class="row-odd"><td><p>ScopyTitleManager</p></td>
+</tr>
+<tr class="row-even"><td><p>DeviceManager</p></td>
+</tr>
+<tr class="row-odd"><td><p>ScopyPreferencesPage</p></td>
+</tr>
+<tr class="row-even"><td><p>ToolStack</p></td>
+</tr>
+<tr class="row-odd"><td><p>EmuAddPage</p></td>
+</tr>
+<tr class="row-even"><td><p>Scopy</p></td>
+</tr>
+<tr class="row-odd"><td><p>DeviceBrowser</p></td>
+</tr>
+<tr class="row-even"><td><p>InfoPageStack</p></td>
+</tr>
+<tr class="row-odd"><td><p>ScopyHomeAddPage</p></td>
+</tr>
+<tr class="row-even"><td><p>PluginManager</p></td>
+</tr>
+<tr class="row-odd"><td><p>Device</p></td>
+</tr>
+<tr class="row-even"><td><p>ToolMenuItem</p></td>
+</tr>
+<tr class="row-odd"><td><p>Scopy_API</p></td>
+</tr>
+<tr class="row-even"><td><p>PluginRepository</p></td>
+</tr>
+<tr class="row-odd"><td><p>ScopyTranslations</p></td>
+</tr>
+<tr class="row-even"><td><p>ScannedIIOContextCollector</p></td>
+</tr>
+<tr class="row-odd"><td><p>IIODevice</p></td>
+</tr>
+<tr class="row-even"><td><p>ToolMenuManager</p></td>
+</tr>
+<tr class="row-odd"><td><p>IIOTabWidget</p></td>
+</tr>
+<tr class="row-even"><td><p>GRManager</p></td>
+</tr>
+<tr class="row-odd"><td><p>TimeSink_f</p></td>
+</tr>
+<tr class="row-even"><td><p>CmdQPingTask</p></td>
+</tr>
+<tr class="row-odd"><td><p>CyclicalTask</p></td>
+</tr>
+<tr class="row-even"><td><p>CommandQueue</p></td>
+</tr>
+<tr class="row-odd"><td><p>ConnectionProvider</p></td>
+</tr>
+<tr class="row-even"><td><p>IIOScanTask</p></td>
+</tr>
+<tr class="row-odd"><td><p>GUITestPlugin</p></td>
+</tr>
+<tr class="row-even"><td><p>BareMinimum</p></td>
+</tr>
+<tr class="row-odd"><td><p>DacPlugin</p></td>
+</tr>
+<tr class="row-even"><td><p>DacInstrument</p></td>
+</tr>
+<tr class="row-odd"><td><p>DacDds</p></td>
+</tr>
+<tr class="row-even"><td><p>DacBuffer</p></td>
+</tr>
+<tr class="row-odd"><td><p>DacData</p></td>
+</tr>
+<tr class="row-even"><td><p>DacDataBuilder</p></td>
+</tr>
+<tr class="row-odd"><td><p>DacFileManager</p></td>
+</tr>
+<tr class="row-even"><td><p>DacDataStrategy</p></td>
+</tr>
+<tr class="row-odd"><td><p>RegReadWrite</p></td>
+</tr>
+<tr class="row-even"><td><p>oscilloscope</p></td>
+</tr>
+<tr class="row-odd"><td><p>signalGenerator</p></td>
+</tr>
+<tr class="row-even"><td><p>voltmeter</p></td>
+</tr>
+<tr class="row-odd"><td><p>powerController</p></td>
+</tr>
+<tr class="row-even"><td><p>spectrumAnalyzer</p></td>
+</tr>
+<tr class="row-odd"><td><p>networkAnalyzer</p></td>
+</tr>
+<tr class="row-even"><td><p>digitalIO</p></td>
+</tr>
+<tr class="row-odd"><td><p>logicAnalyzer</p></td>
+</tr>
+<tr class="row-even"><td><p>patternGenerator</p></td>
+</tr>
+<tr class="row-odd"><td><p>calibration</p></td>
+</tr>
+<tr class="row-even"><td><p>calibration.manual</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioManager</p></td>
+</tr>
+<tr class="row-even"><td><p>plot</p></td>
+</tr>
+<tr class="row-odd"><td><p>REGISTERMAP</p></td>
+</tr>
+<tr class="row-even"><td><p>RegisterMapTable</p></td>
+</tr>
+<tr class="row-odd"><td><p>RegMap_API</p></td>
+</tr>
+<tr class="row-even"><td><p>MeasurementController</p></td>
+</tr>
+<tr class="row-odd"><td><p>ADCInstrument</p></td>
+</tr>
+<tr class="row-even"><td><p>ADCPlugin</p></td>
+</tr>
+<tr class="row-odd"><td><p>AcqTreeNode</p></td>
+</tr>
+<tr class="row-even"><td><p>GRFFTSinkComponent</p></td>
+</tr>
+<tr class="row-odd"><td><p>GRFFTChannelComponent</p></td>
+</tr>
+<tr class="row-even"><td><p>GRTimeSinkComponent</p></td>
+</tr>
+<tr class="row-odd"><td><p>GRTimeChannelComponent</p></td>
+</tr>
+<tr class="row-even"><td><p>PqmRms</p></td>
+</tr>
+<tr class="row-odd"><td><p>PQMLog</p></td>
+</tr>
+<tr class="row-even"><td><p>PqmAqcManager</p></td>
+</tr>
+<tr class="row-odd"><td><p>PQMPlugin</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm_settings</p></td>
+</tr>
+<tr class="row-odd"><td><p>M2kDigitalIo</p></td>
+</tr>
+<tr class="row-even"><td><p>M2kIIOManager</p></td>
+</tr>
+<tr class="row-odd"><td><p>M2kCalibrationManual</p></td>
+</tr>
+<tr class="row-even"><td><p>M2KPowerController</p></td>
+</tr>
+<tr class="row-odd"><td><p>M2kSiggen</p></td>
+</tr>
+<tr class="row-even"><td><p>M2kNetworkAnalyzer</p></td>
+</tr>
+<tr class="row-odd"><td><p>M2kOscilloscope</p></td>
+</tr>
+<tr class="row-even"><td><p>M2KCalibration</p></td>
+</tr>
+<tr class="row-odd"><td><p>M2kSpectrumAnalyzer</p></td>
+</tr>
+<tr class="row-even"><td><p>M2kDMM</p></td>
+</tr>
+<tr class="row-odd"><td><p>M2KPLUGIN</p></td>
+</tr>
+<tr class="row-even"><td><p>Benchmark</p></td>
+</tr>
+<tr class="row-odd"><td><p>Plot</p></td>
+</tr>
+<tr class="row-even"><td><p>SWIOTPlugin</p></td>
+</tr>
+<tr class="row-odd"><td><p>AD74413R</p></td>
+</tr>
+<tr class="row-even"><td><p>SWIOTConfig</p></td>
+</tr>
+<tr class="row-odd"><td><p>SWIOTFaults</p></td>
+</tr>
+<tr class="row-even"><td><p>MAX14906</p></td>
+</tr>
+<tr class="row-odd"><td><p>DebuggerTreeView</p></td>
+</tr>
+<tr class="row-even"><td><p>DebuggerDetailsView</p></td>
+</tr>
+<tr class="row-odd"><td><p>DebuggerWatchList</p></td>
+</tr>
+<tr class="row-even"><td><p>DebuggerIIOModel</p></td>
+</tr>
+<tr class="row-odd"><td><p>IIODebugger</p></td>
+</tr>
+<tr class="row-even"><td><p>DEBUGGERPLUGIN</p></td>
+</tr>
+<tr class="row-odd"><td><p>Benchmark</p></td>
+</tr>
+<tr class="row-even"><td><p>TestPluginIp</p></td>
+</tr>
+<tr class="row-odd"><td><p>TestPlugin</p></td>
+</tr>
+<tr class="row-even"><td><p>TimeTracker</p></td>
+</tr>
+<tr class="row-odd"><td><p>DataMonitor_API</p></td>
+</tr>
+<tr class="row-even"><td><p>DataMonitorSettings</p></td>
+</tr>
+<tr class="row-odd"><td><p>DataLoggerPlugin</p></td>
+</tr>
+<tr class="row-even"><td><p>DataLoggerPlugin</p></td>
+</tr>
+<tr class="row-odd"><td><p>DataMonitorTool</p></td>
+</tr>
+<tr class="row-even"><td><p>ApiObject</p></td>
+</tr>
+<tr class="row-odd"><td><p>ResourceManager</p></td>
+</tr>
+<tr class="row-even"><td><p>VersionCache</p></td>
+</tr>
+<tr class="row-odd"><td><p>Scopy_JS</p></td>
+</tr>
+<tr class="row-even"><td><p>Plugin</p></td>
+</tr>
+<tr class="row-odd"><td><p>StatusBarManager</p></td>
+</tr>
+<tr class="row-even"><td><p>Preferences</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>If you need to regenerate this list after updating parts of Scopy, you can
+use the following command:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>grep<span class="w"> </span>-InH<span class="w"> </span>-r<span class="w"> </span>--exclude<span class="o">=</span><span class="s2">&quot;*.rst*&quot;</span><span class="w"> </span>--exclude<span class="o">=</span><span class="s2">&quot;*.mako&quot;</span><span class="w"> </span>--exclude<span class="o">=</span><span class="s2">&quot;*build*&quot;</span><span class="w"> </span>--exclude<span class="o">=</span><span class="s2">&quot;*html*&quot;</span><span class="w"> </span><span class="s2">&quot;Q_LOGGING_CATEGORY&quot;</span><span class="w"> </span>.<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s1">&#39;s/.*Q_LOGGING_CATEGORY([^,]*, *&quot;\([^&quot;]*\)&quot;).*/\1/&#39;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="linux-wayland-crash">
+<h2>Linux Wayland crash<a class="headerlink" href="#linux-wayland-crash" title="Link to this heading"></a></h2>
+<p>If you are using Scopy on a Linux system with Wayland and you encounter a crash
+when trying to open the application, you can run Scopy with XCB.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>flatpak run –env=QT_QPA_PLATFORM=xcb org.adi.Scopy</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>QT_QPA_PLATFORM=xcb ./Scopy.AppImage</p>
+</div>
+</section>
 <section id="device-doesn-t-show-up">
-<h2>Device doesn’t show up<a class="headerlink" href="#device-doesn-t-show-up" title="Link to this heading">#</a></h2>
+<h2>Device doesn’t show up<a class="headerlink" href="#device-doesn-t-show-up" title="Link to this heading"></a></h2>
 <p>Make sure you install the latest driver :</p>
 <blockquote>
 <div><ul class="simple">
@@ -219,7 +690,7 @@ Drivers</a></p></li>
 </div></blockquote>
 </section>
 <section id="use-compliant-usb-cable">
-<h2>Use compliant USB cable<a class="headerlink" href="#use-compliant-usb-cable" title="Link to this heading">#</a></h2>
+<h2>Use compliant USB cable<a class="headerlink" href="#use-compliant-usb-cable" title="Link to this heading"></a></h2>
 <p>Some USB cables are incapable of power delivery necessary to the ADALM2000 (or
 are just plain flakey). Please use the provided USB cable. Also in order to
 troubleshoot this, you try using two cables, plug in a separate cable to the USB
@@ -228,7 +699,7 @@ center USB connector for data transfer. If using two cables works, it normally
 means it’s a cable, or voltage droop issue on the host.</p>
 </section>
 <section id="reinstall-ini-files">
-<h2>Reinstall &amp; INI files<a class="headerlink" href="#reinstall-ini-files" title="Link to this heading">#</a></h2>
+<h2>Reinstall &amp; INI files<a class="headerlink" href="#reinstall-ini-files" title="Link to this heading"></a></h2>
 <p><strong>Scopy.ini</strong> and <strong>Preferences.ini</strong> contain the user-settings that are saved
 in-between sessions. Sometimes these can get messed up and can cause problems.
 In order to reset them, go to: These file are located in:</p>
@@ -242,6 +713,8 @@ it</a>.</p></li>
 <p>and delete (or rename) <strong>Scopy.ini</strong> <strong>Scopy.ini.bak</strong> <strong>Preferences.ini</strong>
 <strong>Preferences.ini.bak</strong> The preference is to rename things with a different
 suffix, so if you need to report a bug, the file still exists.</p>
+<p>You can also reset these files to default using the <strong>Reset button</strong> from
+the Preferences page.</p>
 <p>Scopy configuration can sometimes get messed up when updating as opposed to
 uninstall/reinstall. If you are facing this issue, you can try uninstalling
 Scopy and then reinstall.</p>
@@ -253,7 +726,7 @@ Scopy and then reinstall.</p>
 privileges since Scopy needs to write to it’s installation folder.</p>
 </section>
 <section id="connecting-through-the-network-interface">
-<h2>Connecting through the network interface<a class="headerlink" href="#connecting-through-the-network-interface" title="Link to this heading">#</a></h2>
+<h2>Connecting through the network interface<a class="headerlink" href="#connecting-through-the-network-interface" title="Link to this heading"></a></h2>
 <p>If you are having trouble connecting through USB, you can always connect to the
 device through the network interface. The USB connection can cause all kinds of
 problems on various systems. In order to connect through the emulated network
@@ -261,7 +734,7 @@ interface follow
 <a class="reference internal" href="index.html#user-guide"><span class="std std-ref">the steps from user guide under Connecting to a remote device.</span></a></p>
 </section>
 <section id="make-sure-you-have-the-latest-firmware">
-<h2>Make sure you have the latest firmware<a class="headerlink" href="#make-sure-you-have-the-latest-firmware" title="Link to this heading">#</a></h2>
+<h2>Make sure you have the latest firmware<a class="headerlink" href="#make-sure-you-have-the-latest-firmware" title="Link to this heading"></a></h2>
 <p>For ADALM2000 visit the firmware page
 <a class="reference external" href="https://github.com/analogdevicesinc/m2k-fw/releases">https://github.com/analogdevicesinc/m2k-fw/releases</a>.</p>
 <p>Compare the latest firmware version on this page with the one you have
@@ -270,7 +743,7 @@ steps</a> to
 update the firmware.</p>
 </section>
 <section id="uninstall-and-reinstall-the-software">
-<h2>Uninstall and reinstall the software<a class="headerlink" href="#uninstall-and-reinstall-the-software" title="Link to this heading">#</a></h2>
+<h2>Uninstall and reinstall the software<a class="headerlink" href="#uninstall-and-reinstall-the-software" title="Link to this heading"></a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p>Run a clean uninstall</p></li>
@@ -281,7 +754,7 @@ update the firmware.</p>
 </div></blockquote>
 </section>
 <section id="make-sure-the-system-doesn-t-limit-the-usb-power-consumption">
-<h2>Make sure the system doesn’t limit the USB power consumption<a class="headerlink" href="#make-sure-the-system-doesn-t-limit-the-usb-power-consumption" title="Link to this heading">#</a></h2>
+<h2>Make sure the system doesn’t limit the USB power consumption<a class="headerlink" href="#make-sure-the-system-doesn-t-limit-the-usb-power-consumption" title="Link to this heading"></a></h2>
 <p>Some laptops limit the amount of current that can be delivered via an USB port
 (either native or from a docking station/usb hub). In order to workaround this
 issue you can try the following:</p>
@@ -298,7 +771,7 @@ the Power management tab</p></li>
 </div></blockquote>
 </section>
 <section id="run-iio-info-a-for-board-diagnostics">
-<h2>Run iio_info -a for board diagnostics<a class="headerlink" href="#run-iio-info-a-for-board-diagnostics" title="Link to this heading">#</a></h2>
+<h2>Run iio_info -a for board diagnostics<a class="headerlink" href="#run-iio-info-a-for-board-diagnostics" title="Link to this heading"></a></h2>
 <p>Download latest version of <a class="reference external" href="https://github.com/analogdevicesinc/libiio/releases">https://github.com/analogdevicesinc/libiio/releases</a> .</p>
 <p>Open a command prompt and run</p>
 <div class="admonition note">
@@ -311,8 +784,16 @@ the Power management tab</p></li>
 <p>iio_info -u “ip:192.168.2.1”</p>
 </div>
 </section>
+<section id="emulator-not-found">
+<h2>Emulator not found<a class="headerlink" href="#emulator-not-found" title="Link to this heading"></a></h2>
+<p>If you are using any binary from the official release artifacts
+and you get something similar to: <em>“iio-emu not found”</em> when
+trying to use the Emulator functionality, go to <strong>Preferences</strong>,
+use the <strong>Reset button</strong> to set everything to its default value
+and restart Scopy.</p>
+</section>
 <section id="scopy-white-screen-on-windows">
-<h2>Scopy white screen on Windows<a class="headerlink" href="#scopy-white-screen-on-windows" title="Link to this heading">#</a></h2>
+<h2>Scopy white screen on Windows<a class="headerlink" href="#scopy-white-screen-on-windows" title="Link to this heading"></a></h2>
 <p>Scopy displaying a white screen on startup (combined with hangs or crashes) is an
 issue that indicates OpenGL incompatibility with your system due to a missing or
 outdated graphics driver/DirectX/OpenGl Driver.</p>
