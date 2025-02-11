@@ -1,7 +1,6 @@
 #include "pdkwindow.h"
 #include <QApplication>
 #include <QSettings>
-#include <iostream>
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include <QButtonGroup>
@@ -11,10 +10,10 @@
 #include <preferences.h>
 #include <menusectionwidget.h>
 #include <menucollapsesection.h>
-#include "gui/stylehelper.h"
 #include "gui/preferenceshelper.h"
 #include "pdk-util_config.h"
 #include <QDesktopServices>
+#include <style.h>
 
 int main(int argc, char *argv[])
 {
@@ -26,7 +25,6 @@ int main(int argc, char *argv[])
 	QSettings::setDefaultFormat(QSettings::IniFormat);
 
 	QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-	app.setStyleSheet(Util::loadStylesheetFromFile(":/default.qss"));
 	PDKWindow test;
 	test.show();
 	int ret = app.exec();
@@ -39,17 +37,16 @@ int main(int argc, char *argv[])
 PDKWindow::PDKWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
+	initPreferencesPage();
 	setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 	setMinimumSize(1280, 720);
 	layout()->setMargin(9);
 	layout()->setSpacing(6);
-	scopy::StyleHelper::GetInstance()->initColorMap();
 	m_mainWidget = new MainWidget(this);
 	m_aboutPage = new QLabel(this);
 	m_aboutPage->setWordWrap(true);
 	m_aboutPage->setAlignment(Qt::AlignTop);
 	initMainWindow();
-	initPreferencesPage();
 
 	addHorizontalTab(m_mainWidget, createTabLabel("Main"));
 	addHorizontalTab(m_aboutPage, createTabLabel("About"));
@@ -68,6 +65,12 @@ PDKWindow::~PDKWindow()
 		delete m_mainWidget;
 		m_mainWidget = nullptr;
 	}
+}
+
+void PDKWindow::initStyle()
+{
+	scopy::Preferences *p = scopy::Preferences::GetInstance();
+	scopy::Style::GetInstance()->init(p->get("general_theme").toString(), p->get("font_scale").toFloat());
 }
 
 void PDKWindow::onConnect()
@@ -152,7 +155,7 @@ QWidget *PDKWindow::buildSaveSessionPreference()
 	lay->addSpacerItem(new QSpacerItem(40, 40, QSizePolicy::Expanding, QSizePolicy::Fixed));
 	lay->addWidget(new QLabel("Settings files location ", this));
 	QPushButton *navigateBtn = new QPushButton("Open", this);
-	scopy::StyleHelper::BasicButton(navigateBtn, "navigateBtn");
+	scopy::Style::setStyle(navigateBtn, style::properties::button::basicButton);
 	navigateBtn->setMaximumWidth(80);
 	connect(navigateBtn, &QPushButton::clicked, this,
 		[=]() { QDesktopServices::openUrl(scopy::config::settingsFolderPath()); });
@@ -164,7 +167,6 @@ QWidget *PDKWindow::generalPreferences()
 {
 	QWidget *page = new QWidget(this);
 	QVBoxLayout *lay = new QVBoxLayout(page);
-	initGeneralPreferences();
 	scopy::Preferences *p = scopy::Preferences::GetInstance();
 
 	lay->setMargin(0);
@@ -174,7 +176,8 @@ QWidget *PDKWindow::generalPreferences()
 	// General preferences
 	scopy::MenuSectionWidget *generalWidget = new scopy::MenuSectionWidget(page);
 	scopy::MenuCollapseSection *generalSection =
-		new scopy::MenuCollapseSection("General", scopy::MenuCollapseSection::MHCW_NONE, generalWidget);
+		new scopy::MenuCollapseSection("General", scopy::MenuCollapseSection::MHCW_NONE,
+					       scopy::MenuCollapseSection::MHW_BASEWIDGET, generalWidget);
 	generalWidget->contentLayout()->setSpacing(10);
 	generalWidget->contentLayout()->addWidget(generalSection);
 	generalSection->contentLayout()->setSpacing(10);
@@ -187,7 +190,8 @@ QWidget *PDKWindow::generalPreferences()
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
 		p, "general_doubleclick_attach", "Doubleclick to attach/detach tool", "", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
-		p, "general_doubleclick_ctrl_opens_menu", "Doubleclick control buttons to open menu", "", generalSection));
+		p, "general_doubleclick_ctrl_opens_menu", "Doubleclick control buttons to open menu", "",
+		generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
 		p, "general_use_opengl", "Enable OpenGL plotting", "", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
@@ -195,25 +199,29 @@ QWidget *PDKWindow::generalPreferences()
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
 		p, "general_check_online_version", "Enable automatic online check for updates.", "", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
-		p, "general_show_status_bar", "Enable the status bar for displaying important messages.",
-		"", generalSection));
+		p, "general_show_status_bar", "Enable the status bar for displaying important messages.", "",
+		generalSection));
 	generalSection->contentLayout()->addWidget(
 		scopy::PreferencesHelper::addPreferenceCheckBox(p, "show_grid", "Show Grid", "", generalSection));
-	generalSection->contentLayout()->addWidget(
-		scopy::PreferencesHelper::addPreferenceCheckBox(p, "show_graticule", "Show Graticule", "", generalSection));
+	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
+		p, "show_graticule", "Show Graticule", "", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
 		p, "iiowidgets_use_lazy_loading", "Use Lazy Loading", "", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
 		p, "plugins_use_debugger_v2", "Use Debugger V2 plugin", "", generalSection));
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
+	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(
 		p, "general_use_native_dialogs", "Use native dialogs", "", generalSection));
 	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCombo(
-		p, "general_theme", "Theme", {"default", "light"}, "", generalSection));
+		p, "general_theme", "Theme", "", scopy::Style::GetInstance()->getThemeList(), generalSection));
+	generalSection->contentLayout()->addWidget(scopy::PreferencesHelper::addPreferenceCombo(
+		p, "font_scale", "Font scale (EXPERIMENTAL)", "", {"1", "1.15", "1.3", "1.45", "1.6", "1.75", "1.9"},
+		generalSection));
 
 	// Debug preferences
 	scopy::MenuSectionWidget *debugWidget = new scopy::MenuSectionWidget(page);
 	scopy::MenuCollapseSection *debugSection =
-		new scopy::MenuCollapseSection("Debug", scopy::MenuCollapseSection::MHCW_NONE, debugWidget);
+		new scopy::MenuCollapseSection("Debug", scopy::MenuCollapseSection::MHCW_NONE,
+					       scopy::MenuCollapseSection::MHW_BASEWIDGET, debugWidget);
 	debugWidget->contentLayout()->setSpacing(10);
 	debugWidget->contentLayout()->addWidget(debugSection);
 	debugSection->contentLayout()->setSpacing(10);
@@ -243,7 +251,8 @@ void PDKWindow::initGeneralPreferences()
 	p->init("general_use_opengl", true);
 #endif
 	p->init("general_use_animations", true);
-	p->init("general_theme", "default");
+	p->init("general_theme", "Scopy");
+	p->init("font_scale", "1");
 	p->init("general_language", "en");
 	p->init("show_grid", true);
 	p->init("show_graticule", false);
@@ -272,9 +281,9 @@ void PDKWindow::initMainWindow()
 	m_tabWidget = new QTabWidget(centralWidget);
 	m_tabWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	m_tabWidget->setTabPosition(QTabWidget::TabPosition::West);
-	scopy::StyleHelper::BackgroundPage(m_tabWidget, "pdkTable");
 
 	lay->addWidget(m_tabWidget);
+	scopy::Style::setBackgroundColor(this, json::theme::background_primary);
 }
 
 QWidget *PDKWindow::addHorizontalTab(QWidget *w, QLabel *lbl, bool tabEnabled)
@@ -302,14 +311,17 @@ QWidget *PDKWindow::addHorizontalTab(QWidget *w, QLabel *lbl, bool tabEnabled)
 }
 void PDKWindow::initPreferencesPage()
 {
+	initGeneralPreferences();
+	PDKWindow::initStyle();
 	m_prefPage = new QWidget(this);
 	QGridLayout *lay = new QGridLayout(m_prefPage);
 	lay->setSpacing(6);
 	lay->setMargin(0);
 
 	scopy::MenuSectionWidget *generalWidget = new scopy::MenuSectionWidget(m_prefPage);
-	scopy::MenuCollapseSection *generalSection = new scopy::MenuCollapseSection(
-		"Scopy preferences", scopy::MenuCollapseSection::MHCW_NONE, generalWidget);
+	scopy::MenuCollapseSection *generalSection =
+		new scopy::MenuCollapseSection("Scopy preferences", scopy::MenuCollapseSection::MHCW_NONE,
+					       scopy::MenuCollapseSection::MHW_BASEWIDGET, generalWidget);
 	generalWidget->contentLayout()->setSpacing(10);
 	generalWidget->contentLayout()->addWidget(generalSection);
 	generalSection->contentLayout()->setSpacing(10);
@@ -327,8 +339,9 @@ void PDKWindow::addPluginPrefPage()
 		if(!lay)
 			return;
 		scopy::MenuSectionWidget *pluginWidget = new scopy::MenuSectionWidget(m_prefPage);
-		scopy::MenuCollapseSection *pluginSection = new scopy::MenuCollapseSection(
-			"Plugin preferences", scopy::MenuCollapseSection::MHCW_NONE, pluginWidget);
+		scopy::MenuCollapseSection *pluginSection =
+			new scopy::MenuCollapseSection("Plugin preferences", scopy::MenuCollapseSection::MHCW_NONE,
+						       scopy::MenuCollapseSection::MHW_BASEWIDGET, pluginWidget);
 		pluginWidget->contentLayout()->setSpacing(10);
 		pluginWidget->contentLayout()->addWidget(pluginSection);
 		pluginSection->contentLayout()->setSpacing(10);
@@ -354,7 +367,7 @@ void PDKWindow::removePluginPrefPage()
 QLabel *PDKWindow::createTabLabel(QString name)
 {
 	QLabel *lbl = new QLabel();
-	scopy::StyleHelper::TabWidgetLabel(lbl, "tabWidgetLabel");
+	scopy::Style::setStyle(lbl, style::properties::label::menuMedium);
 	lbl->setText(name);
 	return lbl;
 }
@@ -371,14 +384,12 @@ MainWidget::MainWidget(QWidget *parent)
 	lay->setSpacing(6);
 
 	m_statusLbl = new QLabel(this);
-	scopy::StyleHelper::WarningLabel(m_statusLbl);
+	scopy::Style::setStyle(m_statusLbl, style::properties::label::warning);
 	m_statusLbl->setWordWrap(true);
 
 	// browse section
 	m_browseBtn = new QPushButton("Browse", this);
-	scopy::StyleHelper::BasicButton(m_browseBtn);
-	m_browseBtn->setFixedWidth(128);
-	m_browseBtn->setFixedHeight(40);
+	scopy::Style::setStyle(m_browseBtn, style::properties::button::basicButton);
 
 	m_pluginPathEdit = new QLineEdit(this);
 	m_pluginPathEdit->setText(PLUGIN_INSTALL_PATH);
@@ -390,29 +401,22 @@ MainWidget::MainWidget(QWidget *parent)
 
 	// init
 	m_initBtn = new QPushButton("Init", this);
-	scopy::StyleHelper::BasicButton(m_initBtn);
-	m_initBtn->setFixedWidth(128);
-	m_initBtn->setFixedHeight(40);
+	scopy::Style::setStyle(m_initBtn, style::properties::button::basicButton);
 	connect(m_initBtn, &QPushButton::clicked, this, &MainWidget::onInit);
 
 	// load btn
 	QWidget *loadBtns = new QWidget(this);
-	loadBtns->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 	loadBtns->setLayout(new QVBoxLayout(loadBtns));
 	loadBtns->layout()->setSpacing(0);
 	loadBtns->layout()->setMargin(0);
 
 	m_loadBtn = new QPushButton("Load", this);
-	scopy::StyleHelper::BasicButton(m_loadBtn);
-	m_loadBtn->setFixedWidth(128);
-	m_loadBtn->setFixedHeight(40);
+	scopy::Style::setStyle(m_loadBtn, style::properties::button::basicButton);
 	m_loadBtn->setEnabled(false);
 	connect(m_loadBtn, &QPushButton::clicked, this, &MainWidget::onLoad);
 
 	m_unloadBtn = new QPushButton("Unload", this);
-	scopy::StyleHelper::BasicButton(m_unloadBtn);
-	m_unloadBtn->setFixedWidth(128);
-	m_unloadBtn->setFixedHeight(40);
+	scopy::Style::setStyle(m_unloadBtn, style::properties::button::basicButton);
 	m_unloadBtn->setVisible(false);
 	connect(m_unloadBtn, &QPushButton::clicked, this, &MainWidget::onUnload);
 
@@ -425,25 +429,19 @@ MainWidget::MainWidget(QWidget *parent)
 	m_uriEdit->setText("ip:127.0.0.1");
 
 	m_deviceTypeCb = new scopy::MenuCombo("category", this);
-	m_deviceTypeCb->setFixedHeight(40);
 
 	QWidget *connBtns = new QWidget(this);
-	connBtns->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 	connBtns->setLayout(new QVBoxLayout(connBtns));
 	connBtns->layout()->setSpacing(0);
 	connBtns->layout()->setMargin(0);
 
 	m_connBtn = new QPushButton("Connect", this);
-	scopy::StyleHelper::BasicButton(m_connBtn);
-	m_connBtn->setFixedWidth(128);
-	m_connBtn->setFixedHeight(40);
+	scopy::Style::setStyle(m_connBtn, style::properties::button::basicButton);
 	m_connBtn->setEnabled(false);
 	connect(m_connBtn, &QPushButton::clicked, this, &MainWidget::onConnect);
 
 	m_disconnBtn = new QPushButton("Disconnect", this);
-	scopy::StyleHelper::BasicButton(m_disconnBtn);
-	m_disconnBtn->setFixedWidth(128);
-	m_disconnBtn->setFixedHeight(40);
+	scopy::Style::setStyle(m_disconnBtn, style::properties::button::basicButton);
 	m_disconnBtn->setVisible(false);
 	connect(m_disconnBtn, &QPushButton::clicked, this, &MainWidget::onDisconnect);
 
