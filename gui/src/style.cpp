@@ -36,8 +36,6 @@
 
 #include <common/scopyconfig.h>
 
-#include <pluginbase/preferences.h>
-
 using namespace scopy;
 
 Style *Style::pinstance_{nullptr};
@@ -54,7 +52,6 @@ Style::Style(QObject *parent)
 	, m_m2kqssFile("m2k")
 {
 	initPaths();
-	init();
 }
 
 Style::~Style() {}
@@ -95,7 +92,7 @@ void Style::initPaths()
 	m_qssFolderPath = getStylePath(m_qssFolderPath);
 }
 
-void Style::init(QString theme)
+void Style::init(QString theme, float fontScale)
 {
 	QFontDatabase::addApplicationFont(":/gui/Inter-Regular.ttf");
 	QFile global_file = QFile(m_globalJsonPath);
@@ -107,7 +104,7 @@ void Style::init(QString theme)
 	if(theme.isEmpty()) {
 		theme = getTheme();
 	}
-	setTheme(theme);
+	setTheme(theme, fontScale);
 }
 
 void Style::setStyle(QWidget *widget, const char *style, QVariant value, bool force)
@@ -160,7 +157,7 @@ QString Style::getColorTransparent(const char *key, double transparency)
 
 QString Style::getTheme() { return QFileInfo(m_themeJsonPath).fileName().replace(".json", ""); }
 
-bool Style::setTheme(QString theme)
+bool Style::setTheme(QString theme, float fontScale)
 {
 	QString tmp_theme_path = m_themeJsonPath;
 	tmp_theme_path.replace(getTheme() + ".json", theme + ".json");
@@ -174,6 +171,7 @@ bool Style::setTheme(QString theme)
 
 		m_theme_json = new QJsonDocument(QJsonDocument::fromJson(theme_data));
 
+		adjustJsonForScaling(fontScale);
 		genrateStyle();
 		QIcon::setThemeName(getAttribute(json::theme::icon_theme_folder));
 		return true;
@@ -197,6 +195,20 @@ QStringList Style::getThemeList()
 	return themes;
 }
 
+void Style::adjustJsonForScaling(float scale)
+{
+	if(scale != 1) {
+		for(QJsonDocument *jsonDoc : {m_theme_json, m_global_json}) {
+			QJsonObject jsonObj = jsonDoc->object();
+			for(QString key : jsonObj.keys()) {
+				QJsonValue value = jsonObj.value(key);
+				jsonObj[key] = adjustForScaling(key, value.toString(), scale);
+			}
+			jsonDoc->setObject(jsonObj);
+		}
+	}
+}
+
 QString Style::getAttribute(const char *key)
 {
 	QString attr = m_theme_json->object().value(key).toString();
@@ -204,7 +216,7 @@ QString Style::getAttribute(const char *key)
 		attr = m_global_json->object().value(key).toString();
 	}
 
-	return replaceAttributes(adjustForScaling(key, attr));
+	return replaceAttributes(attr);
 }
 
 QColor Style::getChannelColor(int index) { return getChannelColorList()[index]; }
@@ -280,11 +292,11 @@ QString Style::replaceAttributes(QString style, int calls_limit)
 	if(style.contains('&') && calls_limit > 0) {
 		for(const QString &key : m_theme_json->object().keys()) {
 			QString value = m_theme_json->object().value(key).toString();
-			style.replace("&" + key + "&", adjustForScaling(QString(key), value));
+			style.replace("&" + key + "&", value);
 		}
 		for(const QString &key : m_global_json->object().keys()) {
 			QString value = m_global_json->object().value(key).toString();
-			style.replace("&" + key + "&", adjustForScaling(QString(key), value));
+			style.replace("&" + key + "&", value);
 		}
 
 		style = replaceAttributes(style, --calls_limit);
@@ -350,14 +362,13 @@ QString Style::scaleNumberInString(QString string, float factor)
 	return string;
 }
 
-QString Style::adjustForScaling(QString key, QString value)
+QString Style::adjustForScaling(QString key, QString value, float scale)
 {
 	if(QString(key).startsWith("font_size")) {
-		value = scaleNumberInString(value, Preferences::GetInstance()->get("font_scale").toFloat());
+		value = scaleNumberInString(value, scale);
 	}
 	if(QString(key).startsWith("unit_")) {
-		value = scaleNumberInString(value,
-					    (Preferences::GetInstance()->get("font_scale").toFloat() - 1) / 2 + 1);
+		value = scaleNumberInString(value, (scale - 1) / 2 + 1);
 	}
 
 	return value;
