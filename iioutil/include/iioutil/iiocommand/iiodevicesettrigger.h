@@ -23,8 +23,9 @@
 #define IIODEVICESETTRIGGER_H
 
 #include "../command.h"
+#include "iiocpp/iiodevice.h"
 
-#include <iio.h>
+#include <iio/iio.h>
 
 namespace scopy {
 class SCOPY_IIOUTIL_EXPORT IioDeviceSetTrigger : public Command
@@ -42,7 +43,7 @@ public:
 	virtual void execute() override
 	{
 		Q_EMIT started(this);
-		ssize_t ret = iio_device_set_trigger(m_device, m_trigger_device);
+		ssize_t ret = IIODevice::set_trigger(m_device, m_trigger_device);
 		m_cmdResult->errorCode = ret;
 		Q_EMIT finished(this);
 	}

@@ -24,7 +24,8 @@
 
 #include "../command.h"
 
-#include <iio.h>
+#include <iio/iio.h>
+#include "iiocpp/iiodevice.h"
 
 namespace scopy {
 class SCOPY_IIOUTIL_EXPORT IioRegisterRead : public Command
@@ -42,7 +43,7 @@ public:
 	virtual ~IioRegisterRead()
 	{
 		if(m_cmdResult->results) {
-			delete[](uint32_t *) m_cmdResult->results;
+			delete[](uint32_t *)m_cmdResult->results;
 			m_cmdResult->results = nullptr;
 		}
 	}
@@ -53,7 +54,7 @@ public:
 		if(!m_cmdResult->results) {
 			m_cmdResult->results = (uint32_t *)malloc(sizeof(uint32_t));
 		}
-		ssize_t ret = iio_device_reg_read(m_device, m_registerAddress, (uint32_t *)m_cmdResult->results);
+		ssize_t ret = IIODevice::reg_read(m_device, m_registerAddress, (uint32_t *)m_cmdResult->results);
 		m_cmdResult->errorCode = ret;
 		Q_EMIT finished(this);
 	}

@@ -60,6 +60,9 @@ public:
 	static int set_trigger(iio_device *dev, const iio_device *trigger);
 	static bool is_trigger(const iio_device *dev);
 
+	/* HWMON related functions */
+	static inline bool is_hwmon(const iio_device *dev);
+
 	/* Low level and debug functions */
 	static ssize_t get_sample_size(const iio_device *dev, const iio_channels_mask *mask);
 	static unsigned int get_debug_attrs_count(const iio_device *dev);

@@ -24,16 +24,16 @@
 
 #include "iregisterwritestrategy.hpp"
 
-#include <iio.h>
+#include <iio/iio.h>
 
 namespace scopy::regmap {
 class IIORegisterWriteStrategy : public IRegisterWriteStrategy
 {
 public:
-	IIORegisterWriteStrategy(struct iio_device *dev);
+	IIORegisterWriteStrategy(iio_device *dev);
 
 private:
-	struct iio_device *dev;
+	iio_device *dev;
 	uint32_t addressSpace = 0;
 
 	// IRegisterWriteStrategy interface

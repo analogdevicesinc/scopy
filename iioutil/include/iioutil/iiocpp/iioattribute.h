@@ -48,11 +48,21 @@ public:
 	 * @param len Length of the destination buffer.
 	 * @return Number of bytes read or -errno on error.
 	 */
-	static ssize_t read(const iio_attr *attr, char *dst, size_t len);
+	static ssize_t read_any(const iio_attr *attr, char *dst, size_t len);
 
 	/* Functions duplicated from libiio */
 	static ssize_t read_raw(const iio_attr *attr, char *dst, size_t len);
+	static ssize_t read(const iio_attr *attr, bool *ptr);
+	static ssize_t read(const iio_attr *attr, long long *ptr);
+	static ssize_t read(const iio_attr *attr, double *ptr);
+
 	static ssize_t write_raw(const iio_attr *attr, const void *src, size_t len);
+	static ssize_t write(const iio_attr *attr, const char *val);
+	static ssize_t write(const iio_attr *attr, char *val);
+	static ssize_t write(const iio_attr *attr, bool val);
+	static ssize_t write(const iio_attr *attr, long long val);
+	static ssize_t write(const iio_attr *attr, double val);
+
 	static const char *get_name(const iio_attr *attr);
 	static const char *get_filename(const iio_attr *attr);
 	static const char *get_static_value(const iio_attr *attr);

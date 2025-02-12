@@ -20,6 +20,7 @@
 
 #include "iiocpp/iiodevice.h"
 #include <QApplication>
+#include <iio/iio.h>
 
 using namespace scopy;
 
@@ -106,6 +107,8 @@ IIOResult<const iio_device *> IIODevice::get_trigger(const iio_device *dev)
 int IIODevice::set_trigger(iio_device *dev, const iio_device *trigger) { return iio_device_set_trigger(dev, trigger); }
 
 bool IIODevice::is_trigger(const iio_device *dev) { return iio_device_is_trigger(dev); }
+
+inline bool IIODevice::is_hwmon(const iio_device *dev) { return iio_device_is_hwmon(dev); }
 
 ssize_t IIODevice::get_sample_size(const iio_device *dev, const iio_channels_mask *mask)
 {

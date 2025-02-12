@@ -32,7 +32,7 @@
 #include "savecontextsetup.h"
 #include "iiodebuglogger.h"
 
-#include <iio.h>
+#include <iio/iio.h>
 #include <QWidget>
 #include <QTreeView>
 #include <QSplitter>
@@ -83,7 +83,7 @@ private:
 	QWidget *m_mainWidget;
 	IIODebugLogger *m_debugLogger;
 
-	struct iio_context *m_context;
+	iio_context *m_context;
 	QString m_uri;
 	QTreeView *m_treeView;
 	IIOModel *m_iioModel;
@@ -110,8 +110,9 @@ public:
 	explicit IIOExplorerInstrument_API(IIOExplorerInstrument *p)
 		: ApiObject(p)
 		, p(p)
-	{}
-	~IIOExplorerInstrument_API(){};
+	{
+	}
+	~IIOExplorerInstrument_API() {};
 
 	QList<int> vSplitter() const;
 	void setVSplitter(const QList<int> &newSplitter);

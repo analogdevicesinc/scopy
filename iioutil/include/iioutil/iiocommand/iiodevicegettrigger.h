@@ -24,7 +24,8 @@
 
 #include "../command.h"
 
-#include <iio.h>
+#include <iio/iio.h>
+#include <iiocpp/iiodevice.h>
 
 namespace scopy {
 class SCOPY_IIOUTIL_EXPORT IioDeviceGetTrigger : public Command
@@ -41,9 +42,10 @@ public:
 	virtual void execute() override
 	{
 		Q_EMIT started(this);
-		const iio_device *test_dev;
-		ssize_t ret = iio_device_get_trigger(m_device, &test_dev);
-		m_cmdResult->errorCode = ret;
+		// FIXME: Fix this later
+		// const iio_device *test_dev;
+		// ssize_t ret = IIODevice::get_trigger(m_device, &test_dev);
+		// m_cmdResult->errorCode = ret;
 		Q_EMIT finished(this);
 	}
 

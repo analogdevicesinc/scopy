@@ -26,7 +26,7 @@
 #include <QMap>
 #include <QObject>
 #include "datamonitor/dmmdatamonitormodel.hpp"
-#include "iio.h"
+#include <iio/iio.h>
 #include "scopy-datalogger_export.h"
 #include "iioutil/iiounits.h"
 

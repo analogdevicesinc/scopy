@@ -24,7 +24,7 @@
 
 #include "iregisterreadstrategy.hpp"
 
-#include <iio.h>
+#include <iio/iio.h>
 
 #include <QObject>
 
@@ -33,7 +33,7 @@ namespace scopy::regmap {
 class IIORegisterReadStrategy : public IRegisterReadStrategy
 {
 public:
-	explicit IIORegisterReadStrategy(struct iio_device *dev);
+	explicit IIORegisterReadStrategy(iio_device *dev);
 	void read(uint32_t address);
 	uint32_t getAddressSpace() const;
 	void setAddressSpace(uint32_t newAddressSpace);
@@ -41,7 +41,7 @@ public:
 Q_SIGNALS:
 
 private:
-	struct iio_device *dev;
+	iio_device *dev;
 	uint32_t addressSpace = 0;
 };
 } // namespace scopy::regmap

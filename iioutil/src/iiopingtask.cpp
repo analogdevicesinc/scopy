@@ -20,14 +20,19 @@
  */
 
 #include "iiopingtask.h"
+#include "iiocpp/iiocontext.h"
+#include "iiocpp/iiodevice.h"
+#include "iiocpp/iioresult.h"
 
 #include <QDebug>
+#include <cerrno>
 
 using namespace scopy;
 IIOPingTask::IIOPingTask(iio_context *c, QObject *parent)
 	: PingTask(parent)
 	, m_ctx(c)
-{}
+{
+}
 
 IIOPingTask::~IIOPingTask() {}
 
@@ -47,14 +52,18 @@ bool IIOPingTask::ping() { return pingCtx(m_ctx); }
 
 bool IIOPingTask::pingCtx(iio_context *ctx)
 {
-	auto dev = iio_context_get_device(ctx, 0);
+	auto dev = IIOContext::get_device(ctx, 0).expect("There should be at least one device in the context");
 	const iio_device *test_device = nullptr;
 
-	int ret = iio_device_get_trigger(dev, &test_device);
-
-	if(ret < 0 && ret != -ENOENT) {
+	IIOResult<const iio_device *> ret = IIODevice::get_trigger(dev);
+	if(ret.ok()) {
+		test_device = ret.data();
+	} else {
+		// FIXME: fix this
+		qDebug() << "Error: " << ret.error();
 		return false;
 	}
+
 	return true;
 }
 

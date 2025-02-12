@@ -21,7 +21,9 @@
 
 #include "iioscantask.h"
 
-#include <iio.h>
+#include <iio/iio.h>
+#include "iiocpp/iioresult.h"
+#include "iiocpp/iioscan.h"
 
 #include <QElapsedTimer>
 #include <QLoggingCategory>
@@ -31,7 +33,8 @@
 using namespace scopy;
 IIOScanTask::IIOScanTask(QObject *parent)
 	: QThread(parent)
-{}
+{
+}
 
 IIOScanTask::~IIOScanTask() {}
 
@@ -52,44 +55,37 @@ void IIOScanTask::setScanParams(QString s) { scanParams = s; }
 int IIOScanTask::scan(QVector<QPair<QString, QString>> *ctxs, QString scanParams)
 {
 	qDebug(CAT_IIOSCANCTX) << "start scanning";
-	struct iio_scan_context *scan_ctx = NULL;
-	struct iio_context_info **info;
+	IIOResult<struct iio_scan *> scan_res;
+	struct iio_scan *scan = nullptr;
+	iio_context_params *params = nullptr;
 	int num_contexts;
-	int ret;
 	int i;
 
 	QElapsedTimer et;
 	et.start();
 	if(scanParams.isEmpty()) {
-		scan_ctx = iio_create_scan_context(NULL, 0);
+		scan_res = IIOScan::scan(params, nullptr);
 	} else {
-		scan_ctx = iio_create_scan_context(scanParams.toStdString().c_str(), 0);
+		scan_res = IIOScan::scan(params, scanParams.toStdString().c_str());
 	}
 
-	if(!scan_ctx) {
-		qWarning(CAT_IIOSCANCTX) << "no scan context - " << errno << " " << strerror(errno);
+	if(!scan_res.ok()) {
+		qWarning(CAT_IIOSCANCTX) << "scan error - " << scan_res.error();
 		return -1;
 	}
-	ret = iio_scan_context_get_info_list(scan_ctx, &info);
-	if(ret < 0) {
-		qWarning(CAT_IIOSCANCTX) << "iio_scan_context_get_info_list error - " << errno << " "
-					 << strerror(errno);
-		goto scan_err;
-	}
-
-	num_contexts = ret;
+	scan = scan_res.data();
+	num_contexts = IIOScan::get_results_count(scan);
 
 	qDebug(CAT_IIOSCANCTX) << "found " << num_contexts << "contexts in " << et.elapsed() << "miliseconds ";
 	for(i = 0; i < num_contexts; i++) {
-		QString description = parseDescription(QString(iio_context_info_get_description(info[i])));
-		ctxs->append({description, QString(iio_context_info_get_uri(info[i]))});
+		QString description = parseDescription(QString(IIOScan::get_description(scan, i)));
+		ctxs->append({description, QString(IIOScan::get_uri(scan, i))});
 	}
-	iio_context_info_list_free(info);
 	qDebug(CAT_IIOSCANCTX) << "scanned " << *ctxs;
 
 scan_err:
-	iio_scan_context_destroy(scan_ctx);
-	return ret;
+	IIOScan::destroy(scan);
+	return num_contexts;
 }
 
 QString IIOScanTask::parseDescription(const QString &d)
@@ -112,7 +108,7 @@ QString IIOScanTask::parseDescription(const QString &d)
 QVector<QString> IIOScanTask::getSerialPortsName()
 {
 	QVector<QString> serialPortsName;
-	struct sp_port **serialPorts;
+	sp_port **serialPorts;
 	int retCode = sp_list_ports(&serialPorts);
 	if(retCode == SP_OK) {
 		for(int i = 0; serialPorts[i]; i++) {

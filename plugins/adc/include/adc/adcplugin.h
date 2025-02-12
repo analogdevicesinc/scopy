@@ -27,7 +27,7 @@
 #include "src/adcacquisitionmanager.h"
 #include "scopy-adc_export.h"
 
-#include <iio.h>
+#include <iio/iio.h>
 
 #include <QLabel>
 #include <QLineEdit>

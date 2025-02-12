@@ -27,7 +27,7 @@
 #include <QMap>
 #include <QFuture>
 
-#include <iio.h>
+#include <iio/iio.h>
 
 namespace scopy {
 namespace dac {

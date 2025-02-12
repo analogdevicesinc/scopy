@@ -28,7 +28,7 @@
 #include "registermaptemplate.hpp"
 #include "scopy-regmap_export.h"
 #include "gui/tooltemplate.h"
-#include <iio.h>
+#include <iio/iio.h>
 
 class QComboBox;
 namespace scopy {

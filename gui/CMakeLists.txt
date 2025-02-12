@@ -128,7 +128,10 @@ target_include_directories(
 target_include_directories(
 	${PROJECT_NAME}
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/
-		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/widgets scopy-common scopy-pluginbase
+		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/widgets
+		scopy-common
+		scopy-pluginbase
+		scopy-iioutil
 )
 
 target_include_directories(
@@ -145,6 +148,7 @@ target_link_libraries(
 	       ${Boost_LIBRARIES}
 	       scopy-common
 	       scopy-pluginbase
+	       scopy-iioutil
 )
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH} COMPONENT ${SCOPY_PDK}

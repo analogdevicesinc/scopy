@@ -22,14 +22,13 @@
 #define IIOSCAN_H
 
 #include "scopy-iioutil_export.h"
+#include "iiocpp/iioresult.h"
 #include <QObject>
 #include <iio/iio.h>
 
 #include "iiocpp/iioresult.h"
 
 namespace scopy {
-struct iio_scan;
-
 class SCOPY_IIOUTIL_EXPORT IIOScan : public QObject
 {
 	Q_OBJECT
@@ -44,8 +43,9 @@ public:
 
 	static IIOScan *GetInstance();
 
-	static IIOResult<iio_scan *> scan(const iio_context_params *params, const char *backends);
-	static void destroy(iio_scan *ctx);
+	// iio_scan needs to be set as a struct because there is a function called iio_scan, should there be one?
+	static IIOResult<struct iio_scan *> scan(const iio_context_params *params, const char *backends);
+	static void destroy(struct iio_scan *ctx);
 	static size_t get_results_count(const struct iio_scan *ctx);
 	static const char *get_description(const struct iio_scan *ctx, size_t idx);
 	static const char *get_uri(const struct iio_scan *ctx, size_t idx);

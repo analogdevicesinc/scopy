@@ -22,6 +22,7 @@
 #include "connectionprovider.h"
 #include <QLoggingCategory>
 #include <QApplication>
+#include <qglobal.h>
 
 Q_LOGGING_CATEGORY(CAT_CONNECTIONMGR, "ConnectionProvider")
 
@@ -67,6 +68,7 @@ Connection *ConnectionProvider::_open(struct iio_context *ctx)
 
 Connection *ConnectionProvider::_open(QString uri)
 {
+	qCritical(CAT_CONNECTIONMGR) << "ConnectionProvider::_open: " << uri;
 	std::lock_guard<std::mutex> lock(mutex_);
 	Connection *connectionObject = nullptr;
 	if(!map.contains(uri)) {

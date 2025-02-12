@@ -21,7 +21,7 @@
 #ifndef IIOCONTEXT_H
 #define IIOCONTEXT_H
 
-#include "iiocpp/iioresult.h"
+#include "iioresult.h"
 #include "scopy-iioutil_export.h"
 #include <iio/iio.h>
 #include <QObject>

@@ -27,7 +27,7 @@
 #include <QString>
 #include <QColor>
 
-#include <iio.h>
+#include <iio/iio.h>
 
 namespace scopy {
 namespace dac {

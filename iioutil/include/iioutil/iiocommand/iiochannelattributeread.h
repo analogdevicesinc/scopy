@@ -23,8 +23,11 @@
 #define IIOCHANNELATTRIBUTEREAD_H
 
 #include "../command.h"
+#include "iiocpp/iioattribute.h"
+#include "iiocpp/iiochannel.h"
+#include "iiocpp/iioresult.h"
 
-#include <iio.h>
+#include <iio/iio.h>
 
 namespace scopy {
 class SCOPY_IIOUTIL_EXPORT IioChannelAttributeRead : public Command
@@ -44,7 +47,7 @@ public:
 	virtual ~IioChannelAttributeRead()
 	{
 		if(m_cmdResult->results) {
-			delete[](char *) m_cmdResult->results;
+			delete[](char *)m_cmdResult->results;
 			m_cmdResult->results = nullptr;
 		}
 	}
@@ -55,8 +58,17 @@ public:
 		if(!m_cmdResult->results) {
 			m_cmdResult->results = new char[m_maxAttrSize];
 		}
-		ssize_t ret = iio_channel_attr_read(m_channel, m_attribute_name.c_str(), (char *)m_cmdResult->results,
-						    m_maxAttrSize);
+
+		IIOResult<const iio_attr *> res = IIOChannel::find_attr(m_channel, m_attribute_name.c_str());
+		if(!res.ok()) {
+			m_cmdResult->errorCode = res.error();
+			Q_EMIT finished(this);
+			return;
+		}
+
+		const iio_attr *attr = res.data();
+		ssize_t ret = IIOAttribute::read_raw(attr, (char *)m_cmdResult->results, m_maxAttrSize);
+
 		m_cmdResult->errorCode = ret;
 		Q_EMIT finished(this);
 	}

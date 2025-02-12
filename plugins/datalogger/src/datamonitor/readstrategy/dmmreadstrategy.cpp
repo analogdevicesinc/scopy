@@ -25,23 +25,40 @@
 #include <QwtDate>
 #include <timemanager.hpp>
 
+#include <iioutil/iiocpp/iiochannel.h>
+#include <iioutil/iiocpp/iioresult.h>
+#include <iioutil/iiocpp/iioattribute.h>
+
 using namespace scopy;
 using namespace datamonitor;
 
 DMMReadStrategy::DMMReadStrategy(iio_device *dev, iio_channel *chn)
 	: dev(dev)
 	, chn(chn)
-{}
+{
+}
 
 void DMMReadStrategy::setUmScale(double scale) { m_umScale = scale; }
 
 void DMMReadStrategy::read()
 {
 	double raw = 0;
-	int readRaw = iio_channel_attr_read_double(chn, "raw", &raw);
+	IIOResult<const iio_attr *> rawChannelRes = IIOChannel::find_attr(chn, "raw");
+	if(!rawChannelRes.ok()) {
+		qDebug() << "Error finding raw channel";
+		return;
+	}
+	const iio_attr *rawChannel = rawChannelRes.data();
+	ssize_t readRaw = IIOAttribute::read(rawChannel, &raw);
 
 	double scale = 0;
-	int readScale = iio_channel_attr_read_double(chn, "scale", &scale);
+	IIOResult<const iio_attr *> scaleChannelRes = IIOChannel::find_attr(chn, "scale");
+	if(!scaleChannelRes.ok()) {
+		qDebug() << "Error finding scale channel";
+		return;
+	}
+	const iio_attr *scaleChannel = scaleChannelRes.data();
+	ssize_t readScale = IIOAttribute::read(scaleChannel, &scale);
 
 	if(readRaw < 0) {
 		char err[1024];

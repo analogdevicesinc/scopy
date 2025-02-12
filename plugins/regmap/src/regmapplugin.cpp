@@ -28,7 +28,6 @@
 #include "registermapvalues.hpp"
 #include "regmapplugin.h"
 #include "xmlfilemanager.hpp"
-#include <iio.h>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QDebug>

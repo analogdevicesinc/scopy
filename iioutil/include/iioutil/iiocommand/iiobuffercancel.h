@@ -23,8 +23,9 @@
 #define IIOBUFFERCANCEL_H
 
 #include "../command.h"
+#include "iiocpp/iiobuffer.h"
 
-#include <iio.h>
+#include <iio/iio.h>
 
 namespace scopy {
 class SCOPY_IIOUTIL_EXPORT IioBufferCancel : public Command
@@ -41,7 +42,7 @@ public:
 	virtual void execute() override
 	{
 		Q_EMIT started(this);
-		iio_buffer_cancel(m_buffer);
+		IIOBuffer::cancel(m_buffer);
 		m_cmdResult->errorCode = 0;
 		Q_EMIT finished(this);
 	}

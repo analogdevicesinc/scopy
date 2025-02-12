@@ -24,7 +24,8 @@
 
 #include "../command.h"
 
-#include <iio.h>
+#include <iio/iio.h>
+#include "iiocpp/iiochannel.h"
 
 namespace scopy {
 class SCOPY_IIOUTIL_EXPORT IioChannelEnable : public Command
@@ -42,10 +43,11 @@ public:
 	virtual void execute() override
 	{
 		Q_EMIT started(this);
+		// FIXME: Fix this later
 		if(m_enable) {
-			iio_channel_enable(m_channel);
+			IIOChannel::enable(m_channel, {});
 		} else {
-			iio_channel_disable(m_channel);
+			IIOChannel::disable(m_channel, {});
 		}
 		m_cmdResult->errorCode = 0;
 		Q_EMIT finished(this);

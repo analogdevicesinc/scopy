@@ -20,7 +20,10 @@
 
 #include "regmapparser.h"
 
-#include <string>
+#include <iioutil/iiocpp/iioresult.h>
+#include <iioutil/iiocpp/iiocontext.h>
+#include <iioutil/iiocpp/iiodevice.h>
+#include <iioutil/iiocpp/iiochannel.h>
 
 using namespace scopy;
 using namespace scopy::debugger;
@@ -28,13 +31,19 @@ using namespace scopy::debugger;
 RegmapParser::RegmapParser(QObject *parent, struct iio_context *context)
 	: QObject(parent)
 	, ctx(context)
-{}
+{
+}
 
 void RegmapParser::setIioContext(struct iio_context *ctx) { this->ctx = ctx; }
 
 void RegmapParser::deviceXmlFileSelection(const QString *device, QString *filename, const QString source)
 {
-	struct iio_device *dev = iio_context_find_device(ctx, device->toLatin1().data());
+	IIOResult<iio_device *> res = IIOContext::find_device(ctx, device->toLatin1().data());
+	if(!res.ok()) {
+		qDebug() << "Error: " << res.error();
+		return;
+	}
+	iio_device *dev = res.data();
 
 	filename->clear();
 
@@ -83,10 +92,15 @@ int RegmapParser::pcoreGetVersion(const QString *device, int *pcoreMajor)
 	struct iio_device *dev;
 	int ret;
 
-	dev = iio_context_find_device(ctx, device->toLatin1().data());
+	IIOResult<iio_device *> res = IIOContext::find_device(ctx, device->toLatin1().data());
+	if(!res.ok()) {
+		qDebug() << "Error: " << res.error();
+		return -1;
+	}
+	dev = res.data();
 
 	uint32_t value, address = 0x80000000;
-	ret = iio_device_reg_read(dev, address, &value);
+	ret = IIODevice::reg_read(dev, address, &value);
 
 	*pcoreMajor = (int)PCORE_VERSION_MAJOR(value);
 
@@ -179,19 +193,19 @@ bool RegmapParser::isOutputDevice(const iio_device *dev) { return deviceTypeGet(
 
 bool RegmapParser::deviceTypeGet(const iio_device *dev, int type)
 {
-	struct iio_channel *ch;
+	const iio_channel *ch;
 	int nbChannels, i;
 
 	if(!dev) {
 		return false;
 	}
 
-	nbChannels = iio_device_get_channels_count(dev);
+	nbChannels = IIODevice::get_channels_count(dev);
 
 	for(i = 0; i < nbChannels; i++) {
-		ch = iio_device_get_channel(dev, i);
+		ch = IIODevice::get_channel(dev, i).expect("Channel index should be valid");
 
-		if(iio_channel_is_scan_element(ch) && (type ? !iio_channel_is_output(ch) : iio_channel_is_output(ch))) {
+		if(IIOChannel::is_scan_element(ch) && (type ? !IIOChannel::is_output(ch) : IIOChannel::is_output(ch))) {
 			return true;
 		}
 	}
@@ -201,11 +215,16 @@ bool RegmapParser::deviceTypeGet(const iio_device *dev, int type)
 
 uint32_t RegmapParser::readRegister(const QString *device, const uint32_t u32Address)
 {
-	struct iio_device *dev = iio_context_find_device(ctx, device->toLatin1().data());
+	IIOResult<iio_device *> res = IIOContext::find_device(ctx, device->toLatin1().data());
+	if(!res.ok()) {
+		qDebug() << "Error: " << res.error();
+		return -1;
+	}
+	iio_device *dev = res.data();
 	int ret;
 	uint32_t i;
 
-	ret = iio_device_reg_read(dev, u32Address, &i);
+	ret = IIODevice::reg_read(dev, u32Address, &i);
 
 	if(ret == 0) {
 		return i;
@@ -218,7 +237,12 @@ uint32_t RegmapParser::readRegister(const QString *device, const uint32_t u32Add
 
 void RegmapParser::writeRegister(const QString *device, const uint32_t u32Address, const uint32_t value)
 {
-	struct iio_device *dev = iio_context_find_device(ctx, device->toLatin1().data());
+	IIOResult<iio_device *> res = IIOContext::find_device(ctx, device->toLatin1().data());
+	if(!res.ok()) {
+		qDebug() << "Error: " << res.error();
+		return;
+	}
+	iio_device *dev = res.data();
 
-	iio_device_reg_write(dev, u32Address, value);
+	IIODevice::reg_write(dev, u32Address, value);
 }

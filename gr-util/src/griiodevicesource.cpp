@@ -25,16 +25,23 @@
 #include "griiofloatchannelsrc.h"
 #include "grlog.h"
 #include "grtopblock.h"
+#include "iiocpp/iiocontext.h"
+
+#include <iioutil/iiocpp/iioattribute.h>
+#include <iioutil/iiocpp/iiodevice.h>
+#include <iioutil/iiocpp/iioresult.h>
+#include <iioutil/iiocpp/iiochannel.h>
 
 using namespace scopy::grutil;
 QString GRIIODeviceSource::findAttribute(QStringList possibleNames, iio_device *dev)
 {
-
+	IIOResult<const iio_attr *> res;
 	const char *attr = nullptr;
 	for(const QString &name : possibleNames) {
-		attr = iio_device_find_attr(dev, name.toStdString().c_str());
-		if(attr)
-			break;
+		res = IIODevice::find_attr(dev, name.toStdString().c_str());
+		if(res.ok()) {
+			attr = IIOAttribute::get_name(res.data());
+		}
 	}
 	QString attributeName = QString(attr);
 	return attributeName;
@@ -46,11 +53,14 @@ iio_context *GRIIODeviceSource::ctx() const { return m_ctx; }
 
 QString GRIIOChannel::findAttribute(QStringList possibleNames, iio_channel *ch)
 {
+	IIOResult<const iio_attr *> attrRes;
 	const char *attr = nullptr;
 	for(const QString &name : possibleNames) {
-		attr = iio_channel_find_attr(ch, name.toStdString().c_str());
-		if(attr)
+		attrRes = IIOChannel::find_attr(ch, name.toStdString().c_str());
+		if(attrRes.ok()) {
+			attr = IIOAttribute::get_name(attrRes.data());
 			break;
+		}
 	}
 	QString attributeName = QString(attr);
 	return attributeName;
@@ -65,7 +75,8 @@ GRIIODeviceSource::GRIIODeviceSource(iio_context *ctx, QString deviceName, QStri
 	, m_buffersize(buffersize)
 {
 
-	m_iioDev = iio_context_find_device(m_ctx, m_deviceName.toStdString().c_str());
+	m_iioDev = IIOContext::find_device(m_ctx, m_deviceName.toStdString().c_str())
+			   .expect(QString("Expected device %1").arg(m_deviceName).toStdString().c_str());
 	m_sampleRateAttribute = findAttribute(
 		{
 			"sample_rate",
@@ -79,8 +90,9 @@ GRIIODeviceSource::GRIIODeviceSource(iio_context *ctx, QString deviceName, QStri
 void GRIIODeviceSource::addChannelAtIndex(iio_device *iio_dev, QString channelName)
 {
 	std::string channel_name = channelName.toStdString();
-	iio_channel *iio_ch = iio_device_find_channel(iio_dev, channel_name.c_str(), false);
-	int idx = iio_channel_get_index(iio_ch);
+	iio_channel *iio_ch = IIODevice::find_channel(iio_dev, channel_name.c_str(), false)
+				      .expect(QString("Expected channel %1").arg(channelName).toStdString().c_str());
+	int idx = IIOChannel::get_index(iio_ch);
 
 	while(idx < m_channelNames.size() && m_channelNames[idx] != "" &&
 	      QString::fromStdString(m_channelNames[idx]) != channelName) {
@@ -92,7 +104,7 @@ void GRIIODeviceSource::addChannelAtIndex(iio_device *iio_dev, QString channelNa
 void GRIIODeviceSource::computeChannelNames()
 {
 
-	int max_channels = iio_device_get_channels_count(m_iioDev);
+	int max_channels = IIODevice::get_channels_count(m_iioDev);
 
 	for(int i = 0; i < max_channels; i++) {
 		m_channelNames.push_back(std::string());
@@ -146,7 +158,12 @@ double GRIIODeviceSource::readSampleRate()
 	if(!sampleRateAvailable())
 		return -1;
 
-	iio_device_attr_read(m_iioDev, m_sampleRateAttribute.toStdString().c_str(), buffer, 20);
+	IIOResult<const iio_attr *> res = IIODevice::find_attr(m_iioDev, m_sampleRateAttribute.toStdString().c_str());
+	if(!res.ok()) {
+		return -1;
+	}
+	const iio_attr *attr = res.data();
+	ssize_t ret = IIOAttribute::read_raw(attr, buffer, 20);
 	QString str(buffer);
 	sr = str.toDouble(&ok);
 	if(ok) {

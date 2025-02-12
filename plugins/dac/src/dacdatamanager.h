@@ -33,7 +33,7 @@
 #include <gui/mapstackedwidget.h>
 #include <gui/widgets/menucontrolbutton.h>
 
-#include <iio.h>
+#include <iio/iio.h>
 
 namespace scopy {
 namespace dac {

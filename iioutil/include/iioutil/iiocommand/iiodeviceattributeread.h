@@ -24,7 +24,9 @@
 
 #include "../command.h"
 
-#include <iio.h>
+#include <iio/iio.h>
+#include "iiocpp/iioattribute.h"
+#include "iiocpp/iiodevice.h"
 
 namespace scopy {
 class SCOPY_IIOUTIL_EXPORT IioDeviceAttributeRead : public Command
@@ -44,7 +46,7 @@ public:
 	virtual ~IioDeviceAttributeRead()
 	{
 		if(m_cmdResult->results) {
-			delete[](char *) m_cmdResult->results;
+			delete[](char *)m_cmdResult->results;
 			m_cmdResult->results = nullptr;
 		}
 	}
@@ -55,8 +57,17 @@ public:
 		if(!m_cmdResult->results) {
 			m_cmdResult->results = new char[m_maxAttrSize];
 		}
-		ssize_t ret = iio_device_attr_read(m_device, m_attribute_name.c_str(), (char *)m_cmdResult->results,
-						   m_maxAttrSize);
+
+		IIOResult<const iio_attr *> res = IIODevice::find_attr(m_device, m_attribute_name.c_str());
+		if(!res.ok()) {
+			m_cmdResult->errorCode = res.error();
+			Q_EMIT finished(this);
+			return;
+		}
+
+		const iio_attr *attr = res.data();
+		ssize_t ret = IIOAttribute::read_raw(attr, (char *)m_cmdResult->results, m_maxAttrSize);
+
 		m_cmdResult->errorCode = ret;
 		Q_EMIT finished(this);
 	}

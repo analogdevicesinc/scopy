@@ -28,6 +28,11 @@
 #include <QHBoxLayout>
 #include <stylehelper.h>
 
+#include <iioutil/iiocpp/iiocontext.h>
+#include <iioutil/iiocpp/iioresult.h>
+#include <iioutil/iiocpp/iiodevice.h>
+#include <iioutil/iiocpp/iiochannel.h>
+
 #include <pluginbase/preferences.h>
 
 using namespace scopy;
@@ -197,25 +202,25 @@ void DacInstrument::abortTutorial()
 void DacInstrument::setupDacDataManagers()
 {
 	QStringList deviceList;
-	int devCount = iio_context_get_devices_count(m_conn->context());
+	int devCount = IIOContext::get_devices_count(m_conn->context());
 	qDebug(CAT_DAC_INSTRUMENT) << " Found " << devCount << "devices";
 	for(int i = 0; i < devCount; i++) {
-		iio_device *dev = iio_context_get_device(m_conn->context(), i);
-		QString dev_name = QString::fromLocal8Bit(iio_device_get_name(dev));
+		iio_device *dev = IIOContext::get_device(m_conn->context(), i).data();
+		QString dev_name = QString::fromLocal8Bit(IIODevice::get_name(dev));
 
 		qDebug(CAT_DAC_INSTRUMENT) << "Looking for scan elements in " << dev_name;
 		QStringList channelList;
-		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
+		for(int j = 0; j < IIODevice::get_channels_count(dev); j++) {
 
-			struct iio_channel *chn = iio_device_get_channel(dev, j);
-			QString chn_name = QString::fromLocal8Bit(iio_channel_get_id(chn));
+			const iio_channel *chn = IIODevice::get_channel(dev, j).data();
+			QString chn_name = QString::fromLocal8Bit(IIOChannel::get_id(chn));
 			qDebug(CAT_DAC_INSTRUMENT) << "Verify if " << chn_name << "is scan element";
 			if(chn_name == "timestamp" /*|| chn_name == "accel_z" || chn_name =="accel_y"*/)
 				continue;
-			if(!iio_channel_is_output(chn)) {
+			if(!IIOChannel::is_output(chn)) {
 				continue;
 			}
-			if(iio_channel_is_scan_element(chn) || DacUtils::checkDdsChannel(chn)) {
+			if(IIOChannel::is_scan_element(chn) || DacUtils::checkDdsChannel(chn)) {
 				channelList.append(chn_name);
 				deviceList.append(dev_name);
 

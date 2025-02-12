@@ -21,8 +21,8 @@
 #ifndef IIOCHANNEL_H
 #define IIOCHANNEL_H
 
-#include "iiocpp/iioresult.h"
 #include "scopy-iioutil_export.h"
+#include "iiocpp/iioresult.h"
 #include <QObject>
 #include <iio/iio.h>
 
@@ -58,6 +58,9 @@ public:
 	static void *get_data(const iio_channel *chn);
 	static enum iio_chan_type get_type(const iio_channel *chn);
 	static enum iio_modifier get_modifier(const iio_channel *chn);
+
+	/* HWMON functions */
+	static inline hwmon_chan_type hwmon_get_type(const iio_channel *chn);
 
 	/* Low level and debug functions */
 	static iio_channels_mask *create_channels_mask(unsigned int nb_channels);

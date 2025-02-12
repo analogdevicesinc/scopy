@@ -21,7 +21,7 @@
 #ifndef REGMAPPARSER_H
 #define REGMAPPARSER_H
 
-#include <iio.h>
+#include <iio/iio.h>
 
 #include <QDebug>
 #include <QDomDocument>

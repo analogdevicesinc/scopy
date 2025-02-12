@@ -22,6 +22,7 @@
 #include "datamonitor/dmmdatamonitormodel.hpp"
 
 #include <pluginbase/preferences.h>
+#include <iioutil/iiocpp/iiodevice.h>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -56,7 +57,7 @@ iio_channel *DmmDataMonitorModel::iioChannel() const { return m_iioChannel; }
 
 void DmmDataMonitorModel::setIioChannel(iio_channel *newIioChannel) { m_iioChannel = newIioChannel; }
 
-QString DmmDataMonitorModel::getDeviceName() { return QString::fromStdString(iio_device_get_name(m_iioDevice)); }
+QString DmmDataMonitorModel::getDeviceName() { return QString::fromStdString(IIODevice::get_name(m_iioDevice)); }
 
 iio_device *DmmDataMonitorModel::iioDevice() const { return m_iioDevice; }
 

@@ -24,7 +24,7 @@
 #include <QWidget>
 #include <QList>
 #include <QSet>
-#include <iio.h>
+#include <iio/iio.h>
 #include "datastrategy/datastrategyinterface.h"
 #include "scopy-iio-widgets_export.h"
 

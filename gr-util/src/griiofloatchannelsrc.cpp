@@ -27,12 +27,18 @@
 #include "grlog.h"
 #include "grtopblock.h"
 
+#include <iioutil/iiocpp/iioattribute.h>
+#include <iioutil/iiocpp/iiodevice.h>
+#include <iioutil/iiocpp/iioresult.h>
+#include <iioutil/iiocpp/iiochannel.h>
+
 using namespace scopy::grutil;
 GRIIOFloatChannelSrc::GRIIOFloatChannelSrc(GRIIODeviceSource *dev, QString channelName, QObject *parent)
 	: GRIIOChannel(channelName, dev, parent)
 {
-	m_iioCh = iio_device_find_channel(dev->iioDev(), channelName.toStdString().c_str(), false);
-	fmt = iio_channel_get_data_format(m_iioCh);
+	m_iioCh = IIODevice::find_channel(dev->iioDev(), channelName.toStdString().c_str(), false)
+			  .expect(QString("Expected channel %1").arg(channelName).toLatin1().data());
+	fmt = IIOChannel::get_data_format(m_iioCh);
 
 	m_sampleRateAttribute = findAttribute(
 		{
@@ -49,7 +55,7 @@ GRIIOFloatChannelSrc::GRIIOFloatChannelSrc(GRIIODeviceSource *dev, QString chann
 		},
 		m_iioCh);
 
-	iio_chan_type type = iio_channel_get_type(m_iioCh);
+	iio_chan_type type = IIOChannel::get_type(m_iioCh);
 	m_unit = IIOUnitsManager::iioChannelTypes().value(type, {"Adimensional", ".", 1});
 }
 
@@ -101,7 +107,13 @@ double GRIIOFloatChannelSrc::readSampleRate()
 	if(!samplerateAttributeAvailable())
 		return -1;
 
-	iio_channel_attr_read(m_iioCh, m_sampleRateAttribute.toStdString().c_str(), buffer, 20);
+	IIOResult<const iio_attr *> res = IIOChannel::find_attr(m_iioCh, m_sampleRateAttribute.toStdString().c_str());
+	if(!res.ok()) {
+		return -1;
+	}
+	const iio_attr *attr = res.data();
+	ssize_t ret = IIOAttribute::read_raw(attr, buffer, 20);
+
 	QString str(buffer);
 	sr = str.toDouble(&ok);
 	if(ok) {
@@ -126,7 +138,13 @@ double GRIIOFloatChannelSrc::readScale()
 	if(!scaleAttributeAvailable())
 		return -1;
 
-	iio_channel_attr_read(m_iioCh, m_scaleAttribute.toStdString().c_str(), buffer, 20);
+	IIOResult<const iio_attr *> res = IIOChannel::find_attr(m_iioCh, m_scaleAttribute.toStdString().c_str());
+	if(!res.ok()) {
+		return -1;
+	}
+	const iio_attr *attr = res.data();
+	ssize_t ret = IIOAttribute::read_raw(attr, buffer, 20);
+
 	QString str(buffer);
 	sc = str.toDouble(&ok);
 	if(ok) {

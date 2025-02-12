@@ -25,7 +25,7 @@
 #include "registermaptemplate.hpp"
 #include "scopy-regmap_export.h"
 
-#include <iio.h>
+#include <iio/iio.h>
 
 #include <QObject>
 

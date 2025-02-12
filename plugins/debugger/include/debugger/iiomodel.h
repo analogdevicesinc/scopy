@@ -26,7 +26,7 @@
 #include <QStandardItemModel>
 #include <QSet>
 #include <iio-widgets/iiowidgetbuilder.h>
-#include <iio.h>
+#include <iio/iio.h>
 #include "iiostandarditem.h"
 
 namespace scopy::debugger {

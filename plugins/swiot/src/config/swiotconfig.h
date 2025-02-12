@@ -29,7 +29,7 @@
 #include <QScrollArea>
 #include <gui/tooltemplate.h>
 
-#include <iio.h>
+#include <iio/iio.h>
 #include <iioutil/commandqueue.h>
 
 #define NUMBER_OF_CHANNELS 4

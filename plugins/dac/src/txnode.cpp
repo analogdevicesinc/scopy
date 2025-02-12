@@ -22,6 +22,10 @@
 #include "txnode.h"
 #include "dac_logging_categories.h"
 
+#include <iio/iio.h>
+#include <iioutil/iiocpp/iiochannel.h>
+#include <iioutil/iiocpp/iioattribute.h>
+
 using namespace scopy;
 using namespace scopy::dac;
 TxNode::TxNode(QString uuid, iio_channel *chn, QObject *parent)
@@ -32,7 +36,7 @@ TxNode::TxNode(QString uuid, iio_channel *chn, QObject *parent)
 	, m_fmtShift(0)
 {
 	if(m_channel) {
-		auto fmt = iio_channel_get_data_format(m_channel);
+		auto fmt = IIOChannel::get_data_format(m_channel);
 		m_fmtShift = fmt->shift;
 		m_fmtBits = fmt->bits;
 	}
@@ -71,8 +75,16 @@ bool TxNode::enableDds(bool enable)
 {
 	qDebug(CAT_DAC_DATA) << QString("Try enable:%1 DDS TXNode %2").arg(enable).arg(m_txUuid);
 	if(m_channel) {
-		if(iio_channel_get_type(m_channel) == IIO_ALTVOLTAGE) {
-			int ret = iio_channel_attr_write_bool(m_channel, "raw", enable);
+		if(IIOChannel::get_type(m_channel) == IIO_ALTVOLTAGE) {
+			IIOResult<const iio_attr *> attrRes = IIOChannel::find_attr(m_channel, "raw");
+			if(!attrRes.ok()) {
+				qDebug(CAT_DAC_DATA)
+					<< QString("Can't get DDS channel attribute, error: %1").arg(attrRes.error());
+				return false;
+			}
+			const iio_attr *attr = attrRes.data();
+
+			int ret = IIOAttribute::write_raw(attr, enable ? "1" : "0", 1);
 			if(ret < 0) {
 				qDebug(CAT_DAC_DATA) << QString("Can't enable DDS channel, error: %1").arg(ret);
 				return false;

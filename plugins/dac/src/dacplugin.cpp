@@ -24,6 +24,10 @@
 #include "dacinstrument.h"
 #include "dacutils.h"
 
+#include <iioutil/iiocpp/iiodevice.h>
+#include <iioutil/iiocpp/iiocontext.h>
+#include <iioutil/iiocpp/iiochannel.h>
+
 #include <QLabel>
 #include <menusectionwidget.h>
 #include <style.h>
@@ -43,14 +47,14 @@ bool DACPlugin::compatible(QString m_param, QString category)
 	if(conn == nullptr)
 		return ret;
 
-	for(int i = 0; i < iio_context_get_devices_count(conn->context()); i++) {
-		iio_device *dev = iio_context_get_device(conn->context(), i);
-		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
-			struct iio_channel *chn = iio_device_get_channel(dev, j);
-			if(!iio_channel_is_output(chn)) {
+	for(int i = 0; i < IIOContext::get_devices_count(conn->context()); i++) {
+		iio_device *dev = IIOContext::get_device(conn->context(), i).data();
+		for(int j = 0; j < IIODevice::get_channels_count(dev); j++) {
+			struct iio_channel *chn = IIODevice::get_channel(dev, j).data();
+			if(!IIOChannel::is_output(chn)) {
 				continue;
 			}
-			if(iio_channel_is_scan_element(chn) || DacUtils::checkDdsChannel(chn)) {
+			if(IIOChannel::is_scan_element(chn) || DacUtils::checkDdsChannel(chn)) {
 				ret = true;
 				goto finish;
 			}

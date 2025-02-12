@@ -662,7 +662,7 @@ void TST_GRBlocks::test5()
 	top.registerSignalPath(ch2);
 	ch3 = new GRSignalPath("complex", &top);
 
-	iio_context *ctx = scopy::IIOContext::create_context(nullptr, "ip:192.168.2.1");
+	iio_context *ctx = scopy::IIOContext::create_context(nullptr, "ip:192.168.2.1").expect("Expected valid ip");
 	if(!ctx) {
 		QSKIP("No context. Skipping");
 	}

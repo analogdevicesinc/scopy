@@ -20,6 +20,9 @@
  */
 
 #include "iiomodel.h"
+#include <iioutil/iiocpp/iiocontext.h>
+#include <iioutil/iiocpp/iiochannel.h>
+#include <iioutil/iiocpp/iiodevice.h>
 #include <QLoggingCategory>
 
 #define BUFFER_SIZE 256
@@ -47,12 +50,12 @@ void IIOModel::iioTreeSetup()
 	setupCtx();
 
 	// add all devices from context, dfs
-	uint ctx_devices_count = iio_context_get_devices_count(m_ctx);
+	uint ctx_devices_count = IIOContext::get_devices_count(m_ctx);
 	for(m_currentDeviceIndex = 0; m_currentDeviceIndex < ctx_devices_count; ++m_currentDeviceIndex) {
 		setupCurrentDevice();
 
 		// add all channels to current device
-		uint device_channels_count = iio_device_get_channels_count(m_currentDevice);
+		uint device_channels_count = IIODevice::get_channels_count(m_currentDevice);
 		for(m_currentChannelIndex = 0; m_currentChannelIndex < device_channels_count; ++m_currentChannelIndex) {
 			setupCurrentChannel();
 			generateChannelAttributes();

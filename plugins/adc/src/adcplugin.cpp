@@ -41,6 +41,7 @@
 #include <iioutil/iiocpp/iiodevice.h>
 #include <iioutil/iiocpp/iiochannel.h>
 #include <iioutil/iiocpp/iioattribute.h>
+#include <iioutil/iiocpp/iioresult.h>
 
 #include "adctimeinstrumentcontroller.h"
 #include "adcfftinstrumentcontroller.h"
@@ -61,9 +62,9 @@ bool ADCPlugin::compatible(QString m_param, QString category)
 		return ret;
 
 	for(int i = 0; i < IIOContext::get_devices_count(conn->context()); i++) {
-		iio_device *dev = IIOContext::get_device(conn->context(), i).data();
+		iio_device *dev = IIOContext::get_device(conn->context(), i).expect("Expected device");
 		for(int j = 0; j < IIODevice::get_channels_count(dev); j++) {
-			iio_channel *chn = IIODevice::get_channel(dev, j).data();
+			const iio_channel *chn = IIODevice::get_channel(dev, j).expect("Expected channel");
 			if(!IIOChannel::is_output(chn) && IIOChannel::is_scan_element(chn)) {
 				ret = true;
 				goto finish;
@@ -182,9 +183,10 @@ void ADCPlugin::loadToolList()
 
 bool iio_is_buffer_capable(struct iio_device *dev)
 {
-	for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, j);
-		if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
+	for(int j = 0; j < IIODevice::get_channels_count(dev); j++) {
+		const iio_channel *chn =
+			IIODevice::get_channel(dev, j).expect(QString("Expected channel with id %1").arg(j));
+		if(!IIOChannel::is_output(chn) && IIOChannel::is_scan_element(chn)) {
 			return true;
 		}
 	}
@@ -193,12 +195,18 @@ bool iio_is_buffer_capable(struct iio_device *dev)
 
 void ADCPlugin::createGRIIOTreeNode(GRTopBlockNode *ctxNode, iio_context *ctx)
 {
-	int devCount = iio_context_get_devices_count(ctx);
+	int devCount = IIOContext::get_devices_count(ctx);
 	qDebug(CAT_ADCPLUGIN) << " Found " << devCount << "devices";
 	ctxNode->setCtx(ctx);
 	for(int i = 0; i < devCount; i++) {
-		iio_device *dev = iio_context_get_device(ctx, i);
-		QString dev_name = QString::fromLocal8Bit(iio_device_get_name(dev));
+		IIOResult<iio_device *> res = IIOContext::get_device(ctx, i);
+		if(!res.ok()) {
+			qDebug(CAT_ADCPLUGIN) << "Failed to get device" << i << res.error();
+			continue;
+		}
+		iio_device *dev = res.data();
+
+		QString dev_name = QString::fromLocal8Bit(IIODevice::get_name(dev));
 
 		if(dev_name.isEmpty())
 			continue;
@@ -218,13 +226,18 @@ void ADCPlugin::createGRIIOTreeNode(GRTopBlockNode *ctxNode, iio_context *ctx)
 			continue;
 		}
 
-		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
-			struct iio_channel *chn = iio_device_get_channel(dev, j);
-			QString chn_name = QString::fromLocal8Bit(iio_channel_get_id(chn));
+		for(int j = 0; j < IIODevice::get_channels_count(dev); j++) {
+			IIOResult<const iio_channel *> res = IIODevice::get_channel(dev, j);
+			if(!res.ok()) {
+				qDebug(CAT_ADCPLUGIN) << "Failed to get channel" << j << res.error();
+				continue;
+			}
+			const iio_channel *chn = res.data();
+			QString chn_name = QString::fromLocal8Bit(IIOChannel::get_id(chn));
 			qDebug(CAT_ADCPLUGIN) << "Verify if " << chn_name << "is scan element";
 			if(chn_name == "timestamp" /*|| chn_name == "accel_z" || chn_name =="accel_y"*/)
 				continue;
-			if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
+			if(!IIOChannel::is_output(chn) && IIOChannel::is_scan_element(chn)) {
 
 				GRIIOFloatChannelSrc *ch = new GRIIOFloatChannelSrc(gr_dev, chn_name, d);
 				GRIIOFloatChannelNode *c = new GRIIOFloatChannelNode(ctxNode, ch, d);

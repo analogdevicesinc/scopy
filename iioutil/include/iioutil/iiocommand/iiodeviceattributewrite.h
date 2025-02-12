@@ -24,7 +24,9 @@
 
 #include "../command.h"
 
-#include <iio.h>
+#include <iio/iio.h>
+#include "iiocpp/iioattribute.h"
+#include "iiocpp/iiodevice.h"
 
 namespace scopy {
 class SCOPY_IIOUTIL_EXPORT IioDeviceAttributeWrite : public Command
@@ -45,7 +47,17 @@ public:
 	virtual void execute() override
 	{
 		Q_EMIT started(this);
-		ssize_t ret = iio_device_attr_write(m_device, m_attribute_name.c_str(), m_value.c_str());
+
+		IIOResult<const iio_attr *> res = IIODevice::find_attr(m_device, m_attribute_name.c_str());
+		if(!res.ok()) {
+			m_cmdResult->errorCode = res.error();
+			Q_EMIT finished(this);
+			return;
+		}
+
+		const iio_attr *attr = res.data();
+		ssize_t ret = IIOAttribute::write_raw(attr, m_value.c_str(), m_value.size());
+
 		m_cmdResult->errorCode = ret;
 		Q_EMIT finished(this);
 	}

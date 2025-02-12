@@ -54,6 +54,7 @@ int Connection::refCount() const { return m_refCount; }
 
 void Connection::open()
 {
+	qCritical() << "Connection::open()";
 	if(!this->m_context) {
 		IIOResult<iio_context *> res = IIOContext::create_context(nullptr, this->m_uri.toStdString().c_str());
 		if(res.ok()) {

@@ -41,7 +41,7 @@ IIOAttribute *IIOAttribute::GetInstance()
 	return pinstance_;
 }
 
-ssize_t IIOAttribute::read(const iio_attr *attr, char *dst, size_t len)
+ssize_t IIOAttribute::read_any(const iio_attr *attr, char *dst, size_t len)
 {
 	const char *value = iio_attr_get_static_value(attr);
 	ssize_t ret = 0;
@@ -59,10 +59,26 @@ ssize_t IIOAttribute::read_raw(const iio_attr *attr, char *dst, size_t len)
 	return iio_attr_read_raw(attr, dst, len);
 }
 
+ssize_t read(const iio_attr *attr, bool *ptr) { return iio_attr_read_bool(attr, ptr); }
+
+ssize_t read(const iio_attr *attr, long long *ptr) { return iio_attr_read_longlong(attr, ptr); }
+
+ssize_t read(const iio_attr *attr, double *ptr) { return iio_attr_read_double(attr, ptr); }
+
 ssize_t IIOAttribute::write_raw(const iio_attr *attr, const void *src, size_t len)
 {
 	return iio_attr_write_raw(attr, src, len);
 }
+
+ssize_t IIOAttribute::write(const iio_attr *attr, const char *val) { return iio_attr_write_string(attr, val); }
+
+ssize_t IIOAttribute::write(const iio_attr *attr, char *val) { return iio_attr_write_string(attr, val); }
+
+ssize_t IIOAttribute::write(const iio_attr *attr, bool val) { return iio_attr_write_bool(attr, val); }
+
+ssize_t IIOAttribute::write(const iio_attr *attr, long long val) { return iio_attr_write_longlong(attr, val); }
+
+ssize_t IIOAttribute::write(const iio_attr *attr, double val) { return iio_attr_write_double(attr, val); }
 
 const char *IIOAttribute::get_name(const iio_attr *attr) { return iio_attr_get_name(attr); }
 

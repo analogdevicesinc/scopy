@@ -22,7 +22,7 @@
 #ifndef DMMREADSTRATEGY_HPP
 #define DMMREADSTRATEGY_HPP
 
-#include "iio.h"
+#include <iio/iio.h>
 #include "ireadstrategy.hpp"
 #include "scopy-datalogger_export.h"
 

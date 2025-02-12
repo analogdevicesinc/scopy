@@ -100,6 +100,8 @@ enum iio_chan_type IIOChannel::get_type(const iio_channel *chn) { return iio_cha
 
 enum iio_modifier IIOChannel::get_modifier(const iio_channel *chn) { return iio_channel_get_modifier(chn); }
 
+inline hwmon_chan_type IIOChannel::hwmon_get_type(const iio_channel *chn) { return hwmon_channel_get_type(chn); }
+
 iio_channels_mask *IIOChannel::create_channels_mask(unsigned int nb_channels)
 {
 	return iio_create_channels_mask(nb_channels);

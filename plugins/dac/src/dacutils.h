@@ -24,7 +24,7 @@
 
 #include <QObject>
 #include "scopy-dac_export.h"
-#include <iio.h>
+#include <iio/iio.h>
 
 namespace scopy {
 namespace dac {
@@ -33,7 +33,7 @@ class SCOPY_DAC_EXPORT DacUtils : public QObject
 	Q_OBJECT
 public:
 	static double dbFullScaleConvert(double scale, bool inverse);
-	static bool checkDdsChannel(struct iio_channel *chn);
+	static bool checkDdsChannel(const iio_channel *chn);
 };
 } // namespace dac
 } // namespace scopy

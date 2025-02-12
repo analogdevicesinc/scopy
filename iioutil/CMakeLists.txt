@@ -45,16 +45,20 @@ file(
 	SRC_LIST
 	src/*.cpp
 	src/*.cc
-	src/*/*.cpp
-	src/*/*.cc
+	src/iiocommand/*.cpp
+	src/iiocommand/*.cc
+	src/iiocpp/*.cpp
+	src/iiocpp/*.cc
 )
 file(
 	GLOB
 	HEADER_LIST
 	include/${SCOPY_MODULE}/*.h
 	include/${SCOPY_MODULE}/*.hpp
-	include/${SCOPY_MODULE}/*/*.h
-	include/${SCOPY_MODULE}/*/*.hpp
+	include/${SCOPY_MODULE}/iiocommand/*.h
+	include/${SCOPY_MODULE}/iiocommand/*.hpp
+	include/${SCOPY_MODULE}/iiocpp/*.h
+	include/${SCOPY_MODULE}/iiocpp/*.hpp
 )
 file(GLOB UI_LIST ui/*.ui)
 
@@ -88,11 +92,19 @@ generate_export_header(
 )
 
 target_include_directories(
-	${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include/ ${IIO_INCLUDE_DIRS} ${LIBSERIALPORT_INCLUDE_DIR}
+	${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include/
+				  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
+				  ${IIO_INCLUDE_DIRS}
+				  ${LIBSERIALPORT_INCLUDE_DIR}
 )
 target_include_directories(
-	${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${IIO_INCLUDE_DIRS}
+	${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
+				${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/iiocommand
+				${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/iiocpp
+				${CMAKE_CURRENT_SOURCE_DIR}/src
+				${CMAKE_CURRENT_SOURCE_DIR}/src/iiocpp
 				${LIBSERIALPORT_INCLUDE_DIR}
+				${IIO_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets ${IIO_LIBRARIES} ${LIBSERIALPORT_LIBRARIES})

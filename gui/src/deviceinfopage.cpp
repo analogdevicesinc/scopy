@@ -79,7 +79,7 @@ void DeviceInfoPage::setupInfoPage()
 	const char *name;
 	const char *value;
 	for(int i = 0; i < IIOContext::get_attrs_count(m_conn->context()); ++i) {
-		IIOResult<const iio_attr *> res = IIOContext::get_attr(m_conn->context(), i, &name, &value);
+		IIOResult<const iio_attr *> res = IIOContext::get_attr(m_conn->context(), i);
 		if(!res.ok()) {
 			qDebug() << "Error getting attribute at index" << i << "error code:" << res.error();
 			continue;

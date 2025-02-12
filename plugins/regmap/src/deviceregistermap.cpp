@@ -26,7 +26,7 @@
 
 #include <QLineEdit>
 #include <QPushButton>
-#include <iio.h>
+#include <iio/iio.h>
 #include <qboxlayout.h>
 #include <qcheckbox.h>
 #include <stylehelper.h>
@@ -43,7 +43,7 @@
 #include "search.hpp"
 #include "utils.hpp"
 
-#include <iio.h>
+#include <iio/iio.h>
 
 #include <QLineEdit>
 #include <QPushButton>

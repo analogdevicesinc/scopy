@@ -23,8 +23,9 @@
 #define IIOBUFFERDESTROY_H
 
 #include "../command.h"
+#include "iiocpp/iiobuffer.h"
 
-#include <iio.h>
+#include <iio/iio.h>
 
 namespace scopy {
 class SCOPY_IIOUTIL_EXPORT IioBufferDestroy : public Command
@@ -42,7 +43,7 @@ public:
 	{
 		Q_EMIT started(this);
 		m_cmdResult->errorCode = 0;
-		iio_buffer_destroy(m_buffer);
+		IIOBuffer::destroy(m_buffer);
 		if(!m_buffer) {
 			m_cmdResult->errorCode = -errno;
 		}

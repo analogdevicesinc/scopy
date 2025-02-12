@@ -24,7 +24,7 @@
 #include "debugger/debuggerinstrument.h"
 #include "iioexplorerinstrument.h"
 
-#include <iio.h>
+#include <iio/iio.h>
 
 #include <QDebug>
 #include <QElapsedTimer>

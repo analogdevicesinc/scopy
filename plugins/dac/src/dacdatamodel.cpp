@@ -20,10 +20,15 @@
  */
 
 #include "dacdatamodel.h"
+#include "iioutil/iiocpp/iiobuffer.h"
 #include "txnode.h"
 #include "dac_logging_categories.h"
 
 #include <algorithm>
+
+#include <iioutil/iiocpp/iiodevice.h>
+#include <iioutil/iiocpp/iiochannel.h>
+#include <iioutil/iiocpp/iioresult.h>
 
 #include <QtConcurrentRun>
 #include <QDebug>
@@ -45,7 +50,7 @@ DacDataModel::DacDataModel(struct iio_device *dev, QObject *parent)
 	, m_decimation(1)
 {
 	m_dev = dev;
-	m_name = iio_device_get_name(m_dev);
+	m_name = IIODevice::get_name(m_dev);
 
 	m_isBufferCapable = initBufferDac();
 	m_isDds = initDdsDac();
@@ -176,9 +181,9 @@ void DacDataModel::enableBufferChannel(QString uuid, bool enable)
 		qDebug(CAT_DAC_DATA) << QString("No channel for uuid %1").arg(uuid);
 	}
 	if(enable) {
-		iio_channel_enable(chn);
+		IIOChannel::enable(chn);
 	} else {
-		iio_channel_disable(chn);
+		IIOChannel::disable(chn);
 	}
 
 	Q_EMIT reqInitBuffer();
@@ -188,7 +193,7 @@ unsigned int DacDataModel::getEnabledChannelsCount()
 {
 	unsigned int enChannelsCount = 0;
 	for(auto node : qAsConst(m_bufferTxs)) {
-		enChannelsCount += iio_channel_is_enabled(node->getChannel()) ? 1 : 0;
+		enChannelsCount += IIOChannel::is_enabled(node->getChannel()) ? 1 : 0;
 	}
 	return enChannelsCount;
 }
@@ -247,7 +252,7 @@ bool DacDataModel::validateBufferParams()
 	}
 
 	auto enabledChannelsCount = getEnabledChannelsCount();
-	ssize_t s_size = iio_device_get_sample_size(m_dev);
+	ssize_t s_size = IIODevice::get_sample_size(m_dev);
 	if(!s_size || enabledChannelsCount == 0) {
 		auto msg = "Unable to create buffer, no channel enabled.";
 		qDebug(CAT_DAC_DATA) << msg;
@@ -320,7 +325,7 @@ void DacDataModel::push()
 	}
 
 	if(m_buffer) {
-		iio_buffer_destroy(m_buffer);
+		IIOBuffer::destroy(m_buffer);
 		m_buffer = nullptr;
 	}
 
@@ -354,7 +359,7 @@ void DacDataModel::push()
 	while(!m_interrupted && bufferIdx <= totalNbBuffers) {
 		int chnIdx = 0;
 		for(auto ch : qAsConst(m_bufferTxs)) {
-			if(!iio_channel_is_enabled(ch->getChannel())) {
+			if(!IIOChannel::is_enabled(ch->getChannel())) {
 				continue;
 			}
 			uintptr_t dst_ptr, src_ptr = (uintptr_t)(allDataC[chnIdx].data()),
@@ -404,19 +409,19 @@ void DacDataModel::stop()
 bool DacDataModel::initBufferDac()
 {
 	unsigned int txCount = 0;
-	unsigned int channelCount = iio_device_get_channels_count(m_dev);
+	unsigned int channelCount = IIODevice::get_channels_count(m_dev);
 	for(unsigned int i = 0; i < channelCount; i++) {
-		struct iio_channel *chn = iio_device_get_channel(m_dev, i);
-		if(!iio_channel_is_output(chn))
+		struct iio_channel *chn = IIODevice::get_channel(m_dev, i).data();
+		if(!IIOChannel::is_output(chn))
 			continue;
-		if(iio_channel_is_scan_element(chn)) {
+		if(IIOChannel::is_scan_element(chn)) {
 			txCount++;
-			QString id = iio_channel_get_id(chn);
-			QString name = iio_channel_get_name(chn);
+			QString id = IIOChannel::get_id(chn);
+			QString name = IIOChannel::get_name(chn);
 			if(name != "") {
 				id += ":" + name;
 			}
-			QString uuid = iio_device_get_name(m_dev);
+			QString uuid = IIODevice::get_name(m_dev);
 			uuid += ":" + id;
 			m_bufferTxs.insert(uuid, new TxNode(uuid, chn, this));
 		}
@@ -431,19 +436,19 @@ bool DacDataModel::initBufferDac()
 bool DacDataModel::initDdsDac()
 {
 	unsigned int ddsTonesCount = 0;
-	unsigned int channelCount = iio_device_get_channels_count(m_dev);
+	unsigned int channelCount = IIODevice::get_channels_count(m_dev);
 	for(unsigned int i = 0; i < channelCount; i++) {
-		struct iio_channel *chn = iio_device_get_channel(m_dev, i);
-		if(!iio_channel_is_output(chn))
+		struct iio_channel *chn = IIODevice::get_channel(m_dev, i).data();
+		if(!IIOChannel::is_output(chn))
 			continue;
-		iio_chan_type chnType = iio_channel_get_type(chn);
+		iio_chan_type chnType = IIOChannel::get_type(chn);
 		if(chnType != IIO_ALTVOLTAGE)
 			continue;
 		ddsTonesCount++;
 
 		// Name should contain TX*_I/Q_F or *A/*B
-		QString name = iio_channel_get_name(chn);
-		QString id = iio_channel_get_id(chn);
+		QString name = IIOChannel::get_name(chn);
+		QString id = IIOChannel::get_id(chn);
 		if(name == "") {
 			name = generateToneName(id);
 		}
@@ -477,7 +482,7 @@ int DacDataModel::getTxChannelEnabledCount(unsigned *enabled_mask)
 		*enabled_mask = 0;
 
 	for(auto ch : qAsConst(m_bufferTxs)) {
-		bool enabled = iio_channel_is_enabled(ch->getChannel());
+		bool enabled = IIOChannel::is_enabled(ch->getChannel());
 		if(enabled) {
 			num_enabled++;
 			if(enabled_mask)

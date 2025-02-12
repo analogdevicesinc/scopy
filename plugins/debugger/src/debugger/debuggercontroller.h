@@ -21,7 +21,7 @@
 #ifndef DEBUGGERCONTROLLER_H
 #define DEBUGGERCONTROLLER_H
 
-#include <iio.h>
+#include <iio/iio.h>
 
 #include <QDebug>
 #include <QObject>

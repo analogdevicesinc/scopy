@@ -21,7 +21,7 @@
 #ifndef DEBUGGERINSTRUMENT_H
 #define DEBUGGERINSTRUMENT_H
 
-#include <iio.h>
+#include <iio/iio.h>
 
 /* Qt includes */
 #include <QFile>

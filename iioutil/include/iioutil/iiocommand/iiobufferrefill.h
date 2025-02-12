@@ -24,7 +24,7 @@
 
 #include "../command.h"
 
-#include <iio.h>
+#include <iio/iio.h>
 
 namespace scopy {
 class SCOPY_IIOUTIL_EXPORT IioBufferRefill : public Command
@@ -41,8 +41,9 @@ public:
 	virtual void execute() override
 	{
 		Q_EMIT started(this);
-		ssize_t ret = iio_buffer_refill(m_buffer);
-		m_cmdResult->errorCode = ret;
+		// FIXME: Fix this later
+		// ssize_t ret = iio_buffer_refill(m_buffer);
+		// m_cmdResult->errorCode = ret;
 		Q_EMIT finished(this);
 	}
 

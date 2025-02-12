@@ -25,7 +25,7 @@
 #include "pingtask.h"
 #include "scopy-iioutil_export.h"
 
-#include <iio.h>
+#include <iio/iio.h>
 
 namespace scopy {
 /**

@@ -29,7 +29,7 @@
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
-#include <iio.h>
+#include <iio/iio.h>
 
 namespace scopy {
 namespace dac {

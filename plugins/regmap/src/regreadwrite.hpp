@@ -24,7 +24,7 @@
 
 #include "scopy-regmap_export.h"
 
-#include <iio.h>
+#include <iio/iio.h>
 
 #include <QObject>
 
@@ -37,7 +37,7 @@ class SCOPY_REGMAP_EXPORT RegReadWrite : public QObject
 	Q_OBJECT
 
 public:
-	explicit RegReadWrite(struct iio_device *dev, QObject *parent = nullptr);
+	explicit RegReadWrite(iio_device *dev, QObject *parent = nullptr);
 
 	~RegReadWrite();
 
@@ -51,7 +51,7 @@ Q_SIGNALS:
 	void writeSuccess(uint32_t address);
 
 private:
-	struct iio_device *dev;
+	iio_device *dev;
 };
 } // namespace scopy::regmap
 #endif // REGREADWRITE_HPP

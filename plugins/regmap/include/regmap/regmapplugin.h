@@ -28,7 +28,7 @@
 #include "pluginbase/pluginbase.h"
 #include "scopy-regmap_export.h"
 
-#include <iio.h>
+#include <iio/iio.h>
 
 #include <QObject>
 
@@ -37,8 +37,6 @@
 
 #include <readwrite/iregisterreadstrategy.hpp>
 #include <readwrite/iregisterwritestrategy.hpp>
-
-namespace Ui {}
 
 namespace scopy {
 namespace regmap {

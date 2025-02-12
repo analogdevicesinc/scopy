@@ -23,6 +23,7 @@
 
 #include <QLoggingCategory>
 #include "iiocommand/iiodevicegettrigger.h"
+#include "iiocpp/iiocontext.h"
 
 Q_LOGGING_CATEGORY(CAT_CMDQPING, "CmdQPingTask")
 
@@ -61,8 +62,14 @@ void CmdQPingTask::run()
 
 bool CmdQPingTask::ping()
 {
-	auto dev = (!m_pingDevice.isEmpty()) ? iio_context_find_device(c->context(), m_pingDevice.toStdString().c_str())
-					     : iio_context_find_device(c->context(), 0);
+	IIOResult<iio_device *> dev_res = (!m_pingDevice.isEmpty())
+		? IIOContext::find_device(c->context(), m_pingDevice.toStdString().c_str())
+		: IIOContext::find_device(c->context(), 0);
+	if(!dev_res.ok()) {
+		qWarning(CAT_CMDQPING) << "Error finding device: " << dev_res.error();
+		return false;
+	}
+	iio_device *dev = dev_res.data();
 
 	if(!dev) {
 		qWarning(CAT_CMDQPING) << "Device not found!";
