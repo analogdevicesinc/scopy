@@ -232,7 +232,7 @@ Test 3: Preferences
 
 **UID:** TST.GEN.SETUP.PREFERENCES
 
-**Description:** This test verifies the preferences feature of Scopy. It checks the seven sections of the preferences menu and the options available in each section.
+**Description:** This test verifies the preferences feature of Scopy. It checks the sections of the preferences menu and the options available in each section.
 
 **Preconditions:**
         - Scopy is installed on the system.
@@ -240,27 +240,26 @@ Test 3: Preferences
         - Use :ref:`M2k.Usb <m2k-usb-general-settings>` setup.
 
 **Steps:**
-        1. Click the Preferences option located below the instrument options.
-                - **Expected Result:** The Preferences menu should contain seven sections: General, Oscilloscope, Spectrum Analyzer, Logic Analyzer, Signal Generator, Network Analyzer, and Debug.
+        1. Click the Preferences option located below the instrument options. After the Preferences menu appears, click the M2kPlugin tab.
+                - **Expected Result:** The Preferences menu should contain several sections: General, Analog tools and Logic tools.
                 - **Actual Result:**
 
 ..
   Actual test result goes here.
 ..
 
-        2. Enable “Save session when closing Scopy.”
+        2. Enable “Save session when closing Scopy.” This setting is in the General tab.
         3. Use Scopy and play with its instruments, changing the configurations and settings. Close Scopy and reopen.
-        4. Enable “Show advanced device information.”
-        5. On the Home menu, click the M2K icon and drag down to see the advanced device information.
-                - **Expected Result:** A dialog box should appear confirming the reset command.
+        4. On the General tab, click the M2K icon and drag down to see the debug section.
+                - **Expected Result:** A dialog box with the “Restart” text should appear confirming the reset command.
                 - **Actual Result:**
 
 ..
   Actual test result goes here.
 ..
 
-        6. Reset profile to default by deleting the files from ``C:\Users\your_username\AppData\Roaming\ADI``. Enable auto save feature. Load profile 1, profile 2 or profile 3 from Testing Save and Load feature steps. Close Scopy and Open.
-        7. Following step 6, open Scopy and the current profile should be one of the profiles created from the Save and load test case. On the General Setting preference, the reset scopy is located in the lower right of the Scopy screen. Click reset scopy.
+        5. Reset profile to default by deleting the files from ``C:\Users\your_username\AppData\Roaming\ADI``. Enable auto save feature. Load profile 1, profile 2 or profile 3 from Testing Save and Load feature steps. Close Scopy and Open.
+        6. Following step 5, open Scopy and the current profile should be one of the profiles created from the Save and load test case. On the General Setting preference, the reset scopy is located in the lower right of the Scopy screen. Click reset scopy.
                 - **Expected Result:** Reopening Scopy, the profile loaded should be the profile saved. Scopy should return to its default setting. Similar with deleting the files from folder.
                 - **Actual Result:**
 
@@ -268,7 +267,7 @@ Test 3: Preferences
   Actual test result goes here.
 ..
 
-        8. Under the Oscilloscope section, labels on the plot may be toggled on or off.
+        7. In the M2kPlugin Tab, under the Analog tools section, labels on the plot may be toggled on or off.
                 - **Expected Result:** Checking the Oscilloscope plot, the labels must synchronize with the option chosen.
                 - **Actual Result:**
 
@@ -276,9 +275,9 @@ Test 3: Preferences
   Actual test result goes here.
 ..
 
-        9. On the Spectrum Analyzer section, an option to search or not to search marker peaks in the visible domain is given.
-        10. Signal Generator’s Settings: For Channel 1: Sinewave, 10Vpp, 500kHz. Spectrum Analyzer’s Sweep Settings: Start – 700kHz, Stop – 1MHz. Disable Channel 2. Connect AWG channel 1 to Scope Ch1+.
-        11. Under the Marker Settings, click Marker 1 then “Peak.” Turn the Marker Table on and look for the marked frequencies.
+        8. On the Analog tools section, an option to search or not to search marker peaks in the visible domain is given.
+        9. Signal Generator’s Settings: For Channel 1: Sinewave, 10Vpp, 500kHz. Spectrum Analyzer’s Sweep Settings: Start – 700kHz, Stop – 1MHz. Disable Channel 2. Connect AWG channel 1 to Scope Ch1+.
+        10. Under the Marker Settings, click Marker 1 then “Peak.” Turn the Marker Table on and look for the marked frequencies.
                  - **Expected Result:** A marker labeled M1 will automatically appear on the spectrum upon clicking Marker 1. Clicking “Peak” will put the Marker on the 500kHz mark.
                  - **Actual Result:**
 
@@ -286,7 +285,7 @@ Test 3: Preferences
   Actual test result goes here.
 ..
 
-        12. Under the Signal Generator section, The number of periods shown may be adjusted from 2 to 9.
+        11. Under the Analog tools section, The number of periods shown may be adjusted from 2 to 9.
                  - **Expected Result:** The signal generator’s graphical representation must follow the desired number of periods on the lower frequency channel (if both channels are configured to output waveform signals). When numbers other than 2 to 9 are entered, the number and the line under it turns to red.
                  - **Actual Result:**
 
@@ -294,9 +293,9 @@ Test 3: Preferences
   Actual test result goes here.
 ..
 
-        13. On the Network Analyzer section, an option to display 0dB on the graph is available. Click to enable it.
-        14. Construct a first-order low pass RC filter with the following components: R = 470 Ohms, C = 1uF. This will have a cut-off frequency of ~340 Hz.
-        15. Network Analyzer’s Settings: Reference: Channel 1, 1V Amplitude, 0V Offset. Sweep: Logarithmic, Start – 10Hz, Stop – 500kHz, Sample Count - 100. Display: Min. Magnitude – -90dB, Max. Magnitude – 10dB, Min. Phase – -150deg, Max. Phase – 60deg. Run Network Analyzer.
+        12. On the Analog tools section, an option to display 0dB on the graph is available. Click to enable it.
+        13. Construct a first-order low pass RC filter with the following components: R = 470 Ohms, C = 1uF. This will have a cut-off frequency of ~340 Hz.
+        14. Network Analyzer’s Settings: Reference: Channel 1, 1V Amplitude, 0V Offset. Sweep: Logarithmic, Start – 10Hz, Stop – 500kHz, Sample Count - 100. Display: Min. Magnitude – -90dB, Max. Magnitude – 10dB, Min. Phase – -150deg, Max. Phase – 60deg. Run Network Analyzer.
                  - **Expected Result:** The Bode Plot has 0dB on its labels.
                  - **Actual Result:**
 
