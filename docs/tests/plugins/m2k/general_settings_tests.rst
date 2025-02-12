@@ -44,7 +44,7 @@ Test 1: Installation
 **Preconditions:**
         - Scopy is installed on the system.
         - OS: ANY
-        - Use :ref:`M2k.Usb <m2k-usb-pattern-generator>` setup.
+        - Use :ref:`M2k.Usb <m2k-usb-general-settings>` setup.
 
 **Steps:**
         1. If you have a different version of Scopy installed before, please uninstall along with the M2K drivers.
@@ -109,7 +109,7 @@ Test 2: M2K Connection and Calibration
 **Preconditions:**
         - Scopy is installed on the system.
         - OS: ANY
-        - Use :ref:`M2k.Usb <m2k-usb-pattern-generator>` setup.
+        - Use :ref:`M2k.Usb <m2k-usb-general-settings>` setup.
 
 **Steps:**
         1. Connect the M2K board to the PC using a micro-USB connector.
@@ -211,7 +211,7 @@ Test 3: Save and Load Profile
 **Preconditions:**
         - Scopy is installed on the system.
         - OS: ANY
-        - Use :ref:`M2k.Usb <m2k-usb-pattern-generator>` setup.
+        - Use :ref:`M2k.Usb <m2k-usb-general-settings>` setup.
 
 **Steps:**
         1. Save the current profile. On the bottom part of the left panel, click the “Save” icon and save the profile as “default.ini.” Change any setting on any instrument and reload the profile.
@@ -301,7 +301,7 @@ Test 4: Preferences
 **Preconditions:**
         - Scopy is installed on the system.
         - OS: ANY
-        - Use :ref:`M2k.Usb <m2k-usb-pattern-generator>` setup.
+        - Use :ref:`M2k.Usb <m2k-usb-general-settings>` setup.
 
 **Steps:**
         1. Click the Preferences option located below the instrument options.
