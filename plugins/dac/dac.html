@@ -92,7 +92,6 @@
 <li><a class="reference internal" href="#">DAC plugin</a><ul>
 <li><a class="reference internal" href="#buffer-mode">Buffer mode</a></li>
 <li><a class="reference internal" href="#dds-mode">DDS mode</a></li>
-<li><a class="reference internal" href="#tutorial">Tutorial</a></li>
 </ul>
 </li>
 </ul>
@@ -258,11 +257,15 @@ data generation modes.</p>
 implements an output IIO buffer or at least one DDS (ALTVOLTAGE) output channel.</p>
 <p>Both generation modes feature a few common items in their layout.</p>
 <ol class="arabic simple">
-<li><p>Tutorial button</p></li>
+<li><p>Info button</p></li>
 </ol>
 <blockquote>
-<div><p>The top left side information button will start a quick tutorial for basic
-usage of the instrument.</p>
+<div><p>The top left side information button will open a pop-up window containing
+two buttons: <strong>Tutorial</strong> and <strong>Documentation</strong>.</p>
+<p>The Documentation button will open this page in a browser and close the
+pop-up window.</p>
+<p>The Tutorial button will start a tutorial that will guide the user through
+the main features of the plugin.</p>
 </div></blockquote>
 <ol class="arabic simple" start="2">
 <li><p>Right side menu</p></li>
@@ -309,6 +312,16 @@ file size and a new section will appear below.</p>
 enabled or disabled using their left side check.</p>
 </div></blockquote>
 <ol class="arabic simple" start="3">
+<li><p>Repeat data</p></li>
+</ol>
+<blockquote>
+<div><p>Choose whether to repeat the data columns loaded from file or not.
+If enabled, the data columns will be repeated on all enabled channels,
+without requiring the user to duplicate the data sets in the file to
+match the number of enabled channels.</p>
+<p>By default it is set to true.</p>
+</div></blockquote>
+<ol class="arabic simple" start="4">
 <li><p>Cyclic</p></li>
 </ol>
 <blockquote>
@@ -317,14 +330,14 @@ If disabled, a new section containing “Buffer size” and “Kernel buffers”
 will appear.</p>
 <p>By default it is set to true.</p>
 </div></blockquote>
-<ol class="arabic simple" start="4">
+<ol class="arabic simple" start="5">
 <li><p>File Size</p></li>
 </ol>
 <blockquote>
 <div><p>The size of the loaded file. It is populated once loading is successful
 and can be changed to a lower value, truncating the data loaded from file.</p>
 </div></blockquote>
-<ol class="arabic simple" start="5">
+<ol class="arabic simple" start="6">
 <li><p>Run Button</p></li>
 </ol>
 <blockquote>
@@ -341,19 +354,19 @@ the Run Button is pressed.</p>
 </dd>
 </dl>
 </div></blockquote>
-<ol class="arabic simple" start="6">
+<ol class="arabic simple" start="7">
 <li><p>Data Configuration</p></li>
 </ol>
 <blockquote>
 <div><p>This section allows the user to scale the data before output.</p>
 </div></blockquote>
-<ol class="arabic simple" start="7">
+<ol class="arabic simple" start="8">
 <li><p>Console Log</p></li>
 </ol>
 <blockquote>
 <div><p>All errors or status messages are displayed here.</p>
 </div></blockquote>
-<ol class="arabic simple" start="8">
+<ol class="arabic simple" start="9">
 <li><p>File Configuration</p></li>
 </ol>
 <blockquote>
@@ -402,11 +415,6 @@ selector.</p>
 <p>For scale, “-Inf dB” is equivalent with scale=0 or a disabled channel.</p>
 </div>
 </div></blockquote>
-</section>
-<section id="tutorial">
-<h2>Tutorial<a class="headerlink" href="#tutorial" title="Link to this heading"></a></h2>
-<p>A tutorial will automatically start first time the tool is open. It can
-be restarted from tool Preferences.</p>
 </section>
 </section>
 

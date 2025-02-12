@@ -101,6 +101,7 @@
 <li><a class="reference internal" href="#test-8-dds-mode-attributes-refresh">Test 8 - DDS mode attributes refresh</a></li>
 <li><a class="reference internal" href="#test-9-plugin-tutorial">Test 9 - Plugin tutorial</a></li>
 <li><a class="reference internal" href="#test-10-channel-attributes">Test 10 - Channel attributes</a></li>
+<li><a class="reference internal" href="#test-11-repeat-data-option">Test 11 - Repeat data option</a></li>
 </ul>
 </li>
 </ul>
@@ -946,6 +947,79 @@ should appear.</p></li>
 <li><dl class="simple">
 <dt>Change the <strong>sampling_frequency</strong> attribute to 38400000.</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> The attribute is updated successfully.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-11-repeat-data-option">
+<h2>Test 11 - Repeat data option<a class="headerlink" href="#test-11-repeat-data-option" title="Link to this heading"></a></h2>
+<p id="tst-dac-repeat-data"><strong>UID:</strong> TST.DAC.REPEAT_DATA</p>
+<p><strong>Description:</strong> This test verifies the DAC plugin repeat data option.
+The data sets loaded from the file should be repeated to fill in all the enabled
+channels.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-setup"><span class="std std-ref">AdalmPluto.Device</span></a></p></li>
+<li><p>Enable 2 TX channels on your Pluto device.</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Resources:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sinewave_0.9_2ch.csv">https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sinewave_0.9_2ch.csv</a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the DAC plugin.</p></li>
+<li><p>Switch the “Mode” to “Buffer”.</p></li>
+<li><p>Browse and select the <em>sinewave_0.9_2ch.csv</em> file.</p></li>
+<li><dl class="simple">
+<dt>Press the “Load” button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The first 2 channels are enabled.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><p>Enable the remaining 2 channels from the channel list.</p></li>
+<li><dl class="simple">
+<dt>Set the <strong>Repeat data</strong> option to true and press <strong>Run</strong>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The console log displays the following message: <em>Pushed 8444 samples, 67552 bytes (1/1 buffers).</em></p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Set the <strong>Repeat data</strong> option to false and press <strong>Run</strong>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The console log displays the following message: <em>Not enough data columns for all enabled channels.</em></p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Leave the <strong>Repeat data</strong> as is, disable the last 2 channels and press <strong>Run</strong>:</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The console log displays the following message: <em>Pushed 8444 samples, 33776 bytes (1/1 buffers).</em></p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>

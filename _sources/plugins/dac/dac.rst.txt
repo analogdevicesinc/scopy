@@ -12,10 +12,16 @@ implements an output IIO buffer or at least one DDS (ALTVOLTAGE) output channel.
 
 Both generation modes feature a few common items in their layout.
 
-1. Tutorial button
+1. Info button
 
- The top left side information button will start a quick tutorial for basic
- usage of the instrument.
+ The top left side information button will open a pop-up window containing
+ two buttons: **Tutorial** and **Documentation**.
+
+ The Documentation button will open this page in a browser and close the 
+ pop-up window.
+
+ The Tutorial button will start a tutorial that will guide the user through
+ the main features of the plugin.
 
 2. Right side menu
 
@@ -61,7 +67,16 @@ Find all the sections of the instrument described below.
  List of detected IIO channels that are buffer capable. These can be 
  enabled or disabled using their left side check.
 
-3. Cyclic
+3. Repeat data
+
+ Choose whether to repeat the data columns loaded from file or not.
+ If enabled, the data columns will be repeated on all enabled channels, 
+ without requiring the user to duplicate the data sets in the file to
+ match the number of enabled channels.
+
+ By default it is set to true.
+
+4. Cyclic
 
  Choose whether to push a cyclic IIO buffer or stream non-cyclic buffers.
  If disabled, a new section containing "Buffer size" and "Kernel buffers"
@@ -69,12 +84,12 @@ Find all the sections of the instrument described below.
 
  By default it is set to true.
 
-4. File Size
+5. File Size
 
  The size of the loaded file. It is populated once loading is successful
  and can be changed to a lower value, truncating the data loaded from file.
 
-5. Run Button
+6. Run Button
 
  Start output generation on the currently enabled channels. If anything 
  is invalid in the setup it will appear in the bottom "Console Log" once 
@@ -86,15 +101,15 @@ Find all the sections of the instrument described below.
   - errors appeared while trying to configure the IIO Buffer
   - the combined enabled channels are not compatible (for I/Q channels)
 
-6. Data Configuration
+7. Data Configuration
 
  This section allows the user to scale the data before output.
 
-7. Console Log
+8. Console Log
 
  All errors or status messages are displayed here.
 
-8. File Configuration
+9. File Configuration
 
  This section is visible only when the buffer is non-cyclic. It contains a 
  control for buffer size and one for kernel buffers. Both are automatically
@@ -138,10 +153,3 @@ for available TX channels with I/Q corresponding channels.
  
  .. note::
    For scale, "-Inf dB" is equivalent with scale=0 or a disabled channel.
-
-
-Tutorial 
---------------------------------------------------------------------------------
-
-A tutorial will automatically start first time the tool is open. It can
-be restarted from tool Preferences.
