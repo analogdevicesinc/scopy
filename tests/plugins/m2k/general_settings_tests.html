@@ -91,10 +91,9 @@
           <ul>
 <li><a class="reference internal" href="#">General Settings - Test Case</a><ul>
 <li><a class="reference internal" href="#setup-environment">Setup environment:</a></li>
-<li><a class="reference internal" href="#test-1-installation">Test 1: Installation</a></li>
-<li><a class="reference internal" href="#test-2-m2k-connection-and-calibration">Test 2: M2K Connection and Calibration</a></li>
-<li><a class="reference internal" href="#test-3-save-and-load-profile">Test 3: Save and Load Profile</a></li>
-<li><a class="reference internal" href="#test-4-preferences">Test 4: Preferences</a></li>
+<li><a class="reference internal" href="#test-1-m2k-connection-and-calibration">Test 1: M2K Connection and Calibration</a></li>
+<li><a class="reference internal" href="#test-2-save-and-load-profile">Test 2: Save and Load Profile</a></li>
+<li><a class="reference internal" href="#test-3-preferences">Test 3: Preferences</a></li>
 </ul>
 </li>
 </ul>
@@ -298,82 +297,15 @@ Content on this topic
 </dd>
 </dl>
 </section>
-<section id="test-1-installation">
-<h2>Test 1: Installation<a class="headerlink" href="#test-1-installation" title="Link to this heading"></a></h2>
-<p><strong>UID:</strong> TST.GEN.SETUP.INSTALL</p>
-<p><strong>Description:</strong> This test verifies the installation process of Scopy, ensuring that the software and its drivers are correctly installed, uninstalled, and reinstalled. It checks the sequence of prompts during installation and validates the correct setup of the ADALM2000 drivers.</p>
-<dl class="simple">
-<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
-<li><p>Scopy is installed on the system.</p></li>
-<li><p>OS: ANY</p></li>
-<li><p>Use <a class="reference internal" href="pattern_generator_tests.html#m2k-usb-pattern-generator"><span class="std std-ref">M2k.Usb</span></a> setup.</p></li>
-</ul>
-</dd>
-<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
-<li><dl class="simple">
-<dt>If you have a different version of Scopy installed before, please uninstall along with the M2K drivers.</dt><dd><ul class="simple">
-<li><p><strong>Expected Result:</strong> A dialog box will open asking if you want to uninstall Scopy and all of its contents. Upon clicking “Yes”, Scopy must be properly uninstalled.</p></li>
-<li><p><strong>Actual Result</strong>:</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ol>
-</dd>
-</dl>
-<blockquote>
-<div><ol class="arabic simple" start="2">
-<li><p>Download Scopy’s latest release on GitHub (<a class="reference external" href="https://github.com/analogdevicesinc/scopy/releases">https://github.com/analogdevicesinc/scopy/releases</a>) and run.</p></li>
-<li><p>If you want to automatically install the ADALM2000 drivers, check the box indicating “Install drivers for ADALM2000” and click “Next.”</p></li>
-<li><p>If you want to manually install the ADALM2000 drivers, uncheck the box indicating “Install drivers for ADALM2000” and click “Next.” Go to this link (<a class="reference external" href="https://github.com/analogdevicesinc/plutosdr-m2k-drivers-win/releases">https://github.com/analogdevicesinc/plutosdr-m2k-drivers-win/releases</a>) to find your preferred version of ADALM2000 drivers.</p></li>
-<li><p>Continue with the installation by following the promptings.</p></li>
-<li><dl class="simple">
-<dt>After Scopy finishes its installation, a different dialog box will open – the Device Driver Installation Wizard.</dt><dd><ul class="simple">
-<li><p><strong>Expected Result:</strong> After completion, the “Device Driver Installation Wizard” dialog box will automatically close and direct you back to the Scopy installation setup.</p></li>
-<li><p><strong>Actual Result</strong>:</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ol>
-</div></blockquote>
-<blockquote>
-<div><ol class="arabic simple" start="7">
-<li><dl class="simple">
-<dt>To use the application immediately, choose the “Yes, restart the computer now” option and click “Finish.”</dt><dd><ul class="simple">
-<li><p><strong>Expected Result:</strong> After the restart, open Scopy and check that it is running.</p></li>
-<li><p><strong>Actual Result</strong>:</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ol>
-</div></blockquote>
-<blockquote>
-<div><ol class="arabic simple" start="8">
-<li><dl class="simple">
-<dt>If you opt to use the application for later, choose the “No, I will restart the computer later” option and click “Finish.”</dt><dd><ul class="simple">
-<li><p><strong>Expected Result:</strong> The prompt will close and after a restart, scopy can be opened.</p></li>
-<li><p><strong>Actual Result</strong>:</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ol>
-</div></blockquote>
-<p><strong>Tested OS:</strong></p>
-<p><strong>Comments:</strong></p>
-<p><strong>Result:</strong> PASS/FAIL</p>
-</section>
-<section id="test-2-m2k-connection-and-calibration">
-<h2>Test 2: M2K Connection and Calibration<a class="headerlink" href="#test-2-m2k-connection-and-calibration" title="Link to this heading"></a></h2>
+<section id="test-1-m2k-connection-and-calibration">
+<h2>Test 1: M2K Connection and Calibration<a class="headerlink" href="#test-1-m2k-connection-and-calibration" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.GEN.SETUP.M2KCONN</p>
 <p><strong>Description:</strong> This test verifies the connection and calibration of the M2K board using both local and remote connections. It checks the auto and manual calibration features of the M2K board.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
 <li><p>Scopy is installed on the system.</p></li>
 <li><p>OS: ANY</p></li>
-<li><p>Use <a class="reference internal" href="pattern_generator_tests.html#m2k-usb-pattern-generator"><span class="std std-ref">M2k.Usb</span></a> setup.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-usb-general-settings"><span class="std std-ref">M2k.Usb</span></a> setup.</p></li>
 </ul>
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
@@ -489,15 +421,15 @@ Content on this topic
 <p><strong>Comments:</strong></p>
 <p><strong>Result:</strong> PASS/FAIL</p>
 </section>
-<section id="test-3-save-and-load-profile">
-<h2>Test 3: Save and Load Profile<a class="headerlink" href="#test-3-save-and-load-profile" title="Link to this heading"></a></h2>
+<section id="test-2-save-and-load-profile">
+<h2>Test 2: Save and Load Profile<a class="headerlink" href="#test-2-save-and-load-profile" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.GEN.SETUP.SAVELOAD</p>
 <p><strong>Description:</strong> This test verifies the save and load profile feature of Scopy. It checks the ability to save and load profiles for each instrument and the ability to save and load the default profile.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
 <li><p>Scopy is installed on the system.</p></li>
 <li><p>OS: ANY</p></li>
-<li><p>Use <a class="reference internal" href="pattern_generator_tests.html#m2k-usb-pattern-generator"><span class="std std-ref">M2k.Usb</span></a> setup.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-usb-general-settings"><span class="std std-ref">M2k.Usb</span></a> setup.</p></li>
 </ul>
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
@@ -593,21 +525,21 @@ Content on this topic
 <p><strong>Comments:</strong></p>
 <p><strong>Result:</strong> PASS/FAIL</p>
 </section>
-<section id="test-4-preferences">
-<h2>Test 4: Preferences<a class="headerlink" href="#test-4-preferences" title="Link to this heading"></a></h2>
+<section id="test-3-preferences">
+<h2>Test 3: Preferences<a class="headerlink" href="#test-3-preferences" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.GEN.SETUP.PREFERENCES</p>
-<p><strong>Description:</strong> This test verifies the preferences feature of Scopy. It checks the seven sections of the preferences menu and the options available in each section.</p>
+<p><strong>Description:</strong> This test verifies the preferences feature of Scopy. It checks the sections of the preferences menu and the options available in each section.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
 <li><p>Scopy is installed on the system.</p></li>
 <li><p>OS: ANY</p></li>
-<li><p>Use <a class="reference internal" href="pattern_generator_tests.html#m2k-usb-pattern-generator"><span class="std std-ref">M2k.Usb</span></a> setup.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-usb-general-settings"><span class="std std-ref">M2k.Usb</span></a> setup.</p></li>
 </ul>
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
 <li><dl class="simple">
-<dt>Click the Preferences option located below the instrument options.</dt><dd><ul class="simple">
-<li><p><strong>Expected Result:</strong> The Preferences menu should contain seven sections: General, Oscilloscope, Spectrum Analyzer, Logic Analyzer, Signal Generator, Network Analyzer, and Debug.</p></li>
+<dt>Click the Preferences option located below the instrument options. After the Preferences menu appears, click the M2kPlugin tab.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The Preferences menu should contain several sections: General, Analog tools and Logic tools.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
 </dd>
@@ -618,12 +550,11 @@ Content on this topic
 </dl>
 <blockquote>
 <div><ol class="arabic simple" start="2">
-<li><p>Enable “Save session when closing Scopy.”</p></li>
+<li><p>Enable “Save session when closing Scopy.” This setting is in the General tab.</p></li>
 <li><p>Use Scopy and play with its instruments, changing the configurations and settings. Close Scopy and reopen.</p></li>
-<li><p>Enable “Show advanced device information.”</p></li>
 <li><dl class="simple">
-<dt>On the Home menu, click the M2K icon and drag down to see the advanced device information.</dt><dd><ul class="simple">
-<li><p><strong>Expected Result:</strong> A dialog box should appear confirming the reset command.</p></li>
+<dt>On the General tab, click the M2K icon and drag down to see the debug section.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> A dialog box with the “Restart” text should appear confirming the reset command.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
 </dd>
@@ -632,10 +563,10 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="6">
+<div><ol class="arabic simple" start="5">
 <li><p>Reset profile to default by deleting the files from <code class="docutils literal notranslate"><span class="pre">C:\Users\your_username\AppData\Roaming\ADI</span></code>. Enable auto save feature. Load profile 1, profile 2 or profile 3 from Testing Save and Load feature steps. Close Scopy and Open.</p></li>
 <li><dl class="simple">
-<dt>Following step 6, open Scopy and the current profile should be one of the profiles created from the Save and load test case. On the General Setting preference, the reset scopy is located in the lower right of the Scopy screen. Click reset scopy.</dt><dd><ul class="simple">
+<dt>Following step 5, open Scopy and the current profile should be one of the profiles created from the Save and load test case. On the General Setting preference, the reset scopy is located in the lower right of the Scopy screen. Click reset scopy.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> Reopening Scopy, the profile loaded should be the profile saved. Scopy should return to its default setting. Similar with deleting the files from folder.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -645,9 +576,9 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="8">
+<div><ol class="arabic simple" start="7">
 <li><dl class="simple">
-<dt>Under the Oscilloscope section, labels on the plot may be toggled on or off.</dt><dd><ul class="simple">
+<dt>In the M2kPlugin Tab, under the Analog tools section, labels on the plot may be toggled on or off.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> Checking the Oscilloscope plot, the labels must synchronize with the option chosen.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -657,8 +588,8 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="9">
-<li><p>On the Spectrum Analyzer section, an option to search or not to search marker peaks in the visible domain is given.</p></li>
+<div><ol class="arabic simple" start="8">
+<li><p>On the Analog tools section, an option to search or not to search marker peaks in the visible domain is given.</p></li>
 <li><p>Signal Generator’s Settings: For Channel 1: Sinewave, 10Vpp, 500kHz. Spectrum Analyzer’s Sweep Settings: Start – 700kHz, Stop – 1MHz. Disable Channel 2. Connect AWG channel 1 to Scope Ch1+.</p></li>
 <li><dl class="simple">
 <dt>Under the Marker Settings, click Marker 1 then “Peak.” Turn the Marker Table on and look for the marked frequencies.</dt><dd><ul class="simple">
@@ -671,9 +602,9 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="12">
+<div><ol class="arabic simple" start="11">
 <li><dl class="simple">
-<dt>Under the Signal Generator section, The number of periods shown may be adjusted from 2 to 9.</dt><dd><ul class="simple">
+<dt>Under the Analog tools section, The number of periods shown may be adjusted from 2 to 9.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The signal generator’s graphical representation must follow the desired number of periods on the lower frequency channel (if both channels are configured to output waveform signals). When numbers other than 2 to 9 are entered, the number and the line under it turns to red.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -683,8 +614,8 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="13">
-<li><p>On the Network Analyzer section, an option to display 0dB on the graph is available. Click to enable it.</p></li>
+<div><ol class="arabic simple" start="12">
+<li><p>On the Analog tools section, an option to display 0dB on the graph is available. Click to enable it.</p></li>
 <li><p>Construct a first-order low pass RC filter with the following components: R = 470 Ohms, C = 1uF. This will have a cut-off frequency of ~340 Hz.</p></li>
 <li><dl class="simple">
 <dt>Network Analyzer’s Settings: Reference: Channel 1, 1V Amplitude, 0V Offset. Sweep: Logarithmic, Start – 10Hz, Stop – 500kHz, Sample Count - 100. Display: Min. Magnitude – -90dB, Max. Magnitude – 10dB, Min. Phase – -150deg, Max. Phase – 60deg. Run Network Analyzer.</dt><dd><ul class="simple">
