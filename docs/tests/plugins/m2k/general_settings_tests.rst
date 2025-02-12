@@ -34,72 +34,8 @@ Setup environment:
         - Connect an **ADALM2000** device to the system by USB.
         - Add the device in device browser.
 
-Test 1: Installation
------------------------------------------------
 
-**UID:** TST.GEN.SETUP.INSTALL
-
-**Description:** This test verifies the installation process of Scopy, ensuring that the software and its drivers are correctly installed, uninstalled, and reinstalled. It checks the sequence of prompts during installation and validates the correct setup of the ADALM2000 drivers.
-
-**Preconditions:**
-        - Scopy is installed on the system.
-        - OS: ANY
-        - Use :ref:`M2k.Usb <m2k-usb-general-settings>` setup.
-
-**Steps:**
-        1. If you have a different version of Scopy installed before, please uninstall along with the M2K drivers.
-                - **Expected Result:** A dialog box will open asking if you want to uninstall Scopy and all of its contents. Upon clicking “Yes”, Scopy must be properly uninstalled.
-                - **Actual Result**:
-
-..
-  Actual test result goes here.
-..
-
-        2. Download Scopy’s latest release on GitHub (https://github.com/analogdevicesinc/scopy/releases) and run.
-        3. If you want to automatically install the ADALM2000 drivers, check the box indicating “Install drivers for ADALM2000” and click “Next.”
-        4. If you want to manually install the ADALM2000 drivers, uncheck the box indicating “Install drivers for ADALM2000” and click “Next.” Go to this link (https://github.com/analogdevicesinc/plutosdr-m2k-drivers-win/releases) to find your preferred version of ADALM2000 drivers.
-        5. Continue with the installation by following the promptings.
-        6. After Scopy finishes its installation, a different dialog box will open – the Device Driver Installation Wizard.
-                - **Expected Result:** After completion, the “Device Driver Installation Wizard” dialog box will automatically close and direct you back to the Scopy installation setup.
-                - **Actual Result**:
-
-..
-  Actual test result goes here.
-..
-
-        7. To use the application immediately, choose the “Yes, restart the computer now” option and click “Finish.”
-                - **Expected Result:** After the restart, open Scopy and check that it is running.
-                - **Actual Result**:
-
-..
-  Actual test result goes here.
-..
-
-        8. If you opt to use the application for later, choose the “No, I will restart the computer later” option and click “Finish.”
-                - **Expected Result:** The prompt will close and after a restart, scopy can be opened.
-                - **Actual Result**:
-
-..
-  Actual test result goes here.
-..
-
-**Tested OS:**
-
-..
-  Details about the tested OS goes here.
-
-**Comments:**
-
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
-
-
-Test 2: M2K Connection and Calibration
+Test 1: M2K Connection and Calibration
 -----------------------------------------------
 
 **UID:** TST.GEN.SETUP.M2KCONN
@@ -201,7 +137,7 @@ Test 2: M2K Connection and Calibration
   The result of the test goes here (PASS/FAIL).
 
 
-Test 3: Save and Load Profile
+Test 2: Save and Load Profile
 -----------------------------------------------
 
 **UID:** TST.GEN.SETUP.SAVELOAD
@@ -291,7 +227,7 @@ Test 3: Save and Load Profile
   The result of the test goes here (PASS/FAIL).
 
 
-Test 4: Preferences
+Test 3: Preferences
 -----------------------------------------------
 
 **UID:** TST.GEN.SETUP.PREFERENCES
