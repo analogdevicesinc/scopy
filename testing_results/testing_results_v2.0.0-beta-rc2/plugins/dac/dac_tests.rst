@@ -18,10 +18,10 @@ If the test case has special requirements, they will be listed in the test case 
        :widths: 50 30 30 50 50
        :header-rows: 1
 
-       * - Tester
-         - Test Date
-         - Scopy version
-         - Plugin version (N/A if not applicable)
+       * - Tester Septimiu Vana
+         - Test Date 13.02.2025
+         - Scopy version 2.0.0-d6cefcb
+         - Plugin version N/A
          - Comments
        * - 
          - 
@@ -73,7 +73,7 @@ and that the plugin is able to correctly parse it.
     2. Switch the "Mode" to "Buffer" and check the "Channels" list:
         - **Expected result:** The channels list contains the following: **cf-ad9361-dds-core-lpc:voltage0** 
           and **cf-ad9361-dds-core-lpc:voltage1**.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -81,14 +81,14 @@ and that the plugin is able to correctly parse it.
 
     3. Switch the "Mode" to "DDS" and check the TX section:
         - **Expected result:** The TX section contains one entry with "TX1".
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Windows
 
 ..
   Details about the tested OS goes here.
@@ -98,7 +98,7 @@ and that the plugin is able to correctly parse it.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -134,7 +134,7 @@ Test 2 - Buffer mode file loading
             - A new section called "DATA CONFIGURATION" should appear.
             - The bottom log section contains the following entry structure: *[timestamp] 
               Successfully loaded: [file name]*.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -148,14 +148,14 @@ Test 2 - Buffer mode file loading
             - The Run button is disabled.
             - The bottom log section contains the following entry structure: *[timestamp] 
               Failed to load: [file name]*.
-        - **Actual result:**
+        - **Actual result:** File missing. Loaded another json instead and get the expected message.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Windows
 
 ..
   Details about the tested OS goes here.
@@ -165,7 +165,7 @@ Test 2 - Buffer mode file loading
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -195,7 +195,7 @@ Test 3 - Buffer mode channel selection
     4. Press the "Load" button.
     5. Check the channels list for enabled channels:
         - **Expected result:** Both channels are enabled.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -206,7 +206,7 @@ Test 3 - Buffer mode channel selection
             - The "Run" button changes to "Stop".
             - The bottom log section contains the following entry structure: 
               *[timestamp]  Pushed 40000 samples, 160000 bytes (1/1 buffers).*
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -217,7 +217,7 @@ Test 3 - Buffer mode channel selection
             - The plugin keeps running.
             - The bottom log section contains the following entry structure: 
               *[timestamp]  Pushed 40000 samples, 80000 bytes (1/1 buffers).*
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -228,14 +228,14 @@ Test 3 - Buffer mode channel selection
             - The plugin stops running and the button change back to "Run".
             - The bottom log section contains the following entry structure: 
               *[timestamp]  Unable to create buffer, no channel enabled.*
-         - **Actual result:**
+         - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Windows
 
 ..
   Details about the tested OS goes here.
@@ -245,7 +245,7 @@ Test 3 - Buffer mode channel selection
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -276,7 +276,7 @@ size in buffer mode.
     4. Press the "Load" button.
     5. Check the "File Size" field.
         - **Expected result:** The "File Size" field is populated with **40 ksamples**.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -285,7 +285,7 @@ size in buffer mode.
     6. Change the "File Size" field to a value higher than the actual file size (write 50 and press Enter).
         - **Expected result:** The field value remains 40 ksamples since that's 
           the maximum number of samples in the file.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -293,7 +293,7 @@ size in buffer mode.
 
     7. Change the "File Size" field to a value lower than the actual file size (write 30 and press Enter).
         - **Expected result:** The field value changes to 30 ksamples.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -301,7 +301,7 @@ size in buffer mode.
 
     8. Change the "File Size" using the "+" button.
         - **Expected result:** The field value changes to the 31.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -309,14 +309,14 @@ size in buffer mode.
 
     9. Change the "File Size" using the "-" button.
         - **Expected result:** The field value changes to the 30.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Windows
 
 ..
   Details about the tested OS goes here.
@@ -326,7 +326,7 @@ size in buffer mode.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -368,7 +368,7 @@ Test 5 - Cyclic buffer mode
     10. Press "Run".
     11. Check the ADC plugin for the generated signal.
          - **Expected result:** A sinewave is seen on the ADC plot.
-         - **Actual result:**
+         - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -376,14 +376,14 @@ Test 5 - Cyclic buffer mode
 
     12. Stop the DAC plugin while monitoring the ADC plot.
          - **Expected result:** The sinewave no longer appears.
-         - **Actual result:**
+         - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Windows
 
 ..
   Details about the tested OS goes here.
@@ -393,7 +393,7 @@ Test 5 - Cyclic buffer mode
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -423,7 +423,7 @@ Test 6 -  DDS modes
                 - **scale**: -Inf db
                 - **phase**: 90
                 - the channel name: "Tone 1 - TX1_I_F1"
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -433,7 +433,7 @@ Test 6 -  DDS modes
         - **Expected result:**
             - Two configuration panels appear having the same fields as in the previous step.
             - The second channel name: "Tone 2 - TX1_I_F2"
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -444,14 +444,14 @@ Test 6 -  DDS modes
             - Four configuration panels appear having the same fields as in the previous step.
             - The third channel name: "Tone 1 - TX1_Q_F1"
             - The fourth channel name: "Tone 2 - TX1_Q_F2"
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Windows
 
 ..
   Details about the tested OS goes here.
@@ -461,7 +461,7 @@ Test 6 -  DDS modes
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -503,7 +503,7 @@ Test 7 - DDS mode sinewave generation
          - **Expected result:**
             - A sinewave should be seen on the ADC plot.
             - The measurements show a frequency of 1 MHz.
-         - **Actual result:**
+         - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -511,14 +511,14 @@ Test 7 - DDS mode sinewave generation
 
     12. In the DAC plugin change the "DDS Mode" to **Disabled**.
          - **Expected result:** The sinewave no longer appears on the ADC plot.
-         - **Actual result:**
+         - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Windows
 
 ..
   Details about the tested OS goes here.
@@ -528,7 +528,7 @@ Test 7 - DDS mode sinewave generation
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -560,14 +560,14 @@ Test 8 - DDS mode attributes refresh
        for the **altvoltage0 TX1_I_F1** to 2000000.
     7. Go to the DAC Plugin and click the refresh attributes button.
         - **Expected result:** The frequency field is updated to 2 MHz.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Windows
 
 ..
   Details about the tested OS goes here.
@@ -577,7 +577,7 @@ Test 8 - DDS mode attributes refresh
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -602,7 +602,7 @@ Test 9 - Plugin tutorial
     2. Click the "Info" button.
         - **Expected result:** A pop-up window with 2 buttons (Tutorial and Documentation)
           should appear.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -610,7 +610,7 @@ Test 9 - Plugin tutorial
 
     3. Click the "Documentation" button.
         - **Expected result:** The documentation page opens in the default browser.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -619,14 +619,14 @@ Test 9 - Plugin tutorial
     4. Click the "Tutorial" button.
         - **Expected result:**
             - The tutorial opens as a walkthrough in the plugin.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Windows
 
 ..
   Details about the tested OS goes here.
@@ -636,7 +636,7 @@ Test 9 - Plugin tutorial
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -660,7 +660,7 @@ Test 10 - Channel attributes
     2. Switch the "Mode" to "Buffer".
     3. In the "Channels" panel click on the first channel "cf-ad9361-dds-core-lpc:voltage0".
         - **Expected result:** The channel attributes are displayed in the right side menu.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -668,14 +668,14 @@ Test 10 - Channel attributes
 
     4. Change the **sampling_frequency** attribute to 38400000.
         - **Expected result:** The attribute is updated successfully.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Windows
 
 ..
   Details about the tested OS goes here.
@@ -685,7 +685,7 @@ Test 10 - Channel attributes
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
