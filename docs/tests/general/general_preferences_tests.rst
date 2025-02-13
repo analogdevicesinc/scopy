@@ -176,7 +176,7 @@ Test 3 - Save/Load tool attached state
    - OS: ALL  
 
 **Steps:**  
-   1. Set preference to enabled.  
+   1. Set the following preferences to enabled: **Save/Load tool attached state** and **Double click to attach/detach tool**. 
    2. Double click Oscilloscope tool to detach it.  
    3. Close Scopy.  
    4. Open the app using the same setup.  
@@ -187,7 +187,7 @@ Test 3 - Save/Load tool attached state
   Actual test result goes here.
 ..
 
-   5. Redo all the steps with the preference disabled.  
+   5. Redo all the steps with the  **Save/Load tool attached state** preference disabled.  
        - **Expected result:** Oscilloscope should not be detached.    
        - **Actual result:**
 
@@ -588,7 +588,8 @@ Test 11 - Use native dialogs
 **Steps:**  
    1. Set preference to enabled.  
    2. Press the Load button on the left menu.  
-       - **Expected result:** A native file browser window should open.
+       - **Expected result:** A native file browser window should open. A native file dialog is the file chooser 
+         that is provided by the operating system.
        - **Actual result:**
 
 ..
@@ -740,8 +741,8 @@ Test 14 - Theme
    - OS: ANY
 
 **Steps:**
-   1. Set preference to a different theme and restart the app.
-       - **Expected result:** Themes should change while retaining 
+   1. Set preference to a **Harmonic light** theme and restart the application.
+       - **Expected result:** Application should be displayed in a light theme while retaining 
          the same UX and usability in all tools.
        - **Actual result:**
 
@@ -1067,7 +1068,7 @@ Test 21 - Reset settings and plugins to default
 
 **Steps:**  
    1. Change general preferences and M2K preferences.  
-   2. Press the "Restart" button and restart the app.  
+   2. Press the "Reset" button and the "Restart" to restart the app.  
        - **Expected result:** All changed preferences should have 
          the default values.    
        - **Actual result:**
