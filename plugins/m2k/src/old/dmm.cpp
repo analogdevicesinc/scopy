@@ -587,20 +587,21 @@ void DMM::chooseFile()
 {
 	QString selectedFilter;
 
-	//	filename = QFileDialog::getSaveFileName(this,
-	//	    tr("Export"), "", tr("Comma-separated values files (*.csv);;All Files(*)"),
-	//	    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
+	filename = QFileDialog::getSaveFileName(
+		this, tr("Export"), "", tr("Comma-separated values files (*.csv);;All Files(*)"), &selectedFilter,
+		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
-	//	ui->filename->setText(filename);
+	ui->filename->setText(filename);
 
-	//	if(!ui->run_button->isChecked()) {
-	//		toggleDataLogging(data_logging);
-	//	}
+	if(!ui->run_button->isChecked()) {
+		toggleDataLogging(data_logging);
+	}
 
-	//	if (ui->run_button->isChecked() && data_logging) {
-	//		toggleDataLogging(false);
-	//		toggleDataLogging(true);
-	//	}
+	if(ui->run_button->isChecked() && data_logging) {
+		toggleDataLogging(false);
+		toggleDataLogging(true);
+	}
 }
 
 void DMM::enableDataLogging(bool en)
