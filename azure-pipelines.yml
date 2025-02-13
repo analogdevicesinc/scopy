@@ -42,7 +42,7 @@ stages:
       vmImage: $[ variables['vmImage'] ]
     steps:
     - checkout: self
-      fetchDepth: 1
+      fetchDepth: 0
       clean: true
     - script: ./ci/macOS/install_macos_deps.sh
       displayName: 'Build and Install Dependencies'
