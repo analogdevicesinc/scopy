@@ -13,11 +13,16 @@ Installers
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Alexandra Trifan
+         - 13/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Ubuntu 22.04.5 LTS
+       * - Alexandra Trifan
+         - 14/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Debian 12 arm64
 
 Test 1: Check Scopy AppImage x86_64
 ------------------------------------
@@ -36,7 +41,7 @@ Linux Operating System with x86_64 architecture.
     1. Download Scopy Linux AppImage x86_64 from the `release page <https://github.com/analogdevicesinc/scopy/releases>`_.
     2. Unzip the archive.
         - **Expected result:** a file named **Scopy-x86_64.AppImage** should be extracted.
-        - **Actual result:**
+        - **Actual result:** file extracted as described above.
 
 ..
   Actual test result goes here.
@@ -61,7 +66,7 @@ Linux Operating System with x86_64 architecture.
           application should be displayed inside the terminal. Inside the application,
           a window containing the license agreement should appear with 2 buttons
           "Exit" and "Continue".
-        - **Actual result:**
+        - **Actual result:** Scopy successfully displayed the GUI and the license agreement window.
 
 ..
   Actual test result goes here.
@@ -69,7 +74,7 @@ Linux Operating System with x86_64 architecture.
 
     5. Press "Exit".
         - **Expected result:** Scopy should gracefully close.
-        - **Actual result:**
+        - **Actual result:** Scopy closed gracefully.
 
 ..
   Actual test result goes here.
@@ -79,13 +84,13 @@ Linux Operating System with x86_64 architecture.
     7. Press "Continue".
         - **Expected result:** The window containing the license agreement
           should close and Scopy should be still running.
-        - **Actual result:**
+        - **Actual result:** Scopy closed the license agreement window and continued running.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS
 
 ..
   Details about the tested OS goes here.
@@ -95,7 +100,7 @@ Linux Operating System with x86_64 architecture.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -249,7 +254,7 @@ Linux Operating System with arm64 architecture.
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -259,7 +264,7 @@ Linux Operating System with arm64 architecture.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).

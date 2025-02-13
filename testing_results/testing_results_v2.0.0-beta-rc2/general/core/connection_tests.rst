@@ -17,11 +17,16 @@ Connection flow
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Alexandra Trifan
+         - 13/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Ubuntu 22.04.5 LTS
+       * - Alexandra Trifan
+         - 14/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Debian 12 arm64
 
 Setup environment:
 ------------------
@@ -67,13 +72,13 @@ Test 1: Verify the connection flow.
           appears in the application's status bar. After a while, the connection 
           is established, the status LED turns green, and the tools in the menu 
           become accessible. 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -83,7 +88,7 @@ Test 1: Verify the connection flow.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -112,13 +117,13 @@ unplugged during the connection process.
     2. Click on **Connect** button.
     3. Unplug the device while connecting. 
         - **Expected result:** The device is removed from device browser. 
-        - **Actual result:**
+        - **Actual result:** The device is removed as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -128,7 +133,7 @@ unplugged during the connection process.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -160,13 +165,13 @@ unplugged during the connection process.
           of the device in the device browser, and when hovered over, the 
           message "The device is not available! Verify the connection!" is 
           displayed.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -176,7 +181,7 @@ unplugged during the connection process.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -206,13 +211,13 @@ unplugged before the connection process.
     3. Click on **Connect** button.
         - **Expected result:** The connection process starts but does not 
           complete. A warning icon appears in the top-right corner.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -222,7 +227,7 @@ unplugged before the connection process.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -252,13 +257,13 @@ Test 5: Disconnecting a device.
         - **Expected result:** The device is disconnected, the **Connect** 
           button appears, the device remains in the device browser, and the 
           tools in the menu are no longer accessible.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -268,7 +273,7 @@ Test 5: Disconnecting a device.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).

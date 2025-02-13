@@ -17,11 +17,16 @@ EMU
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Alexandra Trifan
+         - 13/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Ubuntu 22.04.5 LTS
+       * - Alexandra Trifan
+         - 14/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Debian 12 arm64
 
 .. _tst-emu-en:
 
@@ -46,13 +51,13 @@ correctly.
     5. Click on **Enable** button.
         - **Expected result:** The IIO device tab is selected, and the URI 
           "ip:127.0.0.1" is entered in the corresponding section. 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -62,7 +67,7 @@ correctly.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -90,13 +95,13 @@ when the IIO emulator is not found.
     3. Click on **Emulator** tab.
         - **Expected result:** All the components are disabled and the message 
           "Can't find iio-emu in the system!" is displayed. 
-        - **Actual result:**
+        - **Actual result:** Handled as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -106,7 +111,7 @@ when the IIO emulator is not found.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -138,13 +143,13 @@ correctly.
     7. Click on **Disable** button.
         - **Expected result:** The fields in this tab become editable, and the 
           **Enable** button appears. 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -154,7 +159,7 @@ correctly.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -188,23 +193,25 @@ when an emulated device is connected and the "iio-emu" process is stopped.
         - **Expected result:** The fields in this tab become editable, and the 
           **Enable** button appears. After a few seconds, the device is 
           disconnected.
-        - **Actual result:**
+        - **Actual result:** The device is not disconnected on Debian on Raspberry Pi 4 but 
+          is disconnected on Ubuntu x86_64.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** The iio-emu is disabled and the device is disconnected as expected on Ubuntu 22.04.5 LTS. However, on Debian 12 arm64, 
+the device is not disconnected - due to iio-emu process not properly stopped.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -236,13 +243,13 @@ correctly (using adalm2000 device).
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: M2kPlugin (checked), ADCPlugin, DACPlugin, DataLoggerPlugin, 
           DebuggerPlugin, RegmapPlugin.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -252,7 +259,7 @@ correctly (using adalm2000 device).
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -284,13 +291,13 @@ correctly (using pluto device).
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: ADCPlugin (checked), DACPlugin (checked), DataLoggerPlugin 
           (checked), DebuggerPlugin (checked), RegmapPlugin (checked). 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -300,7 +307,7 @@ correctly (using pluto device).
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -332,13 +339,13 @@ correctly (using pqm device).
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: PQMPlugin (checked), ADCPlugin, DACPlugin, DataLoggerPlugin, 
           DebuggerPlugin.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -348,7 +355,7 @@ correctly (using pqm device).
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -379,13 +386,13 @@ correctly (using swiot_config device).
     6. Click on **Verify** button.
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: SWIOTPlugin (checked), DataLoggerPlugin, DebuggerPlugin.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -395,7 +402,7 @@ correctly (using swiot_config device).
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -427,13 +434,13 @@ correctly (using swiot_runtime device).
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: SWIOTPlugin (checked), ADCPlugin, DataLoggerPlugin, 
           DebuggerPlugin, RegmapPlugin.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -443,7 +450,7 @@ correctly (using swiot_runtime device).
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -474,13 +481,13 @@ correctly (using generic device).
     6. Click on **Verify** button.
         - **Expected result:** The message **"ip:127.0.0.1" not a valid 
           context!** is displayed. 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -490,7 +497,7 @@ correctly (using generic device).
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
