@@ -17,6 +17,11 @@ ADC Plugin - Test Suite
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
+       * - Septimiu Vana
+         - 17/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Windows
        * - Alexandra Trifan
          - 17/02/2025
          - v2.0.0-beta-rc2-a3a7c43
@@ -112,7 +117,7 @@ Test 1 - X-AXIS
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -163,7 +168,7 @@ Test 2 - Y-AXIS
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -207,7 +212,7 @@ Test 3 - XY PLOT
    3. Turn on Autoscale
        - **Expected result:** On the time plot, both channel curves should 
          look the same, but voltage0 should have a higher amplitude
-       - **Actual result:** voltage1 has higher amplitude as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -215,7 +220,7 @@ Test 3 - XY PLOT
 
    4. Set X Axis source to voltage0
        - **Expected result:** A small circular curve should appear on the XY plot
-       - **Actual result:** Circular curve appears on the XY plot.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -223,7 +228,7 @@ Test 3 - XY PLOT
 
    5. Set X Axis source to voltage1
        - **Expected result:** A larger circular curve should appear on the XY plot
-       - **Actual result:** A circular curve appears on the plot.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -231,24 +236,24 @@ Test 3 - XY PLOT
 
    6. Turn Plot X source on and off
        - **Expected result:** A line cutting the circle should be visible in a different color
-       - **Actual result:** As expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** TBD discuss these test cases.
+**Comments:**
 
 ..
   Any comments about the test goes here.
 
-**Result:** FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -294,7 +299,7 @@ Test 4 - Settings
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -331,14 +336,14 @@ Test 5 - Print
    4. Select a folder and save the file
        - **Expected result:** a new PDF file should appear within the folder containing 
          the last view of the plot
-       - **Actual result:** PDF file exported as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -371,14 +376,14 @@ Test 6 - Info
 **Steps:**
    1. Press the info button in the top left corner of the window
        - **Expected result:** this should open the ADC plugin documentation.
-       - **Actual result:** Browser opens doc page as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -412,7 +417,7 @@ Test 7 - Plot Navigation
    1. Scroll down and turn on plot labels in the settings panel
    2. Place mouse cursor within the plot and use the scroll wheel
        - **Expected result:** should zoom in/out on the area at the cursor, should not be able to zoom out more than the default view
-       - **Actual result:** Zoom behaviour as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -420,7 +425,7 @@ Test 7 - Plot Navigation
 
    3. Right-click the plot after zooming in
        - **Expected result:** should undo the zoom
-       - **Actual result:** Zoom behaviour as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -428,7 +433,7 @@ Test 7 - Plot Navigation
 
    4. Select an area on the plot using left-click
        - **Expected result:** should zoom in exactly on the selected area
-       - **Actual result:** Zoom behaviour as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -436,7 +441,7 @@ Test 7 - Plot Navigation
 
    5. Zoom in using the selection method, then hold left shift button and zoom using the scroll wheel
        - **Expected result:** should pan left and right
-       - **Actual result:** Pan behaviour as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -444,14 +449,14 @@ Test 7 - Plot Navigation
 
    6. Zoom in using all methods described above and press right-click until zoom is back to default
        - **Expected result:** should undo each zoom operation one by one
-       - **Actual result:** Undo behaviour as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -492,7 +497,7 @@ Test 8 - ADC-Time Channel Settings
 
    3. Turn autoscale off. Set YMode to ADC Counts, Min to -4000 and Max to 4000, and press single
        - **Expected result:** only voltage0 curve should vertically adjust
-       - **Actual result:** Only voltage0 is adjusted as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -500,7 +505,7 @@ Test 8 - ADC-Time Channel Settings
 
    4. Turn off Y-AXIS
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -537,7 +542,7 @@ and checking frequency and stats
        - **Expected result:** check frequency measure and stats in the horizontal measurements table, 
          middle measure and stats in the vertical measurements table. Frequency should be around 1MHz in 
          both panels, middle should be hovering around the 0 value in both panels
-       - **Actual result:** Measurements as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -546,7 +551,7 @@ and checking frequency and stats
    3. Open the Measure menu and show all Stats and Measurements
        - **Expected result:** all checkboxes in the measurement tables should be checked and each 
          should have a corresponding label above and below the plot
-       - **Actual result:** All measurements and stats as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -554,7 +559,7 @@ and checking frequency and stats
 
    4. Turn off measurements
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -592,7 +597,7 @@ tracking, and moving readouts
    4. Open the Cursors menu at the bottom of the window. Enable X and Enable Y
    5. Move the X cursors on the plot via the axis handles and place one on voltage0 sine high peak and the other on the next low peak
        - **Expected result:** delta x should be around 15 samples between voltage0 high peak and low peak
-       - **Actual result:** Delta X is around 15 samples.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -600,7 +605,7 @@ tracking, and moving readouts
 
    6. Lock X cursors via the Cursor menu. Move one cursor to a voltage1 high peak
        - **Expected result:** the second cursor should move and maintain the same delta. High peak to low peak should match in both voltage0 and voltage1
-       - **Actual result:** High and low peak difference matches both channels.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -608,7 +613,7 @@ tracking, and moving readouts
 
    7. Enable track and select voltage0
        - **Expected result:** markers should appear on the voltage0 curve synced with the X cursor. Values in cursor readouts should change accordingly
-       - **Actual result:** As expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -616,7 +621,7 @@ tracking, and moving readouts
 
    8. Select voltage1 channel
        - **Expected result:** markers and readouts should now be related to voltage1
-       - **Actual result:** As expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -624,7 +629,7 @@ tracking, and moving readouts
 
    9. Turn off track and measure voltage0 and voltage1 amplitudes
        - **Expected result:** for voltage0 delta y should be around 1.4kV and for voltage1 500V
-       - **Actual result:** 
+       - **Actual result:** Not as expected, the test case definition might be incorrect.
 
 ..
   Actual test result goes here.
@@ -632,14 +637,14 @@ tracking, and moving readouts
 
    10. Enable move readouts. Click and hold the readouts to move them
        - **Expected result:** should be able to move the readouts anywhere within the plot
-       - **Actual result:** Readouts moving as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -705,12 +710,13 @@ plotting in the ADC plugin
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
 
 **Comments:** There are some inconsistencies with the functionality of the ADC Frequency Instrument.
+Sometimes it fails and it resets the settings for XMin, XMax
 
 ..
   Any comments about the test goes here.
@@ -740,7 +746,7 @@ range settings
    1. Scroll down and turn on plot labels in the settings panel
    2. Turn on autoscale and press run
        - **Expected result:** Y-axis should automatically scale according to the channel curves
-       - **Actual result:** Y-axis scaled as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -756,7 +762,7 @@ range settings
 
    4. Set power offset to 20 dB and press single
        - **Expected result:** Curves should move 20 dB up
-       - **Actual result:** As expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -764,14 +770,14 @@ range settings
 
    5. Press run and change through all the window options and window correction
        - **Expected result:** The curves should change slightly in real time
-       - **Actual result:** Window changes are applied as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -821,14 +827,14 @@ and style
 
    3. Change thickness and style to all available modes and observe the changes
        - **Expected result:** Channel curves should adjust appearance as expected
-       - **Actual result:**  Style applied as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -862,14 +868,14 @@ Test 4 - Print plot
    2. Press the single button and then the print button
    3. Select a folder and save the file
        - **Expected result:** A new PDF file should appear in the folder containing the last view of the plot
-       - **Actual result:** PDF exported as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -902,14 +908,14 @@ Test 5 - View plugin documentation
 **Steps:**
    1. Press the info button in the top left corner of the window
        - **Expected result:** The ADC plugin documentation should open
-       - **Actual result:** Browser opens doc page as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -958,7 +964,7 @@ Test 6 - Y-Axis channel settings
 
    3. Turn off Y-Axis
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -993,7 +999,7 @@ Test 7 - Marker settings
    2. Press run and enable the marker
    3. Set marker type to peak and count to 5
        - **Expected result:** 5 markers should appear on voltage0's curve at the highest peaks
-       - **Actual result:** 5 markers appear as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -1001,7 +1007,7 @@ Test 7 - Marker settings
 
    4. Repeat the process with a count of 7
        - **Expected result:** 7 markers should appear on voltage0's curve at the highest peaks
-       - **Actual result:** 7 markers appear as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -1009,7 +1015,7 @@ Test 7 - Marker settings
 
    5. Check the table below the plot in peak mode
        - **Expected result:** The highest peak should be at 1 MHz
-       - **Actual result:** The highest peak is around 1MHz.
+       - **Actual result:** Shows 1 GHz instead of MHz
 
 ..
   Actual test result goes here.
@@ -1017,7 +1023,7 @@ Test 7 - Marker settings
 
    6. Set marker type to fixed and count to 5
        - **Expected result:** 5 movable cursors should appear
-       - **Actual result:** 5 movable markers appear as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -1025,14 +1031,14 @@ Test 7 - Marker settings
 
    7. Repeat for a count of 7
        - **Expected result:** 7 movable cursors should appear
-       - **Actual result:** 7 movable markers appear as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1110,17 +1116,17 @@ Test 8 - Cursor settings
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Missing TMode selector (or is it the one in preferences?). Measuring samples and not freq
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1150,7 +1156,7 @@ Test 1 - X Scale Position
 **Steps:**
    1. Change Plot X-Axis scale position to Top, restart app, open ADC-Time and enable plot labels in SETTINGS panel
        - **Expected result:** Axis labels should appear on top
-       - **Actual result:** Label appear on top on the ADC Time instrument.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -1158,7 +1164,7 @@ Test 1 - X Scale Position
 
    2. Do this again for Bottom option
        - **Expected result:** Axis labels should appear on the bottom
-       - **Actual result:** Label appear on bottom on the ADC Time instrument.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -1166,14 +1172,14 @@ Test 1 - X Scale Position
 
    3. Repeat for ADC-Frequency
        - **Expected result:** Same result for ADC-Frequency
-       - **Actual result:** Label position changes correctly on the ADC Frequency instrument.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64.
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1209,7 +1215,7 @@ position on the plot
 **Steps:**
    1. Change Plot Y-Axis scale position to Right, restart app, open ADC-Time and enable plot labels in SETTINGS panel
        - **Expected result:** Axis labels should appear on the right
-       - **Actual result:** Label appear on right on the ADC Time instrument.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -1217,7 +1223,7 @@ position on the plot
 
    2. Do this again for Left option
        - **Expected result:** Axis labels should appear on the left
-       - **Actual result:** Label appear on left on the ADC Time instrument.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -1225,14 +1231,14 @@ position on the plot
 
    3. Repeat for ADC-Frequency
        - **Expected result:** Same result for ADC-Frequency
-       - **Actual result:** Label position changes correctly on the ADC Frequency instrument.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1269,7 +1275,7 @@ Test 3 - Channel Handle Position
       ADC-Time, double click voltage0 to open channel settings and enable Y-AXIS
        
        - **Expected result:** Axis handle should appear on the right
-       - **Actual result:** Handle appears on the right.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -1277,7 +1283,7 @@ Test 3 - Channel Handle Position
 
    2. Do this again for Left option
        - **Expected result:** Axis handle should appear on the left
-       - **Actual result:** Handle appears on the left.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -1285,14 +1291,14 @@ Test 3 - Channel Handle Position
 
    3. Repeat for ADC-Frequency
        - **Expected result:** Same result for ADC-Frequency
-       - **Actual result:** Handle position changes correctly on the ADC Frequency instrument.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1327,7 +1333,7 @@ Test 4 - X Cursor Position
 **Steps:**
    1. Change Plot X-Cursor position to Top, restart app, open ADC-Time and enable x cursors
        - **Expected result:** X cursor handle should appear on top
-       - **Actual result:** Plot X Cursor handles appear on the bottom side.
+       - **Actual result:** X cursor handle appears on bottom
 
 ..
   Actual test result goes here.
@@ -1335,7 +1341,7 @@ Test 4 - X Cursor Position
 
    2. Do this again for Bottom option
        - **Expected result:** X cursor handle should appear on the bottom
-       - **Actual result:** Plot X Cursor handles appear on the bottom side.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -1343,14 +1349,14 @@ Test 4 - X Cursor Position
 
    3. Repeat for ADC-Frequency
        - **Expected result:** Same result for ADC-Frequency
-       - **Actual result:** Plot X Cursor handles always appear on the bottom side.
+       - **Actual result:** X cursor handle appears on bottom when set to top
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1386,7 +1392,7 @@ Test 5 - Y Cursor Position
 **Steps:**
    1. Change Plot Y-Cursor position to Right, restart app, open ADC-Time and enable y cursors
        - **Expected result:** Y cursor handle should appear on the right
-       - **Actual result:** Y cursors handles appear on the right side.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -1394,7 +1400,7 @@ Test 5 - Y Cursor Position
 
    2. Do this again for Left option
        - **Expected result:** Y cursor handle should appear on the left
-       - **Actual result:** Y cursors handles appear on the right side.
+       - **Actual result:** Y cursor still on right
 
 ..
   Actual test result goes here.
@@ -1402,14 +1408,14 @@ Test 5 - Y Cursor Position
 
    3. Repeat for ADC-Frequency
        - **Expected result:** Same result for ADC-Frequency
-       - **Actual result:** Y cursors handles always appear on the right side.
+       - **Actual result:** Y cursor always on right
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1460,7 +1466,7 @@ Test 6 - Show Buffer
 ..
 
 
-**Tested OS:**
+**Tested OS:** Windows
 
 ..
   Details about the tested OS goes here.
@@ -1496,14 +1502,14 @@ Test 7 - Default YMode
 **Steps:**
    1. Set YMode to % Full scale, restart app, open ADC-Time
        - **Expected result:** In Y-AXIS, YMODE should be % Full scale
-       - **Actual result:** YMODE is not consistently set to % Full scale.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1514,7 +1520,7 @@ default value in channel settings is set to **%Full Scale** as the test expects.
 ..
   Any comments about the test goes here.
 
-**Result:** FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).

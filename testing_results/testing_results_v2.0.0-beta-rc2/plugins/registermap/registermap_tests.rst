@@ -24,6 +24,11 @@ Prerequisites:
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
+       * - Septimiu Vana
+         - 18/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Windows
        * - Alexandra Trifan
          - 19/02/2025
          - v2.0.0-beta-rc2-a3a7c43
@@ -78,14 +83,14 @@ Test 1 : Read
     2. Select a register address "0x2" using address picker
     3. Press **Read** button
         - **Expected result:** The value "0x02" is displayed in the **Value** field 
-        - **Actual result:** Value 0x02 is displayed in the Value field
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -124,13 +129,13 @@ Test 2 : Write
     3. Read current value of the register
     4. Change the value to 0x4a
         - **Expected result:** The value "0x4a" is displayed in the **Value** field
-        - **Actual result:** Value changed and remained 0x4a after reading it again.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -169,13 +174,13 @@ Test 3 : Write wrong value
     3. Read current value of the register
     4. Change the value to 0xtest
         - **Expected result:** The value "0x00" is displayed in the **Value** field 
-        - **Actual result:** Invalid value is handled correctly.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -213,13 +218,13 @@ Test 4 : Change device
        ad9361-phy to cf-ad9361-lpc
 
         - **Expected result:** The device is changed reflected by changing the register table 
-        - **Actual result:** Register map table is updated with the new device
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -258,13 +263,13 @@ Test 5 : Show register map table
 **Steps:**
     1. Open Register Map plugin
         - **Expected result:** The register map table is displayed in the plugin
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -308,7 +313,7 @@ Test 6 : Search register
           table each of them has "test" in the name or 
           description of the register or bitfields
 
-        - **Actual result:** 4 registers visible in the table.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -320,7 +325,7 @@ Test 6 : Search register
           rest have "010" in the name or description of the 
           register or bitfields
 
-        - **Actual result:** 3 registers visible in the table.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -328,7 +333,7 @@ Test 6 : Search register
 
     6. Input "not in here" in the search field
         - **Expected result:** No register is displayed in the table
-        - **Actual result:** No register visible as expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -336,13 +341,13 @@ Test 6 : Search register
 
     7. Clear the search field
         - **Expected result:** All registers are displayed in the table.
-        - **Actual result:** All registers visible as expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -382,13 +387,13 @@ Test 7 : Simple Register value updated on read
     2. Select a register address "0x2" using address picker
     3. Press **Read** button
         - **Expected result:** The value in the table is updated to the new value.
-        - **Actual result:** Values in the register table are updated as expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -430,14 +435,14 @@ Test 8 : Simple Register value updated on write
     4. Change the value to 0x4a
     5. Press **Write** button
         - **Expected result:** The value in the table is updated to the new value
-        - **Actual result:** Values in the register table are updated as expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -476,14 +481,14 @@ Test 9 : Detailed Register value updated on read
     2. Select a register address "0x2" using address picker
     3. Press **Read** button
         - **Expected result:** The detailed register bitfields value is updated to the new value
-        - **Actual result:** Bitfield updated as expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -524,13 +529,13 @@ Test 10 : Detailed Register value updated on write
     4. Change the value to 0x4a
     5. Press **Write** button
         - **Expected result:** The detailed register bitfields value is updated to the new value
-        - **Actual result:** Bitfield updated as expected when changing the value.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -571,7 +576,7 @@ Test 11 : Change value of the bitfield inside the detailed register
     2. Select a register address "0x2" using address picker
     3. Change the value of "reg002_b3" bitfield from on to off
         - **Expected result:** The **Value** field is updated to the "0x44" value
-        - **Actual result:** Value updated as expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -579,13 +584,13 @@ Test 11 : Change value of the bitfield inside the detailed register
 
     4. Press **Write** button
         - **Expected result:** The register value is updated to "0x44" 
-        - **Actual result:** Value updated as expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -625,13 +630,13 @@ Test 12 : Change **Value** field updates detailed register bitfields
     2. Select a register address "0x2" using address picker
     3. Change the value of the **Value** field to "0x44"
         - **Expected result:** The detailed bitfield "reg002_b3" value is changed from on to off
-        - **Actual result:** Bitfield updated as expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -670,7 +675,7 @@ Test 13 : Change selected register
     1. Open Register Map plugin
     2. Select a register address "0x20" using address picker
         - **Expected result:** The register "0x20" is displayed in the table and selected 
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -678,7 +683,7 @@ Test 13 : Change selected register
 
     3. Using + button from address picker change the register to "0x21"
         - **Expected result:** The register "0x21" is displayed in the table and selected
-        - **Actual result:** Register 0x21 is now visible in the table.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -686,7 +691,7 @@ Test 13 : Change selected register
 
     4. Using - button from address picker change the register to "0x20"
         - **Expected result:** The register "0x20" is displayed in the table and selected
-        - **Actual result:** Register 0x20 is now visible in the table.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -694,13 +699,13 @@ Test 13 : Change selected register
 
     5. Click on the register "0x21" in the table
         - **Expected result:** The register "0x21" in the table is selected value from address picker is updated to "0x21"
-        - **Actual result:** Register 0x21 is now selected in the table.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -738,7 +743,7 @@ Test 14 : Toggle detailed register visible
     1. Open Register Map plugin
     2. Press **Toggle detailed register** button
         - **Expected result:** The detailed register is hidden
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -746,13 +751,13 @@ Test 14 : Toggle detailed register visible
 
     3. Press **Toggle detailed register** button
         - **Expected result:** The detailed register is visible
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -793,13 +798,13 @@ Test 15 : Settings autoread
     3. Check **Autoread** checkbox
     4. Select a register address "0x02" using address picker
         - **Expected result:** The value is updated to the read value
-        - **Actual result:** The value is automatically read when the register is selected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -841,18 +846,18 @@ Test 16 : Settings read interval
     4. Input "4" in the "To register" field
     5. Press **Read interval** button
         - **Expected result:** registers "0x02", "0x03" and "0x04" now have their values read   
-        - **Actual result:** Interval read works as expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Would increase the range, easier to observe if more values are updated
 
 ..
   Any comments about the test goes here.
@@ -889,13 +894,13 @@ Test 17 : Settings read interval with wrong interval
     4. Input "2" in the "To register" field
     5. Press **Read interval** button
         - **Expected result:** Nothing happens
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -936,7 +941,7 @@ Test 18 : Settings register dump
     4. Press **Find path** button
     5. Select a ".csv" file to save the register dump
         - **Expected result:** file path is displayed in the **File path** field
-        - **Actual result:** File path is displayed as expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -947,13 +952,13 @@ Test 18 : Settings register dump
           in the selected file with the structure of each row 
           containing register address and register value
 
-        - **Actual result:** The data is saved into the file.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
   
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -999,7 +1004,7 @@ Test 19 : Settings write values
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1037,7 +1042,7 @@ Test 20 : Settings Dump regisr and write values disabled
     2. Press **Settings** button
     3. Press **Register dump** button
         - **Expected result:** The button is disabled
-        - **Actual result:** Button is disabled
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -1045,7 +1050,7 @@ Test 20 : Settings Dump regisr and write values disabled
 
     4. Press **Write values** button
         - **Expected result:** The button is disabled
-        - **Actual result:** Button is disabled
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -1053,13 +1058,13 @@ Test 20 : Settings Dump regisr and write values disabled
 
     5. Use **Find path** button to select a file
         - **Expected result:** The **Write values** and **Register dump** buttons are enabled
-        - **Actual result:** Buttons are enabled
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1107,13 +1112,13 @@ Tests 21 : Preferences color coding background color
         - **Expected result:** 
             - The background color of the register is changed to reflect the value of the register 
             - The background color of the bitfields is changed to reflect the value of the bitfield
-        - **Actual result:** Registers and bitfields are colored as expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1160,13 +1165,13 @@ Test 22 : Preferences color coding text color
         - **Expected result:** 
             - The text color of the register is changed to reflect the value of the register 
             - The text color of the bitfields is changed to reflect the value of the bitfield
-        - **Actual result:** Register and bitfield text is colored as expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1214,13 +1219,13 @@ Test 23 : Preferences color for value
     9. Write value "0x6f" to the register
     10. Press **Read** button
         - **Expected result:** The bitfields that have the same value will have the text value same color 
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1266,13 +1271,13 @@ Test 24 : Preferences color coding dynamic change
        background**
     7. Open Register Map plugin
         - **Expected result:** The background color of the register is changed to reflect the value of the register
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1320,13 +1325,13 @@ Test 25 : Preference settings save on close
     8. Select register with address "0x2"
     9. Press **Read** button
         - **Expected result:** The background color of the register is changed to reflect the value of the register
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1364,13 +1369,13 @@ Test 26 : Info button documentation
     2. Press **i** button
     3. Press **Documentation** button
         - **Expected result:** An internet browser is opened with the documentation for the register
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1407,13 +1412,13 @@ Test 27 : Info button tutorial
     2. Press **i** button
     3. Press **Tutorial** button
         - **Expected result:** A tutorial explaining how to use the plugin is displayed 
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1452,13 +1457,13 @@ Test 28 : Info button tutorial no XML
           plugin is displayed and does not include explanation of 
           the register map table
 
-        - **Actual result:** Tutorial limited, as expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -1563,7 +1568,7 @@ Test 29 : Custom XML file
     4. Open Register Map plugin
     5. Select device "ad9963"
         - **Expected result:** The register map has no table displayed
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -1581,13 +1586,13 @@ Test 29 : Custom XML file
             - The register map table is displayed and contains only the registers from the custom XML file
             - The detailed register is displayed and contains the data from the custom XML file
 
-         - **Actual result:**  XML loaded as expected when ad9963 is selected in the Register Map.
+         - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
