@@ -9,6 +9,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: '0'
+
     - name: Pull the Docker Image
       run: docker pull cristianbindea/scopy2-mingw64:latest
       

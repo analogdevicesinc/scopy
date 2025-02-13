@@ -15,6 +15,7 @@ jobs:
         - uses: actions/checkout@v4
           with:
                 set-safe-directory: 'true'
+                fetch-depth: '0'
 
         - name: Pull the Docker Image
           run: docker pull cristianbindea/scopy2-arm64-appimage:latest
