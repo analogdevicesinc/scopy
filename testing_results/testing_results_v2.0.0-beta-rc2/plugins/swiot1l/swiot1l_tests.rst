@@ -24,11 +24,11 @@ If the test case has special requirements, they will be listed in the test case 
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Andrei-Fabian Pop
+         - 12.02.2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - None
 
 Setup environment
 ------------------
@@ -111,23 +111,23 @@ with the selected device and that the plugin is able to correctly parse it.
         - **Expected Result**:
             - The plugin is able to connect to the device.
             - The Config instrument shows 4 disabled channels.
-        - **Actual result:**
+        - **Actual result:** The emulator is not found. If the emulator works, this test is a success.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Linux-arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** The iio-emu is not found. Issue #1904 opened.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -156,7 +156,7 @@ to switch between Config and Runtime modes.
               automatically.
             - Upon reconnection, the Config instrument is replaced 
               by 3 instruments: AD74413R, MAX14906, and Faults.
-        - **Actual result:**
+        - **Actual result:** The expected result.
 
 ..
   Actual test result goes here.
@@ -169,7 +169,7 @@ to switch between Config and Runtime modes.
               automatically.
             - The AD74413R, MAX14906 and Faults instruments are replaced 
               by the Config instrument.
-        - **Actual result:**
+        - **Actual result:** The expected result.
 
 ..
   Actual test result goes here.
@@ -182,7 +182,7 @@ to switch between Config and Runtime modes.
               automatically.
             - Upon reconnection, the Config instrument is replaced 
               by 3 instruments: AD74413R, MAX14906, and Faults.
-        - **Actual result:**
+        - **Actual result:** The expected result.
 
 ..
   Actual test result goes here.
@@ -195,7 +195,7 @@ to switch between Config and Runtime modes.
               automatically.
             - The AD74413R, MAX14906 and Faults instruments are replaced 
               by the Config instrument.
-        - **Actual result:**
+        - **Actual result:** The expected result.
 
 ..
   Actual test result goes here.
@@ -209,7 +209,7 @@ to switch between Config and Runtime modes.
             - Upon reconnection, the Config instrument is replaced 
               by 3 instruments: AD74413R, MAX14906, and Faults.
 
-         - **Actual result:**
+         - **Actual result:** The expected result.
 
 ..
   Actual test result goes here.
@@ -222,13 +222,13 @@ to switch between Config and Runtime modes.
             - The AD74413R, MAX14906 and Faults instruments are replaced 
               by the Config instrument.
 
-         - **Actual result:**
+         - **Actual result:** The expected result.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -238,7 +238,7 @@ to switch between Config and Runtime modes.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -264,7 +264,7 @@ is able to configure the device correctly.
         - **Expected Result**:
             - Their respective dropdowns for device and function are 
               accessible and not greyed out anymore.
-        - **Actual result:**
+        - **Actual result:** The expected result.
 
 ..
   Actual test result goes here.
@@ -281,7 +281,7 @@ is able to configure the device correctly.
               automatically.
             - Upon reconnection, the Config instrument is replaced 
               by 3 instruments: AD74413R, MAX14906, and Faults.
-        - **Actual result:**
+        - **Actual result:** The expected result.
 
 ..
   Actual test result goes here.
@@ -293,7 +293,7 @@ is able to configure the device correctly.
         - **Expected Result**:
             - There are 6 channels available in the channel manager:
               4 diagnostic channels, **voltage_out 1** and **voltage_in 2**.
-        - **Actual result:**
+        - **Actual result:** The expected result.
 
 ..
   Actual test result goes here.
@@ -303,14 +303,14 @@ is able to configure the device correctly.
         - **Expected result:** There are 2 channels available in the 
           channel manager **voltage 2** as INPUT and **voltage 3** as 
           OUTPUT.
-        - **Actual result:**
+        - **Actual result:** The expected result.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -320,7 +320,7 @@ is able to configure the device correctly.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -349,7 +349,7 @@ plot changes such as labels and timestamp are correctly modified.
             - The labels are displayed on the right side of the plot.
             - The X axis of the plot shows a 4s timespan, 
               using the -4 to 0 range.
-        - **Actual result:**
+        - **Actual result:** The expected result.
 
 ..
   Actual test result goes here.
@@ -359,7 +359,7 @@ plot changes such as labels and timestamp are correctly modified.
         - **Expected Result**:
             - The voltage_out 1 data is displayed on the plot 
               from the right to the left side.
-        - **Actual result:**
+        - **Actual result:** The expected result.
 
 ..
   Actual test result goes here.
@@ -370,23 +370,23 @@ plot changes such as labels and timestamp are correctly modified.
             - The measurements are displayed above the plot
               and the instant value for the first channel is
               around 0A.
-        - **Actual result:**
+        - **Actual result:** The measurements are not visible, instead they are jumbled in the top left corner.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Linux-arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Failed at step 4. Issue #1905 opened.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -420,7 +420,7 @@ displayed on the plot and measured by the instrument.
             - On the top right on the plot the status message 
               displays: a number of samples at **1.2ksps**.
         
-        - **Actual result:**
+        - **Actual result:** The expected result.
 
 ..
   Actual test result goes here.
@@ -429,7 +429,7 @@ displayed on the plot and measured by the instrument.
     5. Set YMin to -1A and YMax to 10A.
         - **Expected result:** 
             - The plot Y axis is scaled between -5A and 5A.
-        - **Actual result:**
+        - **Actual result:** Fail, the test is wrong, but the program is working as intended (by the law).
 
 ..
   Actual test result goes here.
@@ -444,7 +444,7 @@ displayed on the plot and measured by the instrument.
             - The value is automatically changed to 8191.
             - Below the field the value 10.9V is displayed.
         
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -453,7 +453,7 @@ displayed on the plot and measured by the instrument.
     8. Run a Single capture and check the measurements:
         - **Expected result:** 
             - The instant value of **voltage_in 2** shows 10V.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -462,7 +462,7 @@ displayed on the plot and measured by the instrument.
     9. Run a Continuous capture and check the measurements:
         - **Expected result:** 
             - The instant value of **voltage_in 2** shows 10V.
-        - **Actual result:**
+        - **Actual result:** Works as expected
 
 ..
   Actual test result goes here.
@@ -475,7 +475,7 @@ displayed on the plot and measured by the instrument.
               dropping from the previous value to 5.5V.
             - The same value is displayed in the instant value 
               measurement.
-         - **Actual result:**
+         - **Actual result:** Works as expected
 
 ..
   Actual test result goes here.
@@ -489,24 +489,24 @@ displayed on the plot and measured by the instrument.
               dropping to 0V.
             - The same value is displayed in the instant value 
               measurement.
-         - **Actual result:**
+         - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Linux-arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** The test should be a success, but step 5 is wrong, so it fails. No issue was created, but the tests will be changed.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -541,7 +541,7 @@ displayed on the instrument.
         - **Expected result:** 
             - The instant value of **diagnostic 5** shows around 10V,
               the same as **voltage_in 2**.
-        - **Actual result:**
+        - **Actual result:** The diag 5 is around 11, not 10, it fails
 
 ..
   Actual test result goes here.
@@ -551,7 +551,7 @@ displayed on the instrument.
         - **Expected result:** 
             - Both the **diagnostic 5** and **voltage_in 2** signals 
               are dropping from the previous value to 5.5V.
-        - **Actual result:**
+        - **Actual result:** Correct.
 
 ..
   Actual test result goes here.
@@ -561,24 +561,24 @@ displayed on the instrument.
         - **Expected result:** 
             - Both the **diagnostic 5** and **voltage_in 2** signals 
               are dropping from the previous value to around 2.7V.
-        - **Actual result:**
+        - **Actual result:** Correct
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Linux-arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Test 6 fails
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -608,7 +608,7 @@ the number of enabled channels.
             - The status message on the top right of the plot 
               displays a number of samples at **800 sps**.
         
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -618,14 +618,14 @@ the number of enabled channels.
         - **Expected result:** 
             - The status message on the top right of the plot 
               displays a number of samples at **1.2 ksps**. 
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -635,7 +635,7 @@ the number of enabled channels.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -662,7 +662,7 @@ and the documentation is accessible.
         - **Expected result:** 
             - A pop up with 2 options (Tutorial and Documentation) 
               is displayed.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -671,7 +671,7 @@ and the documentation is accessible.
     3. Click the **Documentation** button.
         - **Expected result:** 
             - The AD74413R documentation is opened in a browser.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -683,7 +683,7 @@ and the documentation is accessible.
             - The AD74413R tutorial starts, guiding the user 
               through the instrument's features and providing 
               a button to Exit the tutorial.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -694,7 +694,7 @@ and the documentation is accessible.
             - The tutorial continues with the next step, always
               greying out the background and highlighting only 
               the explained item.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -704,14 +704,14 @@ and the documentation is accessible.
         - **Expected result:** 
             - The tutorial is closed and the user is returned 
               to the instrument.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -721,7 +721,7 @@ and the documentation is accessible.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -747,7 +747,7 @@ time span can be correctly modified.
         - **Expected result:** 
             - The X axis of the plots shows a 10s timespan, 
               using the 0 to 10 range.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -757,14 +757,14 @@ time span can be correctly modified.
         - **Expected result:** 
             - The X axis of the plots shows a 1s timespan, 
               using the 0 to 1 range.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -774,7 +774,7 @@ time span can be correctly modified.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -803,7 +803,7 @@ displayed on the plot and measured by the instrument.
         - **Expected result:** 
             - The plot trace rises from 0 to 1 for 
               both channels.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -813,14 +813,14 @@ displayed on the plot and measured by the instrument.
         - **Expected result:** 
             - The plot trace drops from 1 to 0 for 
               both channels.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
     
-**Tested OS:**
+**Tested OS:** Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -830,7 +830,7 @@ displayed on the plot and measured by the instrument.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -857,7 +857,7 @@ and the documentation is accessible.
         - **Expected result:** 
             - A pop up with 2 options (Tutorial and Documentation) 
               is displayed.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -866,7 +866,7 @@ and the documentation is accessible.
     3. Click the **Documentation** button.
         - **Expected result:** 
             - The MAX14906 documentation is opened in a browser.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -878,7 +878,7 @@ and the documentation is accessible.
             - The MAX14906 tutorial starts, guiding the user 
               through the instrument's features and providing 
               a button to Exit the tutorial.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -889,7 +889,7 @@ and the documentation is accessible.
             - The tutorial continues with the next step, always
               greying out the background and highlighting only 
               the explained item.
-        - **Actual result:**
+        - **Actual result:** Works, but the second tutorial step only displays a part of the text.
 
 ..
   Actual test result goes here.
@@ -899,14 +899,14 @@ and the documentation is accessible.
         - **Expected result:** 
             - The tutorial is closed and the user is returned 
               to the instrument.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -916,7 +916,7 @@ and the documentation is accessible.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -943,7 +943,7 @@ can poll faults values for both devices.
     2. Open the Faults instrument and run a **Single** capture.
         - **Expected result:** 
             - Bit 10 is enabled on the AD74413R device.
-        - **Actual result:**
+        - **Actual result:** Works as expected
 
 ..
   Actual test result goes here.
@@ -953,7 +953,7 @@ can poll faults values for both devices.
         - **Expected result:** 
             - The section below the leds only displays the 
               fault explanation for the selected bit.
-        - **Actual result:**
+        - **Actual result:** Works as expected
 
 ..
   Actual test result goes here.
@@ -962,14 +962,14 @@ can poll faults values for both devices.
     4. Turn **Faults explanation** off:
         - **Expected result:** 
             - The section below the leds is hidden.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -979,7 +979,7 @@ can poll faults values for both devices.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1009,7 +1009,7 @@ can reset the polled values after a capture.
         - **Expected result:** 
             - Bit 10 is not selected and the Faults explanation
               display all the text greyed out.
-        - **Actual result:**
+        - **Actual result:** Works as expected
 
 ..
   Actual test result goes here.
@@ -1018,14 +1018,14 @@ can reset the polled values after a capture.
     5. Run a **Reset stored** capture.
         - **Expected result:** 
             - Both the leds for Bit 10 are turned off.
-        - **Actual result:**
+        - **Actual result:** Works as expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1035,7 +1035,7 @@ can reset the polled values after a capture.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1061,7 +1061,7 @@ can poll faults values for both devices in continuous mode.
     2. Open the Faults instrument and run a **Continuous**  capture.
         - **Expected result:** 
             - Bit 10 is enabled on the AD74413R device.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1071,7 +1071,7 @@ can poll faults values for both devices in continuous mode.
         - **Expected result:** 
             - The **STORED** LED is turned off until the next
               polled value turns it on again.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1079,7 +1079,7 @@ can poll faults values for both devices in continuous mode.
 
     4. Stop the Faults instrument.
 
-**Tested OS:**
+**Tested OS:** Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1089,7 +1089,7 @@ can poll faults values for both devices in continuous mode.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1116,7 +1116,7 @@ and the documentation is accessible.
         - **Expected result:** 
             - A pop up with 2 options (Tutorial and Documentation) 
               is displayed.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1125,7 +1125,7 @@ and the documentation is accessible.
     3. Click the **Documentation** button.
         - **Expected result:** 
             - The Faults documentation is opened in a browser.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1137,7 +1137,7 @@ and the documentation is accessible.
             - The Faults tutorial starts, guiding the user 
               through the instrument's features and providing 
               a button to Exit the tutorial.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1148,7 +1148,7 @@ and the documentation is accessible.
             - The tutorial continues with the next step, always
               greying out the background and highlighting only 
               the explained item.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1158,14 +1158,14 @@ and the documentation is accessible.
         - **Expected result:** 
             - The tutorial is closed and the user is returned 
               to the instrument.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1204,7 +1204,7 @@ power supply switch is turned off.
             - A status bar is displayed at the bottom of the instrument
               with a warning message that the system is not running at 
               full capacity due to not being powered by the external supply.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1213,14 +1213,14 @@ power supply switch is turned off.
     3. Turn on the external power supply switch on the SWIOT device.
         - **Expected result:** 
             - The status bar is not displayed.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Linux-arm64
 
 ..
   Details about the tested OS goes here.
