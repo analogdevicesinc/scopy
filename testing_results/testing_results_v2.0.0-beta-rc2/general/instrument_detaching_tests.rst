@@ -11,10 +11,10 @@ Instrument Detaching - Test Suite
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
+       * - Alexandra Trifan
+         - 14/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
          - 
 
 General Description:
@@ -47,7 +47,7 @@ Test 1: Detach and reattach an instrument
         1. Click on the connected Pluto device and connect to it. Select the 'ADC - Time' plugin.
         2. Double click the 'ADC - Time' tool name from the tool menu.
                 - **Expected Result:** The 'ADC - Time' instrument should be detached from the main window. The title bar of the detached window should include the name of the detached instrument.
-                - **Actual result:**
+                - **Actual result:** Instrument is detached as expected.
 
 ..
   Actual test result goes here.
@@ -55,7 +55,7 @@ Test 1: Detach and reattach an instrument
 
         3. Click the square button from the tool menu to start the ADC data aquisition.
                 - **Expected Result:** The ADC should start acquiring data. The data should be displayed in the detached window.
-                - **Actual result:**
+                - **Actual result:** The ADC data aquisition is started and the data is displayed in the detached window.
 
 ..
   Actual test result goes here.
@@ -63,13 +63,13 @@ Test 1: Detach and reattach an instrument
 
         4. Click the X button from the detached window title bar.
                 - **Expected Result:** The 'ADC - Time' instrument should be reattached to the main window. The 'ADC - Time' instrument should be the one currently selected.
-                - **Actual result:**
+                - **Actual result:** Instrument is reattached as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS
 
 ..
   Details about the tested OS goes here.
@@ -79,7 +79,7 @@ Test 1: Detach and reattach an instrument
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
