@@ -10,9 +10,14 @@ General Description: Debugger preferences are settings that control the behavior
 
        * - Tester
          - Test Date
-         - Scopy version
-         - Plugin version (N/A if not applicable)
+         - Scopy version (N/A if not applicable)
+         - Plugin version
          - Comments
+       * - Septimiu Vana
+         - 19/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Windows
        * - Alexandra Trifan
          - 18/02/2025
          - v2.0.0-beta-rc2-a3a7c43
@@ -43,7 +48,7 @@ Test 1: Control debugger version
 **Steps**:
         1. Click on the connected Pluto device and connect to it. Select the Debugger plugin. By default, the IIO Explorer (Debugger v2) should be displayed.
                 - **Expected Result:** The IIO Explorer (Debugger v2) should be displayed. If you notice the navigation bar with devices and attributes on the left side, the IIO Explorer is displayed.
-                - **Actual result:** As expected.
+                - **Actual result:** As expected
 
 ..
         Actual test result goes here.
@@ -51,7 +56,7 @@ Test 1: Control debugger version
 
         2. Go to the Preferences page (lower left corner, above the Analog Devices logo and the About button). From there, select the Debugger Plugin from the right-hand side menu. Uncheck the "Use debugger V2 plugin" option.
                 - **Expected Result:** A 'Restart' button should appear at the bottom of the preferences page. Click on the 'Restart' button. Scopy should restart.
-                - **Actual result:** Scopy restarted as expected.
+                - **Actual result:** As expected
 
 ..
         Actual test result goes here.
@@ -59,7 +64,7 @@ Test 1: Control debugger version
 
         3. Click on the connected Pluto device and connect to it. Select the Debugger plugin.
                 - **Expected Result:** The Debugger v1 plugin should be displayed. If you notice 2 sections, 'DEVICE SELECTION' and 'REGISTER MAP SETTINGS', the Debugger v1 plugin is displayed.
-                - **Actual result:** Debugger v1 is displayed as expected.
+                - **Actual result:** As expected
 
 ..
         Actual test result goes here.
@@ -67,7 +72,7 @@ Test 1: Control debugger version
 
         4. Repeat step 2, but this time check the "Use debugger V2 plugin" option.
                 - **Expected Result:** A 'Restart' button should appear at the bottom of the preferences page. Click on the 'Restart' button. Scopy should restart.
-                - **Actual result:** As expected.
+                - **Actual result:** As expected
 
 ..
         Actual test result goes here.
@@ -75,13 +80,13 @@ Test 1: Control debugger version
 
         5. Click on the connected Pluto device and connect to it. Select the Debugger plugin.
                 - **Expected Result:** The IIO Explorer (Debugger v2) should be displayed. If you notice the navigation bar with devices and attributes on the left side, the IIO Explorer is displayed.
-                - **Actual result:** As expected.
+                - **Actual result:** As expected
 
 ..
         Actual test result goes here.
 ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
@@ -116,7 +121,7 @@ Test 2: Include debug attributes in IIO Explorer
         2. Go to the Preferences page (lower left corner, above the Analog Devices logo and the About button). From there, select the Debugger Plugin from the right-hand side menu. Check the "Include debug attributes in IIO Explorer" option. (if it is checked, leave it as it is)
         3. Go back to the Debugger plugin and notice the navigation bar on the left side. Double click on ad9361-phy and scroll down a bit.
                 - **Expected Result:** Among the final device attributes of the ad9361-phy device, you should see the debug attributes. They should start with the 'adi,' prefix.
-                - **Actual result:** As expected.
+                - **Actual result:** As expected
 
 ..
         Actual test result goes here.
@@ -134,7 +139,7 @@ Test 2: Include debug attributes in IIO Explorer
 ..
 
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows
 
 ..
   Details about the tested OS goes here.
