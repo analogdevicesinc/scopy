@@ -45,17 +45,17 @@ private:
 public:
 	typedef std::shared_ptr<frequency_compensation_filter> sptr;
 	frequency_compensation_filter_impl(bool enable, float TC, float gain, float sample_rate);
-	int work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items);
+	int work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) override;
 
-	void set_enable(bool en, int gain_mode);
+	void set_enable(bool en, int gain_mode) override;
 	bool get_enable(int gain_mode) override;
-	void set_TC(float TC, int gain_mode);
+	void set_TC(float TC, int gain_mode) override;
 	float get_TC(int gain_mode) override;
-	void set_filter_gain(float gain, int gain_mode);
+	void set_filter_gain(float gain, int gain_mode) override;
 	float get_filter_gain(int gain_mode) override;
-	void set_sample_rate(float sample_rate);
+	void set_sample_rate(float sample_rate) override;
 	bool get_high_gain() override;
-	void set_high_gain(bool en);
+	void set_high_gain(bool en) override;
 };
 } // namespace scopy
 #endif

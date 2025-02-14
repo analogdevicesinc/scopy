@@ -137,14 +137,14 @@ public:
 	void setResolutionBW(double values);
 	void enableYaxisLabels();
 	void enableXaxisLabels();
-	QString formatXValue(double value, int precision) const;
+	QString formatXValue(double value, int precision) const override;
 
 	void setBtmHorAxisUnit(const QString &unit);
 	void setLeftVertAxisUnit(const QString &unit);
-	QString formatYValue(double value, int precision) const;
+	QString formatYValue(double value, int precision) const override;
 	void updateHandleAreaPadding();
 
-	bool eventFilter(QObject *, QEvent *);
+	bool eventFilter(QObject *, QEvent *) override;
 	void setupReadouts();
 	void updateCursorsData();
 
@@ -161,15 +161,15 @@ public Q_SLOTS:
 	void enableLegend();
 	void enableLegend(bool en);
 	void setNumRows(int nrows);
-	void customEvent(QEvent *e);
+	void customEvent(QEvent *e) override;
 	void enableChannel(int id);
 	void resetAvgAcquisitionTime();
 
 private Q_SLOTS:
-	void onHCursor1Moved(double value);
-	void onHCursor2Moved(double value);
-	void onVCursor1Moved(double value);
-	void onVCursor2Moved(double value);
+	void onHCursor1Moved(double value) override;
+	void onHCursor2Moved(double value) override;
+	void onVCursor1Moved(double value) override;
+	void onVCursor2Moved(double value) override;
 
 Q_SIGNALS:
 	void updatedLowerIntensityLevel(const double);
