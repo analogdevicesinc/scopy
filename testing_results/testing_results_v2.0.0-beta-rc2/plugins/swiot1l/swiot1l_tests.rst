@@ -117,12 +117,12 @@ with the selected device and that the plugin is able to correctly parse it.
   Actual test result goes here.
 ..
 
-**Tested OS:** Linux-arm64
+**Tested OS:** Linux-arm64, Windows 10
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** The iio-emu is not found. Issue #1904 opened.
+**Comments:** The iio-emu is not found for Linux-arm64. Issue #1904 opened. On Windows it works.
 
 ..
   Any comments about the test goes here.
@@ -228,7 +228,7 @@ to switch between Config and Runtime modes.
   Actual test result goes here.
 ..
 
-**Tested OS:** Linux-arm64
+**Tested OS:** Linux-arm64, Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -310,7 +310,7 @@ is able to configure the device correctly.
 ..
 
 
-**Tested OS:** Linux-arm64
+**Tested OS:** Linux-arm64, Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -370,18 +370,18 @@ plot changes such as labels and timestamp are correctly modified.
             - The measurements are displayed above the plot
               and the instant value for the first channel is
               around 0A.
-        - **Actual result:** The measurements are not visible, instead they are jumbled in the top left corner.
+        - **Actual result:** The measurements are not visible, instead they are jumbled in the top left corner. (on arm64)
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Linux-arm64
+**Tested OS:** Linux-arm64, Windows 10
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Failed at step 4. Issue #1905 opened.
+**Comments:** Failed at step 4, arm64. Issue #1905 opened.
 
 ..
   Any comments about the test goes here.
@@ -496,7 +496,7 @@ displayed on the plot and measured by the instrument.
 ..
 
 
-**Tested OS:** Linux-arm64
+**Tested OS:** Linux-arm64, Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -541,7 +541,7 @@ displayed on the instrument.
         - **Expected result:** 
             - The instant value of **diagnostic 5** shows around 10V,
               the same as **voltage_in 2**.
-        - **Actual result:** The diag 5 is around 11, not 10, it fails
+        - **Actual result:** The diag 5 is around 11, not 10, it fails, on ARM64 and Windows 10
 
 ..
   Actual test result goes here.
@@ -568,12 +568,12 @@ displayed on the instrument.
 ..
 
 
-**Tested OS:** Linux-arm64
+**Tested OS:** Linux-arm64, Windows 10
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Test 6 fails
+**Comments:** Test 6 fails.
 
 ..
   Any comments about the test goes here.
@@ -625,7 +625,7 @@ the number of enabled channels.
 ..
 
 
-**Tested OS:** Linux-arm64
+**Tested OS:** Linux-arm64, Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -711,7 +711,7 @@ and the documentation is accessible.
 ..
 
 
-**Tested OS:** Linux-arm64
+**Tested OS:** Linux-arm64, Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -764,7 +764,7 @@ time span can be correctly modified.
 ..
 
 
-**Tested OS:** Linux-arm64
+**Tested OS:** Linux-arm64, Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -820,7 +820,7 @@ displayed on the plot and measured by the instrument.
 ..
 
     
-**Tested OS:** Linux-arm64
+**Tested OS:** Linux-arm64, Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -906,7 +906,7 @@ and the documentation is accessible.
 ..
 
 
-**Tested OS:** Linux-arm64
+**Tested OS:** Linux-arm64, Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -969,7 +969,7 @@ can poll faults values for both devices.
 ..
 
 
-**Tested OS:** Linux-arm64
+**Tested OS:** Linux-arm64, Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -1025,7 +1025,7 @@ can reset the polled values after a capture.
 ..
 
 
-**Tested OS:** Linux-arm64
+**Tested OS:** Linux-arm64, Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -1079,7 +1079,7 @@ can poll faults values for both devices in continuous mode.
 
     4. Stop the Faults instrument.
 
-**Tested OS:** Linux-arm64
+**Tested OS:** Linux-arm64, Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -1165,7 +1165,7 @@ and the documentation is accessible.
 ..
 
 
-**Tested OS:** Linux-arm64
+**Tested OS:** Linux-arm64, Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -1175,7 +1175,7 @@ and the documentation is accessible.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1220,7 +1220,7 @@ power supply switch is turned off.
 ..
 
 
-**Tested OS:** Linux-arm64
+**Tested OS:** Linux-arm64, Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -1230,7 +1230,7 @@ power supply switch is turned off.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
