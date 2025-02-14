@@ -456,6 +456,7 @@ create_appdir(){
 	cp $STAGING_AREA_DEPS/lib/libspdlog.so* $APP_DIR/usr/lib
 	cp -r $QT_LOCATION/plugins $APP_DIR/usr
 	cp $QT_LOCATION/lib/libQt5XcbQpa.so* $APP_DIR/usr/lib
+	cp $QT_LOCATION/lib/libQt5WaylandClient.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5EglFSDeviceIntegration.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5DBus.so* $APP_DIR/usr/lib
 	cp /usr/lib/x86_64-linux-gnu/libXdmcp.so* $APP_DIR/usr/lib
