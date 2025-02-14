@@ -44,7 +44,7 @@ JOBS=-j14
 
 APP_DIR=$SRC_SCRIPT/scopy.AppDir
 APP_IMAGE=$SRC_SCRIPT/Scopy.AppImage
-APP_RUN=$SRC_SCRIPT/AppRun
+APP_RUN=$SRC_SCRIPT/../general/AppRun
 APP_DESKTOP=$SRC_SCRIPT/scopy.desktop
 APP_SQUASHFS=$SRC_SCRIPT/scopy.squashfs
 

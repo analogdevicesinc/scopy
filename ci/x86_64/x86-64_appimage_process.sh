@@ -409,8 +409,8 @@ create_appdir(){
 	${STAGING_AREA}/linuxdeploy-x86_64.AppImage \
 		--appdir  $APP_DIR \
 		--executable $SRC_DIR/build/scopy \
-		--custom-apprun $SRC_DIR/ci/x86_64/AppRun \
-		--desktop-file $SRC_DIR/ci/x86_64/scopy.desktop \
+		--custom-apprun $SRC_DIR/ci/general/AppRun \
+		--desktop-file $SRC_DIR/ci/general/scopy.desktop \
 		--icon-file $SRC_DIR/gui/res/scopy.png \
 		--deploy-deps-only $DLL_FOLDER \
 		--plugin qt

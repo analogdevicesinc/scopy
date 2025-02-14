@@ -1,0 +1,49 @@
+#!/bin/bash
+set -e
+SELF=$(readlink -f "$0")
+HERE=${SELF%/*}
+
+
+APPIMAGE_INSTALL=$HOME/.local/bin/$(basename "${APPIMAGE}")
+DESKTOP_INSTALL="$HOME/.local/share/applications/scopy.desktop"
+ICON_INSTALL="$HOME/.local/share/icons/scopy/scopy.png"
+
+
+if [ "$INSTALL" == "true" ]; then
+
+	echo "INSTALLING..."
+
+	mkdir -p ${ICON_INSTALL%/*}
+	mkdir -p ${DESKTOP_INSTALL%/*}
+	mkdir -p ${APPIMAGE_INSTALL%/*}
+
+	cp -v -u "$HERE/usr/share/icons/hicolor/512x512/apps/scopy.png" "$ICON_INSTALL"
+	cp -v -u "$HERE/usr/share/applications/scopy.desktop" "$DESKTOP_INSTALL"
+	cp -v -u "$APPIMAGE" "$APPIMAGE_INSTALL"
+
+	sed -i "s|^Exec=.*|Exec=$APPIMAGE_INSTALL|" "$DESKTOP_INSTALL"
+	sed -i "s|^Icon=.*|Icon=$ICON_INSTALL|" "$DESKTOP_INSTALL"
+	exit
+
+elif [ "$UNINSTALL" == "true" ]; then
+
+	echo "UNINSTALLING..."
+
+	rm -rvf "$APPIMAGE_INSTALL"
+	rm -rvf "$DESKTOP_INSTALL"
+	rm -rvf "${ICON_INSTALL%/*}"
+	exit
+fi
+
+
+export QT_PLUGIN_PATH=$HERE/usr/plugins
+export QT_QPA_PLATFORM_PLUGIN_PATH=$HERE/usr/plugins/platforms
+export QT_QPA_PLATFORM="wayland;xcb"
+export LD_LIBRARY_PATH=$HERE/usr/lib
+
+python_dir=$(find "$HERE/usr/lib/" -maxdepth 1 -type d -name "python3.*")
+export PYTHONHOME=$python_dir
+export PYTHONPATH=$python_dir:$python_dir/lib-dynload:$python_dir/site-packages:$python_dir/encodings
+echo "Starting Scopy"
+ldd "$HERE"/usr/bin/scopy
+exec "$HERE"/usr/bin/scopy
