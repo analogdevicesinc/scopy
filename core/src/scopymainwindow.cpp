@@ -59,6 +59,7 @@
 #include <scopymainwindow_api.h>
 #include <QVersionNumber>
 #include <iioutil/iiounits.h>
+#include <gui/widgets/scopysplashscreen.h>
 
 using namespace scopy;
 using namespace scopy::gui;
@@ -72,7 +73,9 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 {
 	QElapsedTimer timer;
 	timer.start();
+
 	initPreferences();
+	ScopySplashscreen::showMessage("Initializing ui");
 	ui->setupUi(this);
 
 	ScopyTitleManager::setMainWindow(this);
@@ -127,6 +130,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	initPreferencesPage(pm);
 	initTranslations();
 
+	ScopySplashscreen::showMessage("Loading homepage");
 	hp = new ScopyHomePage(this, pm);
 	m_sbc = new ScanButtonController(scanCycle, hp->scanControlBtn(), this);
 	connect(hp->scanBtn(), &QPushButton::clicked, this, [=]() { scanTask->run(); });
@@ -379,6 +383,7 @@ void ScopyMainWindow::setupPreferences()
 
 void ScopyMainWindow::initPreferences()
 {
+	ScopySplashscreen::showMessage("Initializing preferences");
 	QElapsedTimer timer;
 	timer.start();
 	QString preferencesPath = scopy::config::preferencesFolderPath() + "/preferences.ini";
@@ -479,11 +484,18 @@ void ScopyMainWindow::loadPluginsFromRepository(PluginRepository *pr)
 	// Check if directory exists and it's not empty
 	QDir pathDir(scopy::config::localPluginFolderPath());
 
+	ScopySplashscreen::setPrefix("Loading plugin: ");
+
+	connect(pr->getPluginManager(), SIGNAL(startLoadPlugin(QString)), ScopySplashscreen::GetInstance(),
+		SLOT(setMessage(QString)));
 	if(pathDir.exists() && pathDir.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries).count() != 0) {
 		pr->init(scopy::config::localPluginFolderPath());
 	} else {
 		pr->init(scopy::config::defaultPluginFolderPath());
 	}
+	ScopySplashscreen::setPrefix("");
+	disconnect(pr->getPluginManager(), SIGNAL(startLoadPlugin(QString)), ScopySplashscreen::GetInstance(),
+		   SLOT(setMessage(QString)));
 
 #ifndef Q_OS_ANDROID
 	QString pluginAdditionalPath = Preferences::GetInstance()->get("general_additional_plugin_path").toString();
@@ -534,6 +546,8 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 void ScopyMainWindow::initPythonWIN32()
 {
 #ifdef WIN32
+	ScopySplashscreen::showMessage("Initializing Python engine");
+
 	QString pythonhome;
 	QString pythonpath;
 
@@ -563,6 +577,7 @@ void ScopyMainWindow::initPythonWIN32()
 
 void ScopyMainWindow::loadDecoders()
 {
+	ScopySplashscreen::showMessage("Loading sigrok decoders");
 	QElapsedTimer timer;
 	timer.start();
 #if defined(WITH_SIGROK) && defined(WITH_PYTHON)

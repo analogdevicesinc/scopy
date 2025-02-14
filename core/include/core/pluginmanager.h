@@ -47,6 +47,9 @@ public:
 	void setMetadata(QJsonObject metadata);
 	QJsonObject metadata() const;
 
+Q_SIGNALS:
+	void startLoadPlugin(QString);
+
 private:
 	Plugin *loadPlugin(QString file);
 	QList<Plugin *> list;
