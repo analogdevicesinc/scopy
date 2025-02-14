@@ -148,7 +148,7 @@ public:
 
 	static double get_best_ratio(double ratio, double max, double *fract);
 	QPushButton *getRunButton();
-	void settingsLoaded();
+	void settingsLoaded() override;
 
 private:
 	const size_t m_maxNbOfSamples;
@@ -285,7 +285,7 @@ private Q_SLOTS:
 
 	void startStop(bool start);
 	void setFunction(const QString &function);
-	void readPreferences();
+	void readPreferences() override;
 Q_SIGNALS:
 	void showTool();
 };

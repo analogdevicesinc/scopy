@@ -129,7 +129,7 @@ public:
 	~Oscilloscope();
 
 	QPushButton *getRunButton();
-	void settingsLoaded();
+	void settingsLoaded() override;
 
 	bool getTrigger_input() const;
 	void setTrigger_input(bool value);
@@ -234,7 +234,7 @@ private Q_SLOTS:
 	void updateTriggerLevelValue(std::vector<float> value);
 	void configureAcCouplingTrigger(bool);
 
-	void readPreferences();
+	void readPreferences() override;
 
 	void onCmbMemoryDepthChanged(QString);
 	void setSinksDisplayOneBuffer(bool);

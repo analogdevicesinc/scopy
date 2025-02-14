@@ -61,8 +61,8 @@ class SCOPY_M2K_GUI_EXPORT AverageHistoryN : public SpectrumAverage
 public:
 	AverageHistoryN(unsigned int data_width, unsigned int history);
 	virtual ~AverageHistoryN();
-	virtual void pushNewData(double *data);
-	virtual void reset();
+	virtual void pushNewData(double *data) override;
+	virtual void reset() override;
 
 protected:
 	double **m_history;
