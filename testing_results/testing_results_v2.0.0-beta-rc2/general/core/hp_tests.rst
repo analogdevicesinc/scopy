@@ -21,7 +21,12 @@ Homepage
          - 13/02/2025
          - v2.0.0-beta-rc2-a3a7c43
          - N/A
-         - 
+         - OS: Ubuntu 22.04.5 LTS
+       * - Alexandra Trifan
+         - 14/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Debian 12 arm64
 
 Test 1: The homepage displays correctly when running the application.
 ---------------------------------------------------------------------
@@ -45,7 +50,7 @@ Test 1: The homepage displays correctly when running the application.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -85,7 +90,7 @@ Test 2: Verifying the "Add device" (+) button.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -130,7 +135,7 @@ Test 3: Verifying the auto-scan feature (ON).
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -175,7 +180,7 @@ scan is turned off.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -221,7 +226,7 @@ all available devices correctly.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -285,7 +290,7 @@ Test 6: Navigation using the buttons in the info page.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -323,13 +328,13 @@ available devices correctly.
     5. Unplug the device.
     6. Observe the application's behavior.
         - **Expected result:** The device is removed from device browser.
-        - **Actual result:** As expcted the device disappears from the device browser.
+        - **Actual result:** As expected the device disappears from the device browser.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.

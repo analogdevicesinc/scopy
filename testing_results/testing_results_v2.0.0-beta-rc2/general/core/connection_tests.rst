@@ -21,7 +21,12 @@ Connection flow
          - 13/02/2025
          - v2.0.0-beta-rc2-a3a7c43
          - N/A
-         - 
+         - OS: Ubuntu 22.04.5 LTS
+       * - Alexandra Trifan
+         - 14/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Debian 12 arm64
 
 Setup environment:
 ------------------
@@ -73,7 +78,7 @@ Test 1: Verify the connection flow.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -118,7 +123,7 @@ unplugged during the connection process.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -166,7 +171,7 @@ unplugged during the connection process.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -212,7 +217,7 @@ unplugged before the connection process.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -258,7 +263,7 @@ Test 5: Disconnecting a device.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.

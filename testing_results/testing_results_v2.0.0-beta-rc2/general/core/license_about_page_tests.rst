@@ -13,11 +13,16 @@ License and About Page
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-      * - Alexandra Trifan
-        - 13/02/2025
-        - v2.0.0-beta-rc2-a3a7c43
-        - N/A
-        - 
+       * - Alexandra Trifan
+         - 13/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Ubuntu 22.04.5 LTS
+       * - Alexandra Trifan
+         - 14/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Debian 12 arm64
 
 Test 1: Check license pop-up
 -----------------------------
@@ -60,7 +65,7 @@ Test 1: Check license pop-up
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -165,7 +170,7 @@ Test 2: Check links from About Page
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.

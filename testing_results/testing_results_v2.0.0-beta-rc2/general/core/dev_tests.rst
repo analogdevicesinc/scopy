@@ -21,7 +21,12 @@ Device interaction
          - 13/02/2025
          - v2.0.0-beta-rc2-a3a7c43
          - N/A
-         - 
+         - OS: Ubuntu 22.04.5 LTS
+       * - Alexandra Trifan
+         - 14/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Debian 12 arm64
 
 Setup environment:
 ------------------
@@ -72,7 +77,7 @@ expected action: displaying device details and device tools.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -113,7 +118,7 @@ Test 2: Remove a device from device browser.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -158,7 +163,7 @@ of a connected device.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -205,7 +210,7 @@ Test 4: Edit the name of the device.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -257,7 +262,7 @@ Test 5: Select a tool.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -323,7 +328,7 @@ correctly.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -369,7 +374,7 @@ reconnection.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -421,7 +426,7 @@ the tool menu.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -482,7 +487,7 @@ properly.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -539,7 +544,7 @@ properly.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -585,7 +590,7 @@ entered into the device browser.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.

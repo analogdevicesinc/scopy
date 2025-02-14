@@ -17,7 +17,12 @@ General Preferences - Test Suite
          - 14/02/2025
          - v2.0.0-beta-rc2-a3a7c43
          - N/A
-         - 
+         - OS: Ubuntu 22.04.5 LTS
+       * - Alexandra Trifan
+         - 14/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Debian 12 arm64
 
 Setup environment:
 ------------------
@@ -86,12 +91,13 @@ states (only applies to plugins which have this implemented).
          .ini files for every plugins' session saved
        - **Actual result:** A pop-up window appears with: "KDE Connect URL handler" 
        and the file explorer is not able to open the location.
+       The Open settings file location works on a Debian 12 arm64.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -143,7 +149,7 @@ double clicking them in the left menu.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -196,7 +202,7 @@ Test 3 - Save/Load tool attached state
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -249,7 +255,7 @@ Test 4 - Double click control buttons to open menu
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -304,7 +310,7 @@ Test 5 - Enable OpenGL plotting
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -354,7 +360,7 @@ Test 6 - Enable menu animations
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -405,7 +411,7 @@ Steps
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -456,7 +462,7 @@ Test 8 - Show Grid
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -510,7 +516,7 @@ Test 9 - Show Graticule
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -559,7 +565,7 @@ Test 10 - Use Lazy Loading
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -606,12 +612,12 @@ Test 11 - Use native dialogs
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Works with AppImage installer on a Ubuntu 20.04, fails on Ubuntu 22.04.5 LTS.
+**Comments:** Works with AppImage installer on a Ubuntu 20.04, fails on Ubuntu 22.04.5 LTS and on Debian 12 on Raspberry Pi.
 
 ..
   Any comments about the test goes here.
@@ -658,7 +664,7 @@ Test 12 - Auto-connect to previous session
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -708,7 +714,7 @@ so some layout artifacts may appear).
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -752,7 +758,7 @@ Test 14 - Theme
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -788,14 +794,14 @@ Test 15 - Language
 Steps
    1. Set preference to a different language and restart the app.
        - **Expected result:** Some text language should change in the M2K tools.
-       - **Actual result:** Changed lanuage to "es". All the M2K instruments display a part of the text in 
+       - **Actual result:** Changed language to "es". All the M2K instruments display a part of the text in 
          Spanish, but not everything is translated. Some buttons return to English after interacting with them (Run/Single).
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -847,7 +853,7 @@ Test 16 - Connect to multiple devices
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -899,7 +905,7 @@ Test 17 - Regularly scan for new devices
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -943,7 +949,7 @@ Test 18 - Session devices
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -994,7 +1000,7 @@ Test 19 - Show plot FPS
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1037,12 +1043,12 @@ Test 20 - Plot target FPS
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** On Debian 12 on a Raspberry Pi, the FPS does not go higher than 5 or 10 FPS.
 
 ..
   Any comments about the test goes here.
@@ -1083,7 +1089,7 @@ Test 21 - Reset settings and plugins to default
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.

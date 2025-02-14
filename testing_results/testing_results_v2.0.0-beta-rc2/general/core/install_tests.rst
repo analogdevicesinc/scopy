@@ -17,7 +17,12 @@ Installers
          - 13/02/2025
          - v2.0.0-beta-rc2-a3a7c43
          - N/A
-         - 
+         - OS: Ubuntu 22.04.5 LTS
+       * - Alexandra Trifan
+         - 14/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Debian 12 arm64
 
 Test 1: Check Scopy AppImage x86_64
 ------------------------------------
@@ -249,7 +254,7 @@ Linux Operating System with arm64 architecture.
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -259,7 +264,7 @@ Linux Operating System with arm64 architecture.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
