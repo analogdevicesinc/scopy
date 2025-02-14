@@ -72,6 +72,7 @@ void PluginManager::add(QString pluginFileName)
 	Plugin *p = nullptr;
 	p = loadPlugin(pluginFileName);
 	if(p) {
+		Q_EMIT startLoadPlugin(p->name());
 		qInfo(CAT_PLUGINMANAGER) << "Found plugin:" << p->name() << "in " << pluginFileName;
 		list.append(p);
 		p->initMetadata();

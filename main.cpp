@@ -30,6 +30,7 @@
 #include <core/cmdlinehandler.h>
 #include <core/scopymainwindow_api.h>
 #include <gui/utils.h>
+#include <gui/widgets/scopysplashscreen.h>
 #include <core/crashreport.h>
 
 using namespace scopy;
@@ -107,6 +108,9 @@ int main(int argc, char *argv[])
 	QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
 	QApplication a(argc, argv);
+	ScopySplashscreen::init();
+	ScopySplashscreen::showMessage("Initializing scopy");
+
 	QCommandLineParser parser;
 	parser.addHelpOption();
 	parser.addVersionOption();
@@ -135,7 +139,7 @@ int main(int argc, char *argv[])
 	if(retHandler == EXIT_FAILURE) {
 		return retHandler;
 	}
-
+	ScopySplashscreen::finish(&w);
 	int ret = a.exec();
 	restarter.restart(ret);
 	printf("Scopy finished gracefully\n");
