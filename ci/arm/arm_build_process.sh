@@ -373,6 +373,7 @@ create_appdir(){
 	cp -r $SYSROOT/share/libsigrokdecode/decoders  $APP_DIR/usr/lib
 
 	cp $QT_LOCATION/lib/libQt5XcbQpa.so* $APP_DIR/usr/lib
+	cp $QT_LOCATION/lib/libQt5WaylandClient.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5EglFSDeviceIntegration.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5DBus.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5OpenGL.so* $APP_DIR/usr/lib
