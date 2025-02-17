@@ -48,9 +48,15 @@
                           </DElement>
                          </base-DElement>
                          <object>{e8cdc70f-9f4c-40e2-b256-d10eb4672e42}</object>
-                         <name>PkgInstaller</name>
+                         <stereotypes>
+                          <qlist>
+                           <item>singleton</item>
+                          </qlist>
+                         </stereotypes>
+                         <name>PkgManager</name>
                          <pos>x:810;y:400</pos>
-                         <rect>x:-205;y:-110;w:410;h:220</rect>
+                         <rect>x:-395;y:-180;w:790;h:360</rect>
+                         <auto-sized>false</auto-sized>
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
@@ -70,53 +76,15 @@
                           </DElement>
                          </base-DElement>
                          <object>{906bcf25-7478-41a6-ab4c-7b767dc6746a}</object>
-                         <name>PkgInstallerTool</name>
-                         <pos>x:805;y:40</pos>
-                         <rect>x:-180;y:-105;w:360;h:210</rect>
+                         <name>PkgWidget</name>
+                         <pos>x:800;y:-75</pos>
+                         <rect>x:-250;y:-105;w:500;h:210</rect>
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
                        <namespace>scopy</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DClass">
-                      <DClass>
-                       <base-DObject>
-                        <DObject>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{125feb13-4d9d-428a-9a1c-63b43d891c9c}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{65a2fbef-0a48-4ad9-b3b5-3c2369be13ad}</object>
-                         <name>QWidget</name>
-                         <pos>x:880;y:-145</pos>
-                         <rect>x:-40;y:-30;w:80;h:60</rect>
-                         <visual-role>0</visual-role>
-                        </DObject>
-                       </base-DObject>
-                      </DClass>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DInheritance">
-                      <DInheritance>
-                       <base-DRelation>
-                        <DRelation>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{d4b195a7-1eea-49b1-a878-3b728edd311a}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{8f76929a-4899-47a0-839a-db8bdbf532a6}</object>
-                         <a>{60d3b51a-b413-4ec4-8731-c02f4e12b765}</a>
-                         <b>{125feb13-4d9d-428a-9a1c-63b43d891c9c}</b>
-                        </DRelation>
-                       </base-DRelation>
-                      </DInheritance>
                      </instance>
                     </item>
                     <item>
@@ -158,65 +126,24 @@
                      </instance>
                     </item>
                     <item>
-                     <instance type="DAssociation">
-                      <DAssociation>
-                       <base-DRelation>
-                        <DRelation>
-                         <base-DElement>
-                          <DElement>
-                           <uid>{d0c5e9e5-300c-4e5b-82b4-f7e00dbd2303}</uid>
-                          </DElement>
-                         </base-DElement>
-                         <object>{89966f8a-6f8c-4c24-b487-4849542c7f6b}</object>
-                         <a>{60d3b51a-b413-4ec4-8731-c02f4e12b765}</a>
-                         <b>{d79ce38f-199f-47ca-b567-0defb718f833}</b>
-                        </DRelation>
-                       </base-DRelation>
-                       <a>
-                        <DAssociationEnd>
-                         <cradinality>1</cradinality>
-                         <navigable>true</navigable>
-                         <kind>1</kind>
-                        </DAssociationEnd>
-                       </a>
-                      </DAssociation>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DAnnotation">
-                      <DAnnotation>
-                       <base-DElement>
-                        <DElement>
-                         <uid>{5a9cf67b-6b48-4e7e-9676-bb2a2ace71dd}</uid>
-                        </DElement>
-                       </base-DElement>
-                       <text>A preference for destPath ?
-QMap for installed plugins??
-&lt;pluginName, version&gt;</text>
-                       <pos>x:565;y:230</pos>
-                       <rect>x:0;y:0;w:192.938;h:55</rect>
-                       <auto-sized>false</auto-sized>
-                      </DAnnotation>
-                     </instance>
-                    </item>
-                    <item>
                      <instance type="DClass">
                       <DClass>
                        <base-DObject>
                         <DObject>
                          <base-DElement>
                           <DElement>
-                           <uid>{42c784d5-abf0-4a18-8d52-2a392d6ffa09}</uid>
+                           <uid>{2023e4fb-81fd-4ddc-8b38-ef4321bc9a54}</uid>
                           </DElement>
                          </base-DElement>
-                         <object>{d109cd58-0491-42aa-9af1-4f744a1f0e0c}</object>
-                         <name>StatusBarManager</name>
-                         <pos>x:725;y:-150</pos>
-                         <rect>x:-55;y:-30;w:110;h:60</rect>
+                         <object>{93dd4053-a0a6-452a-8948-50f2ee47f8db}</object>
+                         <name>PkgUtil</name>
+                         <pos>x:810;y:775</pos>
+                         <rect>x:-330;y:-100;w:660;h:200</rect>
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
                        <namespace>scopy</namespace>
+                       <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
                     </item>
@@ -227,12 +154,12 @@ QMap for installed plugins??
                         <DRelation>
                          <base-DElement>
                           <DElement>
-                           <uid>{c934a4d3-55a3-409d-b8c6-5fe1fd555f1f}</uid>
+                           <uid>{0a127c6c-6068-409b-8029-7feea396249a}</uid>
                           </DElement>
                          </base-DElement>
-                         <object>{33baa0d7-38d1-4ae6-8fa6-dddce3b02a4e}</object>
-                         <a>{60d3b51a-b413-4ec4-8731-c02f4e12b765}</a>
-                         <b>{42c784d5-abf0-4a18-8d52-2a392d6ffa09}</b>
+                         <object>{60d733b4-11e1-4617-9219-39402c20389c}</object>
+                         <a>{d79ce38f-199f-47ca-b567-0defb718f833}</a>
+                         <b>{2023e4fb-81fd-4ddc-8b38-ef4321bc9a54}</b>
                         </DRelation>
                        </base-DRelation>
                       </DDependency>
@@ -245,13 +172,13 @@ QMap for installed plugins??
                         <DObject>
                          <base-DElement>
                           <DElement>
-                           <uid>{b69c9edc-0968-437e-815b-651060507595}</uid>
+                           <uid>{69951935-3c87-4123-b104-83648ee61a45}</uid>
                           </DElement>
                          </base-DElement>
-                         <object>{cc368629-053a-41c5-9dc8-4449935c7dd1}</object>
-                         <name>PkgInstallerEntry</name>
-                         <pos>x:1315;y:40</pos>
-                         <rect>x:-225;y:-140;w:450;h:280</rect>
+                         <object>{114698a5-a2c2-4683-8c76-f179aeaeee15}</object>
+                         <name>PkgInstalledTab</name>
+                         <pos>x:-360;y:-60</pos>
+                         <rect>x:-180;y:-115;w:360;h:230</rect>
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
@@ -261,46 +188,50 @@ QMap for installed plugins??
                      </instance>
                     </item>
                     <item>
-                     <instance type="DAnnotation">
-                      <DAnnotation>
-                       <base-DElement>
-                        <DElement>
-                         <uid>{def0343b-582a-4369-93ba-a7059dbbd4b0}</uid>
-                        </DElement>
-                       </base-DElement>
-                       <text>- setters chaining
-- typedef enum
-{
-        UNINSTALLED,
-        STORE_INSTALLED,
-        ZIP_INSTALLED,
-} InstallStatus;
-- we may need to have a combination 
-between version and installStatus; a pair
-or a map maybe???
-- Daca utilizam campurile installed_version si manual_installled 
-in .json-ul loal, e posibil sa nu mai fie nevoie de InstallStatus</text>
-                       <pos>x:1160;y:-275</pos>
-                       <rect>x:0;y:0;w:329.922;h:172</rect>
-                      </DAnnotation>
-                     </instance>
-                    </item>
-                    <item>
-                     <instance type="DInheritance">
-                      <DInheritance>
+                     <instance type="DAssociation">
+                      <DAssociation>
                        <base-DRelation>
                         <DRelation>
                          <base-DElement>
                           <DElement>
-                           <uid>{b22528ee-55ca-4019-9914-8b85d02ae908}</uid>
+                           <uid>{e1b09302-69c7-49ee-a0ec-833cffd5de07}</uid>
                           </DElement>
                          </base-DElement>
-                         <object>{ca6e172f-1779-44cf-aeca-dccc40981887}</object>
-                         <a>{b69c9edc-0968-437e-815b-651060507595}</a>
-                         <b>{bb4f1ec1-ae64-4fb0-9b41-e11dd1d2c660}</b>
+                         <object>{0a44bc85-bb6f-433b-bb41-1e54881561bd}</object>
+                         <a>{60d3b51a-b413-4ec4-8731-c02f4e12b765}</a>
+                         <b>{69951935-3c87-4123-b104-83648ee61a45}</b>
                         </DRelation>
                        </base-DRelation>
-                      </DInheritance>
+                       <a>
+                        <DAssociationEnd>
+                         <cradinality>1</cradinality>
+                         <navigable>true</navigable>
+                         <kind>2</kind>
+                        </DAssociationEnd>
+                       </a>
+                      </DAssociation>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{59a585b5-4711-49b1-b9fe-00b53e94f5b9}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{e5f3f983-0a86-45c7-81c3-f82e04e12cbf}</object>
+                         <name>PkgZipWidget</name>
+                         <pos>x:-355;y:-335</pos>
+                         <rect>x:-355;y:-130;w:710;h:260</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <namespace>scopy</namespace>
+                       <show-all-members>true</show-all-members>
+                      </DClass>
                      </instance>
                     </item>
                     <item>
@@ -310,12 +241,319 @@ in .json-ul loal, e posibil sa nu mai fie nevoie de InstallStatus</text>
                         <DRelation>
                          <base-DElement>
                           <DElement>
-                           <uid>{f4102e56-40ca-4b2a-ab65-1aa6c9377420}</uid>
+                           <uid>{35ef61ea-7d28-4fa2-ab68-8622e40ec0d6}</uid>
                           </DElement>
                          </base-DElement>
-                         <object>{9b16df1f-527c-4de4-a185-67758a7f2945}</object>
+                         <object>{4ebc2fea-be1d-4b80-90f6-781694345882}</object>
                          <a>{60d3b51a-b413-4ec4-8731-c02f4e12b765}</a>
-                         <b>{b69c9edc-0968-437e-815b-651060507595}</b>
+                         <b>{59a585b5-4711-49b1-b9fe-00b53e94f5b9}</b>
+                        </DRelation>
+                       </base-DRelation>
+                       <a>
+                        <DAssociationEnd>
+                         <cradinality>1</cradinality>
+                         <navigable>true</navigable>
+                         <kind>2</kind>
+                        </DAssociationEnd>
+                       </a>
+                      </DAssociation>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{6b5c2801-6a26-4a0c-b8b5-f88bf6a78fe7}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{fe2beb0e-9709-4a5e-b193-8a49f9bacc0f}</object>
+                         <name>PluginsTab</name>
+                         <pos>x:-375;y:180</pos>
+                         <rect>x:-515;y:-90;w:1030;h:180</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <namespace>scopy</namespace>
+                       <show-all-members>true</show-all-members>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DAssociation">
+                      <DAssociation>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{5ebcd01e-40bb-46c3-8ef9-5ccb23cfc49b}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{6a58a13b-deb1-44fb-b0a8-3dd5d93c143b}</object>
+                         <a>{60d3b51a-b413-4ec4-8731-c02f4e12b765}</a>
+                         <b>{6b5c2801-6a26-4a0c-b8b5-f88bf6a78fe7}</b>
+                        </DRelation>
+                       </base-DRelation>
+                       <a>
+                        <DAssociationEnd>
+                         <cradinality>1</cradinality>
+                         <navigable>true</navigable>
+                         <kind>2</kind>
+                        </DAssociationEnd>
+                       </a>
+                      </DAssociation>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DDependency">
+                      <DDependency>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{7bb81e13-7852-4e35-84b4-9cfdea2adaa0}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{b3fd6cb8-978d-4708-8e99-b1cdfeea850f}</object>
+                         <a>{60d3b51a-b413-4ec4-8731-c02f4e12b765}</a>
+                         <b>{d79ce38f-199f-47ca-b567-0defb718f833}</b>
+                        </DRelation>
+                       </base-DRelation>
+                      </DDependency>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DDependency">
+                      <DDependency>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{41f4a23b-ccc8-4e2f-8446-00e70cffae3f}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{26b604f8-0dd9-42be-baec-1f5ef4fc64b0}</object>
+                         <a>{6b5c2801-6a26-4a0c-b8b5-f88bf6a78fe7}</a>
+                         <b>{d79ce38f-199f-47ca-b567-0defb718f833}</b>
+                        </DRelation>
+                       </base-DRelation>
+                      </DDependency>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DDependency">
+                      <DDependency>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{bd35f2e9-874b-4cc5-b637-664cf534acea}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{5383d352-8fc4-4e86-bd40-bf9cbc30d4ee}</object>
+                         <a>{69951935-3c87-4123-b104-83648ee61a45}</a>
+                         <b>{d79ce38f-199f-47ca-b567-0defb718f833}</b>
+                        </DRelation>
+                       </base-DRelation>
+                      </DDependency>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{38c0dcf1-cb8a-409c-88f1-6932e24c0d54}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{39493bd4-72b0-42cc-8a51-2682e23ef88c}</object>
+                         <name>PkgGridWidget</name>
+                         <pos>x:-1090;y:-210</pos>
+                         <rect>x:-345;y:-75;w:690;h:150</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <namespace>scopy</namespace>
+                       <show-all-members>true</show-all-members>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DAssociation">
+                      <DAssociation>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{2653afde-0994-492a-9510-17c70463fd5d}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{d7239f69-fa54-405c-828c-3745f8d4afa4}</object>
+                         <a>{69951935-3c87-4123-b104-83648ee61a45}</a>
+                         <b>{38c0dcf1-cb8a-409c-88f1-6932e24c0d54}</b>
+                        </DRelation>
+                       </base-DRelation>
+                       <a>
+                        <DAssociationEnd>
+                         <cradinality>1</cradinality>
+                         <navigable>true</navigable>
+                         <kind>2</kind>
+                        </DAssociationEnd>
+                       </a>
+                      </DAssociation>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{a92facc6-8913-4d85-84e7-19dde65d353d}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{00711039-16b4-4c11-aebd-5b9c40b61258}</object>
+                         <name>PkgPreviewPage</name>
+                         <pos>x:-1015;y:-10</pos>
+                         <rect>x:-325;y:-75;w:650;h:150</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <namespace>scopy</namespace>
+                       <show-all-members>true</show-all-members>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DAssociation">
+                      <DAssociation>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{0abe530e-0c17-41d4-9bf6-b1a231891bba}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{5649abbd-f22b-4bc4-8eef-ca00409b332e}</object>
+                         <a>{69951935-3c87-4123-b104-83648ee61a45}</a>
+                         <b>{a92facc6-8913-4d85-84e7-19dde65d353d}</b>
+                        </DRelation>
+                       </base-DRelation>
+                       <a>
+                        <DAssociationEnd>
+                         <cradinality>1</cradinality>
+                         <navigable>true</navigable>
+                         <kind>2</kind>
+                        </DAssociationEnd>
+                       </a>
+                      </DAssociation>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{7541acab-2c62-4593-9002-420b4706db2a}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{2e39025d-48eb-440f-93aa-206413dc5fc5}</object>
+                         <name>GridWidget</name>
+                         <pos>x:-1635;y:115</pos>
+                         <rect>x:-180;y:-110;w:360;h:220</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <namespace>scopy</namespace>
+                       <show-all-members>true</show-all-members>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DAssociation">
+                      <DAssociation>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{91b7f3e1-e1d2-4782-886f-0b1156d82648}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{ce064848-2ac5-4cab-800d-00db902636d6}</object>
+                         <a>{6b5c2801-6a26-4a0c-b8b5-f88bf6a78fe7}</a>
+                         <b>{7541acab-2c62-4593-9002-420b4706db2a}</b>
+                        </DRelation>
+                       </base-DRelation>
+                       <a>
+                        <DAssociationEnd>
+                         <cradinality>1</cradinality>
+                         <navigable>true</navigable>
+                         <kind>2</kind>
+                        </DAssociationEnd>
+                       </a>
+                      </DAssociation>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DInheritance">
+                      <DInheritance>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{eb0ea166-1eb5-4aea-a685-9f230ebe5163}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{1024efc0-4e7a-4cd8-86b3-a6389528f751}</object>
+                         <a>{38c0dcf1-cb8a-409c-88f1-6932e24c0d54}</a>
+                         <b>{7541acab-2c62-4593-9002-420b4706db2a}</b>
+                        </DRelation>
+                       </base-DRelation>
+                      </DInheritance>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{1b9aa759-73e5-4761-9929-39c1de7b29f8}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{e873e609-b672-4af0-b122-6f46588830b1}</object>
+                         <name>PkgCard</name>
+                         <pos>x:-1765;y:-210</pos>
+                         <rect>x:-230;y:-160;w:460;h:320</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <namespace>scopy</namespace>
+                       <show-all-members>true</show-all-members>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DAssociation">
+                      <DAssociation>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{f9829813-6382-41e2-a18d-c746fca74376}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{18a32274-8f49-4b0f-b7b7-79c8b667f312}</object>
+                         <a>{38c0dcf1-cb8a-409c-88f1-6932e24c0d54}</a>
+                         <b>{1b9aa759-73e5-4761-9929-39c1de7b29f8}</b>
                         </DRelation>
                        </base-DRelation>
                        <a>
@@ -328,9 +566,48 @@ in .json-ul loal, e posibil sa nu mai fie nevoie de InstallStatus</text>
                       </DAssociation>
                      </instance>
                     </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{e6e92fef-24c9-4f0a-b2e2-7df029f33e53}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{1e5ffb46-930e-4598-becb-0eb7ebb7c4d1}</object>
+                         <name>CardWidget</name>
+                         <pos>x:-1770;y:-500</pos>
+                         <rect>x:-45;y:-30;w:90;h:60</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <namespace>scopy</namespace>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DInheritance">
+                      <DInheritance>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{b1c93666-f293-43d0-a58d-71531542b5d8}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{0f245402-3a1b-4c1f-8b02-757844300e86}</object>
+                         <a>{1b9aa759-73e5-4761-9929-39c1de7b29f8}</a>
+                         <b>{e6e92fef-24c9-4f0a-b2e2-7df029f33e53}</b>
+                        </DRelation>
+                       </base-DRelation>
+                      </DInheritance>
+                     </instance>
+                    </item>
                    </qlist>
                   </elements>
-                  <last-modified>1738219679268</last-modified>
+                  <last-modified>1747134080467</last-modified>
                   <toolbarid>General</toolbarid>
                  </MDiagram>
                 </base-MDiagram>
@@ -350,9 +627,14 @@ in .json-ul loal, e posibil sa nu mai fie nevoie de InstallStatus</text>
                   <base-MElement>
                    <MElement>
                     <uid>{e8cdc70f-9f4c-40e2-b256-d10eb4672e42}</uid>
+                    <stereotypes>
+                     <qlist>
+                      <item>singleton</item>
+                     </qlist>
+                    </stereotypes>
                    </MElement>
                   </base-MElement>
-                  <name>PkgInstaller</name>
+                  <name>PkgManager</name>
                   <relations>
                    <handles>
                     <handles>
@@ -379,6 +661,28 @@ in .json-ul loal, e posibil sa nu mai fie nevoie de InstallStatus</text>
                         </target>
                        </handle>
                       </item>
+                      <item>
+                       <handle>
+                        <uid>{60d733b4-11e1-4617-9219-39402c20389c}</uid>
+                        <target>
+                         <instance type="MDependency">
+                          <MDependency>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{60d733b4-11e1-4617-9219-39402c20389c}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{e8cdc70f-9f4c-40e2-b256-d10eb4672e42}</a>
+                             <b>{93dd4053-a0a6-452a-8948-50f2ee47f8db}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MDependency>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
                      </qlist>
                     </handles>
                    </handles>
@@ -390,91 +694,185 @@ in .json-ul loal, e posibil sa nu mai fie nevoie de InstallStatus</text>
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{b935eed0-4d97-4994-9f5d-a87c0636db34}</uid>
+                    <uid>{64ce8f2e-fd5a-4b94-9d43-c11e49a60445}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>PkgInstaller()</declaration>
-                   </MClassMember>
-                  </item>
-                  <item>
-                   <MClassMember>
-                    <uid>{82a1534a-2904-4a33-86ba-9dd04532bcda}</uid>
-                    <visibility>1</visibility>
-                    <type>2</type>
-                    <declaration>~PkgInstaller()</declaration>
-                   </MClassMember>
-                  </item>
-                  <item>
-                   <MClassMember>
-                    <uid>{d85f8237-97f8-4857-8de0-2340d8338816}</uid>
-                    <visibility>1</visibility>
-                    <type>2</type>
+                    <properties>64</properties>
                     <declaration>bool install(const QString&amp; zipPath=&quot;&quot;)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{d0878aa7-147a-4bf3-84d8-2bb480226b8a}</uid>
+                    <uid>{7f02c227-d7e7-4901-82c0-521bcb55d3ec}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
+                    <properties>64</properties>
                     <declaration>bool uninstall(const QString&amp; pkgName)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{1f771991-a7f7-4f79-b65a-31dfa16ac278}</uid>
+                    <uid>{fb903d18-eebf-4827-94fd-2a4aca05d1a2}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
+                    <properties>64</properties>
                     <declaration>bool update(const QString&amp; pkgName)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{6e42e19c-b2d7-450e-82ff-7cafb4595516}</uid>
+                    <uid>{3518c5ed-6c5d-454d-8850-bbbb3a73579a}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <properties>4</properties>
-                    <declaration>QStringList installedPkg()</declaration>
+                    <properties>64</properties>
+                    <declaration>bool preview(const QString &amp;zipPath = &quot;&quot;)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{a9108750-4a24-4d94-a5b6-5808ff7be696}</uid>
+                    <uid>{77fb372e-9914-4e27-8fab-c83403aef003}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>QFileInfo reverseSearch(const QString &amp;filePath)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{d386fcb6-def6-468b-9a51-470c0d4e42f3}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>QFileInfoList listFilesInfo(QStringList dirFilter = {}, QStringList fileFilter = {})</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{47f4af1f-3c5a-4672-8f79-d23809fa1e65}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>QStringList getPkgsName()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{e9369e39-6099-4b7a-85ae-cb7a8314bf2d}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>QStringList getPkgsAuthor()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{ba904d5d-1a51-47eb-8ab2-b63ad9804095}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>QStringList getPkgsVersion()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{6e1c1def-713e-4fcf-98d9-324d7ff9280d}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>QStringList getPkgsCategory()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{a06ff591-1db5-4783-88ee-17e125d0f0a0}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>QList&lt;QVariantMap&gt; getPkgsMeta()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{21758062-606e-4c82-a08a-f6c268169860}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void pkgExists(const QString &amp;zipPath, const QString &amp;pkgName)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{9854874e-7ead-4605-abbd-8522422c5981}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void pkgInstalled(bool restart)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{f0ef1494-1810-47fa-9fb2-5bacb294271e}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void pkgUninstalled(bool restart)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{ea3a5591-54dc-4229-9aa6-13df8ed0c5a4}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void zipMetadata(QVariantMap metadata)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{d5d6de49-7fd4-4243-a406-a1619495b6d4}</uid>
                     <visibility>3</visibility>
                     <type>2</type>
-                    <declaration>bool extractZip(const QString&amp; zipPath, const QString&amp; destPath)</declaration>
+                    <properties>64</properties>
+                    <declaration>QFileInfoList getFilesInfo(const QString &amp;path, const QStringList &amp;dirFilter,					  const QStringList &amp;fileFilter)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{ec9d4efa-8443-4669-b0b7-d9dfb73234e3}</uid>
+                    <uid>{2591274d-20aa-4287-8d36-89e377ef61b7}</uid>
                     <visibility>3</visibility>
                     <type>2</type>
-                    <declaration>bool extractFromStore(const QString&amp; pluginName, const QString&amp; destPath)</declaration>
+                    <declaration>void loadPkg(const QFileInfo &amp;fileInfo)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{3e42b2e9-b0ee-4baf-bf99-34e9198f852b}</uid>
+                    <uid>{aa56ed38-7c80-43b8-bd73-2486bfd50a48}</uid>
                     <visibility>3</visibility>
                     <type>2</type>
-                    <declaration>bool validatePkg(const QString&amp; pluginPath, QJsonObject&amp; metadata)</declaration>
+                    <declaration>void createPkgDirectory()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{92d71be1-dcdb-4f00-9854-54899ce708d2}</uid>
-                    <visibility>3</visibility>
-                    <type>2</type>
-                    <declaration>void extractJsonMetadata()</declaration>
-                   </MClassMember>
-                  </item>
-                  <item>
-                   <MClassMember>
-                    <uid>{19c134b9-3fa1-4d1f-866e-04257cef1f7d}</uid>
+                    <uid>{e3887020-7f86-4127-ae6f-cc5a676cff28}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>QStringList m_installedPkg</declaration>
+                    <properties>64</properties>
+                    <declaration>QString packagesPath_</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{14010405-9e19-48e9-8d4a-597bd00fe980}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <properties>64</properties>
+                    <declaration>PkgManager *pinstance_</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{8eaf9360-1eff-4bc5-b6b4-23b8fe2c662a}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <properties>64</properties>
+                    <declaration>QMap&lt;QString, QVariantMap&gt; validPackages_</declaration>
                    </MClassMember>
                   </item>
                  </qlist>
@@ -497,33 +895,11 @@ in .json-ul loal, e posibil sa nu mai fie nevoie de InstallStatus</text>
                     <uid>{906bcf25-7478-41a6-ab4c-7b767dc6746a}</uid>
                    </MElement>
                   </base-MElement>
-                  <name>PkgInstallerTool</name>
+                  <name>PkgWidget</name>
                   <relations>
                    <handles>
                     <handles>
                      <qlist>
-                      <item>
-                       <handle>
-                        <uid>{8f76929a-4899-47a0-839a-db8bdbf532a6}</uid>
-                        <target>
-                         <instance type="MInheritance">
-                          <MInheritance>
-                           <base-MRelation>
-                            <MRelation>
-                             <base-MElement>
-                              <MElement>
-                               <uid>{8f76929a-4899-47a0-839a-db8bdbf532a6}</uid>
-                              </MElement>
-                             </base-MElement>
-                             <a>{906bcf25-7478-41a6-ab4c-7b767dc6746a}</a>
-                             <b>{65a2fbef-0a48-4ad9-b3b5-3c2369be13ad}</b>
-                            </MRelation>
-                           </base-MRelation>
-                          </MInheritance>
-                         </instance>
-                        </target>
-                       </handle>
-                      </item>
                       <item>
                        <handle>
                         <uid>{89966f8a-6f8c-4c24-b487-4849542c7f6b}</uid>
@@ -555,29 +931,7 @@ in .json-ul loal, e posibil sa nu mai fie nevoie de InstallStatus</text>
                       </item>
                       <item>
                        <handle>
-                        <uid>{33baa0d7-38d1-4ae6-8fa6-dddce3b02a4e}</uid>
-                        <target>
-                         <instance type="MDependency">
-                          <MDependency>
-                           <base-MRelation>
-                            <MRelation>
-                             <base-MElement>
-                              <MElement>
-                               <uid>{33baa0d7-38d1-4ae6-8fa6-dddce3b02a4e}</uid>
-                              </MElement>
-                             </base-MElement>
-                             <a>{906bcf25-7478-41a6-ab4c-7b767dc6746a}</a>
-                             <b>{d109cd58-0491-42aa-9af1-4f744a1f0e0c}</b>
-                            </MRelation>
-                           </base-MRelation>
-                          </MDependency>
-                         </instance>
-                        </target>
-                       </handle>
-                      </item>
-                      <item>
-                       <handle>
-                        <uid>{9b16df1f-527c-4de4-a185-67758a7f2945}</uid>
+                        <uid>{0a44bc85-bb6f-433b-bb41-1e54881561bd}</uid>
                         <target>
                          <instance type="MAssociation">
                           <MAssociation>
@@ -585,21 +939,101 @@ in .json-ul loal, e posibil sa nu mai fie nevoie de InstallStatus</text>
                             <MRelation>
                              <base-MElement>
                               <MElement>
-                               <uid>{9b16df1f-527c-4de4-a185-67758a7f2945}</uid>
+                               <uid>{0a44bc85-bb6f-433b-bb41-1e54881561bd}</uid>
                               </MElement>
                              </base-MElement>
                              <a>{906bcf25-7478-41a6-ab4c-7b767dc6746a}</a>
-                             <b>{cc368629-053a-41c5-9dc8-4449935c7dd1}</b>
+                             <b>{114698a5-a2c2-4683-8c76-f179aeaeee15}</b>
                             </MRelation>
                            </base-MRelation>
                            <a>
                             <MAssociationEnd>
-                             <cardinality>*</cardinality>
+                             <cardinality>1</cardinality>
                              <navigable>true</navigable>
                              <kind>2</kind>
                             </MAssociationEnd>
                            </a>
                           </MAssociation>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                      <item>
+                       <handle>
+                        <uid>{4ebc2fea-be1d-4b80-90f6-781694345882}</uid>
+                        <target>
+                         <instance type="MAssociation">
+                          <MAssociation>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{4ebc2fea-be1d-4b80-90f6-781694345882}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{906bcf25-7478-41a6-ab4c-7b767dc6746a}</a>
+                             <b>{e5f3f983-0a86-45c7-81c3-f82e04e12cbf}</b>
+                            </MRelation>
+                           </base-MRelation>
+                           <a>
+                            <MAssociationEnd>
+                             <cardinality>1</cardinality>
+                             <navigable>true</navigable>
+                             <kind>2</kind>
+                            </MAssociationEnd>
+                           </a>
+                          </MAssociation>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                      <item>
+                       <handle>
+                        <uid>{6a58a13b-deb1-44fb-b0a8-3dd5d93c143b}</uid>
+                        <target>
+                         <instance type="MAssociation">
+                          <MAssociation>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{6a58a13b-deb1-44fb-b0a8-3dd5d93c143b}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{906bcf25-7478-41a6-ab4c-7b767dc6746a}</a>
+                             <b>{fe2beb0e-9709-4a5e-b193-8a49f9bacc0f}</b>
+                            </MRelation>
+                           </base-MRelation>
+                           <a>
+                            <MAssociationEnd>
+                             <cardinality>1</cardinality>
+                             <navigable>true</navigable>
+                             <kind>2</kind>
+                            </MAssociationEnd>
+                           </a>
+                          </MAssociation>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                      <item>
+                       <handle>
+                        <uid>{b3fd6cb8-978d-4708-8e99-b1cdfeea850f}</uid>
+                        <target>
+                         <instance type="MDependency">
+                          <MDependency>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{b3fd6cb8-978d-4708-8e99-b1cdfeea850f}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{906bcf25-7478-41a6-ab4c-7b767dc6746a}</a>
+                             <b>{e8cdc70f-9f4c-40e2-b256-d10eb4672e42}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MDependency>
                          </instance>
                         </target>
                        </handle>
@@ -615,107 +1049,86 @@ in .json-ul loal, e posibil sa nu mai fie nevoie de InstallStatus</text>
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{1800e3b0-4331-4592-aff8-489a4b7fbcdc}</uid>
+                    <uid>{edc4ca50-329e-4e9d-9e3e-041054262770}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>PkgInstallerTool(PkgInstaller *installer, QWidget *parent=nullptr)</declaration>
+                    <declaration>PkgWidget(QWidget *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{44d2533f-96f9-4b1f-9be0-8a532702cacb}</uid>
+                    <uid>{94ba78c2-589e-4aef-9194-feaf71e990da}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>~PkgInstallerTool()</declaration>
+                    <declaration>~PkgWidget()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{953599da-3229-4f58-8c4c-c05c3e94bfc5}</uid>
+                    <uid>{1ac5445d-5480-46e9-a765-eedbd026592d}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>QWidget *pkgList(QWidget *parent = nullptr)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{7165b5b2-a759-4bb8-a81a-c7a8a544bfe2}</uid>
+                    <visibility>7</visibility>
+                    <type>2</type>
+                    <declaration>void showInstallDialog(const QString &amp;zipPath, const QString &amp;pkgPath)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{8197c0dd-a6e4-4d59-8fde-f5874e0a9b6c}</uid>
                     <visibility>5</visibility>
                     <type>2</type>
-                    <declaration>void addZip()</declaration>
+                    <declaration>void onInstall(const QString &amp;zipPath)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{5eca0920-243a-45aa-9039-a0d1773c4761}</uid>
-                    <visibility>5</visibility>
+                    <uid>{8b8a04c5-4c0f-47fd-a445-ea654d2b3e64}</uid>
+                    <visibility>4</visibility>
                     <type>2</type>
-                    <declaration>void install(const QString &amp;version)</declaration>
+                    <declaration>void pkgReinstalled(bool installed = true)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{1b413a92-b918-4f75-83a9-13f42620ffd5}</uid>
-                    <visibility>5</visibility>
-                    <type>2</type>
-                    <declaration>void uninstall()</declaration>
-                   </MClassMember>
-                  </item>
-                  <item>
-                   <MClassMember>
-                    <uid>{ecc4142e-fe5a-44a7-9b75-eefc25780a91}</uid>
+                    <uid>{572cf900-878e-40de-a37f-a02085433e43}</uid>
                     <visibility>3</visibility>
                     <type>2</type>
-                    <declaration>QWidget *buildPkgSection(QWidget *parent)</declaration>
+                    <declaration>QWidget *createRestartWidget(QWidget *parent)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{6c99bc4a-ea89-43e4-a06a-093393b8c1fd}</uid>
-                    <visibility>3</visibility>
-                    <type>2</type>
-                    <declaration>QJsonObject *getInstalledMetadata()</declaration>
-                   </MClassMember>
-                  </item>
-                  <item>
-                   <MClassMember>
-                    <uid>{47396830-4351-42c1-ac6c-be105b6427b2}</uid>
+                    <uid>{221c9e3f-6980-4679-9353-aa101a32389e}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>PkgInstaller *m_pkgInstaller</declaration>
+                    <declaration>QVBoxLayout *m_layScroll</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{4c046fb3-73d9-4081-82b0-81bbd085e053}</uid>
+                    <uid>{90852675-a518-4716-b05e-b6963525e80e}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>QPushButton *m_addZipBtn</declaration>
+                    <declaration>QSpacerItem *m_scrollSpacer</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{726cd107-bde2-4202-bbf0-b32c9e03605f}</uid>
+                    <uid>{830f715a-f90d-4c50-b9a6-a40268df96b7}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>QMap&lt;QString, PkgInstallerEntry*&gt; m_entryMap</declaration>
+                    <declaration>VerticalTabWidget *m_tabWidget</declaration>
                    </MClassMember>
                   </item>
                  </qlist>
                 </members>
-               </MClass>
-              </instance>
-             </target>
-            </handle>
-           </item>
-           <item>
-            <handle>
-             <uid>{65a2fbef-0a48-4ad9-b3b5-3c2369be13ad}</uid>
-             <target>
-              <instance type="MClass">
-               <MClass>
-                <base-MObject>
-                 <MObject>
-                  <base-MElement>
-                   <MElement>
-                    <uid>{65a2fbef-0a48-4ad9-b3b5-3c2369be13ad}</uid>
-                   </MElement>
-                  </base-MElement>
-                  <name>QWidget</name>
-                 </MObject>
-                </base-MObject>
                </MClass>
               </instance>
              </target>
@@ -744,7 +1157,7 @@ in .json-ul loal, e posibil sa nu mai fie nevoie de InstallStatus</text>
            </item>
            <item>
             <handle>
-             <uid>{d109cd58-0491-42aa-9af1-4f744a1f0e0c}</uid>
+             <uid>{93dd4053-a0a6-452a-8948-50f2ee47f8db}</uid>
              <target>
               <instance type="MClass">
                <MClass>
@@ -752,13 +1165,107 @@ in .json-ul loal, e posibil sa nu mai fie nevoie de InstallStatus</text>
                  <MObject>
                   <base-MElement>
                    <MElement>
-                    <uid>{d109cd58-0491-42aa-9af1-4f744a1f0e0c}</uid>
+                    <uid>{93dd4053-a0a6-452a-8948-50f2ee47f8db}</uid>
                    </MElement>
                   </base-MElement>
-                  <name>StatusBarManager</name>
+                  <name>PkgUtil</name>
                  </MObject>
                 </base-MObject>
                 <namespace>scopy</namespace>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{a7baecbf-a3af-4733-9d8a-7de4d0beef27}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>bool removePkg(const QString &amp;path)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{374c3472-e9d9-4b8d-a0c7-55f93096ea13}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>bool extractZip(const QString &amp;zipPath, const QString &amp;destPath)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{144d9c33-e37c-416a-8da7-6b35d10c2e2b}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>QJsonObject extractJsonMetadata(const QString &amp;zipPath)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{bff2ac92-d592-499d-afbc-4369f84dd41f}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>QJsonObject getMetadata(const QString &amp;path)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{a8b3fffa-3721-4937-b57d-2ecd03b001c8}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>bool validatePkg(QJsonObject &amp;metadata)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{5822ee25-8848-4fe8-b940-cd45c58eae08}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>QString checkPkgPath(const QString &amp;path, const QString &amp;pkgId)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{5d1a83f8-ba2b-47bd-b8f8-b0ef2c8d6f32}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>QString validateArchiveEntry(const KZip &amp;zip)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{044f1d87-48b5-460c-bd0b-37629e10d787}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>void addExtraField(QJsonObject &amp;metadata, const QString &amp;field, const QJsonValue &amp;value)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{b4be7974-4e05-449d-9162-ec82d0db341b}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>void addFileMetadata(QJsonObject &amp;metadata, const QString &amp;path)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{017b5cab-69b7-4852-8e84-995c6b0761d1}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <properties>64</properties>
+                    <declaration>QString getFileSize(const QString &amp;path)</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
                </MClass>
               </instance>
              </target>
@@ -766,7 +1273,7 @@ in .json-ul loal, e posibil sa nu mai fie nevoie de InstallStatus</text>
            </item>
            <item>
             <handle>
-             <uid>{cc368629-053a-41c5-9dc8-4449935c7dd1}</uid>
+             <uid>{114698a5-a2c2-4683-8c76-f179aeaeee15}</uid>
              <target>
               <instance type="MClass">
                <MClass>
@@ -774,17 +1281,514 @@ in .json-ul loal, e posibil sa nu mai fie nevoie de InstallStatus</text>
                  <MObject>
                   <base-MElement>
                    <MElement>
-                    <uid>{cc368629-053a-41c5-9dc8-4449935c7dd1}</uid>
+                    <uid>{114698a5-a2c2-4683-8c76-f179aeaeee15}</uid>
                    </MElement>
                   </base-MElement>
-                  <name>PkgInstallerEntry</name>
+                  <name>PkgInstalledTab</name>
                   <relations>
                    <handles>
                     <handles>
                      <qlist>
                       <item>
                        <handle>
-                        <uid>{ca6e172f-1779-44cf-aeca-dccc40981887}</uid>
+                        <uid>{5383d352-8fc4-4e86-bd40-bf9cbc30d4ee}</uid>
+                        <target>
+                         <instance type="MDependency">
+                          <MDependency>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{5383d352-8fc4-4e86-bd40-bf9cbc30d4ee}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{114698a5-a2c2-4683-8c76-f179aeaeee15}</a>
+                             <b>{e8cdc70f-9f4c-40e2-b256-d10eb4672e42}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MDependency>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                      <item>
+                       <handle>
+                        <uid>{d7239f69-fa54-405c-828c-3745f8d4afa4}</uid>
+                        <target>
+                         <instance type="MAssociation">
+                          <MAssociation>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{d7239f69-fa54-405c-828c-3745f8d4afa4}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{114698a5-a2c2-4683-8c76-f179aeaeee15}</a>
+                             <b>{39493bd4-72b0-42cc-8a51-2682e23ef88c}</b>
+                            </MRelation>
+                           </base-MRelation>
+                           <a>
+                            <MAssociationEnd>
+                             <cardinality>1</cardinality>
+                             <navigable>true</navigable>
+                             <kind>2</kind>
+                            </MAssociationEnd>
+                           </a>
+                          </MAssociation>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                      <item>
+                       <handle>
+                        <uid>{5649abbd-f22b-4bc4-8eef-ca00409b332e}</uid>
+                        <target>
+                         <instance type="MAssociation">
+                          <MAssociation>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{5649abbd-f22b-4bc4-8eef-ca00409b332e}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{114698a5-a2c2-4683-8c76-f179aeaeee15}</a>
+                             <b>{00711039-16b4-4c11-aebd-5b9c40b61258}</b>
+                            </MRelation>
+                           </base-MRelation>
+                           <a>
+                            <MAssociationEnd>
+                             <cardinality>1</cardinality>
+                             <navigable>true</navigable>
+                             <kind>2</kind>
+                            </MAssociationEnd>
+                           </a>
+                          </MAssociation>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                     </qlist>
+                    </handles>
+                   </handles>
+                  </relations>
+                 </MObject>
+                </base-MObject>
+                <namespace>scopy</namespace>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{760e142f-602a-4ef9-b60b-8432869d39e7}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>PkgInstalledTab(QWidget *parent = nullptr)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{82f00b60-0015-4cb8-9940-6c051f45eac8}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>~PkgInstalledTab()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{6abdec86-1fa9-462a-a036-dcbebf2e7434}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>void onUninstall()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{171bc803-fe40-4a4d-8697-da0ddbb3c332}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>void previewSwitchClicked(bool checked)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{307f0145-2294-49f9-804f-3faf2539fdac}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>void onPkgPreview(const QVariantMap &amp;metadata)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{85af34c6-b05e-452e-8c57-1444da64becc}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>void onCategorySelected(const QString &amp;category)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{545c7e09-bcae-4222-925e-4068f7772752}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>void fillPkgSection()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{5e0deef3-9f3e-4756-9d17-ade94d349776}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>PkgCard *createPkgCard(const QVariantMap &amp;meta)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{49e78d01-54bd-4ae2-a6f3-8b699e724078}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>PkgGridWidget *m_pkgGrid</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{ff1768a5-9d4f-411a-9670-72cf8bac33c0}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>SearchBar *m_searchBar</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{7530270e-2eb3-42ac-88f8-9f8dc0b4b440}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>PkgPreviewPage *m_preview</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{f0b1b54a-bd15-436f-895a-5c5fc47f9757}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>QSplitter *m_vSplitter</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{e5f3f983-0a86-45c7-81c3-f82e04e12cbf}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{e5f3f983-0a86-45c7-81c3-f82e04e12cbf}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>PkgZipWidget</name>
+                 </MObject>
+                </base-MObject>
+                <namespace>scopy</namespace>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{af60f32d-3fc6-41e6-83ac-e69fc6ca75e3}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>PkgZipWidget(QWidget *parent)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{5a4acd4d-9668-4dbc-bad8-dd8d312b71f2}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>~PkgZipWidget()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{1806d2a9-8726-47d4-878e-8293e54a55bb}</uid>
+                    <visibility>7</visibility>
+                    <type>2</type>
+                    <declaration>void onZipMetadata(QVariantMap metadata)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{908dedd1-8fc5-4796-a19c-5803b5da1677}</uid>
+                    <visibility>7</visibility>
+                    <type>2</type>
+                    <declaration>void onInstallFinished()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{cb4aab91-f1b5-4d30-80b1-8bbcf485561c}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void pkgPathSelected(const QString &amp;path)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{bda24497-f690-4c9d-b27c-3716558894b3}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void installClicked(const QString &amp;zipPath)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{b0d0a351-b02d-4c87-ad47-23a4685ff21d}</uid>
+                    <visibility>5</visibility>
+                    <type>2</type>
+                    <declaration>void fileBrowserEvent(const QString &amp;text)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{8326cf54-7efc-455b-9595-5ba5793dc698}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>MenuSectionCollapseWidget *createSection(QString title, QString description, QWidget *parent = nullptr)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{d03de46a-ec79-4b20-a5d8-98ae9b42020f}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>InfoHeaderWidget *getInfoHeader(MenuCollapseSection *section)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{0df0bfb7-d9f7-47b1-aa16-5eaa660d781b}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>MenuSectionCollapseWidget *createBrowserSection(QWidget *parent = nullptr)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{22919de9-fd96-40cd-88dd-fba8a689d407}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>FileBrowserWidget *m_fileBrowser</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{e4616afa-6a2f-4631-a612-0b90249917d1}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>PkgPreviewPage *m_preview</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{07549192-6b3a-4bb4-909d-15c090900797}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>QLabel *m_warningLabel</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{45f99350-8344-4695-92e8-8a90a398a9e3}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>InstallBtn *m_installBtn</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{fe2beb0e-9709-4a5e-b193-8a49f9bacc0f}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{fe2beb0e-9709-4a5e-b193-8a49f9bacc0f}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>PluginsTab</name>
+                  <relations>
+                   <handles>
+                    <handles>
+                     <qlist>
+                      <item>
+                       <handle>
+                        <uid>{26b604f8-0dd9-42be-baec-1f5ef4fc64b0}</uid>
+                        <target>
+                         <instance type="MDependency">
+                          <MDependency>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{26b604f8-0dd9-42be-baec-1f5ef4fc64b0}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{fe2beb0e-9709-4a5e-b193-8a49f9bacc0f}</a>
+                             <b>{e8cdc70f-9f4c-40e2-b256-d10eb4672e42}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MDependency>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                      <item>
+                       <handle>
+                        <uid>{ce064848-2ac5-4cab-800d-00db902636d6}</uid>
+                        <target>
+                         <instance type="MAssociation">
+                          <MAssociation>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{ce064848-2ac5-4cab-800d-00db902636d6}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{fe2beb0e-9709-4a5e-b193-8a49f9bacc0f}</a>
+                             <b>{2e39025d-48eb-440f-93aa-206413dc5fc5}</b>
+                            </MRelation>
+                           </base-MRelation>
+                           <a>
+                            <MAssociationEnd>
+                             <cardinality>1</cardinality>
+                             <navigable>true</navigable>
+                             <kind>2</kind>
+                            </MAssociationEnd>
+                           </a>
+                          </MAssociation>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                     </qlist>
+                    </handles>
+                   </handles>
+                  </relations>
+                 </MObject>
+                </base-MObject>
+                <namespace>scopy</namespace>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{60e86ed7-08e5-48d5-8360-8cc6d89d67f3}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>PluginsTab(QWidget *parent = nullptr)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{73a8edfc-2895-4f85-b0d0-0db58434ead8}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>~PluginsTab()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{e976a989-4204-49b9-b4f4-bed0d952deed}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>void addCards()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{0201ef7d-3a01-424e-b489-6f5734a212b0}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>void addLoadedPlugins()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{1be0826a-fcba-40a6-b7e4-50358c306614}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>void addUnloadedPlugins()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{3d2aef02-a11c-4435-88de-e9dbd3f8415e}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>QLabel *createStatusLabel(const QString &amp;text, const QString &amp;status)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{a20e2da5-016c-4812-b1b6-49b0b012555b}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>CardWidget *createPluginCard(const QString &amp;id, const QString &amp;title, const QString &amp;subtitle, 				     const QString &amp;description, const QString &amp;version = &quot;&quot;)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{7d2dd228-a72f-4f06-a3d2-affe751c2d95}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>GridWidget *m_pluginsGrid</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{39493bd4-72b0-42cc-8a51-2682e23ef88c}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{39493bd4-72b0-42cc-8a51-2682e23ef88c}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>PkgGridWidget</name>
+                  <relations>
+                   <handles>
+                    <handles>
+                     <qlist>
+                      <item>
+                       <handle>
+                        <uid>{1024efc0-4e7a-4cd8-86b3-a6389528f751}</uid>
                         <target>
                          <instance type="MInheritance">
                           <MInheritance>
@@ -792,11 +1796,333 @@ in .json-ul loal, e posibil sa nu mai fie nevoie de InstallStatus</text>
                             <MRelation>
                              <base-MElement>
                               <MElement>
-                               <uid>{ca6e172f-1779-44cf-aeca-dccc40981887}</uid>
+                               <uid>{1024efc0-4e7a-4cd8-86b3-a6389528f751}</uid>
                               </MElement>
                              </base-MElement>
-                             <a>{cc368629-053a-41c5-9dc8-4449935c7dd1}</a>
-                             <b>{7d70857a-b28a-4e5b-b1e4-445bce880a79}</b>
+                             <a>{39493bd4-72b0-42cc-8a51-2682e23ef88c}</a>
+                             <b>{2e39025d-48eb-440f-93aa-206413dc5fc5}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MInheritance>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                      <item>
+                       <handle>
+                        <uid>{18a32274-8f49-4b0f-b7b7-79c8b667f312}</uid>
+                        <target>
+                         <instance type="MAssociation">
+                          <MAssociation>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{18a32274-8f49-4b0f-b7b7-79c8b667f312}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{39493bd4-72b0-42cc-8a51-2682e23ef88c}</a>
+                             <b>{e873e609-b672-4af0-b122-6f46588830b1}</b>
+                            </MRelation>
+                           </base-MRelation>
+                           <a>
+                            <MAssociationEnd>
+                             <cardinality>*</cardinality>
+                             <navigable>true</navigable>
+                             <kind>2</kind>
+                            </MAssociationEnd>
+                           </a>
+                          </MAssociation>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                     </qlist>
+                    </handles>
+                   </handles>
+                  </relations>
+                 </MObject>
+                </base-MObject>
+                <namespace>scopy</namespace>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{a6cc45a6-44e5-4b99-be41-01c957f63233}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>PkgGridWidget(QWidget *parent = nullptr)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{adf2aa15-803c-4086-a2b2-abddf2e76d49}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>~PkgGridWidget()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{a1536cac-8398-4b24-a388-a6a865f3af49}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>void searchPkg(const QStringList &amp;fields, const QStringList &amp;options)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{bf611e08-8b49-4ae0-a232-a05bc31a53a6}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>void updatePkgsStyle(bool property)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{d5bbfc0e-c6f5-4165-a370-735432d43e21}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>bool isFieldMatch(const QVariantMap &amp;pkgMetadata, const QString &amp;field, const QStringList &amp;options)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{48272c62-40bf-4a12-82e4-045b52aa6b94}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>bool isSearchMatch(const QString &amp;pkgVal, const QStringList &amp;searchingValues)</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{00711039-16b4-4c11-aebd-5b9c40b61258}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{00711039-16b4-4c11-aebd-5b9c40b61258}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>PkgPreviewPage</name>
+                 </MObject>
+                </base-MObject>
+                <namespace>scopy</namespace>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{6547994f-adfb-447d-9402-96d024395d5f}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>PkgPreviewPage(QWidget *parent = nullptr)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{8034b9a9-34dd-477d-a0ec-457a8ec8aa33}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>~PkgPreviewPage()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{c5a6c059-11c2-4c53-b9f2-80eb80afa418}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>void updatePreview(const QVariantMap &amp;metadata)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{e4f99357-f668-4fb0-97a7-612a6eb1da08}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>InfoHeaderWidget *getInfoHeader(MenuCollapseSection *section)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{7e324631-e384-43a7-b0ed-4ab18ec5d64a}</uid>
+                    <visibility>3</visibility>
+                    <type>2</type>
+                    <declaration>MenuSectionCollapseWidget *createSection(QString title, QString description, QWidget *parent)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{5a5fd07a-ecd4-4542-8862-e1ce57a1265b}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>InfoPage *m_infoPage</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{2e39025d-48eb-440f-93aa-206413dc5fc5}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{2e39025d-48eb-440f-93aa-206413dc5fc5}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>GridWidget</name>
+                 </MObject>
+                </base-MObject>
+                <namespace>scopy</namespace>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{5f7dcbd6-eeab-4855-88e1-cee414b969ec}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>GridWidget(QWidget *parent)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{1dd08b5b-1ad2-4fa4-903a-b430ee954dbd}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>~GridWidget()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{b411dd97-40b5-4d01-9d94-cb38a2dda3a6}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>void addWidget(QWidget *widget, const QString &amp;id)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{038b1247-b5ff-4835-bf21-ad9e415709bf}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>void removeWidget(const QString &amp;id)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{5d3a35e3-c030-4fa5-aa7b-0b5c5edf0996}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>void setColumnCount(int colCount)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{c88f820f-8ba1-4219-b24a-d4519d55b9f1}</uid>
+                    <visibility>1</visibility>
+                    <type>2</type>
+                    <declaration>void clearWidgets()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{a0afc059-7706-41d1-b597-ab61a61fe8f0}</uid>
+                    <visibility>2</visibility>
+                    <type>2</type>
+                    <properties>1</properties>
+                    <declaration>void rebuildLayout()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{a58efbce-1423-4ca6-8237-9e62b63dc5f5}</uid>
+                    <visibility>2</visibility>
+                    <type>2</type>
+                    <declaration>void hideAll()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{9d58109d-8597-4c0c-bd97-52147ef507e8}</uid>
+                    <visibility>2</visibility>
+                    <type>1</type>
+                    <declaration>QGridLayout *m_layout</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{dbffec58-99ff-481e-b1ae-a340c39ef46e}</uid>
+                    <visibility>2</visibility>
+                    <type>1</type>
+                    <declaration>QMap&lt;QString, QWidget *&gt; m_widgetMap</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{66d033c5-b1f3-4cda-9333-d1ff04b0a0aa}</uid>
+                    <visibility>2</visibility>
+                    <type>1</type>
+                    <declaration>int m_maxCol</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{e873e609-b672-4af0-b122-6f46588830b1}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{e873e609-b672-4af0-b122-6f46588830b1}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>PkgCard</name>
+                  <relations>
+                   <handles>
+                    <handles>
+                     <qlist>
+                      <item>
+                       <handle>
+                        <uid>{0f245402-3a1b-4c1f-8b02-757844300e86}</uid>
+                        <target>
+                         <instance type="MInheritance">
+                          <MInheritance>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{0f245402-3a1b-4c1f-8b02-757844300e86}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{e873e609-b672-4af0-b122-6f46588830b1}</a>
+                             <b>{1e5ffb46-930e-4598-becb-0eb7ebb7c4d1}</b>
                             </MRelation>
                            </base-MRelation>
                           </MInheritance>
@@ -815,134 +2141,182 @@ in .json-ul loal, e posibil sa nu mai fie nevoie de InstallStatus</text>
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{7b8a5b39-125d-41af-9221-340ff213ecaa}</uid>
+                    <uid>{6f1923e5-2afc-40d7-a7f4-506374d50208}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>PkgInstallerEntry(QObject *parent=nullptr)</declaration>
+                    <declaration>PkgCard(QWidget *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{add20658-2705-460c-ae4f-df3e578263b0}</uid>
+                    <uid>{c61415ca-dcad-40b9-8a14-797790499bb8}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>~PkgInstallerEntry()</declaration>
+                    <declaration>~PkgCard()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{9607d3fd-c24b-4e9a-ab7b-5706ad15e57c}</uid>
+                    <uid>{badcedf0-c543-41df-b5d8-e27519ba29aa}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>QWidget *build()</declaration>
+                    <declaration>void setVersions(QStringList versions)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{b7904262-4789-4655-a3bc-8c8cd54b7691}</uid>
+                    <uid>{f87bfe89-27b3-43e2-95ea-c1d93e8d0bcd}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>PkgInstallerEntry &amp;name(const QString &amp;name)</declaration>
+                    <declaration>void installFinished(bool installed)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{cd65cf32-8015-49f2-98af-24cb30366e43}</uid>
+                    <uid>{9b9464a4-9b7c-4955-81f5-62cf4ac6bc4a}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>PkgInstallerEntry &amp;description(const QString &amp;description)</declaration>
+                    <declaration>void uninstallFinished(bool uninstalled)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{248f61f7-0d48-4852-829f-598312872f5b}</uid>
+                    <uid>{1993861e-3826-45fd-981e-2601251d06d8}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>PkgInstallerEntry &amp;moreInfo(const QString &amp;moreInfo)</declaration>
+                    <properties>4</properties>
+                    <declaration>QVariantMap metadata()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{250edecb-597a-44c1-8b24-9699b103da89}</uid>
-                    <visibility>1</visibility>
+                    <uid>{ffeca3cf-6538-4caf-ad7b-6538624b19e7}</uid>
+                    <visibility>7</visibility>
                     <type>2</type>
-                    <declaration>PkgInstallerEntry &amp;installStatus(PkgInstallStatus status)</declaration>
+                    <declaration>void fillMetadata(QVariantMap metadata, bool installed = false)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{43c4e21a-f546-4d2d-8e8f-93053a07652b}</uid>
-                    <visibility>1</visibility>
-                    <type>2</type>
-                    <declaration>PkgInstallerEntry &amp;versionStatus(const QMap&lt;QString, InstallStatus&gt; versionStatus)</declaration>
-                   </MClassMember>
-                  </item>
-                  <item>
-                   <MClassMember>
-                    <uid>{358bf0d2-e1cb-4321-9df9-586d78213f99}</uid>
+                    <uid>{618d6fae-ee4a-4dde-81d8-378b2b08be00}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
-                    <declaration>void install(const QString &amp;version)</declaration>
+                    <declaration>void installClicked()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{9fd43d35-e90d-4620-9d47-3203359147b2}</uid>
+                    <uid>{55b8430f-2ab1-4f83-9d97-ee86c73a099f}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
-                    <declaration>void uninstall()</declaration>
+                    <declaration>void uninstallClicked()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{34297e6f-7d46-407c-acd1-4d2e84bc23d8}</uid>
-                    <visibility>3</visibility>
-                    <type>1</type>
-                    <declaration>QString m_name</declaration>
+                    <uid>{9a9620de-d8a7-4172-a848-7dfc020199aa}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void preview(const QVariantMap &amp;metadata)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{a5807cf9-708b-482a-bf1b-ffd81511b617}</uid>
-                    <visibility>3</visibility>
-                    <type>1</type>
-                    <declaration>QString m_description</declaration>
+                    <uid>{0b0ce3e3-aa47-4e76-be78-6e5015ce1cac}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void hidePreview()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{e35c8214-4493-4146-88dd-b4b080331f7c}</uid>
-                    <visibility>3</visibility>
-                    <type>1</type>
-                    <declaration>QString m_moreInfo</declaration>
+                    <uid>{ac9aaa2a-67ad-4661-8d8d-a2a9ea0fd565}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void categorySelected(const QString &amp;cat)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{887b7606-7011-4c75-8e09-3abad6e8d831}</uid>
-                    <visibility>3</visibility>
-                    <type>1</type>
-                    <declaration>QMap&lt;QString, InstallStatus&gt; m_versionStatusMap</declaration>
+                    <uid>{05c5eb49-7c33-4027-bd7b-b7f72ab4f497}</uid>
+                    <visibility>2</visibility>
+                    <type>2</type>
+                    <declaration>void mousePressEvent(QMouseEvent *event)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{056d359a-7441-41d4-9d83-cb9dcda17c1f}</uid>
+                    <uid>{137dbd08-2df7-4579-a87c-9ee7c954f255}</uid>
                     <visibility>3</visibility>
-                    <type>1</type>
-                    <declaration>QPushButton *m_installBtn</declaration>
+                    <type>2</type>
+                    <declaration>void fillCategories(QStringList categories)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{ced1db3d-ac45-466d-a6aa-ac059c512290}</uid>
+                    <uid>{097f335f-d526-4e1c-8af9-f68b6fac846d}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>QPushButton *m_removeBtn</declaration>
+                    <declaration>InstallBtn *m_installBtn</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{c24c7068-1ba3-48e4-9982-6d2d19316b7b}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>UninstallBtn *m_uninstallBtn</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{d6e96b1f-e44f-45e6-b964-533dc774888a}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>QVariantMap m_metadata</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{273a4493-6397-4b1e-b6b3-d27cd9be85af}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <declaration>QHBoxLayout *m_categoryLay</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{59ef1600-d043-4c93-9001-b3215ef52d68}</uid>
+                    <visibility>3</visibility>
+                    <type>1</type>
+                    <properties>64</properties>
+                    <declaration>QVector&lt;QString&gt; m_categories</declaration>
                    </MClassMember>
                   </item>
                  </qlist>
                 </members>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{1e5ffb46-930e-4598-becb-0eb7ebb7c4d1}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{1e5ffb46-930e-4598-becb-0eb7ebb7c4d1}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>CardWidget</name>
+                 </MObject>
+                </base-MObject>
+                <namespace>scopy</namespace>
                </MClass>
               </instance>
              </target>
