@@ -47,11 +47,10 @@ Test 1: Channel 1 Operation
         - Use :ref:`M2k.Usb <m2k-usb-spectrum-analyzer>` setup.
 
 **Steps:**
-        1. Test Channel 1’s frequency accuracy
-        2. On channel 1’s setting, set Type to Sample, Window Function to Flat-top and Averaging to 1.
+        1. Open Spectrum Analyzer plugin.
+        2. On channel 1’s setting, set Type to Sample, Window Function to Flat-top and CH to 1.
         3. Connect Scope ch1+ to W+ and Scope ch1- to GND
-        4. Test at 500Hz
-        5. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 1kHz, set the Resolution BW to 244.14mHZ. On signal Generator, Set Amplitude: 10V, Frequency: 500Hz, Offset: 0V and Phase: 0 degrees
+        4. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 1kHz, set the Resolution BW to 244.14mHZ. On signal Generator, Set Amplitude: 10V, Frequency: 500Hz, Offset: 0V and Phase: 0 degrees
                 - **Expected Result:** After setting the start and stop frequency, the center frequency and Span should follow.
                 - **Actual Result:**
 
@@ -266,8 +265,8 @@ Test 2: Channel 2 Operation
         - Use :ref:`M2k.Usb <m2k-usb-spectrum-analyzer>` setup.
 
 **Steps:**
-        1. Test Channel 2’s frequency accuracy
-        2. On Channel 2’s setting, set Type to Sample, Window Function to Flat-top and Averaging to 1.
+        1. Open Spectrum Analyzer plugin.
+        2. On Channel 2’s setting, set Type to Sample, Window Function to Flat-top and CH Thickness to 1.
         3. Connect Scope ch2+ to W2+ and Scope ch2- to GND
         4. Test at 500Hz
         5. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 1kHz, set the Resolution BW to 244.14mHZ. On signal Generator, Set Amplitude: 10V, Frequency: 500Hz, Offset: 0V and Phase: 0 degrees
@@ -486,9 +485,9 @@ Test 3: Channel 1 and 2 Operation
 
 **Steps:**
         1. Testing the marker function for channel 1 and 2
-        2. On channel 1 and 2’s setting, set Type to Sample, Window Function to Flat-top and Averaging to 1.
+        2. On channel 1 and 2’s setting, set Type to Sample, Window Function to Flat-top and CH Thickness to 1.
         3. Connect Scope ch1+ to W1 and Scope ch1- to GND. Connect Scope ch2+ to W2 and Scope ch2- to GND
-        4. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 1MHz, set the Resolution BW to 61.04Hz. On signal Generator, Set Channel 1’s Amplitude: 10V, Frequency: 250 kHz, Offset: 0V and Phase: 0 degrees. Amplitude: 10V, Frequency: 750 kHz, Offset: 0V and Phase: 0 degrees
+        4. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 1MHz, set the Resolution BW to 61.04Hz. On signal Generator, Set Channel 1’s Amplitude: 10V, Frequency: 250 kHz, Offset: 0V and Phase: 0 degrees. Set Channel 2’s Amplitude: 10V, Frequency: 750 kHz, Offset: 0V and Phase: 0 degrees
         5. Open the marker setting and select channel 1. Enable marker 1,2,3,4 or 5.
                 - **Expected Result:** The marker is enabled when the number box is filled with color. The initial position of the marker is on the center frequency of the window.
                 - **Actual Result:**
@@ -513,7 +512,7 @@ Test 3: Channel 1 and 2 Operation
   Actual test result goes here.
 ..
 
-        8. Click the “Dn Ampl” button.
+        8. Click the “Down Ampl” button.
                 - **Expected Result:** The marker should detect the next lower amplitude signal compared from the previous point within the channel 1’s spectrum.
                 - **Actual Result:**
 
@@ -553,7 +552,7 @@ Test 3: Channel 1 and 2 Operation
   Actual test result goes here.
 ..
 
-        13. Click the “Dn Ampl” button.
+        13. Click the “Down Ampl” button.
                 - **Expected Result:** The marker should detect the next lower amplitude signal compared from the previous point within the channel 2’s spectrum.
                 - **Actual Result:**
 
