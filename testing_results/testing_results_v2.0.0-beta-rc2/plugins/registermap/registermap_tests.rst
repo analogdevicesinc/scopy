@@ -24,11 +24,11 @@ Prerequisites:
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Alexandra Trifan
+         - 19/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Debian 12 arm64
 
 Setup Environment
 ------------------
@@ -78,14 +78,14 @@ Test 1 : Read
     2. Select a register address "0x2" using address picker
     3. Press **Read** button
         - **Expected result:** The value "0x02" is displayed in the **Value** field 
-        - **Actual result:**
+        - **Actual result:** Value 0x02 is displayed in the Value field
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -95,7 +95,7 @@ Test 1 : Read
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -124,13 +124,13 @@ Test 2 : Write
     3. Read current value of the register
     4. Change the value to 0x4a
         - **Expected result:** The value "0x4a" is displayed in the **Value** field
-        - **Actual result:**
+        - **Actual result:** Value changed and remained 0x4a after reading it again.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -140,7 +140,7 @@ Test 2 : Write
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -169,13 +169,13 @@ Test 3 : Write wrong value
     3. Read current value of the register
     4. Change the value to 0xtest
         - **Expected result:** The value "0x00" is displayed in the **Value** field 
-        - **Actual result:**
+        - **Actual result:** Invalid value is handled correctly.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -185,7 +185,7 @@ Test 3 : Write wrong value
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -213,13 +213,13 @@ Test 4 : Change device
        ad9361-phy to cf-ad9361-lpc
 
         - **Expected result:** The device is changed reflected by changing the register table 
-        - **Actual result:**
+        - **Actual result:** Register map table is updated with the new device
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -229,7 +229,7 @@ Test 4 : Change device
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -258,13 +258,13 @@ Test 5 : Show register map table
 **Steps:**
     1. Open Register Map plugin
         - **Expected result:** The register map table is displayed in the plugin
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -274,7 +274,7 @@ Test 5 : Show register map table
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -308,7 +308,7 @@ Test 6 : Search register
           table each of them has "test" in the name or 
           description of the register or bitfields
 
-        - **Actual result:**
+        - **Actual result:** 4 registers visible in the table.
 
 ..
   Actual test result goes here.
@@ -320,7 +320,7 @@ Test 6 : Search register
           rest have "010" in the name or description of the 
           register or bitfields
 
-        - **Actual result:**
+        - **Actual result:** 3 registers visible in the table.
 
 ..
   Actual test result goes here.
@@ -328,7 +328,7 @@ Test 6 : Search register
 
     6. Input "not in here" in the search field
         - **Expected result:** No register is displayed in the table
-        - **Actual result:**
+        - **Actual result:** No register visible as expected.
 
 ..
   Actual test result goes here.
@@ -336,13 +336,13 @@ Test 6 : Search register
 
     7. Clear the search field
         - **Expected result:** All registers are displayed in the table.
-        - **Actual result:**
+        - **Actual result:** All registers visible as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -352,7 +352,7 @@ Test 6 : Search register
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -382,13 +382,13 @@ Test 7 : Simple Register value updated on read
     2. Select a register address "0x2" using address picker
     3. Press **Read** button
         - **Expected result:** The value in the table is updated to the new value.
-        - **Actual result:**
+        - **Actual result:** Values in the register table are updated as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -398,7 +398,7 @@ Test 7 : Simple Register value updated on read
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -430,14 +430,14 @@ Test 8 : Simple Register value updated on write
     4. Change the value to 0x4a
     5. Press **Write** button
         - **Expected result:** The value in the table is updated to the new value
-        - **Actual result:**
+        - **Actual result:** Values in the register table are updated as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -447,7 +447,7 @@ Test 8 : Simple Register value updated on write
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -476,14 +476,14 @@ Test 9 : Detailed Register value updated on read
     2. Select a register address "0x2" using address picker
     3. Press **Read** button
         - **Expected result:** The detailed register bitfields value is updated to the new value
-        - **Actual result:**
+        - **Actual result:** Bitfield updated as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -493,7 +493,7 @@ Test 9 : Detailed Register value updated on read
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -524,13 +524,13 @@ Test 10 : Detailed Register value updated on write
     4. Change the value to 0x4a
     5. Press **Write** button
         - **Expected result:** The detailed register bitfields value is updated to the new value
-        - **Actual result:**
+        - **Actual result:** Bitfield updated as expected when changing the value.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -540,7 +540,7 @@ Test 10 : Detailed Register value updated on write
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -571,7 +571,7 @@ Test 11 : Change value of the bitfield inside the detailed register
     2. Select a register address "0x2" using address picker
     3. Change the value of "reg002_b3" bitfield from on to off
         - **Expected result:** The **Value** field is updated to the "0x44" value
-        - **Actual result:**
+        - **Actual result:** Value updated as expected.
 
 ..
   Actual test result goes here.
@@ -579,13 +579,13 @@ Test 11 : Change value of the bitfield inside the detailed register
 
     4. Press **Write** button
         - **Expected result:** The register value is updated to "0x44" 
-        - **Actual result:**
+        - **Actual result:** Value updated as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -595,7 +595,7 @@ Test 11 : Change value of the bitfield inside the detailed register
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -625,13 +625,13 @@ Test 12 : Change **Value** field updates detailed register bitfields
     2. Select a register address "0x2" using address picker
     3. Change the value of the **Value** field to "0x44"
         - **Expected result:** The detailed bitfield "reg002_b3" value is changed from on to off
-        - **Actual result:**
+        - **Actual result:** Bitfield updated as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -641,7 +641,7 @@ Test 12 : Change **Value** field updates detailed register bitfields
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -670,7 +670,7 @@ Test 13 : Change selected register
     1. Open Register Map plugin
     2. Select a register address "0x20" using address picker
         - **Expected result:** The register "0x20" is displayed in the table and selected 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -678,7 +678,7 @@ Test 13 : Change selected register
 
     3. Using + button from address picker change the register to "0x21"
         - **Expected result:** The register "0x21" is displayed in the table and selected
-        - **Actual result:**
+        - **Actual result:** Register 0x21 is now visible in the table.
 
 ..
   Actual test result goes here.
@@ -686,7 +686,7 @@ Test 13 : Change selected register
 
     4. Using - button from address picker change the register to "0x20"
         - **Expected result:** The register "0x20" is displayed in the table and selected
-        - **Actual result:**
+        - **Actual result:** Register 0x20 is now visible in the table.
 
 ..
   Actual test result goes here.
@@ -694,13 +694,13 @@ Test 13 : Change selected register
 
     5. Click on the register "0x21" in the table
         - **Expected result:** The register "0x21" in the table is selected value from address picker is updated to "0x21"
-        - **Actual result:**
+        - **Actual result:** Register 0x21 is now selected in the table.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -710,7 +710,7 @@ Test 13 : Change selected register
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -738,7 +738,7 @@ Test 14 : Toggle detailed register visible
     1. Open Register Map plugin
     2. Press **Toggle detailed register** button
         - **Expected result:** The detailed register is hidden
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -746,13 +746,13 @@ Test 14 : Toggle detailed register visible
 
     3. Press **Toggle detailed register** button
         - **Expected result:** The detailed register is visible
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -762,7 +762,7 @@ Test 14 : Toggle detailed register visible
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -793,13 +793,13 @@ Test 15 : Settings autoread
     3. Check **Autoread** checkbox
     4. Select a register address "0x02" using address picker
         - **Expected result:** The value is updated to the read value
-        - **Actual result:**
+        - **Actual result:** The value is automatically read when the register is selected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -809,7 +809,7 @@ Test 15 : Settings autoread
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -841,13 +841,13 @@ Test 16 : Settings read interval
     4. Input "4" in the "To register" field
     5. Press **Read interval** button
         - **Expected result:** registers "0x02", "0x03" and "0x04" now have their values read   
-        - **Actual result:**
+        - **Actual result:** Interval read works as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -857,7 +857,7 @@ Test 16 : Settings read interval
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -889,13 +889,13 @@ Test 17 : Settings read interval with wrong interval
     4. Input "2" in the "To register" field
     5. Press **Read interval** button
         - **Expected result:** Nothing happens
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -905,7 +905,7 @@ Test 17 : Settings read interval with wrong interval
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -936,7 +936,7 @@ Test 18 : Settings register dump
     4. Press **Find path** button
     5. Select a ".csv" file to save the register dump
         - **Expected result:** file path is displayed in the **File path** field
-        - **Actual result:**
+        - **Actual result:** File path is displayed as expected.
 
 ..
   Actual test result goes here.
@@ -947,23 +947,24 @@ Test 18 : Settings register dump
           in the selected file with the structure of each row 
           containing register address and register value
 
-        - **Actual result:**
+        - **Actual result:** The data is saved into the file.
 
 ..
   Actual test result goes here.
 ..
   
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Pressing the **Register dump** button multiple times will duplicate data.
+Tracked here: https://github.com/analogdevicesinc/scopy/issues/1925 .
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -992,23 +993,23 @@ Test 19 : Settings write values
     4. Select the ".csv" file generated in Test 18
     5. Press **Write values** button
         - **Expected result:** The values from the selected file are written to the registers
-        - **Actual result:**
+        - **Actual result:** Values are not properly written. Scopy blocks and crashes when pressing the "Write values" button.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** This is linked to the previous test of data duplication.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1036,7 +1037,7 @@ Test 20 : Settings Dump regisr and write values disabled
     2. Press **Settings** button
     3. Press **Register dump** button
         - **Expected result:** The button is disabled
-        - **Actual result:**
+        - **Actual result:** Button is disabled
 
 ..
   Actual test result goes here.
@@ -1044,7 +1045,7 @@ Test 20 : Settings Dump regisr and write values disabled
 
     4. Press **Write values** button
         - **Expected result:** The button is disabled
-        - **Actual result:**
+        - **Actual result:** Button is disabled
 
 ..
   Actual test result goes here.
@@ -1052,13 +1053,13 @@ Test 20 : Settings Dump regisr and write values disabled
 
     5. Use **Find path** button to select a file
         - **Expected result:** The **Write values** and **Register dump** buttons are enabled
-        - **Actual result:**
+        - **Actual result:** Buttons are enabled
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1068,7 +1069,7 @@ Test 20 : Settings Dump regisr and write values disabled
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1106,13 +1107,13 @@ Tests 21 : Preferences color coding background color
         - **Expected result:** 
             - The background color of the register is changed to reflect the value of the register 
             - The background color of the bitfields is changed to reflect the value of the bitfield
-        - **Actual result:**
+        - **Actual result:** Registers and bitfields are colored as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1122,7 +1123,7 @@ Tests 21 : Preferences color coding background color
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1159,13 +1160,13 @@ Test 22 : Preferences color coding text color
         - **Expected result:** 
             - The text color of the register is changed to reflect the value of the register 
             - The text color of the bitfields is changed to reflect the value of the bitfield
-        - **Actual result:**
+        - **Actual result:** Register and bitfield text is colored as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1175,7 +1176,7 @@ Test 22 : Preferences color coding text color
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1213,13 +1214,13 @@ Test 23 : Preferences color for value
     9. Write value "0x6f" to the register
     10. Press **Read** button
         - **Expected result:** The bitfields that have the same value will have the text value same color 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1229,7 +1230,7 @@ Test 23 : Preferences color for value
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1265,13 +1266,13 @@ Test 24 : Preferences color coding dynamic change
        background**
     7. Open Register Map plugin
         - **Expected result:** The background color of the register is changed to reflect the value of the register
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1281,7 +1282,7 @@ Test 24 : Preferences color coding dynamic change
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1319,13 +1320,13 @@ Test 25 : Preference settings save on close
     8. Select register with address "0x2"
     9. Press **Read** button
         - **Expected result:** The background color of the register is changed to reflect the value of the register
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1335,7 +1336,7 @@ Test 25 : Preference settings save on close
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1363,13 +1364,13 @@ Test 26 : Info button documentation
     2. Press **i** button
     3. Press **Documentation** button
         - **Expected result:** An internet browser is opened with the documentation for the register
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1379,7 +1380,7 @@ Test 26 : Info button documentation
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1406,13 +1407,13 @@ Test 27 : Info button tutorial
     2. Press **i** button
     3. Press **Tutorial** button
         - **Expected result:** A tutorial explaining how to use the plugin is displayed 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1422,7 +1423,7 @@ Test 27 : Info button tutorial
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1451,13 +1452,13 @@ Test 28 : Info button tutorial no XML
           plugin is displayed and does not include explanation of 
           the register map table
 
-        - **Actual result:**
+        - **Actual result:** Tutorial limited, as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1467,7 +1468,7 @@ Test 28 : Info button tutorial no XML
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1580,23 +1581,23 @@ Test 29 : Custom XML file
             - The register map table is displayed and contains only the registers from the custom XML file
             - The detailed register is displayed and contains the data from the custom XML file
 
-         - **Actual result:**
+         - **Actual result:**  XML loaded as expected when ad9963 is selected in the Register Map.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Tested on Debian on a RPi instead of Windows by extracting the AppImage and adding the test XML.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
