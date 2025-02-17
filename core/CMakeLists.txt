@@ -102,6 +102,7 @@ set(SRC_LIST ${SRC_LIST} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${P
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
+find_package(KF5Archive QUIET)
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES})
 
@@ -120,6 +121,9 @@ target_include_directories(
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-gui scopy-pluginbase scopy-iioutil scopy-common)
+if(KF5Archive_FOUND)
+	target_link_libraries(${PROJECT_NAME} PUBLIC KF5::Archive)
+endif()
 
 foreach(comp ${SCOPY_QT_COMPONENTS})
 	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})

@@ -214,12 +214,27 @@ else()
 	endif()
 endif()
 
+find_package(ECM REQUIRED NO_MODULE)
+message(STATUS "ECM found at: ${ECM_DIR}")
+
+find_package(KF5Archive REQUIRED)
+if(KF5Archive_FOUND)
+	message(STATUS "Using KF5Archive")
+else()
+	message(STATUS "Not using KF5Archive")
+endif()
+
 list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_constexpr OUT_CONSTEXPR)
 add_definitions(-DQT_NO_KEYWORDS)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-gui scopy-core)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${SCOPY_DEPENDENCIES} scopy-core scopy-gui)
+
+if(KF5Archive_FOUND)
+	target_link_libraries(${PROJECT_NAME} PUBLIC KF5::Archive)
+endif()
 
 # Compiler options
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall)
