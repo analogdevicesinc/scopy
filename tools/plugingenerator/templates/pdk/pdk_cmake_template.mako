@@ -10,6 +10,7 @@ set(CMAKE_AUTOMOC ON)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+list(INSERT CMAKE_MODULE_PATH 0 ${"${PROJECT_SOURCE_DIR}"}/cmake/Modules)
 
 set(PDK_DEPS_PATH ${deps_path})
 if(NOT DEFINED PDK_DEPS_PATH)
@@ -59,6 +60,9 @@ target_include_directories(${"${TARGET_NAME}"} INTERFACE ${"${IIO_INCLUDE_DIRS}"
 target_include_directories(${"${TARGET_NAME}"} PUBLIC ${"${PDK_DEPS_INCLUDE}"} ${"${IIO_INCLUDE_DIRS}"})
 
 inlcude_dirs(${"${PDK_DEPS_INCLUDE}"})
+file(COPY ${"${PDK_DEPS_PATH}"}/usr/local/style DESTINATION ${"${CMAKE_CURRENT_BINARY_DIR}"})
+file(COPY ${"${PDK_DEPS_PATH}"}/usr/local/cmake DESTINATION ${"${CMAKE_CURRENT_BINARY_DIR}"})
+
 # Add any extra libs to link also.
 link_libs(${"${PDK_DEPS_LIB}"})
 target_link_libraries(
