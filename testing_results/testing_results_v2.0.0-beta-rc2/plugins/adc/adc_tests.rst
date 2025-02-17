@@ -17,11 +17,11 @@ ADC Plugin - Test Suite
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Alexandra Trifan
+         - 17/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Debian 12 arm64
 
 Setup environment
 ------------------
@@ -76,7 +76,7 @@ Test 1 - X-AXIS
    4. Press Single
        - **Expected result:** Plot labels should go up to 100, and channel curves 
          should span across the whole plot
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -86,7 +86,7 @@ Test 1 - X-AXIS
    6. Set plot size to 200
    7. Press Single
        - **Expected result:** Plot labels should go up to 200, and channel curves should span across the whole plot
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -94,7 +94,7 @@ Test 1 - X-AXIS
 
    8. Turn on Rolling mode
        - **Expected result:** Plot labels should invert, going from 200 to 0
-       - **Actual result:**
+       - **Actual result:** As expected, signal starts from the right side.
 
 ..
   Actual test result goes here.
@@ -103,14 +103,16 @@ Test 1 - X-AXIS
    9. Change XMin to 200 and XMax to -100
    10. Press Single
         - **Expected result:** Plot labels should range from 300 to -100, with channel curves centered and between samples 200 and 0
-        - **Actual result:**
+        - **Actual result:** The test case is not correctly defined, as the plot range should be 200 to -100. 
+          There is also a bug here. If XMax is set to -100 when stopped, it will be automatically reset to 0 when the plot is started.
+          If XMin is set to -100 while running, the new value is applied.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -120,7 +122,7 @@ Test 1 - X-AXIS
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -142,7 +144,7 @@ Test 2 - Y-AXIS
    1. Scroll down and turn on plot labels in the settings panel
    2. Turn on Autoscale and press Run
        - **Expected result:** Y-axis should automatically scale according to channel curves
-       - **Actual result:**
+       - **Actual result:** Y-axis scaled as expected.
 
 ..
   Actual test result goes here.
@@ -154,14 +156,14 @@ Test 2 - Y-AXIS
    6. Set Min to -4000 and Max to 4000
    7. Press Single
        - **Expected result:** Y-axis labels should range from -4000 to 4000, and curves should vertically adjust accordingly
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -171,7 +173,7 @@ Test 2 - Y-AXIS
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -196,7 +198,7 @@ Test 3 - XY PLOT
    1. Run Pluto.signalGenerator setup
    2. Turn on XY PLOT
        - **Expected result:** A new plot should appear on the right
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -205,7 +207,7 @@ Test 3 - XY PLOT
    3. Turn on Autoscale
        - **Expected result:** On the time plot, both channel curves should 
          look the same, but voltage0 should have a higher amplitude
-       - **Actual result:**
+       - **Actual result:** voltage1 has higher amplitude as expected.
 
 ..
   Actual test result goes here.
@@ -213,7 +215,7 @@ Test 3 - XY PLOT
 
    4. Set X Axis source to voltage0
        - **Expected result:** A small circular curve should appear on the XY plot
-       - **Actual result:**
+       - **Actual result:** Circular curve appears on the XY plot.
 
 ..
   Actual test result goes here.
@@ -221,7 +223,7 @@ Test 3 - XY PLOT
 
    5. Set X Axis source to voltage1
        - **Expected result:** A larger circular curve should appear on the XY plot
-       - **Actual result:**
+       - **Actual result:** A circular curve appears on the plot.
 
 ..
   Actual test result goes here.
@@ -229,24 +231,24 @@ Test 3 - XY PLOT
 
    6. Turn Plot X source on and off
        - **Expected result:** A line cutting the circle should be visible in a different color
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** TBD discuss these test cases.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -269,7 +271,7 @@ Test 4 - Settings
 **Steps:**
    1. Change Plot Title to "test"
        - **Expected result:** text in top left should change to "test"
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -277,7 +279,7 @@ Test 4 - Settings
 
    2. Turn on and off plot labels
        - **Expected result:** labels on x and y axis should appear
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -285,14 +287,14 @@ Test 4 - Settings
 
    3. Change thickness and style to all available modes and observe the changes
        - **Expected result:** channel curves' appearance should behave as expected
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -302,7 +304,7 @@ Test 4 - Settings
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -329,14 +331,14 @@ Test 5 - Print
    4. Select a folder and save the file
        - **Expected result:** a new PDF file should appear within the folder containing 
          the last view of the plot
-       - **Actual result:**
+       - **Actual result:** PDF file exported as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -346,7 +348,7 @@ Test 5 - Print
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -369,14 +371,14 @@ Test 6 - Info
 **Steps:**
    1. Press the info button in the top left corner of the window
        - **Expected result:** this should open the ADC plugin documentation.
-       - **Actual result:**
+       - **Actual result:** Browser opens doc page as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -386,7 +388,7 @@ Test 6 - Info
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -410,7 +412,7 @@ Test 7 - Plot Navigation
    1. Scroll down and turn on plot labels in the settings panel
    2. Place mouse cursor within the plot and use the scroll wheel
        - **Expected result:** should zoom in/out on the area at the cursor, should not be able to zoom out more than the default view
-       - **Actual result:**
+       - **Actual result:** Zoom behaviour as expected.
 
 ..
   Actual test result goes here.
@@ -418,7 +420,7 @@ Test 7 - Plot Navigation
 
    3. Right-click the plot after zooming in
        - **Expected result:** should undo the zoom
-       - **Actual result:**
+       - **Actual result:** Zoom behaviour as expected.
 
 ..
   Actual test result goes here.
@@ -426,7 +428,7 @@ Test 7 - Plot Navigation
 
    4. Select an area on the plot using left-click
        - **Expected result:** should zoom in exactly on the selected area
-       - **Actual result:**
+       - **Actual result:** Zoom behaviour as expected.
 
 ..
   Actual test result goes here.
@@ -434,7 +436,7 @@ Test 7 - Plot Navigation
 
    5. Zoom in using the selection method, then hold left shift button and zoom using the scroll wheel
        - **Expected result:** should pan left and right
-       - **Actual result:**
+       - **Actual result:** Pan behaviour as expected.
 
 ..
   Actual test result goes here.
@@ -442,14 +444,14 @@ Test 7 - Plot Navigation
 
    6. Zoom in using all methods described above and press right-click until zoom is back to default
        - **Expected result:** should undo each zoom operation one by one
-       - **Actual result:**
+       - **Actual result:** Undo behaviour as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -459,7 +461,7 @@ Test 7 - Plot Navigation
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -482,7 +484,7 @@ Test 8 - ADC-Time Channel Settings
    1. Double-click on the voltage0 channel and go to the right menu which pops up
    2. Enable Y-AXIS and move up and down the axis handle
        - **Expected result:** this should move the channel curve within the Y-axis
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -490,7 +492,7 @@ Test 8 - ADC-Time Channel Settings
 
    3. Turn autoscale off. Set YMode to ADC Counts, Min to -4000 and Max to 4000, and press single
        - **Expected result:** only voltage0 curve should vertically adjust
-       - **Actual result:**
+       - **Actual result:** Only voltage0 is adjusted as expected.
 
 ..
   Actual test result goes here.
@@ -498,7 +500,7 @@ Test 8 - ADC-Time Channel Settings
 
    4. Turn off Y-AXIS
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -508,7 +510,7 @@ Test 8 - ADC-Time Channel Settings
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -535,7 +537,7 @@ and checking frequency and stats
        - **Expected result:** check frequency measure and stats in the horizontal measurements table, 
          middle measure and stats in the vertical measurements table. Frequency should be around 1MHz in 
          both panels, middle should be hovering around the 0 value in both panels
-       - **Actual result:**
+       - **Actual result:** Measurements as expected.
 
 ..
   Actual test result goes here.
@@ -544,7 +546,7 @@ and checking frequency and stats
    3. Open the Measure menu and show all Stats and Measurements
        - **Expected result:** all checkboxes in the measurement tables should be checked and each 
          should have a corresponding label above and below the plot
-       - **Actual result:**
+       - **Actual result:** All measurements and stats as expected.
 
 ..
   Actual test result goes here.
@@ -552,7 +554,7 @@ and checking frequency and stats
 
    4. Turn off measurements
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -562,7 +564,7 @@ and checking frequency and stats
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -590,7 +592,7 @@ tracking, and moving readouts
    4. Open the Cursors menu at the bottom of the window. Enable X and Enable Y
    5. Move the X cursors on the plot via the axis handles and place one on voltage0 sine high peak and the other on the next low peak
        - **Expected result:** delta x should be around 15 samples between voltage0 high peak and low peak
-       - **Actual result:**
+       - **Actual result:** Delta X is around 15 samples.
 
 ..
   Actual test result goes here.
@@ -598,7 +600,7 @@ tracking, and moving readouts
 
    6. Lock X cursors via the Cursor menu. Move one cursor to a voltage1 high peak
        - **Expected result:** the second cursor should move and maintain the same delta. High peak to low peak should match in both voltage0 and voltage1
-       - **Actual result:**
+       - **Actual result:** High and low peak difference matches both channels.
 
 ..
   Actual test result goes here.
@@ -606,7 +608,7 @@ tracking, and moving readouts
 
    7. Enable track and select voltage0
        - **Expected result:** markers should appear on the voltage0 curve synced with the X cursor. Values in cursor readouts should change accordingly
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -614,7 +616,7 @@ tracking, and moving readouts
 
    8. Select voltage1 channel
        - **Expected result:** markers and readouts should now be related to voltage1
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -622,7 +624,7 @@ tracking, and moving readouts
 
    9. Turn off track and measure voltage0 and voltage1 amplitudes
        - **Expected result:** for voltage0 delta y should be around 1.4kV and for voltage1 500V
-       - **Actual result:**
+       - **Actual result:** 
 
 ..
   Actual test result goes here.
@@ -630,24 +632,24 @@ tracking, and moving readouts
 
    10. Enable move readouts. Click and hold the readouts to move them
        - **Expected result:** should be able to move the readouts anywhere within the plot
-       - **Actual result:**
+       - **Actual result:** Readouts moving as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** For some reason voltage0 and voltage1 are reversed in the test case description.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -677,7 +679,7 @@ plotting in the ADC plugin
    1. Scroll down and turn on plot labels in the settings panel
    2. Set XMode to Samples, buffer size to 4000, and press single
        - **Expected result:** Plot labels should go up to 4000, and channel curves should span across the whole plot
-       - **Actual result:**
+       - **Actual result:** X axis plot labels for up to 4000/2 .
 
 ..
   Actual test result goes here.
@@ -685,7 +687,8 @@ plotting in the ADC plugin
 
    3. Set XMode to Frequency, XMin to 0.5 MHz, XMax to 2 MHz, and press single
        - **Expected result:** Plot labels should be from 0.5 MHz to 2 MHz, and channel curves should be centered
-       - **Actual result:**
+       - **Actual result:** As expected if doing this while running the capture. If we change when stopped, the 
+         value will be reset to the old value when started.
 
 ..
   Actual test result goes here.
@@ -693,24 +696,26 @@ plotting in the ADC plugin
 
    4. Set frequency offset to 1 MHz and press single
        - **Expected result:** Curves should move 1 MHz to the left
-       - **Actual result:**
+       - **Actual result:** They move for one capture if running continuous. Otherwise, the signal peak 
+         which was at 1MHz, remains in the same plot position, but the label displays 2MHz at that position.
+         Also, the Center Frequency value on the plot is 1MHz. 
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** There are some inconsistencies with the functionality of the ADC Frequency Instrument.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -735,7 +740,7 @@ range settings
    1. Scroll down and turn on plot labels in the settings panel
    2. Turn on autoscale and press run
        - **Expected result:** Y-axis should automatically scale according to the channel curves
-       - **Actual result:**
+       - **Actual result:** Y-axis scaled as expected.
 
 ..
   Actual test result goes here.
@@ -743,7 +748,7 @@ range settings
 
    3. Press stop, turn autoscale off, set YMode to ADC Counts, Min to -140, Max to 20, and press single
        - **Expected result:** Y-axis labels should be from -140 to 20, and curves should vertically adjust
-       - **Actual result:**
+       - **Actual result:** There is no ADC Counts in YMode Frequency.
 
 ..
   Actual test result goes here.
@@ -751,7 +756,7 @@ range settings
 
    4. Set power offset to 20 dB and press single
        - **Expected result:** Curves should move 20 dB up
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -759,24 +764,24 @@ range settings
 
    5. Press run and change through all the window options and window correction
        - **Expected result:** The curves should change slightly in real time
-       - **Actual result:**
+       - **Actual result:** Window changes are applied as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Modify the test cases to remove the ADC Counts mention.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -800,7 +805,7 @@ and style
 **Steps:**
    1. Change Plot Title to "test"
        - **Expected result:** Text in the top left should change to "test"
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -808,7 +813,7 @@ and style
 
    2. Turn on and off plot labels
        - **Expected result:** Labels on X and Y axis should appear
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -816,14 +821,14 @@ and style
 
    3. Change thickness and style to all available modes and observe the changes
        - **Expected result:** Channel curves should adjust appearance as expected
-       - **Actual result:**
+       - **Actual result:**  Style applied as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -833,7 +838,7 @@ and style
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -857,14 +862,14 @@ Test 4 - Print plot
    2. Press the single button and then the print button
    3. Select a folder and save the file
        - **Expected result:** A new PDF file should appear in the folder containing the last view of the plot
-       - **Actual result:**
+       - **Actual result:** PDF exported as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -874,7 +879,7 @@ Test 4 - Print plot
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -897,14 +902,14 @@ Test 5 - View plugin documentation
 **Steps:**
    1. Press the info button in the top left corner of the window
        - **Expected result:** The ADC plugin documentation should open
-       - **Actual result:**
+       - **Actual result:** Browser opens doc page as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -914,7 +919,7 @@ Test 5 - View plugin documentation
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -937,7 +942,7 @@ Test 6 - Y-Axis channel settings
 **Steps:**
    1. Enable Y-Axis and move the axis handle up and down
        - **Expected result:** The channel curve should move within the Y-axis
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -945,7 +950,7 @@ Test 6 - Y-Axis channel settings
 
    2. Turn off autoscale, set YMode to ADC Counts, Min to -140, Max to 20, and press single
        - **Expected result:** Only the voltage0 curve should vertically adjust
-       - **Actual result:**
+       - **Actual result:** There is no ADC Counts in YMode Frequency.
 
 ..
   Actual test result goes here.
@@ -953,7 +958,7 @@ Test 6 - Y-Axis channel settings
 
    3. Turn off Y-Axis
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -963,7 +968,7 @@ Test 6 - Y-Axis channel settings
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -988,7 +993,7 @@ Test 7 - Marker settings
    2. Press run and enable the marker
    3. Set marker type to peak and count to 5
        - **Expected result:** 5 markers should appear on voltage0's curve at the highest peaks
-       - **Actual result:**
+       - **Actual result:** 5 markers appear as expected.
 
 ..
   Actual test result goes here.
@@ -996,7 +1001,7 @@ Test 7 - Marker settings
 
    4. Repeat the process with a count of 7
        - **Expected result:** 7 markers should appear on voltage0's curve at the highest peaks
-       - **Actual result:**
+       - **Actual result:** 7 markers appear as expected.
 
 ..
   Actual test result goes here.
@@ -1004,7 +1009,7 @@ Test 7 - Marker settings
 
    5. Check the table below the plot in peak mode
        - **Expected result:** The highest peak should be at 1 MHz
-       - **Actual result:**
+       - **Actual result:** The highest peak is around 1MHz.
 
 ..
   Actual test result goes here.
@@ -1012,7 +1017,7 @@ Test 7 - Marker settings
 
    6. Set marker type to fixed and count to 5
        - **Expected result:** 5 movable cursors should appear
-       - **Actual result:**
+       - **Actual result:** 5 movable markers appear as expected.
 
 ..
   Actual test result goes here.
@@ -1020,24 +1025,27 @@ Test 7 - Marker settings
 
    7. Repeat for a count of 7
        - **Expected result:** 7 movable cursors should appear
-       - **Actual result:**
+       - **Actual result:** 7 movable markers appear as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** The test case description is not clear enough, this is added in a different commit.
+The marker count doesn't always apply as expected when the plot is stopped. Several times, the markers 
+count is applied only when changing the marker type. The markers don't disappear from the plot when 
+the Marker Panel and the Marker Channel Settings are disabled.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1063,7 +1071,7 @@ Test 8 - Cursor settings
    3. Open the Cursors menu and enable X and Y cursors
    4. Move the X cursor on the plot and place one on voltage0's highest peak
        - **Expected result:** The cursor should measure 1 MHz in the readouts
-       - **Actual result:**
+       - **Actual result:**  The measurement is correct.
 
 ..
   Actual test result goes here.
@@ -1071,7 +1079,7 @@ Test 8 - Cursor settings
 
    5. Enable track and select voltage0
        - **Expected result:** Markers should appear on the voltage0 curve, synced with the X cursor
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -1079,7 +1087,7 @@ Test 8 - Cursor settings
 
    6. Select voltage1 channel
        - **Expected result:** Markers and readouts should now be related to voltage1
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -1087,7 +1095,7 @@ Test 8 - Cursor settings
 
    7. Turn off track and measure voltage0's highest peak using the Y cursor
        - **Expected result:** The cursor should measure about -13 dB in the readouts
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -1095,14 +1103,14 @@ Test 8 - Cursor settings
 
    8. Enable move readouts and click and hold the readouts to move them
        - **Expected result:** Readouts should be movable within the plot
-       - **Actual result:**
+       - **Actual result:** Readouts are movable as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1112,7 +1120,7 @@ Test 8 - Cursor settings
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1142,7 +1150,7 @@ Test 1 - X Scale Position
 **Steps:**
    1. Change Plot X-Axis scale position to Top, restart app, open ADC-Time and enable plot labels in SETTINGS panel
        - **Expected result:** Axis labels should appear on top
-       - **Actual result:**
+       - **Actual result:** Label appear on top on the ADC Time instrument.
 
 ..
   Actual test result goes here.
@@ -1150,7 +1158,7 @@ Test 1 - X Scale Position
 
    2. Do this again for Bottom option
        - **Expected result:** Axis labels should appear on the bottom
-       - **Actual result:**
+       - **Actual result:** Label appear on bottom on the ADC Time instrument.
 
 ..
   Actual test result goes here.
@@ -1158,14 +1166,14 @@ Test 1 - X Scale Position
 
    3. Repeat for ADC-Frequency
        - **Expected result:** Same result for ADC-Frequency
-       - **Actual result:**
+       - **Actual result:** Label position changes correctly on the ADC Frequency instrument.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64.
 
 ..
   Details about the tested OS goes here.
@@ -1175,7 +1183,7 @@ Test 1 - X Scale Position
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1201,7 +1209,7 @@ position on the plot
 **Steps:**
    1. Change Plot Y-Axis scale position to Right, restart app, open ADC-Time and enable plot labels in SETTINGS panel
        - **Expected result:** Axis labels should appear on the right
-       - **Actual result:**
+       - **Actual result:** Label appear on right on the ADC Time instrument.
 
 ..
   Actual test result goes here.
@@ -1209,7 +1217,7 @@ position on the plot
 
    2. Do this again for Left option
        - **Expected result:** Axis labels should appear on the left
-       - **Actual result:**
+       - **Actual result:** Label appear on left on the ADC Time instrument.
 
 ..
   Actual test result goes here.
@@ -1217,14 +1225,14 @@ position on the plot
 
    3. Repeat for ADC-Frequency
        - **Expected result:** Same result for ADC-Frequency
-       - **Actual result:**
+       - **Actual result:** Label position changes correctly on the ADC Frequency instrument.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1234,7 +1242,7 @@ position on the plot
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1261,7 +1269,7 @@ Test 3 - Channel Handle Position
       ADC-Time, double click voltage0 to open channel settings and enable Y-AXIS
        
        - **Expected result:** Axis handle should appear on the right
-       - **Actual result:**
+       - **Actual result:** Handle appears on the right.
 
 ..
   Actual test result goes here.
@@ -1269,7 +1277,7 @@ Test 3 - Channel Handle Position
 
    2. Do this again for Left option
        - **Expected result:** Axis handle should appear on the left
-       - **Actual result:**
+       - **Actual result:** Handle appears on the left.
 
 ..
   Actual test result goes here.
@@ -1277,14 +1285,14 @@ Test 3 - Channel Handle Position
 
    3. Repeat for ADC-Frequency
        - **Expected result:** Same result for ADC-Frequency
-       - **Actual result:**
+       - **Actual result:** Handle position changes correctly on the ADC Frequency instrument.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1294,7 +1302,7 @@ Test 3 - Channel Handle Position
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1319,7 +1327,7 @@ Test 4 - X Cursor Position
 **Steps:**
    1. Change Plot X-Cursor position to Top, restart app, open ADC-Time and enable x cursors
        - **Expected result:** X cursor handle should appear on top
-       - **Actual result:**
+       - **Actual result:** Plot X Cursor handles appear on the bottom side.
 
 ..
   Actual test result goes here.
@@ -1327,7 +1335,7 @@ Test 4 - X Cursor Position
 
    2. Do this again for Bottom option
        - **Expected result:** X cursor handle should appear on the bottom
-       - **Actual result:**
+       - **Actual result:** Plot X Cursor handles appear on the bottom side.
 
 ..
   Actual test result goes here.
@@ -1335,24 +1343,24 @@ Test 4 - X Cursor Position
 
    3. Repeat for ADC-Frequency
        - **Expected result:** Same result for ADC-Frequency
-       - **Actual result:**
+       - **Actual result:** Plot X Cursor handles always appear on the bottom side.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Plot cursor handles always appear on the bottom of the plot, regardless of the preference setting.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1378,7 +1386,7 @@ Test 5 - Y Cursor Position
 **Steps:**
    1. Change Plot Y-Cursor position to Right, restart app, open ADC-Time and enable y cursors
        - **Expected result:** Y cursor handle should appear on the right
-       - **Actual result:**
+       - **Actual result:** Y cursors handles appear on the right side.
 
 ..
   Actual test result goes here.
@@ -1386,7 +1394,7 @@ Test 5 - Y Cursor Position
 
    2. Do this again for Left option
        - **Expected result:** Y cursor handle should appear on the left
-       - **Actual result:**
+       - **Actual result:** Y cursors handles appear on the right side.
 
 ..
   Actual test result goes here.
@@ -1394,24 +1402,24 @@ Test 5 - Y Cursor Position
 
    3. Repeat for ADC-Frequency
        - **Expected result:** Same result for ADC-Frequency
-       - **Actual result:**
+       - **Actual result:** Y cursors handles always appear on the right side.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Plot cursor handles always appear on the right side of the plot, regardless of the preference setting.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1457,7 +1465,7 @@ Test 6 - Show Buffer
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Skipped as the preference no longer exists.
 
 ..
   Any comments about the test goes here.
@@ -1488,24 +1496,25 @@ Test 7 - Default YMode
 **Steps:**
    1. Set YMode to % Full scale, restart app, open ADC-Time
        - **Expected result:** In Y-AXIS, YMODE should be % Full scale
-       - **Actual result:**
+       - **Actual result:** YMODE is not consistently set to % Full scale.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** In YMODE general settings the default value is **ADC Counts** while the 
+default value in channel settings is set to **%Full Scale** as the test expects.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
