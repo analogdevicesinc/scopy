@@ -208,7 +208,7 @@ oscilloscope using Channel 1.
   Actual test result goes here.
 ..
 
-    6. Change the value to 0V in the Signal Generator and monitor it on the Oscilloscope:
+    6. Change the value to 5V in the Signal Generator and monitor it on the Oscilloscope:
         - **Expected result:** 
             - The reading is within 4.9V to 5.1V.
         - **Actual result:**
@@ -619,7 +619,8 @@ with different trigger configurations.
   Actual test result goes here.
 ..
 
-    7. Set the Hysteresis value to 1.25V and Level to -1.7V:
+    7. Change the Trigger Condition to Rising Edge 
+    8. Set the Hysteresis value to 1.25V and Level to -1.7V:
         - **Expected result:**
             - The signal on the plot is not triggered and unstable.
             - The plot level is outside the triggered range of ~1.3V to +2.5V.
@@ -779,7 +780,8 @@ Test 11 - FFT Function
     2. In the Oscilloscope set the following:
         - Channel1 Horizontal: Time Base: 5ms/div, Position: 0ms
         - Channel1 Vertical: Volts/Div: 1V/div, Position: 0V
-    3. Run the Oscilloscope and verify the plot:
+    3. From Oscilloscope settings set FFT to ON.
+    4. Run the Oscilloscope and verify the plot:
         - **Expected result:** The resulting spectrum shows 
           a series of peaks at the fundamental frequency and its harmonics.
         - **Actual result:**
