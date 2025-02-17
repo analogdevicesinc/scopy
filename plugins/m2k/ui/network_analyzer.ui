@@ -1196,12 +1196,6 @@ color: rgba(255,255,255,51);
                            <property name="rightText" stdset="0">
                             <string>Off</string>
                            </property>
-                           <property name="duration_ms" stdset="0">
-                            <number>0</number>
-                           </property>
-                           <property name="polarity" stdset="0">
-                            <bool>false</bool>
-                           </property>
                           </widget>
                          </item>
                         </layout>
@@ -1714,12 +1708,6 @@ QPushButton[invalid=true]:enabled:!pressed { background-color: #4a64ff; }
                          </property>
                          <property name="rightText" stdset="0">
                           <string>Off</string>
-                         </property>
-                         <property name="duration_ms" stdset="0">
-                          <number>0</number>
-                         </property>
-                         <property name="polarity" stdset="0">
-                          <bool>false</bool>
                          </property>
                         </widget>
                        </item>
