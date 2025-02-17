@@ -117,6 +117,11 @@ QString scopy::config::pcSpecs()
 	return ret;
 }
 
+QString scopy::config::pkgFolderPath()
+{
+	return QCoreApplication::applicationDirPath() + QDir::separator() + "packages";
+}
+
 QString scopy::config::dump()
 {
 	QString ret;
