@@ -120,6 +120,12 @@ QString scopy::config::pcSpecs()
 	return ret;
 }
 
+QString scopy::config::pkgLocalRepo()
+{
+	return QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + QDir::separator() +
+		"MANIFEST.json";
+}
+
 QString scopy::config::dump()
 {
 	QString ret;

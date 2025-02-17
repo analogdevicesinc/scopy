@@ -89,6 +89,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	initStatusBar();
 	setupPreferences();
 
+	PkgInstaller::GetInstance();
 	ConnectionProvider::GetInstance();
 	MessageBroker::GetInstance();
 

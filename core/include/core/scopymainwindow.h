@@ -24,6 +24,7 @@
 
 #include <QMainWindow>
 #include <QOpenGLWidget>
+#include "pkginstaller.h"
 
 #include "licenseoverlay.h"
 #include "scanbuttoncontroller.h"

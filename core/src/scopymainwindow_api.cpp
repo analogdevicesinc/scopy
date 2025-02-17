@@ -21,6 +21,7 @@
 
 #include "scopymainwindow_api.h"
 
+#include "pkgutil.h"
 #include "qapplication.h"
 
 #include <pluginbase/scopyjs.h>
@@ -534,4 +535,22 @@ bool ScopyMainWindow_API::saveSetup(QString filename, QString path)
 	}
 	return setupSaved;
 }
+
+bool ScopyMainWindow_API::install(QString zipPath) { return PkgInstaller::install(zipPath); }
+
+QStringList ScopyMainWindow_API::extractZip(QString zipPath, QString dest)
+{
+	return PkgUtil::extractZip(zipPath, dest);
+}
+
+QVariantMap ScopyMainWindow_API::extractMetadata(QString zipPath)
+{
+	QJsonObject obj = PkgUtil::extractJsonMetadata(zipPath);
+	for(auto it = obj.begin(); it != obj.end(); ++it) {
+		qInfo(CAT_SCOPY_API) << it.key() << it.value();
+	}
+	return obj.toVariantMap();
+}
+
+bool ScopyMainWindow_API::uninstall(const QString &pkgName) { return PkgInstaller::uninstall(pkgName); }
 #include "moc_scopymainwindow_api.cpp"
