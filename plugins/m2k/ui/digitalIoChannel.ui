@@ -241,16 +241,10 @@ background-color: red;
         <bool>false</bool>
        </property>
        <property name="leftText" stdset="0">
-        <string>in</string>
+	<string>out</string>
        </property>
        <property name="rightText" stdset="0">
-        <string>out</string>
-       </property>
-       <property name="polarity" stdset="0">
-        <bool>true</bool>
-       </property>
-       <property name="duration" stdset="0">
-        <number>0</number>
+	<string>in</string>
        </property>
       </widget>
      </item>
@@ -310,7 +304,7 @@ background-color: red;
       </spacer>
      </item>
      <item>
-      <widget class="scopy::SmallOnOffSwitch" name="output">
+      <widget class="scopy::CustomSwitch" name="output">
        <property name="enabled">
         <bool>true</bool>
        </property>
