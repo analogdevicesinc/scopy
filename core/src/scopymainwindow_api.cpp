@@ -21,8 +21,9 @@
 
 #include "scopymainwindow_api.h"
 
+#include "pkgutil.h"
 #include "qapplication.h"
-
+#include <pkgmanager.h>
 #include <pluginbase/scopyjs.h>
 using namespace scopy;
 
@@ -533,5 +534,25 @@ bool ScopyMainWindow_API::saveSetup(QString filename, QString path)
 		qWarning(CAT_SCOPY_API) << "Unable to save setup: No device connected";
 	}
 	return setupSaved;
+}
+
+bool ScopyMainWindow_API::install(QString zipPath) { return PkgManager::install(zipPath); }
+
+bool ScopyMainWindow_API::extractZip(QString zipPath, QString dest) { return PkgUtil::extractZip(zipPath, dest); }
+
+QVariantMap ScopyMainWindow_API::extractMetadata(QString zipPath)
+{
+	QJsonObject obj = PkgUtil::extractJsonMetadata(zipPath);
+	for(auto it = obj.begin(); it != obj.end(); ++it) {
+		qInfo(CAT_SCOPY_API) << it.key() << it.value();
+	}
+	return obj.toVariantMap();
+}
+
+bool ScopyMainWindow_API::uninstall(const QString &pkgName) { return PkgManager::uninstall(pkgName); }
+
+QStringList ScopyMainWindow_API::listFiles(const QString &category)
+{
+	return PkgManager::listFilesPath(QStringList() << category);
 }
 #include "moc_scopymainwindow_api.cpp"
