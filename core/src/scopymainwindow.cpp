@@ -30,6 +30,7 @@
 #include <browsemenu.h>
 #include <deviceautoconnect.h>
 #include <style.h>
+#include <pkgmanager.h>
 
 #include <common/debugtimer.h>
 #include "logging_categories.h"
@@ -89,6 +90,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	initStatusBar();
 	setupPreferences();
 
+	PkgManager::GetInstance();
+	PkgManager::init(QStringList() << scopy::config::pkgFolderPath());
 	ConnectionProvider::GetInstance();
 	MessageBroker::GetInstance();
 
