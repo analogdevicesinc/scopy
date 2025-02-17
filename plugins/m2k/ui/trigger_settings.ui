@@ -242,12 +242,6 @@ color: rgba(255,255,255,51);
              <property name="rightText" stdset="0">
               <string>normal</string>
              </property>
-             <property name="duration_ms" stdset="0">
-              <number>0</number>
-             </property>
-             <property name="polarity" stdset="0">
-              <bool>true</bool>
-             </property>
             </widget>
            </item>
            <item>
