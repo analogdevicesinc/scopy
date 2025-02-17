@@ -117,6 +117,17 @@ QString scopy::config::pcSpecs()
 	return ret;
 }
 
+QString scopy::config::pkgLocalRepo()
+{
+	return QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + QDir::separator() +
+		"MANIFEST.json";
+}
+
+QString scopy::config::pkgFolderPath()
+{
+	return QCoreApplication::applicationDirPath() + QDir::separator() + "scopy_libraries";
+}
+
 QString scopy::config::dump()
 {
 	QString ret;
