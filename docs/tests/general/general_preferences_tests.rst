@@ -634,7 +634,7 @@ Test 12 - Auto-connect to previous session
    - Emulator tests
 
 **Preconditions:**  
-   - :ref:`Pluto.emu<pluto_emu_setup>`
+   - :ref:`Pluto.usb<pluto_emu_usb_setup>`
    - OS: ANY  
 
 **Steps:**  
@@ -877,7 +877,8 @@ Test 17 - Regularly scan for new devices
    - OS: ANY
 
 **Steps:**
-   1. Connect the Pluto to the machine via USB.  
+   1. Set preference to enabled.  
+   2. Connect the Pluto to the machine via USB.  
        - **Expected result:** Pluto should automatically appear in 
          the device list, and a toggle switch for scanning should 
          appear in the top right.
@@ -887,7 +888,7 @@ Test 17 - Regularly scan for new devices
   Actual test result goes here.
 ..
 
-   2. Repeat the steps with the preference disabled.
+   3. Repeat the steps with the preference disabled.
        - **Expected result:** Pluto should not appear automatically, 
          only when pressing the on-demand Scan button.
        - **Actual result:**
@@ -927,7 +928,7 @@ Test 18 - Session devices
    - OS: ANY  
 
 **Steps:**
-   1. After connecting to M2K, go to the preferences and press "Refresh."  
+   1. After connecting to Pluto, go to the preferences and press "Refresh."  
    2. Check the current device's URI.  
    3. Go back to the homepage and forget the device by pressing the red 
       "X" button on the device.  
@@ -973,8 +974,9 @@ Test 19 - Show plot FPS
    - OS: ANY  
 
 **Steps:**
-   1. Open Oscilloscope and run it.  
-   2. Open ADC - Time and run it.  
+   1. Set preference to enabled.  
+   2. Open Oscilloscope and run it.  
+   3. Open ADC - Time and run it.  
        - **Expected result:** Should show the FPS on the plot 
          (M2K may look different from other plugins).    
        - **Actual result:**
@@ -983,7 +985,7 @@ Test 19 - Show plot FPS
   Actual test result goes here.
 ..
 
-   3. Repeat the steps with the preference disabled.  
+   4. Repeat the steps with the preference disabled.  
        - **Expected result:** No FPS should be visible.    
        - **Actual result:**
 
