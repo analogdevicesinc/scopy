@@ -1465,7 +1465,7 @@ Test 6 - Show Buffer
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Skipped as the preference no longer exists.
 
 ..
   Any comments about the test goes here.
