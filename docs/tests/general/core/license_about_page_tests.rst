@@ -144,8 +144,7 @@ Test 2: Check links from About Page
   Actual test result goes here.
 ..
 
-    10. Click the home icon button, on the top right side of the application.
-    11. Click on the highlighted text **Documentation**
+    10. Click on the highlighted text **Documentation**
          - **Expected result:** A web browser window will open containing the
            documentation for Scopy.
          - **Actual result:**
@@ -154,8 +153,7 @@ Test 2: Check links from About Page
   Actual test result goes here.
 ..
 
-    12. Click the home icon button, on the top right side of the application.
-    13. Click on the highlighted text **Support Forum**
+    11. Click on the highlighted text **Support Forum**
          - **Expected result:** A web browser window will open containing a forum
            named `ADI EngineerZone`.
          - **Actual result:**

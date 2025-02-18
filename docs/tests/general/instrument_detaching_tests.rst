@@ -29,7 +29,6 @@ Setup enviroment:
 **Pluto.Usb:**
         - Open the Scopy application
         - Connect the PlutoSDR to the computer via USB
-        - Type the URI of the PlutoSDR in the URI field (if you don't know the URI, just type "ip:192.168.2.1")
 
 Test 1: Detach and reattach an instrument
 ----------------------------------------------------------------------------------------------------
