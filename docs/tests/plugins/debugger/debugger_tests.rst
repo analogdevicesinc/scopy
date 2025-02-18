@@ -353,7 +353,7 @@ Test 4: The title bar updates when selecting different elements from the navigat
         Actual test result goes here.
 ..
 
-        6. Click on any elemet from the title bar. 
+        6. Click on any element from the title bar. 
                 - **Expected Result:** The title bar should remove all button after it and the navigation tree should highlight the selected element.
                 - **Actual result:**
 
@@ -363,6 +363,7 @@ Test 4: The title bar updates when selecting different elements from the navigat
 
         7. Click the green circle with the plus sign. 
                 - **Expected Result:** The circle should change to an x. (The current element should be added to the watch list, but this behavior is tested in a different test).
+                  The watch list is located at the bottom of the instrument.
                 - **Actual result:**
 
 ..
@@ -455,14 +456,14 @@ Test 5: The watch list from the debugger works correctly
 ..
 
         9. Repeat steps 3 to 8 with other elements from the navigation tree.
-                - **Expected Result:** Nothing should crash and the watch list should be updated correctly.
+                - **Expected Result:** All elements are added/removed correctly and the watchlist is up-to-date.
                 - **Actual result:**
 
 ..
         Actual test result goes here.
 ..
 
-        10. Add a few elements in the wathch list. Click any other element from the watch list.
+        10. Add a few elements in the watch list. Click any other element from the watch list.
                 - **Expected Result:** The navigation bar, title bar and information from the details view should be updated with the information from the selected element.
                 - **Actual result:**
 
@@ -532,7 +533,7 @@ Test 6: The details view from the debugger work correctly
 ..
 
         6. Repeat step 5 with the following 3 types of attributes: a text box (a box where the user can type any string), a combo box (a box where the user can select from a list of options) and a range box (a box where the user can type a number or use the arrows (or the +/- sign) to increase or decrease the value and/or write the desired value).
-        7. While selectig different elements from the navigation tree, lower part of the GUI View, the General Info section should update with the information from the selected element (information such as weather it is a hardware monitor, a trigger, has a trigger attached, if the channel is a scan element, input or output, enabled or disabled). All these informations should be present within the elements of the ADALM-PLUTO device.
+        7. While selecting different elements from the navigation tree, lower part of the GUI View, the General Info section should update with the information from the selected element (information such as weather it is a hardware monitor, a trigger, has a trigger attached, if the channel is a scan element, input or output, enabled or disabled). All these informations should be present within the elements of the ADALM-PLUTO device.
                 - **Expected Result:** The General Info section should update with the information from the selected element.
                 - **Actual result:**
 
