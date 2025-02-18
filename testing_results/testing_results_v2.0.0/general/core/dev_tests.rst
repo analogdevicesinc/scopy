@@ -17,11 +17,11 @@ Device interaction
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Popa Andrei
+         - 19.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on Windows 10
 
 Setup environment:
 ------------------
@@ -65,13 +65,13 @@ expected action: displaying device details and device tools.
           info page section, and in the tool menu (on the left), the device 
           is added with a list of available tools (in this form, the tools 
           cannot be accessed). 
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -81,7 +81,7 @@ expected action: displaying device details and device tools.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -106,13 +106,13 @@ Test 2: Remove a device from device browser.
 **Steps:**
     1. Click the **Forget** button located at the bottom-right of the device icon.
         - **Expected result:** The device is removed from device browser. 
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -122,7 +122,7 @@ Test 2: Remove a device from device browser.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -151,13 +151,13 @@ of a connected device.
     3. Click the **Forget** button located at the bottom-right of the device icon.
         - **Expected result:** Initially, the device is disconnected and then 
           successfully removed from the device browser.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -167,7 +167,7 @@ of a connected device.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -198,13 +198,13 @@ Test 4: Edit the name of the device.
     5. Press enter. 
         - **Expected result:**  The device name changes both in the device 
           browser and in the tool menu.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -214,7 +214,7 @@ Test 4: Edit the name of the device.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -241,7 +241,7 @@ Test 5: Select a tool.
     2. Click on **Connect** button.
     3. Click on "Oscilloscope" tool.
         - **Expected result:** The "Oscilloscope" tool is displayed and the tool menu item is highlighted.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -250,13 +250,13 @@ Test 5: Select a tool.
     4. Click on "Home" menu entry.
         - **Expected result:** The device page is displayed and the home menu 
           item is highlighted.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -266,7 +266,7 @@ Test 5: Select a tool.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -299,7 +299,7 @@ correctly.
           separate window from the application. The window title should be: 
           "Scopy-M2kPlugin-Oscilloscope-ip:127.0.0.1".
 
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -307,7 +307,7 @@ correctly.
 
     4. Close the "Oscilloscope" window.
         - **Expected result:** The "Oscilloscope" tool is reintegrated into the main window. 
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -316,13 +316,13 @@ correctly.
     5. Detach the oscilloscope tool again. 
     6. Close the  application.
         - **Expected result:** Scopy finished successfully. 
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -332,7 +332,7 @@ correctly.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -360,13 +360,13 @@ reconnection.
     1. Click on the device icon from device browser.
     2. Click on **Connect** button.
         - **Expected result:** The oscilloscope tool is detached.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -376,7 +376,7 @@ reconnection.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -403,7 +403,7 @@ the tool menu.
     1. Click on the device icon from device browser.
     2. Click on the device header from tool menu.
         - **Expected result:** The tools collapse.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -411,13 +411,13 @@ the tool menu.
 
     3. Repeat 2.
         - **Expected result:** The tools expand.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -427,7 +427,7 @@ the tool menu.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -458,7 +458,7 @@ properly.
     1. Click on the emu device icon from device browser.
     2. Click on **Connect** button.
         - **Expected result:** The connection is established successfully.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -472,13 +472,13 @@ properly.
           tools of each device can be accessed. If the menu contains too many 
           entries, then the scroll bar will become visible.
 
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -488,7 +488,7 @@ properly.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -520,7 +520,7 @@ properly.
     4. Click on **Connect** button.
     5. Click on the "Oscilloscope" run button of the emu device in the tool menu.
         - **Expected result:** The button changes from stop button to run button (green color).
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -529,13 +529,13 @@ properly.
     6. Click on the "Spectrum Analyzer" run button of the usb device in the tool menu.
         - **Expected result:** The button changes from stop button to run button, 
           and the oscilloscope button (of the emu device) remains the same.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -545,7 +545,7 @@ properly.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -575,13 +575,13 @@ entered into the device browser.
     2. Add the usb device.
         - **Expected result:** The usb device is on the right side of emu 
           device. 
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -591,7 +591,7 @@ entered into the device browser.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).

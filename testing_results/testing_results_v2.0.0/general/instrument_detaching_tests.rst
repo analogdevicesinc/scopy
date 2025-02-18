@@ -11,11 +11,11 @@ Instrument Detaching - Test Suite
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Popa Andrei
+         - 19.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on Windows 10
 
 General Description:
         - The instrument detaching is the process of removing the instrument from the main window. This is usually done by double clicking the tool name from the tool menu (left side of scopy). The instrument detaching is useful when the user has multiple screens and wants to observe multiple instruments at the same time. The user can detach the instrument from the main window and move it to another screen or another part of the same screen. This feature is not available on Android. Any detached windows will be closed when the main window is closed.
@@ -55,7 +55,7 @@ Test 1: Detach and reattach an instrument
 
         3. Click the square button from the tool menu to start the ADC data aquisition.
                 - **Expected Result:** The ADC should start acquiring data. The data should be displayed in the detached window.
-                - **Actual result:**
+                - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -69,7 +69,7 @@ Test 1: Detach and reattach an instrument
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -79,7 +79,7 @@ Test 1: Detach and reattach an instrument
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
