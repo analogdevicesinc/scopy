@@ -88,7 +88,7 @@ lists available local devices when initiated.
     - Scopy is installed on the system.
     - There is at least one IIO device connected to the system that has local 
       backend.
-    - OS: ANY.
+    - OS: Linux-x86_64.
 
 **Steps:**
     1. Open Scopy.

@@ -467,7 +467,7 @@ properly.
     3. Click on the usb device icon from device browser.
     4. Click on **Connect** button.
         - **Expected result:** The connection is established successfully, both 
-          device icons have a green status LED, both devices are entered into the 
+          device icons have a green status bar, both devices are entered into the 
           tool menu (the device header contains the device name and uri), and the 
           tools of each device can be accessed. If the menu contains too many 
           entries, then the scroll bar will become visible.

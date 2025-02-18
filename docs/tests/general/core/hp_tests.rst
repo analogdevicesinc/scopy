@@ -261,9 +261,11 @@ Test 6: Navigation using the buttons in the info page.
         - **Expected result:** The info page changes from the 'Welcome to Scopy' 
           page to the add page and in device browser the related button is 
           highlighted.
+        - **Actual result:**
     7. Click on the left arrow button.
         - **Expected result:** The "Welcome to Scopy" page is displayed and the 
           related button is highlighted.
+        - **Actual result:**
     8. Click on the left arrow button.
         - **Expected result:** The device's page is displayed and the device 
           icon is highlighted. 
