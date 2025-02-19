@@ -90,6 +90,7 @@
           <ul>
 <li><a class="reference internal" href="#">Scopy troubleshooting guide</a><ul>
 <li><a class="reference internal" href="#scopy-v2-after-scopy-v1">Scopy v2 after Scopy v1?</a></li>
+<li><a class="reference internal" href="#scopy-v1-ini-files-in-scopy-v2">Scopy v1 ini files in Scopy v2</a></li>
 <li><a class="reference internal" href="#any-unexpected-behavior-send-us-the-log">Any unexpected behavior? Send us the log!</a><ul>
 <li><a class="reference internal" href="#how-to-set-the-environment-variable">How to set the environment variable:</a></li>
 <li><a class="reference internal" href="#linux-x86-64-arm64-arm32-macos">Linux x86_64, arm64, arm32, MacOS</a></li>
@@ -273,6 +274,52 @@ any Scopy v1 on your system, we <strong>strongly</strong> recommend to
 uninstall the old Scopy properly.</p>
 <p>Doing this we make sure that the configuration files for
 Scopy v2 are not in any way influenced by Scopy v1.</p>
+</section>
+<section id="scopy-v1-ini-files-in-scopy-v2">
+<span id="inifiles"></span><h2>Scopy v1 ini files in Scopy v2<a class="headerlink" href="#scopy-v1-ini-files-in-scopy-v2" title="Link to this heading"></a></h2>
+<p>Scopy v1.x ini files have a different format from version 2.0</p>
+<p>Scopy v1.x format (snippet):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">[</span>power<span class="o">]</span>
+<span class="nv">dac1_enabled</span><span class="o">=</span><span class="nb">false</span>
+<span class="nv">dac1_value</span><span class="o">=</span><span class="m">0</span>
+<span class="nv">dac2_enabled</span><span class="o">=</span><span class="nb">false</span>
+<span class="nv">dac2_value</span><span class="o">=</span><span class="m">0</span>
+<span class="nv">notes</span><span class="o">=</span>
+<span class="nv">sync</span><span class="o">=</span><span class="nb">false</span>
+<span class="nv">tracking_percent</span><span class="o">=</span><span class="m">100</span>
+
+<span class="o">[</span>siggen<span class="o">]</span>
+<span class="nv">autoscale</span><span class="o">=</span><span class="nb">false</span>
+buffer_amplitude<span class="se">\1\i</span>dx<span class="o">=</span><span class="m">1</span>
+buffer_amplitude<span class="se">\2\i</span>dx<span class="o">=</span><span class="m">1</span>
+buffer_amplitude<span class="se">\s</span>ize<span class="o">=</span><span class="m">2</span>
+buffer_file_path<span class="se">\1\i</span>dx<span class="o">=</span>
+same<span class="w"> </span>info<span class="w"> </span><span class="k">in</span>
+</pre></div>
+</div>
+<p>Scopy v2.0 format (snippet):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">[</span>M2kPlugin<span class="o">]</span>
+power<span class="se">\d</span>ac1_enabled<span class="o">=</span><span class="nb">false</span>
+power<span class="se">\d</span>ac1_value<span class="o">=</span><span class="m">0</span>
+power<span class="se">\d</span>ac2_enabled<span class="o">=</span><span class="nb">false</span>
+power<span class="se">\d</span>ac2_value<span class="o">=</span><span class="m">0</span>
+power<span class="se">\n</span>otes<span class="o">=</span>
+power<span class="se">\s</span>ync<span class="o">=</span><span class="nb">false</span>
+power<span class="se">\t</span>racking_percent<span class="o">=</span><span class="m">100</span>
+siggen<span class="se">\a</span>utoscale<span class="o">=</span><span class="nb">false</span>
+siggen<span class="se">\b</span>uffer_amplitude<span class="se">\1\i</span>dx<span class="o">=</span><span class="m">1</span>
+siggen<span class="se">\b</span>uffer_amplitude<span class="se">\2\i</span>dx<span class="o">=</span><span class="m">1</span>
+siggen<span class="se">\b</span>uffer_amplitude<span class="se">\s</span>ize<span class="o">=</span><span class="m">2</span>
+siggen<span class="se">\b</span>uffer_file_path<span class="se">\1\i</span>dx<span class="o">=</span>
+siggen<span class="se">\b</span>uffer_file_path<span class="se">\2\i</span>dx<span class="o">=</span>
+siggen<span class="se">\b</span>uffer_file_path<span class="se">\s</span>ize<span class="o">=</span><span class="m">2</span>
+siggen<span class="se">\b</span>uffer_offset<span class="se">\1\i</span>dx<span class="o">=</span><span class="m">0</span>
+</pre></div>
+</div>
+<p>As you can see the format of the Scopy v2.0 is different, the main key is the plugin it is part of (in this case M2kPlugin) and the rest of the format is flattened. We created a small tool to help you switch from one format to another. This is a python script found <a class="reference external" href="https://github.com/analogdevicesinc/scopy/blob/main/tools/scopy_ini_converter.py">here</a>. You can run it like this.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>scopy_ini_converter<span class="w"> </span>--outmode<span class="w"> </span>v2<span class="w"> </span>--input<span class="w"> </span>scopy_v1_config.ini<span class="w"> </span>--output<span class="w"> </span>scopy_v2_config.ini
+</pre></div>
+</div>
 </section>
 <section id="any-unexpected-behavior-send-us-the-log">
 <h2>Any unexpected behavior? Send us the log!<a class="headerlink" href="#any-unexpected-behavior-send-us-the-log" title="Link to this heading"></a></h2>
