@@ -66,9 +66,9 @@ As you can see the format of the Scopy v2.0 is different, the main key is the pl
 
 .. code-block:: bash
 
-   scopy_ini_converter --outmode v2 --input scopy_v1_config.ini --output scopy_v2_config.ini
+   python3 ./scopy_ini_converter.py --outmode v2 --input scopy_v1_config.ini --output scopy_v2_config.ini
 
-
+This script will convert ini files from version 1 to version2.
 
 Any unexpected behavior? Send us the log!
 ------------------------------------------------------------
