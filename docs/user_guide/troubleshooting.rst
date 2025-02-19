@@ -13,6 +13,62 @@ uninstall the old Scopy properly.
 Doing this we make sure that the configuration files for
 Scopy v2 are not in any way influenced by Scopy v1.
 
+.. _inifiles:
+
+Scopy v1 ini files in Scopy v2
+------------------------------------------------------------
+Scopy v1.x ini files have a different format from version 2.0
+
+Scopy v1.x format (snippet):
+
+.. code-block:: bash
+
+   [power]
+   dac1_enabled=false
+   dac1_value=0
+   dac2_enabled=false
+   dac2_value=0
+   notes=
+   sync=false
+   tracking_percent=100
+   
+   [siggen]
+   autoscale=false
+   buffer_amplitude\1\idx=1
+   buffer_amplitude\2\idx=1
+   buffer_amplitude\size=2
+   buffer_file_path\1\idx=
+   same info in 
+
+Scopy v2.0 format (snippet):
+
+.. code-block:: bash
+
+   [M2kPlugin]
+   power\dac1_enabled=false
+   power\dac1_value=0
+   power\dac2_enabled=false
+   power\dac2_value=0
+   power\notes=
+   power\sync=false
+   power\tracking_percent=100
+   siggen\autoscale=false
+   siggen\buffer_amplitude\1\idx=1
+   siggen\buffer_amplitude\2\idx=1
+   siggen\buffer_amplitude\size=2
+   siggen\buffer_file_path\1\idx=
+   siggen\buffer_file_path\2\idx=
+   siggen\buffer_file_path\size=2
+   siggen\buffer_offset\1\idx=0
+
+
+As you can see the format of the Scopy v2.0 is different, the main key is the plugin it is part of (in this case M2kPlugin) and the rest of the format is flattened. We created a small tool to help you switch from one format to another. This is a python script found `here <https://github.com/analogdevicesinc/scopy/blob/main/tools/scopy_ini_converter.py>`__. You can run it like this.
+
+.. code-block:: bash
+
+   scopy_ini_converter --outmode v2 --input scopy_v1_config.ini --output scopy_v2_config.ini
+
+
 
 Any unexpected behavior? Send us the log!
 ------------------------------------------------------------

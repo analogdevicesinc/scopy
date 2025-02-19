@@ -8,11 +8,6 @@ About
 Scopy is a multi-functional software toolset with strong capabilities for 
 signal analysis.
 
-.. note::
-
-  Scopy v2.0.0 is now compatible with any IIO system.
-
-
 Download
 ---------------------------------------------------------------------
 
@@ -50,6 +45,20 @@ Download
   please make sure that the Device Drivers are  installed. A guide on this topic can be found in the section:
 
     * `ADALM2000 and ADALM-Pluto drivers <https://wiki.analog.com/university/tools/pluto/drivers/windows?s[]=adalm&s[]=pluto#windows_drivers>`__
+
+
+What's new
+---------------------------------------------------------------------
+Scopy 2.0 is a complete overhaul from the previous version of Scopy introducing a completely new infrastructure and interaction mechanism for any IIO device through generic instruments. While retaining the core functionality of Scopy v1 - support for ADALM2000 devices - this update significantly expands its capabilities. 
+
+Features added in Scopy 2.0
+- Multiple device support - control multiple devices from the same Scopy instance
+- IIO device support - support for IIO devices through IIO instruments - ADC/DAC/Debugger/Register Map
+- ADI Harmonic design style - Light and Dark themes as well as a styling engine
+- Plugin system - support for devices other than the ADALM2000
+
+.. warning::
+  Preferences and saved Scopy configurations from version 1.x are no longer compatible with Scopy v2.0. For more information click :ref:`here <inifiles>`
 
 Installation
 ---------------------------------------------------------------------
