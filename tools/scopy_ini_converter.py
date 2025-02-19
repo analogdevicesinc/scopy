@@ -1,3 +1,5 @@
+#!/bin/python3
+
 import argparse
 import configparser
 
@@ -48,3 +50,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
