@@ -317,9 +317,10 @@ siggen<span class="se">\b</span>uffer_offset<span class="se">\1\i</span>dx<span 
 </pre></div>
 </div>
 <p>As you can see the format of the Scopy v2.0 is different, the main key is the plugin it is part of (in this case M2kPlugin) and the rest of the format is flattened. We created a small tool to help you switch from one format to another. This is a python script found <a class="reference external" href="https://github.com/analogdevicesinc/scopy/blob/main/tools/scopy_ini_converter.py">here</a>. You can run it like this.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>scopy_ini_converter<span class="w"> </span>--outmode<span class="w"> </span>v2<span class="w"> </span>--input<span class="w"> </span>scopy_v1_config.ini<span class="w"> </span>--output<span class="w"> </span>scopy_v2_config.ini
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>./scopy_ini_converter.py<span class="w"> </span>--outmode<span class="w"> </span>v2<span class="w"> </span>--input<span class="w"> </span>scopy_v1_config.ini<span class="w"> </span>--output<span class="w"> </span>scopy_v2_config.ini
 </pre></div>
 </div>
+<p>This script will convert ini files from version 1 to version2.</p>
 </section>
 <section id="any-unexpected-behavior-send-us-the-log">
 <h2>Any unexpected behavior? Send us the log!<a class="headerlink" href="#any-unexpected-behavior-send-us-the-log" title="Link to this heading"></a></h2>
