@@ -25,7 +25,7 @@
 #include <QLoggingCategory>
 #include <QTimer>
 
-Q_LOGGING_CATEGORY(CAT_TIMEYAUTOSCALE, "Time Y-Autoscale");
+Q_LOGGING_CATEGORY(CAT_TIMEYAUTOSCALE, "TimeYAutoscale");
 
 using namespace scopy::gui;
 
