@@ -24,11 +24,11 @@ If the test case has special requirements, they will be listed in the test case 
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Ionut Muthi
+         - 17/02/2025
+         - v2.0.0
+         - N/A
+         - none
 
 Setup environment:
 ------------------
@@ -132,15 +132,9 @@ digital channels - rising edge, falling edge, high, low, any edge.
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 
 Test 2 - External Channel Trigger Function
@@ -237,15 +231,9 @@ Test 2 - External Channel Trigger Function
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 
 Test 3 - Oscilloscope Source External Trigger
@@ -333,15 +321,9 @@ Oscilloscope as the source.
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 
 Test 4 - Trigger Modes
@@ -413,15 +395,9 @@ Test 4 - Trigger Modes
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 
 Test 5 - Clock signal measurement accuracy
@@ -522,15 +498,9 @@ Test 5 - Clock signal measurement accuracy
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 
 Test 6 - Parallel Decoder
@@ -578,15 +548,9 @@ Test 6 - Parallel Decoder
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 
 Test 7 - SPI decoder
@@ -631,15 +595,9 @@ Test 7 - SPI decoder
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 
 Test 8 - UART decoder
@@ -706,15 +664,9 @@ Test 8 - UART decoder
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 
 Test 9 - PWM Decoder
@@ -751,15 +703,9 @@ Test 9 - PWM Decoder
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 
 Test 10 - Channel visual representation
@@ -809,15 +755,9 @@ trace height and plot color.
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 
 Test 11 - Export Functionality
@@ -868,15 +808,9 @@ of the Logic Analyzer.
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 
 Test 12 - Print Plot
@@ -915,15 +849,9 @@ of the Logic Analyzer.
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 
 Test 13 - Decoder Table
@@ -988,12 +916,6 @@ Test 13 - Decoder Table
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
