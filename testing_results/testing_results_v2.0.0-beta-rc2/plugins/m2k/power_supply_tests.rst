@@ -24,11 +24,11 @@ If the test case has special requirements, they will be listed in the test case 
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Ionut Muthi
+         - 13/02/2025
+         - v2.0.0
+         - N/A
+         - none
 
 Setup environment:
 ------------------
@@ -70,7 +70,7 @@ is working correctly.
     3. Set the positive value to 3.3V and click enable.
     4. Monitor the power supply output with voltmeter.
         - **Expected Result**: The voltmeter reads values between 3.25V and 3.35V.
-        - **Actual Result:**
+        - **Actual Result:** The voltmeter reads values between 3.25V and 3.35V.
 
 ..
   Actual test result goes here.
@@ -78,7 +78,7 @@ is working correctly.
 
     5. Change the power supply output value to 1.8V.
         - **Expected Result**: The voltmeter reads values between 1.75V and 1.85V.
-        - **Actual Result:**
+        - **Actual Result:** The voltmeter reads values between 1.75V and 1.85V.
 
 ..
   Actual test result goes here.
@@ -86,23 +86,20 @@ is working correctly.
 
     6. Change the power supply output value to 5V.
         - **Expected Result**: The voltmeter reads values between 4.95V and 5.05V.
-        - **Actual Result**:
+        - **Actual Result**: The voltmeter reads values between 4.95V and 5.05V.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
-..
-  Details about the tested OS goes here.
-
-**Comments:**
+**Comments:** none
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -128,7 +125,7 @@ is working correctly.
     3. Set the negative value to -3.3V and click enable.
     4. Monitor the power supply output with voltmeter.
         - **Expected Result**: The voltmeter reads values between -3.25V and -3.35V.
-        - **Actual Result**:
+        - **Actual Result**: The voltmeter reads values between -3.25V and -3.35V.
 
 ..
   Actual test result goes here.
@@ -136,7 +133,7 @@ is working correctly.
 
     5. Change the power supply output value to -1.8V.
         - **Expected Result**: The voltmeter reads values between -1.75V and -1.85V.
-        - **Actual Result**:
+        - **Actual Result**: The voltmeter reads values between -1.75V and -1.85V.
 
 ..
   Actual test result goes here.
@@ -144,23 +141,20 @@ is working correctly.
 
     6. Change the power supply output value to -5V.
         - **Expected Result**: The voltmeter reads values between -4.95V and -5.05V.
-        - **Actual Result**:
+        - **Actual Result**: The voltmeter reads values between -4.95V and -5.05V.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
-..
-  Details about the tested OS goes here.
-
-**Comments:**
+**Comments:** none
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -186,7 +180,7 @@ is working correctly.
     3. Set the knob to ±1V interval. No orange dot on the center.
     4. Set value to 3V. Then use +/- sign to change value with ±1V interval.
         - **Expected Result**: The value changes accordingly. Set Value ± 1V = the new value.
-        - **Actual Result**:
+        - **Actual Result**: The value changes accordingly. Set Value ± 1V = the new value.
 
 ..
   Actual test result goes here.
@@ -195,23 +189,20 @@ is working correctly.
     5. Set the knob to ±100mV interval. Orange dot seen on the center.
     6. Set value to 300mV. Then use +/- sign to change value with ±100mV interval.
         - **Expected Result**: The value changes accordingly. Set Value ± 100mV = the new value.
-        - **Actual Result**:
+        - **Actual Result**: The value changes accordingly. Set Value ± 100mV = the new value.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
-..
-  Details about the tested OS goes here.
-
-**Comments:**
+**Comments:** none
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -236,7 +227,7 @@ is working correctly.
     2. Set Tracking ratio control to Tracking.
     3. Set the positive output to 5V. Set tracking ratio to 50%.
         - **Expected Result**: The negative output value is automatically set to -2.5V.
-        - **Actual Result**:
+        - **Actual Result**: The negative output value is automatically set to -2.5V.
 
 ..
   Actual test result goes here.
@@ -244,7 +235,7 @@ is working correctly.
 
     4. Set the tracking ratio to 100%:
         - **Expected Result**: The negative output value is automatically set to -5V.
-        - **Actual Result**:
+        - **Actual Result**: The negative output value is automatically set to -5V.
 
 ..
   Actual test result goes here.
@@ -252,7 +243,7 @@ is working correctly.
 
     5. Set the tracking ratio to 0%:
         - **Expected Result**: The negative output value is automatically set to 0mV.
-        - **Actual Result**:
+        - **Actual Result**: The negative output value is automatically set to 0mV.
 
 ..
   Actual test result goes here.
@@ -261,23 +252,20 @@ is working correctly.
     6. Set Tracking ratio control to Independent.
     7. Set the positive output to 5V and verify the negative output:
         - **Expected Result**: The negative output value does not change.
-        - **Actual Result**:
+        - **Actual Result**: The negative output value does not change.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
-..
-  Details about the tested OS goes here.
-
-**Comments:**
+**Comments:** none
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).

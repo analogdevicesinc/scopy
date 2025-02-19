@@ -18,11 +18,11 @@ Pattern Generator - Test Suite
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Ionut Muthi
+         - 17/02/2025
+         - v2.0.0
+         - N/A
+         - none
 
 Setup environment:
 ----------------------------------------------------------------------------------------------------
@@ -152,15 +152,9 @@ Test 1: Individual Channel Operation
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 
 Test 2: Group Channel Operation
@@ -429,15 +423,9 @@ Test 2: Group Channel Operation
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 
 Test 3: Simultaneous Group and Individual Channels Operation
@@ -486,15 +474,9 @@ Test 3: Simultaneous Group and Individual Channels Operation
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 
 Test 4: Other Features
@@ -631,14 +613,8 @@ Test 4: Other Features
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 

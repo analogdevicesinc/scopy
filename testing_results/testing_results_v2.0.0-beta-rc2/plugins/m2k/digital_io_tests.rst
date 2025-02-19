@@ -24,11 +24,11 @@ If the test case has special requirements, they will be listed in the test case 
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Ionut Muthi
+         - 12/02/2025
+         - V2.0.0
+         - N/A
+         - none
 
 Setup environment:
 ------------------
@@ -86,13 +86,13 @@ Test 1 - Check individual digital pin state
        Start the instrument and monitor the voltage value on Channel 1.
 
         - **Expected Result**: The voltage displayed on the voltmeter is between -0.050V and 0.4V.
-        - **Actual Result**:
+        - **Actual Result**: 
 
 ..
   Actual test result goes here.
 ..
         
-    8. Set DIO 0 to logic 1 and monitor the voltage value on Channel 1. Start the instrument.
+    1. Set DIO 0 to logic 1 and monitor the voltage value on Channel 1. Start the instrument.
         - **Expected Result**: The voltage displayed on the voltmeter is between 2.9V and 3.4V.
         - **Actual Result**:
 
@@ -132,20 +132,11 @@ Test 1 - Check individual digital pin state
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
-..
-  Details about the tested OS goes here.
+**Comments:** Signals not connected correctly issue reported here `#1903 <https://github.com/analogdevicesinc/scopy/issues/1903>`_
 
-**Comments:**
-
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
 
 
 Test 2 - Checking grouped digital pin states
@@ -199,17 +190,8 @@ are working correctly.
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
-..
-  Details about the tested OS goes here.
+**Comments:** Signals not connected correctly issue reported here `#1903 <https://github.com/analogdevicesinc/scopy/issues/1903>`_
 
-**Comments:**
-
-..
-  Any comments about the test goes here.
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
+**Result:** FAIL
