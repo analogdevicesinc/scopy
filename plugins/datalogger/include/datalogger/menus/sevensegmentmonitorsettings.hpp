@@ -46,6 +46,7 @@ private:
 	MenuOnOffSwitch *peakHolderToggle;
 	QLineEdit *precision;
 	void changePrecision();
+	QString currentPrecision;
 };
 } // namespace datamonitor
 } // namespace scopy
