@@ -439,7 +439,7 @@ frequency of 15.9kHz.
     - Resistor: R1 = 100 Ohms
     - Resistor: R2 = 100 Ohms
     - Capacitor: C1 = 1uF
-    - Capacitor: C2 = 0.1uF
+    - Capacitor: C2 = 0.1uF (Analog Devices part code 104)
 
 **Steps:**
     1. In the Network Analyzer settings menu set the following:
@@ -599,7 +599,7 @@ by exporting the low pass filter plot screenshot to a PDF file.
     1. Setup the Network Analyzer as stated in the low pass filter test
        linked above.
     2. Click the Print plot button and choose a name and location for the file.
-        - **Expected result:** The file is saved as a PDF in the selected 
+        - **Expected result:** The file is saved as a BMP in the selected
           location.
         - **Actual result:**
 
@@ -608,7 +608,7 @@ by exporting the low pass filter plot screenshot to a PDF file.
 ..
 
     3. Open the exported file and verify it:
-        - **Expected result:** The plot is correctly saved in the PDF file.
+        - **Expected result:** The plot is correctly saved in the BMP file.
         - **Actual result:**
 
 ..
@@ -650,7 +650,7 @@ by viewing the acquired data in the Oscilloscope and analyzing measurements.
 **Steps:**
     1. In the Network Analyzer set the following configuration:
         - Reference: Channel 1, 1V Amplitude, 0V Offset
-        - Sweep: Linear, Start: 20Hz, Stop: 10MHz, Sample Count: 10
+        - Sweep: Linear, Start: 20Hz, Stop: 1MHz, Sample Count: 10
         - Display: Min. Magnitude: -50dB, Max. Magnitude: 5dB, Min. Phase: -180°, 
           Max. Phase: 180°
     2. Run a Single capture in the Network Analyzer.
