@@ -63,6 +63,10 @@ digital channels - rising edge, falling edge, high, low, any edge.
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
 
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
+    - :ref:`Digital IO<digital_io_tests>`
+
 **Steps:**
     1. Open the Logic Analyzer instrument.
     2. Enable DIO 0 and DIO 1 on the Logic Analyzer.
@@ -155,6 +159,10 @@ Test 2 - External Channel Trigger Function
 **Preconditions:**
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
+
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
+    - :ref:`Digital IO<digital_io_tests>`
 
 **Steps:**
     1. Open the Logic Analyzer instrument.
@@ -357,6 +365,10 @@ Test 4 - Trigger Modes
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
 
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
+    - :ref:`Digital IO<digital_io_tests>`
+
 **Steps:**
     1. Open the Logic Analyzer instrument.
     2. Enable DIO 0, DIO 1 and DIO 2 on the Logic Analyzer.
@@ -436,6 +448,9 @@ Test 5 - Clock signal measurement accuracy
 **Preconditions:**
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
+
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
 
 **Steps:**
     1. Open the Logic Analyzer instrument.
@@ -546,6 +561,9 @@ Test 6 - Parallel Decoder
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
 
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
+
 **Steps:**
     1. Open the Logic Analyzer instrument.
     2. Add a parallel decoder from the main settings menu and set the following parameters:
@@ -602,6 +620,9 @@ Test 7 - SPI decoder
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
 
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
+
 **Steps:**
     1. Open the Logic Analyzer instrument.
     2. Add an SPI decoder from the main settings menu and set the following parameters:
@@ -654,6 +675,9 @@ Test 8 - UART decoder
 **Preconditions:**
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
+
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
 
 **Steps:**
     1. Open the Logic Analyzer instrument and set time base to 1 ms.
@@ -729,6 +753,9 @@ Test 9 - PWM Decoder
 **Preconditions:**
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
+
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
 
 **Steps:**
     1. Open the Logic Analyzer instrument.
@@ -834,6 +861,9 @@ of the Logic Analyzer.
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
 
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
+
 **Steps:**
     1. Open the Pattern Generator and set two consecutive channels with similar
        configurations:
@@ -893,6 +923,9 @@ of the Logic Analyzer.
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
 
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
+
 **Steps:**
     1. Open the Logic Analyzer and set the time base to 5 ms.
     2. Open the Pattern Generator and set two consecutive channels with similar
@@ -938,6 +971,9 @@ Test 13 - Decoder Table
 **Preconditions:**
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
+
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
 
 **Steps:**
     1. Open the Pattern Generator and set the following parameters:
