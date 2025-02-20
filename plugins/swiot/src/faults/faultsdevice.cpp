@@ -273,7 +273,7 @@ QWidget *FaultsDevice::createTopWidget(QWidget *parent)
 	layout->setContentsMargins(0, 0, 0, 0);
 
 	QLabel *deviceNameLabel = new QLabel(w);
-	StyleHelper::MenuLargeLabel(deviceNameLabel);
+	Style::setStyle(deviceNameLabel, style::properties::label::menuBig);
 	deviceNameLabel->setText(m_name);
 
 	m_registerNoLineEdit = new QLineEdit(w);

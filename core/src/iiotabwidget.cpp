@@ -408,7 +408,7 @@ QWidget *IioTabWidget::createUriWidget(QWidget *parent)
 	Style::setStyle(w, style::properties::widget::border_interactive);
 
 	QLabel *uriLabel = new QLabel("URI", w);
-	StyleHelper::MenuLargeLabel(uriLabel);
+	Style::setStyle(uriLabel, style::properties::label::menuMedium);
 
 	m_uriEdit = new QLineEdit(w);
 	m_uriEdit->setPlaceholderText("The device you are connecting to");
