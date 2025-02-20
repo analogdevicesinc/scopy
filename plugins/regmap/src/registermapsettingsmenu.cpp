@@ -124,13 +124,14 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 	findPathWidget->setLayout(findPathLayout);
 
 	filePath = new QLineEdit();
+	filePath->setReadOnly(true);
 	filePath->setPlaceholderText("File path");
 	pathButton = new QPushButton("Find path");
 
 	QObject::connect(pathButton, &QPushButton::clicked, this, [=]() {
 		bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
-		filePath->setText(QFileDialog::getOpenFileName(
-			this, ("Open File"), "", QString(), nullptr,
+		filePath->setText(QFileDialog::getSaveFileName(
+			this, ("Open File"), "", tr("Comma-separated values files (*.csv);;All Files(*)"), nullptr,
 			(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog)));
 	});
 
