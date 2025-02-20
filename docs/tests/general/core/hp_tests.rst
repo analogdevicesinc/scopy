@@ -39,13 +39,13 @@ Test 1: The homepage displays correctly when running the application.
     2. Observe the application's behavior.
         - **Expected result:** The application launches without errors and the 
           home page is displayed.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -55,7 +55,7 @@ Test 1: The homepage displays correctly when running the application.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -79,13 +79,13 @@ Test 2: Verifying the "Add device" (+) button.
     4. Observe the application's behavior.
         - **Expected result:** The page for adding a new device is displayed in 
           the info page section.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -95,7 +95,7 @@ Test 2: Verifying the "Add device" (+) button.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -124,13 +124,13 @@ Test 3: Verifying the auto-scan feature (ON).
     4. Observe the application's behavior.
         - **Expected result:** After a short period, the device appears in the 
           device browser section. 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -140,7 +140,7 @@ Test 3: Verifying the auto-scan feature (ON).
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -169,13 +169,13 @@ scan is turned off.
     4. Observe the application's behavior.
         - **Expected result:** The device should not be visible in the device 
           browser. 
-        - **Actual result:**
+        - **Actual result:** As expected. 
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -185,7 +185,7 @@ scan is turned off.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -215,13 +215,13 @@ all available devices correctly.
     4. Click on the **Scan** button.
     5. Observe the application's behavior.
         - **Expected result:** The device appears in the device browser section.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -231,7 +231,7 @@ all available devices correctly.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -261,19 +261,21 @@ Test 6: Navigation using the buttons in the info page.
         - **Expected result:** The info page changes from the 'Welcome to Scopy' 
           page to the add page and in device browser the related button is 
           highlighted.
+        - **Actual result:** As expected.
     7. Click on the left arrow button.
         - **Expected result:** The "Welcome to Scopy" page is displayed and the 
           related button is highlighted.
+        - **Actual result:** As expected.
     8. Click on the left arrow button.
         - **Expected result:** The device's page is displayed and the device 
           icon is highlighted. 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -283,7 +285,7 @@ Test 6: Navigation using the buttons in the info page.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -311,13 +313,13 @@ available devices correctly.
     5. Unplug the device.
     6. Observe the application's behavior.
         - **Expected result:** The device is removed from device browser.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -327,7 +329,7 @@ available devices correctly.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).

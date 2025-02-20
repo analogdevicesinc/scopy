@@ -46,13 +46,13 @@ correctly.
     5. Click on **Enable** button.
         - **Expected result:** The IIO device tab is selected, and the URI 
           "ip:127.0.0.1" is entered in the corresponding section. 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -62,7 +62,7 @@ correctly.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -96,17 +96,17 @@ when the IIO emulator is not found.
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Unable to locate the preferences.ini file on macOS when using the **Open** button.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -138,13 +138,13 @@ correctly.
     7. Click on **Disable** button.
         - **Expected result:** The fields in this tab become editable, and the 
           **Enable** button appears. 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -154,7 +154,7 @@ correctly.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -188,13 +188,13 @@ when an emulated device is connected and the "iio-emu" process is stopped.
         - **Expected result:** The fields in this tab become editable, and the 
           **Enable** button appears. After a few seconds, the device is 
           disconnected.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -204,7 +204,7 @@ when an emulated device is connected and the "iio-emu" process is stopped.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -236,13 +236,13 @@ correctly (using adalm2000 device).
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: M2kPlugin (checked), ADCPlugin, DACPlugin, DataLoggerPlugin, 
           DebuggerPlugin, RegmapPlugin.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -252,7 +252,7 @@ correctly (using adalm2000 device).
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -284,13 +284,13 @@ correctly (using pluto device).
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: ADCPlugin (checked), DACPlugin (checked), DataLoggerPlugin 
           (checked), DebuggerPlugin (checked), RegmapPlugin (checked). 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -300,7 +300,7 @@ correctly (using pluto device).
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -332,13 +332,13 @@ correctly (using pqm device).
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: PQMPlugin (checked), ADCPlugin, DACPlugin, DataLoggerPlugin, 
           DebuggerPlugin.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -348,7 +348,7 @@ correctly (using pqm device).
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -379,13 +379,13 @@ correctly (using swiot_config device).
     6. Click on **Verify** button.
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: SWIOTPlugin (checked), DataLoggerPlugin, DebuggerPlugin.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -395,7 +395,7 @@ correctly (using swiot_config device).
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -427,13 +427,13 @@ correctly (using swiot_runtime device).
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: SWIOTPlugin (checked), ADCPlugin, DataLoggerPlugin, 
           DebuggerPlugin, RegmapPlugin.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -443,7 +443,7 @@ correctly (using swiot_runtime device).
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -474,13 +474,13 @@ correctly (using generic device).
     6. Click on **Verify** button.
         - **Expected result:** The message **"ip:127.0.0.1" not a valid 
           context!** is displayed. 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -490,7 +490,7 @@ correctly (using generic device).
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
