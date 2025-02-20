@@ -18,11 +18,11 @@ Signal Generator - Test Suite
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Ionut Muthi
+         - 12/02/2025
+         - v2.0.0
+         - N/A
+         - none
 
 Setup environment:
 -------------------------------------------------------
@@ -52,7 +52,7 @@ Test 1: Channel 1 Operation
         4. Set the knob to ± 1V interval. No orange dot on the center.
         5. Change the voltage value using the up and down arrow
                     - **Expected Result:** The voltage value should change accordingly with an increment or decrement of ±1V from -5V to 5V. The graphical representation should follow accordingly
-                    - **Actual Result:**
+                    - **Actual Result:** The voltage value changes accordingly with an increment or decrement of ±1V from -5V to 5V. The graphical representation follows accordingly
 
 ..
   Actual test result goes here.
@@ -62,7 +62,7 @@ Test 1: Channel 1 Operation
         7. Set the knob to ± 100mV interval. With orange dot on the center.
         8. Change the voltage value using the up and down arrow
                     - **Expected Result:** The voltage value should change accordingly with an increment or decrement of ±100mV from -5V to 5V. The graphical representation should follow accordingly
-                    - **Actual Result:**
+                    - **Actual Result:** The voltage value changes accordingly with an increment or decrement of ±100mV from -5V to 5V. The graphical representation follows accordingly
 
 ..
   Actual test result goes here.
@@ -71,7 +71,7 @@ Test 1: Channel 1 Operation
         9. Connect AWG ch1 to scope ch1+ and scope ch1- to gnd
         10. Set the voltage value of the signal generator to 4.5V and set the Oscilloscope’s Volts/div from 1V/div to 5V/div and set the trigger mode to auto.
                     - **Expected Result:** The voltage reading on the oscilloscope should be from 4.4V to 4.6V using the cursor or from the measured data
-                    - **Actual Result:**
+                    - **Actual Result:** The voltage reading on the oscilloscope is from 4.4V to 4.6V using the cursor or from the measured data
 
 ..
   Actual test result goes here.
@@ -79,19 +79,19 @@ Test 1: Channel 1 Operation
 
         11. Set the voltage value of the signal generator to -4.5V and set the Oscilloscope’s Volts/div from 1V/div to 5V/div and set the trigger mode to auto.
                     - **Expected Result:** The voltage reading on the oscilloscope should be from -4.4V to -4.6V using the cursor or from the measured data
-                    - **Actual Result:**
+                    - **Actual Result:** The voltage reading on the oscilloscope is from -4.4V to -4.6V using the cursor. 
 
 ..
   Actual test result goes here.
 ..
 
-        12. Testing different waveform types
-        13. Turn on channel 1 and view the configuration window by clicking the on/off button and menu button respectively. Choose Waveform from the configuration menu
-        14. Checking increment/decrement value of Amplitude and Frequency; Large increment
-        15. Set the knob to without the orange dot on the center.
-        16. Change the Amplitude or Frequency value using the up and down arrow
+        1.  Testing different waveform types
+        2.  Turn on channel 1 and view the configuration window by clicking the on/off button and menu button respectively. Choose Waveform from the configuration menu
+        3.  Checking increment/decrement value of Amplitude and Frequency; Large increment
+        4.  Set the knob to without the orange dot on the center.
+        5.  Change the Amplitude or Frequency value using the up and down arrow
                     - **Expected Result:** The amplitude value should change accordingly with a high increment/decrement from 1uV to 10V. The frequency value should change accordingly with a high increment/decrement from 1mHz to 20MHz.The graphical representation should follow accordingly
-                    - **Actual Result:**
+                    - **Actual Result:** The amplitude value changes accordingly with a high increment/decrement from 1uV to 10V. The frequency value changes accordingly with a high increment/decrement from 1mHz to 20MHz.The graphical representation follows accordingly
 
 ..
   Actual test result goes here.
@@ -101,7 +101,7 @@ Test 1: Channel 1 Operation
         18. Set the knob to with the orange dot on the center.
         19. Change the voltage or frequency value using the up and down arrow
                     - **Expected Result:** The Amplitude value should change accordingly with a ±1 unit on the least significant digit from 1uV to 10V. The frequency value should change accordingly with a ±1 unit on the least significant digit from 1mHz to 20MHz.The graphical representation should follow accordingly
-                    - **Actual Result:**
+                    - **Actual Result:** The Amplitude value changes accordingly with a ±1 unit on the least significant digit from 1uV to 10V. The frequency value changes accordingly with a ±1 unit on the least significant digit from 1mHz to 20MHz.The graphical representation follows accordingly 
 
 ..
   Actual test result goes here.
@@ -111,7 +111,7 @@ Test 1: Channel 1 Operation
         21. Set the knob without the orange dot on the center.
         22. Change the Offset voltage or Phase value using the up and down arrow
                     - **Expected Result:** The Offset voltage value should change accordingly with ±1 increment/decrement from -5V to 5V. The phase value should change accordingly with a ±45 increment/decrement from 0° to 360°.The graphical representation should follow accordingly
-                    - **Actual Result:**
+                    - **Actual Result:** The Offset voltage value changes accordingly with ±1 increment/decrement from -5V to 5V. The phase value changes accordingly with a ±45 increment/decrement from 0° to 360°.The graphical representation follows accordingly
 
 ..
   Actual test result goes here.
@@ -121,7 +121,7 @@ Test 1: Channel 1 Operation
         24. Set the knob to with the orange dot on the center.
         25. Change the Offset voltage or Phase value using the up and down arrow
                     - **Expected Result:** The Offset voltage value should change accordingly with ±.1 increment/decrement from -5V to 5V. The phase value should change accordingly with ±1 increment/decrement from 0° to 360°.The graphical representation should follow accordingly
-                    - **Actual Result:**
+                    - **Actual Result:** The Offset voltage value changes accordingly with ±.1 increment/decrement from -5V to 5V. The phase value changes accordingly with ±1 increment/decrement from 0° to 360°.The graphical representation follows accordingly
 
 ..
   Actual test result goes here.
@@ -131,7 +131,7 @@ Test 1: Channel 1 Operation
         27. Testing Sinewave Waveform
         28. Set the signal generator’s waveform type: Sinewave, Amplitude 5V, Frequency: 200Hz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 500mV/div, trigger mode: Auto and time base: 5ms.
                     - **Expected Result:** The measurement reading on Oscilloscope should be: Period: 5ms, Frequency: 200Hz, Peak-peak: 4.8V to 5.2V
-                    - **Actual Result:**
+                    - **Actual Result:** The measurement reading on Oscilloscope is: Period: 5ms, Frequency: 200Hz, Peak-peak: 4.8V to 5.2V
 
 ..
   Actual test result goes here.
@@ -139,7 +139,7 @@ Test 1: Channel 1 Operation
 
         29. Set the signal generator’s waveform type: Sinewave, Amplitude 10V, Frequency: 500kHz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 2V/div, trigger mode: Auto and time base: 1us
                     - **Expected Result:** The measurement reading on Oscilloscope should be: Period: 2.000us, Frequency: 500 kHz, Peak-peak: 9.6V to 10.2V
-                    - **Actual Result:**
+                    - **Actual Result:** The measurement reading on Oscilloscope is: Period: 2.000us, Frequency: 500 kHz, Peak-peak: 9.6V to 10.2V
 
 ..
   Actual test result goes here.
@@ -147,7 +147,7 @@ Test 1: Channel 1 Operation
 
         30. Set the signal generator’s waveform type: Sinewave, Amplitude 10V, Frequency: 5MHz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 200ns
                     - **Expected Result:** The measurement reading on Oscilloscope should be: Period: 200ns, Frequency: 5MHz, Peak-peak: 8.9V to 9.2V
-                    - **Actual Result:**
+                    - **Actual Result:** The measurement reading on Oscilloscope is: Period: 200ns, Frequency: 5MHz, Peak-peak: 8.9V to 9.2V
 
 ..
   Actual test result goes here.
@@ -156,7 +156,7 @@ Test 1: Channel 1 Operation
         31. Testing Square Waveform
         32. Set the signal generator’s waveform type: Square wave, Amplitude 5V, Frequency: 200Hz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 5ms
                     - **Expected Result:** Use the Oscilloscope’s cursor to check the peak to peak value of the Square wave generated, do not include the inherent overshoot of the signal. The measurement should be Period: 5.000ms, Frequency: 200Hz, peak to peak value: 4.8V to 5.2V and Min/Max: ±2.5V
-                    - **Actual Result:**
+                    - **Actual Result:** The measurement is: Period: 5.000ms, Frequency: 200Hz, peak to peak value: 4.8V to 5.2V and Min/Max: ±2.5V
 
 ..
   Actual test result goes here.
@@ -164,7 +164,7 @@ Test 1: Channel 1 Operation
 
         33. Set the signal generator’s waveform type: Square wave, Amplitude 10V, Frequency: 5MHz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 2V/div, trigger mode: Auto and time base: 100ns
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 200ns, Frequency: 5MHz, peak to peak value: 9.8V to 10.2V and Min/Max: ±5V
-                    - **Actual Result:**
+                    - **Actual Result:** Oscilloscope’s measurement is: Period: 200ns, Frequency: 5MHz, peak to peak value: 9.8V to 10.2V and Min/Max: ±5V
 
 ..
   Actual test result goes here.
@@ -172,7 +172,7 @@ Test 1: Channel 1 Operation
 
         34. Set the signal generator’s waveform type: Square wave, Amplitude 7V, Duty Cycle: 20%, Frequency: 100 kHz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 2us
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 200ns, Frequency: 5MHz, peak to peak value: 6.8V to 7.2V and Min/Max: ±3.5V, +Duty Cycle: 20%, -Duty Cycl: 80%
-                    - **Actual Result:**
+                    - **Actual Result:** Oscilloscope’s measurement is: Period: 200ns, Frequency: 5MHz, peak to peak value: 6.8V to 7.2V and Min/Max: ±3.5V, +Duty Cycle: 20%, -Duty Cycl: 80%
 
 ..
   Actual test result goes here.
@@ -180,7 +180,7 @@ Test 1: Channel 1 Operation
 
         35. Repeat step 10.3 with varying duty cycle from 1% to 99%
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 200ns, Frequency: 5MHz, peak to peak value: 6.8V to 7.2V and Min/Max: ±5V and the varying ±Duty Cycle
-                    - **Actual Result:**
+                    - **Actual Result:** The value are displayed correctly
 
 ..
   Actual test result goes here.
@@ -189,7 +189,7 @@ Test 1: Channel 1 Operation
         36. Testing Triangle Waveform
         37. Set the signal generator’s waveform type: Triangle, Amplitude 5V, Frequency: 200Hz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 2ms
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 5.000ms, Frequency: 200Hz, peak to peak value: 4.8V to 5.2V and Min/Max: ±2.4V to ±2.6V
-                    - **Actual Result:**
+                    - **Actual Result:** The value are displayed correctly
 
 ..
   Actual test result goes here.
@@ -197,7 +197,7 @@ Test 1: Channel 1 Operation
 
         38. Set the signal generator’s waveform type: Triangle, Amplitude 8V, Frequency: 2MHz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 100ns
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 500.000ns, Frequency: 2MHz, peak to peak value: 7.8V to 8.2V and Min/Max: +/- 3.9V
-                    - **Actual Result:**
+                    - **Actual Result:** The value are displayed correctly
 
 ..
   Actual test result goes here.
@@ -206,7 +206,7 @@ Test 1: Channel 1 Operation
         39. Testing Rising Ramp Sawtooth Waveform
         40. Set the signal generator’s waveform type: Rising Ramp Sawtooth, Amplitude 5V, Frequency: 200Hz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 2ms
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 5.000ms, Frequency: 200Hz, peak to peak value: 4.8V to 5.2V and Min/Max: ±2.4V to ±2.7V. Use the Oscilloscope’s cursor to disregard the overshoot of the signal
-                    - **Actual Result:**
+                    - **Actual Result:** The value are displayed correctly
 
 ..
   Actual test result goes here.
@@ -214,7 +214,7 @@ Test 1: Channel 1 Operation
 
         41. Set the signal generator’s waveform type: Rising Ramp Sawtooth, Amplitude 8V, Frequency: 1MHz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 1us
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 1.000us, Frequency: 1MHz, peak to peak value: 7.8V to 8.2V and Min/Max: ±3.9V to ±4.1V. Use the Oscilloscope’s cursor to disregard the overshoot of the signal
-                    - **Actual Result:**
+                    - **Actual Result:** The value are displayed correctly
 
 ..
   Actual test result goes here.
@@ -223,7 +223,7 @@ Test 1: Channel 1 Operation
         42. Testing Falling Ramp Sawtooth Waveform
         43. Set the signal generator’s waveform type: Falling Ramp Sawtooth, Amplitude 5V, Frequency: 200Hz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 2ms
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 5.000ms, Frequency: 200Hz, peak to peak value: 4.8V to 5.2V and Min/Max: ±2.4V to ±2.6V
-                    - **Actual Result:**
+                    - **Actual Result:** The value are displayed correctly
 
 ..
   Actual test result goes here.
@@ -231,7 +231,7 @@ Test 1: Channel 1 Operation
 
         44. Set the signal generator’s waveform type: Falling Ramp Sawtooth, Amplitude 8V, Frequency: 1MHz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 1us
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 1.000us, Frequency: 1MHz, peak to peak value: 7.8V to 8.2V and Min/Max: ±3.9V to ±4.1V. Use the Oscilloscope’s cursor to disregard the overshoot of the signal
-                    - **Actual Result:**
+                    - **Actual Result:** The value are displayed correctly
 
 ..
   Actual test result goes here.
@@ -240,7 +240,7 @@ Test 1: Channel 1 Operation
         45. Testing Trapezoidal waveform
         46. Set the signal generator’s waveform type: Trapezoidal, Amplitude: 5V, Rise Time: 1us, Fall Time: 1us, Hold High Time: 1us, Hold Low time Time: 1us. Set the Oscilloscope’s Volt/div: 2V, Trigger Mode: Auto and Time Base: 1us
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 4.000us, Frequency: 250kHz, peak to peak value: 4.8V to 5.2V and Min/Max: ±2.4V to ±2.6.
-                    - **Actual Result:**
+                    - **Actual Result:** The value are displayed correctly
 
 ..
   Actual test result goes here.
@@ -248,7 +248,7 @@ Test 1: Channel 1 Operation
 
         47. Set the signal generator’s waveform type: Trapezoidal, Amplitude: 10V, Rise Time: 1us, Fall Time: 1us, Hold High Time: 1us, Hold Low time Time: 1us. Set the Oscilloscope’s Volt/div: 2V, Trigger Mode: Auto and Time Base: 1us
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 4.000us, Frequency: 250kHz, peak to peak value: 9.6V to 10.4V and Min/Max: ±4.8V to ±5.2.
-                    - **Actual Result:**
+                    - **Actual Result:** The value are displayed correctly
 
 ..
   Actual test result goes here.
@@ -256,7 +256,7 @@ Test 1: Channel 1 Operation
 
         48. Set the signal generator’s waveform type: Trapezoidal, Amplitude: 10V, Rise Time: 200ns, Fall Time: 200ns, Hold High Time: 200ns, Hold Low time: 200ns. Set the Oscilloscope’s Volt/div: 2V, Trigger Mode: Auto and Time Base: 200ns
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 800ns, Frequency: 1.250MHz, peak to peak value: 9.6V to 10.4V and Min/Max: ±4.8V to ±5.2.
-                    - **Actual Result:**
+                    - **Actual Result:** The value are displayed correctly
 
 ..
   Actual test result goes here.
@@ -267,12 +267,12 @@ Test 1: Channel 1 Operation
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** none 
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -296,7 +296,7 @@ Test 2: Channel 2 Operation
         4. Set the knob to ± 1V interval. No orange dot on the center.
         5. Change the voltage value using the up and down arrow
                     - **Expected Result:** The voltage value should change accordingly with an increment or decrement of ±1V from -5V to 5V. The graphical representation should follow accordingly
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -306,7 +306,7 @@ Test 2: Channel 2 Operation
         7. Set the knob to ± 100mV interval. With orange dot on the center.
         8. Change the voltage value using the up and down arrow
                     - **Expected Result:** The voltage value should change accordingly with an increment or decrement of ±100mV from -5V to 5V. The graphical representation should follow accordingly
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -315,7 +315,7 @@ Test 2: Channel 2 Operation
         9. Connect AWG ch2 to scope ch2+ and scope ch2- to gnd
         10. Set the voltage value of the signal generator to 4.5V and set the Oscilloscope’s Volts/div from 1V/div to 5V/div and set the trigger mode to auto.
                     - **Expected Result:** The voltage reading on the oscilloscope should be from 4.4V to 4.6V using the cursor or from the measured data
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -323,7 +323,7 @@ Test 2: Channel 2 Operation
 
         11. Set the voltage value of the signal generator to -4.5V and set the Oscilloscope’s Volts/div from 1V/div to 5V/div and set the trigger mode to auto.
                     - **Expected Result:** The voltage reading on the oscilloscope should be from -4.4V to -4.6V using the cursor or from the measured data
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -335,7 +335,7 @@ Test 2: Channel 2 Operation
         15. Set the knob to without the orange dot on the center.
         16. Change the Amplitude or Frequency value using the up and down arrow
                     - **Expected Result:** The amplitude value should change accordingly with a high increment/decrement from 1uV to 10V. The frequency value should change accordingly with a high increment/decrement from 1mHz to 20MHz.The graphical representation should follow accordingly
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -345,7 +345,7 @@ Test 2: Channel 2 Operation
         18. Set the knob to with the orange dot on the center.
         19. Change the voltage or frequency value using the up and down arrow
                     - **Expected Result:** The Amplitude value should change accordingly with a ±1 unit on the least significant digit from 1uV to 10V. The frequency value should change accordingly with a ±1 unit on the least significant digit from 1mHz to 20MHz.The graphical representation should follow accordingly
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -355,7 +355,7 @@ Test 2: Channel 2 Operation
         21. Set the knob without the orange dot on the center.
         22. Change the Offset voltage or Phase value using the up and down arrow
                     - **Expected Result:** The Offset voltage value should change accordingly with ±1 increment/decrement from -5V to 5V. The phase value should change accordingly with a ±45 increment/decrement from 0° to 360°.The graphical representation should follow accordingly
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -365,7 +365,7 @@ Test 2: Channel 2 Operation
         24. Set the knob to with the orange dot on the center.
         25. Change the Offset voltage or Phase value using the up and down arrow
                     - **Expected Result:** The Offset voltage value should change accordingly with ±.1 increment/decrement from -5V to 5V. The phase value should change accordingly with ±1 increment/decrement from 0° to 360°.The graphical representation should follow accordingly
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -375,7 +375,7 @@ Test 2: Channel 2 Operation
         27. Testing Sinewave Waveform
         28. Set the signal generator’s waveform type: Sinewave, Amplitude 5V, Frequency: 200Hz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 500mV/div, trigger mode: Auto and time base: 5ms.
                     - **Expected Result:** The measurement reading on Oscilloscope should be: Period: 5ms, Frequency: 200Hz, Peak-peak: 4.8V to 5.2V
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -383,7 +383,7 @@ Test 2: Channel 2 Operation
 
         29. Set the signal generator’s waveform type: Sinewave, Amplitude 10V, Frequency: 500kHz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 2V/div, trigger mode: Auto and time base: 1us
                     - **Expected Result:** The measurement reading on Oscilloscope should be: Period: 2.000us, Frequency: 500 kHz, Peak-peak: 9.6V to 10.2V
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -391,7 +391,7 @@ Test 2: Channel 2 Operation
 
         30. Set the signal generator’s waveform type: Sinewave, Amplitude 10V, Frequency: 5MHz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 200ns
                     - **Expected Result:** The measurement reading on Oscilloscope should be: Period: 200ns, Frequency: 5MHz, Peak-peak: 8.9V to 9.2V
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -400,7 +400,7 @@ Test 2: Channel 2 Operation
         31. Testing Square Waveform
         32. Set the signal generator’s waveform type: Square wave, Amplitude 5V, Frequency: 200Hz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 5ms
                     - **Expected Result:** Use the Oscilloscope’s cursor to check the peak to peak value of the Square wave generated, do not include the inherent overshoot of the signal. The measurement should be Period: 5.000ms, Frequency: 200Hz, peak to peak value: 4.8V to 5.2V and Min/Max: ±2.5V
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -408,7 +408,7 @@ Test 2: Channel 2 Operation
 
         33. Set the signal generator’s waveform type: Square wave, Amplitude 10V, Frequency: 5MHz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 2V/div, trigger mode: Auto and time base: 100ns
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 200ns, Frequency: 5MHz, peak to peak value: 9.8V to 10.2V and Min/Max: ±5V
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -416,7 +416,7 @@ Test 2: Channel 2 Operation
 
         34. Set the signal generator’s waveform type: Square wave, Amplitude 7V, Duty Cycle: 20%, Frequency: 100 kHz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 2us
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 200ns, Frequency: 5MHz, peak to peak value: 6.8V to 7.2V and Min/Max: ±3.5V, +Duty Cycle: 20%, -Duty Cycl: 80%
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -424,7 +424,7 @@ Test 2: Channel 2 Operation
 
         35. Repeat step 10.3 with varying duty cycle from 1% to 99%
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 200ns, Frequency: 5MHz, peak to peak value: 6.8V to 7.2V and Min/Max: ±5V and the varying ±Duty Cycle
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -433,7 +433,7 @@ Test 2: Channel 2 Operation
         36. Testing Triangle Waveform
         37. Set the signal generator’s waveform type: Triangle, Amplitude 5V, Frequency: 200Hz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 2ms
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 5.000ms, Frequency: 200Hz, peak to peak value: 4.8V to 5.2V and Min/Max: ±2.4V to ±2.6V
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -441,7 +441,7 @@ Test 2: Channel 2 Operation
 
         38. Set the signal generator’s waveform type: Triangle, Amplitude 8V, Frequency: 2MHz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 100ns
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 500.000ns, Frequency: 2MHz, peak to peak value: 7.8V to 8.2V and Min/Max: +/- 3.9V
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -450,7 +450,7 @@ Test 2: Channel 2 Operation
         39. Testing Rising Ramp Sawtooth Waveform
         40. Set the signal generator’s waveform type: Rising Ramp Sawtooth, Amplitude 5V, Frequency: 200Hz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 2ms
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 5.000ms, Frequency: 200Hz, peak to peak value: 4.8V to 5.2V and Min/Max: ±2.4V to ±2.7V. Use the Oscilloscope’s cursor to disregard the overshoot of the signal
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -458,7 +458,7 @@ Test 2: Channel 2 Operation
 
         41. Set the signal generator’s waveform type: Rising Ramp Sawtooth, Amplitude 8V, Frequency: 1MHz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 1us
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 1.000us, Frequency: 1MHz, peak to peak value: 7.8V to 8.2V and Min/Max: ±3.9V to ±4.1V. Use the Oscilloscope’s cursor to disregard the overshoot of the signal
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -467,7 +467,7 @@ Test 2: Channel 2 Operation
         42. Testing Falling Ramp Sawtooth Waveform
         43. Set the signal generator’s waveform type: Falling Ramp Sawtooth, Amplitude 5V, Frequency: 200Hz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 2ms
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 5.000ms, Frequency: 200Hz, peak to peak value: 4.8V to 5.2V and Min/Max: ±2.4V to ±2.6V
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -475,7 +475,7 @@ Test 2: Channel 2 Operation
 
         44. Set the signal generator’s waveform type: Falling Ramp Sawtooth, Amplitude 8V, Frequency: 1MHz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 1V/div, trigger mode: Auto and time base: 1us
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 1.000us, Frequency: 1MHz, peak to peak value: 7.8V to 8.2V and Min/Max: ±3.9V to ±4.1V. Use the Oscilloscope’s cursor to disregard the overshoot of the signal
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -484,7 +484,7 @@ Test 2: Channel 2 Operation
         45. Testing Trapezoidal waveform
         46. Set the signal generator’s waveform type: Trapezoidal, Amplitude: 5V, Rise Time: 1us, Fall Time: 1us, Hold High Time: 1us, Hold Low time Time: 1us. Set the Oscilloscope’s Volt/div: 2V, Trigger Mode: Auto and Time Base: 1us
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 4.000us, Frequency: 250kHz, peak to peak value: 4.8V to 5.2V and Min/Max: ±2.4V to ±2.6.
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -492,7 +492,7 @@ Test 2: Channel 2 Operation
 
         47. Set the signal generator’s waveform type: Trapezoidal, Amplitude: 10V, Rise Time: 1us, Fall Time: 1us, Hold High Time: 1us, Hold Low time Time: 1us. Set the Oscilloscope’s Volt/div: 2V, Trigger Mode: Auto and Time Base: 1us
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 4.000us, Frequency: 250kHz, peak to peak value: 9.6V to 10.4V and Min/Max: ±4.8V to ±5.2.
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -500,7 +500,7 @@ Test 2: Channel 2 Operation
 
         48. Set the signal generator’s waveform type: Trapezoidal, Amplitude: 10V, Rise Time: 200ns, Fall Time: 200ns, Hold High Time: 200ns, Hold Low time: 200ns. Set the Oscilloscope’s Volt/div: 2V, Trigger Mode: Auto and Time Base: 200ns
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 800ns, Frequency: 1.250MHz, peak to peak value: 9.6V to 10.4V and Min/Max: ±4.8V to ±5.2.
-                    - **Actual Result:**
+                    - **Actual Result:** The values are displayed correctly
 
 ..
   Actual test result goes here.
@@ -511,12 +511,12 @@ Test 2: Channel 2 Operation
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** none
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).

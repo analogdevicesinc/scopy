@@ -21,11 +21,11 @@ the Oscilloscope plugin.
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Ionut Muthi
+         - 12/02/2025
+         - v2.0.0
+         - N/A
+         - none
 
 Setup environment:
 ------------------
@@ -74,7 +74,7 @@ volts/div knobs.
             - The Time Base value changes to 200ns and 500ns after the + button.
             - The Volts/Div value changes to 1V, 500, 200, 100 mV after the - button.
             - The Volts/Div value changes to 200mV and 500mV after the + button.
-        - **Actual result:**
+        - **Actual result:** All the values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -86,24 +86,24 @@ volts/div knobs.
         - **Expected result:**
             - The Time Base value changes to 3us and back to 2us.
             - The Volts/Div value changes to 3V and back to 2V.
-        - **Actual result:**
+        - **Actual result:** All the values are displayed correctly.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** none
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -132,7 +132,7 @@ which depends on the value of the Time Base.
             - The position changes to 200ns and 400ns after the + 
               and back to 200ns and 0 after the - button.
             - The plot handle position also changes accordingly.
-        - **Actual result:**
+        - **Actual result:** All the values are displayed correctly and the plot handle moves accordingly.
 
 ..
   Actual test result goes here.
@@ -143,7 +143,7 @@ which depends on the value of the Time Base.
             - The position changes to 100ns and 200ns after the + button and 
               back to 100ns and 0 after the - button.
             - The plot handle position also changes accordingly.
-        - **Actual result:**
+        - **Actual result:** All the values are displayed correctly and the plot handle moves accordingly.
 
 ..
   Actual test result goes here.
@@ -156,24 +156,24 @@ which depends on the value of the Time Base.
             - The position changes to 20ns and 40ns after the + button and 
               back to 20ns and 0 after the - button.
             - The plot handle position also changes accordingly.
-        - **Actual result:**
+        - **Actual result:** All the values are displayed correctly and the plot handle moves accordingly.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** none
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -202,33 +202,33 @@ oscilloscope using Channel 1.
     5. Monitor the Oscilloscope RMS measurement:
         - **Expected result:**
             - The RMS reading is within 3.2V to 3.4V.
-        - **Actual result:**
+        - **Actual result:**  The RMS reading is within 3.2V to 3.4V.
 
 ..
   Actual test result goes here.
 ..
 
-    6. Change the value to 0V in the Signal Generator and monitor it on the Oscilloscope:
+    1. Change the value to 0V in the Signal Generator and monitor it on the Oscilloscope:
         - **Expected result:** 
             - The reading is within 4.9V to 5.1V.
-        - **Actual result:**
+        - **Actual result:** The RMS value keeps fluctuating between 34mV and 39mV.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** see actual result on point 6
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -262,35 +262,35 @@ using Channel 1.
             - The plot displays 1.5 periods.
             - The measurements display: Period: 5ms, Frequency: 200 Hz,
               Peak-peak: 1.9Vpp to 2.1Vpp, RMS: 0.6Vrms to 0.8Vrms.
-        - **Actual result:**
+        - **Actual result:** All values are displayed correctly. RMS value is around 733mV.
 
 ..
   Actual test result goes here.
 ..
 
-    5. Change the Signal Generator amplitude to 5V and the frequency to 500Hz:
+    1. Change the Signal Generator amplitude to 5V and the frequency to 500Hz:
         - **Expected result:**
             - The plot displays 4 periods.
             - The measurements display: Period: 2ms, Frequency: 500 Hz,
               Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.74Vrms to 1.78Vrms.
-        - **Actual result:**
+        - **Actual result:** All values are displayed correctly.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** none
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -324,7 +324,7 @@ the oscilloscope using Channel 1.
             - The plot displays 4 square waves.
             - The measurements display: Period: 2ms, Frequency: 500 Hz,
               Amplitude: 4.9Vpp to 5.1Vpp, RMS: 2.4Vrms to 2.6Vrms.
-        - **Actual result:**
+        - **Actual result:** All values are displayed correctly. Except RMS where unit of measure is V not Vrms
 
 ..
   Actual test result goes here.
@@ -338,24 +338,24 @@ the oscilloscope using Channel 1.
             - The measurements display: Period: 500us, Frequency: 2 kHz,
               Amplitude: 7.9Vpp to 8.1Vpp, RMS: 3.9Vrms to 4.1Vrms.
         
-        - **Actual result:**
+        - **Actual result:** All values are displayed correctly. Except RMS where unit of measure is V not Vrms
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** See actual result on point 4 and 5.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -389,7 +389,7 @@ the oscilloscope using Channel 1.
             - The plot displays 6 triangle waves.
             - The measurements display: Period: 500us, Frequency: 2 kHz,
               Peak-peak: 3.9Vpp to 4.1Vpp, RMS: 1.0Vrms to 1.2Vrms.
-        - **Actual result:**
+        - **Actual result:** All values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -403,24 +403,24 @@ the oscilloscope using Channel 1.
             - The measurements display: Period: 50us, Frequency: 20 kHz,
               Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.3Vrms to 1.5Vrms.
         
-        - **Actual result:**
+        - **Actual result:** All values are displayed correctly.
 
 ..
   Actual test result goes here.
 ..
 
               
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** nonne 
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -454,7 +454,7 @@ the signal generator on the oscilloscope using Channel 1.
             - The plot displays 3 sawtooth waves.
             - The measurements display: Period: 50us, Frequency: 20 kHz,
               Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2Vrms to 2.4Vrms.
-        - **Actual result:**
+        - **Actual result:** All values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -465,24 +465,24 @@ the signal generator on the oscilloscope using Channel 1.
             - The plot displays 3 sawtooth waves.
             - The measurements display: Period: 50us, Frequency: 20 kHz,
               Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2Vrms to 2.4Vrms.
-        - **Actual result:**
+        - **Actual result:** All values are displayed correctly.
 
 ..
   Actual test result goes here.
 ..
 
               
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** none
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -556,7 +556,7 @@ Channel 1.
 ..
 
               
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
@@ -670,7 +670,7 @@ with different trigger configurations.
 ..
 
               
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
@@ -744,7 +744,7 @@ Test 10 - Math Channel Operations
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
@@ -789,7 +789,7 @@ Test 11 - FFT Function
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
@@ -864,7 +864,7 @@ The plot displays the current vs voltage characteristics of a PN junction diode.
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
@@ -948,7 +948,7 @@ Test 13 - Export feature
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
@@ -1007,7 +1007,7 @@ the Oscilloscope should be able to center the trace at 0V.
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
@@ -1075,7 +1075,7 @@ Test 15 - Probe Attenuation
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
@@ -1164,7 +1164,7 @@ using the TI pin and the digital DIO1 pin of the ADALM2000 device.
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
@@ -1217,7 +1217,7 @@ using a configuration that displays too many periods on the plot.
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
@@ -1272,7 +1272,7 @@ Test 18 - Print Plot
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
@@ -1337,7 +1337,7 @@ and plot the signal using lines, dots, sticks or steps.
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
@@ -1396,7 +1396,7 @@ Apply the measurements on a gated portion of the acquired signal.
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
@@ -1451,7 +1451,7 @@ Test 21 - Histogram
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
@@ -1491,7 +1491,7 @@ Test 22 - ADC Digital Filters
         - Channel 1 Vertical: Volts/Div: 500mV/div, Position: 0V
     3. TBD
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
