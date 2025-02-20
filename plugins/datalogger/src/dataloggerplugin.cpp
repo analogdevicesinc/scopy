@@ -281,9 +281,16 @@ bool DataLoggerPlugin::loadPreferencesPage()
 				 "Select the maximum data storage size for each monitor in the datalogger.",
 				 storage_options, generalSection));
 
-	generalSection->contentLayout()->addWidget(PREFERENCE_EDIT(
+	generalSection->contentLayout()->addWidget(PREFERENCE_EDIT_VALIDATION(
 		p, "dataloggerplugin_read_interval", "Read interval (seconds) ",
-		"Select the time interval, in seconds, for data polling in the instrument.", generalSection));
+		"Select the time interval, in seconds, for data polling in the instrument.",
+		[](const QString &text) {
+			// check if input is an positive integer
+			bool ok;
+			auto value = text.toInt(&ok);
+			return ok && value >= 0;
+		},
+		generalSection));
 
 	generalSection->contentLayout()->addWidget(PREFERENCE_EDIT(
 		p, "dataloggerplugin_date_time_format", "DateTime format :",
