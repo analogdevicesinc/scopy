@@ -25,7 +25,7 @@ If the test case has special requirements, they will be listed in the test case 
          - Plugin version (N/A if not applicable)
          - Comments
        * - Ionut Muthi
-         - 17/02/2025
+         - 19/02/2025
          - v2.0.0
          - N/A
          - none
@@ -127,7 +127,7 @@ digital channels - rising edge, falling edge, high, low, any edge.
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
@@ -180,7 +180,7 @@ Test 2 - External Channel Trigger Function
     9. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     10. In the Digital IO, change DIO0’s output from 0 to 1.
          - **Expected Result**: The logic analyzer initiates a capture.
-         - **Actual Result:**
+         - **Actual Result:** 
 
 ..
   Actual test result goes here.
@@ -226,7 +226,7 @@ Test 2 - External Channel Trigger Function
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
@@ -274,7 +274,7 @@ Oscilloscope as the source.
             - If you drag the horizontal cursor in the Oscilloscope window above or 
               below the signal, it should be in Waiting state, and Logic analyzer will
               be Waiting too.
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -286,7 +286,7 @@ Oscilloscope as the source.
             - If you drag the horizontal cursor in the Oscilloscope window above or 
               below the signal, it should be in Waiting state, and Logic analyzer will
               be Waiting too.
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -298,7 +298,7 @@ Oscilloscope as the source.
              - If you drag the horizontal cursor in the Oscilloscope window above or 
                below the signal, it should be in Waiting state, and Logic analyzer will
                be Waiting too.
-         - **Actual Result:**
+         - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -310,20 +310,20 @@ Oscilloscope as the source.
              - If you drag the horizontal cursor in the Oscilloscope window above or 
                below the signal, it should be in Waiting state, and Logic analyzer will
                be Waiting too.
-         - **Actual Result:**
+         - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
+**Comments:** none
 
-**Result:** FAIL
+**Result:** PASS
 
 
 Test 4 - Trigger Modes
@@ -430,7 +430,7 @@ Test 5 - Clock signal measurement accuracy
        consecutive rising edges or consecutive falling edges of the signal.
         
         - **Expected Result**: The data measured by the cursor is close to ∆t: 10ms and 1/∆t: 100Hz.
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -440,7 +440,7 @@ Test 5 - Clock signal measurement accuracy
        set of edges.
         
         - **Expected Result**: The data measured by the cursor is close to ∆t: 10ms and 1/∆t: 100Hz.
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -454,7 +454,7 @@ Test 5 - Clock signal measurement accuracy
        consecutive rising edges or consecutive falling edges of the signal.
         
         - **Expected Result**: The data measured by the cursor is close to ∆t: 400ns and 1/∆t: 2.5MHz.
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -464,7 +464,7 @@ Test 5 - Clock signal measurement accuracy
         set of edges.
          
          - **Expected Result**: The data measured by the cursor is close to ∆t: 400ns and 1/∆t: 2.5MHz.
-         - **Actual Result:**
+         - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -479,7 +479,7 @@ Test 5 - Clock signal measurement accuracy
         rising and falling edge of the upper limit.
          
          - **Expected Result**: The data measured by the cursor is close to ∆t: 7ms.
-         - **Actual Result:**
+         - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -487,20 +487,20 @@ Test 5 - Clock signal measurement accuracy
 
     14. Move the cursors to the falling and rising edge of the lower limit.
          - **Expected Result**: The data measured by the cursor is close to ∆t: 3ms.
-         - **Actual Result:**
+         - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
+**Comments:** none
 
-**Result:** FAIL
+**Result:** PASS
 
 
 Test 6 - Parallel Decoder
@@ -527,7 +527,7 @@ Test 6 - Parallel Decoder
     4. Run the Pattern Generator and Logic Analyzer instrument.
     5. Verify the Logic Analyze decoded value.
         - **Expected Result**: The reading is in hex format. For reference, 50 decimal = 32 hex.
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -536,21 +536,20 @@ Test 6 - Parallel Decoder
     6. In the Pattern Generator set the number value to 250.
     7. Verify the Logic Analyzer decoded value.
         - **Expected Result**: The reading is in hex format. For reference, 250 decimal = FA.
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
-
-**Result:** FAIL
+**Comments:** none
+**Result:** PASS
 
 
 Test 7 - SPI decoder
@@ -584,20 +583,20 @@ Test 7 - SPI decoder
     5. Run the Pattern Generator and Logic Analyzer instrument.
     6. Verify the Logic Analyzer plot for the decoder output:
         - **Expected Result**: The MISO data has 2 bytes per frame and the decoded data is AB CD EF 15.
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
+**Comments:** none
 
-**Result:** FAIL
+**Result:** PASS
 
 
 Test 8 - UART decoder
@@ -636,7 +635,7 @@ Test 8 - UART decoder
     6. Run the Pattern Generator and Logic Analyzer instrument.
     7. Verify the Logic Analyzer plot for the decoder output:
         - **Expected Result**: The RX decoded data is "M2K".
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -645,7 +644,7 @@ Test 8 - UART decoder
     8. In the Pattern Generator change the baud rate to 115200.
     9. Verify the Logic Analyzer plot for the decoder output:
         - **Expected Result**: The RX decoded data is not "M2K".
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -653,20 +652,20 @@ Test 8 - UART decoder
 
     10. In the Logic Analyzer change the baud rate to 115200:
          - **Expected Result**: The RX decoded data is "M2K".
-         - **Actual Result:**
+         - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
+**Comments:** none
 
-**Result:** FAIL
+**Result:** PASS
 
 
 Test 9 - PWM Decoder
@@ -692,20 +691,20 @@ Test 9 - PWM Decoder
        decoded data in between changes:
         
         - **Expected Result**: The data follows the duty cycle set in the pattern generator.
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
+**Comments:** none
 
-**Result:** FAIL
+**Result:** PASS
 
 
 Test 10 - Channel visual representation
@@ -728,7 +727,7 @@ trace height and plot color.
        the channel handle.
     3. Change the channel name to "D0" and verify the channel handle:
         - **Expected Result**: The channel handle displays "D0".
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -736,7 +735,7 @@ trace height and plot color.
 
     4. Change the trace height to 50:
         - **Expected Result**: The trace height on the plot is doubled.
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -744,20 +743,20 @@ trace height and plot color.
 
     5. Change the color to **transparent** and verify the channel on plot:
         - **Expected Result**: The channel is no longer seen on the plot.
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
+**Comments:** none
 
-**Result:** FAIL
+**Result:** PASS
 
 
 Test 11 - Export Functionality
@@ -789,7 +788,7 @@ of the Logic Analyzer.
        click the Export button.
     4. Select the file name, location and choose .csv format.
         - **Expected Result**: The file is created in the specified location.
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -797,7 +796,7 @@ of the Logic Analyzer.
 
     5. Open the file and verify the data:
         - **Expected Result**: The exported data is in .csv format and correspods to the data on the plot.
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -808,9 +807,9 @@ of the Logic Analyzer.
 ..
   Details about the tested OS goes here.
 
-**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
+**Comments:** none
 
-**Result:** FAIL
+**Result:** PASS
 
 
 Test 12 - Print Plot
@@ -836,7 +835,7 @@ of the Logic Analyzer.
     3. Run the Logic Analyzer and Pattern Generator.
     4. Press the Print Plot button and choose a location for the exported file:
         - **Expected Result**: The file is created in the specified location.
-        - **Actual Result:**
+        - **Actual Result:** The values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -844,14 +843,14 @@ of the Logic Analyzer.
 
     5. Open the .pdf exported file and visually compare it to the application plot.
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
+**Comments:** none
 
-**Result:** FAIL
+**Result:** PASS
 
 
 Test 13 - Decoder Table
@@ -911,11 +910,11 @@ Test 13 - Decoder Table
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
+**Comments:** none
 
-**Result:** FAIL
+**Result:** PASS
