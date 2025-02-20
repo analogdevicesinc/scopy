@@ -50,12 +50,12 @@ SevenSegmentMonitorSettings::SevenSegmentMonitorSettings(QWidget *parent)
 
 	precision = new QLineEdit(sevenSegmentSettingsSection);
 	precision->setText(QString::number(DataMonitorUtils::getDefaultPrecision()));
+	currentPrecision = precision->text();
 
 	precisionLayout->addWidget(new QLabel("Precision: ", this));
 	precisionLayout->addWidget(precision);
 
 	connect(precision, &QLineEdit::returnPressed, this, &SevenSegmentMonitorSettings::changePrecision);
-	connect(precision, &QLineEdit::textChanged, this, &SevenSegmentMonitorSettings::changePrecision);
 
 	peakHolderToggle = new MenuOnOffSwitch(tr("Min/Max"), sevenSegmentSettingsSection, false);
 	peakHolderToggle->onOffswitch()->setChecked(true);
@@ -70,11 +70,15 @@ SevenSegmentMonitorSettings::SevenSegmentMonitorSettings(QWidget *parent)
 
 	DataMonitorStyleHelper::SevenSegmentMonitorMenuStyle(this);
 }
-
 void SevenSegmentMonitorSettings::changePrecision()
 {
 	// precision value can be between 0 and 9
-	auto value = precision->text().toInt();
+	bool ok;
+	auto value = precision->text().toInt(&ok);
+	if(!ok) {
+		precision->setText(currentPrecision);
+		return;
+	}
 	if(value < 0) {
 		precision->setText("0");
 	}
