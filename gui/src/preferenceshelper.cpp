@@ -113,6 +113,42 @@ QWidget *PreferencesHelper::addPreferenceEdit(Preferences *p, QString id, QStrin
 	return widget;
 }
 
+QWidget *PreferencesHelper::addPreferenceEditValidation(Preferences *p, QString id, QString title, QString description,
+							std::function<bool(const QString &)> validator, QObject *parent)
+{
+	QWidget *widget = new QWidget();
+	QHBoxLayout *layout = new QHBoxLayout();
+	layout->setMargin(0);
+	layout->setSpacing(0);
+	layout->setMargin(0);
+	widget->setLayout(layout);
+
+	QWidget *infoBtn = setupDescriptionButton(id, description, parent);
+
+	QString pref1Val = p->get(id).toString();
+	QLineEdit *pref = new QLineEdit();
+	pref->setText(pref1Val);
+	parent->connect(pref, &QLineEdit::returnPressed, parent, [p, id, validator, pref]() {
+		QString prefText = pref->text();
+		if(validator && !validator(prefText)) {
+			pref->setText(p->get(id).toString());
+			return;
+		}
+		p->set(id, prefText);
+	});
+
+	QLabel *label = new QLabel(title);
+	p->initDescription(id, title, description);
+
+	QSpacerItem *space = new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+	layout->addWidget(infoBtn);
+	layout->addWidget(label, 1);
+	layout->addSpacerItem(space);
+	layout->addWidget(pref, 1);
+	return widget;
+}
+
 QWidget *PreferencesHelper::addPreferenceComboList(Preferences *p, QString id, QString title, QString description,
 						   QList<QPair<QString, QVariant>> options, QObject *parent)
 {

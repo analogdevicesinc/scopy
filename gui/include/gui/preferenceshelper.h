@@ -35,6 +35,9 @@
 #define PREFERENCE_EDIT(p, id, title, description, parent)                                                             \
 	PreferencesHelper::addPreferenceEdit(p, id, title, description, parent)
 
+#define PREFERENCE_EDIT_VALIDATION(p, id, title, description, validator, parent)                                       \
+	PreferencesHelper::addPreferenceEditValidation(p, id, title, description, validator, parent)
+
 #define PREFERENCE_COMBO(p, id, title, description, options, parent)                                                   \
 	PreferencesHelper::addPreferenceCombo(p, id, title, description, options, parent)
 
@@ -56,6 +59,9 @@ public:
 					      QObject *parent = nullptr);
 	static QWidget *addPreferenceEdit(Preferences *p, QString id, QString title, QString description,
 					  QObject *parent = nullptr);
+	static QWidget *addPreferenceEditValidation(Preferences *p, QString id, QString title, QString description,
+						    std::function<bool(const QString &)> validator,
+						    QObject *parent = nullptr);
 	static QWidget *addPreferenceCombo(Preferences *p, QString id, QString title, QString description,
 					   QStringList options, QObject *parent = nullptr);
 	static QWidget *addPreferenceComboList(Preferences *p, QString id, QString title, QString description,
