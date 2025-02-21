@@ -93,7 +93,7 @@ lists available local devices when initiated.
 **Steps:**
     1. Open Scopy.
     2. Click on **Add device** (+) button.
-    3. Click on **local** checkbox located in the **Add page** scan section.
+    3. Check only the **local** checkbox located in the **Add page** scan section.
     4. Wait until the refresh animation stops.
         - **Expected result:** In the "Context" dropdown, all available local 
           devices are listed, each item containing the device name/description and URI. 
@@ -137,7 +137,7 @@ lists available ip devices when initiated.
 **Steps:**
     1. Open Scopy.
     2. Click on **Add device** (+) button.
-    3. Click on **ip** checkbox located in the **Add page** scan section.
+    3. Check only the **ip** checkbox located in the **Add page** scan section.
     4. Wait until the refresh animation stops.
         - **Expected result:** In the "Context" dropdown, all available ip 
           devices are listed, each item containing the device name/description and URI. 
@@ -180,7 +180,7 @@ lists available usb devices when initiated.
     1. Connect an **ADALM2000** device to the system by USB.
     2. Open Scopy.
     3. Click on **Add device** (+) button.
-    4. Click on **usb** checkbox located in the **Add page** scan section.
+    4. Check only the **usb** checkbox located in the **Add page** scan section.
     5. Wait until the refresh animation stops.
         - **Expected result:** In the "Context" dropdown, all available usb 
           devices are listed, each item containing the device name/description 

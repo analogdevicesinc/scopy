@@ -36,7 +36,7 @@ correctly.
 **Preconditions:**
     - Scopy is installed on the system.
     - iio-emu is installed on the system.
-    - OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.
+    - OS: Windows, Linux-x86_64 (flatpak and appimage), Linux-arm64, Linux-arm32, macOS.
 
 **Steps:**
     1. Open Scopy.
@@ -47,6 +47,16 @@ correctly.
         - **Expected result:** The IIO device tab is selected, and the URI 
           "ip:127.0.0.1" is entered in the corresponding section. 
         - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    6. Close Scopy and open it again.
+    7. Click on **Add device** (+) button.
+    8. Click on **Emulator** tab.
+        - **Expected result:** The "Device" dropdown is set to "adalm2000" and 
+          the "Enable" button is displayed.
 
 ..
   Actual test result goes here.
@@ -494,3 +504,4 @@ correctly (using generic device).
 
 ..
   The result of the test goes here (PASS/FAIL).
+

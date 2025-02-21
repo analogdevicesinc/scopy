@@ -428,7 +428,7 @@ Test 8: Print Collected Data
     6. Choose directory where to save the file
         - **Expected result:** 
             - Data is saved to a pdf file in the chosen directory
-            - The file name structure is "Sopy-Data-Logger-<date>-<time>.pdf"
+            - The file name structure is "Scopy-Data-Logger-<date>-<time>.pdf"
         - **Actual result:**
 
 ..
@@ -1737,6 +1737,14 @@ user to set the read interval
   Actual test result goes here.
 ..
 
+    8. Change the **Read interval** to "test"
+        - **Expected result:** Value is reset to the last default value.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
 **Tested OS:**
 
 ..
@@ -1787,6 +1795,21 @@ date time format for the X Axis
   Actual test result goes here.
 ..
 
+    8. Change the **Date time format** to "123"
+        - **Expected result:** Value is reset to the last default value.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    9. Change the **Date time format** to "test"
+        - **Expected result:** Value is reset to the last default value.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
 
 **Tested OS:**
 

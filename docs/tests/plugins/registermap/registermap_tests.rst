@@ -51,6 +51,7 @@ Setup Environment
 **M2k.Emu:**
     - Open Scopy
     - Start the iio-emu process using adalm2000 option from the dropdown
+    - Check the Register Map plugin checkbox in the Add Device page.
     - Connect to the M2k Device
     
 
@@ -569,7 +570,8 @@ Test 11 : Change value of the bitfield inside the detailed register
 **Steps:** 
     1. Open Register Map plugin
     2. Select a register address "0x2" using address picker
-    3. Change the value of "reg002_b3" bitfield from on to off
+    3. Set the value of the register to "0x4c" using the value picker.
+    4. Change the value of "reg002_b3" bitfield from on to off
         - **Expected result:** The **Value** field is updated to the "0x44" value
         - **Actual result:**
 
@@ -577,7 +579,7 @@ Test 11 : Change value of the bitfield inside the detailed register
   Actual test result goes here.
 ..
 
-    4. Press **Write** button
+    5. Press **Write** button
         - **Expected result:** The register value is updated to "0x44" 
         - **Actual result:**
 
@@ -623,7 +625,8 @@ Test 12 : Change **Value** field updates detailed register bitfields
 **Steps:**
     1. Open Register Map plugin
     2. Select a register address "0x2" using address picker
-    3. Change the value of the **Value** field to "0x44"
+    3. Set the value of the register to "0x4c" using the value picker.
+    4. Change the value of the **Value** field to "0x44"
         - **Expected result:** The detailed bitfield "reg002_b3" value is changed from on to off
         - **Actual result:**
 
@@ -1017,8 +1020,8 @@ Test 19 : Settings write values
 
 .. _TST_REGMAP_SETTINGS_DUMP_REGIS_AND_WRITE_VALUES_DISABLED:
 
-Test 20 : Settings Dump regisr and write values disabled
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Test 20 : Settings Dump register and write values disabled
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.REGMAP.SETTINGS_DUMP_REGIS_AND_WRITE_VALUES_DISABLED
 

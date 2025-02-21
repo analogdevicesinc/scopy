@@ -288,7 +288,7 @@ correctly.
 **Preconditions:**
     - Scopy is installed on the system.
     - iio-emu is installed on the system.
-    - Use :ref:`M2k.Emu <m2k-emu-dev>` setup.
+    - Use :ref:`M2k.Emu <m2k-emu-dev>` setup or :ref:`M2k.Usb <m2k-usb-dev>` setup - same as in the previous test.
     - OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.
 
 **Steps:**
@@ -297,7 +297,7 @@ correctly.
     3. Double click on "Oscilloscope" tool.
         - **Expected result:** The "Oscilloscope" tool is integrated into a 
           separate window from the application. The window title should be: 
-          "Scopy-M2kPlugin-Oscilloscope-ip:127.0.0.1".
+          "Scopy-M2kPlugin-Oscilloscope-"ip:127.0.0.1 or usb:x.y.z.
 
         - **Actual result:**
 
@@ -352,7 +352,7 @@ reconnection.
 **Preconditions:**
     - Scopy is installed on the system.
     - iio-emu is installed on the system.
-    - Use :ref:`M2k.Emu <m2k-emu-dev>` setup.
+    - Use :ref:`M2k.Emu <m2k-emu-dev>` setup or :ref:`M2k.Usb <m2k-usb-dev>` setup - same as in the previous test.
     - The application was previously closed with a detached tool (Oscilloscope).
     - OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.
 
