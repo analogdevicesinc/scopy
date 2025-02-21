@@ -24,11 +24,11 @@ The following apply to all tests below, any special requirements will be mention
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Alexandra Trifan
+         - 18/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Debian 12 arm64
 
 Setup Environment
 ------------------
@@ -74,7 +74,7 @@ Test 1: Enable and Disable Data Logger Channel
     3. Press **Run** button
     4. Wait for some data to be collected
         - **Expected result:** Curve will be displayed on the plot
-        - **Actual result:**
+        - **Actual result:** Curve displayed as expected.
 
 ..
   Actual test result goes here.
@@ -82,13 +82,13 @@ Test 1: Enable and Disable Data Logger Channel
 
     5. Using channel menu disable channel **voltage0** of **xadc** device
         - **Expected result:** Curve will be removed from the plot
-        - **Actual result:**
+        - **Actual result:** Curve removed from the plot as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -98,7 +98,7 @@ Test 1: Enable and Disable Data Logger Channel
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -129,7 +129,7 @@ Test 2: Run and Stop Data Logging
         - **Expected result:** 
             - Data is being collected and displayed on the plot
             - **Run** button is changed to **Stop**
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -139,13 +139,13 @@ Test 2: Run and Stop Data Logging
         - **Expected result:** 
             - Data is no longer being collected and displayed on the plot
             - **Stop** button is changed to **Run**
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -155,7 +155,7 @@ Test 2: Run and Stop Data Logging
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -187,14 +187,14 @@ Test 3: Clear Collected Data
     5. Press **Stop** button
     6. Press **Clear** button
         - **Expected result:** Data is removed from the plot
-        - **Actual result:**
+        - **Actual result:** Data is removed from the plot as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -204,7 +204,7 @@ Test 3: Clear Collected Data
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -237,23 +237,25 @@ Test 4: Clear data while running
         - **Expected result:** 
             - Data is removed from the plot
             - Buffer is cleared and the starting point is reset to "0"
-        - **Actual result:**
+        - **Actual result:** Data is removed but labels are not properly reset.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Clear while running resets the right point to "0" but the left side is 23:59. 
+Something is not consistent here on the plot and label resetting when cleared. Also, clear does not
+seem to reset to "0" properly when stopped. Bug tracked here: https://github.com/analogdevicesinc/scopy/issues/1918
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -282,13 +284,13 @@ Test 5: Create a New Data Logger Tool
             - We are moved to the new tool
             - The new tool has **x** button next to **+**
 
-        - **Actual result:**
+        - **Actual result:** New tool created as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -298,7 +300,7 @@ Test 5: Create a New Data Logger Tool
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -327,14 +329,14 @@ Test 6: Remove a Created Tool
     2. Press **+** button
     3. Press **x** button next to **+**
         - **Expected result:** Tool is removed
-        - **Actual result:**
+        - **Actual result:** Tool correctly removed.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -344,7 +346,7 @@ Test 6: Remove a Created Tool
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -369,7 +371,7 @@ Test 7: Verify Removal Disabled for Default Tool
     1. Open Data Logger plugin
     2. Press **+** button
         - **Expected result:** A new tool where **x** button is available is created 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -378,14 +380,14 @@ Test 7: Verify Removal Disabled for Default Tool
 
     3. Open original Data Logger tool
         - **Expected result:** No **x** button is available
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -395,7 +397,7 @@ Test 7: Verify Removal Disabled for Default Tool
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -429,13 +431,13 @@ Test 8: Print Collected Data
         - **Expected result:** 
             - Data is saved to a pdf file in the chosen directory
             - The file name structure is "Sopy-Data-Logger-<date>-<time>.pdf"
-        - **Actual result:**
+        - **Actual result:** Data logger PDF file exported as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -445,7 +447,7 @@ Test 8: Print Collected Data
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -472,14 +474,14 @@ Test 9: Info button documentation
     2. Press **Info** button
     3. Press **Documentation** button
         - **Expected result:** A browser window is opened with the documentation page
-        - **Actual result:**
+        - **Actual result:** Documentation is opened as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -489,7 +491,7 @@ Test 9: Info button documentation
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -515,13 +517,13 @@ Test 10: Info button tutorial
     2. Press **Info** button
     3. Press **Tutorial** button
         - **Expected result:** A tutorial explaining how to use the Data Logger is displayed
-        - **Actual result:**
+        - **Actual result:** Tutorial is displayed as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -531,7 +533,7 @@ Test 10: Info button tutorial
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -557,13 +559,13 @@ Test 11: Settings Change Data Logger Tool Name
     2. Press **Settings** button
     3. Change the tool name at the top of the Settings menu from "Data Logger" to "Test Tool"
         - **Expected result:** Tool name is changed in the tools menu
-        - **Actual result:**
+        - **Actual result:** Tool name changed as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -573,7 +575,7 @@ Test 11: Settings Change Data Logger Tool Name
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -605,13 +607,13 @@ Test 12: Set Valid X-Axis Delta Value
     5. Press **Settings** button
     6. Change the X-Axis Delta Value from "10" to "20" then press enter
         - **Expected result:** X-Axis displays "20" seconds of data instead of "10" seconds
-        - **Actual result:**
+        - **Actual result:** X-Axis displays a maximum of 20 seconds of data.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -621,7 +623,7 @@ Test 12: Set Valid X-Axis Delta Value
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -653,23 +655,24 @@ Test 13: Handle Invalid X-Axis Delta Value Input
     5. Press **Settings** button
     6. Change the X-Axis Delta Value from "10" to "test" then press enter
         - **Expected result:** X-Axis displays "10" seconds 
-        - **Actual result:**
+        - **Actual result:** X-Axis delta value displays 0.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Writing an invalid value in the X-Axis Delta Value field does not reset the value to the previous one, 
+instead resets it to 0. Bug tracked here: https://github.com/analogdevicesinc/scopy/issues/1919
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -700,7 +703,7 @@ Test 14: Adjust X-Axis Delta Value Using Buttons
     4. Press **Settings** button
     5. Press **+** button next to X-Axis Delta Value
         - **Expected result:** X-Axis displays "11" seconds of data instead of "10" seconds
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -709,14 +712,14 @@ Test 14: Adjust X-Axis Delta Value Using Buttons
 
     6. Press **-** button next to X-Axis Delta Value
         - **Expected result:** X-Axis displays "10" seconds of data instead of "11" seconds
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -726,7 +729,7 @@ Test 14: Adjust X-Axis Delta Value Using Buttons
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -757,7 +760,7 @@ Test 15: Toggle X-Axis UTC Time Display
     4. Press **Settings** button
     5. Toggle the **X-Axis UTC Time** on
         - **Expected result:** X-Axis displays UTC time instead of delta value
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -765,13 +768,13 @@ Test 15: Toggle X-Axis UTC Time Display
 
     6. Toggle the **X-Axis UTC Time** off
         - **Expected result:** X-Axis displays delta value instead of UTC time
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -781,7 +784,7 @@ Test 15: Toggle X-Axis UTC Time Display
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -810,7 +813,7 @@ Test 16: Toggle X-Axis Live Plotting
     2. Enable channel **voltage0** of **xadc** device
     3. Press **Run** button
         - **Expected result:** X-Axis is updated so the last point added is always visible
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -821,13 +824,13 @@ Test 16: Toggle X-Axis Live Plotting
         - **Expected result:** 
             - X-Axis displays data collected but the last point added is not always visible
             - Settings for picking date time value to show is now available
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -837,7 +840,7 @@ Test 16: Toggle X-Axis Live Plotting
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -870,7 +873,7 @@ Test 17: Toggle Y-Axis Autoscale
         - **Expected result:** 
             - Y-Axis displays data without autoscale
             - Settings for picking min and max value are now enabled
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -880,13 +883,13 @@ Test 17: Toggle Y-Axis Autoscale
         - **Expected result:** 
             - Y-Axis displays data with autoscale 
             - Settings for picking min and max value is now disabled
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -896,7 +899,7 @@ Test 17: Toggle Y-Axis Autoscale
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -928,7 +931,7 @@ Test 18: Set Y-Axis Minimum and Maximum Values
     5. Toggle the **Y-Axis autoscale** off
     6. Change the Y-Axis min value to "0" then press enter
         - **Expected result:** Y-Axis displays data has now "0" as bottom value
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -936,13 +939,13 @@ Test 18: Set Y-Axis Minimum and Maximum Values
 
     7. Change the Y-Axis max value to "2" then press enter
         - **Expected result:** Y-Axis displays data has now "2" as top value
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -952,7 +955,7 @@ Test 18: Set Y-Axis Minimum and Maximum Values
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -983,13 +986,13 @@ Test 19: Adjust Curve Thickness
     4. Press **Settings** button
     5. Change the curve thickness to "2" then press enter
         - **Expected result:** Curve thickness is changed to "2"
-        - **Actual result:**
+        - **Actual result:** Plot curve thickness changed as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -999,7 +1002,7 @@ Test 19: Adjust Curve Thickness
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1030,13 +1033,13 @@ Test 20: Change Curve Style
     4. Press **Settings** button
     5. Change the curve style to **dots** then press enter
         - **Expected result:** Curve data is displayed as dots instead of lines
-        - **Actual result:**
+        - **Actual result:** Plot curve style changed to dots as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1046,7 +1049,7 @@ Test 20: Change Curve Style
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1075,7 +1078,7 @@ Test 21: Adjust Plot Display Settings
     2. Press **Settings** button
     3. Toggle **Buffer Preview** off
         - **Expected result:** Buffer preview is not displayed
-        - **Actual result:**
+        - **Actual result:** Buffer preview is not visible.
 
 ..
   Actual test result goes here.
@@ -1083,7 +1086,7 @@ Test 21: Adjust Plot Display Settings
 
     4. Toggle **Buffer Preview** on 
         - **Expected result:** Buffer preview is displayed 
-        - **Actual result:**
+        - **Actual result:** Buffer previewer is visible.
 
 ..
   Actual test result goes here.
@@ -1091,7 +1094,7 @@ Test 21: Adjust Plot Display Settings
 
     5. Toggle **X-AXIS label** off
         - **Expected result:** X-Axis labels are not displayed
-        - **Actual result:**
+        - **Actual result:** X-Axis labels are not visible.
 
 ..
   Actual test result goes here.
@@ -1099,7 +1102,7 @@ Test 21: Adjust Plot Display Settings
 
     6. Toggle **X-AXIS label** on
         - **Expected result:** X-Axis labels are displayed
-        - **Actual result:**
+        - **Actual result:** X-Axis labels are visible.
 
 ..
   Actual test result goes here.
@@ -1107,7 +1110,7 @@ Test 21: Adjust Plot Display Settings
 
     7. Toggle **Y-AXIS label** off 
         - **Expected result:** Y-Axis labels are not displayed 
-        - **Actual result:**
+        - **Actual result:** Y-Axis labels are not visible.
 
 ..
   Actual test result goes here.
@@ -1115,13 +1118,13 @@ Test 21: Adjust Plot Display Settings
 
     8. Toggle **Y-AXIS label** on
         - **Expected result:** Y-Axis labels are displayed
-        - **Actual result:**
+        - **Actual result:** Y-Axis labels are visible.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1131,7 +1134,7 @@ Test 21: Adjust Plot Display Settings
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1160,13 +1163,13 @@ Test 22: Verify Plot Display Method
     2. Enable channel **voltage0** of **xadc** device
     3. Press **Run** button
         - **Expected result:** Data is displayed in the plot mode
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1176,7 +1179,7 @@ Test 22: Verify Plot Display Method
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1206,13 +1209,13 @@ Test 23: Verify Plain Text Display Method
     3. Press **Run** button
     4. Press **Text** button
         - **Expected result:** Data is displayed in the plain text mode
-        - **Actual result:**
+        - **Actual result:** Values are updating in text mode.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1222,7 +1225,7 @@ Test 23: Verify Plain Text Display Method
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1252,13 +1255,13 @@ Test 24: Verify 7 Segment Display Method
     3. Press **Run** button
     4. Press **7 Segment** button
         - **Expected result:** Data is displayed in the 7 segment mode
-        - **Actual result:**
+        - **Actual result:** Values are updating in 7 segment mode.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1268,7 +1271,7 @@ Test 24: Verify 7 Segment Display Method
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1298,7 +1301,7 @@ Test 25: Toggle Between Display Methods
     3. Press **Run** button
     4. Press **Text** button
         - **Expected result:** Data is displayed in the plain text mode
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -1306,7 +1309,7 @@ Test 25: Toggle Between Display Methods
 
     5. Press **7 Segment** button
         - **Expected result:** Data is displayed in the 7 segment mode
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -1314,14 +1317,14 @@ Test 25: Toggle Between Display Methods
 
     6. Press **Plot** button
         - **Expected result:** Data is displayed in the plot mode
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1331,7 +1334,7 @@ Test 25: Toggle Between Display Methods
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1363,23 +1366,23 @@ Test 26: Set 7 Segment Display Precision
     5. Press **Settings** button
     6. Change the 7 Segment precision to "2" then press enter
         - **Expected result:** 7 Segment displays data with "2" decimal points
-        - **Actual result:**
+        - **Actual result:** Data is displayed with 2 decimal points.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Failed due to input not being validated if a anything different than a digit is entered.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1411,7 +1414,7 @@ Test 27: Toggle 7 Segment Min/Max Display
     5. Press **Settings** button
     6. Toggle the **7 Segment min/max** off
         - **Expected result:** 7 Segment displays data without min/max values
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -1419,13 +1422,13 @@ Test 27: Toggle 7 Segment Min/Max Display
 
     7. Toggle the **7 Segment min/max** on
         - **Expected result:** 7 Segment displays data with min/max values
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1435,7 +1438,7 @@ Test 27: Toggle 7 Segment Min/Max Display
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1461,7 +1464,7 @@ Test 28: Choose File for Data Logging
     2. Open the settings menu
     3. Press **Browse** button
         - **Expected result:** A file explorer window is opened
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -1469,13 +1472,13 @@ Test 28: Choose File for Data Logging
 
     4. Choose a ".csv" file to save data to
         - **Expected result:** The file path is displayed in the settings menu
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1485,7 +1488,7 @@ Test 28: Choose File for Data Logging
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1519,14 +1522,14 @@ collected data to a file when the “Save Data” function is triggered.
     5. Open the settings menu
     6. Press **Save Data** button
         - **Expected result:** Data is saved to a file in the chosen file.
-        - **Actual result:**
+        - **Actual result:** Data is saved as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1536,7 +1539,7 @@ collected data to a file when the “Save Data” function is triggered.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1571,13 +1574,13 @@ file when the “Live Data Logging” function is triggered.
         - **Expected result:** 
             - Data is saved to a file in the chosen file continuously
             - **Save Data** and **Import data** buttons are disabled
-        - **Actual result:**
+        - **Actual result:** Data is saved to a file as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1587,7 +1590,7 @@ file when the “Live Data Logging” function is triggered.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1619,7 +1622,7 @@ the user to import data from a file
     2. Open the settings menu
     3. Press **Import Data** button
             - **Expected result:** A file explorer window is opened
-            - **Actual result:**
+            - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -1629,7 +1632,7 @@ the user to import data from a file
         - **Expected result:** 
             - in the channel menu a new virtual device  called "Import: <file name>" is created
             - channel **xadc-voltage0** is available under the "Import: <file name>" device
-        - **Actual result:**
+        - **Actual result:** File imported as expected.
 
 ..
   Actual test result goes here.
@@ -1637,14 +1640,14 @@ the user to import data from a file
 
     5. Enable channel **xadc-voltage0** of "Import: <file name>" device 
         - **Expected result:** Data from the file is displayed on the plot relative to the time and date it was recorded 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1654,7 +1657,7 @@ the user to import data from a file
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1681,13 +1684,13 @@ user to set the maximum channel data storage
     2. Go to "DataLoggerPlugin" tab
     3. Change the "Maximum data stored for each monitor" from "10Kb" to "1Mb"
         - **Expected result:** The maximum channel data storage is set to "1Mb"
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1697,7 +1700,7 @@ user to set the maximum channel data storage
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1731,13 +1734,13 @@ user to set the read interval
     6. Change the "Read interval" from "1" to "2"
     7. Open Data Logger plugin 
         - **Expected result:** Data is collected every "2" seconds instead of "1" second 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1747,7 +1750,7 @@ user to set the read interval
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1781,14 +1784,14 @@ date time format for the X Axis
     6. Change the **Date time format** from "hh:mm:ss" to "mm:ss"
     7. Open Data Logger plugin 
         - **Expected result:** X Axis displays date time in the format "mm:ss" 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1798,7 +1801,7 @@ date time format for the X Axis
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
