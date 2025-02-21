@@ -78,6 +78,8 @@ public Q_SLOTS:
 	void save(QString file);
 	void load(QString file);
 	void handlePreferences(QString, QVariant);
+	void saveSession(QSettings &s);
+	void loadSession(QSettings &s);
 
 private:
 	ScopyAboutPage *about;
