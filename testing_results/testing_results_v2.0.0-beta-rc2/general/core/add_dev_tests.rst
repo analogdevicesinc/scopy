@@ -236,13 +236,13 @@ lists available serial devices when initiated.
           devices are listed, each item containing the device name/description 
           and URI. If there is no available device the "No scanned devices 
           available!" message is displayed.
-        - **Actual result:** 
+        - **Actual result:** Device detected as expected.
         
         ..
           Actual test result goes here.
         ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -252,7 +252,7 @@ lists available serial devices when initiated.
 .. 
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 .. 
   The result of the test goes here (PASS/FAIL).
