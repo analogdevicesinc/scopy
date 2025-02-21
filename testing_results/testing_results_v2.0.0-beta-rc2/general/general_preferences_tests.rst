@@ -13,11 +13,16 @@ General Preferences - Test Suite
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Alexandra Trifan
+         - 14/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Ubuntu 22.04.5 LTS
+       * - Alexandra Trifan
+         - 14/02/2025
+         - v2.0.0-beta-rc2-a3a7c43
+         - N/A
+         - OS: Debian 12 arm64
 
 Setup environment:
 ------------------
@@ -67,7 +72,7 @@ states (only applies to plugins which have this implemented).
    4. Close Scopy
    5. Open the app using the same setup and check if the time base
        - **Expected result:** time base is 1s
-       - **Actual result:**
+       - **Actual result:** Time base is reloaded as expected.
 
 ..
   Actual test result goes here.
@@ -75,7 +80,7 @@ states (only applies to plugins which have this implemented).
 
    6. Redo all the steps with the preference disabled
        - **Expected result:** time base is the default value
-       - **Actual result:**
+       - **Actual result:** Time base is loaded as default value.
 
 ..
   Actual test result goes here.
@@ -84,23 +89,25 @@ states (only applies to plugins which have this implemented).
    7. Press the "Settings file location" open button within the preference menu
        - **Expected result:** should open a file browser containing 
          .ini files for every plugins' session saved
-       - **Actual result:**
+       - **Actual result:** A pop-up window appears with: "KDE Connect URL handler" 
+       and the file explorer is not able to open the location.
+       The Open settings file location works on a Debian 12 arm64.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Full bug is described and tracked here: https://github.com/analogdevicesinc/scopy/issues/1906 .
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -128,7 +135,7 @@ double clicking them in the left menu.
    2. Double click Oscilloscope tool to detach it.  
        - **Expected result:** Oscilloscope tool should detach from 
          the main window into a new one.    
-       - **Actual result:**
+       - **Actual result:** Instrument is detached as expected.
 
 ..
   Actual test result goes here.
@@ -136,13 +143,13 @@ double clicking them in the left menu.
 
    3. Redo all the steps with the preference disabled.  
        - **Expected result:** Nothing should happen.  
-       - **Actual result:**
+       - **Actual result:** Instrument does not detach. 
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -152,7 +159,7 @@ double clicking them in the left menu.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -181,7 +188,7 @@ Test 3 - Save/Load tool attached state
    3. Close Scopy.  
    4. Open the app using the same setup.  
        - **Expected result:** Oscilloscope is still detached.    
-       - **Actual result:**
+       - **Actual result:** Instrument detached as expected.
 
 ..
   Actual test result goes here.
@@ -189,13 +196,13 @@ Test 3 - Save/Load tool attached state
 
    5. Redo all the steps with the preference disabled.  
        - **Expected result:** Oscilloscope should not be detached.    
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -205,7 +212,7 @@ Test 3 - Save/Load tool attached state
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -234,7 +241,7 @@ Test 4 - Double click control buttons to open menu
       do not click on the button's icon).  
       
        - **Expected result:** A hovering menu should open above the button.
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -242,13 +249,13 @@ Test 4 - Double click control buttons to open menu
 
    4. Redo all the steps with the preference disabled.  
        - **Expected result:** No menu should open.
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -258,7 +265,7 @@ Test 4 - Double click control buttons to open menu
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -288,7 +295,7 @@ Test 5 - Enable OpenGL plotting
    3. Open Oscilloscope tool and run it.  
        - **Expected result:** The red text inside the plot 
          should contain "OpenGL rendering."
-       - **Actual result:**
+       - **Actual result:** Text displayed on plot as expected.
 
 ..
   Actual test result goes here.
@@ -297,13 +304,13 @@ Test 5 - Enable OpenGL plotting
    4. Redo all the steps with the preference disabled.  
        - **Expected result:** The red text inside the plot
          should contain "Software rendering."
-       - **Actual result:**
+       - **Actual result:** Text displayed on plot as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -313,7 +320,7 @@ Test 5 - Enable OpenGL plotting
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -339,7 +346,7 @@ Test 6 - Enable menu animations
    1. Set preference to enabled.  
    2. Open Oscilloscope tool and toggle between trigger and channel menus.  
        - **Expected result:** Opening menus should be animated.    
-       - **Actual result:**
+       - **Actual result:** Menus slide into the viewport.
 
 ..
   Actual test result goes here.
@@ -347,13 +354,13 @@ Test 6 - Enable menu animations
 
    3. Redo all the steps with the preference disabled.  
        - **Expected result:** Opening menus shouldn't have any animations.    
-       - **Actual result:**
+       - **Actual result:** Menus appear into the viewport.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -363,7 +370,7 @@ Test 6 - Enable menu animations
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -390,7 +397,7 @@ Steps
    1. Set preference to enabled.  
    2. Do the setup again and look for a message bar when pressing "connect."  
        - **Expected result:** A message about connecting should appear at the bottom of the window.    
-       - **Actual result:**
+       - **Actual result:** A status bar message appears at the bottom of the application.
 
 ..
   Actual test result goes here.
@@ -398,13 +405,13 @@ Steps
 
    3. Redo all the steps with the preference disabled.  
        - **Expected result:** No message should pop up.    
-       - **Actual result:**
+       - **Actual result:** No status bar message appears.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -414,7 +421,7 @@ Steps
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -441,7 +448,7 @@ Test 8 - Show Grid
    1. Set preference to enabled.  
    2. Open ADC - Time tool.  
        - **Expected result:** A grid should be visible on the plot.
-       - **Actual result:**
+       - **Actual result:** The plot has a grid.
 
 ..
   Actual test result goes here.
@@ -449,13 +456,13 @@ Test 8 - Show Grid
 
    3. Redo all the steps with the preference disabled.
        - **Expected result:** No grid on the plot.
-       - **Actual result:**
+       - **Actual result:** The plot does not have a grid.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -465,7 +472,7 @@ Test 8 - Show Grid
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -494,7 +501,7 @@ Test 9 - Show Graticule
        - **Expected result:** A horizontal and a vertical 
          measurement line should be centered on the 0-axis 
          points (both may not be visible at the same time).
-       - **Actual result:**
+       - **Actual result:** The plot has graticule lines.
 
 ..
   Actual test result goes here.
@@ -503,13 +510,13 @@ Test 9 - Show Graticule
    3. Redo all the steps with the preference disabled.
        - **Expected result:** The lines should border the entire
          plot instead of centering on 0 points.
-       - **Actual result:**
+       - **Actual result:** The plot does not have graticule lines.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -519,7 +526,7 @@ Test 9 - Show Graticule
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -551,13 +558,14 @@ Test 10 - Use Lazy Loading
 
        - **Expected result:** Elapsed times connecting to some 
          plugins should be lower when lazy loading is enabled.
-       - **Actual result:**
+       - **Actual result:** Connection time displayed in the console is lower 
+         for all plugins when connecting to a Pluto device. 
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -567,7 +575,7 @@ Test 10 - Use Lazy Loading
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -589,7 +597,7 @@ Test 11 - Use native dialogs
    1. Set preference to enabled.  
    2. Press the Load button on the left menu.  
        - **Expected result:** A native file browser window should open.
-       - **Actual result:**
+       - **Actual result:** A Scopy specific file browser window opens.
 
 ..
   Actual test result goes here.
@@ -598,23 +606,23 @@ Test 11 - Use native dialogs
    3. Redo all the steps with the preference disabled.  
        - **Expected result:** A non-native, Scopy-specific, 
          file browser window should open.
-       - **Actual result:**
+       - **Actual result:** The same Scopy specific file browser window opens.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Works with AppImage installer on a Ubuntu 20.04, fails on Ubuntu 22.04.5 LTS and on Debian 12 on Raspberry Pi.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -642,7 +650,7 @@ Test 12 - Auto-connect to previous session
    3. Open Scopy.  
        - **Expected result:** Scopy should automatically connect 
          to the Pluto device.    
-       - **Actual result:**
+       - **Actual result:** Scopy automatically connects to the device connected when the application was closed.
 
 ..
   Actual test result goes here.
@@ -650,13 +658,13 @@ Test 12 - Auto-connect to previous session
 
    4. Redo all the steps with the preference disabled.
        - **Expected result:** Should not connect automatically.
-       - **Actual result:**
+       - **Actual result:** Scopy did not connect to any device upon startup.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -666,7 +674,7 @@ Test 12 - Auto-connect to previous session
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -692,7 +700,7 @@ so some layout artifacts may appear).
 **Steps:**
    1. Set preference to 1.45, restart Scopy, and inspect some tools.  
        - **Expected result:** All app text and some buttons should be larger.    
-       - **Actual result:**
+       - **Actual result:** Text across the application is displayed in a larger font.
 
 ..
   Actual test result goes here.
@@ -700,13 +708,13 @@ so some layout artifacts may appear).
 
    2. Repeat the steps for font size 1.  
        - **Expected result:** Text should return to default size.
-       - **Actual result:**
+       - **Actual result:** Text is displayed in the default font size.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -716,7 +724,7 @@ so some layout artifacts may appear).
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -743,13 +751,14 @@ Test 14 - Theme
    1. Set preference to a different theme and restart the app.
        - **Expected result:** Themes should change while retaining 
          the same UX and usability in all tools.
-       - **Actual result:**
+       - **Actual result:** Changed theme to Harmonic light and to Harmonic dark and the changes are applied
+         to the entire application after restart.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -759,7 +768,7 @@ Test 14 - Theme
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -785,13 +794,14 @@ Test 15 - Language
 Steps
    1. Set preference to a different language and restart the app.
        - **Expected result:** Some text language should change in the M2K tools.
-       - **Actual result:**
+       - **Actual result:** Changed language to "es". All the M2K instruments display a part of the text in 
+         Spanish, but not everything is translated. Some buttons return to English after interacting with them (Run/Single).
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -801,7 +811,7 @@ Steps
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -828,7 +838,7 @@ Test 16 - Connect to multiple devices
    2. Connect to 2 devices following the setup.
        - **Expected result:** Two devices should appear in the left 
          menu and be fully functional.  
-       - **Actual result:**
+       - **Actual result:** Connected to two devices and both are fully functional.
 
 ..
   Actual test result goes here.
@@ -837,13 +847,13 @@ Test 16 - Connect to multiple devices
    3. Repeat the steps with the preference disabled.  
        - **Expected result:** When connecting to the second device, 
          the first one should automatically disconnect.    
-       - **Actual result:**
+       - **Actual result:** When connecting to the second device, the first one automatically disconnects.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -853,7 +863,7 @@ Test 16 - Connect to multiple devices
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -880,7 +890,7 @@ Test 17 - Regularly scan for new devices
        - **Expected result:** Pluto should automatically appear in 
          the device list, and a toggle switch for scanning should 
          appear in the top right.
-       - **Actual result:**
+       - **Actual result:** Device is automatically detected.
 
 ..
   Actual test result goes here.
@@ -889,13 +899,13 @@ Test 17 - Regularly scan for new devices
    2. Repeat the steps with the preference disabled.
        - **Expected result:** Pluto should not appear automatically, 
          only when pressing the on-demand Scan button.
-       - **Actual result:**
+       - **Actual result:** Device does not appear if Scan button is not pressed.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -905,7 +915,7 @@ Test 17 - Regularly scan for new devices
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -933,13 +943,13 @@ Test 18 - Session devices
    4. Close and reopen Scopy.  
        - **Expected result:** Should automatically connect to the URI you 
          checked.
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -949,7 +959,7 @@ Test 18 - Session devices
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -976,7 +986,7 @@ Test 19 - Show plot FPS
    2. Open ADC - Time and run it.  
        - **Expected result:** Should show the FPS on the plot 
          (M2K may look different from other plugins).    
-       - **Actual result:**
+       - **Actual result:** FPS displayed on plot.
 
 ..
   Actual test result goes here.
@@ -984,13 +994,13 @@ Test 19 - Show plot FPS
 
    3. Repeat the steps with the preference disabled.  
        - **Expected result:** No FPS should be visible.    
-       - **Actual result:**
+       - **Actual result:** No FPS is displayed on the plot.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -1000,7 +1010,7 @@ Test 19 - Show plot FPS
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1027,23 +1037,23 @@ Test 20 - Plot target FPS
 **Steps:**  
    1. Set the preference to each value and run ADC - Time to check FPS.  
        - **Expected result:** Plot FPS should be capped at the selected value.    
-       - **Actual result:**
+       - **Actual result:** Tested with FPS 15, then FPS 60 and plot value is capped.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** On Debian 12 on a Raspberry Pi, the FPS does not go higher than 5 or 10 FPS.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1070,23 +1080,26 @@ Test 21 - Reset settings and plugins to default
    2. Press the "Restart" button and restart the app.  
        - **Expected result:** All changed preferences should have 
          the default values.    
-       - **Actual result:**
+       - **Actual result:** When pressing the "Restart" button, all 
+         the changed preferences are applied after restart. If the reset 
+         button is pressed, then the Restart button, the preferences are 
+         set to default values.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Functionality works correctly but the test case is not properly described.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
