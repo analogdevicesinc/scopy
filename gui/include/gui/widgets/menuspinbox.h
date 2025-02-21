@@ -149,7 +149,7 @@ public:
 	} IncrementMode;
 
 	MenuSpinbox(QString name, double val, QString unit, double min, double max, bool vertical = 0, bool left = 0,
-		    QWidget *parent = nullptr);
+		    bool large_widget = true, QWidget *parent = nullptr);
 	~MenuSpinbox();
 
 	double value() const;
@@ -203,6 +203,7 @@ private:
 	double m_value, m_min, m_max;
 	double m_scaleMin, m_scaleMax;
 	QString m_unit;
+	bool m_large_widget;
 
 	QList<UnitPrefix> m_scales;
 	// QMap<QString, double> m_scaleMap;
