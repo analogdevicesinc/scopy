@@ -1806,6 +1806,7 @@ date time format for the X Axis
     9. Change the **Date time format** to "test"
         - **Expected result:** Value is reset to the last default value.
         - **Actual result:**
+
 ..
   Actual test result goes here.
 ..

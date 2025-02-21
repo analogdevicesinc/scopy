@@ -119,6 +119,8 @@ Test 2 - Buffer mode file loading
 
 **Resources:**
     - `<https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sine_complex_1_15360_sr_15360000_samps_40000_ampl_32767.csv>`__
+    - `<https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sine_complex_1_30720_sr_15360000_samps_20000_ampl_32767.csv>`__
+    - `<https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sinewave_0.9_2ch.csv>`__
     - `<https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/tutorial_chapters.json>`__
 
 **Steps:**
@@ -140,9 +142,25 @@ Test 2 - Buffer mode file loading
   Actual test result goes here.
 ..
 
-    5. Select the *tutorial_chapters.json* file from the resources provided above 
+    5. While running, load a file with a lower number of samples using the browser and the file listed in the resources above: *sinewave_0.9_2ch.csv*.
+        - **Expected result:** The "File Size" field is populated with ** 8444 samples**.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    6. While running, load a file with a lower number of samples using the browser and the file listed in the resources above: *sine_complex_1_30720_sr_15360000_samps_20000_ampl_32767.csv*.
+        - **Expected result:** The "File Size" field is populated with ** 20 ksamples**.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    7. Select the *tutorial_chapters.json* file from the resources provided above 
        using the "Browse" button.
-    6. Press the "Load" button.
+    8. Press the "Load" button.
         - **Expected result:**
             - The file should NOT be loaded.
             - The Run button is disabled.
