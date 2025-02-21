@@ -293,6 +293,7 @@ void ScopyMainWindow::load()
 void ScopyMainWindow::save(QString file)
 {
 	QSettings s(file, QSettings::Format::IniFormat);
+	saveSession(s);
 	dm->save(s);
 	ScopyTitleManager::setIniFileName(file);
 }
@@ -300,9 +301,20 @@ void ScopyMainWindow::save(QString file)
 void ScopyMainWindow::load(QString file)
 {
 	QSettings s(file, QSettings::Format::IniFormat);
+	loadSession(s);
 	dm->load(s);
 	ScopyTitleManager::setIniFileName(file);
 }
+
+void ScopyMainWindow::saveSession(QSettings &s)
+{
+	s.beginGroup("scopy");
+	s.setValue("fullversion", config::version());
+	s.setValue("version", config::version());
+	s.endGroup();
+}
+
+void ScopyMainWindow::loadSession(QSettings &s) {}
 
 void ScopyMainWindow::closeEvent(QCloseEvent *event)
 {
