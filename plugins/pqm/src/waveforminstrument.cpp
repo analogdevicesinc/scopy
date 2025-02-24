@@ -329,7 +329,7 @@ void WaveformInstrument::onRollingSwitch(bool checked)
 
 void WaveformInstrument::onBufferDataAvailable(QMap<QString, QVector<double>> data)
 {
-	if(!m_running) {
+	if(!m_running || data.isEmpty()) {
 		return;
 	}
 	int samplingFreq = m_plotSampleRate * m_timespanSpin->value();
