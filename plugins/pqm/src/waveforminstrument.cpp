@@ -105,6 +105,7 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 WaveformInstrument::~WaveformInstrument()
 {
 	m_xTime.clear();
+	deletePlottingStrategy();
 	ResourceManager::close("pqm" + m_uri);
 }
 
@@ -334,6 +335,9 @@ void WaveformInstrument::onBufferDataAvailable(QMap<QString, QVector<double>> da
 	int samplingFreq = m_plotSampleRate * m_timespanSpin->value();
 	m_plottingStrategy->setSamplingFreq(samplingFreq);
 	QMap<QString, QVector<double>> processedData = m_plottingStrategy->processSamples(data);
+	if(processedData.isEmpty()) {
+		return;
+	}
 	if(m_plottingStrategy->dataReady()) {
 		plotData(processedData);
 	}
