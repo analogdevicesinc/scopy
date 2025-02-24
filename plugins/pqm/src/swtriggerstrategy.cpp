@@ -23,10 +23,16 @@
 
 using namespace scopy::pqm;
 
-SwTriggerStrategy::SwTriggerStrategy(int samplingFreq, QString triggeredBy)
+SwTriggerStrategy::SwTriggerStrategy(int samplingFreq, QString triggeredBy, QObject *parent)
 	: PlottingStrategy(samplingFreq)
+	, QObject(parent)
 	, m_triggeredBy(triggeredBy)
-{}
+{
+	m_timer = new QTimer(this);
+	m_timer->setSingleShot(true);
+	m_timer->setInterval(WAITING_TIME_MS);
+	connect(m_timer, &QTimer::timeout, this, &SwTriggerStrategy::autoFill, Qt::QueuedConnection);
+}
 
 SwTriggerStrategy::~SwTriggerStrategy() {}
 
@@ -55,7 +61,6 @@ void SwTriggerStrategy::zeroCrossing(QMap<QString, QVector<double>> samples)
 {
 	QString chnl = (m_triggeredBy.isEmpty()) ? "ua" : m_triggeredBy;
 	bool valid = false;
-
 	for(int i = 0; i < samples[chnl].size() - 1; i++) {
 		if(samples[chnl][i] <= 0 && samples[chnl][i + 1] >= 0) {
 			m_fill = true;
@@ -67,5 +72,16 @@ void SwTriggerStrategy::zeroCrossing(QMap<QString, QVector<double>> samples)
 			}
 			break;
 		}
+	}
+	if(!m_fill && !m_timer->isActive()) {
+		m_timer->start();
+	}
+}
+
+// If there is no zero crossing, it means that we have constant values ​​and auto triggering should be performed
+void SwTriggerStrategy::autoFill()
+{
+	if(m_samples.isEmpty()) {
+		m_fill = true;
 	}
 }
