@@ -250,8 +250,12 @@ QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent)
 		if(b) {
 			auto markerType = static_cast<PlotMarkerController::MarkerTypes>(
 				markerCb->combo()->currentData().toInt());
+			m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(
+				markerType == PlotMarkerController::MC_FIXED &&
+				fixedMarkerEditBtn->onOffswitch()->isChecked());
 			m_fftPlotComponentChannel->markerController()->setMarkerType(markerType);
 		} else {
+			m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(false);
 			m_fftPlotComponentChannel->markerController()->setMarkerType(PlotMarkerController::MC_NONE);
 		}
 	});
@@ -259,6 +263,8 @@ QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent)
 	connect(markerCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		auto markerType =
 			static_cast<PlotMarkerController::MarkerTypes>(markerCb->combo()->currentData().toInt());
+		m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(
+			markerType == PlotMarkerController::MC_FIXED && fixedMarkerEditBtn->onOffswitch()->isChecked());
 		m_fftPlotComponentChannel->markerController()->setMarkerType(markerType);
 		fixedMarkerEditBtn->setVisible(markerCb->combo()->currentData().toInt() ==
 					       PlotMarkerController::MC_FIXED);
