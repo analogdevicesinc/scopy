@@ -162,6 +162,7 @@ void MonitorPlot::setIsRealTime(bool newIsRealTime)
 {
 	m_isRealTime = newIsRealTime;
 	updateAxisScaleDraw();
+	refreshXAxisInterval();
 }
 
 void MonitorPlot::setupXAxis()
@@ -211,7 +212,7 @@ void MonitorPlot::setStartTime()
 	QByteArray formattedTimeMsg = formattedTime.toLocal8Bit();
 	startTimeLabel->setText(QString("Start time: " + formattedTimeMsg));
 	genereateScaleDraw(dateTimeFormat, QDateTime::currentDateTime().offsetFromUtc());
-	updateAxisScaleDraw();
+	setupXAxis();
 }
 
 void MonitorPlot::updateAxisScaleDraw()
