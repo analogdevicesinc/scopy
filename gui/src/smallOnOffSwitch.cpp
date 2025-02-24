@@ -180,7 +180,7 @@ void SmallOnOffSwitch::leaveEvent(QEvent *event)
 void SmallOnOffSwitch::mousePressEvent(QMouseEvent *event)
 {
 	if(event->button() == Qt::LeftButton && m_is_entered) {
-		toggle();
+		click();
 	}
 }
 
