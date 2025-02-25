@@ -317,9 +317,9 @@ class BinaryCounterPatternUI : public PatternUI
 public:
 	BinaryCounterPatternUI(BinaryCounterPattern *pattern, QWidget *parent = 0);
 	~BinaryCounterPatternUI();
-	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
-	void destroy_ui();
+	Pattern *get_pattern() override;
+	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0) override;
+	void destroy_ui() override;
 
 public: // Decoder related
 	virtual GenericLogicPlotCurve *getAnnotationCurve() override;
@@ -328,7 +328,7 @@ public: // Decoder related
 	virtual QVector<int> getChannelsToAssign() override;
 
 private Q_SLOTS:
-	void parse_ui();
+	void parse_ui() override;
 };
 
 class GrayCounterPattern : virtual public BinaryCounterPattern
@@ -419,9 +419,9 @@ class UARTPatternUI : public PatternUI
 public:
 	UARTPatternUI(UARTPattern *pattern, QWidget *parent = 0);
 	~UARTPatternUI();
-	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
-	void destroy_ui();
+	Pattern *get_pattern() override;
+	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0) override;
+	void destroy_ui() override;
 
 public: // Decoder related
 	virtual GenericLogicPlotCurve *getAnnotationCurve() override;
@@ -429,7 +429,7 @@ public: // Decoder related
 	virtual void setAnnotationCurve(GenericLogicPlotCurve *curve) override;
 
 private Q_SLOTS:
-	void parse_ui();
+	void parse_ui() override;
 };
 
 class I2CPattern : virtual public Pattern
@@ -494,9 +494,9 @@ class I2CPatternUI : public PatternUI
 public:
 	I2CPatternUI(I2CPattern *pattern, QWidget *parent = 0);
 	~I2CPatternUI();
-	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
-	void destroy_ui();
+	Pattern *get_pattern() override;
+	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0) override;
+	void destroy_ui() override;
 
 public: // Decoder related
 	virtual GenericLogicPlotCurve *getAnnotationCurve() override;
@@ -504,7 +504,7 @@ public: // Decoder related
 	virtual void setAnnotationCurve(GenericLogicPlotCurve *curve) override;
 
 private Q_SLOTS:
-	void parse_ui();
+	void parse_ui() override;
 };
 
 class SPIPattern : virtual public Pattern
@@ -555,9 +555,9 @@ class SPIPatternUI : public PatternUI
 public:
 	SPIPatternUI(SPIPattern *pattern, QWidget *parent = 0);
 	~SPIPatternUI();
-	Pattern *get_pattern();
-	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0);
-	void destroy_ui();
+	Pattern *get_pattern() override;
+	void build_ui(QWidget *parent = 0, uint16_t number_of_channels = 0) override;
+	void destroy_ui() override;
 
 public: // Decoder related
 	virtual GenericLogicPlotCurve *getAnnotationCurve() override;
@@ -566,7 +566,7 @@ public: // Decoder related
 	virtual QVector<int> getChannelsToAssign() override;
 
 private Q_SLOTS:
-	void parse_ui();
+	void parse_ui() override;
 };
 
 class NumberPattern : virtual public Pattern

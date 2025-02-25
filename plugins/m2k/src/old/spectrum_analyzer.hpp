@@ -126,7 +126,7 @@ public:
 	QPushButton *getRunButton();
 	void setCurrentAverageIndexLabel(uint chnIdx);
 public Q_SLOTS:
-	void readPreferences();
+	void readPreferences() override;
 	void run() override;
 	void stop() override;
 	void setWaterfallWindow(std::vector<float> window, int channel_id);

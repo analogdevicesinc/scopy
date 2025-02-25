@@ -137,7 +137,7 @@ protected Q_SLOTS:
 	void onLineEditTextEdited();
 
 protected:
-	virtual bool eventFilter(QObject *obj, QEvent *event);
+	virtual bool eventFilter(QObject *obj, QEvent *event) override;
 	double findUnitOfValue(double val, int *posInUnitsList = NULL);
 	void setUnits(const QStringList &map);
 	bool isUnitMatched(const QString &unit, double value);

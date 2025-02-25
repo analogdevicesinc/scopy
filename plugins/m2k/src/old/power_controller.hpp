@@ -79,7 +79,7 @@ private Q_SLOTS:
 	void startStop(bool start);
 	void ratioChanged(int percent);
 	void toggleRunButton(bool enabled);
-	void readPreferences();
+	void readPreferences() override;
 
 private:
 	Ui::PowerController *ui;
@@ -92,8 +92,8 @@ private:
 	libm2k::context::M2k *m_m2k_context;
 	libm2k::analog::M2kPowerSupply *m_m2k_powersupply;
 
-	void showEvent(QShowEvent *event);
-	void hideEvent(QHideEvent *event);
+	void showEvent(QShowEvent *event) override;
+	void hideEvent(QHideEvent *event) override;
 
 Q_SIGNALS:
 	void showTool();

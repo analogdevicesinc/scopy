@@ -38,7 +38,7 @@ public Q_SLOTS:
 	void updateZoomBase();
 
 protected:
-	virtual void zoom(const QRectF &);
+	virtual void zoom(const QRectF &) override;
 	virtual QSizeF minZoomSize() const override;
 
 private:
