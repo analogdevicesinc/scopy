@@ -522,6 +522,8 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 		StatusBarManager::GetInstance()->setEnabled(val.toBool());
 	} else if(str == "plugins_use_debugger_v2") {
 		Q_EMIT p->restartRequired();
+	} else if(str == "debugger_v2_include_debugfs") {
+		Q_EMIT p->restartRequired();
 	} else if(str == "general_connect_to_multiple_devices") {
 		bool general_connect_to_multiple_devices =
 			Preferences::get("general_connect_to_multiple_devices").toBool();
