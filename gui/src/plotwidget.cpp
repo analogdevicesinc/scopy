@@ -282,7 +282,7 @@ void PlotWidget::setupAxes()
 
 	m_xPosition = Preferences::get("adc_plot_xaxis_label_position").toInt();
 	m_yPosition = Preferences::get("adc_plot_yaxis_label_position").toInt();
-	QPen pen(QColor(Style::getAttribute(json::theme::interactive_subtle_idle)));
+	QPen pen(QColor(Style::getAttribute(json::theme::content_subtle)));
 	m_xAxis = new PlotAxis(m_xPosition, this, pen, this);
 	m_yAxis = new PlotAxis(m_yPosition, this, pen, this);
 }
