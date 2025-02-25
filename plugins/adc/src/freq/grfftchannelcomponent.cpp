@@ -265,6 +265,13 @@ QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent)
 	connect(markerCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		auto markerType =
 			static_cast<PlotMarkerController::MarkerTypes>(markerCb->combo()->currentData().toInt());
+		if(markerType == PlotMarkerController::MC_SINGLETONE) {
+			markerCnt->setMinValue(2);
+			if(markerCnt->value() < 2)
+				markerCnt->setValue(2);
+		} else {
+			markerCnt->setMinValue(0);
+		}
 		m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(
 			markerType == PlotMarkerController::MC_FIXED && fixedMarkerEditBtn->onOffswitch()->isChecked());
 		m_fftPlotComponentChannel->markerController()->setMarkerType(markerType);
