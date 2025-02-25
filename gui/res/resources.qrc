@@ -171,6 +171,7 @@
         <file>icons/notification_bell.svg</file>
         <file>icons/scopy-default/icons/sba_cmb_box_arrow_up.svg</file>
         <file>icons/scopy-light/icons/sba_cmb_box_arrow_up.svg</file>
+        <file>scopy.png</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>
