@@ -243,15 +243,21 @@ QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent)
 	markerCnt->setScaleRange(1, 10);
 	markerCnt->setValue(5);
 
-	connect(markerCnt, &MenuSpinbox::valueChanged, this,
-		[=](double cnt) { m_fftPlotComponentChannel->markerController()->setNrOfMarkers(cnt); });
+	connect(markerCnt, &MenuSpinbox::valueChanged, this, [=](double cnt) {
+		m_fftPlotComponentChannel->markerController()->setNrOfMarkers(cnt);
+		m_fftPlotComponentChannel->markerController()->computeMarkers();
+	});
 
 	connect(section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
 		if(b) {
 			auto markerType = static_cast<PlotMarkerController::MarkerTypes>(
 				markerCb->combo()->currentData().toInt());
+			m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(
+				markerType == PlotMarkerController::MC_FIXED &&
+				fixedMarkerEditBtn->onOffswitch()->isChecked());
 			m_fftPlotComponentChannel->markerController()->setMarkerType(markerType);
 		} else {
+			m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(false);
 			m_fftPlotComponentChannel->markerController()->setMarkerType(PlotMarkerController::MC_NONE);
 		}
 	});
@@ -259,6 +265,15 @@ QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent)
 	connect(markerCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		auto markerType =
 			static_cast<PlotMarkerController::MarkerTypes>(markerCb->combo()->currentData().toInt());
+		if(markerType == PlotMarkerController::MC_SINGLETONE) {
+			markerCnt->setMinValue(2);
+			if(markerCnt->value() < 2)
+				markerCnt->setValue(2);
+		} else {
+			markerCnt->setMinValue(0);
+		}
+		m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(
+			markerType == PlotMarkerController::MC_FIXED && fixedMarkerEditBtn->onOffswitch()->isChecked());
 		m_fftPlotComponentChannel->markerController()->setMarkerType(markerType);
 		fixedMarkerEditBtn->setVisible(markerCb->combo()->currentData().toInt() ==
 					       PlotMarkerController::MC_FIXED);
