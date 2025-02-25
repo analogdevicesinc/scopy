@@ -26,6 +26,7 @@
 #include <QLineEdit>
 #include <timeplotcomponentchannel.h>
 #include <style.h>
+#include <pluginbase/preferences.h>
 
 using namespace scopy;
 using namespace scopy::adc;
@@ -183,6 +184,10 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	m_plotComponent->timePlot()->plotButtonManager()->add(m_deletePlotHover);
 	m_plotComponent->timePlot()->plotButtonManager()->add(m_settingsPlotHover);
 	m_autoscaleBtn->onOffswitch()->setChecked(true);
+
+	m_ymode = static_cast<YMode>(-1);
+	auto y = Preferences::get("adc_default_y_mode").toInt();
+	m_yModeCb->combo()->setCurrentIndex(y);
 }
 
 void TimePlotComponentSettings::showDeleteButtons(bool b)
