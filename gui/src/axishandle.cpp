@@ -24,6 +24,7 @@
 #include "qpainter.h"
 #include <qwt_scale_div.h>
 #include <QMouseEvent>
+#include <style.h>
 
 using namespace scopy;
 
@@ -31,7 +32,7 @@ AxisHandle::AxisHandle(QwtAxisId axisId, HandlePos handlePos, QwtPlot *plot)
 	: QWidget(plot->canvas())
 	, m_axisId(axisId)
 	, m_plot(plot)
-	, m_color(Qt::gray)
+	, m_color(Style::getColor(json::theme::content_silent))
 	, m_handlePos(handlePos)
 	, m_pos(QPoint(0, 0))
 	, m_handleMargins(6)
