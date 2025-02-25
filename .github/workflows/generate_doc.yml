@@ -7,6 +7,10 @@ on:
     tags:
       - v*.*.*
   pull_request:
+    types: [opened, synchronize, closed]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   build-doc:
@@ -17,7 +21,6 @@ jobs:
     - uses: actions/setup-python@v5
       with:
         python-version: "3.x"
-
 
     - name: Differentiate main from tag
       run: |
@@ -35,8 +38,12 @@ jobs:
 
     - name: Generate test report files
       working-directory: docs
+      if: github.event_name == 'pull_request' && startsWith(github.event.pull_request.head.ref, 'testing_')
       run: |
-        python3 test_report_generator.py . ../testing_results/
+        TEST_REPORT_FOLDER=$(echo "${{ github.event.pull_request.head.ref }}" | sed 's/^testing_//') # Remove the testing_ prefix
+        echo "test_report_folder=$TEST_REPORT_FOLDER"
+        echo "test_report_folder=$TEST_REPORT_FOLDER" >> "$GITHUB_ENV"
+        python3 test_report_generator.py ../testing_results/ tests/test_report/ "${{ github.sha }}"
 
     - name: Build doc
       working-directory: docs
@@ -54,7 +61,7 @@ jobs:
   deploy-doc:
     runs-on: ubuntu-latest
     needs: build-doc
-    if: startsWith(github.ref, 'refs/tags/') ||  github.ref == 'refs/heads/main'
+    if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
 
     steps:
     - uses: actions/checkout@v4
@@ -79,6 +86,10 @@ jobs:
           if [[ "$new_tag" == "1" ]]; then
             git rm -r ${{ github.ref_name }} --quiet || true ;
           fi ;
+          if [[ "$test_report_folder_name" != "" ]]; then
+            printf "Should create this folder for testing-docs: ${test_report_folder}" ;
+            mkdir -p scopy_testing_results/${test_report_folder} ;
+          fi ;
         ) || (
           git checkout --orphan gh-pages ;
           git reset --hard ;
@@ -86,7 +97,13 @@ jobs:
         )
 
     - uses: actions/download-artifact@v4
-      if: ${{ env.new_tag == '0' }}
+      if: ${{ env.new_tag == '0' }} && ${{ env.test_report_folder == '' }}
+      with:
+        name: html
+        path: scopy_testing_results/${{ env.test_report_folder }}
+
+    - uses: actions/download-artifact@v4
+      if: ${{ env.new_tag == '0' }} && !${{ env.test_report_folder == '' }}
       with:
         name: html
 
