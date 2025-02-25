@@ -218,26 +218,12 @@ if pdkSupport:
         directoriesGenerated.append(pdkResPath)
     except FileExistsError:
         print(pdkResPath + " directory already exists!")
-        
-    qssPdkPath = os.path.join(pdkResPath,"default.qss")
-    defaultQssPath = os.path.join(scopyPdkDeps,"usr/local/resources/stylesheets/default.qss")
-    if not os.path.exists(defaultQssPath):
-        defaultQssPath = os.path.join(pathToScopy,"gui/res/stylesheets/default.qss")
-    
-    if os.path.exists(defaultQssPath):
-        if not os.path.exists(qssPdkPath):
-            shutil.copy(defaultQssPath,pdkResPath)
-        else:
-            print(qssPdkPath + " file already exists!")
-    else:
-        print("default.qss stylesheet couldn't be found!")
+
     pdkResQrc = os.path.join(pdkResPath, "resources.qrc")
     if not os.path.exists(pdkResQrc):
         resFile = open(pdkResQrc, "w")
         resFile.write("<RCC>\n")
         resFile.write(" <qresource prefix=\"/\">\n")
-        if os.path.exists(qssPdkPath):
-            resFile.write("     <file>default.qss</file>\n")
         resFile.write(" </qresource>\n")
         resFile.write("</RCC>")
         resFile.close()

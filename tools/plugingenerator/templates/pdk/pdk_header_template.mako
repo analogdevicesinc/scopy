@@ -45,6 +45,7 @@ private:
 	QWidget *buildSaveSessionPreference();
 	QWidget *generalPreferences();
 	void initGeneralPreferences();
+	void initStyle();
 };
 
 class MainWidget : public QWidget
