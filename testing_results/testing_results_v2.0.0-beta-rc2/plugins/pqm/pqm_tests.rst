@@ -72,7 +72,7 @@ accessible without errors.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -116,7 +116,7 @@ Test 2: Info button check.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -160,7 +160,7 @@ Test 3: Single acquisition.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -214,7 +214,7 @@ Test 4: Data acquisition.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -258,7 +258,7 @@ Test 5: Settings button check.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -341,7 +341,7 @@ Test 6: Data logging.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -405,7 +405,7 @@ Test 7: Data logging wrong path.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -466,7 +466,7 @@ Test 8: PQEvents.
 
     6. Run ``iio_attr -u ip:127.0.0.1 -c pqm count0 countEvent 0`` command.
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -551,7 +551,7 @@ and is accessible without errors.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -595,7 +595,7 @@ Test 2: Info button check.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -642,7 +642,7 @@ Test 3: Single acquisition.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -697,7 +697,7 @@ Test 4: Data acquisition.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -761,7 +761,7 @@ Test 5: The features of the table.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -826,7 +826,7 @@ Test 6: Settings button check.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -907,7 +907,7 @@ Test 7: Data logging.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -970,7 +970,7 @@ Test 8: Data logging wrong path.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1030,7 +1030,7 @@ Test 9: PQEvents.
 
     5. Run ``iio_attr -u ip:127.0.0.1 -c pqm count0 countEvent 0`` command.
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1113,7 +1113,7 @@ is accessible without errors.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1157,7 +1157,7 @@ Test 2: Info button check.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1210,7 +1210,7 @@ Test 3: Settings button check.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1264,7 +1264,7 @@ Test 4: Settings timespan check.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1309,7 +1309,7 @@ Test 5: Settings rolling switch check.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1355,7 +1355,7 @@ Test 6: Single acquisition triggered.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1402,7 +1402,7 @@ Test 7: Single acquisition rolling.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1456,7 +1456,7 @@ Test 8: Data acquisition triggered.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1513,7 +1513,7 @@ Test 9: Data acquisition rolling.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1558,12 +1558,12 @@ range of the other plot is modified and matches the zoom range.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** On Linux-arm64, on zoom out, the plot magnifier will not dissapear on plot 1 if zooming out from plot 2 (or vice versa)   
 
 ..
   Any comments about the test goes here.
@@ -1640,7 +1640,7 @@ Test 11: Data logging.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1703,7 +1703,7 @@ Test 12: Data logging wrong path.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1784,7 +1784,7 @@ is accessible without errors.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1830,7 +1830,7 @@ correctly.
 ..
 
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
@@ -1885,7 +1885,7 @@ correctly.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, Linux-arm64
 
 ..
   Details about the tested OS goes here.
