@@ -22,6 +22,11 @@ Connection flow
          - 2.0.0 a3a7c43
          - N/A
          - Tested on Windows 10
+       * - Danila Andrei
+         - 19.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on macOS 14.5
 
 Setup environment:
 ------------------
@@ -73,7 +78,7 @@ Test 1: Verify the connection flow.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -118,7 +123,7 @@ unplugged during the connection process.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -166,7 +171,7 @@ unplugged during the connection process.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -212,7 +217,7 @@ unplugged before the connection process.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -258,7 +263,7 @@ Test 5: Disconnecting a device.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.

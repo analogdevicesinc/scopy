@@ -16,6 +16,11 @@ Instrument Detaching - Test Suite
          - 2.0.0 a3a7c43
          - N/A
          - Tested on Windows 10
+       * - Danila Andrei
+         - 19.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on macOS 14.5
 
 General Description:
         - The instrument detaching is the process of removing the instrument from the main window. This is usually done by double clicking the tool name from the tool menu (left side of scopy). The instrument detaching is useful when the user has multiple screens and wants to observe multiple instruments at the same time. The user can detach the instrument from the main window and move it to another screen or another part of the same screen. This feature is not available on Android. Any detached windows will be closed when the main window is closed.
@@ -47,7 +52,7 @@ Test 1: Detach and reattach an instrument
         1. Click on the connected Pluto device and connect to it. Select the 'ADC - Time' plugin.
         2. Double click the 'ADC - Time' tool name from the tool menu.
                 - **Expected Result:** The 'ADC - Time' instrument should be detached from the main window. The title bar of the detached window should include the name of the detached instrument.
-                - **Actual result:**
+                - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -63,13 +68,13 @@ Test 1: Detach and reattach an instrument
 
         4. Click the X button from the detached window title bar.
                 - **Expected Result:** The 'ADC - Time' instrument should be reattached to the main window. The 'ADC - Time' instrument should be the one currently selected.
-                - **Actual result:**
+                - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.

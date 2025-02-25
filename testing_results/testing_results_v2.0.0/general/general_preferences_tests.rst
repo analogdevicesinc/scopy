@@ -18,6 +18,11 @@ General Preferences - Test Suite
          - 2.0.0 a3a7c43
          - N/A
          - Tested on Windows 10
+       * - Danila Andrei
+         - 19.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on macOS 14.5
 
 Setup environment:
 ------------------
@@ -84,23 +89,23 @@ states (only applies to plugins which have this implemented).
    7. Press the "Settings file location" open button within the preference menu
        - **Expected result:** should open a file browser containing 
          .ini files for every plugins' session saved
-       - **Actual result:** As expected
+       - **Actual result:** Nothing happens
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Test only fails on macOS: Unable to locate the preferences.ini file on macOS when using the **Open** button.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -142,7 +147,7 @@ double clicking them in the left menu.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -195,7 +200,7 @@ Test 3 - Save/Load tool attached state
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -248,7 +253,7 @@ Test 4 - Double click control buttons to open menu
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -303,7 +308,7 @@ Test 5 - Enable OpenGL plotting
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -353,7 +358,7 @@ Test 6 - Enable menu animations
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -404,7 +409,7 @@ Steps
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -455,7 +460,7 @@ Test 8 - Show Grid
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -509,7 +514,7 @@ Test 9 - Show Graticule
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -557,7 +562,7 @@ Test 10 - Use Lazy Loading
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -604,7 +609,7 @@ Test 11 - Use native dialogs
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -656,12 +661,12 @@ Test 12 - Auto-connect to previous session
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Test fails on Windows 10
+**Comments:** Test fails only on Windows 10
 
 ..
   Any comments about the test goes here.
@@ -706,7 +711,7 @@ so some layout artifacts may appear).
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -749,7 +754,7 @@ Test 14 - Theme
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -791,7 +796,7 @@ Steps
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -837,13 +842,13 @@ Test 16 - Connect to multiple devices
    3. Repeat the steps with the preference disabled.  
        - **Expected result:** When connecting to the second device, 
          the first one should automatically disconnect.    
-       - **Actual result:**
+       - **Actual result:**As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -895,7 +900,7 @@ Test 17 - Regularly scan for new devices
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -939,12 +944,12 @@ Test 18 - Session devices
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Test fails on Windows 10
+**Comments:** Test fails only on Windows 10
 
 ..
   Any comments about the test goes here.
@@ -984,13 +989,13 @@ Test 19 - Show plot FPS
 
    3. Repeat the steps with the preference disabled.  
        - **Expected result:** No FPS should be visible.    
-       - **Actual result:**
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -1033,7 +1038,7 @@ Test 20 - Plot target FPS
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -1076,7 +1081,7 @@ Test 21 - Reset settings and plugins to default
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.

@@ -22,6 +22,11 @@ EMU
          - 2.0.0 a3a7c43
          - N/A
          - Tested on Windows 10
+       * - Danila Andrei
+         - 19.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on macOS 14.5
 
 .. _tst-emu-en:
 
@@ -52,7 +57,7 @@ correctly.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -90,18 +95,18 @@ when the IIO emulator is not found.
     3. Click on **Emulator** tab.
         - **Expected result:** All the components are disabled and the message 
           "Can't find iio-emu in the system!" is displayed. 
-        - **Actual result:** Emulator is still available
+        - **Actual result:** Emulator is still available (Windows 10, macOS 14.5)
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** With the iio-emu not installed in system and a bad preferences path, emulator is still found as long as iio-emu.exe is in the same folder as scopy.exe
+**Comments:** Windows 10: With the iio-emu not installed in system and a bad preferences path, emulator is still found as long as iio-emu.exe is in the same folder as scopy.exe; macOS 14.5: Unable to locate the preferences.ini
 
 ..
   Any comments about the test goes here.
@@ -144,7 +149,7 @@ correctly.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -194,7 +199,7 @@ when an emulated device is connected and the "iio-emu" process is stopped.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -242,7 +247,7 @@ correctly (using adalm2000 device).
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -290,7 +295,7 @@ correctly (using pluto device).
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -338,7 +343,7 @@ correctly (using pqm device).
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -385,7 +390,7 @@ correctly (using swiot_config device).
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -433,7 +438,7 @@ correctly (using swiot_runtime device).
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -480,7 +485,7 @@ correctly (using generic device).
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.

@@ -22,6 +22,11 @@ Homepage
          - 2.0.0 a3a7c43
          - N/A
          - Tested on Windows 10
+       * - Danila Andrei
+         - 19.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on macOS 14.5
 
 Test 1: The homepage displays correctly when running the application.
 ---------------------------------------------------------------------
@@ -45,7 +50,7 @@ Test 1: The homepage displays correctly when running the application.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -85,7 +90,7 @@ Test 2: Verifying the "Add device" (+) button.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -130,7 +135,7 @@ Test 3: Verifying the auto-scan feature (ON).
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -175,7 +180,7 @@ scan is turned off.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -221,7 +226,7 @@ all available devices correctly.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -273,7 +278,7 @@ Test 6: Navigation using the buttons in the info page.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -317,7 +322,7 @@ available devices correctly.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.

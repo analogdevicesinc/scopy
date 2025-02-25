@@ -22,6 +22,11 @@ Add device
          - 2.0.0 a3a7c43
          - N/A
          - Tested on Windows 10
+       * - Danila Andrei
+         - 19.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on macOS 14.5
 
 Setup environment:
 ------------------
@@ -61,7 +66,7 @@ lists available devices when initiated.
           Actual test result goes here.
         ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -105,12 +110,12 @@ lists available local devices when initiated.
           Actual test result goes here.
         ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Test only fails on Windows 10
 
 .. 
   Any comments about the test goes here.
@@ -149,7 +154,7 @@ lists available ip devices when initiated.
           Actual test result goes here.
         ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -191,7 +196,7 @@ lists available usb devices when initiated.
           Actual test result goes here.
         ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -236,7 +241,7 @@ lists available serial devices when initiated.
           Actual test result goes here.
         ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -277,7 +282,7 @@ when no device is found.
           Actual test result goes here.
         ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -322,7 +327,7 @@ Test 7: Device validation.
           Actual test result goes here.
         ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -365,7 +370,7 @@ Test 8: Verify the "BACK" button from compatible plugin page.
           Actual test result goes here.
         ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -421,7 +426,7 @@ Only the main plugin of the device is used.
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -476,7 +481,7 @@ Multiple plugins are used.
           Actual test result goes here.
         ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -529,7 +534,7 @@ Test 11: Verify the "ADD DEVICE" button from compatible plugin page with no plug
           Actual test result goes here.
         ..
 
-**Tested OS:** Windows 10
+**Tested OS:** Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
