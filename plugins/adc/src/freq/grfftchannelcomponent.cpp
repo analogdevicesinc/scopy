@@ -243,8 +243,10 @@ QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent)
 	markerCnt->setScaleRange(1, 10);
 	markerCnt->setValue(5);
 
-	connect(markerCnt, &MenuSpinbox::valueChanged, this,
-		[=](double cnt) { m_fftPlotComponentChannel->markerController()->setNrOfMarkers(cnt); });
+	connect(markerCnt, &MenuSpinbox::valueChanged, this, [=](double cnt) {
+		m_fftPlotComponentChannel->markerController()->setNrOfMarkers(cnt);
+		m_fftPlotComponentChannel->markerController()->computeMarkers();
+	});
 
 	connect(section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
 		if(b) {
