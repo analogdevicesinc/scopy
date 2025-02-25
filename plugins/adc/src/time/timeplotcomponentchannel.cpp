@@ -41,8 +41,6 @@ adc::TimePlotComponentChannel::TimePlotComponentChannel(ChannelComponent *ch, Ti
 	m_plotComponent = nullptr;
 	initPlotComponent(plotComponent);
 
-	m_timePlotYAxis->setUnits("V");
-	m_timePlotCh->xAxis()->setUnits("s");
 	m_timePlotYAxis->setInterval(-2048, 2048);
 	m_xyPlotYAxis->setInterval(-2048, 2048);
 }

@@ -265,7 +265,6 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 			ymax = 1 << (fmt->bits);
 		}
 		m_timePlotComponentChannel->m_timePlotYAxis->setUnits("");
-		m_timePlotComponentChannel->m_timePlotYAxis->setUnits("");
 		m_timePlotComponentChannel->m_timePlotYAxis->scaleDraw()->setFloatPrecision(3);
 		m_timePlotComponentChannel->m_timePlotYAxis->getFormatter()->setTwoDecimalMode(false);
 		break;
