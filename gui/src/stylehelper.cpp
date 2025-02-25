@@ -199,15 +199,6 @@ void StyleHelper::MenuControlWidget(QWidget *w, QColor color, QString objectName
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::MenuLargeLabel(QLabel *m_lbl, QString objectName)
-{
-	if(!objectName.isEmpty())
-		m_lbl->setObjectName(objectName);
-	m_lbl->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-
-	Style::setStyle(m_lbl, style::properties::label::menuBig);
-}
-
 void StyleHelper::MenuHeaderLine(QFrame *m_line, QPen pen, QString objectName)
 {
 	if(!objectName.isEmpty())

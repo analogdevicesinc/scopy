@@ -57,10 +57,10 @@ void DataMonitorStyleHelper::SevenSegmentMonitorsStyle(SevenSegmentMonitor *seve
 
 	sevenSegmentMonitor->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-	StyleHelper::MenuLargeLabel(sevenSegmentMonitor->name);
+	Style::setStyle(sevenSegmentMonitor->name, style::properties::label::menuBig);
 	sevenSegmentMonitor->name->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	StyleHelper::MenuLargeLabel(sevenSegmentMonitor->unitOfMeasurement);
+	Style::setStyle(sevenSegmentMonitor->unitOfMeasurement, style::properties::label::menuBig);
 	sevenSegmentMonitor->unitOfMeasurement->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	sevenSegmentMonitor->lcdNumber->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);

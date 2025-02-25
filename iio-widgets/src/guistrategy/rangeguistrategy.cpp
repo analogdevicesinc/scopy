@@ -38,7 +38,7 @@ RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 	m_ui->setLayout(new QVBoxLayout(m_ui));
 	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
-	m_spinBox = new gui::MenuSpinbox(m_recipe.data.toUpper(), 0, "", 0, 1, true, false, m_ui);
+	m_spinBox = new gui::MenuSpinbox(m_recipe.data.toUpper(), 0, "", 0, 1, true, false, false, m_ui);
 	m_spinBox->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 	m_spinBox->setScaleRange(1, 1);
 	m_spinBox->setScalingEnabled(false);

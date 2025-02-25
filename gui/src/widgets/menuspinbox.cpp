@@ -27,10 +27,10 @@ namespace scopy {
 namespace gui {
 
 MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, double max, bool vertical, bool left,
-			 QWidget *parent)
+			 bool large_widget, QWidget *parent)
 	: QWidget(parent)
 {
-
+	m_large_widget = large_widget;
 	m_label = new QLabel(name, parent);
 	m_edit = new QLineEdit("0", parent);
 	m_scaleCb = new QComboBox(parent);
@@ -121,10 +121,10 @@ void MenuSpinbox::layoutVertically(bool left)
 		lay->addLayout(btnLay);
 	}
 
-	Style::setStyle(m_label, style::properties::label::subtle);
 	Style::setStyle(m_scaleCb, style::properties::widget::noBorder);
+	int size = m_large_widget ? Style::getDimension(json::global::unit_2_5)
+				  : Style::getDimension(json::global::unit_1);
 
-	int size = Style::getDimension(json::global::unit_2_5);
 	m_plus->setIcon(Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
 	Style::setStyle(m_plus, style::properties::button::spinboxButton);
 	m_plus->setFixedSize(size, size);
@@ -132,6 +132,12 @@ void MenuSpinbox::layoutVertically(bool left)
 	m_minus->setIcon(Style::getPixmap(":/gui/icons/minus.svg", Style::getColor(json::theme::content_inverse)));
 	Style::setStyle(m_minus, style::properties::button::spinboxButton);
 	m_minus->setFixedSize(size, size);
+
+	if(!m_large_widget) {
+		int icon_size = Style::getDimension(json::global::unit_0_5);
+		m_plus->setIconSize(QSize(icon_size, icon_size));
+		m_minus->setIconSize(QSize(icon_size, icon_size));
+	}
 }
 
 void MenuSpinbox::layoutHorizontally(bool left)
