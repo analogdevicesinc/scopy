@@ -68,7 +68,6 @@ QWidget *GRTimePlotAddonSettings::createYAxisMenu(QWidget *parent)
 	MenuCollapseSection *yaxis = new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE,
 							     MenuCollapseSection::MHW_BASEWIDGET, yaxiscontainer);
 
-	m_plot->plot()->yAxis()->setUnits("V");
 	m_yctrl = new MenuPlotAxisRangeControl(m_plot->plot()->yAxis(), yaxis);
 	m_singleYModeSw = new MenuOnOffSwitch("Single Y Mode", yaxis);
 	m_autoscaleBtn = new QPushButton("Autoscale", yaxis);
