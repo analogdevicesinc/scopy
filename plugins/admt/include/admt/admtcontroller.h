@@ -29,6 +29,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QElapsedTimer>
 
 #include <iioutil/connectionprovider.h>
 #include <pluginbase/statusbarmanager.h>
@@ -53,7 +54,16 @@ public:
     ADMTController(QString uri, QObject *parent = nullptr);
     ~ADMTController();
 
-    int HAR_MAG_1, HAR_MAG_2, HAR_MAG_3, HAR_MAG_8 ,HAR_PHASE_1 ,HAR_PHASE_2 ,HAR_PHASE_3 ,HAR_PHASE_8;
+    int HAR_MAG_1, HAR_MAG_2, HAR_MAG_3, HAR_MAG_8 ,HAR_PHASE_1 ,HAR_PHASE_2 ,HAR_PHASE_3 ,HAR_PHASE_8,
+        sampleCount = 0;
+
+    bool stopStream = false;
+
+    double streamedValue = 0.0;
+    QVector<double> streamBufferedValues;
+    QVector<uint32_t> streamBufferedIntervals;
+
+    QElapsedTimer elapsedStreamTimer;
 
     vector<double> angle_errors_fft_pre, 
                    angle_errors_fft_phase_pre,
@@ -171,6 +181,15 @@ public:
         UNIQID_REGISTER_COUNT
     };
 
+    enum RampGeneratorDriverFeatureControlRegister
+    {
+        VDCMIN,
+        SW_MODE,
+        RAMP_STAT,
+        XLATCH,
+        RAMP_GENERATOR_DRIVER_FEATURE_CONTROL_REGISTER_COUNT
+    };
+
     const char* ChannelIds[CHANNEL_COUNT] = { "rot", "angl", "count", "temp" };
     const char* DeviceIds[DEVICE_COUNT] = { "admt4000", "tmc5240" };
     const char* DeviceAttributes[DEVICE_ATTR_COUNT] = { "page", "sequencer_mode", "angle_filt", "conversion_mode", "h8_ctrl", "sdp_gpio_ctrl", "sdp_gpio0_busy", "sdp_coil_rs", "regmap_dump" };
@@ -186,6 +205,8 @@ public:
     const uint32_t SensorRegisters[SENSOR_REGISTER_COUNT] = { 0x03, 0x05, 0x08, 0x10, 0x11, 0x12, 0x13, 0x18, 0x1D, 0x1E, 0x20, 0x23, 0x14 };
     const uint32_t SensorPages[SENSOR_REGISTER_COUNT] = { UINT32_MAX, UINT32_MAX, UINT32_MAX, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02 };
 
+    const uint32_t RampGeneratorDriverFeatureControlRegisters[RAMP_GENERATOR_DRIVER_FEATURE_CONTROL_REGISTER_COUNT] = { 0x33, 0x34, 0x35, 0x36 };
+
     const char* getChannelId(Channel channel);
     const char* getDeviceId(Device device);
     const char* getDeviceAttribute(DeviceAttribute attribute);
@@ -199,6 +220,8 @@ public:
     const uint32_t getSensorRegister(SensorRegister registerID);
     const uint32_t getSensorPage(SensorRegister registerID);
 
+    const uint32_t getRampGeneratorDriverFeatureControlRegister(RampGeneratorDriverFeatureControlRegister registerID);
+
     void connectADMT();
     void disconnectADMT();
     int getChannelIndex(const char *deviceName, const char *channelName);
@@ -206,7 +229,7 @@ public:
     int getDeviceAttributeValue(const char *deviceName, const char *attributeName, double *returnValue);
     int getDeviceAttributeValueString(const char *deviceName, const char *attributeName, char *returnValue, size_t byteLength = 512);
     int setDeviceAttributeValue(const char *deviceName, const char *attributeName, double writeValue);
-    QString calibrate(vector<double> PANG, int cycles = 11, int samplesPerCycle = 256);
+    QString calibrate(vector<double> PANG, int cycles, int samplesPerCycle, bool CCW);
     int writeDeviceRegistry(const char *deviceName, uint32_t address, uint32_t value);
     int readDeviceRegistry(const char *deviceName, uint32_t address, uint32_t *returnValue);
     void computeSineCosineOfAngles(const vector<double>& angles);
@@ -221,7 +244,7 @@ public:
     map<string, double> getDiag1RegisterBitMapping_Afe(uint16_t registerValue, bool is5V);
     map<string, double> getDiag2RegisterBitMapping(uint16_t registerValue);
     uint16_t setGeneralRegisterBitMapping(uint16_t currentRegisterValue, map<string, int> settings);
-    void postcalibrate(vector<double> PANG, int cycleCount, int samplesPerCycle);
+    void postcalibrate(vector<double> PANG, int cycleCount, int samplesPerCycle, bool CCW);
     int getAbsAngleTurnCount(uint16_t registerValue);
     uint16_t setDIGIOENRegisterBitMapping(uint16_t currentRegisterValue, map<string, bool> settings);
     uint16_t setDIGIORegisterBitMapping(uint16_t currentRegisterValue, map<string, bool> settings);
@@ -235,7 +258,17 @@ public:
     map<string, double> getSecAnglIRegisterBitMapping(uint16_t registerValue);
     map<string, double> getTmp1RegisterBitMapping(uint16_t registerValue, bool is5V);
     bool checkRegisterFault(uint16_t registerValue, bool isMode1);
-
+    int streamIO();
+    void bufferedStreamIO(int totalSamples, int targetSampleRate);
+    bool checkVelocityReachedFlag(uint16_t registerValue);
+public Q_SLOTS:
+    void handleStreamData(double value);
+    void handleStreamBufferedData(const QVector<double> &value);
+    void handleStreamBufferedDataInterval(const QVector<uint32_t> &value);
+Q_SIGNALS:
+    void streamData(double value);
+    void streamBufferedData(const QVector<double> &value);
+    void streamBufferedDataInterval(const QVector<uint32_t> &value);
 private:
     iio_context *m_iioCtx;
     iio_buffer *m_iioBuffer;

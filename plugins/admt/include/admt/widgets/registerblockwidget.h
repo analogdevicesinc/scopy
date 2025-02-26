@@ -65,8 +65,6 @@ namespace scopy::admt {
 
         void addReadButton(QWidget *parent);
         void addWriteButton(QWidget *parent);
-        void applyLineEditStyle(QLineEdit *widget);
-        void applySpinBoxStyle(QSpinBox *widget);
     };
 
     class SCOPY_ADMT_EXPORT PaddedSpinBox : public QSpinBox
