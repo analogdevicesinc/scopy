@@ -121,19 +121,7 @@ void CursorController::connectSignals(CursorSettings *cursorSettings)
 	}
 	connect(m_plot, &PlotWidget::addedChannel, this, &CursorController::onAddedChannel);
 	connect(m_plot, &PlotWidget::removedChannel, this, &CursorController::onRemovedChannel);
-	connect(m_plot, &PlotWidget::channelSelected, this, [=](PlotChannel *ch) {
-		PlotAxis *xAxis = m_plot->xAxis();
-		PlotAxis *yAxis = m_plot->yAxis();
-		if(ch != nullptr) {
-			xAxis = ch->xAxis();
-			yAxis = ch->yAxis();
-		}
-
-		plotCursorReadouts->setXFormatter(xAxis->getFormatter());
-		plotCursorReadouts->setYFormatter(yAxis->getFormatter());
-		plotCursorReadouts->setXUnits(xAxis->getUnits());
-		plotCursorReadouts->setYUnits(yAxis->getUnits());
-	});
+	connect(m_plot, &PlotWidget::channelSelected, this, &CursorController::onSelectedChannel);
 }
 
 void CursorController::xEnToggled(bool toggled)
@@ -182,6 +170,22 @@ void CursorController::onAddedChannel(PlotChannel *ch)
 	connect(ch->yAxis(), &PlotAxis::formatterChanged, plotCursorReadouts, &PlotCursorReadouts::setYFormatter);
 	connect(ch->xAxis(), &PlotAxis::unitsChanged, plotCursorReadouts, &PlotCursorReadouts::setXUnits);
 	connect(ch->yAxis(), &PlotAxis::unitsChanged, plotCursorReadouts, &PlotCursorReadouts::setYUnits);
+}
+
+void CursorController::onSelectedChannel(PlotChannel *ch)
+{
+	PlotAxis *xAxis = m_plot->xAxis();
+	PlotAxis *yAxis = m_plot->yAxis();
+	if(ch != nullptr) {
+		xAxis = ch->xAxis();
+		yAxis = ch->yAxis();
+	}
+
+	plotCursorReadouts->setXFormatter(xAxis->getFormatter());
+	plotCursorReadouts->setYFormatter(yAxis->getFormatter());
+	plotCursorReadouts->setXUnits(xAxis->getUnits());
+	plotCursorReadouts->setYUnits(yAxis->getUnits());
+	plotCursorReadouts->setColor(yAxis->scaleDraw()->getColor());
 }
 
 void CursorController::onRemovedChannel(PlotChannel *ch)

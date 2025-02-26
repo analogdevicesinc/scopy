@@ -156,6 +156,8 @@ bool PlotCursorReadouts::isXVisible() { return x_contents->isVisible(); }
 
 bool PlotCursorReadouts::isYVisible() { return y_contents->isVisible(); }
 
+void PlotCursorReadouts::setColor(QColor color) { setStyleSheet("color: " + color.name(QColor::HexRgb)); }
+
 void PlotCursorReadouts::setYUnits(QString unit)
 {
 	yUnit = unit;

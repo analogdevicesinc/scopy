@@ -45,6 +45,7 @@ public:
 	QString getUnitType() const;
 
 	void setColor(QColor color);
+	QColor getColor();
 
 	void setDisplayScale(double value);
 	void setFormatter(PrefixFormatter *formatter);
