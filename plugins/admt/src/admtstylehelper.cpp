@@ -254,37 +254,6 @@ void ADMTStyleHelper::StartButtonStyle(QPushButton *btn, QString objectName)
 	btn->setIconSize(QSize(64, 64));
 }
 
-void ADMTStyleHelper::TabWidgetStyle(QTabWidget *widget, const QString& styleHelperColor, QString objectName)
-{
-	if(!objectName.isEmpty())
-		widget->setObjectName(objectName);
-	QString style = QString(R"css(
-		QTabWidget::tab-bar {
-		 left: 5px; /* move to the right by 5px */
-		}
-		QTabBar::tab {
-		 min-width: 100px;
-		 min-height: 32px;
-		 padding-bottom: 5px;
-		 padding-left: 16px;
-		 padding-right: 16px;
-		 background-color: &&UIElementBackground&&;
-		 font: normal;
-		}
-		QTabBar::tab:selected {
-		 color: white;
-		 border-bottom: 2px solid &&ScopyBlue&&;
-		 margin-top: 0px;
-		}
-		QTabBar::tab:disabled{
-		 color: grey;
-		}
-		)css");
-	style.replace("&&ScopyBlue&&", Style::getAttribute(json::theme::interactive_primary_idle));
-	style.replace("&&UIElementBackground&&", Style::getAttribute(json::theme::background_primary));
-	widget->tabBar()->setStyleSheet(style);
-}
-
 void ADMTStyleHelper::TextStyle(QWidget *widget, const char *styleHelperColor, bool isBold, QString objectName)
 {
 	if(!objectName.isEmpty())
