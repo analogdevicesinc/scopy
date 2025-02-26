@@ -1,0 +1,39 @@
+QTabBar[&&property&&=true] {
+    font-size: &font_size_1&;
+    font-weight: 600;
+}
+
+QTabBar[&&property&&=true]::tab {
+    height: 48px;
+    background-color: transparent;
+    border-top-left-radius: &radius_1&;
+    border-top-right-radius: &radius_1&;
+    padding: 0;
+}
+
+QTabBar[&&property&&=true]::tab QLabel {
+    background-color: transparent;
+    color: &content_default&;
+    padding: 0;
+    margin: 0;
+}
+
+QTabBar[&&property&&=true]::tab:hover {
+    background-color: &interactive_silent_hover&;
+    color: &content_default&;
+    border-bottom: 1px solid &interactive_subtle_hover&;
+}
+
+QTabBar[&&property&&=true]::tab:selected {
+	background-color: &background_primary&;
+	color: &interactive_primary_idle&;
+	border-bottom: 2px solid &interactive_primary_idle&;
+}
+
+QTabBar[&&property&&=true]::tab:selected:hover {
+    background-color: &interactive_primary_faint&;
+}
+
+QTabBar[&&property&&=true]::tab:disabled {
+	color: &interactive_subtle_idle&;
+}

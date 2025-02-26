@@ -38,11 +38,11 @@ RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, ui
     container->setMargin(0);
     container->setSpacing(0);
     MenuSectionWidget *menuSectionWidget = new MenuSectionWidget(this);
-    MenuCollapseSection *menuCollapseSection = new MenuCollapseSection(header, MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, menuSectionWidget);
-    menuCollapseSection->contentLayout()->setSpacing(10);
+    Style::setStyle(menuSectionWidget, style::properties::widget::basicComponent);
+    QLabel *headerLabel = new QLabel(header, menuSectionWidget);
+    Style::setStyle(headerLabel, style::properties::label::menuMedium);
     menuSectionWidget->setFixedHeight(180);
-    menuSectionWidget->contentLayout()->setSpacing(10);
-    menuSectionWidget->contentLayout()->addWidget(menuCollapseSection);
+    menuSectionWidget->contentLayout()->setSpacing(Style::getDimension(json::global::unit_0_5));
 
     QLabel *descriptionLabel = new QLabel(description, menuSectionWidget);
     descriptionLabel->setWordWrap(true);
@@ -62,7 +62,7 @@ RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, ui
     buttonsWidget->setLayout(buttonsContainer);
 
     buttonsContainer->setMargin(0);
-    buttonsContainer->setSpacing(10);
+    buttonsContainer->setSpacing(Style::getDimension(json::global::unit_0_5));
     switch(m_accessPermission)
     {
         case ACCESS_PERMISSION::READWRITE:
@@ -78,10 +78,10 @@ RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, ui
             break;
     }
 
-    menuCollapseSection->contentLayout()->setSpacing(10);
-    menuCollapseSection->contentLayout()->addWidget(descriptionLabel);
-    menuCollapseSection->contentLayout()->addWidget(m_spinBox);
-    menuCollapseSection->contentLayout()->addWidget(buttonsWidget);
+    menuSectionWidget->contentLayout()->addWidget(headerLabel);
+    menuSectionWidget->contentLayout()->addWidget(descriptionLabel);
+    menuSectionWidget->contentLayout()->addWidget(m_spinBox);
+    menuSectionWidget->contentLayout()->addWidget(buttonsWidget);
     
     container->addWidget(menuSectionWidget);
     container->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::Preferred));
@@ -110,7 +110,7 @@ RegisterBlockWidget::ACCESS_PERMISSION RegisterBlockWidget::getAccessPermission(
 void RegisterBlockWidget::addReadButton(QWidget *parent)
 {
     m_readButton = new QPushButton("Read", parent);
-    StyleHelper::BasicButton(m_readButton);
+    Style::setStyle(m_readButton, style::properties::button::basicButton);
     parent->layout()->addWidget(m_readButton);
 }
 
@@ -119,49 +119,11 @@ QPushButton *RegisterBlockWidget::readButton() { return m_readButton; }
 void RegisterBlockWidget::addWriteButton(QWidget *parent)
 {
     m_writeButton = new QPushButton("Write", parent);
-    StyleHelper::BasicButton(m_writeButton);
+    Style::setStyle(m_writeButton, style::properties::button::basicButton);
     parent->layout()->addWidget(m_writeButton);
 }
 
 QPushButton *RegisterBlockWidget::writeButton() { return m_writeButton; }
-
-void RegisterBlockWidget::applyLineEditStyle(QLineEdit *widget)
-{
-    QString style = QString(R"css(
-                                background-color: black;
-                                font-family: Open Sans;
-								font-size: 16px;
-                                color: &&colorname&&;
-                                border: none;
-                                border-radius: 4px;
-                                qproperty-frame: false;
-                                )css");
-    style = style.replace(QString("&&colorname&&"), Style::getAttribute(json::global::ch0));
-    widget->setStyleSheet(style);
-    widget->setFixedHeight(30);
-    widget->setAlignment(Qt::AlignRight);
-    widget->setContentsMargins(0, 0, 0, 0);
-    widget->setTextMargins(6, 4, 6, 4);
-}
-
-void RegisterBlockWidget::applySpinBoxStyle(QSpinBox *widget)
-{
-    QString style = QString(R"css(
-                                background-color: black;
-                                font-family: Open Sans;
-								font-size: 16px;
-                                color: &&colorname&&;
-                                border: none;
-                                border-radius: 4px;
-                                font-weight: normal;
-                                )css");
-    style = style.replace(QString("&&colorname&&"), Style::getAttribute(json::global::ch0));
-    widget->setStyleSheet(style);
-    widget->setFixedHeight(30);
-    widget->setAlignment(Qt::AlignRight);
-    widget->setContentsMargins(12, 4, 12, 4);
-    widget->setButtonSymbols(widget->ButtonSymbols::NoButtons);
-}
 
 PaddedSpinBox::PaddedSpinBox(QWidget *parent)
     : QSpinBox(parent)

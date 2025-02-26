@@ -113,24 +113,26 @@ public Q_SLOTS:
 	void stop();
 	void start();
 	void restart();
-	void commandLogWrite(QString message);
+	void calibrationLogWrite(QString message = "");
+	void commandLogWrite(QString message = "");
 	void updateFaultStatus(bool value);
 	void updateMotorPosition(double position);
-	void updateDIGIOUI(uint32_t *registerValue);
-	void updateFaultRegisterUI(uint32_t *registerValue);
-	void updateMTDiagnosticRegisterUI(uint32_t *registerValue);
-	void updateMTDiagnosticsUI(uint32_t *registerValue);
+	void updateDIGIOUI(uint16_t *registerValue);
+	void updateFaultRegisterUI(uint16_t *registerValue);
+	void updateMTDiagnosticRegisterUI(uint16_t *registerValue);
+	void updateMTDiagnosticsUI(uint16_t *registerValue);
 Q_SIGNALS:
 	void runningChanged(bool);
 	void canCalibrateChanged(bool);
 	void updateUtilityUI();
+	void calibrationLogWriteSignal(QString message);
 	void commandLogWriteSignal(QString message);
 	void updateFaultStatusSignal(bool value);
 	void motorPositionChanged(double position);
-	void DIGIORegisterChanged(uint32_t *registerValue);
-	void FaultRegisterChanged(uint32_t *registerValue);
-	void DIAG1RegisterChanged(uint32_t *registerValue);
-	void DIAG2RegisterChanged(uint32_t *registerValue);
+	void DIGIORegisterChanged(uint16_t *registerValue);
+	void FaultRegisterChanged(uint16_t *registerValue);
+	void DIAG1RegisterChanged(uint16_t *registerValue);
+	void DIAG2RegisterChanged(uint16_t *registerValue);
 private:
 	ADMTController *m_admtController;
 	iio_context *m_ctx;
@@ -142,7 +144,8 @@ private:
 
 	const char *rotationChannelName, *angleChannelName, *countChannelName, *temperatureChannelName;
 
-	double rotation, angle, count, temp = 0.0, amax, rotate_vmax, dmax, disable, target_pos, current_pos, ramp_mode,
+	double rotation, angle, count, temp = 0.0, 
+		   motor_rpm, amax, rotate_vmax, dmax, disable, target_pos, current_pos, ramp_mode,
 		afeDiag0, afeDiag1, afeDiag2;
 
 	QPushButton *openLastMenuButton, *calibrationStartMotorButton,
@@ -150,7 +153,7 @@ private:
 				*clearCommandLogButton, *applySequenceButton, *readAllRegistersButton;
 	QButtonGroup *rightMenuButtonGroup;
 
-	QLineEdit 	*motorTargetPositionLineEdit, *graphUpdateIntervalLineEdit, *displayLengthLineEdit,
+	QLineEdit 	*acquisitionMotorRPMLineEdit, *calibrationMotorRPMLineEdit, *motorTargetPositionLineEdit, *graphUpdateIntervalLineEdit, *displayLengthLineEdit,
 				*dataGraphSamplesLineEdit, *tempGraphSamplesLineEdit, 
 				*acquisitionMotorCurrentPositionLineEdit,
 				*calibrationH1MagLineEdit, *calibrationH2MagLineEdit, 
@@ -179,7 +182,8 @@ private:
 	MenuSectionWidget *rightMenuSectionWidget;
 	MenuCollapseSection *rotationCollapse, *angleCollapse, *countCollapse, *tempCollapse;
 	MenuCombo *m_dataGraphChannelMenuCombo, *m_dataGraphDirectionMenuCombo, *m_tempGraphDirectionMenuCombo, *m_calibrationMotorRampModeMenuCombo,
-			  *sequenceTypeMenuCombo, *conversionTypeMenuCombo, *cnvSourceMenuCombo, *convertSynchronizationMenuCombo, *angleFilterMenuCombo, *eighthHarmonicMenuCombo;
+			  *sequenceTypeMenuCombo, *conversionTypeMenuCombo, *cnvSourceMenuCombo, *convertSynchronizationMenuCombo, *angleFilterMenuCombo, *eighthHarmonicMenuCombo,
+			  *calibrationModeMenuCombo;
 
 	QTabWidget *tabWidget, *calibrationDataGraphTabWidget, *resultDataTabWidget;
 
@@ -213,7 +217,7 @@ private:
 
 	HorizontalSpinBox *motorMaxVelocitySpinBox, *motorAccelTimeSpinBox, *motorMaxDisplacementSpinBox, *motorTargetPositionSpinBox;
 
-	CustomSwitch *calibrationDisplayFormatSwitch, 
+	CustomSwitch *acquisitionMotorDirectionSwitch, *calibrationMotorDirectionSwitch, *calibrationDisplayFormatSwitch, 
 		*DIGIO0ENToggleSwitch, *DIGIO0FNCToggleSwitch, 
 		*DIGIO1ENToggleSwitch, *DIGIO1FNCToggleSwitch,
 		*DIGIO2ENToggleSwitch, *DIGIO2FNCToggleSwitch,
@@ -226,10 +230,12 @@ private:
 
 	QFuture<void> m_deviceStatusThread, m_currentMotorPositionThread,
 				  m_acquisitionUIThread, m_acquisitionDataThread, m_acquisitionGraphThread,
-				  m_calibrationUIThread, m_utilityUIThread, m_utilityThread;
+				  m_calibrationUIThread, m_calibrationStreamThread, m_calibrationWaitVelocityThread, m_calibrationContinuousThread, 
+				  m_resetMotorToZeroThread, m_utilityUIThread, m_utilityThread;
 	QFutureWatcher<void> m_deviceStatusWatcher, m_currentMotorPositionWatcher,
 						 m_acquisitionUIWatcher, m_acquisitionDataWatcher, m_acquisitionGraphWatcher,
-						 m_calibrationUIWatcher, m_utilityUIWatcher, m_utilityWatcher;
+						 m_calibrationUIWatcher, m_calibrationStreamWatcher, m_calibrationWaitVelocityWatcher, m_calibrationContinuousWatcher, 
+						 m_resetMotorToZeroWatcher, m_utilityUIWatcher, m_utilityWatcher;
 
 	ToolTemplate* createAcquisitionWidget();
 	ToolTemplate* createCalibrationWidget();
@@ -239,6 +245,7 @@ private:
 	void readDeviceProperties();
 	void initializeADMT();
 	bool readSequence();
+	bool writeSequence(const map<string, int> &settings);
 	void applySequence();
 	bool changeCNVPage(uint32_t page);
 	void initializeMotor();
@@ -256,6 +263,8 @@ private:
 	void updateLineEditValues();
 	void startAcquisition();
 	void stopAcquisition();
+	void updateAcquisitionMotorRPM();
+	void updateAcquisitionMotorRotationDirection();
 	void getAcquisitionSamples(int sampleRate);
 	double getAcquisitionParameterValue(const AcquisitionDataKey &key);
 	void plotAcquisition(QVector<double>& list, PlotChannel* channel);
@@ -276,16 +285,29 @@ private:
 	void startCalibrationUITask();
 	void stopCalibrationUITask();
 	void calibrationUITask(int sampleRate);
+	void updateCalibrationMotorRPM();
+	void updateCalibrationMotorRotationDirection();
 	void getCalibrationSamples();
 	void startCalibration();
 	void stopCalibration();
-	void startMotor();
-	void startMotorContinuous();
+	void startContinuousCalibration();
+	void stopContinuousCalibration();
+	void startCalibrationStreamThread();
+	void stopCalibrationStreamThread();
+	void startWaitForVelocityReachedThread(int mode);
+	void stopWaitForVelocityReachedThread();
+	void waitForVelocityReached(int mode, int sampleRate);
+	int calculateContinuousCalibrationSampleRate(double motorRPS, int samplesPerCycle);
+	void configureConversionType(int mode);
+	void configureCalibrationSequenceSettings();
+	void getStreamedCalibrationSamples(int microSampleRate);
+	void startOneShotCalibration();
 	void postCalibrateData();
 	void resetAllCalibrationState();
 	void computeSineCosineOfAngles(QVector<double> graphDataList);
 	void populateAngleErrorGraphs();
 	void populateCorrectedAngleErrorGraphs();
+	void clearHarmonicRegisters();
 	void flashHarmonicValues();
 	void calculateHarmonicValues();
 	void updateCalculatedCoeffAngle();
@@ -293,13 +315,13 @@ private:
 	void resetCalculatedCoeffAngle();
 	void resetCalculatedCoeffHex();
 	void displayCalculatedCoeff();
-	void calibrationLogWrite(QString message = "");
 	void importCalibrationData();
 	void extractCalibrationData();
 	void toggleTabSwitching(bool value);
+	void toggleCalibrationButtonState(int state);
 	void canStartMotor(bool value);
 	void canCalibrate(bool);
-	void toggleMotorControls(bool value);
+	void toggleCalibrationControls(bool value);
 	void clearCalibrationSamples();
 	void clearCalibrationSineCosine();
 	void clearPostCalibrationSamples();
@@ -309,10 +331,17 @@ private:
 
 	#pragma region Motor Methods
 	bool moveMotorToPosition(double& position, bool validate = true);
+	void moveMotorContinuous();
 	bool resetCurrentPositionToZero();
 	void stopMotor();
 	int readMotorAttributeValue(ADMTController::MotorAttribute attribute, double& value);
 	int writeMotorAttributeValue(ADMTController::MotorAttribute attribute, double value);
+	int readMotorRegisterValue(uint32_t address, uint32_t *value);
+	void setRampMode(bool motorRotationClockwise);
+	void getRampMode();
+	void startResetMotorToZero();
+	void stopResetMotorToZero();
+	void resetMotorToZero();
 	#pragma endregion
 
 	#pragma region Utility Methods
@@ -345,12 +374,7 @@ private:
 	void updateLineEditValue(QLineEdit* lineEdit, double value);
 	void toggleWidget(QPushButton *widget, bool value);
 	void changeCustomSwitchLabel(CustomSwitch *customSwitch, QString onLabel, QString offLabel);
-	void changeStatusLEDColor(MenuControlButton *menuControlButton, QColor color, bool checked = true);
-	void changeStatusLEDColor(QCheckBox *widget, const char *colorAttribute);
-	void updateFaultStatusLEDColor(MenuControlButton *widget, bool value);
-	void toggleStatusLEDColor(QCheckBox *widget, const char *trueAttribute, const char* falseAttribute, bool value);
-	MenuControlButton *createStatusLEDWidget(const QString title, QColor color, QWidget *parent = nullptr);
-	QCheckBox *createStatusLEDWidget(const QString &text, const char *colorAttribute, bool checked = false, QWidget *parent = nullptr);
+	QCheckBox *createStatusLEDWidget(const QString &text, QVariant variant = true, bool checked = false, QWidget *parent = nullptr);
 	MenuControlButton *createChannelToggleWidget(const QString title, QColor color, QWidget *parent = nullptr);
 	#pragma endregion
 
@@ -364,6 +388,7 @@ private:
 	void connectLineEditToRPSConversion(QLineEdit* lineEdit, double& vmax);
 	void connectLineEditToAMAXConversion(QLineEdit* lineEdit, double& amax);
 	void connectRegisterBlockToRegistry(RegisterBlockWidget* widget);
+	void connectLineEditToRPM(QLineEdit* lineEdit, double& variable);
 	#pragma endregion
 
 	#pragma region Convert Methods
@@ -371,6 +396,8 @@ private:
 	double convertVMAXtoRPS(double vmax);
 	double convertAccelTimetoAMAX(double accelTime);
 	double convertAMAXtoAccelTime(double amax);
+	double convertRPMtoRPS(double rpm);
+	double convertRPStoRPM(double rps);
 	#pragma endregion
 
 	#pragma region Debug Methods
