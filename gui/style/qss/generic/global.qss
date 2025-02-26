@@ -204,8 +204,8 @@ QTabBar::tab {
 }
 
 QTabBar::tab:selected {
-	background: &background_primary&;
-	color: &interactive_primary_idle&;
+	background: &interactive_subtle_disabled&;
+	color: &content_default&;
 	border-bottom: 1px solid &interactive_primary_idle&;
 }
 
