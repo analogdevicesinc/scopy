@@ -22,7 +22,6 @@
 #include "admtcontroller.h"
 
 #include <iioutil/connectionprovider.h>
-
 #include <string>
 #include <cstdint>
 #include <algorithm>
@@ -37,8 +36,11 @@
 #include <complex>
 #include <iterator>
 #include <iomanip>
+#include <thread>
 
 static const size_t maxAttrSize = 512;
+
+static char *streamBuffer = new char[maxAttrSize];
 
 using namespace scopy::admt;
 using namespace std;
@@ -47,6 +49,9 @@ ADMTController::ADMTController(QString uri, QObject *parent)
     :QObject(parent)
     , uri(uri)
 {
+    connect(this, &ADMTController::streamData, this, &ADMTController::handleStreamData);
+    connect(this, &ADMTController::streamBufferedData, this, &ADMTController::handleStreamBufferedData);
+    connect(this, &ADMTController::streamBufferedDataInterval, this, &ADMTController::handleStreamBufferedDataInterval);
 }
 
 ADMTController::~ADMTController() {}
@@ -160,6 +165,14 @@ const uint32_t ADMTController::getUniqueIdPage(UniqueIDRegister registerID)
 {
 	if(registerID >= 0 && registerID < UNIQID_REGISTER_COUNT){
 		return UniqueIdPages[registerID];
+	}
+	return UINT32_MAX;
+}
+
+const uint32_t ADMTController::getRampGeneratorDriverFeatureControlRegister(RampGeneratorDriverFeatureControlRegister registerID)
+{
+	if(registerID >= 0 && registerID < RAMP_GENERATOR_DRIVER_FEATURE_CONTROL_REGISTER_COUNT){
+		return RampGeneratorDriverFeatureControlRegisters[registerID];
 	}
 	return UINT32_MAX;
 }
@@ -529,8 +542,8 @@ void ADMTController::unwrapAngles(vector<double>& angles_rad) {
     }
 }
 
-QString ADMTController::calibrate(vector<double> PANG, int cycleCount, int samplesPerCycle) {
-    int CCW = 0, circshiftData = 0;
+QString ADMTController::calibrate(vector<double> PANG, int cycleCount, int samplesPerCycle, bool CCW) {
+    int circshiftData = 0;
     QString result = "";
 
     /* Check CCW flag to know if array is to be reversed */
@@ -551,10 +564,10 @@ QString ADMTController::calibrate(vector<double> PANG, int cycleCount, int sampl
     getPreCalibrationFFT(PANG, angle_errors_fft_pre, angle_errors_fft_phase_pre, cycleCount, samplesPerCycle);
 
     // Extract HMag parameters
-    double H1Mag = angle_errors_fft_pre[cycleCount + 1];
-    double H2Mag = angle_errors_fft_pre[2 * cycleCount + 1];
-    double H3Mag = angle_errors_fft_pre[3 * cycleCount + 1];
-    double H8Mag = angle_errors_fft_pre[8 * cycleCount + 1];
+    double H1Mag = angle_errors_fft_pre[cycleCount];
+    double H2Mag = angle_errors_fft_pre[2 * cycleCount];
+    double H3Mag = angle_errors_fft_pre[3 * cycleCount];
+    double H8Mag = angle_errors_fft_pre[8 * cycleCount];
 
     /* Display HMAG values */
     result.append("H1Mag = " + QString::number(H1Mag) + "\n");
@@ -563,10 +576,10 @@ QString ADMTController::calibrate(vector<double> PANG, int cycleCount, int sampl
     result.append("H8Mag = " + QString::number(H8Mag) + "\n");
 
     // Extract HPhase parameters
-    double H1Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[cycleCount + 1]);
-    double H2Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[2 * cycleCount + 1]);
-    double H3Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[3 * cycleCount + 1]);
-    double H8Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[8 * cycleCount + 1]);
+    double H1Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[cycleCount]);
+    double H2Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[2 * cycleCount]);
+    double H3Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[3 * cycleCount]);
+    double H8Phase = (180 / M_PI) * (angle_errors_fft_phase_pre[8 * cycleCount]);
 
     /* Display HPHASE values */
     result.append("H1Phase = " + QString::number(H1Phase) + "\n");
@@ -580,7 +593,7 @@ QString ADMTController::calibrate(vector<double> PANG, int cycleCount, int sampl
     double H8 = H8Mag * cos(M_PI / 180 * (H8Phase));
 
     double init_err = H1 + H2 + H3 + H8;
-    double init_angle = PANG[1] - init_err;
+    double init_angle = PANG[0] - init_err;
     
     double H1PHcor, H2PHcor, H3PHcor, H8PHcor;
 
@@ -654,15 +667,10 @@ void ADMTController::getPreCalibrationFFT(const vector<double>& PANG, vector<dou
     // Store the FFT Angle Error Magnitude and Phase
     FFTAngleErrorMagnitude = angle_errors_fft_pre;
     FFTAngleErrorPhase = angle_errors_fft_phase_pre;
-
-    // Multiply the FFT magnitudes by 2
-    for (auto& magnitude : angle_errors_fft_pre) {
-        magnitude *= 2;
-    }
 }
 
-void ADMTController::postcalibrate(vector<double> PANG, int cycleCount, int samplesPerCycle){
-    int CCW = 0, circshiftData = 0;
+void ADMTController::postcalibrate(vector<double> PANG, int cycleCount, int samplesPerCycle, bool CCW){
+    int circshiftData = 0;
     QString result = "";
 
     /* Check CCW flag to know if array is to be reversed */
@@ -1583,4 +1591,179 @@ bool ADMTController::checkRegisterFault(uint16_t registerValue, bool isMode1) {
                ((registerValue >> 1)  & 0x01) || // VDD Over Voltage
                ((registerValue >> 0)  & 0x01);  // VDD Under Voltage
     }
+}
+
+int ADMTController::streamIO()
+{
+    int result = -1;
+    const char *deviceName = "admt4000";
+    const char *channelName = "rot";
+    const char *scaleAttrName = "scale";
+    const char *offsetAttrName = "offset";
+    size_t samples = 1;
+    bool isOutput = false;
+    bool isCyclic = false;
+
+    unsigned int i, j, major, minor;
+    char git_tag[8];
+    iio_library_get_version(&major, &minor, git_tag);
+    bool has_repeat = ((major * 10000) + minor) >= 8 ? true : false;
+
+    double *scaleAttrValue = new double(1);
+    int offsetAttrValue = 0;
+    char *offsetDst = new char[maxAttrSize];
+
+    if(!m_iioCtx) return result; // Check if the context is valid
+    if(iio_context_get_devices_count(m_iioCtx) < 1) return result; // Check if there are devices in the context
+    struct iio_device *admtDevice = iio_context_find_device(m_iioCtx, deviceName); // Find the ADMT device
+    if(admtDevice == NULL) return result;
+    struct iio_channel *channel = iio_device_find_channel(admtDevice, channelName, isOutput); // Find the rotation channel
+    if(channel == NULL) return result;
+    iio_channel_enable(channel); // Enable the channel
+    int scaleRet = iio_channel_attr_read_double(channel, scaleAttrName, scaleAttrValue); // Read the scale attribute
+    if(scaleRet != 0) return scaleRet;
+    iio_channel_attr_read(channel, offsetAttrName, offsetDst, maxAttrSize); // Read the offset attribute
+    offsetAttrValue = atoi(offsetDst);
+    struct iio_buffer *buffer = iio_device_create_buffer(admtDevice, samples, isCyclic); // Create a buffer
+    
+    while(!stopStream)
+    {
+        ssize_t numBytesRead;
+        char *pointerData, *pointerEnd;
+        ptrdiff_t pointerIncrement;
+
+        numBytesRead = iio_buffer_refill(buffer);
+        if(numBytesRead < 0) break;
+
+        pointerIncrement = iio_buffer_step(buffer);
+        pointerEnd = static_cast<char*>(iio_buffer_end(buffer));
+
+        const struct iio_data_format *format = iio_channel_get_data_format(channel);
+        unsigned int repeat = has_repeat ? format->repeat : 1;
+        
+        for(pointerData = static_cast<char*>(iio_buffer_first(buffer, channel)); pointerData < pointerEnd; pointerData += pointerIncrement)
+        {
+            for(int j = 0; j < repeat; j++)
+            {
+                if(format->length / 8 == sizeof(int16_t))
+                {
+                    int16_t rawValue = (reinterpret_cast<int16_t*>(pointerData))[j];
+                    double scaledValue = (rawValue - offsetAttrValue) * *scaleAttrValue;
+                    Q_EMIT streamData(scaledValue);
+                }
+            }
+        }
+    }
+
+    iio_buffer_destroy(buffer);
+    return 0;
+}
+
+void ADMTController::handleStreamData(double value)
+{
+    streamedValue = value;
+}
+
+void ADMTController::bufferedStreamIO(int totalSamples, int targetSampleRate)
+{
+    streamBufferedIntervals.clear();
+    QVector<double> bufferedValues;
+    vector<uint16_t> rawBufferedValues;
+    sampleCount = 0;
+
+    int result = -1;
+    const char *deviceName = "admt4000";
+    const char *channelName = "rot";
+    const char *scaleAttrName = "scale";
+    const char *offsetAttrName = "offset";
+    size_t samples = 1;
+    bool isOutput = false;
+    bool isCyclic = true;
+
+    unsigned int i, j, major, minor;
+    char git_tag[8];
+    iio_library_get_version(&major, &minor, git_tag);
+    bool has_repeat = ((major * 10000) + minor) >= 8 ? true : false;
+
+    double *scaleAttrValue = new double(1);
+    int offsetAttrValue = 0;
+    char *offsetDst = new char[maxAttrSize];
+
+    if(!m_iioCtx) return; // result; // Check if the context is valid
+    if(iio_context_get_devices_count(m_iioCtx) < 1) return; // result; // Check if there are devices in the context
+    struct iio_device *admtDevice = iio_context_find_device(m_iioCtx, deviceName); // Find the ADMT device
+    if(admtDevice == NULL) return; // result;
+    struct iio_channel *channel = iio_device_find_channel(admtDevice, channelName, isOutput); // Find the rotation channel
+    if(channel == NULL) return; // result;
+    iio_channel_enable(channel); // Enable the channel
+    int scaleRet = iio_channel_attr_read_double(channel, scaleAttrName, scaleAttrValue); // Read the scale attribute
+    if(scaleRet != 0) return; // scaleRet;
+    iio_channel_attr_read(channel, offsetAttrName, offsetDst, maxAttrSize); // Read the offset attribute
+    offsetAttrValue = atoi(offsetDst);
+    struct iio_buffer *buffer = iio_device_create_buffer(admtDevice, samples, isCyclic); // Create a buffer
+    
+    while(!stopStream && sampleCount < totalSamples)
+    {
+        elapsedStreamTimer.start();
+
+        ssize_t numBytesRead;
+        char *pointerData, *pointerEnd;
+        ptrdiff_t pointerIncrement;
+
+        numBytesRead = iio_buffer_refill(buffer);
+        if(numBytesRead < 0) break;
+
+        pointerIncrement = iio_buffer_step(buffer);
+        pointerEnd = static_cast<char*>(iio_buffer_end(buffer));
+
+        const struct iio_data_format *format = iio_channel_get_data_format(channel);
+        unsigned int repeat = has_repeat ? format->repeat : 1;
+        int j = 0;
+
+        for(pointerData = static_cast<char*>(iio_buffer_first(buffer, channel)); pointerData < pointerEnd; pointerData += pointerIncrement)
+        {
+            for(j = 0; j < repeat; j++)
+            {
+                if(format->length / 8 == sizeof(int16_t))
+                {
+                    rawBufferedValues.push_back((reinterpret_cast<int16_t*>(pointerData))[j]);
+                    sampleCount++;
+                    continue;
+                }
+            }
+        }
+
+        qint64 elapsedNanoseconds = elapsedStreamTimer.nsecsElapsed();
+        while(elapsedNanoseconds < targetSampleRate)
+        {
+            elapsedNanoseconds = elapsedStreamTimer.nsecsElapsed();
+        }
+        streamBufferedIntervals.append(elapsedNanoseconds);
+    }
+    iio_buffer_destroy(buffer);
+
+    for(int i = 0; i < rawBufferedValues.size(); i++)
+    {
+        double scaledValue = (rawBufferedValues[i] - offsetAttrValue) * *scaleAttrValue;
+        bufferedValues.append(scaledValue);
+    }
+
+    Q_EMIT streamBufferedData(bufferedValues);
+    Q_EMIT streamBufferedDataInterval(streamBufferedIntervals);
+}
+
+void ADMTController::handleStreamBufferedData(const QVector<double> &value)
+{
+    streamBufferedValues = value;
+}
+
+bool ADMTController::checkVelocityReachedFlag(uint16_t registerValue)
+{
+    // Bit 8 - 1: Signals that the target velocity is reached. This flag becomes set while VACTUAL and VMAX match. 
+    return ((registerValue >> 8) & 0x01) ? true : false;
+}
+
+void ADMTController::handleStreamBufferedDataInterval(const QVector<uint32_t> &value)
+{
+    streamBufferedIntervals = value;
 }

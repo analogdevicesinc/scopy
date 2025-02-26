@@ -1,10 +1,46 @@
-QCheckBox[&&property&&=true] {
+QCheckBox[&&property&&="status"] {
 	width: &unit_1&;
 	height: &unit_1&;
 	background-color: transparent;
 	color: &content_default&;
 }
-QCheckBox::indicator[&&property&&=true] {
+QCheckBox::indicator[&&property&&="status"] {
+	width: 12px;
+	height: 12px;
+	border: 1px solid &content_default&;
+	border-radius: 7px;
+	image: none;
+	background-color: &content_success&;
+}
+QCheckBox::indicator[&&property&&="status"]:checked {
+	background-color: &content_error&;
+}
+
+QCheckBox[&&property&&="digio"] {
+	width: &unit_1&;
+	height: &unit_1&;
+	background-color: transparent;
+	color: &content_default&;
+}
+QCheckBox::indicator[&&property&&="digio"] {
+	width: 12px;
+	height: 12px;
+	border: 1px solid &content_default&;
+	border-radius: 7px;
+	image: none;
+	background-color: &content_success&;
+}
+QCheckBox::indicator[&&property&&="digio"]:checked {
+	background-color: &interactive_primary_idle&;
+}
+
+QCheckBox[&&property&&="fault"] {
+	width: &unit_1&;
+	height: &unit_1&;
+	background-color: transparent;
+	color: &content_default&;
+}
+QCheckBox::indicator[&&property&&="fault"] {
 	width: 12px;
 	height: 12px;
 	border: 1px solid &content_default&;
@@ -12,9 +48,24 @@ QCheckBox::indicator[&&property&&=true] {
 	image: none;
 	background-color: &background_primary&;
 }
-QCheckBox::indicator:checked {
+QCheckBox::indicator[&&property&&="fault"]:checked {
+	background-color: &content_error&;
+}
+
+QCheckBox[&&property&&="mtdiag"] {
+	width: &unit_1&;
+	height: &unit_1&;
+	background-color: transparent;
+	color: &content_default&;
+}
+QCheckBox::indicator[&&property&&="mtdiag"] {
+	width: 12px;
+	height: 12px;
+	border: 1px solid &content_default&;
+	border-radius: 7px;
+	image: none;
 	background-color: &background_primary&;
 }
-QCheckBox::indicator[&&property&&=true]::unchecked { 
-	background-color: &background_primary&; 
+QCheckBox::indicator[&&property&&="mtdiag"]:checked {
+	background-color: &content_success&;
 }
