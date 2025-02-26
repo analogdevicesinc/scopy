@@ -59,15 +59,14 @@ file(
     include/${SCOPY_MODULE}/*.h 
     include/${SCOPY_MODULE}/*.hpp
     include/${SCOPY_MODULE}/widgets/*.h
-) 
-file(GLOB UI_LIST ui/*.ui) 
+)
 
 set(ENABLE_TESTING ON)
 if(ENABLE_TESTING) 
     add_subdirectory(test) 
 endif() 
 
-set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST}) 
+set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST}) 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core) 
 
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc) 
@@ -96,9 +95,7 @@ target_link_libraries(
         Qt::Core 
         scopy-pluginbase 
         scopy-gui 
-        scopy-iioutil 
-        scopy-gr-util
-        scopy-iio-widgets
+        scopy-iioutil
 )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
