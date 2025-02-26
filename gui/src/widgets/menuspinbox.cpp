@@ -32,6 +32,8 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 {
 	m_large_widget = large_widget;
 	m_label = new QLabel(name, parent);
+	Style::setStyle(m_label, style::properties::label::subtle);
+
 	m_edit = new QLineEdit("0", parent);
 	m_scaleCb = new QComboBox(parent);
 	m_plus = new QPushButton("", parent);
@@ -91,7 +93,7 @@ void MenuSpinbox::layoutVertically(bool left)
 	auto lay = new QHBoxLayout(this);
 	setLayout(lay);
 
-	lay->setSpacing(5);
+	lay->setSpacing(0);
 	lay->setMargin(0);
 
 	QLayout *btnLay;
@@ -101,7 +103,7 @@ void MenuSpinbox::layoutVertically(bool left)
 	editLay = new QVBoxLayout();
 
 	btnLay->setSpacing(2);
-	btnLay->setMargin(0);
+	btnLay->setContentsMargins(5, 0, 0, 0);
 	editLay->setSpacing(2);
 	editLay->setMargin(0);
 

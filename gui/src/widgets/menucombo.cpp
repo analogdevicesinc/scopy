@@ -20,6 +20,7 @@
  */
 
 #include <QVBoxLayout>
+#include <style.h>
 
 #include <widgets/menucombo.h>
 
@@ -56,6 +57,8 @@ MenuCombo::MenuCombo(QString title, QWidget *parent)
 	lay->setMargin(0);
 
 	m_label = new QLabel(title, this);
+	Style::setStyle(m_label, style::properties::label::subtle);
+
 	m_combo = new QComboBox(this);
 
 	lay->addWidget(m_label);

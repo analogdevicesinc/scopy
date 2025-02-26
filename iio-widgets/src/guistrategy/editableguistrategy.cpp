@@ -33,9 +33,9 @@ EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isC
 
 	if(isCompact) {
 		m_ui->setLayout(new QHBoxLayout(m_ui));
-		Style::setStyle(label, style::properties::label::iioCompactLabel);
 		m_lineEdit->edit()->setAlignment(Qt::AlignRight);
 	} else {
+		Style::setStyle(label, style::properties::label::subtle);
 		m_ui->setLayout(new QVBoxLayout(m_ui));
 	}
 
@@ -44,6 +44,7 @@ EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isC
 	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 	m_ui->layout()->addWidget(label);
 	m_ui->layout()->addWidget(m_lineEdit);
+	m_ui->layout()->setSpacing(0);
 
 	connect(m_lineEdit->edit(), &QLineEdit::editingFinished, this, [this]() {
 		QString currentText = m_lineEdit->edit()->text();

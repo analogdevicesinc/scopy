@@ -20,6 +20,7 @@
  */
 
 #include "guidetailsview.h"
+#include "style.h"
 
 using namespace scopy::debugger;
 
@@ -41,6 +42,7 @@ void GuiDetailsView::setupUi()
 	m_scrollAreaContents->setLayout(new QVBoxLayout(m_scrollAreaContents));
 	m_scrollAreaContents->setObjectName("DetailsViewScrollAreaContents");
 	m_scrollAreaContents->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	m_scrollAreaContents->layout()->setSpacing(Style::getDimension(json::global::unit_1));
 
 	m_scrollArea->setWidgetResizable(true);
 	m_scrollArea->setWidget(m_scrollAreaContents);
