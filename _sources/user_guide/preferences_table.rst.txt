@@ -59,27 +59,12 @@
    * - general_plot_target_fps
      - Plot target FPS
      - Select the Frames per second value for rendering plots in the entire application.
-   * - adc_acquisition_timeout
-     - ADC Acquisition timeout
-     - Select the timeout for the I/O operation. A valid value is a positive integer representing the time in milliseconds after which a timeout should occur. 
-   * - adc_plot_xaxis_label_position
-     - Plot X-Axis scale position
-     - Select whether the X-Axis labels are displayed on the top or bottom of the plot. Only applied after restart.
-   * - adc_plot_yaxis_label_position
-     - Plot Y-Axis scale position
-     - Select whether the Y-Axis labels are displayed on the left or right side of the       plot. Only applied after restart.
-   * - adc_plot_yaxis_handle_position
-     - Plot channel Y-handle position
-     - Select whether the Y-Axis handle is located on the left or right side of the plot. Only applied after restart.
-   * - adc_plot_xcursor_position
-     - Plot X-Cursor position
-     - Select whether the X-Axis cursor handles are located on the top or bottom of the plot. Only applied after restart.
-   * - adc_plot_ycursor_position
-     - Plot Y-Cursor position
-     - Select whether the Y-Axis cursor handles are located on the left or right side of the plot. Only applied after restart.
-   * - adc_default_y_mode
-     - ADC Default Y-Mode
-     - Select the Y-Axis default mode, can be either ADC Counts or %Full Scale. This is also controllable while running, from the instrument settings. Only applied after restart.
+   * - dataloggerplugin_date_time_format
+     - DateTime format :
+     - Select the date time format of the instrument. Default value is: hh:mm:ss
+   * - dataloggerplugin_data_storage_size
+     - Maximum data stored for each monitor
+     - Select the maximum data storage size for each monitor in the datalogger.
    * - m2k_instrument_notes_active
      - Instrument Notes
      - Enable or disable a text section at the bottom of each ADALM2000 instrument, allowing the user to take notes. Disabled by default.
@@ -119,18 +104,33 @@
    * - m2k_siggen_periods
      - Number of displayed periods
      - Select the number of displayed signal periods in the Signal Generator. Default value is 2.
-   * - dataloggerplugin_date_time_format
-     - DateTime format :
-     - Select the date time format of the instrument. Default value is: hh:mm:ss
-   * - dataloggerplugin_data_storage_size
-     - Maximum data stored for each monitor
-     - Select the maximum data storage size for each monitor in the datalogger.
    * - plugins_use_debugger_v2
      - Use Debugger V2 plugin
      - Switch between the old style debugger instrument, having     just basic controls over attributes or the new instrument     type, IIO Explorer, having a tree-like structure.
    * - debugger_v2_include_debugfs
      - Include debug attributes in IIO Explorer
      - Enable/disable the use of advanced debug attributes in the instrument.
+   * - adc_acquisition_timeout
+     - ADC Acquisition timeout
+     - Select the timeout for the I/O operation. A valid value is a positive integer representing the time in milliseconds after which a timeout should occur. 
+   * - adc_plot_xaxis_label_position
+     - Plot X-Axis scale position
+     - Select whether the X-Axis labels are displayed on the top or bottom of the plot. Only applied after restart.
+   * - adc_plot_yaxis_label_position
+     - Plot Y-Axis scale position
+     - Select whether the Y-Axis labels are displayed on the left or right side of the       plot. Only applied after restart.
+   * - adc_plot_yaxis_handle_position
+     - Plot channel Y-handle position
+     - Select whether the Y-Axis handle is located on the left or right side of the plot. Only applied after restart.
+   * - adc_plot_xcursor_position
+     - Plot X-Cursor position
+     - Select whether the X-Axis cursor handles are located on the top or bottom of the plot. Only applied after restart.
+   * - adc_plot_ycursor_position
+     - Plot Y-Cursor position
+     - Select whether the Y-Axis cursor handles are located on the left or right side of the plot. Only applied after restart.
+   * - adc_default_y_mode
+     - ADC Default Y-Mode
+     - Select the Y-Axis default mode, can be either ADC Counts or %Full Scale. This is also controllable while running, from the instrument settings. Only applied after restart.
    * - regmap_color_by_value
      - Use color to reflect value
      - Select from various configurations available which elements in the Register Map  are color coded for better visual interpretation.
