@@ -150,6 +150,8 @@ void PlotWidget::plotChannelChangeYAxis(PlotChannel *c, PlotAxis *y)
 	m_navigator->addChannel(c);
 	m_tracker->addChannel(c);
 	showAxisLabels();
+
+	Q_EMIT channelSelected(c);
 }
 
 void PlotWidget::addPlotChannel(PlotChannel *ch)

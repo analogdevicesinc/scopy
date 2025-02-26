@@ -56,6 +56,8 @@ public Q_SLOTS:
 	void setXFormatter(PrefixFormatter *formatter);
 	void setYFormatter(PrefixFormatter *formatter);
 
+	void setColor(QColor color);
+
 private:
 	QWidget *y_contents;
 	QWidget *x_contents;

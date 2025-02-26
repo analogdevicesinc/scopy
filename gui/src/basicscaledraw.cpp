@@ -69,6 +69,8 @@ QString BasicScaleDraw::getUnitType() const { return m_unit; }
 
 void BasicScaleDraw::setColor(QColor color) { m_color = color; }
 
+QColor BasicScaleDraw::getColor() { return m_color; }
+
 void BasicScaleDraw::setDisplayScale(double value) { m_displayScale = value; }
 
 void BasicScaleDraw::setFormatter(PrefixFormatter *formatter) { m_formatter = formatter; }
