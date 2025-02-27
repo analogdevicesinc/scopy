@@ -592,9 +592,9 @@ Test 3: Channel 1 and 2 Operation
 
       Testing channel 1 and 2 simultaneously
       
-        16. On channel 1 and 2’s setting, set Type to Sample, Window Function to Flat-top and Averaging to 1.
+        16. On channel 1 and 2’s setting, set Type to Sample, Window Function to Flat-top.
         17. Connect Scope ch1+ to W1 and Scope ch1- to GND. Connect Scope ch2+ to W2 and Scope ch2- to GND
-        18. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 500 Hz, set the Resolution BW to 488.28 mHz. On signal Generator, Set Channel 1’s Amplitude: 10V, Frequency: 100 Hz, Offset: 0V and Phase: 0 degrees. Amplitude: 10V, Frequency: 300 Hz, Offset: 0V and Phase: 0 degrees
+        18. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 500 Hz, set the Resolution BW to 488.28 mHz. On signal Generator, Set Channel 1’s Amplitude: 10V, Frequency: 100 Hz, Offset: 0V and Phase: 0 degrees. Set Channel 2’s Amplitude: 10V, Frequency: 300 Hz, Offset: 0V and Phase: 0 degrees
         19. Run the Signal Generator and Spectrum Analyzer. Set Marker Table on to monitor marker values.
                 - **Expected Result:** The fundamental frequency should be on 100 Hz for channel 1 and 300 Hz for channel 2. The signals shouldn’t be interfering the other.
                 - **Actual Result:**
@@ -611,7 +611,7 @@ Test 3: Channel 1 and 2 Operation
   Actual test result goes here.
 ..
 
-        21. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 1k Hz, set the Resolution BW to 976.56 mHz. On signal Generator, Set Channel 1’s Amplitude: 10V, Frequency: 200 Hz, Offset: 0V and Phase: 0 degrees. Amplitude: 10V, Frequency: 600 Hz, Offset: 0V and Phase: 0 degrees
+        21. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 1k Hz, set the Resolution BW to 976.56 mHz. On signal Generator, Set Channel 1’s Amplitude: 10V, Frequency: 200 Hz, Offset: 0V and Phase: 0 degrees. Set Channel 2’s Amplitude: 10V, Frequency: 600 Hz, Offset: 0V and Phase: 0 degrees
         22. Run the Signal Generator and Spectrum Analyzer.
                 - **Expected Result:** The fundamental frequency should be on 200 Hz for channel 1 and 600 Hz for channel 2. The signals shouldn’t be interfering the other.
                 - **Actual Result:**
@@ -628,7 +628,7 @@ Test 3: Channel 1 and 2 Operation
   Actual test result goes here.
 ..
 
-        24. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 1k Hz, set the Resolution BW to 976.56 mHz. On signal Generator, Set Channel 1’s Amplitude: 10V, Frequency: 300 Hz, Offset: 0V and Phase: 0 degrees. Amplitude: 10V, Frequency: 700 Hz, Offset: 0V and Phase: 0 degrees
+        24. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 1k Hz, set the Resolution BW to 976.56 mHz. On signal Generator, Set Channel 1’s Amplitude: 10V, Frequency: 300 Hz, Offset: 0V and Phase: 0 degrees. Set Channel 2’s Amplitude: 10V, Frequency: 700 Hz, Offset: 0V and Phase: 0 degrees
         25. Run the Signal Generator and Spectrum Analyzer.
                 - **Expected Result:** The fundamental frequency should be on 300 Hz for channel 1 and 700 Hz for channel 2. The signals shouldn’t be interfering the other.
                 - **Actual Result:**
@@ -662,7 +662,7 @@ Test 3: Channel 1 and 2 Operation
   Actual test result goes here.
 ..
 
-        30. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 20 kHz, set the Resolution BW to 9.77 Hz. On signal Generator, Set Channel 1’s Amplitude: 10V, Frequency: 10 kHz, Offset: 0V and Phase: 0 degrees. Amplitude: 10V, Frequency: 15 kHz, Offset: 0V and Phase: 0 degrees
+        30. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 20 kHz, set the Resolution BW to 9.77 Hz. On signal Generator, Set Channel 1’s Amplitude: 10V, Frequency: 10 kHz, Offset: 0V and Phase: 0 degrees. Set Channel 2’s Amplitude: 10V, Frequency: 15 kHz, Offset: 0V and Phase: 0 degrees
         31. Run the Signal Generator and Spectrum Analyzer.
                 - **Expected Result:** The fundamental frequency should be on 10 kHz for channel 1 and 15 kHz for channel 2. The signals shouldn’t be interfering the other.
                 - **Actual Result:**
@@ -696,7 +696,7 @@ Test 3: Channel 1 and 2 Operation
   Actual test result goes here.
 ..
 
-        36. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 100 kHz, set the Resolution BW to 61.04 Hz. On signal Generator, Set Channel 1’s Amplitude: 10V, Frequency: 50 kHz, Offset: 0V and Phase: 0 degrees. Amplitude: 10V, Frequency: 70 kHz, Offset: 0V and Phase: 0 degrees
+        36. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 100 kHz, set the Resolution BW to 61.04 Hz. On signal Generator, Set Channel 1’s Amplitude: 10V, Frequency: 50 kHz, Offset: 0V and Phase: 0 degrees. Set Channel 2’s Amplitude: 10V, Frequency: 70 kHz, Offset: 0V and Phase: 0 degrees
         37. Run the Signal Generator and Spectrum Analyzer.
                 - **Expected Result:** The fundamental frequency should be on 50 kHz for channel 1 and 70 kHz for channel 2. The signals shouldn’t be interfering the other.
                 - **Actual Result:**
@@ -743,7 +743,7 @@ Test 4: Additional Features
 
 **Steps:**
         1. Testing channel 1’s trace detector type
-        2. On channel 1’s setting, set Type to Sample, Window Function to Flat-top and Averaging to 1.
+        2. On channel 1’s setting, set Type to Sample, Window Function to Flat-top.
         3. Connect Scope ch1+ to W1 and Scope ch1- to GND. Connect Scope ch2+ to W2 and Scope ch2- to GND
         4. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 1MHz, set the Resolution BW to 61.04Hz. On signal Generator, Set Channel 1’s Amplitude: 10V, Frequency: 500 kHz, Offset: 0V and Phase: 0 degrees
         5. Test Peak hold Continuous
@@ -793,7 +793,7 @@ Test 4: Additional Features
 
         Testing the marker table
         
-        11. On channel 1’s setting, set Type to Sample, Window Function to Flat-top and Averaging to 1.
+        11. On channel 1’s setting, set Type to Sample, Window Function to Flat-top and.
         12. Connect Scope ch1+ to W1 and Scope ch1- to GND. Connect Scope ch2+ to W2 and Scope ch2- to GND
         13. Set Signal Generator’s channel 1 to the following parameter: Waveformtype: Square Wave, Amplitude: 5V, Frequency: 50kHz, Offset: 0V and Phase 0 degrees. For channel 2 set the following parameters: Waveform type: Triangle , Amplitude: 5V, Frequency: 100kHz, offset: 0V and Phase: 0 degrees
         14. Set Spectrum Analyzer’s channel 1 and 2’s type to sample and Window to Flat top. For the Sweep setting set Start: 0Hz, Stop: 1MHz , Resolution BW: 61.04Hz. Run both Signal Generator and Spectrum Analyzer.
