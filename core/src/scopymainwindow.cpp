@@ -32,6 +32,7 @@
 #include <style.h>
 #include <whatsnewoverlay.h>
 #include <pkgmanager.h>
+#include <pkgwidget.h>
 
 #include <common/debugtimer.h>
 #include "logging_categories.h"
@@ -138,9 +139,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	dtm = new DetachedToolWindowManager(this);
 	m_toolMenuManager = new ToolMenuManager(ts, dtm, browseMenu->toolMenu(), this);
 
+	PkgWidget *pkgWidget = new PkgWidget(this);
+
 	ts->add("home", hp);
 	ts->add("about", about);
 	ts->add("preferences", prefPage);
+	ts->add("package", pkgWidget);
 
 	connect(scanTask, &IIOScanTask::scanFinished, scc, &ScannedIIOContextCollector::update, Qt::QueuedConnection);
 
@@ -448,6 +452,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_connect_to_multiple_devices", true);
 	p->init("general_scan_for_devices", true);
 	p->init("device_menu_item", true);
+	p->init("pkg_menu_columns", 1);
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 	DEBUGTIMER_LOG(benchmark, "Init preferences took:");

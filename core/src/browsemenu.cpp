@@ -87,6 +87,14 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	saveLoadWidget->layout()->addWidget(saveBtn);
 	saveLoadWidget->layout()->addWidget(loadBtn);
 
+	QPushButton *pkgBtn = createBtn("Package manager",
+					":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+						"/icons/preferences.svg",
+					m_content);
+	connect(pkgBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool(PACKAGE_ID); });
+	pkgBtn->setCheckable(true);
+	m_btnsMap[PACKAGE_ID] = pkgBtn;
+
 	QPushButton *preferencesBtn = createBtn("Preferences",
 						":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							"/icons/preferences.svg",
@@ -107,6 +115,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	QLabel *logo = createScopyLogo(m_content);
 
 	btnGroup->addButton(homeBtn);
+	btnGroup->addButton(pkgBtn);
 	btnGroup->addButton(preferencesBtn);
 	btnGroup->addButton(aboutBtn);
 
@@ -117,6 +126,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 
 	add(createHLine(m_content), "toolMenuLine2", MA_BOTTOMLAST);
 	add(saveLoadWidget, "saveLoad", MA_BOTTOMLAST);
+	add(pkgBtn, "pkgBtn", MA_BOTTOMLAST);
 	add(preferencesBtn, "preferencesBtn", MA_BOTTOMLAST);
 	add(aboutBtn, "aboutBtn", MA_BOTTOMLAST);
 	add(logo, "logo", MA_BOTTOMLAST);
