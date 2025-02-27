@@ -23,6 +23,11 @@ Voltmeter - Test Suite
          - v2.0.0
          - N/A
          - none
+       * - Bindea Cristian
+         - 18.02.2025
+         - v2.0.0-beta-rc2-91a3a3a
+         - N/A
+         - None
 
 Setup environment:
 -------------------------------------------------------------------------------
@@ -170,7 +175,7 @@ Test 1: Channel 1 Operation
         23. Connect scope ch1+ to AWG Ch1 and scope ch1- to gnd
         24. Set the Signal generator’s channel 1 configuration to the following setting Waveform Type: Sine Wave, Amplitude: 2.828V, Offset: 0V, Frequency: 800Hz and Phase: 0
                 - **Expected Result:** The voltage displayed in the voltmeter should be around 0.9Vrms to 1.1Vrms and the history graph should follow in 1s, 10s or 60s setting
-                - **Actual Result:** The voltage displayed in the voltmeter is around 0.9Vrms and the history graph follows in 1s, 10s or 60s setting.
+                - **Actual Result:** The voltage displayed in the voltmeter is around 0.7Vrms and the history graph follows in 1s, 10s or 60s setting.
 
 ..
   Actual test result goes here.
@@ -194,7 +199,7 @@ Test 1: Channel 1 Operation
 
         27. Set the Signal generator’s channel 1 configuration to the following setting Waveform Type: Square Wave, Amplitude: 5V, Offset: 0V, Frequency: 40kHz and Phase: 0
                 - **Expected Result:** The voltage displayed in the voltmeter should be around 2.4Vrms to 2.6Vrms and the history graph should follow in 1s, 10s or 60s setting
-                - **Actual Result:** The voltage displayed in the voltmeter is around 2.4Vrms and the history graph follows in 1s, 10s or 60s setting.
+                - **Actual Result:** The voltage displayed in the voltmeter is around 2.2Vrms and the history graph follows in 1s, 10s or 60s setting.
 
 ..
   Actual test result goes here.
@@ -218,7 +223,7 @@ Test 1: Channel 1 Operation
 
 **Tested OS:** WindowsADI
 
-**Comments:** none
+**Comments:** A little bit lower RMS values for some high frequency signals. A cause may be the resistance of the wires used.
 
 ..
   Any comments about the test goes here.
@@ -418,9 +423,9 @@ Test 2: Channel 2 Operation
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
-**Comments:** none
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
@@ -562,9 +567,9 @@ Test 3: Channel 1 and Channel 2 Operation
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
-**Comments:** none
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
@@ -768,11 +773,11 @@ Test 4: Additional Features
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 **Comments:** 
-  - steps 18 to 26 can't be performed because the "Browse" button does nothing when clicked.
-  - fixed in thie PR https://github.com/analogdevicesinc/scopy/pull/1902
+  - steps 18 to 26 can't be performed because the "Browse" button does nothing when clicked ( this happens on Windows and macOS )
+  - fixed in this PR https://github.com/analogdevicesinc/scopy/pull/1902
 
 ..
   Any comments about the test goes here.

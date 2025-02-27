@@ -23,6 +23,11 @@ General Settings - Test Case
          - V2.0.0
          - N/A
          - none
+       * - Bindea Cristian
+         - 18.02.2025
+         - v2.0.0-beta-rc2-91a3a3a
+         - N/A
+         - None
 
 Setup environment:
 -----------------------------------------------
@@ -88,7 +93,7 @@ Test 1: Installation
 ..
   Details about the tested OS goes here.
 
-**Comments:** None
+**Comments:** This test is only valid for the Windows installer.
 
 ..
   Any comments about the test goes here.
@@ -115,7 +120,7 @@ Test 1: M2K Connection and Calibration
         1. Connect the M2K board to the PC using a micro-USB connector.
         2. Click the M2K icon.
                 - **Expected Result:** The instruments will appear on the left panel: Oscilloscope, Spectrum Analyzer, Network Analyzer, Signal Generator, Logic Analyzer, Pattern Generator, Digital IO, Voltmeter, and Power Supply.
-                - **Actual Result**: The instrument appears on the left panel.
+                - **Actual Result**: The instrument appears on the left panel as expected.
 
 ..
   Actual test result goes here.
@@ -123,7 +128,7 @@ Test 1: M2K Connection and Calibration
 
         3. Click “Identify.”
                 - **Expected Result:** The “Ready” LED on the M2K board will rapidly blink 10 times indicating that it is the device identified by Scopy.
-                - **Actual Result**: The "Ready" LED on the M2K board rapidly blinks 10 times.
+                - **Actual Result**: The "Ready" LED on the M2K board rapidly blinks 10 times as expected.
 
 ..
   Actual test result goes here.
@@ -131,7 +136,7 @@ Test 1: M2K Connection and Calibration
 
         4. Click “Connect.”
                 - **Expected Result:** M2K will auto calibrate. The calibration indicator on Oscilloscope, Spectrum Analyzer, Network Analyzer, Signal Generator, and Voltmeter instrument should start. “Calibrate” button must be enabled.
-                - **Actual Result**: M2k auto calibrates.
+                - **Actual Result**: Works as expected.
 
 ..
   Actual test result goes here.
@@ -147,7 +152,7 @@ Test 1: M2K Connection and Calibration
 
         6. On the home menu, click the add “+” button and input the IP address of the desired M2K board to control. The default IP address is 192.168.2.1. Click add.
                 - **Expected Result:** The instruments will appear on the left panel: Oscilloscope, Spectrum Analyzer, Network Analyzer, Signal Generator, Logic Analyzer, Pattern Generator, Digital IO, Voltmeter, and Power Supply.
-                - **Actual Result**: The instrument appears on the left panel.
+                - **Actual Result**: On macOS: Failed. Error: "ip:192.168.2.1" not a valid context. But on Windows works as expected.
 
 ..
   Actual test result goes here.
@@ -155,7 +160,7 @@ Test 1: M2K Connection and Calibration
 
         7. Click “Identify.”
                 - **Expected Result:** The “Ready” LED on the M2K board will rapidly blink 10 times indicating that it is the device identified by Scopy.
-                - **Actual Result**: The "Ready" LED on the M2K board rapidly blinks 10 times.
+                - **Actual Result**: Failed due to step 6.
 
 ..
   Actual test result goes here.
@@ -163,7 +168,7 @@ Test 1: M2K Connection and Calibration
 
         8. Click “Connect.”
                 - **Expected Result:** M2K will auto calibrate. The calibration indicator on Oscilloscope, Spectrum Analyzer, Network Analyzer, Signal Generator, and Voltmeter instrument should start. “Calibrate” button must be enabled.
-                - **Actual Result**: M2k auto calibrates.
+                - **Actual Result**: Failed due to step 6.
 
 ..
   Actual test result goes here.
@@ -171,7 +176,7 @@ Test 1: M2K Connection and Calibration
 
         9. Click “Forget device.”
                 - **Expected Result:** The M2K board icon connected remotely will disappear on the panel.
-                - **Actual Result**: The M2K board icon connected remotely disappears on the panel.
+                - **Actual Result**: Failed due to step 6.
 
 ..
   Actual test result goes here.
@@ -179,23 +184,24 @@ Test 1: M2K Connection and Calibration
 
         10. After connecting the M2K, manually calibrate the device by clicking the “Calibrate” button.
                  - **Expected Result:** M2K will calibrate. The calibration indicator on Oscilloscope, Spectrum Analyzer, Network Analyzer, Signal Generator, and Voltmeter instrument should start.
-                 - **Actual Result**: M2k manually calibrates.
+                 - **Actual Result**: Failed due to step 6.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS M2 processor
 
 ..
   Details about the tested OS goes here.
  
-**Comments:** None
+**Comments:** Step 6 fails on macOS because Scopy can't find the ip context for the M2K and because of this the next steps are also failing. On Windows all steps work as expected.
+
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -216,7 +222,7 @@ Test 2: Save and Load Profile
 **Steps:**
         1. Save the current profile. On the bottom part of the left panel, click the “Save” icon and save the profile as “default.ini.” Change any setting on any instrument and reload the profile.
                 - **Expected Result:** The change made on a certain instrument should be undone and the default profile should load.
-                - **Actual Result**: The change made on an instrument is undone and the default profile loads.
+                - **Actual Result**: The change made on an instrument is undone and the default profile loads as expected.
 
 ..
   Actual test result goes here.
@@ -226,7 +232,7 @@ Test 2: Save and Load Profile
         3. Connect AWG channel 1 to Scope Ch1+ and AWG channel 2 to Scope Ch2+. Connect Scope Ch1- and Ch2- to GND.
         4. Run the Signal Generator instrument, and check the output on Oscilloscope and Spectrum Analyzer. Then save the profile as “profile1.ini.”
                 - **Expected Result:** The output waveform on the Oscilloscope should be set in a way that the signals are can properly be seen compared with the default settings. In the Spectrum Analyzer the fundamental frequency of both signals should be present in the plot window set by the sweep setting.
-                - **Actual Result**: The output waveform on the Oscilloscope is set in a way that the signals are properly seen compared with the default settings. In the Spectrum Analyzer, the fundamental frequency of both signals is present in the plot window set by the sweep setting.
+                - **Actual Result**: Works as expected.
 
 ..
   Actual test result goes here.
@@ -234,7 +240,7 @@ Test 2: Save and Load Profile
 
         5. Reload the default setting by deleting the file in ``C:\Users\your_username\AppData\Roaming\ADI``. Reload “profile1.ini” and run the signal generator and oscilloscope or Spectrum Analyzer.
                 - **Expected Result:** The result should be the same on the saved profile.
-                - **Actual Result**: The result is the same on the saved profile.
+                - **Actual Result**: The result is the same on the saved profile, but the default ini file is on a different path depending on the operating system.
 
 ..
   Actual test result goes here.
@@ -243,7 +249,7 @@ Test 2: Save and Load Profile
         6. Pattern Generator’s Settings: Enable DIO2, DIO3, DIO6, DIO7, DIO10, DIO11, DIO14 and DIO15. Group DIO1 and DIO2 set to random and 1MHz frequency. Group DIO10 and DIO11 and set to Binary Counter at 1MHz. Set the other enabled DIOs to clock at 1MHz. Logic Analyzer’s Settings: Group DIO0, DIO1, DIO4, DIO5, DIO8, DIO9, DIO12, and DIO13 and set to parallel mode. Group DIO2 and DIO3 and set to parallel mode. Group DIO10 and DIO11 and set to parallel mode. Set the time base to 1us. Digital IO’s Settings: Set DIO0, DIO1, DIO4, DIO5, DIO8, DIO9, DIO12, and DIO13 to output.
         7. Run the three instrument and open Logic Analyzer instrument. Save the profile as “profile2.ini”.
                 - **Expected Result:** See that the profile is saved on the desired location and the logic analyzer should be set in a way that the rising and falling edge of the signal is clearly seen.
-                - **Actual Result**: The profile is saved on the desired location and the logic analyzer is set in a way that the rising and falling edge of the signal is clearly seen.
+                - **Actual Result**: Failing, confusing instructions.
 
 ..
   Actual test result goes here.
@@ -251,7 +257,7 @@ Test 2: Save and Load Profile
 
         8. Reload the default setting by deleting the file in ``C:\Users\your_username\AppData\Roaming\ADI``. Reload “profile2.ini”, and run Pattern Generator, DigitalIO and Logic Analyzer.
                 - **Expected Result:** The result should be the same on the saved profile.
-                - **Actual Result**: The result is the same on the saved profile.
+                - **Actual Result**: Works as expected, but the default ini file is on a different path depending on the operating system.
 
 ..
   Actual test result goes here.
@@ -261,7 +267,7 @@ Test 2: Save and Load Profile
         10. Connect Positive Supply to Scope Ch1+, connect AWG1 to Scope Ch2+, connect scope Ch1- and Scope Ch2- to GND.
         11. Run Power Supply, Voltmeter and Signal Generator to see if the voltmeter will be able to read 3V on channel 1 and 0.7V on channel 2. Save the profile as “profile3.ini”.
                  - **Expected Result:** Channel 1’s history should be off and channel 2’s history should be present and the reading must be stable.
-                 - **Actual Result**: The history is off on channel 1 and present on channel 2. The reading is stable.
+                 - **Actual Result**: Works as expected. The history is off on channel 1 and present on channel 2. The reading is stable.
 
 ..
   Actual test result goes here.
@@ -275,12 +281,12 @@ Test 2: Save and Load Profile
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** The paths for the default .ini file are different depending on the operating system.
 
 ..
   Any comments about the test goes here.
@@ -306,7 +312,7 @@ Test 3: Preferences
 **Steps:**
         1. Click the Preferences option located below the instrument options. After the Preferences menu appears, click the M2kPlugin tab.
                 - **Expected Result:** The Preferences menu should contain several sections: General, Analog tools and Logic tools.
-                - **Actual Result:**
+                - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -317,7 +323,7 @@ Test 3: Preferences
         4. Enable “Show advanced device information.”
         5. On the Home menu, click the M2K icon and drag down to see the advanced device information.
                 - **Expected Result:** A dialog box should appear confirming the reset command.
-                - **Actual Result:** Can't find “Show advanced device information.” settings.
+                - **Actual Result:** “Save session when closing Scopy.” is located in the General tab and renamed as "Save/Load Scopy session". Can't find “Show advanced device information.”.
 
 ..
   Actual test result goes here.
@@ -368,7 +374,7 @@ Test 3: Preferences
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS M2 processor
 
 ..
   Details about the tested OS goes here.

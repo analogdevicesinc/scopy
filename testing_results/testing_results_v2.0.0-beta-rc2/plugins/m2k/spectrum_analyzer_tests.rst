@@ -23,6 +23,11 @@ Spectrum Analyzer - Test Suite
          - v2.0.0
          - N/A
          - none 
+       * - Bindea Cristian
+         - 18.02.2025
+         - v2.0.0-beta-rc2-91a3a3a
+         - N/A
+         - None
 
 Setup environment:
 ----------------------------------------------------------------------------------------------------
@@ -53,7 +58,7 @@ Test 1: Channel 1 Operation
         4. Test at 500Hz
         5. On Spectrum Analyzer’s Sweep setting, Set Start Frequency at 0Hz and Stop frequency at 1kHz, set the Resolution BW to 244.14mHZ. On signal Generator, Set Amplitude: 10V, Frequency: 500Hz, Offset: 0V and Phase: 0 degrees
                 - **Expected Result:** After setting the start and stop frequency, the center frequency and Span should follow.
-                - **Actual Result:**  The center frequency and Span followed the start and stop frequency.
+                - **Actual Result:** The center frequency and Span followed the start and stop frequency. The "Averaging" is missing.
 
 ..
   Actual test result goes here.
@@ -237,12 +242,12 @@ Test 1: Channel 1 Operation
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows ADI
+**Tested OS:** Windows ADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** Some steps need to be updated because the tool has changed over time.
 
 ..
   Any comments about the test goes here.
@@ -456,12 +461,12 @@ Test 2: Channel 2 Operation
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows ADI
+**Tested OS:** Windows ADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** Some steps need to be updated because the tool has changed over time.
 
 ..
   Any comments about the test goes here.
@@ -691,12 +696,12 @@ Test 3: Channel 1 and 2 Operation
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows ADI
+**Tested OS:** Windows ADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
@@ -795,12 +800,12 @@ Test 4: Additional Features
   Actual test result goes here.
 ..
 
-**Tested OS:** Windows ADI
+**Tested OS:** Windows ADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** The reference pictures are missing.
 
 ..
   Any comments about the test goes here.
