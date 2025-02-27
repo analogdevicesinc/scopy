@@ -22,7 +22,7 @@
 #ifndef STYLEHELPER_H
 #define STYLEHELPER_H
 
-#include "widgets/hoverwidget.h"
+#include "widgets/interactivelabel.h"
 #include <QMap>
 #include <QLabel>
 #include <QCheckBox>
@@ -91,6 +91,8 @@ public:
 	static void HoverToolTip(QWidget *w, QString info, QString objectName = "");
 	static void NoBackgroundIconButton(QPushButton *w, QIcon icon, QString objectName = "");
 	static void BrowseButton(QPushButton *btn, QString objectName = "");
+	static void VerticalLine(QFrame *line, QString objectName = "");
+	static void ColoredInteractiveLabel(InteractiveLabel *w, int index, QString objectName = "");
 
 private:
 	static StyleHelper *pinstance_;

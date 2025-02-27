@@ -182,6 +182,35 @@ QStringList PkgManager::getPkgsName()
 	return nameList;
 }
 
+QStringList PkgManager::getPkgsAuthor()
+{
+	QStringList authorList;
+	const QList<QVariantMap> pkgsMeta = validPackages_.values();
+	std::transform(pkgsMeta.cbegin(), pkgsMeta.cend(), std::back_inserter(authorList),
+		       [](const QVariantMap &v) { return v[PkgManifest::PKG_AUTHOR].toString(); });
+	return authorList;
+}
+
+QStringList PkgManager::getPkgsVersion()
+{
+	QStringList versList;
+	const QList<QVariantMap> pkgsMeta = validPackages_.values();
+	std::transform(pkgsMeta.cbegin(), pkgsMeta.cend(), std::back_inserter(versList),
+		       [](const QVariantMap &v) { return v[PkgManifest::PKG_VERSION].toString(); });
+	return versList;
+}
+
+QStringList PkgManager::getPkgsCategory()
+{
+	QStringList categoryList;
+	const QList<QVariantMap> pkgsMeta = validPackages_.values();
+	for(const QVariantMap &pkg : pkgsMeta) {
+		QStringList pkgCat = pkg[PkgManifest::PKG_CATEGORY].toStringList();
+		categoryList.append(pkgCat);
+	}
+	return categoryList;
+}
+
 QFileInfoList PkgManager::getFilesInfo(const QString &path, const QStringList &filterList)
 {
 	QDirIterator it(path, filterList, QDir::NoFilter, QDirIterator::Subdirectories);
