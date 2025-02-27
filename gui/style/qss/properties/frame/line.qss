@@ -1,0 +1,3 @@
+*[&&property&&=true] {
+	border: &border_width_interactive& solid &interactive_subtle_idle&;
+}
