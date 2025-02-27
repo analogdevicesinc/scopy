@@ -91,6 +91,7 @@ public:
 	static void HoverToolTip(QWidget *w, QString info, QString objectName = "");
 	static void NoBackgroundIconButton(QPushButton *w, QIcon icon, QString objectName = "");
 	static void BrowseButton(QPushButton *btn, QString objectName = "");
+	static void VerticalLine(QFrame *line, QString objectName = "");
 
 private:
 	static StyleHelper *pinstance_;
