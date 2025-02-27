@@ -538,7 +538,7 @@ void Ad74413r::updateMeasurements(PlotAxis *axis, int chnlIdx)
 void Ad74413r::createMeasurementsLabel(int chnlIdx, QPen chPen, QStringList labels)
 {
 	for(const QString &label : labels) {
-		MeasurementLabel *ml = new MeasurementLabel(this);
+		MeasurementLabel *ml = new MeasurementLabel(m_measurePanel);
 		ml->setColor(chPen.color());
 		ml->setName(label);
 		m_labels[chnlIdx].append(ml);
@@ -548,9 +548,9 @@ void Ad74413r::createMeasurementsLabel(int chnlIdx, QPen chPen, QStringList labe
 
 void Ad74413r::setupDeviceBtn()
 {
-	VerticalChannelManager *vcm = new VerticalChannelManager(this);
+	VerticalChannelManager *vcm = new VerticalChannelManager(m_tool->leftStack());
 	m_tool->leftStack()->add("vcm", vcm);
-	m_devBtn = new CollapsableMenuControlButton(this);
+	m_devBtn = new CollapsableMenuControlButton(vcm);
 	m_devBtn->getControlBtn()->setName("AD74413R");
 	m_devBtn->getControlBtn()->setCheckable(false);
 	m_devBtn->getControlBtn()->button()->setVisible(false);
@@ -588,7 +588,7 @@ void Ad74413r::setupToolTemplate()
 
 	layout->addWidget(m_tool);
 
-	m_plot = new PlotWidget(this);
+	m_plot = new PlotWidget(m_tool->centralContainer());
 	m_info = new PlotInfo(m_plot->plot()->canvas());
 	TimeSamplingInfo *samplingInfo = new TimeSamplingInfo(m_plot);
 	m_info->addCustomInfo(samplingInfo, InfoPosition::IP_RIGHT);
@@ -599,13 +599,13 @@ void Ad74413r::setupToolTemplate()
 	setupDeviceBtn();
 	m_tool->addWidgetToCentralContainerHelper(m_plot);
 
-	m_infoBtn = new InfoBtn(this, true);
+	m_infoBtn = new InfoBtn(m_tool->topContainer(), true);
 	m_infoBtn->installEventFilter(this);
-	m_settingsBtn = new GearBtn(this);
-	m_runBtn = new RunBtn(this);
+	m_settingsBtn = new GearBtn(m_tool->topContainer());
+	m_runBtn = new RunBtn(m_tool->topContainer());
 	m_runBtn->setEnabled(false);
 	m_runBtn->setChecked(false);
-	m_singleBtn = new SingleShotBtn(this);
+	m_singleBtn = new SingleShotBtn(m_tool->topContainer());
 	m_singleBtn->setEnabled(false);
 	m_singleBtn->setChecked(false);
 	m_configBtn = createConfigBtn();
@@ -620,9 +620,9 @@ void Ad74413r::setupToolTemplate()
 		});
 	});
 
-	MenuControlButton *measure = new MenuControlButton(this);
+	MenuControlButton *measure = new MenuControlButton(m_tool->bottomContainer());
 	setupMeasureButtonHelper(measure);
-	m_measurePanel = new MeasurementsPanel(this);
+	m_measurePanel = new MeasurementsPanel(m_tool->topStack());
 	m_tool->topStack()->add(measureMenuId, m_measurePanel);
 	connect(measure, &MenuControlButton::toggled, this, [&](bool en) {
 		if(en)
@@ -630,7 +630,7 @@ void Ad74413r::setupToolTemplate()
 		m_tool->openTopContainerHelper(en);
 	});
 
-	m_chnlsMenuBtn = new MenuControlButton(this);
+	m_chnlsMenuBtn = new MenuControlButton(m_tool->bottomContainer());
 	setupChannelsMenuControlBtn(m_chnlsMenuBtn, "Channels");
 	connect(m_chnlsMenuBtn->button(), &QAbstractButton::toggled, this, [=, this](bool b) {
 		if(b) {
@@ -646,11 +646,11 @@ void Ad74413r::setupToolTemplate()
 	m_rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn *>(openLastMenuBtn)->getButtonGroup();
 	m_rightMenuBtnGrp->addButton(m_chnlsMenuBtn->button());
 
-	m_channelStack = new MapStackedWidget(this);
+	m_channelStack = new MapStackedWidget(m_tool->rightStack());
 	m_tool->rightStack()->add(channelsMenuId, m_channelStack);
 
 	QString settingsMenuId = "PlotSettings";
-	m_tool->rightStack()->add(settingsMenuId, createSettingsMenu(this));
+	m_tool->rightStack()->add(settingsMenuId, createSettingsMenu(m_tool->rightStack()));
 	connect(m_settingsBtn, &QPushButton::toggled, this, [=, this](bool b) {
 		if(b) {
 			m_tool->requestMenu(settingsMenuId);
