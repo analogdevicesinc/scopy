@@ -351,4 +351,17 @@ void StyleHelper::BrowseButton(QPushButton *btn, QString objectName)
 	Style::setStyle(btn, style::properties::button::basicButton);
 }
 
+void StyleHelper::VerticalLine(QFrame *line, QString objectName)
+{
+	if(!objectName.isEmpty()) {
+		line->setObjectName(objectName);
+	}
+	line->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+	line->setFrameShape(QFrame::VLine);
+	line->setFrameShadow(QFrame::Plain);
+	line->setFixedWidth(1);
+
+	Style::setStyle(line, style::properties::frame::line);
+}
+
 #include "moc_stylehelper.cpp"

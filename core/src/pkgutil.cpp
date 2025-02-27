@@ -30,6 +30,8 @@
 #include <qjsonarray.h>
 #include <common/scopyconfig.h>
 
+#include <common/scopyconfig.h>
+
 Q_LOGGING_CATEGORY(CAT_PKGUTIL, "PkgUtil")
 
 using namespace scopy;
