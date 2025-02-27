@@ -32,6 +32,7 @@ using namespace scopy;
 
 MeasurementsPanel::MeasurementsPanel(QWidget *parent)
 	: QWidget(parent)
+	, m_inhibitUpdates(false)
 {
 	QVBoxLayout *lay = new QVBoxLayout(this);
 	setLayout(lay);
