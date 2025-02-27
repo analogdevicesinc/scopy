@@ -261,7 +261,7 @@ using Channel 1.
         - **Expected result:**
             - The plot displays 1.5 periods.
             - The measurements display: Period: 5ms, Frequency: 200 Hz,
-              Peak-peak: 1.9Vpp to 2.1Vpp, RMS: 0.6Vrms to 0.8Vrms.
+              Peak-peak: 1.9Vpp to 2.1Vpp, RMS: 0.6V to 0.8V.
         - **Actual result:**
 
 ..
@@ -272,7 +272,7 @@ using Channel 1.
         - **Expected result:**
             - The plot displays 4 periods.
             - The measurements display: Period: 2ms, Frequency: 500 Hz,
-              Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.74Vrms to 1.78Vrms.
+              Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.74V to 1.78V.
         - **Actual result:**
 
 ..
@@ -323,7 +323,7 @@ the oscilloscope using Channel 1.
         - **Expected result:**
             - The plot displays 4 square waves.
             - The measurements display: Period: 2ms, Frequency: 500 Hz,
-              Amplitude: 4.9Vpp to 5.1Vpp, RMS: 2.4Vrms to 2.6Vrms.
+              Amplitude: 4.9Vpp to 5.1Vpp, RMS: 2.4V to 2.6V.
         - **Actual result:**
 
 ..
@@ -336,7 +336,7 @@ the oscilloscope using Channel 1.
         - **Expected result:**
             - The plot displays 6 square waves.
             - The measurements display: Period: 500us, Frequency: 2 kHz,
-              Amplitude: 7.9Vpp to 8.1Vpp, RMS: 3.9Vrms to 4.1Vrms.
+              Amplitude: 7.9Vpp to 8.1Vpp, RMS: 3.9V to 4.1V.
         
         - **Actual result:**
 
@@ -388,7 +388,7 @@ the oscilloscope using Channel 1.
         - **Expected result:**
             - The plot displays 6 triangle waves.
             - The measurements display: Period: 500us, Frequency: 2 kHz,
-              Peak-peak: 3.9Vpp to 4.1Vpp, RMS: 1.0Vrms to 1.2Vrms.
+              Peak-peak: 3.9Vpp to 4.1Vpp, RMS: 1.0V to 1.2V.
         - **Actual result:**
 
 ..
@@ -396,12 +396,12 @@ the oscilloscope using Channel 1.
 ..
 
     5. Change the Signal Generator amplitude to 5V and the frequency to 20kHz.
-       Change the Oscilloscope Time Base to 5us/dev.
+       Change the Oscilloscope Time Base to 20us/dev.
         
         - **Expected result:**
             - The plot displays 6 triangle waves.
             - The measurements display: Period: 50us, Frequency: 20 kHz,
-              Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.3Vrms to 1.5Vrms.
+              Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.3V to 1.5V.
         
         - **Actual result:**
 
@@ -453,7 +453,7 @@ the signal generator on the oscilloscope using Channel 1.
         - **Expected result:**
             - The plot displays 3 sawtooth waves.
             - The measurements display: Period: 50us, Frequency: 20 kHz,
-              Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2Vrms to 2.4Vrms.
+              Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2V to 2.4V.
         - **Actual result:**
 
 ..
@@ -464,7 +464,7 @@ the signal generator on the oscilloscope using Channel 1.
         - **Expected result:**
             - The plot displays 3 sawtooth waves.
             - The measurements display: Period: 50us, Frequency: 20 kHz,
-              Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2Vrms to 2.4Vrms.
+              Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2V to 2.4V.
         - **Actual result:**
 
 ..
@@ -1375,7 +1375,7 @@ Apply the measurements on a gated portion of the acquired signal.
     2. In the Oscilloscope set the following:
         - Channel 1 Horizontal: Time Base: 10us/div, Position: 0us
         - Channel 1 Vertical: Volts/Div: 1V/div, Position: 0V
-    3. Enable Measurements, turon on Display All.
+    3. Enable Measurements, turn on on Display All.
     4. Enable Gating and set the sliders to two consecutive zero-crossing points
        of the sine wave:
         
