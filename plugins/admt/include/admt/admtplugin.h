@@ -39,29 +39,30 @@
 namespace scopy {
 namespace admt {
 
-class SCOPY_ADMT_EXPORT ADMTPlugin : public QObject, public PluginBase {
-  Q_OBJECT
-  SCOPY_PLUGIN;
+class SCOPY_ADMT_EXPORT ADMTPlugin : public QObject, public PluginBase
+{
+	Q_OBJECT
+	SCOPY_PLUGIN;
 
 public:
-  bool compatible(QString m_param, QString category) override;
-  bool loadPage() override;
-  bool loadIcon() override;
-  void loadToolList() override;
-  void unload() override;
-  void initMetadata() override;
-  QString description() override;
+	bool compatible(QString m_param, QString category) override;
+	bool loadPage() override;
+	bool loadIcon() override;
+	void loadToolList() override;
+	void unload() override;
+	void initMetadata() override;
+	QString description() override;
 
 public Q_SLOTS:
-  bool onConnect() override;
-  bool onDisconnect() override;
+	bool onConnect() override;
+	bool onDisconnect() override;
 
 private:
-  iio_context *m_ctx;
-  QWidget *harmonicCalibration;
-  QLineEdit *edit;
+	iio_context *m_ctx;
+	QWidget *harmonicCalibration;
+	QLineEdit *edit;
 
-  ADMTController *m_admtController;
+	ADMTController *m_admtController;
 };
 } // namespace admt
 } // namespace scopy
