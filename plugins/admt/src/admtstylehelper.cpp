@@ -29,42 +29,44 @@ ADMTStyleHelper *ADMTStyleHelper::pinstance_{nullptr};
 
 ADMTStyleHelper::ADMTStyleHelper(QObject *parent) {}
 
-ADMTStyleHelper *ADMTStyleHelper::GetInstance() {
-  if (pinstance_ == nullptr) {
-    pinstance_ = new ADMTStyleHelper(
-        QApplication::instance()); // singleton has the app as parent
-  }
-  return pinstance_;
+ADMTStyleHelper *ADMTStyleHelper::GetInstance()
+{
+	if(pinstance_ == nullptr) {
+		pinstance_ = new ADMTStyleHelper(QApplication::instance()); // singleton has the app as parent
+	}
+	return pinstance_;
 }
 
 ADMTStyleHelper::~ADMTStyleHelper() {}
 
-void ADMTStyleHelper::initColorMap() {
-  auto sh = ADMTStyleHelper::GetInstance();
-  sh->colorMap.insert("CH0", "#FF7200");
-  sh->colorMap.insert("CH1", "#9013FE");
-  sh->colorMap.insert("CH2", "#27B34F");
-  sh->colorMap.insert("CH3", "#F8E71C");
-  sh->colorMap.insert("CH4", "#4A64FF");
-  sh->colorMap.insert("CH5", "#02BCD4");
-  sh->colorMap.insert("CH6", "#F44336");
-  sh->colorMap.insert("CH7", "#F5A623");
-  sh->colorMap.insert("CH8", "#1981AE");
-  sh->colorMap.insert("CH9", "#6FCEA6");
-  sh->colorMap.insert("CH10", "#F7A1DA");
-  sh->colorMap.insert("CH11", "#E3F5FC");
+void ADMTStyleHelper::initColorMap()
+{
+	auto sh = ADMTStyleHelper::GetInstance();
+	sh->colorMap.insert("CH0", "#FF7200");
+	sh->colorMap.insert("CH1", "#9013FE");
+	sh->colorMap.insert("CH2", "#27B34F");
+	sh->colorMap.insert("CH3", "#F8E71C");
+	sh->colorMap.insert("CH4", "#4A64FF");
+	sh->colorMap.insert("CH5", "#02BCD4");
+	sh->colorMap.insert("CH6", "#F44336");
+	sh->colorMap.insert("CH7", "#F5A623");
+	sh->colorMap.insert("CH8", "#1981AE");
+	sh->colorMap.insert("CH9", "#6FCEA6");
+	sh->colorMap.insert("CH10", "#F7A1DA");
+	sh->colorMap.insert("CH11", "#E3F5FC");
 }
 
-QString ADMTStyleHelper::getColor(QString id) {
-  auto sh = ADMTStyleHelper::GetInstance();
-  return sh->colorMap[id];
+QString ADMTStyleHelper::getColor(QString id)
+{
+	auto sh = ADMTStyleHelper::GetInstance();
+	return sh->colorMap[id];
 }
 
-void ADMTStyleHelper::TopContainerButtonStyle(QPushButton *btn,
-                                              QString objectName) {
-  if (!objectName.isEmpty())
-    btn->setObjectName(objectName);
-  QString style = QString(R"css(
+void ADMTStyleHelper::TopContainerButtonStyle(QPushButton *btn, QString objectName)
+{
+	if(!objectName.isEmpty())
+		btn->setObjectName(objectName);
+	QString style = QString(R"css(
 			QPushButton {
 				width: 88px;
 				height: 48px;
@@ -88,22 +90,23 @@ void ADMTStyleHelper::TopContainerButtonStyle(QPushButton *btn,
 				background-color:#272730;
 			}
 			})css");
-  style.replace("&&ScopyBlue&&",
-                Style::getAttribute(json::theme::interactive_primary_idle));
-  btn->setStyleSheet(style);
+	style.replace("&&ScopyBlue&&", Style::getAttribute(json::theme::interactive_primary_idle));
+	btn->setStyleSheet(style);
 }
 
-void ADMTStyleHelper::PlotWidgetStyle(PlotWidget *widget, QString objectName) {
-  if (!objectName.isEmpty())
-    widget->setObjectName(objectName);
-  widget->setContentsMargins(10, 10, 10, 6);
-  widget->plot()->canvas()->setStyleSheet("background-color: black;");
+void ADMTStyleHelper::PlotWidgetStyle(PlotWidget *widget, QString objectName)
+{
+	if(!objectName.isEmpty())
+		widget->setObjectName(objectName);
+	widget->setContentsMargins(10, 10, 10, 6);
+	widget->plot()->canvas()->setStyleSheet("background-color: black;");
 }
 
-void ADMTStyleHelper::ComboBoxStyle(QComboBox *widget, QString objectName) {
-  if (!objectName.isEmpty())
-    widget->setObjectName(objectName);
-  QString style = QString(R"css(
+void ADMTStyleHelper::ComboBoxStyle(QComboBox *widget, QString objectName)
+{
+	if(!objectName.isEmpty())
+		widget->setObjectName(objectName);
+	QString style = QString(R"css(
         QWidget {
         }
         QComboBox {
@@ -155,14 +158,14 @@ void ADMTStyleHelper::ComboBoxStyle(QComboBox *widget, QString objectName) {
             selection-color: transparent;
         }
     )css");
-  style = style.replace(QString("&&colorname&&"),
-                        Style::getAttribute(json::global::ch0));
-  widget->setStyleSheet(style);
-  widget->setFixedHeight(30);
+	style = style.replace(QString("&&colorname&&"), Style::getAttribute(json::global::ch0));
+	widget->setStyleSheet(style);
+	widget->setFixedHeight(30);
 }
 
-void ADMTStyleHelper::LineEditStyle(QLineEdit *widget, QString objectName) {
-  QString style = QString(R"css(
+void ADMTStyleHelper::LineEditStyle(QLineEdit *widget, QString objectName)
+{
+	QString style = QString(R"css(
 								QLineEdit {
 									font-family: Open Sans;
 									font-size: 16px;
@@ -180,20 +183,19 @@ void ADMTStyleHelper::LineEditStyle(QLineEdit *widget, QString objectName) {
 									color: #9c4600;
                                 }
 							)css");
-  style = style.replace(QString("&&colorname&&"),
-                        Style::getAttribute(json::global::ch0));
-  widget->setStyleSheet(style);
-  widget->setFixedHeight(30);
-  widget->setContentsMargins(0, 0, 0, 0);
-  widget->setTextMargins(12, 4, 12, 4);
-  widget->setAlignment(Qt::AlignRight);
+	style = style.replace(QString("&&colorname&&"), Style::getAttribute(json::global::ch0));
+	widget->setStyleSheet(style);
+	widget->setFixedHeight(30);
+	widget->setContentsMargins(0, 0, 0, 0);
+	widget->setTextMargins(12, 4, 12, 4);
+	widget->setAlignment(Qt::AlignRight);
 }
 
-void ADMTStyleHelper::ColoredSquareCheckbox(QCheckBox *chk, QColor color,
-                                            QString objectName) {
-  if (!objectName.isEmpty())
-    chk->setObjectName(objectName);
-  QString style = QString(R"css(
+void ADMTStyleHelper::ColoredSquareCheckbox(QCheckBox *chk, QColor color, QString objectName)
+{
+	if(!objectName.isEmpty())
+		chk->setObjectName(objectName);
+	QString style = QString(R"css(
 						QCheckBox {
 							width:16px;
 							height:16px;
@@ -209,16 +211,16 @@ void ADMTStyleHelper::ColoredSquareCheckbox(QCheckBox *chk, QColor color,
 						QCheckBox::indicator:unchecked { background-color: &&UIElementBackground&&; }
 						QCheckBox::indicator:checked { background-color: &&colorname&&; }
 						)css");
-  style.replace("&&colorname&&", color.name());
-  style.replace("&&UIElementBackground&&",
-                Style::getAttribute(json::theme::background_primary));
-  chk->setStyleSheet(style);
+	style.replace("&&colorname&&", color.name());
+	style.replace("&&UIElementBackground&&", Style::getAttribute(json::theme::background_primary));
+	chk->setStyleSheet(style);
 }
 
-void ADMTStyleHelper::StartButtonStyle(QPushButton *btn, QString objectName) {
-  if (!objectName.isEmpty())
-    btn->setObjectName(objectName);
-  QString style = QString(R"css(
+void ADMTStyleHelper::StartButtonStyle(QPushButton *btn, QString objectName)
+{
+	if(!objectName.isEmpty())
+		btn->setObjectName(objectName);
+	QString style = QString(R"css(
 			QPushButton {
 				border-radius: 2px;
 				padding-left: 20px;
@@ -239,49 +241,46 @@ void ADMTStyleHelper::StartButtonStyle(QPushButton *btn, QString objectName) {
 			QPushButton:disabled {
 				background-color: grey;
 			})css");
-  btn->setCheckable(true);
-  btn->setChecked(false);
-  btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  btn->setFixedHeight(36);
-  btn->setStyleSheet(style);
-  QIcon playIcon;
-  playIcon.addPixmap(Util::ChangeSVGColor(":/gui/icons/play.svg", "white", 1),
-                     QIcon::Normal, QIcon::Off);
-  playIcon.addPixmap(
-      Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/play_stop.svg",
-                           "white", 1),
-      QIcon::Normal, QIcon::On);
-  btn->setIcon(playIcon);
-  btn->setIconSize(QSize(64, 64));
+	btn->setCheckable(true);
+	btn->setChecked(false);
+	btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	btn->setFixedHeight(36);
+	btn->setStyleSheet(style);
+	QIcon playIcon;
+	playIcon.addPixmap(Util::ChangeSVGColor(":/gui/icons/play.svg", "white", 1), QIcon::Normal, QIcon::Off);
+	playIcon.addPixmap(Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/play_stop.svg", "white", 1),
+			   QIcon::Normal, QIcon::On);
+	btn->setIcon(playIcon);
+	btn->setIconSize(QSize(64, 64));
 }
 
-void ADMTStyleHelper::TextStyle(QWidget *widget, const char *styleHelperColor,
-                                bool isBold, QString objectName) {
-  if (!objectName.isEmpty())
-    widget->setObjectName(objectName);
-  QString existingStyle = widget->styleSheet();
-  QString style = QString(R"css(
+void ADMTStyleHelper::TextStyle(QWidget *widget, const char *styleHelperColor, bool isBold, QString objectName)
+{
+	if(!objectName.isEmpty())
+		widget->setObjectName(objectName);
+	QString existingStyle = widget->styleSheet();
+	QString style = QString(R"css(
 								font-size: 16px;
 								font-weight: &&fontweight&&;
 								text-align: right;
 								color: &&colorname&&;
 							)css");
-  style = style.replace(QString("&&colorname&&"),
-                        Style::getAttribute(styleHelperColor));
-  QString fontWeight = QString("normal");
-  if (isBold) {
-    fontWeight = QString("bold");
-  }
-  style = style.replace(QString("&&fontweight&&"), fontWeight);
-  widget->setStyleSheet(existingStyle + style);
+	style = style.replace(QString("&&colorname&&"), Style::getAttribute(styleHelperColor));
+	QString fontWeight = QString("normal");
+	if(isBold) {
+		fontWeight = QString("bold");
+	}
+	style = style.replace(QString("&&fontweight&&"), fontWeight);
+	widget->setStyleSheet(existingStyle + style);
 }
 
-void ADMTStyleHelper::MenuSmallLabel(QLabel *label, QString objectName) {
-  if (!objectName.isEmpty())
-    label->setObjectName(objectName);
-  label->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+void ADMTStyleHelper::MenuSmallLabel(QLabel *label, QString objectName)
+{
+	if(!objectName.isEmpty())
+		label->setObjectName(objectName);
+	label->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-  QString style = QString(R"css(
+	QString style = QString(R"css(
 				QLabel {
 					color: white;
 					background-color: rgba(255,255,255,0);
@@ -294,73 +293,73 @@ void ADMTStyleHelper::MenuSmallLabel(QLabel *label, QString objectName) {
 					color: grey;
 				}
 				)css");
-  label->setStyleSheet(style);
+	label->setStyleSheet(style);
 }
 
-void ADMTStyleHelper::LineStyle(QFrame *line, QString objectName) {
-  if (!objectName.isEmpty())
-    line->setObjectName(objectName);
-  line->setFrameShape(QFrame::HLine);
-  line->setFrameShadow(QFrame::Plain);
-  line->setFixedHeight(1);
-  QString lineStyle = QString(R"css(
+void ADMTStyleHelper::LineStyle(QFrame *line, QString objectName)
+{
+	if(!objectName.isEmpty())
+		line->setObjectName(objectName);
+	line->setFrameShape(QFrame::HLine);
+	line->setFrameShadow(QFrame::Plain);
+	line->setFixedHeight(1);
+	QString lineStyle = QString(R"css(
 				QFrame {
 					border: 1px solid #808085;
 				}
 				)css");
-  line->setStyleSheet(lineStyle);
+	line->setStyleSheet(lineStyle);
 }
 
-void ADMTStyleHelper::UIBackgroundStyle(QWidget *widget, QString objectName) {
-  if (!objectName.isEmpty())
-    widget->setObjectName(objectName);
-  QString style = QString(R"css(
+void ADMTStyleHelper::UIBackgroundStyle(QWidget *widget, QString objectName)
+{
+	if(!objectName.isEmpty())
+		widget->setObjectName(objectName);
+	QString style = QString(R"css(
 								background-color: &&colorname&&;
 							)css");
-  style.replace(QString("&&colorname&&"),
-                Style::getAttribute(json::theme::background_primary));
-  widget->setStyleSheet(style);
+	style.replace(QString("&&colorname&&"), Style::getAttribute(json::theme::background_primary));
+	widget->setStyleSheet(style);
 }
 
-void ADMTStyleHelper::GraphChannelStyle(QWidget *widget, QLayout *layout,
-                                        QString objectName) {
-  if (!objectName.isEmpty())
-    widget->setObjectName(objectName);
-  widget->setLayout(layout);
-  ADMTStyleHelper::UIBackgroundStyle(widget);
-  layout->setContentsMargins(20, 13, 20, 5);
-  layout->setSpacing(20);
+void ADMTStyleHelper::GraphChannelStyle(QWidget *widget, QLayout *layout, QString objectName)
+{
+	if(!objectName.isEmpty())
+		widget->setObjectName(objectName);
+	widget->setLayout(layout);
+	ADMTStyleHelper::UIBackgroundStyle(widget);
+	layout->setContentsMargins(20, 13, 20, 5);
+	layout->setSpacing(20);
 }
 
-void ADMTStyleHelper::CalculatedCoeffWidgetRowStyle(
-    QWidget *widget, QHBoxLayout *layout, QLabel *hLabel, QLabel *hMagLabel,
-    QLabel *hPhaseLabel, QString objectName) {
-  if (!objectName.isEmpty())
-    widget->setObjectName(objectName);
+void ADMTStyleHelper::CalculatedCoeffWidgetRowStyle(QWidget *widget, QHBoxLayout *layout, QLabel *hLabel,
+						    QLabel *hMagLabel, QLabel *hPhaseLabel, QString objectName)
+{
+	if(!objectName.isEmpty())
+		widget->setObjectName(objectName);
 
-  widget->setLayout(layout);
-  QString style = QString(R"css(
+	widget->setLayout(layout);
+	QString style = QString(R"css(
 								background-color: &&colorname&&;
 								border-radius: 4px;
 							)css");
-  style.replace(QString("&&colorname&&"),
-                Style::getAttribute(json::theme::background_subtle));
-  widget->setStyleSheet(style);
-  widget->setFixedHeight(30);
-  widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-  layout->setContentsMargins(12, 4, 12, 4);
+	style.replace(QString("&&colorname&&"), Style::getAttribute(json::theme::background_subtle));
+	widget->setStyleSheet(style);
+	widget->setFixedHeight(30);
+	widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	layout->setContentsMargins(12, 4, 12, 4);
 
-  ADMTStyleHelper::TextStyle(hLabel, json::global::white, true);
-  ADMTStyleHelper::TextStyle(hMagLabel, json::global::ch0);
-  ADMTStyleHelper::TextStyle(hPhaseLabel, json::global::ch1);
+	ADMTStyleHelper::TextStyle(hLabel, json::global::white, true);
+	ADMTStyleHelper::TextStyle(hMagLabel, json::global::ch0);
+	ADMTStyleHelper::TextStyle(hPhaseLabel, json::global::ch1);
 
-  hLabel->setFixedWidth(24);
-  hMagLabel->setContentsMargins(0, 0, 32, 0);
-  hPhaseLabel->setFixedWidth(72);
+	hLabel->setFixedWidth(24);
+	hMagLabel->setContentsMargins(0, 0, 32, 0);
+	hPhaseLabel->setFixedWidth(72);
 
-  layout->addWidget(hLabel);
-  layout->addWidget(hMagLabel, 0, Qt::AlignRight);
-  layout->addWidget(hPhaseLabel);
+	layout->addWidget(hLabel);
+	layout->addWidget(hMagLabel, 0, Qt::AlignRight);
+	layout->addWidget(hPhaseLabel);
 }
 
 #include "moc_admtstylehelper.cpp"
