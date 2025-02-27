@@ -73,6 +73,7 @@ private:
 	bool m_collapsed;
 
 	const QString HOME_ID = "home";
+	const QString PACKAGE_ID = "package";
 	const QString PREFERENCES_ID = "preferences";
 	const QString ABOUT_ID = "about";
 };

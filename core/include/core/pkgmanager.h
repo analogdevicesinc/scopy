@@ -55,6 +55,9 @@ public:
 	static QStringList listFilesPath(const QStringList &filter);
 
 	static QStringList getPkgsName();
+	static QStringList getPkgsAuthor();
+	static QStringList getPkgsVersion();
+	static QStringList getPkgsCategory();
 	static QList<QVariantMap> getPkgsMeta();
 Q_SIGNALS:
 	void pkgExists(const QString &zipPath, const QString &pkgName);

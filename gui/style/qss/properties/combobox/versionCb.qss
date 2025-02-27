@@ -1,0 +1,22 @@
+QComboBox[&&property&&=true] {
+    border: none;               
+    background: transparent;    
+    padding: 0;                 
+}
+
+QComboBox[&&property&&=true]:disabled {
+    color: &content_subtle&;
+}    
+
+QComboBox::drop-down[&&property&&=true] { 
+    border: none;               
+    background: transparent;    
+    width: 0px; 
+    padding: 0;                 
+}
+
+QComboBox::down-arrow[&&property&&=true] {
+    width: 0;                   
+    height: 0;
+}
+

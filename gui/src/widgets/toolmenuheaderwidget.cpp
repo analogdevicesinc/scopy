@@ -21,6 +21,7 @@
 
 #include "toolmenuheaderwidget.h"
 
+#include <hoverwidget.h>
 #include <style.h>
 #include <stylehelper.h>
 

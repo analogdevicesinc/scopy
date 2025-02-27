@@ -342,6 +342,16 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 		"Clicking the device icon navigates to the device configuration page, if available. "
 		"Note: Enabling this option requires removing and re-adding all devices in the tool menu.",
 		generalSection));
+	generalSection->contentLayout()->addWidget(PREFERENCE_EDIT_VALIDATION(
+		p, "pkg_menu_columns", "Number of columns in the package menu",
+		"This preference impacts the organization of the packages in the package menu. The default value is 1.",
+		[](const QString &text) {
+			// check if input is an positive integer
+			bool ok;
+			auto value = text.toInt(&ok);
+			return ok && value > 0;
+		},
+		generalSection));
 	generalSection->contentLayout()->addWidget(PREFERENCE_FILE_BROWSER(
 		p, "iio_emu_dir_path", "Set the iio-emu location",
 		"Specifies the location of the iio-emu executable. By default, iio-emu is located next "
