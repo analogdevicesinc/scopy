@@ -27,117 +27,113 @@
 using namespace scopy;
 using namespace scopy::admt;
 
-RegisterBlockWidget::RegisterBlockWidget(
-    QString header, QString description, uint32_t address, uint32_t cnvPage,
-    RegisterBlockWidget::ACCESS_PERMISSION accessPermission, QWidget *parent)
-    : QWidget(parent), m_address(address), m_cnvPage(cnvPage),
-      m_accessPermission(accessPermission) {
-  QVBoxLayout *container = new QVBoxLayout(this);
-  setLayout(container);
-  container->setMargin(0);
-  container->setSpacing(0);
-  MenuSectionWidget *menuSectionWidget = new MenuSectionWidget(this);
-  Style::setStyle(menuSectionWidget, style::properties::widget::basicComponent);
-  QLabel *headerLabel = new QLabel(header, menuSectionWidget);
-  Style::setStyle(headerLabel, style::properties::label::menuMedium);
-  menuSectionWidget->setFixedHeight(180);
-  menuSectionWidget->contentLayout()->setSpacing(
-      Style::getDimension(json::global::unit_0_5));
+RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, uint32_t address, uint32_t cnvPage,
+					 RegisterBlockWidget::ACCESS_PERMISSION accessPermission, QWidget *parent)
+	: QWidget(parent)
+	, m_address(address)
+	, m_cnvPage(cnvPage)
+	, m_accessPermission(accessPermission)
+{
+	QVBoxLayout *container = new QVBoxLayout(this);
+	setLayout(container);
+	container->setMargin(0);
+	container->setSpacing(0);
+	MenuSectionWidget *menuSectionWidget = new MenuSectionWidget(this);
+	Style::setStyle(menuSectionWidget, style::properties::widget::basicComponent);
+	QLabel *headerLabel = new QLabel(header, menuSectionWidget);
+	Style::setStyle(headerLabel, style::properties::label::menuMedium);
+	menuSectionWidget->setFixedHeight(180);
+	menuSectionWidget->contentLayout()->setSpacing(Style::getDimension(json::global::unit_0_5));
 
-  QLabel *descriptionLabel = new QLabel(description, menuSectionWidget);
-  descriptionLabel->setWordWrap(true);
-  descriptionLabel->setMinimumHeight(24);
-  descriptionLabel->setAlignment(Qt::AlignTop);
-  descriptionLabel->setSizePolicy(QSizePolicy::Preferred,
-                                  QSizePolicy::MinimumExpanding);
+	QLabel *descriptionLabel = new QLabel(description, menuSectionWidget);
+	descriptionLabel->setWordWrap(true);
+	descriptionLabel->setMinimumHeight(24);
+	descriptionLabel->setAlignment(Qt::AlignTop);
+	descriptionLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 
-  m_spinBox = new PaddedSpinBox(menuSectionWidget);
-  Style::setStyle(m_spinBox, style::properties::admt::spinBox);
-  m_spinBox->setButtonSymbols(m_spinBox->ButtonSymbols::NoButtons);
+	m_spinBox = new PaddedSpinBox(menuSectionWidget);
+	Style::setStyle(m_spinBox, style::properties::admt::spinBox);
+	m_spinBox->setButtonSymbols(m_spinBox->ButtonSymbols::NoButtons);
 
-  m_value = 0x00;
-  m_spinBox->setValue(m_value);
+	m_value = 0x00;
+	m_spinBox->setValue(m_value);
 
-  QWidget *buttonsWidget = new QWidget(menuSectionWidget);
-  QHBoxLayout *buttonsContainer = new QHBoxLayout(buttonsWidget);
-  buttonsWidget->setLayout(buttonsContainer);
+	QWidget *buttonsWidget = new QWidget(menuSectionWidget);
+	QHBoxLayout *buttonsContainer = new QHBoxLayout(buttonsWidget);
+	buttonsWidget->setLayout(buttonsContainer);
 
-  buttonsContainer->setMargin(0);
-  buttonsContainer->setSpacing(Style::getDimension(json::global::unit_0_5));
-  switch (m_accessPermission) {
-  case ACCESS_PERMISSION::READWRITE:
-    addReadButton(buttonsWidget);
-    addWriteButton(buttonsWidget);
-    break;
-  case ACCESS_PERMISSION::WRITE:
-    addWriteButton(buttonsWidget);
-    break;
-  case ACCESS_PERMISSION::READ:
-    addReadButton(buttonsWidget);
-    m_spinBox->setReadOnly(true);
-    break;
-  }
+	buttonsContainer->setMargin(0);
+	buttonsContainer->setSpacing(Style::getDimension(json::global::unit_0_5));
+	switch(m_accessPermission) {
+	case ACCESS_PERMISSION::READWRITE:
+		addReadButton(buttonsWidget);
+		addWriteButton(buttonsWidget);
+		break;
+	case ACCESS_PERMISSION::WRITE:
+		addWriteButton(buttonsWidget);
+		break;
+	case ACCESS_PERMISSION::READ:
+		addReadButton(buttonsWidget);
+		m_spinBox->setReadOnly(true);
+		break;
+	}
 
-  menuSectionWidget->contentLayout()->addWidget(headerLabel);
-  menuSectionWidget->contentLayout()->addWidget(descriptionLabel);
-  menuSectionWidget->contentLayout()->addWidget(m_spinBox);
-  menuSectionWidget->contentLayout()->addWidget(buttonsWidget);
+	menuSectionWidget->contentLayout()->addWidget(headerLabel);
+	menuSectionWidget->contentLayout()->addWidget(descriptionLabel);
+	menuSectionWidget->contentLayout()->addWidget(m_spinBox);
+	menuSectionWidget->contentLayout()->addWidget(buttonsWidget);
 
-  container->addWidget(menuSectionWidget);
-  container->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding,
-                                           QSizePolicy::Preferred));
+	container->addWidget(menuSectionWidget);
+	container->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::Preferred));
 
-  connect(m_spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
-          &RegisterBlockWidget::onValueChanged);
+	connect(m_spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &RegisterBlockWidget::onValueChanged);
 }
 
 RegisterBlockWidget::~RegisterBlockWidget() {}
 
-void RegisterBlockWidget::onValueChanged(int newValue) {
-  m_value = static_cast<uint32_t>(newValue);
-}
+void RegisterBlockWidget::onValueChanged(int newValue) { m_value = static_cast<uint32_t>(newValue); }
 
 uint32_t RegisterBlockWidget::getValue() { return m_value; }
 
-void RegisterBlockWidget::setValue(uint32_t value) {
-  m_value = value;
-  m_spinBox->setValue(m_value);
+void RegisterBlockWidget::setValue(uint32_t value)
+{
+	m_value = value;
+	m_spinBox->setValue(m_value);
 }
 
 uint32_t RegisterBlockWidget::getAddress() { return m_address; }
 
 uint32_t RegisterBlockWidget::getCnvPage() { return m_cnvPage; }
 
-RegisterBlockWidget::ACCESS_PERMISSION
-RegisterBlockWidget::getAccessPermission() {
-  return m_accessPermission;
-}
+RegisterBlockWidget::ACCESS_PERMISSION RegisterBlockWidget::getAccessPermission() { return m_accessPermission; }
 
-void RegisterBlockWidget::addReadButton(QWidget *parent) {
-  m_readButton = new QPushButton("Read", parent);
-  Style::setStyle(m_readButton, style::properties::button::basicButton);
-  parent->layout()->addWidget(m_readButton);
+void RegisterBlockWidget::addReadButton(QWidget *parent)
+{
+	m_readButton = new QPushButton("Read", parent);
+	Style::setStyle(m_readButton, style::properties::button::basicButton);
+	parent->layout()->addWidget(m_readButton);
 }
 
 QPushButton *RegisterBlockWidget::readButton() { return m_readButton; }
 
-void RegisterBlockWidget::addWriteButton(QWidget *parent) {
-  m_writeButton = new QPushButton("Write", parent);
-  Style::setStyle(m_writeButton, style::properties::button::basicButton);
-  parent->layout()->addWidget(m_writeButton);
+void RegisterBlockWidget::addWriteButton(QWidget *parent)
+{
+	m_writeButton = new QPushButton("Write", parent);
+	Style::setStyle(m_writeButton, style::properties::button::basicButton);
+	parent->layout()->addWidget(m_writeButton);
 }
 
 QPushButton *RegisterBlockWidget::writeButton() { return m_writeButton; }
 
-PaddedSpinBox::PaddedSpinBox(QWidget *parent) : QSpinBox(parent) {
-  setDisplayIntegerBase(16);
-  setMinimum(0);
-  setMaximum(INT_MAX);
+PaddedSpinBox::PaddedSpinBox(QWidget *parent)
+	: QSpinBox(parent)
+{
+	setDisplayIntegerBase(16);
+	setMinimum(0);
+	setMaximum(INT_MAX);
 }
 
 PaddedSpinBox::~PaddedSpinBox() {}
 
-QString PaddedSpinBox::textFromValue(int value) const {
-  return QString("0x%1").arg(value, 4, 16, QChar('0'));
-}
+QString PaddedSpinBox::textFromValue(int value) const { return QString("0x%1").arg(value, 4, 16, QChar('0')); }
 #include "moc_registerblockwidget.cpp"
