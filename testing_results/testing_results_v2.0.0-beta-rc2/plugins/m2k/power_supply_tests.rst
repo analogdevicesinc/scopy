@@ -29,6 +29,11 @@ If the test case has special requirements, they will be listed in the test case 
          - v2.0.0
          - N/A
          - none
+       * - Bindea Cristian
+         - 18.02.2025
+         - v2.0.0-beta-rc2-91a3a3a
+         - N/A
+         - None
 
 Setup environment:
 ------------------
@@ -92,9 +97,9 @@ is working correctly.
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
-**Comments:** none
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
@@ -147,9 +152,9 @@ is working correctly.
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
-**Comments:** none
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
@@ -195,9 +200,9 @@ is working correctly.
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
-**Comments:** none
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
@@ -258,9 +263,9 @@ is working correctly.
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
-**Comments:** none
+**Comments:** None.
 
 ..
   Any comments about the test goes here.

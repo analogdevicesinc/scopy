@@ -26,6 +26,11 @@ the Oscilloscope plugin.
          - v2.0.0
          - N/A
          - none
+       * - Bindea Cristian
+         - 18.02.2025
+         - v2.0.0-beta-rc2-91a3a3a
+         - N/A
+         - None
 
 Setup environment:
 ------------------
@@ -93,12 +98,12 @@ volts/div knobs.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
@@ -163,12 +168,12 @@ which depends on the value of the Time Base.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
@@ -211,14 +216,14 @@ oscilloscope using Channel 1.
     1. Change the value to 0V in the Signal Generator and monitor it on the Oscilloscope:
         - **Expected result:** 
             - The reading is within 4.9V to 5.1V.
-        - **Actual result:** The RMS value keeps fluctuating between 34mV and 39mV.
+        - **Actual result:** The RMS value keeps fluctuating between 29mV and 39mV.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
@@ -262,7 +267,7 @@ using Channel 1.
             - The plot displays 1.5 periods.
             - The measurements display: Period: 5ms, Frequency: 200 Hz,
               Peak-peak: 1.9Vpp to 2.1Vpp, RMS: 0.6Vrms to 0.8Vrms.
-        - **Actual result:** All values are displayed correctly. RMS value is around 733mV.
+        - **Actual result:** All values are displayed correctly. RMS value is around 730mV.
 
 ..
   Actual test result goes here.
@@ -280,12 +285,12 @@ using Channel 1.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
@@ -345,7 +350,7 @@ the oscilloscope using Channel 1.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
@@ -403,24 +408,24 @@ the oscilloscope using Channel 1.
             - The measurements display: Period: 50us, Frequency: 20 kHz,
               Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.3Vrms to 1.5Vrms.
         
-        - **Actual result:** All values are displayed correctly.
+        - **Actual result:** Failed, the plot displays ony 2 triangle waves.
 
 ..
   Actual test result goes here.
 ..
 
               
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** nonne 
+**Comments:** For step 5, the Time base of 5us/dev and the signal frequency of 20kHz displays 2 periods, not 6 as in the Expected result. In order to display 6 triangle waves, the time base should be 20us/div. And at step 4, the unit of measure for RMS is displayed as V, not Vrms.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -454,7 +459,7 @@ the signal generator on the oscilloscope using Channel 1.
             - The plot displays 3 sawtooth waves.
             - The measurements display: Period: 50us, Frequency: 20 kHz,
               Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2Vrms to 2.4Vrms.
-        - **Actual result:** All values are displayed correctly.
+        - **Actual result:** The Peak-peak value is a little higher than expected, 8.3-8.4V. Excluding this, the All values are displayed correctly.
 
 ..
   Actual test result goes here.
@@ -465,20 +470,19 @@ the signal generator on the oscilloscope using Channel 1.
             - The plot displays 3 sawtooth waves.
             - The measurements display: Period: 50us, Frequency: 20 kHz,
               Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2Vrms to 2.4Vrms.
-        - **Actual result:** All values are displayed correctly.
+        - **Actual result:** The Peak-peak value is a little higher than expected, 8.5V. Excluding this, the All values are displayed correctly.
 
 ..
   Actual test result goes here.
 ..
 
               
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
-
+**Comments:** The Peak-peak value is a little higher than expected.
 ..
   Any comments about the test goes here.
 
@@ -519,7 +523,7 @@ Channel 1.
         - **Expected result:**
             - The frequency 1/ΔT is around 200Hz.
         
-        - **Actual result:**
+        - **Actual result:** Works as expected, 1/ΔT is around 200Hz.
 
 ..
   Actual test result goes here.
@@ -531,7 +535,7 @@ Channel 1.
         - **Expected result:**
             - The peak-peak amplitude is around 2V.
         
-        - **Actual result:**
+        - **Actual result:** Works as expected, peak-peak amplitude is around 2V.
 
 ..
   Actual test result goes here.
@@ -540,7 +544,7 @@ Channel 1.
     6. In the Cursors Settings menu turn off the Horizontal cursors:
         - **Expected result:**
             - The horizontal cursors disappear from the plot as well as from the readouts.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -549,24 +553,24 @@ Channel 1.
     7. In the Cursors Settings menu turn off the Vertical cursors:
         - **Expected result:**
             - The vertical cursors disappear from the plot as well as from the readouts.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
               
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -603,7 +607,7 @@ with different trigger configurations.
         - **Expected result:**
             - The plot time handle is centered at the rising edge of the triangle wave.
             - The signal is static (not moving around at each triggered sample).
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -613,7 +617,7 @@ with different trigger configurations.
         - **Expected result:**
             - The plot time handle is centered at the falling edge of the triangle wave.
             - The signal is static (not moving around at each triggered sample).
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -623,7 +627,7 @@ with different trigger configurations.
         - **Expected result:**
             - The signal on the plot is not triggered and unstable.
             - The plot level is outside the triggered range of ~1.3V to +2.5V.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -633,7 +637,7 @@ with different trigger configurations.
         - **Expected result:**
             - The signal on the plot is triggered and stable.
             - The plot level is in the triggered range of ~1.3V to +2.5V.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -643,7 +647,7 @@ with different trigger configurations.
         - **Expected result:**
             - The signal on the plot is not triggered and unstable.
             - The plot level is outside the triggered range of 0V to +2.5V.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -653,7 +657,7 @@ with different trigger configurations.
          - **Expected result:**
             - The signal on the plot is triggered and stable.
             - The plot level is in the triggered range of 0V to +2.5V.
-         - **Actual result:**
+         - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -663,24 +667,24 @@ with different trigger configurations.
          - **Expected result:**
             - The signal on the plot is not triggered and unstable.
             - The plot level is outside the triggered range of 0V to +2.5V.
-         - **Actual result:**
+         - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
               
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -712,7 +716,7 @@ Test 10 - Math Channel Operations
         - *sqrt(t0*t0)*
         - **Expected result:**
             - The plot contains a new Channel having all the samples from Channel 1.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -723,7 +727,7 @@ Test 10 - Math Channel Operations
          - **Expected result:**
             - The plot contains a new Channel having the amplitude of 
               Channel 2 increased 4 times.
-         - **Actual result:**
+         - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -737,24 +741,24 @@ Test 10 - Math Channel Operations
         - **Expected result:**
             - The plot contains a new Channel having the sum of Channel 1 and Channel 2.
             - Math channel measurement: Vpp: 8V, Period: 5ms, Frequency: 200Hz.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** On macOS there were a few occasional crashes when editing or removing a math channel.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -782,24 +786,24 @@ Test 11 - FFT Function
     3. Run the Oscilloscope and verify the plot:
         - **Expected result:** The resulting spectrum shows 
           a series of peaks at the fundamental frequency and its harmonics.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** On macOS the information displayed by having the mouse cursor inside the plot is not properly fitted.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -829,7 +833,7 @@ The plot displays the current vs voltage characteristics of a PN junction diode.
         - **Expected result:** The plot displays a horizontal line on level 
           0 of the Y-Axis and in range 1 to 5 on the X-Axis.
 
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -839,7 +843,7 @@ The plot displays the current vs voltage characteristics of a PN junction diode.
         - **Expected result:** The plot displays a horizontal line on level 
           0 of the Y-Axis and in range 0 to 4 on the X-Axis.
 
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -848,7 +852,7 @@ The plot displays the current vs voltage characteristics of a PN junction diode.
     5. Set the X-Y configuration to CH1 on both X-Axis and Y-Axis:
         - **Expected result:** The plot displays a diagonal line 
           in the range 0 to 4 on both axes.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -857,24 +861,24 @@ The plot displays the current vs voltage characteristics of a PN junction diode.
     6. Set the X-Y configuration to CH2 on X-Axis and CH1 on Y-Axis:
         - **Expected result:** The plot displays a vertical line 
           from 0 to 4 on the Y-Axis and 0 on the X-Axis.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -907,7 +911,7 @@ Test 13 - Export feature
     5. Click **Export** and choose a name, the CSV format and location to save the file.
         - **Expected result:** The file is saved successfully at the 
           specified location.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -919,7 +923,7 @@ Test 13 - Export feature
               device name, number of samples, sample rate, instrument name.
             - The file contains 3 columns: sample number, time, voltage.
             - The data matches with that samples displayed on the plot.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -929,7 +933,7 @@ Test 13 - Export feature
     8. Click **Export** and choose a name, the CSV format and location to save the file.
         - **Expected result:** The file is saved successfully at the 
           specified location.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -941,24 +945,24 @@ Test 13 - Export feature
               device name, number of samples, sample rate, instrument name.
             - The file contains 4 columns: sample number, time, voltage1, voltage2.
             - The data matches with that samples displayed on the plot.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -990,7 +994,7 @@ the Oscilloscope should be able to center the trace at 0V.
         - **Expected result:**
             - The trace moves towards 0V until it is centered at level 0V.
             - The measurement Mean is around 0V.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1000,14 +1004,14 @@ the Oscilloscope should be able to center the trace at 0V.
         - **Expected result:**
             - The trace moves back to the original position.
             - The measurement Mean is around 0V.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
@@ -1017,7 +1021,7 @@ the Oscilloscope should be able to center the trace at 0V.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1048,7 +1052,7 @@ Test 15 - Probe Attenuation
         - **Expected result:**
             - The measurement Vpp is 200mV.
             - The Volts/Div is 100mV.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1058,7 +1062,7 @@ Test 15 - Probe Attenuation
         - **Expected result:**
             - The measurement Vpp is 200V.
             - The Volts/Div is 100V.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1068,24 +1072,24 @@ Test 15 - Probe Attenuation
         - **Expected result:**
             - The measurement Vpp is 2V.
             - The Volts/Div is 1V.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1123,7 +1127,7 @@ using the TI pin and the digital DIO1 pin of the ADALM2000 device.
     5. Run all instruments:
         - **Expected result:** The 5Vpp sinewave is displayed on CH2 
           of the Osc plot.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1132,7 +1136,7 @@ using the TI pin and the digital DIO1 pin of the ADALM2000 device.
     6. Stop the Pattern Generator:
         - **Expected result:** The plot stops updating and the status 
           displays "Waiting".
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1147,7 +1151,7 @@ using the TI pin and the digital DIO1 pin of the ADALM2000 device.
         - Source: Logic Analyzer
         - **Expected result:**
             - The plot is not trigger and the status displays "Waiting".
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1157,24 +1161,24 @@ using the TI pin and the digital DIO1 pin of the ADALM2000 device.
     11. Manually toggle DIO1 from output to input and viceversa:
          - **Expected result:**
             - The Osc plot is triggered when toggling the digital pin.
-         - **Actual result:**
+         - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1210,24 +1214,28 @@ using a configuration that displays too many periods on the plot.
             - The horizontal Time Base is adjusted to 50us/div.
             - The horizontal and vertical positions are at 0.
             - The trigger level is at 0V.
-        - **Actual result:**
+        - **Actual result:** Failed, autoset settings are wrong. They are: 
+		- Volts/div = 10V
+		- horizontal Time Base = 50us/div
+		- horizontal and vertical positions are at 0
+		- trigger level = 25V
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Autoset button, sets the trigger level and the time base to wrong values.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1256,7 +1264,7 @@ Test 18 - Print Plot
     4. Click the Print button and choose a name and location for the PDF file:
         - **Expected result:**
             - The file is saved successfully at the specified location.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1265,19 +1273,19 @@ Test 18 - Print Plot
     5. Open the file and verify the data.
         - **Expected result:**
             - The file contains a screenshot of the instrument with inverted colors.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** As step 5 the screenshot does not have inverted colors if the Light Theme for Scopy is used.
 
 ..
   Any comments about the test goes here.
@@ -1312,7 +1320,7 @@ and plot the signal using lines, dots, sticks or steps.
     4. Open the Channel 1 settings menu and set the curve style to Dots:
         - **Expected result:**
             - The plot is displayed using dots (when zoomed in to samples).
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1321,7 +1329,7 @@ and plot the signal using lines, dots, sticks or steps.
     5. Set the curve style to Sticks:
         - **Expected result:**
             - The plot is displayed using lines (the sinewave looks "full").
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1330,24 +1338,24 @@ and plot the signal using lines, dots, sticks or steps.
     6. Set the curve style to Smooth:
         - **Expected result:**
             - The plot is displayed using a smoother lines.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1380,7 +1388,7 @@ Apply the measurements on a gated portion of the acquired signal.
         - **Expected result:**
             - The measurement Vpp is half the set amplitude: 2.5V.
         
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1389,24 +1397,24 @@ Apply the measurements on a gated portion of the acquired signal.
     5. Move the sliders to the left and right ends of the plot:
         - **Expected result:**
             - The measurement Vpp is the set amplitude: 5V.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1435,7 +1443,7 @@ Test 21 - Histogram
     4. In the Oscilloscope General settings menu enable the Histogram:
         - **Expected result:**
             - A histogram is displayed above the time plot.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -1444,24 +1452,24 @@ Test 21 - Histogram
     5. Change the Signal Generator to output a Square wave:
         - **Expected result:**
             - The histogram shows the min and max of the square wave.
-        - **Actual result:**
+        - **Actual result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1491,7 +1499,7 @@ Test 22 - ADC Digital Filters
         - Channel 1 Vertical: Volts/Div: 500mV/div, Position: 0V
     3. TBD
 
-**Tested OS:** WindowsADI
+**Tested OS:**
 
 ..
   Details about the tested OS goes here.

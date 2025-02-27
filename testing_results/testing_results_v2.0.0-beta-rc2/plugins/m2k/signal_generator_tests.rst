@@ -23,6 +23,11 @@ Signal Generator - Test Suite
          - v2.0.0
          - N/A
          - none
+       * - Bindea Cristian
+         - 18.02.2025
+         - v2.0.0-beta-rc2-91a3a3a
+         - N/A
+         - None
 
 Setup environment:
 -------------------------------------------------------
@@ -164,9 +169,8 @@ Test 1: Channel 1 Operation
 
         33. Set the signal generator’s waveform type: Square wave, Amplitude 10V, Frequency: 5MHz, offset: 0V and Phase: 0 degrees. Set the Oscilloscope’s Volts/div: 2V/div, trigger mode: Auto and time base: 100ns
                     - **Expected Result:** Oscilloscope’s measurement should be Period: 200ns, Frequency: 5MHz, peak to peak value: 9.8V to 10.2V and Min/Max: ±5V
-                    - **Actual Result:** Oscilloscope’s measurement is: Period: 200ns, Frequency: 5MHz, peak to peak value: 9.8V to 10.2V and Min/Max: ±5V
+                    - **Actual Result:** Oscilloscope’s measurement is: Period: 200ns, Fr
 
-..
   Actual test result goes here.
 ..
 
@@ -262,12 +266,12 @@ Test 1: Channel 1 Operation
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none 
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
@@ -506,12 +510,12 @@ Test 2: Channel 2 Operation
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
@@ -539,7 +543,7 @@ Test 3: Channel 1 and Channel 2 Operation
         3. Connect AWG ch1 to scope ch1+ and scope ch1- to gnd. Connect AWG ch2 to scope ch2+ and scope ch2- to gnd
         4. Set signal generator’s channel 1 to 4.5V and channel 2 to -4.0V
                     - **Expected Result:** Open voltmeter instrument in DC mode. Channel 1 should have a voltage of 4.4V to 4.6V and channel 2 should have a voltage of -4.1V to -3.9V
-                    - **Actual Result:**
+                    - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -553,7 +557,7 @@ Test 3: Channel 1 and Channel 2 Operation
         10. Set signal generator channels 1 and 2 to either Sine or Triangle waveform type, they should be the same. For channel 1 set Amplitude: 5V, Frequency: 5kHz, offset: 0V and phase: 0°. Set signal generator’s channel 2 to Amplitude: 5V, Frequency: 5kHz, offset: 0V and phase: 180°. Set Oscilloscope’s both channel to Time Base: 200us, Volts/Div: 1V
         11. Run Oscilloscope, add channel with an input function: f(t) = sin(t1) + sin(t0).
                     - **Expected Result:** The new plot’s value should be very close to 0V ranging around -0.2V to 0.2V
-                    - **Actual Result:**
+                    - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -562,23 +566,23 @@ Test 3: Channel 1 and Channel 2 Operation
         12. Set signal generator channels 1 and 2 to either Sine or Triangle waveform type, they should be the same. For channel 1 set Amplitude: 5V, Frequency: 5kHz, offset: 0V and phase: 0°. Set signal generator’s channel 2 to Amplitude: 5V, Frequency: 5kHz, offset: 0V and phase: 360°. Set Oscilloscope’s both channel to Time Base: 200us, Volts/Div: 1V
         13. Run Oscilloscope, add channel with an input function: f(t) = sin(t1) - sin(t0).
                     - **Expected Result:** The new plot’s value should be very close to 0V ranging around -0.2V to 0.2V
-                    - **Actual Result:**
+                    - **Actual Result:** Works as expected, but the 360° phase can't be set, it defaults to 0°. 
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -600,7 +604,7 @@ Test 4: Additional Features
         2. Turn on Signal Generator’s channel 1 and set the following parameter, Waveform Type: Square Wave, Amplitude: 3V, Offset: 1.5V, Frequency: 1kHz, Phase: 0degrees and Duty Cycle: 50%
         3. Connect AWG ch1 to scope ch1+ and scope ch1- to gnd
                     - **Expected Result:** Check in the Oscilloscope if the Square Wave signal generated is from 0V to 3V.
-                    - **Actual Result:**
+                    - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -609,7 +613,7 @@ Test 4: Additional Features
         4. Choose Uniform Noise Type in the dropdown menu and set it to 500mV
         5. Set the Oscilloscope’s setting to Time Base: 100us, Volts/Div: 500mV/Div; Using the cursors measure the noise generated in the square waveform
                     - **Expected Result:** The measured voltage should be close to 500mV. Check the step resource picture for reference.
-                    - **Actual Result:**
+                    - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -617,7 +621,7 @@ Test 4: Additional Features
 
         6. Repeat steps 1.3 and 1.4 using different Noise Amplitude [1V, 1.5V, 2V and 2.5V]
                     - **Expected Result:** The measured voltage should be close to the desired noise voltage.
-                    - **Actual Result:**
+                    - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -626,7 +630,7 @@ Test 4: Additional Features
         7. Test Buffer
         8. Download buffer test files (https://wiki.analog.com/_media/university/tools/m2k/scopy/test-cases/signal_generator_buffer_test.zip). Open Signal Generator Instrument and click the Buffer Tab
                     - **Expected Result:** Refer to the Step Resource Image for reference
-                    - **Actual Result:**
+                    - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -636,7 +640,7 @@ Test 4: Additional Features
         10. Test .csv file
         11. Load the .csv file from the downloaded .zip file
                     - **Expected Result:** The signal generated should be a stair step signal.
-                    - **Actual Result:**
+                    - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -645,7 +649,7 @@ Test 4: Additional Features
         12. Test .mat file
         13. Load the .mat file from the downloaded .zip file. Set the frequency to 20kHz, and the time base of Oscilloscope to 10ms.
                     - **Expected Result:** The signal generated should be a sine wave signal.
-                    - **Actual Result:**
+                    - **Actual Result:** On macOS: File not loaded due to errors.
 
 ..
   Actual test result goes here.
@@ -654,7 +658,7 @@ Test 4: Additional Features
         14. Test Math
         15. Open Signal Generator Instrument and click the Math tab
                     - **Expected Result:** Refer to the Step Resource image for reference.
-                    - **Actual Result:**
+                    - **Actual Result:** Works as expected, the Math tab opens.
 
 ..
   Actual test result goes here.
@@ -664,7 +668,7 @@ Test 4: Additional Features
         17. Generate Sine waves
         18. In the Signal Generator Math Function tab, set frequency to 100Hz, and type in the function box 5*sin(t) and click apply. In the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 2ms
                     - **Expected Result:** The generated sine wave signal should have the following parameters, peak to peak: 9.6Vpp to 10.4Vpp, frequency: 100Hz, and period: 10ms. Refer to the Step resource image for reference
-                    - **Actual Result:**
+                    - **Actual Result:** Failed, this test needs to be updated.
 
 ..
   Actual test result goes here.
@@ -672,7 +676,7 @@ Test 4: Additional Features
 
         19. In the Signal Generator Math Function tab, set frequency to 1kHz, and type in the function box 4*sin(10*t) and click apply. In the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 20us
                     - **Expected Result:** The generated sine wave signal should have the following parameters, peak to peak: 7.6Vpp to 8.4Vpp, frequency: 10kHz, and period: 100us. Refer to the Step resource image for reference
-                    - **Actual Result:**
+                    - **Actual Result:** Failed, this test needs to be updated.
 
 ..
   Actual test result goes here.
@@ -680,7 +684,7 @@ Test 4: Additional Features
 
         20. In the Signal Generator Math Function tab, set frequency to 100kHz, and type in the function box 3*sin(50*t) and click apply. In the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 100ns
                     - **Expected Result:** The generated sine wave signal should have the following parameters, peak to peak: 5.6Vpp to 6.4Vpp, frequency: 5MHz, and period: 200ns. Refer to the Step resource image for reference
-                    - **Actual Result:**
+                    - **Actual Result:** Failed, this test needs to be updated.
 
 ..
   Actual test result goes here.
@@ -689,7 +693,7 @@ Test 4: Additional Features
         21. Generate Square waves
         22. In the Signal Generator Math Function tab, set frequency to 500kHz, and type in the function box 4*sin(t) + 4*sin(3*t)/3 + 4*sin(5*t)/5 + 4*sin(7*t)/7 + 4*sin(9*t)/9 + 4*sin(11*t)/11 (you can copy and paste the text to Scopy) and click apply. In the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 500ns
                     - **Expected Result:** The generated square wave signal should have the following parameters, peak to peak: 7Vpp to 7.4Vpp, frequency: 500kHz, and period: 2us. Refer to the Step resource image for reference
-                    - **Actual Result:**
+                    - **Actual Result:** Failed, this test needs to be updated.
 
 ..
   Actual test result goes here.
@@ -698,7 +702,7 @@ Test 4: Additional Features
         23. Waveform Phase – Seconds
         24. Open Waveform tab. Set frequency to 500Hz. Set Phase to 90 degrees. Then change phase unit to seconds.
                     - **Expected Result:** The value of Phase should automatically change to 500us that is 90 degrees in seconds for a frequency of 500Hz.
-                    - **Actual Result:**
+                    - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -706,7 +710,7 @@ Test 4: Additional Features
 
         25. Increase and decrease the value of phase.
                     - **Expected Result:** The display should follow accordingly.
-                    - **Actual Result:**
+                    - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -714,7 +718,7 @@ Test 4: Additional Features
 
         26. Increase phase value to 1.5 ms. Then change again the unit to degrees.
                     - **Expected Result:** The value should now be 270 degrees.
-                    - **Actual Result:**
+                    - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -722,7 +726,7 @@ Test 4: Additional Features
 
         27. Change frequency to 1 MHz. Then set phase to 1us. This corresponds to a full period of a 1MHz frequency.
                     - **Expected Result:** The interface should look like in steps resources picture.
-                    - **Actual Result:**
+                    - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -730,23 +734,23 @@ Test 4: Additional Features
 
         28. Change phase unit to degrees.
                     - **Expected Result:** The value should be 360 degrees.
-                    - **Actual Result:**
+                    - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** On macOS inside the signal generator buffer tab, the .mat files can't be loaded. Some tests need to be updated. The references to other pictures should be removed.
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).

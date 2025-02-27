@@ -29,6 +29,11 @@ If the test case has special requirements, they will be listed in the test case 
          - v2.0.0
          - N/A
          - none
+       * - Bindea Cristian
+         - 18.02.2025
+         - v2.0.0-beta-rc2-91a3a3a
+         - N/A
+         - None
 
 Setup environment:
 ------------------
@@ -81,7 +86,7 @@ digital channels - rising edge, falling edge, high, low, any edge.
     7. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     8. In the Digital IO, change DIO0’s output from 0 to 1.
         - **Expected Result**: The logic analyzer initiates a capture.
-        - **Actual Result:**
+        - **Actual Result:** Fail at step 5.
 
 ..
   Actual test result goes here.
@@ -91,7 +96,7 @@ digital channels - rising edge, falling edge, high, low, any edge.
     10. Run the Logic Analyzer instrument.
     11. In the Digital IO, change DIO0’s output from 1 to 0.
          - **Expected Result**: The logic analyzer initiates a capture.
-         - **Actual Result:**
+         - **Actual Result:** Skip.
 
 ..
   Actual test result goes here.
@@ -101,7 +106,7 @@ digital channels - rising edge, falling edge, high, low, any edge.
     13. Run the Logic Analyzer instrument.
     14. In the Digital IO, change DIO0’s output from 0 to 1 or 1 to 0.
          - **Expected Result**: The logic analyzer initiates a capture.
-         - **Actual Result:**
+         - **Actual Result:** Skip.
 
 ..
   Actual test result goes here.
@@ -111,7 +116,7 @@ digital channels - rising edge, falling edge, high, low, any edge.
     16. Run the Logic Analyzer instrument.
     17. In the Digital IO, set DIO0’s output to 0.
          - **Expected Result**: The logic analyzer continuously captures the signal.
-         - **Actual Result:**
+         - **Actual Result:** Skip.
 
 ..
   Actual test result goes here.
@@ -121,18 +126,18 @@ digital channels - rising edge, falling edge, high, low, any edge.
     19. Run the Logic Analyzer instrument.
     20. In the Digital IO, set DIO0’s output to 1.
          - **Expected Result**: The logic analyzer continuously captures the signal.
-         - **Actual Result:**
+         - **Actual Result:** Skip.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
+**Comments:** Fail at step 5, due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
 **Result:** FAIL
 
@@ -168,7 +173,7 @@ Test 2 - External Channel Trigger Function
        Select the source as **External Trigger In**.
         
         - **Expected Result**: Triggers set on every DIO channels are automatically turned off.
-        - **Actual Result:**
+        - **Actual Result:** Fail at step 5.
 
 ..
   Actual test result goes here.
@@ -180,7 +185,7 @@ Test 2 - External Channel Trigger Function
     9. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     10. In the Digital IO, change DIO0’s output from 0 to 1.
          - **Expected Result**: The logic analyzer initiates a capture.
-         - **Actual Result:** 
+         - **Actual Result:** Skip.
 
 ..
   Actual test result goes here.
@@ -190,7 +195,7 @@ Test 2 - External Channel Trigger Function
     12. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     13. In the Digital IO, change DIO0’s output from 1 to 0.
          - **Expected Result**: The logic analyzer initiates a capture.
-         - **Actual Result:**
+         - **Actual Result:** Skip.
 
 ..
   Actual test result goes here.
@@ -200,7 +205,7 @@ Test 2 - External Channel Trigger Function
     15. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     16. In the Digital IO, change DIO0’s output from 0 to 1 or 1 to 0.
          - **Expected Result**: The logic analyzer initiates a capture.
-         - **Actual Result:**
+         - **Actual Result:** Skip.
 
 ..
   Actual test result goes here.
@@ -210,7 +215,7 @@ Test 2 - External Channel Trigger Function
     18. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     19. In the Digital IO, set DIO0’s output to 0.
          - **Expected Result**: The logic analyzer continuously captures the signal.
-         - **Actual Result:**
+         - **Actual Result:** Skip.
 
 ..
   Actual test result goes here.
@@ -220,18 +225,18 @@ Test 2 - External Channel Trigger Function
     21. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     22. In the Digital IO, set DIO0’s output to 1.
          - **Expected Result**: The logic analyzer continuously captures the signal.
-         - **Actual Result:**
+         - **Actual Result:** Skip.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
+**Comments:** Fail at step 5, due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
 **Result:** FAIL
 
@@ -316,12 +321,12 @@ Oscilloscope as the source.
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** The instructions are confusing, the first steps are lacking setup information.
 
 **Result:** PASS
 
@@ -357,7 +362,7 @@ Test 4 - Trigger Modes
     8. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     9. In the Digital IO instrument set DIO0’s output to 0 and DIO1’s output to 0.
         - **Expected Result**: The logic analyzer does not start capturing.
-        - **Actual Result:**
+        - **Actual Result:** Fail at step 5.
 
 ..
   Actual test result goes here.
@@ -365,7 +370,7 @@ Test 4 - Trigger Modes
 
     10. In the Digital IO instrument set DIO0 or DIO1’s output to 1.
          - **Expected Result**: The logic analyzer starts capturing signal when either of the DIO0 OR DIO1 is HIGH.
-         - **Actual Result:**
+         - **Actual Result:** Skip.
 
 ..
   Actual test result goes here.
@@ -375,7 +380,7 @@ Test 4 - Trigger Modes
     12. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     13. In the Digital IO instrument set DIO0’s output to 0 and DIO1’s output to 1.
          - **Expected Result**: The logic analyzer does not start capturing.
-         - **Actual Result:**
+         - **Actual Result:** Skip.
 
 ..
   Actual test result goes here.
@@ -383,19 +388,19 @@ Test 4 - Trigger Modes
 
     14. In the Digital IO instrument set DIO0 and DIO1’s output to 1.
          - **Expected Result**: The logic analyzer starts capturing signal only when DIO0 AND DIO1 are HIGH.
-         - **Actual Result:**
+         - **Actual Result:** Skip.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** Fail due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
+**Comments:** Fail at step 5, due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
 
 **Result:** FAIL
 
@@ -493,12 +498,12 @@ Test 5 - Clock signal measurement accuracy
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 **Result:** PASS
 
@@ -543,12 +548,13 @@ Test 6 - Parallel Decoder
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
+
 **Result:** PASS
 
 
@@ -589,12 +595,12 @@ Test 7 - SPI decoder
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 **Result:** PASS
 
@@ -658,12 +664,12 @@ Test 8 - UART decoder
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 **Result:** PASS
 
@@ -697,12 +703,12 @@ Test 9 - PWM Decoder
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 **Result:** PASS
 
@@ -749,12 +755,12 @@ trace height and plot color.
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 **Result:** PASS
 
@@ -802,12 +808,12 @@ of the Logic Analyzer.
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 **Result:** PASS
 
@@ -843,12 +849,12 @@ of the Logic Analyzer.
 
     5. Open the .pdf exported file and visually compare it to the application plot.
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 **Result:** PASS
 
@@ -887,7 +893,7 @@ Test 13 - Decoder Table
         - **Expected Result**:
             - Each table row has RX data and time annotations.
             - The RX data corresponds to the data sent by the Pattern Generator.
-        - **Actual Result:**
+        - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -895,7 +901,7 @@ Test 13 - Decoder Table
 
     7. Write "^3$" in the Regex search box and press Enter.
         - **Expected Result**: Only the RX data equal to "3" is displayed in the table.
-        - **Actual Result:**
+        - **Actual Result:** The regex "^3$" doesn't display anything. But for other regex searches it works as expected. 
 
 ..
   Actual test result goes here.
@@ -903,18 +909,18 @@ Test 13 - Decoder Table
 
     8. Double click on the first RX data row of the decoder table:
         - **Expected Result**: The plot is zoomed in and centered on the corresponding data.
-        - **Actual Result:**
+        - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** The "^3$" regex from step 7 doesn't display anything on macOS.
 
 **Result:** PASS
