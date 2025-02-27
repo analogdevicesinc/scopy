@@ -23,6 +23,11 @@ Pattern Generator - Test Suite
          - v2.0.0
          - N/A
          - none
+       * - Bindea Cristian
+         - 18.02.2025
+         - v2.0.0-beta-rc2-91a3a3a
+         - N/A
+         - None
 
 Setup environment:
 ----------------------------------------------------------------------------------------------------
@@ -51,7 +56,7 @@ Test 1: Individual Channel Operation
         2. Connect DIO-0, CH0 to Scope CH1+, GND to Scope CH1-.
         3. Enable CH0. Double click on the DIO 0 indicator on the plot to open DIO 0 settings. Select pattern as Clock with a 5 KHz clock signal with duty cycle of 50%. Run instrument.
                 - **Expected Result:** You should see a square wave with 5 KHz frequency, 50% duty cycle.
-                - **Actual Result:** Data is displayed as expected.
+                - **Actual Result:** Eventually it works as expected. At least on macOS, the duty cycle is displayed as "--" until you hit the right Time Base. And the other required measurements appear only if the Time Base is above 15 us.
 
 ..
   Actual test result goes here.
@@ -59,7 +64,7 @@ Test 1: Individual Channel Operation
 
         4. Monitor CH0 through oscilloscope. Open built-in measurement feature for frequency, amplitude and duty cycle.
                 - **Expected Result:** You should see a square wave with 5 KHz frequency, 50% duty cycle. In the oscilloscope, Frequency: 5 KHz, Amplitude: 3.2V to 3.4 V, Duty+: 50 %, Duty-:50%
-                - **Actual Result:** The value is displayed correctly.
+                - **Actual Result:** Eventually it works as expected.
 
 ..
   Actual test result goes here.
@@ -67,7 +72,7 @@ Test 1: Individual Channel Operation
 
         5. Change frequency: 100 KHz, duty cycle: 30%.
                 - **Expected Result:** You should see a square wave with 100 KHz frequency, 30% duty cycle. In the oscilloscope, Frequency: 100 KHz, Amplitude: 3.2V to 3.4 V, Duty+: 30 %, Duty-: 70%
-                - **Actual Result:** The value is displayed correctly.
+                - **Actual Result:** Eventually it works as expected.
 
 ..
   Actual test result goes here.
@@ -75,7 +80,7 @@ Test 1: Individual Channel Operation
 
         6. Change frequency: 1 MHz, duty cycle: 60%.
                 - **Expected Result:** You should see a square wave with 1 MHz frequency, 60% duty cycle. In the oscilloscope, Frequency: 1 MHz, Amplitude: 3.2V to 3.4 V, Duty+: 60 %, Duty-: 40%
-                - **Actual Result:** The value is displayed correctly.
+                - **Actual Result:** Eventually it works as expected.
 
 ..
   Actual test result goes here.
@@ -83,7 +88,7 @@ Test 1: Individual Channel Operation
 
         7. Change frequency: 10 MHz, duty cycle: 70%.
                 - **Expected Result:** You should see a square wave with 10 MHz frequency, 70% duty cycle. In the oscilloscope, Frequency: 1 MHz, Amplitude: 3.2V to 3.4 V, Duty+: 70 %, Duty-: 30%
-                - **Actual Result:** The value is displayed correctly.
+                - **Actual Result:** Eventually it works as expected.
 
 ..
   Actual test result goes here.
@@ -147,12 +152,12 @@ Test 1: Individual Channel Operation
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** The Duty Cycle measurement is unreliable, it often displays "--".
 
 **Result:** PASS
 
@@ -171,7 +176,7 @@ Test 2: Group Channel Operation
 
 **Steps:**
         1. Checking Group Channels and Patterns: Use PP as output. Binary Counter
-        2. Create a 4-channel group. Enable channels DIO0 to DIO3. Then click “Group” and double click on the channel indicators on the plot, DIO 0 to DIO 3, then click “Done”. Change pattern to Binary Counter.
+        2. Create a 4-channel group. Enable channels D-n click “Group” and double click on the channel indicators on the plot, DIO 0 to DIO 3, then click “Done”. Change pattern to Binary Counter.
                 - **Expected Result:** The plot should show a binary counter from 1 to e. The frequency should be 5 KHz.
                 - **Actual Result:** The values are displayed correctly.
 
@@ -181,7 +186,7 @@ Test 2: Group Channel Operation
 
         3. Open logic analyzer. Make a group with channels DIO0 to DIO3. Once grouped, add parallel for the decoder. Make sure to select correct data lines in the parallel decoder settings.
                 - **Expected Result:** The plot in the logic analyzer should resemble the plot seen in the pattern generator.
-                - **Actual Result:** The values are displayed correctly.
+                - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -189,7 +194,7 @@ Test 2: Group Channel Operation
 
         4. Check the frequency of each channel through oscilloscope. Connect DIO0 to scopech1+. Enable built-in measurement for frequency.
                 - **Expected Result:** Frequency shown should be 2.4 KHz to 2.6 KHz, corresponding to set clock frequency/2.
-                - **Actual Result:** The values are displayed correctly.
+                - **Actual Result:** The frequency is displayed correctly.
 
 ..
   Actual test result goes here.
@@ -197,7 +202,7 @@ Test 2: Group Channel Operation
 
         5. Connect DIO1 to scopech1+. Enable built-in measurement for frequency.
                 - **Expected Result:** Frequency shown should be 1.24 KHz to 1.27 KHz, corresponding to set clock frequency/4.
-                - **Actual Result:**The values are displayed correctly.
+                - **Actual Result:** The frequency is displayed correctly.
 
 ..
   Actual test result goes here.
@@ -205,7 +210,7 @@ Test 2: Group Channel Operation
 
         6. Connect DIO2 to scopech1+. Enable built-in measurement for frequency.
                 - **Expected Result:** Frequency shown should be 620 Hz to 630 Hz, corresponding to set clock frequency/8.
-                - **Actual Result:** The values are displayed correctly.
+                - **Actual Result:** The frequency is displayed correctly.
 
 ..
   Actual test result goes here.
@@ -213,7 +218,7 @@ Test 2: Group Channel Operation
 
         7. Connect DIO3 to scopech1+. Enable built-in measurement for frequency.
                 - **Expected Result:** Frequency shown should be 310 Hz to 315 Hz, corresponding to set clock frequency/16.
-                - **Actual Result:** The values are displayed correctly.
+                - **Actual Result:** The frequency is displayed correctly.
 
 ..
   Actual test result goes here.
@@ -313,7 +318,7 @@ Test 2: Group Channel Operation
 
         23. Monitor the channel in the logic analyzer. Use UART as decoder. Set Baud: 9600, Data bits: 8, no parity.
                 - **Expected Result:** The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same ASCII data should be seen in logic analyzer.
-                - **Actual Result:** The values are displayed correctly.
+                - **Actual Result:** The values are displayed correctly. But the parallel decoder has to be closed before adding the UART decoder.
 
 ..
   Actual test result goes here.
@@ -418,12 +423,12 @@ Test 2: Group Channel Operation
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 **Result:** PASS
 
@@ -469,12 +474,12 @@ Test 3: Simultaneous Group and Individual Channels Operation
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 **Result:** PASS
 
@@ -495,7 +500,7 @@ Test 4: Other Features
         1. Checking UI: Changing Channel Name
         2. Open individual channel DIO. On its channel manager, modify its name to ‘CH 0’.
                 - **Expected Result:** The name should change as shown in steps resources picture.
-                - **Actual Result:** The values are displayed correctly.
+                - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -503,7 +508,7 @@ Test 4: Other Features
 
         3. Enable DIO 1 and change its name to 'CH 1'. Create a group with 'CH 0' and 'CH 1'.
                 - **Expected Result:** The list of names under the group should also correspond to the names of the channels as should change as shown in steps resources picture.
-                - **Actual Result:** The values are displayed correctly.
+                - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -512,7 +517,7 @@ Test 4: Other Features
         4. Trace Height
         5. Open channel ‘CH 0’. On its channel manager, change trace height to 50.
                 - **Expected Result:** The trace height should now be twice as shown in steps resources picture, compared to previous.
-                - **Actual Result:** The values are displayed correctly.
+                - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -520,7 +525,7 @@ Test 4: Other Features
 
         6. Change height again to 10.
                 - **Expected Result:** The height should now be lower as shown in steps resources picture
-                - **Actual Result:** The values are displayed correctly.
+                - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -529,7 +534,7 @@ Test 4: Other Features
         7. Knobs
         8. Checking frequency knob. Set the knob to large increment. No orange dot on the center. Change frequency value using the ± button.
                 - **Expected Result:** The frequency value should change accordingly with a high increment/decrement from 5 KHz to 10 KHz.
-                - **Actual Result:** The values are displayed correctly.
+                - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -537,7 +542,7 @@ Test 4: Other Features
 
         9. Set the knob to ±1 unit interval. With orange dot on the center. Change frequency value using the ± button.
                 - **Expected Result:** The frequency value should change accordingly with ±1 unit interval.
-                - **Actual Result:** The values are displayed correctly.
+                - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -555,7 +560,7 @@ Test 4: Other Features
 
         13. Try other patterns such as random pattern and monitor on oscilloscope.
                 - **Expected Result:** The oscilloscope should show random pulses from logic 0 to 1. It should look like in steps resources picture.
-                - **Actual Result:** The values are displayed correctly.
+                - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -565,7 +570,7 @@ Test 4: Other Features
         15. OD mode
         16. Change output to OD. Monitor output in oscilloscope.
                 - **Expected Result:** Oscilloscope should only show logic 0 since output is now in OD mode.
-                - **Actual Result:** The values are displayed correctly.
+                - **Actual Result:** Works as expected.
 
 ..
   Actual test result goes here.
@@ -608,12 +613,12 @@ Test 4: Other Features
   Actual test result goes here.
 ..
 
-**Tested OS:** WindowsADI
+**Tested OS:** WindowsADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 **Result:** PASS
 

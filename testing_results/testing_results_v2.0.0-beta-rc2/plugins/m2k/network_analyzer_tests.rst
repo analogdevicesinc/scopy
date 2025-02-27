@@ -23,6 +23,11 @@ Network Analyzer - Test Suite
          - v2.0.0
          - N/A
          - none
+       * - Bindea Cristian
+         - 18.02.2025
+         - v2.0.0-beta-rc2-91a3a3a
+         - N/A
+         - None
 
 Setup environment:
 ------------------
@@ -133,12 +138,12 @@ using a Low Pass Filter.
 ..
 
 
-**Tested OS:** Windows ADI
+**Tested OS:** Windows ADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
@@ -240,12 +245,12 @@ using a Low Pass Filter.
 ..
 
 
-**Tested OS:** Windows ADI
+**Tested OS:** Windows ADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
@@ -325,7 +330,7 @@ using a Low Pass Filter.
 ..
 
 
-**Tested OS:** Windows ADI
+**Tested OS:** Windows ADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
@@ -403,12 +408,12 @@ using a High Pass Filter.
 ..
 
 
-**Tested OS:** Windows ADI
+**Tested OS:** Windows ADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
@@ -488,12 +493,12 @@ frequency of 15.9kHz.
 ..
 
 
-**Tested OS:** Windows ADI
+**Tested OS:** Windows ADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
@@ -572,12 +577,12 @@ using a Band Stop notch Filter with a notch frequency of 795Hz.
 ..
 
 
-**Tested OS:** Windows ADI
+**Tested OS:** Windows ADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**none 
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
@@ -610,8 +615,7 @@ by exporting the low pass filter plot screenshot to a PDF file.
     2. Click the Print plot button and choose a name and location for the file.
         - **Expected result:** The file is saved as a PDF in the selected 
           location.
-        - **Actual result:** The file is saved as BMP file in the selected 
-          location.
+        - **Actual result:**  By default the file is saved as BMP file in the selected location. Several file types can be selected, but PDF file type isn't on the list.
 
 ..
   Actual test result goes here.
@@ -626,7 +630,7 @@ by exporting the low pass filter plot screenshot to a PDF file.
 ..
 
 
-**Tested OS:** Windows ADI
+**Tested OS:** Windows ADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
@@ -715,12 +719,12 @@ by viewing the acquired data in the Oscilloscope and analyzing measurements.
 ..
 
     
-**Tested OS:** Windows ADI
+**Tested OS:** Windows ADI, macOS 14.5 M2 processor
 
 ..
   Details about the tested OS goes here.
 
-**Comments:** none 
+**Comments:** None.
 
 ..
   Any comments about the test goes here.
