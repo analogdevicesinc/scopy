@@ -5,6 +5,8 @@
 #include <QJsonObject>
 #include <QLoggingCategory>
 
+#include <common/scopyconfig.h>
+
 Q_LOGGING_CATEGORY(CAT_PKGUTIL, "PkgUtil")
 
 using namespace scopy;
@@ -132,8 +134,12 @@ QStringList PkgUtil::extractZip(const QString &zipPath, const QString &destPath)
 			continue;
 		}
 		QString destDirPath = destPath + QDir::separator() + dirToExtract->name();
-		success &= dirToExtract->copyTo(destDirPath);
 		getArchiveFiles(dirToExtract, fileList, destDirPath);
+		if(fileList.isEmpty()) {
+			qWarning(CAT_PKGUTIL) << "Don't overwrite existing files!";
+			break;
+		}
+		success &= dirToExtract->copyTo(destDirPath);
 	}
 	if(!success) {
 		fileList.clear();
@@ -169,14 +175,30 @@ void PkgUtil::getArchiveFiles(const KArchiveDirectory *dir, QStringList &fileLis
 	for(const QString &entryName : entries) {
 		const KArchiveEntry *entry = dir->entry(entryName);
 		QString entryPath = prefix + QDir::separator() + entryName;
+		QString installPath = destPath + entryPath;
 
 		if(entry->isFile()) {
-			// Add file path to the list
-			fileList.append(destPath + entryPath);
+			if(QFile::exists(installPath)) {
+				fileList.clear();
+				return;
+			}
+			fileList.append(installPath);
 		} else if(entry->isDirectory()) {
-			// Recursively collect files in the directory
+			// If the directory doesn't exist save the path to that directory.
+			// The entire directory will be removed upon uninstallation.
+			if(!QFile::exists(installPath)) {
+				fileList.append(installPath);
+				continue;
+			}
 			const KArchiveDirectory *subDir = static_cast<const KArchiveDirectory *>(entry);
 			getArchiveFiles(subDir, fileList, destPath, entryPath);
 		}
 	}
+}
+
+// Better in pkgInstaller ????
+QStringList PkgUtil::getPkgsName()
+{
+	QJsonObject localRepository = readLocalRepository(scopy::config::localPluginFolderPath());
+	return localRepository.keys();
 }

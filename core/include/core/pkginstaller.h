@@ -23,9 +23,10 @@ public:
 	static void init();
 
 public:
-	static bool install(const QString &zipPath = "");
-	bool _install(const QString &zipPath = "");
-	static bool uninstall(const QString &pkgName);
+	static bool install(const QString &zipPath = "", bool peformRestart = true);
+	bool _install(const QString &zipPath = "", bool peformRestart = true);
+	static bool uninstall(const QString &pkgName, bool peformRestart = true);
+	bool _uninstall(const QString &pkgName = "", bool peformRestart = true);
 	static bool update(const QString &pkgName);
 
 	static bool preview(const QString &zipPath = "");
@@ -39,6 +40,9 @@ public Q_SLOTS:
 	void onPkgMetadata(QVariantMap metadata);
 
 Q_SIGNALS:
+	void pkgInstalled(bool restart);
+	void pkgUninstalled(bool restart);
+	void pkgExists(const QString &pkgName, const QString &zipPath);
 	void pkgMetadata(QVariantMap metadata);
 	void zipMetadata(QVariantMap metadata);
 
@@ -47,6 +51,8 @@ private:
 	const QStringList m_requiredFields{"name", "version", "license", "author", "scopy_compatibility", "category"};
 
 	bool validatePkg(QJsonObject &metadata);
+	bool processPkgInstalation(const QString &zipPath, const QString &execPath, QJsonObject &metadata,
+				   QJsonObject &localRepository, bool restart);
 	// bool pkgInstalled(const QString &pkgName);
 	// QStringList &filters);
 };

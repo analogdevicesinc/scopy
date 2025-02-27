@@ -17,6 +17,7 @@ public:
 	static bool removeFile(const QString &path);
 	static QStringList extractZip(const QString &zipPath, const QString &destPath);
 	static QJsonObject extractJsonMetadata(const QString &zipPath);
+	static QStringList getPkgsName();
 
 private:
 	static void getArchiveFiles(const KArchiveDirectory *dir, QStringList &fileList, const QString &destPath,

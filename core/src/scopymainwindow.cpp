@@ -30,6 +30,7 @@
 #include <browsemenu.h>
 #include <deviceautoconnect.h>
 #include <style.h>
+#include <pkgwidget.h>
 
 #include "logging_categories.h"
 #include "qmessagebox.h"
@@ -144,9 +145,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	dtm = new DetachedToolWindowManager(this);
 	m_toolMenuManager = new ToolMenuManager(ts, dtm, browseMenu->toolMenu(), this);
 
+	PkgWidget *pkgWidget = new PkgWidget(this);
+
 	ts->add("home", hp);
 	ts->add("about", about);
 	ts->add("preferences", prefPage);
+	ts->add("package", pkgWidget);
 
 	connect(scanTask, &IIOScanTask::scanFinished, scc, &ScannedIIOContextCollector::update, Qt::QueuedConnection);
 
