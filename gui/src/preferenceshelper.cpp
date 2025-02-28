@@ -130,11 +130,16 @@ QWidget *PreferencesHelper::addPreferenceEditValidation(Preferences *p, QString 
 	pref->setText(pref1Val);
 	parent->connect(pref, &QLineEdit::returnPressed, parent, [p, id, validator, pref]() {
 		QString prefText = pref->text();
-		if(validator && !validator(prefText)) {
-			pref->setText(p->get(id).toString());
-			return;
+		bool valid = false;
+		if(validator) {
+			valid = validator(prefText);
 		}
-		p->set(id, prefText);
+
+		if(valid) {
+			p->set(id, prefText);
+		} else {
+			pref->setText(p->get(id).toString());
+		}
 	});
 
 	QLabel *label = new QLabel(title);
