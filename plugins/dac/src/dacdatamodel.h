@@ -54,7 +54,7 @@ public:
 	void setKernelBuffersCount(unsigned int kernelCount);
 	void setDecimation(double decimation);
 	void setBuffersize(unsigned int buffersize);
-	void setFilesize(unsigned int filesize);
+	bool setFilesize(unsigned int filesize);
 	void setData(QVector<QVector<int16_t>> data);
 	void setSamplingFrequency(unsigned int sr);
 
