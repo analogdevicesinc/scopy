@@ -27,6 +27,16 @@ Connection flow
          - v2.0.0-beta-rc2-a3a7c43
          - N/A
          - OS: Debian 12 arm64
+       * - Popa Andrei
+         - 18.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on Windows 10
+       * - Danila Andrei
+         - 19.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on macOS 14.5
 
 Setup environment:
 ------------------
@@ -72,13 +82,13 @@ Test 1: Verify the connection flow.
           appears in the application's status bar. After a while, the connection 
           is established, the status LED turns green, and the tools in the menu 
           become accessible. 
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -117,13 +127,13 @@ unplugged during the connection process.
     2. Click on **Connect** button.
     3. Unplug the device while connecting. 
         - **Expected result:** The device is removed from device browser. 
-        - **Actual result:** The device is removed as expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -165,13 +175,13 @@ unplugged during the connection process.
           of the device in the device browser, and when hovered over, the 
           message "The device is not available! Verify the connection!" is 
           displayed.
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -211,13 +221,13 @@ unplugged before the connection process.
     3. Click on **Connect** button.
         - **Expected result:** The connection process starts but does not 
           complete. A warning icon appears in the top-right corner.
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -257,13 +267,13 @@ Test 5: Disconnecting a device.
         - **Expected result:** The device is disconnected, the **Connect** 
           button appears, the device remains in the device browser, and the 
           tools in the menu are no longer accessible.
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.

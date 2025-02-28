@@ -23,6 +23,16 @@ General Preferences - Test Suite
          - v2.0.0-beta-rc2-a3a7c43
          - N/A
          - OS: Debian 12 arm64
+       * - Popa Andrei
+         - 19.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on Windows 10
+       * - Danila Andrei
+         - 19.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on macOS 14.5
 
 Setup environment:
 ------------------
@@ -72,7 +82,7 @@ states (only applies to plugins which have this implemented).
    4. Close Scopy
    5. Open the app using the same setup and check if the time base
        - **Expected result:** time base is 1s
-       - **Actual result:** Time base is reloaded as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -80,7 +90,7 @@ states (only applies to plugins which have this implemented).
 
    6. Redo all the steps with the preference disabled
        - **Expected result:** time base is the default value
-       - **Actual result:** Time base is loaded as default value.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -92,17 +102,19 @@ states (only applies to plugins which have this implemented).
        - **Actual result:** A pop-up window appears with: "KDE Connect URL handler" 
        and the file explorer is not able to open the location.
        The Open settings file location works on a Debian 12 arm64.
+       On some tested OS nothing happens.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
 
 **Comments:** Full bug is described and tracked here: https://github.com/analogdevicesinc/scopy/issues/1906 .
+Test also fails on macOS: Unable to locate the preferences.ini file on macOS when using the **Open** button.
 
 ..
   Any comments about the test goes here.
@@ -135,7 +147,7 @@ double clicking them in the left menu.
    2. Double click Oscilloscope tool to detach it.  
        - **Expected result:** Oscilloscope tool should detach from 
          the main window into a new one.    
-       - **Actual result:** Instrument is detached as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -143,13 +155,13 @@ double clicking them in the left menu.
 
    3. Redo all the steps with the preference disabled.  
        - **Expected result:** Nothing should happen.  
-       - **Actual result:** Instrument does not detach. 
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -188,7 +200,7 @@ Test 3 - Save/Load tool attached state
    3. Close Scopy.  
    4. Open the app using the same setup.  
        - **Expected result:** Oscilloscope is still detached.    
-       - **Actual result:** Instrument detached as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -196,13 +208,13 @@ Test 3 - Save/Load tool attached state
 
    5. Redo all the steps with the preference disabled.  
        - **Expected result:** Oscilloscope should not be detached.    
-       - **Actual result:** As expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -241,7 +253,7 @@ Test 4 - Double click control buttons to open menu
       do not click on the button's icon).  
       
        - **Expected result:** A hovering menu should open above the button.
-       - **Actual result:** As expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -249,13 +261,13 @@ Test 4 - Double click control buttons to open menu
 
    4. Redo all the steps with the preference disabled.  
        - **Expected result:** No menu should open.
-       - **Actual result:** As expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -295,7 +307,7 @@ Test 5 - Enable OpenGL plotting
    3. Open Oscilloscope tool and run it.  
        - **Expected result:** The red text inside the plot 
          should contain "OpenGL rendering."
-       - **Actual result:** Text displayed on plot as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -304,13 +316,13 @@ Test 5 - Enable OpenGL plotting
    4. Redo all the steps with the preference disabled.  
        - **Expected result:** The red text inside the plot
          should contain "Software rendering."
-       - **Actual result:** Text displayed on plot as expected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -346,7 +358,7 @@ Test 6 - Enable menu animations
    1. Set preference to enabled.  
    2. Open Oscilloscope tool and toggle between trigger and channel menus.  
        - **Expected result:** Opening menus should be animated.    
-       - **Actual result:** Menus slide into the viewport.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -354,13 +366,13 @@ Test 6 - Enable menu animations
 
    3. Redo all the steps with the preference disabled.  
        - **Expected result:** Opening menus shouldn't have any animations.    
-       - **Actual result:** Menus appear into the viewport.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -397,7 +409,7 @@ Steps
    1. Set preference to enabled.  
    2. Do the setup again and look for a message bar when pressing "connect."  
        - **Expected result:** A message about connecting should appear at the bottom of the window.    
-       - **Actual result:** A status bar message appears at the bottom of the application.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -405,13 +417,13 @@ Steps
 
    3. Redo all the steps with the preference disabled.  
        - **Expected result:** No message should pop up.    
-       - **Actual result:** No status bar message appears.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -448,7 +460,7 @@ Test 8 - Show Grid
    1. Set preference to enabled.  
    2. Open ADC - Time tool.  
        - **Expected result:** A grid should be visible on the plot.
-       - **Actual result:** The plot has a grid.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -456,13 +468,13 @@ Test 8 - Show Grid
 
    3. Redo all the steps with the preference disabled.
        - **Expected result:** No grid on the plot.
-       - **Actual result:** The plot does not have a grid.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -501,7 +513,7 @@ Test 9 - Show Graticule
        - **Expected result:** A horizontal and a vertical 
          measurement line should be centered on the 0-axis 
          points (both may not be visible at the same time).
-       - **Actual result:** The plot has graticule lines.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -510,13 +522,13 @@ Test 9 - Show Graticule
    3. Redo all the steps with the preference disabled.
        - **Expected result:** The lines should border the entire
          plot instead of centering on 0 points.
-       - **Actual result:** The plot does not have graticule lines.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -558,14 +570,13 @@ Test 10 - Use Lazy Loading
 
        - **Expected result:** Elapsed times connecting to some 
          plugins should be lower when lazy loading is enabled.
-       - **Actual result:** Connection time displayed in the console is lower 
-         for all plugins when connecting to a Pluto device. 
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -597,7 +608,7 @@ Test 11 - Use native dialogs
    1. Set preference to enabled.  
    2. Press the Load button on the left menu.  
        - **Expected result:** A native file browser window should open.
-       - **Actual result:** A Scopy specific file browser window opens.
+       - **Actual result:** A Scopy specific file browser window opens on some tested OS.
 
 ..
   Actual test result goes here.
@@ -606,13 +617,13 @@ Test 11 - Use native dialogs
    3. Redo all the steps with the preference disabled.  
        - **Expected result:** A non-native, Scopy-specific, 
          file browser window should open.
-       - **Actual result:** The same Scopy specific file browser window opens.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -650,7 +661,7 @@ Test 12 - Auto-connect to previous session
    3. Open Scopy.  
        - **Expected result:** Scopy should automatically connect 
          to the Pluto device.    
-       - **Actual result:** Scopy automatically connects to the device connected when the application was closed.
+       - **Actual result:** Device does not automatically connect on some tested OS.
 
 ..
   Actual test result goes here.
@@ -658,23 +669,23 @@ Test 12 - Auto-connect to previous session
 
    4. Redo all the steps with the preference disabled.
        - **Expected result:** Should not connect automatically.
-       - **Actual result:** Scopy did not connect to any device upon startup.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Test fails only on Windows 10
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -700,7 +711,7 @@ so some layout artifacts may appear).
 **Steps:**
    1. Set preference to 1.45, restart Scopy, and inspect some tools.  
        - **Expected result:** All app text and some buttons should be larger.    
-       - **Actual result:** Text across the application is displayed in a larger font.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -708,13 +719,13 @@ so some layout artifacts may appear).
 
    2. Repeat the steps for font size 1.  
        - **Expected result:** Text should return to default size.
-       - **Actual result:** Text is displayed in the default font size.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -751,14 +762,13 @@ Test 14 - Theme
    1. Set preference to a different theme and restart the app.
        - **Expected result:** Themes should change while retaining 
          the same UX and usability in all tools.
-       - **Actual result:** Changed theme to Harmonic light and to Harmonic dark and the changes are applied
-         to the entire application after restart.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -801,12 +811,12 @@ Steps
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Most text is not translated
 
 ..
   Any comments about the test goes here.
@@ -838,7 +848,7 @@ Test 16 - Connect to multiple devices
    2. Connect to 2 devices following the setup.
        - **Expected result:** Two devices should appear in the left 
          menu and be fully functional.  
-       - **Actual result:** Connected to two devices and both are fully functional.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -847,13 +857,13 @@ Test 16 - Connect to multiple devices
    3. Repeat the steps with the preference disabled.  
        - **Expected result:** When connecting to the second device, 
          the first one should automatically disconnect.    
-       - **Actual result:** When connecting to the second device, the first one automatically disconnects.
+       - **Actual result:**As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -890,7 +900,7 @@ Test 17 - Regularly scan for new devices
        - **Expected result:** Pluto should automatically appear in 
          the device list, and a toggle switch for scanning should 
          appear in the top right.
-       - **Actual result:** Device is automatically detected.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -899,13 +909,13 @@ Test 17 - Regularly scan for new devices
    2. Repeat the steps with the preference disabled.
        - **Expected result:** Pluto should not appear automatically, 
          only when pressing the on-demand Scan button.
-       - **Actual result:** Device does not appear if Scan button is not pressed.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -943,23 +953,23 @@ Test 18 - Session devices
    4. Close and reopen Scopy.  
        - **Expected result:** Should automatically connect to the URI you 
          checked.
-       - **Actual result:** As expected.
+       - **Actual result:** Device does not automatically connect
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Test fails only on Windows 10
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -986,7 +996,7 @@ Test 19 - Show plot FPS
    2. Open ADC - Time and run it.  
        - **Expected result:** Should show the FPS on the plot 
          (M2K may look different from other plugins).    
-       - **Actual result:** FPS displayed on plot.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -994,13 +1004,13 @@ Test 19 - Show plot FPS
 
    3. Repeat the steps with the preference disabled.  
        - **Expected result:** No FPS should be visible.    
-       - **Actual result:** No FPS is displayed on the plot.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -1037,13 +1047,13 @@ Test 20 - Plot target FPS
 **Steps:**  
    1. Set the preference to each value and run ADC - Time to check FPS.  
        - **Expected result:** Plot FPS should be capped at the selected value.    
-       - **Actual result:** Tested with FPS 15, then FPS 60 and plot value is capped.
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -1089,7 +1099,7 @@ Test 21 - Reset settings and plugins to default
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
