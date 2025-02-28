@@ -7,12 +7,12 @@
 
     <title>ADC Plugin - Test Suite &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=9cb8e28d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=3d3703ae" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script defer="" src="../../../_static/app.umd.js?v=8d0ced9f"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=dcfbb431"></script>
     <link rel="icon" href="../../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -121,8 +121,7 @@
 <li><a class="reference internal" href="#test-3-channel-handle-position">Test 3 - Channel Handle Position</a></li>
 <li><a class="reference internal" href="#test-4-x-cursor-position">Test 4 - X Cursor Position</a></li>
 <li><a class="reference internal" href="#test-5-y-cursor-position">Test 5 - Y Cursor Position</a></li>
-<li><a class="reference internal" href="#test-6-show-buffer">Test 6 - Show Buffer</a></li>
-<li><a class="reference internal" href="#test-7-default-ymode">Test 7 - Default YMode</a></li>
+<li><a class="reference internal" href="#test-6-default-ymode">Test 6 - Default YMode</a></li>
 </ul>
 </li>
 </ul>
@@ -406,7 +405,7 @@ should span across the whole plot</p></li>
 <li><p>Change XMin to 200 and XMax to -100</p></li>
 <li><dl class="simple">
 <dt>Press Single</dt><dd><ul class="simple">
-<li><p><strong>Expected result:</strong> Plot labels should range from 300 to -100, with channel curves centered and between samples 200 and 0</p></li>
+<li><p><strong>Expected result:</strong> Plot labels should range from 200 to -100, with channel curves centered and between samples 200 and 0</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
@@ -490,7 +489,7 @@ should span across the whole plot</p></li>
 <li><dl class="simple">
 <dt>Turn on Autoscale</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> On the time plot, both channel curves should
-look the same, but voltage0 should have a higher amplitude</p></li>
+look the same, but voltage1 should have a higher amplitude</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
@@ -775,12 +774,11 @@ and checking frequency and stats</p>
 </ul>
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
-<li><p>Double-click on the voltage0 channel and go to the right menu which pops up</p></li>
+<li><p>Double-click on the voltage0 channel and go to the right menu which pops up.</p></li>
+<li><p>Check frequency measure and stats in the horizontal measurements table, middle measure and stats in the vertical measurements table.</p></li>
 <li><dl class="simple">
 <dt>Open the Measure menu at the bottom of the window, enable Measure Panel and Stats panel</dt><dd><ul class="simple">
-<li><p><strong>Expected result:</strong> check frequency measure and stats in the horizontal measurements table,
-middle measure and stats in the vertical measurements table. Frequency should be around 1MHz in
-both panels, middle should be hovering around the 0 value in both panels</p></li>
+<li><p><strong>Expected result:</strong> Frequency should be around 1MHz in both panels, middle should be hovering around the 0 value in both panels</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
@@ -825,7 +823,7 @@ tracking, and moving readouts</p>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
 <li><p>Double-click on the voltage0 channel and go to the right menu which pops up</p></li>
 <li><p>Run <a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a> setup</p></li>
-<li><p>In ADC, set X-AXIS buffer size to 200, XMode to Sample, and TMode to ADC Counts</p></li>
+<li><p>In ADC, set X-AXIS buffer size to 200, XMode to Sample, and YMode to ADC Counts</p></li>
 <li><p>Open the Cursors menu at the bottom of the window. Enable X and Enable Y</p></li>
 <li><dl class="simple">
 <dt>Move the X cursors on the plot via the axis handles and place one on voltage0 sine high peak and the other on the next low peak</dt><dd><ul class="simple">
@@ -1176,9 +1174,9 @@ and style</p>
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
 <li><p>Run <a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a> setup</p></li>
-<li><p>Press run and enable the marker</p></li>
+<li><p>Press run and enable the markers from the bottom right <strong>Measure</strong> panel.</p></li>
 <li><dl class="simple">
-<dt>Set marker type to peak and count to 5</dt><dd><ul class="simple">
+<dt>In the <strong>voltage0 channels settings</strong>, enable the markers, set the marker type to <strong>peak</strong> and count to <strong>5</strong>.</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> 5 markers should appear on voltage0’s curve at the highest peaks</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
@@ -1252,10 +1250,10 @@ and style</p>
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
 <li><p>Run <a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a> setup</p></li>
-<li><p>Press run and set X-Axis buffer size to 200, XMode to Sample, and TMode to ADC Counts</p></li>
-<li><p>Open the Cursors menu and enable X and Y cursors</p></li>
+<li><p>Press run and set X-Axis buffer size to 200, XMode to Frequency.</p></li>
+<li><p>Open the Cursors menu and enable X cursors.</p></li>
 <li><dl class="simple">
-<dt>Move the X cursor on the plot and place one on voltage0’s highest peak</dt><dd><ul class="simple">
+<dt>Move the X cursor on the plot and place one on voltage0’s highest peak.</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> The cursor should measure 1 MHz in the readouts</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
@@ -1349,8 +1347,8 @@ and style</p>
 <blockquote>
 <div><ol class="arabic simple" start="2">
 <li><dl class="simple">
-<dt>Do this again for Bottom option</dt><dd><ul class="simple">
-<li><p><strong>Expected result:</strong> Axis labels should appear on the bottom</p></li>
+<dt>Open ADC-Frequency and enable plot labels in SETTINGS panel.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis labels should appear on top</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
@@ -1361,7 +1359,19 @@ and style</p>
 <blockquote>
 <div><ol class="arabic simple" start="3">
 <li><dl class="simple">
-<dt>Repeat for ADC-Frequency</dt><dd><ul class="simple">
+<dt>Change Plot X-Axis scale position to Bottom, restart app, open ADC-Time and enable plot labels in SETTINGS panel</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis labels should appear on the bottom</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Open ADC-Frequency and enable plot labels in SETTINGS panel.</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> Same result for ADC-Frequency</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
@@ -1404,8 +1414,8 @@ position on the plot</p>
 <blockquote>
 <div><ol class="arabic simple" start="2">
 <li><dl class="simple">
-<dt>Do this again for Left option</dt><dd><ul class="simple">
-<li><p><strong>Expected result:</strong> Axis labels should appear on the left</p></li>
+<dt>Open ADC-Frequency and enable plot labels in SETTINGS panel.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis labels should appear on the right</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
@@ -1416,8 +1426,20 @@ position on the plot</p>
 <blockquote>
 <div><ol class="arabic simple" start="3">
 <li><dl class="simple">
-<dt>Repeat for ADC-Frequency</dt><dd><ul class="simple">
-<li><p><strong>Expected result:</strong> Same result for ADC-Frequency</p></li>
+<dt>Change Plot Y-Axis scale position to Left, restart app, open ADC-Time and enable plot labels in SETTINGS panel</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis labels should appear on the left</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Open ADC-Frequency and enable plot labels in SETTINGS panel.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis labels should appear on the left</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
@@ -1459,8 +1481,8 @@ ADC-Time, double click voltage0 to open channel settings and enable Y-AXIS</p>
 <blockquote>
 <div><ol class="arabic simple" start="2">
 <li><dl class="simple">
-<dt>Do this again for Left option</dt><dd><ul class="simple">
-<li><p><strong>Expected result:</strong> Axis handle should appear on the left</p></li>
+<dt>Open ADC-Frequency, double click voltage0 to open channel settings and enable Y-AXIS.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis handle should appear on the right</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
@@ -1469,10 +1491,23 @@ ADC-Time, double click voltage0 to open channel settings and enable Y-AXIS</p>
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="3">
+<div><ol class="arabic" start="3">
+<li><p>Change Plot channel Y-handle position to Left, restart app, open
+ADC-Time, double click voltage0 to open channel settings and enable Y-AXIS</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis handle should appear on the left</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
 <li><dl class="simple">
-<dt>Repeat for ADC-Frequency</dt><dd><ul class="simple">
-<li><p><strong>Expected result:</strong> Same result for ADC-Frequency</p></li>
+<dt>Open ADC-Frequency, double click voltage0 to open channel settings and enable Y-AXIS.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis handle should appear on the left</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
@@ -1513,8 +1548,8 @@ ADC-Time, double click voltage0 to open channel settings and enable Y-AXIS</p>
 <blockquote>
 <div><ol class="arabic simple" start="2">
 <li><dl class="simple">
-<dt>Do this again for Bottom option</dt><dd><ul class="simple">
-<li><p><strong>Expected result:</strong> X cursor handle should appear on the bottom</p></li>
+<dt>Open ADC-Frequency and enable X cursors.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> X cursor handle should appear on top</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
@@ -1525,8 +1560,20 @@ ADC-Time, double click voltage0 to open channel settings and enable Y-AXIS</p>
 <blockquote>
 <div><ol class="arabic simple" start="3">
 <li><dl class="simple">
-<dt>Repeat for ADC-Frequency</dt><dd><ul class="simple">
-<li><p><strong>Expected result:</strong> Same result for ADC-Frequency</p></li>
+<dt>Change Plot X-Cursor position to Bottom, restart app, open ADC-Time and enable x cursors</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> X cursor handle should appear on the bottom</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Open ADC-Frequency and enable X cursors.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> X cursor handle should appear on the bottom</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
@@ -1554,7 +1601,7 @@ ADC-Time, double click voltage0 to open channel settings and enable Y-AXIS</p>
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
 <li><dl class="simple">
-<dt>Change Plot Y-Cursor position to Right, restart app, open ADC-Time and enable y cursors</dt><dd><ul class="simple">
+<dt>Change Plot Y-Cursor position to Right, restart app, open ADC-Time and enable Y cursors</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> Y cursor handle should appear on the right</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
@@ -1567,8 +1614,8 @@ ADC-Time, double click voltage0 to open channel settings and enable Y-AXIS</p>
 <blockquote>
 <div><ol class="arabic simple" start="2">
 <li><dl class="simple">
-<dt>Do this again for Left option</dt><dd><ul class="simple">
-<li><p><strong>Expected result:</strong> Y cursor handle should appear on the left</p></li>
+<dt>Open the ADC-Frequency and enable Y cursors</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Y cursor handle should appear on the right</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
@@ -1579,7 +1626,19 @@ ADC-Time, double click voltage0 to open channel settings and enable Y-AXIS</p>
 <blockquote>
 <div><ol class="arabic simple" start="3">
 <li><dl class="simple">
-<dt>Repeat for ADC-Frequency</dt><dd><ul class="simple">
+<dt>Change Plot Y-Cursor position to Left, restart app, open ADC-Time and enable y cursors</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Y cursor handle should appear on the left</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Open the ADC-Frequency and enable Y cursors</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> Same result for ADC-Frequency</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
@@ -1592,50 +1651,8 @@ ADC-Time, double click voltage0 to open channel settings and enable Y-AXIS</p>
 <p><strong>Comments:</strong></p>
 <p><strong>Result:</strong> PASS/FAIL</p>
 </section>
-<section id="test-6-show-buffer">
-<h3>Test 6 - Show Buffer<a class="headerlink" href="#test-6-show-buffer" title="Link to this heading"></a></h3>
-<p id="tst-pref-show-buffer"><strong>UID:</strong> TST.PREF.SHOW_BUFFER</p>
-<p><strong>Description:</strong> Enable/disable the buffer and verify its appearance on the plot</p>
-<dl class="simple">
-<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
-<li><p>Emulator tests</p></li>
-</ul>
-</dd>
-<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
-<li><p><a class="reference internal" href="#adalm-pluto-device-emu"><span class="std std-ref">Pluto.emu</span></a></p></li>
-<li><p>OS: ANY</p></li>
-</ul>
-</dd>
-<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
-<li><dl class="simple">
-<dt>Set buffer to disabled, open ADC-Time</dt><dd><ul class="simple">
-<li><p><strong>Expected result:</strong> There should be no buffer previewer above the plot</p></li>
-<li><p><strong>Actual result:</strong></p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ol>
-</dd>
-</dl>
-<blockquote>
-<div><ol class="arabic simple" start="2">
-<li><dl class="simple">
-<dt>Do this again for the enabled option</dt><dd><ul class="simple">
-<li><p><strong>Expected result:</strong> Buffer previewer should appear above the plot</p></li>
-<li><p><strong>Actual result:</strong></p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ol>
-</div></blockquote>
-<p><strong>Tested OS:</strong></p>
-<p><strong>Comments:</strong></p>
-<p><strong>Result:</strong> PASS/FAIL</p>
-</section>
-<section id="test-7-default-ymode">
-<h3>Test 7 - Default YMode<a class="headerlink" href="#test-7-default-ymode" title="Link to this heading"></a></h3>
+<section id="test-6-default-ymode">
+<h3>Test 6 - Default YMode<a class="headerlink" href="#test-6-default-ymode" title="Link to this heading"></a></h3>
 <p id="tst-pref-default-ymode"><strong>UID:</strong> TST.PREF.DEFAULT_YMODE</p>
 <p><strong>Description:</strong> Set the default Y-mode and verify its behavior in ADC-Time</p>
 <dl class="simple">
@@ -1649,8 +1666,9 @@ ADC-Time, double click voltage0 to open channel settings and enable Y-AXIS</p>
 </ul>
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Set YMode to % Full scale, restart app, open ADC-Time</p></li>
 <li><dl class="simple">
-<dt>Set YMode to % Full scale, restart app, open ADC-Time</dt><dd><ul class="simple">
+<dt>Check the YMODE in General Settings:</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> In Y-AXIS, YMODE should be % Full scale</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
@@ -1660,6 +1678,18 @@ ADC-Time, double click voltage0 to open channel settings and enable Y-AXIS</p>
 </ol>
 </dd>
 </dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Double click a channel to open the channel settings and check the <strong>Y-MODE</strong> by enabling <strong>Y-AXIS</strong>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> In Y-AXIS, YMODE should be % Full scale</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
 <p><strong>Tested OS:</strong></p>
 <p><strong>Comments:</strong></p>
 <p><strong>Result:</strong> PASS/FAIL</p>

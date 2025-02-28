@@ -7,12 +7,12 @@
 
     <title>DAC Plugin - Test suite &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=9cb8e28d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=3d3703ae" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script defer="" src="../../../_static/app.umd.js?v=8d0ced9f"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=dcfbb431"></script>
     <link rel="icon" href="../../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -379,6 +379,8 @@ and <strong>cf-ad9361-dds-core-lpc:voltage1</strong>.</p></li>
 </dd>
 <dt><strong>Resources:</strong></dt><dd><ul class="simple">
 <li><p><a class="reference external" href="https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sine_complex_1_15360_sr_15360000_samps_40000_ampl_32767.csv">https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sine_complex_1_15360_sr_15360000_samps_40000_ampl_32767.csv</a></p></li>
+<li><p><a class="reference external" href="https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sine_complex_1_30720_sr_15360000_samps_20000_ampl_32767.csv">https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sine_complex_1_30720_sr_15360000_samps_20000_ampl_32767.csv</a></p></li>
+<li><p><a class="reference external" href="https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sinewave_0.9_2ch.csv">https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sinewave_0.9_2ch.csv</a></p></li>
 <li><p><a class="reference external" href="https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/tutorial_chapters.json">https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/tutorial_chapters.json</a></p></li>
 </ul>
 </dd>
@@ -411,6 +413,30 @@ Successfully loaded: [file name]</em>.</p></li>
 </dl>
 <blockquote>
 <div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>While running, load a file with a lower number of samples using the browser and the file listed in the resources above: <em>sinewave_0.9_2ch.csv</em>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The “File Size” field is populated with ** 8444 samples**.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>While running, load a file with a lower number of samples using the browser and the file listed in the resources above: <em>sine_complex_1_30720_sr_15360000_samps_20000_ampl_32767.csv</em>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The “File Size” field is populated with ** 20 ksamples**.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
 <li><p>Select the <em>tutorial_chapters.json</em> file from the resources provided above
 using the “Browse” button.</p></li>
 <li><dl class="simple">

@@ -99,14 +99,14 @@ Test 2: Check links from About Page
 
     3. Click on the underlined word **here** from the line **Build info: here**
         - **Expected result:** The displayed text will change, and it now shows
-          more detailed information about the building process.
+          more detailed information about the build environment for the current Scopy version.
         - **Actual result:**
 
 ..
   Actual test result goes here.
 ..
 
-    4. Click on the **Home** buttom from the top right side of the application.
+    4. Click the home icon button, on the top right side of the application.
         - **Expected result:** The application will display the initial screen
           of the About page.
         - **Actual result:**
@@ -117,14 +117,14 @@ Test 2: Check links from About Page
 
     5. Click on the highlighted text **Scopy open source project**
         - **Expected result:** The application will display more information about
-          the Scopy project.
+          the Scopy project and the current software license.
         - **Actual result:**
 
 ..
   Actual test result goes here.
 ..
 
-    6. Click on the **Home** buttom from the top right side of the application.
+    6. Click the home icon button, on the top right side of the application.
     7. Click on the highlighted text **other open source software**
         - **Expected result:** The application will display a list of open source
           libraries included or linked to Scopy.
@@ -134,7 +134,7 @@ Test 2: Check links from About Page
   Actual test result goes here.
 ..
 
-    8. Click on the **Home** buttom from the top right side of the application.
+    8. Click the home icon button, on the top right side of the application.
     9. Click on the highlighted text **Latest Release**
         - **Expected result:** A web browser window will open containing the latest
           release of Scopy.
@@ -144,7 +144,7 @@ Test 2: Check links from About Page
   Actual test result goes here.
 ..
 
-    10. Click on the **Home** buttom from the top right side of the application.
+    10. Click the home icon button, on the top right side of the application.
     11. Click on the highlighted text **Documentation**
          - **Expected result:** A web browser window will open containing the
            documentation for Scopy.
@@ -154,7 +154,7 @@ Test 2: Check links from About Page
   Actual test result goes here.
 ..
 
-    12. Click on the **Home** buttom from the top right side of the application.
+    12. Click the home icon button, on the top right side of the application.
     13. Click on the highlighted text **Support Forum**
          - **Expected result:** A web browser window will open containing a forum
            named `ADI EngineerZone`.

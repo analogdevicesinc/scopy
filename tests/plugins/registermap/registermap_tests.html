@@ -7,12 +7,12 @@
 
     <title>Register Map - Test suite &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=9cb8e28d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=3d3703ae" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script defer="" src="../../../_static/app.umd.js?v=8d0ced9f"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=dcfbb431"></script>
     <link rel="icon" href="../../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -114,7 +114,7 @@
 <li><a class="reference internal" href="#test-17-settings-read-interval-with-wrong-interval">Test 17 : Settings read interval with wrong interval</a></li>
 <li><a class="reference internal" href="#test-18-settings-register-dump">Test 18 : Settings register dump</a></li>
 <li><a class="reference internal" href="#test-19-settings-write-values">Test 19 : Settings write values</a></li>
-<li><a class="reference internal" href="#test-20-settings-dump-regisr-and-write-values-disabled">Test 20 : Settings Dump regisr and write values disabled</a></li>
+<li><a class="reference internal" href="#test-20-settings-dump-register-and-write-values-disabled">Test 20 : Settings Dump register and write values disabled</a></li>
 <li><a class="reference internal" href="#tests-21-preferences-color-coding-background-color">Tests 21 : Preferences color coding background color</a></li>
 <li><a class="reference internal" href="#test-22-preferences-color-coding-text-color">Test 22 : Preferences color coding text color</a></li>
 <li><a class="reference internal" href="#test-23-preferences-color-for-value">Test 23 : Preferences color for value</a></li>
@@ -348,6 +348,7 @@ Content on this topic
 <dt><strong>M2k.Emu:</strong></dt><dd><ul class="simple">
 <li><p>Open Scopy</p></li>
 <li><p>Start the iio-emu process using adalm2000 option from the dropdown</p></li>
+<li><p>Check the Register Map plugin checkbox in the Add Device page.</p></li>
 <li><p>Connect to the M2k Device</p></li>
 </ul>
 </dd>
@@ -749,6 +750,7 @@ register until <strong>Write</strong> button is pressed.</p>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
 <li><p>Open Register Map plugin</p></li>
 <li><p>Select a register address “0x2” using address picker</p></li>
+<li><p>Set the value of the register to “0x4c” using the value picker.</p></li>
 <li><dl class="simple">
 <dt>Change the value of “reg002_b3” bitfield from on to off</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> The <strong>Value</strong> field is updated to the “0x44” value</p></li>
@@ -761,7 +763,7 @@ register until <strong>Write</strong> button is pressed.</p>
 </dd>
 </dl>
 <blockquote>
-<div><ol class="arabic simple" start="4">
+<div><ol class="arabic simple" start="5">
 <li><dl class="simple">
 <dt>Press <strong>Write</strong> button</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> The register value is updated to “0x44”</p></li>
@@ -797,6 +799,7 @@ register until <strong>Write</strong> button is pressed.</p>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
 <li><p>Open Register Map plugin</p></li>
 <li><p>Select a register address “0x2” using address picker</p></li>
+<li><p>Set the value of the register to “0x4c” using the value picker.</p></li>
 <li><dl class="simple">
 <dt>Change the value of the <strong>Value</strong> field to “0x44”</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> The detailed bitfield “reg002_b3” value is changed from on to off</p></li>
@@ -1119,8 +1122,8 @@ containing register address and register value</p></li>
 <p><strong>Comments:</strong></p>
 <p><strong>Result:</strong> PASS/FAIL</p>
 </section>
-<section id="test-20-settings-dump-regisr-and-write-values-disabled">
-<span id="tst-regmap-settings-dump-regis-and-write-values-disabled"></span><h3>Test 20 : Settings Dump regisr and write values disabled<a class="headerlink" href="#test-20-settings-dump-regisr-and-write-values-disabled" title="Link to this heading"></a></h3>
+<section id="test-20-settings-dump-register-and-write-values-disabled">
+<span id="tst-regmap-settings-dump-regis-and-write-values-disabled"></span><h3>Test 20 : Settings Dump register and write values disabled<a class="headerlink" href="#test-20-settings-dump-register-and-write-values-disabled" title="Link to this heading"></a></h3>
 <p><strong>UID:</strong> TST.REGMAP.SETTINGS_DUMP_REGIS_AND_WRITE_VALUES_DISABLED</p>
 <dl class="simple">
 <dt><strong>Description:</strong> Verify that the <strong>Register dump</strong> and <strong>Write values</strong> buttons are disabled</dt><dd><p>when the file path is not selected.</p>

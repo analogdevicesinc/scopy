@@ -7,12 +7,12 @@
 
     <title>Homepage &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=9cb8e28d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=3d3703ae" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script defer="" src="../../../_static/app.umd.js?v=8d0ced9f"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=dcfbb431"></script>
     <link rel="icon" href="../../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -330,7 +330,7 @@ home page is displayed.</p></li>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
 <li><p>Open Scopy.</p></li>
 <li><p>Navigate to the application’s home page.</p></li>
-<li><p>Click on the <strong>Add device</strong> button.</p></li>
+<li><p>Click on the <strong>Add device</strong> button, having a <strong>+</strong> icon.</p></li>
 <li><dl class="simple">
 <dt>Observe the application’s behavior.</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> The page for adding a new device is displayed in
@@ -355,6 +355,7 @@ the info page section.</p></li>
 </dd>
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
 <li><p>Scopy is installed on the system.</p></li>
+<li><p>ADALM2000 drivers are installed on the system.</p></li>
 <li><p>The “Regularly scan for new devices” preference is enabled in the
 preferences page.</p></li>
 <li><p>OS: ANY.</p></li>
@@ -388,6 +389,7 @@ scan is turned off.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
 <li><p>Scopy is installed on the system.</p></li>
+<li><p>ADALM2000 drivers are installed on the system.</p></li>
 <li><p>The “Regularly scan for new devices” preference is enabled in the
 preferences page.</p></li>
 <li><p>OS: ANY.</p></li>
@@ -421,6 +423,7 @@ all available devices correctly.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
 <li><p>Scopy is installed on the system.</p></li>
+<li><p>ADALM2000 drivers are installed on the system.</p></li>
 <li><p>The “Regularly scan for new devices” preference is disabled in the
 preferences page.</p></li>
 <li><p>OS: ANY.</p></li>
@@ -458,6 +461,7 @@ established.</p></li>
 </dd>
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
 <li><p>Scopy is installed on the system.</p></li>
+<li><p>ADALM2000 drivers are installed on the system.</p></li>
 <li><p>OS: ANY.</p></li>
 </ul>
 </dd>
@@ -472,18 +476,29 @@ established.</p></li>
 <li><p><strong>Expected result:</strong> The info page changes from the ‘Welcome to Scopy’
 page to the add page and in device browser the related button is
 highlighted.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
 </dl>
 </li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="7">
 <li><dl class="simple">
 <dt>Click on the left arrow button.</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> The “Welcome to Scopy” page is displayed and the
 related button is highlighted.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
 </dl>
 </li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
 <li><dl class="simple">
 <dt>Click on the left arrow button.</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> The device’s page is displayed and the device
@@ -494,8 +509,7 @@ icon is highlighted.</p></li>
 </dl>
 </li>
 </ol>
-</dd>
-</dl>
+</div></blockquote>
 <p><strong>Tested OS:</strong></p>
 <p><strong>Comments:</strong></p>
 <p><strong>Result:</strong> PASS/FAIL</p>
@@ -512,6 +526,9 @@ available devices correctly.</p>
 </dd>
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
 <li><p>Scopy is installed on the system.</p></li>
+<li><p>ADALM2000 drivers are installed on the system.</p></li>
+<li><p>The “Regularly scan for new devices” preference is enabled in the
+preferences page.</p></li>
 <li><p>OS: ANY.</p></li>
 </ul>
 </dd>

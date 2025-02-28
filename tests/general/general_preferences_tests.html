@@ -7,12 +7,12 @@
 
     <title>General Preferences - Test Suite &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=9cb8e28d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=3d3703ae" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
     <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script defer="" src="../../_static/app.umd.js?v=8d0ced9f"></script>
+    <script defer="" src="../../_static/app.umd.js?v=dcfbb431"></script>
     <link rel="icon" href="../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -447,7 +447,7 @@ the main window into a new one.</p></li>
 </ul>
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
-<li><p>Set preference to enabled.</p></li>
+<li><p>Set the following preferences to enabled: <strong>Save/Load tool attached state</strong> and <strong>Double click to attach/detach tool</strong>.</p></li>
 <li><p>Double click Oscilloscope tool to detach it.</p></li>
 <li><p>Close Scopy.</p></li>
 <li><dl class="simple">
@@ -464,7 +464,7 @@ the main window into a new one.</p></li>
 <blockquote>
 <div><ol class="arabic simple" start="5">
 <li><dl class="simple">
-<dt>Redo all the steps with the preference disabled.</dt><dd><ul class="simple">
+<dt>Redo all the steps with the  <strong>Save/Load tool attached state</strong> preference disabled.</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> Oscilloscope should not be detached.</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
@@ -793,7 +793,8 @@ plugins should be lower when lazy loading is enabled.</p></li>
 <li><p>Set preference to enabled.</p></li>
 <li><dl class="simple">
 <dt>Press the Load button on the left menu.</dt><dd><ul class="simple">
-<li><p><strong>Expected result:</strong> A native file browser window should open.</p></li>
+<li><p><strong>Expected result:</strong> A native file browser window should open. A native file dialog is the file chooser
+that is provided by the operating system.</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
@@ -923,8 +924,8 @@ so some layout artifacts may appear).</p>
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
 <li><dl class="simple">
-<dt>Set preference to a different theme and restart the app.</dt><dd><ul class="simple">
-<li><p><strong>Expected result:</strong> Themes should change while retaining
+<dt>Set preference to a <strong>Harmonic light</strong> theme and restart the application.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Application should be displayed in a light theme while retaining
 the same UX and usability in all tools.</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
@@ -1183,7 +1184,7 @@ checked.</p></li>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
 <li><p>Change general preferences and M2K preferences.</p></li>
 <li><dl class="simple">
-<dt>Press the “Restart” button and restart the app.</dt><dd><ul class="simple">
+<dt>Press the “Reset” button and the “Restart” to restart the app.</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> All changed preferences should have
 the default values.</p></li>
 <li><p><strong>Actual result:</strong></p></li>

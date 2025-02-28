@@ -75,7 +75,7 @@ Test 2: Verifying the "Add device" (+) button.
 **Steps:**
     1. Open Scopy.
     2. Navigate to the application's home page.
-    3. Click on the **Add device** button.
+    3. Click on the **Add device** button, having a **+** icon.
     4. Observe the application's behavior.
         - **Expected result:** The page for adding a new device is displayed in 
           the info page section.
@@ -113,6 +113,7 @@ Test 3: Verifying the auto-scan feature (ON).
 
 **Preconditions:**
     - Scopy is installed on the system.
+    - ADALM2000 drivers are installed on the system.
     - The "Regularly scan for new devices" preference is enabled in the 
       preferences page.
     - OS: ANY.
@@ -158,6 +159,7 @@ scan is turned off.
 
 **Preconditions:**
     - Scopy is installed on the system.
+    - ADALM2000 drivers are installed on the system.
     - The "Regularly scan for new devices" preference is enabled in the 
       preferences page.
     - OS: ANY.
@@ -203,6 +205,7 @@ all available devices correctly.
 
 **Preconditions:**
     - Scopy is installed on the system.
+    - ADALM2000 drivers are installed on the system.
     - The "Regularly scan for new devices" preference is disabled in the 
       preferences page.
     - OS: ANY.
@@ -249,6 +252,7 @@ Test 6: Navigation using the buttons in the info page.
 
 **Preconditions:**
     - Scopy is installed on the system.
+    - ADALM2000 drivers are installed on the system.
     - OS: ANY.
 
 **Steps:**
@@ -261,9 +265,21 @@ Test 6: Navigation using the buttons in the info page.
         - **Expected result:** The info page changes from the 'Welcome to Scopy' 
           page to the add page and in device browser the related button is 
           highlighted.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     7. Click on the left arrow button.
         - **Expected result:** The "Welcome to Scopy" page is displayed and the 
           related button is highlighted.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
     8. Click on the left arrow button.
         - **Expected result:** The device's page is displayed and the device 
           icon is highlighted. 
@@ -301,6 +317,9 @@ available devices correctly.
 
 **Preconditions:**
     - Scopy is installed on the system.
+    - ADALM2000 drivers are installed on the system.
+    - The "Regularly scan for new devices" preference is enabled in the 
+      preferences page.
     - OS: ANY.
 
 **Steps:**
