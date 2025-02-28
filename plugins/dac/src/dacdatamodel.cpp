@@ -167,14 +167,16 @@ void DacDataModel::setBuffersize(unsigned int buffersize)
 	}
 }
 
-void DacDataModel::setFilesize(unsigned int filesize)
+bool DacDataModel::setFilesize(unsigned int filesize)
 {
-	if(m_filesize != filesize) {
+	bool needToUpdate = (m_filesize != filesize);
+	if(needToUpdate) {
 		requestInterruption();
 		m_filesize = filesize;
 		autoBuffersizeAndKernelBuffers();
 		Q_EMIT reqInitBuffer();
 	}
+	return needToUpdate;
 }
 
 void DacDataModel::enableBufferChannel(QString uuid, bool enable)
@@ -204,8 +206,13 @@ unsigned int DacDataModel::getEnabledChannelsCount()
 
 void DacDataModel::setData(QVector<QVector<int16_t>> data)
 {
+	requestInterruption();
+	m_data.clear();
 	m_data = data;
-	Q_EMIT reqInitBuffer();
+	bool updatedAndReqInit = setFilesize(data.size());
+	if(!updatedAndReqInit) {
+		Q_EMIT reqInitBuffer();
+	}
 }
 
 void DacDataModel::setSamplingFrequency(unsigned int sr)
