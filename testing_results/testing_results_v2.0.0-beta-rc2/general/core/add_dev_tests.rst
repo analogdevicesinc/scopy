@@ -28,6 +28,16 @@ Add device
          - N/A
          - OS: Debian 12 arm64
       
+       * - Popa Andrei
+         - 18.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on Windows 10
+       * - Danila Andrei
+         - 19.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on macOS 14.5
 
 Setup environment:
 ------------------
@@ -61,13 +71,13 @@ lists available devices when initiated.
         - **Expected result:** In the "Context" dropdown, all available devices 
           are listed, each item containing the device name/description and URI. The 
           **ADALM2000** device [usb] must appear in the list.
-        - **Actual result:** ADALM2000 device with USB backend appears in the list.
+        - **Actual result:** As expected
         
         ..
           Actual test result goes here.
         ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -105,23 +115,23 @@ lists available local devices when initiated.
           devices are listed, each item containing the device name/description and URI. 
           If there is no available device the "No scanned devices available!" message 
           is displayed.
-        - **Actual result:** As expected, seeing available devices on the laptop.
+        - **Actual result:** Missing **local** checkbox on Windows 10
         
         ..
           Actual test result goes here.
         ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Test only fails on Windows 10
 
 .. 
   Any comments about the test goes here.
 
-**Result:** PASS
+**Result:** FAIL
 
 .. 
   The result of the test goes here (PASS/FAIL).
@@ -149,13 +159,13 @@ lists available ip devices when initiated.
           devices are listed, each item containing the device name/description and URI. 
           If there is no available device the "No scanned devices available!" message 
           is displayed.
-        - **Actual result:** Multiple devices on the network detected.
+        - **Actual result:** As expected
         
         ..
           Actual test result goes here.
         ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -191,13 +201,13 @@ lists available usb devices when initiated.
         - **Expected result:** In the "Context" dropdown, all available usb 
           devices are listed, each item containing the device name/description 
           and URI. The **ADALM2000** device must appear in the list. 
-        - **Actual result:** The ADALM2000 with USB connection is detected.
+        - **Actual result:** As expected
         
         ..
           Actual test result goes here.
         ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -236,13 +246,13 @@ lists available serial devices when initiated.
           devices are listed, each item containing the device name/description 
           and URI. If there is no available device the "No scanned devices 
           available!" message is displayed.
-        - **Actual result:** Device detected as expected.
+        - **Actual result:** As expected
         
         ..
           Actual test result goes here.
         ..
 
-**Tested OS:** Debian 12 arm64
+**Tested OS:** Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -277,13 +287,13 @@ when no device is found.
     5. Wait until the refresh animation stops.
         - **Expected result:** The "No scanned devices available!" message is 
           displayed.
-        - **Actual result:** The message is displayed as expected.
+        - **Actual result:** As expected
         
         ..
           Actual test result goes here.
         ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -322,13 +332,13 @@ Test 7: Device validation.
     3. Click on **Verify** button.
         - **Expected result:** A loading animation starts and after a short time 
           a page with device details and compatible plugins is displayed. 
-        - **Actual result:** ADALM2000 compatible plugins are displayed.
+        - **Actual result:** As expected
         
         ..
           Actual test result goes here.
         ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -365,13 +375,13 @@ Test 8: Verify the "BACK" button from compatible plugin page.
     3. Click on **Verify** button.
     4. Click on **BACK** button.
         - **Expected result:** The verify page is displayed.
-        - **Actual result:** The page is displayed as expected.
+        - **Actual result:** As expected
         
         ..
           Actual test result goes here.
         ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -411,7 +421,7 @@ Only the main plugin of the device is used.
     3. Click on **Verify** button.
         - **Expected result:** Only the M2kPlugin should be selected in the 
           compatible plugins section.
-        - **Actual result:** Plugin selected as expected.
+        - **Actual result:**  As expected
         
 ..
   Actual test result goes here.
@@ -421,13 +431,13 @@ Only the main plugin of the device is used.
         - **Expected result:** The device is added to the device browser, the 
           device's info page is displayed, and the m2k tools are added to the 
           tool menu. 
-        - **Actual result:** Tools displayed as expected.
+        - **Actual result:** As expected
         
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -465,7 +475,7 @@ Multiple plugins are used.
     3. Click on **Verify** button.
         - **Expected result:** Only the M2kPlugin should be selected in the 
           compatible plugins section.
-        - **Actual result:** Plugin selected as expected.
+        - **Actual result:**  As expected
         
 ..
   Actual test result goes here.
@@ -476,13 +486,13 @@ Multiple plugins are used.
         - **Expected result:** The device is added to the device browser, the 
           device's info page is displayed, and all tools, including the debugger, are added 
           to the tool menu.
-        - **Actual result:** Debugger is added to the tools.
+        - **Actual result:** As expected
         
         ..
           Actual test result goes here.
         ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -519,7 +529,7 @@ Test 11: Verify the "ADD DEVICE" button from compatible plugin page with no plug
     3. Click on **Verify** button.
         - **Expected result:** Only the M2kPlugin should be selected in the 
           compatible plugins section.
-        - **Actual result:** Plugin selected as expected.
+        - **Actual result:**  As expected
 
 ..
   Actual test result goes here.
@@ -529,13 +539,13 @@ Test 11: Verify the "ADD DEVICE" button from compatible plugin page with no plug
     5. Click on **ADD DEVICE** button.
         - **Expected result:** A NO_PLUGIN device is added in device browser and 
           in tool menu.
-        - **Actual result:** NO_PLUGIN device is added.
+        - **Actual result:**  As expected
 
         ..
           Actual test result goes here.
         ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.

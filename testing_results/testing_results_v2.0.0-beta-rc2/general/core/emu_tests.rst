@@ -27,6 +27,16 @@ EMU
          - v2.0.0-beta-rc2-a3a7c43
          - N/A
          - OS: Debian 12 arm64
+       * - Popa Andrei
+         - 18.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on Windows 10
+       * - Danila Andrei
+         - 19.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on macOS 14.5
 
 .. _tst-emu-en:
 
@@ -51,13 +61,13 @@ correctly.
     5. Click on **Enable** button.
         - **Expected result:** The IIO device tab is selected, and the URI 
           "ip:127.0.0.1" is entered in the corresponding section. 
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -95,23 +105,23 @@ when the IIO emulator is not found.
     3. Click on **Emulator** tab.
         - **Expected result:** All the components are disabled and the message 
           "Can't find iio-emu in the system!" is displayed. 
-        - **Actual result:** Handled as expected.
+        - **Actual result:** Emulator is still available (Windows 10, macOS 14.5)
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Windows 10: With the iio-emu not installed in system and a bad preferences path, emulator is still found as long as iio-emu.exe is in the same folder as scopy.exe; macOS 14.5: Unable to locate the preferences.ini
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS
+**Result:** FAIL
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -143,13 +153,13 @@ correctly.
     7. Click on **Disable** button.
         - **Expected result:** The fields in this tab become editable, and the 
           **Enable** button appears. 
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -200,7 +210,7 @@ when an emulated device is connected and the "iio-emu" process is stopped.
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -243,13 +253,13 @@ correctly (using adalm2000 device).
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: M2kPlugin (checked), ADCPlugin, DACPlugin, DataLoggerPlugin, 
           DebuggerPlugin, RegmapPlugin.
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -291,13 +301,13 @@ correctly (using pluto device).
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: ADCPlugin (checked), DACPlugin (checked), DataLoggerPlugin 
           (checked), DebuggerPlugin (checked), RegmapPlugin (checked). 
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -339,13 +349,13 @@ correctly (using pqm device).
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: PQMPlugin (checked), ADCPlugin, DACPlugin, DataLoggerPlugin, 
           DebuggerPlugin.
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -386,13 +396,13 @@ correctly (using swiot_config device).
     6. Click on **Verify** button.
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: SWIOTPlugin (checked), DataLoggerPlugin, DebuggerPlugin.
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -434,13 +444,13 @@ correctly (using swiot_runtime device).
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: SWIOTPlugin (checked), ADCPlugin, DataLoggerPlugin, 
           DebuggerPlugin, RegmapPlugin.
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -481,13 +491,13 @@ correctly (using generic device).
     6. Click on **Verify** button.
         - **Expected result:** The message **"ip:127.0.0.1" not a valid 
           context!** is displayed. 
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.

@@ -23,6 +23,16 @@ License and About Page
          - v2.0.0-beta-rc2-a3a7c43
          - N/A
          - OS: Debian 12 arm64
+       * - Popa Andrei
+         - 18.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on Windows 10
+       * - Danila Andrei
+         - 19.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on macOS 14.5
 
 Test 1: Check license pop-up
 -----------------------------
@@ -40,7 +50,7 @@ Test 1: Check license pop-up
     3. Scroll down, click on **Reset** and after that on **Restart**
         - **Expected result:** The application should restart and the first thing
           that appears on the screen is a pop-up regarding the license used in Scopy.
-        - **Actual result:** Restart and pop-up window works as expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -49,8 +59,7 @@ Test 1: Check license pop-up
     4. Click on the highlighted text **"GPLv3"**
         - **Expected result:** A web browser window will open containing the GPLv3
           license used by Scopy.
-        - **Actual result:** The web browser window opens and displays the GPLv3
-          license.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -59,13 +68,13 @@ Test 1: Check license pop-up
     5. Click on **Continue**
         - **Expected result:** The application will display the home screen with
           the text "Welcome to Scopy!".
-        - **Actual result:** The application displays the home screen.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
@@ -97,7 +106,7 @@ Test 2: Check links from About Page
     2. Click on the **About** button from the bottom left side of the application.
         - **Expected result:** The application will display a screen containing
           textual information about the current version.
-        - **Actual result:** As expected, the application displays the About page.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -106,7 +115,7 @@ Test 2: Check links from About Page
     3. Click on the underlined word **here** from the line **Build info: here**
         - **Expected result:** The displayed text will change, and it now shows
           more detailed information about the building process.
-        - **Actual result:** The text changes and displays more information about the current build environment.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -115,7 +124,7 @@ Test 2: Check links from About Page
     4. Click on the **Home** buttom from the top right side of the application.
         - **Expected result:** The application will display the initial screen
           of the About page.
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -124,7 +133,7 @@ Test 2: Check links from About Page
     5. Click on the highlighted text **Scopy open source project**
         - **Expected result:** The application will display more information about
           the Scopy project.
-        - **Actual result:** As expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -134,7 +143,7 @@ Test 2: Check links from About Page
     7. Click on the highlighted text **other open source software**
         - **Expected result:** The application will display a list of open source
           libraries included or linked to Scopy.
-        - **Actual result:** List displayed as expected.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -144,7 +153,7 @@ Test 2: Check links from About Page
     9. Click on the highlighted text **Latest Release**
         - **Expected result:** A web browser window will open containing the latest
           release of Scopy.
-        - **Actual result:** As expected, release v2.0.0-beta-rc1 opens in the web browser.
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -154,7 +163,7 @@ Test 2: Check links from About Page
     11. Click on the highlighted text **Documentation**
          - **Expected result:** A web browser window will open containing the
            documentation for Scopy.
-         - **Actual result:** The Github page with the documentation opens as expected.
+         - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -164,18 +173,18 @@ Test 2: Check links from About Page
     13. Click on the highlighted text **Support Forum**
          - **Expected result:** A web browser window will open containing a forum
            named `ADI EngineerZone`.
-         - **Actual result:** As expected.
+         - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** Steps 10 and 12 are not needed since there is no need to press the home button
 
 ..
   Any comments about the test goes here.
