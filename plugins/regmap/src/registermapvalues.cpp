@@ -29,6 +29,12 @@
 #include <src/readwrite/fileregisterwritestrategy.hpp>
 #include <src/readwrite/iioregisterwritestrategy.hpp>
 
+#include <QFile>
+#include <QTextStream>
+#include <QDebug>
+
+#include <pluginbase/statusbarmanager.h>
+
 using namespace scopy;
 using namespace regmap;
 
@@ -77,16 +83,26 @@ void RegisterMapValues::setWriteStrategy(IRegisterWriteStrategy *writeStrategy)
 
 void RegisterMapValues::registerDump(QString path)
 {
-	IRegisterWriteStrategy *currentStrategy = getWriteStrategy();
-	setWriteStrategy(new FileRegisterWriteStrategy(path));
-
 	QMap<uint32_t, uint32_t>::iterator mapIterator;
 
-	for(mapIterator = registerReadValues->begin(); mapIterator != registerReadValues->end(); mapIterator++) {
-		Q_EMIT requestWrite(mapIterator.key(), mapIterator.value());
-	}
+	QFile file(path);
+	if(!file.isOpen()) {
+		if(!file.open(QIODevice::WriteOnly)) {
+			StatusBarManager::pushMessage("Can't open file!", 3000);
+		} else {
+			QTextStream out(&file);
 
-	setWriteStrategy(currentStrategy);
+			for(mapIterator = registerReadValues->begin(); mapIterator != registerReadValues->end();
+			    mapIterator++) {
+				out << QString::number(mapIterator.key(), 16) << ","
+				    << QString::number(mapIterator.value(), 16) << endl;
+			}
+		}
+
+		file.close();
+	} else {
+		qDebug() << "File already opened! ";
+	}
 }
 
 IRegisterReadStrategy *RegisterMapValues::getReadStrategy() const { return readStrategy; }
