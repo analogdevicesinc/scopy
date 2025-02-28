@@ -23,6 +23,16 @@ Installers
          - v2.0.0-beta-rc2-a3a7c43
          - N/A
          - OS: Debian 12 arm64
+       * - Popa Andrei
+         - 18.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on Windows 10
+       * - Danila Andrei
+         - 19.02.2025
+         - 2.0.0 a3a7c43
+         - N/A
+         - Tested on macOS 14.5
 
 Test 1: Check Scopy AppImage x86_64
 ------------------------------------
@@ -288,7 +298,7 @@ system with an x86_64 architecture.
     2. Unzip the archive.
         - **Expected result:** A DMG file named **Scopy-macos** should be extracted.
           (the file name will also contain the macOS version and the commit hash)
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -296,7 +306,7 @@ system with an x86_64 architecture.
 
     3. Double-click the file.
         - **Expected result:** A pop-up that contains the Scopy icon will appear
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -304,7 +314,7 @@ system with an x86_64 architecture.
 
     4. Install the application by right clicking the file and click on **Open**.
         - **Expected result:** A error pop-up will appear.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -313,7 +323,7 @@ system with an x86_64 architecture.
     5. Click on **Cancel** and after that repeat the step 4, right click on the file, and click on **Open**.
         - **Expected result:** A warning pop-up will appear. Different than
           the first one by including an Open button.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -323,7 +333,7 @@ system with an x86_64 architecture.
         - **Expected result:** After a while, a window with the GUI of the application
           should open. Inside the application, a window containing the license
           agreement should appear with 2 buttons "Exit" and "Continue".
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -331,7 +341,7 @@ system with an x86_64 architecture.
 
     7. Press "Exit".
         - **Expected result:** Scopy should gracefully close.
-        - **Actual result:**
+        - **Actual result:** AS expected.
 
 ..
   Actual test result goes here.
@@ -341,13 +351,13 @@ system with an x86_64 architecture.
     9. Press "Continue".
         - **Expected result:** The window containing the license agreement
           should close and Scopy should be still running.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -357,7 +367,7 @@ system with an x86_64 architecture.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -382,7 +392,7 @@ system with an x86_64 architecture.
         - **Expected result:** A window containing the installation wizard
           should open. It should contain a drop-down menu from which can be
           selected the language during the installation.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -390,7 +400,7 @@ system with an x86_64 architecture.
 
     3. Click on **OK**
         - **Expected result:** The installer continues with the `License Agreement` tab.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -399,7 +409,7 @@ system with an x86_64 architecture.
     4. Click on **I accept the agreement** and on **Next**.
         - **Expected result:** The installer continues with the location where
           the application will be installed.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -408,7 +418,7 @@ system with an x86_64 architecture.
     5. Select a location and click on **Next**.
         - **Expected result:** The installer continues with the list of components
           that will be installed.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -416,7 +426,7 @@ system with an x86_64 architecture.
 
     6. Click on **Next**.
         - **Expected result:** The installer continues with the `Additional Tasks` tab.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -424,7 +434,7 @@ system with an x86_64 architecture.
 
     7. Check the `"Install drivers for ADALM2000 - Requires Administrative Rights"` box and click on **Next**.
         - **Expected result:** The installer continues with the installation summary.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -434,7 +444,7 @@ system with an x86_64 architecture.
         - **Expected result:** The application should start installing. At the end of
           the installation, it should ask for Administrative Rights in order to install
           ADALM2000 drivers.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -444,7 +454,7 @@ system with an x86_64 architecture.
         - **Expected result:** Both the application and the ADALM2000 drivers
           installed successfully. And optionally, you can check to restart the
           computer or not.
-        - **Actual result:**
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -452,7 +462,7 @@ system with an x86_64 architecture.
 
     10. Click on **Finish**.
 
-**Tested OS:**
+**Tested OS:** Windows 10
 
 ..
   Details about the tested OS goes here.
@@ -462,7 +472,7 @@ system with an x86_64 architecture.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
