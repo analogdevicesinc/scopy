@@ -208,7 +208,7 @@ oscilloscope using Channel 1.
   Actual test result goes here.
 ..
 
-    6. Change the value to 0V in the Signal Generator and monitor it on the Oscilloscope:
+    6. Change the value to 5V in the Signal Generator and monitor it on the Oscilloscope:
         - **Expected result:** 
             - The reading is within 4.9V to 5.1V.
         - **Actual result:**
@@ -261,7 +261,7 @@ using Channel 1.
         - **Expected result:**
             - The plot displays 1.5 periods.
             - The measurements display: Period: 5ms, Frequency: 200 Hz,
-              Peak-peak: 1.9Vpp to 2.1Vpp, RMS: 0.6Vrms to 0.8Vrms.
+              Peak-peak: 1.9Vpp to 2.1Vpp, RMS: 0.6V to 0.8V.
         - **Actual result:**
 
 ..
@@ -272,7 +272,7 @@ using Channel 1.
         - **Expected result:**
             - The plot displays 4 periods.
             - The measurements display: Period: 2ms, Frequency: 500 Hz,
-              Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.74Vrms to 1.78Vrms.
+              Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.74V to 1.78V.
         - **Actual result:**
 
 ..
@@ -323,7 +323,7 @@ the oscilloscope using Channel 1.
         - **Expected result:**
             - The plot displays 4 square waves.
             - The measurements display: Period: 2ms, Frequency: 500 Hz,
-              Amplitude: 4.9Vpp to 5.1Vpp, RMS: 2.4Vrms to 2.6Vrms.
+              Amplitude: 4.9Vpp to 5.1Vpp, RMS: 2.4V to 2.6V.
         - **Actual result:**
 
 ..
@@ -336,7 +336,7 @@ the oscilloscope using Channel 1.
         - **Expected result:**
             - The plot displays 6 square waves.
             - The measurements display: Period: 500us, Frequency: 2 kHz,
-              Amplitude: 7.9Vpp to 8.1Vpp, RMS: 3.9Vrms to 4.1Vrms.
+              Amplitude: 7.9Vpp to 8.1Vpp, RMS: 3.9V to 4.1V.
         
         - **Actual result:**
 
@@ -388,7 +388,7 @@ the oscilloscope using Channel 1.
         - **Expected result:**
             - The plot displays 6 triangle waves.
             - The measurements display: Period: 500us, Frequency: 2 kHz,
-              Peak-peak: 3.9Vpp to 4.1Vpp, RMS: 1.0Vrms to 1.2Vrms.
+              Peak-peak: 3.9Vpp to 4.1Vpp, RMS: 1.0V to 1.2V.
         - **Actual result:**
 
 ..
@@ -396,12 +396,12 @@ the oscilloscope using Channel 1.
 ..
 
     5. Change the Signal Generator amplitude to 5V and the frequency to 20kHz.
-       Change the Oscilloscope Time Base to 5us/dev.
+       Change the Oscilloscope Time Base to 20us/dev.
         
         - **Expected result:**
             - The plot displays 6 triangle waves.
             - The measurements display: Period: 50us, Frequency: 20 kHz,
-              Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.3Vrms to 1.5Vrms.
+              Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.3V to 1.5V.
         
         - **Actual result:**
 
@@ -453,7 +453,7 @@ the signal generator on the oscilloscope using Channel 1.
         - **Expected result:**
             - The plot displays 3 sawtooth waves.
             - The measurements display: Period: 50us, Frequency: 20 kHz,
-              Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2Vrms to 2.4Vrms.
+              Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2V to 2.4V.
         - **Actual result:**
 
 ..
@@ -464,7 +464,7 @@ the signal generator on the oscilloscope using Channel 1.
         - **Expected result:**
             - The plot displays 3 sawtooth waves.
             - The measurements display: Period: 50us, Frequency: 20 kHz,
-              Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2Vrms to 2.4Vrms.
+              Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2V to 2.4V.
         - **Actual result:**
 
 ..
@@ -619,7 +619,8 @@ with different trigger configurations.
   Actual test result goes here.
 ..
 
-    7. Set the Hysteresis value to 1.25V and Level to -1.7V:
+    7. Change the Trigger Condition to Rising Edge 
+    8. Set the Hysteresis value to 1.25V and Level to -1.7V:
         - **Expected result:**
             - The signal on the plot is not triggered and unstable.
             - The plot level is outside the triggered range of ~1.3V to +2.5V.
@@ -779,7 +780,8 @@ Test 11 - FFT Function
     2. In the Oscilloscope set the following:
         - Channel1 Horizontal: Time Base: 5ms/div, Position: 0ms
         - Channel1 Vertical: Volts/Div: 1V/div, Position: 0V
-    3. Run the Oscilloscope and verify the plot:
+    3. From Oscilloscope settings set FFT to ON.
+    4. Run the Oscilloscope and verify the plot:
         - **Expected result:** The resulting spectrum shows 
           a series of peaks at the fundamental frequency and its harmonics.
         - **Actual result:**
@@ -1373,7 +1375,7 @@ Apply the measurements on a gated portion of the acquired signal.
     2. In the Oscilloscope set the following:
         - Channel 1 Horizontal: Time Base: 10us/div, Position: 0us
         - Channel 1 Vertical: Volts/Div: 1V/div, Position: 0V
-    3. Enable Measurements, turon on Display All.
+    3. Enable Measurements, turn on on Display All.
     4. Enable Gating and set the sliders to two consecutive zero-crossing points
        of the sine wave:
         
