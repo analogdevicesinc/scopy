@@ -83,9 +83,6 @@ void RegisterMapValues::setWriteStrategy(IRegisterWriteStrategy *writeStrategy)
 
 void RegisterMapValues::registerDump(QString path)
 {
-	IRegisterWriteStrategy *currentStrategy = getWriteStrategy();
-	setWriteStrategy(new FileRegisterWriteStrategy(path));
-
 	QMap<uint32_t, uint32_t>::iterator mapIterator;
 
 	QFile file(path);
@@ -106,8 +103,6 @@ void RegisterMapValues::registerDump(QString path)
 	} else {
 		qDebug() << "File already opened! ";
 	}
-
-	setWriteStrategy(currentStrategy);
 }
 
 IRegisterReadStrategy *RegisterMapValues::getReadStrategy() const { return readStrategy; }
