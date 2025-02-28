@@ -302,6 +302,7 @@ QMainWindow *Max14906::createDockableMainWindow(const QString &title, DioDigital
 						QWidget *parent)
 {
 	auto mainWindow = new QMainWindow(parent);
+	Style::setBackgroundColor(mainWindow, json::theme::background_primary, true);
 	mainWindow->setCentralWidget(nullptr);
 	mainWindow->setWindowFlags(Qt::Widget);
 
