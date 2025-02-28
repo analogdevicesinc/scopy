@@ -1037,6 +1037,8 @@ void PatternGenerator::updateChannelGroupWidget(bool visible)
 		LogicGroupItem *item = new LogicGroupItem(name, m_currentGroupMenu);
 		connect(m_plotCurves[channelsInGroup[i]], &GenericLogicPlotCurve::nameChanged, item,
 			&LogicGroupItem::setName);
+		connect(m_ui->btnGroupChannels, &QPushButton::toggled, this,
+			[=](bool toggled) { item->getDeleteBtn()->setEnabled(!toggled); });
 		connect(item, &LogicGroupItem::deleteBtnClicked, [=]() {
 			bool groupDeleted = false;
 			m_plot.removeFromGroup(m_selectedChannel, item->position(), groupDeleted);

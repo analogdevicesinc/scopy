@@ -24,7 +24,6 @@
 
 #include <QDebug>
 #include <QHBoxLayout>
-#include <QPushButton>
 #include <QVBoxLayout>
 
 using namespace scopy;
@@ -80,12 +79,12 @@ void LogicGroupItem::buildUi()
 
 	QSpacerItem *spacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-	QPushButton *deleteBtn = new QPushButton(this);
-	deleteBtn->setFlat(true);
-	deleteBtn->setIcon(QIcon(":/gui/icons/close_hovered.svg"));
-	deleteBtn->setMaximumSize(QSize(16, 16));
-	connect(deleteBtn, &QPushButton::clicked, this, &LogicGroupItem::deleteBtnClicked);
-	connect(deleteBtn, &QPushButton::clicked, [=]() {
+	m_deleteBtn = new QPushButton(this);
+	m_deleteBtn->setFlat(true);
+	m_deleteBtn->setIcon(QIcon(":/gui/icons/close_hovered.svg"));
+	m_deleteBtn->setMaximumSize(QSize(16, 16));
+	connect(m_deleteBtn, &QPushButton::clicked, this, &LogicGroupItem::deleteBtnClicked);
+	connect(m_deleteBtn, &QPushButton::clicked, [=]() {
 		BaseMenu *menu = getOwner();
 
 		if(!menu) {
@@ -101,7 +100,7 @@ void LogicGroupItem::buildUi()
 	m_nameLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
 	layout->insertWidget(1, m_nameLabel);
-	layout->insertWidget(0, deleteBtn);
+	layout->insertWidget(0, m_deleteBtn);
 	layout->insertSpacerItem(2, spacer);
 	layout->insertWidget(3, dragWidget);
 
@@ -109,3 +108,5 @@ void LogicGroupItem::buildUi()
 
 	setWidget(groupItem);
 }
+
+QPushButton *LogicGroupItem::getDeleteBtn() const { return m_deleteBtn; }

@@ -24,6 +24,7 @@
 #include "gui/basemenuitem.h"
 
 #include <QLabel>
+#include <QPushButton>
 
 namespace scopy {
 class LogicGroupItem : public BaseMenuItem
@@ -33,6 +34,8 @@ public:
 	LogicGroupItem(const QString &name, QWidget *parent = nullptr);
 
 	QString getName() const;
+
+	QPushButton *getDeleteBtn() const;
 
 public Q_SLOTS:
 	void setName(const QString &name);
@@ -45,6 +48,7 @@ private:
 
 private:
 	QLabel *m_nameLabel;
+	QPushButton *m_deleteBtn;
 };
 } // namespace scopy
 
