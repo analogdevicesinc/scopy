@@ -62,6 +62,7 @@ private:
 	QStringList createArgList();
 	void setStatusMessage(QString msg);
 	QString findEmuPath();
+	QString buildEmuPath(QString dirPath);
 	void stopEnableBtn(QString btnText);
 	bool startIioEmuProcess(QString processPath, QStringList arg = {});
 	void killEmuProcess();

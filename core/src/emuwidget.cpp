@@ -124,15 +124,8 @@ EmuWidget::~EmuWidget()
 
 void EmuWidget::init()
 {
-	Preferences *p = Preferences::GetInstance();
-	p->init("iio_emu_path", QCoreApplication::applicationDirPath());
-
-	QString systemEmuCall = "iio-emu";
-	if(startIioEmuProcess(systemEmuCall)) {
-		m_emuPath = systemEmuCall;
-	} else {
-		m_emuPath = findEmuPath();
-	}
+	Preferences::init("iio_emu_dir_path", "");
+	m_emuPath = findEmuPath();
 	if(m_emuPath.isEmpty()) {
 		setStatusMessage("Can't find iio-emu in the system!");
 	} else {
@@ -207,17 +200,38 @@ QStringList EmuWidget::createArgList()
 
 QString EmuWidget::findEmuPath()
 {
-	Preferences *p = Preferences::GetInstance();
-	QString program = p->get("iio_emu_path").toString() + "/iio-emu";
-#ifdef WIN32
-	program += ".exe";
-#endif
-
-	QFileInfo fi(program);
-	if(!fi.exists()) {
-		program = "";
+	// The path from the preferences has the highest priority. The path must be added manually.
+	QString emuPath = buildEmuPath(Preferences::get("iio_emu_dir_path").toString());
+	if(!emuPath.isEmpty() && QFile::exists(emuPath)) {
+		qInfo(CAT_EMU_ADD_PAGE) << "iio-emu path from preferences:" << emuPath;
+		return emuPath;
 	}
-	return program;
+	// Search iio-emu next to scopy executable.
+	emuPath = buildEmuPath(scopy::config::executableFolderPath());
+	if(!emuPath.isEmpty() && QFile::exists(emuPath)) {
+		qInfo(CAT_EMU_ADD_PAGE) << "iio-emu path:" << emuPath;
+		return emuPath;
+	}
+	// Search iio-emu in system.
+	emuPath = "iio-emu";
+	if(startIioEmuProcess(emuPath)) {
+		qInfo(CAT_EMU_ADD_PAGE) << "iio-emu from system!";
+		return emuPath;
+	}
+
+	return "";
+}
+
+QString EmuWidget::buildEmuPath(QString dirPath)
+{
+	QString emuPath = "";
+	if(!dirPath.isEmpty()) {
+		emuPath = dirPath + QDir::separator() + "iio-emu";
+#ifdef WIN32
+		emuPath += ".exe";
+#endif
+	}
+	return emuPath;
 }
 
 void EmuWidget::stopEnableBtn(QString btnText)
