@@ -242,6 +242,7 @@ void Ad74413r::verifyChnlsChanges()
 	bool changes = m_swiotAdLogic->verifyChannelsEnabledChanges(m_enabledChannels);
 	if(changes) {
 		m_readerThread->requestStop();
+		m_runBtn->setChecked(false);
 		m_swiotAdLogic->applyChannelsEnabledChanges(m_enabledChannels);
 	}
 }
