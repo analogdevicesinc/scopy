@@ -2272,6 +2272,12 @@ size_t SignalGenerator::get_samples_count(unsigned int chnIdx, double rate, bool
 	}
 
 out_cleanup:
+
+	// for size 0 return 0 going further with this value will get stuck in an infinite loop
+	if(size == 0) {
+		return 0;
+	}
+
 	/* The buffer size must be a multiple of 4 */
 	if(ptr->type == SIGNAL_TYPE_BUFFER) {
 		size = size + size % 0x04;
