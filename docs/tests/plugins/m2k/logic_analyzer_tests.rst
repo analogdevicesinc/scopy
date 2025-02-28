@@ -867,13 +867,47 @@ of the Logic Analyzer.
 **Steps:**
     1. Open the Pattern Generator and set two consecutive channels with similar
        configurations:
-            
-            - DIO0 and DIO1: Pattern: Clock, Frequency: 100Hz, Phase: 0 and Duty Cycle: 50%.
-            - DIO2 and DIO3: Pattern: Clock, Frequency: 300Hz, Phase: 0 and Duty Cycle: 50%.
-            - DIO4 and DIO5: Pattern: Clock, Frequency: 500Hz, Phase: 0 and Duty Cycle: 50%.
-            - DIO6 and DIO7: Pattern: Clock, Frequency: 150Hz, Phase: 0 and Duty Cycle: 80%.
-            - DIO8 and DIO9: Pattern: Clock, Frequency: 200Hz, Phase: 0 and Duty Cycle: 20%.
-            - Group DIO10 to DIO15: Pattern: Number Pattern and Data: 50.
+        
+        - DIO0 and DIO1:
+         
+          - Pattern: Clock, 
+          - Frequency: 100Hz, 
+          - Phase: 0,
+          - Duty Cycle: 50%.
+         
+        - DIO2 and DIO3: 
+
+          - Pattern: Clock, 
+          - Frequency: 300Hz, 
+          - Phase: 0, 
+          - Duty Cycle: 50%.
+         
+        - DIO4 and DIO5: 
+
+          - Pattern: Clock, 
+          - Frequency: 500Hz, 
+          - Phase: 0, 
+          - Duty Cycle: 50%.
+         
+        - DIO6 and DIO7: 
+
+          - Pattern: Clock, 
+          - Frequency: 150Hz, 
+          - Phase: 0, 
+          - Duty Cycle: 80%.
+         
+        - DIO8 and DIO9: 
+
+          - Pattern: Clock, 
+          - Frequency: 200Hz, 
+          - Phase: 0, 
+          - Duty Cycle: 20%.
+         
+        - Group DIO10 to DIO15: 
+
+          - Pattern: Number Pattern, 
+          - Data: 50.
+        
     2. Run the Logic Analyzer and Pattern Generator.
     3. In the Logic Analyzer General Settings menu set the Export All to **On** and 
        click the Export button.
@@ -928,10 +962,14 @@ of the Logic Analyzer.
 
 **Steps:**
     1. Open the Logic Analyzer and set the time base to 5 ms.
-    2. Open the Pattern Generator and set two consecutive channels with similar
-       configurations:
-        
-        - DIO0 and DIO1: Pattern: Clock, Frequency: 100Hz, Phase: 0 and Duty Cycle: 50%.
+    2. Open the Pattern Generator and set two consecutive channels with similar configurations:
+       - DIO0 and DIO1: 
+
+         - Pattern: Clock
+         - Frequency: 100Hz
+         - Phase: 0
+         - Duty Cycle: 50%
+         
     3. Run the Logic Analyzer and Pattern Generator.
     4. Press the Print Plot button and choose a location for the exported file:
         - **Expected Result**: The file is created in the specified location.
@@ -977,7 +1015,10 @@ Test 13 - Decoder Table
 
 **Steps:**
     1. Open the Pattern Generator and set the following parameters:
-        - DIO 0: UART, Baud rate: 9600, Data to Send: 123.
+
+        - DIO 0: UART, 
+        - Baud rate: 9600, 
+        - Data to Send: 123.
     2. Open the Logic Analyzer, enable DIO 0 and add a UART decoder with the 
        following parameters:
         
