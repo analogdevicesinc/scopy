@@ -54,6 +54,8 @@ private:
 	QPushButton *m_devRefresh;
 	QWidget *buildSaveSessionPreference();
 	QWidget *buildResetScopyDefaultButton();
+	QWidget *buildEmuPreference(const QString &id, const QString &title, const QString &description,
+				    QWidget *parent = nullptr);
 	QVBoxLayout *layout;
 	MenuSectionCollapseWidget *m_autoConnectWidget;
 	void removeIniFiles(bool backup = true);
