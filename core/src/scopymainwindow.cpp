@@ -528,6 +528,8 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 		dm->setExclusive(!general_connect_to_multiple_devices);
 	} else if(str == "general_scan_for_devices") {
 		enableScanner();
+	} else if(str == "iio_emu_dir_path") {
+		Q_EMIT p->restartRequired();
 	}
 }
 
