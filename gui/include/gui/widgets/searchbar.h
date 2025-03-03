@@ -29,9 +29,10 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QSet>
+#include <scopy-gui_export.h>
 
-namespace scopy::debugger {
-class SearchBar : public QWidget
+namespace scopy {
+class SCOPY_GUI_EXPORT SearchBar : public QWidget
 {
 	Q_OBJECT
 public:
