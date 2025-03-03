@@ -20,18 +20,17 @@
  */
 
 #include "searchbar.h"
-#include "style_properties.h"
 #include <QHBoxLayout>
 #include <style.h>
 
-using namespace scopy::debugger;
+using namespace scopy;
 
 SearchBar::SearchBar(QSet<QString> options, QWidget *parent)
 	: QWidget(parent)
 	, m_lineEdit(new QLineEdit(this))
 	, m_completer(new QCompleter(options.values(), this))
 {
-	Style::setStyle(m_lineEdit, style::properties::debugger::searchBar);
+	Style::setStyle(m_lineEdit, style::properties::widget::genericSearchBar);
 	setFixedHeight(34); // Hardcoded to match similar container
 	m_completer->setCaseSensitivity(Qt::CaseInsensitive);
 	m_completer->setFilterMode(Qt::MatchContains);
