@@ -286,6 +286,7 @@ private Q_SLOTS:
 	void startStop(bool start);
 	void setFunction(const QString &function);
 	void readPreferences();
+	void checkRunEnabled();
 Q_SIGNALS:
 	void showTool();
 };
