@@ -229,8 +229,8 @@ SignalGenerator::SignalGenerator(libm2k::context::M2k *m2k, QString uri, Filter 
 	fileAmplitude = new ScaleSpinButton({{tr("μVolts"), 1e-6}, {tr("mVolts"), 1e-3}, {tr("Volts"), 1e0}},
 					    tr("Amplitude"), 0.000001, 10, true, true, this);
 
-	mathSampleRate = new ScaleSpinButton({{"msps", 1e-3}, {"sps", 1e0}, {"ksps", 1e3}, {"Msps", 1e6}},
-					     tr("SampleRate"), 0.001, 75000000.0, true, false, this);
+	mathSampleRate = new ScaleSpinButton({{"sps", 1e0}, {"ksps", 1e3}, {"Msps", 1e6}}, tr("SampleRate"), 0.001,
+					     75000000.0, true, false, this);
 
 	mathSampleRate->setIntegerDivider(75000000);
 
@@ -781,6 +781,13 @@ void SignalGenerator::mathRecordLengthChanged(double value)
 		ptr->math_record_length = value;
 		resetZoom();
 	}
+
+	size_t size = (size_t)value * mathSampleRate->value();
+	if(size <= 0) {
+		ui->run_button->setEnabled(false);
+	} else {
+		ui->run_button->setEnabled(true);
+	}
 }
 
 void SignalGenerator::mathSampleRateChanged(double value)
@@ -789,6 +796,13 @@ void SignalGenerator::mathSampleRateChanged(double value)
 	if(ptr->math_sr != value) {
 		ptr->math_sr = value;
 		resetZoom();
+	}
+
+	size_t size = (size_t)value * mathRecordLength->value();
+	if(size <= 0) {
+		ui->run_button->setEnabled(false);
+	} else {
+		ui->run_button->setEnabled(true);
 	}
 }
 
