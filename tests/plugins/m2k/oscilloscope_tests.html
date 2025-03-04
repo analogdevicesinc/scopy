@@ -515,7 +515,7 @@ oscilloscope using Channel 1.</p>
 <blockquote>
 <div><ol class="arabic simple" start="6">
 <li><dl class="simple">
-<dt>Change the value to 0V in the Signal Generator and monitor it on the Oscilloscope:</dt><dd><ul class="simple">
+<dt>Change the value to 5V in the Signal Generator and monitor it on the Oscilloscope:</dt><dd><ul class="simple">
 <li><dl class="simple">
 <dt><strong>Expected result:</strong></dt><dd><ul>
 <li><p>The reading is within 4.9V to 5.1V.</p></li>
@@ -569,7 +569,7 @@ the following configuration in the general settings:</p>
 <dt><strong>Expected result:</strong></dt><dd><ul>
 <li><p>The plot displays 1.5 periods.</p></li>
 <li><p>The measurements display: Period: 5ms, Frequency: 200 Hz,
-Peak-peak: 1.9Vpp to 2.1Vpp, RMS: 0.6Vrms to 0.8Vrms.</p></li>
+Peak-peak: 1.9Vpp to 2.1Vpp, RMS: 0.6V to 0.8V.</p></li>
 </ul>
 </dd>
 </dl>
@@ -590,7 +590,7 @@ Peak-peak: 1.9Vpp to 2.1Vpp, RMS: 0.6Vrms to 0.8Vrms.</p></li>
 <dt><strong>Expected result:</strong></dt><dd><ul>
 <li><p>The plot displays 4 periods.</p></li>
 <li><p>The measurements display: Period: 2ms, Frequency: 500 Hz,
-Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.74Vrms to 1.78Vrms.</p></li>
+Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.74V to 1.78V.</p></li>
 </ul>
 </dd>
 </dl>
@@ -641,7 +641,7 @@ the following configuration in the general settings:</p>
 <dt><strong>Expected result:</strong></dt><dd><ul>
 <li><p>The plot displays 4 square waves.</p></li>
 <li><p>The measurements display: Period: 2ms, Frequency: 500 Hz,
-Amplitude: 4.9Vpp to 5.1Vpp, RMS: 2.4Vrms to 2.6Vrms.</p></li>
+Amplitude: 4.9Vpp to 5.1Vpp, RMS: 2.4V to 2.6V.</p></li>
 </ul>
 </dd>
 </dl>
@@ -664,7 +664,7 @@ Change the Oscilloscope Time Base to 200us/div:</p>
 <dt><strong>Expected result:</strong></dt><dd><ul>
 <li><p>The plot displays 6 square waves.</p></li>
 <li><p>The measurements display: Period: 500us, Frequency: 2 kHz,
-Amplitude: 7.9Vpp to 8.1Vpp, RMS: 3.9Vrms to 4.1Vrms.</p></li>
+Amplitude: 7.9Vpp to 8.1Vpp, RMS: 3.9V to 4.1V.</p></li>
 </ul>
 </dd>
 </dl>
@@ -714,7 +714,7 @@ the following configuration in the general settings:</p>
 <dt><strong>Expected result:</strong></dt><dd><ul>
 <li><p>The plot displays 6 triangle waves.</p></li>
 <li><p>The measurements display: Period: 500us, Frequency: 2 kHz,
-Peak-peak: 3.9Vpp to 4.1Vpp, RMS: 1.0Vrms to 1.2Vrms.</p></li>
+Peak-peak: 3.9Vpp to 4.1Vpp, RMS: 1.0V to 1.2V.</p></li>
 </ul>
 </dd>
 </dl>
@@ -730,14 +730,14 @@ Peak-peak: 3.9Vpp to 4.1Vpp, RMS: 1.0Vrms to 1.2Vrms.</p></li>
 <blockquote>
 <div><ol class="arabic" start="5">
 <li><p>Change the Signal Generator amplitude to 5V and the frequency to 20kHz.
-Change the Oscilloscope Time Base to 5us/dev.</p>
+Change the Oscilloscope Time Base to 20us/dev.</p>
 <blockquote>
 <div><ul class="simple">
 <li><dl class="simple">
 <dt><strong>Expected result:</strong></dt><dd><ul>
 <li><p>The plot displays 6 triangle waves.</p></li>
 <li><p>The measurements display: Period: 50us, Frequency: 20 kHz,
-Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.3Vrms to 1.5Vrms.</p></li>
+Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.3V to 1.5V.</p></li>
 </ul>
 </dd>
 </dl>
@@ -787,7 +787,7 @@ the following configuration in the general settings:</p>
 <dt><strong>Expected result:</strong></dt><dd><ul>
 <li><p>The plot displays 3 sawtooth waves.</p></li>
 <li><p>The measurements display: Period: 50us, Frequency: 20 kHz,
-Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2Vrms to 2.4Vrms.</p></li>
+Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2V to 2.4V.</p></li>
 </ul>
 </dd>
 </dl>
@@ -808,7 +808,7 @@ Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2Vrms to 2.4Vrms.</p></li>
 <dt><strong>Expected result:</strong></dt><dd><ul>
 <li><p>The plot displays 3 sawtooth waves.</p></li>
 <li><p>The measurements display: Period: 50us, Frequency: 20 kHz,
-Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2Vrms to 2.4Vrms.</p></li>
+Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2V to 2.4V.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1010,6 +1010,7 @@ with different trigger configurations.</p>
 </div></blockquote>
 <blockquote>
 <div><ol class="arabic simple" start="7">
+<li><p>Change the Trigger Condition to Rising Edge</p></li>
 <li><dl class="simple">
 <dt>Set the Hysteresis value to 1.25V and Level to -1.7V:</dt><dd><ul class="simple">
 <li><dl class="simple">
@@ -1232,6 +1233,7 @@ Channel 2 increased 4 times.</p></li>
 </dd>
 </dl>
 </li>
+<li><p>From Oscilloscope settings set FFT to ON.</p></li>
 <li><dl class="simple">
 <dt>Run the Oscilloscope and verify the plot:</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> The resulting spectrum shows
@@ -1942,7 +1944,7 @@ Apply the measurements on a gated portion of the acquired signal.</p>
 </dd>
 </dl>
 </li>
-<li><p>Enable Measurements, turon on Display All.</p></li>
+<li><p>Enable Measurements, turn on on Display All.</p></li>
 <li><p>Enable Gating and set the sliders to two consecutive zero-crossing points
 of the sine wave:</p>
 <blockquote>

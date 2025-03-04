@@ -93,6 +93,7 @@
 <li><a class="reference internal" href="#setup-environment">Setup environment:</a></li>
 <li><a class="reference internal" href="#test-1-check-individual-digital-pin-state">Test 1 - Check individual digital pin state</a></li>
 <li><a class="reference internal" href="#test-2-checking-grouped-digital-pin-states">Test 2 - Checking grouped digital pin states</a></li>
+<li><a class="reference internal" href="#test-3-checking-individual-digital-pin-state-voltmeter-and-power-supply">Test 3 - Checking individual digital pin state voltmeter and power supply</a></li>
 </ul>
 </li>
 </ul>
@@ -296,7 +297,15 @@ If the test case has special requirements, they will be listed in the test case 
 <li><p>Open Scopy.</p></li>
 <li><p>Connect the ADALM2000 device to the system.</p></li>
 <li><p>Connect the ADALM2000 device in Scopy using the USB/network backend.</p></li>
-<li><p>Connect loopback cables between DIO 0-7 and DIO 8-15 using the pinout diagram.</p></li>
+<li><p>Connect loopback cables using the pinout diagram between:
+- DIO 0-8
+- DIO 1-9
+- DIO 2-10
+- DIO 3-11
+- DIO 4-12
+- DIO 5-13
+- DIO 6-14
+- DIO 7-15</p></li>
 </ul>
 </dd>
 <dt>Depends on:</dt><dd><ul class="simple">
@@ -325,14 +334,14 @@ If the test case has special requirements, they will be listed in the test case 
 <li><p>Open the DigitalIO instrument.</p></li>
 <li><p>Set DIO 0-7 and DIO 8-15 as individual pins using the combo box.</p></li>
 <li><p>Set DIO Channel 0 as <strong>output</strong>.</p></li>
-<li><p>Set DIO Channel 7 as <strong>input</strong>.</p></li>
+<li><p>Set DIO Channel 8 as <strong>input</strong>.</p></li>
 <li><dl class="simple">
-<dt>Change the logic state of DIO 0 (0/1) multiple times and monitor DIO 7 state.</dt><dd><ul class="simple">
+<dt>Change the logic state of DIO 0 (0/1) multiple times and monitor DIO 8 state.</dt><dd><ul class="simple">
 <li><dl class="simple">
 <dt><strong>Expected Result</strong>:</dt><dd><ul>
-<li><p>When DIO 0 is set to logic 1, DIO 7 will be automatically set to logic 1
+<li><p>When DIO 0 is set to logic 1, DIO 8 will be automatically set to logic 1
 (the corresponding led will be turned on).</p></li>
-<li><p>When DIO 0 is set to logic 0, DIO 7 will be automatically set to logic 0
+<li><p>When DIO 0 is set to logic 0, DIO 8 will be automatically set to logic 0
 (the corresponding led will be turned off).</p></li>
 </ul>
 </dd>
@@ -348,75 +357,17 @@ If the test case has special requirements, they will be listed in the test case 
 </dl>
 <blockquote>
 <div><ol class="arabic" start="6">
-<li><p>Connect DIO 0 to a the analog pin <strong>1+</strong> and DIO 7 to the positive power
-supply <strong>V+</strong> using the pinout diagram attached in resources.</p></li>
-<li><p>Set DIO 0 to logic 0 and open the <a class="reference internal" href="../../../plugins/m2k/voltmeter.html#voltmeter"><span class="std std-ref">Voltmeter</span></a> instrument.
-Start the instrument and monitor the voltage value on Channel 1.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><strong>Expected Result</strong>: The voltage displayed on the voltmeter is between -0.050V and 0.4V.</p></li>
-<li><p><strong>Actual Result</strong>:</p></li>
-</ul>
-</div></blockquote>
-</li>
-</ol>
-</div></blockquote>
-<blockquote>
-<div><ol class="arabic simple" start="8">
-<li><dl class="simple">
-<dt>Set DIO 0 to logic 1 and monitor the voltage value on Channel 1. Start the instrument.</dt><dd><ul class="simple">
-<li><p><strong>Expected Result</strong>: The voltage displayed on the voltmeter is between 2.9V and 3.4V.</p></li>
-<li><p><strong>Actual Result</strong>:</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ol>
-</div></blockquote>
-<blockquote>
-<div><ol class="arabic" start="9">
-<li><p>Open the <a class="reference internal" href="../../../plugins/m2k/power_supply.html#power-supply"><span class="std std-ref">Power Supply instrument</span></a> and set the positive
-power supply to a voltage level between 0V and 0.8V.
-Monitor the DIO 7 logic state.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><strong>Expected Result</strong>: DIO 7 indicates logic 0 level.</p></li>
-<li><p><strong>Actual Result</strong>:</p></li>
-</ul>
-</div></blockquote>
-</li>
-</ol>
-</div></blockquote>
-<blockquote>
-<div><ol class="arabic" start="10">
-<li><p>Open the <a class="reference internal" href="../../../plugins/m2k/power_supply.html#power-supply"><span class="std std-ref">Power Supply instrument</span></a> and set the positive
-power supply to a voltage level between 2V and 3.3V.
-Monitor the DIO 7 logic state.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><strong>Expected Result</strong>: DIO 7 indicates logic 1 level.</p></li>
-<li><p><strong>Actual Result</strong>:</p></li>
-</ul>
-</div></blockquote>
-</li>
-</ol>
-</div></blockquote>
-<blockquote>
-<div><ol class="arabic" start="11">
-<li><p>Repeat steps 6 to 11 using DIO 8 as <strong>output</strong> (for step 3) and
+<li><p>Repeat steps 3 to 5 using DIO 8 as <strong>output</strong> (for step 3) and
 DIO 1 as <strong>input</strong> for (step 4).</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><strong>Expected Result</strong>: All the expected results in step 6 to 11 are met.</p></li>
+<li><p><strong>Expected Result</strong>: All the expected results in step 5 are met.</p></li>
 <li><p><strong>Actual Result</strong>:</p></li>
 </ul>
 </div></blockquote>
 </li>
 </ol>
 </div></blockquote>
-<p><strong>Tested OS:</strong></p>
-<p><strong>Comments:</strong></p>
-<p><strong>Result:</strong> PASS/FAIL</p>
 </section>
 <section id="test-2-checking-grouped-digital-pin-states">
 <h2>Test 2 - Checking grouped digital pin states<a class="headerlink" href="#test-2-checking-grouped-digital-pin-states" title="Link to this heading"></a></h2>
@@ -478,6 +429,92 @@ are working correctly.</p>
 </ul>
 </dd>
 </dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-checking-individual-digital-pin-state-voltmeter-and-power-supply">
+<h2>Test 3 - Checking individual digital pin state voltmeter and power supply<a class="headerlink" href="#test-3-checking-individual-digital-pin-state-voltmeter-and-power-supply" title="Link to this heading"></a></h2>
+<p id="tst-dio-individual-voltmeter"><strong>UID:</strong> TST.DIO.INDIVIDUAL.VOLTMETER</p>
+<p><strong>Description:</strong> This test verifies that the individual digital pins are working correctly using voltmeter and power supply.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-device-digital-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Steps:</strong></p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>Open the DigitalIO instrument.</p></li>
+<li><p>Set DIO 0-7 and DIO 8-15 as individual pins using the combo box.</p></li>
+<li><p>Set DIO Channel 0 as <strong>output</strong>.</p></li>
+<li><p>Set DIO Channel 8 as <strong>input</strong>.</p></li>
+<li><p>Connect DIO 0 to the analog pin <strong>1+</strong> and DIO 8 to the positive power
+supply <strong>V+</strong> using the pinout diagram attached in resources.</p></li>
+<li><p>Set DIO 0 to logic 0 and open the <a class="reference internal" href="../../../plugins/m2k/voltmeter.html#voltmeter"><span class="std std-ref">Voltmeter</span></a> instrument.
+Start the instrument and monitor the voltage value on Channel 1.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Expected Result</strong>: The voltage displayed on the voltmeter is between -0.050V and 0.4V.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Set DIO 0 to logic 1 and monitor the voltage value on Channel 1. Start the instrument.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The voltage displayed on the voltmeter is between 2.9V and 3.4V.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic" start="8">
+<li><p>Open the <a class="reference internal" href="../../../plugins/m2k/power_supply.html#power-supply"><span class="std std-ref">Power Supply instrument</span></a> and set the positive
+power supply to a voltage level between 0V and 0.8V.
+Monitor the DIO 8 logic state.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Expected Result</strong>: DIO 8 indicates logic 0 level.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic" start="9">
+<li><p>Open the <a class="reference internal" href="../../../plugins/m2k/power_supply.html#power-supply"><span class="std std-ref">Power Supply instrument</span></a> and set the positive
+power supply to a voltage level between 2V and 3.3V.
+Monitor the DIO 8 logic state.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Expected Result</strong>: DIO 8 indicates logic 1 level.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><p>Repeat steps 5 to 9 using DIO 8 as <strong>output</strong> (for step 3) and
+DIO 1 as <strong>input</strong> for (step 4).</p>
+<ul class="simple">
+<li><p><strong>Expected Result</strong>: All the expected results in step 6 to 11 are met.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
 </li>
 </ol>
 </div></blockquote>

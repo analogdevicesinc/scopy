@@ -9,7 +9,7 @@ General Settings - Test Case
 
 
 .. note::
-    .. list-table:: 
+    .. list-table::
        :widths: 50 30 30 50 50
        :header-rows: 1
 
@@ -158,7 +158,15 @@ Test 2: Save and Load Profile
   Actual test result goes here.
 ..
 
-        2. Oscilloscope’s Settings: For Channel 1: Time Base: 100ns, Volts/Div: 2V, For Channel 2: Volts/Div: 5V. Signal Generator’s Settings: For Channel 1: Sinewave, 3Vpp, 3MHz, For Channel 2: Square Wave, 5Vpp, 900kHz. Spectrum Analyzer’s Settings: Frequency Sweep Setting: Start – 500kHz; Stop – 5MHz, Amplitude: Top – 10dBFS; Bottom – -140dBFS.
+        2. Set the following settings:
+                - **Oscilloscope’s Settings:**
+                - Channel 1: Time Base: 100ns, Volts/Div: 2V
+                - Channel 2: Volts/Div: 5V
+                - **Signal Generator’s Settings:**
+                - Channel 1: Sinewave, 3Vpp, 3MHz
+                - Channel 2: Square Wave, 5Vpp, 900kHz
+                - **Spectrum Analyzer’s Settings:**
+                - Frequency Sweep Setting: Start – 500kHz; Stop – 5MHz, Amplitude: Top – 10dBFS; Bottom – -140dBFS
         3. Connect AWG channel 1 to Scope Ch1+ and AWG channel 2 to Scope Ch2+. Connect Scope Ch1- and Ch2- to GND.
         4. Run the Signal Generator instrument, and check the output on Oscilloscope and Spectrum Analyzer. Then save the profile as “profile1.ini.”
                 - **Expected Result:** The output waveform on the Oscilloscope should be set in a way that the signals are can properly be seen compared with the default settings. In the Spectrum Analyzer the fundamental frequency of both signals should be present in the plot window set by the sweep setting.
@@ -176,7 +184,16 @@ Test 2: Save and Load Profile
   Actual test result goes here.
 ..
 
-        6. Pattern Generator’s Settings: Enable DIO2, DIO3, DIO6, DIO7, DIO10, DIO11, DIO14 and DIO15. Group DIO1 and DIO2 set to random and 1MHz frequency. Group DIO10 and DIO11 and set to Binary Counter at 1MHz. Set the other enabled DIOs to clock at 1MHz. Logic Analyzer’s Settings: Group DIO0, DIO1, DIO4, DIO5, DIO8, DIO9, DIO12, and DIO13 and set to parallel mode. Group DIO2 and DIO3 and set to parallel mode. Group DIO10 and DIO11 and set to parallel mode. Set the time base to 1us. Digital IO’s Settings: Set DIO0, DIO1, DIO4, DIO5, DIO8, DIO9, DIO12, and DIO13 to output.
+        6. Pattern Generator’s Settings:
+                - Enable DIO2, DIO3, DIO6, DIO7, DIO10, DIO11, DIO14 and DIO15.
+                - Group DIO2 and DIO3 set to random and 1MHz frequency.
+                - Group DIO10 and DIO11 and set to Binary Counter at 1MHz.
+                - Set the other enabled DIOs to clock at 1MHz.
+                - Logic Analyzer’s Settings:
+                - Group DIO0, DIO1, DIO4, DIO5, DIO8, DIO9, DIO12, and DIO13 and set to parallel mode.
+                - Group DIO2 and DIO3 and set to parallel mode. Group DIO10 and DIO11 and set to parallel mode.
+                - Set the time base to 1us.
+                - Digital IO’s Settings: Set DIO0, DIO1, DIO4, DIO5, DIO8, DIO9, DIO12, and DIO13 to output.
         7. Run the three instrument and open Logic Analyzer instrument. Save the profile as “profile2.ini”.
                 - **Expected Result:** See that the profile is saved on the desired location and the logic analyzer should be set in a way that the rising and falling edge of the signal is clearly seen.
                 - **Actual Result**:
@@ -193,7 +210,12 @@ Test 2: Save and Load Profile
   Actual test result goes here.
 ..
 
-        9. Power Supply’s Settings: Set to “Tracking Mode” with 35% tracking setting. Set positive supply to 3V and the negative supply should automatically be set to -1.05V. Signal Generator’s Settings: For Channel 1: Sinewave, 2Vpp, 10kHz, For Channel 2: Sinewave, 1Vpp, 10kHz, 90deg phase. Voltmeter Settings: For Channel 1: DC (Direct Current), History – OFF, For Channel 2: AC (20Hz – 40kHz), History – ON (1s). Network Analyzer: Reference: Channel 1, 2V Amplitude, Sweep: Linear, Start – 1kHz, Stop – 100kHz, Sample Count – 200, Display: Min. Magnitude – -90dB, Max. Magnitude – 10dB, Min. Phase – -100deg, Max. Phase – 100deg.
+        9. Power Supply’s Settings:
+                - Set to “Tracking Mode” with 35% tracking setting.
+                - Set positive supply to 3V and the negative supply should automatically be set to -1.05V.
+                - Signal Generator’s Settings: For Channel 1: Sinewave, 2Vpp, 10kHz, For Channel 2: Sinewave, 1Vpp, 10kHz, 90deg phase.
+                - Voltmeter Settings: For Channel 1: DC (Direct Current), History – OFF, For Channel 2: AC (20Hz – 40kHz), History – ON (1s).
+                - Network Analyzer: Reference: Channel 1, 2V Amplitude, Sweep: Linear, Start – 1kHz, Stop – 100kHz, Sample Count – 200, Display: Min. Magnitude – -90dB, Max. Magnitude – 10dB, Min. Phase – -100deg, Max. Phase – 100deg.
         10. Connect Positive Supply to Scope Ch1+, connect AWG1 to Scope Ch2+, connect scope Ch1- and Scope Ch2- to GND.
         11. Run Power Supply, Voltmeter and Signal Generator to see if the voltmeter will be able to read 3V on channel 1 and 0.7V on channel 2. Save the profile as “profile3.ini”.
                  - **Expected Result:** Channel 1’s history should be off and channel 2’s history should be present and the reading must be stable.
@@ -258,10 +280,15 @@ Test 3: Preferences
   Actual test result goes here.
 ..
 
-        5. Reset profile to default by deleting the files from ``C:\Users\your_username\AppData\Roaming\ADI``. Enable auto save feature. Load profile 1, profile 2 or profile 3 from Testing Save and Load feature steps. Close Scopy and Open.
-        6. Following step 5, open Scopy and the current profile should be one of the profiles created from the Save and load test case. On the General Setting preference, the reset scopy is located in the lower right of the Scopy screen. Click reset scopy.
-                - **Expected Result:** Reopening Scopy, the profile loaded should be the profile saved. Scopy should return to its default setting. Similar with deleting the files from folder.
-                - **Actual Result:**
+        5. Reset profile to default by deleting the files from ``C:\Users\your_username\AppData\Roaming\ADI``.
+                - Enable auto save feature.
+                - Load profile 1, profile 2 or profile 3 from Testing Save and Load feature steps.
+                - Close Scopy and Open.
+        6. Following step 5, open Scopy and the current profile should be one of the profiles created from the Save and load test case.
+                - On the General Setting preference, the reset scopy is located in the lower right of the Scopy screen.
+                - Click reset scopy.
+                        - **Expected Result:** Reopening Scopy, the profile loaded should be the profile saved. Scopy should return to its default setting. Similar with deleting the files from folder.
+                        - **Actual Result:**
 
 ..
   Actual test result goes here.
@@ -276,18 +303,22 @@ Test 3: Preferences
 ..
 
         8. On the Analog tools section, an option to search or not to search marker peaks in the visible domain is given.
-        9. Signal Generator’s Settings: For Channel 1: Sinewave, 10Vpp, 500kHz. Spectrum Analyzer’s Sweep Settings: Start – 700kHz, Stop – 1MHz. Disable Channel 2. Connect AWG channel 1 to Scope Ch1+.
+        9. Signal Generator’s Settings:
+                - For Channel 1: Sinewave, 10Vpp, 500kHz.
+                - Spectrum Analyzer’s Sweep Settings: Start – 700kHz, Stop – 1MHz.
+                - Disable Channel 2.
+                - Connect AWG channel 1 to Scope Ch1+.
         10. Under the Marker Settings, click Marker 1 then “Peak.” Turn the Marker Table on and look for the marked frequencies.
-                 - **Expected Result:** A marker labeled M1 will automatically appear on the spectrum upon clicking Marker 1. Clicking “Peak” will put the Marker on the 500kHz mark.
-                 - **Actual Result:**
+                - **Expected Result:** A marker labeled M1 will automatically appear on the spectrum upon clicking Marker 1. Clicking “Peak” will put the Marker on the 500kHz mark.
+                - **Actual Result:**
 
 ..
   Actual test result goes here.
 ..
 
         11. Under the Analog tools section, The number of periods shown may be adjusted from 2 to 9.
-                 - **Expected Result:** The signal generator’s graphical representation must follow the desired number of periods on the lower frequency channel (if both channels are configured to output waveform signals). When numbers other than 2 to 9 are entered, the number and the line under it turns to red.
-                 - **Actual Result:**
+                - **Expected Result:** The signal generator’s graphical representation must follow the desired number of periods on the lower frequency channel (if both channels are configured to output waveform signals). When numbers other than 2 to 9 are entered, the number and the line under it turns to red.
+                - **Actual Result:**
 
 ..
   Actual test result goes here.
@@ -295,9 +326,22 @@ Test 3: Preferences
 
         12. On the Analog tools section, an option to display 0dB on the graph is available. Click to enable it.
         13. Construct a first-order low pass RC filter with the following components: R = 470 Ohms, C = 1uF. This will have a cut-off frequency of ~340 Hz.
-        14. Network Analyzer’s Settings: Reference: Channel 1, 1V Amplitude, 0V Offset. Sweep: Logarithmic, Start – 10Hz, Stop – 500kHz, Sample Count - 100. Display: Min. Magnitude – -90dB, Max. Magnitude – 10dB, Min. Phase – -150deg, Max. Phase – 60deg. Run Network Analyzer.
-                 - **Expected Result:** The Bode Plot has 0dB on its labels.
-                 - **Actual Result:**
+        14. Network Analyzer’s Settings
+                - Reference: Channel 1
+                - 1V Amplitude
+                - 0V Offset
+                - Sweep: Logarithmic
+                - Start – 10Hz
+                - Stop – 500kHz
+                - Sample Count - 100
+                - Display settings:
+                - Min. Magnitude – -90dB
+                - Max. Magnitude – 10dB
+                - Min. Phase – -150deg
+                - Max. Phase – 60deg
+                - Run Network Analyzer.
+                        - **Expected Result:** The Bode Plot has 0dB on its labels.
+                        - **Actual Result:**
 
 ..
   Actual test result goes here.

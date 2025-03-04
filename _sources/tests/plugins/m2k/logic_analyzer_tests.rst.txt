@@ -63,6 +63,10 @@ digital channels - rising edge, falling edge, high, low, any edge.
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
 
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
+    - :ref:`Digital IO<digital_io_tests>`
+
 **Steps:**
     1. Open the Logic Analyzer instrument.
     2. Enable DIO 0 and DIO 1 on the Logic Analyzer.
@@ -155,6 +159,10 @@ Test 2 - External Channel Trigger Function
 **Preconditions:**
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
+
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
+    - :ref:`Digital IO<digital_io_tests>`
 
 **Steps:**
     1. Open the Logic Analyzer instrument.
@@ -357,6 +365,10 @@ Test 4 - Trigger Modes
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
 
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
+    - :ref:`Digital IO<digital_io_tests>`
+
 **Steps:**
     1. Open the Logic Analyzer instrument.
     2. Enable DIO 0, DIO 1 and DIO 2 on the Logic Analyzer.
@@ -436,6 +448,9 @@ Test 5 - Clock signal measurement accuracy
 **Preconditions:**
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
+
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
 
 **Steps:**
     1. Open the Logic Analyzer instrument.
@@ -546,6 +561,9 @@ Test 6 - Parallel Decoder
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
 
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
+
 **Steps:**
     1. Open the Logic Analyzer instrument.
     2. Add a parallel decoder from the main settings menu and set the following parameters:
@@ -602,6 +620,9 @@ Test 7 - SPI decoder
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
 
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
+
 **Steps:**
     1. Open the Logic Analyzer instrument.
     2. Add an SPI decoder from the main settings menu and set the following parameters:
@@ -654,6 +675,9 @@ Test 8 - UART decoder
 **Preconditions:**
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
+
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
 
 **Steps:**
     1. Open the Logic Analyzer instrument and set time base to 1 ms.
@@ -729,6 +753,9 @@ Test 9 - PWM Decoder
 **Preconditions:**
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
+
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
 
 **Steps:**
     1. Open the Logic Analyzer instrument.
@@ -834,16 +861,53 @@ of the Logic Analyzer.
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
 
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
+
 **Steps:**
     1. Open the Pattern Generator and set two consecutive channels with similar
        configurations:
-            
-            - DIO0 and DIO1: Pattern: Clock, Frequency: 100Hz, Phase: 0 and Duty Cycle: 50%.
-            - DIO2 and DIO3: Pattern: Clock, Frequency: 300Hz, Phase: 0 and Duty Cycle: 50%.
-            - DIO4 and DIO5: Pattern: Clock, Frequency: 500Hz, Phase: 0 and Duty Cycle: 50%.
-            - DIO6 and DIO7: Pattern: Clock, Frequency: 150Hz, Phase: 0 and Duty Cycle: 80%.
-            - DIO8 and DIO9: Pattern: Clock, Frequency: 200Hz, Phase: 0 and Duty Cycle: 20%.
-            - Group DIO10 to DIO15: Pattern: Number Pattern and Data: 50.
+        
+        - DIO0 and DIO1:
+         
+          - Pattern: Clock, 
+          - Frequency: 100Hz, 
+          - Phase: 0,
+          - Duty Cycle: 50%.
+         
+        - DIO2 and DIO3: 
+
+          - Pattern: Clock, 
+          - Frequency: 300Hz, 
+          - Phase: 0, 
+          - Duty Cycle: 50%.
+         
+        - DIO4 and DIO5: 
+
+          - Pattern: Clock, 
+          - Frequency: 500Hz, 
+          - Phase: 0, 
+          - Duty Cycle: 50%.
+         
+        - DIO6 and DIO7: 
+
+          - Pattern: Clock, 
+          - Frequency: 150Hz, 
+          - Phase: 0, 
+          - Duty Cycle: 80%.
+         
+        - DIO8 and DIO9: 
+
+          - Pattern: Clock, 
+          - Frequency: 200Hz, 
+          - Phase: 0, 
+          - Duty Cycle: 20%.
+         
+        - Group DIO10 to DIO15: 
+
+          - Pattern: Number Pattern, 
+          - Data: 50.
+        
     2. Run the Logic Analyzer and Pattern Generator.
     3. In the Logic Analyzer General Settings menu set the Export All to **On** and 
        click the Export button.
@@ -893,12 +957,19 @@ of the Logic Analyzer.
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
 
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
+
 **Steps:**
     1. Open the Logic Analyzer and set the time base to 5 ms.
-    2. Open the Pattern Generator and set two consecutive channels with similar
-       configurations:
-        
-        - DIO0 and DIO1: Pattern: Clock, Frequency: 100Hz, Phase: 0 and Duty Cycle: 50%.
+    2. Open the Pattern Generator and set two consecutive channels with similar configurations:
+       - DIO0 and DIO1: 
+
+         - Pattern: Clock
+         - Frequency: 100Hz
+         - Phase: 0
+         - Duty Cycle: 50%
+         
     3. Run the Logic Analyzer and Pattern Generator.
     4. Press the Print Plot button and choose a location for the exported file:
         - **Expected Result**: The file is created in the specified location.
@@ -939,9 +1010,15 @@ Test 13 - Decoder Table
     - :ref:`Adalm2000.Device<adalm2000_device_setup>`
     - OS: ANY
 
+**Prerequisites:**
+    - :ref:`Pattern Generator<m2k_pattern_generator_tests>`
+
 **Steps:**
     1. Open the Pattern Generator and set the following parameters:
-        - DIO 0: UART, Baud rate: 9600, Data to Send: 123.
+
+        - DIO 0: UART, 
+        - Baud rate: 9600, 
+        - Data to Send: 123.
     2. Open the Logic Analyzer, enable DIO 0 and add a UART decoder with the 
        following parameters:
         

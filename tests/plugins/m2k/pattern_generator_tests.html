@@ -312,8 +312,11 @@ Content on this topic
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
 <li><p>Checking Individual Channels: Use PP as output</p></li>
 <li><p>Connect DIO-0, CH0 to Scope CH1+, GND to Scope CH1-.</p></li>
+<li><p>Enable CH0.</p></li>
+<li><p>Double click on the DIO 0 indicator on the plot to open DIO 0 settings.</p></li>
+<li><p>Select pattern as Clock with a 5 KHz clock signal with duty cycle of 50%.</p></li>
 <li><dl class="simple">
-<dt>Enable CH0. Double click on the DIO 0 indicator on the plot to open DIO 0 settings. Select pattern as Clock with a 5 KHz clock signal with duty cycle of 50%. Run instrument.</dt><dd><ul class="simple">
+<dt>Run instrument.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> You should see a square wave with 5 KHz frequency, 50% duty cycle.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -324,9 +327,10 @@ Content on this topic
 </dd>
 </dl>
 <blockquote>
-<div><ol class="arabic simple" start="4">
+<div><ol class="arabic simple" start="7">
+<li><p>Monitor CH0 through oscilloscope.</p></li>
 <li><dl class="simple">
-<dt>Monitor CH0 through oscilloscope. Open built-in measurement feature for frequency, amplitude and duty cycle.</dt><dd><ul class="simple">
+<dt>Open built-in measurement feature for frequency, amplitude and duty cycle.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> You should see a square wave with 5 KHz frequency, 50% duty cycle. In the oscilloscope, Frequency: 5 KHz, Amplitude: 3.2V to 3.4 V, Duty+: 50 %, Duty-:50%</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -336,7 +340,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="5">
+<div><ol class="arabic simple" start="9">
 <li><dl class="simple">
 <dt>Change frequency: 100 KHz, duty cycle: 30%.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> You should see a square wave with 100 KHz frequency, 30% duty cycle. In the oscilloscope, Frequency: 100 KHz, Amplitude: 3.2V to 3.4 V, Duty+: 30 %, Duty-: 70%</p></li>
@@ -348,7 +352,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="6">
+<div><ol class="arabic simple" start="10">
 <li><dl class="simple">
 <dt>Change frequency: 1 MHz, duty cycle: 60%.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> You should see a square wave with 1 MHz frequency, 60% duty cycle. In the oscilloscope, Frequency: 1 MHz, Amplitude: 3.2V to 3.4 V, Duty+: 60 %, Duty-: 40%</p></li>
@@ -360,7 +364,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="7">
+<div><ol class="arabic simple" start="11">
 <li><dl class="simple">
 <dt>Change frequency: 10 MHz, duty cycle: 70%.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> You should see a square wave with 10 MHz frequency, 70% duty cycle. In the oscilloscope, Frequency: 1 MHz, Amplitude: 3.2V to 3.4 V, Duty+: 70 %, Duty-: 30%</p></li>
@@ -372,7 +376,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="8">
+<div><ol class="arabic simple" start="12">
 <li><dl class="simple">
 <dt>Repeat steps 2. to 7. for DIO-1 to DIO-15.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> Behavior of each channel should be the same as with DIO-0, CH0. As the parameters are changed, the trace displayed in oscilloscope should follow.</p></li>
@@ -384,11 +388,29 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="9">
+<div><ol class="arabic simple" start="13">
 <li><p>Checking Phase</p></li>
-<li><p>Connect the following: DIO0 to ScopeCH1+, DIO1 to ScopeCH2+. GND to Scope CH1- and Scope CH2-.</p></li>
+<li><p>Connect the following:</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>DIO0 to ScopeCH1+,</p></li>
+<li><p>DIO1 to ScopeCH2+,</p></li>
+<li><p>GND to Scope CH1- and Scope CH2-.</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="15">
+<li><p>Enable DIO0 and DIO1. Set the following parameters:</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>DIO0: Frequency: 5 KHz, Phase: 0°, Duty Cycle: 50%;</p></li>
+<li><p>DIO1: Frequency: 5 KHz, Phase: 45°, Duty Cycle: 50 %.</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="16">
 <li><dl class="simple">
-<dt>Enable DIO0 and DIO1. Set the following parameters: DIO0: Frequency: 5 KHz, Phase: 0°, Duty Cycle: 50%; DIO1: Frequency: 5 KHz, Phase: 45°, Duty Cycle: 50 %. Run instrument.</dt><dd><ul class="simple">
+<dt>Run instrument.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> You should see two square waves with 5 KHz frequency, 50% duty cycle. DIO0 should be at 0° phase and DIO1 should be at 45° phase.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -398,7 +420,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="12">
+<div><ol class="arabic simple" start="17">
 <li><dl class="simple">
 <dt>Monitor pattern generator output through oscilloscope.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> Use cursor feature of the oscilloscope. Move the vertical cursors as shown in steps resources. ΔT = 24us to 26us, corresponding to the 45° phase shift.</p></li>
@@ -410,7 +432,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="13">
+<div><ol class="arabic simple" start="18">
 <li><dl class="simple">
 <dt>Change DIO1 phase: 120°.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> Use cursor feature of the oscilloscope. Move the vertical cursors as shown in steps resources. ΔT = 65us to 67us, corresponding to the 120° phase shift.</p></li>
@@ -422,7 +444,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="14">
+<div><ol class="arabic simple" start="19">
 <li><dl class="simple">
 <dt>Change DIO1 phase: 270°.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> Use cursor feature of the oscilloscope. Move the vertical cursors as shown in steps resources. ΔT = 149us to 151us, corresponding to the 270° phase shift.</p></li>
@@ -434,7 +456,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="15">
+<div><ol class="arabic simple" start="20">
 <li><dl class="simple">
 <dt>Set DIO1 phase to 0°. Now repeat steps for DIO0.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> Behavior of channel should be the same as with DIO1, CH1.</p></li>
@@ -446,7 +468,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="16">
+<div><ol class="arabic simple" start="21">
 <li><dl class="simple">
 <dt>Use other channels, DIO2 to DIO15, and repeat steps to verify each.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> Behavior of each channel should be the same as with DIO1, CH1.</p></li>
@@ -474,8 +496,11 @@ Content on this topic
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
 <li><p>Checking Group Channels and Patterns: Use PP as output. Binary Counter</p></li>
+<li><p>Enable channels DIO0 to DIO3.</p></li>
+<li><p>Click “Group” and double click on the channel indicators on the plot, DIO 0 to DIO 3</p></li>
+<li><p>Click “Done”.</p></li>
 <li><dl class="simple">
-<dt>Create a 4-channel group. Enable channels DIO0 to DIO3. Then click “Group” and double click on the channel indicators on the plot, DIO 0 to DIO 3, then click “Done”. Change pattern to Binary Counter.</dt><dd><ul class="simple">
+<dt>Change pattern to Binary Counter.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot should show a binary counter from 1 to e. The frequency should be 5 KHz.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -486,9 +511,12 @@ Content on this topic
 </dd>
 </dl>
 <blockquote>
-<div><ol class="arabic simple" start="3">
+<div><ol class="arabic simple" start="6">
+<li><p>Open logic analyzer.</p></li>
+<li><p>Make a group with channels DIO0 to DIO3.</p></li>
+<li><p>Add parallel for the decoder.</p></li>
 <li><dl class="simple">
-<dt>Open logic analyzer. Make a group with channels DIO0 to DIO3. Once grouped, add parallel for the decoder. Make sure to select correct data lines in the parallel decoder settings.</dt><dd><ul class="simple">
+<dt>Make sure to select correct data lines in the parallel decoder settings.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -498,9 +526,11 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="4">
+<div><ol class="arabic simple" start="10">
+<li><p>Check the frequency of each channel through oscilloscope.</p></li>
+<li><p>Connect DIO0 to scopech1+.</p></li>
 <li><dl class="simple">
-<dt>Check the frequency of each channel through oscilloscope. Connect DIO0 to scopech1+. Enable built-in measurement for frequency.</dt><dd><ul class="simple">
+<dt>Enable built-in measurement for frequency.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> Frequency shown should be 2.4 KHz to 2.6 KHz, corresponding to set clock frequency/2.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -510,9 +540,10 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="5">
+<div><ol class="arabic simple" start="13">
+<li><p>Connect DIO1 to scopech1+.</p></li>
 <li><dl class="simple">
-<dt>Connect DIO1 to scopech1+. Enable built-in measurement for frequency.</dt><dd><ul class="simple">
+<dt>Enable built-in measurement for frequency.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> Frequency shown should be 1.24 KHz to 1.27 KHz, corresponding to set clock frequency/4.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -522,9 +553,10 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="6">
+<div><ol class="arabic simple" start="15">
+<li><p>Connect DIO2 to scopech1+.</p></li>
 <li><dl class="simple">
-<dt>Connect DIO2 to scopech1+. Enable built-in measurement for frequency.</dt><dd><ul class="simple">
+<dt>Enable built-in measurement for frequency.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> Frequency shown should be 620 Hz to 630 Hz, corresponding to set clock frequency/8.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -534,9 +566,10 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="7">
+<div><ol class="arabic simple" start="17">
+<li><p>Connect DIO3 to scopech1+.</p></li>
 <li><dl class="simple">
-<dt>Connect DIO3 to scopech1+. Enable built-in measurement for frequency.</dt><dd><ul class="simple">
+<dt>Enable built-in measurement for frequency.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> Frequency shown should be 310 Hz to 315 Hz, corresponding to set clock frequency/16.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -546,8 +579,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="8">
-<li><p>Random</p></li>
+<div><ol class="arabic simple" start="19">
 <li><dl class="simple">
 <dt>Change pattern to Random. Frequency: 5KHz</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot should show random data.</p></li>
@@ -559,7 +591,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="10">
+<div><ol class="arabic simple" start="20">
 <li><dl class="simple">
 <dt>Monitor through logic analyzer. Use parallel as decoder.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same hexadecimal equivalents should be seen in logic analyzer.</p></li>
@@ -571,7 +603,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="11">
+<div><ol class="arabic simple" start="21">
 <li><dl class="simple">
 <dt>Change frequency: 100 KHz</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The frequency should now be 100 KHz. There should be new set of data and hexadecimal equivalents.</p></li>
@@ -583,7 +615,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="12">
+<div><ol class="arabic simple" start="22">
 <li><dl class="simple">
 <dt>Monitor through logic analyzer. Use parallel as decoder.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same hexadecimal equivalents should be seen in logic analyzer.</p></li>
@@ -595,10 +627,12 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="13">
+<div><ol class="arabic simple" start="23">
 <li><p>Number pattern</p></li>
+<li><p>Change pattern to Number pattern.</p></li>
+<li><p>Set number to 3.</p></li>
 <li><dl class="simple">
-<dt>Change pattern to Number pattern. Set number to 3. Enable DIO 4 and set to Clock pattern with 5kHz frequency. Do not add DIO 4 to group, keep it as individual channel.</dt><dd><ul class="simple">
+<dt>Enable DIO 4 and set to Clock pattern with 5kHz frequency. Do not add DIO 4 to group, keep it as individual channel.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot should contain the group channel and individual channel. The group channel should show the number pattern and the individual channel should show the clock pattern.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -608,9 +642,12 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="15">
+<div><ol class="arabic simple" start="27">
+<li><p>Monitor through logic analyzer.</p></li>
+<li><p>Enable DIO 4 as individual channel.</p></li>
+<li><p>Use parallel as decoder.</p></li>
 <li><dl class="simple">
-<dt>Monitor through logic analyzer. Enable DIO 4 as individual channel. Use parallel as decoder. Set data lines to DIO 0 to DIO 3 and set clock line to DIO 4.</dt><dd><ul class="simple">
+<dt>Set data lines to DIO 0 to DIO 3 and set clock line to DIO 4.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same number is seen in logic analyzer. Number: 3</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -620,7 +657,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="16">
+<div><ol class="arabic simple" start="31">
 <li><dl class="simple">
 <dt>Change number to 14. In the plot, it will show the hexadecimal equivalent which is E.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same hexadecimal equivalent is seen in logic analyzer. Hexadecimal equivalent: E</p></li>
@@ -632,9 +669,10 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="17">
+<div><ol class="arabic simple" start="32">
+<li><p>Add channels DIO4 to DIO7 to the group. It will now be an 8-channel group.</p></li>
 <li><dl class="simple">
-<dt>Add channels DIO4 to DIO7 to the group. It will now be an 8-channel group. Change number to 254. The plot will show the hexadecimal equivalent which is FE.</dt><dd><ul class="simple">
+<dt>Change number to 254. The plot will show the hexadecimal equivalent which is FE.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same hexadecimal equivalent is seen in logic analyzer. Hexadecimal equivalent: FE</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -644,10 +682,11 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="18">
+<div><ol class="arabic simple" start="34">
 <li><p>Gray Counter</p></li>
+<li><p>Change pattern to Gray Counter.</p></li>
 <li><dl class="simple">
-<dt>Change pattern to Gray Counter. Disable DIO 8.</dt><dd><ul class="simple">
+<dt>Disable DIO 8.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot should show a gray counter from 1 to 7. The frequency should be 5 KHz.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -657,9 +696,11 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="20">
+<div><ol class="arabic simple" start="37">
+<li><p>Monitor through logic analyzer.</p></li>
+<li><p>Choose parallel for the decoder.</p></li>
 <li><dl class="simple">
-<dt>Monitor through logic analyzer. Choose parallel for the decoder. Set Clock line as X.</dt><dd><ul class="simple">
+<dt>Set Clock line as X.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. One bit change per clock cycle.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -669,10 +710,13 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="21">
+<div><ol class="arabic simple" start="40">
 <li><p>UART</p></li>
+<li><p>Dissolve current group channel.</p></li>
+<li><p>Enable DIO 0 channel and double click on the channel indicator on the plot.</p></li>
+<li><p>Change channel pattern to UART.</p></li>
 <li><dl class="simple">
-<dt>Dissolve current group channel. Enable DIO 0 channel and double click on the channel indicator on the plot. Change channel pattern to UART. Set parameters: Baud: 9600, Stop bit: 1, no parity, Data to send: ‘HELLO’.</dt><dd><ul class="simple">
+<dt>Set parameters: Baud: 9600, Stop bit: 1, no parity, Data to send: ‘HELLO’.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot should show the data ‘HELLO’ in ASCII format. The frequency should be 9600 Hz.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -682,9 +726,10 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="23">
+<div><ol class="arabic simple" start="45">
+<li><p>Monitor the channel in the logic analyzer.</p></li>
 <li><dl class="simple">
-<dt>Monitor the channel in the logic analyzer. Use UART as decoder. Set Baud: 9600, Data bits: 8, no parity.</dt><dd><ul class="simple">
+<dt>Use UART as decoder. Set Baud: 9600, Data bits: 8, no parity.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same ASCII data should be seen in logic analyzer.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -694,7 +739,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="24">
+<div><ol class="arabic simple" start="47">
 <li><dl class="simple">
 <dt>Change set parameters: Baud: 115200, Stop bit: 1, even parity, Data to send: ‘HI’.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot should show the data ‘HI’ in ASCII format. The frequency should be 115200 Hz.</p></li>
@@ -706,9 +751,10 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="25">
+<div><ol class="arabic simple" start="48">
+<li><p>Monitor the channel in the logic analyzer.</p></li>
 <li><dl class="simple">
-<dt>Monitor the channel in the logic analyzer. Use UART as decoder. Set Baud: 115200, Data bits: 8, even parity.</dt><dd><ul class="simple">
+<dt>Use UART as decoder. Set Baud: 115200, Data bits: 8, even parity.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same ASCII data should be seen in logic analyzer.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -718,7 +764,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="26">
+<div><ol class="arabic simple" start="50">
 <li><dl class="simple">
 <dt>Change set parameters: Baud: 115200, Stop bit: 1, odd parity, Data to send: ‘HI’.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot should show the data ‘HI’ in ASCII format. The frequency should be 115200 Hz.</p></li>
@@ -730,7 +776,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="27">
+<div><ol class="arabic simple" start="51">
 <li><dl class="simple">
 <dt>Monitor the channel in the logic analyzer. Use UART as decoder. Set Baud: 115200, Data bits: 8, odd parity.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same ASCII data should be seen in logic analyzer.</p></li>
@@ -742,10 +788,13 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="28">
+<div><ol class="arabic simple" start="52">
 <li><p>SPI</p></li>
+<li><p>Disable DIO 0.</p></li>
+<li><p>Enable and select DIO5 to DIO7 to create a 3-channel group.</p></li>
+<li><p>Change pattern to SPI.</p></li>
 <li><dl class="simple">
-<dt>Disable DIO 0. Enable and select DIO5 to DIO7 to create a 3-channel group. Change pattern to SPI. Set the following parameters: Bytes per frame: 2, inter frame space: 3, Data: ABCD1234.</dt><dd><ul class="simple">
+<dt>Set the following parameters: Bytes per frame: 2, inter frame space: 3, Data: ABCD1234.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot should show the data ‘ABCD1234’ in ASCII format. The frequency should be 5 KHz.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -755,9 +804,10 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="30">
+<div><ol class="arabic simple" start="57">
+<li><p>Monitor the channel through logic analyzer.</p></li>
 <li><dl class="simple">
-<dt>Monitor the channel through logic analyzer. Use SPI as decoder. Refer to steps resources picture for the configuration of logic analyzer.</dt><dd><ul class="simple">
+<dt>Use SPI as decoder.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same ASCII data should be seen in logic analyzer.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -767,7 +817,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="31">
+<div><ol class="arabic simple" start="59">
 <li><dl class="simple">
 <dt>Change the following parameters: Bytes per frame: 1, inter frame space: 4, Data: ABCD1234.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot should show the data ‘ABCD1234’ in ASCII format. The frequency should be 5 KHz.</p></li>
@@ -779,9 +829,9 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="32">
+<div><ol class="arabic simple" start="60">
 <li><dl class="simple">
-<dt>Monitor the channel through logic analyzer. Use SPI as decoder. Refer to steps resources picture for the configuration of logic analyzer.</dt><dd><ul class="simple">
+<dt>Monitor the channel through logic analyzer. Use SPI as decoder.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same ASCII data should be seen in logic analyzer.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -791,10 +841,12 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="33">
+<div><ol class="arabic simple" start="61">
 <li><p>I2C</p></li>
+<li><p>Dissolve current group channel.</p></li>
+<li><p>Enable and select DIO0 and DIO1 to create a 2-channel group.</p></li>
 <li><dl class="simple">
-<dt>Dissolve current group channel. Enable and select DIO0 and DIO1 to create a 2-channel group. Change pattern to I2C. Set the following parameters: Address: 72, Inter frame space: 3, Data: ABCD1234.</dt><dd><ul class="simple">
+<dt>Change pattern to I2C. Set the following parameters: Address: 72, Inter frame space: 3, Data: ABCD1234.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot should show the data ‘ABCD1234’ in ASCII format. The frequency should be 5 KHz.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -804,9 +856,10 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="35">
+<div><ol class="arabic simple" start="65">
+<li><p>Monitor the channel through logic analyzer.</p></li>
 <li><dl class="simple">
-<dt>Monitor the channel through logic analyzer. Use I2C as decoder. Refer to steps resources picture for the configuration of logic analyzer.</dt><dd><ul class="simple">
+<dt>Use I2C as decoder.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same ASCII data should be seen in logic analyzer.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -816,10 +869,11 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="36">
+<div><ol class="arabic simple" start="67">
 <li><p>Pulse Pattern</p></li>
+<li><p>Change pattern to Pulse Pattern.</p></li>
 <li><dl class="simple">
-<dt>Change pattern to Pulse Pattern. Set the following parameters: Low: 5, High: 1, Counter Init: 0, Delay: 10, Number of Pulses: 5.</dt><dd><ul class="simple">
+<dt>Set the following parameters: Low: 5, High: 1, Counter Init: 0, Delay: 10, Number of Pulses: 5.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot should show 5 pulses with 5 low and 1 high.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -829,9 +883,9 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="38">
+<div><ol class="arabic simple" start="70">
 <li><dl class="simple">
-<dt>Monitor the channels through logic analyzer. Refer to steps resources picture for the configuration of logic analyzer.</dt><dd><ul class="simple">
+<dt>Monitor the channels through logic analyzer.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -857,7 +911,9 @@ Content on this topic
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
 <li><p>Checking Group and Individual Channels Simultaneously: Use PP as output.</p></li>
-<li><p>Enable and select channels DIO0 to DIO3 to create 4-channel group. Change group pattern to Binary Counter with frequency set to 5 KHz. Enable DIO4 channel and set as clock with frequency of 5 KHz.</p></li>
+<li><p>Enable and select channels DIO0 to DIO3 to create 4-channel group.</p></li>
+<li><p>Change group pattern to Binary Counter with frequency set to 5 KHz.</p></li>
+<li><p>Enable DIO4 channel and set as clock with frequency of 5 KHz.</p></li>
 <li><dl class="simple">
 <dt>Monitor DIO4 through oscilloscope. And at the same time monitor the group channel through logic analyzer.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> On logic analyzer, the plot should resemble the plot seen in pattern generator, the group channel as well as the individual channel DIO4. On oscilloscope, frequency can be viewed by enabling measurement feature, frequency: 5KHz.</p></li>
@@ -870,8 +926,10 @@ Content on this topic
 </dd>
 </dl>
 <blockquote>
-<div><ol class="arabic simple" start="4">
-<li><p>Do not dissolve group channel. Add another group channel. Enable and select DIO5, create a 1-channel group for UART. Change pattern to UART. Baud: 2400, stop bit: 1, no parity, Data: ‘HI’. Also, individual DIO4 channel remains enabled.</p></li>
+<div><ol class="arabic simple" start="6">
+<li><p>Do not dissolve group channel. Add another group channel.</p></li>
+<li><p>Enable and select DIO5, create a 1-channel group for UART.</p></li>
+<li><p>Change pattern to UART. Baud: 2400, stop bit: 1, no parity, Data: ‘HI’. Also, individual DIO4 channel remains enabled.</p></li>
 <li><dl class="simple">
 <dt>Monitor the 2 groups and DIO4 through logic analyzer.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> On logic analyzer, the plot should resemble the plot seen in pattern generator.</p></li>
@@ -883,8 +941,13 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="6">
-<li><p>Do not dissolve group channels. Disable Group UART. Add another group channel. Enable and select DIO6 to DIO9, create a 4-channel group. Change pattern to Gray Counter. Frequency: 10 KHz. Name this group as Group GC. Also, individual DIO4 channel remains enabled.</p></li>
+<div><ol class="arabic simple" start="10">
+<li><p>Do not dissolve group channels.</p></li>
+<li><p>Disable Group UART.</p></li>
+<li><p>Add another group channel.</p></li>
+<li><p>Enable and select DIO6 to DIO9, create a 4-channel group.</p></li>
+<li><p>Change pattern to Gray Counter. Frequency: 10 KHz.</p></li>
+<li><p>Name this group as Group GC. Also, individual DIO4 channel remains enabled.</p></li>
 <li><dl class="simple">
 <dt>Monitor the 2 groups and DIO4 through logic analyzer.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> On logic analyzer, the plot should resemble the plot seen in pattern generator.</p></li>
@@ -912,8 +975,9 @@ Content on this topic
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
 <li><p>Checking UI: Changing Channel Name</p></li>
+<li><p>Open individual channel DIO.</p></li>
 <li><dl class="simple">
-<dt>Open individual channel DIO. On its channel manager, modify its name to ‘CH 0’.</dt><dd><ul class="simple">
+<dt>On its channel manager, modify its name to ‘CH 0’.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The name should change as shown in steps resources picture.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -924,9 +988,10 @@ Content on this topic
 </dd>
 </dl>
 <blockquote>
-<div><ol class="arabic simple" start="3">
+<div><ol class="arabic simple" start="4">
+<li><p>Enable DIO 1 and change its name to ‘CH 1’.</p></li>
 <li><dl class="simple">
-<dt>Enable DIO 1 and change its name to ‘CH 1’. Create a group with ‘CH 0’ and ‘CH 1’.</dt><dd><ul class="simple">
+<dt>Create a group with ‘CH 0’ and ‘CH 1’.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The list of names under the group should also correspond to the names of the channels as should change as shown in steps resources picture.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -936,7 +1001,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="4">
+<div><ol class="arabic simple" start="6">
 <li><p>Trace Height</p></li>
 <li><dl class="simple">
 <dt>Open channel ‘CH 0’. On its channel manager, change trace height to 50.</dt><dd><ul class="simple">
@@ -949,7 +1014,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="6">
+<div><ol class="arabic simple" start="8">
 <li><dl class="simple">
 <dt>Change height again to 10.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The height should now be lower as shown in steps resources picture</p></li>
@@ -961,10 +1026,11 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="7">
+<div><ol class="arabic simple" start="9">
 <li><p>Knobs</p></li>
+<li><p>Checking frequency knob. Set the knob to large increment. No orange dot on the center.</p></li>
 <li><dl class="simple">
-<dt>Checking frequency knob. Set the knob to large increment. No orange dot on the center. Change frequency value using the ± button.</dt><dd><ul class="simple">
+<dt>Change frequency value using the ± button.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The frequency value should change accordingly with a high increment/decrement from 5 KHz to 10 KHz.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -974,9 +1040,10 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="9">
+<div><ol class="arabic simple" start="12">
+<li><p>Set the knob to ±1 unit interval. With orange dot on the center.</p></li>
 <li><dl class="simple">
-<dt>Set the knob to ±1 unit interval. With orange dot on the center. Change frequency value using the ± button.</dt><dd><ul class="simple">
+<dt>Change frequency value using the ± button.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The frequency value should change accordingly with ±1 unit interval.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -986,11 +1053,14 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="10">
+<div><ol class="arabic simple" start="14">
 <li><p>Checking the output: PP mode</p></li>
 <li><p>Connect the DIO0 to oscilloscope ch1+, and oscilloscope ch1- to gnd. This is to monitor the output from the pattern generator.</p></li>
+<li><p>Enable DIO0 in pattern generator.</p></li>
+<li><p>Set pattern to clock with 5 kHz frequency.</p></li>
+<li><p>Set output as PP.</p></li>
 <li><dl class="simple">
-<dt>Enable DIO0 in pattern generator. Set pattern to clock with 5 kHz frequency. Set output as PP. Run instrument and monitor on Oscilloscope.</dt><dd><ul class="simple">
+<dt>Run instrument and monitor on Oscilloscope.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The oscilloscope should show clock pulses from logic 0 to 1. It should look like in steps resources picture.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -1000,7 +1070,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="13">
+<div><ol class="arabic simple" start="20">
 <li><dl class="simple">
 <dt>Try other patterns such as random pattern and monitor on oscilloscope.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The oscilloscope should show random pulses from logic 0 to 1. It should look like in steps resources picture.</p></li>
@@ -1012,8 +1082,8 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="14">
-<li><p>Repeat steps 10. and 13. for all channels</p></li>
+<div><ol class="arabic simple" start="21">
+<li><p>Repeat steps 15. and 20. for all channels</p></li>
 <li><p>OD mode</p></li>
 <li><dl class="simple">
 <dt>Change output to OD. Monitor output in oscilloscope.</dt><dd><ul class="simple">
@@ -1026,8 +1096,8 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="17">
-<li><p>Do 5.1 to other channels.</p></li>
+<div><ol class="arabic simple" start="24">
+<li><p>Do 23. to other channels.</p></li>
 <li><p>To output two logic levels when operating in OD, a pull up resistor is needed. Connect the breadboard connection shown in steps resources.</p></li>
 <li><dl class="simple">
 <dt>Set power supply to 5V. Run power supply, pattern generator and monitor in oscilloscope.</dt><dd><ul class="simple">
@@ -1040,8 +1110,8 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="20">
-<li><p>Repeat step 5.3 and 5.4 for all channels.</p></li>
+<div><ol class="arabic simple" start="27">
+<li><p>Repeat step 25. and 26. for all channels.</p></li>
 <li><p>Print</p></li>
 <li><dl class="simple">
 <dt>Click on Print button and save file as sample.pdf</dt><dd><ul class="simple">
@@ -1054,7 +1124,7 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="23">
+<div><ol class="arabic simple" start="30">
 <li><dl class="simple">
 <dt>Open the saved file.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The file should show the waveform that you have saved.</p></li>
@@ -1066,10 +1136,9 @@ Content on this topic
 </ol>
 </div></blockquote>
 <blockquote>
-<div><ol class="arabic simple" start="24">
-<li><p>See more info</p></li>
+<div><ol class="arabic simple" start="31">
 <li><dl class="simple">
-<dt>Click the ‘See more info’ icon on the upper left of the pattern generator window.</dt><dd><ul class="simple">
+<dt>Click the ‘Info button’ icon on the upper left of the pattern generator window.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> It should lead to the wiki page of pattern generator.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>

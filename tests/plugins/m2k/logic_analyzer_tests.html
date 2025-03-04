@@ -333,6 +333,11 @@ digital channels - rising edge, falling edge, high, low, any edge.</p>
 <li><p>OS: ANY</p></li>
 </ul>
 </dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+<li><p><a class="reference internal" href="digital_io_tests.html#digital-io-tests"><span class="std std-ref">Digital IO</span></a></p></li>
+</ul>
+</dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic">
 <li><p>Open the Logic Analyzer instrument.</p></li>
 <li><p>Enable DIO 0 and DIO 1 on the Logic Analyzer.</p></li>
@@ -437,6 +442,11 @@ Set the following parameters:</p>
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
 <li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
 <li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+<li><p><a class="reference internal" href="digital_io_tests.html#digital-io-tests"><span class="std std-ref">Digital IO</span></a></p></li>
 </ul>
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic">
@@ -684,6 +694,11 @@ be Waiting too.</p></li>
 <li><p>OS: ANY</p></li>
 </ul>
 </dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+<li><p><a class="reference internal" href="digital_io_tests.html#digital-io-tests"><span class="std std-ref">Digital IO</span></a></p></li>
+</ul>
+</dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic">
 <li><p>Open the Logic Analyzer instrument.</p></li>
 <li><p>Enable DIO 0, DIO 1 and DIO 2 on the Logic Analyzer.</p></li>
@@ -770,6 +785,10 @@ to <strong>HIGH</strong> and disable the External trigger.</p></li>
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
 <li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
 <li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
 </ul>
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic">
@@ -903,6 +922,10 @@ rising and falling edge of the upper limit.</p>
 <li><p>OS: ANY</p></li>
 </ul>
 </dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+</ul>
+</dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
 <li><p>Open the Logic Analyzer instrument.</p></li>
 <li><dl class="simple">
@@ -955,6 +978,10 @@ Set the number value to 50 (it is read as decimal).</p></li>
 <li><p>OS: ANY</p></li>
 </ul>
 </dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+</ul>
+</dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic">
 <li><p>Open the Logic Analyzer instrument.</p></li>
 <li><dl class="simple">
@@ -1003,6 +1030,10 @@ Set the following parameters:</p>
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
 <li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
 <li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
 </ul>
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic">
@@ -1083,6 +1114,10 @@ Set the following parameters:</p>
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
 <li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
 <li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
 </ul>
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic">
@@ -1177,17 +1212,61 @@ of the Logic Analyzer.</p>
 <li><p>OS: ANY</p></li>
 </ul>
 </dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+</ul>
+</dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic">
 <li><p>Open the Pattern Generator and set two consecutive channels with similar
 configurations:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>DIO0 and DIO1: Pattern: Clock, Frequency: 100Hz, Phase: 0 and Duty Cycle: 50%.</p></li>
-<li><p>DIO2 and DIO3: Pattern: Clock, Frequency: 300Hz, Phase: 0 and Duty Cycle: 50%.</p></li>
-<li><p>DIO4 and DIO5: Pattern: Clock, Frequency: 500Hz, Phase: 0 and Duty Cycle: 50%.</p></li>
-<li><p>DIO6 and DIO7: Pattern: Clock, Frequency: 150Hz, Phase: 0 and Duty Cycle: 80%.</p></li>
-<li><p>DIO8 and DIO9: Pattern: Clock, Frequency: 200Hz, Phase: 0 and Duty Cycle: 20%.</p></li>
-<li><p>Group DIO10 to DIO15: Pattern: Number Pattern and Data: 50.</p></li>
+<li><p>DIO0 and DIO1:</p>
+<ul>
+<li><p>Pattern: Clock,</p></li>
+<li><p>Frequency: 100Hz,</p></li>
+<li><p>Phase: 0,</p></li>
+<li><p>Duty Cycle: 50%.</p></li>
+</ul>
+</li>
+<li><p>DIO2 and DIO3:</p>
+<ul>
+<li><p>Pattern: Clock,</p></li>
+<li><p>Frequency: 300Hz,</p></li>
+<li><p>Phase: 0,</p></li>
+<li><p>Duty Cycle: 50%.</p></li>
+</ul>
+</li>
+<li><p>DIO4 and DIO5:</p>
+<ul>
+<li><p>Pattern: Clock,</p></li>
+<li><p>Frequency: 500Hz,</p></li>
+<li><p>Phase: 0,</p></li>
+<li><p>Duty Cycle: 50%.</p></li>
+</ul>
+</li>
+<li><p>DIO6 and DIO7:</p>
+<ul>
+<li><p>Pattern: Clock,</p></li>
+<li><p>Frequency: 150Hz,</p></li>
+<li><p>Phase: 0,</p></li>
+<li><p>Duty Cycle: 80%.</p></li>
+</ul>
+</li>
+<li><p>DIO8 and DIO9:</p>
+<ul>
+<li><p>Pattern: Clock,</p></li>
+<li><p>Frequency: 200Hz,</p></li>
+<li><p>Phase: 0,</p></li>
+<li><p>Duty Cycle: 20%.</p></li>
+</ul>
+</li>
+<li><p>Group DIO10 to DIO15:</p>
+<ul>
+<li><p>Pattern: Number Pattern,</p></li>
+<li><p>Data: 50.</p></li>
+</ul>
+</li>
 </ul>
 </div></blockquote>
 </li>
@@ -1232,13 +1311,20 @@ of the Logic Analyzer.</p>
 <li><p>OS: ANY</p></li>
 </ul>
 </dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+</ul>
+</dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic">
 <li><p>Open the Logic Analyzer and set the time base to 5 ms.</p></li>
-<li><p>Open the Pattern Generator and set two consecutive channels with similar
-configurations:</p>
+<li><p>Open the Pattern Generator and set two consecutive channels with similar configurations:
+- DIO0 and DIO1:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>DIO0 and DIO1: Pattern: Clock, Frequency: 100Hz, Phase: 0 and Duty Cycle: 50%.</p></li>
+<li><p>Pattern: Clock</p></li>
+<li><p>Frequency: 100Hz</p></li>
+<li><p>Phase: 0</p></li>
+<li><p>Duty Cycle: 50%</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -1273,13 +1359,19 @@ configurations:</p>
 <li><p>OS: ANY</p></li>
 </ul>
 </dd>
-<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
-<li><dl class="simple">
-<dt>Open the Pattern Generator and set the following parameters:</dt><dd><ul class="simple">
-<li><p>DIO 0: UART, Baud rate: 9600, Data to Send: 123.</p></li>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
 </ul>
 </dd>
-</dl>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Open the Pattern Generator and set the following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>DIO 0: UART,</p></li>
+<li><p>Baud rate: 9600,</p></li>
+<li><p>Data to Send: 123.</p></li>
+</ul>
+</div></blockquote>
 </li>
 <li><p>Open the Logic Analyzer, enable DIO 0 and add a UART decoder with the
 following parameters:</p>
