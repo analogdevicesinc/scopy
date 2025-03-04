@@ -3,13 +3,13 @@ name: Scopy x86_64 AppImage Build
 on: [push, pull_request]
 
 env:
-  BUILD_HOST: ubuntu-20.04
+  BUILD_HOST: ubuntu-22.04
   USERNAME: github-actions
 
 jobs:
 
   build_scopy_x86-64_appimage:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
         image: cristianbindea/scopy2-x86_64-appimage:latest
         options: --user root
