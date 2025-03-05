@@ -192,6 +192,38 @@ QWidget *PreferencesHelper::addPreferenceComboList(Preferences *p, QString id, Q
 	return w;
 }
 
+QWidget *PreferencesHelper::addPreferenceFileBrowser(Preferences *p, QString id, QString title, QString description,
+						     FileBrowserWidget::BrowserDialogType type, QObject *parent)
+{
+	QWidget *widget = new QWidget();
+	QHBoxLayout *layout = new QHBoxLayout();
+	layout->setMargin(0);
+	layout->setSpacing(0);
+	layout->setMargin(0);
+	widget->setLayout(layout);
+
+	QWidget *infoBtn = setupDescriptionButton(id, description, parent);
+
+	QLabel *label = new QLabel(title, widget);
+	p->initDescription(id, title, description);
+
+	QSpacerItem *space = new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+	FileBrowserWidget *fileBrowser = new FileBrowserWidget(type, widget);
+
+	QString pref1Val = p->get(id).toString();
+	QLineEdit *browserEdit = fileBrowser->lineEdit();
+	browserEdit->setText(pref1Val);
+	parent->connect(browserEdit, &QLineEdit::textChanged, parent, [p, id](QString b) { p->set(id, b); });
+
+	layout->addWidget(infoBtn);
+	layout->addWidget(label, 1);
+	layout->addSpacerItem(space);
+	layout->addWidget(fileBrowser, 1);
+
+	return widget;
+}
+
 QWidget *PreferencesHelper::addPreferenceCombo(Preferences *p, QString id, QString title, QString description,
 					       QStringList options, QObject *parent)
 {

@@ -224,56 +224,6 @@ QWidget *ScopyPreferencesPage::buildResetScopyDefaultButton()
 	return w;
 }
 
-QWidget *ScopyPreferencesPage::buildEmuPreference(const QString &id, const QString &title, const QString &description,
-						  QWidget *parent)
-{
-	Preferences *p = Preferences::GetInstance();
-	QWidget *emuPref = new QWidget(parent);
-	QHBoxLayout *layout = new QHBoxLayout(emuPref);
-	layout->setMargin(0);
-	layout->setSpacing(0);
-	layout->setMargin(0);
-
-	QWidget *infoBtn = PreferencesHelper::setupDescriptionButton(id, description, emuPref);
-
-	QLabel *label = new QLabel(title, emuPref);
-	p->initDescription(id, title, description);
-
-	QSpacerItem *space = new QSpacerItem(20, 20, QSizePolicy::Preferred, QSizePolicy::Preferred);
-
-	QWidget *browseW = new QWidget(emuPref);
-	QHBoxLayout *browseLay = new QHBoxLayout(browseW);
-	browseLay->setMargin(0);
-	browseLay->setSpacing(10);
-
-	QString pref1Val = p->get(id).toString();
-	QLineEdit *pref = new QLineEdit(browseW);
-	pref->setText(pref1Val);
-	connect(pref, &QLineEdit::textChanged, this, [p, id](QString b) { p->set(id, b); });
-
-	QPushButton *browseBtn = new QPushButton("...", browseW);
-	StyleHelper::BrowseButton(browseBtn);
-	connect(browseBtn, &QPushButton::pressed, this, [this, pref]() {
-		bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
-		QString filePath = QFileDialog::getExistingDirectory(
-			this, "Select iio-emu path", "directoryToOpen",
-			(useNativeDialogs ? QFileDialog::Options()
-					  : QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks |
-					 QFileDialog::DontUseNativeDialog));
-		pref->setText(filePath);
-	});
-
-	browseLay->addWidget(pref);
-	browseLay->addWidget(browseBtn);
-
-	layout->addWidget(infoBtn);
-	layout->addWidget(label, 1);
-	layout->addSpacerItem(space);
-	layout->addWidget(browseW, 1);
-
-	return emuPref;
-}
-
 QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 {
 	QWidget *page = new QWidget(this);
@@ -385,12 +335,12 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 				     "allowing the application to automatically populate the device list with connected"
 				     "devices. Otherwise, all devices need to be added manually from the Add page.",
 				     generalSection));
-	generalSection->contentLayout()->addWidget(buildEmuPreference(
-		"iio_emu_dir_path", "Set the iio-emu location",
+	generalSection->contentLayout()->addWidget(PREFERENCE_FILE_BROWSER(
+		p, "iio_emu_dir_path", "Set the iio-emu location",
 		"Specifies the location of the iio-emu executable. By default, iio-emu is located next "
 		"to the scopy executable. However, if it cannot be found or is not installed on the "
 		"system, this preference offers the possibility to manually set the path to it.",
-		generalSection));
+		FileBrowserWidget::DIRECTORY, generalSection));
 
 	// Auto-connect
 	m_autoConnectWidget = new MenuSectionCollapseWidget("Session ", MenuCollapseSection::MHCW_NONE,
