@@ -292,9 +292,16 @@ bool DataLoggerPlugin::loadPreferencesPage()
 		},
 		generalSection));
 
-	generalSection->contentLayout()->addWidget(PREFERENCE_EDIT(
-		p, "dataloggerplugin_date_time_format", "DateTime format :",
-		"Select the date time format of the instrument. Default value is: hh:mm:ss", generalSection));
+	generalSection->contentLayout()->addWidget(PREFERENCE_EDIT_VALIDATION(
+		p, "dataloggerplugin_date_time_format",
+		"DateTime format :", "Select the date time format of the instrument. Default value is: hh:mm:ss",
+		[](const QString &text) {
+			// check if input is a valid datetime format
+			QRegularExpression pattern(
+				R"(^((YYYY-MM-DD)|(YYYY-MM-DD hh:mm:ss)|(YYYY-MM-DD mm:ss)|(YYYY-MM-DD ss)|(hh:mm:ss)|(mm:ss)|(ss))$)");
+			return pattern.match(text).hasMatch();
+		},
+		generalSection));
 
 	return true;
 }
