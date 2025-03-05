@@ -34,6 +34,7 @@
 #include <menusectionwidget.h>
 #include <QDesktopServices>
 #include <style.h>
+#include <gui/widgets/filebrowserwidget.h>
 
 using namespace scopy::pqm;
 
@@ -271,21 +272,13 @@ QWidget *HarmonicsInstrument::createMenuLogSection(QWidget *parent)
 	logSection->contentLayout()->setSpacing(10);
 	logSection->setCollapsed(true);
 
-	QWidget *browseWidget = new QWidget(logSection);
-	browseWidget->setLayout(new QHBoxLayout(browseWidget));
-	browseWidget->layout()->setMargin(0);
+	FileBrowserWidget *fileBrowser = new FileBrowserWidget(FileBrowserWidget::DIRECTORY, this);
+	QLineEdit *browserEdit = fileBrowser->lineEdit();
+	browserEdit->setPlaceholderText("Select log directory");
 
-	MenuLineEdit *logFilePath = new MenuLineEdit(browseWidget);
-	logFilePath->edit()->setPlaceholderText("Select log directory");
-	QPushButton *browseBtn = new QPushButton("...", browseWidget);
-	StyleHelper::BrowseButton(browseBtn);
-
-	browseWidget->layout()->addWidget(logFilePath);
-	browseWidget->layout()->addWidget(browseBtn);
-
-	connect(this, &HarmonicsInstrument::enableTool, this, [this, logFilePath, logSection](bool en) {
+	connect(this, &HarmonicsInstrument::enableTool, this, [this, browserEdit, logSection](bool en) {
 		logSection->setDisabled(en);
-		QString dirPath = logFilePath->edit()->text();
+		QString dirPath = browserEdit->text();
 		QDir logDir = QDir(dirPath);
 		logSection->setCollapsed(dirPath.isEmpty() || !logDir.exists());
 		if(en && !logSection->collapsed()) {
@@ -294,9 +287,8 @@ QWidget *HarmonicsInstrument::createMenuLogSection(QWidget *parent)
 			Q_EMIT logData(PqmDataLogger::None, "");
 		}
 	});
-	connect(browseBtn, &QPushButton::clicked, this, [this, logFilePath]() { browseFile(logFilePath->edit()); });
 
-	logSection->add(browseWidget);
+	logSection->add(fileBrowser);
 
 	return logSection;
 }
@@ -415,14 +407,6 @@ QPushButton *HarmonicsInstrument::createPQEventsBtn(QWidget *parent)
 	connect(btn, &QPushButton::toggled, btn, &QPushButton::setEnabled);
 
 	return btn;
-}
-
-void HarmonicsInstrument::browseFile(QLineEdit *lineEditPath)
-{
-	QString dirPath =
-		QFileDialog::getExistingDirectory(this, "Select a directory", "directoryToOpen",
-						  QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-	lineEditPath->setText(dirPath);
 }
 
 #include "moc_harmonicsinstrument.cpp"
