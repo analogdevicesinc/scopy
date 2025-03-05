@@ -123,27 +123,20 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 	Utils::removeLayoutMargins(findPathLayout);
 	findPathWidget->setLayout(findPathLayout);
 
-	filePath = new QLineEdit();
-	filePath->setReadOnly(true);
-	filePath->setPlaceholderText("File path");
-	pathButton = new QPushButton("Find path");
+	fileBrowser = new FileBrowserWidget(FileBrowserWidget::BrowserDialogType::SAVE_FILE);
+	fileBrowser->setFilter(tr("Comma-separated values files (*.csv);;All Files(*)"));
+	QLineEdit *fileBrowserEdit = fileBrowser->lineEdit();
+	fileBrowserEdit->setReadOnly(true);
+	fileBrowserEdit->setPlaceholderText("File path");
 
-	QObject::connect(pathButton, &QPushButton::clicked, this, [=]() {
-		bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
-		filePath->setText(QFileDialog::getSaveFileName(
-			this, ("Open File"), "", tr("Comma-separated values files (*.csv);;All Files(*)"), nullptr,
-			(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog)));
-	});
-
-	findPathLayout->addWidget(filePath);
-	findPathLayout->addWidget(pathButton);
+	findPathLayout->addWidget(fileBrowser);
 	menuSection->contentLayout()->addWidget(findPathWidget);
 
 	writeListOfValuesButton = new QPushButton("Write values");
 	writeListOfValuesButton->setEnabled(false);
 
-	QObject::connect(writeListOfValuesButton, &QPushButton::clicked, this, [=]() {
-		FileRegisterReadStrategy *fileRead = new FileRegisterReadStrategy(filePath->text());
+	QObject::connect(writeListOfValuesButton, &QPushButton::clicked, this, [this, fileBrowserEdit]() {
+		FileRegisterReadStrategy *fileRead = new FileRegisterReadStrategy(fileBrowserEdit->text());
 
 		QObject::connect(fileRead, &FileRegisterReadStrategy::readDone, this,
 				 &RegisterMapSettingsMenu::requestWrite);
@@ -156,17 +149,18 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 	registerDump = new QPushButton("Register dump");
 	registerDump->setEnabled(false);
 
-	QObject::connect(registerDump, &QPushButton::clicked, this, [=]() {
+	QObject::connect(registerDump, &QPushButton::clicked, this, [this, fileBrowserEdit]() {
 		if(autoread->isChecked()) {
 			readInterval->click();
 		}
-		QFile::remove(filePath->text());
-		Q_EMIT requestRegisterDump(filePath->text());
+		QString filePath = fileBrowserEdit->text();
+		QFile::remove(filePath);
+		Q_EMIT requestRegisterDump(filePath);
 	});
 
 	menuSection->contentLayout()->addWidget(registerDump);
 
-	QObject::connect(filePath, &QLineEdit::textChanged, this, [=](QString text) {
+	QObject::connect(fileBrowserEdit, &QLineEdit::textChanged, this, [this](QString text) {
 		writeListOfValuesButton->setEnabled(!text.isEmpty());
 		registerDump->setEnabled(!text.isEmpty());
 	});

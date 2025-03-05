@@ -27,6 +27,7 @@
 #include <menucollapsesection.h>
 
 #include <QFileDialog>
+#include <filebrowserwidget.h>
 #include <style.h>
 
 using namespace scopy;
@@ -46,17 +47,16 @@ FileBrowser::FileBrowser(QWidget *parent)
 	fileBufferContainer->contentLayout()->setSpacing(10);
 	fileBufferContainer->contentLayout()->setMargin(0);
 
-	m_fileBufferPath = new ProgressLineEdit(this);
-	m_fileBufferPath->getLineEdit()->setReadOnly(true);
+	FileBrowserWidget *fileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, fileBufferContainer);
+	fileBrowser->setFilter(tr("All Files(*)"));
+	QLineEdit *lineEdit = fileBrowser->lineEdit();
+	lineEdit->setReadOnly(true);
+	connect(lineEdit, &QLineEdit::textChanged, this, &FileBrowser::setFilename);
 
-	m_fileBufferBrowseBtn = new QPushButton("Browse", fileBufferContainer);
 	m_fileBufferLoadBtn = new QPushButton("Load", fileBufferContainer);
-	connect(m_fileBufferBrowseBtn, &QPushButton::clicked, this, &FileBrowser::chooseFile);
 	connect(m_fileBufferLoadBtn, &QPushButton::clicked, this, &FileBrowser::loadFile);
-	fileBufferContainer->contentLayout()->addWidget(m_fileBufferPath);
-	fileBufferContainer->contentLayout()->addWidget(m_fileBufferBrowseBtn);
+	fileBufferContainer->contentLayout()->addWidget(fileBrowser);
 	fileBufferContainer->contentLayout()->addWidget(m_fileBufferLoadBtn);
-	Style::setStyle(m_fileBufferBrowseBtn, style::properties::button::basicButton);
 	Style::setStyle(m_fileBufferLoadBtn, style::properties::button::basicButton);
 
 	m_layout->addWidget(fileBufferContainer);
@@ -68,18 +68,11 @@ QString FileBrowser::getFilePath() const { return m_filename; }
 
 void FileBrowser::loadFile() { Q_EMIT load(m_filename); }
 
-void FileBrowser::setDefaultDir(QString dir) { m_defaultDir = dir; }
-
-void FileBrowser::chooseFile()
+void FileBrowser::setFilename(const QString &text)
 {
-	QString selectedFilter;
-
-	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
-	QString tmpFilename = QFileDialog::getOpenFileName(
-		this, tr("Import"), m_defaultDir, tr("All Files(*)"), &selectedFilter,
-		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
-	if(!tmpFilename.isEmpty()) {
-		m_filename = tmpFilename;
-		m_fileBufferPath->getLineEdit()->setText(m_filename);
+	if(!text.isEmpty()) {
+		m_filename = text;
 	}
 }
+
+void FileBrowser::setDefaultDir(QString dir) { m_defaultDir = dir; }

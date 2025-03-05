@@ -61,7 +61,6 @@ private:
 	QWidget *createSettingsMenu(QWidget *parent);
 	QWidget *createMenuLogSection(QWidget *parent);
 	QPushButton *createPQEventsBtn(QWidget *parent);
-	void browseFile(QLineEdit *lineEditPath);
 
 	QString m_uri;
 	ToolMenuEntry *m_tme;

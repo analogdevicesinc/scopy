@@ -112,7 +112,10 @@ void RegMap_API::registerDump(QString filePath)
 	Q_EMIT devRegMap->registerMapValues->registerDump(filePath);
 }
 
-void RegMap_API::setPath(QString filePath) { m_regMapPlugin->registerMapTool->settings->filePath->setText(filePath); }
+void RegMap_API::setPath(QString filePath)
+{
+	m_regMapPlugin->registerMapTool->settings->fileBrowser->lineEdit()->setText(filePath);
+}
 
 void RegMap_API::writeFromFile(QString filePath)
 {

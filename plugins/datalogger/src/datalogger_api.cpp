@@ -172,7 +172,7 @@ void DataLogger_API::setLogPathOfTool(QString toolName, QString path)
 	if(tool) {
 		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
 		monitorTool->m_dataMonitorSettings->dataLoggingMenu->filename = path;
-		monitorTool->m_dataMonitorSettings->dataLoggingMenu->dataLoggingFilePath->getLineEdit()->setText(path);
+		monitorTool->m_dataMonitorSettings->dataLoggingMenu->fileBrowser->lineEdit()->setText(path);
 	}
 }
 

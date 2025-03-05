@@ -32,6 +32,7 @@
 #include <rollingstrategy.h>
 #include <style.h>
 #include <swtriggerstrategy.h>
+#include <gui/widgets/filebrowserwidget.h>
 #include <gui/stylehelper.h>
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/plotaxis.h>
@@ -226,21 +227,13 @@ QWidget *WaveformInstrument::createMenuLogSection(QWidget *parent)
 	logSection->contentLayout()->setSpacing(10);
 	logSection->setCollapsed(true);
 
-	QWidget *browseWidget = new QWidget(logSection);
-	browseWidget->setLayout(new QHBoxLayout(browseWidget));
-	browseWidget->layout()->setMargin(0);
+	FileBrowserWidget *fileBrowser = new FileBrowserWidget(FileBrowserWidget::DIRECTORY, this);
+	QLineEdit *browserEdit = fileBrowser->lineEdit();
+	browserEdit->setPlaceholderText("Select log directory");
 
-	MenuLineEdit *logFilePath = new MenuLineEdit(browseWidget);
-	logFilePath->edit()->setPlaceholderText("Select log directory");
-	QPushButton *browseBtn = new QPushButton("...", browseWidget);
-	StyleHelper::BrowseButton(browseBtn);
-
-	browseWidget->layout()->addWidget(logFilePath);
-	browseWidget->layout()->addWidget(browseBtn);
-
-	connect(this, &WaveformInstrument::enableTool, this, [this, logFilePath, logSection](bool en) {
+	connect(this, &WaveformInstrument::enableTool, this, [this, browserEdit, logSection](bool en) {
 		logSection->setDisabled(en);
-		QString dirPath = logFilePath->edit()->text();
+		QString dirPath = browserEdit->text();
 		QDir logDir = QDir(dirPath);
 		logSection->setCollapsed(dirPath.isEmpty() || !logDir.exists());
 		if(en && !logSection->collapsed()) {
@@ -249,10 +242,9 @@ QWidget *WaveformInstrument::createMenuLogSection(QWidget *parent)
 			Q_EMIT logData(PqmDataLogger::None, "");
 		}
 	});
-	connect(this, &WaveformInstrument::enableTool, browseWidget, &QWidget::setDisabled);
-	connect(browseBtn, &QPushButton::clicked, this, [this, logFilePath]() { browseFile(logFilePath->edit()); });
+	connect(this, &WaveformInstrument::enableTool, fileBrowser, &QWidget::setDisabled);
 
-	logSection->add(browseWidget);
+	logSection->add(fileBrowser);
 
 	return logSection;
 }
@@ -344,14 +336,6 @@ void WaveformInstrument::onBufferDataAvailable(QMap<QString, QVector<double>> da
 	if(m_singleBtn->isChecked() && processedData.first().size() == samplingFreq) {
 		m_singleBtn->setChecked(false);
 	}
-}
-
-void WaveformInstrument::browseFile(QLineEdit *lineEditPath)
-{
-	QString dirPath =
-		QFileDialog::getExistingDirectory(this, "Select a directory", "directoryToOpen",
-						  QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-	lineEditPath->setText(dirPath);
 }
 
 #include "moc_waveforminstrument.cpp"

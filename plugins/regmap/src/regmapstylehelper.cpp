@@ -52,7 +52,6 @@ void RegmapStyleHelper::regmapSettingsMenu(RegisterMapSettingsMenu *settings, QS
 	if(!objectName.isEmpty() && settings)
 		settings->setObjectName(objectName);
 
-	Style::setStyle(settings->pathButton, style::properties::button::basicButton);
 	Style::setStyle(settings->registerDump, style::properties::button::basicButton);
 	Style::setStyle(settings->readInterval, style::properties::button::basicButton);
 	Style::setStyle(settings->writeListOfValuesButton, style::properties::button::basicButton);
