@@ -28,6 +28,7 @@
 #include <QLineEdit>
 
 #include <pluginbase/preferences.h>
+#include <widgets/filebrowserwidget.h>
 
 #define PREFERENCE_CHECK_BOX(p, id, title, description, parent)                                                        \
 	PreferencesHelper::addPreferenceCheckBox(p, id, title, description, parent)
@@ -43,6 +44,9 @@
 
 #define PREFERENCE_COMBO_LIST(p, id, title, description, options, parent)                                              \
 	PreferencesHelper::addPreferenceComboList(p, id, title, description, options, parent)
+
+#define PREFERENCE_FILE_BROWSER(p, id, title, description, type, parent)                                               \
+	PreferencesHelper::addPreferenceFileBrowser(p, id, title, description, type, parent)
 
 namespace scopy {
 
@@ -66,6 +70,8 @@ public:
 					   QStringList options, QObject *parent = nullptr);
 	static QWidget *addPreferenceComboList(Preferences *p, QString id, QString title, QString description,
 					       QList<QPair<QString, QVariant>> options, QObject *parent);
+	static QWidget *addPreferenceFileBrowser(Preferences *p, QString id, QString title, QString description,
+						 FileBrowserWidget::BrowserDialogType type, QObject *parent = nullptr);
 	static QWidget *setupDescriptionButton(QString id, QString description, QObject *parent);
 };
 } // namespace scopy
