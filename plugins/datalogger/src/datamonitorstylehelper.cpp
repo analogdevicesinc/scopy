@@ -82,7 +82,6 @@ void DataMonitorStyleHelper::SevenSegmentMonitorMenuStyle(SevenSegmentMonitorSet
 
 void DataMonitorStyleHelper::DataLoggingMenuStyle(DataLoggingMenu *menu)
 {
-	StyleHelper::BasicButton(menu->dataLoggingBrowseBtn);
 	StyleHelper::BasicButton(menu->dataLoggingBtn);
 	StyleHelper::BasicButton(menu->dataLoadingBtn);
 }

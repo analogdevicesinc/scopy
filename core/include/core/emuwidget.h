@@ -30,6 +30,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <animationpushbutton.h>
+#include <gui/widgets/filebrowserwidget.h>
 
 namespace scopy {
 class SCOPY_CORE_EXPORT EmuWidget : public QWidget
@@ -46,20 +47,17 @@ protected:
 	void showEvent(QShowEvent *event) override;
 private Q_SLOTS:
 	void onEnableDemoClicked();
-	void browseFile(QLineEdit *lineEditPath);
 
 Q_SIGNALS:
 	void demoEnabled(bool en);
 
 private:
 	QWidget *createDemoOptWidget(QWidget *parent);
-	QWidget *createXmlPathWidget(QWidget *parent);
-	QWidget *createRxTxDevWidget(QWidget *parent);
 	QWidget *createPortWidget(QWidget *parent);
 	QWidget *createUriWidget(QWidget *parent);
 	void initEnBtn(QWidget *parent);
 	void init();
-	void enGenericOptWidget(QWidget *xmlPathWidget, QWidget *rxTxDevWidget, QString crtOpt);
+	void enGenericOptWidget(QString crtOpt);
 	QStringList createArgList();
 	void setStatusMessage(QString msg);
 	QString findEmuPath();
@@ -74,9 +72,9 @@ private:
 	void setEnableDemo(bool en);
 
 	QComboBox *m_demoOptCb;
-	QLineEdit *m_xmlPathEdit;
-	QLineEdit *m_rxTxDevEdit;
 	QLineEdit *m_portEdit;
+	FileBrowserWidget *m_xmlFileBrowser;
+	FileBrowserWidget *m_rxTxFileBrowser;
 	QLineEdit *m_uriEdit;
 	QLabel *m_uriMsgLabel;
 	AnimationPushButton *m_enDemoBtn;

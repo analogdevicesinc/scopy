@@ -78,18 +78,30 @@ EmuWidget::EmuWidget(QWidget *parent)
 	connect(this, &EmuWidget::demoEnabled, demoOptWidget, &QWidget::setDisabled);
 
 	QLabel *xmlLabel = new QLabel("XML", emuWidget);
-	QWidget *xmlPathWidget = createXmlPathWidget(emuWidget);
+	m_xmlFileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, emuWidget);
+	m_xmlFileBrowser->setFilter("All (*);;XML Files (*.xml);;Text Files (*.txt);;BIN Files (*.bin)");
+	QLineEdit *xmlEdit = m_xmlFileBrowser->lineEdit();
+	xmlEdit->setPlaceholderText("Load an emu XML file");
+
 	emuWidgetLay->addWidget(xmlLabel, 1, 0);
-	emuWidgetLay->addWidget(xmlPathWidget, 1, 1);
+	emuWidgetLay->addWidget(m_xmlFileBrowser, 1, 1);
 	connect(this, &EmuWidget::demoEnabled, xmlLabel, &QWidget::setDisabled);
-	connect(this, &EmuWidget::demoEnabled, xmlPathWidget, &QWidget::setDisabled);
+	connect(this, &EmuWidget::demoEnabled, m_xmlFileBrowser, &QWidget::setDisabled);
+	connect(xmlEdit, &QLineEdit::returnPressed, this, [this]() { m_enDemoBtn->setFocus(); });
+	connect(m_xmlFileBrowser->btn(), &QPushButton::pressed, this, [this]() { m_enDemoBtn->setFocus(); });
 
 	QLabel *rxTxLabel = new QLabel("Rx/Tx", emuWidget);
-	QWidget *rxTxDevWidget = createRxTxDevWidget(emuWidget);
+	m_rxTxFileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, emuWidget);
+	m_rxTxFileBrowser->setFilter("All (*);;XML Files (*.xml);;Text Files (*.txt);;BIN Files (*.bin)");
+	QLineEdit *rxTxEdit = m_rxTxFileBrowser->lineEdit();
+	rxTxEdit->setPlaceholderText("iio:device0@/absolutePathTo/data.bin");
+
 	emuWidgetLay->addWidget(rxTxLabel, 2, 0);
-	emuWidgetLay->addWidget(rxTxDevWidget, 2, 1);
+	emuWidgetLay->addWidget(m_rxTxFileBrowser, 2, 1);
 	connect(this, &EmuWidget::demoEnabled, rxTxLabel, &QWidget::setDisabled);
-	connect(this, &EmuWidget::demoEnabled, rxTxDevWidget, &QWidget::setDisabled);
+	connect(this, &EmuWidget::demoEnabled, m_rxTxFileBrowser, &QWidget::setDisabled);
+	connect(rxTxEdit, &QLineEdit::returnPressed, this, [this]() { m_enDemoBtn->setFocus(); });
+	connect(m_rxTxFileBrowser->btn(), &QPushButton::pressed, this, [this]() { m_enDemoBtn->setFocus(); });
 
 	QLabel *portLabel = new QLabel("Port", emuWidget);
 	QWidget *portWidget = createPortWidget(emuWidget);
@@ -114,11 +126,9 @@ EmuWidget::EmuWidget(QWidget *parent)
 	layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 1);
 	layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding), 1, 0);
 
-	enGenericOptWidget(xmlPathWidget, rxTxDevWidget, m_demoOptCb->currentText());
+	enGenericOptWidget(m_demoOptCb->currentText());
 	connect(m_demoOptCb, &QComboBox::currentTextChanged, this,
-		[this, xmlPathWidget, rxTxDevWidget](QString option) {
-			enGenericOptWidget(xmlPathWidget, rxTxDevWidget, option);
-		});
+		[this](QString option) { enGenericOptWidget(option); });
 	connect(m_enDemoBtn, &QPushButton::clicked, this, &EmuWidget::onEnableDemoClicked);
 
 	m_emuProcess = new QProcess(this);
@@ -144,18 +154,20 @@ void EmuWidget::init()
 	this->setEnabled(!m_emuPath.isEmpty());
 }
 
-void EmuWidget::enGenericOptWidget(QWidget *xmlPathWidget, QWidget *rxTxDevWidget, QString crtOpt)
+void EmuWidget::enGenericOptWidget(QString crtOpt)
 {
 	// when a new option is selected clear all fields
-	m_xmlPathEdit->setText("");
-	m_rxTxDevEdit->setText("");
 	m_portEdit->setText("");
+	QLineEdit *xmlEdit = m_xmlFileBrowser->lineEdit();
+	xmlEdit->setText("");
+	QLineEdit *rxTxEdit = m_rxTxFileBrowser->lineEdit();
+	rxTxEdit->setText("");
 	m_uriEdit->setText("");
 
 	bool isNotAdalm2000 = !crtOpt.contains("adalm2000");
 
-	xmlPathWidget->setEnabled(isNotAdalm2000);
-	rxTxDevWidget->setEnabled(isNotAdalm2000);
+	m_xmlFileBrowser->setEnabled(isNotAdalm2000);
+	m_rxTxFileBrowser->setEnabled(isNotAdalm2000);
 	m_enDemoBtn->setFocus();
 
 	configureOption(crtOpt);
@@ -204,12 +216,14 @@ QStringList EmuWidget::createArgList()
 	arguments.append(m_emuType);
 
 	if(option.compare("adalm2000") != 0) {
-		auto xmlFullPath = m_xmlPathEdit->text();
+		QLineEdit *rxTxEdit = m_rxTxFileBrowser->lineEdit();
+		QLineEdit *xmlEdit = m_xmlFileBrowser->lineEdit();
+		auto xmlFullPath = xmlEdit->text();
 		QFileInfo f(xmlFullPath);
 		m_workingDir = f.absoluteDir().path();
 
 		arguments.append(f.fileName());
-		arguments.append(m_rxTxDevEdit->text());
+		arguments.append(rxTxEdit->text());
 	} else {
 		m_workingDir = "";
 	}
@@ -319,15 +333,17 @@ void EmuWidget::configureOption(QString option)
 
 			if(jsonObject.contains("xml_path")) {
 				QString xmlPath = jsonObject.value(QString("xml_path")).toString();
-				m_xmlPathEdit->setText(currentPath + xmlPath);
+				QLineEdit *xmlEdit = m_xmlFileBrowser->lineEdit();
+				xmlEdit->setText(currentPath + xmlPath);
 			}
 
 			if(jsonObject.contains("rx_tx_device")) {
+				QLineEdit *rxTxEdit = m_rxTxFileBrowser->lineEdit();
 				QString rxTxDevice = jsonObject.value(QString("rx_tx_device")).toString();
 				rxTxDevice += "@";
 				rxTxDevice += currentPath;
 				rxTxDevice += jsonObject.value(QString("rx_tx_bin_path")).toString();
-				m_rxTxDevEdit->setText(rxTxDevice);
+				rxTxEdit->setText(rxTxDevice);
 			}
 
 			if(jsonObject.contains("port")) {
@@ -378,17 +394,6 @@ void EmuWidget::setEnableDemo(bool en)
 	Q_EMIT demoEnabled(en);
 }
 
-void EmuWidget::browseFile(QLineEdit *lineEditPath)
-{
-	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
-	QString filePath = QFileDialog::getOpenFileName(
-		this, "Open a file", "directoryToOpen",
-		"All (*);;XML Files (*.xml);;Text Files (*.txt);;BIN Files (*.bin)", nullptr,
-		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
-	lineEditPath->setText(filePath);
-	m_enDemoBtn->setFocus();
-}
-
 QWidget *EmuWidget::createDemoOptWidget(QWidget *parent)
 {
 	QWidget *w = new QWidget(parent);
@@ -402,46 +407,6 @@ QWidget *EmuWidget::createDemoOptWidget(QWidget *parent)
 		m_demoOptCb->addItem(opt);
 	}
 	layout->addWidget(m_demoOptCb);
-	return w;
-}
-
-QWidget *EmuWidget::createXmlPathWidget(QWidget *parent)
-{
-	QWidget *w = new QWidget(parent);
-	QHBoxLayout *layout = new QHBoxLayout(w);
-	layout->setMargin(0);
-	layout->setSpacing(10);
-	w->setLayout(layout);
-
-	m_xmlPathEdit = new QLineEdit(w);
-
-	QPushButton *xmlPathBtn = new QPushButton("...", w);
-	StyleHelper::BrowseButton(xmlPathBtn);
-	connect(xmlPathBtn, &QPushButton::clicked, this, [=]() { browseFile(m_xmlPathEdit); });
-
-	layout->addWidget(m_xmlPathEdit);
-	layout->addWidget(xmlPathBtn);
-	return w;
-}
-
-QWidget *EmuWidget::createRxTxDevWidget(QWidget *parent)
-{
-	QWidget *w = new QWidget(parent);
-	QHBoxLayout *layout = new QHBoxLayout(w);
-	layout->setMargin(0);
-	layout->setSpacing(10);
-	w->setLayout(layout);
-
-	m_rxTxDevEdit = new QLineEdit(w);
-	m_rxTxDevEdit->setPlaceholderText("iio:device0@/absolutePathTo/data.bin");
-
-	QPushButton *rxTxDevBtn = new QPushButton("...", w);
-	StyleHelper::BrowseButton(rxTxDevBtn);
-
-	connect(rxTxDevBtn, &QPushButton::clicked, this, [=]() { browseFile(m_rxTxDevEdit); });
-
-	layout->addWidget(m_rxTxDevEdit);
-	layout->addWidget(rxTxDevBtn);
 	return w;
 }
 

@@ -74,7 +74,6 @@ private:
 	QWidget *createMenuLogSection(QWidget *parent);
 	bool selectedFromSameCol(QModelIndexList list);
 	QPushButton *createPQEventsBtn(QWidget *parent);
-	void browseFile(QLineEdit *lineEditPath);
 
 	QString m_uri;
 	bool m_running;

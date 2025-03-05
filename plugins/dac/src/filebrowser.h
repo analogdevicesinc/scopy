@@ -28,6 +28,8 @@
 
 #include <gui/widgets/progresslineedit.h>
 
+#include <filebrowserwidget.h>
+
 namespace scopy {
 namespace dac {
 class SCOPY_DAC_EXPORT FileBrowser : public QWidget
@@ -41,12 +43,10 @@ public:
 Q_SIGNALS:
 	void load(QString path);
 private Q_SLOTS:
-	void chooseFile();
 	void loadFile();
+	void setFilename(const QString &text);
 
 private:
-	ProgressLineEdit *m_fileBufferPath;
-	QPushButton *m_fileBufferBrowseBtn;
 	QPushButton *m_fileBufferLoadBtn;
 	QString m_filename;
 	QString m_defaultDir;

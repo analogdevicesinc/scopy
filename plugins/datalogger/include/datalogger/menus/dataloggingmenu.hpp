@@ -25,6 +25,7 @@
 #include <QWidget>
 #include <menuonoffswitch.h>
 #include <progresslineedit.h>
+#include <filebrowserwidget.h>
 #include "scopy-datalogger_export.h"
 
 namespace scopy {
@@ -58,13 +59,12 @@ Q_SIGNALS:
 
 private:
 	QString filename;
-	ProgressLineEdit *dataLoggingFilePath;
-	QPushButton *dataLoggingBrowseBtn;
+	FileBrowserWidget *fileBrowser;
+	SmallProgressBar *progressBar;
 	QPushButton *dataLoggingBtn;
 	QPushButton *dataLoadingBtn;
 	MenuOnOffSwitch *liveDataLoggingButton;
 	bool m_liveDataLogging = false;
-	void chooseFile();
 	void toggleButtonsEnabled(bool en);
 };
 } // namespace datamonitor

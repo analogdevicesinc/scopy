@@ -26,6 +26,7 @@
 #include <QPushButton>
 #include <QWidget>
 #include <menuheader.h>
+#include <gui/widgets/filebrowserwidget.h>
 
 class QCheckBox;
 
@@ -61,10 +62,9 @@ private:
 	QLineEdit *startReadInterval;
 	QLineEdit *endReadInterval;
 	QPushButton *readInterval;
-	QLineEdit *filePath;
 	QPushButton *writeListOfValuesButton;
 	QPushButton *registerDump;
-	QPushButton *pathButton;
+	FileBrowserWidget *fileBrowser;
 };
 } // namespace regmap
 } // namespace scopy
