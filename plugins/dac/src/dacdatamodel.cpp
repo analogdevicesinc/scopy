@@ -43,6 +43,7 @@ DacDataModel::DacDataModel(struct iio_device *dev, QObject *parent)
 	, m_interrupted(false)
 	, m_userBuffersize(0)
 	, m_userKernelBufferCount(0)
+	, m_filesize(0)
 	, m_decimation(1)
 {
 	m_dev = dev;

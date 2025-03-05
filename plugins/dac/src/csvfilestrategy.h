@@ -53,7 +53,7 @@ private:
 	QVector<QVector<double>> m_data;
 	QVector<QVector<short>> m_dataConverted;
 	DataBufferRecipe m_recipe;
-	unsigned short convert(double value);
+	short convert(double value);
 	void applyConversion();
 };
 } // namespace dac

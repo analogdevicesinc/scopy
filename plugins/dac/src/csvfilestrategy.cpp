@@ -114,7 +114,7 @@ void CSVFileStrategy::applyConversion()
 	qDebug(CAT_DAC_DATASTRATEGY) << "Apply conversion on all samples";
 }
 
-unsigned short CSVFileStrategy::convert(double value)
+short CSVFileStrategy::convert(double value)
 {
 	double scale = 0.0;
 	double offset = 0.0;
