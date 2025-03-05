@@ -73,7 +73,6 @@ private:
 	void plotData(QMap<QString, QVector<double>> chnlsData);
 	void deletePlottingStrategy();
 	void createTriggeredStrategy(QString triggerChnl);
-	void browseFile(QLineEdit *lineEditPath);
 
 	bool m_running;
 	PlotWidget *m_voltagePlot;
