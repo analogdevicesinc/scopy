@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Debugger - Test Suite &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=3d3703ae" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=dcfbb431"></script>
+    <link rel="icon" href="../../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Debugger Preferences - Test Suite" href="debugger_preferences_tests.html" />
+    <link rel="prev" title="Debugger" href="index.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Debugger - Test Suite</a><ul>
+<li><a class="reference internal" href="#setup-enviroment">Setup enviroment:</a></li>
+<li><a class="reference internal" href="#test-1-loading-the-debugger">Test 1: Loading the debugger</a></li>
+<li><a class="reference internal" href="#test-2-the-navigation-tree-from-the-debugger-displays-the-correct-information">Test 2: The navigation tree from the debugger displays the correct information</a></li>
+<li><a class="reference internal" href="#test-3-the-filter-bar-from-the-debugger-works-correctly">Test 3: The Filter Bar from the debugger works correctly</a></li>
+<li><a class="reference internal" href="#test-4-the-title-bar-updates-when-selecting-different-elements-from-the-navigation-tree">Test 4: The title bar updates when selecting different elements from the navigation tree</a></li>
+<li><a class="reference internal" href="#test-5-the-watch-list-from-the-debugger-works-correctly">Test 5: The watch list from the debugger works correctly</a></li>
+<li><a class="reference internal" href="#test-6-the-details-view-from-the-debugger-work-correctly">Test 6: The details view from the debugger work correctly</a></li>
+<li><a class="reference internal" href="#test-7-the-read-all-button-correctly-reads-all-visible-attributes">Test 7: The read all button correctly reads all visible attributes</a></li>
+<li><a class="reference internal" href="#test-8-the-log-window-from-the-debugger-correctly-displays-the-operations">Test 8: The log window from the debugger correctly displays the operations</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../../index.html">
+      <img class="only-light" src="../../../_static/scopy.png"/>
+      <img class="only-dark" src="../../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../../../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8" checked=""/><div class="collapse"><a class="reference internal" href="index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../../general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="debugger-test-suite">
+<h1>Debugger - Test Suite<a class="headerlink" href="#debugger-test-suite" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>User Guide: <a class="reference external" href="https://analogdevicesinc.github.io/scopy/plugins/debugger/index.html">https://analogdevicesinc.github.io/scopy/plugins/debugger/index.html</a></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23.8%" />
+<col style="width: 14.3%" />
+<col style="width: 14.3%" />
+<col style="width: 23.8%" />
+<col style="width: 23.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Tester</p></th>
+<th class="head"><p>Test Date</p></th>
+<th class="head"><p>Scopy version</p></th>
+<th class="head"><p>Plugin version (N/A if not applicable)</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="setup-enviroment">
+<h2>Setup enviroment:<a class="headerlink" href="#setup-enviroment" title="Link to this heading"></a></h2>
+<dl class="simple" id="pluto-usb-debugger">
+<dt><strong>Pluto.Usb:</strong></dt><dd><ul class="simple">
+<li><p>Open the Scopy application</p></li>
+<li><p>Connect the PlutoSDR to the computer via USB</p></li>
+<li><p>Type the URI of the PlutoSDR in the URI field (if you don’t know the URI, just type “ip:192.168.2.1”)</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="test-1-loading-the-debugger">
+<span id="tst-dbg-explr-load"></span><h2>Test 1: Loading the debugger<a class="headerlink" href="#test-1-loading-the-debugger" title="Link to this heading"></a></h2>
+<p><strong>UID</strong>: TST.DBG.EXPLR.LOAD</p>
+<p><strong>Description</strong>: This test checks if the debugger plugin is loaded when any device is connected to Scopy.</p>
+<dl class="simple">
+<dt><strong>Preconditions</strong>:</dt><dd><ul class="simple">
+<li><p>Disable the Scopy scan feature</p></li>
+<li><p>Use <a class="reference internal" href="debugger_preferences_tests.html#pluto-usb"><span class="std std-ref">pluto-usb</span></a> setup.</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps</strong>:</dt><dd><ol class="arabic simple">
+<li><p>After adding the URI, click the “Verify” button</p></li>
+<li><dl class="simple">
+<dt>Select the debugger plugin from the list of compatible plugins (the debugger works with any IIO compatible device)</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plugin list should contain the Debugger plugin</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Connect to the device and see that the Debugger plugin appears on the left side of the screen (the tool menu)</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The tool menu panel (left side of the screen) should contain the Debugger plugin</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Disconnect the device and see that the Debugger plugin disappears from the tool menu</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The tool menu panel (left side of the screen) should not contain the Debugger plugin</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Connect the device again and see that the Debugger plugin reappears in the tool menu</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The tool menu panel (left side of the screen) should contain the Debugger plugin</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Disconnect the device and see that the Debugger plugin disappears from the tool menu</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The tool menu panel (left side of the screen) should not contain the Debugger plugin</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-the-navigation-tree-from-the-debugger-displays-the-correct-information">
+<span id="tst-dbg-explr-nav"></span><h2>Test 2: The navigation tree from the debugger displays the correct information<a class="headerlink" href="#test-2-the-navigation-tree-from-the-debugger-displays-the-correct-information" title="Link to this heading"></a></h2>
+<p><strong>UID</strong>: TST.DBG.EXPLR.NAV</p>
+<p><strong>Description</strong>: This test checks if the navigation tree from the debugger displays the correct information.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites</strong>:</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#tst-dbg-explr-load"><span class="std std-ref">TST.DBG.EXPLR.LOAD</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions</strong>:</dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system</p></li>
+<li><p>Use <a class="reference internal" href="debugger_preferences_tests.html#pluto-usb"><span class="std std-ref">pluto-usb</span></a> setup.</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps</strong>:</dt><dd><ol class="arabic simple">
+<li><p>Connect a device to Scopy</p></li>
+<li><p>Connect to the device and see that the Debugger plugin appears on the left side of the screen (the tool menu)</p></li>
+<li><dl class="simple">
+<dt>Click on the Debugger plugin</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> On the left side of the Debugger tool there is an element under the filter bar that displays the devices from the connected IIO Context</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Click on any element from the navigation tree</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The information about that element is displayed on the right side of the screen (Details View)</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Click on another element from the navigation tree</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The information about the new element is displayed on the right side of the screen</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Double click on an device name, for example the ad9361-phy (should have an arrow on the left of the name).</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The ad9361-phy has a small arrow in the left of it and the list with the channels should be displayed below the device name</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Click on a channel from the list</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The information about the channel is displayed on the right side of the screen</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Click on another channel from the list</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The information about the new channel is displayed on the right side of the screen</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><dl class="simple">
+<dt>Double click on a channel name, for example voltage0 (should have an arrow on the left of the name).</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The list with the attributes should be displayed below the channel name</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><dl class="simple">
+<dt>Click on an attribute from the list</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The information about the attribute is displayed on the right side of the screen</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="11">
+<li><dl class="simple">
+<dt>Click on another attribute from the list</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The information about the new attribute is displayed on the right side of the screen</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="12">
+<li><dl class="simple">
+<dt>Double click again on the channel name (voltage0).</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The list with the attributes should disappear</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="13">
+<li><dl class="simple">
+<dt>Double click again on the device name (ad9361-phy).</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The list with the channels should disappear</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-the-filter-bar-from-the-debugger-works-correctly">
+<span id="tst-dbg-explr-filter"></span><h2>Test 3: The Filter Bar from the debugger works correctly<a class="headerlink" href="#test-3-the-filter-bar-from-the-debugger-works-correctly" title="Link to this heading"></a></h2>
+<p><strong>UID</strong>: TST.DBG.EXPLR.FILTER</p>
+<p><strong>Description</strong>: This test checks if the Filter Bar from the debugger works correctly.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites</strong>:</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#tst-dbg-explr-load"><span class="std std-ref">TST.DBG.EXPLR.LOAD</span></a></p></li>
+<li><p><a class="reference internal" href="#tst-dbg-explr-nav"><span class="std std-ref">TST.DBG.EXPLR.NAV</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions</strong>:</dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="debugger_preferences_tests.html#pluto-usb"><span class="std std-ref">pluto-usb</span></a> setup.</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps</strong>:</dt><dd><ol class="arabic simple">
+<li><p>Connect a device to Scopy</p></li>
+<li><dl class="simple">
+<dt>Connect to the device.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> On the top left side of the Debugger tool there is a filter bar. The filter bar should have a placeholder text that says “Type to filter”</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Click on the filter bar and type a string that is not present or contained in the navigation tree.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The navigation tree should be empty</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Clear the filter bar</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The navigation tree should be populated again. No element should be missing, the context element should be the first one and the devices should be displayed below it (it is opened).</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Click on the filter bar and type a string that is present in the navigation tree.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The navigation tree should display only the elements that contain the string</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Repeat step 4 and 5 with another string that is present in the navigation tree.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The steps should work as before.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-the-title-bar-updates-when-selecting-different-elements-from-the-navigation-tree">
+<span id="tst-dbg-explr-title"></span><h2>Test 4: The title bar updates when selecting different elements from the navigation tree<a class="headerlink" href="#test-4-the-title-bar-updates-when-selecting-different-elements-from-the-navigation-tree" title="Link to this heading"></a></h2>
+<p><strong>UID</strong>: TST.DBG.EXPLR.TITLE</p>
+<p><strong>Description</strong>: This test checks if the title bar updates when selecting different elements from the navigation tree.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites</strong>:</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#tst-dbg-explr-load"><span class="std std-ref">TST.DBG.EXPLR.LOAD</span></a></p></li>
+<li><p><a class="reference internal" href="#tst-dbg-explr-nav"><span class="std std-ref">TST.DBG.EXPLR.NAV</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions</strong>:</dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="debugger_preferences_tests.html#pluto-usb"><span class="std std-ref">pluto-usb</span></a> setup.</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps</strong>:</dt><dd><ol class="arabic simple">
+<li><p>Connect a device to Scopy</p></li>
+<li><dl class="simple">
+<dt>Connect to the device.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> On the top side of the Debugger tool there is a title bar. The title bar should have a square button with the name of the first element from the navigation tree. After this button, there should be a small green circle with a plus sign.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Click on any element from the navigation tree.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The title bar appends the name of the selected element. The name of the element should appear after the first element name and separated in a new button.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Click on another element from the navigation tree.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The title bar appends the name of the selected element. The name of the element should appear after the first element name and separated in a new button.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Open a device from the navigation panel, and then a channel from this device and select an attribute from the channel.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The title bar should display the 4 names in order: The context name, the device name, the channel name and the attribute name. Each name should be separated a different button.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Click on any element from the title bar.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The title bar should remove all button after it and the navigation tree should highlight the selected element.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Click the green circle with the plus sign.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The circle should change to an x. (The current element should be added to the watch list, but this behavior is tested in a different test).
+The watch list is located at the bottom of the instrument.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-5-the-watch-list-from-the-debugger-works-correctly">
+<span id="tst-dbg-explr-watch"></span><h2>Test 5: The watch list from the debugger works correctly<a class="headerlink" href="#test-5-the-watch-list-from-the-debugger-works-correctly" title="Link to this heading"></a></h2>
+<p><strong>UID</strong>: TST.DBG.EXPLR.WATCH</p>
+<p><strong>Description</strong>: This test checks if the watch list from the debugger works correctly.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites</strong>:</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#tst-dbg-explr-load"><span class="std std-ref">TST.DBG.EXPLR.LOAD</span></a></p></li>
+<li><p><a class="reference internal" href="#tst-dbg-explr-nav"><span class="std std-ref">TST.DBG.EXPLR.NAV</span></a></p></li>
+<li><p><a class="reference internal" href="#tst-dbg-explr-title"><span class="std std-ref">TST.DBG.EXPLR.TITLE</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions</strong>:</dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="debugger_preferences_tests.html#pluto-usb"><span class="std std-ref">pluto-usb</span></a> setup.</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps</strong>:</dt><dd><ol class="arabic simple">
+<li><p>Connect a device to Scopy</p></li>
+<li><dl class="simple">
+<dt>Connect to the device</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> At the bottom of the Debugger tool there is a watch list. The watch list should be a tabel with 4 columns: Name, Value, Type and Path. The table should have a header with the column names. There should also be another column with no name where the ‘X’ buttons for each row are displayed.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><p>Click on an element from the navigation tree, the title bar should update with the name of the selected element and a green circle with a plus sign should exist on the right side of the title bar.</p></li>
+<li><dl class="simple">
+<dt>Click on the green circle with the plus sign.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The circle should change to an x and the selected element should be added to the watch list. The element should be added in the first row of the table and the columns should be filled with the information from the selected element.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Repeat step 3 and 4 with another element from the navigation tree.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The new element should be added to the watch list in the second row of the table and the columns should be filled with the information from the selected element.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Modify the value of an element from the watch list.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The value should be updated in the table and in the panel above it (the details view).</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Click on the red x from the watch list.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The selected element should be removed from the watch list.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Click on the x from the last column of the watch list.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The selected element should be removed from the watch list.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><dl class="simple">
+<dt>Repeat steps 3 to 8 with other elements from the navigation tree.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> All elements are added/removed correctly and the watchlist is up-to-date.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><dl class="simple">
+<dt>Add a few elements in the watch list. Click any other element from the watch list.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The navigation bar, title bar and information from the details view should be updated with the information from the selected element.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-6-the-details-view-from-the-debugger-work-correctly">
+<span id="tst-dbg-explr-details"></span><h2>Test 6: The details view from the debugger work correctly<a class="headerlink" href="#test-6-the-details-view-from-the-debugger-work-correctly" title="Link to this heading"></a></h2>
+<p><strong>UID</strong>: TST.DBG.EXPLR.DETAILS</p>
+<p><strong>Description</strong>: This test checks if the details view from the debugger work correctly.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites</strong>:</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#tst-dbg-explr-load"><span class="std std-ref">TST.DBG.EXPLR.LOAD</span></a></p></li>
+<li><p><a class="reference internal" href="#tst-dbg-explr-nav"><span class="std std-ref">TST.DBG.EXPLR.NAV</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions</strong>:</dt><dd><ul class="simple">
+<li><p>Have the iio_info command installed on the system</p></li>
+<li><p>Use <a class="reference internal" href="debugger_preferences_tests.html#pluto-usb"><span class="std std-ref">pluto-usb</span></a> setup.</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps</strong>:</dt><dd><ol class="arabic simple">
+<li><p>Connect a device to Scopy</p></li>
+<li><dl class="simple">
+<dt>Connect to the device</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Ensure that on the right side of the Debugger tool there is a details view. The details view should have a title bar with the name of the selected element from the navigation tree. At first the details view should display the context attributes.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><p>Test the GUI View.</p></li>
+<li><dl class="simple">
+<dt>Click on any element from the navigation tree.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The details view should display the information from the selected element.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Click on any attribute from the details view. Change the data, press enter or click outside the attribute.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Under the attribute value, a progress bar should appear and start filling. After the progress bar is filled, the progress bar should turn green for a few seconds and the attribute value should be updated. To verify that the value was updated, run an external program like iio_info and check that the value is the same</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><p>Repeat step 5 with the following 3 types of attributes: a text box (a box where the user can type any string), a combo box (a box where the user can select from a list of options) and a range box (a box where the user can type a number or use the arrows (or the +/- sign) to increase or decrease the value and/or write the desired value).</p></li>
+<li><dl class="simple">
+<dt>While selecting different elements from the navigation tree, lower part of the GUI View, the General Info section should update with the information from the selected element (information such as weather it is a hardware monitor, a trigger, has a trigger attached, if the channel is a scan element, input or output, enabled or disabled). All these informations should be present within the elements of the ADALM-PLUTO device.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The General Info section should update with the information from the selected element.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><p>Test the IIO View.</p></li>
+<li><dl class="simple">
+<dt>Click on the IIOView button, it should be next to the GUI View, under the title.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The IIO View should display a snippet similar to the iio_info command. The snippet should contain the information from the selected element from the navigation tree. To check this, run the iio_info command in a terminal and compare the information from the terminal with the information from the IIO View.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><dl class="simple">
+<dt>Repeat step 9 with different elements from the navigation tree.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The IIO View should update with the information from the selected element.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-7-the-read-all-button-correctly-reads-all-visible-attributes">
+<span id="tst-dbg-explr-read-all"></span><h2>Test 7: The read all button correctly reads all visible attributes<a class="headerlink" href="#test-7-the-read-all-button-correctly-reads-all-visible-attributes" title="Link to this heading"></a></h2>
+<p><strong>UID</strong>: TST.DBG.EXPLR.READ_ALL</p>
+<p><strong>Description</strong>: This test checks if the read all button correctly reads all visible attributes.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites</strong>:</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#tst-dbg-explr-load"><span class="std std-ref">TST.DBG.EXPLR.LOAD</span></a></p></li>
+<li><p><a class="reference internal" href="#tst-dbg-explr-nav"><span class="std std-ref">TST.DBG.EXPLR.NAV</span></a></p></li>
+<li><p><a class="reference internal" href="#tst-dbg-explr-details"><span class="std std-ref">TST.DBG.EXPLR.DETAILS</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions</strong>:</dt><dd><ul class="simple">
+<li><p>Have the iio_attr command installed on the system</p></li>
+<li><p>Use <a class="reference internal" href="debugger_preferences_tests.html#pluto-usb"><span class="std std-ref">pluto-usb</span></a> setup.</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps</strong>:</dt><dd><ol class="arabic simple">
+<li><p>Connect a device to Scopy</p></li>
+<li><dl class="simple">
+<dt>Connect to the device</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The Debugger plugin appears on the left side of the screen (the tool menu)</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><p>Add a few elements in the watch list. The added elements should be device attributes or channel attributes.</p></li>
+<li><p>Select any element from the navigation tree (preferable one with a few attributes)</p></li>
+<li><dl class="simple">
+<dt>Click the read all button.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Nothing should change as all the attributes are already read.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><p>In a terminal, run the iio_attr command and change the value of one of the attributes from the selected element or the watch list.</p></li>
+<li><dl class="simple">
+<dt>Click the read all button again.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The value of the attribute should be updated in the details view and the watch list (optionally, based on weather the changed element is also in the watch list).</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Also check the IIO View.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The value of the attribute should be updated in the IIO View as well.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-8-the-log-window-from-the-debugger-correctly-displays-the-operations">
+<span id="tst-dbg-explr-log"></span><h2>Test 8: The log window from the debugger correctly displays the operations<a class="headerlink" href="#test-8-the-log-window-from-the-debugger-correctly-displays-the-operations" title="Link to this heading"></a></h2>
+<p><strong>UID</strong>: TST.DBG.EXPLR.LOG</p>
+<p><strong>Description</strong>: This test checks if the log window from the debugger correctly displays the operations.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites</strong>:</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#tst-dbg-explr-load"><span class="std std-ref">TST.DBG.EXPLR.LOAD</span></a></p></li>
+<li><p><a class="reference internal" href="#tst-dbg-explr-nav"><span class="std std-ref">TST.DBG.EXPLR.NAV</span></a></p></li>
+<li><p><a class="reference internal" href="#tst-dbg-explr-details"><span class="std std-ref">TST.DBG.EXPLR.DETAILS</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions</strong>:</dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="debugger_preferences_tests.html#pluto-usb"><span class="std std-ref">pluto-usb</span></a> setup.</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps</strong>:</dt><dd><ol class="arabic simple">
+<li><p>Connect a device to Scopy</p></li>
+<li><p>Connect to the device and see that the Debugger plugin appears on the left side of the screen (the tool menu)</p></li>
+<li><dl class="simple">
+<dt>At the bottom of the debugger instrument, next to the ‘IIO Attributes’ button, there should be a ‘Log’ button. Click on the ‘Log’ button.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The current window should change to the log window.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Select back the ‘IIO Attributes’ button.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The current window should change back to the details view.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>(Correct attribute change) Modify an attribute from the detais view (e.g. on the ADALM-PLUTO device, select the ad9361-phy device and the voltage0 channel and modify the gain_control_mode attribute to hybrid).</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The progress bar should appear and start filling. After the progress bar is filled, it should turn green and the value should be read again.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>(Incorrect attribute change) Select the adm1177-iio device from the navigation tree, the voltage0 channel and modify the raw attribute (write whatever value you want, it should be read-only anyways). After the progress bar is filled, it should turn red and the value should be read again.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The progress bar should appear and start filling. After the progress bar is filled, it should turn red and the value should be read again.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Click on the ‘Log’ button. The log window should appear and display the operations from steps 6 and 7. The operations should be displayed in the following format: [timestamp] [operation] [status] [attribute path] [old value (if write operation)] [new value]. The timestamp should be the current time, the operation should be ‘W’ (write) or ‘R’ (read), the status should be SUCCESS or FAILURE and the error code, the attribute path should be the name of the modified attribute title, separated by slashes, the old value should be the value before the modification, the new value should be the value after the modification. If the operation is a read operation, the old value should be empty (not exist). Step 6 should be a successful write operation and step 7 should be a failed write operation. After each write operation, a read operation is automatically performed. The read operation should be displayed in the log window as well.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The log window should display the operations from steps 6 and 7 in the format described above.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Debugger</a>
+    <a href="debugger_preferences_tests.html" title="Next document (Alt+Shift+RightArrow)" class="next">Debugger Preferences - Test Suite</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

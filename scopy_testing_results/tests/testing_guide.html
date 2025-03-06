@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Testing Guide &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=3d3703ae" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../_static/app.umd.js?v=dcfbb431"></script>
+    <link rel="icon" href="../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Plugins Test Cases" href="plugins/index.html" />
+    <link rel="prev" title="Test Cases" href="index.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Testing Guide</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#testing-process-in-detail">Testing process in detail</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../index.html">
+      <img class="only-light" src="../_static/scopy.png"/>
+      <img class="only-dark" src="../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4" checked=""/><div class="collapse"><a class="reference internal" href="index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Testing Guide</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1"/><div class="collapse"><a class="reference internal" href="plugins/index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="plugins/pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="plugins/pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="plugins/datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="plugins/datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="plugins/dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="plugins/dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="plugins/swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="plugins/swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="plugins/adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="plugins/adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="plugins/m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="plugins/m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="plugins/m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="plugins/m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="plugins/m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="plugins/m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="plugins/m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="plugins/m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="plugins/m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="plugins/m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="plugins/registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="plugins/registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="plugins/debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="plugins/debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="testing-guide">
+<span id="id1"></span><h1>Testing Guide<a class="headerlink" href="#testing-guide" title="Link to this heading"></a></h1>
+<p>Test cases, test results and test reports for Scopy are found in the source code
+repository. This approach allows for the test cases to be versioned and
+maintained along with the source code.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The test cases are written in reStructuredText format and are
+located in the <cite>scopy/docs/tests</cite> directory. The test results and reports are
+generated by the test runner and are located in the <cite>scopy/testing_results</cite> directory.</p>
+<dl class="simple">
+<dt>The test cases are organized in the following structure:</dt><dd><ul class="simple">
+<li><p><cite>docs/tests/index.rst</cite> - the main index file for the test cases.</p></li>
+<li><p><cite>docs/tests/testing_guide.rst</cite> - this file.</p></li>
+<li><p><cite>docs/tests/plugins/index.rst</cite> - the index file for the plugin test cases.</p></li>
+<li><p><cite>docs/tests/general/index.rst</cite> - the index file for the general test cases.</p></li>
+<li><p><cite>docs/tests/plugins/&lt;plugin_name&gt;/index.rst</cite> - the index file for the plugin test cases.</p></li>
+<li><p><cite>docs/tests/plugins/&lt;plugin_name&gt;/&lt;test_suite_name&gt;.rst</cite> - the test suite file for the plugin.</p></li>
+</ul>
+</dd>
+</dl>
+<p>A test suite is a collection of tests that are related to a specific plugin or instrument.
+Each test suite has a setup environment section that describes the steps to setup the environment
+for the tests in the suite. Multiple scenarios can be described in the setup environment section.</p>
+<p>At the beginning of each test suite, a note is included that specifies the user guide for the
+plugin. The steps do not include detailed information about each feature, it is expected that the
+tester is familiar with the above mentioned user guide.</p>
+<p>Below the note, a list table is included that specifies the tester, test date, Scopy version,
+plugin version and comments. This table is completed by the tester during the testing phase and
+it is used for test report generation.</p>
+<p>Each test case has a unique identifier (UID) that is used to reference the test case in the test results
+and reports. The test case description is a brief description of the test case.
+The test case preconditions are the requirements that need to be met before running the test case.
+This section includes a link specifying the setup environment for the test case.</p>
+<p>The steps section describes the steps to be taken to run the test case. Multiple steps can
+have an expected result and an actual result. The expected result is the expected outcome of the
+step. The actual result is the actual outcome of the step and will be completed during testing,
+by the tester, as described in this document.</p>
+<p>The tested OS section specifies the operating system on which the test was run and it must be
+completed according to the OS information provided in the Preconditions section. If the test
+is specifically written for a certain OS, the OS information will be provided in the Preconditions
+section and the tested OS needs to be the same. Other options can be: “ANY” (the outcome is the
+same on all OSes, so testing one of them is sufficient) or “ALL” (it is necessary to run the test
+separately on each OS). This section is also completed during testing.</p>
+<p>The comments and the result sections are completed by the tester during testing. The comments
+section can include any additional information about the test case. The result section specifies
+whether all expected results were met during testing. The result can be “PASS” or “FAIL”.</p>
+</section>
+<section id="testing-process-in-detail">
+<h2>Testing process in detail<a class="headerlink" href="#testing-process-in-detail" title="Link to this heading"></a></h2>
+<p>Example: we are testing Scopy v3.0.0.</p>
+<p>The testing process is as follows:</p>
+<ol class="arabic simple">
+<li><p>Navigate to the <a class="reference external" href="https://github.com/analogdevicesinc/scopy">official Scopy repository</a>.</p></li>
+<li><p>From the <strong>main</strong> branch create a new branch named <strong>testing_v3.0.0</strong>.</p></li>
+</ol>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/testing/create_new_branch.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/testing/create_new_branch.png" />
+<ol class="arabic simple" start="3">
+<li><p>On the newly created branch, make a copy of the <cite>docs/tests</cite> directory
+in the <cite>testing_results</cite> directory. Rename the new folder to <cite>testing_results_v3.0.0</cite>.</p></li>
+<li><p>In the <cite>testing_results_v3.0.0</cite> directory, choose the test case that needs to be run.
+For this example we will consider the ADC tests, located in plugins/adc/adc_tests.rst.</p></li>
+<li><p>Open the <cite>adc_tests.rst</cite> file.</p></li>
+<li><p>Enter the Github Edit mode (edit in place) to be able to edit the file.</p></li>
+</ol>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/testing/github_edit_mode.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/testing/github_edit_mode.png" />
+<ol class="arabic simple" start="7">
+<li><p>First thing that needs completion is the table containing information on the tester,
+test date, Scopy version, plugin version and comments.
+This table is located at the beginning of the file.
+Check the screenshot below on where to modify data inside the table and what’s the
+outcome after committing.</p></li>
+</ol>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/testing/update_table_date.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/testing/update_table_date.png" />
+<ol class="arabic simple" start="8">
+<li><p>After making some changes to a file, you can commit them and resume the testing later.
+In order to commit the changes, click the top right <strong>Commit changes…</strong> button.
+A popup will appear requesting a commit title and an optional description.
+Make sure to <strong>check the “Commit directly to the testing_v3.0.0 branch”</strong> option
+before clicking the <strong>Commit changes</strong> button.</p></li>
+</ol>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/testing/committing_changes.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/testing/committing_changes.png" />
+<ol class="arabic simple" start="9">
+<li><p>The last step will create a new commit on the testing branch. There can be multiple
+commits before the testing is finished. This is actually recommended as multiple
+persons can test multiple instruments in parallel.</p></li>
+<li><p>While going through each test, complete the missing information accordingly.
+The missing information is the actual result for each step and the tested OS.
+The actual result is the outcome of the step and the tested OS is the operating
+system on which the test was run.
+The Comment section can be left empty if there is no additional information to add.
+The Result section will be modified to either show <strong>PASS</strong> or <strong>FAIL</strong> according
+to the actual results from the steps reproduced during testing.</p></li>
+</ol>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/testing/actual_result_tests.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/testing/actual_result_tests.png" />
+<blockquote>
+<div><p>As seen in the example above, the first step failed, so the result is FAIL
+even if the second one passed. In the Comments section, it is mentioned what
+might be the cause of the failure.</p>
+</div></blockquote>
+<ol class="arabic simple" start="11">
+<li><p>Commit all the changes often to reduce the risk of losing any data.</p></li>
+<li><p>After all the tests are completed, a <strong>Pull Request (PR)</strong> will be created, having
+having as target the <strong>main</strong> branch. The PR description will contain any
+relevant information about testing.
+The PR will be reviewed by the Scopy team and merged into the <strong>main</strong> branch.
+The failures will be addressed, bugs will be fixed and the testing process will
+be repeated until the final release candidate.</p></li>
+</ol>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Test Cases</a>
+    <a href="plugins/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Plugins Test Cases</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

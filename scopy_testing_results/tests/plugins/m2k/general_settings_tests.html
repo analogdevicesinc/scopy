@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>General Settings - Test Case &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=3d3703ae" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=dcfbb431"></script>
+    <link rel="icon" href="../../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Logic Analyzer - Test Suite" href="logic_analyzer_tests.html" />
+    <link rel="prev" title="Digital IO - Test Suite" href="digital_io_tests.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">General Settings - Test Case</a><ul>
+<li><a class="reference internal" href="#setup-environment">Setup environment:</a></li>
+<li><a class="reference internal" href="#test-1-m2k-connection-and-calibration">Test 1: M2K Connection and Calibration</a></li>
+<li><a class="reference internal" href="#test-2-save-and-load-profile">Test 2: Save and Load Profile</a></li>
+<li><a class="reference internal" href="#test-3-preferences">Test 3: Preferences</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../../index.html">
+      <img class="only-light" src="../../../_static/scopy.png"/>
+      <img class="only-dark" src="../../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../../../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6" checked=""/><div class="collapse"><a class="reference internal" href="index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../../general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="general-settings-test-case">
+<span id="m2k-general-settings-tests"></span><h1>General Settings - Test Case<a class="headerlink" href="#general-settings-test-case" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>User guide: <a class="reference internal" href="../../../user_guide/index.html#user-guide"><span class="std std-ref">Scopy Overview</span></a>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23.8%" />
+<col style="width: 14.3%" />
+<col style="width: 14.3%" />
+<col style="width: 23.8%" />
+<col style="width: 23.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Tester</p></th>
+<th class="head"><p>Test Date</p></th>
+<th class="head"><p>Scopy version</p></th>
+<th class="head"><p>Plugin version (N/A if not applicable)</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="setup-environment">
+<h2>Setup environment:<a class="headerlink" href="#setup-environment" title="Link to this heading"></a></h2>
+<dl class="simple" id="m2k-usb-general-settings">
+<dt><strong>M2k.Usb:</strong></dt><dd><ul class="simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Connect an <strong>ADALM2000</strong> device to the system by USB.</p></li>
+<li><p>Add the device in device browser.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="test-1-m2k-connection-and-calibration">
+<h2>Test 1: M2K Connection and Calibration<a class="headerlink" href="#test-1-m2k-connection-and-calibration" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.GEN.SETUP.M2KCONN</p>
+<p><strong>Description:</strong> This test verifies the connection and calibration of the M2K board using both local and remote connections. It checks the auto and manual calibration features of the M2K board.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>OS: ANY</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-usb-general-settings"><span class="std std-ref">M2k.Usb</span></a> setup.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Connect the M2K board to the PC using a micro-USB connector.</p></li>
+<li><dl class="simple">
+<dt>Click the M2K icon.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The instruments will appear on the left panel: Oscilloscope, Spectrum Analyzer, Network Analyzer, Signal Generator, Logic Analyzer, Pattern Generator, Digital IO, Voltmeter, and Power Supply.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Click “Identify.”</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The “Ready” LED on the M2K board will rapidly blink 10 times indicating that it is the device identified by Scopy.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Click “Connect.”</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> M2K will auto calibrate. The calibration indicator on Oscilloscope, Spectrum Analyzer, Network Analyzer, Signal Generator, and Voltmeter instrument should start. “Calibrate” button must be enabled.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>After connecting the M2K, manually calibrate the device by clicking the “Calibrate” button.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> M2K will calibrate. The calibration indicator on Oscilloscope, Spectrum Analyzer, Network Analyzer, Signal Generator, and Voltmeter instrument should start.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>On the home menu, click the add “+” button and input the IP address of the desired M2K board to control. The default IP address is 192.168.2.1. Click add.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The instruments will appear on the left panel: Oscilloscope, Spectrum Analyzer, Network Analyzer, Signal Generator, Logic Analyzer, Pattern Generator, Digital IO, Voltmeter, and Power Supply.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Click “Identify.”</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The “Ready” LED on the M2K board will rapidly blink 10 times indicating that it is the device identified by Scopy.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Click “Connect.”</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> M2K will auto calibrate. The calibration indicator on Oscilloscope, Spectrum Analyzer, Network Analyzer, Signal Generator, and Voltmeter instrument should start. “Calibrate” button must be enabled.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><dl class="simple">
+<dt>Click “Forget device.”</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The M2K board icon connected remotely will disappear on the panel.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><dl class="simple">
+<dt>After connecting the M2K, manually calibrate the device by clicking the “Calibrate” button.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> M2K will calibrate. The calibration indicator on Oscilloscope, Spectrum Analyzer, Network Analyzer, Signal Generator, and Voltmeter instrument should start.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-save-and-load-profile">
+<h2>Test 2: Save and Load Profile<a class="headerlink" href="#test-2-save-and-load-profile" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.GEN.SETUP.SAVELOAD</p>
+<p><strong>Description:</strong> This test verifies the save and load profile feature of Scopy. It checks the ability to save and load profiles for each instrument and the ability to save and load the default profile.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>OS: ANY</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-usb-general-settings"><span class="std std-ref">M2k.Usb</span></a> setup.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Save the current profile. On the bottom part of the left panel, click the “Save” icon and save the profile as “default.ini.” Change any setting on any instrument and reload the profile.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The change made on a certain instrument should be undone and the default profile should load.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>Set the following settings:</dt><dd><ul class="simple">
+<li><p><strong>Oscilloscope’s Settings:</strong></p></li>
+<li><p>Channel 1: Time Base: 100ns, Volts/Div: 2V</p></li>
+<li><p>Channel 2: Volts/Div: 5V</p></li>
+<li><p><strong>Signal Generator’s Settings:</strong></p></li>
+<li><p>Channel 1: Sinewave, 3Vpp, 3MHz</p></li>
+<li><p>Channel 2: Square Wave, 5Vpp, 900kHz</p></li>
+<li><p><strong>Spectrum Analyzer’s Settings:</strong></p></li>
+<li><p>Frequency Sweep Setting: Start – 500kHz; Stop – 5MHz, Amplitude: Top – 10dBFS; Bottom – -140dBFS</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Connect AWG channel 1 to Scope Ch1+ and AWG channel 2 to Scope Ch2+. Connect Scope Ch1- and Ch2- to GND.</p></li>
+<li><dl class="simple">
+<dt>Run the Signal Generator instrument, and check the output on Oscilloscope and Spectrum Analyzer. Then save the profile as “profile1.ini.”</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The output waveform on the Oscilloscope should be set in a way that the signals are can properly be seen compared with the default settings. In the Spectrum Analyzer the fundamental frequency of both signals should be present in the plot window set by the sweep setting.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Reload the default setting by deleting the file in <code class="docutils literal notranslate"><span class="pre">C:\Users\your_username\AppData\Roaming\ADI</span></code>. Reload “profile1.ini” and run the signal generator and oscilloscope or Spectrum Analyzer.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The result should be the same on the saved profile.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Pattern Generator’s Settings:</dt><dd><ul class="simple">
+<li><p>Enable DIO2, DIO3, DIO6, DIO7, DIO10, DIO11, DIO14 and DIO15.</p></li>
+<li><p>Group DIO2 and DIO3 set to random and 1MHz frequency.</p></li>
+<li><p>Group DIO10 and DIO11 and set to Binary Counter at 1MHz.</p></li>
+<li><p>Set the other enabled DIOs to clock at 1MHz.</p></li>
+<li><p>Logic Analyzer’s Settings:</p></li>
+<li><p>Group DIO0, DIO1, DIO4, DIO5, DIO8, DIO9, DIO12, and DIO13 and set to parallel mode.</p></li>
+<li><p>Group DIO2 and DIO3 and set to parallel mode. Group DIO10 and DIO11 and set to parallel mode.</p></li>
+<li><p>Set the time base to 1us.</p></li>
+<li><p>Digital IO’s Settings: Set DIO0, DIO1, DIO4, DIO5, DIO8, DIO9, DIO12, and DIO13 to output.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Run the three instrument and open Logic Analyzer instrument. Save the profile as “profile2.ini”.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> See that the profile is saved on the desired location and the logic analyzer should be set in a way that the rising and falling edge of the signal is clearly seen.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Reload the default setting by deleting the file in <code class="docutils literal notranslate"><span class="pre">C:\Users\your_username\AppData\Roaming\ADI</span></code>. Reload “profile2.ini”, and run Pattern Generator, DigitalIO and Logic Analyzer.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The result should be the same on the saved profile.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><dl class="simple">
+<dt>Power Supply’s Settings:</dt><dd><ul class="simple">
+<li><p>Set to “Tracking Mode” with 35% tracking setting.</p></li>
+<li><p>Set positive supply to 3V and the negative supply should automatically be set to -1.05V.</p></li>
+<li><p>Signal Generator’s Settings: For Channel 1: Sinewave, 2Vpp, 10kHz, For Channel 2: Sinewave, 1Vpp, 10kHz, 90deg phase.</p></li>
+<li><p>Voltmeter Settings: For Channel 1: DC (Direct Current), History – OFF, For Channel 2: AC (20Hz – 40kHz), History – ON (1s).</p></li>
+<li><p>Network Analyzer: Reference: Channel 1, 2V Amplitude, Sweep: Linear, Start – 1kHz, Stop – 100kHz, Sample Count – 200, Display: Min. Magnitude – -90dB, Max. Magnitude – 10dB, Min. Phase – -100deg, Max. Phase – 100deg.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Connect Positive Supply to Scope Ch1+, connect AWG1 to Scope Ch2+, connect scope Ch1- and Scope Ch2- to GND.</p></li>
+<li><dl class="simple">
+<dt>Run Power Supply, Voltmeter and Signal Generator to see if the voltmeter will be able to read 3V on channel 1 and 0.7V on channel 2. Save the profile as “profile3.ini”.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Channel 1’s history should be off and channel 2’s history should be present and the reading must be stable.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="12">
+<li><dl class="simple">
+<dt>Reload the default setting by deleting the file in <code class="docutils literal notranslate"><span class="pre">C:\Users\your_username\AppData\Roaming\ADI</span></code>. Reload “profile3.ini”, and run Power Supply, Voltmeter and Signal Generator.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The result should be the same on the saved profile. The network analyzer’s setting should be retained.</p></li>
+<li><p><strong>Actual Result</strong>:</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-preferences">
+<h2>Test 3: Preferences<a class="headerlink" href="#test-3-preferences" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.GEN.SETUP.PREFERENCES</p>
+<p><strong>Description:</strong> This test verifies the preferences feature of Scopy. It checks the sections of the preferences menu and the options available in each section.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>OS: ANY</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-usb-general-settings"><span class="std std-ref">M2k.Usb</span></a> setup.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Click the Preferences option located below the instrument options. After the Preferences menu appears, click the M2kPlugin tab.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The Preferences menu should contain several sections: General, Analog tools and Logic tools.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="2">
+<li><p>Enable “Save session when closing Scopy.” This setting is in the General tab.</p></li>
+<li><p>Use Scopy and play with its instruments, changing the configurations and settings. Close Scopy and reopen.</p></li>
+<li><dl class="simple">
+<dt>On the General tab, click the M2K icon and drag down to see the debug section.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> A dialog box with the “Restart” text should appear confirming the reset command.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Reset profile to default by deleting the files from <code class="docutils literal notranslate"><span class="pre">C:\Users\your_username\AppData\Roaming\ADI</span></code>.</dt><dd><ul class="simple">
+<li><p>Enable auto save feature.</p></li>
+<li><p>Load profile 1, profile 2 or profile 3 from Testing Save and Load feature steps.</p></li>
+<li><p>Close Scopy and Open.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Following step 5, open Scopy and the current profile should be one of the profiles created from the Save and load test case.</dt><dd><ul class="simple">
+<li><p>On the General Setting preference, the reset scopy is located in the lower right of the Scopy screen.</p></li>
+<li><dl class="simple">
+<dt>Click reset scopy.</dt><dd><ul>
+<li><p><strong>Expected Result:</strong> Reopening Scopy, the profile loaded should be the profile saved. Scopy should return to its default setting. Similar with deleting the files from folder.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>In the M2kPlugin Tab, under the Analog tools section, labels on the plot may be toggled on or off.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Checking the Oscilloscope plot, the labels must synchronize with the option chosen.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><p>On the Analog tools section, an option to search or not to search marker peaks in the visible domain is given.</p></li>
+<li><dl class="simple">
+<dt>Signal Generator’s Settings:</dt><dd><ul class="simple">
+<li><p>For Channel 1: Sinewave, 10Vpp, 500kHz.</p></li>
+<li><p>Spectrum Analyzer’s Sweep Settings: Start – 700kHz, Stop – 1MHz.</p></li>
+<li><p>Disable Channel 2.</p></li>
+<li><p>Connect AWG channel 1 to Scope Ch1+.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Under the Marker Settings, click Marker 1 then “Peak.” Turn the Marker Table on and look for the marked frequencies.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> A marker labeled M1 will automatically appear on the spectrum upon clicking Marker 1. Clicking “Peak” will put the Marker on the 500kHz mark.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="11">
+<li><dl class="simple">
+<dt>Under the Analog tools section, The number of periods shown may be adjusted from 2 to 9.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The signal generator’s graphical representation must follow the desired number of periods on the lower frequency channel (if both channels are configured to output waveform signals). When numbers other than 2 to 9 are entered, the number and the line under it turns to red.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="12">
+<li><p>On the Analog tools section, an option to display 0dB on the graph is available. Click to enable it.</p></li>
+<li><p>Construct a first-order low pass RC filter with the following components: R = 470 Ohms, C = 1uF. This will have a cut-off frequency of ~340 Hz.</p></li>
+<li><dl class="simple">
+<dt>Network Analyzer’s Settings</dt><dd><ul class="simple">
+<li><p>Reference: Channel 1</p></li>
+<li><p>1V Amplitude</p></li>
+<li><p>0V Offset</p></li>
+<li><p>Sweep: Logarithmic</p></li>
+<li><p>Start – 10Hz</p></li>
+<li><p>Stop – 500kHz</p></li>
+<li><p>Sample Count - 100</p></li>
+<li><p>Display settings:</p></li>
+<li><p>Min. Magnitude – -90dB</p></li>
+<li><p>Max. Magnitude – 10dB</p></li>
+<li><p>Min. Phase – -150deg</p></li>
+<li><p>Max. Phase – 60deg</p></li>
+<li><dl class="simple">
+<dt>Run Network Analyzer.</dt><dd><ul>
+<li><p><strong>Expected Result:</strong> The Bode Plot has 0dB on its labels.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="digital_io_tests.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Digital IO - Test Suite</a>
+    <a href="logic_analyzer_tests.html" title="Next document (Alt+Shift+RightArrow)" class="next">Logic Analyzer - Test Suite</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

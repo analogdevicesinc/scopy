@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Oscilloscope - Test Suite &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=3d3703ae" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=dcfbb431"></script>
+    <link rel="icon" href="../../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Pattern Generator - Test Suite" href="pattern_generator_tests.html" />
+    <link rel="prev" title="Network Analyzer - Test Suite" href="network_analyzer_tests.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Oscilloscope - Test Suite</a><ul>
+<li><a class="reference internal" href="#setup-environment">Setup environment:</a></li>
+<li><a class="reference internal" href="#test-1-time-base-and-volts-div-knobs">Test 1 - Time base and Volts/div Knobs</a></li>
+<li><a class="reference internal" href="#test-2-position-knob">Test 2 - Position Knob</a></li>
+<li><a class="reference internal" href="#test-3-constant-signal-check">Test 3 - Constant Signal Check</a></li>
+<li><a class="reference internal" href="#test-4-sine-wave-signal-check">Test 4 - Sine Wave Signal Check</a></li>
+<li><a class="reference internal" href="#test-5-square-wave-signal-check">Test 5 - Square Wave Signal Check</a></li>
+<li><a class="reference internal" href="#test-6-triangle-wave-signal-check">Test 6 - Triangle Wave Signal Check</a></li>
+<li><a class="reference internal" href="#test-7-rising-falling-ramp-sawtooth-wave">Test 7 - Rising/Falling Ramp Sawtooth Wave</a></li>
+<li><a class="reference internal" href="#test-8-cursor-reading-check">Test 8 - Cursor Reading Check</a></li>
+<li><a class="reference internal" href="#test-9-trigger-function-check">Test 9 - Trigger Function Check</a></li>
+<li><a class="reference internal" href="#test-10-math-channel-operations">Test 10 - Math Channel Operations</a></li>
+<li><a class="reference internal" href="#test-11-fft-function">Test 11 - FFT Function</a></li>
+<li><a class="reference internal" href="#test-12-xy-function">Test 12 - XY Function</a></li>
+<li><a class="reference internal" href="#test-13-export-feature">Test 13 - Export feature</a></li>
+<li><a class="reference internal" href="#test-14-software-ac-coupling">Test 14 - Software AC coupling</a></li>
+<li><a class="reference internal" href="#test-15-probe-attenuation">Test 15 - Probe Attenuation</a></li>
+<li><a class="reference internal" href="#test-16-external-trigger">Test 16 - External Trigger</a></li>
+<li><a class="reference internal" href="#test-17-autoset">Test 17 - Autoset</a></li>
+<li><a class="reference internal" href="#test-18-print-plot">Test 18 - Print Plot</a></li>
+<li><a class="reference internal" href="#test-19-curve-style">Test 19 - Curve style</a></li>
+<li><a class="reference internal" href="#test-20-gating">Test 20 - Gating</a></li>
+<li><a class="reference internal" href="#test-21-histogram">Test 21 - Histogram</a></li>
+<li><a class="reference internal" href="#test-22-adc-digital-filters">Test 22 - ADC Digital Filters</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../../index.html">
+      <img class="only-light" src="../../../_static/scopy.png"/>
+      <img class="only-dark" src="../../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../../../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6" checked=""/><div class="collapse"><a class="reference internal" href="index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../../general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="oscilloscope-test-suite">
+<span id="oscilloscope-tests"></span><h1>Oscilloscope - Test Suite<a class="headerlink" href="#oscilloscope-test-suite" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>User guide: <a class="reference internal" href="../../../plugins/m2k/oscilloscope.html#oscilloscope"><span class="std std-ref">Oscilloscope user guide</span></a></p>
+</div>
+<p>The following test cases are designed to verify the functionality of
+the Oscilloscope plugin.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23.8%" />
+<col style="width: 14.3%" />
+<col style="width: 14.3%" />
+<col style="width: 23.8%" />
+<col style="width: 23.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Tester</p></th>
+<th class="head"><p>Test Date</p></th>
+<th class="head"><p>Scopy version</p></th>
+<th class="head"><p>Plugin version (N/A if not applicable)</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="setup-environment">
+<h2>Setup environment:<a class="headerlink" href="#setup-environment" title="Link to this heading"></a></h2>
+<dl class="simple" id="adalm2000-osc-setup-ch1">
+<dt><strong>Adalm2000.Osc.CH1:</strong></dt><dd><ul class="simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Connect the ADALM2000 device to the system.</p></li>
+<li><p>Connect the ADALM2000 device in Scopy using the USB/network backend.</p></li>
+<li><p>Open the Oscilloscope instrument and use only the CH1 settings and menus.</p></li>
+</ul>
+</dd>
+<dt>Depends on:</dt><dd><ul class="simple">
+<li><p>Test TST.PREFS.RESET</p></li>
+</ul>
+</dd>
+<dt>Prerequisites:</dt><dd><ul class="simple">
+<li><p>Scopy v2.0.0 or later with ADALM2000 plugin installed on the system.</p></li>
+<li><p>Tests listed as dependencies are successfully completed.</p></li>
+<li><p>Reset .ini files to default using the Preferences “Reset” button.</p></li>
+<li><p>Connect <strong>W1</strong> to <strong>1+</strong> and <strong>GND</strong> to <strong>1-</strong> on the ADALM2000 device
+using loopback cables.</p></li>
+<li><p>Connect <strong>W2</strong> to <strong>2+</strong> and <strong>GND</strong> to <strong>2-</strong> on the ADALM2000 device
+using loopback cables.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="test-1-time-base-and-volts-div-knobs">
+<h2>Test 1 - Time base and Volts/div Knobs<a class="headerlink" href="#test-1-time-base-and-volts-div-knobs" title="Link to this heading"></a></h2>
+<p id="tst-osc-time-volts-1"><strong>UID:</strong> TST.OSC.TIME_VOLTS_1</p>
+<p><strong>Description:</strong> Check the increment/decrement operation of the time base and
+volts/div knobs.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the channel settings and set the knob to large increment
+(NO orange dot in the center).</p></li>
+<li><p>Set the Time Base to 2us and the Volts/Div to 2 Volts.</p></li>
+<li><dl class="simple">
+<dt>Use the - button 4 times and the + button 2 times on each knob:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The Time Base value changes to 1us, 500ns, 200ns, 100ns after the - button.</p></li>
+<li><p>The Time Base value changes to 200ns and 500ns after the + button.</p></li>
+<li><p>The Volts/Div value changes to 1V, 500, 200, 100 mV after the - button.</p></li>
+<li><p>The Volts/Div value changes to 200mV and 500mV after the + button.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><p>Set the knob to small increment (orange dot in the center).
+Set the Time Base to 2us and the Volts/Div to 2 Volts.</p></li>
+<li><dl class="simple">
+<dt>Use the + and - button once on each knob:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The Time Base value changes to 3us and back to 2us.</p></li>
+<li><p>The Volts/Div value changes to 3V and back to 2V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-position-knob">
+<h2>Test 2 - Position Knob<a class="headerlink" href="#test-2-position-knob" title="Link to this heading"></a></h2>
+<p id="tst-osc-position-1"><strong>UID:</strong> TST.OSC.POSITION_1</p>
+<p><strong>Description:</strong> Check the increment/decrement operation of the position knob
+which depends on the value of the Time Base.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the channel settings and set the Position knob to large increment
+(NO orange dot in the center).</p></li>
+<li><p>Set the Time Base to 2us and the horizontal position to 0.</p></li>
+<li><dl class="simple">
+<dt>Use the + button 2 times and the - button 2 times on the horizontal Position knob:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The position changes to 200ns and 400ns after the +
+and back to 200ns and 0 after the - button.</p></li>
+<li><p>The plot handle position also changes accordingly.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Set the Time Base to 1us and the horizontal position to 0.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The position changes to 100ns and 200ns after the + button and
+back to 100ns and 0 after the - button.</p></li>
+<li><p>The plot handle position also changes accordingly.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><p>Set the Position knob to small increment (orange dot in the center).
+Set the Time Base to 2us and the horizontal position to 0.</p></li>
+<li><dl class="simple">
+<dt>Use the + button 2 times and the - button 2 times on the horizontal Position knob:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The position changes to 20ns and 40ns after the + button and
+back to 20ns and 0 after the - button.</p></li>
+<li><p>The plot handle position also changes accordingly.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-constant-signal-check">
+<h2>Test 3 - Constant Signal Check<a class="headerlink" href="#test-3-constant-signal-check" title="Link to this heading"></a></h2>
+<p id="tst-osc-constant-signal-1"><strong>UID:</strong> TST.OSC.CONSTANT_SIGNAL_1</p>
+<p><strong>Description:</strong> Check the constant signal from the signal generator on the
+oscilloscope using Channel 1.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the Signal Generator instrument and set the following config on CH1:</dt><dd><ul class="simple">
+<li><p>Constant signal, 3.3V</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>In the Oscilloscope Trigger Settings, set the mode to <strong>Auto</strong>.</p></li>
+<li><p>In the Oscilloscope Measure Settings enable <strong>Display All</strong>.</p></li>
+<li><p>Run both instruments.</p></li>
+<li><dl class="simple">
+<dt>Monitor the Oscilloscope RMS measurement:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The RMS reading is within 3.2V to 3.4V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Change the value to 5V in the Signal Generator and monitor it on the Oscilloscope:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The reading is within 4.9V to 5.1V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-sine-wave-signal-check">
+<h2>Test 4 - Sine Wave Signal Check<a class="headerlink" href="#test-4-sine-wave-signal-check" title="Link to this heading"></a></h2>
+<p id="tst-osc-sine-wave-signal-1"><strong>UID:</strong> TST.OSC.SINE_WAVE_SIGNAL_1</p>
+<p><strong>Description:</strong> Check the sine wave signal from the signal generator on the oscilloscope
+using Channel 1.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><dl class="simple">
+<dt>Open the Signal Generator instrument and set the following config on CH1:</dt><dd><ul class="simple">
+<li><p>Sine wave, 2Vpp, 200Hz, 0V Offset, 0deg Phase</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>In the Oscilloscope Trigger Settings, set the mode to <strong>Auto</strong> and
+the following configuration in the general settings:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Horizontal: Time Base: 500us/div, Position: 0ms</p></li>
+<li><p>Vertical: Volts/Div: 500mV/div, Position: 0V</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Run both instruments.</p></li>
+<li><dl class="simple">
+<dt>Monitor the Oscilloscope measurements and plot:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot displays 1.5 periods.</p></li>
+<li><p>The measurements display: Period: 5ms, Frequency: 200 Hz,
+Peak-peak: 1.9Vpp to 2.1Vpp, RMS: 0.6V to 0.8V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Change the Signal Generator amplitude to 5V and the frequency to 500Hz:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot displays 4 periods.</p></li>
+<li><p>The measurements display: Period: 2ms, Frequency: 500 Hz,
+Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.74V to 1.78V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-5-square-wave-signal-check">
+<h2>Test 5 - Square Wave Signal Check<a class="headerlink" href="#test-5-square-wave-signal-check" title="Link to this heading"></a></h2>
+<p id="tst-osc-square-wave-signal-1"><strong>UID:</strong> TST.OSC.SQUARE_WAVE_SIGNAL_1</p>
+<p><strong>Description:</strong> Check the square wave signal from the signal generator on
+the oscilloscope using Channel 1.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config on CH1:</dt><dd><ul class="simple">
+<li><p>Square wave, 5Vpp, 500Hz, 0V Offset, 0deg Phase</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>In the Oscilloscope Trigger Settings, set the mode to <strong>Auto</strong> and
+the following configuration in the general settings:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Horizontal: Time Base: 500us/div, Position: 0ms</p></li>
+<li><p>Vertical: Volts/Div: 1V/div, Position: 0V</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Run both instruments.</p></li>
+<li><dl class="simple">
+<dt>Monitor the Oscilloscope measurements and plot:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot displays 4 square waves.</p></li>
+<li><p>The measurements display: Period: 2ms, Frequency: 500 Hz,
+Amplitude: 4.9Vpp to 5.1Vpp, RMS: 2.4V to 2.6V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic" start="5">
+<li><p>Change the Signal Generator amplitude to 8V and the frequency to 2 kHz.
+Change the Oscilloscope Time Base to 200us/div:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot displays 6 square waves.</p></li>
+<li><p>The measurements display: Period: 500us, Frequency: 2 kHz,
+Amplitude: 7.9Vpp to 8.1Vpp, RMS: 3.9V to 4.1V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-6-triangle-wave-signal-check">
+<h2>Test 6 - Triangle Wave Signal Check<a class="headerlink" href="#test-6-triangle-wave-signal-check" title="Link to this heading"></a></h2>
+<p id="tst-osc-triangle-wave-signal-1"><strong>UID:</strong> TST.OSC.TRIANGLE_WAVE_SIGNAL_1</p>
+<p><strong>Description:</strong> Check the triangle wave signal from the signal generator on
+the oscilloscope using Channel 1.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config on CH1:</dt><dd><ul class="simple">
+<li><p>Triangle wave, 4Vpp, 2kHz, 0V Offset, 0deg Phase</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>In the Oscilloscope Trigger Settings, set the mode to <strong>Auto</strong> and
+the following configuration in the general settings:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Horizontal: Time Base: 200us/div, Position: 0ms</p></li>
+<li><p>Vertical: Volts/Div: 1V/div, Position: 0V</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Run both instruments.</p></li>
+<li><dl class="simple">
+<dt>Monitor the Oscilloscope measurements and plot:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot displays 6 triangle waves.</p></li>
+<li><p>The measurements display: Period: 500us, Frequency: 2 kHz,
+Peak-peak: 3.9Vpp to 4.1Vpp, RMS: 1.0V to 1.2V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic" start="5">
+<li><p>Change the Signal Generator amplitude to 5V and the frequency to 20kHz.
+Change the Oscilloscope Time Base to 20us/dev.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot displays 6 triangle waves.</p></li>
+<li><p>The measurements display: Period: 50us, Frequency: 20 kHz,
+Peak-peak: 4.9Vpp to 5.1Vpp, RMS: 1.3V to 1.5V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-7-rising-falling-ramp-sawtooth-wave">
+<h2>Test 7 - Rising/Falling Ramp Sawtooth Wave<a class="headerlink" href="#test-7-rising-falling-ramp-sawtooth-wave" title="Link to this heading"></a></h2>
+<p id="tst-osc-ramp-sawtooth-wave-signal-1"><strong>UID:</strong> TST.OSC.RAMP_SAWTOOTH_WAVE_SIGNAL_1</p>
+<p><strong>Description:</strong> Check the rising and falling ramp sawtooth wave signal from
+the signal generator on the oscilloscope using Channel 1.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config on CH1:</dt><dd><ul class="simple">
+<li><p>Rising Ramp Sawtooth, 8Vpp, 20kHz, 0V Offset, 0deg Phase.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>In the Oscilloscope Trigger Settings, set the mode to <strong>Auto</strong> and
+the following configuration in the general settings:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Horizontal: Time Base: 10us/div, Position: 0ms</p></li>
+<li><p>Vertical: Volts/Div: 2V/div, Position: 0V</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Run both instruments.</p></li>
+<li><dl class="simple">
+<dt>Monitor the Oscilloscope measurements and plot:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot displays 3 sawtooth waves.</p></li>
+<li><p>The measurements display: Period: 50us, Frequency: 20 kHz,
+Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2V to 2.4V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Change the Signal Generator configuration to Falling Ramp Sawtooth:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot displays 3 sawtooth waves.</p></li>
+<li><p>The measurements display: Period: 50us, Frequency: 20 kHz,
+Peak-peak: 7.9Vpp to 8.1Vpp, RMS: 2.2V to 2.4V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-8-cursor-reading-check">
+<h2>Test 8 - Cursor Reading Check<a class="headerlink" href="#test-8-cursor-reading-check" title="Link to this heading"></a></h2>
+<p id="tst-osc-cursor-reading-1"><strong>UID:</strong> TST.OSC.CURSOR_READING_1</p>
+<p><strong>Description:</strong> Check the cursor reading value on the oscilloscope using
+Channel 1.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config on CH1:</dt><dd><ul class="simple">
+<li><p>Sine wave, 2Vpp, 200Hz, 0V Offset, 0deg Phase</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>In the Oscilloscope Trigger Settings, set the mode to <strong>Auto</strong> and
+the following configuration in the general settings:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Horizontal: Time Base: 1ms/div, Position: 0ms</p></li>
+<li><p>Vertical: Volts/Div: 500mV/div, Position: 0V</p></li>
+<li><p>Enable <strong>Cursors</strong> and disable <strong>Measure</strong>.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Run both instruments.</p></li>
+<li><p>Adjust the horizontal cursors to measure the period (place cursor
+T2 on the positive-going zero crossing point and T1 on the adjacent
+positive-going zero crossing point):</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The frequency 1/ΔT is around 200Hz.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic" start="5">
+<li><p>Adjust the vertical cursors to measure the peak-peak amplitude:
+place cursor V1 on the crest and V2 on the bottom of the sine wave:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The peak-peak amplitude is around 2V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>In the Cursors Settings menu turn off the Horizontal cursors:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The horizontal cursors disappear from the plot as well as from the readouts.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>In the Cursors Settings menu turn off the Vertical cursors:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The vertical cursors disappear from the plot as well as from the readouts.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-9-trigger-function-check">
+<h2>Test 9 - Trigger Function Check<a class="headerlink" href="#test-9-trigger-function-check" title="Link to this heading"></a></h2>
+<p id="tst-osc-trigger-function-1"><strong>UID:</strong> TST.OSC.TRIGGER_FUNCTION_1</p>
+<p><strong>Description:</strong> Check the trigger function on the oscilloscope using Channel 1
+with different trigger configurations.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config on CH1:</dt><dd><ul class="simple">
+<li><p>Triangle wave, 5Vpp, 200Hz</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>In the Oscilloscope set the following:</dt><dd><ul class="simple">
+<li><p>Time Base to 1ms/div, Position to 0ms</p></li>
+<li><p>Volts/Div to 1V/div, Position to 0V</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Open the Oscilloscope Trigger Settings and set the following configuration:</dt><dd><ul class="simple">
+<li><p>Trigger mode: Auto</p></li>
+<li><p>Internal: ON</p></li>
+<li><p>Source: channel 1</p></li>
+<li><p>Level: 0, Hysteresis: 50mV</p></li>
+<li><p>Condition: Rising Edge</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Run both instruments.</p></li>
+<li><dl class="simple">
+<dt>Check the Oscilloscope plot:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot time handle is centered at the rising edge of the triangle wave.</p></li>
+<li><p>The signal is static (not moving around at each triggered sample).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Change the Trigger Condition to Falling Edge:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot time handle is centered at the falling edge of the triangle wave.</p></li>
+<li><p>The signal is static (not moving around at each triggered sample).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><p>Change the Trigger Condition to Rising Edge</p></li>
+<li><dl class="simple">
+<dt>Set the Hysteresis value to 1.25V and Level to -1.7V:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The signal on the plot is not triggered and unstable.</p></li>
+<li><p>The plot level is outside the triggered range of ~1.3V to +2.5V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Set the Hysteresis value to 1.25V and Level to -1.2V:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The signal on the plot is triggered and stable.</p></li>
+<li><p>The plot level is in the triggered range of ~1.3V to +2.5V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><dl class="simple">
+<dt>Set the Hysteresis value to 2.5V and Level to -2.5V:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The signal on the plot is not triggered and unstable.</p></li>
+<li><p>The plot level is outside the triggered range of 0V to +2.5V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><dl class="simple">
+<dt>Set the Hysteresis value to 2.5V and Level to 0.1V:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The signal on the plot is triggered and stable.</p></li>
+<li><p>The plot level is in the triggered range of 0V to +2.5V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="11">
+<li><dl class="simple">
+<dt>Set the Hysteresis value to 2.5V and Level to 3V:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The signal on the plot is not triggered and unstable.</p></li>
+<li><p>The plot level is outside the triggered range of 0V to +2.5V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-10-math-channel-operations">
+<h2>Test 10 - Math Channel Operations<a class="headerlink" href="#test-10-math-channel-operations" title="Link to this heading"></a></h2>
+<p id="tst-osc-math-channel"><strong>UID:</strong> TST.OSC.MATH_CHANNEL</p>
+<p><strong>Description:</strong> Check the math channel operations on the oscilloscope using Channel 1.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config:</dt><dd><ul class="simple">
+<li><p>Channel 1: Sine wave, 5Vpp, 500Hz</p></li>
+<li><p>Channel 2: Square wave, 2Vpp, 500Hz</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>In the Oscilloscope set the following:</dt><dd><ul class="simple">
+<li><p>Time Base to 500us/div, Position to 0ms</p></li>
+<li><p>Volts/Div to 1V/div, Position to 0V</p></li>
+<li><p>Trigger mode: Auto</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Run both instrument.</p></li>
+<li><dl class="simple">
+<dt>Add a Math Channel (using the + button beside Channel 2) with the following function:</dt><dd><ul class="simple">
+<li><p><em>sqrt(t0*t0)</em></p></li>
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot contains a new Channel having all the samples from Channel 1.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Add a new Math Channel with the following function:</dt><dd><ul class="simple">
+<li><p><em>2*(t1+t1)</em></p></li>
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot contains a new Channel having the amplitude of
+Channel 2 increased 4 times.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Change the Signal Generator configuration to:</dt><dd><ul class="simple">
+<li><p>Channel 1: Square wave, 5Vpp, 200Hz</p></li>
+<li><p>Channel 2: Sine wave, 3Vpp, 200Hz</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Add a new Math channel with the following function and verify the measurements:</dt><dd><ul class="simple">
+<li><p><em>t0+t1</em></p></li>
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot contains a new Channel having the sum of Channel 1 and Channel 2.</p></li>
+<li><p>Math channel measurement: Vpp: 8V, Period: 5ms, Frequency: 200Hz.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-11-fft-function">
+<h2>Test 11 - FFT Function<a class="headerlink" href="#test-11-fft-function" title="Link to this heading"></a></h2>
+<p id="tst-osc-fft-function"><strong>UID:</strong> TST.OSC.FFT_FUNCTION</p>
+<p><strong>Description:</strong> Check the FFT function on the oscilloscope.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config:</dt><dd><ul class="simple">
+<li><p>Channel 1: Square wave, 5Vpp, 1kHz</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>In the Oscilloscope set the following:</dt><dd><ul class="simple">
+<li><p>Channel1 Horizontal: Time Base: 5ms/div, Position: 0ms</p></li>
+<li><p>Channel1 Vertical: Volts/Div: 1V/div, Position: 0V</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>From Oscilloscope settings set FFT to ON.</p></li>
+<li><dl class="simple">
+<dt>Run the Oscilloscope and verify the plot:</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The resulting spectrum shows
+a series of peaks at the fundamental frequency and its harmonics.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-12-xy-function">
+<h2>Test 12 - XY Function<a class="headerlink" href="#test-12-xy-function" title="Link to this heading"></a></h2>
+<p id="tst-osc-xy-function"><strong>UID:</strong> TST.OSC.XY_FUNCTION</p>
+<p><strong>Description:</strong> Check the XY function on the oscilloscope.
+The plot displays the current vs voltage characteristics of a PN junction diode.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config:</dt><dd><ul class="simple">
+<li><p>Channel 1: Sine wave, 4Vpp, 100Hz, 3V Offset</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>In the Oscilloscope set the following:</dt><dd><ul class="simple">
+<li><p>General Settings: XY (View): ON</p></li>
+<li><p>Channel 1 on the X Axis and Channel 2 on the Y Axis.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Run both instruments.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The plot displays a horizontal line on level
+0 of the Y-Axis and in range 1 to 5 on the X-Axis.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Change the Signal Generator offset to 2V:</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The plot displays a horizontal line on level
+0 of the Y-Axis and in range 0 to 4 on the X-Axis.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Set the X-Y configuration to CH1 on both X-Axis and Y-Axis:</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The plot displays a diagonal line
+in the range 0 to 4 on both axes.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Set the X-Y configuration to CH2 on X-Axis and CH1 on Y-Axis:</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The plot displays a vertical line
+from 0 to 4 on the Y-Axis and 0 on the X-Axis.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-13-export-feature">
+<h2>Test 13 - Export feature<a class="headerlink" href="#test-13-export-feature" title="Link to this heading"></a></h2>
+<p id="tst-osc-export-feature"><strong>UID:</strong> TST.OSC.EXPORT_FEATURE</p>
+<p><strong>Description:</strong> Check the data export feature on the oscilloscope.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps</strong>:</dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config:</dt><dd><ul class="simple">
+<li><p>Channel 1: Sine wave, 2Vpp, 200Hz</p></li>
+<li><p>Channel 2: Square wave, 5Vpp, 500Hz</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>In the Oscilloscope set the following:</dt><dd><ul class="simple">
+<li><p>Channel 1 Horizontal: Time Base: 1ms/div, Position: 0ms</p></li>
+<li><p>Channel 1 Vertical: Volts/Div: 1V/div, Position: 0V</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Run both instruments.</p></li>
+<li><dl class="simple">
+<dt>In the Oscilloscope, open the General Settings Menu:</dt><dd><ul class="simple">
+<li><p>Turn off “Export All”.</p></li>
+<li><p>From the dropdown list only choose Channel 1.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Click <strong>Export</strong> and choose a name, the CSV format and location to save the file.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The file is saved successfully at the
+specified location.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Open the file and verify the data.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The first 7 lines of the CSV contain metadata such as: timestamp,
+device name, number of samples, sample rate, instrument name.</p></li>
+<li><p>The file contains 3 columns: sample number, time, voltage.</p></li>
+<li><p>The data matches with that samples displayed on the plot.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><p>In the Export menu, turn on “Export All”.</p></li>
+<li><dl class="simple">
+<dt>Click <strong>Export</strong> and choose a name, the CSV format and location to save the file.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The file is saved successfully at the
+specified location.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><dl class="simple">
+<dt>Open the file and verify the data.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The first 7 lines of the CSV contain metadata such as: timestamp,
+device name, number of samples, sample rate, instrument name.</p></li>
+<li><p>The file contains 4 columns: sample number, time, voltage1, voltage2.</p></li>
+<li><p>The data matches with that samples displayed on the plot.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-14-software-ac-coupling">
+<h2>Test 14 - Software AC coupling<a class="headerlink" href="#test-14-software-ac-coupling" title="Link to this heading"></a></h2>
+<p id="tst-osc-software-ac-coupling"><strong>UID:</strong> TST.OSC.SOFTWARE_AC_COUPLING</p>
+<p><strong>Description:</strong> Check the software AC coupling feature on the oscilloscope.
+The Signal Generator will output a sine wave with a 3V DC offset and
+the Oscilloscope should be able to center the trace at 0V.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config:</dt><dd><ul class="simple">
+<li><p>Channel 1: Sine wave, 2Vpp, 1kHz, 3V Offset</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>In the Oscilloscope set the following:</dt><dd><ul class="simple">
+<li><p>Channel 1 Horizontal: Time Base: 200us/div, Position: 0ms</p></li>
+<li><p>Channel 1 Vertical: Volts/Div: 1V/div, Position: 0V</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Run both instruments.</p></li>
+<li><dl class="simple">
+<dt>In the Oscilloscope Channel 1 Settings turn on Software AC Coupling.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The trace moves towards 0V until it is centered at level 0V.</p></li>
+<li><p>The measurement Mean is around 0V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Turn off Software AC Coupling.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The trace moves back to the original position.</p></li>
+<li><p>The measurement Mean is around 0V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-15-probe-attenuation">
+<h2>Test 15 - Probe Attenuation<a class="headerlink" href="#test-15-probe-attenuation" title="Link to this heading"></a></h2>
+<p id="tst-osc-probe-attenuation"><strong>UID:</strong> TST.OSC.PROBE_ATTENUATION</p>
+<p><strong>Description:</strong> Check the probe attenuation feature on the oscilloscope.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config:</dt><dd><ul class="simple">
+<li><p>Channel 1: Sine wave, 2Vpp, 1kHz</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>In the Oscilloscope set the following:</dt><dd><ul class="simple">
+<li><p>Channel 1 Horizontal: Time Base: 200us/div, Position: 0ms</p></li>
+<li><p>Channel 1 Vertical: Volts/Div: 1V/div, Position: 0V</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Enable the Measurement feature and turn on Display All.</p></li>
+<li><p>Run both instruments.</p></li>
+<li><dl class="simple">
+<dt>In the Channel 1 settings of the Oscilloscope set Probe Attenuation to 0.1.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The measurement Vpp is 200mV.</p></li>
+<li><p>The Volts/Div is 100mV.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Change the Probe Attenuation to 100.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The measurement Vpp is 200V.</p></li>
+<li><p>The Volts/Div is 100V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Change the Probe Attenuation to 1.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The measurement Vpp is 2V.</p></li>
+<li><p>The Volts/Div is 1V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-16-external-trigger">
+<h2>Test 16 - External Trigger<a class="headerlink" href="#test-16-external-trigger" title="Link to this heading"></a></h2>
+<p id="tst-osc-external-trigger"><strong>UID:</strong> TST.OSC.EXTERNAL_TRIGGER</p>
+<p><strong>Description:</strong> Check the external trigger feature on the oscilloscope
+using the TI pin and the digital DIO1 pin of the ADALM2000 device.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>Disconnect 1+ and 1- from any loopback cables.</p></li>
+<li><p>Connect 2+ to W2 and 2- to GND using loopback cables.</p></li>
+<li><p>Connect TI to DIO0 using loopback cables.</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config:</dt><dd><ul class="simple">
+<li><p>Channel 2: Sine wave, 5Vpp, 5kHz</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Open the Pattern Generator and set the following config:</dt><dd><ul class="simple">
+<li><p>DIO0: Clock, 5kHz</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>In the Oscilloscope set the Channel 2 TimeBase to 500us.</p></li>
+<li><dl class="simple">
+<dt>In the Oscilloscope Trigger settings set the following:</dt><dd><ul class="simple">
+<li><p>Mode: normal</p></li>
+<li><p>Internal: OFF</p></li>
+<li><p>Digital: ON</p></li>
+<li><p>Source: External Trigger In</p></li>
+<li><p>Condition: Rising Edge</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Run all instruments:</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The 5Vpp sinewave is displayed on CH2
+of the Osc plot.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Stop the Pattern Generator:</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The plot stops updating and the status
+displays “Waiting”.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><p>Stop the Pattern Generator.</p></li>
+<li><p>Open the Logic Analyzer and set a Rising Edge trigger on DIO1.</p></li>
+<li><dl class="simple">
+<dt>In the Oscilloscope Trigger settings set the following:</dt><dd><ul class="simple">
+<li><p>Mode: normal</p></li>
+<li><p>Internal: OFF</p></li>
+<li><p>Digital: ON</p></li>
+<li><p>Source: Logic Analyzer</p></li>
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot is not trigger and the status displays “Waiting”.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><p>Open the DigitalIO, detach the instrument and run it.</p></li>
+<li><dl class="simple">
+<dt>Manually toggle DIO1 from output to input and viceversa:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The Osc plot is triggered when toggling the digital pin.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-17-autoset">
+<h2>Test 17 - Autoset<a class="headerlink" href="#test-17-autoset" title="Link to this heading"></a></h2>
+<p id="tst-osc-autoset"><strong>UID:</strong> TST.OSC.AUTOSET</p>
+<p><strong>Description:</strong> Check the Autoset feature on the oscilloscope.
+A sinewave is fed by the Signal Generator, captured with the Oscilloscope
+using a configuration that displays too many periods on the plot.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config:</dt><dd><ul class="simple">
+<li><p>Channel 1: Sine wave, 5Vpp, 20kHz</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>In the Oscilloscope set the following:</dt><dd><ul class="simple">
+<li><p>Channel 1 Horizontal: Time Base: 200us/div, Position: -200us</p></li>
+<li><p>Channel 1 Vertical: Volts/Div: 500mV/div, Position: 2.5V</p></li>
+<li><p>In the Trigger Settings set the analog level to 5V.</p></li>
+<li><p>In the Trigger Settings set the trigger mode to Auto.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Open the Channel 1 settings menu and click Autoset while running both instruments:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot displays less periods of the sinewave.</p></li>
+<li><p>The vertical Volts/div are adjusted to 1V.</p></li>
+<li><p>The horizontal Time Base is adjusted to 50us/div.</p></li>
+<li><p>The horizontal and vertical positions are at 0.</p></li>
+<li><p>The trigger level is at 0V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-18-print-plot">
+<h2>Test 18 - Print Plot<a class="headerlink" href="#test-18-print-plot" title="Link to this heading"></a></h2>
+<p id="tst-osc-print-plot"><strong>UID:</strong> TST.OSC.PRINT_PLOT</p>
+<p><strong>Description:</strong> Check the Print feature on the oscilloscope.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config:</dt><dd><ul class="simple">
+<li><p>Channel 1: Sine wave, 5Vpp, 20kHz</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>In the Oscilloscope set the following:</dt><dd><ul class="simple">
+<li><p>Channel 1 Horizontal: Time Base: 200us/div, Position: 0us</p></li>
+<li><p>Channel 1 Vertical: Volts/Div: 500mV/div, Position: 0V</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Run both instruments.</p></li>
+<li><dl class="simple">
+<dt>Click the Print button and choose a name and location for the PDF file:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The file is saved successfully at the specified location.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Open the file and verify the data.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The file contains a screenshot of the instrument with inverted colors.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-19-curve-style">
+<h2>Test 19 - Curve style<a class="headerlink" href="#test-19-curve-style" title="Link to this heading"></a></h2>
+<p id="tst-osc-curve-style"><strong>UID:</strong> TST.OSC.CURVE_STYLE</p>
+<p><strong>Description:</strong> Check the curve style feature on the oscilloscope
+and plot the signal using lines, dots, sticks or steps.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config:</dt><dd><ul class="simple">
+<li><p>Channel 1: Sine wave, 5Vpp, 5kHz</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>In the Oscilloscope set the following:</dt><dd><ul class="simple">
+<li><p>Channel 1 Horizontal: Time Base: 10us/div, Position: 0us</p></li>
+<li><p>Channel 1 Vertical: Volts/Div: 1V/div, Position: 0V</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Run both instruments.</p></li>
+<li><dl class="simple">
+<dt>Open the Channel 1 settings menu and set the curve style to Dots:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot is displayed using dots (when zoomed in to samples).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Set the curve style to Sticks:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot is displayed using lines (the sinewave looks “full”).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Set the curve style to Smooth:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot is displayed using a smoother lines.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-20-gating">
+<h2>Test 20 - Gating<a class="headerlink" href="#test-20-gating" title="Link to this heading"></a></h2>
+<p id="tst-osc-gating"><strong>UID:</strong> TST.OSC.GATING</p>
+<p><strong>Description:</strong> Check the Gating feature on the oscilloscope.
+Apply the measurements on a gated portion of the acquired signal.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config:</dt><dd><ul class="simple">
+<li><p>Channel 1: Sine wave, 5Vpp, 10kHz</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>In the Oscilloscope set the following:</dt><dd><ul class="simple">
+<li><p>Channel 1 Horizontal: Time Base: 10us/div, Position: 0us</p></li>
+<li><p>Channel 1 Vertical: Volts/Div: 1V/div, Position: 0V</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Enable Measurements, turn on on Display All.</p></li>
+<li><p>Enable Gating and set the sliders to two consecutive zero-crossing points
+of the sine wave:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The measurement Vpp is half the set amplitude: 2.5V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Move the sliders to the left and right ends of the plot:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The measurement Vpp is the set amplitude: 5V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-21-histogram">
+<h2>Test 21 - Histogram<a class="headerlink" href="#test-21-histogram" title="Link to this heading"></a></h2>
+<p id="tst-osc-histogram"><strong>UID:</strong> TST.OSC.HISTOGRAM</p>
+<p><strong>Description:</strong> Check the Histogram feature on the oscilloscope.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config:</dt><dd><ul class="simple">
+<li><p>Channel 1: Square wave, 5Vpp, 10kHz</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>In the Oscilloscope set the following:</dt><dd><ul class="simple">
+<li><p>Channel 1 Horizontal: Time Base: 10us/div, Position: 0ms</p></li>
+<li><p>Channel 1 Vertical: Volts/Div: 1V/div, Position: 0V</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Run both instruments.</p></li>
+<li><dl class="simple">
+<dt>In the Oscilloscope General settings menu enable the Histogram:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>A histogram is displayed above the time plot.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Change the Signal Generator to output a Square wave:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The histogram shows the min and max of the square wave.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-22-adc-digital-filters">
+<h2>Test 22 - ADC Digital Filters<a class="headerlink" href="#test-22-adc-digital-filters" title="Link to this heading"></a></h2>
+<p id="tst-osc-adc-digital-filters"><strong>UID:</strong> TST.OSC.ADC_DIGITAL_FILTERS</p>
+<p><strong>Description:</strong> Check the ADC digital Filter calibration.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-osc-setup-ch1"><span class="std std-ref">Adalm2000.Osc.CH1:</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Resources:</strong></dt><dd><ul class="simple">
+<li><p><cite>ADC Digital Filters documentation&lt;https://wiki.analog.com/university/tools/m2k/scopy/adcdigitalfilters&gt;`</cite></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the Signal Generator and set the following config on CH1:</dt><dd><ul class="simple">
+<li><p>Square wave, 2Vpp, 1kHz</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>In the Oscilloscope set the following:</dt><dd><ul class="simple">
+<li><p>Channel 1 Horizontal: Time Base: 200ms/div, Position: 0ms</p></li>
+<li><p>Channel 1 Vertical: Volts/Div: 500mV/div, Position: 0V</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>TBD</p></li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="network_analyzer_tests.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Network Analyzer - Test Suite</a>
+    <a href="pattern_generator_tests.html" title="Next document (Alt+Shift+RightArrow)" class="next">Pattern Generator - Test Suite</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

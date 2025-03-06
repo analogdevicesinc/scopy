@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>DAC Plugin - Test suite &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=3d3703ae" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=dcfbb431"></script>
+    <link rel="icon" href="../../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="SWIOT1L" href="../swiot1l/index.html" />
+    <link rel="prev" title="DAC" href="index.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">DAC Plugin - Test suite</a><ul>
+<li><a class="reference internal" href="#setup-environment">Setup environment:</a></li>
+<li><a class="reference internal" href="#test-1-compatibility-with-device">Test 1 - Compatibility with device</a></li>
+<li><a class="reference internal" href="#test-2-buffer-mode-file-loading">Test 2 - Buffer mode file loading</a></li>
+<li><a class="reference internal" href="#test-3-buffer-mode-channel-selection">Test 3 - Buffer mode channel selection</a></li>
+<li><a class="reference internal" href="#test-4-buffer-mode-file-size-validation">Test 4 - Buffer mode file size validation</a></li>
+<li><a class="reference internal" href="#test-5-cyclic-buffer-mode">Test 5 - Cyclic buffer mode</a></li>
+<li><a class="reference internal" href="#test-6-dds-modes">Test 6 -  DDS modes</a></li>
+<li><a class="reference internal" href="#test-7-dds-mode-sinewave-generation">Test 7 - DDS mode sinewave generation</a></li>
+<li><a class="reference internal" href="#test-8-dds-mode-attributes-refresh">Test 8 - DDS mode attributes refresh</a></li>
+<li><a class="reference internal" href="#test-9-plugin-tutorial">Test 9 - Plugin tutorial</a></li>
+<li><a class="reference internal" href="#test-10-channel-attributes">Test 10 - Channel attributes</a></li>
+<li><a class="reference internal" href="#test-11-repeat-data-option">Test 11 - Repeat data option</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../../index.html">
+      <img class="only-light" src="../../../_static/scopy.png"/>
+      <img class="only-dark" src="../../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../../../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3" checked=""/><div class="collapse"><a class="reference internal" href="index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../../general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="dac-plugin-test-suite">
+<span id="dac-tests"></span><h1>DAC Plugin - Test suite<a class="headerlink" href="#dac-plugin-test-suite" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>User guide: <a class="reference internal" href="../../../plugins/dac/dac.html#dac"><span class="std std-ref">DAC Plugin user Guide</span></a></p>
+</div>
+<p>The DAC plugin tests are a set of tests that are run to verify the DAC plugin in Scopy.</p>
+<p>The following apply for all the test cases in this suite.
+If the test case has special requirements, they will be listed in the test case section.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23.8%" />
+<col style="width: 14.3%" />
+<col style="width: 14.3%" />
+<col style="width: 23.8%" />
+<col style="width: 23.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Tester</p></th>
+<th class="head"><p>Test Date</p></th>
+<th class="head"><p>Scopy version</p></th>
+<th class="head"><p>Plugin version (N/A if not applicable)</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="setup-environment">
+<h2>Setup environment:<a class="headerlink" href="#setup-environment" title="Link to this heading"></a></h2>
+<dl class="simple" id="adalm-pluto-emu-setup">
+<dt><strong>AdalmPluto.Emu:</strong></dt><dd><ul class="simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Start the IIO-EMU process.</p></li>
+<li><p>Connect to the ADALM-Pluto device using the EMU dropdown.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple" id="adalm-pluto-device-setup">
+<dt><strong>AdalmPluto.Device:</strong></dt><dd><ul class="simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Connect the ADALM-Pluto device to the system.</p></li>
+<li><p>Connect to the ADALM-Pluto device in Scopy using USB/network backend.</p></li>
+</ul>
+</dd>
+<dt><strong>Depends on::</strong></dt><dd><ul class="simple">
+<li><p>Test TST.PREFS.RESET</p></li>
+</ul>
+</dd>
+<dt>Prerequisites:</dt><dd><ul class="simple">
+<li><p>Scopy v2.0.0 or later with DAC plugin installed on the system.</p></li>
+<li><p>Tests listed as dependencies are successfully completed.</p></li>
+<li><p>Reset .ini files to default using the Preferences “Reset” button.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="test-1-compatibility-with-device">
+<h2>Test 1 - Compatibility with device<a class="headerlink" href="#test-1-compatibility-with-device" title="Link to this heading"></a></h2>
+<p id="tst-dac-compat"><strong>UID:</strong> TST.DAC.COMPAT</p>
+<p><strong>Description:</strong> This test verifies that the DAC plugin is compatible with the selected device
+and that the plugin is able to correctly parse it.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-emu-setup"><span class="std std-ref">AdalmPluto.Emu</span></a></p></li>
+<li><p>OS: ALL (Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS)</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the DAC plugin.</p></li>
+<li><dl class="simple">
+<dt>Switch the “Mode” to “Buffer” and check the “Channels” list:</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The channels list contains the following: <strong>cf-ad9361-dds-core-lpc:voltage0</strong>
+and <strong>cf-ad9361-dds-core-lpc:voltage1</strong>.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Switch the “Mode” to “DDS” and check the TX section:</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The TX section contains one entry with “TX1”.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-buffer-mode-file-loading">
+<h2>Test 2 - Buffer mode file loading<a class="headerlink" href="#test-2-buffer-mode-file-loading" title="Link to this heading"></a></h2>
+<p id="tst-dac-buffer-load"><strong>UID:</strong> TST.DAC.BUFFER_LOAD</p>
+<p><strong>Description:</strong> This test verifies that the DAC plugin is able to load a file in buffer mode.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-emu-setup"><span class="std std-ref">AdalmPluto.Emu</span></a></p></li>
+<li><p>OS: ALL (Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS)</p></li>
+</ul>
+</dd>
+<dt><strong>Resources:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sine_complex_1_15360_sr_15360000_samps_40000_ampl_32767.csv">https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sine_complex_1_15360_sr_15360000_samps_40000_ampl_32767.csv</a></p></li>
+<li><p><a class="reference external" href="https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sine_complex_1_30720_sr_15360000_samps_20000_ampl_32767.csv">https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sine_complex_1_30720_sr_15360000_samps_20000_ampl_32767.csv</a></p></li>
+<li><p><a class="reference external" href="https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sinewave_0.9_2ch.csv">https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sinewave_0.9_2ch.csv</a></p></li>
+<li><p><a class="reference external" href="https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/tutorial_chapters.json">https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/tutorial_chapters.json</a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the DAC plugin.</p></li>
+<li><p>Switch the “Mode” to “Buffer”.</p></li>
+<li><p>Select the <em>sine_complex_1_15360_sr_15360000_samps_40000_ampl_32767.csv</em> file using the
+“Browse” button.</p></li>
+<li><dl class="simple">
+<dt>Press the “Load” button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The file should be loaded successfully.</p></li>
+<li><p>The “File Size” field is populated with ** 40 ksamples**.</p></li>
+<li><p>The Run button is enabled.</p></li>
+<li><p>A new section called “DATA CONFIGURATION” should appear.</p></li>
+<li><p>The bottom log section contains the following entry structure: <em>[timestamp]
+Successfully loaded: [file name]</em>.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>While running, load a file with a lower number of samples using the browser and the file listed in the resources above: <em>sinewave_0.9_2ch.csv</em>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The “File Size” field is populated with ** 8444 samples**.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>While running, load a file with a lower number of samples using the browser and the file listed in the resources above: <em>sine_complex_1_30720_sr_15360000_samps_20000_ampl_32767.csv</em>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The “File Size” field is populated with ** 20 ksamples**.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><p>Select the <em>tutorial_chapters.json</em> file from the resources provided above
+using the “Browse” button.</p></li>
+<li><dl class="simple">
+<dt>Press the “Load” button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The file should NOT be loaded.</p></li>
+<li><p>The Run button is disabled.</p></li>
+<li><p>The bottom log section contains the following entry structure: <em>[timestamp]
+Failed to load: [file name]</em>.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-buffer-mode-channel-selection">
+<h2>Test 3 - Buffer mode channel selection<a class="headerlink" href="#test-3-buffer-mode-channel-selection" title="Link to this heading"></a></h2>
+<p id="tst-dac-buffer-channel-select"><strong>UID:</strong> TST.DAC.BUFFER_CHANNEL_SELECT</p>
+<p><strong>Description:</strong> This test verifies that the DAC plugin is able to validate channel selection in buffer mode.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-setup"><span class="std std-ref">AdalmPluto.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Resources:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sine_complex_1_15360_sr_15360000_samps_40000_ampl_32767.csv">https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sine_complex_1_15360_sr_15360000_samps_40000_ampl_32767.csv</a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the DAC plugin.</p></li>
+<li><p>Switch the “Mode” to “Buffer”.</p></li>
+<li><p>Select the <em>sine_complex_1_15360_sr_15360000_samps_40000_ampl_32767.csv</em> file using the
+“Browse” button.</p></li>
+<li><p>Press the “Load” button.</p></li>
+<li><dl class="simple">
+<dt>Check the channels list for enabled channels:</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Both channels are enabled.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Press “Run”.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The “Run” button changes to “Stop”.</p></li>
+<li><p>The bottom log section contains the following entry structure:
+<em>[timestamp]  Pushed 40000 samples, 160000 bytes (1/1 buffers).</em></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>While the plugin is running, disable one of the channels.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plugin keeps running.</p></li>
+<li><p>The bottom log section contains the following entry structure:
+<em>[timestamp]  Pushed 40000 samples, 80000 bytes (1/1 buffers).</em></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>While the plugin is still running, disable the other channel.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plugin stops running and the button change back to “Run”.</p></li>
+<li><p>The bottom log section contains the following entry structure:
+<em>[timestamp]  Unable to create buffer, no channel enabled.</em></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-buffer-mode-file-size-validation">
+<h2>Test 4 - Buffer mode file size validation<a class="headerlink" href="#test-4-buffer-mode-file-size-validation" title="Link to this heading"></a></h2>
+<p id="tst-dac-buffer-file-size"><strong>UID:</strong> TST.DAC.BUFFER_FILE_SIZE</p>
+<p><strong>Description:</strong> This test verifies that the DAC plugin is able to validate the file
+size in buffer mode.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-setup"><span class="std std-ref">AdalmPluto.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Resources:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sine_complex_1_15360_sr_15360000_samps_40000_ampl_32767.csv">https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sine_complex_1_15360_sr_15360000_samps_40000_ampl_32767.csv</a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the DAC plugin.</p></li>
+<li><p>Switch the “Mode” to “Buffer”.</p></li>
+<li><p>Select the <em>sine_complex_1_15360_sr_15360000_samps_40000_ampl_32767.csv</em> file using the
+“Browse” button.</p></li>
+<li><p>Press the “Load” button.</p></li>
+<li><dl class="simple">
+<dt>Check the “File Size” field.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The “File Size” field is populated with <strong>40 ksamples</strong>.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Change the “File Size” field to a value higher than the actual file size (write 50 and press Enter).</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The field value remains 40 ksamples since that’s
+the maximum number of samples in the file.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Change the “File Size” field to a value lower than the actual file size (write 30 and press Enter).</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The field value changes to 30 ksamples.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Change the “File Size” using the “+” button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The field value changes to the 31.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><dl class="simple">
+<dt>Change the “File Size” using the “-” button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The field value changes to the 30.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-5-cyclic-buffer-mode">
+<h2>Test 5 - Cyclic buffer mode<a class="headerlink" href="#test-5-cyclic-buffer-mode" title="Link to this heading"></a></h2>
+<p id="tst-dac-buffer-cyclic"><strong>UID:</strong> TST.DAC.BUFFER_CYCLIC</p>
+<p><strong>Description:</strong> This test verifies the DAC plugin buffer generation in cyclic mode.</p>
+<dl class="simple">
+<dt><strong>Depends on::</strong></dt><dd><ul class="simple">
+<li><p>Test TST.ADC.*</p></li>
+<li><p>Test TST.Debugger.*</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-setup"><span class="std std-ref">AdalmPluto.Device</span></a></p></li>
+<li><p>ADALM-Pluto with loopback cable between RX and TX.</p></li>
+<li><p>OS: ALL (Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS)</p></li>
+</ul>
+</dd>
+<dt><strong>Resources:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sine_complex_1_15360_sr_15360000_samps_40000_ampl_32767.csv">https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sine_complex_1_15360_sr_15360000_samps_40000_ampl_32767.csv</a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the DAC plugin.</p></li>
+<li><p>Switch the “Mode” to “Buffer”.</p></li>
+<li><p>Select the <em>sine_complex_1_15360_sr_15360000_samps_40000_ampl_32767.csv</em> file using the
+“Browse” button.</p></li>
+<li><p>Press the “Load” button.</p></li>
+<li><p>Press “Run”.</p></li>
+<li><p>Open the Debugger plugin.</p></li>
+<li><p>In the <strong>ad9361-phy</strong> device, set the <strong>frequency</strong> attribute for the <strong>altvoltage1 TX_LO</strong>
+and <strong>altvoltage0 RX_LO</strong> channels to 2450000000.</p></li>
+<li><p>Open the ADC plugin.</p></li>
+<li><p>Change the Buffer Size to 4096.</p></li>
+<li><p>Press “Run”.</p></li>
+<li><dl class="simple">
+<dt>Check the ADC plugin for the generated signal.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A sinewave is seen on the ADC plot.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="12">
+<li><dl class="simple">
+<dt>Stop the DAC plugin while monitoring the ADC plot.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The sinewave no longer appears.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-6-dds-modes">
+<h2>Test 6 -  DDS modes<a class="headerlink" href="#test-6-dds-modes" title="Link to this heading"></a></h2>
+<p id="tst-dac-dds-modes"><strong>UID:</strong> TST.DAC.DDS_MODES</p>
+<p><strong>Description:</strong> This test verifies the DAC plugin DDS modes.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-emu-setup"><span class="std std-ref">AdalmPluto.Emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the DAC plugin.</p></li>
+<li><p>Switch the “Mode” to “DDS”.</p></li>
+<li><dl class="simple">
+<dt>Change the “DDS Mode” to <strong>One CW Tone</strong>.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>One configuration panel appears.</p></li>
+<li><dl class="simple">
+<dt>The configuration panel contains the following fields:</dt><dd><ul>
+<li><p><strong>frequency</strong>: 9.279985 MHz</p></li>
+<li><p><strong>scale</strong>: -Inf db</p></li>
+<li><p><strong>phase</strong>: 90</p></li>
+<li><p>the channel name: “Tone 1 - TX1_I_F1”</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Change the “DDS Mode” to <strong>Two CW Tones</strong>.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>Two configuration panels appear having the same fields as in the previous step.</p></li>
+<li><p>The second channel name: “Tone 2 - TX1_I_F2”</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Change the “DDS Mode” to <strong>Independent I/Q Control</strong>.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>Four configuration panels appear having the same fields as in the previous step.</p></li>
+<li><p>The third channel name: “Tone 1 - TX1_Q_F1”</p></li>
+<li><p>The fourth channel name: “Tone 2 - TX1_Q_F2”</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-7-dds-mode-sinewave-generation">
+<h2>Test 7 - DDS mode sinewave generation<a class="headerlink" href="#test-7-dds-mode-sinewave-generation" title="Link to this heading"></a></h2>
+<dl class="simple" id="tst-dac-dds-sinewave">
+<dt><strong>UID:</strong></dt><dd><p>TST.DAC.DDS_SINEWAVE</p>
+</dd>
+<dt><strong>Description:</strong></dt><dd><p>This test verifies the DAC plugin DDS mode sinewave generation.</p>
+</dd>
+<dt><strong>Depends on::</strong></dt><dd><ul class="simple">
+<li><p>Test TST.DEBUGGER.*</p></li>
+<li><p>Test TST.ADC.*</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-setup"><span class="std std-ref">AdalmPluto.Device</span></a></p></li>
+<li><p>ADALM-Pluto with loopback cable between RX and TX.</p></li>
+<li><p>OS: ALL (Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS)</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the DAC plugin.</p></li>
+<li><p>Switch the “Mode” to “DDS”.</p></li>
+<li><p>Change the “DDS Mode” to <strong>One CW Tone</strong>.</p></li>
+<li><p>Change the “frequency” to 1 MHz.</p></li>
+<li><p>Change the “scale” to 0 db.</p></li>
+<li><p>Open the Debugger plugin.</p></li>
+<li><p>In the <strong>ad9361-phy</strong> device, set the <strong>frequency</strong> attribute for the <strong>altvoltage1 TX_LO</strong> and
+<strong>altvoltage0 RX_LO</strong> channels to 2450000000.</p></li>
+<li><p>Open the ADC plugin.</p></li>
+<li><p>Enable all the Measurements.</p></li>
+<li><p>Press “Run”.</p></li>
+<li><dl class="simple">
+<dt>Check the plot for the generated sinewave.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>A sinewave should be seen on the ADC plot.</p></li>
+<li><p>The measurements show a frequency of 1 MHz.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="12">
+<li><dl class="simple">
+<dt>In the DAC plugin change the “DDS Mode” to <strong>Disabled</strong>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The sinewave no longer appears on the ADC plot.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-8-dds-mode-attributes-refresh">
+<h2>Test 8 - DDS mode attributes refresh<a class="headerlink" href="#test-8-dds-mode-attributes-refresh" title="Link to this heading"></a></h2>
+<p id="tst-dac-dds-attrs"><strong>UID:</strong> TST.DAC.DDS_ATTRS</p>
+<p><strong>Description:</strong> This test verifies the DAC plugin DDS mode attributes refresh.</p>
+<dl class="simple">
+<dt><strong>Depends on::</strong></dt><dd><ul class="simple">
+<li><p>Test TST.DEBUGGER.*</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-emu-setup"><span class="std std-ref">AdalmPluto.Emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the DAC plugin.</p></li>
+<li><p>Switch the “Mode” to “DDS”.</p></li>
+<li><p>Change the “DDS Mode” to <strong>One CW Tone</strong>.</p></li>
+<li><p>Change the “frequency” to 1 MHz.</p></li>
+<li><p>Open the Debugger plugin.</p></li>
+<li><p>In the <strong>cf-ad9361-dds-core-lpc</strong> device, set the <strong>frequency</strong> attribute
+for the <strong>altvoltage0 TX1_I_F1</strong> to 2000000.</p></li>
+<li><dl class="simple">
+<dt>Go to the DAC Plugin and click the refresh attributes button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The frequency field is updated to 2 MHz.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-9-plugin-tutorial">
+<h2>Test 9 - Plugin tutorial<a class="headerlink" href="#test-9-plugin-tutorial" title="Link to this heading"></a></h2>
+<p id="tst-dac-tutorial"><strong>UID:</strong> TST.DAC.TUTORIAL</p>
+<p><strong>Description:</strong> This test verifies the DAC plugin tutorial.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-emu-setup"><span class="std std-ref">AdalmPluto.Emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the DAC plugin.</p></li>
+<li><dl class="simple">
+<dt>Click the “Info” button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A pop-up window with 2 buttons (Tutorial and Documentation)
+should appear.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Click the “Documentation” button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The documentation page opens in the default browser.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Click the “Tutorial” button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The tutorial opens as a walkthrough in the plugin.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-10-channel-attributes">
+<h2>Test 10 - Channel attributes<a class="headerlink" href="#test-10-channel-attributes" title="Link to this heading"></a></h2>
+<p id="tst-dac-channel-attrs"><strong>UID:</strong> TST.DAC.CHANNEL_ATTRS</p>
+<p><strong>Description:</strong> This test verifies the DAC plugin channel attributes.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-emu-setup"><span class="std std-ref">AdalmPluto.Emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the DAC plugin.</p></li>
+<li><p>Switch the “Mode” to “Buffer”.</p></li>
+<li><dl class="simple">
+<dt>In the “Channels” panel click on the first channel “cf-ad9361-dds-core-lpc:voltage0”.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The channel attributes are displayed in the right side menu.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Change the <strong>sampling_frequency</strong> attribute to 38400000.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The attribute is updated successfully.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-11-repeat-data-option">
+<h2>Test 11 - Repeat data option<a class="headerlink" href="#test-11-repeat-data-option" title="Link to this heading"></a></h2>
+<p id="tst-dac-repeat-data"><strong>UID:</strong> TST.DAC.REPEAT_DATA</p>
+<p><strong>Description:</strong> This test verifies the DAC plugin repeat data option.
+The data sets loaded from the file should be repeated to fill in all the enabled
+channels.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-setup"><span class="std std-ref">AdalmPluto.Device</span></a></p></li>
+<li><p>Enable 2 TX channels on your Pluto device.</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Resources:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sinewave_0.9_2ch.csv">https://github.com/analogdevicesinc/scopy/blob/main/plugins/dac/res/csv/sinewave_0.9_2ch.csv</a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the DAC plugin.</p></li>
+<li><p>Switch the “Mode” to “Buffer”.</p></li>
+<li><p>Browse and select the <em>sinewave_0.9_2ch.csv</em> file.</p></li>
+<li><dl class="simple">
+<dt>Press the “Load” button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The first 2 channels are enabled.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><p>Enable the remaining 2 channels from the channel list.</p></li>
+<li><dl class="simple">
+<dt>Set the <strong>Repeat data</strong> option to true and press <strong>Run</strong>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The console log displays the following message: <em>Pushed 8444 samples, 67552 bytes (1/1 buffers).</em></p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Set the <strong>Repeat data</strong> option to false and press <strong>Run</strong>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The console log displays the following message: <em>Not enough data columns for all enabled channels.</em></p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Leave the <strong>Repeat data</strong> as is, disable the last 2 channels and press <strong>Run</strong>:</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The console log displays the following message: <em>Pushed 8444 samples, 33776 bytes (1/1 buffers).</em></p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">DAC</a>
+    <a href="../swiot1l/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">SWIOT1L</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

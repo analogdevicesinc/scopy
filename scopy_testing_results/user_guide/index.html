@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Scopy Overview &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=3d3703ae" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../_static/app.umd.js?v=dcfbb431"></script>
+    <link rel="icon" href="../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Windows Build Instructions" href="build_instructions/windowsBuild.html" />
+    <link rel="prev" title="Scopy" href="../index.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Scopy Overview</a><ul>
+<li><a class="reference internal" href="#about">About</a></li>
+<li><a class="reference internal" href="#download">Download</a></li>
+<li><a class="reference internal" href="#what-s-new">What’s new</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#launch">Launch</a></li>
+<li><a class="reference internal" href="#application-overview">Application Overview</a><ul>
+<li><a class="reference internal" href="#homepage-layout">Homepage layout</a><ul>
+<li><a class="reference internal" href="#device-browser">Device browser</a></li>
+<li><a class="reference internal" href="#add-device-page">Add(+) device page</a></li>
+<li><a class="reference internal" href="#instruments-menu">Instruments Menu</a></li>
+<li><a class="reference internal" href="#information-window">Information Window</a></li>
+<li><a class="reference internal" href="#save-load-session">Save &amp; Load session</a></li>
+<li><a class="reference internal" href="#preferences">Preferences</a></li>
+<li><a class="reference internal" href="#about-page">About page</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#connecting-to-a-device">Connecting to a device</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#user-guides">User Guides</a><ul>
+<li><a class="reference internal" href="#detaching-instruments">Detaching Instruments</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#instruments-overview">Instruments Overview</a></li>
+<li><a class="reference internal" href="#scripting">Scripting</a></li>
+<li><a class="reference internal" href="#building-from-source">Building from source</a></li>
+<li><a class="reference internal" href="#source-code">Source code</a></li>
+<li><a class="reference internal" href="#old-documentation">Old documentation</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../index.html">
+      <img class="only-light" src="../_static/scopy.png"/>
+      <img class="only-dark" src="../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1" checked=""/><div class="collapse"><a class="current reference internal" href="#">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4"/><div class="collapse"><a class="reference internal" href="../tests/index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tests/testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1"/><div class="collapse"><a class="reference internal" href="../tests/plugins/index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../tests/plugins/pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../tests/plugins/datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../tests/plugins/dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../tests/plugins/swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../tests/plugins/adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../tests/plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../tests/plugins/registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../tests/plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../tests/general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="scopy-overview">
+<span id="user-guide"></span><h1>Scopy Overview<a class="headerlink" href="#scopy-overview" title="Link to this heading"></a></h1>
+<section id="about">
+<h2>About<a class="headerlink" href="#about" title="Link to this heading"></a></h2>
+<p>Scopy is a multi-functional software toolset with strong capabilities for
+signal analysis.</p>
+</section>
+<section id="download">
+<h2>Download<a class="headerlink" href="#download" title="Link to this heading"></a></h2>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p><strong>Scopy for Windows</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Download: <a class="reference external" href="https://github.com/analogdevicesinc/scopy/releases/latest">Installer for latest release (Windows 64-bit)</a></p></li>
+</ul>
+</div></blockquote>
+<p><strong>Scopy for Linux</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Download: <a class="reference external" href="https://github.com/analogdevicesinc/scopy/releases/latest">Scopy Flatpak installer</a></p></li>
+<li><p>Download: <a class="reference external" href="https://github.com/analogdevicesinc/scopy/releases/latest">Scopy AppImage executable</a></p></li>
+</ul>
+</div></blockquote>
+<p><strong>Scopy for OSX</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Download:<a class="reference external" href="https://github.com/analogdevicesinc/scopy/releases/latest">OSX installer</a></p></li>
+</ul>
+</div></blockquote>
+<p><strong>Scopy for Android</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>APK soon available</p></li>
+</ul>
+</div></blockquote>
+<p><strong>ARM64</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Download: <a class="reference external" href="https://github.com/analogdevicesinc/scopy/releases/latest">Scopy AppImage executable for ARM64</a></p></li>
+</ul>
+</div></blockquote>
+<p><strong>ARM32</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Download: <a class="reference external" href="https://github.com/analogdevicesinc/scopy/releases/latest">Scopy AppImage executable for ARM32</a></p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>In order to have Scopy working with <a class="reference external" href="https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/ADALM2000.html">ADALM2000</a>
+or <a class="reference external" href="https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html">ADALM-Pluto</a>
+please make sure that the Device Drivers are  installed. A guide on this topic can be found in the section:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://wiki.analog.com/university/tools/pluto/drivers/windows?s[]=adalm&amp;s[]=pluto#windows_drivers">ADALM2000 and ADALM-Pluto drivers</a></p></li>
+</ul>
+</div></blockquote>
+</div>
+</section>
+<section id="what-s-new">
+<h2>What’s new<a class="headerlink" href="#what-s-new" title="Link to this heading"></a></h2>
+<p>Scopy 2.0 is a complete overhaul from the previous version of Scopy introducing a completely new infrastructure and interaction mechanism for any IIO device through generic instruments. While retaining the core functionality of Scopy v1 - support for ADALM2000 devices - this update significantly expands its capabilities.</p>
+<p>Features added in Scopy 2.0
+- Multiple device support - control multiple devices from the same Scopy instance
+- IIO device support - support for IIO devices through IIO instruments - ADC/DAC/Debugger/Register Map
+- ADI Harmonic design style - Light and Dark themes as well as a styling engine
+- Plugin system - support for devices other than the ADALM2000</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Preferences and saved Scopy configurations from version 1.x are no longer compatible with Scopy v2.0. For more information click <a class="reference internal" href="troubleshooting.html#inifiles"><span class="std std-ref">here</span></a></p>
+</div>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<blockquote>
+<div><p><strong>Scopy for Windows</strong></p>
+</div></blockquote>
+<p>Once you downloaded the installer, run it and follow all the required steps.
+After completion, system reboot is required.</p>
+<p>Video installation guide:</p>
+<div class="iframe-video"><iframe class="only-screen" src="https://www.youtube-nocookie.com/embed/894HkVXf7-U"></iframe><span class="only-screen"><p><strong>Scopy for Linux</strong></p>
+</span><div class="admonition video only-print"><p class="admonition-title">Video</p>
+<p><strong>Scopy for Linux</strong></p>
+<p><a href="https://www.youtube.com/watch?v=894HkVXf7-U"><span>https://www.youtube.com/watch?v=894HkVXf7-U</span></a></p>
+</div></div><p><strong>AppImage</strong>: Make the application executable by running <strong>chmod +x ./Scopy.AppImage</strong> in a command line,
+then run Scopy as any other Linux executable. These steps are applicable for ARM64 and ARM32 also.</p>
+<p><strong>Flatpak</strong>: Before downloading and extracting the scopy-Linux-flatpak.zip archive,
+you need to setup Flatpak <a class="reference external" href="https://flatpak.org/setup/">using this setup guide</a>
+for your Linux distribution.</p>
+<p>For Ubuntu, you can use the following steps:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">add</span><span class="o">-</span><span class="n">apt</span><span class="o">-</span><span class="n">repository</span> <span class="n">ppa</span><span class="p">:</span><span class="n">alexlarsson</span><span class="o">/</span><span class="n">flatpak</span>
+
+<span class="n">sudo</span> <span class="n">apt</span> <span class="n">update</span>
+
+<span class="n">sudo</span> <span class="n">apt</span> <span class="n">install</span> <span class="n">flatpak</span>
+
+<span class="n">flatpak</span> <span class="n">remote</span><span class="o">-</span><span class="n">add</span> <span class="o">--</span><span class="k">if</span><span class="o">-</span><span class="ow">not</span><span class="o">-</span><span class="n">exists</span> <span class="n">flathub</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">flathub</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">repo</span><span class="o">/</span><span class="n">flathub</span><span class="o">.</span><span class="n">flatpakrepo</span>
+</pre></div>
+</div>
+<p>After this, get the Scopy.flatpak file from the downloaded archive and run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">flatpak</span> <span class="n">install</span> <span class="n">scopy</span><span class="o">-</span><span class="n">Linux</span><span class="o">-</span><span class="n">flatpak</span><span class="o">.</span><span class="n">flatpak</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Video installation guide:</p>
+<div class="iframe-video"><iframe class="only-screen" src="https://www.youtube-nocookie.com/embed/9qgxmmTrcSE"></iframe><span class="only-screen"></span><div class="admonition video only-print"><p class="admonition-title">Video</p>
+<p><a href="https://www.youtube.com/watch?v=9qgxmmTrcSE"><span>https://www.youtube.com/watch?v=9qgxmmTrcSE</span></a></p>
+</div></div><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<blockquote>
+<div><p><strong>Scopy for OSX</strong></p>
+</div></blockquote>
+<p>Double click the downloaded .dmg to make its content available. “Scopy”
+will show up in the Finder sidebar and a window showing the content should open
+up.
+Drag the application from the .dmg window into Applications to install and wait
+for the process to finish.</p>
+<p>Video installation guide:</p>
+<div class="iframe-video"><iframe class="only-screen" src="https://www.youtube-nocookie.com/embed/To0ACQ77tkg"></iframe><span class="only-screen"><p><strong>Scopy for Android</strong> - APK coming soon</p>
+</span><div class="admonition video only-print"><p class="admonition-title">Video</p>
+<p><strong>Scopy for Android</strong> - APK coming soon</p>
+<p><a href="https://www.youtube.com/watch?v=To0ACQ77tkg"><span>https://www.youtube.com/watch?v=To0ACQ77tkg</span></a></p>
+</div></div><p>Tap on the downloaded .apk file to start the installation process and proceed
+by hitting the “Install” button. Optionally, you may be warned that this
+application comes from unknown sources, hit the “Install anyway” button.
+Now, you can find “Scopy” together with your other apps.</p>
+<p>In order to connect <a class="reference external" href="https://www.analog.com/ADALM2000">ADALM2000</a>  to your
+device, you will need an OTG adapter that will mediate the connection between
+your device and the USB cable, as shown in the image below.</p>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-android-setup-example.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-android-setup-example.png" />
+</section>
+<section id="launch">
+<h2>Launch<a class="headerlink" href="#launch" title="Link to this heading"></a></h2>
+<p>Run Scopy from the Desktop Shortcut / Start Menu / Installation Folder.</p>
+<p>On Linux, you can also run it using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chmod</span> <span class="o">+</span><span class="n">x</span> <span class="n">Scopy</span><span class="o">.</span><span class="n">AppImage</span>
+<span class="o">./</span><span class="n">Scopy</span><span class="o">.</span><span class="n">AppImage</span>
+</pre></div>
+</div>
+<p>OR</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">flatpak</span> <span class="n">run</span> <span class="n">org</span><span class="o">.</span><span class="n">adi</span><span class="o">.</span><span class="n">Scopy</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If the latter raises issues related to platform display plugins use the following modified command
+to solve it.</p>
+<p>flatpak run –env=QT_QPA_PLATFORM=xcb org.adi.Scopy</p>
+<p>QT_QPA_PLATFORM=xcb ./Scopy.AppImage</p>
+</div>
+</section>
+<section id="application-overview">
+<h2>Application Overview<a class="headerlink" href="#application-overview" title="Link to this heading"></a></h2>
+<section id="homepage-layout">
+<h3>Homepage layout<a class="headerlink" href="#homepage-layout" title="Link to this heading"></a></h3>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-start-page.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-start-page.png" />
+<p>The Home view is divided into multiple sections:</p>
+<section id="device-browser">
+<h4>Device browser<a class="headerlink" href="#device-browser" title="Link to this heading"></a></h4>
+<blockquote>
+<div><p>Contains a list of devices (USB/serial/network/emulated) that Scopy can connect to.</p>
+<p>USB devices are scanned automatically at startup when the top right “Scan”
+switch is ON.</p>
+</div></blockquote>
+</section>
+<section id="add-device-page">
+<h4>Add(+) device page<a class="headerlink" href="#add-device-page" title="Link to this heading"></a></h4>
+<blockquote>
+<div><p>Can be used to connect to devices that are not automatically detected in
+the above mentioned list.</p>
+</div></blockquote>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-iio.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-iio.png" />
+<blockquote>
+<div><p>The interface has two tabs for device configuration:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>IIO</strong>: adding and configuring IIO devices.</p></li>
+<li><p><strong>EMU</strong>: adding and configuring virtually emulated devices using
+the iio-emulator.</p></li>
+</ul>
+</div></blockquote>
+<p>The <strong>IIO</strong> tab includes settings for scanning, connecting, and configuring
+various connected devices.</p>
+<p><strong>SCAN Section</strong></p>
+<ul>
+<li><p><strong>Filter</strong>: Allows the user to choose which connection types to scan for.</p>
+<p>If none is selected, the application will scan for all types.</p>
+<p>A new scan is triggered every time one of the following
+options is selected.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Local</strong>: Scans local devices, usually on target.</p></li>
+<li><p><strong>IP</strong>: Scans network devices.</p></li>
+<li><p><strong>USB</strong>: Scans USB devices.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Context</strong>: List of currently scanned contexts.</p></li>
+<li><p><strong>Refresh</strong>: Button to re-scan and detect available devices.</p></li>
+</ul>
+<p><strong>SERIAL Section</strong></p>
+<ul class="simple">
+<li><p><strong>Port Name</strong>: Drop-down to select available serial devices.</p></li>
+<li><p><strong>Baud Rate</strong>: Allows setting the communication speed.</p></li>
+<li><p><strong>Port Config</strong>: Specifies the data format and parity.</p></li>
+<li><p><strong>Refresh</strong>: Refreshes the list of available serial devices.</p></li>
+</ul>
+<p><strong>URI</strong></p>
+<ul class="simple">
+<li><p><strong>URI Input</strong>: This is where the user specifies the connection URI.
+This field is automatically populated based on the selection from one
+of the previous sections but the user can manually input the URI of
+the required device.</p></li>
+<li><p><strong>Verify</strong>: Button to verify the connection based on the provided URI.
+This will display an error if no such context is available. On success
+a different page will be displayed allowing the user to configure
+compatible plugins.</p></li>
+</ul>
+<p>The <strong>EMU</strong> tab includes settings for selecting the emulation mode,
+XML configuration files, RX/TX devices, and URI for the emulated device.</p>
+</div></blockquote>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-emu.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-emu.png" />
+<blockquote>
+<div><dl class="simple">
+<dt><strong>DEMO OPTION</strong>:</dt><dd><ul class="simple">
+<li><p>Drop-down menu to select one of the predefined emulated devices.</p></li>
+<li><p>Options are: adalm2000, pluto, swiot, pqm and generic.
+When using the <strong>generic</strong> option, the user must provide a path
+of the XML for the emulated device. If an existing option is
+selected, the XML path will be automatically completed in the
+field.</p></li>
+</ul>
+</dd>
+<dt><strong>XML PATH</strong>:</dt><dd><ul class="simple">
+<li><p>Specifies the path to the XML configuration file required for the emulation.</p></li>
+</ul>
+</dd>
+<dt><strong>RX/TX DEVICES</strong>:</dt><dd><ul class="simple">
+<li><p>Specifies the RX (receive) and TX (transmit) device files for the emulation mode.
+These are .bin files containing samples to be used on RX/TX devices.</p></li>
+<li><p>For detailed examples check the <a class="reference external" href="https://github.com/analogdevicesinc/iio-emu/blob/main/GENERIC_EMULATOR.md">official iio-emu Github docs</a> .</p></li>
+</ul>
+</dd>
+<dt><strong>URI</strong>:</dt><dd><ul class="simple">
+<li><p>The URI is automatically set to <strong>ip:127.0.0.1</strong> or <strong>ip:localhost</strong>.</p></li>
+</ul>
+</dd>
+<dt><strong>Enable Demo Button</strong>:</dt><dd><ul class="simple">
+<li><p>Validates and activates the demo mode based on the selected configuration.</p></li>
+<li><p>Automatically displays the IIO tab and populates the URI field
+if the EMU validation is successful.</p></li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-plugin-config.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-plugin-config.png" />
+<blockquote>
+<div><p>The add device plugin configuration page will allow the user to
+select compatible plugins for the newly added device.</p>
+<p>By default, the plugins with the highest priority will be selected.
+Clicking the <strong>ADD DEVICE</strong> button will finalize the process and
+create a new device entry in the device browser.</p>
+</div></blockquote>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-done.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-add-page-done.png" />
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Scopy can be connected to multiple IIO devices simultaneously starting
+with v2.0. All the connected or available IIO devices will be available
+in the device browser.</p>
+</div>
+</section>
+<section id="instruments-menu">
+<h4>Instruments Menu<a class="headerlink" href="#instruments-menu" title="Link to this heading"></a></h4>
+<blockquote>
+<div><p>This left side area can contain multiple sections of instrument lists,
+one for each connected or selected device. It can also be empty if
+no device is connected or selected. If the device is selected but not
+connected, the instruments will be available only as previews, without
+responding to any interaction.</p>
+<p>A device section has a collapsible section displaying the name and URI of
+the device and will contain a list of available instruments for the selected
+device. The instruments for an IIO device are provided by one or multiple
+plugins based on compatibility. (Example: An IIO device containing only
+ADCs will not have the DAC plugin as an available instrument).
+For more details on the Scopy plugin system and existing plugins please
+check below the “Plugins” documentation section.</p>
+</div></blockquote>
+</section>
+<section id="information-window">
+<h4>Information Window<a class="headerlink" href="#information-window" title="Link to this heading"></a></h4>
+<blockquote>
+<div><p>This area contains the welcome page, add device page and for each device
+a device page.</p>
+<p>The device page will contain context attributes extracted from the
+IIO context, as well as specific buttons or controls that can be provided
+by any compatible plugin (Example: The ADALM2000 has a “Calibrate” button
+which is only specific to this type of device).</p>
+</div></blockquote>
+</section>
+<section id="save-load-session">
+<h4>Save &amp; Load session<a class="headerlink" href="#save-load-session" title="Link to this heading"></a></h4>
+<blockquote>
+<div><p>Scopy can save or load different configurations in an .ini file format.</p>
+</div></blockquote>
+</section>
+<section id="preferences">
+<h4>Preferences<a class="headerlink" href="#preferences" title="Link to this heading"></a></h4>
+<p>Scopy allows multiple application specific user preference configurations
+described <a class="reference internal" href="preferences.html#preferences"><span class="std std-ref">in the Scopy general preferences page</span></a></p>
+</section>
+<section id="about-page">
+<h4>About page<a class="headerlink" href="#about-page" title="Link to this heading"></a></h4>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-about-page.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-about-page.png" />
+<blockquote>
+<div><p>Scopy About page can be accessed using the bottom left side <strong>about
+button</strong>. On the right side of the page, about pages specific for each
+plugin are available if necessary. More details can be found in their
+specific plugin documentation section.</p>
+<p>The General About page contains different useful links:</p>
+<p><strong>Build info</strong> will display the application version, Git commit,
+build date and whether it was created locally or in a continuous
+integration environment, a list of dependencies and their specific
+versions or Git commit hashes, a list of the last 100 commits and
+the Scopy branch.</p>
+</div></blockquote>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>These are all important in the debugging process and most of this
+information should be specified when reporting an issue.</p>
+</div>
+<blockquote>
+<div><p><strong>License</strong> link to the open-source LICENSE file in the Github
+repository.</p>
+<p><strong>Open-source dependencies list</strong> of Scopy includes a number
+of open source libraries, released under their own licenses.</p>
+</div></blockquote>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-deps-licenses.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/scopy-deps-licenses.png" />
+<blockquote>
+<div><p><strong>Latest release</strong> for quick access to the latest Github release page.</p>
+<p><strong>Documentation</strong> for quick access to this documentation.</p>
+<p><strong>Support forum</strong> for quick access to Engineer Zone.</p>
+</div></blockquote>
+</section>
+</section>
+<section id="connecting-to-a-device">
+<h3>Connecting to a device<a class="headerlink" href="#connecting-to-a-device" title="Link to this heading"></a></h3>
+<p>To connect to any device on the Device Browser click on the device and
+then click the <strong>Connect</strong> button in the <strong>Information Window.</strong></p>
+<p>If the connection was established, the device will have a green status line
+under it and you will be able to disconnect from it in the same <strong>Information
+Window.</strong></p>
+<ul class="simple">
+<li><p>Clicking the <img src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/dev/gui/res/icons/orange_close.svg" alt="Inline image" style="display:inline; vertical-align:middle;"> button will remove the device from the list.</p></li>
+<li><p>The device title can be modified by hovering over the top right
+corner of the icon and clicking the <img src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/dev/gui/res/icons/edit_pen.svg" alt="Inline image" style="display:inline; scale:80%; vertical-align:middle;"> pen icon.</p></li>
+<li><p>If errors are encountered during the connection phase
+a warning sign <img src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/dev/gui/res/icons/warning.svg" alt="Inline image" style="display:inline; width:30px; vertical-align:middle;"> will appear on the top right side of the
+device icon.</p></li>
+</ul>
+</section>
+</section>
+<section id="user-guides">
+<h2>User Guides<a class="headerlink" href="#user-guides" title="Link to this heading"></a></h2>
+<p>Scopy can now interact with multiple hardware devices at a time. Once a device is
+selected to be used with the application, a list of instruments that are
+available for that device will be visible as a preview. Once connected to a device
+the instruments will be enabled and available.</p>
+<p>Each instrument can be opened from the left menu. The icon on the right of
+the instrument name specifies that the instrument is enabled and provides
+a shortcut that allows an instrument to be turned on or off.</p>
+<p>For each connected device, there is an entry in the left side menu, above
+all the instruments, displaying the <strong>Name</strong> and <strong>URI</strong> of the
+connected device.</p>
+<p>The instruments menu can be minimized by clicking on the <strong>Scopy</strong> button near
+the top-left window.</p>
+<section id="detaching-instruments">
+<h3>Detaching Instruments<a class="headerlink" href="#detaching-instruments" title="Link to this heading"></a></h3>
+<p>Scopy provides the detaching into multiple windows feature for each instrument
+available, providing a better view/manipulation.</p>
+<p>This can be done by double clicking the instrument to detach it.</p>
+<p>Please make sure that the <strong>Double click to detach</strong> a tool
+option is enabled in the <strong>Preferences</strong> menu.</p>
+</section>
+</section>
+<section id="instruments-overview">
+<h2>Instruments Overview<a class="headerlink" href="#instruments-overview" title="Link to this heading"></a></h2>
+<p>Scopy provides a list of plugins and instruments
+described <a class="reference internal" href="../plugins/index.html#plugins"><span class="std std-ref">in the Plugins page</span></a></p>
+</section>
+<section id="scripting">
+<h2>Scripting<a class="headerlink" href="#scripting" title="Link to this heading"></a></h2>
+<p>User guide on how to use scripts with Scopy:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://wiki.analog.com/university/tools/m2k/scopy/scripting-guide">Scopy Scripting Guide</a></p></li>
+</ul>
+</section>
+<section id="building-from-source">
+<h2>Building from source<a class="headerlink" href="#building-from-source" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</div>
+</section>
+<section id="source-code">
+<h2>Source code<a class="headerlink" href="#source-code" title="Link to this heading"></a></h2>
+<p>The source code for the entire application can be found on <a class="reference external" href="https://github.com/analogdevicesinc/scopy">github</a></p>
+</section>
+<section id="old-documentation">
+<h2>Old documentation<a class="headerlink" href="#old-documentation" title="Link to this heading"></a></h2>
+<p><a class="reference external" href="https://wiki.analog.com/university/tools/m2k/scopy">Our wiki</a></p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="../index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Scopy</a>
+    <a href="build_instructions/windowsBuild.html" title="Next document (Alt+Shift+RightArrow)" class="next">Windows Build Instructions</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

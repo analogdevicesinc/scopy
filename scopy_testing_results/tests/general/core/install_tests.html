@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Installers &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=3d3703ae" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=dcfbb431"></script>
+    <link rel="icon" href="../../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Add device" href="add_dev_tests.html" />
+    <link rel="prev" title="License and About Page" href="license_about_page_tests.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Installers</a><ul>
+<li><a class="reference internal" href="#test-1-check-scopy-appimage-x86-64">Test 1: Check Scopy AppImage x86_64</a></li>
+<li><a class="reference internal" href="#test-2-check-scopy-appimage-arm32">Test 2: Check Scopy AppImage arm32</a></li>
+<li><a class="reference internal" href="#test-3-check-if-scopy-appimage-arm64-opens-correctly">Test 3: Check if Scopy AppImage arm64 opens correctly</a></li>
+<li><a class="reference internal" href="#test-4-check-scopy-macos">Test 4: Check Scopy macOS</a></li>
+<li><a class="reference internal" href="#test-5-check-scopy-windows-installer">Test 5: Check Scopy Windows installer</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../../index.html">
+      <img class="only-light" src="../../../_static/scopy.png"/>
+      <img class="only-dark" src="../../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../../../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1"/><div class="collapse"><a class="reference internal" href="../../plugins/index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../../plugins/datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../../plugins/dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../../plugins/swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../../plugins/adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../../plugins/registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="installers">
+<span id="install-tests"></span><h1>Installers<a class="headerlink" href="#installers" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23.8%" />
+<col style="width: 14.3%" />
+<col style="width: 14.3%" />
+<col style="width: 23.8%" />
+<col style="width: 23.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Tester</p></th>
+<th class="head"><p>Test Date</p></th>
+<th class="head"><p>Scopy version</p></th>
+<th class="head"><p>Plugin version (N/A if not applicable)</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="test-1-check-scopy-appimage-x86-64">
+<h2>Test 1: Check Scopy AppImage x86_64<a class="headerlink" href="#test-1-check-scopy-appimage-x86-64" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.START.APPIMAGE.X86_64</p>
+<p><strong>Description:</strong> This test verifies if the Scopy AppImage starts correctly on an
+Linux Operating System with x86_64 architecture.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>OS: Linux intel x86_64</p></li>
+<li><p>libfuse2 is required in order to execute an AppImage, install it using
+<strong>sudo apt-get install</strong></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Download Scopy Linux AppImage x86_64 from the <a class="reference external" href="https://github.com/analogdevicesinc/scopy/releases">release page</a>.</p></li>
+<li><dl class="simple">
+<dt>Unzip the archive.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> a file named <strong>Scopy-x86_64.AppImage</strong> should be extracted.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic" start="3">
+<li><p>Grant execution permission to the file using the terminal.</p>
+<blockquote>
+<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>chmod<span class="w"> </span>+x<span class="w"> </span>Scopy-x86_64.AppImage
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>To start the application execute the .AppImage file.</p>
+<blockquote>
+<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>./Scopy-x86_64.AppImage
+</pre></div>
+</div>
+<p>Or double-click from the GUI.</p>
+<ul class="simple">
+<li><p><strong>Expected result:</strong> A window containing the GUI of the application
+should open and if opened from the terminal, the logs generated by the
+application should be displayed inside the terminal. Inside the application,
+a window containing the license agreement should appear with 2 buttons
+“Exit” and “Continue”.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Press “Exit”.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Scopy should gracefully close.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><p>Start again the application, just like in step 4.</p></li>
+<li><dl class="simple">
+<dt>Press “Continue”.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The window containing the license agreement
+should close and Scopy should be still running.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-check-scopy-appimage-arm32">
+<h2>Test 2: Check Scopy AppImage arm32<a class="headerlink" href="#test-2-check-scopy-appimage-arm32" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.START.APPIMAGE.X86_64</p>
+<p><strong>Description:</strong> This test verifies if the Scopy AppImage starts correctly on an
+Linux Operating System with arm32 architecture.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>OS: Linux intel arm32</p></li>
+<li><p>libfuse2 is required in order to execute an AppImage, install it using
+<strong>sudo apt-get install</strong></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Download Scopy Linux AppImage arm32 from the <a class="reference external" href="https://github.com/analogdevicesinc/scopy/releases">release page</a>.</p></li>
+<li><dl class="simple">
+<dt>Unzip the archive.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> a file named <strong>Scopy-armhf.AppImage</strong> should be extracted.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic" start="3">
+<li><p>Grant execution permission to the file using the terminal.</p>
+<blockquote>
+<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>chmod<span class="w"> </span>+x<span class="w"> </span>Scopy-armhf.AppImage
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>To start the application execute the .AppImage file.</p>
+<blockquote>
+<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>./Scopy-armhf.AppImage
+</pre></div>
+</div>
+<p>Or double-click from the GUI.</p>
+<ul class="simple">
+<li><p><strong>Expected result:</strong> A window containing the GUI of the application
+should open and if opened from the terminal, the logs generated by the
+application should be displayed inside the terminal. Inside the application,
+a window containing the license agreement should appear with 2 buttons
+“Exit” and “Continue”.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Press “Exit”.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Scopy should gracefully close.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><p>Start again the application, just like in step 4.</p></li>
+<li><dl class="simple">
+<dt>Press “Continue”.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The window containing the license agreement
+should close and Scopy should be still running.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-check-if-scopy-appimage-arm64-opens-correctly">
+<h2>Test 3: Check if Scopy AppImage arm64 opens correctly<a class="headerlink" href="#test-3-check-if-scopy-appimage-arm64-opens-correctly" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.START.APPIMAGE.X86_64</p>
+<p><strong>Description:</strong> This test verifies if the Scopy AppImage starts correctly on an
+Linux Operating System with arm64 architecture.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>OS: Linux intel arm64</p></li>
+<li><p>libfuse2 is required in order to execute an AppImage, install it using
+<strong>sudo apt-get install</strong></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Download Scopy Linux AppImage arm64 from the <a class="reference external" href="https://github.com/analogdevicesinc/scopy/releases">release page</a>.</p></li>
+<li><dl class="simple">
+<dt>Unzip the archive.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> a file named <strong>Scopy-arm64.AppImage</strong> should be extracted.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic" start="3">
+<li><p>Grant execution permission to the file using the terminal.</p>
+<blockquote>
+<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>chmod<span class="w"> </span>+x<span class="w"> </span>Scopy-arm64.AppImage
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>To start the application execute the .AppImage file.</p>
+<blockquote>
+<div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>./Scopy-arm64.AppImage
+</pre></div>
+</div>
+<p>Or double-click from the GUI.</p>
+<ul class="simple">
+<li><p><strong>Expected result:</strong> A window containing the GUI of the application
+should open and if opened from the terminal, the logs generated by the
+application should be displayed inside the terminal. Inside the application,
+a window containing the license agreement should appear with 2 buttons
+“Exit” and “Continue”.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Press “Exit”.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Scopy should gracefully close.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><p>Start again the application, just like in step 4.</p></li>
+<li><dl class="simple">
+<dt>Press “Continue”.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The window containing the license agreement
+should close and Scopy should be still running.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-check-scopy-macos">
+<h2>Test 4: Check Scopy macOS<a class="headerlink" href="#test-4-check-scopy-macos" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.START.MACOS</p>
+<dl class="simple">
+<dt><strong>Precondition:</strong></dt><dd><ul class="simple">
+<li><p>OS: macOS intel</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Description:</strong> This test checks whether the Scopy macOS installer successfully
+installs the application and ensures it launches correctly on a macOS operating
+system with an x86_64 architecture.</p>
+<dl class="simple">
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Download Scopy macOS installer from the release page.</p></li>
+<li><dl class="simple">
+<dt>Unzip the archive.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A DMG file named <strong>Scopy-macos</strong> should be extracted.
+(the file name will also contain the macOS version and the commit hash)</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Double-click the file.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A pop-up that contains the Scopy icon will appear</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Install the application by right clicking the file and click on <strong>Open</strong>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A error pop-up will appear.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Click on <strong>Cancel</strong> and after that repeat the step 4, right click on the file, and click on <strong>Open</strong>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A warning pop-up will appear. Different than
+the first one by including an Open button.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Click on <strong>Open</strong></dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> After a while, a window with the GUI of the application
+should open. Inside the application, a window containing the license
+agreement should appear with 2 buttons “Exit” and “Continue”.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Press “Exit”.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Scopy should gracefully close.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><p>Start again the application by right-clicking and click on <strong>Open</strong>.</p></li>
+<li><dl class="simple">
+<dt>Press “Continue”.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The window containing the license agreement
+should close and Scopy should be still running.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-5-check-scopy-windows-installer">
+<h2>Test 5: Check Scopy Windows installer<a class="headerlink" href="#test-5-check-scopy-windows-installer" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.START.WINDOWS</p>
+<dl class="simple">
+<dt><strong>Precondition:</strong></dt><dd><ul class="simple">
+<li><p>OS: Windows</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Description:</strong> This test checks whether the Scopy Windows installer successfully
+installs the application and ensures it launches correctly on a Windows operating
+system with an x86_64 architecture.</p>
+<dl class="simple">
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Download Scopy Windows installer from the release page.</p></li>
+<li><dl class="simple">
+<dt>Double-click the installer.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A window containing the installation wizard
+should open. It should contain a drop-down menu from which can be
+selected the language during the installation.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Click on <strong>OK</strong></dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The installer continues with the <cite>License Agreement</cite> tab.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Click on <strong>I accept the agreement</strong> and on <strong>Next</strong>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The installer continues with the location where
+the application will be installed.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Select a location and click on <strong>Next</strong>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The installer continues with the list of components
+that will be installed.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Click on <strong>Next</strong>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The installer continues with the <cite>Additional Tasks</cite> tab.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Check the <cite>“Install drivers for ADALM2000 - Requires Administrative Rights”</cite> box and click on <strong>Next</strong>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The installer continues with the installation summary.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Click on <strong>Install</strong>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The application should start installing. At the end of
+the installation, it should ask for Administrative Rights in order to install
+ADALM2000 drivers.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><dl class="simple">
+<dt>Inside the newly opened window. Follow the ADALM2000 drivers installation by clicking <strong>Next</strong> and <strong>Finish</strong>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Both the application and the ADALM2000 drivers
+installed successfully. And optionally, you can check to restart the
+computer or not.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><p>Click on <strong>Finish</strong>.</p></li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="license_about_page_tests.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">License and About Page</a>
+    <a href="add_dev_tests.html" title="Next document (Alt+Shift+RightArrow)" class="next">Add device</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Linux Build Instructions &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=3d3703ae" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../../_static/app.umd.js?v=dcfbb431"></script>
+    <link rel="icon" href="../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="MacOS Build Instructions" href="macosBuild.html" />
+    <link rel="prev" title="Windows Build Instructions" href="windowsBuild.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Linux Build Instructions</a><ul>
+<li><a class="reference internal" href="#qt-setup-instructions">Qt Setup Instructions</a></li>
+<li><a class="reference internal" href="#building-scopy">Building Scopy</a></li>
+<li><a class="reference internal" href="#qt-creator-project-configuration">Qt Creator project configuration</a></li>
+<li><a class="reference internal" href="#creating-an-installer-for-x86-64-architecture">Creating an Installer for x86_64 architecture</a><ul>
+<li><a class="reference internal" href="#appimage">AppImage</a></li>
+<li><a class="reference internal" href="#flatpak">Flatpak</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-an-installer-for-other-architectures">Creating an Installer for other architectures</a><ul>
+<li><a class="reference internal" href="#installer-for-armhf">Installer for armhf</a></li>
+<li><a class="reference internal" href="#installer-for-arm64">Installer for arm64</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../index.html">
+      <img class="only-light" src="../../_static/scopy.png"/>
+      <img class="only-dark" src="../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4"/><div class="collapse"><a class="reference internal" href="../../tests/index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tests/testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../../tests/general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="linux-build-instructions">
+<span id="id1"></span><h1>Linux Build Instructions<a class="headerlink" href="#linux-build-instructions" title="Link to this heading"></a></h1>
+<section id="qt-setup-instructions">
+<h2>Qt Setup Instructions<a class="headerlink" href="#qt-setup-instructions" title="Link to this heading"></a></h2>
+<p>Before building Scopy on a Linux system, ensure all necessary requirements are installed.
+One key prerequisite is installing the Qt Framework (LTS version 5.15), which can be done using either the online or offline installer available on the official <a class="reference external" href="https://www.qt.io/download-dev">Qt Downloads page</a>.</p>
+<p>If you want to continue the development of the Scopy application, we recommend using the Qt Creator.
+This can be installed with the official installer from <a class="reference external" href="https://www.qt.io/download-dev">Qt Downloads page</a>, just make sure to also select the Qt Creator, alongside the Qt libraries, in the Qt Maintenance tool.</p>
+<p>Another way to install the Qt Framework is to use the unofficial Qt CLI Installer <a class="reference external" href="https://github.com/miurahr/aqtinstall">aqtinstall</a>.
+Note that this method is not recommended if you want to continue developing the Scopy application or any other application that uses the Qt Framework. For a more secure method use the official installer.</p>
+<p>To use aqtinstall, first clone the Scopy repository. With Python3 installed, execute the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>scopy/ci/ubuntu/ubuntu_build_process.sh<span class="w"> </span>install_qt
+</pre></div>
+</div>
+</section>
+<section id="building-scopy">
+<h2>Building Scopy<a class="headerlink" href="#building-scopy" title="Link to this heading"></a></h2>
+<p>After the Qt installation is complete you can start following the next steps:</p>
+<ol class="arabic">
+<li><p>If not done yet, clone the Scopy repository:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>~
+$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/analogdevicesinc/scopy.git
+</pre></div>
+</div>
+</li>
+<li><p>Set up dependencies.</p>
+<ul class="simple">
+<li><p>Run the following script with its respective arguments:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>scopy/ci/ubuntu/ubuntu_build_process.sh<span class="w"> </span>install_packages<span class="w"> </span>build_deps
+</pre></div>
+</div>
+<p>This will install all packages needed to build the Scopy application. Note that this process may take a long time since Scopy requires many libraries to function properly.</p>
+<p>This script will require administrative rights to copy the libs and headers to known paths: <cite>/usr/local/lib</cite> and <cite>/usr/local/include</cite>.
+If you don’t want that to happen, you can edit in the script the line that contains <cite>USE_STAGING=OFF</cite> to <cite>USE_STAGING=ON</cite>.
+But this will make the build process even more difficult and will not be covered in this tutorial.</p>
+</li>
+<li><p>Build the application.</p>
+<ul class="simple">
+<li><p>From the root of the repository, create a build folder:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>~/scopy
+$<span class="w"> </span>mkdir<span class="w"> </span>build
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>build
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>From inside the build folder, execute CMake and point to the root of the repository:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>cmake<span class="w"> </span>-DCMAKE_PREFIX_PATH<span class="o">=</span>/opt/Qt/5.15.2/gcc_64<span class="w"> </span>../
+</pre></div>
+</div>
+<p>Depending on where you installed Qt, you may need to tell cmake where it was installed.
+If everything goes well, it should say <cite>“Configuring done”</cite> and <cite>“Generating done”</cite>.</p>
+<ul class="simple">
+<li><p>After CMake completes, execute:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>make
+</pre></div>
+</div>
+<p>This will compile the entire project. The process may take 15 minutes or more, depending on your CPU.
+To speed up the process, you can run make with <code class="docutils literal notranslate"><span class="pre">-j</span></code> argument followed by the number of threads that you want to use to build the app: <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">-j14</span></code></p>
+<p>At the end of the build, an executable will be available, named simply: <cite>scopy</cite>.</p>
+<p>This can be run from the terminal and it should start the Scopy GUI.</p>
+</li>
+</ol>
+</section>
+<section id="qt-creator-project-configuration">
+<h2>Qt Creator project configuration<a class="headerlink" href="#qt-creator-project-configuration" title="Link to this heading"></a></h2>
+<p>In order to streamline the development of the Scopy application, we recommend using the <a class="reference external" href="https://www.qt.io/product/development-tools">Qt Creator IDE</a>.</p>
+<p>To start using Qt Creator for development, you have to first install all dependencies needed to build Scopy. To make sure you have this done right, follow the <a class="reference internal" href="#building-scopy">Building Scopy</a> tutorial from above.</p>
+<p>After that, open Qt Creator and click <strong>Open Project</strong>. Navigate to the location where you cloned Scopy and select the <strong>CMakeLists.txt</strong> file. Last step is to click <strong>configure</strong>, and Qt Creator should be able to build the application at the press of a button.
+If there are errors at the building phase, try to first make a build manually from the terminal using the steps in <a class="reference internal" href="#building-scopy">Building Scopy</a>, and inside the Qt Creator, select the build folder and click <strong>Configure</strong>.</p>
+<p>After completing these steps, Qt Creator will be ready to build the Scopy application.</p>
+</section>
+<section id="creating-an-installer-for-x86-64-architecture">
+<h2>Creating an Installer for x86_64 architecture<a class="headerlink" href="#creating-an-installer-for-x86-64-architecture" title="Link to this heading"></a></h2>
+<p>If you want to create a Scopy installer for the Linux x86_64 architecture, you have two options: <cite>AppImage</cite> or <cite>Flatpak</cite>.</p>
+<section id="appimage">
+<h3>AppImage<a class="headerlink" href="#appimage" title="Link to this heading"></a></h3>
+<p>An <a class="reference external" href="https://docs.appimage.org/index.html">AppImage</a> is a self-contained file that includes all the necessary components for an application to run.
+Once made executable and launched, the AppImage directly opens the application.</p>
+<ul class="simple">
+<li><p>To create a Scopy AppImage you will need the Scopy build dependencies to be already build and installed. If they are not installed, run the commad</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>scopy/ci/ubuntu/ubuntu_build_process.sh<span class="w"> </span>install_packages<span class="w"> </span>build_deps
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>After this step is completed, Scopy AppImage can be generated using the command:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>scopy/ci/x86_64/x86-64_appimage_process.sh<span class="w"> </span>install_packages<span class="w"> </span>run_workflow
+</pre></div>
+</div>
+<p>This will download the packaging tools and use them to create an Scopy-x86_64.AppImage that can be easily distributed.</p>
+</section>
+<section id="flatpak">
+<h3>Flatpak<a class="headerlink" href="#flatpak" title="Link to this heading"></a></h3>
+<p>A <a class="reference external" href="https://docs.flatpak.org/en/latest">Flatpak</a>
+- To use a Flatpak application, you first want to install the flatpak cli using the <a class="reference external" href="https://flatpak.org/setup">instructions</a>.</p>
+<ul class="simple">
+<li><p>After that to use Flatpak for building an installer you will need to install the following packages and runtimes.</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>build-essential<span class="w"> </span>subversion<span class="w"> </span>mm-common<span class="w"> </span>jq<span class="w"> </span>flatpak-builder
+$<span class="w"> </span>sudo<span class="w"> </span>flatpak<span class="w"> </span>remote-add<span class="w"> </span>--if-not-exists<span class="w"> </span>flathub<span class="w"> </span>https://dl.flathub.org/repo/flathub.flatpakrepo
+$<span class="w"> </span>sudo<span class="w"> </span>flatpak<span class="w"> </span>install<span class="w"> </span>flathub<span class="w"> </span>org.kde.Platform//5.15-23.08<span class="w"> </span>-y
+$<span class="w"> </span>sudo<span class="w"> </span>flatpak<span class="w"> </span>install<span class="w"> </span>flathub<span class="w"> </span>org.kde.Sdk//5.15-23.08<span class="w"> </span>-y
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>After the installation is complete just run the script:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>scopy/ci/flatpak/flatpak_build_process.sh
+</pre></div>
+</div>
+<p>This process will take some time because the flatpak build system will compile all dependencies needed for Scopy before packaging the application.</p>
+</section>
+</section>
+<section id="creating-an-installer-for-other-architectures">
+<h2>Creating an Installer for other architectures<a class="headerlink" href="#creating-an-installer-for-other-architectures" title="Link to this heading"></a></h2>
+<p>The Scopy application provides support for Linux on different architectures: <cite>x86_64</cite>, <cite>armhf</cite> and <cite>arm64</cite>.
+The tutorial for building an installer for <cite>x86_64</cite> was presented above.</p>
+<p>The Scopy installer for other architectures can be done locally on the host operating system, but it is out of the scope of this tutorial.
+A shortcut that can be taken here is to download the Docker Image that is already configured to build and package the Scopy application.
+All Docker Images are hosted on <a class="reference external" href="https://hub.docker.com/u/cristianbindea">Dockerhub</a>, and can be freely downloaded. The recipe for each image can be found inside the <a class="reference external" href="https://github.com/analogdevicesinc/scopy/tree/main/ci">Scopy</a> repository.</p>
+<p>Next, a temporary Docker volume is created to link the local environment with the Docker container.
+The compilation process takes place inside the container using the pre-configured filesystem.
+This Docker volume will include the previously cloned Scopy repository.</p>
+<section id="installer-for-armhf">
+<h3>Installer for armhf<a class="headerlink" href="#installer-for-armhf" title="Link to this heading"></a></h3>
+<ol class="arabic">
+<li><p>The first step is to clone the Scopy repository, if not cloned yet</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>~
+$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/analogdevicesinc/scopy.git
+</pre></div>
+</div>
+</li>
+<li><p>Download the Docker image</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>pull<span class="w"> </span>cristianbindea/scopy2-armhf-appimage:latest
+</pre></div>
+</div>
+</li>
+<li><p>Run the image, while creating a docker volume</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--mount<span class="w"> </span><span class="nv">type</span><span class="o">=</span>bind,source<span class="o">=</span>~/scopy,target<span class="o">=</span>/home/runner/scopy<span class="w"> </span>cristianbindea/scopy2-armhf-appimage:latest
+</pre></div>
+</div>
+<p>Now this repository folder is shared with the Docker container.</p>
+</li>
+<li><p>To compile and package the application use</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>scopy/ci/arm/arm_build_process.sh<span class="w"> </span>arm32<span class="w"> </span>run_workflow
+</pre></div>
+</div>
+</li>
+</ol>
+<p>Finally, after the development is done use this to clean the system:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>container<span class="w"> </span>ls<span class="w"> </span>-a<span class="w"> </span><span class="c1"># get the container id</span>
+$<span class="w"> </span>docker<span class="w"> </span>container<span class="w"> </span>rm<span class="w"> </span>-v<span class="w"> </span><span class="o">(</span>container<span class="w"> </span>id<span class="o">)</span>
+$<span class="w"> </span>docker<span class="w"> </span>image<span class="w"> </span>rm<span class="w"> </span>cristianbindea/scopy2-arm32-appimage:latest
+</pre></div>
+</div>
+</section>
+<section id="installer-for-arm64">
+<h3>Installer for arm64<a class="headerlink" href="#installer-for-arm64" title="Link to this heading"></a></h3>
+<ol class="arabic">
+<li><p>The first step is to clone the Scopy repository, if not cloned yet</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>~
+$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/analogdevicesinc/scopy.git
+</pre></div>
+</div>
+</li>
+<li><p>Download the Docker image</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>pull<span class="w"> </span>cristianbindea/scopy2-arm64-appimage:latest
+</pre></div>
+</div>
+</li>
+<li><p>Run the image, while creating a docker volume</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--mount<span class="w"> </span><span class="nv">type</span><span class="o">=</span>bind,source<span class="o">=</span>~/scopy,target<span class="o">=</span>/home/runner/scopy<span class="w"> </span>cristianbindea/scopy2-arm64-appimage:latest
+</pre></div>
+</div>
+<p>Now this repository folder is shared with the Docker container.</p>
+</li>
+<li><p>To compile and package the application use</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>scopy/ci/arm/arm_build_process.sh<span class="w"> </span>arm64<span class="w"> </span>run_workflow
+</pre></div>
+</div>
+</li>
+</ol>
+<p>Finally, after the development is done use this to clean the system:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>container<span class="w"> </span>ls<span class="w"> </span>-a<span class="w"> </span><span class="c1"># get the container id</span>
+$<span class="w"> </span>docker<span class="w"> </span>container<span class="w"> </span>rm<span class="w"> </span>-v<span class="w"> </span><span class="o">(</span>container<span class="w"> </span>id<span class="o">)</span>
+$<span class="w"> </span>docker<span class="w"> </span>image<span class="w"> </span>rm<span class="w"> </span>cristianbindea/scopy2-arm64-appimage:latest
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="windowsBuild.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Windows Build Instructions</a>
+    <a href="macosBuild.html" title="Next document (Alt+Shift+RightArrow)" class="next">MacOS Build Instructions</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

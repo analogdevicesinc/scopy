@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>AD-SWIOT1L-SL plugin &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=3d3703ae" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../../_static/app.umd.js?v=dcfbb431"></script>
+    <link rel="icon" href="../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Configuration" href="swiot_config.html" />
+    <link rel="prev" title="System settings" href="../pqm/settings.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">AD-SWIOT1L-SL plugin</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#software-setup">Software setup</a></li>
+<li><a class="reference internal" href="#software-installation">Software installation</a></li>
+<li><a class="reference internal" href="#launching-the-application">Launching the application</a></li>
+<li><a class="reference internal" href="#power-supply-options">Power Supply Options</a></li>
+<li><a class="reference internal" href="#system-operation-modes">System operation modes</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../index.html">
+      <img class="only-light" src="../../_static/scopy.png"/>
+      <img class="only-dark" src="../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4" checked=""/><div class="collapse"><a class="current reference internal" href="#">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4"/><div class="collapse"><a class="reference internal" href="../../tests/index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tests/testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../../tests/general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="ad-swiot1l-sl-plugin">
+<span id="swiot1l-index"></span><h1>AD-SWIOT1L-SL plugin<a class="headerlink" href="#ad-swiot1l-sl-plugin" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The Scopy <a class="reference external" href="https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/ad-swiot1l-sl.html">AD-SWIOT1L-SL</a> plugin is responsible with the operation and
+control of the AD-SWIOT1L-SL platform. The Scopy AD-SWIOT1L-SL
+plugin, while based on the Scopy application infrastructure, is tailored
+to provide all the specific functionalities of this system.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For an overview of the AD-SWIOT1L-SL system, check the complete user guide: <a class="reference external" href="https://wiki.analog.com/resources/eval/user-guides/ad-swiot1l-sl">AD-SWIOT1L-SL User</a></p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The Scopy application is in the process of a major rework so a mismatch
+between some parts of the documentation and the actual application may
+exist. The new Scopy version is not officially released, so the
+installers for Scopy with AD-SWIOT1L-SL plugin will be available at the
+links provided below.</p>
+</div>
+</section>
+<section id="software-setup">
+<h2>Software setup<a class="headerlink" href="#software-setup" title="Link to this heading"></a></h2>
+<p><strong>Scopy for Windows</strong>
+<a class="reference external" href="https://swdownloads.analog.com/cse/ad-swiot1l-sl/scopy-alpha-swiot1l/scopy-alpha-windows-setup.zip">Download: Installer for latest release (Windows 64/32-bit); Updated: November
+2023</a></p>
+<p><strong>Scopy for Windows portable</strong>
+<a class="reference external" href="https://swdownloads.analog.com/cse/ad-swiot1l-sl/scopy-alpha-swiot1l/scopy-alpha-windows-portable.zip">Download: Portable version for latest release (Windows 64/32-bit); Updated: November
+2023</a></p>
+<p><strong>Scopy for Linux</strong>
+<a class="reference external" href="https://swdownloads.analog.com/cse/ad-swiot1l-sl/scopy-alpha-swiot1l/scopy-alpha-linux.zip">Download: Scopy Flatpak installer; Updated: November 2023</a></p>
+<p><strong>Scopy for OSX</strong>
+<a class="reference external" href="https://swdownloads.analog.com/cse/ad-swiot1l-sl/scopy-prealpha-swiot1l/scopy-prealpha-macos.zip">Download: Scopy MacOS installer</a></p>
+</section>
+<section id="software-installation">
+<h2>Software installation<a class="headerlink" href="#software-installation" title="Link to this heading"></a></h2>
+<p><strong>Windows</strong></p>
+<blockquote>
+<div><p>Once you downloaded the installer, run it and follow all the required steps.
+After completion, system reboot is required.</p>
+</div></blockquote>
+<p><strong>Linux</strong></p>
+<blockquote>
+<div><p>Setup Flatpak using <a class="reference external" href="https://flatpak.org/setup/Ubuntu">the setup guide</a> for your Linux distribution.</p>
+<p>After Flatpak is setup get the <strong>Scopy.flatpak</strong> file from the downloaded archive and run:</p>
+<p><strong>flatpak install scopy–flatpak.flatpak</strong></p>
+</div></blockquote>
+<p><strong>MacOS</strong></p>
+<blockquote>
+<div><p>Double click the downloaded .dmg to make its content available. “Scopy” will
+show up in the Finder sidebar and a window showing the content should open up.
+Drag the application from the .dmg window into Applications to install and wait
+for the process to finish.</p>
+</div></blockquote>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The AD-SWIOT1L-SL system is not compatible with Scopy v1.4.1 or older</p>
+</div>
+</section>
+<section id="launching-the-application">
+<h2>Launching the application<a class="headerlink" href="#launching-the-application" title="Link to this heading"></a></h2>
+<div class="embed-video"><video class="only-screen" controls="controls"><source src="https://github.com/analogdevicesinc/scopy/raw/doc_resources/resources/swiot1l/connect.mov" type="video/mp4"></source></video><span class="only-screen"></span><div class="admonition video only-print"><p class="admonition-title">Video</p>
+<p><a href="https://github.com/analogdevicesinc/scopy/raw/doc_resources/resources/swiot1l/connect.mov"><span>https://github.com/analogdevicesinc/scopy/raw/doc_resources/resources/swiot1l/connect.mov</span></a></p>
+</div></div><p>Scopy is able to control and operate multiple devices. In order to use
+it for the AD-SWIOT1L-SL system, the user should click the “Add
+Device”(+) button displayed on the front page of the application.</p>
+<p>The video attached above demonstrates the process of connecting to the
+board. First it will scan the network in order to detect the device. If
+the device is connected to the network and able to be scanned, it will
+appear in the list as <strong>ip:analog.local</strong>. If the device is not
+available in the list, but the IP is known, the user can manually write
+the IP in the URI textbox and proceed forward.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The default static IP for all the boards is <strong>169.254.97.40</strong> .</p>
+</div>
+<p>Once found and verified Scopy will present a list of compatible
+instruments. The list of instruments is explained below, but during this
+step the user can enable or disable Scopy functionalities for this
+board.</p>
+<p>Going forward the homepage of the board is displayed. The homepage
+displays some basic information about the board, including its network
+IP. It also contains three buttons. One will perform the connection to
+the device, the second one performs identification and will blink a led
+on the board and the third one will start a quick tutorial for Scopy
+first time users. The tutorial is recommended in addition to this user
+guide as it will highlight and explain the user interface controls for
+the SWIOT1L available instruments.</p>
+<div class="embed-video"><video class="only-screen" controls="controls"><source src="https://github.com/analogdevicesinc/scopy/raw/doc_resources/resources/swiot1l/tutorial-config.mov" type="video/mp4"></source></video><span class="only-screen"></span><div class="admonition video only-print"><p class="admonition-title">Video</p>
+<p><a href="https://github.com/analogdevicesinc/scopy/raw/doc_resources/resources/swiot1l/tutorial-config.mov"><span>https://github.com/analogdevicesinc/scopy/raw/doc_resources/resources/swiot1l/tutorial-config.mov</span></a></p>
+</div></div></section>
+<section id="power-supply-options">
+<h2>Power Supply Options<a class="headerlink" href="#power-supply-options" title="Link to this heading"></a></h2>
+<img alt="https://github.com/analogdevicesinc/scopy/blob/doc_resources/resources/swiot1l/ps-warning.png?raw=true" class="align-center" src="https://github.com/analogdevicesinc/scopy/blob/doc_resources/resources/swiot1l/ps-warning.png?raw=true" />
+<p>This warning may appear in any of the instruments that interact with
+AD-SWIOT1L-SL. The user should check the external power supply switch
+position and verify which option is used to power the system.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For more details on the power supply options, check the hardware user guide: <a class="reference external" href="https://wiki.analog.com/resources/eval/user-guides/ad-swiot1l-sl/hardware">AD-SWIOT1L-SL Hardware User Guide</a></p>
+</div>
+</section>
+<section id="system-operation-modes">
+<h2>System operation modes<a class="headerlink" href="#system-operation-modes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><strong>Configuration mode:</strong></dt><dd><p>When the system is powered up it will enter the Configuration
+mode. This mode allows the user to choose device and function
+configuration for each of the 4 physical channels. When entering the
+Configuration mode, everything is reset to default values. Other than
+the initial state after power up, the user can enter this mode by using
+the <strong>Config</strong> button available in all the runtime instruments of Scopy
+(instruments: AD74413R, MAX14906, Faults).</p>
+</dd>
+<dt><strong>Runtime mode:</strong></dt><dd><p>In order to enter the Runtime mode, the user needs to configure the required
+channels and use the <strong>Apply</strong> button provided in the Config Instrument.
+In this mode the physical channels are configured and can be used to
+control or acquire data. If any changes are needed, the user can go back
+into Configuration mode by using the <strong>Config</strong> button mentioned above.</p>
+</dd>
+</dl>
+<p>More details on switching through the board states are provided on
+specific instrument documentation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Switching between operation modes might take some time depending on the
+network status. When switching from one mode to another the board is
+briefly disconnected from Scopy, that is because the IIO Context that it
+relies on needs to be destroyed and recreated based on the selected
+configuration.</p>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="swiot_config.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="swiot_config.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="swiot_config.html#tutorial">Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ad74413r.html">AD74413R</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ad74413r.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ad74413r.html#instrument-layout">Instrument Layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ad74413r.html#channel-item-layout">Channel item layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ad74413r.html#plot-layout">Plot Layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ad74413r.html#general-settings-layout">General settings layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ad74413r.html#tutorial">Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="max14906.html">MAX14906</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="max14906.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="max14906.html#instrument-layout">Instrument layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="max14906.html#channel-layout">Channel Layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="max14906.html#settings-tab">Settings tab</a></li>
+<li class="toctree-l2"><a class="reference internal" href="max14906.html#tutorial">Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faults.html">Faults</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faults.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faults.html#instrument-layout">Instrument layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faults.html#id2">Faults</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faults.html#tutorial">Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../registermap/registermap.html">Register Map</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../registermap/registermap.html#user-guide">User Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../registermap/registermap.html#settings">Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../registermap/registermap.html#tutorial">Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../registermap/registermap.html#xml-file-format">XML file format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../registermap/registermap.html#preferences">Preferences</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="../pqm/settings.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">System settings</a>
+    <a href="swiot_config.html" title="Next document (Alt+Shift+RightArrow)" class="next">Configuration</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>
