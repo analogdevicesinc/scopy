@@ -341,7 +341,7 @@ correctly (using pqm device).
     6. Click on **Verify** button.
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: PQMPlugin (checked), ADCPlugin, DACPlugin, DataLoggerPlugin, 
-          DebuggerPlugin.
+          DebuggerPlugin (checked).
         - **Actual result:**
 
 ..
@@ -388,7 +388,7 @@ correctly (using swiot_config device).
     5. Click on **Enable** button.
     6. Click on **Verify** button.
         - **Expected result:** The compatible plugins page opens. The compatible 
-          plugins are: SWIOTPlugin (checked), DataLoggerPlugin, DebuggerPlugin.
+          plugins are: SWIOTPlugin (checked), DataLoggerPlugin, DebuggerPlugin (checked).
         - **Actual result:**
 
 ..
@@ -436,7 +436,7 @@ correctly (using swiot_runtime device).
     6. Click on **Verify** button.
         - **Expected result:** The compatible plugins page opens. The compatible 
           plugins are: SWIOTPlugin (checked), ADCPlugin, DataLoggerPlugin, 
-          DebuggerPlugin, RegmapPlugin.
+          DebuggerPlugin (checked), RegmapPlugin.
         - **Actual result:**
 
 ..

@@ -428,7 +428,7 @@ displayed on the plot and measured by the instrument.
 
     5. Set YMin to -1A and YMax to 10A.
         - **Expected result:** 
-            - The plot Y axis is scaled between -5A and 5A.
+            - The plot Y axis is scaled between -1A and 10A.
         - **Actual result:**
 
 ..

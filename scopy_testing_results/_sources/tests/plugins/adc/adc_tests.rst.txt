@@ -100,9 +100,8 @@ Test 1 - X-AXIS
   Actual test result goes here.
 ..
 
-   9. Change XMin to 200 and XMax to -100
-   10. Press Single
-        - **Expected result:** Plot labels should range from 200 to -100, with channel curves centered and between samples 200 and 0
+   9. Change XMin to 300 and XMax to -100 (pressing Single will reset this setting)
+        - **Expected result:** Plot labels should range from 300 to -100, with channel curves centered and between samples 200 and 0
         - **Actual result:**
 
 ..
@@ -682,8 +681,8 @@ plotting in the ADC plugin
   Actual test result goes here.
 ..
 
-   3. Set XMode to Frequency, XMin to 0.5 MHz, XMax to 2 MHz, and press single
-       - **Expected result:** Plot labels should be from 0.5 MHz to 2 MHz, and channel curves should be centered
+   3. Set XMode to Frequency, XMin to 0.5 MHz, XMax to 2 MHz (pressing Single will reset this setting)
+       - **Expected result:** Plot labels should be from 0.5 MHz to 2 MHz
        - **Actual result:**
 
 ..

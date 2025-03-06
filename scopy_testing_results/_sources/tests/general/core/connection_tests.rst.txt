@@ -62,10 +62,10 @@ Test 1: Verify the connection flow.
 **Steps:**
     1. Click on the device icon from device browser.
     2. Click on **Connect** button.
-        - **Expected result:** The **Disconnect** button appears, a status LED 
+        - **Expected result:** The **Disconnect** button appears, a status bar 
           is displayed under the icon in the device browser, and a progress bar 
           appears in the application's status bar. After a while, the connection 
-          is established, the status LED turns green, and the tools in the menu 
+          is established, the status bar turns green, and the tools in the menu 
           become accessible. 
         - **Actual result:**
 
