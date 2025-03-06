@@ -62,8 +62,8 @@
 			"index": 2,
 			"names": ["RUN_BUTTON"],
 			"description": "When pressed, the run button starts polling from all channels every second. The values will be plotted in the plot section of each channel.",
-			"anchor": "HP_BOTTOM",
-			"content": "HP_BOTTOM",
+			"anchor": "HP_BOTTOMLEFT",
+			"content": "HP_BOTTOMLEFT",
 			"y_offset": 10
 		},
 		{
