@@ -169,7 +169,7 @@ QWidget *ScopyPreferencesPage::buildSaveSessionPreference()
 	Style::setStyle(navigateBtn, style::properties::button::borderButton);
 	navigateBtn->setMaximumWidth(Style::getDimension(json::global::unit_5));
 	connect(navigateBtn, &QPushButton::clicked, this,
-		[=]() { QDesktopServices::openUrl(scopy::config::settingsFolderPath()); });
+		[=]() { QDesktopServices::openUrl(QUrl("file:" + scopy::config::settingsFolderPath())); });
 	lay->addWidget(navigateBtn);
 	return w;
 }
