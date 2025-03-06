@@ -146,12 +146,18 @@ bool ADCPlugin::loadPreferencesPage()
 		"%Full Scale. This is also controllable while running, from the instrument settings. "
 		"Only applied after restart.",
 		y_mode_options, generalSection);
-	auto adc_acquisition_timeout =
-		PREFERENCE_EDIT(p, "adc_acquisition_timeout", "ADC Acquisition timeout",
-				"Select the timeout for the I/O operation. A valid value is "
-				"a positive integer representing the time in milliseconds after which a timeout "
-				"should occur. ",
-				m_preferencesPage);
+	auto adc_acquisition_timeout = PREFERENCE_EDIT_VALIDATION(
+		p, "adc_acquisition_timeout", "ADC Acquisition timeout",
+		"Select the timeout for the I/O operation. A valid value is "
+		"a positive integer representing the time in milliseconds after which a timeout "
+		"should occur. ",
+		[](const QString &text) {
+			// check if input is an positive integer
+			bool ok;
+			auto value = text.toInt(&ok);
+			return ok && value >= 0;
+		},
+		m_preferencesPage);
 	auto adc_add_remove_plot =
 		PREFERENCE_CHECK_BOX(p, "adc_add_remove_plot", "Add/Remove plot feature (EXPERIMENTAL)",
 				     "Experimental feature allowing the user to create multiple time or frequency plots"

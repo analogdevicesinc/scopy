@@ -349,11 +349,17 @@ bool M2kPlugin::loadPreferencesPage()
 				     "Select whether the 0dB value is displayed as a reference point on the "
 				     "Network Analyzer plot. This control is disabled by default.",
 				     analogSection));
-	analogSection->contentLayout()->addWidget(
-		PREFERENCE_EDIT(p, "m2k_siggen_periods", "Number of displayed periods",
-				"Select the number of displayed signal periods in the Signal Generator. "
-				"Default value is 2.",
-				analogSection));
+	analogSection->contentLayout()->addWidget(PREFERENCE_EDIT_VALIDATION(
+		p, "m2k_siggen_periods", "Number of displayed periods",
+		"Select the number of displayed signal periods in the Signal Generator. "
+		"Default value is 2.",
+		[](const QString &text) {
+			// check if input is an positive integer
+			bool ok;
+			auto value = text.toInt(&ok);
+			return ok && value >= 0;
+		},
+		analogSection));
 
 	// Logic tools preferences
 	MenuSectionWidget *logicWidget = new MenuSectionWidget(m_preferencesPage);
