@@ -1,0 +1,31 @@
+QCheckBox::indicator[&&property&&="ch0"]::checked {
+    background-color: &ch0&;
+}
+
+QCheckBox::indicator[&&property&&="ch1"]::checked {
+    background-color: &ch1&;
+}
+
+QCheckBox::indicator[&&property&&="ch2"]::checked {
+    background-color: &ch2&;
+}
+
+QCheckBox::indicator[&&property&&="ch3"]::checked {
+    background-color: &ch3&;
+}
+
+QCheckBox::indicator[&&property&&="ch4"]::checked {
+    background-color: &ch4&;
+}
+
+QCheckBox::indicator[&&property&&="ch5"]::checked {
+    background-color: &ch5&;
+}
+
+QCheckBox::indicator[&&property&&="ch6"]::checked {
+    background-color: &ch6&;
+}
+
+QCheckBox::indicator[&&property&&="ch7"]::checked {
+    background-color: &ch7&;
+}
