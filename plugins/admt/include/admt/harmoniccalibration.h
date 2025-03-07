@@ -76,24 +76,21 @@
 #include <widgets/horizontalspinbox.h>
 #include <widgets/registerblockwidget.h>
 
-enum AcquisitionDataKey
+enum SensorDataKey
 {
-	RADIUS,
-	ANGLE,
-	TURNCOUNT,
 	ABSANGLE,
+	ANGLE,
+	ANGLESEC,
 	SINE,
 	COSINE,
 	SECANGLI,
 	SECANGLQ,
-	ANGLESEC,
+	RADIUS,
 	DIAG1,
 	DIAG2,
 	TMP0,
 	TMP1,
-	CNVCNT,
-	SCRADIUS,
-	SPIFAULT
+	CNVCNT
 };
 
 namespace scopy {
@@ -117,10 +114,10 @@ public Q_SLOTS:
 	void commandLogWrite(QString message = "");
 	void updateFaultStatus(bool value);
 	void updateMotorPosition(double position);
-	void updateDIGIOUI(uint16_t *registerValue);
-	void updateFaultRegisterUI(uint16_t *registerValue);
-	void updateMTDiagnosticRegisterUI(uint16_t *registerValue);
-	void updateMTDiagnosticsUI(uint16_t *registerValue);
+	void updateDIGIOUI(quint16 registerValue);
+	void updateFaultRegisterUI(quint16 registerValue);
+	void updateMTDiagnosticRegisterUI(quint16 registerValue);
+	void updateMTDiagnosticsUI(quint16 registerValue);
 Q_SIGNALS:
 	void runningChanged(bool);
 	void canCalibrateChanged(bool);
@@ -129,10 +126,10 @@ Q_SIGNALS:
 	void commandLogWriteSignal(QString message);
 	void updateFaultStatusSignal(bool value);
 	void motorPositionChanged(double position);
-	void DIGIORegisterChanged(uint16_t *registerValue);
-	void FaultRegisterChanged(uint16_t *registerValue);
-	void DIAG1RegisterChanged(uint16_t *registerValue);
-	void DIAG2RegisterChanged(uint16_t *registerValue);
+	void DIGIORegisterChanged(quint16 registerValue);
+	void FaultRegisterChanged(quint16 registerValue);
+	void DIAG1RegisterChanged(quint16 registerValue);
+	void DIAG2RegisterChanged(quint16 registerValue);
 
 private:
 	ADMTController *m_admtController;
@@ -181,7 +178,9 @@ private:
 
 	QPlainTextEdit *logsPlainTextEdit, *commandLogPlainTextEdit;
 
-	QCheckBox *acquisitionFaultRegisterLEDWidget, *calibrationFaultRegisterLEDWidget, *DIGIOBusyStatusLED,
+	QCheckBox *angleCheckBox, *absAngleCheckBox, *temp0CheckBox, *sineCheckBox, *cosineCheckBox, *radiusCheckBox,
+		*angleSecCheckBox, *secAnglQCheckBox, *secAnglICheckBox, *temp1CheckBox,
+		*acquisitionFaultRegisterLEDWidget, *calibrationFaultRegisterLEDWidget, *DIGIOBusyStatusLED,
 		*DIGIOCNVStatusLED, *DIGIOSENTStatusLED, *DIGIOACALCStatusLED, *DIGIOFaultStatusLED,
 		*DIGIOBootloaderStatusLED, *R0StatusLED, *R1StatusLED, *R2StatusLED, *R3StatusLED, *R4StatusLED,
 		*R5StatusLED, *R6StatusLED, *R7StatusLED, *VDDUnderVoltageStatusLED, *VDDOverVoltageStatusLED,
@@ -192,18 +191,25 @@ private:
 
 	QScrollArea *MTDiagnosticsScrollArea;
 
+	QWidget *acquisitionGraphChannelWidget;
+
+	QGridLayout *acquisitionGraphChannelGridLayout;
+
 	PlotWidget *acquisitionGraphPlotWidget, *angleErrorPlotWidget, *calibrationRawDataPlotWidget,
-		*FFTAngleErrorPlotWidget, *correctedErrorPlotWidget, *postCalibrationRawDataPlotWidget,
-		*FFTCorrectedErrorPlotWidget;
+		*FFTAngleErrorMagnitudePlotWidget, *FFTAngleErrorPhasePlotWidget, *correctedErrorPlotWidget,
+		*postCalibrationRawDataPlotWidget, *FFTCorrectedErrorMagnitudePlotWidget,
+		*FFTCorrectedErrorPhasePlotWidget;
 	PlotAxis *acquisitionXPlotAxis, *acquisitionYPlotAxis, *calibrationRawDataXPlotAxis,
-		*calibrationRawDataYPlotAxis, *angleErrorXPlotAxis, *angleErrorYPlotAxis, *FFTAngleErrorXPlotAxis,
-		*FFTAngleErrorYPlotAxis, *correctedErrorXPlotAxis, *correctedErrorYPlotAxis,
-		*FFTCorrectedErrorXPlotAxis, *FFTCorrectedErrorYPlotAxis, *postCalibrationRawDataXPlotAxis,
+		*calibrationRawDataYPlotAxis, *angleErrorXPlotAxis, *angleErrorYPlotAxis,
+		*FFTAngleErrorMagnitudeXPlotAxis, *FFTAngleErrorMagnitudeYPlotAxis, *FFTAngleErrorPhaseXPlotAxis,
+		*FFTAngleErrorPhaseYPlotAxis, *correctedErrorXPlotAxis, *correctedErrorYPlotAxis,
+		*FFTCorrectedErrorMagnitudeXPlotAxis, *FFTCorrectedErrorMagnitudeYPlotAxis,
+		*FFTCorrectedErrorPhaseXPlotAxis, *FFTCorrectedErrorPhaseYPlotAxis, *postCalibrationRawDataXPlotAxis,
 		*postCalibrationRawDataYPlotAxis;
-	PlotChannel *acquisitionAnglePlotChannel, *acquisitionABSAnglePlotChannel, *acquisitionTurnCountPlotChannel,
-		*acquisitionTmp0PlotChannel, *acquisitionTmp1PlotChannel, *acquisitionSinePlotChannel,
-		*acquisitionCosinePlotChannel, *acquisitionRadiusPlotChannel, *acquisitionSecAnglQPlotChannel,
-		*acquisitionSecAnglIPlotChannel, *angleErrorPlotChannel, *preCalibrationFFTPhasePlotChannel,
+	PlotChannel *acquisitionAnglePlotChannel, *acquisitionABSAnglePlotChannel, *acquisitionTmp0PlotChannel,
+		*acquisitionTmp1PlotChannel, *acquisitionSinePlotChannel, *acquisitionCosinePlotChannel,
+		*acquisitionRadiusPlotChannel, *acquisitionSecAnglQPlotChannel, *acquisitionSecAnglIPlotChannel,
+		*acquisitionAngleSecPlotChannel, *angleErrorPlotChannel, *preCalibrationFFTPhasePlotChannel,
 		*calibrationRawDataPlotChannel, *calibrationSineDataPlotChannel, *calibrationCosineDataPlotChannel,
 		*FFTAngleErrorMagnitudeChannel, *FFTAngleErrorPhaseChannel, *correctedErrorPlotChannel,
 		*postCalibrationRawDataPlotChannel, *postCalibrationSineDataPlotChannel,
@@ -266,7 +272,7 @@ private:
 	void updateAcquisitionMotorRPM();
 	void updateAcquisitionMotorRotationDirection();
 	void getAcquisitionSamples(int sampleRate);
-	double getAcquisitionParameterValue(const AcquisitionDataKey &key);
+	double getSensorDataAcquisitionValue(const ADMTController::SensorRegister &key);
 	void plotAcquisition(QVector<double> &list, PlotChannel *channel);
 	void prependAcquisitionData(const double &data, QVector<double> &list);
 	void resetAcquisitionYAxisScale();
@@ -275,9 +281,10 @@ private:
 	void startAcquisitionUITask();
 	void stopAcquisitionUITask();
 	void updateSequenceWidget();
+	void updateCapturedDataCheckBoxes();
 	void applySequenceAndUpdate();
 	void updateGeneralSettingEnabled(bool value);
-	void connectCheckBoxToAcquisitionGraph(QCheckBox *widget, PlotChannel *channel, AcquisitionDataKey key);
+	void connectCheckBoxToAcquisitionGraph(QCheckBox *widget, PlotChannel *channel, SensorDataKey key);
 	void GMRReset();
 #pragma endregion
 
@@ -326,7 +333,7 @@ private:
 	void clearCalibrationSineCosine();
 	void clearPostCalibrationSamples();
 	void clearAngleErrorGraphs();
-	void clearCorrectedAngleErrorGraphs();
+	void clearFFTAngleErrorGraphs();
 #pragma endregion
 
 #pragma region Motor Methods
@@ -376,7 +383,6 @@ private:
 	void changeCustomSwitchLabel(CustomSwitch *customSwitch, QString onLabel, QString offLabel);
 	QCheckBox *createStatusLEDWidget(const QString &text, QVariant variant = true, bool checked = false,
 					 QWidget *parent = nullptr);
-	MenuControlButton *createChannelToggleWidget(const QString title, QColor color, QWidget *parent = nullptr);
 #pragma endregion
 
 #pragma region Connect Methods
