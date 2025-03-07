@@ -558,6 +558,9 @@ void SignalGenerator::checkRunEnabled()
 	size_t size = (size_t)mathSampleRate->value() * mathRecordLength->value();
 	if(size <= 0) {
 		ui->run_button->setEnabled(false);
+		if(m_running) {
+			stop();
+		}
 	} else {
 		ui->run_button->setEnabled(true);
 	}
