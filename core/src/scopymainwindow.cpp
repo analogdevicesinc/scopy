@@ -173,12 +173,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	connect(dm, SIGNAL(requestDevice(QString)), hp, SLOT(viewDevice(QString)));
 
-	if(Preferences::get("general_scan_for_devices").toBool()) {
-		scanTask->run();
-	}
-
-	enableScanner();
-
 	connect(dm, &DeviceManager::deviceChangedToolList, m_toolMenuManager, &ToolMenuManager::changeToolListContents);
 	connect(dm, SIGNAL(deviceConnected(QString, Device *)), m_toolMenuManager, SLOT(deviceConnected(QString)));
 	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), m_toolMenuManager,
@@ -210,6 +204,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	if(Preferences::get("autoconnect_previous").toBool())
 		deviceAutoconnect();
 	prefPage->initSessionDevices();
+
+	if(Preferences::get("general_scan_for_devices").toBool()) {
+		scanTask->run();
+	}
+
+	enableScanner();
 
 	qInfo(CAT_BENCHMARK) << "ScopyMainWindow constructor took: " << timer.elapsed() << "ms";
 }
