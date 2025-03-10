@@ -55,6 +55,7 @@ private:
 	QWidget *createDemoOptWidget(QWidget *parent);
 	QWidget *createXmlPathWidget(QWidget *parent);
 	QWidget *createRxTxDevWidget(QWidget *parent);
+	QWidget *createPortWidget(QWidget *parent);
 	QWidget *createUriWidget(QWidget *parent);
 	void initEnBtn(QWidget *parent);
 	void init();
@@ -75,6 +76,7 @@ private:
 	QComboBox *m_demoOptCb;
 	QLineEdit *m_xmlPathEdit;
 	QLineEdit *m_rxTxDevEdit;
+	QLineEdit *m_portEdit;
 	QLineEdit *m_uriEdit;
 	QLabel *m_uriMsgLabel;
 	AnimationPushButton *m_enDemoBtn;
