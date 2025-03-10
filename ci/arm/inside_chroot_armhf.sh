@@ -8,20 +8,19 @@ locale-gen en_US.UTF-8
 
 sed -i 's/#deb-src/deb-src/' /etc/apt/sources.list
 
+apt update && apt -y upgrade
+apt -y dist-upgrade
 apt -y purge openjdk* tex-common
 apt -y remove gnuradio gnuradio-* libgnuradio-* libvolk*
 apt -y remove *qt*
 apt -y autoremove
-apt update && apt -y upgrade
-apt -y dist-upgrade
 dpkg --configure -a
 
-rm -rfv $(find / | grep libiio)
-rm -rfv $(find / | grep m2k)
-rm -rfv $(find / | grep libad9361)
-rm -rfv $(find / | grep libad9166)
-rm -rfv $(find / | grep volk)
-rm -rfv $(find / | grep gnuradio)
+find / -name '*libiio*' -exec rm -rfv {} +
+find / -name '*m2k*' -exec rm -rfv {} +
+find / -name '*libad9361*' -exec rm -rfv {} +
+find / -name '*volk*' -exec rm -rfv {} +
+find / -name '*gnuradio*' -exec rm -rfv {} +
 
 apt -y build-dep qtbase5-dev
 apt -y install '^libxcb.*-dev' autoconf automake bison build-essential cmake figlet flex freeglut3-dev g++ gawk gcc \
@@ -29,6 +28,7 @@ apt -y install '^libxcb.*-dev' autoconf automake bison build-essential cmake fig
 	libglu1-mesa-dev libgmp-dev libinput-dev libopenal-dev libsndfile1-dev libspeechd-dev libts-dev libudev-dev \
 	libunwind-dev libx11-xcb-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev libxrender-dev libxml2-dev libxml2-utils \
 	mesa-common-dev mesa-utils* perl pkg-config dh-python unzip wget
+apt -y install libusb-1.0-0-dev libaio-dev libpkgconf-dev libpython3-all-dev libfftw3-dev swig swig4.0 libgsl-dev libfuse2  libzmq3-dev libwayland-egl-backend-dev  libwayland-dev libwayland-egl1-mesa libssl-dev  
 
 wget https://raw.githubusercontent.com/abhiTronix/raspberry-pi-cross-compilers/master/utils/SSymlinker
 sed -i 's/sudo//g' SSymlinker
