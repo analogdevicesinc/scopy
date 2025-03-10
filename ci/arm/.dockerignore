@@ -7,5 +7,4 @@
 !copy-deps.sh
 !inside_chroot.sh
 !build_qt.sh
-!qt_patch_armhf.patch
-!qt_patch_arm64.patch
+!qt_patch.patch

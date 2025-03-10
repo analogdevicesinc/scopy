@@ -37,7 +37,7 @@ set_config_opts() {
 	AR="${TOOLCHAIN_BIN}/${TOOLCHAIN_HOST}-ar"
 	RANLIB="${TOOLCHAIN_BIN}/${TOOLCHAIN_HOST}-ranlib"
 
-	CFLAGS=" -I${SYSROOT}/include -I${SYSROOT}/include/${TOOLCHAIN_HOST} -I${SYSROOT}/usr/include -I${SYSROOT}/usr/include/${TOOLCHAIN_HOST} -I${TOOLCHAIN}/include- -fPIC"
+	CFLAGS=" -march=armv7-a -I${SYSROOT}/include -I${SYSROOT}/include/${TOOLCHAIN_HOST} -I${SYSROOT}/usr/include -I${SYSROOT}/usr/include/${TOOLCHAIN_HOST} -I${TOOLCHAIN}/include- -fPIC"
 	CPPFLAGS="-fexceptions ${CFLAGS}"
 	LDFLAGS="--sysroot=${SYSROOT} -Wl,-rpath=XORIGIN -L${SYSROOT}/lib -L${SYSROOT}/usr/lib -L${SYSROOT}/usr/lib/${TOOLCHAIN_HOST} -L${SYSROOT}/usr/lib/${TOOLCHAIN_HOST}"
 
@@ -58,6 +58,9 @@ set_config_opts() {
 		CONFIG_OPTS+=("PKG_CONFIG=${SYSROOT}/usr/bin/${TOOLCHAIN_HOST}-pkg-config" )
 	fi
 
+	# CONFIG_OPTS+=("PKG_CONFIG_PATH=${SYSROOT}/usr/lib/${TOOLCHAIN_HOST}/pkgconfig")
+	# CONFIG_OPTS+=("PKG_CONFIG=/usr/bin/${TOOLCHAIN_HOST}-pkg-config" )
+
 	CONFIG_OPTS+=("PKG_CONFIG_ALLOW_CROSS=1")
 	CONFIG_OPTS+=("LDFLAGS=${LDFLAGS}")
 	CONFIG_OPTS+=("CFLAGS=${CFLAGS}")
@@ -75,7 +78,7 @@ install_packages() {
 	sudo apt update
 	sudo apt install -y build-essential cmake unzip gfortran gcc git bison libtool \
 		python3 pip gperf pkg-config gdb-multiarch g++ flex texinfo gawk openssl pkg-config-aarch64-linux-gnu \
-		pigz libncurses-dev autoconf automake tar figlet liborc-0.4-dev* patchelf libc6-dev-arm64-cross squashfs-tools
+		pigz libncurses-dev autoconf automake tar figlet liborc-0.4-dev* patchelf libc6-dev-arm64-cross squashfs-tools ccache
 	pip install mako
 }
 
@@ -127,14 +130,14 @@ clone() {
 
 build_libserialport(){
 	echo "### Building libserialport - branch $LIBSERIALPORT_BRANCH"
+	set_config_opts
 	pushd $STAGING_AREA/libserialport
 	git clean -xdf
 	./autogen.sh
-	./configure ${AUTOCONF_OPTS}
+	./configure "${CONFIG_OPTS[@]}"
 	make $JOBS
 	patchelf --force-rpath --set-rpath \$ORIGIN $STAGING_AREA/libserialport/.libs/libserialport.so
 	sudo make install
-
 	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 	popd
@@ -203,6 +206,18 @@ build_volk() {
 build_gnuradio() {
 	echo "### Building gnuradio - branch $GNURADIO_BRANCH"
 	pushd $STAGING_AREA/gnuradio
+
+	PYTHON_WRAPPER="$STAGING_AREA/python-wrapper.sh"
+
+	echo '#!/bin/bash' > $PYTHON_WRAPPER
+	echo "
+	LOADER="$SYSROOT/lib/ld-linux-armhf.so.3"
+	LIB_PATH="$SYSROOT/usr/lib/arm-linux-gnueabihf"
+	PYTHON_BIN="$SYSROOT/usr/bin/python3"
+	" >> $PYTHON_WRAPPER
+	echo 'exec $LOADER --library-path $LIB_PATH $PYTHON_BIN "$@"'>> $PYTHON_WRAPPER
+	chmod +x $PYTHON_WRAPPER
+
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_DEFAULT=OFF \
 		-DENABLE_GNURADIO_RUNTIME=ON \
@@ -212,7 +227,9 @@ build_gnuradio() {
 		-DENABLE_GR_FILTER=ON \
 		-DENABLE_GR_IIO=ON \
 		-DENABLE_POSTINSTALL=OFF \
+		-DPYTHON_EXECUTABLE=${PYTHON_WRAPPER} \
 		"
+
 	build_with_cmake
 	sudo make install
 	popd
@@ -359,6 +376,10 @@ create_appdir(){
 	mkdir -p $APP_DIR/usr/lib/scopy/plugins/resources
 	cp $EMU_CONFIG $APP_DIR/usr/lib/scopy/plugins/resources
 
+	if [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
+		sudo rm -rfv ${SYSROOT}/usr/lib/arm-linux-gnueabihf/libQt5*
+	fi
+
 	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/scopy
 	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/iio-emu
 	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/scopy
@@ -373,7 +394,6 @@ create_appdir(){
 	cp -r $SYSROOT/share/libsigrokdecode/decoders  $APP_DIR/usr/lib
 
 	cp $QT_LOCATION/lib/libQt5XcbQpa.so* $APP_DIR/usr/lib
-	cp $QT_LOCATION/lib/libQt5WaylandClient.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5EglFSDeviceIntegration.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5DBus.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5OpenGL.so* $APP_DIR/usr/lib
@@ -477,6 +497,7 @@ dev_setup(){
 	# and the compiling is done inside the container unsing the already prepared filesystem
 
 	# for example, if you want to develop for ARMHF architecture, you would execute:
+
 	docker pull cristianbindea/scopy2-armhf-appimage:latest # to download the image
 
 	# and to run the image, while creating a docker volume, you would run:
@@ -487,13 +508,13 @@ dev_setup(){
 
 	# now this repository folder it shared with the docker container
 
-	# to compile and package the application use "scopy/ci/arm/arm_build_process.sh run_workflow"
+	# to compile and package the application use "scopy/ci/arm/arm_build_process.sh arm32 run_workflow"
 	
 	# to continue using the same docker container use "docker start (container id)" and "docker attach (container id)"
 
 	# finally after the development is done use this to clean the system
 	# "docker container rm -v (container id)"
-	# "docker image rm cristianbindea/scopy2-arm-appimage:latest"
+	# "docker image rm cristianbindea/scopy2-armhf-appimage:latest"
 
 	# **to get the container id use "docker container ls -a"
 }

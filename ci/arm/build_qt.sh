@@ -18,12 +18,9 @@ download_qt(){
 		wget --progress=dot:giga ${QT_DOWNLOAD_LINK}
 		tar -xf qt-everywhere-*.tar.xz && rm qt-everywhere-*.tar.xz && mv qt-everywhere-* qt-everywhere-src # unzip and rename
 		cd qt-everywhere-src
+
 		# Patch QT Source
-		if [ $TOOLCHAIN_HOST == "aarch64-linux-gnu"  ]; then
-			patch -p1 -R < $SRC_SCRIPT/qt_patch_arm64.patch
-		elif [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
-			patch -p1 < $SRC_SCRIPT/qt_patch_armhf.patch
-		fi
+		patch -p1 < $SRC_SCRIPT/qt_patch.patch
 	else
 		echo "QT already downloaded"
 	fi
@@ -56,10 +53,11 @@ build(){
 	-eglfs \
 	-reduce-exports \
 	-opengl desktop \
-	-device $QT_DEVICE \
+	-device linux-rasp-pi3-vc4-g++\
 	-device-option CROSS_COMPILE="$CROSS_COMPILER"/bin/"$TOOLCHAIN_HOST"- \
 	-skip qtandroidextras \
 	-skip qtcharts \
+	-skip qtcanvas3d \
 	-skip qtdatavis3d \
 	-skip qtdoc \
 	-skip qtgamepad \
@@ -68,9 +66,9 @@ build(){
 	-skip qtlottie \
 	-skip qtmacextras \
 	-skip qtnetworkauth \
+	-skip qtpurchasing \
 	-skip qtquick3d \
 	-skip qtquickcontrols \
-	-skip qtquickcontrols2 \
 	-skip qtquicktimeline \
 	-skip qtremoteobjects \
 	-skip qtscript \
@@ -78,13 +76,13 @@ build(){
 	-skip qtspeech \
 	-skip qttranslations \
 	-skip qtvirtualkeyboard \
-	-skip qtwayland \
 	-skip qtwebchannel \
 	-skip qtwebengine \
 	-skip qtwebglplugin \
 	-skip qtwebsockets \
 	-skip qtwebview \
 	-skip qtwinextras \
+	-skip qtxmlpatterns\
 	-nomake examples -no-compile-examples \
 	-nomake tests \
 	-make libs \

@@ -1,5 +1,16 @@
---- new/qt-everywhere-src-5.15.2/qtbase/src/3rdparty/angle/include/EGL/eglplatform.h
-+++ qt-everywhere-src-5.15.2/qtbase/src/3rdparty/angle/include/EGL/eglplatform.h
+--- qt-everywhere-src2/qtbase/mkspecs/devices/linux-rasp-pi3-vc4-g++/qmake.conf	2024-11-08 15:36:08.000000000 +0200
++++ qt-everywhere-src/qtbase/mkspecs/devices/linux-rasp-pi3-vc4-g++/qmake.conf	2025-03-05 17:50:14.627810328 +0200
+@@ -31,7 +31,7 @@
+ QMAKE_LIBS_EGL         += -lEGL
+ QMAKE_LIBS_OPENGL_ES2  += -lGLESv2 -lEGL
+ 
+-QMAKE_CFLAGS            = -march=armv8-a -mtune=cortex-a53 -mfpu=crypto-neon-fp-armv8
++QMAKE_CFLAGS            = -march=armv7-a -mfloat-abi=hard -mfpu=neon -mno-unaligned-access
+ QMAKE_CXXFLAGS          = $$QMAKE_CFLAGS
+ 
+ DISTRO_OPTS            += hard-float
+--- qt-everywhere-src2/qtbase/src/3rdparty/angle/include/EGL/eglplatform.h
++++ qt-everywhere-src/qtbase/src/3rdparty/angle/include/EGL/eglplatform.h
 @@ -141,6 +141,7 @@
   */
  typedef khronos_int32_t EGLint;
@@ -22,8 +33,8 @@
              },
              "use": "egl bcm_host"
          },
---- new/qt-everywhere-src-5.15.2/qtbase/src/plugins/platforms/eglfs/deviceintegration/eglfs_brcm/qeglfsbrcmintegration.cpp
-+++ qt-everywhere-src-5.15.2/qtbase/src/plugins/platforms/eglfs/deviceintegration/eglfs_brcm/qeglfsbrcmintegration.cpp
+--- qt-everywhere-src2/qtbase/src/plugins/platforms/eglfs/deviceintegration/eglfs_brcm/qeglfsbrcmintegration.cpp
++++ qt-everywhere-src/qtbase/src/plugins/platforms/eglfs/deviceintegration/eglfs_brcm/qeglfsbrcmintegration.cpp
 @@ -44,6 +44,12 @@
  
  static DISPMANX_DISPLAY_HANDLE_T dispman_display = 0;
