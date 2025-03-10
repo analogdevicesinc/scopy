@@ -45,6 +45,13 @@ void LogicGroupItem::setName(const QString &name)
 	}
 }
 
+void LogicGroupItem::toggleEnableDeleteButton(bool en)
+{
+	if(m_deleteBtn != nullptr) {
+		m_deleteBtn->setEnabled(en);
+	}
+}
+
 void LogicGroupItem::buildUi()
 {
 	QWidget *groupItem = new QWidget(this);

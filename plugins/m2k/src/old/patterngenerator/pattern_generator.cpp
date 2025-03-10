@@ -995,6 +995,7 @@ void PatternGenerator::updateChannelGroupWidget(bool visible)
 	QVector<int> channelsInGroup = m_plot.getGroupOfChannel(m_selectedChannel);
 
 	int channelsInGroupSize = channelsInGroup.size();
+
 	for(int i = 0; i < channelsInGroup.size(); ++i) {
 		if(channelsInGroup[i] >= DIGITAL_NR_CHANNELS) {
 			channelsInGroupSize--;
@@ -1037,8 +1038,17 @@ void PatternGenerator::updateChannelGroupWidget(bool visible)
 		LogicGroupItem *item = new LogicGroupItem(name, m_currentGroupMenu);
 		connect(m_plotCurves[channelsInGroup[i]], &GenericLogicPlotCurve::nameChanged, item,
 			&LogicGroupItem::setName);
-		connect(m_ui->btnGroupChannels, &QPushButton::toggled, this,
-			[=](bool toggled) { item->getDeleteBtn()->setEnabled(!toggled); });
+
+		if(m_ui->btnGroupChannels->isChecked()) {
+			item->toggleEnableDeleteButton(false);
+		}
+
+		connect(
+			m_ui->btnGroupChannels, &QPushButton::toggled, item,
+			[=](bool toggled) { item->toggleEnableDeleteButton(!toggled); }, Qt::QueuedConnection);
+
+		m_currentGroupMenu->insertMenuItem(item);
+
 		connect(item, &LogicGroupItem::deleteBtnClicked, [=]() {
 			bool groupDeleted = false;
 			m_plot.removeFromGroup(m_selectedChannel, item->position(), groupDeleted);
@@ -1050,10 +1060,18 @@ void PatternGenerator::updateChannelGroupWidget(bool visible)
 			}
 
 			m_currentGroup.removeAt(item->position());
+			item->deleteLater();
+
 			if(groupDeleted) {
 				m_ui->groupWidget->setVisible(false);
 				m_currentGroup.clear();
 				m_ui->groupWidgetLayout->removeWidget(m_currentGroupMenu);
+				// Delete all LogicGroupItem instances
+				for(auto item : m_currentGroupMenu->findChildren<LogicGroupItem *>()) {
+					delete item;
+				}
+				m_ui->groupWidgetLayout->removeWidget(m_currentGroupMenu);
+
 				m_currentGroupMenu->deleteLater();
 				m_currentGroupMenu = nullptr;
 			}
