@@ -94,7 +94,7 @@ void IIOModel::generateCtxAttributes()
 void IIOModel::setupCurrentDevice()
 {
 	m_currentDevice = iio_context_get_device(m_ctx, m_currentDeviceIndex);
-	m_devList = IIOWidgetBuilder(m_parent).device(m_currentDevice).buildAll();
+	m_devList = IIOWidgetBuilder(m_parent).device(m_currentDevice).includeAvailableAttributes(true).buildAll();
 	m_currentDeviceName = iio_device_get_name(m_currentDevice);
 	QString currentDeviceId = iio_device_get_id(m_currentDevice);
 	bool is_trigger = iio_device_is_trigger(m_currentDevice);
@@ -136,7 +136,7 @@ void IIOModel::generateDeviceAttributes()
 void IIOModel::setupCurrentChannel()
 {
 	m_currentChannel = iio_device_get_channel(m_currentDevice, m_currentChannelIndex);
-	m_chnlList = IIOWidgetBuilder(m_parent).channel(m_currentChannel).buildAll();
+	m_chnlList = IIOWidgetBuilder(m_parent).channel(m_currentChannel).includeAvailableAttributes(true).buildAll();
 	m_currentChannelName = iio_channel_get_id(m_currentChannel);
 	QString currentChannelId = iio_channel_get_name(m_currentChannel);
 

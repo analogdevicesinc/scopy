@@ -42,6 +42,7 @@ IIOWidgetBuilder::IIOWidgetBuilder(QWidget *parent)
 	, m_connection(nullptr)
 	, m_isCompact(false)
 	, m_includeDebugAttrs(Preferences::get("debugger_v2_include_debugfs").toBool())
+	, m_includeAvailableAttrs(false)
 	, m_context(nullptr)
 	, m_device(nullptr)
 	, m_channel(nullptr)
@@ -51,7 +52,9 @@ IIOWidgetBuilder::IIOWidgetBuilder(QWidget *parent)
 	, m_dataStrategy(DS::NoDataStrategy)
 	, m_uiStrategy(UIS::NoUIStrategy)
 	, m_widgetParent(parent)
-{}
+{
+	setObjectName("IIOWidgetBuilder");
+}
 
 IIOWidgetBuilder::~IIOWidgetBuilder() {}
 
@@ -106,7 +109,7 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 			}
 
 			m_attribute = attrName;
-			if(QString(attrName).endsWith("_available")) {
+			if(QString(attrName).endsWith("_available") && !m_includeAvailableAttrs) {
 				continue;
 			}
 
@@ -131,7 +134,7 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 			}
 
 			m_attribute = attrName;
-			if(QString(attrName).endsWith("_available")) {
+			if(QString(attrName).endsWith("_available") && !m_includeAvailableAttrs) {
 				continue;
 			}
 
@@ -158,7 +161,7 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 				}
 
 				m_attribute = attrName;
-				if(QString(attrName).endsWith("_available")) {
+				if(QString(attrName).endsWith("_available") && !m_includeAvailableAttrs) {
 					continue;
 				}
 
@@ -232,6 +235,12 @@ IIOWidgetBuilder &IIOWidgetBuilder::compactMode(bool isCompact)
 IIOWidgetBuilder &IIOWidgetBuilder::includeDebugAttributes(bool isIncluded)
 {
 	m_includeDebugAttrs = isIncluded;
+	return *this;
+}
+
+IIOWidgetBuilder &IIOWidgetBuilder::includeAvailableAttributes(bool includeAvailableAttributes)
+{
+	m_includeAvailableAttrs = includeAvailableAttributes;
 	return *this;
 }
 
