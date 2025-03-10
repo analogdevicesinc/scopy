@@ -39,6 +39,7 @@ public:
 
 public Q_SLOTS:
 	void setName(const QString &name);
+	void toggleEnableDeleteButton(bool en);
 
 Q_SIGNALS:
 	void deleteBtnClicked();
@@ -48,7 +49,7 @@ private:
 
 private:
 	QLabel *m_nameLabel;
-	QPushButton *m_deleteBtn;
+	QPushButton *m_deleteBtn = nullptr;
 };
 } // namespace scopy
 
