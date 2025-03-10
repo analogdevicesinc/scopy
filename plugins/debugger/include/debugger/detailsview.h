@@ -25,6 +25,7 @@
 #include <QWidget>
 #include <QTabWidget>
 #include <QTextBrowser>
+#include <gui/animationpushbutton.h>
 #include "iiostandarditem.h"
 #include "guidetailsview.h"
 #include "clidetailsview.h"
@@ -39,7 +40,7 @@ public:
 	void setIIOStandardItem(IIOStandardItem *item);
 	void refreshIIOView();
 
-	QPushButton *readBtn();
+	AnimationPushButton *readBtn();
 	QPushButton *addToWatchlistBtn();
 
 	// add:true = +, add:false = X
@@ -59,7 +60,7 @@ private:
 	QWidget *m_iioView;
 	QWidget *m_titleContainer;
 	PathTitle *m_titlePath;
-	QPushButton *m_readBtn;
+	AnimationPushButton *m_readBtn;
 	QPushButton *m_addToWatchlistBtn;
 };
 } // namespace scopy::debugger

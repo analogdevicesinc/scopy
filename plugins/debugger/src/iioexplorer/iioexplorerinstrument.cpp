@@ -22,6 +22,8 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QScrollBar>
+#include <QFutureWatcher>
+#include <QtConcurrent>
 #include <style.h>
 #include <gui/stylehelper.h>
 #include "iioexplorerinstrument.h"
@@ -175,9 +177,23 @@ void IIOExplorerInstrument::connectSignalsAndSlots()
 
 	QObject::connect(m_detailsView->readBtn(), &QPushButton::clicked, this, [this]() {
 		qDebug(CAT_DEBUGGERIIOMODEL) << "Read button pressed.";
-		triggerReadOnAllChildItems(m_currentlySelectedItem);
-		m_detailsView->refreshIIOView();
-		m_watchListView->refreshWatchlist();
+		m_detailsView->readBtn()->startAnimation();
+
+		QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
+		QObject::connect(
+			watcher, &QFutureWatcher<void>::finished, this,
+			[this, watcher]() {
+				m_detailsView->refreshIIOView();
+				m_watchListView->refreshWatchlist();
+				m_detailsView->readBtn()->stopAnimation();
+				watcher->deleteLater();
+			},
+			Qt::QueuedConnection);
+
+		QFuture<void> future =
+			QtConcurrent::run([this]() { triggerReadOnAllChildItems(m_currentlySelectedItem); });
+
+		watcher->setFuture(future);
 	});
 
 	QObject::connect(m_detailsView->addToWatchlistBtn(), &QPushButton::clicked, this, [this]() {
@@ -220,7 +236,7 @@ void IIOExplorerInstrument::connectSignalsAndSlots()
 		}
 		IIOStandardItem *item = findItemByPath(iioRoot, pathList);
 		if(!item) {
-			qWarning(CAT_IIODEBUGGER) << "Could not find the item with path:" << item->path();
+			qWarning(CAT_IIODEBUGGER) << "Could not find the item with path:" << path;
 		}
 
 		selectItem(item);
@@ -320,7 +336,7 @@ void IIOExplorerInstrument::triggerReadOnAllChildItems(QStandardItem *item)
 	   type == IIOStandardItem::ChannelAttribute) {
 		QList<IIOWidget *> iioWidgets = IIOitem->getIIOWidgets();
 		for(int i = 0; i < iioWidgets.size(); ++i) {
-			qInfo(CAT_DEBUGGERIIOMODEL) << "Reading " << IIOitem->path();
+			qDebug(CAT_DEBUGGERIIOMODEL) << "Reading " << IIOitem->path();
 			iioWidgets.at(i)->getDataStrategy()->readAsync();
 		}
 	} else {

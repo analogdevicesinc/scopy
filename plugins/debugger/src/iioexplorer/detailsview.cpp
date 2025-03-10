@@ -27,6 +27,7 @@
 #define ADD_ICON ":/gui/icons/green_add.svg"
 #define REMOVE_ICON ":/gui/icons/orange_close.svg"
 
+using namespace scopy;
 using namespace scopy::debugger;
 
 DetailsView::DetailsView(QWidget *parent)
@@ -37,7 +38,7 @@ DetailsView::DetailsView(QWidget *parent)
 	, m_tabWidget(new QTabWidget(this))
 	, m_guiView(new QWidget(this))
 	, m_iioView(new QWidget(this))
-	, m_readBtn(new QPushButton(this))
+	, m_readBtn(new AnimationPushButton(this))
 	, m_addToWatchlistBtn(new QPushButton(this))
 	, m_titleContainer(new QWidget(this))
 {
@@ -74,6 +75,9 @@ void DetailsView::setupUi()
 	m_readBtn->setIcon(Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
 	m_readBtn->setIconSize(QSize(25, 25));
 	m_readBtn->setText("Read All");
+	m_readBtn->setAutoDefault(true);
+	QMovie *movie = new QMovie(":/gui/loading.gif");
+	m_readBtn->setAnimation(movie, 20000);
 	m_addToWatchlistBtn->setStyleSheet("QPushButton { background-color: transparent; border: 0px; }");
 
 	m_titleContainer->layout()->addWidget(m_titlePath);
@@ -109,7 +113,7 @@ void DetailsView::setIIOStandardItem(IIOStandardItem *item)
 
 void DetailsView::refreshIIOView() { m_cliDetailsView->refreshView(); }
 
-QPushButton *DetailsView::readBtn() { return m_readBtn; }
+AnimationPushButton *DetailsView::readBtn() { return m_readBtn; }
 
 QPushButton *DetailsView::addToWatchlistBtn() { return m_addToWatchlistBtn; }
 
