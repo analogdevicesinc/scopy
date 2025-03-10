@@ -99,6 +99,14 @@ public:
 	IIOWidgetBuilder &includeDebugAttributes(bool isIncluded);
 
 	/**
+	 * @brief includeAvailableAttributes If set to true, the buildAll function will
+	 * also create IIOWidgets for the attributes that end with "_available".
+	 * @param includeAvailableAttributes Default value is false.
+	 * @return
+	 */
+	IIOWidgetBuilder &includeAvailableAttributes(bool includeAvailableAttributes);
+
+	/**
 	 * @brief Sets the context that will be used, if no iio_device or iio_channel
 	 * is set, the build functions will work with the context.
 	 * @param context
@@ -170,9 +178,10 @@ private:
 	Connection *m_connection;
 	bool m_isCompact;
 	bool m_includeDebugAttrs;
-	struct iio_context *m_context;
-	struct iio_device *m_device;
-	struct iio_channel *m_channel;
+	bool m_includeAvailableAttrs;
+	iio_context *m_context;
+	iio_device *m_device;
+	iio_channel *m_channel;
 	QString m_attribute;
 	QString m_optionsAttribute;
 	QString m_optionsValues;
