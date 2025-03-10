@@ -346,65 +346,57 @@ identify them in the .ini files, can be found in the table below.</p>
 <td><p>Plot target FPS</p></td>
 <td><p>Select the Frames per second value for rendering plots in the entire application.</p></td>
 </tr>
-<tr class="row-even"><td><p>dataloggerplugin_date_time_format</p></td>
-<td><p>DateTime format :</p></td>
-<td><p>Select the date time format of the instrument. Default value is: hh:mm:ss</p></td>
-</tr>
-<tr class="row-odd"><td><p>dataloggerplugin_data_storage_size</p></td>
+<tr class="row-even"><td><p>dataloggerplugin_data_storage_size</p></td>
 <td><p>Maximum data stored for each monitor</p></td>
 <td><p>Select the maximum data storage size for each monitor in the datalogger.</p></td>
 </tr>
-<tr class="row-even"><td><p>m2k_instrument_notes_active</p></td>
+<tr class="row-odd"><td><p>m2k_instrument_notes_active</p></td>
 <td><p>Instrument Notes</p></td>
 <td><p>Enable or disable a text section at the bottom of each ADALM2000 instrument, allowing the user to take notes. Disabled by default.</p></td>
 </tr>
-<tr class="row-odd"><td><p>m2k_debugger_plugin_included</p></td>
+<tr class="row-even"><td><p>m2k_debugger_plugin_included</p></td>
 <td><p>Include debugger plugin</p></td>
 <td><p>Include the Debugger in the current instrument list      when connected to an ADALM2000 device. Disabled by default.</p></td>
 </tr>
-<tr class="row-even"><td><p>m2k_show_adc_filters</p></td>
+<tr class="row-odd"><td><p>m2k_show_adc_filters</p></td>
 <td><p>Show ADC digital filter config</p></td>
 <td><p>Enable/disable the configuration panel for ADC digital filters.      This allows manual control over the parameters of the filters.</p></td>
 </tr>
-<tr class="row-odd"><td><p>m2k_show_graticule</p></td>
+<tr class="row-even"><td><p>m2k_show_graticule</p></td>
 <td><p>Enable graticule</p></td>
 <td><p>Select whether the plot backbone (graticule</p></td>
 </tr>
-<tr class="row-even"><td><p>m2k_mini_histogram</p></td>
+<tr class="row-odd"><td><p>m2k_mini_histogram</p></td>
 <td><p>Enable mini histogram</p></td>
 <td><p>Select whether the Oscilloscope plot displays a histogram on the right side.</p></td>
 </tr>
-<tr class="row-odd"><td><p>m2k_osc_filtering</p></td>
+<tr class="row-even"><td><p>m2k_osc_filtering</p></td>
 <td><p>Enable sample rate filters</p></td>
 <td><p>Enable or disable the ADALM2000 ADC filters for all samplerates less than      100 MHz.</p></td>
 </tr>
-<tr class="row-even"><td><p>m2k_osc_label</p></td>
+<tr class="row-odd"><td><p>m2k_osc_label</p></td>
 <td><p>Enable labels on the plot</p></td>
 <td><p>Enable or disable the plot labels in the Oscilloscope instrument.</p></td>
 </tr>
-<tr class="row-odd"><td><p>m2k_spectrum_visible_peak_search</p></td>
+<tr class="row-even"><td><p>m2k_spectrum_visible_peak_search</p></td>
 <td><p>Only search marker peaks in visible domain</p></td>
 <td><p>Enabled by default, this control allows the Spectrum Analyzer to search for marker peaks outside the visible frequency range.</p></td>
 </tr>
-<tr class="row-even"><td><p>m2k_na_show_zero</p></td>
+<tr class="row-odd"><td><p>m2k_na_show_zero</p></td>
 <td><p>Always display 0db value on the graph</p></td>
 <td><p>Select whether the 0dB value is displayed as a reference point on the      Network Analyzer plot. This control is disabled by default.</p></td>
 </tr>
-<tr class="row-odd"><td><p>m2k_logic_separate_annotations</p></td>
+<tr class="row-even"><td><p>m2k_logic_separate_annotations</p></td>
 <td><p>Separate decoder annotations when exporting</p></td>
 <td><p>Select whether to export decoder annotations and data separately from the      Logic Analyzer instrument. Disabled by default.</p></td>
 </tr>
-<tr class="row-even"><td><p>m2k_logic_display_sampling_points</p></td>
+<tr class="row-odd"><td><p>m2k_logic_display_sampling_points</p></td>
 <td><p>Display sampling points when zoomed</p></td>
 <td><p>Select whether to display each sampling point when zoomed in on the Logic Analyzer. Disabled by default.</p></td>
 </tr>
-<tr class="row-odd"><td><p>m2k_logic_display_sample_time</p></td>
+<tr class="row-even"><td><p>m2k_logic_display_sample_time</p></td>
 <td><p>Show sample and time info in decoder table</p></td>
 <td><p>Select whether the sample and time detailed information is shown in the      decoder table of the Logic Analyzer. Enabled by default.</p></td>
-</tr>
-<tr class="row-even"><td><p>m2k_siggen_periods</p></td>
-<td><p>Number of displayed periods</p></td>
-<td><p>Select the number of displayed signal periods in the Signal Generator. Default value is 2.</p></td>
 </tr>
 <tr class="row-odd"><td><p>plugins_use_debugger_v2</p></td>
 <td><p>Use Debugger V2 plugin</p></td>
@@ -414,35 +406,31 @@ identify them in the .ini files, can be found in the table below.</p>
 <td><p>Include debug attributes in IIO Explorer</p></td>
 <td><p>Enable/disable the use of advanced debug attributes in the instrument.</p></td>
 </tr>
-<tr class="row-odd"><td><p>adc_acquisition_timeout</p></td>
-<td><p>ADC Acquisition timeout</p></td>
-<td><p>Select the timeout for the I/O operation. A valid value is a positive integer representing the time in milliseconds after which a timeout should occur.</p></td>
-</tr>
-<tr class="row-even"><td><p>adc_plot_xaxis_label_position</p></td>
+<tr class="row-odd"><td><p>adc_plot_xaxis_label_position</p></td>
 <td><p>Plot X-Axis scale position</p></td>
 <td><p>Select whether the X-Axis labels are displayed on the top or bottom of the plot. Only applied after restart.</p></td>
 </tr>
-<tr class="row-odd"><td><p>adc_plot_yaxis_label_position</p></td>
+<tr class="row-even"><td><p>adc_plot_yaxis_label_position</p></td>
 <td><p>Plot Y-Axis scale position</p></td>
 <td><p>Select whether the Y-Axis labels are displayed on the left or right side of the       plot. Only applied after restart.</p></td>
 </tr>
-<tr class="row-even"><td><p>adc_plot_yaxis_handle_position</p></td>
+<tr class="row-odd"><td><p>adc_plot_yaxis_handle_position</p></td>
 <td><p>Plot channel Y-handle position</p></td>
 <td><p>Select whether the Y-Axis handle is located on the left or right side of the plot. Only applied after restart.</p></td>
 </tr>
-<tr class="row-odd"><td><p>adc_plot_xcursor_position</p></td>
+<tr class="row-even"><td><p>adc_plot_xcursor_position</p></td>
 <td><p>Plot X-Cursor position</p></td>
 <td><p>Select whether the X-Axis cursor handles are located on the top or bottom of the plot. Only applied after restart.</p></td>
 </tr>
-<tr class="row-even"><td><p>adc_plot_ycursor_position</p></td>
+<tr class="row-odd"><td><p>adc_plot_ycursor_position</p></td>
 <td><p>Plot Y-Cursor position</p></td>
 <td><p>Select whether the Y-Axis cursor handles are located on the left or right side of the plot. Only applied after restart.</p></td>
 </tr>
-<tr class="row-odd"><td><p>adc_default_y_mode</p></td>
+<tr class="row-even"><td><p>adc_default_y_mode</p></td>
 <td><p>ADC Default Y-Mode</p></td>
 <td><p>Select the Y-Axis default mode, can be either ADC Counts or %Full Scale. This is also controllable while running, from the instrument settings. Only applied after restart.</p></td>
 </tr>
-<tr class="row-even"><td><p>regmap_color_by_value</p></td>
+<tr class="row-odd"><td><p>regmap_color_by_value</p></td>
 <td><p>Use color to reflect value</p></td>
 <td><p>Select from various configurations available which elements in the Register Map  are color coded for better visual interpretation.</p></td>
 </tr>

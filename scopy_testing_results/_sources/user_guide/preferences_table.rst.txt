@@ -59,9 +59,6 @@
    * - general_plot_target_fps
      - Plot target FPS
      - Select the Frames per second value for rendering plots in the entire application.
-   * - dataloggerplugin_date_time_format
-     - DateTime format :
-     - Select the date time format of the instrument. Default value is: hh:mm:ss
    * - dataloggerplugin_data_storage_size
      - Maximum data stored for each monitor
      - Select the maximum data storage size for each monitor in the datalogger.
@@ -101,18 +98,12 @@
    * - m2k_logic_display_sample_time
      - Show sample and time info in decoder table
      - Select whether the sample and time detailed information is shown in the      decoder table of the Logic Analyzer. Enabled by default.
-   * - m2k_siggen_periods
-     - Number of displayed periods
-     - Select the number of displayed signal periods in the Signal Generator. Default value is 2.
    * - plugins_use_debugger_v2
      - Use Debugger V2 plugin
      - Switch between the old style debugger instrument, having     just basic controls over attributes or the new instrument     type, IIO Explorer, having a tree-like structure.
    * - debugger_v2_include_debugfs
      - Include debug attributes in IIO Explorer
      - Enable/disable the use of advanced debug attributes in the instrument.
-   * - adc_acquisition_timeout
-     - ADC Acquisition timeout
-     - Select the timeout for the I/O operation. A valid value is a positive integer representing the time in milliseconds after which a timeout should occur. 
    * - adc_plot_xaxis_label_position
      - Plot X-Axis scale position
      - Select whether the X-Axis labels are displayed on the top or bottom of the plot. Only applied after restart.
