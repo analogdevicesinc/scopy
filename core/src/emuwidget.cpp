@@ -36,6 +36,10 @@
 #include <style.h>
 #include <menusectionwidget.h>
 
+#define PORT_DEFAULT 30431
+#define PORT_MIN 30431
+#define PORT_MAX 30439
+
 Q_LOGGING_CATEGORY(CAT_EMU_ADD_PAGE, "EmuAddPage")
 using namespace scopy;
 
@@ -87,10 +91,16 @@ EmuWidget::EmuWidget(QWidget *parent)
 	connect(this, &EmuWidget::demoEnabled, rxTxLabel, &QWidget::setDisabled);
 	connect(this, &EmuWidget::demoEnabled, rxTxDevWidget, &QWidget::setDisabled);
 
+	QLabel *portLabel = new QLabel("Port", emuWidget);
+	QWidget *portWidget = createPortWidget(emuWidget);
+	emuWidgetLay->addWidget(portLabel, 3, 0);
+	emuWidgetLay->addWidget(portWidget, 3, 1);
+	connect(this, &EmuWidget::demoEnabled, portLabel, &QWidget::setDisabled);
+
 	QLabel *uriLabel = new QLabel("URI", emuWidget);
 	QWidget *uriWidget = createUriWidget(emuWidget);
-	emuWidgetLay->addWidget(uriLabel, 3, 0);
-	emuWidgetLay->addWidget(uriWidget, 3, 1);
+	emuWidgetLay->addWidget(uriLabel, 4, 0);
+	emuWidgetLay->addWidget(uriWidget, 4, 1);
 	connect(this, &EmuWidget::demoEnabled, uriLabel, &QWidget::setDisabled);
 
 	m_uriMsgLabel = new QLabel(emuWidget);
@@ -139,6 +149,7 @@ void EmuWidget::enGenericOptWidget(QWidget *xmlPathWidget, QWidget *rxTxDevWidge
 	// when a new option is selected clear all fields
 	m_xmlPathEdit->setText("");
 	m_rxTxDevEdit->setText("");
+	m_portEdit->setText("");
 	m_uriEdit->setText("");
 
 	bool isNotAdalm2000 = !crtOpt.contains("adalm2000");
@@ -168,11 +179,19 @@ void EmuWidget::onEnableDemoClicked()
 			return;
 		}
 		stopEnableBtn("Disable");
+
 		if(m_uriEdit->text().isEmpty()) {
 			m_uriEdit->setText("ip:127.0.0.1");
 		}
+
 		setEnableDemo(!m_enableDemo);
-		Q_EMIT emuDeviceAvailable(m_uriEdit->text());
+		QString uri = m_uriEdit->text();
+		QString port = m_portEdit->text();
+		if(!port.isEmpty()) {
+			uri += ":";
+			uri += port;
+		}
+		Q_EMIT emuDeviceAvailable(uri);
 	} else {
 		killEmuProcess();
 	}
@@ -193,6 +212,10 @@ QStringList EmuWidget::createArgList()
 		arguments.append(m_rxTxDevEdit->text());
 	} else {
 		m_workingDir = "";
+	}
+	QString port = m_portEdit->text();
+	if(!port.isEmpty()) {
+		arguments.append("-p " + port);
 	}
 
 	return arguments;
@@ -307,6 +330,11 @@ void EmuWidget::configureOption(QString option)
 				m_rxTxDevEdit->setText(rxTxDevice);
 			}
 
+			if(jsonObject.contains("port")) {
+				QString port = jsonObject.value(QString("port")).toString();
+				m_portEdit->setText(port);
+			}
+
 			if(jsonObject.contains("uri")) {
 				QString uri = jsonObject.value(QString("uri")).toString();
 				m_uriEdit->setText(uri);
@@ -414,6 +442,39 @@ QWidget *EmuWidget::createRxTxDevWidget(QWidget *parent)
 
 	layout->addWidget(m_rxTxDevEdit);
 	layout->addWidget(rxTxDevBtn);
+	return w;
+}
+
+QWidget *EmuWidget::createPortWidget(QWidget *parent)
+{
+	QWidget *w = new QWidget(parent);
+	QHBoxLayout *layout = new QHBoxLayout(w);
+	layout->setMargin(0);
+	layout->setSpacing(10);
+	w->setLayout(layout);
+
+	m_portEdit = new QLineEdit(w);
+	m_portEdit->setPlaceholderText(QString::number(PORT_DEFAULT));
+	connect(this, &EmuWidget::demoEnabled, m_portEdit, &QWidget::setDisabled);
+	connect(m_portEdit, &QLineEdit::editingFinished, this, [this]() {
+		bool ok;
+		bool resetDefault = false;
+		QString port = m_portEdit->text();
+		int portValue = port.toInt(&ok);
+		if(ok) {
+			if((portValue < PORT_MIN) || (portValue > PORT_MAX)) {
+				resetDefault = true;
+			}
+		} else {
+			resetDefault = true;
+		}
+		if(resetDefault) {
+			m_portEdit->setText(QString::number(PORT_DEFAULT));
+		}
+		m_enDemoBtn->setFocus();
+	});
+
+	layout->addWidget(m_portEdit);
 	return w;
 }
 
