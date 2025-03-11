@@ -105,7 +105,7 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 	addScanFeedbackMsg("No scanned devices... Press the refresh button!");
 
 	m_fwScan = new QFutureWatcher<int>(this);
-	m_fwSerialScan = new QFutureWatcher<QVector<QString>>(this);
+	m_fwSerialScan = new QFutureWatcher<QMap<QString, QString>>(this);
 	setupConnections();
 	if(serialCompatible)
 		futureSerialScan();
@@ -136,8 +136,12 @@ void IioTabWidget::setupConnections()
 		Qt::QueuedConnection);
 	connect(m_btnSerialScan, SIGNAL(clicked()), this, SLOT(futureSerialScan()), Qt::QueuedConnection);
 	// serial widget connections
-	connect(m_serialPortCb->combo(), &QComboBox::textActivated, this,
-		[=]() { Q_EMIT uriChanged(getSerialPath()); });
+	connect(m_serialPortCb->combo(), &QComboBox::textActivated, this, [this]() {
+		QString crtText = m_serialPortCb->combo()->currentText();
+		m_serialDescriptionLabel->setVisible(true);
+		m_serialDescriptionLabel->setText(m_serialPortsNames[crtText]);
+		Q_EMIT uriChanged(getSerialPath());
+	});
 	connect(m_baudRateCb->combo(), &QComboBox::textActivated, this, [=]() { Q_EMIT uriChanged(getSerialPath()); });
 	connect(m_serialFrameEdit, &QLineEdit::returnPressed, this, [=]() { Q_EMIT uriChanged(getSerialPath()); });
 	connect(this, &IioTabWidget::uriChanged, this, &IioTabWidget::updateUri);
@@ -225,7 +229,7 @@ void IioTabWidget::futureScan()
 
 void IioTabWidget::futureSerialScan()
 {
-	QFuture<QVector<QString>> f = QtConcurrent::run(std::bind(&IIOScanTask::getSerialPortsName));
+	QFuture<QMap<QString, QString>> f = QtConcurrent::run(std::bind(&IIOScanTask::getSerialPortsName));
 	m_fwSerialScan->setFuture(f);
 }
 
@@ -262,20 +266,37 @@ void IioTabWidget::scanFinished()
 
 void IioTabWidget::serialScanFinished()
 {
-	QVector<QString> portsName = m_fwSerialScan->result();
+	m_serialDescriptionLabel->clear();
+	m_serialPortsNames = m_fwSerialScan->result();
 	m_btnSerialScan->stopAnimation();
 	m_serialPortCb->combo()->clear();
-	if(!portsName.empty()) {
-		for(const QString &port : portsName) {
+	if(!m_serialPortsNames.empty()) {
+		QList<QString> keys = m_serialPortsNames.keys();
+		for(const QString &port : keys) {
 			m_serialPortCb->combo()->addItem(port);
 		}
+		QString crtText = m_serialPortCb->combo()->currentText();
+		m_serialDescriptionLabel->setVisible(true);
+		m_serialDescriptionLabel->setText(m_serialPortsNames[crtText]);
+	} else {
+		m_serialDescriptionLabel->setVisible(false);
 	}
 }
 
 QString IioTabWidget::getSerialPath()
 {
 	QString serialPath = "serial:";
-	serialPath.append(m_serialPortCb->combo()->currentText());
+	QString serialId = "";
+	QString serialFullName = m_serialPortCb->combo()->currentText();
+	int s_idx = serialFullName.indexOf("[");
+	int e_idx = serialFullName.indexOf("]");
+	if((s_idx >= 0) && (e_idx >= 0)) {
+		serialId = serialFullName.mid(s_idx + 1, e_idx - s_idx - 1);
+		serialId = serialId.trimmed();
+	} else {
+		serialId = serialFullName;
+	}
+	serialPath.append(serialId);
 	serialPath.append("," + m_baudRateCb->combo()->currentText());
 	serialPath.append("," + m_serialFrameEdit->text());
 	return serialPath;
@@ -361,7 +382,7 @@ QWidget *IioTabWidget::createAvlCtxWidget(QWidget *parent)
 QWidget *IioTabWidget::createSerialSettWidget(QWidget *parent)
 {
 	QWidget *w = new QWidget(parent);
-	QHBoxLayout *layout = new QHBoxLayout(w);
+	QGridLayout *layout = new QGridLayout(w);
 	layout->setMargin(0);
 	layout->setSpacing(10);
 	w->setLayout(layout);
@@ -393,10 +414,16 @@ QWidget *IioTabWidget::createSerialSettWidget(QWidget *parent)
 	setupBtnLdIcon(m_btnSerialScan);
 	StyleHelper::RefreshButton(m_btnSerialScan);
 
-	layout->addWidget(m_serialPortCb);
-	layout->addWidget(m_baudRateCb);
-	layout->addWidget(lineEditWidget);
-	layout->addWidget(m_btnSerialScan);
+	m_serialDescriptionLabel = new QLabel(w);
+	Style::setStyle(m_serialDescriptionLabel, style::properties::label::subtle);
+	m_serialDescriptionLabel->setWordWrap(true);
+	m_serialDescriptionLabel->setVisible(false);
+
+	layout->addWidget(m_serialPortCb, 0, 0);
+	layout->addWidget(m_baudRateCb, 0, 1);
+	layout->addWidget(lineEditWidget, 0, 2);
+	layout->addWidget(m_btnSerialScan, 0, 3, Qt::AlignRight);
+	layout->addWidget(m_serialDescriptionLabel, 1, 0, Qt::AlignLeft);
 	return w;
 }
 

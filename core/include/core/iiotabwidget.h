@@ -73,6 +73,7 @@ private:
 
 	QWidget *m_filterWidget;
 	QLabel *m_ctxUriLabel;
+	QLabel *m_serialDescriptionLabel;
 	QComboBox *m_avlCtxCb;
 	MenuCombo *m_serialPortCb;
 	MenuCombo *m_baudRateCb;
@@ -84,7 +85,8 @@ private:
 	AnimationPushButton *m_btnVerify;
 
 	QFutureWatcher<int> *m_fwScan;
-	QFutureWatcher<QVector<QString>> *m_fwSerialScan;
+	QMap<QString, QString> m_serialPortsNames;
+	QFutureWatcher<QMap<QString, QString>> *m_fwSerialScan;
 	QStringList m_scanParamsList;
 	QVector<QPair<QString, QString>> m_scanList;
 

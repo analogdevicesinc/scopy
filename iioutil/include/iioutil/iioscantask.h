@@ -41,7 +41,7 @@ public:
 	virtual void run() override;
 	void setScanParams(QString s);
 	static int scan(QVector<QPair<QString, QString>> *ctxs, QString scanParams);
-	static QVector<QString> getSerialPortsName();
+	static QMap<QString, QString> getSerialPortsName();
 
 Q_SIGNALS:
 	void scanFinished(QVector<QPair<QString, QString>> ctxs);
