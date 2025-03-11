@@ -19,42 +19,35 @@
  *
  */
 
-#ifndef SCRIPTING_H
-#define SCRIPTING_H
+#ifndef SCRIPTINGTOOL_H
+#define SCRIPTINGTOOL_H
 
-#define SCOPY_PLUGIN_NAME Scripting
-
+#include <QPlainTextEdit>
+#include <QWidget>
 #include "scopy-scripting_export.h"
-#include <QObject>
-#include <pluginbase/plugin.h>
-#include <pluginbase/pluginbase.h>
+#include "scopycodeeditor.h"
 
 namespace scopy {
 namespace scripting {
 
-class SCOPY_SCRIPTING_EXPORT Scripting : public QObject, public PluginBase
+class SCOPY_SCRIPTING_EXPORT ScriptingTool : public QWidget
 {
 	Q_OBJECT
-	SCOPY_PLUGIN;
-
 public:
-	bool compatible(QString m_param, QString category) override;
-	bool loadPage() override;
-	bool loadIcon() override;
-	void loadToolList() override;
-	void unload() override;
-	void initMetadata() override;
-	QString description() override;
+	explicit ScriptingTool(QWidget *parent = nullptr);
 
-	QWidget *getTool();
-
-public Q_SLOTS:
-	bool onConnect() override;
-	bool onDisconnect() override;
+signals:
 
 private:
-	QWidget *m_scriptingWidget = nullptr;
+	QString fileName = "";
+	ScopyCodeEditor *codeEditor;
+	QPlainTextEdit *codeOutput;
+
+	void loadFile();
+	void saveToFile();
+	void compileCode();
 };
+
 } // namespace scripting
 } // namespace scopy
-#endif // SCRIPTING_H
+#endif // SCRIPTINGTOOL_H
