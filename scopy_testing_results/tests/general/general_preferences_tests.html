@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>General Preferences - Test Suite &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=3d3703ae" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../../_static/app.umd.js?v=dcfbb431"></script>
+    <link rel="icon" href="../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Scopy Preferences" href="../../user_guide/preferences.html" />
+    <link rel="prev" title="Instrument Detaching - Test Suite" href="instrument_detaching_tests.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">General Preferences - Test Suite</a><ul>
+<li><a class="reference internal" href="#setup-environment">Setup environment:</a></li>
+<li><a class="reference internal" href="#test-1-save-load-scopy-session">Test 1 - Save/Load Scopy session</a></li>
+<li><a class="reference internal" href="#test-2-double-click-to-attach-detach-tool">Test 2 - Double click to attach/detach tool</a></li>
+<li><a class="reference internal" href="#test-3-save-load-tool-attached-state">Test 3 - Save/Load tool attached state</a></li>
+<li><a class="reference internal" href="#test-4-double-click-control-buttons-to-open-menu">Test 4 - Double click control buttons to open menu</a></li>
+<li><a class="reference internal" href="#test-5-enable-opengl-plotting">Test 5 - Enable OpenGL plotting</a></li>
+<li><a class="reference internal" href="#test-6-enable-menu-animations">Test 6 - Enable menu animations</a></li>
+<li><a class="reference internal" href="#test-7-enable-the-status-bar-for-displaying-important-messages">Test 7 - Enable the status bar for displaying important messages</a></li>
+<li><a class="reference internal" href="#test-8-show-grid">Test 8 - Show Grid</a></li>
+<li><a class="reference internal" href="#test-9-show-graticule">Test 9 - Show Graticule</a></li>
+<li><a class="reference internal" href="#test-10-use-lazy-loading">Test 10 - Use Lazy Loading</a></li>
+<li><a class="reference internal" href="#test-11-use-native-dialogs">Test 11 - Use native dialogs</a></li>
+<li><a class="reference internal" href="#test-12-auto-connect-to-previous-session">Test 12 - Auto-connect to previous session</a></li>
+<li><a class="reference internal" href="#test-13-font-scale">Test 13 - Font scale</a></li>
+<li><a class="reference internal" href="#test-14-theme">Test 14 - Theme</a></li>
+<li><a class="reference internal" href="#test-15-language">Test 15 - Language</a></li>
+<li><a class="reference internal" href="#test-16-connect-to-multiple-devices">Test 16 - Connect to multiple devices</a></li>
+<li><a class="reference internal" href="#test-17-regularly-scan-for-new-devices">Test 17 - Regularly scan for new devices</a></li>
+<li><a class="reference internal" href="#test-18-session-devices">Test 18 - Session devices</a></li>
+<li><a class="reference internal" href="#test-19-show-plot-fps">Test 19 - Show plot FPS</a></li>
+<li><a class="reference internal" href="#test-20-plot-target-fps">Test 20 - Plot target FPS</a></li>
+<li><a class="reference internal" href="#test-21-reset-settings-and-plugins-to-default">Test 21 - Reset settings and plugins to default</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../index.html">
+      <img class="only-light" src="../../_static/scopy.png"/>
+      <img class="only-dark" src="../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1"/><div class="collapse"><a class="reference internal" href="../plugins/index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../plugins/datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../plugins/dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../plugins/swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../plugins/adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../plugins/registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2" checked=""/><div class="collapse"><a class="reference internal" href="index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="general-preferences-test-suite">
+<span id="general-preferences-tests"></span><h1>General Preferences - Test Suite<a class="headerlink" href="#general-preferences-test-suite" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23.8%" />
+<col style="width: 14.3%" />
+<col style="width: 14.3%" />
+<col style="width: 23.8%" />
+<col style="width: 23.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Tester</p></th>
+<th class="head"><p>Test Date</p></th>
+<th class="head"><p>Scopy version</p></th>
+<th class="head"><p>Plugin version (N/A if not applicable)</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="setup-environment">
+<h2>Setup environment:<a class="headerlink" href="#setup-environment" title="Link to this heading"></a></h2>
+<dl class="simple" id="m2k-emu-setup">
+<dt><strong>M2K.emu:</strong></dt><dd><ul class="simple">
+<li><p>Press the add device button</p></li>
+<li><p>Enable emulator for adalm2000</p></li>
+<li><p>Verify and add device with M2KPlugin and ADCPlugin enabled</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple" id="pluto-emu-setup">
+<dt><strong>Pluto.emu:</strong></dt><dd><ul class="simple">
+<li><p>Press the add device button</p></li>
+<li><p>Enable emulator for pluto</p></li>
+<li><p>Verify and add device with ADCPlugin enabled</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple" id="pluto-emu-usb-setup">
+<dt><strong>Pluto.usb:</strong></dt><dd><ul class="simple">
+<li><p>Connect a pluto device via usb to your PC</p></li>
+<li><p>Connect to the device in Scopy with ADCPlugin enabled</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="test-1-save-load-scopy-session">
+<h2>Test 1 - Save/Load Scopy session<a class="headerlink" href="#test-1-save-load-scopy-session" title="Link to this heading"></a></h2>
+<p id="tst-pref-save-load-session"><strong>UID:</strong> TST.PREF.SAVE_LOAD_SESSION</p>
+<p><strong>Description:</strong> Manage sessions to retain or load overall application
+states (only applies to plugins which have this implemented).</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#m2k-emu-setup"><span class="std std-ref">M2K.emu</span></a></p></li>
+<li><p>OS: ALL</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Set preference to enabled</p></li>
+<li><p>Open Oscilloscope tool</p></li>
+<li><p>Modify the time base value to 1s</p></li>
+<li><p>Close Scopy</p></li>
+<li><dl class="simple">
+<dt>Open the app using the same setup and check if the time base</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> time base is 1s</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Redo all the steps with the preference disabled</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> time base is the default value</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Press the “Settings file location” open button within the preference menu</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> should open a file browser containing
+.ini files for every plugins’ session saved</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-double-click-to-attach-detach-tool">
+<h2>Test 2 - Double click to attach/detach tool<a class="headerlink" href="#test-2-double-click-to-attach-detach-tool" title="Link to this heading"></a></h2>
+<p id="tst-pref-doubleclick-attach-detach"><strong>UID:</strong> TST.PREF.DOUBLECLICK_ATTACH_DETACH</p>
+<p><strong>Description:</strong> Tools can be detached from the main window by
+double clicking them in the left menu.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#m2k-emu-setup"><span class="std std-ref">M2k.emu</span></a></p></li>
+<li><p>OS: ALL</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Set preference to enabled.</p></li>
+<li><dl class="simple">
+<dt>Double click Oscilloscope tool to detach it.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Oscilloscope tool should detach from
+the main window into a new one.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Redo all the steps with the preference disabled.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Nothing should happen.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-save-load-tool-attached-state">
+<h2>Test 3 - Save/Load tool attached state<a class="headerlink" href="#test-3-save-load-tool-attached-state" title="Link to this heading"></a></h2>
+<p id="tst-pref-save-load-tool-state"><strong>UID:</strong> TST.PREF.SAVE_LOAD_TOOL_STATE</p>
+<p><strong>Description:</strong> Manage sessions to retain tool attached states.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+<li><p>Depends on <a class="reference internal" href="#tst-pref-doubleclick-attach-detach"><span class="std std-ref">Test Double click to attach/detach tool</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#m2k-emu-setup"><span class="std std-ref">M2k.emu</span></a></p></li>
+<li><p>OS: ALL</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Set the following preferences to enabled: <strong>Save/Load tool attached state</strong> and <strong>Double click to attach/detach tool</strong>.</p></li>
+<li><p>Double click Oscilloscope tool to detach it.</p></li>
+<li><p>Close Scopy.</p></li>
+<li><dl class="simple">
+<dt>Open the app using the same setup.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Oscilloscope is still detached.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Redo all the steps with the  <strong>Save/Load tool attached state</strong> preference disabled.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Oscilloscope should not be detached.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-double-click-control-buttons-to-open-menu">
+<h2>Test 4 - Double click control buttons to open menu<a class="headerlink" href="#test-4-double-click-control-buttons-to-open-menu" title="Link to this heading"></a></h2>
+<p id="tst-pref-doubleclick-control-menu"><strong>UID:</strong> TST.PREF.DOUBLECLICK_CONTROL_MENU</p>
+<p><strong>Description:</strong> Open menu from MenuControlButtons by double clicking them.</p>
+<dl>
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#pluto-emu-setup"><span class="std std-ref">Pluto.emu</span></a></p></li>
+<li><p>OS: ALL</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Set preference to enabled.</p></li>
+<li><p>Open ADC - Time tool.</p></li>
+<li><p>Double click Cursors button in the bottom right (
+do not click on the button’s icon).</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Expected result:</strong> A hovering menu should open above the button.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Redo all the steps with the preference disabled.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> No menu should open.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-5-enable-opengl-plotting">
+<h2>Test 5 - Enable OpenGL plotting<a class="headerlink" href="#test-5-enable-opengl-plotting" title="Link to this heading"></a></h2>
+<p id="tst-pref-enable-opengl-plotting"><strong>UID:</strong> TST.PREF.ENABLE_OPENGL_PLOTTING</p>
+<p><strong>Description:</strong> Use GPU acceleration for rendering plots (OpenGL-based).</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+<li><p>Depends on Test “Plot FPS”</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#m2k-emu-setup"><span class="std std-ref">M2k.emu</span></a></p></li>
+<li><p>OS: ALL</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Set preference to enabled.</p></li>
+<li><p>Set Debug preference “Show plot FPS” to enabled.</p></li>
+<li><dl class="simple">
+<dt>Open Oscilloscope tool and run it.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The red text inside the plot
+should contain “OpenGL rendering.”</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Redo all the steps with the preference disabled.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The red text inside the plot
+should contain “Software rendering.”</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-6-enable-menu-animations">
+<h2>Test 6 - Enable menu animations<a class="headerlink" href="#test-6-enable-menu-animations" title="Link to this heading"></a></h2>
+<p id="tst-pref-enable-menu-animations"><strong>UID:</strong> TST.PREF.ENABLE_MENU_ANIMATIONS</p>
+<p><strong>Description:</strong> Toggle visual animations for menu transitions.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#m2k-emu-setup"><span class="std std-ref">M2k.emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Set preference to enabled.</p></li>
+<li><dl class="simple">
+<dt>Open Oscilloscope tool and toggle between trigger and channel menus.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Opening menus should be animated.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Redo all the steps with the preference disabled.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Opening menus shouldn’t have any animations.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-7-enable-the-status-bar-for-displaying-important-messages">
+<h2>Test 7 - Enable the status bar for displaying important messages<a class="headerlink" href="#test-7-enable-the-status-bar-for-displaying-important-messages" title="Link to this heading"></a></h2>
+<p id="tst-pref-enable-status-bar"><strong>UID:</strong> TST.PREF.ENABLE_STATUS_BAR</p>
+<p><strong>Description:</strong> Show status messages on the bottom of the app window.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#m2k-emu-setup"><span class="std std-ref">M2k.emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt>Steps</dt><dd><ol class="arabic simple">
+<li><p>Set preference to enabled.</p></li>
+<li><dl class="simple">
+<dt>Do the setup again and look for a message bar when pressing “connect.”</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A message about connecting should appear at the bottom of the window.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Redo all the steps with the preference disabled.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> No message should pop up.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-8-show-grid">
+<h2>Test 8 - Show Grid<a class="headerlink" href="#test-8-show-grid" title="Link to this heading"></a></h2>
+<p id="tst-pref-show-grid"><strong>UID:</strong> TST.PREF.SHOW_GRID</p>
+<p><strong>Description:</strong> Display grid lines for better visual referencing on plots.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#pluto-emu-setup"><span class="std std-ref">Pluto.emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Set preference to enabled.</p></li>
+<li><dl class="simple">
+<dt>Open ADC - Time tool.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A grid should be visible on the plot.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Redo all the steps with the preference disabled.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> No grid on the plot.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-9-show-graticule">
+<h2>Test 9 - Show Graticule<a class="headerlink" href="#test-9-show-graticule" title="Link to this heading"></a></h2>
+<p id="tst-pref-show-graticule"><strong>UID:</strong> TST.PREF.SHOW_GRATICULE</p>
+<p><strong>Description:</strong> Display lines for axes centered on 0 points on plots.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#pluto-emu-setup"><span class="std std-ref">Pluto.emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Set preference to enabled.</p></li>
+<li><dl class="simple">
+<dt>Open ADC - Time tool.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A horizontal and a vertical
+measurement line should be centered on the 0-axis
+points (both may not be visible at the same time).</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Redo all the steps with the preference disabled.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The lines should border the entire
+plot instead of centering on 0 points.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-10-use-lazy-loading">
+<h2>Test 10 - Use Lazy Loading<a class="headerlink" href="#test-10-use-lazy-loading" title="Link to this heading"></a></h2>
+<p id="tst-pref-use-lazy-loading"><strong>UID:</strong> TST.PREF.USE_LAZY_LOADING</p>
+<p><strong>Description:</strong> Load IIO resources as needed to improve initial load performance.</p>
+<dl>
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#pluto-emu-usb-setup"><span class="std std-ref">Pluto.emu</span></a></p></li>
+<li><p>OS: Windows</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Set preference to enabled.</p></li>
+<li><p>Open Scopy console executable.</p></li>
+<li><p>After connecting to Pluto as described in the setup, look
+in the console for “device connection took:” times.</p></li>
+<li><p>Redo all the steps with the preference disabled and
+compare the elapsed times.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Expected result:</strong> Elapsed times connecting to some
+plugins should be lower when lazy loading is enabled.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-11-use-native-dialogs">
+<h2>Test 11 - Use native dialogs<a class="headerlink" href="#test-11-use-native-dialogs" title="Link to this heading"></a></h2>
+<p id="tst-pref-use-native-dialogs"><strong>UID:</strong> TST.PREF.USE_NATIVE_DIALOGS</p>
+<p><strong>Description:</strong> Use system-native dialog windows.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>OS: ALL</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Set preference to enabled.</p></li>
+<li><dl class="simple">
+<dt>Press the Load button on the left menu.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A native file browser window should open. A native file dialog is the file chooser
+that is provided by the operating system.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Redo all the steps with the preference disabled.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A non-native, Scopy-specific,
+file browser window should open.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-12-auto-connect-to-previous-session">
+<h2>Test 12 - Auto-connect to previous session<a class="headerlink" href="#test-12-auto-connect-to-previous-session" title="Link to this heading"></a></h2>
+<p id="tst-pref-auto-connect-previous-session"><strong>UID:</strong> TST.PREF.AUTO_CONNECT_PREVIOUS_SESSION</p>
+<p><strong>Description:</strong> Automatically reconnect to the last used devices on startup.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#pluto-emu-usb-setup"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Set preference to enabled.</p></li>
+<li><p>Connect to the device and then close the application.</p></li>
+<li><dl class="simple">
+<dt>Open Scopy.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Scopy should automatically connect
+to the Pluto device.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Redo all the steps with the preference disabled.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Should not connect automatically.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-13-font-scale">
+<h2>Test 13 - Font scale<a class="headerlink" href="#test-13-font-scale" title="Link to this heading"></a></h2>
+<p id="tst-pref-font-scale"><strong>UID:</strong> TST.PREF.FONT_SCALE</p>
+<p><strong>Description:</strong> Adjust font size within the app (this is experimental,
+so some layout artifacts may appear).</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#pluto-emu-setup"><span class="std std-ref">Pluto.emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Set preference to 1.45, restart Scopy, and inspect some tools.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> All app text and some buttons should be larger.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>Repeat the steps for font size 1.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Text should return to default size.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-14-theme">
+<h2>Test 14 - Theme<a class="headerlink" href="#test-14-theme" title="Link to this heading"></a></h2>
+<p id="tst-pref-theme"><strong>UID:</strong> TST.PREF.THEME</p>
+<p><strong>Description:</strong> Change application theme.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#pluto-emu-setup"><span class="std std-ref">Pluto.emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Set preference to a <strong>Harmonic light</strong> theme and restart the application.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Application should be displayed in a light theme while retaining
+the same UX and usability in all tools.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-15-language">
+<h2>Test 15 - Language<a class="headerlink" href="#test-15-language" title="Link to this heading"></a></h2>
+<p id="tst-pref-language"><strong>UID:</strong> TST.PREF.LANGUAGE</p>
+<p><strong>Description:</strong> Change the language of the application interface.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#m2k-emu-setup"><span class="std std-ref">M2k.emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt>Steps</dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Set preference to a different language and restart the app.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Some text language should change in the M2K tools.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-16-connect-to-multiple-devices">
+<h2>Test 16 - Connect to multiple devices<a class="headerlink" href="#test-16-connect-to-multiple-devices" title="Link to this heading"></a></h2>
+<p id="tst-pref-connect-multiple-devices"><strong>UID:</strong> TST.PREF.CONNECT_MULTIPLE_DEVICES</p>
+<p><strong>Description:</strong> Enable connections to multiple hardware and emulator</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#pluto-emu-setup"><span class="std std-ref">Pluto.emu</span></a> and <a class="reference internal" href="#m2k-emu-setup"><span class="std std-ref">M2k.emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Set preference to enabled.</p></li>
+<li><dl class="simple">
+<dt>Connect to 2 devices following the setup.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Two devices should appear in the left
+menu and be fully functional.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Repeat the steps with the preference disabled.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> When connecting to the second device,
+the first one should automatically disconnect.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-17-regularly-scan-for-new-devices">
+<h2>Test 17 - Regularly scan for new devices<a class="headerlink" href="#test-17-regularly-scan-for-new-devices" title="Link to this heading"></a></h2>
+<p id="tst-pref-regularly-scan-new-devices"><strong>UID:</strong> TST.PREF.REGULARLY_SCAN_NEW_DEVICES</p>
+<p><strong>Description:</strong> Continuously scan and recognize newly connected devices.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#pluto-emu-usb-setup"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Set preference to enabled.</p></li>
+<li><dl class="simple">
+<dt>Connect the Pluto to the machine via USB.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Pluto should automatically appear in
+the device list, and a toggle switch for scanning should
+appear in the top right.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Repeat the steps with the preference disabled.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Pluto should not appear automatically,
+only when pressing the on-demand Scan button.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-18-session-devices">
+<h2>Test 18 - Session devices<a class="headerlink" href="#test-18-session-devices" title="Link to this heading"></a></h2>
+<p id="tst-pref-session-devices"><strong>UID:</strong> TST.PREF.SESSION_DEVICES</p>
+<p><strong>Description:</strong> Automatically connect to saved devices.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#pluto-emu-usb-setup"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p><a class="reference internal" href="#tst-pref-auto-connect-previous-session"><span class="std std-ref">“Auto-connect to previous session”</span></a> preference needs to be enabled</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>After connecting to Pluto, go to the preferences and press “Refresh.”</p></li>
+<li><p>Check the current device’s URI.</p></li>
+<li><p>Go back to the homepage and forget the device by pressing the red
+“X” button on the device.</p></li>
+<li><dl class="simple">
+<dt>Close and reopen Scopy.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Should automatically connect to the URI you
+checked.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-19-show-plot-fps">
+<h2>Test 19 - Show plot FPS<a class="headerlink" href="#test-19-show-plot-fps" title="Link to this heading"></a></h2>
+<p id="tst-pref-show-plot-fps"><strong>UID:</strong> TST.PREF.SHOW_PLOT_FPS</p>
+<p><strong>Description:</strong> Show FPS on plots.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#m2k-emu-setup"><span class="std std-ref">M2k.emu</span></a> and <a class="reference internal" href="#pluto-emu-usb-setup"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Set preference to enabled.</p></li>
+<li><p>Open Oscilloscope and run it.</p></li>
+<li><dl class="simple">
+<dt>Open ADC - Time and run it.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Should show the FPS on the plot
+(M2K may look different from other plugins).</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Repeat the steps with the preference disabled.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> No FPS should be visible.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-20-plot-target-fps">
+<h2>Test 20 - Plot target FPS<a class="headerlink" href="#test-20-plot-target-fps" title="Link to this heading"></a></h2>
+<p id="tst-pref-plot-target-fps"><strong>UID:</strong> TST.PREF.PLOT_TARGET_FPS</p>
+<p><strong>Description:</strong> Manage the maximum FPS plots should run at
+(this may also affect the IIO acquisition).</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#pluto-emu-usb-setup"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>“Show plot FPS” needs to be enabled.</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Set the preference to each value and run ADC - Time to check FPS.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Plot FPS should be capped at the selected value.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-21-reset-settings-and-plugins-to-default">
+<h2>Test 21 - Reset settings and plugins to default<a class="headerlink" href="#test-21-reset-settings-and-plugins-to-default" title="Link to this heading"></a></h2>
+<p id="tst-pref-reset-settings-default"><strong>UID:</strong> TST.PREF.RESET_SETTINGS_DEFAULT</p>
+<p><strong>Description:</strong> Resets all settings and plugins to default values.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#m2k-emu-setup"><span class="std std-ref">M2k.emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Change general preferences and M2K preferences.</p></li>
+<li><dl class="simple">
+<dt>Press the “Reset” button and the “Restart” to restart the app.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> All changed preferences should have
+the default values.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="instrument_detaching_tests.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Instrument Detaching - Test Suite</a>
+    <a href="../../user_guide/preferences.html" title="Next document (Alt+Shift+RightArrow)" class="next">Scopy Preferences</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

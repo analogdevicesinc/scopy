@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SWIOT Plugin - Test Suite &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=3d3703ae" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=dcfbb431"></script>
+    <link rel="icon" href="../../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="ADC" href="../adc/index.html" />
+    <link rel="prev" title="SWIOT1L" href="index.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">SWIOT Plugin - Test Suite</a><ul>
+<li><a class="reference internal" href="#setup-environment">Setup environment</a></li>
+<li><a class="reference internal" href="#test-1-swiot-compatibility">Test 1 - SWIOT compatibility</a></li>
+<li><a class="reference internal" href="#test-2-mode-switching">Test 2 - Mode switching</a></li>
+<li><a class="reference internal" href="#test-3-swiot-config-mode">Test 3 - SWIOT config mode</a></li>
+<li><a class="reference internal" href="#test-4-ad74413r-plot-operations">Test 4 - AD74413R plot operations</a></li>
+<li><a class="reference internal" href="#test-5-ad74413r-channel-operations">Test 5 - AD74413R channel operations</a></li>
+<li><a class="reference internal" href="#test-6-ad74413r-diagnostic-channels">Test 6 - AD74413R diagnostic channels</a></li>
+<li><a class="reference internal" href="#test-7-ad74413r-sampling-frequency">Test 7 - AD74413R sampling frequency</a></li>
+<li><a class="reference internal" href="#test-8-ad74413r-tutorial-docs">Test 8 - AD74413R tutorial &amp; docs</a></li>
+<li><a class="reference internal" href="#test-9-max14906-plot-operations">Test 9 - MAX14906 plot operations</a></li>
+<li><a class="reference internal" href="#test-10-max14906-channel-operations">Test 10 - MAX14906 channel operations</a></li>
+<li><a class="reference internal" href="#test-11-max14906-tutorial-docs">Test 11 - MAX14906 tutorial &amp; docs</a></li>
+<li><a class="reference internal" href="#test-12-faults-run-single">Test 12 - Faults Run Single</a></li>
+<li><a class="reference internal" href="#test-13-faults-clear-and-reset">Test 13 - Faults clear and reset</a></li>
+<li><a class="reference internal" href="#test-14-faults-run-continuous">Test 14 - Faults Run continuous</a></li>
+<li><a class="reference internal" href="#test-15-faults-tutorial-docs">Test 15 - Faults tutorial &amp; docs</a></li>
+<li><a class="reference internal" href="#test-16-swiot-external-supply">Test 16 - SWIOT external supply</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../../index.html">
+      <img class="only-light" src="../../../_static/scopy.png"/>
+      <img class="only-dark" src="../../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../../../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4" checked=""/><div class="collapse"><a class="reference internal" href="index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../../general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="swiot-plugin-test-suite">
+<span id="swiot1l-tests"></span><h1>SWIOT Plugin - Test Suite<a class="headerlink" href="#swiot-plugin-test-suite" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>User guide <a class="reference internal" href="../../../plugins/swiot1l/index.html#swiot1l-index"><span class="std std-ref">AD-SWIOT1L-SL user guide</span></a></p>
+</div>
+<p>The SWIOT plugin tests are a set of tests that are used to verify the functionality of the SWIOT plugin.
+The tests are designed to be run in a specific order to ensure that the plugin is functioning correctly.
+The tests are divided into two main categories: <strong>CONFIG</strong> AND <strong>RUNTIME</strong>.</p>
+<p>The following apply for all the test cases in this suite.
+If the test case has special requirements, they will be listed in the test case section.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23.8%" />
+<col style="width: 14.3%" />
+<col style="width: 14.3%" />
+<col style="width: 23.8%" />
+<col style="width: 23.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Tester</p></th>
+<th class="head"><p>Test Date</p></th>
+<th class="head"><p>Scopy version</p></th>
+<th class="head"><p>Plugin version (N/A if not applicable)</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="setup-environment">
+<h2>Setup environment<a class="headerlink" href="#setup-environment" title="Link to this heading"></a></h2>
+<dl class="simple" id="swiot1l-emu-config">
+<dt><strong>SWIOT.Emu.Config:</strong></dt><dd><ul class="simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Start the IIO-EMU process.</p></li>
+<li><p>Connect to the <strong>swiot_config</strong> device.</p></li>
+</ul>
+</dd>
+<dt>Depends on:</dt><dd><ul class="simple">
+<li><p>Test TST.EMU.CONNECT</p></li>
+<li><p>Test TST.PREFS.RESET</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple" id="swiot1l-emu-runtime">
+<dt><strong>SWIOT.Emu.Runtime:</strong></dt><dd><ul class="simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Start the IIO-EMU process.</p></li>
+<li><p>Connect to the <strong>swiot_runtime</strong> device.</p></li>
+</ul>
+</dd>
+<dt>Depends on:</dt><dd><ul class="simple">
+<li><p>Test TST.EMU.CONNECT</p></li>
+<li><p>Test TST.PREFS.RESET</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple" id="swiot1l-device">
+<dt><strong>SWIOT.Device:</strong></dt><dd><ul class="simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Connect to AD-SWIOT1L-SL using the static ip:169.254.97.40</p></li>
+<li><p>Connect <strong>CH_1 GND</strong> to <strong>CH_2 GND</strong> using loopback cables.</p></li>
+<li><p>Connect <strong>CH_1</strong> to <strong>CH_2</strong> using loopback cables.</p></li>
+<li><p>Connect <strong>CH_3 GND</strong> to <strong>CH_4 GND</strong> using loopback cables.</p></li>
+<li><p>Connect <strong>CH_3</strong> to <strong>CH_4</strong> using loopback cables.</p></li>
+</ul>
+</dd>
+<dt>Depends on:</dt><dd><ul class="simple">
+<li><p>Test TST.PREFS.RESET</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple" id="swiot1l-device-runtime">
+<dt><strong>SWIOT.Device.Runtime:</strong></dt><dd><ul class="simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Connect to AD-SWIOT1L-SL using the static ip:169.254.97.40</p></li>
+<li><p>Connect <strong>CH_1 GND</strong> to <strong>CH_2 GND</strong> using loopback cables.</p></li>
+<li><p>Connect <strong>CH_1</strong> to <strong>CH_2</strong> using loopback cables.</p></li>
+<li><p>Connect <strong>CH_3 GND</strong> to <strong>CH_4 GND</strong> using loopback cables.</p></li>
+<li><p>Connect <strong>CH_3</strong> to <strong>CH_4</strong> using loopback cables.</p></li>
+<li><dl class="simple">
+<dt>Configure SWIOT in the following way:</dt><dd><ul>
+<li><p>Channel 1: device <strong>ad74413r</strong> and function <strong>voltage_out</strong></p></li>
+<li><p>Channel 2: device <strong>ad74413r</strong> and function <strong>voltage_in</strong></p></li>
+<li><p>Channel 3: device <strong>max14906</strong> and function <strong>input</strong></p></li>
+<li><p>Channel 4: device <strong>max14906</strong> and function <strong>output</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Click <strong>Apply</strong> to enter Runtime mode.</p></li>
+</ul>
+</dd>
+<dt>Depends on:</dt><dd><ul class="simple">
+<li><p>Test TST.PREFS.RESET</p></li>
+</ul>
+</dd>
+<dt>Prerequisites:</dt><dd><ul class="simple">
+<li><p>Scopy v2.0.0 or later with SWIOT plugin installed on the system.</p></li>
+<li><p>Tests listed as dependencies are successfully completed.</p></li>
+<li><p>Reset .ini files to default using the Preferences “Reset” button.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="test-1-swiot-compatibility">
+<h2>Test 1 - SWIOT compatibility<a class="headerlink" href="#test-1-swiot-compatibility" title="Link to this heading"></a></h2>
+<p id="tst-swiot-compat"><strong>UID</strong>: TST.SWIOT.COMPAT</p>
+<p><strong>Description</strong>: This test verifies that the SWIOT plugin is compatible
+with the selected device and that the plugin is able to correctly parse it.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#swiot1l-emu-config"><span class="std std-ref">SWIOT.Emu.Config</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the SWIOT plugin - Config Instrument.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>The plugin is able to connect to the device.</p></li>
+<li><p>The Config instrument shows 4 disabled channels.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-mode-switching">
+<h2>Test 2 - Mode switching<a class="headerlink" href="#test-2-mode-switching" title="Link to this heading"></a></h2>
+<p id="tst-swiot-modes"><strong>UID</strong>: TST.SWIOT.MODES</p>
+<p><strong>Description</strong>: This test verifies that the SWIOT plugin is able
+to switch between Config and Runtime modes.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#swiot1l-device"><span class="std std-ref">SWIOT.Device</span></a></p></li>
+<li><p>OS: ALL</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the Config instrument.</p></li>
+<li><dl class="simple">
+<dt>Click the <strong>Apply</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>The device disconnects for a moment and then reconnects
+automatically.</p></li>
+<li><p>Upon reconnection, the Config instrument is replaced
+by 3 instruments: AD74413R, MAX14906, and Faults.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><p>Open the AD74413R instrument.</p></li>
+<li><dl class="simple">
+<dt>Click the <strong>Config</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>The device disconnects for a moment and then reconnects
+automatically.</p></li>
+<li><p>The AD74413R, MAX14906 and Faults instruments are replaced
+by the Config instrument.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><p>Open the Config instrument.</p></li>
+<li><dl class="simple">
+<dt>Click the <strong>Apply</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>The device disconnects for a moment and then reconnects
+automatically.</p></li>
+<li><p>Upon reconnection, the Config instrument is replaced
+by 3 instruments: AD74413R, MAX14906, and Faults.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><p>Open the MAX14906 instrument.</p></li>
+<li><dl class="simple">
+<dt>Click the <strong>Config</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>The device disconnects for a moment and then reconnects
+automatically.</p></li>
+<li><p>The AD74413R, MAX14906 and Faults instruments are replaced
+by the Config instrument.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><p>Open the Config instrument.</p></li>
+<li><dl class="simple">
+<dt>Click the <strong>Apply</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>The device disconnects for a moment and then reconnects
+automatically.</p></li>
+<li><p>Upon reconnection, the Config instrument is replaced
+by 3 instruments: AD74413R, MAX14906, and Faults.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="11">
+<li><p>Open the Faults instrument.</p></li>
+<li><dl class="simple">
+<dt>Click the <strong>Config</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>The device disconnects for a moment and then reconnects automatically.</p></li>
+<li><p>The AD74413R, MAX14906 and Faults instruments are replaced
+by the Config instrument.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-swiot-config-mode">
+<h2>Test 3 - SWIOT config mode<a class="headerlink" href="#test-3-swiot-config-mode" title="Link to this heading"></a></h2>
+<p id="tst-swiot-config"><strong>UID</strong>: TST.SWIOT.CONFIG</p>
+<p><strong>Description:</strong> This test verifies that the SWIOT plugin
+is able to configure the device correctly.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#swiot1l-device"><span class="std std-ref">SWIOT.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the Config instrument.</p></li>
+<li><dl class="simple">
+<dt>Enable all 4 channels:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>Their respective dropdowns for device and function are
+accessible and not greyed out anymore.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Configure SWIOT in the following way:</dt><dd><ul class="simple">
+<li><p>Channel 1: device <strong>ad74413r</strong> and function <strong>voltage_out</strong></p></li>
+<li><p>Channel 2: device <strong>ad74413r</strong> and function <strong>voltage_in</strong></p></li>
+<li><p>Channel 3: device <strong>max14906</strong> and function <strong>input</strong></p></li>
+<li><p>Channel 4: device <strong>max14906</strong> and function <strong>output</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Click the <strong>Apply</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>The device disconnects for a moment and then reconnects
+automatically.</p></li>
+<li><p>Upon reconnection, the Config instrument is replaced
+by 3 instruments: AD74413R, MAX14906, and Faults.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic" start="5">
+<li><p>Open the AD74413R instrument and check the channels configured
+as AD74413R channels:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>There are 6 channels available in the channel manager:
+4 diagnostic channels, <strong>voltage_out 1</strong> and <strong>voltage_in 2</strong>.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Open the MAX14906 instrument and check the channels configured:</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> There are 2 channels available in the
+channel manager <strong>voltage 2</strong> as INPUT and <strong>voltage 3</strong> as
+OUTPUT.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-ad74413r-plot-operations">
+<h2>Test 4 - AD74413R plot operations<a class="headerlink" href="#test-4-ad74413r-plot-operations" title="Link to this heading"></a></h2>
+<p id="tst-ad74413r-plot"><strong>UID</strong>: TST.AD74413R.PLOT</p>
+<p><strong>Description:</strong> This test verifies that the AD74413R instrument
+plot changes such as labels and timestamp are correctly modified.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#swiot1l-device-runtime"><span class="std std-ref">SWIOT.Device.Runtime</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Open the AD74413R instrument.</p></li>
+<li><p>In the General settings menu, enable Plot Labels and
+set the Timespan to 4s.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>The labels are displayed on the right side of the plot.</p></li>
+<li><p>The X axis of the plot shows a 4s timespan,
+using the -4 to 0 range.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Enable channel <strong>voltage_out 1</strong> and run a <strong>Single</strong> capture:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>The voltage_out 1 data is displayed on the plot
+from the right to the left side.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Click the <strong>Measure</strong> button to enable measurements:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>The measurements are displayed above the plot
+and the instant value for the first channel is
+around 0A.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-5-ad74413r-channel-operations">
+<h2>Test 5 - AD74413R channel operations<a class="headerlink" href="#test-5-ad74413r-channel-operations" title="Link to this heading"></a></h2>
+<p id="tst-ad74413r-channel"><strong>UID</strong>: TST.AD74413R.CHANNEL</p>
+<p><strong>Description:</strong> This test verifies that AD74413R
+channels can correctly output and acquire accurate data as
+displayed on the plot and measured by the instrument.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#swiot1l-device-runtime"><span class="std std-ref">SWIOT.Device.Runtime</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Open the AD74413R instrument.</p></li>
+<li><p>In the General settings menu, enable Plot Labels and
+set the Timespan to 2s.</p></li>
+<li><p>Enable <strong>voltage_out 1 ** and **voltage_in 2</strong> channels.</p></li>
+<li><p>Open the channel settings menu for the <strong>voltage_out 1</strong> channel
+and set the <strong>sampling_frequency</strong> to 1200.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>A green animation appears while underlining the field value.</p></li>
+<li><p>On the top right on the plot the status message
+displays: a number of samples at <strong>1.2ksps</strong>.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Set YMin to -1A and YMax to 10A.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot Y axis is scaled between -1A and 10A.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic" start="6">
+<li><p>Open the channel settings menu for the <strong>voltage_in 2</strong> channel
+and set YMin to 0V and YMax to 20V.</p></li>
+<li><p>Go back to the first channel menu and set the <strong>RAW</strong> output
+value to <strong>8192</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The value is automatically changed to 8191.</p></li>
+<li><p>Below the field the value 10.9V is displayed.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Run a Single capture and check the measurements:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The instant value of <strong>voltage_in 2</strong> shows 10V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><dl class="simple">
+<dt>Run a Continuous capture and check the measurements:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The instant value of <strong>voltage_in 2</strong> shows 10V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><dl class="simple">
+<dt>While running change the RAW value to <strong>4096</strong>:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>Below the field the value 5.5V is displayed.</p></li>
+<li><p>The signal on the plot for <strong>voltage_in 2</strong> is
+dropping from the previous value to 5.5V.</p></li>
+<li><p>The same value is displayed in the instant value
+measurement.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="11">
+<li><dl class="simple">
+<dt>While running change the RAW value to <strong>-1</strong>:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The value is automatically set to 0V.</p></li>
+<li><p>Below the field the value 0V is displayed.</p></li>
+<li><p>The signal on the plot for <strong>voltage_in 2</strong> is
+dropping to 0V.</p></li>
+<li><p>The same value is displayed in the instant value
+measurement.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-6-ad74413r-diagnostic-channels">
+<h2>Test 6 - AD74413R diagnostic channels<a class="headerlink" href="#test-6-ad74413r-diagnostic-channels" title="Link to this heading"></a></h2>
+<p id="tst-ad74413r-diag"><strong>UID</strong>: TST.AD74413R.DIAG</p>
+<p><strong>Description:</strong> This test verifies that the AD74413R
+diagnostic channels can be correctly configured and
+displayed on the instrument.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#swiot1l-device-runtime"><span class="std std-ref">SWIOT.Device.Runtime</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the AD74413R instrument.</p></li>
+<li><p>In the General settings menu, enable Plot Labels and
+set the Timespan to 2s.</p></li>
+<li><p>Enable <strong>voltage_out 1 **, **voltage_in 2</strong>  and
+<strong>diagnostic 5</strong> channels.</p></li>
+<li><p>Open the channel settings for <strong>diagnostic 5</strong> and set
+the <strong>diag_function</strong> to <strong>sensel_b</strong>.</p></li>
+<li><p>Open the channel settings for <strong>voltage_out 1</strong>
+and set the <strong>RAW</strong> output value to <strong>8192</strong>.</p></li>
+<li><dl class="simple">
+<dt>Run a Continuous capture and check the measurements.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The instant value of <strong>diagnostic 5</strong> shows around 10V,
+the same as <strong>voltage_in 2</strong>.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>While running change the RAW value to <strong>4096</strong>:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>Both the <strong>diagnostic 5</strong> and <strong>voltage_in 2</strong> signals
+are dropping from the previous value to 5.5V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>While running change the RAW value to <strong>2000</strong>:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>Both the <strong>diagnostic 5</strong> and <strong>voltage_in 2</strong> signals
+are dropping from the previous value to around 2.7V.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-7-ad74413r-sampling-frequency">
+<h2>Test 7 - AD74413R sampling frequency<a class="headerlink" href="#test-7-ad74413r-sampling-frequency" title="Link to this heading"></a></h2>
+<p id="tst-ad74413r-sampling"><strong>UID</strong>: TST.AD74413R.SAMPLING</p>
+<p><strong>Description:</strong> This test verifies that the AD74413R
+instrument can correctly compute the acquisition rate based on
+the number of enabled channels.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#swiot1l-device-runtime"><span class="std std-ref">SWIOT.Device.Runtime</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Open the AD74413R instrument.</p></li>
+<li><p>Enable all the channels. Set the sampling frequency
+for each channel to 4800.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The status message on the top right of the plot
+displays a number of samples at <strong>800 sps</strong>.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Disable the last two diagnostic channels:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The status message on the top right of the plot
+displays a number of samples at <strong>1.2 ksps</strong>.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-8-ad74413r-tutorial-docs">
+<h2>Test 8 - AD74413R tutorial &amp; docs<a class="headerlink" href="#test-8-ad74413r-tutorial-docs" title="Link to this heading"></a></h2>
+<p id="tst-ad74413r-tutorial"><strong>UID</strong>: TST.AD74413R.TUTORIAL</p>
+<p><strong>Description:</strong> This test verifies that the AD74413R
+instrument tutorial can be correctly started, followed
+and the documentation is accessible.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#swiot1l-device-runtime"><span class="std std-ref">SWIOT.Device.Runtime</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the AD74413R instrument.</p></li>
+<li><dl class="simple">
+<dt>Click the top left info button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>A pop up with 2 options (Tutorial and Documentation)
+is displayed.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Click the <strong>Documentation</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The AD74413R documentation is opened in a browser.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><p>Click the info button.</p></li>
+<li><dl class="simple">
+<dt>Click the <strong>Tutorial</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The AD74413R tutorial starts, guiding the user
+through the instrument’s features and providing
+a button to Exit the tutorial.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Click the <strong>Continue</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The tutorial continues with the next step, always
+greying out the background and highlighting only
+the explained item.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Click the <strong>Exit</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The tutorial is closed and the user is returned
+to the instrument.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-9-max14906-plot-operations">
+<h2>Test 9 - MAX14906 plot operations<a class="headerlink" href="#test-9-max14906-plot-operations" title="Link to this heading"></a></h2>
+<p id="tst-max14906-plot"><strong>UID</strong>: TST.MAX14906.PLOT</p>
+<p><strong>Description:</strong> This test verifies that the MAX14906 instrument
+time span can be correctly modified.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#swiot1l-device-runtime"><span class="std std-ref">SWIOT.Device.Runtime</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the MAX14906 instrument.</p></li>
+<li><dl class="simple">
+<dt>In the General settings menu, set the Timespan to 10s.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The X axis of the plots shows a 10s timespan,
+using the 0 to 10 range.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Set the Timespan to 1s.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The X axis of the plots shows a 1s timespan,
+using the 0 to 1 range.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-10-max14906-channel-operations">
+<h2>Test 10 - MAX14906 channel operations<a class="headerlink" href="#test-10-max14906-channel-operations" title="Link to this heading"></a></h2>
+<p id="tst-max14906-channel"><strong>UID</strong>: TST.MAX14906.CHANNEL</p>
+<p><strong>Description:</strong> This test verifies that MAX14906
+channels can correctly output and acquire accurate data as
+displayed on the plot and measured by the instrument.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#swiot1l-device-runtime"><span class="std std-ref">SWIOT.Device.Runtime</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the MAX14906 instrument.</p></li>
+<li><p>In the General settings menu, set the Timespan to 1s.</p></li>
+<li><p>Run a continuous capture.</p></li>
+<li><dl class="simple">
+<dt>Set the <strong>Output</strong> for <strong>voltage3</strong> to ON.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot trace rises from 0 to 1 for
+both channels.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Set the <strong>Output</strong> for <strong>voltage3</strong> to OFF.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The plot trace drops from 1 to 0 for
+both channels.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-11-max14906-tutorial-docs">
+<h2>Test 11 - MAX14906 tutorial &amp; docs<a class="headerlink" href="#test-11-max14906-tutorial-docs" title="Link to this heading"></a></h2>
+<p id="tst-max14906-tutorial"><strong>UID</strong>: TST.MAX14906.TUTORIAL</p>
+<p><strong>Description:</strong> This test verifies that the MAX14906
+instrument tutorial can be correctly started, followed
+and the documentation is accessible.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#swiot1l-device-runtime"><span class="std std-ref">SWIOT.Device.Runtime</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the MAX14906 instrument.</p></li>
+<li><dl class="simple">
+<dt>Click the top left info button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>A pop up with 2 options (Tutorial and Documentation)
+is displayed.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Click the <strong>Documentation</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The MAX14906 documentation is opened in a browser.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><p>Click the info button.</p></li>
+<li><dl class="simple">
+<dt>Click the <strong>Tutorial</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The MAX14906 tutorial starts, guiding the user
+through the instrument’s features and providing
+a button to Exit the tutorial.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Click the <strong>Continue</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The tutorial continues with the next step, always
+greying out the background and highlighting only
+the explained item.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Click the <strong>Exit</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The tutorial is closed and the user is returned
+to the instrument.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-12-faults-run-single">
+<h2>Test 12 - Faults Run Single<a class="headerlink" href="#test-12-faults-run-single" title="Link to this heading"></a></h2>
+<p id="tst-faults-run-single"><strong>UID</strong>: TST.FAULTS.RUN_SINGLE</p>
+<p><strong>Description:</strong> This test verifies that the Faults instrument
+can poll faults values for both devices.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#swiot1l-device-runtime"><span class="std std-ref">SWIOT.Device.Runtime</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Run a continuous capture with all channels enabled
+on the AD74413R instrument.</p></li>
+<li><dl class="simple">
+<dt>Open the Faults instrument and run a <strong>Single</strong> capture.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>Bit 10 is enabled on the AD74413R device.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Click on Bit 10:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The section below the leds only displays the
+fault explanation for the selected bit.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Turn <strong>Faults explanation</strong> off:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The section below the leds is hidden.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-13-faults-clear-and-reset">
+<h2>Test 13 - Faults clear and reset<a class="headerlink" href="#test-13-faults-clear-and-reset" title="Link to this heading"></a></h2>
+<p id="tst-faults-clear-reset"><strong>UID</strong>: TST.FAULTS.CLEAR_RESET</p>
+<p><strong>Description:</strong> This test verifies that the Faults instrument
+can reset the polled values after a capture.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#swiot1l-device-runtime"><span class="std std-ref">SWIOT.Device.Runtime</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Run a continuous capture with all channels enabled
+on the AD74413R instrument.</p></li>
+<li><p>Open the Faults instrument and run a <strong>Single</strong>
+capture.</p></li>
+<li><p>Select Bit 10.</p></li>
+<li><dl class="simple">
+<dt>Click the <strong>Clear selection</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>Bit 10 is not selected and the Faults explanation
+display all the text greyed out.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Run a <strong>Reset stored</strong> capture.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>Both the leds for Bit 10 are turned off.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-14-faults-run-continuous">
+<h2>Test 14 - Faults Run continuous<a class="headerlink" href="#test-14-faults-run-continuous" title="Link to this heading"></a></h2>
+<p id="tst-faults-run-continuous"><strong>UID</strong>: TST.FAULTS.RUN_CONTINUOUS</p>
+<p><strong>Description:</strong> This test verifies that the Faults instrument
+can poll faults values for both devices in continuous mode.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#swiot1l-device-runtime"><span class="std std-ref">SWIOT.Device.Runtime</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Run a continuous capture with all channels enabled
+on the AD74413R instrument.</p></li>
+<li><dl class="simple">
+<dt>Open the Faults instrument and run a <strong>Continuous</strong>  capture.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>Bit 10 is enabled on the AD74413R device.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>While running click the <strong>Reset stored</strong> button:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The <strong>STORED</strong> LED is turned off until the next
+polled value turns it on again.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><p>Stop the Faults instrument.</p></li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-15-faults-tutorial-docs">
+<h2>Test 15 - Faults tutorial &amp; docs<a class="headerlink" href="#test-15-faults-tutorial-docs" title="Link to this heading"></a></h2>
+<p id="tst-faults-tutorial"><strong>UID</strong>: TST.FAULTS.TUTORIAL</p>
+<p><strong>Description:</strong> This test verifies that the Faults
+instrument tutorial can be correctly started, followed
+and the documentation is accessible.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#swiot1l-device-runtime"><span class="std std-ref">SWIOT.Device.Runtime</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the Faults instrument.</p></li>
+<li><dl class="simple">
+<dt>Click the top left info button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>A pop up with 2 options (Tutorial and Documentation)
+is displayed.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Click the <strong>Documentation</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The Faults documentation is opened in a browser.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><p>Click the info button.</p></li>
+<li><dl class="simple">
+<dt>Click the <strong>Tutorial</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The Faults tutorial starts, guiding the user
+through the instrument’s features and providing
+a button to Exit the tutorial.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Click the <strong>Continue</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The tutorial continues with the next step, always
+greying out the background and highlighting only
+the explained item.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Click the <strong>Exit</strong> button.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The tutorial is closed and the user is returned
+to the instrument.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-16-swiot-external-supply">
+<h2>Test 16 - SWIOT external supply<a class="headerlink" href="#test-16-swiot-external-supply" title="Link to this heading"></a></h2>
+<p id="tst-swiot-external-supply"><strong>UID</strong>: TST.SWIOT.EXTERNAL_SUPPLY</p>
+<p><strong>Description:</strong> This test verifies that the SWIOT plugin
+can correctly detect and notify the user that the external
+power supply switch is turned off.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#swiot1l-device-runtime"><span class="std std-ref">SWIOT.Device.Runtime</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open any instrument from the SWIOT plugin.</p></li>
+<li><dl class="simple">
+<dt>Turn off the external power supply switch on the SWIOT device.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>A status bar is displayed at the bottom of the instrument
+with a warning message that the system is not running at
+full capacity due to not being powered by the external supply.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Turn on the external power supply switch on the SWIOT device.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>The status bar is not displayed.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">SWIOT1L</a>
+    <a href="../adc/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">ADC</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

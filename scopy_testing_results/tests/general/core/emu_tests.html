@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>EMU &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=3d3703ae" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=dcfbb431"></script>
+    <link rel="icon" href="../../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Device interaction" href="dev_tests.html" />
+    <link rel="prev" title="Connection flow" href="connection_tests.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">EMU</a><ul>
+<li><a class="reference internal" href="#test-1-enable-the-emulator">Test 1: Enable the emulator.</a></li>
+<li><a class="reference internal" href="#test-2-emu-is-not-installed">Test 2: EMU is not installed.</a></li>
+<li><a class="reference internal" href="#test-3-disable-the-emulator">Test 3: Disable the emulator.</a></li>
+<li><a class="reference internal" href="#test-4-disable-the-emulator-while-the-emulated-device-is-connected">Test 4: Disable the emulator while the emulated device is connected.</a></li>
+<li><a class="reference internal" href="#test-5-verify-adalm2000-emu-device">Test 5: Verify adalm2000 emu device.</a></li>
+<li><a class="reference internal" href="#test-6-verify-pluto-emu-device">Test 6: Verify pluto emu device.</a></li>
+<li><a class="reference internal" href="#test-7-verify-pqm-emu-device">Test 7: Verify pqm emu device.</a></li>
+<li><a class="reference internal" href="#test-8-verify-swiot-config-emu-device">Test 8: Verify swiot_config emu device.</a></li>
+<li><a class="reference internal" href="#test-9-verify-swiot-runtime-emu-device">Test 9: Verify swiot_runtime emu device.</a></li>
+<li><a class="reference internal" href="#test-10-verify-generic-emu-device">Test 10: Verify generic emu device.</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../../index.html">
+      <img class="only-light" src="../../../_static/scopy.png"/>
+      <img class="only-dark" src="../../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../../../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1"/><div class="collapse"><a class="reference internal" href="../../plugins/index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../../plugins/datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../../plugins/dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../../plugins/swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../../plugins/adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../../plugins/registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="emu">
+<span id="emu-tests"></span><h1>EMU<a class="headerlink" href="#emu" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>User guide: <a class="reference internal" href="../../../user_guide/index.html#user-guide"><span class="std std-ref">Scopy Overview</span></a>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23.8%" />
+<col style="width: 14.3%" />
+<col style="width: 14.3%" />
+<col style="width: 23.8%" />
+<col style="width: 23.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Tester</p></th>
+<th class="head"><p>Test Date</p></th>
+<th class="head"><p>Scopy version</p></th>
+<th class="head"><p>Plugin version (N/A if not applicable)</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="test-1-enable-the-emulator">
+<span id="tst-emu-en"></span><h2>Test 1: Enable the emulator.<a class="headerlink" href="#test-1-enable-the-emulator" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.EMU.EN</p>
+<p><strong>Description:</strong> This test verifies if starting the emulator in Scopy works
+correctly.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>OS: Windows, Linux-x86_64 (flatpak and appimage), Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Click on <strong>Add device</strong> (+) button.</p></li>
+<li><p>Click on <strong>Emulator</strong> tab.</p></li>
+<li><p>From “Device” dropdown select “adalm2000”.</p></li>
+<li><dl class="simple">
+<dt>Click on <strong>Enable</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The IIO device tab is selected, and the URI
+“ip:127.0.0.1” is entered in the corresponding section.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><p>Close Scopy and open it again.</p></li>
+<li><p>Click on <strong>Add device</strong> (+) button.</p></li>
+<li><dl class="simple">
+<dt>Click on <strong>Emulator</strong> tab.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The “Device” dropdown is set to “adalm2000” and
+the “Enable” button is displayed.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-emu-is-not-installed">
+<h2>Test 2: EMU is not installed.<a class="headerlink" href="#test-2-emu-is-not-installed" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.EMU.NOT</p>
+<p><strong>Description:</strong> This test verifies if Scopy handles the situation correctly
+when the IIO emulator is not found.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is not installed on the system.</p></li>
+<li><p>Modify the “iio_emu_path” preference from “preferences.ini” file with an
+invalid path (you can access the file through the <strong>Open</strong> button in the
+general preferences).</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Click on <strong>Add device</strong> (+) button.</p></li>
+<li><dl class="simple">
+<dt>Click on <strong>Emulator</strong> tab.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> All the components are disabled and the message
+“Can’t find iio-emu in the system!” is displayed.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-disable-the-emulator">
+<h2>Test 3: Disable the emulator.<a class="headerlink" href="#test-3-disable-the-emulator" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.EMU.DIS</p>
+<p><strong>Description:</strong> This test verifies if stopping the emulator in Scopy works
+correctly.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#tst-emu-en"><span class="std std-ref">TST.EMU.EN</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Click on <strong>Add device</strong> (+) button.</p></li>
+<li><p>Click on <strong>Emulator</strong> tab.</p></li>
+<li><p>From “Device” dropdown select “adalm2000”.</p></li>
+<li><p>Click on <strong>Enable</strong> button.</p></li>
+<li><p>Click on <strong>Emulator</strong> tab.</p></li>
+<li><dl class="simple">
+<dt>Click on <strong>Disable</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The fields in this tab become editable, and the
+<strong>Enable</strong> button appears.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-disable-the-emulator-while-the-emulated-device-is-connected">
+<h2>Test 4: Disable the emulator while the emulated device is connected.<a class="headerlink" href="#test-4-disable-the-emulator-while-the-emulated-device-is-connected" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.EMU.DIS_CONN</p>
+<p><strong>Description:</strong> The test verifies if Scopy handles the situation correctly
+when an emulated device is connected and the “iio-emu” process is stopped.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="connection_tests.html#tst-conn-succ"><span class="std std-ref">TST.CONN.SUCC</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Start the iio-emu process using “adalm2000” in the dropdown and
+“ip:127.0.0.1” as URI.</p></li>
+<li><p>Add the device in device browser.</p></li>
+<li><p>Connect to emu device.</p></li>
+<li><p>Click on <strong>Add device</strong> (+) button.</p></li>
+<li><p>Click on <strong>Emulator</strong> tab.</p></li>
+<li><dl class="simple">
+<dt>Click on <strong>Disable</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The fields in this tab become editable, and the
+<strong>Enable</strong> button appears. After a few seconds, the device is
+disconnected.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-5-verify-adalm2000-emu-device">
+<h2>Test 5: Verify adalm2000 emu device.<a class="headerlink" href="#test-5-verify-adalm2000-emu-device" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.EMU.EN_ADALM2000</p>
+<p><strong>Description:</strong> This test verifies if starting the emulator in Scopy works
+correctly (using adalm2000 device).</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="add_dev_tests.html#tst-add-verify"><span class="std std-ref">TST.ADD.VERIFY</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Click on <strong>Add device</strong> (+) button.</p></li>
+<li><p>Click on <strong>Emulator</strong> tab.</p></li>
+<li><p>From “Device” dropdown select “adalm2000”.</p></li>
+<li><p>Click on <strong>Enable</strong> button.</p></li>
+<li><dl class="simple">
+<dt>Click on <strong>Verify</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The compatible plugins page opens. The compatible
+plugins are: M2kPlugin (checked), ADCPlugin, DACPlugin, DataLoggerPlugin,
+DebuggerPlugin, RegmapPlugin.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-6-verify-pluto-emu-device">
+<h2>Test 6: Verify pluto emu device.<a class="headerlink" href="#test-6-verify-pluto-emu-device" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.EMU.EN_PLUTO</p>
+<p><strong>Description:</strong> This test verifies if starting the emulator in Scopy works
+correctly (using pluto device).</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="add_dev_tests.html#tst-add-verify"><span class="std std-ref">TST.ADD.VERIFY</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Click on <strong>Add device</strong> (+) button.</p></li>
+<li><p>Click on <strong>Emulator</strong> tab.</p></li>
+<li><p>From “Device” dropdown select “pluto”.</p></li>
+<li><p>Click on <strong>Enable</strong> button.</p></li>
+<li><dl class="simple">
+<dt>Click on <strong>Verify</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The compatible plugins page opens. The compatible
+plugins are: ADCPlugin (checked), DACPlugin (checked), DataLoggerPlugin
+(checked), DebuggerPlugin (checked), RegmapPlugin (checked).</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-7-verify-pqm-emu-device">
+<h2>Test 7: Verify pqm emu device.<a class="headerlink" href="#test-7-verify-pqm-emu-device" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.EMU.EN_PQM</p>
+<p><strong>Description:</strong> This test verifies if starting the emulator in Scopy works
+correctly (using pqm device).</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="add_dev_tests.html#tst-add-verify"><span class="std std-ref">TST.ADD.VERIFY</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Click on <strong>Add device</strong> (+) button.</p></li>
+<li><p>Click on <strong>Emulator</strong> tab.</p></li>
+<li><p>From “Device” dropdown select “pqm”.</p></li>
+<li><p>Click on <strong>Enable</strong> button.</p></li>
+<li><dl class="simple">
+<dt>Click on <strong>Verify</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The compatible plugins page opens. The compatible
+plugins are: PQMPlugin (checked), ADCPlugin, DACPlugin, DataLoggerPlugin,
+DebuggerPlugin (checked).</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-8-verify-swiot-config-emu-device">
+<h2>Test 8: Verify swiot_config emu device.<a class="headerlink" href="#test-8-verify-swiot-config-emu-device" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.EMU.EN_SWIOT_CONFIG</p>
+<p><strong>Description:</strong> This test verifies if starting the emulator in Scopy works
+correctly (using swiot_config device).</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="add_dev_tests.html#tst-add-verify"><span class="std std-ref">TST.ADD.VERIFY</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Click on <strong>Add device</strong> (+) button.</p></li>
+<li><p>Click on <strong>Emulator</strong> tab.</p></li>
+<li><p>From “Device” dropdown select “swiot_config”.</p></li>
+<li><p>Click on <strong>Enable</strong> button.</p></li>
+<li><dl class="simple">
+<dt>Click on <strong>Verify</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The compatible plugins page opens. The compatible
+plugins are: SWIOTPlugin (checked), DataLoggerPlugin, DebuggerPlugin (checked).</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-9-verify-swiot-runtime-emu-device">
+<h2>Test 9: Verify swiot_runtime emu device.<a class="headerlink" href="#test-9-verify-swiot-runtime-emu-device" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.EMU.EN_SWIOT_RUNTIME</p>
+<p><strong>Description:</strong> This test verifies if starting the emulator in Scopy works
+correctly (using swiot_runtime device).</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="add_dev_tests.html#tst-add-verify"><span class="std std-ref">TST.ADD.VERIFY</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Click on <strong>Add device</strong> (+) button.</p></li>
+<li><p>Click on <strong>Emulator</strong> tab.</p></li>
+<li><p>From “Device” dropdown select “swiot_runtime”.</p></li>
+<li><p>Click on <strong>Enable</strong> button.</p></li>
+<li><dl class="simple">
+<dt>Click on <strong>Verify</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The compatible plugins page opens. The compatible
+plugins are: SWIOTPlugin (checked), ADCPlugin, DataLoggerPlugin,
+DebuggerPlugin (checked), RegmapPlugin.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-10-verify-generic-emu-device">
+<h2>Test 10: Verify generic emu device.<a class="headerlink" href="#test-10-verify-generic-emu-device" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.EMU.EN_GENERIC</p>
+<p><strong>Description:</strong> This test verifies if starting the emulator in Scopy works
+correctly (using generic device).</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="add_dev_tests.html#tst-add-verify"><span class="std std-ref">TST.ADD.VERIFY</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Click on <strong>Add device</strong> (+) button.</p></li>
+<li><p>Click on <strong>Emulator</strong> tab.</p></li>
+<li><p>From “Device” dropdown select “generic”.</p></li>
+<li><p>Click on <strong>Enable</strong> button.</p></li>
+<li><dl class="simple">
+<dt>Click on <strong>Verify</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The message <strong>“ip:127.0.0.1” not a valid
+context!</strong> is displayed.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="connection_tests.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Connection flow</a>
+    <a href="dev_tests.html" title="Next document (Alt+Shift+RightArrow)" class="next">Device interaction</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

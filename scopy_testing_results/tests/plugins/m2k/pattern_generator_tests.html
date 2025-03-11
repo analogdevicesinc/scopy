@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Pattern Generator - Test Suite &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=3d3703ae" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=dcfbb431"></script>
+    <link rel="icon" href="../../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Power Supply - Test Suite" href="power_supply_tests.html" />
+    <link rel="prev" title="Oscilloscope - Test Suite" href="oscilloscope_tests.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Pattern Generator - Test Suite</a><ul>
+<li><a class="reference internal" href="#setup-environment">Setup environment:</a></li>
+<li><a class="reference internal" href="#test-1-individual-channel-operation">Test 1: Individual Channel Operation</a></li>
+<li><a class="reference internal" href="#test-2-group-channel-operation">Test 2: Group Channel Operation</a></li>
+<li><a class="reference internal" href="#test-3-simultaneous-group-and-individual-channels-operation">Test 3: Simultaneous Group and Individual Channels Operation</a></li>
+<li><a class="reference internal" href="#test-4-other-features">Test 4: Other Features</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../../index.html">
+      <img class="only-light" src="../../../_static/scopy.png"/>
+      <img class="only-dark" src="../../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../../../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6" checked=""/><div class="collapse"><a class="reference internal" href="index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../../general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="pattern-generator-test-suite">
+<span id="m2k-pattern-generator-tests"></span><h1>Pattern Generator - Test Suite<a class="headerlink" href="#pattern-generator-test-suite" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>User guide: <a class="reference internal" href="../../../user_guide/index.html#user-guide"><span class="std std-ref">Scopy Overview</span></a>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23.8%" />
+<col style="width: 14.3%" />
+<col style="width: 14.3%" />
+<col style="width: 23.8%" />
+<col style="width: 23.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Tester</p></th>
+<th class="head"><p>Test Date</p></th>
+<th class="head"><p>Scopy version</p></th>
+<th class="head"><p>Plugin version (N/A if not applicable)</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="setup-environment">
+<h2>Setup environment:<a class="headerlink" href="#setup-environment" title="Link to this heading"></a></h2>
+<dl class="simple" id="m2k-usb-pattern-generator">
+<dt><strong>M2k.Usb:</strong></dt><dd><ul class="simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Connect an <strong>ADALM2000</strong> device to the system by USB.</p></li>
+<li><p>Add the device in device browser.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="test-1-individual-channel-operation">
+<h2>Test 1: Individual Channel Operation<a class="headerlink" href="#test-1-individual-channel-operation" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.M2K.PG.INDIVIDUAL_CHANNEL_OPERATION</p>
+<p><strong>Description:</strong> This test case verifies the functionality of the pattern generator in individual channel operation mode.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>OS: ANY</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-usb-pattern-generator"><span class="std std-ref">M2k.Usb</span></a> setup.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Checking Individual Channels: Use PP as output</p></li>
+<li><p>Connect DIO-0, CH0 to Scope CH1+, GND to Scope CH1-.</p></li>
+<li><p>Enable CH0.</p></li>
+<li><p>Double click on the DIO 0 indicator on the plot to open DIO 0 settings.</p></li>
+<li><p>Select pattern as Clock with a 5 KHz clock signal with duty cycle of 50%.</p></li>
+<li><dl class="simple">
+<dt>Run instrument.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> You should see a square wave with 5 KHz frequency, 50% duty cycle.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><p>Monitor CH0 through oscilloscope.</p></li>
+<li><dl class="simple">
+<dt>Open built-in measurement feature for frequency, amplitude and duty cycle.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> You should see a square wave with 5 KHz frequency, 50% duty cycle. In the oscilloscope, Frequency: 5 KHz, Amplitude: 3.2V to 3.4 V, Duty+: 50 %, Duty-:50%</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><dl class="simple">
+<dt>Change frequency: 100 KHz, duty cycle: 30%.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> You should see a square wave with 100 KHz frequency, 30% duty cycle. In the oscilloscope, Frequency: 100 KHz, Amplitude: 3.2V to 3.4 V, Duty+: 30 %, Duty-: 70%</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><dl class="simple">
+<dt>Change frequency: 1 MHz, duty cycle: 60%.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> You should see a square wave with 1 MHz frequency, 60% duty cycle. In the oscilloscope, Frequency: 1 MHz, Amplitude: 3.2V to 3.4 V, Duty+: 60 %, Duty-: 40%</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="11">
+<li><dl class="simple">
+<dt>Change frequency: 10 MHz, duty cycle: 70%.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> You should see a square wave with 10 MHz frequency, 70% duty cycle. In the oscilloscope, Frequency: 1 MHz, Amplitude: 3.2V to 3.4 V, Duty+: 70 %, Duty-: 30%</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="12">
+<li><dl class="simple">
+<dt>Repeat steps 2. to 7. for DIO-1 to DIO-15.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Behavior of each channel should be the same as with DIO-0, CH0. As the parameters are changed, the trace displayed in oscilloscope should follow.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="13">
+<li><p>Checking Phase</p></li>
+<li><p>Connect the following:</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>DIO0 to ScopeCH1+,</p></li>
+<li><p>DIO1 to ScopeCH2+,</p></li>
+<li><p>GND to Scope CH1- and Scope CH2-.</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="15">
+<li><p>Enable DIO0 and DIO1. Set the following parameters:</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>DIO0: Frequency: 5 KHz, Phase: 0°, Duty Cycle: 50%;</p></li>
+<li><p>DIO1: Frequency: 5 KHz, Phase: 45°, Duty Cycle: 50 %.</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="16">
+<li><dl class="simple">
+<dt>Run instrument.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> You should see two square waves with 5 KHz frequency, 50% duty cycle. DIO0 should be at 0° phase and DIO1 should be at 45° phase.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="17">
+<li><dl class="simple">
+<dt>Monitor pattern generator output through oscilloscope.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Use cursor feature of the oscilloscope. Move the vertical cursors as shown in steps resources. ΔT = 24us to 26us, corresponding to the 45° phase shift.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="18">
+<li><dl class="simple">
+<dt>Change DIO1 phase: 120°.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Use cursor feature of the oscilloscope. Move the vertical cursors as shown in steps resources. ΔT = 65us to 67us, corresponding to the 120° phase shift.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="19">
+<li><dl class="simple">
+<dt>Change DIO1 phase: 270°.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Use cursor feature of the oscilloscope. Move the vertical cursors as shown in steps resources. ΔT = 149us to 151us, corresponding to the 270° phase shift.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="20">
+<li><dl class="simple">
+<dt>Set DIO1 phase to 0°. Now repeat steps for DIO0.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Behavior of channel should be the same as with DIO1, CH1.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="21">
+<li><dl class="simple">
+<dt>Use other channels, DIO2 to DIO15, and repeat steps to verify each.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Behavior of each channel should be the same as with DIO1, CH1.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-group-channel-operation">
+<h2>Test 2: Group Channel Operation<a class="headerlink" href="#test-2-group-channel-operation" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.M2K.PG.GROUP_CHANNEL_OPERATION</p>
+<p><strong>Description:</strong> This test case verifies the functionality of the pattern generator in group channel operation mode.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-usb-pattern-generator"><span class="std std-ref">M2k.Usb</span></a> setup.</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Checking Group Channels and Patterns: Use PP as output. Binary Counter</p></li>
+<li><p>Enable channels DIO0 to DIO3.</p></li>
+<li><p>Click “Group” and double click on the channel indicators on the plot, DIO 0 to DIO 3</p></li>
+<li><p>Click “Done”.</p></li>
+<li><dl class="simple">
+<dt>Change pattern to Binary Counter.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot should show a binary counter from 1 to e. The frequency should be 5 KHz.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><p>Open logic analyzer.</p></li>
+<li><p>Make a group with channels DIO0 to DIO3.</p></li>
+<li><p>Add parallel for the decoder.</p></li>
+<li><dl class="simple">
+<dt>Make sure to select correct data lines in the parallel decoder settings.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><p>Check the frequency of each channel through oscilloscope.</p></li>
+<li><p>Connect DIO0 to scopech1+.</p></li>
+<li><dl class="simple">
+<dt>Enable built-in measurement for frequency.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Frequency shown should be 2.4 KHz to 2.6 KHz, corresponding to set clock frequency/2.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="13">
+<li><p>Connect DIO1 to scopech1+.</p></li>
+<li><dl class="simple">
+<dt>Enable built-in measurement for frequency.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Frequency shown should be 1.24 KHz to 1.27 KHz, corresponding to set clock frequency/4.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="15">
+<li><p>Connect DIO2 to scopech1+.</p></li>
+<li><dl class="simple">
+<dt>Enable built-in measurement for frequency.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Frequency shown should be 620 Hz to 630 Hz, corresponding to set clock frequency/8.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="17">
+<li><p>Connect DIO3 to scopech1+.</p></li>
+<li><dl class="simple">
+<dt>Enable built-in measurement for frequency.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Frequency shown should be 310 Hz to 315 Hz, corresponding to set clock frequency/16.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="19">
+<li><dl class="simple">
+<dt>Change pattern to Random. Frequency: 5KHz</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot should show random data.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="20">
+<li><dl class="simple">
+<dt>Monitor through logic analyzer. Use parallel as decoder.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same hexadecimal equivalents should be seen in logic analyzer.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="21">
+<li><dl class="simple">
+<dt>Change frequency: 100 KHz</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The frequency should now be 100 KHz. There should be new set of data and hexadecimal equivalents.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="22">
+<li><dl class="simple">
+<dt>Monitor through logic analyzer. Use parallel as decoder.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same hexadecimal equivalents should be seen in logic analyzer.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="23">
+<li><p>Number pattern</p></li>
+<li><p>Change pattern to Number pattern.</p></li>
+<li><p>Set number to 3.</p></li>
+<li><dl class="simple">
+<dt>Enable DIO 4 and set to Clock pattern with 5kHz frequency. Do not add DIO 4 to group, keep it as individual channel.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot should contain the group channel and individual channel. The group channel should show the number pattern and the individual channel should show the clock pattern.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="27">
+<li><p>Monitor through logic analyzer.</p></li>
+<li><p>Enable DIO 4 as individual channel.</p></li>
+<li><p>Use parallel as decoder.</p></li>
+<li><dl class="simple">
+<dt>Set data lines to DIO 0 to DIO 3 and set clock line to DIO 4.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same number is seen in logic analyzer. Number: 3</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="31">
+<li><dl class="simple">
+<dt>Change number to 14. In the plot, it will show the hexadecimal equivalent which is E.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same hexadecimal equivalent is seen in logic analyzer. Hexadecimal equivalent: E</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="32">
+<li><p>Add channels DIO4 to DIO7 to the group. It will now be an 8-channel group.</p></li>
+<li><dl class="simple">
+<dt>Change number to 254. The plot will show the hexadecimal equivalent which is FE.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same hexadecimal equivalent is seen in logic analyzer. Hexadecimal equivalent: FE</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="34">
+<li><p>Gray Counter</p></li>
+<li><p>Change pattern to Gray Counter.</p></li>
+<li><dl class="simple">
+<dt>Disable DIO 8.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot should show a gray counter from 1 to 7. The frequency should be 5 KHz.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="37">
+<li><p>Monitor through logic analyzer.</p></li>
+<li><p>Choose parallel for the decoder.</p></li>
+<li><dl class="simple">
+<dt>Set Clock line as X.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. One bit change per clock cycle.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="40">
+<li><p>UART</p></li>
+<li><p>Dissolve current group channel.</p></li>
+<li><p>Enable DIO 0 channel and double click on the channel indicator on the plot.</p></li>
+<li><p>Change channel pattern to UART.</p></li>
+<li><dl class="simple">
+<dt>Set parameters: Baud: 9600, Stop bit: 1, no parity, Data to send: ‘HELLO’.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot should show the data ‘HELLO’ in ASCII format. The frequency should be 9600 Hz.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="45">
+<li><p>Monitor the channel in the logic analyzer.</p></li>
+<li><dl class="simple">
+<dt>Use UART as decoder. Set Baud: 9600, Data bits: 8, no parity.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same ASCII data should be seen in logic analyzer.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="47">
+<li><dl class="simple">
+<dt>Change set parameters: Baud: 115200, Stop bit: 1, even parity, Data to send: ‘HI’.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot should show the data ‘HI’ in ASCII format. The frequency should be 115200 Hz.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="48">
+<li><p>Monitor the channel in the logic analyzer.</p></li>
+<li><dl class="simple">
+<dt>Use UART as decoder. Set Baud: 115200, Data bits: 8, even parity.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same ASCII data should be seen in logic analyzer.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="50">
+<li><dl class="simple">
+<dt>Change set parameters: Baud: 115200, Stop bit: 1, odd parity, Data to send: ‘HI’.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot should show the data ‘HI’ in ASCII format. The frequency should be 115200 Hz.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="51">
+<li><dl class="simple">
+<dt>Monitor the channel in the logic analyzer. Use UART as decoder. Set Baud: 115200, Data bits: 8, odd parity.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same ASCII data should be seen in logic analyzer.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="52">
+<li><p>SPI</p></li>
+<li><p>Disable DIO 0.</p></li>
+<li><p>Enable and select DIO5 to DIO7 to create a 3-channel group.</p></li>
+<li><p>Change pattern to SPI.</p></li>
+<li><dl class="simple">
+<dt>Set the following parameters: Bytes per frame: 2, inter frame space: 3, Data: ABCD1234.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot should show the data ‘ABCD1234’ in ASCII format. The frequency should be 5 KHz.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="57">
+<li><p>Monitor the channel through logic analyzer.</p></li>
+<li><dl class="simple">
+<dt>Use SPI as decoder.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same ASCII data should be seen in logic analyzer.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="59">
+<li><dl class="simple">
+<dt>Change the following parameters: Bytes per frame: 1, inter frame space: 4, Data: ABCD1234.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot should show the data ‘ABCD1234’ in ASCII format. The frequency should be 5 KHz.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="60">
+<li><dl class="simple">
+<dt>Monitor the channel through logic analyzer. Use SPI as decoder.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same ASCII data should be seen in logic analyzer.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="61">
+<li><p>I2C</p></li>
+<li><p>Dissolve current group channel.</p></li>
+<li><p>Enable and select DIO0 and DIO1 to create a 2-channel group.</p></li>
+<li><dl class="simple">
+<dt>Change pattern to I2C. Set the following parameters: Address: 72, Inter frame space: 3, Data: ABCD1234.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot should show the data ‘ABCD1234’ in ASCII format. The frequency should be 5 KHz.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="65">
+<li><p>Monitor the channel through logic analyzer.</p></li>
+<li><dl class="simple">
+<dt>Use I2C as decoder.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator. The same ASCII data should be seen in logic analyzer.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="67">
+<li><p>Pulse Pattern</p></li>
+<li><p>Change pattern to Pulse Pattern.</p></li>
+<li><dl class="simple">
+<dt>Set the following parameters: Low: 5, High: 1, Counter Init: 0, Delay: 10, Number of Pulses: 5.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot should show 5 pulses with 5 low and 1 high.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="70">
+<li><dl class="simple">
+<dt>Monitor the channels through logic analyzer.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The plot in the logic analyzer should resemble the plot seen in the pattern generator.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-simultaneous-group-and-individual-channels-operation">
+<h2>Test 3: Simultaneous Group and Individual Channels Operation<a class="headerlink" href="#test-3-simultaneous-group-and-individual-channels-operation" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.M2K.PG.SIMULTANEOUS_GROUP_AND_INDIVIDUAL_CHANNELS_OPERATION</p>
+<p><strong>Description:</strong> This test case verifies the functionality of the pattern generator in simultaneous group and individual channels operation mode.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-usb-pattern-generator"><span class="std std-ref">M2k.Usb</span></a> setup.</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Checking Group and Individual Channels Simultaneously: Use PP as output.</p></li>
+<li><p>Enable and select channels DIO0 to DIO3 to create 4-channel group.</p></li>
+<li><p>Change group pattern to Binary Counter with frequency set to 5 KHz.</p></li>
+<li><p>Enable DIO4 channel and set as clock with frequency of 5 KHz.</p></li>
+<li><dl class="simple">
+<dt>Monitor DIO4 through oscilloscope. And at the same time monitor the group channel through logic analyzer.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> On logic analyzer, the plot should resemble the plot seen in pattern generator, the group channel as well as the individual channel DIO4. On oscilloscope, frequency can be viewed by enabling measurement feature, frequency: 5KHz.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><p>Do not dissolve group channel. Add another group channel.</p></li>
+<li><p>Enable and select DIO5, create a 1-channel group for UART.</p></li>
+<li><p>Change pattern to UART. Baud: 2400, stop bit: 1, no parity, Data: ‘HI’. Also, individual DIO4 channel remains enabled.</p></li>
+<li><dl class="simple">
+<dt>Monitor the 2 groups and DIO4 through logic analyzer.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> On logic analyzer, the plot should resemble the plot seen in pattern generator.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><p>Do not dissolve group channels.</p></li>
+<li><p>Disable Group UART.</p></li>
+<li><p>Add another group channel.</p></li>
+<li><p>Enable and select DIO6 to DIO9, create a 4-channel group.</p></li>
+<li><p>Change pattern to Gray Counter. Frequency: 10 KHz.</p></li>
+<li><p>Name this group as Group GC. Also, individual DIO4 channel remains enabled.</p></li>
+<li><dl class="simple">
+<dt>Monitor the 2 groups and DIO4 through logic analyzer.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> On logic analyzer, the plot should resemble the plot seen in pattern generator.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-other-features">
+<h2>Test 4: Other Features<a class="headerlink" href="#test-4-other-features" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.M2K.PG.OTHER_FEATURES</p>
+<p><strong>Description:</strong> This test case verifies the functionality of the pattern generator in other features.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-usb-pattern-generator"><span class="std std-ref">M2k.Usb</span></a> setup.</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Checking UI: Changing Channel Name</p></li>
+<li><p>Open individual channel DIO.</p></li>
+<li><dl class="simple">
+<dt>On its channel manager, modify its name to ‘CH 0’.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The name should change as shown in steps resources picture.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><p>Enable DIO 1 and change its name to ‘CH 1’.</p></li>
+<li><dl class="simple">
+<dt>Create a group with ‘CH 0’ and ‘CH 1’.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The list of names under the group should also correspond to the names of the channels as should change as shown in steps resources picture.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><p>Trace Height</p></li>
+<li><dl class="simple">
+<dt>Open channel ‘CH 0’. On its channel manager, change trace height to 50.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The trace height should now be twice as shown in steps resources picture, compared to previous.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Change height again to 10.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The height should now be lower as shown in steps resources picture</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><p>Knobs</p></li>
+<li><p>Checking frequency knob. Set the knob to large increment. No orange dot on the center.</p></li>
+<li><dl class="simple">
+<dt>Change frequency value using the ± button.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The frequency value should change accordingly with a high increment/decrement from 5 KHz to 10 KHz.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="12">
+<li><p>Set the knob to ±1 unit interval. With orange dot on the center.</p></li>
+<li><dl class="simple">
+<dt>Change frequency value using the ± button.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The frequency value should change accordingly with ±1 unit interval.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="14">
+<li><p>Checking the output: PP mode</p></li>
+<li><p>Connect the DIO0 to oscilloscope ch1+, and oscilloscope ch1- to gnd. This is to monitor the output from the pattern generator.</p></li>
+<li><p>Enable DIO0 in pattern generator.</p></li>
+<li><p>Set pattern to clock with 5 kHz frequency.</p></li>
+<li><p>Set output as PP.</p></li>
+<li><dl class="simple">
+<dt>Run instrument and monitor on Oscilloscope.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The oscilloscope should show clock pulses from logic 0 to 1. It should look like in steps resources picture.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="20">
+<li><dl class="simple">
+<dt>Try other patterns such as random pattern and monitor on oscilloscope.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The oscilloscope should show random pulses from logic 0 to 1. It should look like in steps resources picture.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="21">
+<li><p>Repeat steps 15. and 20. for all channels</p></li>
+<li><p>OD mode</p></li>
+<li><dl class="simple">
+<dt>Change output to OD. Monitor output in oscilloscope.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Oscilloscope should only show logic 0 since output is now in OD mode.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="24">
+<li><p>Do 23. to other channels.</p></li>
+<li><p>To output two logic levels when operating in OD, a pull up resistor is needed. Connect the breadboard connection shown in steps resources.</p></li>
+<li><dl class="simple">
+<dt>Set power supply to 5V. Run power supply, pattern generator and monitor in oscilloscope.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The trace should show two logic levels, with a few mV offset. When power supply is turned off, the oscilloscope should show only logic 0.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="27">
+<li><p>Repeat step 25. and 26. for all channels.</p></li>
+<li><p>Print</p></li>
+<li><dl class="simple">
+<dt>Click on Print button and save file as sample.pdf</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> Upon saving, the prompt window should look like the steps resources picture.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="30">
+<li><dl class="simple">
+<dt>Open the saved file.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> The file should show the waveform that you have saved.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="31">
+<li><dl class="simple">
+<dt>Click the ‘Info button’ icon on the upper left of the pattern generator window.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result:</strong> It should lead to the wiki page of pattern generator.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="oscilloscope_tests.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Oscilloscope - Test Suite</a>
+    <a href="power_supply_tests.html" title="Next document (Alt+Shift+RightArrow)" class="next">Power Supply - Test Suite</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

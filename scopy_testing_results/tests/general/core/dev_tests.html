@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Device interaction &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=3d3703ae" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=dcfbb431"></script>
+    <link rel="icon" href="../../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Instrument Detaching - Test Suite" href="../instrument_detaching_tests.html" />
+    <link rel="prev" title="EMU" href="emu_tests.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Device interaction</a><ul>
+<li><a class="reference internal" href="#setup-environment">Setup environment:</a></li>
+<li><a class="reference internal" href="#test-1-verifying-the-device-button">Test 1: Verifying the device button.</a></li>
+<li><a class="reference internal" href="#test-2-remove-a-device-from-device-browser">Test 2: Remove a device from device browser.</a></li>
+<li><a class="reference internal" href="#test-3-remove-a-device-from-device-browser-while-it-is-connected">Test 3: Remove a device from device browser while it is connected.</a></li>
+<li><a class="reference internal" href="#test-4-edit-the-name-of-the-device">Test 4: Edit the name of the device.</a></li>
+<li><a class="reference internal" href="#test-5-select-a-tool">Test 5: Select a tool.</a></li>
+<li><a class="reference internal" href="#test-6-detach-a-tool">Test 6: Detach a tool.</a></li>
+<li><a class="reference internal" href="#test-7-reopen-the-app-with-a-detached-tool">Test 7: Reopen the app with a detached tool.</a></li>
+<li><a class="reference internal" href="#test-8-collapse-device-tools-in-the-tool-menu">Test 8: Collapse device tools in the tool menu.</a></li>
+<li><a class="reference internal" href="#test-9-connecting-to-multiple-devices">Test 9: Connecting to multiple devices.</a></li>
+<li><a class="reference internal" href="#test-10-resource-manager-with-multiple-devices">Test 10: Resource manager with multiple devices.</a></li>
+<li><a class="reference internal" href="#test-11-devices-order-in-device-browser">Test 11: Devices order in device browser.</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../../index.html">
+      <img class="only-light" src="../../../_static/scopy.png"/>
+      <img class="only-dark" src="../../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../../../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1"/><div class="collapse"><a class="reference internal" href="../../plugins/index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../../plugins/datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../../plugins/dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../../plugins/swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../../plugins/adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../../plugins/registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../plugins/debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emu_tests.html">EMU</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="device-interaction">
+<span id="dev-tests"></span><h1>Device interaction<a class="headerlink" href="#device-interaction" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>User guide: <a class="reference internal" href="../../../user_guide/index.html#user-guide"><span class="std std-ref">Scopy Overview</span></a>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23.8%" />
+<col style="width: 14.3%" />
+<col style="width: 14.3%" />
+<col style="width: 23.8%" />
+<col style="width: 23.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Tester</p></th>
+<th class="head"><p>Test Date</p></th>
+<th class="head"><p>Scopy version</p></th>
+<th class="head"><p>Plugin version (N/A if not applicable)</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="setup-environment">
+<h2>Setup environment:<a class="headerlink" href="#setup-environment" title="Link to this heading"></a></h2>
+<dl class="simple" id="m2k-emu-dev">
+<dt><strong>M2k.Emu:</strong></dt><dd><ul class="simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Start the iio-emu process using “adalm2000” in the dropdown and
+“ip:127.0.0.1” as URI.</p></li>
+<li><p>Add the device in device browser.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple" id="m2k-usb-dev">
+<dt><strong>M2k.Usb:</strong></dt><dd><ul class="simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Connect an <strong>ADALM2000</strong> device to the system by USB.</p></li>
+<li><p>Add the device in device browser.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="test-1-verifying-the-device-button">
+<h2>Test 1: Verifying the device button.<a class="headerlink" href="#test-1-verifying-the-device-button" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.HP.DEV_BTN</p>
+<p><strong>Description:</strong> To verify that clicking on the device button triggers the
+expected action: displaying device details and device tools.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="add_dev_tests.html#tst-add-plugins-add"><span class="std std-ref">TST.ADD.PLUGINS_ADD_SINGLE</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-emu-dev"><span class="std std-ref">M2k.Emu</span></a> setup.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Click on the device icon.</p></li>
+<li><dl class="simple">
+<dt>Observe the application’s behavior.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The device details page is displayed in the
+info page section, and in the tool menu (on the left), the device
+is added with a list of available tools (in this form, the tools
+cannot be accessed).</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-remove-a-device-from-device-browser">
+<h2>Test 2: Remove a device from device browser.<a class="headerlink" href="#test-2-remove-a-device-from-device-browser" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.DEV.FORGET</p>
+<p><strong>Description:</strong> This test checks if the “Forget” (x) button work correctly.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="add_dev_tests.html#tst-add-plugins-add"><span class="std std-ref">TST.ADD.PLUGINS_ADD_SINGLE</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-emu-dev"><span class="std std-ref">M2k.Emu</span></a> setup.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Click the <strong>Forget</strong> button located at the bottom-right of the device icon.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The device is removed from device browser.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-remove-a-device-from-device-browser-while-it-is-connected">
+<h2>Test 3: Remove a device from device browser while it is connected.<a class="headerlink" href="#test-3-remove-a-device-from-device-browser-while-it-is-connected" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.DEV.FORGET_CONN</p>
+<p><strong>Description:</strong> This test verifies whether Scopy properly handles the removal
+of a connected device.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="connection_tests.html#tst-conn-succ"><span class="std std-ref">TST.CONN.SUCC</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-emu-dev"><span class="std std-ref">M2k.Emu</span></a> setup.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Click on the device icon from device browser.</p></li>
+<li><p>Click on <strong>Connect</strong> button.</p></li>
+<li><dl class="simple">
+<dt>Click the <strong>Forget</strong> button located at the bottom-right of the device icon.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Initially, the device is disconnected and then
+successfully removed from the device browser.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-edit-the-name-of-the-device">
+<h2>Test 4: Edit the name of the device.<a class="headerlink" href="#test-4-edit-the-name-of-the-device" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.DEV.EDIT_NAME</p>
+<p><strong>Description:</strong> This test checks if the <strong>Edit pen</strong> button work correctly.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="add_dev_tests.html#tst-add-plugins-add"><span class="std std-ref">TST.ADD.PLUGINS_ADD_SINGLE</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-emu-dev"><span class="std std-ref">M2k.Emu</span></a> setup.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Place the cursor in the top-right corner of the device icon in the
+device browser.</p></li>
+<li><p>After the pen icon appears, click on it.</p></li>
+<li><p>Delete “M2k”.</p></li>
+<li><p>Write “M3k”.</p></li>
+<li><dl class="simple">
+<dt>Press enter.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong>  The device name changes both in the device
+browser and in the tool menu.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-5-select-a-tool">
+<h2>Test 5: Select a tool.<a class="headerlink" href="#test-5-select-a-tool" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.DEV.SELECT_TOOL</p>
+<p><strong>Description:</strong> This test checks if the tool infrastructure works correctly.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="connection_tests.html#tst-conn-succ"><span class="std std-ref">TST.CONN.SUCC</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-emu-dev"><span class="std std-ref">M2k.Emu</span></a> setup.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Click on the device icon from device browser.</p></li>
+<li><p>Click on <strong>Connect</strong> button.</p></li>
+<li><dl class="simple">
+<dt>Click on “Oscilloscope” tool.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The “Oscilloscope” tool is displayed and the tool menu item is highlighted.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Click on “Home” menu entry.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The device page is displayed and the home menu
+item is highlighted.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-6-detach-a-tool">
+<span id="tst-dev-detach-tool"></span><h2>Test 6: Detach a tool.<a class="headerlink" href="#test-6-detach-a-tool" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.DEV.DETACH_TOOL</p>
+<p><strong>Description:</strong> This test checks if the tool detachment mechanism is working
+correctly.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="connection_tests.html#tst-conn-succ"><span class="std std-ref">TST.CONN.SUCC</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-emu-dev"><span class="std std-ref">M2k.Emu</span></a> setup or <a class="reference internal" href="#m2k-usb-dev"><span class="std std-ref">M2k.Usb</span></a> setup - same as in the previous test.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Click on the device icon from device browser.</p></li>
+<li><p>Click on <strong>Connect</strong> button.</p></li>
+<li><dl class="simple">
+<dt>Double click on “Oscilloscope” tool.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The “Oscilloscope” tool is integrated into a
+separate window from the application. The window title should be:
+“Scopy-M2kPlugin-Oscilloscope-“ip:127.0.0.1 or usb:x.y.z.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Close the “Oscilloscope” window.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The “Oscilloscope” tool is reintegrated into the main window.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><p>Detach the oscilloscope tool again.</p></li>
+<li><dl class="simple">
+<dt>Close the  application.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Scopy finished successfully.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-7-reopen-the-app-with-a-detached-tool">
+<h2>Test 7: Reopen the app with a detached tool.<a class="headerlink" href="#test-7-reopen-the-app-with-a-detached-tool" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.DEV.DETACH_TOOL_RE</p>
+<p><strong>Description:</strong> This test checks whether detached tools retain their state upon
+reconnection.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#tst-dev-detach-tool"><span class="std std-ref">TST.DEV.DETACH_TOOL</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-emu-dev"><span class="std std-ref">M2k.Emu</span></a> setup or <a class="reference internal" href="#m2k-usb-dev"><span class="std std-ref">M2k.Usb</span></a> setup - same as in the previous test.</p></li>
+<li><p>The application was previously closed with a detached tool (Oscilloscope).</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Click on the device icon from device browser.</p></li>
+<li><dl class="simple">
+<dt>Click on <strong>Connect</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The oscilloscope tool is detached.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-8-collapse-device-tools-in-the-tool-menu">
+<h2>Test 8: Collapse device tools in the tool menu.<a class="headerlink" href="#test-8-collapse-device-tools-in-the-tool-menu" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.DEV.COLLAPSE</p>
+<p><strong>Description:</strong> This test verifies if the collapse feature works properly in
+the tool menu.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="add_dev_tests.html#tst-add-plugins-add"><span class="std std-ref">TST.ADD.PLUGINS_ADD_SINGLE</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-emu-dev"><span class="std std-ref">M2k.Emu</span></a> setup.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Click on the device icon from device browser.</p></li>
+<li><dl class="simple">
+<dt>Click on the device header from tool menu.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The tools collapse.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Repeat 2.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The tools expand.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-9-connecting-to-multiple-devices">
+<span id="tst-dev-multi-conn"></span><h2>Test 9: Connecting to multiple devices.<a class="headerlink" href="#test-9-connecting-to-multiple-devices" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.DEV.MULTI_CONN</p>
+<p><strong>Description:</strong> This test checks if connecting to multiple devices is working
+properly.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="connection_tests.html#tst-conn-succ"><span class="std std-ref">TST.CONN.SUCC</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>The “Connect to multiple devices” preference is enabled in the preferences
+page.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-emu-dev"><span class="std std-ref">M2k.Emu</span></a> and <a class="reference internal" href="#m2k-usb-dev"><span class="std std-ref">M2k.Usb</span></a> setups.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Click on the emu device icon from device browser.</p></li>
+<li><dl class="simple">
+<dt>Click on <strong>Connect</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The connection is established successfully.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><p>Click on the usb device icon from device browser.</p></li>
+<li><dl class="simple">
+<dt>Click on <strong>Connect</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The connection is established successfully, both
+device icons have a green status bar, both devices are entered into the
+tool menu (the device header contains the device name and uri), and the
+tools of each device can be accessed. If the menu contains too many
+entries, then the scroll bar will become visible.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-10-resource-manager-with-multiple-devices">
+<h2>Test 10: Resource manager with multiple devices.<a class="headerlink" href="#test-10-resource-manager-with-multiple-devices" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.DEV.RM_MULTI</p>
+<p><strong>Description:</strong> This test verifies that the resource manager is being used
+properly.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#tst-dev-multi-conn"><span class="std std-ref">TST.DEV.MULTI_CONN</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>The “Connect to multiple devices” preference is enabled in the
+preferences page.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-emu-dev"><span class="std std-ref">M2k.Emu</span></a> and <a class="reference internal" href="#m2k-usb-dev"><span class="std std-ref">M2k.Usb</span></a> setups.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Click on the emu device icon from device browser.</p></li>
+<li><p>Click on <strong>Connect</strong> button.</p></li>
+<li><p>Click on the usb device icon from device browser.</p></li>
+<li><p>Click on <strong>Connect</strong> button.</p></li>
+<li><dl class="simple">
+<dt>Click on the “Oscilloscope” run button of the emu device in the tool menu.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The button changes from stop button to run button (green color).</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Click on the “Spectrum Analyzer” run button of the usb device in the tool menu.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The button changes from stop button to run button,
+and the oscilloscope button (of the emu device) remains the same.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-11-devices-order-in-device-browser">
+<h2>Test 11: Devices order in device browser.<a class="headerlink" href="#test-11-devices-order-in-device-browser" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.DEV.ADD_ORDER</p>
+<p><strong>Description:</strong> This test verifies that each newly added device is finally
+entered into the device browser.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="add_dev_tests.html#tst-add-plugins-add"><span class="std std-ref">TST.ADD.PLUGINS_ADD_SINGLE</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>The “Connect to multiple devices” preference is enabled in the
+preferences page.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-emu-dev"><span class="std std-ref">M2k.Emu</span></a> and <a class="reference internal" href="#m2k-usb-dev"><span class="std std-ref">M2k.Usb</span></a> setups.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Add the emu device.</p></li>
+<li><dl class="simple">
+<dt>Add the usb device.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The usb device is on the right side of emu
+device.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="emu_tests.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">EMU</a>
+    <a href="../instrument_detaching_tests.html" title="Next document (Alt+Shift+RightArrow)" class="next">Instrument Detaching - Test Suite</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

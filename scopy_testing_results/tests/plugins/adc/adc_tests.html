@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ADC Plugin - Test Suite &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=3d3703ae" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=dcfbb431"></script>
+    <link rel="icon" href="../../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="ADALM2000" href="../m2k/index.html" />
+    <link rel="prev" title="ADC" href="index.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">ADC Plugin - Test Suite</a><ul>
+<li><a class="reference internal" href="#setup-environment">Setup environment</a></li>
+<li><a class="reference internal" href="#adc-time">ADC-Time</a><ul>
+<li><a class="reference internal" href="#test-1-x-axis">Test 1 - X-AXIS</a></li>
+<li><a class="reference internal" href="#test-2-y-axis">Test 2 - Y-AXIS</a></li>
+<li><a class="reference internal" href="#test-3-xy-plot">Test 3 - XY PLOT</a></li>
+<li><a class="reference internal" href="#test-4-settings">Test 4 - Settings</a></li>
+<li><a class="reference internal" href="#test-5-print">Test 5 - Print</a></li>
+<li><a class="reference internal" href="#test-6-info">Test 6 - Info</a></li>
+<li><a class="reference internal" href="#test-7-plot-navigation">Test 7 - Plot Navigation</a></li>
+<li><a class="reference internal" href="#test-8-adc-time-channel-settings">Test 8 - ADC-Time Channel Settings</a></li>
+<li><a class="reference internal" href="#test-9-measure">Test 9 - Measure</a></li>
+<li><a class="reference internal" href="#test-10-cursors">Test 10 - Cursors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adc-frequency">ADC-Frequency</a><ul>
+<li><a class="reference internal" href="#test-1-x-axis-settings">Test 1 - X-Axis settings</a></li>
+<li><a class="reference internal" href="#test-2-y-axis-settings">Test 2 - Y-Axis settings</a></li>
+<li><a class="reference internal" href="#test-3-settings-adjustment">Test 3 - Settings adjustment</a></li>
+<li><a class="reference internal" href="#test-4-print-plot">Test 4 - Print plot</a></li>
+<li><a class="reference internal" href="#test-5-view-plugin-documentation">Test 5 - View plugin documentation</a></li>
+<li><a class="reference internal" href="#test-6-y-axis-channel-settings">Test 6 - Y-Axis channel settings</a></li>
+<li><a class="reference internal" href="#test-7-marker-settings">Test 7 - Marker settings</a></li>
+<li><a class="reference internal" href="#test-8-cursor-settings">Test 8 - Cursor settings</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#preferences">Preferences</a><ul>
+<li><a class="reference internal" href="#test-1-x-scale-position">Test 1 - X Scale Position</a></li>
+<li><a class="reference internal" href="#test-2-y-scale-position">Test 2 - Y Scale Position</a></li>
+<li><a class="reference internal" href="#test-3-channel-handle-position">Test 3 - Channel Handle Position</a></li>
+<li><a class="reference internal" href="#test-4-x-cursor-position">Test 4 - X Cursor Position</a></li>
+<li><a class="reference internal" href="#test-5-y-cursor-position">Test 5 - Y Cursor Position</a></li>
+<li><a class="reference internal" href="#test-6-default-ymode">Test 6 - Default YMode</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../../index.html">
+      <img class="only-light" src="../../../_static/scopy.png"/>
+      <img class="only-dark" src="../../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../../../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5" checked=""/><div class="collapse"><a class="reference internal" href="index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../../general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="adc-plugin-test-suite">
+<span id="adc-tests"></span><h1>ADC Plugin - Test Suite<a class="headerlink" href="#adc-plugin-test-suite" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>User guide: <a class="reference internal" href="../../../plugins/adc/adc.html#adc"><span class="std std-ref">ADC user guide</span></a></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23.8%" />
+<col style="width: 14.3%" />
+<col style="width: 14.3%" />
+<col style="width: 23.8%" />
+<col style="width: 23.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Tester</p></th>
+<th class="head"><p>Test Date</p></th>
+<th class="head"><p>Scopy version</p></th>
+<th class="head"><p>Plugin version (N/A if not applicable)</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="setup-environment">
+<h2>Setup environment<a class="headerlink" href="#setup-environment" title="Link to this heading"></a></h2>
+<dl class="simple" id="adalm-pluto-device-usb">
+<dt><strong>Pluto.usb:</strong></dt><dd><ul class="simple">
+<li><p>Connect a pluto device via usb to your PC</p></li>
+<li><p>connect to the device in Scopy with ADCPlugin enabled</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple" id="adalm-pluto-device-emu">
+<dt><strong>Pluto.emu:</strong></dt><dd><ul class="simple">
+<li><p>Press the add device button and go to emulator</p></li>
+<li><p>Select pluto device</p></li>
+<li><p>Enable, verify and select all plugins available</p></li>
+<li><p>Connect to the device</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple" id="adalm-pluto-device-siggen">
+<dt><strong>Pluto.signalGenerator:</strong></dt><dd><ul class="simple">
+<li><p>Requires DAC and Debugger tests to work</p></li>
+<li><p>Go to Debugger, select context0/ad9361-phy/TX_LO/frequency and set it to 2400000000.
+Do the same for context0/ad9361-phy/RX_LO/frequency</p></li>
+<li><p>Go to DAC plugin, mode: DDS, dds mode: independent I/Q control.
+TX1_I_F1 scale: -40, TX1_I_F2: -40, TX1_Q_F1: -30, TX1_Q_F2: -30. set all frequency values to 1MHz.</p></li>
+<li><p>Run DAC plugin.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="adc-time">
+<span id="adc-time-tests"></span><h2>ADC-Time<a class="headerlink" href="#adc-time" title="Link to this heading"></a></h2>
+<section id="test-1-x-axis">
+<h3>Test 1 - X-AXIS<a class="headerlink" href="#test-1-x-axis" title="Link to this heading"></a></h3>
+<p id="tst-adc-time-x-axis"><strong>UID:</strong> TST.ADC_TIME.X_AXIS</p>
+<p><strong>Description:</strong> Verify X-axis behavior under different configurations</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Scroll down and turn on plot labels in the settings panel</p></li>
+<li><p>Set XMode to Samples on the X-axis</p></li>
+<li><p>Set buffer size to 100</p></li>
+<li><dl class="simple">
+<dt>Press Single</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Plot labels should go up to 100, and channel curves
+should span across the whole plot</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><p>Turn off Sync buffer-plot sizes</p></li>
+<li><p>Set plot size to 200</p></li>
+<li><dl class="simple">
+<dt>Press Single</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Plot labels should go up to 200, and channel curves should span across the whole plot</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Turn on Rolling mode</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Plot labels should invert, going from 200 to 0</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><dl class="simple">
+<dt>Change XMin to 300 and XMax to -100 (pressing Single will reset this setting)</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Plot labels should range from 300 to -100, with channel curves centered and between samples 200 and 0</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-y-axis">
+<h3>Test 2 - Y-AXIS<a class="headerlink" href="#test-2-y-axis" title="Link to this heading"></a></h3>
+<p id="tst-adc-time-y-axis"><strong>UID:</strong> TST.ADC_TIME.Y_AXIS</p>
+<p><strong>Description:</strong> Verify Y-axis behavior under different configurations</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Scroll down and turn on plot labels in the settings panel</p></li>
+<li><dl class="simple">
+<dt>Turn on Autoscale and press Run</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Y-axis should automatically scale according to channel curves</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><p>Press Stop</p></li>
+<li><p>Turn Autoscale off</p></li>
+<li><p>Set YMode to ADC Counts</p></li>
+<li><p>Set Min to -4000 and Max to 4000</p></li>
+<li><dl class="simple">
+<dt>Press Single</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Y-axis labels should range from -4000 to 4000, and curves should vertically adjust accordingly</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-xy-plot">
+<h3>Test 3 - XY PLOT<a class="headerlink" href="#test-3-xy-plot" title="Link to this heading"></a></h3>
+<p id="tst-adc-time-xy-plot"><strong>UID:</strong> TST.ADC_TIME.XY_PLOT</p>
+<p><strong>Description:</strong> Verify XY plot functionality and visualization</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p><a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Run Pluto.signalGenerator setup</p></li>
+<li><dl class="simple">
+<dt>Turn on XY PLOT</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A new plot should appear on the right</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Turn on Autoscale</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> On the time plot, both channel curves should
+look the same, but voltage1 should have a higher amplitude</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Set X Axis source to voltage0</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A small circular curve should appear on the XY plot</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Set X Axis source to voltage1</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A larger circular curve should appear on the XY plot</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Turn Plot X source on and off</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A line cutting the circle should be visible in a different color</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-settings">
+<h3>Test 4 - Settings<a class="headerlink" href="#test-4-settings" title="Link to this heading"></a></h3>
+<p id="tst-adc-time-settings"><strong>UID:</strong> TST.ADC_TIME.SETTINGS</p>
+<p><strong>Description:</strong> Change Plot Title and toggle various plot settings</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Change Plot Title to “test”</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> text in top left should change to “test”</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>Turn on and off plot labels</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> labels on x and y axis should appear</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Change thickness and style to all available modes and observe the changes</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> channel curves’ appearance should behave as expected</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-5-print">
+<h3>Test 5 - Print<a class="headerlink" href="#test-5-print" title="Link to this heading"></a></h3>
+<p id="tst-adc-time-print"><strong>UID:</strong> TST.ADC_TIME.PRINT</p>
+<p><strong>Description:</strong> Save the plot as a PDF file via the print functionality</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Run <a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a> setup</p></li>
+<li><p>Press the single button</p></li>
+<li><p>Press the print button</p></li>
+<li><dl class="simple">
+<dt>Select a folder and save the file</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> a new PDF file should appear within the folder containing
+the last view of the plot</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-6-info">
+<h3>Test 6 - Info<a class="headerlink" href="#test-6-info" title="Link to this heading"></a></h3>
+<p id="tst-adc-time-info"><strong>UID:</strong> TST.ADC_TIME.INFO</p>
+<p><strong>Description:</strong> Open the ADC plugin documentation via the info button</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Press the info button in the top left corner of the window</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> this should open the ADC plugin documentation.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-7-plot-navigation">
+<h3>Test 7 - Plot Navigation<a class="headerlink" href="#test-7-plot-navigation" title="Link to this heading"></a></h3>
+<p id="tst-plot-navigation"><strong>UID:</strong> TST.PLOT_NAVIGATION</p>
+<p><strong>Description:</strong> Test plot zooming, panning, and undo features</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Scroll down and turn on plot labels in the settings panel</p></li>
+<li><dl class="simple">
+<dt>Place mouse cursor within the plot and use the scroll wheel</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> should zoom in/out on the area at the cursor, should not be able to zoom out more than the default view</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Right-click the plot after zooming in</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> should undo the zoom</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Select an area on the plot using left-click</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> should zoom in exactly on the selected area</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Zoom in using the selection method, then hold left shift button and zoom using the scroll wheel</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> should pan left and right</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Zoom in using all methods described above and press right-click until zoom is back to default</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> should undo each zoom operation one by one</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-8-adc-time-channel-settings">
+<h3>Test 8 - ADC-Time Channel Settings<a class="headerlink" href="#test-8-adc-time-channel-settings" title="Link to this heading"></a></h3>
+<p id="tst-adc-time-channel-settings"><strong>UID:</strong> TST.ADC_TIME_CHANNEL_SETTINGS</p>
+<p><strong>Description:</strong> Test Y-axis settings and adjustments for the ADC-Time tool</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Double-click on the voltage0 channel and go to the right menu which pops up</p></li>
+<li><dl class="simple">
+<dt>Enable Y-AXIS and move up and down the axis handle</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> this should move the channel curve within the Y-axis</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Turn autoscale off. Set YMode to ADC Counts, Min to -4000 and Max to 4000, and press single</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> only voltage0 curve should vertically adjust</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><p>Turn off Y-AXIS</p></li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-9-measure">
+<h3>Test 9 - Measure<a class="headerlink" href="#test-9-measure" title="Link to this heading"></a></h3>
+<p id="tst-measure"><strong>UID:</strong> TST.MEASURE</p>
+<p><strong>Description:</strong> Test the Measure functionality, enabling panels
+and checking frequency and stats</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Double-click on the voltage0 channel and go to the right menu which pops up.</p></li>
+<li><p>Check frequency measure and stats in the horizontal measurements table, middle measure and stats in the vertical measurements table.</p></li>
+<li><dl class="simple">
+<dt>Open the Measure menu at the bottom of the window, enable Measure Panel and Stats panel</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Frequency should be around 1MHz in both panels, middle should be hovering around the 0 value in both panels</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Open the Measure menu and show all Stats and Measurements</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> all checkboxes in the measurement tables should be checked and each
+should have a corresponding label above and below the plot</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><p>Turn off measurements</p></li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-10-cursors">
+<h3>Test 10 - Cursors<a class="headerlink" href="#test-10-cursors" title="Link to this heading"></a></h3>
+<p id="tst-cursors"><strong>UID:</strong> TST.CURSORS</p>
+<p><strong>Description:</strong> Test cursor functionality including synchronization,
+tracking, and moving readouts</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Double-click on the voltage0 channel and go to the right menu which pops up</p></li>
+<li><p>Run <a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a> setup</p></li>
+<li><p>In ADC, set X-AXIS buffer size to 200, XMode to Sample, and YMode to ADC Counts</p></li>
+<li><p>Open the Cursors menu at the bottom of the window. Enable X and Enable Y</p></li>
+<li><dl class="simple">
+<dt>Move the X cursors on the plot via the axis handles and place one on voltage0 sine high peak and the other on the next low peak</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> delta x should be around 15 samples between voltage0 high peak and low peak</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Lock X cursors via the Cursor menu. Move one cursor to a voltage1 high peak</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> the second cursor should move and maintain the same delta. High peak to low peak should match in both voltage0 and voltage1</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Enable track and select voltage0</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> markers should appear on the voltage0 curve synced with the X cursor. Values in cursor readouts should change accordingly</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Select voltage1 channel</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> markers and readouts should now be related to voltage1</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><dl class="simple">
+<dt>Turn off track and measure voltage0 and voltage1 amplitudes</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> for voltage0 delta y should be around 1.4kV and for voltage1 500V</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><p>Enable move readouts. Click and hold the readouts to move them
+- <strong>Expected result:</strong> should be able to move the readouts anywhere within the plot
+- <strong>Actual result:</strong></p></li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+<section id="adc-frequency">
+<span id="adc-frequency-tests"></span><h2>ADC-Frequency<a class="headerlink" href="#adc-frequency" title="Link to this heading"></a></h2>
+<section id="test-1-x-axis-settings">
+<h3>Test 1 - X-Axis settings<a class="headerlink" href="#test-1-x-axis-settings" title="Link to this heading"></a></h3>
+<p id="tst-adc-freq-x-axis-settings"><strong>UID:</strong> TST.ADC_FREQ.X_AXIS_SETTINGS</p>
+<p><strong>Description:</strong> Adjust X-axis settings for frequency and sample-based
+plotting in the ADC plugin</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Scroll down and turn on plot labels in the settings panel</p></li>
+<li><dl class="simple">
+<dt>Set XMode to Samples, buffer size to 4000, and press single</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Plot labels should go up to 4000, and channel curves should span across the whole plot</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Set XMode to Frequency, XMin to 0.5 MHz, XMax to 2 MHz (pressing Single will reset this setting)</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Plot labels should be from 0.5 MHz to 2 MHz</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Set frequency offset to 1 MHz and press single</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Curves should move 1 MHz to the left</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-y-axis-settings">
+<h3>Test 2 - Y-Axis settings<a class="headerlink" href="#test-2-y-axis-settings" title="Link to this heading"></a></h3>
+<p id="tst-adc-freq-y-axis-settings"><strong>UID:</strong> TST.ADC_FREQ.Y_AXIS_SETTINGS</p>
+<p><strong>Description:</strong> Adjust Y-axis settings, including autoscaling and manual
+range settings</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Scroll down and turn on plot labels in the settings panel</p></li>
+<li><dl class="simple">
+<dt>Turn on autoscale and press run</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Y-axis should automatically scale according to the channel curves</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Press stop, turn autoscale off, set YMode to ADC Counts, Min to -140, Max to 20, and press single</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Y-axis labels should be from -140 to 20, and curves should vertically adjust</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Set power offset to 20 dB and press single</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Curves should move 20 dB up</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Press run and change through all the window options and window correction</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The curves should change slightly in real time</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-settings-adjustment">
+<h3>Test 3 - Settings adjustment<a class="headerlink" href="#test-3-settings-adjustment" title="Link to this heading"></a></h3>
+<p id="tst-adc-freq-settings-adjustment"><strong>UID:</strong> TST.ADC_FREQ.SETTINGS_ADJUSTMENT</p>
+<p><strong>Description:</strong> Adjust plot settings such as title, labels, thickness,
+and style</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Change Plot Title to “test”</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Text in the top left should change to “test”</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>Turn on and off plot labels</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Labels on X and Y axis should appear</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Change thickness and style to all available modes and observe the changes</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Channel curves should adjust appearance as expected</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-print-plot">
+<h3>Test 4 - Print plot<a class="headerlink" href="#test-4-print-plot" title="Link to this heading"></a></h3>
+<p id="tst-adc-freq-print-plot"><strong>UID:</strong> TST.ADC_FREQ.PRINT_PLOT</p>
+<p><strong>Description:</strong> Print the current plot to a PDF file</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Run <a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a> setup</p></li>
+<li><p>Press the single button and then the print button</p></li>
+<li><dl class="simple">
+<dt>Select a folder and save the file</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A new PDF file should appear in the folder containing the last view of the plot</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-5-view-plugin-documentation">
+<h3>Test 5 - View plugin documentation<a class="headerlink" href="#test-5-view-plugin-documentation" title="Link to this heading"></a></h3>
+<p id="tst-adc-freq-view-plugin-doc"><strong>UID:</strong> TST.ADC_FREQ.VIEW_PLUGIN_DOC</p>
+<p><strong>Description:</strong> Open the ADC plugin documentation</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Press the info button in the top left corner of the window</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The ADC plugin documentation should open</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-6-y-axis-channel-settings">
+<h3>Test 6 - Y-Axis channel settings<a class="headerlink" href="#test-6-y-axis-channel-settings" title="Link to this heading"></a></h3>
+<p id="tst-adc-freq-y-axis-channel-settings"><strong>UID:</strong> TST.ADC_FREQ.Y_AXIS_CHANNEL_SETTINGS</p>
+<p><strong>Description:</strong> Adjust the Y-axis for individual channel curve manipulation</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Enable Y-Axis and move the axis handle up and down</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The channel curve should move within the Y-axis</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>Turn off autoscale, set YMode to ADC Counts, Min to -140, Max to 20, and press single</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Only the voltage0 curve should vertically adjust</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><p>Turn off Y-Axis</p></li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-7-marker-settings">
+<h3>Test 7 - Marker settings<a class="headerlink" href="#test-7-marker-settings" title="Link to this heading"></a></h3>
+<p id="tst-adc-freq-marker-settings"><strong>UID:</strong> TST.ADC_FREQ.MARKER_SETTINGS</p>
+<p><strong>Description:</strong> Use markers to identify peaks on channel curves</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Run <a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a> setup</p></li>
+<li><p>Press run and enable the markers from the bottom right <strong>Measure</strong> panel.</p></li>
+<li><dl class="simple">
+<dt>In the <strong>voltage0 channels settings</strong>, enable the markers, set the marker type to <strong>peak</strong> and count to <strong>5</strong>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> 5 markers should appear on voltage0’s curve at the highest peaks</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Repeat the process with a count of 7</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> 7 markers should appear on voltage0’s curve at the highest peaks</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Check the table below the plot in peak mode</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The highest peak should be at 1 MHz</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Set marker type to fixed and count to 5</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> 5 movable cursors should appear</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Repeat for a count of 7</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> 7 movable cursors should appear</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-8-cursor-settings">
+<h3>Test 8 - Cursor settings<a class="headerlink" href="#test-8-cursor-settings" title="Link to this heading"></a></h3>
+<p id="tst-adc-freq-cursor-settings"><strong>UID:</strong> TST.ADC_FREQ.CURSOR_SETTINGS</p>
+<p><strong>Description:</strong> Use cursors to measure specific points on channel curves.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Run <a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a> setup</p></li>
+<li><p>Press run and set X-Axis buffer size to 200, XMode to Frequency.</p></li>
+<li><p>Open the Cursors menu and enable X cursors.</p></li>
+<li><dl class="simple">
+<dt>Move the X cursor on the plot and place one on voltage0’s highest peak.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The cursor should measure 1 MHz in the readouts</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Enable track and select voltage0</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Markers should appear on the voltage0 curve, synced with the X cursor</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Select voltage1 channel</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Markers and readouts should now be related to voltage1</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Turn off track and measure voltage0’s highest peak using the Y cursor</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The cursor should measure about -13 dB in the readouts</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Enable move readouts and click and hold the readouts to move them</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Readouts should be movable within the plot</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+<section id="preferences">
+<span id="adc-preferences-tests"></span><h2>Preferences<a class="headerlink" href="#preferences" title="Link to this heading"></a></h2>
+<section id="test-1-x-scale-position">
+<h3>Test 1 - X Scale Position<a class="headerlink" href="#test-1-x-scale-position" title="Link to this heading"></a></h3>
+<p id="tst-pref-x-scale-pos"><strong>UID:</strong> TST.PREF.X_SCALE_POS</p>
+<p><strong>Description:</strong> Change the X-axis scale position and verify the label’s position on the plot</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-emu"><span class="std std-ref">Pluto.emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Change Plot X-Axis scale position to Top, restart app, open ADC-Time and enable plot labels in SETTINGS panel</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis labels should appear on top</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>Open ADC-Frequency and enable plot labels in SETTINGS panel.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis labels should appear on top</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Change Plot X-Axis scale position to Bottom, restart app, open ADC-Time and enable plot labels in SETTINGS panel</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis labels should appear on the bottom</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Open ADC-Frequency and enable plot labels in SETTINGS panel.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Same result for ADC-Frequency</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-y-scale-position">
+<h3>Test 2 - Y Scale Position<a class="headerlink" href="#test-2-y-scale-position" title="Link to this heading"></a></h3>
+<p id="tst-pref-y-scale-pos"><strong>UID:</strong> TST.PREF.Y_SCALE_POS</p>
+<p><strong>Description:</strong> Change the Y-axis scale position and verify the label’s
+position on the plot</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-emu"><span class="std std-ref">Pluto.emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Change Plot Y-Axis scale position to Right, restart app, open ADC-Time and enable plot labels in SETTINGS panel</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis labels should appear on the right</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>Open ADC-Frequency and enable plot labels in SETTINGS panel.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis labels should appear on the right</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Change Plot Y-Axis scale position to Left, restart app, open ADC-Time and enable plot labels in SETTINGS panel</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis labels should appear on the left</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Open ADC-Frequency and enable plot labels in SETTINGS panel.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis labels should appear on the left</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-channel-handle-position">
+<h3>Test 3 - Channel Handle Position<a class="headerlink" href="#test-3-channel-handle-position" title="Link to this heading"></a></h3>
+<p id="tst-pref-ch-handle-pos"><strong>UID:</strong> TST.PREF.CH_HANDLE_POS</p>
+<p><strong>Description:</strong> Change the Y-handle position and verify the appearance of the handle</p>
+<dl>
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-emu"><span class="std std-ref">Pluto.emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Change Plot channel Y-handle position to Right, restart app, open
+ADC-Time, double click voltage0 to open channel settings and enable Y-AXIS</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis handle should appear on the right</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>Open ADC-Frequency, double click voltage0 to open channel settings and enable Y-AXIS.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis handle should appear on the right</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic" start="3">
+<li><p>Change Plot channel Y-handle position to Left, restart app, open
+ADC-Time, double click voltage0 to open channel settings and enable Y-AXIS</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis handle should appear on the left</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Open ADC-Frequency, double click voltage0 to open channel settings and enable Y-AXIS.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Axis handle should appear on the left</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-x-cursor-position">
+<h3>Test 4 - X Cursor Position<a class="headerlink" href="#test-4-x-cursor-position" title="Link to this heading"></a></h3>
+<p id="tst-pref-x-cursor-pos"><strong>UID:</strong> TST.PREF.X_CURSOR_POS</p>
+<p><strong>Description:</strong> Change the X-cursor position and verify the cursor’s appearance.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-emu"><span class="std std-ref">Pluto.emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Change Plot X-Cursor position to Top, restart app, open ADC-Time and enable x cursors</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> X cursor handle should appear on top</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>Open ADC-Frequency and enable X cursors.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> X cursor handle should appear on top</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Change Plot X-Cursor position to Bottom, restart app, open ADC-Time and enable x cursors</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> X cursor handle should appear on the bottom</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Open ADC-Frequency and enable X cursors.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> X cursor handle should appear on the bottom</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-5-y-cursor-position">
+<h3>Test 5 - Y Cursor Position<a class="headerlink" href="#test-5-y-cursor-position" title="Link to this heading"></a></h3>
+<p id="tst-pref-y-cursor-pos"><strong>UID:</strong> TST.PREF.Y_CURSOR_POS</p>
+<p><strong>Description:</strong> Change the Y-cursor position and verify the cursor’s appearance</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-emu"><span class="std std-ref">Pluto.emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Change Plot Y-Cursor position to Right, restart app, open ADC-Time and enable Y cursors</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Y cursor handle should appear on the right</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>Open the ADC-Frequency and enable Y cursors</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Y cursor handle should appear on the right</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Change Plot Y-Cursor position to Left, restart app, open ADC-Time and enable y cursors</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Y cursor handle should appear on the left</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Open the ADC-Frequency and enable Y cursors</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Same result for ADC-Frequency</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-6-default-ymode">
+<h3>Test 6 - Default YMode<a class="headerlink" href="#test-6-default-ymode" title="Link to this heading"></a></h3>
+<p id="tst-pref-default-ymode"><strong>UID:</strong> TST.PREF.DEFAULT_YMODE</p>
+<p><strong>Description:</strong> Set the default Y-mode and verify its behavior in ADC-Time</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Emulator tests</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-emu"><span class="std std-ref">Pluto.emu</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Set YMode to % Full scale, restart app, open ADC-Time</p></li>
+<li><dl class="simple">
+<dt>Check the YMODE in General Settings:</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> In Y-AXIS, YMODE should be % Full scale</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Double click a channel to open the channel settings and check the <strong>Y-MODE</strong> by enabling <strong>Y-AXIS</strong>.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> In Y-AXIS, YMODE should be % Full scale</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">ADC</a>
+    <a href="../m2k/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">ADALM2000</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

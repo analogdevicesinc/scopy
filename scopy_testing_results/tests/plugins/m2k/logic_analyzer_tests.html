@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Logic Analyzer - Test Suite &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=3d3703ae" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=dcfbb431"></script>
+    <link rel="icon" href="../../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Network Analyzer - Test Suite" href="network_analyzer_tests.html" />
+    <link rel="prev" title="General Settings - Test Case" href="general_settings_tests.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button value="search" class="icon"></button>
+      <span id="search-progress"></span>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Logic Analyzer - Test Suite</a><ul>
+<li><a class="reference internal" href="#setup-environment">Setup environment:</a></li>
+<li><a class="reference internal" href="#test-1-channel-trigger-function">Test 1 - Channel Trigger Function</a></li>
+<li><a class="reference internal" href="#test-2-external-channel-trigger-function">Test 2 - External Channel Trigger Function</a></li>
+<li><a class="reference internal" href="#test-3-oscilloscope-source-external-trigger">Test 3 - Oscilloscope Source External Trigger</a></li>
+<li><a class="reference internal" href="#test-4-trigger-modes">Test 4 - Trigger Modes</a></li>
+<li><a class="reference internal" href="#test-5-clock-signal-measurement-accuracy">Test 5 - Clock signal measurement accuracy</a></li>
+<li><a class="reference internal" href="#test-6-parallel-decoder">Test 6 - Parallel Decoder</a></li>
+<li><a class="reference internal" href="#test-7-spi-decoder">Test 7 - SPI decoder</a></li>
+<li><a class="reference internal" href="#test-8-uart-decoder">Test 8 - UART decoder</a></li>
+<li><a class="reference internal" href="#test-9-pwm-decoder">Test 9 - PWM Decoder</a></li>
+<li><a class="reference internal" href="#test-10-channel-visual-representation">Test 10 - Channel visual representation</a></li>
+<li><a class="reference internal" href="#test-11-export-functionality">Test 11 - Export Functionality</a></li>
+<li><a class="reference internal" href="#test-12-print-plot">Test 12 - Print Plot</a></li>
+<li><a class="reference internal" href="#test-13-decoder-table">Test 13 - Decoder Table</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../../index.html">
+      <img class="only-light" src="../../../_static/scopy.png"/>
+      <img class="only-dark" src="../../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../../../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6" checked=""/><div class="collapse"><a class="reference internal" href="index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../../general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body" role="main">
+            
+  <section id="logic-analyzer-test-suite">
+<span id="logic-analyzer-tests"></span><h1>Logic Analyzer - Test Suite<a class="headerlink" href="#logic-analyzer-test-suite" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>User guide: <a class="reference internal" href="../../../plugins/m2k/logic_analyzer.html#logic-analyzer"><span class="std std-ref">Logic Analyzer user guide</span></a></p>
+</div>
+<p>The Logic Analyzer tests are a set of tests that are run to verify the
+Logic Analyzer instrument of the ADALM2000 plugin in Scopy.</p>
+<p>The following apply for all the test cases in this suite.
+If the test case has special requirements, they will be listed in the test case section.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23.8%" />
+<col style="width: 14.3%" />
+<col style="width: 14.3%" />
+<col style="width: 23.8%" />
+<col style="width: 23.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Tester</p></th>
+<th class="head"><p>Test Date</p></th>
+<th class="head"><p>Scopy version</p></th>
+<th class="head"><p>Plugin version (N/A if not applicable)</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="setup-environment">
+<h2>Setup environment:<a class="headerlink" href="#setup-environment" title="Link to this heading"></a></h2>
+<dl class="simple" id="adalm2000-device-setup">
+<dt><strong>Adalm2000.Device:</strong></dt><dd><ul class="simple">
+<li><p>Open Scopy.</p></li>
+<li><p>Connect the ADALM2000 device to the system.</p></li>
+<li><p>Connect the ADALM2000 device in Scopy using the USB/network backend.</p></li>
+<li><p>Connect <strong>W1</strong> to <strong>1+</strong> and <strong>GND</strong> to <strong>1-</strong> using the pinout diagram.</p></li>
+</ul>
+</dd>
+<dt>Depends on:</dt><dd><ul class="simple">
+<li><p>Test TST.PREFS.RESET</p></li>
+</ul>
+</dd>
+<dt>Prerequisites:</dt><dd><ul class="simple">
+<li><p>Scopy v2.0.0 or later with ADALM2000 plugin installed on the system.</p></li>
+<li><p>Tests listed as dependencies are successfully completed.</p></li>
+<li><p>Reset .ini files to default using the Preferences “Reset” button.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="test-1-channel-trigger-function">
+<h2>Test 1 - Channel Trigger Function<a class="headerlink" href="#test-1-channel-trigger-function" title="Link to this heading"></a></h2>
+<p id="tst-logic-chn-trigger"><strong>UID:</strong> TST.LOGIC.CHN_TRIGGER</p>
+<p><strong>Description:</strong> This test verifies the basic trigger functionality on individual
+digital channels - rising edge, falling edge, high, low, any edge.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+<li><p><a class="reference internal" href="digital_io_tests.html#digital-io-tests"><span class="std std-ref">Digital IO</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Open the Logic Analyzer instrument.</p></li>
+<li><p>Enable DIO 0 and DIO 1 on the Logic Analyzer.</p></li>
+<li><dl class="simple">
+<dt>Set the following parameters:</dt><dd><ul class="simple">
+<li><p>Sample rate to 50ksps.</p></li>
+<li><p>Sample delay of -142 samples.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Open the <a class="reference internal" href="../../../plugins/m2k/pattern_generator.html#pattern-generator"><span class="std std-ref">Pattern Generator</span></a> instrument and enable DIO 1.
+Set the following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Pattern: clock.</p></li>
+<li><p>Frequency: 100Hz.</p></li>
+<li><p>Phase: 0 degrees.</p></li>
+<li><p>Duty Cycle: 50%.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Open the <a class="reference internal" href="../../../plugins/m2k/digitalio.html#digitalio"><span class="std std-ref">Digital IO</span></a> instrument and set DIO 0 as output.</p></li>
+<li><p>In the Logic Analyzer set DIO0’s trigger to <strong>rising edge</strong> configuration.</p></li>
+<li><p>Run the Digital IO, Pattern Generator and Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>In the Digital IO, change DIO0’s output from 0 to 1.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The logic analyzer initiates a capture.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><p>Stop the Logic Analyzer and set DIO0’s trigger to <strong>rising edge</strong> configuration.</p></li>
+<li><p>Run the Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>In the Digital IO, change DIO0’s output from 1 to 0.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The logic analyzer initiates a capture.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="12">
+<li><p>Stop the Logic Analyzer and set DIO0’s trigger to <strong>any edge</strong> configuration.</p></li>
+<li><p>Run the Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>In the Digital IO, change DIO0’s output from 0 to 1 or 1 to 0.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The logic analyzer initiates a capture.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="15">
+<li><p>Stop the Logic Analyzer and set DIO0’s trigger to <strong>low</strong> configuration.</p></li>
+<li><p>Run the Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>In the Digital IO, set DIO0’s output to 0.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The logic analyzer continuously captures the signal.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="18">
+<li><p>Stop the Logic Analyzer and set DIO0’s trigger to <strong>high</strong> configuration.</p></li>
+<li><p>Run the Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>In the Digital IO, set DIO0’s output to 1.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The logic analyzer continuously captures the signal.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-external-channel-trigger-function">
+<h2>Test 2 - External Channel Trigger Function<a class="headerlink" href="#test-2-external-channel-trigger-function" title="Link to this heading"></a></h2>
+<p id="tst-logic-ext-chn-trigger"><strong>UID:</strong> TST.LOGIC.EXT_CHN_TRIGGER</p>
+<p><strong>Description:</strong> This test verifies the external trigger functionality.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+<li><p><a class="reference internal" href="digital_io_tests.html#digital-io-tests"><span class="std std-ref">Digital IO</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Open the Logic Analyzer instrument.</p></li>
+<li><p>Enable DIO 0 and DIO 1 on the Logic Analyzer.</p></li>
+<li><dl class="simple">
+<dt>Set the following parameters:</dt><dd><ul class="simple">
+<li><p>Sample rate to 50ksps.</p></li>
+<li><p>Sample delay of -142 samples.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Open the <a class="reference internal" href="../../../plugins/m2k/pattern_generator.html#pattern-generator"><span class="std std-ref">Pattern Generator</span></a> instrument and enable DIO 1.
+Set the following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Pattern: clock.</p></li>
+<li><p>Frequency: 100Hz.</p></li>
+<li><p>Phase: 0 degrees.</p></li>
+<li><p>Duty Cycle: 50%.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Open the <a class="reference internal" href="../../../plugins/m2k/digitalio.html#digitalio"><span class="std std-ref">Digital IO</span></a> instrument and set DIO 0 as output.</p></li>
+<li><p>Open the Logic Analyzer trigger menu and turn on the External trigger.
+Select the source as <strong>External Trigger In</strong>.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Expected Result</strong>: Triggers set on every DIO channels are automatically turned off.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><p>Connect Trigger in 1 to DIO0 using a loopback cable.</p></li>
+<li><p>In the Logic Analyzer Trigger settings menu set the External Trigger In condition
+to <strong>rising edge</strong>.</p></li>
+<li><p>Run the Digital IO, Pattern Generator and Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>In the Digital IO, change DIO0’s output from 0 to 1.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The logic analyzer initiates a capture.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="11">
+<li><p>Stop all instruments and set the External Trigger In condition to <strong>falling edge</strong>.</p></li>
+<li><p>Run the Digital IO, Pattern Generator and Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>In the Digital IO, change DIO0’s output from 1 to 0.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The logic analyzer initiates a capture.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="14">
+<li><p>Stop all instruments and set the External Trigger In condition to <strong>any edge</strong>.</p></li>
+<li><p>Run the Digital IO, Pattern Generator and Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>In the Digital IO, change DIO0’s output from 0 to 1 or 1 to 0.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The logic analyzer initiates a capture.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="17">
+<li><p>Stop all instruments and set the External Trigger In condition to <strong>low</strong>.</p></li>
+<li><p>Run the Digital IO, Pattern Generator and Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>In the Digital IO, set DIO0’s output to 0.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The logic analyzer continuously captures the signal.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="20">
+<li><p>Stop all instruments and set the External Trigger In condition to <strong>high</strong>.</p></li>
+<li><p>Run the Digital IO, Pattern Generator and Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>In the Digital IO, set DIO0’s output to 1.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The logic analyzer continuously captures the signal.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-oscilloscope-source-external-trigger">
+<h2>Test 3 - Oscilloscope Source External Trigger<a class="headerlink" href="#test-3-oscilloscope-source-external-trigger" title="Link to this heading"></a></h2>
+<p id="tst-logic-osc-ext-trigger"><strong>UID:</strong> TST.LOGIC.OSC_EXT_TRIGGER</p>
+<p><strong>Description:</strong> This test verifies the external trigger functionality using the
+Oscilloscope as the source.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Open the Logic Analyzer instrument.</p></li>
+<li><p>Enable DIO 0 and DIO 1 on the Logic Analyzer.</p></li>
+<li><dl class="simple">
+<dt>Set the following parameters:</dt><dd><ul class="simple">
+<li><p>Sample rate to 50ksps.</p></li>
+<li><p>Sample delay of -142 samples.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Open the Logic Analyzer trigger menu and turn on the External trigger.
+Select the source as <strong>Oscilloscope</strong>.</p></li>
+<li><p>Open the <a class="reference internal" href="../../../plugins/m2k/signal_generator.html#signal-generator"><span class="std std-ref">Signal Generator</span></a> instrument and generate a sinewave
+with the following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Peak-to-peak: 2V.</p></li>
+<li><p>Frequency: 200Hz.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Open the <a class="reference internal" href="../../../plugins/m2k/oscilloscope.html#oscilloscope"><span class="std std-ref">Oscilloscope</span></a> instrument and set the trigger to <strong>normal</strong>
+and condition to <strong>rising edge</strong>.</p></li>
+<li><p>Run the Signal Generator, Oscilloscope and Logic Analyzer instrument and verify if the
+Logic Analyzer is triggered at the same time with the Oscilloscope.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>The Oscilloscope is triggered when the two blue Trigger cursors are intersected
+on the rising edge of the signal.</p></li>
+<li><p>If you drag the horizontal cursor in the Oscilloscope window above or
+below the signal, it should be in Waiting state, and Logic analyzer will
+be Waiting too.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><p>Open the Oscilloscope trigger menu and set the trigger condition to <strong>falling edge</strong>.</p></li>
+<li><dl class="simple">
+<dt>Verify that the Logic Analyzer is triggered at the same time with the Oscilloscope.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>If you drag the horizontal cursor in the Oscilloscope window above or
+below the signal, it should be in Waiting state, and Logic analyzer will
+be Waiting too.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><p>Open the Oscilloscope trigger menu and set the trigger condition to <strong>low</strong>.</p></li>
+<li><dl class="simple">
+<dt>Verify that the Logic Analyzer is triggered at the same time with the Oscilloscope.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>If you drag the horizontal cursor in the Oscilloscope window above or
+below the signal, it should be in Waiting state, and Logic analyzer will
+be Waiting too.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="12">
+<li><p>Open the Oscilloscope trigger menu and set the trigger condition to <strong>high</strong>.</p></li>
+<li><dl class="simple">
+<dt>Verify that the Logic Analyzer is triggered at the same time with the Oscilloscope.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>If you drag the horizontal cursor in the Oscilloscope window above or
+below the signal, it should be in Waiting state, and Logic analyzer will
+be Waiting too.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-trigger-modes">
+<h2>Test 4 - Trigger Modes<a class="headerlink" href="#test-4-trigger-modes" title="Link to this heading"></a></h2>
+<p id="tst-logic-trigger-modes"><strong>UID:</strong> TST.LOGIC.TRIGGER_MODES</p>
+<p><strong>Description:</strong> This test verifies the trigger modes (and/or) of the Logic Analyzer.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+<li><p><a class="reference internal" href="digital_io_tests.html#digital-io-tests"><span class="std std-ref">Digital IO</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Open the Logic Analyzer instrument.</p></li>
+<li><p>Enable DIO 0, DIO 1 and DIO 2 on the Logic Analyzer.</p></li>
+<li><dl class="simple">
+<dt>Set the following parameters:</dt><dd><ul class="simple">
+<li><p>Sample rate to 50ksps.</p></li>
+<li><p>Sample delay of -142 samples.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Open the <a class="reference internal" href="../../../plugins/m2k/pattern_generator.html#pattern-generator"><span class="std std-ref">Pattern Generator</span></a> instrument and enable DIO 2.
+Set the following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Pattern: clock.</p></li>
+<li><p>Frequency: 5KHz.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Open the <a class="reference internal" href="../../../plugins/m2k/digitalio.html#digitalio"><span class="std std-ref">Digital IO</span></a> instrument and set DIO 0 and DIO 1 as output.</p></li>
+<li><p>In the Logic Analyzer trigger settings set DIO 0 and DIO 1 trigger conditions
+to <strong>HIGH</strong> and disable the External trigger.</p></li>
+<li><p>In the Logic Analyzer trigger configuration, set the trigger logic to <strong>OR</strong>.</p></li>
+<li><p>Run the Digital IO, Pattern Generator and Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>In the Digital IO instrument set DIO0’s output to 0 and DIO1’s output to 0.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The logic analyzer does not start capturing.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><dl class="simple">
+<dt>In the Digital IO instrument set DIO0 or DIO1’s output to 1.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The logic analyzer starts capturing signal when either of the DIO0 OR DIO1 is HIGH.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="11">
+<li><p>Stop all instruments and set the trigger logic to <strong>AND</strong>.</p></li>
+<li><p>Run the Digital IO, Pattern Generator and Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>In the Digital IO instrument set DIO0’s output to 0 and DIO1’s output to 1.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The logic analyzer does not start capturing.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="14">
+<li><dl class="simple">
+<dt>In the Digital IO instrument set DIO0 and DIO1’s output to 1.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The logic analyzer starts capturing signal only when DIO0 AND DIO1 are HIGH.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-5-clock-signal-measurement-accuracy">
+<h2>Test 5 - Clock signal measurement accuracy<a class="headerlink" href="#test-5-clock-signal-measurement-accuracy" title="Link to this heading"></a></h2>
+<p id="tst-logic-clock-signal"><strong>UID:</strong> TST.LOGIC.CLOCK_SIGNAL</p>
+<p><strong>Description:</strong> This test verifies the accuracy of the clock signal measurement.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Open the Logic Analyzer instrument.</p></li>
+<li><p>Enable DIO 0 on the Logic Analyzer.</p></li>
+<li><dl class="simple">
+<dt>Set the following parameters:</dt><dd><ul class="simple">
+<li><p>Sample rate to 50ksps.</p></li>
+<li><p>Enable the cursor.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Open the <a class="reference internal" href="../../../plugins/m2k/pattern_generator.html#pattern-generator"><span class="std std-ref">Pattern Generator</span></a> instrument and enable DIO 0.
+Set the following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Pattern: clock.</p></li>
+<li><p>Frequency: 100Hz.</p></li>
+<li><p>Phase: 0 degrees.</p></li>
+<li><p>Duty Cycle: 50%.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Run a single capture of the Logic Analyzer and move the cursor handles to the
+consecutive rising edges or consecutive falling edges of the signal.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Expected Result</strong>: The data measured by the cursor is close to ∆t: 10ms and 1/∆t: 100Hz.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic" start="6">
+<li><p>In the Cursors settings menu enable <strong>Cursors lock</strong> and measure the next
+set of edges.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Expected Result</strong>: The data measured by the cursor is close to ∆t: 10ms and 1/∆t: 100Hz.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic" start="7">
+<li><p>Set the Logic Analyzer sample rate to 100Msps and position to 0s.</p></li>
+<li><dl class="simple">
+<dt>Set the Pattern Generator DIO 0 parameters to:</dt><dd><ul class="simple">
+<li><p>Pattern: clock.</p></li>
+<li><p>Frequency: 2.5MHz.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Run a single capture of the Logic Analyzer and move the cursor handles to the
+consecutive rising edges or consecutive falling edges of the signal.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Expected Result</strong>: The data measured by the cursor is close to ∆t: 400ns and 1/∆t: 2.5MHz.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic" start="10">
+<li><p>In the Cursors settings menu enable <strong>Cursors lock</strong> and measure the next
+set of edges.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Expected Result</strong>: The data measured by the cursor is close to ∆t: 400ns and 1/∆t: 2.5MHz.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic" start="11">
+<li><p>Set the Logic Analyzer sample rate to 20ksps.</p></li>
+<li><dl class="simple">
+<dt>Set the Pattern Generator DIO 0 parameters to:</dt><dd><ul class="simple">
+<li><p>Pattern: clock.</p></li>
+<li><p>Frequency: 100Hz.</p></li>
+<li><p>Duty Cycle: 70%.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Run a single capture of the Logic Analyzer and move the cursor handles to the
+rising and falling edge of the upper limit.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Expected Result</strong>: The data measured by the cursor is close to ∆t: 7ms.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="14">
+<li><dl class="simple">
+<dt>Move the cursors to the falling and rising edge of the lower limit.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The data measured by the cursor is close to ∆t: 3ms.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-6-parallel-decoder">
+<h2>Test 6 - Parallel Decoder<a class="headerlink" href="#test-6-parallel-decoder" title="Link to this heading"></a></h2>
+<p id="tst-logic-parallel-decoder"><strong>UID:</strong> TST.LOGIC.PARALLEL_DECODER</p>
+<p><strong>Description:</strong> This test verifies the parallel decoder functionality.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>Add a parallel decoder from the main settings menu and set the following parameters:</dt><dd><ul class="simple">
+<li><p>Clock line to DIO8.</p></li>
+<li><p>Data lines 0-7 to DIO0 to DIO7.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Open the Pattern Generator instrument and group DIO0 to DIO7 as number pattern.
+Enable DIO8 and set it to Clock with 500Hz frequency.
+Set the number value to 50 (it is read as decimal).</p></li>
+<li><p>Run the Pattern Generator and Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>Verify the Logic Analyze decoded value.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The reading is in hex format. For reference, 50 decimal = 32 hex.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><p>In the Pattern Generator set the number value to 250.</p></li>
+<li><dl class="simple">
+<dt>Verify the Logic Analyzer decoded value.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The reading is in hex format. For reference, 250 decimal = FA.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-7-spi-decoder">
+<h2>Test 7 - SPI decoder<a class="headerlink" href="#test-7-spi-decoder" title="Link to this heading"></a></h2>
+<p id="tst-logic-spi-decoder"><strong>UID:</strong> TST.LOGIC.SPI_DECODER</p>
+<p><strong>Description:</strong> This test verifies the SPI decoder functionality.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Open the Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>Add an SPI decoder from the main settings menu and set the following parameters:</dt><dd><ul class="simple">
+<li><p>Clock line to DIO0.</p></li>
+<li><p>MISO line to DIO1.</p></li>
+<li><p>MOSI line to DIO2.</p></li>
+<li><p>CS# line to DIO3.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Set DIO2’s trigger to falling edge.</p></li>
+<li><p>Open the Pattern Generator instrument and group DIO0 to DIO2 as SPI.
+Set the following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Frequency: 5kHz.</p></li>
+<li><p>Bytes per frame: 2.</p></li>
+<li><p>Interframe space: 4.</p></li>
+<li><p>Data: insert 4 bytes in hex form e.g: AB CD EF 15.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Run the Pattern Generator and Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>Verify the Logic Analyzer plot for the decoder output:</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The MISO data has 2 bytes per frame and the decoded data is AB CD EF 15.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-8-uart-decoder">
+<h2>Test 8 - UART decoder<a class="headerlink" href="#test-8-uart-decoder" title="Link to this heading"></a></h2>
+<p id="tst-logic-uart-decoder"><strong>UID:</strong> TST.LOGIC.UART_DECODER</p>
+<p><strong>Description:</strong> This test verifies the UART decoder functionality.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Open the Logic Analyzer instrument and set time base to 1 ms.</p></li>
+<li><dl class="simple">
+<dt>Add a UART decoder from the main settings menu and set the following parameters:</dt><dd><ul class="simple">
+<li><p>TX line to DIO0.</p></li>
+<li><p>RX line to DIO1.</p></li>
+<li><p>Baud rate to 9600.</p></li>
+<li><p>Data bits to 8.</p></li>
+<li><p>Data format to ASCII.</p></li>
+<li><p>Partity type to none.</p></li>
+<li><p>Stop bits to 1.</p></li>
+<li><p>Bit order to lsb-first.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Set DIO0’s trigger to falling edge.</p></li>
+<li><p>Open the Pattern Generator instrument and group DIO0 as UART.
+Set the following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Baud rate: 9600.</p></li>
+<li><p>Stop bit to 1.</p></li>
+<li><p>Parity to none.</p></li>
+<li><p>Data to send: M2K.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Connect DIO0 to DIO1 using a loopback cable.</p></li>
+<li><p>Run the Pattern Generator and Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>Verify the Logic Analyzer plot for the decoder output:</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The RX decoded data is “M2K”.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><p>In the Pattern Generator change the baud rate to 115200.</p></li>
+<li><dl class="simple">
+<dt>Verify the Logic Analyzer plot for the decoder output:</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The RX decoded data is not “M2K”.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><dl class="simple">
+<dt>In the Logic Analyzer change the baud rate to 115200:</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The RX decoded data is “M2K”.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-9-pwm-decoder">
+<h2>Test 9 - PWM Decoder<a class="headerlink" href="#test-9-pwm-decoder" title="Link to this heading"></a></h2>
+<p id="tst-logic-pwm-decoder"><strong>UID:</strong> TST.LOGIC.PWM_DECODER</p>
+<p><strong>Description:</strong> This test verifies the PWM decoder functionality.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Open the Logic Analyzer instrument.</p></li>
+<li><dl class="simple">
+<dt>Add a PWM decoder from the main settings menu and set the following parameters:</dt><dd><ul class="simple">
+<li><p>Data line to DIO0.</p></li>
+<li><p>Polarity to active-high.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>In the Pattern Generator instrument, set DIO0 to Clock with 100 Hz frequency
+and set the duty cycle to 5%, 30%, 50%, 75% and 95% verifying the Logic Analyzer
+decoded data in between changes:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Expected Result</strong>: The data follows the duty cycle set in the pattern generator.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-10-channel-visual-representation">
+<h2>Test 10 - Channel visual representation<a class="headerlink" href="#test-10-channel-visual-representation" title="Link to this heading"></a></h2>
+<p id="tst-logic-chn-visual"><strong>UID:</strong> TST.LOGIC.CHN_VISUAL</p>
+<p><strong>Description:</strong> This test verifies changing the channel name,
+trace height and plot color.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the Logic Analyzer instrument.</p></li>
+<li><p>Enable DIO0 and open the channel settings by double clicking
+the channel handle.</p></li>
+<li><dl class="simple">
+<dt>Change the channel name to “D0” and verify the channel handle:</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The channel handle displays “D0”.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Change the trace height to 50:</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The trace height on the plot is doubled.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Change the color to <strong>transparent</strong> and verify the channel on plot:</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The channel is no longer seen on the plot.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-11-export-functionality">
+<h2>Test 11 - Export Functionality<a class="headerlink" href="#test-11-export-functionality" title="Link to this heading"></a></h2>
+<p id="tst-logic-export"><strong>UID:</strong> TST.LOGIC.EXPORT</p>
+<p><strong>Description:</strong> This test verifies the data export functionality
+of the Logic Analyzer.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Open the Pattern Generator and set two consecutive channels with similar
+configurations:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>DIO0 and DIO1:</p>
+<ul>
+<li><p>Pattern: Clock,</p></li>
+<li><p>Frequency: 100Hz,</p></li>
+<li><p>Phase: 0,</p></li>
+<li><p>Duty Cycle: 50%.</p></li>
+</ul>
+</li>
+<li><p>DIO2 and DIO3:</p>
+<ul>
+<li><p>Pattern: Clock,</p></li>
+<li><p>Frequency: 300Hz,</p></li>
+<li><p>Phase: 0,</p></li>
+<li><p>Duty Cycle: 50%.</p></li>
+</ul>
+</li>
+<li><p>DIO4 and DIO5:</p>
+<ul>
+<li><p>Pattern: Clock,</p></li>
+<li><p>Frequency: 500Hz,</p></li>
+<li><p>Phase: 0,</p></li>
+<li><p>Duty Cycle: 50%.</p></li>
+</ul>
+</li>
+<li><p>DIO6 and DIO7:</p>
+<ul>
+<li><p>Pattern: Clock,</p></li>
+<li><p>Frequency: 150Hz,</p></li>
+<li><p>Phase: 0,</p></li>
+<li><p>Duty Cycle: 80%.</p></li>
+</ul>
+</li>
+<li><p>DIO8 and DIO9:</p>
+<ul>
+<li><p>Pattern: Clock,</p></li>
+<li><p>Frequency: 200Hz,</p></li>
+<li><p>Phase: 0,</p></li>
+<li><p>Duty Cycle: 20%.</p></li>
+</ul>
+</li>
+<li><p>Group DIO10 to DIO15:</p>
+<ul>
+<li><p>Pattern: Number Pattern,</p></li>
+<li><p>Data: 50.</p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Run the Logic Analyzer and Pattern Generator.</p></li>
+<li><p>In the Logic Analyzer General Settings menu set the Export All to <strong>On</strong> and
+click the Export button.</p></li>
+<li><dl class="simple">
+<dt>Select the file name, location and choose .csv format.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The file is created in the specified location.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Open the file and verify the data:</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The exported data is in .csv format and correspods to the data on the plot.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-12-print-plot">
+<h2>Test 12 - Print Plot<a class="headerlink" href="#test-12-print-plot" title="Link to this heading"></a></h2>
+<p id="tst-logic-print-plot"><strong>UID:</strong> TST.LOGIC.PRINT_PLOT</p>
+<p><strong>Description:</strong> This test verifies the print plot functionality
+of the Logic Analyzer.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Open the Logic Analyzer and set the time base to 5 ms.</p></li>
+<li><p>Open the Pattern Generator and set two consecutive channels with similar configurations:
+- DIO0 and DIO1:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Pattern: Clock</p></li>
+<li><p>Frequency: 100Hz</p></li>
+<li><p>Phase: 0</p></li>
+<li><p>Duty Cycle: 50%</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Run the Logic Analyzer and Pattern Generator.</p></li>
+<li><dl class="simple">
+<dt>Press the Print Plot button and choose a location for the exported file:</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The file is created in the specified location.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><p>Open the .pdf exported file and visually compare it to the application plot.</p></li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-13-decoder-table">
+<h2>Test 13 - Decoder Table<a class="headerlink" href="#test-13-decoder-table" title="Link to this heading"></a></h2>
+<p id="tst-logic-decoder-table"><strong>UID:</strong> TST.LOGIC.DECODER_TABLE</p>
+<p><strong>Description:</strong> This test verifies the decoder table functionality of the Logic Analyzer.</p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm2000-device-setup"><span class="std std-ref">Adalm2000.Device</span></a></p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pattern_generator_tests.html#m2k-pattern-generator-tests"><span class="std std-ref">Pattern Generator</span></a></p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Open the Pattern Generator and set the following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>DIO 0: UART,</p></li>
+<li><p>Baud rate: 9600,</p></li>
+<li><p>Data to Send: 123.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Open the Logic Analyzer, enable DIO 0 and add a UART decoder with the
+following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>RX on channel 0.</p></li>
+<li><p>Baud rate: 9600.</p></li>
+<li><p>Data format: ASCII.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>In the General Settings set the sample rate to 1Msps and nb of samples to 10k samples.</p></li>
+<li><p>Run the Pattern Generator and Logic Analyzer.</p></li>
+<li><p>In the Logic Analyzer open the Decoder Table using the right side Decode menu.
+Set the following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Group by: RX data.</p></li>
+<li><p>Group size: 3.</p></li>
+<li><p>Filter out all except for RX data.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><dl class="simple">
+<dt>Check the decoder table:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected Result</strong>:</dt><dd><ul>
+<li><p>Each table row has RX data and time annotations.</p></li>
+<li><p>The RX data corresponds to the data sent by the Pattern Generator.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Write “^3$” in the Regex search box and press Enter.</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: Only the RX data equal to “3” is displayed in the table.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Double click on the first RX data row of the decoder table:</dt><dd><ul class="simple">
+<li><p><strong>Expected Result</strong>: The plot is zoomed in and centered on the corresponding data.</p></li>
+<li><p><strong>Actual Result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="general_settings_tests.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">General Settings - Test Case</a>
+    <a href="network_analyzer_tests.html" title="Next document (Alt+Shift+RightArrow)" class="next">Network Analyzer - Test Suite</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <div id="vertical-border"></div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

@@ -1,4 +1,5 @@
-{
-  "scopy_testing_results/v2.0.0-beta-rc2/": ["v2.0.0-beta-rc2", "test report"],
-  "": ["main", "unstable"]
-}
+[
+  "scopy_testing_results/v2.0.0-beta-rc2",
+  "scopy_testing_results",
+  ""
+]
