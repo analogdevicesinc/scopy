@@ -29,9 +29,6 @@
 using namespace scopy;
 using namespace scopy::admt;
 
-static int acquisitionUITimerRate = 500; // In ms
-static int acquisitionSampleRate = 20;
-static int acquisitionGraphSampleRate = 100;
 static int motorWaitVelocityReachedSampleRate = 50;
 
 static int calibrationUITimerRate = 500;
@@ -136,7 +133,7 @@ static double defaultPhaseGraphMax = 4;
 static double currentPhaseGraphMin = defaultPhaseGraphMin;
 static double currentPhaseGraphMax = defaultPhaseGraphMax;
 
-static map<SensorDataKey, bool> acquisitionDataMap = {
+static QMap<SensorData, bool> acquisitionDataMap = {
 	{ABSANGLE, false}, {ANGLE, false},    {ANGLESEC, false}, {SINE, false},	 {COSINE, false},
 	{SECANGLI, false}, {SECANGLQ, false}, {RADIUS, false},	 {DIAG1, false}, {DIAG2, false},
 	{TMP0, false},	   {TMP1, false},     {CNVCNT, false},
@@ -187,22 +184,24 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 
 		if(index == 0) // Acquisition Tab
 		{
-			startAcquisitionUITask();
+			isAcquisitionTab = true;
 			readSequence();
 			updateSequenceWidget();
 			updateAcquisitionMotorRPM();
 			updateAcquisitionMotorRotationDirection();
 		} else {
-			stopAcquisitionUITask();
+			isAcquisitionTab = false;
 			stop();
 		}
 
 		if(index == 1) // Calibration Tab
 		{
+			isCalibrationTab = true;
 			startCalibrationUITask();
 			updateCalibrationMotorRPM();
 			updateCalibrationMotorRotationDirection();
 		} else {
+			isCalibrationTab = false;
 			stopCalibrationUITask();
 		}
 
@@ -223,9 +222,12 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 		}
 	});
 
+	qRegisterMetaType<QMap<SensorData, double>>("QMap<SensorData, double>");
+	connect(this, &HarmonicCalibration::acquisitionDataChanged, this, &HarmonicCalibration::updateAcquisitionData);
+	connect(this, &HarmonicCalibration::acquisitionGraphChanged, this,
+		&HarmonicCalibration::updateAcquisitionGraph);
 	connect(this, &HarmonicCalibration::updateFaultStatusSignal, this, &HarmonicCalibration::updateFaultStatus);
 	connect(this, &HarmonicCalibration::motorPositionChanged, this, &HarmonicCalibration::updateMotorPosition);
-
 	connect(this, &HarmonicCalibration::calibrationLogWriteSignal, this, &HarmonicCalibration::calibrationLogWrite);
 	connect(this, &HarmonicCalibration::commandLogWriteSignal, this, &HarmonicCalibration::commandLogWrite);
 	connect(this, &HarmonicCalibration::DIGIORegisterChanged, this, &HarmonicCalibration::updateDIGIOUI);
@@ -234,7 +236,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 		&HarmonicCalibration::updateMTDiagnosticRegisterUI);
 	connect(this, &HarmonicCalibration::DIAG2RegisterChanged, this, &HarmonicCalibration::updateMTDiagnosticsUI);
 
-	startAcquisitionUITask();
+	isAcquisitionTab = true;
 	startDeviceStatusMonitor();
 	startCurrentMotorPositionMonitor();
 }
@@ -560,23 +562,8 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 	MenuCollapseSection *generalSection =
 		new MenuCollapseSection("Data Acquisition", MenuCollapseSection::MHCW_NONE,
 					MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, generalWidget);
-	generalSection->header()->toggle();
 	generalSection->contentLayout()->setSpacing(globalSpacingSmall);
 	generalWidget->contentLayout()->addWidget(generalSection);
-
-	// Graph Update Interval
-	QWidget *graphUpdateIntervalWidget = new QWidget(generalSection);
-	QVBoxLayout *graphUpdateIntervalLayout = new QVBoxLayout(graphUpdateIntervalWidget);
-	graphUpdateIntervalWidget->setLayout(graphUpdateIntervalLayout);
-	graphUpdateIntervalLayout->setMargin(0);
-	graphUpdateIntervalLayout->setSpacing(0);
-	QLabel *graphUpdateIntervalLabel = new QLabel("Graph Update Interval (ms)", graphUpdateIntervalWidget);
-	Style::setStyle(graphUpdateIntervalLabel, style::properties::label::subtle);
-	graphUpdateIntervalLineEdit = new QLineEdit(graphUpdateIntervalWidget);
-	graphUpdateIntervalLineEdit->setText(QString::number(acquisitionGraphSampleRate));
-	connectLineEditToNumber(graphUpdateIntervalLineEdit, acquisitionGraphSampleRate, 1, 5000);
-	graphUpdateIntervalLayout->addWidget(graphUpdateIntervalLabel);
-	graphUpdateIntervalLayout->addWidget(graphUpdateIntervalLineEdit);
 
 	// Data Sample Size
 	QWidget *displayLengthWidget = new QWidget(generalSection);
@@ -596,7 +583,6 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 	StyleHelper::BasicButton(resetYAxisButton);
 	connect(resetYAxisButton, &QPushButton::clicked, this, &HarmonicCalibration::resetAcquisitionYAxisScale);
 
-	generalSection->contentLayout()->addWidget(graphUpdateIntervalWidget);
 	generalSection->contentLayout()->addWidget(displayLengthWidget);
 	generalSection->contentLayout()->addWidget(resetYAxisButton);
 
@@ -2609,7 +2595,6 @@ void HarmonicCalibration::requestDisconnect()
 {
 	stopAcquisition();
 
-	stopAcquisitionUITask();
 	stopCalibrationUITask();
 	stopUtilityTask();
 
@@ -2754,17 +2739,63 @@ void HarmonicCalibration::updateLineEditValues()
 	}
 }
 
+void HarmonicCalibration::updateAcquisitionData(QMap<SensorData, double> sensorDataMap)
+{
+	if(isStartAcquisition)
+		updateLineEditValues();
+
+	if(acquisitionDataMap.value(ANGLE) && sensorDataMap.keys().contains(ANGLE))
+		appendAcquisitionData(sensorDataMap.value(ANGLE), acquisitionAngleList);
+	else
+		acquisitionAngleList.clear();
+	if(acquisitionDataMap.value(ABSANGLE) && sensorDataMap.keys().contains(ABSANGLE))
+		appendAcquisitionData(sensorDataMap.value(ABSANGLE), acquisitionABSAngleList);
+	else
+		acquisitionABSAngleList.clear();
+	if(acquisitionDataMap.value(TMP0) && sensorDataMap.keys().contains(TMP0))
+		appendAcquisitionData(sensorDataMap.value(TMP0), acquisitionTmp0List);
+	else
+		acquisitionTmp0List.clear();
+	if(acquisitionDataMap.value(SINE) && sensorDataMap.keys().contains(SINE))
+		appendAcquisitionData(sensorDataMap.value(SINE), acquisitionSineList);
+	else
+		acquisitionSineList.clear();
+	if(acquisitionDataMap.value(COSINE) && sensorDataMap.keys().contains(COSINE))
+		appendAcquisitionData(sensorDataMap.value(COSINE), acquisitionCosineList);
+	else
+		acquisitionCosineList.clear();
+	if(acquisitionDataMap.value(RADIUS) && sensorDataMap.keys().contains(RADIUS))
+		appendAcquisitionData(sensorDataMap.value(RADIUS), acquisitionRadiusList);
+	else
+		acquisitionRadiusList.clear();
+	if(acquisitionDataMap.value(ANGLESEC) && sensorDataMap.keys().contains(ANGLESEC))
+		appendAcquisitionData(sensorDataMap.value(ANGLESEC), acquisitionAngleSecList);
+	else
+		acquisitionAngleSecList.clear();
+	if(acquisitionDataMap.value(SECANGLI) && sensorDataMap.keys().contains(SECANGLI))
+		appendAcquisitionData(sensorDataMap.value(SECANGLI), acquisitionSecAnglIList);
+	else
+		acquisitionSecAnglIList.clear();
+	if(acquisitionDataMap.value(SECANGLQ) && sensorDataMap.keys().contains(SECANGLQ))
+		appendAcquisitionData(sensorDataMap.value(SECANGLQ), acquisitionSecAnglQList);
+	else
+		acquisitionSecAnglQList.clear();
+	if(acquisitionDataMap.value(TMP1) && sensorDataMap.keys().contains(TMP1))
+		appendAcquisitionData(sensorDataMap.value(TMP1), acquisitionTmp1List);
+	else
+		acquisitionTmp1List.clear();
+
+	Q_EMIT acquisitionGraphChanged();
+}
+
 void HarmonicCalibration::startAcquisition()
 {
 	isStartAcquisition = true;
 	acquisitionXPlotAxis->setInterval(0, acquisitionDisplayLength);
 
 	m_acquisitionDataThread =
-		QtConcurrent::run(this, &HarmonicCalibration::getAcquisitionSamples, acquisitionSampleRate);
+		QtConcurrent::run(this, &HarmonicCalibration::getAcquisitionSamples, acquisitionDataMap);
 	m_acquisitionDataWatcher.setFuture(m_acquisitionDataThread);
-	m_acquisitionGraphThread =
-		QtConcurrent::run(this, &HarmonicCalibration::acquisitionPlotTask, acquisitionGraphSampleRate);
-	m_acquisitionGraphWatcher.setFuture(m_acquisitionGraphThread);
 }
 
 void HarmonicCalibration::stopAcquisition()
@@ -2778,8 +2809,14 @@ void HarmonicCalibration::stopAcquisition()
 		m_acquisitionGraphThread.cancel();
 		m_acquisitionGraphWatcher.waitForFinished();
 	}
+}
 
-	stopCurrentMotorPositionMonitor();
+void HarmonicCalibration::restartAcquisition()
+{
+	if(m_acquisitionDataThread.isRunning()) {
+		stopAcquisition();
+		startAcquisition();
+	}
 }
 
 void HarmonicCalibration::updateFaultStatus(bool status)
@@ -2802,63 +2839,42 @@ void HarmonicCalibration::updateAcquisitionMotorRotationDirection()
 	acquisitionMotorDirectionSwitch->setChecked(isMotorRotationClockwise);
 }
 
-void HarmonicCalibration::getAcquisitionSamples(int sampleRate)
+void HarmonicCalibration::getAcquisitionSamples(QMap<SensorData, bool> dataMap)
 {
 	while(isStartAcquisition) {
-		if(!updateChannelValues()) {
-			break;
+		if(updateChannelValues()) {
+			QMap<SensorData, double> sensorDataMap;
+
+			if(dataMap.value(ANGLE))
+				sensorDataMap[ANGLE] = angle;
+			if(dataMap.value(ABSANGLE))
+				sensorDataMap[ABSANGLE] = rotation;
+			if(dataMap.value(TMP0))
+				sensorDataMap[TMP0] = temp;
+			if(dataMap.value(SINE))
+				sensorDataMap[SINE] =
+					getSensorDataAcquisitionValue(ADMTController::SensorRegister::SINE);
+			if(dataMap.value(COSINE))
+				sensorDataMap[COSINE] =
+					getSensorDataAcquisitionValue(ADMTController::SensorRegister::COSINE);
+			if(dataMap.value(RADIUS))
+				sensorDataMap[RADIUS] =
+					getSensorDataAcquisitionValue(ADMTController::SensorRegister::RADIUS);
+			if(dataMap.value(ANGLESEC))
+				sensorDataMap[ANGLESEC] =
+					getSensorDataAcquisitionValue(ADMTController::SensorRegister::ANGLESEC);
+			if(dataMap.value(SECANGLI))
+				sensorDataMap[SECANGLI] =
+					getSensorDataAcquisitionValue(ADMTController::SensorRegister::SECANGLI);
+			if(dataMap.value(SECANGLQ))
+				sensorDataMap[SECANGLQ] =
+					getSensorDataAcquisitionValue(ADMTController::SensorRegister::SECANGLQ);
+			if(dataMap.value(TMP1))
+				sensorDataMap[TMP1] =
+					getSensorDataAcquisitionValue(ADMTController::SensorRegister::TMP1);
+
+			Q_EMIT acquisitionDataChanged(sensorDataMap);
 		}
-
-		if(acquisitionDataMap.at(ANGLE) == false && acquisitionAngleList.size() > 0)
-			acquisitionAngleList.clear();
-		if(acquisitionDataMap.at(ABSANGLE) == false && acquisitionABSAngleList.size() > 0)
-			acquisitionABSAngleList.clear();
-		if(acquisitionDataMap.at(TMP0) == false && acquisitionTmp0List.size() > 0)
-			acquisitionTmp0List.clear();
-		if(acquisitionDataMap.at(SINE) == false && acquisitionSineList.size() > 0)
-			acquisitionSineList.clear();
-		if(acquisitionDataMap.at(COSINE) == false && acquisitionCosineList.size() > 0)
-			acquisitionCosineList.clear();
-		if(acquisitionDataMap.at(RADIUS) == false && acquisitionRadiusList.size() > 0)
-			acquisitionRadiusList.clear();
-		if(acquisitionDataMap.at(ANGLESEC) == false && acquisitionAngleSecList.size() > 0)
-			acquisitionAngleSecList.clear();
-		if(acquisitionDataMap.at(SECANGLI) == false && acquisitionSecAnglIList.size() > 0)
-			acquisitionSecAnglIList.clear();
-		if(acquisitionDataMap.at(SECANGLQ) == false && acquisitionSecAnglQList.size() > 0)
-			acquisitionSecAnglQList.clear();
-		if(acquisitionDataMap.at(TMP1) == false && acquisitionTmp1List.size() > 0)
-			acquisitionTmp1List.clear();
-
-		if(acquisitionDataMap.at(ANGLE))
-			prependAcquisitionData(angle, acquisitionAngleList);
-		if(acquisitionDataMap.at(ABSANGLE))
-			prependAcquisitionData(rotation, acquisitionABSAngleList);
-		if(acquisitionDataMap.at(TMP0))
-			prependAcquisitionData(temp, acquisitionTmp0List);
-		if(acquisitionDataMap.at(SINE))
-			prependAcquisitionData(getSensorDataAcquisitionValue(ADMTController::SensorRegister::SINE),
-					       acquisitionSineList);
-		if(acquisitionDataMap.at(COSINE))
-			prependAcquisitionData(getSensorDataAcquisitionValue(ADMTController::SensorRegister::COSINE),
-					       acquisitionCosineList);
-		if(acquisitionDataMap.at(RADIUS))
-			prependAcquisitionData(getSensorDataAcquisitionValue(ADMTController::SensorRegister::RADIUS),
-					       acquisitionRadiusList);
-		if(acquisitionDataMap.at(ANGLESEC))
-			prependAcquisitionData(getSensorDataAcquisitionValue(ADMTController::SensorRegister::ANGLESEC),
-					       acquisitionAngleSecList);
-		if(acquisitionDataMap.at(SECANGLI))
-			prependAcquisitionData(getSensorDataAcquisitionValue(ADMTController::SensorRegister::SECANGLI),
-					       acquisitionSecAnglIList);
-		if(acquisitionDataMap.at(SECANGLQ))
-			prependAcquisitionData(getSensorDataAcquisitionValue(ADMTController::SensorRegister::SECANGLQ),
-					       acquisitionSecAnglQList);
-		if(acquisitionDataMap.at(TMP1))
-			prependAcquisitionData(getSensorDataAcquisitionValue(ADMTController::SensorRegister::TMP1),
-					       acquisitionTmp1List);
-
-		QThread::msleep(sampleRate);
 	}
 }
 
@@ -2918,9 +2934,10 @@ double HarmonicCalibration::getSensorDataAcquisitionValue(const ADMTController::
 	}
 }
 
-void HarmonicCalibration::plotAcquisition(QVector<double> &list, PlotChannel *channel)
+void HarmonicCalibration::plotAcquisition(QVector<double> list, PlotChannel *channel)
 {
-	channel->curve()->setSamples(list);
+	QVector<double> reverseList(list.rbegin(), list.rend());
+	channel->curve()->setSamples(reverseList);
 	auto result = minmax_element(list.begin(), list.end());
 	if(*result.first < acquisitionGraphYMin)
 		acquisitionGraphYMin = *result.first;
@@ -2928,10 +2945,13 @@ void HarmonicCalibration::plotAcquisition(QVector<double> &list, PlotChannel *ch
 		acquisitionGraphYMax = *result.second;
 }
 
-void HarmonicCalibration::prependAcquisitionData(const double &data, QVector<double> &list)
+void HarmonicCalibration::appendAcquisitionData(const double &data, QVector<double> &list)
 {
-	list.prepend(data);
+	if(data == qQNaN())
+		return;
+	list.append(data);
 	if(list.size() >= acquisitionDisplayLength) {
+		list.removeFirst();
 		list.resize(acquisitionDisplayLength);
 		list.squeeze();
 	}
@@ -2945,64 +2965,31 @@ void HarmonicCalibration::resetAcquisitionYAxisScale()
 	acquisitionGraphPlotWidget->replot();
 }
 
-void HarmonicCalibration::acquisitionPlotTask(int sampleRate)
+void HarmonicCalibration::updateAcquisitionGraph()
 {
-	while(isStartAcquisition) {
-		if(acquisitionDataMap.at(ANGLE))
-			plotAcquisition(acquisitionAngleList, acquisitionAnglePlotChannel);
-		if(acquisitionDataMap.at(ABSANGLE))
-			plotAcquisition(acquisitionABSAngleList, acquisitionABSAnglePlotChannel);
-		if(acquisitionDataMap.at(TMP0))
-			plotAcquisition(acquisitionTmp0List, acquisitionTmp0PlotChannel);
-		if(acquisitionDataMap.at(SINE))
-			plotAcquisition(acquisitionSineList, acquisitionSinePlotChannel);
-		if(acquisitionDataMap.at(COSINE))
-			plotAcquisition(acquisitionCosineList, acquisitionCosinePlotChannel);
-		if(acquisitionDataMap.at(RADIUS))
-			plotAcquisition(acquisitionRadiusList, acquisitionRadiusPlotChannel);
-		if(acquisitionDataMap.at(ANGLESEC))
-			plotAcquisition(acquisitionAngleSecList, acquisitionAngleSecPlotChannel);
-		if(acquisitionDataMap.at(SECANGLI))
-			plotAcquisition(acquisitionSecAnglIList, acquisitionSecAnglIPlotChannel);
-		if(acquisitionDataMap.at(SECANGLQ))
-			plotAcquisition(acquisitionSecAnglQList, acquisitionSecAnglQPlotChannel);
-		if(acquisitionDataMap.at(TMP1))
-			plotAcquisition(acquisitionTmp1List, acquisitionTmp1PlotChannel);
+	if(acquisitionDataMap.value(ANGLE))
+		plotAcquisition(acquisitionAngleList, acquisitionAnglePlotChannel);
+	if(acquisitionDataMap.value(ABSANGLE))
+		plotAcquisition(acquisitionABSAngleList, acquisitionABSAnglePlotChannel);
+	if(acquisitionDataMap.value(TMP0))
+		plotAcquisition(acquisitionTmp0List, acquisitionTmp0PlotChannel);
+	if(acquisitionDataMap.value(SINE))
+		plotAcquisition(acquisitionSineList, acquisitionSinePlotChannel);
+	if(acquisitionDataMap.value(COSINE))
+		plotAcquisition(acquisitionCosineList, acquisitionCosinePlotChannel);
+	if(acquisitionDataMap.value(RADIUS))
+		plotAcquisition(acquisitionRadiusList, acquisitionRadiusPlotChannel);
+	if(acquisitionDataMap.value(ANGLESEC))
+		plotAcquisition(acquisitionAngleSecList, acquisitionAngleSecPlotChannel);
+	if(acquisitionDataMap.value(SECANGLI))
+		plotAcquisition(acquisitionSecAnglIList, acquisitionSecAnglIPlotChannel);
+	if(acquisitionDataMap.value(SECANGLQ))
+		plotAcquisition(acquisitionSecAnglQList, acquisitionSecAnglQPlotChannel);
+	if(acquisitionDataMap.value(TMP1))
+		plotAcquisition(acquisitionTmp1List, acquisitionTmp1PlotChannel);
 
-		acquisitionYPlotAxis->setInterval(acquisitionGraphYMin, acquisitionGraphYMax);
-		acquisitionGraphPlotWidget->replot();
-
-		QThread::msleep(sampleRate);
-	}
-}
-
-void HarmonicCalibration::acquisitionUITask(int sampleRate)
-{
-	while(isAcquisitionTab) {
-		if(isStartAcquisition)
-			updateLineEditValues();
-
-		QThread::msleep(sampleRate);
-	}
-}
-
-void HarmonicCalibration::startAcquisitionUITask()
-{
-	if(!m_acquisitionUIThread.isRunning()) {
-		isAcquisitionTab = true;
-		m_acquisitionUIThread =
-			QtConcurrent::run(this, &HarmonicCalibration::acquisitionUITask, acquisitionUITimerRate);
-		m_acquisitionUIWatcher.setFuture(m_acquisitionUIThread);
-	}
-}
-
-void HarmonicCalibration::stopAcquisitionUITask()
-{
-	isAcquisitionTab = false;
-	if(m_acquisitionUIThread.isRunning()) {
-		m_acquisitionUIThread.cancel();
-		m_acquisitionUIWatcher.waitForFinished();
-	}
+	acquisitionYPlotAxis->setInterval(acquisitionGraphYMin, acquisitionGraphYMax);
+	acquisitionGraphPlotWidget->replot();
 }
 
 void HarmonicCalibration::updateSequenceWidget()
@@ -3086,13 +3073,9 @@ void HarmonicCalibration::applySequenceAndUpdate()
 	updateCapturedDataCheckBoxes();
 }
 
-void HarmonicCalibration::updateGeneralSettingEnabled(bool value)
-{
-	graphUpdateIntervalLineEdit->setEnabled(value);
-	displayLengthLineEdit->setEnabled(value);
-}
+void HarmonicCalibration::updateGeneralSettingEnabled(bool value) { displayLengthLineEdit->setEnabled(value); }
 
-void HarmonicCalibration::connectCheckBoxToAcquisitionGraph(QCheckBox *widget, PlotChannel *channel, SensorDataKey key)
+void HarmonicCalibration::connectCheckBoxToAcquisitionGraph(QCheckBox *widget, PlotChannel *channel, SensorData key)
 {
 	connect(widget, &QCheckBox::stateChanged, [this, channel, key](int state) {
 		if(state == Qt::Checked) {
@@ -3102,6 +3085,8 @@ void HarmonicCalibration::connectCheckBoxToAcquisitionGraph(QCheckBox *widget, P
 			channel->setEnabled(false);
 			acquisitionDataMap[key] = false;
 		}
+
+		restartAcquisition();
 	});
 }
 
