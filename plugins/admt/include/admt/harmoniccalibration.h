@@ -73,7 +73,6 @@
 #include <stylehelper.h>
 #include <toolbuttons.h>
 #include <tooltemplate.h>
-#include <widgets/horizontalspinbox.h>
 #include <widgets/registerblockwidget.h>
 
 enum SensorDataKey
@@ -215,9 +214,6 @@ private:
 		*postCalibrationRawDataPlotChannel, *postCalibrationSineDataPlotChannel,
 		*postCalibrationCosineDataPlotChannel, *FFTCorrectedErrorMagnitudeChannel,
 		*FFTCorrectedErrorPhaseChannel;
-
-	HorizontalSpinBox *motorMaxVelocitySpinBox, *motorAccelTimeSpinBox, *motorMaxDisplacementSpinBox,
-		*motorTargetPositionSpinBox;
 
 	CustomSwitch *acquisitionMotorDirectionSwitch, *calibrationMotorDirectionSwitch,
 		*calibrationDisplayFormatSwitch, *DIGIO0ENToggleSwitch, *DIGIO0FNCToggleSwitch, *DIGIO1ENToggleSwitch,
@@ -383,6 +379,8 @@ private:
 	void changeCustomSwitchLabel(CustomSwitch *customSwitch, QString onLabel, QString offLabel);
 	QCheckBox *createStatusLEDWidget(const QString &text, QVariant variant = true, bool checked = false,
 					 QWidget *parent = nullptr);
+	void configureCoeffRow(QWidget *container, QHBoxLayout *layout, QLabel *hLabel, QLabel *hMagLabel,
+			       QLabel *hPhaseLabel);
 #pragma endregion
 
 #pragma region Connect Methods
