@@ -1,4 +1,4 @@
-.. admonition:: Test Report /home/andrei-fabian/adi/newscopy/my-scopy/docs/tests/test_report/test_report_overview.rst
+.. admonition:: Test Report Overview
 
    .. list-table::
       :header-rows: 1
