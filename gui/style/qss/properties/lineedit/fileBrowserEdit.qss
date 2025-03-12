@@ -1,0 +1,3 @@
+QLineEdit[&&property&&=true] {
+	border: 0px solid transparent;
+}
