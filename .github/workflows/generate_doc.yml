@@ -116,7 +116,7 @@ jobs:
     - name: Generate aux files
       run: |
         touch .nojekyll ;
-        find . -name objects.inv -exec sh -c 'dirname {}' ';' | cut -c 3- | sort -r | jq -Rn 'reduce inputs as $i ({}; .[$i] = if $i == "" then ["main", "unstable"] elif $i | test("testing_") then [$i | split("/") | last, "testing"] else ["", ""] end ) > tags.json
+        find . -name objects.inv -exec sh -c 'dirname {}' ';' | cut -c 3- | sort -r | jq -Rn 'reduce inputs as $i ({}; .[$i] = if $i == "" then ["main", "unstable"] elif $i | test("testing_") then [$i | split("/") | last, "testing"] else ["", ""] end )' > tags.json
 
     - name: Commit and push to gh-pages
       run: |
