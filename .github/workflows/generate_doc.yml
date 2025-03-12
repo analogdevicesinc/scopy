@@ -43,7 +43,7 @@ jobs:
         TEST_REPORT_FOLDER=$(echo "${{ github.event.pull_request.head.ref }}" | sed 's/^testing_//') # Remove the testing_ prefix
         echo "test_report_folder=$TEST_REPORT_FOLDER"
         echo "test_report_folder=$TEST_REPORT_FOLDER" >> "$GITHUB_ENV"
-        python3 test_report_generator.py ../testing_results/ tests/test_report/ "${{ github.sha }}"
+        # python3 test_report_generator.py ../testing_results/ tests/test_report/ "${{ github.sha }}"
 
     - name: Build doc
       working-directory: docs
@@ -96,14 +96,14 @@ jobs:
           git commit -m "initial commit" --allow-empty
         )
 
-    - uses: actions/download-artifact@v4
-      if: ${{ env.new_tag == '0' }} && ${{ env.test_report_folder == '' }}
-      with:
-        name: html
-        path: scopy_testing_results/${{ env.test_report_folder }}
+    # - uses: actions/download-artifact@v4
+    #   if: ${{ env.new_tag == '0' }} && ${{ env.test_report_folder == '' }}
+    #   with:
+    #     name: html
+    #     path: scopy_testing_results/${{ env.test_report_folder }}
 
     - uses: actions/download-artifact@v4
-      if: ${{ env.new_tag == '0' }} && !${{ env.test_report_folder == '' }}
+      if: ${{ env.new_tag == '0' }} # && !${{ env.test_report_folder == '' }}
       with:
         name: html
 
@@ -116,10 +116,7 @@ jobs:
     - name: Generate aux files
       run: |
         touch .nojekyll ;
-        find . -name objects.inv -exec sh -c 'dirname {}' ';' |
-        cut -c 3- | sort -r |
-        jq --raw-input . |
-        jq --slurp . > tags.json
+        find . -name objects.inv -exec sh -c 'dirname {}' ';' | cut -c 3- | sort -r | jq -Rn 'reduce inputs as $i ({}; .[$i] = if $i == "" then ["main", "unstable"] elif $i | test("testing_") then [$i | split("/") | last, "testing"] else ["", ""] end ) > tags.json
 
     - name: Commit and push to gh-pages
       run: |
