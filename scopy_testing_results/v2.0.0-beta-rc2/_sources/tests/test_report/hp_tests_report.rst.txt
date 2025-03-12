@@ -1,0 +1,52 @@
+.. _hp_tests_report:
+
+Test Report for hp_tests
+==========================================================
+
+
+.. admonition:: Test Report hp_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.HP.RUN
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/hp_tests.rst
+      * - TST.HP.ADD
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/hp_tests.rst
+      * - TST.HP.AUTO_SCAN_ON
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/hp_tests.rst
+      * - TST.HP.AUTO_SCAN_OFF
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/hp_tests.rst
+      * - TST.HP.MANUAL_SCAN
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/hp_tests.rst
+      * - TST.HP.NAV
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - Missing Actual result section in step 6 and 7
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/hp_tests.rst
+      * - TST.HP.UNPLUGGED
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/hp_tests.rst

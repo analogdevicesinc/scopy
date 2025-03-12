@@ -1,0 +1,37 @@
+.. _general_settings_tests_report:
+
+Test Report for general_settings_tests
+==========================================================
+
+
+.. admonition:: Test Report general_settings_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.GEN.SETUP.INSTALL
+        - WindowsADI
+        - This test is only valid for the Windows installer.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/general_settings_tests.rst
+      * - TST.GEN.SETUP.M2KCONN
+        - WindowsADI, macOS M2 processor
+        - Step 6 fails on macOS because Scopy can't find the ip context for the M2K and because of this the next steps are also failing. On Windows all steps work as expected.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/general_settings_tests.rst
+      * - TST.GEN.SETUP.SAVELOAD
+        - WindowsADI, macOS M2 processor
+        - The paths for the default .ini file are different depending on the operating system.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/general_settings_tests.rst
+      * - TST.GEN.SETUP.PREFERENCES
+        - WindowsADI, macOS M2 processor
+        - on step 5 Can't find “Show advanced device information.” settings.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/general_settings_tests.rst

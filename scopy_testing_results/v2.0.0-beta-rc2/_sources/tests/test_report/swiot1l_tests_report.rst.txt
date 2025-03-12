@@ -1,0 +1,97 @@
+.. _swiot1l_tests_report:
+
+Test Report for swiot1l_tests
+==========================================================
+
+
+.. admonition:: Test Report swiot1l_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.SWIOT.COMPAT
+        - Linux-arm64, Windows 10
+        - The iio-emu is not found for Linux-arm64. Issue #1904 opened. On Windows it works.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/swiot1l/swiot1l_tests.rst
+      * - TST.SWIOT.MODES
+        - Linux-arm64, Windows 10
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/swiot1l/swiot1l_tests.rst
+      * - TST.SWIOT.CONFIG
+        - Linux-arm64, Windows 10
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/swiot1l/swiot1l_tests.rst
+      * - TST.AD74413R.PLOT
+        - Linux-arm64, Windows 10
+        - Failed at step 4, arm64. Issue #1905 opened.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/swiot1l/swiot1l_tests.rst
+      * - TST.AD74413R.CHANNEL
+        - Linux-arm64, Windows 10
+        - The test should be a success, but step 5 is wrong, so it fails. No issue was created, but the tests will be changed.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/swiot1l/swiot1l_tests.rst
+      * - TST.AD74413R.DIAG
+        - Linux-arm64, Windows 10
+        - Test 6 fails.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/swiot1l/swiot1l_tests.rst
+      * - TST.AD74413R.SAMPLING
+        - Linux-arm64, Windows 10
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/swiot1l/swiot1l_tests.rst
+      * - TST.AD74413R.TUTORIAL
+        - Linux-arm64, Windows 10
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/swiot1l/swiot1l_tests.rst
+      * - TST.MAX14906.PLOT
+        - Linux-arm64, Windows 10
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/swiot1l/swiot1l_tests.rst
+      * - TST.MAX14906.CHANNEL
+        - Linux-arm64, Windows 10
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/swiot1l/swiot1l_tests.rst
+      * - TST.MAX14906.TUTORIAL
+        - Linux-arm64, Windows 10
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/swiot1l/swiot1l_tests.rst
+      * - TST.FAULTS.RUN_SINGLE
+        - Linux-arm64, Windows 10
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/swiot1l/swiot1l_tests.rst
+      * - TST.FAULTS.CLEAR_RESET
+        - Linux-arm64, Windows 10
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/swiot1l/swiot1l_tests.rst
+      * - TST.FAULTS.RUN_CONTINUOUS
+        - Linux-arm64, Windows 10
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/swiot1l/swiot1l_tests.rst
+      * - TST.FAULTS.TUTORIAL
+        - Linux-arm64, Windows 10
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/swiot1l/swiot1l_tests.rst
+      * - TST.SWIOT.EXTERNAL_SUPPLY
+        - Linux-arm64, Windows 10
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/swiot1l/swiot1l_tests.rst

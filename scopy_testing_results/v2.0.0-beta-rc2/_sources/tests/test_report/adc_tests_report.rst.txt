@@ -1,0 +1,142 @@
+.. _adc_tests_report:
+
+Test Report for adc_tests
+==========================================================
+
+
+.. admonition:: Test Report adc_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.ADC_TIME.X_AXIS
+        - Debian 12 arm64, Windows
+        - 
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.ADC_TIME.Y_AXIS
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.ADC_TIME.XY_PLOT
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.ADC_TIME.SETTINGS
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.ADC_TIME.PRINT
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.ADC_TIME.INFO
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.PLOT_NAVIGATION
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.ADC_TIME_CHANNEL_SETTINGS
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.MEASURE
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.CURSORS
+        - Debian 12 arm64, Windows
+        - For some reason voltage0 and voltage1 are reversed in the test case description.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.ADC_FREQ.X_AXIS_SETTINGS
+        - Debian 12 arm64, Windows
+        - There are some inconsistencies with the functionality of the ADC Frequency Instrument.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.ADC_FREQ.Y_AXIS_SETTINGS
+        - Debian 12 arm64, Windows
+        - Modify the test cases to remove the ADC Counts mention.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.ADC_FREQ.SETTINGS_ADJUSTMENT
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.ADC_FREQ.PRINT_PLOT
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.ADC_FREQ.VIEW_PLUGIN_DOC
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.ADC_FREQ.Y_AXIS_CHANNEL_SETTINGS
+        - Debian 12 arm64, Windows
+        - 
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.ADC_FREQ.MARKER_SETTINGS
+        - Debian 12 arm64, Windows
+        - The test case description is not clear enough, this is added in a different commit.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.ADC_FREQ.CURSOR_SETTINGS
+        - Debian 12 arm64, Windows
+        - Missing TMode selector (or is it the one in preferences?). Measuring samples and not freq
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.PREF.X_SCALE_POS
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.PREF.Y_SCALE_POS
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.PREF.CH_HANDLE_POS
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.PREF.X_CURSOR_POS
+        - Debian 12 arm64, Windows
+        - Plot cursor handles always appear on the bottom of the plot, regardless of the preference setting.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.PREF.Y_CURSOR_POS
+        - Debian 12 arm64, Windows
+        - Plot cursor handles always appear on the right side of the plot, regardless of the preference setting.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.PREF.SHOW_BUFFER
+        - Windows
+        - Skipped as the preference no longer exists.
+        - PASS/FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst
+      * - TST.PREF.DEFAULT_YMODE
+        - Debian 12 arm64, Windows
+        - In YMODE general settings the default value is **ADC Counts** while the 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/adc/adc_tests.rst

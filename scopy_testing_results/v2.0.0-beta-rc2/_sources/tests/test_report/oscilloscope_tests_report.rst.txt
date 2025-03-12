@@ -1,0 +1,127 @@
+.. _oscilloscope_tests_report:
+
+Test Report for oscilloscope_tests
+==========================================================
+
+
+.. admonition:: Test Report oscilloscope_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.OSC.TIME_VOLTS_1
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.POSITION_1
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.CONSTANT_SIGNAL_1
+        - WindowsADI, macOS 14.5 M2 processor
+        - see actual result on point 6
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.SINE_WAVE_SIGNAL_1
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.SQUARE_WAVE_SIGNAL_1
+        - WindowsADI, macOS 14.5 M2 processor
+        - See actual result on point 4 and 5.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.TRIANGLE_WAVE_SIGNAL_1
+        - WindowsADI, macOS 14.5 M2 processor
+        - For step 5, the Time base of 5us/dev and the signal frequency of 20kHz displays 2 periods, not 6 as in the Expected result. In order to display 6 triangle waves, the time base should be 20us/div. And at step 4, the unit of measure for RMS is displayed as V, not Vrms.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.RAMP_SAWTOOTH_WAVE_SIGNAL_1
+        - WindowsADI, macOS 14.5 M2 processor
+        - The Peak-peak value is a little higher than expected.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.CURSOR_READING_1
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.TRIGGER_FUNCTION_1
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.MATH_CHANNEL
+        - WindowsADI, macOS 14.5 M2 processor
+        - On macOS there were a few occasional crashes when editing or removing a math channel.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.FFT_FUNCTION
+        - WindowsADI, macOS 14.5 M2 processor
+        - On macOS the information displayed by having the mouse cursor inside the plot is not properly fitted.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.XY_FUNCTION
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.EXPORT_FEATURE
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.SOFTWARE_AC_COUPLING
+        - WindowsADI, macOS 14.5 M2 processor
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.PROBE_ATTENUATION
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.EXTERNAL_TRIGGER
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.AUTOSET
+        - WindowsADI, macOS 14.5 M2 processor
+        - Autoset button, sets the trigger level and the time base to wrong values.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.PRINT_PLOT
+        - WindowsADI, macOS 14.5 M2 processor
+        - As step 5 the screenshot does not have inverted colors if the Light Theme for Scopy is used.
+        - PASS/FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.CURVE_STYLE
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.GATING
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.HISTOGRAM
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst
+      * - TST.OSC.ADC_DIGITAL_FILTERS
+        - 
+        - 
+        - PASS/FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/oscilloscope_tests.rst

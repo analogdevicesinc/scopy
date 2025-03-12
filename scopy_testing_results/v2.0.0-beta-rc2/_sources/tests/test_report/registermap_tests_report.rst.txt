@@ -1,0 +1,127 @@
+.. _registermap_tests_report:
+
+Test Report for registermap_tests
+==========================================================
+
+
+.. admonition:: Test Report registermap_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.REGMAP.READ
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.WRITE
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.WRITE_WRONG_VALUE  
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.CHANGE_DEVICE  
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.SHOW_TABLE
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.SEARCH
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.SIMPLE_REGISTER_VALUE_UPDATED_ON_READ
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.SIMPLE_REGISTER_VALUE_UPDATED_ON_WRITE
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.DETAILED_REGISTER_VALUE_UPDATED_ON_READ
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.CHANGE_SELECTED_REGISTER
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.TOGGLE_DETAILED_REGISTER_VISIBLE
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.SETTINGS_READ_INTERVAL
+        - Debian 12 arm64, Windows
+        - Would increase the range, easier to observe if more values are updated
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.SETTINGS_READ_INTERVAL_WRONG_INTERVAL
+        - Debian 12 arm64, Windows
+        - Pressing the **Register dump** button multiple times will duplicate data.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.SETTINGS_WRITE_VALUES
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.PREFERENCES_COLOR_CODING_BACKGROUND_COLOR
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.PREFERENCES_COLOR_CODING_TEXT_COLOR
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.PREFERENCES_COLOR_CODING_DYNAMIC_CHANGE
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.PREFERENCES_SETTINGS_SAVE_ON_CLOSE
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.INFO_BUTTON_DOCUMENTATION
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.INFO_BUTTON_TUTORIAL
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.INFO_BUTTON_TUTORIAL_NO_XML
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst
+      * - TST.REGMAP.CUSTOM_XML_FILE
+        - Debian 12 arm64, Windows
+        - Tested on Debian on a RPi instead of Windows by extracting the AppImage and adding the test XML.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/registermap/registermap_tests.rst

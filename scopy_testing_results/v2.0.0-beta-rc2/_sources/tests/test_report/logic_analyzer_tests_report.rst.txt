@@ -1,0 +1,82 @@
+.. _logic_analyzer_tests_report:
+
+Test Report for logic_analyzer_tests
+==========================================================
+
+
+.. admonition:: Test Report logic_analyzer_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.LOGIC.CHN_TRIGGER
+        - WindowsADI, macOS 14.5 M2 processor
+        - Fail at step 5, due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/logic_analyzer_tests.rst
+      * - TST.LOGIC.EXT_CHN_TRIGGER
+        - WindowsADI, macOS 14.5 M2 processor
+        - Fail at step 5, due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/logic_analyzer_tests.rst
+      * - TST.LOGIC.OSC_EXT_TRIGGER
+        - WindowsADI, macOS 14.5 M2 processor
+        - The instructions are confusing, the first steps are lacking setup information.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/logic_analyzer_tests.rst
+      * - TST.LOGIC.TRIGGER_MODES
+        - WindowsADI, macOS 14.5 M2 processor
+        - Fail at step 5, due to Digital IO not working issue reported here `#1903 https://github.com/analogdevicesinc/scopy/issues/1903 >`
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/logic_analyzer_tests.rst
+      * - TST.LOGIC.CLOCK_SIGNAL
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/logic_analyzer_tests.rst
+      * - TST.LOGIC.PARALLEL_DECODER
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/logic_analyzer_tests.rst
+      * - TST.LOGIC.SPI_DECODER
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/logic_analyzer_tests.rst
+      * - TST.LOGIC.UART_DECODER
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/logic_analyzer_tests.rst
+      * - TST.LOGIC.PWM_DECODER
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/logic_analyzer_tests.rst
+      * - TST.LOGIC.CHN_VISUAL
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/logic_analyzer_tests.rst
+      * - TST.LOGIC.EXPORT
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/logic_analyzer_tests.rst
+      * - TST.LOGIC.PRINT_PLOT
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/logic_analyzer_tests.rst
+      * - TST.LOGIC.DECODER_TABLE
+        - WindowsADI, macOS 14.5 M2 processor
+        - The "^3$" regex from step 7 doesn't display anything on macOS.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/logic_analyzer_tests.rst

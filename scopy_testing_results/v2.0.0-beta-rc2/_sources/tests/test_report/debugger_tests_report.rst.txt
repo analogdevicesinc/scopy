@@ -1,0 +1,57 @@
+.. _debugger_tests_report:
+
+Test Report for debugger_tests
+==========================================================
+
+
+.. admonition:: Test Report debugger_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.DBG.EXPLR.LOAD
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/debugger/debugger_tests.rst
+      * - TST.DBG.EXPLR.NAV
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/debugger/debugger_tests.rst
+      * - TST.DBG.EXPLR.FILTER
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/debugger/debugger_tests.rst
+      * - TST.DBG.EXPLR.TITLE
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/debugger/debugger_tests.rst
+      * - TST.DBG.EXPLR.WATCH
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/debugger/debugger_tests.rst
+      * - TST.DBG.EXPLR.DETAILS
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/debugger/debugger_tests.rst
+      * - TST.DBG.EXPLR.READ_ALL
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/debugger/debugger_tests.rst
+      * - TST.DBG.EXPLR.LOG
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/debugger/debugger_tests.rst

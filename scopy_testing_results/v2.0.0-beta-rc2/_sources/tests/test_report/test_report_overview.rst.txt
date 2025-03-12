@@ -1,0 +1,168 @@
+.. admonition:: Test Report /home/andrei-fabian/adi/newscopy/my-scopy/docs/tests/test_report/test_report_overview.rst
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 50 30 30 50 50 50
+
+      * - NAME
+        - PASS
+        - FAIL
+        - SKIP
+        - Total
+        - Details
+      * - debugger_preferences_tests
+        - 1
+        - 1
+        - 0
+        - 2
+        - :ref:`debugger_preferences_tests_report`
+      * - debugger_tests
+        - 8
+        - 0
+        - 0
+        - 8
+        - :ref:`debugger_tests_report`
+      * - registermap_tests
+        - 21
+        - 1
+        - 0
+        - 22
+        - :ref:`registermap_tests_report`
+      * - dac_tests
+        - 8
+        - 2
+        - 0
+        - 10
+        - :ref:`dac_tests_report`
+      * - pqm_tests
+        - 32
+        - 0
+        - 0
+        - 32
+        - :ref:`pqm_tests_report`
+      * - swiot1l_tests
+        - 12
+        - 4
+        - 0
+        - 16
+        - :ref:`swiot1l_tests_report`
+      * - network_analyzer_tests
+        - 8
+        - 0
+        - 0
+        - 8
+        - :ref:`network_analyzer_tests_report`
+      * - pattern_generator_tests
+        - 4
+        - 0
+        - 0
+        - 4
+        - :ref:`pattern_generator_tests_report`
+      * - power_supply_tests
+        - 4
+        - 0
+        - 0
+        - 4
+        - :ref:`power_supply_tests_report`
+      * - digital_io_tests
+        - 0
+        - 2
+        - 0
+        - 2
+        - :ref:`digital_io_tests_report`
+      * - voltmeter_tests
+        - 3
+        - 1
+        - 0
+        - 4
+        - :ref:`voltmeter_tests_report`
+      * - oscilloscope_tests
+        - 17
+        - 3
+        - 2
+        - 22
+        - :ref:`oscilloscope_tests_report`
+      * - general_settings_tests
+        - 2
+        - 2
+        - 0
+        - 4
+        - :ref:`general_settings_tests_report`
+      * - signal_generator_tests
+        - 3
+        - 1
+        - 0
+        - 4
+        - :ref:`signal_generator_tests_report`
+      * - logic_analyzer_tests
+        - 10
+        - 3
+        - 0
+        - 13
+        - :ref:`logic_analyzer_tests_report`
+      * - spectrum_analyzer_tests
+        - 4
+        - 0
+        - 0
+        - 4
+        - :ref:`spectrum_analyzer_tests_report`
+      * - adc_tests
+        - 16
+        - 8
+        - 1
+        - 25
+        - :ref:`adc_tests_report`
+      * - datalogger_tests
+        - 30
+        - 4
+        - 0
+        - 34
+        - :ref:`datalogger_tests_report`
+      * - general_preferences_tests
+        - 7
+        - 2
+        - 0
+        - 9
+        - :ref:`general_preferences_tests_report`
+      * - license_about_page_tests
+        - 2
+        - 0
+        - 0
+        - 2
+        - :ref:`license_about_page_tests_report`
+      * - emu_tests
+        - 8
+        - 2
+        - 0
+        - 10
+        - :ref:`emu_tests_report`
+      * - hp_tests
+        - 7
+        - 0
+        - 0
+        - 7
+        - :ref:`hp_tests_report`
+      * - dev_tests
+        - 10
+        - 1
+        - 0
+        - 11
+        - :ref:`dev_tests_report`
+      * - add_dev_tests
+        - 10
+        - 1
+        - 0
+        - 11
+        - :ref:`add_dev_tests_report`
+      * - connection_tests
+        - 5
+        - 0
+        - 0
+        - 5
+        - :ref:`connection_tests_report`
+      * - install_tests
+        - 4
+        - 0
+        - 1
+        - 5
+        - :ref:`install_tests_report`

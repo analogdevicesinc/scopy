@@ -1,0 +1,72 @@
+.. _add_dev_tests_report:
+
+Test Report for add_dev_tests
+==========================================================
+
+
+.. admonition:: Test Report add_dev_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.ADD.SCAN_ALL
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/add_dev_tests.rst
+      * - TST.ADD.SCAN_LOCAL
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - Test only fails on Windows 10
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/add_dev_tests.rst
+      * - TST.ADD.SCAN_IP
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/add_dev_tests.rst
+      * - TST.ADD.SCAN_USB
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/add_dev_tests.rst
+      * - TST.ADD.SCAN_SERIAL
+        - Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/add_dev_tests.rst
+      * - TST.ADD.SCAN_EMPTY
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/add_dev_tests.rst
+      * - TST.ADD.VERIFY
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/add_dev_tests.rst
+      * - TST.ADD.PLUGINS_BACK
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/add_dev_tests.rst
+      * - TST.ADD.PLUGINS_ADD_SINGLE
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/add_dev_tests.rst
+      * - TST.ADD.PLUGINS_ADD_MULTIPLE
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/add_dev_tests.rst
+      * - TST.ADD.PLUGINS_EMPTY
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/add_dev_tests.rst

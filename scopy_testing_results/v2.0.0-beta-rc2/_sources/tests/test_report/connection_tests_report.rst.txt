@@ -1,0 +1,42 @@
+.. _connection_tests_report:
+
+Test Report for connection_tests
+==========================================================
+
+
+.. admonition:: Test Report connection_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.CONN.SUCC
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/connection_tests.rst
+      * - TST.CONN.UNPLUG_AUTO
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/connection_tests.rst
+      * - TST.CONN.UNPLUG_AUTO
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/connection_tests.rst
+      * - TST.CONN.UNPLUG_BEFORE
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/connection_tests.rst
+      * - TST.CONN.DISCONN
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/connection_tests.rst

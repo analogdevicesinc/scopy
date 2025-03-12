@@ -1,0 +1,177 @@
+.. _pqm_tests_report:
+
+Test Report for pqm_tests
+==========================================================
+
+
+.. admonition:: Test Report pqm_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.PQM.RMS_OPEN
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.RMS_INFO
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.RMS_SINGLE
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.RMS_RUN
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.RMS_SETTINGS
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.RMS_LOG
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.RMS_LOG_WRONG
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.RMS_PQEVENTS
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.HARMONICS_OPEN
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.HARMONICS_INFO
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.HARMONICS_SINGLE
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.HARMONICS_RUN
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.HARMONICS_TABLE
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.HARMONICS_SETTINGS
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.HARMONICS_LOG
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.HARMONICS_LOG_WRONG
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.HARMONICS_PQEVENTS
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.WAVEFORM_OPEN
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.WAVEFORM_INFO
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.WAVEFORM_SETTINGS
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.WAVEFORM_SETTINGS_TIMESPAN
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.WAVEFORM_SETTINGS_ROLLING
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.WAVEFORM_SINGLE_TRIG
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.WAVEFORM_SINGLE_ROLL
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.WAVEFORM_RUN_TRIG
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.WAVEFORM_RUN_ROLL
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.WAVEFORM_PLOT_ZOOM
+        - Windows 10, Linux-arm64
+        - On Linux-arm64, on zoom out, the plot magnifier will not dissapear on plot 1 if zooming out from plot 2 (or vice versa)   
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.WAVEFORM_LOG
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.WAVEFORM_LOG_WRONG
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.SETTINGS_OPEN
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.SETTINGS_READ
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst
+      * - TST.PQM.SETTINGS_WRITE
+        - Windows 10, Linux-arm64
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/pqm/pqm_tests.rst

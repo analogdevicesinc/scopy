@@ -1,0 +1,27 @@
+.. _digital_io_tests_report:
+
+Test Report for digital_io_tests
+==========================================================
+
+
+.. admonition:: Test Report digital_io_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.DIO.INDIVIDUAL
+        - WindowsADI, macOS 14.5 M2 processor
+        - Signals not connected correctly issue reported here `#1903 <https://github.com/analogdevicesinc/scopy/issues/1903>`_
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/digital_io_tests.rst
+      * - TST.DIO.GROUP
+        - WindowsADI, macOS 14.5 M2 processor
+        - Signals not connected correctly issue reported here `#1903 <https://github.com/analogdevicesinc/scopy/issues/1903>`_
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/digital_io_tests.rst

@@ -1,0 +1,62 @@
+.. _general_preferences_tests_report:
+
+Test Report for general_preferences_tests
+==========================================================
+
+
+.. admonition:: Test Report general_preferences_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.PREF.SAVE_LOAD_SESSION
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - Full bug is described and tracked here: https://github.com/analogdevicesinc/scopy/issues/1906 .
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/general_preferences_tests.rst
+      * - TST.PREF.DOUBLECLICK_ATTACH_DETACH  
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/general_preferences_tests.rst
+      * - TST.PREF.ENABLE_OPENGL_PLOTTING  
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/general_preferences_tests.rst
+      * - TST.PREF.SHOW_GRATICULE
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/general_preferences_tests.rst
+      * - TST.PREF.THEME
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/general_preferences_tests.rst
+      * - TST.PREF.LANGUAGE
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/general_preferences_tests.rst
+      * - TST.PREF.REGULARLY_SCAN_NEW_DEVICES  
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/general_preferences_tests.rst
+      * - TST.PREF.SESSION_DEVICES
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - Test fails only on Windows 10
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/general_preferences_tests.rst
+      * - TST.PREF.SHOW_PLOT_FPS
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/general_preferences_tests.rst

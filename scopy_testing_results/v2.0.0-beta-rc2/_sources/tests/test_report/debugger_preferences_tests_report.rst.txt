@@ -1,0 +1,27 @@
+.. _debugger_preferences_tests_report:
+
+Test Report for debugger_preferences_tests
+==========================================================
+
+
+.. admonition:: Test Report debugger_preferences_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.DBG.PREF.CHANGE_VERSION
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/debugger/debugger_preferences_tests.rst
+      * - TST.DBG.PREF.INCLUDE_DEBUG_ATTRIBUTES
+        - Debian 12 arm64, Windows
+        - The preference should flag the application to request a restart, otherwise the preference is not applied.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/debugger/debugger_preferences_tests.rst

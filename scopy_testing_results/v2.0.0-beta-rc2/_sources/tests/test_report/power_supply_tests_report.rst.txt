@@ -1,0 +1,37 @@
+.. _power_supply_tests_report:
+
+Test Report for power_supply_tests
+==========================================================
+
+
+.. admonition:: Test Report power_supply_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.PS.POSITIVE
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/power_supply_tests.rst
+      * - TST.PS.NEGATIVE
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/power_supply_tests.rst
+      * - TST.PS.FINE_TUNING
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/power_supply_tests.rst
+      * - TST.PS.TRACKING
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/power_supply_tests.rst

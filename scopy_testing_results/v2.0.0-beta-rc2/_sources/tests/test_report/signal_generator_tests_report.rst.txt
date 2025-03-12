@@ -1,0 +1,37 @@
+.. _signal_generator_tests_report:
+
+Test Report for signal_generator_tests
+==========================================================
+
+
+.. admonition:: Test Report signal_generator_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.M2K.SG.CHANNEL_1_OPERATION
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/signal_generator_tests.rst
+      * - TST.M2K.SG.CHANNEL_2_OPERATION
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/signal_generator_tests.rst
+      * - TST.M2K.SG.CHANNEL_1_AND_CHANNEL_2_OPERATION
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/signal_generator_tests.rst
+      * - TST.M2K.SG.ADDITIONAL_FEATURES
+        - WindowsADI, macOS 14.5 M2 processor
+        - On macOS inside the signal generator buffer tab, the .mat files can't be loaded. Some tests need to be updated. The references to other pictures should be removed.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/signal_generator_tests.rst

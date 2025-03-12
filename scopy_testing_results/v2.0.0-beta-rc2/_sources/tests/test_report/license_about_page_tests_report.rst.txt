@@ -1,0 +1,27 @@
+.. _license_about_page_tests_report:
+
+Test Report for license_about_page_tests
+==========================================================
+
+
+.. admonition:: Test Report license_about_page_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.LICENSE.POPUP
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/license_about_page_tests.rst
+      * - TST.ABOUT.PAGE
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - Steps 10 and 12 are not needed since there is no need to press the home button
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/license_about_page_tests.rst

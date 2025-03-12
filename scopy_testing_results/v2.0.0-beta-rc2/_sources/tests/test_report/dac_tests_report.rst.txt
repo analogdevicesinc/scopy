@@ -1,0 +1,67 @@
+.. _dac_tests_report:
+
+Test Report for dac_tests
+==========================================================
+
+
+.. admonition:: Test Report dac_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.DAC.COMPAT
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/dac/dac_tests.rst
+      * - TST.DAC.BUFFER_LOAD
+        - Debian 12 arm64, Windows
+        - Clicking **Load** using a different file while the DAC is running generates a crash.
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/dac/dac_tests.rst
+      * - TST.DAC.BUFFER_CHANNEL_SELECT
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/dac/dac_tests.rst
+      * - TST.DAC.BUFFER_FILE_SIZE
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/dac/dac_tests.rst
+      * - TST.DAC.BUFFER_CYCLIC
+        - Debian 12 arm64, Windows
+        - When tested on the RPi, the DAC in Buffer mode seems to generate a distorted sinewave,
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/dac/dac_tests.rst
+      * - TST.DAC.DDS_MODES
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/dac/dac_tests.rst
+      * - TST.DAC.DDS_SINEWAVE
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/dac/dac_tests.rst
+      * - TST.DAC.DDS_ATTRS
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/dac/dac_tests.rst
+      * - TST.DAC.TUTORIAL
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/dac/dac_tests.rst
+      * - TST.DAC.CHANNEL_ATTRS
+        - Debian 12 arm64, Windows
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/dac/dac_tests.rst

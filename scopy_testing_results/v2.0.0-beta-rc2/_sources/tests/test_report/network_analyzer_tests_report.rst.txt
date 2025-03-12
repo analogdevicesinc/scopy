@@ -1,0 +1,57 @@
+.. _network_analyzer_tests_report:
+
+Test Report for network_analyzer_tests
+==========================================================
+
+
+.. admonition:: Test Report network_analyzer_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.NA.LOWPASS_CH1_340HZ
+        - Windows ADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/network_analyzer_tests.rst
+      * - TST.NA.LOWPASS_CH2_340HZ
+        - Windows ADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/network_analyzer_tests.rst
+      * - TST.NA.LOWPASS_CH1_1_59MHZ
+        - Windows ADI, macOS 14.5 M2 processor
+        - On step 1 configuration max stop value is 25MHz test is done using this.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/network_analyzer_tests.rst
+      * - TST.NA.HIGHPASS_CH1_340HZ
+        - Windows ADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/network_analyzer_tests.rst
+      * - TST.NA.BANDPASS_CH1
+        - Windows ADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/network_analyzer_tests.rst
+      * - TST.NA.BANDSTOP_CH1
+        - Windows ADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/network_analyzer_tests.rst
+      * - TST.NA.PRINT_PLOT
+        - Windows ADI, macOS 14.5 M2 processor
+        - File format is not PDF
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/network_analyzer_tests.rst
+      * - TST.NA.BUFFER_PREVIEWER
+        - Windows ADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/network_analyzer_tests.rst

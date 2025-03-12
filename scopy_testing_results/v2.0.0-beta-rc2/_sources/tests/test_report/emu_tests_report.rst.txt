@@ -1,0 +1,67 @@
+.. _emu_tests_report:
+
+Test Report for emu_tests
+==========================================================
+
+
+.. admonition:: Test Report emu_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.EMU.EN
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/emu_tests.rst
+      * - TST.EMU.NOT
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - Windows 10: With the iio-emu not installed in system and a bad preferences path, emulator is still found as long as iio-emu.exe is in the same folder as scopy.exe; macOS 14.5: Unable to locate the preferences.ini
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/emu_tests.rst
+      * - TST.EMU.DIS
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/emu_tests.rst
+      * - TST.EMU.DIS_CONN
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - The iio-emu is disabled and the device is disconnected as expected on Ubuntu 22.04.5 LTS. However, on Debian 12 arm64, 
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/emu_tests.rst
+      * - TST.EMU.EN_ADALM2000
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/emu_tests.rst
+      * - TST.EMU.EN_PLUTO
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/emu_tests.rst
+      * - TST.EMU.EN_PQM
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/emu_tests.rst
+      * - TST.EMU.EN_SWIOT_CONFIG
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/emu_tests.rst
+      * - TST.EMU.EN_SWIOT_RUNTIME
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/emu_tests.rst
+      * - TST.EMU.EN_GENERIC
+        - Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5 
+        - 
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/general/core/emu_tests.rst

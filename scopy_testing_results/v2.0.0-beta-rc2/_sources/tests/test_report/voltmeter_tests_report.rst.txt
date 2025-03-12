@@ -1,0 +1,37 @@
+.. _voltmeter_tests_report:
+
+Test Report for voltmeter_tests
+==========================================================
+
+
+.. admonition:: Test Report voltmeter_tests
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 10 10 10 10 10
+
+      * - UID
+        - TESTED OS
+        - COMMENTS
+        - RESULT
+        - TEST LINK
+      * - TST.M2K.VOLTMETER.CHANNEL_1_OPERATION
+        - WindowsADI
+        - A little bit lower RMS values for some high frequency signals. A cause may be the resistance of the wires used.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/voltmeter_tests.rst
+      * - TST.M2K.VOLTMETER.CHANNEL_2_OPERATION
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/voltmeter_tests.rst
+      * - TST.M2K.VOLTMETER.CHANNEL_1_AND_CHANNEL_2_OPERATION
+        - WindowsADI, macOS 14.5 M2 processor
+        - None.
+        - PASS
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/voltmeter_tests.rst
+      * - TST.M2K.VOLTMETER.ADDITIONAL_FEATURES
+        - WindowsADI, macOS 14.5 M2 processor
+        - 
+        - FAIL
+        - https://github.com/analogdevicesinc/scopy/blob/476701fade264f710e1895c46d7cb2ca42752d91/testing_results/../testing_results/testing_results_v2.0.0-beta-rc2/plugins/m2k/voltmeter_tests.rst

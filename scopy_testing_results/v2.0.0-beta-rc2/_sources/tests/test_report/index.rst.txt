@@ -1,0 +1,38 @@
+.. _test_report:
+
+Test Report
+========================================================
+
+.. include:: test_report_overview.rst
+
+Contents
+----------------------------------------------------------
+.. toctree::
+   :maxdepth: 3
+
+   debugger_preferences_tests_report
+   debugger_tests_report
+   registermap_tests_report
+   dac_tests_report
+   pqm_tests_report
+   swiot1l_tests_report
+   network_analyzer_tests_report
+   pattern_generator_tests_report
+   power_supply_tests_report
+   digital_io_tests_report
+   voltmeter_tests_report
+   oscilloscope_tests_report
+   general_settings_tests_report
+   signal_generator_tests_report
+   logic_analyzer_tests_report
+   spectrum_analyzer_tests_report
+   adc_tests_report
+   datalogger_tests_report
+   general_preferences_tests_report
+   license_about_page_tests_report
+   emu_tests_report
+   hp_tests_report
+   dev_tests_report
+   add_dev_tests_report
+   connection_tests_report
+   install_tests_report
