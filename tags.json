@@ -1,4 +1,10 @@
 {
-  "scopy_testing_results/v2.0.0-beta-rc2": ["v2.0.0-beta-rc2", "testing"],
-  "": ["main", "unstable"]
+  "scopy_testing_results/v2.0.0-beta-rc2": [
+    "v2.0.0-beta-rc2",
+    "testing"
+  ],
+  "": [
+    "main",
+    "unstable"
+  ]
 }
