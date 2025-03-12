@@ -24,9 +24,7 @@
 #include "style.h"
 #include "style_properties.h"
 
-#include <admtstylehelper.h>
 #include <stylehelper.h>
-#include <widgets/horizontalspinbox.h>
 
 using namespace scopy;
 using namespace scopy::admt;
@@ -149,7 +147,6 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	, isDebug(isDebug)
 	, m_admtController(m_admtController)
 {
-	ADMTStyleHelper::GetInstance()->initColorMap();
 	readDeviceProperties();
 	initializeADMT();
 	initializeMotor();
@@ -323,6 +320,7 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 	motorRPMLayout->setMargin(0);
 	motorRPMLayout->setSpacing(0);
 	QLabel *motorRPMLabel = new QLabel("Motor RPM", motorRPMWidget);
+	Style::setStyle(motorRPMLabel, style::properties::label::subtle);
 	acquisitionMotorRPMLineEdit = new QLineEdit(QString::number(motor_rpm), motorRPMWidget);
 	connectLineEditToRPM(acquisitionMotorRPMLineEdit, motor_rpm);
 	motorRPMLayout->addWidget(motorRPMLabel);
@@ -334,6 +332,7 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 	currentPositionLayout->setMargin(0);
 	currentPositionLayout->setSpacing(0);
 	QLabel *currentPositionLabel = new QLabel("Current Position", currentPositionWidget);
+	Style::setStyle(currentPositionLabel, style::properties::label::subtle);
 	acquisitionMotorCurrentPositionLineEdit = new QLineEdit("--.--", currentPositionWidget);
 	acquisitionMotorCurrentPositionLineEdit->setReadOnly(true);
 	connectLineEditToDouble(acquisitionMotorCurrentPositionLineEdit, current_pos);
@@ -346,6 +345,7 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 	targetPositionLayout->setMargin(0);
 	targetPositionLayout->setSpacing(0);
 	QLabel *targetPositionLabel = new QLabel("Target Position", targetPositionWidget);
+	Style::setStyle(targetPositionLabel, style::properties::label::subtle);
 	motorTargetPositionLineEdit = new QLineEdit(QString::number(target_pos), targetPositionWidget);
 	connectLineEditToNumberWrite(motorTargetPositionLineEdit, target_pos,
 				     ADMTController::MotorAttribute::TARGET_POS);
@@ -358,6 +358,7 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 	motorDirectionLayout->setMargin(0);
 	motorDirectionLayout->setSpacing(0);
 	QLabel *motorDirectionLabel = new QLabel("Rotation Direction", motorDirectionWidget);
+	Style::setStyle(motorDirectionLabel, style::properties::label::subtle);
 	acquisitionMotorDirectionSwitch = new CustomSwitch("CW", "CCW", motorControlSectionWidget);
 	acquisitionMotorDirectionSwitch->setChecked(isMotorRotationClockwise);
 	connect(acquisitionMotorDirectionSwitch, &CustomSwitch::toggled, this,
@@ -569,8 +570,8 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 	graphUpdateIntervalWidget->setLayout(graphUpdateIntervalLayout);
 	graphUpdateIntervalLayout->setMargin(0);
 	graphUpdateIntervalLayout->setSpacing(0);
-	QLabel *graphUpdateIntervalLabel = new QLabel(graphUpdateIntervalWidget);
-	graphUpdateIntervalLabel->setText("Graph Update Interval (ms)");
+	QLabel *graphUpdateIntervalLabel = new QLabel("Graph Update Interval (ms)", graphUpdateIntervalWidget);
+	Style::setStyle(graphUpdateIntervalLabel, style::properties::label::subtle);
 	graphUpdateIntervalLineEdit = new QLineEdit(graphUpdateIntervalWidget);
 	graphUpdateIntervalLineEdit->setText(QString::number(acquisitionGraphSampleRate));
 	connectLineEditToNumber(graphUpdateIntervalLineEdit, acquisitionGraphSampleRate, 1, 5000);
@@ -584,6 +585,7 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 	displayLengthLayout->setMargin(0);
 	displayLengthLayout->setSpacing(0);
 	QLabel *displayLengthLabel = new QLabel("Display Length", displayLengthWidget);
+	Style::setStyle(displayLengthLabel, style::properties::label::subtle);
 	displayLengthLineEdit = new QLineEdit(displayLengthWidget);
 	displayLengthLineEdit->setText(QString::number(acquisitionDisplayLength));
 	connectLineEditToNumber(displayLengthLineEdit, acquisitionDisplayLength, 1, 2048);
@@ -718,8 +720,8 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	Style::setStyle(calibrationDataGraphSectionWidget, style::properties::widget::basicComponent);
 	calibrationDataGraphTabWidget = new QTabWidget(calibrationDataGraphSectionWidget);
 	calibrationDataGraphTabWidget->tabBar()->setStyleSheet("QTabBar::tab { width: 176px; }");
-	calibrationDataGraphSectionWidget->contentLayout()->setContentsMargins(globalSpacingSmall, 1,
-									       globalSpacingSmall, globalSpacingSmall);
+	Style::setStyle(calibrationDataGraphTabWidget->tabBar(), style::properties::admt::tabBar, "rounded", true);
+	calibrationDataGraphSectionWidget->contentLayout()->setMargin(1);
 	calibrationDataGraphSectionWidget->contentLayout()->addWidget(calibrationDataGraphTabWidget);
 
 #pragma region Calibration Samples
@@ -772,7 +774,7 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	Style::setStyle(calibrationDataGraphChannelsWidget, style::properties::widget::basicBackground);
 	QHBoxLayout *calibrationDataGraphChannelsLayout = new QHBoxLayout(calibrationDataGraphChannelsWidget);
 	calibrationDataGraphChannelsWidget->setLayout(calibrationDataGraphChannelsLayout);
-	calibrationDataGraphChannelsLayout->setContentsMargins(globalSpacingSmall, 0, globalSpacingSmall,
+	calibrationDataGraphChannelsLayout->setContentsMargins(globalSpacingMedium, 0, globalSpacingMedium,
 							       globalSpacingSmall);
 	calibrationDataGraphChannelsLayout->setSpacing(globalSpacingMedium);
 
@@ -850,7 +852,7 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	Style::setStyle(postCalibrationDataGraphChannelsWidget, style::properties::widget::basicBackground);
 	QHBoxLayout *postCalibrationDataGraphChannelsLayout = new QHBoxLayout(postCalibrationDataGraphChannelsWidget);
 	postCalibrationDataGraphChannelsWidget->setLayout(postCalibrationDataGraphChannelsLayout);
-	postCalibrationDataGraphChannelsLayout->setContentsMargins(globalSpacingSmall, 0, globalSpacingSmall,
+	postCalibrationDataGraphChannelsLayout->setContentsMargins(globalSpacingMedium, 0, globalSpacingMedium,
 								   globalSpacingSmall);
 	postCalibrationDataGraphChannelsLayout->setSpacing(globalSpacingMedium);
 
@@ -880,8 +882,8 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	Style::setStyle(resultDataSectionWidget, style::properties::widget::basicComponent);
 	resultDataTabWidget = new QTabWidget(calibrationDataGraphWidget);
 	resultDataTabWidget->tabBar()->setStyleSheet("QTabBar::tab { width: 160px; }");
-	resultDataSectionWidget->contentLayout()->setContentsMargins(globalSpacingSmall, 1, globalSpacingSmall,
-								     globalSpacingSmall);
+	Style::setStyle(resultDataTabWidget->tabBar(), style::properties::admt::tabBar, "rounded", true);
+	resultDataSectionWidget->contentLayout()->setContentsMargins(1, 1, 1, globalSpacingSmall);
 	resultDataSectionWidget->contentLayout()->setSpacing(0);
 	resultDataSectionWidget->contentLayout()->addWidget(resultDataTabWidget);
 
@@ -934,7 +936,9 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	FFTAngleErrorLayout->setSpacing(0);
 
 	QLabel *FFTAngleErrorMagnitudeLabel = new QLabel("Magnitude", FFTAngleErrorWidget);
-	FFTAngleErrorMagnitudeLabel->setContentsMargins(globalSpacingSmall, globalSpacingSmall, globalSpacingSmall, 0);
+	Style::setStyle(FFTAngleErrorMagnitudeLabel, style::properties::label::menuSmall);
+	FFTAngleErrorMagnitudeLabel->setContentsMargins(globalSpacingMedium, globalSpacingSmall, globalSpacingSmall,
+							globalSpacingSmall);
 
 	FFTAngleErrorMagnitudePlotWidget = new PlotWidget();
 	FFTAngleErrorMagnitudePlotWidget->setContentsMargins(globalSpacingSmall, 0, globalSpacingSmall, 0);
@@ -968,7 +972,9 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	FFTAngleErrorMagnitudePlotWidget->replot();
 
 	QLabel *FFTAngleErrorPhaseLabel = new QLabel("Phase", FFTAngleErrorWidget);
-	FFTAngleErrorPhaseLabel->setContentsMargins(globalSpacingSmall, globalSpacingSmall, globalSpacingSmall, 0);
+	Style::setStyle(FFTAngleErrorPhaseLabel, style::properties::label::menuSmall);
+	FFTAngleErrorPhaseLabel->setContentsMargins(globalSpacingMedium, globalSpacingSmall, globalSpacingSmall,
+						    globalSpacingSmall);
 
 	FFTAngleErrorPhasePlotWidget = new PlotWidget();
 	FFTAngleErrorPhasePlotWidget->setContentsMargins(globalSpacingSmall, 0, globalSpacingSmall, 0);
@@ -1055,8 +1061,9 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	FFTCorrectedErrorLayout->setSpacing(0);
 
 	QLabel *FFTCorrectedErrorMagnitudeLabel = new QLabel("Magnitude", FFTCorrectedErrorWidget);
-	FFTCorrectedErrorMagnitudeLabel->setContentsMargins(globalSpacingSmall, globalSpacingSmall, globalSpacingSmall,
-							    0);
+	Style::setStyle(FFTCorrectedErrorMagnitudeLabel, style::properties::label::menuSmall);
+	FFTCorrectedErrorMagnitudeLabel->setContentsMargins(globalSpacingMedium, globalSpacingSmall, globalSpacingSmall,
+							    globalSpacingSmall);
 
 	FFTCorrectedErrorMagnitudePlotWidget = new PlotWidget();
 	FFTCorrectedErrorMagnitudePlotWidget->setContentsMargins(globalSpacingSmall, 0, globalSpacingSmall, 0);
@@ -1093,7 +1100,9 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	FFTCorrectedErrorMagnitudePlotWidget->replot();
 
 	QLabel *FFTCorrectedErrorPhaseLabel = new QLabel("Phase", FFTCorrectedErrorWidget);
-	FFTCorrectedErrorPhaseLabel->setContentsMargins(globalSpacingSmall, globalSpacingSmall, globalSpacingSmall, 0);
+	Style::setStyle(FFTCorrectedErrorPhaseLabel, style::properties::label::menuSmall);
+	FFTCorrectedErrorPhaseLabel->setContentsMargins(globalSpacingMedium, globalSpacingSmall, globalSpacingSmall,
+							globalSpacingSmall);
 
 	FFTCorrectedErrorPhasePlotWidget = new PlotWidget();
 	FFTCorrectedErrorPhasePlotWidget->setContentsMargins(globalSpacingSmall, 0, globalSpacingSmall, 0);
@@ -1245,21 +1254,12 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 #pragma region Calibration Coefficient Section Widget
 	MenuSectionWidget *calibrationCoeffSectionWidget = new MenuSectionWidget(calibrationSettingsWidget);
 	Style::setStyle(calibrationCoeffSectionWidget, style::properties::widget::basicComponent);
-	QLabel *calibrationDisplayFormatLabel = new QLabel(calibrationCoeffSectionWidget);
-	calibrationDisplayFormatLabel->setText("Display Format");
-	Style::setStyle(calibrationDisplayFormatLabel, style::properties::label::menuMedium);
-	QLabel *calibrationCalculatedCoeffLabel = new QLabel(calibrationCoeffSectionWidget);
-	calibrationCalculatedCoeffLabel->setText("Calculated Coefficients");
-	Style::setStyle(calibrationCalculatedCoeffLabel, style::properties::label::menuMedium);
 
-	calibrationDisplayFormatSwitch = new CustomSwitch();
-	calibrationDisplayFormatSwitch->setOffText("Hex");
-	calibrationDisplayFormatSwitch->setOnText("Angle");
-	calibrationDisplayFormatSwitch->setProperty("bigBtn", true);
+	QLabel *calibrationCalculatedCoeffLabel = new QLabel("Calculated Coefficients", calibrationCoeffSectionWidget);
+	Style::setStyle(calibrationCalculatedCoeffLabel, style::properties::label::menuMedium);
 
 	QWidget *calibrationCalculatedCoeffWidget = new QWidget(calibrationCoeffSectionWidget);
 	QGridLayout *calibrationCalculatedCoeffLayout = new QGridLayout(calibrationCalculatedCoeffWidget);
-
 	calibrationCalculatedCoeffWidget->setLayout(calibrationCalculatedCoeffLayout);
 	calibrationCalculatedCoeffLayout->setMargin(0);
 	calibrationCalculatedCoeffLayout->setVerticalSpacing(4);
@@ -1270,43 +1270,59 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	QLabel *calibrationH1Label = new QLabel("H1", calibrationCalculatedCoeffWidget);
 	calibrationH1MagLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
 	calibrationH1PhaseLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
-	ADMTStyleHelper::CalculatedCoeffWidgetRowStyle(h1RowContainer, h1RowLayout, calibrationH1Label,
-						       calibrationH1MagLabel, calibrationH1PhaseLabel);
+	configureCoeffRow(h1RowContainer, h1RowLayout, calibrationH1Label, calibrationH1MagLabel,
+			  calibrationH1PhaseLabel);
 
 	QWidget *h2RowContainer = new QWidget(calibrationCalculatedCoeffWidget);
 	QHBoxLayout *h2RowLayout = new QHBoxLayout(h2RowContainer);
 	QLabel *calibrationH2Label = new QLabel("H2", calibrationCalculatedCoeffWidget);
 	calibrationH2MagLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
 	calibrationH2PhaseLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
-	ADMTStyleHelper::CalculatedCoeffWidgetRowStyle(h2RowContainer, h2RowLayout, calibrationH2Label,
-						       calibrationH2MagLabel, calibrationH2PhaseLabel);
+	configureCoeffRow(h2RowContainer, h2RowLayout, calibrationH2Label, calibrationH2MagLabel,
+			  calibrationH2PhaseLabel);
 
 	QWidget *h3RowContainer = new QWidget(calibrationCalculatedCoeffWidget);
 	QHBoxLayout *h3RowLayout = new QHBoxLayout(h3RowContainer);
 	QLabel *calibrationH3Label = new QLabel("H3", calibrationCalculatedCoeffWidget);
 	calibrationH3MagLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
 	calibrationH3PhaseLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
-	ADMTStyleHelper::CalculatedCoeffWidgetRowStyle(h3RowContainer, h3RowLayout, calibrationH3Label,
-						       calibrationH3MagLabel, calibrationH3PhaseLabel);
+	configureCoeffRow(h3RowContainer, h3RowLayout, calibrationH3Label, calibrationH3MagLabel,
+			  calibrationH3PhaseLabel);
 
 	QWidget *h8RowContainer = new QWidget(calibrationCalculatedCoeffWidget);
 	QHBoxLayout *h8RowLayout = new QHBoxLayout(h8RowContainer);
 	QLabel *calibrationH8Label = new QLabel("H8", calibrationCalculatedCoeffWidget);
 	calibrationH8MagLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
 	calibrationH8PhaseLabel = new QLabel("0x----", calibrationCalculatedCoeffWidget);
-	ADMTStyleHelper::CalculatedCoeffWidgetRowStyle(h8RowContainer, h8RowLayout, calibrationH8Label,
-						       calibrationH8MagLabel, calibrationH8PhaseLabel);
+	configureCoeffRow(h8RowContainer, h8RowLayout, calibrationH8Label, calibrationH8MagLabel,
+			  calibrationH8PhaseLabel);
 
 	calibrationCalculatedCoeffLayout->addWidget(h1RowContainer, 0, 0);
 	calibrationCalculatedCoeffLayout->addWidget(h2RowContainer, 1, 0);
 	calibrationCalculatedCoeffLayout->addWidget(h3RowContainer, 2, 0);
 	calibrationCalculatedCoeffLayout->addWidget(h8RowContainer, 3, 0);
 
-	calibrationCoeffSectionWidget->contentLayout()->setSpacing(8);
-	calibrationCoeffSectionWidget->contentLayout()->addWidget(calibrationDisplayFormatLabel);
-	calibrationCoeffSectionWidget->contentLayout()->addWidget(calibrationDisplayFormatSwitch);
+	QWidget *calibrationDisplayFormatWidget = new QWidget(calibrationCoeffSectionWidget);
+	QVBoxLayout *calibrationDisplayFormatLayout = new QVBoxLayout(calibrationDisplayFormatWidget);
+	calibrationDisplayFormatWidget->setLayout(calibrationDisplayFormatLayout);
+	calibrationDisplayFormatLayout->setMargin(0);
+	calibrationDisplayFormatLayout->setSpacing(0);
+
+	QLabel *calibrationDisplayFormatLabel = new QLabel("Display Format", calibrationDisplayFormatWidget);
+	Style::setStyle(calibrationDisplayFormatLabel, style::properties::label::subtle);
+
+	calibrationDisplayFormatSwitch = new CustomSwitch();
+	calibrationDisplayFormatSwitch->setOffText("Hex");
+	calibrationDisplayFormatSwitch->setOnText("Angle");
+	calibrationDisplayFormatSwitch->setProperty("bigBtn", true);
+
+	calibrationDisplayFormatLayout->addWidget(calibrationDisplayFormatLabel);
+	calibrationDisplayFormatLayout->addWidget(calibrationDisplayFormatSwitch);
+
+	calibrationCoeffSectionWidget->contentLayout()->setSpacing(globalSpacingSmall);
 	calibrationCoeffSectionWidget->contentLayout()->addWidget(calibrationCalculatedCoeffLabel);
 	calibrationCoeffSectionWidget->contentLayout()->addWidget(calibrationCalculatedCoeffWidget);
+	calibrationCoeffSectionWidget->contentLayout()->addWidget(calibrationDisplayFormatWidget);
 #pragma endregion
 
 #pragma region Calibration Dataset Configuration
@@ -1332,6 +1348,7 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	calibrationCycleCountLayout->setMargin(0);
 	calibrationCycleCountLayout->setSpacing(0);
 	QLabel *calibrationCycleCountLabel = new QLabel("Cycle Count", calibrationCycleCountWidget);
+	Style::setStyle(calibrationCycleCountLabel, style::properties::label::subtle);
 	QLineEdit *calibrationCycleCountLineEdit = new QLineEdit(calibrationCycleCountWidget);
 	calibrationCycleCountLineEdit->setText(QString::number(cycleCount));
 	connectLineEditToNumber(calibrationCycleCountLineEdit, cycleCount, 1, 1000);
@@ -1344,6 +1361,7 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	calibrationSamplesPerCycleLayout->setMargin(0);
 	calibrationSamplesPerCycleLayout->setSpacing(0);
 	QLabel *calibrationSamplesPerCycleLabel = new QLabel("Samples Per Cycle", calibrationSamplesPerCycleWidget);
+	Style::setStyle(calibrationSamplesPerCycleLabel, style::properties::label::subtle);
 	QLineEdit *calibrationSamplesPerCycleLineEdit = new QLineEdit(calibrationSamplesPerCycleWidget);
 	calibrationSamplesPerCycleLineEdit->setText(QString::number(samplesPerCycle));
 	connectLineEditToNumber(calibrationSamplesPerCycleLineEdit, samplesPerCycle, 1, 5000);
@@ -1391,6 +1409,7 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	motorRPMLayout->setMargin(0);
 	motorRPMLayout->setSpacing(0);
 	QLabel *motorRPMLabel = new QLabel("Motor RPM", motorRPMWidget);
+	Style::setStyle(motorRPMLabel, style::properties::label::subtle);
 	calibrationMotorRPMLineEdit = new QLineEdit(QString::number(motor_rpm), motorRPMWidget);
 	connectLineEditToRPM(calibrationMotorRPMLineEdit, motor_rpm);
 	motorRPMLayout->addWidget(motorRPMLabel);
@@ -1402,6 +1421,7 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	currentPositionLayout->setMargin(0);
 	currentPositionLayout->setSpacing(0);
 	QLabel *currentPositionLabel = new QLabel("Current Position", currentPositionWidget);
+	Style::setStyle(currentPositionLabel, style::properties::label::subtle);
 	calibrationMotorCurrentPositionLineEdit = new QLineEdit("--.--", currentPositionWidget);
 	calibrationMotorCurrentPositionLineEdit->setReadOnly(true);
 	connectLineEditToDouble(calibrationMotorCurrentPositionLineEdit, current_pos);
@@ -1414,6 +1434,7 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	targetPositionLayout->setMargin(0);
 	targetPositionLayout->setSpacing(0);
 	QLabel *targetPositionLabel = new QLabel("Target Position", targetPositionWidget);
+	Style::setStyle(targetPositionLabel, style::properties::label::subtle);
 	motorTargetPositionLineEdit = new QLineEdit(QString::number(target_pos), targetPositionWidget);
 	connectLineEditToNumberWrite(motorTargetPositionLineEdit, target_pos,
 				     ADMTController::MotorAttribute::TARGET_POS);
@@ -1426,6 +1447,7 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	motorDirectionLayout->setMargin(0);
 	motorDirectionLayout->setSpacing(0);
 	QLabel *motorDirectionLabel = new QLabel("Rotation Direction", motorDirectionWidget);
+	Style::setStyle(motorDirectionLabel, style::properties::label::subtle);
 	calibrationMotorDirectionSwitch = new CustomSwitch("CW", "CCW", motorControlSectionWidget);
 	calibrationMotorDirectionSwitch->setChecked(isMotorRotationClockwise);
 	connect(calibrationMotorDirectionSwitch, &CustomSwitch::toggled, this,
@@ -1548,11 +1570,11 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 		toggleTabSwitching(true);
 		toggleCalibrationControls(true);
 
-		QString log = "Calibration Stream Timing: \n";
-		for(auto &value : m_admtController->streamBufferedIntervals) {
-			log += QString::number(value) + "\n";
-		}
-		Q_EMIT calibrationLogWriteSignal(log);
+		// QString log = "Calibration Stream Timing: \n";
+		// for(auto &value : m_admtController->streamBufferedIntervals) {
+		// 	log += QString::number(value) + "\n";
+		// }
+		// Q_EMIT calibrationLogWriteSignal(log);
 
 		if(isPostCalibration) {
 			graphPostDataList = m_admtController->streamBufferedValues;
@@ -2043,50 +2065,62 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 
 	DIGIO0ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO0ENToggleSwitch, "Output", "Input");
+	DIGIO0ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
 	connect(DIGIO0ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("DIGIO0EN", value); });
 
 	DIGIO0FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO0FNCToggleSwitch, "GPIO0", "BUSY");
+	DIGIO0FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
 	connect(DIGIO0FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("BUSY", value); });
 
 	DIGIO1ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO1ENToggleSwitch, "Output", "Input");
+	DIGIO1ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
 	connect(DIGIO1ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("DIGIO1EN", value); });
 
 	DIGIO1FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO1FNCToggleSwitch, "GPIO1", "CNV");
+	DIGIO1FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
 	connect(DIGIO1FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("CNV", value); });
 
 	DIGIO2ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO2ENToggleSwitch, "Output", "Input");
+	DIGIO2ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
 	connect(DIGIO2ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("DIGIO2EN", value); });
 
 	DIGIO2FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO2FNCToggleSwitch, "GPIO2", "SENT");
+	DIGIO2FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
 	connect(DIGIO2FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("SENT", value); });
 
 	DIGIO3ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO3ENToggleSwitch, "Output", "Input");
+	DIGIO3ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
 	connect(DIGIO3ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("DIGIO3EN", value); });
 
 	DIGIO3FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO3FNCToggleSwitch, "GPIO3", "ACALC");
+	DIGIO3FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
 	connect(DIGIO3FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("ACALC", value); });
 
 	DIGIO4ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO4ENToggleSwitch, "Output", "Input");
+	DIGIO4ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
 	connect(DIGIO4ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("DIGIO4EN", value); });
 
 	DIGIO4FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO4FNCToggleSwitch, "GPIO4", "FAULT");
+	DIGIO4FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
 	connect(DIGIO4FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("FAULT", value); });
 
 	DIGIO5ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO5ENToggleSwitch, "Output", "Input");
+	DIGIO5ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
 	connect(DIGIO5ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("DIGIO5EN", value); });
 
 	DIGIO5FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO5FNCToggleSwitch, "GPIO5", "BOOT");
+	DIGIO5FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
 	connect(DIGIO5FNCToggleSwitch, &CustomSwitch::clicked,
 		[this](bool value) { toggleDIGIOEN("BOOTLOAD", value); });
 
@@ -2186,31 +2220,50 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 		"MT Diagnostics", MenuCollapseSection::MenuHeaderCollapseStyle::MHCW_NONE,
 		MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, MTDiagnosticsSectionWidget);
 	MTDiagnosticsSectionWidget->contentLayout()->addWidget(MTDiagnosticsCollapseSection);
-	MTDiagnosticsCollapseSection->contentLayout()->setSpacing(8);
+	MTDiagnosticsCollapseSection->contentLayout()->setSpacing(globalSpacingSmall);
 
-	QLabel *AFEDIAG0Label = new QLabel("AFEDIAG0 (%)");
-	Style::setStyle(AFEDIAG0Label, style::properties::label::menuSmall);
-	QLabel *AFEDIAG1Label = new QLabel("AFEDIAG1 (%)");
-	Style::setStyle(AFEDIAG1Label, style::properties::label::menuSmall);
-	QLabel *AFEDIAG2Label = new QLabel("AFEDIAG2 (V)");
-	Style::setStyle(AFEDIAG2Label, style::properties::label::menuSmall);
-
-	AFEDIAG0LineEdit = new QLineEdit(MTDiagnosticsSectionWidget);
-	AFEDIAG1LineEdit = new QLineEdit(MTDiagnosticsSectionWidget);
-	AFEDIAG2LineEdit = new QLineEdit(MTDiagnosticsSectionWidget);
+	QWidget *AFEDIAG0Widget = new QWidget(MTDiagnosticsSectionWidget);
+	QVBoxLayout *AFEDIAG0Layout = new QVBoxLayout(AFEDIAG0Widget);
+	AFEDIAG0Widget->setLayout(AFEDIAG0Layout);
+	AFEDIAG0Layout->setMargin(0);
+	AFEDIAG0Layout->setSpacing(0);
+	QLabel *AFEDIAG0Label = new QLabel("AFEDIAG0 (%)", AFEDIAG0Widget);
+	Style::setStyle(AFEDIAG0Label, style::properties::label::subtle);
+	AFEDIAG0LineEdit = new QLineEdit(AFEDIAG0Widget);
 	AFEDIAG0LineEdit->setReadOnly(true);
-	AFEDIAG1LineEdit->setReadOnly(true);
-	AFEDIAG2LineEdit->setReadOnly(true);
 	connectLineEditToNumber(AFEDIAG0LineEdit, afeDiag0, "V");
-	connectLineEditToNumber(AFEDIAG1LineEdit, afeDiag1, "V");
-	connectLineEditToNumber(AFEDIAG2LineEdit, afeDiag2, "V");
+	AFEDIAG0Layout->addWidget(AFEDIAG0Label);
+	AFEDIAG0Layout->addWidget(AFEDIAG0LineEdit);
 
-	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG0Label);
-	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG0LineEdit);
-	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG1Label);
-	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG1LineEdit);
-	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG2Label);
-	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG2LineEdit);
+	QWidget *AFEDIAG1Widget = new QWidget(MTDiagnosticsSectionWidget);
+	QVBoxLayout *AFEDIAG1Layout = new QVBoxLayout(AFEDIAG1Widget);
+	AFEDIAG1Widget->setLayout(AFEDIAG1Layout);
+	AFEDIAG1Layout->setMargin(0);
+	AFEDIAG1Layout->setSpacing(0);
+	QLabel *AFEDIAG1Label = new QLabel("AFEDIAG1 (%)", AFEDIAG1Widget);
+	Style::setStyle(AFEDIAG1Label, style::properties::label::subtle);
+	AFEDIAG1LineEdit = new QLineEdit(AFEDIAG1Widget);
+	AFEDIAG1LineEdit->setReadOnly(true);
+	connectLineEditToNumber(AFEDIAG1LineEdit, afeDiag1, "V");
+	AFEDIAG1Layout->addWidget(AFEDIAG1Label);
+	AFEDIAG1Layout->addWidget(AFEDIAG1LineEdit);
+
+	QWidget *AFEDIAG2Widget = new QWidget(MTDiagnosticsSectionWidget);
+	QVBoxLayout *AFEDIAG2Layout = new QVBoxLayout(AFEDIAG2Widget);
+	AFEDIAG2Widget->setLayout(AFEDIAG2Layout);
+	AFEDIAG2Layout->setMargin(0);
+	AFEDIAG2Layout->setSpacing(0);
+	QLabel *AFEDIAG2Label = new QLabel("AFEDIAG2 (V)", AFEDIAG2Widget);
+	Style::setStyle(AFEDIAG2Label, style::properties::label::subtle);
+	AFEDIAG2LineEdit = new QLineEdit(AFEDIAG2Widget);
+	AFEDIAG2LineEdit->setReadOnly(true);
+	connectLineEditToNumber(AFEDIAG2LineEdit, afeDiag2, "V");
+	AFEDIAG2Layout->addWidget(AFEDIAG2Label);
+	AFEDIAG2Layout->addWidget(AFEDIAG2LineEdit);
+
+	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG0Widget);
+	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG1Widget);
+	MTDiagnosticsCollapseSection->contentLayout()->addWidget(AFEDIAG2Widget);
 
 	MTDiagnosticsLayout->addWidget(MTDiagnosticsSectionWidget);
 	MTDiagnosticsLayout->addWidget(MTDIAG1SectionWidget);
@@ -4801,6 +4854,24 @@ QCheckBox *HarmonicCalibration::createStatusLEDWidget(const QString &text, QVari
 	checkBox->setChecked(checked);
 	checkBox->setEnabled(false);
 	return checkBox;
+}
+
+void HarmonicCalibration::configureCoeffRow(QWidget *container, QHBoxLayout *layout, QLabel *hLabel, QLabel *hMagLabel,
+					    QLabel *hPhaseLabel)
+{
+	container->setLayout(layout);
+	container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	layout->setContentsMargins(12, 4, 12, 4);
+	hLabel->setProperty("hLabel", true);
+	hMagLabel->setProperty("hMagLabel", true);
+	hPhaseLabel->setProperty("hPhaseLabel", true);
+	hLabel->setFixedWidth(24);
+	hMagLabel->setContentsMargins(0, 0, 32, 0);
+	hPhaseLabel->setFixedWidth(72);
+	layout->addWidget(hLabel);
+	layout->addWidget(hMagLabel, 0, Qt::AlignRight);
+	layout->addWidget(hPhaseLabel);
+	Style::setStyle(container, style::properties::admt::coeffRowContainer, true, true);
 }
 #pragma endregion
 

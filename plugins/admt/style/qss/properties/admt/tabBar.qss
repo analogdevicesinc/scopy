@@ -3,6 +3,10 @@ QTabBar[&&property&&=true] {
     font-weight: 600;
 }
 
+QTabBar[&&property&&="rounded"] {
+    border-radius: &radius_1&;
+}
+
 QTabBar[&&property&&=true]::tab {
     height: 48px;
     background-color: transparent;
