@@ -75,7 +75,7 @@
 #include <tooltemplate.h>
 #include <widgets/registerblockwidget.h>
 
-enum SensorDataKey
+enum SensorData
 {
 	ABSANGLE,
 	ANGLE,
@@ -109,6 +109,8 @@ public Q_SLOTS:
 	void stop();
 	void start();
 	void restart();
+	void updateAcquisitionData(QMap<SensorData, double> sensorDataMap);
+	void updateAcquisitionGraph();
 	void calibrationLogWrite(QString message = "");
 	void commandLogWrite(QString message = "");
 	void updateFaultStatus(bool value);
@@ -119,6 +121,8 @@ public Q_SLOTS:
 	void updateMTDiagnosticsUI(quint16 registerValue);
 Q_SIGNALS:
 	void runningChanged(bool);
+	void acquisitionDataChanged(QMap<SensorData, double> sensorDataMap);
+	void acquisitionGraphChanged();
 	void canCalibrateChanged(bool);
 	void updateUtilityUI();
 	void calibrationLogWriteSignal(QString message);
@@ -149,12 +153,11 @@ private:
 	QButtonGroup *rightMenuButtonGroup;
 
 	QLineEdit *acquisitionMotorRPMLineEdit, *calibrationMotorRPMLineEdit, *motorTargetPositionLineEdit,
-		*graphUpdateIntervalLineEdit, *displayLengthLineEdit, *dataGraphSamplesLineEdit,
-		*tempGraphSamplesLineEdit, *acquisitionMotorCurrentPositionLineEdit, *calibrationH1MagLineEdit,
-		*calibrationH2MagLineEdit, *calibrationH3MagLineEdit, *calibrationH8MagLineEdit,
-		*calibrationH1PhaseLineEdit, *calibrationH2PhaseLineEdit, *calibrationH3PhaseLineEdit,
-		*calibrationH8PhaseLineEdit, *calibrationMotorCurrentPositionLineEdit, *AFEDIAG0LineEdit,
-		*AFEDIAG1LineEdit, *AFEDIAG2LineEdit;
+		*displayLengthLineEdit, *dataGraphSamplesLineEdit, *tempGraphSamplesLineEdit,
+		*acquisitionMotorCurrentPositionLineEdit, *calibrationH1MagLineEdit, *calibrationH2MagLineEdit,
+		*calibrationH3MagLineEdit, *calibrationH8MagLineEdit, *calibrationH1PhaseLineEdit,
+		*calibrationH2PhaseLineEdit, *calibrationH3PhaseLineEdit, *calibrationH8PhaseLineEdit,
+		*calibrationMotorCurrentPositionLineEdit, *AFEDIAG0LineEdit, *AFEDIAG1LineEdit, *AFEDIAG2LineEdit;
 
 	QLabel *rawAngleValueLabel, *rotationValueLabel, *angleValueLabel, *countValueLabel, *tempValueLabel,
 		*motorAmaxValueLabel, *motorRotateVmaxValueLabel, *motorDmaxValueLabel, *motorDisableValueLabel,
@@ -265,22 +268,19 @@ private:
 	void updateLineEditValues();
 	void startAcquisition();
 	void stopAcquisition();
+	void restartAcquisition();
 	void updateAcquisitionMotorRPM();
 	void updateAcquisitionMotorRotationDirection();
-	void getAcquisitionSamples(int sampleRate);
+	void getAcquisitionSamples(QMap<SensorData, bool> dataMap);
 	double getSensorDataAcquisitionValue(const ADMTController::SensorRegister &key);
-	void plotAcquisition(QVector<double> &list, PlotChannel *channel);
-	void prependAcquisitionData(const double &data, QVector<double> &list);
+	void plotAcquisition(QVector<double> list, PlotChannel *channel);
+	void appendAcquisitionData(const double &data, QVector<double> &list);
 	void resetAcquisitionYAxisScale();
-	void acquisitionPlotTask(int sampleRate);
-	void acquisitionUITask(int sampleRate);
-	void startAcquisitionUITask();
-	void stopAcquisitionUITask();
 	void updateSequenceWidget();
 	void updateCapturedDataCheckBoxes();
 	void applySequenceAndUpdate();
 	void updateGeneralSettingEnabled(bool value);
-	void connectCheckBoxToAcquisitionGraph(QCheckBox *widget, PlotChannel *channel, SensorDataKey key);
+	void connectCheckBoxToAcquisitionGraph(QCheckBox *widget, PlotChannel *channel, SensorData key);
 	void GMRReset();
 #pragma endregion
 
