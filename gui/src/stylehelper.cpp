@@ -338,11 +338,17 @@ void StyleHelper::NoBackgroundIconButton(QPushButton *w, QIcon icon, QString obj
 
 void StyleHelper::BrowseButton(QPushButton *btn, QString objectName)
 {
+	if(!objectName.isEmpty()) {
+		btn->setObjectName(objectName);
+	}
+	int btnSize = Style::getDimension(json::global::unit_2_5);
+	int iconSize = Style::getDimension(json::global::unit_2);
+	QString iconPath(":/gui/icons/choose_file.svg");
+	btn->setIcon(Style::getPixmap(iconPath, Style::getColor(json::theme::content_inverse)));
+	btn->setCheckable(false);
+	btn->setFixedSize(btnSize, btnSize);
+	btn->setIconSize(QSize(iconSize, iconSize));
 	Style::setStyle(btn, style::properties::button::basicButton);
-	btn->setText("...");
-
-	int size = Style::getDimension(json::global::unit_2_5);
-	btn->setFixedSize(size, size);
 }
 
 #include "moc_stylehelper.cpp"
