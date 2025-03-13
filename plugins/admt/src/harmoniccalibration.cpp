@@ -208,9 +208,11 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 		if(index == 2) // Utility Tab
 		{
 			readSequence();
-			toggleFaultRegisterMode(GENERALRegisterMap.at("Sequence Type"));
-			toggleMTDiagnostics(GENERALRegisterMap.at("Sequence Type"));
-			toggleUtilityTask(true);
+			if(GENERALRegisterMap.contains("Sequence Type")) {
+				toggleFaultRegisterMode(GENERALRegisterMap.at("Sequence Type"));
+				toggleMTDiagnostics(GENERALRegisterMap.at("Sequence Type"));
+				toggleUtilityTask(true);
+			}
 		} else {
 			toggleUtilityTask(false);
 		}
@@ -218,7 +220,9 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 		if(index == 3) // Registers Tab
 		{
 			readSequence();
-			toggleRegisters(GENERALRegisterMap.at("Sequence Type"));
+			if(GENERALRegisterMap.contains("Sequence Type")) {
+				toggleRegisters(GENERALRegisterMap.at("Sequence Type"));
+			}
 		}
 	});
 
@@ -518,27 +522,45 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 	Style::setStyle(temp1CheckBox, style::properties::admt::coloredCheckBox, "ch1");
 	connectCheckBoxToAcquisitionGraph(temp1CheckBox, acquisitionTmp1PlotChannel, TMP1);
 
-	if(GENERALRegisterMap.at("Sequence Type") == 0) // Sequence Mode 1
-	{
+	if(!GENERALRegisterMap.contains("Sequence Type")) {
 		acquisitionGraphChannelGridLayout->addWidget(angleCheckBox, 0, 0);
 		acquisitionGraphChannelGridLayout->addWidget(sineCheckBox, 0, 1);
 		acquisitionGraphChannelGridLayout->addWidget(cosineCheckBox, 0, 2);
 		acquisitionGraphChannelGridLayout->addWidget(radiusCheckBox, 0, 3);
 		acquisitionGraphChannelGridLayout->addWidget(absAngleCheckBox, 1, 0);
 		acquisitionGraphChannelGridLayout->addWidget(temp0CheckBox, 1, 1);
-	} else if(GENERALRegisterMap.at("Sequence Type") == 1) // Sequence Mode 2
-	{
-		acquisitionGraphChannelGridLayout->addWidget(angleCheckBox, 0, 0);
-		acquisitionGraphChannelGridLayout->addWidget(sineCheckBox, 0, 1);
-		acquisitionGraphChannelGridLayout->addWidget(cosineCheckBox, 0, 2);
-		acquisitionGraphChannelGridLayout->addWidget(angleSecCheckBox, 0, 3);
-		acquisitionGraphChannelGridLayout->addWidget(secAnglQCheckBox, 0, 4);
-		acquisitionGraphChannelGridLayout->addWidget(secAnglICheckBox, 1, 0);
-		acquisitionGraphChannelGridLayout->addWidget(radiusCheckBox, 1, 1);
-		acquisitionGraphChannelGridLayout->addWidget(absAngleCheckBox, 1, 2);
-		acquisitionGraphChannelGridLayout->addWidget(temp0CheckBox, 1, 3);
-		acquisitionGraphChannelGridLayout->addWidget(temp1CheckBox, 1, 4);
+		angleSecCheckBox->hide();
+		secAnglICheckBox->hide();
+		secAnglQCheckBox->hide();
+		temp1CheckBox->hide();
+	} else {
+		if(GENERALRegisterMap.at("Sequence Type") == 0) // Sequence Mode 1
+		{
+			acquisitionGraphChannelGridLayout->addWidget(angleCheckBox, 0, 0);
+			acquisitionGraphChannelGridLayout->addWidget(sineCheckBox, 0, 1);
+			acquisitionGraphChannelGridLayout->addWidget(cosineCheckBox, 0, 2);
+			acquisitionGraphChannelGridLayout->addWidget(radiusCheckBox, 0, 3);
+			acquisitionGraphChannelGridLayout->addWidget(absAngleCheckBox, 1, 0);
+			acquisitionGraphChannelGridLayout->addWidget(temp0CheckBox, 1, 1);
+			angleSecCheckBox->hide();
+			secAnglICheckBox->hide();
+			secAnglQCheckBox->hide();
+			temp1CheckBox->hide();
+		} else if(GENERALRegisterMap.at("Sequence Type") == 1) // Sequence Mode 2
+		{
+			acquisitionGraphChannelGridLayout->addWidget(angleCheckBox, 0, 0);
+			acquisitionGraphChannelGridLayout->addWidget(sineCheckBox, 0, 1);
+			acquisitionGraphChannelGridLayout->addWidget(cosineCheckBox, 0, 2);
+			acquisitionGraphChannelGridLayout->addWidget(angleSecCheckBox, 0, 3);
+			acquisitionGraphChannelGridLayout->addWidget(secAnglQCheckBox, 0, 4);
+			acquisitionGraphChannelGridLayout->addWidget(secAnglICheckBox, 1, 0);
+			acquisitionGraphChannelGridLayout->addWidget(radiusCheckBox, 1, 1);
+			acquisitionGraphChannelGridLayout->addWidget(absAngleCheckBox, 1, 2);
+			acquisitionGraphChannelGridLayout->addWidget(temp0CheckBox, 1, 3);
+			acquisitionGraphChannelGridLayout->addWidget(temp1CheckBox, 1, 4);
+		}
 	}
+
 #pragma endregion
 
 	acquisitionGraphSectionWidget->contentLayout()->addWidget(acquisitionGraphLabel);
@@ -646,7 +668,7 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 	acquisitionDeviceStatusWidget->contentLayout()->addWidget(acquisitionDeviceStatusSection);
 
 	acquisitionFaultRegisterLEDWidget =
-		createStatusLEDWidget("Fault Register", "status", false, acquisitionDeviceStatusSection);
+		createStatusLEDWidget("Fault Register", "status", deviceStatusFault, acquisitionDeviceStatusSection);
 	acquisitionDeviceStatusSection->contentLayout()->addWidget(acquisitionFaultRegisterLEDWidget);
 #pragma endregion
 
@@ -1146,7 +1168,7 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	calibrationDeviceStatusWidget->contentLayout()->addWidget(calibrationDeviceStatusSection);
 
 	calibrationFaultRegisterLEDWidget =
-		createStatusLEDWidget("Fault Register", "status", false, calibrationDeviceStatusSection);
+		createStatusLEDWidget("Fault Register", "status", deviceStatusFault, calibrationDeviceStatusSection);
 	calibrationDeviceStatusSection->contentLayout()->addWidget(calibrationFaultRegisterLEDWidget);
 #pragma endregion
 
@@ -2124,7 +2146,7 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 	DIGIOControlCollapseSection->contentLayout()->addWidget(DIGIOControlGridWidget);
 	DIGIOControlCollapseSection->contentLayout()->addWidget(DIGIOResetButton);
 
-	if(GENERALRegisterMap.at("Sequence Type") == 0) {
+	if(deviceType == "Industrial") {
 		DIGIO2FNCToggleSwitch->setVisible(false);
 		DIGIO4FNCToggleSwitch->setVisible(false);
 	}
@@ -2366,15 +2388,19 @@ void HarmonicCalibration::readDeviceProperties()
 
 	if(!success) {
 		StatusBarManager::pushMessage("Failed to read device properties");
+
+		// If read device property fails, assumes running emulator
+		deviceName = "ADMT4000";
+		deviceType = "Emulator";
 	}
 }
 
 void HarmonicCalibration::initializeADMT()
 {
-	bool success = resetDIGIO();
-	success = resetGENERAL();
+	bool resetDIGIOSuccess = resetDIGIO();
+	bool resetGENERALSuccess = resetGENERAL();
 
-	if(!success) {
+	if(!resetDIGIOSuccess || !resetGENERALSuccess) {
 		StatusBarManager::pushMessage("Failed initialize ADMT");
 	}
 }
@@ -2549,16 +2575,19 @@ void HarmonicCalibration::getDeviceFaultStatus(int sampleRate)
 				   m_admtController->getConfigurationRegister(
 					   ADMTController::ConfigurationRegister::FAULT),
 				   readValue) == 0) {
-				registerFault = m_admtController->checkRegisterFault(
-					static_cast<uint16_t>(*readValue),
-					GENERALRegisterMap.at("Sequence Type") == 0 ? true : false);
-				Q_EMIT updateFaultStatusSignal(registerFault);
-			} else {
+				if(GENERALRegisterMap.contains("Sequence Type")) {
+					registerFault = m_admtController->checkRegisterFault(
+						static_cast<uint16_t>(*readValue),
+						GENERALRegisterMap.at("Sequence Type") == 0 ? true : false);
+
+					Q_EMIT updateFaultStatusSignal(registerFault);
+				} else
+					Q_EMIT updateFaultStatusSignal(true);
+			} else
 				Q_EMIT updateFaultStatusSignal(true);
-			}
-		} else {
+
+		} else
 			Q_EMIT updateFaultStatusSignal(true);
-		}
 
 		QThread::msleep(sampleRate);
 	}
@@ -2622,20 +2651,23 @@ bool HarmonicCalibration::resetGENERAL()
 {
 	bool success = false;
 
-	uint32_t resetValue = 0x0000;
-	if(deviceRegisterMap.at("ASIL ID") == "ASIL QM") {
-		resetValue = 0x1231;
-	} // Industrial or ASIL QM
-	else if(deviceRegisterMap.at("ASIL ID") == "ASIL B") {
-		resetValue = 0x1200;
-	} // Automotive or ASIL B
+	if(deviceRegisterMap.contains("ASIL ID")) {
+		uint32_t resetValue = 0x0000;
+		if(deviceRegisterMap.at("ASIL ID") == "ASIL QM") {
+			resetValue = 0x1231;
+		} // Industrial or ASIL QM
+		else if(deviceRegisterMap.at("ASIL ID") == "ASIL B") {
+			resetValue = 0x1200;
+		} // Automotive or ASIL B
 
-	if(resetValue != 0x0000) {
-		if(m_admtController->writeDeviceRegistry(
-			   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-			   m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL),
-			   resetValue) == 0) {
-			success = true;
+		if(resetValue != 0x0000) {
+			if(m_admtController->writeDeviceRegistry(
+				   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+				   m_admtController->getConfigurationRegister(
+					   ADMTController::ConfigurationRegister::GENERAL),
+				   resetValue) == 0) {
+				success = true;
+			}
 		}
 	}
 
@@ -2968,6 +3000,12 @@ void HarmonicCalibration::updateAcquisitionGraph()
 
 void HarmonicCalibration::updateSequenceWidget()
 {
+	if(!GENERALRegisterMap.contains("Sequence Type") || !GENERALRegisterMap.contains("Conversion Type") ||
+	   !GENERALRegisterMap.contains("Convert Synchronization") || !GENERALRegisterMap.contains("Angle Filter") ||
+	   !GENERALRegisterMap.contains("8th Harmonic")) {
+		return;
+	}
+
 	if(GENERALRegisterMap.at("Sequence Type") == -1) {
 		sequenceTypeMenuCombo->combo()->setCurrentText("Reserved");
 	} else {
@@ -2991,6 +3029,11 @@ void HarmonicCalibration::updateSequenceWidget()
 
 void HarmonicCalibration::updateCapturedDataCheckBoxes()
 {
+	if(!GENERALRegisterMap.contains("Sequence Type")) {
+		StatusBarManager::pushMessage("Failed to read sequence settings");
+		return;
+	}
+
 	acquisitionGraphChannelGridLayout->removeWidget(angleCheckBox);
 	acquisitionGraphChannelGridLayout->removeWidget(sineCheckBox);
 	acquisitionGraphChannelGridLayout->removeWidget(cosineCheckBox);
@@ -3397,6 +3440,11 @@ int HarmonicCalibration::calculateContinuousCalibrationSampleRate(double motorRP
 void HarmonicCalibration::configureConversionType(int mode)
 {
 	readSequence();
+	if(!GENERALRegisterMap.contains("Conversion Type")) {
+		StatusBarManager::pushMessage("Failed to configure calibration conversion type");
+		return;
+	}
+
 	GENERALRegisterMap.at("Conversion Type") = mode;
 	writeSequence(GENERALRegisterMap);
 }
@@ -3404,6 +3452,11 @@ void HarmonicCalibration::configureConversionType(int mode)
 void HarmonicCalibration::configureCalibrationSequenceSettings()
 {
 	readSequence();
+	if(!GENERALRegisterMap.contains("8th Harmonic")) {
+		StatusBarManager::pushMessage("Failed to configure calibration sequence settings");
+		return;
+	}
+
 	GENERALRegisterMap.at("8th Harmonic") = 1; // User-supplied 8th Harmonic
 	writeSequence(GENERALRegisterMap);
 }
@@ -4621,6 +4674,11 @@ void HarmonicCalibration::clearCommandLog() { commandLogPlainTextEdit->clear(); 
 #pragma region Register Methods
 void HarmonicCalibration::readAllRegisters()
 {
+	if(!GENERALRegisterMap.contains("Sequence Type")) {
+		StatusBarManager::pushMessage("Failed to read all registers");
+		return;
+	}
+
 	readAllRegistersButton->setEnabled(false);
 	readAllRegistersButton->setText(QString("Reading Registers..."));
 	QTimer::singleShot(1000, this, [this]() {
@@ -4628,6 +4686,7 @@ void HarmonicCalibration::readAllRegisters()
 		readAllRegistersButton->setText(QString("Read All Registers"));
 	});
 
+	// TODO: Change to a more efficient way to read all registers
 	cnvPageRegisterBlock->readButton()->click();
 	digIORegisterBlock->readButton()->click();
 	faultRegisterBlock->readButton()->click();
