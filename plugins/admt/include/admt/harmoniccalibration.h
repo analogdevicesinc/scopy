@@ -111,6 +111,7 @@ public Q_SLOTS:
 	void restart();
 	void updateAcquisitionData(QMap<SensorData, double> sensorDataMap);
 	void updateAcquisitionGraph();
+	void updateCalibrationGraph();
 	void calibrationLogWrite(QString message = "");
 	void commandLogWrite(QString message = "");
 	void updateFaultStatus(bool value);
@@ -123,6 +124,7 @@ Q_SIGNALS:
 	void runningChanged(bool);
 	void acquisitionDataChanged(QMap<SensorData, double> sensorDataMap);
 	void acquisitionGraphChanged();
+	void calibrationGraphChanged();
 	void canCalibrateChanged(bool);
 	void updateUtilityUI();
 	void calibrationLogWriteSignal(QString message);
@@ -303,7 +305,6 @@ private:
 	int calculateContinuousCalibrationSampleRate(double motorRPS, int samplesPerCycle);
 	void configureConversionType(int mode);
 	void configureCalibrationSequenceSettings();
-	void getStreamedCalibrationSamples(int microSampleRate);
 	void startOneShotCalibration();
 	void postCalibrateData();
 	void resetAllCalibrationState();
