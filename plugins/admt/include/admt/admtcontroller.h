@@ -61,7 +61,6 @@ public:
 
 	double streamedValue = 0.0;
 	QVector<double> streamBufferedValues;
-	QVector<uint32_t> streamBufferedIntervals;
 
 	QElapsedTimer elapsedStreamTimer;
 
@@ -264,11 +263,9 @@ public:
 public Q_SLOTS:
 	void handleStreamData(double value);
 	void handleStreamBufferedData(const QVector<double> &value);
-	void handleStreamBufferedDataInterval(const QVector<uint32_t> &value);
 Q_SIGNALS:
 	void streamData(double value);
 	void streamBufferedData(const QVector<double> &value);
-	void streamBufferedDataInterval(const QVector<uint32_t> &value);
 
 private:
 	iio_context *m_iioCtx;
