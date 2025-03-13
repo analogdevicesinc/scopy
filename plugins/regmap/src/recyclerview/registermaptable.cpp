@@ -43,7 +43,6 @@ RegisterMapTable::RegisterMapTable(QMap<uint32_t, RegisterModel *> *registerMode
 	}
 
 	recyclerView = new RecyclerView(widgets, parent);
-	recyclerView->setMaxrowCount(10);
 
 	QObject::connect(recyclerView, &RecyclerView::requestWidget, this, &RegisterMapTable::generateWidget);
 	QObject::connect(this, &RegisterMapTable::widgetGenerated, recyclerView, &RecyclerView::addWidget);
