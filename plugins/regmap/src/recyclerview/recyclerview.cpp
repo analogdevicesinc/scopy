@@ -40,6 +40,7 @@ RecyclerView::RecyclerView(QList<int> *widgets, QWidget *parent)
 	: QWidget(parent)
 	, widgets(widgets)
 {
+	m_maxRowCount = DEFAULT_MAX_ROW_COUNT;
 	this->installEventFilter(this);
 	layout = new QHBoxLayout();
 	this->setLayout(layout);
@@ -153,7 +154,7 @@ void RecyclerView::scrollTo(int index)
 	slider->setValue(index);
 }
 
-void RecyclerView::setMaxrowCount(int maxRowCount) { this->maxRowCount = maxRowCount; }
+void RecyclerView::setMaxrowCount(int maxRowCount) { this->m_maxRowCount = maxRowCount; }
 
 void RecyclerView::scrollDown()
 {
@@ -199,10 +200,8 @@ void RecyclerView::populateMap()
 	}
 
 	// TODO find a way to autocompute max row count
-	// maxRowCount = 10;
-
 	int i = 0;
-	while(i < maxRowCount && mapIterator != widgets->end()) {
+	while(i < m_maxRowCount && mapIterator != widgets->end()) {
 		if(widgetMap->contains(*mapIterator)) {
 			widgetMap->value(*mapIterator)->show();
 		} else {

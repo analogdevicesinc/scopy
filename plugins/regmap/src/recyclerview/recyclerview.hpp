@@ -33,6 +33,9 @@ class QGridLayout;
 
 class QHBoxLayout;
 namespace scopy::regmap {
+
+#define DEFAULT_MAX_ROW_COUNT 15
+
 class RecyclerView : public QWidget
 {
 	Q_OBJECT
@@ -61,7 +64,7 @@ Q_SIGNALS:
 	void requestInit();
 
 private:
-	int maxRowCount;
+	int m_maxRowCount;
 	QSlider *slider;
 	VerticalScrollArea *m_scrollArea;
 	int m_scrollBarCurrentValue;
