@@ -51,8 +51,6 @@ ADMTController::ADMTController(QString uri, QObject *parent)
 {
 	connect(this, &ADMTController::streamData, this, &ADMTController::handleStreamData);
 	connect(this, &ADMTController::streamBufferedData, this, &ADMTController::handleStreamBufferedData);
-	connect(this, &ADMTController::streamBufferedDataInterval, this,
-		&ADMTController::handleStreamBufferedDataInterval);
 }
 
 ADMTController::~ADMTController() {}
@@ -1749,7 +1747,6 @@ void ADMTController::handleStreamData(double value) { streamedValue = value; }
 
 void ADMTController::bufferedStreamIO(int totalSamples, int targetSampleRate)
 {
-	streamBufferedIntervals.clear();
 	QVector<double> bufferedValues;
 	vector<uint16_t> rawBufferedValues;
 	sampleCount = 0;
@@ -1825,7 +1822,6 @@ void ADMTController::bufferedStreamIO(int totalSamples, int targetSampleRate)
 		while(elapsedNanoseconds < targetSampleRate) {
 			elapsedNanoseconds = elapsedStreamTimer.nsecsElapsed();
 		}
-		streamBufferedIntervals.append(elapsedNanoseconds);
 	}
 	iio_buffer_destroy(buffer);
 
@@ -1835,7 +1831,6 @@ void ADMTController::bufferedStreamIO(int totalSamples, int targetSampleRate)
 	}
 
 	Q_EMIT streamBufferedData(bufferedValues);
-	Q_EMIT streamBufferedDataInterval(streamBufferedIntervals);
 }
 
 void ADMTController::handleStreamBufferedData(const QVector<double> &value) { streamBufferedValues = value; }
@@ -1845,10 +1840,5 @@ bool ADMTController::checkVelocityReachedFlag(uint16_t registerValue)
 	// Bit 8 - 1: Signals that the target velocity is reached. This flag becomes
 	// set while VACTUAL and VMAX match.
 	return ((registerValue >> 8) & 0x01) ? true : false;
-}
-
-void ADMTController::handleStreamBufferedDataInterval(const QVector<uint32_t> &value)
-{
-	streamBufferedIntervals = value;
 }
 #include "moc_admtcontroller.cpp"

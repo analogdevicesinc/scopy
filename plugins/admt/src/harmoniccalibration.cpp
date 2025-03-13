@@ -29,17 +29,18 @@
 using namespace scopy;
 using namespace scopy::admt;
 
+// In milliseconds
 static int motorWaitVelocityReachedSampleRate = 50;
-
 static int calibrationUITimerRate = 500;
 static int utilityUITimerRate = 1000;
-
-static int continuousCalibrationSampleRate = 10000000; // In nanoseconds
 static int deviceStatusMonitorRate = 500;
 static int motorPositionMonitorRate = 500;
+static int readMotorDebounce = 50;
+
+// In nanoseconds
+static int continuousCalibrationSampleRate = 10000000;
 
 static int bufferSize = 1;
-
 static int cycleCount = 11;
 static int samplesPerCycle = 256;
 static int totalSamplesCount = cycleCount * samplesPerCycle;
@@ -60,7 +61,7 @@ static double motorAccelTime = 1;	 // In seconds
 
 static double motorFullStepPerRevolution = 360 / motorFullStepAngle;
 static double motorMicrostepPerRevolution = motorFullStepPerRevolution * microStepResolution;
-static double motorTimeUnit = static_cast<double>(1 << 24) / motorfCLK; // t = 2^24/16Mhz
+static double motorTimeUnit = static_cast<double>(1 << 24) / motorfCLK; // t = 2^24/motorfCLK
 
 static int acquisitionDisplayLength = 200;
 static QVector<double> acquisitionAngleList, acquisitionABSAngleList, acquisitionTmp0List, acquisitionTmp1List,
@@ -112,7 +113,6 @@ static bool isMotorVelocityCheck = false;
 static bool isMotorVelocityReached = false;
 static bool isResetMotorToZero = false;
 
-static int readMotorDebounce = 50; // In ms
 static int calibrationMode = 0;
 
 static int globalSpacingSmall = Style::getDimension(json::global::unit_0_5);
@@ -226,6 +226,8 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	connect(this, &HarmonicCalibration::acquisitionDataChanged, this, &HarmonicCalibration::updateAcquisitionData);
 	connect(this, &HarmonicCalibration::acquisitionGraphChanged, this,
 		&HarmonicCalibration::updateAcquisitionGraph);
+	connect(this, &HarmonicCalibration::calibrationGraphChanged, this,
+		&HarmonicCalibration::updateCalibrationGraph);
 	connect(this, &HarmonicCalibration::updateFaultStatusSignal, this, &HarmonicCalibration::updateFaultStatus);
 	connect(this, &HarmonicCalibration::motorPositionChanged, this, &HarmonicCalibration::updateMotorPosition);
 	connect(this, &HarmonicCalibration::calibrationLogWriteSignal, this, &HarmonicCalibration::calibrationLogWrite);
@@ -646,16 +648,6 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 	acquisitionFaultRegisterLEDWidget =
 		createStatusLEDWidget("Fault Register", "status", false, acquisitionDeviceStatusSection);
 	acquisitionDeviceStatusSection->contentLayout()->addWidget(acquisitionFaultRegisterLEDWidget);
-
-	// if(deviceType == "Automotive" && GENERALRegisterMap.at("Sequence Type") == 1) // Automotive & Sequence Mode 2
-	// {
-	// 	QCheckBox *acquisitionSPICRCLEDWidget =
-	// 		createStatusLEDWidget("SPI CRC", "status", false, acquisitionDeviceStatusSection);
-	// 	QCheckBox *acquisitionSPIFlagLEDWidget =
-	// 		createStatusLEDWidget("SPI Flag", "status", false, acquisitionDeviceStatusSection);
-	// 	acquisitionDeviceStatusSection->contentLayout()->addWidget(acquisitionSPICRCLEDWidget);
-	// 	acquisitionDeviceStatusSection->contentLayout()->addWidget(acquisitionSPIFlagLEDWidget);
-	// }
 #pragma endregion
 
 	generalSettingLayout->setSpacing(globalSpacingSmall);
@@ -1156,16 +1148,6 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	calibrationFaultRegisterLEDWidget =
 		createStatusLEDWidget("Fault Register", "status", false, calibrationDeviceStatusSection);
 	calibrationDeviceStatusSection->contentLayout()->addWidget(calibrationFaultRegisterLEDWidget);
-
-	// if(deviceType == "Automotive" && GENERALRegisterMap.at("Sequence Type") == 1) // Automotive & Sequence Mode 2
-	// {
-	// 	QCheckBox *calibrationSPICRCLEDWidget =
-	// 		createStatusLEDWidget("SPI CRC", "status", false, calibrationDeviceStatusSection);
-	// 	QCheckBox *calibrationSPIFlagLEDWidget =
-	// 		createStatusLEDWidget("SPI Flag", "status", false, calibrationDeviceStatusSection);
-	// 	calibrationDeviceStatusSection->contentLayout()->addWidget(calibrationSPICRCLEDWidget);
-	// 	calibrationDeviceStatusSection->contentLayout()->addWidget(calibrationSPIFlagLEDWidget);
-	// }
 #pragma endregion
 
 #pragma region Acquire Calibration Samples Button
@@ -1215,8 +1197,6 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	clearCalibrateDataButton = new QPushButton("Reset Calibration", calibrationSettingsGroupWidget);
 	StyleHelper::BasicButton(clearCalibrateDataButton);
 	QIcon resetIcon;
-	// resetIcon.addPixmap(Util::ChangeSVGColor(":/gui/icons/refresh.svg",
-	// "white", 1), QIcon::Normal, QIcon::Off);
 	resetIcon.addPixmap(Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)),
 			    QIcon::Normal, QIcon::Off);
 	clearCalibrateDataButton->setIcon(resetIcon);
@@ -1481,7 +1461,6 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	calibrationSettingsLayout->addWidget(calibrationDatasetConfigSectionWidget);
 	calibrationSettingsLayout->addWidget(motorControlSectionWidget);
 	calibrationSettingsLayout->addWidget(calibrationCoeffSectionWidget);
-	// calibrationSettingsLayout->addWidget(motorConfigurationSectionWidget);
 	calibrationSettingsLayout->addWidget(calibrationDataSectionWidget);
 	calibrationSettingsLayout->addWidget(logsSectionWidget);
 	calibrationSettingsLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -1555,12 +1534,6 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 		isStartMotor = false;
 		toggleTabSwitching(true);
 		toggleCalibrationControls(true);
-
-		// QString log = "Calibration Stream Timing: \n";
-		// for(auto &value : m_admtController->streamBufferedIntervals) {
-		// 	log += QString::number(value) + "\n";
-		// }
-		// Q_EMIT calibrationLogWriteSignal(log);
 
 		if(isPostCalibration) {
 			graphPostDataList = m_admtController->streamBufferedValues;
@@ -2598,6 +2571,7 @@ void HarmonicCalibration::requestDisconnect()
 	stopCalibrationUITask();
 	stopUtilityTask();
 
+	stopResetMotorToZero();
 	stopCalibrationStreamThread();
 
 	stopDeviceStatusMonitor();
@@ -3181,18 +3155,23 @@ void HarmonicCalibration::stopCalibrationUITask()
 	}
 }
 
+void HarmonicCalibration::updateCalibrationGraph()
+{
+	if(isStartMotor) {
+		if(isPostCalibration) {
+			postCalibrationRawDataPlotChannel->curve()->setSamples(graphPostDataList);
+			postCalibrationRawDataPlotWidget->replot();
+		} else {
+			calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
+			calibrationRawDataPlotWidget->replot();
+		}
+	}
+}
+
 void HarmonicCalibration::calibrationUITask(int sampleRate)
 {
 	while(isCalibrationTab) {
-		if(isStartMotor) {
-			if(isPostCalibration) {
-				postCalibrationRawDataPlotChannel->curve()->setSamples(graphPostDataList);
-				postCalibrationRawDataPlotWidget->replot();
-			} else {
-				calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
-				calibrationRawDataPlotWidget->replot();
-			}
-		}
+		Q_EMIT calibrationGraphChanged();
 
 		QThread::msleep(sampleRate);
 	}
@@ -3427,20 +3406,6 @@ void HarmonicCalibration::configureCalibrationSequenceSettings()
 	readSequence();
 	GENERALRegisterMap.at("8th Harmonic") = 1; // User-supplied 8th Harmonic
 	writeSequence(GENERALRegisterMap);
-}
-
-void HarmonicCalibration::getStreamedCalibrationSamples(int microSampleRate)
-{
-	int currentSamplesCount = graphDataList.size();
-	moveMotorContinuous();
-	while(isStartMotor && currentSamplesCount < totalSamplesCount) {
-		graphDataList.append(m_admtController->streamedValue);
-		// graphPostDataList.append(m_admtController->streamedValue);
-		currentSamplesCount = graphDataList.size();
-		// currentSamplesCount = graphDataPostList.size();
-
-		QThread::usleep(microSampleRate);
-	}
 }
 
 void HarmonicCalibration::startOneShotCalibration()
@@ -4085,10 +4050,6 @@ void HarmonicCalibration::canCalibrate(bool value) { calibrateDataButton->setEna
 
 void HarmonicCalibration::toggleCalibrationControls(bool value)
 {
-	// motorMaxVelocitySpinBox->setEnabled(value);
-	// motorAccelTimeSpinBox->setEnabled(value);
-	// motorMaxDisplacementSpinBox->setEnabled(value);
-	// m_calibrationMotorRampModeMenuCombo->setEnabled(value);
 	motorTargetPositionLineEdit->setEnabled(value);
 	calibrationModeMenuCombo->setEnabled(value);
 }
