@@ -1681,10 +1681,10 @@ ToolTemplate *HarmonicCalibration::createRegistersWidget()
 		m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::ANGLECK),
 		m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::ANGLECK),
 		RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
-	eccDcdeRegisterBlock = new RegisterBlockWidget(
-		"ECCDCDE", "Error Correction Codes",
-		m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::ECCDCDE),
-		m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::ECCDCDE),
+	eccCdeRegisterBlock = new RegisterBlockWidget(
+		"ECCCDE", "Error Correction Codes",
+		m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::ECCCDE),
+		m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::ECCCDE),
 		RegisterBlockWidget::ACCESS_PERMISSION::READWRITE, registerWidget);
 	eccDisRegisterBlock = new RegisterBlockWidget(
 		"ECCDIS", "Error Correction Code disable",
@@ -1824,7 +1824,7 @@ ToolTemplate *HarmonicCalibration::createRegistersWidget()
 	registerConfigurationGridLayout->addWidget(faultRegisterBlock, 0, 2);
 	registerConfigurationGridLayout->addWidget(generalRegisterBlock, 0, 3);
 	registerConfigurationGridLayout->addWidget(digIOEnRegisterBlock, 0, 4);
-	registerConfigurationGridLayout->addWidget(eccDcdeRegisterBlock, 1, 0);
+	registerConfigurationGridLayout->addWidget(eccCdeRegisterBlock, 1, 0);
 	registerConfigurationGridLayout->addWidget(eccDisRegisterBlock, 1, 1);
 	registerConfigurationGridLayout->addWidget(angleCkRegisterBlock, 1, 2);
 
@@ -1906,7 +1906,7 @@ ToolTemplate *HarmonicCalibration::createRegistersWidget()
 	connectRegisterBlockToRegistry(generalRegisterBlock);
 	connectRegisterBlockToRegistry(digIOEnRegisterBlock);
 	connectRegisterBlockToRegistry(angleCkRegisterBlock);
-	connectRegisterBlockToRegistry(eccDcdeRegisterBlock);
+	connectRegisterBlockToRegistry(eccCdeRegisterBlock);
 	connectRegisterBlockToRegistry(eccDisRegisterBlock);
 
 	connectRegisterBlockToRegistry(absAngleRegisterBlock);
@@ -2047,70 +2047,109 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 	DIGIO0ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO0ENToggleSwitch, "Output", "Input");
 	DIGIO0ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO0ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("DIGIO0EN", value); });
+	connect(DIGIO0ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+		if(!toggleDIGIOEN("DIGIO0EN", value))
+			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "Output" : "Input"));
+	});
 
 	DIGIO0FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO0FNCToggleSwitch, "GPIO0", "BUSY");
 	DIGIO0FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO0FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("BUSY", value); });
+	connect(DIGIO0FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+		if(!toggleDIGIOEN("BUSY", value))
+			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "GPIO0" : "BUSY"));
+	});
 
 	DIGIO1ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO1ENToggleSwitch, "Output", "Input");
 	DIGIO1ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO1ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("DIGIO1EN", value); });
+	connect(DIGIO1ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+		if(!toggleDIGIOEN("DIGIO1EN", value))
+			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "Output" : "Input"));
+	});
 
 	DIGIO1FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO1FNCToggleSwitch, "GPIO1", "CNV");
 	DIGIO1FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO1FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("CNV", value); });
+	connect(DIGIO1FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+		if(!toggleDIGIOEN("CNV", value))
+			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "GPIO1" : "CNV"));
+	});
 
 	DIGIO2ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO2ENToggleSwitch, "Output", "Input");
 	DIGIO2ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO2ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("DIGIO2EN", value); });
+	connect(DIGIO2ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+		if(!toggleDIGIOEN("DIGIO2EN", value))
+			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "Output" : "Input"));
+	});
 
 	DIGIO2FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO2FNCToggleSwitch, "GPIO2", "SENT");
 	DIGIO2FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO2FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("SENT", value); });
+	connect(DIGIO2FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+		if(!toggleDIGIOEN("SENT", value))
+			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "GPIO2" : "SENT"));
+	});
 
 	DIGIO3ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO3ENToggleSwitch, "Output", "Input");
 	DIGIO3ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO3ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("DIGIO3EN", value); });
+	connect(DIGIO3ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+		if(!toggleDIGIOEN("DIGIO3EN", value))
+			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "Output" : "Input"));
+	});
 
 	DIGIO3FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO3FNCToggleSwitch, "GPIO3", "ACALC");
 	DIGIO3FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO3FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("ACALC", value); });
+	connect(DIGIO3FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+		if(!toggleDIGIOEN("ACALC", value))
+			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "GPIO3" : "ACALC"));
+	});
 
 	DIGIO4ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO4ENToggleSwitch, "Output", "Input");
 	DIGIO4ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO4ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("DIGIO4EN", value); });
+	connect(DIGIO4ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+		if(!toggleDIGIOEN("DIGIO4EN", value))
+			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "Output" : "Input"));
+	});
 
 	DIGIO4FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO4FNCToggleSwitch, "GPIO4", "FAULT");
 	DIGIO4FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO4FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("FAULT", value); });
+	connect(DIGIO4FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+		if(!toggleDIGIOEN("FAULT", value))
+			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "GPIO4" : "FAULT"));
+	});
 
 	DIGIO5ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO5ENToggleSwitch, "Output", "Input");
 	DIGIO5ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO5ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) { toggleDIGIOEN("DIGIO5EN", value); });
+	connect(DIGIO5ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+		if(!toggleDIGIOEN("DIGIO5EN", value))
+			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "Output" : "Input"));
+	});
 
 	DIGIO5FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO5FNCToggleSwitch, "GPIO5", "BOOT");
 	DIGIO5FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO5FNCToggleSwitch, &CustomSwitch::clicked,
-		[this](bool value) { toggleDIGIOEN("BOOTLOAD", value); });
+	connect(DIGIO5FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+		if(!toggleDIGIOEN("BOOTLOAD", value))
+			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "GPIO5" : "BOOT"));
+	});
 
 	QPushButton *DIGIOResetButton = new QPushButton("Reset DIGIO", DIGIOControlGridWidget);
 	DIGIOResetButton->setFixedWidth(100);
 	StyleHelper::BasicButton(DIGIOResetButton);
 	connect(DIGIOResetButton, &QPushButton::clicked, [this] {
 		toggleUtilityTask(false);
-		resetDIGIO();
+		bool success = resetDIGIO();
+		if(success)
+			StatusBarManager::pushMessage("Successfully reset DIGIO");
+		else
+			StatusBarManager::pushMessage("Failed to reset DIGIO");
 		toggleUtilityTask(true);
 	});
 
@@ -2437,29 +2476,39 @@ bool HarmonicCalibration::writeSequence(const map<string, int> &settings)
 
 	bool success = false;
 
+	if(!disableECC(true)) {
+		return false;
+	}
+
 	if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-						generalRegisterAddress, generalRegValue) != -1) {
+						generalRegisterAddress, generalRegValue) != 0) {
+		return false;
+	}
 
-		uint32_t newGeneralRegValue =
-			m_admtController->setGeneralRegisterBitMapping(*generalRegValue, settings);
-		uint32_t generalRegisterPage =
-			m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL);
+	uint32_t newGeneralRegValue = m_admtController->setGeneralRegisterBitMapping(*generalRegValue, settings);
+	uint32_t generalRegisterPage =
+		m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL);
 
-		if(changeCNVPage(generalRegisterPage)) {
-			if(m_admtController->writeDeviceRegistry(
-				   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-				   generalRegisterAddress, newGeneralRegValue) != -1) {
-				if(readSequence()) {
-					if(settings.at("Convert Synchronization") ==
-						   GENERALRegisterMap.at("Convert Synchronization") &&
-					   settings.at("Angle Filter") == GENERALRegisterMap.at("Angle Filter") &&
-					   settings.at("8th Harmonic") == GENERALRegisterMap.at("8th Harmonic") &&
-					   settings.at("Sequence Type") == GENERALRegisterMap.at("Sequence Type") &&
-					   settings.at("Conversion Type") == GENERALRegisterMap.at("Conversion Type")) {
-						success = true;
-					}
-				}
-			}
+	if(!changeCNVPage(generalRegisterPage)) {
+		return false;
+	}
+
+	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+						 generalRegisterAddress, newGeneralRegValue) != 0) {
+		return false;
+	}
+
+	if(!disableECC(false)) {
+		return false;
+	}
+
+	if(readSequence()) {
+		if(settings.at("Convert Synchronization") == GENERALRegisterMap.at("Convert Synchronization") &&
+		   settings.at("Angle Filter") == GENERALRegisterMap.at("Angle Filter") &&
+		   settings.at("8th Harmonic") == GENERALRegisterMap.at("8th Harmonic") &&
+		   settings.at("Sequence Type") == GENERALRegisterMap.at("Sequence Type") &&
+		   settings.at("Conversion Type") == GENERALRegisterMap.at("Conversion Type")) {
+			success = true;
 		}
 	}
 
@@ -2651,14 +2700,17 @@ bool HarmonicCalibration::resetGENERAL()
 {
 	bool success = false;
 
+	if(!disableECC(true)) {
+		return false;
+	}
+
 	if(deviceRegisterMap.contains("ASIL ID")) {
 		uint32_t resetValue = 0x0000;
-		if(deviceRegisterMap.at("ASIL ID") == "ASIL QM") {
-			resetValue = 0x1231;
-		} // Industrial or ASIL QM
-		else if(deviceRegisterMap.at("ASIL ID") == "ASIL B") {
-			resetValue = 0x1200;
-		} // Automotive or ASIL B
+
+		if(deviceRegisterMap.at("ASIL ID") == "ASIL QM")
+			resetValue = 0x1230; // Industrial or ASIL QM
+		else if(deviceRegisterMap.at("ASIL ID") == "ASIL B")
+			resetValue = 0x1200; // Automotive or ASIL B
 
 		if(resetValue != 0x0000) {
 			if(m_admtController->writeDeviceRegistry(
@@ -2669,6 +2721,10 @@ bool HarmonicCalibration::resetGENERAL()
 				success = true;
 			}
 		}
+	}
+
+	if(!disableECC(false)) {
+		return false;
 	}
 
 	return success;
@@ -3699,103 +3755,126 @@ void HarmonicCalibration::populateCorrectedAngleErrorGraphs()
 	resultDataTabWidget->setCurrentIndex(2); // Set tab to Angle Error
 }
 
-void HarmonicCalibration::clearHarmonicRegisters()
+bool HarmonicCalibration::clearHarmonicRegisters()
 {
 	bool success = false;
+
 	uint32_t value = 0x0;
 	uint32_t harmonicCNVPage = m_admtController->getHarmonicPage(ADMTController::HarmonicRegister::H1MAG);
-	if(changeCNVPage(harmonicCNVPage)) {
-		success = m_admtController->writeDeviceRegistry(
-				  m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-				  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG),
-				  value) == 0
-			? true
-			: false;
-		success = m_admtController->writeDeviceRegistry(
-				  m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-				  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH),
-				  value) == 0
-			? true
-			: false;
-		success = m_admtController->writeDeviceRegistry(
-				  m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-				  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG),
-				  value) == 0
-			? true
-			: false;
-		success = m_admtController->writeDeviceRegistry(
-				  m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-				  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH),
-				  value) == 0
-			? true
-			: false;
-		success = m_admtController->writeDeviceRegistry(
-				  m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-				  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG),
-				  value) == 0
-			? true
-			: false;
-		success = m_admtController->writeDeviceRegistry(
-				  m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-				  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH),
-				  value) == 0
-			? true
-			: false;
-		success = m_admtController->writeDeviceRegistry(
-				  m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-				  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG),
-				  value) == 0
-			? true
-			: false;
-		success = m_admtController->writeDeviceRegistry(
-				  m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-				  m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH),
-				  value) == 0
-			? true
-			: false;
-	}
+
+	if(!disableECC(true))
+		return false;
+
+	if(!changeCNVPage(harmonicCNVPage))
+		return false;
+
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), value) != 0)
+		return false;
+
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), value) != 0)
+		return false;
+
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG), value) != 0)
+		return false;
+
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH), value) != 0)
+		return false;
+
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG), value) != 0)
+		return false;
+
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH), value) != 0)
+		return false;
+
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), value) != 0)
+		return false;
+
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), value) != 0)
+		return false;
+
+	if(disableECC(false)) {
+		success = true;
+	} else
+		return false;
 
 	if(!success) {
-		calibrationLogWrite("Unable to clear Harmonic Registers!");
+		StatusBarManager::pushMessage("Unable to clear Harmonic Registers!");
 	}
+
+	return success;
 }
 
-void HarmonicCalibration::flashHarmonicValues()
+bool HarmonicCalibration::flashHarmonicValues()
 {
-	if(changeCNVPage(0x02)) {
-		m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-						      0x01, 0x02);
+	bool success = false;
 
-		m_admtController->writeDeviceRegistry(
-			m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-			m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), H1_MAG_HEX);
-		m_admtController->writeDeviceRegistry(
-			m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-			m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), H1_PHASE_HEX);
-		m_admtController->writeDeviceRegistry(
-			m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-			m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG), H2_MAG_HEX);
-		m_admtController->writeDeviceRegistry(
-			m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-			m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH), H2_PHASE_HEX);
-		m_admtController->writeDeviceRegistry(
-			m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-			m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG), H3_MAG_HEX);
-		m_admtController->writeDeviceRegistry(
-			m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-			m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH), H3_PHASE_HEX);
-		m_admtController->writeDeviceRegistry(
-			m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-			m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), H8_MAG_HEX);
-		m_admtController->writeDeviceRegistry(
-			m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-			m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), H8_PHASE_HEX);
+	if(!disableECC(true))
+		return false;
 
-		isCalculatedCoeff = true;
-		displayCalculatedCoeff();
-	} else {
-		calibrationLogWrite("Unabled to flash Harmonic Registers!");
-	}
+	if(!changeCNVPage(0x02))
+		return false;
+
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1MAG), H1_MAG_HEX) != 0)
+		return false;
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H1PH), H1_PHASE_HEX) != 0)
+		return false;
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2MAG), H2_MAG_HEX) != 0)
+		return false;
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H2PH), H2_PHASE_HEX) != 0)
+		return false;
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3MAG), H3_MAG_HEX) != 0)
+		return false;
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H3PH), H3_PHASE_HEX) != 0)
+		return false;
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8MAG), H8_MAG_HEX) != 0)
+		return false;
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), H8_PHASE_HEX) != 0)
+		return false;
+
+	isCalculatedCoeff = true;
+	displayCalculatedCoeff();
+
+	if(disableECC(true))
+		success = true;
+	else
+		return false;
+
+	if(!success)
+		StatusBarManager::pushMessage("Unable to flash Harmonic Registers!");
+
+	return success;
 }
 
 void HarmonicCalibration::calculateHarmonicValues()
@@ -4585,39 +4664,51 @@ void HarmonicCalibration::updateFaultRegisterUI(quint16 faultRegValue)
 	SequencerWatchdogStatusLED->setChecked(regmap.at("Sequencer Watchdog"));
 }
 
-void HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool value)
+bool HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool value)
 {
 	toggleUtilityTask(false);
+
+	bool success = false;
+
+	if(!disableECC(true))
+		return false;
 
 	uint32_t *DIGIOENRegisterValue = new uint32_t;
 	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
 
-	if(changeCNVPage(DIGIOENPage)) {
-		if(m_admtController->readDeviceRegistry(
-			   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-			   m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN),
-			   DIGIOENRegisterValue) != -1) {
-			map<string, bool> DIGIOSettings = m_admtController->getDIGIOENRegisterBitMapping(
-				static_cast<uint16_t>(*DIGIOENRegisterValue));
+	if(!changeCNVPage(DIGIOENPage))
+		return false;
 
-			DIGIOSettings.at(DIGIOENName) = value;
+	if(m_admtController->readDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN),
+		   DIGIOENRegisterValue) != 0)
+		return false;
 
-			uint16_t newRegisterValue = m_admtController->setDIGIOENRegisterBitMapping(
-				static_cast<uint16_t>(*DIGIOENRegisterValue), DIGIOSettings);
+	map<string, bool> DIGIOSettings =
+		m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));
 
-			if(changeCNVPage(DIGIOENPage)) {
-				if(m_admtController->writeDeviceRegistry(
-					   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-					   m_admtController->getConfigurationRegister(
-						   ADMTController::ConfigurationRegister::DIGIOEN),
-					   static_cast<uint32_t>(newRegisterValue)) != -1) {
-					updateDIGIOControlUI();
-				}
-			}
-		}
-	}
+	DIGIOSettings.at(DIGIOENName) = value;
+
+	uint16_t newRegisterValue = m_admtController->setDIGIOENRegisterBitMapping(
+		static_cast<uint16_t>(*DIGIOENRegisterValue), DIGIOSettings);
+
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN),
+		   static_cast<uint32_t>(newRegisterValue)) == 0) {
+		success = true;
+	} else
+		return false;
+
+	updateDIGIOControlUI();
+
+	if(!disableECC(false))
+		return false;
 
 	toggleUtilityTask(true);
+
+	return success;
 }
 
 void HarmonicCalibration::toggleMTDiagnostics(int mode)
@@ -4658,12 +4749,47 @@ void HarmonicCalibration::toggleFaultRegisterMode(int mode)
 
 bool HarmonicCalibration::resetDIGIO()
 {
-	return (m_admtController->writeDeviceRegistry(
-			m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-			m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN),
-			0x241b) == 0
-			? true
-			: false);
+	bool success = false;
+
+	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
+
+	if(!disableECC(true)) {
+		return false;
+	}
+
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN),
+		   0x241b) == 0) {
+		success = true;
+	}
+
+	if(!disableECC(false)) {
+		return false;
+	}
+
+	return success;
+}
+
+bool HarmonicCalibration::disableECC(bool disable)
+{
+	bool success = false;
+
+	uint32_t ECCDISRegValue = disable ? 0x4D54 : 0x0000;
+	uint32_t ECCDISCNVPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::ECCDIS);
+
+	if(!changeCNVPage(ECCDISCNVPage)) {
+		return success;
+	}
+
+	if(m_admtController->writeDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::ECCDIS),
+		   ECCDISRegValue) == 0) {
+		success = true;
+	}
+
+	return success;
 }
 
 void HarmonicCalibration::commandLogWrite(QString message) { commandLogPlainTextEdit->appendPlainText(message); }
@@ -4692,7 +4818,7 @@ void HarmonicCalibration::readAllRegisters()
 	faultRegisterBlock->readButton()->click();
 	generalRegisterBlock->readButton()->click();
 	digIOEnRegisterBlock->readButton()->click();
-	eccDcdeRegisterBlock->readButton()->click();
+	eccCdeRegisterBlock->readButton()->click();
 	eccDisRegisterBlock->readButton()->click();
 	absAngleRegisterBlock->readButton()->click();
 	angleRegisterBlock->readButton()->click();

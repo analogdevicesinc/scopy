@@ -227,7 +227,7 @@ private:
 		*DIGIO5FNCToggleSwitch, *DIGIOALLToggleSwitch;
 
 	RegisterBlockWidget *cnvPageRegisterBlock, *digIORegisterBlock, *faultRegisterBlock, *generalRegisterBlock,
-		*digIOEnRegisterBlock, *angleCkRegisterBlock, *eccDcdeRegisterBlock, *eccDisRegisterBlock,
+		*digIOEnRegisterBlock, *angleCkRegisterBlock, *eccCdeRegisterBlock, *eccDisRegisterBlock,
 		*absAngleRegisterBlock, *angleRegisterBlock, *angleSecRegisterBlock, *sineRegisterBlock,
 		*cosineRegisterBlock, *secAnglIRegisterBlock, *secAnglQRegisterBlock, *radiusRegisterBlock,
 		*diag1RegisterBlock, *diag2RegisterBlock, *tmp0RegisterBlock, *tmp1RegisterBlock, *cnvCntRegisterBlock,
@@ -311,8 +311,8 @@ private:
 	void computeSineCosineOfAngles(QVector<double> graphDataList);
 	void populateAngleErrorGraphs();
 	void populateCorrectedAngleErrorGraphs();
-	void clearHarmonicRegisters();
-	void flashHarmonicValues();
+	bool clearHarmonicRegisters();
+	bool flashHarmonicValues();
 	void calculateHarmonicValues();
 	void updateCalculatedCoeffAngle();
 	void updateCalculatedCoeffHex();
@@ -359,10 +359,11 @@ private:
 	void getDIAG2Register();
 	void getDIAG1Register();
 	void getFAULTRegister();
-	void toggleDIGIOEN(string DIGIOENName, bool value);
+	bool toggleDIGIOEN(string DIGIOENName, bool value);
 	void toggleMTDiagnostics(int mode);
 	void toggleFaultRegisterMode(int mode);
 	bool resetDIGIO();
+	bool disableECC(bool disable);
 	void clearCommandLog();
 #pragma endregion
 
