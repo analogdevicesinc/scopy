@@ -23,6 +23,7 @@
 #include "qtconcurrentrun.h"
 #include "style.h"
 #include "style_properties.h"
+#include "pluginbase/preferences.h"
 
 #include <stylehelper.h>
 
@@ -4055,10 +4056,12 @@ void HarmonicCalibration::calibrationLogWrite(QString message) { logsPlainTextEd
 
 void HarmonicCalibration::importCalibrationData()
 {
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Import"), "",
-							tr("Comma-separated values files (*.csv);;"
-							   "Tab-delimited values files (*.txt)"),
-							nullptr, QFileDialog::Options());
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
+	QString fileName = QFileDialog::getOpenFileName(
+		this, tr("Import"), "",
+		tr("Comma-separated values files (*.csv);;"
+		   "Tab-delimited values files (*.txt)"),
+		nullptr, (useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	FileManager fm("HarmonicCalibration");
 
@@ -4092,8 +4095,10 @@ void HarmonicCalibration::extractCalibrationData()
 
 	QString selectedFilter = filter[0];
 
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Export"), "", filter.join(";;"), &selectedFilter,
-							QFileDialog::Options());
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
+	QString fileName = QFileDialog::getSaveFileName(
+		this, tr("Export"), "", filter.join(";;"), &selectedFilter,
+		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	if(fileName.split(".").size() <= 1) {
 		QString ext = selectedFilter.split(".")[1].split(")")[0];
