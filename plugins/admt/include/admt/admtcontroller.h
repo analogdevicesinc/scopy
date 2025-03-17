@@ -268,6 +268,7 @@ Q_SIGNALS:
 	void streamBufferedData(const QVector<double> &value);
 
 private:
+	QWidget *m_page;
 	iio_context *m_iioCtx;
 	iio_buffer *m_iioBuffer;
 	Connection *m_conn;

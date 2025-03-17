@@ -44,7 +44,7 @@ private Q_SLOTS:
 };
 
 #define PLUGIN_LOCATION "../../plugins"
-#define FILENAME PLUGIN_LOCATION "/libscopy-admtplugin.so"
+#define FILENAME PLUGIN_LOCATION "/libscopy-admt.so"
 
 void TST_ADMTPlugin::fileExists()
 {
@@ -67,7 +67,9 @@ void TST_ADMTPlugin::className()
 void TST_ADMTPlugin::loaded()
 {
 	QPluginLoader qp(FILENAME, this);
+	qDebug() << qp.errorString();
 	qp.load();
+
 	QVERIFY(qp.isLoaded());
 }
 
