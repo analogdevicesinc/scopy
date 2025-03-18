@@ -20,6 +20,7 @@
  */
 
 #include "pluginrepository.h"
+#include "pkgmanager.h"
 
 #ifdef Q_OS_WINDOWS
 #include <windows.h>
@@ -53,6 +54,7 @@ void PluginRepository::init(QString location)
 	QDir loc(location);
 
 	QFileInfoList plugins = loc.entryInfoList(QDir::Files);
+	plugins.append(PkgManager::listFilesInfo(QStringList() << "plugins"));
 	QStringList pluginFiles;
 
 	for(const QFileInfo &p : plugins) {
