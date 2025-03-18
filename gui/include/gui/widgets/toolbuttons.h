@@ -114,6 +114,36 @@ public:
 	SyncBtn(QWidget *parent = nullptr);
 };
 
+class SCOPY_GUI_EXPORT InstallerBtn : public QPushButton
+{
+	Q_OBJECT
+public:
+	InstallerBtn(const QString &iconPath, QWidget *parent = nullptr);
+
+	virtual bool eventFilter(QObject *watched, QEvent *event);
+
+	void setFinished(bool finished);
+
+protected:
+	QString m_iconPath;
+};
+
+class SCOPY_GUI_EXPORT InstallBtn : public InstallerBtn
+{
+	Q_OBJECT
+public:
+	InstallBtn(QWidget *parent = nullptr);
+	void setInstalled(bool installed);
+};
+
+class SCOPY_GUI_EXPORT UninstallBtn : public InstallerBtn
+{
+	Q_OBJECT
+public:
+	UninstallBtn(QWidget *parent = nullptr);
+	void setUninstalled(bool uninstalled);
+};
+
 } // namespace scopy
 
 #endif
