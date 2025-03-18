@@ -52,7 +52,8 @@ public:
 	{
 		MHW_BASEWIDGET,
 		MHW_COMPOSITEWIDGET,
-		MHW_TOOLMENUWIDGET
+		MHW_TOOLMENUWIDGET,
+		MHW_INFOWIDGET
 	} MenuHeaderWidgetType;
 
 	MenuCollapseSection(QString title, MenuCollapseSection::MenuHeaderCollapseStyle style = MHCW_ARROW,
