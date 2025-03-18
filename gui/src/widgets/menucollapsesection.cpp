@@ -25,6 +25,7 @@
 #include <widgets/menucollapsesection.h>
 #include <QLoggingCategory>
 #include <compositeheaderwidget.h>
+#include <infoheaderwidget.h>
 
 Q_LOGGING_CATEGORY(CAT_MENU_COLLAPSE_SECTION, "MenuCollapseSection")
 
@@ -49,6 +50,11 @@ MenuCollapseHeader::MenuCollapseHeader(QString title, MenuCollapseSection::MenuH
 		break;
 	case MenuCollapseSection::MHW_COMPOSITEWIDGET:
 		m_headerWidget = new CompositeHeaderWidget(title, this);
+		break;
+	case MenuCollapseSection::MHW_INFOWIDGET:
+		m_headerWidget = new InfoHeaderWidget(title, this);
+		break;
+	default:
 		break;
 	}
 
