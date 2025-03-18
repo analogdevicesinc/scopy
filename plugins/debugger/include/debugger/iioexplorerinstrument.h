@@ -25,7 +25,7 @@
 #include "scopy-debugger_export.h"
 #include "iiomodel.h"
 #include "detailsview.h"
-#include "searchbar.h"
+#include <gui/widgets/searchbar.h>
 #include "iiosortfilterproxymodel.h"
 #include "watchlistview.h"
 #include "pluginbase/apiobject.h"
