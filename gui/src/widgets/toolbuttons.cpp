@@ -240,3 +240,72 @@ SyncBtn::SyncBtn(QWidget *parent)
 	setCheckable(true);
 	setIcon(icon1);
 }
+
+InstallerBtn::InstallerBtn(const QString &iconPath, QWidget *parent)
+	: QPushButton(parent)
+	, m_iconPath(iconPath)
+{
+	setIcon(Style::getPixmap(m_iconPath, Style::getColor(json::theme::interactive_primary_idle)));
+	setCheckable(false);
+	Style::setStyle(this, style::properties::button::borderButton);
+	installEventFilter(this);
+}
+
+bool InstallerBtn::eventFilter(QObject *watched, QEvent *event)
+{
+	QPushButton *button = qobject_cast<QPushButton *>(watched);
+	if(!button || !button->isEnabled()) {
+		return false;
+	}
+
+	if(event->type() == QEvent::Enter) {
+		setIcon(Style::getPixmap(m_iconPath, Style::getColor(json::theme::interactive_primary_hover)));
+		return true;
+	}
+
+	if(event->type() == QEvent::Leave) {
+		setIcon(Style::getPixmap(m_iconPath, Style::getColor(json::theme::interactive_primary_idle)));
+		return true;
+	}
+	return false;
+}
+
+void InstallerBtn::setFinished(bool finished)
+{
+	QIcon icon = finished ? QIcon()
+			      : Style::getPixmap(m_iconPath, Style::getColor(json::theme::interactive_primary_idle));
+	setIcon(icon);
+	setEnabled(!finished);
+}
+
+InstallBtn::InstallBtn(QWidget *parent)
+	: InstallerBtn(":/gui/icons/install-icon.svg", parent)
+{
+	setText("Install");
+}
+
+void InstallBtn::setInstalled(bool installed)
+{
+	if(installed) {
+		setText("Installed");
+	} else {
+		setText("Install");
+	}
+	setFinished(installed);
+}
+
+UninstallBtn::UninstallBtn(QWidget *parent)
+	: InstallerBtn(":/gui/icons/uninstall-icon.svg", parent)
+{
+	setText("Uninstall");
+}
+
+void UninstallBtn::setUninstalled(bool uninstalled)
+{
+	if(uninstalled) {
+		setText("Uninstalled");
+	} else {
+		setText("Uninstall");
+	}
+	setFinished(uninstalled);
+}
