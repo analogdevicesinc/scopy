@@ -299,7 +299,7 @@ build_libtinyiiod() {
 build_kddock () {
 	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
 	pushd $STAGING_AREA/KDDockWidgets
-	CURRENT_BUILD_CMAKE_OPTS=""
+	CURRENT_BUILD_CMAKE_OPTS="-DKDDockWidgets_FRONTENDS=qtwidgets -DKDDockWidgets_EXAMPLES=false -DKDDockWidgets_QT6=false"
 	build_with_cmake
 	sudo make install
 	popd
@@ -461,7 +461,7 @@ build_deps(){
 	build_qwt
 	build_libsigrokdecode
 	build_libtinyiiod
-	# build_kddock temporary disabled
+	build_kddock
 }
 
 run_workflow(){
