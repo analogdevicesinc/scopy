@@ -5,9 +5,11 @@
 #include <QWidget>
 #include <QComboBox>
 #include <QPushButton>
+#include <animationpushbutton.h>
+#include <toolbuttons.h>
 
 namespace scopy {
-class PkgItemWidget : public QWidget
+class PkgItemWidget : public QFrame
 {
 	Q_OBJECT
 public:
@@ -19,8 +21,10 @@ public:
 	QString zipPath() const;
 	void setZipPath(const QString &newZipPath);
 
-	void setUninstalled();
-	void setInstalled();
+	void setSingleVersion(bool en);
+	void installFinished(bool installed);
+	void uninstallFinished(bool uninstalled);
+	void setPreview(bool en);
 
 public Q_SLOTS:
 	void fillMetadata(QVariantMap metadata, bool installed = false);
@@ -30,12 +34,15 @@ Q_SIGNALS:
 	void uninstallClicked();
 
 private:
+	QWidget *createTitleW(QWidget *parent = nullptr);
+
 	QString m_zipPath;
 	QLabel *m_title;
 	QComboBox *m_versCb;
 	QLabel *m_description;
-	QPushButton *m_installBtn;
-	QPushButton *m_uninstallBtn;
+	InstallBtn *m_installBtn;
+	UninstallBtn *m_uninstallBtn;
+	QWidget *m_btnsW;
 	QVariantMap m_metadata;
 };
 } // namespace scopy

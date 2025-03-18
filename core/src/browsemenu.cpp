@@ -111,6 +111,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	QLabel *logo = createScopyLogo(m_content);
 
 	btnGroup->addButton(homeBtn);
+	btnGroup->addButton(pkgBtn);
 	btnGroup->addButton(preferencesBtn);
 	btnGroup->addButton(aboutBtn);
 

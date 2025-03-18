@@ -3,51 +3,39 @@
 #include <QJsonObject>
 #include <QVBoxLayout>
 #include <installpkgdialog.h>
-#include <pkginstaller.h>
-#include <pkgutil.h>
+#include <stylehelper.h>
 #include <common/scopyconfig.h>
 
 using namespace scopy;
 
 PkgItemWidget::PkgItemWidget(QWidget *parent)
-	: QWidget(parent)
+	: QFrame(parent)
 {
 	QVBoxLayout *lay = new QVBoxLayout(this);
-	lay->setMargin(0);
-
-	QWidget *titleW = new QWidget(this);
-	QHBoxLayout *titleLay = new QHBoxLayout(titleW);
-	titleLay->setMargin(0);
-	m_title = new QLabel(titleW);
-	Style::setStyle(m_title, style::properties::label::menuSmall);
-	m_versCb = new QComboBox(titleW);
-	m_versCb->setFixedWidth(60);
-	m_versCb->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-
-	titleLay->addWidget(m_title, Qt::AlignLeft);
-	titleLay->addWidget(m_versCb, Qt::AlignRight);
-
-	lay->addWidget(titleW);
+	QWidget *titleW = createTitleW(this);
 
 	m_description = new QLabel(this);
 	m_description->setWordWrap(true);
 
-	m_installBtn = new QPushButton("Install", this);
-	Style::setStyle(m_installBtn, style::properties::button::basicButton);
-	m_installBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	connect(m_installBtn, &QPushButton::pressed, this, &PkgItemWidget::installClicked);
+	m_btnsW = new QWidget(this);
+	QHBoxLayout *btnsLay = new QHBoxLayout(m_btnsW);
+	btnsLay->setMargin(0);
 
-	m_uninstallBtn = new QPushButton("Uninstall", this);
-	Style::setStyle(m_uninstallBtn, style::properties::button::basicButton);
-	m_uninstallBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	m_installBtn = new InstallBtn(this);
+	connect(m_installBtn, &QPushButton::clicked, this, &PkgItemWidget::installClicked);
+
+	m_uninstallBtn = new UninstallBtn(this);
 	m_uninstallBtn->setVisible(false);
-	connect(m_uninstallBtn, &QPushButton::pressed, this, &PkgItemWidget::uninstallClicked);
+	connect(m_uninstallBtn, &QPushButton::clicked, this, &PkgItemWidget::uninstallClicked);
+
+	btnsLay->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
+	btnsLay->addWidget(m_installBtn);
+	btnsLay->addWidget(m_uninstallBtn);
 
 	lay->addWidget(titleW);
 	lay->addWidget(m_description);
-	lay->addWidget(m_installBtn, Qt::AlignLeft);
-	lay->addWidget(m_uninstallBtn, Qt::AlignLeft);
 	lay->addItem(new QSpacerItem(0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding));
+	lay->addWidget(m_btnsW);
 }
 
 PkgItemWidget::~PkgItemWidget() {}
@@ -58,17 +46,7 @@ QString PkgItemWidget::zipPath() const { return m_zipPath; }
 
 void PkgItemWidget::setZipPath(const QString &newZipPath) { m_zipPath = newZipPath; }
 
-void PkgItemWidget::setUninstalled()
-{
-	m_uninstallBtn->setDisabled(true);
-	m_uninstallBtn->setText("Uninstalled");
-}
-
-void PkgItemWidget::setInstalled()
-{
-	m_installBtn->setDisabled(true);
-	m_installBtn->setText("Installled");
-}
+void PkgItemWidget::setSingleVersion(bool en) { m_versCb->setDisabled(en); }
 
 void PkgItemWidget::fillMetadata(QVariantMap metadata, bool installed)
 {
@@ -79,3 +57,35 @@ void PkgItemWidget::fillMetadata(QVariantMap metadata, bool installed)
 	m_installBtn->setVisible(!installed);
 	m_uninstallBtn->setVisible(installed);
 }
+
+QWidget *PkgItemWidget::createTitleW(QWidget *parent)
+{
+	QWidget *w = new QWidget(this);
+	w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	QHBoxLayout *lay = new QHBoxLayout(w);
+	lay->setMargin(0);
+
+	m_title = new QLabel(w);
+	Style::setStyle(m_title, style::properties::label::menuSmall);
+
+	m_versCb = new QComboBox(w);
+	m_versCb->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+	Style::setStyle(m_versCb, style::properties::checkbox::squareCB);
+
+	lay->addWidget(m_title, Qt::AlignLeft);
+	lay->addWidget(m_versCb, Qt::AlignRight);
+
+	return w;
+}
+
+void PkgItemWidget::installFinished(bool installed)
+{
+	m_installBtn->setDisabled(installed);
+	if(installed) {
+		m_installBtn->setText("Installled");
+	}
+}
+
+void PkgItemWidget::uninstallFinished(bool uninstalled) { m_uninstallBtn->setUninstalled(uninstalled); }
+
+void PkgItemWidget::setPreview(bool en) { m_btnsW->setVisible(!en); }

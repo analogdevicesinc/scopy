@@ -1,18 +1,17 @@
 #include "pkgwidget.h"
-#include "common/scopyconfig.h"
-
 #include <QCompleter>
 #include <QFileDialog>
 #include <QJsonObject>
 #include <application_restarter.h>
 #include <installpkgdialog.h>
-#include <pkginstaller.h>
 #include <pkgitemwidget.h>
-#include <pkgutil.h>
 #include <qgridlayout.h>
 #include <restartdialog.h>
 #include <style.h>
 #include <QSet>
+#include <pkgmanager.h>
+#include <pkgzipwidget.h>
+#include <pkggridwidget.h>
 
 using namespace scopy;
 
@@ -27,12 +26,12 @@ PkgWidget::PkgWidget(QWidget *parent)
 	QVBoxLayout *wLay = new QVBoxLayout(w);
 	wLay->setMargin(10);
 
-	initZipSection(w);
+	PkgZipWidget *zipWidget = new PkgZipWidget(w);
 
 	QWidget *pkgW = pkgSection(w);
-	initPkgList();
+	fillPkgSection(pkgW);
 
-	wLay->addWidget(m_zipSection, 0, Qt::AlignTop);
+	wLay->addWidget(zipWidget, 0, Qt::AlignTop);
 	wLay->addWidget(pkgW, 1, Qt::AlignTop);
 
 	QWidget *restartW = createRestartWidget(this);
@@ -41,68 +40,85 @@ PkgWidget::PkgWidget(QWidget *parent)
 	lay->addWidget(w);
 	lay->addWidget(restartW, Qt::AlignBottom);
 
-	connect(PkgInstaller::GetInstance(), &PkgInstaller::zipMetadata, this, &PkgWidget::onZipMetadata);
-	connect(PkgInstaller::GetInstance(), &PkgInstaller::pkgExists, this, &PkgWidget::showInstallDialog);
-	connect(PkgInstaller::GetInstance(), &PkgInstaller::pkgInstalled, this,
+	PkgManager *pkgManager = PkgManager::GetInstance();
+	connect(zipWidget, &PkgZipWidget::pkgPathSelected, pkgManager, &PkgManager::preview);
+	connect(zipWidget, &PkgZipWidget::installClicked, this, &PkgWidget::onInstall);
+	connect(pkgManager, &PkgManager::zipMetadata, zipWidget, &PkgZipWidget::onZipMetadata);
+
+	connect(pkgManager, &PkgManager::pkgExists, this, &PkgWidget::showInstallDialog);
+	connect(pkgManager, &PkgManager::pkgInstalled, this,
 		[this, restartW](bool restart) { restartW->setVisible(restart); });
-	connect(PkgInstaller::GetInstance(), &PkgInstaller::pkgUninstalled, this,
+	connect(pkgManager, &PkgManager::pkgUninstalled, this,
 		[this, restartW](bool restart) { restartW->setVisible(restart); });
+
+	// Must be deleted. Another method needs to be found to ensure that the event was triggered from zipWidget
+	// and not from somewhere else.
+	connect(pkgManager, &PkgManager::pkgInstalled, zipWidget, &PkgZipWidget::onInstallFinished);
 
 	Style::setBackgroundColor(w, json::theme::background_subtle);
 }
 
 PkgWidget::~PkgWidget() {}
 
-void PkgWidget::initZipSection(QWidget *parent)
+void PkgWidget::fillPkgSection(QWidget *parent)
 {
-	m_zipSection = new MenuSectionCollapseWidget("Inlcude ZIP packages", MenuCollapseSection::MHCW_NONE,
-						     MenuCollapseSection::MHW_BASEWIDGET, parent);
-	m_zipSection->contentLayout()->setSpacing(6);
-
-	QWidget *browseWidget = new QWidget(m_zipSection);
-	browseWidget->setLayout(new QHBoxLayout(browseWidget));
-	browseWidget->layout()->setMargin(0);
-
-	m_zipFileEdit = new MenuLineEdit(browseWidget);
-	m_zipFileEdit->edit()->setPlaceholderText("Select ZIP");
-	m_zipFileEdit->edit()->setReadOnly(true);
-	QPushButton *browseBtn = new QPushButton("...", browseWidget);
-	StyleHelper::BrowseButton(browseBtn);
-
-	browseWidget->layout()->addWidget(m_zipFileEdit);
-	browseWidget->layout()->addWidget(browseBtn);
-
-	connect(browseBtn, &QPushButton::clicked, this, [this]() { browseFile(); });
-
-	m_zipSection->add(new QLabel("Add a ZIP file containing the plugin you'd like to include"));
-	m_zipSection->add(browseWidget);
+	const QList<QVariantMap> pkgsMeta = PkgManager::getPkgsMeta();
+	for(const QVariantMap &meta : pkgsMeta) {
+		PkgItemWidget *pkgItem = new PkgItemWidget(parent);
+		pkgItem->fillMetadata(meta, true);
+		pkgItem->setSingleVersion(true);
+		Style::setStyle(pkgItem, style::properties::widget::border_interactive);
+		m_pkgGrid->addPkg(pkgItem);
+		connect(pkgItem, &PkgItemWidget::uninstallClicked, this, &PkgWidget::onUninstall);
+	}
 }
 
 QWidget *PkgWidget::pkgSection(QWidget *parent)
 {
+	QWidget *container = new QWidget(parent);
+	container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	container->setLayout(new QVBoxLayout(container));
+	container->layout()->setMargin(10);
+	Style::setStyle(container, style::properties::widget::border_interactive);
+	Style::setBackgroundColor(container, json::theme::background_primary);
+
 	MenuSectionCollapseWidget *pkgSection = new MenuSectionCollapseWidget(
-		"Packages", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, parent);
+		"Packages", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, container);
 	pkgSection->contentLayout()->setSpacing(6);
-	pkgSection->collapseSection()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	pkgSection->menuSection()->contentLayout()->setMargin(0);
+	pkgSection->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	QStringList packages = PkgUtil::getPkgsName();
+	QStringList packages = PkgManager::getInstalledPkgs();
+	m_searchBar = new SearchBar(QSet(packages.begin(), packages.end()), pkgSection);
 
-	QWidget *listW = pkgList(pkgSection);
-	listW->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	m_pkgGrid = new PkgGridWidget(pkgSection);
+	// The right margin is used to avoid the scroll bar overlapping with the packages.
+	QMargins rightMargin(0, 0, 2, 0);
+	m_pkgGrid->layout()->setContentsMargins(rightMargin);
+	QScrollArea *scrollArea = new QScrollArea(pkgSection);
+	scrollArea->setWidget(m_pkgGrid);
+	scrollArea->setWidgetResizable(true);
 
-	pkgSection->add(listW);
+	pkgSection->add(m_searchBar);
+	pkgSection->add(scrollArea);
 
-	return pkgSection;
+	container->layout()->addWidget(pkgSection);
+
+	connect(m_searchBar->getLineEdit(), &QLineEdit::textChanged, m_pkgGrid, &PkgGridWidget::searchPkg);
+
+	return container;
 }
 
 QWidget *PkgWidget::pkgList(QWidget *parent)
 {
 	QScrollArea *scroll = new QScrollArea(parent);
 	scroll->setWidgetResizable(true);
+	scroll->setMinimumHeight(300);
 
 	QWidget *wScroll = new QWidget(scroll);
 	m_layScroll = new QVBoxLayout(wScroll);
 	m_layScroll->setMargin(0);
+	m_layScroll->setSpacing(10);
 
 	m_scrollSpacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_layScroll->addItem(m_scrollSpacer);
@@ -112,93 +128,25 @@ QWidget *PkgWidget::pkgList(QWidget *parent)
 	return scroll;
 }
 
-void PkgWidget::onZipMetadata(QVariantMap metadata)
-{
-	QWidget *w = new QWidget(this);
-	QVBoxLayout *wLay = new QVBoxLayout(w);
-	wLay->setMargin(0);
-
-	QLineEdit *header = new QLineEdit("Package preview", w);
-	header->setEnabled(false);
-	header->setReadOnly(false);
-	StyleHelper::MenuCollapseHeaderLineEdit(header, "zipPreviewHeader");
-
-	PkgItemWidget *pkgItem = new PkgItemWidget(w);
-	pkgItem->fillMetadata(metadata);
-	pkgItem->setZipPath(m_zipFileEdit->edit()->text());
-
-	wLay->addWidget(header);
-	wLay->addWidget(pkgItem);
-
-	m_zipSection->add(w);
-	connect(pkgItem, &PkgItemWidget::installClicked, this, &PkgWidget::onInstall);
-	connect(this, &PkgWidget::pkgReinstalled, pkgItem, &PkgItemWidget::setInstalled);
-	connect(PkgInstaller::GetInstance(), &PkgInstaller::zipMetadata, w, &QWidget::deleteLater);
-}
-
-void PkgWidget::showInstallDialog(const QString &pkgName, const QString &zipPath)
+void PkgWidget::showInstallDialog(const QString &zipPath, const QString &pkgName)
 {
 	InstallPkgDialog *installDialog = new InstallPkgDialog(this);
 	installDialog->setMessage("A package with the name " + pkgName +
 				  " already exists. Are you sure you want to continue?");
 	connect(installDialog, &InstallPkgDialog::yesClicked, this, [this, pkgName, zipPath, installDialog] {
-		bool uninstalled = PkgInstaller::uninstall(pkgName, false);
+		bool uninstalled = PkgManager::uninstall(pkgName, false);
 		if(!uninstalled) {
 			return;
 		}
-		bool installed = PkgInstaller::install(zipPath);
-		if(installed) {
-			Q_EMIT pkgReinstalled();
-		}
+		bool installed = PkgManager::install(zipPath);
+		Q_EMIT pkgReinstalled(installed);
 		installDialog->deleteLater();
 	});
 	connect(installDialog, &InstallPkgDialog::noClicked, this, [installDialog] { installDialog->deleteLater(); });
 	QMetaObject::invokeMethod(installDialog, &InstallPkgDialog::showDialog, Qt::QueuedConnection);
 }
 
-void PkgWidget::initPkgList()
-{
-	QJsonObject obj = PkgUtil::readLocalRepository(scopy::config::pkgLocalRepo());
-	for(auto it = obj.begin(); it != obj.end(); ++it) {
-		QJsonObject pkgMetadata = it.value().toObject();
-
-		QWidget *container = new QWidget(this);
-		container->setLayout(new QVBoxLayout(container));
-		container->layout()->setContentsMargins(0, 10, 0, 10);
-		PkgItemWidget *pkgItem = new PkgItemWidget(container);
-		pkgItem->fillMetadata(pkgMetadata.toVariantMap(), true);
-		container->layout()->addWidget(pkgItem);
-
-		Style::setStyle(container, style::properties::widget::topBorder);
-		addPkgItem(container);
-		connect(pkgItem, &PkgItemWidget::uninstallClicked, this, &PkgWidget::onUninstall);
-	}
-}
-
-void PkgWidget::browseFile()
-{
-	QString zipPath = QFileDialog::getOpenFileName(this, tr("Open"), "", "");
-	m_zipFileEdit->edit()->setText(zipPath);
-	PkgInstaller::preview(zipPath);
-}
-
-void PkgWidget::addPkgItem(QWidget *pkgItem)
-{
-	int spacerIdx = m_layScroll->indexOf(m_scrollSpacer);
-	m_layScroll->insertWidget(spacerIdx, pkgItem);
-}
-
-void PkgWidget::onInstall()
-{
-	PkgItemWidget *pkgItem = dynamic_cast<PkgItemWidget *>(QObject::sender());
-	if(!pkgItem || pkgItem->zipPath().isEmpty()) {
-		return;
-	}
-	bool installed = PkgInstaller::install(pkgItem->zipPath());
-	if(installed) {
-		pkgItem->setInstalled();
-	}
-}
+void PkgWidget::onInstall(const QString &zipPath) { PkgManager::install(zipPath); }
 
 void PkgWidget::onUninstall()
 {
@@ -209,13 +157,14 @@ void PkgWidget::onUninstall()
 	InstallPkgDialog *uninstallDialog = new InstallPkgDialog(this);
 	uninstallDialog->setMessage("Are you sure you want to uninstall " + pkgItem->name() + "?");
 	connect(uninstallDialog, &InstallPkgDialog::yesClicked, this, [this, uninstallDialog, pkgItem]() {
-		bool uninstalled = PkgInstaller::uninstall(pkgItem->name());
-		if(uninstalled) {
-			pkgItem->setUninstalled();
-		}
+		bool uninstalled = PkgManager::uninstall(pkgItem->name());
+		pkgItem->uninstallFinished(uninstalled);
 		uninstallDialog->deleteLater();
 	});
-	connect(uninstallDialog, &InstallPkgDialog::noClicked, [=] { uninstallDialog->deleteLater(); });
+	connect(uninstallDialog, &InstallPkgDialog::noClicked, this, [this, uninstallDialog, pkgItem]() {
+		pkgItem->uninstallFinished(false);
+		uninstallDialog->deleteLater();
+	});
 	QMetaObject::invokeMethod(uninstallDialog, &InstallPkgDialog::showDialog, Qt::QueuedConnection);
 }
 

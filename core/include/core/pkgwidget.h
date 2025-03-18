@@ -7,6 +7,8 @@
 #include <menulineedit.h>
 #include <menusectionwidget.h>
 #include <scopy-core_export.h>
+#include <searchbar.h>
+#include <pkggridwidget.h>
 
 namespace scopy {
 
@@ -17,31 +19,26 @@ public:
 	PkgWidget(QWidget *parent = nullptr);
 	~PkgWidget();
 
-	void initZipSection(QWidget *parent = nullptr);
+	void fillPkgSection(QWidget *parent = nullptr);
 	QWidget *pkgSection(QWidget *parent = nullptr);
 	QWidget *pkgList(QWidget *parent = nullptr);
 
 public Q_SLOTS:
-	void onZipMetadata(QVariantMap metadata);
-	void showInstallDialog(const QString &pkgName, const QString &zipPath);
-
-private:
-	void initPkgList();
-	void browseFile();
-	void addPkgItem(QWidget *pkgItem);
+	void showInstallDialog(const QString &zipPath, const QString &pkgPath);
 
 private Q_SLOTS:
-	void onInstall();
+	void onInstall(const QString &zipPath);
 	void onUninstall();
 
 Q_SIGNALS:
-	void pkgReinstalled();
+	void pkgReinstalled(bool installed = true);
 
 private:
-	MenuSectionCollapseWidget *m_zipSection;
+	PkgGridWidget *m_pkgGrid;
 	QVBoxLayout *m_layScroll;
 	QSpacerItem *m_scrollSpacer;
-	MenuLineEdit *m_zipFileEdit;
+	SearchBar *m_searchBar;
+
 	QWidget *createRestartWidget(QWidget *parent);
 };
 
