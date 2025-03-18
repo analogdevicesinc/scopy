@@ -5,23 +5,25 @@
 #include <QObject>
 #include <kzip.h>
 
-#define DESCRIPTOR_FILE "MANIFEST.json"
+#define METADATA_FILE "MANIFEST.json"
+
 namespace scopy {
 class SCOPY_CORE_EXPORT PkgUtil
 {
 public:
-	static bool copyDir(const QString &source, const QString &destination);
-	static bool copyItem(const QString &src, const QString &dst);
-	static QJsonObject readLocalRepository(const QString &filePath);
-	static void updateLocalRepository(const QString &filePath, const QJsonObject &jsonObject);
-	static bool removeFile(const QString &path);
-	static QStringList extractZip(const QString &zipPath, const QString &destPath);
+	static bool removePkg(const QString &path);
+	static bool extractZip(const QString &zipPath, const QString &destPath);
 	static QJsonObject extractJsonMetadata(const QString &zipPath);
-	static QStringList getPkgsName();
+	static QJsonObject getMetadata(const QString &path);
+
+	static bool validatePkg(QJsonObject &metadata);
+
+	static QString checkPkgPath(const QString &path, const QString &pkgName);
 
 private:
-	static void getArchiveFiles(const KArchiveDirectory *dir, QStringList &fileList, const QString &destPath,
-				    const QString &prefix = "");
+	static QString validateArchiveEntry(const KZip &zip);
+
+	static const QStringList REQUIRED_FIELDS;
 };
 } // namespace scopy
 

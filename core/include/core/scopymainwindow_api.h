@@ -66,9 +66,11 @@ public:
 	Q_INVOKABLE bool saveSetup(QString fileName, QString path = QCoreApplication::applicationDirPath());
 
 	Q_INVOKABLE bool install(QString zipPath);
-	Q_INVOKABLE QStringList extractZip(QString zipPath, QString dest);
+	Q_INVOKABLE bool extractZip(QString zipPath, QString dest);
 	Q_INVOKABLE QVariantMap extractMetadata(QString zipPath);
 	Q_INVOKABLE bool uninstall(const QString &pkgName);
+
+	Q_INVOKABLE QStringList listFiles(const QString &category);
 
 private:
 	static bool sortByUUID(const QString &k1, const QString &k2);

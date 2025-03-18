@@ -4,6 +4,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLoggingCategory>
+#include <qjsonarray.h>
 
 #include <common/scopyconfig.h>
 
@@ -11,98 +12,12 @@ Q_LOGGING_CATEGORY(CAT_PKGUTIL, "PkgUtil")
 
 using namespace scopy;
 
-bool PkgUtil::copyDir(const QString &src, const QString &dst)
-{
-	QDir srcDir(src);
-	if(!srcDir.exists()) {
-		return false;
-	}
+const QStringList PkgUtil::REQUIRED_FIELDS{"name", "version", "license", "author", "scopy_compatibility", "category"};
 
-	QDir destDir(dst);
-	if(destDir.exists()) {
-		destDir.removeRecursively();
-	}
-	if(!destDir.mkpath(dst)) {
-		return false;
-	}
-
-	foreach(const QString &entry, srcDir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot)) {
-		QString srcPath = src + "/" + entry;
-		QString destPath = dst + "/" + entry;
-		QFileInfo srcInfo(srcPath);
-		if(srcInfo.isDir()) {
-			if(!copyDir(srcPath, destPath)) {
-				return false;
-			}
-		} else {
-			if(!QFile::copy(srcPath, destPath)) {
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
-bool PkgUtil::copyItem(const QString &src, const QString &dst)
-{
-	QFileInfo srcInfo(src);
-
-	if(!srcInfo.exists()) {
-		qWarning(CAT_PKGUTIL) << "Src does not exist:" << src;
-		return false;
-	}
-
-	if(srcInfo.isFile()) {
-		QFile dstFile(dst);
-		if(dstFile.exists()) {
-			dstFile.remove();
-		}
-		return QFile::copy(src, dst);
-	} else if(srcInfo.isDir()) {
-		return copyDir(src, dst);
-	}
-	return false;
-}
-
-QJsonObject PkgUtil::readLocalRepository(const QString &filePath)
-{
-	QFile file(filePath);
-	if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		qWarning(CAT_PKGUTIL) << "The local repo doesn't exist or cannot be oppened:" << filePath;
-		return {};
-	}
-
-	QByteArray jsonData = file.readAll();
-	file.close();
-
-	QJsonDocument doc = QJsonDocument::fromJson(jsonData);
-	if(doc.isNull()) {
-		qDebug(CAT_PKGUTIL) << "JSON document is null:" << filePath;
-	}
-
-	return doc.object();
-}
-
-void PkgUtil::updateLocalRepository(const QString &filePath, const QJsonObject &jsonObject)
-{
-	QFile file(filePath);
-	if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-		qWarning(CAT_PKGUTIL) << "Cannot open the local repo for writing:" << filePath;
-		return;
-	}
-
-	QJsonDocument doc(jsonObject);
-	file.write(doc.toJson());
-	file.close();
-}
-
-bool PkgUtil::removeFile(const QString &path)
+bool PkgUtil::removePkg(const QString &path)
 {
 	bool removed = false;
 	QFileInfo fInfo(path);
-	if(fInfo.isFile()) {
-		removed = QFile::remove(path);
-	}
 	if(fInfo.isDir()) {
 		QDir dir(path);
 		removed = dir.removeRecursively();
@@ -114,37 +29,25 @@ bool PkgUtil::removeFile(const QString &path)
 	return removed;
 }
 
-QStringList PkgUtil::extractZip(const QString &zipPath, const QString &destPath)
+bool PkgUtil::extractZip(const QString &zipPath, const QString &destPath)
 {
-	bool success = true;
-	QStringList files;
 	KZip zip(zipPath);
 	if(!zip.open(QIODevice::ReadOnly)) {
 		qWarning(CAT_PKGUTIL) << "Cannot open the zip file:" << zipPath;
-		return files;
+		return false;
 	}
-	QStringList fileList;
+	QString entryName = validateArchiveEntry(zip);
+	if(entryName.isEmpty()) {
+		return false;
+	}
+	QString extractedPath = destPath + QDir::separator() + entryName;
+	QDir d(extractedPath);
+	if(d.exists()) {
+		qWarning(CAT_PKGUTIL) << "A package with an identical name was discovered at:" << destPath;
+		return false;
+	}
 	const KArchiveDirectory *dir = zip.directory();
-	for(const QString &entry : dir->entries()) {
-		if(!dir->entry(entry)->isDirectory()) {
-			continue;
-		}
-		const KArchiveDirectory *dirToExtract = static_cast<const KArchiveDirectory *>(dir->entry(entry));
-		if(!dirToExtract) {
-			continue;
-		}
-		QString destDirPath = destPath + QDir::separator() + dirToExtract->name();
-		getArchiveFiles(dirToExtract, fileList, destDirPath);
-		if(fileList.isEmpty()) {
-			qWarning(CAT_PKGUTIL) << "Don't overwrite existing files!";
-			break;
-		}
-		success &= dirToExtract->copyTo(destDirPath);
-	}
-	if(!success) {
-		fileList.clear();
-	}
-	return fileList;
+	return dir->copyTo(destPath);
 }
 
 QJsonObject PkgUtil::extractJsonMetadata(const QString &zipPath)
@@ -154,51 +57,87 @@ QJsonObject PkgUtil::extractJsonMetadata(const QString &zipPath)
 		qWarning(CAT_PKGUTIL) << "Cannot open the zip file:" << zipPath;
 		return {};
 	}
-	const KArchiveFile *manifestFile = zip.directory()->file(DESCRIPTOR_FILE);
+	QString entryName = validateArchiveEntry(zip);
+	if(entryName.isEmpty()) {
+		return {};
+	}
+	const KArchiveDirectory *zipDir = static_cast<const KArchiveDirectory *>(zip.directory()->entry(entryName));
+	const KArchiveFile *manifestFile = zipDir->file(METADATA_FILE);
 	if(!manifestFile) {
-		qWarning(CAT_PKGUTIL) << DESCRIPTOR_FILE << "not found in package!";
+		qWarning(CAT_PKGUTIL) << METADATA_FILE << "not found in package!";
 		return {};
 	}
 	QJsonDocument doc = QJsonDocument::fromJson(manifestFile->data());
 	if(!doc.isObject()) {
-		qWarning(CAT_PKGUTIL) << "QJsonDocument parsing failed:" << DESCRIPTOR_FILE;
+		qWarning(CAT_PKGUTIL) << "QJsonDocument parsing failed:" << METADATA_FILE;
 		return {};
 	}
 	return doc.object();
 }
 
-void PkgUtil::getArchiveFiles(const KArchiveDirectory *dir, QStringList &fileList, const QString &destPath,
-			      const QString &prefix)
+QJsonObject PkgUtil::getMetadata(const QString &path)
 {
-	// Iterate over all entries in the directory
-	const QStringList entries = dir->entries();
-	for(const QString &entryName : entries) {
-		const KArchiveEntry *entry = dir->entry(entryName);
-		QString entryPath = prefix + QDir::separator() + entryName;
-		QString installPath = destPath + entryPath;
-
-		if(entry->isFile()) {
-			if(QFile::exists(installPath)) {
-				fileList.clear();
-				return;
-			}
-			fileList.append(installPath);
-		} else if(entry->isDirectory()) {
-			// If the directory doesn't exist save the path to that directory.
-			// The entire directory will be removed upon uninstallation.
-			if(!QFile::exists(installPath)) {
-				fileList.append(installPath);
-				continue;
-			}
-			const KArchiveDirectory *subDir = static_cast<const KArchiveDirectory *>(entry);
-			getArchiveFiles(subDir, fileList, destPath, entryPath);
-		}
+	QFile file(path);
+	if(!file.open(QIODevice::ReadOnly)) {
+		qWarning(CAT_PKGUTIL) << "Cannot open the MANIFEST file:" << path;
+		return {};
 	}
+	QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+	if(!doc.isObject()) {
+		qWarning(CAT_PKGUTIL) << "QJsonDocument parsing failed:" << METADATA_FILE;
+		return {};
+	}
+	return doc.object();
 }
 
-// Better in pkgInstaller ????
-QStringList PkgUtil::getPkgsName()
+// In this method we also can make another checks
+bool PkgUtil::validatePkg(QJsonObject &metadata)
 {
-	QJsonObject localRepository = readLocalRepository(scopy::config::localPluginFolderPath());
-	return localRepository.keys();
+	// Validate metadata fields
+	for(const QString &field : REQUIRED_FIELDS) {
+		QJsonValue value = metadata.value(field);
+		// Check if field is missing or null
+		if(value.isNull() || value.isUndefined()) {
+			qWarning(CAT_PKGUTIL) << "Missing required field:" << field;
+			return false;
+		}
+		// Check if field is empty (string or array)
+		if((value.isString() && value.toString().trimmed().isEmpty()) ||
+		   (value.isArray() && value.toArray().isEmpty())) {
+			qWarning(CAT_PKGUTIL) << "Empty required field:" << field;
+			return false;
+		}
+	}
+	return true;
+}
+
+QString PkgUtil::checkPkgPath(const QString &path, const QString &pkgName)
+{
+	QDir pkgsDir(path);
+	const QFileInfoList pkgs = pkgsDir.entryInfoList(QDir::Dirs);
+	for(const QFileInfo &p : pkgs) {
+		if(p.fileName().contains(pkgName)) {
+			return p.absoluteFilePath();
+		}
+	}
+	return "";
+}
+
+QString PkgUtil::validateArchiveEntry(const KZip &zip)
+{
+	const KArchiveDirectory *zipDir = zip.directory();
+	if(!zipDir) {
+		return "";
+	}
+	QStringList zipEntries = zipDir->entries();
+	if(zipEntries.size() != 1) {
+		qWarning(CAT_PKGUTIL) << "There must be a single entry in the archive!";
+		return "";
+	}
+	QString entryName = zipEntries.first();
+	if(!zipDir->entry(entryName)->isDirectory()) {
+		qWarning(CAT_PKGUTIL) << "The archive entry must be a directory!!";
+		return "";
+	}
+	return entryName;
 }

@@ -31,6 +31,7 @@
 #include <deviceautoconnect.h>
 #include <style.h>
 #include <pkgwidget.h>
+#include <pkgmanager.h>
 
 #include "logging_categories.h"
 #include "qmessagebox.h"
@@ -90,7 +91,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	initStatusBar();
 	setupPreferences();
 
-	PkgInstaller::GetInstance();
+	PkgManager::GetInstance();
+	PkgManager::init(QStringList() << scopy::config::pkgFolderPath());
 	ConnectionProvider::GetInstance();
 	MessageBroker::GetInstance();
 
@@ -520,7 +522,6 @@ void ScopyMainWindow::loadPluginsFromRepository(PluginRepository *pr)
 		pr->init(pluginAdditionalPath);
 	}
 #endif
-
 	qInfo(CAT_BENCHMARK) << "Loading the plugins from the repository took: " << timer.elapsed() << "ms";
 }
 

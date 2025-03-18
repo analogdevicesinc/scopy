@@ -126,6 +126,11 @@ QString scopy::config::pkgLocalRepo()
 		"MANIFEST.json";
 }
 
+QString scopy::config::pkgFolderPath()
+{
+	return QCoreApplication::applicationDirPath() + QDir::separator() + "scopy_libraries";
+}
+
 QString scopy::config::dump()
 {
 	QString ret;

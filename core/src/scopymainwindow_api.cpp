@@ -23,7 +23,7 @@
 
 #include "pkgutil.h"
 #include "qapplication.h"
-
+#include <pkgmanager.h>
 #include <pluginbase/scopyjs.h>
 using namespace scopy;
 
@@ -536,12 +536,9 @@ bool ScopyMainWindow_API::saveSetup(QString filename, QString path)
 	return setupSaved;
 }
 
-bool ScopyMainWindow_API::install(QString zipPath) { return PkgInstaller::install(zipPath); }
+bool ScopyMainWindow_API::install(QString zipPath) { return PkgManager::install(zipPath); }
 
-QStringList ScopyMainWindow_API::extractZip(QString zipPath, QString dest)
-{
-	return PkgUtil::extractZip(zipPath, dest);
-}
+bool ScopyMainWindow_API::extractZip(QString zipPath, QString dest) { return PkgUtil::extractZip(zipPath, dest); }
 
 QVariantMap ScopyMainWindow_API::extractMetadata(QString zipPath)
 {
@@ -552,5 +549,10 @@ QVariantMap ScopyMainWindow_API::extractMetadata(QString zipPath)
 	return obj.toVariantMap();
 }
 
-bool ScopyMainWindow_API::uninstall(const QString &pkgName) { return PkgInstaller::uninstall(pkgName); }
+bool ScopyMainWindow_API::uninstall(const QString &pkgName) { return PkgManager::uninstall(pkgName); }
+
+QStringList ScopyMainWindow_API::listFiles(const QString &category)
+{
+	return PkgManager::listFilesPath(QStringList() << category);
+}
 #include "moc_scopymainwindow_api.cpp"
