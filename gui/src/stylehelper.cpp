@@ -54,7 +54,7 @@ QString StyleHelper::getChannelColor(int index)
 	QColor color;
 	int colorCount = Style::getChannelColorList().length();
 
-	if(colorCount <= index) {
+	if(colorCount != 0 && colorCount <= index) {
 		color = QColor(getChannelColor(index - colorCount));
 		color.setHsv(color.hue() + 30, color.saturation(), color.value());
 	} else {

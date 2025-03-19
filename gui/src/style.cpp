@@ -219,7 +219,14 @@ QString Style::getAttribute(const char *key)
 	return replaceAttributes(attr);
 }
 
-QColor Style::getChannelColor(int index) { return getChannelColorList()[index]; }
+QColor Style::getChannelColor(int index)
+{
+	QList<QColor> list = getChannelColorList();
+	if(list.count() <= index)
+		return QColor();
+
+	return getChannelColorList()[index];
+}
 
 QList<QColor> Style::getChannelColorList()
 {
