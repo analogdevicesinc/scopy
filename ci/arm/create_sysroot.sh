@@ -79,7 +79,7 @@ move_and_extract_sysroot(){
 
 fix_relativelinks(){
 	pushd ${STAGING_AREA}
-	wget $SYSROOT_RELATIVE_LINKS
+	[ -f sysroot-relativelinks.py ] || wget $SYSROOT_RELATIVE_LINKS
 	chmod +x sysroot-relativelinks.py
 	sudo ./sysroot-relativelinks.py ${SYSROOT}
 	popd

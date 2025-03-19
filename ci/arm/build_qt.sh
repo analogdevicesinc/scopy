@@ -32,7 +32,9 @@ download_crosscompiler(){
 	pushd ${STAGING_AREA}
 	if [ ! -d cross-pi-gcc ];then
 		wget --progress=dot:giga ${CROSSCOMPILER_DOWNLOAD_LINK}
-		tar -xf cross-gcc-*.tar.gz && rm cross-gcc-*.tar.gz && mv cross-pi-* cross-pi-gcc # unzip and rename
+		tar -xf cross-gcc-*.tar.gz
+		rm cross-gcc-*.tar.gz
+		mv ${STAGING_AREA}/cross-pi-* ${CROSS_COMPILER} # unzip and rename
 	else
 		echo "Crosscompiler already downloaded"
 	fi

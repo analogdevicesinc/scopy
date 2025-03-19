@@ -100,8 +100,9 @@ download_crosscompiler(){
 	pushd ${STAGING_AREA}
 	if [ ! -d cross-pi-gcc ];then
 		wget --progress=dot:giga ${CROSSCOMPILER_DOWNLOAD_LINK}
-		# unzip and rename
-		tar -xf cross-gcc-*.tar.gz && rm cross-gcc-*.tar.gz && mv cross-pi-* cross-pi-gcc
+		tar -xf cross-gcc-*.tar.gz
+		rm cross-gcc-*.tar.gz
+		mv ${STAGING_AREA}/cross-pi-* ${CROSS_COMPILER} # unzip and rename
 	else
 		echo "Crosscompiler already downloaded"
 	fi
@@ -375,10 +376,6 @@ create_appdir(){
 	cp -r $EMU_XMLS $APP_DIR/usr/lib/scopy/plugins
 	mkdir -p $APP_DIR/usr/lib/scopy/plugins/resources
 	cp $EMU_CONFIG $APP_DIR/usr/lib/scopy/plugins/resources
-
-	if [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
-		sudo rm -rfv ${SYSROOT}/usr/lib/arm-linux-gnueabihf/libQt5*
-	fi
 
 	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/scopy
 	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/iio-emu
