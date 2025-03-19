@@ -17,6 +17,9 @@ QSplitter::handle:disabled { background-color: transparent; }
 QTextBrowser {
     border: none;
 }
+QTextEdit {
+    border: none;
+}
 
 *:focus {
     outline: &interactive_focus&;
