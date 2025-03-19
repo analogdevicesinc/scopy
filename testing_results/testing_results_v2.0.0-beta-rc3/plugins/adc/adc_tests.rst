@@ -17,11 +17,11 @@ ADC Plugin - Test Suite
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Trifan Alexandra
+         - 20/03/2025
+         - v2.0.0-beta-rc3-8ade0b5
+         - N/A
+         - OS: Ubuntu 20.04 retesting
 
 Setup environment
 ------------------
@@ -76,7 +76,7 @@ Test 1 - X-AXIS
    4. Press Single
        - **Expected result:** Plot labels should go up to 100, and channel curves 
          should span across the whole plot
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -86,7 +86,7 @@ Test 1 - X-AXIS
    6. Set plot size to 200
    7. Press Single
        - **Expected result:** Plot labels should go up to 200, and channel curves should span across the whole plot
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -94,7 +94,7 @@ Test 1 - X-AXIS
 
    8. Turn on Rolling mode
        - **Expected result:** Plot labels should invert, going from 200 to 0
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -102,14 +102,14 @@ Test 1 - X-AXIS
 
    9. Change XMin to 300 and XMax to -100 (pressing Single will reset this setting)
         - **Expected result:** Plot labels should range from 300 to -100, with channel curves centered and between samples 200 and 0
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -119,7 +119,7 @@ Test 1 - X-AXIS
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -588,7 +588,7 @@ tracking, and moving readouts
    4. Open the Cursors menu at the bottom of the window. Enable X and Enable Y
    5. Move the X cursors on the plot via the axis handles and place one on voltage0 sine high peak and the other on the next low peak
        - **Expected result:** delta x should be around 15 samples between voltage0 high peak and low peak
-       - **Actual result:**
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -596,7 +596,7 @@ tracking, and moving readouts
 
    6. Lock X cursors via the Cursor menu. Move one cursor to a voltage1 high peak
        - **Expected result:** the second cursor should move and maintain the same delta. High peak to low peak should match in both voltage0 and voltage1
-       - **Actual result:**
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -604,7 +604,7 @@ tracking, and moving readouts
 
    7. Enable track and select voltage0
        - **Expected result:** markers should appear on the voltage0 curve synced with the X cursor. Values in cursor readouts should change accordingly
-       - **Actual result:**
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
@@ -612,30 +612,30 @@ tracking, and moving readouts
 
    8. Select voltage1 channel
        - **Expected result:** markers and readouts should now be related to voltage1
-       - **Actual result:**
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
    9. Turn off track and measure voltage0 and voltage1 amplitudes
-       - **Expected result:** for voltage0 delta y should be around should be around  500 and for voltage1 1.4k
-       - **Actual result:**
+       - **Expected result:** for voltage0 delta y should be around  500 and for voltage1 1.4k
+       - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
    10. Enable move readouts. Click and hold the readouts to move them
-       - **Expected result:** should be able to move the readouts anywhere within the plot
-       - **Actual result:**
+        - **Expected result:** should be able to move the readouts anywhere within the plot
+        - **Actual result:** As expected
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -645,7 +645,7 @@ tracking, and moving readouts
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -674,8 +674,8 @@ plotting in the ADC plugin
 **Steps:**
    1. Scroll down and turn on plot labels in the settings panel
    2. Set XMode to Samples, buffer size to 4000, and press single
-       - **Expected result:** Plot labels should go up to 2000, and channel curves should span across the whole plot
-       - **Actual result:**
+       - **Expected result:** Plot labels should go up to 4000, and channel curves should span across the whole plot
+       - **Actual result:**  X axis plot labels for up to 4000/2 .
 
 ..
   Actual test result goes here.
@@ -683,7 +683,7 @@ plotting in the ADC plugin
 
    3. Set XMode to Frequency, XMin to 0.5 MHz, XMax to 2 MHz (pressing Single will reset this setting)
        - **Expected result:** Plot labels should be from 0.5 MHz to 2 MHz
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -691,14 +691,14 @@ plotting in the ADC plugin
 
    4. Set frequency offset to 1 MHz and press single
        - **Expected result:** Curves should move 1 MHz to the left
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -708,7 +708,7 @@ plotting in the ADC plugin
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -940,10 +940,10 @@ Test 6 - Y-Axis channel settings
 ..
   Actual test result goes here.
 ..
-  
-3. Turn off Y-Axis
 
-**Tested OS:**
+   3. Turn off Y-Axis
+
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -953,7 +953,7 @@ Test 6 - Y-Axis channel settings
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -978,7 +978,7 @@ Test 7 - Marker settings
    2. Press run and enable the markers from the bottom right **Measure** panel.
    3. In the **voltage0 channels settings**, enable the markers, set the marker type to **peak** and count to **5**.
        - **Expected result:** 5 markers should appear on voltage0's curve at the highest peaks
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -986,7 +986,7 @@ Test 7 - Marker settings
 
    4. Repeat the process with a count of 7
        - **Expected result:** 7 markers should appear on voltage0's curve at the highest peaks
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -994,7 +994,7 @@ Test 7 - Marker settings
 
    5. Check the table below the plot in peak mode
        - **Expected result:** The highest peak should be at 1 MHz
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -1002,7 +1002,7 @@ Test 7 - Marker settings
 
    6. Set marker type to fixed and count to 5
        - **Expected result:** 5 movable cursors should appear
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -1010,14 +1010,14 @@ Test 7 - Marker settings
 
    7. Repeat for a count of 7
        - **Expected result:** 7 movable cursors should appear
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -1027,7 +1027,7 @@ Test 7 - Marker settings
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1053,7 +1053,7 @@ Test 8 - Cursor settings
    3. Open the Cursors menu and enable X cursors.
    4. Move the X cursor on the plot and place one on voltage0's highest peak.
        - **Expected result:** The cursor should measure 1 MHz in the readouts
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -1061,7 +1061,7 @@ Test 8 - Cursor settings
 
    5. Enable track and select voltage0
        - **Expected result:** Markers should appear on the voltage0 curve, synced with the X cursor
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -1069,7 +1069,7 @@ Test 8 - Cursor settings
 
    6. Select voltage1 channel
        - **Expected result:** Markers and readouts should now be related to voltage1
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -1077,7 +1077,7 @@ Test 8 - Cursor settings
 
    7. Turn off track and measure voltage0's highest peak using the Y cursor
        - **Expected result:** The cursor should measure about -13 dB in the readouts
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -1085,14 +1085,14 @@ Test 8 - Cursor settings
 
    8. Enable move readouts and click and hold the readouts to move them
        - **Expected result:** Readouts should be movable within the plot
-       - **Actual result:**
+       - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -1102,7 +1102,7 @@ Test 8 - Cursor settings
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).

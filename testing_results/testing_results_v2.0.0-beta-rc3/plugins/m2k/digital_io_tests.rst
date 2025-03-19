@@ -23,11 +23,11 @@ If the test case has special requirements, they will be listed in the test case 
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Trifan Alexandra
+         - 19/03/2025
+         - v2.0.0-beta-rc3-8ade0b5
+         - N/A
+         - OS: Ubuntu 20.04 retesting
 
 Setup environment:
 ------------------
@@ -81,7 +81,7 @@ Test 1 - Check individual digital pin state
             - When DIO 0 is set to logic 0, DIO 8 will be automatically set to logic 0
               (the corresponding led will be turned off).
         
-        - **Actual Result**:
+        - **Actual Result**: As expected.
 
 ..
   Actual test result goes here.
@@ -91,13 +91,13 @@ Test 1 - Check individual digital pin state
        DIO 1 as **input** for (step 4).
 
         - **Expected Result**: All the expected results in step 5 are met.
-        - **Actual Result**:
+        - **Actual Result**: As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -107,7 +107,7 @@ Test 1 - Check individual digital pin state
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -133,7 +133,7 @@ are working correctly.
     3. Set DIO 0-7 as **output** and DIO 8-15 as **input**.
     4. Set DIO 0-7 to value 0.
         - **Expected Result**: DIO 8-15 value indicates the same value as DIO 0-7 group.
-        - **Actual Result**:
+        - **Actual Result**: As expected.
 
 ..
   Actual test result goes here.
@@ -141,7 +141,7 @@ are working correctly.
 
     5. Set DIO 0-7 to value 128.
         - **Expected Result**: DIO 8-15 value indicates the same value as DIO 0-7 group.
-        - **Actual Result**:
+        - **Actual Result**: As expected.
 
 ..
   Actual test result goes here.
@@ -150,7 +150,7 @@ are working correctly.
     6. Set DIO 0-7 as **input** and DIO 8-15 as **output**.
     7. Set DIO 8-15 to value 0.
         - **Expected Result**: DIO 0-7 value indicates the same value as DIO 8-15 group.
-        - **Actual Result**:
+        - **Actual Result**: As expected.
 
 ..
   Actual test result goes here.
@@ -158,13 +158,13 @@ are working correctly.
 
     8. Set DIO 8-15 to value 128.
         - **Expected Result**: DIO 0-7 value indicates the same value as DIO 8-15 group.
-        - **Actual Result**:
+        - **Actual Result**: As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -174,7 +174,7 @@ are working correctly.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -205,7 +205,7 @@ Test 3 - Checking individual digital pin state voltmeter and power supply
        Start the instrument and monitor the voltage value on Channel 1.
 
         - **Expected Result**: The voltage displayed on the voltmeter is between -0.050V and 0.4V.
-        - **Actual Result**:
+        - **Actual Result**: As expected.
 
 ..
   Actual test result goes here.
@@ -213,7 +213,7 @@ Test 3 - Checking individual digital pin state voltmeter and power supply
         
     7. Set DIO 0 to logic 1 and monitor the voltage value on Channel 1. Start the instrument.
         - **Expected Result**: The voltage displayed on the voltmeter is between 2.9V and 3.4V.
-        - **Actual Result**:
+        - **Actual Result**: As expected.
 
 ..
   Actual test result goes here.
@@ -224,7 +224,7 @@ Test 3 - Checking individual digital pin state voltmeter and power supply
        Monitor the DIO 8 logic state.
 
         - **Expected Result**: DIO 8 indicates logic 0 level.
-        - **Actual Result**:
+        - **Actual Result**: As expected.
 
 ..
   Actual test result goes here.
@@ -235,7 +235,7 @@ Test 3 - Checking individual digital pin state voltmeter and power supply
        Monitor the DIO 8 logic state.
 
         - **Expected Result**: DIO 8 indicates logic 1 level.
-        - **Actual Result**:
+        - **Actual Result**: As expected.
 
 ..
   Actual test result goes here.
@@ -245,13 +245,13 @@ Test 3 - Checking individual digital pin state voltmeter and power supply
         DIO 1 as **input** for (step 4).
 
         - **Expected Result**: All the expected results in step 6 to 11 are met.
-        - **Actual Result**:
+        - **Actual Result**: As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -261,7 +261,7 @@ Test 3 - Checking individual digital pin state voltmeter and power supply
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).

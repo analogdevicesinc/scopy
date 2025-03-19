@@ -89,8 +89,9 @@ when the IIO emulator is not found.
 **Preconditions:**
     - Scopy is installed on the system.
     - iio-emu is not installed on the system.
-    - iio-emu is not next to the scopy executable.
-    - The path preference for iio-emu is empty.
+    - Modify the "iio_emu_path" preference from "preferences.ini" file with an 
+      invalid path (you can access the file through the **Open** button in the 
+      general preferences).
     - OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.
 
 **Steps:**
@@ -99,13 +100,15 @@ when the IIO emulator is not found.
     3. Click on **Emulator** tab.
         - **Expected result:** All the components are disabled and the message 
           "Can't find iio-emu in the system!" is displayed. 
-        - **Actual result:**
+        - **Actual result:** Changes have been made to the emulator loading method, 
+          which is why the test preconditions must be updated to work as expected.
+          With these changes it works as expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.
 
 ..
   Details about the tested OS goes here.
@@ -115,7 +118,7 @@ when the IIO emulator is not found.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -197,13 +200,13 @@ when an emulated device is connected and the "iio-emu" process is stopped.
         - **Expected result:** The fields in this tab become editable, and the 
           **Enable** button appears. After a few seconds, the device is 
           disconnected.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -213,7 +216,7 @@ when an emulated device is connected and the "iio-emu" process is stopped.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).

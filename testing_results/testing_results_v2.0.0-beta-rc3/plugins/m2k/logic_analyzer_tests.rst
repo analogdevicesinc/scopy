@@ -24,11 +24,11 @@ If the test case has special requirements, they will be listed in the test case 
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Trifan Alexandra
+         - 19/03/2025
+         - v2.0.0-beta-rc3-8ade0b5
+         - N/A
+         - OS: Ubuntu 20.04 retesting
 
 Setup environment:
 ------------------
@@ -85,17 +85,17 @@ digital channels - rising edge, falling edge, high, low, any edge.
     7. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     8. In the Digital IO, change DIO0’s output from 0 to 1.
         - **Expected Result**: The logic analyzer initiates a capture.
-        - **Actual Result:**
+        - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-    9. Stop the Logic Analyzer and set DIO0’s trigger to **rising edge** configuration.
+    9. Stop the Logic Analyzer and set DIO0’s trigger to **falling edge** configuration.
     10. Run the Logic Analyzer instrument.
     11. In the Digital IO, change DIO0’s output from 1 to 0.
          - **Expected Result**: The logic analyzer initiates a capture.
-         - **Actual Result:**
+         - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -105,7 +105,7 @@ digital channels - rising edge, falling edge, high, low, any edge.
     13. Run the Logic Analyzer instrument.
     14. In the Digital IO, change DIO0’s output from 0 to 1 or 1 to 0.
          - **Expected Result**: The logic analyzer initiates a capture.
-         - **Actual Result:**
+         - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -115,7 +115,7 @@ digital channels - rising edge, falling edge, high, low, any edge.
     16. Run the Logic Analyzer instrument.
     17. In the Digital IO, set DIO0’s output to 0.
          - **Expected Result**: The logic analyzer continuously captures the signal.
-         - **Actual Result:**
+         - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -125,13 +125,13 @@ digital channels - rising edge, falling edge, high, low, any edge.
     19. Run the Logic Analyzer instrument.
     20. In the Digital IO, set DIO0’s output to 1.
          - **Expected Result**: The logic analyzer continuously captures the signal.
-         - **Actual Result:**
+         - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -141,7 +141,7 @@ digital channels - rising edge, falling edge, high, low, any edge.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -180,6 +180,13 @@ Test 2 - External Channel Trigger Function
     5. Open the :ref:`Digital IO<digitalio>` instrument and set DIO 0 as output.
     6. Open the Logic Analyzer trigger menu and turn on the External trigger.
        Select the source as **External Trigger In**.
+        
+        - **Expected Result**: Triggers set on every DIO channels are automatically turned off.
+        - **Actual Result:** Skip (trigger source is set in the fw, so channel triggers are ignored from this point).
+
+..
+  Actual test result goes here.
+..
 
     7. Connect Trigger in 1 to DIO0 using a loopback cable.
     8. In the Logic Analyzer Trigger settings menu set the External Trigger In condition
@@ -187,7 +194,7 @@ Test 2 - External Channel Trigger Function
     9. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     10. In the Digital IO, change DIO0’s output from 0 to 1.
          - **Expected Result**: The logic analyzer initiates a capture.
-         - **Actual Result:**
+         - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -197,7 +204,7 @@ Test 2 - External Channel Trigger Function
     12. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     13. In the Digital IO, change DIO0’s output from 1 to 0.
          - **Expected Result**: The logic analyzer initiates a capture.
-         - **Actual Result:**
+         - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -207,7 +214,7 @@ Test 2 - External Channel Trigger Function
     15. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     16. In the Digital IO, change DIO0’s output from 0 to 1 or 1 to 0.
          - **Expected Result**: The logic analyzer initiates a capture.
-         - **Actual Result:**
+         - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -217,7 +224,7 @@ Test 2 - External Channel Trigger Function
     18. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     19. In the Digital IO, set DIO0’s output to 0.
          - **Expected Result**: The logic analyzer continuously captures the signal.
-         - **Actual Result:**
+         - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -227,13 +234,13 @@ Test 2 - External Channel Trigger Function
     21. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     22. In the Digital IO, set DIO0’s output to 1.
          - **Expected Result**: The logic analyzer continuously captures the signal.
-         - **Actual Result:**
+         - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -243,7 +250,7 @@ Test 2 - External Channel Trigger Function
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -380,7 +387,7 @@ Test 4 - Trigger Modes
     8. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     9. In the Digital IO instrument set DIO0’s output to 0 and DIO1’s output to 0.
         - **Expected Result**: The logic analyzer does not start capturing.
-        - **Actual Result:**
+        - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -388,7 +395,7 @@ Test 4 - Trigger Modes
 
     10. In the Digital IO instrument set DIO0 or DIO1’s output to 1.
          - **Expected Result**: The logic analyzer starts capturing signal when either of the DIO0 OR DIO1 is HIGH.
-         - **Actual Result:**
+         - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -398,7 +405,7 @@ Test 4 - Trigger Modes
     12. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     13. In the Digital IO instrument set DIO0’s output to 0 and DIO1’s output to 1.
          - **Expected Result**: The logic analyzer does not start capturing.
-         - **Actual Result:**
+         - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -406,14 +413,14 @@ Test 4 - Trigger Modes
 
     14. In the Digital IO instrument set DIO0 and DIO1’s output to 1.
          - **Expected Result**: The logic analyzer starts capturing signal only when DIO0 AND DIO1 are HIGH.
-         - **Actual Result:**
+         - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -423,7 +430,7 @@ Test 4 - Trigger Modes
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
