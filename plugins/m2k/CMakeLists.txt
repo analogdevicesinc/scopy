@@ -98,6 +98,12 @@ find_package(gnuradio-m2k REQUIRED PATH_SUFFIXES m2k)
 
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
 
+option(ENABLE_MATIO "Enable MATLAB support for ADALM2000 SignalGenerator" ON)
+if(ENABLE_MATIO)
+	find_library(MATIO_LIBRARIES REQUIRED NAMES matio)
+	add_definitions(-DMATLAB_SUPPORT_SIGGEN)
+endif()
+
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
 
 generate_export_header(
@@ -148,6 +154,7 @@ target_link_libraries(
 	       gnuradio::gnuradio-iio
 	       gnuradio::gnuradio-scopy
 	       gnuradio::gnuradio-m2k
+	       ${MATIO_LIBRARIES}
 )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")

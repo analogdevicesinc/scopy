@@ -1244,9 +1244,10 @@ bool SignalGenerator::loadParametersFromFile(QSharedPointer<signal_generator_dat
 			     matvar->class_type != MAT_C_DOUBLE)) {
 				Mat_VarReadDataAll(matfp, matvar);
 
-				if(!matvar->isComplex) {
+				if(matvar->isComplex) {
 					qDebug(CAT_M2K_SIGNAL_GENERATOR) << "Complex buffers not supported";
 					ptr->file_message = "Complex buffers not supported";
+				} else {
 					ptr->file_channel_names.push_back(QString(matvar->name));
 					ptr->file_nr_of_samples.push_back(*matvar->dims);
 					ptr->file_nr_of_channels++;
@@ -1341,7 +1342,8 @@ void SignalGenerator::loadFile()
 		this, tr("Open File"), "",
 		tr("Comma-separated values files (*.csv);;"
 		   "Tab-delimited values files (*.txt);;"
-		   "Waveform Audio File Format (*.wav)"),
+		   "Waveform Audio File Format (*.wav);;"
+		   "MATLAB Binary File Format (*.mat)"),
 		nullptr, (useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	if(fileName.isEmpty()) { // user hit cancel
@@ -1564,10 +1566,12 @@ void SignalGenerator::loadFileChannelData(int chIdx)
 	}
 
 	ptr->file_data.clear();
-	if(ptr->file_type == FORMAT_WAVE || ptr->file_type == FORMAT_MAT) // let GR flow load data
+	if(ptr->file_type == FORMAT_WAVE) // let GR flow load data
 		return;
 	try {
-		fileManager->open(ptr->file, FileManager::IMPORT);
+		if(ptr->file_type != FORMAT_MAT) {
+			fileManager->open(ptr->file, FileManager::IMPORT);
+		}
 
 		if(ptr->file_type == FORMAT_CSV) {
 
