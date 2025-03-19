@@ -1332,8 +1332,7 @@ void SignalGenerator::loadFile()
 		this, tr("Open File"), "",
 		tr("Comma-separated values files (*.csv);;"
 		   "Tab-delimited values files (*.txt);;"
-		   "Waveform Audio File Format (*.wav);;"
-		   "Matlab files (*.mat)"),
+		   "Waveform Audio File Format (*.wav)"),
 		nullptr, (useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	if(fileName.isEmpty()) { // user hit cancel
