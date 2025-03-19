@@ -46,7 +46,8 @@ install_packages() {
 		mingw-w64-${ARCH}-angleproject\
 		mingw-w64-${ARCH}-zlib\
 		mingw-w64-${ARCH}-breakpad\
-		mingw-w64-${ARCH}-libusb
+		mingw-w64-${ARCH}-libusb\
+		mingw-w64-${ARCH}-matio
 	"
 
 	if [ "$USE_STAGING" == "ON" ]; then
