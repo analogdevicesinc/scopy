@@ -158,6 +158,8 @@ private:
 
 	Ui::SignalGenerator *ui;
 	CapturePlot *m_plot;
+	QLabel *m_plotStatus;
+	bool m_resampOk;
 	gr::top_block_sptr top_block;
 	struct time_block_data *time_block_data;
 
@@ -238,6 +240,7 @@ private:
 	void loadFileChannelData(int chIdx);
 	bool riffCompare(riff_header_t &ptr, const char *id2);
 	bool chunkCompare(chunk_header_t &ptr, const char *id2);
+	bool handleResampler(gr::basic_block_sptr resamp);
 
 public Q_SLOTS:
 	void run() override;
@@ -289,6 +292,7 @@ private Q_SLOTS:
 	void checkRunEnabled();
 Q_SIGNALS:
 	void showTool();
+	void previewUpdated(bool);
 };
 
 enum SIGNAL_TYPE

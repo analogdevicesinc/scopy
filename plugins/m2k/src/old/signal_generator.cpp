@@ -81,6 +81,8 @@
 #include <libm2k/m2kexceptions.hpp>
 #include <pluginbase/scopyjs.h>
 
+#include <style.h>
+
 #define NB_POINTS 32768
 #define DAC_BIT_COUNT 12
 #define INTERP_BY_100_CORR 1.168 // correction value at an interpolation by 100
@@ -147,6 +149,8 @@ SignalGenerator::SignalGenerator(libm2k::context::M2k *m2k, QString uri, Filter 
 	, channels_group(new QButtonGroup(this))
 	, m_maxNbOfSamples(4 * 1024 * 1024)
 	, m_uri(uri)
+	, m_plotStatus(new QLabel(this))
+	, m_resampOk(true)
 {
 	zoomT1 = 0;
 	zoomT2 = 1;
@@ -155,6 +159,8 @@ SignalGenerator::SignalGenerator(libm2k::context::M2k *m2k, QString uri, Filter 
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
 
 	this->m_plot = new CapturePlot(this, false, 10, 10, new TimePrefixFormatter, new MetricPrefixFormatter);
+	this->m_plot->setStatusWidget(m_plotStatus);
+	Style::setStyle(m_plotStatus, style::properties::label::menuBig);
 
 	for(size_t i = 0; i < m_m2k_analogout->getNbChannels(); i++) {
 
@@ -487,6 +493,13 @@ SignalGenerator::SignalGenerator(libm2k::context::M2k *m2k, QString uri, Filter 
 	connect(tme, SIGNAL(runToggled(bool)), this, SLOT(startStop(bool)));
 
 	connect(ui->refreshBtn, SIGNAL(clicked()), this, SLOT(loadFileCurrentChannelData()));
+	connect(
+		this, &SignalGenerator::previewUpdated, this,
+		[this](bool updated) {
+			QString status = (updated) ? "" : "Warning: Preview was not updated!";
+			m_plotStatus->setText(status);
+		},
+		Qt::QueuedConnection);
 
 	m_plot->addZoomer(0);
 	m_plot->addMagnifier(0);
@@ -1038,6 +1051,7 @@ void SignalGenerator::updatePreview()
 	bool enabled = false;
 
 	time_block_data->time_block->reset();
+	m_resampOk = true;
 	for(auto it = channels.begin(); it != channels.end(); ++it) {
 		basic_block_sptr source;
 
@@ -1360,6 +1374,7 @@ void SignalGenerator::start()
 	unsigned long final_rate;
 	unsigned long oversampling;
 
+	m_resampOk = true;
 	for(size_t i = 0; i < m_m2k_analogout->getNbChannels(); i++) {
 		buffers.push_back({});
 		if(!m_m2k_analogout->isChannelEnabled(i)) {
@@ -1625,6 +1640,13 @@ gr::basic_block_sptr SignalGenerator::getNoise(QWidget *obj, gr::top_block_sptr 
 	}
 }
 
+bool SignalGenerator::handleResampler(gr::basic_block_sptr resamp)
+{
+	m_resampOk &= !!resamp;
+	Q_EMIT previewUpdated(m_resampOk);
+	return (resamp != nullptr);
+}
+
 gr::basic_block_sptr SignalGenerator::displayResampler(double samp_rate, double freq, gr::top_block_sptr top,
 						       gr::basic_block_sptr generated_wave,
 						       gr::basic_block_sptr noiseSrc, gr::basic_block_sptr noiseAdd)
@@ -1639,9 +1661,8 @@ gr::basic_block_sptr SignalGenerator::displayResampler(double samp_rate, double 
 			break;
 		}
 	}
-	ok = true;
 	if(!ok) {
-		return blocks::nop::make(sizeof(float));
+		return nullptr;
 	}
 
 	auto interp = blocks::repeat::make(sizeof(float), m);
@@ -1677,14 +1698,21 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj, double samp_rate, 
 
 			generated_wave = getSignalSource(top, samp_rate, *ptr, phase);
 
-			if(ptr->waveform != SG_STAIR_WAVE)
+			if(ptr->waveform != SG_STAIR_WAVE) {
+				handleResampler(generated_wave);
 				break;
+			}
 
 			// Only for STAIR wave
-			return displayResampler(sample_rate, (ptr->frequency * (ptr->steps_up + ptr->steps_down)), top,
-						generated_wave, noiseSrc, noiseAdd);
-
-		} else {
+			auto resamp =
+				displayResampler(sample_rate, (ptr->frequency * (ptr->steps_up + ptr->steps_down)), top,
+						 generated_wave, noiseSrc, noiseAdd);
+			bool resampOk = handleResampler(resamp);
+			if(resampOk) {
+				return resamp;
+			}
+		}
+		if(!preview || !m_resampOk) {
 			generated_wave = getSignalSource(top, samp_rate, *ptr, phase);
 		}
 		break;
@@ -1742,18 +1770,23 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj, double samp_rate, 
 			if(preview) {
 				auto resamp = displayResampler(sample_rate, (ptr->file_sr), top, phase_skip, noiseSrc,
 							       noiseAdd);
-				double buffer_freq = 1;
-				if(ptr->file_nr_of_samples.size() > 0) {
-					buffer_freq = ptr->file_sr / (double)ptr->file_nr_of_samples[ptr->file_channel];
+				bool resampOk = handleResampler(resamp);
+				if(resampOk) {
+					double buffer_freq = 1;
+					if(ptr->file_nr_of_samples.size() > 0) {
+						buffer_freq = ptr->file_sr /
+							(double)ptr->file_nr_of_samples[ptr->file_channel];
+					}
+					int full_periods = (int)((double)zoomT1OnScreen * buffer_freq);
+					double phase_in_time = zoomT1OnScreen - (full_periods / buffer_freq);
+					unsigned long samples_to_skip = phase_in_time * samp_rate;
+					auto skip = blocks::skiphead::make(sizeof(float), samples_to_skip);
+					top->connect(resamp, 0, skip, 0);
+					// return before readding the noise.
+					return skip;
 				}
-				int full_periods = (int)((double)zoomT1OnScreen * buffer_freq);
-				double phase_in_time = zoomT1OnScreen - (full_periods / buffer_freq);
-				unsigned long samples_to_skip = phase_in_time * samp_rate;
-				auto skip = blocks::skiphead::make(sizeof(float), samples_to_skip);
-				top->connect(resamp, 0, skip, 0);
-				// return before readding the noise.
-				return skip;
-			} else {
+			}
+			if(!preview || !m_resampOk) {
 				generated_wave = phase_skip;
 			}
 		} else {
@@ -1767,7 +1800,6 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj, double samp_rate, 
 			double math_record_freq = (1.0 / ptr->math_record_length);
 
 			if(preview) {
-
 				int full_periods = (int)((double)zoomT1OnScreen * math_record_freq);
 				double phase_in_time = zoomT1OnScreen - full_periods / math_record_freq;
 				phase = (phase_in_time * math_record_freq) * 360.0;
@@ -1779,15 +1811,20 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj, double samp_rate, 
 						ptr->math_sr, str, (uint64_t)ptr->math_sr * ptr->math_record_length);
 					auto resamp =
 						displayResampler(samp_rate, ptr->math_sr, top, src, noiseSrc, noiseAdd);
-					top->connect(resamp, 0, skip_head, 0);
-					return skip_head;
-				} else {
+					bool resampOk = handleResampler(resamp);
+					if(resampOk) {
+						top->connect(resamp, 0, skip_head, 0);
+						return skip_head;
+					}
+				}
+				if((ptr->math_sr >= samp_rate) || !m_resampOk) {
 					auto src = gr::scopy::iio_math_gen::make(
 						samp_rate, str, (uint64_t)samp_rate * ptr->math_record_length);
 					top->connect(src, 0, skip_head, 0);
 					generated_wave = skip_head;
 				}
-			} else {
+			}
+			if(!preview || !m_resampOk) {
 				generated_wave = gr::scopy::iio_math_gen::make(
 					samp_rate, str, (uint64_t)samp_rate * ptr->math_record_length);
 			}
