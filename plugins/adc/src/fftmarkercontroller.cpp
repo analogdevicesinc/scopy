@@ -111,7 +111,7 @@ void FFTMarkerController::computeSingleToneMarkers()
 
 	int histeresis = log2(data->size()); // easy hack - if data size is higher, so is the histeresis
 
-	for(int i = 2; i < this->m_nrOfMarkers - 1; i++) {
+	for(int i = 2; i < this->m_nrOfMarkers; i++) {
 		int idx = findPeakNearIdx((fund_offset * i + dc_idx), histeresis);
 		MarkerInfo mi = {.name = QString::number(i) + "H",
 				 .marker = m_markers[i],
