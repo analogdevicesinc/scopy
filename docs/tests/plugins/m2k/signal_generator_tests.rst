@@ -751,7 +751,7 @@ Test 4: Additional Features
     8. Download buffer test files from `here <https://wiki.analog.com/_media/university/tools/m2k/scopy/test-cases/signal_generator_buffer_test.zip>`_. Open Signal Generator Instrument and click the Buffer Tab.
     9. Connect AWG ch1 to scope ch1+ and scope ch1- to gnd
     10. Test .csv file
-    11. Load the .csv file from the downloaded .zip file
+    11. Load the .csv file from the downloaded .zip file. Make sure the Noise is disabled.
             - **Expected Result:** The signal generated should be a stair step signal.
             - **Actual Result:**
 
@@ -774,8 +774,8 @@ Test 4: Additional Features
     17. Connect AWG ch1 to scope ch1+ and scope ch1- to gnd
     18. Generate Sine waves
     19. In the Signal Generator Math Function tab:
-         - set frequency to 100Hz
-         - type in the function box 5*sin(t) and click apply.
+         - set sample rate to 37.5 Msps and record length to 10 ms
+         - type in the function box 5*sin(2*pi*100*t) and click apply.
          - in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 2ms
             - **Expected Result:** The generated sine wave signal should have the following parameters:
                 - peak to peak: 9.6V to 10.4V
@@ -788,13 +788,13 @@ Test 4: Additional Features
 ..
 
     20. In the Signal Generator Math Function tab:
-         - set frequency to 1kHz
-         - type in the function box 4*sin(10*t) and click apply.
-         - in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 20us
+         - set sample rate to 37.5 Msps and record length to 2ms
+         - type in the function box 4*sin(2*pi*1000*t) and click apply.
+         - in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 200us
             - **Expected Result:** The generated sine wave signal should have the following parameters:
                 - peak to peak: 7.6V to 8.4V
-                - frequency: 10kHz
-                - period: 100us
+                - frequency: 1kHz
+                - period: 1ms
             - **Actual Result:**
 
 ..
@@ -802,9 +802,9 @@ Test 4: Additional Features
 ..
 
     21. In the Signal Generator Math Function tab:
-         - set frequency to 100kHz
-         - type in the function box 3*sin(50*t) and click apply.
-         - in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 100ns
+         - set sample rate to 75 Msps and record length to 2us
+         - type in the function box 3*sin(2*pi*5000000*t)and click apply.
+         - in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 500ns
             - **Expected Result:** The generated sine wave signal should have the following parameters:
                 - peak to peak: 5.6V to 6.4V
                 - frequency: 5MHz
@@ -817,8 +817,8 @@ Test 4: Additional Features
 
     22. Generate Square waves
     23. In the Signal Generator Math Function tab:
-         - set frequency to 500kHz
-         - type in the function box 4*sin(t) + 4*sin(3*t)/3 + 4*sin(5*t)/5 + 4*sin(7*t)/7 + 4*sin(9*t)/9 + 4*sin(11*t)/11 (you can copy and paste the text to Scopy) and click apply.
+         - set sample rate to 75 Msps and record length to 10us
+         - type in the function box 4*sin(2*pi*t*500000) + 4*sin(2*pi*3*t*500000)/3 + 4*sin(2*pi*t*5*500000)/5 + 4*sin(2*pi*7*500000*t)/7 (you can copy and paste the text to Scopy) and click apply.
          - in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 500ns
             - **Expected Result:** The generated square wave signal should have the following parameters:
                 - peak to peak: 7V to 7.4V

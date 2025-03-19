@@ -180,13 +180,6 @@ Test 2 - External Channel Trigger Function
     5. Open the :ref:`Digital IO<digitalio>` instrument and set DIO 0 as output.
     6. Open the Logic Analyzer trigger menu and turn on the External trigger.
        Select the source as **External Trigger In**.
-        
-        - **Expected Result**: Triggers set on every DIO channels are automatically turned off.
-        - **Actual Result:**
-
-..
-  Actual test result goes here.
-..
 
     7. Connect Trigger in 1 to DIO0 using a loopback cable.
     8. In the Logic Analyzer Trigger settings menu set the External Trigger In condition
