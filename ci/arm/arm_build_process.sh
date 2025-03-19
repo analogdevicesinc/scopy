@@ -376,10 +376,6 @@ create_appdir(){
 	mkdir -p $APP_DIR/usr/lib/scopy/plugins/resources
 	cp $EMU_CONFIG $APP_DIR/usr/lib/scopy/plugins/resources
 
-	if [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
-		sudo rm -rfv ${SYSROOT}/usr/lib/arm-linux-gnueabihf/libQt5*
-	fi
-
 	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/scopy
 	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/iio-emu
 	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/scopy
