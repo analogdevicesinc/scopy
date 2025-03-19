@@ -31,7 +31,7 @@
 #include <style.h>
 
 using namespace scopy;
-ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
+ScopyHomePage::ScopyHomePage(QWidget *parent)
 	: QWidget(parent)
 	, ui(new Ui::ScopyHomePage)
 {
@@ -39,7 +39,7 @@ ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm)
 	auto &&is = ui->wInfoPageStack;
 	auto &&hc = is->getHomepageControls();
 	auto &&db = ui->wDeviceBrowser;
-	add = new ScopyHomeAddPage(this, pm);
+	add = new ScopyHomeAddPage(this);
 
 	ui->wInfoPageStack->setStyleSheet(".QWidget {border-radius: " + Style::getAttribute(json::global::radius_1) +
 					  ";}");
