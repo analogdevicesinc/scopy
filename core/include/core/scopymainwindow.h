@@ -59,13 +59,13 @@ class SCOPY_CORE_EXPORT ScopyMainWindow : public QMainWindow
 public:
 	ScopyMainWindow(QWidget *parent = nullptr);
 	~ScopyMainWindow();
-	void initAboutPage(PluginManager *pm = nullptr);
-	void initPreferencesPage(PluginManager *pm = nullptr);
+	void initAboutPage();
+	void initPreferencesPage();
 	void initPreferences();
 	void setAppTheme();
 	void setupPreferences();
 	void initTranslations();
-	void loadPluginsFromRepository(PluginRepository *pr = nullptr);
+	void loadPluginsFromRepository();
 
 	void showEvent(QShowEvent *event) override;
 
@@ -85,7 +85,6 @@ public Q_SLOTS:
 private:
 	ScopyAboutPage *about;
 	ScopyPreferencesPage *prefPage;
-	PluginRepository *pr;
 	ScopyHomePage *hp;
 	DeviceManager *dm;
 

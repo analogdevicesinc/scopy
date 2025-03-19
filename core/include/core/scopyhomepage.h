@@ -23,7 +23,6 @@
 #define SCOPYHOMEPAGE_H
 
 #include "device.h"
-#include "pluginmanager.h"
 #include "scopy-core_export.h"
 #include "scopyhomeaddpage.h"
 
@@ -40,7 +39,7 @@ class SCOPY_CORE_EXPORT ScopyHomePage : public QWidget
 	Q_OBJECT
 
 public:
-	explicit ScopyHomePage(QWidget *parent = nullptr, PluginManager *pm = nullptr);
+	explicit ScopyHomePage(QWidget *parent = nullptr);
 	~ScopyHomePage();
 	QCheckBox *scanControlBtn();
 	QPushButton *scanBtn();

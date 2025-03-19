@@ -38,6 +38,9 @@
 Q_LOGGING_CATEGORY(CAT_PLUGINREPOSTIORY, "PluginRepository");
 
 using namespace scopy;
+
+PluginRepository *PluginRepository::pinstance_{nullptr};
+
 PluginRepository::PluginRepository(QObject *parent)
 	: QObject(parent)
 {
@@ -46,7 +49,17 @@ PluginRepository::PluginRepository(QObject *parent)
 
 PluginRepository::~PluginRepository() {}
 
-void PluginRepository::init(QString location)
+PluginRepository *PluginRepository::GetInstance()
+{
+	if(pinstance_ == nullptr) {
+		pinstance_ = new PluginRepository(QApplication::instance());
+	}
+	return pinstance_;
+}
+
+void PluginRepository::init(QString location) { pinstance_->_init(location); }
+
+void PluginRepository::_init(QString location)
 {
 	qInfo(CAT_PLUGINREPOSTIORY) << "initializing plugins from: " << location;
 	const QString pluginMetaFileName = "plugin.json";
@@ -57,7 +70,7 @@ void PluginRepository::init(QString location)
 	plugins.append(PkgManager::listFilesInfo(QStringList() << "plugins"));
 	QStringList pluginFiles;
 
-	for(const QFileInfo &p : plugins) {
+	for(const QFileInfo &p : qAsConst(plugins)) {
 		if(p.fileName() == pluginMetaFileName) {
 			pluginMetaFilePath = p.absoluteFilePath();
 			continue;
@@ -96,6 +109,28 @@ void PluginRepository::init(QString location)
 	pm->clear();
 	pm->add(pluginFiles);
 	pm->sort();
+}
+
+PluginManager *PluginRepository::getPluginManager() { return pinstance_->_getPluginManager(); }
+
+PluginManager *PluginRepository::_getPluginManager() { return pm; }
+
+QList<Plugin *> PluginRepository::getOriginalPlugins()
+{
+	PluginManager *pm = getPluginManager();
+	return pm->getOriginalPlugins();
+}
+
+QList<Plugin *> PluginRepository::getPlugins(QString category)
+{
+	PluginManager *pm = getPluginManager();
+	return pm->getPlugins(category);
+}
+
+QList<Plugin *> PluginRepository::getCompatiblePlugins(const QString &param, const QString &category)
+{
+	PluginManager *pm = getPluginManager();
+	return pm->getCompatiblePlugins(param, category);
 }
 
 #include "moc_pluginrepository.cpp"
