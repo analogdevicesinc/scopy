@@ -441,15 +441,14 @@ QStringList ScopyMainWindow_API::getPlugins(QString uri, QString cat)
 
 QStringList ScopyMainWindow_API::availablePlugins(QString uri, QString cat, Device *dev)
 {
-	PluginRepository *pr = new PluginRepository(this);
-	m_w->loadPluginsFromRepository(pr);
-	PluginManager *pm = pr->getPluginManager();
+	PluginRepository *pr = PluginRepository::GetInstance();
+	m_w->loadPluginsFromRepository();
 	QList<Plugin *> compatiblePlugins;
 	QStringList resultList;
 	if(!uri.isEmpty()) {
-		compatiblePlugins = pm->getCompatiblePlugins(uri, cat);
-	} else {
-		compatiblePlugins = pm->getCompatiblePlugins(dev->param(), dev->category());
+		compatiblePlugins = pr->getCompatiblePlugins(uri, cat);
+	} else if(dev) {
+		compatiblePlugins = pr->getCompatiblePlugins(dev->param(), dev->category());
 	}
 
 	for(int i = 0; i < compatiblePlugins.size(); i++) {
