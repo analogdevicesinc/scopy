@@ -25,7 +25,6 @@
 #include "devicefactory.h"
 #include "deviceimpl.h"
 #include "deviceloader.h"
-#include "pluginbase/preferences.h"
 #include "pluginbase/statusbarmanager.h"
 
 #include <QDebug>
@@ -36,9 +35,8 @@
 
 Q_LOGGING_CATEGORY(CAT_DEVICEMANAGER, "DeviceManager")
 using namespace scopy;
-DeviceManager::DeviceManager(PluginManager *pm, QObject *parent)
+DeviceManager::DeviceManager(QObject *parent)
 	: QObject{parent}
-	, pm(pm)
 {}
 
 DeviceManager::~DeviceManager() {}
@@ -75,7 +73,7 @@ QString DeviceManager::createDevice(QString category, QString param, bool async,
 	qInfo(CAT_DEVICEMANAGER) << category << "device with params" << param << "added";
 	Q_EMIT deviceAddStarted(param);
 
-	DeviceImpl *d = DeviceFactory::build(param, pm, category);
+	DeviceImpl *d = DeviceFactory::build(param, category);
 	DeviceLoader *dl = new DeviceLoader(d, this);
 
 	connect(dl, &DeviceLoader::initialized, this, [=]() {

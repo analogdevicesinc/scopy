@@ -24,7 +24,6 @@
 
 #include "device.h"
 #include "pluginbase/plugin.h"
-#include "pluginmanager.h"
 #include "scopy-core_export.h"
 
 #include <QCheckBox>
@@ -38,7 +37,7 @@ class SCOPY_CORE_EXPORT DeviceImpl : public QObject, public Device
 {
 	Q_OBJECT
 public:
-	explicit DeviceImpl(QString param, PluginManager *p, QString category = "", QObject *parent = nullptr);
+	explicit DeviceImpl(QString param, QString category = "", QObject *parent = nullptr);
 	virtual ~DeviceImpl();
 
 	// Device interface
@@ -95,7 +94,6 @@ protected:
 	void unbindPing();
 
 protected:
-	PluginManager *p;
 	QList<Plugin *> m_plugins;
 	QList<Plugin *> m_connectedPlugins;
 	DeviceState_t m_state;

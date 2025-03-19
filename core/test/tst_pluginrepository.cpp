@@ -42,13 +42,11 @@ private:
 
 void TST_PluginRepository::loadLibs()
 {
-	PluginRepository *p = new PluginRepository(this);
+	PluginRepository *p = PluginRepository::GetInstance();
 	PluginManager *pm = p->getPluginManager();
 	QVERIFY(pm->metadata().isEmpty());
 	p->init(PLUGIN_LOCATION);
 	//	QVERIFY(!pm->metadata().isEmpty());
-
-	delete p;
 }
 
 QTEST_MAIN(TST_PluginRepository)

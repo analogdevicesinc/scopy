@@ -32,7 +32,7 @@ class DeviceFactory : public QObject
 {
 	Q_OBJECT
 public:
-	static DeviceImpl *build(QString param, PluginManager *pm, QString category = "", QObject *parent = nullptr);
+	static DeviceImpl *build(QString param, QString category = "", QObject *parent = nullptr);
 };
 } // namespace scopy
 #endif // DEVICEFACTORY_H

@@ -25,13 +25,13 @@
 
 using namespace scopy;
 
-DeviceImpl *DeviceFactory::build(QString param, PluginManager *pm, QString category, QObject *parent)
+DeviceImpl *DeviceFactory::build(QString param, QString category, QObject *parent)
 {
 	QString cat = category.toLower();
 	if(cat.compare("iio") == 0) {
-		return new IIODeviceImpl(param, pm, parent);
+		return new IIODeviceImpl(param, parent);
 	} else {
-		return new DeviceImpl(param, pm, category, parent);
+		return new DeviceImpl(param, category, parent);
 	}
 }
 

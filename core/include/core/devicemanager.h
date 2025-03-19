@@ -24,7 +24,6 @@
 
 #include "device.h"
 #include "deviceimpl.h"
-#include "pluginmanager.h"
 #include "scopy-core_export.h"
 
 #include <QMap>
@@ -38,7 +37,7 @@ class SCOPY_CORE_EXPORT DeviceManager : public QObject
 	friend class ScopyMainWindow_API;
 
 public:
-	explicit DeviceManager(PluginManager *pm, QObject *parent = nullptr);
+	explicit DeviceManager(QObject *parent = nullptr);
 	~DeviceManager();
 	Device *getDevice(QString id);
 	void setExclusive(bool);
@@ -96,7 +95,6 @@ private:
 	QStringList scannedDev;
 	QStringList connectedDev;
 	QMap<QString, Device *> map;
-	PluginManager *pm;
 
 	void disconnectingDevice(QString id);
 	void disconnectDevice(QString id);
