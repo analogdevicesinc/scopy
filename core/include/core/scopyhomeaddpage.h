@@ -27,7 +27,6 @@
 #include "iiotabwidget.h"
 #include "infopage.h"
 #include "pluginenablewidget.h"
-#include "pluginmanager.h"
 #include "scopy-core_export.h"
 
 #include <iio.h>
@@ -47,7 +46,7 @@ class SCOPY_CORE_EXPORT ScopyHomeAddPage : public QWidget
 	Q_OBJECT
 
 public:
-	explicit ScopyHomeAddPage(QWidget *parent = nullptr, PluginManager *pm = nullptr);
+	explicit ScopyHomeAddPage(QWidget *parent = nullptr);
 	~ScopyHomeAddPage();
 
 Q_SIGNALS:
@@ -79,7 +78,6 @@ private:
 	QFutureWatcher<bool> *m_fw;
 
 	InfoPage *m_deviceInfoPage;
-	PluginManager *m_pluginManager;
 	DeviceImpl *m_deviceImpl;
 	QList<PluginEnableWidget *> m_pluginDescriptionList;
 
