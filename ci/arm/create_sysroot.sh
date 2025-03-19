@@ -5,7 +5,7 @@ SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 source $SRC_SCRIPT/arm_build_config.sh $1
 
-IMAGE_FILE=2023-12-13-ADI-Kuiper-full.img
+IMAGE_FILE=""
 
 install_packages(){
 	sudo apt update
@@ -15,24 +15,28 @@ install_packages(){
 download_kuiper(){
 	mkdir -p ${STAGING_AREA}
 	pushd ${STAGING_AREA}
-	if [ ! -f image_2023-12-13-ADI-Kuiper-full.zip ]; then
-		wget \
-		--progress=bar:force:noscroll \
-		--progress=dot:giga \
-		--header='User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0' \
-		--header='Accept-Language: en-US,en;q=0.5' \
-		--header='Accept-Encoding: gzip, deflate, br' \
-		--header='Connection: keep-alive' \
-		--header='Upgrade-Insecure-Requests: 1' \
-		--header='Sec-Fetch-Dest: document' \
-		--header='Sec-Fetch-Mode: navigate' \
-		--header='Sec-Fetch-Site: none' \
-		--header='Sec-Fetch-User: ?1' \
-		--header='Pragma: no-cache' \
-		--header='Cache-Control: no-cache' \
-		${KUIPER_DOWNLOAD_LINK}
-	fi
-	[ -f $IMAGE_FILE ] || unzip image*.zip
+
+	# Currently we wait for the next Kuiper release that will contain both armhf and arm64 images
+
+	# if [ ! -f image_2023-12-13-ADI-Kuiper-full.zip ]; then
+	# 	wget \
+	# 	--progress=bar:force:noscroll \
+	# 	--progress=dot:giga \
+	# 	--header='User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0' \
+	# 	--header='Accept-Language: en-US,en;q=0.5' \
+	# 	--header='Accept-Encoding: gzip, deflate, br' \
+	# 	--header='Connection: keep-alive' \
+	# 	--header='Upgrade-Insecure-Requests: 1' \
+	# 	--header='Sec-Fetch-Dest: document' \
+	# 	--header='Sec-Fetch-Mode: navigate' \
+	# 	--header='Sec-Fetch-Site: none' \
+	# 	--header='Sec-Fetch-User: ?1' \
+	# 	--header='Pragma: no-cache' \
+	# 	--header='Cache-Control: no-cache' \
+	# 	${KUIPER_DOWNLOAD_LINK}
+	# fi
+
+	[ -f $IMAGE_FILE ] || unzip image_*.zip
 	popd
 }
 
@@ -62,11 +66,7 @@ extract_sysroot(){
 
 # execute chroot inside the sysroot folder and install/remove packages using apt
 configure_sysroot(){
-	if [ $TOOLCHAIN_HOST == "aarch64-linux-gnu"  ]; then
-			cat $SRC_SCRIPT/inside_chroot_arm64.sh | sudo chroot ${SYSROOT}
-	elif [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
-			cat $SRC_SCRIPT/inside_chroot_armhf.sh | sudo chroot ${SYSROOT}
-	fi
+	cat $SRC_SCRIPT/inside_chroot_arm.sh | sudo chroot ${SYSROOT}
 }
 
 move_and_extract_sysroot(){

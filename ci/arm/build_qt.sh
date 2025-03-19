@@ -20,7 +20,11 @@ download_qt(){
 		cd qt-everywhere-src
 
 		# Patch QT Source
-		patch -p1 < $SRC_SCRIPT/qt_patch.patch
+		if [ $TOOLCHAIN_HOST == "aarch64-linux-gnu"  ]; then
+			patch -p1 -R < $SRC_SCRIPT/qt_configure_arm64.patch
+		elif [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
+			patch -p1 < $SRC_SCRIPT/qt_configure_arm32.patch
+		fi
 	else
 		echo "QT already downloaded"
 	fi
@@ -55,7 +59,7 @@ build(){
 	-eglfs \
 	-reduce-exports \
 	-opengl desktop \
-	-device linux-rasp-pi3-vc4-g++\
+	-device linux-rasp-pi4-v3d-g++ \
 	-device-option CROSS_COMPILE="$CROSS_COMPILER"/bin/"$TOOLCHAIN_HOST"- \
 	-skip qtandroidextras \
 	-skip qtcharts \
@@ -71,6 +75,7 @@ build(){
 	-skip qtpurchasing \
 	-skip qtquick3d \
 	-skip qtquickcontrols \
+	-skip qtquickcontrols2 \
 	-skip qtquicktimeline \
 	-skip qtremoteobjects \
 	-skip qtscript \

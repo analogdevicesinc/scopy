@@ -1,0 +1,20 @@
+--- qt-everywhere-src/qtbase/mkspecs/devices/linux-rasp-pi4-v3d-g++/qmake.conf	2024-11-08 15:36:08.000000000 +0200
++++ qt-everywhere-src2/qtbase/mkspecs/devices/linux-rasp-pi4-v3d-g++/qmake.conf	2025-03-18 10:13:09.188643024 +0200
+@@ -27,7 +27,7 @@
+ QMAKE_LIBS_EGL         += -lEGL
+ QMAKE_LIBS_OPENGL_ES2  += -lGLESv2 -lEGL
+ 
+-QMAKE_CFLAGS            = -march=armv8-a -mtune=cortex-a72 -mfpu=crypto-neon-fp-armv8
++QMAKE_CFLAGS            = -march=armv7-a -mfloat-abi=hard -mfpu=neon -mno-unaligned-access
+ QMAKE_CXXFLAGS          = $$QMAKE_CFLAGS
+ 
+ DISTRO_OPTS            += hard-float
+@@ -35,6 +35,8 @@
+ 
+ EGLFS_DEVICE_INTEGRATION = eglfs_kms
+ 
++LINKER_FLAGS   += -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed
++
+ include(../common/linux_arm_device_post.conf)
+ 
+ load(qt_config)

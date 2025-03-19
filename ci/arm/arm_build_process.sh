@@ -50,16 +50,8 @@ set_config_opts() {
 	CONFIG_OPTS+=("PKG_CONFIG_SYSROOT=${SYSROOT}")
 	CONFIG_OPTS+=("PKG_CONFIG_SYSROOT_DIR=${SYSROOT}")
 
-	if [ "$TOOLCHAIN_HOST" == "aarch64-linux-gnu" ]; then
-		CONFIG_OPTS+=("PKG_CONFIG_PATH=${SYSROOT}/usr/lib/${TOOLCHAIN_HOST}/pkgconfig")
-		CONFIG_OPTS+=("PKG_CONFIG=/usr/bin/${TOOLCHAIN_HOST}-pkg-config" )
-	elif [ "$TOOLCHAIN_HOST" == "arm-linux-gnueabihf" ]; then
-		CONFIG_OPTS+=("PKG_CONFIG_PATH=${SYSROOT}/usr/bin/arm-linux-gnueabihf-pkg-config")
-		CONFIG_OPTS+=("PKG_CONFIG=${SYSROOT}/usr/bin/${TOOLCHAIN_HOST}-pkg-config" )
-	fi
-
-	# CONFIG_OPTS+=("PKG_CONFIG_PATH=${SYSROOT}/usr/lib/${TOOLCHAIN_HOST}/pkgconfig")
-	# CONFIG_OPTS+=("PKG_CONFIG=/usr/bin/${TOOLCHAIN_HOST}-pkg-config" )
+	CONFIG_OPTS+=("PKG_CONFIG_PATH=${SYSROOT}/usr/lib/${TOOLCHAIN_HOST}/pkgconfig")
+	CONFIG_OPTS+=("PKG_CONFIG=/usr/bin/${TOOLCHAIN_HOST}-pkg-config" )
 
 	CONFIG_OPTS+=("PKG_CONFIG_ALLOW_CROSS=1")
 	CONFIG_OPTS+=("LDFLAGS=${LDFLAGS}")
@@ -77,7 +69,7 @@ set_config_opts() {
 install_packages() {
 	sudo apt update
 	sudo apt install -y build-essential cmake unzip gfortran gcc git bison libtool \
-		python3 pip gperf pkg-config gdb-multiarch g++ flex texinfo gawk openssl pkg-config-aarch64-linux-gnu \
+		python3 pip gperf pkg-config gdb-multiarch g++ flex texinfo gawk openssl pkg-config-arm-linux-gnueabihf pkg-config-aarch64-linux-gnu \
 		pigz libncurses-dev autoconf automake tar figlet liborc-0.4-dev* patchelf libc6-dev-arm64-cross squashfs-tools ccache
 	pip install mako
 }
