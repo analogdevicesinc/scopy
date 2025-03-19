@@ -35,6 +35,7 @@
 #include <QTextBrowser>
 #include <QThread>
 #include <QtConcurrent/QtConcurrent>
+#include <pluginrepository.h>
 #include <style.h>
 
 #include <common/scopyconfig.h>
@@ -45,11 +46,10 @@
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "Device")
 
 namespace scopy {
-DeviceImpl::DeviceImpl(QString param, PluginManager *p, QString category, QObject *parent)
+DeviceImpl::DeviceImpl(QString param, QString category, QObject *parent)
 	: QObject{parent}
 	, m_param(param)
 	, m_category(category)
-	, p(p)
 {
 	m_state = DEV_INIT;
 	m_id = "dev_" + category + "_" + param + "_" + scopy::config::getUuid();
@@ -60,7 +60,7 @@ void DeviceImpl::init()
 {
 	QElapsedTimer timer;
 	timer.start();
-	m_plugins = p->getCompatiblePlugins(m_param, m_category);
+	m_plugins = PluginRepository::getCompatiblePlugins(m_param, m_category);
 	for(Plugin *p : qAsConst(m_plugins)) {
 		QObject *obj = dynamic_cast<QObject *>(p);
 		if(obj) {

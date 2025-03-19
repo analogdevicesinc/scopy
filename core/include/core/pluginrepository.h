@@ -33,13 +33,27 @@ namespace scopy {
 class SCOPY_CORE_EXPORT PluginRepository : public QObject
 {
 	Q_OBJECT
-public:
-	PluginRepository(QObject *parent);
+protected:
+	explicit PluginRepository(QObject *parent);
 	~PluginRepository();
-	void init(QString location);
-	PluginManager *getPluginManager() { return pm; }
+
+public:
+	PluginRepository(PluginRepository &other) = delete;
+	void operator=(const PluginRepository &) = delete;
+	static PluginRepository *GetInstance();
+
+	static void init(QString location);
+	void _init(QString location);
+
+	static PluginManager *getPluginManager();
+	PluginManager *_getPluginManager();
+
+	static QList<Plugin *> getOriginalPlugins();
+	static QList<Plugin *> getPlugins(QString category = "");
+	static QList<Plugin *> getCompatiblePlugins(const QString &param, const QString &category = "");
 
 private:
+	static PluginRepository *pinstance_;
 	PluginManager *pm;
 	QJsonObject metadata;
 };
