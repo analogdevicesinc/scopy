@@ -24,6 +24,9 @@
 #include <QDebug>
 #include <style.h>
 #include <stylehelper.h>
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(CAT_HOVERWIDGET, "HoverWidget")
 
 using namespace scopy;
 
@@ -320,9 +323,9 @@ void HoverWidget::moveToAnchor()
 		break;
 	}
 
-	qDebug() << "moveAnchor"
-		 << "mapped" << mappedPoint << "contentPosition" << contentPosition << "anchorPosition"
-		 << anchorPosition << "offset" << m_anchorOffset;
+	qDebug(CAT_HOVERWIDGET) << "moveAnchor"
+				<< "mapped" << mappedPoint << "contentPosition" << contentPosition << "anchorPosition"
+				<< anchorPosition << "offset" << m_anchorOffset;
 	move(mappedPoint + contentPosition + anchorPosition + m_anchorOffset);
 }
 
