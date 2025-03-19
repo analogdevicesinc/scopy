@@ -29,8 +29,8 @@ namespace scopy {
 class SCOPY_CORE_EXPORT IIODeviceImpl : public DeviceImpl
 {
 public:
-	explicit IIODeviceImpl(QString param, PluginManager *p, QObject *parent = nullptr)
-		: DeviceImpl(param, p, "iio", parent)
+	explicit IIODeviceImpl(QString param, QObject *parent = nullptr)
+		: DeviceImpl(param, "iio", parent)
 	{}
 	~IIODeviceImpl() {}
 
