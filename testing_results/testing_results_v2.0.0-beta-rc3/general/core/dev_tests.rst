@@ -351,7 +351,8 @@ reconnection.
 
 **Preconditions:**
     - Scopy is installed on the system.
-    - Use :ref:`M2k.Usb <m2k-usb-dev>` setup - same as in the previous test.
+    - iio-emu is installed on the system.
+    - Use :ref:`M2k.Emu <m2k-emu-dev>` setup or :ref:`M2k.Usb <m2k-usb-dev>` setup - same as in the previous test.
     - The application was previously closed with a detached tool (Oscilloscope).
     - OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.
 
@@ -359,13 +360,14 @@ reconnection.
     1. Click on the device icon from device browser.
     2. Click on **Connect** button.
         - **Expected result:** The oscilloscope tool is detached.
-        - **Actual result:**
+        - **Actual result:** Works as expected but the test description needs to be changed. 
+          The :ref:`M2k.Usb <m2k-usb-dev>` setup must be used.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 22.04.5 LTS, Debian 12 arm64, Windows 10, macOS 14.5
 
 ..
   Details about the tested OS goes here.
@@ -375,7 +377,7 @@ reconnection.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).

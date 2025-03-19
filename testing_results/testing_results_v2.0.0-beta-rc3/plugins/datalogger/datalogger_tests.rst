@@ -24,11 +24,11 @@ The following apply to all tests below, any special requirements will be mention
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Trifan Alexandra
+         - 20/03/2025
+         - v2.0.0-beta-rc3-8ade0b5
+         - N/A
+         - OS: Ubuntu 20.04 retesting
 
 Setup Environment
 ------------------
@@ -237,13 +237,13 @@ Test 4: Clear data while running
         - **Expected result:** 
             - Data is removed from the plot
             - Buffer is cleared and the starting point is reset to "0"
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -253,7 +253,7 @@ Test 4: Clear data while running
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -653,23 +653,23 @@ Test 13: Handle Invalid X-Axis Delta Value Input
     5. Press **Settings** button
     6. Change the X-Axis Delta Value from "10" to "test" then press enter
         - **Expected result:** X-Axis displays "10" seconds 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
 
-**Comments:**
+**Comments:** there is a bug regarding input validation which will be handled in v2.1
 
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1363,13 +1363,13 @@ Test 26: Set 7 Segment Display Precision
     5. Press **Settings** button
     6. Change the 7 Segment precision to "2" then press enter
         - **Expected result:** 7 Segment displays data with "2" decimal points
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -1379,7 +1379,7 @@ Test 26: Set 7 Segment Display Precision
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -1617,9 +1617,9 @@ the user to import data from a file
 **Steps:**
     1. Open Data Logger plugin
     2. Open the settings menu
-    3. Press the **Browse** button
+    3. Press **Import Data** button
             - **Expected result:** A file explorer window is opened
-            - **Actual result:**
+            - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -1629,7 +1629,7 @@ the user to import data from a file
         - **Expected result:** 
             - in the channel menu a new virtual device  called "Import: <file name>" is created
             - channel **xadc-voltage0** is available under the "Import: <file name>" device
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -1637,14 +1637,14 @@ the user to import data from a file
 
     5. Enable channel **xadc-voltage0** of "Import: <file name>" device 
         - **Expected result:** Data from the file is displayed on the plot relative to the time and date it was recorded 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -1654,7 +1654,7 @@ the user to import data from a file
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).

@@ -18,11 +18,11 @@ Signal Generator - Test Suite
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Trifan Alexandra
+         - 19/03/2025
+         - v2.0.0-beta-rc3-8ade0b5
+         - N/A
+         - OS: Ubuntu 20.04 retesting
 
 Setup environment:
 -------------------------------------------------------
@@ -724,7 +724,7 @@ Test 4: Additional Features
         - Waveform Type: Square Wave, Amplitude: 3V, Offset: 1.5V, Frequency: 1kHz, Phase: 0 degrees and Duty Cycle: 50%
     3. Connect AWG ch1 to scope ch1+ and scope ch1- to gnd.
             - **Expected Result:** Check in the Oscilloscope if the Square Wave signal generated is from 0V to 3V.
-            - **Actual Result:**
+            - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -733,7 +733,7 @@ Test 4: Additional Features
     4. Under Noise choose Uniform Noise Type in the dropdown menu and set it to 500mV.
     5. Set the Oscilloscope’s setting to Time Base: 100us, Volts/Div: 500mV/Div; Using the cursors measure the noise generated in the square waveform.
             - **Expected Result:** The measured voltage should be close to 500mV.
-            - **Actual Result:**
+            - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -741,7 +741,7 @@ Test 4: Additional Features
 
     6. Repeat steps 1.3 and 1.4 using different Noise Amplitude [1V, 1.5V, 2V and 2.5V]
             - **Expected Result:** The measured voltage should be close to the desired noise voltage.
-            - **Actual Result:**
+            - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -751,9 +751,9 @@ Test 4: Additional Features
     8. Download buffer test files from `here <https://wiki.analog.com/_media/university/tools/m2k/scopy/test-cases/signal_generator_buffer_test.zip>`_. Open Signal Generator Instrument and click the Buffer Tab.
     9. Connect AWG ch1 to scope ch1+ and scope ch1- to gnd
     10. Test .csv file
-    11. Load the .csv file from the downloaded .zip file. Make sure the Noise is disabled.
+    11. Load the .csv file from the downloaded .zip file
             - **Expected Result:** The signal generated should be a stair step signal.
-            - **Actual Result:**
+            - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -763,7 +763,7 @@ Test 4: Additional Features
     13. Press "Load file" button and make sure the field "File of type" in the dialog box is set to "MATLAB Files (\*.mat)".
     14. Load the .mat file from the downloaded .zip file. Set the frequency to 20kHz, and the time base of Oscilloscope to 10ms.
             - **Expected Result:** The signal generated should be a sine wave signal.
-            - **Actual Result:**
+            - **Actual Result:** Skipped. In this version mat files are unsupported.
 
 ..
   Actual test result goes here.
@@ -774,42 +774,42 @@ Test 4: Additional Features
     17. Connect AWG ch1 to scope ch1+ and scope ch1- to gnd
     18. Generate Sine waves
     19. In the Signal Generator Math Function tab:
-         - set sample rate to 37.5 Msps and record length to 10 ms
-         - type in the function box 5*sin(2*pi*100*t) and click apply.
+         - set frequency to 100Hz
+         - type in the function box 5*sin(t) and click apply.
          - in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 2ms
             - **Expected Result:** The generated sine wave signal should have the following parameters:
                 - peak to peak: 9.6V to 10.4V
                 - frequency: 100Hz
                 - period: 10ms
-            - **Actual Result:**
+            - **Actual Result:** Works as expected, but the test case description should have been updated.
 
 ..
   Actual test result goes here.
 ..
 
     20. In the Signal Generator Math Function tab:
-         - set sample rate to 37.5 Msps and record length to 2ms
-         - type in the function box 4*sin(2*pi*1000*t) and click apply.
-         - in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 200us
+         - set frequency to 1kHz
+         - type in the function box 4*sin(10*t) and click apply.
+         - in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 20us
             - **Expected Result:** The generated sine wave signal should have the following parameters:
                 - peak to peak: 7.6V to 8.4V
-                - frequency: 1kHz
-                - period: 1ms
-            - **Actual Result:**
+                - frequency: 10kHz
+                - period: 100us
+            - **Actual Result:** Works as expected, but the test case description should have been updated.
 
 ..
   Actual test result goes here.
 ..
 
     21. In the Signal Generator Math Function tab:
-         - set sample rate to 75 Msps and record length to 2us
-         - type in the function box 3*sin(2*pi*5000000*t)and click apply.
-         - in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 500ns
+         - set frequency to 100kHz
+         - type in the function box 3*sin(50*t) and click apply.
+         - in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 100ns
             - **Expected Result:** The generated sine wave signal should have the following parameters:
                 - peak to peak: 5.6V to 6.4V
                 - frequency: 5MHz
                 - period: 200ns
-            - **Actual Result:**
+            - **Actual Result:** Works as expected, but the test case description should have been updated.
 
 ..
   Actual test result goes here.
@@ -817,14 +817,14 @@ Test 4: Additional Features
 
     22. Generate Square waves
     23. In the Signal Generator Math Function tab:
-         - set sample rate to 75 Msps and record length to 10us
-         - type in the function box 4*sin(2*pi*t*500000) + 4*sin(2*pi*3*t*500000)/3 + 4*sin(2*pi*t*5*500000)/5 + 4*sin(2*pi*7*500000*t)/7 (you can copy and paste the text to Scopy) and click apply.
+         - set frequency to 500kHz
+         - type in the function box 4*sin(t) + 4*sin(3*t)/3 + 4*sin(5*t)/5 + 4*sin(7*t)/7 + 4*sin(9*t)/9 + 4*sin(11*t)/11 (you can copy and paste the text to Scopy) and click apply.
          - in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 500ns
             - **Expected Result:** The generated square wave signal should have the following parameters:
                 - peak to peak: 7V to 7.4V
                 - frequency: 500kHz
                 - period: 2us
-            - **Actual Result:**
+            - **Actual Result:** Works as expected, but the test case description should have been updated.
 
 ..
   Actual test result goes here.
@@ -833,7 +833,7 @@ Test 4: Additional Features
     24. Waveform Phase – Seconds
     25. Open Waveform tab. Set frequency to 500Hz. Set Phase to 90 degrees. Then change phase unit to seconds.
             - **Expected Result:** The value of Phase should automatically change to 500us that is 90 degrees in seconds for a frequency of 500Hz.
-            - **Actual Result:**
+            - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -841,7 +841,7 @@ Test 4: Additional Features
 
     26. Increase and decrease the value of phase.
             - **Expected Result:** The display should follow accordingly.
-            - **Actual Result:**
+            - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -849,7 +849,7 @@ Test 4: Additional Features
 
     27. Increase phase value to 1.5 ms. Then change again the unit to degrees.
             - **Expected Result:** The value should now be 270 degrees.
-            - **Actual Result:**
+            - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
@@ -858,13 +858,13 @@ Test 4: Additional Features
     28. Change frequency to 1 MHz. Then set phase to 1us. This corresponds to a full period of a 1MHz frequency.
     29. Change phase unit to degrees.
             - **Expected Result:** The value should be 360 degrees.
-            - **Actual Result:**
+            - **Actual Result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -874,7 +874,7 @@ Test 4: Additional Features
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
