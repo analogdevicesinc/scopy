@@ -117,22 +117,20 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	scanTask->setScanParams("usb");
 	scanCycle = new CyclicalTask(scanTask, this);
 	scc = new ScannedIIOContextCollector(this);
-	pr = new PluginRepository(this);
-	loadPluginsFromRepository(pr);
 
-	PluginManager *pm = pr->getPluginManager();
+	loadPluginsFromRepository();
 
-	initAboutPage(pm);
-	initPreferencesPage(pm);
+	initAboutPage();
+	initPreferencesPage();
 	initTranslations();
 
 	ScopySplashscreen::showMessage("Loading homepage");
-	hp = new ScopyHomePage(this, pm);
+	hp = new ScopyHomePage(this);
 	m_sbc = new ScanButtonController(scanCycle, hp->scanControlBtn(), this);
 	connect(hp->scanBtn(), &QPushButton::clicked, this, [=]() { scanTask->run(); });
 
 	DeviceAutoConnect::initPreferences();
-	dm = new DeviceManager(pm, this);
+	dm = new DeviceManager(this);
 	bool general_connect_to_multiple_devices = Preferences::get("general_connect_to_multiple_devices").toBool();
 	dm->setExclusive(!general_connect_to_multiple_devices);
 
@@ -349,13 +347,14 @@ ScopyMainWindow::~ScopyMainWindow()
 	delete ui;
 }
 
-void ScopyMainWindow::initAboutPage(PluginManager *pm)
+void ScopyMainWindow::initAboutPage()
 {
 	DebugTimer benchmark;
 	about = new ScopyAboutPage(this);
-	if(!pm)
+	if(!PluginRepository::GetInstance()) {
 		return;
-	QList<Plugin *> plugin = pm->getOriginalPlugins();
+	}
+	QList<Plugin *> plugin = PluginRepository::getOriginalPlugins();
 	for(Plugin *p : plugin) {
 		QString content = p->about();
 		if(!content.isEmpty()) {
@@ -365,13 +364,14 @@ void ScopyMainWindow::initAboutPage(PluginManager *pm)
 	DEBUGTIMER_LOG(benchmark, "Init about page took:");
 }
 
-void ScopyMainWindow::initPreferencesPage(PluginManager *pm)
+void ScopyMainWindow::initPreferencesPage()
 {
 	prefPage = new ScopyPreferencesPage(this);
-	if(!pm)
+	if(!PluginRepository::GetInstance()) {
 		return;
+	}
 
-	QList<Plugin *> plugin = pm->getOriginalPlugins();
+	QList<Plugin *> plugin = PluginRepository::getOriginalPlugins();
 	for(Plugin *p : plugin) {
 		p->initPreferences();
 		if(p->loadPreferencesPage()) {
@@ -523,26 +523,26 @@ void ScopyMainWindow::loadOpenGL()
 	m_glLoader = nullptr;
 }
 
-void ScopyMainWindow::loadPluginsFromRepository(PluginRepository *pr)
+void ScopyMainWindow::loadPluginsFromRepository()
 {
 
 	DebugTimer benchmark;
 	// Check the local build plugins folder first
 	// Check if directory exists and it's not empty
 	QDir pathDir(scopy::config::localPluginFolderPath());
+	PluginRepository *pr = PluginRepository::GetInstance();
+	PluginManager *pm = pr->getPluginManager();
 
 	ScopySplashscreen::setPrefix("Loading plugin: ");
 
-	connect(pr->getPluginManager(), SIGNAL(startLoadPlugin(QString)), ScopySplashscreen::GetInstance(),
-		SLOT(setMessage(QString)));
+	connect(pm, SIGNAL(startLoadPlugin(QString)), ScopySplashscreen::GetInstance(), SLOT(setMessage(QString)));
 	if(pathDir.exists() && pathDir.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries).count() != 0) {
 		pr->init(scopy::config::localPluginFolderPath());
 	} else {
 		pr->init(scopy::config::defaultPluginFolderPath());
 	}
 	ScopySplashscreen::setPrefix("");
-	disconnect(pr->getPluginManager(), SIGNAL(startLoadPlugin(QString)), ScopySplashscreen::GetInstance(),
-		   SLOT(setMessage(QString)));
+	disconnect(pm, SIGNAL(startLoadPlugin(QString)), ScopySplashscreen::GetInstance(), SLOT(setMessage(QString)));
 
 #ifndef Q_OS_ANDROID
 	QString pluginAdditionalPath = Preferences::GetInstance()->get("general_additional_plugin_path").toString();

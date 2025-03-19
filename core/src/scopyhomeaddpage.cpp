@@ -33,9 +33,8 @@ Q_LOGGING_CATEGORY(CAT_HOME_ADD_PAGE, "ScopyHomeAddPage")
 
 using namespace scopy;
 
-ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm)
+ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent)
 	: QWidget(parent)
-	, m_pluginManager(pm)
 	, m_deviceImpl(nullptr)
 {
 	setProperty("device_page", true);
@@ -83,7 +82,7 @@ void ScopyHomeAddPage::futureVerify(QString uri, QString cat)
 {
 	removePluginsCheckBoxes();
 	m_deviceInfoPage->clear();
-	m_deviceImpl = DeviceFactory::build(uri, m_pluginManager, cat);
+	m_deviceImpl = DeviceFactory::build(uri, cat);
 	QFuture<bool> f = QtConcurrent::run(std::bind(&DeviceImpl::verify, m_deviceImpl));
 	m_fw->setFuture(f);
 }
