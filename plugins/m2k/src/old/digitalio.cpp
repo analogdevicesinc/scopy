@@ -200,6 +200,9 @@ void DigitalIO::readPreferences()
 
 DigitalIO::~DigitalIO()
 {
+	if(poll->isActive()) {
+		poll->stop();
+	}
 	delete api;
 	delete ui;
 }
