@@ -3,9 +3,15 @@
 if [ "$1" == "arm64" ];then
 	echo "Building for aarch64"
 	TOOLCHAIN_HOST="aarch64-linux-gnu"
+	ARCHITECTURE=aarch64
+	CMAKE_SYSTEM_PROCESSOR=aarch64
+	CMAKE_LIBRARY_ARCHITECTURE=aarch64-linux-gnu
 elif [ "$1" == "arm32" ]; then
 	echo "Building for armhf"
 	TOOLCHAIN_HOST="arm-linux-gnueabihf"
+	ARCHITECTURE=armhf
+	CMAKE_SYSTEM_PROCESSOR=arm
+	CMAKE_LIBRARY_ARCHITECTURE=arm-linux-gnueabihf
 else
 	echo "$1 is invalid.  Enter first argument arm32 or arm64 to choose the toolchain"
 	exit
@@ -49,19 +55,8 @@ APP_DESKTOP=$SRC_SCRIPT/../general/scopy.desktop
 APP_SQUASHFS=$SRC_SCRIPT/scopy.squashfs
 
 # Runetimes downloaded from https://github.com/AppImage/AppImageKit/releases/continuous Mar 9, 2023
-if [ $TOOLCHAIN_HOST == "aarch64-linux-gnu" ]; then
-	RUNTIME_ARM=$SRC_SCRIPT/runtime-aarch64
-elif [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
-	RUNTIME_ARM=$SRC_SCRIPT/runtime-armhf
-fi
+RUNTIME_ARM=$SRC_SCRIPT/runtime-$ARCHITECTURE
 
-if [ $TOOLCHAIN_HOST == "aarch64-linux-gnu" ]; then
-	CMAKE_SYSTEM_PROCESSOR=aarch64
-	CMAKE_LIBRARY_ARCHITECTURE=aarch64-linux-gnu
-elif [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
-	CMAKE_SYSTEM_PROCESSOR=arm
-	CMAKE_LIBRARY_ARCHITECTURE=arm-linux-gnueabihf
-fi
 
 # The exports below ensure these variables are available to the toolchain file.
 export CMAKE_SYSROOT="$SYSROOT"
@@ -78,17 +73,9 @@ CMAKE_OPTS=(\
 
 CMAKE="$CMAKE_BIN ${CMAKE_OPTS[*]}"
 
-
-
-# if [ $TOOLCHAIN_HOST == "aarch64-linux-gnu"  ]; then
-# 	IMAGE_FILE="image_2025-03-03-ADI-Kuiper-Linux-arm64.img"
-# elif [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
-# 	IMAGE_FILE="image_2025-03-03-ADI-Kuiper-Linux-armhf.img"
-# fi
-
 QT_BUILD_LOCATION=$QT_LOCATION # the location where Qt will be installed in the system
 QT_SYSTEM_LOCATION=/usr/lib/$TOOLCHAIN_HOST/qt5 # the Qt location relative to the sysroot folder
-CROSS_COMPILER=$STAGING_AREA/cross-pi-gcc
+CROSS_COMPILER=$TOOLCHAIN
 
 if [ $TOOLCHAIN_HOST == "aarch64-linux-gnu"  ]; then
 	CROSSCOMPILER_DOWNLOAD_LINK=https://sourceforge.net/projects/raspberry-pi-cross-compilers/files/Bonus%20Raspberry%20Pi%20GCC%2064-Bit%20Toolchains/Raspberry%20Pi%20GCC%2064-Bit%20Cross-Compiler%20Toolchains/Bookworm/GCC%2012.2.0/cross-gcc-12.2.0-pi_64.tar.gz

@@ -298,7 +298,7 @@ build_libtinyiiod() {
 build_kddock () {
 	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
 	pushd $STAGING_AREA/KDDockWidgets
-	CURRENT_BUILD_CMAKE_OPTS=""
+	CURRENT_BUILD_CMAKE_OPTS="-DKDDockWidgets_FRONTENDS=qtwidgets -DKDDockWidgets_EXAMPLES=false -DKDDockWidgets_QT6=false"
 	build_with_cmake
 	sudo make install
 	popd
@@ -375,10 +375,6 @@ create_appdir(){
 	cp -r $EMU_XMLS $APP_DIR/usr/lib/scopy/plugins
 	mkdir -p $APP_DIR/usr/lib/scopy/plugins/resources
 	cp $EMU_CONFIG $APP_DIR/usr/lib/scopy/plugins/resources
-
-	if [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
-		sudo rm -rfv ${SYSROOT}/usr/lib/arm-linux-gnueabihf/libQt5*
-	fi
 
 	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/scopy
 	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/iio-emu
@@ -464,7 +460,7 @@ build_deps(){
 	build_qwt
 	build_libsigrokdecode
 	build_libtinyiiod
-	# build_kddock temporary disabled
+	build_kddock
 }
 
 run_workflow(){
