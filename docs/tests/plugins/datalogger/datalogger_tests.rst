@@ -1617,7 +1617,7 @@ the user to import data from a file
 **Steps:**
     1. Open Data Logger plugin
     2. Open the settings menu
-    3. Press **Import Data** button
+    3. Press the **Browse** button
             - **Expected result:** A file explorer window is opened
             - **Actual result:**
 

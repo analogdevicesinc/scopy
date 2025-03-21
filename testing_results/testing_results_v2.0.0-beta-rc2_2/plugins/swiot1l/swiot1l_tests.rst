@@ -24,11 +24,11 @@ If the test case has special requirements, they will be listed in the test case 
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Trifan Alexandra
+         - 20/03/2025
+         - v2.0.0-beta-rc2-8ade0b5
+         - N/A
+         - OS: Ubuntu 20.04 retesting
 
 Setup environment
 ------------------
@@ -111,13 +111,13 @@ with the selected device and that the plugin is able to correctly parse it.
         - **Expected Result**:
             - The plugin is able to connect to the device.
             - The Config instrument shows 4 disabled channels.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -127,7 +127,7 @@ with the selected device and that the plugin is able to correctly parse it.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -349,7 +349,7 @@ plot changes such as labels and timestamp are correctly modified.
             - The labels are displayed on the right side of the plot.
             - The X axis of the plot shows a 4s timespan, 
               using the -4 to 0 range.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -359,7 +359,7 @@ plot changes such as labels and timestamp are correctly modified.
         - **Expected Result**:
             - The voltage_out 1 data is displayed on the plot 
               from the right to the left side.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -370,13 +370,13 @@ plot changes such as labels and timestamp are correctly modified.
             - The measurements are displayed above the plot
               and the instant value for the first channel is
               around 0A.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -386,7 +386,7 @@ plot changes such as labels and timestamp are correctly modified.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -420,7 +420,7 @@ displayed on the plot and measured by the instrument.
             - On the top right on the plot the status message 
               displays: a number of samples at **1.2ksps**.
         
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -429,7 +429,7 @@ displayed on the plot and measured by the instrument.
     5. Set YMin to -1A and YMax to 10A.
         - **Expected result:** 
             - The plot Y axis is scaled between -1A and 10A.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -444,7 +444,7 @@ displayed on the plot and measured by the instrument.
             - The value is automatically changed to 8191.
             - Below the field the value 10.9V is displayed.
         
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -453,7 +453,7 @@ displayed on the plot and measured by the instrument.
     8. Run a Single capture and check the measurements:
         - **Expected result:** 
             - The instant value of **voltage_in 2** shows 10V.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -462,7 +462,7 @@ displayed on the plot and measured by the instrument.
     9. Run a Continuous capture and check the measurements:
         - **Expected result:** 
             - The instant value of **voltage_in 2** shows 10V.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -475,7 +475,7 @@ displayed on the plot and measured by the instrument.
               dropping from the previous value to 5.5V.
             - The same value is displayed in the instant value 
               measurement.
-         - **Actual result:**
+         - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -489,14 +489,14 @@ displayed on the plot and measured by the instrument.
               dropping to 0V.
             - The same value is displayed in the instant value 
               measurement.
-         - **Actual result:**
+         - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -506,7 +506,7 @@ displayed on the plot and measured by the instrument.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -541,7 +541,7 @@ displayed on the instrument.
         - **Expected result:** 
             - The instant value of **diagnostic 5** shows around 10V,
               the same as **voltage_in 2**.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -551,7 +551,7 @@ displayed on the instrument.
         - **Expected result:** 
             - Both the **diagnostic 5** and **voltage_in 2** signals 
               are dropping from the previous value to 5.5V.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -561,14 +561,14 @@ displayed on the instrument.
         - **Expected result:** 
             - Both the **diagnostic 5** and **voltage_in 2** signals 
               are dropping from the previous value to around 2.7V.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -578,7 +578,7 @@ displayed on the instrument.
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).

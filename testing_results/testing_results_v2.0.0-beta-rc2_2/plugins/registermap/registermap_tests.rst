@@ -24,11 +24,12 @@ Prerequisites:
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Trifan Alexandra
+         - 20/03/2025
+         - v2.0.0-beta-rc2-8ade0b5
+         - N/A
+         - OS: Ubuntu 20.04 retesting
+
 
 Setup Environment
 ------------------
@@ -939,7 +940,7 @@ Test 18 : Settings register dump
     4. Press **Find path** button
     5. Select a ".csv" file to save the register dump
         - **Expected result:** file path is displayed in the **File path** field
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -950,13 +951,13 @@ Test 18 : Settings register dump
           in the selected file with the structure of each row 
           containing register address and register value
 
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
   
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -966,7 +967,7 @@ Test 18 : Settings register dump
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).

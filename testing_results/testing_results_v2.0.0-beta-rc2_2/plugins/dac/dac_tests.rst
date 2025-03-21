@@ -23,11 +23,11 @@ If the test case has special requirements, they will be listed in the test case 
          - Scopy version
          - Plugin version (N/A if not applicable)
          - Comments
-       * - 
-         - 
-         - 
-         - 
-         - 
+       * - Trifan Alexandra
+         - 20/03/2025
+         - v2.0.0-beta-rc2-8ade0b5
+         - N/A
+         - OS: Ubuntu 20.04 retesting
 
 Setup environment:
 -------------------
@@ -136,7 +136,7 @@ Test 2 - Buffer mode file loading
             - A new section called "DATA CONFIGURATION" should appear.
             - The bottom log section contains the following entry structure: *[timestamp] 
               Successfully loaded: [file name]*.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -144,7 +144,7 @@ Test 2 - Buffer mode file loading
 
     5. While running, load a file with a lower number of samples using the browser and the file listed in the resources above: *sinewave_0.9_2ch.csv*.
         - **Expected result:** The "File Size" field is populated with ** 8444 samples**.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -152,7 +152,7 @@ Test 2 - Buffer mode file loading
 
     6. While running, load a file with a lower number of samples using the browser and the file listed in the resources above: *sine_complex_1_30720_sr_15360000_samps_20000_ampl_32767.csv*.
         - **Expected result:** The "File Size" field is populated with ** 20 ksamples**.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -166,14 +166,14 @@ Test 2 - Buffer mode file loading
             - The Run button is disabled.
             - The bottom log section contains the following entry structure: *[timestamp] 
               Failed to load: [file name]*.
-        - **Actual result:**
+        - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Ubuntu 20.04
 
 ..
   Details about the tested OS goes here.
@@ -183,7 +183,7 @@ Test 2 - Buffer mode file loading
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
@@ -386,7 +386,7 @@ Test 5 - Cyclic buffer mode
     10. Press "Run".
     11. Check the ADC plugin for the generated signal.
          - **Expected result:** A sinewave is seen on the ADC plot.
-         - **Actual result:**
+         - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
@@ -394,14 +394,14 @@ Test 5 - Cyclic buffer mode
 
     12. Stop the DAC plugin while monitoring the ADC plot.
          - **Expected result:** The sinewave no longer appears.
-         - **Actual result:**
+         - **Actual result:** As expected.
 
 ..
   Actual test result goes here.
 ..
 
 
-**Tested OS:**
+**Tested OS:** Debian 12 arm64
 
 ..
   Details about the tested OS goes here.
@@ -411,7 +411,7 @@ Test 5 - Cyclic buffer mode
 ..
   Any comments about the test goes here.
 
-**Result:** PASS/FAIL
+**Result:** PASS
 
 ..
   The result of the test goes here (PASS/FAIL).
