@@ -12,17 +12,20 @@ STAGING_AREA_DEPS=$STAGING_AREA/dependencies
 
 USE_STAGING=OFF
 
+LIBSERIALPORT_BRANCH=master
 LIBIIO_VERSION=v0.26
+LIBAD9361_BRANCH=main
 LIBM2K_BRANCH=main
 SPDLOG_BRANCH=v1.x
 VOLK_BRANCH=main
 GNURADIO_BRANCH=scopy2-maint-3.10
 GRSCOPY_BRANCH=3.10
-GRM2K_BRANCH=master
+GRM2K_BRANCH=main
 LIBSIGROKDECODE_BRANCH=master
 QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 IIOEMU_BRANCH=main
+KDDOCK_BRANCH=2.1
 
 if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
 	then
@@ -67,7 +70,9 @@ build_with_cmake() {
 clone() {
 	echo "####### CLONE #######"
 	pushd $STAGING_AREA
+	[ -d 'libserialport' ] || git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
+	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
 	[ -d 'spdlog' ]		|| git clone --recursive https://github.com/gabime/spdlog.git -b $SPDLOG_BRANCH spdlog
 	[ -d 'volk' ]		|| git clone --recursive https://github.com/gnuradio/volk.git -b $VOLK_BRANCH volk
@@ -78,6 +83,7 @@ clone() {
 	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	[ -d 'iio-emu' ]	|| git clone --recursive https://github.com/analogdevicesinc/iio-emu -b $IIOEMU_BRANCH iio-emu
+	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 	popd
 }
 
@@ -88,6 +94,17 @@ install_apt() {
 		libusb-1.0-* libavahi-client* libavahi-common* libxml2* libsndfile-dev libfuse2 libboost1.74-* libglib2.0-dev \
 		qtbase5-dev* qt5-qmake* qttools5-dev* qtdeclarative5-dev libqt5qml* libqt5svg5* libgmp3-dev libgmp-dev libthrift-dev libunwind-dev
 	pip install mako --break-system-packages
+}
+
+build_libserialport(){
+	echo "####### BUILD LIBSERIALPORT #######"
+	pushd $STAGING_AREA/libserialport
+	git clean -xdf
+	./autogen.sh
+	./configure ${AUTOCONF_OPTS}
+	make $JOBS
+	sudo make install
+	popd
 }
 
 build_libiio() {
@@ -104,6 +121,13 @@ build_libiio() {
 		-DENABLE_IPV6:BOOL=OFF \
 		-DINSTALL_UDEV_RULE:BOOL=OFF\
 		../
+	popd
+}
+
+build_libad9361() {
+	echo "####### BUILD LIBAD9361 #######"
+	pushd $STAGING_AREA/libad9361
+	build_with_cmake
 	popd
 }
 
@@ -206,6 +230,14 @@ build_libtinyiiod() {
 	popd
 }
 
+build_kddock () {
+	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
+	pushd $STAGING_AREA/KDDockWidgets
+	build_with_cmake ../
+	sudo make install
+	popd
+}
+
 build_iio-emu() {
 	echo "####### BUILD IIO-EMU #######"
 	pushd $STAGING_AREA/iio-emu
@@ -231,7 +263,9 @@ build_scopy_appimage()
 }
 
 buid_deps() {
+	build_libserialport
 	build_libiio
+	build_libad9361
 	build_libm2k
 	build_spdlog
 	build_volk
@@ -241,6 +275,7 @@ buid_deps() {
 	build_qwt
 	build_libsigrokdecode
 	build_libtinyiiod
+	build_kddock
 }
 
 

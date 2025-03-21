@@ -63,7 +63,7 @@ clone() {
 	echo "#######CLONE#######"
 	mkdir -p $STAGING_AREA
 	pushd $STAGING_AREA
-	git clone --recursive https://github.com/cseci/libserialport -b $LIBSERIALPORT_BRANCH libserialport
+	git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 	git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
@@ -301,7 +301,7 @@ build_libtinyiiod() {
 build_kddock () {
 	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
 	pushd $STAGING_AREA/KDDockWidgets
-	CURRENT_BUILD_CMAKE_OPTS=""
+	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS"
 	build_with_cmake
 	make install
 	popd
