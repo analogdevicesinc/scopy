@@ -9,7 +9,7 @@ DESKTOP_INSTALL="$HOME/.local/share/applications/scopy.desktop"
 ICON_INSTALL="$HOME/.local/share/icons/scopy/scopy.png"
 
 
-if [ "$INSTALL" == "true" ]; then
+if [ "$INSTALL" == "ON" ]; then
 
 	echo "INSTALLING..."
 
@@ -25,7 +25,7 @@ if [ "$INSTALL" == "true" ]; then
 	sed -i "s|^Icon=.*|Icon=$ICON_INSTALL|" "$DESKTOP_INSTALL"
 	exit
 
-elif [ "$UNINSTALL" == "true" ]; then
+elif [ "$UNINSTALL" == "ON" ]; then
 
 	echo "UNINSTALLING..."
 

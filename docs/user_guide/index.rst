@@ -75,10 +75,32 @@ Video installation guide:
 
   **Scopy for Linux**
 
-**AppImage**: Make the application executable by running **chmod +x ./Scopy.AppImage** in a command line,
-then run Scopy as any other Linux executable. These steps are applicable for ARM64 and ARM32 also.
+**AppImage**
 
-**Flatpak**: Before downloading and extracting the scopy-Linux-flatpak.zip archive,
+Make the application executable by running:
+
+.. code-block::
+
+	chmod +x ./Scopy.AppImage
+
+
+Then run Scopy as any other Linux executable. These steps are applicable for ARM64 and ARM32 also.
+
+To install the AppImage inside the system and create a quick access icon in the app launcher, run:
+
+.. code-block::
+
+	INSTALL=ON ./Scopy.AppImage
+
+To remove all the files installed by the AppImage, run:
+
+.. code-block::
+
+	UNINSTALL=ON ./Scopy.AppImage
+
+**Flatpak**
+
+Before downloading and extracting the scopy-flatpak.zip archive,
 you need to setup Flatpak `using this setup guide <https://flatpak.org/setup/>`_ 
 for your Linux distribution.
 
@@ -99,7 +121,7 @@ After this, get the Scopy.flatpak file from the downloaded archive and run:
 
 .. code-block::
 
-    flatpak install scopy-Linux-flatpak.flatpak
+    flatpak install Scopy.flatpak
 
 |
 
