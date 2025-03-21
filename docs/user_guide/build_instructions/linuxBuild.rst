@@ -174,13 +174,19 @@ Installer for armhf
       $ cd ~
       $ git clone https://github.com/analogdevicesinc/scopy.git
 
-2. Download the Docker image
+2. Install the packages needed for cross-compilation
+
+  .. code-block:: bash
+
+      $ ./ci/arm/create_sysroot.sh arm32 install_packages install_qemu
+
+3. Download the Docker image
 
    .. code-block:: bash
 
       $ docker pull cristianbindea/scopy2-armhf-appimage:latest
 
-3. Run the image, while creating a docker volume
+4. Run the image, while creating a docker volume
 
    .. code-block:: bash
 
@@ -188,7 +194,7 @@ Installer for armhf
 
    Now this repository folder is shared with the Docker container.
 
-4. To compile and package the application use
+5. To compile and package the application use
 
    .. code-block:: bash
 
@@ -201,7 +207,7 @@ Finally, after the development is done use this to clean the system:
 
    $ docker container ls -a # get the container id
    $ docker container rm -v (container id)
-   $ docker image rm cristianbindea/scopy2-arm32-appimage:latest
+   $ docker image rm cristianbindea/scopy2-armhf-appimage:latest
 
 
 Installer for arm64
@@ -214,13 +220,19 @@ Installer for arm64
       $ cd ~
       $ git clone https://github.com/analogdevicesinc/scopy.git
 
-2. Download the Docker image
+2. Install the packages needed for cross-compilation
+
+  .. code-block:: bash
+
+      $ ./ci/arm/create_sysroot.sh arm64 install_packages install_qemu
+
+3. Download the Docker image
 
    .. code-block:: bash
 
       $ docker pull cristianbindea/scopy2-arm64-appimage:latest
 
-3. Run the image, while creating a docker volume
+4. Run the image, while creating a docker volume
 
    .. code-block:: bash
 
@@ -228,7 +240,7 @@ Installer for arm64
 
    Now this repository folder is shared with the Docker container.
 
-4. To compile and package the application use
+5. To compile and package the application use
 
    .. code-block:: bash
 
