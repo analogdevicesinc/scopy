@@ -15,23 +15,30 @@ install_packages(){
 download_kuiper(){
 	mkdir -p ${STAGING_AREA}
 	pushd ${STAGING_AREA}
-	if [ ! -f image_2023-12-13-ADI-Kuiper-full.zip ]; then
-		wget \
-		--progress=bar:force:noscroll \
-		--progress=dot:giga \
-		--header='User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0' \
-		--header='Accept-Language: en-US,en;q=0.5' \
-		--header='Accept-Encoding: gzip, deflate, br' \
-		--header='Connection: keep-alive' \
-		--header='Upgrade-Insecure-Requests: 1' \
-		--header='Sec-Fetch-Dest: document' \
-		--header='Sec-Fetch-Mode: navigate' \
-		--header='Sec-Fetch-Site: none' \
-		--header='Sec-Fetch-User: ?1' \
-		--header='Pragma: no-cache' \
-		--header='Cache-Control: no-cache' \
-		${KUIPER_DOWNLOAD_LINK}
+
+	if [ $TOOLCHAIN_HOST == "aarch64-linux-gnu"  ]; then
+		echo "Waiting for a arm64 Kuiper linux release"
+		exit
+	elif [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
+		if [ ! -f image_2023-12-13-ADI-Kuiper-full.zip ]; then
+			wget \
+			--progress=bar:force:noscroll \
+			--progress=dot:giga \
+			--header='User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0' \
+			--header='Accept-Language: en-US,en;q=0.5' \
+			--header='Accept-Encoding: gzip, deflate, br' \
+			--header='Connection: keep-alive' \
+			--header='Upgrade-Insecure-Requests: 1' \
+			--header='Sec-Fetch-Dest: document' \
+			--header='Sec-Fetch-Mode: navigate' \
+			--header='Sec-Fetch-Site: none' \
+			--header='Sec-Fetch-User: ?1' \
+			--header='Pragma: no-cache' \
+			--header='Cache-Control: no-cache' \
+			${KUIPER_DOWNLOAD_LINK}
+		fi
 	fi
+
 	[ -f $IMAGE_FILE ] || unzip image*.zip
 	popd
 }
