@@ -357,7 +357,7 @@ bool M2kPlugin::loadPreferencesPage()
 			// check if input is an positive integer
 			bool ok;
 			auto value = text.toInt(&ok);
-			return ok && value >= 0;
+			return ok && value > 0;
 		},
 		analogSection));
 

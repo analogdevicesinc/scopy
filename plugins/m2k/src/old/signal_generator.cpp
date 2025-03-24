@@ -557,7 +557,7 @@ void SignalGenerator::readPreferences()
 	Preferences *p = Preferences::GetInstance();
 	bool showFps = p->get("general_show_plot_fps").toBool();
 	m_plot->setVisibleFpsLabel(showFps);
-	double prefered_periods_nr = 2; // p->get("M2k_siggen_periods").toBool());
+	double prefered_periods_nr = p->get("m2k_siggen_periods").toInt();
 
 	if(nr_of_periods != prefered_periods_nr) {
 		nr_of_periods = prefered_periods_nr;
