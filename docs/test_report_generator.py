@@ -98,7 +98,7 @@ def maneuver(test_folder: str, test_report_dir: str, scopy_version: str) -> None
                     # This mega regex is used to extract the test cases from
                     # the rst files.
                     matches = re.findall(
-                        r'\*\*UID:*\*\*:*\s*(.*?)\n.*?OS:\s*(.*?)\n.*?\*\*Steps:*\*\*:*\n(.*?)\*\*Tested OS:?\*\*:? ?(.*?)\n.*?\*\*Comments:?\*\*:? ?(.*?)\n.*?\*\*Result:?\*\*:? ?(.*?)\n',
+                        r'\*\*UID:?\*\*:?\s*(.*?)\n.*?OS:\s*(.*?)\n.*?\*\*Steps:?\*\*:? *\n(.*?)\*\*Tested OS:?\*\*:? ?(.*?)\n.*?\*\*Comments:?\*\*:? ?(.*?)\n.*?\*\*Result:?\*\*:? ?(.*?)\n',
                         content,
                         re.DOTALL)
 
@@ -106,40 +106,42 @@ def maneuver(test_folder: str, test_report_dir: str, scopy_version: str) -> None
                     fail_count = 0
                     skip_count = 0
 
-                    if len(matches) > 0:
-                        file_name = file.removesuffix(".rst")
-                        full_output_name = os.path.join(
-                            test_report_dir_full, f"{file_name}_report.rst")
-                        TestCaseOverview.output_rst_header(
+                    if len(matches) == 0:
+                        continue
+
+                    file_name = file.removesuffix(".rst")
+                    full_output_name = os.path.join(
+                        test_report_dir_full, f"{file_name}_report.rst")
+                    TestCaseOverview.output_rst_header(
+                        output_rst_file=full_output_name,
+                        file_name=file_name
+                    )
+
+                    for match in matches:
+                        uid, _, _, tested_os, comments, result = match
+                        TestCaseOverview.output_to_rst_table(
                             output_rst_file=full_output_name,
-                            file_name=file_name
+                            uid=uid,
+                            tested_os=tested_os,
+                            comments=comments,
+                            result=result,
+                            link_to_file=scopy_test_resources_base_dir(
+                                scopy_version) + test_folder + os.path.relpath(root, test_folder_full) + "/" + file
                         )
 
-                        for match in matches:
-                            uid, _, _, tested_os, comments, result = match
-                            TestCaseOverview.output_to_rst_table(
-                                output_rst_file=full_output_name,
-                                uid=uid,
-                                tested_os=tested_os,
-                                comments=comments,
-                                result=result,
-                                link_to_file=scopy_test_resources_base_dir(
-                                    scopy_version) + test_folder + os.path.relpath(root, test_folder_full) + "/" + file
-                            )
+                        if result == "PASS":
+                            pass_count += 1
+                        elif result == "FAIL":
+                            fail_count += 1
+                        else:
+                            skip_count += 1
 
-                            if result == "PASS":
-                                pass_count += 1
-                            elif result == "FAIL":
-                                fail_count += 1
-                            else:
-                                skip_count += 1
-
-                        tests[file_name] = {
-                            "pass": pass_count,
-                            "fail": fail_count,
-                            "skip": skip_count,
-                            "total": len(matches)
-                        }
+                    tests[file_name] = {
+                        "pass": pass_count,
+                        "fail": fail_count,
+                        "skip": skip_count,
+                        "total": len(matches)
+                    }
 
     overview_file_name = os.path.join(
         test_report_dir_full, "test_report_overview.rst")
