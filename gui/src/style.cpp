@@ -45,11 +45,14 @@ Style *Style::pinstance_{nullptr};
 QJsonDocument *Style::m_global_json{new QJsonDocument()};
 QJsonDocument *Style::m_theme_json{new QJsonDocument()};
 QMap<QString, QString> *Style::m_styleMap{new QMap<QString, QString>()};
+QFileInfoList Style::m_pkgThemes{};
+QFileInfoList Style::m_pkgQss{};
 
 Style::Style(QObject *parent)
 	: QObject(parent)
 	, m_globalJsonPath("/json/global.json")
 	, m_themeJsonPath("/json/Scopy.json")
+	, m_jsonFolderPath("/json")
 	, m_qssFolderPath("/qss")
 	, m_qssGlobalFile("global")
 	, m_m2kqssFile("m2k")
@@ -70,6 +73,7 @@ Style *Style::GetInstance()
 QString Style::getStylePath(QString relativePath)
 {
 	// Check the local plugins folder first
+
 	QString path = config::localStyleFolderPath() + relativePath;
 	QDir *pathDir = new QDir(path);
 	QFile *pathFile = new QFile(path);
@@ -93,6 +97,7 @@ void Style::initPaths()
 	m_globalJsonPath = getStylePath(m_globalJsonPath);
 	m_themeJsonPath = getStylePath(m_themeJsonPath);
 	m_qssFolderPath = getStylePath(m_qssFolderPath);
+	m_jsonFolderPath = getStylePath(m_jsonFolderPath);
 }
 
 bool Style::init(QString theme, float fontScale)
@@ -115,6 +120,10 @@ QString Style::getThemePath(QString theme)
 {
 	QString tmp_theme_path = m_themeJsonPath;
 	tmp_theme_path.replace(getTheme() + ".json", theme + ".json");
+	if(!QFile::exists(tmp_theme_path)) {
+		tmp_theme_path = getThemeFromPkgs(theme);
+		qInfo(CAT_STYLE) << "Theme not found in the default path, searching in the packages folder...";
+	}
 
 	return tmp_theme_path;
 }
@@ -167,7 +176,7 @@ QString Style::getColorTransparent(const char *key, double transparency)
 	return color;
 }
 
-QString Style::getTheme() { return QFileInfo(m_themeJsonPath).fileName().replace(".json", ""); }
+QString Style::getTheme() { return QFileInfo(m_themeJsonPath).baseName(); }
 
 bool Style::setTheme(QString themePath, float fontScale)
 {
@@ -183,7 +192,7 @@ bool Style::setTheme(QString themePath, float fontScale)
 		m_theme_json = new QJsonDocument(QJsonDocument::fromJson(theme_data));
 
 		adjustJsonForScaling(fontScale);
-		genrateStyle();
+		generateStyle();
 		QIcon::setThemeName(getAttribute(json::theme::icon_theme_folder));
 	} else {
 		qCritical(CAT_STYLE) << "Style: Failed set theme: " << themePath.toStdString().c_str();
@@ -193,10 +202,25 @@ bool Style::setTheme(QString themePath, float fontScale)
 	return ret;
 }
 
+QString Style::getThemeFromPkgs(QString theme)
+{
+	QString path = "";
+	for(const QFileInfo &file : qAsConst(m_pkgThemes)) {
+		if(file.baseName().contains(theme)) {
+			path = file.filePath();
+			break;
+		}
+	}
+	return path;
+}
+
 QStringList Style::getThemeList()
 {
 	QStringList themes = QStringList();
-	QStringList fileList = QDir(QFileInfo(m_themeJsonPath).path()).entryList(QDir::Files);
+	QStringList fileList;
+	std::transform(m_pkgThemes.begin(), m_pkgThemes.end(), std::back_inserter(fileList),
+		       [](const QFileInfo &fi) { return fi.fileName(); });
+	fileList.append(QDir(m_jsonFolderPath).entryList(QDir::Files));
 	QString globalJsonName = QFileInfo(m_globalJsonPath).fileName();
 
 	foreach(QString filename, fileList) {
@@ -329,19 +353,21 @@ QString Style::replaceAttributes(QString style, int calls_limit)
 	return style;
 }
 
-void Style::genrateStyle()
-{
-	QDirIterator it(m_qssFolderPath, QStringList() << "*.qss", QDir::Files, QDirIterator::Subdirectories);
-	QFile *file;
+void Style::setPkgsThemes(QFileInfoList infoList) { m_pkgThemes = infoList; }
 
-	while(it.hasNext()) {
-		it.next();
-		file = new QFile(it.filePath());
+void Style::setPkgsQss(QFileInfoList infoList) { m_pkgQss = infoList; }
+
+void Style::generateStyle()
+{
+	QFileInfoList qssList = getQssList(m_qssFolderPath);
+	qssList.append(m_pkgQss);
+	QFile *file;
+	for(const QFileInfo &fInfo : qAsConst(qssList)) {
+		file = new QFile(fInfo.filePath());
 		file->open(QIODevice::ReadOnly);
 		QString data = QString(file->readAll());
-		m_styleMap->insert(QFileInfo(it.filePath()).baseName(), replaceAttributes(data));
+		m_styleMap->insert(fInfo.baseName(), replaceAttributes(data));
 	}
-
 	setGlobalStyle();
 }
 
@@ -355,6 +381,17 @@ QString Style::getAllProperties()
 	}
 
 	return style;
+}
+
+QFileInfoList Style::getQssList(QString path)
+{
+	QDirIterator it(path, QStringList() << "*.qss", QDir::Files, QDirIterator::Subdirectories);
+	QFileInfoList files;
+	while(it.hasNext()) {
+		it.next();
+		files.append(it.fileInfo());
+	}
+	return files;
 }
 
 void Style::setGlobalStyle(QWidget *widget)
