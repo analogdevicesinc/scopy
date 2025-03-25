@@ -26,11 +26,15 @@
 using namespace scopy;
 using namespace datamonitor;
 
-DmmDataMonitorModel::DmmDataMonitorModel(QObject *parent) {}
+DmmDataMonitorModel::DmmDataMonitorModel(QObject *parent, double defaultScale, double defaultOffset)
+	: ReadableDataMonitorModel(parent, defaultScale, defaultOffset)
+{}
 
 DmmDataMonitorModel::DmmDataMonitorModel(QString name, QColor color, UnitOfMeasurement *unitOfMeasure,
-					 DMMReadStrategy *readStrategy, QObject *parent)
-	: ReadableDataMonitorModel(parent)
+					 double defaultScale, double defaultOffset, DMMReadStrategy *readStrategy,
+					 QObject *parent)
+	: ReadableDataMonitorModel(parent, defaultScale, defaultOffset)
+	, m_readStrategy(readStrategy) // Ensure m_readStrategy is initialized
 {
 	setName(name);
 	setColor(color);
@@ -61,5 +65,7 @@ QString DmmDataMonitorModel::getDeviceName() { return QString::fromStdString(iio
 iio_device *DmmDataMonitorModel::iioDevice() const { return m_iioDevice; }
 
 void DmmDataMonitorModel::setIioDevice(iio_device *newIioDevice) { m_iioDevice = newIioDevice; }
+
+DMMReadStrategy *DmmDataMonitorModel::readStrategy() { return m_readStrategy; }
 
 #include "moc_dmmdatamonitormodel.cpp"
