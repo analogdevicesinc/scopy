@@ -52,12 +52,17 @@ QList<DmmDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
 				UnitOfMeasurement *unitOfMeasurement = new UnitOfMeasurement("", "");
 				DMMReadStrategy *dmmReadStrategy = new DMMReadStrategy(dev, chn);
 
-				if(iioChannelHasAttribute(chn, "offset")) {
-					double offset = 0;
+				double offset = 0;
+				bool hasOffset = iioChannelHasAttribute(chn, "offset");
+				if(hasOffset) {
 					iio_channel_attr_read_double(chn, "offset", &offset);
-					dmmReadStrategy->setOffset(offset);
 				}
 
+				double scale = 1;
+				bool hasScale = iioChannelHasAttribute(chn, "scale");
+				if(hasScale) {
+					iio_channel_attr_read_double(chn, "scale", &scale);
+				}
 				int type = iio_channel_get_type(chn);
 				if(type != iio_chan_type::IIO_CHAN_TYPE_UNKNOWN) {
 					IIOUnit dmmInfo = m_iioDevices.value(static_cast<iio_chan_type>(type));
@@ -66,14 +71,16 @@ QList<DmmDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
 						dmmInfo = m_hwmonDevices.value(static_cast<hwmon_chan_type>(type));
 					}
 					unitOfMeasurement = new UnitOfMeasurement(dmmInfo.name, dmmInfo.symbol);
-					dmmReadStrategy->setUmScale(dmmInfo.scale);
+					scale = scale * dmmInfo.scale;
 				}
 
-				DmmDataMonitorModel *channelModel = new DmmDataMonitorModel(
-					name, StyleHelper::getChannelColor(j), unitOfMeasurement, dmmReadStrategy);
-
+				DmmDataMonitorModel *channelModel =
+					new DmmDataMonitorModel(name, StyleHelper::getChannelColor(j),
+								unitOfMeasurement, scale, offset, dmmReadStrategy);
 				channelModel->setIioChannel(chn);
 				channelModel->setIioDevice(dev);
+				channelModel->setHasOffset(hasOffset);
+				channelModel->setHasScale(hasScale);
 
 				result.push_back(channelModel);
 			}

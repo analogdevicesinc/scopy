@@ -29,10 +29,22 @@
 using namespace scopy;
 using namespace datamonitor;
 
-DataMonitorModel::DataMonitorModel(QObject *parent) { setDataStorageSize(); }
+DataMonitorModel::DataMonitorModel(QObject *parent, double defaultScale, double defaultOffset)
+	: m_defaultScale(defaultScale)
+	, m_defaultOffset(defaultOffset)
+	, m_scale(defaultScale)
+	, m_offset(defaultOffset)
+{
+	setDataStorageSize();
+}
 
-DataMonitorModel::DataMonitorModel(QString name, QColor color, UnitOfMeasurement *unitOfMeasure, QObject *parent)
+DataMonitorModel::DataMonitorModel(QString name, QColor color, UnitOfMeasurement *unitOfMeasure, double defaultScale,
+				   double defaultOffset, QObject *parent)
 	: color(color)
+	, m_defaultScale(defaultScale)
+	, m_defaultOffset(defaultOffset)
+	, m_scale(defaultScale)
+	, m_offset(defaultOffset)
 	, QObject{parent}
 {
 	m_minValue = std::numeric_limits<double>::max();
@@ -129,6 +141,16 @@ void DataMonitorModel::setDataStorageSize()
 	}
 }
 
+void DataMonitorModel::setHasScale(bool newHasScale) { m_hasScale = newHasScale; }
+
+bool DataMonitorModel::hasScale() const { return m_hasScale; }
+
+bool DataMonitorModel::hasOffset() const { return m_hasOffset; }
+
+void DataMonitorModel::setHasOffset(bool newHasOffset) { m_hasOffset = newHasOffset; }
+
+double DataMonitorModel::defaultOffset() const { return m_defaultOffset; }
+
 void DataMonitorModel::setYdata(const QVector<double> &newYdata)
 {
 	ydata.erase(ydata.begin(), ydata.end());
@@ -189,7 +211,7 @@ void DataMonitorModel::setDeviceName(const QString &newDeviceName) { deviceName 
 
 void DataMonitorModel::addValue(double time, double value)
 {
-	// make sure the total amout of data won't be more than what is set in prefferences
+	// make sure the total amount of data won't be more than what is set in preferences
 	if(xdata.length() >= m_dataSize) {
 		xdata.pop_front();
 		ydata.pop_front();
@@ -200,11 +222,40 @@ void DataMonitorModel::addValue(double time, double value)
 		setMaxValue(value);
 	}
 
-	xdata.push_back(time);
-	ydata.push_back(value);
-	checkMinMaxUpdate(value);
+	// Apply scaling, offset, and unit of measurement scale
+	double adjustedValue = (value + m_offset) * m_scale;
 
-	Q_EMIT valueUpdated(time, value);
+	xdata.push_back(time);
+	ydata.push_back(adjustedValue);
+	checkMinMaxUpdate(adjustedValue);
+
+	Q_EMIT valueUpdated(time, adjustedValue);
+}
+
+double DataMonitorModel::defaultScale() const { return m_defaultScale; }
+
+double DataMonitorModel::offset() const { return m_offset; }
+
+void DataMonitorModel::setOffset(double newOffset)
+{
+	double oldOffset = m_offset;
+	m_offset = newOffset;
+	for(int i = 0; i < ydata.size(); ++i) {
+		ydata[i] = ((ydata[i] / m_scale - oldOffset) + newOffset) * m_scale;
+	}
+	Q_EMIT dataCleared();
+}
+
+double DataMonitorModel::scale() const { return m_scale; }
+
+void DataMonitorModel::setScale(double newScale)
+{
+	double oldScale = m_scale;
+	m_scale = newScale;
+	for(int i = 0; i < ydata.size(); ++i) {
+		ydata[i] = ydata[i] / oldScale * newScale;
+	}
+	Q_EMIT dataCleared();
 }
 
 #include "moc_datamonitormodel.cpp"

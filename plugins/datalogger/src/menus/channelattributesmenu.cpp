@@ -23,9 +23,12 @@
 
 #include <iiowidgetbuilder.h>
 #include <menuheader.h>
+#include <menuspinbox.h>
+#include <float.h>
 
 using namespace scopy;
 using namespace datamonitor;
+using namespace gui;
 
 ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, QWidget *parent)
 	: QWidget{parent}
@@ -48,6 +51,8 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, QWidget *p
 	scrollArea->setWidgetResizable(true);
 	scrollArea->setWidget(settingsBody);
 	mainLayout->addWidget(scrollArea);
+
+	///////////////////// channel attributes ///////////////////////////////////////////
 
 	MenuSectionWidget *attrcontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *attr = new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE,
@@ -72,10 +77,150 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, QWidget *p
 		attrLayout->addWidget(new QLabel("NO ATTRIBUTE FOUND !"));
 	}
 
+	////////////////////// scalling settings ////////////////////////////////////////////////
+
+	MenuSectionWidget *scalingcontainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *scaling = new MenuCollapseSection("Scaling", MenuCollapseSection::MHCW_NONE,
+							       MenuCollapseSection::MHW_BASEWIDGET, scalingcontainer);
+
+	QVBoxLayout *scalingLayout = new QVBoxLayout();
+	scalingLayout->setSpacing(10);
+	scalingLayout->setMargin(0);
+	scalingLayout->setContentsMargins(0, 0, 0, 10); // bottom margin
+
+	MenuCombo *scaleModeCBb = new MenuCombo("Scale Mode", scaling);
+	auto scaleCb = scaleModeCBb->combo();
+
+	scaleCb->addItem("Raw", SCALE_RAW);
+
+	if(model->hasScale()) {
+		scaleCb->addItem("Scale", SCALE_SCALED);
+	}
+
+	scaleCb->addItem("Scale override", SCALE_OVERRIDE);
+
+	MenuSpinbox *scaleOverride =
+		new MenuSpinbox("Override scale ", 1, "counts", -DBL_MAX, DBL_MAX, true, false, false, scaling);
+	scaleOverride->setScaleRange(1, 1);
+	scaleOverride->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
+	scaleOverride->setVisible(false);
+	scaleOverride->setScalingEnabled(false);
+
+	connect(scaleCb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+		if(scaleCb->itemData(idx) == SCALE_RAW) {
+
+			scaleOverride->setVisible(false);
+			// non scaled value is 1
+			model->setScale(1);
+
+		} else if(scaleCb->itemData(idx) == SCALE_SCALED) {
+
+			scaleOverride->setVisible(true);
+			scaleOverride->setEnabled(false);
+			model->setScale(model->defaultScale());
+			scaleOverride->blockSignals(true);
+			scaleOverride->setValue(model->defaultScale());
+			scaleOverride->blockSignals(false);
+
+		} else if(scaleCb->itemData(idx) == SCALE_OVERRIDE) {
+
+			scaleOverride->setVisible(true);
+			scaleOverride->setEnabled(true);
+			model->setScale(model->defaultScale());
+			scaleOverride->blockSignals(true);
+			scaleOverride->setValue(model->defaultScale());
+			scaleOverride->blockSignals(false);
+		}
+	});
+
+	if(model->hasScale()) {
+		scaleCb->setCurrentIndex(1);
+	}
+
+	scalingLayout->addWidget(scaleModeCBb);
+	scalingLayout->addWidget(scaleOverride);
+
+	connect(scaleOverride, &MenuSpinbox::valueChanged, this, [=](double value) {
+		if(qobject_cast<DmmDataMonitorModel *>(model)) {
+			DmmDataMonitorModel *dmmModel = dynamic_cast<DmmDataMonitorModel *>(model);
+			if(dmmModel) {
+				dmmModel->setScale(value);
+			}
+		}
+	});
+
+	////////////////////// offset settings ////////////////////////////////////////////////
+
+	MenuCombo *offsetModeCBb = new MenuCombo("Offset Mode", scaling);
+	auto offsetCb = offsetModeCBb->combo();
+
+	offsetCb->addItem("Raw", OFFSET_RAW);
+
+	if(model->hasOffset()) {
+		offsetCb->addItem("Offset", OFFSET_OFFSETED);
+	}
+
+	offsetCb->addItem("Offset override", OFFSET_OVERRIDE);
+
+	MenuSpinbox *offsetOverride =
+		new MenuSpinbox("Override offset", 1, "counts", -DBL_MAX, DBL_MAX, true, false, false, scaling);
+	offsetOverride->setScaleRange(1, 1);
+	offsetOverride->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
+	offsetOverride->setVisible(false);
+	offsetOverride->setScalingEnabled(false);
+
+	connect(offsetCb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+		if(offsetCb->itemData(idx) == OFFSET_RAW) {
+
+			offsetOverride->setVisible(false);
+			// non offset value is 0
+			model->setOffset(0);
+
+		} else if(offsetCb->itemData(idx) == OFFSET_OFFSETED) {
+
+			offsetOverride->setVisible(true);
+			offsetOverride->setEnabled(false);
+			model->setOffset(model->defaultOffset());
+			offsetOverride->blockSignals(true);
+			offsetOverride->setValue(model->defaultOffset());
+			offsetOverride->blockSignals(false);
+
+		} else if(offsetCb->itemData(idx) == OFFSET_OVERRIDE) {
+
+			offsetOverride->setVisible(true);
+			offsetOverride->setEnabled(true);
+			model->setOffset(model->defaultOffset());
+			offsetOverride->blockSignals(true);
+			offsetOverride->setValue(model->defaultOffset());
+			offsetOverride->blockSignals(false);
+		}
+	});
+
+	if(model->hasOffset()) {
+		offsetCb->setCurrentIndex(1);
+	}
+
+	scalingLayout->addWidget(offsetModeCBb);
+	scalingLayout->addWidget(offsetOverride);
+
+	connect(offsetOverride, &MenuSpinbox::valueChanged, this, [=](double value) {
+		if(qobject_cast<DmmDataMonitorModel *>(model)) {
+			DmmDataMonitorModel *dmmModel = dynamic_cast<DmmDataMonitorModel *>(model);
+			if(dmmModel) {
+				dmmModel->setOffset(value);
+			}
+		}
+	});
+	///////////////// add attributes to settings ///////////////////
 	attr->contentLayout()->addLayout(attrLayout);
 	attrcontainer->contentLayout()->addWidget(attr);
 
 	layout->addWidget(attrcontainer);
+
+	//////////////// add scaling attributes to settings ///////////////////////////////
+	scaling->contentLayout()->addLayout(scalingLayout);
+	scalingcontainer->contentLayout()->addWidget(scaling);
+	layout->addWidget(scalingcontainer);
 
 	QSpacerItem *spacer = new QSpacerItem(10, 10, QSizePolicy::Preferred, QSizePolicy::Expanding);
 	layout->addItem(spacer);

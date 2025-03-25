@@ -40,14 +40,9 @@ public:
 public:
 	void read();
 
-	double offset() const;
-	void setOffset(double newOffset);
-
 private:
 	iio_device *dev;
 	iio_channel *chn;
-	double m_umScale = 1;
-	double m_offset = 0;
 };
 } // namespace datamonitor
 } // namespace scopy

@@ -33,6 +33,20 @@ class SCOPY_DATALOGGER_EXPORT ChannelAttributesMenu : public QWidget
 {
 	Q_OBJECT
 public:
+	typedef enum
+	{
+		SCALE_RAW,
+		SCALE_SCALED,
+		SCALE_OVERRIDE
+	} ScaleMode;
+
+	typedef enum
+	{
+		OFFSET_RAW,
+		OFFSET_OFFSETED,
+		OFFSET_OVERRIDE
+	} OffsetMode;
+
 	explicit ChannelAttributesMenu(DataMonitorModel *model, QWidget *parent = nullptr);
 };
 } // namespace datamonitor
