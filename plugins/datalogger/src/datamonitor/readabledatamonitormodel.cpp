@@ -26,12 +26,15 @@
 using namespace scopy;
 using namespace datamonitor;
 
-ReadableDataMonitorModel::ReadableDataMonitorModel(QObject *parent) {}
+ReadableDataMonitorModel::ReadableDataMonitorModel(QObject *parent, double defaultScale, double defaultOffset)
+	: DataMonitorModel(parent, defaultScale, defaultOffset)
+{}
 
 ReadableDataMonitorModel::ReadableDataMonitorModel(QString name, QColor color, UnitOfMeasurement *unitOfMeasure,
-						   IReadStrategy *readStrategy, QObject *parent)
-	: m_readStrategy(readStrategy)
-	, DataMonitorModel{parent}
+						   IReadStrategy *readStrategy, double defaultScale,
+						   double defaultOffset, QObject *parent)
+	: DataMonitorModel(parent, defaultScale, defaultOffset)
+	, m_readStrategy(readStrategy)
 {
 	setName(name);
 	setColor(color);
