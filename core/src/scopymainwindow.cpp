@@ -76,8 +76,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	, m_glLoader(nullptr)
 {
 	DebugTimer benchmark;
+
+	PkgManager::GetInstance();
+	PkgManager::init(QStringList() << scopy::config::pkgFolderPath());
+
 	initPreferences();
-	setAppTheme();
+	initStyle();
 	ScopySplashscreen::showMessage("Initializing ui");
 	ui->setupUi(this);
 
@@ -92,8 +96,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	initStatusBar();
 	setupPreferences();
 
-	PkgManager::GetInstance();
-	PkgManager::init(QStringList() << scopy::config::pkgFolderPath());
 	ConnectionProvider::GetInstance();
 	MessageBroker::GetInstance();
 
@@ -458,21 +460,22 @@ void ScopyMainWindow::initPreferences()
 	DEBUGTIMER_LOG(benchmark, "Init preferences took:");
 }
 
-// must be called after initializing preferences
-void ScopyMainWindow::setAppTheme()
+void ScopyMainWindow::initStyle()
 {
-	Preferences *p = Preferences::GetInstance();
-
-	QString theme = p->get("general_theme").toString();
-	float font = p->get("font_scale").toFloat();
-	bool theme_set = Style::GetInstance()->init(theme, font);
-
-	// set default theme if current theme is invalid
-	if(!theme_set) {
-		QString default_theme = Style::GetInstance()->getTheme();
-		Style::GetInstance()->init(default_theme, font);
-		p->set("general_theme", default_theme);
+	Style *style = Style::GetInstance();
+	QString theme = Preferences::get("general_theme").toString();
+	style->setPkgsThemes(PkgManager::listFilesInfo(QStringList() << "json"
+								     << "*.json"));
+	style->setPkgsQss(PkgManager::listFilesInfo(QStringList() << "qss"
+								  << "*.qss"));
+	if(!style->getThemeList().contains(theme)) {
+		theme = style->getTheme();
+		Preferences::set("general_theme", theme);
 	}
+	style->init(theme, Preferences::get("font_scale").toFloat());
+
+	QString themeName = "scopy-" + theme;
+	QIcon::setThemeSearchPaths({":/gui/icons/" + themeName});
 }
 
 void ScopyMainWindow::loadOpenGL()
