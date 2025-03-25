@@ -62,7 +62,7 @@ public:
 	void initAboutPage();
 	void initPreferencesPage();
 	void initPreferences();
-	void setAppTheme();
+	void initStyle();
 	void setupPreferences();
 	void initTranslations();
 	void loadPluginsFromRepository();
