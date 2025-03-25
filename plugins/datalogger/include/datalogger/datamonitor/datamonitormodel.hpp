@@ -37,9 +37,9 @@ class SCOPY_DATALOGGER_EXPORT DataMonitorModel : public QObject
 
 	Q_OBJECT
 public:
-	DataMonitorModel(QObject *parent = nullptr);
+	DataMonitorModel(QObject *parent = nullptr, double defaultScale = 1, double defaultOffset = 0);
 	explicit DataMonitorModel(QString name, QColor color, UnitOfMeasurement *unitOfMeasure = nullptr,
-				  QObject *parent = nullptr);
+				  double defaultScale = 1, double defaultOffset = 0, QObject *parent = nullptr);
 
 	QString getName() const;
 	void setName(QString newName);
@@ -78,6 +78,21 @@ public:
 
 	void setMaxValue(double newMaxValue);
 
+	double defaultScale() const;
+
+	double offset() const;
+	void setOffset(double newOffset);
+
+	double scale() const;
+	void setScale(double newScale);
+
+	double defaultOffset() const;
+
+	bool hasScale() const;
+	void setHasScale(bool newHasScale);
+	bool hasOffset() const;
+	void setHasOffset(bool newHasOffset);
+
 Q_SIGNALS:
 	void valueUpdated(double time, double value);
 	void minValueUpdated(double value);
@@ -97,8 +112,15 @@ private:
 	double m_dataSize;
 	QVector<double> ydata;
 	QVector<double> xdata;
+	const double m_defaultScale;
+	const double m_defaultOffset;
+	bool m_hasScale = false;
+	bool m_hasOffset = false;
+	double m_offset = 0;
+	double m_scale = 1;
 	void checkMinMaxUpdate(double value);
 	UnitOfMeasurement *unitOfMeasure;
+	Q_PROPERTY(bool hasOffset READ hasOffset CONSTANT FINAL)
 };
 } // namespace datamonitor
 } // namespace scopy
