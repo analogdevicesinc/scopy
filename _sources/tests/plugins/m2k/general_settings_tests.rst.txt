@@ -81,7 +81,10 @@ Test 1: M2K Connection and Calibration
   Actual test result goes here.
 ..
 
-        6. On the home menu, click the add “+” button and input the IP address of the desired M2K board to control. The default IP address is 192.168.2.1. Click add.
+        6. On the home menu, click the add “+” button and input the IP address of the desired M2K board to control. The default IP address is 192.168.2.1. 
+           In order for the connection via the ip:192.168.2.1 to take place, on macOS, the usb_ethernet_mode variable in m2k config.txt must be changed to
+           ncm (for more details access `<https://wiki.analog.com/university/tools/pluto/users/customizing>`__). Click add.
+                
                 - **Expected Result:** The instruments will appear on the left panel: Oscilloscope, Spectrum Analyzer, Network Analyzer, Signal Generator, Logic Analyzer, Pattern Generator, Digital IO, Voltmeter, and Power Supply.
                 - **Actual Result**:
 
@@ -137,6 +140,8 @@ Test 1: M2K Connection and Calibration
   The result of the test goes here (PASS/FAIL).
 
 
+.. _m2k-test2-general-settings:
+
 Test 2: Save and Load Profile
 -----------------------------------------------
 
@@ -176,7 +181,7 @@ Test 2: Save and Load Profile
   Actual test result goes here.
 ..
 
-        5. Reload the default setting by deleting the file in ``C:\Users\your_username\AppData\Roaming\ADI``. Reload “profile1.ini” and run the signal generator and oscilloscope or Spectrum Analyzer.
+        5. Reload the default setting by deleting the file in the settings folder. To open the setting folder, Open Preferences, make sure the "General" tab is selected, scroll to "Session" section and click the "Open" button. Reload “profile1.ini” and run the signal generator and oscilloscope or Spectrum Analyzer.
                 - **Expected Result:** The result should be the same on the saved profile.
                 - **Actual Result**:
 
@@ -202,7 +207,7 @@ Test 2: Save and Load Profile
   Actual test result goes here.
 ..
 
-        8. Reload the default setting by deleting the file in ``C:\Users\your_username\AppData\Roaming\ADI``. Reload “profile2.ini”, and run Pattern Generator, DigitalIO and Logic Analyzer.
+        8. Reload the default setting by deleting the files in the setting folder (Click "Prefences" -> Scroll to "Session" -> Click "Open"). Reload “profile2.ini”, and run Pattern Generator, DigitalIO and Logic Analyzer.
                 - **Expected Result:** The result should be the same on the saved profile.
                 - **Actual Result**:
 
@@ -225,9 +230,9 @@ Test 2: Save and Load Profile
   Actual test result goes here.
 ..
 
-        12. Reload the default setting by deleting the file in ``C:\Users\your_username\AppData\Roaming\ADI``. Reload “profile3.ini”, and run Power Supply, Voltmeter and Signal Generator.
-                 - **Expected Result:** The result should be the same on the saved profile. The network analyzer’s setting should be retained.
-                 - **Actual Result**:
+        12. Reload the default setting by deleting the files in the settings folder (Click "Prefences" -> Scroll to "Session" -> Click "Open"). Reload “profile3.ini”, and run Power Supply, Voltmeter and Signal Generator.
+                - **Expected Result:** The result should be the same on the saved profile. The network analyzer’s setting should be retained.
+                - **Actual Result**:
 
 ..
   Actual test result goes here.
@@ -262,7 +267,7 @@ Test 3: Preferences
         - Use :ref:`M2k.Usb <m2k-usb-general-settings>` setup.
 
 **Steps:**
-        1. Click the Preferences option located below the instrument options. After the Preferences menu appears, click the M2kPlugin tab.
+        1. Click the Preferences option located below the instrument options. After the Preferences menu appears, click the "M2kPlugin" tab.
                 - **Expected Result:** The Preferences menu should contain several sections: General, Analog tools and Logic tools.
                 - **Actual Result:**
 
@@ -270,31 +275,40 @@ Test 3: Preferences
   Actual test result goes here.
 ..
 
-        2. Enable “Save session when closing Scopy.” This setting is in the General tab.
+        2. Enable “Save/Load Scopy session.” This setting is in the General tab.
         3. Use Scopy and play with its instruments, changing the configurations and settings. Close Scopy and reopen.
-        4. On the General tab, click the M2K icon and drag down to see the debug section.
-                - **Expected Result:** A dialog box with the “Restart” text should appear confirming the reset command.
+                - **Expected Result:** The settings are the ones configured by us.
                 - **Actual Result:**
 
 ..
   Actual test result goes here.
 ..
 
-        5. Reset profile to default by deleting the files from ``C:\Users\your_username\AppData\Roaming\ADI``.
-                - Enable auto save feature.
-                - Load profile 1, profile 2 or profile 3 from Testing Save and Load feature steps.
-                - Close Scopy and Open.
-        6. Following step 5, open Scopy and the current profile should be one of the profiles created from the Save and load test case.
-                - On the General Setting preference, the reset scopy is located in the lower right of the Scopy screen.
-                - Click reset scopy.
-                        - **Expected Result:** Reopening Scopy, the profile loaded should be the profile saved. Scopy should return to its default setting. Similar with deleting the files from folder.
-                        - **Actual Result:**
+        4. Reset profile to default by deleting the files the settings folder. Open Preferences, make sure the "General" tab is selected, scroll to "Session" section and click the "Open" button to view the settings file location. Close Scopy and reopen.
+                - **Expected Result:** The settings configured by us are not longer available.
+                - **Actual Result:**
+
+..
+  Actual test result goes here.
+..
+        
+        5. Enable “Save/Load Scopy session”. Load profile 1, profile 2 or profile 3 from :ref:`Save and Load Profile <m2k-test2-general-settings>` test. Also, change the value of some "M2kPlugin" preferences. Close Scopy and reopen.
+                - **Expected Result:** After reopening Scopy, the active profile will be the previously saved one, and the settings will remain as we set them.
+                - **Actual Result:**
+                        
+..
+  Actual test result goes here.
+..
+
+        6. Open the preferences menu and click on the "General" tab. Click on the "Reset" button from "Debug" section and then press "Restart".
+                - **Expected Result:** Scopy should return to its default settings. Similar with deleting the files from folder.
+                - **Actual Result:**
 
 ..
   Actual test result goes here.
 ..
 
-        7. In the M2kPlugin Tab, under the Analog tools section, labels on the plot may be toggled on or off.
+        7. In the "M2kPlugin" tab, under the "Analog tools" section, labels on the plot may be toggled on or off.
                 - **Expected Result:** Checking the Oscilloscope plot, the labels must synchronize with the option chosen.
                 - **Actual Result:**
 
@@ -302,43 +316,46 @@ Test 3: Preferences
   Actual test result goes here.
 ..
 
-        8. On the Analog tools section, an option to search or not to search marker peaks in the visible domain is given.
-        9. Signal Generator’s Settings:
+        8. Enable "Only search marker peaks in visible domain" preference from "Analog tools" section.
+        9. Signal Generator's Settings:
                 - For Channel 1: Sinewave, 10Vpp, 500kHz.
-                - Spectrum Analyzer’s Sweep Settings: Start – 700kHz, Stop – 1MHz.
+                - Spectrum Analyzer's Sweep Settings: Start = 700kHz, Stop = 1MHz.
                 - Disable Channel 2.
                 - Connect AWG channel 1 to Scope Ch1+.
-        10. Under the Marker Settings, click Marker 1 then “Peak.” Turn the Marker Table on and look for the marked frequencies.
-                - **Expected Result:** A marker labeled M1 will automatically appear on the spectrum upon clicking Marker 1. Clicking “Peak” will put the Marker on the 500kHz mark.
+        10.  Under the Marker Settings, click Marker 1 then "Peak". Turn the Marker Table on and look for the marked frequencies.
+                - **Expected Result:** A marker labeled M1 will automatically appear on the spectrum upon clicking Marker 1. Clicking "Peak" will put the Marker on the 500kHz mark.
                 - **Actual Result:**
 
 ..
   Actual test result goes here.
 ..
 
-        11. Under the Analog tools section, The number of periods shown may be adjusted from 2 to 9.
-                - **Expected Result:** The signal generator’s graphical representation must follow the desired number of periods on the lower frequency channel (if both channels are configured to output waveform signals). When numbers other than 2 to 9 are entered, the number and the line under it turns to red.
+        11.  Under the "Analog tools" section, the "Number of displayed periods" preference can be adjusted.
+                - **Expected Result:** The signal generator's graphical representation must follow the 
+                  desired number of periods on the lower frequency channel (if both channels are configured 
+                  to output waveform signals). If the entered value is not a number greater than 0, the last 
+                  valid value is restored.
                 - **Actual Result:**
 
 ..
   Actual test result goes here.
 ..
 
-        12. On the Analog tools section, an option to display 0dB on the graph is available. Click to enable it.
-        13. Construct a first-order low pass RC filter with the following components: R = 470 Ohms, C = 1uF. This will have a cut-off frequency of ~340 Hz.
-        14. Network Analyzer’s Settings
+        12.  Enable "Always display 0db value on the graph" preference from "Analog tools" section.
+        13.  Construct a first-order low pass RC filter with the following components: R = 470 Ohms, C = 1uF. This will have a cut-off frequency of ~340 Hz.
+        14.  Network Analyzer's Settings
                 - Reference: Channel 1
                 - 1V Amplitude
                 - 0V Offset
                 - Sweep: Logarithmic
-                - Start – 10Hz
-                - Stop – 500kHz
-                - Sample Count - 100
+                - Start = 10Hz
+                - Stop = 500kHz
+                - Sample Count = 100
                 - Display settings:
-                - Min. Magnitude – -90dB
-                - Max. Magnitude – 10dB
-                - Min. Phase – -150deg
-                - Max. Phase – 60deg
+                - Min. Magnitude = -90dB
+                - Max. Magnitude = 10dB
+                - Min. Phase = -150deg
+                - Max. Phase = 60deg
                 - Run Network Analyzer.
                         - **Expected Result:** The Bode Plot has 0dB on its labels.
                         - **Actual Result:**

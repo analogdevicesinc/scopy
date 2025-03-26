@@ -1475,7 +1475,7 @@ Content on this topic
 <li><p>Connect AWG ch1 to scope ch1+ and scope ch1- to gnd</p></li>
 <li><p>Test .csv file</p></li>
 <li><dl class="simple">
-<dt>Load the .csv file from the downloaded .zip file</dt><dd><ul class="simple">
+<dt>Load the .csv file from the downloaded .zip file. Make sure the Noise is disabled.</dt><dd><ul class="simple">
 <li><p><strong>Expected Result:</strong> The signal generated should be a stair step signal.</p></li>
 <li><p><strong>Actual Result:</strong></p></li>
 </ul>
@@ -1506,8 +1506,8 @@ Content on this topic
 <li><p>Generate Sine waves</p></li>
 <li><dl class="simple">
 <dt>In the Signal Generator Math Function tab:</dt><dd><ul class="simple">
-<li><p>set frequency to 100Hz</p></li>
-<li><p>type in the function box 5*sin(t) and click apply.</p></li>
+<li><p>set sample rate to 37.5 Msps and record length to 10 ms</p></li>
+<li><p>type in the function box 5*sin(2*pi*100*t) and click apply.</p></li>
 <li><dl class="simple">
 <dt>in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 2ms</dt><dd><ul>
 <li><dl class="simple">
@@ -1534,15 +1534,15 @@ Content on this topic
 <div><ol class="arabic simple" start="20">
 <li><dl class="simple">
 <dt>In the Signal Generator Math Function tab:</dt><dd><ul class="simple">
-<li><p>set frequency to 1kHz</p></li>
-<li><p>type in the function box 4*sin(10*t) and click apply.</p></li>
+<li><p>set sample rate to 37.5 Msps and record length to 2ms</p></li>
+<li><p>type in the function box 4*sin(2*pi*1000*t) and click apply.</p></li>
 <li><dl class="simple">
-<dt>in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 20us</dt><dd><ul>
+<dt>in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 200us</dt><dd><ul>
 <li><dl class="simple">
 <dt><strong>Expected Result:</strong> The generated sine wave signal should have the following parameters:</dt><dd><ul>
 <li><p>peak to peak: 7.6V to 8.4V</p></li>
-<li><p>frequency: 10kHz</p></li>
-<li><p>period: 100us</p></li>
+<li><p>frequency: 1kHz</p></li>
+<li><p>period: 1ms</p></li>
 </ul>
 </dd>
 </dl>
@@ -1562,10 +1562,10 @@ Content on this topic
 <div><ol class="arabic simple" start="21">
 <li><dl class="simple">
 <dt>In the Signal Generator Math Function tab:</dt><dd><ul class="simple">
-<li><p>set frequency to 100kHz</p></li>
-<li><p>type in the function box 3*sin(50*t) and click apply.</p></li>
+<li><p>set sample rate to 75 Msps and record length to 2us</p></li>
+<li><p>type in the function box 3*sin(2*pi*5000000*t)and click apply.</p></li>
 <li><dl class="simple">
-<dt>in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 100ns</dt><dd><ul>
+<dt>in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 500ns</dt><dd><ul>
 <li><dl class="simple">
 <dt><strong>Expected Result:</strong> The generated sine wave signal should have the following parameters:</dt><dd><ul>
 <li><p>peak to peak: 5.6V to 6.4V</p></li>
@@ -1591,8 +1591,8 @@ Content on this topic
 <li><p>Generate Square waves</p></li>
 <li><dl class="simple">
 <dt>In the Signal Generator Math Function tab:</dt><dd><ul class="simple">
-<li><p>set frequency to 500kHz</p></li>
-<li><p>type in the function box 4*sin(t) + 4*sin(3*t)/3 + 4*sin(5*t)/5 + 4*sin(7*t)/7 + 4*sin(9*t)/9 + 4*sin(11*t)/11 (you can copy and paste the text to Scopy) and click apply.</p></li>
+<li><p>set sample rate to 75 Msps and record length to 10us</p></li>
+<li><p>type in the function box 4*sin(2*pi*t*500000) + 4*sin(2*pi*3*t*500000)/3 + 4*sin(2*pi*t*5*500000)/5 + 4*sin(2*pi*7*500000*t)/7 (you can copy and paste the text to Scopy) and click apply.</p></li>
 <li><dl class="simple">
 <dt>in the Oscilloscope instrument set Volts/div: 1V/div, Trigger: Auto, Time base: 500ns</dt><dd><ul>
 <li><dl class="simple">

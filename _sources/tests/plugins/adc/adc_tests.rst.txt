@@ -619,7 +619,7 @@ tracking, and moving readouts
 ..
 
    9. Turn off track and measure voltage0 and voltage1 amplitudes
-       - **Expected result:** for voltage0 delta y should be around 1.4kV and for voltage1 500V
+       - **Expected result:** for voltage0 delta y should be around should be around  500 and for voltage1 1.4k
        - **Actual result:**
 
 ..
@@ -674,7 +674,7 @@ plotting in the ADC plugin
 **Steps:**
    1. Scroll down and turn on plot labels in the settings panel
    2. Set XMode to Samples, buffer size to 4000, and press single
-       - **Expected result:** Plot labels should go up to 4000, and channel curves should span across the whole plot
+       - **Expected result:** Plot labels should go up to 2000, and channel curves should span across the whole plot
        - **Actual result:**
 
 ..
@@ -940,16 +940,8 @@ Test 6 - Y-Axis channel settings
 ..
   Actual test result goes here.
 ..
-
-   2. Turn off autoscale, set YMode to ADC Counts, Min to -140, Max to 20, and press single
-       - **Expected result:** Only the voltage0 curve should vertically adjust
-       - **Actual result:**
-
-..
-  Actual test result goes here.
-..
-
-   3. Turn off Y-Axis
+  
+3. Turn off Y-Axis
 
 **Tested OS:**
 

@@ -89,9 +89,8 @@ when the IIO emulator is not found.
 **Preconditions:**
     - Scopy is installed on the system.
     - iio-emu is not installed on the system.
-    - Modify the "iio_emu_path" preference from "preferences.ini" file with an 
-      invalid path (you can access the file through the **Open** button in the 
-      general preferences).
+    - iio-emu is not next to the scopy executable.
+    - The path preference for iio-emu is empty.
     - OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.
 
 **Steps:**

@@ -351,8 +351,7 @@ reconnection.
 
 **Preconditions:**
     - Scopy is installed on the system.
-    - iio-emu is installed on the system.
-    - Use :ref:`M2k.Emu <m2k-emu-dev>` setup or :ref:`M2k.Usb <m2k-usb-dev>` setup - same as in the previous test.
+    - Use :ref:`M2k.Usb <m2k-usb-dev>` setup - same as in the previous test.
     - The application was previously closed with a detached tool (Oscilloscope).
     - OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.
 

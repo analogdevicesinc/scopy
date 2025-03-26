@@ -93,6 +93,25 @@ Test 1 - Check individual digital pin state
         - **Expected Result**: All the expected results in step 5 are met.
         - **Actual Result**:
 
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
 
 Test 2 - Checking grouped digital pin states
 ----------------------------------------------------
