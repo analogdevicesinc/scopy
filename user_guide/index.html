@@ -360,9 +360,22 @@ After completion, system reboot is required.</p>
 </span><div class="admonition video only-print"><p class="admonition-title">Video</p>
 <p><strong>Scopy for Linux</strong></p>
 <p><a href="https://www.youtube.com/watch?v=894HkVXf7-U"><span>https://www.youtube.com/watch?v=894HkVXf7-U</span></a></p>
-</div></div><p><strong>AppImage</strong>: Make the application executable by running <strong>chmod +x ./Scopy.AppImage</strong> in a command line,
-then run Scopy as any other Linux executable. These steps are applicable for ARM64 and ARM32 also.</p>
-<p><strong>Flatpak</strong>: Before downloading and extracting the scopy-Linux-flatpak.zip archive,
+</div></div><p><strong>AppImage</strong></p>
+<p>Make the application executable by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chmod</span> <span class="o">+</span><span class="n">x</span> <span class="o">./</span><span class="n">Scopy</span><span class="o">.</span><span class="n">AppImage</span>
+</pre></div>
+</div>
+<p>Then run Scopy as any other Linux executable. These steps are applicable for ARM64 and ARM32 also.</p>
+<p>To install the AppImage inside the system and create a quick access icon in the app launcher, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INSTALL</span><span class="o">=</span><span class="n">ON</span> <span class="o">./</span><span class="n">Scopy</span><span class="o">.</span><span class="n">AppImage</span>
+</pre></div>
+</div>
+<p>To remove all the files installed by the AppImage, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">UNINSTALL</span><span class="o">=</span><span class="n">ON</span> <span class="o">./</span><span class="n">Scopy</span><span class="o">.</span><span class="n">AppImage</span>
+</pre></div>
+</div>
+<p><strong>Flatpak</strong></p>
+<p>Before downloading and extracting the scopy-flatpak.zip archive,
 you need to setup Flatpak <a class="reference external" href="https://flatpak.org/setup/">using this setup guide</a>
 for your Linux distribution.</p>
 <p>For Ubuntu, you can use the following steps:</p>
@@ -376,7 +389,7 @@ for your Linux distribution.</p>
 </pre></div>
 </div>
 <p>After this, get the Scopy.flatpak file from the downloaded archive and run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">flatpak</span> <span class="n">install</span> <span class="n">scopy</span><span class="o">-</span><span class="n">Linux</span><span class="o">-</span><span class="n">flatpak</span><span class="o">.</span><span class="n">flatpak</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">flatpak</span> <span class="n">install</span> <span class="n">Scopy</span><span class="o">.</span><span class="n">flatpak</span>
 </pre></div>
 </div>
 <div class="line-block">

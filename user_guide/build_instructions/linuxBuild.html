@@ -396,6 +396,14 @@ $<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span
 </pre></div>
 </div>
 </li>
+<li><p>Install the packages needed for cross-compilation</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./ci/arm/create_sysroot.sh<span class="w"> </span>arm32<span class="w"> </span>install_packages<span class="w"> </span>install_qemu
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic" start="3">
 <li><p>Download the Docker image</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>pull<span class="w"> </span>cristianbindea/scopy2-armhf-appimage:latest
 </pre></div>
@@ -416,7 +424,7 @@ $<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span
 <p>Finally, after the development is done use this to clean the system:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>container<span class="w"> </span>ls<span class="w"> </span>-a<span class="w"> </span><span class="c1"># get the container id</span>
 $<span class="w"> </span>docker<span class="w"> </span>container<span class="w"> </span>rm<span class="w"> </span>-v<span class="w"> </span><span class="o">(</span>container<span class="w"> </span>id<span class="o">)</span>
-$<span class="w"> </span>docker<span class="w"> </span>image<span class="w"> </span>rm<span class="w"> </span>cristianbindea/scopy2-arm32-appimage:latest
+$<span class="w"> </span>docker<span class="w"> </span>image<span class="w"> </span>rm<span class="w"> </span>cristianbindea/scopy2-armhf-appimage:latest
 </pre></div>
 </div>
 </section>
@@ -429,6 +437,14 @@ $<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span
 </pre></div>
 </div>
 </li>
+<li><p>Install the packages needed for cross-compilation</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./ci/arm/create_sysroot.sh<span class="w"> </span>arm64<span class="w"> </span>install_packages<span class="w"> </span>install_qemu
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic" start="3">
 <li><p>Download the Docker image</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>pull<span class="w"> </span>cristianbindea/scopy2-arm64-appimage:latest
 </pre></div>
