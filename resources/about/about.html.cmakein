@@ -4,7 +4,7 @@
 <p>Scopy version: ${scopy_VERSION}-${SCOPY_VERSION_GIT}<br>
   Build info: <a style='color: #3b71b8' href="qrc:/buildinfo.html">here</a><br></p>
 
-<p>Copyright 2019-2020 Analog Devices and others.<br> Scopy is made possible by the <a style='color: #3b71b8' href="qrc:/scopy_osp.html" >Scopy open source project</a> and <a style='color: #3b71b8' href="qrc:/credits.html">other open source software</a>. <br></p>
+<p>Copyright 2019-2025 Analog Devices and others.<br> Scopy is made possible by the <a style='color: #3b71b8' href="qrc:/scopy_osp.html" >Scopy open source project</a> and <a style='color: #3b71b8' href="qrc:/credits.html">other open source software</a>. <br></p>
 
 <p><a style='color: #3b71b8' href=https://github.com/analogdevicesinc/scopy/releases/latest>Latest Release</a><br>
 <a style='color: #3b71b8' href=https://analogdevicesinc.github.io/scopy/user_guide/index.html>Documentation</a><br>

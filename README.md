@@ -20,3 +20,8 @@ Complete installation and usage instructions can be found on our [official docum
 ## Contributing
 
 See the [CONTRIBUTING file](CONTRIBUTING.md) for guidance on contributing to this project.
+
+## License
+
+Third party licenses for open-source components are detailed at the location below:
+[3rd party licenses](https://download.analog.com/scopy/versions.html)
