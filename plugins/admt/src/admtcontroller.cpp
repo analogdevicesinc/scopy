@@ -28,14 +28,11 @@
 #include <cstdlib>
 #include <cstring>
 #include <iioutil/connectionprovider.h>
-#include <iomanip>
-#include <iostream>
 #include <iterator>
 #include <list>
 #include <math.h>
 #include <numeric>
 #include <string>
-#include <thread>
 #include <vector>
 
 static const size_t maxAttrSize = 512;
@@ -252,13 +249,17 @@ double ADMTController::getChannelValue(const char *deviceName, const char *chann
 
 	double *scaleVal = new double(1);
 	int scaleRet = iio_channel_attr_read_double(channel, scaleAttr, scaleVal);
-	if(scaleRet != 0)
+	if(scaleRet != 0) {
+		delete scaleVal;
 		return static_cast<double>(UINT64_MAX); // return QString("Cannot read scale attribute");
+	}
 	scale = *scaleVal;
+	delete scaleVal;
 
 	char *offsetDst = new char[maxAttrSize];
 	iio_channel_attr_read(channel, offsetAttr, offsetDst, maxAttrSize);
 	offsetAttrVal = std::atoi(offsetDst);
+	delete[] offsetDst;
 
 	iio_buffer *iioBuffer = iio_device_create_buffer(admtDevice, bufferSize, false);
 	if(iioBuffer == NULL)
@@ -273,14 +274,9 @@ double ADMTController::getChannelValue(const char *deviceName, const char *chann
 	if(numBytesRead < 0)
 		return static_cast<double>(UINT64_MAX); // return QString("Cannot refill buffer.");
 
-	pointerIncrement = reinterpret_cast<ptrdiff_t>(iio_buffer_step(iioBuffer));
-	pointerEnd = static_cast<int8_t *>(iio_buffer_end(iioBuffer));
-
 	const struct iio_data_format *format = iio_channel_get_data_format(channel);
 	const struct iio_data_format channelFormat = *format;
 	unsigned int repeat = channelFormat.repeat;
-	uint8_t bitLength = static_cast<uint8_t>(channelFormat.bits);
-	size_t offset = static_cast<uint8_t>(channelFormat.shift);
 
 	QString result;
 	std::list<char> rawSamples;
@@ -726,7 +722,6 @@ void ADMTController::getPreCalibrationFFT(const vector<double> &PANG, vector<dou
 void ADMTController::postcalibrate(vector<double> PANG, int cycleCount, int samplesPerCycle, bool CCW)
 {
 	int circshiftData = 0;
-	QString result = "";
 
 	/* Check CCW flag to know if array is to be reversed */
 	if(CCW)
@@ -1220,12 +1215,12 @@ int ADMTController::getAbsAngleTurnCount(uint16_t registerValue)
 	// Bits 15:8: Turn count in quarter turns
 	uint8_t turnCount = (registerValue & 0xFF00) >> 8;
 
-	if(turnCount <= 0xD5) {
+	if(turnCount <= 0xD7) {
 		// Straight binary turn count
 		return turnCount / 4; // Convert from quarter turns to whole turns
-	} else if(turnCount == 0xD6) {
+	} else if(turnCount >= 0xD8 && turnCount <= 0xDB) {
 		// Invalid turn count
-		return -1;
+		return -10;
 	} else {
 		// 2's complement turn count
 		int8_t signedTurnCount = static_cast<int8_t>(turnCount); // Handle as signed value
@@ -1688,9 +1683,7 @@ int ADMTController::streamIO()
 	iio_library_get_version(&major, &minor, git_tag);
 	bool has_repeat = ((major * 10000) + minor) >= 8 ? true : false;
 
-	double *scaleAttrValue = new double(1);
 	int offsetAttrValue = 0;
-	char *offsetDst = new char[maxAttrSize];
 
 	if(!m_iioCtx)
 		return result; // Check if the context is valid
@@ -1703,13 +1696,19 @@ int ADMTController::streamIO()
 		iio_device_find_channel(admtDevice, channelName, isOutput); // Find the rotation channel
 	if(channel == NULL)
 		return result;
-	iio_channel_enable(channel);							     // Enable the channel
+	iio_channel_enable(channel);
+	double *scaleAttrValue = new double(1);
 	int scaleRet = iio_channel_attr_read_double(channel, scaleAttrName, scaleAttrValue); // Read the scale attribute
-	if(scaleRet != 0)
+	if(scaleRet != 0) {
+		delete scaleAttrValue;
 		return scaleRet;
+	}
+
+	char *offsetDst = new char[maxAttrSize];
 	iio_channel_attr_read(channel, offsetAttrName, offsetDst,
 			      maxAttrSize); // Read the offset attribute
 	offsetAttrValue = atoi(offsetDst);
+	delete[] offsetDst;
 	struct iio_buffer *buffer = iio_device_create_buffer(admtDevice, samples, isCyclic); // Create a buffer
 
 	while(!stopStream) {
@@ -1739,6 +1738,7 @@ int ADMTController::streamIO()
 		}
 	}
 
+	delete scaleAttrValue;
 	iio_buffer_destroy(buffer);
 	return 0;
 }
@@ -1765,9 +1765,7 @@ void ADMTController::bufferedStreamIO(int totalSamples, int targetSampleRate)
 	iio_library_get_version(&major, &minor, git_tag);
 	bool has_repeat = ((major * 10000) + minor) >= 8 ? true : false;
 
-	double *scaleAttrValue = new double(1);
 	int offsetAttrValue = 0;
-	char *offsetDst = new char[maxAttrSize];
 
 	if(!m_iioCtx)
 		return; // result; // Check if the context is valid
@@ -1779,11 +1777,16 @@ void ADMTController::bufferedStreamIO(int totalSamples, int targetSampleRate)
 	struct iio_channel *channel =
 		iio_device_find_channel(admtDevice, channelName, isOutput); // Find the rotation channel
 	if(channel == NULL)
-		return;									     // result;
-	iio_channel_enable(channel);							     // Enable the channel
+		return;
+	iio_channel_enable(channel);
+	double *scaleAttrValue = new double(1);
 	int scaleRet = iio_channel_attr_read_double(channel, scaleAttrName, scaleAttrValue); // Read the scale attribute
-	if(scaleRet != 0)
+	if(scaleRet != 0) {
+		delete scaleAttrValue;
 		return; // scaleRet;
+	}
+
+	char *offsetDst = new char[maxAttrSize];
 	iio_channel_attr_read(channel, offsetAttrName, offsetDst,
 			      maxAttrSize); // Read the offset attribute
 	offsetAttrValue = atoi(offsetDst);
@@ -1831,6 +1834,9 @@ void ADMTController::bufferedStreamIO(int totalSamples, int targetSampleRate)
 	}
 
 	Q_EMIT streamBufferedData(bufferedValues);
+
+	delete scaleAttrValue;
+	delete[] offsetDst;
 }
 
 void ADMTController::handleStreamBufferedData(const QVector<double> &value) { streamBufferedValues = value; }
