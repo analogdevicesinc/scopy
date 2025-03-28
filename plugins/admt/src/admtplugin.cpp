@@ -100,6 +100,9 @@ bool ADMTPlugin::onConnect()
 	harmonicCalibration = new HarmonicCalibration(m_admtController, isDebug);
 	m_toolList[0]->setTool(harmonicCalibration);
 
+	connect(m_admtController, &ADMTController::requestDisconnect, this, &ADMTPlugin::disconnectDevice,
+		Qt::QueuedConnection);
+
 	return true;
 }
 

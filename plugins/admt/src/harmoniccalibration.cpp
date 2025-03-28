@@ -65,32 +65,12 @@ static double motorMicrostepPerRevolution = motorFullStepPerRevolution * microSt
 static double motorTimeUnit = static_cast<double>(1 << 24) / motorfCLK; // t = 2^24/motorfCLK
 
 static int acquisitionDisplayLength = 200;
-static QVector<double> acquisitionAngleList, acquisitionABSAngleList, acquisitionTmp0List, acquisitionTmp1List,
-	acquisitionSineList, acquisitionCosineList, acquisitionRadiusList, acquisitionAngleSecList,
-	acquisitionSecAnglIList, acquisitionSecAnglQList, graphDataList, graphPostDataList;
 
 static const QColor scopyBlueColor = Style::getColor(json::theme::interactive_primary_idle);
 
-static const QPen scopyBluePen(scopyBlueColor);
-static const QPen channel0Pen(StyleHelper::getChannelColor(0));
-static const QPen channel1Pen(StyleHelper::getChannelColor(1));
-static const QPen channel2Pen(StyleHelper::getChannelColor(2));
-static const QPen channel3Pen(StyleHelper::getChannelColor(3));
-static const QPen channel4Pen(StyleHelper::getChannelColor(4));
-static const QPen channel5Pen(StyleHelper::getChannelColor(5));
-static const QPen channel6Pen(StyleHelper::getChannelColor(6));
-static const QPen channel7Pen(StyleHelper::getChannelColor(7));
+QPen scopyBluePen(scopyBlueColor);
 
-static map<string, string> deviceRegisterMap;
-static map<string, int> GENERALRegisterMap;
-static map<string, bool> DIGIOENRegisterMap;
-static map<string, bool> FAULTRegisterMap;
-static map<string, bool> DIAG1RegisterMap;
-static map<string, double> DIAG2RegisterMap;
-static map<string, double> DIAG1AFERegisterMap;
-
-static QString deviceName = "";
-static QString deviceType = "";
+QString deviceName = "", deviceType = "";
 static bool is5V = false;
 
 static double H1_MAG_ANGLE, H2_MAG_ANGLE, H3_MAG_ANGLE, H8_MAG_ANGLE, H1_PHASE_ANGLE, H2_PHASE_ANGLE, H3_PHASE_ANGLE,
@@ -134,7 +114,7 @@ static double defaultPhaseGraphMax = 4;
 static double currentPhaseGraphMin = defaultPhaseGraphMin;
 static double currentPhaseGraphMax = defaultPhaseGraphMax;
 
-static QMap<SensorData, bool> acquisitionDataMap = {
+QMap<SensorData, bool> acquisitionDataMap = {
 	{ABSANGLE, false}, {ANGLE, false},    {ANGLESEC, false}, {SINE, false},	 {COSINE, false},
 	{SECANGLI, false}, {SECANGLQ, false}, {RADIUS, false},	 {DIAG1, false}, {DIAG2, false},
 	{TMP0, false},	   {TMP1, false},     {CNVCNT, false},
@@ -155,6 +135,8 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	countChannelName = m_admtController->getChannelId(ADMTController::Channel::COUNT);
 	temperatureChannelName = m_admtController->getChannelId(ADMTController::Channel::TEMPERATURE);
 
+	initializeChannelColors();
+
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *lay = new QHBoxLayout(this);
 	tabWidget = new QTabWidget(this);
@@ -172,16 +154,13 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	tabWidget->addTab(createUtilityWidget(), "Utility");
 	tabWidget->addTab(createRegistersWidget(), "Registers");
 
-	connect(tabWidget, &QTabWidget::currentChanged, [this](int index) {
+	connect(tabWidget, &QTabWidget::currentChanged, this, [this](int index) {
 		tabWidget->setCurrentIndex(index);
 
-		if(index == 0 || index == 1) {
+		if(index == 0 || index == 1)
 			startDeviceStatusMonitor();
-			startCurrentMotorPositionMonitor();
-		} else {
+		else
 			stopDeviceStatusMonitor();
-			stopCurrentMotorPositionMonitor();
-		}
 
 		if(index == 0) // Acquisition Tab
 		{
@@ -190,9 +169,11 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 			updateSequenceWidget();
 			updateAcquisitionMotorRPM();
 			updateAcquisitionMotorRotationDirection();
+			startCurrentMotorPositionMonitor();
 		} else {
 			isAcquisitionTab = false;
 			stop();
+			stopCurrentMotorPositionMonitor();
 		}
 
 		if(index == 1) // Calibration Tab
@@ -210,8 +191,8 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 		{
 			readSequence();
 			if(GENERALRegisterMap.contains("Sequence Type")) {
-				toggleFaultRegisterMode(GENERALRegisterMap.at("Sequence Type"));
-				toggleMTDiagnostics(GENERALRegisterMap.at("Sequence Type"));
+				toggleFaultRegisterMode(GENERALRegisterMap.value("Sequence Type"));
+				toggleMTDiagnostics(GENERALRegisterMap.value("Sequence Type"));
 				toggleUtilityTask(true);
 			}
 		} else {
@@ -222,7 +203,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 		{
 			readSequence();
 			if(GENERALRegisterMap.contains("Sequence Type")) {
-				toggleRegisters(GENERALRegisterMap.at("Sequence Type"));
+				toggleRegisters(GENERALRegisterMap.value("Sequence Type"));
 			}
 		}
 	});
@@ -248,7 +229,7 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	startCurrentMotorPositionMonitor();
 }
 
-HarmonicCalibration::~HarmonicCalibration() { requestDisconnect(); }
+HarmonicCalibration::~HarmonicCalibration() { stopTasks(); }
 
 ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 {
@@ -535,7 +516,7 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 		secAnglQCheckBox->hide();
 		temp1CheckBox->hide();
 	} else {
-		if(GENERALRegisterMap.at("Sequence Type") == 0) // Sequence Mode 1
+		if(GENERALRegisterMap.value("Sequence Type") == 0) // Sequence Mode 1
 		{
 			acquisitionGraphChannelGridLayout->addWidget(angleCheckBox, 0, 0);
 			acquisitionGraphChannelGridLayout->addWidget(sineCheckBox, 0, 1);
@@ -547,7 +528,7 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 			secAnglICheckBox->hide();
 			secAnglQCheckBox->hide();
 			temp1CheckBox->hide();
-		} else if(GENERALRegisterMap.at("Sequence Type") == 1) // Sequence Mode 2
+		} else if(GENERALRegisterMap.value("Sequence Type") == 1) // Sequence Mode 2
 		{
 			acquisitionGraphChannelGridLayout->addWidget(angleCheckBox, 0, 0);
 			acquisitionGraphChannelGridLayout->addWidget(sineCheckBox, 0, 1);
@@ -1338,9 +1319,9 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	calibrationCycleCountLayout->setSpacing(0);
 	QLabel *calibrationCycleCountLabel = new QLabel("Cycle Count", calibrationCycleCountWidget);
 	Style::setStyle(calibrationCycleCountLabel, style::properties::label::subtle);
-	QLineEdit *calibrationCycleCountLineEdit = new QLineEdit(calibrationCycleCountWidget);
+	calibrationCycleCountLineEdit = new QLineEdit(calibrationCycleCountWidget);
 	calibrationCycleCountLineEdit->setText(QString::number(cycleCount));
-	connectLineEditToNumber(calibrationCycleCountLineEdit, cycleCount, 1, 1000);
+	connectLineEditToNumber(calibrationCycleCountLineEdit, cycleCount, 1, 100);
 	calibrationCycleCountLayout->addWidget(calibrationCycleCountLabel);
 	calibrationCycleCountLayout->addWidget(calibrationCycleCountLineEdit);
 
@@ -1351,16 +1332,44 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	calibrationSamplesPerCycleLayout->setSpacing(0);
 	QLabel *calibrationSamplesPerCycleLabel = new QLabel("Samples Per Cycle", calibrationSamplesPerCycleWidget);
 	Style::setStyle(calibrationSamplesPerCycleLabel, style::properties::label::subtle);
-	QLineEdit *calibrationSamplesPerCycleLineEdit = new QLineEdit(calibrationSamplesPerCycleWidget);
+	calibrationSamplesPerCycleLineEdit = new QLineEdit(calibrationSamplesPerCycleWidget);
 	calibrationSamplesPerCycleLineEdit->setText(QString::number(samplesPerCycle));
-	connectLineEditToNumber(calibrationSamplesPerCycleLineEdit, samplesPerCycle, 1, 5000);
+	connectLineEditToNumber(calibrationSamplesPerCycleLineEdit, samplesPerCycle, 1, 256);
 	calibrationSamplesPerCycleLayout->addWidget(calibrationSamplesPerCycleLabel);
 	calibrationSamplesPerCycleLayout->addWidget(calibrationSamplesPerCycleLineEdit);
+
+	QWidget *motorRPMWidget = new QWidget(calibrationDatasetConfigCollapseSection);
+	QVBoxLayout *motorRPMLayout = new QVBoxLayout(motorRPMWidget);
+	motorRPMWidget->setLayout(motorRPMLayout);
+	motorRPMLayout->setMargin(0);
+	motorRPMLayout->setSpacing(0);
+	QLabel *motorRPMLabel = new QLabel("Motor RPM", motorRPMWidget);
+	Style::setStyle(motorRPMLabel, style::properties::label::subtle);
+	calibrationMotorRPMLineEdit = new QLineEdit(QString::number(motor_rpm), motorRPMWidget);
+	connectLineEditToRPM(calibrationMotorRPMLineEdit, motor_rpm);
+	motorRPMLayout->addWidget(motorRPMLabel);
+	motorRPMLayout->addWidget(calibrationMotorRPMLineEdit);
+
+	QWidget *motorDirectionWidget = new QWidget(calibrationDatasetConfigCollapseSection);
+	QVBoxLayout *motorDirectionLayout = new QVBoxLayout(motorDirectionWidget);
+	motorDirectionWidget->setLayout(motorDirectionLayout);
+	motorDirectionLayout->setMargin(0);
+	motorDirectionLayout->setSpacing(0);
+	QLabel *motorDirectionLabel = new QLabel("Rotation Direction", motorDirectionWidget);
+	Style::setStyle(motorDirectionLabel, style::properties::label::subtle);
+	calibrationMotorDirectionSwitch = new CustomSwitch("CW", "CCW", motorDirectionWidget);
+	calibrationMotorDirectionSwitch->setChecked(isMotorRotationClockwise);
+	connect(calibrationMotorDirectionSwitch, &CustomSwitch::toggled, this,
+		[this](bool b) { isMotorRotationClockwise = b; });
+	motorDirectionLayout->addWidget(motorDirectionLabel);
+	motorDirectionLayout->addWidget(calibrationMotorDirectionSwitch);
 
 	calibrationDatasetConfigCollapseSection->contentLayout()->setSpacing(8);
 	calibrationDatasetConfigCollapseSection->contentLayout()->addWidget(calibrationModeMenuCombo);
 	calibrationDatasetConfigCollapseSection->contentLayout()->addWidget(calibrationCycleCountWidget);
 	calibrationDatasetConfigCollapseSection->contentLayout()->addWidget(calibrationSamplesPerCycleWidget);
+	calibrationDatasetConfigCollapseSection->contentLayout()->addWidget(motorRPMWidget);
+	calibrationDatasetConfigCollapseSection->contentLayout()->addWidget(motorDirectionWidget);
 
 #pragma endregion
 
@@ -1381,84 +1390,6 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	calibrationDataCollapseSection->contentLayout()->setSpacing(8);
 	calibrationDataCollapseSection->contentLayout()->addWidget(importSamplesButton);
 	calibrationDataCollapseSection->contentLayout()->addWidget(extractDataButton);
-#pragma endregion
-
-#pragma region Motor Control Section Widget
-	MenuSectionWidget *motorControlSectionWidget = new MenuSectionWidget(calibrationSettingsWidget);
-	Style::setStyle(motorControlSectionWidget, style::properties::widget::basicComponent);
-	MenuCollapseSection *motorControlCollapseSection = new MenuCollapseSection(
-		"Motor Control", MenuCollapseSection::MHCW_NONE,
-		MenuCollapseSection::MenuHeaderWidgetType::MHW_BASEWIDGET, motorControlSectionWidget);
-	motorControlSectionWidget->contentLayout()->setSpacing(8);
-	motorControlSectionWidget->contentLayout()->addWidget(motorControlCollapseSection);
-
-	QWidget *motorRPMWidget = new QWidget(motorControlSectionWidget);
-	QVBoxLayout *motorRPMLayout = new QVBoxLayout(motorRPMWidget);
-	motorRPMWidget->setLayout(motorRPMLayout);
-	motorRPMLayout->setMargin(0);
-	motorRPMLayout->setSpacing(0);
-	QLabel *motorRPMLabel = new QLabel("Motor RPM", motorRPMWidget);
-	Style::setStyle(motorRPMLabel, style::properties::label::subtle);
-	calibrationMotorRPMLineEdit = new QLineEdit(QString::number(motor_rpm), motorRPMWidget);
-	connectLineEditToRPM(calibrationMotorRPMLineEdit, motor_rpm);
-	motorRPMLayout->addWidget(motorRPMLabel);
-	motorRPMLayout->addWidget(calibrationMotorRPMLineEdit);
-
-	QWidget *currentPositionWidget = new QWidget(motorControlSectionWidget);
-	QVBoxLayout *currentPositionLayout = new QVBoxLayout(currentPositionWidget);
-	currentPositionWidget->setLayout(currentPositionLayout);
-	currentPositionLayout->setMargin(0);
-	currentPositionLayout->setSpacing(0);
-	QLabel *currentPositionLabel = new QLabel("Current Position", currentPositionWidget);
-	Style::setStyle(currentPositionLabel, style::properties::label::subtle);
-	calibrationMotorCurrentPositionLineEdit = new QLineEdit("--.--", currentPositionWidget);
-	calibrationMotorCurrentPositionLineEdit->setReadOnly(true);
-	connectLineEditToDouble(calibrationMotorCurrentPositionLineEdit, current_pos);
-	currentPositionLayout->addWidget(currentPositionLabel);
-	currentPositionLayout->addWidget(calibrationMotorCurrentPositionLineEdit);
-
-	QWidget *targetPositionWidget = new QWidget(motorControlSectionWidget);
-	QVBoxLayout *targetPositionLayout = new QVBoxLayout(targetPositionWidget);
-	targetPositionWidget->setLayout(targetPositionLayout);
-	targetPositionLayout->setMargin(0);
-	targetPositionLayout->setSpacing(0);
-	QLabel *targetPositionLabel = new QLabel("Target Position", targetPositionWidget);
-	Style::setStyle(targetPositionLabel, style::properties::label::subtle);
-	motorTargetPositionLineEdit = new QLineEdit(QString::number(target_pos), targetPositionWidget);
-	connectLineEditToNumberWrite(motorTargetPositionLineEdit, target_pos,
-				     ADMTController::MotorAttribute::TARGET_POS);
-	targetPositionLayout->addWidget(targetPositionLabel);
-	targetPositionLayout->addWidget(motorTargetPositionLineEdit);
-
-	QWidget *motorDirectionWidget = new QWidget(motorControlSectionWidget);
-	QVBoxLayout *motorDirectionLayout = new QVBoxLayout(motorDirectionWidget);
-	motorDirectionWidget->setLayout(motorDirectionLayout);
-	motorDirectionLayout->setMargin(0);
-	motorDirectionLayout->setSpacing(0);
-	QLabel *motorDirectionLabel = new QLabel("Rotation Direction", motorDirectionWidget);
-	Style::setStyle(motorDirectionLabel, style::properties::label::subtle);
-	calibrationMotorDirectionSwitch = new CustomSwitch("CW", "CCW", motorControlSectionWidget);
-	calibrationMotorDirectionSwitch->setChecked(isMotorRotationClockwise);
-	connect(calibrationMotorDirectionSwitch, &CustomSwitch::toggled, this,
-		[this](bool b) { isMotorRotationClockwise = b; });
-	motorDirectionLayout->addWidget(motorDirectionLabel);
-	motorDirectionLayout->addWidget(calibrationMotorDirectionSwitch);
-
-	QPushButton *continuousRotationButton = new QPushButton("Continuous Rotation", motorControlSectionWidget);
-	StyleHelper::BasicButton(continuousRotationButton);
-	connect(continuousRotationButton, &QPushButton::clicked, this, &HarmonicCalibration::moveMotorContinuous);
-
-	QPushButton *stopMotorButton = new QPushButton("Stop Motor", motorControlSectionWidget);
-	StyleHelper::BasicButton(stopMotorButton);
-	connect(stopMotorButton, &QPushButton::clicked, this, &HarmonicCalibration::stopMotor);
-
-	motorControlCollapseSection->contentLayout()->setSpacing(8);
-	motorControlCollapseSection->contentLayout()->addWidget(motorRPMWidget);
-	motorControlCollapseSection->contentLayout()->addWidget(currentPositionWidget);
-	motorControlCollapseSection->contentLayout()->addWidget(targetPositionWidget);
-	motorControlCollapseSection->contentLayout()->addWidget(motorDirectionWidget);
-	motorControlCollapseSection->contentLayout()->addWidget(continuousRotationButton);
-	motorControlCollapseSection->contentLayout()->addWidget(stopMotorButton);
 #pragma endregion
 
 #pragma region Logs Section Widget
@@ -1482,7 +1413,7 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 
 	calibrationSettingsLayout->setMargin(0);
 	calibrationSettingsLayout->addWidget(calibrationDatasetConfigSectionWidget);
-	calibrationSettingsLayout->addWidget(motorControlSectionWidget);
+	// calibrationSettingsLayout->addWidget(motorControlSectionWidget);
 	calibrationSettingsLayout->addWidget(calibrationCoeffSectionWidget);
 	calibrationSettingsLayout->addWidget(calibrationDataSectionWidget);
 	calibrationSettingsLayout->addWidget(logsSectionWidget);
@@ -1547,7 +1478,7 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	connect(&m_resetMotorToZeroWatcher, &QFutureWatcher<void>::finished, this,
 		[this]() { startWaitForVelocityReachedThread(1); });
 
-	connect(&m_calibrationStreamWatcher, &QFutureWatcher<void>::started, [this]() {
+	connect(&m_calibrationStreamWatcher, &QFutureWatcher<void>::started, this, [this]() {
 		QThread *thread = QThread::currentThread();
 		thread->setPriority(QThread::TimeCriticalPriority);
 	});
@@ -2048,7 +1979,7 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 	DIGIO0ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO0ENToggleSwitch, "Output", "Input");
 	DIGIO0ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO0ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+	connect(DIGIO0ENToggleSwitch, &CustomSwitch::clicked, this, [this](bool value) {
 		if(!toggleDIGIOEN("DIGIO0EN", value))
 			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "Output" : "Input"));
 	});
@@ -2056,7 +1987,7 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 	DIGIO0FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO0FNCToggleSwitch, "GPIO0", "BUSY");
 	DIGIO0FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO0FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+	connect(DIGIO0FNCToggleSwitch, &CustomSwitch::clicked, this, [this](bool value) {
 		if(!toggleDIGIOEN("BUSY", value))
 			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "GPIO0" : "BUSY"));
 	});
@@ -2064,7 +1995,7 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 	DIGIO1ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO1ENToggleSwitch, "Output", "Input");
 	DIGIO1ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO1ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+	connect(DIGIO1ENToggleSwitch, &CustomSwitch::clicked, this, [this](bool value) {
 		if(!toggleDIGIOEN("DIGIO1EN", value))
 			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "Output" : "Input"));
 	});
@@ -2072,7 +2003,7 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 	DIGIO1FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO1FNCToggleSwitch, "GPIO1", "CNV");
 	DIGIO1FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO1FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+	connect(DIGIO1FNCToggleSwitch, &CustomSwitch::clicked, this, [this](bool value) {
 		if(!toggleDIGIOEN("CNV", value))
 			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "GPIO1" : "CNV"));
 	});
@@ -2080,7 +2011,7 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 	DIGIO2ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO2ENToggleSwitch, "Output", "Input");
 	DIGIO2ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO2ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+	connect(DIGIO2ENToggleSwitch, &CustomSwitch::clicked, this, [this](bool value) {
 		if(!toggleDIGIOEN("DIGIO2EN", value))
 			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "Output" : "Input"));
 	});
@@ -2088,7 +2019,7 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 	DIGIO2FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO2FNCToggleSwitch, "GPIO2", "SENT");
 	DIGIO2FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO2FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+	connect(DIGIO2FNCToggleSwitch, &CustomSwitch::clicked, this, [this](bool value) {
 		if(!toggleDIGIOEN("SENT", value))
 			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "GPIO2" : "SENT"));
 	});
@@ -2096,7 +2027,7 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 	DIGIO3ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO3ENToggleSwitch, "Output", "Input");
 	DIGIO3ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO3ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+	connect(DIGIO3ENToggleSwitch, &CustomSwitch::clicked, this, [this](bool value) {
 		if(!toggleDIGIOEN("DIGIO3EN", value))
 			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "Output" : "Input"));
 	});
@@ -2104,7 +2035,7 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 	DIGIO3FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO3FNCToggleSwitch, "GPIO3", "ACALC");
 	DIGIO3FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO3FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+	connect(DIGIO3FNCToggleSwitch, &CustomSwitch::clicked, this, [this](bool value) {
 		if(!toggleDIGIOEN("ACALC", value))
 			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "GPIO3" : "ACALC"));
 	});
@@ -2112,7 +2043,7 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 	DIGIO4ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO4ENToggleSwitch, "Output", "Input");
 	DIGIO4ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO4ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+	connect(DIGIO4ENToggleSwitch, &CustomSwitch::clicked, this, [this](bool value) {
 		if(!toggleDIGIOEN("DIGIO4EN", value))
 			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "Output" : "Input"));
 	});
@@ -2120,7 +2051,7 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 	DIGIO4FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO4FNCToggleSwitch, "GPIO4", "FAULT");
 	DIGIO4FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO4FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+	connect(DIGIO4FNCToggleSwitch, &CustomSwitch::clicked, this, [this](bool value) {
 		if(!toggleDIGIOEN("FAULT", value))
 			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "GPIO4" : "FAULT"));
 	});
@@ -2128,7 +2059,7 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 	DIGIO5ENToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO5ENToggleSwitch, "Output", "Input");
 	DIGIO5ENToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO5ENToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+	connect(DIGIO5ENToggleSwitch, &CustomSwitch::clicked, this, [this](bool value) {
 		if(!toggleDIGIOEN("DIGIO5EN", value))
 			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "Output" : "Input"));
 	});
@@ -2136,7 +2067,7 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 	DIGIO5FNCToggleSwitch = new CustomSwitch();
 	changeCustomSwitchLabel(DIGIO5FNCToggleSwitch, "GPIO5", "BOOT");
 	DIGIO5FNCToggleSwitch->setFixedWidth(Style::getDimension(json::global::unit_6));
-	connect(DIGIO5FNCToggleSwitch, &CustomSwitch::clicked, [this](bool value) {
+	connect(DIGIO5FNCToggleSwitch, &CustomSwitch::clicked, this, [this](bool value) {
 		if(!toggleDIGIOEN("BOOTLOAD", value))
 			StatusBarManager::pushMessage("Failed to toggle " + QString(value ? "GPIO5" : "BOOT"));
 	});
@@ -2144,7 +2075,7 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 	QPushButton *DIGIOResetButton = new QPushButton("Reset DIGIO", DIGIOControlGridWidget);
 	DIGIOResetButton->setFixedWidth(100);
 	StyleHelper::BasicButton(DIGIOResetButton);
-	connect(DIGIOResetButton, &QPushButton::clicked, [this] {
+	connect(DIGIOResetButton, &QPushButton::clicked, this, [this] {
 		toggleUtilityTask(false);
 		bool success = resetDIGIO();
 		if(success)
@@ -2379,52 +2310,44 @@ ToolTemplate *HarmonicCalibration::createUtilityWidget()
 	return tool;
 }
 
-void HarmonicCalibration::readDeviceProperties()
+bool HarmonicCalibration::readDeviceProperties()
 {
-	uint32_t *uniqId3RegisterValue = new uint32_t;
-	uint32_t *cnvPageRegValue = new uint32_t;
-	uint32_t page = m_admtController->getUniqueIdPage(ADMTController::UniqueIDRegister::UNIQID3);
-	uint32_t cnvPageAddress =
-		m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE);
+	uint32_t UNIQID3Page = m_admtController->getUniqueIdPage(ADMTController::UniqueIDRegister::UNIQID3);
 
 	bool success = false;
 
-	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-						 cnvPageAddress, page) != -1) {
-		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-							cnvPageAddress, cnvPageRegValue) != -1) {
-			if(*cnvPageRegValue == page) {
-				if(m_admtController->readDeviceRegistry(
-					   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-					   m_admtController->getUniqueIdRegister(
-						   ADMTController::UniqueIDRegister::UNIQID3),
-					   uniqId3RegisterValue) != -1) {
-					deviceRegisterMap = m_admtController->getUNIQID3RegisterMapping(
-						static_cast<uint16_t>(*uniqId3RegisterValue));
+	if(!changeCNVPage(UNIQID3Page))
+		return false;
 
-					if(deviceRegisterMap.at("Supply ID") == "5V") {
-						is5V = true;
-					} else if(deviceRegisterMap.at("Supply ID") == "3.3V") {
-						is5V = false;
-					} else {
-						is5V = false;
-					}
+	uint32_t *uniqId3RegisterValue = new uint32_t;
+	if(m_admtController->readDeviceRegistry(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getUniqueIdRegister(ADMTController::UniqueIDRegister::UNIQID3),
+		   uniqId3RegisterValue) != -1) {
+		deviceRegisterMap =
+			QMap(m_admtController->getUNIQID3RegisterMapping(static_cast<uint16_t>(*uniqId3RegisterValue)));
 
-					deviceName = QString::fromStdString(deviceRegisterMap.at("Product ID"));
-
-					if(deviceRegisterMap.at("ASIL ID") == "ASIL QM") {
-						deviceType = QString::fromStdString("Industrial");
-					} else if(deviceRegisterMap.at("ASIL ID") == "ASIL B") {
-						deviceType = QString::fromStdString("Automotive");
-					} else {
-						deviceType = QString::fromStdString(deviceRegisterMap.at("ASIL ID"));
-					}
-
-					success = true;
-				}
-			}
+		if(deviceRegisterMap.value("Supply ID") == "5V") {
+			is5V = true;
+		} else if(deviceRegisterMap.value("Supply ID") == "3.3V") {
+			is5V = false;
+		} else {
+			is5V = false;
 		}
+
+		deviceName = QString::fromStdString(deviceRegisterMap.value("Product ID"));
+
+		if(deviceRegisterMap.value("ASIL ID") == "ASIL QM") {
+			deviceType = QString::fromStdString("Industrial");
+		} else if(deviceRegisterMap.value("ASIL ID") == "ASIL B") {
+			deviceType = QString::fromStdString("Automotive");
+		} else {
+			deviceType = QString::fromStdString(deviceRegisterMap.value("ASIL ID"));
+		}
+
+		success = true;
 	}
+	delete uniqId3RegisterValue;
 
 	if(!success) {
 		StatusBarManager::pushMessage("Failed to read device properties");
@@ -2433,21 +2356,23 @@ void HarmonicCalibration::readDeviceProperties()
 		deviceName = "ADMT4000";
 		deviceType = "Emulator";
 	}
+
+	return success;
 }
 
 void HarmonicCalibration::initializeADMT()
 {
+	bool disabledECC = disableECC(true);
 	bool resetDIGIOSuccess = resetDIGIO();
 	bool resetGENERALSuccess = resetGENERAL();
 
-	if(!resetDIGIOSuccess || !resetGENERALSuccess) {
+	if(!disabledECC || !resetDIGIOSuccess || !resetGENERALSuccess) {
 		StatusBarManager::pushMessage("Failed initialize ADMT");
 	}
 }
 
 bool HarmonicCalibration::readSequence()
 {
-	uint32_t *generalRegValue = new uint32_t;
 	uint32_t generalRegisterAddress =
 		m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL);
 	uint32_t generalRegisterPage =
@@ -2455,63 +2380,57 @@ bool HarmonicCalibration::readSequence()
 
 	bool success = false;
 
-	if(changeCNVPage(generalRegisterPage)) {
-		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-							generalRegisterAddress, generalRegValue) != -1) {
-			if(*generalRegValue != UINT32_MAX) {
-				GENERALRegisterMap = m_admtController->getGeneralRegisterBitMapping(
-					static_cast<uint16_t>(*generalRegValue));
-				success = true;
-			}
+	if(!changeCNVPage(generalRegisterPage))
+		return false;
+
+	uint32_t *generalRegValue = new uint32_t;
+	if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+						generalRegisterAddress, generalRegValue) != -1) {
+		if(*generalRegValue != UINT32_MAX) {
+			GENERALRegisterMap = QMap(m_admtController->getGeneralRegisterBitMapping(
+				static_cast<uint16_t>(*generalRegValue)));
+			success = true;
 		}
 	}
+	delete generalRegValue;
 
 	return success;
 }
 
-bool HarmonicCalibration::writeSequence(const map<string, int> &settings)
+bool HarmonicCalibration::writeSequence(QMap<string, int> settings)
 {
-	uint32_t *generalRegValue = new uint32_t;
-	uint32_t generalRegisterAddress =
-		m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL);
-
 	bool success = false;
 
-	if(!disableECC(true)) {
+	if(!disableECC(true))
 		return false;
-	}
 
+	uint32_t generalRegisterAddress =
+		m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL);
+	uint32_t *generalRegValue = new uint32_t;
 	if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-						generalRegisterAddress, generalRegValue) != 0) {
+						generalRegisterAddress, generalRegValue) != 0)
 		return false;
-	}
 
-	uint32_t newGeneralRegValue = m_admtController->setGeneralRegisterBitMapping(*generalRegValue, settings);
+	uint32_t newGeneralRegValue =
+		m_admtController->setGeneralRegisterBitMapping(*generalRegValue, settings.toStdMap());
 	uint32_t generalRegisterPage =
 		m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL);
 
-	if(!changeCNVPage(generalRegisterPage)) {
+	if(!changeCNVPage(generalRegisterPage))
 		return false;
-	}
 
 	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-						 generalRegisterAddress, newGeneralRegValue) != 0) {
+						 generalRegisterAddress, newGeneralRegValue) != 0)
 		return false;
-	}
 
-	if(!disableECC(false)) {
-		return false;
-	}
-
-	if(readSequence()) {
-		if(settings.at("Convert Synchronization") == GENERALRegisterMap.at("Convert Synchronization") &&
-		   settings.at("Angle Filter") == GENERALRegisterMap.at("Angle Filter") &&
-		   settings.at("8th Harmonic") == GENERALRegisterMap.at("8th Harmonic") &&
-		   settings.at("Sequence Type") == GENERALRegisterMap.at("Sequence Type") &&
-		   settings.at("Conversion Type") == GENERALRegisterMap.at("Conversion Type")) {
+	if(readSequence())
+		if(settings.value("Convert Synchronization") ==
+			   GENERALRegisterMap.value("Convert Synchronizvalueion") &&
+		   settings.value("Angle Filter") == GENERALRegisterMap.value("Angle Filter") &&
+		   settings.value("8th Harmonic") == GENERALRegisterMap.value("8th Harmonic") &&
+		   settings.value("Sequence Type") == GENERALRegisterMap.value("Sequence Type") &&
+		   settings.value("Conversion Type") == GENERALRegisterMap.value("Conversion Type"))
 			success = true;
-		}
-	}
 
 	return success;
 }
@@ -2524,10 +2443,8 @@ void HarmonicCalibration::applySequence()
 		this->toggleWidget(applySequenceButton, true);
 		applySequenceButton->setText("Apply");
 	});
-	uint32_t *generalRegValue = new uint32_t;
-	uint32_t generalRegisterAddress =
-		m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL);
-	map<string, int> settings;
+
+	QMap<string, int> settings;
 
 	bool success = false;
 
@@ -2542,9 +2459,9 @@ void HarmonicCalibration::applySequence()
 
 	success = writeSequence(settings);
 	if(!success)
-		StatusBarManager::pushMessage("Failed to apply sequence settings");
+		StatusBarManager::pushUrgentMessage("Failed to apply sequence settings");
 	else
-		StatusBarManager::pushMessage("Sequence settings applied successfully");
+		StatusBarManager::pushUrgentMessage("Sequence settings applied successfully");
 }
 
 bool HarmonicCalibration::changeCNVPage(uint32_t page)
@@ -2562,6 +2479,8 @@ bool HarmonicCalibration::changeCNVPage(uint32_t page)
 			}
 		}
 	}
+
+	delete cnvPageRegValue;
 
 	return false;
 }
@@ -2613,13 +2532,14 @@ void HarmonicCalibration::stopDeviceStatusMonitor()
 
 void HarmonicCalibration::getDeviceFaultStatus(int sampleRate)
 {
-	uint32_t *readValue = new uint32_t;
 	bool registerFault = false;
+	bool success = true;
 	while(isDeviceStatusMonitor) {
 		if(m_admtController->writeDeviceRegistry(
 			   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 			   m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::FAULT),
 			   0) == 0) {
+			uint32_t *readValue = new uint32_t;
 			if(m_admtController->readDeviceRegistry(
 				   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 				   m_admtController->getConfigurationRegister(
@@ -2628,22 +2548,31 @@ void HarmonicCalibration::getDeviceFaultStatus(int sampleRate)
 				if(GENERALRegisterMap.contains("Sequence Type")) {
 					registerFault = m_admtController->checkRegisterFault(
 						static_cast<uint16_t>(*readValue),
-						GENERALRegisterMap.at("Sequence Type") == 0 ? true : false);
+						GENERALRegisterMap.value("Sequence Type") == 0 ? true : false);
 
 					Q_EMIT updateFaultStatusSignal(registerFault);
 				} else
-					Q_EMIT updateFaultStatusSignal(true);
-			} else
-				Q_EMIT updateFaultStatusSignal(true);
-
+					success = false;
+			} else {
+				success = false;
+				delete readValue;
+			}
 		} else
-			Q_EMIT updateFaultStatusSignal(true);
+			success = false;
+
+		if(!success) {
+			StatusBarManager::pushUrgentMessage("Could not read device, disconnecting device");
+			Q_EMIT m_admtController->requestDisconnect();
+			break;
+		}
 
 		QThread::msleep(sampleRate);
 	}
 }
 
-void HarmonicCalibration::requestDisconnect()
+void HarmonicCalibration::requestDisconnect() { Q_EMIT m_admtController->requestDisconnect(); }
+
+void HarmonicCalibration::stopTasks()
 {
 	stopAcquisition();
 
@@ -2693,24 +2622,26 @@ void HarmonicCalibration::updateMotorPosition(double position)
 	current_pos = position;
 	if(isAcquisitionTab)
 		updateLineEditValue(acquisitionMotorCurrentPositionLineEdit, current_pos);
-	else if(isCalibrationTab)
-		updateLineEditValue(calibrationMotorCurrentPositionLineEdit, current_pos);
 }
 
 bool HarmonicCalibration::resetGENERAL()
 {
 	bool success = false;
 
-	if(!disableECC(true)) {
+	uint32_t GENERALPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL);
+
+	if(!disableECC(true))
 		return false;
-	}
+
+	if(!changeCNVPage(GENERALPage))
+		return false;
 
 	if(deviceRegisterMap.contains("ASIL ID")) {
 		uint32_t resetValue = 0x0000;
 
-		if(deviceRegisterMap.at("ASIL ID") == "ASIL QM")
+		if(deviceRegisterMap.value("ASIL ID") == "ASIL QM")
 			resetValue = 0x1230; // Industrial or ASIL QM
-		else if(deviceRegisterMap.at("ASIL ID") == "ASIL B")
+		else if(deviceRegisterMap.value("ASIL ID") == "ASIL B")
 			resetValue = 0x1200; // Automotive or ASIL B
 
 		if(resetValue != 0x0000) {
@@ -2722,10 +2653,6 @@ bool HarmonicCalibration::resetGENERAL()
 				success = true;
 			}
 		}
-	}
-
-	if(!disableECC(false)) {
-		return false;
 	}
 
 	return success;
@@ -2746,6 +2673,8 @@ bool HarmonicCalibration::updateChannelValues()
 		return false;
 	}
 	updateCountValue();
+	// count = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+	// countChannelName, bufferSize);
 	if(count == static_cast<double>(UINT64_MAX)) {
 		return false;
 	}
@@ -2754,28 +2683,29 @@ bool HarmonicCalibration::updateChannelValues()
 	if(temp == static_cast<double>(UINT64_MAX)) {
 		return false;
 	}
-	return success = true;
+
+	success = true;
+
+	return success;
 }
 
 void HarmonicCalibration::updateCountValue()
 {
 	uint32_t *absAngleRegValue = new uint32_t;
 	bool success = false;
-	if(m_admtController->writeDeviceRegistry(
+
+	if(m_admtController->readDeviceRegistry(
 		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-		   m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::CNVPAGE),
-		   0x0000) == 0) {
-		if(m_admtController->readDeviceRegistry(
-			   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-			   m_admtController->getSensorRegister(ADMTController::SensorRegister::ABSANGLE),
-			   absAngleRegValue) == 0) {
-			count = m_admtController->getAbsAngleTurnCount(static_cast<uint16_t>(*absAngleRegValue));
-			success = true;
-		}
+		   m_admtController->getSensorRegister(ADMTController::SensorRegister::ABSANGLE),
+		   absAngleRegValue) == 0) {
+		count = m_admtController->getAbsAngleTurnCount(static_cast<uint16_t>(*absAngleRegValue));
+		success = true;
 	}
-	if(!success) {
+
+	delete absAngleRegValue;
+
+	if(!success)
 		count = static_cast<double>(UINT64_MAX);
-	}
 }
 
 void HarmonicCalibration::updateLineEditValues()
@@ -2793,12 +2723,15 @@ void HarmonicCalibration::updateLineEditValues()
 	if(count == static_cast<double>(UINT64_MAX)) {
 		countValueLabel->setText("N/A");
 	} else {
-		countValueLabel->setText(QString::number(count));
+		if(count == -10)
+			countValueLabel->setText("Invalid turn count");
+		else
+			countValueLabel->setText(QString::number(count));
 	}
 	if(temp == static_cast<double>(UINT64_MAX)) {
 		tempValueLabel->setText("N/A");
 	} else {
-		tempValueLabel->setText(QString::number(temp) + " °C");
+		tempValueLabel->setText(QString::number(temp, 10, 2) + " °C");
 	}
 }
 
@@ -2807,43 +2740,43 @@ void HarmonicCalibration::updateAcquisitionData(QMap<SensorData, double> sensorD
 	if(isStartAcquisition)
 		updateLineEditValues();
 
-	if(acquisitionDataMap.value(ANGLE) && sensorDataMap.keys().contains(ANGLE))
+	if(acquisitionDataMap.value(ANGLE) && sensorDataMap.contains(ANGLE))
 		appendAcquisitionData(sensorDataMap.value(ANGLE), acquisitionAngleList);
 	else
 		acquisitionAngleList.clear();
-	if(acquisitionDataMap.value(ABSANGLE) && sensorDataMap.keys().contains(ABSANGLE))
+	if(acquisitionDataMap.value(ABSANGLE) && sensorDataMap.contains(ABSANGLE))
 		appendAcquisitionData(sensorDataMap.value(ABSANGLE), acquisitionABSAngleList);
 	else
 		acquisitionABSAngleList.clear();
-	if(acquisitionDataMap.value(TMP0) && sensorDataMap.keys().contains(TMP0))
+	if(acquisitionDataMap.value(TMP0) && sensorDataMap.contains(TMP0))
 		appendAcquisitionData(sensorDataMap.value(TMP0), acquisitionTmp0List);
 	else
 		acquisitionTmp0List.clear();
-	if(acquisitionDataMap.value(SINE) && sensorDataMap.keys().contains(SINE))
+	if(acquisitionDataMap.value(SINE) && sensorDataMap.contains(SINE))
 		appendAcquisitionData(sensorDataMap.value(SINE), acquisitionSineList);
 	else
 		acquisitionSineList.clear();
-	if(acquisitionDataMap.value(COSINE) && sensorDataMap.keys().contains(COSINE))
+	if(acquisitionDataMap.value(COSINE) && sensorDataMap.contains(COSINE))
 		appendAcquisitionData(sensorDataMap.value(COSINE), acquisitionCosineList);
 	else
 		acquisitionCosineList.clear();
-	if(acquisitionDataMap.value(RADIUS) && sensorDataMap.keys().contains(RADIUS))
+	if(acquisitionDataMap.value(RADIUS) && sensorDataMap.contains(RADIUS))
 		appendAcquisitionData(sensorDataMap.value(RADIUS), acquisitionRadiusList);
 	else
 		acquisitionRadiusList.clear();
-	if(acquisitionDataMap.value(ANGLESEC) && sensorDataMap.keys().contains(ANGLESEC))
+	if(acquisitionDataMap.value(ANGLESEC) && sensorDataMap.contains(ANGLESEC))
 		appendAcquisitionData(sensorDataMap.value(ANGLESEC), acquisitionAngleSecList);
 	else
 		acquisitionAngleSecList.clear();
-	if(acquisitionDataMap.value(SECANGLI) && sensorDataMap.keys().contains(SECANGLI))
+	if(acquisitionDataMap.value(SECANGLI) && sensorDataMap.contains(SECANGLI))
 		appendAcquisitionData(sensorDataMap.value(SECANGLI), acquisitionSecAnglIList);
 	else
 		acquisitionSecAnglIList.clear();
-	if(acquisitionDataMap.value(SECANGLQ) && sensorDataMap.keys().contains(SECANGLQ))
+	if(acquisitionDataMap.value(SECANGLQ) && sensorDataMap.contains(SECANGLQ))
 		appendAcquisitionData(sensorDataMap.value(SECANGLQ), acquisitionSecAnglQList);
 	else
 		acquisitionSecAnglQList.clear();
-	if(acquisitionDataMap.value(TMP1) && sensorDataMap.keys().contains(TMP1))
+	if(acquisitionDataMap.value(TMP1) && sensorDataMap.contains(TMP1))
 		appendAcquisitionData(sensorDataMap.value(TMP1), acquisitionTmp1List);
 	else
 		acquisitionTmp1List.clear();
@@ -3063,25 +2996,25 @@ void HarmonicCalibration::updateSequenceWidget()
 		return;
 	}
 
-	if(GENERALRegisterMap.at("Sequence Type") == -1) {
+	if(GENERALRegisterMap.value("Sequence Type") == -1) {
 		sequenceTypeMenuCombo->combo()->setCurrentText("Reserved");
 	} else {
 		sequenceTypeMenuCombo->combo()->setCurrentIndex(
-			sequenceTypeMenuCombo->combo()->findData(GENERALRegisterMap.at("Sequence Type")));
+			sequenceTypeMenuCombo->combo()->findData(GENERALRegisterMap.value("Sequence Type")));
 	}
 	conversionTypeMenuCombo->combo()->setCurrentIndex(
-		conversionTypeMenuCombo->combo()->findData(GENERALRegisterMap.at("Conversion Type")));
-	if(GENERALRegisterMap.at("Convert Synchronization") == -1) {
+		conversionTypeMenuCombo->combo()->findData(GENERALRegisterMap.value("Conversion Type")));
+	if(GENERALRegisterMap.value("Convert Synchronization") == -1) {
 		convertSynchronizationMenuCombo->combo()->setCurrentText("Reserved");
 	} else {
 		convertSynchronizationMenuCombo->combo()->setCurrentIndex(
 			convertSynchronizationMenuCombo->combo()->findData(
-				GENERALRegisterMap.at("Convert Synchronization")));
+				GENERALRegisterMap.value("Convert Synchronization")));
 	}
 	angleFilterMenuCombo->combo()->setCurrentIndex(
-		angleFilterMenuCombo->combo()->findData(GENERALRegisterMap.at("Angle Filter")));
+		angleFilterMenuCombo->combo()->findData(GENERALRegisterMap.value("Angle Filter")));
 	eighthHarmonicMenuCombo->combo()->setCurrentIndex(
-		eighthHarmonicMenuCombo->combo()->findData(GENERALRegisterMap.at("8th Harmonic")));
+		eighthHarmonicMenuCombo->combo()->findData(GENERALRegisterMap.value("8th Harmonic")));
 }
 
 void HarmonicCalibration::updateCapturedDataCheckBoxes()
@@ -3102,7 +3035,7 @@ void HarmonicCalibration::updateCapturedDataCheckBoxes()
 	acquisitionGraphChannelGridLayout->removeWidget(secAnglICheckBox);
 	acquisitionGraphChannelGridLayout->removeWidget(temp1CheckBox);
 
-	if(GENERALRegisterMap.at("Sequence Type") == 0) // Sequence Mode 1
+	if(GENERALRegisterMap.value("Sequence Type") == 0) // Sequence Mode 1
 	{
 		acquisitionGraphChannelGridLayout->addWidget(angleCheckBox, 0, 0);
 		acquisitionGraphChannelGridLayout->addWidget(sineCheckBox, 0, 1);
@@ -3118,7 +3051,7 @@ void HarmonicCalibration::updateCapturedDataCheckBoxes()
 		secAnglICheckBox->hide();
 		secAnglQCheckBox->hide();
 		temp1CheckBox->hide();
-	} else if(GENERALRegisterMap.at("Sequence Type") == 1) // Sequence Mode 2
+	} else if(GENERALRegisterMap.value("Sequence Type") == 1) // Sequence Mode 2
 	{
 		acquisitionGraphChannelGridLayout->addWidget(angleCheckBox, 0, 0);
 		acquisitionGraphChannelGridLayout->addWidget(sineCheckBox, 0, 1);
@@ -3142,6 +3075,7 @@ void HarmonicCalibration::updateCapturedDataCheckBoxes()
 
 void HarmonicCalibration::applySequenceAndUpdate()
 {
+	disableECC(true);
 	applySequence();
 	updateSequenceWidget();
 	updateCapturedDataCheckBoxes();
@@ -3151,7 +3085,7 @@ void HarmonicCalibration::updateGeneralSettingEnabled(bool value) { displayLengt
 
 void HarmonicCalibration::connectCheckBoxToAcquisitionGraph(QCheckBox *widget, PlotChannel *channel, SensorData key)
 {
-	connect(widget, &QCheckBox::stateChanged, [this, channel, key](int state) {
+	connect(widget, &QCheckBox::stateChanged, this, [this, channel, key](int state) {
 		if(state == Qt::Checked) {
 			channel->setEnabled(true);
 			acquisitionDataMap[key] = true;
@@ -3290,11 +3224,9 @@ void HarmonicCalibration::updateCalibrationMotorRotationDirection()
 void HarmonicCalibration::getCalibrationSamples()
 {
 	if(resetCurrentPositionToZero()) {
-		double step = 0;
-		if(isMotorRotationClockwise)
-			step = motorFullStepPerRevolution;
-		else
-			step = -motorFullStepPerRevolution;
+		int step = floor(motorMicrostepPerRevolution / samplesPerCycle);
+		if(!isMotorRotationClockwise)
+			step = -step;
 		if(isPostCalibration) {
 			int currentSamplesCount = graphPostDataList.size();
 			while(isStartMotor && currentSamplesCount < totalSamplesCount) {
@@ -3331,8 +3263,8 @@ void HarmonicCalibration::startCalibration()
 	graphDataList.reserve(totalSamplesCount);
 	graphDataList.squeeze();
 
-	// configureConversionType(calibrationMode); // TODO uncomment when conversion
-	// type is okay
+	configureConversionType(calibrationMode);
+
 	configureCalibrationSequenceSettings();
 	clearHarmonicRegisters();
 
@@ -3502,7 +3434,7 @@ void HarmonicCalibration::configureConversionType(int mode)
 		return;
 	}
 
-	GENERALRegisterMap.at("Conversion Type") = mode;
+	GENERALRegisterMap["Conversion Type"] = mode;
 	writeSequence(GENERALRegisterMap);
 }
 
@@ -3514,7 +3446,7 @@ void HarmonicCalibration::configureCalibrationSequenceSettings()
 		return;
 	}
 
-	GENERALRegisterMap.at("8th Harmonic") = 1; // User-supplied 8th Harmonic
+	GENERALRegisterMap["8th Harmonic"] = 1; // User-supplied 8th Harmonic
 	writeSequence(GENERALRegisterMap);
 }
 
@@ -3763,10 +3695,10 @@ bool HarmonicCalibration::clearHarmonicRegisters()
 	uint32_t value = 0x0;
 	uint32_t harmonicCNVPage = m_admtController->getHarmonicPage(ADMTController::HarmonicRegister::H1MAG);
 
-	if(!disableECC(true))
+	if(!changeCNVPage(harmonicCNVPage))
 		return false;
 
-	if(!changeCNVPage(harmonicCNVPage))
+	if(!disableECC(true))
 		return false;
 
 	if(m_admtController->writeDeviceRegistry(
@@ -3809,14 +3741,7 @@ bool HarmonicCalibration::clearHarmonicRegisters()
 		   m_admtController->getHarmonicRegister(ADMTController::HarmonicRegister::H8PH), value) != 0)
 		return false;
 
-	if(disableECC(false)) {
-		success = true;
-	} else
-		return false;
-
-	if(!success) {
-		StatusBarManager::pushMessage("Unable to clear Harmonic Registers!");
-	}
+	success = true;
 
 	return success;
 }
@@ -3825,10 +3750,10 @@ bool HarmonicCalibration::flashHarmonicValues()
 {
 	bool success = false;
 
-	if(!disableECC(true))
+	if(!changeCNVPage(0x02))
 		return false;
 
-	if(!changeCNVPage(0x02))
+	if(!disableECC(true))
 		return false;
 
 	if(m_admtController->writeDeviceRegistry(
@@ -3867,24 +3792,18 @@ bool HarmonicCalibration::flashHarmonicValues()
 	isCalculatedCoeff = true;
 	displayCalculatedCoeff();
 
-	if(disableECC(true))
-		success = true;
-	else
-		return false;
-
-	if(!success)
-		StatusBarManager::pushMessage("Unable to flash Harmonic Registers!");
+	success = true;
 
 	return success;
 }
 
 void HarmonicCalibration::calculateHarmonicValues()
 {
-	uint32_t *h1MagCurrent = new uint32_t, *h1PhaseCurrent = new uint32_t, *h2MagCurrent = new uint32_t,
-		 *h2PhaseCurrent = new uint32_t, *h3MagCurrent = new uint32_t, *h3PhaseCurrent = new uint32_t,
-		 *h8MagCurrent = new uint32_t, *h8PhaseCurrent = new uint32_t;
-
 	if(changeCNVPage(0x02)) {
+		uint32_t *h1MagCurrent = new uint32_t, *h1PhaseCurrent = new uint32_t, *h2MagCurrent = new uint32_t,
+			 *h2PhaseCurrent = new uint32_t, *h3MagCurrent = new uint32_t, *h3PhaseCurrent = new uint32_t,
+			 *h8MagCurrent = new uint32_t, *h8PhaseCurrent = new uint32_t;
+
 		// Read and store current harmonic values
 		m_admtController->readDeviceRegistry(
 			m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
@@ -4187,8 +4106,11 @@ void HarmonicCalibration::canCalibrate(bool value) { calibrateDataButton->setEna
 
 void HarmonicCalibration::toggleCalibrationControls(bool value)
 {
-	motorTargetPositionLineEdit->setEnabled(value);
 	calibrationModeMenuCombo->setEnabled(value);
+	calibrationCycleCountLineEdit->setEnabled(value);
+	calibrationSamplesPerCycleLineEdit->setEnabled(value);
+	calibrationMotorRPMLineEdit->setEnabled(value);
+	calibrationMotorDirectionSwitch->setEnabled(value);
 }
 
 void HarmonicCalibration::clearCalibrationSamples()
@@ -4424,70 +4346,70 @@ void HarmonicCalibration::getDIGIOENRegister()
 
 void HarmonicCalibration::updateDIGIOUI(quint16 registerValue)
 {
-	DIGIOENRegisterMap = m_admtController->getDIGIOENRegisterBitMapping(registerValue);
+	DIGIOENRegisterMap = QMap(m_admtController->getDIGIOENRegisterBitMapping(registerValue));
 	updateDIGIOMonitorUI();
 	updateDIGIOControlUI();
 }
 
 void HarmonicCalibration::updateDIGIOMonitorUI()
 {
-	map<string, bool> registerMap = DIGIOENRegisterMap;
-	DIGIOBusyStatusLED->setChecked(registerMap.at("BUSY"));
-	DIGIOCNVStatusLED->setChecked(registerMap.at("CNV"));
-	DIGIOSENTStatusLED->setChecked(registerMap.at("SENT"));
-	DIGIOACALCStatusLED->setChecked(registerMap.at("ACALC"));
-	DIGIOFaultStatusLED->setChecked(registerMap.at("FAULT"));
-	DIGIOBootloaderStatusLED->setChecked(registerMap.at("BOOTLOAD"));
+	QMap<string, bool> registerMap = DIGIOENRegisterMap;
+	DIGIOBusyStatusLED->setChecked(registerMap.value("BUSY"));
+	DIGIOCNVStatusLED->setChecked(registerMap.value("CNV"));
+	DIGIOSENTStatusLED->setChecked(registerMap.value("SENT"));
+	DIGIOACALCStatusLED->setChecked(registerMap.value("ACALC"));
+	DIGIOFaultStatusLED->setChecked(registerMap.value("FAULT"));
+	DIGIOBootloaderStatusLED->setChecked(registerMap.value("BOOTLOAD"));
 
-	if(!registerMap.at("BUSY"))
+	if(!registerMap.value("BUSY"))
 		DIGIOBusyStatusLED->setText("BUSY (Output)");
 	else {
-		if(registerMap.at("DIGIO0EN"))
+		if(registerMap.value("DIGIO0EN"))
 			DIGIOBusyStatusLED->setText("GPIO0 (Output)");
 		else
 			DIGIOBusyStatusLED->setText("GPIO0 (Input)");
 	}
 
-	if(!registerMap.at("CNV"))
+	if(!registerMap.value("CNV"))
 		DIGIOCNVStatusLED->setText("CNV (Input)");
 	else {
-		if(registerMap.at("DIGIO1EN"))
+		if(registerMap.value("DIGIO1EN"))
 			DIGIOCNVStatusLED->setText("GPIO1 (Output)");
 		else
 			DIGIOCNVStatusLED->setText("GPIO1 (Input)");
 	}
 
-	if(!registerMap.at("SENT"))
+	if(!registerMap.value("SENT"))
 		DIGIOSENTStatusLED->setText("SENT (Output)");
 	else {
-		if(registerMap.at("DIGIO2EN"))
+		if(registerMap.value("DIGIO2EN"))
 			DIGIOSENTStatusLED->setText("GPIO2 (Output)");
 		else
 			DIGIOSENTStatusLED->setText("GPIO2 (Input)");
 	}
 
-	if(!registerMap.at("ACALC"))
+	if(!registerMap.value("ACALC"))
 		DIGIOACALCStatusLED->setText("ACALC (Output)");
 	else {
-		if(registerMap.at("DIGIO3EN"))
+		if(registerMap.value("DIGIO3EN"))
 			DIGIOACALCStatusLED->setText("GPIO3 (Output)");
 		else
 			DIGIOACALCStatusLED->setText("GPIO3 (Input)");
 	}
 
-	if(!registerMap.at("FAULT"))
+	if(!registerMap.value("FAULT"))
 		DIGIOFaultStatusLED->setText("FAULT (Output)");
 	else {
-		if(registerMap.at("DIGIO4EN"))
+		if(registerMap.value("DIGIO4EN"))
 			DIGIOFaultStatusLED->setText("GPIO4 (Output)");
 		else
 			DIGIOFaultStatusLED->setText("GPIO4 (Input)");
 	}
 
-	if(!registerMap.at("BOOTLOAD"))
+	if(!registerMap.value("BOOTLOAD"))
 		DIGIOBootloaderStatusLED->setText("BOOTLOAD (Output)");
 	else {
-		if(registerMap.at("DIGIO5EN"))
+		if(registerMap.value("DIGIO5EN"))
 			DIGIOBootloaderStatusLED->setText("GPIO5 (Output)");
 		else
 			DIGIOBootloaderStatusLED->setText("GPIO5 (Input)");
@@ -4496,26 +4418,25 @@ void HarmonicCalibration::updateDIGIOMonitorUI()
 
 void HarmonicCalibration::updateDIGIOControlUI()
 {
-	map<string, bool> registerMap = DIGIOENRegisterMap;
+	QMap<string, bool> registerMap = DIGIOENRegisterMap;
 
-	DIGIO0ENToggleSwitch->setChecked(registerMap.at("DIGIO0EN"));
-	DIGIO1ENToggleSwitch->setChecked(registerMap.at("DIGIO1EN"));
-	DIGIO2ENToggleSwitch->setChecked(registerMap.at("DIGIO2EN"));
-	DIGIO3ENToggleSwitch->setChecked(registerMap.at("DIGIO3EN"));
-	DIGIO4ENToggleSwitch->setChecked(registerMap.at("DIGIO4EN"));
-	DIGIO5ENToggleSwitch->setChecked(registerMap.at("DIGIO5EN"));
-	DIGIO0FNCToggleSwitch->setChecked(registerMap.at("BUSY"));
-	DIGIO1FNCToggleSwitch->setChecked(registerMap.at("CNV"));
-	DIGIO2FNCToggleSwitch->setChecked(registerMap.at("SENT"));
-	DIGIO3FNCToggleSwitch->setChecked(registerMap.at("ACALC"));
-	DIGIO4FNCToggleSwitch->setChecked(registerMap.at("FAULT"));
-	DIGIO5FNCToggleSwitch->setChecked(registerMap.at("BOOTLOAD"));
+	DIGIO0ENToggleSwitch->setChecked(registerMap.value("DIGIO0EN"));
+	DIGIO1ENToggleSwitch->setChecked(registerMap.value("DIGIO1EN"));
+	DIGIO2ENToggleSwitch->setChecked(registerMap.value("DIGIO2EN"));
+	DIGIO3ENToggleSwitch->setChecked(registerMap.value("DIGIO3EN"));
+	DIGIO4ENToggleSwitch->setChecked(registerMap.value("DIGIO4EN"));
+	DIGIO5ENToggleSwitch->setChecked(registerMap.value("DIGIO5EN"));
+	DIGIO0FNCToggleSwitch->setChecked(registerMap.value("BUSY"));
+	DIGIO1FNCToggleSwitch->setChecked(registerMap.value("CNV"));
+	DIGIO2FNCToggleSwitch->setChecked(registerMap.value("SENT"));
+	DIGIO3FNCToggleSwitch->setChecked(registerMap.value("ACALC"));
+	DIGIO4FNCToggleSwitch->setChecked(registerMap.value("FAULT"));
+	DIGIO5FNCToggleSwitch->setChecked(registerMap.value("BOOTLOAD"));
 }
 
 void HarmonicCalibration::getDIAG2Register()
 {
 	uint32_t *mtDiag2RegValue = new uint32_t;
-	uint32_t *cnvPageRegValue = new uint32_t;
 	uint32_t mtDiag2RegisterAddress = m_admtController->getSensorRegister(ADMTController::SensorRegister::DIAG2);
 	uint32_t mtDiag2PageValue = m_admtController->getSensorPage(ADMTController::SensorRegister::DIAG2);
 	uint32_t cnvPageAddress =
@@ -4523,6 +4444,7 @@ void HarmonicCalibration::getDIAG2Register()
 
 	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 						 cnvPageAddress, mtDiag2PageValue) != -1) {
+		uint32_t *cnvPageRegValue = new uint32_t;
 		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 							cnvPageAddress, cnvPageRegValue) != -1) {
 			if(*cnvPageRegValue == mtDiag2PageValue) {
@@ -4546,20 +4468,22 @@ void HarmonicCalibration::getDIAG2Register()
 		} else {
 			Q_EMIT commandLogWriteSignal("Failed to read CNVPAGE for MT Diagnostic 2");
 		}
+
+		delete cnvPageRegValue;
 	} else {
 		Q_EMIT commandLogWriteSignal("Failed to write CNVPAGE for MT Diagnostic 2");
 	}
 
-	delete mtDiag2RegValue, cnvPageRegValue;
+	delete mtDiag2RegValue;
 }
 
 void HarmonicCalibration::updateMTDiagnosticsUI(quint16 registerValue)
 {
-	DIAG2RegisterMap = m_admtController->getDiag2RegisterBitMapping(registerValue);
+	DIAG2RegisterMap = QMap(m_admtController->getDiag2RegisterBitMapping(registerValue));
 
-	map<string, double> regmap = DIAG2RegisterMap;
-	afeDiag0 = regmap.at("AFE Diagnostic 0 (-57%)");
-	afeDiag1 = regmap.at("AFE Diagnostic 1 (+57%)");
+	QMap<string, double> regmap = DIAG2RegisterMap;
+	afeDiag0 = regmap.value("AFE Diagnostic 0 (-57%)");
+	afeDiag1 = regmap.value("AFE Diagnostic 1 (+57%)");
 	AFEDIAG0LineEdit->setText(QString::number(afeDiag0) + " V");
 	AFEDIAG1LineEdit->setText(QString::number(afeDiag1) + " V");
 }
@@ -4567,7 +4491,7 @@ void HarmonicCalibration::updateMTDiagnosticsUI(quint16 registerValue)
 void HarmonicCalibration::getDIAG1Register()
 {
 	uint32_t *mtDiag1RegValue = new uint32_t;
-	uint32_t *cnvPageRegValue = new uint32_t;
+
 	uint32_t mtDiag1RegisterAddress = m_admtController->getSensorRegister(ADMTController::SensorRegister::DIAG1);
 	uint32_t mtDiag1PageValue = m_admtController->getSensorPage(ADMTController::SensorRegister::DIAG1);
 	uint32_t cnvPageAddress =
@@ -4575,6 +4499,7 @@ void HarmonicCalibration::getDIAG1Register()
 
 	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 						 cnvPageAddress, mtDiag1PageValue) != -1) {
+		uint32_t *cnvPageRegValue = new uint32_t;
 		if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 							cnvPageAddress, cnvPageRegValue) != -1) {
 			if(*cnvPageRegValue == mtDiag1PageValue) {
@@ -4599,29 +4524,31 @@ void HarmonicCalibration::getDIAG1Register()
 		} else {
 			Q_EMIT commandLogWriteSignal("Failed to read CNVPAGE for MT Diagnostic 1");
 		}
+
+		delete cnvPageRegValue;
 	} else {
 		Q_EMIT commandLogWriteSignal("Failed to write CNVPAGE for MT Diagnostic 1");
 	}
 
-	delete mtDiag1RegValue, cnvPageRegValue;
+	delete mtDiag1RegValue;
 }
 
 void HarmonicCalibration::updateMTDiagnosticRegisterUI(quint16 registerValue)
 {
-	DIAG1RegisterMap = m_admtController->getDiag1RegisterBitMapping_Register(registerValue);
-	DIAG1AFERegisterMap = m_admtController->getDiag1RegisterBitMapping_Afe(registerValue, is5V);
+	DIAG1RegisterMap = QMap(m_admtController->getDiag1RegisterBitMapping_Register(registerValue));
+	DIAG1AFERegisterMap = QMap(m_admtController->getDiag1RegisterBitMapping_Afe(registerValue, is5V));
 
-	map<string, bool> regmap = DIAG1RegisterMap;
-	map<string, double> afeRegmap = DIAG1AFERegisterMap;
-	R0StatusLED->setChecked(regmap.at("R0"));
-	R1StatusLED->setChecked(regmap.at("R1"));
-	R2StatusLED->setChecked(regmap.at("R2"));
-	R3StatusLED->setChecked(regmap.at("R3"));
-	R4StatusLED->setChecked(regmap.at("R4"));
-	R5StatusLED->setChecked(regmap.at("R5"));
-	R6StatusLED->setChecked(regmap.at("R6"));
-	R7StatusLED->setChecked(regmap.at("R7"));
-	afeDiag2 = afeRegmap.at("AFE Diagnostic 2");
+	QMap<string, bool> regmap = DIAG1RegisterMap;
+	QMap<string, double> afeRegmap = DIAG1AFERegisterMap;
+	R0StatusLED->setChecked(regmap.value("R0"));
+	R1StatusLED->setChecked(regmap.value("R1"));
+	R2StatusLED->setChecked(regmap.value("R2"));
+	R3StatusLED->setChecked(regmap.value("R3"));
+	R4StatusLED->setChecked(regmap.value("R4"));
+	R5StatusLED->setChecked(regmap.value("R5"));
+	R6StatusLED->setChecked(regmap.value("R6"));
+	R7StatusLED->setChecked(regmap.value("R7"));
+	afeDiag2 = afeRegmap.value("AFE Diagnostic 2");
 	AFEDIAG2LineEdit->setText(QString::number(afeDiag2) + " V");
 }
 
@@ -4649,24 +4576,24 @@ void HarmonicCalibration::getFAULTRegister()
 
 void HarmonicCalibration::updateFaultRegisterUI(quint16 faultRegValue)
 {
-	FAULTRegisterMap = m_admtController->getFaultRegisterBitMapping(faultRegValue);
+	FAULTRegisterMap = QMap(m_admtController->getFaultRegisterBitMapping(faultRegValue));
 
-	map<string, bool> regmap = FAULTRegisterMap;
-	VDDUnderVoltageStatusLED->setChecked(regmap.at("VDD Under Voltage"));
-	VDDOverVoltageStatusLED->setChecked(regmap.at("VDD Over Voltage"));
-	VDRIVEUnderVoltageStatusLED->setChecked(regmap.at("VDRIVE Under Voltage"));
-	VDRIVEOverVoltageStatusLED->setChecked(regmap.at("VDRIVE Over Voltage"));
-	AFEDIAGStatusLED->setChecked(regmap.at("AFE Diagnostic"));
-	NVMCRCFaultStatusLED->setChecked(regmap.at("NVM CRC Fault"));
-	ECCDoubleBitErrorStatusLED->setChecked(regmap.at("ECC Double Bit Error"));
-	OscillatorDriftStatusLED->setChecked(regmap.at("Oscillator Drift"));
-	CountSensorFalseStateStatusLED->setChecked(regmap.at("Count Sensor False State"));
-	AngleCrossCheckStatusLED->setChecked(regmap.at("Angle Cross Check"));
-	TurnCountSensorLevelsStatusLED->setChecked(regmap.at("Turn Count Sensor Levels"));
-	MTDIAGStatusLED->setChecked(regmap.at("MT Diagnostic"));
-	TurnCounterCrossCheckStatusLED->setChecked(regmap.at("Turn Counter Cross Check"));
-	RadiusCheckStatusLED->setChecked(regmap.at("AMR Radius Check"));
-	SequencerWatchdogStatusLED->setChecked(regmap.at("Sequencer Watchdog"));
+	QMap<string, bool> regmap = FAULTRegisterMap;
+	VDDUnderVoltageStatusLED->setChecked(regmap.value("VDD Under Voltage"));
+	VDDOverVoltageStatusLED->setChecked(regmap.value("VDD Over Voltage"));
+	VDRIVEUnderVoltageStatusLED->setChecked(regmap.value("VDRIVE Under Voltage"));
+	VDRIVEOverVoltageStatusLED->setChecked(regmap.value("VDRIVE Over Voltage"));
+	AFEDIAGStatusLED->setChecked(regmap.value("AFE Diagnostic"));
+	NVMCRCFaultStatusLED->setChecked(regmap.value("NVM CRC Fault"));
+	ECCDoubleBitErrorStatusLED->setChecked(regmap.value("ECC Double Bit Error"));
+	OscillatorDriftStatusLED->setChecked(regmap.value("Oscillator Drift"));
+	CountSensorFalseStateStatusLED->setChecked(regmap.value("Count Sensor False State"));
+	AngleCrossCheckStatusLED->setChecked(regmap.value("Angle Cross Check"));
+	TurnCountSensorLevelsStatusLED->setChecked(regmap.value("Turn Count Sensor Levels"));
+	MTDIAGStatusLED->setChecked(regmap.value("MT Diagnostic"));
+	TurnCounterCrossCheckStatusLED->setChecked(regmap.value("Turn Counter Cross Check"));
+	RadiusCheckStatusLED->setChecked(regmap.value("AMR Radius Check"));
+	SequencerWatchdogStatusLED->setChecked(regmap.value("Sequencer Watchdog"));
 }
 
 bool HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool value)
@@ -4678,17 +4605,20 @@ bool HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool value)
 	if(!disableECC(true))
 		return false;
 
-	uint32_t *DIGIOENRegisterValue = new uint32_t;
 	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
 
 	if(!changeCNVPage(DIGIOENPage))
 		return false;
 
+	uint32_t *DIGIOENRegisterValue = new uint32_t;
+
 	if(m_admtController->readDeviceRegistry(
 		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 		   m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN),
-		   DIGIOENRegisterValue) != 0)
+		   DIGIOENRegisterValue) != 0) {
+		delete DIGIOENRegisterValue;
 		return false;
+	}
 
 	map<string, bool> DIGIOSettings =
 		m_admtController->getDIGIOENRegisterBitMapping(static_cast<uint16_t>(*DIGIOENRegisterValue));
@@ -4708,11 +4638,9 @@ bool HarmonicCalibration::toggleDIGIOEN(string DIGIOENName, bool value)
 
 	updateDIGIOControlUI();
 
-	if(!disableECC(false))
-		return false;
-
 	toggleUtilityTask(true);
 
+	delete DIGIOENRegisterValue;
 	return success;
 }
 
@@ -4758,19 +4686,17 @@ bool HarmonicCalibration::resetDIGIO()
 
 	uint32_t DIGIOENPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::DIGIOEN);
 
-	if(!disableECC(true)) {
+	if(!disableECC(true))
 		return false;
-	}
+
+	if(!changeCNVPage(DIGIOENPage))
+		return false;
 
 	if(m_admtController->writeDeviceRegistry(
 		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 		   m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::DIGIOEN),
-		   0x241b) == 0) {
+		   0x241b) == 0) { // Reset value is 0x241b
 		success = true;
-	}
-
-	if(!disableECC(false)) {
-		return false;
 	}
 
 	return success;
@@ -4783,9 +4709,8 @@ bool HarmonicCalibration::disableECC(bool disable)
 	uint32_t ECCDISRegValue = disable ? 0x4D54 : 0x0000;
 	uint32_t ECCDISCNVPage = m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::ECCDIS);
 
-	if(!changeCNVPage(ECCDISCNVPage)) {
-		return success;
-	}
+	if(!changeCNVPage(ECCDISCNVPage))
+		return false;
 
 	if(m_admtController->writeDeviceRegistry(
 		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
@@ -4844,7 +4769,7 @@ void HarmonicCalibration::readAllRegisters()
 	h8MagRegisterBlock->readButton()->click();
 	h8PhRegisterBlock->readButton()->click();
 
-	if(GENERALRegisterMap.at("Sequence Type") == 1) {
+	if(GENERALRegisterMap.value("Sequence Type") == 1) {
 		angleSecRegisterBlock->readButton()->click();
 		secAnglIRegisterBlock->readButton()->click();
 		secAnglQRegisterBlock->readButton()->click();
@@ -4925,6 +4850,8 @@ void HarmonicCalibration::updateLabelValue(QLabel *label, ADMTController::MotorA
 		break;
 	case ADMTController::MotorAttribute::RAMP_MODE:
 		label->setText(QString::number(ramp_mode));
+		break;
+	default:
 		break;
 	}
 }
@@ -5009,13 +4936,23 @@ void HarmonicCalibration::configureCoeffRow(QWidget *container, QHBoxLayout *lay
 	layout->addWidget(hPhaseLabel);
 	Style::setStyle(container, style::properties::admt::coeffRowContainer, true, true);
 }
+
+void HarmonicCalibration::initializeChannelColors()
+{
+	channel0Pen = QPen(StyleHelper::getChannelColor(0));
+	channel1Pen = QPen(StyleHelper::getChannelColor(1));
+	channel2Pen = QPen(StyleHelper::getChannelColor(2));
+	channel3Pen = QPen(StyleHelper::getChannelColor(3));
+	channel4Pen = QPen(StyleHelper::getChannelColor(4));
+	channel5Pen = QPen(StyleHelper::getChannelColor(5));
+	channel6Pen = QPen(StyleHelper::getChannelColor(6));
+	channel7Pen = QPen(StyleHelper::getChannelColor(7));
+}
 #pragma endregion
 
 #pragma region Connect Methods
 void HarmonicCalibration::connectLineEditToNumber(QLineEdit *lineEdit, int &variable, int min, int max)
 {
-	QIntValidator *validator = new QIntValidator(min, max, this);
-	lineEdit->setValidator(validator);
 	connect(lineEdit, &QLineEdit::editingFinished, this, [&variable, lineEdit, min, max]() {
 		bool ok;
 		int value = lineEdit->text().toInt(&ok);
@@ -5063,7 +5000,7 @@ void HarmonicCalibration::connectLineEditToNumberWrite(QLineEdit *lineEdit, doub
 	QDoubleValidator *validator = new QDoubleValidator(this);
 	validator->setNotation(QDoubleValidator::StandardNotation);
 	lineEdit->setValidator(validator);
-	connect(lineEdit, &QLineEdit::editingFinished, [this, lineEdit, attribute, &variable]() {
+	connect(lineEdit, &QLineEdit::editingFinished, this, [this, lineEdit, attribute, &variable]() {
 		bool ok;
 		double value = lineEdit->text().toDouble(&ok);
 		if(ok) {
@@ -5092,7 +5029,7 @@ void HarmonicCalibration::connectMenuComboToNumber(MenuCombo *menuCombo, int &va
 
 void HarmonicCalibration::connectLineEditToRPSConversion(QLineEdit *lineEdit, double &vmax)
 {
-	connect(lineEdit, &QLineEdit::editingFinished, [this, lineEdit, &vmax]() {
+	connect(lineEdit, &QLineEdit::editingFinished, this, [this, lineEdit, &vmax]() {
 		bool ok;
 		double rps = lineEdit->text().toDouble(&ok);
 		if(ok) {
@@ -5112,7 +5049,7 @@ void HarmonicCalibration::connectLineEditToRPSConversion(QLineEdit *lineEdit, do
 
 void HarmonicCalibration::connectLineEditToAMAXConversion(QLineEdit *lineEdit, double &amax)
 {
-	connect(lineEdit, &QLineEdit::editingFinished, [this, lineEdit, &amax]() {
+	connect(lineEdit, &QLineEdit::editingFinished, this, [this, lineEdit, &amax]() {
 		bool ok;
 		double accelTime = lineEdit->text().toDouble(&ok);
 		if(ok) {
@@ -5186,7 +5123,7 @@ void HarmonicCalibration::connectLineEditToRPM(QLineEdit *lineEdit, double &vari
 	connect(lineEdit, &QLineEdit::editingFinished, this, [this, lineEdit, &variable]() {
 		bool ok;
 		double value = lineEdit->text().toDouble(&ok);
-		if(ok) {
+		if(ok && variable != value) {
 			variable = value;
 			rotate_vmax = convertRPStoVMAX(convertRPMtoRPS(variable));
 			writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
@@ -5228,11 +5165,11 @@ QString HarmonicCalibration::readRegmapDumpAttributeValue()
 {
 	QString output = "";
 	char value[1024];
-	int result = -1;
-	result = m_admtController->getDeviceAttributeValueString(
-		m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-		m_admtController->getDeviceAttribute(ADMTController::DeviceAttribute::REGMAP_DUMP), value, 1024);
-	output = QString(value);
+	if(m_admtController->getDeviceAttributeValueString(
+		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+		   m_admtController->getDeviceAttribute(ADMTController::DeviceAttribute::REGMAP_DUMP), value,
+		   1024) == 0)
+		output = QString(value);
 	return output;
 }
 #pragma endregion

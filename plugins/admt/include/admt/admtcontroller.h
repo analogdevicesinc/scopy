@@ -24,7 +24,6 @@
 
 #include "scopy-admt_export.h"
 
-#include <bitset>
 #include <iio.h>
 
 #include <QElapsedTimer>
@@ -34,14 +33,10 @@
 #include <iioutil/connectionprovider.h>
 #include <pluginbase/statusbarmanager.h>
 
-#include <algorithm>
 #include <cmath>
-#include <complex>
 #include <cstdint>
 #include <cstdlib>
-#include <iterator>
 #include <math.h>
-#include <numeric>
 #include <vector>
 
 using namespace std;
@@ -266,6 +261,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void streamData(double value);
 	void streamBufferedData(const QVector<double> &value);
+	void requestDisconnect();
 
 private:
 	QWidget *m_page;

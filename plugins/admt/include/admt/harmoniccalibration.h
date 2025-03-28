@@ -104,6 +104,7 @@ public:
 	bool running() const;
 	void setRunning(bool newRunning);
 	void requestDisconnect();
+
 public Q_SLOTS:
 	void run(bool);
 	void stop();
@@ -150,16 +151,28 @@ private:
 	double rotation, angle, count, temp = 0.0, motor_rpm, amax, rotate_vmax, dmax, disable, target_pos, current_pos,
 				       ramp_mode, afeDiag0, afeDiag1, afeDiag2;
 
+	QPen channel0Pen, channel1Pen, channel2Pen, channel3Pen, channel4Pen, channel5Pen, channel6Pen, channel7Pen;
+
+	QMap<string, string> deviceRegisterMap;
+	QMap<string, int> GENERALRegisterMap;
+	QMap<string, bool> DIGIOENRegisterMap, FAULTRegisterMap, DIAG1RegisterMap;
+	QMap<string, double> DIAG2RegisterMap, DIAG1AFERegisterMap;
+
+	QVector<double> acquisitionAngleList, acquisitionABSAngleList, acquisitionTmp0List, acquisitionTmp1List,
+		acquisitionSineList, acquisitionCosineList, acquisitionRadiusList, acquisitionAngleSecList,
+		acquisitionSecAnglIList, acquisitionSecAnglQList, graphDataList, graphPostDataList;
+
 	QPushButton *openLastMenuButton, *calibrationStartMotorButton, *calibrateDataButton, *extractDataButton,
 		*clearCalibrateDataButton, *clearCommandLogButton, *applySequenceButton, *readAllRegistersButton;
 	QButtonGroup *rightMenuButtonGroup;
 
-	QLineEdit *acquisitionMotorRPMLineEdit, *calibrationMotorRPMLineEdit, *motorTargetPositionLineEdit,
-		*displayLengthLineEdit, *dataGraphSamplesLineEdit, *tempGraphSamplesLineEdit,
-		*acquisitionMotorCurrentPositionLineEdit, *calibrationH1MagLineEdit, *calibrationH2MagLineEdit,
-		*calibrationH3MagLineEdit, *calibrationH8MagLineEdit, *calibrationH1PhaseLineEdit,
-		*calibrationH2PhaseLineEdit, *calibrationH3PhaseLineEdit, *calibrationH8PhaseLineEdit,
-		*calibrationMotorCurrentPositionLineEdit, *AFEDIAG0LineEdit, *AFEDIAG1LineEdit, *AFEDIAG2LineEdit;
+	QLineEdit *acquisitionMotorRPMLineEdit, *calibrationCycleCountLineEdit, *calibrationSamplesPerCycleLineEdit,
+		*calibrationMotorRPMLineEdit, *motorTargetPositionLineEdit, *displayLengthLineEdit,
+		*dataGraphSamplesLineEdit, *tempGraphSamplesLineEdit, *acquisitionMotorCurrentPositionLineEdit,
+		*calibrationH1MagLineEdit, *calibrationH2MagLineEdit, *calibrationH3MagLineEdit,
+		*calibrationH8MagLineEdit, *calibrationH1PhaseLineEdit, *calibrationH2PhaseLineEdit,
+		*calibrationH3PhaseLineEdit, *calibrationH8PhaseLineEdit, *calibrationMotorCurrentPositionLineEdit,
+		*AFEDIAG0LineEdit, *AFEDIAG1LineEdit, *AFEDIAG2LineEdit;
 
 	QLabel *rawAngleValueLabel, *rotationValueLabel, *angleValueLabel, *countValueLabel, *tempValueLabel,
 		*motorAmaxValueLabel, *motorRotateVmaxValueLabel, *motorDmaxValueLabel, *motorDisableValueLabel,
@@ -249,10 +262,10 @@ private:
 	ToolTemplate *createRegistersWidget();
 	ToolTemplate *createUtilityWidget();
 
-	void readDeviceProperties();
+	bool readDeviceProperties();
 	void initializeADMT();
 	bool readSequence();
-	bool writeSequence(const map<string, int> &settings);
+	bool writeSequence(QMap<string, int> settings);
 	void applySequence();
 	bool changeCNVPage(uint32_t page);
 	void initializeMotor();
@@ -263,6 +276,7 @@ private:
 	void stopCurrentMotorPositionMonitor();
 	void currentMotorPositionTask(int sampleRate);
 	bool resetGENERAL();
+	void stopTasks();
 
 #pragma region Acquisition Methods
 	bool updateChannelValues();
@@ -383,6 +397,7 @@ private:
 					 QWidget *parent = nullptr);
 	void configureCoeffRow(QWidget *container, QHBoxLayout *layout, QLabel *hLabel, QLabel *hMagLabel,
 			       QLabel *hPhaseLabel);
+	void initializeChannelColors();
 #pragma endregion
 
 #pragma region Connect Methods
