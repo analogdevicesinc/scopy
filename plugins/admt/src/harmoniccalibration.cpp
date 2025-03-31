@@ -43,8 +43,8 @@ static int continuousCalibrationSampleRate = 10000000;
 
 static int bufferSize = 1;
 static int cycleCount = 11;
-static int samplesPerCycle = 256;
-static int totalSamplesCount = cycleCount * samplesPerCycle;
+static int samplesPerCycle = 24;
+static int totalSamplesCount = 256;
 static bool isStartMotor = false;
 static bool isPostCalibration = false;
 static bool isCalculatedCoeff = false;
@@ -312,7 +312,7 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 	QLabel *motorRPMLabel = new QLabel("Motor RPM", motorRPMWidget);
 	Style::setStyle(motorRPMLabel, style::properties::label::subtle);
 	acquisitionMotorRPMLineEdit = new QLineEdit(QString::number(motor_rpm), motorRPMWidget);
-	connectLineEditToRPM(acquisitionMotorRPMLineEdit, motor_rpm);
+	connectLineEditToRPM(acquisitionMotorRPMLineEdit, motor_rpm, 1, fast_motor_rpm);
 	motorRPMLayout->addWidget(motorRPMLabel);
 	motorRPMLayout->addWidget(acquisitionMotorRPMLineEdit);
 
@@ -1325,18 +1325,18 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	calibrationCycleCountLayout->addWidget(calibrationCycleCountLabel);
 	calibrationCycleCountLayout->addWidget(calibrationCycleCountLineEdit);
 
-	QWidget *calibrationSamplesPerCycleWidget = new QWidget(calibrationDatasetConfigCollapseSection);
-	QVBoxLayout *calibrationSamplesPerCycleLayout = new QVBoxLayout(calibrationSamplesPerCycleWidget);
-	calibrationSamplesPerCycleWidget->setLayout(calibrationSamplesPerCycleLayout);
-	calibrationSamplesPerCycleLayout->setMargin(0);
-	calibrationSamplesPerCycleLayout->setSpacing(0);
-	QLabel *calibrationSamplesPerCycleLabel = new QLabel("Samples Per Cycle", calibrationSamplesPerCycleWidget);
-	Style::setStyle(calibrationSamplesPerCycleLabel, style::properties::label::subtle);
-	calibrationSamplesPerCycleLineEdit = new QLineEdit(calibrationSamplesPerCycleWidget);
-	calibrationSamplesPerCycleLineEdit->setText(QString::number(samplesPerCycle));
-	connectLineEditToNumber(calibrationSamplesPerCycleLineEdit, samplesPerCycle, 1, 256);
-	calibrationSamplesPerCycleLayout->addWidget(calibrationSamplesPerCycleLabel);
-	calibrationSamplesPerCycleLayout->addWidget(calibrationSamplesPerCycleLineEdit);
+	QWidget *calibrationTotalSamplesWidget = new QWidget(calibrationDatasetConfigCollapseSection);
+	QVBoxLayout *calibrationTotalSamplesLayout = new QVBoxLayout(calibrationTotalSamplesWidget);
+	calibrationTotalSamplesWidget->setLayout(calibrationTotalSamplesLayout);
+	calibrationTotalSamplesLayout->setMargin(0);
+	calibrationTotalSamplesLayout->setSpacing(0);
+	QLabel *calibrationTotalSamplesLabel = new QLabel("Total Samples", calibrationTotalSamplesWidget);
+	Style::setStyle(calibrationTotalSamplesLabel, style::properties::label::subtle);
+	calibrationTotalSamplesLineEdit = new QLineEdit(calibrationTotalSamplesWidget);
+	calibrationTotalSamplesLineEdit->setText(QString::number(totalSamplesCount));
+	connectLineEditToNumber(calibrationTotalSamplesLineEdit, totalSamplesCount, 1, 8192);
+	calibrationTotalSamplesLayout->addWidget(calibrationTotalSamplesLabel);
+	calibrationTotalSamplesLayout->addWidget(calibrationTotalSamplesLineEdit);
 
 	QWidget *motorRPMWidget = new QWidget(calibrationDatasetConfigCollapseSection);
 	QVBoxLayout *motorRPMLayout = new QVBoxLayout(motorRPMWidget);
@@ -1346,7 +1346,7 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	QLabel *motorRPMLabel = new QLabel("Motor RPM", motorRPMWidget);
 	Style::setStyle(motorRPMLabel, style::properties::label::subtle);
 	calibrationMotorRPMLineEdit = new QLineEdit(QString::number(motor_rpm), motorRPMWidget);
-	connectLineEditToRPM(calibrationMotorRPMLineEdit, motor_rpm);
+	connectLineEditToRPM(calibrationMotorRPMLineEdit, motor_rpm, 1, fast_motor_rpm);
 	motorRPMLayout->addWidget(motorRPMLabel);
 	motorRPMLayout->addWidget(calibrationMotorRPMLineEdit);
 
@@ -1367,7 +1367,7 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 	calibrationDatasetConfigCollapseSection->contentLayout()->setSpacing(8);
 	calibrationDatasetConfigCollapseSection->contentLayout()->addWidget(calibrationModeMenuCombo);
 	calibrationDatasetConfigCollapseSection->contentLayout()->addWidget(calibrationCycleCountWidget);
-	calibrationDatasetConfigCollapseSection->contentLayout()->addWidget(calibrationSamplesPerCycleWidget);
+	calibrationDatasetConfigCollapseSection->contentLayout()->addWidget(calibrationTotalSamplesWidget);
 	calibrationDatasetConfigCollapseSection->contentLayout()->addWidget(motorRPMWidget);
 	calibrationDatasetConfigCollapseSection->contentLayout()->addWidget(motorDirectionWidget);
 
@@ -1487,7 +1487,6 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 		stopMotor();
 		isStartMotor = false;
 		toggleTabSwitching(true);
-		toggleCalibrationControls(true);
 
 		if(isPostCalibration) {
 			graphPostDataList = m_admtController->streamBufferedValues;
@@ -2561,7 +2560,7 @@ void HarmonicCalibration::getDeviceFaultStatus(int sampleRate)
 			success = false;
 
 		if(!success) {
-			StatusBarManager::pushUrgentMessage("Could not read device, disconnecting device");
+			StatusBarManager::pushMessage("Could not read device, disconnecting device");
 			Q_EMIT m_admtController->requestDisconnect();
 			break;
 		}
@@ -2723,8 +2722,10 @@ void HarmonicCalibration::updateLineEditValues()
 	if(count == static_cast<double>(UINT64_MAX)) {
 		countValueLabel->setText("N/A");
 	} else {
-		if(count == -10)
-			countValueLabel->setText("Invalid turn count");
+		if(count == 54)
+			countValueLabel->setText("Invalid turn count (54)");
+		else if(count == -9)
+			countValueLabel->setText("Invalid turn count (-9)");
 		else
 			countValueLabel->setText(QString::number(count));
 	}
@@ -3257,7 +3258,8 @@ void HarmonicCalibration::getCalibrationSamples()
 
 void HarmonicCalibration::startCalibration()
 {
-	totalSamplesCount = cycleCount * samplesPerCycle;
+	// totalSamplesCount = cycleCount * samplesPerCycle;
+	samplesPerCycle = ceil(totalSamplesCount / cycleCount);
 	graphPostDataList.reserve(totalSamplesCount);
 	graphPostDataList.squeeze();
 	graphDataList.reserve(totalSamplesCount);
@@ -3542,6 +3544,10 @@ void HarmonicCalibration::resetAllCalibrationState()
 	isCalculatedCoeff = false;
 	resetToZero = true;
 	displayCalculatedCoeff();
+
+	clearHarmonicRegisters();
+
+	toggleCalibrationControls(true);
 }
 
 void HarmonicCalibration::computeSineCosineOfAngles(QVector<double> graphDataList)
@@ -4108,7 +4114,7 @@ void HarmonicCalibration::toggleCalibrationControls(bool value)
 {
 	calibrationModeMenuCombo->setEnabled(value);
 	calibrationCycleCountLineEdit->setEnabled(value);
-	calibrationSamplesPerCycleLineEdit->setEnabled(value);
+	calibrationTotalSamplesLineEdit->setEnabled(value);
 	calibrationMotorRPMLineEdit->setEnabled(value);
 	calibrationMotorDirectionSwitch->setEnabled(value);
 }
@@ -5115,15 +5121,12 @@ void HarmonicCalibration::connectRegisterBlockToRegistry(RegisterBlockWidget *wi
 	}
 }
 
-void HarmonicCalibration::connectLineEditToRPM(QLineEdit *lineEdit, double &variable)
+void HarmonicCalibration::connectLineEditToRPM(QLineEdit *lineEdit, double &variable, double min, double max)
 {
-	QDoubleValidator *validator = new QDoubleValidator(this);
-	validator->setNotation(QDoubleValidator::StandardNotation);
-	lineEdit->setValidator(validator);
-	connect(lineEdit, &QLineEdit::editingFinished, this, [this, lineEdit, &variable]() {
+	connect(lineEdit, &QLineEdit::editingFinished, this, [this, lineEdit, min, max, &variable]() {
 		bool ok;
 		double value = lineEdit->text().toDouble(&ok);
-		if(ok && variable != value) {
+		if(ok && variable != value && value >= min && value <= max) {
 			variable = value;
 			rotate_vmax = convertRPStoVMAX(convertRPMtoRPS(variable));
 			writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);

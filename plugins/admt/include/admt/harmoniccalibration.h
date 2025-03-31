@@ -166,7 +166,7 @@ private:
 		*clearCalibrateDataButton, *clearCommandLogButton, *applySequenceButton, *readAllRegistersButton;
 	QButtonGroup *rightMenuButtonGroup;
 
-	QLineEdit *acquisitionMotorRPMLineEdit, *calibrationCycleCountLineEdit, *calibrationSamplesPerCycleLineEdit,
+	QLineEdit *acquisitionMotorRPMLineEdit, *calibrationCycleCountLineEdit, *calibrationTotalSamplesLineEdit,
 		*calibrationMotorRPMLineEdit, *motorTargetPositionLineEdit, *displayLengthLineEdit,
 		*dataGraphSamplesLineEdit, *tempGraphSamplesLineEdit, *acquisitionMotorCurrentPositionLineEdit,
 		*calibrationH1MagLineEdit, *calibrationH2MagLineEdit, *calibrationH3MagLineEdit,
@@ -411,7 +411,7 @@ private:
 	void connectLineEditToRPSConversion(QLineEdit *lineEdit, double &vmax);
 	void connectLineEditToAMAXConversion(QLineEdit *lineEdit, double &amax);
 	void connectRegisterBlockToRegistry(RegisterBlockWidget *widget);
-	void connectLineEditToRPM(QLineEdit *lineEdit, double &variable);
+	void connectLineEditToRPM(QLineEdit *lineEdit, double &variable, double min, double max);
 #pragma endregion
 
 #pragma region Convert Methods
