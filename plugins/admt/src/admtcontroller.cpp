@@ -1220,7 +1220,7 @@ int ADMTController::getAbsAngleTurnCount(uint16_t registerValue)
 		return turnCount / 4; // Convert from quarter turns to whole turns
 	} else if(turnCount >= 0xD8 && turnCount <= 0xDB) {
 		// Invalid turn count
-		return -10;
+		return turnCount / 4;
 	} else {
 		// 2's complement turn count
 		int8_t signedTurnCount = static_cast<int8_t>(turnCount); // Handle as signed value
