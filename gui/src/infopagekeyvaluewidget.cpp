@@ -34,7 +34,9 @@ InfoPageKeyValueWidget::InfoPageKeyValueWidget(QString key, QString value, QWidg
 	lay->setSpacing(0);
 
 	keyWidget = new QLabel(key, this);
+	keyWidget->setWordWrap(true);
 	valueWidget = new QLabel(value, this);
+	valueWidget->setWordWrap(true);
 	lay->addWidget(keyWidget);
 	lay->addWidget(valueWidget);
 	lay->setStretch(0, 1);
