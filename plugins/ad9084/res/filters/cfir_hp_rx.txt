@@ -1,0 +1,24 @@
+# coeffs_16_hp0.txt
+dest: rx cfir_all profile_1 datapath_all
+gain: 0
+complex_scalar: 32767 0
+enable: 1 profile_1
+selection_mode: direct_regmap
+coeff_transfer: 0
+bypass: 0
+64515 64515
+65535 65535
+0 0
+0 0
+3598 3598
+65535 65535
+45971 45971
+32767 32767
+45971 45971
+65535 65535
+3598 3598
+0 0
+0 0
+65535 65535
+64515 64515
+0 0

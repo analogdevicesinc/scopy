@@ -1,0 +1,40 @@
+{
+    "pdk": {
+        "enable": false,
+        "deps_path": "",
+        "project_path": ""
+    },
+    "plugin": {
+        "dir_name": "ad9084",
+        "plugin_name": "ad9084plugin",
+        "plugin_display_name": "ad9084",
+        "plugin_description": "Tool for Apollo MxFE Quad AD9084 interaction.",
+        "class_name": "AD9084Plugin",
+        "cmakelists": true,
+        "namespace": "scopy::ad9084plugin",
+        "device_category": "iio",
+        "tools": [
+            {
+                "id": "ad9084",
+                "tool_name": "Ad9084",
+                "file_name": "ad9084",
+                "class_name": "Ad9084",
+                "namespace": "scopy::ad9084plugin"
+            }
+        ]
+    },
+    "cmakelists": {
+        "cmake_min_required": 3.9,
+        "cxx_standard": 20,
+        "enable_testing": "ON"
+    },
+    "test": {
+        "cmakelists": true,
+        "cmake_min_required": 3.5,
+        "tst_pluginloader": true
+    },
+    "resources": {
+        "resources_qrc": true
+    },
+    "doc": true
+}
