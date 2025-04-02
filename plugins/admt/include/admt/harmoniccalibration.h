@@ -272,8 +272,6 @@ private:
 	void startDeviceStatusMonitor();
 	void stopDeviceStatusMonitor();
 	void getDeviceFaultStatus(int sampleRate);
-	void startCurrentMotorPositionMonitor();
-	void stopCurrentMotorPositionMonitor();
 	void currentMotorPositionTask(int sampleRate);
 	bool resetGENERAL();
 	void stopTasks();
@@ -357,7 +355,7 @@ private:
 	int readMotorRegisterValue(uint32_t address, uint32_t *value);
 	void setRampMode(bool motorRotationClockwise);
 	void getRampMode();
-	void startResetMotorToZero();
+	void startResetMotorToZero(bool enableWatcher = false);
 	void stopResetMotorToZero();
 	void resetMotorToZero();
 #pragma endregion
@@ -387,8 +385,6 @@ private:
 #pragma endregion
 
 #pragma region UI Helper Methods
-	void updateLabelValue(QLabel *label, int channelIndex);
-	void updateLabelValue(QLabel *label, ADMTController::MotorAttribute attribute);
 	bool updateChannelValue(int channelIndex);
 	void updateLineEditValue(QLineEdit *lineEdit, double value);
 	void toggleWidget(QPushButton *widget, bool value);
@@ -406,6 +402,7 @@ private:
 	void connectLineEditToDouble(QLineEdit *lineEdit, double &variable);
 	void connectLineEditToNumberWrite(QLineEdit *lineEdit, double &variable,
 					  ADMTController::MotorAttribute attribute);
+	void connectLineEditToMotorTurnCount(QLineEdit *lineEdit, int &variable, int min, int max);
 	void connectMenuComboToNumber(MenuCombo *menuCombo, double &variable);
 	void connectMenuComboToNumber(MenuCombo *menuCombo, int &variable);
 	void connectLineEditToRPSConversion(QLineEdit *lineEdit, double &vmax);
