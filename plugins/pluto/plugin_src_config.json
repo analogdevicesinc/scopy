@@ -1,0 +1,40 @@
+{
+    "pdk": {
+        "enable": false,
+        "deps_path": "",
+        "project_path": ""
+    },
+    "plugin": {
+        "dir_name": "pluto",
+        "plugin_name": "plutoplugin",
+        "plugin_display_name": "AD936X",
+        "plugin_description": "This is a plugin for AD936X",
+        "class_name": "PlutoPlugin",
+        "cmakelists": true,
+        "namespace": "scopy::pluto",
+        "device_category": "iio",
+        "tools": [
+            {
+                "id": "ad963xTool",
+                "tool_name": "AD936X",
+                "file_name": "ad963x",
+                "class_name": "AD936X",
+                "namespace": "scopy::ad963xplugin"
+            }
+        ]
+    },
+    "cmakelists": {
+        "cmake_min_required": 3.9,
+        "cxx_standard": 20,
+        "enable_testing": "ON"
+    },
+    "test": {
+        "cmakelists": true,
+        "cmake_min_required": 3.5,
+        "tst_pluginloader": true
+    },
+    "resources": {
+        "resources_qrc": true
+    },
+    "doc": true
+}

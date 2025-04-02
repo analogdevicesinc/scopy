@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/pluto">
+        <file>ad936x.svg</file>
+    </qresource>
+</RCC>
