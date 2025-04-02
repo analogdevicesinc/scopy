@@ -65,6 +65,7 @@ static double motorMicrostepPerRevolution = motorFullStepPerRevolution * microSt
 static double motorTimeUnit = static_cast<double>(1 << 24) / motorfCLK; // t = 2^24/motorfCLK
 
 static int acquisitionDisplayLength = 200;
+static int turnCount = 0;
 
 static const QColor scopyBlueColor = Style::getColor(json::theme::interactive_primary_idle);
 
@@ -169,11 +170,9 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 			updateSequenceWidget();
 			updateAcquisitionMotorRPM();
 			updateAcquisitionMotorRotationDirection();
-			startCurrentMotorPositionMonitor();
 		} else {
 			isAcquisitionTab = false;
 			stop();
-			stopCurrentMotorPositionMonitor();
 		}
 
 		if(index == 1) // Calibration Tab
@@ -215,7 +214,6 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	connect(this, &HarmonicCalibration::calibrationGraphChanged, this,
 		&HarmonicCalibration::updateCalibrationGraph);
 	connect(this, &HarmonicCalibration::updateFaultStatusSignal, this, &HarmonicCalibration::updateFaultStatus);
-	connect(this, &HarmonicCalibration::motorPositionChanged, this, &HarmonicCalibration::updateMotorPosition);
 	connect(this, &HarmonicCalibration::calibrationLogWriteSignal, this, &HarmonicCalibration::calibrationLogWrite);
 	connect(this, &HarmonicCalibration::commandLogWriteSignal, this, &HarmonicCalibration::commandLogWrite);
 	connect(this, &HarmonicCalibration::DIGIORegisterChanged, this, &HarmonicCalibration::updateDIGIOUI);
@@ -226,7 +224,6 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 
 	isAcquisitionTab = true;
 	startDeviceStatusMonitor();
-	startCurrentMotorPositionMonitor();
 }
 
 HarmonicCalibration::~HarmonicCalibration() { stopTasks(); }
@@ -316,32 +313,6 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 	motorRPMLayout->addWidget(motorRPMLabel);
 	motorRPMLayout->addWidget(acquisitionMotorRPMLineEdit);
 
-	QWidget *currentPositionWidget = new QWidget(motorControlSectionWidget);
-	QVBoxLayout *currentPositionLayout = new QVBoxLayout(currentPositionWidget);
-	currentPositionWidget->setLayout(currentPositionLayout);
-	currentPositionLayout->setMargin(0);
-	currentPositionLayout->setSpacing(0);
-	QLabel *currentPositionLabel = new QLabel("Current Position", currentPositionWidget);
-	Style::setStyle(currentPositionLabel, style::properties::label::subtle);
-	acquisitionMotorCurrentPositionLineEdit = new QLineEdit("--.--", currentPositionWidget);
-	acquisitionMotorCurrentPositionLineEdit->setReadOnly(true);
-	connectLineEditToDouble(acquisitionMotorCurrentPositionLineEdit, current_pos);
-	currentPositionLayout->addWidget(currentPositionLabel);
-	currentPositionLayout->addWidget(acquisitionMotorCurrentPositionLineEdit);
-
-	QWidget *targetPositionWidget = new QWidget(motorControlSectionWidget);
-	QVBoxLayout *targetPositionLayout = new QVBoxLayout(targetPositionWidget);
-	targetPositionWidget->setLayout(targetPositionLayout);
-	targetPositionLayout->setMargin(0);
-	targetPositionLayout->setSpacing(0);
-	QLabel *targetPositionLabel = new QLabel("Target Position", targetPositionWidget);
-	Style::setStyle(targetPositionLabel, style::properties::label::subtle);
-	motorTargetPositionLineEdit = new QLineEdit(QString::number(target_pos), targetPositionWidget);
-	connectLineEditToNumberWrite(motorTargetPositionLineEdit, target_pos,
-				     ADMTController::MotorAttribute::TARGET_POS);
-	targetPositionLayout->addWidget(targetPositionLabel);
-	targetPositionLayout->addWidget(motorTargetPositionLineEdit);
-
 	QWidget *motorDirectionWidget = new QWidget(motorControlSectionWidget);
 	QVBoxLayout *motorDirectionLayout = new QVBoxLayout(motorDirectionWidget);
 	motorDirectionWidget->setLayout(motorDirectionLayout);
@@ -356,6 +327,22 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 	motorDirectionLayout->addWidget(motorDirectionLabel);
 	motorDirectionLayout->addWidget(acquisitionMotorDirectionSwitch);
 
+	QWidget *turnCountWidget = new QWidget(motorControlSectionWidget);
+	QVBoxLayout *turnCountLayout = new QVBoxLayout(turnCountWidget);
+	turnCountWidget->setLayout(turnCountLayout);
+	turnCountLayout->setMargin(0);
+	turnCountLayout->setSpacing(0);
+	QLabel *turnCountLabel = new QLabel("Turn Count", turnCountWidget);
+	Style::setStyle(turnCountLabel, style::properties::label::subtle);
+	QLineEdit *turnCountLineEdit = new QLineEdit(QString::number(turnCount), turnCountWidget);
+	connectLineEditToMotorTurnCount(turnCountLineEdit, turnCount, 0, 100);
+	turnCountLayout->addWidget(turnCountLabel);
+	turnCountLayout->addWidget(turnCountLineEdit);
+
+	QPushButton *resetMotorPositionButton = new QPushButton("Reset Motor Position", motorControlSectionWidget);
+	StyleHelper::BasicButton(resetMotorPositionButton);
+	connect(resetMotorPositionButton, &QPushButton::clicked, this, &HarmonicCalibration::startResetMotorToZero);
+
 	QPushButton *continuousRotationButton = new QPushButton("Continuous Rotation", motorControlSectionWidget);
 	StyleHelper::BasicButton(continuousRotationButton);
 	connect(continuousRotationButton, &QPushButton::clicked, this, &HarmonicCalibration::moveMotorContinuous);
@@ -366,9 +353,9 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 
 	motorControlCollapseSection->contentLayout()->setSpacing(globalSpacingSmall);
 	motorControlCollapseSection->contentLayout()->addWidget(motorRPMWidget);
-	motorControlCollapseSection->contentLayout()->addWidget(currentPositionWidget);
-	motorControlCollapseSection->contentLayout()->addWidget(targetPositionWidget);
 	motorControlCollapseSection->contentLayout()->addWidget(motorDirectionWidget);
+	motorControlCollapseSection->contentLayout()->addWidget(turnCountWidget);
+	motorControlCollapseSection->contentLayout()->addWidget(resetMotorPositionButton);
 	motorControlCollapseSection->contentLayout()->addWidget(continuousRotationButton);
 	motorControlCollapseSection->contentLayout()->addWidget(stopMotorButton);
 #pragma endregion
@@ -1413,7 +1400,6 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 
 	calibrationSettingsLayout->setMargin(0);
 	calibrationSettingsLayout->addWidget(calibrationDatasetConfigSectionWidget);
-	// calibrationSettingsLayout->addWidget(motorControlSectionWidget);
 	calibrationSettingsLayout->addWidget(calibrationCoeffSectionWidget);
 	calibrationSettingsLayout->addWidget(calibrationDataSectionWidget);
 	calibrationSettingsLayout->addWidget(logsSectionWidget);
@@ -1470,7 +1456,6 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 		if(isMotorVelocityReached) {
 			startCalibrationStreamThread();
 		} else {
-			startCurrentMotorPositionMonitor();
 			startDeviceStatusMonitor();
 		}
 	});
@@ -1521,7 +1506,6 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 			}
 		}
 
-		startCurrentMotorPositionMonitor();
 		startDeviceStatusMonitor();
 	});
 
@@ -2415,6 +2399,9 @@ bool HarmonicCalibration::writeSequence(QMap<string, int> settings)
 	uint32_t generalRegisterPage =
 		m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL);
 
+	if(settings.value("Sequence Type") != GENERALRegisterMap.value("Sequence Type"))
+		generalRegisterPage = 0xc002;
+
 	if(!changeCNVPage(generalRegisterPage))
 		return false;
 
@@ -2423,8 +2410,7 @@ bool HarmonicCalibration::writeSequence(QMap<string, int> settings)
 		return false;
 
 	if(readSequence())
-		if(settings.value("Convert Synchronization") ==
-			   GENERALRegisterMap.value("Convert Synchronizvalueion") &&
+		if(settings.value("Convert Synchronization") == GENERALRegisterMap.value("Convert Synchronization") &&
 		   settings.value("Angle Filter") == GENERALRegisterMap.value("Angle Filter") &&
 		   settings.value("8th Harmonic") == GENERALRegisterMap.value("8th Harmonic") &&
 		   settings.value("Sequence Type") == GENERALRegisterMap.value("Sequence Type") &&
@@ -2582,26 +2568,6 @@ void HarmonicCalibration::stopTasks()
 	stopCalibrationStreamThread();
 
 	stopDeviceStatusMonitor();
-	stopCurrentMotorPositionMonitor();
-}
-
-void HarmonicCalibration::startCurrentMotorPositionMonitor()
-{
-	if(!m_currentMotorPositionThread.isRunning()) {
-		isMotorPositionMonitor = true;
-		m_currentMotorPositionThread = QtConcurrent::run(this, &HarmonicCalibration::currentMotorPositionTask,
-								 motorPositionMonitorRate);
-		m_currentMotorPositionWatcher.setFuture(m_currentMotorPositionThread);
-	}
-}
-
-void HarmonicCalibration::stopCurrentMotorPositionMonitor()
-{
-	isMotorPositionMonitor = false;
-	if(m_currentMotorPositionThread.isRunning()) {
-		m_currentMotorPositionThread.cancel();
-		m_currentMotorPositionWatcher.waitForFinished();
-	}
 }
 
 void HarmonicCalibration::currentMotorPositionTask(int sampleRate)
@@ -2672,8 +2638,6 @@ bool HarmonicCalibration::updateChannelValues()
 		return false;
 	}
 	updateCountValue();
-	// count = m_admtController->getChannelValue(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-	// countChannelName, bufferSize);
 	if(count == static_cast<double>(UINT64_MAX)) {
 		return false;
 	}
@@ -2690,16 +2654,23 @@ bool HarmonicCalibration::updateChannelValues()
 
 void HarmonicCalibration::updateCountValue()
 {
-	uint32_t *absAngleRegValue = new uint32_t;
-	bool success = false;
+	bool success = true;
 
-	if(m_admtController->readDeviceRegistry(
+	uint32_t absAngleRegPage = m_admtController->getSensorPage(ADMTController::SensorRegister::ABSANGLE);
+	if(!changeCNVPage(absAngleRegPage))
+		success = false;
+
+	uint32_t *absAngleRegValue = new uint32_t;
+
+	if(success &&
+	   m_admtController->readDeviceRegistry(
 		   m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
 		   m_admtController->getSensorRegister(ADMTController::SensorRegister::ABSANGLE),
 		   absAngleRegValue) == 0) {
 		count = m_admtController->getAbsAngleTurnCount(static_cast<uint16_t>(*absAngleRegValue));
 		success = true;
-	}
+	} else
+		success = false;
 
 	delete absAngleRegValue;
 
@@ -3258,7 +3229,6 @@ void HarmonicCalibration::getCalibrationSamples()
 
 void HarmonicCalibration::startCalibration()
 {
-	// totalSamplesCount = cycleCount * samplesPerCycle;
 	samplesPerCycle = ceil(totalSamplesCount / cycleCount);
 	graphPostDataList.reserve(totalSamplesCount);
 	graphPostDataList.squeeze();
@@ -3296,14 +3266,13 @@ void HarmonicCalibration::stopCalibration()
 
 void HarmonicCalibration::startContinuousCalibration()
 {
-	stopCurrentMotorPositionMonitor();
 	stopDeviceStatusMonitor();
 
 	if(isPostCalibration)
 		StatusBarManager::pushMessage("Acquiring Post Calibration Samples, Please Wait...");
 	else
 		StatusBarManager::pushMessage("Acquiring Calibration Samples, Please Wait...");
-	startResetMotorToZero();
+	startResetMotorToZero(true);
 }
 
 void HarmonicCalibration::stopContinuousCalibration()
@@ -3312,16 +3281,16 @@ void HarmonicCalibration::stopContinuousCalibration()
 	stopWaitForVelocityReachedThread();
 	stopCalibrationStreamThread();
 
-	startCurrentMotorPositionMonitor();
 	startDeviceStatusMonitor();
 }
 
-void HarmonicCalibration::startResetMotorToZero()
+void HarmonicCalibration::startResetMotorToZero(bool enableWatcher)
 {
 	isResetMotorToZero = true;
 	if(!m_resetMotorToZeroThread.isRunning()) {
 		m_resetMotorToZeroThread = QtConcurrent::run(this, &HarmonicCalibration::resetMotorToZero);
-		m_resetMotorToZeroWatcher.setFuture(m_resetMotorToZeroThread);
+		if(enableWatcher)
+			m_resetMotorToZeroWatcher.setFuture(m_resetMotorToZeroThread);
 	}
 }
 
@@ -4518,8 +4487,6 @@ void HarmonicCalibration::getDIAG1Register()
 					Q_EMIT commandLogWriteSignal(
 						"DIAG1: 0b" +
 						QString::number(mtDiag1RegValue16, 2).rightJustified(16, '0'));
-
-					// delete mtDiag1RegValue16;
 				} else {
 					Q_EMIT commandLogWriteSignal("Failed to read MT Diagnostic 1 Register");
 				}
@@ -4815,53 +4782,6 @@ void HarmonicCalibration::toggleRegisters(int mode)
 #pragma endregion
 
 #pragma region UI Helper Methods
-void HarmonicCalibration::updateLabelValue(QLabel *label, int channelIndex)
-{
-	switch(channelIndex) {
-	case ADMTController::Channel::ROTATION:
-		label->setText(QString("%1").arg(rotation, 0, 'f', 2) + "°");
-		break;
-	case ADMTController::Channel::ANGLE:
-		label->setText(QString("%1").arg(angle, 0, 'f', 2) + "°");
-		break;
-	case ADMTController::Channel::COUNT:
-		label->setText(QString::number(count));
-		break;
-	case ADMTController::Channel::TEMPERATURE:
-		label->setText(QString("%1").arg(temp, 0, 'f', 2) + "°C");
-		break;
-	}
-}
-
-void HarmonicCalibration::updateLabelValue(QLabel *label, ADMTController::MotorAttribute attribute)
-{
-	switch(attribute) {
-	case ADMTController::MotorAttribute::AMAX:
-		label->setText(QString::number(amax));
-		break;
-	case ADMTController::MotorAttribute::ROTATE_VMAX:
-		label->setText(QString::number(rotate_vmax));
-		break;
-	case ADMTController::MotorAttribute::DMAX:
-		label->setText(QString::number(dmax));
-		break;
-	case ADMTController::MotorAttribute::DISABLE:
-		label->setText(QString::number(disable));
-		break;
-	case ADMTController::MotorAttribute::TARGET_POS:
-		label->setText(QString::number(target_pos));
-		break;
-	case ADMTController::MotorAttribute::CURRENT_POS:
-		label->setText(QString::number(current_pos));
-		break;
-	case ADMTController::MotorAttribute::RAMP_MODE:
-		label->setText(QString::number(ramp_mode));
-		break;
-	default:
-		break;
-	}
-}
-
 bool HarmonicCalibration::updateChannelValue(int channelIndex)
 {
 	bool success = false;
@@ -5016,6 +4936,26 @@ void HarmonicCalibration::connectLineEditToNumberWrite(QLineEdit *lineEdit, doub
 		} else {
 			lineEdit->setText(QString::number(variable));
 		}
+	});
+}
+
+void HarmonicCalibration::connectLineEditToMotorTurnCount(QLineEdit *lineEdit, int &variable, int min, int max)
+{
+	connect(lineEdit, &QLineEdit::editingFinished, this, [this, lineEdit, &variable, min, max]() {
+		bool ok;
+		int value = lineEdit->text().toInt(&ok);
+		if(ok && value >= min && value <= max && value != 0) {
+			readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
+			int target_pos = value * motorMicrostepPerRevolution;
+			if(!isMotorRotationClockwise)
+				target_pos *= -1;
+
+			int final_pos = current_pos + target_pos;
+			writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, final_pos);
+			variable = 0;
+		} else
+			variable = 0;
+		lineEdit->setText(QString::number(variable));
 	});
 }
 

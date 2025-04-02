@@ -1213,12 +1213,12 @@ uint16_t ADMTController::setGeneralRegisterBitMapping(uint16_t currentRegisterVa
 int ADMTController::getAbsAngleTurnCount(uint16_t registerValue)
 {
 	// Bits 15:8: Turn count in quarter turns
-	uint8_t turnCount = (registerValue & 0xFF00) >> 8;
+	uint8_t turnCount = (registerValue >> 8) & 0xFC;
 
-	if(turnCount <= 0xD7) {
+	if(turnCount <= 0xD4) {
 		// Straight binary turn count
 		return turnCount / 4; // Convert from quarter turns to whole turns
-	} else if(turnCount >= 0xD8 && turnCount <= 0xDB) {
+	} else if(turnCount == 0xD8) {
 		// Invalid turn count
 		return turnCount / 4;
 	} else {
