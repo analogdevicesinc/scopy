@@ -105,7 +105,8 @@ PkgItemWidget *PkgInstalledTab::createPkgItemWidget(const QVariantMap &meta)
 	PkgItemWidget *pkgItem = new PkgItemWidget(m_pkgGrid);
 	pkgItem->fillMetadata(meta, true);
 	connect(pkgItem, &PkgItemWidget::preview, this, &PkgInstalledTab::onPkgPreview);
-	connect(pkgItem, &PkgItemWidget::hidePreview, m_pkgGrid, &PkgGridWidget::refreshPkgsStyle);
+	connect(pkgItem, &PkgItemWidget::hidePreview, this,
+		[this]() { m_pkgGrid->updatePkgsStyle(m_preview->isEnabled()); });
 	connect(pkgItem, &PkgItemWidget::categorySelected, this, &PkgInstalledTab::onCategorySelected);
 	connect(pkgItem, &PkgItemWidget::hidePreview, m_preview, &PkgPreviewPage::hide);
 	connect(pkgItem, &PkgItemWidget::uninstallClicked, this, &PkgInstalledTab::onUninstall);
@@ -166,7 +167,7 @@ void PkgInstalledTab::previewSwitchClicked(bool checked)
 	if(!checked) {
 		m_preview->setVisible(checked);
 	}
-	m_pkgGrid->refreshPkgsStyle();
+	m_pkgGrid->updatePkgsStyle(checked);
 }
 
 void PkgInstalledTab::categoryChanged(const QString &text)
@@ -181,8 +182,8 @@ void PkgInstalledTab::onPkgPreview(const QVariantMap &metadata)
 	if(previewEnabled) {
 		m_preview->updatePreview(metadata);
 		m_preview->show();
+		m_pkgGrid->updatePkgsStyle(previewEnabled);
 	}
-	m_pkgGrid->refreshPkgsStyle();
 }
 
 void PkgInstalledTab::onCategorySelected(const QString &category, bool checked)

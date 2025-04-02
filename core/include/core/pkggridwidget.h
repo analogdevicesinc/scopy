@@ -40,7 +40,7 @@ public:
 	void removePkg(const QString &pkgName);
 
 	int gridSize() const;
-	void refreshPkgsStyle();
+	void updatePkgsStyle(bool property);
 
 public Q_SLOTS:
 	void searchPkg(const QString &field, const QStringList &values);

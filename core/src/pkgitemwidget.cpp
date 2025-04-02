@@ -104,7 +104,7 @@ void PkgItemWidget::mousePressEvent(QMouseEvent *event)
 		QVariant prop = this->property(style::properties::widget::pkgItem);
 		if(prop.toString() == "selected") {
 			Q_EMIT hidePreview();
-		} else {
+		} else if(prop.toBool()) {
 			Q_EMIT preview(m_metadata);
 			Style::setStyle(this, style::properties::widget::pkgItem, "selected");
 		}
