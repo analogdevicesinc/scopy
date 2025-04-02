@@ -17,8 +17,10 @@ Contents
 
 .. toctree::
    :includehidden:
-   :maxdepth: 3
+   :maxdepth: 1
 
    style
+   package_generator
+   plugin_developer_guide
 
 
