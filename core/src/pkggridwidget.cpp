@@ -167,10 +167,10 @@ bool PkgGridWidget::isSearchMatch(const QString &pkgVal, const QStringList &sear
 	return matchFound;
 }
 
-void PkgGridWidget::refreshPkgsStyle()
+void PkgGridWidget::updatePkgsStyle(bool property)
 {
 	for(auto it = m_pkgMap.begin(); it != m_pkgMap.end(); ++it) {
-		Style::setStyle(it.value(), style::properties::widget::pkgItem, true);
+		Style::setStyle(it.value(), style::properties::widget::pkgItem, property);
 	}
 }
 
