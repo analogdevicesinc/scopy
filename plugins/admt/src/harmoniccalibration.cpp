@@ -4006,33 +4006,127 @@ void HarmonicCalibration::extractCalibrationData()
 		FileManager fm("HarmonicCalibration");
 		fm.open(fileName, FileManager::EXPORT);
 
-		QVector<double> preCalibrationAngleErrorsFFTMagnitude(m_admtController->angle_errors_fft_pre.begin(),
-								      m_admtController->angle_errors_fft_pre.end());
-		QVector<double> preCalibrationAngleErrorsFFTPhase(m_admtController->angle_errors_fft_phase_pre.begin(),
-								  m_admtController->angle_errors_fft_phase_pre.end());
+		QVector<double> angleError =
+			QVector<double>(m_admtController->angleError.begin(), m_admtController->angleError.end());
+		QVector<double> FFTAngleErrorMagnitude =
+			QVector<double>(m_admtController->FFTAngleErrorMagnitude.begin(),
+					m_admtController->FFTAngleErrorMagnitude.end());
+		QVector<double> FFTAngleErrorPhase = QVector<double>(m_admtController->FFTAngleErrorPhase.begin(),
+								     m_admtController->FFTAngleErrorPhase.end());
 
-		QVector<double> h1Mag = {H1_MAG_ANGLE};
-		QVector<double> h2Mag = {H2_MAG_ANGLE};
-		QVector<double> h3Mag = {H3_MAG_ANGLE};
-		QVector<double> h8Mag = {H8_MAG_ANGLE};
-		QVector<double> h1Phase = {H1_PHASE_ANGLE};
-		QVector<double> h2Phase = {H2_PHASE_ANGLE};
-		QVector<double> h3Phase = {H3_PHASE_ANGLE};
-		QVector<double> h8Phase = {H8_PHASE_ANGLE};
+		QVector<double> correctedError(m_admtController->correctedError.begin(),
+					       m_admtController->correctedError.end());
+		QVector<double> FFTCorrectedErrorMagnitude(m_admtController->FFTCorrectedErrorMagnitude.begin(),
+							   m_admtController->FFTCorrectedErrorMagnitude.end());
+		QVector<double> FFTCorrectedErrorPhase(m_admtController->FFTCorrectedErrorPhase.begin(),
+						       m_admtController->FFTCorrectedErrorPhase.end());
 
-		fm.save(graphDataList, "Raw Data");
-		fm.save(preCalibrationAngleErrorsFFTMagnitude, "Pre-Calibration Angle Errors FFT Magnitude");
-		fm.save(preCalibrationAngleErrorsFFTPhase, "Pre-Calibration Angle Errors FFT Phase");
-		fm.save(h1Mag, "H1 Mag");
-		fm.save(h2Mag, "H2 Mag");
-		fm.save(h3Mag, "H3 Mag");
-		fm.save(h8Mag, "H8 Mag");
-		fm.save(h1Phase, "H1 Phase");
-		fm.save(h2Phase, "H2 Phase");
-		fm.save(h3Phase, "H3 Phase");
-		fm.save(h8Phase, "H8 Phase");
+		QVector<QString> h1Mag = {QString::number(H1_MAG_ANGLE)};
+		QVector<QString> h2Mag = {QString::number(H2_MAG_ANGLE)};
+		QVector<QString> h3Mag = {QString::number(H3_MAG_ANGLE)};
+		QVector<QString> h8Mag = {QString::number(H8_MAG_ANGLE)};
+		QVector<QString> h1Phase = {QString::number(H1_PHASE_ANGLE)};
+		QVector<QString> h2Phase = {QString::number(H2_PHASE_ANGLE)};
+		QVector<QString> h3Phase = {QString::number(H3_PHASE_ANGLE)};
+		QVector<QString> h8Phase = {QString::number(H8_PHASE_ANGLE)};
 
-		fm.performWrite(withScopyHeader);
+		QVector<QString> h1MagHex = {QString("0x%1").arg(H1_MAG_HEX, 4, 16, QChar('0'))};
+		QVector<QString> h2MagHex = {QString("0x%1").arg(H2_MAG_HEX, 4, 16, QChar('0'))};
+		QVector<QString> h3MagHex = {QString("0x%1").arg(H3_MAG_HEX, 4, 16, QChar('0'))};
+		QVector<QString> h8MagHex = {QString("0x%1").arg(H8_MAG_HEX, 4, 16, QChar('0'))};
+		QVector<QString> h1PhaseHex = {QString("0x%1").arg(H1_PHASE_HEX, 4, 16, QChar('0'))};
+		QVector<QString> h2PhaseHex = {QString("0x%1").arg(H2_PHASE_HEX, 4, 16, QChar('0'))};
+		QVector<QString> h3PhaseHex = {QString("0x%1").arg(H3_PHASE_HEX, 4, 16, QChar('0'))};
+		QVector<QString> h8PhaseHex = {QString("0x%1").arg(H8_PHASE_HEX, 4, 16, QChar('0'))};
+
+		QVector<QString> stringGraphDataList(graphDataList.size());
+		QVector<QString> stringGraphPostDataList(graphPostDataList.size());
+
+		transform(graphDataList.begin(), graphDataList.end(), stringGraphDataList.begin(),
+			  [](double value) { return QString::number(value); });
+		transform(graphPostDataList.begin(), graphPostDataList.end(), stringGraphPostDataList.begin(),
+			  [](double value) { return QString::number(value); });
+
+		QMap<QString, QVector<QString>> headerData;
+
+		headerData["a"] = {"Calibration Samples"};
+		headerData["b"] = {"Angle Error"};
+		headerData["c"] = {"FFT Angle Error Magnitude"};
+		headerData["d"] = {"FFT Angle Error Phase"};
+		headerData["e"] = {"Post Calibration Samples"};
+		headerData["f"] = {"Corrected Error"};
+		headerData["g"] = {"FFT Corrected Error Magnitude"};
+		headerData["h"] = {"FFT Corrected Error Phase"};
+		headerData["i"] = {"H1 Mag"};
+		headerData["j"] = {"H2 Mag"};
+		headerData["k"] = {"H3 Mag"};
+		headerData["l"] = {"H8 Mag"};
+		headerData["m"] = {"H1 Phase"};
+		headerData["n"] = {"H2 Phase"};
+		headerData["o"] = {"H3 Phase"};
+		headerData["p"] = {"H8 Phase"};
+		fm.writeToFile(false, headerData);
+
+		bool addedHarmonicAngleValues = false, addedHarmonicHexValues = false;
+		for(int i = 0; i < stringGraphDataList.count(); i++) {
+			QMap<QString, QVector<QString>> tempData;
+			tempData["a"] = {stringGraphDataList[i]};
+
+			if(i < angleError.count())
+				tempData["b"] = {QString::number(angleError[i])};
+
+			if(i < FFTAngleErrorMagnitude.count())
+				tempData["c"] = {QString::number(FFTAngleErrorMagnitude[i])};
+
+			if(i < FFTAngleErrorPhase.count())
+				tempData["d"] = {QString::number(FFTAngleErrorPhase[i])};
+
+			if(stringGraphPostDataList.count() > 0 && i < stringGraphPostDataList.count())
+				tempData["e"] = {stringGraphPostDataList[i]};
+			else
+				tempData["e"] = {""};
+
+			if(correctedError.count() > 0 && i < correctedError.count())
+				tempData["f"] = {QString::number(correctedError[i])};
+			else
+				tempData["f"] = {""};
+
+			if(FFTCorrectedErrorMagnitude.count() > 0 && i < FFTCorrectedErrorMagnitude.count())
+				tempData["g"] = {QString::number(FFTCorrectedErrorMagnitude[i])};
+			else
+				tempData["g"] = {""};
+
+			if(FFTCorrectedErrorPhase.count() > 0 && i < FFTCorrectedErrorPhase.count())
+				tempData["h"] = {QString::number(FFTCorrectedErrorPhase[i])};
+			else
+				tempData["h"] = {""};
+
+			if(!addedHarmonicAngleValues) {
+				tempData["i"] = h1Mag;
+				tempData["j"] = h2Mag;
+				tempData["k"] = h3Mag;
+				tempData["l"] = h8Mag;
+				tempData["m"] = h1Phase;
+				tempData["n"] = h2Phase;
+				tempData["o"] = h3Phase;
+				tempData["p"] = h8Phase;
+
+				addedHarmonicAngleValues = true;
+			} else if(!addedHarmonicHexValues) {
+				tempData["i"] = h1MagHex;
+				tempData["j"] = h2MagHex;
+				tempData["k"] = h3MagHex;
+				tempData["l"] = h8MagHex;
+				tempData["m"] = h1PhaseHex;
+				tempData["n"] = h2PhaseHex;
+				tempData["o"] = h3PhaseHex;
+				tempData["p"] = h8PhaseHex;
+
+				addedHarmonicHexValues = true;
+			}
+
+			fm.writeToFile(false, tempData);
+		}
 	}
 }
 
