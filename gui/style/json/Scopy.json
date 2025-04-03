@@ -1,6 +1,8 @@
 {
 "icon_theme_folder": "scopy-default",
 "pixmap_color": "#FFFFFF",
+"interactive_pixmap": "#FFFFFF",
+"interactive_pixmap_hover": "#FFFFFF",
 "interactive_subtle_idle": "#5b5b6b",
 "interactive_subtle_hover": "#535361",
 "interactive_subtle_pressed": "#4c4c59",
