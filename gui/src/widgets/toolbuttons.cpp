@@ -245,7 +245,7 @@ InstallerBtn::InstallerBtn(const QString &iconPath, QWidget *parent)
 	: QPushButton(parent)
 	, m_iconPath(iconPath)
 {
-	setIcon(Style::getPixmap(m_iconPath, Style::getColor(json::theme::interactive_primary_idle)));
+	setIcon(Style::getPixmap(m_iconPath, Style::getColor(json::theme::interactive_pixmap)));
 	setCheckable(false);
 	Style::setStyle(this, style::properties::button::borderButton);
 	installEventFilter(this);
@@ -259,12 +259,12 @@ bool InstallerBtn::eventFilter(QObject *watched, QEvent *event)
 	}
 
 	if(event->type() == QEvent::Enter) {
-		setIcon(Style::getPixmap(m_iconPath, Style::getColor(json::theme::interactive_primary_hover)));
+		setIcon(Style::getPixmap(m_iconPath, Style::getColor(json::theme::interactive_pixmap_hover)));
 		return true;
 	}
 
 	if(event->type() == QEvent::Leave) {
-		setIcon(Style::getPixmap(m_iconPath, Style::getColor(json::theme::interactive_primary_idle)));
+		setIcon(Style::getPixmap(m_iconPath, Style::getColor(json::theme::interactive_pixmap)));
 		return true;
 	}
 	return false;
@@ -272,8 +272,8 @@ bool InstallerBtn::eventFilter(QObject *watched, QEvent *event)
 
 void InstallerBtn::setFinished(bool finished)
 {
-	QIcon icon = finished ? QIcon()
-			      : Style::getPixmap(m_iconPath, Style::getColor(json::theme::interactive_primary_idle));
+	QIcon icon =
+		finished ? QIcon() : Style::getPixmap(m_iconPath, Style::getColor(json::theme::interactive_pixmap));
 	setIcon(icon);
 	setEnabled(!finished);
 }
