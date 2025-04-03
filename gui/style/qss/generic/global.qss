@@ -321,3 +321,13 @@ scopy--BufferPreviewer {
     color: &content_default&;
 }
 
+
+QAbstractItemView {
+    subcontrol-position: center right;
+    background-color: &background_primary&;
+    padding-right: &padding_2&;
+    width: 10px;
+    height: 6px;
+    font-size: &font_size_1&;
+    text-align: left;
+}
