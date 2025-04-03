@@ -572,7 +572,7 @@ ToolTemplate *HarmonicCalibration::createAcquisitionWidget()
 	displayLengthLayout->addWidget(displayLengthLabel);
 	displayLengthLayout->addWidget(displayLengthLineEdit);
 
-	QPushButton *resetYAxisButton = new QPushButton("Reset Y-Axis Scale", generalSection);
+	QPushButton *resetYAxisButton = new QPushButton("Reset Graph Scale", generalSection);
 	StyleHelper::BasicButton(resetYAxisButton);
 	connect(resetYAxisButton, &QPushButton::clicked, this, &HarmonicCalibration::resetAcquisitionYAxisScale);
 
@@ -2348,8 +2348,9 @@ void HarmonicCalibration::initializeADMT()
 	bool disabledECC = disableECC(true);
 	bool resetDIGIOSuccess = resetDIGIO();
 	bool resetGENERALSuccess = resetGENERAL();
+	bool resetHarmonicSuccess = clearHarmonicRegisters();
 
-	if(!disabledECC || !resetDIGIOSuccess || !resetGENERALSuccess) {
+	if(!disabledECC || !resetDIGIOSuccess || !resetGENERALSuccess || resetHarmonicSuccess) {
 		StatusBarManager::pushMessage("Failed initialize ADMT");
 	}
 }
@@ -3197,7 +3198,7 @@ void HarmonicCalibration::getCalibrationSamples()
 {
 	if(resetCurrentPositionToZero()) {
 		int step = floor(motorMicrostepPerRevolution / samplesPerCycle);
-		if(!isMotorRotationClockwise)
+		if(isMotorRotationClockwise)
 			step = -step;
 		if(isPostCalibration) {
 			int currentSamplesCount = graphPostDataList.size();
@@ -3307,6 +3308,7 @@ void HarmonicCalibration::resetMotorToZero()
 {
 	if(readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) == 0) {
 		if(current_pos != 0) {
+			setRampMode(true); // Write to ramp mode in case of motor disable
 			writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX,
 						 convertRPStoVMAX(convertRPMtoRPS(fast_motor_rpm)));
 			writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, 0);
@@ -4172,6 +4174,7 @@ bool HarmonicCalibration::moveMotorToPosition(double &position, bool validate)
 
 void HarmonicCalibration::moveMotorContinuous()
 {
+	stopResetMotorToZero();
 	writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX, rotate_vmax);
 	setRampMode(isMotorRotationClockwise);
 }
@@ -4200,7 +4203,11 @@ bool HarmonicCalibration::resetCurrentPositionToZero()
 	return success;
 }
 
-void HarmonicCalibration::stopMotor() { writeMotorAttributeValue(ADMTController::MotorAttribute::DISABLE, 1); }
+void HarmonicCalibration::stopMotor()
+{
+	stopResetMotorToZero();
+	writeMotorAttributeValue(ADMTController::MotorAttribute::DISABLE, 1);
+}
 
 int HarmonicCalibration::readMotorAttributeValue(ADMTController::MotorAttribute attribute, double &value)
 {
@@ -4234,9 +4241,9 @@ int HarmonicCalibration::readMotorRegisterValue(uint32_t address, uint32_t *valu
 
 void HarmonicCalibration::setRampMode(bool motorRotationClockwise)
 {
-	// Ramp Mode 1: Clockwise, Ramp Mode 2: Counter-Clockwise
+	// Ramp Mode 1: Counter-Clockwise, Ramp Mode 2: Clockwise
 	isMotorRotationClockwise = motorRotationClockwise;
-	int mode = isMotorRotationClockwise ? 1 : 2;
+	int mode = !isMotorRotationClockwise ? 1 : 2;
 	writeMotorAttributeValue(ADMTController::MotorAttribute::RAMP_MODE, mode);
 }
 
@@ -4947,7 +4954,7 @@ void HarmonicCalibration::connectLineEditToMotorTurnCount(QLineEdit *lineEdit, i
 		if(ok && value >= min && value <= max && value != 0) {
 			readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos);
 			int target_pos = value * motorMicrostepPerRevolution;
-			if(!isMotorRotationClockwise)
+			if(isMotorRotationClockwise)
 				target_pos *= -1;
 
 			int final_pos = current_pos + target_pos;
