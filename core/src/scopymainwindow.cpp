@@ -75,6 +75,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	timer.start();
 
 	initPreferences();
+	setAppTheme();
 	ScopySplashscreen::showMessage("Initializing ui");
 	ui->setupUi(this);
 
@@ -431,12 +432,24 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_scan_for_devices", true);
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
-
-	Style::GetInstance()->init(p->get("general_theme").toString(), p->get("font_scale").toFloat());
-	QString theme = p->get("general_theme").toString();
-	QString themeName = "scopy-" + theme;
-	QIcon::setThemeSearchPaths({":/gui/icons/" + themeName});
 	qInfo(CAT_BENCHMARK) << "Init preferences took: " << timer.elapsed() << "ms";
+}
+
+// must be called after initializing preferences
+void ScopyMainWindow::setAppTheme()
+{
+	Preferences *p = Preferences::GetInstance();
+
+	QString theme = p->get("general_theme").toString();
+	float font = p->get("font_scale").toFloat();
+	bool theme_set = Style::GetInstance()->init(theme, font);
+
+	// set default theme if current theme is invalid
+	if(!theme_set) {
+		QString default_theme = Style::GetInstance()->getTheme();
+		Style::GetInstance()->init(default_theme, font);
+		p->set("general_theme", default_theme);
+	}
 }
 
 void ScopyMainWindow::loadOpenGL()

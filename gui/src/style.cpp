@@ -33,8 +33,11 @@
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QFontDatabase>
+#include <QLoggingCategory>
 
 #include <common/scopyconfig.h>
+
+Q_LOGGING_CATEGORY(CAT_STYLE, "STYLE");
 
 using namespace scopy;
 
@@ -92,7 +95,7 @@ void Style::initPaths()
 	m_qssFolderPath = getStylePath(m_qssFolderPath);
 }
 
-void Style::init(QString theme, float fontScale)
+bool Style::init(QString theme, float fontScale)
 {
 	QFontDatabase::addApplicationFont(":/gui/Inter-Regular.ttf");
 	QFile global_file = QFile(m_globalJsonPath);
@@ -104,15 +107,24 @@ void Style::init(QString theme, float fontScale)
 	if(theme.isEmpty()) {
 		theme = getTheme();
 	}
-	setTheme(theme, fontScale);
+
+	return setTheme(getThemePath(theme), fontScale);
+}
+
+QString Style::getThemePath(QString theme)
+{
+	QString tmp_theme_path = m_themeJsonPath;
+	tmp_theme_path.replace(getTheme() + ".json", theme + ".json");
+
+	return tmp_theme_path;
 }
 
 void Style::setStyle(QWidget *widget, const char *style, QVariant value, bool force)
 {
 	style = replaceProperty(style);
 	if(!m_styleMap->contains(style)) {
-		qCritical("Style: Failed to set style: %s to widget: %s", widget->objectName().toStdString().c_str(),
-			  style);
+		qCritical(CAT_STYLE) << "Style: Failed to set style: " << widget->objectName().toStdString().c_str()
+				     << " to widget: " << style;
 	}
 
 	// set property stylesheet directly to the widget
@@ -157,13 +169,12 @@ QString Style::getColorTransparent(const char *key, double transparency)
 
 QString Style::getTheme() { return QFileInfo(m_themeJsonPath).fileName().replace(".json", ""); }
 
-bool Style::setTheme(QString theme, float fontScale)
+bool Style::setTheme(QString themePath, float fontScale)
 {
-	QString tmp_theme_path = m_themeJsonPath;
-	tmp_theme_path.replace(getTheme() + ".json", theme + ".json");
-	if(getTheme() == theme || (QFileInfo(tmp_theme_path).isFile() && tmp_theme_path != m_themeJsonPath)) {
-		m_themeJsonPath = tmp_theme_path;
+	bool ret = true;
 
+	if(QFileInfo(themePath).isFile()) {
+		m_themeJsonPath = themePath;
 		QFile theme_file = QFile(m_themeJsonPath);
 		theme_file.open(QIODevice::ReadOnly);
 		QByteArray theme_data = theme_file.readAll();
@@ -174,10 +185,12 @@ bool Style::setTheme(QString theme, float fontScale)
 		adjustJsonForScaling(fontScale);
 		genrateStyle();
 		QIcon::setThemeName(getAttribute(json::theme::icon_theme_folder));
-		return true;
+	} else {
+		qCritical(CAT_STYLE) << "Style: Failed set theme: " << themePath.toStdString().c_str();
+		ret = false;
 	}
 
-	return false;
+	return ret;
 }
 
 QStringList Style::getThemeList()
@@ -309,7 +322,8 @@ QString Style::replaceAttributes(QString style, int calls_limit)
 		style = replaceAttributes(style, --calls_limit);
 	}
 	if(style.contains('&')) {
-		qCritical("Style: Failed to replace attribute: %s", style.split('&')[1].toStdString().c_str());
+		qCritical(CAT_STYLE) << "Style: Failed to replace attribute: "
+				     << style.split('&')[1].toStdString().c_str();
 	}
 
 	return style;
