@@ -73,32 +73,44 @@ void PkgGridWidget::removePkg(const QString &pkgName)
 	w->deleteLater();
 }
 
-void PkgGridWidget::searchPkg(const QString &field, const QStringList &values)
+bool PkgGridWidget::isFieldMatch(const QVariantMap &pkgMetadata, const QString &field, const QStringList &options)
+{
+	if(!pkgMetadata.contains(field) || options.isEmpty()) {
+		return false;
+	}
+
+	QVariant var = pkgMetadata[field];
+	QStringList pkgValues = (var.type() == QVariant::String) ? QStringList{var.toString()} : var.toStringList();
+
+	for(const QString &pkgVal : pkgValues) {
+		if(isSearchMatch(pkgVal, options)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void PkgGridWidget::searchPkg(const QStringList &fields, const QStringList &options)
 {
 	// Hide all the packages
 	hideAll();
+
 	// Reorganize the widgets within the layout
 	int counter = 0;
 	for(auto it = m_pkgMap.begin(); it != m_pkgMap.end(); ++it) {
 		QVariantMap pkgMetadata = it.value()->metadata();
-		if(!pkgMetadata.contains(field) || values.isEmpty()) {
-			showPkg(it.value(), counter++);
-			continue;
-		}
-
-		QVariant var = pkgMetadata[field];
-		QStringList pkgValues =
-			(var.type() == QVariant::String) ? QStringList{var.toString()} : var.toStringList();
-
 		bool matchFound = false;
-		for(const QString &pkgVal : pkgValues) {
-			matchFound = isSearchMatch(pkgVal, values);
-			if(matchFound) {
-				showPkg(it.value(), counter++);
+		for(const QString &field : fields) {
+			if(isFieldMatch(pkgMetadata, field, options)) {
+				matchFound = true;
 				break;
 			}
 		}
+		if(matchFound || options.isEmpty()) {
+			showPkg(it.value(), counter++);
+		}
 	}
+
 	Q_ASSERT(counter <= m_pkgMap.size());
 }
 

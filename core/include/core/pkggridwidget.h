@@ -43,7 +43,7 @@ public:
 	void updatePkgsStyle(bool property);
 
 public Q_SLOTS:
-	void searchPkg(const QString &field, const QStringList &values);
+	void searchPkg(const QStringList &fields, const QStringList &options);
 
 private Q_SLOTS:
 	void colNumberChanged(QString pref, QVariant val);
@@ -55,6 +55,7 @@ private:
 	void fillCatBtnGroup(const QList<QPushButton *> btns);
 	void showPkg(QWidget *pkg, int index);
 	bool isSearchMatch(const QString &pkgVal, const QStringList &searchingValues);
+	bool isFieldMatch(const QVariantMap &pkgMetadata, const QString &field, const QStringList &options);
 
 	QStringList m_categories;
 	QMap<QString, PkgItemWidget *> m_pkgMap;
