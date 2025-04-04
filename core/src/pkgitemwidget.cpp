@@ -161,6 +161,7 @@ void PkgItemWidget::fillCategories(QStringList categories)
 		catBtn->setCheckable(true);
 		Style::setStyle(catBtn, style::properties::button::subtleButton);
 		Style::setStyle(catBtn, style::properties::widget::border_interactive);
+		catBtn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 		m_categoryLay->addWidget(catBtn);
 		m_catBtnList.append(catBtn);
 		connect(catBtn, &QPushButton::clicked, this,

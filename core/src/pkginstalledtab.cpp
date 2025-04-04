@@ -47,27 +47,26 @@ PkgInstalledTab::PkgInstalledTab(QWidget *parent)
 	pkgSection->collapseSection()->header()->setCheckable(false);
 	pkgSection->menuSection()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	QStringList packages = PkgManager::getPkgsName();
+	QStringList searchOptions = PkgManager::getPkgsName();
+	searchOptions.append(PkgManager::getPkgsCategory());
+	searchOptions.append(PkgManager::getPkgsAuthor());
+	searchOptions.append(PkgManager::getPkgsVersion());
 
 	QWidget *searchW = new QWidget(pkgSection);
 	searchW->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 	QGridLayout *searchLay = new QGridLayout(searchW);
 	searchLay->setMargin(0);
 
-	m_searchBar = new SearchBar(QSet(packages.begin(), packages.end()), searchW);
-	m_searchBar->getLineEdit()->setPlaceholderText("Filter by name");
+	m_searchBar = new SearchBar(QSet<QString>{searchOptions.begin(), searchOptions.end()}, searchW);
+	m_searchBar->getLineEdit()->setPlaceholderText("Filter by keyword");
 	m_searchBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-	m_categoryCb = createCategoryCb(searchW);
-	m_categoryCb->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	MenuOnOffSwitch *previewSwitch = new MenuOnOffSwitch("Preview", searchW);
 	previewSwitch->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	previewSwitch->onOffswitch()->setChecked(true);
 
 	searchLay->addWidget(m_searchBar, 0, 0);
-	searchLay->addWidget(m_categoryCb, 0, 1);
-	searchLay->addWidget(previewSwitch, 1, 1, Qt::AlignRight);
+	searchLay->addWidget(previewSwitch, 1, 0, Qt::AlignRight);
 
 	m_pkgGrid = new PkgGridWidget(pkgSection);
 	// The right margin is used to avoid the scroll bar overlapping with the packages.
@@ -89,10 +88,12 @@ PkgInstalledTab::PkgInstalledTab(QWidget *parent)
 	layout->addWidget(w);
 
 	fillPkgSection();
-	m_categoryCb->setCurrentIndex(-1);
-	connect(m_searchBar->getLineEdit(), &QLineEdit::textChanged, this,
-		[this](const QString &text) { m_pkgGrid->searchPkg(PkgManifest::PKG_TITLE, {text}); });
-	connect(m_categoryCb, &QComboBox::editTextChanged, this, &PkgInstalledTab::categoryChanged);
+	connect(m_searchBar->getLineEdit(), &QLineEdit::textChanged, this, [this](const QString &text) {
+		QStringList searchParam = text.split(";", Qt::SkipEmptyParts);
+		m_pkgGrid->searchPkg({PkgManifest::PKG_AUTHOR, PkgManifest::PKG_CATEGORY, PkgManifest::PKG_TITLE,
+				      PkgManifest::PKG_VERSION},
+				     searchParam);
+	});
 	connect(previewSwitch->onOffswitch(), &QAbstractButton::clicked, this, &PkgInstalledTab::previewSwitchClicked);
 
 	Style::setBackgroundColor(w, json::theme::background_subtle);
@@ -119,7 +120,6 @@ void PkgInstalledTab::fillPkgSection()
 	for(const QVariantMap &meta : pkgsMeta) {
 		PkgItemWidget *pkgItem = createPkgItemWidget(meta);
 		m_pkgGrid->addPkg(pkgItem);
-		fillCategoryCb(meta[PkgManifest::PKG_CATEGORY].toStringList());
 	}
 }
 
@@ -130,15 +130,6 @@ QComboBox *PkgInstalledTab::createCategoryCb(QWidget *parent)
 	cb->lineEdit()->setPlaceholderText("Filter by category");
 	cb->setFixedHeight(31);
 	return cb;
-}
-
-void PkgInstalledTab::fillCategoryCb(const QStringList &categories)
-{
-	for(const QString &cat : categories) {
-		if(m_categoryCb->findText(cat) < 0) {
-			m_categoryCb->addItem(cat);
-		}
-	}
 }
 
 void PkgInstalledTab::onUninstall()
@@ -173,7 +164,7 @@ void PkgInstalledTab::previewSwitchClicked(bool checked)
 void PkgInstalledTab::categoryChanged(const QString &text)
 {
 	QStringList categories = text.split(";", Qt::SkipEmptyParts);
-	m_pkgGrid->searchPkg(PkgManifest::PKG_CATEGORY, categories);
+	m_pkgGrid->searchPkg({PkgManifest::PKG_CATEGORY}, categories);
 }
 
 void PkgInstalledTab::onPkgPreview(const QVariantMap &metadata)
@@ -188,10 +179,11 @@ void PkgInstalledTab::onPkgPreview(const QVariantMap &metadata)
 
 void PkgInstalledTab::onCategorySelected(const QString &category, bool checked)
 {
+	QLineEdit *lineEdit = m_searchBar->getLineEdit();
 	if(checked) {
-		m_categoryCb->setEditText(category);
+		lineEdit->setText(category);
 	} else {
-		m_categoryCb->setEditText("");
+		lineEdit->setText("");
 	}
 }
 

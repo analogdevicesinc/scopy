@@ -46,12 +46,10 @@ private slots:
 private:
 	void fillPkgSection();
 	QComboBox *createCategoryCb(QWidget *parent = nullptr);
-	void fillCategoryCb(const QStringList &categories);
 	PkgItemWidget *createPkgItemWidget(const QVariantMap &meta);
 
 	PkgGridWidget *m_pkgGrid;
 	SearchBar *m_searchBar;
-	QComboBox *m_categoryCb;
 	PkgPreviewPage *m_preview;
 };
 } // namespace scopy
