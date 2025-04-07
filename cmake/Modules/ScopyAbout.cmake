@@ -38,12 +38,6 @@ if(GIT_FOUND)
 		OUTPUT_VARIABLE SCOPY_VERSION_GIT
 		OUTPUT_STRIP_TRAILING_WHITESPACE
 	)
-	execute_process(
-		COMMAND ${GIT_EXECUTABLE} diff
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-		OUTPUT_VARIABLE SCOPY_GIT_DIFF
-		OUTPUT_STRIP_TRAILING_WHITESPACE
-	)
 
 	execute_process(
 		COMMAND ${GIT_EXECUTABLE} config --get remote.origin.url
@@ -68,9 +62,6 @@ if(GIT_FOUND)
 
 	string(REPLACE "\n" "<br>" SCOPY_GIT_LOG ${GIT_LOG})
 
-	if(NOT SCOPY_GIT_DIFF STREQUAL "")
-		set(SCOPY_GIT_DIRTY "dirty")
-	endif()
 endif()
 
 function(configure_about ABOUT_RESOURCES_DIR)

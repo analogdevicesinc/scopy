@@ -93,9 +93,6 @@ QString scopy::config::gitCommit() { return SCOPY_VERSION_GIT; }
 QString scopy::config::fullversion()
 {
 	QString ver = QString("v") + SCOPY_VERSION + "-g" + SCOPY_VERSION_GIT;
-	if(QString(SCOPY_GIT_DIRTY) == "dirty") {
-		ver += QString("-") + "dirty";
-	}
 	return ver;
 }
 
