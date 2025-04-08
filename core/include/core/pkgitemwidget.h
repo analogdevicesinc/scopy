@@ -28,6 +28,7 @@
 #include <QPushButton>
 #include <animationpushbutton.h>
 #include <toolbuttons.h>
+#include <widgets/interactivelabel.h>
 
 namespace scopy {
 class PkgItemWidget : public QFrame
@@ -44,7 +45,6 @@ public:
 	void uninstallFinished(bool uninstalled);
 
 	QVariantMap metadata() const;
-	QList<QPushButton *> categoryBtns() const;
 
 public Q_SLOTS:
 	void fillMetadata(QVariantMap metadata, bool installed = false);
@@ -54,7 +54,7 @@ Q_SIGNALS:
 	void uninstallClicked();
 	void preview(const QVariantMap &metadata);
 	void hidePreview();
-	void categorySelected(const QString &cat, bool checked);
+	void categorySelected(const QString &cat);
 
 protected:
 	void mousePressEvent(QMouseEvent *event);
@@ -71,7 +71,8 @@ private:
 	UninstallBtn *m_uninstallBtn;
 	QVariantMap m_metadata;
 	QHBoxLayout *m_categoryLay;
-	QList<QPushButton *> m_catBtnList;
+
+	static QVector<QString> m_categories;
 };
 } // namespace scopy
 

@@ -31,9 +31,10 @@
 
 using namespace scopy;
 
+QVector<QString> PkgItemWidget::m_categories{};
+
 PkgItemWidget::PkgItemWidget(QWidget *parent)
 	: QFrame(parent)
-	, m_catBtnList{}
 {
 	QVBoxLayout *lay = new QVBoxLayout(this);
 	lay->setSpacing(10);
@@ -142,8 +143,6 @@ QWidget *PkgItemWidget::createTitleW(QWidget *parent)
 
 QVariantMap PkgItemWidget::metadata() const { return m_metadata; }
 
-QList<QPushButton *> PkgItemWidget::categoryBtns() const { return m_catBtnList; }
-
 void PkgItemWidget::installFinished(bool installed)
 {
 	m_installBtn->setDisabled(installed);
@@ -157,15 +156,15 @@ void PkgItemWidget::uninstallFinished(bool uninstalled) { m_uninstallBtn->setUni
 void PkgItemWidget::fillCategories(QStringList categories)
 {
 	for(const QString &cat : categories) {
-		QPushButton *catBtn = new QPushButton(cat, this);
-		catBtn->setCheckable(true);
-		Style::setStyle(catBtn, style::properties::button::subtleButton);
-		Style::setStyle(catBtn, style::properties::widget::border_interactive);
-		catBtn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-		m_categoryLay->addWidget(catBtn);
-		m_catBtnList.append(catBtn);
-		connect(catBtn, &QPushButton::clicked, this,
-			[this, catBtn](bool checked) { Q_EMIT categorySelected(catBtn->text(), checked); });
+		InteractiveLabel *catLbl = new InteractiveLabel(cat, this);
+		if(!m_categories.contains(cat)) {
+			m_categories.push_back(cat);
+		}
+		int index = m_categories.indexOf(cat);
+		catLbl->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+		m_categoryLay->addWidget(catLbl);
+		StyleHelper::ColoredInteractiveLabel(catLbl, index);
+		connect(catLbl, &InteractiveLabel::clickEvent, this, &PkgItemWidget::categorySelected);
 	}
 }
 

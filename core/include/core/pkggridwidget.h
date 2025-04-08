@@ -47,21 +47,16 @@ public Q_SLOTS:
 
 private Q_SLOTS:
 	void colNumberChanged(QString pref, QVariant val);
-	void handleCategoryClick(QAbstractButton *abstract);
 
 private:
 	void hideAll();
 	void rebuildLayout();
-	void fillCatBtnGroup(const QList<QPushButton *> btns);
 	void showPkg(QWidget *pkg, int index);
 	bool isSearchMatch(const QString &pkgVal, const QStringList &searchingValues);
 	bool isFieldMatch(const QVariantMap &pkgMetadata, const QString &field, const QStringList &options);
 
-	QStringList m_categories;
 	QMap<QString, PkgItemWidget *> m_pkgMap;
 	QGridLayout *m_layout;
-	QButtonGroup *m_catBtnGroup;
-	QPushButton *m_crtCatBtn;
 	int m_maxCol;
 };
 } // namespace scopy

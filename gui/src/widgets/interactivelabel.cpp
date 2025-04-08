@@ -19,37 +19,25 @@
  *
  */
 
-#ifndef PKGINSTALLEDTAB_H
-#define PKGINSTALLEDTAB_H
+#include "interactivelabel.h"
+#include <qevent.h>
+#include <style.h>
 
-#include "pkggridwidget.h"
-#include "searchbar.h"
-#include <QWidget>
-#include <pkgpreviewpage.h>
+using namespace scopy;
 
-namespace scopy {
-class PkgInstalledTab : public QWidget
+InteractiveLabel::InteractiveLabel(QString text, QWidget *parent)
+	: QLabel(text, parent)
 {
-	Q_OBJECT
+	Style::setStyle(this, style::properties::label::interactive);
+}
 
-public:
-	PkgInstalledTab(QWidget *parent = nullptr);
-	~PkgInstalledTab();
+InteractiveLabel::~InteractiveLabel() {}
 
-private slots:
-	void onUninstall();
-	void previewSwitchClicked(bool checked);
-	void onPkgPreview(const QVariantMap &metadata);
-	void onCategorySelected(const QString &category);
+void InteractiveLabel::mousePressEvent(QMouseEvent *event)
+{
+	if(event->button() == Qt::LeftButton) {
+		Q_EMIT clickEvent(text());
+	}
+}
 
-private:
-	void fillPkgSection();
-	PkgItemWidget *createPkgItemWidget(const QVariantMap &meta);
-
-	PkgGridWidget *m_pkgGrid;
-	SearchBar *m_searchBar;
-	PkgPreviewPage *m_preview;
-};
-} // namespace scopy
-
-#endif // PKGINSTALLEDTAB_H
+#include "moc_interactivelabel.cpp"

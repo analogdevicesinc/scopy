@@ -123,15 +123,6 @@ void PkgInstalledTab::fillPkgSection()
 	}
 }
 
-QComboBox *PkgInstalledTab::createCategoryCb(QWidget *parent)
-{
-	QComboBox *cb = new QComboBox(parent);
-	cb->setEditable(true);
-	cb->lineEdit()->setPlaceholderText("Filter by category");
-	cb->setFixedHeight(31);
-	return cb;
-}
-
 void PkgInstalledTab::onUninstall()
 {
 	PkgItemWidget *pkgItem = dynamic_cast<PkgItemWidget *>(QObject::sender());
@@ -161,12 +152,6 @@ void PkgInstalledTab::previewSwitchClicked(bool checked)
 	m_pkgGrid->updatePkgsStyle(checked);
 }
 
-void PkgInstalledTab::categoryChanged(const QString &text)
-{
-	QStringList categories = text.split(";", Qt::SkipEmptyParts);
-	m_pkgGrid->searchPkg({PkgManifest::PKG_CATEGORY}, categories);
-}
-
 void PkgInstalledTab::onPkgPreview(const QVariantMap &metadata)
 {
 	bool previewEnabled = m_preview->isEnabled();
@@ -177,14 +162,16 @@ void PkgInstalledTab::onPkgPreview(const QVariantMap &metadata)
 	}
 }
 
-void PkgInstalledTab::onCategorySelected(const QString &category, bool checked)
+void PkgInstalledTab::onCategorySelected(const QString &category)
 {
 	QLineEdit *lineEdit = m_searchBar->getLineEdit();
-	if(checked) {
-		lineEdit->setText(category);
+	QStringList searchingList = lineEdit->text().split(";", Qt::SkipEmptyParts);
+	if(searchingList.contains(category)) {
+		searchingList.removeAll(category);
 	} else {
-		lineEdit->setText("");
+		searchingList.append(category);
 	}
+	lineEdit->setText(searchingList.join(";"));
 }
 
 #include "moc_pkginstalledtab.cpp"
