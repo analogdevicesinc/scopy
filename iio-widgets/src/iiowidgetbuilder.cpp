@@ -218,6 +218,7 @@ void IIOWidgetBuilder::clear()
 	m_dataStrategy = DS::NoDataStrategy;
 	m_uiStrategy = UIS::NoUIStrategy;
 	m_widgetParent = nullptr;
+	m_title = "";
 }
 
 IIOWidgetBuilder &IIOWidgetBuilder::connection(Connection *connection)
@@ -295,6 +296,12 @@ IIOWidgetBuilder &IIOWidgetBuilder::uiStrategy(UIS uiStrategy)
 IIOWidgetBuilder &IIOWidgetBuilder::parent(QWidget *parent)
 {
 	m_widgetParent = parent;
+	return *this;
+}
+
+IIOWidgetBuilder &IIOWidgetBuilder::title(QString title)
+{
+	m_title = title;
 	return *this;
 }
 
@@ -396,6 +403,7 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 	switch(strategy) {
 	case UIS::EditableUi:
 		ui = new EditableGuiStrategy(m_generatedRecipe, m_isCompact, m_widgetParent);
+
 		break;
 	case UIS::SwitchUi:
 	case UIS::ComboUi:
@@ -406,6 +414,10 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 		break;
 	default:
 		break;
+	}
+
+	if(!m_title.isEmpty() && ui != nullptr) {
+		ui->setCustomTitle(m_title);
 	}
 
 	return ui;

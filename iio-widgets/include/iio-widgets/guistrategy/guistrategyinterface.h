@@ -50,6 +50,8 @@ public:
 	 * */
 	virtual bool isValid() = 0;
 
+	virtual void setCustomTitle(QString title) = 0;
+
 public Q_SLOTS:
 	/**
 	 * @brief Reads the data from the attributes that are set in the recipe if available.

@@ -43,6 +43,9 @@ public:
 
 	QComboBox *combo();
 
+	QString title() const;
+	void setTitle(const QString &newTitle);
+
 private:
 	QLabel *m_label;
 	QComboBox *m_combo;
@@ -58,6 +61,9 @@ public:
 	virtual ~MenuComboWidget();
 
 	QComboBox *combo();
+
+	QString title() const;
+	void setTitle(const QString &newTitle);
 
 private:
 	MenuCombo *m_combo;

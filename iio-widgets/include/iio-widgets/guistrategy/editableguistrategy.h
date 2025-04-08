@@ -48,6 +48,8 @@ public:
 
 	bool isValid() override;
 
+	void setCustomTitle(QString title) override;
+
 public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
 
@@ -60,6 +62,7 @@ private:
 	QWidget *m_ui;
 	MenuLineEdit *m_lineEdit;
 	QString m_lastEmittedText;
+	QLabel *m_title;
 };
 } // namespace scopy
 

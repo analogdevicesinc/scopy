@@ -45,6 +45,10 @@ MenuComboWidget::~MenuComboWidget() {}
 
 QComboBox *MenuComboWidget::combo() { return m_combo->combo(); }
 
+QString MenuComboWidget::title() const { return m_combo->title(); }
+
+void MenuComboWidget::setTitle(const QString &newTitle) { m_combo->setTitle(newTitle); }
+
 MenuCombo::MenuCombo(QString title, QWidget *parent)
 	: QWidget(parent)
 {
@@ -68,5 +72,9 @@ MenuCombo::MenuCombo(QString title, QWidget *parent)
 
 MenuCombo::~MenuCombo() {}
 QComboBox *MenuCombo::combo() { return m_combo; }
+
+QString MenuCombo::title() const { return m_label->text(); }
+
+void MenuCombo::setTitle(const QString &newTitle) { m_label->setText(newTitle); }
 
 #include "moc_menucombo.cpp"
