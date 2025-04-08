@@ -29,20 +29,20 @@ EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isC
 	, m_lineEdit(new MenuLineEdit(m_ui))
 {
 	m_recipe = recipe;
-	QLabel *label = new QLabel(recipe.data, m_ui);
+	m_title = new QLabel(recipe.data, m_ui);
 
 	if(isCompact) {
 		m_ui->setLayout(new QHBoxLayout(m_ui));
 		m_lineEdit->edit()->setAlignment(Qt::AlignRight);
 	} else {
-		Style::setStyle(label, style::properties::label::subtle);
+		Style::setStyle(m_title, style::properties::label::subtle);
 		m_ui->setLayout(new QVBoxLayout(m_ui));
 	}
 
 	Style::setStyle(m_lineEdit->edit(), style::properties::iiowidgets::lineEdit, true, true);
 	m_lineEdit->edit()->setCursorPosition(0);
 	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
-	m_ui->layout()->addWidget(label);
+	m_ui->layout()->addWidget(m_title);
 	m_ui->layout()->addWidget(m_lineEdit);
 	m_ui->layout()->setSpacing(0);
 
@@ -68,6 +68,8 @@ bool EditableGuiStrategy::isValid()
 	}
 	return false;
 }
+
+void EditableGuiStrategy::setCustomTitle(QString title) { m_title->setText(title); }
 
 void EditableGuiStrategy::receiveData(QString currentData, QString optionalData)
 {

@@ -171,6 +171,12 @@ public:
 	 */
 	IIOWidgetBuilder &parent(QWidget *parent);
 
+	/**
+	 * @brief Sets a custom title for the IIOWidget
+	 * @param title
+	 */
+	IIOWidgetBuilder &title(QString title);
+
 private:
 	DataStrategyInterface *createDS();
 	GuiStrategyInterface *createUIS();
@@ -185,6 +191,7 @@ private:
 	QString m_attribute;
 	QString m_optionsAttribute;
 	QString m_optionsValues;
+	QString m_title;
 	IIOWidgetBuilder::DS m_dataStrategy;
 	IIOWidgetBuilder::UIS m_uiStrategy;
 	QWidget *m_widgetParent;

@@ -36,23 +36,23 @@ ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 		m_ui->setLayout(new QHBoxLayout(m_ui));
 		m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
-		auto label = new QLabel(recipe.data, m_ui);
+		m_title = new QLabel(recipe.data, m_ui);
 		m_comboWidget = new QComboBox(m_ui);
 		m_comboWidget->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
 
 		m_comboWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-		m_ui->layout()->addWidget(label);
+		m_ui->layout()->addWidget(m_title);
 		m_ui->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
 		m_ui->layout()->addWidget(m_comboWidget);
 	} else {
 		m_ui->setLayout(new QVBoxLayout(m_ui));
 		m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
-		auto comboMenuWidget = new MenuCombo(recipe.data, m_ui);
-		m_comboWidget = comboMenuWidget->combo();
+		m_comboMenuWidget = new MenuCombo(recipe.data, m_ui);
+		m_comboWidget = m_comboMenuWidget->combo();
 
-		m_ui->layout()->addWidget(comboMenuWidget);
+		m_ui->layout()->addWidget(m_comboMenuWidget);
 	}
 
 	Style::setStyle(m_comboWidget, style::properties::iiowidgets::comboBox, true, true);
@@ -75,6 +75,15 @@ bool ComboAttrUi::isValid()
 		return true;
 	}
 	return false;
+}
+
+void ComboAttrUi::setCustomTitle(QString title)
+{
+	if(m_isCompact) {
+		m_title->setText(title);
+	} else {
+		m_comboMenuWidget->setTitle(title);
+	}
 }
 
 void ComboAttrUi::receiveData(QString currentData, QString optionalData)

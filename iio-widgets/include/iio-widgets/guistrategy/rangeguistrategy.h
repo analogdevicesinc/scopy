@@ -50,6 +50,8 @@ public:
 
 	bool isValid() final;
 
+	void setCustomTitle(QString title) override;
+
 public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
 
