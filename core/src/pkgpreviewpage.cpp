@@ -33,11 +33,17 @@ PkgPreviewPage::PkgPreviewPage(QWidget *parent)
 		createSection("Preview", "Details about the selected package are displayed here.", this);
 	QMargins sectionMargins(0, 10, 10, 10);
 	section->menuSection()->layout()->setContentsMargins(sectionMargins);
+	section->menuSection()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	m_infoPage = new InfoPage(this);
+	m_infoPage->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 	m_infoPage->layout()->setMargin(0);
 
-	section->add(m_infoPage);
+	QScrollArea *scrollArea = new QScrollArea(section);
+	scrollArea->setWidget(m_infoPage);
+	scrollArea->setWidgetResizable(true);
+
+	section->add(scrollArea);
 
 	layout->addWidget(section);
 }

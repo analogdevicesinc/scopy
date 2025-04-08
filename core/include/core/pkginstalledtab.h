@@ -36,7 +36,7 @@ public:
 	PkgInstalledTab(QWidget *parent = nullptr);
 	~PkgInstalledTab();
 
-private slots:
+private Q_SLOTS:
 	void onUninstall();
 	void previewSwitchClicked(bool checked);
 	void onPkgPreview(const QVariantMap &metadata);
@@ -49,6 +49,7 @@ private:
 	PkgGridWidget *m_pkgGrid;
 	SearchBar *m_searchBar;
 	PkgPreviewPage *m_preview;
+	QSplitter *m_vSplitter;
 };
 } // namespace scopy
 

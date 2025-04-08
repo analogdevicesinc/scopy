@@ -53,7 +53,6 @@ PkgInstalledTab::PkgInstalledTab(QWidget *parent)
 	searchOptions.append(PkgManager::getPkgsVersion());
 
 	QWidget *searchW = new QWidget(pkgSection);
-	searchW->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 	QGridLayout *searchLay = new QGridLayout(searchW);
 	searchLay->setMargin(0);
 
@@ -79,12 +78,14 @@ PkgInstalledTab::PkgInstalledTab(QWidget *parent)
 	pkgSection->contentLayout()->addWidget(searchW);
 	pkgSection->contentLayout()->addWidget(scrollArea);
 
-	m_preview = new PkgPreviewPage(this);
-	m_preview->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	m_preview = new PkgPreviewPage(w);
 	m_preview->hide();
 
-	wLay->addWidget(pkgSection, Qt::AlignTop);
-	wLay->addWidget(m_preview, Qt::AlignBottom);
+	m_vSplitter = new QSplitter(Qt::Vertical, w);
+	m_vSplitter->addWidget(pkgSection);
+	m_vSplitter->addWidget(m_preview);
+
+	wLay->addWidget(m_vSplitter);
 	layout->addWidget(w);
 
 	fillPkgSection();
