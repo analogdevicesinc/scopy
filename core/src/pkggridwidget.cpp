@@ -24,6 +24,7 @@
 #include <pluginbase/preferences.h>
 
 #include <style.h>
+#include <stylehelper.h>
 
 using namespace scopy;
 
@@ -41,14 +42,6 @@ PkgGridWidget::PkgGridWidget(QWidget *parent)
 	lay->addWidget(pkgsW);
 	lay->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
-	m_catBtnGroup = new QButtonGroup(this);
-	m_catBtnGroup->setExclusive(false);
-
-	m_crtCatBtn = nullptr;
-
-	connect(m_catBtnGroup, qOverload<QAbstractButton *>(&QButtonGroup::buttonClicked), this,
-		&PkgGridWidget::handleCategoryClick);
-
 	m_maxCol = Preferences::get("pkg_menu_columns").toInt();
 	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this, &PkgGridWidget::colNumberChanged);
 }
@@ -59,7 +52,6 @@ void PkgGridWidget::addPkg(PkgItemWidget *pkgItem)
 {
 	int gridSize = m_pkgMap.size();
 	m_layout->addWidget(pkgItem, gridSize / m_maxCol, gridSize % m_maxCol);
-	fillCatBtnGroup(pkgItem->categoryBtns());
 	m_pkgMap.insert(pkgItem->id(), pkgItem);
 }
 
@@ -94,7 +86,6 @@ void PkgGridWidget::searchPkg(const QStringList &fields, const QStringList &opti
 {
 	// Hide all the packages
 	hideAll();
-
 	// Reorganize the widgets within the layout
 	int counter = 0;
 	for(auto it = m_pkgMap.begin(); it != m_pkgMap.end(); ++it) {
@@ -123,20 +114,6 @@ void PkgGridWidget::colNumberChanged(QString pref, QVariant val)
 	}
 }
 
-void PkgGridWidget::handleCategoryClick(QAbstractButton *abstract)
-{
-	QPushButton *btn = dynamic_cast<QPushButton *>(abstract);
-	if(m_crtCatBtn == btn) {
-		btn->setChecked(false);
-		m_crtCatBtn = nullptr;
-	} else {
-		if(m_crtCatBtn) {
-			m_crtCatBtn->setChecked(false);
-		}
-		m_crtCatBtn = dynamic_cast<QPushButton *>(btn);
-	}
-}
-
 void PkgGridWidget::hideAll()
 {
 	for(auto it = m_pkgMap.begin(); it != m_pkgMap.end(); ++it) {
@@ -152,13 +129,6 @@ void PkgGridWidget::rebuildLayout()
 		showPkg(it.value(), counter++);
 	}
 	Q_ASSERT(counter <= m_pkgMap.size());
-}
-
-void PkgGridWidget::fillCatBtnGroup(const QList<QPushButton *> btns)
-{
-	for(QPushButton *btn : btns) {
-		m_catBtnGroup->addButton(btn);
-	}
 }
 
 void PkgGridWidget::showPkg(QWidget *pkg, int index)

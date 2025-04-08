@@ -19,37 +19,26 @@
  *
  */
 
-#ifndef PKGINSTALLEDTAB_H
-#define PKGINSTALLEDTAB_H
+#ifndef INTERACTIVELABEL_H
+#define INTERACTIVELABEL_H
 
-#include "pkggridwidget.h"
-#include "searchbar.h"
-#include <QWidget>
-#include <pkgpreviewpage.h>
+#include <QLabel>
+#include <scopy-gui_export.h>
 
 namespace scopy {
-class PkgInstalledTab : public QWidget
+class SCOPY_GUI_EXPORT InteractiveLabel : public QLabel
 {
 	Q_OBJECT
-
 public:
-	PkgInstalledTab(QWidget *parent = nullptr);
-	~PkgInstalledTab();
+	InteractiveLabel(QString text, QWidget *parent = nullptr);
+	~InteractiveLabel();
 
-private slots:
-	void onUninstall();
-	void previewSwitchClicked(bool checked);
-	void onPkgPreview(const QVariantMap &metadata);
-	void onCategorySelected(const QString &category);
+Q_SIGNALS:
+	void clickEvent(const QString &text);
 
-private:
-	void fillPkgSection();
-	PkgItemWidget *createPkgItemWidget(const QVariantMap &meta);
-
-	PkgGridWidget *m_pkgGrid;
-	SearchBar *m_searchBar;
-	PkgPreviewPage *m_preview;
+protected:
+	void mousePressEvent(QMouseEvent *event);
 };
 } // namespace scopy
 
-#endif // PKGINSTALLEDTAB_H
+#endif // INTERACTIVELABEL_H
