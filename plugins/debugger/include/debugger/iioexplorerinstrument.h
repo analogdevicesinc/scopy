@@ -78,12 +78,15 @@ private:
 	// Finds the item containing the path variable
 	IIOStandardItem *findItemByPath(IIOStandardItem *currentItem, const QStringList &path, int depth = 0);
 
+	void setupCodeGeneratorWindow();
+
 	// Stacked widget
 	QTabWidget *m_tabWidget;
 	QWidget *m_mainWidget;
 	IIODebugLogger *m_debugLogger;
+	QWidget *m_codeGenerator;
 
-	struct iio_context *m_context;
+	iio_context *m_context;
 	QString m_uri;
 	QTreeView *m_treeView;
 	IIOModel *m_iioModel;
@@ -94,6 +97,7 @@ private:
 	ApiObject *m_apiObject;
 	IIOStandardItem *m_currentlySelectedItem;
 	SaveContextSetup *m_saveContextSetup;
+	QTextBrowser *m_generatedCodeBrowser;
 
 	// GUI elements
 	QSplitter *m_VSplitter;
@@ -110,8 +114,9 @@ public:
 	explicit IIOExplorerInstrument_API(IIOExplorerInstrument *p)
 		: ApiObject(p)
 		, p(p)
-	{}
-	~IIOExplorerInstrument_API(){};
+	{
+		setObjectName("IIOExplorerInstrument_API");
+	}
 
 	QList<int> vSplitter() const;
 	void setVSplitter(const QList<int> &newSplitter);

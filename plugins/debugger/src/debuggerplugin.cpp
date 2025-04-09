@@ -133,7 +133,7 @@ bool DebuggerPlugin::onConnect()
 	ToolMenuEntry *dbgTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "debugger");
 	m_useDebuggerV2 = Preferences::get("plugins_use_debugger_v2").toBool();
 	if(m_useDebuggerV2) {
-		m_iioDebugger = new IIOExplorerInstrument(m_conn->context(), nullptr, nullptr);
+		m_iioDebugger = new IIOExplorerInstrument(m_conn->context(), m_param, nullptr);
 		dbgTme->setTool(m_iioDebugger);
 	} else {
 		dbgTme->setTool(new DebuggerInstrument(m_conn->context(), nullptr, nullptr));

@@ -39,8 +39,9 @@ using namespace scopy::debugger;
 
 WatchListView::WatchListView(QWidget *parent)
 	: QTableWidget(parent)
-	, m_apiObject(new WatchListView_API(this))
 	, m_offsets({0, 0, 0, 0, 0})
+	, m_apiObject(new WatchListView_API(this))
+	, m_entryObjects(new QMap<QString, WatchListEntry *>())
 {
 	setupUi();
 	connectSignalsAndSlots();
@@ -82,16 +83,17 @@ void WatchListView::setupUi()
 void WatchListView::connectSignalsAndSlots()
 {
 	QObject::connect(this, &QTableWidget::cellClicked, this, [this](int row, int column) {
+		Q_UNUSED(column)
 		selectRow(row);
 		QString path = item(row, PATH_POS)->text();
 		qInfo(CAT_WATCHLIST) << "Selected" << path;
 
-		if(!m_entryObjects.contains(path)) {
+		if(!m_entryObjects->contains(path)) {
 			qWarning(CAT_WATCHLIST) << "No object with name" << path
 						<< "was found in the entry objects map, skipping cell selection.";
 			return;
 		}
-		WatchListEntry *watchListEntry = m_entryObjects[path];
+		WatchListEntry *watchListEntry = (*m_entryObjects)[path];
 		IIOStandardItem *item = watchListEntry->item();
 
 		Q_EMIT selectedItem(item);
@@ -100,6 +102,7 @@ void WatchListView::connectSignalsAndSlots()
 	// this lambda is responsible for modifying the column offsets
 	QObject::connect(horizontalHeader(), &QHeaderView::sectionResized, this,
 			 [this](int logicalIndex, int oldSize, int newSize) {
+				 Q_UNUSED(oldSize)
 				 int originalSize = width() / DIVISION_REGION;
 				 int offset = newSize - originalSize;
 				 m_offsets[logicalIndex] = offset;
@@ -110,10 +113,12 @@ void WatchListView::saveSettings(QSettings &s) { m_apiObject->save(s); }
 
 void WatchListView::loadSettings(QSettings &s) { m_apiObject->load(s); }
 
+QMap<QString, WatchListEntry *> *WatchListView::watchListEntries() const { return m_entryObjects; }
+
 void WatchListView::addToWatchlist(IIOStandardItem *item)
 {
 	auto entry = new WatchListEntry(item, this);
-	m_entryObjects.insert(entry->path()->text(), entry);
+	m_entryObjects->insert(entry->path()->text(), entry);
 	int row = rowCount();
 	insertRow(row);
 	setItem(row, NAME_POS, entry->name());
@@ -143,6 +148,7 @@ void WatchListView::addToWatchlist(IIOStandardItem *item)
 
 		item->setWatched(false);
 		entry->deleteLater();
+		m_entryObjects->remove(item->path());
 
 		Q_EMIT removeItem(item);
 	});
@@ -160,7 +166,7 @@ void WatchListView::removeFromWatchlist(IIOStandardItem *item)
 
 	if(row != -1) {
 		removeRow(row);
-		WatchListEntry *entry = m_entryObjects.value(item->path(), nullptr);
+		WatchListEntry *entry = m_entryObjects->value(item->path(), nullptr);
 		if(entry) {
 			entry->deleteLater();
 		} else {
@@ -173,7 +179,7 @@ void WatchListView::removeFromWatchlist(IIOStandardItem *item)
 void WatchListView::currentTreeSelectionChanged(IIOStandardItem *item)
 {
 	QString path = item->path();
-	if(m_entryObjects.contains(path)) {
+	if(m_entryObjects->contains(path)) {
 		// highlight path
 		for(int i = 0; i < rowCount(); ++i) {
 			if(this->item(i, PATH_POS)->text() == path) {
@@ -189,7 +195,7 @@ void WatchListView::currentTreeSelectionChanged(IIOStandardItem *item)
 
 void WatchListView::refreshWatchlist()
 {
-	for(auto object : qAsConst(m_entryObjects)) {
+	for(auto object : qAsConst(*m_entryObjects)) {
 		IIOStandardItem::Type type = object->item()->type();
 		if(type == IIOStandardItem::ContextAttribute || type == IIOStandardItem::DeviceAttribute ||
 		   type == IIOStandardItem::ChannelAttribute) {

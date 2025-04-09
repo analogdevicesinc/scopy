@@ -93,7 +93,7 @@ void IIOModel::generateCtxAttributes()
 
 void IIOModel::setupCurrentDevice()
 {
-	m_currentDevice = iio_context_get_device(m_ctx, m_currentDeviceIndex);
+	m_currentDevice = iio_context_get_device(m_ctx, static_cast<uint>(m_currentDeviceIndex));
 	m_devList = IIOWidgetBuilder(m_parent).device(m_currentDevice).includeAvailableAttributes(true).buildAll();
 	m_currentDeviceName = iio_device_get_name(m_currentDevice);
 	QString currentDeviceId = iio_device_get_id(m_currentDevice);
@@ -114,12 +114,20 @@ void IIOModel::setupCurrentDevice()
 
 void IIOModel::generateDeviceAttributes()
 {
+	// Debug attr idx
+	uint debug_attr_idx = 0;
+
 	// add all attrs to current device
 	for(int j = 0; j < m_devList.size(); ++j) {
-		QString device_attr = iio_device_get_attr(m_currentDevice, j);
+		QString device_attr = iio_device_get_attr(m_currentDevice, static_cast<uint>(j));
 		if(device_attr.isEmpty()) {
 			// Probably a debug attribute
-			device_attr = iio_device_get_debug_attr(m_currentDevice, j);
+			device_attr = iio_device_get_debug_attr(m_currentDevice, debug_attr_idx++);
+		}
+
+		if(device_attr.isEmpty()) {
+			// Skip empty attributes
+			continue;
 		}
 
 		m_entries.insert(device_attr);
@@ -135,7 +143,7 @@ void IIOModel::generateDeviceAttributes()
 
 void IIOModel::setupCurrentChannel()
 {
-	m_currentChannel = iio_device_get_channel(m_currentDevice, m_currentChannelIndex);
+	m_currentChannel = iio_device_get_channel(m_currentDevice, static_cast<uint>(m_currentChannelIndex));
 	m_chnlList = IIOWidgetBuilder(m_parent).channel(m_currentChannel).includeAvailableAttributes(true).buildAll();
 	m_currentChannelName = iio_channel_get_id(m_currentChannel);
 	QString currentChannelId = iio_channel_get_name(m_currentChannel);
