@@ -26,6 +26,7 @@
 #include <QTabWidget>
 #include <QTextBrowser>
 #include <gui/animationpushbutton.h>
+#include "codegenerator.h"
 #include "iiostandarditem.h"
 #include "guidetailsview.h"
 #include "clidetailsview.h"
@@ -36,7 +37,7 @@ class DetailsView : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit DetailsView(QWidget *parent = nullptr);
+	explicit DetailsView(QString uri, QWidget *parent = nullptr);
 	void setIIOStandardItem(IIOStandardItem *item);
 	void refreshIIOView();
 
@@ -45,6 +46,8 @@ public:
 
 	// add:true = +, add:false = X
 	void setAddToWatchlistState(bool add);
+
+	void resetGeneratedCodeView(QList<IIOStandardItem *> items);
 
 Q_SIGNALS:
 	void pathSelected(QString path);
@@ -58,10 +61,13 @@ private:
 	QTabWidget *m_tabWidget;
 	QWidget *m_guiView;
 	QWidget *m_iioView;
+	QWidget *m_generatedCodeView;
 	QWidget *m_titleContainer;
 	PathTitle *m_titlePath;
 	AnimationPushButton *m_readBtn;
 	QPushButton *m_addToWatchlistBtn;
+	QTextBrowser *m_generatedCodeBrowser;
+	QString m_uri;
 };
 } // namespace scopy::debugger
 

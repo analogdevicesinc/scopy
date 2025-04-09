@@ -24,9 +24,11 @@
 #include <QScrollBar>
 #include <QFutureWatcher>
 #include <QtConcurrent>
+#include <QFileDialog>
 #include <style.h>
 #include <gui/stylehelper.h>
 #include "iioexplorerinstrument.h"
+#include "hoverwidget.h"
 #include "iiostandarditem.h"
 #include "debuggerloggingcategories.h"
 #include "style_properties.h"
@@ -72,8 +74,15 @@ void IIOExplorerInstrument::setupUi()
 
 	m_debugLogger = new IIODebugLogger(m_tabWidget);
 	m_debugLogger->setObjectName("IIODebuggerLogWidget");
+
+	m_codeGenerator = new QWidget(m_tabWidget);
+	m_codeGenerator->setObjectName("IIODebuggerCodeGeneratorWidget");
+	setupCodeGeneratorWindow();
+
 	m_tabWidget->addTab(m_mainWidget, "IIO Attributes");
 	m_tabWidget->addTab(m_debugLogger, "Log");
+	m_tabWidget->addTab(m_codeGenerator, "Code Generator");
+
 	m_tabWidget->setCurrentIndex(0);
 	m_tabWidget->setTabPosition(QTabWidget::South);
 
@@ -114,7 +123,7 @@ void IIOExplorerInstrument::setupUi()
 	// TODO: see what to do with context0 when multiple simultaneous connections are available
 	m_iioModel = new IIOModel(m_context, "context0", m_treeView);
 	m_searchBar = new SearchBar(m_iioModel->getEntries(), this);
-	m_detailsView = new DetailsView(details_container);
+	m_detailsView = new DetailsView(m_uri, details_container);
 	m_watchListView = new WatchListView(watch_list);
 
 	watch_list->layout()->addWidget(m_watchListView);
@@ -124,6 +133,7 @@ void IIOExplorerInstrument::setupUi()
 
 	Style::setBackgroundColor(m_mainWidget, json::theme::background_subtle);
 	Style::setBackgroundColor(m_debugLogger, json::theme::background_subtle);
+	Style::setBackgroundColor(m_codeGenerator, json::theme::background_subtle);
 	Style::setStyle(m_treeView, style::properties::debugger::treeView);
 
 	m_treeView->setModel(m_proxyModel);
@@ -173,6 +183,13 @@ void IIOExplorerInstrument::connectSignalsAndSlots()
 	QObject::connect(m_watchListView, &WatchListView::removeItem, this, [this](IIOStandardItem *item) {
 		item->setWatched(false);
 		m_detailsView->setAddToWatchlistState(true);
+
+		QList<CodeGenerator::CodeGeneratorRecipe> recipes;
+		for(auto witem : *m_watchListView->watchListEntries()) {
+			recipes.append(CodeGenerator::convertToCodeGeneratorRecipe(witem->item(), m_uri));
+		}
+
+		m_generatedCodeBrowser->setPlainText(CodeGenerator::generateCode(recipes));
 	});
 
 	QObject::connect(m_detailsView->readBtn(), &QPushButton::clicked, this, [this]() {
@@ -211,6 +228,13 @@ void IIOExplorerInstrument::connectSignalsAndSlots()
 			m_watchListView->addToWatchlist(m_currentlySelectedItem);
 			m_detailsView->setAddToWatchlistState(false);
 		}
+
+		QList<CodeGenerator::CodeGeneratorRecipe> recipes;
+		for(auto item : *m_watchListView->watchListEntries()) {
+			recipes.append(CodeGenerator::convertToCodeGeneratorRecipe(item->item(), m_uri));
+		}
+
+		m_generatedCodeBrowser->setPlainText(CodeGenerator::generateCode(recipes));
 	});
 
 	QObject::connect(
@@ -435,6 +459,40 @@ void IIOExplorerInstrument::selectItem(IIOStandardItem *item)
 	auto sourceModel = qobject_cast<QStandardItemModel *>(m_proxyModel->sourceModel());
 	recursiveExpandItem(sourceModel->invisibleRootItem(), item);
 	m_detailsView->setIIOStandardItem(item);
+}
+
+void IIOExplorerInstrument::setupCodeGeneratorWindow()
+{
+	m_codeGenerator->setLayout(new QVBoxLayout(m_codeGenerator));
+	m_codeGenerator->layout()->setContentsMargins(0, 0, 0, 0);
+
+	m_generatedCodeBrowser = new QTextBrowser(m_codeGenerator);
+	m_generatedCodeBrowser->setObjectName("CodeGeneratorTextBrowser");
+	m_codeGenerator->layout()->addWidget(m_generatedCodeBrowser);
+	Style::setStyle(m_generatedCodeBrowser, style::properties::widget::textBrowser);
+
+	QPushButton *saveButton = new QPushButton("Save Code");
+	Style::setStyle(saveButton, style::properties::button::basicButton, true, true);
+	saveButton->setObjectName("SaveCodeButton");
+	connect(saveButton, &QPushButton::clicked, this, [this]() {
+		QString fileName = QFileDialog::getSaveFileName(this, "Save Code", "", "C++ Files (*.cpp *.h)");
+		if(!fileName.isEmpty()) {
+			QFile file(fileName);
+			if(file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+				file.write(m_generatedCodeBrowser->toPlainText().toUtf8());
+				file.close();
+			}
+		}
+	});
+
+	HoverWidget *hoverWidget = new HoverWidget(saveButton, m_generatedCodeBrowser, m_generatedCodeBrowser);
+	hoverWidget->setObjectName("SaveCodeHoverWidget");
+
+	hoverWidget->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+	hoverWidget->setContentPos(HoverPosition::HP_BOTTOMLEFT);
+	hoverWidget->setAnchorOffset(QPoint(-10, 10));
+	hoverWidget->setVisible(true);
+	hoverWidget->raise();
 }
 
 // --------------------------------------------------------

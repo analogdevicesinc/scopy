@@ -44,6 +44,8 @@ public:
 	void saveSettings(QSettings &);
 	void loadSettings(QSettings &);
 
+	QMap<QString, WatchListEntry *> *watchListEntries() const;
+
 public Q_SLOTS:
 	void addToWatchlist(IIOStandardItem *item);
 	void removeFromWatchlist(IIOStandardItem *item);
@@ -60,7 +62,7 @@ protected:
 private:
 	QList<int> m_offsets;
 	ApiObject *m_apiObject;
-	QMap<QString, WatchListEntry *> m_entryObjects;
+	QMap<QString, WatchListEntry *> *m_entryObjects;
 };
 
 class WatchListView_API : public ApiObject

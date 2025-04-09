@@ -20,9 +20,11 @@
  */
 
 #include "detailsview.h"
+#include "iiostandarditem.h"
 #include "style_properties.h"
 #include <QVBoxLayout>
 #include <style.h>
+#include "codegenerator.h"
 
 #define ADD_ICON ":/gui/icons/green_add.svg"
 #define REMOVE_ICON ":/gui/icons/orange_close.svg"
@@ -30,17 +32,18 @@
 using namespace scopy;
 using namespace scopy::debugger;
 
-DetailsView::DetailsView(QWidget *parent)
+DetailsView::DetailsView(QString uri, QWidget *parent)
 	: QWidget(parent)
-	, m_titlePath(new PathTitle("Select an IIO item.", this))
 	, m_guiDetailsView(new GuiDetailsView(this))
 	, m_cliDetailsView(new CliDetailsView(this))
 	, m_tabWidget(new QTabWidget(this))
 	, m_guiView(new QWidget(this))
 	, m_iioView(new QWidget(this))
+	, m_titleContainer(new QWidget(this))
+	, m_titlePath(new PathTitle("Select an IIO item.", this))
 	, m_readBtn(new AnimationPushButton(this))
 	, m_addToWatchlistBtn(new QPushButton(this))
-	, m_titleContainer(new QWidget(this))
+	, m_uri(uri)
 {
 	setupUi();
 	// Fw the signal
@@ -67,8 +70,15 @@ void DetailsView::setupUi()
 	m_guiView->layout()->addWidget(m_guiDetailsView);
 	m_iioView->layout()->addWidget(m_cliDetailsView);
 
+	m_generatedCodeView = new QWidget(this);
+	m_generatedCodeView->setLayout(new QVBoxLayout(m_generatedCodeView));
+	m_generatedCodeView->layout()->setContentsMargins(0, 0, 0, 0);
+	m_generatedCodeBrowser = new QTextBrowser(this);
+	m_generatedCodeView->layout()->addWidget(m_generatedCodeBrowser);
+
 	m_tabWidget->addTab(m_guiView, "GUI View");
 	m_tabWidget->addTab(m_iioView, "IIO View");
+	m_tabWidget->addTab(m_generatedCodeView, "Libiio Code");
 	QTabBar *tabBar = m_tabWidget->tabBar();
 	tabBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
@@ -109,6 +119,7 @@ void DetailsView::setIIOStandardItem(IIOStandardItem *item)
 	m_titlePath->setTitle(item->path());
 	m_guiDetailsView->setIIOStandardItem(item);
 	m_cliDetailsView->setIIOStandardItem(item);
+	this->resetGeneratedCodeView({item});
 }
 
 void DetailsView::refreshIIOView() { m_cliDetailsView->refreshView(); }
@@ -128,6 +139,16 @@ void DetailsView::setAddToWatchlistState(bool add)
 			Style::getPixmap(REMOVE_ICON, Style::getColor(json::theme::content_inverse)));
 		m_addToWatchlistBtn->setToolTip("Remove from Watchlist");
 	}
+}
+
+void DetailsView::resetGeneratedCodeView(QList<IIOStandardItem *> items)
+{
+	QList<CodeGenerator::CodeGeneratorRecipe> recipes;
+	for(auto item : qAsConst(items)) {
+		recipes.append(CodeGenerator::convertToCodeGeneratorRecipe(item, m_uri));
+	}
+
+	m_generatedCodeBrowser->setPlainText(CodeGenerator::generateCode(recipes));
 }
 
 #include "moc_detailsview.cpp"
