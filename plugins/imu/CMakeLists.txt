@@ -58,7 +58,8 @@ set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
 
-add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} # ${PROJECT_RESOURCES}
+add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES}
+    include/imuanalyzer/imuanalyzerinterface.hpp include/imuanalyzer/3Drenderer.hpp include/imuanalyzer/2DRenderer.hpp # ${PROJECT_RESOURCES}
 )
 
 generate_export_header(
@@ -68,12 +69,21 @@ generate_export_header(
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase)
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
+target_include_directories(${PROJECT_NAME} PRIVATE ${IIO_INCLUDE_DIRS} scopy-gui scopy-iio-widgets scopy-iioutil)
 
 foreach(comp ${SCOPY_QT_COMPONENTS})
 	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
 endforeach()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${SCOPY_QT_LIBRARIES} scopy-pluginbase)
+target_link_libraries(
+	${PROJECT_NAME}
+	PUBLIC Qt::Widgets
+	       Qt::Core
+	       scopy-pluginbase
+	       scopy-gui
+	       scopy-iioutil
+	       scopy-iio-widgets
+)
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
