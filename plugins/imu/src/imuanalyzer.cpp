@@ -48,7 +48,14 @@ void IMUAnalyzer::loadToolList()
 bool IMUAnalyzer::onConnect()
 {
 	m_toolList[0]->setEnabled(true);
-	m_toolList[0]->setTool(new QLabel("IMUAnalyzer"));
+
+	m_imuInterface = new IMUAnalyzerInterface();
+
+	QString tool_name = QString("IMUAnalyzer");
+
+	m_toolList.last()->setTool(m_imuInterface);
+	m_toolList.last()->setVisible(true);
+
 	return true;
 }
 

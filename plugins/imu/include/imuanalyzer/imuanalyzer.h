@@ -19,18 +19,28 @@
  *
  */
 
-#ifndef TESTPLUGIN_H
-#define TESTPLUGIN_H
+#ifndef IMUANALYZER_H
+#define IMUANALYZER_H
 
 #define SCOPY_PLUGIN_NAME IMUAnalyzer
 
 #include "scopy-imuanalyzer_export.h"
+#include "imuanalyzerinterface.hpp"
 
 #include <QLineEdit>
 #include <QObject>
 
+#include <QLabel>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QWidget>
+#include <toolbuttons.h>
+#include <tooltemplate.h>
+#include "qloggingcategory.h"
+
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
+#include "style.h"
 
 namespace scopy {
 
@@ -46,8 +56,14 @@ public:
 
 	bool onConnect() override;
 	bool onDisconnect() override;
+
+private:
+
+	IMUAnalyzerInterface *m_imuInterface;
+	QString m_toolIcon =
+		":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_datalogger.svg";
 };
 
 } // namespace scopy
 
-#endif // TESTPLUGIN_H
+#endif // IMUANALYZER
