@@ -2372,38 +2372,41 @@ bool HarmonicCalibration::readSequence()
 
 bool HarmonicCalibration::writeSequence(QMap<string, int> settings)
 {
-	bool success = false;
-
-	uint32_t generalRegisterAddress =
-		m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL);
-	uint32_t *generalRegValue = new uint32_t;
-	if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-						generalRegisterAddress, generalRegValue) != 0)
+	if(!disableECC(true))
 		return false;
 
-	uint32_t newGeneralRegValue =
-		m_admtController->setGeneralRegisterBitMapping(*generalRegValue, settings.toStdMap());
 	uint8_t generalRegisterPage =
 		m_admtController->getConfigurationPage(ADMTController::ConfigurationRegister::GENERAL);
 
 	if(!changeCNVPage(generalRegisterPage))
 		return false;
 
-	convertStart(false);
+	bool success = false;
 
-	if(m_admtController->writeDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
-						 generalRegisterAddress, newGeneralRegValue) != 0)
-		return false;
+	uint32_t generalRegisterAddress =
+		m_admtController->getConfigurationRegister(ADMTController::ConfigurationRegister::GENERAL);
+	uint32_t *generalRegValue = new uint32_t;
 
-	if(readSequence())
-		if(settings.value("Convert Synchronization") == GENERALRegisterMap.value("Convert Synchronization") &&
+	if(m_admtController->readDeviceRegistry(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+						generalRegisterAddress, generalRegValue) == 0) {
+		uint32_t newGeneralRegValue =
+			m_admtController->setGeneralRegisterBitMapping(*generalRegValue, settings.toStdMap());
+
+		if(convertStart(false) && changeCNVPage(generalRegisterPage) &&
+		   m_admtController->writeDeviceRegistry(
+			   m_admtController->getDeviceId(ADMTController::Device::ADMT4000), generalRegisterAddress,
+			   newGeneralRegValue) == 0 &&
+		   readSequence() &&
+		   settings.value("Convert Synchronization") == GENERALRegisterMap.value("Convert Synchronization") &&
 		   settings.value("Angle Filter") == GENERALRegisterMap.value("Angle Filter") &&
 		   settings.value("8th Harmonic") == GENERALRegisterMap.value("8th Harmonic") &&
 		   settings.value("Sequence Type") == GENERALRegisterMap.value("Sequence Type") &&
-		   settings.value("Conversion Type") == GENERALRegisterMap.value("Conversion Type"))
+		   settings.value("Conversion Type") == GENERALRegisterMap.value("Conversion Type")) {
 			success = true;
+		}
+	}
 
-	convertStart(true);
+	delete generalRegValue;
 
 	return success;
 }
@@ -2689,12 +2692,10 @@ bool HarmonicCalibration::updateChannelValues()
 		updateChannelValue(3);
 	} else if(readMode == 1) {
 		if(conversionMode == 1)
-			convertStart(true);
+			convertRestart();
 		updateSensorValue(ADMTController::SensorRegister::ANGLE);
 		updateSensorValue(ADMTController::SensorRegister::ABSANGLE);
 		updateSensorValue(ADMTController::SensorRegister::TMP0);
-		if(conversionMode == 1)
-			convertStart(false);
 	}
 
 	if(rotation == UINT32_MAX)
@@ -2730,10 +2731,6 @@ bool HarmonicCalibration::updateSensorValue(ADMTController::SensorRegister senso
 			break;
 		case ADMTController::SensorRegister::ANGLE:
 			angle = m_admtController->getAngle(static_cast<uint16_t>(*registerValue));
-			if(angle < 5) {
-				qInfo() << angle;
-				qInfo() << *registerValue;
-			}
 			break;
 		case ADMTController::SensorRegister::TMP0:
 			temp = m_admtController->getTemperature(static_cast<uint16_t>(*registerValue));
@@ -2896,37 +2893,61 @@ void HarmonicCalibration::updateAcquisitionMotorRotationDirection()
 void HarmonicCalibration::getAcquisitionSamples(QMap<SensorData, bool> dataMap)
 {
 	QMap<SensorData, double> sensorDataMap;
+	bool dataChanged = false;
 	while(isStartAcquisition) {
 		if(updateChannelValues()) {
-			if(dataMap.value(ANGLE))
+			dataChanged = false;
+
+			if(dataMap.value(ANGLE)) {
 				sensorDataMap[ANGLE] = angle;
-			if(dataMap.value(ABSANGLE))
+				dataChanged = true;
+			}
+			if(dataMap.value(ABSANGLE)) {
 				sensorDataMap[ABSANGLE] = rotation;
-			if(dataMap.value(TMP0))
+				dataChanged = true;
+			}
+			if(dataMap.value(TMP0)) {
 				sensorDataMap[TMP0] = temp;
-			if(dataMap.value(SINE))
+				dataChanged = true;
+			}
+			if(dataMap.value(SINE)) {
 				sensorDataMap[SINE] =
 					getSensorDataAcquisitionValue(ADMTController::SensorRegister::SINE);
-			if(dataMap.value(COSINE))
+				dataChanged = true;
+			}
+			if(dataMap.value(COSINE)) {
 				sensorDataMap[COSINE] =
 					getSensorDataAcquisitionValue(ADMTController::SensorRegister::COSINE);
-			if(dataMap.value(RADIUS))
+				dataChanged = true;
+			}
+			if(dataMap.value(RADIUS)) {
 				sensorDataMap[RADIUS] =
 					getSensorDataAcquisitionValue(ADMTController::SensorRegister::RADIUS);
-			if(dataMap.value(ANGLESEC))
+				dataChanged = true;
+			}
+			if(dataMap.value(ANGLESEC)) {
 				sensorDataMap[ANGLESEC] =
 					getSensorDataAcquisitionValue(ADMTController::SensorRegister::ANGLESEC);
-			if(dataMap.value(SECANGLI))
+				dataChanged = true;
+			}
+			if(dataMap.value(SECANGLI)) {
 				sensorDataMap[SECANGLI] =
 					getSensorDataAcquisitionValue(ADMTController::SensorRegister::SECANGLI);
-			if(dataMap.value(SECANGLQ))
+				dataChanged = true;
+			}
+			if(dataMap.value(SECANGLQ)) {
 				sensorDataMap[SECANGLQ] =
 					getSensorDataAcquisitionValue(ADMTController::SensorRegister::SECANGLQ);
-			if(dataMap.value(TMP1))
+				dataChanged = true;
+			}
+			if(dataMap.value(TMP1)) {
 				sensorDataMap[TMP1] =
 					getSensorDataAcquisitionValue(ADMTController::SensorRegister::TMP1);
+				dataChanged = true;
+			}
 
-			Q_EMIT acquisitionDataChanged(sensorDataMap);
+			if(dataChanged)
+				Q_EMIT acquisitionDataChanged(sensorDataMap);
 		}
 	}
 }
@@ -3327,18 +3348,16 @@ void HarmonicCalibration::startCalibration()
 	graphDataList.reserve(totalSamplesCount);
 	graphDataList.squeeze();
 
-	configureConversionType(calibrationMode);
-
-	configureCalibrationSequenceSettings();
-	clearHarmonicRegisters();
-
-	toggleTabSwitching(false);
-	toggleCalibrationControls(false);
-
 	calibrationDataGraphTabWidget->setCurrentIndex(0);
 	calibrationRawDataXPlotAxis->setInterval(0, totalSamplesCount);
 
+	toggleTabSwitching(false);
+	toggleCalibrationControls(false);
 	toggleCalibrationButtonState(1);
+
+	configureCalibrationSequenceSettings(calibrationMode);
+	clearHarmonicRegisters();
+	convertRestart();
 	if(calibrationMode == 0)
 		startContinuousCalibration();
 	else
@@ -3399,7 +3418,7 @@ void HarmonicCalibration::resetMotorToZero()
 {
 	if(readMotorAttributeValue(ADMTController::MotorAttribute::CURRENT_POS, current_pos) == 0) {
 		if(current_pos != 0) {
-			setRampMode(true); // Write to ramp mode in case of motor disable
+			setRampMode(isMotorRotationClockwise); // Write to ramp mode in case of motor disable
 			writeMotorAttributeValue(ADMTController::MotorAttribute::ROTATE_VMAX,
 						 convertRPStoVMAX(convertRPMtoRPS(fast_motor_rpm)));
 			writeMotorAttributeValue(ADMTController::MotorAttribute::TARGET_POS, 0);
@@ -3490,27 +3509,15 @@ int HarmonicCalibration::calculateContinuousCalibrationSampleRate(double motorRP
 	return static_cast<int>(floor(1 / motorRPS / samplesPerCycle * 1000 * 1000 * 1000)); // In nanoseconds
 }
 
-void HarmonicCalibration::configureConversionType(int mode)
+void HarmonicCalibration::configureCalibrationSequenceSettings(int conversionMode)
 {
-	readSequence();
-	if(!GENERALRegisterMap.contains("Conversion Type")) {
-		StatusBarManager::pushMessage("Failed to configure calibration conversion type");
-		return;
-	}
-
-	GENERALRegisterMap["Conversion Type"] = mode;
-	writeSequence(GENERALRegisterMap);
-}
-
-void HarmonicCalibration::configureCalibrationSequenceSettings()
-{
-	readSequence();
-	if(!GENERALRegisterMap.contains("8th Harmonic")) {
+	if(!readSequence()) {
 		StatusBarManager::pushMessage("Failed to configure calibration sequence settings");
 		return;
 	}
 
-	GENERALRegisterMap["8th Harmonic"] = 1; // User-supplied 8th Harmonic
+	GENERALRegisterMap["Conversion Type"] = conversionMode; // 0: One-shot Conversion, 1: Continuous Conversion
+	GENERALRegisterMap["8th Harmonic"] = 1;			// Always use user-supplied 8th Harmonic
 	writeSequence(GENERALRegisterMap);
 }
 
