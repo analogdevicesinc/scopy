@@ -319,8 +319,7 @@ private:
 	void stopWaitForVelocityReachedThread();
 	void waitForVelocityReached(int mode, int sampleRate);
 	int calculateContinuousCalibrationSampleRate(double motorRPS, int samplesPerCycle);
-	void configureConversionType(int mode);
-	void configureCalibrationSequenceSettings();
+	void configureCalibrationSequenceSettings(int conversionMode);
 	void startOneShotCalibration();
 	void postCalibrateData();
 	void resetAllCalibrationState();
