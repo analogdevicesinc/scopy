@@ -56,10 +56,12 @@ endif()
 
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED Core Gui Widgets 3DCore 3DExtras 3DRender 3DInput)
+find_package(OpenGL REQUIRED)
+find_package(GLUT REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES}
-    include/imuanalyzer/imuanalyzerinterface.hpp include/imuanalyzer/3Drenderer.hpp include/imuanalyzer/2DRenderer.hpp # ${PROJECT_RESOURCES}
+    include/imuanalyzer/imuanalyzerinterface.hpp include/imuanalyzer/3Drenderer.hpp include/imuanalyzer/2Drenderer.hpp # ${PROJECT_RESOURCES}
 )
 
 generate_export_header(
@@ -70,7 +72,7 @@ target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
-target_include_directories(${PROJECT_NAME} PRIVATE ${IIO_INCLUDE_DIRS} scopy-gui scopy-iio-widgets scopy-iioutil)
+target_include_directories(${PROJECT_NAME} PRIVATE ${IIO_INCLUDE_DIRS} scopy-gui scopy-iio-widgets scopy-iioutil ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS})
 
 foreach(comp ${SCOPY_QT_COMPONENTS})
 	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
@@ -84,6 +86,15 @@ target_link_libraries(
 	       scopy-gui
 	       scopy-iioutil
 	       scopy-iio-widgets
+               Qt5::Core
+               Qt5::Gui
+               Qt5::Widgets
+               Qt5::3DCore
+               Qt5::3DExtras
+               Qt5::3DRender
+               Qt5::3DInput
+               ${OPENGL_LIBRARIES}
+               ${GLUT_LIBRARY}
 )
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
