@@ -6,471 +6,302 @@ import argparse
 import shutil
 from mako.template import Template
 
-parser = argparse.ArgumentParser(
-    prog="Plugin generator",
-    description="Support script for plugin development",
-    epilog="Text at the bottom of help",
-)
+MODE = 0o775
+FILES_CREATED = []
+DIRS_CREATED = []
 
-parser.add_argument(
-    "-s", "--scopy_path", help="Path to the Scopy repository"
-)
-parser.add_argument(
-    "-c",
-    "--config_file_path",
-    help="Path to the plugin generator configuration file",
-)
+def log_created_file(path):
+    FILES_CREATED.append(path)
 
-args = parser.parse_args()
-pathToScopy = ""
-if args.scopy_path:
-    pathToScopy = args.scopy_path
-else:
-    pathToScopy = os.path.dirname(os.path.dirname(os.getcwd()))
+def log_created_dir(path):
+    DIRS_CREATED.append(path)
 
-pathToConfigFile = ""
-if args.config_file_path:
-    pathToConfigFile = args.config_file_path
-else:
-    pathToConfigFile = os.path.join(pathToScopy, "tools/plugingenerator/config.json")
-
-if not os.path.exists(pathToConfigFile):
-    print("Couldn't find the " + pathToConfigFile + " file!")
-    exit(1)
-
-configFile = open(pathToConfigFile, "r")
-generatorOptions = json.load(configFile)
-configFile.close()
-
-mode = 0o775
-
-filesGenerated = []
-directoriesGenerated = []
-pdkSupport = generatorOptions["pdk"]["enable"]
-pluginDirName = generatorOptions["plugin"]["dir_name"]
-pluginName = generatorOptions["plugin"]["plugin_name"]
-pluginDisplayName = generatorOptions["plugin"]["plugin_display_name"]
-pluginDecription = generatorOptions["plugin"]["plugin_description"]
-pluginClassName = generatorOptions["plugin"]["class_name"]
-pluginExportMacro = "SCOPY_" + pluginName.upper() + "_EXPORT"
-
-print("Starting file generation:")
-
-pluginsPath = os.path.join(pathToScopy, "plugins")
-if pdkSupport:
-    pdkPath = generatorOptions["pdk"]["project_path"]
-    if not pdkPath:
-        pdkPath = os.path.join(pathToScopy, "ScopyPluginRunner")
+def create_directory(path):
+    if not os.path.exists(path):
+        os.makedirs(path, MODE)
+        log_created_dir(path)
     else:
-        pdkPath = os.path.join(pdkPath, "ScopyPluginRunner")
-    try:
-        os.makedirs(pdkPath, mode)
-        directoriesGenerated.append(pdkPath)
-    except FileExistsError:
-        print(pdkPath + " directory already exists!")
-    
-    pluginsPath = os.path.join(pdkPath, "plugin")
-    try:
-        os.mkdir(pluginsPath, mode)
-        directoriesGenerated.append(pluginsPath)
-    except FileExistsError:
-        print(pluginsPath + " directory already exists!")
-    
+        print(f"{path} already exists!")
 
-if not os.path.exists(pluginsPath):
-    print("Couldn't find " + pluginsPath + " path!")
-    exit(1)
+def create_file_from_template(template_path, output_path, **kwargs):
+    if not os.path.exists(output_path):
+        template = Template(filename=template_path)
+        content = template.render(**kwargs)
+        with open(output_path, "w") as f:
+            f.write(content)
+        log_created_file(output_path)
+    else:
+        print(f"{output_path} already exists!")
 
-#################################################### Plugin dir #############################################
-newPluginPath = os.path.join(pluginsPath, pluginDirName)
-if not os.path.exists(newPluginPath):
-    os.mkdir(newPluginPath, mode)
-    directoriesGenerated.append(newPluginPath)
+def get_args():
+    parser = argparse.ArgumentParser(
+        prog="Plugin generator",
+        description="Support script for plugin development",
+    )
+    parser.add_argument("-s", "--scopy_path", help="Path to the Scopy repository")
+    parser.add_argument("-c", "--config_file_path", help="Path to the configuration file")
+    return parser.parse_args()
 
-############################################# Plugin Source Configuration ####################################
-if os.path.exists(newPluginPath):
-    pluginSrcConfigPath = os.path.join(newPluginPath, "plugin_src_config.json")
-    createSrcJson = True
-    if os.path.exists(pluginSrcConfigPath):
-        pluginSrcConfigFile = open(pluginSrcConfigPath, "r")
-        srcGeneratorOptions = json.load(pluginSrcConfigFile)
-        pluginSrcConfigFile.close()
-        if srcGeneratorOptions == generatorOptions:
-            createSrcJson = False
-        else:
-            print(
-                "The configuration file has been changed! Do you want to apply these changes?\n"
-                "*All the data in the plugin forlder will be lost!"
-            )
-            key = ""
-            while key not in {"y", "n"}:
-                key = input("Type 'y' (yes) or 'n' (no)\n")
-            if key == "y":
-                for file in os.listdir(newPluginPath):
-                    filePath = os.path.join(newPluginPath, file)
-                    if os.path.isfile(filePath):
-                        os.unlink(filePath)
-                    elif os.path.isdir(filePath):
-                        shutil.rmtree(filePath)
+def load_config(path):
+    if not os.path.exists(path):
+        print(f"Couldn't find the {path} file!")
+        exit(1)
+    with open(path, "r") as f:
+        return json.load(f)
+
+def confirm(prompt):
+    while True:
+        answer = input(prompt + " (y/n): ").lower()
+        if answer in {"y", "n"}:
+            return answer == "y"
+
+def maybe_clear_plugin_dir(plugin_path, config):
+    config_path = os.path.join(plugin_path, "plugin_src_config.json")
+    if os.path.exists(config_path):
+        with open(config_path, "r") as f:
+            old_config = json.load(f)
+        if old_config != config:
+            print("Configuration changed. This will clear existing plugin directory.")
+            if confirm("Apply changes and delete existing files?"):
+                for item in os.listdir(plugin_path):
+                    item_path = os.path.join(plugin_path, item)
+                    if os.path.isfile(item_path):
+                        os.unlink(item_path)
+                    else:
+                        shutil.rmtree(item_path)
+                return True
             else:
-                createSrcJson = False
-    if createSrcJson:
-        pluginSrcConfigFile = open(pluginSrcConfigPath, "w")
-        json.dump(generatorOptions, pluginSrcConfigFile, indent=4)
-        pluginSrcConfigFile.close()
-        filesGenerated.append(pluginSrcConfigPath)
-    else:
-        print(pluginSrcConfigPath + " file already exists!")
+                return False
+    return True
 
-####################################################### pdk ##################################################
-if pdkSupport:
-    scopyPdkDeps = generatorOptions["pdk"]["deps_path"]
-    pdkPreferencesPath = os.path.join(pdkPath, "preferences.ini")
-    if not os.path.exists(pdkPreferencesPath):
-        pdkPreferences = open(pdkPreferencesPath, "w")
-        pdkPreferences.close()
-    
-    pdkCmakeFuncFilePath = os.path.join(pdkPath, "PdkSupport.cmake")
-    if not os.path.exists(pdkCmakeFuncFilePath):
-        pdkCmakeFuncTemplate = Template(
-            filename="templates/pdk/pdk_cmake_func_template.mako"
+def save_config(plugin_path, config):
+    config_path = os.path.join(plugin_path, "plugin_src_config.json")
+    with open(config_path, "w") as f:
+        json.dump(config, f, indent=4)
+    log_created_file(config_path)
+
+def generate_tool_sources(tools, include_path, src_path, plugin_name, plugin_export_macro):
+    for tool in tools:
+        header_path = os.path.join(include_path, f"{tool['file_name']}.h")
+        src_path_file = os.path.join(src_path, f"{tool['file_name']}.cpp")
+
+        create_file_from_template(
+            "templates/plugin/tool_header_template.mako", header_path,
+            plugin_export_macro=plugin_export_macro, plugin_name=plugin_name, config=tool
         )
-        pdkCmakeFuncContent = pdkCmakeFuncTemplate.render()
-        pdkCmakeFuncFile = open(pdkCmakeFuncFilePath, "w")
-        pdkCmakeFuncFile.write(pdkCmakeFuncContent)
-        pdkCmakeFuncFile.close()
-        filesGenerated.append(pdkCmakeFuncFilePath)
-    else:
-        print(pdkCmakeFuncFilePath + " file already exists!")
 
-    pdkCmakeFilePath = os.path.join(pdkPath, "CMakeLists.txt")
-    if not os.path.exists(pdkCmakeFilePath):
-        pdkCmakeTemplate = Template(
-            filename="templates/pdk/pdk_cmake_template.mako"
+        create_file_from_template(
+            "templates/plugin/tool_src_template.mako", src_path_file,
+            config=tool
         )
-        pdkCmakeContent = pdkCmakeTemplate.render(
-            deps_path=scopyPdkDeps,
-            plugin_dir=pluginDirName, 
-            plugin_name=pluginName,
-            preferences_path = pdkPreferencesPath
-        )
-        pdkCmakeFile = open(pdkCmakeFilePath, "w")
-        pdkCmakeFile.write(pdkCmakeContent)
-        pdkCmakeFile.close()
-        filesGenerated.append(pdkCmakeFilePath)
-    else:
-        print(pdkCmakeFilePath + " file already exists!")
 
-    pdkIncludePath = os.path.join(pdkPath, "include")
-    try:
-        os.mkdir(pdkIncludePath, mode)
-        directoriesGenerated.append(pdkIncludePath)
-    except FileExistsError:
-        print(pdkIncludePath + " directory already exists!")
+def generate_plugin(plugin_path, config):
+    pdk_enable = config.get("pdk", {}).get("enable", False)
+    plugin = config["plugin"]
+    test = config.get("test", {})
+    resources = config.get("resources", {})
+    doc_enabled = config.get("doc", False)
 
-    pdkHeaderFilePath = os.path.join(pdkIncludePath, "pdkwindow.h")
-    if not os.path.exists(pdkHeaderFilePath):
-        pdkHeaderTemplate = Template(
-            filename="templates/pdk/pdk_header_template.mako"
-        )
-        pdkHeaderContent = pdkHeaderTemplate.render()
-        pdkHeaderFile = open(pdkHeaderFilePath, "w")
-        pdkHeaderFile.write(pdkHeaderContent)
-        pdkHeaderFile.close()
-        filesGenerated.append(pdkHeaderFilePath)
-    else:
-        print(pdkHeaderFilePath + " file already exists!")
+    plugin_name = plugin["plugin_name"]
+    plugin_dir = plugin["dir_name"]
+    plugin_class = plugin["class_name"]
+    plugin_export_macro = f"SCOPY_{plugin_name.upper()}_EXPORT"
 
-    pdkCmakeInFilePath = os.path.join(pdkIncludePath, "pdk-util_config.h.cmakein")
-    if not os.path.exists(pdkCmakeInFilePath):
-        pdkCmakeInTemplate = Template(
-            filename="templates/pdk/pdk_cmakein_template.mako"
-        )
-        pdkCmakeInTemplate = pdkCmakeInTemplate.render()
-        pdkCmakeInFile = open(pdkCmakeInFilePath, "w")
-        pdkCmakeInFile.write(pdkCmakeInTemplate)
-        pdkCmakeInFile.close()
-        filesGenerated.append(pdkCmakeInFilePath)
-    else:
-        print(pdkCmakeInFilePath + " file already exists!")
+    include_path = os.path.join(plugin_path, "include", plugin_name)
+    src_path = os.path.join(plugin_path, "src")
+    ui_path = os.path.join(plugin_path, "ui")
+    doc_path = os.path.join(plugin_path, "doc")
+    test_path = os.path.join(plugin_path, "test")
+    res_path = os.path.join(plugin_path, "res")
 
-    pdkSrcPath = os.path.join(pdkPath, "src")
-    try:
-        os.mkdir(pdkSrcPath, mode)
-        directoriesGenerated.append(pdkSrcPath)
-    except FileExistsError:
-        print(pdkSrcPath + " directory already exists!")
+    for path in [include_path, src_path, ui_path]:
+        create_directory(path)
 
-    pdkSrcFilePath = os.path.join(pdkSrcPath, "main.cpp")
-    if not os.path.exists(pdkSrcFilePath):
-        pdkSrcTemplate = Template(
-            filename="templates/pdk/pdk_src_template.mako"
-        )
-        pdkSrcContent = pdkSrcTemplate.render()
-        pdkSrcFile = open(pdkSrcFilePath, "w")
-        pdkSrcFile.write(pdkSrcContent)
-        pdkSrcFile.close()
-        filesGenerated.append(pdkSrcFilePath)
+    if doc_enabled:
+        create_directory(doc_path)
 
-    pdkResPath = os.path.join(pdkPath, "res")
-    try:
-        os.mkdir(pdkResPath, mode)
-        directoriesGenerated.append(pdkResPath)
-    except FileExistsError:
-        print(pdkResPath + " directory already exists!")
+    # Test directory
+    if test:
+        create_directory(test_path)
+        if test["cmakelists"]:
+            test_cmake = os.path.join(test_path, "CMakeLists.txt")
+            with open(test_cmake, "w") as f:
+                f.write(f"cmake_minimum_required(VERSION {test['cmake_min_required']})\n")
+                if not pdk_enable:
+                    if test.get("tst_pluginloader"):
+                        f.write("include(ScopyTest)\n\nsetup_scopy_tests(pluginloader)")
+            log_created_file(test_cmake)
 
-    pdkResQrc = os.path.join(pdkResPath, "resources.qrc")
-    if not os.path.exists(pdkResQrc):
-        resFile = open(pdkResQrc, "w")
-        resFile.write("<RCC>\n")
-        resFile.write(" <qresource prefix=\"/\">\n")
-        resFile.write(" </qresource>\n")
-        resFile.write("</RCC>")
-        resFile.close()
-        filesGenerated.append(pdkResQrc)
-
-##################################################### Include ################################################
-includePath = os.path.join(newPluginPath, "include")
-try:
-    os.mkdir(includePath, mode)
-    directoriesGenerated.append(includePath)
-except FileExistsError:
-    print(includePath + " directory already exists!")
-pluginIncludePath = os.path.join(includePath, pluginName)
-try:
-    os.mkdir(pluginIncludePath, mode)
-    directoriesGenerated.append(pluginIncludePath)
-except FileExistsError:
-    print(pluginIncludePath + " directory already exists!")
-
-
-if os.path.exists(pluginIncludePath):
-    pluginHeaderFilePath = os.path.join(pluginIncludePath, pluginName + ".h")
-    if not os.path.exists(pluginHeaderFilePath):
-        pluginHeaderTemplate = Template(
-            filename="templates/plugin_header_template.mako"
-        )
-        headerContent = pluginHeaderTemplate.render(
-            plugin_export_macro=pluginExportMacro, config=generatorOptions["plugin"]
-        )
-        pluginHeaderFile = open(pluginHeaderFilePath, "w")
-        pluginHeaderFile.write(headerContent)
-        pluginHeaderFile.close()
-        filesGenerated.append(pluginHeaderFilePath)
-    else:
-        print(pluginHeaderFilePath + " file already exists!")
-
-##################################################### Source #################################################
-srcPath = os.path.join(newPluginPath, "src")
-try:
-    os.mkdir(srcPath, mode)
-    directoriesGenerated.append(srcPath)
-except FileExistsError:
-    print(srcPath + " directory already exists!")
-
-####################################################### Ui ###################################################
-try:
-    uiPath = os.path.join(newPluginPath, "ui")
-    os.mkdir(uiPath, mode)
-    directoriesGenerated.append(uiPath)
-except FileExistsError:
-    print(uiPath + " directory already exists!")
-
-####################################################### Doc ###################################################
-if "doc" in generatorOptions and generatorOptions["doc"]:
-    docPath = os.path.join(newPluginPath, "doc")
-    try:
-        os.mkdir(docPath, mode)
-        directoriesGenerated.append(docPath)
-    except FileExistsError:
-        print(docPath + " directory already exists!")
-
-####################################################### Test ###################################################
-if "test" in generatorOptions:
-    testPath = os.path.join(newPluginPath, "test")
-    try:
-        os.mkdir(testPath, mode)
-        directoriesGenerated.append(testPath)
-    except FileExistsError:
-        print(testPath + " directory already exists!")
-if generatorOptions["test"]["cmakelists"]:
-    testCmakePath = os.path.join(testPath, "CMakeLists.txt")
-    if not os.path.exists(testCmakePath):
-        testCmakeFile = open(testCmakePath, "w")
-        testCmakeFile.write(
-            "cmake_minimum_required(VERSION "
-            + str(generatorOptions["test"]["cmake_min_required"])
-            + ")\n\n"
-        )
-        if not pdkSupport:
-            if generatorOptions["test"]["tst_pluginloader"]:
-                testCmakeFile.write("include(ScopyTest)\n\nsetup_scopy_tests(pluginloader)")
-        filesGenerated.append(testCmakePath)
-    else:
-        print(testCmakePath + " file already exists!")
-    if generatorOptions["test"]["tst_pluginloader"]:
-        pluginLoaderTestPath = os.path.join(testPath, "tst_pluginloader.cpp")
-        if not os.path.exists(pluginLoaderTestPath):
-            pluginloaderTemplate = Template(
-                filename="templates/pluginloader_template.mako"
+        if test.get("tst_pluginloader"):
+            plugin_loader_test = os.path.join(test_path, "tst_pluginloader.cpp")
+            create_file_from_template(
+                "templates/plugin/pluginloader_template.mako", plugin_loader_test,
+                tst_classname=f"TST_{plugin_class}", plugin_classname=plugin_class, plugin_name=plugin_name
             )
-            pluginLoaderTestContent = pluginloaderTemplate.render(
-                tst_classname="TST_" + pluginClassName,
-                plugin_classname=pluginClassName,
-                plugin_name=pluginName,
-            )
-            pluginLoaderTestFile = open(pluginLoaderTestPath, "w")
-            pluginLoaderTestFile.write(pluginLoaderTestContent)
-            pluginLoaderTestFile.close()
-            filesGenerated.append(pluginLoaderTestPath)
-        else:
-            print(pluginLoaderTestPath + " file already exists!")
 
-##################################################### Resources ################################################
-if "resources" in generatorOptions:
-    resPath = os.path.join(newPluginPath, "res")
-    try:
-        os.mkdir(resPath, mode)
-        directoriesGenerated.append(resPath)
-    except FileExistsError:
-        print(resPath + " directory already exists!")
-    if generatorOptions["resources"]["resources_qrc"]:
-        resQrc = os.path.join(resPath, "resources.qrc")
-        if not os.path.exists(resQrc):
-            resFile = open(resQrc, "w")
-            resFile.write("<!DOCTYPE RCC>\n")
-            resFile.write('<RCC version="1.0"/>')
-            resFile.close()
-            filesGenerated.append(resQrc)
-        else:
-            print(resQrc + " file already exists!")
+    # Resources directory
+    if resources and resources.get("resources_qrc"):
+        create_directory(res_path)
+        res_qrc = os.path.join(res_path, "resources.qrc")
+        if not os.path.exists(res_qrc):
+            with open(res_qrc, "w") as f:
+                f.write("<!DOCTYPE RCC>\n<RCC version=\"1.0\"/>")
+            log_created_file(res_qrc)
 
-##################################################### Plugin CMakeLists #########################################
-
-if generatorOptions["plugin"]["cmakelists"]:
-    cmakeListsPath = os.path.join(newPluginPath, "CMakeLists.txt")
-    cmakeTemplate = Template(filename="templates/cmakelists_template.mako")
-    
-    cmakeContent = cmakeTemplate.render(
-        pdk_en=pdkSupport,
-        scopy_module=pluginName,
-        plugin_display_name=pluginDisplayName, 
-        plugin_description=pluginDecription, config=generatorOptions["cmakelists"]
+    # Plugin header and source files
+    plugin_header = os.path.join(include_path, f"{plugin_name}.h")
+    create_file_from_template(
+        "templates/plugin/plugin_header_template.mako", plugin_header,
+        plugin_export_macro=plugin_export_macro, config=plugin
     )
 
-if not os.path.exists(cmakeListsPath):
-    cmakeListsFile = open(cmakeListsPath, "w")
-    cmakeListsFile.write(cmakeContent)
-    cmakeListsFile.close()
-    filesGenerated.append(cmakeListsPath)
-else:
-    print(cmakeListsPath + " file already exists!")
-########################################### Plugin CMAKE variable configuration file ##########################
-if os.path.exists(pluginIncludePath):
-    cmakeinFilePath = os.path.join(pluginIncludePath, "scopy-" + pluginName + "_config.h.cmakein")
-    if not os.path.exists(cmakeinFilePath):
-        cmakeinFileTemplate =  Template(
-                filename="templates/plugin_cmake_config_vars.mako"
-            )
-        cmakeinFileContent = cmakeinFileTemplate.render(
-                plugin_name=pluginName
-            )
-        
-        cmakeinFile = open(cmakeinFilePath, "w")
-        cmakeinFile.write(cmakeinFileContent)
-        cmakeinFile.close()
-        filesGenerated.append(cmakeinFilePath)
-        
+    plugin_src = os.path.join(src_path, f"{plugin_name}.cpp")
+    create_file_from_template(
+        "templates/plugin/plugin_src_template.mako", plugin_src,
+        config=plugin
+    )
+
+    # CMakeLists.txt
+    if plugin["cmakelists"]:
+        cmake_path = os.path.join(plugin_path, "CMakeLists.txt")
+        create_file_from_template(
+            "templates/plugin/cmakelists_template.mako", cmake_path,
+            pdk_en=False,
+            scopy_module=plugin_name,
+            plugin_display_name=plugin["plugin_display_name"],
+            plugin_description=plugin["plugin_description"],
+            config=config["cmakelists"]
+        )
+
+    # Cmake config header
+    cmakein_path = os.path.join(include_path, f"scopy-{plugin_name}_config.h.cmakein")
+    create_file_from_template(
+        "templates/plugin/plugin_cmake_config_vars.mako", cmakein_path,
+        plugin_name=plugin_name
+    )
+
+    generate_tool_sources(plugin["tools"], include_path, src_path, plugin_name, plugin_export_macro)
+
+    # gitignore handling
+    gitignore_path = os.path.join(plugin_path, ".gitignore")
+    if not os.path.exists(gitignore_path):
+        with open(gitignore_path, "w") as f:
+            f.write(f"include/{plugin_name}/scopy-{plugin_name}_export.h\n")
+            f.write(f"include/{plugin_name}/scopy-{plugin_name}_config.h\n")
+        print("Plugin .gitignore file created!")
+
+
+def generate_pdk(pdkPath, config):
+    scopyPdkDeps = config["pdk"]["deps_path"]
+    pluginName = config["plugin"]["plugin_name"]
+    pluginDirName = config["plugin"]["dir_name"]
+
+    create_directory(pdkPath)
+
+    # preferences.ini
+    preferences_path = os.path.join(pdkPath, "preferences.ini")
+    if not os.path.exists(preferences_path):
+        pdk_preferences = open(preferences_path, "w")
+        pdk_preferences.close()
+
+    # PdkSupport.cmake
+    create_file_from_template(
+        "templates/pdk/pdk_cmake_func_template.mako",
+        os.path.join(pdkPath, "PdkSupport.cmake")
+    )
+
+    # CMakeLists.txt
+    create_file_from_template(
+        "templates/pdk/pdk_cmake_template.mako",
+        os.path.join(pdkPath, "CMakeLists.txt"),
+            deps_path = scopyPdkDeps,
+            plugin_dir = pluginDirName,
+            plugin_name = pluginName,
+            preferences_path = preferences_path
+    )
+
+    # include directory and pdkwindow.h + pdk-util_config.h.cmakein
+    include_path = os.path.join(pdkPath, "include")
+    create_directory(include_path)
+
+    create_file_from_template(
+        "templates/pdk/pdk_header_template.mako",
+        os.path.join(include_path, "pdkwindow.h")
+    )
+
+    create_file_from_template(
+        "templates/pdk/pdk_cmakein_template.mako",
+        os.path.join(include_path, "pdk-util_config.h.cmakein")
+    )
+
+    # src directory and main.cpp
+    src_path = os.path.join(pdkPath, "src")
+    create_directory(src_path)
+
+    create_file_from_template(
+        "templates/pdk/pdk_src_template.mako",
+        os.path.join(src_path, "main.cpp")
+    )
+
+    # res directory and resources.qrc
+    res_path = os.path.join(pdkPath, "res")
+    create_directory(res_path)
+
+    res_qrc_path = os.path.join(res_path, "resources.qrc")
+    if not os.path.exists(res_qrc_path):
+        content = "<RCC>\n <qresource prefix=\"/\">\n </qresource>\n</RCC>"
+        with open(res_qrc_path, "w") as f:
+            f.write(content)
+        FILES_CREATED.append(res_qrc_path)
     else:
-        print(cmakeinFilePath + " file already exists!")
+        print(res_qrc_path + " file already exists!")
+    
     
 
-##################################################### Plugin ToolList #########################################
-toolList = generatorOptions["plugin"]["tools"]
-if toolList:
-    for t in toolList:
-        if os.path.exists(pluginIncludePath) and os.path.exists(srcPath):
-            includeFilePath = os.path.join(pluginIncludePath, t["file_name"] + ".h")
-            srcFilePath = os.path.join(srcPath, t["file_name"] + ".cpp")
+def main():
+    args = get_args()
+    scopy_path = args.scopy_path or os.path.dirname(os.path.dirname(os.getcwd()))
+    config_path = args.config_file_path or os.path.join(scopy_path, "tools/plugingenerator/config.json")
+    config = load_config(config_path)
 
-            includeFileTemplate = Template(
-                filename="templates/tool_header_template.mako"
-            )
-            includeFileContent = includeFileTemplate.render(
-                plugin_export_macro=pluginExportMacro, plugin_name=pluginName, config=t
-            )
-            if not os.path.exists(includeFilePath):
-                includeFile = open(includeFilePath, "w")
-                includeFile.write(includeFileContent)
-                includeFile.close()
-                filesGenerated.append(includeFilePath)
-            else:
-                print(includeFilePath + " file already exists!")
-
-            srcFileTemplate = Template(filename="templates/tool_src_template.mako")
-            srcFileContent = srcFileTemplate.render(config=t)
-
-            if not os.path.exists(srcFilePath):
-                srcFile = open(srcFilePath, "w")
-                srcFile.write(srcFileContent)
-                srcFile.close()
-                filesGenerated.append(srcFilePath)
-            else:
-                print(srcFilePath + " file already exists!")
-
-################################################### Plugin Src #################################################
-if os.path.exists(srcPath):
-    pluginSourceFilePath = os.path.join(srcPath, pluginName + ".cpp")
-    if not os.path.exists(pluginSourceFilePath):
-        pluginSrcTemplate = Template(filename="templates/plugin_src_template.mako")
-        pluginSrcContent = pluginSrcTemplate.render(config=generatorOptions["plugin"])
-        pluginSourceFile = open(pluginSourceFilePath, "w")
-        pluginSourceFile.write(pluginSrcContent)
-        pluginSourceFile.close()
-        filesGenerated.append(pluginSourceFilePath)
+    # Get the pdk project path from the config
+    pdk_project_path = config.get("pdk", {}).get("project_path", "").strip()
+    pdk_enable = config.get("pdk", {}).get("enable", False)
+    
+    
+    if pdk_enable:
+        # Create the ScopyPluginRunner project if it doesn't exist
+        plugin_runner_path = os.path.join(pdk_project_path, "ScopyPluginRunner")
+        generate_pdk(plugin_runner_path, config)
+        
+        # Use the ScopyPluginRunner path as the base for plugin generation
+        plugin_path = os.path.join(plugin_runner_path, "plugin", config["plugin"]["dir_name"])
     else:
-        print(pluginSourceFilePath + " file already exists!")
+        # Fall back to the default plugin path under scopy_path
+        plugin_path = os.path.join(scopy_path, "plugins", config["plugin"]["dir_name"])
 
-if len(directoriesGenerated) > 0:   
-    directoriesGenerated.sort()
-    print("\nGenerated directories:")
-    print(*directoriesGenerated, sep="\n")
+    create_directory(plugin_path)
 
-if len(filesGenerated) > 0:   
-    filesGenerated.sort()
-    print("\nGenerated files:")
-    print(*filesGenerated, sep="\n")
+    if maybe_clear_plugin_dir(plugin_path, config):
+        save_config(plugin_path, config)
+        generate_plugin(plugin_path, config)
 
-################################################### Add export to gitignore ##################################
+    if DIRS_CREATED:
+        print("\nGenerated directories:")
+        print(*sorted(DIRS_CREATED), sep="\n")
 
-gitignorePath = os.path.join(newPluginPath, ".gitignore")
-if os.path.exists(gitignorePath):
-    print(gitignorePath + " file already exists!")
-else:
-    pluginExportPath = "include/"+ pluginName + "/scopy-" + pluginName + "_export.h"
-    pluginConfigPath = "\ninclude/"+ pluginName + "/scopy-" + pluginName + "_config.h"
-    gitignoreFile = open(gitignorePath, "w")
-    gitignoreFile.write(pluginExportPath)
-    gitignoreFile.write(pluginConfigPath)
-    gitignoreFile.close()
-    print("Plugin .gitignore file created!")
+    if FILES_CREATED:
+        print("\nGenerated files:")
+        print(*sorted(FILES_CREATED), sep="\n")
 
-##############################################################################################################
+    print("\nTo enable building the plugin, add the following to the plugins' CMakeLists.txt:\n")
+    plugin_name = config["plugin"]["plugin_name"]
+    print(f"""option(ENABLE_PLUGIN_{plugin_name.upper()} "Enable {plugin_name.upper()} plugin" ON)
+if(ENABLE_PLUGIN_{plugin_name.upper()})
+    add_subdirectory({config['plugin']['dir_name']})
+    list(APPEND PLUGINS ${{PLUGIN_NAME}})
+endif()""")
 
-pluginsCMakeListsOption = """option(ENABLE_PLUGIN_<<upper_plugin_name>> "Enable <<upper_plugin_name>> plugin" ON)
-if(ENABLE_PLUGIN_<<upper_plugin_name>>)
-	add_subdirectory(<<plugin_dir_name>>)
-	list(APPEND PLUGINS ${PLUGIN_NAME})
-endif()"""
-pluginsCMakeListsOption = pluginsCMakeListsOption.replace(
-    "<<upper_plugin_name>>", pluginName.upper()
-)
-pluginsCMakeListsOption = pluginsCMakeListsOption.replace(
-    "<<plugin_dir_name>>", pluginDirName
-)
-print(
-    "\nTo enable building the plugin go to "
-    + os.path.join(pluginsPath, "CMakeLists.txt")
-    + " and add:"
-)
-print(pluginsCMakeListsOption)
+
+if __name__ == "__main__":
+    main()
