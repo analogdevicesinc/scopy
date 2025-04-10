@@ -47,7 +47,7 @@ public:
 
 	QPushButton *m_readButton, *m_writeButton;
 
-	RegisterBlockWidget(QString header, QString description, uint32_t address, uint32_t cnvPage,
+	RegisterBlockWidget(QString header, QString description, uint32_t address, uint8_t cnvPage,
 			    RegisterBlockWidget::ACCESS_PERMISSION accessPermission, QWidget *parent = nullptr);
 	virtual ~RegisterBlockWidget();
 	QPushButton *readButton();

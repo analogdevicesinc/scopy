@@ -67,7 +67,7 @@ public:
 	enum Channel
 	{
 		ROTATION,
-		ANGLE,
+		ANGL,
 		COUNT,
 		TEMPERATURE,
 		CHANNEL_COUNT
@@ -141,7 +141,7 @@ public:
 	enum SensorRegister
 	{
 		ABSANGLE,
-		ANGLEREG,
+		ANGLE,
 		ANGLESEC,
 		SINE,
 		COSINE,
@@ -183,16 +183,16 @@ public:
 							 "target_pos", "current_pos", "ramp_mode"};
 	const uint32_t ConfigurationRegisters[CONFIGURATION_REGISTER_COUNT] = {0x01, 0x04, 0x06, 0x10,
 									       0x12, 0x13, 0x1D, 0x23};
-	const uint32_t ConfigurationPages[CONFIGURATION_REGISTER_COUNT] = {UINT32_MAX, UINT32_MAX, UINT32_MAX, 0x02,
-									   0x02,       0x02,	   0x02,       0x02};
+	const uint8_t ConfigurationPages[CONFIGURATION_REGISTER_COUNT] = {UINT8_MAX, UINT8_MAX, UINT8_MAX, 0x02,
+									  0x02,	     0x02,	0x02,	   0x02};
 	const uint32_t UniqueIdRegisters[UNIQID_REGISTER_COUNT] = {0x1E, 0x1F, 0x20, 0x21};
-	const uint32_t UniqueIdPages[UNIQID_REGISTER_COUNT] = {0x02, 0x02, 0x02, 0x02};
+	const uint8_t UniqueIdPages[UNIQID_REGISTER_COUNT] = {0x02, 0x02, 0x02, 0x02};
 	const uint32_t HarmonicRegisters[HARMONIC_REGISTER_COUNT] = {0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C};
-	const uint32_t HarmonicPages[HARMONIC_REGISTER_COUNT] = {0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02};
+	const uint8_t HarmonicPages[HARMONIC_REGISTER_COUNT] = {0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02};
 	const uint32_t SensorRegisters[SENSOR_REGISTER_COUNT] = {0x03, 0x05, 0x08, 0x10, 0x11, 0x12, 0x13,
 								 0x18, 0x1D, 0x1E, 0x20, 0x23, 0x14};
-	const uint32_t SensorPages[SENSOR_REGISTER_COUNT] = {0x00, UINT32_MAX, UINT32_MAX, 0x00, 0x00, 0x00, 0x00,
-							     0x00, 0x00,       0x00,	   0x00, 0x00, 0x02};
+	const uint8_t SensorPages[SENSOR_REGISTER_COUNT] = {0x00, UINT8_MAX, UINT8_MAX, 0x00, 0x00, 0x00, 0x00,
+							    0x00, 0x00,	     0x00,	0x00, 0x00, 0x02};
 
 	const uint32_t
 		RampGeneratorDriverFeatureControlRegisters[RAMP_GENERATOR_DRIVER_FEATURE_CONTROL_REGISTER_COUNT] = {
@@ -203,13 +203,13 @@ public:
 	const char *getDeviceAttribute(DeviceAttribute attribute);
 	const char *getMotorAttribute(MotorAttribute attribute);
 	const uint32_t getConfigurationRegister(ConfigurationRegister registerID);
-	const uint32_t getConfigurationPage(ConfigurationRegister registerID);
+	const uint8_t getConfigurationPage(ConfigurationRegister registerID);
 	const uint32_t getUniqueIdRegister(UniqueIDRegister registerID);
 	const uint32_t getHarmonicRegister(HarmonicRegister registerID);
-	const uint32_t getHarmonicPage(HarmonicRegister registerID);
-	const uint32_t getUniqueIdPage(UniqueIDRegister registerID);
+	const uint8_t getHarmonicPage(HarmonicRegister registerID);
+	const uint8_t getUniqueIdPage(UniqueIDRegister registerID);
 	const uint32_t getSensorRegister(SensorRegister registerID);
-	const uint32_t getSensorPage(SensorRegister registerID);
+	const uint8_t getSensorPage(SensorRegister registerID);
 
 	const uint32_t
 	getRampGeneratorDriverFeatureControlRegister(RampGeneratorDriverFeatureControlRegister registerID);
@@ -240,6 +240,9 @@ public:
 	uint16_t setGeneralRegisterBitMapping(uint16_t currentRegisterValue, map<string, int> settings);
 	void postcalibrate(vector<double> PANG, int cycleCount, int samplesPerCycle, bool CCW);
 	int getAbsAngleTurnCount(uint16_t registerValue);
+	double getAbsAngle(uint16_t registerValue);
+	double getAngle(uint16_t registerValue);
+	double getTemperature(uint16_t registerValue);
 	uint16_t setDIGIOENRegisterBitMapping(uint16_t currentRegisterValue, map<string, bool> settings);
 	uint16_t setDIGIORegisterBitMapping(uint16_t currentRegisterValue, map<string, bool> settings);
 	void unwrapAngles(vector<double> &angles_rad);
@@ -254,7 +257,10 @@ public:
 	bool checkRegisterFault(uint16_t registerValue, bool isMode1);
 	int streamIO();
 	void bufferedStreamIO(int totalSamples, int targetSampleRate);
+	void registryStream(int totalSamples, int targetSampleRate);
 	bool checkVelocityReachedFlag(uint16_t registerValue);
+	uint16_t changeCNVPage(uint16_t registerValue, uint8_t page);
+	uint16_t convertStart(bool start, uint16_t registerValue);
 public Q_SLOTS:
 	void handleStreamData(double value);
 	void handleStreamBufferedData(const QVector<double> &value);
