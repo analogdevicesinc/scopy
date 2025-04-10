@@ -2,6 +2,7 @@
 #define IMUANALYZERINTERFACE_H
 
 #include "scopy-imuanalyzer_export.h"
+#include "3Drenderer.hpp"
 
 #include <QLineEdit>
 #include <QObject>
@@ -28,8 +29,13 @@ public:
 
 private:
     ToolTemplate *m_tool;
+
     InfoBtn *m_infoBtn;
     RunBtn *m_runBtn;
+    QPushButton *m_rstPos;
+    QPushButton *m_rstView;
+
+    SceneRenderer *m_sceneRender;
 };
 }
 
