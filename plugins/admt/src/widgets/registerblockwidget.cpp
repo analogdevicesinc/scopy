@@ -27,7 +27,7 @@
 using namespace scopy;
 using namespace scopy::admt;
 
-RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, uint32_t address, uint32_t cnvPage,
+RegisterBlockWidget::RegisterBlockWidget(QString header, QString description, uint32_t address, uint8_t cnvPage,
 					 RegisterBlockWidget::ACCESS_PERMISSION accessPermission, QWidget *parent)
 	: QWidget(parent)
 	, m_address(address)

@@ -109,12 +109,12 @@ const uint32_t ADMTController::getHarmonicRegister(HarmonicRegister registerID)
 	return UINT32_MAX;
 }
 
-const uint32_t ADMTController::getHarmonicPage(HarmonicRegister registerID)
+const uint8_t ADMTController::getHarmonicPage(HarmonicRegister registerID)
 {
 	if(registerID >= 0 && registerID < HARMONIC_REGISTER_COUNT) {
 		return HarmonicPages[registerID];
 	}
-	return UINT32_MAX;
+	return UINT8_MAX;
 }
 
 const uint32_t ADMTController::getConfigurationRegister(ConfigurationRegister registerID)
@@ -125,12 +125,12 @@ const uint32_t ADMTController::getConfigurationRegister(ConfigurationRegister re
 	return UINT32_MAX;
 }
 
-const uint32_t ADMTController::getConfigurationPage(ConfigurationRegister registerID)
+const uint8_t ADMTController::getConfigurationPage(ConfigurationRegister registerID)
 {
 	if(registerID >= 0 && registerID < CONFIGURATION_REGISTER_COUNT) {
 		return ConfigurationPages[registerID];
 	}
-	return UINT32_MAX;
+	return UINT8_MAX;
 }
 
 const uint32_t ADMTController::getSensorRegister(SensorRegister registerID)
@@ -141,12 +141,12 @@ const uint32_t ADMTController::getSensorRegister(SensorRegister registerID)
 	return UINT32_MAX;
 }
 
-const uint32_t ADMTController::getSensorPage(SensorRegister registerID)
+const uint8_t ADMTController::getSensorPage(SensorRegister registerID)
 {
 	if(registerID >= 0 && registerID < SENSOR_REGISTER_COUNT) {
 		return SensorPages[registerID];
 	}
-	return UINT32_MAX;
+	return UINT8_MAX;
 }
 
 const uint32_t ADMTController::getUniqueIdRegister(UniqueIDRegister registerID)
@@ -157,12 +157,12 @@ const uint32_t ADMTController::getUniqueIdRegister(UniqueIDRegister registerID)
 	return UINT32_MAX;
 }
 
-const uint32_t ADMTController::getUniqueIdPage(UniqueIDRegister registerID)
+const uint8_t ADMTController::getUniqueIdPage(UniqueIDRegister registerID)
 {
 	if(registerID >= 0 && registerID < UNIQID_REGISTER_COUNT) {
 		return UniqueIdPages[registerID];
 	}
-	return UINT32_MAX;
+	return UINT8_MAX;
 }
 
 const uint32_t
@@ -203,21 +203,21 @@ int ADMTController::getChannelIndex(const char *deviceName, const char *channelN
 double ADMTController::getChannelValue(const char *deviceName, const char *channelName, int bufferSize)
 {
 	if(!m_iioCtx) {
-		return static_cast<double>(UINT64_MAX);
+		return UINT32_MAX;
 	} // return QString("No context available.");
 	double value;
 
 	int deviceCount = iio_context_get_devices_count(m_iioCtx);
 	if(deviceCount < 1)
-		return static_cast<double>(UINT64_MAX); // return QString("No devices found");
+		return UINT32_MAX; // return QString("No devices found");
 
 	iio_device *admtDevice = iio_context_find_device(m_iioCtx, deviceName);
 	if(admtDevice == NULL)
-		return static_cast<double>(UINT64_MAX); // return QString("No ADMT4000 device");
+		return UINT32_MAX; // return QString("No ADMT4000 device");
 
 	int channelCount = iio_device_get_channels_count(admtDevice);
 	if(channelCount < 1)
-		return static_cast<double>(UINT64_MAX); // return QString("No channels found.");
+		return UINT32_MAX; // return QString("No channels found.");
 
 	iio_channel *channel;
 	std::string message = "";
@@ -233,7 +233,7 @@ double ADMTController::getChannelValue(const char *deviceName, const char *chann
 		}
 	}
 	if(channel == NULL)
-		return static_cast<double>(UINT64_MAX); // return QString("Channel not found.");
+		return UINT32_MAX; // return QString("Channel not found.");
 	iio_channel_enable(channel);
 
 	double scale = 1.0;
@@ -242,16 +242,16 @@ double ADMTController::getChannelValue(const char *deviceName, const char *chann
 	const char *offsetAttrName = "offset";
 	const char *scaleAttr = iio_channel_find_attr(channel, scaleAttrName);
 	if(scaleAttr == NULL)
-		return static_cast<double>(UINT64_MAX); // return QString("No scale attribute");
+		return UINT32_MAX; // return QString("No scale attribute");
 	const char *offsetAttr = iio_channel_find_attr(channel, offsetAttrName);
 	if(offsetAttr == NULL)
-		return static_cast<double>(UINT64_MAX); // return QString("No offset attribute");
+		return UINT32_MAX; // return QString("No offset attribute");
 
 	double *scaleVal = new double(1);
 	int scaleRet = iio_channel_attr_read_double(channel, scaleAttr, scaleVal);
 	if(scaleRet != 0) {
 		delete scaleVal;
-		return static_cast<double>(UINT64_MAX); // return QString("Cannot read scale attribute");
+		return UINT32_MAX; // return QString("Cannot read scale attribute");
 	}
 	scale = *scaleVal;
 	delete scaleVal;
@@ -263,7 +263,7 @@ double ADMTController::getChannelValue(const char *deviceName, const char *chann
 
 	iio_buffer *iioBuffer = iio_device_create_buffer(admtDevice, bufferSize, false);
 	if(iioBuffer == NULL)
-		return static_cast<double>(UINT64_MAX); // return QString("Cannot create buffer.");
+		return UINT32_MAX; // return QString("Cannot create buffer.");
 
 	ssize_t numBytesRead;
 	int8_t *pointerData, *pointerEnd;
@@ -272,7 +272,7 @@ double ADMTController::getChannelValue(const char *deviceName, const char *chann
 
 	numBytesRead = iio_buffer_refill(iioBuffer);
 	if(numBytesRead < 0)
-		return static_cast<double>(UINT64_MAX); // return QString("Cannot refill buffer.");
+		return UINT32_MAX; // return QString("Cannot refill buffer.");
 
 	const struct iio_data_format *format = iio_channel_get_data_format(channel);
 	const struct iio_data_format channelFormat = *format;
@@ -1228,6 +1228,40 @@ int ADMTController::getAbsAngleTurnCount(uint16_t registerValue)
 	}
 }
 
+double ADMTController::getAbsAngle(uint16_t registerValue)
+{
+	double scale = 0.351562500;
+
+	int turnCount = getAbsAngleTurnCount(registerValue);
+
+	double angle = static_cast<double>(registerValue & 0x03FF) * scale;
+	double absAngle = angle;
+
+	if(turnCount != 0)
+		absAngle += (turnCount * 360);
+
+	return absAngle;
+}
+
+double ADMTController::getAngle(uint16_t registerValue)
+{
+	// Angle resolution: 360 deg / 4096
+	double scale = 0.087890625;
+
+	// Bits 15:4: Magnetic Field Angle with 360 deg range.
+	double angle = static_cast<double>(registerValue >> 4) * scale;
+
+	return angle;
+}
+
+double ADMTController::getTemperature(uint16_t registerValue)
+{
+	// Bits 15:4: Internal Temperature Sensor.
+	double temperature = (static_cast<double>((registerValue >> 4)) - 1168) / 15.66;
+
+	return temperature;
+}
+
 uint16_t ADMTController::setDIGIOENRegisterBitMapping(uint16_t currentRegisterValue, map<string, bool> settings)
 {
 	uint16_t registerValue = currentRegisterValue; // Start with the current register value
@@ -1839,6 +1873,41 @@ void ADMTController::bufferedStreamIO(int totalSamples, int targetSampleRate)
 	delete[] offsetDst;
 }
 
+void ADMTController::registryStream(int totalSamples, int targetSampleRate)
+{
+	QVector<double> values;
+	sampleCount = 0;
+	double angle = 0;
+	bool readSuccess = false;
+	uint32_t *registerValue = new uint32_t;
+
+	while(!stopStream && sampleCount < totalSamples) {
+		elapsedStreamTimer.start();
+
+		qint64 elapsedNanoseconds = elapsedStreamTimer.nsecsElapsed();
+		while(elapsedNanoseconds < targetSampleRate) {
+			if(readDeviceRegistry(getDeviceId(Device::ADMT4000), getSensorRegister(SensorRegister::ANGLE),
+					      registerValue) == 0)
+				break;
+			elapsedNanoseconds = elapsedStreamTimer.nsecsElapsed();
+		}
+
+		angle = getAngle(static_cast<uint16_t>(*registerValue));
+
+		values.append(angle);
+		sampleCount++;
+
+		elapsedNanoseconds = elapsedStreamTimer.nsecsElapsed();
+		while(elapsedNanoseconds < targetSampleRate) {
+			elapsedNanoseconds = elapsedStreamTimer.nsecsElapsed();
+		}
+	}
+
+	delete registerValue;
+
+	Q_EMIT streamBufferedData(values);
+}
+
 void ADMTController::handleStreamBufferedData(const QVector<double> &value) { streamBufferedValues = value; }
 
 bool ADMTController::checkVelocityReachedFlag(uint16_t registerValue)
@@ -1846,5 +1915,20 @@ bool ADMTController::checkVelocityReachedFlag(uint16_t registerValue)
 	// Bit 8 - 1: Signals that the target velocity is reached. This flag becomes
 	// set while VACTUAL and VMAX match.
 	return ((registerValue >> 8) & 0x01) ? true : false;
+}
+
+uint16_t ADMTController::changeCNVPage(uint16_t registerValue, uint8_t page)
+{
+	return (registerValue & ~0x001F) | (page & 0x1F);
+}
+
+uint16_t ADMTController::convertStart(bool start, uint16_t registerValue)
+{
+	registerValue &= ~(0b11 << 14);
+
+	if(!start)
+		registerValue |= (0b11 << 14);
+
+	return registerValue;
 }
 #include "moc_admtcontroller.cpp"

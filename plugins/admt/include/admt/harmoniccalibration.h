@@ -162,8 +162,10 @@ private:
 		acquisitionSineList, acquisitionCosineList, acquisitionRadiusList, acquisitionAngleSecList,
 		acquisitionSecAnglIList, acquisitionSecAnglQList, graphDataList, graphPostDataList;
 
-	QPushButton *openLastMenuButton, *calibrationStartMotorButton, *calibrateDataButton, *extractDataButton,
-		*clearCalibrateDataButton, *clearCommandLogButton, *applySequenceButton, *readAllRegistersButton;
+	QPushButton *openLastMenuButton, *calibrationStartMotorButton, *calibrateDataButton, *importSamplesButton,
+		*extractDataButton, *clearCalibrateDataButton, *clearCommandLogButton, *applySequenceButton,
+		*readAllRegistersButton;
+
 	QButtonGroup *rightMenuButtonGroup;
 
 	QLineEdit *acquisitionMotorRPMLineEdit, *calibrationCycleCountLineEdit, *calibrationTotalSamplesLineEdit,
@@ -185,7 +187,7 @@ private:
 	MenuSectionWidget *rightMenuSectionWidget;
 	MenuCollapseSection *rotationCollapse, *angleCollapse, *countCollapse, *tempCollapse;
 	MenuCombo *m_dataGraphChannelMenuCombo, *m_dataGraphDirectionMenuCombo, *m_tempGraphDirectionMenuCombo,
-		*m_calibrationMotorRampModeMenuCombo, *sequenceTypeMenuCombo, *conversionTypeMenuCombo,
+		*m_calibrationMotorRampModeMenuCombo, *sequenceModeMenuCombo, *conversionModeMenuCombo,
 		*cnvSourceMenuCombo, *convertSynchronizationMenuCombo, *angleFilterMenuCombo, *eighthHarmonicMenuCombo,
 		*calibrationModeMenuCombo;
 
@@ -267,7 +269,9 @@ private:
 	bool readSequence();
 	bool writeSequence(QMap<string, int> settings);
 	void applySequence();
-	bool changeCNVPage(uint32_t page);
+	bool changeCNVPage(uint8_t page);
+	bool convertStart(bool start);
+	bool convertRestart();
 	void initializeMotor();
 	void startDeviceStatusMonitor();
 	void stopDeviceStatusMonitor();
@@ -278,7 +282,7 @@ private:
 
 #pragma region Acquisition Methods
 	bool updateChannelValues();
-	void updateCountValue();
+	bool updateSensorValue(ADMTController::SensorRegister sensor);
 	void updateLineEditValues();
 	void startAcquisition();
 	void stopAcquisition();
@@ -293,7 +297,7 @@ private:
 	void updateSequenceWidget();
 	void updateCapturedDataCheckBoxes();
 	void applySequenceAndUpdate();
-	void updateGeneralSettingEnabled(bool value);
+	void toggleAcquisitionControls(bool value);
 	void connectCheckBoxToAcquisitionGraph(QCheckBox *widget, PlotChannel *channel, SensorData key);
 	void GMRReset();
 #pragma endregion
