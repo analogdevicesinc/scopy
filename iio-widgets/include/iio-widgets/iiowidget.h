@@ -129,7 +129,11 @@ public:
 	void setUItoDataConversion(std::function<QString(QString)> func);
 	void setDataToUIConversion(std::function<QString(QString)> func);
 
+	void showProgressBar(bool show);
+
 Q_SIGNALS:
+	void progressBarVisible(bool);
+
 	/**
 	 * @brief Emits the current state of the IIOWidget system and a string containing a more
 	 * elaborate explanation of the current state

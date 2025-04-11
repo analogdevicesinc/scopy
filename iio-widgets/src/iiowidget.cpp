@@ -72,6 +72,8 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 	// intercept the sendData from dataStrategy to collect information
 	connect(dataStrategyObject, SIGNAL(sendData(QString, QString)), this, SLOT(storeReadInfo(QString, QString)));
 
+	connect(this, SIGNAL(progressBarVisible(bool)), m_progressBar, SLOT(setVisible(bool)));
+
 	// The data will be populated here
 	bool useLazyLoading = Preferences::GetInstance()->get("iiowidgets_use_lazy_loading").toBool();
 	if(!useLazyLoading) { // force skip lazy load
@@ -151,6 +153,8 @@ int IIOWidget::lastReturnCode() { return m_lastReturnCode; }
 void IIOWidget::setUItoDataConversion(std::function<QString(QString)> func) { m_UItoDS = func; }
 
 void IIOWidget::setDataToUIConversion(std::function<QString(QString)> func) { m_DStoUI = func; }
+
+void IIOWidget::showProgressBar(bool show) { Q_EMIT progressBarVisible(show); }
 
 void IIOWidget::startTimer(QString data)
 {
