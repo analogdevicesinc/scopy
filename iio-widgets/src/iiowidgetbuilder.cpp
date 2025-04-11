@@ -62,6 +62,7 @@ IIOWidget *IIOWidgetBuilder::buildSingle()
 {
 	DataStrategyInterface *ds = nullptr;
 	GuiStrategyInterface *ui = nullptr;
+	const char *availableAttr = nullptr;
 
 	if(!m_context && !m_device && !m_channel) {
 		qWarning(CAT_ATTRBUILDER) << "No channel/device/context set.";
@@ -71,6 +72,24 @@ IIOWidget *IIOWidgetBuilder::buildSingle()
 	if(m_attribute.isEmpty()) {
 		qWarning(CAT_ATTRBUILDER) << "No attribute name set.";
 		return nullptr;
+	}
+
+	if(m_optionsAttribute.isEmpty()) {
+		if(m_channel) {
+			availableAttr = iio_channel_find_attr(
+				m_channel, (QString(m_attribute) + "_available").toStdString().c_str());
+		} else if(m_device) {
+			availableAttr = iio_device_find_attr(
+				m_device, (QString(m_attribute) + "_available").toStdString().c_str());
+			if(m_includeDebugAttrs) {
+				availableAttr = iio_device_find_debug_attr(
+					m_device, (QString(m_attribute) + "_available").toStdString().c_str());
+			}
+		}
+
+		if(availableAttr) {
+			m_optionsAttribute = availableAttr;
+		}
 	}
 
 	m_generatedRecipe = {
