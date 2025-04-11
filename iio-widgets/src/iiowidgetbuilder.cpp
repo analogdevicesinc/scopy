@@ -21,6 +21,7 @@
 #include "iiowidgetbuilder.h"
 #include "guistrategy/editableguistrategy.h"
 #include "guistrategy/switchguistrategy.h"
+#include "guistrategy/checkboxguistrategy.h"
 #include "datastrategy/channelattrdatastrategy.h"
 #include "datastrategy/triggerdatastrategy.h"
 #include "datastrategy/deviceattrdatastrategy.h"
@@ -422,6 +423,9 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 		break;
 	case UIS::RangeUi:
 		ui = new RangeAttrUi(m_generatedRecipe, m_isCompact, m_widgetParent);
+		break;
+	case UIS::CheckBoxUi:
+		ui = new CheckBoxAttrUi(m_generatedRecipe, m_isCompact, m_widgetParent);
 		break;
 	default:
 		break;
