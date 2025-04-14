@@ -84,12 +84,12 @@ QString PlutoPlugin::description() { return "This is a plugin for AD936X"; }
 
 bool PlutoPlugin::onConnect()
 {
-	// This method is called when you try to connect to a device and the plugin is 
-	// compatible to that device 
-	// In case of success the function must return true and false otherwise 
-    	
-	AD936X *aD936X = new AD936X();
-	m_toolList[0]->setTool(aD936X);
+	// This method is called when you try to connect to a device and the plugin is
+	// compatible to that device
+	// In case of success the function must return true and false otherwise
+
+	AD936X *ad936X = new AD936X(m_param);
+	m_toolList[0]->setTool(ad936X);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
     	return true;
