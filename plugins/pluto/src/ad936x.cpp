@@ -1,4 +1,4 @@
-#include "ad963x.h"
+#include "ad936x.h"
 
 #include "fastlockprofileswidget.h"
 #include "firfilterqidget.h"
@@ -37,8 +37,8 @@ AD936X::AD936X(QString uri, QWidget *parent)
 	InfoBtn *infoBtn = new InfoBtn(this, true);
 	m_tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
 
-	connect(infoBtn, &InfoBtn::clicked, this, [=]() {
-		infoBtn->generateInfoPopup(this);
+	connect(infoBtn, &InfoBtn::clicked, this, [=, this]() {
+		// infoBtn->generateInfoPopup(this);
 		// TODO
 		// connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, [=]() {
 		// 	if(searchBarWidget->isVisible()) {
@@ -127,9 +127,15 @@ AD936X::AD936X(QString uri, QWidget *parent)
 
 	m_tool->addWidgetToTopContainerHelper(ad963xBtn, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(blockDiagramBtn, TTA_LEFT);
+
+	// Style::setStyle(scrollWidget, style::properties::widget::border_interactive, true, true);
 }
 
-AD936X::~AD936X() {}
+AD936X::~AD936X()
+{
+	// close Connection
+	ConnectionProvider::close(m_uri);
+}
 
 QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 {
@@ -212,7 +218,7 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 	layout->addWidget(xoCorrection);
 
 	/// close device connection
-	ConnectionProvider::close(m_uri);
+	// ConnectionProvider::close(m_uri);
 
 	return globalSettingsWidget;
 }
@@ -345,7 +351,7 @@ QWidget *AD936X::generateRxWidget(QWidget *parent)
 	layout->addWidget(gainControlMode);
 
 	/// close device connection
-	ConnectionProvider::close(m_uri);
+	// ConnectionProvider::close(m_uri);
 
 	return rxChainWidget;
 }
@@ -443,7 +449,7 @@ QWidget *AD936X::generateTxWidget(QWidget *parent)
 	IIOWidget *rssi = IIOWidgetBuilder(txChainWidget).channel(voltage0).attribute("rssi").buildSingle();
 	layout->addWidget(rssi);
 
-	ConnectionProvider::close(m_uri);
+	// ConnectionProvider::close(m_uri);
 
 	return txChainWidget;
 }

@@ -19,34 +19,29 @@
  *
  */
 
-#ifndef PLUTOPLUGIN_H
-#define PLUTOPLUGIN_H
+#ifndef AD963XADVANCED_H
+#define AD963XADVANCED_H
 
-#define SCOPY_PLUGIN_NAME PlutoPlugin
+#include <QBoxLayout>
+#include <QWidget>
+#include <tooltemplate.h>
 
-#include "scopy-plutoplugin_export.h"
-#include <QObject>
-#include <pluginbase/plugin.h>
-#include <pluginbase/pluginbase.h>
-
-namespace scopy::pluto {
-class SCOPY_PLUTOPLUGIN_EXPORT PlutoPlugin : public QObject, public PluginBase
+namespace scopy {
+namespace pluto {
+class AD936XAdvanced : public QWidget
 {
 	Q_OBJECT
-	SCOPY_PLUGIN;
-
 public:
-	bool compatible(QString m_param, QString category) override;
-	bool loadPage() override;
-	bool loadIcon() override;
-	void loadToolList() override;
-	void unload() override;
-	void initMetadata() override;
-	QString description() override;
+	explicit AD936XAdvanced(QString uri, QWidget *parent = nullptr);
+	~AD936XAdvanced();
 
-public Q_SLOTS:
-	bool onConnect() override;
-	bool onDisconnect() override;
+signals:
+
+private:
+	QString m_uri;
+	ToolTemplate *m_tool;
+	QVBoxLayout *m_mainLayout;
 };
-} // namespace scopy::pluto
-#endif // PLUTOPLUGIN_H
+} // namespace pluto
+} // namespace scopy
+#endif // AD963XADVANCED_H

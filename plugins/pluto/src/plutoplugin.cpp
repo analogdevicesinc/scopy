@@ -3,7 +3,8 @@
 #include <QLoggingCategory>
 #include <QLabel>
 
-#include "ad963x.h"
+#include "ad936x.h"
+#include "ad963xadvanced.h"
 
 #include <iioutil/connectionprovider.h>
 
@@ -35,7 +36,7 @@ bool PlutoPlugin::compatible(QString m_param, QString category)
 
 bool PlutoPlugin::loadPage()
 {
-	// Here you must write the code for the plugin info page 
+	// Here you must write the code for the plugin info page
 	// Below is an example for an iio device
 	/*m_page = new QWidget();
 	m_page->setLayout(new QVBoxLayout(m_page));
@@ -76,9 +77,13 @@ void PlutoPlugin::loadToolList()
 {
 	m_toolList.append(
 		SCOPY_NEW_TOOLMENUENTRY("ad963xTool", "AD936X", ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("ad963xAdvancedTool", "AD936X Advanced",
+						  ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
 }
 
-void PlutoPlugin::unload() { /*delete m_infoPage;*/ }
+void PlutoPlugin::unload()
+{ /*delete m_infoPage;*/
+}
 
 QString PlutoPlugin::description() { return "This is a plugin for AD936X"; }
 
@@ -92,7 +97,12 @@ bool PlutoPlugin::onConnect()
 	m_toolList[0]->setTool(ad936X);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
-    	return true;
+
+	AD936XAdvanced *ad936XAdvanced = new AD936XAdvanced(m_param);
+	m_toolList[1]->setTool(ad936XAdvanced);
+	m_toolList[1]->setEnabled(true);
+	m_toolList[1]->setRunBtnVisible(true);
+	return true;
 }
 
 bool PlutoPlugin::onDisconnect()
@@ -109,6 +119,9 @@ bool PlutoPlugin::onDisconnect()
 			delete(w);
 		}
 	}
+
+	// make sure connection is closed
+	// ConnectionProvider::close(m_param);
 	return true;
 }
 

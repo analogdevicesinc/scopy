@@ -21,6 +21,9 @@ FirFilterQidget::FirFilterQidget(iio_device *dev1, iio_device *dev2, QWidget *pa
 	m_layout = new QVBoxLayout(this);
 	setLayout(m_layout);
 
+	m_isRxFilter = false;
+	m_isTxFilter = false;
+
 	QLabel *label = new QLabel("Filter FIR configuraion:", this);
 
 	// TODO REPLACE WITH FILE CHOSE WIDGET
@@ -35,53 +38,32 @@ FirFilterQidget::FirFilterQidget(iio_device *dev1, iio_device *dev2, QWidget *pa
 	connect(autoFilter->onOffswitch(), &QAbstractButton::toggled, this, &FirFilterQidget::autofilterToggled);
 
 	m_applyRxTxFilter = new MenuOnOffSwitch("Enable RX and TX FIR Filters", this, false);
-	m_applyRxFilter = new MenuOnOffSwitch("Enable RX FIR Filters", this, false);
-	m_applyTxFilter = new MenuOnOffSwitch("Enable TX FIR Filters", this, false);
-	m_disableAllFilters = new MenuOnOffSwitch("Disable all FIR Filters", this, false);
 
 	connect(m_applyRxTxFilter->onOffswitch(), &QAbstractButton::toggled, this, [=, this](bool toggled) {
-		toggleDeviceFilter(m_dev1, toggled);
+		if(m_isRxFilter) {
+			if(m_isTxFilter) {
+				// we have a rx & tx filter we try to apply filter fo device
+				toggleDeviceFilter(m_dev1, toggled);
+				if(m_dev2 != nullptr) {
+					toggleDeviceFilter(m_dev2, toggled);
+				}
+			} else {
+				// we have a Rx filter
+				applyChannelFilterToggled(false, toggled);
+			}
 
-		if(m_dev2 != nullptr) {
-			toggleDeviceFilter(m_dev2, toggled);
+		} else if(m_isTxFilter) {
+			// we have a Tx filter
+			applyChannelFilterToggled(true, toggled);
 		}
 	});
-
-	connect(m_disableAllFilters->onOffswitch(), &QAbstractButton::toggled, this, [=, this](bool toggled) {
-		toggleDeviceFilter(m_dev1, toggled);
-
-		if(m_dev2 != nullptr) {
-			toggleDeviceFilter(m_dev2, toggled);
-		}
-	});
-
-	connect(m_applyTxFilter->onOffswitch(), &QAbstractButton::toggled, this, [=, this](bool toggled) {
-		toggleChannelFilter(m_dev1, true, toggled);
-		if(m_dev2 != nullptr) {
-			toggleChannelFilter(m_dev2, true, toggled);
-		}
-	});
-
-	connect(m_applyRxFilter->onOffswitch(), &QAbstractButton::toggled, this, [=, this](bool toggled) {
-		toggleChannelFilter(m_dev1, false, toggled);
-		if(m_dev2 != nullptr) {
-			toggleChannelFilter(m_dev2, false, toggled);
-		}
-	});
-
-	// QButtonGroup *filterButtons = new QButtonGroup(this);
-	// filterButtons->setExclusive(true);
-	// navigationButtons->addButton(bistBtn);
 
 	m_layout->addWidget(label);
 	m_layout->addWidget(autoFilter);
 	m_layout->addWidget(m_choseFileBtn);
 	m_layout->addWidget(m_applyRxTxFilter);
-	m_layout->addWidget(m_applyRxFilter);
-	m_layout->addWidget(m_applyTxFilter);
-	m_layout->addWidget(m_disableAllFilters);
 
-	hideAllFilters();
+	m_applyRxTxFilter->setVisible(false);
 }
 
 void FirFilterQidget::chooseFile()
@@ -136,11 +118,13 @@ void FirFilterQidget::applyFirFilter(QString path)
 		}
 
 		// Read the entire file content
-		QByteArray buffer = file.readAll();
+		textStream.seek(0);
+		QString buffer = textStream.readAll();
 		file.close();
 
 		// Write configuration to the device(s)
-		ret = iio_device_attr_write_raw(m_dev1, "filter_fir_config", buffer.data(), buffer.size());
+		ret = iio_device_attr_write_raw(m_dev1, "filter_fir_config", buffer.toStdString().c_str(),
+						buffer.length());
 
 		if(m_dev2 != nullptr) {
 			int ret2 = iio_device_attr_write_raw(m_dev2, "filter_fir_config", buffer.data(), buffer.size());
@@ -156,57 +140,43 @@ void FirFilterQidget::applyFirFilter(QString path)
 		return;
 	}
 
-	refreshVisibleFilters();
-	if(rx && tx) {
+	if(rx || tx) {
+		m_isRxFilter = rx;
+		m_isTxFilter = tx;
 		m_applyRxTxFilter->setVisible(true);
-	} else if(rx) {
-		m_applyRxFilter->setVisible(true);
-	} else if(tx) {
-		m_applyTxFilter->setVisible(true);
-	} else {
-		m_disableAllFilters->setVisible(false);
 	}
 }
 
-void FirFilterQidget::refreshVisibleFilters()
+void FirFilterQidget::applyChannelFilterToggled(bool isTx, bool toggled)
 {
-
-	m_applyRxTxFilter->setVisible(false);
-	m_applyRxFilter->setVisible(false);
-	m_applyTxFilter->setVisible(false);
-	m_disableAllFilters->setVisible(true);
-}
-
-void FirFilterQidget::hideAllFilters()
-{
-	m_applyRxTxFilter->setVisible(false);
-	m_applyRxFilter->setVisible(false);
-	m_applyTxFilter->setVisible(false);
-	m_disableAllFilters->setVisible(false);
+	iio_channel *chn = iio_device_find_channel(m_dev1, "voltage0", isTx);
+	toggleChannelFilter(chn, "filter_fir_en", toggled);
+	if(m_dev2 != nullptr) {
+		iio_channel *chn = iio_device_find_channel(m_dev2, "voltage0", isTx);
+		toggleChannelFilter(chn, "filter_fir_en", toggled);
+	}
 }
 
 void FirFilterQidget::toggleDeviceFilter(iio_device *dev, bool toggled)
 {
 	int ret = -ENOMEM;
-	// iio-osc uses in_out_voltage_filter_fir_en find out why
-	iio_channel *chn = iio_device_find_channel(dev, "out", false);
-	if(chn) {
-		ret = iio_channel_attr_write_bool(chn, "voltage_filter_fir_en", toggled);
-		if(ret < 0) {
-			qWarning(CAT_FIR_FILTER)
-				<< "FIR Filter enablement failed: " << QString::fromLocal8Bit(strerror(ret * (-1)));
-		} else {
-			Q_EMIT filterChangeWasMade();
-		}
+	// for FMCOMMS2 devices the attribute might be a device attr or a channel attr
+	ret = iio_device_attr_write_bool(dev, "in_out_voltage_filter_fir_en", toggled);
+
+	// if you are not able to write it as a device attr then it should be a channel attr for channel out
+	if(ret < 0) {
+		iio_channel *chn = iio_device_find_channel(dev, "out", false);
+		toggleChannelFilter(chn, "voltage_filter_fir_en", toggled);
+	} else {
+		Q_EMIT filterChangeWasMade();
 	}
 }
 
-void FirFilterQidget::toggleChannelFilter(iio_device *dev, bool isTx, bool toggled)
+void FirFilterQidget::toggleChannelFilter(iio_channel *chn, QString attr, bool toggled)
 {
-	iio_channel *chn = iio_device_find_channel(dev, "voltage0", isTx);
 	if(chn) {
 		int ret = -ENOMEM;
-		ret = iio_channel_attr_write_bool(chn, "filter_fir_en", toggled);
+		ret = iio_channel_attr_write_bool(chn, attr.toStdString().c_str(), toggled);
 		if(ret < 0) {
 			qWarning(CAT_FIR_FILTER) << "FIR Filter channel enablement failed: "
 						 << QString::fromLocal8Bit(strerror(ret * (-1)));

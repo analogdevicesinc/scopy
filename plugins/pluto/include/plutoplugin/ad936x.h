@@ -19,34 +19,38 @@
  *
  */
 
-#ifndef PLUTOPLUGIN_H
-#define PLUTOPLUGIN_H
-
-#define SCOPY_PLUGIN_NAME PlutoPlugin
+#ifndef AD936X_H
+#define AD936X_H
 
 #include "scopy-plutoplugin_export.h"
-#include <QObject>
-#include <pluginbase/plugin.h>
-#include <pluginbase/pluginbase.h>
+#include <QBoxLayout>
+#include <QWidget>
+#include <tooltemplate.h>
 
-namespace scopy::pluto {
-class SCOPY_PLUTOPLUGIN_EXPORT PlutoPlugin : public QObject, public PluginBase
+#include <iio-widgets/iiowidgetbuilder.h>
+
+namespace scopy {
+namespace pluto {
+class SCOPY_PLUTOPLUGIN_EXPORT AD936X : public QWidget
 {
 	Q_OBJECT
-	SCOPY_PLUGIN;
-
 public:
-	bool compatible(QString m_param, QString category) override;
-	bool loadPage() override;
-	bool loadIcon() override;
-	void loadToolList() override;
-	void unload() override;
-	void initMetadata() override;
-	QString description() override;
+	AD936X(QString uri, QWidget *parent = nullptr);
+	~AD936X();
 
-public Q_SLOTS:
-	bool onConnect() override;
-	bool onDisconnect() override;
+private:
+	QString m_uri;
+	ToolTemplate *m_tool;
+	QVBoxLayout *m_mainLayout;
+	QWidget *m_controlsWidget;
+	QWidget *m_blockDiagramWidget;
+
+	QWidget *generateGlobalSettingsWidget(QWidget *parent);
+
+	QWidget *generateRxWidget(QWidget *parent);
+
+	QWidget *generateTxWidget(QWidget *parent);
 };
-} // namespace scopy::pluto
-#endif // PLUTOPLUGIN_H
+} // namespace pluto
+} // namespace scopy
+#endif // AD936X_H
