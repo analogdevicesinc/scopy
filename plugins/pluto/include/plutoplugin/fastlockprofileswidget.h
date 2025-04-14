@@ -19,34 +19,39 @@
  *
  */
 
-#ifndef PLUTOPLUGIN_H
-#define PLUTOPLUGIN_H
+#ifndef FASTLOCKPROFILESWIDGET_H
+#define FASTLOCKPROFILESWIDGET_H
 
-#define SCOPY_PLUGIN_NAME PlutoPlugin
-
+#include <QWidget>
 #include "scopy-plutoplugin_export.h"
-#include <QObject>
-#include <pluginbase/plugin.h>
-#include <pluginbase/pluginbase.h>
 
-namespace scopy::pluto {
-class SCOPY_PLUTOPLUGIN_EXPORT PlutoPlugin : public QObject, public PluginBase
+#include <QComboBox>
+#include <QLabel>
+#include <QPushButton>
+#include <iio.h>
+
+namespace scopy {
+namespace pluto {
+class SCOPY_PLUTOPLUGIN_EXPORT FastlockProfilesWidget : public QWidget
 {
 	Q_OBJECT
-	SCOPY_PLUGIN;
-
 public:
-	bool compatible(QString m_param, QString category) override;
-	bool loadPage() override;
-	bool loadIcon() override;
-	void loadToolList() override;
-	void unload() override;
-	void initMetadata() override;
-	QString description() override;
+	explicit FastlockProfilesWidget(iio_channel *chn, QWidget *parent = nullptr);
 
-public Q_SLOTS:
-	bool onConnect() override;
-	bool onDisconnect() override;
+	QComboBox *fastlockProfiles() const;
+
+	QString title() const;
+	void setTitle(QString *newTitle);
+
+Q_SIGNALS:
+	void recallCalled();
+
+private:
+	QLabel *m_title;
+	QComboBox *m_fastlockProfiles;
+	QPushButton *m_storeBtn;
+	QPushButton *m_recallBtn;
 };
-} // namespace scopy::pluto
-#endif // PLUTOPLUGIN_H
+} // namespace pluto
+} // namespace scopy
+#endif // FASTLOCKPROFILESWIDGET_H

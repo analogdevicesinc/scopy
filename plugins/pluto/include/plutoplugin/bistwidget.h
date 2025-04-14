@@ -19,34 +19,44 @@
  *
  */
 
-#ifndef PLUTOPLUGIN_H
-#define PLUTOPLUGIN_H
+#ifndef BISTWIDGET_H
+#define BISTWIDGET_H
 
-#define SCOPY_PLUGIN_NAME PlutoPlugin
+#include <QWidget>
+#include <QBoxLayout>
+#include <iio.h>
+#include <menuonoffswitch.h>
+#include <iiowidgetbuilder.h>
 
-#include "scopy-plutoplugin_export.h"
-#include <QObject>
-#include <pluginbase/plugin.h>
-#include <pluginbase/pluginbase.h>
+namespace scopy {
+namespace pluto {
 
-namespace scopy::pluto {
-class SCOPY_PLUTOPLUGIN_EXPORT PlutoPlugin : public QObject, public PluginBase
+class BistWidget : public QWidget
 {
 	Q_OBJECT
-	SCOPY_PLUGIN;
-
 public:
-	bool compatible(QString m_param, QString category) override;
-	bool loadPage() override;
-	bool loadIcon() override;
-	void loadToolList() override;
-	void unload() override;
-	void initMetadata() override;
-	QString description() override;
+	explicit BistWidget(QString uri, QWidget *parent = nullptr);
+	~BistWidget();
 
-public Q_SLOTS:
-	bool onConnect() override;
-	bool onDisconnect() override;
+Q_SIGNALS:
+	void bistToneUpdated();
+
+private:
+	QString m_uri;
+	QVBoxLayout *m_layout;
+	iio_device *m_device;
+	void updateBistTone();
+
+	IIOWidget *m_bistTone;
+	IIOWidget *m_toneFrequency;
+	IIOWidget *m_toneLevel;
+
+	MenuOnOffSwitch *m_c2q;
+	MenuOnOffSwitch *m_c2i;
+	MenuOnOffSwitch *m_c1q;
+	MenuOnOffSwitch *m_c1i;
 };
-} // namespace scopy::pluto
-#endif // PLUTOPLUGIN_H
+} // namespace pluto
+} // namespace scopy
+
+#endif // BISTWIDGET_H
