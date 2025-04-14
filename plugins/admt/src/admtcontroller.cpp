@@ -202,111 +202,69 @@ int ADMTController::getChannelIndex(const char *deviceName, const char *channelN
 
 double ADMTController::getChannelValue(const char *deviceName, const char *channelName, int bufferSize)
 {
-	if(!m_iioCtx) {
-		return UINT32_MAX;
-	} // return QString("No context available.");
 	double value;
-
-	int deviceCount = iio_context_get_devices_count(m_iioCtx);
-	if(deviceCount < 1)
-		return UINT32_MAX; // return QString("No devices found");
-
-	iio_device *admtDevice = iio_context_find_device(m_iioCtx, deviceName);
-	if(admtDevice == NULL)
-		return UINT32_MAX; // return QString("No ADMT4000 device");
-
-	int channelCount = iio_device_get_channels_count(admtDevice);
-	if(channelCount < 1)
-		return UINT32_MAX; // return QString("No channels found.");
-
-	iio_channel *channel;
-	std::string message = "";
-	for(int i = 0; i < channelCount; i++) {
-		channel = iio_device_get_channel(admtDevice, i);
-		const char *deviceChannel = iio_channel_get_id(channel);
-
-		if(deviceChannel != nullptr && std::string(deviceChannel) == std::string(channelName)) {
-			message = message + "[" + std::to_string(i) + "]" + std::string(deviceChannel) + ", ";
-			break;
-		} else {
-			channel = NULL;
-		}
-	}
-	if(channel == NULL)
-		return UINT32_MAX; // return QString("Channel not found.");
-	iio_channel_enable(channel);
-
-	double scale = 1.0;
-	int offsetAttrVal = 0;
 	const char *scaleAttrName = "scale";
 	const char *offsetAttrName = "offset";
-	const char *scaleAttr = iio_channel_find_attr(channel, scaleAttrName);
-	if(scaleAttr == NULL)
-		return UINT32_MAX; // return QString("No scale attribute");
-	const char *offsetAttr = iio_channel_find_attr(channel, offsetAttrName);
-	if(offsetAttr == NULL)
-		return UINT32_MAX; // return QString("No offset attribute");
+	size_t samples = 1;
+	bool isOutput = false, isCyclic = false;
 
-	double *scaleVal = new double(1);
-	int scaleRet = iio_channel_attr_read_double(channel, scaleAttr, scaleVal);
+	unsigned int i, j, major, minor;
+	char git_tag[8];
+	iio_library_get_version(&major, &minor, git_tag);
+	bool has_repeat = ((major * 10000) + minor) >= 8 ? true : false;
+
+	int offsetAttrValue = 0;
+
+	if(!m_iioCtx)
+		return UINT32_MAX;
+	if(iio_context_get_devices_count(m_iioCtx) < 1)
+		return UINT32_MAX;
+	struct iio_device *admtDevice = iio_context_find_device(m_iioCtx, deviceName);
+	if(admtDevice == NULL)
+		return UINT32_MAX;
+	struct iio_channel *channel = iio_device_find_channel(admtDevice, channelName, isOutput);
+	if(channel == NULL)
+		return UINT32_MAX;
+	iio_channel_enable(channel);
+	double *scaleAttrValue = new double(1);
+	int scaleRet = iio_channel_attr_read_double(channel, scaleAttrName, scaleAttrValue); // Read the scale attribute
 	if(scaleRet != 0) {
-		delete scaleVal;
-		return UINT32_MAX; // return QString("Cannot read scale attribute");
+		delete scaleAttrValue;
+		return scaleRet;
 	}
-	scale = *scaleVal;
-	delete scaleVal;
 
 	char *offsetDst = new char[maxAttrSize];
-	iio_channel_attr_read(channel, offsetAttr, offsetDst, maxAttrSize);
-	offsetAttrVal = std::atoi(offsetDst);
+	iio_channel_attr_read(channel, offsetAttrName, offsetDst,
+			      maxAttrSize); // Read the offset attribute
+	offsetAttrValue = atoi(offsetDst);
 	delete[] offsetDst;
 
-	iio_buffer *iioBuffer = iio_device_create_buffer(admtDevice, bufferSize, false);
-	if(iioBuffer == NULL)
-		return UINT32_MAX; // return QString("Cannot create buffer.");
-
+	struct iio_buffer *buffer = iio_device_create_buffer(admtDevice, samples, isCyclic); // Create a buffer
 	ssize_t numBytesRead;
-	int8_t *pointerData, *pointerEnd;
-	void *buffer;
+	char *pointerData, *pointerEnd;
 	ptrdiff_t pointerIncrement;
 
-	numBytesRead = iio_buffer_refill(iioBuffer);
-	if(numBytesRead < 0)
-		return UINT32_MAX; // return QString("Cannot refill buffer.");
+	numBytesRead = iio_buffer_refill(buffer);
+
+	pointerIncrement = iio_buffer_step(buffer);
+	pointerEnd = static_cast<char *>(iio_buffer_end(buffer));
 
 	const struct iio_data_format *format = iio_channel_get_data_format(channel);
-	const struct iio_data_format channelFormat = *format;
-	unsigned int repeat = channelFormat.repeat;
+	unsigned int repeat = has_repeat ? format->repeat : 1;
 
-	QString result;
-	std::list<char> rawSamples;
-	// std::list<uint16_t> unsignedSamples;
-	std::list<int16_t> castSamples;
-
-	size_t sample, bytes;
-
-	size_t sampleSize = channelFormat.length / 8 * repeat;
-	// if(sampleSize == 0) return QString("Sample size is zero.");
-
-	buffer = malloc(sampleSize * bufferSize);
-	// if(!buffer) return QString("Cannot allocate memory for buffer.");
-
-	bytes = iio_channel_read(channel, iioBuffer, buffer, sampleSize * bufferSize);
-	for(sample = 0; sample < bytes / sampleSize; ++sample) {
-		for(int j = 0; j < repeat; ++j) {
-			if(channelFormat.length / 8 == sizeof(int16_t)) {
-				rawSamples.push_back(*((int8_t *)buffer));
-				int16_t rawValue = ((int16_t *)buffer)[sample + j];
-				castSamples.push_back(rawValue);
-				value = (rawValue - static_cast<int16_t>(offsetAttrVal)) * scale;
-				result = QString::number(value);
+	for(pointerData = static_cast<char *>(iio_buffer_first(buffer, channel)); pointerData < pointerEnd;
+	    pointerData += pointerIncrement) {
+		for(int j = 0; j < repeat; j++) {
+			if(format->length / 8 == sizeof(int16_t)) {
+				int16_t rawValue = (reinterpret_cast<int16_t *>(pointerData))[j];
+				value = (rawValue - offsetAttrValue) * *scaleAttrValue;
 			}
 		}
 	}
 
-	message = message + result.toStdString();
-	iio_buffer_destroy(iioBuffer);
-	return value; // QString::fromStdString(message);
+	delete scaleAttrValue;
+	iio_buffer_destroy(buffer);
+	return value;
 }
 
 /** @brief Get the attribute value of a device
