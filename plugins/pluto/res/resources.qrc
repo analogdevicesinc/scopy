@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/pluto">
         <file>ad936x.svg</file>
+        <file>firFilter/AD936x_LP_180kHz_521kSPS.ftr</file>
+        <file>firFilter/AD936x_LP_256kHz_768kSPS.ftr</file>
+        <file>firFilter/AD936x_LP_333kHz_1MSPS.ftr</file>
+        <file>firFilter/AD936x_LP_666kHz_2MSPS.ftr</file>
     </qresource>
 </RCC>
