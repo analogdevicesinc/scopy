@@ -470,6 +470,7 @@ void IIOExplorerInstrument::setupCodeGeneratorWindow()
 	m_generatedCodeBrowser->setObjectName("CodeGeneratorTextBrowser");
 	m_codeGenerator->layout()->addWidget(m_generatedCodeBrowser);
 	Style::setStyle(m_generatedCodeBrowser, style::properties::widget::textBrowser);
+	m_generatedCodeBrowser->setPlaceholderText("// Add items to the watchlist to generate code.");
 
 	QPushButton *saveButton = new QPushButton("Save Code");
 	Style::setStyle(saveButton, style::properties::button::basicButton, true, true);
