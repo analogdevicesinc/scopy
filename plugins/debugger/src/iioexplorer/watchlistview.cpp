@@ -169,6 +169,7 @@ void WatchListView::removeFromWatchlist(IIOStandardItem *item)
 		WatchListEntry *entry = m_entryObjects->value(item->path(), nullptr);
 		if(entry) {
 			entry->deleteLater();
+			m_entryObjects->remove(item->path());
 		} else {
 			qWarning(CAT_WATCHLIST)
 				<< "Entry" << item->path() << "not present in entries, cannot remove from watchlist.";
