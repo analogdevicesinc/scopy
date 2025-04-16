@@ -359,6 +359,11 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 		"system, this preference offers the possibility to manually set the path to it.",
 		FileBrowserWidget::DIRECTORY, generalSection));
 
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_FILE_BROWSER(p, "packages_path", "Packages location",
+					"Specifies the location from which the packages should be loaded.",
+					FileBrowserWidget::DIRECTORY, generalSection));
+
 	// Auto-connect
 	m_autoConnectWidget = new MenuSectionCollapseWidget("Session ", MenuCollapseSection::MHCW_NONE,
 							    MenuCollapseSection::MHW_COMPOSITEWIDGET, page);
