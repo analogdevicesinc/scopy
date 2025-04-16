@@ -455,6 +455,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_scan_for_devices", true);
 	p->init("device_menu_item", true);
 	p->init("pkg_menu_columns", 1);
+	p->init("packages_path", scopy::config::pkgFolderPath());
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 	DEBUGTIMER_LOG(benchmark, "Init preferences took:");
@@ -593,6 +594,8 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 	} else if(str == "general_scan_for_devices") {
 		enableScanner();
 	} else if(str == "iio_emu_dir_path") {
+		Q_EMIT p->restartRequired();
+	} else if(str == "packages_path") {
 		Q_EMIT p->restartRequired();
 	}
 }
