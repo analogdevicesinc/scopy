@@ -31,6 +31,7 @@
 #include <QFileSystemModel>
 #include <QLoggingCategory>
 #include <QTreeView>
+#include <pluginbase/preferences.h>
 
 Q_LOGGING_CATEGORY(CAT_PKGMANAGER, "PkgManager")
 
@@ -43,7 +44,7 @@ QString PkgManager::packagesPath_{};
 PkgManager::PkgManager(QObject *parent)
 	: QObject(parent)
 {
-	packagesPath_ = scopy::config::pkgFolderPath();
+	packagesPath_ = Preferences::get("packages_path").toString();
 	createPkgDirectory();
 }
 
@@ -57,7 +58,7 @@ PkgManager *PkgManager::GetInstance()
 	return pinstance_;
 }
 
-void PkgManager::init(const QStringList &paths) { pinstance_->_init(paths); }
+void PkgManager::init() { pinstance_->_init(QStringList() << packagesPath_); }
 
 void PkgManager::_init(const QStringList &paths)
 {
