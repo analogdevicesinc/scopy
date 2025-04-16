@@ -46,7 +46,6 @@ public:
 	static QString fullversion();
 	static QString os();
 	static QString pcSpecs();
-	static QString pkgLocalRepo();
 	static QString pkgFolderPath();
 
 	static QString dump();
