@@ -39,7 +39,7 @@ public:
 
 	static bool validatePkg(QJsonObject &metadata);
 
-	static QString checkPkgPath(const QString &path, const QString &pkgName);
+	static QString checkPkgPath(const QString &path, const QString &pkgId);
 
 private:
 	static QString validateArchiveEntry(const KZip &zip);
