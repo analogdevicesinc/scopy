@@ -39,7 +39,7 @@ public:
 	PkgManager(PkgManager &other) = delete;
 	void operator=(const PkgManager &) = delete;
 	static PkgManager *GetInstance();
-	static void init(const QStringList &paths);
+	static void init();
 	void _init(const QStringList &paths);
 
 	static bool install(const QString &zipPath = "", bool performRestart = true);
