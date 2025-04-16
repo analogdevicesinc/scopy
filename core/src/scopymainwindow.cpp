@@ -76,10 +76,11 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 {
 	DebugTimer benchmark;
 
-	PkgManager::GetInstance();
-	PkgManager::init(QStringList() << scopy::config::pkgFolderPath());
-
 	initPreferences();
+
+	PkgManager::GetInstance();
+	PkgManager::init();
+
 	initStyle();
 	ScopySplashscreen::showMessage("Initializing ui");
 	ui->setupUi(this);
