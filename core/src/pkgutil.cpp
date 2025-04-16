@@ -137,12 +137,12 @@ bool PkgUtil::validatePkg(QJsonObject &metadata)
 	return true;
 }
 
-QString PkgUtil::checkPkgPath(const QString &path, const QString &pkgName)
+QString PkgUtil::checkPkgPath(const QString &path, const QString &pkgId)
 {
 	QDir pkgsDir(path);
 	const QFileInfoList pkgs = pkgsDir.entryInfoList(QDir::Dirs);
 	for(const QFileInfo &p : pkgs) {
-		if(p.fileName().contains(pkgName)) {
+		if(p.fileName().contains(pkgId)) {
 			return p.absoluteFilePath();
 		}
 	}

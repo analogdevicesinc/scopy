@@ -101,16 +101,16 @@ bool PkgManager::_install(const QString &zipPath, bool performRestart)
 	return installed;
 }
 
-bool PkgManager::uninstall(const QString &pkgName, bool performRestart)
+bool PkgManager::uninstall(const QString &pkgId, bool performRestart)
 {
-	return pinstance_->_uninstall(pkgName, performRestart);
+	return pinstance_->_uninstall(pkgId, performRestart);
 }
 
-bool PkgManager::_uninstall(const QString &pkgName, bool performRestart)
+bool PkgManager::_uninstall(const QString &pkgId, bool performRestart)
 {
-	QString pkgPath = PkgUtil::checkPkgPath(packagesPath_, pkgName);
+	QString pkgPath = PkgUtil::checkPkgPath(packagesPath_, pkgId);
 	if(pkgPath.isEmpty()) {
-		qWarning(CAT_PKGMANAGER) << "There is no package:" << pkgName;
+		qWarning(CAT_PKGMANAGER) << "There is no package:" << pkgId;
 		return false;
 	}
 	bool removed = PkgUtil::removePkg(pkgPath);

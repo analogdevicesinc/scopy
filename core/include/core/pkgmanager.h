@@ -44,8 +44,8 @@ public:
 
 	static bool install(const QString &zipPath = "", bool performRestart = true);
 	bool _install(const QString &zipPath = "", bool performRestart = true);
-	static bool uninstall(const QString &pkgName, bool performRestart = true);
-	bool _uninstall(const QString &pkgName = "", bool performRestart = true);
+	static bool uninstall(const QString &pkgId, bool performRestart = true);
+	bool _uninstall(const QString &pkgId = "", bool performRestart = true);
 	static bool update(const QString &pkgName);
 
 	static bool preview(const QString &zipPath = "");
